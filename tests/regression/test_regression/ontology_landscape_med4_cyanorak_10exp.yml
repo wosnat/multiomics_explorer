@@ -2,38 +2,38 @@ case_id: ontology_landscape_med4_cyanorak_10exp
 row_count: 3
 rows:
 - best_effort_share: null
-  genome_coverage: 0.7277
+  genome_coverage: 0.5607
   level: 1
   max_exp_coverage: 0.783
-  max_genes_per_term: 340
+  max_genes_per_term: 213
   median_exp_coverage: 0.7496
   median_genes_per_term: 14.0
   min_exp_coverage: 0.0
   min_genes_per_term: 5
   n_experiments_with_coverage: 9
-  n_genes_at_level: 1438
+  n_genes_at_level: 1108
   n_levels_in_ontology: 3
-  n_terms_with_genes: 69
+  n_terms_with_genes: 67
   ontology_type: cyanorak_role
   q1_genes_per_term: 9.0
   q3_genes_per_term: 23.0
   relevance_rank: 1
 - best_effort_share: null
-  genome_coverage: 0.7596
+  genome_coverage: 0.5663
   level: 0
   max_exp_coverage: 0.8483
-  max_genes_per_term: 419
+  max_genes_per_term: 242
   median_exp_coverage: 0.782
-  median_genes_per_term: 77.0
+  median_genes_per_term: 73.5
   min_exp_coverage: 0.2812
   min_genes_per_term: 16
   n_experiments_with_coverage: 10
-  n_genes_at_level: 1501
+  n_genes_at_level: 1119
   n_levels_in_ontology: 3
-  n_terms_with_genes: 17
+  n_terms_with_genes: 16
   ontology_type: cyanorak_role
-  q1_genes_per_term: 52.0
-  q3_genes_per_term: 130.0
+  q1_genes_per_term: 49.75
+  q3_genes_per_term: 117.25
   relevance_rank: 2
 - best_effort_share: null
   genome_coverage: 0.1695

@@ -847,6 +847,10 @@ class TestGeneOverviewWrapper:
         "by_category": [{"category": "DNA replication", "count": 1},
                         {"category": "Unknown", "count": 1}],
         "by_annotation_type": [{"annotation_type": "go_bp", "count": 1}],
+        "by_annotation_state": [
+            {"annotation_state": "informative_multi", "count": 1},
+            {"annotation_state": "no_evidence", "count": 1},
+        ],
         "has_expression": 1,
         "has_significant_expression": 1,
         "has_orthologs": 2,
@@ -859,7 +863,10 @@ class TestGeneOverviewWrapper:
             {"locus_tag": "PMM1428", "gene_name": "test", "product": "test product",
              "gene_category": "DNA replication", "annotation_quality": 3,
              "organism_name": "Prochlorococcus MED4",
-             "annotation_types": ["go_bp"], "expression_edge_count": 36,
+             "annotation_types": ["go_bp"],
+             "annotation_state": "informative_multi",
+             "informative_annotation_types": ["go_mf", "pfam"],
+             "expression_edge_count": 36,
              "significant_up_count": 3, "significant_down_count": 2, "closest_ortholog_group_size": 9,
              "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
              "cluster_membership_count": 2, "cluster_types": ["condition_comparison"],
@@ -867,7 +874,10 @@ class TestGeneOverviewWrapper:
             {"locus_tag": "EZ55_00275", "gene_name": None, "product": "hypothetical",
              "gene_category": "Unknown", "annotation_quality": 0,
              "organism_name": "Alteromonas EZ55",
-             "annotation_types": [], "expression_edge_count": 0,
+             "annotation_types": [],
+             "annotation_state": "no_evidence",
+             "informative_annotation_types": [],
+             "expression_edge_count": 0,
              "significant_up_count": 0, "significant_down_count": 0, "closest_ortholog_group_size": 1,
              "closest_ortholog_genera": [],
              "cluster_membership_count": 0, "cluster_types": [],
@@ -1333,8 +1343,10 @@ class TestSearchOntologyWrapper:
         "returned": 2,
         "truncated": False,
         "results": [
-            {"id": "go:0006260", "name": "DNA replication", "score": 5.0, "level": 5},
-            {"id": "go:0006261", "name": "DNA-templated DNA replication", "score": 3.2, "level": 6},
+            {"id": "go:0006260", "name": "DNA replication", "score": 5.0, "level": 5,
+             "is_informative": True},
+            {"id": "go:0006261", "name": "DNA-templated DNA replication", "score": 3.2, "level": 6,
+             "is_informative": True},
         ],
     }
 
@@ -1475,7 +1487,8 @@ class TestGenesByOntologyWrapper:
         ],
         "top_terms": [
             {"term_id": "go:0050896",
-             "term_name": "response to stimulus", "count": 152}
+             "term_name": "response to stimulus", "count": 152,
+             "is_informative": True}
         ],
         "n_best_effort_terms": 1,
         "not_found": [],
@@ -1489,11 +1502,13 @@ class TestGenesByOntologyWrapper:
             {"locus_tag": "PMM0001", "gene_name": "dnaN",
              "product": "DNA pol", "gene_category": "Replication",
              "term_id": "go:0050896",
-             "term_name": "response to stimulus", "level": 1},
+             "term_name": "response to stimulus", "level": 1,
+             "is_informative": True},
             {"locus_tag": "PMM0002", "gene_name": None,
              "product": None, "gene_category": None,
              "term_id": "go:0050896",
-             "term_name": "response to stimulus", "level": 1},
+             "term_name": "response to stimulus", "level": 1,
+             "is_informative": True},
         ],
     }
 
@@ -1586,6 +1601,7 @@ class TestGenesByOntologyWrapper:
                     "locus_tag": "PMM0001", "gene_name": None, "product": None,
                     "gene_category": None, "term_id": "go:0098754",
                     "term_name": "detoxification", "level": 1,
+                    "is_informative": True,
                     "level_is_best_effort": True,  # sparse — only set when True
                 },
                 {
@@ -1593,6 +1609,7 @@ class TestGenesByOntologyWrapper:
                     "locus_tag": "PMM0002", "gene_name": None, "product": None,
                     "gene_category": None, "term_id": "go:0098754",
                     "term_name": "detoxification", "level": 1,
+                    "is_informative": True,
                 },
             ],
         }
@@ -1702,9 +1719,11 @@ class TestGeneOntologyTermsWrapper:
         "no_terms": [],
         "results": [
             {"locus_tag": "PMM0001", "term_id": "go:0006260",
-             "term_name": "DNA replication", "level": 5},
+             "term_name": "DNA replication", "level": 5,
+             "is_informative": True},
             {"locus_tag": "PMM0001", "term_id": "go:0006271",
-             "term_name": "DNA strand elongation", "level": 6},
+             "term_name": "DNA strand elongation", "level": 6,
+             "is_informative": True},
         ],
     }
 
@@ -6167,3 +6186,295 @@ class TestExpectedToolsUnchangedForTcdbCazy:
             "tcdb/cazy adds NO new tools (it's a Mode-B ontology surface "
             "refresh); MBG legitimately adds one."
         )
+
+
+# ===========================================================================
+# Cluster A — F1 informativeness surface (frozen spec 2026-05-04)
+# ===========================================================================
+# MCP wrapper layer: Pydantic models gain new fields, wrappers accept new
+# `informative_only` param and forward it to the api/ layer.
+
+
+class TestGeneOverviewF1SurfaceWrapper:
+    """gene_overview Pydantic models add annotation_state +
+    informative_annotation_types + by_annotation_state."""
+
+    @pytest.mark.asyncio
+    async def test_response_includes_by_annotation_state(self, tool_fns, mock_ctx):
+        api_return = {
+            "total_matching": 1,
+            "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
+            "by_category": [{"category": "DNA replication", "count": 1}],
+            "by_annotation_type": [{"annotation_type": "go_mf", "count": 1}],
+            "by_annotation_state": [
+                {"annotation_state": "informative_multi", "count": 1},
+            ],
+            "has_expression": 0,
+            "has_significant_expression": 0,
+            "has_orthologs": 1,
+            "has_clusters": 0,
+            "has_derived_metrics": 0,
+            "returned": 1,
+            "truncated": False,
+            "not_found": [],
+            "results": [{
+                "locus_tag": "PMM1428", "gene_name": "test",
+                "product": "DNA polymerase III subunit beta",
+                "gene_category": "DNA replication", "annotation_quality": 3,
+                "organism_name": "Prochlorococcus MED4",
+                "annotation_types": ["go_mf", "pfam"],
+                "expression_edge_count": 0,
+                "significant_up_count": 0, "significant_down_count": 0,
+                "closest_ortholog_group_size": 9,
+                "closest_ortholog_genera": ["Prochlorococcus"],
+                "cluster_membership_count": 0, "cluster_types": [],
+                "derived_metric_count": 0, "derived_metric_value_kinds": [],
+                "annotation_state": "informative_multi",
+                "informative_annotation_types": ["go_mf", "pfam"],
+            }],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=api_return,
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["PMM1428"],
+            )
+        # New envelope rollup
+        assert hasattr(result, "by_annotation_state")
+        assert len(result.by_annotation_state) == 1
+        # New per-row fields
+        r = result.results[0]
+        assert r.annotation_state == "informative_multi"
+        assert r.informative_annotation_types == ["go_mf", "pfam"]
+
+
+class TestGeneOntologyTermsF1SurfaceWrapper:
+    """gene_ontology_terms wrapper accepts informative_only;
+    response model has is_informative."""
+
+    _SAMPLE_API_RETURN = {
+        "total_matching": 1,
+        "total_genes": 1,
+        "total_terms": 1,
+        "by_ontology": [{"ontology_type": "go_bp", "term_count": 1, "gene_count": 1}],
+        "by_term": [{"term_id": "go:0006260", "term_name": "DNA replication",
+                     "level": 5, "ontology_type": "go_bp", "count": 1}],
+        "terms_per_gene_min": 1,
+        "terms_per_gene_max": 1,
+        "terms_per_gene_median": 1.0,
+        "returned": 1,
+        "truncated": False,
+        "not_found": [],
+        "no_terms": [],
+        "results": [
+            {"locus_tag": "PMM0001", "term_id": "go:0006260",
+             "term_name": "DNA replication", "level": 5,
+             "is_informative": True},
+        ],
+    }
+
+    @pytest.mark.asyncio
+    async def test_informative_only_param_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["gene_ontology_terms"](
+                mock_ctx, locus_tags=["PMM0001"], organism="MED4",
+                informative_only=True,
+            )
+        assert mock_api.call_args.kwargs["informative_only"] is True
+
+    @pytest.mark.asyncio
+    async def test_informative_only_default_false(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["gene_ontology_terms"](
+                mock_ctx, locus_tags=["PMM0001"], organism="MED4",
+            )
+        # Default must be False for opt-in.
+        assert mock_api.call_args.kwargs.get("informative_only") is False
+
+    @pytest.mark.asyncio
+    async def test_is_informative_in_result_row(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["gene_ontology_terms"](
+                mock_ctx, locus_tags=["PMM0001"], organism="MED4",
+            )
+        assert result.results[0].is_informative is True
+
+
+class TestSearchOntologyF1SurfaceWrapper:
+    """search_ontology wrapper accepts informative_only; result has is_informative."""
+
+    _SAMPLE_API_RETURN = {
+        "total_entries": 847,
+        "total_matching": 1,
+        "score_max": 5.0,
+        "score_median": 5.0,
+        "returned": 1,
+        "truncated": False,
+        "results": [
+            {"id": "go:0006260", "name": "DNA replication", "score": 5.0,
+             "level": 5, "is_informative": True},
+        ],
+    }
+
+    @pytest.mark.asyncio
+    async def test_informative_only_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["search_ontology"](
+                mock_ctx, search_text="replication", ontology="go_bp",
+                informative_only=True,
+            )
+        assert mock_api.call_args.kwargs["informative_only"] is True
+
+    @pytest.mark.asyncio
+    async def test_informative_only_default_false(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["search_ontology"](
+                mock_ctx, search_text="replication", ontology="go_bp",
+            )
+        assert mock_api.call_args.kwargs.get("informative_only") is False
+
+    @pytest.mark.asyncio
+    async def test_is_informative_in_result_row(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, search_text="replication", ontology="go_bp",
+            )
+        assert result.results[0].is_informative is True
+
+
+class TestGenesByOntologyF1SurfaceWrapper:
+    """genes_by_ontology wrapper accepts informative_only; detail row has is_informative."""
+
+    _SAMPLE_API_RETURN = {
+        "ontology": "go_bp",
+        "organism_name": "Prochlorococcus MED4",
+        "total_matching": 7,
+        "total_genes": 7,
+        "total_terms": 1,
+        "total_categories": 1,
+        "genes_per_term_min": 7, "genes_per_term_median": 7.0,
+        "genes_per_term_max": 7,
+        "terms_per_gene_min": 1, "terms_per_gene_median": 1.0,
+        "terms_per_gene_max": 1,
+        "by_category": [{"category": "Stress", "count": 7}],
+        "by_level": [{"level": 1, "n_terms": 1, "n_genes": 7, "row_count": 7}],
+        "top_terms": [{"term_id": "go:0050896",
+                       "term_name": "response to stimulus", "count": 7,
+                       "is_informative": True}],
+        "n_best_effort_terms": 0,
+        "not_found": [], "wrong_ontology": [],
+        "wrong_level": [], "filtered_out": [],
+        "returned": 1, "offset": 0, "truncated": False,
+        "results": [
+            {"locus_tag": "PMM0001", "gene_name": "x", "product": "y",
+             "gene_category": "Stress", "term_id": "go:0050896",
+             "term_name": "response to stimulus", "level": 1,
+             "is_informative": True},
+        ],
+    }
+
+    @pytest.mark.asyncio
+    async def test_informative_only_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_ontology",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["genes_by_ontology"](
+                mock_ctx, ontology="go_bp", organism="MED4", level=1,
+                informative_only=True,
+            )
+        assert mock_api.call_args.kwargs["informative_only"] is True
+
+    @pytest.mark.asyncio
+    async def test_informative_only_default_false(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_ontology",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["genes_by_ontology"](
+                mock_ctx, ontology="go_bp", organism="MED4", level=1,
+            )
+        assert mock_api.call_args.kwargs.get("informative_only") is False
+
+    @pytest.mark.asyncio
+    async def test_is_informative_in_result_row(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_ontology",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["genes_by_ontology"](
+                mock_ctx, ontology="go_bp", organism="MED4", level=1,
+            )
+        assert result.results[0].is_informative is True
+
+
+class TestOntologyLandscapeF1SurfaceWrapper:
+    """ontology_landscape wrapper accepts informative_only with default True."""
+
+    _SAMPLE_API_RETURN = {
+        "organism_name": "Prochlorococcus MED4",
+        "organism_gene_count": 1976,
+        "n_ontologies": 1,
+        "by_ontology": {
+            "cyanorak_role": {
+                "best_level": 1, "best_genome_coverage": 0.75,
+                "best_relevance_rank": 1, "n_levels": 3,
+            },
+        },
+        "not_found": [],
+        "not_matched": [],
+        "results": [{
+            "ontology_type": "cyanorak_role", "level": 1,
+            "relevance_rank": 1,
+            "n_terms_with_genes": 110, "n_genes_at_level": 1491,
+            "genome_coverage": 0.755,
+            "min_genes_per_term": 5, "q1_genes_per_term": 9.0,
+            "median_genes_per_term": 14.0, "q3_genes_per_term": 23.0,
+            "max_genes_per_term": 340,
+            "n_levels_in_ontology": 3,
+            "best_effort_share": None,
+        }],
+        "returned": 1, "total_matching": 3, "truncated": True, "offset": 0,
+    }
+
+    @pytest.mark.asyncio
+    async def test_informative_only_default_true(self, tool_fns, mock_ctx):
+        """Spec decision 3: default True for ontology_landscape."""
+        with patch(
+            "multiomics_explorer.api.functions.ontology_landscape",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["ontology_landscape"](
+                mock_ctx, organism="MED4",
+            )
+        assert mock_api.call_args.kwargs.get("informative_only") is True
+
+    @pytest.mark.asyncio
+    async def test_informative_only_opt_out_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.ontology_landscape",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["ontology_landscape"](
+                mock_ctx, organism="MED4", informative_only=False,
+            )
+        assert mock_api.call_args.kwargs["informative_only"] is False

@@ -405,11 +405,13 @@ def build_gene_overview_summary(
         "     size(found) AS total_matching,\n"
         "     [g IN found | g.organism_name] AS orgs,\n"
         "     [g IN found | g.gene_category] AS cats,\n"
+        "     [g IN found | g.annotation_state] AS states,\n"
         "     apoc.coll.flatten([g IN found | g.annotation_types]) AS all_atypes\n"
         "RETURN total_matching,\n"
         "       apoc.coll.frequencies(orgs) AS by_organism,\n"
         "       apoc.coll.frequencies(cats) AS by_category,\n"
         "       apoc.coll.frequencies(all_atypes) AS by_annotation_type,\n"
+        "       apoc.coll.frequencies(states) AS by_annotation_state,\n"
         "       size([g IN found WHERE g.expression_edge_count > 0]) AS has_expression,\n"
         "       size([g IN found WHERE (g.significant_up_count + g.significant_down_count) > 0]) AS has_significant_expression,\n"
         "       size([g IN found WHERE g.closest_ortholog_group_size > 0]) AS has_orthologs,\n"
@@ -473,6 +475,8 @@ def build_gene_overview(
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.gene_category AS gene_category,\n"
         "       g.annotation_quality AS annotation_quality,\n"
+        "       g.annotation_state AS annotation_state,\n"
+        "       coalesce(g.informative_annotation_types, []) AS informative_annotation_types,\n"
         "       g.organism_name AS organism_name,\n"
         "       g.annotation_types AS annotation_types,\n"
         "       g.expression_edge_count AS expression_edge_count,\n"
@@ -1881,6 +1885,7 @@ def build_search_ontology_summary(
     *, ontology: str, search_text: str,
     level: int | None = None,
     tree: str | None = None,
+    informative_only: bool = False,
 ) -> tuple[str, dict]:
     """Build summary Cypher for search_ontology.
 
@@ -1904,6 +1909,8 @@ def build_search_ontology_summary(
     if tree is not None:
         where_parts.append("t.tree = $tree")
         params["tree"] = tree
+    if informative_only:
+        where_parts.append("coalesce(t.is_uninformative, '') <> 'true'")
     where_clause = "  WHERE " + " AND ".join(where_parts) + "\n" if where_parts else ""
 
     if parent_index:
@@ -1948,10 +1955,11 @@ def build_search_ontology(
     offset: int = 0,
     level: int | None = None,
     tree: str | None = None,
+    informative_only: bool = False,
 ) -> tuple[str, dict]:
     """Build Cypher for search_ontology.
 
-    RETURN keys: id, name, score, level, tree, tree_code.
+    RETURN keys: id, name, score, level, tree, tree_code, is_informative.
     """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
@@ -1979,6 +1987,8 @@ def build_search_ontology(
     if tree is not None:
         where_parts.append("t.tree = $tree")
         params["tree"] = tree
+    if informative_only:
+        where_parts.append("coalesce(t.is_uninformative, '') <> 'true'")
     where_clause = "  WHERE " + " AND ".join(where_parts) + "\n" if where_parts else ""
 
     if parent_index:
@@ -1989,15 +1999,17 @@ def build_search_ontology(
             "  YIELD node AS t, score\n"
             + where_clause
             + "  RETURN t.id AS id, t.name AS name, score,\n"
-            "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code\n"
+            "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
+            "         coalesce(t.is_uninformative, '') <> 'true' AS is_informative\n"
             "  UNION ALL\n"
             f"  CALL db.index.fulltext.queryNodes('{parent_index}', $search_text)\n"
             "  YIELD node AS t, score\n"
             + where_clause
             + "  RETURN t.id AS id, t.name AS name, score,\n"
-            "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code\n"
+            "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
+            "         coalesce(t.is_uninformative, '') <> 'true' AS is_informative\n"
             "}\n"
-            "RETURN id, name, score, level, tree, tree_code\n"
+            "RETURN id, name, score, level, tree, tree_code, is_informative\n"
             "ORDER BY score DESC, id" + skip_clause + limit_clause
         )
     else:
@@ -2006,7 +2018,8 @@ def build_search_ontology(
             "YIELD node AS t, score\n"
             + where_clause
             + "RETURN t.id AS id, t.name AS name, score,\n"
-            "       t.level AS level, t.tree AS tree, t.tree_code AS tree_code\n"
+            "       t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
+            "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative\n"
             "ORDER BY score DESC, id" + skip_clause + limit_clause
         )
     return cypher, params
@@ -2081,12 +2094,18 @@ def _genes_by_ontology_match_stage(
     term_ids: list[str] | None,
     organism: str,
     tree: str | None = None,
+    informative_only: bool = False,
 ) -> tuple[str, dict]:
     """Shared MATCH + size-filter-WITH for detail/per_term/per_gene builders.
 
     Returns the Cypher fragment through `WITH t, collect(DISTINCT g) AS term_genes`
     with the $min_gene_set_size / $max_gene_set_size filter applied,
     plus the common params dict (org, term_ids/level as applicable).
+
+    When `informative_only=True`, an extra term-level filter
+    `AND coalesce(t.is_uninformative, '') <> 'true'` is applied BEFORE the
+    size collapse so per-term gene counts reflect informative terms only.
+
     Consumers are responsible for adding $min_gene_set_size / $max_gene_set_size
     into params, and for appending their own UNWIND/RETURN tail.
     """
@@ -2157,6 +2176,13 @@ def _genes_by_ontology_match_stage(
             # Flat ontology: t = leaf; no walk; level filter on t directly.
             cypher_head = f"{bind}\n{level_clause}\n"
 
+    # Term-level informative filter: must apply BEFORE size collapse so
+    # per-term gene counts reflect informative-only terms.
+    informative_filter = (
+        "WITH t, g WHERE coalesce(t.is_uninformative, '') <> 'true'\n"
+        if informative_only else ""
+    )
+
     # Size filter (common to all modes). Caller must add
     # $min_gene_set_size and $max_gene_set_size to params.
     size_filter = (
@@ -2165,7 +2191,7 @@ def _genes_by_ontology_match_stage(
         "  AND ($max_gene_set_size IS NULL OR "
         "size(term_genes) <= $max_gene_set_size)"
     )
-    return f"{cypher_head}\n{size_filter}", params
+    return f"{cypher_head}\n{informative_filter}{size_filter}", params
 
 
 def build_genes_by_ontology_detail(
@@ -2180,6 +2206,7 @@ def build_genes_by_ontology_detail(
     limit: int | None = None,
     offset: int = 0,
     tree: str | None = None,
+    informative_only: bool = False,
 ) -> tuple[str, dict]:
     """Build (gene × term) detail query. Dispatches on (level, term_ids).
 
@@ -2190,7 +2217,7 @@ def build_genes_by_ontology_detail(
     Mode 3: level + term_ids — walk UP, filter on level AND input_tids.
 
     RETURN keys (compact): locus_tag, gene_name, product, gene_category,
-    term_id, term_name, level.
+    term_id, term_name, level, is_informative.
     RETURN keys (verbose): adds function_description, level_is_best_effort.
     """
     # Validation stays in the builder (helper would also need it, but the
@@ -2206,7 +2233,7 @@ def build_genes_by_ontology_detail(
 
     head, params = _genes_by_ontology_match_stage(
         ontology=ontology, level=level, term_ids=term_ids, organism=organism,
-        tree=tree,
+        tree=tree, informative_only=informative_only,
     )
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
@@ -2221,7 +2248,8 @@ def build_genes_by_ontology_detail(
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.gene_category AS gene_category,\n"
         "       t.id AS term_id, t.name AS term_name, t.level AS level,\n"
-        "       t.tree AS tree, t.tree_code AS tree_code"
+        "       t.tree AS tree, t.tree_code AS tree_code,\n"
+        "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
         f"{verbose_cols}\n"
         "ORDER BY t.id, g.locus_tag"
     )
@@ -2248,11 +2276,12 @@ def build_genes_by_ontology_per_term(
     *,
     ontology: str,
     organism: str,
-    level: int | None,
-    term_ids: list[str] | None,
-    min_gene_set_size: int,
-    max_gene_set_size: int | None,
+    level: int | None = None,
+    term_ids: list[str] | None = None,
+    min_gene_set_size: int = 5,
+    max_gene_set_size: int | None = 500,
     tree: str | None = None,
+    informative_only: bool = False,
 ) -> tuple[str, dict]:
     """Per-term aggregate. One row per surviving term.
 
@@ -2264,11 +2293,12 @@ def build_genes_by_ontology_per_term(
     Mode 2: level only — walk UP, filter on level.
     Mode 3: level + term_ids — walk UP, filter on level AND input_tids.
 
-    RETURN keys: term_id, term_name, level, best_effort, n_genes, cat_freqs.
+    RETURN keys: term_id, term_name, level, best_effort, n_genes, cat_freqs,
+    is_informative.
     """
     head, params = _genes_by_ontology_match_stage(
         ontology=ontology, level=level, term_ids=term_ids, organism=organism,
-        tree=tree,
+        tree=tree, informative_only=informative_only,
     )
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
@@ -2282,7 +2312,8 @@ def build_genes_by_ontology_per_term(
         "       t.level_is_best_effort IS NOT NULL AS best_effort,\n"
         "       size(gene_rows) AS n_genes,\n"
         "       apoc.coll.frequencies("
-        "[r IN gene_rows | r.cat]) AS cat_freqs\n"
+        "[r IN gene_rows | r.cat]) AS cat_freqs,\n"
+        "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative\n"
         "ORDER BY t.id"
     )
     return f"{head}\n{tail}", params
@@ -2292,21 +2323,26 @@ def build_genes_by_ontology_per_gene(
     *,
     ontology: str,
     organism: str,
-    level: int | None,
-    term_ids: list[str] | None,
-    min_gene_set_size: int,
-    max_gene_set_size: int | None,
+    level: int | None = None,
+    term_ids: list[str] | None = None,
+    min_gene_set_size: int = 5,
+    max_gene_set_size: int | None = 500,
     tree: str | None = None,
+    informative_only: bool = False,
 ) -> tuple[str, dict]:
     """Per-gene aggregate. One row per surviving gene.
 
     RETURN keys: locus_tag, gene_category, n_terms, levels_hit.
     `levels_hit` is the distinct set of term levels each gene was reached
     via — used by L2 to compute by_level.n_genes via set-union.
+
+    Per-gene rows do not carry per-term flags; `informative_only` threads
+    through the helper so only informative terms count toward each gene's
+    aggregate, but `is_informative` is NOT a row column here.
     """
     head, params = _genes_by_ontology_match_stage(
         ontology=ontology, level=level, term_ids=term_ids, organism=organism,
-        tree=tree,
+        tree=tree, informative_only=informative_only,
     )
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
@@ -2361,6 +2397,7 @@ def build_gene_ontology_terms_summary(
     mode: str = "leaf",
     level: int | None = None,
     tree: str | None = None,
+    informative_only: bool = False,
 ) -> tuple[str, dict]:
     """Build summary for gene_ontology_terms for ONE ontology.
 
@@ -2435,10 +2472,15 @@ def build_gene_ontology_terms_summary(
         if tree is not None:
             tree_filter = "AND t.tree = $tree\n"
             params["tree"] = tree
+        informative_filter = (
+            "AND coalesce(t.is_uninformative, '') <> 'true'\n"
+            if informative_only else ""
+        )
         cypher = (
             f"{bind}"
             f"{walk}"
             f"{tree_filter}"
+            f"{informative_filter}"
             "WITH g.locus_tag AS lt, collect(DISTINCT {id: t.id, name: t.name, level: t.level, tree: t.tree, tree_code: t.tree_code}) AS terms\n"
             "WITH collect({lt: lt, cnt: size(terms), terms: terms}) AS genes\n"
             "WITH genes,\n"
@@ -2482,12 +2524,17 @@ def build_gene_ontology_terms_summary(
         if tree is not None:
             tree_filter = "AND t.tree = $tree\n"
             params["tree"] = tree
+        informative_filter = (
+            "AND coalesce(t.is_uninformative, '') <> 'true'\n"
+            if informative_only else ""
+        )
 
         cypher = (
             f"{match_line}"
             f"{leaf_filter}"
             f"{level_filter}"
             f"{tree_filter}"
+            f"{informative_filter}"
             "WITH g.locus_tag AS lt, collect({id: t.id, name: t.name, level: t.level, tree: t.tree, tree_code: t.tree_code}) AS terms\n"
             "WITH collect({lt: lt, cnt: size(terms), terms: terms}) AS genes\n"
             "WITH genes,\n"
@@ -2516,10 +2563,12 @@ def build_gene_ontology_terms(
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
+    informative_only: bool = False,
 ) -> tuple[str, dict]:
     """Build detail Cypher for gene_ontology_terms for ONE ontology.
 
-    RETURN keys (compact): locus_tag, term_id, term_name, level, tree, tree_code.
+    RETURN keys (compact): locus_tag, term_id, term_name, level, tree,
+    tree_code, is_informative.
     RETURN keys (verbose): adds organism_name.
 
     Called by api/ — which adds ontology_type column and merges
@@ -2605,12 +2654,18 @@ def build_gene_ontology_terms(
         if tree is not None:
             tree_filter = "AND t.tree = $tree\n"
             params["tree"] = tree
+        informative_filter = (
+            "AND coalesce(t.is_uninformative, '') <> 'true'\n"
+            if informative_only else ""
+        )
         cypher = (
             f"{bind}"
             f"{walk}"
             f"{tree_filter}"
+            f"{informative_filter}"
             "RETURN DISTINCT g.locus_tag AS locus_tag, t.id AS term_id,\n"
-            f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code{verbose_cols}\n"
+            f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
+            f"       coalesce(t.is_uninformative, '') <> 'true' AS is_informative{verbose_cols}\n"
             f"ORDER BY g.locus_tag, t.id{skip_clause}{limit_clause}"
         )
     else:
@@ -2642,14 +2697,20 @@ def build_gene_ontology_terms(
         if tree is not None:
             tree_filter = "AND t.tree = $tree\n"
             params["tree"] = tree
+        informative_filter = (
+            "AND coalesce(t.is_uninformative, '') <> 'true'\n"
+            if informative_only else ""
+        )
 
         cypher = (
             f"{match_line}"
             f"{leaf_filter}"
             f"{level_filter}"
             f"{tree_filter}"
+            f"{informative_filter}"
             "RETURN g.locus_tag AS locus_tag, t.id AS term_id,\n"
-            f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code{verbose_cols}\n"
+            f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
+            f"       coalesce(t.is_uninformative, '') <> 'true' AS is_informative{verbose_cols}\n"
             f"ORDER BY g.locus_tag, t.id{skip_clause}{limit_clause}"
         )
     return cypher, params
@@ -4657,6 +4718,7 @@ def build_ontology_landscape(
     min_gene_set_size: int = 5,
     max_gene_set_size: int = 500,
     tree: str | None = None,
+    informative_only: bool = True,
 ) -> tuple[str, dict]:
     """Per-(ontology, level) aggregated landscape stats for one ontology.
 
@@ -4692,6 +4754,13 @@ def build_ontology_landscape(
     if tree is not None:
         tree_filter = "WHERE t.tree = $tree\n"
 
+    # Informative-only filter (default-on per spec § decision 3 for
+    # ontology_landscape). Filters terms by per-term flag in the level-rollup.
+    informative_filter = (
+        "WITH t, g WHERE coalesce(t.is_uninformative, '') <> 'true'\n"
+        if informative_only else ""
+    )
+
     # Verbose clauses — Python string composition so compute is
     # short-circuited when verbose=False (see scoping D4).
     # pre_sort is an intermediate WITH..ORDER BY to pre-sort rows by gene count
@@ -4712,6 +4781,7 @@ def build_ontology_landscape(
         f"{frag['bind_up']}\n"
         f"{walk}"
         f"{tree_filter}"
+        f"{informative_filter}"
         "WITH t, count(DISTINCT g) AS n_g_per_term, "
         "collect(DISTINCT g) AS term_genes\n"
         "WHERE n_g_per_term >= $min_gene_set_size "

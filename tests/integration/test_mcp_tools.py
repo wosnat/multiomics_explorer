@@ -1155,8 +1155,11 @@ class TestGeneOverview:
 class TestOntologyLandscapeIntegration:
     def test_med4_all_ontologies_cyanorak_l1_rank1_among_hierarchical(self, conn):
         from multiomics_explorer.api.functions import ontology_landscape
+        # informative_only=False preserves the pre-F1-surface rank ordering
+        # (cyanorak_role L1 has 5 uninformative-flagged terms / ~16.5% of
+        # gene-pairs that the default-on filter would drop).
         result = ontology_landscape(
-            organism="MED4", limit=None, conn=conn,
+            organism="MED4", limit=None, informative_only=False, conn=conn,
         )
         hierarchical = [
             r for r in result["results"]

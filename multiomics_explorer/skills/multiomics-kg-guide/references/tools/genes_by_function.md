@@ -18,7 +18,7 @@ For gene details, use gene_overview.
 | search_text | string | — | Free-text query (Lucene syntax supported). E.g. 'photosystem', 'nitrogen AND transport', 'dnaN~'. |
 | organism | string \| None | None | Filter by organism (case-insensitive substring). E.g. 'MED4', 'Prochlorococcus MED4'. Use list_organisms to see valid values. |
 | category | string \| None | None | Filter by gene_category. E.g. 'Photosynthesis', 'Transport'. Use list_filter_values to see valid values. |
-| min_quality | int | 0 | Minimum annotation_quality (0-3). 0=hypothetical, 1=has description, 2=named product, 3=well-annotated. Use 2 to skip hypothetical proteins. |
+| min_quality | int | 0 | Minimum annotation_quality (0..3 numeric encoding of annotation_state): 0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. Use 2 to require >=1 informative annotation source. Note: this field was redefined in May 2026 KG release. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include function_description and gene_summary. |
 | limit | int | 5 | Max results. |
@@ -114,6 +114,8 @@ search_ontology → genes_by_ontology (ontology-first route, alternative to gene
 ```
 
 ## Common mistakes
+
+- annotation_quality is a 0..3 numeric encoding of annotation_state (informative-evidence count). 0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. Redefined in May 2026 KG release — old semantics conflated product-name quality. Existing min_quality filters silently shifted meaning.
 
 ```mistake
 genes_by_function(search_text='GO:0015977')

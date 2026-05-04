@@ -45,9 +45,9 @@ The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for 
 |---|---|
 | `kg_schema` | Graph schema with node labels, relationship types, property names |
 | `resolve_gene` | Resolve a gene identifier (case-insensitive) to matching graph nodes. Returns flat list sorted by organism. |
-| `genes_by_function` | Free-text search across gene functional annotations (Lucene syntax). Rich summary fields (by_organism, by_category, score stats). Supports category and organism filtering. |
-| `gene_details` | All Gene node properties via g{.*} — use gene_overview for the common case |
-| `gene_overview` | Batch gene routing: identity + data availability signals (annotation_types, expression counts, ortholog summary, cluster membership). Accepts locus_tags list. Rich summary fields (by_organism, by_category, by_annotation_type, expression/ortholog/cluster availability counts). Per-row `derived_metric_count` + `derived_metric_value_kinds` (route to drill-downs); verbose adds per-kind counts + `compartments_observed`. Envelope `has_derived_metrics`. When per-row chemistry counts (`reaction_count`, `metabolite_count`, `transporter_count`) are non-zero, drill in via `genes_by_metabolite(metabolite_ids=[...], organism=...)` (metabolite-anchored) or the upcoming gene→metabolite tool (gene-anchored). |
+| `genes_by_function` | Free-text search across gene functional annotations (Lucene syntax). Rich summary fields (by_organism, by_category, score stats). Supports category and organism filtering. `[AQ]` |
+| `gene_details` | All Gene node properties via g{.*} — use gene_overview for the common case. `[AQ]` |
+| `gene_overview` | Batch gene routing: identity + data availability signals (annotation_types, expression counts, ortholog summary, cluster membership). Accepts locus_tags list. Rich summary fields (by_organism, by_category, by_annotation_type, expression/ortholog/cluster availability counts). Per-row `derived_metric_count` + `derived_metric_value_kinds` (route to drill-downs); verbose adds per-kind counts + `compartments_observed`. Envelope `has_derived_metrics`. When per-row chemistry counts (`reaction_count`, `metabolite_count`, `transporter_count`) are non-zero, drill in via `genes_by_metabolite(metabolite_ids=[...], organism=...)` (metabolite-anchored) or the upcoming gene→metabolite tool (gene-anchored). `[AQ]` |
 | `gene_homologs` | Batch: gene locus_tags → ortholog group memberships. Flat long format (one row per gene × group). Filterable by source/level/rank. |
 | `list_filter_values` | List valid values for categorical filters (gene categories, BRITE trees, DM discovery). Filter types: `gene_category`, `brite_tree`, `metric_type`, `value_kind`, `compartment`. |
 | `list_metabolites` | Discover/filter metabolites in the chemistry layer (incl. TCDB transport substrates). Filterable by elements, mass, organism_names, pathway_ids, evidence_sources, plus xref ID batch input. Rich envelope (top_organisms, top_pathways, by_evidence_source, xref_coverage, mass_stats) and per-row routing (gene_count, transporter_count → drill-down tools). |
@@ -75,6 +75,8 @@ The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for 
 | `genes_in_cluster` | Cluster IDs or analysis_id → member genes. Drill-down tool. Accepts cluster_ids list OR analysis_id (mutually exclusive). Summary with top_categories, genes_per_cluster stats, analysis_name. Verbose includes gene-level and cluster-level descriptions with disambiguated names. |
 | `pathway_enrichment` | Pathway ORA (Fisher + BH) from DE results. Single-organism. `direction='both'` runs up and down per experiment×timepoint. Background modes: `table_scope` (default), `organism`, or explicit locus_tag list. Filterable by `tree` (BRITE only). Long-format compareCluster-compatible rows + envelope with validation buckets. See `docs://analysis/enrichment`. |
 | `run_cypher` | Raw Cypher escape hatch (read-only). Write operations blocked; syntax and schema validated via CyVer before execution. Returns `{returned, truncated, warnings, results}`. |
+
+`[AQ]` `annotation_quality` was redefined in the May 2026 KG release as a 0..3 numeric encoding of `Gene.annotation_state` (informative-evidence count). Existing `min_quality` filters silently shifted meaning.
 
 ### Claude Code Configuration
 

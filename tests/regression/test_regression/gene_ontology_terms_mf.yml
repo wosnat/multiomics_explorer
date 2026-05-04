@@ -1,25 +1,29 @@
 case_id: gene_ontology_terms_mf
 row_count: 4
 rows:
-- level: 5
+- is_informative: true
+  level: 5
   locus_tag: MIT1002_03493
   term_id: go:0000987
   term_name: cis-regulatory region sequence-specific DNA binding
   tree: null
   tree_code: null
-- level: 3
+- is_informative: true
+  level: 3
   locus_tag: MIT1002_03493
   term_id: go:0034618
   term_name: arginine binding
   tree: null
   tree_code: null
-- level: 3
+- is_informative: true
+  level: 3
   locus_tag: MIT1002_03493
   term_id: go:0042802
   term_name: identical protein binding
   tree: null
   tree_code: null
-- level: 3
+- is_informative: true
+  level: 3
   locus_tag: MIT1002_03493
   term_id: go:1901363
   term_name: heterocyclic compound binding

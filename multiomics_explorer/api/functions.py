@@ -361,6 +361,9 @@ def gene_overview(
         "by_annotation_type": _rename_freq(
             raw_summary["by_annotation_type"], "annotation_type",
         ),
+        "by_annotation_state": _rename_freq(
+            raw_summary.get("by_annotation_state", []), "annotation_state",
+        ),
         "has_expression": raw_summary["has_expression"],
         "has_significant_expression": raw_summary["has_significant_expression"],
         "has_orthologs": raw_summary["has_orthologs"],
@@ -1148,6 +1151,7 @@ def search_ontology(
     offset: int = 0,
     level: int | None = None,
     tree: str | None = None,
+    informative_only: bool = False,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -1175,6 +1179,7 @@ def search_ontology(
         sum_cypher, sum_params = build_search_ontology_summary(
             ontology=ontology, search_text=effective_text,
             level=level, tree=tree,
+            informative_only=informative_only,
         )
         raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
     except Neo4jClientError:
@@ -1183,6 +1188,7 @@ def search_ontology(
         sum_cypher, sum_params = build_search_ontology_summary(
             ontology=ontology, search_text=effective_text,
             level=level, tree=tree,
+            informative_only=informative_only,
         )
         raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
 
@@ -1206,6 +1212,7 @@ def search_ontology(
         det_cypher, det_params = build_search_ontology(
             ontology=ontology, search_text=effective_text, limit=limit, offset=offset,
             level=level, tree=tree,
+            informative_only=informative_only,
         )
         results = conn.execute_query(det_cypher, **det_params)
     except Neo4jClientError:
@@ -1215,6 +1222,7 @@ def search_ontology(
             det_cypher, det_params = build_search_ontology(
                 ontology=ontology, search_text=effective_text, limit=limit, offset=offset,
                 level=level, tree=tree,
+                informative_only=informative_only,
             )
             results = conn.execute_query(det_cypher, **det_params)
         else:
@@ -1456,6 +1464,7 @@ def genes_by_ontology(
     limit: int | None = None,
     offset: int = 0,
     tree: str | None = None,
+    informative_only: bool = False,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -1529,6 +1538,7 @@ def genes_by_ontology(
             min_gene_set_size=min_gene_set_size,
             max_gene_set_size=max_gene_set_size,
             tree=tree,
+            informative_only=informative_only,
         )
         per_term = conn.execute_query(pt_cypher, **pt_params)
 
@@ -1539,6 +1549,7 @@ def genes_by_ontology(
             min_gene_set_size=min_gene_set_size,
             max_gene_set_size=max_gene_set_size,
             tree=tree,
+            informative_only=informative_only,
         )
         per_gene = conn.execute_query(pg_cypher, **pg_params)
 
@@ -1581,7 +1592,8 @@ def genes_by_ontology(
         per_term, key=lambda r: (-r["n_genes"], r["term_id"])
     )[:5]
     top_terms = [
-        {"term_id": r["term_id"], "term_name": r["term_name"], "count": r["n_genes"]}
+        {"term_id": r["term_id"], "term_name": r["term_name"],
+         "count": r["n_genes"], "is_informative": r["is_informative"]}
         for r in top_terms_sorted
     ]
 
@@ -1643,6 +1655,7 @@ def genes_by_ontology(
         max_gene_set_size=max_gene_set_size,
         verbose=verbose, limit=limit, offset=offset,
         tree=tree,
+        informative_only=informative_only,
     )
     results = conn.execute_query(det_cypher, **det_params)
 
@@ -1675,6 +1688,7 @@ def gene_ontology_terms(
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
+    informative_only: bool = False,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -1738,6 +1752,7 @@ def gene_ontology_terms(
                     locus_tags=chunk, ontology=ont,
                     organism_name=organism_name,
                     mode=mode, level=level, tree=tree,
+                    informative_only=informative_only,
                 )
                 rows = conn.execute_query(sum_cypher, **sum_params)
                 if not rows or rows[0]["gene_count"] == 0:
@@ -1790,6 +1805,7 @@ def gene_ontology_terms(
                         organism_name=organism_name,
                         mode=mode, level=level, tree=tree,
                         verbose=verbose, limit=None,
+                        informative_only=informative_only,
                     )
                     rows = conn.execute_query(det_cypher, **det_params)
                     # Strip sparse tree/tree_code when None
@@ -4058,6 +4074,7 @@ def ontology_landscape(
     min_gene_set_size: int = 5,
     max_gene_set_size: int = 500,
     tree: str | None = None,
+    informative_only: bool = True,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -4124,6 +4141,7 @@ def ontology_landscape(
             min_gene_set_size=min_gene_set_size,
             max_gene_set_size=max_gene_set_size,
             tree=tree if ont == "brite" else None,
+            informative_only=informative_only,
         )
         stat_rows = conn.execute_query(ls_cypher, **ls_params)
         n_levels = len(stat_rows)

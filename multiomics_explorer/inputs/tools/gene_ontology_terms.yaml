@@ -51,6 +51,21 @@ examples:
   - title: TCDB family annotations for a gene
     call: gene_ontology_terms(locus_tags=["PMM1129"], organism="MED4", ontology="tcdb")
 
+  - title: Filter out uninformative terms (e.g. catch-all KEGG modules)
+    call: gene_ontology_terms(locus_tags=["PMM0001"], organism="Prochlorococcus MED4", ontology="kegg", informative_only=True)
+    response: |
+      # Filter effect on Prochlorococcus MED4 KEGG: 1124 leaf-mode rows → 1094
+      # with informative_only=True (30 rows filtered, ~2.7%). Each result row
+      # carries an `is_informative: bool` column (always populated;
+      # coalesce of sparse term-side `is_uninformative='true'` flag).
+      {
+        "total_matching": 1094,
+        "results": [
+          {"locus_tag": "PMM0001", "term_id": "kegg:K02338", "term_name": "DNA polymerase III subunit beta", "is_informative": true},
+          ...
+        ]
+      }
+
   - title: From overview to ontology details
     steps: |
       Step 1: gene_overview(locus_tags=["PMM0001"])

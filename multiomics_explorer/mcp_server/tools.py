@@ -1573,9 +1573,10 @@ def register_tools(mcp: FastMCP):
             "Use list_filter_values to see valid values.",
         )] = None,
         min_quality: Annotated[int, Field(
-            description="Minimum annotation_quality (0-3). "
-            "0=hypothetical, 1=has description, 2=named product, "
-            "3=well-annotated. Use 2 to skip hypothetical proteins.",
+            description="Minimum annotation_quality (0..3 numeric encoding of annotation_state): "
+            "0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. "
+            "Use 2 to require >=1 informative annotation source. "
+            "Note: this field was redefined in May 2026 KG release.",
             ge=0, le=3,
         )] = 0,
         summary: Annotated[bool, Field(
@@ -1644,6 +1645,8 @@ def register_tools(mcp: FastMCP):
         annotation_quality: int | None = Field(default=None, description="Annotation quality score 0-3 (e.g. 3)")
         organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
         annotation_types: list[str] = Field(default_factory=list, description="Ontology source types where this gene has at least one annotation (e.g. ['go_bp', 'ec', 'kegg']). Presence-only — does NOT indicate content informativeness; a 'cog_category' entry may be 'Function unknown'. For term content, call gene_ontology_terms.")
+        annotation_state: str = Field(description="Informativeness state: informative_multi | informative_single | catch_all_only | no_evidence")
+        informative_annotation_types: list[str] = Field(default_factory=list, description="Subset of annotation_types backed by informative (non-catch-all) terms")
         expression_edge_count: int = Field(default=0, description="Number of expression data points (e.g. 36). When > 0, drill into differential_expression_by_gene or gene_response_profile.")
         significant_up_count: int = Field(default=0, description="Significant up-regulated DE observations (e.g. 3). When > 0, use differential_expression_by_gene with direction='up' for per-experiment detail.")
         significant_down_count: int = Field(default=0, description="Significant down-regulated DE observations (e.g. 2). When > 0, use differential_expression_by_gene with direction='down' for per-experiment detail.")
@@ -1685,11 +1688,16 @@ def register_tools(mcp: FastMCP):
         annotation_type: str = Field(description="Ontology type (e.g. 'go_bp', 'ec', 'kegg')")
         count: int = Field(description="Genes with this annotation type (e.g. 12)")
 
+    class OverviewAnnotationStateBreakdown(BaseModel):
+        annotation_state: str = Field(description="Informativeness state (e.g. 'informative_multi', 'informative_single', 'catch_all_only', 'no_evidence')")
+        count: int = Field(description="Genes in this state (e.g. 1386)")
+
     class GeneOverviewResponse(BaseModel):
         total_matching: int = Field(description="Genes found in KG from input locus_tags")
         by_organism: list[OverviewOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc")
         by_category: list[OverviewCategoryBreakdown] = Field(description="Gene counts per category, sorted desc")
         by_annotation_type: list[OverviewAnnotationTypeBreakdown] = Field(description="Gene counts per annotation type, sorted desc")
+        by_annotation_state: list[OverviewAnnotationStateBreakdown] = Field(default_factory=list, description="Rollup of annotation_state over result set (e.g. [{'annotation_state': 'informative_multi', 'count': 1386}, ...]). Sorted desc by count, matching existing rollups.")
         has_expression: int = Field(description="Genes with expression data (expression_edge_count > 0)")
         has_significant_expression: int = Field(description="Genes with significant DE observations")
         has_orthologs: int = Field(description="Genes with ortholog group membership")
@@ -1751,12 +1759,17 @@ def register_tools(mcp: FastMCP):
             by_organism = [OverviewOrganismBreakdown(**b) for b in data["by_organism"]]
             by_category = [OverviewCategoryBreakdown(**b) for b in data["by_category"]]
             by_annotation_type = [OverviewAnnotationTypeBreakdown(**b) for b in data["by_annotation_type"]]
+            by_annotation_state = [
+                OverviewAnnotationStateBreakdown(**b)
+                for b in data.get("by_annotation_state", [])
+            ]
             results = [GeneOverviewResult(**r) for r in data["results"]]
             return GeneOverviewResponse(
                 total_matching=data["total_matching"],
                 by_organism=by_organism,
                 by_category=by_category,
                 by_annotation_type=by_annotation_type,
+                by_annotation_state=by_annotation_state,
                 has_expression=data["has_expression"],
                 has_significant_expression=data["has_significant_expression"],
                 has_orthologs=data["has_orthologs"],
@@ -2027,6 +2040,7 @@ def register_tools(mcp: FastMCP):
         name: str = Field(description="Term name (e.g. 'DNA replication')")
         score: float = Field(description="Fulltext relevance score (e.g. 5.23)")
         level: int = Field(description="Hierarchy level of this term (0 = broadest)")
+        is_informative: bool = Field(description="True iff term is not flagged is_uninformative (positive framing; coerced from sparse '<term>.is_uninformative' KG flag)")
         tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
         tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
 
@@ -2074,6 +2088,12 @@ def register_tools(mcp: FastMCP):
             description="BRITE tree name filter (e.g. 'transporters'). "
             "Only valid when ontology='brite'.",
         )] = None,
+        informative_only: Annotated[bool, Field(
+            description="When True, exclude terms flagged uninformative in KG "
+            "(e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' "
+            "go:0008150). Term-side filter only — never restricts the gene set. "
+            "Default False (opt-in).",
+        )] = False,
     ) -> SearchOntologyResponse:
         """Browse ontology terms by text search (fuzzy, Lucene syntax).
 
@@ -2086,7 +2106,9 @@ def register_tools(mcp: FastMCP):
             data = api.search_ontology(
                 search_text, ontology, summary=summary,
                 limit=limit, offset=offset,
-                level=level, tree=tree, conn=conn,
+                level=level, tree=tree,
+                informative_only=informative_only,
+                conn=conn,
             )
             results = [SearchOntologyResult(**r) for r in data["results"]]
             return SearchOntologyResponse(**{**data, "results": results})
@@ -2110,6 +2132,7 @@ def register_tools(mcp: FastMCP):
         term_id: str = Field(description="Ontology term ID (e.g. 'go:0050896')")
         term_name: str = Field(description="Term name (e.g. 'response to stimulus')")
         level: int = Field(description="Hierarchy level of this term (0 = broadest)")
+        is_informative: bool = Field(description="True iff term is not flagged is_uninformative (positive framing; coerced from sparse '<term>.is_uninformative' KG flag)")
         tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
         tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
         # verbose only
@@ -2134,6 +2157,8 @@ def register_tools(mcp: FastMCP):
         term_id: str = Field(description="Term ID (e.g. 'go:0050896')")
         term_name: str = Field(description="Term name (e.g. 'response to stimulus')")
         count: int = Field(description="Distinct gene count (e.g. 152)")
+        is_informative: bool = Field(
+            description="True iff term is not flagged is_uninformative")
 
     class GenesByOntologyResponse(BaseModel):
         ontology: str = Field(description="Echo of input ontology (e.g. 'go_bp')")
@@ -2210,6 +2235,12 @@ def register_tools(mcp: FastMCP):
             description="Exclude terms with more organism-scoped genes than this.",
             ge=1,
         )] = 500,
+        informative_only: Annotated[bool, Field(
+            description="When True, exclude terms flagged uninformative in KG "
+            "(e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' "
+            "go:0008150). Term-side filter only — never restricts the gene set. "
+            "Default False (opt-in).",
+        )] = False,
         summary: Annotated[bool, Field(
             description="If true, omit `results` (envelope only).",
         )] = False,
@@ -2246,6 +2277,7 @@ def register_tools(mcp: FastMCP):
                 level=level, term_ids=term_ids,
                 min_gene_set_size=min_gene_set_size,
                 max_gene_set_size=max_gene_set_size,
+                informative_only=informative_only,
                 summary=summary, verbose=verbose,
                 limit=limit, offset=offset,
                 tree=tree, conn=conn,
@@ -2273,6 +2305,7 @@ def register_tools(mcp: FastMCP):
         term_id: str = Field(description="Ontology term ID (e.g. 'go:0006260')")
         term_name: str = Field(description="Term name (e.g. 'DNA replication')")
         level: int = Field(description="Hierarchy level of this term (0 = broadest)")
+        is_informative: bool = Field(description="True iff term is not flagged is_uninformative (positive framing; coerced from sparse '<term>.is_uninformative' KG flag)")
         ontology_type: str | None = Field(default=None, description="Ontology type when querying all (e.g. 'go_bp')")
         tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
         tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
@@ -2340,6 +2373,12 @@ def register_tools(mcp: FastMCP):
         tree: Annotated[str | None, Field(
             description="BRITE tree name filter. Only valid when ontology='brite'.",
         )] = None,
+        informative_only: Annotated[bool, Field(
+            description="When True, exclude terms flagged uninformative in KG "
+            "(e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' "
+            "go:0008150). Term-side filter only — never restricts the gene set. "
+            "Default False (opt-in).",
+        )] = False,
         summary: Annotated[bool, Field(
             description="When true, return only summary fields (results=[]).",
         )] = False,
@@ -2372,6 +2411,7 @@ def register_tools(mcp: FastMCP):
             data = api.gene_ontology_terms(
                 locus_tags, organism=organism, ontology=ontology,
                 mode=mode, level=level, tree=tree,
+                informative_only=informative_only,
                 summary=summary, verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
             results = [OntologyTermRow(**r) for r in data["results"]]
@@ -5457,6 +5497,13 @@ def register_tools(mcp: FastMCP):
             description="Exclude terms with more genes than this (default 500).",
             ge=1,
         )] = 500,
+        informative_only: Annotated[bool, Field(
+            description="When True (default), exclude terms flagged uninformative "
+            "in KG (e.g. KEGG 'metabolic pathways' map00001, GO root "
+            "'biological_process' go:0008150). Term-side filter only — never "
+            "restricts the gene set. Pass False to opt out and survey the full "
+            "term set (rebaselines may differ).",
+        )] = True,
     ) -> OntologyLandscapeResponse:
         """Rank (ontology x level) combinations by enrichment suitability.
 
@@ -5476,7 +5523,9 @@ def register_tools(mcp: FastMCP):
                 limit=limit, offset=offset,
                 min_gene_set_size=min_gene_set_size,
                 max_gene_set_size=max_gene_set_size,
-                tree=tree, conn=conn,
+                tree=tree,
+                informative_only=informative_only,
+                conn=conn,
             )
             return OntologyLandscapeResponse(**data)
         except ValueError as e:

@@ -1,73 +1,85 @@
 case_id: gene_ontology_terms_bp_limited
 row_count: 12
 rows:
-- level: 6
+- is_informative: true
+  level: 6
   locus_tag: MIT1002_03493
   term_id: go:0006525
   term_name: arginine metabolic process
   tree: null
   tree_code: null
-- level: 5
+- is_informative: true
+  level: 5
   locus_tag: MIT1002_03493
   term_id: go:0010565
   term_name: regulation of ketone metabolic process
   tree: null
   tree_code: null
-- level: 8
+- is_informative: true
+  level: 8
   locus_tag: MIT1002_03493
   term_id: go:0010628
   term_name: positive regulation of gene expression
   tree: null
   tree_code: null
-- level: 8
+- is_informative: true
+  level: 8
   locus_tag: MIT1002_03493
   term_id: go:0010629
   term_name: negative regulation of gene expression
   tree: null
   tree_code: null
-- level: 6
+- is_informative: true
+  level: 6
   locus_tag: MIT1002_03493
   term_id: go:0031333
   term_name: negative regulation of protein-containing complex assembly
   tree: null
   tree_code: null
-- level: 6
+- is_informative: true
+  level: 6
   locus_tag: MIT1002_03493
   term_id: go:0031334
   term_name: positive regulation of protein-containing complex assembly
   tree: null
   tree_code: null
-- level: 7
+- is_informative: true
+  level: 7
   locus_tag: MIT1002_03493
   term_id: go:0034214
   term_name: protein hexamerization
   tree: null
   tree_code: null
-- level: 7
+- is_informative: true
+  level: 7
   locus_tag: MIT1002_03493
   term_id: go:0042150
   term_name: plasmid recombination
   tree: null
   tree_code: null
-- level: 6
+- is_informative: true
+  level: 6
   locus_tag: MIT1002_03493
   term_id: go:1900079
   term_name: regulation of arginine biosynthetic process
   tree: null
   tree_code: null
-- level: 6
+- is_informative: true
+  level: 6
   locus_tag: MIT1002_03493
   term_id: go:1900081
   term_name: regulation of arginine catabolic process
   tree: null
   tree_code: null
-- level: 10
+- is_informative: true
+  level: 10
   locus_tag: MIT1002_03493
   term_id: go:2000143
   term_name: negative regulation of DNA-templated transcription initiation
   tree: null
   tree_code: null
-- level: 10
+- is_informative: true
+  level: 10
   locus_tag: MIT1002_03493
   term_id: go:2000144
   term_name: positive regulation of DNA-templated transcription initiation

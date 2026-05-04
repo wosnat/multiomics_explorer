@@ -18,6 +18,7 @@ wildcards (*), exact phrases ("..."), boolean (AND, OR).
 | offset | int | 0 | Number of results to skip for pagination. |
 | level | int \| None | None | Filter to terms at this hierarchy level. 0 = broadest. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. |
+| informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' go:0008150). Term-side filter only — never restricts the gene set. Default False (opt-in). |
 
 ## Response format
 
@@ -43,6 +44,7 @@ total_entries, total_matching, score_max, score_median, returned, offset, trunca
 | name | string | Term name (e.g. 'DNA replication') |
 | score | float | Fulltext relevance score (e.g. 5.23) |
 | level | int | Hierarchy level of this term (0 = broadest) |
+| is_informative | bool | True iff term is not flagged is_uninformative (positive framing; coerced from sparse '<term>.is_uninformative' KG flag) |
 | tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
 | tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
 
@@ -133,7 +135,30 @@ search_ontology(search_text="sucrose", ontology="tcdb")
 search_ontology(search_text="GH13", ontology="cazy")
 ```
 
-### Example 7: From search to gene discovery
+### Example 7: Filter out uninformative terms (term-side, opt-in)
+
+```example-call
+search_ontology(search_text="transport", ontology="kegg", informative_only=True)
+```
+
+```example-response
+# `informative_only=True` drops terms flagged `is_uninformative='true'`
+# (~224 sparsely-flagged terms genome-wide, mostly KEGG catch-all
+# modules + a handful of Cyanorak / TIGR / GO / COG entries — Pfam is
+# not flagged in the current KG). Each result row carries
+# `is_informative: bool` (always populated). Use this when seeding
+# term IDs into `genes_by_ontology` for enrichment so catch-all KEGG
+# buckets don't dominate the term set.
+{
+  "total_entries": 18000,
+  "total_matching": 22,
+  "results": [
+    {"id": "kegg:K02035", "name": "ABC.PE.S; peptide/nickel transport system substrate-binding protein", "score": 2.81, "level": 3, "is_informative": true}
+  ]
+}
+```
+
+### Example 8: From search to gene discovery
 
 ```
 Step 1: search_ontology(search_text="replication", ontology="go_bp")

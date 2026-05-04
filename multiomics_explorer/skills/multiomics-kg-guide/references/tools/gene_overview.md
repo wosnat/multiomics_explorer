@@ -31,13 +31,14 @@ derived_metric_count > 0).
 ### Envelope
 
 ```expected-keys
-total_matching, by_organism, by_category, by_annotation_type, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, returned, offset, truncated, not_found, results
+total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, returned, offset, truncated, not_found, results
 ```
 
 - **total_matching** (int): Genes found in KG from input locus_tags
 - **by_organism** (list[OverviewOrganismBreakdown]): Gene counts per organism, sorted desc
 - **by_category** (list[OverviewCategoryBreakdown]): Gene counts per category, sorted desc
 - **by_annotation_type** (list[OverviewAnnotationTypeBreakdown]): Gene counts per annotation type, sorted desc
+- **by_annotation_state** (list[OverviewAnnotationStateBreakdown]): Rollup of annotation_state over result set (e.g. [{'annotation_state': 'informative_multi', 'count': 1386}, ...]). Sorted desc by count, matching existing rollups.
 - **has_expression** (int): Genes with expression data (expression_edge_count > 0)
 - **has_significant_expression** (int): Genes with significant DE observations
 - **has_orthologs** (int): Genes with ortholog group membership
@@ -59,6 +60,8 @@ total_matching, by_organism, by_category, by_annotation_type, has_expression, ha
 | annotation_quality | int \| None (optional) | Annotation quality score 0-3 (e.g. 3) |
 | organism_name | string | Organism (e.g. 'Prochlorococcus MED4') |
 | annotation_types | list[string] (optional) | Ontology source types where this gene has at least one annotation (e.g. ['go_bp', 'ec', 'kegg']). Presence-only — does NOT indicate content informativeness; a 'cog_category' entry may be 'Function unknown'. For term content, call gene_ontology_terms. |
+| annotation_state | string | Informativeness state: informative_multi | informative_single | catch_all_only | no_evidence |
+| informative_annotation_types | list[string] (optional) | Subset of annotation_types backed by informative (non-catch-all) terms |
 | expression_edge_count | int (optional) | Number of expression data points (e.g. 36). When > 0, drill into differential_expression_by_gene or gene_response_profile. |
 | significant_up_count | int (optional) | Significant up-regulated DE observations (e.g. 3). When > 0, use differential_expression_by_gene with direction='up' for per-experiment detail. |
 | significant_down_count | int (optional) | Significant down-regulated DE observations (e.g. 2). When > 0, use differential_expression_by_gene with direction='down' for per-experiment detail. |
@@ -98,10 +101,11 @@ gene_overview(locus_tags=["PMM1428"])
   "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
   "by_category": [{"category": "Unknown", "count": 1}],
   "by_annotation_type": [{"annotation_type": "go_mf", "count": 1}, ...],
+  "by_annotation_state": [{"annotation_state": "informative_multi", "count": 1}],
   "has_expression": 1, "has_significant_expression": 1, "has_orthologs": 1, "has_clusters": 1,
   "returned": 1, "truncated": false, "offset": 0, "not_found": [],
   "results": [
-    {"locus_tag": "PMM1428", "gene_name": null, "product": "EVE domain protein", "gene_category": "Unknown", "annotation_quality": 3, "organism_name": "Prochlorococcus MED4", "annotation_types": ["go_mf", "pfam", "cog_category", "tigr_role"], "expression_edge_count": 36, "significant_up_count": 3, "significant_down_count": 2, "closest_ortholog_group_size": 9, "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"], "cluster_membership_count": 2, "cluster_types": ["condition_comparison"]}
+    {"locus_tag": "PMM1428", "gene_name": null, "product": "EVE domain protein", "gene_category": "Unknown", "annotation_quality": 3, "annotation_state": "informative_multi", "informative_annotation_types": ["go_mf", "pfam"], "organism_name": "Prochlorococcus MED4", "annotation_types": ["go_mf", "pfam", "cog_category", "tigr_role"], "expression_edge_count": 36, "significant_up_count": 3, "significant_down_count": 2, "closest_ortholog_group_size": 9, "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"], "cluster_membership_count": 2, "cluster_types": ["condition_comparison"]}
   ]
 }
 ```
@@ -159,6 +163,8 @@ gene_overview(verbose=True) → see compartments_observed for vesicle/whole-cell
 
 ## Common mistakes
 
+- annotation_quality is a 0..3 numeric encoding of annotation_state (informative-evidence count). 0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. Redefined in May 2026 KG release — old semantics conflated product-name quality. Existing min_quality filters silently shifted meaning.
+
 - If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this gene.
 
 - annotation_types lists which ontology types have data — use gene_ontology_terms to get the actual terms
@@ -183,7 +189,7 @@ gene_overview(locus_tags=['PMM0845'])  # verbose only needed for gene_summary te
 from multiomics_explorer import gene_overview
 
 result = gene_overview(locus_tags=...)
-# returns dict with keys: total_matching, by_organism, by_category, by_annotation_type, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, offset, not_found, results
+# returns dict with keys: total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, offset, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.
