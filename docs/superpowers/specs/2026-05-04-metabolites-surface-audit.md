@@ -327,26 +327,301 @@ How existing MCP tools surface (or fail to surface) the reaction-arm and transpo
 
 ### 3a — Existing-tool modifications
 
-(populated in Phase B Task B2; second pass — Phase E Task E2)
+How existing MCP tools should expose measurement data, given that node-level rollups already exist (per Part 1 §1.2). Sorted P0 → P3.
 
 | Tool | Current surfacing | Recommended change | Priority | Phase |
 |---|---|---|---|---|
+| `list_metabolites` | `gene_count`, `transporter_count`, `pathway_count`, `evidence_sources` per row | Add `measured_assay_count`, `measured_paper_count`, `measured_organisms` per row (pass-through from Metabolite node — already pre-computed). Add envelope `by_measurement_coverage` (counts at 0 / 1 / 2 papers; counts by compartment) | P0 | first-pass |
+| `list_publications` | `omics_types` filter accepts METABOLOMICS but no measurement counts surfaced | Per-row `metabolite_assay_count`, `metabolite_count`, `metabolite_compartments` (pass-through from Publication node — pre-computed). Envelope `by_omics_type` already exists; extend to surface measurement specifics for METABOLOMICS rows | P0 | first-pass |
+| `list_experiments` | `omics_types` filter accepts METABOLOMICS; no per-row metabolite counts | Per-row `metabolite_assay_count`, `metabolite_count`, `metabolite_compartments` (pass-through from Experiment node). Routing hint: when non-zero, drill via run_cypher (until native tool ships) | P0 | first-pass |
+| `list_organisms` | Chemistry rollups present; measurement absent | Per-row `measured_metabolite_count` (pass-through from Organism node). Envelope `by_measurement_capability` mirroring `by_metabolic_capability` (top 10 organisms by measured_metabolite_count) | P1 | first-pass |
+| `list_filter_values` | `compartment` filter type returns observed compartments; missing entries possibly | Verify `extracellular` is present in returned compartment list (KG release added it). Add `omics_type` filter type returning the canonical list including `METABOLOMICS` | P1 | first-pass |
+| `kg_schema` | Returns full schema with all metabolomics nodes/edges | No change — Part 1 §1.2 confirmed introspection is correct and complete | — | first-pass (no change) |
+
+**P0 summary (3 items):** `list_metabolites`, `list_publications`, `list_experiments` all need measurement-rollup pass-through. All data exists on nodes — no KG change required. This is the foundation for the Track-B discovery workflow.
 
 ### 3b — New-tool proposals
 
-(populated in Phase B Task B3; second pass — Phase E Task E3)
+Each candidate gets a paragraph + signature sketch + `{recommendation, phase}`. Pending-definition entries name their blocking Part 4 question(s).
+
+#### 3b.1 `list_metabolite_assays`
+
+Discovery surface for `MetaboliteAssay` nodes — mirrors `list_experiments` but per-assay.
+
+```python
+list_metabolite_assays(
+    organism: str | None = None,
+    organism_names: list[str] | None = None,
+    treatment_types: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    publication_dois: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    metabolite_ids: list[str] | None = None,
+    compartment: Literal['whole_cell', 'extracellular'] | None = None,
+    value_kind: Literal['numeric', 'boolean'] | None = None,
+    metric_types: list[str] | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int = 25,
+) -> dict
+```
+
+Per-row: `id`, `name`, `organism_name`, `experiment_id`, `publication_doi`, `compartment`, `value_kind`, `metric_type`, `n_replicates`, `total_metabolite_count`, `treatment_type`, `background_factors`, `growth_phases`, `time_points`. Envelope: `by_compartment`, `by_value_kind`, `by_organism`, `top_metric_types`, `total_assay_count`, `total_metabolite_count`.
+
+**Justification:** structural — there's a node type with rich properties and no discovery tool. The 10-assay scale is small but the property graph is rich; all 8 metabolomics experiments are reachable today only via run_cypher.
+
+**Recommendation: Should-add (P1).** Phase: first-pass.
+
+#### 3b.2 `metabolite_response_profile`
+
+Cross-experiment per-metabolite summary mirroring `gene_response_profile` — for each metabolite, summarise how it responds across treatments / growth phases / compartments.
+
+```python
+metabolite_response_profile(
+    metabolite_ids: list[str],
+    organism: str | None = None,
+    experiment_ids: list[str] | None = None,
+    compartment: str | None = None,
+    summary: bool = False,
+    limit: int = 25,
+) -> dict
+```
+
+Per-row: `metabolite_id`, `preferred_name`, `compartments_observed`, `n_assays`, `n_papers`, `value_stats` (min/median/max/sd across edges), `direction_stats` (when fold-change semantic resolves), `n_replicates_total`, `top_treatments`. Envelope: `by_compartment`, `by_treatment_type`, `top_metabolites_by_response_breadth`.
+
+**Recommendation: Pending-definition.** Blocking Part 4 questions: §4.3.2 (FC relevance for metabolomics), §4.3.3 (replicate rollup convention), §4.3.5 (compartment semantics for cross-compartment comparison).
+
+Phase: first-pass.
+
+#### 3b.3 `metabolites_by_assay` / `assays_by_metabolite`
+
+Drill-down pair. `metabolites_by_assay` returns metabolites measured by one or more assays; `assays_by_metabolite` is the reverse lookup. Mostly mechanical given the edge schema.
+
+```python
+metabolites_by_assay(
+    assay_ids: list[str],
+    summary: bool = False,
+    limit: int = 25,
+) -> dict
+# row: metabolite_id, name, value (or flag_value), value_sd, n_replicates, metric_type,
+#      metric_bucket, metric_percentile, time_point, condition_label, detection_status
+
+assays_by_metabolite(
+    metabolite_ids: list[str],
+    organism: str | None = None,
+    summary: bool = False,
+    limit: int = 25,
+) -> dict
+# row: assay_id, organism_name, compartment, metric_type, value, value_sd, n_replicates,
+#      time_point, condition_label, experiment_id, publication_doi
+```
+
+**Recommendation: Should-add (P1).** Phase: first-pass.
+
+#### 3b.4 `differential_metabolite_abundance`
+
+DE-shaped tool for metabolite measurements. Inputs: experiment + condition pair; output: per-metabolite log-ratio (or comparable summary) + dispersion + significance.
+
+**Recommendation: Pending-definition.** Blocking Part 4 questions: §4.3.2 (FC vs other statistics), §4.3.3 (replicate rollup), §4.3.4 (Quantifies vs Flags merging), §4.3.5 (within-vs-cross-compartment), §4.3.7 (cross-organism comparability for coculture).
+
+Phase: first-pass.
+
+#### 3b.5 DM-family extension to Metabolite entity
+
+The DM tool family (`list_derived_metrics`, `gene_derived_metrics`, `genes_by_*_metric`) currently targets Gene as the entity. Extending to also target Metabolite would let the KG model metabolomics summary statistics (rhythmicity, condition response, etc.) the same way it models gene-level rhythmicity / amplitudes today.
+
+Looking at Part 1 §1.2: `MetaboliteAssay` is structurally similar to `DerivedMetric` (both are `InformationContentEntity`; both carry `value_kind`, `metric_type`, `value_max/median/min/q1/q3`, etc.). This suggests the KG modellers were thinking along these lines.
+
+**Recommendation: Pending-definition.** Blocking Part 4 questions: §4.3.1 (Assay-vs-DM-vs-both modelling), §4.3.6 (whether DM-family extension is the right surface for metabolite-level summaries given Assay nodes already exist).
+
+Phase: first-pass.
+
+#### 3b.6 First-pass summary
+
+| Proposal | Recommendation | Phase | Blocked by |
+|---|---|---|---|
+| `list_metabolite_assays` | Should-add (P1) | first-pass | — |
+| `metabolite_response_profile` | Pending-definition | first-pass | §4.3.2, §4.3.3, §4.3.5 |
+| `metabolites_by_assay` / `assays_by_metabolite` | Should-add (P1) | first-pass | — |
+| `differential_metabolite_abundance` | Pending-definition | first-pass | §4.3.2, §4.3.3, §4.3.4, §4.3.5, §4.3.7 |
+| DM-family extension to Metabolite | Pending-definition | first-pass | §4.3.1, §4.3.6 |
+
+Two ship-now (Should-add). Three blocked on Part 4 questions.
 
 ---
 
 ## Part 4 — Open definition questions
 
-(populated in Phase B Task B4)
+Organised by metabolite-source pipeline. Each question states the issue, names the options where enumerable, and lists the Part 3b proposals it blocks.
+
+### 4.1 Reaction (KEGG) source
+
+#### 4.1.1 Reaction edge directionality / role
+
+**Question:** Does `Reaction_has_metabolite` distinguish substrate from product, or only "involved in"?
+
+**Why it matters:** If undirected, `metabolites_by_gene` cannot honestly say "this gene produces X" — only "X is involved in a reaction this gene catalyses."
+
+**Current state (from Part 1 §1.2):** edge has `id` only; no `role` property. Effectively undirected.
+
+**Options:**
+- (a) Add `role` property on edge (`'substrate' | 'product' | 'cofactor'`).
+- (b) Split into two edges (`Reaction_consumes_metabolite`, `Reaction_produces_metabolite`).
+- (c) Stay undirected; document the framing limitation in tools.
+
+**Blocks:** chemistry-track honesty (analysis doc Track A1), and any future "production capacity" tool. Surfaced as KG-MET-003.
+
+#### 4.1.2 Reversibility
+
+**Question:** Is reaction reversibility represented?
+
+**Why it matters:** "Produces X" claims are even weaker for reversible reactions.
+
+**Current state:** Reaction node has no `is_reversible` property in the schema dump (Part 1 §1.2 implied; verify).
+
+**Blocks:** future fold-change interpretation if metabolite measurements are paired with reaction-level inference.
+
+#### 4.1.3 Multi-subunit enzymes
+
+**Question:** When a reaction needs multiple gene products, are all subunits attributed to the reaction (1 reaction × N gene edges) or is there explicit complex modelling?
+
+**Why it matters:** Naive counting would overstate "genes that catalyse reaction X" by a factor of subunit count.
+
+**Current state:** unclear from schema. Likely 1 reaction × N gene edges. No `complex_id` property visible.
+
+**Blocks:** ortholog-side chemistry rollups (`gene_homologs`, `genes_by_homolog_group`); affects whether group-level coverage is "any member" or weighted.
+
+### 4.2 Transport (TCDB) source
+
+#### 4.2.1 Transport direction (import vs export)
+
+**Question:** Is import vs export representable per-family or per-(family, substrate) pair?
+
+**Why it matters:** Some TCDB families have curated directionality. For cross-feeding workflows (`metabolites_by_gene` → `genes_by_metabolite` Workflow B′), direction would let us claim "MED4 exports X, ALT imports X" instead of just "both touch X."
+
+**Current state:** edge has `id` only; no `direction` property. TcdbFamily node has no direction property visible.
+
+**Options:**
+- (a) Add `direction` property on `Tcdb_family_transports_metabolite` edge.
+- (b) Add per-family `default_direction` on TcdbFamily node.
+- (c) Stay undirected; document limitation.
+
+**Blocks:** cross-feeding causal claims (analysis doc Track A combined §d).
+
+#### 4.2.2 Curated primary substrate vs family-inferred substrate
+
+**Question:** TcdbFamily already has `superfamily` (Part 1 §1.3). For non-superfamily families with many curated substrates, is one substrate the family's "primary"?
+
+**Why it matters:** family_inferred dominance auto-warning could rank within-family substrates by primary-vs-secondary instead of treating them all equally.
+
+**Current state:** no `is_primary` property on edge or node; the `<none>`-superfamily families (605 families, 7886 substrate links) average 13 substrates each — wide enough to benefit from ranking.
+
+**Blocks:** sharper precision-tier reasoning in the example python's `precision_tier` scenario.
+
+### 4.3 Metabolomics measurement source
+
+#### 4.3.1 Surface modelling — Assay surface vs DM-on-Metabolite vs both
+
+**Question:** The KG already chose `MetaboliteAssay` as a first-class node (Part 1). Is that the *only* measurement surface, or should there also be `DerivedMetric` nodes attached to `Metabolite` (mirroring `DerivedMetric → Gene` for gene-level summaries)?
+
+**Why it matters:** Determines whether the DM-family-extension new tool (Part 3b.5) is the right shape, or whether all metabolite-level summaries flow through the new `MetaboliteAssay`-anchored tools (3b.1-3b.3).
+
+**Empirical note:** `MetaboliteAssay` properties (`value_kind`, `metric_type`, `value_max/median/min/q1/q3`, `unit`) are nearly identical to `DerivedMetric` properties — suggesting the KG modellers may already be treating Assay as a metabolite-targeted DM analog.
+
+**Blocks:** Part 3b.5 (DM-family extension).
+
+#### 4.3.2 Fold-change vs other summary statistics
+
+**Question:** Is fold-change the right summary statistic for metabolomics, or do we need a different convention?
+
+**Empirical note:** Existing edges carry `value` (concentration), `value_sd`, `n_replicates`, `metric_percentile`, `metric_bucket`, `rank_by_metric` — all suggesting the KG modellers have already declined to commit to a single FC-style summary and instead carry raw values + percentile/rank context. **The user's intuition that FC may not apply is empirically supported by the schema.**
+
+**Blocks:** Part 3b.2 (`metabolite_response_profile`), Part 3b.4 (`differential_metabolite_abundance`).
+
+#### 4.3.3 Replicate rollup convention
+
+**Question:** When a tool surfaces a value per metabolite, is it the mean across replicates, the median, or per-replicate rows?
+
+**Empirical note:** Edges carry both `value` (single number, presumably aggregated) and `replicate_values` (list). Both are present, so consumers can choose. The open question is which to default to in tool envelopes.
+
+**Blocks:** Part 3b.2, Part 3b.4.
+
+#### 4.3.4 Quantifies vs Flags semantics — separate or merged
+
+**Question:** `Assay_quantifies_metabolite` (concentration/intensity) and `Assay_flags_metabolite` (qualitative detection) carry different properties. Should new tools surface them as separate response columns (with `evidence_kind` discriminator) or merge them?
+
+**Current state:** they are structurally distinct edges; the natural shape is to keep them separate but with a unifying `evidence_kind` field.
+
+**Blocks:** Part 3b.4 (DE-shape tool needs to decide how to handle flag-only data).
+
+#### 4.3.5 Compartment semantics
+
+**Question:** `MetaboliteAssay` carries `compartment` as a string property (`whole_cell` | `extracellular`). Is the *same* metabolite measured in both compartments treated as one Metabolite node (with two edges) or two distinct Metabolite nodes?
+
+**Current state:** appears to be one Metabolite × two assays (whole_cell + extracellular); compartment is on the Assay, not the Metabolite. Verify with a query in second pass.
+
+**Blocks:** Part 3b.2 (response profile across compartments).
+
+#### 4.3.6 DM family vs Assay surface — which carries metabolite-level summaries
+
+(See §4.3.1 — same question, framed from the tool-surface side.)
+
+**Blocks:** Part 3b.5.
+
+#### 4.3.7 Cross-organism comparability in coculture
+
+**Question:** When a coculture experiment profiles both partners, can a metabolite measurement be attributed to one partner vs the other, or only to the joint medium?
+
+**Current state:** assays carry `organism_name`. For monoculture this is unambiguous; for coculture, does the KG record the host organism or the medium?
+
+**Blocks:** Part 3b.4 (differential abundance becomes cross-organism-ambiguous).
+
+#### 4.3.8 Replicate / temporal axis
+
+**Question:** Edges carry `time_point`, `time_point_hours`, `time_point_order` — same axis as expression DE? What's the relationship between metabolomics and expression timepoints?
+
+**Current state:** schema is symmetric; need empirical check that timepoints align with `Changes_expression_of` timepoints in the same experiments.
+
+**Blocks:** Part 3b.2 (response profile that crosses expression and metabolomics).
+
+### 4.4 Question-to-proposal blocking matrix
+
+| Question | Blocks proposal |
+|---|---|
+| §4.1.1 reaction direction | (none in 3b; affects analysis doc honesty) |
+| §4.1.3 multi-subunit | gene_homologs / homolog-group rollups (Part 2) |
+| §4.2.1 transport direction | (none in 3b; affects Track A combined §d) |
+| §4.2.2 primary substrate | (none in 3b; sharpens precision_tier scenario) |
+| §4.3.1 / §4.3.6 surface modelling | 3b.5 DM-family extension |
+| §4.3.2 FC relevance | 3b.2, 3b.4 |
+| §4.3.3 replicate rollup | 3b.2, 3b.4 |
+| §4.3.4 Quantifies vs Flags | 3b.4 |
+| §4.3.5 compartment semantics | 3b.2 |
+| §4.3.7 coculture attribution | 3b.4 |
+| §4.3.8 temporal axis | 3b.2 |
 
 ---
 
 ## Part 5 — KG-side asks
 
-(populated in Phase B Task B5; second pass — Phase E Task E4)
+Items only `multiomics_biocypher_kg` can fix. Each ask carries `{category, priority, phase, why}`. Categories: Data gap / Precompute / Rollup / Index / Schema / Decision / Documentation.
 
 | ID | Category | Priority | Phase | Ask | Why (explorer item it unblocks) |
 |---|---|---|---|---|---|
+| KG-MET-001 | Documentation | P1 | first-pass | Document the normalisation convention used for `Assay_quantifies_metabolite.value` per paper (raw concentration? log-transformed? z-score?) — and whether `value_sd` is on the same scale | Resolves Part 4 §4.3.3 (replicate rollup convention); needed for tool docstrings explaining what `value` means to the LLM |
+| KG-MET-002 | Decision + Documentation | P2 | first-pass | Compartment-as-property is the chosen modelling. Document the convention: `Metabolite` node is compartment-agnostic; `MetaboliteAssay.compartment` carries the compartment. Verify no Metabolite node has compartment in its name/properties (i.e., glucose-intracellular and glucose-extracellular are the same Metabolite) | Resolves Part 4 §4.3.5 (compartment semantics); needed for analysis doc Track B |
+| KG-MET-003 | Data gap | P0 | first-pass | Add `role` property on `Reaction_has_metabolite` edge (`'substrate' \| 'product' \| 'cofactor'` or similar). Even partial coverage (KEGG-derived) helps | Allows `metabolites_by_gene` to honestly distinguish "consumes" / "produces" instead of "involved in"; resolves Part 4 §4.1.1 |
+| KG-MET-004 | Rollup | — | first-pass (CLOSED — already satisfied) | Per-Metabolite measurement rollups already on the node: `measured_assay_count`, `measured_paper_count`, `measured_organisms` | (verified in Part 1 §1.2 — no action needed) |
+| KG-MET-005 | Rollup | — | first-pass (CLOSED — already satisfied) | Per-Publication / per-Experiment / per-Organism measurement rollups already exist: `metabolite_assay_count`, `metabolite_count`, `metabolite_compartments`, `measured_metabolite_count` | (verified in Part 1 §1.2) |
+| KG-MET-006 | Precompute | P2 | first-pass | TcdbFamily.superfamily exists. Add: per-family `is_promiscuous` boolean (true when superfamily ∈ {large set} OR `member_count` > threshold OR `metabolite_count` > threshold) so explorer tools can dim/rank without re-deriving the rule | Sharper family_inferred precision-tier reasoning (Part 4 §4.2.2; analysis doc Track A2 §g). Today the explorer recomputes the rule client-side or via per-query joins |
+| KG-MET-007 | Index | P3 | first-pass (deferred) | Audit-Phase-E-derived index asks — populated based on the slowest queries observed during example python build | Performance for new tool query paths; populated in second pass once query shapes stabilise |
+| KG-MET-008 | Documentation | P3 | first-pass | Document each metabolomics paper's processed-value pipeline: extraction method, MS platform, internal standards, normalisation, replicate count, statistical-test convention. Likely surfaces as a Publication-node `processing_notes` field | LLM-readable provenance for Track-B caveat surfacing; reduces ambiguity when the LLM cites a measurement |
+| KG-MET-009 | Data gap | P2 | first-pass | Reaction reversibility (`is_reversible` boolean on Reaction node, where curated) | Resolves Part 4 §4.1.2; sharpens "produces" claims in metabolites_by_gene |
+| KG-MET-010 | Data gap | P3 | first-pass | Multi-subunit enzyme complex modelling (e.g., `complex_id` on Reaction or Gene_catalyzes_reaction edges) | Resolves Part 4 §4.1.3; allows ortholog-side rollups to weight by complex membership |
+| KG-MET-011 | Data gap | P2 | first-pass | Transport direction (import vs export) on Tcdb_family_transports_metabolite edges OR per-family default_direction on TcdbFamily | Resolves Part 4 §4.2.1; enables cross-feeding causal claims |
+| KG-MET-012 | Decision | P2 | first-pass | Decide whether metabolite-level summary statistics (rhythmicity, etc.) should attach as `DerivedMetric → Metabolite` edges or live entirely on `MetaboliteAssay` properties. Communicate decision to explorer side | Resolves Part 4 §4.3.1 / §4.3.6; unblocks Part 3b.5 (DM-family extension to Metabolite) |
+| KG-MET-013 | Documentation | P2 | first-pass | Confirm `time_point` properties on `Assay_quantifies_metabolite` align with `Changes_expression_of.time_point` for experiments that have both omics types | Resolves Part 4 §4.3.8; enables future cross-omics tools |
+
+**Priority summary:** 1× P0 (KG-MET-003 reaction role), 6× P2 (data gaps + decisions), 3× P3 (low-priority polish), 2× CLOSED (KG-MET-004/005), 1× deferred (KG-MET-007 indexes).
+
+**Surprising finding:** the original spec assumed many KG asks would land in P0/P1 (data is missing). The actual KG release shipped much further than expected — node-level rollups exist, edge schemas are rich, family promiscuity is partially flagged. The remaining P0 (reaction role) is the genuinely-blocking gap.
