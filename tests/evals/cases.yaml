@@ -186,7 +186,7 @@
   params: {}
   expect:
     min_rows: 13
-    max_rows: 36
+    max_rows: 40
     columns: [organism_name, genus, species, strain, clade, ncbi_taxon_id,
               gene_count, publication_count, experiment_count,
               treatment_types, omics_types]
@@ -1681,6 +1681,7 @@
     organism: Alteromonas macleodii ATCC27126
     limit: 5
   expect:
+    min_rows: 0
     max_rows: 0
 
 - id: genes_by_metabolite_pathway_anchored_n_metabolism

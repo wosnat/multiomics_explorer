@@ -3,10 +3,12 @@ by_evidence_source:
   evidence_source: metabolism
 - count: 1097
   evidence_source: transport
+- count: 107
+  evidence_source: metabolomics
 case_id: list_metabolites_all
 mass_stats:
   mass_max: 5227.103
-  mass_median: 243.219
+  mass_median: 243.213
   mass_min: 1.00794
 not_found:
   metabolite_ids: []
@@ -22,11 +24,11 @@ results:
   - metabolism
   - transport
   formula: H2O
-  gene_count: 7971
+  gene_count: 8150
   mass: 18.015
   metabolite_id: kegg.compound:C00001
   name: H2O
-  organism_count: 31
+  organism_count: 32
   pathway_count: 17
   pathway_ids:
   - kegg.pathway:ko00190
@@ -54,11 +56,11 @@ results:
   - metabolism
   - transport
   formula: H
-  gene_count: 5296
+  gene_count: 5405
   mass: 1.0079
   metabolite_id: kegg.compound:C00080
   name: H+
-  organism_count: 31
+  organism_count: 32
   pathway_count: 27
   pathway_ids:
   - kegg.pathway:ko00190
@@ -100,11 +102,11 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O13P3
-  gene_count: 4432
+  gene_count: 4559
   mass: 503.15
   metabolite_id: kegg.compound:C00002
   name: ATP
-  organism_count: 31
+  organism_count: 32
   pathway_count: 33
   pathway_ids:
   - kegg.pathway:ko00190
@@ -150,11 +152,11 @@ results:
   - metabolism
   - transport
   formula: HO4P
-  gene_count: 3722
+  gene_count: 3823
   mass: 95.978
   metabolite_id: kegg.compound:C00009
   name: Orthophosphate
-  organism_count: 31
+  organism_count: 32
   pathway_count: 10
   pathway_ids:
   - kegg.pathway:ko00190
@@ -177,11 +179,11 @@ results:
   - metabolism
   - transport
   formula: HO7P2
-  gene_count: 3162
+  gene_count: 3253
   mass: 174.949
   metabolite_id: kegg.compound:C00013
   name: Diphosphate
-  organism_count: 31
+  organism_count: 32
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00190
@@ -214,13 +216,13 @@ top_organisms:
 - count: 2061
   organism_name: Alteromonas macleodii AD45
 top_pathways:
-- count: 1564
+- count: 1565
   pathway_id: kegg.pathway:ko01100
   pathway_name: Metabolic pathways
 - count: 585
   pathway_id: kegg.pathway:ko01110
   pathway_name: Biosynthesis of secondary metabolites
-- count: 578
+- count: 579
   pathway_id: kegg.pathway:ko01120
   pathway_name: Microbial metabolism in diverse environments
 - count: 283
@@ -244,10 +246,10 @@ top_pathways:
 - count: 90
   pathway_id: kegg.pathway:ko00860
   pathway_name: Porphyrin metabolism
-total_entries: 3025
-total_matching: 3025
+total_entries: 3035
+total_matching: 3035
 truncated: true
 xref_coverage:
-  with_chebi: 2724
-  with_hmdb: 1425
-  with_mnxm: 3025
+  with_chebi: 2732
+  with_hmdb: 1427
+  with_mnxm: 3031

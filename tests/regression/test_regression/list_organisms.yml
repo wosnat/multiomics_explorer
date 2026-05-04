@@ -1,5 +1,5 @@
 case_id: list_organisms
-row_count: 36
+row_count: 37
 rows:
 - background_factors: []
   clade: null
@@ -527,6 +527,33 @@ rows:
   - viral
 - background_factors:
   - axenic
+  clade: LLI
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  experiment_count: 6
+  gene_count: 2358
+  genus: Prochlorococcus
+  growth_phases: []
+  metabolite_count: 1543
+  ncbi_taxon_id: 1501269
+  omics_types:
+  - METABOLOMICS
+  organism_name: Prochlorococcus MIT0801
+  organism_type: genome_strain
+  publication_count: 1
+  reaction_count: 934
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: MIT0801
+  treatment_types:
+  - growth_phase
+  - phosphorus
+- background_factors:
+  - axenic
   - diel
   - light
   clade: HLII
@@ -536,7 +563,7 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 2
+  experiment_count: 8
   gene_count: 1935
   genus: Prochlorococcus
   growth_phases:
@@ -544,10 +571,11 @@ rows:
   metabolite_count: 1559
   ncbi_taxon_id: 167546
   omics_types:
+  - METABOLOMICS
   - RNASEQ
   organism_name: Prochlorococcus MIT9301
   organism_type: genome_strain
-  publication_count: 2
+  publication_count: 3
   reaction_count: 945
   reference_database: null
   reference_proteome: null
@@ -555,6 +583,7 @@ rows:
   strain: MIT9301
   treatment_types:
   - growth_phase
+  - phosphorus
   - temperature
 - background_factors:
   - axenic
@@ -565,7 +594,7 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 2
+  experiment_count: 4
   gene_count: 3114
   genus: Prochlorococcus
   growth_phases:
@@ -573,6 +602,7 @@ rows:
   metabolite_count: 1696
   ncbi_taxon_id: 59922
   omics_types:
+  - METABOLOMICS
   - RNASEQ
   organism_name: Prochlorococcus MIT9303
   organism_type: genome_strain
@@ -639,7 +669,7 @@ rows:
   - boolean
   - categorical
   - numeric
-  experiment_count: 26
+  experiment_count: 34
   gene_count: 2948
   genus: Prochlorococcus
   growth_phases:
@@ -650,13 +680,14 @@ rows:
   metabolite_count: 1643
   ncbi_taxon_id: 74547
   omics_types:
+  - METABOLOMICS
   - MICROARRAY
   - RNASEQ
   - VESICLE_DNASEQ
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MIT9313
   organism_type: genome_strain
-  publication_count: 8
+  publication_count: 9
   reaction_count: 953
   reference_database: null
   reference_proteome: null
@@ -666,6 +697,7 @@ rows:
   - carbon
   - coculture
   - compartment
+  - growth_phase
   - iron
   - nitrogen
   - phosphorus

@@ -1,5 +1,5 @@
 case_id: list_experiments_all
-row_count: 181
+row_count: 189
 rows:
 - authors:
   - Guadalupe Gómez-Baena
@@ -5394,6 +5394,88 @@ rows:
   treatment_type:
   - light
 - authors:
+  - Elizabeth B. Kujawinski
+  - Gretchen J. Swarr
+  - Jamie W. Becker
+  - Kathryn Halloran
+  - Keven Dooley
+  - Krista Longnecker
+  - Melissa C. Kido Soule
+  - Rogier Braakman
+  - Sallie W. Chisholm
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: extracellular
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 0
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_0801_extracellular
+  experiment_name: MIT0801 metabolite diversity (extracellular pool)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT0801
+  publication_doi: 10.1128/msystems.01261-22
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: ''
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - growth_phase
+- authors:
+  - Elizabeth B. Kujawinski
+  - Gretchen J. Swarr
+  - Jamie W. Becker
+  - Kathryn Halloran
+  - Keven Dooley
+  - Krista Longnecker
+  - Melissa C. Kido Soule
+  - Rogier Braakman
+  - Sallie W. Chisholm
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 0
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_0801_whole_cell
+  experiment_name: MIT0801 metabolite diversity (intracellular pool)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT0801
+  publication_doi: 10.1128/msystems.01261-22
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: ''
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - growth_phase
+- authors:
   - James I. Mullet
   - Katelyn G. Jones
   - Kurt G. Castro
@@ -5484,6 +5566,88 @@ rows:
   treatment_type:
   - temperature
 - authors:
+  - Elizabeth B. Kujawinski
+  - Gretchen J. Swarr
+  - Jamie W. Becker
+  - Kathryn Halloran
+  - Keven Dooley
+  - Krista Longnecker
+  - Melissa C. Kido Soule
+  - Rogier Braakman
+  - Sallie W. Chisholm
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: extracellular
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 0
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_extracellular
+  experiment_name: MIT9301 metabolite diversity (extracellular pool)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9301
+  publication_doi: 10.1128/msystems.01261-22
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: ''
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - phosphorus
+- authors:
+  - Elizabeth B. Kujawinski
+  - Gretchen J. Swarr
+  - Jamie W. Becker
+  - Kathryn Halloran
+  - Keven Dooley
+  - Krista Longnecker
+  - Melissa C. Kido Soule
+  - Rogier Braakman
+  - Sallie W. Chisholm
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 0
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell
+  experiment_name: MIT9301 metabolite diversity (intracellular pool)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9301
+  publication_doi: 10.1128/msystems.01261-22
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: ''
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - phosphorus
+- authors:
   - Alessandro Mongero
   - Alexis Yelton
   - Elaina Thomas
@@ -5540,6 +5704,57 @@ rows:
   - '7'
   time_point_totals:
   - '25'
+  treatment_type:
+  - carbon
+- authors:
+  - Alessandro Mongero
+  - Alexis Yelton
+  - Elaina Thomas
+  - Elizabeth B. Kujawinska
+  - Giovanna Capovilla
+  - Gregory P. Fournier
+  - Gretchen Swarr
+  - Jack G. Payette
+  - Jacob R. Waldbauer
+  - Julia Schwartzman
+  - Krista Longnecker
+  - Kurt G. Castro
+  - Melissa C. Kido-Soule
+  - Otto X. Cordero
+  - Rogier Braakman
+  - Sallie W. Chisholm
+  - Thomas Hackl
+  - Xinda Lu
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 0
+  experiment_id: 10.1073/pnas.2213271120_chitosan_addition_mit9303_metabolomics
+  experiment_name: MIT9303 chitosan addition — intracellular metabolomics
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9303
+  publication_doi: 10.1073/pnas.2213271120
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: ''
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
   treatment_type:
   - carbon
 - authors:
@@ -5884,6 +6099,139 @@ rows:
   - '72'
   treatment_type:
   - carbon
+- authors:
+  - Alessandro Mongero
+  - Alexis Yelton
+  - Elaina Thomas
+  - Elizabeth B. Kujawinska
+  - Giovanna Capovilla
+  - Gregory P. Fournier
+  - Gretchen Swarr
+  - Jack G. Payette
+  - Jacob R. Waldbauer
+  - Julia Schwartzman
+  - Krista Longnecker
+  - Kurt G. Castro
+  - Melissa C. Kido-Soule
+  - Otto X. Cordero
+  - Rogier Braakman
+  - Sallie W. Chisholm
+  - Thomas Hackl
+  - Xinda Lu
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 0
+  experiment_id: 10.1073/pnas.2213271120_chitosan_addition_mit9313_metabolomics
+  experiment_name: MIT9313 chitosan addition — intracellular metabolomics
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1073/pnas.2213271120
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: ''
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - carbon
+- authors:
+  - Elizabeth B. Kujawinski
+  - Gretchen J. Swarr
+  - Jamie W. Becker
+  - Kathryn Halloran
+  - Keven Dooley
+  - Krista Longnecker
+  - Melissa C. Kido Soule
+  - Rogier Braakman
+  - Sallie W. Chisholm
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: extracellular
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 0
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9313_extracellular
+  experiment_name: MIT9313 metabolite diversity (extracellular pool)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1128/msystems.01261-22
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: ''
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - growth_phase
+- authors:
+  - Elizabeth B. Kujawinski
+  - Gretchen J. Swarr
+  - Jamie W. Becker
+  - Kathryn Halloran
+  - Keven Dooley
+  - Krista Longnecker
+  - Melissa C. Kido Soule
+  - Rogier Braakman
+  - Sallie W. Chisholm
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 0
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9313_whole_cell
+  experiment_name: MIT9313 metabolite diversity (intracellular pool)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1128/msystems.01261-22
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: ''
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - growth_phase
 - authors:
   - Aldo A. Arellano
   - Anitra E. Ingalls

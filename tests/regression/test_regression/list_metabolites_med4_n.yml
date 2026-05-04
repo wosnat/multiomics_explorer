@@ -3,6 +3,8 @@ by_evidence_source:
   evidence_source: metabolism
 - count: 286
   evidence_source: transport
+- count: 66
+  evidence_source: metabolomics
 case_id: list_metabolites_med4_n
 mass_stats:
   mass_max: 5227.103
@@ -25,11 +27,11 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O13P3
-  gene_count: 4432
+  gene_count: 4559
   mass: 503.15
   metabolite_id: kegg.compound:C00002
   name: ATP
-  organism_count: 31
+  organism_count: 32
   pathway_count: 33
   pathway_ids:
   - kegg.pathway:ko00190
@@ -77,11 +79,11 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O10P2
-  gene_count: 2633
+  gene_count: 2705
   mass: 424.179
   metabolite_id: kegg.compound:C00008
   name: ADP
-  organism_count: 31
+  organism_count: 32
   pathway_count: 20
   pathway_ids:
   - kegg.pathway:ko00190
@@ -116,11 +118,11 @@ results:
   - metabolism
   - transport
   formula: C21H26N7O14P2
-  gene_count: 2552
+  gene_count: 2610
   mass: 662.422
   metabolite_id: kegg.compound:C00003
   name: NAD+
-  organism_count: 31
+  organism_count: 32
   pathway_count: 14
   pathway_ids:
   - kegg.pathway:ko00190
@@ -147,12 +149,13 @@ results:
   - P
   evidence_sources:
   - metabolism
+  - metabolomics
   formula: C21H27N7O14P2
-  gene_count: 2351
+  gene_count: 2400
   mass: 663.43
   metabolite_id: kegg.compound:C00004
   name: NADH
-  organism_count: 31
+  organism_count: 32
   pathway_count: 5
   pathway_ids:
   - kegg.pathway:ko00190
@@ -170,12 +173,13 @@ results:
   - P
   evidence_sources:
   - metabolism
+  - metabolomics
   formula: C10H12N5O7P
-  gene_count: 1817
+  gene_count: 1870
   mass: 345.208
   metabolite_id: kegg.compound:C00020
   name: AMP
-  organism_count: 31
+  organism_count: 32
   pathway_count: 25
   pathway_ids:
   - kegg.pathway:ko00230
@@ -218,17 +222,17 @@ top_organisms:
 - count: 778
   organism_name: Prochlorococcus RSP50
 - count: 778
+  organism_name: Prochlorococcus MIT0801
+- count: 778
   organism_name: Prochlorococcus MIT9301
 - count: 777
   organism_name: Prochlorococcus MIT9303
+- count: 776
+  organism_name: Prochlorococcus MIT9313
 - count: 774
   organism_name: Prochlorococcus NATL2A
-- count: 774
-  organism_name: Prochlorococcus MIT9313
 - count: 773
   organism_name: Prochlorococcus NATL1A
-- count: 769
-  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
 top_pathways:
 - count: 472
   pathway_id: kegg.pathway:ko01100
@@ -260,7 +264,7 @@ top_pathways:
 - count: 47
   pathway_id: kegg.pathway:ko00970
   pathway_name: Aminoacyl-tRNA biosynthesis
-total_entries: 3025
+total_entries: 3035
 total_matching: 804
 truncated: true
 xref_coverage:

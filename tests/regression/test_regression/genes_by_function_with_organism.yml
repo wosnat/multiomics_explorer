@@ -7,154 +7,154 @@ rows:
   locus_tag: PMM0001
   organism_name: Prochlorococcus MED4
   product: DNA polymerase III, beta subunit
-  score: 5.2445
+  score: 5.2486
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMM0005
   organism_name: Prochlorococcus MED4
   product: DNA gyrase/topoisomerase IV, subunit A family protein
-  score: 8.1062
+  score: 8.0983
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: msrB
   locus_tag: PMM0015
   organism_name: Prochlorococcus MED4
   product: peptide methionine-R-sulfoxide reductase
-  score: 1.4376
+  score: 1.4354
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ1
   locus_tag: PMM0017
   organism_name: Prochlorococcus MED4
   product: DnaJ type I chaperone protein
-  score: 1.2885
+  score: 1.2936
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: PMM0020
   organism_name: Prochlorococcus MED4
   product: DNA-binding protein, YbaB/EbfC family
-  score: 3.816
+  score: 3.8235
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: PMM0025
   organism_name: Prochlorococcus MED4
   product: cyclophilin type peptidyl-prolyl cis-trans isomerase/CLD family protein
-  score: 0.9386
+  score: 0.9384
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMM0031
   organism_name: Prochlorococcus MED4
   product: HNH endonuclease family protein
-  score: 2.3892
+  score: 2.3934
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMM0038
   organism_name: Prochlorococcus MED4
   product: putative restriction endonuclease
-  score: 1.4225
+  score: 1.4288
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: ypsC
   locus_tag: PMM0053
   organism_name: Prochlorococcus MED4
   product: putative N6-adenine-specific DNA methylase
-  score: 4.4594
+  score: 4.4588
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: PMM0056
   organism_name: Prochlorococcus MED4
   product: conserved hypothetical protein
-  score: 2.6133
+  score: 2.6165
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: smc
   locus_tag: PMM0057
   organism_name: Prochlorococcus MED4
   product: chromosome segregation protein
-  score: 0.8561
+  score: 0.8625
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: def
   locus_tag: PMM0068
   organism_name: Prochlorococcus MED4
   product: peptide deformylase
-  score: 1.5502
+  score: 1.5472
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: rarA
   locus_tag: PMM0077
   organism_name: Prochlorococcus MED4
   product: recombination factor
-  score: 6.0931
+  score: 6.0912
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
   locus_tag: PMM0129
   organism_name: Prochlorococcus MED4
   product: DNA polymerase III, delta^ subunit
-  score: 6.1962
+  score: 6.1942
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: radA
   locus_tag: PMM0133
   organism_name: Prochlorococcus MED4
   product: DNA repair protein Sms/RadA
-  score: 5.6569
+  score: 5.6607
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: rpaB
   locus_tag: PMM0134
   organism_name: Prochlorococcus MED4
   product: two-component system response regulator RR class II (RRII)-CheY-OmpR
-  score: 2.0098
+  score: 2.016
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: rbcR
   locus_tag: PMM0147
   organism_name: Prochlorococcus MED4
   product: possible RuBisCO operon transcriptional regulator
-  score: 1.4315
+  score: 1.4391
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: scpA
   locus_tag: PMM0151
   organism_name: Prochlorococcus MED4
   product: scpA/B family protein
-  score: 2.1858
+  score: 2.193
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: pedR
   locus_tag: PMM0154
   organism_name: Prochlorococcus MED4
   product: redox-responsive LuxR-type transcriptional regulator PedR
-  score: 1.4664
+  score: 1.4739
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: ycf29
   locus_tag: PMM0169
   organism_name: Prochlorococcus MED4
   product: two-component response regulator, NarL subfamily
-  score: 1.4315
+  score: 1.4391
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rnhA
   locus_tag: PMM0200
   organism_name: Prochlorococcus MED4
   product: ribonuclease HI
-  score: 4.8464
+  score: 4.849
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: mutS2
   locus_tag: PMM0217
   organism_name: Prochlorococcus MED4
   product: DNA mismatch repair protein, MutS family
-  score: 4.6711
+  score: 4.6693
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: coaBC
@@ -162,133 +162,133 @@ rows:
   organism_name: Prochlorococcus MED4
   product: phosphopantothenoylcysteine decarboxylase / phosphopantothenate--cysteine
     ligase
-  score: 0.4416
+  score: 0.4459
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: mpg
   locus_tag: PMM0234
   organism_name: Prochlorococcus MED4
   product: DNA-3-methyladenine glycosylase
-  score: 6.7329
+  score: 6.7289
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: sll1424
   locus_tag: PMM0247
   organism_name: Prochlorococcus MED4
   product: conserved hypothetical protein (DUF3084)
-  score: 1.1584
+  score: 1.1571
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMM0248
   organism_name: Prochlorococcus MED4
   product: polynucleotidyl transferase, ribonuclease H fold superfamily
-  score: 4.4218
+  score: 4.4153
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbN
   locus_tag: PMM0252
   organism_name: Prochlorococcus MED4
   product: photosystem II reaction center assembly factor
-  score: 1.8382
+  score: 1.8328
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: PMM0254
   organism_name: Prochlorococcus MED4
   product: protein of unknown function DUF3769
-  score: 1.2699
+  score: 1.268
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: sfsA
   locus_tag: PMM0262
   organism_name: Prochlorococcus MED4
   product: sugar fermentation stimulation protein
-  score: 1.0689
+  score: 1.0757
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: null
   locus_tag: PMM0269
   organism_name: Prochlorococcus MED4
   product: two-component sensor histidine kinase
-  score: 0.9077
+  score: 0.9142
 - annotation_quality: 3
   gene_category: Translation
   gene_name: ygfz
   locus_tag: PMM0276
   organism_name: Prochlorococcus MED4
   product: tRNA-modifying protein
-  score: 3.1259
+  score: 3.1204
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMM0277
   organism_name: Prochlorococcus MED4
   product: recB nuclease, TM0106 family domain protein
-  score: 3.3707
+  score: 3.3737
 - annotation_quality: 3
   gene_category: Nucleotide metabolism
   gene_name: rdgB
   locus_tag: PMM0279
   organism_name: Prochlorococcus MED4
   product: XTP/dITP diphosphohydrolase
-  score: 1.2862
+  score: 1.2914
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: phrA
   locus_tag: PMM0285
   organism_name: Prochlorococcus MED4
   product: deoxyribodipyrimidine photolyase (DNA photolyase) (photoreactivating enzyme)
-  score: 6.2343
+  score: 6.235
 - annotation_quality: 3
   gene_category: Nucleotide metabolism
   gene_name: nudF
   locus_tag: PMM0286
   organism_name: Prochlorococcus MED4
   product: ADP-ribose diphosphatase, NUDIX hydrolase superfamily
-  score: 6.4695
+  score: 6.4623
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: uvrD
   locus_tag: PMM0304
   organism_name: Prochlorococcus MED4
   product: DNA-dependent ATPase I and helicase II
-  score: 5.7335
+  score: 5.7362
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: unk6
   locus_tag: PMM0307
   organism_name: Prochlorococcus MED4
   product: conserved hypothetical protein
-  score: 1.9153
+  score: 1.9075
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: nrdR
   locus_tag: PMM0313
   organism_name: Prochlorococcus MED4
   product: transcriptional regulator, NrdR family
-  score: 1.4664
+  score: 1.4739
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ctp
   locus_tag: PMM0324
   organism_name: Prochlorococcus MED4
   product: carboxy-terminal processing peptidase
-  score: 1.6134
+  score: 1.6099
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: mutM
   locus_tag: PMM0328
   organism_name: Prochlorococcus MED4
   product: formamidopyrimidine-DNA glycolase
-  score: 6.3124
+  score: 6.3111
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: null
   locus_tag: PMM0363
   organism_name: Prochlorococcus MED4
   product: transcriptional regulator, MarR family
-  score: 1.8076
+  score: 1.814
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: spnII1interrupted1C
@@ -296,273 +296,273 @@ rows:
   organism_name: Prochlorococcus MED4
   product: Putative Type IIC bifunctional restriction-modification protein with endonuclease
     and N6-adenine DNA methyltransferase activity
-  score: 2.462
+  score: 2.4695
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMM0386
   organism_name: Prochlorococcus MED4
   product: Putative Type III restriction-modification system, M subunit
-  score: 4.446
+  score: 4.4487
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recO
   locus_tag: PMM0398
   organism_name: Prochlorococcus MED4
   product: gap repair protein RecO
-  score: 9.2357
+  score: 9.2221
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: nifU
   locus_tag: PMM0418
   organism_name: Prochlorococcus MED4
   product: NifU-like protein
-  score: 2.9258
+  score: 2.9203
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: PMM0425
   organism_name: Prochlorococcus MED4
   product: deoxyribodipyrimidine photolyase-like, FAD-domain containing protein
-  score: 4.108
+  score: 4.1059
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: PMM0432
   organism_name: Prochlorococcus MED4
   product: conserved hypothetical protein
-  score: 1.2206
+  score: 1.2273
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: birA
   locus_tag: PMM0433
   organism_name: Prochlorococcus MED4
   product: biotin operon repressor / biotin-[acetyl-CoA-carboxylase] ligase
-  score: 1.0552
+  score: 1.0626
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: topA
   locus_tag: PMM0436
   organism_name: Prochlorococcus MED4
   product: DNA topoisomerase I, omega subunit
-  score: 5.4233
+  score: 5.4286
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: null
   locus_tag: PMM0451
   organism_name: Prochlorococcus MED4
   product: conserved hypothetical protein
-  score: 1.9153
+  score: 1.9075
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: null
   locus_tag: PMM0458
   organism_name: Prochlorococcus MED4
   product: transcriptional regulator with a Cro/C1-type helix-turn-helix domain
-  score: 1.6469
+  score: 1.654
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: lgt
   locus_tag: PMM0460
   organism_name: Prochlorococcus MED4
   product: phosphatidylglycerol:prolipoprotein diacylglycerol transferase
-  score: 1.7965
+  score: 1.7915
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: null
   locus_tag: PMM0466
   organism_name: Prochlorococcus MED4
   product: fibronectin-binding A family protein
-  score: 1.2304
+  score: 1.2287
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: map
   locus_tag: PMM0477
   organism_name: Prochlorococcus MED4
   product: methionine aminopeptidase, type I
-  score: 1.3402
+  score: 1.3386
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMM0480
   organism_name: Prochlorococcus MED4
   product: possible DNA recombination-mediator A family protein
-  score: 3.344
+  score: 3.3524
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: xthA
   locus_tag: PMM0484
   organism_name: Prochlorococcus MED4
   product: exodeoxyribonuclease III
-  score: 4.4784
+  score: 4.4709
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: priA
   locus_tag: PMM0497
   organism_name: Prochlorococcus MED4
   product: primosomal protein N^
-  score: 3.2908
+  score: 3.2949
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: APE1
   locus_tag: PMM0500
   organism_name: Prochlorococcus MED4
   product: acclimation of photosynthesis to environment protein
-  score: 1.1933
+  score: 1.1919
 - annotation_quality: 3
   gene_category: Transport
   gene_name: ycf41
   locus_tag: PMM0502
   organism_name: Prochlorococcus MED4
   product: possible single-stranded DNA-binding protein
-  score: 6.078
+  score: 6.077
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb27
   locus_tag: PMM0507
   organism_name: Prochlorococcus MED4
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 2.1919
+  score: 2.1881
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: null
   locus_tag: PMM0509
   organism_name: Prochlorococcus MED4
   product: conserved hypothetical protein
-  score: 1.4306
+  score: 1.4275
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMM0524
   organism_name: Prochlorococcus MED4
   product: phage integrase family protein
-  score: 3.6762
+  score: 3.6755
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: PMM0538
   organism_name: Prochlorococcus MED4
   product: metallopeptidase M50 family protein
-  score: 1.7965
+  score: 1.7915
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: csoS1D
   locus_tag: PMM0547
   organism_name: Prochlorococcus MED4
   product: carboxysome shell component
-  score: 1.2304
+  score: 1.2287
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaA
   locus_tag: PMM0565
   organism_name: Prochlorococcus MED4
   product: chromosomal replication initiator protein
-  score: 4.93
+  score: 4.9276
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: PMM0605
   organism_name: Prochlorococcus MED4
   product: conserved hypothetical protein (DUF760)
-  score: 1.357
+  score: 1.3545
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaQ
   locus_tag: PMM0621
   organism_name: Prochlorococcus MED4
   product: exonuclease family protein
-  score: 2.4009
+  score: 2.3899
 - annotation_quality: 3
   gene_category: Mobile elements
   gene_name: null
   locus_tag: PMM0631
   organism_name: Prochlorococcus MED4
   product: bacteriophage-like membrane-associated DNA-binding domain-containing protein
-  score: 2.746
+  score: 2.7534
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: fur
   locus_tag: PMM0637
   organism_name: Prochlorococcus MED4
   product: ferric uptake regulator
-  score: 1.5415
+  score: 1.5489
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: PMM0651
   organism_name: Prochlorococcus MED4
   product: conserved hypothetical protein
-  score: 1.357
+  score: 1.3545
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMM0659
   organism_name: Prochlorococcus MED4
   product: NAD-dependent DNA ligase, N-terminal domain
-  score: 6.3504
+  score: 6.3477
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: nrdJ
   locus_tag: PMM0661
   organism_name: Prochlorococcus MED4
   product: ribonucleoside-diphosphate reductase
-  score: 2.9052
+  score: 2.9098
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: PMM0667
   organism_name: Prochlorococcus MED4
   product: conserved hypothetical protein
-  score: 1.4843
+  score: 1.4807
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMM0675
   organism_name: Prochlorococcus MED4
   product: uracil-DNA glycosylase
-  score: 6.8476
+  score: 6.8438
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ctpA
   locus_tag: PMM0677
   organism_name: Prochlorococcus MED4
   product: photosystem II D1 protein carboxyl-terminal processing peptidase
-  score: 1.5502
+  score: 1.5472
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: PMM0680
   organism_name: Prochlorococcus MED4
   product: repair family protein
-  score: 4.5213
+  score: 4.5141
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpS1
   locus_tag: PMM0686
   organism_name: Prochlorococcus MED4
   product: ATP-dependent Clp protease adaptor protein ClpS
-  score: 1.2304
+  score: 1.2287
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: phoR
   locus_tag: PMM0706
   organism_name: Prochlorococcus MED4
   product: two-component system sensor histidine kinase, phosphate sensing PhoR
-  score: 0.8811
+  score: 0.8876
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: null
   locus_tag: PMM0718
   organism_name: Prochlorococcus MED4
   product: transcriptional regulator, Crp family
-  score: 1.6031
+  score: 1.6103
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: pdeM
   locus_tag: PMM0727
   organism_name: Prochlorococcus MED4
   product: metallophosphoesterase, DNA ligase-associated
-  score: 5.5897
+  score: 5.5905
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
@@ -576,690 +576,690 @@ rows:
   locus_tag: PMM0729
   organism_name: Prochlorococcus MED4
   product: ATP-dependent DNA ligase
-  score: 6.5452
+  score: 6.5451
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: null
   locus_tag: PMM0730
   organism_name: Prochlorococcus MED4
   product: putative mRNA 3-end processing factor
-  score: 0.9077
+  score: 0.9142
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: psb29
   locus_tag: PMM0741
   organism_name: Prochlorococcus MED4
   product: photosystem II repair protein Psb29
-  score: 3.268
+  score: 3.2626
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ftsH2
   locus_tag: PMM0743
   organism_name: Prochlorococcus MED4
   product: photosystem II D1 repair protein FtsH2
-  score: 2.985
+  score: 2.9783
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: PMM0745
   organism_name: Prochlorococcus MED4
   product: metallopeptidase, M16 family
-  score: 1.8382
+  score: 1.8328
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: PMM0746
   organism_name: Prochlorococcus MED4
   product: peptidase M16 inactive domain protein
-  score: 1.2304
+  score: 1.2287
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recG
   locus_tag: PMM0756
   organism_name: Prochlorococcus MED4
   product: ATP-dependent DNA helicase
-  score: 6.5794
+  score: 6.5779
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: yqgF
   locus_tag: PMM0791
   organism_name: Prochlorococcus MED4
   product: DNA damage response protein YqgF / putative pre-16S rRNA nuclease
-  score: 4.0569
+  score: 4.0554
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: nth
   locus_tag: PMM0802
   organism_name: Prochlorococcus MED4
   product: endonuclease III
-  score: 6.2957
+  score: 6.2934
 - annotation_quality: 2
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: PMM0805
   organism_name: Prochlorococcus MED4
   product: iron stress-induced protein, Prochlorococcus-specific
-  score: 1.806
+  score: 1.7994
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: PMM0806
   organism_name: Prochlorococcus MED4
   product: possible transcriptional regulator of iron metabolism, Crp/Fnr family protein
-  score: 1.4315
+  score: 1.4391
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: mfd
   locus_tag: PMM0839
   organism_name: Prochlorococcus MED4
   product: transcription-repair coupling factor
-  score: 8.3294
+  score: 8.3198
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: pmbA
   locus_tag: PMM0842
   organism_name: Prochlorococcus MED4
   product: possible modulator of DNA gyrase
-  score: 2.38
+  score: 2.3867
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: tldD
   locus_tag: PMM0843
   organism_name: Prochlorococcus MED4
   product: modulator of DNA gyrase
-  score: 4.9496
+  score: 4.9535
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ftsH3
   locus_tag: PMM0854
   organism_name: Prochlorococcus MED4
   product: possible photosystem II D1 repair protein FtsH3
-  score: 2.8327
+  score: 2.8269
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: PMM0880
   organism_name: Prochlorococcus MED4
   product: PHP domain-containing protein
-  score: 1.9278
+  score: 1.9215
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: uvrC
   locus_tag: PMM0882
   organism_name: Prochlorococcus MED4
   product: excinuclease UvrABC complex, endonuclease subunit
-  score: 5.3702
+  score: 5.3654
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: ribBA
   locus_tag: PMM0893
   organism_name: Prochlorococcus MED4
   product: 3,4-dihydroxy 2-butanone 4-phosphate synthase / GTP cyclohydrolase II
-  score: 0.6578
+  score: 0.6584
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: htpG
   locus_tag: PMM0901
   organism_name: Prochlorococcus MED4
   product: molecular chaperone HtpG
-  score: 1.2272
+  score: 1.2349
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: scpB
   locus_tag: PMM0909
   organism_name: Prochlorococcus MED4
   product: segregation and condensation protein B
-  score: 1.9696
+  score: 1.9767
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
   locus_tag: PMM0936
   organism_name: Prochlorococcus MED4
   product: DNA polymerase V, subunit D
-  score: 5.6441
+  score: 5.6455
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
   locus_tag: PMM0937
   organism_name: Prochlorococcus MED4
   product: DNA polymerase V, subunit C
-  score: 6.4077
+  score: 6.4084
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaG
   locus_tag: PMM0939
   organism_name: Prochlorococcus MED4
   product: DNA primase
-  score: 6.3774
+  score: 6.3763
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: ruvA
   locus_tag: PMM0942
   organism_name: Prochlorococcus MED4
   product: holliday junction ATP-dependent DNA helicase RuvA
-  score: 4.8217
+  score: 4.8263
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
   locus_tag: PMM0945
   organism_name: Prochlorococcus MED4
   product: DNA polymerase III, alpha subunit
-  score: 6.6243
+  score: 6.6254
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: null
   locus_tag: PMM0947
   organism_name: Prochlorococcus MED4
   product: uncharacterized conserved secreted protein (DUF1816)
-  score: 1.4052
+  score: 1.4023
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: msrA1
   locus_tag: PMM0955
   organism_name: Prochlorococcus MED4
   product: peptide methionine sulfoxide reductase
-  score: 3.2204
+  score: 3.2118
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: PMM0975
   organism_name: Prochlorococcus MED4
   product: conserved hypothetical protein (DUF2862)
-  score: 1.655
+  score: 1.6499
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMM0988
   organism_name: Prochlorococcus MED4
   product: helix-hairpin-helix DNA-binding motif class 1-containing protein
-  score: 2.979
+  score: 2.9861
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMM1014
   organism_name: Prochlorococcus MED4
   product: type II-like restriction endonuclease
-  score: 1.0689
+  score: 1.0757
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: zur
   locus_tag: PMM1030
   organism_name: Prochlorococcus MED4
   product: zinc uptake regulator family protein
-  score: 1.5415
+  score: 1.5489
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: PMM1035
   organism_name: Prochlorococcus MED4
   product: possible DNA gyrase/topoisomerase IV, subunit
-  score: 3.6792
+  score: 3.6848
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: ruvC
   locus_tag: PMM1054
   organism_name: Prochlorococcus MED4
   product: crossover junction endodeoxyribonuclease RuvC
-  score: 3.7588
+  score: 3.7614
 - annotation_quality: 3
   gene_category: Translation
   gene_name: rsmD
   locus_tag: PMM1059
   organism_name: Prochlorococcus MED4
   product: 16S rRNA m2G966 methyltransferase
-  score: 2.1605
+  score: 2.1524
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: gyrA
   locus_tag: PMM1063
   organism_name: Prochlorococcus MED4
   product: DNA gyrase, A subunit
-  score: 6.0631
+  score: 6.063
 - annotation_quality: 3
   gene_category: Carbohydrate metabolism
   gene_name: sasA
   locus_tag: PMM1077
   organism_name: Prochlorococcus MED4
   product: adaptive-response sensory kinase
-  score: 0.7139
+  score: 0.7198
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: null
   locus_tag: PMM1082
   organism_name: Prochlorococcus MED4
   product: helix-turn-helix domain-containing protein
-  score: 1.6932
+  score: 1.7001
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpC
   locus_tag: PMM1088
   organism_name: Prochlorococcus MED4
   product: ATP-dependent Clp protease ATP-binding subunit ClpC
-  score: 0.6168
+  score: 0.6174
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recR
   locus_tag: PMM1097
   organism_name: Prochlorococcus MED4
   product: recombination protein RecR
-  score: 7.7676
+  score: 7.7587
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: crhR
   locus_tag: PMM1101
   organism_name: Prochlorococcus MED4
   product: cyanobacterial RNA helicase
-  score: 1.2552
+  score: 1.2541
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: PMM1102
   organism_name: Prochlorococcus MED4
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 3.7408
+  score: 3.7402
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recB
   locus_tag: PMM1103
   organism_name: Prochlorococcus MED4
   product: exodeoxyribonuclease V (RecBCD complex), beta subunit
-  score: 6.3412
+  score: 6.3361
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recC
   locus_tag: PMM1105
   organism_name: Prochlorococcus MED4
   product: exodeoxyribonuclease V (RecBCD complex), gamma subunit
-  score: 3.2497
+  score: 3.25
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: PMM1112
   organism_name: Prochlorococcus MED4
   product: conserved hypothetical protein
-  score: 1.4306
+  score: 1.4275
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: null
   locus_tag: PMM1113
   organism_name: Prochlorococcus MED4
   product: two-component system response regulator RR class II (RRII)-OmpR
-  score: 1.0322
+  score: 1.039
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: PMM1140
   organism_name: Prochlorococcus MED4
   product: DNA polymerase I
-  score: 6.0294
+  score: 6.0301
 - annotation_quality: 2
   gene_category: Transport
   gene_name: null
   locus_tag: PMM1195
   organism_name: Prochlorococcus MED4
   product: conserved hypothetical protein
-  score: 1.312
+  score: 1.3098
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: wzc
   locus_tag: PMM1225
   organism_name: Prochlorococcus MED4
   product: P-loop containing nucleoside triphosphate hydrolase
-  score: 0.9853
+  score: 0.9849
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: lexA
   locus_tag: PMM1262
   organism_name: Prochlorococcus MED4
   product: SOS-response transcriptional repressor
-  score: 6.3772
+  score: 6.3773
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: zipN
   locus_tag: PMM1287
   organism_name: Prochlorococcus MED4
   product: cell division protein ZipN
-  score: 1.0943
+  score: 1.0934
 - annotation_quality: 3
   gene_category: Nucleotide metabolism
   gene_name: yjef
   locus_tag: PMM1290
   organism_name: Prochlorococcus MED4
   product: bifunctional NAD(P)HX epimerase / NAD(P)HX dehydratase
-  score: 1.7818
+  score: 1.7796
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: ftsQ
   locus_tag: PMM1308
   organism_name: Prochlorococcus MED4
   product: cell division protein FtsQ
-  score: 1.1254
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: hupB
   locus_tag: PMM1321
   organism_name: Prochlorococcus MED4
   product: DNA-binding protein HU-beta
-  score: 5.9293
+  score: 5.9294
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: PMM1326
   organism_name: Prochlorococcus MED4
   product: conserved hypothetical protein
-  score: 1.0943
+  score: 1.0934
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: PMM1330
   organism_name: Prochlorococcus MED4
   product: conserved hypothetical protein
-  score: 1.4052
+  score: 1.4023
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: pepA
   locus_tag: PMM1332
   organism_name: Prochlorococcus MED4
   product: leucine aminopeptidase
-  score: 1.2794
+  score: 1.2871
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: msrA2
   locus_tag: PMM1333
   organism_name: Prochlorococcus MED4
   product: peptide methionine sulfoxide reductase
-  score: 3.0069
+  score: 2.9998
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: nblS
   locus_tag: PMM1341
   organism_name: Prochlorococcus MED4
   product: two component sensor, signal transduction histidine kinase
-  score: 0.8561
+  score: 0.8625
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: kaiC
   locus_tag: PMM1342
   organism_name: Prochlorococcus MED4
   product: circadian clock protein KaiC
-  score: 1.4149
+  score: 1.4201
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: PMM1359
   organism_name: Prochlorococcus MED4
   product: uncharacterized conserved membrane protein, DoxX family
-  score: 1.312
+  score: 1.3098
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: PMM1360
   organism_name: Prochlorococcus MED4
   product: FAD binding domain of DNA photolyase
-  score: 5.0131
+  score: 5.02
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: null
   locus_tag: PMM1369
   organism_name: Prochlorococcus MED4
   product: GAF domain-containing protein
-  score: 0.8561
+  score: 0.8625
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: yedK
   locus_tag: PMM1381
   organism_name: Prochlorococcus MED4
   product: putative SOS response associated peptidase
-  score: 3.3042
+  score: 3.3076
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: null
   locus_tag: PMM1391
   organism_name: Prochlorococcus MED4
   product: ribbon helix-helix domain containing protein
-  score: 2.0199
+  score: 2.0251
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMM1403
   organism_name: Prochlorococcus MED4
   product: HNH endonuclease family protein
-  score: 2.31
+  score: 2.3145
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMM1417
   organism_name: Prochlorococcus MED4
   product: nuclease (SNase-like)
-  score: 4.4522
+  score: 4.4461
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rpoZ
   locus_tag: PMM1431
   organism_name: Prochlorococcus MED4
   product: DNA-directed RNA polymerase omega subunit
-  score: 3.635
+  score: 3.6424
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: glnB
   locus_tag: PMM1463
   organism_name: Prochlorococcus MED4
   product: nitrogen regulatory protein P-II
-  score: 1.3665
+  score: 1.3742
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: ski2
   locus_tag: PMM1467
   organism_name: Prochlorococcus MED4
   product: ATP-dependent DNA/RNA helicase, superfamily 1/2
-  score: 5.9077
+  score: 5.9047
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rpoC2
   locus_tag: PMM1483
   organism_name: Prochlorococcus MED4
   product: DNA-directed RNA polymerase, beta^^ subunit
-  score: 3.9806
+  score: 3.9883
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rpoC1
   locus_tag: PMM1484
   organism_name: Prochlorococcus MED4
   product: DNA-directed RNA polymerase complex, gamma subunit
-  score: 3.9553
+  score: 3.963
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rpoB
   locus_tag: PMM1485
   organism_name: Prochlorococcus MED4
   product: DNA-directed RNA polymerase, beta subunit
-  score: 3.9308
+  score: 3.9387
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: tatD
   locus_tag: PMM1486
   organism_name: Prochlorococcus MED4
   product: Mg-dependent DNase
-  score: 2.1219
+  score: 2.1142
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rnhB
   locus_tag: PMM1502
   organism_name: Prochlorococcus MED4
   product: ribonuclease HII
-  score: 4.8004
+  score: 4.8014
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMM1515
   organism_name: Prochlorococcus MED4
   product: site-specific recombinase
-  score: 4.5717
+  score: 4.5645
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rpoA
   locus_tag: PMM1535
   organism_name: Prochlorococcus MED4
   product: DNA-directed RNA polymerase, alpha subunit
-  score: 3.9806
+  score: 3.9883
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recA
   locus_tag: PMM1562
   organism_name: Prochlorococcus MED4
   product: recombinase A
-  score: 5.415
+  score: 5.4146
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dinG
   locus_tag: PMM1564
   organism_name: Prochlorococcus MED4
   product: ATP-dependent helicase C-terminal domain-containing protein
-  score: 4.2981
+  score: 4.2943
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recF
   locus_tag: PMM1573
   organism_name: Prochlorococcus MED4
   product: DNA replication and repair protein recF
-  score: 7.7569
+  score: 7.7479
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ptpA
   locus_tag: PMM1591
   organism_name: Prochlorococcus MED4
   product: low molecular weight protein-tyrosine-phosphatase
-  score: 1.4376
+  score: 1.4354
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: pebA
   locus_tag: PMM1593
   organism_name: Prochlorococcus MED4
   product: 15,16 dihydrobiliverdin:ferredoxin oxidoreductase
-  score: 1.1254
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: ruvB
   locus_tag: PMM1615
   organism_name: Prochlorococcus MED4
   product: holliday junction ATP-dependent DNA helicase RuvB
-  score: 4.7894
+  score: 4.7933
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: srrA
   locus_tag: PMM1619
   organism_name: Prochlorococcus MED4
   product: NblS-interacting two-component response regulator, OmpR family
-  score: 2.5497
+  score: 2.5572
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: ssb
   locus_tag: PMM1623
   organism_name: Prochlorococcus MED4
   product: single-stranded DNA-binding protein
-  score: 6.5924
+  score: 6.5889
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: rpoD8
   locus_tag: PMM1629
   organism_name: Prochlorococcus MED4
   product: RNA polymerase sigma factor, type II
-  score: 1.2272
+  score: 1.2349
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: gyrB
   locus_tag: PMM1634
   organism_name: Prochlorococcus MED4
   product: DNA gyrase, B subunit
-  score: 6.0121
+  score: 6.0125
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: null
   locus_tag: PMM1637
   organism_name: Prochlorococcus MED4
   product: transcriptional regulator, GntR family
-  score: 1.582
+  score: 1.5893
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: mutS
   locus_tag: PMM1645
   organism_name: Prochlorococcus MED4
   product: DNA mismatch repair protein MutS
-  score: 7.2541
+  score: 7.2444
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
   locus_tag: PMM1647
   organism_name: Prochlorococcus MED4
   product: DNA polymerase III, delta subunit
-  score: 6.1558
+  score: 6.1549
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: uvrB
   locus_tag: PMM1649
   organism_name: Prochlorococcus MED4
   product: excinuclease UvrABC complex, helicase subunit
-  score: 5.317
+  score: 5.3196
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: PMM1658
   organism_name: Prochlorococcus MED4
   product: DNA polymerase III, gamma and tau subunits
-  score: 5.8211
+  score: 5.8229
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaB
   locus_tag: PMM1674
   organism_name: Prochlorococcus MED4
   product: replicative DNA helicase
-  score: 6.2865
+  score: 6.2868
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: ubiC
   locus_tag: PMM1676
   organism_name: Prochlorococcus MED4
   product: chorismate pyruvate-lyase
-  score: 1.0943
+  score: 1.0934
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: ligA
   locus_tag: PMM1679
   organism_name: Prochlorococcus MED4
   product: ATP-dependent DNA ligase
-  score: 6.5583
+  score: 6.5558
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rpoD4
   locus_tag: PMM1697
   organism_name: Prochlorococcus MED4
   product: RNA polymerase sigma factor, type II
-  score: 1.0935
+  score: 1.101
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: uvrA
   locus_tag: PMM1712
   organism_name: Prochlorococcus MED4
   product: excinuclease UvrABC complex, ATPase subunit
-  score: 6.3844
+  score: 6.3814
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: recN
   locus_tag: PMM1713
   organism_name: Prochlorococcus MED4
   product: ATP-dependent DNA repair protein RecN
-  score: 9.2217
+  score: 9.2109
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMM1841
   organism_name: Prochlorococcus MED4
   product: Putative Type III restriction-modification system, R subunit
-  score: 2.5605
+  score: 2.5674
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMM1843
   organism_name: Prochlorococcus MED4
   product: Hypothetical protein
-  score: 3.7346
+  score: 3.7413

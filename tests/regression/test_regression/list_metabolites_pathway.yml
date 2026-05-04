@@ -3,6 +3,8 @@ by_evidence_source:
   evidence_source: metabolism
 - count: 12
   evidence_source: transport
+- count: 2
+  evidence_source: metabolomics
 case_id: list_metabolites_pathway
 mass_stats:
   mass_max: 146.146
@@ -22,11 +24,11 @@ results:
   - metabolism
   - transport
   formula: CO2
-  gene_count: 1834
+  gene_count: 1879
   mass: 44.009
   metabolite_id: kegg.compound:C00011
   name: CO2
-  organism_count: 31
+  organism_count: 32
   pathway_count: 25
   pathway_ids:
   - kegg.pathway:ko00220
@@ -63,11 +65,11 @@ results:
   - metabolism
   - transport
   formula: H4N
-  gene_count: 1684
+  gene_count: 1720
   mass: 18.039
   metabolite_id: kegg.compound:C00014
   name: Ammonia
-  organism_count: 31
+  organism_count: 32
   pathway_count: 19
   pathway_ids:
   - kegg.pathway:ko00220
@@ -97,11 +99,11 @@ results:
   - metabolism
   - transport
   formula: O2
-  gene_count: 1668
+  gene_count: 1703
   mass: 31.998
   metabolite_id: kegg.compound:C00007
   name: Oxygen
-  organism_count: 31
+  organism_count: 32
   pathway_count: 13
   pathway_ids:
   - kegg.pathway:ko00190
@@ -126,13 +128,14 @@ results:
   - O
   evidence_sources:
   - metabolism
+  - metabolomics
   - transport
   formula: C5H10N2O3
-  gene_count: 1645
+  gene_count: 1686
   mass: 146.146
   metabolite_id: kegg.compound:C00064
   name: L-Glutamine
-  organism_count: 31
+  organism_count: 32
   pathway_count: 24
   pathway_ids:
   - kegg.pathway:ko00220
@@ -168,13 +171,14 @@ results:
   - O
   evidence_sources:
   - metabolism
+  - metabolomics
   - transport
   formula: C5H8NO4
-  gene_count: 1458
+  gene_count: 1496
   mass: 146.122
   metabolite_id: kegg.compound:C00025
   name: L-Glutamate
-  organism_count: 31
+  organism_count: 32
   pathway_count: 52
   pathway_ids:
   - kegg.pathway:ko00220
@@ -239,11 +243,11 @@ results:
   - metabolism
   - transport
   formula: CHO3
-  gene_count: 943
+  gene_count: 965
   mass: 61.016
   metabolite_id: kegg.compound:C00288
   name: HCO3-
-  organism_count: 31
+  organism_count: 32
   pathway_count: 17
   pathway_ids:
   - kegg.pathway:ko00220
@@ -272,11 +276,11 @@ results:
   - metabolism
   - transport
   formula: NO2
-  gene_count: 664
+  gene_count: 676
   mass: 46.005
   metabolite_id: kegg.compound:C00088
   name: Nitrite
-  organism_count: 31
+  organism_count: 32
   pathway_count: 8
   pathway_ids:
   - kegg.pathway:ko00910
@@ -297,11 +301,11 @@ results:
   - metabolism
   - transport
   formula: CNO
-  gene_count: 567
+  gene_count: 579
   mass: 42.017
   metabolite_id: kegg.compound:C01417
   name: Cyanate
-  organism_count: 31
+  organism_count: 32
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00910
@@ -317,11 +321,11 @@ results:
   - metabolism
   - transport
   formula: CHO2
-  gene_count: 307
+  gene_count: 313
   mass: 45.017
   metabolite_id: kegg.compound:C00058
   name: Formate
-  organism_count: 31
+  organism_count: 32
   pathway_count: 11
   pathway_ids:
   - kegg.pathway:ko00440
@@ -346,11 +350,11 @@ results:
   evidence_sources:
   - metabolism
   formula: CH2NO5P
-  gene_count: 133
+  gene_count: 137
   mass: 139.003
   metabolite_id: kegg.compound:C00169
   name: Carbamoyl phosphate
-  organism_count: 31
+  organism_count: 32
   pathway_count: 11
   pathway_ids:
   - kegg.pathway:ko00220
@@ -373,11 +377,11 @@ results:
   - metabolism
   - transport
   formula: N2O
-  gene_count: 103
+  gene_count: 105
   mass: 44.013
   metabolite_id: kegg.compound:C00887
   name: Nitrous oxide
-  organism_count: 31
+  organism_count: 32
   pathway_count: 4
   pathway_ids:
   - kegg.pathway:ko00910
@@ -394,11 +398,11 @@ results:
   evidence_sources:
   - metabolism
   formula: CH2NO2
-  gene_count: 96
+  gene_count: 99
   mass: 60.032
   metabolite_id: kegg.compound:C01563
   name: Carbamate
-  organism_count: 31
+  organism_count: 32
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00240
@@ -615,7 +619,7 @@ top_pathways:
 - count: 6
   pathway_id: kegg.pathway:ko02010
   pathway_name: ABC transporters
-total_entries: 3025
+total_entries: 3035
 total_matching: 18
 truncated: false
 xref_coverage:

@@ -2,54 +2,54 @@ case_id: list_filter_values
 row_count: 26
 rows:
 - category: Amino acid metabolism
-  gene_count: 6124
+  gene_count: 6228
 - category: Carbohydrate metabolism
-  gene_count: 3692
+  gene_count: 3781
 - category: Cell cycle and division
-  gene_count: 1089
+  gene_count: 1108
 - category: Cell motility
-  gene_count: 1715
+  gene_count: 1727
 - category: Cell wall and membrane
-  gene_count: 5276
+  gene_count: 5372
 - category: Cellular processes
-  gene_count: 449
+  gene_count: 470
 - category: Central intermediary metabolism
-  gene_count: 326
+  gene_count: 348
 - category: Coenzyme metabolism
-  gene_count: 4950
+  gene_count: 5133
 - category: Defense mechanisms
-  gene_count: 892
+  gene_count: 894
 - category: Energy production
-  gene_count: 4443
+  gene_count: 4454
 - category: Inorganic ion transport
-  gene_count: 3470
+  gene_count: 3471
 - category: Intracellular trafficking
-  gene_count: 896
+  gene_count: 898
 - category: Lipid metabolism
-  gene_count: 2559
+  gene_count: 2590
 - category: Mobile elements
-  gene_count: 45
+  gene_count: 49
 - category: Nucleotide metabolism
-  gene_count: 2322
+  gene_count: 2371
 - category: Photosynthesis
-  gene_count: 1161
+  gene_count: 1237
 - category: Post-translational modification
-  gene_count: 3189
+  gene_count: 3272
 - category: Regulatory functions
-  gene_count: 325
+  gene_count: 342
 - category: Replication and repair
-  gene_count: 4081
+  gene_count: 4161
 - category: Secondary metabolites
-  gene_count: 1006
+  gene_count: 1016
 - category: Signal transduction
-  gene_count: 3122
+  gene_count: 3135
 - category: Stress response and adaptation
-  gene_count: 3048
+  gene_count: 3284
 - category: Transcription
-  gene_count: 4679
+  gene_count: 4721
 - category: Translation
-  gene_count: 5219
+  gene_count: 5359
 - category: Transport
-  gene_count: 1261
+  gene_count: 1332
 - category: Unknown
-  gene_count: 32174
+  gene_count: 33118

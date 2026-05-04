@@ -1,5 +1,5 @@
 case_id: list_publications_all
-row_count: 40
+row_count: 41
 rows:
 - authors:
   - James I. Mullet
@@ -236,11 +236,12 @@ rows:
   derived_metric_count: 0
   derived_metric_value_kinds: []
   doi: 10.1073/pnas.2213271120
-  experiment_count: 2
+  experiment_count: 4
   growth_phases:
   - exponential
   journal: Proceedings of the National Academy of Sciences
   omics_types:
+  - METABOLOMICS
   - RNASEQ
   organisms:
   - Prochlorococcus MIT9303
@@ -288,6 +289,41 @@ rows:
   treatment_types:
   - carbon
   - coculture
+  year: 2023
+- authors:
+  - Elizabeth B. Kujawinski
+  - Gretchen J. Swarr
+  - Jamie W. Becker
+  - Kathryn Halloran
+  - Keven Dooley
+  - Krista Longnecker
+  - Melissa C. Kido Soule
+  - Rogier Braakman
+  - Sallie W. Chisholm
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - extracellular
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  doi: 10.1128/msystems.01261-22
+  experiment_count: 6
+  growth_phases: []
+  journal: mSystems
+  omics_types:
+  - METABOLOMICS
+  organisms:
+  - Prochlorococcus MIT0801
+  - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9313
+  study_type: Metabolomics
+  title: Metabolite diversity among representatives of divergent Prochlorococcus ecotypes
+  treatment_types:
+  - growth_phase
+  - phosphorus
   year: 2023
 - authors:
   - ' Ana M. Cabello'

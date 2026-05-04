@@ -24,11 +24,11 @@ results:
   - metabolism
   - transport
   formula: C6H12O6
-  gene_count: 320
+  gene_count: 324
   mass: 180.156
   metabolite_id: kegg.compound:C00031
   name: D-Glucose
-  organism_count: 31
+  organism_count: 32
   pathway_count: 35
   pathway_ids:
   - kegg.pathway:ko00010
@@ -123,7 +123,7 @@ top_pathways:
 - count: 1
   pathway_id: kegg.pathway:ko00010
   pathway_name: Glycolysis / Gluconeogenesis
-total_entries: 3025
+total_entries: 3035
 total_matching: 1
 truncated: false
 xref_coverage:

@@ -75,7 +75,7 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 2
+  experiment_count: 8
   gene_count: 1935
   genus: Prochlorococcus
   growth_phases:
@@ -83,10 +83,11 @@ rows:
   metabolite_count: 1559
   ncbi_taxon_id: 167546
   omics_types:
+  - METABOLOMICS
   - RNASEQ
   organism_name: Prochlorococcus MIT9301
   organism_type: genome_strain
-  publication_count: 2
+  publication_count: 3
   reaction_count: 945
   reference_database: null
   reference_proteome: null
@@ -94,4 +95,5 @@ rows:
   strain: MIT9301
   treatment_types:
   - growth_phase
+  - phosphorus
   - temperature
