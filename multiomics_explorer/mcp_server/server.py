@@ -88,15 +88,22 @@ for uri_prefix, (doc_dir, desc_template) in _DOC_DIRS.items():
 # --- Static resources: example scripts (not auto-discovered from .md files) ---
 _EXAMPLES_DIR = Path(__file__).resolve().parent.parent.parent / "examples"
 
-mcp.add_resource(
-    FunctionResource.from_function(
-        fn=(lambda p: lambda: p.read_text())(_EXAMPLES_DIR / "pathway_enrichment.py"),
-        uri="docs://examples/pathway_enrichment.py",
-        name="pathway_enrichment.py",
-        description="Runnable example script for pathway enrichment",
-        mime_type="text/x-python",
+for example_name, example_description in [
+    ("pathway_enrichment.py", "Runnable example script for pathway enrichment"),
+    (
+        "metabolites.py",
+        "Runnable metabolites workflow examples (3 source pipelines × 8 scenarios)",
+    ),
+]:
+    mcp.add_resource(
+        FunctionResource.from_function(
+            fn=(lambda p: lambda: p.read_text())(_EXAMPLES_DIR / example_name),
+            uri=f"docs://examples/{example_name}",
+            name=example_name,
+            description=example_description,
+            mime_type="text/x-python",
+        )
     )
-)
 
 
 def main():
