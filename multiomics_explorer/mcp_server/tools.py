@@ -806,6 +806,376 @@ class GenesByMetaboliteResponse(BaseModel):
         "`summary=True`.")
 
 
+# ---------------------------------------------------------------------------
+# metabolites_by_gene response models (module-level for direct importability)
+#
+# Naming convention: tool-anchored `Mbg*` prefix because the envelope mixes
+# entity types (gene-anchored `by_gene`, element-anchored `by_element`,
+# metabolite-anchored `top_metabolites`, pathway-anchored `top_pathways`).
+# `GeneReactionMetaboliteTriplet` is REUSED VERBATIM from
+# `genes_by_metabolite` (defined above at module level) — the per-row payload
+# is identical regardless of which side anchored the query.
+# ---------------------------------------------------------------------------
+
+class MbgByGene(BaseModel):
+    """Per-gene rollup. One entry per input locus_tag that produced ≥1 row.
+
+    Cardinality bounded by the input list — kept as `by_*` (full rollup),
+    not `top_*`. The gene-anchored mirror of GBM's `by_metabolite`.
+    """
+    locus_tag: str = Field(
+        description="Gene locus tag (e.g. 'PMM0963').")
+    gene_name: str | None = Field(
+        default=None,
+        description="Curated gene name (e.g. 'ureC'); often null.")
+    product: str | None = Field(
+        default=None,
+        description="Annotated product description (e.g. 'urease alpha "
+        "subunit'). Often null.")
+    rows: int = Field(
+        description="Total rows for this gene across both arms in the "
+        "filtered slice.")
+    metabolite_count: int = Field(
+        description="Distinct metabolites this gene reaches via either arm "
+        "(deduplicated across metabolism and transport).")
+    reaction_count: int = Field(
+        description="Distinct Reactions this gene catalyzes (metabolism "
+        "arm). 0 when the gene is reachable only via the transport arm.")
+    transporter_count: int = Field(
+        description="Distinct TcdbFamily nodes this gene is annotated to "
+        "(transport arm). 0 when the gene is reachable only via the "
+        "metabolism arm.")
+    metabolism_rows: int = Field(
+        description="Row count for the metabolism arm.")
+    transport_substrate_confirmed_rows: int = Field(
+        description="Row count for transport rows annotated at TCDB "
+        "`tc_specificity` (substrate-curated). High-precision transport "
+        "evidence.")
+    transport_family_inferred_rows: int = Field(
+        description="Row count for transport rows annotated at coarser "
+        "TCDB levels (rolled up via the substrate edge). Lower-precision — "
+        "the gene's actual substrate may differ.")
+
+
+class MbgByEvidenceSource(BaseModel):
+    """Frequency rollup over `evidence_source` values present in the slice.
+
+    ≤2 entries — `metabolism` and/or `transport`. Identical shape to GBM's
+    `GbmByEvidenceSource`. (Metabolomics has no gene anchor and never
+    produces rows here.)
+    """
+    evidence_source: Literal["metabolism", "transport"] = Field(
+        description="Path through which the gene reaches the metabolite. "
+        "'metabolism' = `Gene → Reaction → Metabolite`. 'transport' = "
+        "`Gene → TcdbFamily → Metabolite` (rollup-extended).")
+    count: int = Field(
+        description="Row count for this evidence_source in the filtered "
+        "slice.")
+
+
+class MbgByTransportConfidence(BaseModel):
+    """Frequency rollup over `transport_confidence` for transport rows only.
+
+    ≤2 entries — `substrate_confirmed` and/or `family_inferred`. Identical
+    shape to GBM's `GbmByTransportConfidence`. Metabolism rows are
+    excluded from this rollup (their `transport_confidence` is None).
+    """
+    transport_confidence: Literal[
+        "substrate_confirmed", "family_inferred"] = Field(
+        description="TCDB-annotation specificity behind the transport "
+        "edge. `substrate_confirmed` = annotated at `tc_specificity` "
+        "(leaf, substrate-curated). `family_inferred` = annotated at a "
+        "coarser TCDB level (rolled up; gene may not move this metabolite).")
+    count: int = Field(
+        description="Transport-row count for this confidence level in the "
+        "filtered slice.")
+
+
+class MbgByElement(BaseModel):
+    """NEW (vs GBM) — Element presence rollup across the metabolites the
+    gene set touches. Periodic-table-bounded (~30 elements max in KG);
+    kept as `by_*` (full rollup, not top-N).
+
+    Answers the C/N/P/S/metal-presence signature question. Anchored on
+    `Metabolite.elements` (KG-A3 Hill-parsed presence list).
+    """
+    element: str = Field(
+        description="Element symbol (Hill notation, e.g. 'C', 'N', 'P', "
+        "'S', 'Fe').")
+    metabolite_count: int = Field(
+        description="Distinct metabolites in the filtered slice that "
+        "contain this element. Empty `m.elements` (31/2,188 metabolites "
+        "without formula) does not contribute.")
+
+
+class MbgTopMetabolite(BaseModel):
+    """Top-N (truncated to 10) metabolites by gene reach in the filtered
+    slice. The headline answer to 'what metabolites do my gene set hit
+    most.' The gene-anchored mirror of GBM's `top_genes`.
+
+    Drill-down: pass any `metabolite_id` to
+    `list_metabolites(metabolite_ids=[...])` for richer per-metabolite
+    cross-refs, or
+    `list_metabolites(metabolite_ids=[...], organism_names=[partner])`
+    for cross-organism presence (cross-feeding primitive).
+    """
+    metabolite_id: str = Field(
+        description="Full prefixed Metabolite ID (e.g. "
+        "'kegg.compound:C00086').")
+    name: str = Field(
+        description="Metabolite display name (e.g. 'Urea').")
+    formula: str | None = Field(
+        default=None,
+        description="Hill-notation formula (e.g. 'CH4N2O'); null on ~9% "
+        "of metabolites (transport-only ChEBI generics).")
+    gene_count: int = Field(
+        description="Distinct input genes touching this metabolite via "
+        "either arm.")
+    reaction_count: int = Field(
+        description="Distinct Reactions in the filtered metabolism arm "
+        "connecting this metabolite to input genes. 0 when the metabolite "
+        "is reachable only via the transport arm.")
+    transporter_count: int = Field(
+        description="Distinct TcdbFamily nodes (transport arm). 0 when "
+        "reachable only via the metabolism arm.")
+    metabolism_rows: int = Field(
+        description="Metabolism-arm row count for this metabolite.")
+    transport_substrate_confirmed_rows: int = Field(
+        description="Transport-arm row count at `tc_specificity` "
+        "(substrate-curated). High-precision.")
+    transport_family_inferred_rows: int = Field(
+        description="Transport-arm row count at coarser TCDB levels "
+        "(rolled up; lower-precision).")
+
+
+class MbgTopReaction(BaseModel):
+    """Top-N (truncated to 10) reactions by gene_count in the metabolism
+    arm. Identical shape to GBM's `GbmTopReaction`.
+
+    Drill-down: pass any `ec_numbers` entry to
+    `genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)` for
+    genes in adjacent reactions, or `pathway_enrichment` for context.
+    """
+    reaction_id: str = Field(
+        description="Full prefixed Reaction ID (e.g. "
+        "'kegg.reaction:R00131').")
+    name: str = Field(
+        description="Reaction systematic name + KEGG equation (raw KEGG; "
+        "may be empty `''` for 32 reactions in the KG).")
+    ec_numbers: list[str] = Field(
+        description="EC classification(s) for this reaction; empty list "
+        "for 107/2,349 reactions without EC annotation.")
+    gene_count: int = Field(
+        description="Distinct input genes catalyzing this reaction in "
+        "the filtered slice.")
+    metabolite_count: int = Field(
+        description="Distinct metabolites this reaction connects to in "
+        "the filtered slice.")
+
+
+class MbgTopTcdbFamily(BaseModel):
+    """Top-N (truncated to 10) TCDB families by gene_count in transport
+    rows. Identical shape to GBM's `GbmTopTcdbFamily`.
+
+    Drill-down: pass any `tcdb_family_id` to
+    `genes_by_ontology(ontology="tcdb", term_ids=[id], organism=...)`
+    for sibling genes in the same family.
+    """
+    tcdb_family_id: str = Field(
+        description="Full prefixed TcdbFamily ID (e.g. 'tcdb:3.A.1.4.5').")
+    tcdb_family_name: str = Field(
+        description="Display name. For tc_family-level entries (~10 in "
+        "the KG) this is human-readable (e.g. 'The ATP-binding Cassette "
+        "(ABC) Superfamily'); for tc_subfamily / tc_specificity falls "
+        "back to the `tcdb_id` value.")
+    level_kind: str = Field(
+        description="One of tc_class / tc_subclass / tc_family / "
+        "tc_subfamily / tc_specificity. Determines `transport_confidence`.")
+    transport_confidence: Literal[
+        "substrate_confirmed", "family_inferred"] = Field(
+        description="Derived from level_kind: 'substrate_confirmed' iff "
+        "level_kind == 'tc_specificity'. Pre-computed for at-a-glance "
+        "filtering of the rollup.")
+    gene_count: int = Field(
+        description="Distinct input genes annotated to this TCDB family "
+        "in the filtered transport-row slice.")
+    metabolite_count: int = Field(
+        description="Distinct metabolites this family transports in the "
+        "filtered slice.")
+
+
+class MbgTopGeneCategory(BaseModel):
+    """Top-N (truncated to 10) `Gene.gene_category` values by gene_count
+    over the input gene set. Identical shape to GBM's `GbmTopGeneCategory`.
+    """
+    category: str = Field(
+        description="One of the curated Gene.gene_category values (e.g. "
+        "'Amino acid metabolism', 'Transport'). Use "
+        "`list_filter_values(filter_type=\"gene_category\")` for the "
+        "valid set.")
+    gene_count: int = Field(
+        description="Distinct input genes in this category contributing "
+        "rows in the filtered slice.")
+
+
+class MbgTopPathway(BaseModel):
+    """NEW (vs GBM) — Top-N (truncated to 10) KEGG pathways the gene
+    set's chemistry reaches. Pathway namespace explicitly distinct from
+    gene-KO pathway annotations available via
+    `genes_by_ontology(ontology="kegg")` (where pathway membership is
+    asserted by the gene's KO assignment, not by chemistry reach).
+
+    Source: UNION of `Reaction_in_kegg_pathway` (reaction-side) +
+    `Metabolite_in_pathway` (metabolite-side, via reaction-arm
+    metabolites OR transport-arm metabolites). Filter
+    `WHERE p.reaction_count >= 3` drops signaling/disease pathways with
+    no chemistry breadth. Rank: `gene_count DESC, p.reaction_count ASC`
+    (more genes hitting + more focused pathway).
+
+    Drill-down: pass any `pathway_id` to
+    `list_metabolites(pathway_ids=[...])` for the full metabolite roster
+    of the pathway (not just gene-set hits), or
+    `genes_by_ontology(ontology="kegg", term_ids=[id], organism=...)`
+    for gene-KO-mediated pathway annotations. For metabolic pathway
+    analysis with a hypothesis test, use `pathway_enrichment`.
+    """
+    pathway_id: str = Field(
+        description="Full prefixed KEGG pathway ID (e.g. "
+        "'kegg.pathway:ko00910').")
+    pathway_name: str = Field(
+        description="Pathway display name (e.g. 'Nitrogen metabolism').")
+    gene_count: int = Field(
+        description="Distinct input genes with ≥1 chemistry edge into "
+        "this pathway (via reaction-side or metabolite-side).")
+    pathway_reaction_count: int = Field(
+        description="Total reactions in this pathway in the KG (KG-4 "
+        "rollup, 100% on pathway-level entries). At-a-glance pathway "
+        "sizing.")
+    pathway_metabolite_count: int = Field(
+        description="Total metabolites in this pathway in the KG (KG-4 "
+        "rollup).")
+
+
+class MbgNotFound(BaseModel):
+    """Diagnostics for inputs that did not resolve to any KG node.
+
+    See also `not_matched` (top-level field on the response): locus_tags
+    that DO resolve to a Gene in the requested organism but produce zero
+    chemistry rows — different concept.
+    """
+    locus_tags: list[str] = Field(
+        default_factory=list,
+        description="Input locus_tags that don't resolve to any Gene in "
+        "the requested organism (typo, wrong organism, gene removed in "
+        "KG rebuild). E.g. ['PMM9999'].")
+    organism: str | None = Field(
+        default=None,
+        description="Set to the input string when the fuzzy-match "
+        "resolves to zero genes for the input locus_tags. None on success.")
+    metabolite_ids: list[str] = Field(
+        default_factory=list,
+        description="Input metabolite_ids that don't exist as a "
+        "Metabolite node (typo, wrong prefix, ChEBI ID not in our KG). "
+        "E.g. ['kegg.compound:C99999'].")
+    metabolite_pathway_ids: list[str] = Field(
+        default_factory=list,
+        description="Input metabolite_pathway_ids that don't exist as a "
+        "KeggTerm node. E.g. ['kegg.pathway:bogus'].")
+    metabolite_elements: list[str] = Field(
+        default_factory=list,
+        description="Input element symbols that don't appear on any KG "
+        "Metabolite (typo, lowercase). E.g. ['Nx'].")
+
+
+class MetabolitesByGeneResponse(BaseModel):
+    """Top-level response envelope for metabolites_by_gene."""
+    total_matching: int = Field(
+        description="Total row count after all filters, across both arms.")
+    returned: int = Field(
+        description="Number of rows in `results` (≤ `limit`).")
+    offset: int = Field(
+        description="Echo of the requested offset.")
+    truncated: bool = Field(
+        description="True when `offset + limit < total_matching`.")
+    warnings: list[str] = Field(
+        default_factory=list,
+        description="Diagnostic strings. Currently emitted: "
+        "family-inferred-dominance auto-warning when transport rows are "
+        "family-inferred majority and `transport_confidence` was not set "
+        "explicitly (mirror of GBM behavior).")
+    not_found: MbgNotFound = Field(
+        default_factory=MbgNotFound,
+        description="Inputs that did not resolve to a KG node — see model.")
+    not_matched: list[str] = Field(
+        default_factory=list,
+        description="Input locus_tags that resolve to a Gene in the "
+        "requested organism but produced zero chemistry rows (no "
+        "Gene_catalyzes_reaction AND no Gene_has_tcdb_family). Distinct "
+        "from `not_found.locus_tags` (those don't resolve at all).")
+    by_gene: list[MbgByGene] = Field(
+        default_factory=list,
+        description="Per-gene rollup. One entry per input locus_tag that "
+        "produced ≥1 row.")
+    by_evidence_source: list[MbgByEvidenceSource] = Field(
+        default_factory=list,
+        description="Frequency over `evidence_source` values present in "
+        "the slice (≤2 entries).")
+    by_transport_confidence: list[MbgByTransportConfidence] = Field(
+        default_factory=list,
+        description="Frequency over `transport_confidence` values across "
+        "transport rows only (≤2 entries; metabolism rows are excluded).")
+    by_element: list[MbgByElement] = Field(
+        default_factory=list,
+        description="NEW (vs GBM): element-presence rollup across the "
+        "metabolites the gene set touches. Periodic-table-bounded "
+        "(~30 elements max in KG); full rollup, not top-N.")
+    top_metabolites: list[MbgTopMetabolite] = Field(
+        default_factory=list,
+        description="Top 10 metabolites by gene reach in the filtered "
+        "slice. The headline answer to 'what metabolites do my gene set "
+        "hit most.' Drill into any entry via "
+        "`list_metabolites(metabolite_ids=[id])`.")
+    top_reactions: list[MbgTopReaction] = Field(
+        default_factory=list,
+        description="Top 10 reactions by gene_count in the metabolism "
+        "arm. Drill into any entry via "
+        "`genes_by_ontology(ontology=\"ec\", term_ids=[ec], "
+        "organism=...)`.")
+    top_tcdb_families: list[MbgTopTcdbFamily] = Field(
+        default_factory=list,
+        description="Top 10 TCDB families by gene_count in the transport "
+        "arm. Drill into any entry via "
+        "`genes_by_ontology(ontology=\"tcdb\", term_ids=[id], "
+        "organism=...)`.")
+    top_gene_categories: list[MbgTopGeneCategory] = Field(
+        default_factory=list,
+        description="Top 10 gene categories by gene_count across both "
+        "arms.")
+    top_pathways: list[MbgTopPathway] = Field(
+        default_factory=list,
+        description="NEW (vs GBM): top 10 KEGG pathways the gene set's "
+        "chemistry reaches. Distinct from gene-KO pathway annotations "
+        "(`genes_by_ontology(ontology=\"kegg\")`) — see model docstring "
+        "for naming disambiguation. Drill into any entry via "
+        "`list_metabolites(pathway_ids=[id])`.")
+    gene_count_total: int = Field(
+        description="Distinct input genes in the filtered slice (across "
+        "both arms).")
+    reaction_count_total: int = Field(
+        description="Distinct reactions in the filtered metabolism arm.")
+    transporter_count_total: int = Field(
+        description="Distinct TcdbFamily nodes in the filtered transport "
+        "arm.")
+    metabolite_count_total: int = Field(
+        description="Distinct metabolites that produced ≥1 row across "
+        "both arms.")
+    results: list[GeneReactionMetaboliteTriplet] = Field(
+        default_factory=list,
+        description="Detail rows after global sort + slice. Empty when "
+        "`summary=True`. SHARED row class with `genes_by_metabolite` — "
+        "same Pydantic class.")
+
+
 def register_tools(mcp: FastMCP):
     """Register all KG tools with the MCP server."""
 
@@ -6924,3 +7294,313 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             await ctx.error(f"genes_by_metabolite unexpected error: {e}")
             raise ToolError(f"Error in genes_by_metabolite: {e}")
+
+    # --- metabolites_by_gene ---
+
+    @mcp.tool(
+        tags={"genes", "metabolites", "chemistry", "drill-down"},
+        annotations={"readOnlyHint": True, "destructiveHint": False,
+                     "idempotentHint": True, "openWorldHint": False},
+    )
+    async def metabolites_by_gene(
+        ctx: Context,
+        locus_tags: Annotated[list[str], Field(
+            description="Gene locus tags to drill into (case-sensitive). "
+            "E.g. ['PMM0963', 'PMM0964', 'PMM0965'] for urease α/β/γ "
+            "subunits. `not_found.locus_tags` lists tags that don't "
+            "resolve to any Gene in the requested organism; "
+            "`not_matched` lists tags that DO resolve but have no "
+            "chemistry edges (no Gene_catalyzes_reaction AND no "
+            "Gene_has_tcdb_family).",
+            min_length=1,
+        )],
+        organism: Annotated[str, Field(
+            description="Organism name (case-insensitive, fuzzy "
+            "word-based match — mirrors `differential_expression_by_gene` "
+            "and `genes_by_metabolite`). Single-organism enforced. "
+            "E.g. 'Prochlorococcus MED4'. `not_found.organism` is set "
+            "when the name resolves to zero matching genes for the "
+            "input locus_tags.",
+            min_length=1,
+        )],
+        metabolite_elements: Annotated[list[str] | None, Field(
+            description="Filter to rows where the metabolite contains "
+            "ALL of the given element symbols (AND-of-presence). "
+            "E.g. `['N']` keeps only N-bearing metabolites — the "
+            "headline N-source workflow primitive. `['N', 'P']` requires "
+            "both. Anchored on `Metabolite.elements` (KG-A3 Hill-parsed "
+            "presence list); applies uniformly to both arms. Never "
+            "substring-match on `formula` (Hill notation has element-"
+            "clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). "
+            "`not_found.metabolite_elements` lists symbols that don't "
+            "exist on any KG metabolite.",
+        )] = None,
+        metabolite_ids: Annotated[list[str] | None, Field(
+            description="Restrict rows to specific metabolite IDs (full "
+            "prefixed, e.g. ['kegg.compound:C00086', "
+            "'kegg.compound:C00064']). Useful for the cross-feeding "
+            "workflow: after MBG returns top_metabolites, re-query a "
+            "partner organism via `genes_by_metabolite` with these IDs. "
+            "Applies uniformly to both arms.",
+        )] = None,
+        ec_numbers: Annotated[list[str] | None, Field(
+            description="Narrow metabolism rows to those whose Reaction "
+            "carries any of these EC numbers. **Metabolism arm only — "
+            "does not affect transport rows**, which are returned "
+            "unchanged. To restrict to metabolism rows alone, combine "
+            "with `evidence_sources=['metabolism']`. E.g. ['3.5.1.5'] "
+            "for urease.",
+        )] = None,
+        metabolite_pathway_ids: Annotated[list[str] | None, Field(
+            description="Filter to rows where the **metabolite** is in "
+            "any of these KEGG pathways (`KeggTerm.id`, e.g. "
+            "['kegg.pathway:ko00910'] for nitrogen metabolism). Anchored "
+            "on `Metabolite.pathway_ids` (KG-A5 denorm, transport-"
+            "extended), so applies uniformly to both arms. **Not "
+            "gene-anchored** — for filtering by genes' KEGG-pathway "
+            "annotations, route through `genes_by_ontology(ontology="
+            "\"kegg\", term_ids=[pathway_id], organism=...)` first to "
+            "obtain locus_tags. `not_found.metabolite_pathway_ids` "
+            "lists IDs that don't exist as a KeggTerm.",
+        )] = None,
+        mass_balance: Annotated[
+            Literal["balanced", "unbalanced"] | None, Field(
+                description="Narrow metabolism rows to those whose "
+                "Reaction has this mass balance status. **Metabolism arm "
+                "only — does not affect transport rows**. Combine with "
+                "`evidence_sources=['metabolism']` to restrict to "
+                "metabolism rows alone.",
+            ),
+        ] = None,
+        gene_categories: Annotated[list[str] | None, Field(
+            description="Filter on `Gene.gene_category` (exact match, "
+            "applies to both arms uniformly). Use "
+            "`list_filter_values(filter_type=\"gene_category\")` for "
+            "valid values. Note: somewhat redundant with `locus_tags` "
+            "input; useful when locus_tags is a broad batch and you want "
+            "chemistry from specific functional categories only.",
+        )] = None,
+        transport_confidence: Annotated[
+            Literal["substrate_confirmed", "family_inferred"] | None,
+            Field(
+                description="Narrow transport rows by TCDB-annotation "
+                "specificity. `substrate_confirmed` restricts transport "
+                "rows to those annotated at TCDB `tc_specificity` "
+                "(substrate-curated). `family_inferred` restricts to "
+                "transport rows annotated at coarser TCDB levels (rolled "
+                "up via the substrate edge). **Transport arm only — does "
+                "not affect metabolism rows**, which are always "
+                "substrate-confirmed by definition (direct catalysis "
+                "edge) and carry `transport_confidence = None`. To "
+                "restrict to transport rows alone, combine with "
+                "`evidence_sources=['transport']`. **Recommended for "
+                "high-precision transporter-hunting in batch DE inputs:** "
+                "`transport_confidence='substrate_confirmed', "
+                "evidence_sources=['transport']` (mutes the ABC-"
+                "superfamily 551-row blowup).",
+            ),
+        ] = None,
+        evidence_sources: Annotated[
+            list[Literal["metabolism", "transport"]] | None,
+            Field(
+                description="Path selector — restricts which arms "
+                "execute. Set to `['metabolism']` to skip transport "
+                "entirely (no rollup noise); `['transport']` to skip "
+                "metabolism. Default fires both arms. Note: "
+                "`'metabolomics'` is NOT a valid value here — "
+                "metabolomics evidence has no gene anchor and surfaces "
+                "only in `list_metabolites`.",
+            ),
+        ] = None,
+        summary: Annotated[bool, Field(
+            description="When true, return only summary fields "
+            "(results=[]). **Strongly recommended for batch DE inputs** "
+            "(50+ locus_tags) — envelope rollups (top_metabolites, "
+            "top_pathways, top_reactions, top_tcdb_families, "
+            "by_element, by_gene, top_gene_categories) are the actually-"
+            "useful artifact at that scale; detail rows can exceed 1,000 "
+            "quickly.",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include extended fields per row: gene_category, "
+            "metabolite_inchikey/smiles/mnxm_id/hmdb_id, reaction_mnxr_id"
+            "/rhea_ids (metabolism rows), tcdb_level_kind/tc_class_id "
+            "(transport rows). Same field set as `genes_by_metabolite`.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max results in `results`. Default 10 covers "
+            "~p70 of single-gene UNION row distributions (median 6, p75 "
+            "12 in MED4). Long-tail genes (ABC-superfamily-only) emit "
+            "up to 551 rows — use "
+            "`transport_confidence='substrate_confirmed'` to mute, or "
+            "`offset` to page.",
+            ge=1,
+        )] = 10,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.",
+            ge=0,
+        )] = 0,
+    ) -> MetabolitesByGeneResponse:
+        """Find metabolites the input gene set's chemistry reaches in one organism.
+
+        **Direction-agnostic.** Joins through `Reaction_has_metabolite`
+        (metabolism) and `Tcdb_family_transports_metabolite` (transport)
+        are direction-agnostic — a gene that *produces* a metabolite and
+        a gene that *consumes* it surface identically. KEGG equation
+        order is arbitrary. To distinguish, layer transcriptional
+        evidence (`differential_expression_by_gene`) and gene functional
+        annotation (`gene_overview` Pfam / KEGG KO names like
+        `*-synthase` vs `*-permease`).
+
+        **Transport-confidence semantics (transport arm only).** Identical
+        model to `genes_by_metabolite`: `family_inferred` rows ride a
+        TCDB substrate-edge rollup that propagates leaf-curated
+        substrates up the hierarchy. The ABC Superfamily long tail
+        (9 MED4 genes annotated only at `tcdb:3.A.1` emit 551
+        family_inferred rows each via the rollup) means batch DE inputs
+        can explode in row count. Filter
+        `transport_confidence='substrate_confirmed'` (paired with
+        `evidence_sources=['transport']` for the transport arm in
+        isolation) for the precise set; the default fires both arms and
+        flags `family_inferred` in `warnings` when it dominates.
+        Metabolism rows are not subject to this concern — direct
+        catalysis edges are always substrate-confirmed — and their
+        `transport_confidence` is None.
+
+        **Evidence sources accepted here:** `metabolism`, `transport`.
+        The metabolomics path (DerivedMetric → Metabolite) has no gene
+        anchor and is not surfaced by gene-anchored chemistry tools —
+        see `list_metabolites`.
+
+        **Sort order:** detail rows are globally sorted by precision
+        tier (metabolism → transport_substrate_confirmed →
+        transport_family_inferred), then by input gene order, then by
+        locus_tag, then by metabolite_id. This surfaces high-precision
+        rows from the entire batch first regardless of input position —
+        a single ABC-superfamily-only gene at the front of input does
+        NOT eat the entire `limit=10` with family_inferred rows.
+
+        Drill-downs from result rows / envelope rollups:
+        - Any `top_metabolites` entry →
+          `list_metabolites(metabolite_ids=[...])` for richer per-
+          metabolite cross-refs, or
+          `list_metabolites(metabolite_ids=[...], organism_names=[partner])`
+          for cross-organism presence (cross-feeding primitive).
+        - Any `top_pathways` entry →
+          `list_metabolites(pathway_ids=[...])` for the full metabolite
+          roster of the pathway (not just gene-set hits), or
+          `genes_by_ontology(ontology="kegg", term_ids=[id], organism=...)`
+          for gene-KO-mediated pathway annotations (different surface —
+          see naming disambiguation below).
+        - Any `top_reactions` entry →
+          `genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)`
+          for genes in adjacent reactions, or `pathway_enrichment` for
+          context.
+        - Any `top_tcdb_families` entry →
+          `genes_by_ontology(ontology="tcdb", term_ids=[id], organism=...)`
+          for sibling genes in the same family.
+
+        **`top_pathways` naming disambiguation.** Despite this being a
+        gene-anchored tool, `top_pathways` here means *KEGG pathways the
+        gene set's chemistry reaches* — via `Reaction_in_kegg_pathway`
+        and `Metabolite_in_pathway`. Distinct from the **gene-KO-
+        mediated** pathway annotations available via
+        `genes_by_ontology(ontology="kegg")` (where pathway membership
+        is asserted by the gene's KO assignment). For metabolic pathway
+        analysis with a hypothesis test, use `pathway_enrichment`.
+        """
+        await ctx.info(
+            f"metabolites_by_gene locus_tags={locus_tags} "
+            f"organism={organism} "
+            f"metabolite_elements={metabolite_elements} "
+            f"metabolite_ids={metabolite_ids} ec_numbers={ec_numbers} "
+            f"metabolite_pathway_ids={metabolite_pathway_ids} "
+            f"mass_balance={mass_balance} "
+            f"gene_categories={gene_categories} "
+            f"transport_confidence={transport_confidence} "
+            f"evidence_sources={evidence_sources} summary={summary} "
+            f"verbose={verbose} limit={limit} offset={offset}"
+        )
+        try:
+            conn = _conn(ctx)
+            result = api.metabolites_by_gene(
+                locus_tags=locus_tags,
+                organism=organism,
+                metabolite_elements=metabolite_elements,
+                metabolite_ids=metabolite_ids,
+                ec_numbers=ec_numbers,
+                metabolite_pathway_ids=metabolite_pathway_ids,
+                mass_balance=mass_balance,
+                gene_categories=gene_categories,
+                transport_confidence=transport_confidence,
+                evidence_sources=evidence_sources,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                offset=offset,
+                conn=conn,
+            )
+            results = [
+                GeneReactionMetaboliteTriplet(**r) for r in result["results"]
+            ]
+            by_gene = [MbgByGene(**b) for b in result["by_gene"]]
+            by_evidence_source = [
+                MbgByEvidenceSource(**b)
+                for b in result["by_evidence_source"]
+            ]
+            by_transport_confidence = [
+                MbgByTransportConfidence(**b)
+                for b in result["by_transport_confidence"]
+            ]
+            by_element = [MbgByElement(**b) for b in result["by_element"]]
+            top_metabolites = [
+                MbgTopMetabolite(**b) for b in result["top_metabolites"]
+            ]
+            top_reactions = [
+                MbgTopReaction(**b) for b in result["top_reactions"]
+            ]
+            top_tcdb_families = [
+                MbgTopTcdbFamily(**b) for b in result["top_tcdb_families"]
+            ]
+            top_gene_categories = [
+                MbgTopGeneCategory(**b)
+                for b in result["top_gene_categories"]
+            ]
+            top_pathways = [
+                MbgTopPathway(**b) for b in result["top_pathways"]
+            ]
+            not_found = MbgNotFound(**result["not_found"])
+            response = MetabolitesByGeneResponse(
+                total_matching=result["total_matching"],
+                returned=result["returned"],
+                offset=result.get("offset", 0),
+                truncated=result["truncated"],
+                warnings=result.get("warnings", []),
+                not_found=not_found,
+                not_matched=result.get("not_matched", []),
+                by_gene=by_gene,
+                by_evidence_source=by_evidence_source,
+                by_transport_confidence=by_transport_confidence,
+                by_element=by_element,
+                top_metabolites=top_metabolites,
+                top_reactions=top_reactions,
+                top_tcdb_families=top_tcdb_families,
+                top_gene_categories=top_gene_categories,
+                top_pathways=top_pathways,
+                gene_count_total=result["gene_count_total"],
+                reaction_count_total=result["reaction_count_total"],
+                transporter_count_total=result["transporter_count_total"],
+                metabolite_count_total=result["metabolite_count_total"],
+                results=results,
+            )
+            await ctx.info(
+                f"Returning {response.returned} of "
+                f"{response.total_matching} gene×metabolite rows"
+            )
+            return response
+        except ValueError as e:
+            await ctx.warning(f"metabolites_by_gene error: {e}")
+            raise ToolError(str(e))
+        except Exception as e:
+            await ctx.error(f"metabolites_by_gene unexpected error: {e}")
+            raise ToolError(f"Error in metabolites_by_gene: {e}")

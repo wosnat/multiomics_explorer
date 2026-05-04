@@ -89,6 +89,9 @@ from multiomics_explorer.kg.queries_lib import (
     build_genes_by_metabolite_metabolism,
     build_genes_by_metabolite_transport,
     build_genes_by_metabolite_summary,
+    build_metabolites_by_gene_metabolism,
+    build_metabolites_by_gene_transport,
+    build_metabolites_by_gene_summary,
     build_gene_clusters_by_gene,
     build_gene_clusters_by_gene_summary,
     build_gene_derived_metrics,
@@ -5194,6 +5197,589 @@ def genes_by_metabolite(
         "top_tcdb_families": top_tcdb_families,
         "top_gene_categories": top_gene_categories,
         "top_genes": top_genes,
+        "gene_count_total": gene_count_total,
+        "reaction_count_total": raw_summary.get("reaction_count_total", 0) or 0,
+        "transporter_count_total": raw_summary.get("transporter_count_total", 0) or 0,
+        "metabolite_count_total": raw_summary.get("metabolite_count_total", 0) or 0,
+        "results": results,
+    }
+
+
+# ---------------------------------------------------------------------------
+# metabolites_by_gene — gene-anchored mirror of genes_by_metabolite.
+# ---------------------------------------------------------------------------
+
+# Same evidence-source Literal as GBM (gene-anchored tools reject
+# 'metabolomics' — there is no gene anchor on metabolomics evidence).
+_VALID_EVIDENCE_SOURCES_MBG = ("metabolism", "transport")
+
+
+# Sparse-strip set is identical to GBM's: per-arm-specific fields drop on
+# rows from the other arm, and per-row sparse fields drop when null.
+_MBG_SPARSE_FIELDS = _GBM_SPARSE_FIELDS
+
+
+def _build_mbg_top_pathways_query(
+    *,
+    locus_tags: list[str],
+    organism: str,
+    active_arms: tuple[str, ...],
+    metabolite_elements: list[str] | None,
+    metabolite_ids: list[str] | None,
+    metabolite_pathway_ids: list[str] | None,
+    ec_numbers: list[str] | None,
+    mass_balance: str | None,
+    gene_categories: list[str] | None,
+    transport_confidence: str | None,
+) -> tuple[str, dict]:
+    """Build the spec § 5 verified 3-branch top_pathways UNION query.
+
+    Branches:
+      1. reaction-side via metabolism arm (`Reaction → Reaction_in_kegg_pathway`)
+      2. metabolite-side via metabolism arm (`Reaction → Reaction_has_metabolite → Metabolite_in_pathway`)
+      3. metabolite-side via transport arm (`TcdbFamily → Tcdb_family_transports_metabolite → Metabolite_in_pathway`)
+
+    Branch 1 is load-bearing across MED4 — measurement found 6 (gene, pathway)
+    pairs that the metabolite-side-only summary builder misses. Branches 2+3
+    are also load-bearing because R00131-style reactions (zero
+    Reaction_in_kegg_pathway edges) are pathway-reachable only via metabolites.
+
+    Filter scope (mirrors per-arm rules; for branch 1, metabolite-anchored
+    filters apply via EXISTS subquery since `m` is not bound on the main
+    path):
+      - locus_tags + organism: all branches
+      - gene_categories: all branches (uniform)
+      - ec_numbers, mass_balance: branches 1+2 (metabolism arm)
+      - transport_confidence: branch 3 (transport arm)
+      - metabolite_elements/ids/pathway_ids: branches 2+3 directly;
+        branch 1 via EXISTS predicate
+    """
+    params: dict = {"locus_tags": locus_tags, "organism": organism}
+
+    org_clause = (
+        "ALL(word IN split(toLower($organism), ' ')"
+        " WHERE toLower(g.organism_name) CONTAINS word)"
+    )
+
+    # Build the metabolite-anchored EXISTS predicate fragment (used in branch 1)
+    # AND the matching standalone WHERE conditions (used in branches 2+3).
+    metab_anchored_conds: list[str] = []
+    if metabolite_ids:
+        metab_anchored_conds.append("m.id IN $metabolite_ids")
+        params["metabolite_ids"] = metabolite_ids
+    if metabolite_elements:
+        metab_anchored_conds.append(
+            "ALL(elem IN $metabolite_elements"
+            " WHERE elem IN coalesce(m.elements, []))"
+        )
+        params["metabolite_elements"] = metabolite_elements
+    if metabolite_pathway_ids:
+        metab_anchored_conds.append(
+            "ANY(pid IN $metabolite_pathway_ids"
+            " WHERE pid IN coalesce(m.pathway_ids, []))"
+        )
+        params["metabolite_pathway_ids"] = metabolite_pathway_ids
+
+    branches: list[str] = []
+
+    if "metabolism" in active_arms:
+        # Branch 1: reaction-side via metabolism arm
+        b1_conds = ["g.locus_tag IN $locus_tags", org_clause]
+        if ec_numbers:
+            b1_conds.append(
+                "ANY(ec IN $ec_numbers WHERE ec IN coalesce(r.ec_numbers, []))"
+            )
+            params["ec_numbers"] = ec_numbers
+        if mass_balance is not None:
+            b1_conds.append("r.mass_balance = $mass_balance")
+            params["mass_balance"] = mass_balance
+        if gene_categories:
+            b1_conds.append("g.gene_category IN $gene_categories")
+            params["gene_categories"] = gene_categories
+        if metab_anchored_conds:
+            exists_inner = " AND ".join(metab_anchored_conds)
+            b1_conds.append(
+                "EXISTS { (r)-[:Reaction_has_metabolite]->(m:Metabolite)"
+                f" WHERE {exists_inner} }}"
+            )
+        b1_where = " AND ".join(b1_conds)
+        branches.append(
+            "  MATCH (g:Gene)-[:Gene_catalyzes_reaction]->"
+            "(r:Reaction)-[:Reaction_in_kegg_pathway]->(p:KeggTerm)\n"
+            f"  WHERE {b1_where}\n"
+            "  RETURN g.locus_tag AS locus_tag, p.id AS pathway_id"
+        )
+
+        # Branch 2: metabolite-side via metabolism arm
+        b2_conds = ["g.locus_tag IN $locus_tags", org_clause]
+        if ec_numbers:
+            b2_conds.append(
+                "ANY(ec IN $ec_numbers WHERE ec IN coalesce(r.ec_numbers, []))"
+            )
+        if mass_balance is not None:
+            b2_conds.append("r.mass_balance = $mass_balance")
+        if gene_categories:
+            b2_conds.append("g.gene_category IN $gene_categories")
+        b2_conds.extend(metab_anchored_conds)
+        b2_where = " AND ".join(b2_conds)
+        branches.append(
+            "  MATCH (g:Gene)-[:Gene_catalyzes_reaction]->(r:Reaction)"
+            "-[:Reaction_has_metabolite]->(m:Metabolite)"
+            "-[:Metabolite_in_pathway]->(p:KeggTerm)\n"
+            f"  WHERE {b2_where}\n"
+            "  RETURN g.locus_tag AS locus_tag, p.id AS pathway_id"
+        )
+
+    if "transport" in active_arms:
+        # Branch 3: metabolite-side via transport arm
+        b3_conds = ["g.locus_tag IN $locus_tags", org_clause]
+        if gene_categories:
+            b3_conds.append("g.gene_category IN $gene_categories")
+        if transport_confidence == "substrate_confirmed":
+            b3_conds.append("tf.level_kind = 'tc_specificity'")
+        elif transport_confidence == "family_inferred":
+            b3_conds.append("tf.level_kind <> 'tc_specificity'")
+        b3_conds.extend(metab_anchored_conds)
+        b3_where = " AND ".join(b3_conds)
+        branches.append(
+            "  MATCH (g:Gene)-[:Gene_has_tcdb_family]->(tf:TcdbFamily)"
+            "-[:Tcdb_family_transports_metabolite]->(m:Metabolite)"
+            "-[:Metabolite_in_pathway]->(p:KeggTerm)\n"
+            f"  WHERE {b3_where}\n"
+            "  RETURN g.locus_tag AS locus_tag, p.id AS pathway_id"
+        )
+
+    if not branches:
+        return "", {}
+
+    union_body = "\n  UNION\n".join(branches)
+    cypher = (
+        "CALL {\n"
+        f"{union_body}\n"
+        "}\n"
+        "WITH pathway_id, count(DISTINCT locus_tag) AS gene_count\n"
+        "MATCH (p:KeggTerm {id: pathway_id})\n"
+        "WHERE p.reaction_count >= 3\n"
+        "RETURN p.id AS pathway_id, p.name AS pathway_name, gene_count,\n"
+        "       p.reaction_count AS pathway_reaction_count,\n"
+        "       p.metabolite_count AS pathway_metabolite_count\n"
+        "ORDER BY gene_count DESC, p.reaction_count ASC, p.id ASC\n"
+        "LIMIT 10"
+    )
+    return cypher, params
+
+
+def _mbg_sort_key(row: dict, locus_index: dict[str, int]) -> tuple:
+    """Global sort key for metabolites_by_gene detail rows.
+
+    Sort spec (per `docs/tool-specs/metabolites_by_gene.md` § "Sort order"):
+      1. precision_tier: 0 = metabolism, 1 = transport_substrate_confirmed,
+         2 = transport_family_inferred
+      2. input gene order via `apoc.coll.indexOf` equivalent
+      3. locus_tag (deterministic tiebreaker)
+      4. metabolite_id (final tiebreaker)
+    """
+    if row.get("evidence_source") == "metabolism":
+        precision_tier = 0
+    elif row.get("transport_confidence") == "substrate_confirmed":
+        precision_tier = 1
+    else:
+        precision_tier = 2
+    locus = row.get("locus_tag") or ""
+    # Genes not in the input list (shouldn't happen but be defensive) sort
+    # last within their precision tier.
+    input_pos = locus_index.get(locus, len(locus_index))
+    return (
+        precision_tier,
+        input_pos,
+        locus,
+        row.get("metabolite_id") or "",
+    )
+
+
+def metabolites_by_gene(
+    locus_tags: list[str],
+    organism: str,
+    *,
+    metabolite_elements: list[str] | None = None,
+    metabolite_ids: list[str] | None = None,
+    ec_numbers: list[str] | None = None,
+    metabolite_pathway_ids: list[str] | None = None,
+    mass_balance: str | None = None,
+    gene_categories: list[str] | None = None,
+    transport_confidence: str | None = None,
+    evidence_sources: list[str] | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int = 10,
+    offset: int = 0,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Find metabolites the input gene set's chemistry reaches in one organism.
+
+    Two evidence arms (joined api-side, not via Cypher UNION):
+      - metabolism: `Gene → Reaction → Metabolite`
+      - transport:  `Gene → TcdbFamily → Metabolite` (rollup-extended)
+
+    Path-scoped filters narrow only their own arm; the other arm runs
+    unfiltered. Use `evidence_sources` to suppress an entire arm.
+
+    See `docs/tool-specs/metabolites_by_gene.md` for the full contract,
+    paging strategy, sort order, and auto-warning trigger conditions.
+
+    Raises:
+        ValueError: if `evidence_sources` contains values outside
+            ``("metabolism", "transport")``. Mirrors `genes_by_metabolite`
+            — gene-anchored tools reject ``"metabolomics"``.
+    """
+    # 1. Defense-in-depth validator on evidence_sources.
+    if evidence_sources is not None:
+        invalid = [
+            s for s in evidence_sources
+            if s not in _VALID_EVIDENCE_SOURCES_MBG
+        ]
+        if invalid:
+            raise ValueError(
+                f"evidence_sources contains invalid value(s) {invalid}; "
+                f"allowed: {list(_VALID_EVIDENCE_SOURCES_MBG)}."
+            )
+
+    conn = _default_conn(conn)
+
+    # 2. Arm selection driven solely by evidence_sources.
+    if evidence_sources is None:
+        active_arms = ("metabolism", "transport")
+    else:
+        # Preserve canonical order regardless of input ordering.
+        active_arms = tuple(
+            arm for arm in ("metabolism", "transport")
+            if arm in evidence_sources
+        )
+
+    # 3. Always run summary builder (envelope rollups even when summary=True).
+    sum_cypher, sum_params = build_metabolites_by_gene_summary(
+        locus_tags=locus_tags,
+        organism=organism,
+        metabolite_elements=metabolite_elements,
+        metabolite_ids=metabolite_ids,
+        ec_numbers=ec_numbers,
+        mass_balance=mass_balance,
+        metabolite_pathway_ids=metabolite_pathway_ids,
+        gene_categories=gene_categories,
+        transport_confidence=transport_confidence,
+        arms=active_arms,
+    )
+    summary_rows = conn.execute_query(sum_cypher, **sum_params)
+    raw_summary = summary_rows[0] if summary_rows else {}
+
+    total_matching = raw_summary.get("total_matching", 0) or 0
+    gene_count_total = raw_summary.get("gene_count_total", 0) or 0
+    by_gene = raw_summary.get("by_gene", []) or []
+
+    # 4. Detail collection — Mode 1 (single arm), Mode 2 (summary), or
+    # Mode 3 (both arms over-fetch + concat + global-sort + slice).
+    locus_index = {lt: idx for idx, lt in enumerate(locus_tags)}
+    results: list[dict]
+    if summary:
+        results = []
+    elif offset > 0 and offset >= total_matching:
+        # Deep-paging guardrail: short-circuit; don't touch detail arms
+        # but still run existence probes so not_found is populated.
+        # Only kicks in for explicit pagination (offset>0); offset=0 with
+        # total_matching=0 still dispatches the arms (cheap; preserves
+        # symmetry with non-empty case for callers/mocks).
+        results = []
+    else:
+        single_arm_mode = len(active_arms) == 1
+        if single_arm_mode:
+            # Mode 1: pass limit + offset directly into the single arm.
+            arm = active_arms[0]
+            if arm == "metabolism":
+                cypher, params = build_metabolites_by_gene_metabolism(
+                    locus_tags=locus_tags,
+                    organism=organism,
+                    metabolite_elements=metabolite_elements,
+                    metabolite_ids=metabolite_ids,
+                    ec_numbers=ec_numbers,
+                    mass_balance=mass_balance,
+                    metabolite_pathway_ids=metabolite_pathway_ids,
+                    gene_categories=gene_categories,
+                    verbose=verbose,
+                    limit=limit,
+                    offset=offset,
+                )
+            else:
+                cypher, params = build_metabolites_by_gene_transport(
+                    locus_tags=locus_tags,
+                    organism=organism,
+                    metabolite_elements=metabolite_elements,
+                    metabolite_ids=metabolite_ids,
+                    metabolite_pathway_ids=metabolite_pathway_ids,
+                    gene_categories=gene_categories,
+                    transport_confidence=transport_confidence,
+                    verbose=verbose,
+                    limit=limit,
+                    offset=offset,
+                )
+            results = list(conn.execute_query(cypher, **params))
+        else:
+            # Mode 3: both arms; over-fetch limit+offset per arm,
+            # concat, global-sort, slice.
+            per_arm_fetch = limit + offset
+            combined: list[dict] = []
+            for arm in active_arms:
+                if arm == "metabolism":
+                    cypher, params = build_metabolites_by_gene_metabolism(
+                        locus_tags=locus_tags,
+                        organism=organism,
+                        metabolite_elements=metabolite_elements,
+                        metabolite_ids=metabolite_ids,
+                        ec_numbers=ec_numbers,
+                        mass_balance=mass_balance,
+                        metabolite_pathway_ids=metabolite_pathway_ids,
+                        gene_categories=gene_categories,
+                        verbose=verbose,
+                        limit=per_arm_fetch,
+                        offset=0,
+                    )
+                else:
+                    cypher, params = build_metabolites_by_gene_transport(
+                        locus_tags=locus_tags,
+                        organism=organism,
+                        metabolite_elements=metabolite_elements,
+                        metabolite_ids=metabolite_ids,
+                        metabolite_pathway_ids=metabolite_pathway_ids,
+                        gene_categories=gene_categories,
+                        transport_confidence=transport_confidence,
+                        verbose=verbose,
+                        limit=per_arm_fetch,
+                        offset=0,
+                    )
+                combined.extend(conn.execute_query(cypher, **params))
+            combined.sort(key=lambda r: _mbg_sort_key(r, locus_index))
+            results = combined[offset:offset + limit]
+
+    # 5. Sparse-strip nullable result columns.
+    results = [
+        {k: v for k, v in row.items()
+         if not (k in _MBG_SPARSE_FIELDS and v is None)}
+        for row in results
+    ]
+
+    # 6. Compute not_found.locus_tags via existence probe (always run).
+    if locus_tags:
+        rows = conn.execute_query(
+            "MATCH (g:Gene {organism_name: $organism}) "
+            "WHERE g.locus_tag IN $locus_tags "
+            "RETURN collect(DISTINCT g.locus_tag) AS found",
+            organism=organism, locus_tags=locus_tags,
+        )
+        found_locus = set(rows[0]["found"]) if rows else set()
+        not_found_locus = [lt for lt in locus_tags if lt not in found_locus]
+    else:
+        found_locus = set()
+        not_found_locus = []
+
+    # 7. Compute not_found.metabolite_pathway_ids via existence probe.
+    if metabolite_pathway_ids:
+        rows = conn.execute_query(
+            "MATCH (p:KeggTerm) WHERE p.id IN $ids "
+            "RETURN collect(p.id) AS found",
+            ids=metabolite_pathway_ids,
+        )
+        found_paths = set(rows[0]["found"]) if rows else set()
+        not_found_paths = [
+            x for x in metabolite_pathway_ids if x not in found_paths
+        ]
+    else:
+        not_found_paths = []
+
+    # 8. Compute not_found.metabolite_elements via existence probe (any
+    # KG metabolite carrying the element symbol).
+    if metabolite_elements:
+        rows = conn.execute_query(
+            "MATCH (m:Metabolite) "
+            "WHERE size(m.elements) > 0 "
+            "WITH apoc.coll.toSet(apoc.coll.flatten(collect(m.elements))) AS all_elements "
+            "RETURN [e IN $elements WHERE e IN all_elements] AS found",
+            elements=metabolite_elements,
+        )
+        found_elems = set(rows[0]["found"]) if rows else set()
+        not_found_elements = [
+            e for e in metabolite_elements if e not in found_elems
+        ]
+    else:
+        not_found_elements = []
+
+    # 9. Compute not_found.metabolite_ids via existence probe.
+    if metabolite_ids:
+        rows = conn.execute_query(
+            "MATCH (m:Metabolite) WHERE m.id IN $ids "
+            "RETURN collect(m.id) AS found",
+            ids=metabolite_ids,
+        )
+        found_metab = set(rows[0]["found"]) if rows else set()
+        not_found_metab = [x for x in metabolite_ids if x not in found_metab]
+    else:
+        not_found_metab = []
+
+    # 10. not_found.organism — set when fuzzy-resolution yielded zero genes
+    # in the slice (mirror GBM).
+    not_found_org = organism if gene_count_total == 0 else None
+
+    # 11. not_matched: locus_tags that resolve to a Gene in the requested
+    # organism (i.e. exist in `found_locus`) but produced 0 rows in the
+    # filtered slice (i.e. NOT in by_gene). This is symmetric to GBM's
+    # `not_matched` (which uses metabolite_ids).
+    summary_locus_tags = {
+        entry.get("locus_tag") for entry in by_gene
+    }
+    not_matched = [
+        lt for lt in locus_tags
+        if lt in found_locus and lt not in summary_locus_tags
+    ]
+
+    # 12. Build envelope rollups from the summary builder output.
+    rows_by_es = raw_summary.get("rows_by_evidence_source", []) or []
+    rows_by_tc = raw_summary.get("rows_by_transport_confidence", []) or []
+
+    by_evidence_source = sorted(
+        [
+            {"evidence_source": e["evidence_source"], "count": e["count"]}
+            for e in rows_by_es
+        ],
+        key=lambda r: (-r["count"], r["evidence_source"]),
+    )
+    by_transport_confidence = sorted(
+        [
+            {"transport_confidence": e["transport_confidence"], "count": e["count"]}
+            for e in rows_by_tc
+        ],
+        key=lambda r: (-r["count"], r["transport_confidence"]),
+    )
+
+    # by_gene: bounded by input list; sort by input order (mirror builder
+    # ORDER BY apoc.coll.indexOf), then locus_tag for stability.
+    by_gene = sorted(
+        by_gene,
+        key=lambda r: (
+            locus_index.get(r.get("locus_tag") or "", len(locus_index)),
+            r.get("locus_tag") or "",
+        ),
+    )
+
+    # by_element: full freq, periodic-table-bounded (~30 max). Sort desc by
+    # count + ascending element for deterministic output.
+    by_element = sorted(
+        raw_summary.get("by_element", []) or [],
+        key=lambda r: (
+            -(r.get("metabolite_count") or 0),
+            r.get("element") or "",
+        ),
+    )
+
+    # top_* envelopes: sort by gene_count desc + stable tiebreaker, then [:10].
+    top_metabolites = sorted(
+        raw_summary.get("top_metabolites", []) or [],
+        key=lambda r: (
+            -(r.get("gene_count") or 0),
+            r.get("metabolite_id") or "",
+        ),
+    )[:10]
+    top_reactions = sorted(
+        raw_summary.get("top_reactions", []) or [],
+        key=lambda r: (-(r.get("gene_count") or 0), r.get("reaction_id") or ""),
+    )[:10]
+    top_tcdb_families = sorted(
+        raw_summary.get("top_tcdb_families", []) or [],
+        key=lambda r: (
+            -(r.get("gene_count") or 0),
+            r.get("tcdb_family_id") or "",
+        ),
+    )[:10]
+    top_gene_categories = sorted(
+        raw_summary.get("top_gene_categories", []) or [],
+        key=lambda r: (-(r.get("gene_count") or 0), r.get("category") or ""),
+    )[:10]
+    # top_pathways: spec § 5 verified 3-branch UNION (reaction-side metabolism
+    # + metabolite-side metabolism + metabolite-side transport). The summary
+    # builder's metabolite-side-only rollup misses ~6 (gene, pathway) pairs
+    # across MED4 where reactions have zero Reaction_in_kegg_pathway-anchored
+    # metabolite-side coverage but DO have Reaction_in_kegg_pathway edges
+    # (e.g. PMM0453 → ko01040 Biosynthesis of unsaturated fatty acids).
+    # The dedicated query honors all input filters and ranks per spec.
+    tp_cypher, tp_params = _build_mbg_top_pathways_query(
+        locus_tags=locus_tags,
+        organism=organism,
+        active_arms=active_arms,
+        metabolite_elements=metabolite_elements,
+        metabolite_ids=metabolite_ids,
+        metabolite_pathway_ids=metabolite_pathway_ids,
+        ec_numbers=ec_numbers,
+        mass_balance=mass_balance,
+        gene_categories=gene_categories,
+        transport_confidence=transport_confidence,
+    )
+    if tp_cypher:
+        top_pathways = list(conn.execute_query(tp_cypher, **tp_params))
+    else:
+        top_pathways = []
+
+    # 13. Auto-warning: family-inferred dominance (transport-only check).
+    # Strict majority threshold; metabolism rows do not factor in. Mirrors
+    # GBM but drives off `by_gene` rollup (the gene-anchored equivalent of
+    # GBM's per-metabolite rollup).
+    warnings: list[str] = []
+    transport_sc_total = sum(
+        (entry.get("transport_substrate_confirmed_rows") or 0)
+        for entry in by_gene
+    )
+    transport_fi_total = sum(
+        (entry.get("transport_family_inferred_rows") or 0)
+        for entry in by_gene
+    )
+    transport_rows_present = (transport_sc_total + transport_fi_total) > 0
+    if (
+        transport_rows_present
+        and transport_fi_total > transport_sc_total
+        and transport_confidence is None
+    ):
+        warnings.append(
+            f"Transport rows in this slice are dominated by "
+            f"`family_inferred` rollup ({transport_fi_total} of "
+            f"{transport_fi_total + transport_sc_total} transport rows). "
+            "For high-precision substrate-curated annotations only, set "
+            "`transport_confidence='substrate_confirmed'` and/or "
+            "`evidence_sources=['transport']`."
+        )
+
+    # 14. Assemble + return envelope.
+    not_found = {
+        "locus_tags": not_found_locus,
+        "organism": not_found_org,
+        "metabolite_ids": not_found_metab,
+        "metabolite_pathway_ids": not_found_paths,
+        "metabolite_elements": not_found_elements,
+    }
+
+    return {
+        "total_matching": total_matching,
+        "returned": len(results),
+        "offset": offset,
+        # truncated iff (offset + limit) < total_matching (mirrors GBM).
+        "truncated": (offset + limit) < total_matching,
+        "warnings": warnings,
+        "not_found": not_found,
+        "not_matched": not_matched,
+        "by_gene": by_gene,
+        "by_evidence_source": by_evidence_source,
+        "by_transport_confidence": by_transport_confidence,
+        "by_element": by_element,
+        "top_metabolites": top_metabolites,
+        "top_reactions": top_reactions,
+        "top_tcdb_families": top_tcdb_families,
+        "top_gene_categories": top_gene_categories,
+        "top_pathways": top_pathways,
         "gene_count_total": gene_count_total,
         "reaction_count_total": raw_summary.get("reaction_count_total", 0) or 0,
         "transporter_count_total": raw_summary.get("transporter_count_total", 0) or 0,

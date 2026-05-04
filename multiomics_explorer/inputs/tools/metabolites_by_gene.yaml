@@ -1,0 +1,221 @@
+# Human-authored content for metabolites_by_gene about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Single-gene drill-down — urease subunit (Workflow D)
+    call: metabolites_by_gene(locus_tags=["PMM0913"], organism="Prochlorococcus MED4", limit=5)
+    # Workflow D: single-gene mode. Envelope rollups are mostly noise at n=1;
+    # detail rows + total_matching do the work. PMM0913 (salY) is one of the
+    # 9 ABC-superfamily-only MED4 genes — pure transport-arm family_inferred,
+    # ~551 rows total. Auto-warning fires (family_inferred dominates).
+    # `limit=5` caps the regression baseline; pair with
+    # `transport_confidence='substrate_confirmed'` in real workflows to mute
+    # the rollup blowup.
+
+  - title: Urease subunits (canonical detail-row example)
+    call: metabolites_by_gene(locus_tags=["PMM0963", "PMM0964", "PMM0965"], organism="Prochlorococcus MED4", limit=5)
+    # 12 metabolism rows total (3 ureA/B/C × R00131 × 4 metabolites
+    # {Urea, H2O, CO2, NH3}); zero transport rows because the ureA/B/C trio
+    # carry no Gene_has_tcdb_family edges. Detail rows surface the catalysis
+    # triplets; envelope `top_metabolites` ranks {Urea, H2O, CO2, NH3} by
+    # gene reach, `top_pathways` (with the chemistry-pathway filter
+    # `reaction_count >= 3`) ranks Nitrogen cycle, Cyanoamino acid metabolism,
+    # Biotin metabolism, Calvin cycle, Nitrogen metabolism, Arginine
+    # biosynthesis, Alanine/aspartate/glutamate metabolism (no signaling/
+    # disease pathways pollute the top 10), `by_element` returns
+    # [{H,3},{O,3},{C,2},{N,2}].
+
+  - title: Workflow A (N-source marquee) — DE batch with element filter
+    steps: |
+      Step 1: differential_expression_by_gene(
+                organism="Prochlorococcus MED4",
+                experiment_ids=[<N-limitation experiment IDs>],
+                direction="up", significant_only=True,
+              )
+              → DE gene set (~50-200 locus_tags)
+
+      Step 2: metabolites_by_gene(
+                locus_tags=DE_gene_set,
+                organism="Prochlorococcus MED4",
+                metabolite_elements=["N"],
+                summary=True,                 # batch DE → envelope is the artifact
+              )
+              → top_metabolites ranks N-bearing compounds by gene reach;
+                top_pathways concentrates Nitrogen metabolism, Arginine
+                biosynthesis, Alanine/aspartate/glutamate metabolism;
+                by_element confirms N-presence dominance.
+
+      Step 3 (optional): list_metabolites(metabolite_ids=[top_N_metabolite_ids])
+              → cross-refs, mass, formula, full pathway names.
+
+  - title: Workflow C (cluster characterization) — chemistry of a co-expressed cluster
+    steps: |
+      Step 1: genes_in_cluster(cluster_ids=[<cluster_id>])
+              → gene set (~10-100 locus_tags)
+
+      Step 2: metabolites_by_gene(
+                locus_tags=cluster_genes,
+                organism="Prochlorococcus MED4",
+                summary=True,
+              )
+              → top_pathways = "what pathways does this set sit in"
+                by_element = C/N/P/S signature
+                top_metabolites = specific compounds the set's chemistry hits
+
+      Step 3 (optional): list_metabolites(pathway_ids=[<top_pathway_id>])
+              → full metabolite roster of the pathway (not just gene-set hits).
+
+  - title: Workflow B' (cross-feeding) — MBG → GBM bridge
+    steps: |
+      Step 1: differential_expression_by_gene(
+                organism="Prochlorococcus MED4",
+                experiment_ids=[<coculture experiment IDs>],
+                direction="up", significant_only=True,
+              )
+              → MED4 coculture-up DE gene set
+
+      Step 2: metabolites_by_gene(
+                locus_tags=MED4_DE_genes,
+                organism="Prochlorococcus MED4",
+                summary=True,
+              )
+              → top_metabolites = "metabolites my upregulated MED4 genes deal in"
+
+      Step 3: genes_by_metabolite(
+                metabolite_ids=[id for id in top_metabolites],
+                organism="Alteromonas macleodii MIT1002",
+              )
+              → catalysts and transporters for those metabolites in the
+                partner organism. Intersect / diff client-side to seed
+                cross-feeding hypotheses.
+
+  - title: High-precision transporter slice (mute the 551-row blowup)
+    call: metabolites_by_gene(locus_tags=["PMM0434", "PMM0913"], organism="Prochlorococcus MED4", transport_confidence="substrate_confirmed", evidence_sources=["transport"], limit=5)
+    # Both inputs are ABC-superfamily-only genes (long-tail p99 = max = 551
+    # family_inferred rows each via the TCDB substrate-edge rollup). Default
+    # call would emit ~1,100 rows and trip the family_inferred-dominance
+    # auto-warning. Pairing `transport_confidence='substrate_confirmed'`
+    # (drops family_inferred rows) AND `evidence_sources=['transport']`
+    # (skips metabolism arm) returns 0 high-precision rows for these two
+    # genes — exposing that ABC Superfamily-only annotation is too coarse
+    # for substrate-level claims. Useful diagnostic for batch DE inputs that
+    # contain ABC-only genes mixed with substrate-curated transporters.
+
+verbose_fields:
+  - gene_category
+  - metabolite_inchikey
+  - metabolite_smiles
+  - metabolite_mnxm_id
+  - metabolite_hmdb_id
+  - reaction_mnxr_id
+  - reaction_rhea_ids
+  - tcdb_level_kind
+  - tc_class_id
+
+chaining:
+  # upstream — gene-set producers
+  - "differential_expression_by_gene(organism=..., direction='up') → metabolites_by_gene(locus_tags=DE_genes, organism=..., metabolite_elements=['N']) (Workflow A — N-source marquee)"
+  - "genes_in_cluster(cluster_ids=...) → metabolites_by_gene(locus_tags=cluster_genes, organism=...) (Workflow C — cluster chemistry characterization)"
+  - "genes_by_function(query=..., organism=...) → metabolites_by_gene(locus_tags=function_hit_genes, organism=...) (Workflow C variant — function-search chemistry)"
+  - "gene_overview(locus_tags=[...]) → per-row reaction_count/metabolite_count > 0 → metabolites_by_gene(locus_tags=chemistry_genes, organism=...)"
+
+  # downstream from envelope — top_metabolites
+  - "metabolites_by_gene → top_metabolites → list_metabolites(metabolite_ids=[top_metabolite_ids]) for richer per-metabolite cross-refs (mass, formula, full pathway names)"
+  - "metabolites_by_gene → top_metabolites → list_metabolites(metabolite_ids=[top_metabolite_ids], organism_names=[partner_organism]) for cross-organism presence (Workflow B' cross-feeding seed)"
+  - "metabolites_by_gene → top_metabolites → genes_by_metabolite(metabolite_ids=[top_metabolite_ids], organism=PARTNER_ORGANISM) (Workflow B' cross-feeding bridge — catalysts + transporters in partner)"
+
+  # downstream from envelope — top_pathways (chemistry-pathway-filtered)
+  - "metabolites_by_gene → top_pathways → list_metabolites(pathway_ids=[top_pathway_id]) for the full metabolite roster of the pathway (not just gene-set hits)"
+  - "metabolites_by_gene → top_pathways → genes_by_ontology(ontology='kegg', term_ids=[top_pathway_id], organism=...) for gene-KO-mediated pathway annotations (different surface — see top_pathways naming disambiguation)"
+  - "metabolites_by_gene → top_pathways → pathway_enrichment(...) when gene-set hypothesis test is the goal"
+
+  # downstream from envelope — top_reactions / top_tcdb_families
+  - "metabolites_by_gene → top_reactions → genes_by_ontology(ontology='ec', term_ids=[ec_number], organism=...) for genes in adjacent reactions"
+  - "metabolites_by_gene → top_tcdb_families → genes_by_ontology(ontology='tcdb', term_ids=[tcdb_family_id], organism=...) for sibling genes in the same family"
+
+  # downstream from not_matched (annotation-context drill-out)
+  - "metabolites_by_gene → not_matched (locus_tags with no chemistry edges) → gene_overview(locus_tags=not_matched) for annotation context (most are richly-annotated non-chemistry genes — DNA gyrase, signaling, etc. — not annotation gaps)"
+
+mistakes:
+  - >-
+    Single-organism enforced (mirrors `differential_expression_by_gene` and
+    `genes_by_metabolite`). There is no `organisms` list. For
+    cross-organism / cross-feeding work, use Workflow B': call MBG once on
+    the focal organism, take `top_metabolites`, then route to
+    `genes_by_metabolite(metabolite_ids=[...], organism=partner)` (or
+    `list_metabolites(metabolite_ids=[...], organism_names=[partner])` for
+    presence-only).
+  - >-
+    `'metabolomics'` is NOT accepted in `evidence_sources` here — the
+    Pydantic Literal allows only `('metabolism', 'transport')`. The
+    metabolomics path (DerivedMetric → Metabolite) has no Gene anchor and
+    surfaces only in `list_metabolites` (where `'metabolomics'` is a valid
+    forward-compat filter value). Same divergence as `genes_by_metabolite`.
+  - >-
+    family_inferred-dominance blowup is per-gene-side here. The 9
+    ABC-superfamily-only MED4 genes (PMM0434, PMM0449, PMM0450, PMM0749,
+    PMM0750, PMM0913, PMM0976/0977/0978) each emit 551 family_inferred
+    transport rows via the TCDB substrate-edge rollup — a single one of
+    them in a batch DE input is enough to dominate the result. The
+    precision-tier sort (metabolism → substrate_confirmed → family_inferred)
+    keeps high-precision rows at the top regardless of input position, but
+    `total_matching` and the auto-warning still reflect the blowup. For
+    high-precision transporter-hunting set BOTH
+    `transport_confidence='substrate_confirmed'` AND
+    `evidence_sources=['transport']`.
+  - >-
+    `gene_categories` filter is partially redundant with `locus_tags` input
+    (since the input already constrains the gene set). It's useful only as
+    further narrowing within a broad batch — e.g. `locus_tags=DE_genes,
+    gene_categories=['Transport and binding']` to slice DE chemistry to
+    transport-classified genes only. Don't use it as the primary anchor.
+  - >-
+    `ec_numbers` and `mass_balance` are metabolism-arm-only filters — they
+    DO NOT suppress transport rows. Transport rows pass through unchanged.
+    To restrict to metabolism alone, combine with
+    `evidence_sources=['metabolism']`. Symmetrically, `transport_confidence`
+    narrows transport rows only and metabolism rows are unaffected. Per-arm
+    filter scope is predictable + composable; it is NOT soft-exclude.
+    `metabolite_elements`, `metabolite_ids`, `metabolite_pathway_ids`, and
+    `gene_categories` are the only filters that narrow both arms uniformly.
+  - >-
+    `top_pathways` here means *KEGG pathways the gene set's chemistry
+    reaches* (via `Reaction_in_kegg_pathway` + `Metabolite_in_pathway`).
+    These are NOT the same as gene-KO-mediated pathway annotations (where
+    pathway membership is asserted by the gene's KO assignment) — those
+    live in `genes_by_ontology(ontology='kegg', term_ids=[...], organism=...)`.
+    The two are distinct surfaces: chemistry-reach (this tool) vs
+    KO-annotation (`genes_by_ontology`). For metabolic pathway analysis
+    with a hypothesis test, use `pathway_enrichment` instead.
+  - >-
+    `metabolite_elements` is presence-only AND-of (not formula substring).
+    `['N']` keeps metabolites whose `Metabolite.elements` Hill-parsed list
+    contains 'N'. `['N', 'P']` requires BOTH N and P. Never substring-match
+    on `formula` — Hill notation has element-clash footguns: `'Cl'`
+    contains `'C'`, `'Na'` contains `'N'`. Use the `metabolite_elements`
+    filter, never grep `formula`.
+  - >-
+    Use `summary=True` for batch DE inputs (50+ locus_tags). Detail rows
+    can exceed 1,000 quickly even after the precision-tier sort; the
+    envelope rollups (top_metabolites, top_pathways, top_reactions,
+    top_tcdb_families, by_element, by_gene, top_gene_categories) are the
+    actually-useful artifact at that scale.
+  - >-
+    `not_found.locus_tags` vs `not_matched`. `not_found.locus_tags` =
+    locus_tags that don't resolve to any Gene in the requested organism
+    (typo, wrong organism, gene removed in KG rebuild). `not_matched` =
+    locus_tags that DO resolve to a Gene but have zero chemistry edges
+    (no `Gene_catalyzes_reaction` AND no `Gene_has_tcdb_family`). In MED4
+    1,366/1,976 genes (69%) fall into the `not_matched` bucket — most are
+    richly-annotated non-chemistry genes (DNA gyrase, queG, signaling
+    modules), not annotation gaps. Pivot via
+    `gene_overview(locus_tags=not_matched)` for annotation context.
+  - >-
+    Detail rows are direction-agnostic. The transport edge
+    (`Tcdb_family_transports_metabolite`) does not distinguish substrate
+    from product, and the metabolism arm's `Reaction_has_metabolite`
+    edge doesn't either (KEGG equation order is arbitrary). To distinguish,
+    layer transcriptional evidence (`differential_expression_by_gene`) and
+    functional annotation (`gene_overview` Pfam / KEGG KO names like
+    `*-synthase` vs `*-permease`).

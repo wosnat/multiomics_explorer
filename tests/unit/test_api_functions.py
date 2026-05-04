@@ -7379,3 +7379,763 @@ class TestGenesByMetabolite:
         )
         out2 = gbm(self._METS, self._ORG, limit=10, offset=20, conn=conn2)
         assert out2["truncated"] is False
+
+
+# ---------------------------------------------------------------------------
+# metabolites_by_gene (MBG) — Tool 3 of chemistry slice 1
+#
+# Mirrors TestGenesByMetabolite (above). Anchor flips from metabolite_ids
+# → locus_tags + organism (single-organism enforced). Adds:
+#   - metabolite_elements filter (uniform across both arms)
+#   - by_element / top_pathways envelope rollups
+#   - not_matched semantics flip: locus_tags that resolve in organism but
+#     have zero chemistry edges (mirror of GBM's metabolite-side not_matched)
+#   - not_found.metabolite_elements bucket (typo / unknown element symbols)
+# Spec: docs/tool-specs/metabolites_by_gene.md
+# ---------------------------------------------------------------------------
+
+
+class TestMetabolitesByGene:
+    """Tests for api.metabolites_by_gene.
+
+    Mirrors TestGenesByMetabolite mocked-conn pattern. Each test wires a
+    `_mock_conn` whose `execute_query` yields a defined sequence matching
+    the expected per-call order in the api layer. Detail order:
+      1. summary builder (always)
+      2. metabolism-arm detail (when summary=False AND metabolism arm fires)
+      3. transport-arm detail   (when summary=False AND transport arm fires)
+      4. existence probes (one per filter that has unknown-input diagnostics)
+    """
+
+    _LOCUS = ["PMM0963", "PMM0964", "PMM0965"]   # urease α/β/γ subunits
+    _ORG = "Prochlorococcus MED4"
+
+    # ---- Canned summary row (envelope payload from build_*_summary) ----
+    _SUMMARY_ROW_BOTH_ARMS = {
+        "total_matching": 15,
+        "gene_count_total": 3,
+        "reaction_count_total": 1,
+        "transporter_count_total": 3,
+        "metabolite_count_total": 4,
+        "rows_by_evidence_source": [
+            {"evidence_source": "metabolism", "count": 12},
+            {"evidence_source": "transport", "count": 3},
+        ],
+        "rows_by_transport_confidence": [
+            {"transport_confidence": "substrate_confirmed", "count": 2},
+            {"transport_confidence": "family_inferred", "count": 1},
+        ],
+        "by_gene": [
+            {
+                "locus_tag": "PMM0963",
+                "gene_name": "ureA",
+                "product": "urease gamma subunit",
+                "rows": 5,
+                "metabolite_count": 4,
+                "reaction_count": 1,
+                "transporter_count": 1,
+                "metabolism_rows": 4,
+                "transport_substrate_confirmed_rows": 1,
+                "transport_family_inferred_rows": 0,
+            },
+            {
+                "locus_tag": "PMM0964",
+                "gene_name": "ureB",
+                "product": "urease beta subunit",
+                "rows": 5,
+                "metabolite_count": 4,
+                "reaction_count": 1,
+                "transporter_count": 1,
+                "metabolism_rows": 4,
+                "transport_substrate_confirmed_rows": 1,
+                "transport_family_inferred_rows": 0,
+            },
+            {
+                "locus_tag": "PMM0965",
+                "gene_name": "ureC",
+                "product": "urease alpha subunit",
+                "rows": 5,
+                "metabolite_count": 4,
+                "reaction_count": 1,
+                "transporter_count": 1,
+                "metabolism_rows": 4,
+                "transport_substrate_confirmed_rows": 0,
+                "transport_family_inferred_rows": 1,
+            },
+        ],
+        "top_metabolites": [],
+        "top_reactions": [],
+        "top_tcdb_families": [],
+        "top_gene_categories": [],
+        "top_pathways": [],
+        "by_element": [],
+    }
+
+    # Family-inferred dominates — for the auto-warning trigger
+    _SUMMARY_ROW_FI_DOMINATES = {
+        **_SUMMARY_ROW_BOTH_ARMS,
+        "total_matching": 551,
+        "gene_count_total": 1,
+        "reaction_count_total": 0,
+        "transporter_count_total": 1,
+        "metabolite_count_total": 551,
+        "rows_by_evidence_source": [
+            {"evidence_source": "transport", "count": 551},
+        ],
+        "rows_by_transport_confidence": [
+            {"transport_confidence": "substrate_confirmed", "count": 0},
+            {"transport_confidence": "family_inferred", "count": 551},
+        ],
+        "by_gene": [
+            {
+                "locus_tag": "PMM0913",
+                "gene_name": "salY",
+                "product": "ABC superfamily ATP-binding cassette transporter",
+                "rows": 551,
+                "metabolite_count": 551,
+                "reaction_count": 0,
+                "transporter_count": 1,
+                "metabolism_rows": 0,
+                "transport_substrate_confirmed_rows": 0,
+                "transport_family_inferred_rows": 551,
+            },
+        ],
+    }
+
+    # Sample metabolism-arm detail row (substrate_confirmed-by-definition)
+    _METAB_ROW = {
+        "locus_tag": "PMM0963",
+        "gene_name": "ureA",
+        "product": "urease gamma subunit",
+        "evidence_source": "metabolism",
+        "transport_confidence": None,
+        "reaction_id": "kegg.reaction:R00131",
+        "reaction_name": "Urea + 2H2O => CO2 + 2NH3",
+        "ec_numbers": ["3.5.1.5"],
+        "mass_balance": "balanced",
+        "tcdb_family_id": None,
+        "tcdb_family_name": None,
+        "metabolite_id": "kegg.compound:C00086",
+        "metabolite_name": "Urea",
+        "metabolite_formula": "CH4N2O",
+        "metabolite_mass": 60.032,
+        "metabolite_chebi_id": "16199",
+    }
+
+    # Sample transport-arm detail row (substrate_confirmed)
+    _TRANS_ROW_SC = {
+        "locus_tag": "PMM0963",
+        "gene_name": "ureA",
+        "product": "urease gamma subunit",
+        "evidence_source": "transport",
+        "transport_confidence": "substrate_confirmed",
+        "reaction_id": None,
+        "reaction_name": None,
+        "ec_numbers": None,
+        "mass_balance": None,
+        "tcdb_family_id": "tcdb:3.A.1.4.5",
+        "tcdb_family_name": "tcdb:3.A.1.4.5",
+        "metabolite_id": "kegg.compound:C00086",
+        "metabolite_name": "Urea",
+        "metabolite_formula": "CH4N2O",
+        "metabolite_mass": 60.032,
+        "metabolite_chebi_id": "16199",
+    }
+
+    # Sample transport-arm detail row (family_inferred)
+    _TRANS_ROW_FI = {
+        "locus_tag": "PMM0913",
+        "gene_name": "salY",
+        "product": "ABC superfamily ATP-binding cassette transporter",
+        "evidence_source": "transport",
+        "transport_confidence": "family_inferred",
+        "reaction_id": None,
+        "reaction_name": None,
+        "ec_numbers": None,
+        "mass_balance": None,
+        "tcdb_family_id": "tcdb:3.A.1",
+        "tcdb_family_name": "The ATP-binding Cassette (ABC) Superfamily",
+        "metabolite_id": "kegg.compound:C00086",
+        "metabolite_name": "Urea",
+        "metabolite_formula": "CH4N2O",
+        "metabolite_mass": 60.032,
+        "metabolite_chebi_id": "16199",
+    }
+
+    # ---- Helpers ----
+
+    def _mock_conn(self, *side_effect):
+        conn = MagicMock()
+        # Auto-pad with empty results to cover the post-existence-probe
+        # top_pathways query (added in S1 fix to honor spec § 5 verified
+        # 3-branch UNION). Tests that need to assert on top_pathways
+        # content provide an explicit positional response in the slot.
+        conn.execute_query.side_effect = list(side_effect) + [[]] * 4
+        return conn
+
+    def _api(self):
+        from multiomics_explorer.api.functions import metabolites_by_gene
+        return metabolites_by_gene
+
+    # ---- Tests ----
+
+    def test_returns_dict_envelope(self):
+        mbg = self._api()
+        # summary, metab arm, transport arm, locus_tag existence probe
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(self._LOCUS, self._ORG, conn=conn)
+        assert isinstance(out, dict)
+        assert out["total_matching"] == 15
+        # MBG envelope keys
+        assert "by_gene" in out
+        assert "by_evidence_source" in out
+        assert "by_transport_confidence" in out
+        assert "by_element" in out      # NEW vs GBM
+        assert "top_metabolites" in out
+        assert "top_reactions" in out
+        assert "top_tcdb_families" in out
+        assert "top_gene_categories" in out
+        assert "top_pathways" in out    # NEW vs GBM
+        assert "not_found" in out
+        assert "not_matched" in out
+        assert "warnings" in out
+        assert "results" in out
+
+    def test_default_fires_both_arms(self):
+        """No `evidence_sources` filter → both arms dispatched."""
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(self._LOCUS, self._ORG, conn=conn)
+        evidence = {r["evidence_source"] for r in out["results"]}
+        assert evidence == {"metabolism", "transport"}
+
+    def test_evidence_sources_metabolism_only_skips_transport_arm(self):
+        """evidence_sources=['metabolism'] suppresses the transport arm."""
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(
+            self._LOCUS, self._ORG,
+            evidence_sources=["metabolism"], conn=conn,
+        )
+        for r in out["results"]:
+            assert r["evidence_source"] == "metabolism"
+        assert out["warnings"] == []
+
+    def test_evidence_sources_transport_only_skips_metabolism_arm(self):
+        """evidence_sources=['transport'] suppresses the metabolism arm."""
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._TRANS_ROW_SC],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(
+            self._LOCUS, self._ORG,
+            evidence_sources=["transport"], conn=conn,
+        )
+        for r in out["results"]:
+            assert r["evidence_source"] == "transport"
+        assert out["warnings"] == []
+
+    def test_ec_numbers_does_not_suppress_transport_arm(self):
+        """Per per-arm filter scope: ec_numbers narrows only the metabolism
+        arm WHERE; transport-arm rows still appear."""
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(
+            self._LOCUS, self._ORG,
+            ec_numbers=["3.5.1.5"], conn=conn,
+        )
+        evidence = {r["evidence_source"] for r in out["results"]}
+        assert "transport" in evidence
+
+    def test_mass_balance_does_not_suppress_transport_arm(self):
+        """Same per-arm filter scope as ec_numbers."""
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(
+            self._LOCUS, self._ORG,
+            mass_balance="balanced", conn=conn,
+        )
+        evidence = {r["evidence_source"] for r in out["results"]}
+        assert "transport" in evidence
+
+    def test_transport_confidence_substrate_confirmed_no_warning(self):
+        """transport_confidence='substrate_confirmed' suppresses the
+        family-inferred-dominance warning (user chose explicitly)."""
+        mbg = self._api()
+        sc_summary = {
+            **self._SUMMARY_ROW_BOTH_ARMS,
+            "rows_by_transport_confidence": [
+                {"transport_confidence": "substrate_confirmed", "count": 2},
+            ],
+        }
+        conn = self._mock_conn(
+            [sc_summary],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(
+            self._LOCUS, self._ORG,
+            transport_confidence="substrate_confirmed", conn=conn,
+        )
+        # Metabolism rows still present (per-arm scope)
+        evidence = {r["evidence_source"] for r in out["results"]}
+        assert evidence == {"metabolism", "transport"}
+        # No auto-warning (user explicitly set transport_confidence)
+        assert out["warnings"] == []
+
+    def test_transport_confidence_family_inferred_no_warning(self):
+        """transport_confidence='family_inferred' likewise suppresses
+        the auto-warning (user chose explicitly)."""
+        mbg = self._api()
+        fi_summary = {
+            **self._SUMMARY_ROW_BOTH_ARMS,
+            "rows_by_transport_confidence": [
+                {"transport_confidence": "family_inferred", "count": 1},
+            ],
+        }
+        conn = self._mock_conn(
+            [fi_summary],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_FI],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(
+            self._LOCUS, self._ORG,
+            transport_confidence="family_inferred", conn=conn,
+        )
+        assert out["warnings"] == []
+
+    def test_family_inferred_dominance_warning_fires(self):
+        """Spec § family_inferred-dominance auto-warning. Fires when
+        - transport rows present in result AND
+        - transport_family_inferred_rows > transport_substrate_confirmed_rows AND
+        - user did NOT set transport_confidence."""
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_FI_DOMINATES],
+            [],   # metabolism arm fires but returns nothing (PMM0913 transport-only)
+            [self._TRANS_ROW_FI],
+            [{"found": ["PMM0913"]}],
+        )
+        out = mbg(["PMM0913"], self._ORG, conn=conn)
+        assert any(
+            "family_inferred" in w for w in out["warnings"]
+        ), f"expected family-inferred warning, got {out['warnings']!r}"
+
+    def test_no_warning_when_substrate_confirmed_majority(self):
+        """sc >= fi → no auto-warning."""
+        mbg = self._api()
+        # 2 SC > 1 FI on transport in default summary
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(self._LOCUS, self._ORG, conn=conn)
+        assert all("family_inferred" not in w for w in out["warnings"])
+
+    def test_not_found_locus_tags(self):
+        """Input locus_tags that don't resolve to any Gene in the requested
+        organism surface in not_found.locus_tags."""
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            # Existence probe returns only 3 of the 4 (PMM9999 missing)
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(
+            ["PMM0963", "PMM0964", "PMM0965", "PMM9999"],
+            self._ORG, conn=conn,
+        )
+        assert out["not_found"]["locus_tags"] == ["PMM9999"]
+
+    def test_not_matched_for_resolved_but_no_chemistry(self):
+        """locus_tag that resolves in organism but has zero chemistry edges
+        (e.g. PMM0005 DNA gyrase) → not_matched (NOT not_found)."""
+        mbg = self._api()
+        # by_gene only has the 3 urease subunits — PMM0005 resolves but
+        # produces no rows.
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            # All four locus_tags exist in organism
+            [{"found": ["PMM0963", "PMM0964", "PMM0965", "PMM0005"]}],
+        )
+        out = mbg(
+            ["PMM0963", "PMM0964", "PMM0965", "PMM0005"],
+            self._ORG, conn=conn,
+        )
+        assert "PMM0005" in out["not_matched"]
+        assert "PMM0005" not in out["not_found"]["locus_tags"]
+
+    def test_mixed_batch_found_not_found_not_matched(self):
+        """Spec § Edge case 10: mixed batch.
+
+        Input: ['PMM0963' chemistry, 'PMM0005' no chemistry, 'PMM9999' nonexistent]
+          → results = PMM0963 rows
+          → not_matched = ['PMM0005']
+          → not_found.locus_tags = ['PMM9999']
+        """
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            # Existence probe finds 0963 + 0005, not 9999
+            [{"found": ["PMM0963", "PMM0005"]}],
+        )
+        out = mbg(
+            ["PMM0963", "PMM0005", "PMM9999"],
+            self._ORG, conn=conn,
+        )
+        assert out["not_found"]["locus_tags"] == ["PMM9999"]
+        assert "PMM0005" in out["not_matched"]
+        assert "PMM9999" not in out["not_matched"]
+
+    def test_not_found_organism_when_zero_genes(self):
+        """fuzzy organism match yields zero genes → not_found.organism set."""
+        mbg = self._api()
+        empty_summary = {
+            **self._SUMMARY_ROW_BOTH_ARMS,
+            "total_matching": 0,
+            "gene_count_total": 0,
+            "rows_by_evidence_source": [],
+            "rows_by_transport_confidence": [],
+            "by_gene": [],
+        }
+        conn = self._mock_conn(
+            [empty_summary],
+            [],
+            [],
+            [{"found": []}],
+        )
+        out = mbg(self._LOCUS, "Bogus organism", conn=conn)
+        assert out["not_found"]["organism"] == "Bogus organism"
+
+    def test_not_found_organism_none_on_success(self):
+        """gene_count_total > 0 → not_found.organism is None."""
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(self._LOCUS, self._ORG, conn=conn)
+        assert out["not_found"]["organism"] is None
+
+    def test_not_found_metabolite_pathway_ids(self):
+        """Input metabolite_pathway_ids that don't resolve → bucket."""
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            # locus_tag existence probe
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+            # pathway-id existence probe
+            [{"found": ["kegg.pathway:ko00910"]}],
+        )
+        out = mbg(
+            self._LOCUS, self._ORG,
+            metabolite_pathway_ids=[
+                "kegg.pathway:ko00910", "kegg.pathway:bogus",
+            ],
+            conn=conn,
+        )
+        assert (
+            out["not_found"]["metabolite_pathway_ids"]
+            == ["kegg.pathway:bogus"]
+        )
+
+    def test_not_found_metabolite_elements(self):
+        """Input metabolite_elements that don't appear on any KG metabolite
+        surface in not_found.metabolite_elements (typo / lowercase)."""
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            # locus_tag existence probe
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+            # element existence probe — only 'N' is real
+            [{"found": ["N"]}],
+        )
+        out = mbg(
+            self._LOCUS, self._ORG,
+            metabolite_elements=["N", "Nx"],   # 'Nx' is a typo
+            conn=conn,
+        )
+        assert out["not_found"]["metabolite_elements"] == ["Nx"]
+
+    def test_not_found_metabolite_ids(self):
+        """Input metabolite_ids that don't exist as Metabolite node → bucket."""
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            # locus_tag existence probe
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+            # metabolite-id existence probe
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = mbg(
+            self._LOCUS, self._ORG,
+            metabolite_ids=[
+                "kegg.compound:C00086", "kegg.compound:C99999",
+            ],
+            conn=conn,
+        )
+        assert (
+            out["not_found"]["metabolite_ids"]
+            == ["kegg.compound:C99999"]
+        )
+
+    def test_summary_true_skips_detail_dispatch(self):
+        """summary=True returns envelope only; detail builders not called.
+        Trailing `[]` covers the post-existence-probe top_pathways query
+        (S1 fix to honor spec § 5 verified 3-branch UNION)."""
+        mbg = self._api()
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+            [],
+        ]
+        out = mbg(self._LOCUS, self._ORG, summary=True, conn=conn)
+        assert out["results"] == []
+        assert out["returned"] == 0
+
+    def test_evidence_sources_validator_rejects_bogus(self):
+        """ValueError on unknown evidence_source value."""
+        mbg = self._api()
+        conn = MagicMock()
+        with pytest.raises(ValueError):
+            mbg(
+                self._LOCUS, self._ORG,
+                evidence_sources=["bogus"], conn=conn,
+            )
+
+    def test_evidence_sources_validator_rejects_metabolomics(self):
+        """`metabolomics` is NOT a valid value here — gene-anchored tools
+        have no metabolomics path. Per spec § Resolved decisions."""
+        mbg = self._api()
+        conn = MagicMock()
+        with pytest.raises(ValueError):
+            mbg(
+                self._LOCUS, self._ORG,
+                evidence_sources=["metabolomics"], conn=conn,
+            )
+
+    def test_truncated_flag(self):
+        """When (offset + limit) < total_matching → truncated=True."""
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],   # total_matching=15
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(self._LOCUS, self._ORG, limit=2, conn=conn)
+        assert out["truncated"] is True
+
+    def test_offset_echoed_in_envelope(self):
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(self._LOCUS, self._ORG, offset=3, conn=conn)
+        assert out["offset"] == 3
+
+    def test_total_count_fields_in_envelope(self):
+        """gene_count_total / reaction_count_total / transporter_count_total /
+        metabolite_count_total surface on the envelope."""
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(self._LOCUS, self._ORG, conn=conn)
+        assert out["gene_count_total"] == 3
+        assert out["reaction_count_total"] == 1
+        assert out["transporter_count_total"] == 3
+        assert out["metabolite_count_total"] == 4
+
+    def test_creates_conn_when_none(self):
+        """When conn=None, default GraphConnection is created. Trailing
+        `[]` covers the post-existence-probe top_pathways query (S1 fix
+        to honor spec § 5 verified 3-branch UNION)."""
+        mbg = self._api()
+        with patch(
+            "multiomics_explorer.api.functions.GraphConnection",
+        ) as MockConn:
+            mock_instance = MockConn.return_value
+            mock_instance.execute_query.side_effect = [
+                [self._SUMMARY_ROW_BOTH_ARMS],
+                [self._METAB_ROW],
+                [self._TRANS_ROW_SC],
+                [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+                [],
+            ]
+            out = mbg(self._LOCUS, self._ORG)
+        MockConn.assert_called_once()
+        assert out["total_matching"] == 15
+
+    def test_importable_from_package(self):
+        from multiomics_explorer import (
+            metabolites_by_gene as pkg_mbg,
+        )
+        from multiomics_explorer.api import (
+            metabolites_by_gene as api_direct,
+        )
+        assert pkg_mbg is api_direct
+
+    def test_envelope_carries_by_element_rollup(self):
+        """by_element envelope rollup mirrors the verified Cypher example
+        in spec § 6 (e.g. urease subunits → [{H,3},{O,3},{C,2},{N,2}])."""
+        mbg = self._api()
+        with_by_element = {
+            **self._SUMMARY_ROW_BOTH_ARMS,
+            "by_element": [
+                {"element": "H", "metabolite_count": 3},
+                {"element": "O", "metabolite_count": 3},
+                {"element": "C", "metabolite_count": 2},
+                {"element": "N", "metabolite_count": 2},
+            ],
+        }
+        conn = self._mock_conn(
+            [with_by_element],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(self._LOCUS, self._ORG, conn=conn)
+        elements = {b["element"] for b in out["by_element"]}
+        assert elements == {"H", "O", "C", "N"}
+
+    def test_envelope_carries_top_pathways_rollup(self):
+        """top_pathways envelope rollup with Mbg-shaped fields
+        (pathway_id, pathway_name, gene_count, pathway_reaction_count,
+        pathway_metabolite_count). Per S1 fix, top_pathways is sourced from
+        a dedicated post-existence-probe 3-branch UNION query (spec § 5),
+        not from the summary builder. Mock the dedicated call separately."""
+        mbg = self._api()
+        top_pathways_response = [
+            {
+                "pathway_id": "kegg.pathway:ko00910",
+                "pathway_name": "Nitrogen metabolism",
+                "gene_count": 3,
+                "pathway_reaction_count": 23,
+                "pathway_metabolite_count": 35,
+            },
+        ]
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+            top_pathways_response,
+        )
+        out = mbg(self._LOCUS, self._ORG, conn=conn)
+        assert len(out["top_pathways"]) == 1
+        p = out["top_pathways"][0]
+        assert p["pathway_id"] == "kegg.pathway:ko00910"
+        assert p["pathway_name"] == "Nitrogen metabolism"
+        assert p["gene_count"] == 3
+        assert p["pathway_reaction_count"] == 23
+        assert p["pathway_metabolite_count"] == 35
+
+    def test_envelope_carries_by_gene_rollup(self):
+        """by_gene rollup is INPUT-BOUNDED (gene-anchored mirror of
+        GBM's by_metabolite). Fields per Mbg shape."""
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(self._LOCUS, self._ORG, conn=conn)
+        assert len(out["by_gene"]) == 3
+        first = out["by_gene"][0]
+        assert "locus_tag" in first
+        assert "gene_name" in first
+        assert "rows" in first
+        assert "metabolite_count" in first
+        assert "reaction_count" in first
+        assert "transporter_count" in first
+        assert "metabolism_rows" in first
+        assert "transport_substrate_confirmed_rows" in first
+        assert "transport_family_inferred_rows" in first
+
+    def test_empty_inputs_zero_rollups(self):
+        """All locus_tags in not_matched (resolved but zero chemistry)
+        → empty rollups, total_matching=0, no warning, no spurious not_found."""
+        mbg = self._api()
+        empty_summary = {
+            **self._SUMMARY_ROW_BOTH_ARMS,
+            "total_matching": 0,
+            "gene_count_total": 0,
+            "reaction_count_total": 0,
+            "transporter_count_total": 0,
+            "metabolite_count_total": 0,
+            "rows_by_evidence_source": [],
+            "rows_by_transport_confidence": [],
+            "by_gene": [],
+            "by_element": [],
+            "top_pathways": [],
+            "top_metabolites": [],
+            "top_reactions": [],
+            "top_tcdb_families": [],
+            "top_gene_categories": [],
+        }
+        conn = self._mock_conn(
+            [empty_summary],
+            [],
+            [],
+            # All inputs exist in organism but have zero chemistry
+            [{"found": ["PMM0005", "PMM0006", "PMM0007"]}],
+        )
+        out = mbg(["PMM0005", "PMM0006", "PMM0007"], self._ORG, conn=conn)
+        assert out["total_matching"] == 0
+        assert out["results"] == []
+        assert out["warnings"] == []
+        assert set(out["not_matched"]) == {"PMM0005", "PMM0006", "PMM0007"}
+        assert out["not_found"]["locus_tags"] == []
