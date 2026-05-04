@@ -1,5 +1,5 @@
 version: 1
-captured_at: '2026-04-16T09:28:19.938280+00:00'
+captured_at: '2026-05-04T17:57:54.187408+00:00'
 schema:
   nodes:
     AnatomicalEntity:
@@ -14,11 +14,21 @@ schema:
         all_identifiers: list
         alternate_functional_descriptions: list
         annotation_quality: int
+        annotation_state: string
         annotation_types: list
+        bigg_reaction: list
+        boolean_metric_count: int
+        boolean_metric_types_observed: list
+        categorical_metric_count: int
+        categorical_metric_types_observed: list
+        cazy_family_count: int
         closest_ortholog_genera: list
         closest_ortholog_group_size: int
         cluster_membership_count: int
         cluster_types: list
+        compartments_observed: list
+        contig: string
+        contributing_sources: list
         end: int
         expression_edge_count: int
         function_description: string
@@ -26,16 +36,26 @@ schema:
         gene_name: string
         gene_summary: string
         id: string
+        informative_annotation_types: list
         locus_tag: string
+        metabolite_count: int
+        numeric_metric_count: int
+        numeric_metric_types_observed: list
         organism_name: string
         preferred_id: string
         product: string
+        protein_family: string
         protein_id: string
-        signal_peptide: string
+        reaction_count: int
+        seed_ortholog: string
+        seed_ortholog_evalue: float
+        sequence: string
         significant_down_count: int
         significant_up_count: int
         start: int
         strand: string
+        tcdb_family_count: int
+        transmembrane_regions: list
     BiologicalProcess:
       properties:
         id: string
@@ -62,6 +82,16 @@ schema:
         preferred_id: string
         tree: string
         tree_code: string
+    CazyFamily:
+      properties:
+        cazy_id: string
+        gene_count: int
+        id: string
+        level: int
+        level_kind: string
+        name: string
+        organism_count: int
+        preferred_id: string
     CellularComponent:
       properties:
         id: string
@@ -76,6 +106,7 @@ schema:
         cluster_method: string
         cluster_type: string
         experimental_context: string
+        growth_phases: list
         id: string
         light_condition: string
         name: string
@@ -99,6 +130,50 @@ schema:
         level: int
         name: string
         preferred_id: string
+    DataSource:
+      properties:
+        applies_to_organisms: list
+        description: string
+        id: string
+        info_types: list
+        name: string
+        preferred_id: string
+        provenance: string
+        scope: string
+        version: string
+    DerivedMetric:
+      properties:
+        allowed_categories: list
+        background_factors: list
+        category_counts: list
+        category_labels: list
+        compartment: string
+        experiment_id: string
+        experimental_context: string
+        field_description: string
+        flag_false_count: int
+        flag_true_count: int
+        growth_phases: list
+        has_p_value: string
+        id: string
+        light_condition: string
+        metric_type: string
+        name: string
+        omics_type: string
+        organism_name: string
+        preferred_id: string
+        publication_doi: string
+        rankable: string
+        total_gene_count: int
+        treatment: string
+        treatment_type: list
+        unit: string
+        value_kind: string
+        value_max: float
+        value_median: float
+        value_min: float
+        value_q1: float
+        value_q3: float
     EcNumber:
       properties:
         alternate_name: list
@@ -110,20 +185,51 @@ schema:
         preferred_id: string
     Entity:
       properties:
-        background_factors: list
-        cluster_count: int
-        cluster_method: string
-        cluster_type: string
-        experimental_context: string
+        all_identifiers: list
+        alternate_functional_descriptions: list
+        annotation_quality: int
+        annotation_state: string
+        annotation_types: list
+        bigg_reaction: list
+        boolean_metric_count: int
+        boolean_metric_types_observed: list
+        categorical_metric_count: int
+        categorical_metric_types_observed: list
+        cazy_family_count: int
+        closest_ortholog_genera: list
+        closest_ortholog_group_size: int
+        cluster_membership_count: int
+        cluster_types: list
+        compartments_observed: list
+        contig: string
+        contributing_sources: list
+        end: int
+        expression_edge_count: int
+        function_description: string
+        gene_category: string
+        gene_name: string
+        gene_summary: string
         id: string
-        light_condition: string
-        name: string
-        omics_type: string
+        informative_annotation_types: list
+        locus_tag: string
+        metabolite_count: int
+        numeric_metric_count: int
+        numeric_metric_types_observed: list
         organism_name: string
         preferred_id: string
-        total_gene_count: int
-        treatment: string
-        treatment_type: list
+        product: string
+        protein_family: string
+        protein_id: string
+        reaction_count: int
+        seed_ortholog: string
+        seed_ortholog_evalue: float
+        sequence: string
+        significant_down_count: int
+        significant_up_count: int
+        start: int
+        strand: string
+        tcdb_family_count: int
+        transmembrane_regions: list
     Experiment:
       properties:
         background_factors: list
@@ -131,7 +237,13 @@ schema:
         cluster_types: list
         clustering_analysis_count: int
         coculture_partner: string
+        compartment: string
         control: string
+        derived_metric_count: int
+        derived_metric_gene_count: int
+        derived_metric_search_text: string
+        derived_metric_value_kinds: list
+        distinct_gene_count: int
         experimental_context: string
         gene_count: int
         growth_phases: list
@@ -140,10 +252,15 @@ schema:
         light_condition: string
         light_intensity: string
         medium: string
+        metabolite_assay_count: int
+        metabolite_compartments: list
+        metabolite_count: int
         name: string
         omics_type: string
         organism_name: string
         preferred_id: string
+        reports_derived_metric_types: list
+        reports_fold_change: string
         significant_down_count: int
         significant_up_count: int
         statistical_test: string
@@ -151,6 +268,7 @@ schema:
         table_scope_detail: string
         temperature: string
         time_point_count: int
+        time_point_growth_phases: list
         time_point_hours: list
         time_point_labels: list
         time_point_orders: list
@@ -164,11 +282,21 @@ schema:
         all_identifiers: list
         alternate_functional_descriptions: list
         annotation_quality: int
+        annotation_state: string
         annotation_types: list
+        bigg_reaction: list
+        boolean_metric_count: int
+        boolean_metric_types_observed: list
+        categorical_metric_count: int
+        categorical_metric_types_observed: list
+        cazy_family_count: int
         closest_ortholog_genera: list
         closest_ortholog_group_size: int
         cluster_membership_count: int
         cluster_types: list
+        compartments_observed: list
+        contig: string
+        contributing_sources: list
         end: int
         expression_edge_count: int
         function_description: string
@@ -176,26 +304,33 @@ schema:
         gene_name: string
         gene_summary: string
         id: string
+        informative_annotation_types: list
         locus_tag: string
+        metabolite_count: int
+        numeric_metric_count: int
+        numeric_metric_types_observed: list
         organism_name: string
         preferred_id: string
         product: string
+        protein_family: string
         protein_id: string
-        signal_peptide: string
+        reaction_count: int
+        seed_ortholog: string
+        seed_ortholog_evalue: float
+        sequence: string
         significant_down_count: int
         significant_up_count: int
         start: int
         strand: string
+        tcdb_family_count: int
+        transmembrane_regions: list
     GeneCluster:
       properties:
-        expression_dynamics: string
-        functional_description: string
         id: string
         member_count: int
         name: string
         organism_name: string
         preferred_id: string
-        temporal_pattern: string
     GeneOntology:
       properties:
         id: string
@@ -205,30 +340,44 @@ schema:
         preferred_id: string
     GroupingClass:
       properties:
-        expression_dynamics: string
-        functional_description: string
         id: string
         member_count: int
         name: string
         organism_name: string
         preferred_id: string
-        temporal_pattern: string
     InformationContentEntity:
       properties:
+        allowed_categories: list
         background_factors: list
-        cluster_count: int
-        cluster_method: string
-        cluster_type: string
+        category_counts: list
+        category_labels: list
+        compartment: string
+        experiment_id: string
         experimental_context: string
+        field_description: string
+        flag_false_count: int
+        flag_true_count: int
+        growth_phases: list
+        has_p_value: string
         id: string
         light_condition: string
+        metric_type: string
         name: string
         omics_type: string
         organism_name: string
         preferred_id: string
+        publication_doi: string
+        rankable: string
         total_gene_count: int
         treatment: string
         treatment_type: list
+        unit: string
+        value_kind: string
+        value_max: float
+        value_median: float
+        value_min: float
+        value_q1: float
+        value_q3: float
     InvestigativeProcess:
       properties:
         background_factors: list
@@ -236,7 +385,13 @@ schema:
         cluster_types: list
         clustering_analysis_count: int
         coculture_partner: string
+        compartment: string
         control: string
+        derived_metric_count: int
+        derived_metric_gene_count: int
+        derived_metric_search_text: string
+        derived_metric_value_kinds: list
+        distinct_gene_count: int
         experimental_context: string
         gene_count: int
         growth_phases: list
@@ -245,10 +400,15 @@ schema:
         light_condition: string
         light_intensity: string
         medium: string
+        metabolite_assay_count: int
+        metabolite_compartments: list
+        metabolite_count: int
         name: string
         omics_type: string
         organism_name: string
         preferred_id: string
+        reports_derived_metric_types: list
+        reports_fold_change: string
         significant_down_count: int
         significant_up_count: int
         statistical_test: string
@@ -256,6 +416,7 @@ schema:
         table_scope_detail: string
         temperature: string
         time_point_count: int
+        time_point_growth_phases: list
         time_point_hours: list
         time_point_labels: list
         time_point_orders: list
@@ -271,6 +432,61 @@ schema:
         level_kind: string
         name: string
         preferred_id: string
+    Metabolite:
+      properties:
+        chebi_id: string
+        elements: list
+        evidence_sources: list
+        formula: string
+        gene_count: int
+        hmdb_id: string
+        id: string
+        inchikey: string
+        kegg_compound_id: string
+        mass: float
+        measured_assay_count: int
+        measured_organisms: list
+        measured_paper_count: int
+        mnxm_id: string
+        name: string
+        organism_count: int
+        organism_names: list
+        pathway_count: int
+        pathway_ids: list
+        pathway_names: list
+        preferred_id: string
+        smiles: string
+        transporter_count: int
+    MetaboliteAssay:
+      properties:
+        aggregation_method: string
+        background_factors: list
+        compartment: string
+        experiment_id: string
+        experimental_context: string
+        field_description: string
+        flag_false_count: int
+        flag_true_count: int
+        growth_phases: list
+        id: string
+        light_condition: string
+        metric_type: string
+        name: string
+        omics_type: string
+        organism_name: string
+        preferred_id: string
+        publication_doi: string
+        rankable: string
+        total_metabolite_count: int
+        treatment: string
+        treatment_type: list
+        unit: string
+        value_kind: string
+        value_max: float
+        value_median: float
+        value_min: float
+        value_q1: float
+        value_q3: float
     MolecularFunction:
       properties:
         id: string
@@ -280,20 +496,51 @@ schema:
         preferred_id: string
     NamedThing:
       properties:
-        background_factors: list
-        cluster_count: int
-        cluster_method: string
-        cluster_type: string
-        experimental_context: string
+        all_identifiers: list
+        alternate_functional_descriptions: list
+        annotation_quality: int
+        annotation_state: string
+        annotation_types: list
+        bigg_reaction: list
+        boolean_metric_count: int
+        boolean_metric_types_observed: list
+        categorical_metric_count: int
+        categorical_metric_types_observed: list
+        cazy_family_count: int
+        closest_ortholog_genera: list
+        closest_ortholog_group_size: int
+        cluster_membership_count: int
+        cluster_types: list
+        compartments_observed: list
+        contig: string
+        contributing_sources: list
+        end: int
+        expression_edge_count: int
+        function_description: string
+        gene_category: string
+        gene_name: string
+        gene_summary: string
         id: string
-        light_condition: string
-        name: string
-        omics_type: string
+        informative_annotation_types: list
+        locus_tag: string
+        metabolite_count: int
+        numeric_metric_count: int
+        numeric_metric_types_observed: list
         organism_name: string
         preferred_id: string
-        total_gene_count: int
-        treatment: string
-        treatment_type: list
+        product: string
+        protein_family: string
+        protein_id: string
+        reaction_count: int
+        seed_ortholog: string
+        seed_ortholog_evalue: float
+        sequence: string
+        significant_down_count: int
+        significant_up_count: int
+        start: int
+        strand: string
+        tcdb_family_count: int
+        transmembrane_regions: list
     OrganismTaxon:
       properties:
         background_factors: list
@@ -301,21 +548,31 @@ schema:
         cluster_count: int
         cluster_types: list
         clustering_analysis_count: int
+        compartments: list
+        derived_metric_count: int
+        derived_metric_gene_count: int
+        derived_metric_types: list
+        derived_metric_value_kinds: list
         experiment_count: int
         family: string
         gene_count: int
         genus: string
+        growth_phases: list
         id: string
         kingdom: string
         lineage: string
+        measured_metabolite_count: int
+        metabolite_count: int
         ncbi_taxon_id: int
         omics_types: list
         order: string
         organism_name: string
+        organism_type: string
         phylum: string
         preferred_id: string
         preferred_name: string
         publication_count: int
+        reaction_count: int
         species: string
         strain_name: string
         superkingdom: string
@@ -361,15 +618,10 @@ schema:
     Polypeptide:
       properties:
         annotation_score: float
-        catalytic_activities: list
         cofactor_names: list
-        ec_numbers: list
         eggnog_ids: string
         gene_names: list
-        gene_symbol: string
         go_biological_processes: list
-        go_cellular_components: list
-        go_molecular_functions: list
         id: string
         is_reviewed: string
         keyword_ids: list
@@ -383,20 +635,15 @@ schema:
         proteome_ids: list
         refseq_ids: list
         sequence_length: int
-        signal_peptide: string
+        string_ids: string
         transmembrane_regions: list
     Protein:
       properties:
         annotation_score: float
-        catalytic_activities: list
         cofactor_names: list
-        ec_numbers: list
         eggnog_ids: string
         gene_names: list
-        gene_symbol: string
         go_biological_processes: list
-        go_cellular_components: list
-        go_molecular_functions: list
         id: string
         is_reviewed: string
         keyword_ids: list
@@ -410,7 +657,7 @@ schema:
         proteome_ids: list
         refseq_ids: list
         sequence_length: int
-        signal_peptide: string
+        string_ids: string
         transmembrane_regions: list
     Publication:
       properties:
@@ -420,11 +667,21 @@ schema:
         cluster_count: int
         cluster_types: list
         clustering_analysis_count: int
+        compartments: list
+        derived_metric_count: int
+        derived_metric_gene_count: int
+        derived_metric_search_text: string
+        derived_metric_types: list
+        derived_metric_value_kinds: list
         description: string
         doi: string
         experiment_count: int
+        growth_phases: list
         id: string
         journal: string
+        metabolite_assay_count: int
+        metabolite_compartments: list
+        metabolite_count: int
         omics_types: list
         organisms: list
         preferred_id: string
@@ -432,11 +689,40 @@ schema:
         study_type: string
         title: string
         treatment_types: list
+    Reaction:
+      properties:
+        ec_numbers: list
+        gene_count: int
+        id: string
+        kegg_pathway_ids: list
+        kegg_reaction_id: string
+        mass_balance: string
+        mnxr_id: string
+        name: string
+        organism_count: int
+        organisms: list
+        preferred_id: string
+        reaction_class: string
+        rhea_ids: list
     Schema_info:
       properties:
         id: string
         preferred_id: string
         schema_info: string
+    TcdbFamily:
+      properties:
+        gene_count: int
+        id: string
+        level: int
+        level_kind: string
+        member_count: int
+        metabolite_count: int
+        name: string
+        organism_count: int
+        preferred_id: string
+        superfamily: string
+        tc_class_id: string
+        tcdb_id: string
     TigrRole:
       properties:
         code: string
@@ -445,6 +731,49 @@ schema:
         name: string
         preferred_id: string
   relationships:
+    Assay_flags_metabolite:
+      source_labels:
+      - Entity
+      - InformationContentEntity
+      - MetaboliteAssay
+      - NamedThing
+      target_labels:
+      - Entity
+      - Metabolite
+      - NamedThing
+      properties:
+        condition_label: string
+        flag_value: string
+        id: string
+        metric_type: string
+        n_positive: int
+        n_replicates: int
+    Assay_quantifies_metabolite:
+      source_labels:
+      - Entity
+      - InformationContentEntity
+      - MetaboliteAssay
+      - NamedThing
+      target_labels:
+      - Entity
+      - Metabolite
+      - NamedThing
+      properties:
+        condition_label: string
+        detection_status: string
+        id: string
+        metric_bucket: string
+        metric_percentile: float
+        metric_type: string
+        n_non_zero: int
+        n_replicates: int
+        rank_by_metric: int
+        replicate_values: list
+        time_point: string
+        time_point_hours: float
+        time_point_order: int
+        value: float
+        value_sd: float
     Biological_process_is_a_biological_process:
       source_labels:
       - BiologicalEntity
@@ -516,6 +845,17 @@ schema:
       - NamedThing
       target_labels:
       - BriteCategory
+      - Entity
+      - NamedThing
+      properties:
+        id: string
+    Cazy_family_is_a_cazy_family:
+      source_labels:
+      - CazyFamily
+      - Entity
+      - NamedThing
+      target_labels:
+      - CazyFamily
       - Entity
       - NamedThing
       properties:
@@ -608,6 +948,63 @@ schema:
       - NamedThing
       properties:
         id: string
+    DerivedMetricBelongsToOrganism:
+      source_labels:
+      - DerivedMetric
+      - Entity
+      - InformationContentEntity
+      - NamedThing
+      target_labels:
+      - Entity
+      - NamedThing
+      - OrganismTaxon
+      properties:
+        id: string
+    Derived_metric_classifies_gene:
+      source_labels:
+      - DerivedMetric
+      - Entity
+      - InformationContentEntity
+      - NamedThing
+      target_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      properties:
+        id: string
+        metric_type: string
+        value: string
+    Derived_metric_flags_gene:
+      source_labels:
+      - DerivedMetric
+      - Entity
+      - InformationContentEntity
+      - NamedThing
+      target_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      properties:
+        id: string
+        metric_type: string
+        value: string
+    Derived_metric_quantifies_gene:
+      source_labels:
+      - DerivedMetric
+      - Entity
+      - InformationContentEntity
+      - NamedThing
+      target_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      properties:
+        id: string
+        metric_type: string
+        value: float
     Ec_number_is_a_ec_number:
       source_labels:
       - EcNumber
@@ -626,6 +1023,28 @@ schema:
       - ClusteringAnalysis
       - Entity
       - InformationContentEntity
+      - NamedThing
+      properties:
+        id: string
+    ExperimentHasDerivedMetric:
+      source_labels:
+      - Experiment
+      - InvestigativeProcess
+      target_labels:
+      - DerivedMetric
+      - Entity
+      - InformationContentEntity
+      - NamedThing
+      properties:
+        id: string
+    ExperimentHasMetaboliteAssay:
+      source_labels:
+      - Experiment
+      - InvestigativeProcess
+      target_labels:
+      - Entity
+      - InformationContentEntity
+      - MetaboliteAssay
       - NamedThing
       properties:
         id: string
@@ -651,6 +1070,18 @@ schema:
       - EcNumber
       - Entity
       - NamedThing
+      properties:
+        id: string
+    Gene_catalyzes_reaction:
+      source_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      target_labels:
+      - Entity
+      - NamedThing
+      - Reaction
       properties:
         id: string
     Gene_enables_molecular_function:
@@ -683,6 +1114,18 @@ schema:
         licence: string
         source: string
         version: string
+    Gene_has_cazy_family:
+      source_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      target_labels:
+      - CazyFamily
+      - Entity
+      - NamedThing
+      properties:
+        id: string
     Gene_has_cyanorak_role:
       source_labels:
       - BiologicalEntity
@@ -717,6 +1160,18 @@ schema:
       - Entity
       - NamedThing
       - Pfam
+      properties:
+        id: string
+    Gene_has_tcdb_family:
+      source_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      target_labels:
+      - Entity
+      - NamedThing
+      - TcdbFamily
       properties:
         id: string
     Gene_has_tigr_role:
@@ -831,6 +1286,29 @@ schema:
       - NamedThing
       properties:
         id: string
+    MetaboliteAssayBelongsToOrganism:
+      source_labels:
+      - Entity
+      - InformationContentEntity
+      - MetaboliteAssay
+      - NamedThing
+      target_labels:
+      - Entity
+      - NamedThing
+      - OrganismTaxon
+      properties:
+        id: string
+    Metabolite_in_pathway:
+      source_labels:
+      - Entity
+      - Metabolite
+      - NamedThing
+      target_labels:
+      - Entity
+      - KeggTerm
+      - NamedThing
+      properties:
+        id: string
     Molecular_function_is_a_molecular_function:
       source_labels:
       - BiologicalEntity
@@ -879,6 +1357,20 @@ schema:
       - NamedThing
       properties:
         id: string
+    Organism_has_metabolite:
+      source_labels:
+      - Entity
+      - NamedThing
+      - OrganismTaxon
+      target_labels:
+      - Entity
+      - Metabolite
+      - NamedThing
+      properties:
+        evidence_sources: list
+        measured_assay_count: int
+        measured_compartments: list
+        measured_paper_count: int
     Pfam_in_pfam_clan:
       source_labels:
       - Entity
@@ -915,6 +1407,76 @@ schema:
       - ClusteringAnalysis
       - Entity
       - InformationContentEntity
+      - NamedThing
+      properties:
+        id: string
+    PublicationHasDerivedMetric:
+      source_labels:
+      - Entity
+      - InformationContentEntity
+      - NamedThing
+      - Publication
+      target_labels:
+      - DerivedMetric
+      - Entity
+      - InformationContentEntity
+      - NamedThing
+      properties:
+        id: string
+    PublicationHasMetaboliteAssay:
+      source_labels:
+      - Entity
+      - InformationContentEntity
+      - NamedThing
+      - Publication
+      target_labels:
+      - Entity
+      - InformationContentEntity
+      - MetaboliteAssay
+      - NamedThing
+      properties:
+        id: string
+    Reaction_has_metabolite:
+      source_labels:
+      - Entity
+      - NamedThing
+      - Reaction
+      target_labels:
+      - Entity
+      - Metabolite
+      - NamedThing
+      properties:
+        id: string
+    Reaction_in_kegg_pathway:
+      source_labels:
+      - Entity
+      - NamedThing
+      - Reaction
+      target_labels:
+      - Entity
+      - KeggTerm
+      - NamedThing
+      properties:
+        id: string
+    Tcdb_family_is_a_tcdb_family:
+      source_labels:
+      - Entity
+      - NamedThing
+      - TcdbFamily
+      target_labels:
+      - Entity
+      - NamedThing
+      - TcdbFamily
+      properties:
+        id: string
+    Tcdb_family_transports_metabolite:
+      source_labels:
+      - Entity
+      - NamedThing
+      - TcdbFamily
+      target_labels:
+      - Entity
+      - Metabolite
       - NamedThing
       properties:
         id: string
