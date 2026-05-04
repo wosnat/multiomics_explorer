@@ -5830,6 +5830,230 @@ class TestPathwayEnrichment:
 
 
 # ---------------------------------------------------------------------------
+# A3 — pathway_enrichment.informative_only (frozen spec 2026-05-04)
+# ---------------------------------------------------------------------------
+
+
+class TestPathwayEnrichmentInformativeOnly:
+    """A3 spec § Decisions locked: default `informative_only=True`,
+    per-row `is_informative` carried through to result.results.
+
+    Each test uses mocked genes_by_ontology rows with a mix of informative
+    and uninformative terms, then checks (a) which rows survive (informative
+    side controls inclusion), (b) `result.params['informative_only']` records
+    the requested value, (c) the `is_informative` column is present on
+    result.results.
+    """
+
+    @staticmethod
+    def _stub_de_result():
+        # Field names align with `de_enrichment_inputs` consumption:
+        # log2fc / padj (or log2_fc / p_adjust), `significant` flag, `direction`
+        # ('up'|'down'). Two significant-up rows over the same exp/timepoint
+        # so cluster `exp1|T0|up` gets 2 foreground genes.
+        return {
+            "organism_name": "MED4",
+            "results": [
+                {"locus_tag": "PMM0001", "experiment_id": "exp1",
+                 "timepoint": "T0", "direction": "up",
+                 "log2fc": 2.0, "padj": 0.001, "significant": True,
+                 "name": "exp1", "omics_type": "transcriptomics",
+                 "table_scope": "rnaseq",
+                 "treatment_type": ["light_dark"],
+                 "background_factors": [], "is_time_course": False,
+                 "growth_phase": None, "timepoint_hours": 0.0,
+                 "timepoint_order": 0},
+                {"locus_tag": "PMM0002", "experiment_id": "exp1",
+                 "timepoint": "T0", "direction": "up",
+                 "log2fc": 1.5, "padj": 0.001, "significant": True,
+                 "name": "exp1", "omics_type": "transcriptomics",
+                 "table_scope": "rnaseq",
+                 "treatment_type": ["light_dark"],
+                 "background_factors": [], "is_time_course": False,
+                 "growth_phase": None, "timepoint_hours": 0.0,
+                 "timepoint_order": 0},
+            ],
+            "not_found": [], "not_matched": [], "no_expression": [],
+        }
+
+    @staticmethod
+    def _gbo_rows_mixed_informativeness():
+        """Two terms — one informative (TERM_OK), one uninformative
+        (TERM_ROOT). Each has 2 gene members in the foreground."""
+        return [
+            # Informative term (e.g. a real pathway) — kept under default True.
+            {"term_id": "CR:OK", "term_name": "Real Pathway",
+             "locus_tag": "PMM0001", "level": 1,
+             "is_informative": True},
+            {"term_id": "CR:OK", "term_name": "Real Pathway",
+             "locus_tag": "PMM0002", "level": 1,
+             "is_informative": True},
+            # Uninformative term (e.g. KEGG map00001) — excluded under default.
+            {"term_id": "CR:ROOT", "term_name": "Metabolic pathways",
+             "locus_tag": "PMM0001", "level": 0,
+             "is_informative": False},
+            {"term_id": "CR:ROOT", "term_name": "Metabolic pathways",
+             "locus_tag": "PMM0002", "level": 0,
+             "is_informative": False},
+        ]
+
+    def _gbo_factory(self, captured, *, filter_uninformative_when_true):
+        """Return a genes_by_ontology stub that mimics KG-side filtering.
+
+        When `informative_only=True` is in the call kwargs, the stub emits
+        only the informative subset of `_gbo_rows_mixed_informativeness()`,
+        matching the real KG-side semantics (filter happens server-side).
+        When False, all rows pass through.
+        """
+        rows = self._gbo_rows_mixed_informativeness()
+
+        def _gbo(**kwargs):
+            captured.update(kwargs)
+            io = kwargs.get("informative_only", False)
+            if filter_uninformative_when_true and io:
+                kept = [r for r in rows if r["is_informative"]]
+            else:
+                kept = list(rows)
+            return {
+                "ontology": "cyanorak_role", "organism_name": "MED4",
+                "results": kept,
+                "not_found": [], "wrong_ontology": [],
+                "wrong_level": [], "filtered_out": [],
+            }
+
+        return _gbo
+
+    # --- (a) default informative_only=True excludes uninformative term rows ---
+    def test_default_excludes_uninformative_term_rows(self, monkeypatch):
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+
+        captured: dict = {}
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory(captured, filter_uninformative_when_true=True),
+        )
+
+        result = pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        # Default carried into the genes_by_ontology call.
+        assert captured.get("informative_only") is True
+        # No uninformative term row in the Fisher result.
+        if not result.results.empty:
+            term_ids = set(result.results["term_id"])
+            assert "CR:ROOT" not in term_ids, (
+                "Default informative_only=True must exclude uninformative term"
+            )
+            assert "CR:OK" in term_ids
+
+    # --- (b) informative_only=False includes them -----------------------
+    def test_explicit_false_includes_uninformative_term_rows(self, monkeypatch):
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+
+        captured: dict = {}
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory(captured, filter_uninformative_when_true=True),
+        )
+
+        result = pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+            informative_only=False,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert captured.get("informative_only") is False
+        if not result.results.empty:
+            term_ids = set(result.results["term_id"])
+            assert "CR:ROOT" in term_ids, (
+                "informative_only=False must include uninformative term rows"
+            )
+            assert "CR:OK" in term_ids
+
+    # --- (c) result.params['informative_only'] recorded -----------------
+    def test_params_records_informative_only_default(self, monkeypatch):
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory({}, filter_uninformative_when_true=True),
+        )
+        result = pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert "informative_only" in result.params
+        assert result.params["informative_only"] is True
+
+    def test_params_records_informative_only_false(self, monkeypatch):
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory({}, filter_uninformative_when_true=True),
+        )
+        result = pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+            informative_only=False,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert result.params["informative_only"] is False
+
+    # --- (d) is_informative column present in result.results DataFrame ---
+    def test_is_informative_column_present_in_results(self, monkeypatch):
+        """fisher_ora auto-passes through any term2gene column other than
+        term_id/term_name/locus_tag (analysis/enrichment.py:367-374). The
+        `is_informative` column must therefore appear on result.results."""
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(),
+        )
+        # Use False so both informative and uninformative rows survive
+        # to the result.results DataFrame.
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory({}, filter_uninformative_when_true=False),
+        )
+        result = pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+            informative_only=False,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert not result.results.empty, (
+            "Fixture should yield Fisher rows (gene_set ⊆ background, M >= 1)"
+        )
+        assert "is_informative" in result.results.columns
+
+
+# ---------------------------------------------------------------------------
 # cluster_enrichment_inputs
 # ---------------------------------------------------------------------------
 class TestClusterEnrichmentInputs:
@@ -6204,6 +6428,202 @@ class TestClusterEnrichment:
         assert len(skips) == 1
         assert skips[0].cluster_id == "gc:99"
         assert skips[0].cluster_name == "Cluster B"
+
+
+# ---------------------------------------------------------------------------
+# A3 — cluster_enrichment.informative_only (frozen spec 2026-05-04)
+# ---------------------------------------------------------------------------
+
+
+class TestClusterEnrichmentInformativeOnly:
+    """Parallel of TestPathwayEnrichmentInformativeOnly for cluster_enrichment.
+
+    Mode-B template-and-extend: same param, same threading pattern, same
+    `is_informative` field placement.
+    """
+
+    @staticmethod
+    def _stub_inputs():
+        from multiomics_explorer.analysis.enrichment import EnrichmentInputs
+        # Cluster A has 2 foreground genes ⊆ background of 3.
+        return EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={"Cluster A": ["PMM0001", "PMM0002"]},
+            background={"Cluster A": ["PMM0001", "PMM0002", "PMM0003"]},
+            cluster_metadata={"Cluster A": {
+                "cluster_id": "gc:1", "cluster_name": "Cluster A",
+                "member_count": 2,
+            }},
+            not_found=[], not_matched=[], no_expression=[],
+            clusters_skipped=[],
+            analysis_metadata={
+                "analysis_id": "ca:test", "analysis_name": "Test",
+                "cluster_method": "kmeans", "cluster_type": "diel_cycle",
+                "omics_type": "transcriptomics",
+                "treatment_type": ["light_dark"],
+                "background_factors": [], "growth_phases": [],
+                "experiment_ids": ["exp:1"],
+            },
+        )
+
+    @staticmethod
+    def _gbo_rows_mixed_informativeness():
+        return [
+            {"term_id": "CR:OK", "term_name": "Real Pathway",
+             "locus_tag": "PMM0001", "level": 1,
+             "is_informative": True},
+            {"term_id": "CR:OK", "term_name": "Real Pathway",
+             "locus_tag": "PMM0002", "level": 1,
+             "is_informative": True},
+            {"term_id": "CR:ROOT", "term_name": "Metabolic pathways",
+             "locus_tag": "PMM0001", "level": 0,
+             "is_informative": False},
+            {"term_id": "CR:ROOT", "term_name": "Metabolic pathways",
+             "locus_tag": "PMM0002", "level": 0,
+             "is_informative": False},
+        ]
+
+    def _gbo_factory(self, captured, *, filter_uninformative_when_true):
+        rows = self._gbo_rows_mixed_informativeness()
+
+        def _gbo(**kwargs):
+            captured.update(kwargs)
+            io = kwargs.get("informative_only", False)
+            if filter_uninformative_when_true and io:
+                kept = [r for r in rows if r["is_informative"]]
+            else:
+                kept = list(rows)
+            return {
+                "ontology": "cyanorak_role", "organism_name": "MED4",
+                "results": kept,
+                "not_found": [], "wrong_ontology": [],
+                "wrong_level": [], "filtered_out": [],
+            }
+
+        return _gbo
+
+    # --- (a) default informative_only=True excludes uninformative rows ---
+    def test_default_excludes_uninformative_term_rows(self, monkeypatch):
+        from multiomics_explorer.api import cluster_enrichment
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+
+        captured: dict = {}
+        monkeypatch.setattr(
+            enr, "cluster_enrichment_inputs",
+            lambda **_: self._stub_inputs(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory(captured, filter_uninformative_when_true=True),
+        )
+
+        result = cluster_enrichment(
+            analysis_id="ca:test", organism="MED4",
+            ontology="cyanorak_role", level=1,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert captured.get("informative_only") is True
+        if not result.results.empty:
+            term_ids = set(result.results["term_id"])
+            assert "CR:ROOT" not in term_ids
+            assert "CR:OK" in term_ids
+
+    # --- (b) informative_only=False includes them -----------------------
+    def test_explicit_false_includes_uninformative_term_rows(self, monkeypatch):
+        from multiomics_explorer.api import cluster_enrichment
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+
+        captured: dict = {}
+        monkeypatch.setattr(
+            enr, "cluster_enrichment_inputs",
+            lambda **_: self._stub_inputs(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory(captured, filter_uninformative_when_true=True),
+        )
+
+        result = cluster_enrichment(
+            analysis_id="ca:test", organism="MED4",
+            ontology="cyanorak_role", level=1,
+            informative_only=False,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert captured.get("informative_only") is False
+        if not result.results.empty:
+            term_ids = set(result.results["term_id"])
+            assert "CR:ROOT" in term_ids
+            assert "CR:OK" in term_ids
+
+    # --- (c) result.params['informative_only'] recorded -----------------
+    def test_params_records_informative_only_default(self, monkeypatch):
+        from multiomics_explorer.api import cluster_enrichment
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+
+        monkeypatch.setattr(
+            enr, "cluster_enrichment_inputs",
+            lambda **_: self._stub_inputs(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory({}, filter_uninformative_when_true=True),
+        )
+        result = cluster_enrichment(
+            analysis_id="ca:test", organism="MED4",
+            ontology="cyanorak_role", level=1,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert "informative_only" in result.params
+        assert result.params["informative_only"] is True
+
+    def test_params_records_informative_only_false(self, monkeypatch):
+        from multiomics_explorer.api import cluster_enrichment
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+
+        monkeypatch.setattr(
+            enr, "cluster_enrichment_inputs",
+            lambda **_: self._stub_inputs(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory({}, filter_uninformative_when_true=True),
+        )
+        result = cluster_enrichment(
+            analysis_id="ca:test", organism="MED4",
+            ontology="cyanorak_role", level=1,
+            informative_only=False,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert result.params["informative_only"] is False
+
+    # --- (d) is_informative column present in result.results DataFrame ---
+    def test_is_informative_column_present_in_results(self, monkeypatch):
+        from multiomics_explorer.api import cluster_enrichment
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+
+        monkeypatch.setattr(
+            enr, "cluster_enrichment_inputs",
+            lambda **_: self._stub_inputs(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory({}, filter_uninformative_when_true=False),
+        )
+        result = cluster_enrichment(
+            analysis_id="ca:test", organism="MED4",
+            ontology="cyanorak_role", level=1,
+            informative_only=False,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert not result.results.empty, (
+            "Fixture should yield Fisher rows (gene_set ⊆ background, M >= 1)"
+        )
+        assert "is_informative" in result.results.columns
 
 
 class TestListDerivedMetrics:

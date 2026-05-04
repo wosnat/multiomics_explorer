@@ -4282,6 +4282,7 @@ def pathway_enrichment(
     timepoint_filter: list[str] | None = None,
     growth_phases: list[str] | None = None,
     tree: str | None = None,
+    informative_only: bool = True,
     *,
     conn: GraphConnection | None = None,
 ):
@@ -4366,6 +4367,7 @@ def pathway_enrichment(
         min_gene_set_size=0, max_gene_set_size=None,
         summary=False, verbose=False,
         limit=None, offset=0, tree=tree,
+        informative_only=informative_only,
         conn=conn,
     )
     from multiomics_explorer.analysis.frames import to_dataframe
@@ -4422,6 +4424,7 @@ def pathway_enrichment(
     result.params = {
         "organism": organism, "ontology": ontology,
         "level": level, "term_ids": term_ids, "tree": tree,
+        "informative_only": informative_only,
         "min_gene_set_size": min_gene_set_size,
         "max_gene_set_size": max_gene_set_size,
         "pvalue_cutoff": pvalue_cutoff,
@@ -4465,6 +4468,7 @@ def cluster_enrichment(
     max_cluster_size: int | None = None,
     pvalue_cutoff: float = 0.05,
     tree: str | None = None,
+    informative_only: bool = True,
     *,
     conn: GraphConnection | None = None,
 ):
@@ -4548,6 +4552,7 @@ def cluster_enrichment(
         result.params = _cluster_enrichment_params_dict(
             analysis_id=analysis_id, organism=organism,
             ontology=ontology, level=level, term_ids=term_ids, tree=tree,
+            informative_only=informative_only,
             background_mode=background_mode,
             min_gene_set_size=min_gene_set_size, max_gene_set_size=max_gene_set_size,
             min_cluster_size=min_cluster_size, max_cluster_size=max_cluster_size,
@@ -4562,6 +4567,7 @@ def cluster_enrichment(
         min_gene_set_size=0, max_gene_set_size=None,
         summary=False, verbose=False,
         limit=None, offset=0, tree=tree,
+        informative_only=informative_only,
         conn=conn,
     )
     from multiomics_explorer.analysis.frames import to_dataframe
@@ -4626,6 +4632,7 @@ def cluster_enrichment(
     result.params = _cluster_enrichment_params_dict(
         analysis_id=analysis_id, organism=organism,
         ontology=ontology, level=level, term_ids=term_ids, tree=tree,
+        informative_only=informative_only,
         background_mode=background_mode,
         min_gene_set_size=min_gene_set_size, max_gene_set_size=max_gene_set_size,
         min_cluster_size=min_cluster_size, max_cluster_size=max_cluster_size,
@@ -4636,7 +4643,8 @@ def cluster_enrichment(
 
 
 def _cluster_enrichment_params_dict(
-    *, analysis_id, organism, ontology, level, term_ids, tree, background_mode,
+    *, analysis_id, organism, ontology, level, term_ids, tree,
+    informative_only, background_mode,
     min_gene_set_size, max_gene_set_size,
     min_cluster_size, max_cluster_size, pvalue_cutoff,
     inputs, produced, term2gene,
@@ -4644,6 +4652,7 @@ def _cluster_enrichment_params_dict(
     return {
         "analysis_id": analysis_id, "organism": organism,
         "ontology": ontology, "level": level, "term_ids": term_ids, "tree": tree,
+        "informative_only": informative_only,
         "background_mode": background_mode,
         "min_gene_set_size": min_gene_set_size,
         "max_gene_set_size": max_gene_set_size,

@@ -71,6 +71,15 @@ class PathwayEnrichmentResult(BaseModel):
     level: int | None = Field(
         default=None, description="Hierarchy depth of the term (0 = root)"
     )
+    is_informative: bool = Field(
+        description=(
+            "True if the term is not flagged is_uninformative in the KG. Always "
+            "present, regardless of informative_only setting, so callers can "
+            "post-filter or diagnose. With default informative_only=True, all rows "
+            "have is_informative=True by construction; pass informative_only=False "
+            "to opt out and see uninformative terms."
+        ),
+    )
     tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
     tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
     gene_ratio: str = Field(
@@ -270,6 +279,15 @@ class ClusterEnrichmentResult(BaseModel):
     term_id: str = Field(description="Ontology term ID")
     term_name: str = Field(description="Ontology term display name")
     level: int | None = Field(default=None, description="Hierarchy depth (0 = root)")
+    is_informative: bool = Field(
+        description=(
+            "True if the term is not flagged is_uninformative in the KG. Always "
+            "present, regardless of informative_only setting, so callers can "
+            "post-filter or diagnose. With default informative_only=True, all rows "
+            "have is_informative=True by construction; pass informative_only=False "
+            "to opt out and see uninformative terms."
+        ),
+    )
     tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
     tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
     gene_ratio: str = Field(
@@ -5604,6 +5622,15 @@ def register_tools(mcp: FastMCP):
             description="Skip N rows before limit.",
             ge=0,
         )] = 0,
+        informative_only: Annotated[bool, Field(
+            description=(
+                "When True (default), exclude ontology terms flagged uninformative in "
+                "the KG (e.g. KEGG map00001 'metabolic pathways', GO root go:0008150). "
+                "Term-side filter — never restricts the gene set, background, or DE "
+                "inputs. Pass False to include uninformative terms; per-row "
+                "is_informative still surfaces in either mode."
+            ),
+        )] = True,
     ) -> PathwayEnrichmentResponse:
         """Pathway over-representation analysis from DE results (Fisher + BH).
 
@@ -5632,6 +5659,7 @@ def register_tools(mcp: FastMCP):
                 timepoint_filter=timepoint_filter,
                 growth_phases=growth_phases,
                 tree=tree,
+                informative_only=informative_only,
                 conn=conn,
             )
         except ValueError as e:
@@ -5684,6 +5712,15 @@ def register_tools(mcp: FastMCP):
         summary: Annotated[bool, Field(description="If true, omit results (envelope only).")] = False,
         limit: Annotated[int, Field(description="Max rows returned.", ge=1)] = 5,
         offset: Annotated[int, Field(description="Skip N rows before limit.", ge=0)] = 0,
+        informative_only: Annotated[bool, Field(
+            description=(
+                "When True (default), exclude ontology terms flagged uninformative in "
+                "the KG (e.g. KEGG map00001 'metabolic pathways', GO root go:0008150). "
+                "Term-side filter — never restricts the gene set, background, or DE "
+                "inputs. Pass False to include uninformative terms; per-row "
+                "is_informative still surfaces in either mode."
+            ),
+        )] = True,
     ) -> ClusterEnrichmentResponse:
         """Cluster-membership over-representation analysis (Fisher + BH).
 
@@ -5713,6 +5750,7 @@ def register_tools(mcp: FastMCP):
                 min_cluster_size=min_cluster_size,
                 max_cluster_size=max_cluster_size,
                 pvalue_cutoff=pvalue_cutoff,
+                informative_only=informative_only,
                 conn=conn,
             )
         except ValueError as e:

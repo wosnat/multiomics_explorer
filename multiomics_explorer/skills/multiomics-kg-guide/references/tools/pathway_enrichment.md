@@ -29,6 +29,7 @@ EnrichmentResult accessors, custom term2gene, compareCluster export).
 | summary | bool | False | If true, omit results (envelope only). |
 | limit | int | 100 | Max rows returned. Default 100 — top hits by p_adjust globally. |
 | offset | int | 0 | Skip N rows before limit. |
+| informative_only | bool | True | When True (default), exclude ontology terms flagged uninformative in the KG (e.g. KEGG map00001 'metabolic pathways', GO root go:0008150). Term-side filter — never restricts the gene set, background, or DE inputs. Pass False to include uninformative terms; per-row is_informative still surfaces in either mode. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -81,6 +82,7 @@ organism_name, ontology, level, total_matching, returned, truncated, offset, n_s
 | term_id | string | Ontology term ID |
 | term_name | string | Ontology term display name |
 | level | int \| None (optional) | Hierarchy depth of the term (0 = root) |
+| is_informative | bool | True if the term is not flagged is_uninformative in the KG. Always present, regardless of informative_only setting, so callers can post-filter or diagnose. With default informative_only=True, all rows have is_informative=True by construction; pass informative_only=False to opt out and see uninformative terms. |
 | tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
 | tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
 | gene_ratio | string | 'k/n' string — DE genes in pathway over total DE genes in cluster (clusterProfiler: GeneRatio) |
@@ -101,6 +103,18 @@ organism_name, ontology, level, total_matching, returned, truncated, offset, n_s
 |---|---|---|
 | foreground_gene_ids | list[string] \| None (optional) | Verbose only: the k DE genes in this pathway (clusterProfiler: geneID split) |
 | background_gene_ids | list[string] \| None (optional) | Verbose only: pathway members in background NOT in DE set (non-overlapping complement) |
+
+### `informative_only` filter (default 2026-05)
+
+When True (default), exclude ontology terms flagged uninformative
+in the KG (e.g. KEGG map00001 'metabolic pathways', GO root
+go:0008150). Term-side filter — never restricts the gene set,
+background, or DE inputs. Pass False to include uninformative terms;
+per-row `is_informative` still surfaces in either mode.
+
+See `docs://analysis/enrichment` (section "Informative-only filtering")
+for rationale, Fisher denominator behavior, and opt-out guidance.
+
 
 ### Cluster naming
 
@@ -178,9 +192,12 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
 ontology_landscape → genes_by_ontology(level=N) → pathway_enrichment
 pathway_enrichment → gene_overview
 differential_expression_by_gene → pathway_enrichment
+See `docs://analysis/enrichment` for the full methodology, including the `informative_only` (default `True` since 2026-05) filter semantics.
 ```
 
 ## Common mistakes
+
+- Caller pinning row counts from pre-2026-05 runs sees fewer rows by default. Pass `informative_only=False` to restore old behavior, or accept the new default (recommended).
 
 - Default background is `table_scope` (per-experiment quantified set). `'organism'` inflates the denominator and underestimates enrichment. See `docs://analysis/enrichment` for the full methodology note.
 

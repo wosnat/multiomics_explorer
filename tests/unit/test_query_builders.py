@@ -8129,3 +8129,241 @@ class TestBuildOntologyLandscapeF1Surface:
             ontology="cyanorak_role", organism_name="Prochlorococcus MED4",
         )
         assert " AS is_informative" not in cypher
+
+
+# ===========================================================================
+# A3 — Enrichment defaults: pathway_enrichment + cluster_enrichment thread
+# `informative_only` through to genes_by_ontology (frozen spec 2026-05-04).
+# ===========================================================================
+# The query builders themselves are unchanged for A3 — the existing
+# build_genes_by_ontology_* helpers already support `informative_only` (covered
+# by TestBuildGenesByOntologyF1Surface above). These tests pin the api-layer
+# threading: when api.pathway_enrichment / api.cluster_enrichment invoke
+# genes_by_ontology, the `informative_only` kwarg must flow through verbatim,
+# defaulting to True per spec.
+
+
+class TestPathwayEnrichmentBuilderInformativeOnly:
+    """api.pathway_enrichment threads `informative_only` to genes_by_ontology.
+
+    The query-builder layer is untouched (genes_by_ontology builders already
+    accept the param via TestBuildGenesByOntologyF1Surface). These mock-based
+    tests pin the orchestration: every internal genes_by_ontology call must
+    receive the caller's `informative_only` value.
+    """
+
+    @staticmethod
+    def _stub_de_result(rows=()):
+        return {
+            "organism_name": "MED4",
+            "results": list(rows),
+            "not_found": [], "not_matched": [], "no_expression": [],
+        }
+
+    @staticmethod
+    def _stub_gbo_result(rows=()):
+        return {
+            "ontology": "cyanorak_role", "organism_name": "MED4",
+            "results": list(rows),
+            "not_found": [], "wrong_ontology": [],
+            "wrong_level": [], "filtered_out": [],
+        }
+
+    def test_default_threads_informative_only_true(self, monkeypatch):
+        """Spec § Default value: `informative_only: bool = True` on both tools.
+        The internal genes_by_ontology call must receive informative_only=True
+        when the caller passes nothing (the new default)."""
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+
+        captured: dict = {}
+
+        def _gbo(**kwargs):
+            captured.update(kwargs)
+            return self._stub_gbo_result()
+
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(),
+        )
+        monkeypatch.setattr(f, "genes_by_ontology", _gbo)
+
+        pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+        )
+        assert "informative_only" in captured, (
+            "pathway_enrichment must thread informative_only to genes_by_ontology"
+        )
+        assert captured["informative_only"] is True, (
+            "Default informative_only must be True (spec § Default value)"
+        )
+
+    def test_explicit_false_threads_through(self, monkeypatch):
+        """Caller opt-out (`informative_only=False`) must reach genes_by_ontology
+        unchanged."""
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+
+        captured: dict = {}
+
+        def _gbo(**kwargs):
+            captured.update(kwargs)
+            return self._stub_gbo_result()
+
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(),
+        )
+        monkeypatch.setattr(f, "genes_by_ontology", _gbo)
+
+        pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+            informative_only=False,
+        )
+        assert captured.get("informative_only") is False
+
+    def test_explicit_true_threads_through(self, monkeypatch):
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+
+        captured: dict = {}
+
+        def _gbo(**kwargs):
+            captured.update(kwargs)
+            return self._stub_gbo_result()
+
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(),
+        )
+        monkeypatch.setattr(f, "genes_by_ontology", _gbo)
+
+        pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+            informative_only=True,
+        )
+        assert captured.get("informative_only") is True
+
+
+class TestClusterEnrichmentBuilderInformativeOnly:
+    """api.cluster_enrichment threads `informative_only` to genes_by_ontology.
+
+    Parallel to TestPathwayEnrichmentBuilderInformativeOnly — same param,
+    same threading pattern. Builders themselves unchanged.
+    """
+
+    @staticmethod
+    def _stub_inputs(gene_sets=None, not_found=(), not_matched=()):
+        from multiomics_explorer.analysis.enrichment import EnrichmentInputs
+        if gene_sets is None:
+            gene_sets = {"Cluster A": ["PMM0001", "PMM0002"]}
+        return EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets=gene_sets,
+            background={"Cluster A": ["PMM0001", "PMM0002", "PMM0003"]},
+            cluster_metadata={"Cluster A": {
+                "cluster_id": "gc:1", "cluster_name": "Cluster A",
+                "member_count": 2,
+            }},
+            not_found=list(not_found),
+            not_matched=list(not_matched),
+            no_expression=[],
+            clusters_skipped=[],
+            analysis_metadata={
+                "analysis_id": "ca:test", "analysis_name": "Test",
+                "cluster_method": "kmeans", "cluster_type": "diel_cycle",
+                "omics_type": "transcriptomics",
+                "treatment_type": ["light_dark"],
+                "background_factors": [], "growth_phases": [],
+                "experiment_ids": ["exp:1"],
+            },
+        )
+
+    @staticmethod
+    def _stub_gbo_result(rows=()):
+        return {
+            "ontology": "cyanorak_role", "organism_name": "MED4",
+            "results": list(rows),
+            "not_found": [], "wrong_ontology": [],
+            "wrong_level": [], "filtered_out": [],
+        }
+
+    def test_default_threads_informative_only_true(self, monkeypatch):
+        from multiomics_explorer.api import cluster_enrichment
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+
+        captured: dict = {}
+
+        def _gbo(**kwargs):
+            captured.update(kwargs)
+            return self._stub_gbo_result()
+
+        monkeypatch.setattr(
+            enr, "cluster_enrichment_inputs",
+            lambda **_: self._stub_inputs(),
+        )
+        monkeypatch.setattr(f, "genes_by_ontology", _gbo)
+
+        cluster_enrichment(
+            analysis_id="ca:test", organism="MED4",
+            ontology="cyanorak_role", level=1,
+            pvalue_cutoff=0.99,
+        )
+        assert "informative_only" in captured, (
+            "cluster_enrichment must thread informative_only to genes_by_ontology"
+        )
+        assert captured["informative_only"] is True, (
+            "Default informative_only must be True (spec § Default value)"
+        )
+
+    def test_explicit_false_threads_through(self, monkeypatch):
+        from multiomics_explorer.api import cluster_enrichment
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+
+        captured: dict = {}
+
+        def _gbo(**kwargs):
+            captured.update(kwargs)
+            return self._stub_gbo_result()
+
+        monkeypatch.setattr(
+            enr, "cluster_enrichment_inputs",
+            lambda **_: self._stub_inputs(),
+        )
+        monkeypatch.setattr(f, "genes_by_ontology", _gbo)
+
+        cluster_enrichment(
+            analysis_id="ca:test", organism="MED4",
+            ontology="cyanorak_role", level=1,
+            informative_only=False, pvalue_cutoff=0.99,
+        )
+        assert captured.get("informative_only") is False
+
+    def test_explicit_true_threads_through(self, monkeypatch):
+        from multiomics_explorer.api import cluster_enrichment
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+
+        captured: dict = {}
+
+        def _gbo(**kwargs):
+            captured.update(kwargs)
+            return self._stub_gbo_result()
+
+        monkeypatch.setattr(
+            enr, "cluster_enrichment_inputs",
+            lambda **_: self._stub_inputs(),
+        )
+        monkeypatch.setattr(f, "genes_by_ontology", _gbo)
+
+        cluster_enrichment(
+            analysis_id="ca:test", organism="MED4",
+            ontology="cyanorak_role", level=1,
+            informative_only=True, pvalue_cutoff=0.99,
+        )
+        assert captured.get("informative_only") is True

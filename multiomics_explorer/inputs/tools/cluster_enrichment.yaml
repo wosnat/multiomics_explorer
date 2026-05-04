@@ -33,13 +33,27 @@ verbose_fields:
   - cluster_temporal_pattern
   - cluster_member_count
 
+response_notes:
+  - title: "`informative_only` filter (default 2026-05)"
+    body: |
+      When True (default), exclude ontology terms flagged uninformative
+      in the KG (e.g. KEGG map00001 'metabolic pathways', GO root
+      go:0008150). Term-side filter — never restricts the gene set,
+      background, or DE inputs. Pass False to include uninformative terms;
+      per-row `is_informative` still surfaces in either mode.
+
+      See `docs://analysis/enrichment` (section "Informative-only filtering")
+      for rationale, Fisher denominator behavior, and opt-out guidance.
+
 chaining:
   - "list_clustering_analyses → cluster_enrichment"
   - "ontology_landscape → cluster_enrichment"
   - "cluster_enrichment → gene_overview"
   - "cluster_enrichment → genes_in_cluster"
+  - "See `docs://analysis/enrichment` for the full methodology, including the `informative_only` (default `True` since 2026-05) filter semantics."
 
 mistakes:
+  - "Caller pinning row counts from pre-2026-05 runs sees fewer rows by default. Pass `informative_only=False` to restore old behavior, or accept the new default (recommended)."
   - "Default background is `cluster_union` (union of all clustered genes, including size-filtered). Use `'organism'` only when clustering covers the full genome."
   - "BH correction is per-cluster, NOT across clusters."
   - "Single-organism enforced."
