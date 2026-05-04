@@ -1387,7 +1387,8 @@ class TestGenesByOntology:
         """Mock Query A output. Each term = (id, name, level, be, n_genes, cat_freqs)."""
         return [
             {"term_id": tid, "term_name": name, "level": lvl,
-             "best_effort": be, "n_genes": n, "cat_freqs": freqs}
+             "best_effort": be, "n_genes": n, "cat_freqs": freqs,
+             "is_informative": True}
             for tid, name, lvl, be, n, freqs in terms
         ]
 
@@ -8223,3 +8224,343 @@ class TestMetabolitesByGene:
         assert out["warnings"] == []
         assert set(out["not_matched"]) == {"PMM0005", "PMM0006", "PMM0007"}
         assert out["not_found"]["locus_tags"] == []
+
+
+# ===========================================================================
+# Cluster A — F1 informativeness surface (frozen spec 2026-05-04)
+# ===========================================================================
+# API-layer pass-through: the new fields appear in results, the new
+# `informative_only` param reaches the underlying builder.
+
+
+class TestGeneOverviewF1Surface:
+    """gene_overview adds annotation_state + informative_annotation_types
+    to results and `by_annotation_state` to the envelope."""
+
+    def _summary_with_annotation_state(self):
+        return [{
+            "total_matching": 1,
+            "by_organism": [{"item": "Prochlorococcus MED4", "count": 1}],
+            "by_category": [{"item": "DNA replication", "count": 1}],
+            "by_annotation_type": [{"item": "go_mf", "count": 1}],
+            "by_annotation_state": [
+                {"item": "informative_multi", "count": 1},
+            ],
+            "has_expression": 1,
+            "has_significant_expression": 1,
+            "has_orthologs": 1,
+            "has_clusters": 0,
+            "has_derived_metrics": 0,
+            "not_found": [],
+        }]
+
+    def _detail_with_state(self):
+        return [{
+            "locus_tag": "PMM1428", "gene_name": "test",
+            "product": "DNA polymerase III subunit beta",
+            "gene_category": "DNA replication",
+            "annotation_quality": 3,
+            "organism_name": "Prochlorococcus MED4",
+            "annotation_types": ["go_mf", "pfam"],
+            "expression_edge_count": 0,
+            "significant_up_count": 0, "significant_down_count": 0,
+            "closest_ortholog_group_size": 9,
+            "closest_ortholog_genera": ["Prochlorococcus"],
+            "cluster_membership_count": 0, "cluster_types": [],
+            "numeric_metric_count": 0,
+            "boolean_metric_count": 0,
+            "categorical_metric_count": 0,
+            # New fields:
+            "annotation_state": "informative_multi",
+            "informative_annotation_types": ["go_mf", "pfam"],
+        }]
+
+    def test_envelope_contains_by_annotation_state(self, mock_conn):
+        """Spec § envelope: by_annotation_state added (rollup over results)."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_annotation_state(),
+            self._detail_with_state(),
+        ]
+        result = api.gene_overview(["PMM1428"], conn=mock_conn)
+        assert "by_annotation_state" in result
+        # _rename_freq path: APOC {item,count} → {annotation_state,count}.
+        assert isinstance(result["by_annotation_state"], list)
+        assert len(result["by_annotation_state"]) == 1
+        first = result["by_annotation_state"][0]
+        assert first["count"] == 1
+        # The renamed key holds the state value.
+        assert first.get("annotation_state") == "informative_multi"
+
+    def test_results_pass_through_annotation_state(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_annotation_state(),
+            self._detail_with_state(),
+        ]
+        result = api.gene_overview(["PMM1428"], conn=mock_conn)
+        row = result["results"][0]
+        assert row["annotation_state"] == "informative_multi"
+        assert row["informative_annotation_types"] == ["go_mf", "pfam"]
+
+
+class TestGeneOntologyTermsF1Surface:
+    """gene_ontology_terms threads `informative_only` to builders + returns
+    is_informative on rows."""
+
+    def _exist_found(self, *locus_tags):
+        return [{"lt": lt, "found": True} for lt in locus_tags]
+
+    def _summary_row(self):
+        return [{
+            "gene_count": 1, "term_count": 1,
+            "by_term": [{"term_id": "go:0006260", "term_name": "DNA replication",
+                         "level": 5, "count": 1}],
+            "gene_term_counts": [{"locus_tag": "PMM0001", "term_count": 1}],
+        }]
+
+    def _detail_rows(self):
+        return [{"locus_tag": "PMM0001", "term_id": "go:0006260",
+                 "term_name": "DNA replication", "level": 5,
+                 "is_informative": True}]
+
+    @patch("multiomics_explorer.api.functions._validate_organism_inputs",
+           return_value="Prochlorococcus MED4")
+    def test_informative_only_reaches_summary_builder(self, _val, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._exist_found("PMM0001"),
+            self._summary_row(),
+            self._detail_rows(),
+        ]
+        api.gene_ontology_terms(
+            ["PMM0001"], organism="MED4", ontology="go_bp",
+            informative_only=True, conn=mock_conn,
+        )
+        # Summary call (the 2nd execute_query call) should carry the
+        # builder's informative_only=True propagation. We assert by
+        # cypher contents — the builder emits the WHERE filter when True.
+        summary_cypher = mock_conn.execute_query.call_args_list[1].args[0]
+        assert "AND coalesce(t.is_uninformative, '') <> 'true'" in summary_cypher
+
+    @patch("multiomics_explorer.api.functions._validate_organism_inputs",
+           return_value="Prochlorococcus MED4")
+    def test_informative_only_reaches_detail_builder(self, _val, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._exist_found("PMM0001"),
+            self._summary_row(),
+            self._detail_rows(),
+        ]
+        api.gene_ontology_terms(
+            ["PMM0001"], organism="MED4", ontology="go_bp",
+            informative_only=True, conn=mock_conn,
+        )
+        # Detail call (3rd) — informative_only=True forces WHERE filter.
+        detail_cypher = mock_conn.execute_query.call_args_list[2].args[0]
+        assert "AND coalesce(t.is_uninformative, '') <> 'true'" in detail_cypher
+
+    @patch("multiomics_explorer.api.functions._validate_organism_inputs",
+           return_value="Prochlorococcus MED4")
+    def test_default_informative_only_is_false(self, _val, mock_conn):
+        """No filter when default param is left untouched."""
+        mock_conn.execute_query.side_effect = [
+            self._exist_found("PMM0001"),
+            self._summary_row(),
+            self._detail_rows(),
+        ]
+        api.gene_ontology_terms(
+            ["PMM0001"], organism="MED4", ontology="go_bp", conn=mock_conn,
+        )
+        for call in mock_conn.execute_query.call_args_list[1:]:
+            cypher = call.args[0]
+            assert "AND coalesce(t.is_uninformative, '') <> 'true'" not in cypher
+
+    @patch("multiomics_explorer.api.functions._validate_organism_inputs",
+           return_value="Prochlorococcus MED4")
+    def test_is_informative_flows_through_to_results(self, _val, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._exist_found("PMM0001"),
+            self._summary_row(),
+            self._detail_rows(),
+        ]
+        result = api.gene_ontology_terms(
+            ["PMM0001"], organism="MED4", ontology="go_bp", conn=mock_conn,
+        )
+        assert result["results"][0]["is_informative"] is True
+
+
+class TestGenesByOntologyF1Surface:
+    """genes_by_ontology threads informative_only to detail/per_term/per_gene."""
+
+    def _org_resolve(self):
+        return [{"organisms": ["Prochlorococcus MED4"]}]
+
+    def _per_term_rows(self):
+        return [{
+            "term_id": "go:0050896", "term_name": "response to stimulus",
+            "level": 1, "best_effort": False, "n_genes": 7,
+            "cat_freqs": [{"item": "Stress", "count": 7}],
+            "is_informative": True,
+        }]
+
+    def _per_gene_rows(self):
+        return [{"locus_tag": "PMM0001", "gene_category": "Stress",
+                 "n_terms": 1, "levels_hit": [1]}]
+
+    def _detail_rows(self):
+        return [{"locus_tag": "PMM0001", "gene_name": None,
+                 "product": None, "gene_category": "Stress",
+                 "term_id": "go:0050896",
+                 "term_name": "response to stimulus", "level": 1,
+                 "is_informative": True}]
+
+    def test_informative_only_threads_to_per_term_per_gene_detail(self, mock_conn):
+        """Default param routes through helper into all three builders'
+        match-stage. Per spec: detail/per_term/per_gene inherit via helper."""
+        mock_conn.execute_query.side_effect = [
+            self._org_resolve(),
+            self._per_term_rows(),
+            self._per_gene_rows(),
+            self._detail_rows(),
+        ]
+        api.genes_by_ontology(
+            ontology="go_bp", organism="Prochlorococcus MED4",
+            level=1, informative_only=True, conn=mock_conn,
+        )
+        # Calls 2,3,4 are per_term, per_gene, detail. Each must have the filter.
+        for call in mock_conn.execute_query.call_args_list[1:]:
+            cypher = call.args[0]
+            assert "coalesce(t.is_uninformative, '') <> 'true'" in cypher, (
+                f"informative_only=True did not reach builder:\n{cypher}"
+            )
+
+    def test_default_informative_only_no_filter(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._org_resolve(),
+            self._per_term_rows(),
+            self._per_gene_rows(),
+            self._detail_rows(),
+        ]
+        api.genes_by_ontology(
+            ontology="go_bp", organism="Prochlorococcus MED4",
+            level=1, conn=mock_conn,
+        )
+        # Detail (last call) should still have RETURN-side coalesce only,
+        # not the WHERE-side filter, because default informative_only=False.
+        # Distinguish WHERE-side `AND coalesce(...)` from RETURN-side
+        # `coalesce(...) AS is_informative` since per_term/detail builders
+        # always emit the RETURN-side form unconditionally.
+        for call in mock_conn.execute_query.call_args_list[1:]:
+            cypher = call.args[0]
+            assert "AND coalesce(t.is_uninformative, '') <> 'true'" not in cypher
+
+    def test_results_carry_is_informative(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._org_resolve(),
+            self._per_term_rows(),
+            self._per_gene_rows(),
+            self._detail_rows(),
+        ]
+        result = api.genes_by_ontology(
+            ontology="go_bp", organism="Prochlorococcus MED4",
+            level=1, conn=mock_conn,
+        )
+        assert result["results"][0]["is_informative"] is True
+
+
+class TestSearchOntologyF1Surface:
+    """search_ontology threads informative_only + returns is_informative."""
+
+    def _summary_result(self):
+        return [{
+            "total_entries": 847, "total_matching": 1,
+            "score_max": 5.0, "score_median": 5.0,
+        }]
+
+    def _detail_rows(self):
+        return [{"id": "go:0006260", "name": "DNA replication", "score": 5.0,
+                 "level": 5, "is_informative": True}]
+
+    def test_informative_only_reaches_builder(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        api.search_ontology(
+            "DNA replication", "go_bp",
+            informative_only=True, conn=mock_conn,
+        )
+        # Summary + detail Cypher both should carry the where-side filter.
+        for call in mock_conn.execute_query.call_args_list:
+            cypher = call.args[0]
+            assert "coalesce(t.is_uninformative, '') <> 'true'" in cypher
+
+    def test_default_informative_only_no_where_filter(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        api.search_ontology(
+            "DNA replication", "go_bp", conn=mock_conn,
+        )
+        # Summary builder doesn't have a RETURN-side coalesce either, so
+        # any appearance in the summary cypher would be the where-side filter.
+        sum_cypher = mock_conn.execute_query.call_args_list[0].args[0]
+        assert "coalesce(t.is_uninformative, '') <> 'true'" not in sum_cypher
+
+    def test_is_informative_flows_through(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        result = api.search_ontology(
+            "DNA replication", "go_bp", conn=mock_conn,
+        )
+        assert result["results"][0]["is_informative"] is True
+
+
+class TestOntologyLandscapeF1Surface:
+    """ontology_landscape threads informative_only (default-on)."""
+
+    def _conn(self, gene_count, per_ont_rows):
+        conn = MagicMock()
+
+        def run(cypher, **params):
+            if "RETURN collect(DISTINCT e.organism_name)" in cypher:
+                return [{"organisms": ["Prochlorococcus MED4"]}]
+            if "count(g) AS total_genes" in cypher:
+                return [{"total_genes": gene_count}]
+            from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+            for ont, rows in per_ont_rows.items():
+                cfg = ONTOLOGY_CONFIG[ont]
+                if cfg["gene_rel"] in cypher and f":{cfg['label']}" in cypher:
+                    return rows
+            raise AssertionError(f"no mock for cypher:\n{cypher[:200]}")
+
+        conn.execute_query.side_effect = run
+        return conn
+
+    def test_default_filters_uninformative(self):
+        """Default param: filter present in landscape Cypher (not opt-out)."""
+        per_ont_rows = {"cyanorak_role": []}
+        conn = self._conn(gene_count=1976, per_ont_rows=per_ont_rows)
+        api.ontology_landscape(
+            organism="Prochlorococcus MED4", ontology="cyanorak_role", conn=conn,
+        )
+        # Find the landscape-builder call.
+        cyphers = [c.args[0] for c in conn.execute_query.call_args_list]
+        landscape_cyphers = [c for c in cyphers if "n_terms_with_genes" in c]
+        assert landscape_cyphers, "expected at least one landscape cypher"
+        for c in landscape_cyphers:
+            assert "coalesce(t.is_uninformative, '') <> 'true'" in c, (
+                "default informative_only=True should emit WHERE filter"
+            )
+
+    def test_opt_out_omits_filter(self):
+        per_ont_rows = {"cyanorak_role": []}
+        conn = self._conn(gene_count=1976, per_ont_rows=per_ont_rows)
+        api.ontology_landscape(
+            organism="Prochlorococcus MED4", ontology="cyanorak_role",
+            informative_only=False, conn=conn,
+        )
+        cyphers = [c.args[0] for c in conn.execute_query.call_args_list]
+        landscape_cyphers = [c for c in cyphers if "n_terms_with_genes" in c]
+        for c in landscape_cyphers:
+            assert "coalesce(t.is_uninformative, '') <> 'true'" not in c

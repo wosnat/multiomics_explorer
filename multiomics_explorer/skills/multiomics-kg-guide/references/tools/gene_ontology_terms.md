@@ -22,6 +22,7 @@ expansion), use genes_by_ontology. Use search_ontology to find terms by text.
 | mode | string ('leaf', 'rollup') | leaf | 'leaf' returns most-specific annotations (default). 'rollup' walks up to ancestors at the given level. |
 | level | int \| None | None | Hierarchy level. In leaf mode: filter to leaves at this level. In rollup mode: required — target ancestor level (0 = broadest). |
 | tree | string \| None | None | BRITE tree name filter. Only valid when ontology='brite'. |
+| informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' go:0008150). Term-side filter only — never restricts the gene set. Default False (opt-in). |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include organism_name per row. |
 | limit | int | 5 | Max results. |
@@ -59,6 +60,7 @@ total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_m
 | term_id | string | Ontology term ID (e.g. 'go:0006260') |
 | term_name | string | Term name (e.g. 'DNA replication') |
 | level | int | Hierarchy level of this term (0 = broadest) |
+| is_informative | bool | True iff term is not flagged is_uninformative (positive framing; coerced from sparse '<term>.is_uninformative' KG flag) |
 | ontology_type | string \| None (optional) | Ontology type when querying all (e.g. 'go_bp') |
 | tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
 | tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
@@ -141,7 +143,27 @@ gene_ontology_terms(locus_tags=["PMM0584", "PMM1322"], organism="MED4", ontology
 gene_ontology_terms(locus_tags=["PMM1129"], organism="MED4", ontology="tcdb")
 ```
 
-### Example 7: From overview to ontology details
+### Example 7: Filter out uninformative terms (e.g. catch-all KEGG modules)
+
+```example-call
+gene_ontology_terms(locus_tags=["PMM0001"], organism="Prochlorococcus MED4", ontology="kegg", informative_only=True)
+```
+
+```example-response
+# Filter effect on Prochlorococcus MED4 KEGG: 1124 leaf-mode rows → 1094
+# with informative_only=True (30 rows filtered, ~2.7%). Each result row
+# carries an `is_informative: bool` column (always populated;
+# coalesce of sparse term-side `is_uninformative='true'` flag).
+{
+  "total_matching": 1094,
+  "results": [
+    {"locus_tag": "PMM0001", "term_id": "kegg:K02338", "term_name": "DNA polymerase III subunit beta", "is_informative": true},
+    ...
+  ]
+}
+```
+
+### Example 8: From overview to ontology details
 
 ```
 Step 1: gene_overview(locus_tags=["PMM0001"])

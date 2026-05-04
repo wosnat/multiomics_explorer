@@ -38,6 +38,7 @@ chaining:
   - "search_ontology → genes_by_ontology (ontology-first route, alternative to genes_by_function)"
 
 mistakes:
+  - "annotation_quality is a 0..3 numeric encoding of annotation_state (informative-evidence count). 0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. Redefined in May 2026 KG release — old semantics conflated product-name quality. Existing min_quality filters silently shifted meaning."
   - wrong: "genes_by_function(search_text='GO:0015977')"
     right: "genes_by_ontology(ontology='go_bp', organism='MED4', term_ids=['go:0015977']) for ontology term lookup (ontology + organism required); genes_by_function is for free-text search"
   - wrong: "len(result['results'])  # to count matches"

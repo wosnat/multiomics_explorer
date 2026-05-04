@@ -2,6 +2,7 @@ case_id: gene_overview_regression_alt
 row_count: 1
 rows:
 - annotation_quality: 0
+  annotation_state: no_evidence
   annotation_types: []
   boolean_metric_count: 0
   categorical_metric_count: 0
@@ -13,6 +14,7 @@ rows:
   expression_edge_count: 0
   gene_category: Unknown
   gene_name: null
+  informative_annotation_types: []
   locus_tag: EZ55_00275
   numeric_metric_count: 0
   organism_name: Alteromonas macleodii EZ55

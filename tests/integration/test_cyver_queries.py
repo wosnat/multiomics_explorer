@@ -141,6 +141,11 @@ _KNOWN_MAP_KEYS = {
     # BRITE-only properties — present on BriteCategory nodes,
     # absent on all other ontology labels (returns null)
     "tree", "tree_code",
+    # F1 informativeness flag — sparse on 7 ontology types
+    # (KeggTerm, BiologicalProcess, MolecularFunction, CellularComponent,
+    #  CogFunctionalCategory, CyanorakRole, TigrRole); coalesce-handled
+    # for nodes without the property.
+    "is_uninformative",
 }
 
 # Regex to extract property name from CyVer description:

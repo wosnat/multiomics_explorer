@@ -24,6 +24,7 @@ experiments' quantified genes. See docs://tools/ontology_landscape.
 | offset | int | 0 | Skip N rows before limit |
 | min_gene_set_size | int | 5 | Exclude terms with fewer genes than this (default 5). |
 | max_gene_set_size | int | 500 | Exclude terms with more genes than this (default 500). |
+| informative_only | bool | True | When True (default), exclude terms flagged uninformative in KG (e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' go:0008150). Term-side filter only — never restricts the gene set. Pass False to opt out and survey the full term set (rebaselines may differ). |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -124,7 +125,28 @@ ontology_landscape(organism="MED4")
  ]}
 ```
 
-### Example 5: Weight by experiments (coverage of quantified genes)
+### Example 5: Opt out of informative-only filtering (browse all terms, including catch-alls)
+
+```example-call
+ontology_landscape(organism="MED4", informative_only=False)
+```
+
+```example-response
+# `ontology_landscape` defaults to `informative_only=True` — the
+# ranking surface for enrichment should reflect informative terms
+# only (~224 KG-wide terms flagged `is_uninformative='true'` are
+# excluded by default). Pass `informative_only=False` when you need
+# an unfiltered census, e.g. when triaging coverage gaps in
+# KEGG / Cyanorak / TIGR or comparing unfiltered vs filtered
+# genome_coverage. Term-set sizes and genome_coverage will be
+# slightly higher than the default (delta ≈ 30 KEGG rows in MED4).
+{"organism_name": "Prochlorococcus MED4", "n_ontologies": 12,
+ "results": [
+   {"ontology_type": "kegg", "level": 3, "n_terms_with_genes": 1017, "genome_coverage": 0.61}
+ ]}
+```
+
+### Example 6: Weight by experiments (coverage of quantified genes)
 
 ```
 Step 1: list_experiments(organism="MED4", table_scope=["all_detected_genes"])

@@ -11,10 +11,11 @@ examples:
         "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
         "by_category": [{"category": "Unknown", "count": 1}],
         "by_annotation_type": [{"annotation_type": "go_mf", "count": 1}, ...],
+        "by_annotation_state": [{"annotation_state": "informative_multi", "count": 1}],
         "has_expression": 1, "has_significant_expression": 1, "has_orthologs": 1, "has_clusters": 1,
         "returned": 1, "truncated": false, "offset": 0, "not_found": [],
         "results": [
-          {"locus_tag": "PMM1428", "gene_name": null, "product": "EVE domain protein", "gene_category": "Unknown", "annotation_quality": 3, "organism_name": "Prochlorococcus MED4", "annotation_types": ["go_mf", "pfam", "cog_category", "tigr_role"], "expression_edge_count": 36, "significant_up_count": 3, "significant_down_count": 2, "closest_ortholog_group_size": 9, "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"], "cluster_membership_count": 2, "cluster_types": ["condition_comparison"]}
+          {"locus_tag": "PMM1428", "gene_name": null, "product": "EVE domain protein", "gene_category": "Unknown", "annotation_quality": 3, "annotation_state": "informative_multi", "informative_annotation_types": ["go_mf", "pfam"], "organism_name": "Prochlorococcus MED4", "annotation_types": ["go_mf", "pfam", "cog_category", "tigr_role"], "expression_edge_count": 36, "significant_up_count": 3, "significant_down_count": 2, "closest_ortholog_group_size": 9, "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"], "cluster_membership_count": 2, "cluster_types": ["condition_comparison"]}
         ]
       }
 
@@ -59,6 +60,7 @@ chaining:
   - "gene_overview(verbose=True) → see compartments_observed for vesicle/whole-cell triage"
 
 mistakes:
+  - "annotation_quality is a 0..3 numeric encoding of annotation_state (informative-evidence count). 0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. Redefined in May 2026 KG release — old semantics conflated product-name quality. Existing min_quality filters silently shifted meaning."
   - "If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this gene."
   - "annotation_types lists which ontology types have data — use gene_ontology_terms to get the actual terms"
   - "expression_edge_count > 0 means expression data exists — use differential_expression_by_gene to explore it"

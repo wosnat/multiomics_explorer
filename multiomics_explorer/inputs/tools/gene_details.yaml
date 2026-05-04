@@ -43,6 +43,7 @@ chaining:
   - "genes_by_function → gene_details"
 
 mistakes:
+  - "annotation_quality is a 0..3 numeric encoding of annotation_state (informative-evidence count). 0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. Redefined in May 2026 KG release — old semantics conflated product-name quality. Existing min_quality filters silently shifted meaning."
   - "This returns ALL Gene node properties via g{.*} — for the common case, use gene_overview which returns curated fields"
   - "Sparse fields (ec_numbers, catalytic_activities, ko_terms) are only present when the gene has them — check with gene_overview first. TCDB / CAZy memberships are graph edges, not properties — use gene_overview's annotation_types or traverse Gene_has_tcdb_family / Gene_has_cazy_family."
   - wrong: "gene_details(locus_tags='PMM0001')"

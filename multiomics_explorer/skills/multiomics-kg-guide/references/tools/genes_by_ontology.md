@@ -24,6 +24,7 @@ search_ontology. For per-gene ontology details, use gene_ontology_terms.
 | term_ids | list[string] \| None | None | Ontology term IDs (from search_ontology). Mode 1 (no `level`): expand DOWN from each input term. Mode 3 (with `level`): scope rollup to these level-N terms. |
 | min_gene_set_size | int | 5 | Exclude terms with fewer organism-scoped genes than this. |
 | max_gene_set_size | int | 500 | Exclude terms with more organism-scoped genes than this. |
+| informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' go:0008150). Term-side filter only — never restricts the gene set. Default False (opt-in). |
 | summary | bool | False | If true, omit `results` (envelope only). |
 | verbose | bool | False | Include function_description and sparse level_is_best_effort. |
 | limit | int | 500 | Max rows returned. Default 500 — this tool feeds enrichment. |
@@ -74,6 +75,7 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 | term_id | string | Ontology term ID (e.g. 'go:0050896') |
 | term_name | string | Term name (e.g. 'response to stimulus') |
 | level | int | Hierarchy level of this term (0 = broadest) |
+| is_informative | bool | True iff term is not flagged is_uninformative (positive framing; coerced from sparse '<term>.is_uninformative' KG flag) |
 | tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
 | tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
 
@@ -150,7 +152,30 @@ genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:1.A.1"])
 genes_by_ontology(ontology="cazy", organism="MED4", level=0)
 ```
 
-### Example 9: From level-survey to pathway defs
+### Example 9: Filter out uninformative terms (term-side filter, opt-in)
+
+```example-call
+genes_by_ontology(ontology="kegg", organism="MED4", level=3, informative_only=True)
+```
+
+```example-response
+# `informative_only=True` excludes terms flagged `is_uninformative='true'`
+# (~224 terms genome-wide, concentrated in KEGG / Cyanorak / TIGR /
+# CogFunctionalCategory / GO-CC / GO-MF / GO-BP). The filter is term-side
+# only — never narrows the gene set.
+#
+# Detail rows (and `per_term` mode) carry `is_informative: bool`. The
+# `per_gene` aggregate mode does NOT include `is_informative` because the
+# row is per-gene, not per-term.
+{
+  "ontology": "kegg", "organism_name": "Prochlorococcus MED4",
+  "results": [
+    {"locus_tag": "PMM0001", "term_id": "kegg:K02338", "term_name": "DNA polymerase III subunit beta", "level": 3, "is_informative": true}
+  ]
+}
+```
+
+### Example 10: From level-survey to pathway defs
 
 ```
 Step 1: ontology_landscape(organism="MED4")

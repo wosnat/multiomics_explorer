@@ -2,31 +2,18 @@ case_id: ontology_landscape_med4_all
 row_count: 69
 rows:
 - best_effort_share: null
-  genome_coverage: 0.8745
+  genome_coverage: 0.6144
   level: 0
-  max_genes_per_term: 451
+  max_genes_per_term: 118
   median_genes_per_term: 13.0
   min_genes_per_term: 5
-  n_genes_at_level: 1728
+  n_genes_at_level: 1214
   n_levels_in_ontology: 1
-  n_terms_with_genes: 77
+  n_terms_with_genes: 73
   ontology_type: tigr_role
   q1_genes_per_term: 7.0
-  q3_genes_per_term: 24.0
+  q3_genes_per_term: 21.0
   relevance_rank: 1
-- best_effort_share: null
-  genome_coverage: 0.7277
-  level: 1
-  max_genes_per_term: 340
-  median_genes_per_term: 14.0
-  min_genes_per_term: 5
-  n_genes_at_level: 1438
-  n_levels_in_ontology: 3
-  n_terms_with_genes: 69
-  ontology_type: cyanorak_role
-  q1_genes_per_term: 9.0
-  q3_genes_per_term: 23.0
-  relevance_rank: 2
 - best_effort_share: 0.2
   genome_coverage: 0.5779
   level: 2
@@ -39,6 +26,19 @@ rows:
   ontology_type: go_mf
   q1_genes_per_term: 8.0
   q3_genes_per_term: 96.0
+  relevance_rank: 2
+- best_effort_share: null
+  genome_coverage: 0.5607
+  level: 1
+  max_genes_per_term: 213
+  median_genes_per_term: 14.0
+  min_genes_per_term: 5
+  n_genes_at_level: 1108
+  n_levels_in_ontology: 3
+  n_terms_with_genes: 67
+  ontology_type: cyanorak_role
+  q1_genes_per_term: 9.0
+  q3_genes_per_term: 23.0
   relevance_rank: 3
 - best_effort_share: 0.1944
   genome_coverage: 0.5587
@@ -79,19 +79,6 @@ rows:
   q1_genes_per_term: 8.0
   q3_genes_per_term: 38.0
   relevance_rank: 6
-- best_effort_share: null
-  genome_coverage: 0.7596
-  level: 0
-  max_genes_per_term: 419
-  median_genes_per_term: 77.0
-  min_genes_per_term: 16
-  n_genes_at_level: 1501
-  n_levels_in_ontology: 3
-  n_terms_with_genes: 17
-  ontology_type: cyanorak_role
-  q1_genes_per_term: 52.0
-  q3_genes_per_term: 130.0
-  relevance_rank: 7
 - best_effort_share: 0.2
   genome_coverage: 0.4813
   level: 4
@@ -104,7 +91,7 @@ rows:
   ontology_type: go_mf
   q1_genes_per_term: 9.0
   q3_genes_per_term: 25.0
-  relevance_rank: 8
+  relevance_rank: 7
 - best_effort_share: 0.6294
   genome_coverage: 0.4398
   level: 5
@@ -117,7 +104,7 @@ rows:
   ontology_type: go_bp
   q1_genes_per_term: 7.0
   q3_genes_per_term: 24.0
-  relevance_rank: 9
+  relevance_rank: 8
 - best_effort_share: null
   genome_coverage: 0.4372
   level: 0
@@ -130,7 +117,7 @@ rows:
   ontology_type: pfam
   q1_genes_per_term: 6.0
   q3_genes_per_term: 11.0
-  relevance_rank: 10
+  relevance_rank: 9
 - best_effort_share: null
   genome_coverage: 0.5633
   level: 0
@@ -143,7 +130,7 @@ rows:
   ontology_type: cog_category
   q1_genes_per_term: 32.0
   q3_genes_per_term: 102.0
-  relevance_rank: 11
+  relevance_rank: 10
 - best_effort_share: 0.3889
   genome_coverage: 0.4003
   level: 2
@@ -156,7 +143,7 @@ rows:
   ontology_type: go_cc
   q1_genes_per_term: 13.5
   q3_genes_per_term: 148.25
-  relevance_rank: 12
+  relevance_rank: 11
 - best_effort_share: null
   genome_coverage: 0.3861
   level: 1
@@ -169,7 +156,7 @@ rows:
   ontology_type: ec
   q1_genes_per_term: 9.25
   q3_genes_per_term: 34.5
-  relevance_rank: 13
+  relevance_rank: 12
 - best_effort_share: null
   genome_coverage: 0.3861
   level: 1
@@ -182,6 +169,19 @@ rows:
   ontology_type: kegg
   q1_genes_per_term: 11.0
   q3_genes_per_term: 45.25
+  relevance_rank: 13
+- best_effort_share: null
+  genome_coverage: 0.5663
+  level: 0
+  max_genes_per_term: 242
+  median_genes_per_term: 73.5
+  min_genes_per_term: 16
+  n_genes_at_level: 1119
+  n_levels_in_ontology: 3
+  n_terms_with_genes: 16
+  ontology_type: cyanorak_role
+  q1_genes_per_term: 49.75
+  q3_genes_per_term: 117.25
   relevance_rank: 14
 - best_effort_share: null
   genome_coverage: 0.3765

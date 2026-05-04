@@ -111,7 +111,8 @@ class TestGeneOverviewContract:
         expected_keys = {
             "locus_tag", "gene_name", "product",
             "gene_category", "annotation_quality", "organism_name",
-            "annotation_types", "expression_edge_count",
+            "annotation_types", "annotation_state", "informative_annotation_types",
+            "expression_edge_count",
             "significant_up_count", "significant_down_count", "closest_ortholog_group_size",
             "closest_ortholog_genera", "cluster_membership_count", "cluster_types",
             "derived_metric_count", "derived_metric_value_kinds",
@@ -250,7 +251,7 @@ class TestSearchOntologyContract:
 
     def test_result_keys(self, conn):
         result = api.search_ontology("DNA replication", "go_bp", conn=conn)
-        expected_keys = {"id", "name", "score", "level"}
+        expected_keys = {"id", "name", "score", "level", "is_informative"}
         assert len(result["results"]) >= 1
         assert set(result["results"][0].keys()) == expected_keys
 
@@ -288,7 +289,7 @@ class TestGenesByOntologyContract:
         )
         expected_keys = {
             "locus_tag", "gene_name", "product", "gene_category",
-            "term_id", "term_name", "level",
+            "term_id", "term_name", "level", "is_informative",
         }
         assert set(result["results"][0].keys()) == expected_keys
 

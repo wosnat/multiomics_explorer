@@ -33,6 +33,8 @@ GENES = [
             "PMM0001"
         ],
         "annotation_quality": 3,
+        "annotation_state": "informative_multi",
+        "informative_annotation_types": ["go_mf", "pfam"],
         "bacteria_cog_og": "COG0592",
         "cluster_number": "CK_00000364",
         "cog_category": [
@@ -213,6 +215,8 @@ GENES = [
             "TX50_RS00025"
         ],
         "annotation_quality": 1,
+        "annotation_state": "catch_all_only",
+        "informative_annotation_types": [],
         "bacteria_cog_og": "COG3881",
         "cluster_number": "CK_00000363",
         "cog_category": [
@@ -342,6 +346,8 @@ GENES = [
             "PMM0446"
         ],
         "annotation_quality": 3,
+        "annotation_state": "informative_multi",
+        "informative_annotation_types": ["go_mf", "pfam"],
         "bacteria_cog_og": "COG1622",
         "catalytic_activities": [
             "Reaction=4 Fe(II)-[cytochrome c] + O2 + 8 H(+)(in) = 4 Fe(III)-[cytochrome c] + 2 H2O + 4 H(+)(out); Xref=Rhea:RHEA:11436, Rhea:RHEA-COMP:10350, Rhea:RHEA-COMP:14399, ChEBI:CHEBI:15377, ChEBI:CHEBI:15378, ChEBI:CHEBI:15379, ChEBI:CHEBI:29033, ChEBI:CHEBI:29034; EC=7.1.1.9; Evidence="
@@ -581,6 +587,8 @@ GENES = [
             "PMT9312_0001"
         ],
         "annotation_quality": 3,
+        "annotation_state": "informative_multi",
+        "informative_annotation_types": ["go_mf", "pfam"],
         "bacteria_cog_og": "COG0592",
         "cluster_number": "CK_00000364",
         "cog_category": [
@@ -745,6 +753,8 @@ GENES = [
             "[cyanorak] hypothetical protein"
         ],
         "annotation_quality": 0,
+        "annotation_state": "no_evidence",
+        "informative_annotation_types": [],
         "cluster_number": "CK_00038231",
         "end_cyanorak": 329961,
         "gene_category": "Unknown",
@@ -795,6 +805,8 @@ GENES = [
             "PMN2A_0044"
         ],
         "annotation_quality": 3,
+        "annotation_state": "informative_multi",
+        "informative_annotation_types": ["go_mf", "pfam"],
         "bacteria_cog_og": "COG0447",
         "bigg_reaction": [
             "iJN678.menB"
@@ -955,6 +967,8 @@ GENES = [
             "ALT831_RS00180"
         ],
         "annotation_quality": 3,
+        "annotation_state": "informative_multi",
+        "informative_annotation_types": ["go_mf", "pfam"],
         "bacteria_cog_og": "COG3335",
         "cog_category": [
             "L"
@@ -1021,6 +1035,8 @@ GENES = [
             "ALT831_RS00590"
         ],
         "annotation_quality": 0,
+        "annotation_state": "no_evidence",
+        "informative_annotation_types": [],
         "end": 130720,
         "gene_category": "Unknown",
         "gene_summary": "hypothetical protein",
@@ -1051,6 +1067,8 @@ GENES = [
         ],
         "alteromonadaceae_og": "46684@72275|Alteromonadaceae",
         "annotation_quality": 1,
+        "annotation_state": "catch_all_only",
+        "informative_annotation_types": [],
         "bacteria_cog_og": "COG0737",
         "cog_category": [
             "F"
@@ -1157,6 +1175,8 @@ GENES = [
         ],
         "alteromonadaceae_og": "468S0@72275|Alteromonadaceae",
         "annotation_quality": 3,
+        "annotation_state": "informative_multi",
+        "informative_annotation_types": ["go_mf", "pfam"],
         "bacteria_cog_og": "COG2832",
         "cog_category": [
             "S"
@@ -1260,6 +1280,8 @@ GENES = [
             "SYNW0305"
         ],
         "annotation_quality": 3,
+        "annotation_state": "informative_multi",
+        "informative_annotation_types": ["go_mf", "pfam"],
         "bacteria_cog_og": "COG0465",
         "cluster_number": "CK_00008085",
         "cog_category": [
@@ -1482,6 +1504,8 @@ GENES = [
             "[tigr_role] Cell envelope / Other"
         ],
         "annotation_quality": 2,
+        "annotation_state": "informative_single",
+        "informative_annotation_types": ["pfam"],
         "cluster_number": "CK_00056274",
         "end_cyanorak": 373534,
         "gene_category": "Cell wall and membrane",
@@ -1525,6 +1549,8 @@ GENES = [
             "[pfam] MoCF_biosynth: Probable molybdopterin binding domain"
         ],
         "annotation_quality": 3,
+        "annotation_state": "informative_multi",
+        "informative_annotation_types": ["go_mf", "pfam"],
         "bacteria_cog_og": "COG0521",
         "cog_category": [
             "H"
@@ -1635,6 +1661,8 @@ GENES = [
             "PMM0630"
         ],
         "annotation_quality": 3,
+        "annotation_state": "informative_multi",
+        "informative_annotation_types": ["go_mf", "pfam"],
         "bacteria_cog_og": "COG0625",
         "cluster_number": "CK_00000753",
         "cog_category": [
@@ -1816,6 +1844,8 @@ GENES = [
             "ALTBGP6_RS12485"
         ],
         "annotation_quality": 3,
+        "annotation_state": "informative_multi",
+        "informative_annotation_types": ["go_mf", "pfam"],
         "bacteria_cog_og": "COG1335",
         "cog_category": [
             "Q"

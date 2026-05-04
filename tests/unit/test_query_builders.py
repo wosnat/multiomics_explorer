@@ -7775,3 +7775,357 @@ class TestBuildMetabolitesByGeneSummary:
         cypher, _ = self._build()
         assert "m.elements" in cypher
 
+
+# ===========================================================================
+# Cluster A — F1 informativeness surface (frozen spec 2026-05-04)
+# ===========================================================================
+# These tests pin the new behaviors from cluster-a-f1-surface.md:
+# A2 surface additions across 5 builders (gene_overview + 4 ontology tools).
+#
+# - gene_overview (gene side): RETURN adds annotation_state +
+#   informative_annotation_types; summary builder gets `by_annotation_state`.
+# - gene_ontology_terms (term side, template): adds informative_only param +
+#   `is_informative` row column.
+# - genes_by_ontology (term side, per-builder split per spec table).
+# - search_ontology (term side): adds informative_only + `is_informative`.
+# - ontology_landscape (term side, default-on filter, no row column).
+
+
+class TestBuildGeneOverviewF1Surface:
+    """gene_overview detail: adds annotation_state + informative_annotation_types."""
+
+    def test_compact_return_includes_annotation_state(self):
+        cypher, _ = build_gene_overview(locus_tags=["PMM1428"])
+        assert "g.annotation_state AS annotation_state" in cypher
+
+    def test_compact_return_includes_informative_annotation_types(self):
+        cypher, _ = build_gene_overview(locus_tags=["PMM1428"])
+        # Coalesced to [] since the prop is sparse-default-empty per KG.
+        assert "informative_annotation_types" in cypher
+        assert "coalesce(g.informative_annotation_types, [])" in cypher
+
+    def test_verbose_still_has_new_columns(self):
+        cypher, _ = build_gene_overview(locus_tags=["PMM1428"], verbose=True)
+        assert "g.annotation_state AS annotation_state" in cypher
+        assert "informative_annotation_types" in cypher
+
+
+class TestBuildGeneOverviewSummaryF1Surface:
+    """gene_overview_summary: adds by_annotation_state envelope rollup."""
+
+    def test_summary_returns_by_annotation_state(self):
+        cypher, _ = build_gene_overview_summary(locus_tags=["PMM1428"])
+        assert "by_annotation_state" in cypher
+
+    def test_summary_uses_apoc_frequencies_on_annotation_state(self):
+        """Spec § Cypher: WITH ..., [g IN found | g.annotation_state] AS states
+        RETURN ..., apoc.coll.frequencies(states) AS by_annotation_state."""
+        cypher, _ = build_gene_overview_summary(locus_tags=["PMM1428"])
+        assert "annotation_state" in cypher
+        # frequencies of the annotation_state list expression
+        assert "apoc.coll.frequencies" in cypher
+
+
+class TestBuildGeneOntologyTermsF1Surface:
+    """gene_ontology_terms (leaf + rollup builders): informative_only
+    filter + is_informative row column."""
+
+    def test_default_is_informative_in_return(self):
+        """is_informative column in RETURN — always present (positive framing)."""
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
+        )
+        assert "is_informative" in cypher
+        # Coalesce-from-sparse: 'true'/null on KG → bool via <> 'true'.
+        assert "coalesce(t.is_uninformative, '') <> 'true'" in cypher
+
+    def test_informative_only_default_false_skips_filter(self):
+        """Default behavior: informative_only=False ⇒ filter NOT in WHERE."""
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
+        )
+        # The filter predicate (used as a WHERE condition) should NOT be
+        # present when informative_only is False — only the RETURN coercion.
+        # Search for the WHERE-side predicate (it won't have AS is_informative).
+        # We assert no filter line emits the predicate as an AND-clause.
+        assert "AND coalesce(t.is_uninformative, '') <> 'true'" not in cypher
+        # default param value
+        assert params.get("informative_only") in (None, False)
+
+    def test_informative_only_true_adds_where(self):
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
+            informative_only=True,
+        )
+        # Spec § filter pattern: AND coalesce(t.is_uninformative, '') <> 'true'.
+        assert "AND coalesce(t.is_uninformative, '') <> 'true'" in cypher
+
+    def test_rollup_mode_also_supports_informative_only(self):
+        """Rollup mode (walk to ancestors) must thread the same filter."""
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
+            mode="rollup", level=1, informative_only=True,
+        )
+        assert "AND coalesce(t.is_uninformative, '') <> 'true'" in cypher
+
+    def test_rollup_mode_returns_is_informative(self):
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
+            mode="rollup", level=1,
+        )
+        assert "is_informative" in cypher
+
+
+class TestBuildGeneOntologyTermsSummaryF1Surface:
+    """gene_ontology_terms_summary: informative_only filter (no row column)."""
+
+    def test_default_does_not_filter(self):
+        cypher, params = build_gene_ontology_terms_summary(
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
+        )
+        assert "AND coalesce(t.is_uninformative, '') <> 'true'" not in cypher
+
+    def test_informative_only_true_adds_where(self):
+        cypher, _ = build_gene_ontology_terms_summary(
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
+            informative_only=True,
+        )
+        assert "AND coalesce(t.is_uninformative, '') <> 'true'" in cypher
+
+    def test_rollup_summary_supports_informative_only(self):
+        cypher, _ = build_gene_ontology_terms_summary(
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
+            mode="rollup", level=1, informative_only=True,
+        )
+        assert "AND coalesce(t.is_uninformative, '') <> 'true'" in cypher
+
+
+class TestBuildSearchOntologyF1Surface:
+    """search_ontology: informative_only filter + is_informative row column."""
+
+    def test_default_returns_is_informative_column(self):
+        cypher, _ = build_search_ontology(ontology="go_bp", search_text="test")
+        assert "is_informative" in cypher
+        assert "coalesce(t.is_uninformative, '') <> 'true'" in cypher
+
+    def test_default_does_not_filter(self):
+        """informative_only=False (default) ⇒ no filter in WHERE."""
+        cypher, _ = build_search_ontology(ontology="go_bp", search_text="test")
+        # No predicate-side filter (only the RETURN coercion as `is_informative`).
+        # The where-side filter clause must be absent.
+        assert "t.is_uninformative" in cypher  # only in RETURN coalesce
+        # Confirm there's no standalone WHERE-side filter clause; the only
+        # appearance is the RETURN-side coalesce.
+        assert cypher.count("coalesce(t.is_uninformative, '') <> 'true'") == 1
+
+    def test_informative_only_true_adds_where_clause(self):
+        cypher, _ = build_search_ontology(
+            ontology="go_bp", search_text="test", informative_only=True,
+        )
+        # Now appears at least twice: once in WHERE-side filter, once in RETURN.
+        assert cypher.count("coalesce(t.is_uninformative, '') <> 'true'") >= 2
+
+    def test_pfam_union_threads_filter_into_both_branches(self):
+        """Pfam uses CALL { ... UNION ALL ... } structure; filter must apply
+        in both UNION branches when informative_only=True."""
+        cypher, _ = build_search_ontology(
+            ontology="pfam", search_text="test", informative_only=True,
+        )
+        # The filter must appear in both UNION branches AND in the
+        # outer RETURN coalesce — so total ≥ 3.
+        assert cypher.count("coalesce(t.is_uninformative, '') <> 'true'") >= 3
+
+
+class TestBuildSearchOntologySummaryF1Surface:
+    """search_ontology_summary: informative_only filter (no row column)."""
+
+    def test_default_does_not_filter(self):
+        cypher, _ = build_search_ontology_summary(
+            ontology="go_bp", search_text="test",
+        )
+        assert "coalesce(t.is_uninformative, '') <> 'true'" not in cypher
+
+    def test_informative_only_true_adds_where(self):
+        cypher, _ = build_search_ontology_summary(
+            ontology="go_bp", search_text="test", informative_only=True,
+        )
+        assert "coalesce(t.is_uninformative, '') <> 'true'" in cypher
+
+
+class TestBuildGenesByOntologyF1Surface:
+    """genes_by_ontology: split per-builder per spec table.
+
+    | Builder | filter | row column |
+    |---|---|---|
+    | validate | No | No |
+    | match-stage helper | Yes (shared) | n/a |
+    | detail | inherited | Yes |
+    | per_term | inherited | Yes |
+    | per_gene | inherited | No |
+    """
+
+    # ---- validate: no filter, no row column ---------------------------------
+    def test_validate_does_not_emit_filter(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_validate,
+        )
+        cypher, _ = build_genes_by_ontology_validate(
+            term_ids=["go:0006260"], ontology="go_bp", level=1,
+        )
+        # Validate reports input IDs as-is regardless of informativeness.
+        assert "is_uninformative" not in cypher
+        assert "is_informative" not in cypher
+
+    # ---- match-stage helper: filter when informative_only=True --------------
+    def test_match_stage_default_omits_filter(self):
+        from multiomics_explorer.kg.queries_lib import (
+            _genes_by_ontology_match_stage,
+        )
+        cypher, _ = _genes_by_ontology_match_stage(
+            ontology="go_bp", organism="Test Org",
+            level=1, term_ids=None,
+        )
+        assert "coalesce(t.is_uninformative, '') <> 'true'" not in cypher
+
+    def test_match_stage_appends_filter_when_informative_only(self):
+        """Spec § per-builder table: shared helper appends
+        `AND ($informative_only = false OR coalesce(t.is_uninformative, '') <> 'true')`
+        before the size_filter WITH (term-level filter must apply before
+        size collapse)."""
+        from multiomics_explorer.kg.queries_lib import (
+            _genes_by_ontology_match_stage,
+        )
+        cypher, _ = _genes_by_ontology_match_stage(
+            ontology="go_bp", organism="Test Org",
+            level=1, term_ids=None, informative_only=True,
+        )
+        assert "coalesce(t.is_uninformative, '') <> 'true'" in cypher
+
+    def test_match_stage_filter_before_size_collapse(self):
+        """Filter must apply BEFORE the `WITH t, collect(DISTINCT g) AS term_genes`
+        size-collapse stage (otherwise it would filter on collapsed nodes)."""
+        from multiomics_explorer.kg.queries_lib import (
+            _genes_by_ontology_match_stage,
+        )
+        cypher, _ = _genes_by_ontology_match_stage(
+            ontology="go_bp", organism="Test Org",
+            level=1, term_ids=None, informative_only=True,
+        )
+        idx_filter = cypher.find("coalesce(t.is_uninformative, '') <> 'true'")
+        idx_collapse = cypher.find("collect(DISTINCT g) AS term_genes")
+        assert idx_filter != -1 and idx_collapse != -1
+        assert idx_filter < idx_collapse
+
+    # ---- detail: inherits filter, adds is_informative row column ------------
+    def test_detail_default_is_informative_in_return(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="go_bp", organism="Test Org",
+            level=1, min_gene_set_size=5, max_gene_set_size=500,
+        )
+        assert "is_informative" in cypher
+        assert "coalesce(t.is_uninformative, '') <> 'true'" in cypher
+
+    def test_detail_default_omits_filter(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="go_bp", organism="Test Org",
+            level=1, min_gene_set_size=5, max_gene_set_size=500,
+        )
+        # Only the RETURN-side coalesce appears once; no WHERE-side filter.
+        assert cypher.count("coalesce(t.is_uninformative, '') <> 'true'") == 1
+
+    def test_detail_threads_informative_only(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="go_bp", organism="Test Org",
+            level=1, min_gene_set_size=5, max_gene_set_size=500,
+            informative_only=True,
+        )
+        # Now we expect ≥2 — once in WHERE filter, once in RETURN coalesce.
+        assert cypher.count("coalesce(t.is_uninformative, '') <> 'true'") >= 2
+
+    # ---- per_term: inherits filter, adds is_informative row column ----------
+    def test_per_term_default_is_informative_in_return(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
+        )
+        cypher, _ = build_genes_by_ontology_per_term(
+            ontology="go_bp", organism="Test Org",
+            level=1, min_gene_set_size=5, max_gene_set_size=500,
+        )
+        assert "is_informative" in cypher
+
+    def test_per_term_threads_informative_only(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
+        )
+        cypher, _ = build_genes_by_ontology_per_term(
+            ontology="go_bp", organism="Test Org",
+            level=1, min_gene_set_size=5, max_gene_set_size=500,
+            informative_only=True,
+        )
+        assert cypher.count("coalesce(t.is_uninformative, '') <> 'true'") >= 2
+
+    # ---- per_gene: inherits filter, NO row column ---------------------------
+    def test_per_gene_does_not_emit_is_informative_column(self):
+        """Per-gene rows are per gene, not per term — `is_informative` is
+        a per-term flag, so the row column does NOT belong here."""
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_gene,
+        )
+        cypher, _ = build_genes_by_ontology_per_gene(
+            ontology="go_bp", organism="Test Org",
+            level=1, min_gene_set_size=5, max_gene_set_size=500,
+        )
+        assert "is_informative" not in cypher
+
+    def test_per_gene_threads_informative_only_filter(self):
+        """Filter still threads through (via shared helper) even though no
+        row column — narrows which terms count toward this gene."""
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_gene,
+        )
+        cypher, _ = build_genes_by_ontology_per_gene(
+            ontology="go_bp", organism="Test Org",
+            level=1, min_gene_set_size=5, max_gene_set_size=500,
+            informative_only=True,
+        )
+        assert "coalesce(t.is_uninformative, '') <> 'true'" in cypher
+
+
+class TestBuildOntologyLandscapeF1Surface:
+    """ontology_landscape: informative_only filter, default-on (True).
+
+    Spec decision 3: ontology_landscape opts OUT (default True), opt-in via
+    informative_only=False.
+    No row-level `is_informative` (landscape is aggregated per ontology x level).
+    """
+
+    def test_default_filters_uninformative_terms(self):
+        """Default `informative_only=True` ⇒ filter present in WHERE."""
+        cypher, _ = build_ontology_landscape(
+            ontology="cyanorak_role", organism_name="Prochlorococcus MED4",
+        )
+        assert "coalesce(t.is_uninformative, '') <> 'true'" in cypher
+
+    def test_opt_out_omits_filter(self):
+        cypher, _ = build_ontology_landscape(
+            ontology="cyanorak_role", organism_name="Prochlorococcus MED4",
+            informative_only=False,
+        )
+        assert "coalesce(t.is_uninformative, '') <> 'true'" not in cypher
+
+    def test_no_is_informative_row_column(self):
+        """ontology_landscape returns aggregated stats — no per-term rows.
+        is_informative does NOT appear in RETURN."""
+        cypher, _ = build_ontology_landscape(
+            ontology="cyanorak_role", organism_name="Prochlorococcus MED4",
+        )
+        assert " AS is_informative" not in cypher
