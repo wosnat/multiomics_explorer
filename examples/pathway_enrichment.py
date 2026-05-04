@@ -9,6 +9,7 @@ Demonstrates:
   - result.generate_summary() for the aggregate view
   - result.to_envelope() for the MCP-compatible dict
   - Custom term2gene path (hand-built, no KG)
+  - Side-by-side `informative_only=True` (default) vs `False` row counts
 
 Run with: uv run python examples/pathway_enrichment.py
 """
@@ -77,6 +78,48 @@ def demo_compare_cluster():
     print(cc_frame.head())
 
 
+def demo_informative_only():
+    """Side-by-side: `informative_only=True` (default) vs `False`.
+
+    As of the 2026-05 KG release, both `pathway_enrichment` and
+    `cluster_enrichment` default to `informative_only=True`. Uninformative
+    ontology terms (e.g. KEGG `map00001` "metabolic pathways", GO root
+    `go:0008150`) are excluded from the Fisher tests by default — they are
+    large catch-all buckets that "enrich" trivially in any DE set.
+
+    The filter is term-side only — the DE foreground, the background, and
+    the DE inputs are all unaffected. Only the term2gene mapping fed into
+    Fisher loses rows when `informative_only=True`.
+
+    Running the same call once with the default and once with
+    `informative_only=False` lets you see both rankings side by side. The
+    per-row `is_informative` column is present in either mode, so the
+    opt-out call alone gives you both views (filter the DataFrame on
+    `is_informative` post-hoc to recover the default-True ranking).
+    """
+    common_kwargs = dict(
+        organism="MED4",
+        experiment_ids=["EXP042"],
+        ontology="go",
+        level=2,
+    )
+    default_run: EnrichmentResult = pathway_enrichment(
+        **common_kwargs,  # informative_only=True (default)
+    )
+    full_run: EnrichmentResult = pathway_enrichment(
+        **common_kwargs,
+        informative_only=False,
+    )
+    print(f"informative_only=True   rows={len(default_run.results)}")
+    print(f"informative_only=False  rows={len(full_run.results)}")
+    print("\nFull-run head (uninformative terms surfaced via is_informative):")
+    print(
+        full_run.results[
+            ["term_id", "term_name", "is_informative", "p_adjust"]
+        ].head(10)
+    )
+
+
 if __name__ == "__main__":
     print("=== Custom term2gene (no KG) ===")
     demo_custom_term2gene()
@@ -84,5 +127,7 @@ if __name__ == "__main__":
     try:
         demo_mcp_path()
         demo_compare_cluster()
+        print("\n=== informative_only side-by-side ===")
+        demo_informative_only()
     except Exception as e:
         print(f"(skipped KG demos: {e})")

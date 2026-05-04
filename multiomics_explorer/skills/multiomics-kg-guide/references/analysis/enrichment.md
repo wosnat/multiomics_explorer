@@ -363,6 +363,89 @@ that *could* have been selected for the foreground by the same process that prod
 
 ---
 
+## Informative-only filtering (default 2026-05)
+
+As of the 2026-05 KG release, both `pathway_enrichment` and `cluster_enrichment` default to
+`informative_only=True`. Uninformative ontology terms — those flagged
+`is_uninformative='true'` in the KG — are excluded from the Fisher tests by default.
+
+### Rationale
+
+Uninformative terms are noise in over-representation testing. They are large catch-all
+buckets that "enrich" trivially in any DE set:
+
+- **KEGG `map00001`** ("metabolic pathways") covers 800+ MED4 genes — roughly 40% of the
+  genome. Almost any nontrivial DE set passes Fisher significance against it.
+- **GO root `go:0008150`** ("biological_process") covers approximately every annotated
+  gene. It is by definition uninformative as an ORA hit.
+- **GO root `go:0003674`** ("molecular_function") and **`go:0005575`** ("cellular_component")
+  are similarly genome-spanning.
+
+Surfacing such terms at the top of an enrichment ranking is misleading and crowds out
+the smaller, more diagnostic terms below them. The `2026-05` default flip aligns enrichment
+with the rest of the F1 informativeness work in Cluster A — `ontology_landscape`,
+`search_ontology`, `genes_by_ontology`, and `gene_ontology_terms` all default to
+`informative_only=True`. Without this default, "discovery says X is rank-1 (uninformative
+excluded), enrichment includes it anyway" creates a tool inconsistency callers would
+have to remember.
+
+### Term-side-only semantics
+
+The filter applies to the term2gene table only. The gene set, the background, and the DE
+inputs are all unaffected:
+
+- The DE foreground (significant locus_tags per cluster) is computed independent of any
+  ontology terms.
+- The background (`table_scope` per cluster, or `'organism'`, or a custom list) is computed
+  independent of any ontology terms.
+- Only the term2gene mapping fed into Fisher loses rows when `informative_only=True`.
+
+This is the same contract enforced on `genes_by_ontology` and `gene_ontology_terms` —
+filtering happens at the term-MATCH stage in Cypher (`coalesce(t.is_uninformative, '') <>
+'true'`), before any gene-side aggregation. No Fisher 2×2 cell shifts because the term set
+shrank; only the set of (cluster, term) pairs tested shrinks.
+
+### Fisher denominator behavior
+
+The implicit denominator for Benjamini-Hochberg correction within a cluster is the number
+of terms tested in that cluster. With default `informative_only=True`, that number is the
+informative-only term set. With `informative_only=False`, that number is the full term set
+including uninformative terms.
+
+This means BH-adjusted p-values are reproducible only when the `informative_only` setting
+is held constant. Comparing `p_adjust` across two runs that differ in this setting is not
+meaningful — the test family changed.
+
+The raw `pvalue` column is unaffected by the setting (Fisher is per-pair; the per-pair test
+does not depend on the number of other tests in the family).
+
+### Opt-out guidance
+
+Pass `informative_only=False` for browse-mode enrichment when you explicitly want to see
+uninformative trivially-enriched terms — for example, to confirm that `go:0008150` does
+indeed appear at the top, or to inspect the size of the catch-all signal before deciding to
+exclude it. The per-row `is_informative` column is present in either mode, so a single
+opt-out call gives you both views simultaneously (filter the DataFrame post-hoc on
+`is_informative` to recover the default-True ranking).
+
+`docs://examples/pathway_enrichment.py` (`demo_informative_only`) shows the side-by-side
+pattern.
+
+### KG drift caveat
+
+The `is_uninformative` flag is KG-side state. If a future KG release changes which terms
+are flagged, prior enrichment runs become non-reproducible — the term set that defined the
+2026-05-default cluster denominator may no longer match. Two practical mitigations:
+
+1. **Pin via param:** if reproducibility matters (paper figures, locked baselines), pass
+   `informative_only=False` and post-filter on the per-row `is_informative` column. This
+   captures the full term set; downstream filtering is then independent of KG state.
+2. **Record `result.params`:** the `informative_only` setting is recorded in
+   `result.params` for both `pathway_enrichment` and `cluster_enrichment`, so a saved
+   `EnrichmentResult` documents which mode produced it.
+
+---
+
 ## 10. Choosing an ontology and level (narrative)
 
 Use `ontology_landscape` (§3) to scout before committing to an ontology and level. The key
