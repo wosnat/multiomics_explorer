@@ -3,7 +3,7 @@
 **Date:** 2026-05-04
 **Spec:** [2026-05-04-metabolites-assets-design.md](2026-05-04-metabolites-assets-design.md)
 **Owner:** Osnat Weissberg
-**Status:** First pass in progress
+**Status:** Two-pass complete; ready for KG-side review and metabolomics-DM definition conversation.
 
 This audit accompanies the metabolites assets effort. It quantifies the metabolite surface in the KG, lists existing-tool gaps for both chemistry-annotation and metabolomics-measurement layers, proposes new tools, captures open definition questions, and itemises KG-side asks. The audit runs in two passes: a first pass populated before the analysis doc and example python are written (`phase=first-pass`), and a second pass appended after they are written (`phase=build-derived`).
 
@@ -321,6 +321,16 @@ How existing MCP tools surface (or fail to surface) the reaction-arm and transpo
 
 **Cross-cut:** all P0/P1 items are pure pass-through of Gene/Publication/Experiment/Organism node properties that already exist in the KG. No tool needs new Cypher for these — only the Pydantic envelope/row model and the query SELECT list need expansion.
 
+### Part 2 — build-derived rows (second pass)
+
+| Tool | Current chemistry surfacing | Recommended change | Priority | Phase |
+|---|---|---|---|---|
+| `differential_expression_by_gene` | Accepts `direction` parameter but rejects `'both'` (only `'up'` / `'down'`) | Either accept `'both'` (run both internally and merge) OR document the limitation in the docstring + raise a clearer error message naming the alternative (omit param to get both directions). Surfaced by example python scenario `n_source_de` — initial code used `direction='both'` mirroring `pathway_enrichment` and crashed with `Invalid direction 'both'` | P2 | build-derived (scenario 5 `n_source_de`) |
+| `genes_by_metabolite` | Per-row schema is **union** by evidence_source (metabolism rows have `reaction_id`/`reaction_name`/`ec_numbers`/`mass_balance`; transport rows have `transport_confidence`/`tcdb_family_id`/`tcdb_family_name`) — neither set is documented as conditional in the docstring | Document the union shape explicitly in the tool description; consider surfacing `transport_confidence: None` and `reaction_id: None` keys in metabolism/transport rows respectively for shape consistency | P2 | build-derived (scenarios 2 `compound_to_genes` + 6 `tcdb_chain` — required arm-specific result printing logic) |
+| `metabolites_by_gene` | Same union shape as `genes_by_metabolite` | Same — document union shape | P2 | build-derived (scenario 3 `gene_to_metabolites`) |
+| `metabolites_by_gene` (summary mode) | `summary=True` returns `top_genes=None` even when results exist (observed for small inputs) | Investigate: is `top_genes` only populated when input list is large enough? Document threshold or fix to always populate. Workaround used: extract gene set from non-summary `results` directly | P3 | build-derived (scenario 5 `n_source_de`) |
+| `search_ontology` | Kwarg is `search_text`, not `query` (initially confused) | The discoverability is fine via signature inspection but the analysis-doc patterns and existing `pathway_enrichment.py` use `query=` style elsewhere. Consider accepting both `query=` and `search_text=` aliases for ergonomics | P3 | build-derived (scenario 6 `tcdb_chain`) |
+
 ---
 
 ## Part 3 — Metabolomics-measurement surface (greenfield)
@@ -339,6 +349,13 @@ How existing MCP tools should expose measurement data, given that node-level rol
 | `kg_schema` | Returns full schema with all metabolomics nodes/edges | No change — Part 1 §1.2 confirmed introspection is correct and complete | — | first-pass (no change) |
 
 **P0 summary (3 items):** `list_metabolites`, `list_publications`, `list_experiments` all need measurement-rollup pass-through. All data exists on nodes — no KG change required. This is the foundation for the Track-B discovery workflow.
+
+#### 3a — build-derived rows (second pass)
+
+| Tool | Current surfacing | Recommended change | Priority | Phase |
+|---|---|---|---|---|
+| `list_metabolites` | Confirmed empirically: per-row schema includes `gene_count`, `transporter_count`, `pathway_count`, `evidence_sources` — but NOT `measured_assay_count`, `measured_paper_count`, `measured_organisms` despite all three being on the Metabolite node | (Validates the first-pass P0 row.) Rephrase: this is **confirmed required** — without it, the LLM cannot use `list_metabolites` to find "measured-and-transport-able" metabolites in one call. Surfaced by scenario 1 `discover` | P0 | build-derived (validates first-pass) |
+| `list_metabolites` envelope | `top_pathways[].pathway_id`/`pathway_name` (not `term_id`/`term_name`); `top_organisms[].organism_name` (not `preferred_name`); `by_evidence_source` is a list of dicts, not a flat dict | Naming inconsistency vs. ontology tools (`top_pathways[].term_id` in `pathway_enrichment`). Either: (a) align `list_metabolites` envelope keys to use `term_id`/`term_name`/`preferred_name`, or (b) document the divergence prominently in the tool description | P2 | build-derived (scenario 1 `discover`) |
 
 ### 3b — New-tool proposals
 
@@ -447,6 +464,18 @@ Phase: first-pass.
 | DM-family extension to Metabolite | Pending-definition | first-pass | §4.3.1, §4.3.6 |
 
 Two ship-now (Should-add). Three blocked on Part 4 questions.
+
+#### 3b — build-derived (second pass)
+
+No new tool proposals from the build phase — the existing first-pass surface (5 candidates) covers the workflow gaps observed during the analysis doc and example python builds. The build did however **validate** the existing proposals:
+
+| First-pass proposal | Build-derived verdict |
+|---|---|
+| `list_metabolite_assays` | **Validated.** Scenario 8 `measurement` had to use `run_cypher` because no native discovery tool exists for assays. Confirms Should-add (P1). |
+| `metabolite_response_profile` | **Validated.** Scenario 8 illustrates the pattern (per-metabolite × condition aggregation) but it is laborious in raw Cypher. Pending-definition stands. |
+| `metabolites_by_assay` / `assays_by_metabolite` | **Validated.** Scenario 8 walks the assay → metabolite path; reverse lookup not exercised but the bidirectional pattern is the right shape. Should-add stands. |
+| `differential_metabolite_abundance` | **Strengthened pending-definition signal.** Scenario 8's raw values are clearly per-replicate concentrations; FC is not the natural summary. Pending-definition stands. |
+| DM-family extension to Metabolite | **Empirical evidence shifted toward Assay-only modelling.** Per Part 1 §1.2, `MetaboliteAssay` already carries the same fields a `DerivedMetric` would (value_kind, metric_type, percentiles, etc.). The KG modellers appear to have answered Part 4 §4.3.1 implicitly: Assay IS the DM-on-Metabolite analog. Recommendation: downgrade DM-family extension from Pending-definition to **Not-needed** — direct any metabolite-level summary work onto `MetaboliteAssay`-anchored tools instead. |
 
 ---
 
@@ -625,3 +654,13 @@ Items only `multiomics_biocypher_kg` can fix. Each ask carries `{category, prior
 **Priority summary:** 1× P0 (KG-MET-003 reaction role), 6× P2 (data gaps + decisions), 3× P3 (low-priority polish), 2× CLOSED (KG-MET-004/005), 1× deferred (KG-MET-007 indexes).
 
 **Surprising finding:** the original spec assumed many KG asks would land in P0/P1 (data is missing). The actual KG release shipped much further than expected — node-level rollups exist, edge schemas are rich, family promiscuity is partially flagged. The remaining P0 (reaction role) is the genuinely-blocking gap.
+
+### Part 5 — build-derived KG asks (second pass)
+
+| ID | Category | Priority | Phase | Ask | Why |
+|---|---|---|---|---|---|
+| KG-MET-014 | Documentation | P3 | build-derived | Document the metabolite-ID prefix convention prominently in `kg_schema` output and tool docstrings (KEGG IDs are stored as `kegg.compound:Cxxxxx`, not bare `Cxxxxx`) | Caused first-attempt query failures during scenario 2 `compound_to_genes` — bare `C00064` returned 0 rows; the prefixed form returned 42. Cheap docstring win |
+| KG-MET-015 | Documentation | P3 | build-derived | Document organism-name resolution rules: chemistry tools (e.g., `genes_by_metabolite(organism='MED4')`) accept short-name aliases, but `list_organisms(organism_names=['MED4'])` requires the full `preferred_name` (`Prochlorococcus MED4`) | Surfaces during scenario 1 `discover` first-attempt; minor friction but confusing without docs |
+| KG-MET-007 (resolved) | Index | — | build-derived (NO INDEX ASKS) | Audit-Phase-D scenarios all completed in <30s aggregate (scenario 5 longest at ~8s due to multi-step DE chain). No slow queries observed. KG-MET-007 closes with no concrete index requests; revisit in next round | Performance baseline confirmed acceptable for current scale. |
+
+**Final Part 5 totals:** 14 numbered KG asks (1× P0, 6× P2, 6× P3, 1× CLOSED rollup-already-shipped, 0× index after closure). The KG release substantially overshipped relative to what was assumed at design time.
