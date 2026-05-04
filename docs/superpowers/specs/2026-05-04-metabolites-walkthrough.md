@@ -13,7 +13,7 @@ All three deliverables shipped, all tests pass, ready for review.
 - **Analysis doc** — `docs://analysis/metabolites` registered via auto-loader; three-source disambiguation table + tracks A1/A2/A-combined/B + decision tree.
 - **Example python** — `examples/metabolites.py` registered as `docs://examples/metabolites.py`; 8/8 scenarios pass under `-m kg` in 29s aggregate.
 
-**Surprising headline finding:** the 2026-05-04 KG release shipped **further** than the original spec assumed — node-level measurement rollups, edge-level replicate counts and percentile ranks, and TcdbFamily.superfamily are all already present. The remaining genuine KG gap is **reaction-edge role** (substrate vs product, KG-MET-003 P0). Other proposed asks downgrade to documentation / decision items.
+**Surprising headline finding:** the 2026-05-04 KG release shipped **further** than the original spec assumed — node-level measurement rollups, edge-level replicate counts and percentile ranks, and TcdbFamily.superfamily are all already present. **Update 2026-05-04 (post-walkthrough):** the originally-flagged P0 KG ask (KG-MET-003 reaction-edge `role`) is **retired** — upstream KEGG annotation direction is unreliable, so the KG intentionally stays undirected. There are now **zero P0 KG asks**; the chemistry-track "involved in" framing is the permanent convention, not a transitional limitation.
 
 ---
 
@@ -68,17 +68,18 @@ The metabolomics-side questions are the high-leverage ones for the next planning
 
 | Priority | Asks |
 |---|---|
-| **P0** | KG-MET-003 — add `role` property on `Reaction_has_metabolite` edge |
+| **P0** | _(none — KG-MET-003 retired)_ |
 | **P2** | KG-MET-002 (compartment-as-property documentation), KG-MET-006 (TCDB promiscuity flag for non-superfamily families), KG-MET-009 (reaction reversibility), KG-MET-011 (transport direction), KG-MET-012 (Assay-vs-DM modelling decision), KG-MET-013 (timepoint alignment between metabolomics and expression) |
 | **P3** | KG-MET-001 (normalisation method docs), KG-MET-008 (data dictionary per paper), KG-MET-010 (multi-subunit modelling), KG-MET-014 (metabolite-ID prefix doc), KG-MET-015 (organism-name resolution doc) |
 | **CLOSED** | KG-MET-004, KG-MET-005 (rollups already shipped); KG-MET-007 (no slow queries observed during build) |
+| **RETIRED** | KG-MET-003 (reaction role) — upstream KEGG annotation direction is unreliable; KG stays undirected; "involved in" framing is permanent |
 
 ### 3. Build-derived discoveries that meaningfully changed the picture
 
 These are observations that emerged from actually writing the analysis doc + example python, and feed into the audit's second pass:
 
 1. **The KG overshipped vs. design assumptions.** Per-Metabolite/Publication/Experiment/Organism measurement rollups, edge-level replicate counts, TcdbFamily.superfamily — all already present. Most originally-proposed P0 KG asks downgrade to closed or P3 documentation items.
-2. **`Reaction_has_metabolite` is empirically undirected.** Confirmed by edge-property introspection (only `id`). Cannot honestly say "this gene produces X" until KG-MET-003 lands.
+2. **`Reaction_has_metabolite` is empirically undirected — and will stay that way.** Confirmed by edge-property introspection (only `id`). User confirmed 2026-05-04: upstream KEGG-source annotation direction is unreliable, so adding `role` would propagate false confidence. KG-MET-003 retired. Tools must use "involved in" framing as the permanent convention.
 3. **`genes_by_metabolite` row schema is union** — different fields per evidence_source. Documented in audit Part 2 build-derived; affects how the analysis doc + example python format result rows.
 4. **`differential_expression_by_gene` rejects `direction='both'`.** Caught by scenario 5 with `ValueError`. CLAUDE.md's filter description is misleading. P2 documentation/ergonomics fix.
 5. **The DM-family-extension proposal is retired.** Empirical schema evidence shows MetaboliteAssay is already the DM-on-Metabolite analog. Direct future metabolite-summary tools onto Assay-anchored surface, not DerivedMetric → Metabolite.
@@ -88,7 +89,7 @@ These are observations that emerged from actually writing the analysis doc + exa
 
 1. **Pick a small Part 2 P0 batch** (e.g., chemistry-rollup pass-through to `gene_response_profile` + `list_publications` + `list_experiments`) and ship as a quick "Pass A" — pure plumbing, no KG change.
 2. **Schedule the metabolomics-DM definition conversation** with the KG side. The high-leverage questions are §4.3.1 (Assay-only is implicit answer; needs explicit confirmation), §4.3.2 (FC vs other summaries), §4.3.3 (replicate rollup).
-3. **File KG-MET-003** (reaction role) as the P0 KG-side ticket — this is the only true blocking gap and unlocks "produces X" framing in `metabolites_by_gene`.
+3. ~~File KG-MET-003 (reaction role) as the P0 KG-side ticket~~ — **retired** 2026-05-04 (upstream KEGG direction unreliable). No P0 KG asks remain. Closing this line item.
 4. **Defer Part 3b new-tool building** until the Part 4 questions resolve. `list_metabolite_assays` (Should-add P1) could land independently as it doesn't depend on definition.
 
 ---

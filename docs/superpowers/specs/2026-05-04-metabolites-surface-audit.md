@@ -273,7 +273,7 @@ The 8 metabolites covered by both papers are the cross-paper anchor set. 99 are 
 1. **Three pipelines coexist with mostly-disjoint reach.** 1895 metabolites are reaction-only, 832 transport-only, 107 measurement-anchored. Only 59 metabolites surface across all three.
 2. **The metabolomics layer is rich but small.** 10 assays, 1386 edges, 107 distinct metabolites measured, 2 papers. Edge schemas already carry replicate counts, SD, percentiles, detection status, time point, condition label.
 3. **Several proposed KG asks are already satisfied.** Per-Metabolite/-Publication/-Experiment/-Organism measurement rollups exist (KG-MET-004/005). TCDB family superfamily flag exists (KG-MET-006). Replicate counts exist on edges (KG-MET-001 partial).
-4. **The genuine KG gaps** (confirmed by §1.2 edge inventory) are: reaction-direction role, normalisation-method documentation, and a TcdbFamily-level promiscuity score that distinguishes narrow `<none>`-superfamily families from broad ones.
+4. **The genuine remaining KG gaps** (confirmed by §1.2 edge inventory and 2026-05-04 user resolution): normalisation-method documentation, a TcdbFamily-level promiscuity score for non-superfamily families, and a few documentation items. The reaction-direction role question is **resolved as a non-ask** — upstream KEGG annotation direction is unreliable, so explorer tools commit to "involved in" framing as a permanent convention. See Part 4 §4.1.1 + Part 5 KG-MET-003 retirement.
 
 ---
 
@@ -485,20 +485,15 @@ Organised by metabolite-source pipeline. Each question states the issue, names t
 
 ### 4.1 Reaction (KEGG) source
 
-#### 4.1.1 Reaction edge directionality / role
+#### 4.1.1 Reaction edge directionality / role — RESOLVED (option c)
 
 **Question:** Does `Reaction_has_metabolite` distinguish substrate from product, or only "involved in"?
 
-**Why it matters:** If undirected, `metabolites_by_gene` cannot honestly say "this gene produces X" — only "X is involved in a reaction this gene catalyses."
+**Resolution (2026-05-04, user):** option (c). The KEGG-source annotation direction is unreliable upstream, so propagating it as a `role` property would surface false confidence rather than help. The KG stays undirected; explorer tools must use "involved in" framing as the **permanent** convention, not a transitional one.
 
-**Current state (from Part 1 §1.2):** edge has `id` only; no `role` property. Effectively undirected.
+**Implication for tools:** `metabolites_by_gene` and `genes_by_metabolite` row docstrings must say "involved in" (never "produces" / "consumes") for metabolism-arm rows. Analysis doc Track A1 caveat is now permanent. KG-MET-003 retired (see Part 5).
 
-**Options:**
-- (a) Add `role` property on edge (`'substrate' | 'product' | 'cofactor'`).
-- (b) Split into two edges (`Reaction_consumes_metabolite`, `Reaction_produces_metabolite`).
-- (c) Stay undirected; document the framing limitation in tools.
-
-**Blocks:** chemistry-track honesty (analysis doc Track A1), and any future "production capacity" tool. Surfaced as KG-MET-003.
+**Blocks:** none — answered.
 
 #### 4.1.2 Reversibility
 
@@ -639,7 +634,7 @@ Items only `multiomics_biocypher_kg` can fix. Each ask carries `{category, prior
 |---|---|---|---|---|---|
 | KG-MET-001 | Documentation | P1 | first-pass | Document the normalisation convention used for `Assay_quantifies_metabolite.value` per paper (raw concentration? log-transformed? z-score?) — and whether `value_sd` is on the same scale | Resolves Part 4 §4.3.3 (replicate rollup convention); needed for tool docstrings explaining what `value` means to the LLM |
 | KG-MET-002 | Decision + Documentation | P2 | first-pass | Compartment-as-property is the chosen modelling. Document the convention: `Metabolite` node is compartment-agnostic; `MetaboliteAssay.compartment` carries the compartment. Verify no Metabolite node has compartment in its name/properties (i.e., glucose-intracellular and glucose-extracellular are the same Metabolite) | Resolves Part 4 §4.3.5 (compartment semantics); needed for analysis doc Track B |
-| KG-MET-003 | Data gap | P0 | first-pass | Add `role` property on `Reaction_has_metabolite` edge (`'substrate' \| 'product' \| 'cofactor'` or similar). Even partial coverage (KEGG-derived) helps | Allows `metabolites_by_gene` to honestly distinguish "consumes" / "produces" instead of "involved in"; resolves Part 4 §4.1.1 |
+| KG-MET-003 | Data gap | — | RETIRED 2026-05-04 | (Was: add `role` property on `Reaction_has_metabolite`.) **Retired** — upstream KEGG-source annotation direction is unreliable, so propagating it as `role` would create false confidence. Resolution to Part 4 §4.1.1 is option (c): stay undirected, "involved in" framing is permanent. | n/a — explorer-side tools simply commit to the "involved in" framing as their permanent convention |
 | KG-MET-004 | Rollup | — | first-pass (CLOSED — already satisfied) | Per-Metabolite measurement rollups already on the node: `measured_assay_count`, `measured_paper_count`, `measured_organisms` | (verified in Part 1 §1.2 — no action needed) |
 | KG-MET-005 | Rollup | — | first-pass (CLOSED — already satisfied) | Per-Publication / per-Experiment / per-Organism measurement rollups already exist: `metabolite_assay_count`, `metabolite_count`, `metabolite_compartments`, `measured_metabolite_count` | (verified in Part 1 §1.2) |
 | KG-MET-006 | Precompute | P2 | first-pass | TcdbFamily.superfamily exists. Add: per-family `is_promiscuous` boolean (true when superfamily ∈ {large set} OR `member_count` > threshold OR `metabolite_count` > threshold) so explorer tools can dim/rank without re-deriving the rule | Sharper family_inferred precision-tier reasoning (Part 4 §4.2.2; analysis doc Track A2 §g). Today the explorer recomputes the rule client-side or via per-query joins |
@@ -651,9 +646,9 @@ Items only `multiomics_biocypher_kg` can fix. Each ask carries `{category, prior
 | KG-MET-012 | Decision | P2 | first-pass | Decide whether metabolite-level summary statistics (rhythmicity, etc.) should attach as `DerivedMetric → Metabolite` edges or live entirely on `MetaboliteAssay` properties. Communicate decision to explorer side | Resolves Part 4 §4.3.1 / §4.3.6; unblocks Part 3b.5 (DM-family extension to Metabolite) |
 | KG-MET-013 | Documentation | P2 | first-pass | Confirm `time_point` properties on `Assay_quantifies_metabolite` align with `Changes_expression_of.time_point` for experiments that have both omics types | Resolves Part 4 §4.3.8; enables future cross-omics tools |
 
-**Priority summary:** 1× P0 (KG-MET-003 reaction role), 6× P2 (data gaps + decisions), 3× P3 (low-priority polish), 2× CLOSED (KG-MET-004/005), 1× deferred (KG-MET-007 indexes).
+**Priority summary (after 2026-05-04 retirement of KG-MET-003):** 0× P0, 6× P2 (data gaps + decisions), 3× P3 (low-priority polish), 2× CLOSED (KG-MET-004/005), 1× RETIRED (KG-MET-003), 1× deferred (KG-MET-007 indexes).
 
-**Surprising finding:** the original spec assumed many KG asks would land in P0/P1 (data is missing). The actual KG release shipped much further than expected — node-level rollups exist, edge schemas are rich, family promiscuity is partially flagged. The remaining P0 (reaction role) is the genuinely-blocking gap.
+**Surprising finding (revised):** the original spec assumed many KG asks would land in P0/P1 (data is missing). The actual KG release shipped much further than expected — node-level rollups exist, edge schemas are rich, family promiscuity is partially flagged. The originally-flagged P0 (reaction role) was retired by user decision because upstream KEGG annotation direction is unreliable. **There are no remaining P0 KG asks.** The chemistry-annotation track's "involved in" framing is now a permanent convention, not a transitional limitation.
 
 ### Part 5 — build-derived KG asks (second pass)
 

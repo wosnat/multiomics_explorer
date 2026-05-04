@@ -8,7 +8,7 @@ Runnable companion: `docs://examples/metabolites.py` (8 scenarios).
 
 | `evidence_source` | Path in KG | Question it answers | Native tools | Key caveats |
 |---|---|---|---|---|
-| `metabolism` | `Gene → Reaction → Metabolite` (KEGG-derived) | "Which metabolites can this gene catalyse?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['metabolism']`) | KO inference may be putative; `Reaction_has_metabolite` carries no substrate-vs-product role today (KG-MET-003 open) — prefer "involved in" framing over "produces"; promiscuous enzymes inflate counts |
+| `metabolism` | `Gene → Reaction → Metabolite` (KEGG-derived) | "Which metabolites is this gene's reaction involved in?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['metabolism']`) | KO inference may be putative; `Reaction_has_metabolite` is undirected — upstream KEGG direction is unreliable, so the convention is permanent: use "involved in" framing, never "produces"/"consumes"; promiscuous enzymes inflate counts |
 | `transport` | `Gene → TcdbFamily → Metabolite` (TCDB-derived) | "Which metabolites does this gene transport (or could transport, family-inferred)?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['transport']`) | family_inferred ≫ substrate_confirmed (per-gene median = 6 metabolites, p90 = 90, max = 551 via ABC superfamily); auto-warning fires when this skews; no import/export direction |
 | `metabolomics` | `MetaboliteAssay → Metabolite` (mass-spec) | "Which metabolites were measured under this condition?" | None native today — use `run_cypher` (see Track B) | No gene anchor; `Assay_quantifies` (concentration/intensity) ≠ `Assay_flags` (qualitative detection); compartment matters (whole_cell vs extracellular); 107 of 3035 metabolites measured (96% are annotation-only); 2 papers, 10 assays; replicate / normalisation conventions vary by paper |
 
@@ -20,7 +20,7 @@ The `Metabolite.evidence_sources` list field on each Metabolite node already ind
 
 Always restate the row's caveats when the answer touches it. The LLM should never claim:
 
-- "This gene produces X" — only "this gene catalyses a reaction involving X" (until KG-MET-003 lands).
+- "This gene produces X" — only "this gene catalyses a reaction involving X". This is the permanent convention: upstream KEGG annotation direction is unreliable, so the KG intentionally stays undirected (Part 4 §4.1.1 resolved 2026-05-04).
 - "This gene transports X" without qualifying tier — say "this gene's TCDB family is curated as transporting X (family-inferred)" when `transport_confidence='family_inferred'`.
 - "Metabolite X was not produced under condition Y" based on metabolomics absence — say "X was not detected in the targeted panel under condition Y" (targeted ≠ comprehensive).
 
@@ -28,7 +28,7 @@ Always restate the row's caveats when the answer touches it. The LLM should neve
 
 ## Track A1 — Reaction (KEGG) annotation
 
-For the chemistry the gene can catalyse via curated KEGG enzyme reactions. Always restate inline: KO inference may be putative; reaction direction unresolved; promiscuous enzymes inflate counts.
+For the chemistry the gene's reaction is involved in via curated KEGG annotations. Always restate inline: KO inference may be putative; reaction direction is **permanently undirected** in this KG (upstream KEGG direction is unreliable); promiscuous enzymes inflate counts.
 
 ### a — Metabolite discovery & filtering
 
