@@ -1,5 +1,5 @@
 case_id: ontology_landscape_med4_all
-row_count: 62
+row_count: 69
 rows:
 - best_effort_share: null
   genome_coverage: 0.8745
@@ -463,6 +463,19 @@ rows:
   q3_genes_per_term: 15.0
   relevance_rank: 35
 - best_effort_share: null
+  genome_coverage: 0.044
+  level: 0
+  max_genes_per_term: 67
+  median_genes_per_term: 15.0
+  min_genes_per_term: 8
+  n_genes_at_level: 87
+  n_levels_in_ontology: 5
+  n_terms_with_genes: 3
+  ontology_type: tcdb
+  q1_genes_per_term: 11.5
+  q3_genes_per_term: 41.0
+  relevance_rank: 36
+- best_effort_share: null
   genome_coverage: 0.043
   level: 0
   max_genes_per_term: 49
@@ -474,9 +487,22 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 18.5
   q3_genes_per_term: 39.5
-  relevance_rank: 36
+  relevance_rank: 37
   tree: transporters
   tree_code: ko02000
+- best_effort_share: null
+  genome_coverage: 0.0415
+  level: 1
+  max_genes_per_term: 63
+  median_genes_per_term: 15.0
+  min_genes_per_term: 7
+  n_genes_at_level: 82
+  n_levels_in_ontology: 5
+  n_terms_with_genes: 3
+  ontology_type: tcdb
+  q1_genes_per_term: 11.0
+  q3_genes_per_term: 39.0
+  relevance_rank: 38
 - best_effort_share: null
   genome_coverage: 0.038
   level: 1
@@ -489,7 +515,7 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 8.5
   q3_genes_per_term: 12.5
-  relevance_rank: 37
+  relevance_rank: 39
   tree: transporters
   tree_code: ko02000
 - best_effort_share: null
@@ -504,7 +530,7 @@ rows:
   ontology_type: ec
   q1_genes_per_term: 5.0
   q3_genes_per_term: 9.5
-  relevance_rank: 38
+  relevance_rank: 40
 - best_effort_share: null
   genome_coverage: 0.0329
   level: 0
@@ -517,7 +543,7 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 42.0
   q3_genes_per_term: 56.0
-  relevance_rank: 39
+  relevance_rank: 41
   tree: trna_biogenesis
   tree_code: ko03016
 - best_effort_share: null
@@ -532,9 +558,22 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 12.0
   q3_genes_per_term: 20.0
-  relevance_rank: 40
+  relevance_rank: 42
   tree: trna_biogenesis
   tree_code: ko03016
+- best_effort_share: null
+  genome_coverage: 0.0304
+  level: 2
+  max_genes_per_term: 52
+  median_genes_per_term: 30.0
+  min_genes_per_term: 8
+  n_genes_at_level: 60
+  n_levels_in_ontology: 5
+  n_terms_with_genes: 2
+  ontology_type: tcdb
+  q1_genes_per_term: 19.0
+  q3_genes_per_term: 41.0
+  relevance_rank: 43
 - best_effort_share: null
   genome_coverage: 0.0273
   level: 2
@@ -547,7 +586,7 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 17.0
   q3_genes_per_term: 29.0
-  relevance_rank: 41
+  relevance_rank: 44
   tree: ribosome
   tree_code: ko03011
 - best_effort_share: null
@@ -562,7 +601,7 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 54.0
   q3_genes_per_term: 54.0
-  relevance_rank: 42
+  relevance_rank: 45
   tree: ribosome
   tree_code: ko03011
 - best_effort_share: null
@@ -577,7 +616,7 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 42.0
   q3_genes_per_term: 54.0
-  relevance_rank: 43
+  relevance_rank: 46
   tree: ribosome
   tree_code: ko03011
 - best_effort_share: 0.0
@@ -592,7 +631,7 @@ rows:
   ontology_type: go_cc
   q1_genes_per_term: 257.0
   q3_genes_per_term: 257.0
-  relevance_rank: 44
+  relevance_rank: 47
 - best_effort_share: null
   genome_coverage: 0.0223
   level: 2
@@ -605,7 +644,7 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 8.0
   q3_genes_per_term: 14.5
-  relevance_rank: 45
+  relevance_rank: 48
   tree: trna_biogenesis
   tree_code: ko03016
 - best_effort_share: 0.0
@@ -620,7 +659,7 @@ rows:
   ontology_type: go_cc
   q1_genes_per_term: 17.5
   q3_genes_per_term: 26.5
-  relevance_rank: 46
+  relevance_rank: 49
 - best_effort_share: null
   genome_coverage: 0.0192
   level: 0
@@ -633,7 +672,7 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 10.5
   q3_genes_per_term: 16.5
-  relevance_rank: 47
+  relevance_rank: 50
   tree: peptidases
   tree_code: ko01002
 - best_effort_share: null
@@ -648,9 +687,22 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 5.75
   q3_genes_per_term: 9.0
-  relevance_rank: 48
+  relevance_rank: 51
   tree: enzymes
   tree_code: ko01000
+- best_effort_share: null
+  genome_coverage: 0.0127
+  level: 3
+  max_genes_per_term: 7
+  median_genes_per_term: 5.5
+  min_genes_per_term: 5
+  n_genes_at_level: 25
+  n_levels_in_ontology: 5
+  n_terms_with_genes: 6
+  ontology_type: tcdb
+  q1_genes_per_term: 5.0
+  q3_genes_per_term: 6.75
+  relevance_rank: 52
 - best_effort_share: null
   genome_coverage: 0.0121
   level: 0
@@ -663,9 +715,22 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 5.5
   q3_genes_per_term: 9.5
-  relevance_rank: 49
+  relevance_rank: 53
   tree: chaperones
   tree_code: ko03110
+- best_effort_share: null
+  genome_coverage: 0.0116
+  level: 0
+  max_genes_per_term: 17
+  median_genes_per_term: 11.5
+  min_genes_per_term: 6
+  n_genes_at_level: 23
+  n_levels_in_ontology: 2
+  n_terms_with_genes: 2
+  ontology_type: cazy
+  q1_genes_per_term: 8.75
+  q3_genes_per_term: 14.25
+  relevance_rank: 54
 - best_effort_share: null
   genome_coverage: 0.0111
   level: 0
@@ -678,7 +743,7 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 22.0
   q3_genes_per_term: 22.0
-  relevance_rank: 50
+  relevance_rank: 55
   tree: dna_replication
   tree_code: ko03032
 - best_effort_share: null
@@ -693,7 +758,7 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 7.5
   q3_genes_per_term: 10.5
-  relevance_rank: 51
+  relevance_rank: 56
   tree: dna_replication
   tree_code: ko03032
 - best_effort_share: null
@@ -708,7 +773,7 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 11.75
   q3_genes_per_term: 13.25
-  relevance_rank: 52
+  relevance_rank: 57
   tree: translation_factors
   tree_code: ko03012
 - best_effort_share: null
@@ -723,7 +788,7 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 7.0
   q3_genes_per_term: 9.0
-  relevance_rank: 53
+  relevance_rank: 58
   tree: dna_replication
   tree_code: ko03032
 - best_effort_share: null
@@ -738,7 +803,7 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 5.0
   q3_genes_per_term: 5.5
-  relevance_rank: 54
+  relevance_rank: 59
   tree: transporters
   tree_code: ko02000
 - best_effort_share: null
@@ -753,7 +818,7 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 10.0
   q3_genes_per_term: 10.0
-  relevance_rank: 55
+  relevance_rank: 60
   tree: transcription_factors
   tree_code: ko03000
 - best_effort_share: null
@@ -768,7 +833,7 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 9.0
   q3_genes_per_term: 9.0
-  relevance_rank: 56
+  relevance_rank: 61
   tree: secretion
   tree_code: ko02044
 - best_effort_share: null
@@ -783,7 +848,7 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 9.0
   q3_genes_per_term: 9.0
-  relevance_rank: 57
+  relevance_rank: 62
   tree: secretion
   tree_code: ko02044
 - best_effort_share: null
@@ -798,7 +863,7 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 7.0
   q3_genes_per_term: 7.0
-  relevance_rank: 58
+  relevance_rank: 63
   tree: translation_factors
   tree_code: ko03012
 - best_effort_share: null
@@ -813,7 +878,7 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 7.0
   q3_genes_per_term: 7.0
-  relevance_rank: 59
+  relevance_rank: 64
   tree: transcription_factors
   tree_code: ko03000
 - best_effort_share: 1.0
@@ -828,7 +893,7 @@ rows:
   ontology_type: go_bp
   q1_genes_per_term: 7.0
   q3_genes_per_term: 7.0
-  relevance_rank: 60
+  relevance_rank: 65
 - best_effort_share: null
   genome_coverage: 0.003
   level: 0
@@ -841,9 +906,22 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 6.0
   q3_genes_per_term: 6.0
-  relevance_rank: 61
+  relevance_rank: 66
   tree: two_component
   tree_code: ko02022
+- best_effort_share: null
+  genome_coverage: 0.003
+  level: 1
+  max_genes_per_term: 6
+  median_genes_per_term: 6.0
+  min_genes_per_term: 6
+  n_genes_at_level: 6
+  n_levels_in_ontology: 2
+  n_terms_with_genes: 1
+  ontology_type: cazy
+  q1_genes_per_term: 6.0
+  q3_genes_per_term: 6.0
+  relevance_rank: 67
 - best_effort_share: null
   genome_coverage: 0.003
   level: 3
@@ -856,6 +934,19 @@ rows:
   ontology_type: brite
   q1_genes_per_term: 6.0
   q3_genes_per_term: 6.0
-  relevance_rank: 62
+  relevance_rank: 68
   tree: dna_replication
   tree_code: ko03032
+- best_effort_share: null
+  genome_coverage: 0.0025
+  level: 4
+  max_genes_per_term: 5
+  median_genes_per_term: 5.0
+  min_genes_per_term: 5
+  n_genes_at_level: 5
+  n_levels_in_ontology: 5
+  n_terms_with_genes: 2
+  ontology_type: tcdb
+  q1_genes_per_term: 5.0
+  q3_genes_per_term: 5.0
+  relevance_rank: 69

@@ -5444,3 +5444,116 @@ class TestGenesByMetaboliteWrapper:
 
     def test_in_expected_tools(self):
         assert "genes_by_metabolite" in EXPECTED_TOOLS
+
+
+# ---------------------------------------------------------------------------
+# tcdb / cazy: Literal enum acceptance on the 5 ontology wrappers
+# ---------------------------------------------------------------------------
+class TestOntologyLiteralAcceptsTcdbCazy:
+    """The closed Literal[...] enums on the 5 ontology wrappers must accept
+    'tcdb' and 'cazy'. We introspect the type hints (FastMCP uses these to
+    build the JSON schema enforced at the MCP protocol boundary) — calling
+    tool_fns[...] bypasses Pydantic validation, so the introspection test
+    is the right enforcement point. (search_ontology uses an open `str`,
+    so it has no Literal — only its description string changes.)
+    """
+
+    @staticmethod
+    def _ontology_hint_str(tool_fns, tool_name: str) -> str:
+        import typing
+        fn = tool_fns[tool_name]
+        hints = typing.get_type_hints(fn, include_extras=True)
+        ontology_hint = hints.get("ontology")
+        assert ontology_hint is not None, (
+            f"ontology parameter not found in type hints for {tool_name}"
+        )
+        return str(ontology_hint)
+
+    def test_genes_by_ontology_literal_includes_tcdb_cazy(self, tool_fns):
+        hint_str = self._ontology_hint_str(tool_fns, "genes_by_ontology")
+        assert "Literal" in hint_str, (
+            f"Expected Literal in genes_by_ontology ontology hint, got: {hint_str}"
+        )
+        assert "'tcdb'" in hint_str, (
+            f"Expected 'tcdb' in genes_by_ontology ontology Literal, got: {hint_str}"
+        )
+        assert "'cazy'" in hint_str, (
+            f"Expected 'cazy' in genes_by_ontology ontology Literal, got: {hint_str}"
+        )
+
+    def test_gene_ontology_terms_literal_includes_tcdb_cazy(self, tool_fns):
+        hint_str = self._ontology_hint_str(tool_fns, "gene_ontology_terms")
+        assert "Literal" in hint_str, (
+            f"Expected Literal in gene_ontology_terms ontology hint, got: {hint_str}"
+        )
+        assert "'tcdb'" in hint_str
+        assert "'cazy'" in hint_str
+
+    def test_ontology_landscape_literal_includes_tcdb_cazy(self, tool_fns):
+        hint_str = self._ontology_hint_str(tool_fns, "ontology_landscape")
+        assert "Literal" in hint_str, (
+            f"Expected Literal in ontology_landscape ontology hint, got: {hint_str}"
+        )
+        assert "'tcdb'" in hint_str
+        assert "'cazy'" in hint_str
+
+    def test_pathway_enrichment_literal_includes_tcdb_cazy(self, tool_fns):
+        hint_str = self._ontology_hint_str(tool_fns, "pathway_enrichment")
+        assert "Literal" in hint_str, (
+            f"Expected Literal in pathway_enrichment ontology hint, got: {hint_str}"
+        )
+        assert "'tcdb'" in hint_str
+        assert "'cazy'" in hint_str
+
+    def test_cluster_enrichment_literal_includes_tcdb_cazy(self, tool_fns):
+        hint_str = self._ontology_hint_str(tool_fns, "cluster_enrichment")
+        assert "Literal" in hint_str, (
+            f"Expected Literal in cluster_enrichment ontology hint, got: {hint_str}"
+        )
+        assert "'tcdb'" in hint_str
+        assert "'cazy'" in hint_str
+
+    def test_search_ontology_description_mentions_tcdb_cazy(self, tool_fns):
+        """search_ontology uses open `str` (no Literal); the description
+        string is the contract surface that lists supported ontology keys."""
+        import typing
+        fn = tool_fns["search_ontology"]
+        hints = typing.get_type_hints(fn, include_extras=True)
+        ontology_hint = hints.get("ontology")
+        assert ontology_hint is not None
+        # Annotated[str, Field(description="...")] — pull the description
+        # via metadata. Iterate __metadata__ in case there's more than one
+        # annotation entry.
+        descriptions = [
+            getattr(meta, "description", None) for meta in
+            getattr(ontology_hint, "__metadata__", ())
+        ]
+        joined = " ".join(d for d in descriptions if d)
+        assert "tcdb" in joined, (
+            f"search_ontology description should mention 'tcdb'; got: {joined!r}"
+        )
+        assert "cazy" in joined, (
+            f"search_ontology description should mention 'cazy'; got: {joined!r}"
+        )
+
+
+class TestExpectedToolsUnchangedForTcdbCazy:
+    """Adding tcdb/cazy as ontology dimensions does NOT add new tool entries.
+    EXPECTED_TOOLS must NOT grow."""
+
+    def test_no_new_tools_added(self, tool_fns):
+        # Sanity guardrail — implementer must not register any new tool.
+        assert "tcdb" not in tool_fns, (
+            "No tool should be named 'tcdb' — tcdb is a new ontology key, "
+            "not a new tool"
+        )
+        assert "cazy" not in tool_fns
+
+    def test_expected_tools_size_unchanged(self):
+        # Brittle but cheap check: tcdb/cazy add NO rows to EXPECTED_TOOLS.
+        # If this fails, someone added a new tool when the spec said no
+        # new tools should be added.
+        assert len(EXPECTED_TOOLS) == 32, (
+            f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
+            "this spec is a Mode-B surface refresh — no new tools."
+        )

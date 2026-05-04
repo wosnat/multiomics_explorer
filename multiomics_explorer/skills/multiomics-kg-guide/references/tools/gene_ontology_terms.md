@@ -18,7 +18,7 @@ expansion), use genes_by_ontology. Use search_ontology to find terms by text.
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags to look up. E.g. ['PMM0001', 'PMM0845']. |
 | organism | string | — | Organism (case-insensitive substring match, e.g. 'MED4'). Required — single-valued. |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite') \| None | None | Filter to one ontology. None returns all. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy') \| None | None | Filter to one ontology. None returns all. |
 | mode | string ('leaf', 'rollup') | leaf | 'leaf' returns most-specific annotations (default). 'rollup' walks up to ancestors at the given level. |
 | level | int \| None | None | Hierarchy level. In leaf mode: filter to leaves at this level. In rollup mode: required — target ancestor level (0 = broadest). |
 | tree | string \| None | None | BRITE tree name filter. Only valid when ontology='brite'. |
@@ -112,7 +112,36 @@ gene_ontology_terms(locus_tags=["PMM0001", "PMM0845"], organism="MED4", summary=
 gene_ontology_terms(locus_tags=["PMM0001", "PMM0845"], organism="MED4", ontology="brite", mode="rollup", level=1, tree="transporters")
 ```
 
-### Example 5: From overview to ontology details
+### Example 5: CAZy class membership rollup (which CAZy class does each gene belong to?)
+
+```example-call
+gene_ontology_terms(locus_tags=["PMM0584", "PMM1322"], organism="MED4", ontology="cazy", mode="rollup", level=0)
+```
+
+```example-response
+{
+  "total_matching": 4, "total_genes": 2, "total_terms": 2,
+  "by_ontology": [{"ontology_type": "cazy", "term_count": 2, "gene_count": 2}],
+  "by_term": [
+    {"term_id": "cazy:CBM", "term_name": "Carbohydrate-Binding Module", "ontology_type": "cazy", "count": 2},
+    {"term_id": "cazy:GH",  "term_name": "Glycoside Hydrolases",        "ontology_type": "cazy", "count": 2}
+  ],
+  "results": [
+    {"locus_tag": "PMM0584", "term_id": "cazy:CBM", "term_name": "Carbohydrate-Binding Module"},
+    {"locus_tag": "PMM0584", "term_id": "cazy:GH",  "term_name": "Glycoside Hydrolases"},
+    {"locus_tag": "PMM1322", "term_id": "cazy:CBM", "term_name": "Carbohydrate-Binding Module"},
+    {"locus_tag": "PMM1322", "term_id": "cazy:GH",  "term_name": "Glycoside Hydrolases"}
+  ]
+}
+```
+
+### Example 6: TCDB family annotations for a gene
+
+```example-call
+gene_ontology_terms(locus_tags=["PMM1129"], organism="MED4", ontology="tcdb")
+```
+
+### Example 7: From overview to ontology details
 
 ```
 Step 1: gene_overview(locus_tags=["PMM0001"])
@@ -149,6 +178,12 @@ resolve_gene → gene_ontology_terms
 - For brite: leaf annotations are KO-level terms (same leaf as kegg). Use ontology='brite' to filter; the returned term_ids are KO IDs shared with the kegg ontology.
 
 - Use `tree` to scope BRITE rollup to a single tree (e.g. 'transporters'). Without it, rollup mixes all BRITE trees.
+
+- Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `kegg`, `ec`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`.
+
+- CAZy rollup at `level=0` returns the 6 top-level classes (GH, GT, PL, CE, AA, CBM). Genes commonly belong to multiple top-level classes (e.g. a CBM-domain-containing GH); duplicates per `(gene × class)` are de-duped automatically.
+
+- TCDB substrate-level questions ('which genes does this metabolite bind to?') chain via `genes_by_metabolite`, NOT this tool. Use `gene_ontology_terms(ontology='tcdb')` for *family*-level annotations (e.g. 'what TCDB family does PMM1129 belong to?').
 
 ## Package import equivalent
 

@@ -15,7 +15,7 @@ experiments' quantified genes. See docs://tools/ontology_landscape.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | organism | string | — | Organism (fuzzy match, e.g. 'MED4'). |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite') \| None | None | If None, surveys all 10 ontologies. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy') \| None | None | If None, surveys all 12 ontologies. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. |
 | experiment_ids | list[string] \| None | None | Restrict coverage computation to genes quantified in these experiments. |
 | summary | bool | False | If true, omit per-row results (by_ontology only). |
@@ -104,7 +104,27 @@ ontology_landscape(organism="MED4", ontology="go_bp", verbose=True)
 ontology_landscape(organism="MED4", ontology="brite", tree="transporters")
 ```
 
-### Example 4: Weight by experiments (coverage of quantified genes)
+### Example 4: TCDB and CAZy in the multi-ontology fan-out
+
+```example-call
+ontology_landscape(organism="MED4")
+```
+
+```example-response
+{"organism_name": "Prochlorococcus MED4", "n_ontologies": 12,
+ "by_ontology": {
+   "tigr_role": {"best_level": 0, "best_genome_coverage": 0.893, "best_relevance_rank": 1, "n_levels": 1},
+   "tcdb":      {"best_level": 0, "best_genome_coverage": 0.04,  "best_relevance_rank": 11, "n_levels": 5},
+   "cazy":      {"best_level": 0, "best_genome_coverage": 0.012, "best_relevance_rank": 12, "n_levels": 2}
+ },
+ "results": [
+   {"ontology_type": "tcdb", "level": 0, "level_kind": "tc_class",   "n_terms_with_genes": 3, "min_genes_per_term": 8, "max_genes_per_term": 67},
+   {"ontology_type": "tcdb", "level": 3, "level_kind": "tc_subfamily", "n_terms_with_genes": 6, "min_genes_per_term": 5, "max_genes_per_term": 7},
+   {"ontology_type": "cazy", "level": 0, "level_kind": "cazy_class",  "n_terms_with_genes": 2, "min_genes_per_term": 6, "max_genes_per_term": 17}
+ ]}
+```
+
+### Example 5: Weight by experiments (coverage of quantified genes)
 
 ```
 Step 1: list_experiments(organism="MED4", table_scope=["all_detected_genes"])
@@ -146,6 +166,12 @@ results[0]['relevance_rank']
 ```
 
 - BRITE stats at each level mix all trees together by default. Use `tree` to scope to a single BRITE tree (e.g. `tree='transporters'`). BRITE rows are broken down per tree when `tree` is specified. Use `list_filter_values('brite_tree')` to discover available trees.
+
+- Default surveys all 12 ontologies (`go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`).
+
+- CAZy is a small ontology (64 nodes — 6 classes + 58 families). With default `min_gene_set_size=5`, only a handful of CAZy terms ever pass the filter — typically 1–2 rows per organism. This is expected, not a bug. Pass `min_gene_set_size=1` to see all CAZy classes/families.
+
+- TCDB and CAZy use organism-scoped term-size stats just like the other ontologies. TCDB has 5 levels (`tc_class`...`tc_specificity`); CAZy has 2 (`cazy_class`, `cazy_family`).
 
 ```mistake
 result['total_rows']  # KeyError
