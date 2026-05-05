@@ -6478,3 +6478,309 @@ class TestOntologyLandscapeF1SurfaceWrapper:
                 mock_ctx, organism="MED4", informative_only=False,
             )
         assert mock_api.call_args.kwargs["informative_only"] is False
+
+
+# ===========================================================================
+# A3 — Enrichment defaults wrapper layer (frozen spec 2026-05-04)
+# ===========================================================================
+# pathway_enrichment + cluster_enrichment MCP wrappers add `informative_only`
+# (default True per spec § Decisions locked) and the per-row `is_informative`
+# field on PathwayEnrichmentResult / ClusterEnrichmentResult.
+#
+# The two existing top-level introspection tests
+# (TestPathwayEnrichmentWrapper.test_every_result_field_has_description and
+# TestClusterEnrichmentWrapper.test_every_result_field_has_description) already
+# loop over .model_fields, so once `is_informative: bool = Field(description=...)`
+# is added by the api-updater, those tests automatically cover the new field's
+# Field(description=...) contract — no new test required for that.
+
+
+class TestPathwayEnrichmentInformativeOnlyWrapper:
+    """pathway_enrichment MCP wrapper threads `informative_only` (default True)
+    and surfaces `is_informative` on per-row Pydantic models."""
+
+    _SAMPLE_API_ENVELOPE = {
+        "organism_name": "MED4",
+        "ontology": "cyanorak_role",
+        "level": 1,
+        "total_matching": 1,
+        "returned": 1, "truncated": False, "offset": 0,
+        "n_significant": 1,
+        "by_experiment": [],
+        "by_direction": [],
+        "by_omics_type": [],
+        "cluster_summary": {
+            "n_clusters": 1,
+            "n_tests_min": 1, "n_tests_median": 1.0, "n_tests_max": 1,
+            "n_significant_min": 1, "n_significant_median": 1.0, "n_significant_max": 1,
+            "universe_size_min": 3, "universe_size_median": 3.0, "universe_size_max": 3,
+        },
+        "top_clusters_by_min_padj": [],
+        "top_pathways_by_padj": [],
+        "not_found": [], "not_matched": [], "no_expression": [],
+        "term_validation": {
+            "not_found": [], "wrong_ontology": [],
+            "wrong_level": [], "filtered_out": [],
+        },
+        "clusters_skipped": [],
+        "results": [
+            {
+                "cluster": "exp1|T0|up",
+                "experiment_id": "exp1",
+                "name": "exp1",
+                "timepoint": "T0",
+                "timepoint_hours": 0.0,
+                "timepoint_order": 0,
+                "direction": "up",
+                "omics_type": "transcriptomics",
+                "table_scope": "rnaseq",
+                "treatment_type": ["light_dark"],
+                "background_factors": [],
+                "is_time_course": False,
+                "growth_phase": None,
+                "term_id": "CR:OK",
+                "term_name": "Real Pathway",
+                "level": 1,
+                "is_informative": True,
+                "gene_ratio": "2/2",
+                "gene_ratio_numeric": 1.0,
+                "bg_ratio": "2/3",
+                "bg_ratio_numeric": 0.6667,
+                "rich_factor": 1.0,
+                "fold_enrichment": 1.5,
+                "pvalue": 0.001,
+                "p_adjust": 0.001,
+                "count": 2,
+                "bg_count": 2,
+                "signed_score": 3.0,
+            },
+        ],
+    }
+
+    @staticmethod
+    def _api_result_double():
+        """Mock api.pathway_enrichment return — the wrapper calls
+        `result.to_envelope(...)`, so we need an object with that method."""
+        envelope = TestPathwayEnrichmentInformativeOnlyWrapper._SAMPLE_API_ENVELOPE
+
+        class _Result:
+            @staticmethod
+            def to_envelope(*, summary=False, limit=None, offset=0):
+                return dict(envelope)
+        return _Result()
+
+    @pytest.mark.asyncio
+    async def test_informative_only_default_true(self, tool_fns, mock_ctx):
+        """Spec § Default value: pathway_enrichment defaults informative_only=True."""
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.pathway_enrichment",
+            return_value=self._api_result_double(),
+        ) as mock_api:
+            await tool_fns["pathway_enrichment"](
+                mock_ctx, organism="MED4", experiment_ids=["exp1"],
+                ontology="cyanorak_role", level=1,
+            )
+        assert mock_api.call_args.kwargs.get("informative_only") is True, (
+            "Wrapper default must be informative_only=True (spec § Decisions locked)"
+        )
+
+    @pytest.mark.asyncio
+    async def test_informative_only_explicit_false_threaded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.pathway_enrichment",
+            return_value=self._api_result_double(),
+        ) as mock_api:
+            await tool_fns["pathway_enrichment"](
+                mock_ctx, organism="MED4", experiment_ids=["exp1"],
+                ontology="cyanorak_role", level=1,
+                informative_only=False,
+            )
+        assert mock_api.call_args.kwargs["informative_only"] is False
+
+    @pytest.mark.asyncio
+    async def test_informative_only_explicit_true_threaded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.pathway_enrichment",
+            return_value=self._api_result_double(),
+        ) as mock_api:
+            await tool_fns["pathway_enrichment"](
+                mock_ctx, organism="MED4", experiment_ids=["exp1"],
+                ontology="cyanorak_role", level=1,
+                informative_only=True,
+            )
+        assert mock_api.call_args.kwargs["informative_only"] is True
+
+    @pytest.mark.asyncio
+    async def test_is_informative_present_on_per_row_model(self, tool_fns, mock_ctx):
+        """Spec § Pydantic field shape: is_informative on PathwayEnrichmentResult."""
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.pathway_enrichment",
+            return_value=self._api_result_double(),
+        ):
+            response = await tool_fns["pathway_enrichment"](
+                mock_ctx, organism="MED4", experiment_ids=["exp1"],
+                ontology="cyanorak_role", level=1,
+            )
+        assert hasattr(response.results[0], "is_informative"), (
+            "PathwayEnrichmentResult must expose `is_informative` per-row"
+        )
+        assert response.results[0].is_informative is True
+
+    def test_is_informative_field_required(self):
+        """Spec § Pydantic field shape: required field, not Optional.
+        Pydantic must reject a row dict missing `is_informative`."""
+        from pydantic import ValidationError
+        from multiomics_explorer.mcp_server.tools import PathwayEnrichmentResult
+
+        # Build a minimum-viable row WITHOUT is_informative; expect ValidationError.
+        row_without = dict(self._SAMPLE_API_ENVELOPE["results"][0])
+        row_without.pop("is_informative", None)
+        with pytest.raises(ValidationError) as excinfo:
+            PathwayEnrichmentResult(**row_without)
+        assert "is_informative" in str(excinfo.value)
+
+    def test_is_informative_field_in_model_fields(self):
+        """The new field must appear on model_fields with a description."""
+        from multiomics_explorer.mcp_server.tools import PathwayEnrichmentResult
+
+        assert "is_informative" in PathwayEnrichmentResult.model_fields
+        field = PathwayEnrichmentResult.model_fields["is_informative"]
+        # Required field — Pydantic v2: PydanticUndefined as default sentinel.
+        assert field.is_required(), (
+            "is_informative must be required (spec § Pydantic field shape)"
+        )
+        assert field.description, "is_informative must have a Field(description=...)"
+
+
+class TestClusterEnrichmentInformativeOnlyWrapper:
+    """cluster_enrichment MCP wrapper — parallel of
+    TestPathwayEnrichmentInformativeOnlyWrapper (Mode-B template-and-extend)."""
+
+    _SAMPLE_API_ENVELOPE = {
+        "analysis_id": "ca:test",
+        "analysis_name": "Test Analysis",
+        "organism_name": "MED4",
+        "cluster_method": "kmeans",
+        "cluster_type": "diel_cycle",
+        "omics_type": "transcriptomics",
+        "treatment_type": ["light_dark"],
+        "background_factors": [],
+        "growth_phases": [],
+        "experiment_ids": ["exp:1"],
+        "ontology": "cyanorak_role",
+        "level": 1,
+        "tree": None,
+        "total_matching": 1,
+        "returned": 1, "truncated": False, "offset": 0,
+        "n_significant": 1,
+        "by_cluster": [],
+        "by_term": [],
+        "clusters_tested": 1,
+        "not_found": [], "not_matched": [],
+        "clusters_skipped": [],
+        "term_validation": {
+            "not_found": [], "wrong_ontology": [],
+            "wrong_level": [], "filtered_out": [],
+        },
+        "results": [
+            {
+                "cluster": "Cluster A",
+                "cluster_id": "gc:1",
+                "term_id": "CR:OK",
+                "term_name": "Real Pathway",
+                "level": 1,
+                "is_informative": True,
+                "gene_ratio": "2/2",
+                "gene_ratio_numeric": 1.0,
+                "bg_ratio": "2/3",
+                "bg_ratio_numeric": 0.6667,
+                "rich_factor": 1.0,
+                "fold_enrichment": 1.5,
+                "pvalue": 0.001,
+                "p_adjust": 0.001,
+                "count": 2,
+                "bg_count": 2,
+            },
+        ],
+    }
+
+    @staticmethod
+    def _api_result_double():
+        envelope = TestClusterEnrichmentInformativeOnlyWrapper._SAMPLE_API_ENVELOPE
+
+        class _Result:
+            @staticmethod
+            def to_envelope(*, summary=False, limit=None, offset=0):
+                return dict(envelope)
+        return _Result()
+
+    @pytest.mark.asyncio
+    async def test_informative_only_default_true(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.cluster_enrichment",
+            return_value=self._api_result_double(),
+        ) as mock_api:
+            await tool_fns["cluster_enrichment"](
+                mock_ctx, analysis_id="ca:test", organism="MED4",
+                ontology="cyanorak_role", level=1,
+            )
+        assert mock_api.call_args.kwargs.get("informative_only") is True
+
+    @pytest.mark.asyncio
+    async def test_informative_only_explicit_false_threaded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.cluster_enrichment",
+            return_value=self._api_result_double(),
+        ) as mock_api:
+            await tool_fns["cluster_enrichment"](
+                mock_ctx, analysis_id="ca:test", organism="MED4",
+                ontology="cyanorak_role", level=1,
+                informative_only=False,
+            )
+        assert mock_api.call_args.kwargs["informative_only"] is False
+
+    @pytest.mark.asyncio
+    async def test_informative_only_explicit_true_threaded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.cluster_enrichment",
+            return_value=self._api_result_double(),
+        ) as mock_api:
+            await tool_fns["cluster_enrichment"](
+                mock_ctx, analysis_id="ca:test", organism="MED4",
+                ontology="cyanorak_role", level=1,
+                informative_only=True,
+            )
+        assert mock_api.call_args.kwargs["informative_only"] is True
+
+    @pytest.mark.asyncio
+    async def test_is_informative_present_on_per_row_model(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.cluster_enrichment",
+            return_value=self._api_result_double(),
+        ):
+            response = await tool_fns["cluster_enrichment"](
+                mock_ctx, analysis_id="ca:test", organism="MED4",
+                ontology="cyanorak_role", level=1,
+            )
+        assert hasattr(response.results[0], "is_informative")
+        assert response.results[0].is_informative is True
+
+    def test_is_informative_field_required(self):
+        from pydantic import ValidationError
+        from multiomics_explorer.mcp_server.tools import ClusterEnrichmentResult
+
+        row_without = dict(self._SAMPLE_API_ENVELOPE["results"][0])
+        row_without.pop("is_informative", None)
+        with pytest.raises(ValidationError) as excinfo:
+            ClusterEnrichmentResult(**row_without)
+        assert "is_informative" in str(excinfo.value)
+
+    def test_is_informative_field_in_model_fields(self):
+        from multiomics_explorer.mcp_server.tools import ClusterEnrichmentResult
+
+        assert "is_informative" in ClusterEnrichmentResult.model_fields
+        field = ClusterEnrichmentResult.model_fields["is_informative"]
+        assert field.is_required(), (
+            "is_informative must be required (spec § Pydantic field shape)"
+        )
+        assert field.description, "is_informative must have a Field(description=...)"

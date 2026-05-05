@@ -37,6 +37,17 @@ verbose_fields:
   - background_gene_ids
 
 response_notes:
+  - title: "`informative_only` filter (default 2026-05)"
+    body: |
+      When True (default), exclude ontology terms flagged uninformative
+      in the KG (e.g. KEGG map00001 'metabolic pathways', GO root
+      go:0008150). Term-side filter — never restricts the gene set,
+      background, or DE inputs. Pass False to include uninformative terms;
+      per-row `is_informative` still surfaces in either mode.
+
+      See `docs://analysis/enrichment` (section "Informative-only filtering")
+      for rationale, Fisher denominator behavior, and opt-out guidance.
+
   - title: "Cluster naming"
     body: |
       Cluster IDs returned in `results[].cluster` follow the canonical format:
@@ -62,8 +73,10 @@ chaining:
   - "ontology_landscape → genes_by_ontology(level=N) → pathway_enrichment"
   - "pathway_enrichment → gene_overview"
   - "differential_expression_by_gene → pathway_enrichment"
+  - "See `docs://analysis/enrichment` for the full methodology, including the `informative_only` (default `True` since 2026-05) filter semantics."
 
 mistakes:
+  - "Caller pinning row counts from pre-2026-05 runs sees fewer rows by default. Pass `informative_only=False` to restore old behavior, or accept the new default (recommended)."
   - "Default background is `table_scope` (per-experiment quantified set). `'organism'` inflates the denominator and underestimates enrichment. See `docs://analysis/enrichment` for the full methodology note."
   - "BH correction is per-cluster (experiment × timepoint × direction), NOT across clusters. Cross-experiment FDR is biological replication, not statistical."
   - "Single-organism enforced. Run separate calls per organism."
