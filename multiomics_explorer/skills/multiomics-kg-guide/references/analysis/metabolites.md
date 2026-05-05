@@ -207,11 +207,12 @@ de = differential_expression_by_gene(
 ### Discovery
 
 ```python
-# Find metabolomics experiments (filterable by treatment/background).
-exps = list_experiments(omics_types=["METABOLOMICS"])
+# Find metabolomics experiments (kwarg is `omics_type`, takes a list).
+exps = list_experiments(omics_type=["METABOLOMICS"])
 
-# Find papers.
-pubs = list_publications(omics_types=["METABOLOMICS"])
+# Find papers — `list_publications` has NO omics filter today (audit Part 3a P0).
+# Workaround: search_text or run_cypher.
+pubs = list_publications(search_text="metabolomics")
 # (Audit Part 3a calls these out as P0 measurement-rollup pass-through gaps.)
 ```
 

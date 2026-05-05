@@ -73,6 +73,7 @@ _EXPECTED_ANALYSIS_RESOURCES = {
 # Example scripts served explicitly (not auto-discovered from .md files)
 _EXPECTED_EXAMPLE_RESOURCES = {
     "docs://examples/pathway_enrichment.py",
+    "docs://examples/metabolites.py",
 }
 _EXPECTED_RESOURCES = (
     _EXPECTED_TOOL_RESOURCES
