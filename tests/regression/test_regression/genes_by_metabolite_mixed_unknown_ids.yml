@@ -1,26 +1,26 @@
 by_evidence_source:
-- count: 19
+- count: 22
   evidence_source: transport
 - count: 4
   evidence_source: metabolism
 by_metabolite:
 - formula: CH4N2O
-  gene_count: 18
+  gene_count: 21
   metabolism_rows: 4
   metabolite_id: kegg.compound:C00086
   name: Urea
   reaction_count: 2
-  rows: 23
-  transport_family_inferred_rows: 9
+  rows: 26
+  transport_family_inferred_rows: 12
   transport_substrate_confirmed_rows: 10
   transporter_count: 3
 by_transport_confidence:
+- count: 12
+  transport_confidence: family_inferred
 - count: 10
   transport_confidence: substrate_confirmed
-- count: 9
-  transport_confidence: family_inferred
 case_id: genes_by_metabolite_mixed_unknown_ids
-gene_count_total: 18
+gene_count_total: 21
 metabolite_count_total: 1
 not_found:
   metabolite_ids:
@@ -107,7 +107,7 @@ top_gene_categories:
 - category: Stress response and adaptation
   gene_count: 11
 - category: Transport
-  gene_count: 5
+  gene_count: 8
 - category: Carbohydrate metabolism
   gene_count: 1
 - category: Cellular processes
@@ -153,6 +153,22 @@ top_genes:
   transport_family_inferred_rows: 0
   transport_substrate_confirmed_rows: 2
   transporter_count: 2
+- gene_name: ecfA1
+  locus_tag: PMM0125
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 1
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 1
+- gene_name: cbiQ
+  locus_tag: PMM0392
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 1
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 1
 - gene_name: ftsE
   locus_tag: PMM0434
   metabolism_rows: 0
@@ -177,22 +193,6 @@ top_genes:
   transport_family_inferred_rows: 1
   transport_substrate_confirmed_rows: 0
   transporter_count: 1
-- gene_name: devC
-  locus_tag: PMM0749
-  metabolism_rows: 0
-  metabolite_count: 1
-  reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
-  transporter_count: 1
-- gene_name: devA
-  locus_tag: PMM0750
-  metabolism_rows: 0
-  metabolite_count: 1
-  reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
-  transporter_count: 1
 top_reactions:
 - ec_numbers:
   - 3.5.1.5
@@ -208,7 +208,7 @@ top_reactions:
   name: agmatine amidinohydrolase; Agmatine + H2O <=> Putrescine + Urea
   reaction_id: kegg.reaction:R01157
 top_tcdb_families:
-- gene_count: 9
+- gene_count: 12
   level_kind: tc_family
   metabolite_count: 1
   tcdb_family_id: tcdb:3.A.1
@@ -226,7 +226,10 @@ top_tcdb_families:
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: 3.A.1.4.5
   transport_confidence: substrate_confirmed
-total_matching: 23
+total_matching: 26
 transporter_count_total: 3
 truncated: true
-warnings: []
+warnings:
+- Majority of transport rows are family_inferred (rolled-up from broad TCDB families).
+  Re-run with transport_confidence='substrate_confirmed' for substrate-curated transporter
+  genes only.

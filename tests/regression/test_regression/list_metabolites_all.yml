@@ -1,14 +1,14 @@
 by_evidence_source:
 - count: 2188
   evidence_source: metabolism
-- count: 1097
+- count: 1355
   evidence_source: transport
 - count: 107
   evidence_source: metabolomics
 case_id: list_metabolites_all
 mass_stats:
   mass_max: 5227.103
-  mass_median: 243.213
+  mass_median: 242.231
   mass_min: 1.00794
 not_found:
   metabolite_ids: []
@@ -24,7 +24,7 @@ results:
   - metabolism
   - transport
   formula: H2O
-  gene_count: 8150
+  gene_count: 8157
   mass: 18.015
   metabolite_id: kegg.compound:C00001
   name: H2O
@@ -48,7 +48,7 @@ results:
   - kegg.pathway:ko05022
   - kegg.pathway:ko05208
   - kegg.pathway:ko05415
-  transporter_count: 107
+  transporter_count: 117
 - chebi_id: '10744'
   elements:
   - H
@@ -56,7 +56,7 @@ results:
   - metabolism
   - transport
   formula: H
-  gene_count: 5405
+  gene_count: 6045
   mass: 1.0079
   metabolite_id: kegg.compound:C00080
   name: H+
@@ -90,7 +90,7 @@ results:
   - kegg.pathway:ko05120
   - kegg.pathway:ko05164
   - kegg.pathway:ko05323
-  transporter_count: 289
+  transporter_count: 437
 - chebi_id: '10789'
   elements:
   - C
@@ -102,7 +102,7 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O13P3
-  gene_count: 4559
+  gene_count: 4562
   mass: 503.15
   metabolite_id: kegg.compound:C00002
   name: ATP
@@ -142,7 +142,7 @@ results:
   - kegg.pathway:ko05133
   - kegg.pathway:ko05410
   - kegg.pathway:ko05415
-  transporter_count: 18
+  transporter_count: 47
 - chebi_id: '14791'
   elements:
   - H
@@ -152,7 +152,7 @@ results:
   - metabolism
   - transport
   formula: HO4P
-  gene_count: 3823
+  gene_count: 3912
   mass: 95.978
   metabolite_id: kegg.compound:C00009
   name: Orthophosphate
@@ -169,7 +169,7 @@ results:
   - kegg.pathway:ko04978
   - kegg.pathway:ko05012
   - kegg.pathway:ko05022
-  transporter_count: 39
+  transporter_count: 109
 - chebi_id: '13420'
   elements:
   - H
@@ -179,7 +179,7 @@ results:
   - metabolism
   - transport
   formula: HO7P2
-  gene_count: 3253
+  gene_count: 3254
   mass: 174.949
   metabolite_id: kegg.compound:C00013
   name: Diphosphate
@@ -189,46 +189,46 @@ results:
   - kegg.pathway:ko00190
   - kegg.pathway:ko05012
   - kegg.pathway:ko05022
-  transporter_count: 2
+  transporter_count: 5
 returned: 5
 row_count: 5
 score_max: null
 score_median: null
 top_organisms:
-- count: 2294
-  organism_name: Ruegeria pomeroyi DSS-3
-- count: 2258
+- count: 2551
   organism_name: Pseudomonas putida KT2440
-- count: 2212
+- count: 2325
+  organism_name: Ruegeria pomeroyi DSS-3
+- count: 2228
   organism_name: Alteromonas (MarRef v6)
-- count: 2186
+- count: 2213
   organism_name: Shewanella sp. W3-18-1
-- count: 2172
+- count: 2193
   organism_name: Alteromonas macleodii EZ55
-- count: 2095
+- count: 2116
   organism_name: Alteromonas macleodii MIT1002
-- count: 2092
+- count: 2112
   organism_name: Alteromonas macleodii BGP6
-- count: 2079
+- count: 2098
   organism_name: Alteromonas macleodii HOT1A3
-- count: 2062
+- count: 2093
+  organism_name: Marinobacter (MarRef v6)
+- count: 2082
   organism_name: Alteromonas macleodii ATCC27126
-- count: 2061
-  organism_name: Alteromonas macleodii AD45
 top_pathways:
-- count: 1565
+- count: 1588
   pathway_id: kegg.pathway:ko01100
   pathway_name: Metabolic pathways
-- count: 585
+- count: 596
   pathway_id: kegg.pathway:ko01110
   pathway_name: Biosynthesis of secondary metabolites
-- count: 579
+- count: 587
   pathway_id: kegg.pathway:ko01120
   pathway_name: Microbial metabolism in diverse environments
-- count: 283
+- count: 286
   pathway_id: kegg.pathway:ko01240
   pathway_name: Biosynthesis of cofactors
-- count: 142
+- count: 146
   pathway_id: kegg.pathway:ko01220
   pathway_name: Degradation of aromatic compounds
 - count: 125
@@ -246,10 +246,10 @@ top_pathways:
 - count: 90
   pathway_id: kegg.pathway:ko00860
   pathway_name: Porphyrin metabolism
-total_entries: 3035
-total_matching: 3035
+total_entries: 3218
+total_matching: 3218
 truncated: true
 xref_coverage:
-  with_chebi: 2732
-  with_hmdb: 1427
-  with_mnxm: 3031
+  with_chebi: 2915
+  with_hmdb: 1481
+  with_mnxm: 3214

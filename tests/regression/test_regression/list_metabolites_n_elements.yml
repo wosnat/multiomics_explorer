@@ -1,14 +1,14 @@
 by_evidence_source:
 - count: 1212
   evidence_source: metabolism
-- count: 491
+- count: 619
   evidence_source: transport
 - count: 78
   evidence_source: metabolomics
 case_id: list_metabolites_n_elements
 mass_stats:
   mass_max: 5227.103
-  mass_median: 328.192
+  mass_median: 322.799
   mass_min: 18.039
 not_found:
   metabolite_ids: []
@@ -27,7 +27,7 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O13P3
-  gene_count: 4559
+  gene_count: 4562
   mass: 503.15
   metabolite_id: kegg.compound:C00002
   name: ATP
@@ -67,7 +67,7 @@ results:
   - kegg.pathway:ko05133
   - kegg.pathway:ko05410
   - kegg.pathway:ko05415
-  transporter_count: 18
+  transporter_count: 47
 - chebi_id: '13222'
   elements:
   - C
@@ -79,7 +79,7 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O10P2
-  gene_count: 2705
+  gene_count: 2706
   mass: 424.179
   metabolite_id: kegg.compound:C00008
   name: ADP
@@ -106,7 +106,7 @@ results:
   - kegg.pathway:ko05012
   - kegg.pathway:ko05014
   - kegg.pathway:ko05022
-  transporter_count: 14
+  transporter_count: 45
 - chebi_id: '13393'
   elements:
   - C
@@ -118,7 +118,7 @@ results:
   - metabolism
   - transport
   formula: C21H26N7O14P2
-  gene_count: 2610
+  gene_count: 2611
   mass: 662.422
   metabolite_id: kegg.compound:C00003
   name: NAD+
@@ -139,7 +139,7 @@ results:
   - kegg.pathway:ko04936
   - kegg.pathway:ko04977
   - kegg.pathway:ko05208
-  transporter_count: 2
+  transporter_count: 10
 - chebi_id: '13395'
   elements:
   - C
@@ -150,8 +150,9 @@ results:
   evidence_sources:
   - metabolism
   - metabolomics
+  - transport
   formula: C21H27N7O14P2
-  gene_count: 2400
+  gene_count: 2401
   mass: 663.43
   metabolite_id: kegg.compound:C00004
   name: NADH
@@ -163,7 +164,7 @@ results:
   - kegg.pathway:ko04020
   - kegg.pathway:ko04714
   - kegg.pathway:ko04925
-  transporter_count: 0
+  transporter_count: 1
 - chebi_id: '12056'
   elements:
   - C
@@ -174,8 +175,9 @@ results:
   evidence_sources:
   - metabolism
   - metabolomics
+  - transport
   formula: C10H12N5O7P
-  gene_count: 1870
+  gene_count: 1871
   mass: 345.208
   metabolite_id: kegg.compound:C00020
   name: AMP
@@ -207,43 +209,43 @@ results:
   - kegg.pathway:ko05012
   - kegg.pathway:ko05022
   - kegg.pathway:ko05032
-  transporter_count: 0
+  transporter_count: 8
 returned: 5
 row_count: 5
 score_max: null
 score_median: null
 top_organisms:
-- count: 1271
-  organism_name: Ruegeria pomeroyi DSS-3
-- count: 1242
+- count: 1360
   organism_name: Pseudomonas putida KT2440
-- count: 1202
+- count: 1281
+  organism_name: Ruegeria pomeroyi DSS-3
+- count: 1209
   organism_name: Alteromonas (MarRef v6)
-- count: 1183
+- count: 1196
   organism_name: Shewanella sp. W3-18-1
-- count: 1140
+- count: 1146
   organism_name: Alteromonas macleodii EZ55
-- count: 1140
+- count: 1146
   organism_name: Alteromonas macleodii MIT1002
-- count: 1135
+- count: 1141
   organism_name: Alteromonas macleodii ATCC27126
-- count: 1134
+- count: 1140
   organism_name: Alteromonas macleodii BGP6
-- count: 1133
+- count: 1139
   organism_name: Alteromonas macleodii HOT1A3
-- count: 1126
+- count: 1132
   organism_name: Alteromonas macleodii AD45
 top_pathways:
-- count: 870
+- count: 880
   pathway_id: kegg.pathway:ko01100
   pathway_name: Metabolic pathways
-- count: 314
+- count: 320
   pathway_id: kegg.pathway:ko01110
   pathway_name: Biosynthesis of secondary metabolites
-- count: 198
+- count: 199
   pathway_id: kegg.pathway:ko01120
   pathway_name: Microbial metabolism in diverse environments
-- count: 181
+- count: 182
   pathway_id: kegg.pathway:ko01240
   pathway_name: Biosynthesis of cofactors
 - count: 85
@@ -264,10 +266,10 @@ top_pathways:
 - count: 57
   pathway_id: kegg.pathway:ko00330
   pathway_name: Arginine and proline metabolism
-total_entries: 3035
-total_matching: 1566
+total_entries: 3218
+total_matching: 1644
 truncated: true
 xref_coverage:
-  with_chebi: 1387
-  with_hmdb: 849
-  with_mnxm: 1566
+  with_chebi: 1465
+  with_hmdb: 878
+  with_mnxm: 1644

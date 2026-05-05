@@ -1,24 +1,24 @@
 by_evidence_source:
-- count: 10
+- count: 13
   evidence_source: transport
 - count: 1
   evidence_source: metabolism
 by_metabolite:
 - formula: C5H10N2O3
-  gene_count: 11
+  gene_count: 14
   metabolism_rows: 1
   metabolite_id: kegg.compound:C00064
   name: L-Glutamine
   reaction_count: 1
-  rows: 11
-  transport_family_inferred_rows: 10
+  rows: 14
+  transport_family_inferred_rows: 13
   transport_substrate_confirmed_rows: 0
   transporter_count: 2
 by_transport_confidence:
-- count: 10
+- count: 13
   transport_confidence: family_inferred
 case_id: genes_by_metabolite_glutamine_ec_filter
-gene_count_total: 11
+gene_count_total: 14
 metabolite_count_total: 1
 not_found:
   metabolite_ids: []
@@ -28,6 +28,18 @@ not_matched: []
 offset: 0
 reaction_count_total: 1
 results:
+- evidence_source: transport
+  gene_name: ecfA1
+  locus_tag: PMM0125
+  metabolite_chebi_id: '13110'
+  metabolite_formula: C5H10N2O3
+  metabolite_id: kegg.compound:C00064
+  metabolite_mass: 146.146
+  metabolite_name: L-Glutamine
+  product: energy-coupling factor transport system ATP-binding protein
+  tcdb_family_id: tcdb:3.A.1
+  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_confidence: family_inferred
 - evidence_source: transport
   gene_name: murJ
   locus_tag: PMM0261
@@ -41,6 +53,18 @@ results:
   tcdb_family_name: 2.A.66.4
   transport_confidence: family_inferred
 - evidence_source: transport
+  gene_name: cbiQ
+  locus_tag: PMM0392
+  metabolite_chebi_id: '13110'
+  metabolite_formula: C5H10N2O3
+  metabolite_id: kegg.compound:C00064
+  metabolite_mass: 146.146
+  metabolite_name: L-Glutamine
+  product: transmembrane component of ECF transporter energizing module
+  tcdb_family_id: tcdb:3.A.1
+  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_confidence: family_inferred
+- evidence_source: transport
   gene_name: ftsE
   locus_tag: PMM0434
   metabolite_chebi_id: '13110'
@@ -49,30 +73,6 @@ results:
   metabolite_mass: 146.146
   metabolite_name: L-Glutamine
   product: ATP-binding protein FtsE
-  tcdb_family_id: tcdb:3.A.1
-  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
-  transport_confidence: family_inferred
-- evidence_source: transport
-  gene_name: ccmA
-  locus_tag: PMM0449
-  metabolite_chebi_id: '13110'
-  metabolite_formula: C5H10N2O3
-  metabolite_id: kegg.compound:C00064
-  metabolite_mass: 146.146
-  metabolite_name: L-Glutamine
-  product: ABC-type multidrug transport system, ATPase component
-  tcdb_family_id: tcdb:3.A.1
-  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
-  transport_confidence: family_inferred
-- evidence_source: transport
-  gene_name: ycf38
-  locus_tag: PMM0450
-  metabolite_chebi_id: '13110'
-  metabolite_formula: C5H10N2O3
-  metabolite_id: kegg.compound:C00064
-  metabolite_mass: 146.146
-  metabolite_name: L-Glutamine
-  product: ABC-2 type transporter family protein
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
   transport_confidence: family_inferred
@@ -95,7 +95,7 @@ returned: 5
 row_count: 5
 top_gene_categories:
 - category: Transport
-  gene_count: 5
+  gene_count: 8
 - category: Stress response and adaptation
   gene_count: 3
 - category: Amino acid metabolism
@@ -105,8 +105,24 @@ top_gene_categories:
 - category: Cellular processes
   gene_count: 1
 top_genes:
+- gene_name: ecfA1
+  locus_tag: PMM0125
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 1
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 1
 - gene_name: murJ
   locus_tag: PMM0261
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 1
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 1
+- gene_name: cbiQ
+  locus_tag: PMM0392
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
@@ -137,6 +153,14 @@ top_genes:
   transport_family_inferred_rows: 1
   transport_substrate_confirmed_rows: 0
   transporter_count: 1
+- gene_name: null
+  locus_tag: PMM0666
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 1
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 1
 - gene_name: devC
   locus_tag: PMM0749
   metabolism_rows: 0
@@ -161,30 +185,6 @@ top_genes:
   transport_family_inferred_rows: 1
   transport_substrate_confirmed_rows: 0
   transporter_count: 1
-- gene_name: glnA
-  locus_tag: PMM0920
-  metabolism_rows: 1
-  metabolite_count: 1
-  reaction_count: 1
-  transport_family_inferred_rows: 0
-  transport_substrate_confirmed_rows: 0
-  transporter_count: 0
-- gene_name: evrA
-  locus_tag: PMM0976
-  metabolism_rows: 0
-  metabolite_count: 1
-  reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
-  transporter_count: 1
-- gene_name: evrB
-  locus_tag: PMM0977
-  metabolism_rows: 0
-  metabolite_count: 1
-  reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
-  transporter_count: 1
 top_reactions:
 - ec_numbers:
   - 6.3.1.2
@@ -194,7 +194,7 @@ top_reactions:
     ADP + Orthophosphate + L-Glutamine
   reaction_id: kegg.reaction:R00253
 top_tcdb_families:
-- gene_count: 9
+- gene_count: 12
   level_kind: tc_family
   metabolite_count: 1
   tcdb_family_id: tcdb:3.A.1
@@ -206,7 +206,7 @@ top_tcdb_families:
   tcdb_family_id: tcdb:2.A.66.4
   tcdb_family_name: 2.A.66.4
   transport_confidence: family_inferred
-total_matching: 11
+total_matching: 14
 transporter_count_total: 2
 truncated: true
 warnings:

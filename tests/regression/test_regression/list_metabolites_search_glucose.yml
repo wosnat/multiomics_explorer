@@ -1,7 +1,7 @@
 by_evidence_source:
 - count: 20
   evidence_source: metabolism
-- count: 7
+- count: 8
   evidence_source: transport
 - count: 1
   evidence_source: metabolomics
@@ -24,15 +24,15 @@ results:
   evidence_sources:
   - transport
   formula: C6H12O6
-  gene_count: 764
+  gene_count: 826
   mass: 180.156
   metabolite_id: chebi:14313
   name: glucose
   organism_count: 32
   pathway_count: 0
   pathway_ids: []
-  score: 3.0409
-  transporter_count: 88
+  score: 3.0671
+  transporter_count: 108
 - chebi_id: '13498'
   elements:
   - C
@@ -44,7 +44,7 @@ results:
   - metabolism
   - transport
   formula: C15H22N2O17P2
-  gene_count: 672
+  gene_count: 733
   mass: 564.286
   metabolite_id: kegg.compound:C00029
   name: UDP-glucose
@@ -68,8 +68,8 @@ results:
   - kegg.pathway:ko01240
   - kegg.pathway:ko01250
   - kegg.pathway:ko04082
-  score: 2.5622
-  transporter_count: 1
+  score: 2.5784
+  transporter_count: 8
 - chebi_id: '4167'
   elements:
   - C
@@ -79,7 +79,7 @@ results:
   - metabolism
   - transport
   formula: C6H12O6
-  gene_count: 324
+  gene_count: 328
   mass: 180.156
   metabolite_id: kegg.compound:C00031
   name: D-Glucose
@@ -121,8 +121,8 @@ results:
   - kegg.pathway:ko05111
   - kegg.pathway:ko05230
   - kegg.pathway:ko05415
-  score: 2.5622
-  transporter_count: 17
+  score: 2.5784
+  transporter_count: 23
 - chebi_id: '10526'
   elements:
   - C
@@ -132,8 +132,9 @@ results:
   - P
   evidence_sources:
   - metabolism
+  - transport
   formula: C16H24N2O16P2
-  gene_count: 141
+  gene_count: 143
   mass: 562.314
   metabolite_id: kegg.compound:C00842
   name: dTDP-glucose
@@ -149,8 +150,8 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 2.5622
-  transporter_count: 0
+  score: 2.5784
+  transporter_count: 1
 - chebi_id: '13230'
   elements:
   - C
@@ -173,7 +174,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 2.5622
+  score: 2.5784
   transporter_count: 0
 - chebi_id: '13264'
   elements:
@@ -197,7 +198,7 @@ results:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 2.5622
+  score: 2.5784
   transporter_count: 0
 - chebi_id: '10397'
   elements:
@@ -220,7 +221,7 @@ results:
   - kegg.pathway:ko01110
   - kegg.pathway:ko01120
   - kegg.pathway:ko01200
-  score: 2.2137
+  score: 2.224
   transporter_count: 0
 - chebi_id: '10242'
   elements:
@@ -247,7 +248,7 @@ results:
   - kegg.pathway:ko01200
   - kegg.pathway:ko01250
   - kegg.pathway:ko04964
-  score: 2.2137
+  score: 2.224
   transporter_count: 0
 - chebi_id: '14314'
   elements:
@@ -260,7 +261,7 @@ results:
   - metabolomics
   - transport
   formula: C6H11O9P
-  gene_count: 152
+  gene_count: 153
   mass: 258.119
   metabolite_id: kegg.compound:C00092
   name: D-Glucose 6-phosphate
@@ -284,8 +285,8 @@ results:
   - kegg.pathway:ko05111
   - kegg.pathway:ko05230
   - kegg.pathway:ko05415
-  score: 1.9487
-  transporter_count: 3
+  score: 1.9552
+  transporter_count: 6
 - chebi_id: '10246'
   elements:
   - C
@@ -319,7 +320,7 @@ results:
   - kegg.pathway:ko01240
   - kegg.pathway:ko01250
   - kegg.pathway:ko04922
-  score: 1.9487
+  score: 1.9552
   transporter_count: 0
 - chebi_id: '1078'
   elements:
@@ -329,15 +330,15 @@ results:
   evidence_sources:
   - transport
   formula: C6H12O5
-  gene_count: 15
+  gene_count: 19
   mass: 164.157
   metabolite_id: kegg.compound:C00586
   name: 2-Deoxy-D-glucose
-  organism_count: 10
+  organism_count: 11
   pathway_count: 0
   pathway_ids: []
-  score: 1.9487
-  transporter_count: 2
+  score: 1.9552
+  transporter_count: 3
 - chebi_id: '10245'
   elements:
   - C
@@ -366,7 +367,7 @@ results:
   - kegg.pathway:ko01250
   - kegg.pathway:ko04152
   - kegg.pathway:ko04922
-  score: 1.7404
+  score: 1.7444
   transporter_count: 0
 - chebi_id: '10399'
   elements:
@@ -378,7 +379,7 @@ results:
   - metabolism
   - transport
   formula: C6H11O9P
-  gene_count: 146
+  gene_count: 147
   mass: 258.119
   metabolite_id: kegg.compound:C01172
   name: beta-D-Glucose 6-phosphate
@@ -393,7 +394,7 @@ results:
   - kegg.pathway:ko01200
   - kegg.pathway:ko04152
   - kegg.pathway:ko04922
-  score: 1.7404
+  score: 1.7444
   transporter_count: 1
 - chebi_id: '10398'
   elements:
@@ -412,7 +413,7 @@ results:
   pathway_count: 1
   pathway_ids:
   - kegg.pathway:ko00500
-  score: 1.7404
+  score: 1.7444
   transporter_count: 0
 - chebi_id: '73918'
   elements:
@@ -422,14 +423,14 @@ results:
   evidence_sources:
   - transport
   formula: C7H14O6
-  gene_count: 15
+  gene_count: 16
   mass: 194.183
   metabolite_id: chebi:73918
   name: 3-O-methyl-D-glucose
-  organism_count: 10
+  organism_count: 11
   pathway_count: 0
   pathway_ids: []
-  score: 1.7404
+  score: 1.7444
   transporter_count: 1
 - chebi_id: '70785'
   elements:
@@ -451,7 +452,7 @@ results:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 1.7404
+  score: 1.7444
   transporter_count: 0
 - chebi_id: '10510'
   elements:
@@ -478,7 +479,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 1.4338
+  score: 1.435
   transporter_count: 0
 - chebi_id: '13262'
   elements:
@@ -500,7 +501,7 @@ results:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 1.4338
+  score: 1.435
   transporter_count: 0
 - chebi_id: '70783'
   elements:
@@ -522,7 +523,7 @@ results:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 1.4338
+  score: 1.435
   transporter_count: 0
 - chebi_id: '10508'
   elements:
@@ -547,7 +548,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 1.4338
+  score: 1.435
   transporter_count: 0
 - chebi_id: '12230'
   elements:
@@ -567,7 +568,7 @@ results:
   pathway_ids:
   - kegg.pathway:ko00500
   - kegg.pathway:ko02060
-  score: 1.3177
+  score: 1.3181
   transporter_count: 0
 - chebi_id: '32332'
   elements:
@@ -592,7 +593,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 1.219
+  score: 1.2188
   transporter_count: 0
 - chebi_id: '155215'
   elements:
@@ -611,12 +612,12 @@ results:
   pathway_ids:
   - kegg.pathway:ko00052
   - kegg.pathway:ko01100
-  score: 1.1341
+  score: 1.1334
   transporter_count: 0
 returned: 23
 row_count: 23
-score_max: 3.040865659713745
-score_median: 1.7403564453125
+score_max: 3.0671024322509766
+score_median: 1.7444241046905518
 top_organisms:
 - count: 18
   organism_name: Shewanella sp. W3-18-1
@@ -669,7 +670,7 @@ top_pathways:
 - count: 5
   pathway_id: kegg.pathway:ko00521
   pathway_name: Streptomycin biosynthesis
-total_entries: 3035
+total_entries: 3218
 total_matching: 23
 truncated: false
 xref_coverage:

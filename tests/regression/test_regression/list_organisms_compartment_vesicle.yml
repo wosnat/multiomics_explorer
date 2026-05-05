@@ -16,7 +16,7 @@ rows:
   gene_count: 3929
   genus: Alteromonas
   growth_phases: []
-  metabolite_count: 2061
+  metabolite_count: 2081
   ncbi_taxon_id: 1004787
   omics_types:
   - VESICLE_PROTEOMICS
@@ -45,7 +45,7 @@ rows:
   gene_count: 3834
   genus: Alteromonas
   growth_phases: []
-  metabolite_count: 2062
+  metabolite_count: 2082
   ncbi_taxon_id: 529120
   omics_types:
   - VESICLE_PROTEOMICS
@@ -74,7 +74,7 @@ rows:
   gene_count: 4063
   genus: Alteromonas
   growth_phases: []
-  metabolite_count: 2092
+  metabolite_count: 2112
   ncbi_taxon_id: 28108
   omics_types:
   - VESICLE_PROTEOMICS
@@ -103,7 +103,7 @@ rows:
   gene_count: 3741
   genus: Alteromonas
   growth_phases: []
-  metabolite_count: 2038
+  metabolite_count: 2057
   ncbi_taxon_id: 1004785
   omics_types:
   - VESICLE_PROTEOMICS
@@ -137,7 +137,7 @@ rows:
   - death
   - exponential
   - nutrient_limited
-  metabolite_count: 2079
+  metabolite_count: 2098
   ncbi_taxon_id: 28108
   omics_types:
   - PROTEOMICS
@@ -178,7 +178,7 @@ rows:
   - darkness
   - diel
   - exponential
-  metabolite_count: 2095
+  metabolite_count: 2116
   ncbi_taxon_id: 28108
   omics_types:
   - RNASEQ
@@ -229,7 +229,7 @@ rows:
   - nutrient_limited
   - recovery
   - stationary
-  metabolite_count: 1550
+  metabolite_count: 1572
   ncbi_taxon_id: 59919
   omics_types:
   - MICROARRAY
@@ -279,7 +279,7 @@ rows:
   - acute_stress
   - exponential
   - stationary
-  metabolite_count: 1559
+  metabolite_count: 1581
   ncbi_taxon_id: 74546
   omics_types:
   - PROTEOMICS
@@ -321,7 +321,7 @@ rows:
   - exponential
   - nutrient_limited
   - recovery
-  metabolite_count: 1643
+  metabolite_count: 1666
   ncbi_taxon_id: 74547
   omics_types:
   - METABOLOMICS

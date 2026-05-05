@@ -35,7 +35,7 @@ rows:
   - nutrient_limited
   - recovery
   - stationary
-  metabolite_count: 1550
+  metabolite_count: 1572
   ncbi_taxon_id: 59919
   omics_types:
   - MICROARRAY
@@ -80,7 +80,7 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - exponential
-  metabolite_count: 1559
+  metabolite_count: 1581
   ncbi_taxon_id: 167546
   omics_types:
   - METABOLOMICS

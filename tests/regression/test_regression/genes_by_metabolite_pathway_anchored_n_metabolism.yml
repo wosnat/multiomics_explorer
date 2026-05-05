@@ -1,36 +1,36 @@
 by_evidence_source:
 - count: 32
   evidence_source: metabolism
-- count: 24
+- count: 30
   evidence_source: transport
 by_metabolite:
 - formula: C5H10N2O3
-  gene_count: 33
+  gene_count: 36
   metabolism_rows: 32
   metabolite_id: kegg.compound:C00064
   name: L-Glutamine
   reaction_count: 19
-  rows: 42
-  transport_family_inferred_rows: 10
+  rows: 45
+  transport_family_inferred_rows: 13
   transport_substrate_confirmed_rows: 0
   transporter_count: 2
 - formula: NO2
-  gene_count: 12
+  gene_count: 15
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00088
   name: Nitrite
   reaction_count: 0
-  rows: 14
-  transport_family_inferred_rows: 9
+  rows: 17
+  transport_family_inferred_rows: 12
   transport_substrate_confirmed_rows: 5
   transporter_count: 3
 by_transport_confidence:
-- count: 19
+- count: 25
   transport_confidence: family_inferred
 - count: 5
   transport_confidence: substrate_confirmed
 case_id: genes_by_metabolite_pathway_anchored_n_metabolism
-gene_count_total: 36
+gene_count_total: 39
 metabolite_count_total: 2
 not_found:
   metabolite_ids: []
@@ -146,6 +146,8 @@ results:
 returned: 5
 row_count: 5
 top_gene_categories:
+- category: Transport
+  gene_count: 8
 - category: Nucleotide metabolism
   gene_count: 7
 - category: Amino acid metabolism
@@ -153,8 +155,6 @@ top_gene_categories:
 - category: Coenzyme metabolism
   gene_count: 5
 - category: Stress response and adaptation
-  gene_count: 5
-- category: Transport
   gene_count: 5
 - category: Central intermediary metabolism
   gene_count: 4
@@ -346,7 +346,7 @@ top_reactions:
     AMP + Diphosphate + L-Glutamate
   reaction_id: kegg.reaction:R08244
 top_tcdb_families:
-- gene_count: 9
+- gene_count: 12
   level_kind: tc_family
   metabolite_count: 2
   tcdb_family_id: tcdb:3.A.1
@@ -370,7 +370,7 @@ top_tcdb_families:
   tcdb_family_id: tcdb:2.A.66.4
   tcdb_family_name: 2.A.66.4
   transport_confidence: family_inferred
-total_matching: 56
+total_matching: 62
 transporter_count_total: 4
 truncated: true
 warnings:

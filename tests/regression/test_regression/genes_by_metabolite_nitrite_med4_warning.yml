@@ -1,24 +1,24 @@
 by_evidence_source:
-- count: 14
+- count: 17
   evidence_source: transport
 by_metabolite:
 - formula: NO2
-  gene_count: 12
+  gene_count: 15
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00088
   name: Nitrite
   reaction_count: 0
-  rows: 14
-  transport_family_inferred_rows: 9
+  rows: 17
+  transport_family_inferred_rows: 12
   transport_substrate_confirmed_rows: 5
   transporter_count: 3
 by_transport_confidence:
-- count: 9
+- count: 12
   transport_confidence: family_inferred
 - count: 5
   transport_confidence: substrate_confirmed
 case_id: genes_by_metabolite_nitrite_med4_warning
-gene_count_total: 12
+gene_count_total: 15
 metabolite_count_total: 1
 not_found:
   metabolite_ids: []
@@ -92,7 +92,7 @@ returned: 5
 row_count: 5
 top_gene_categories:
 - category: Transport
-  gene_count: 5
+  gene_count: 8
 - category: Central intermediary metabolism
   gene_count: 3
 - category: Stress response and adaptation
@@ -116,6 +116,14 @@ top_genes:
   transport_family_inferred_rows: 0
   transport_substrate_confirmed_rows: 2
   transporter_count: 2
+- gene_name: ecfA1
+  locus_tag: PMM0125
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 1
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 1
 - gene_name: cynD
   locus_tag: PMM0372
   metabolism_rows: 0
@@ -123,6 +131,14 @@ top_genes:
   reaction_count: 0
   transport_family_inferred_rows: 0
   transport_substrate_confirmed_rows: 1
+  transporter_count: 1
+- gene_name: cbiQ
+  locus_tag: PMM0392
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 1
+  transport_substrate_confirmed_rows: 0
   transporter_count: 1
 - gene_name: ftsE
   locus_tag: PMM0434
@@ -148,6 +164,14 @@ top_genes:
   transport_family_inferred_rows: 1
   transport_substrate_confirmed_rows: 0
   transporter_count: 1
+- gene_name: null
+  locus_tag: PMM0666
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 1
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 1
 - gene_name: devC
   locus_tag: PMM0749
   metabolism_rows: 0
@@ -156,33 +180,9 @@ top_genes:
   transport_family_inferred_rows: 1
   transport_substrate_confirmed_rows: 0
   transporter_count: 1
-- gene_name: devA
-  locus_tag: PMM0750
-  metabolism_rows: 0
-  metabolite_count: 1
-  reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
-  transporter_count: 1
-- gene_name: salY
-  locus_tag: PMM0913
-  metabolism_rows: 0
-  metabolite_count: 1
-  reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
-  transporter_count: 1
-- gene_name: evrA
-  locus_tag: PMM0976
-  metabolism_rows: 0
-  metabolite_count: 1
-  reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
-  transporter_count: 1
 top_reactions: []
 top_tcdb_families:
-- gene_count: 9
+- gene_count: 12
   level_kind: tc_family
   metabolite_count: 1
   tcdb_family_id: tcdb:3.A.1
@@ -200,7 +200,7 @@ top_tcdb_families:
   tcdb_family_id: tcdb:3.A.1.16.2
   tcdb_family_name: 3.A.1.16.2
   transport_confidence: substrate_confirmed
-total_matching: 14
+total_matching: 17
 transporter_count_total: 3
 truncated: true
 warnings:

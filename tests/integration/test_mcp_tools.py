@@ -2361,28 +2361,28 @@ class TestListMetabolites:
     """Live-KG smoke tests for the list_metabolites api function."""
 
     def test_no_filters_returns_all(self, conn):
-        """Unfiltered query reports 3,035 total Metabolite nodes."""
+        """Unfiltered query reports 3,218 total Metabolite nodes."""
         result = api.list_metabolites(conn=conn)
-        assert result["total_matching"] == 3035
+        assert result["total_matching"] == 3218
 
     def test_elements_n_filter(self, conn):
-        """N-bearing metabolites: 1,566 total."""
+        """N-bearing metabolites: 1,644 total."""
         result = api.list_metabolites(elements=["N"], conn=conn)
-        assert result["total_matching"] == 1566
+        assert result["total_matching"] == 1644
 
     def test_elements_n_and_p_filter(self, conn):
-        """Multi-element AND filter (must contain both N and P): 557."""
+        """Multi-element AND filter (must contain both N and P): 566."""
         result = api.list_metabolites(elements=["N", "P"], conn=conn)
-        assert result["total_matching"] == 557
+        assert result["total_matching"] == 566
 
     def test_organism_plus_elements_filter(self, conn):
-        """MED4 + N elements (the canonical N-source primitive): 804."""
+        """MED4 + N elements (the canonical N-source primitive): 813."""
         result = api.list_metabolites(
             organism_names=["Prochlorococcus MED4"],
             elements=["N"],
             conn=conn,
         )
-        assert result["total_matching"] == 804
+        assert result["total_matching"] == 813
 
     def test_pathway_id_filter(self, conn):
         """Nitrogen metabolism pathway (ko00910) has 18 metabolites."""
@@ -2416,18 +2416,18 @@ class TestListMetabolites:
         assert "score" in result["results"][0]
 
     def test_evidence_sources_transport_filter(self, conn):
-        """transport-only evidence filter: 1,097 metabolites."""
+        """transport-only evidence filter: 1,355 metabolites."""
         result = api.list_metabolites(
             evidence_sources=["transport"], conn=conn,
         )
-        assert result["total_matching"] == 1097
+        assert result["total_matching"] == 1355
 
     def test_summary_mode_empty_results_envelope_populated(self, conn):
         """summary=True returns no result rows but envelope is populated."""
         result = api.list_metabolites(summary=True, conn=conn)
         assert result["results"] == []
         assert result["returned"] == 0
-        assert result["total_matching"] == 3035
+        assert result["total_matching"] == 3218
         # Envelope rollups present (lists, possibly empty but typed)
         assert isinstance(result["top_organisms"], list)
         assert isinstance(result["top_pathways"], list)
@@ -2463,11 +2463,13 @@ class TestGenesByMetabolite:
     """
 
     def test_urea_med4_both_arms_round_trip(self, conn):
-        """Urea × MED4: both arms exercised, sc > fi, warning DOES NOT fire.
+        """Urea × MED4: both arms exercised, fi > sc post-2026-05-05 rebuild.
 
-        Pins the spec § Live-KG state snapshot probes (verified 2026-05-03):
-        total_matching=23, gene_count_total=18, metabolism_rows=4,
-        transport_substrate_confirmed_rows=10, transport_family_inferred_rows=9.
+        Pins live-KG snapshot (verified 2026-05-05 post-rebuild):
+        total_matching=26, gene_count_total=21, metabolism_rows=4,
+        transport_substrate_confirmed_rows=10, transport_family_inferred_rows=12.
+        Family-inferred-dominance warning fires (fi=12 > sc=10) — flipped from
+        2026-05-03 state where sc > fi.
         """
         from multiomics_explorer.mcp_server.tools import (
             GenesByMetaboliteResponse,
@@ -2479,23 +2481,23 @@ class TestGenesByMetabolite:
             conn=conn,
         )
         model = GenesByMetaboliteResponse(**result)
-        assert model.total_matching == 23
-        assert model.gene_count_total == 18
+        assert model.total_matching == 26
+        assert model.gene_count_total == 21
         urea_row = next(
             r for r in model.by_metabolite
             if r.metabolite_id == "kegg.compound:C00086"
         )
         assert urea_row.metabolism_rows == 4
         assert urea_row.transport_substrate_confirmed_rows == 10
-        assert urea_row.transport_family_inferred_rows == 9
-        assert model.warnings == []
+        assert urea_row.transport_family_inferred_rows == 12
+        assert any("family_inferred" in w for w in model.warnings)
 
     def test_nitrite_med4_transport_only_warning_fires(self, conn):
         """Nitrite × MED4: transport-only, fi > sc, auto-warning fires.
 
-        Pins spec smoke 2: total_matching=14, no metabolism rows,
-        substrate_confirmed=5, family_inferred=9, family-inferred-dominance
-        warning present.
+        Pins live-KG snapshot (verified 2026-05-05 post-rebuild):
+        total_matching=17, no metabolism rows, substrate_confirmed=5,
+        family_inferred=12, family-inferred-dominance warning present.
         """
         from multiomics_explorer.mcp_server.tools import (
             GenesByMetaboliteResponse,
@@ -2507,13 +2509,13 @@ class TestGenesByMetabolite:
             conn=conn,
         )
         model = GenesByMetaboliteResponse(**result)
-        assert model.total_matching == 14
+        assert model.total_matching == 17
         es_counts = {r.evidence_source: r.count for r in model.by_evidence_source}
         assert "metabolism" not in es_counts
-        assert es_counts.get("transport") == 14
+        assert es_counts.get("transport") == 17
         tc_counts = {
             r.transport_confidence: r.count
             for r in model.by_transport_confidence
         }
-        assert tc_counts == {"substrate_confirmed": 5, "family_inferred": 9}
+        assert tc_counts == {"substrate_confirmed": 5, "family_inferred": 12}
         assert any("family_inferred" in w for w in model.warnings)

@@ -1,14 +1,14 @@
 by_evidence_source:
-- count: 632
+- count: 637
   evidence_source: metabolism
-- count: 286
+- count: 328
   evidence_source: transport
 - count: 66
   evidence_source: metabolomics
 case_id: list_metabolites_med4_n
 mass_stats:
   mass_max: 5227.103
-  mass_median: 346.208
+  mass_median: 345.208
   mass_min: 18.039
 not_found:
   metabolite_ids: []
@@ -27,7 +27,7 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O13P3
-  gene_count: 4559
+  gene_count: 4562
   mass: 503.15
   metabolite_id: kegg.compound:C00002
   name: ATP
@@ -67,7 +67,7 @@ results:
   - kegg.pathway:ko05133
   - kegg.pathway:ko05410
   - kegg.pathway:ko05415
-  transporter_count: 18
+  transporter_count: 47
 - chebi_id: '13222'
   elements:
   - C
@@ -79,7 +79,7 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O10P2
-  gene_count: 2705
+  gene_count: 2706
   mass: 424.179
   metabolite_id: kegg.compound:C00008
   name: ADP
@@ -106,7 +106,7 @@ results:
   - kegg.pathway:ko05012
   - kegg.pathway:ko05014
   - kegg.pathway:ko05022
-  transporter_count: 14
+  transporter_count: 45
 - chebi_id: '13393'
   elements:
   - C
@@ -118,7 +118,7 @@ results:
   - metabolism
   - transport
   formula: C21H26N7O14P2
-  gene_count: 2610
+  gene_count: 2611
   mass: 662.422
   metabolite_id: kegg.compound:C00003
   name: NAD+
@@ -139,7 +139,7 @@ results:
   - kegg.pathway:ko04936
   - kegg.pathway:ko04977
   - kegg.pathway:ko05208
-  transporter_count: 2
+  transporter_count: 10
 - chebi_id: '13395'
   elements:
   - C
@@ -150,8 +150,9 @@ results:
   evidence_sources:
   - metabolism
   - metabolomics
+  - transport
   formula: C21H27N7O14P2
-  gene_count: 2400
+  gene_count: 2401
   mass: 663.43
   metabolite_id: kegg.compound:C00004
   name: NADH
@@ -163,7 +164,7 @@ results:
   - kegg.pathway:ko04020
   - kegg.pathway:ko04714
   - kegg.pathway:ko04925
-  transporter_count: 0
+  transporter_count: 1
 - chebi_id: '12056'
   elements:
   - C
@@ -174,8 +175,9 @@ results:
   evidence_sources:
   - metabolism
   - metabolomics
+  - transport
   formula: C10H12N5O7P
-  gene_count: 1870
+  gene_count: 1871
   mass: 345.208
   metabolite_id: kegg.compound:C00020
   name: AMP
@@ -207,37 +209,37 @@ results:
   - kegg.pathway:ko05012
   - kegg.pathway:ko05022
   - kegg.pathway:ko05032
-  transporter_count: 0
+  transporter_count: 8
 returned: 5
 row_count: 5
 score_max: null
 score_median: null
 top_organisms:
-- count: 804
+- count: 813
   organism_name: Prochlorococcus MED4
-- count: 783
+- count: 792
   organism_name: Prochlorococcus AS9601
-- count: 779
+- count: 788
   organism_name: Prochlorococcus MIT9312
-- count: 778
+- count: 787
   organism_name: Prochlorococcus RSP50
-- count: 778
+- count: 787
   organism_name: Prochlorococcus MIT0801
-- count: 778
+- count: 787
   organism_name: Prochlorococcus MIT9301
-- count: 777
+- count: 786
   organism_name: Prochlorococcus MIT9303
-- count: 776
+- count: 785
   organism_name: Prochlorococcus MIT9313
-- count: 774
-  organism_name: Prochlorococcus NATL2A
-- count: 773
+- count: 782
   organism_name: Prochlorococcus NATL1A
+- count: 780
+  organism_name: Prochlorococcus NATL2A
 top_pathways:
-- count: 472
+- count: 475
   pathway_id: kegg.pathway:ko01100
   pathway_name: Metabolic pathways
-- count: 191
+- count: 192
   pathway_id: kegg.pathway:ko01110
   pathway_name: Biosynthesis of secondary metabolites
 - count: 157
@@ -246,13 +248,13 @@ top_pathways:
 - count: 77
   pathway_id: kegg.pathway:ko00860
   pathway_name: Porphyrin metabolism
-- count: 69
+- count: 71
   pathway_id: kegg.pathway:ko01120
   pathway_name: Microbial metabolism in diverse environments
 - count: 63
   pathway_id: kegg.pathway:ko01230
   pathway_name: Biosynthesis of amino acids
-- count: 60
+- count: 61
   pathway_id: kegg.pathway:ko02010
   pathway_name: ABC transporters
 - count: 56
@@ -264,10 +266,10 @@ top_pathways:
 - count: 47
   pathway_id: kegg.pathway:ko00970
   pathway_name: Aminoacyl-tRNA biosynthesis
-total_entries: 3035
-total_matching: 804
+total_entries: 3218
+total_matching: 813
 truncated: true
 xref_coverage:
-  with_chebi: 707
-  with_hmdb: 487
-  with_mnxm: 804
+  with_chebi: 716
+  with_hmdb: 490
+  with_mnxm: 813
