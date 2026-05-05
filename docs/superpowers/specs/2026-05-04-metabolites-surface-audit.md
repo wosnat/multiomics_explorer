@@ -531,6 +531,8 @@ metabolites_by_quantifies_assay(
 # row: metabolite_id, name, value, value_sd, replicate_values, n_replicates, n_non_zero,
 #      metric_type, metric_bucket, metric_percentile, rank_by_metric, detection_status,
 #      time_point, time_point_hours, time_point_order, condition_label, assay_id
+# envelope: by_detection_status (counts of detected/sporadic/not_detected — primary headline
+#           summary per §4.3.3 resolution), by_metric_bucket, by_assay, total_metabolite_count
 ```
 
 ##### 3b.3.b `metabolites_by_flags_assay`
@@ -712,6 +714,22 @@ Together these answer "is metabolite X consistently and detectably present?" —
 
 **Implication for proposals:** Part 3b.4 (`differential_metabolite_abundance`) stays DEFER (already so) — its premise weakens further. If a downstream FC-style summary is ever needed, it should be computed by consumers using the raw edge fields, not baked into a tool surface.
 
+#### 4.3.3 Replicate rollup convention — RESOLVED (don't impose; surface raw fields + by_detection_status envelope, 2026-05-05)
+
+**Question:** When a tool surfaces a value per metabolite, is it the mean across replicates, the median, or per-replicate rows?
+
+**Resolution:** Don't pick. Same spirit as §4.3.2 — surface the rich field set the KG already exposes, let consumers choose:
+
+- **Per-row** (Quantifies edges): `value` (KG-pre-aggregated single number), `value_sd`, `replicate_values` (list of per-replicate values for consumers who want a different rollup), `n_replicates`, `n_non_zero`, `detection_status`.
+- **Envelope:** `by_detection_status` (counts of `detected` / `sporadic` / `not_detected` across the slice). This sidesteps the central-tendency question entirely by making the detection-reliability distribution the headline summary — more informative than "average value" when many measurements are at LOD.
+
+**Implication for tools:**
+- 3b.3 quantifies drill-down (`metabolites_by_quantifies_assay`): include `by_detection_status` in the envelope rollup spec.
+- 3b.1 `list_metabolite_assays`: doesn't aggregate per-replicate; no change needed.
+- 3b.4 (`differential_metabolite_abundance`) stays DEFER — its premise of choosing a single summary continues to weaken.
+
+**Implication for KG asks:** none. KG-MET-001 (normalisation docs) still stands at P1 — separate concern (what does `value` mean per paper, units / log-scale / z-score).
+
 #### 4.3.1 + 4.3.6 Surface modelling — Assay IS the DM-on-Metabolite analog — RESOLVED (empirically, 2026-05-04 build-derived)
 
 **Question (§4.3.1):** Is `MetaboliteAssay` the *only* measurement surface, or should there also be `DerivedMetric` nodes attached to `Metabolite` (mirroring `DerivedMetric → Gene` for gene-level summaries)?
@@ -734,15 +752,7 @@ Both sub-questions resolved (§4.2.1 direction, §4.2.2 primary substrate) — s
 
 ### 4.3 Metabolomics measurement source
 
-(§4.3.1 + §4.3.2 + §4.3.6 resolved — see §4.0.)
-
-#### 4.3.3 Replicate rollup convention
-
-**Question:** When a tool surfaces a value per metabolite, is it the mean across replicates, the median, or per-replicate rows?
-
-**Empirical note:** Edges carry both `value` (single number, presumably aggregated) and `replicate_values` (list). Both are present, so consumers can choose. The open question is which to default to in tool envelopes.
-
-**Blocks:** Part 3b.2, Part 3b.4.
+(§4.3.1 + §4.3.2 + §4.3.3 + §4.3.6 resolved — see §4.0.)
 
 #### 4.3.4 Quantifies vs Flags semantics — separate or merged
 
@@ -782,7 +792,6 @@ Resolved questions live in §4.0 and don't appear here (they don't block anythin
 
 | Question | Blocks proposal |
 |---|---|
-| §4.3.3 replicate rollup | 3b.2 (DEFER), 3b.4 (DEFER) |
 | §4.3.4 Quantifies vs Flags | 3b.4 (DEFER) |
 | §4.3.5 compartment semantics | 3b.2 (DEFER); also gates `list_metabolites.measured_compartments` sparse-field policy (Part 3a) |
 | §4.3.7 coculture attribution | 3b.4 (DEFER) |
