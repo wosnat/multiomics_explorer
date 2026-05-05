@@ -1,9 +1,9 @@
 # Metabolites Surface Audit — 2026-05-04
 
-**Date:** 2026-05-04
+**Date:** 2026-05-04 (initial); **last refreshed:** 2026-05-05 (walkthrough Q&A pass)
 **Spec:** [2026-05-04-metabolites-assets-design.md](2026-05-04-metabolites-assets-design.md)
 **Owner:** Osnat Weissberg
-**Status:** Two-pass complete; ready for KG-side review and metabolomics-DM definition conversation.
+**Status:** Three-pass complete (first-pass design; build-derived second pass; walkthrough Q&A third pass). Ready for KG-side review and metabolomics-DM definition conversation.
 
 This audit accompanies the metabolites assets effort. It quantifies the metabolite surface in the KG, lists existing-tool gaps for both chemistry-annotation and metabolomics-measurement layers, proposes new tools, captures open definition questions, and itemises KG-side asks. The audit runs in two passes: a first pass populated before the analysis doc and example python are written (`phase=first-pass`), and a second pass appended after they are written (`phase=build-derived`).
 
@@ -588,9 +588,9 @@ The DM tool family (`list_derived_metrics`, `gene_derived_metrics`, `genes_by_*_
 
 Looking at Part 1 §1.2: `MetaboliteAssay` is structurally similar to `DerivedMetric` (both are `InformationContentEntity`; both carry `value_kind`, `metric_type`, `value_max/median/min/q1/q3`, etc.). This suggests the KG modellers were thinking along these lines.
 
-**Recommendation: Pending-definition.** Blocking Part 4 questions: §4.3.1 (Assay-vs-DM-vs-both modelling), §4.3.6 (whether DM-family extension is the right surface for metabolite-level summaries given Assay nodes already exist).
+**Recommendation: NOT-NEEDED (downgraded build-derived).** Originally Pending-definition (Part 4 §4.3.1 / §4.3.6). Build-derived second pass concluded the KG modellers already answered §4.3.1 implicitly: `MetaboliteAssay` IS the DM-on-Metabolite analog (same `value_kind` / `metric_type` / `value_max/median/min/q1/q3` fields). Direct future metabolite-summary work onto `MetaboliteAssay`-anchored tools instead. See build-derived second pass below.
 
-Phase: first-pass.
+Phase: not-needed.
 
 #### 3b.6 First-pass summary
 
@@ -600,9 +600,9 @@ Phase: first-pass.
 | `metabolite_response_profile` | DEFER (premature at current scale) | deferred | §4.3.2, §4.3.3, §4.3.5; revisit when scale grows |
 | `metabolites_by_quantifies_assay` + `metabolites_by_flags_assay` + `assays_by_metabolite` | Should-add (P1) — split per DM convention; drill-down split by edge type, reverse-lookup merged | first-pass | — |
 | `differential_metabolite_abundance` | DEFER (premature; may never happen — depends on §4.3.2 FC-relevance resolution) | deferred | §4.3.2, §4.3.3, §4.3.4, §4.3.5, §4.3.7 |
-| DM-family extension to Metabolite | Pending-definition | first-pass | §4.3.1, §4.3.6 |
+| DM-family extension to Metabolite | NOT-NEEDED (downgraded build-derived) | not-needed | (resolved — Assay IS the DM-on-Metabolite analog) |
 
-Two ship-now (Should-add). Three blocked on Part 4 questions.
+**Verdict (post-walkthrough 2026-05-05):** Two ship-now slices = 4 tools total (3b.1 `list_metabolite_assays`; 3b.3 split into `metabolites_by_quantifies_assay` + `metabolites_by_flags_assay` + `assays_by_metabolite`). Two DEFER (3b.2 premature; 3b.4 premature, may never happen). One NOT-NEEDED (3b.5). Net forward path: 4 tools, all unblocked by Part 4 questions.
 
 #### 3b — build-derived (second pass)
 
@@ -610,10 +610,10 @@ No new tool proposals from the build phase — the existing first-pass surface (
 
 | First-pass proposal | Build-derived verdict |
 |---|---|
-| `list_metabolite_assays` | **Validated.** Scenario 8 `measurement` had to use `run_cypher` because no native discovery tool exists for assays. Confirms Should-add (P1). |
-| `metabolite_response_profile` | **Pattern validated, but recommendation flipped to DEFER (premature)** at walkthrough Q&A 2026-05-05. Scenario 8 (`measurement`) demonstrates the per-metabolite × compartment aggregation in run_cypher and it is adequate at the current 10-assay / 92-metabolite / 2-paper scale. Add the dedicated tool only when (a) Part 4 questions resolve AND (b) measurement scale grows materially OR `differential_metabolite_abundance` (3b.4) lands and absorbs part of this surface. |
-| `metabolites_by_quantifies_assay` + `metabolites_by_flags_assay` + `assays_by_metabolite` (split per DM convention 2026-05-05) | **Pattern validated; surface refined.** Scenario 8 walks the assay → metabolite path. Walkthrough Q&A 2026-05-05: split drill-down by edge type per DM family precedent (Quantifies edge = 15 fields, Flags edge = 6 fields — 9-field difference makes union row schema heavily sparse). Reverse lookup stays merged with polymorphic `value`/`flag_value`. Should-add stands. |
-| `differential_metabolite_abundance` | **Flipped to DEFER (premature; may never happen)** at walkthrough Q&A 2026-05-05. Scenario 8's raw values are clearly per-replicate concentrations; FC is not the natural summary. The schema empirically declines FC and the 3b.3 quantifies drill-down already exposes percentile/rank context — if §4.3.2 confirms FC is wrong for metabolomics, this tool's shape evaporates entirely. |
+| `list_metabolite_assays` | **Validated.** Scenario `measurement` `measurement` had to use `run_cypher` because no native discovery tool exists for assays. Confirms Should-add (P1). |
+| `metabolite_response_profile` | **Pattern validated, but recommendation flipped to DEFER (premature)** at walkthrough Q&A 2026-05-05. Scenario `measurement` (`measurement`) demonstrates the per-metabolite × compartment aggregation in run_cypher and it is adequate at the current 10-assay / 92-metabolite / 2-paper scale. Add the dedicated tool only when (a) Part 4 questions resolve AND (b) measurement scale grows materially OR `differential_metabolite_abundance` (3b.4) lands and absorbs part of this surface. |
+| `metabolites_by_quantifies_assay` + `metabolites_by_flags_assay` + `assays_by_metabolite` (split per DM convention 2026-05-05) | **Pattern validated; surface refined.** Scenario `measurement` walks the assay → metabolite path. Walkthrough Q&A 2026-05-05: split drill-down by edge type per DM family precedent (Quantifies edge = 15 fields, Flags edge = 6 fields — 9-field difference makes union row schema heavily sparse). Reverse lookup stays merged with polymorphic `value`/`flag_value`. Should-add stands. |
+| `differential_metabolite_abundance` | **Flipped to DEFER (premature; may never happen)** at walkthrough Q&A 2026-05-05. Scenario `measurement`'s raw values are clearly per-replicate concentrations; FC is not the natural summary. The schema empirically declines FC and the 3b.3 quantifies drill-down already exposes percentile/rank context — if §4.3.2 confirms FC is wrong for metabolomics, this tool's shape evaporates entirely. |
 | DM-family extension to Metabolite | **Empirical evidence shifted toward Assay-only modelling.** Per Part 1 §1.2, `MetaboliteAssay` already carries the same fields a `DerivedMetric` would (value_kind, metric_type, percentiles, etc.). The KG modellers appear to have answered Part 4 §4.3.1 implicitly: Assay IS the DM-on-Metabolite analog. Recommendation: downgrade DM-family extension from Pending-definition to **Not-needed** — direct any metabolite-level summary work onto `MetaboliteAssay`-anchored tools instead. |
 
 ---
@@ -812,7 +812,7 @@ Items only `multiomics_biocypher_kg` can fix. Each ask carries `{category, prior
 | KG-MET-012 | Decision | P2 | first-pass | Decide whether metabolite-level summary statistics (rhythmicity, etc.) should attach as `DerivedMetric → Metabolite` edges or live entirely on `MetaboliteAssay` properties. Communicate decision to explorer side | Resolves Part 4 §4.3.1 / §4.3.6; unblocks Part 3b.5 (DM-family extension to Metabolite) |
 | KG-MET-013 | Documentation | P2 | first-pass | Confirm `time_point` properties on `Assay_quantifies_metabolite` align with `Changes_expression_of.time_point` for experiments that have both omics types | Resolves Part 4 §4.3.8; enables future cross-omics tools |
 
-**Priority summary (after 2026-05-04 retirement of KG-MET-003):** 0× P0, 6× P2 (data gaps + decisions), 3× P3 (low-priority polish), 2× CLOSED (KG-MET-004/005), 1× RETIRED (KG-MET-003), 1× deferred (KG-MET-007 indexes).
+**Priority summary (first-pass, after 2026-05-04 retirement of KG-MET-003):** 0× P0, 1× P1 (KG-MET-001), 6× P2 (KG-MET-002/006/009/011/012/013), 3× P3 (KG-MET-007 deferred / 008 / 010), 2× CLOSED (KG-MET-004/005), 1× RETIRED (KG-MET-003) = 13 first-pass asks.
 
 **Surprising finding (revised):** the original spec assumed many KG asks would land in P0/P1 (data is missing). The actual KG release shipped much further than expected — node-level rollups exist, edge schemas are rich, family promiscuity is partially flagged. The originally-flagged P0 (reaction role) was retired by user decision because upstream KEGG annotation direction is unreliable. **There are no remaining P0 KG asks.** The chemistry-annotation track's "involved in" framing is now a permanent convention, not a transitional limitation.
 
@@ -824,4 +824,4 @@ Items only `multiomics_biocypher_kg` can fix. Each ask carries `{category, prior
 | KG-MET-015 | Documentation | P3 | build-derived | Document organism-name resolution rules: chemistry tools (e.g., `genes_by_metabolite(organism='MED4')`) accept short-name aliases, but `list_organisms(organism_names=['MED4'])` requires the full `preferred_name` (`Prochlorococcus MED4`) | Surfaces during scenario 1 `discover` first-attempt; minor friction but confusing without docs |
 | KG-MET-007 (resolved) | Index | — | build-derived (NO INDEX ASKS) | Audit-Phase-D scenarios all completed in <30s aggregate (scenario 5 longest at ~8s due to multi-step DE chain). No slow queries observed. KG-MET-007 closes with no concrete index requests; revisit in next round | Performance baseline confirmed acceptable for current scale. |
 
-**Final Part 5 totals:** 14 numbered KG asks (1× P0, 6× P2, 6× P3, 1× CLOSED rollup-already-shipped, 0× index after closure). The KG release substantially overshipped relative to what was assumed at design time.
+**Final Part 5 totals (refreshed walkthrough Q&A 2026-05-05):** 15 numbered KG asks. **0× P0** (KG-MET-003 retired; no P0 asks remain), 1× P1 (KG-MET-001 normalisation docs), 6× P2 (KG-MET-002/006/009/011/012/013), 5× P3 (KG-MET-008/010/014/015 + KG-MET-007 deferred), 2× CLOSED (KG-MET-004/005 rollup-already-shipped), 1× RETIRED (KG-MET-003). The KG release substantially overshipped relative to design-time assumptions.
