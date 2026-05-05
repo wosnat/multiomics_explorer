@@ -37,6 +37,7 @@ from typing import Callable
 
 from multiomics_explorer import (
     differential_expression_by_gene,
+    gene_response_profile,
     genes_by_metabolite,
     genes_by_ontology,
     list_experiments,
@@ -363,66 +364,118 @@ def scenario_cross_feeding() -> None:
 
 
 def scenario_n_source_de() -> None:
-    """Use this when the user asks 'which N-acting genes respond to N starvation?'
+    """Use this when the user asks 'which MED4 N-substrate transporters respond to N stress?'
 
-    Sources: reaction + transport → expression (chemistry filters DE input).
-    Caveat surfaced: promiscuous enzymes / family_inferred transport can
-    inflate the gene set fed to DE — tighten with evidence_sources or
-    transport_confidence if results are noisy.
+    Sources: chemistry layer (transport) → expression matrix.
+
+    Three-tool cascade: list_metabolites → genes_by_metabolite → gene_response_profile.
+    Demonstrates how the chemistry layer can scope a DE-style query without
+    requiring a hand-curated gene pool.
+
+    Important re: transport_confidence — this scenario does NOT filter to
+    substrate_confirmed (contrast with cross_feeding A4). Transporter
+    specificity in nature is often promiscuous or under-characterized;
+    `substrate_confirmed` reflects "a curator listed this compound for this
+    family", `family_inferred` reflects "this family is known to transport
+    these compound classes, exact specificity unknown." Both are annotations,
+    neither is ground truth. For a broad-screen question like 'which N-source
+    transporters respond?', family_inferred is appropriate — you want any
+    candidate that could plausibly act on N substrates, including the real
+    MED4 N-uptake genes (PMM0263 amt1, PMM0628 gltS) which the KG only
+    annotates via family-level rollup.
+
+    The opposite filter call applies in cross_feeding (A4) — there the
+    narrower substrate_confirmed cast is the more conservative call for
+    cross-organism inferences that are already fragile.
+
+    Tolonen 2006 (10.1038/msb4100087) is the canonical MED4 N-source paper:
+    3 microarray experiments (cyanate, urea, N-deprivation) provide the
+    DE response context.
     """
     print("=== Scenario: n_source_de ===")
-    print("Question class: 'which N-acting genes respond to N starvation?'")
+    print("Question class: 'which MED4 N-substrate transporters respond to N stress?'")
     print()
 
-    pool = [
-        "PMM0001", "PMM0002", "PMM0003", "PMM0004", "PMM0005",
-        "PMM1428", "PMM0532", "PMM0374", "PMM0533", "PMM0534",
-    ]
-
-    print(f"Step 1: filter pool ({len(pool)} genes) to N-bearing chemistry")
-    chem = metabolites_by_gene(
-        locus_tags=pool,
-        organism="MED4",
-        metabolite_elements=["N"],
-        limit=200,
+    print("Step 1: list_metabolites — N-bearing compounds with transport annotations in MED4")
+    metabs = list_metabolites(
+        elements=["N"],
+        organism_names=["Prochlorococcus MED4"],
+        evidence_sources=["transport"],   # filter at source, not post
+        limit=50,
     )
-    n_genes = sorted({row.get("locus_tag") for row in chem["results"] if row.get("locus_tag")})
-    print(f"  → {len(n_genes)} N-acting genes (from {chem['returned']} (gene, metabolite) rows): "
-          f"{n_genes[:5]}{'...' if len(n_genes) > 5 else ''}")
-    print("  CAVEAT: pool may include promiscuous-enzyme / family_inferred-transport hits.")
-    print("  To tighten: add evidence_sources=['metabolism'] or "
-          "transport_confidence='substrate_confirmed'.")
-    print()
-
-    if not n_genes:
-        print("(no N-acting genes in pool — try a larger or differently-curated pool)")
-        return
-
-    print(f"Step 2: DE for {len(n_genes)} N-acting genes (significant_only=True)")
-    # Note: direction valid values are {'up', 'down'} — NOT 'both'. Omit to get
-    # both directions (default).
-    de = differential_expression_by_gene(
-        organism="MED4",
-        locus_tags=n_genes,
-        significant_only=True,
-        limit=10,
-    )
-    print(f"  → returned={de['returned']}  total_matching={de.get('total_matching')}")
-    print(f"  rows_by_treatment_type: {de.get('rows_by_treatment_type')}")
-    print()
-    print("First 10 DE rows:")
-    for row in de["results"][:10]:
-        log2fc = row.get("log2fc")
-        padj = row.get("padj")
-        log2fc_str = f"{log2fc:.3f}" if isinstance(log2fc, (int, float)) else str(log2fc)
-        padj_str = f"{padj:.3g}" if isinstance(padj, (int, float)) else str(padj)
+    candidates = [
+        row for row in metabs["results"]
+        if row["metabolite_id"] not in CURRENCY_METABOLITES_MIN8
+    ][:10]
+    metabolite_ids = [row["metabolite_id"] for row in candidates]
+    print(f"  total_matching={metabs.get('total_matching')}  "
+          f"after currency-blacklist + top-10 by transporter_count: {len(metabolite_ids)}")
+    for row in candidates:
         print(
-            f"  {row.get('locus_tag', '?'):<10} "
-            f"treatment={str(row.get('treatment_type', '-')):<22} "
-            f"tp={str(row.get('timepoint', '-')):<6} "
-            f"log2fc={log2fc_str:<8} adj_p={padj_str:<10} "
-            f"{row.get('expression_status', '-')}"
+            f"    {row['metabolite_id']:<22} {(row.get('name') or '?'):<32} "
+            f"transporter_count={row.get('transporter_count')}"
         )
+    print()
+
+    print(f"Step 2: genes_by_metabolite — MED4 transporter genes for these {len(metabolite_ids)} substrates")
+    print("  (no transport_confidence filter — see docstring; family_inferred is appropriate here)")
+    g = genes_by_metabolite(
+        metabolite_ids=metabolite_ids,
+        organism="MED4",
+        evidence_sources=["transport"],
+        limit=300,
+    )
+    distinct_genes = sorted({row["locus_tag"] for row in g["results"] if row.get("locus_tag")})
+    sub_conf_genes = sorted({
+        row["locus_tag"] for row in g["results"]
+        if row.get("transport_confidence") == "substrate_confirmed" and row.get("locus_tag")
+    })
+    fam_inf_only = sorted(set(distinct_genes) - set(sub_conf_genes))
+    print(f"  total_matching={g['total_matching']}  distinct_genes={len(distinct_genes)}")
+    print(f"  substrate_confirmed alone:    {len(sub_conf_genes)} genes (mostly efflux / detoxification)")
+    print(f"  family_inferred (additional): {len(fam_inf_only)} genes (incl. real N-uptake — see below)")
+    print()
+
+    print(f"Step 3: gene_response_profile — how do these {len(distinct_genes)} genes respond across N treatments?")
+    tolonen_n_experiments = [
+        # 10.1038/msb4100087 — Tolonen 2006: MED4 N-source microarray
+        "10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray",
+        "10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray",
+        "10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray",
+    ]
+    profile = gene_response_profile(
+        locus_tags=distinct_genes,
+        experiment_ids=tolonen_n_experiments,
+    )
+    print(f"  scoped to {len(tolonen_n_experiments)} Tolonen 2006 N-source experiments  "
+          f"(returned={profile['returned']})")
+    print()
+
+    # Sort: responders first, then non-responders. Within responders, by total magnitude (up + down).
+    def _sort_key(row: dict) -> tuple:
+        s = (row.get("response_summary") or {}).get("nitrogen") or {}
+        responded = s.get("timepoints_up", 0) + s.get("timepoints_down", 0)
+        return (-responded, row["locus_tag"])
+
+    rows_sorted = sorted(profile["results"], key=_sort_key)
+    print(f"{'gene':<12}{'name':<10}{'product':<48}"
+          f"{'exps_up/down':<14}{'tps_up/down':<14}")
+    print("-" * 100)
+    for row in rows_sorted:
+        s = (row.get("response_summary") or {}).get("nitrogen") or {}
+        eu, ed = s.get("experiments_up", 0), s.get("experiments_down", 0)
+        tu, td = s.get("timepoints_up", 0), s.get("timepoints_down", 0)
+        prod = (row.get("product") or "")[:46]
+        print(
+            f"  {row['locus_tag']:<10}{(row.get('gene_name') or '-'):<10}{prod:<48}"
+            f"{eu}/{ed:<12}{tu}/{td}"
+        )
+    print()
+    print("  CAVEAT: transporter specificity is often unknown or context-dependent in nature.")
+    print("  family_inferred annotations reflect family-level transport potential, not")
+    print("  measured per-substrate confirmation. The DE column is the empirical anchor:")
+    print("  genes that respond to N stress are functionally implicated regardless of")
+    print("  whether their substrate annotation is family-level or curator-confirmed.")
 
 
 def scenario_tcdb_chain() -> None:

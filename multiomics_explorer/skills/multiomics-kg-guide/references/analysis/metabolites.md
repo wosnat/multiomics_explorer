@@ -121,13 +121,17 @@ result = metabolites_by_gene(
 # Detail rows are sorted by precision tier — substrate_confirmed first, then family_inferred.
 ```
 
-### g — Precision-tier reading
+### g — Reading the substrate_confirmed vs family_inferred split
 
-When `genes_by_metabolite` / `metabolites_by_gene` emit the family_inferred-dominance auto-warning, most rows came from broad family-level inheritance. Strategies:
+Both tiers are annotations, not ground truth. `substrate_confirmed` reflects "a curator listed this compound for this family"; `family_inferred` reflects "this family is known to transport these compound classes, exact specificity unknown." Real transporter specificity is often promiscuous or under-characterized — the gap between tiers is more about curation effort than biological certainty.
 
-- **Tighten** with `transport_confidence="substrate_confirmed"` to keep high-confidence rows only.
-- **Read** the warning's named family — often ABC superfamily — and decide whether to filter it out (`tcdb_family_ids` exclusion in advanced cases).
+**Choose by question shape, not by reflex toward "high confidence":**
+
+- **`transport_confidence='substrate_confirmed'`** — narrower, more conservative cast. Use when the downstream inference is fragile (cross-organism cross-feeding) or when over-claiming specific substrates would mislead.
+- **No filter / both tiers** — broader cast that includes family-level potential. Use for screening questions ("which transporters could plausibly act on N substrates?") where you'd rather over-include and let downstream evidence (e.g. DE response) anchor the functional interpretation. Real N-uptake transporters in MED4 (PMM0263 amt1, PMM0628 gltS) are family_inferred — `substrate_confirmed` would silently exclude them.
 - **Pivot** for a single transporter family: `genes_by_ontology(ontology="tcdb", term_ids=[...])`. (But for substrate-anchored questions — "which genes transport X" — prefer the metabolite-anchored route in §b2.)
+
+The family_inferred-dominance auto-warning is informational, not a defect signal: it tells you most rows came from family-level inheritance so you can pick a confidence tier deliberately.
 
 Empirical scale (KG release 2026-05-05 post-TCDB-bug-fix): per-gene metabolite count via transport — median 4, p90 48, max **992**. In MED4 specifically, **12 genes** sit at the ABC-superfamily plateau (554 metabolites each): PMM0125, PMM0392, PMM0434, PMM0449, PMM0450, PMM0666, PMM0749, PMM0750, PMM0913, PMM0976, PMM0977, PMM0978. Expect family_inferred-dominance warnings when querying common metabolites against MED4.
 
@@ -146,7 +150,7 @@ Workflows that cross both reaction and transport arms, or that consume the annot
 | # | Confounder | Arm | Mitigation |
 |---|---|---|---|
 | 1 | **Currency cofactors flood the rollup.** `top_metabolites` is sorted by gene_count, which is exactly the wrong sort for cross-feeding because the highest-reach metabolites are universal (H2O, ATP/ADP/AMP, Pi, PPi, NAD(P)(H), CO2). | metabolism | Post-filter the harvested IDs against a currency blacklist. Minimal-8 (H2O, CO2, ATP, ADP, AMP, Pi, PPi, NAD(P)(H)) is the conservative default — see `examples/metabolites.py::CURRENCY_METABOLITES_MIN8`. Extend with H+, Glu/Gln, CoA, FAD if the seed pulls them in (these are borderline and depend on whether you care about central-N flux as a signal). |
-| 2 | **Family-inferred plateau.** Broad-substrate TCDB families (especially ABC superfamily) propagate ~554 metabolites per MED4 gene at low confidence. A single ABC-superfamily gene in the seed will swamp the metabolite_id list with weak transport rollups. | transport | `transport_confidence='substrate_confirmed'` on the Step-2 `genes_by_metabolite` call. Empirical: in a 7-metabolite N-cross test against ALT this dropped transport rows 1426 → 185 (87%), leaving only curated CmpA/NrtA-family nitrate transporters. |
+| 2 | **Family-level transport casts a wide net.** Broad-substrate TCDB families (especially ABC superfamily) inherit ~554 substrates per MED4 gene via family rollup. Substrate specificity is often unknown or context-dependent in nature — `family_inferred` reflects family-level potential, not measured per-substrate confirmation. For cross-feeding *inferences* (which over-claim a specific substrate flowing between organisms), the conservative `substrate_confirmed` cast is preferable. | transport | `transport_confidence='substrate_confirmed'` on the Step-2 `genes_by_metabolite` call. Empirical: in a 7-metabolite N-cross test against ALT this narrowed transport rows 1426 → 185, leaving the curated CmpA/NrtA-family nitrate transporters. **Note:** for *broad-screen* questions (e.g. "which transporters could plausibly act on N?", scenario `n_source_de`) the opposite call applies — drop the filter so family_inferred biology is included; see §g. |
 | 3 | **Transport polarity not encoded.** TCDB annotation says "transports X" without import/export direction (KG-MET-011 open). Even with clean filters, "MED4 has cynA, ALT has nrtA" tells you both touch the substrate, not who's the producer. | both | None on the annotation side — surface the limitation in the answer ("compatible with", not "confirmed"). The Track-B measurement layer can corroborate (extracellular elevation in coculture) but cannot confirm causality. |
 
 **Pattern (two-step, with all three mitigations applied):**
