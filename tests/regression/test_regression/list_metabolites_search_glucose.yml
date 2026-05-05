@@ -727,6 +727,37 @@ returned: 23
 row_count: 23
 score_max: 3.0671024322509766
 score_median: 1.7444241046905518
+top_metabolite_pathways:
+- count: 18
+  metabolite_pathway_id: kegg.pathway:ko01100
+  metabolite_pathway_name: Metabolic pathways
+- count: 13
+  metabolite_pathway_id: kegg.pathway:ko01250
+  metabolite_pathway_name: Biosynthesis of nucleotide sugars
+- count: 13
+  metabolite_pathway_id: kegg.pathway:ko01110
+  metabolite_pathway_name: Biosynthesis of secondary metabolites
+- count: 9
+  metabolite_pathway_id: kegg.pathway:ko00541
+  metabolite_pathway_name: Biosynthesis of various nucleotide sugars
+- count: 8
+  metabolite_pathway_id: kegg.pathway:ko00520
+  metabolite_pathway_name: Amino sugar and nucleotide sugar metabolism
+- count: 8
+  metabolite_pathway_id: kegg.pathway:ko00500
+  metabolite_pathway_name: Starch and sucrose metabolism
+- count: 6
+  metabolite_pathway_id: kegg.pathway:ko00010
+  metabolite_pathway_name: Glycolysis / Gluconeogenesis
+- count: 6
+  metabolite_pathway_id: kegg.pathway:ko00052
+  metabolite_pathway_name: Galactose metabolism
+- count: 6
+  metabolite_pathway_id: kegg.pathway:ko01120
+  metabolite_pathway_name: Microbial metabolism in diverse environments
+- count: 5
+  metabolite_pathway_id: kegg.pathway:ko00521
+  metabolite_pathway_name: Streptomycin biosynthesis
 top_organisms:
 - count: 18
   organism_name: Shewanella sp. W3-18-1
@@ -748,37 +779,6 @@ top_organisms:
   organism_name: Alteromonas macleodii AD45
 - count: 17
   organism_name: Prochlorococcus MIT9303
-top_pathways:
-- count: 18
-  pathway_id: kegg.pathway:ko01100
-  pathway_name: Metabolic pathways
-- count: 13
-  pathway_id: kegg.pathway:ko01250
-  pathway_name: Biosynthesis of nucleotide sugars
-- count: 13
-  pathway_id: kegg.pathway:ko01110
-  pathway_name: Biosynthesis of secondary metabolites
-- count: 9
-  pathway_id: kegg.pathway:ko00541
-  pathway_name: Biosynthesis of various nucleotide sugars
-- count: 8
-  pathway_id: kegg.pathway:ko00520
-  pathway_name: Amino sugar and nucleotide sugar metabolism
-- count: 8
-  pathway_id: kegg.pathway:ko00500
-  pathway_name: Starch and sucrose metabolism
-- count: 6
-  pathway_id: kegg.pathway:ko00010
-  pathway_name: Glycolysis / Gluconeogenesis
-- count: 6
-  pathway_id: kegg.pathway:ko00052
-  pathway_name: Galactose metabolism
-- count: 6
-  pathway_id: kegg.pathway:ko01120
-  pathway_name: Microbial metabolism in diverse environments
-- count: 5
-  pathway_id: kegg.pathway:ko00521
-  pathway_name: Streptomycin biosynthesis
 total_entries: 3218
 total_matching: 23
 truncated: false

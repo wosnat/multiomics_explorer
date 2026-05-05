@@ -8630,7 +8630,7 @@ class TestMetabolitesByGene:
             "rows_by_transport_confidence": [],
             "by_gene": [],
             "by_element": [],
-            "top_pathways": [],
+            "top_metabolite_pathways": [],
             "top_metabolites": [],
             "top_reactions": [],
             "top_tcdb_families": [],
@@ -9418,7 +9418,7 @@ class TestListMetabolitesPhase1Plumbing:
     _SUMMARY_ROW = {
         "total_entries": 3218, "total_matching": 1,
         "top_organisms": [],
-        "top_pathways": [],
+        "top_metabolite_pathways": [],
         "by_evidence_source": [{"item": "metabolism", "count": 1}],
         "with_chebi": 0, "with_hmdb": 0, "with_mnxm": 0,
         "mass_min": None, "mass_median": None, "mass_max": None,

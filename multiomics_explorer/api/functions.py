@@ -1999,7 +1999,8 @@ def run_cypher(
 # ---------------------------------------------------------------------------
 
 _EXPRESSION_STATUS_KEYS = ("significant_up", "significant_down", "not_significant")
-_VALID_DIRECTIONS = {"up", "down", "both"}
+_VALID_DIRECTIONS_BY_GENE = {"up", "down", "both"}
+_VALID_DIRECTIONS_BY_ORTHOLOG = {"up", "down"}
 
 
 def _apoc_freq_to_dict(freq_list: list[dict]) -> dict[str, int]:
@@ -2152,9 +2153,9 @@ def differential_expression_by_gene(
     conn = _default_conn(conn)
 
     # Validate direction
-    if direction is not None and direction not in _VALID_DIRECTIONS:
+    if direction is not None and direction not in _VALID_DIRECTIONS_BY_GENE:
         raise ValueError(
-            f"Invalid direction '{direction}'. Valid: {sorted(_VALID_DIRECTIONS)}"
+            f"Invalid direction '{direction}'. Valid: {sorted(_VALID_DIRECTIONS_BY_GENE)}"
         )
 
     # Require at least one filter
@@ -2337,9 +2338,9 @@ def differential_expression_by_ortholog(
     if not group_ids:
         raise ValueError("group_ids must not be empty.")
 
-    if direction is not None and direction not in _VALID_DIRECTIONS:
+    if direction is not None and direction not in _VALID_DIRECTIONS_BY_ORTHOLOG:
         raise ValueError(
-            f"Invalid direction '{direction}'. Valid: {sorted(_VALID_DIRECTIONS)}"
+            f"Invalid direction '{direction}'. Valid: {sorted(_VALID_DIRECTIONS_BY_ORTHOLOG)}"
         )
 
     if summary:
@@ -5600,16 +5601,12 @@ def metabolites_by_gene(
         )
 
     # 3. Always run summary builder (envelope rollups even when summary=True).
-    _mbg_exclude_kw = (
-        {"exclude_metabolite_ids": exclude_metabolite_ids}
-        if exclude_metabolite_ids else {}
-    )
     sum_cypher, sum_params = build_metabolites_by_gene_summary(
         locus_tags=locus_tags,
         organism=organism,
         metabolite_elements=metabolite_elements,
         metabolite_ids=metabolite_ids,
-        **_mbg_exclude_kw,
+        exclude_metabolite_ids=exclude_metabolite_ids,
         ec_numbers=ec_numbers,
         mass_balance=mass_balance,
         metabolite_pathway_ids=metabolite_pathway_ids,
@@ -5648,7 +5645,7 @@ def metabolites_by_gene(
                     organism=organism,
                     metabolite_elements=metabolite_elements,
                     metabolite_ids=metabolite_ids,
-                    **_mbg_exclude_kw,
+                    exclude_metabolite_ids=exclude_metabolite_ids,
                     ec_numbers=ec_numbers,
                     mass_balance=mass_balance,
                     metabolite_pathway_ids=metabolite_pathway_ids,
@@ -5663,7 +5660,7 @@ def metabolites_by_gene(
                     organism=organism,
                     metabolite_elements=metabolite_elements,
                     metabolite_ids=metabolite_ids,
-                    **_mbg_exclude_kw,
+                    exclude_metabolite_ids=exclude_metabolite_ids,
                     metabolite_pathway_ids=metabolite_pathway_ids,
                     gene_categories=gene_categories,
                     transport_confidence=transport_confidence,
@@ -5684,7 +5681,7 @@ def metabolites_by_gene(
                         organism=organism,
                         metabolite_elements=metabolite_elements,
                         metabolite_ids=metabolite_ids,
-                        **_mbg_exclude_kw,
+                        exclude_metabolite_ids=exclude_metabolite_ids,
                         ec_numbers=ec_numbers,
                         mass_balance=mass_balance,
                         metabolite_pathway_ids=metabolite_pathway_ids,
@@ -5699,7 +5696,7 @@ def metabolites_by_gene(
                         organism=organism,
                         metabolite_elements=metabolite_elements,
                         metabolite_ids=metabolite_ids,
-                        **_mbg_exclude_kw,
+                        exclude_metabolite_ids=exclude_metabolite_ids,
                         metabolite_pathway_ids=metabolite_pathway_ids,
                         gene_categories=gene_categories,
                         transport_confidence=transport_confidence,

@@ -2434,7 +2434,7 @@ class TestListMetabolites:
         assert result["total_matching"] == 3218
         # Envelope rollups present (lists, possibly empty but typed)
         assert isinstance(result["top_organisms"], list)
-        assert isinstance(result["top_pathways"], list)
+        assert isinstance(result["top_metabolite_pathways"], list)
         assert isinstance(result["by_evidence_source"], list)
         assert isinstance(result["xref_coverage"], dict)
         assert isinstance(result["mass_stats"], dict)

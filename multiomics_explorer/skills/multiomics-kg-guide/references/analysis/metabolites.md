@@ -43,7 +43,7 @@ result = list_metabolites(
     organism_names=["Prochlorococcus MED4"],
     limit=20,
 )
-# Read result["top_pathways"], result["top_organisms"], result["xref_coverage"],
+# Read result["top_metabolite_pathways"], result["top_organisms"], result["xref_coverage"],
 # result["mass_stats"], result["by_evidence_source"].
 ```
 
@@ -76,13 +76,13 @@ result = metabolites_by_gene(
     organism="MED4",
     evidence_sources=["metabolism"],
 )
-# Read result["by_element"] (chemistry signature) and result["top_pathways"]
+# Read result["by_element"] (chemistry signature) and result["top_metabolite_pathways"]
 # (chemistry-pathway distinction — see caveat below).
 ```
 
 **`by_element` semantics — presence-only, not stoichiometric.** Each row carries `metabolite_count` = the count of *distinct compounds in the full match set* that contain that element at all. E.g., `[('H', 6), ('O', 6), ('P', 6), ('C', 5), ('N', 4)]` over 6 distinct compounds means 6 contain H/O/P, 5 contain C, 4 contain N. It does **not** count atoms per compound (stoichiometry lives in `metabolite.formula`, e.g. `HO7P2` for diphosphate), and it is **not** mass-balanced across reactions — the KG intentionally carries no substrate-vs-product role on `Reaction_has_metabolite` (Part 4 §4.1.1 resolved). The per-row `elements` field is the same shape: a set of symbols, no counts. The envelope aggregates over `total_matching`, not the truncated page.
 
-**Caveat — `top_pathways` is metabolite-anchored, NOT KO-anchored.** The chemistry-side `top_pathways` traverses `Metabolite → KeggTerm` via the denormalized `m.pathway_ids` field (sourced from `Metabolite_in_pathway` edges; KG-A5 rollup). Target pathways are filtered by `KeggTerm.reaction_count >= 3` to drop signaling/disease pathways with no chemistry breadth — that's a *gate* on the target node, not part of the traversal. So this rollup answers **"which pathways do my gene's metabolites participate in?"** Naming convention (Option A): treat this as **metabolite_pathways**, distinct from **ko_pathways** (anchored on `Gene → KeggTerm` via the KO hierarchy, surfaced by `genes_by_ontology(ontology="kegg", ...)`, `pathway_enrichment`, etc.). They reach the same KEGG pathway maps but via different membership relations. Disambiguate explicitly when answering.
+**Caveat — `top_metabolite_pathways` is metabolite-anchored, NOT KO-anchored.** The chemistry-side `top_metabolite_pathways` traverses `Metabolite → KeggTerm` via the denormalized `m.pathway_ids` field (sourced from `Metabolite_in_pathway` edges; KG-A5 rollup). Target pathways are filtered by `KeggTerm.reaction_count >= 3` to drop signaling/disease pathways with no chemistry breadth — that's a *gate* on the target node, not part of the traversal. So this rollup answers **"which pathways do my gene's metabolites participate in?"** Naming convention (Option A, locked Phase 2): the envelope key is **`top_metabolite_pathways`** with per-element keys `metabolite_pathway_id` / `metabolite_pathway_name`, distinct from **ko-pathway** annotations (anchored on `Gene → KeggTerm` via the KO hierarchy, surfaced by `genes_by_ontology(ontology="kegg", ...)`, `pathway_enrichment`, etc.). They reach the same KEGG pathway maps but via different membership relations. Disambiguate explicitly when answering.
 
 ---
 

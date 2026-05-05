@@ -850,7 +850,7 @@ class GenesByMetaboliteResponse(BaseModel):
 #
 # Naming convention: tool-anchored `Mbg*` prefix because the envelope mixes
 # entity types (gene-anchored `by_gene`, element-anchored `by_element`,
-# metabolite-anchored `top_metabolites`, pathway-anchored `top_pathways`).
+# metabolite-anchored `top_metabolites`, pathway-anchored `top_metabolite_pathways`).
 # `GeneReactionMetaboliteTriplet` is REUSED VERBATIM from
 # `genes_by_metabolite` (defined above at module level) — the per-row payload
 # is identical regardless of which side anchored the query.
@@ -7624,7 +7624,7 @@ def register_tools(mcp: FastMCP):
             description="When true, return only summary fields "
             "(results=[]). **Strongly recommended for batch DE inputs** "
             "(50+ locus_tags) — envelope rollups (top_metabolites, "
-            "top_pathways, top_reactions, top_tcdb_families, "
+            "top_metabolite_pathways, top_reactions, top_tcdb_families, "
             "by_element, by_gene, top_gene_categories) are the actually-"
             "useful artifact at that scale; detail rows can exceed 1,000 "
             "quickly.",
@@ -7694,7 +7694,7 @@ def register_tools(mcp: FastMCP):
           metabolite cross-refs, or
           `list_metabolites(metabolite_ids=[...], organism_names=[partner])`
           for cross-organism presence (cross-feeding primitive).
-        - Any `top_pathways` entry →
+        - Any `top_metabolite_pathways` entry →
           `list_metabolites(pathway_ids=[...])` for the full metabolite
           roster of the pathway (not just gene-set hits), or
           `genes_by_ontology(ontology="kegg", term_ids=[id], organism=...)`
@@ -7708,8 +7708,8 @@ def register_tools(mcp: FastMCP):
           `genes_by_ontology(ontology="tcdb", term_ids=[id], organism=...)`
           for sibling genes in the same family.
 
-        **`top_pathways` naming disambiguation.** Despite this being a
-        gene-anchored tool, `top_pathways` here means *KEGG pathways the
+        **`top_metabolite_pathways` naming disambiguation.** Despite this being a
+        gene-anchored tool, `top_metabolite_pathways` here means *KEGG pathways the
         gene set's chemistry reaches* — via `Reaction_in_kegg_pathway`
         and `Metabolite_in_pathway`. Distinct from the **gene-KO-
         mediated** pathway annotations available via

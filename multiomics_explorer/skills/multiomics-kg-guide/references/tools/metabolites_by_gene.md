@@ -47,7 +47,7 @@ Drill-downs from result rows / envelope rollups:
   metabolite cross-refs, or
   `list_metabolites(metabolite_ids=[...], organism_names=[partner])`
   for cross-organism presence (cross-feeding primitive).
-- Any `top_pathways` entry →
+- Any `top_metabolite_pathways` entry →
   `list_metabolites(pathway_ids=[...])` for the full metabolite
   roster of the pathway (not just gene-set hits), or
   `genes_by_ontology(ontology="kegg", term_ids=[id], organism=...)`
@@ -61,8 +61,8 @@ Drill-downs from result rows / envelope rollups:
   `genes_by_ontology(ontology="tcdb", term_ids=[id], organism=...)`
   for sibling genes in the same family.
 
-**`top_pathways` naming disambiguation.** Despite this being a
-gene-anchored tool, `top_pathways` here means *KEGG pathways the
+**`top_metabolite_pathways` naming disambiguation.** Despite this being a
+gene-anchored tool, `top_metabolite_pathways` here means *KEGG pathways the
 gene set's chemistry reaches* — via `Reaction_in_kegg_pathway`
 and `Metabolite_in_pathway`. Distinct from the **gene-KO-
 mediated** pathway annotations available via
@@ -85,7 +85,7 @@ analysis with a hypothesis test, use `pathway_enrichment`.
 | gene_categories | list[string] \| None | None | Filter on `Gene.gene_category` (exact match, applies to both arms uniformly). Use `list_filter_values(filter_type="gene_category")` for valid values. Note: somewhat redundant with `locus_tags` input; useful when locus_tags is a broad batch and you want chemistry from specific functional categories only. |
 | transport_confidence | string ('substrate_confirmed', 'family_inferred') \| None | None | Narrow transport rows by TCDB-annotation specificity. `substrate_confirmed` restricts transport rows to those annotated at TCDB `tc_specificity` (substrate-curated). `family_inferred` restricts to transport rows annotated at coarser TCDB levels (rolled up via the substrate edge). **Transport arm only — does not affect metabolism rows**, which are always substrate-confirmed by definition (direct catalysis edge) and carry `transport_confidence = None`. To restrict to transport rows alone, combine with `evidence_sources=['transport']`. **Recommended for high-precision transporter-hunting in batch DE inputs:** `transport_confidence='substrate_confirmed', evidence_sources=['transport']` (mutes the ABC-superfamily 551-row blowup). |
 | evidence_sources | list[string ('metabolism', 'transport')] \| None | None | Path selector — restricts which arms execute. Set to `['metabolism']` to skip transport entirely (no rollup noise); `['transport']` to skip metabolism. Default fires both arms. Note: `'metabolomics'` is NOT a valid value here — metabolomics evidence has no gene anchor and surfaces only in `list_metabolites`. |
-| summary | bool | False | When true, return only summary fields (results=[]). **Strongly recommended for batch DE inputs** (50+ locus_tags) — envelope rollups (top_metabolites, top_pathways, top_reactions, top_tcdb_families, by_element, by_gene, top_gene_categories) are the actually-useful artifact at that scale; detail rows can exceed 1,000 quickly. |
+| summary | bool | False | When true, return only summary fields (results=[]). **Strongly recommended for batch DE inputs** (50+ locus_tags) — envelope rollups (top_metabolites, top_metabolite_pathways, top_reactions, top_tcdb_families, by_element, by_gene, top_gene_categories) are the actually-useful artifact at that scale; detail rows can exceed 1,000 quickly. |
 | verbose | bool | False | Include extended fields per row: gene_category, metabolite_inchikey/smiles/mnxm_id/hmdb_id, reaction_mnxr_id/rhea_ids (metabolism rows), tcdb_level_kind/tc_class_id (transport rows). Same field set as `genes_by_metabolite`. |
 | limit | int | 10 | Max results in `results`. Default 10 covers ~p70 of single-gene UNION row distributions (median 6, p75 12 in MED4). Long-tail genes (ABC-superfamily-only) emit up to 551 rows — use `transport_confidence='substrate_confirmed'` to mute, or `offset` to page. |
 | offset | int | 0 | Number of results to skip for pagination. |

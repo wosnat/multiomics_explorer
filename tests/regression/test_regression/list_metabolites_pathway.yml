@@ -661,6 +661,37 @@ returned: 18
 row_count: 18
 score_max: null
 score_median: null
+top_metabolite_pathways:
+- count: 18
+  metabolite_pathway_id: kegg.pathway:ko00910
+  metabolite_pathway_name: Nitrogen metabolism
+- count: 18
+  metabolite_pathway_id: kegg.pathway:ko01100
+  metabolite_pathway_name: Metabolic pathways
+- count: 13
+  metabolite_pathway_id: kegg.pathway:ko01120
+  metabolite_pathway_name: Microbial metabolism in diverse environments
+- count: 7
+  metabolite_pathway_id: kegg.pathway:ko01110
+  metabolite_pathway_name: Biosynthesis of secondary metabolites
+- count: 7
+  metabolite_pathway_id: kegg.pathway:ko01310
+  metabolite_pathway_name: Nitrogen cycle
+- count: 7
+  metabolite_pathway_id: kegg.pathway:ko02020
+  metabolite_pathway_name: Two-component system
+- count: 6
+  metabolite_pathway_id: kegg.pathway:ko00630
+  metabolite_pathway_name: Glyoxylate and dicarboxylate metabolism
+- count: 6
+  metabolite_pathway_id: kegg.pathway:ko01200
+  metabolite_pathway_name: Carbon metabolism
+- count: 6
+  metabolite_pathway_id: kegg.pathway:ko00220
+  metabolite_pathway_name: Arginine biosynthesis
+- count: 6
+  metabolite_pathway_id: kegg.pathway:ko02010
+  metabolite_pathway_name: ABC transporters
 top_organisms:
 - count: 18
   organism_name: Ruegeria pomeroyi DSS-3
@@ -682,37 +713,6 @@ top_organisms:
   organism_name: Alteromonas macleodii BS11
 - count: 15
   organism_name: Alteromonas macleodii BGP6
-top_pathways:
-- count: 18
-  pathway_id: kegg.pathway:ko00910
-  pathway_name: Nitrogen metabolism
-- count: 18
-  pathway_id: kegg.pathway:ko01100
-  pathway_name: Metabolic pathways
-- count: 13
-  pathway_id: kegg.pathway:ko01120
-  pathway_name: Microbial metabolism in diverse environments
-- count: 7
-  pathway_id: kegg.pathway:ko01110
-  pathway_name: Biosynthesis of secondary metabolites
-- count: 7
-  pathway_id: kegg.pathway:ko01310
-  pathway_name: Nitrogen cycle
-- count: 7
-  pathway_id: kegg.pathway:ko02020
-  pathway_name: Two-component system
-- count: 6
-  pathway_id: kegg.pathway:ko00630
-  pathway_name: Glyoxylate and dicarboxylate metabolism
-- count: 6
-  pathway_id: kegg.pathway:ko01200
-  pathway_name: Carbon metabolism
-- count: 6
-  pathway_id: kegg.pathway:ko00220
-  pathway_name: Arginine biosynthesis
-- count: 6
-  pathway_id: kegg.pathway:ko02010
-  pathway_name: ABC transporters
 total_entries: 3218
 total_matching: 18
 truncated: false

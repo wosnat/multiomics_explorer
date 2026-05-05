@@ -1212,7 +1212,7 @@ class TestListMetabolitesContract:
 
     EXPECTED_ENVELOPE_KEYS = {
         "total_entries", "total_matching",
-        "top_organisms", "top_pathways", "by_evidence_source",
+        "top_organisms", "top_metabolite_pathways", "by_evidence_source",
         "xref_coverage", "mass_stats",
         "score_max", "score_median",
         "returned", "offset", "truncated", "not_found", "results",

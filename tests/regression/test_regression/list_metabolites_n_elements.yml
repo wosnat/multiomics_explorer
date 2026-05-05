@@ -257,6 +257,37 @@ returned: 5
 row_count: 5
 score_max: null
 score_median: null
+top_metabolite_pathways:
+- count: 880
+  metabolite_pathway_id: kegg.pathway:ko01100
+  metabolite_pathway_name: Metabolic pathways
+- count: 320
+  metabolite_pathway_id: kegg.pathway:ko01110
+  metabolite_pathway_name: Biosynthesis of secondary metabolites
+- count: 199
+  metabolite_pathway_id: kegg.pathway:ko01120
+  metabolite_pathway_name: Microbial metabolism in diverse environments
+- count: 182
+  metabolite_pathway_id: kegg.pathway:ko01240
+  metabolite_pathway_name: Biosynthesis of cofactors
+- count: 85
+  metabolite_pathway_id: kegg.pathway:ko00860
+  metabolite_pathway_name: Porphyrin metabolism
+- count: 78
+  metabolite_pathway_id: kegg.pathway:ko01230
+  metabolite_pathway_name: Biosynthesis of amino acids
+- count: 77
+  metabolite_pathway_id: kegg.pathway:ko01250
+  metabolite_pathway_name: Biosynthesis of nucleotide sugars
+- count: 71
+  metabolite_pathway_id: kegg.pathway:ko00230
+  metabolite_pathway_name: Purine metabolism
+- count: 65
+  metabolite_pathway_id: kegg.pathway:ko02010
+  metabolite_pathway_name: ABC transporters
+- count: 57
+  metabolite_pathway_id: kegg.pathway:ko00330
+  metabolite_pathway_name: Arginine and proline metabolism
 top_organisms:
 - count: 1360
   organism_name: Pseudomonas putida KT2440
@@ -278,37 +309,6 @@ top_organisms:
   organism_name: Alteromonas macleodii HOT1A3
 - count: 1132
   organism_name: Alteromonas macleodii AD45
-top_pathways:
-- count: 880
-  pathway_id: kegg.pathway:ko01100
-  pathway_name: Metabolic pathways
-- count: 320
-  pathway_id: kegg.pathway:ko01110
-  pathway_name: Biosynthesis of secondary metabolites
-- count: 199
-  pathway_id: kegg.pathway:ko01120
-  pathway_name: Microbial metabolism in diverse environments
-- count: 182
-  pathway_id: kegg.pathway:ko01240
-  pathway_name: Biosynthesis of cofactors
-- count: 85
-  pathway_id: kegg.pathway:ko00860
-  pathway_name: Porphyrin metabolism
-- count: 78
-  pathway_id: kegg.pathway:ko01230
-  pathway_name: Biosynthesis of amino acids
-- count: 77
-  pathway_id: kegg.pathway:ko01250
-  pathway_name: Biosynthesis of nucleotide sugars
-- count: 71
-  pathway_id: kegg.pathway:ko00230
-  pathway_name: Purine metabolism
-- count: 65
-  pathway_id: kegg.pathway:ko02010
-  pathway_name: ABC transporters
-- count: 57
-  pathway_id: kegg.pathway:ko00330
-  pathway_name: Arginine and proline metabolism
 total_entries: 3218
 total_matching: 1644
 truncated: true

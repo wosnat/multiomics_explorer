@@ -1581,7 +1581,7 @@
 - id: list_metabolites_search_glucose
   tool: list_metabolites
   desc: Lucene search by name
-  params: {search: glucose}
+  params: {search_text: glucose}
   expect:
     min_rows: 1
     columns: [metabolite_id, name, score]
