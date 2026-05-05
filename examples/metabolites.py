@@ -481,48 +481,103 @@ def scenario_n_source_de() -> None:
 def scenario_tcdb_chain() -> None:
     """Use this when the user asks 'which MED4 genes transport glycine betaine?'
 
-    Sources: transport (TCDB ontology bridge to metabolite-anchored route).
-    Caveat surfaced: substrate-anchored route (`genes_by_metabolite`) is
-    preferred over family-anchored route (`genes_by_ontology(ontology='tcdb')`)
-    for cross-family substrate hits.
+    Sources: transport (TCDB).
+
+    Demonstrates substrate-anchored vs family-anchored routing through three
+    concrete routes, with the family-anchored alternative made explicit (not
+    just asserted). For betaine in MED4 specifically, only the substrate-
+    anchored family_inferred rollup surfaces candidate transporters — the
+    literal 'betaine family' (BCCT, tcdb:2.A.15) has zero MED4 members.
+
+    Three-route comparison teaches:
+      - Substrate-anchored is the right primitive for 'which genes transport X?'
+        questions because it scopes by substrate, not by family taxonomy.
+      - Family-anchored is the right primitive for 'what does this family
+        transport?' or 'which genes are in this family?' — different shape.
+      - The substrate_confirmed vs no-filter call is question-shape-dependent
+        per analysis-doc §g (annotations ≠ ground truth; transporter
+        specificity is often promiscuous in nature).
     """
     print("=== Scenario: tcdb_chain ===")
     print("Question class: 'which genes transport this substrate?' "
           "(substrate-anchored, not family-anchored)")
     print()
 
-    print("Step 1 (illustrative): locate substrate via search_ontology(tcdb)")
-    # search_ontology requires positional `search_text` and `ontology` kwargs.
+    print("Step 1: discover betaine-relevant TCDB family via search_ontology")
     found = search_ontology(search_text="betaine", ontology="tcdb", limit=5)
-    print(f"  search returned {found.get('returned')} ontology terms.")
+    bcct_term_id: str | None = None
+    for row in found["results"]:
+        print(f"  {row.get('id'):<22} level={row.get('level')}  {row.get('name')}")
+        if "BCCT" in (row.get("name") or "") or "Betaine" in (row.get("name") or ""):
+            bcct_term_id = row.get("id")
+    print(f"  → discovered family: {bcct_term_id}")
     print()
 
-    print("Step 2: substrate-anchored — genes_by_metabolite(['kegg.compound:C00719'], "
-          "evidence_sources=['transport'])")
-    result = genes_by_metabolite(
-        metabolite_ids=["kegg.compound:C00719"],            # glycine betaine
+    BETAINE = "kegg.compound:C00719"
+    print(f"Step 2: three routes to answer 'which MED4 genes transport {BETAINE}?'")
+    print()
+
+    # Route A — substrate-anchored, substrate_confirmed only (most conservative)
+    a = genes_by_metabolite(
+        metabolite_ids=[BETAINE],
         organism="MED4",
         evidence_sources=["transport"],
-        limit=10,
+        transport_confidence="substrate_confirmed",
+        limit=50,
     )
-    print(f"  returned={result['returned']}  total_matching={result.get('total_matching')}")
-    print(f"  warnings: {result.get('warnings', [])}")
-    by_tc = result.get("by_transport_confidence") or []
-    print(f"  by_transport_confidence: "
-          f"{[(e.get('transport_confidence'), e.get('count')) for e in by_tc]}")
+    a_genes = sorted({r["locus_tag"] for r in a["results"] if r.get("locus_tag")})
+    print(f"  Route A — substrate-anchored, substrate_confirmed only: {len(a_genes)} genes")
+    print(f"           call: genes_by_metabolite(metabolite_ids=['{BETAINE}'],")
+    print(f"                                    transport_confidence='substrate_confirmed')")
+    print(f"           interp: no curator listed betaine at any MED4 family annotation level")
     print()
-    print("First 10 transporter candidates:")
-    for row in result["results"][:10]:
-        tc = row.get("transport_confidence", "-")
-        print(
-            f"  {row.get('locus_tag', '?'):<12} "
-            f"conf={tc:<22} "
-            f"family={str(row.get('tcdb_family_id', '-'))[:14]:<14} "
-            f"({str(row.get('tcdb_family_name', '?'))[:35]})"
-        )
+
+    # Route B — substrate-anchored, no filter (substrate scoped via family rollup)
+    b = genes_by_metabolite(
+        metabolite_ids=[BETAINE],
+        organism="MED4",
+        evidence_sources=["transport"],
+        limit=50,
+    )
+    b_genes = sorted({r["locus_tag"] for r in b["results"] if r.get("locus_tag")})
+    b_families = sorted({r.get("tcdb_family_id") for r in b["results"] if r.get("tcdb_family_id")})
+    print(f"  Route B — substrate-anchored, no transport_confidence filter: {len(b_genes)} genes")
+    print(f"           call: genes_by_metabolite(metabolite_ids=['{BETAINE}'])")
+    print(f"           interp: MED4 genes annotated to families that include betaine via rollup")
+    print(f"           tcdb_family_ids surfaced: {b_families}")
+    print(f"           genes: {b_genes}")
     print()
-    print("NOTE: prefer this substrate-anchored route over genes_by_ontology(ontology='tcdb').")
-    print("      The latter is family-anchored — misses substrates curated by other families.")
+
+    # Route C — family-anchored on the literal 'betaine family' (BCCT)
+    if bcct_term_id is None:
+        bcct_term_id = "tcdb:2.A.15"  # fallback to canonical BCCT id
+    c = genes_by_ontology(
+        ontology="tcdb",
+        term_ids=[bcct_term_id],
+        organism="MED4",
+        limit=50,
+    )
+    c_genes = sorted({r["locus_tag"] for r in c["results"] if r.get("locus_tag")})
+    print(f"  Route C — family-anchored on the literal 'betaine family' ({bcct_term_id}, BCCT):")
+    print(f"           {len(c_genes)} genes")
+    print(f"           call: genes_by_ontology(ontology='tcdb', term_ids=['{bcct_term_id}'])")
+    print(f"           interp: MED4 has zero BCCT-family members — the family-anchored route")
+    print(f"                   would have missed the candidates that Route B surfaced")
+    print()
+
+    print("Reading the 3-way comparison:")
+    print(f"  - Substrate-anchored Routes A and B share the *anchor* (the metabolite),")
+    print(f"    differ only in confidence-tier filter. A=conservative cast (curator-explicit);")
+    print(f"    B=broader cast that includes family-level transport potential.")
+    print(f"  - Family-anchored Route C uses a different anchor (the family taxonomy)")
+    print(f"    and answers a different question. For betaine in MED4 it returns zero —")
+    print(f"    the only candidates live in ABC superfamily (3.A.1) via family_inferred rollup.")
+    print(f"  - For 'which genes transport X?' — use substrate-anchored (A or B).")
+    print(f"  - For 'what does family Y transport?' or 'which genes are in family Y?' — use C.")
+    print()
+    print("Filter call (substrate_confirmed vs no filter) is question-shape-dependent.")
+    print("See analysis-doc §g — both tiers are annotations, neither is ground truth;")
+    print("transporter specificity is often promiscuous or under-characterized in nature.")
 
 
 def scenario_precision_tier() -> None:
