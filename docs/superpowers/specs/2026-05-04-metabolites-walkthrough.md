@@ -1,5 +1,7 @@
 # Metabolites Assets — End-of-Run Walkthrough
 
+> **Snapshot from initial run 2026-05-04.** The walkthrough was executed across 2026-05-04 → 2026-05-05; all four sections (A scenarios / B audit gap tables / C Part 4 questions / D Part 5 KG asks) are complete. Counts and status labels in this doc reflect the initial run; current canonical state lives in `2026-05-04-metabolites-surface-audit.md` (Part 5 5.A/5.B/5.C tables, 7 scenarios, KG-state-verified live asks).
+
 **Date:** 2026-05-04 (autonomous run)
 **Branch:** `feat-metabolites-assets` in `.worktrees/feat-metabolites-assets/`
 **Spec:** [2026-05-04-metabolites-assets-design.md](2026-05-04-metabolites-assets-design.md)
