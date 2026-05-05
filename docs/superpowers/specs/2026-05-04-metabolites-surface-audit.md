@@ -2,6 +2,8 @@
 
 **Date:** 2026-05-04 (initial); **last refreshed:** 2026-05-05 (walkthrough Q&A pass)
 **Spec:** [2026-05-04-metabolites-assets-design.md](2026-05-04-metabolites-assets-design.md)
+**Roadmap (explorer side):** [2026-05-05-metabolites-surface-refresh-roadmap.md](2026-05-05-metabolites-surface-refresh-roadmap.md) — risk-axis 5-phase shipping plan
+**KG-side asks (companion):** [docs/kg-specs/2026-05-05-metabolites-surface-asks.md](../../kg-specs/2026-05-05-metabolites-surface-asks.md) — 5 Live asks distilled from Part 5.A
 **Owner:** Osnat Weissberg
 **Status:** Three-pass complete (first-pass design; build-derived second pass; walkthrough Q&A third pass). Ready for KG-side review and metabolomics-DM definition conversation.
 
