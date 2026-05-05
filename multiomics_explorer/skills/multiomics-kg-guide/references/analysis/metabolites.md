@@ -183,13 +183,13 @@ metabolite_ids = [
 #    plateau is killed on the transport side only.
 alt_transport = genes_by_metabolite(
     metabolite_ids=metabolite_ids,
-    organism="Alteromonas macleodii",
+    organism="Alteromonas macleodii HOT1A3",   # one strain, not the species — keeps locus tags consistent and cuts cross-strain duplicate rows
     evidence_sources=["transport"],
     transport_confidence="substrate_confirmed",          # confounder #2
 )
 alt_metab = genes_by_metabolite(
     metabolite_ids=metabolite_ids,
-    organism="Alteromonas macleodii",
+    organism="Alteromonas macleodii HOT1A3",   # one strain, not the species — keeps locus tags consistent and cuts cross-strain duplicate rows
     evidence_sources=["metabolism"],
 )
 # Frame results as "compatible with cross-feeding" — confounder #3 unmitigable today.

@@ -244,7 +244,9 @@ def scenario_cross_feeding() -> None:
        the highest-reach metabolites are universal cofactors (H2O, ATP, ADP,
        Pi, PPi, NAD(P)(H)). Mitigation: post-filter via CURRENCY_METABOLITES_MIN8.
        Extend the blacklist if H+, glutamate/glutamine, or coenzyme A dominate
-       results in your seed.
+       results in your seed. The printed output deliberately keeps H+ outside
+       the minimal-8 blacklist — proton channels (MotA/TolQ/ExbB family)
+       surface in the transport arm and demonstrate when extension is warranted.
     2. Family-inferred plateau (transport arm) — broad-substrate ABC superfamily
        annotations propagate ~554 metabolites per MED4 gene at low confidence.
        Mitigation: transport_confidence='substrate_confirmed' on Step 2.
@@ -316,14 +318,14 @@ def scenario_cross_feeding() -> None:
     print("   transport_confidence='substrate_confirmed' kills the ABC family-inferred plateau)")
     alt_transport = genes_by_metabolite(
         metabolite_ids=metabolite_ids,
-        organism="Alteromonas macleodii",
+        organism="Alteromonas macleodii HOT1A3",
         evidence_sources=["transport"],
         transport_confidence="substrate_confirmed",
         limit=8,
     )
     alt_metab = genes_by_metabolite(
         metabolite_ids=metabolite_ids,
-        organism="Alteromonas macleodii",
+        organism="Alteromonas macleodii HOT1A3",
         evidence_sources=["metabolism"],
         limit=8,
     )
@@ -340,10 +342,15 @@ def scenario_cross_feeding() -> None:
 
     print(f"Top {alt_transport['returned']} ALT transporter candidates (substrate_confirmed):")
     for row in alt_transport["results"]:
+        suffix = (
+            "  [H+ → extend blacklist if PMF-coupling components are noise]"
+            if row.get("metabolite_id") == "kegg.compound:C00080"
+            else ""
+        )
         print(
             f"  {row.get('locus_tag', '?'):<14} → "
             f"{str(row.get('metabolite_id', '?'))[:22]:<22} "
-            f"{(row.get('product') or row.get('gene_name') or '')[:48]}"
+            f"{(row.get('product') or row.get('gene_name') or '')[:48]}{suffix}"
         )
     print()
     print(f"Top {alt_metab['returned']} ALT metabolism candidates (involved-in framing):")
