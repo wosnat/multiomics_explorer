@@ -420,6 +420,10 @@ def build_gene_overview_summary(
         "           coalesce(g.numeric_metric_count, 0)\n"
         "         + coalesce(g.boolean_metric_count, 0)\n"
         "         + coalesce(g.categorical_metric_count, 0) > 0]) AS has_derived_metrics,\n"
+        "       size([g IN found WHERE EXISTS {\n"
+        "         MATCH (g)-[:Gene_catalyzes_reaction|Gene_has_tcdb_family]->()"
+        "-[:Reaction_has_metabolite|Tcdb_family_transports_metabolite]->(:Metabolite)\n"
+        "       }]) AS has_chemistry,\n"
         "       not_found"
     )
     return cypher, {"locus_tags": locus_tags}
@@ -469,9 +473,35 @@ def build_gene_overview(
     else:
         limit_clause = ""
 
+    # Phase 1 plumbing (spec §6.1): per-row chemistry counts +
+    # path-existence-derived evidence_sources. The CASE/EXISTS form
+    # avoids the false-positive 'metabolism' tag that a metabolite-level
+    # rollup would produce on transport-only genes (e.g. PMM0392).
+    chemistry_with = (
+        "WITH g,\n"
+        "  CASE WHEN EXISTS {\n"
+        "    MATCH (g)-[:Gene_catalyzes_reaction]->(:Reaction)"
+        "-[:Reaction_has_metabolite]->(:Metabolite)\n"
+        "  } THEN ['metabolism'] ELSE [] END +\n"
+        "  CASE WHEN EXISTS {\n"
+        "    MATCH (g)-[:Gene_has_tcdb_family]->(:TcdbFamily)"
+        "-[:Tcdb_family_transports_metabolite]->(:Metabolite)\n"
+        "  } THEN ['transport'] ELSE [] END +\n"
+        "  CASE WHEN EXISTS {\n"
+        "    MATCH (g)-[:Gene_catalyzes_reaction]->(:Reaction)"
+        "-[:Reaction_has_metabolite]->(m:Metabolite)\n"
+        "    WHERE coalesce(m.measured_assay_count, 0) > 0\n"
+        "  } OR EXISTS {\n"
+        "    MATCH (g)-[:Gene_has_tcdb_family]->(:TcdbFamily)"
+        "-[:Tcdb_family_transports_metabolite]->(m:Metabolite)\n"
+        "    WHERE coalesce(m.measured_assay_count, 0) > 0\n"
+        "  } THEN ['metabolomics'] ELSE [] END AS evidence_sources\n"
+    )
+
     cypher = (
         "UNWIND $locus_tags AS lt\n"
         "MATCH (g:Gene {locus_tag: lt})\n"
+        f"{chemistry_with}"
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.gene_category AS gene_category,\n"
         "       g.annotation_quality AS annotation_quality,\n"
@@ -488,7 +518,11 @@ def build_gene_overview(
         "       coalesce(g.cluster_types, []) AS cluster_types,\n"
         "       coalesce(g.numeric_metric_count, 0) AS numeric_metric_count,\n"
         "       coalesce(g.boolean_metric_count, 0) AS boolean_metric_count,\n"
-        f"       coalesce(g.categorical_metric_count, 0) AS categorical_metric_count{verbose_cols}\n"
+        "       coalesce(g.categorical_metric_count, 0) AS categorical_metric_count,\n"
+        "       coalesce(g.reaction_count, 0) AS reaction_count,\n"
+        "       coalesce(g.metabolite_count, 0) AS metabolite_count,\n"
+        "       coalesce(g.tcdb_family_count, 0) AS transporter_count,\n"
+        f"       evidence_sources{verbose_cols}\n"
         f"ORDER BY g.locus_tag{skip_clause}{limit_clause}"
     )
     return cypher, params
@@ -864,6 +898,9 @@ def build_list_publications(
             "       coalesce(p.derived_metric_count, 0) AS derived_metric_count,\n"
             "       coalesce(p.derived_metric_value_kinds, []) AS derived_metric_value_kinds,\n"
             "       coalesce(p.compartments, []) AS compartments,\n"
+            "       coalesce(p.metabolite_count, 0) AS metabolite_count,\n"
+            "       coalesce(p.metabolite_assay_count, 0) AS metabolite_assay_count,\n"
+            "       coalesce(p.metabolite_compartments, []) AS metabolite_compartments,\n"
             f"       score{verbose_cols}\n"
             f"ORDER BY score DESC, p.publication_year DESC, p.title\n"
             f"{limit_clause}"
@@ -888,7 +925,10 @@ def build_list_publications(
             "       coalesce(p.growth_phases, []) AS growth_phases,\n"
             "       coalesce(p.derived_metric_count, 0) AS derived_metric_count,\n"
             "       coalesce(p.derived_metric_value_kinds, []) AS derived_metric_value_kinds,\n"
-            f"       coalesce(p.compartments, []) AS compartments{verbose_cols}\n"
+            "       coalesce(p.compartments, []) AS compartments,\n"
+            "       coalesce(p.metabolite_count, 0) AS metabolite_count,\n"
+            "       coalesce(p.metabolite_assay_count, 0) AS metabolite_assay_count,\n"
+            f"       coalesce(p.metabolite_compartments, []) AS metabolite_compartments{verbose_cols}\n"
             f"ORDER BY p.publication_year DESC, p.title\n"
             f"{limit_clause}"
         )
@@ -1147,6 +1187,10 @@ def build_list_metabolites(
             "       m.chebi_id AS chebi_id,\n"
             "       coalesce(m.pathway_ids, []) AS pathway_ids,\n"
             "       coalesce(m.pathway_count, 0) AS pathway_count,\n"
+            "       coalesce(m.measured_assay_count, 0) AS measured_assay_count,\n"
+            "       coalesce(m.measured_paper_count, 0) AS measured_paper_count,\n"
+            "       coalesce(m.measured_organisms, []) AS measured_organisms,\n"
+            "       coalesce(m.measured_compartments, []) AS measured_compartments,\n"
             f"       score{verbose_cols}\n"
             "ORDER BY score DESC, m.organism_count DESC, m.id\n"
             f"{limit_clause}"
@@ -1166,7 +1210,11 @@ def build_list_metabolites(
             "       coalesce(m.evidence_sources, []) AS evidence_sources,\n"
             "       m.chebi_id AS chebi_id,\n"
             "       coalesce(m.pathway_ids, []) AS pathway_ids,\n"
-            f"       coalesce(m.pathway_count, 0) AS pathway_count{verbose_cols}\n"
+            "       coalesce(m.pathway_count, 0) AS pathway_count,\n"
+            "       coalesce(m.measured_assay_count, 0) AS measured_assay_count,\n"
+            "       coalesce(m.measured_paper_count, 0) AS measured_paper_count,\n"
+            "       coalesce(m.measured_organisms, []) AS measured_organisms,\n"
+            f"       coalesce(m.measured_compartments, []) AS measured_compartments{verbose_cols}\n"
             "ORDER BY m.organism_count DESC, m.gene_count DESC, m.id\n"
             f"{limit_clause}"
         )
@@ -1256,10 +1304,14 @@ def build_list_metabolites_summary(
             "     count(m.hmdb_id) AS with_hmdb,\n"
             "     count(m.mnxm_id) AS with_mnxm,\n"
             "     collect(m.mass) AS masses,\n"
-            "     collect(score) AS scores\n"
+            "     collect(score) AS scores,\n"
+            "     collect(coalesce(m.measured_paper_count, 0)) AS paper_counts,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(m.measured_compartments, []))) AS m_comps\n"
             "MATCH (m2:Metabolite)\n"
             "WITH count(m2) AS total_entries, total_matching, es, all_orgs, "
-            "all_pwys, with_chebi, with_hmdb, with_mnxm, masses, scores\n"
+            "all_pwys, with_chebi, with_hmdb, with_mnxm, masses, scores, "
+            "paper_counts, m_comps\n"
             f"{top_organisms_block}"
             f"{top_pathways_block}"
             "RETURN total_entries, total_matching,\n"
@@ -1270,7 +1322,11 @@ def build_list_metabolites_summary(
             "       apoc.coll.max(masses) AS mass_max,\n"
             "       apoc.coll.max(scores) AS score_max,\n"
             "       apoc.coll.sort(scores)[size(scores)/2] AS score_median,\n"
-            "       top_organisms, top_pathways"
+            "       top_organisms, top_pathways,\n"
+            "       {\n"
+            "         by_paper_count: apoc.coll.frequencies(paper_counts),\n"
+            "         by_compartment: apoc.coll.frequencies(m_comps)\n"
+            "       } AS by_measurement_coverage"
         )
     else:
         # OPTIONAL MATCH preserves the total_entries row when the filtered
@@ -1292,7 +1348,10 @@ def build_list_metabolites_summary(
             "     count(m.chebi_id) AS with_chebi,\n"
             "     count(m.hmdb_id) AS with_hmdb,\n"
             "     count(m.mnxm_id) AS with_mnxm,\n"
-            "     collect(m.mass) AS masses\n"
+            "     collect(m.mass) AS masses,\n"
+            "     collect(coalesce(m.measured_paper_count, 0)) AS paper_counts,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(m.measured_compartments, []))) AS m_comps\n"
             f"{top_organisms_block}"
             f"{top_pathways_block}"
             "RETURN total_entries, total_matching,\n"
@@ -1301,7 +1360,11 @@ def build_list_metabolites_summary(
             "       apoc.coll.min(masses) AS mass_min,\n"
             "       apoc.coll.sort(masses)[size(masses)/2] AS mass_median,\n"
             "       apoc.coll.max(masses) AS mass_max,\n"
-            "       top_organisms, top_pathways"
+            "       top_organisms, top_pathways,\n"
+            "       {\n"
+            "         by_paper_count: apoc.coll.frequencies(paper_counts),\n"
+            "         by_compartment: apoc.coll.frequencies(m_comps)\n"
+            "       } AS by_measurement_coverage"
         )
 
     return cypher, params
@@ -1387,6 +1450,41 @@ def build_list_compartments() -> tuple[str, dict]:
     return cypher, {}
 
 
+def build_list_omics_types() -> tuple[str, dict]:
+    """List distinct Experiment.omics_type values with experiment counts.
+
+    Sourced from Experiment.omics_type (per spec §6.5). Live distinct
+    values: 8 categories. The Python wrapper layer is expected to merge
+    this with the canonical OMICS_TYPE enum so values like METABOLOMICS
+    appear with count=0 when no experiments of that type exist yet.
+
+    RETURN keys: value, count.
+    """
+    cypher = (
+        "MATCH (e:Experiment) WHERE e.omics_type IS NOT NULL\n"
+        "RETURN e.omics_type AS value, count(*) AS count\n"
+        "ORDER BY count DESC, value"
+    )
+    return cypher, {}
+
+
+def build_list_evidence_sources() -> tuple[str, dict]:
+    """List Metabolite.evidence_sources buckets with metabolite counts.
+
+    Sourced from Metabolite.evidence_sources array (per spec §6.5).
+    Live distribution: metabolism=2188, transport=1355, metabolomics=107.
+
+    RETURN keys: value, count.
+    """
+    cypher = (
+        "MATCH (m:Metabolite)\n"
+        "UNWIND coalesce(m.evidence_sources, []) AS src\n"
+        "RETURN src AS value, count(*) AS count\n"
+        "ORDER BY count DESC, value"
+    )
+    return cypher, {}
+
+
 def build_list_organisms(
     *,
     organism_names_lc: list[str] | None = None,
@@ -1460,6 +1558,7 @@ def build_list_organisms(
         "       coalesce(o.compartments, []) AS compartments,\n"
         "       coalesce(o.reaction_count, 0) AS reaction_count,\n"
         "       coalesce(o.metabolite_count, 0) AS metabolite_count,\n"
+        "       coalesce(o.measured_metabolite_count, 0) AS measured_metabolite_count,\n"
         "       o.reference_database AS reference_database,\n"
         "       o.reference_proteome AS reference_proteome,\n"
         "       coalesce(o.growth_phases, []) AS growth_phases"
@@ -1504,13 +1603,18 @@ def build_list_organisms_summary(
         "       collect(coalesce(o.compartments, []))) AS comps,\n"
         "     apoc.coll.flatten(\n"
         "       collect(coalesce(o.cluster_types, []))) AS ctypes,\n"
-        "     collect(o.organism_type) AS otypes\n"
+        "     collect(o.organism_type) AS otypes,\n"
+        "     collect(coalesce(o.measured_metabolite_count, 0)) AS mmc\n"
         "RETURN total_entries, total_matching,\n"
         "       apoc.coll.frequencies(vks) AS by_value_kind,\n"
         "       apoc.coll.frequencies(mtypes) AS by_metric_type,\n"
         "       apoc.coll.frequencies(comps) AS by_compartment,\n"
         "       apoc.coll.frequencies(ctypes) AS by_cluster_type,\n"
-        "       apoc.coll.frequencies(otypes) AS by_organism_type"
+        "       apoc.coll.frequencies(otypes) AS by_organism_type,\n"
+        "       {\n"
+        "         has_metabolomics: size([c IN mmc WHERE c > 0]),\n"
+        "         no_metabolomics: size([c IN mmc WHERE c = 0])\n"
+        "       } AS by_measurement_capability"
     )
     return cypher, params
 
@@ -1532,7 +1636,8 @@ def build_list_organisms_capability(
     Same WHERE clause as build_list_organisms / build_list_organisms_summary
     so the matched set is identical.
 
-    RETURN keys: organism_name, reaction_count, metabolite_count.
+    RETURN keys: organism_name, reaction_count, metabolite_count,
+    measured_metabolite_count.
     """
     conditions = [
         "($organism_names_lc IS NULL"
@@ -1550,7 +1655,8 @@ def build_list_organisms_capability(
         f"{where_block}"
         "RETURN o.preferred_name AS organism_name,\n"
         "       coalesce(o.reaction_count, 0) AS reaction_count,\n"
-        "       coalesce(o.metabolite_count, 0) AS metabolite_count\n"
+        "       coalesce(o.metabolite_count, 0) AS metabolite_count,\n"
+        "       coalesce(o.measured_metabolite_count, 0) AS measured_metabolite_count\n"
         "ORDER BY o.genus, o.preferred_name"
     )
     return cypher, params
@@ -1759,6 +1865,9 @@ def build_list_experiments(
         ",\n       coalesce(e.derived_metric_count, 0) AS derived_metric_count"
         ",\n       coalesce(e.derived_metric_value_kinds, []) AS derived_metric_value_kinds"
         ",\n       e.compartment AS compartment"
+        ",\n       coalesce(e.metabolite_count, 0) AS metabolite_count"
+        ",\n       coalesce(e.metabolite_assay_count, 0) AS metabolite_assay_count"
+        ",\n       coalesce(e.metabolite_compartments, []) AS metabolite_compartments"
     )
 
     if search_text:

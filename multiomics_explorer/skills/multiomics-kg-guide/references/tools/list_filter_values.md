@@ -12,7 +12,7 @@ Use the returned values as filter parameters in `genes_by_function`
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment') | gene_category | Which categorical filter to enumerate. 'gene_category' / 'brite_tree' / 'growth_phase'; 'metric_type' / 'value_kind' / 'compartment' (DerivedMetric discovery). |
+| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment', 'omics_type', 'evidence_source') | gene_category | Which categorical filter to enumerate. 'gene_category' / 'brite_tree' / 'growth_phase'; 'metric_type' / 'value_kind' / 'compartment' (DerivedMetric discovery); 'omics_type' (Experiment.omics_type enum incl. METABOLOMICS); 'evidence_source' (Metabolite.evidence_sources values: 'metabolism', 'transport', 'metabolomics'). |
 
 ## Response format
 
@@ -145,6 +145,37 @@ list_filter_values(filter_type="compartment")
  ]}
 ```
 
+### Example 8: Enumerate omics types (for experiment / publication filtering)
+
+```example-call
+list_filter_values(filter_type="omics_type")
+```
+
+```example-response
+{"filter_type": "omics_type", "total_entries": 8, "returned": 8, "truncated": false,
+ "results": [
+   {"value": "RNASEQ", "count": 48},
+   {"value": "PROTEOMICS", "count": 14},
+   {"value": "MICROARRAY", "count": 6},
+   {"value": "METABOLOMICS", "count": 8}
+ ]}
+```
+
+### Example 9: Enumerate metabolite evidence sources
+
+```example-call
+list_filter_values(filter_type="evidence_source")
+```
+
+```example-response
+{"filter_type": "evidence_source", "total_entries": 3, "returned": 3, "truncated": false,
+ "results": [
+   {"value": "metabolism", "count": 2188},
+   {"value": "transport", "count": 1355},
+   {"value": "metabolomics", "count": 107}
+ ]}
+```
+
 ## Chaining patterns
 
 ```
@@ -152,6 +183,8 @@ list_filter_values → genes_by_function(category=...)
 list_filter_values('brite_tree') → ontology_landscape(tree=...) → pathway_enrichment(tree=...)
 list_filter_values(filter_type='metric_type') → list_derived_metrics(metric_types=[...]) → genes_by_{kind}_metric
 list_filter_values(filter_type='compartment') → list_experiments(compartment=...) / list_organisms(compartment=...) / list_publications(compartment=...)
+list_filter_values(filter_type='evidence_source') → list_metabolites(evidence_sources=[...]) for slicing by evidence type.
+list_filter_values(filter_type='omics_type') → list_experiments(omics_type=...) for filtering by experiment type.
 ```
 
 ## Common mistakes

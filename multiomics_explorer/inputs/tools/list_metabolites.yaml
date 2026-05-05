@@ -18,6 +18,16 @@ examples:
   - title: Transport-only metabolites (TCDB-curated substrates without local catalysis)
     call: list_metabolites(evidence_sources=["transport"], summary=True)
 
+  - title: Measured metabolites — measurement coverage envelope
+    call: list_metabolites(evidence_sources=["metabolomics"], summary=True)
+    response: |
+      {"total_entries": 3218, "total_matching": 107,
+       "by_measurement_coverage": {
+         "by_paper_count": [{"paper_count": 1, "n": 99}, {"paper_count": 2, "n": 8}],
+         "by_compartment": [{"compartment": "whole_cell", "n": 99}, {"compartment": "extracellular", "n": 92}]
+       },
+       "returned": 0, "truncated": true, "offset": 0, "results": []}
+
   - title: Multi-step — find N-metabolites then drill into catalysts
     steps: |
       Step 1: list_metabolites(organism_names=["Prochlorococcus MED4"], elements=["N"], limit=10)
@@ -38,6 +48,7 @@ chaining:
   - "list_metabolites → genes_by_metabolite(metabolite_ids=[...], organism=...)"
   - "list_metabolites (per-row pathway_ids) → genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...)"
   - "differential_expression_by_gene → gene_metabolic_role(metabolite_elements=['N']) → list_metabolites for chemistry context"
+  - "list_metabolites (per-row `measured_assay_count > 0`) → run_cypher to inspect MetaboliteAssay edges (Phase 5 will replace this with `assays_by_metabolite(metabolite_ids=[...])`)."
 
 mistakes:
   - "Direction-agnostic. Joining through Reaction_has_metabolite (catalysis) and Tcdb_family_transports_metabolite (transport) does NOT distinguish substrates from products. KEGG equation order is arbitrary. Layer DE direction (`differential_expression_by_gene`) and functional annotation to disambiguate."
@@ -46,6 +57,7 @@ mistakes:
   - "organism_names with multiple values is UNION, not intersection. To find metabolites BOTH organisms reach, run two single-org calls and intersect by metabolite_id (or filter per-row by organism_count and inspect `m.organism_names` for the full UNION list)."
   - "metaboliteFullText covers Metabolite.name only — NOT formula. For element/composition queries, use `elements` (presence list)."
   - "evidence_sources accepts 'metabolomics' as forward-compat for the future metabolomics-DM spec; no row matches it today."
+  - "`measured_compartments` is populated on all 107 measured metabolites (defaults to `[]` on the 3111 unmeasured); use `len(m['measured_compartments']) >= 1` to filter for measurement-anchored rows. Same metabolite measured in both whole_cell and extracellular returns one row with `measured_compartments=['extracellular','whole_cell']` (sorted), not two rows — Metabolite is compartment-agnostic per KG-MET-002."
   - wrong: "list_metabolites(elements=['N'], gene_count_min=1)  # gene_count_min isn't a param"
     right: "list_metabolites(elements=['N'])  # then filter rows in code by gene_count > 0"
   - wrong: "list_metabolites(organism_names=['MED4'])  # short name doesn't match"

@@ -31,7 +31,7 @@ derived_metric_count > 0).
 ### Envelope
 
 ```expected-keys
-total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, returned, offset, truncated, not_found, results
+total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, has_chemistry, returned, offset, truncated, not_found, results
 ```
 
 - **total_matching** (int): Genes found in KG from input locus_tags
@@ -44,6 +44,7 @@ total_matching, by_organism, by_category, by_annotation_type, by_annotation_stat
 - **has_orthologs** (int): Genes with ortholog group membership
 - **has_clusters** (int): Genes with cluster membership
 - **has_derived_metrics** (int): Count of requested locus_tags carrying any DM annotation.
+- **has_chemistry** (int): Count of requested locus_tags with non-empty evidence_sources (i.e. participate in at least one reaction-to-metabolite or transport path). Mirrors has_orthologs / has_clusters routing-signal pattern.
 - **returned** (int): Results in this response (0 when summary=true)
 - **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
@@ -71,6 +72,10 @@ total_matching, by_organism, by_category, by_annotation_type, by_annotation_stat
 | cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison', 'diel']). Use gene_clusters_by_gene with cluster_type filter to scope drill-down. |
 | derived_metric_count | int (optional) | Total DerivedMetric annotations on this gene (sum across numeric/boolean/categorical kinds). |
 | derived_metric_value_kinds | list[string] (optional) | Subset of {numeric, boolean, categorical} where this gene has DM annotations. Use to route to genes_by_{kind}_metric drill-downs. |
+| reaction_count | int (optional) | Distinct reactions catalysed by this gene (precomputed Gene-side rollup; e.g. 4 for PMM0001). When > 0, drill via metabolites_by_gene(locus_tags=[locus_tag], organism=...). |
+| metabolite_count | int (optional) | Distinct metabolites reachable from this gene via reaction OR transport (UNION; e.g. 554 for PMM0392 with reaction_count=0 from 8 TCDB families). Differs from OrganismTaxon.metabolite_count which is reaction-only. |
+| transporter_count | int (optional) | Distinct TCDB families annotated to this gene (sourced from Gene.tcdb_family_count; e.g. 8 for PMM0392). When > 0, drill via genes_by_metabolite or metabolites_by_gene with the transport arm. |
+| evidence_sources | list[string] (optional) | Subset of {'metabolism','transport','metabolomics'} describing which kinds of paths exist from this gene to its metabolites. Path-existence semantics — 'metabolism' means at least one Gene→Reaction→Metabolite path exists; 'transport' means at least one Gene→TcdbFamily→Metabolite path exists; 'metabolomics' means at least one reachable metabolite has measurement coverage. Routing hint for chemistry drill-down tools. |
 | numeric_metric_count | int \| None (optional) | Numeric DM count (verbose). |
 | boolean_metric_count | int \| None (optional) | Boolean DM count (verbose). |
 | categorical_metric_count | int \| None (optional) | Categorical DM count (verbose). |
@@ -148,6 +153,19 @@ gene_overview(locus_tags=["MIT1002_01809"])
  ]}
 ```
 
+### Example 6: Chemistry-rich gene — broad ABC transporter with measurement coverage
+
+```example-call
+gene_overview(locus_tags=["PMM0392"])
+```
+
+```example-response
+{"total_matching": 1, "has_expression": 1, "has_chemistry": 1, "returned": 1, "truncated": false, "offset": 0, "not_found": [],
+ "results": [
+   {"locus_tag": "PMM0392", "gene_name": null, "product": "ABC transporter, ATP-binding protein", "organism_name": "Prochlorococcus MED4", "reaction_count": 0, "metabolite_count": 554, "transporter_count": 8, "evidence_sources": ["transport", "metabolomics"]}
+ ]}
+```
+
 ## Chaining patterns
 
 ```
@@ -159,6 +177,7 @@ gene_overview → differential_expression_by_gene
 gene_overview → gene_clusters_by_gene
 gene_overview(locus_tags=...) → for genes with derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric; for ['numeric'] use genes_by_numeric_metric; for ['categorical'] use genes_by_categorical_metric
 gene_overview(verbose=True) → see compartments_observed for vesicle/whole-cell triage
+gene_overview (per-row `evidence_sources` non-empty) → metabolites_by_gene OR genes_by_metabolite for chemistry drill-down.
 ```
 
 ## Common mistakes
@@ -175,6 +194,10 @@ gene_overview(verbose=True) → see compartments_observed for vesicle/whole-cell
 
 - cluster_membership_count > 0 means cluster data exists — use gene_clusters_by_gene to explore it
 
+- When `evidence_sources` is non-empty, drill via `metabolites_by_gene` (gene-anchored) or `genes_by_metabolite` (metabolite-anchored). The list values are `['metabolism', 'transport', 'metabolomics']` — `metabolomics` means at least one of the gene's reachable metabolites has measurement coverage.
+
+- `metabolite_count` on Gene is reaction-OR-transport reachable (verified PMM0392 with reaction_count=0 has metabolite_count=554 from 8 TCDB families) — not the same as `OrganismTaxon.metabolite_count` which is reaction-only.
+
 ```mistake
 gene_overview(locus_tags=['PMM0845'], verbose=True)  # just to see the gene
 ```
@@ -189,7 +212,7 @@ gene_overview(locus_tags=['PMM0845'])  # verbose only needed for gene_summary te
 from multiomics_explorer import gene_overview
 
 result = gene_overview(locus_tags=...)
-# returns dict with keys: total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, offset, not_found, results
+# returns dict with keys: total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, has_chemistry, offset, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

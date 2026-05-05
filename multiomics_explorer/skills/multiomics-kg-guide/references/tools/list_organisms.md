@@ -40,7 +40,7 @@ field enumeration.
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind, by_metric_type, by_compartment, by_metabolic_capability, returned, offset, truncated, not_found, results
+total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind, by_metric_type, by_compartment, by_metabolic_capability, by_measurement_capability, returned, offset, truncated, not_found, results
 ```
 
 - **total_entries** (int): Total organisms in the KG
@@ -51,6 +51,7 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 - **by_metric_type** (list[OrgMetricTypeBreakdown]): DM metric_type frequency rollup across matched organisms. Each entry: {metric_type, count}.
 - **by_compartment** (list[OrgCompartmentBreakdown]): Wet-lab compartment frequency rollup across matched organisms. Each entry: {compartment, count}.
 - **by_metabolic_capability** (list[OrgMetabolicCapabilityBreakdown]): Top 10 organisms by metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites.
+- **by_measurement_capability** (OrgMeasurementCapability): Binary rollup of metabolomics measurement coverage across matched organisms: {has_metabolomics, no_metabolomics}. Today 4 organisms carry non-zero measured_metabolite_count out of ~37 total (Phase 1 plumbing — spec §6.4).
 - **returned** (int): Number of results returned
 - **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > offset + returned
@@ -81,6 +82,7 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 | compartments | list[string] (optional) | Wet-lab compartments measured for this organism (e.g. ['whole_cell', 'vesicle']). |
 | reaction_count | int (optional) | Distinct reactions catalyzed by genes in this organism (e.g. 943). When > 0, drill in via list_metabolites(organism_names=[organism_name]) to enumerate metabolites this organism is capable of metabolizing. |
 | metabolite_count | int (optional) | Distinct metabolites this organism's genes can act on (e.g. 1039). Capability signal — does NOT mean these metabolites were measured. Today reflects gene catalysis only; will grow to include transport substrates when the TCDB-CAZy ontology ships, with no schema change. When > 0, drill in via list_metabolites(organism_names=[organism_name]). |
+| measured_metabolite_count | int (optional) | Distinct metabolites measured in this organism via any MetaboliteAssay (precomputed OrganismTaxon.measured_metabolite_count). Non-zero on 4 organisms today: MIT9301 (4 assays), MIT9313 (3), MIT0801 (2), MIT9303 (1). Different from metabolite_count (reaction-only chemistry capability). |
 | derived_metric_gene_count | int \| None (optional) | Total gene-level DM annotation count (verbose-only). |
 | derived_metric_types | list[string] \| None (optional) | Distinct metric_type tags observed (verbose-only). |
 | reference_database | string \| None (optional) | Reference database used for matching (e.g. 'MarRef v6'). Only on reference_proteome_match organisms. |
@@ -178,6 +180,16 @@ list_organisms(summary=True)
 {"total_entries": 36, "total_matching": 36, "by_metabolic_capability": [{"organism_name": "Pseudomonas putida KT2440", "reaction_count": 1449, "metabolite_count": 1490}, {"organism_name": "Ruegeria pomeroyi DSS-3", "reaction_count": 1377, "metabolite_count": 1468}, {"organism_name": "Alteromonas macleodii EZ55", "reaction_count": 1348, "metabolite_count": 1428}], "returned": 0, "truncated": true, "offset": 0, "not_found": [], "results": []}
 ```
 
+### Example 7: Survey measurement coverage across organisms
+
+```example-call
+list_organisms(summary=True)
+```
+
+```example-response
+{"total_entries": 37, "total_matching": 37, "by_measurement_capability": {"has_metabolomics": 4, "no_metabolomics": 33}, "returned": 0, "truncated": true, "offset": 0, "not_found": [], "results": []}
+```
+
 ## Chaining patterns
 
 ```
@@ -214,13 +226,15 @@ list_organisms (per-row metabolite_count > 0) → list_metabolites(organism_name
 
 - by_metabolic_capability is a top-10 ranking sorted by metabolite_count descending; organisms with zero chemistry are excluded. Use it on summary=True calls to identify chemistry-rich organisms before drilling in via list_metabolites(organism_names=[...]).
 
+- `measured_metabolite_count` is the count of distinct metabolites measured in this organism via any MetaboliteAssay — different from `metabolite_count` (reaction-only chemistry capability) and from `metabolite_count` on Gene/Publication/Experiment which are different rollups. The 4 organisms with non-zero `measured_metabolite_count` today are MIT9301 (4 assays), MIT9313 (3), MIT0801 (2), MIT9303 (1).
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import list_organisms
 
 result = list_organisms()
-# returns dict with keys: total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind, by_metric_type, by_compartment, by_metabolic_capability, offset, not_found, results
+# returns dict with keys: total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind, by_metric_type, by_compartment, by_metabolic_capability, by_measurement_capability, offset, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

@@ -75,6 +75,9 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 | derived_metric_count | int (optional) | Number of DerivedMetric nodes from this publication (e.g. 3) |
 | derived_metric_value_kinds | list[string] (optional) | Value kinds of DerivedMetrics in this publication (e.g. ['numeric', 'boolean']) |
 | compartments | list[string] (optional) | Wet-lab compartments measured in this publication (e.g. ['whole_cell', 'vesicle']) |
+| metabolite_count | int (optional) | Distinct metabolites measured in this publication (precomputed Publication.metabolite_count). Non-zero on the metabolomics-paired papers only (Capovilla 2023, Kujawinski 2023). When > 0 → list_metabolites or run_cypher to inspect MetaboliteAssay nodes. |
+| metabolite_assay_count | int (optional) | Distinct MetaboliteAssay edges anchored to this publication (precomputed). Mirrors metabolite_count today; will diverge once a metabolite is measured in multiple compartments per paper. |
+| metabolite_compartments | list[string] (optional) | Wet-lab compartments measured for metabolomics in this publication (e.g. ['whole_cell', 'extracellular']). Populated only when metabolite_assay_count > 0; [] otherwise. |
 | score | float \| None (optional) | Lucene relevance score (only with search_text) |
 | derived_metric_gene_count | int \| None (optional) | Total genes annotated by DerivedMetrics in this publication (only with verbose=True) |
 | derived_metric_types | list[string] \| None (optional) | Distinct DerivedMetric types in this publication (only with verbose=True, e.g. ['diel_rhythmicity']) |
@@ -148,6 +151,20 @@ list_publications(compartment="vesicle")
  ]}
 ```
 
+### Example 6: Find metabolomics-bearing publications
+
+```example-call
+list_publications(search_text="metabolite")
+```
+
+```example-response
+{"total_matching": 2, "returned": 2, "truncated": false, "offset": 0,
+ "results": [
+   {"doi": "10.1038/s41396-023-01394-0", "title": "Capovilla 2023 metabolomics study", "year": 2023, "metabolite_count": 92, "metabolite_assay_count": 184, "metabolite_compartments": ["extracellular", "whole_cell"]},
+   {"doi": "10.1038/s41396-023-01415-y", "title": "Kujawinski 2023 metabolomics study", "year": 2023, "metabolite_count": 15, "metabolite_assay_count": 15, "metabolite_compartments": ["whole_cell"]}
+ ]}
+```
+
 ## Chaining patterns
 
 ```
@@ -157,6 +174,7 @@ list_publications → list_clustering_analyses(publication_doi=[...])
 list_publications(search_text=..., verbose=True) → classify → list_publications(publication_dois=[...]) for the picked subset
 list_publications(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric
 list_filter_values(filter_type='metric_type') → list_publications(search_text='<metric_type>') to find publications with that metric
+list_publications (per-row `metabolite_count > 0`) → run_cypher to inspect MetaboliteAssay nodes for the publication (Phase 5 will replace this with `list_metabolite_assays(publication_doi=[...])`).
 ```
 
 ## Common mistakes

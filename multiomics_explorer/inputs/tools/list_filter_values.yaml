@@ -82,11 +82,34 @@ examples:
          {"value": "vesicle", "count": 5}
        ]}
 
+  - title: Enumerate omics types (for experiment / publication filtering)
+    call: list_filter_values(filter_type="omics_type")
+    response: |
+      {"filter_type": "omics_type", "total_entries": 8, "returned": 8, "truncated": false,
+       "results": [
+         {"value": "RNASEQ", "count": 48},
+         {"value": "PROTEOMICS", "count": 14},
+         {"value": "MICROARRAY", "count": 6},
+         {"value": "METABOLOMICS", "count": 8}
+       ]}
+
+  - title: Enumerate metabolite evidence sources
+    call: list_filter_values(filter_type="evidence_source")
+    response: |
+      {"filter_type": "evidence_source", "total_entries": 3, "returned": 3, "truncated": false,
+       "results": [
+         {"value": "metabolism", "count": 2188},
+         {"value": "transport", "count": 1355},
+         {"value": "metabolomics", "count": 107}
+       ]}
+
 chaining:
   - "list_filter_values → genes_by_function(category=...)"
   - "list_filter_values('brite_tree') → ontology_landscape(tree=...) → pathway_enrichment(tree=...)"
   - "list_filter_values(filter_type='metric_type') → list_derived_metrics(metric_types=[...]) → genes_by_{kind}_metric"
   - "list_filter_values(filter_type='compartment') → list_experiments(compartment=...) / list_organisms(compartment=...) / list_publications(compartment=...)"
+  - "list_filter_values(filter_type='evidence_source') → list_metabolites(evidence_sources=[...]) for slicing by evidence type."
+  - "list_filter_values(filter_type='omics_type') → list_experiments(omics_type=...) for filtering by experiment type."
 
 mistakes:
   - "Use filter_type='metric_type' to discover DerivedMetric tags before passing them to genes_by_{kind}_metric or list_derived_metrics. filter_type='value_kind' enumerates {numeric, boolean, categorical}. filter_type='compartment' enumerates wet-lab fractions (whole_cell, vesicle, exoproteome, ...)."

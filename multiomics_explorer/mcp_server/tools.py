@@ -406,6 +406,11 @@ class MetaboliteResult(BaseModel):
     chebi_id: str | None = Field(default=None, description="ChEBI ID (raw numeric, e.g. '4167'). Populated on 90% of metabolites overall — 100% of the 452 chebi:-IDed transport-only metabolites (extracted from the ID itself), plus the kegg.compound:-IDed metabolites that cross-ref ChEBI.")
     pathway_ids: list[str] = Field(default_factory=list, description="KEGG pathway memberships (e.g. ['kegg.pathway:ko00010', 'kegg.pathway:ko01100']). Empty when no Metabolite_in_pathway edges. Drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...).")
     pathway_count: int = Field(default=0, description="Distinct count of KEGG pathways this metabolite is in (e.g. 5). Routing signal — when > 0, drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...) for genes annotated to those pathways. Equal to size(pathway_ids).")
+    # Metabolomics measurement rollup (Phase 1 plumbing — spec §6.6)
+    measured_assay_count: int = Field(default=0, description="Distinct MetaboliteAssay edges anchored to this metabolite (precomputed Metabolite.measured_assay_count). Non-zero on 107 of ~3200 metabolites today. When > 0, the metabolite has experimental measurement coverage.")
+    measured_paper_count: int = Field(default=0, description="Distinct papers measuring this metabolite (precomputed). Non-zero on 107; today 8 covered by 2 papers, 99 by 1.")
+    measured_organisms: list[str] = Field(default_factory=list, description="Organism preferred_names with at least one MetaboliteAssay anchored to this metabolite. Populated when measured_assay_count > 0; [] otherwise.")
+    measured_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments observed for this metabolite (subset of {'whole_cell', 'extracellular'}). Populated by post-import on all 107 measured metabolites; [] on the 3111 unmeasured. Use len(measured_compartments) >= 1 to filter for measurement-anchored rows.")
     score: float | None = Field(default=None, description="Lucene relevance score (only with `search`).")
 
     # verbose
@@ -450,6 +455,21 @@ class MetNotFound(BaseModel):
     pathway_ids: list[str] = Field(default_factory=list, description="Input pathway_ids with no matching KeggTerm (e.g. ['kegg.pathway:bogus']).")
 
 
+class MetPaperCountBucket(BaseModel):
+    paper_count: int = Field(description="Number of distinct papers measuring a metabolite (e.g. 0, 1, 2).")
+    n: int = Field(description="Number of metabolites in the matched set with this paper_count value (e.g. 3111 metabolites with paper_count=0).")
+
+
+class MetCompartmentBucket(BaseModel):
+    compartment: str = Field(description="Wet-lab compartment (e.g. 'whole_cell', 'extracellular').")
+    n: int = Field(description="Number of matched measured metabolites observed in this compartment (e.g. 107 for whole_cell).")
+
+
+class MetMeasurementCoverage(BaseModel):
+    by_paper_count: list[MetPaperCountBucket] = Field(default_factory=list, description="Frequency distribution of measured_paper_count across the matched metabolite set. E.g. [{paper_count: 0, n: 3111}, {paper_count: 1, n: 99}, {paper_count: 2, n: 8}].")
+    by_compartment: list[MetCompartmentBucket] = Field(default_factory=list, description="Frequency distribution of measured_compartments values across the matched set (over the 107 measured metabolites). Sums to >= count of measured metabolites because the same metabolite can be measured in multiple compartments.")
+
+
 class ListMetabolitesResponse(BaseModel):
     total_entries: int = Field(description="Total Metabolite nodes in KG (unfiltered, 3,025 today)")
     total_matching: int = Field(description="Metabolites matching filters")
@@ -458,6 +478,7 @@ class ListMetabolitesResponse(BaseModel):
     by_evidence_source: list[MetEvidenceSourceBreakdown] = Field(default_factory=list, description="Frequency of evidence_sources values across matched set. Today: at most 2 entries (metabolism, transport).")
     xref_coverage: MetXrefCoverage = Field(description="Cross-ref ID coverage within matched set")
     mass_stats: MetMassStats = Field(description="Mass distribution within matched set")
+    by_measurement_coverage: MetMeasurementCoverage = Field(default_factory=MetMeasurementCoverage, description="Metabolomics measurement coverage rollup across matched metabolites. Two sub-rollups: by_paper_count (frequency by measured_paper_count value) + by_compartment (frequency by measured_compartments value). Phase 1 plumbing — spec §6.6.")
     score_max: float | None = Field(default=None, description="Max Lucene score (only with search)")
     score_median: float | None = Field(default=None, description="Median Lucene score (only with search)")
     returned: int = Field(description="Metabolites in this response")
@@ -1253,12 +1274,16 @@ def register_tools(mcp: FastMCP):
         ctx: Context,
         filter_type: Annotated[
             Literal["gene_category", "brite_tree", "growth_phase",
-                    "metric_type", "value_kind", "compartment"],
+                    "metric_type", "value_kind", "compartment",
+                    "omics_type", "evidence_source"],
             Field(description=(
                 "Which categorical filter to enumerate. "
                 "'gene_category' / 'brite_tree' / 'growth_phase'; "
                 "'metric_type' / 'value_kind' / 'compartment' (DerivedMetric "
-                "discovery)."
+                "discovery); "
+                "'omics_type' (Experiment.omics_type enum incl. METABOLOMICS); "
+                "'evidence_source' (Metabolite.evidence_sources values: "
+                "'metabolism', 'transport', 'metabolomics')."
             )),
         ] = "gene_category",
     ) -> ListFilterValuesResponse:
@@ -1316,6 +1341,8 @@ def register_tools(mcp: FastMCP):
         # Chemistry rollups (slice 1)
         reaction_count: int = Field(default=0, description="Distinct reactions catalyzed by genes in this organism (e.g. 943). When > 0, drill in via list_metabolites(organism_names=[organism_name]) to enumerate metabolites this organism is capable of metabolizing.")
         metabolite_count: int = Field(default=0, description="Distinct metabolites this organism's genes can act on (e.g. 1039). Capability signal — does NOT mean these metabolites were measured. Today reflects gene catalysis only; will grow to include transport substrates when the TCDB-CAZy ontology ships, with no schema change. When > 0, drill in via list_metabolites(organism_names=[organism_name]).")
+        # Metabolomics measurement rollup (Phase 1 plumbing — spec §6.4)
+        measured_metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this organism via any MetaboliteAssay (precomputed OrganismTaxon.measured_metabolite_count). Non-zero on 4 organisms today: MIT9301 (4 assays), MIT9313 (3), MIT0801 (2), MIT9303 (1). Different from metabolite_count (reaction-only chemistry capability).")
         # DM verbose-only fields
         derived_metric_gene_count: int | None = Field(default=None, description="Total gene-level DM annotation count (verbose-only).")
         derived_metric_types: list[str] | None = Field(default=None, description="Distinct metric_type tags observed (verbose-only).")
@@ -1348,6 +1375,10 @@ def register_tools(mcp: FastMCP):
         reaction_count: int = Field(description="Distinct reactions catalyzed by this organism's genes (e.g. 943)")
         metabolite_count: int = Field(description="Distinct metabolites this organism's genes can act on (e.g. 1039). Same semantics as OrganismResult.metabolite_count.")
 
+    class OrgMeasurementCapability(BaseModel):
+        has_metabolomics: int = Field(default=0, description="Number of matched organisms with measured_metabolite_count > 0 (e.g. 4 across the full set today).")
+        no_metabolomics: int = Field(default=0, description="Number of matched organisms with measured_metabolite_count == 0.")
+
     class ListOrganismsResponse(BaseModel):
         total_entries: int = Field(description="Total organisms in the KG")
         total_matching: int = Field(description="Organisms matching the filter (= total_entries when no filter)")
@@ -1357,6 +1388,7 @@ def register_tools(mcp: FastMCP):
         by_metric_type: list[OrgMetricTypeBreakdown] = Field(default_factory=list, description="DM metric_type frequency rollup across matched organisms. Each entry: {metric_type, count}.")
         by_compartment: list[OrgCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched organisms. Each entry: {compartment, count}.")
         by_metabolic_capability: list[OrgMetabolicCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms by metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites.")
+        by_measurement_capability: OrgMeasurementCapability = Field(default_factory=OrgMeasurementCapability, description="Binary rollup of metabolomics measurement coverage across matched organisms: {has_metabolomics, no_metabolomics}. Today 4 organisms carry non-zero measured_metabolite_count out of ~37 total (Phase 1 plumbing — spec §6.4).")
         returned: int = Field(description="Number of results returned")
         offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > offset + returned")
@@ -1441,6 +1473,8 @@ def register_tools(mcp: FastMCP):
                 OrgMetabolicCapabilityBreakdown(**b)
                 for b in result.get("by_metabolic_capability", [])
             ]
+            measurement_cap_data = result.get("by_measurement_capability") or {}
+            by_measurement_capability = OrgMeasurementCapability(**measurement_cap_data)
             response = ListOrganismsResponse(
                 total_entries=result["total_entries"],
                 total_matching=result["total_matching"],
@@ -1450,6 +1484,7 @@ def register_tools(mcp: FastMCP):
                 by_metric_type=by_metric_type,
                 by_compartment=by_compartment,
                 by_metabolic_capability=by_metabolic_capability,
+                by_measurement_capability=by_measurement_capability,
                 returned=result["returned"],
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],
@@ -1681,6 +1716,23 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="Subset of {numeric, boolean, categorical} where this gene has DM annotations. Use to route to genes_by_{kind}_metric drill-downs.",
         )
+        # Chemistry rollups (Phase 1 plumbing — spec §6.1)
+        reaction_count: int = Field(
+            default=0,
+            description="Distinct reactions catalysed by this gene (precomputed Gene-side rollup; e.g. 4 for PMM0001). When > 0, drill via metabolites_by_gene(locus_tags=[locus_tag], organism=...).",
+        )
+        metabolite_count: int = Field(
+            default=0,
+            description="Distinct metabolites reachable from this gene via reaction OR transport (UNION; e.g. 554 for PMM0392 with reaction_count=0 from 8 TCDB families). Differs from OrganismTaxon.metabolite_count which is reaction-only.",
+        )
+        transporter_count: int = Field(
+            default=0,
+            description="Distinct TCDB families annotated to this gene (sourced from Gene.tcdb_family_count; e.g. 8 for PMM0392). When > 0, drill via genes_by_metabolite or metabolites_by_gene with the transport arm.",
+        )
+        evidence_sources: list[str] = Field(
+            default_factory=list,
+            description="Subset of {'metabolism','transport','metabolomics'} describing which kinds of paths exist from this gene to its metabolites. Path-existence semantics — 'metabolism' means at least one Gene→Reaction→Metabolite path exists; 'transport' means at least one Gene→TcdbFamily→Metabolite path exists; 'metabolomics' means at least one reachable metabolite has measurement coverage. Routing hint for chemistry drill-down tools.",
+        )
         # verbose-only
         gene_summary: str | None = Field(default=None, description="Concatenated summary text (e.g. 'prmA :: ribosomal protein L11 methyltransferase :: Methylates ribosomal protein L11')")
         function_description: str | None = Field(default=None, description="Curated functional description (e.g. 'Methylates ribosomal protein L11'). May be null when no curated text exists.")
@@ -1723,6 +1775,10 @@ def register_tools(mcp: FastMCP):
         has_derived_metrics: int = Field(
             default=0,
             description="Count of requested locus_tags carrying any DM annotation.",
+        )
+        has_chemistry: int = Field(
+            default=0,
+            description="Count of requested locus_tags with non-empty evidence_sources (i.e. participate in at least one reaction-to-metabolite or transport path). Mirrors has_orthologs / has_clusters routing-signal pattern.",
         )
         returned: int = Field(description="Results in this response (0 when summary=true)")
         offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
@@ -1793,6 +1849,7 @@ def register_tools(mcp: FastMCP):
                 has_orthologs=data["has_orthologs"],
                 has_clusters=data["has_clusters"],
                 has_derived_metrics=data["has_derived_metrics"],
+                has_chemistry=data.get("has_chemistry", 0),
                 returned=data["returned"],
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],
@@ -2463,6 +2520,10 @@ def register_tools(mcp: FastMCP):
         derived_metric_count: int = Field(default=0, description="Number of DerivedMetric nodes from this publication (e.g. 3)")
         derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Value kinds of DerivedMetrics in this publication (e.g. ['numeric', 'boolean'])")
         compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured in this publication (e.g. ['whole_cell', 'vesicle'])")
+        # Metabolomics measurement rollup (Phase 1 plumbing — spec §6.2)
+        metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this publication (precomputed Publication.metabolite_count). Non-zero on the metabolomics-paired papers only (Capovilla 2023, Kujawinski 2023). When > 0 → list_metabolites or run_cypher to inspect MetaboliteAssay nodes.")
+        metabolite_assay_count: int = Field(default=0, description="Distinct MetaboliteAssay edges anchored to this publication (precomputed). Mirrors metabolite_count today; will diverge once a metabolite is measured in multiple compartments per paper.")
+        metabolite_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured for metabolomics in this publication (e.g. ['whole_cell', 'extracellular']). Populated only when metabolite_assay_count > 0; [] otherwise.")
         score: float | None = Field(default=None, description="Lucene relevance score (only with search_text)")
 
         abstract: str | None = Field(default=None, description="Publication abstract (only with verbose=True)")
@@ -2672,6 +2733,10 @@ def register_tools(mcp: FastMCP):
         derived_metric_count: int = Field(default=0, description="Number of DerivedMetrics associated with this experiment (e.g. 4)")
         derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Distinct DerivedMetric value kinds for this experiment (e.g. ['numeric', 'boolean'])")
         compartment: str | None = Field(default=None, description="Wet-lab fraction this experiment profiles (e.g. 'whole_cell', 'vesicle', 'exoproteome'). Scalar per experiment.")
+        # Metabolomics measurement rollup (Phase 1 plumbing — spec §6.3)
+        metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this experiment (precomputed Experiment.metabolite_count). Non-zero on 8 experiments today (the metabolomics-paired ones).")
+        metabolite_assay_count: int = Field(default=0, description="Distinct MetaboliteAssay edges anchored to this experiment (precomputed). Mirrors metabolite_count today.")
+        metabolite_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured for metabolomics in this experiment (subset of {'whole_cell', 'extracellular'}). Populated only when metabolite_assay_count > 0.")
         score: float | None = Field(default=None, description="Lucene relevance score, present only when search_text is used (e.g. 2.45)")
         # verbose-only fields
         publication_title: str | None = Field(default=None, description="Publication title")
@@ -7141,6 +7206,17 @@ def register_tools(mcp: FastMCP):
             ]
             xref_coverage = MetXrefCoverage(**result["xref_coverage"])
             mass_stats = MetMassStats(**result["mass_stats"])
+            measurement_coverage_data = result.get("by_measurement_coverage") or {}
+            by_measurement_coverage = MetMeasurementCoverage(
+                by_paper_count=[
+                    MetPaperCountBucket(**b)
+                    for b in measurement_coverage_data.get("by_paper_count", [])
+                ],
+                by_compartment=[
+                    MetCompartmentBucket(**b)
+                    for b in measurement_coverage_data.get("by_compartment", [])
+                ],
+            )
             not_found = MetNotFound(**result["not_found"])
             response = ListMetabolitesResponse(
                 total_entries=result["total_entries"],
@@ -7150,6 +7226,7 @@ def register_tools(mcp: FastMCP):
                 by_evidence_source=by_evidence_source,
                 xref_coverage=xref_coverage,
                 mass_stats=mass_stats,
+                by_measurement_coverage=by_measurement_coverage,
                 score_max=result.get("score_max"),
                 score_median=result.get("score_median"),
                 returned=result["returned"],

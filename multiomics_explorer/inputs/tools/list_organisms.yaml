@@ -55,6 +55,11 @@ examples:
     response: |
       {"total_entries": 36, "total_matching": 36, "by_metabolic_capability": [{"organism_name": "Pseudomonas putida KT2440", "reaction_count": 1449, "metabolite_count": 1490}, {"organism_name": "Ruegeria pomeroyi DSS-3", "reaction_count": 1377, "metabolite_count": 1468}, {"organism_name": "Alteromonas macleodii EZ55", "reaction_count": 1348, "metabolite_count": 1428}], "returned": 0, "truncated": true, "offset": 0, "not_found": [], "results": []}
 
+  - title: Survey measurement coverage across organisms
+    call: list_organisms(summary=True)
+    response: |
+      {"total_entries": 37, "total_matching": 37, "by_measurement_capability": {"has_metabolomics": 4, "no_metabolomics": 33}, "returned": 0, "truncated": true, "offset": 0, "not_found": [], "results": []}
+
 chaining:
   - "list_organisms → genes_by_function"
   - "list_organisms → list_publications"
@@ -86,3 +91,4 @@ mistakes:
   - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"
   - "metabolite_count counts capability via gene catalysis — distinct metabolites reachable through Gene → Reaction → Metabolite. Does NOT include transport substrates (until TCDB-CAZy ships) or measured metabolites (until metabolomics-DM ships). 0 does not mean the metabolite is absent from the KG."
   - "by_metabolic_capability is a top-10 ranking sorted by metabolite_count descending; organisms with zero chemistry are excluded. Use it on summary=True calls to identify chemistry-rich organisms before drilling in via list_metabolites(organism_names=[...])."
+  - "`measured_metabolite_count` is the count of distinct metabolites measured in this organism via any MetaboliteAssay — different from `metabolite_count` (reaction-only chemistry capability) and from `metabolite_count` on Gene/Publication/Experiment which are different rollups. The 4 organisms with non-zero `measured_metabolite_count` today are MIT9301 (4 assays), MIT9313 (3), MIT0801 (2), MIT9303 (1)."

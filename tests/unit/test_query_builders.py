@@ -8367,3 +8367,287 @@ class TestClusterEnrichmentBuilderInformativeOnly:
             informative_only=True, pvalue_cutoff=0.99,
         )
         assert captured.get("informative_only") is True
+
+
+# ===========================================================================
+# Phase 1 — P0 pass-through plumbing (metabolites surface refresh)
+# Spec: docs/tool-specs/2026-05-05-phase1-pass-through-plumbing.md
+# 6 tools, all additive. Imports happen inside each test so collection
+# still passes pre-impl.
+# ===========================================================================
+
+
+class TestBuildGeneOverviewPhase1Plumbing:
+    """gene_overview detail: adds reaction_count + metabolite_count +
+    transporter_count + evidence_sources per row. Path-existence subqueries
+    derive evidence_sources (NOT a metabolite-level rollup) — see spec §6.1."""
+
+    def test_compact_returns_reaction_count(self):
+        cypher, _ = build_gene_overview(locus_tags=["PMM0001"])
+        assert "coalesce(g.reaction_count, 0) AS reaction_count" in cypher
+
+    def test_compact_returns_metabolite_count(self):
+        """metabolite_count is reaction-OR-transport reachable, sourced from
+        precomputed Gene.metabolite_count."""
+        cypher, _ = build_gene_overview(locus_tags=["PMM0001"])
+        assert "coalesce(g.metabolite_count, 0) AS metabolite_count" in cypher
+
+    def test_compact_returns_transporter_count(self):
+        """transporter_count surface alias of g.tcdb_family_count (spec §6.1)."""
+        cypher, _ = build_gene_overview(locus_tags=["PMM0001"])
+        assert "coalesce(g.tcdb_family_count, 0) AS transporter_count" in cypher
+
+    def test_compact_returns_evidence_sources(self):
+        """evidence_sources column present in RETURN."""
+        cypher, _ = build_gene_overview(locus_tags=["PMM0001"])
+        assert "evidence_sources" in cypher
+
+    def test_evidence_sources_uses_path_existence(self):
+        """Spec §6.1: path-existence subqueries (EXISTS { MATCH ... }) — NOT a
+        rollup over m.evidence_sources. Without this, transport-only genes
+        falsely tag as 'metabolism'."""
+        cypher, _ = build_gene_overview(locus_tags=["PMM0001"])
+        assert "EXISTS" in cypher
+        # Both edges must be referenced for the path-existence subqueries
+        assert "Gene_catalyzes_reaction" in cypher
+        assert "Reaction_has_metabolite" in cypher
+        assert "Gene_has_tcdb_family" in cypher
+        assert "Tcdb_family_transports_metabolite" in cypher
+
+    def test_evidence_sources_metabolomics_gated_by_measured(self):
+        """metabolomics evidence requires reachable metabolite with
+        measured_assay_count > 0 (path-existence + measurement gate)."""
+        cypher, _ = build_gene_overview(locus_tags=["PMM0001"])
+        assert "measured_assay_count" in cypher
+
+    def test_verbose_still_has_chemistry_columns(self):
+        """Verbose mode keeps all the new chemistry columns."""
+        cypher, _ = build_gene_overview(locus_tags=["PMM0001"], verbose=True)
+        assert "reaction_count" in cypher
+        assert "metabolite_count" in cypher
+        assert "transporter_count" in cypher
+        assert "evidence_sources" in cypher
+
+
+class TestBuildGeneOverviewSummaryPhase1Plumbing:
+    """gene_overview_summary: adds has_chemistry envelope key."""
+
+    def test_summary_returns_has_chemistry(self):
+        cypher, _ = build_gene_overview_summary(locus_tags=["PMM0001"])
+        assert "has_chemistry" in cypher
+
+
+class TestBuildListPublicationsPhase1Plumbing:
+    """list_publications detail: pass-through additions for measurement
+    rollup fields on Publication node (spec §6.2)."""
+
+    def test_compact_returns_metabolite_count(self):
+        cypher, _ = build_list_publications()
+        assert "coalesce(p.metabolite_count, 0) AS metabolite_count" in cypher
+
+    def test_compact_returns_metabolite_assay_count(self):
+        cypher, _ = build_list_publications()
+        assert (
+            "coalesce(p.metabolite_assay_count, 0) AS metabolite_assay_count"
+            in cypher
+        )
+
+    def test_compact_returns_metabolite_compartments(self):
+        """List sparse-default convention — coalesce to []."""
+        cypher, _ = build_list_publications()
+        assert (
+            "coalesce(p.metabolite_compartments, []) AS metabolite_compartments"
+            in cypher
+        )
+
+    def test_search_branch_also_has_metabolite_fields(self):
+        """Both no-search and fulltext branches surface the new pass-throughs."""
+        cypher, _ = build_list_publications(search_text="metabolite")
+        assert "metabolite_count" in cypher
+        assert "metabolite_assay_count" in cypher
+        assert "metabolite_compartments" in cypher
+
+
+class TestBuildListExperimentsPhase1Plumbing:
+    """list_experiments detail: same shape as 6.2, pass-through from
+    Experiment node properties (spec §6.3)."""
+
+    def test_compact_returns_metabolite_count(self):
+        cypher, _ = build_list_experiments()
+        assert "coalesce(e.metabolite_count, 0) AS metabolite_count" in cypher
+
+    def test_compact_returns_metabolite_assay_count(self):
+        cypher, _ = build_list_experiments()
+        assert (
+            "coalesce(e.metabolite_assay_count, 0) AS metabolite_assay_count"
+            in cypher
+        )
+
+    def test_compact_returns_metabolite_compartments(self):
+        cypher, _ = build_list_experiments()
+        assert (
+            "coalesce(e.metabolite_compartments, []) AS metabolite_compartments"
+            in cypher
+        )
+
+    def test_search_branch_also_has_metabolite_fields(self):
+        cypher, _ = build_list_experiments(search_text="metabolite")
+        assert "metabolite_count" in cypher
+        assert "metabolite_assay_count" in cypher
+        assert "metabolite_compartments" in cypher
+
+
+class TestBuildListOrganismsPhase1Plumbing:
+    """list_organisms detail: adds measured_metabolite_count per row.
+    Summary: adds by_measurement_capability binary envelope rollup
+    (spec §6.4)."""
+
+    def test_detail_returns_measured_metabolite_count(self):
+        cypher, _ = build_list_organisms()
+        assert (
+            "coalesce(o.measured_metabolite_count, 0) AS measured_metabolite_count"
+            in cypher
+        )
+
+    def test_summary_returns_by_measurement_capability(self):
+        cypher, _ = build_list_organisms_summary()
+        assert "by_measurement_capability" in cypher
+
+    def test_summary_capability_uses_binary_buckets(self):
+        """Spec §6.4: binary 2-bucket count {has_metabolomics, no_metabolomics}.
+        Summary builder must reference both bucket names."""
+        cypher, _ = build_list_organisms_summary()
+        assert "has_metabolomics" in cypher
+        assert "no_metabolomics" in cypher
+
+    def test_summary_capability_thresholds_on_measured_count(self):
+        """Both buckets gate on measured_metabolite_count > 0 / = 0."""
+        cypher, _ = build_list_organisms_summary()
+        # Either form is acceptable; both must reference the prop.
+        assert "measured_metabolite_count" in cypher
+
+
+class TestBuildListMetabolitesPhase1Plumbing:
+    """list_metabolites detail: pass-through additions for 4 measurement
+    fields. Summary: adds by_measurement_coverage envelope (spec §6.6)."""
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolites
+        return build_list_metabolites(**kwargs)
+
+    def _build_summary(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_list_metabolites_summary,
+        )
+        return build_list_metabolites_summary(**kwargs)
+
+    def test_detail_returns_measured_assay_count(self):
+        cypher, _ = self._build()
+        assert (
+            "coalesce(m.measured_assay_count, 0) AS measured_assay_count"
+            in cypher
+        )
+
+    def test_detail_returns_measured_paper_count(self):
+        cypher, _ = self._build()
+        assert (
+            "coalesce(m.measured_paper_count, 0) AS measured_paper_count"
+            in cypher
+        )
+
+    def test_detail_returns_measured_organisms(self):
+        """Sparse-default convention — coalesce to []."""
+        cypher, _ = self._build()
+        assert (
+            "coalesce(m.measured_organisms, []) AS measured_organisms"
+            in cypher
+        )
+
+    def test_detail_returns_measured_compartments(self):
+        """KG-MET-016 closed; populated on all 107 measured metabolites,
+        defaults to [] on the 3111 unmeasured (spec §6.6)."""
+        cypher, _ = self._build()
+        assert (
+            "coalesce(m.measured_compartments, []) AS measured_compartments"
+            in cypher
+        )
+
+    def test_search_branch_also_has_measurement_fields(self):
+        """Search variant of detail builder threads the 4 measurement
+        fields just like the no-search branch."""
+        cypher, _ = self._build(search="glucose")
+        assert "measured_assay_count" in cypher
+        assert "measured_paper_count" in cypher
+        assert "measured_organisms" in cypher
+        assert "measured_compartments" in cypher
+
+    def test_summary_returns_by_measurement_coverage(self):
+        cypher, _ = self._build_summary()
+        assert "by_measurement_coverage" in cypher
+
+    def test_summary_coverage_has_paper_count_subkey(self):
+        """Spec §6.6: by_measurement_coverage envelope = {by_paper_count, by_compartment}."""
+        cypher, _ = self._build_summary()
+        # The Cypher must surface both sub-rollup keys somewhere.
+        assert "by_paper_count" in cypher
+
+    def test_summary_coverage_has_compartment_subkey(self):
+        cypher, _ = self._build_summary()
+        # by_compartment from the measurement rollup (distinct from any DM
+        # by_compartment elsewhere in the codebase — list_metabolites doesn't
+        # carry DM rollups). The literal substring must appear.
+        assert "by_compartment" in cypher
+
+
+class TestBuildListOmicsTypes:
+    """New filter_values branch: omics_type. Returns canonical OMICS_TYPE
+    enum incl. METABOLOMICS (spec §6.5)."""
+
+    def test_builder_function_exists(self):
+        """build_list_omics_types must be importable from queries_lib."""
+        from multiomics_explorer.kg.queries_lib import build_list_omics_types
+        assert callable(build_list_omics_types)
+
+    def test_returns_value_and_count_columns(self):
+        from multiomics_explorer.kg.queries_lib import build_list_omics_types
+        cypher, params = build_list_omics_types()
+        # Conventional value/count return shape (matches sibling builders).
+        assert "value" in cypher
+        assert "count" in cypher
+        assert params == {}
+
+    def test_sources_from_experiment(self):
+        """omics_type counts come from Experiment.omics_type."""
+        from multiomics_explorer.kg.queries_lib import build_list_omics_types
+        cypher, _ = build_list_omics_types()
+        assert "Experiment" in cypher
+        assert "omics_type" in cypher
+
+
+class TestBuildListEvidenceSources:
+    """New filter_values branch: evidence_source. Returns metabolism /
+    transport / metabolomics with counts (spec §6.5)."""
+
+    def test_builder_function_exists(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_list_evidence_sources,
+        )
+        assert callable(build_list_evidence_sources)
+
+    def test_returns_value_and_count_columns(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_list_evidence_sources,
+        )
+        cypher, params = build_list_evidence_sources()
+        assert "value" in cypher
+        assert "count" in cypher
+        assert params == {}
+
+    def test_sources_from_metabolite_evidence_sources(self):
+        """Counts derive from Metabolite.evidence_sources array."""
+        from multiomics_explorer.kg.queries_lib import (
+            build_list_evidence_sources,
+        )
+        cypher, _ = build_list_evidence_sources()
+        assert "Metabolite" in cypher
+        assert "evidence_sources" in cypher

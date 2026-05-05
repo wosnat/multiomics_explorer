@@ -8984,3 +8984,552 @@ class TestOntologyLandscapeF1Surface:
         landscape_cyphers = [c for c in cyphers if "n_terms_with_genes" in c]
         for c in landscape_cyphers:
             assert "coalesce(t.is_uninformative, '') <> 'true'" not in c
+
+
+# ===========================================================================
+# Phase 1 — P0 pass-through plumbing (metabolites surface refresh)
+# Spec: docs/tool-specs/2026-05-05-phase1-pass-through-plumbing.md
+# 6 tools, all additive. Verification cases per spec §6.1 (gene_overview).
+# ===========================================================================
+
+
+class TestGeneOverviewPhase1Plumbing:
+    """gene_overview adds reaction_count + metabolite_count + transporter_count
+    + evidence_sources per row, plus has_chemistry envelope. Verification cases
+    per spec §6.1 (PMM1428 / PMM0001 / PMM0392 / PMM0628 / PMM0263)."""
+
+    def _summary_with_chemistry(self, total=1, has_chemistry=0, not_found=None):
+        return [{
+            "total_matching": total,
+            "by_organism": [{"item": "Prochlorococcus MED4", "count": total}],
+            "by_category": [],
+            "by_annotation_type": [],
+            "has_expression": 0,
+            "has_significant_expression": 0,
+            "has_orthologs": 0,
+            "has_clusters": 0,
+            "has_derived_metrics": 0,
+            "has_chemistry": has_chemistry,
+            "not_found": not_found or [],
+        }]
+
+    def _detail_row(self, locus_tag, **chem_overrides):
+        """Default row carries no chemistry; overrides for verification cases."""
+        row = {
+            "locus_tag": locus_tag, "gene_name": None,
+            "product": "test", "gene_category": "Unknown",
+            "annotation_quality": 0,
+            "organism_name": "Prochlorococcus MED4",
+            "annotation_types": [],
+            "expression_edge_count": 0,
+            "significant_up_count": 0, "significant_down_count": 0,
+            "closest_ortholog_group_size": 0,
+            "closest_ortholog_genera": [],
+            "cluster_membership_count": 0, "cluster_types": [],
+            "numeric_metric_count": 0,
+            "boolean_metric_count": 0,
+            "categorical_metric_count": 0,
+            "reaction_count": 0,
+            "metabolite_count": 0,
+            "transporter_count": 0,
+            "evidence_sources": [],
+        }
+        row.update(chem_overrides)
+        return row
+
+    def test_pmm1428_no_chemistry_zeros_and_empty(self, mock_conn):
+        """PMM1428 (EVE domain) — all zeros / empty list per spec §6.1."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_chemistry(total=1, has_chemistry=0),
+            [self._detail_row("PMM1428")],
+        ]
+        result = api.gene_overview(["PMM1428"], conn=mock_conn)
+        row = result["results"][0]
+        assert row["reaction_count"] == 0
+        assert row["metabolite_count"] == 0
+        assert row["transporter_count"] == 0
+        assert row["evidence_sources"] == []
+
+    def test_pmm0001_metabolism_only(self, mock_conn):
+        """PMM0001: 4 reactions, 6 metabolites, 0 transporters, ['metabolism']."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_chemistry(total=1, has_chemistry=1),
+            [self._detail_row(
+                "PMM0001",
+                reaction_count=4, metabolite_count=6, transporter_count=0,
+                evidence_sources=["metabolism"],
+            )],
+        ]
+        result = api.gene_overview(["PMM0001"], conn=mock_conn)
+        row = result["results"][0]
+        assert row["reaction_count"] == 4
+        assert row["metabolite_count"] == 6
+        assert row["transporter_count"] == 0
+        assert row["evidence_sources"] == ["metabolism"]
+
+    def test_pmm0392_transport_and_metabolomics(self, mock_conn):
+        """PMM0392: 0 reactions, 554 metabolites (TCDB-reachable),
+        8 transporters, ['transport', 'metabolomics'].
+        Critical reproducer: reaction_count=0 must NOT promote 'metabolism'."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_chemistry(total=1, has_chemistry=1),
+            [self._detail_row(
+                "PMM0392",
+                reaction_count=0, metabolite_count=554, transporter_count=8,
+                evidence_sources=["transport", "metabolomics"],
+            )],
+        ]
+        result = api.gene_overview(["PMM0392"], conn=mock_conn)
+        row = result["results"][0]
+        assert row["reaction_count"] == 0
+        assert row["metabolite_count"] == 554
+        assert row["transporter_count"] == 8
+        assert row["evidence_sources"] == ["transport", "metabolomics"]
+        assert "metabolism" not in row["evidence_sources"]
+
+    def test_pmm0628_transport_with_measurement(self, mock_conn):
+        """PMM0628: 0 / 5 / 1 / ['transport', 'metabolomics']."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_chemistry(total=1, has_chemistry=1),
+            [self._detail_row(
+                "PMM0628",
+                reaction_count=0, metabolite_count=5, transporter_count=1,
+                evidence_sources=["transport", "metabolomics"],
+            )],
+        ]
+        result = api.gene_overview(["PMM0628"], conn=mock_conn)
+        row = result["results"][0]
+        assert row["transporter_count"] == 1
+        assert row["evidence_sources"] == ["transport", "metabolomics"]
+
+    def test_pmm0263_transport_only_no_measured(self, mock_conn):
+        """PMM0263: 0 / 7 / 1 / ['transport'] — single reachable metabolite
+        not in 107 measured, so 'metabolomics' correctly drops out."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_chemistry(total=1, has_chemistry=1),
+            [self._detail_row(
+                "PMM0263",
+                reaction_count=0, metabolite_count=7, transporter_count=1,
+                evidence_sources=["transport"],
+            )],
+        ]
+        result = api.gene_overview(["PMM0263"], conn=mock_conn)
+        row = result["results"][0]
+        assert row["evidence_sources"] == ["transport"]
+        assert "metabolomics" not in row["evidence_sources"]
+
+    def test_envelope_has_chemistry_present(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_chemistry(total=1, has_chemistry=1),
+            [self._detail_row(
+                "PMM0001", reaction_count=4, evidence_sources=["metabolism"],
+            )],
+        ]
+        result = api.gene_overview(["PMM0001"], conn=mock_conn)
+        assert "has_chemistry" in result
+        assert result["has_chemistry"] == 1
+
+    def test_envelope_has_chemistry_zero(self, mock_conn):
+        """Empty evidence_sources => has_chemistry stays at 0."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_chemistry(total=1, has_chemistry=0),
+            [self._detail_row("PMM1428")],
+        ]
+        result = api.gene_overview(["PMM1428"], conn=mock_conn)
+        assert result["has_chemistry"] == 0
+
+    def test_evidence_sources_defaults_empty_when_absent(self, mock_conn):
+        """Per spec — when chemistry edges are absent, evidence_sources is
+        a list (possibly empty), never null on the response row."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_chemistry(total=1, has_chemistry=0),
+            [self._detail_row("PMM1428")],  # default factory sets [] above
+        ]
+        result = api.gene_overview(["PMM1428"], conn=mock_conn)
+        row = result["results"][0]
+        assert row["evidence_sources"] == []
+
+
+class TestListPublicationsPhase1Plumbing:
+    """list_publications adds 3 metabolite measurement pass-through fields
+    per row (spec §6.2). Pure pass-through — no envelope change."""
+
+    _PUB_BASE = {
+        "doi": "10.1234/test", "title": "Test", "authors": ["A"],
+        "year": 2024, "journal": "J", "study_type": "S",
+        "organisms": ["MED4"], "experiment_count": 1,
+        "treatment_types": ["coculture"], "background_factors": [],
+        "omics_types": ["RNASEQ"],
+        "clustering_analysis_count": 0, "cluster_types": [],
+    }
+
+    def test_metabolite_count_passes_through(self, mock_conn):
+        row = {**self._PUB_BASE, "metabolite_count": 42,
+               "metabolite_assay_count": 18, "metabolite_compartments": ["whole_cell"]}
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 1, "total_matching": 1}], [row],
+        ]
+        result = api.list_publications(conn=mock_conn)
+        r = result["results"][0]
+        assert r["metabolite_count"] == 42
+        assert r["metabolite_assay_count"] == 18
+        assert r["metabolite_compartments"] == ["whole_cell"]
+
+    def test_zero_when_no_measurement(self, mock_conn):
+        """Publication without metabolomics data — fields default to 0/[]."""
+        row = {**self._PUB_BASE, "metabolite_count": 0,
+               "metabolite_assay_count": 0, "metabolite_compartments": []}
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 1, "total_matching": 1}], [row],
+        ]
+        result = api.list_publications(conn=mock_conn)
+        r = result["results"][0]
+        assert r["metabolite_count"] == 0
+        assert r["metabolite_assay_count"] == 0
+        assert r["metabolite_compartments"] == []
+
+    def test_dual_compartment_publication(self, mock_conn):
+        """Capovilla 2023 / Kujawinski 2023 example: papers measuring multiple
+        compartments — list comes through as-is."""
+        row = {**self._PUB_BASE, "metabolite_count": 92,
+               "metabolite_assay_count": 92,
+               "metabolite_compartments": ["extracellular", "whole_cell"]}
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 1, "total_matching": 1}], [row],
+        ]
+        result = api.list_publications(conn=mock_conn)
+        r = result["results"][0]
+        assert r["metabolite_compartments"] == ["extracellular", "whole_cell"]
+
+
+class TestListExperimentsPhase1Plumbing:
+    """list_experiments adds 3 metabolite measurement pass-through fields
+    per row (spec §6.3). Symmetric with list_publications."""
+
+    def _summary_result(self):
+        return [{
+            "total_matching": 1, "time_course_count": 0,
+            "by_organism": [{"item": "MED4", "count": 1}],
+            "by_treatment_type": [],
+            "by_background_factors": [],
+            "by_omics_type": [{"item": "METABOLOMICS", "count": 1}],
+            "by_publication": [],
+            "by_table_scope": [],
+            "by_cluster_type": [],
+            "by_growth_phase": [],
+        }]
+
+    def _exp_row(self, **overrides):
+        row = {
+            "experiment_id": "exp_a", "experiment_name": "A",
+            "publication_doi": "10.1234/a",
+            "organism_name": "MED4", "treatment_type": ["control"],
+            "coculture_partner": None, "omics_type": "METABOLOMICS",
+            "is_time_course": "false",
+            "table_scope": "all_detected_genes",
+            "table_scope_detail": None,
+            "gene_count": 0, "distinct_gene_count": 0,
+            "significant_up_count": 0, "significant_down_count": 0,
+            "time_point_count": 1, "time_point_labels": ["20h"],
+            "time_point_orders": [1], "time_point_hours": [20.0],
+            "time_point_totals": [0], "time_point_significant_up": [0],
+            "time_point_significant_down": [0],
+            "clustering_analysis_count": 0, "cluster_types": [],
+            "metabolite_count": 0,
+            "metabolite_assay_count": 0,
+            "metabolite_compartments": [],
+        }
+        row.update(overrides)
+        return row
+
+    def test_metabolite_count_passes_through(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),  # filtered summary
+            self._summary_result(),  # unfiltered total_entries
+            [self._exp_row(metabolite_count=42, metabolite_assay_count=18,
+                           metabolite_compartments=["whole_cell"])],
+        ]
+        result = api.list_experiments(conn=mock_conn)
+        r = result["results"][0]
+        assert r["metabolite_count"] == 42
+        assert r["metabolite_assay_count"] == 18
+        assert r["metabolite_compartments"] == ["whole_cell"]
+
+    def test_zero_when_no_measurement(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+            [self._exp_row()],
+        ]
+        result = api.list_experiments(conn=mock_conn)
+        r = result["results"][0]
+        assert r["metabolite_count"] == 0
+        assert r["metabolite_assay_count"] == 0
+        assert r["metabolite_compartments"] == []
+
+
+class TestListOrganismsPhase1Plumbing:
+    """list_organisms adds measured_metabolite_count per row + binary
+    by_measurement_capability envelope (spec §6.4)."""
+
+    _ROW_HIGH = {
+        "organism_name": "Prochlorococcus MIT9301", "organism_type": "genome_strain",
+        "genus": "Prochlorococcus", "species": "Prochlorococcus marinus",
+        "strain": "MIT9301", "clade": "HLII", "ncbi_taxon_id": 167546,
+        "gene_count": 1900, "publication_count": 5, "experiment_count": 12,
+        "treatment_types": [], "background_factors": [],
+        "omics_types": ["METABOLOMICS"], "clustering_analysis_count": 0,
+        "cluster_types": [], "derived_metric_count": 0,
+        "derived_metric_value_kinds": [], "compartments": [],
+        "reaction_count": 0, "metabolite_count": 0,
+        "measured_metabolite_count": 4,
+    }
+    _ROW_NONE = {
+        "organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain",
+        "genus": "Prochlorococcus", "species": "Prochlorococcus marinus",
+        "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919,
+        "gene_count": 1976, "publication_count": 11, "experiment_count": 46,
+        "treatment_types": [], "background_factors": [],
+        "omics_types": ["RNASEQ"], "clustering_analysis_count": 0,
+        "cluster_types": [], "derived_metric_count": 0,
+        "derived_metric_value_kinds": [], "compartments": [],
+        "reaction_count": 0, "metabolite_count": 0,
+        "measured_metabolite_count": 0,
+    }
+    _SUMMARY_ROW = {
+        "total_entries": 2, "total_matching": 2,
+        "by_value_kind": [], "by_metric_type": [],
+        "by_compartment": [],
+        "by_cluster_type": [], "by_organism_type": [],
+        "by_measurement_capability": {
+            "has_metabolomics": 1, "no_metabolomics": 1,
+        },
+    }
+
+    def test_measured_metabolite_count_per_row(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW], [self._ROW_HIGH, self._ROW_NONE],
+        ]
+        result = api.list_organisms(conn=mock_conn)
+        # Row order isn't strict here — assert by name lookup.
+        by_name = {r["organism_name"]: r for r in result["results"]}
+        assert by_name["Prochlorococcus MIT9301"]["measured_metabolite_count"] == 4
+        assert by_name["Prochlorococcus MED4"]["measured_metabolite_count"] == 0
+
+    def test_envelope_has_by_measurement_capability(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW], [self._ROW_HIGH, self._ROW_NONE],
+        ]
+        result = api.list_organisms(conn=mock_conn)
+        assert "by_measurement_capability" in result
+
+    def test_envelope_binary_buckets_sum_to_total(self, mock_conn):
+        """Spec §6.4: has_metabolomics + no_metabolomics == total organisms."""
+        mock_conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW], [self._ROW_HIGH, self._ROW_NONE],
+        ]
+        result = api.list_organisms(conn=mock_conn)
+        cap = result["by_measurement_capability"]
+        # The shape is a dict per spec ({has_metabolomics, no_metabolomics}).
+        assert isinstance(cap, dict)
+        assert cap["has_metabolomics"] == 1
+        assert cap["no_metabolomics"] == 1
+        assert cap["has_metabolomics"] + cap["no_metabolomics"] == 2
+
+    def test_envelope_summary_mode(self, mock_conn):
+        """summary=True still surfaces by_measurement_capability."""
+        mock_conn.execute_query.return_value = [self._SUMMARY_ROW]
+        result = api.list_organisms(summary=True, conn=mock_conn)
+        assert "by_measurement_capability" in result
+
+
+class TestListFilterValuesPhase1Plumbing:
+    """list_filter_values gains two new filter_type values: omics_type and
+    evidence_source (spec §6.5)."""
+
+    def test_dispatches_omics_type(self, mock_conn):
+        """omics_type returns canonical OMICS_TYPE enum (8 values)."""
+        # Mock returns 7 of 8 values present in KG; the function must merge
+        # canonical METABOLOMICS even at count=0.
+        mock_conn.execute_query.return_value = [
+            {"value": "RNASEQ", "count": 80},
+            {"value": "PROTEOMICS", "count": 30},
+            {"value": "MICROARRAY", "count": 12},
+            {"value": "EXOPROTEOMICS", "count": 5},
+            {"value": "VESICLE_DNASEQ", "count": 4},
+            {"value": "VESICLE_PROTEOMICS", "count": 4},
+            {"value": "PAIRED_RNASEQ_PROTEOME", "count": 2},
+            {"value": "METABOLOMICS", "count": 1},
+        ]
+        result = api.list_filter_values(filter_type="omics_type", conn=mock_conn)
+        assert result["filter_type"] == "omics_type"
+        # 8 distinct OMICS_TYPE enum values per spec §6.5.
+        values = {r["value"] for r in result["results"]}
+        assert "METABOLOMICS" in values
+        assert "RNASEQ" in values
+        assert "PROTEOMICS" in values
+        assert len(values) == 8
+
+    def test_omics_type_includes_metabolomics_even_when_zero(self, mock_conn):
+        """Spec §6.5 — METABOLOMICS must appear even when no Experiment carries it.
+        Canonical enum is merged in Python after the Cypher count."""
+        # Cypher returns count rows for some omics types but NOT METABOLOMICS.
+        mock_conn.execute_query.return_value = [
+            {"value": "RNASEQ", "count": 80},
+            {"value": "PROTEOMICS", "count": 30},
+        ]
+        result = api.list_filter_values(filter_type="omics_type", conn=mock_conn)
+        values = {r["value"] for r in result["results"]}
+        assert "METABOLOMICS" in values
+        # The METABOLOMICS row must surface count=0 for backward-consistency.
+        metab_row = next(r for r in result["results"] if r["value"] == "METABOLOMICS")
+        assert metab_row["count"] == 0
+
+    def test_dispatches_evidence_source(self, mock_conn):
+        """evidence_source returns 3 values: metabolism / transport / metabolomics."""
+        mock_conn.execute_query.return_value = [
+            {"value": "metabolism", "count": 2188},
+            {"value": "transport", "count": 1355},
+            {"value": "metabolomics", "count": 107},
+        ]
+        result = api.list_filter_values(
+            filter_type="evidence_source", conn=mock_conn,
+        )
+        assert result["filter_type"] == "evidence_source"
+        assert result["total_entries"] == 3
+        values = {r["value"] for r in result["results"]}
+        assert values == {"metabolism", "transport", "metabolomics"}
+        by_value = {r["value"]: r["count"] for r in result["results"]}
+        assert by_value["metabolism"] == 2188
+        assert by_value["transport"] == 1355
+        assert by_value["metabolomics"] == 107
+
+
+class TestListMetabolitesPhase1Plumbing:
+    """list_metabolites adds 4 measurement pass-through fields per row +
+    by_measurement_coverage envelope (spec §6.6). All KG fields populated
+    by post-import — KG-MET-016 closed."""
+
+    _SUMMARY_ROW = {
+        "total_entries": 3218, "total_matching": 1,
+        "top_organisms": [],
+        "top_pathways": [],
+        "by_evidence_source": [{"item": "metabolism", "count": 1}],
+        "with_chebi": 0, "with_hmdb": 0, "with_mnxm": 0,
+        "mass_min": None, "mass_median": None, "mass_max": None,
+        "by_measurement_coverage": {
+            "by_paper_count": [
+                {"paper_count": 0, "n": 3111},
+                {"paper_count": 1, "n": 99},
+                {"paper_count": 2, "n": 8},
+            ],
+            "by_compartment": [
+                {"compartment": "whole_cell", "n": 107},
+                {"compartment": "extracellular", "n": 92},
+            ],
+        },
+    }
+
+    _DETAIL_ROW = {
+        "metabolite_id": "kegg.compound:C00031",
+        "name": "D-Glucose",
+        "formula": "C6H12O6",
+        "elements": ["C", "H", "O"],
+        "mass": 180.156,
+        "gene_count": 320,
+        "organism_count": 31,
+        "transporter_count": 17,
+        "evidence_sources": ["metabolism", "metabolomics"],
+        "chebi_id": "4167",
+        "pathway_ids": ["kegg.pathway:ko00010"],
+        "pathway_count": 1,
+        # New measurement fields:
+        "measured_assay_count": 4,
+        "measured_paper_count": 1,
+        "measured_organisms": ["Prochlorococcus MIT9301"],
+        "measured_compartments": ["whole_cell"],
+    }
+
+    def _mock_conn(self, summary_row, detail_rows, *extra):
+        conn = MagicMock()
+        side_effect = [[summary_row], detail_rows]
+        side_effect.extend(extra)
+        conn.execute_query.side_effect = side_effect
+        return conn
+
+    def test_per_row_measured_assay_count(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(conn=conn)
+        r = out["results"][0]
+        assert r["measured_assay_count"] == 4
+
+    def test_per_row_measured_paper_count(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(conn=conn)
+        r = out["results"][0]
+        assert r["measured_paper_count"] == 1
+
+    def test_per_row_measured_organisms(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(conn=conn)
+        r = out["results"][0]
+        assert r["measured_organisms"] == ["Prochlorococcus MIT9301"]
+
+    def test_per_row_measured_compartments(self):
+        """KG-MET-016 closed: populated on all 107 measured metabolites."""
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(conn=conn)
+        r = out["results"][0]
+        assert r["measured_compartments"] == ["whole_cell"]
+
+    def test_unmeasured_metabolite_zero_and_empty(self):
+        """3111 unmeasured metabolites: assay_count=0, paper_count=0,
+        organisms=[], compartments=[] — never None per KG default-empty
+        convention (spec §6.6)."""
+        from multiomics_explorer.api.functions import list_metabolites
+        unmeasured_row = {
+            **self._DETAIL_ROW,
+            "evidence_sources": ["metabolism"],
+            "measured_assay_count": 0,
+            "measured_paper_count": 0,
+            "measured_organisms": [],
+            "measured_compartments": [],
+        }
+        conn = self._mock_conn(self._SUMMARY_ROW, [unmeasured_row])
+        out = list_metabolites(conn=conn)
+        r = out["results"][0]
+        assert r["measured_assay_count"] == 0
+        assert r["measured_paper_count"] == 0
+        assert r["measured_organisms"] == []
+        assert r["measured_compartments"] == []
+
+    def test_envelope_has_by_measurement_coverage(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(conn=conn)
+        assert "by_measurement_coverage" in out
+
+    def test_envelope_coverage_has_paper_count_subkey(self):
+        """Spec §6.6: by_measurement_coverage.by_paper_count exposes the
+        live distribution (3111 / 99 / 8)."""
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(conn=conn)
+        cov = out["by_measurement_coverage"]
+        assert "by_paper_count" in cov
+        # 3 buckets matching the live KG counts.
+        buckets = {b["paper_count"]: b["n"] for b in cov["by_paper_count"]}
+        assert buckets[0] == 3111
+        assert buckets[1] == 99
+        assert buckets[2] == 8
+
+    def test_envelope_coverage_has_compartment_subkey(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(conn=conn)
+        cov = out["by_measurement_coverage"]
+        assert "by_compartment" in cov

@@ -24,6 +24,7 @@ from multiomics_explorer.kg.constants import (
     GO_ONTOLOGIES,
     MAX_SPECIFICITY_RANK,
     VALID_OG_SOURCES,
+    VALID_OMICS_TYPES,
     VALID_TAXONOMIC_LEVELS,
 )
 from multiomics_explorer.kg.queries_lib import (
@@ -45,9 +46,11 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_homologs_summary,
     build_list_brite_trees,
     build_list_compartments,
+    build_list_evidence_sources,
     build_list_gene_categories,
     build_list_growth_phases,
     build_list_metric_types,
+    build_list_omics_types,
     build_list_value_kinds,
     build_list_organisms,
     build_list_organisms_capability,
@@ -369,6 +372,9 @@ def gene_overview(
         "has_orthologs": raw_summary["has_orthologs"],
         "has_clusters": raw_summary["has_clusters"],
         "has_derived_metrics": raw_summary["has_derived_metrics"],
+        # Phase 1 plumbing (spec §6.1): count of genes in batch with non-empty
+        # evidence_sources. Mirrors has_orthologs / has_clusters envelope keys.
+        "has_chemistry": raw_summary.get("has_chemistry", 0),
         "not_found": raw_summary["not_found"],
     }
 
@@ -577,6 +583,11 @@ def list_filter_values(
       - ``metric_type``: DerivedMetric.metric_type tag values.
       - ``value_kind``: DerivedMetric.value_kind enum.
       - ``compartment``: Experiment.compartment values.
+      - ``omics_type``: Experiment.omics_type values; result merges the
+        canonical OMICS_TYPE enum (8 values) so METABOLOMICS surfaces with
+        count=0 even when no experiments of that type exist (spec §6.5).
+      - ``evidence_source``: Metabolite.evidence_sources buckets
+        (metabolism / transport / metabolomics; spec §6.5).
     """
     conn = _default_conn(conn)
     if filter_type == "gene_category":
@@ -606,8 +617,27 @@ def list_filter_values(
         cypher, params = build_list_compartments()
         rows = conn.execute_query(cypher, **params)
         results = [{"value": r["value"], "count": r["count"]} for r in rows]
+    elif filter_type == "omics_type":
+        # Phase 1 plumbing (spec §6.5): merge canonical OMICS_TYPE enum
+        # so METABOLOMICS (and any future enum addition) surfaces with
+        # count=0 when no experiments of that type exist yet.
+        cypher, params = build_list_omics_types()
+        rows = conn.execute_query(cypher, **params)
+        observed = {r["value"]: r["count"] for r in rows}
+        results = [
+            {"value": v, "count": observed.get(v, 0)}
+            for v in sorted(VALID_OMICS_TYPES)
+        ]
+    elif filter_type == "evidence_source":
+        cypher, params = build_list_evidence_sources()
+        rows = conn.execute_query(cypher, **params)
+        results = [{"value": r["value"], "count": r["count"]} for r in rows]
     else:
-        raise ValueError(f"Unknown filter_type: {filter_type!r}")
+        raise ValueError(
+            f"Unknown filter_type: {filter_type!r}. Valid options: "
+            "'gene_category', 'brite_tree', 'growth_phase', 'metric_type', "
+            "'value_kind', 'compartment', 'omics_type', 'evidence_source'."
+        )
     total = len(results)
     return {
         "filter_type": filter_type,
@@ -639,18 +669,22 @@ def list_organisms(
 
     Returns dict with keys: total_entries, total_matching, returned, offset,
     truncated, by_cluster_type, by_organism_type, by_value_kind, by_metric_type,
-    by_compartment, by_metabolic_capability, not_found, results.
+    by_compartment, by_metabolic_capability, by_measurement_capability,
+    not_found, results.
     Per result (compact): organism_name, organism_type, genus, species,
     strain, clade, ncbi_taxon_id, gene_count, publication_count,
     experiment_count, treatment_types, omics_types, clustering_analysis_count,
     cluster_types, derived_metric_count, derived_metric_value_kinds, compartments,
-    reaction_count, metabolite_count.
+    reaction_count, metabolite_count, measured_metabolite_count.
     Sparse fields (omitted when null): reference_database, reference_proteome.
     When verbose=True, also includes: family, order, tax_class, phylum, kingdom,
     superkingdom, lineage, cluster_count, derived_metric_gene_count,
     derived_metric_types.
     by_metabolic_capability: top 10 organisms (within matched set) by
     metabolite_count, sorted desc; excludes zero-chemistry organisms.
+    by_measurement_capability: binary 2-bucket count
+    {has_metabolomics: N, no_metabolomics: M} where has_metabolomics counts
+    organisms with measured_metabolite_count > 0. Sums to total_matching.
     """
     conn = _default_conn(conn)
     if summary:
@@ -668,6 +702,9 @@ def list_organisms(
         "total_entries": 0, "total_matching": 0,
         "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
         "by_cluster_type": [], "by_organism_type": [],
+        "by_measurement_capability": {
+            "has_metabolomics": 0, "no_metabolomics": 0,
+        },
     }
     total_entries = summary_row["total_entries"]
     total_matching = summary_row["total_matching"]
@@ -755,6 +792,13 @@ def list_organisms(
         "by_compartment": _rename_freq(summary_row.get("by_compartment", []),
                                        "compartment"),
         "by_metabolic_capability": by_metabolic_capability,
+        # Phase 1 plumbing (spec §6.4): pass-through binary 2-bucket dict
+        # surfaced by build_list_organisms_summary. Default to zero-bucket
+        # dict on no-summary fall-through.
+        "by_measurement_capability": summary_row.get(
+            "by_measurement_capability",
+            {"has_metabolomics": 0, "no_metabolomics": 0},
+        ),
         "returned": len(results),
         "offset": offset,
         "truncated": total_matching > offset + len(results),
@@ -4695,13 +4739,18 @@ def list_metabolites(
 
     Returns dict with keys: total_entries, total_matching, returned, offset,
     truncated, top_organisms, top_pathways, by_evidence_source, xref_coverage,
-    mass_stats, score_max, score_median, not_found, results.
+    mass_stats, by_measurement_coverage, score_max, score_median, not_found,
+    results.
     Per result (compact): metabolite_id, name, formula, elements, mass,
     gene_count, organism_count, transporter_count, evidence_sources,
-    chebi_id (sparse), pathway_ids, pathway_count.
+    chebi_id (sparse), pathway_ids, pathway_count, measured_assay_count,
+    measured_paper_count, measured_organisms, measured_compartments.
     When verbose=True, also includes: inchikey, smiles, mnxm_id, hmdb_id,
     pathway_names. (For per-organism gene tallies, drill into
     genes_by_metabolite — slice-1 Tool #2.)
+    by_measurement_coverage envelope (spec §6.6): sub-rollups
+    {by_paper_count: [{paper_count, n}], by_compartment: [{compartment, n}]}
+    over the matched metabolite set.
     When search is provided, also includes score (per row) +
     score_max, score_median (envelope, otherwise None).
 
@@ -4847,6 +4896,15 @@ def list_metabolites(
             "mass_median": raw_summary.get("mass_median"),
             "mass_max": raw_summary.get("mass_max"),
         },
+        # Phase 1 plumbing (spec §6.6): pass-through measurement-coverage
+        # rollup surfaced by build_list_metabolites_summary. Two sub-rollups:
+        # by_paper_count (distribution over m.measured_paper_count) and
+        # by_compartment (frequency over m.measured_compartments). Default
+        # to empty sub-rollups when the builder hasn't emitted the key.
+        "by_measurement_coverage": raw_summary.get(
+            "by_measurement_coverage",
+            {"by_paper_count": [], "by_compartment": []},
+        ),
         "score_max": raw_summary.get("score_max") if search else None,
         "score_median": raw_summary.get("score_median") if search else None,
         "returned": len(results),

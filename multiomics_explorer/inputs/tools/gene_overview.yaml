@@ -44,6 +44,14 @@ examples:
          {"locus_tag": "MIT1002_01809", "gene_name": null, "product": "MarR family winged helix-turn-helix transcriptional regulator", "organism_name": "Alteromonas macleodii MIT1002", "derived_metric_count": 1, "derived_metric_value_kinds": ["boolean"]}
        ]}
 
+  - title: Chemistry-rich gene — broad ABC transporter with measurement coverage
+    call: gene_overview(locus_tags=["PMM0392"])
+    response: |
+      {"total_matching": 1, "has_expression": 1, "has_chemistry": 1, "returned": 1, "truncated": false, "offset": 0, "not_found": [],
+       "results": [
+         {"locus_tag": "PMM0392", "gene_name": null, "product": "ABC transporter, ATP-binding protein", "organism_name": "Prochlorococcus MED4", "reaction_count": 0, "metabolite_count": 554, "transporter_count": 8, "evidence_sources": ["transport", "metabolomics"]}
+       ]}
+
 verbose_fields:
   - gene_summary
   - function_description
@@ -58,6 +66,7 @@ chaining:
   - "gene_overview → gene_clusters_by_gene"
   - "gene_overview(locus_tags=...) → for genes with derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric; for ['numeric'] use genes_by_numeric_metric; for ['categorical'] use genes_by_categorical_metric"
   - "gene_overview(verbose=True) → see compartments_observed for vesicle/whole-cell triage"
+  - "gene_overview (per-row `evidence_sources` non-empty) → metabolites_by_gene OR genes_by_metabolite for chemistry drill-down."
 
 mistakes:
   - "annotation_quality is a 0..3 numeric encoding of annotation_state (informative-evidence count). 0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. Redefined in May 2026 KG release — old semantics conflated product-name quality. Existing min_quality filters silently shifted meaning."
@@ -66,5 +75,7 @@ mistakes:
   - "expression_edge_count > 0 means expression data exists — use differential_expression_by_gene to explore it"
   - "closest_ortholog_genera shows cross-genus reach — use gene_homologs for full group membership"
   - "cluster_membership_count > 0 means cluster data exists — use gene_clusters_by_gene to explore it"
+  - "When `evidence_sources` is non-empty, drill via `metabolites_by_gene` (gene-anchored) or `genes_by_metabolite` (metabolite-anchored). The list values are `['metabolism', 'transport', 'metabolomics']` — `metabolomics` means at least one of the gene's reachable metabolites has measurement coverage."
+  - "`metabolite_count` on Gene is reaction-OR-transport reachable (verified PMM0392 with reaction_count=0 has metabolite_count=554 from 8 TCDB families) — not the same as `OrganismTaxon.metabolite_count` which is reaction-only."
   - wrong: "gene_overview(locus_tags=['PMM0845'], verbose=True)  # just to see the gene"
     right: "gene_overview(locus_tags=['PMM0845'])  # verbose only needed for gene_summary text"

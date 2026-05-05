@@ -45,7 +45,7 @@ After this tool, drill in via:
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, top_organisms, top_pathways, by_evidence_source, xref_coverage, mass_stats, score_max, score_median, returned, offset, truncated, not_found, results
+total_entries, total_matching, top_organisms, top_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, score_max, score_median, returned, offset, truncated, not_found, results
 ```
 
 - **total_entries** (int): Total Metabolite nodes in KG (unfiltered, 3,025 today)
@@ -55,6 +55,7 @@ total_entries, total_matching, top_organisms, top_pathways, by_evidence_source, 
 - **by_evidence_source** (list[MetEvidenceSourceBreakdown]): Frequency of evidence_sources values across matched set. Today: at most 2 entries (metabolism, transport).
 - **xref_coverage** (MetXrefCoverage): Cross-ref ID coverage within matched set
 - **mass_stats** (MetMassStats): Mass distribution within matched set
+- **by_measurement_coverage** (MetMeasurementCoverage): Metabolomics measurement coverage rollup across matched metabolites. Two sub-rollups: by_paper_count (frequency by measured_paper_count value) + by_compartment (frequency by measured_compartments value). Phase 1 plumbing — spec §6.6.
 - **score_max** (float | None): Max Lucene score (only with search)
 - **score_median** (float | None): Median Lucene score (only with search)
 - **returned** (int): Metabolites in this response
@@ -78,6 +79,10 @@ total_entries, total_matching, top_organisms, top_pathways, by_evidence_source, 
 | chebi_id | string \| None (optional) | ChEBI ID (raw numeric, e.g. '4167'). Populated on 90% of metabolites overall — 100% of the 452 chebi:-IDed transport-only metabolites (extracted from the ID itself), plus the kegg.compound:-IDed metabolites that cross-ref ChEBI. |
 | pathway_ids | list[string] (optional) | KEGG pathway memberships (e.g. ['kegg.pathway:ko00010', 'kegg.pathway:ko01100']). Empty when no Metabolite_in_pathway edges. Drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...). |
 | pathway_count | int (optional) | Distinct count of KEGG pathways this metabolite is in (e.g. 5). Routing signal — when > 0, drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...) for genes annotated to those pathways. Equal to size(pathway_ids). |
+| measured_assay_count | int (optional) | Distinct MetaboliteAssay edges anchored to this metabolite (precomputed Metabolite.measured_assay_count). Non-zero on 107 of ~3200 metabolites today. When > 0, the metabolite has experimental measurement coverage. |
+| measured_paper_count | int (optional) | Distinct papers measuring this metabolite (precomputed). Non-zero on 107; today 8 covered by 2 papers, 99 by 1. |
+| measured_organisms | list[string] (optional) | Organism preferred_names with at least one MetaboliteAssay anchored to this metabolite. Populated when measured_assay_count > 0; [] otherwise. |
+| measured_compartments | list[string] (optional) | Wet-lab compartments observed for this metabolite (subset of {'whole_cell', 'extracellular'}). Populated by post-import on all 107 measured metabolites; [] on the 3111 unmeasured. Use len(measured_compartments) >= 1 to filter for measurement-anchored rows. |
 | score | float \| None (optional) | Lucene relevance score (only with `search`). |
 
 **Verbose-only fields** (included when `verbose=True`):
@@ -122,7 +127,22 @@ list_metabolites(search="glucose", limit=3)
 list_metabolites(evidence_sources=["transport"], summary=True)
 ```
 
-### Example 6: Multi-step — find N-metabolites then drill into catalysts
+### Example 6: Measured metabolites — measurement coverage envelope
+
+```example-call
+list_metabolites(evidence_sources=["metabolomics"], summary=True)
+```
+
+```example-response
+{"total_entries": 3218, "total_matching": 107,
+ "by_measurement_coverage": {
+   "by_paper_count": [{"paper_count": 1, "n": 99}, {"paper_count": 2, "n": 8}],
+   "by_compartment": [{"compartment": "whole_cell", "n": 99}, {"compartment": "extracellular", "n": 92}]
+ },
+ "returned": 0, "truncated": true, "offset": 0, "results": []}
+```
+
+### Example 7: Multi-step — find N-metabolites then drill into catalysts
 
 ```
 Step 1: list_metabolites(organism_names=["Prochlorococcus MED4"], elements=["N"], limit=10)
@@ -139,6 +159,7 @@ list_organisms (per-row metabolite_count > 0) → list_metabolites(organism_name
 list_metabolites → genes_by_metabolite(metabolite_ids=[...], organism=...)
 list_metabolites (per-row pathway_ids) → genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...)
 differential_expression_by_gene → gene_metabolic_role(metabolite_elements=['N']) → list_metabolites for chemistry context
+list_metabolites (per-row `measured_assay_count > 0`) → run_cypher to inspect MetaboliteAssay edges (Phase 5 will replace this with `assays_by_metabolite(metabolite_ids=[...])`).
 ```
 
 ## Common mistakes
@@ -154,6 +175,8 @@ differential_expression_by_gene → gene_metabolic_role(metabolite_elements=['N'
 - metaboliteFullText covers Metabolite.name only — NOT formula. For element/composition queries, use `elements` (presence list).
 
 - evidence_sources accepts 'metabolomics' as forward-compat for the future metabolomics-DM spec; no row matches it today.
+
+- `measured_compartments` is populated on all 107 measured metabolites (defaults to `[]` on the 3111 unmeasured); use `len(m['measured_compartments']) >= 1` to filter for measurement-anchored rows. Same metabolite measured in both whole_cell and extracellular returns one row with `measured_compartments=['extracellular','whole_cell']` (sorted), not two rows — Metabolite is compartment-agnostic per KG-MET-002.
 
 ```mistake
 list_metabolites(elements=['N'], gene_count_min=1)  # gene_count_min isn't a param
@@ -177,7 +200,7 @@ list_metabolites(organism_names=['Prochlorococcus MED4'])  # full preferred_name
 from multiomics_explorer import list_metabolites
 
 result = list_metabolites()
-# returns dict with keys: total_entries, total_matching, top_organisms, top_pathways, by_evidence_source, xref_coverage, mass_stats, score_max, score_median, offset, not_found, results
+# returns dict with keys: total_entries, total_matching, top_organisms, top_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, score_max, score_median, offset, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

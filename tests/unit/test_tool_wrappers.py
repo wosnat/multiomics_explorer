@@ -6784,3 +6784,494 @@ class TestClusterEnrichmentInformativeOnlyWrapper:
             "is_informative must be required (spec § Pydantic field shape)"
         )
         assert field.description, "is_informative must have a Field(description=...)"
+
+
+# ===========================================================================
+# Phase 1 — P0 pass-through plumbing (metabolites surface refresh)
+# Spec: docs/tool-specs/2026-05-05-phase1-pass-through-plumbing.md
+# 6 tools, all additive — no new MCP tools registered (EXPECTED_TOOLS
+# unchanged), only Pydantic models extended.
+# ===========================================================================
+
+
+class TestExpectedToolsUnchangedForPhase1Plumbing:
+    """Phase 1 plumbing: 6 existing tools gain pass-through fields.
+    No new tool gets registered."""
+
+    def test_expected_tools_size_unchanged(self):
+        # Phase 1 plumbing must NOT register a new MCP tool — all 6 tools
+        # touched are existing surfaces (gene_overview, list_publications,
+        # list_experiments, list_organisms, list_filter_values, list_metabolites).
+        assert len(EXPECTED_TOOLS) == 33, (
+            f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
+            "Phase 1 plumbing adds no new tools — only field additions."
+        )
+
+
+class TestGeneOverviewPhase1PlumbingWrapper:
+    """Pydantic GeneOverviewResult adds reaction_count, metabolite_count,
+    transporter_count, evidence_sources. GeneOverviewResponse adds
+    has_chemistry envelope key (spec §6.1)."""
+
+    def _api_return_with_chem(self, locus_tag, **chem):
+        defaults = {
+            "reaction_count": 0, "metabolite_count": 0,
+            "transporter_count": 0, "evidence_sources": [],
+        }
+        defaults.update(chem)
+        return {
+            "total_matching": 1,
+            "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
+            "by_category": [],
+            "by_annotation_type": [],
+            "by_annotation_state": [],
+            "has_expression": 0,
+            "has_significant_expression": 0,
+            "has_orthologs": 0,
+            "has_clusters": 0,
+            "has_derived_metrics": 0,
+            "has_chemistry": 1 if defaults["evidence_sources"] else 0,
+            "returned": 1,
+            "truncated": False,
+            "not_found": [],
+            "results": [{
+                "locus_tag": locus_tag, "gene_name": None,
+                "product": "test", "gene_category": "Unknown",
+                "annotation_quality": 0,
+                "organism_name": "Prochlorococcus MED4",
+                "annotation_types": [],
+                "annotation_state": "no_evidence",
+                "informative_annotation_types": [],
+                "expression_edge_count": 0,
+                "significant_up_count": 0, "significant_down_count": 0,
+                "closest_ortholog_group_size": 0,
+                "closest_ortholog_genera": [],
+                "cluster_membership_count": 0, "cluster_types": [],
+                "derived_metric_count": 0, "derived_metric_value_kinds": [],
+                **defaults,
+            }],
+        }
+
+    @pytest.mark.asyncio
+    async def test_pmm0392_transport_metabolomics_validates(self, tool_fns, mock_ctx):
+        """Spec §6.1 verification: PMM0392 → 0 / 554 / 8 / [transport, metabolomics]."""
+        api_return = self._api_return_with_chem(
+            "PMM0392",
+            reaction_count=0, metabolite_count=554, transporter_count=8,
+            evidence_sources=["transport", "metabolomics"],
+        )
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=api_return,
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["PMM0392"],
+            )
+        r = result.results[0]
+        assert r.reaction_count == 0
+        assert r.metabolite_count == 554
+        assert r.transporter_count == 8
+        assert r.evidence_sources == ["transport", "metabolomics"]
+
+    @pytest.mark.asyncio
+    async def test_pmm1428_no_chemistry_validates(self, tool_fns, mock_ctx):
+        """Spec §6.1 verification: PMM1428 → all-zero / empty list."""
+        api_return = self._api_return_with_chem("PMM1428")
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=api_return,
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["PMM1428"],
+            )
+        r = result.results[0]
+        assert r.reaction_count == 0
+        assert r.metabolite_count == 0
+        assert r.transporter_count == 0
+        assert r.evidence_sources == []
+
+    @pytest.mark.asyncio
+    async def test_pmm0001_metabolism_only_validates(self, tool_fns, mock_ctx):
+        """Spec §6.1 verification: PMM0001 → 4 / 6 / 0 / ['metabolism']."""
+        api_return = self._api_return_with_chem(
+            "PMM0001",
+            reaction_count=4, metabolite_count=6, transporter_count=0,
+            evidence_sources=["metabolism"],
+        )
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=api_return,
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["PMM0001"],
+            )
+        r = result.results[0]
+        assert r.reaction_count == 4
+        assert r.metabolite_count == 6
+        assert r.evidence_sources == ["metabolism"]
+
+    @pytest.mark.asyncio
+    async def test_envelope_has_chemistry_field(self, tool_fns, mock_ctx):
+        api_return = self._api_return_with_chem(
+            "PMM0001", reaction_count=4, evidence_sources=["metabolism"],
+        )
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=api_return,
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["PMM0001"],
+            )
+        assert hasattr(result, "has_chemistry")
+        assert result.has_chemistry == 1
+
+
+class TestListPublicationsPhase1PlumbingWrapper:
+    """PublicationResult adds metabolite_count + metabolite_assay_count +
+    metabolite_compartments per row (spec §6.2)."""
+
+    @pytest.mark.asyncio
+    async def test_metabolite_fields_per_row(self, tool_fns, mock_ctx):
+        pub_with_metab = {
+            "doi": "10.1234/cap2023", "title": "Capovilla 2023",
+            "authors": ["Capovilla G"], "year": 2023, "journal": "ISME",
+            "study_type": "metabolomics", "organisms": ["MIT9301"],
+            "experiment_count": 4, "treatment_types": [],
+            "background_factors": [], "omics_types": ["METABOLOMICS"],
+            "metabolite_count": 92, "metabolite_assay_count": 92,
+            "metabolite_compartments": ["extracellular", "whole_cell"],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={
+                "total_entries": 1, "total_matching": 1,
+                "by_organism": [], "by_treatment_type": [],
+                "by_background_factors": [], "by_omics_type": [],
+                "by_value_kind": [], "by_metric_type": [],
+                "by_compartment": [], "by_cluster_type": [],
+                "returned": 1, "truncated": False, "not_found": [],
+                "results": [pub_with_metab],
+            },
+        ):
+            result = await tool_fns["list_publications"](mock_ctx)
+        r = result.results[0]
+        assert r.metabolite_count == 92
+        assert r.metabolite_assay_count == 92
+        assert r.metabolite_compartments == ["extracellular", "whole_cell"]
+
+    @pytest.mark.asyncio
+    async def test_zero_when_no_metabolomics_data(self, tool_fns, mock_ctx):
+        """Most publications have metabolite_count=0 — fields are not optional."""
+        pub_no_metab = {
+            "doi": "10.1234/test", "title": "T", "authors": [],
+            "year": 2024, "journal": "J", "study_type": "S",
+            "organisms": [], "experiment_count": 0,
+            "treatment_types": [], "background_factors": [],
+            "omics_types": [], "metabolite_count": 0,
+            "metabolite_assay_count": 0, "metabolite_compartments": [],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={
+                "total_entries": 1, "total_matching": 1,
+                "by_organism": [], "by_treatment_type": [],
+                "by_background_factors": [], "by_omics_type": [],
+                "by_value_kind": [], "by_metric_type": [],
+                "by_compartment": [], "by_cluster_type": [],
+                "returned": 1, "truncated": False, "not_found": [],
+                "results": [pub_no_metab],
+            },
+        ):
+            result = await tool_fns["list_publications"](mock_ctx)
+        r = result.results[0]
+        assert r.metabolite_count == 0
+        assert r.metabolite_assay_count == 0
+        assert r.metabolite_compartments == []
+
+
+class TestListExperimentsPhase1PlumbingWrapper:
+    """ExperimentResult adds the same 3 metabolite fields per row (spec §6.3)."""
+
+    _SUMMARY = {
+        "total_entries": 1, "total_matching": 1,
+        "by_organism": [], "by_treatment_type": [],
+        "by_background_factors": [], "by_omics_type": [],
+        "by_publication": [], "by_table_scope": [],
+        "time_course_count": 0, "score_max": None, "score_median": None,
+        "returned": 0, "truncated": True, "results": [],
+    }
+
+    _EXP_BASE = {
+        "experiment_id": "exp_metab", "experiment_name": "Metab",
+        "publication_doi": "10.1234/m", "authors": [],
+        "organism_name": "MIT9301",
+        "treatment_type": ["control"], "background_factors": [],
+        "coculture_partner": None, "omics_type": "METABOLOMICS",
+        "is_time_course": False, "table_scope": "all_detected_genes",
+        "table_scope_detail": None, "gene_count": 0,
+        "distinct_gene_count": 0,
+        "genes_by_status": {
+            "significant_up": 0, "significant_down": 0, "not_significant": 0,
+        },
+    }
+
+    @pytest.mark.asyncio
+    async def test_metabolite_fields_per_row(self, tool_fns, mock_ctx):
+        exp = {
+            **self._EXP_BASE,
+            "metabolite_count": 30,
+            "metabolite_assay_count": 30,
+            "metabolite_compartments": ["extracellular"],
+        }
+        detail = {**self._SUMMARY, "returned": 1, "truncated": False,
+                  "results": [exp]}
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=detail,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx)
+        r = result.results[0]
+        assert r.metabolite_count == 30
+        assert r.metabolite_assay_count == 30
+        assert r.metabolite_compartments == ["extracellular"]
+
+    @pytest.mark.asyncio
+    async def test_zero_when_no_metabolomics_data(self, tool_fns, mock_ctx):
+        exp = {**self._EXP_BASE, "metabolite_count": 0,
+               "metabolite_assay_count": 0, "metabolite_compartments": []}
+        detail = {**self._SUMMARY, "returned": 1, "truncated": False,
+                  "results": [exp]}
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=detail,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx)
+        r = result.results[0]
+        assert r.metabolite_count == 0
+        assert r.metabolite_assay_count == 0
+        assert r.metabolite_compartments == []
+
+
+class TestListOrganismsPhase1PlumbingWrapper:
+    """OrganismResult adds measured_metabolite_count per row;
+    response adds by_measurement_capability binary envelope (spec §6.4)."""
+
+    _ORG = {
+        "organism_name": "Prochlorococcus MIT9301",
+        "organism_type": "genome_strain",
+        "genus": "Prochlorococcus", "species": "P. marinus",
+        "strain": "MIT9301", "clade": "HLII", "ncbi_taxon_id": 167546,
+        "gene_count": 1900, "publication_count": 5, "experiment_count": 12,
+        "treatment_types": [], "omics_types": [],
+        "measured_metabolite_count": 4,
+    }
+
+    @pytest.mark.asyncio
+    async def test_measured_metabolite_count_per_row(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 1, "total_matching": 1,
+                "returned": 1, "truncated": False, "not_found": [],
+                "results": [self._ORG],
+            },
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        org = result.results[0]
+        assert org.measured_metabolite_count == 4
+
+    @pytest.mark.asyncio
+    async def test_envelope_has_by_measurement_capability(self, tool_fns, mock_ctx):
+        """Spec §6.4: dict shape {has_metabolomics, no_metabolomics}."""
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 37, "total_matching": 37,
+                "returned": 0, "truncated": True, "not_found": [],
+                "by_measurement_capability": {
+                    "has_metabolomics": 4, "no_metabolomics": 33,
+                },
+                "results": [],
+            },
+        ):
+            result = await tool_fns["list_organisms"](
+                mock_ctx, summary=True,
+            )
+        # The Pydantic model must surface the new envelope key.
+        assert hasattr(result, "by_measurement_capability")
+        cap = result.by_measurement_capability
+        # Acceptable shapes: dict-like or Pydantic submodel — both expose
+        # has/no_metabolomics.
+        if isinstance(cap, dict):
+            assert cap["has_metabolomics"] == 4
+            assert cap["no_metabolomics"] == 33
+        else:
+            assert cap.has_metabolomics == 4
+            assert cap.no_metabolomics == 33
+
+
+class TestListFilterValuesPhase1PlumbingWrapper:
+    """list_filter_values gains 2 new filter_type values: omics_type +
+    evidence_source (spec §6.5)."""
+
+    @pytest.mark.asyncio
+    async def test_omics_type_branch_returns_8_values(self, tool_fns, mock_ctx):
+        """Canonical OMICS_TYPE enum has 8 values incl. METABOLOMICS."""
+        api_return = {
+            "filter_type": "omics_type",
+            "total_entries": 8, "returned": 8, "truncated": False,
+            "results": [
+                {"value": "RNASEQ", "count": 80},
+                {"value": "PROTEOMICS", "count": 30},
+                {"value": "METABOLOMICS", "count": 1},
+                {"value": "MICROARRAY", "count": 12},
+                {"value": "EXOPROTEOMICS", "count": 5},
+                {"value": "VESICLE_DNASEQ", "count": 4},
+                {"value": "VESICLE_PROTEOMICS", "count": 4},
+                {"value": "PAIRED_RNASEQ_PROTEOME", "count": 2},
+            ],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            return_value=api_return,
+        ):
+            result = await tool_fns["list_filter_values"](
+                mock_ctx, filter_type="omics_type",
+            )
+        assert result.filter_type == "omics_type"
+        values = {r.value for r in result.results}
+        assert "METABOLOMICS" in values
+        assert len(values) == 8
+
+    @pytest.mark.asyncio
+    async def test_evidence_source_branch_returns_3_values(self, tool_fns, mock_ctx):
+        api_return = {
+            "filter_type": "evidence_source",
+            "total_entries": 3, "returned": 3, "truncated": False,
+            "results": [
+                {"value": "metabolism", "count": 2188},
+                {"value": "transport", "count": 1355},
+                {"value": "metabolomics", "count": 107},
+            ],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            return_value=api_return,
+        ):
+            result = await tool_fns["list_filter_values"](
+                mock_ctx, filter_type="evidence_source",
+            )
+        assert result.filter_type == "evidence_source"
+        assert len(result.results) == 3
+        values = {r.value for r in result.results}
+        assert values == {"metabolism", "transport", "metabolomics"}
+
+    def test_filter_type_literal_includes_phase1_values(self, tool_fns):
+        """The Literal annotation on filter_type must enumerate the 2 new
+        values (omics_type + evidence_source) so the JSON schema gates
+        them at the MCP boundary (spec §6.5)."""
+        import typing
+        fn = tool_fns["list_filter_values"]
+        hints = typing.get_type_hints(fn, include_extras=True)
+        ft_hint = hints.get("filter_type")
+        assert ft_hint is not None
+        hint_str = str(ft_hint)
+        assert "omics_type" in hint_str, (
+            f"Phase 1 must add 'omics_type' to filter_type Literal; got: {hint_str}"
+        )
+        assert "evidence_source" in hint_str, (
+            f"Phase 1 must add 'evidence_source' to filter_type Literal; got: {hint_str}"
+        )
+
+
+class TestListMetabolitesPhase1PlumbingWrapper:
+    """MetaboliteResult adds 4 measurement pass-through fields per row;
+    list_metabolites response gains by_measurement_coverage envelope (spec §6.6)."""
+
+    _DETAIL_ROW = {
+        "metabolite_id": "kegg.compound:C00031",
+        "name": "D-Glucose",
+        "formula": "C6H12O6",
+        "elements": ["C", "H", "O"],
+        "mass": 180.156,
+        "gene_count": 320,
+        "organism_count": 31,
+        "transporter_count": 17,
+        "evidence_sources": ["metabolism", "metabolomics"],
+        "chebi_id": "4167",
+        "pathway_ids": ["kegg.pathway:ko00010"],
+        "pathway_count": 1,
+        "measured_assay_count": 4,
+        "measured_paper_count": 1,
+        "measured_organisms": ["Prochlorococcus MIT9301"],
+        "measured_compartments": ["whole_cell"],
+    }
+
+    _API_RETURN = {
+        "total_entries": 3218, "total_matching": 1,
+        "top_organisms": [], "top_pathways": [],
+        "by_evidence_source": [],
+        "xref_coverage": {
+            "with_chebi": 0, "with_hmdb": 0, "with_mnxm": 0,
+        },
+        "mass_stats": {
+            "mass_min": None, "mass_median": None, "mass_max": None,
+        },
+        "score_max": None, "score_median": None,
+        "by_measurement_coverage": {
+            "by_paper_count": [
+                {"paper_count": 0, "n": 3111},
+                {"paper_count": 1, "n": 99},
+                {"paper_count": 2, "n": 8},
+            ],
+            "by_compartment": [
+                {"compartment": "whole_cell", "n": 107},
+                {"compartment": "extracellular", "n": 92},
+            ],
+        },
+        "returned": 1, "offset": 0, "truncated": True,
+        "not_found": {
+            "metabolite_ids": [], "organism_names": [], "pathway_ids": [],
+        },
+        "results": [_DETAIL_ROW],
+    }
+
+    @pytest.mark.asyncio
+    async def test_measurement_fields_per_row(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=self._API_RETURN,
+        ):
+            result = await tool_fns["list_metabolites"](mock_ctx)
+        r = result.results[0]
+        assert r.measured_assay_count == 4
+        assert r.measured_paper_count == 1
+        assert r.measured_organisms == ["Prochlorococcus MIT9301"]
+        assert r.measured_compartments == ["whole_cell"]
+
+    @pytest.mark.asyncio
+    async def test_envelope_has_by_measurement_coverage(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=self._API_RETURN,
+        ):
+            result = await tool_fns["list_metabolites"](mock_ctx)
+        # Pydantic-side surface: must expose the new envelope key.
+        assert hasattr(result, "by_measurement_coverage")
+
+    @pytest.mark.asyncio
+    async def test_envelope_coverage_subkeys_present(self, tool_fns, mock_ctx):
+        """Sub-keys: by_paper_count + by_compartment (spec §6.6)."""
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=self._API_RETURN,
+        ):
+            result = await tool_fns["list_metabolites"](mock_ctx)
+        cov = result.by_measurement_coverage
+        # Accept either dict shape or Pydantic submodel.
+        if isinstance(cov, dict):
+            assert "by_paper_count" in cov
+            assert "by_compartment" in cov
+        else:
+            assert hasattr(cov, "by_paper_count")
+            assert hasattr(cov, "by_compartment")
