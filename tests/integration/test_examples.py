@@ -46,7 +46,6 @@ METABOLITES_SCENARIOS = [
     "cross_feeding",
     "n_source_de",
     "tcdb_chain",
-    "precision_tier",
     "measurement",
 ]
 

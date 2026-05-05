@@ -251,8 +251,9 @@ def scenario_cross_feeding() -> None:
        annotations propagate ~554 metabolites per MED4 gene at low confidence.
        Mitigation: transport_confidence='substrate_confirmed' on Step 2.
     3. Transport polarity not encoded — TCDB annotation says 'transports X'
-       without import/export direction (KG-MET-011 open). Even with clean
-       filters, the result is 'compatible with cross-feeding', never confirmed.
+       without import/export direction (KG-MET-011 retired; permanently
+       unmitigable). Even with clean filters, the result is 'compatible
+       with cross-feeding', never confirmed.
 
     Seed choice: 6 MED4 N-metabolism genes derived live from
     genes_by_ontology(ontology='kegg', term_ids=['kegg.pathway:ko00910']).
@@ -335,9 +336,10 @@ def scenario_cross_feeding() -> None:
     print("  CAVEATS — Workflow B′ is 'compatible with cross-feeding', never confirmed:")
     print("    1. Currency cofactors blacklisted above (mitigated)")
     print("    2. transport_confidence filter applied (mitigated for ABC plateau)")
-    print("    3. Transport polarity not encoded — KG-MET-011 open. The Track-B")
-    print("       measurement layer can corroborate (extracellular elevation in coculture)")
-    print("       but cannot confirm causality.")
+    print("    3. Transport polarity not encoded — KG-MET-011 retired (permanently")
+    print("       unmitigable; TCDB lacks direction upstream). The Track-B measurement")
+    print("       layer can corroborate (extracellular elevation in coculture) but")
+    print("       cannot confirm causality.")
     print()
 
     print(f"Top {alt_transport['returned']} ALT transporter candidates (substrate_confirmed):")

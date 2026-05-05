@@ -16,7 +16,7 @@ uv run python examples/pathway_enrichment.py --scenario custom --locus-tags PMM0
 
 ## `metabolites.py`
 
-Eight scenarios across the three Metabolite-source pipelines (transport / gene reaction / metabolomics). See `docs://analysis/metabolites`.
+Seven scenarios across the three Metabolite-source pipelines (transport / gene reaction / metabolomics). See `docs://analysis/metabolites`.
 
 ```bash
 uv run python examples/metabolites.py --scenario discover
@@ -25,7 +25,6 @@ uv run python examples/metabolites.py --scenario gene_to_metabolites
 uv run python examples/metabolites.py --scenario cross_feeding
 uv run python examples/metabolites.py --scenario n_source_de
 uv run python examples/metabolites.py --scenario tcdb_chain
-uv run python examples/metabolites.py --scenario precision_tier
 uv run python examples/metabolites.py --scenario measurement
 ```
 

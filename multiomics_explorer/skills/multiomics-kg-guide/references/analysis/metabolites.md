@@ -2,7 +2,7 @@
 
 LLM-facing decision-tree guide for metabolite questions. The KG models metabolites via three distinct source pipelines, each answering a different question class. **Read the disambiguation table first; pick the right row before drilling.**
 
-Runnable companion: `docs://examples/metabolites.py` (8 scenarios).
+Runnable companion: `docs://examples/metabolites.py` (7 scenarios).
 
 ## Source disambiguation
 
@@ -151,7 +151,7 @@ Workflows that cross both reaction and transport arms, or that consume the annot
 |---|---|---|---|
 | 1 | **Currency cofactors flood the rollup.** `top_metabolites` is sorted by gene_count, which is exactly the wrong sort for cross-feeding because the highest-reach metabolites are universal (H2O, ATP/ADP/AMP, Pi, PPi, NAD(P)(H), CO2). | metabolism | Post-filter the harvested IDs against a currency blacklist. Minimal-8 (H2O, CO2, ATP, ADP, AMP, Pi, PPi, NAD(P)(H)) is the conservative default — see `examples/metabolites.py::CURRENCY_METABOLITES_MIN8`. Extend with H+, Glu/Gln, CoA, FAD if the seed pulls them in (these are borderline and depend on whether you care about central-N flux as a signal). |
 | 2 | **Family-level transport casts a wide net.** Broad-substrate TCDB families (especially ABC superfamily) inherit ~554 substrates per MED4 gene via family rollup. Substrate specificity is often unknown or context-dependent in nature — `family_inferred` reflects family-level potential, not measured per-substrate confirmation. For cross-feeding *inferences* (which over-claim a specific substrate flowing between organisms), the conservative `substrate_confirmed` cast is preferable. | transport | `transport_confidence='substrate_confirmed'` on the Step-2 `genes_by_metabolite` call. Empirical: in a 7-metabolite N-cross test against ALT this narrowed transport rows 1426 → 185, leaving the curated CmpA/NrtA-family nitrate transporters. **Note:** for *broad-screen* questions (e.g. "which transporters could plausibly act on N?", scenario `n_source_de`) the opposite call applies — drop the filter so family_inferred biology is included; see §g. |
-| 3 | **Transport polarity not encoded.** TCDB annotation says "transports X" without import/export direction (KG-MET-011 open). Even with clean filters, "MED4 has cynA, ALT has nrtA" tells you both touch the substrate, not who's the producer. | both | None on the annotation side — surface the limitation in the answer ("compatible with", not "confirmed"). The Track-B measurement layer can corroborate (extracellular elevation in coculture) but cannot confirm causality. |
+| 3 | **Transport polarity not encoded.** TCDB annotation says "transports X" without import/export direction — KG-MET-011 retired (TCDB lacks direction upstream; permanently unmitigable, not a queued ask). Even with clean filters, "MED4 has cynA, ALT has nrtA" tells you both touch the substrate, not who's the producer. | both | None on the annotation side — surface the limitation in the answer ("compatible with", not "confirmed"). The Track-B measurement layer can corroborate (extracellular elevation in coculture) but cannot confirm causality. |
 
 **Pattern (two-step, with all three mitigations applied):**
 
@@ -277,7 +277,7 @@ result = run_cypher(
     MATCH (p:Publication {doi: 'DOI_HERE'})
           -[:PublicationHasMetaboliteAssay]->(a:MetaboliteAssay)
           -[r:Assay_quantifies_metabolite]->(m:Metabolite)
-    RETURN m.preferred_id AS metabolite_id,
+    RETURN m.id AS metabolite_id,
            m.name AS metabolite,
            a.compartment AS compartment,
            r.value AS value,
@@ -300,7 +300,7 @@ For flag-only assays (qualitative detection — 2 of the 10 current assays), sub
 ```python
 result = run_cypher(
     """
-    MATCH (m:Metabolite {preferred_id: 'METABOLITE_ID'})
+    MATCH (m:Metabolite {id: 'kegg.compound:C00064'})  -- example: glutamine; replace with desired ID
           <-[r:Assay_quantifies_metabolite|Assay_flags_metabolite]-(a:MetaboliteAssay)
           <-[:ExperimentHasMetaboliteAssay]-(e:Experiment)
     RETURN type(r) AS evidence_kind,
