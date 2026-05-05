@@ -498,27 +498,76 @@ Per-row: `metabolite_id`, `preferred_name`, `compartments_observed`, `n_assays`,
 
 Phase: deferred.
 
-#### 3b.3 `metabolites_by_assay` / `assays_by_metabolite`
+#### 3b.3 Assay drill-down family — split per DM convention
 
-Drill-down pair. `metabolites_by_assay` returns metabolites measured by one or more assays; `assays_by_metabolite` is the reverse lookup. Mostly mechanical given the edge schema.
+The DM family pattern: **drill-down split by value_kind** (`genes_by_numeric_metric` + `genes_by_boolean_metric` + `genes_by_categorical_metric`); **batch reverse-lookup merged** (`gene_derived_metrics`, polymorphic `value`).
+
+Apply the same pattern to assays. Empirical justification: the two assay edges differ substantially (verified 2026-05-05) — `Assay_quantifies_metabolite` carries 15 fields including `value`/`value_sd`/`replicate_values`/`metric_percentile`/`metric_bucket`/`rank_by_metric`/`detection_status`/`time_point`/`time_point_hours`/`time_point_order`; `Assay_flags_metabolite` carries 6 fields (just `flag_value`/`n_positive` + common). Merging into one drill-down would force a heavily-union row schema (60% sparse fields for flags rows).
+
+Three tools in this slice:
+
+##### 3b.3.a `metabolites_by_quantifies_assay`
+
+Numeric drill-down — analog of `genes_by_numeric_metric`.
 
 ```python
-metabolites_by_assay(
+metabolites_by_quantifies_assay(
     assay_ids: list[str],
+    metabolite_ids: list[str] | None = None,
+    metric_bucket: list[str] | None = None,
+    metric_percentile_min: float | None = None,
+    metric_percentile_max: float | None = None,
+    rank_by_metric_max: int | None = None,
+    value_min: float | None = None,
+    value_max: float | None = None,
+    detection_status: list[str] | None = None,
+    time_point: list[str] | None = None,
     summary: bool = False,
-    limit: int = 25,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
 ) -> dict
-# row: metabolite_id, name, value (or flag_value), value_sd, n_replicates, metric_type,
-#      metric_bucket, metric_percentile, time_point, condition_label, detection_status
+# row: metabolite_id, name, value, value_sd, replicate_values, n_replicates, n_non_zero,
+#      metric_type, metric_bucket, metric_percentile, rank_by_metric, detection_status,
+#      time_point, time_point_hours, time_point_order, condition_label, assay_id
+```
 
+##### 3b.3.b `metabolites_by_flags_assay`
+
+Boolean drill-down — analog of `genes_by_boolean_metric`.
+
+```python
+metabolites_by_flags_assay(
+    assay_ids: list[str],
+    metabolite_ids: list[str] | None = None,
+    flag_value: bool | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> dict
+# row: metabolite_id, name, flag_value, n_positive, n_replicates, metric_type,
+#      condition_label, assay_id
+```
+
+##### 3b.3.c `assays_by_metabolite`
+
+Batch reverse-lookup — analog of `gene_derived_metrics`. Merged across edge types with polymorphic `value` column.
+
+```python
 assays_by_metabolite(
     metabolite_ids: list[str],
     organism: str | None = None,
+    evidence_kind: Literal['quantifies', 'flags'] | None = None,   # filter by edge type if needed
     summary: bool = False,
-    limit: int = 25,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
 ) -> dict
-# row: assay_id, organism_name, compartment, metric_type, value, value_sd, n_replicates,
-#      time_point, condition_label, experiment_id, publication_doi
+# row: assay_id, organism_name, compartment, metric_type, evidence_kind,
+#      value (numeric arm only), flag_value (boolean arm only), n_replicates,
+#      time_point (numeric arm only), condition_label, experiment_id, publication_doi
+# not_found / not_matched buckets for diagnosability (parallel to gene_derived_metrics)
 ```
 
 **Recommendation: Should-add (P1).** Phase: first-pass.
@@ -547,7 +596,7 @@ Phase: first-pass.
 |---|---|---|---|
 | `list_metabolite_assays` | Should-add (P1) | first-pass | — |
 | `metabolite_response_profile` | DEFER (premature at current scale) | deferred | §4.3.2, §4.3.3, §4.3.5; revisit when scale grows |
-| `metabolites_by_assay` / `assays_by_metabolite` | Should-add (P1) | first-pass | — |
+| `metabolites_by_quantifies_assay` + `metabolites_by_flags_assay` + `assays_by_metabolite` | Should-add (P1) — split per DM convention; drill-down split by edge type, reverse-lookup merged | first-pass | — |
 | `differential_metabolite_abundance` | Pending-definition | first-pass | §4.3.2, §4.3.3, §4.3.4, §4.3.5, §4.3.7 |
 | DM-family extension to Metabolite | Pending-definition | first-pass | §4.3.1, §4.3.6 |
 
@@ -561,7 +610,7 @@ No new tool proposals from the build phase — the existing first-pass surface (
 |---|---|
 | `list_metabolite_assays` | **Validated.** Scenario 8 `measurement` had to use `run_cypher` because no native discovery tool exists for assays. Confirms Should-add (P1). |
 | `metabolite_response_profile` | **Pattern validated, but recommendation flipped to DEFER (premature)** at walkthrough Q&A 2026-05-05. Scenario 8 (`measurement`) demonstrates the per-metabolite × compartment aggregation in run_cypher and it is adequate at the current 10-assay / 92-metabolite / 2-paper scale. Add the dedicated tool only when (a) Part 4 questions resolve AND (b) measurement scale grows materially OR `differential_metabolite_abundance` (3b.4) lands and absorbs part of this surface. |
-| `metabolites_by_assay` / `assays_by_metabolite` | **Validated.** Scenario 8 walks the assay → metabolite path; reverse lookup not exercised but the bidirectional pattern is the right shape. Should-add stands. |
+| `metabolites_by_quantifies_assay` + `metabolites_by_flags_assay` + `assays_by_metabolite` (split per DM convention 2026-05-05) | **Pattern validated; surface refined.** Scenario 8 walks the assay → metabolite path. Walkthrough Q&A 2026-05-05: split drill-down by edge type per DM family precedent (Quantifies edge = 15 fields, Flags edge = 6 fields — 9-field difference makes union row schema heavily sparse). Reverse lookup stays merged with polymorphic `value`/`flag_value`. Should-add stands. |
 | `differential_metabolite_abundance` | **Strengthened pending-definition signal.** Scenario 8's raw values are clearly per-replicate concentrations; FC is not the natural summary. Pending-definition stands. |
 | DM-family extension to Metabolite | **Empirical evidence shifted toward Assay-only modelling.** Per Part 1 §1.2, `MetaboliteAssay` already carries the same fields a `DerivedMetric` would (value_kind, metric_type, percentiles, etc.). The KG modellers appear to have answered Part 4 §4.3.1 implicitly: Assay IS the DM-on-Metabolite analog. Recommendation: downgrade DM-family extension from Pending-definition to **Not-needed** — direct any metabolite-level summary work onto `MetaboliteAssay`-anchored tools instead. |
 
