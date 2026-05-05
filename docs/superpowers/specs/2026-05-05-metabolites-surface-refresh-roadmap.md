@@ -1,9 +1,10 @@
 # Metabolites Surface Refresh — Phasing Roadmap
 
-**Date:** 2026-05-05
+**Date:** 2026-05-05 (initial); refreshed 2026-05-05 post-rebuild after KG-state verification reduced KG asks 5 Live → 3 Live.
 **Audit (driver):** [docs/superpowers/specs/2026-05-04-metabolites-surface-audit.md](2026-05-04-metabolites-surface-audit.md)
 **KG-side asks (companion):** [docs/kg-specs/2026-05-05-metabolites-surface-asks.md](../../kg-specs/2026-05-05-metabolites-surface-asks.md)
-**Status:** Phasing locked; per-phase implementation plans pending.
+**Phase 1 frozen spec:** [docs/tool-specs/2026-05-05-phase1-pass-through-plumbing.md](../../tool-specs/2026-05-05-phase1-pass-through-plumbing.md)
+**Status:** Phasing locked; Phase 1 frozen spec drafted (pending user approval); per-phase implementation plans pending for Phases 2-5.
 **Convention:** each phase below becomes one downstream `writing-plans` cycle.
 
 ---
@@ -20,13 +21,15 @@ Each phase is small enough to fit one writing-plans cycle and one cohesive PR. P
 
 | Phase | Theme | Items | Blast radius | KG dep |
 |---|---|---:|---|---|
-| 1 | P0 plumbing — pass-through additions | 6 | non-breaking, additive | none |
+| 1 | P0 plumbing — pass-through additions | 7 | non-breaking, additive | none |
 | 2 | Cross-cutting renames + filter additions | 4 | breaking (controlled call sites) | none |
 | 3 | Compound-anchored tightening + ergonomics | 6 | docstring + minor schema | none |
 | 4 | Docstring-only routing hints | 5 | docs-only | none |
-| 5 | Greenfield assay tools + KG-MET-016 consumer | 5 (4 new tools + 1 existing) | new surface | KG-MET-016 |
+| 5 | Greenfield assay tools | 4 (new tools) | new surface | none |
 
 **Total Live items:** 26 (matches audit Parts 2 + 3a + 3b Live tally).
+
+**Refresh 2026-05-05 post-rebuild:** the `list_metabolites` measurement-rollup pass-through item moved from Phase 5 → Phase 1 because KG-MET-016 (`Metabolite.measured_compartments`) is now populated by the post-import script, removing the gating dependency. Phase 5 is now pure greenfield (4 new assay tools, no existing-tool plumbing). Phase 1 grows from 6 → 7 items. Total Live items unchanged.
 
 ---
 
@@ -40,18 +43,19 @@ Each phase lists items, dependencies, and the open decisions (if any) that must 
 
 **Items:**
 
-- **`gene_overview`** — per-row `evidence_sources` rollup (which of metabolism / transport / measurement applies to the gene's metabolites). *Audit Part 2 P0.*
+- **`gene_overview`** — per-row chemistry counts (`reaction_count`, `metabolite_count`, `transporter_count`) **plus** `evidence_sources` rollup (subset of `['metabolism', 'transport', 'metabolomics']` describing which path-existence applies) **plus** envelope `has_chemistry`. *Audit Part 2 P0; live verification 2026-05-05 surfaced that the chemistry counts are not currently in the response shape, so this item adds 4 fields, not just 1.*
 - **`list_publications`** — per-row `metabolite_count`, `metabolite_assay_count`, `metabolite_compartments` (pass-through from Publication node — KG rollup already exists). *Audit Part 2 P0 / Part 3a cross-ref.*
 - **`list_experiments`** — per-row `metabolite_count`, `metabolite_assay_count`, `metabolite_compartments` (pass-through from Experiment node). *Audit Part 2 P0 / Part 3a cross-ref.*
 - **`list_organisms`** — per-row `measured_metabolite_count` (pass-through from Organism node) + envelope `by_measurement_capability` as a 2-bucket count `{has_metabolomics: N, no_metabolomics: M}`. *Audit Part 3a P1.*
-- **`list_filter_values`** — add `omics_type` filter type (returns canonical list including `METABOLOMICS`); add `evidence_source` filter type (returns `['metabolism', 'transport', 'metabolomics']`) for downstream chemistry-layer routing; verify `extracellular` is present in the existing `compartment` filter return. *Audit Part 2 P2 + Part 3a P1.*
-- **`kg_schema` + analysis docs** — (a) verify the MCP tool surfaces BioCypher property descriptions reaching the LLM, especially `MetaboliteAssay.field_description`; if introspection drops descriptions, extend so `field_description`'s docstring reaches consumers; (b) update `skills/multiomics-kg-guide/references/analysis/metabolites.md` Track B to reference `field_description` as the canonical provenance read. *Audit Part 3a build-derived P1; companion to KG-MET-001.*
+- **`list_metabolites`** — per-row `measured_assay_count`, `measured_paper_count`, `measured_organisms`, `measured_compartments` (pass-through from Metabolite node) + envelope `by_measurement_coverage` (counts at 0 / 1 / 2 papers + counts by compartment). *Audit Part 3a P0; **previously gated on KG-MET-016, now unblocked** since the post-import script populates `Metabolite.measured_compartments` on all 107 measured metabolites (verified live 2026-05-05).*
+- **`list_filter_values`** — add `omics_type` filter type (returns canonical list including `METABOLOMICS`); add `evidence_source` filter type (returns `['metabolism', 'transport', 'metabolomics']`) for downstream chemistry-layer routing. The `compartment` filter already returns `extracellular` via `Experiment.compartment` (verified live; 3 records). *Audit Part 2 P2 + Part 3a P1.*
+- **`kg_schema` + analysis docs** — (a) extend `kg/schema.py` introspection to merge a curated static dict of property descriptions (start with `MetaboliteAssay.field_description` and key `Metabolite.*` measurement-rollup descriptions) into the schema response; (b) update `skills/multiomics-kg-guide/references/analysis/metabolites.md` Track B to reference `field_description` as the canonical provenance read. *Audit Part 3a build-derived P1; companion to KG-MET-001.*
 
-**Dependencies:** none.
+**Dependencies:** none. KG-MET-016 (was the gating item for the `list_metabolites` row) is now Closed — see kg-asks §5.B.
 
-**Ready-to-plan gate:** none open. All node-property reads have been verified in audit Part 1 §1.2 + 5.A verification pass.
+**Ready-to-plan gate:** none open. All node-property reads verified in audit Part 1 §1.2 + 2026-05-05 post-rebuild verification.
 
-**Out of scope here (deferred to Phase 5):** `list_metabolites` measurement-rollup pass-through. The 4-field unit (`measured_assay_count` / `measured_paper_count` / `measured_organisms` / `measured_compartments`) is gated on KG-MET-016 — see Phase 5.
+**Out of scope here (deferred to Phase 5):** the four greenfield assay tools (`list_metabolite_assays`, `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`, `assays_by_metabolite`).
 
 ---
 
@@ -113,27 +117,22 @@ Each phase lists items, dependencies, and the open decisions (if any) that must 
 
 ---
 
-### Phase 5 — Greenfield assay tools + KG-MET-016 consumer
+### Phase 5 — Greenfield assay tools
 
-**Goal:** ship the four new metabolomics-measurement tools that close the Track-B (measurement-anchored) workflow, plus the one existing-tool measurement-rollup pass-through that's gated on KG-MET-016.
+**Goal:** ship the four new metabolomics-measurement tools that close the Track-B (measurement-anchored) workflow.
 
 **Items:**
 
-- **`list_metabolites`** — measurement rollup pass-through: per-row `measured_assay_count`, `measured_paper_count`, `measured_organisms`, `measured_compartments` (sparse-field policy: omit key entirely when `measured_assay_count == 0`); envelope `by_measurement_coverage` (counts at 0 / 1 / 2 papers + counts by compartment). **Gated on [KG-MET-016](../../kg-specs/2026-05-05-metabolites-surface-asks.md#kg-met-016--metabolitemeasured_compartments-rollup-p2)** for the `measured_compartments` field. *Audit Part 3a P0.*
 - **`list_metabolite_assays`** — discovery surface for `MetaboliteAssay` nodes (mirrors `list_experiments` per-assay; parameter naming follows `list_derived_metrics`). Full signature + per-row schema + envelope shape in audit Part 3b.1. *Audit Part 3b.1 P1.*
 - **`metabolites_by_quantifies_assay`** — numeric-arm drill-down on `Assay_quantifies_metabolite` edges. Analog of `genes_by_numeric_metric`. Edge filters: `metric_bucket`, `metric_percentile_min/max`, `rank_by_metric_max`, `value_min/max`, `detection_status`, `time_point`. Envelope: `by_detection_status` (primary headline per audit §4.3.3 resolution) + `by_metric_bucket` + `by_assay`. *Audit Part 3b.3a P1.*
 - **`metabolites_by_flags_assay`** — boolean-arm drill-down on `Assay_flags_metabolite` edges. Analog of `genes_by_boolean_metric`. Edge filter: `flag_value`. *Audit Part 3b.3b P1.*
 - **`assays_by_metabolite`** — batch reverse-lookup merged across edge types with polymorphic `value` / `flag_value` columns. Analog of `gene_derived_metrics`. Filter: `evidence_kind: Literal['quantifies', 'flags']`. `not_found` / `not_matched` buckets for diagnosability. *Audit Part 3b.3c P1.*
 
-**Dependencies:**
+**Dependencies:** none. KG-MET-001 (field_description provenance docs) and KG-MET-002 (compartment-as-property docs) inform (not block) tool docstrings; if either lands before Phase 5 ships, the new tool docstrings can cite the canonical convention directly.
 
-- KG-MET-016 (`Metabolite.measured_compartments` rollup) — blocks the `list_metabolites` item only. Assay tools are independent.
-- KG-MET-001 (field_description provenance docs) — informs (not blocks) tool docstrings; if KG-MET-001 lands first, assay tool docstrings can cite the canonical convention directly.
-- KG-MET-002 (compartment-as-property docs) — informs (not blocks) `list_metabolite_assays` docstring re: per-edge compartment surfacing.
+**Ready-to-plan gate:** the four new tools should follow the `add-or-update-tool` skill (Phase 1 scoping → Phase 2 parallel TDD build), per CLAUDE.md.
 
-**Ready-to-plan gate:** the four new tools should follow the `add-or-update-tool` skill (Phase 1 scoping → Phase 2 parallel TDD build), per CLAUDE.md. The single `list_metabolites` rollup item can ride alongside or be split into its own micro-slice; recommendation is to bundle so the metabolomics rollup story lands cohesively.
-
-**Sequencing within phase:** `list_metabolite_assays` first (discovery), then the three drill-down tools as a slice (shared envelope shape + Pydantic patterns), then `list_metabolites` rollup once KG-MET-016 is verified.
+**Sequencing within phase:** `list_metabolite_assays` first (discovery), then the three drill-down tools as a slice (shared envelope shape + Pydantic patterns).
 
 ---
 
@@ -165,7 +164,7 @@ Lets the reader verify completeness from either direction.
 | Part 2 build-derived P3 — family_inferred-dominance warning rewrite | 3 |
 | Part 2 build-derived P1 cross-cutting — `top_pathways` → `top_metabolite_pathways` | 2 |
 | Part 2 build-derived P2 cross-cutting — `exclude_metabolite_ids` filter | 2 |
-| Part 3a P0 — `list_metabolites` measurement-rollup pass-through | 5 |
+| Part 3a P0 — `list_metabolites` measurement-rollup pass-through | 1 (moved from 5; KG-MET-016 closed) |
 | Part 3a P1 — `list_organisms` measurement extension (cross-ref Part 2) | 1 |
 | Part 3a P1 — `list_filter_values` `omics_type` filter type | 1 |
 | Part 3a build-derived P1 — `kg_schema` field_description plumbing | 1 |
@@ -207,5 +206,5 @@ Mirrors the audit's drop list. Each item gets a one-line reason for not landing 
 - **Phase 1 ships first.** Lowest blast radius; exercises the test-update + about-content regen pipeline before bigger phases hit it.
 - **Phase 2 ships next.** Renames are cheapest now (audit reports 2 internal call sites for `search→search_text`; `top_pathways` rename has similarly small footprint). Delaying compounds the migration cost.
 - **Phases 3 and 4 can interleave or run parallel** in separate worktrees — compound-anchored tightening (Phase 3) vs docstring-only routing (Phase 4) touch disjoint files. If only one developer is available, ship Phase 3 first because Phase 4's routing examples reference the final docstring framing landed in Phase 3.
-- **Phase 5 is the largest phase.** Start writing-plans for it as soon as Phase 4 is in flight; only the `list_metabolites` measurement-rollup item actually gates on KG-MET-016, and the four new tools can proceed in parallel.
+- **Phase 5 is now pure greenfield** (4 new tools; the `list_metabolites` measurement-rollup item moved to Phase 1 after KG-MET-016 was confirmed Closed 2026-05-05 post-rebuild). Start writing-plans for it as soon as Phase 4 is in flight; the four new tools can proceed in parallel.
 - **Per CLAUDE.md, all four new tools in Phase 5 should use the `add-or-update-tool` skill** (Phase 1 scoping → Phase 2 parallel TDD build). The three drill-down tools (`metabolites_by_quantifies_assay` / `metabolites_by_flags_assay` / `assays_by_metabolite`) form a natural slice and should be planned as a single writing-plans cycle, mirroring how the DM-family slice was structured.
