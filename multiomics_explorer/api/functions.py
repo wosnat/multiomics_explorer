@@ -1999,7 +1999,7 @@ def run_cypher(
 # ---------------------------------------------------------------------------
 
 _EXPRESSION_STATUS_KEYS = ("significant_up", "significant_down", "not_significant")
-_VALID_DIRECTIONS = {"up", "down"}
+_VALID_DIRECTIONS = {"up", "down", "both"}
 
 
 def _apoc_freq_to_dict(freq_list: list[dict]) -> dict[str, int]:
@@ -2126,6 +2126,13 @@ def differential_expression_by_gene(
 
     Returns dict with summary fields + results list. Results are long form:
     one row per gene x experiment x timepoint, all context inlined.
+
+    direction: ``'up'`` / ``'down'`` / ``'both'`` / ``None``. ``'both'`` is
+        the explicit, self-documenting spelling for "return rows with
+        ``expression_status`` ∈ {``'significant_up'``, ``'significant_down'``}"
+        — functionally equivalent to ``direction=None, significant_only=True``
+        (per spec §6.4); pick whichever spelling is clearer at the call site.
+        Default ``None`` is unchanged.
 
     Raises:
         ValueError: if no filter provided, if inputs span multiple organisms,
@@ -4742,8 +4749,9 @@ _VALID_EVIDENCE_SOURCES = ("metabolism", "transport", "metabolomics")
 
 
 def list_metabolites(
-    search: str | None = None,
+    search_text: str | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     kegg_compound_ids: list[str] | None = None,
     chebi_ids: list[str] | None = None,
     hmdb_ids: list[str] | None = None,
@@ -4764,9 +4772,9 @@ def list_metabolites(
     """List metabolites in the chemistry layer with rich filtering.
 
     Returns dict with keys: total_entries, total_matching, returned, offset,
-    truncated, top_organisms, top_pathways, by_evidence_source, xref_coverage,
-    mass_stats, by_measurement_coverage, score_max, score_median, not_found,
-    results.
+    truncated, top_organisms, top_metabolite_pathways, by_evidence_source,
+    xref_coverage, mass_stats, by_measurement_coverage, score_max,
+    score_median, not_found, results.
     Per result (compact): metabolite_id, name, formula, elements, mass,
     gene_count, organism_count, transporter_count, evidence_sources,
     chebi_id (sparse), pathway_ids, pathway_count, measured_assay_count,
@@ -4777,17 +4785,21 @@ def list_metabolites(
     by_measurement_coverage envelope (spec §6.6): sub-rollups
     {by_paper_count: [{paper_count, n}], by_compartment: [{compartment, n}]}
     over the matched metabolite set.
-    When search is provided, also includes score (per row) +
+    When search_text is provided, also includes score (per row) +
     score_max, score_median (envelope, otherwise None).
 
+    exclude_metabolite_ids: Exclude metabolites with these IDs. Set-difference
+        semantics with metabolite_ids — exclude wins on overlap. Empty list
+        is no-op.
+
     Raises:
-        ValueError: if search is empty/whitespace, or evidence_sources
+        ValueError: if search_text is empty/whitespace, or evidence_sources
             contains values outside {"metabolism", "transport",
             "metabolomics"}.
     """
-    # 1. Validate search (non-empty when provided)
-    if search is not None and not search.strip():
-        raise ValueError("search must not be empty or whitespace.")
+    # 1. Validate search_text (non-empty when provided)
+    if search_text is not None and not search_text.strip():
+        raise ValueError("search_text must not be empty or whitespace.")
 
     # 1. Validate evidence_sources enum (defensive — MCP wrapper also gates)
     if evidence_sources is not None:
@@ -4822,31 +4834,33 @@ def list_metabolites(
         pathway_ids=pathway_ids,
         evidence_sources=evidence_sources,
     )
+    if exclude_metabolite_ids:
+        filter_kwargs["exclude_metabolite_ids"] = exclude_metabolite_ids
 
-    def _run_summary(st=search):
+    def _run_summary(st=search_text):
         cypher, params = build_list_metabolites_summary(
-            search=st, **filter_kwargs,
+            search_text=st, **filter_kwargs,
         )
         return conn.execute_query(cypher, **params)[0]
 
-    def _run_detail(st=search):
+    def _run_detail(st=search_text):
         cypher, params = build_list_metabolites(
-            search=st, **filter_kwargs,
+            search_text=st, **filter_kwargs,
             verbose=verbose, limit=limit, offset=offset,
         )
         return conn.execute_query(cypher, **params)
 
     # 4. Always run summary builder (with Lucene retry)
-    effective_search = search
+    effective_search = search_text
     try:
         raw_summary = _run_summary()
     except Neo4jClientError:
-        if search:
+        if search_text:
             logger.debug(
                 "list_metabolites: Lucene parse error, "
                 "retrying with escaped query"
             )
-            effective_search = _LUCENE_SPECIAL.sub(r'\\\g<0>', search)
+            effective_search = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
             raw_summary = _run_summary(st=effective_search)
         else:
             raise
@@ -4907,7 +4921,9 @@ def list_metabolites(
         "total_entries": raw_summary.get("total_entries", 0),
         "total_matching": total_matching,
         "top_organisms": raw_summary.get("top_organisms", []) or [],
-        "top_pathways": raw_summary.get("top_pathways", []) or [],
+        "top_metabolite_pathways": raw_summary.get(
+            "top_metabolite_pathways", []
+        ) or [],
         "by_evidence_source": _rename_freq(
             raw_summary.get("by_evidence_source", []) or [],
             "evidence_source",
@@ -4932,8 +4948,8 @@ def list_metabolites(
         "by_measurement_coverage": _rename_measurement_coverage(
             raw_summary.get("by_measurement_coverage"),
         ),
-        "score_max": raw_summary.get("score_max") if search else None,
-        "score_median": raw_summary.get("score_median") if search else None,
+        "score_max": raw_summary.get("score_max") if search_text else None,
+        "score_median": raw_summary.get("score_median") if search_text else None,
         "returned": len(results),
         "offset": offset,
         "truncated": total_matching > offset + len(results),
@@ -5014,6 +5030,7 @@ def genes_by_metabolite(
     metabolite_ids: list[str],
     organism: str,
     *,
+    exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     mass_balance: str | None = None,
@@ -5037,6 +5054,10 @@ def genes_by_metabolite(
 
     See `docs/tool-specs/genes_by_metabolite.md` for the full contract,
     paging strategy, and auto-warning trigger conditions.
+
+    exclude_metabolite_ids: Exclude metabolites with these IDs. Set-difference
+        semantics with metabolite_ids — exclude wins on overlap. Empty list
+        is no-op.
 
     Raises:
         ValueError: if `evidence_sources` contains values outside
@@ -5072,6 +5093,7 @@ def genes_by_metabolite(
     # summary=True).
     sum_cypher, sum_params = build_genes_by_metabolite_summary(
         metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
         organism=organism,
         ec_numbers=ec_numbers,
         mass_balance=mass_balance,
@@ -5104,6 +5126,7 @@ def genes_by_metabolite(
             if arm == "metabolism":
                 cypher, params = build_genes_by_metabolite_metabolism(
                     metabolite_ids=metabolite_ids,
+                    exclude_metabolite_ids=exclude_metabolite_ids,
                     organism=organism,
                     ec_numbers=ec_numbers,
                     mass_balance=mass_balance,
@@ -5116,6 +5139,7 @@ def genes_by_metabolite(
             else:
                 cypher, params = build_genes_by_metabolite_transport(
                     metabolite_ids=metabolite_ids,
+                    exclude_metabolite_ids=exclude_metabolite_ids,
                     organism=organism,
                     metabolite_pathway_ids=metabolite_pathway_ids,
                     gene_categories=gene_categories,
@@ -5134,6 +5158,7 @@ def genes_by_metabolite(
                 if arm == "metabolism":
                     cypher, params = build_genes_by_metabolite_metabolism(
                         metabolite_ids=metabolite_ids,
+                        exclude_metabolite_ids=exclude_metabolite_ids,
                         organism=organism,
                         ec_numbers=ec_numbers,
                         mass_balance=mass_balance,
@@ -5146,6 +5171,7 @@ def genes_by_metabolite(
                 else:
                     cypher, params = build_genes_by_metabolite_transport(
                         metabolite_ids=metabolite_ids,
+                        exclude_metabolite_ids=exclude_metabolite_ids,
                         organism=organism,
                         metabolite_pathway_ids=metabolite_pathway_ids,
                         gene_categories=gene_categories,
@@ -5515,6 +5541,7 @@ def metabolites_by_gene(
     *,
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     mass_balance: str | None = None,
@@ -5538,6 +5565,10 @@ def metabolites_by_gene(
 
     See `docs/tool-specs/metabolites_by_gene.md` for the full contract,
     paging strategy, sort order, and auto-warning trigger conditions.
+
+    exclude_metabolite_ids: Exclude metabolites with these IDs. Set-difference
+        semantics with metabolite_ids — exclude wins on overlap. Empty list
+        is no-op.
 
     Raises:
         ValueError: if `evidence_sources` contains values outside
@@ -5569,11 +5600,16 @@ def metabolites_by_gene(
         )
 
     # 3. Always run summary builder (envelope rollups even when summary=True).
+    _mbg_exclude_kw = (
+        {"exclude_metabolite_ids": exclude_metabolite_ids}
+        if exclude_metabolite_ids else {}
+    )
     sum_cypher, sum_params = build_metabolites_by_gene_summary(
         locus_tags=locus_tags,
         organism=organism,
         metabolite_elements=metabolite_elements,
         metabolite_ids=metabolite_ids,
+        **_mbg_exclude_kw,
         ec_numbers=ec_numbers,
         mass_balance=mass_balance,
         metabolite_pathway_ids=metabolite_pathway_ids,
@@ -5612,6 +5648,7 @@ def metabolites_by_gene(
                     organism=organism,
                     metabolite_elements=metabolite_elements,
                     metabolite_ids=metabolite_ids,
+                    **_mbg_exclude_kw,
                     ec_numbers=ec_numbers,
                     mass_balance=mass_balance,
                     metabolite_pathway_ids=metabolite_pathway_ids,
@@ -5626,6 +5663,7 @@ def metabolites_by_gene(
                     organism=organism,
                     metabolite_elements=metabolite_elements,
                     metabolite_ids=metabolite_ids,
+                    **_mbg_exclude_kw,
                     metabolite_pathway_ids=metabolite_pathway_ids,
                     gene_categories=gene_categories,
                     transport_confidence=transport_confidence,
@@ -5646,6 +5684,7 @@ def metabolites_by_gene(
                         organism=organism,
                         metabolite_elements=metabolite_elements,
                         metabolite_ids=metabolite_ids,
+                        **_mbg_exclude_kw,
                         ec_numbers=ec_numbers,
                         mass_balance=mass_balance,
                         metabolite_pathway_ids=metabolite_pathway_ids,
@@ -5660,6 +5699,7 @@ def metabolites_by_gene(
                         organism=organism,
                         metabolite_elements=metabolite_elements,
                         metabolite_ids=metabolite_ids,
+                        **_mbg_exclude_kw,
                         metabolite_pathway_ids=metabolite_pathway_ids,
                         gene_categories=gene_categories,
                         transport_confidence=transport_confidence,
@@ -5813,29 +5853,13 @@ def metabolites_by_gene(
         raw_summary.get("top_gene_categories", []) or [],
         key=lambda r: (-(r.get("gene_count") or 0), r.get("category") or ""),
     )[:10]
-    # top_pathways: spec § 5 verified 3-branch UNION (reaction-side metabolism
-    # + metabolite-side metabolism + metabolite-side transport). The summary
-    # builder's metabolite-side-only rollup misses ~6 (gene, pathway) pairs
-    # across MED4 where reactions have zero Reaction_in_kegg_pathway-anchored
-    # metabolite-side coverage but DO have Reaction_in_kegg_pathway edges
-    # (e.g. PMM0453 → ko01040 Biosynthesis of unsaturated fatty acids).
-    # The dedicated query honors all input filters and ranks per spec.
-    tp_cypher, tp_params = _build_mbg_top_pathways_query(
-        locus_tags=locus_tags,
-        organism=organism,
-        active_arms=active_arms,
-        metabolite_elements=metabolite_elements,
-        metabolite_ids=metabolite_ids,
-        metabolite_pathway_ids=metabolite_pathway_ids,
-        ec_numbers=ec_numbers,
-        mass_balance=mass_balance,
-        gene_categories=gene_categories,
-        transport_confidence=transport_confidence,
+    # Phase 2 Item 2: top_metabolite_pathways now sourced directly from the
+    # summary builder, which produces a chemistry-pathway-filtered rollup
+    # (p.reaction_count >= 3) over m.pathway_ids (KG-A5 denorm,
+    # transport-extended; uniform coverage across both arms).
+    top_metabolite_pathways = (
+        raw_summary.get("top_metabolite_pathways", []) or []
     )
-    if tp_cypher:
-        top_pathways = list(conn.execute_query(tp_cypher, **tp_params))
-    else:
-        top_pathways = []
 
     # 13. Auto-warning: family-inferred dominance (transport-only check).
     # Strict majority threshold; metabolism rows do not factor in. Mirrors
@@ -5891,7 +5915,7 @@ def metabolites_by_gene(
         "top_reactions": top_reactions,
         "top_tcdb_families": top_tcdb_families,
         "top_gene_categories": top_gene_categories,
-        "top_pathways": top_pathways,
+        "top_metabolite_pathways": top_metabolite_pathways,
         "gene_count_total": gene_count_total,
         "reaction_count_total": raw_summary.get("reaction_count_total", 0) or 0,
         "transporter_count_total": raw_summary.get("transporter_count_total", 0) or 0,

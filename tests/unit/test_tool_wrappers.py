@@ -6031,12 +6031,14 @@ class TestMetabolitesByGeneWrapper:
             assert hasattr(tools_mod, name), f"missing class: {name}"
 
     def test_mbg_top_pathway_fields(self):
-        """MbgTopPathway has the spec'd fields."""
+        """MbgTopPathway has the spec'd fields. Phase 2 Item 2:
+        pathway_id/pathway_name renamed to metabolite_pathway_id /
+        metabolite_pathway_name. Other fields unchanged."""
         from multiomics_explorer.mcp_server.tools import MbgTopPathway
         fields = set(MbgTopPathway.model_fields.keys())
         for required in [
-            "pathway_id",
-            "pathway_name",
+            "metabolite_pathway_id",
+            "metabolite_pathway_name",
             "gene_count",
             "pathway_reaction_count",
             "pathway_metabolite_count",
@@ -7235,7 +7237,7 @@ class TestListMetabolitesPhase1PlumbingWrapper:
 
     _API_RETURN = {
         "total_entries": 3218, "total_matching": 1,
-        "top_organisms": [], "top_pathways": [],
+        "top_organisms": [], "top_metabolite_pathways": [],
         "by_evidence_source": [],
         "xref_coverage": {
             "with_chebi": 0, "with_hmdb": 0, "with_mnxm": 0,
@@ -7379,24 +7381,35 @@ class TestListMetabolitesWrapperPhase2:
         # Default forwarded as None or absent — both acceptable.
         assert kwargs.get("exclude_metabolite_ids") in (None, [])
 
-    @pytest.mark.asyncio
-    async def test_exclude_metabolite_ids_rejects_non_list(
-        self, tool_fns, mock_ctx,
-    ):
-        """Pydantic validation: rejects non-list input (e.g. a string)."""
-        from fastmcp.exceptions import ToolError
-        # Non-list input should fail at Pydantic-validation stage,
-        # raising ToolError (the FastMCP wrapper converts validation
-        # errors to ToolError).
-        with patch(
-            "multiomics_explorer.api.functions.list_metabolites",
-            return_value=self._SAMPLE_API_RETURN,
-        ):
-            with pytest.raises((ToolError, Exception)):
-                await tool_fns["list_metabolites"](
-                    mock_ctx,
-                    exclude_metabolite_ids="kegg.compound:C00002",
-                )
+    def test_exclude_metabolite_ids_typed_as_optional_list(self, tool_fns):
+        """The wrapper signature's `exclude_metabolite_ids` annotation is
+        `list[str] | None`.
+
+        Direct call-time Pydantic validation isn't reliably enforced
+        through `tool_fns` dispatch (FastMCP's `mcp.get_tool(name).fn`
+        returns the raw Python function and bypasses Pydantic at
+        raw-Python-dispatch time). So we pin the signature itself —
+        `list[str] | None` — which is what FastMCP exposes to remote
+        callers as the contract and what Pydantic enforces at the MCP
+        boundary.
+        """
+        import types
+        import typing
+        fn = tool_fns["list_metabolites"]
+        hints = typing.get_type_hints(fn, include_extras=True)
+        annotation = hints["exclude_metabolite_ids"]
+        # Annotated[list[str] | None, Field(...)] — strip Annotated.
+        inner = (
+            typing.get_args(annotation)[0]
+            if hasattr(annotation, "__metadata__")
+            else annotation
+        )
+        # Inner is `list[str] | None`; origin is types.UnionType (PEP 604)
+        # or typing.Union for older typing.Optional forms.
+        assert typing.get_origin(inner) in {types.UnionType, typing.Union}
+        args = set(typing.get_args(inner))
+        assert list[str] in args
+        assert type(None) in args
 
 
 class TestGenesByMetaboliteWrapperPhase2:
@@ -7437,22 +7450,25 @@ class TestGenesByMetaboliteWrapperPhase2:
         kwargs = mock_api.call_args.kwargs
         assert kwargs.get("exclude_metabolite_ids") in (None, [])
 
-    @pytest.mark.asyncio
-    async def test_exclude_metabolite_ids_rejects_non_list(
-        self, tool_fns, mock_ctx,
-    ):
-        from fastmcp.exceptions import ToolError
-        with patch(
-            "multiomics_explorer.api.functions.genes_by_metabolite",
-            return_value=self._SAMPLE_API_RETURN,
-        ):
-            with pytest.raises((ToolError, Exception)):
-                await tool_fns["genes_by_metabolite"](
-                    mock_ctx,
-                    metabolite_ids=["kegg.compound:C00086"],
-                    organism="Prochlorococcus MED4",
-                    exclude_metabolite_ids="kegg.compound:C00002",
-                )
+    def test_exclude_metabolite_ids_typed_as_optional_list(self, tool_fns):
+        """The wrapper signature's `exclude_metabolite_ids` annotation is
+        `list[str] | None`. (Same FastMCP raw-dispatch caveat as
+        list_metabolites.)
+        """
+        import types
+        import typing
+        fn = tool_fns["genes_by_metabolite"]
+        hints = typing.get_type_hints(fn, include_extras=True)
+        annotation = hints["exclude_metabolite_ids"]
+        inner = (
+            typing.get_args(annotation)[0]
+            if hasattr(annotation, "__metadata__")
+            else annotation
+        )
+        assert typing.get_origin(inner) in {types.UnionType, typing.Union}
+        args = set(typing.get_args(inner))
+        assert list[str] in args
+        assert type(None) in args
 
 
 class TestMetabolitesByGeneWrapperPhase2:
@@ -7516,22 +7532,25 @@ class TestMetabolitesByGeneWrapperPhase2:
         kwargs = mock_api.call_args.kwargs
         assert kwargs.get("exclude_metabolite_ids") in (None, [])
 
-    @pytest.mark.asyncio
-    async def test_exclude_metabolite_ids_rejects_non_list(
-        self, tool_fns, mock_ctx,
-    ):
-        from fastmcp.exceptions import ToolError
-        with patch(
-            "multiomics_explorer.api.functions.metabolites_by_gene",
-            return_value=self._SAMPLE_API_RETURN,
-        ):
-            with pytest.raises((ToolError, Exception)):
-                await tool_fns["metabolites_by_gene"](
-                    mock_ctx,
-                    locus_tags=["PMM0963"],
-                    organism="Prochlorococcus MED4",
-                    exclude_metabolite_ids="kegg.compound:C00002",
-                )
+    def test_exclude_metabolite_ids_typed_as_optional_list(self, tool_fns):
+        """The wrapper signature's `exclude_metabolite_ids` annotation is
+        `list[str] | None`. (Same FastMCP raw-dispatch caveat as
+        list_metabolites.)
+        """
+        import types
+        import typing
+        fn = tool_fns["metabolites_by_gene"]
+        hints = typing.get_type_hints(fn, include_extras=True)
+        annotation = hints["exclude_metabolite_ids"]
+        inner = (
+            typing.get_args(annotation)[0]
+            if hasattr(annotation, "__metadata__")
+            else annotation
+        )
+        assert typing.get_origin(inner) in {types.UnionType, typing.Union}
+        args = set(typing.get_args(inner))
+        assert list[str] in args
+        assert type(None) in args
 
 
 class TestDifferentialExpressionByGeneWrapperPhase2:

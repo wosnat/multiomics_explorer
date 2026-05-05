@@ -23,8 +23,9 @@ After this tool, drill in via:
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| search | string \| None | None | Free-text search on metabolite name (Lucene syntax). Index covers Metabolite.name only — element/formula composition is filtered through `elements` (presence list), not search. E.g. 'glucose', 'phosphate AND amino'. |
+| search_text | string \| None | None | Free-text search on metabolite name (Lucene syntax). Index covers Metabolite.name only — element/formula composition is filtered through `elements` (presence list), not search. E.g. 'glucose', 'phosphate AND amino'. |
 | metabolite_ids | list[string] \| None | None | Restrict to specific metabolites by full prefixed ID (case-sensitive). E.g. ['kegg.compound:C00031', 'kegg.compound:C00002']. Combines with other filters via AND. `not_found.metabolite_ids` lists any IDs that don't exist in the KG. |
+| exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites with these IDs. Set-difference semantics with `metabolite_ids` — exclude wins on overlap. Empty list is no-op. |
 | kegg_compound_ids | list[string] \| None | None | Filter by raw KEGG C-numbers (e.g. ['C00031']). Convenience over `metabolite_ids` when working with KEGG-anchored data; the prefixed equivalent is `kegg.compound:C*`. |
 | chebi_ids | list[string] \| None | None | Filter by raw ChEBI numeric IDs (e.g. ['4167', '15422']). 90% of Metabolite nodes carry a `chebi_id`. |
 | hmdb_ids | list[string] \| None | None | Filter by raw HMDB IDs (e.g. ['HMDB0000122']). 47% coverage. |
@@ -45,13 +46,13 @@ After this tool, drill in via:
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, top_organisms, top_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, score_max, score_median, returned, offset, truncated, not_found, results
+total_entries, total_matching, top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, score_max, score_median, returned, offset, truncated, not_found, results
 ```
 
 - **total_entries** (int): Total Metabolite nodes in KG (unfiltered, 3,025 today)
 - **total_matching** (int): Metabolites matching filters
 - **top_organisms** (list[MetTopOrganism]): Top 10 organisms by metabolite count (within matched set), sorted desc
-- **top_pathways** (list[MetTopPathway]): Top 10 pathways by metabolite count (within matched set), sorted desc
+- **top_metabolite_pathways** (list[MetTopPathway]): Top 10 pathways by metabolite count (within matched set), sorted desc. Metabolite-pathway rollup (distinct from KO-pathway annotations on `genes_by_ontology`).
 - **by_evidence_source** (list[MetEvidenceSourceBreakdown]): Frequency of evidence_sources values across matched set. Today: at most 2 entries (metabolism, transport).
 - **xref_coverage** (MetXrefCoverage): Cross-ref ID coverage within matched set
 - **mass_stats** (MetMassStats): Mass distribution within matched set
@@ -118,7 +119,7 @@ list_metabolites(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii 
 ### Example 4: Lucene search by name
 
 ```example-call
-list_metabolites(search="glucose", limit=3)
+list_metabolites(search_text="glucose", limit=3)
 ```
 
 ### Example 5: Transport-only metabolites (TCDB-curated substrates without local catalysis)
@@ -152,6 +153,23 @@ Step 2: genes_by_metabolite(metabolite_ids=[chosen_ids], organism="Prochlorococc
         → catalysing genes per metabolite
 ```
 
+### Example 8: Currency-cofactor strip — exclude ATP/ADP/NADH/NADPH/H2O when top_metabolites is dominated by them
+
+```example-call
+list_metabolites(
+  organism_names=["Prochlorococcus MED4"],
+  exclude_metabolite_ids=[
+    "kegg.compound:C00002",  # ATP
+    "kegg.compound:C00008",  # ADP
+    "kegg.compound:C00004",  # NADH
+    "kegg.compound:C00005",  # NADPH
+    "kegg.compound:C00001",  # H2O
+  ],
+  summary=True,
+)
+
+```
+
 ## Chaining patterns
 
 ```
@@ -178,6 +196,8 @@ list_metabolites (per-row `measured_assay_count > 0`) → run_cypher to inspect 
 
 - `measured_compartments` is populated on all 107 measured metabolites (defaults to `[]` on the 3111 unmeasured); use `len(m['measured_compartments']) >= 1` to filter for measurement-anchored rows. Same metabolite measured in both whole_cell and extracellular returns one row with `measured_compartments=['extracellular','whole_cell']` (sorted), not two rows — Metabolite is compartment-agnostic per KG-MET-002.
 
+- When the `top_metabolites` rollup is dominated by ATP / ADP / NADH / NADPH / H2O, pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip cofactor noise. Set-difference semantics with `metabolite_ids` — exclude wins on overlap. KG namespace is `kegg.compound:` (not `chebi:`).
+
 ```mistake
 list_metabolites(elements=['N'], gene_count_min=1)  # gene_count_min isn't a param
 ```
@@ -200,7 +220,7 @@ list_metabolites(organism_names=['Prochlorococcus MED4'])  # full preferred_name
 from multiomics_explorer import list_metabolites
 
 result = list_metabolites()
-# returns dict with keys: total_entries, total_matching, top_organisms, top_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, score_max, score_median, offset, not_found, results
+# returns dict with keys: total_entries, total_matching, top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, score_max, score_median, offset, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

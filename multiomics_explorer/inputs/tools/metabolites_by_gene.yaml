@@ -19,7 +19,7 @@ examples:
     # {Urea, H2O, CO2, NH3}); zero transport rows because the ureA/B/C trio
     # carry no Gene_has_tcdb_family edges. Detail rows surface the catalysis
     # triplets; envelope `top_metabolites` ranks {Urea, H2O, CO2, NH3} by
-    # gene reach, `top_pathways` (with the chemistry-pathway filter
+    # gene reach, `top_metabolite_pathways` (with the chemistry-pathway filter
     # `reaction_count >= 3`) ranks Nitrogen cycle, Cyanoamino acid metabolism,
     # Biotin metabolism, Calvin cycle, Nitrogen metabolism, Arginine
     # biosynthesis, Alanine/aspartate/glutamate metabolism (no signaling/
@@ -42,8 +42,8 @@ examples:
                 summary=True,                 # batch DE → envelope is the artifact
               )
               → top_metabolites ranks N-bearing compounds by gene reach;
-                top_pathways concentrates Nitrogen metabolism, Arginine
-                biosynthesis, Alanine/aspartate/glutamate metabolism;
+                top_metabolite_pathways concentrates Nitrogen metabolism,
+                Arginine biosynthesis, Alanine/aspartate/glutamate metabolism;
                 by_element confirms N-presence dominance.
 
       Step 3 (optional): list_metabolites(metabolite_ids=[top_N_metabolite_ids])
@@ -59,11 +59,11 @@ examples:
                 organism="Prochlorococcus MED4",
                 summary=True,
               )
-              → top_pathways = "what pathways does this set sit in"
+              → top_metabolite_pathways = "what pathways does this set sit in"
                 by_element = C/N/P/S signature
                 top_metabolites = specific compounds the set's chemistry hits
 
-      Step 3 (optional): list_metabolites(pathway_ids=[<top_pathway_id>])
+      Step 3 (optional): list_metabolites(pathway_ids=[<top_metabolite_pathway_id>])
               → full metabolite roster of the pathway (not just gene-set hits).
 
   - title: Workflow B' (cross-feeding) — MBG → GBM bridge
@@ -89,6 +89,29 @@ examples:
               → catalysts and transporters for those metabolites in the
                 partner organism. Intersect / diff client-side to seed
                 cross-feeding hypotheses.
+
+  - title: Currency-cofactor strip — exclude ATP/ADP/NADH/NADPH/H2O on a chemistry rollup
+    call: |
+      metabolites_by_gene(
+        locus_tags=["PMM0963", "PMM0964", "PMM0965"],
+        organism="Prochlorococcus MED4",
+        exclude_metabolite_ids=[
+          "kegg.compound:C00002",
+          "kegg.compound:C00008",
+          "kegg.compound:C00004",
+          "kegg.compound:C00005",
+          "kegg.compound:C00001",
+        ],
+        summary=True,
+      )
+    # Cofactor IDs above: ATP (C00002), ADP (C00008), NADH (C00004),
+    # NADPH (C00005), H2O (C00001). Set-difference semantics with
+    # `metabolite_ids` — exclude wins on overlap (silent). Per-arm scope:
+    # the exclude applies on BOTH the metabolism arm
+    # (Reaction_has_metabolite) and the transport arm
+    # (Tcdb_family_transports_metabolite), mirroring `metabolite_ids`. On
+    # the urease trio, this drops H2O from the {Urea, H2O, CO2, NH3}
+    # canonical envelope.
 
   - title: High-precision transporter slice (mute the 551-row blowup)
     call: metabolites_by_gene(locus_tags=["PMM0434", "PMM0913"], organism="Prochlorococcus MED4", transport_confidence="substrate_confirmed", evidence_sources=["transport"], limit=5)
@@ -125,10 +148,10 @@ chaining:
   - "metabolites_by_gene → top_metabolites → list_metabolites(metabolite_ids=[top_metabolite_ids], organism_names=[partner_organism]) for cross-organism presence (Workflow B' cross-feeding seed)"
   - "metabolites_by_gene → top_metabolites → genes_by_metabolite(metabolite_ids=[top_metabolite_ids], organism=PARTNER_ORGANISM) (Workflow B' cross-feeding bridge — catalysts + transporters in partner)"
 
-  # downstream from envelope — top_pathways (chemistry-pathway-filtered)
-  - "metabolites_by_gene → top_pathways → list_metabolites(pathway_ids=[top_pathway_id]) for the full metabolite roster of the pathway (not just gene-set hits)"
-  - "metabolites_by_gene → top_pathways → genes_by_ontology(ontology='kegg', term_ids=[top_pathway_id], organism=...) for gene-KO-mediated pathway annotations (different surface — see top_pathways naming disambiguation)"
-  - "metabolites_by_gene → top_pathways → pathway_enrichment(...) when gene-set hypothesis test is the goal"
+  # downstream from envelope — top_metabolite_pathways (chemistry-pathway-filtered)
+  - "metabolites_by_gene → top_metabolite_pathways → list_metabolites(pathway_ids=[metabolite_pathway_id]) for the full metabolite roster of the pathway (not just gene-set hits)"
+  - "metabolites_by_gene → top_metabolite_pathways → genes_by_ontology(ontology='kegg', term_ids=[metabolite_pathway_id], organism=...) for gene-KO-mediated pathway annotations (different surface — see top_metabolite_pathways naming disambiguation)"
+  - "metabolites_by_gene → top_metabolite_pathways → pathway_enrichment(...) when gene-set hypothesis test is the goal"
 
   # downstream from envelope — top_reactions / top_tcdb_families
   - "metabolites_by_gene → top_reactions → genes_by_ontology(ontology='ec', term_ids=[ec_number], organism=...) for genes in adjacent reactions"
@@ -180,14 +203,15 @@ mistakes:
     `metabolite_elements`, `metabolite_ids`, `metabolite_pathway_ids`, and
     `gene_categories` are the only filters that narrow both arms uniformly.
   - >-
-    `top_pathways` here means *KEGG pathways the gene set's chemistry
-    reaches* (via `Reaction_in_kegg_pathway` + `Metabolite_in_pathway`).
-    These are NOT the same as gene-KO-mediated pathway annotations (where
-    pathway membership is asserted by the gene's KO assignment) — those
-    live in `genes_by_ontology(ontology='kegg', term_ids=[...], organism=...)`.
-    The two are distinct surfaces: chemistry-reach (this tool) vs
-    KO-annotation (`genes_by_ontology`). For metabolic pathway analysis
-    with a hypothesis test, use `pathway_enrichment` instead.
+    `top_metabolite_pathways` here means *KEGG pathways the gene set's
+    chemistry reaches* (via `Reaction_in_kegg_pathway` +
+    `Metabolite_in_pathway`). These are NOT the same as gene-KO-mediated
+    pathway annotations (where pathway membership is asserted by the gene's
+    KO assignment) — those live in `genes_by_ontology(ontology='kegg',
+    term_ids=[...], organism=...)`. The two are distinct surfaces:
+    chemistry-reach (this tool) vs KO-annotation (`genes_by_ontology`). For
+    metabolic pathway analysis with a hypothesis test, use
+    `pathway_enrichment` instead.
   - >-
     `metabolite_elements` is presence-only AND-of (not formula substring).
     `['N']` keeps metabolites whose `Metabolite.elements` Hill-parsed list
@@ -198,9 +222,9 @@ mistakes:
   - >-
     Use `summary=True` for batch DE inputs (50+ locus_tags). Detail rows
     can exceed 1,000 quickly even after the precision-tier sort; the
-    envelope rollups (top_metabolites, top_pathways, top_reactions,
-    top_tcdb_families, by_element, by_gene, top_gene_categories) are the
-    actually-useful artifact at that scale.
+    envelope rollups (top_metabolites, top_metabolite_pathways,
+    top_reactions, top_tcdb_families, by_element, by_gene,
+    top_gene_categories) are the actually-useful artifact at that scale.
   - >-
     `not_found.locus_tags` vs `not_matched`. `not_found.locus_tags` =
     locus_tags that don't resolve to any Gene in the requested organism
@@ -211,6 +235,13 @@ mistakes:
     richly-annotated non-chemistry genes (DNA gyrase, queG, signaling
     modules), not annotation gaps. Pivot via
     `gene_overview(locus_tags=not_matched)` for annotation context.
+  - >-
+    When `top_metabolites` is dominated by ATP / ADP / NADH / NADPH / H2O,
+    pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip the
+    currency-cofactor noise. Set-difference semantics with
+    `metabolite_ids` — exclude wins on overlap (silent). Per-arm scope:
+    exclude applies on BOTH metabolism + transport arms (mirrors
+    `metabolite_ids`). KG namespace is `kegg.compound:` (not `chebi:`).
   - >-
     Detail rows are direction-agnostic. The transport edge
     (`Tcdb_family_transports_metabolite`) does not distinguish substrate

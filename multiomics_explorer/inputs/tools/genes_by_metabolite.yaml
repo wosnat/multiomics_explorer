@@ -39,6 +39,25 @@ examples:
     # KEGG nitrogen-metabolism pathway survive — useful when batch-querying
     # mixed metabolites and you want only the N-pathway slice.
 
+  - title: Currency-cofactor strip — exclude ATP/ADP/NADH/NADPH/H2O on a multi-metabolite drill
+    call: |
+      genes_by_metabolite(
+        metabolite_ids=["kegg.compound:C00064", "kegg.compound:C00086"],
+        organism="Prochlorococcus MED4",
+        exclude_metabolite_ids=[
+          "kegg.compound:C00002",  # ATP
+          "kegg.compound:C00008",  # ADP
+          "kegg.compound:C00004",  # NADH
+          "kegg.compound:C00005",  # NADPH
+          "kegg.compound:C00001",  # H2O
+        ],
+      )
+    # Set-difference semantics with `metabolite_ids` — exclude wins on
+    # overlap (silent). Per-arm scope: exclude applies on BOTH the
+    # metabolism arm and the transport arm (mirrors `metabolite_ids`).
+    # Useful when the include set inadvertently pulls cofactor-heavy
+    # reactions into the result.
+
   - title: EC-anchored metabolism narrowing (transport rows still returned)
     call: genes_by_metabolite(metabolite_ids=["kegg.compound:C00064"], organism="Prochlorococcus MED4", ec_numbers=["6.3.1.2"])
     # ec_numbers narrows the metabolism arm WHERE only — transport rows are
@@ -119,6 +138,14 @@ mistakes:
     (e.g. transport-only metabolite curated for non-MED4 strains). Don't
     conflate them — `not_matched` may go to zero by relaxing filters or
     swapping organism; `not_found` won't.
+  - >-
+    When the result is dominated by ATP / ADP / NADH / NADPH / H2O
+    (currency cofactors that catalysts and transporters touch ubiquitously),
+    pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip them.
+    Set-difference semantics with `metabolite_ids` — exclude wins on overlap
+    (silent). Per-arm scope: exclude applies on BOTH metabolism + transport
+    arms (mirrors `metabolite_ids`). KG namespace is `kegg.compound:` (not
+    `chebi:`).
   - >-
     Transport rows are direction-agnostic. The `Tcdb_family_transports_metabolite`
     edge does not distinguish substrate from product, and the metabolism

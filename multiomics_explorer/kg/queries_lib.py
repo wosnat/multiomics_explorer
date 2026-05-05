@@ -1025,8 +1025,9 @@ def build_list_publications_summary(
 
 def _list_metabolites_where(
     *,
-    search: str | None = None,
+    search_text: str | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     kegg_compound_ids: list[str] | None = None,
     chebi_ids: list[str] | None = None,
     hmdb_ids: list[str] | None = None,
@@ -1041,19 +1042,25 @@ def _list_metabolites_where(
     """Build WHERE clause and params for metabolite queries.
 
     Shared between build_list_metabolites and build_list_metabolites_summary.
-    `search` is not added to WHERE — it controls which Cypher variant is
-    used (fulltext entry point vs MATCH). The $search param is added to
-    params when search is provided.
+    `search_text` is not added to WHERE — it controls which Cypher variant
+    is used (fulltext entry point vs MATCH). The Cypher param name `$search`
+    stays unchanged (it's the second arg to
+    `db.index.fulltext.queryNodes('metaboliteFullText', $search)`); only
+    the Python kwarg renamed.
     """
     conditions: list[str] = []
     params: dict = {}
 
-    if search:
-        params["search"] = search
+    if search_text:
+        params["search"] = search_text
 
     if metabolite_ids:
         conditions.append("m.id IN $metabolite_ids")
         params["metabolite_ids"] = metabolite_ids
+
+    if exclude_metabolite_ids:
+        conditions.append("(NOT (m.id IN $exclude_metabolite_ids))")
+        params["exclude_metabolite_ids"] = exclude_metabolite_ids
 
     if kegg_compound_ids:
         conditions.append("m.kegg_compound_id IN $kegg_compound_ids")
@@ -1111,8 +1118,9 @@ def _list_metabolites_where(
 
 def build_list_metabolites(
     *,
-    search: str | None = None,
+    search_text: str | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     kegg_compound_ids: list[str] | None = None,
     chebi_ids: list[str] | None = None,
     hmdb_ids: list[str] | None = None,
@@ -1132,14 +1140,15 @@ def build_list_metabolites(
     RETURN keys (compact): metabolite_id, name, formula, elements, mass,
     gene_count, organism_count, transporter_count, evidence_sources,
     chebi_id, pathway_ids, pathway_count.
-    When search is provided, also: score.
+    When search_text is provided, also: score.
     RETURN keys (verbose): adds inchikey, smiles, mnxm_id, hmdb_id,
     pathway_names. All verbose columns are direct property reads on m;
     no edge traversal in either compact or verbose mode.
     """
     where_block, params = _list_metabolites_where(
-        search=search,
+        search_text=search_text,
         metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
         kegg_compound_ids=kegg_compound_ids,
         chebi_ids=chebi_ids,
         hmdb_ids=hmdb_ids,
@@ -1170,7 +1179,7 @@ def build_list_metabolites(
         params["limit"] = limit
     limit_clause = " ".join(pagination_parts)
 
-    if search:
+    if search_text:
         cypher = (
             "CALL db.index.fulltext.queryNodes('metaboliteFullText', $search)\n"
             "YIELD node AS m, score\n"
@@ -1224,8 +1233,9 @@ def build_list_metabolites(
 
 def build_list_metabolites_summary(
     *,
-    search: str | None = None,
+    search_text: str | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     kegg_compound_ids: list[str] | None = None,
     chebi_ids: list[str] | None = None,
     hmdb_ids: list[str] | None = None,
@@ -1239,17 +1249,18 @@ def build_list_metabolites_summary(
 ) -> tuple[str, dict]:
     """Build summary aggregation Cypher for list_metabolites.
 
-    RETURN keys: total_entries, total_matching, top_organisms, top_pathways,
-    by_evidence_source, with_chebi, with_hmdb, with_mnxm, mass_min,
-    mass_median, mass_max.
-    When search is provided, also: score_max, score_median.
+    RETURN keys: total_entries, total_matching, top_organisms,
+    top_metabolite_pathways, by_evidence_source, with_chebi, with_hmdb,
+    with_mnxm, mass_min, mass_median, mass_max.
+    When search_text is provided, also: score_max, score_median.
 
     Critical: never `collect(m) AS matched`. Instead flatten denormalized
     list properties (KG-A5..A8) via apoc.coll.flatten over cheap collects.
     """
     where_block, params = _list_metabolites_where(
-        search=search,
+        search_text=search_text,
         metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
         kegg_compound_ids=kegg_compound_ids,
         chebi_ids=chebi_ids,
         hmdb_ids=hmdb_ids,
@@ -1276,16 +1287,18 @@ def build_list_metabolites_summary(
         "CALL {\n"
         "  WITH all_pwys\n"
         "  UNWIND apoc.coll.frequencies(all_pwys) AS f\n"
-        "  WITH f.item AS pathway_id, f.count AS count\n"
+        "  WITH f.item AS metabolite_pathway_id, f.count AS count\n"
         "  ORDER BY count DESC LIMIT 10\n"
-        "  OPTIONAL MATCH (p:KeggTerm {id: pathway_id})\n"
+        "  OPTIONAL MATCH (p:KeggTerm {id: metabolite_pathway_id})\n"
         "  RETURN collect({\n"
-        "    pathway_id: pathway_id, pathway_name: p.name, count: count\n"
-        "  }) AS top_pathways\n"
+        "    metabolite_pathway_id: metabolite_pathway_id,\n"
+        "    metabolite_pathway_name: p.name,\n"
+        "    count: count\n"
+        "  }) AS top_metabolite_pathways\n"
         "}\n"
     )
 
-    if search:
+    if search_text:
         # Search variant: fulltext entry point + score collection. Pull
         # total_entries from a small unfiltered Metabolite count after
         # the filtered aggregation.
@@ -1322,7 +1335,7 @@ def build_list_metabolites_summary(
             "       apoc.coll.max(masses) AS mass_max,\n"
             "       apoc.coll.max(scores) AS score_max,\n"
             "       apoc.coll.sort(scores)[size(scores)/2] AS score_median,\n"
-            "       top_organisms, top_pathways,\n"
+            "       top_organisms, top_metabolite_pathways,\n"
             "       {\n"
             "         by_paper_count: apoc.coll.frequencies(paper_counts),\n"
             "         by_compartment: apoc.coll.frequencies(m_comps)\n"
@@ -1360,7 +1373,7 @@ def build_list_metabolites_summary(
             "       apoc.coll.min(masses) AS mass_min,\n"
             "       apoc.coll.sort(masses)[size(masses)/2] AS mass_median,\n"
             "       apoc.coll.max(masses) AS mass_max,\n"
-            "       top_organisms, top_pathways,\n"
+            "       top_organisms, top_metabolite_pathways,\n"
             "       {\n"
             "         by_paper_count: apoc.coll.frequencies(paper_counts),\n"
             "         by_compartment: apoc.coll.frequencies(m_comps)\n"
@@ -2879,6 +2892,10 @@ def _differential_expression_where(
         conditions.append("r.expression_status = 'significant_up'")
     elif direction == "down":
         conditions.append("r.expression_status = 'significant_down'")
+    elif direction == "both":
+        conditions.append(
+            "r.expression_status IN ['significant_up', 'significant_down']"
+        )
     elif significant_only:
         conditions.append("r.expression_status <> 'not_significant'")
     if growth_phases:
@@ -6267,6 +6284,7 @@ def _genes_by_metabolite_metabolism_where(
     *,
     metabolite_ids: list[str],
     organism: str,
+    exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     mass_balance: str | None = None,
     metabolite_pathway_ids: list[str] | None = None,
@@ -6287,6 +6305,9 @@ def _genes_by_metabolite_metabolism_where(
         "metabolite_ids": metabolite_ids,
         "organism": organism,
     }
+    if exclude_metabolite_ids:
+        conditions.append("(NOT (m.id IN $exclude_metabolite_ids))")
+        params["exclude_metabolite_ids"] = exclude_metabolite_ids
     if ec_numbers:
         conditions.append(
             "ANY(ec IN $ec_numbers WHERE ec IN coalesce(r.ec_numbers, []))"
@@ -6311,6 +6332,7 @@ def _genes_by_metabolite_transport_where(
     *,
     metabolite_ids: list[str],
     organism: str,
+    exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
     transport_confidence: str | None = None,
@@ -6333,6 +6355,9 @@ def _genes_by_metabolite_transport_where(
         "metabolite_ids": metabolite_ids,
         "organism": organism,
     }
+    if exclude_metabolite_ids:
+        conditions.append("(NOT (m.id IN $exclude_metabolite_ids))")
+        params["exclude_metabolite_ids"] = exclude_metabolite_ids
     if metabolite_pathway_ids:
         conditions.append(
             "ANY(p IN $metabolite_pathway_ids "
@@ -6353,6 +6378,7 @@ def build_genes_by_metabolite_metabolism(
     *,
     metabolite_ids: list[str],
     organism: str,
+    exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     mass_balance: str | None = None,
     metabolite_pathway_ids: list[str] | None = None,
@@ -6377,6 +6403,7 @@ def build_genes_by_metabolite_metabolism(
     conditions, params = _genes_by_metabolite_metabolism_where(
         metabolite_ids=metabolite_ids,
         organism=organism,
+        exclude_metabolite_ids=exclude_metabolite_ids,
         ec_numbers=ec_numbers,
         mass_balance=mass_balance,
         metabolite_pathway_ids=metabolite_pathway_ids,
@@ -6439,6 +6466,7 @@ def build_genes_by_metabolite_transport(
     *,
     metabolite_ids: list[str],
     organism: str,
+    exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
     transport_confidence: str | None = None,
@@ -6466,6 +6494,7 @@ def build_genes_by_metabolite_transport(
     conditions, params = _genes_by_metabolite_transport_where(
         metabolite_ids=metabolite_ids,
         organism=organism,
+        exclude_metabolite_ids=exclude_metabolite_ids,
         metabolite_pathway_ids=metabolite_pathway_ids,
         gene_categories=gene_categories,
         transport_confidence=transport_confidence,
@@ -6531,6 +6560,7 @@ def build_genes_by_metabolite_summary(
     *,
     metabolite_ids: list[str],
     organism: str,
+    exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     mass_balance: str | None = None,
     metabolite_pathway_ids: list[str] | None = None,
@@ -6572,6 +6602,7 @@ def build_genes_by_metabolite_summary(
         m_conditions, m_params = _genes_by_metabolite_metabolism_where(
             metabolite_ids=metabolite_ids,
             organism=organism,
+            exclude_metabolite_ids=exclude_metabolite_ids,
             ec_numbers=ec_numbers,
             mass_balance=mass_balance,
             metabolite_pathway_ids=metabolite_pathway_ids,
@@ -6591,6 +6622,7 @@ def build_genes_by_metabolite_summary(
         t_conditions, t_params = _genes_by_metabolite_transport_where(
             metabolite_ids=metabolite_ids,
             organism=organism,
+            exclude_metabolite_ids=exclude_metabolite_ids,
             metabolite_pathway_ids=metabolite_pathway_ids,
             gene_categories=gene_categories,
             transport_confidence=transport_confidence,
@@ -6763,7 +6795,8 @@ def build_genes_by_metabolite_summary(
 #   - sort uses **global precision-tier** then input-gene order via
 #     apoc.coll.indexOf($locus_tags, locus_tag), then locus_tag, then
 #     metabolite_id
-#   - summary builder gains two new envelope keys: by_element + top_pathways
+#   - summary builder gains two new envelope keys: by_element +
+#     top_metabolite_pathways
 #
 # Spec: docs/tool-specs/metabolites_by_gene.md
 # ---------------------------------------------------------------------------
@@ -6775,6 +6808,7 @@ def _metabolites_by_gene_metabolism_where(
     organism: str,
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     mass_balance: str | None = None,
@@ -6798,6 +6832,9 @@ def _metabolites_by_gene_metabolism_where(
     if metabolite_ids:
         conditions.append("m.id IN $metabolite_ids")
         params["metabolite_ids"] = metabolite_ids
+    if exclude_metabolite_ids:
+        conditions.append("(NOT (m.id IN $exclude_metabolite_ids))")
+        params["exclude_metabolite_ids"] = exclude_metabolite_ids
     if metabolite_elements:
         conditions.append(
             "ALL(elem IN $metabolite_elements "
@@ -6830,6 +6867,7 @@ def _metabolites_by_gene_transport_where(
     organism: str,
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
     transport_confidence: str | None = None,
@@ -6855,6 +6893,9 @@ def _metabolites_by_gene_transport_where(
     if metabolite_ids:
         conditions.append("m.id IN $metabolite_ids")
         params["metabolite_ids"] = metabolite_ids
+    if exclude_metabolite_ids:
+        conditions.append("(NOT (m.id IN $exclude_metabolite_ids))")
+        params["exclude_metabolite_ids"] = exclude_metabolite_ids
     if metabolite_elements:
         conditions.append(
             "ALL(elem IN $metabolite_elements "
@@ -6883,6 +6924,7 @@ def build_metabolites_by_gene_metabolism(
     organism: str,
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     mass_balance: str | None = None,
@@ -6917,6 +6959,7 @@ def build_metabolites_by_gene_metabolism(
         organism=organism,
         metabolite_elements=metabolite_elements,
         metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
         ec_numbers=ec_numbers,
         metabolite_pathway_ids=metabolite_pathway_ids,
         mass_balance=mass_balance,
@@ -6983,6 +7026,7 @@ def build_metabolites_by_gene_transport(
     organism: str,
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
     transport_confidence: str | None = None,
@@ -7016,6 +7060,7 @@ def build_metabolites_by_gene_transport(
         organism=organism,
         metabolite_elements=metabolite_elements,
         metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
         metabolite_pathway_ids=metabolite_pathway_ids,
         gene_categories=gene_categories,
         transport_confidence=transport_confidence,
@@ -7084,6 +7129,7 @@ def build_metabolites_by_gene_summary(
     organism: str,
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     mass_balance: str | None = None,
@@ -7110,8 +7156,8 @@ def build_metabolites_by_gene_summary(
     by_gene (per-input-gene rollup with metabolism_rows /
        transport_substrate_confirmed_rows / transport_family_inferred_rows),
     top_metabolites, top_reactions, top_tcdb_families,
-    top_gene_categories, top_pathways (NEW — chemistry-filtered to
-    p.reaction_count >= 3), by_element (NEW — periodic-table-bounded
+    top_gene_categories, top_metabolite_pathways (NEW — chemistry-filtered
+    to p.reaction_count >= 3), by_element (NEW — periodic-table-bounded
     rollup over m.elements).
 
     The api/ layer post-processes some apoc.coll outputs into the
@@ -7131,6 +7177,7 @@ def build_metabolites_by_gene_summary(
             organism=organism,
             metabolite_elements=metabolite_elements,
             metabolite_ids=metabolite_ids,
+            exclude_metabolite_ids=exclude_metabolite_ids,
             ec_numbers=ec_numbers,
             metabolite_pathway_ids=metabolite_pathway_ids,
             mass_balance=mass_balance,
@@ -7152,6 +7199,7 @@ def build_metabolites_by_gene_summary(
             organism=organism,
             metabolite_elements=metabolite_elements,
             metabolite_ids=metabolite_ids,
+            exclude_metabolite_ids=exclude_metabolite_ids,
             metabolite_pathway_ids=metabolite_pathway_ids,
             gene_categories=gene_categories,
             transport_confidence=transport_confidence,
@@ -7324,11 +7372,12 @@ def build_metabolites_by_gene_summary(
         "         metabolite_count: size(apoc.coll.toSet("
         "[row IN rows WHERE elem IN row.metabolite_elements"
         " | row.metabolite_id]))}] AS by_element\n"
-        "// top_pathways rollup: metabolite-side KEGG pathways the gene set\n"
-        "// reaches, filtered to chemistry pathways (p.reaction_count >= 3)\n"
-        "// to drop signaling/disease pathways with no chemistry breadth.\n"
-        "// Pathway IDs sourced from m.pathway_ids (KG-A5 denorm,\n"
-        "// transport-extended), so coverage is uniform across both arms.\n"
+        "// top_metabolite_pathways rollup: metabolite-side KEGG pathways\n"
+        "// the gene set reaches, filtered to chemistry pathways\n"
+        "// (p.reaction_count >= 3) to drop signaling/disease pathways with\n"
+        "// no chemistry breadth. Pathway IDs sourced from m.pathway_ids\n"
+        "// (KG-A5 denorm, transport-extended), so coverage is uniform\n"
+        "// across both arms.\n"
         "WITH total_matching, gene_count_total, reaction_count_total,\n"
         "     transporter_count_total, metabolite_count_total,\n"
         "     rows_by_evidence_source, rows_by_transport_confidence,\n"
@@ -7343,20 +7392,20 @@ def build_metabolites_by_gene_summary(
         "  MATCH (p:KeggTerm {id: pid})\n"
         "  WHERE p.reaction_count >= 3\n"
         "  RETURN collect({\n"
-        "    pathway_id: p.id,\n"
-        "    pathway_name: p.name,\n"
+        "    metabolite_pathway_id: p.id,\n"
+        "    metabolite_pathway_name: p.name,\n"
         "    gene_count: size(apoc.coll.toSet("
         "[row IN rows WHERE p.id IN row.metabolite_pathway_ids"
         " | row.locus_tag])),\n"
         "    pathway_reaction_count: p.reaction_count,\n"
         "    pathway_metabolite_count: p.metabolite_count\n"
-        "  }) AS top_pathways\n"
+        "  }) AS top_metabolite_pathways\n"
         "}\n"
         "RETURN total_matching, gene_count_total, reaction_count_total,\n"
         "       transporter_count_total, metabolite_count_total,\n"
         "       rows_by_evidence_source, rows_by_transport_confidence,\n"
         "       by_gene, top_reactions, top_tcdb_families,\n"
         "       top_gene_categories, top_metabolites, by_element,\n"
-        "       top_pathways"
+        "       top_metabolite_pathways"
     )
     return cypher, params

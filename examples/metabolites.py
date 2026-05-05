@@ -14,7 +14,7 @@ Run with: uv run python examples/metabolites.py --scenario <name>
 Scenarios:
   1. discover            — element + organism filter (sources: reaction + transport)
   2. compound_to_genes   — evidence_source split on glutamine (reaction + transport)
-  3. gene_to_metabolites — element signature + top_pathways (reaction + transport)
+  3. gene_to_metabolites — element signature + top_metabolite_pathways (reaction + transport)
   4. cross_feeding       — bridge MED4 → ALT (reaction + transport)
   5. n_source_de         — N-source primitive → DE (reaction + transport → expression)
   6. tcdb_chain          — substrate-anchored vs family-anchored 3-route comparison (transport)
@@ -80,8 +80,8 @@ def scenario_discover() -> None:
     print(f"returned={result['returned']}  truncated={result['truncated']}  "
           f"total_matching={result.get('total_matching')}")
 
-    top_paths = result.get("top_pathways") or []
-    print(f"top_pathways: {[p.get('pathway_name') for p in top_paths][:5]}")
+    top_paths = result.get("top_metabolite_pathways") or []
+    print(f"top_metabolite_pathways: {[p.get('metabolite_pathway_name') for p in top_paths][:5]}")
 
     by_es = result.get("by_evidence_source") or []
     print(f"by_evidence_source: {[(e.get('evidence_source'), e.get('count')) for e in by_es]}")
@@ -123,8 +123,8 @@ def scenario_compound_to_genes() -> None:
     print()
 
     # Step 1: name → KEGG ID via free-text search.
-    print("Step 1: resolve name → KEGG ID via list_metabolites(search='glutamine')")
-    name_lookup = list_metabolites(search="glutamine", limit=5)
+    print("Step 1: resolve name → KEGG ID via list_metabolites(search_text='glutamine')")
+    name_lookup = list_metabolites(search_text="glutamine", limit=5)
     print(f"  returned={name_lookup['returned']}  total_matching={name_lookup['total_matching']}")
     for row in name_lookup["results"][:5]:
         print(f"  {row['metabolite_id']:<25} {row['name']}")
@@ -184,8 +184,9 @@ def scenario_gene_to_metabolites() -> None:
     """Use this when the user asks 'what metabolites does PMM0001 act on?'
 
     Sources: reaction + transport.
-    Caveat surfaced: chemistry-side `top_pathways` (Reaction-anchored) is
-    NOT the same surface as gene-KO pathways from `genes_by_ontology(ontology='kegg')`.
+    Caveat surfaced: chemistry-side `top_metabolite_pathways`
+    (Reaction-anchored) is NOT the same surface as gene-KO pathways from
+    `genes_by_ontology(ontology='kegg')`.
     """
     print("=== Scenario: gene_to_metabolites ===")
     print("Question class: 'what does this gene act on (chemistry)?'")
@@ -202,12 +203,12 @@ def scenario_gene_to_metabolites() -> None:
     print(f"by_element (chemistry signature): "
           f"{[(e.get('element'), e.get('metabolite_count')) for e in by_el[:6]]}")
     print()
-    chem_pathways = result.get("top_pathways") or []
-    print("top_pathways (chemistry-side, via Reaction → KeggTerm):")
+    chem_pathways = result.get("top_metabolite_pathways") or []
+    print("top_metabolite_pathways (chemistry-side, via Reaction → KeggTerm):")
     for p in chem_pathways[:5]:
         print(
-            f"  {str(p.get('pathway_id', '?'))[:24]:<24} "
-            f"{str(p.get('pathway_name', '?'))[:40]:<40} "
+            f"  {str(p.get('metabolite_pathway_id', '?'))[:24]:<24} "
+            f"{str(p.get('metabolite_pathway_name', '?'))[:40]:<40} "
             f"genes={p.get('gene_count')}"
         )
     print()

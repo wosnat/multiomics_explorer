@@ -6694,7 +6694,7 @@ class TestBuildListMetabolites:
 
     def test_search_uses_fulltext_entrypoint(self):
         """Search variant uses the metaboliteFullText index."""
-        cypher, params = self._build(search="glucose")
+        cypher, params = self._build(search_text="glucose")
         assert "metaboliteFullText" in cypher
         assert "YIELD node AS m, score" in cypher
         assert params["search"] == "glucose"
@@ -6753,7 +6753,7 @@ class TestBuildListMetabolites:
 
     def test_order_by_with_search(self):
         """Search variant ORDER BY: score DESC, organism_count DESC, m.id."""
-        cypher, _ = self._build(search="glucose")
+        cypher, _ = self._build(search_text="glucose")
         assert "ORDER BY score DESC, m.organism_count DESC, m.id" in cypher
 
     def test_limit_and_offset_clauses(self):
@@ -6823,14 +6823,15 @@ class TestBuildListMetabolitesSummary:
 
     def test_returns_envelope_columns(self):
         """Summary RETURN includes envelope keys: total_entries,
-        total_matching, top_organisms, top_pathways, by_evidence_source,
-        with_chebi/with_hmdb/with_mnxm, mass_min/median/max."""
+        total_matching, top_organisms, top_metabolite_pathways,
+        by_evidence_source, with_chebi/with_hmdb/with_mnxm,
+        mass_min/median/max."""
         cypher, _ = self._build()
         for key in [
             "total_entries",
             "total_matching",
             "top_organisms",
-            "top_pathways",
+            "top_metabolite_pathways",
             "by_evidence_source",
             "with_chebi",
             "with_hmdb",
@@ -6868,7 +6869,7 @@ class TestBuildListMetabolitesSummary:
     def test_search_adds_score_columns(self):
         """Search variant adds score_max + score_median to the envelope
         via apoc.coll.max + apoc.coll.sort + median index."""
-        cypher, params = self._build(search="glucose")
+        cypher, params = self._build(search_text="glucose")
         assert "metaboliteFullText" in cypher
         assert "score_max" in cypher
         assert "score_median" in cypher
@@ -7685,7 +7686,7 @@ class TestBuildMetabolitesByGeneSummary:
 
         MBG envelope mirrors GBM but flips per-entity rollups (by_gene
         instead of by_metabolite, top_metabolites instead of top_genes)
-        and adds two new keys: top_pathways + by_element.
+        and adds two new keys: top_metabolite_pathways + by_element.
         """
         cypher, _ = self._build()
         for key in [
@@ -7701,7 +7702,7 @@ class TestBuildMetabolitesByGeneSummary:
             "top_tcdb_families",
             "top_gene_categories",
             "top_metabolites",
-            "top_pathways",
+            "top_metabolite_pathways",
             "by_element",
         ]:
             assert key in cypher, f"missing envelope key: {key}"
@@ -8575,7 +8576,7 @@ class TestBuildListMetabolitesPhase1Plumbing:
     def test_search_branch_also_has_measurement_fields(self):
         """Search variant of detail builder threads the 4 measurement
         fields just like the no-search branch."""
-        cypher, _ = self._build(search="glucose")
+        cypher, _ = self._build(search_text="glucose")
         assert "measured_assay_count" in cypher
         assert "measured_paper_count" in cypher
         assert "measured_organisms" in cypher

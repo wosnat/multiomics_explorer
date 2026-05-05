@@ -427,8 +427,8 @@ class MetTopOrganism(BaseModel):
 
 
 class MetTopPathway(BaseModel):
-    pathway_id: str = Field(description="KEGG pathway ID (e.g. 'kegg.pathway:ko01100')")
-    pathway_name: str = Field(description="Pathway name (e.g. 'Metabolic pathways')")
+    metabolite_pathway_id: str = Field(description="KEGG pathway ID (e.g. 'kegg.pathway:ko01100'). Metabolite-pathway rollup (distinct from KO-pathway annotations on `genes_by_ontology`).")
+    metabolite_pathway_name: str = Field(description="Pathway name (e.g. 'Metabolic pathways'). Metabolite-pathway rollup (distinct from KO-pathway annotations on `genes_by_ontology`).")
     count: int = Field(description="Number of matched metabolites in this pathway (e.g. 870)")
 
 
@@ -474,7 +474,7 @@ class ListMetabolitesResponse(BaseModel):
     total_entries: int = Field(description="Total Metabolite nodes in KG (unfiltered, 3,025 today)")
     total_matching: int = Field(description="Metabolites matching filters")
     top_organisms: list[MetTopOrganism] = Field(default_factory=list, description="Top 10 organisms by metabolite count (within matched set), sorted desc")
-    top_pathways: list[MetTopPathway] = Field(default_factory=list, description="Top 10 pathways by metabolite count (within matched set), sorted desc")
+    top_metabolite_pathways: list[MetTopPathway] = Field(default_factory=list, description="Top 10 pathways by metabolite count (within matched set), sorted desc. Metabolite-pathway rollup (distinct from KO-pathway annotations on `genes_by_ontology`).")
     by_evidence_source: list[MetEvidenceSourceBreakdown] = Field(default_factory=list, description="Frequency of evidence_sources values across matched set. Today: at most 2 entries (metabolism, transport).")
     xref_coverage: MetXrefCoverage = Field(description="Cross-ref ID coverage within matched set")
     mass_stats: MetMassStats = Field(description="Mass distribution within matched set")
@@ -1078,11 +1078,14 @@ class MbgTopPathway(BaseModel):
     for gene-KO-mediated pathway annotations. For metabolic pathway
     analysis with a hypothesis test, use `pathway_enrichment`.
     """
-    pathway_id: str = Field(
+    metabolite_pathway_id: str = Field(
         description="Full prefixed KEGG pathway ID (e.g. "
-        "'kegg.pathway:ko00910').")
-    pathway_name: str = Field(
-        description="Pathway display name (e.g. 'Nitrogen metabolism').")
+        "'kegg.pathway:ko00910'). Metabolite-pathway rollup (distinct "
+        "from KO-pathway annotations on `genes_by_ontology`).")
+    metabolite_pathway_name: str = Field(
+        description="Pathway display name (e.g. 'Nitrogen metabolism'). "
+        "Metabolite-pathway rollup (distinct from KO-pathway "
+        "annotations on `genes_by_ontology`).")
     gene_count: int = Field(
         description="Distinct input genes with ≥1 chemistry edge into "
         "this pathway (via reaction-side or metabolite-side).")
@@ -1190,13 +1193,13 @@ class MetabolitesByGeneResponse(BaseModel):
         default_factory=list,
         description="Top 10 gene categories by gene_count across both "
         "arms.")
-    top_pathways: list[MbgTopPathway] = Field(
+    top_metabolite_pathways: list[MbgTopPathway] = Field(
         default_factory=list,
         description="NEW (vs GBM): top 10 KEGG pathways the gene set's "
-        "chemistry reaches. Distinct from gene-KO pathway annotations "
-        "(`genes_by_ontology(ontology=\"kegg\")`) — see model docstring "
-        "for naming disambiguation. Drill into any entry via "
-        "`list_metabolites(pathway_ids=[id])`.")
+        "chemistry reaches. Metabolite-pathway rollup (distinct from "
+        "KO-pathway annotations on `genes_by_ontology(ontology=\"kegg\")`) "
+        "— see model docstring for naming disambiguation. Drill into "
+        "any entry via `list_metabolites(pathway_ids=[id])`.")
     gene_count_total: int = Field(
         description="Distinct input genes in the filtered slice (across "
         "both arms).")
@@ -3298,8 +3301,13 @@ def register_tools(mcp: FastMCP):
             description="Experiment IDs to restrict to. "
                         "Get these from list_experiments.",
         )] = None,
-        direction: Annotated[Literal["up", "down"] | None, Field(
-            description="Filter by expression direction.",
+        direction: Annotated[Literal["up", "down", "both"] | None, Field(
+            description="Filter by expression direction. `'up'` / `'down'` "
+            "restrict to one arm. `'both'` is the explicit, self-documenting "
+            "spelling for the union of significant up + significant down — "
+            "functionally identical to `direction=None, significant_only=True` "
+            "(per spec §6.4); pick whichever spelling is clearer at the "
+            "call site. Default `None` is unchanged.",
         )] = None,
         significant_only: Annotated[bool, Field(
             description="If true, return only statistically significant"
@@ -7069,7 +7077,7 @@ def register_tools(mcp: FastMCP):
     )
     async def list_metabolites(
         ctx: Context,
-        search: Annotated[str | None, Field(
+        search_text: Annotated[str | None, Field(
             description="Free-text search on metabolite name (Lucene syntax). "
             "Index covers Metabolite.name only — element/formula composition "
             "is filtered through `elements` (presence list), not search. "
@@ -7081,6 +7089,14 @@ def register_tools(mcp: FastMCP):
             "Combines with other filters via AND. `not_found.metabolite_ids` "
             "lists any IDs that don't exist in the KG.",
         )] = None,
+        exclude_metabolite_ids: Annotated[
+            list[str] | None,
+            Field(
+                description="Exclude metabolites with these IDs. Set-difference "
+                "semantics with `metabolite_ids` — exclude wins on overlap. "
+                "Empty list is no-op.",
+            ),
+        ] = None,
         kegg_compound_ids: Annotated[list[str] | None, Field(
             description="Filter by raw KEGG C-numbers (e.g. ['C00031']). "
             "Convenience over `metabolite_ids` when working with KEGG-anchored "
@@ -7171,7 +7187,9 @@ def register_tools(mcp: FastMCP):
         - genes_by_ontology(ontology="kegg", term_ids=[pathway_id], organism=...) — pathway → genes
         """
         await ctx.info(
-            f"list_metabolites search={search} metabolite_ids={metabolite_ids} "
+            f"list_metabolites search_text={search_text} "
+            f"metabolite_ids={metabolite_ids} "
+            f"exclude_metabolite_ids={exclude_metabolite_ids} "
             f"elements={elements} organism_names={organism_names} "
             f"pathway_ids={pathway_ids} evidence_sources={evidence_sources} "
             f"summary={summary} verbose={verbose} limit={limit} offset={offset}"
@@ -7179,8 +7197,9 @@ def register_tools(mcp: FastMCP):
         try:
             conn = _conn(ctx)
             result = api.list_metabolites(
-                search=search,
+                search_text=search_text,
                 metabolite_ids=metabolite_ids,
+                exclude_metabolite_ids=exclude_metabolite_ids,
                 kegg_compound_ids=kegg_compound_ids,
                 chebi_ids=chebi_ids,
                 hmdb_ids=hmdb_ids,
@@ -7199,7 +7218,9 @@ def register_tools(mcp: FastMCP):
             )
             results = [MetaboliteResult(**r) for r in result["results"]]
             top_organisms = [MetTopOrganism(**b) for b in result["top_organisms"]]
-            top_pathways = [MetTopPathway(**b) for b in result["top_pathways"]]
+            top_metabolite_pathways = [
+                MetTopPathway(**b) for b in result["top_metabolite_pathways"]
+            ]
             by_evidence_source = [
                 MetEvidenceSourceBreakdown(**b)
                 for b in result["by_evidence_source"]
@@ -7222,7 +7243,7 @@ def register_tools(mcp: FastMCP):
                 total_entries=result["total_entries"],
                 total_matching=result["total_matching"],
                 top_organisms=top_organisms,
-                top_pathways=top_pathways,
+                top_metabolite_pathways=top_metabolite_pathways,
                 by_evidence_source=by_evidence_source,
                 xref_coverage=xref_coverage,
                 mass_stats=mass_stats,
@@ -7271,6 +7292,14 @@ def register_tools(mcp: FastMCP):
             "name resolves to zero matching genes.",
             min_length=1,
         )],
+        exclude_metabolite_ids: Annotated[
+            list[str] | None,
+            Field(
+                description="Exclude metabolites with these IDs. Set-difference "
+                "semantics with `metabolite_ids` — exclude wins on overlap. "
+                "Empty list is no-op.",
+            ),
+        ] = None,
         ec_numbers: Annotated[list[str] | None, Field(
             description="Narrow metabolism rows to those whose Reaction carries "
             "any of these EC numbers. **Metabolism arm only — does not affect "
@@ -7395,6 +7424,7 @@ def register_tools(mcp: FastMCP):
             conn = _conn(ctx)
             result = api.genes_by_metabolite(
                 metabolite_ids=metabolite_ids,
+                exclude_metabolite_ids=exclude_metabolite_ids,
                 organism=organism,
                 ec_numbers=ec_numbers,
                 metabolite_pathway_ids=metabolite_pathway_ids,
@@ -7513,6 +7543,14 @@ def register_tools(mcp: FastMCP):
             "partner organism via `genes_by_metabolite` with these IDs. "
             "Applies uniformly to both arms.",
         )] = None,
+        exclude_metabolite_ids: Annotated[
+            list[str] | None,
+            Field(
+                description="Exclude metabolites with these IDs. Set-difference "
+                "semantics with `metabolite_ids` — exclude wins on overlap. "
+                "Empty list is no-op.",
+            ),
+        ] = None,
         ec_numbers: Annotated[list[str] | None, Field(
             description="Narrow metabolism rows to those whose Reaction "
             "carries any of these EC numbers. **Metabolism arm only — "
@@ -7698,6 +7736,7 @@ def register_tools(mcp: FastMCP):
                 organism=organism,
                 metabolite_elements=metabolite_elements,
                 metabolite_ids=metabolite_ids,
+                exclude_metabolite_ids=exclude_metabolite_ids,
                 ec_numbers=ec_numbers,
                 metabolite_pathway_ids=metabolite_pathway_ids,
                 mass_balance=mass_balance,
@@ -7736,8 +7775,9 @@ def register_tools(mcp: FastMCP):
                 MbgTopGeneCategory(**b)
                 for b in result["top_gene_categories"]
             ]
-            top_pathways = [
-                MbgTopPathway(**b) for b in result["top_pathways"]
+            top_metabolite_pathways = [
+                MbgTopPathway(**b)
+                for b in result["top_metabolite_pathways"]
             ]
             not_found = MbgNotFound(**result["not_found"])
             response = MetabolitesByGeneResponse(
@@ -7756,7 +7796,7 @@ def register_tools(mcp: FastMCP):
                 top_reactions=top_reactions,
                 top_tcdb_families=top_tcdb_families,
                 top_gene_categories=top_gene_categories,
-                top_pathways=top_pathways,
+                top_metabolite_pathways=top_metabolite_pathways,
                 gene_count_total=result["gene_count_total"],
                 reaction_count_total=result["reaction_count_total"],
                 transporter_count_total=result["transporter_count_total"],

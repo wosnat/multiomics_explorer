@@ -28,7 +28,7 @@ differential_expression_by_ortholog.
 | organism | string \| None | None | Organism name or partial match (e.g. 'MED4', 'Prochlorococcus MED4'). Fuzzy word-based matching (same as list_experiments). Get valid names from list_organisms. |
 | locus_tags | list[string] \| None | None | Gene locus tags. E.g. ['PMM0001', 'PMM0845']. Get these from resolve_gene / gene_overview. |
 | experiment_ids | list[string] \| None | None | Experiment IDs to restrict to. Get these from list_experiments. |
-| direction | string ('up', 'down') \| None | None | Filter by expression direction. |
+| direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the explicit, self-documenting spelling for the union of significant up + significant down — functionally identical to `direction=None, significant_only=True` (per spec §6.4); pick whichever spelling is clearer at the call site. Default `None` is unchanged. |
 | significant_only | bool | False | If true, return only statistically significant results. |
 | growth_phases | list[string] \| None | None | Filter by growth phase(s) at sampling time (case-insensitive, edge-level). Isolates specific-phase rows from multi-phase experiments. E.g. ['exponential']. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
@@ -132,7 +132,13 @@ differential_expression_by_gene(locus_tags=["ACZ81_01830", "ACZ81_15555"], exper
 {"organism_name": "Alteromonas macleodii HOT1A3", "matching_genes": 2, "total_matching": 6, "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 4}, "median_abs_log2fc": 2.78, "max_abs_log2fc": 3.591, "experiment_count": 1, "rows_by_treatment_type": {"nutrient_starvation": 6}, "by_table_scope": {"all_detected_genes": 6}, "top_categories": [{"category": "Inorganic ion transport", "total_genes": 1, "significant_genes": 1}, {"category": "Signal transduction", "total_genes": 1, "significant_genes": 1}], "experiments": [{"experiment_id": "10.1101/...", "experiment_name": "HOT1A3 PRO99-lowN nutrient starvation (RNASEQ)", "treatment_type": "nutrient_starvation", "omics_type": "RNASEQ", "coculture_partner": null, "is_time_course": "true", "table_scope": "all_detected_genes", "table_scope_detail": null, "matching_genes": 2, "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 4}, "timepoints": [{"timepoint": "day 18", "timepoint_hours": 432.0, "timepoint_order": 1, "matching_genes": 2, "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 2}}]}], "not_found": [], "no_expression": [], "returned": 5, "truncated": true, "offset": 0, "results": [{"locus_tag": "ACZ81_01830", "gene_name": "amtB", "experiment_id": "...", "treatment_type": "nutrient_starvation", "timepoint": "days 60+89", "timepoint_hours": null, "timepoint_order": 3, "log2fc": 3.591, "padj": 1.13e-12, "rank": 77, "rank_up": 1, "rank_down": null, "expression_status": "significant_up"}]}
 ```
 
-### Example 5: Chaining — find genes then check expression
+### Example 5: Both significant directions in one call (direction='both')
+
+```example-call
+differential_expression_by_gene(organism="MED4", direction="both", summary=True)
+```
+
+### Example 6: Chaining — find genes then check expression
 
 ```
 Step 1: genes_by_function(search_text="nitrogen transport", organism="HOT1A3")
@@ -187,6 +193,8 @@ Mixing organisms in a single call (e.g. MED4 + HOT1A3 locus_tags)
 ```correction
 Call once per organism — tool enforces single-organism constraint
 ```
+
+- `direction='both'` is functionally identical to `direction=None, significant_only=True` — pick whichever spelling is clearer at the call site. Default `direction=None` is unchanged. KG live counts: 51169 significant (25637 up + 25532 down).
 
 - expression_status uses publication-specific thresholds, not a uniform padj<0.05
 

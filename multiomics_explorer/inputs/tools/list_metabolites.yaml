@@ -13,7 +13,7 @@ examples:
     call: list_metabolites(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MIT1002"], summary=True)
 
   - title: Lucene search by name
-    call: list_metabolites(search="glucose", limit=3)
+    call: list_metabolites(search_text="glucose", limit=3)
 
   - title: Transport-only metabolites (TCDB-curated substrates without local catalysis)
     call: list_metabolites(evidence_sources=["transport"], summary=True)
@@ -35,6 +35,23 @@ examples:
 
       Step 2: genes_by_metabolite(metabolite_ids=[chosen_ids], organism="Prochlorococcus MED4")
               → catalysing genes per metabolite
+
+  - title: Currency-cofactor strip — exclude ATP/ADP/NADH/NADPH/H2O when top_metabolites is dominated by them
+    call: |
+      list_metabolites(
+        organism_names=["Prochlorococcus MED4"],
+        exclude_metabolite_ids=[
+          "kegg.compound:C00002",  # ATP
+          "kegg.compound:C00008",  # ADP
+          "kegg.compound:C00004",  # NADH
+          "kegg.compound:C00005",  # NADPH
+          "kegg.compound:C00001",  # H2O
+        ],
+        summary=True,
+      )
+    # Set-difference semantics: when both `metabolite_ids` and
+    # `exclude_metabolite_ids` are passed, exclude wins on overlap (silent —
+    # no warning). Empty list is a no-op (treated as None).
 
 verbose_fields:
   - inchikey
@@ -58,6 +75,7 @@ mistakes:
   - "metaboliteFullText covers Metabolite.name only — NOT formula. For element/composition queries, use `elements` (presence list)."
   - "evidence_sources accepts 'metabolomics' as forward-compat for the future metabolomics-DM spec; no row matches it today."
   - "`measured_compartments` is populated on all 107 measured metabolites (defaults to `[]` on the 3111 unmeasured); use `len(m['measured_compartments']) >= 1` to filter for measurement-anchored rows. Same metabolite measured in both whole_cell and extracellular returns one row with `measured_compartments=['extracellular','whole_cell']` (sorted), not two rows — Metabolite is compartment-agnostic per KG-MET-002."
+  - "When the `top_metabolites` rollup is dominated by ATP / ADP / NADH / NADPH / H2O, pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip cofactor noise. Set-difference semantics with `metabolite_ids` — exclude wins on overlap. KG namespace is `kegg.compound:` (not `chebi:`)."
   - wrong: "list_metabolites(elements=['N'], gene_count_min=1)  # gene_count_min isn't a param"
     right: "list_metabolites(elements=['N'])  # then filter rows in code by gene_count > 0"
   - wrong: "list_metabolites(organism_names=['MED4'])  # short name doesn't match"

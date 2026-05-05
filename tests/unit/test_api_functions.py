@@ -8559,33 +8559,35 @@ class TestMetabolitesByGene:
         assert elements == {"H", "O", "C", "N"}
 
     def test_envelope_carries_top_pathways_rollup(self):
-        """top_pathways envelope rollup with Mbg-shaped fields
-        (pathway_id, pathway_name, gene_count, pathway_reaction_count,
-        pathway_metabolite_count). Per S1 fix, top_pathways is sourced from
-        a dedicated post-existence-probe 3-branch UNION query (spec § 5),
-        not from the summary builder. Mock the dedicated call separately."""
+        """top_metabolite_pathways envelope rollup with Mbg-shaped fields
+        (metabolite_pathway_id, metabolite_pathway_name, gene_count,
+        pathway_reaction_count, pathway_metabolite_count). Phase 2 Item 2:
+        top_metabolite_pathways is now sourced directly from the summary
+        builder (no dedicated post-existence-probe UNION query)."""
         mbg = self._api()
-        top_pathways_response = [
-            {
-                "pathway_id": "kegg.pathway:ko00910",
-                "pathway_name": "Nitrogen metabolism",
-                "gene_count": 3,
-                "pathway_reaction_count": 23,
-                "pathway_metabolite_count": 35,
-            },
-        ]
+        summary_with_pathways = {
+            **self._SUMMARY_ROW_BOTH_ARMS,
+            "top_metabolite_pathways": [
+                {
+                    "metabolite_pathway_id": "kegg.pathway:ko00910",
+                    "metabolite_pathway_name": "Nitrogen metabolism",
+                    "gene_count": 3,
+                    "pathway_reaction_count": 23,
+                    "pathway_metabolite_count": 35,
+                },
+            ],
+        }
         conn = self._mock_conn(
-            [self._SUMMARY_ROW_BOTH_ARMS],
+            [summary_with_pathways],
             [self._METAB_ROW],
             [self._TRANS_ROW_SC],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
-            top_pathways_response,
         )
         out = mbg(self._LOCUS, self._ORG, conn=conn)
-        assert len(out["top_pathways"]) == 1
-        p = out["top_pathways"][0]
-        assert p["pathway_id"] == "kegg.pathway:ko00910"
-        assert p["pathway_name"] == "Nitrogen metabolism"
+        assert len(out["top_metabolite_pathways"]) == 1
+        p = out["top_metabolite_pathways"][0]
+        assert p["metabolite_pathway_id"] == "kegg.pathway:ko00910"
+        assert p["metabolite_pathway_name"] == "Nitrogen metabolism"
         assert p["gene_count"] == 3
         assert p["pathway_reaction_count"] == 23
         assert p["pathway_metabolite_count"] == 35

@@ -78,6 +78,7 @@ analysis with a hypothesis test, use `pathway_enrichment`.
 | organism | string | — | Organism name (case-insensitive, fuzzy word-based match — mirrors `differential_expression_by_gene` and `genes_by_metabolite`). Single-organism enforced. E.g. 'Prochlorococcus MED4'. `not_found.organism` is set when the name resolves to zero matching genes for the input locus_tags. |
 | metabolite_elements | list[string] \| None | None | Filter to rows where the metabolite contains ALL of the given element symbols (AND-of-presence). E.g. `['N']` keeps only N-bearing metabolites — the headline N-source workflow primitive. `['N', 'P']` requires both. Anchored on `Metabolite.elements` (KG-A3 Hill-parsed presence list); applies uniformly to both arms. Never substring-match on `formula` (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). `not_found.metabolite_elements` lists symbols that don't exist on any KG metabolite. |
 | metabolite_ids | list[string] \| None | None | Restrict rows to specific metabolite IDs (full prefixed, e.g. ['kegg.compound:C00086', 'kegg.compound:C00064']). Useful for the cross-feeding workflow: after MBG returns top_metabolites, re-query a partner organism via `genes_by_metabolite` with these IDs. Applies uniformly to both arms. |
+| exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites with these IDs. Set-difference semantics with `metabolite_ids` — exclude wins on overlap. Empty list is no-op. |
 | ec_numbers | list[string] \| None | None | Narrow metabolism rows to those whose Reaction carries any of these EC numbers. **Metabolism arm only — does not affect transport rows**, which are returned unchanged. To restrict to metabolism rows alone, combine with `evidence_sources=['metabolism']`. E.g. ['3.5.1.5'] for urease. |
 | metabolite_pathway_ids | list[string] \| None | None | Filter to rows where the **metabolite** is in any of these KEGG pathways (`KeggTerm.id`, e.g. ['kegg.pathway:ko00910'] for nitrogen metabolism). Anchored on `Metabolite.pathway_ids` (KG-A5 denorm, transport-extended), so applies uniformly to both arms. **Not gene-anchored** — for filtering by genes' KEGG-pathway annotations, route through `genes_by_ontology(ontology="kegg", term_ids=[pathway_id], organism=...)` first to obtain locus_tags. `not_found.metabolite_pathway_ids` lists IDs that don't exist as a KeggTerm. |
 | mass_balance | string ('balanced', 'unbalanced') \| None | None | Narrow metabolism rows to those whose Reaction has this mass balance status. **Metabolism arm only — does not affect transport rows**. Combine with `evidence_sources=['metabolism']` to restrict to metabolism rows alone. |
@@ -96,7 +97,7 @@ analysis with a hypothesis test, use `pathway_enrichment`.
 ### Envelope
 
 ```expected-keys
-total_matching, returned, offset, truncated, warnings, not_found, not_matched, by_gene, by_evidence_source, by_transport_confidence, by_element, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_pathways, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
+total_matching, returned, offset, truncated, warnings, not_found, not_matched, by_gene, by_evidence_source, by_transport_confidence, by_element, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 
 - **total_matching** (int): Total row count after all filters, across both arms.
@@ -114,7 +115,7 @@ total_matching, returned, offset, truncated, warnings, not_found, not_matched, b
 - **top_reactions** (list[MbgTopReaction]): Top 10 reactions by gene_count in the metabolism arm. Drill into any entry via `genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)`.
 - **top_tcdb_families** (list[MbgTopTcdbFamily]): Top 10 TCDB families by gene_count in the transport arm. Drill into any entry via `genes_by_ontology(ontology="tcdb", term_ids=[id], organism=...)`.
 - **top_gene_categories** (list[MbgTopGeneCategory]): Top 10 gene categories by gene_count across both arms.
-- **top_pathways** (list[MbgTopPathway]): NEW (vs GBM): top 10 KEGG pathways the gene set's chemistry reaches. Distinct from gene-KO pathway annotations (`genes_by_ontology(ontology="kegg")`) — see model docstring for naming disambiguation. Drill into any entry via `list_metabolites(pathway_ids=[id])`.
+- **top_metabolite_pathways** (list[MbgTopPathway]): NEW (vs GBM): top 10 KEGG pathways the gene set's chemistry reaches. Metabolite-pathway rollup (distinct from KO-pathway annotations on `genes_by_ontology(ontology="kegg")`) — see model docstring for naming disambiguation. Drill into any entry via `list_metabolites(pathway_ids=[id])`.
 - **gene_count_total** (int): Distinct input genes in the filtered slice (across both arms).
 - **reaction_count_total** (int): Distinct reactions in the filtered metabolism arm.
 - **transporter_count_total** (int): Distinct TcdbFamily nodes in the filtered transport arm.
@@ -186,8 +187,8 @@ Step 2: metabolites_by_gene(
           summary=True,                 # batch DE → envelope is the artifact
         )
         → top_metabolites ranks N-bearing compounds by gene reach;
-          top_pathways concentrates Nitrogen metabolism, Arginine
-          biosynthesis, Alanine/aspartate/glutamate metabolism;
+          top_metabolite_pathways concentrates Nitrogen metabolism,
+          Arginine biosynthesis, Alanine/aspartate/glutamate metabolism;
           by_element confirms N-presence dominance.
 
 Step 3 (optional): list_metabolites(metabolite_ids=[top_N_metabolite_ids])
@@ -205,11 +206,11 @@ Step 2: metabolites_by_gene(
           organism="Prochlorococcus MED4",
           summary=True,
         )
-        → top_pathways = "what pathways does this set sit in"
+        → top_metabolite_pathways = "what pathways does this set sit in"
           by_element = C/N/P/S signature
           top_metabolites = specific compounds the set's chemistry hits
 
-Step 3 (optional): list_metabolites(pathway_ids=[<top_pathway_id>])
+Step 3 (optional): list_metabolites(pathway_ids=[<top_metabolite_pathway_id>])
         → full metabolite roster of the pathway (not just gene-set hits).
 ```
 
@@ -239,7 +240,25 @@ Step 3: genes_by_metabolite(
           cross-feeding hypotheses.
 ```
 
-### Example 6: High-precision transporter slice (mute the 551-row blowup)
+### Example 6: Currency-cofactor strip — exclude ATP/ADP/NADH/NADPH/H2O on a chemistry rollup
+
+```example-call
+metabolites_by_gene(
+  locus_tags=["PMM0963", "PMM0964", "PMM0965"],
+  organism="Prochlorococcus MED4",
+  exclude_metabolite_ids=[
+    "kegg.compound:C00002",
+    "kegg.compound:C00008",
+    "kegg.compound:C00004",
+    "kegg.compound:C00005",
+    "kegg.compound:C00001",
+  ],
+  summary=True,
+)
+
+```
+
+### Example 7: High-precision transporter slice (mute the 551-row blowup)
 
 ```example-call
 metabolites_by_gene(locus_tags=["PMM0434", "PMM0913"], organism="Prochlorococcus MED4", transport_confidence="substrate_confirmed", evidence_sources=["transport"], limit=5)
@@ -255,9 +274,9 @@ gene_overview(locus_tags=[...]) → per-row reaction_count/metabolite_count > 0 
 metabolites_by_gene → top_metabolites → list_metabolites(metabolite_ids=[top_metabolite_ids]) for richer per-metabolite cross-refs (mass, formula, full pathway names)
 metabolites_by_gene → top_metabolites → list_metabolites(metabolite_ids=[top_metabolite_ids], organism_names=[partner_organism]) for cross-organism presence (Workflow B' cross-feeding seed)
 metabolites_by_gene → top_metabolites → genes_by_metabolite(metabolite_ids=[top_metabolite_ids], organism=PARTNER_ORGANISM) (Workflow B' cross-feeding bridge — catalysts + transporters in partner)
-metabolites_by_gene → top_pathways → list_metabolites(pathway_ids=[top_pathway_id]) for the full metabolite roster of the pathway (not just gene-set hits)
-metabolites_by_gene → top_pathways → genes_by_ontology(ontology='kegg', term_ids=[top_pathway_id], organism=...) for gene-KO-mediated pathway annotations (different surface — see top_pathways naming disambiguation)
-metabolites_by_gene → top_pathways → pathway_enrichment(...) when gene-set hypothesis test is the goal
+metabolites_by_gene → top_metabolite_pathways → list_metabolites(pathway_ids=[metabolite_pathway_id]) for the full metabolite roster of the pathway (not just gene-set hits)
+metabolites_by_gene → top_metabolite_pathways → genes_by_ontology(ontology='kegg', term_ids=[metabolite_pathway_id], organism=...) for gene-KO-mediated pathway annotations (different surface — see top_metabolite_pathways naming disambiguation)
+metabolites_by_gene → top_metabolite_pathways → pathway_enrichment(...) when gene-set hypothesis test is the goal
 metabolites_by_gene → top_reactions → genes_by_ontology(ontology='ec', term_ids=[ec_number], organism=...) for genes in adjacent reactions
 metabolites_by_gene → top_tcdb_families → genes_by_ontology(ontology='tcdb', term_ids=[tcdb_family_id], organism=...) for sibling genes in the same family
 metabolites_by_gene → not_matched (locus_tags with no chemistry edges) → gene_overview(locus_tags=not_matched) for annotation context (most are richly-annotated non-chemistry genes — DNA gyrase, signaling, etc. — not annotation gaps)
@@ -275,13 +294,15 @@ metabolites_by_gene → not_matched (locus_tags with no chemistry edges) → gen
 
 - `ec_numbers` and `mass_balance` are metabolism-arm-only filters — they DO NOT suppress transport rows. Transport rows pass through unchanged. To restrict to metabolism alone, combine with `evidence_sources=['metabolism']`. Symmetrically, `transport_confidence` narrows transport rows only and metabolism rows are unaffected. Per-arm filter scope is predictable + composable; it is NOT soft-exclude. `metabolite_elements`, `metabolite_ids`, `metabolite_pathway_ids`, and `gene_categories` are the only filters that narrow both arms uniformly.
 
-- `top_pathways` here means *KEGG pathways the gene set's chemistry reaches* (via `Reaction_in_kegg_pathway` + `Metabolite_in_pathway`). These are NOT the same as gene-KO-mediated pathway annotations (where pathway membership is asserted by the gene's KO assignment) — those live in `genes_by_ontology(ontology='kegg', term_ids=[...], organism=...)`. The two are distinct surfaces: chemistry-reach (this tool) vs KO-annotation (`genes_by_ontology`). For metabolic pathway analysis with a hypothesis test, use `pathway_enrichment` instead.
+- `top_metabolite_pathways` here means *KEGG pathways the gene set's chemistry reaches* (via `Reaction_in_kegg_pathway` + `Metabolite_in_pathway`). These are NOT the same as gene-KO-mediated pathway annotations (where pathway membership is asserted by the gene's KO assignment) — those live in `genes_by_ontology(ontology='kegg', term_ids=[...], organism=...)`. The two are distinct surfaces: chemistry-reach (this tool) vs KO-annotation (`genes_by_ontology`). For metabolic pathway analysis with a hypothesis test, use `pathway_enrichment` instead.
 
 - `metabolite_elements` is presence-only AND-of (not formula substring). `['N']` keeps metabolites whose `Metabolite.elements` Hill-parsed list contains 'N'. `['N', 'P']` requires BOTH N and P. Never substring-match on `formula` — Hill notation has element-clash footguns: `'Cl'` contains `'C'`, `'Na'` contains `'N'`. Use the `metabolite_elements` filter, never grep `formula`.
 
-- Use `summary=True` for batch DE inputs (50+ locus_tags). Detail rows can exceed 1,000 quickly even after the precision-tier sort; the envelope rollups (top_metabolites, top_pathways, top_reactions, top_tcdb_families, by_element, by_gene, top_gene_categories) are the actually-useful artifact at that scale.
+- Use `summary=True` for batch DE inputs (50+ locus_tags). Detail rows can exceed 1,000 quickly even after the precision-tier sort; the envelope rollups (top_metabolites, top_metabolite_pathways, top_reactions, top_tcdb_families, by_element, by_gene, top_gene_categories) are the actually-useful artifact at that scale.
 
 - `not_found.locus_tags` vs `not_matched`. `not_found.locus_tags` = locus_tags that don't resolve to any Gene in the requested organism (typo, wrong organism, gene removed in KG rebuild). `not_matched` = locus_tags that DO resolve to a Gene but have zero chemistry edges (no `Gene_catalyzes_reaction` AND no `Gene_has_tcdb_family`). In MED4 1,366/1,976 genes (69%) fall into the `not_matched` bucket — most are richly-annotated non-chemistry genes (DNA gyrase, queG, signaling modules), not annotation gaps. Pivot via `gene_overview(locus_tags=not_matched)` for annotation context.
+
+- When `top_metabolites` is dominated by ATP / ADP / NADH / NADPH / H2O, pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip the currency-cofactor noise. Set-difference semantics with `metabolite_ids` — exclude wins on overlap (silent). Per-arm scope: exclude applies on BOTH metabolism + transport arms (mirrors `metabolite_ids`). KG namespace is `kegg.compound:` (not `chebi:`).
 
 - Detail rows are direction-agnostic. The transport edge (`Tcdb_family_transports_metabolite`) does not distinguish substrate from product, and the metabolism arm's `Reaction_has_metabolite` edge doesn't either (KEGG equation order is arbitrary). To distinguish, layer transcriptional evidence (`differential_expression_by_gene`) and functional annotation (`gene_overview` Pfam / KEGG KO names like `*-synthase` vs `*-permease`).
 
@@ -291,7 +312,7 @@ metabolites_by_gene → not_matched (locus_tags with no chemistry edges) → gen
 from multiomics_explorer import metabolites_by_gene
 
 result = metabolites_by_gene(locus_tags=..., organism=...)
-# returns dict with keys: total_matching, offset, warnings, not_found, not_matched, by_gene, by_evidence_source, by_transport_confidence, by_element, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_pathways, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
+# returns dict with keys: total_matching, offset, warnings, not_found, not_matched, by_gene, by_evidence_source, by_transport_confidence, by_element, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 
 Use package import for bulk data extraction in scripts.
