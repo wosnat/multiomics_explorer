@@ -294,6 +294,7 @@ User asks about a metabolite or chemistry
 │   └─ "transport" → Track A2 b2/c2 (transport arm) + g (precision-tier)
 ├─ "Which genes act on M?" → genes_by_metabolite (read evidence_source split)
 ├─ "Which metabolites does gene X act on?" → metabolites_by_gene
+├─ "Find metabolite by name → metabolite_id" → list_metabolites(search="...")  ← name-search hook; precedes any compound-anchored chain
 ├─ "Find metabolites by element / pathway / mass" → list_metabolites
 ├─ "Cross-feeding between organisms" → Track A combined §d
 ├─ "N-source / chemistry-filtered DE" → Track A combined §e

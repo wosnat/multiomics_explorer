@@ -340,6 +340,7 @@ How existing MCP tools surface (or fail to surface) the reaction-arm and transpo
 | `metabolites_by_gene` | Same union shape as `genes_by_metabolite` | Same — document union shape | P2 | build-derived (scenario 3 `gene_to_metabolites`) |
 | `metabolites_by_gene` (summary mode) | `summary=True` returns `top_genes=None` even when results exist (observed for small inputs) | Investigate: is `top_genes` only populated when input list is large enough? Document threshold or fix to always populate. Workaround used: extract gene set from non-summary `results` directly | P3 | build-derived (scenario 5 `n_source_de`) |
 | `search_ontology` | Kwarg is `search_text`, not `query` (initially confused) | The discoverability is fine via signature inspection but the analysis-doc patterns and existing `pathway_enrichment.py` use `query=` style elsewhere. Consider accepting both `query=` and `search_text=` aliases for ergonomics | P3 | build-derived (scenario 6 `tcdb_chain`) |
+| `list_metabolites` (name-search discoverability) | `search` parameter exists and works (e.g., `search='glutamine'` returns 4 matches) but is **not surfaced in the analysis doc decision tree** as the canonical name→ID hook. Most user-facing questions arrive by metabolite NAME, not by KEGG ID. | Surface name→ID lookup as an explicit decision-tree branch: `list_metabolites(search='...')` precedes any compound-anchored chain. **Updated in this run (analysis doc + scenario `compound_to_genes` now demonstrates the two-step chain).** | P3 | build-derived (walkthrough Q&A 2026-05-05) |
 
 ---
 

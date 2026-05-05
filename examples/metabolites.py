@@ -96,14 +96,39 @@ def scenario_compound_to_genes() -> None:
     are not comparable (transport rows often family_inferred). Per-row
     schema is union — metabolism rows carry reaction_id/ec_numbers;
     transport rows carry transport_confidence/tcdb_family_id.
+
+    Two-step chain: name → metabolite_id (via list_metabolites search)
+    → genes (via genes_by_metabolite). Most user-facing questions arrive
+    by metabolite NAME, not by KEGG ID, so the search step is the
+    realistic entry point.
     """
     print("=== Scenario: compound_to_genes ===")
     print("Question class: 'which genes catalyse / transport this compound?'")
     print()
 
-    # L-Glutamine (KEGG C00064) — N-bearing, has BOTH metabolism and transport arms in MED4.
+    # Step 1: name → KEGG ID via free-text search.
+    print("Step 1: resolve name → KEGG ID via list_metabolites(search='glutamine')")
+    name_lookup = list_metabolites(search="glutamine", limit=5)
+    print(f"  returned={name_lookup['returned']}  total_matching={name_lookup['total_matching']}")
+    for row in name_lookup["results"][:5]:
+        print(f"  {row['metabolite_id']:<25} {row['name']}")
+    # Pick the canonical L-Glutamine match (KEGG C00064) — N-bearing, has
+    # BOTH metabolism and transport arms in MED4.
+    canonical_id = next(
+        (row["metabolite_id"] for row in name_lookup["results"]
+         if row.get("name") == "L-Glutamine"),
+        None,
+    )
+    if canonical_id is None:
+        print("(L-Glutamine not found in KG — try a different name)")
+        return
+    print(f"  → picked canonical match: {canonical_id}")
+    print()
+
+    # Step 2: genes_by_metabolite on the canonical ID.
+    print(f"Step 2: genes_by_metabolite(metabolite_ids=[{canonical_id!r}], organism='MED4')")
     result = genes_by_metabolite(
-        metabolite_ids=["kegg.compound:C00064"],
+        metabolite_ids=[canonical_id],
         organism="MED4",
         limit=10,
     )
