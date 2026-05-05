@@ -756,6 +756,18 @@ This mirrors the DM family precedent (split drill-down across `genes_by_numeric_
 
 **Implication for KG asks:** KG-MET-002 (documentation ask) **stays alive** at P2 — the verification piece is checked off (one Metabolite node confirmed) but the explicit KG-side docstring documenting "Metabolite node is compartment-agnostic; compartment lives on MetaboliteAssay" is still useful for downstream consumers.
 
+#### 4.3.7 Cross-organism comparability in coculture — RESOLVED (paper-method-dependent; not applicable to current data, 2026-05-05)
+
+**Question:** When a coculture experiment profiles both partners, can a metabolite measurement be attributed to one partner vs the other, or only to the joint medium?
+
+**Resolution (user 2026-05-05):** Paper-method-dependent. Some experimental designs allow per-partner attribution (e.g., physical separation, isotope labeling); others can only resolve the joint medium. The KG records this where applicable via analysis-node / edge properties + paper-level methodological context. Tools shouldn't bake in a single attribution convention — surface the per-paper context and let consumers interpret.
+
+**Not applicable to current data:** the 2 metabolomics papers in the KG today (Kujawinski et al. 2022 — phosphorus + growth-phase axenic monocultures; chitobiose 2023 — carbon-source axenic) are NOT coculture metabolomics. The question doesn't surface in any current scenario.
+
+**Implication for tools:** none today. When coculture metabolomics papers land, tools should expose per-paper method context (likely via the planned `MetaboliteAssay` properties + Publication-node `processing_notes` field — see KG-MET-008 P3).
+
+**Implication for KG asks:** **KG-MET-008** (per-paper processing notes documentation, P3) **stays alive** — it covers this and the wider provenance question. No new ask.
+
 #### 4.3.1 + 4.3.6 Surface modelling — Assay IS the DM-on-Metabolite analog — RESOLVED (empirically, 2026-05-04 build-derived)
 
 **Question (§4.3.1):** Is `MetaboliteAssay` the *only* measurement surface, or should there also be `DerivedMetric` nodes attached to `Metabolite` (mirroring `DerivedMetric → Gene` for gene-level summaries)?
@@ -778,15 +790,7 @@ Both sub-questions resolved (§4.2.1 direction, §4.2.2 primary substrate) — s
 
 ### 4.3 Metabolomics measurement source
 
-(§4.3.1 + §4.3.2 + §4.3.3 + §4.3.4 + §4.3.5 + §4.3.6 resolved — see §4.0.)
-
-#### 4.3.7 Cross-organism comparability in coculture
-
-**Question:** When a coculture experiment profiles both partners, can a metabolite measurement be attributed to one partner vs the other, or only to the joint medium?
-
-**Current state:** assays carry `organism_name`. For monoculture this is unambiguous; for coculture, does the KG record the host organism or the medium?
-
-**Blocks:** Part 3b.4 (differential abundance becomes cross-organism-ambiguous).
+(§4.3.1 + §4.3.2 + §4.3.3 + §4.3.4 + §4.3.5 + §4.3.6 + §4.3.7 resolved — see §4.0.)
 
 #### 4.3.8 Replicate / temporal axis
 
@@ -802,7 +806,6 @@ Resolved questions live in §4.0 and don't appear here (they don't block anythin
 
 | Question | Blocks proposal |
 |---|---|
-| §4.3.7 coculture attribution | 3b.4 (DEFER) |
 | §4.3.8 temporal axis | 3b.2 (DEFER) |
 
 ### 4.5 Workflow B′ (cross-feeding bridge) — three-confounder synthesis
