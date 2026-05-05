@@ -658,6 +658,16 @@ Questions that have been answered during design, build, or walkthrough. Numbered
 
 **Implication for KG asks:** none new. KG-MET-009 (was: add `is_reversible`) becomes moot — annotation upstream is insufficient. Mark KG-MET-009 RETIRED in Part 5 next time we touch it.
 
+#### 4.1.3 Multi-subunit enzymes — RESOLVED (annotation data insufficient + no remaining consumer, 2026-05-05)
+
+**Question:** When a reaction needs multiple gene products, are all subunits attributed to the reaction (1 reaction × N gene edges) or is there explicit complex modelling?
+
+**Resolution:** Same retirement pattern as §4.1.1 / §4.1.2 — KEGG itself has no first-class complex/holo-enzyme modeling. KEGG's relational structure is `REACTION ↔ KO` (orthology groups) and `REACTION ↔ EC` (enzyme classification); multi-subunit info lives only in free-text ENZYME entry descriptions OR is implicit in multiple KO groups sharing a reaction. There is no upstream `complex_id` to propagate. (UniProt and BioCyc have explicit Complex nodes; KEGG does not.) Plus the question's original consumer (Part 2 ortholog-side chemistry rollups) was DROPPED in the gene-side reframe — even if the data existed, no proposal would consume it.
+
+**Implication for tools:** none. Naive 1-reaction × N-gene-edge counting may overstate "genes that catalyse reaction X" by subunit count, but no downstream consumer cares today.
+
+**Implication for KG asks:** KG-MET-010 RETIRED 2026-05-05. Annotation upstream insufficient; would only have been consumed by a now-DROPPED proposal.
+
 #### 4.3.1 + 4.3.6 Surface modelling — Assay IS the DM-on-Metabolite analog — RESOLVED (empirically, 2026-05-04 build-derived)
 
 **Question (§4.3.1):** Is `MetaboliteAssay` the *only* measurement surface, or should there also be `DerivedMetric` nodes attached to `Metabolite` (mirroring `DerivedMetric → Gene` for gene-level summaries)?
@@ -672,17 +682,7 @@ Questions that have been answered during design, build, or walkthrough. Numbered
 
 ### 4.1 Reaction (KEGG) source
 
-(§4.1.1 + §4.1.2 + §4.1.4 resolved — see §4.0.)
-
-#### 4.1.3 Multi-subunit enzymes
-
-**Question:** When a reaction needs multiple gene products, are all subunits attributed to the reaction (1 reaction × N gene edges) or is there explicit complex modelling?
-
-**Why it matters:** Naive counting would overstate "genes that catalyse reaction X" by a factor of subunit count.
-
-**Current state:** unclear from schema. Likely 1 reaction × N gene edges. No `complex_id` property visible.
-
-**Blocks:** ortholog-side chemistry rollups (`gene_homologs`, `genes_by_homolog_group`); affects whether group-level coverage is "any member" or weighted.
+All four sub-questions resolved (§4.1.1 direction, §4.1.2 reversibility, §4.1.3 multi-subunit, §4.1.4 currency cofactor) — see §4.0.
 
 ### 4.2 Transport (TCDB) source
 
@@ -769,7 +769,6 @@ Resolved questions live in §4.0 and don't appear here (they don't block anythin
 
 | Question | Blocks proposal |
 |---|---|
-| §4.1.3 multi-subunit | gene_homologs / homolog-group rollups (Part 2 — but those proposals are now DROPPED per gene-side reframe; question stays open for future ortholog work) |
 | §4.2.1 transport direction | (none in 3b; affects Track A combined §d — confounder #3 of Workflow B′ §4.5) |
 | §4.2.2 primary substrate | (none in 3b; sharpens precision_tier scenario; confounder #2 of Workflow B′ §4.5) |
 | §4.3.2 FC relevance | 3b.2 (DEFER), 3b.4 (DEFER) |
@@ -810,12 +809,12 @@ Items only `multiomics_biocypher_kg` can fix. Each ask carries `{category, prior
 | KG-MET-007 | Index | P3 | first-pass (deferred) | Audit-Phase-E-derived index asks — populated based on the slowest queries observed during example python build | Performance for new tool query paths; populated in second pass once query shapes stabilise |
 | KG-MET-008 | Documentation | P3 | first-pass | Document each metabolomics paper's processed-value pipeline: extraction method, MS platform, internal standards, normalisation, replicate count, statistical-test convention. Likely surfaces as a Publication-node `processing_notes` field | LLM-readable provenance for Track-B caveat surfacing; reduces ambiguity when the LLM cites a measurement |
 | KG-MET-009 | Data gap | — | RETIRED 2026-05-05 | (Was: add `is_reversible` boolean on Reaction node.) **Retired** — KEGG-source annotation lacks reversibility data upstream; same conclusion as KG-MET-003 retirement (Part 4 §4.1.1). Combined with no direction, the Reaction node cannot support either claim. Explorer commits to "involved in" framing as permanent. Resolution to Part 4 §4.1.2 = annotation insufficient. | n/a — explorer-side tools document the dual gap (no direction + no reversibility) in docstrings + analysis doc |
-| KG-MET-010 | Data gap | P3 | first-pass | Multi-subunit enzyme complex modelling (e.g., `complex_id` on Reaction or Gene_catalyzes_reaction edges) | Resolves Part 4 §4.1.3; allows ortholog-side rollups to weight by complex membership |
+| KG-MET-010 | Data gap | — | RETIRED 2026-05-05 | (Was: add `complex_id` on Reaction or Gene_catalyzes_reaction edges.) **Retired** — KEGG has no first-class complex/holo-enzyme modeling upstream (REACTION ↔ KO + EC only; subunit info is free-text or implicit in multi-KO sharing); no clean `complex_id` to propagate. Plus the originally-blocking Part 2 ortholog-side rollups were DROPPED in the gene-side reframe (walkthrough Q&A 2026-05-05) — no remaining consumer. Resolution to Part 4 §4.1.3 = annotation insufficient + no consumer. | n/a — no remaining downstream proposal needs this |
 | KG-MET-011 | Data gap | P2 | first-pass | Transport direction (import vs export) on Tcdb_family_transports_metabolite edges OR per-family default_direction on TcdbFamily | Resolves Part 4 §4.2.1; enables cross-feeding causal claims |
 | KG-MET-012 | Decision | P2 | first-pass | Decide whether metabolite-level summary statistics (rhythmicity, etc.) should attach as `DerivedMetric → Metabolite` edges or live entirely on `MetaboliteAssay` properties. Communicate decision to explorer side | Resolves Part 4 §4.3.1 / §4.3.6; unblocks Part 3b.5 (DM-family extension to Metabolite) |
 | KG-MET-013 | Documentation | P2 | first-pass | Confirm `time_point` properties on `Assay_quantifies_metabolite` align with `Changes_expression_of.time_point` for experiments that have both omics types | Resolves Part 4 §4.3.8; enables future cross-omics tools |
 
-**Priority summary (first-pass, after 2026-05-04 retirement of KG-MET-003 + 2026-05-05 retirement of KG-MET-009):** 0× P0, 1× P1 (KG-MET-001), 5× P2 (KG-MET-002/006/011/012/013), 3× P3 (KG-MET-007 deferred / 008 / 010), 2× CLOSED (KG-MET-004/005), 2× RETIRED (KG-MET-003 / 009) = 13 first-pass asks.
+**Priority summary (first-pass, after 2026-05-04 retirement of KG-MET-003 + 2026-05-05 retirements of KG-MET-009 + KG-MET-010):** 0× P0, 1× P1 (KG-MET-001), 5× P2 (KG-MET-002/006/011/012/013), 2× P3 (KG-MET-007 deferred / 008), 2× CLOSED (KG-MET-004/005), 3× RETIRED (KG-MET-003 / 009 / 010) = 13 first-pass asks.
 
 **Surprising finding (revised):** the original spec assumed many KG asks would land in P0/P1 (data is missing). The actual KG release shipped much further than expected — node-level rollups exist, edge schemas are rich, family promiscuity is partially flagged. The originally-flagged P0 (reaction role) was retired by user decision because upstream KEGG annotation direction is unreliable. **There are no remaining P0 KG asks.** The chemistry-annotation track's "involved in" framing is now a permanent convention, not a transitional limitation.
 
@@ -827,4 +826,4 @@ Items only `multiomics_biocypher_kg` can fix. Each ask carries `{category, prior
 | KG-MET-015 | Documentation | P3 | build-derived | Document organism-name resolution rules: chemistry tools (e.g., `genes_by_metabolite(organism='MED4')`) accept short-name aliases, but `list_organisms(organism_names=['MED4'])` requires the full `preferred_name` (`Prochlorococcus MED4`) | Surfaces during scenario 1 `discover` first-attempt; minor friction but confusing without docs |
 | KG-MET-007 (resolved) | Index | — | build-derived (NO INDEX ASKS) | Audit-Phase-D scenarios all completed in <30s aggregate (scenario 5 longest at ~8s due to multi-step DE chain). No slow queries observed. KG-MET-007 closes with no concrete index requests; revisit in next round | Performance baseline confirmed acceptable for current scale. |
 
-**Final Part 5 totals (refreshed walkthrough Q&A 2026-05-05):** 15 numbered KG asks. **0× P0** (no P0 asks remain), 1× P1 (KG-MET-001 normalisation docs), 5× P2 (KG-MET-002/006/011/012/013), 5× P3 (KG-MET-008/010/014/015 + KG-MET-007 deferred), 2× CLOSED (KG-MET-004/005 rollup-already-shipped), 2× RETIRED (KG-MET-003 reaction direction; KG-MET-009 reaction reversibility — both KEGG-source upstream gaps). The KG release substantially overshipped relative to design-time assumptions.
+**Final Part 5 totals (refreshed walkthrough Q&A 2026-05-05):** 15 numbered KG asks. **0× P0** (no P0 asks remain), 1× P1 (KG-MET-001 normalisation docs), 5× P2 (KG-MET-002/006/011/012/013), 4× P3 (KG-MET-008/014/015 + KG-MET-007 deferred), 2× CLOSED (KG-MET-004/005 rollup-already-shipped), 3× RETIRED (KG-MET-003 reaction direction; KG-MET-009 reaction reversibility; KG-MET-010 multi-subunit complex modelling — all KEGG-source upstream gaps). The KG release substantially overshipped relative to design-time assumptions.
