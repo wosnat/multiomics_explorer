@@ -743,6 +743,19 @@ This mirrors the DM family precedent (split drill-down across `genes_by_numeric_
 
 **Implication for tools:** see Part 3b.3 — three-tool split shipped together as a slice. Already specified.
 
+#### 4.3.5 Compartment semantics — RESOLVED (one Metabolite node shared across all organisms + compartments, 2026-05-05)
+
+**Question:** When the same metabolite is measured in both compartments, treated as one Metabolite node (with two edges) or two distinct Metabolite nodes?
+
+**Resolution (user confirmation 2026-05-05):** **one Metabolite node shared across all organisms AND all compartments.** Compartment lives on the `MetaboliteAssay` edge property, not on the Metabolite node. Glucose intracellular and glucose extracellular in MED4, MIT9301, etc. are all the same `kegg.compound:C00031` node — disambiguation is via assay attachment, not node duplication.
+
+**Implication for tools:**
+- `list_metabolites` rows: per-row `measured_compartments` (sparse, only when `measured_assay_count > 0`) is the correct shape — collects `DISTINCT a.compartment` across attached assays. Already specced in Part 3a.
+- Cross-compartment comparison (e.g., scenario `measurement` Step 2 side-by-side print) works because the same metabolite_id appears once with multiple assay edges.
+- `metabolite_response_profile` (3b.2 DEFER) — when revisited, no compartment-disambiguation logic needed at the entity layer.
+
+**Implication for KG asks:** KG-MET-002 (documentation ask) **stays alive** at P2 — the verification piece is checked off (one Metabolite node confirmed) but the explicit KG-side docstring documenting "Metabolite node is compartment-agnostic; compartment lives on MetaboliteAssay" is still useful for downstream consumers.
+
 #### 4.3.1 + 4.3.6 Surface modelling — Assay IS the DM-on-Metabolite analog — RESOLVED (empirically, 2026-05-04 build-derived)
 
 **Question (§4.3.1):** Is `MetaboliteAssay` the *only* measurement surface, or should there also be `DerivedMetric` nodes attached to `Metabolite` (mirroring `DerivedMetric → Gene` for gene-level summaries)?
@@ -765,15 +778,7 @@ Both sub-questions resolved (§4.2.1 direction, §4.2.2 primary substrate) — s
 
 ### 4.3 Metabolomics measurement source
 
-(§4.3.1 + §4.3.2 + §4.3.3 + §4.3.4 + §4.3.6 resolved — see §4.0.)
-
-#### 4.3.5 Compartment semantics
-
-**Question:** `MetaboliteAssay` carries `compartment` as a string property (`whole_cell` | `extracellular`). Is the *same* metabolite measured in both compartments treated as one Metabolite node (with two edges) or two distinct Metabolite nodes?
-
-**Current state:** appears to be one Metabolite × two assays (whole_cell + extracellular); compartment is on the Assay, not the Metabolite. Verify with a query in second pass.
-
-**Blocks:** Part 3b.2 (response profile across compartments).
+(§4.3.1 + §4.3.2 + §4.3.3 + §4.3.4 + §4.3.5 + §4.3.6 resolved — see §4.0.)
 
 #### 4.3.7 Cross-organism comparability in coculture
 
@@ -797,7 +802,6 @@ Resolved questions live in §4.0 and don't appear here (they don't block anythin
 
 | Question | Blocks proposal |
 |---|---|
-| §4.3.5 compartment semantics | 3b.2 (DEFER); also gates `list_metabolites.measured_compartments` sparse-field policy (Part 3a) |
 | §4.3.7 coculture attribution | 3b.4 (DEFER) |
 | §4.3.8 temporal axis | 3b.2 (DEFER) |
 
