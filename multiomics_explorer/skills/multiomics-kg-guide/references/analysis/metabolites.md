@@ -80,6 +80,8 @@ result = metabolites_by_gene(
 # (chemistry-pathway distinction — see caveat below).
 ```
 
+**`by_element` semantics — presence-only, not stoichiometric.** Each row carries `metabolite_count` = the count of *distinct compounds in the full match set* that contain that element at all. E.g., `[('H', 6), ('O', 6), ('P', 6), ('C', 5), ('N', 4)]` over 6 distinct compounds means 6 contain H/O/P, 5 contain C, 4 contain N. It does **not** count atoms per compound (stoichiometry lives in `metabolite.formula`, e.g. `HO7P2` for diphosphate), and it is **not** mass-balanced across reactions — the KG intentionally carries no substrate-vs-product role on `Reaction_has_metabolite` (Part 4 §4.1.1 resolved). The per-row `elements` field is the same shape: a set of symbols, no counts. The envelope aggregates over `total_matching`, not the truncated page.
+
 **Caveat — `top_pathways` is NOT KEGG-KO pathways.** The chemistry-side `top_pathways` walks `Reaction → KeggTerm` via reaction-pathway edges (filtered to `KeggTerm.reaction_count >= 3`). This is distinct from gene-KO pathway annotations from `genes_by_ontology(ontology="kegg", ...)`. If the user wants the KO pathway annotation surface, route there instead. Disambiguate explicitly when answering.
 
 ---
