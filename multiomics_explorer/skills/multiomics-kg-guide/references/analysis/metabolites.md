@@ -141,25 +141,61 @@ Workflows that cross both reaction and transport arms, or that consume the annot
 
 **When:** "what could MED4 produce that ALT might consume?" — between-organism metabolic coupling.
 
-**Pattern (two-step):**
+**Three structural confounders — apply mitigations or the bridge degenerates to "both organisms have water and ATP":**
+
+| # | Confounder | Arm | Mitigation |
+|---|---|---|---|
+| 1 | **Currency cofactors flood the rollup.** `top_metabolites` is sorted by gene_count, which is exactly the wrong sort for cross-feeding because the highest-reach metabolites are universal (H2O, ATP/ADP/AMP, Pi, PPi, NAD(P)(H), CO2). | metabolism | Post-filter the harvested IDs against a currency blacklist. Minimal-8 (H2O, CO2, ATP, ADP, AMP, Pi, PPi, NAD(P)(H)) is the conservative default — see `examples/metabolites.py::CURRENCY_METABOLITES_MIN8`. Extend with H+, Glu/Gln, CoA, FAD if the seed pulls them in (these are borderline and depend on whether you care about central-N flux as a signal). |
+| 2 | **Family-inferred plateau.** Broad-substrate TCDB families (especially ABC superfamily) propagate ~554 metabolites per MED4 gene at low confidence. A single ABC-superfamily gene in the seed will swamp the metabolite_id list with weak transport rollups. | transport | `transport_confidence='substrate_confirmed'` on the Step-2 `genes_by_metabolite` call. Empirical: in a 7-metabolite N-cross test against ALT this dropped transport rows 1426 → 185 (87%), leaving only curated CmpA/NrtA-family nitrate transporters. |
+| 3 | **Transport polarity not encoded.** TCDB annotation says "transports X" without import/export direction (KG-MET-011 open). Even with clean filters, "MED4 has cynA, ALT has nrtA" tells you both touch the substrate, not who's the producer. | both | None on the annotation side — surface the limitation in the answer ("compatible with", not "confirmed"). The Track-B measurement layer can corroborate (extracellular elevation in coculture) but cannot confirm causality. |
+
+**Pattern (two-step, with all three mitigations applied):**
 
 ```python
+# 0. Derive a biologically-motivated seed (don't pick random PMM IDs — housekeeping
+#    genes carry only currency cofactors and zero transport).
+CURRENCY = {  # minimal-8 (H2O, CO2, ATP, ADP, AMP, Pi, PPi, NAD(P)(H))
+    "kegg.compound:C00001", "kegg.compound:C00011", "kegg.compound:C00002",
+    "kegg.compound:C00008", "kegg.compound:C00020", "kegg.compound:C00009",
+    "kegg.compound:C00013", "kegg.compound:C00003", "kegg.compound:C00004",
+    "kegg.compound:C00005", "kegg.compound:C00006",
+}
+seed = genes_by_ontology(
+    organism="MED4",
+    ontology="kegg",
+    term_ids=["kegg.pathway:ko00910"],   # Nitrogen metabolism — both arms exercised
+)
+seed_locus_tags = sorted({r["locus_tag"] for r in seed["results"]})
+
 # 1. Harvest MED4-side metabolite IDs from gene-anchored chemistry.
 med4_chem = metabolites_by_gene(
-    locus_tags=["PMM0001", "PMM0002", ...],
+    locus_tags=seed_locus_tags,
     organism="MED4",
     summary=True,
 )
-metabolite_ids = [m["metabolite_id"] for m in med4_chem["top_metabolites"]]
+metabolite_ids = [
+    m["metabolite_id"]
+    for m in med4_chem["top_metabolites"]
+    if m["metabolite_id"] not in CURRENCY                # confounder #1
+]
 
-# 2. Cross to ALT — which ALT genes can metabolise / transport those?
-alt_consumers = genes_by_metabolite(
+# 2. Cross to ALT — split per-arm so both have airtime and the family_inferred
+#    plateau is killed on the transport side only.
+alt_transport = genes_by_metabolite(
     metabolite_ids=metabolite_ids,
     organism="Alteromonas macleodii",
+    evidence_sources=["transport"],
+    transport_confidence="substrate_confirmed",          # confounder #2
 )
+alt_metab = genes_by_metabolite(
+    metabolite_ids=metabolite_ids,
+    organism="Alteromonas macleodii",
+    evidence_sources=["metabolism"],
+)
+# Frame results as "compatible with cross-feeding" — confounder #3 unmitigable today.
 ```
 
-**Caveat — KG is annotation-only.** Direction of cross-feeding (which organism actually produces vs consumes under what condition) is not represented (KG-MET-003, KG-MET-011 open). The Track-B measurement layer can corroborate ("compound X was extracellularly elevated when the partners cocultured") but cannot confirm causality.
+See `examples/metabolites.py --scenario cross_feeding` for the runnable end-to-end with both arms printed and the cyn-cluster + glnA + glsF seed.
 
 ### e — N-source / nutrient-class workflow
 

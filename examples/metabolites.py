@@ -38,12 +38,28 @@ from typing import Callable
 from multiomics_explorer import (
     differential_expression_by_gene,
     genes_by_metabolite,
+    genes_by_ontology,
     list_experiments,
     list_metabolites,
     metabolites_by_gene,
     run_cypher,
     search_ontology,
 )
+
+
+CURRENCY_METABOLITES_MIN8: frozenset[str] = frozenset({
+    "kegg.compound:C00001",  # H2O
+    "kegg.compound:C00011",  # CO2
+    "kegg.compound:C00002",  # ATP
+    "kegg.compound:C00008",  # ADP
+    "kegg.compound:C00020",  # AMP
+    "kegg.compound:C00009",  # Orthophosphate (Pi)
+    "kegg.compound:C00013",  # Diphosphate (PPi)
+    "kegg.compound:C00003",  # NAD+
+    "kegg.compound:C00004",  # NADH
+    "kegg.compound:C00005",  # NADPH
+    "kegg.compound:C00006",  # NADP+
+})
 
 
 def scenario_discover() -> None:
@@ -219,52 +235,123 @@ def scenario_cross_feeding() -> None:
     """Use this when the user asks 'what could MED4 produce that ALT might consume?'
 
     Sources: reaction + transport (annotation-only).
-    Caveat surfaced: KG is annotation-only — direction-of-cross-feeding
-    not represented; conclusions are 'compatible with' not 'confirmed'.
+
+    Workflow B′ has THREE structural confounders that compound; each requires
+    a workflow-side mitigation:
+
+    1. Currency-cofactor flooding (metabolism arm) — top_metabolites is sorted
+       by gene_count, which is exactly the wrong sort for cross-feeding because
+       the highest-reach metabolites are universal cofactors (H2O, ATP, ADP,
+       Pi, PPi, NAD(P)(H)). Mitigation: post-filter via CURRENCY_METABOLITES_MIN8.
+       Extend the blacklist if H+, glutamate/glutamine, or coenzyme A dominate
+       results in your seed.
+    2. Family-inferred plateau (transport arm) — broad-substrate ABC superfamily
+       annotations propagate ~554 metabolites per MED4 gene at low confidence.
+       Mitigation: transport_confidence='substrate_confirmed' on Step 2.
+    3. Transport polarity not encoded — TCDB annotation says 'transports X'
+       without import/export direction (KG-MET-011 open). Even with clean
+       filters, the result is 'compatible with cross-feeding', never confirmed.
+
+    Seed choice: 6 MED4 N-metabolism genes derived live from
+    genes_by_ontology(ontology='kegg', term_ids=['kegg.pathway:ko00910']).
+    The cyn cluster (cynABDS) is biologically motivated for cross-feeding —
+    cyanate is a small N-bearing solute bacteria can release/consume. Both
+    arms exercised: 3 transporters + 3 metabolism genes (cynS + glnA + glsF).
     """
     print("=== Scenario: cross_feeding (Workflow B') ===")
     print("Question class: 'between-organism metabolic coupling candidates'")
     print()
 
-    med4_locus = ["PMM0001", "PMM0002", "PMM0003", "PMM0004", "PMM0005"]
-    print(f"Step 1: MED4 chemistry for {med4_locus}")
+    print("Step 0: derive a biologically-motivated seed via KEGG N-metabolism pathway")
+    seed_query = genes_by_ontology(
+        organism="MED4",
+        ontology="kegg",
+        term_ids=["kegg.pathway:ko00910"],  # Nitrogen metabolism
+    )
+    seed_locus_tags = sorted({row["locus_tag"] for row in seed_query["results"]})
+    print(f"  → {len(seed_locus_tags)} MED4 N-metabolism genes:")
+    for row in seed_query["results"][: len(seed_locus_tags)]:
+        print(
+            f"    {row['locus_tag']:<10} {(row.get('gene_name') or '?'):<8} "
+            f"{(row.get('product') or '')[:55]}"
+        )
+    print()
+
+    print(f"Step 1: MED4 chemistry for {len(seed_locus_tags)} N-metabolism genes")
     med4 = metabolites_by_gene(
-        locus_tags=med4_locus,
+        locus_tags=seed_locus_tags,
         organism="MED4",
         summary=True,
     )
+    by_es_med4 = med4.get("by_evidence_source") or []
+    print(f"  total_matching={med4.get('total_matching')}  "
+          f"by_evidence_source={[(e['evidence_source'], e['count']) for e in by_es_med4]}")
     top_metabs = med4.get("top_metabolites") or []
+
+    print("  top_metabolites (raw, pre-blacklist):")
+    for r in top_metabs:
+        flag = " [CURRENCY → blacklisted]" if r["metabolite_id"] in CURRENCY_METABOLITES_MIN8 else ""
+        print(
+            f"    {r['metabolite_id']:<22} {(r.get('name') or '?'):<32} "
+            f"metab={r.get('metabolism_rows')} "
+            f"trans_conf={r.get('transport_substrate_confirmed_rows')} "
+            f"trans_inf={r.get('transport_family_inferred_rows')}{flag}"
+        )
+
     metabolite_ids = [
-        m.get("metabolite_id") for m in top_metabs if m.get("metabolite_id")
-    ][:10]
-    print(f"  → harvested {len(metabolite_ids)} metabolite_ids:")
-    for mid in metabolite_ids[:5]:
-        print(f"    {mid}")
+        m["metabolite_id"]
+        for m in top_metabs
+        if m.get("metabolite_id") and m["metabolite_id"] not in CURRENCY_METABOLITES_MIN8
+    ]
+    dropped = [m["metabolite_id"] for m in top_metabs if m.get("metabolite_id") in CURRENCY_METABOLITES_MIN8]
+    print(f"  after minimal-8 currency blacklist: {len(metabolite_ids)} kept, {len(dropped)} dropped")
     print()
 
     if not metabolite_ids:
-        print("(no metabolites — try larger MED4 gene set)")
+        print("(no non-currency metabolites — extend the seed or relax the blacklist)")
         return
 
     print(f"Step 2: which Alteromonas genes touch any of the {len(metabolite_ids)} metabolites?")
-    alt = genes_by_metabolite(
+    print("  (split per-arm so both transport and metabolism get airtime;")
+    print("   transport_confidence='substrate_confirmed' kills the ABC family-inferred plateau)")
+    alt_transport = genes_by_metabolite(
         metabolite_ids=metabolite_ids,
         organism="Alteromonas macleodii",
-        limit=10,
+        evidence_sources=["transport"],
+        transport_confidence="substrate_confirmed",
+        limit=8,
     )
-    print(f"  → returned={alt['returned']}  total_matching={alt.get('total_matching')}")
-    by_es = alt.get("by_evidence_source") or []
-    print(f"  by_evidence_source: {[(e.get('evidence_source'), e.get('count')) for e in by_es]}")
+    alt_metab = genes_by_metabolite(
+        metabolite_ids=metabolite_ids,
+        organism="Alteromonas macleodii",
+        evidence_sources=["metabolism"],
+        limit=8,
+    )
+    print(f"  transport-arm: total_matching={alt_transport.get('total_matching')}")
+    print(f"  metabolism-arm: total_matching={alt_metab.get('total_matching')}")
     print()
-    print("  CAVEAT: KG is annotation-only — these are 'compatible with cross-feeding',")
-    print("  not 'confirmed cross-feeding'. The Track-B measurement layer can corroborate.")
+    print("  CAVEATS — Workflow B′ is 'compatible with cross-feeding', never confirmed:")
+    print("    1. Currency cofactors blacklisted above (mitigated)")
+    print("    2. transport_confidence filter applied (mitigated for ABC plateau)")
+    print("    3. Transport polarity not encoded — KG-MET-011 open. The Track-B")
+    print("       measurement layer can corroborate (extracellular elevation in coculture)")
+    print("       but cannot confirm causality.")
     print()
-    print("First 10 ALT consumer candidates:")
-    for row in alt["results"][:10]:
+
+    print(f"Top {alt_transport['returned']} ALT transporter candidates (substrate_confirmed):")
+    for row in alt_transport["results"]:
         print(
             f"  {row.get('locus_tag', '?'):<14} → "
-            f"{str(row.get('metabolite_id', '?'))[:18]:<18} "
-            f"({row.get('evidence_source', '?')})"
+            f"{str(row.get('metabolite_id', '?'))[:22]:<22} "
+            f"{(row.get('product') or row.get('gene_name') or '')[:48]}"
+        )
+    print()
+    print(f"Top {alt_metab['returned']} ALT metabolism candidates (involved-in framing):")
+    for row in alt_metab["results"]:
+        print(
+            f"  {row.get('locus_tag', '?'):<14} → "
+            f"{str(row.get('metabolite_id', '?'))[:22]:<22} "
+            f"{(row.get('product') or row.get('gene_name') or '')[:48]}"
         )
 
 

@@ -528,6 +528,18 @@ Organised by metabolite-source pipeline. Each question states the issue, names t
 
 **Blocks:** ortholog-side chemistry rollups (`gene_homologs`, `genes_by_homolog_group`); affects whether group-level coverage is "any member" or weighted.
 
+#### 4.1.4 Currency-cofactor confounder in metabolism rollups — RESOLVED (workflow-side)
+
+**Question:** `top_metabolites` rollup in `metabolites_by_gene` is sorted by gene_count. For cross-feeding (Workflow B′), this is exactly the wrong sort: the highest-reach compounds across any non-trivial gene set are universal cofactors (H2O, ATP/ADP/AMP, Pi, PPi, NAD(P)(H), CO2). The bridge degenerates to "both organisms have water and ATP."
+
+**Resolution (2026-05-05, walkthrough):** workflow-side mitigation, no KG ask. The KG should not flag currency cofactors itself — what counts as "currency" is task-dependent (e.g., glutamate/glutamine are central-N currency in N-flux contexts but real signals in nutrient-class contexts). The mitigation is a tool-side post-filter against a minimal-8 blacklist (H2O, CO2, ATP, ADP, AMP, Pi, PPi, NAD(P)(H)), extensible per workflow.
+
+**Implication for tools:** analysis doc Track A §d caveat now lists this as confounder #1 of three for Workflow B′. Example python `examples/metabolites.py::CURRENCY_METABOLITES_MIN8` provides the canonical blacklist constant. No tool API change needed.
+
+**Empirical evidence (2026-05-05 walkthrough):** seed PMM0001–PMM0005 (housekeeping) returned top_metabolites = {H2O, PPi, Glu, Gln, ATP, ADP, Pi, DNA, PRPP, dATP} — 7/10 currency or activated cofactors. Replacement biologically-motivated seed (6 N-metabolism genes via `genes_by_ontology(ontology='kegg', term_ids=['kegg.pathway:ko00910'])`) returned {nitrate, ammonia, nitrite, cyanate, Glu, Gln, H+, H2O, ATP, ADP} — minimal-8 blacklist drops 3, leaves 7 N-relevant compounds.
+
+**Blocks:** none — answered.
+
 ### 4.2 Transport (TCDB) source
 
 #### 4.2.1 Transport direction (import vs export)
@@ -627,8 +639,9 @@ Organised by metabolite-source pipeline. Each question states the issue, names t
 |---|---|
 | §4.1.1 reaction direction | (none in 3b; affects analysis doc honesty) |
 | §4.1.3 multi-subunit | gene_homologs / homolog-group rollups (Part 2) |
-| §4.2.1 transport direction | (none in 3b; affects Track A combined §d) |
-| §4.2.2 primary substrate | (none in 3b; sharpens precision_tier scenario) |
+| §4.1.4 currency-cofactor confounder | (none — workflow-side, resolved via minimal-8 blacklist) |
+| §4.2.1 transport direction | (none in 3b; affects Track A combined §d — confounder #3 of Workflow B′ §4.5) |
+| §4.2.2 primary substrate | (none in 3b; sharpens precision_tier scenario; confounder #2 of Workflow B′ §4.5) |
 | §4.3.1 / §4.3.6 surface modelling | 3b.5 DM-family extension |
 | §4.3.2 FC relevance | 3b.2, 3b.4 |
 | §4.3.3 replicate rollup | 3b.2, 3b.4 |
@@ -636,6 +649,20 @@ Organised by metabolite-source pipeline. Each question states the issue, names t
 | §4.3.5 compartment semantics | 3b.2 |
 | §4.3.7 coculture attribution | 3b.4 |
 | §4.3.8 temporal axis | 3b.2 |
+
+### 4.5 Workflow B′ (cross-feeding bridge) — three-confounder synthesis
+
+The cross-feeding bridge (`metabolites_by_gene` → `genes_by_metabolite` across organisms) has three structural confounders that compound; the analysis doc Track A §d caveat lists them as a single table. They are individually addressed in §4.1.4 / §4.2.2 / §4.2.1 above; this section synthesises so the bridge's net unmitigable risk is visible in one place.
+
+| # | Confounder | Arm | Mitigation today | Status / KG ask |
+|---|---|---|---|---|
+| 1 | Currency-cofactor flooding (top_metabolites sorted by gene_count) | metabolism | Workflow-side: post-filter against minimal-8 blacklist (`examples/metabolites.py::CURRENCY_METABOLITES_MIN8`) | §4.1.4 — RESOLVED workflow-side |
+| 2 | Family-inferred plateau (ABC superfamily → ~554 metabolites/gene) | transport | `transport_confidence='substrate_confirmed'` on Step 2; empirical 87% noise reduction in N-cross test | §4.2.2 — sharpened by KG-MET-006 (is_promiscuous flag, P2) |
+| 3 | Transport polarity not encoded | transport | None — surface as "compatible with cross-feeding", never confirmed | §4.2.1 — KG-MET-011 P2 (transport direction) |
+
+**Net for Workflow B′:** confounders #1 and #2 are fully mitigable workflow-side today (no KG dependency); #3 is unmitigable and forces the "compatible with" framing regardless of filter aggressiveness. Track-B measurement layer can corroborate but not confirm causality — see analysis doc Track B §a.
+
+**Empirical validation (2026-05-05):** the canonical example (`examples/metabolites.py --scenario cross_feeding`) uses 6 MED4 N-metabolism genes (cyn cluster + glnA + glsF) seeded via `genes_by_ontology(ontology='kegg', term_ids=['kegg.pathway:ko00910'])` and returns interpretable cross-feeding candidates: ALT CmpA/NrtA-family nitrate ABC transporters across 5 strains for the transport arm, ammonia-involved enzymes (5-oxoprolinase, hydroxymethylbilane synthase) for the metabolism arm. With all three mitigations applied, the bridge produces a non-trivial answer.
 
 ---
 
