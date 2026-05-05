@@ -412,27 +412,66 @@ Each candidate gets a paragraph + signature sketch + `{recommendation, phase}`. 
 
 #### 3b.1 `list_metabolite_assays`
 
-Discovery surface for `MetaboliteAssay` nodes — mirrors `list_experiments` but per-assay.
+Discovery surface for `MetaboliteAssay` nodes — mirrors `list_experiments` per-assay and the parameter naming follows `list_derived_metrics` (the closest sibling discovery tool).
 
 ```python
 list_metabolite_assays(
-    organism: str | None = None,
-    organism_names: list[str] | None = None,
-    treatment_types: list[str] | None = None,
-    background_factors: list[str] | None = None,
-    publication_dois: list[str] | None = None,
-    experiment_ids: list[str] | None = None,
-    metabolite_ids: list[str] | None = None,
-    compartment: Literal['whole_cell', 'extracellular'] | None = None,
-    value_kind: Literal['numeric', 'boolean'] | None = None,
+    search_text: str | None = None,                      # Lucene — matches sibling discovery tools
+    organism: str | None = None,                         # singular str (not organism_names list) — matches list_derived_metrics
     metric_types: list[str] | None = None,
+    value_kind: Literal['numeric', 'boolean'] | None = None,
+    compartment: str | None = None,                      # str not Literal — KG may add new compartments; matches list_derived_metrics
+    treatment_type: list[str] | None = None,             # singular — matches sibling discovery tools
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    publication_doi: list[str] | None = None,            # singular
+    experiment_ids: list[str] | None = None,
+    assay_ids: list[str] | None = None,                  # batch specific-ID lookup; parallel to derived_metric_ids
+    metabolite_ids: list[str] | None = None,             # unique to assays — find assays measuring specific compounds
+    rankable: bool | None = None,                        # MetaboliteAssay node carries `rankable` (verified 2026-05-05); parallels list_derived_metrics
     summary: bool = False,
     verbose: bool = False,
-    limit: int = 25,
+    limit: int | None = None,
+    offset: int = 0,
 ) -> dict
 ```
 
-Per-row: `id`, `name`, `organism_name`, `experiment_id`, `publication_doi`, `compartment`, `value_kind`, `metric_type`, `n_replicates`, `total_metabolite_count`, `treatment_type`, `background_factors`, `growth_phases`, `time_points`. Envelope: `by_compartment`, `by_value_kind`, `by_organism`, `top_metric_types`, `total_assay_count`, `total_metabolite_count`.
+**Filters intentionally omitted (compared to `list_derived_metrics`):**
+- `omics_type` — assays are inherently METABOLOMICS; redundant.
+- `has_p_value` — `MetaboliteAssay` node carries no p-value flag in the schema; not applicable. Add only if the KG gains an analog.
+
+**Per-row** (verified against `MetaboliteAssay` node properties 2026-05-05; parallels `list_derived_metrics` row schema where applicable):
+
+| Field | Source | Notes |
+|---|---|---|
+| `assay_id` | node `id` | renamed for clarity (parallels DM's `derived_metric_id`) |
+| `name` | node | parallels DM |
+| `organism_name` | node | parallels DM |
+| `experiment_id` | node | parallels DM |
+| `publication_doi` | node | parallels DM |
+| `compartment` | node | parallels DM |
+| `value_kind` | node | parallels DM (numeric / boolean — no categorical for assays) |
+| `metric_type` | node | parallels DM |
+| `treatment_type` | node | parallels DM |
+| `treatment` | node | assay-specific (string detail beyond treatment_type) |
+| `background_factors` | node | parallels DM |
+| `growth_phases` | node | parallels DM |
+| `unit` | node | parallels DM |
+| `field_description` | node | parallels DM |
+| `omics_type` | node | parallels DM (always METABOLOMICS for assays) |
+| `rankable` | node | parallels DM — assay node carries this flag |
+| `total_metabolite_count` | node | parallels DM's `total_gene_count` |
+| `aggregation_method` | node | assay-specific |
+| `light_condition` | node | assay-specific |
+| `experimental_context` | node | assay-specific |
+| `value_min` / `value_q1` / `value_median` / `value_q3` / `value_max` | node | distribution stats precomputed on assay node; not surfaced in DM today but available |
+| `time_points` | edge aggregation | `collect(DISTINCT r.time_point)` across this assay's edges |
+
+**Excluded (not on assay node, would require unhelpful aggregation):**
+- `n_replicates` — varies per (metabolite × condition × timepoint); surface at edge-level via 3b.3 `metabolites_by_assay` instead.
+- `allowed_categories` — DM-only; no categorical assays in current data.
+
+**Envelope:** `by_compartment`, `by_value_kind`, `by_organism`, `top_metric_types`, `total_assay_count`, `total_metabolite_count` — parallels DM envelope shape.
 
 **Justification:** structural — there's a node type with rich properties and no discovery tool. The 10-assay scale is small but the property graph is rich; all 8 metabolomics experiments are reachable today only via run_cypher.
 
