@@ -17,9 +17,8 @@ Scenarios:
   3. gene_to_metabolites — element signature + top_pathways (reaction + transport)
   4. cross_feeding       — bridge MED4 → ALT (reaction + transport)
   5. n_source_de         — N-source primitive → DE (reaction + transport → expression)
-  6. tcdb_chain          — TCDB ontology → metabolite (transport)
-  7. precision_tier      — family_inferred warning interpretation (transport)
-  8. measurement         — metabolomics via run_cypher (measurement; native tools pending)
+  6. tcdb_chain          — substrate-anchored vs family-anchored 3-route comparison (transport)
+  7. measurement         — metabolomics via run_cypher (measurement; native tools pending)
 
 Build-derived notes (audit Part 2/3a P0 confirmed):
 - list_metabolites does NOT pass through `measured_assay_count` per row, even
@@ -580,51 +579,6 @@ def scenario_tcdb_chain() -> None:
     print("transporter specificity is often promiscuous or under-characterized in nature.")
 
 
-def scenario_precision_tier() -> None:
-    """Use this when interpreting a `genes_by_metabolite` result with the
-    family_inferred-dominance auto-warning.
-
-    Sources: transport (warning is transport-arm specific).
-    Caveat surfaced: ABC superfamily inflates family_inferred row counts;
-    tighten via transport_confidence='substrate_confirmed' for high-confidence
-    rows only.
-    """
-    print("=== Scenario: precision_tier ===")
-    print("Question class: 'how do I interpret family_inferred-dominance warning?'")
-    print()
-
-    # Glycine betaine triggers the warning (ABC superfamily curates it).
-    print("Step 1: query a substrate likely to trigger the family_inferred warning")
-    broad = genes_by_metabolite(
-        metabolite_ids=["kegg.compound:C00719"],            # glycine betaine
-        organism="MED4",
-        evidence_sources=["transport"],
-        limit=5,
-    )
-    print(f"  returned={broad['returned']}  total_matching={broad.get('total_matching')}")
-    print(f"  warnings: {broad.get('warnings', [])}")
-    by_tc = broad.get("by_transport_confidence") or []
-    print(f"  by_transport_confidence: "
-          f"{[(e.get('transport_confidence'), e.get('count')) for e in by_tc]}")
-    print()
-
-    print("Step 2: tighten to transport_confidence='substrate_confirmed'")
-    tight = genes_by_metabolite(
-        metabolite_ids=["kegg.compound:C00719"],
-        organism="MED4",
-        evidence_sources=["transport"],
-        transport_confidence="substrate_confirmed",
-        limit=5,
-    )
-    print(f"  returned={tight['returned']}  total_matching={tight.get('total_matching')}")
-    print(f"  warnings: {tight.get('warnings', [])}")
-    print()
-    print("LESSON: when the warning fires, decide between:")
-    print("  (a) keep all rows but explicitly call out family_inferred-vs-substrate_confirmed,")
-    print("  (b) tighten to substrate_confirmed only (high precision, lower recall),")
-    print("  (c) exclude promiscuous families via tcdb_family_ids (rarely needed).")
-
-
 def scenario_measurement() -> None:
     """Use this when the user asks 'what metabolites were measured under N starvation?'
 
@@ -703,7 +657,6 @@ SCENARIOS: dict[str, Callable[[], None]] = {
     "cross_feeding": scenario_cross_feeding,
     "n_source_de": scenario_n_source_de,
     "tcdb_chain": scenario_tcdb_chain,
-    "precision_tier": scenario_precision_tier,
     "measurement": scenario_measurement,
 }
 
