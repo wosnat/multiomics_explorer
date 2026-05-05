@@ -768,6 +768,16 @@ This mirrors the DM family precedent (split drill-down across `genes_by_numeric_
 
 **Implication for KG asks:** **KG-MET-008** (per-paper processing notes documentation, P3) **stays alive** — it covers this and the wider provenance question. No new ask.
 
+#### 4.3.8 Replicate / temporal axis — RESOLVED (paper/experiment-design-dependent, 2026-05-05)
+
+**Question:** Edges carry `time_point`, `time_point_hours`, `time_point_order` — same axis as expression DE? What's the relationship between metabolomics and expression timepoints?
+
+**Resolution (user 2026-05-05):** Paper-method-dependent. Same `Experiment` node in the KG should imply the same time-axis (assays + expression edges sharing an experiment share their time origin). But actual alignment across measurement modalities depends on experiment design — sometimes samples were collected at the same timepoints, sometimes offset, sometimes at different cadences. Tools shouldn't assume alignment universally.
+
+**Implication for tools:** when surfacing time-correlated cross-omics views (e.g., "metabolite X concentration ↔ gene Y expression at the same timepoint"), tools must filter or join by `experiment_id` first AND surface the timepoint values explicitly so consumers can verify alignment per case. Don't infer cross-omics co-timing from raw `time_point` matching alone.
+
+**Implication for KG asks:** **KG-MET-013** (was: confirm time_point alignment) reframed but stays alive at P2. Now: document per-experiment which timepoints align across omics modalities (i.e., the `Experiment` node could carry a flag or note when cross-omics samples share collection timepoints). Resolves naturally with KG-MET-008 (per-paper processing notes).
+
 #### 4.3.1 + 4.3.6 Surface modelling — Assay IS the DM-on-Metabolite analog — RESOLVED (empirically, 2026-05-04 build-derived)
 
 **Question (§4.3.1):** Is `MetaboliteAssay` the *only* measurement surface, or should there also be `DerivedMetric` nodes attached to `Metabolite` (mirroring `DerivedMetric → Gene` for gene-level summaries)?
@@ -790,27 +800,15 @@ Both sub-questions resolved (§4.2.1 direction, §4.2.2 primary substrate) — s
 
 ### 4.3 Metabolomics measurement source
 
-(§4.3.1 + §4.3.2 + §4.3.3 + §4.3.4 + §4.3.5 + §4.3.6 + §4.3.7 resolved — see §4.0.)
-
-#### 4.3.8 Replicate / temporal axis
-
-**Question:** Edges carry `time_point`, `time_point_hours`, `time_point_order` — same axis as expression DE? What's the relationship between metabolomics and expression timepoints?
-
-**Current state:** schema is symmetric; need empirical check that timepoints align with `Changes_expression_of` timepoints in the same experiments.
-
-**Blocks:** Part 3b.2 (response profile that crosses expression and metabolomics).
+All eight sub-questions resolved (§4.3.1–§4.3.8) — see §4.0.
 
 ### 4.4 Question-to-proposal blocking matrix
 
-Resolved questions live in §4.0 and don't appear here (they don't block anything). Only open questions and what they gate.
-
-| Question | Blocks proposal |
-|---|---|
-| §4.3.8 temporal axis | 3b.2 (DEFER) |
+**All Part 4 sub-questions resolved as of 2026-05-05** — see §4.0. No proposals remain blocked on a Part 4 question. The two DEFERed proposals (3b.2 `metabolite_response_profile`, 3b.4 `differential_metabolite_abundance`) are deferred on **scale**, not on definition.
 
 ### 4.5 Workflow B′ (cross-feeding bridge) — three-confounder synthesis
 
-The cross-feeding bridge (`metabolites_by_gene` → `genes_by_metabolite` across organisms) has three structural confounders that compound; the analysis doc Track A §d caveat lists them as a single table. They are individually addressed in §4.1.4 / §4.2.2 / §4.2.1 above; this section synthesises so the bridge's net unmitigable risk is visible in one place.
+The cross-feeding bridge (`metabolites_by_gene` → `genes_by_metabolite` across organisms) has three structural confounders that compound; the analysis doc Track A §d caveat lists them as a single table. They are individually addressed in §4.0 (resolved entries for §4.1.4, §4.2.1, §4.2.2); this section synthesises so the bridge's net unmitigable risk is visible in one place.
 
 | # | Confounder | Arm | Mitigation today | Status / KG ask |
 |---|---|---|---|---|
