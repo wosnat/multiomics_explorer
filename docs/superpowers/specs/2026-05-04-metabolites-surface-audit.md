@@ -620,19 +620,45 @@ No new tool proposals from the build phase — the existing first-pass surface (
 
 ## Part 4 — Open definition questions
 
-Organised by metabolite-source pipeline. Each question states the issue, names the options where enumerable, and lists the Part 3b proposals it blocks.
+Organised by metabolite-source pipeline. Each question states the issue, names the options where enumerable, and lists the Part 3b proposals it blocks. Resolved questions live in §4.0 (numbered IDs preserved for back-references).
 
-### 4.1 Reaction (KEGG) source
+### 4.0 Resolved (or empirically resolved)
 
-#### 4.1.1 Reaction edge directionality / role — RESOLVED (option c)
+Questions that have been answered during design, build, or walkthrough. Numbered IDs preserved so cross-references in the rest of the doc + skill content + KG asks remain stable.
+
+#### 4.1.1 Reaction edge directionality / role — RESOLVED (option c, 2026-05-04)
 
 **Question:** Does `Reaction_has_metabolite` distinguish substrate from product, or only "involved in"?
 
-**Resolution (2026-05-04, user):** option (c). The KEGG-source annotation direction is unreliable upstream, so propagating it as a `role` property would surface false confidence rather than help. The KG stays undirected; explorer tools must use "involved in" framing as the **permanent** convention, not a transitional one.
+**Resolution:** option (c). The KEGG-source annotation direction is unreliable upstream, so propagating it as a `role` property would surface false confidence rather than help. The KG stays undirected; explorer tools must use "involved in" framing as the **permanent** convention, not a transitional one.
 
 **Implication for tools:** `metabolites_by_gene` and `genes_by_metabolite` row docstrings must say "involved in" (never "produces" / "consumes") for metabolism-arm rows. Analysis doc Track A1 caveat is now permanent. KG-MET-003 retired (see Part 5).
 
-**Blocks:** none — answered.
+#### 4.1.4 Currency-cofactor confounder in metabolism rollups — RESOLVED (workflow-side, 2026-05-05)
+
+**Question:** `top_metabolites` rollup in `metabolites_by_gene` is sorted by gene_count. For cross-feeding (Workflow B′), this is exactly the wrong sort: the highest-reach compounds across any non-trivial gene set are universal cofactors (H2O, ATP/ADP/AMP, Pi, PPi, NAD(P)(H), CO2). The bridge degenerates to "both organisms have water and ATP."
+
+**Resolution:** workflow-side mitigation, no KG ask. The KG should not flag currency cofactors itself — what counts as "currency" is task-dependent (e.g., glutamate/glutamine are central-N currency in N-flux contexts but real signals in nutrient-class contexts). The mitigation is a tool-side post-filter against a minimal-8 blacklist (H2O, CO2, ATP, ADP, AMP, Pi, PPi, NAD(P)(H)), extensible per workflow.
+
+**Implication for tools:** analysis doc Track A §d caveat now lists this as confounder #1 of three for Workflow B′. Example python `examples/metabolites.py::CURRENCY_METABOLITES_MIN8` provides the canonical blacklist constant. No tool API change needed.
+
+**Empirical evidence:** seed PMM0001–PMM0005 (housekeeping) returned top_metabolites = {H2O, PPi, Glu, Gln, ATP, ADP, Pi, DNA, PRPP, dATP} — 7/10 currency or activated cofactors. Replacement biologically-motivated seed (6 N-metabolism genes via `genes_by_ontology(ontology='kegg', term_ids=['kegg.pathway:ko00910'])`) returned {nitrate, ammonia, nitrite, cyanate, Glu, Gln, H+, H2O, ATP, ADP} — minimal-8 blacklist drops 3, leaves 7 N-relevant compounds.
+
+#### 4.3.1 + 4.3.6 Surface modelling — Assay IS the DM-on-Metabolite analog — RESOLVED (empirically, 2026-05-04 build-derived)
+
+**Question (§4.3.1):** Is `MetaboliteAssay` the *only* measurement surface, or should there also be `DerivedMetric` nodes attached to `Metabolite` (mirroring `DerivedMetric → Gene` for gene-level summaries)?
+
+**Same question, tool-surface framing (§4.3.6):** Should DM family extend to Metabolite, or stay Gene-only?
+
+**Resolution:** Empirical evidence from the KG release shifted toward Assay-only. Per Part 1 §1.2, `MetaboliteAssay` already carries the same fields a `DerivedMetric` would (`value_kind`, `metric_type`, `value_max/median/min/q1/q3`, `unit`). The KG modellers appear to have answered §4.3.1 implicitly: **Assay IS the DM-on-Metabolite analog.**
+
+**Implication for tools:** Part 3b.5 (DM-family extension to Metabolite) downgraded to NOT-NEEDED. Direct future metabolite-level summary work onto `MetaboliteAssay`-anchored tools (3b.1, 3b.3) instead.
+
+---
+
+### 4.1 Reaction (KEGG) source
+
+(§4.1.1 + §4.1.4 resolved — see §4.0.)
 
 #### 4.1.2 Reversibility
 
@@ -653,18 +679,6 @@ Organised by metabolite-source pipeline. Each question states the issue, names t
 **Current state:** unclear from schema. Likely 1 reaction × N gene edges. No `complex_id` property visible.
 
 **Blocks:** ortholog-side chemistry rollups (`gene_homologs`, `genes_by_homolog_group`); affects whether group-level coverage is "any member" or weighted.
-
-#### 4.1.4 Currency-cofactor confounder in metabolism rollups — RESOLVED (workflow-side)
-
-**Question:** `top_metabolites` rollup in `metabolites_by_gene` is sorted by gene_count. For cross-feeding (Workflow B′), this is exactly the wrong sort: the highest-reach compounds across any non-trivial gene set are universal cofactors (H2O, ATP/ADP/AMP, Pi, PPi, NAD(P)(H), CO2). The bridge degenerates to "both organisms have water and ATP."
-
-**Resolution (2026-05-05, walkthrough):** workflow-side mitigation, no KG ask. The KG should not flag currency cofactors itself — what counts as "currency" is task-dependent (e.g., glutamate/glutamine are central-N currency in N-flux contexts but real signals in nutrient-class contexts). The mitigation is a tool-side post-filter against a minimal-8 blacklist (H2O, CO2, ATP, ADP, AMP, Pi, PPi, NAD(P)(H)), extensible per workflow.
-
-**Implication for tools:** analysis doc Track A §d caveat now lists this as confounder #1 of three for Workflow B′. Example python `examples/metabolites.py::CURRENCY_METABOLITES_MIN8` provides the canonical blacklist constant. No tool API change needed.
-
-**Empirical evidence (2026-05-05 walkthrough):** seed PMM0001–PMM0005 (housekeeping) returned top_metabolites = {H2O, PPi, Glu, Gln, ATP, ADP, Pi, DNA, PRPP, dATP} — 7/10 currency or activated cofactors. Replacement biologically-motivated seed (6 N-metabolism genes via `genes_by_ontology(ontology='kegg', term_ids=['kegg.pathway:ko00910'])`) returned {nitrate, ammonia, nitrite, cyanate, Glu, Gln, H+, H2O, ATP, ADP} — minimal-8 blacklist drops 3, leaves 7 N-relevant compounds.
-
-**Blocks:** none — answered.
 
 ### 4.2 Transport (TCDB) source
 
@@ -695,15 +709,7 @@ Organised by metabolite-source pipeline. Each question states the issue, names t
 
 ### 4.3 Metabolomics measurement source
 
-#### 4.3.1 Surface modelling — Assay surface vs DM-on-Metabolite vs both
-
-**Question:** The KG already chose `MetaboliteAssay` as a first-class node (Part 1). Is that the *only* measurement surface, or should there also be `DerivedMetric` nodes attached to `Metabolite` (mirroring `DerivedMetric → Gene` for gene-level summaries)?
-
-**Why it matters:** Determines whether the DM-family-extension new tool (Part 3b.5) is the right shape, or whether all metabolite-level summaries flow through the new `MetaboliteAssay`-anchored tools (3b.1-3b.3).
-
-**Empirical note:** `MetaboliteAssay` properties (`value_kind`, `metric_type`, `value_max/median/min/q1/q3`, `unit`) are nearly identical to `DerivedMetric` properties — suggesting the KG modellers may already be treating Assay as a metabolite-targeted DM analog.
-
-**Blocks:** Part 3b.5 (DM-family extension).
+(§4.3.1 + §4.3.6 resolved — see §4.0.)
 
 #### 4.3.2 Fold-change vs other summary statistics
 
@@ -737,12 +743,6 @@ Organised by metabolite-source pipeline. Each question states the issue, names t
 
 **Blocks:** Part 3b.2 (response profile across compartments).
 
-#### 4.3.6 DM family vs Assay surface — which carries metabolite-level summaries
-
-(See §4.3.1 — same question, framed from the tool-surface side.)
-
-**Blocks:** Part 3b.5.
-
 #### 4.3.7 Cross-organism comparability in coculture
 
 **Question:** When a coculture experiment profiles both partners, can a metabolite measurement be attributed to one partner vs the other, or only to the joint medium?
@@ -761,20 +761,20 @@ Organised by metabolite-source pipeline. Each question states the issue, names t
 
 ### 4.4 Question-to-proposal blocking matrix
 
+Resolved questions live in §4.0 and don't appear here (they don't block anything). Only open questions and what they gate.
+
 | Question | Blocks proposal |
 |---|---|
-| §4.1.1 reaction direction | (none in 3b; affects analysis doc honesty) |
-| §4.1.3 multi-subunit | gene_homologs / homolog-group rollups (Part 2) |
-| §4.1.4 currency-cofactor confounder | (none — workflow-side, resolved via minimal-8 blacklist) |
+| §4.1.2 reversibility | (none in 3b; affects "produces" claims in metabolites_by_gene) |
+| §4.1.3 multi-subunit | gene_homologs / homolog-group rollups (Part 2 — but those proposals are now DROPPED per gene-side reframe; question stays open for future ortholog work) |
 | §4.2.1 transport direction | (none in 3b; affects Track A combined §d — confounder #3 of Workflow B′ §4.5) |
 | §4.2.2 primary substrate | (none in 3b; sharpens precision_tier scenario; confounder #2 of Workflow B′ §4.5) |
-| §4.3.1 / §4.3.6 surface modelling | 3b.5 DM-family extension |
-| §4.3.2 FC relevance | 3b.2, 3b.4 |
-| §4.3.3 replicate rollup | 3b.2, 3b.4 |
-| §4.3.4 Quantifies vs Flags | 3b.4 |
-| §4.3.5 compartment semantics | 3b.2 |
-| §4.3.7 coculture attribution | 3b.4 |
-| §4.3.8 temporal axis | 3b.2 |
+| §4.3.2 FC relevance | 3b.2 (DEFER), 3b.4 (DEFER) |
+| §4.3.3 replicate rollup | 3b.2 (DEFER), 3b.4 (DEFER) |
+| §4.3.4 Quantifies vs Flags | 3b.4 (DEFER) |
+| §4.3.5 compartment semantics | 3b.2 (DEFER); also gates `list_metabolites.measured_compartments` sparse-field policy (Part 3a) |
+| §4.3.7 coculture attribution | 3b.4 (DEFER) |
+| §4.3.8 temporal axis | 3b.2 (DEFER) |
 
 ### 4.5 Workflow B′ (cross-feeding bridge) — three-confounder synthesis
 
