@@ -576,9 +576,11 @@ assays_by_metabolite(
 
 DE-shaped tool for metabolite measurements. Inputs: experiment + condition pair; output: per-metabolite log-ratio (or comparable summary) + dispersion + significance.
 
-**Recommendation: Pending-definition.** Blocking Part 4 questions: §4.3.2 (FC vs other statistics), §4.3.3 (replicate rollup), §4.3.4 (Quantifies vs Flags merging), §4.3.5 (within-vs-cross-compartment), §4.3.7 (cross-organism comparability for coculture).
+**Recommendation: DEFER (premature; may never happen).** Blocking Part 4 questions: §4.3.2 (FC vs other statistics), §4.3.3 (replicate rollup), §4.3.4 (Quantifies vs Flags merging), §4.3.5 (within-vs-cross-compartment), §4.3.7 (cross-organism comparability for coculture).
 
-Phase: first-pass.
+**Walkthrough Q&A 2026-05-05:** premature for current scale (10 assays / 92 metabolites measured / 2 papers). The "may never happen" note is empirical: §4.3.2 may resolve that FC is *not* the right summary statistic for metabolomics — the schema already declines to commit to FC and instead carries raw `value` + `value_sd` + `metric_percentile` + `rank_by_metric` (Part 1 §1.5 / Part 4 §4.3.2). If Part 4 §4.3.2 confirms FC is wrong, this tool's natural shape evaporates and the right surface is per-metabolite percentile/rank context (already exposed via the 3b.3 quantifies drill-down). Revisit only if (a) measurement scale grows materially AND (b) Part 4 §4.3.2 + §4.3.4 resolve in favor of a DE-style aggregate.
+
+Phase: deferred.
 
 #### 3b.5 DM-family extension to Metabolite entity
 
@@ -597,7 +599,7 @@ Phase: first-pass.
 | `list_metabolite_assays` | Should-add (P1) | first-pass | — |
 | `metabolite_response_profile` | DEFER (premature at current scale) | deferred | §4.3.2, §4.3.3, §4.3.5; revisit when scale grows |
 | `metabolites_by_quantifies_assay` + `metabolites_by_flags_assay` + `assays_by_metabolite` | Should-add (P1) — split per DM convention; drill-down split by edge type, reverse-lookup merged | first-pass | — |
-| `differential_metabolite_abundance` | Pending-definition | first-pass | §4.3.2, §4.3.3, §4.3.4, §4.3.5, §4.3.7 |
+| `differential_metabolite_abundance` | DEFER (premature; may never happen — depends on §4.3.2 FC-relevance resolution) | deferred | §4.3.2, §4.3.3, §4.3.4, §4.3.5, §4.3.7 |
 | DM-family extension to Metabolite | Pending-definition | first-pass | §4.3.1, §4.3.6 |
 
 Two ship-now (Should-add). Three blocked on Part 4 questions.
@@ -611,7 +613,7 @@ No new tool proposals from the build phase — the existing first-pass surface (
 | `list_metabolite_assays` | **Validated.** Scenario 8 `measurement` had to use `run_cypher` because no native discovery tool exists for assays. Confirms Should-add (P1). |
 | `metabolite_response_profile` | **Pattern validated, but recommendation flipped to DEFER (premature)** at walkthrough Q&A 2026-05-05. Scenario 8 (`measurement`) demonstrates the per-metabolite × compartment aggregation in run_cypher and it is adequate at the current 10-assay / 92-metabolite / 2-paper scale. Add the dedicated tool only when (a) Part 4 questions resolve AND (b) measurement scale grows materially OR `differential_metabolite_abundance` (3b.4) lands and absorbs part of this surface. |
 | `metabolites_by_quantifies_assay` + `metabolites_by_flags_assay` + `assays_by_metabolite` (split per DM convention 2026-05-05) | **Pattern validated; surface refined.** Scenario 8 walks the assay → metabolite path. Walkthrough Q&A 2026-05-05: split drill-down by edge type per DM family precedent (Quantifies edge = 15 fields, Flags edge = 6 fields — 9-field difference makes union row schema heavily sparse). Reverse lookup stays merged with polymorphic `value`/`flag_value`. Should-add stands. |
-| `differential_metabolite_abundance` | **Strengthened pending-definition signal.** Scenario 8's raw values are clearly per-replicate concentrations; FC is not the natural summary. Pending-definition stands. |
+| `differential_metabolite_abundance` | **Flipped to DEFER (premature; may never happen)** at walkthrough Q&A 2026-05-05. Scenario 8's raw values are clearly per-replicate concentrations; FC is not the natural summary. The schema empirically declines FC and the 3b.3 quantifies drill-down already exposes percentile/rank context — if §4.3.2 confirms FC is wrong for metabolomics, this tool's shape evaporates entirely. |
 | DM-family extension to Metabolite | **Empirical evidence shifted toward Assay-only modelling.** Per Part 1 §1.2, `MetaboliteAssay` already carries the same fields a `DerivedMetric` would (value_kind, metric_type, percentiles, etc.). The KG modellers appear to have answered Part 4 §4.3.1 implicitly: Assay IS the DM-on-Metabolite analog. Recommendation: downgrade DM-family extension from Pending-definition to **Not-needed** — direct any metabolite-level summary work onto `MetaboliteAssay`-anchored tools instead. |
 
 ---
