@@ -466,7 +466,7 @@ def scenario_measurement() -> None:
     print("  - Quantifies (concentration) vs Flags (qualitative detection).")
     print("  - Compartment matters — extracellular ≠ whole_cell biology.")
     print("  - Targeted panel — absence in measurement ≠ absence in cell.")
-    print("  - 107 of 3035 metabolites measured; 2 papers; 10 assays (KG release 2026-05-04).")
+    print("  - 107 of 3218 metabolites measured; 2 papers; 10 assays (KG release 2026-05-05).")
 
 
 SCENARIOS: dict[str, Callable[[], None]] = {

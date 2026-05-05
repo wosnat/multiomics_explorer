@@ -11,7 +11,7 @@ This audit accompanies the metabolites assets effort. It quantifies the metaboli
 
 ## Part 1 — KG inventory (quantified)
 
-All counts come from live `run_cypher` queries against the deployed KG (`bolt://localhost:7687`, KG release 2026-05-04). Each query is shown inline so the audit is reproducible.
+All counts come from live `run_cypher` queries against the deployed KG (`bolt://localhost:7687`). Each query is shown inline so the audit is reproducible. **Numbers refreshed 2026-05-05** after the TCDB bug-fix KG rebuild (no schema changes; transport coverage broadened).
 
 ### 1.1 Source-coverage Venn over Metabolite
 
@@ -38,19 +38,20 @@ ORDER BY n DESC;
 
 | Bucket | n | % of total |
 |---|---:|---:|
-| `reaction-only` | 1895 | 62.4% |
-| `transport-only` | 832 | 27.4% |
-| `transport+reaction` | 201 | 6.6% |
-| `transport+reaction+measurement` | 59 | 1.9% |
-| `reaction+measurement` | 33 | 1.1% |
+| `reaction-only` | 1833 | 56.9% |
+| `transport-only` | 1015 | 31.5% |
+| `transport+reaction` | 263 | 8.2% |
+| `transport+reaction+measurement` | 72 | 2.2% |
+| `reaction+measurement` | 20 | 0.6% |
 | `measurement-only` | 10 | 0.3% |
 | `transport+measurement` | 5 | 0.2% |
-| **Total** | **3035** | **100%** |
+| **Total** | **3218** | **100%** |
 
-**Key facts:**
-- **107 metabolites have measurement evidence** (sum of last 4 buckets) — the metabolomics layer is broader than just the 10 measurement-only metabolites. Most measured metabolites also have annotation paths.
+**Key facts (2026-05-05 refresh):**
+- **107 metabolites have measurement evidence** (sum of last 4 buckets) — unchanged in total, but the breakdown shifted toward `transport+reaction+measurement` (was 59, now 72) because the TCDB bug fix exposed transport links for 13 measured metabolites that previously surfaced as `reaction+measurement` only.
 - **97% of measurement-anchored metabolites also have annotation evidence** (97 of 107) — the layers are mostly aligned, not parallel.
-- **Annotation overlap is small:** only 260 of 2188 reaction-anchored metabolites also have transport (12%), suggesting the two annotation pipelines target largely different chemistry.
+- **Annotation overlap grew with the bug fix:** 335 metabolites now have both transport and reaction annotation (was 260) — 12% of reaction-anchored metabolites also have transport (was 12% — same proportion, larger denominator on the transport side).
+- **Net new metabolites:** +183 since 2026-05-04 (3035 → 3218). Most of the new content is transport-only (832 → 1015) and transport+reaction overlap (201 → 263).
 
 The `Metabolite.evidence_sources` list field already encodes the same split as a node-level array; the bucketing above can be reproduced from `m.evidence_sources` directly:
 
@@ -104,10 +105,10 @@ RETURN count(*) AS gene_metabolite_pairs,
 
 | Metric | Value |
 |---|---:|
-| Gene → metabolite pairs (cross product through family) | 347 937 |
-| Distinct genes annotated to ≥1 TCDB family | 6 700 |
-| Distinct TCDB families with substrate links | 404 |
-| Distinct metabolites with transport evidence | 1 097 |
+| Gene → metabolite pairs (cross product through family) | 389 694 |
+| Distinct genes annotated to ≥1 TCDB family | 8 971 |
+| Distinct TCDB families with substrate links | 490 |
+| Distinct metabolites with transport evidence | 1 355 |
 
 ```cypher
 MATCH (g:Gene)-[:Gene_has_tcdb_family]->(f:TcdbFamily)-[:Tcdb_family_transports_metabolite]->(m:Metabolite)
@@ -120,9 +121,18 @@ RETURN min(n_metabolites_per_gene) AS min_m,
 
 | Per-gene metabolite count (transport) | min | median | p90 | max |
 |---|---:|---:|---:|---:|
-| Distinct metabolites per gene | 1 | 6 | 90 | **551** |
+| Distinct metabolites per gene | 1 | 4 | 48 | **992** |
 
-The `max=551` confirms the spec's ABC-superfamily caveat: a single gene can carry hundreds of family-inferred metabolite associations.
+Median dropped (6 → 4) because the bug fix added many narrow-family transport annotations to genes that previously had broad-family-only coverage; max went up (551 → 992) because the broadest ABC family now curates ~440 more substrates than it did pre-fix. The empirical ABC-superfamily caveat is sharper, not weaker.
+
+In MED4 specifically, **12 genes** (was 9) now hit 554 distinct metabolites each via TCDB:
+
+```
+PMM0125, PMM0392, PMM0434, PMM0449, PMM0450, PMM0666,
+PMM0749, PMM0750, PMM0913, PMM0976, PMM0977, PMM0978
+```
+
+The original 9 (PMM0434/0449/0450/0749/0750/0913/0976/0977/0978) are still present; the bug fix added PMM0125, PMM0392, PMM0666 to the same ABC-anchored band.
 
 ```cypher
 MATCH (f:TcdbFamily)
@@ -136,13 +146,13 @@ Top 5 superfamilies by metabolite-link volume:
 
 | Superfamily | n families | total metabolite links |
 |---|---:|---:|
-| `<none>` (no superfamily) | 605 | 7 886 |
-| Major Facilitator (MFS) | 1 123 | 1 501 |
-| ArsA ATPase | 1 053 | 1 298 |
-| Outer Membrane Pore-forming Protein I | 505 | 451 |
-| APC | 265 | 441 |
+| `<none>` (no superfamily) | 5 985 | 10 712 |
+| Major Facilitator (MFS) | 1 325 | 2 461 |
+| ArsA ATPase | 1 059 | 1 855 |
+| APC | 695 | 1 610 |
+| Outer Membrane Pore-forming Protein I | 574 | 636 |
 
-**Observation:** the `<none>`-superfamily families dominate the substrate-link volume because they are typically narrower curations (avg 13 metabolites per family) — but they have no superfamily-level promiscuity flag. Whether they should be treated as substrate_confirmed or family_inferred depends on family member count, which is in `TcdbFamily.member_count` — captured as a Part 5 ask.
+**Observation:** post-bug-fix, the `<none>`-superfamily-family count grew almost 10× (605 → 5 985) — the fix appears to have admitted many more curated TCDB families that lack superfamily assignment. Total link volume in this bucket only ~1.36× (7 886 → 10 712), so most new families are narrow (avg 1.8 metabolites). Whether they should be treated as substrate_confirmed or family_inferred still depends on family member count (KG-MET-006).
 
 ### 1.4 Reaction (KEGG) source
 
@@ -264,13 +274,13 @@ ORDER BY papers DESC;
 |---:|---:|
 | 2 | 8 |
 | 1 | 99 |
-| 0 | 2928 |
+| 0 | 3111 |
 
-The 8 metabolites covered by both papers are the cross-paper anchor set. 99 are paper-specific. 2928 (96%) of all metabolites have no measurement coverage at all (chemistry annotation only).
+The 8 metabolites covered by both papers are the cross-paper anchor set. 99 are paper-specific. 3111 (97%) of all metabolites have no measurement coverage at all (chemistry annotation only). Total measurement-anchored metabolites = 107 (unchanged across the rebuild).
 
 ### 1.6 Summary of Part 1 findings
 
-1. **Three pipelines coexist with mostly-disjoint reach.** 1895 metabolites are reaction-only, 832 transport-only, 107 measurement-anchored. Only 59 metabolites surface across all three.
+1. **Three pipelines coexist with mostly-disjoint reach.** 1833 metabolites are reaction-only, 1015 transport-only, 107 measurement-anchored. Only 72 metabolites surface across all three. (Refreshed 2026-05-05 after the TCDB bug-fix rebuild; transport coverage grew most.)
 2. **The metabolomics layer is rich but small.** 10 assays, 1386 edges, 107 distinct metabolites measured, 2 papers. Edge schemas already carry replicate counts, SD, percentiles, detection status, time point, condition label.
 3. **Several proposed KG asks are already satisfied.** Per-Metabolite/-Publication/-Experiment/-Organism measurement rollups exist (KG-MET-004/005). TCDB family superfamily flag exists (KG-MET-006). Replicate counts exist on edges (KG-MET-001 partial).
 4. **The genuine remaining KG gaps** (confirmed by §1.2 edge inventory and 2026-05-04 user resolution): normalisation-method documentation, a TcdbFamily-level promiscuity score for non-superfamily families, and a few documentation items. The reaction-direction role question is **resolved as a non-ask** — upstream KEGG annotation direction is unreliable, so explorer tools commit to "involved in" framing as a permanent convention. See Part 4 §4.1.1 + Part 5 KG-MET-003 retirement.

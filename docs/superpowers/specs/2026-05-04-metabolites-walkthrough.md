@@ -31,16 +31,16 @@ Each has a docstring stating its trigger, source(s) touched, and caveat surfaced
 | 4 | `cross_feeding` | reaction + transport | Workflow B′: harvest MED4 metabolites → query Alteromonas. Returns 12362 candidate (gene, metabolite) consumer pairs (truncated). Caveat: KG is annotation-only — direction-of-cross-feeding not represented. |
 | 5 | `n_source_de` | reaction + transport → expression | Filter pool to N-bearing chemistry → DE. 4 of 10 pool genes act on N. **Build-derived gotcha:** `differential_expression_by_gene(direction='both')` raises `ValueError` — only `'up'` or `'down'` accepted; omit for both directions. |
 | 6 | `tcdb_chain` | transport | Substrate-anchored route via `genes_by_metabolite(C00719, evidence_sources=['transport'])` finds 9 betaine transporters. Auto-warning fires correctly: all 9 are family_inferred (ABC superfamily). |
-| 7 | `precision_tier` | transport | Same 9-betaine result; tightening to `transport_confidence='substrate_confirmed'` returns 0 — confirms TCDB has no gene-level betaine curation in MED4, only ABC family rollup. The 9 ABC-superfamily-only MED4 genes (PMM0434/0449/0450/0749/0750/0913/0976/0977/0978) are the empirical match for the spec's "9 genes × 551 substrates" reference. |
+| 7 | `precision_tier` | transport | Tightening to `transport_confidence='substrate_confirmed'` returns 0 — confirms TCDB has no gene-level betaine curation in MED4, only ABC family rollup. Post-2026-05-05 rebuild: **12 ABC-superfamily-only MED4 genes** (was 9) at the family-inferred plateau (554 metabolites each): PMM0125, PMM0392, PMM0434, PMM0449, PMM0450, PMM0666, PMM0749, PMM0750, PMM0913, PMM0976, PMM0977, PMM0978. |
 | 8 | `measurement` | metabolomics | `list_experiments(omics_type=['METABOLOMICS'])` returns 8 experiments (singular kwarg name). `run_cypher` walk over `MetaboliteAssay → Metabolite` returns concentration values with `value_sd`, `n_replicates`, `metric_type` — ready to use. Banner notes native tools pending. |
 
 ### 2. Top audit findings
 
 **Part 1 KG inventory** (the empirical baseline):
 
-- 3035 Metabolite nodes total. **107** have measurement evidence (broader than the +10 new-from-2026-05-04 nodes the design assumed). 2928 (96%) are annotation-only.
+- 3218 Metabolite nodes total (refreshed 2026-05-05 post-TCDB-bug-fix; was 3035). **107** have measurement evidence (broader than the +10 new-from-2026-05-04 nodes the design assumed). 3111 (97%) are annotation-only.
 - 2 metabolomics papers (Capovilla 2023 + chitin paper 2023). 10 MetaboliteAssay nodes. 1200 Quantifies edges + 186 Flags edges = 1386 measurement edges. 4 organisms profiled.
-- Transport per-gene: median 6 metabolites, p90 90, max **551** (the ABC-superfamily-only genes).
+- Transport per-gene (2026-05-05 refresh): median 4 metabolites (was 6), p90 48 (was 90), max **992** (was 551). The drop in median + jump in max means the bug fix added many narrow curations AND broadened the ABC superfamily plateau.
 - Reaction edge inventory: `Reaction_has_metabolite` carries `id` only — no `role` property. Confirms KG-MET-003 (reaction direction) gap is real.
 - Assay edges already carry `value`, `value_sd`, `n_replicates`, `metric_percentile`, `metric_bucket`, `rank_by_metric`, `condition_label`, `detection_status`, `time_point` — much richer than the design assumed.
 
@@ -83,7 +83,7 @@ These are observations that emerged from actually writing the analysis doc + exa
 3. **`genes_by_metabolite` row schema is union** — different fields per evidence_source. Documented in audit Part 2 build-derived; affects how the analysis doc + example python format result rows.
 4. **`differential_expression_by_gene` rejects `direction='both'`.** Caught by scenario 5 with `ValueError`. CLAUDE.md's filter description is misleading. P2 documentation/ergonomics fix.
 5. **The DM-family-extension proposal is retired.** Empirical schema evidence shows MetaboliteAssay is already the DM-on-Metabolite analog. Direct future metabolite-summary tools onto Assay-anchored surface, not DerivedMetric → Metabolite.
-6. **The 9 ABC-superfamily-only MED4 genes are confirmed:** PMM0434, PMM0449, PMM0450, PMM0749, PMM0750, PMM0913, PMM0976, PMM0977, PMM0978.
+6. **12 ABC-superfamily-only MED4 genes** (post-2026-05-05 rebuild; was 9 pre-fix): PMM0125, PMM0392, PMM0434, PMM0449, PMM0450, PMM0666, PMM0749, PMM0750, PMM0913, PMM0976, PMM0977, PMM0978. The original 9 are still present; the bug fix added PMM0125, PMM0392, PMM0666 to the same plateau.
 
 ### 4. Recommended next steps (post-walkthrough decisions)
 

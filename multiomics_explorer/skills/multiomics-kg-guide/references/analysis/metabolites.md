@@ -127,7 +127,7 @@ When `genes_by_metabolite` / `metabolites_by_gene` emit the family_inferred-domi
 - **Read** the warning's named family — often ABC superfamily — and decide whether to filter it out (`tcdb_family_ids` exclusion in advanced cases).
 - **Pivot** for a single transporter family: `genes_by_ontology(ontology="tcdb", term_ids=[...])`. (But for substrate-anchored questions — "which genes transport X" — prefer the metabolite-anchored route in §b2.)
 
-Empirical scale (KG release 2026-05-04): per-gene metabolite count via transport — median 6, p90 90, max **551**. The max is the ABC-superfamily-anchored gene; expect this when querying common metabolites against MED4.
+Empirical scale (KG release 2026-05-05 post-TCDB-bug-fix): per-gene metabolite count via transport — median 4, p90 48, max **992**. In MED4 specifically, **12 genes** sit at the ABC-superfamily plateau (554 metabolites each): PMM0125, PMM0392, PMM0434, PMM0449, PMM0450, PMM0666, PMM0749, PMM0750, PMM0913, PMM0976, PMM0977, PMM0978. Expect family_inferred-dominance warnings when querying common metabolites against MED4.
 
 ---
 
@@ -201,7 +201,7 @@ de = differential_expression_by_gene(
 - **No gene anchor.** A metabolite measurement says nothing about which gene produced/consumed it.
 - **`Assay_quantifies` vs `Assay_flags`.** Quantifies = concentration/intensity (with `value`, `value_sd`, `n_replicates`, `metric_percentile`, `rank_by_metric`); Flags = qualitative detection (with `flag_value`, `n_positive`, `n_replicates`). Their downstream interpretation differs.
 - **Compartment matters.** `whole_cell` measures pool; `extracellular` measures excretion / uptake / spent media. Filter by compartment.
-- **Targeted panel ≠ full metabolome.** Absence in measurement ≠ absence in cell. The current KG covers 107 distinct metabolites across 10 assays in 2 papers (Capovilla 2023 and the chitin paper).
+- **Targeted panel ≠ full metabolome.** Absence in measurement ≠ absence in cell. The current KG covers 107 distinct metabolites across 10 assays in 2 papers (Capovilla 2023 and the chitin paper) — out of 3218 metabolites total, so 97% have no measurement coverage.
 - **Replicate / normalisation conventions vary by paper.** Read `value_sd` and `n_replicates` on the edge; the `value` itself is processed per the paper's pipeline (KG-MET-001 documentation is open).
 
 ### Discovery
@@ -216,7 +216,7 @@ pubs = list_publications(search_text="metabolomics")
 # (Audit Part 3a calls these out as P0 measurement-rollup pass-through gaps.)
 ```
 
-Today (2026-05-04) returns 8 experiments + 2 publications:
+Today (2026-05-05) returns 8 experiments + 2 publications:
 - `10.1128/msystems.01261-22` (Capovilla 2023, "Metabolite diversity ..."), 8 assays.
 - `10.1073/pnas.2213271120` (chitin paper 2023), 2 assays.
 
