@@ -1297,7 +1297,7 @@ class TestListMetabolitesContract:
 
     def test_search_populates_score_fields(self, conn):
         """Search mode adds `score` per row + score_max/score_median envelope."""
-        result = api.list_metabolites(search="glucose", conn=conn)
+        result = api.list_metabolites(search_text="glucose", conn=conn)
         assert len(result["results"]) >= 1
         assert "score" in result["results"][0]
         assert result["score_max"] is not None
@@ -1325,7 +1325,7 @@ class TestListMetabolitesContract:
 
     def test_empty_search_raises(self, conn):
         with pytest.raises(ValueError, match="search"):
-            api.list_metabolites(search="   ", conn=conn)
+            api.list_metabolites(search_text="   ", conn=conn)
 
     def test_phase1_per_row_measurement_fields_present(self, conn):
         """Phase 1 §6.6: measurement-rollup pass-through fields are

@@ -2410,8 +2410,12 @@ class TestListMetabolites:
         assert result["not_found"]["pathway_ids"] == []
 
     def test_search_glucose_returns_score(self, conn):
-        """Lucene search by name returns ranked rows with `score` field."""
-        result = api.list_metabolites(search="glucose", conn=conn)
+        """Lucene search by name returns ranked rows with `score` field.
+
+        Phase 2 Item 1: `search` kwarg renamed to `search_text` (the
+        Cypher `$search` param stays unchanged).
+        """
+        result = api.list_metabolites(search_text="glucose", conn=conn)
         assert len(result["results"]) >= 1
         assert "score" in result["results"][0]
 
@@ -2519,3 +2523,169 @@ class TestGenesByMetabolite:
         }
         assert tc_counts == {"substrate_confirmed": 5, "family_inferred": 12}
         assert any("family_inferred" in w for w in model.warnings)
+
+
+# ===========================================================================
+# Phase 2 — KG-integration round-trip cases (frozen spec
+# 2026-05-05-phase2-cross-cutting-renames.md). Stage 1 RED — failing tests.
+# ===========================================================================
+
+
+@pytest.mark.kg
+class TestListMetabolitesPhase2:
+    """Phase 2 Item 3 — exclude_metabolite_ids on list_metabolites."""
+
+    # Currency cofactors per spec §6.3 worked example (kegg.compound IDs).
+    _COFACTORS = [
+        "kegg.compound:C00002",  # ATP
+        "kegg.compound:C00008",  # ADP
+        "kegg.compound:C00004",  # NADH
+        "kegg.compound:C00005",  # NADPH
+        "kegg.compound:C00001",  # H2O
+    ]
+
+    def test_exclude_cofactors_drops_rows(self, conn):
+        """Pass exclude list of 5 currency cofactors; assert their IDs do
+        not appear in any returned row, and total_matching decreases by
+        exactly the count of cofactors known to the KG."""
+        # Baseline (no exclusion) — get total_matching for the unfiltered set.
+        baseline = api.list_metabolites(conn=conn)
+        # With exclusion
+        filtered = api.list_metabolites(
+            exclude_metabolite_ids=self._COFACTORS, conn=conn,
+        )
+        assert filtered["total_matching"] <= baseline["total_matching"]
+        # Reduction is at most len(cofactors) — possibly less if some
+        # cofactor IDs aren't in the KG.
+        reduction = (
+            baseline["total_matching"] - filtered["total_matching"]
+        )
+        assert 0 <= reduction <= len(self._COFACTORS)
+        # Spot-check: no excluded metabolite_id appears in the returned
+        # rows. (Pull a generous sample to make this assertion robust.)
+        rows = api.list_metabolites(
+            exclude_metabolite_ids=self._COFACTORS, limit=200, conn=conn,
+        )["results"]
+        seen_ids = {r["metabolite_id"] for r in rows}
+        for cofactor in self._COFACTORS:
+            assert cofactor not in seen_ids
+
+
+@pytest.mark.kg
+class TestGenesByMetabolitePhase2:
+    """Phase 2 Item 3 — exclude_metabolite_ids on genes_by_metabolite."""
+
+    def test_exclude_metabolite_ids_drops_target(self, conn):
+        """Excluding the only requested metabolite drops the result set
+        to zero rows (set-difference semantics confirmed end-to-end)."""
+        # Baseline: urea × MED4 — a known non-empty result.
+        base = api.genes_by_metabolite(
+            metabolite_ids=["kegg.compound:C00086"],
+            organism="Prochlorococcus MED4",
+            conn=conn,
+        )
+        assert base["total_matching"] > 0
+        # Now exclude the SAME urea ID — set-difference reduces to zero
+        # since the include set is fully removed.
+        excluded = api.genes_by_metabolite(
+            metabolite_ids=["kegg.compound:C00086"],
+            exclude_metabolite_ids=["kegg.compound:C00086"],
+            organism="Prochlorococcus MED4",
+            conn=conn,
+        )
+        assert excluded["total_matching"] == 0
+
+
+@pytest.mark.kg
+class TestMetabolitesByGenePhase2:
+    """Phase 2 Items 2 + 3 on metabolites_by_gene."""
+
+    # Cofactor list per spec §6.3.
+    _COFACTORS = [
+        "kegg.compound:C00002",  # ATP
+        "kegg.compound:C00008",  # ADP
+        "kegg.compound:C00004",  # NADH
+        "kegg.compound:C00005",  # NADPH
+        "kegg.compound:C00001",  # H2O
+    ]
+
+    def test_exclude_metabolite_ids_drops_cofactor_rows(self, conn):
+        """Cofactor exclusion drops rows whose metabolite_id matches."""
+        result = api.metabolites_by_gene(
+            ["PMM0963", "PMM0964", "PMM0965"],
+            "Prochlorococcus MED4",
+            exclude_metabolite_ids=self._COFACTORS,
+            limit=200,
+            conn=conn,
+        )
+        seen_ids = {r["metabolite_id"] for r in result["results"]}
+        for cofactor in self._COFACTORS:
+            assert cofactor not in seen_ids
+
+    def test_top_metabolite_pathways_envelope_round_trip(self, conn):
+        """Phase 2 Item 2: envelope key `top_metabolite_pathways` round-trips
+        through Cypher → API → Pydantic envelope."""
+        from multiomics_explorer.mcp_server.tools import (
+            MetabolitesByGeneResponse,
+        )
+        result = api.metabolites_by_gene(
+            ["PMM0963", "PMM0964", "PMM0965"],
+            "Prochlorococcus MED4",
+            summary=True, conn=conn,
+        )
+        # Envelope key present at the dict level
+        assert "top_metabolite_pathways" in result
+        # Pydantic round-trip succeeds (validates field rename end-to-end)
+        model = MetabolitesByGeneResponse(**result)
+        assert hasattr(model, "top_metabolite_pathways")
+
+
+@pytest.mark.kg
+class TestListMetabolitesPhase2Item2:
+    """Phase 2 Item 2 — top_metabolite_pathways round-trip on list_metabolites."""
+
+    def test_top_metabolite_pathways_envelope_round_trip(self, conn):
+        from multiomics_explorer.mcp_server.tools import (
+            ListMetabolitesResponse,
+        )
+        result = api.list_metabolites(summary=True, conn=conn)
+        assert "top_metabolite_pathways" in result
+        # Pydantic round-trip succeeds (validates field rename end-to-end)
+        model = ListMetabolitesResponse(**result)
+        assert hasattr(model, "top_metabolite_pathways")
+
+
+@pytest.mark.kg
+class TestDifferentialExpressionByGenePhase2:
+    """Phase 2 Item 4 — direction='both' functional equivalence on DE."""
+
+    def test_direction_both_equals_significant_only_none(self, conn):
+        """Spec §6.4 verification: `direction='both'` is functionally
+        equivalent to `direction=None, significant_only=True` on the
+        current 3-status universe (verified live KG 2026-05-05).
+
+        Both forms must return the same `total_matching` on a controlled
+        organism + treatment slice.
+        """
+        kwargs = dict(
+            organism="MED4", summary=True, conn=conn,
+        )
+        both = api.differential_expression_by_gene(
+            **kwargs, direction="both",
+        )
+        none_significant = api.differential_expression_by_gene(
+            **kwargs, direction=None, significant_only=True,
+        )
+        assert both["total_matching"] == none_significant["total_matching"]
+        # Both should be > 0 on the live MED4 dataset.
+        assert both["total_matching"] > 0
+
+    def test_direction_both_returns_only_significant_rows(self, conn):
+        """direction='both' rows are all in {significant_up, significant_down}."""
+        result = api.differential_expression_by_gene(
+            organism="MED4", direction="both", limit=20, conn=conn,
+        )
+        for row in result["results"]:
+            assert row["expression_status"] in (
+                "significant_up", "significant_down"
+            )

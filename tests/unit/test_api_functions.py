@@ -6773,10 +6773,10 @@ class TestListMetabolites:
         "top_organisms": [
             {"organism_name": "Prochlorococcus MED4", "count": 1},
         ],
-        "top_pathways": [
+        "top_metabolite_pathways": [
             {
-                "pathway_id": "kegg.pathway:ko01100",
-                "pathway_name": "Metabolic pathways",
+                "metabolite_pathway_id": "kegg.pathway:ko01100",
+                "metabolite_pathway_name": "Metabolic pathways",
                 "count": 1,
             },
         ],
@@ -6819,7 +6819,8 @@ class TestListMetabolites:
         assert out["total_entries"] == 3025
         assert out["total_matching"] == 1
         assert "top_organisms" in out
-        assert "top_pathways" in out
+        # Phase 2 Item 2 rename: top_pathways → top_metabolite_pathways
+        assert "top_metabolite_pathways" in out
         assert "by_evidence_source" in out
         assert "xref_coverage" in out
         assert "mass_stats" in out
@@ -6847,7 +6848,7 @@ class TestListMetabolites:
             [self._SUMMARY_ROW],
             [self._DETAIL_ROW],
         ]
-        out = list_metabolites(search="glucose*", conn=conn)
+        out = list_metabolites(search_text="glucose*", conn=conn)
         assert out["total_matching"] == 1
         assert conn.execute_query.call_count == 3
 
@@ -6860,9 +6861,9 @@ class TestListMetabolites:
     def test_search_empty_validation(self):
         from multiomics_explorer.api.functions import list_metabolites
         with pytest.raises(ValueError):
-            list_metabolites(search="")
+            list_metabolites(search_text="")
         with pytest.raises(ValueError):
-            list_metabolites(search="   ")
+            list_metabolites(search_text="   ")
 
     def test_organism_names_lowercased(self):
         """organism_names is lowercased before being passed as
@@ -7972,7 +7973,8 @@ class TestMetabolitesByGene:
         "top_reactions": [],
         "top_tcdb_families": [],
         "top_gene_categories": [],
-        "top_pathways": [],
+        # Phase 2 Item 2 rename: top_pathways → top_metabolite_pathways
+        "top_metabolite_pathways": [],
         "by_element": [],
     }
 
@@ -8105,7 +8107,8 @@ class TestMetabolitesByGene:
         assert "top_reactions" in out
         assert "top_tcdb_families" in out
         assert "top_gene_categories" in out
-        assert "top_pathways" in out    # NEW vs GBM
+        # Phase 2 Item 2 rename: top_pathways → top_metabolite_pathways
+        assert "top_metabolite_pathways" in out
         assert "not_found" in out
         assert "not_matched" in out
         assert "warnings" in out
@@ -9538,3 +9541,339 @@ class TestListMetabolitesPhase1Plumbing:
         out = list_metabolites(conn=conn)
         cov = out["by_measurement_coverage"]
         assert "by_compartment" in cov
+
+
+# ===========================================================================
+# Phase 2 — Cross-cutting renames + filter additions (frozen spec
+# 2026-05-05-phase2-cross-cutting-renames.md). Stage 1 RED — failing tests.
+# ===========================================================================
+
+
+class TestListMetabolitesPhase2:
+    """API-layer tests for Phase 2 items 2 and 3 on list_metabolites.
+
+    Item 1 (search → search_text) is exercised structurally by the
+    existing `test_lucene_retry_on_parse_error` and
+    `test_search_empty_validation` tests, which were renamed in place.
+    """
+
+    _SUMMARY_ROW = {
+        "total_entries": 3025,
+        "total_matching": 1,
+        "top_organisms": [],
+        # Phase 2 Item 2: renamed envelope key + per-element keys.
+        "top_metabolite_pathways": [
+            {
+                "metabolite_pathway_id": "kegg.pathway:ko01100",
+                "metabolite_pathway_name": "Metabolic pathways",
+                "count": 1,
+            },
+        ],
+        "by_evidence_source": [{"item": "metabolism", "count": 1}],
+        "with_chebi": 1,
+        "with_hmdb": 0,
+        "with_mnxm": 1,
+        "mass_min": 180.156,
+        "mass_median": 180.156,
+        "mass_max": 180.156,
+    }
+
+    _DETAIL_ROW = {
+        "metabolite_id": "kegg.compound:C00031",
+        "name": "D-Glucose",
+        "formula": "C6H12O6",
+        "elements": ["C", "H", "O"],
+        "mass": 180.156,
+        "gene_count": 320,
+        "organism_count": 31,
+        "transporter_count": 17,
+        "evidence_sources": ["metabolism"],
+        "chebi_id": "4167",
+        "pathway_ids": ["kegg.pathway:ko00010"],
+        "pathway_count": 1,
+    }
+
+    def _mock_conn(self, summary_row, detail_rows):
+        conn = MagicMock()
+        conn.execute_query.side_effect = [[summary_row], detail_rows]
+        return conn
+
+    def test_envelope_top_metabolite_pathways_propagated(self):
+        """Phase 2 Item 2: api passes through renamed envelope rollup."""
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(conn=conn)
+        assert "top_metabolite_pathways" in out
+        assert len(out["top_metabolite_pathways"]) == 1
+        entry = out["top_metabolite_pathways"][0]
+        assert entry["metabolite_pathway_id"] == "kegg.pathway:ko01100"
+        assert entry["metabolite_pathway_name"] == "Metabolic pathways"
+        assert entry["count"] == 1
+
+    def test_exclude_metabolite_ids_passed(self):
+        """Phase 2 Item 3: api forwards exclude_metabolite_ids to builder."""
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        list_metabolites(
+            exclude_metabolite_ids=[
+                "kegg.compound:C00002", "kegg.compound:C00008",
+            ],
+            conn=conn,
+        )
+        # Inspect the summary call (first call) — kwargs should carry
+        # the exclude list through to the builder.
+        summary_call = conn.execute_query.call_args_list[0]
+        kw = summary_call.kwargs
+        # The builder param `exclude_metabolite_ids` is passed as a
+        # Cypher param of the same name — so it appears in execute_query
+        # kwargs.
+        assert kw.get("exclude_metabolite_ids") == [
+            "kegg.compound:C00002", "kegg.compound:C00008",
+        ]
+
+    def test_exclude_metabolite_ids_default_none(self):
+        """Default (no exclude param) → no exclude_metabolite_ids in
+        builder kwargs."""
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        list_metabolites(conn=conn)
+        summary_call = conn.execute_query.call_args_list[0]
+        kw = summary_call.kwargs
+        assert "exclude_metabolite_ids" not in kw
+
+
+class TestGenesByMetabolitePhase2:
+    """API-layer tests for Phase 2 item 3 on genes_by_metabolite."""
+
+    _METS = ["kegg.compound:C00086"]
+    _ORG = "Prochlorococcus MED4"
+
+    _SUMMARY_ROW = {
+        "total_matching": 0,
+        "gene_count_total": 0,
+        "reaction_count_total": 0,
+        "transporter_count_total": 0,
+        "metabolite_count_total": 0,
+        "rows_by_evidence_source": [],
+        "rows_by_transport_confidence": [],
+        "by_metabolite": [],
+        "top_reactions": [],
+        "top_tcdb_families": [],
+        "top_gene_categories": [],
+        "top_genes": [],
+    }
+
+    def _mock_conn(self):
+        """Provide a wide buffer of empty results to satisfy probes."""
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW],
+        ] + [[]] * 10
+        return conn
+
+    def test_exclude_metabolite_ids_passed(self):
+        from multiomics_explorer.api.functions import genes_by_metabolite
+        conn = self._mock_conn()
+        genes_by_metabolite(
+            metabolite_ids=self._METS, organism=self._ORG,
+            exclude_metabolite_ids=["kegg.compound:C00002"],
+            summary=True, conn=conn,
+        )
+        summary_call = conn.execute_query.call_args_list[0]
+        kw = summary_call.kwargs
+        assert kw.get("exclude_metabolite_ids") == ["kegg.compound:C00002"]
+
+    def test_exclude_metabolite_ids_default_none(self):
+        from multiomics_explorer.api.functions import genes_by_metabolite
+        conn = self._mock_conn()
+        genes_by_metabolite(
+            metabolite_ids=self._METS, organism=self._ORG,
+            summary=True, conn=conn,
+        )
+        summary_call = conn.execute_query.call_args_list[0]
+        kw = summary_call.kwargs
+        assert "exclude_metabolite_ids" not in kw
+
+
+class TestMetabolitesByGenePhase2:
+    """API-layer tests for Phase 2 items 2 + 3 on metabolites_by_gene."""
+
+    _LOCUS = ["PMM0963", "PMM0964", "PMM0965"]
+    _ORG = "Prochlorococcus MED4"
+
+    _SUMMARY_ROW = {
+        "total_matching": 0,
+        "gene_count_total": 0,
+        "reaction_count_total": 0,
+        "transporter_count_total": 0,
+        "metabolite_count_total": 0,
+        "rows_by_evidence_source": [],
+        "rows_by_transport_confidence": [],
+        "by_gene": [],
+        "top_metabolites": [],
+        "top_reactions": [],
+        "top_tcdb_families": [],
+        "top_gene_categories": [],
+        # Phase 2 Item 2: renamed envelope key.
+        "top_metabolite_pathways": [
+            {
+                "metabolite_pathway_id": "kegg.pathway:ko00910",
+                "metabolite_pathway_name": "Nitrogen metabolism",
+                "gene_count": 3,
+                "pathway_reaction_count": 23,
+                "pathway_metabolite_count": 35,
+            },
+        ],
+        "by_element": [],
+    }
+
+    def _mock_conn(self):
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW],
+        ] + [[]] * 10
+        return conn
+
+    def test_envelope_top_metabolite_pathways_propagated(self):
+        """Phase 2 Item 2: api passes through renamed envelope rollup."""
+        from multiomics_explorer.api.functions import metabolites_by_gene
+        conn = self._mock_conn()
+        out = metabolites_by_gene(
+            self._LOCUS, self._ORG, summary=True, conn=conn,
+        )
+        assert "top_metabolite_pathways" in out
+        assert len(out["top_metabolite_pathways"]) == 1
+        entry = out["top_metabolite_pathways"][0]
+        assert entry["metabolite_pathway_id"] == "kegg.pathway:ko00910"
+        assert entry["metabolite_pathway_name"] == "Nitrogen metabolism"
+        # Other element keys unchanged
+        assert entry["gene_count"] == 3
+        assert entry["pathway_reaction_count"] == 23
+        assert entry["pathway_metabolite_count"] == 35
+
+    def test_exclude_metabolite_ids_passed(self):
+        from multiomics_explorer.api.functions import metabolites_by_gene
+        conn = self._mock_conn()
+        metabolites_by_gene(
+            self._LOCUS, self._ORG,
+            exclude_metabolite_ids=["kegg.compound:C00002"],
+            summary=True, conn=conn,
+        )
+        summary_call = conn.execute_query.call_args_list[0]
+        kw = summary_call.kwargs
+        assert kw.get("exclude_metabolite_ids") == ["kegg.compound:C00002"]
+
+    def test_exclude_metabolite_ids_default_none(self):
+        from multiomics_explorer.api.functions import metabolites_by_gene
+        conn = self._mock_conn()
+        metabolites_by_gene(
+            self._LOCUS, self._ORG, summary=True, conn=conn,
+        )
+        summary_call = conn.execute_query.call_args_list[0]
+        kw = summary_call.kwargs
+        assert "exclude_metabolite_ids" not in kw
+
+
+class TestDifferentialExpressionByGenePhase2:
+    """API-layer tests for Phase 2 item 4 — direction='both'."""
+
+    def _organism_result(self, orgs=None):
+        if orgs is None:
+            orgs = ["Prochlorococcus MED4"]
+        return [{"organisms": orgs}]
+
+    def _global_summary(self):
+        return [{
+            "total_matching": 6,
+            "matching_genes": 4,
+            "rows_by_status": [
+                {"item": "significant_up", "count": 3},
+                {"item": "significant_down", "count": 3},
+            ],
+            "rows_by_treatment_type": [
+                {"item": "nitrogen_stress", "count": 6},
+            ],
+            "rows_by_background_factors": [],
+            "by_table_scope": [
+                {"item": "all_detected_genes", "count": 6},
+            ],
+            "median_abs_log2fc": 1.5,
+            "max_abs_log2fc": 3.5,
+        }]
+
+    def _experiment_summary(self):
+        return [{
+            "organism_name": "Prochlorococcus MED4",
+            "experiments": [],
+        }]
+
+    def _diagnostics_summary(self):
+        return [{
+            "top_categories": [],
+            "not_found": [],
+            "no_expression": [],
+        }]
+
+    def _detail_rows(self):
+        return [
+            {
+                "locus_tag": "PMM0001", "gene_name": "dnaN",
+                "experiment_id": "exp1", "treatment_type": "nitrogen_stress",
+                "timepoint": "day 18", "timepoint_hours": 432.0,
+                "timepoint_order": 1,
+                "log2fc": 3.5, "padj": 1e-12, "rank": 1,
+                "expression_status": "significant_up",
+            },
+            {
+                "locus_tag": "PMM0002", "gene_name": "rpoA",
+                "experiment_id": "exp1", "treatment_type": "nitrogen_stress",
+                "timepoint": "day 18", "timepoint_hours": 432.0,
+                "timepoint_order": 1,
+                "log2fc": -2.5, "padj": 1e-9, "rank": 2,
+                "expression_status": "significant_down",
+            },
+        ]
+
+    def test_direction_both_accepted(self):
+        """direction='both' must NOT raise; passes validation."""
+        import multiomics_explorer.api.functions as api
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            self._organism_result(),
+            self._global_summary(),
+            self._experiment_summary(),
+            self._diagnostics_summary(),
+            self._detail_rows(),
+        ]
+        # Should not raise on 'both'
+        result = api.differential_expression_by_gene(
+            organism="MED4", direction="both", conn=mock_conn,
+        )
+        assert result["total_matching"] == 6
+
+    def test_direction_both_returns_both_statuses(self):
+        """direction='both' returns both up + down rows."""
+        import multiomics_explorer.api.functions as api
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            self._organism_result(),
+            self._global_summary(),
+            self._experiment_summary(),
+            self._diagnostics_summary(),
+            self._detail_rows(),
+        ]
+        result = api.differential_expression_by_gene(
+            organism="MED4", direction="both", conn=mock_conn,
+        )
+        statuses = {r["expression_status"] for r in result["results"]}
+        assert "significant_up" in statuses
+        assert "significant_down" in statuses
+
+    def test_invalid_direction_still_raises(self):
+        """Invalid direction values still raise even with 'both' support."""
+        import multiomics_explorer.api.functions as api
+        mock_conn = MagicMock()
+        with pytest.raises(ValueError, match="Invalid direction"):
+            api.differential_expression_by_gene(
+                organism="MED4", direction="sideways", conn=mock_conn,
+            )

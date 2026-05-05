@@ -4828,10 +4828,13 @@ _LM_SAMPLE_API_RETURN = {
     "top_organisms": [
         {"organism_name": "Prochlorococcus MED4", "count": 1},
     ],
-    "top_pathways": [
+    # Phase 2 Item 2: rename top_pathways → top_metabolite_pathways and
+    # element keys pathway_id/pathway_name → metabolite_pathway_id/
+    # metabolite_pathway_name.
+    "top_metabolite_pathways": [
         {
-            "pathway_id": "kegg.pathway:ko01100",
-            "pathway_name": "Metabolic pathways",
+            "metabolite_pathway_id": "kegg.pathway:ko01100",
+            "metabolite_pathway_name": "Metabolic pathways",
             "count": 1,
         },
     ],
@@ -4939,8 +4942,14 @@ class TestListMetabolitesWrapper:
 
     @pytest.mark.asyncio
     async def test_envelope_breakdowns_present(self, tool_fns, mock_ctx):
-        """top_organisms, top_pathways, by_evidence_source, xref_coverage,
-        mass_stats are surfaced on the Pydantic envelope."""
+        """top_organisms, top_metabolite_pathways, by_evidence_source,
+        xref_coverage, mass_stats are surfaced on the Pydantic envelope.
+
+        Phase 2 Item 2: envelope key renamed from `top_pathways` to
+        `top_metabolite_pathways`; per-element keys renamed from
+        `pathway_id`/`pathway_name` to `metabolite_pathway_id`/
+        `metabolite_pathway_name`.
+        """
         with patch(
             "multiomics_explorer.api.functions.list_metabolites",
             return_value=self._SAMPLE_API_RETURN,
@@ -4949,9 +4958,15 @@ class TestListMetabolitesWrapper:
         assert len(result.top_organisms) == 1
         assert result.top_organisms[0].organism_name == "Prochlorococcus MED4"
         assert result.top_organisms[0].count == 1
-        assert len(result.top_pathways) == 1
-        assert result.top_pathways[0].pathway_id == "kegg.pathway:ko01100"
-        assert result.top_pathways[0].pathway_name == "Metabolic pathways"
+        assert len(result.top_metabolite_pathways) == 1
+        assert (
+            result.top_metabolite_pathways[0].metabolite_pathway_id
+            == "kegg.pathway:ko01100"
+        )
+        assert (
+            result.top_metabolite_pathways[0].metabolite_pathway_name
+            == "Metabolic pathways"
+        )
         assert len(result.by_evidence_source) == 1
         assert result.by_evidence_source[0].evidence_source == "metabolism"
         assert result.xref_coverage.with_chebi == 1
@@ -4962,14 +4977,17 @@ class TestListMetabolitesWrapper:
 
     @pytest.mark.asyncio
     async def test_params_forwarded(self, tool_fns, mock_ctx):
-        """All filter params flow from MCP wrapper into api.list_metabolites."""
+        """All filter params flow from MCP wrapper into api.list_metabolites.
+
+        Phase 2 Item 1: `search` kwarg renamed to `search_text`.
+        """
         with patch(
             "multiomics_explorer.api.functions.list_metabolites",
             return_value=self._SAMPLE_API_RETURN,
         ) as mock_api:
             await tool_fns["list_metabolites"](
                 mock_ctx,
-                search="glucose",
+                search_text="glucose",
                 metabolite_ids=["kegg.compound:C00031"],
                 kegg_compound_ids=["C00031"],
                 chebi_ids=["4167"],
@@ -4988,7 +5006,7 @@ class TestListMetabolitesWrapper:
             )
         mock_api.assert_called_once()
         kwargs = mock_api.call_args.kwargs
-        assert kwargs["search"] == "glucose"
+        assert kwargs["search_text"] == "glucose"
         assert kwargs["metabolite_ids"] == ["kegg.compound:C00031"]
         assert kwargs["kegg_compound_ids"] == ["C00031"]
         assert kwargs["chebi_ids"] == ["4167"]
@@ -5006,13 +5024,16 @@ class TestListMetabolitesWrapper:
 
     @pytest.mark.asyncio
     async def test_validation_error_raises_tool_error(self, tool_fns, mock_ctx):
-        """ValueError from api.list_metabolites becomes a ToolError."""
+        """ValueError from api.list_metabolites becomes a ToolError.
+
+        Phase 2 Item 1: `search` kwarg renamed to `search_text`.
+        """
         with patch(
             "multiomics_explorer.api.functions.list_metabolites",
             side_effect=ValueError("search must not be empty."),
         ):
             with pytest.raises(ToolError, match="search must not be empty"):
-                await tool_fns["list_metabolites"](mock_ctx, search="")
+                await tool_fns["list_metabolites"](mock_ctx, search_text="")
 
 
 # ---------------------------------------------------------------------------
@@ -5586,10 +5607,13 @@ _MBG_SAMPLE_API_RETURN = {
     "top_gene_categories": [
         {"category": "Amino acid metabolism", "gene_count": 3},
     ],
-    "top_pathways": [
+    # Phase 2 Item 2: rename top_pathways → top_metabolite_pathways and
+    # element keys pathway_id/pathway_name → metabolite_pathway_id/
+    # metabolite_pathway_name. Other element keys unchanged.
+    "top_metabolite_pathways": [
         {
-            "pathway_id": "kegg.pathway:ko00910",
-            "pathway_name": "Nitrogen metabolism",
+            "metabolite_pathway_id": "kegg.pathway:ko00910",
+            "metabolite_pathway_name": "Nitrogen metabolism",
             "gene_count": 3,
             "pathway_reaction_count": 23,
             "pathway_metabolite_count": 35,
@@ -5838,11 +5862,12 @@ class TestMetabolitesByGeneWrapper:
         assert len(result.top_gene_categories) == 1
         assert result.top_gene_categories[0].category == "Amino acid metabolism"
 
-        # NEW MBG: top_pathways rollup
-        assert len(result.top_pathways) == 1
-        p = result.top_pathways[0]
-        assert p.pathway_id == "kegg.pathway:ko00910"
-        assert p.pathway_name == "Nitrogen metabolism"
+        # NEW MBG: top_metabolite_pathways rollup (Phase 2 Item 2: renamed
+        # from top_pathways; per-element keys also renamed).
+        assert len(result.top_metabolite_pathways) == 1
+        p = result.top_metabolite_pathways[0]
+        assert p.metabolite_pathway_id == "kegg.pathway:ko00910"
+        assert p.metabolite_pathway_name == "Nitrogen metabolism"
         assert p.gene_count == 3
         assert p.pathway_reaction_count == 23
         assert p.pathway_metabolite_count == 35
@@ -5979,7 +6004,8 @@ class TestMetabolitesByGeneWrapper:
             "by_element",          # NEW vs GBM
             "top_metabolites", "top_reactions", "top_tcdb_families",
             "top_gene_categories",
-            "top_pathways",        # NEW vs GBM
+            # Phase 2 Item 2: renamed from top_pathways.
+            "top_metabolite_pathways",
             "gene_count_total", "reaction_count_total",
             "transporter_count_total", "metabolite_count_total",
             "results",
@@ -7278,3 +7304,340 @@ class TestListMetabolitesPhase1PlumbingWrapper:
         else:
             assert hasattr(cov, "by_paper_count")
             assert hasattr(cov, "by_compartment")
+
+
+# ===========================================================================
+# Phase 2 — Cross-cutting renames + filter additions (frozen spec
+# 2026-05-05-phase2-cross-cutting-renames.md). Stage 1 RED — failing tests.
+# ===========================================================================
+# Wrapper-layer tests:
+#   - Item 2: Pydantic envelope reflects renamed fields (top_metabolite_pathways
+#     + per-element renames).
+#   - Item 3: exclude_metabolite_ids parameter accepted on 3 wrappers (forwarded
+#     to api).
+#   - Item 4: direction Literal accepts 'both' on the DE wrapper.
+# ===========================================================================
+
+
+class TestListMetabolitesWrapperPhase2:
+    """Phase 2 items 2 + 3 on list_metabolites wrapper."""
+
+    _SAMPLE_API_RETURN = _LM_SAMPLE_API_RETURN
+
+    @pytest.mark.asyncio
+    async def test_top_metabolite_pathways_field(self, tool_fns, mock_ctx):
+        """Phase 2 Item 2: ListMetabolitesResponse parses envelope with
+        the renamed `top_metabolite_pathways` key + per-element renames."""
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["list_metabolites"](mock_ctx)
+        # Renamed envelope field surfaces on the Pydantic model.
+        assert hasattr(result, "top_metabolite_pathways")
+        # Old envelope name no longer exists.
+        assert not hasattr(result, "top_pathways")
+        # Per-element key renames.
+        entry = result.top_metabolite_pathways[0]
+        assert entry.metabolite_pathway_id == "kegg.pathway:ko01100"
+        assert entry.metabolite_pathway_name == "Metabolic pathways"
+        # Other element keys unchanged.
+        assert entry.count == 1
+
+    @pytest.mark.asyncio
+    async def test_exclude_metabolite_ids_param_forwarded(
+        self, tool_fns, mock_ctx,
+    ):
+        """Phase 2 Item 3: wrapper forwards exclude_metabolite_ids to api."""
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["list_metabolites"](
+                mock_ctx,
+                exclude_metabolite_ids=[
+                    "kegg.compound:C00002", "kegg.compound:C00008",
+                ],
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs["exclude_metabolite_ids"] == [
+            "kegg.compound:C00002", "kegg.compound:C00008",
+        ]
+
+    @pytest.mark.asyncio
+    async def test_exclude_metabolite_ids_accepts_none(
+        self, tool_fns, mock_ctx,
+    ):
+        """exclude_metabolite_ids defaults to None (no error, not forwarded
+        as a positional)."""
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["list_metabolites"](mock_ctx)
+        kwargs = mock_api.call_args.kwargs
+        # Default forwarded as None or absent — both acceptable.
+        assert kwargs.get("exclude_metabolite_ids") in (None, [])
+
+    @pytest.mark.asyncio
+    async def test_exclude_metabolite_ids_rejects_non_list(
+        self, tool_fns, mock_ctx,
+    ):
+        """Pydantic validation: rejects non-list input (e.g. a string)."""
+        from fastmcp.exceptions import ToolError
+        # Non-list input should fail at Pydantic-validation stage,
+        # raising ToolError (the FastMCP wrapper converts validation
+        # errors to ToolError).
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            with pytest.raises((ToolError, Exception)):
+                await tool_fns["list_metabolites"](
+                    mock_ctx,
+                    exclude_metabolite_ids="kegg.compound:C00002",
+                )
+
+
+class TestGenesByMetaboliteWrapperPhase2:
+    """Phase 2 item 3 on genes_by_metabolite wrapper."""
+
+    _SAMPLE_API_RETURN = _GBM_SAMPLE_API_RETURN
+
+    @pytest.mark.asyncio
+    async def test_exclude_metabolite_ids_param_forwarded(
+        self, tool_fns, mock_ctx,
+    ):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["genes_by_metabolite"](
+                mock_ctx,
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+                exclude_metabolite_ids=["kegg.compound:C00002"],
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs["exclude_metabolite_ids"] == ["kegg.compound:C00002"]
+
+    @pytest.mark.asyncio
+    async def test_exclude_metabolite_ids_accepts_none(
+        self, tool_fns, mock_ctx,
+    ):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["genes_by_metabolite"](
+                mock_ctx,
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs.get("exclude_metabolite_ids") in (None, [])
+
+    @pytest.mark.asyncio
+    async def test_exclude_metabolite_ids_rejects_non_list(
+        self, tool_fns, mock_ctx,
+    ):
+        from fastmcp.exceptions import ToolError
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            with pytest.raises((ToolError, Exception)):
+                await tool_fns["genes_by_metabolite"](
+                    mock_ctx,
+                    metabolite_ids=["kegg.compound:C00086"],
+                    organism="Prochlorococcus MED4",
+                    exclude_metabolite_ids="kegg.compound:C00002",
+                )
+
+
+class TestMetabolitesByGeneWrapperPhase2:
+    """Phase 2 items 2 + 3 on metabolites_by_gene wrapper."""
+
+    _SAMPLE_API_RETURN = _MBG_SAMPLE_API_RETURN
+
+    @pytest.mark.asyncio
+    async def test_top_metabolite_pathways_field(self, tool_fns, mock_ctx):
+        """Phase 2 Item 2: MetabolitesByGeneResponse parses envelope with
+        the renamed `top_metabolite_pathways` key + per-element renames."""
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["metabolites_by_gene"](
+                mock_ctx,
+                locus_tags=["PMM0963", "PMM0964", "PMM0965"],
+                organism="Prochlorococcus MED4",
+            )
+        assert hasattr(result, "top_metabolite_pathways")
+        assert not hasattr(result, "top_pathways")
+        entry = result.top_metabolite_pathways[0]
+        assert entry.metabolite_pathway_id == "kegg.pathway:ko00910"
+        assert entry.metabolite_pathway_name == "Nitrogen metabolism"
+        # Other element keys unchanged.
+        assert entry.gene_count == 3
+        assert entry.pathway_reaction_count == 23
+        assert entry.pathway_metabolite_count == 35
+
+    @pytest.mark.asyncio
+    async def test_exclude_metabolite_ids_param_forwarded(
+        self, tool_fns, mock_ctx,
+    ):
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["metabolites_by_gene"](
+                mock_ctx,
+                locus_tags=["PMM0963"],
+                organism="Prochlorococcus MED4",
+                exclude_metabolite_ids=["kegg.compound:C00002"],
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs["exclude_metabolite_ids"] == ["kegg.compound:C00002"]
+
+    @pytest.mark.asyncio
+    async def test_exclude_metabolite_ids_accepts_none(
+        self, tool_fns, mock_ctx,
+    ):
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["metabolites_by_gene"](
+                mock_ctx,
+                locus_tags=["PMM0963"],
+                organism="Prochlorococcus MED4",
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs.get("exclude_metabolite_ids") in (None, [])
+
+    @pytest.mark.asyncio
+    async def test_exclude_metabolite_ids_rejects_non_list(
+        self, tool_fns, mock_ctx,
+    ):
+        from fastmcp.exceptions import ToolError
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            with pytest.raises((ToolError, Exception)):
+                await tool_fns["metabolites_by_gene"](
+                    mock_ctx,
+                    locus_tags=["PMM0963"],
+                    organism="Prochlorococcus MED4",
+                    exclude_metabolite_ids="kegg.compound:C00002",
+                )
+
+
+class TestDifferentialExpressionByGeneWrapperPhase2:
+    """Phase 2 item 4 on differential_expression_by_gene wrapper.
+
+    Expand the `direction` Literal from `Literal["up", "down"] | None`
+    to `Literal["up", "down", "both"] | None`.
+    """
+
+    _SAMPLE_API_RETURN = {
+        "organism_name": "Prochlorococcus MED4",
+        "matching_genes": 4,
+        "total_matching": 6,
+        "rows_by_status": {
+            "significant_up": 3,
+            "significant_down": 3,
+            "not_significant": 0,
+        },
+        "median_abs_log2fc": 1.5,
+        "max_abs_log2fc": 3.5,
+        "experiment_count": 1,
+        "rows_by_treatment_type": {"nitrogen_stress": 6},
+        "rows_by_background_factors": {},
+        "by_table_scope": {"all_detected_genes": 6},
+        "top_categories": [],
+        "experiments": [],
+        "not_found": [],
+        "no_expression": [],
+        "returned": 0,
+        "truncated": True,
+        "results": [],
+    }
+
+    @pytest.mark.asyncio
+    async def test_direction_both_accepted(self, tool_fns, mock_ctx):
+        """direction='both' is accepted by Pydantic Literal validation."""
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            result = await tool_fns["differential_expression_by_gene"](
+                mock_ctx, organism="MED4", direction="both",
+            )
+        # direction='both' must reach the api layer
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs.get("direction") == "both"
+        # Response model still builds
+        assert result.organism_name == "Prochlorococcus MED4"
+
+    def test_direction_literal_includes_both(self, tool_fns):
+        """The wrapper signature's `direction` Literal includes 'both'.
+
+        Inspects the FastMCP-registered function annotation: the Literal
+        for the `direction` param must contain {'up', 'down', 'both'}
+        after Phase 2 Item 4 lands. (Direct call-time Pydantic
+        validation isn't reliably enforced through tool_fns dispatch,
+        so we pin the signature itself.)
+        """
+        import typing
+        fn = tool_fns["differential_expression_by_gene"]
+        hints = typing.get_type_hints(fn, include_extras=True)
+        direction_hint = hints.get("direction")
+        assert direction_hint is not None
+        # Walk the Annotated wrapper to extract the Literal args.
+        # `direction_hint` looks like Annotated[Literal[...] | None, Field(...)].
+        origin = typing.get_origin(direction_hint)
+        # Strip Annotated/Union; collect Literal arg sets.
+        def _literal_values(tp):
+            o = typing.get_origin(tp)
+            if o is typing.Literal:
+                return set(typing.get_args(tp))
+            vals: set = set()
+            for arg in typing.get_args(tp):
+                vals.update(_literal_values(arg))
+            return vals
+        literal_vals = _literal_values(direction_hint)
+        # Phase 2 Item 4: 'both' must be one of the accepted values.
+        assert "both" in literal_vals
+        # Existing values still present (no regression).
+        assert "up" in literal_vals
+        assert "down" in literal_vals
+        # 'invalid' is NOT a Literal value.
+        assert "invalid" not in literal_vals
+
+    @pytest.mark.asyncio
+    async def test_direction_up_still_accepted(self, tool_fns, mock_ctx):
+        """Existing 'up' value still accepted (no regression)."""
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["differential_expression_by_gene"](
+                mock_ctx, organism="MED4", direction="up",
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs.get("direction") == "up"
+
+    @pytest.mark.asyncio
+    async def test_direction_down_still_accepted(self, tool_fns, mock_ctx):
+        """Existing 'down' value still accepted (no regression)."""
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["differential_expression_by_gene"](
+                mock_ctx, organism="MED4", direction="down",
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs.get("direction") == "down"

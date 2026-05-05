@@ -8651,3 +8651,461 @@ class TestBuildListEvidenceSources:
         cypher, _ = build_list_evidence_sources()
         assert "Metabolite" in cypher
         assert "evidence_sources" in cypher
+
+
+# ===========================================================================
+# Phase 2 — Cross-cutting renames + filter additions (frozen spec
+# 2026-05-05-phase2-cross-cutting-renames.md). Stage 1 RED — failing tests.
+# ===========================================================================
+# 4 items:
+#   1. list_metabolites: rename `search` Python kwarg → `search_text`
+#      (Cypher param `$search` stays — internal fulltext-index arg).
+#   2. list_metabolites + metabolites_by_gene: rename envelope
+#      `top_pathways` → `top_metabolite_pathways`; per-element keys
+#      `pathway_id`/`pathway_name` → `metabolite_pathway_id`/
+#      `metabolite_pathway_name`. Other element keys unchanged.
+#   3. list_metabolites + genes_by_metabolite + metabolites_by_gene:
+#      add `exclude_metabolite_ids: list[str] | None = None` filter.
+#      Cypher fragment: `(NOT (m.id IN $exclude_metabolite_ids))` —
+#      parens are LOAD-BEARING (CyVer false-positive on unparenthesized
+#      form when combined with another `IN` clause; spec §6.3 verified
+#      against live KG 2026-05-05).
+#   4. differential_expression_by_gene: add `direction='both'` branch
+#      emitting `r.expression_status IN ['significant_up',
+#      'significant_down']`.
+# ===========================================================================
+
+
+# --- Item 1 — search_text rename on list_metabolites detail builder ---
+
+
+class TestBuildListMetabolitesPhase2SearchText:
+    """Phase 2 Item 1 — `search` Python kwarg renames to `search_text`.
+
+    The Cypher param name `$search` (passed to
+    `db.index.fulltext.queryNodes('metaboliteFullText', $search)`) is
+    internal and stays unchanged — only the Python kwarg renames.
+    """
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolites
+        return build_list_metabolites(**kwargs)
+
+    def test_search_text_param_threads(self):
+        """Builder accepts `search_text=` kwarg and produces fulltext Cypher."""
+        cypher, params = self._build(search_text="glucose")
+        # Fulltext-index entrypoint preserved
+        assert "metaboliteFullText" in cypher
+        assert "YIELD node AS m, score" in cypher
+        # Internal Cypher param name `$search` stays unchanged
+        assert "$search" in cypher
+        # Param value flows under the same Cypher key
+        assert params["search"] == "glucose"
+
+    def test_search_text_kwarg_only(self):
+        """The old `search=` kwarg is gone — TypeError on unexpected kwarg."""
+        with pytest.raises(TypeError):
+            self._build(search="glucose")
+
+
+class TestBuildListMetabolitesSummaryPhase2SearchText:
+    """Phase 2 Item 1 — same rename on the summary builder."""
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_list_metabolites_summary,
+        )
+        return build_list_metabolites_summary(**kwargs)
+
+    def test_search_text_param_threads(self):
+        cypher, params = self._build(search_text="glucose")
+        assert "metaboliteFullText" in cypher
+        assert "$search" in cypher
+        assert params["search"] == "glucose"
+
+
+# --- Item 2 — top_metabolite_pathways rename ---
+
+
+class TestBuildListMetabolitesSummaryPhase2TopMetabolitePathways:
+    """Phase 2 Item 2 — RETURN aliases rename for list_metabolites summary.
+
+    Spec §6.2: rename envelope key `top_pathways` →
+    `top_metabolite_pathways`; rename per-element keys `pathway_id` /
+    `pathway_name` → `metabolite_pathway_id` / `metabolite_pathway_name`.
+    Other element keys (`count`) unchanged.
+    """
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_list_metabolites_summary,
+        )
+        return build_list_metabolites_summary(**kwargs)
+
+    def test_top_metabolite_pathways_alias(self):
+        """RETURN aliases use the renamed envelope key + element keys."""
+        cypher, _ = self._build()
+        assert "top_metabolite_pathways" in cypher
+        assert "metabolite_pathway_id" in cypher
+        assert "metabolite_pathway_name" in cypher
+
+    def test_old_aliases_absent(self):
+        """Old `top_pathways` envelope alias and `pathway_id`/`pathway_name`
+        per-element aliases must not appear in the renamed Cypher."""
+        cypher, _ = self._build()
+        # Pin the absence of the old element-key aliases (`AS pathway_id`,
+        # `AS pathway_name`). A bare `pathway_id` substring would over-match
+        # legitimate property reads on the metabolite (e.g. `m.pathway_ids`).
+        assert "AS pathway_id" not in cypher
+        assert "AS pathway_name" not in cypher
+        # Old envelope-list alias absent.
+        assert "AS top_pathways" not in cypher
+
+    def test_top_metabolite_pathways_alias_with_search(self):
+        """Search variant of the summary builder also emits the renamed
+        aliases (search and non-search variants must agree per spec §6.2
+        files-touched table)."""
+        cypher, _ = self._build(search_text="glucose")
+        assert "top_metabolite_pathways" in cypher
+        assert "metabolite_pathway_id" in cypher
+        assert "metabolite_pathway_name" in cypher
+
+
+class TestBuildMetabolitesByGeneSummaryPhase2TopMetabolitePathways:
+    """Phase 2 Item 2 — same rename for metabolites_by_gene summary."""
+
+    _LOCUS = ["PMM0963", "PMM0964", "PMM0965"]
+    _ORG = "Prochlorococcus MED4"
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolites_by_gene_summary,
+        )
+        kwargs.setdefault("locus_tags", self._LOCUS)
+        kwargs.setdefault("organism", self._ORG)
+        return build_metabolites_by_gene_summary(**kwargs)
+
+    def test_top_metabolite_pathways_alias(self):
+        cypher, _ = self._build()
+        assert "top_metabolite_pathways" in cypher
+        assert "metabolite_pathway_id" in cypher
+        assert "metabolite_pathway_name" in cypher
+
+    def test_old_aliases_absent(self):
+        cypher, _ = self._build()
+        assert "AS pathway_id" not in cypher
+        assert "AS pathway_name" not in cypher
+        assert "AS top_pathways" not in cypher
+
+
+# --- Item 3 — exclude_metabolite_ids filter (3 tools, 5 WHERE helpers) ---
+
+
+class TestBuildListMetabolitesPhase2ExcludeMetaboliteIds:
+    """Phase 2 Item 3 — exclude_metabolite_ids filter on detail builder.
+
+    Cypher pattern: `(NOT (m.id IN $exclude_metabolite_ids))`. Parens
+    are LOAD-BEARING per spec §6.3 (CyVer false-positive on
+    unparenthesized form when combined with another `IN` clause).
+    """
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolites
+        return build_list_metabolites(**kwargs)
+
+    def test_exclude_metabolite_ids_filter(self):
+        cypher, params = self._build(
+            exclude_metabolite_ids=[
+                "kegg.compound:C00002", "kegg.compound:C00008",
+            ]
+        )
+        assert "(NOT (m.id IN $exclude_metabolite_ids))" in cypher
+        assert params["exclude_metabolite_ids"] == [
+            "kegg.compound:C00002", "kegg.compound:C00008",
+        ]
+
+    def test_exclude_combined_with_include(self):
+        """Both `metabolite_ids` (include) and `exclude_metabolite_ids`
+        (exclude) clauses appear AND-joined per set-difference semantics."""
+        cypher, params = self._build(
+            metabolite_ids=["kegg.compound:C00031"],
+            exclude_metabolite_ids=["kegg.compound:C00002"],
+        )
+        assert "m.id IN $metabolite_ids" in cypher
+        assert "(NOT (m.id IN $exclude_metabolite_ids))" in cypher
+        assert " AND " in cypher
+        assert params["metabolite_ids"] == ["kegg.compound:C00031"]
+        assert params["exclude_metabolite_ids"] == ["kegg.compound:C00002"]
+
+    def test_exclude_none_no_filter(self):
+        """Default (no exclude) produces no `exclude_metabolite_ids` clause."""
+        cypher, params = self._build()
+        assert "exclude_metabolite_ids" not in cypher
+        assert "exclude_metabolite_ids" not in params
+
+    def test_exclude_empty_list_no_filter(self):
+        """Empty list is treated as None (no-op) per spec §6.3 truthy check."""
+        cypher, params = self._build(exclude_metabolite_ids=[])
+        assert "exclude_metabolite_ids" not in cypher
+        assert "exclude_metabolite_ids" not in params
+
+
+class TestBuildListMetabolitesSummaryPhase2ExcludeMetaboliteIds:
+    """Phase 2 Item 3 — same filter on the summary builder."""
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_list_metabolites_summary,
+        )
+        return build_list_metabolites_summary(**kwargs)
+
+    def test_exclude_metabolite_ids_filter(self):
+        cypher, params = self._build(
+            exclude_metabolite_ids=["kegg.compound:C00002"]
+        )
+        assert "(NOT (m.id IN $exclude_metabolite_ids))" in cypher
+        assert params["exclude_metabolite_ids"] == ["kegg.compound:C00002"]
+
+    def test_exclude_combined_with_include(self):
+        cypher, params = self._build(
+            metabolite_ids=["kegg.compound:C00031"],
+            exclude_metabolite_ids=["kegg.compound:C00002"],
+        )
+        assert "m.id IN $metabolite_ids" in cypher
+        assert "(NOT (m.id IN $exclude_metabolite_ids))" in cypher
+        assert " AND " in cypher
+
+
+class TestBuildGenesByMetaboliteMetabolismPhase2ExcludeMetaboliteIds:
+    """Phase 2 Item 3 — exclude on the metabolism arm WHERE helper of
+    genes_by_metabolite. Per-arm scope: exclude applies on BOTH arms."""
+
+    _METS = ["kegg.compound:C00086"]
+    _ORG = "Prochlorococcus MED4"
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_metabolism,
+        )
+        kwargs.setdefault("metabolite_ids", self._METS)
+        kwargs.setdefault("organism", self._ORG)
+        return build_genes_by_metabolite_metabolism(**kwargs)
+
+    def test_exclude_metabolite_ids_filter(self):
+        cypher, params = self._build(
+            exclude_metabolite_ids=["kegg.compound:C00002"]
+        )
+        assert "(NOT (m.id IN $exclude_metabolite_ids))" in cypher
+        assert params["exclude_metabolite_ids"] == ["kegg.compound:C00002"]
+
+    def test_exclude_combined_with_include(self):
+        cypher, params = self._build(
+            metabolite_ids=["kegg.compound:C00086", "kegg.compound:C00031"],
+            exclude_metabolite_ids=["kegg.compound:C00002"],
+        )
+        assert "m.id IN $metabolite_ids" in cypher
+        assert "(NOT (m.id IN $exclude_metabolite_ids))" in cypher
+
+
+class TestBuildGenesByMetaboliteTransportPhase2ExcludeMetaboliteIds:
+    """Phase 2 Item 3 — exclude on the transport arm WHERE helper."""
+
+    _METS = ["kegg.compound:C00086"]
+    _ORG = "Prochlorococcus MED4"
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_transport,
+        )
+        kwargs.setdefault("metabolite_ids", self._METS)
+        kwargs.setdefault("organism", self._ORG)
+        return build_genes_by_metabolite_transport(**kwargs)
+
+    def test_exclude_metabolite_ids_filter(self):
+        cypher, params = self._build(
+            exclude_metabolite_ids=["kegg.compound:C00002"]
+        )
+        assert "(NOT (m.id IN $exclude_metabolite_ids))" in cypher
+        assert params["exclude_metabolite_ids"] == ["kegg.compound:C00002"]
+
+    def test_exclude_combined_with_include(self):
+        cypher, params = self._build(
+            metabolite_ids=["kegg.compound:C00086"],
+            exclude_metabolite_ids=["kegg.compound:C00002"],
+        )
+        assert "m.id IN $metabolite_ids" in cypher
+        assert "(NOT (m.id IN $exclude_metabolite_ids))" in cypher
+
+
+class TestBuildGenesByMetaboliteSummaryPhase2ExcludeMetaboliteIds:
+    """Phase 2 Item 3 — exclude on the summary (UNION) builder. The exclude
+    clause must appear (in both UNION arms — verified via param presence)."""
+
+    _METS = ["kegg.compound:C00086"]
+    _ORG = "Prochlorococcus MED4"
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_summary,
+        )
+        kwargs.setdefault("metabolite_ids", self._METS)
+        kwargs.setdefault("organism", self._ORG)
+        return build_genes_by_metabolite_summary(**kwargs)
+
+    def test_exclude_metabolite_ids_filter(self):
+        cypher, params = self._build(
+            exclude_metabolite_ids=["kegg.compound:C00002"]
+        )
+        assert "(NOT (m.id IN $exclude_metabolite_ids))" in cypher
+        assert params["exclude_metabolite_ids"] == ["kegg.compound:C00002"]
+
+    def test_exclude_appears_in_both_union_arms(self):
+        """Per-arm scope: exclude applies on BOTH metabolism + transport arms.
+        Since the summary builder UNIONs both, the exclude clause should
+        appear at least twice in the generated Cypher (once per arm)."""
+        cypher, _ = self._build(
+            exclude_metabolite_ids=["kegg.compound:C00002"]
+        )
+        assert (
+            cypher.count("(NOT (m.id IN $exclude_metabolite_ids))") >= 2
+        )
+
+
+class TestBuildMetabolitesByGeneMetabolismPhase2ExcludeMetaboliteIds:
+    """Phase 2 Item 3 — exclude on the metabolism arm of metabolites_by_gene."""
+
+    _LOCUS = ["PMM0963", "PMM0964", "PMM0965"]
+    _ORG = "Prochlorococcus MED4"
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolites_by_gene_metabolism,
+        )
+        kwargs.setdefault("locus_tags", self._LOCUS)
+        kwargs.setdefault("organism", self._ORG)
+        return build_metabolites_by_gene_metabolism(**kwargs)
+
+    def test_exclude_metabolite_ids_filter(self):
+        cypher, params = self._build(
+            exclude_metabolite_ids=["kegg.compound:C00002"]
+        )
+        assert "(NOT (m.id IN $exclude_metabolite_ids))" in cypher
+        assert params["exclude_metabolite_ids"] == ["kegg.compound:C00002"]
+
+    def test_exclude_combined_with_include(self):
+        cypher, params = self._build(
+            metabolite_ids=["kegg.compound:C00086"],
+            exclude_metabolite_ids=["kegg.compound:C00002"],
+        )
+        assert "m.id IN $metabolite_ids" in cypher
+        assert "(NOT (m.id IN $exclude_metabolite_ids))" in cypher
+
+
+class TestBuildMetabolitesByGeneTransportPhase2ExcludeMetaboliteIds:
+    """Phase 2 Item 3 — exclude on the transport arm of metabolites_by_gene."""
+
+    _LOCUS = ["PMM0963", "PMM0964", "PMM0965"]
+    _ORG = "Prochlorococcus MED4"
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolites_by_gene_transport,
+        )
+        kwargs.setdefault("locus_tags", self._LOCUS)
+        kwargs.setdefault("organism", self._ORG)
+        return build_metabolites_by_gene_transport(**kwargs)
+
+    def test_exclude_metabolite_ids_filter(self):
+        cypher, params = self._build(
+            exclude_metabolite_ids=["kegg.compound:C00002"]
+        )
+        assert "(NOT (m.id IN $exclude_metabolite_ids))" in cypher
+        assert params["exclude_metabolite_ids"] == ["kegg.compound:C00002"]
+
+    def test_exclude_combined_with_include(self):
+        cypher, params = self._build(
+            metabolite_ids=["kegg.compound:C00086"],
+            exclude_metabolite_ids=["kegg.compound:C00002"],
+        )
+        assert "m.id IN $metabolite_ids" in cypher
+        assert "(NOT (m.id IN $exclude_metabolite_ids))" in cypher
+
+
+class TestBuildMetabolitesByGeneSummaryPhase2ExcludeMetaboliteIds:
+    """Phase 2 Item 3 — exclude on the summary builder of metabolites_by_gene
+    (UNION across both arms)."""
+
+    _LOCUS = ["PMM0963", "PMM0964", "PMM0965"]
+    _ORG = "Prochlorococcus MED4"
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolites_by_gene_summary,
+        )
+        kwargs.setdefault("locus_tags", self._LOCUS)
+        kwargs.setdefault("organism", self._ORG)
+        return build_metabolites_by_gene_summary(**kwargs)
+
+    def test_exclude_metabolite_ids_filter(self):
+        cypher, params = self._build(
+            exclude_metabolite_ids=["kegg.compound:C00002"]
+        )
+        assert "(NOT (m.id IN $exclude_metabolite_ids))" in cypher
+        assert params["exclude_metabolite_ids"] == ["kegg.compound:C00002"]
+
+    def test_exclude_appears_in_both_union_arms(self):
+        cypher, _ = self._build(
+            exclude_metabolite_ids=["kegg.compound:C00002"]
+        )
+        assert (
+            cypher.count("(NOT (m.id IN $exclude_metabolite_ids))") >= 2
+        )
+
+
+# --- Item 4 — direction='both' branch on differential_expression_by_gene ---
+
+
+class TestBuildDifferentialExpressionByGenePhase2DirectionBoth:
+    """Phase 2 Item 4 — `direction='both'` emits IN-list Cypher.
+
+    Spec §6.4: `r.expression_status IN ['significant_up',
+    'significant_down']` — explicit positive form (robust to future
+    status-vocabulary additions, vs. `<> 'not_significant'`).
+    Functionally equivalent to `direction=None, significant_only=True`
+    on the current 3-status universe (verified live KG 2026-05-05:
+    51169 rows in both forms).
+    """
+
+    def test_direction_both_filter(self):
+        cypher, _ = build_differential_expression_by_gene(direction="both")
+        assert (
+            "r.expression_status IN ['significant_up', 'significant_down']"
+            in cypher
+        )
+
+    def test_direction_both_no_single_status_clause(self):
+        """direction='both' must NOT emit a single-status equality clause
+        (= 'significant_up' or = 'significant_down') — only the IN-list."""
+        cypher, _ = build_differential_expression_by_gene(direction="both")
+        # The new branch supersedes the up/down branches when
+        # direction='both' — neither single-status clause should appear.
+        assert "r.expression_status = 'significant_up'" not in cypher
+        assert "r.expression_status = 'significant_down'" not in cypher
+
+    def test_direction_up_unchanged(self):
+        """Existing direction='up' branch is unchanged."""
+        cypher, _ = build_differential_expression_by_gene(direction="up")
+        assert "r.expression_status = 'significant_up'" in cypher
+        assert (
+            "r.expression_status IN ['significant_up', 'significant_down']"
+            not in cypher
+        )
+
+    def test_direction_down_unchanged(self):
+        """Existing direction='down' branch is unchanged."""
+        cypher, _ = build_differential_expression_by_gene(direction="down")
+        assert "r.expression_status = 'significant_down'" in cypher
+        assert (
+            "r.expression_status IN ['significant_up', 'significant_down']"
+            not in cypher
+        )
