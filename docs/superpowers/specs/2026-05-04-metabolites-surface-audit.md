@@ -788,6 +788,8 @@ This mirrors the DM family precedent (split drill-down across `genes_by_numeric_
 
 **Implication for tools:** Part 3b.5 (DM-family extension to Metabolite) downgraded to NOT-NEEDED. Direct future metabolite-level summary work onto `MetaboliteAssay`-anchored tools (3b.1, 3b.3) instead.
 
+**Implication for KG asks:** KG-MET-012 RETIRED 2026-05-05. The decision the ask requested is implicitly answered (Assay-only), and the only remaining downstream consumer (3b.5) is NOT-NEEDED — no consumer remains. See Part 5.
+
 ---
 
 ### 4.1 Reaction (KEGG) source
@@ -814,11 +816,11 @@ The cross-feeding bridge (`metabolites_by_gene` → `genes_by_metabolite` across
 |---|---|---|---|---|
 | 1 | Currency-cofactor flooding (top_metabolites sorted by gene_count) | metabolism | Workflow-side: post-filter against minimal-8 blacklist (`examples/metabolites.py::CURRENCY_METABOLITES_MIN8`) | §4.1.4 — RESOLVED workflow-side |
 | 2 | Family-level transport casts a wide net (ABC superfamily → ~554 metabolites/gene). Both tiers are annotations, not ground truth — transporter specificity is often promiscuous or under-characterized in nature. The gap between `substrate_confirmed` and `family_inferred` is more about curation effort than biological certainty. | transport | Filter call is question-shape-dependent: cross-feeding *inferences* (this workflow) → use `substrate_confirmed` for the conservative cast (~87% narrower; missing real family-level promiscuity is the lesser risk). Broad-screen *candidate* questions (e.g. `n_source_de`) → no filter; family_inferred captures the real N-uptake biology (PMM0263 amt1, PMM0628 gltS) that substrate_confirmed silently excludes. | §4.2.2 — sharpened by KG-MET-006 (is_promiscuous flag, P2) |
-| 3 | Transport polarity not encoded | transport | None — surface as "compatible with cross-feeding", never confirmed | §4.2.1 — KG-MET-011 P2 (transport direction) |
+| 3 | Transport polarity not encoded | transport | None — surface as "compatible with cross-feeding", never confirmed | §4.2.1 — KG-MET-011 RETIRED (TCDB upstream lacks direction; heuristic + curation alternatives rejected). Permanent constraint. |
 
-**Net for Workflow B′:** confounders #1 and #2 are fully mitigable workflow-side today (no KG dependency); #3 is unmitigable and forces the "compatible with" framing regardless of filter aggressiveness. Track-B measurement layer can corroborate but not confirm causality — see analysis doc Track B §a.
+**Net for Workflow B′:** confounders #1 and #2 are fully mitigable workflow-side today (no KG dependency). #3 is permanently unmitigable — TCDB doesn't carry direction, heuristic alternatives were rejected, and KG-MET-011 is retired. The bridge therefore stays "compatible with cross-feeding" regardless of filter aggressiveness. Track-B measurement layer can corroborate but not confirm causality — see analysis doc Track B §a.
 
-**Empirical validation (2026-05-05):** the canonical example (`examples/metabolites.py --scenario cross_feeding`) uses 6 MED4 N-metabolism genes (cyn cluster + glnA + glsF) seeded via `genes_by_ontology(ontology='kegg', term_ids=['kegg.pathway:ko00910'])` and returns interpretable cross-feeding candidates: ALT CmpA/NrtA-family nitrate ABC transporters across 5 strains for the transport arm, ammonia-involved enzymes (5-oxoprolinase, hydroxymethylbilane synthase) for the metabolism arm. With all three mitigations applied, the bridge produces a non-trivial answer.
+**Empirical validation (2026-05-05):** the canonical example (`examples/metabolites.py --scenario cross_feeding`) uses 6 MED4 N-metabolism genes (cyn cluster + glnA + glsF) seeded via `genes_by_ontology(ontology='kegg', term_ids=['kegg.pathway:ko00910'])` and returns interpretable cross-feeding candidates: ALT CmpA/NrtA-family nitrate ABC transporters across 5 strains for the transport arm, ammonia-involved enzymes (5-oxoprolinase, hydroxymethylbilane synthase) for the metabolism arm. With #1 and #2 mitigated workflow-side and #3 surfaced as "compatible with", the bridge produces a non-trivial answer.
 
 ---
 
@@ -826,32 +828,40 @@ The cross-feeding bridge (`metabolites_by_gene` → `genes_by_metabolite` across
 
 Items only `multiomics_biocypher_kg` can fix. Each ask carries `{category, priority, phase, why}`. Categories: Data gap / Precompute / Rollup / Index / Schema / Decision / Documentation.
 
+After walkthrough Q&A 2026-05-05, the 15 numbered asks split into three status buckets. **Live** is what the KG team should review; **Closed** and **Retired** are kept for traceability.
+
+### 5.A Live asks (7 — review-required)
+
 | ID | Category | Priority | Phase | Ask | Why (explorer item it unblocks) |
 |---|---|---|---|---|---|
 | KG-MET-001 | Documentation | P1 | first-pass | Document the normalisation convention used for `Assay_quantifies_metabolite.value` per paper (raw concentration? log-transformed? z-score?) — and whether `value_sd` is on the same scale | Resolves Part 4 §4.3.3 (replicate rollup convention); needed for tool docstrings explaining what `value` means to the LLM |
 | KG-MET-002 | Decision + Documentation | P2 | first-pass | Compartment-as-property is the chosen modelling. Document the convention: `Metabolite` node is compartment-agnostic; `MetaboliteAssay.compartment` carries the compartment. Verify no Metabolite node has compartment in its name/properties (i.e., glucose-intracellular and glucose-extracellular are the same Metabolite) | Resolves Part 4 §4.3.5 (compartment semantics); needed for analysis doc Track B |
-| KG-MET-003 | Data gap | — | RETIRED 2026-05-04 | (Was: add `role` property on `Reaction_has_metabolite`.) **Retired** — upstream KEGG-source annotation direction is unreliable, so propagating it as `role` would create false confidence. Resolution to Part 4 §4.1.1 is option (c): stay undirected, "involved in" framing is permanent. | n/a — explorer-side tools simply commit to the "involved in" framing as their permanent convention |
-| KG-MET-004 | Rollup | — | first-pass (CLOSED — already satisfied) | Per-Metabolite measurement rollups already on the node: `measured_assay_count`, `measured_paper_count`, `measured_organisms` | (verified in Part 1 §1.2 — no action needed) |
-| KG-MET-005 | Rollup | — | first-pass (CLOSED — already satisfied) | Per-Publication / per-Experiment / per-Organism measurement rollups already exist: `metabolite_assay_count`, `metabolite_count`, `metabolite_compartments`, `measured_metabolite_count` | (verified in Part 1 §1.2) |
-| KG-MET-006 | Precompute | P2 | first-pass | TcdbFamily.superfamily exists. Add: per-family `is_promiscuous` boolean (true when superfamily ∈ {large set} OR `member_count` > threshold OR `metabolite_count` > threshold) so explorer tools can dim/rank without re-deriving the rule | Sharper family_inferred precision-tier reasoning (Part 4 §4.2.2; analysis doc Track A2 §g). Today the explorer recomputes the rule client-side or via per-query joins |
-| KG-MET-007 | Index | P3 | first-pass (deferred) | Audit-Phase-E-derived index asks — populated based on the slowest queries observed during example python build | Performance for new tool query paths; populated in second pass once query shapes stabilise |
-| KG-MET-008 | Documentation | P3 | first-pass | Document each metabolomics paper's processed-value pipeline: extraction method, MS platform, internal standards, normalisation, replicate count, statistical-test convention. Likely surfaces as a Publication-node `processing_notes` field | LLM-readable provenance for Track-B caveat surfacing; reduces ambiguity when the LLM cites a measurement |
-| KG-MET-009 | Data gap | — | RETIRED 2026-05-05 | (Was: add `is_reversible` boolean on Reaction node.) **Retired** — KEGG-source annotation lacks reversibility data upstream; same conclusion as KG-MET-003 retirement (Part 4 §4.1.1). Combined with no direction, the Reaction node cannot support either claim. Explorer commits to "involved in" framing as permanent. Resolution to Part 4 §4.1.2 = annotation insufficient. | n/a — explorer-side tools document the dual gap (no direction + no reversibility) in docstrings + analysis doc |
-| KG-MET-010 | Data gap | — | RETIRED 2026-05-05 | (Was: add `complex_id` on Reaction or Gene_catalyzes_reaction edges.) **Retired** — KEGG has no first-class complex/holo-enzyme modeling upstream (REACTION ↔ KO + EC only; subunit info is free-text or implicit in multi-KO sharing); no clean `complex_id` to propagate. Plus the originally-blocking Part 2 ortholog-side rollups were DROPPED in the gene-side reframe (walkthrough Q&A 2026-05-05) — no remaining consumer. Resolution to Part 4 §4.1.3 = annotation insufficient + no consumer. | n/a — no remaining downstream proposal needs this |
-| KG-MET-011 | Data gap | — | RETIRED 2026-05-05 | (Was: add transport direction on Tcdb_family_transports_metabolite edges OR per-family default_direction on TcdbFamily.) **Retired** — TCDB has no direction property upstream; KG is direct reflection of TCDB. Heuristic name-matching (uptake/efflux/importer keywords) and hand-curated direction map both rejected per Part 4 §4.2.1: false-confidence trap, same retirement pattern as KG-MET-003. Cross-feeding stays "compatible with", never "confirmed". | n/a — §4.5 confounder #3 stays unmitigable |
-| KG-MET-012 | Decision | P2 | first-pass | Decide whether metabolite-level summary statistics (rhythmicity, etc.) should attach as `DerivedMetric → Metabolite` edges or live entirely on `MetaboliteAssay` properties. Communicate decision to explorer side | Resolves Part 4 §4.3.1 / §4.3.6; unblocks Part 3b.5 (DM-family extension to Metabolite) |
+| KG-MET-006 | Precompute | P2 | first-pass | TcdbFamily.superfamily exists. Add: per-family `is_promiscuous` boolean (true when superfamily ∈ {large set} OR `member_count` > threshold OR `metabolite_count` > threshold) so explorer tools can dim/rank without re-deriving the rule | Sharper family_inferred precision-tier reasoning (Part 4 §4.2.2; analysis doc Track A2 §g). Today the explorer's only family-promiscuity signal is the auto-warning when family_inferred rows dominate; per-row sharpening (dim/sort by promiscuity likelihood) needs a per-family precomputed flag |
 | KG-MET-013 | Documentation | P2 | first-pass | Confirm `time_point` properties on `Assay_quantifies_metabolite` align with `Changes_expression_of.time_point` for experiments that have both omics types | Resolves Part 4 §4.3.8; enables future cross-omics tools |
-
-**Priority summary (first-pass, after 2026-05-04 retirement of KG-MET-003 + 2026-05-05 retirements of KG-MET-009 / 010 / 011):** 0× P0, 1× P1 (KG-MET-001), 4× P2 (KG-MET-002/006/012/013), 2× P3 (KG-MET-007 deferred / 008), 2× CLOSED (KG-MET-004/005), 4× RETIRED (KG-MET-003 / 009 / 010 / 011) = 13 first-pass asks.
-
-**Surprising finding (revised):** the original spec assumed many KG asks would land in P0/P1 (data is missing). The actual KG release shipped much further than expected — node-level rollups exist, edge schemas are rich, family promiscuity is partially flagged. The originally-flagged P0 (reaction role) was retired by user decision because upstream KEGG annotation direction is unreliable. **There are no remaining P0 KG asks.** The chemistry-annotation track's "involved in" framing is now a permanent convention, not a transitional limitation.
-
-### Part 5 — build-derived KG asks (second pass)
-
-| ID | Category | Priority | Phase | Ask | Why |
-|---|---|---|---|---|---|
+| KG-MET-008 | Documentation | P3 | first-pass | Document each metabolomics paper's processed-value pipeline: extraction method, MS platform, internal standards, normalisation, replicate count, statistical-test convention. Likely surfaces as a Publication-node `processing_notes` field | LLM-readable provenance for Track-B caveat surfacing; reduces ambiguity when the LLM cites a measurement |
 | KG-MET-014 | Documentation | P3 | build-derived | Document the metabolite-ID prefix convention prominently in `kg_schema` output and tool docstrings (KEGG IDs are stored as `kegg.compound:Cxxxxx`, not bare `Cxxxxx`) | Caused first-attempt query failures during scenario 2 `compound_to_genes` — bare `C00064` returned 0 rows; the prefixed form returned 42. Cheap docstring win |
 | KG-MET-015 | Documentation | P3 | build-derived | Document organism-name resolution rules: chemistry tools (e.g., `genes_by_metabolite(organism='MED4')`) accept short-name aliases, but `list_organisms(organism_names=['MED4'])` requires the full `preferred_name` (`Prochlorococcus MED4`) | Surfaces during scenario 1 `discover` first-attempt; minor friction but confusing without docs |
-| KG-MET-007 (resolved) | Index | — | build-derived (NO INDEX ASKS) | Audit-Phase-D scenarios all completed in <30s aggregate (scenario 5 longest at ~8s due to multi-step DE chain). No slow queries observed. KG-MET-007 closes with no concrete index requests; revisit in next round | Performance baseline confirmed acceptable for current scale. |
 
-**Final Part 5 totals (refreshed walkthrough Q&A 2026-05-05):** 15 numbered KG asks. **0× P0** (no P0 asks remain), 1× P1 (KG-MET-001 normalisation docs), 4× P2 (KG-MET-002/006/012/013), 4× P3 (KG-MET-008/014/015 + KG-MET-007 deferred), 2× CLOSED (KG-MET-004/005 rollup-already-shipped), 4× RETIRED (KG-MET-003 reaction direction; KG-MET-009 reaction reversibility; KG-MET-010 multi-subunit complex modelling; KG-MET-011 transport direction — all upstream-annotation gaps in KEGG/TCDB). The KG release substantially overshipped relative to design-time assumptions.
+**Live tally:** 1× P1, 3× P2, 3× P3 = 7 asks. **No P0 asks remain.** Six of seven are documentation-class; only KG-MET-006 is a precompute. The KG release substantially overshipped relative to design-time assumptions.
+
+### 5.B Closed (3 — already satisfied or no asks found)
+
+| ID | Category | Closed reason | Verified at |
+|---|---|---|---|
+| KG-MET-004 | Rollup | Per-Metabolite measurement rollups already on the node: `measured_assay_count`, `measured_paper_count`, `measured_organisms` | Part 1 §1.2 |
+| KG-MET-005 | Rollup | Per-Publication / per-Experiment / per-Organism measurement rollups already exist: `metabolite_assay_count`, `metabolite_count`, `metabolite_compartments`, `measured_metabolite_count` | Part 1 §1.2 |
+| KG-MET-007 | Index | Audit-Phase-D scenarios all completed in <30s aggregate (scenario 5 longest at ~8s due to multi-step DE chain). No slow queries observed; no concrete index requests to file. Revisit in next round when query shapes evolve | Phase-D run, 2026-05-04 |
+
+### 5.C Retired (5 — out-of-scope: upstream-annotation gaps or no consumer)
+
+| ID | Category | Retired | Reason |
+|---|---|---|---|
+| KG-MET-003 | Data gap | 2026-05-04 | (Was: `role` on `Reaction_has_metabolite`.) Upstream KEGG annotation direction unreliable; propagating would create false confidence. Resolution: "involved in" framing is permanent. See §4.0 §4.1.1. |
+| KG-MET-009 | Data gap | 2026-05-05 | (Was: `is_reversible` on Reaction.) KEGG lacks reversibility upstream — same gap as MET-003. See §4.0 §4.1.2. |
+| KG-MET-010 | Data gap | 2026-05-05 | (Was: `complex_id` on Reaction / Gene_catalyzes_reaction.) KEGG has no first-class complex modelling upstream; the originally-blocking ortholog-side rollups were also DROPPED in the gene-side reframe — no remaining consumer. See §4.0 §4.1.3. |
+| KG-MET-011 | Data gap | 2026-05-05 | (Was: transport direction on Tcdb_family_transports_metabolite or per-family default_direction.) TCDB lacks direction upstream; heuristic and curation alternatives both rejected (false-confidence trap). §4.5 confounder #3 stays permanently unmitigable. See §4.0 §4.2.1. |
+| KG-MET-012 | Decision | 2026-05-05 | (Was: decide DerivedMetric → Metabolite vs MetaboliteAssay-only modelling.) The KG release implicitly answered §4.3.1/§4.3.6 — `MetaboliteAssay` already carries the DM-equivalent fields. The only remaining downstream consumer (3b.5) is NOT-NEEDED. See §4.0 §4.3.1+§4.3.6. |
+
+### 5.D Final tally
+
+15 numbered asks → **7 Live** (5.A) + **3 Closed** (5.B) + **5 Retired** (5.C). The headline shape: zero data-gap or precompute asks remain at P0/P1; the live queue is mostly documentation. **Surprising finding:** the original spec assumed many asks would land in P0/P1 because data was missing. The actual KG release shipped much further than expected — node-level rollups exist, edge schemas are rich, family promiscuity is partially flagged via `superfamily`. The "involved in" framing for the chemistry-annotation track is now a permanent convention, not a transitional limitation.
