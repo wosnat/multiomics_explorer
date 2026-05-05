@@ -494,9 +494,9 @@ metabolite_response_profile(
 
 Per-row: `metabolite_id`, `preferred_name`, `compartments_observed`, `n_assays`, `n_papers`, `value_stats` (min/median/max/sd across edges), `direction_stats` (when fold-change semantic resolves), `n_replicates_total`, `top_treatments`. Envelope: `by_compartment`, `by_treatment_type`, `top_metabolites_by_response_breadth`.
 
-**Recommendation: Pending-definition.** Blocking Part 4 questions: §4.3.2 (FC relevance for metabolomics), §4.3.3 (replicate rollup convention), §4.3.5 (compartment semantics for cross-compartment comparison).
+**Recommendation: DEFER (premature).** Blocking Part 4 questions: §4.3.2 (FC relevance for metabolomics), §4.3.3 (replicate rollup convention), §4.3.5 (compartment semantics for cross-compartment comparison). **Walkthrough Q&A 2026-05-05:** marked premature for current scale (10 assays / 92 metabolites measured in both compartments / 2 papers). Reasons: (a) Part 4 questions unresolved; (b) at present scale a dedicated cross-experiment per-metabolite summary tool is not justified — `run_cypher` covers it adequately, and the side-by-side compartment shape demonstrated in scenario `measurement` is sufficient; (c) the future `differential_metabolite_abundance` (3b.4) may subsume part of this surface once FC semantics resolve. Revisit when measurement scale grows materially OR when Part 4 questions answer.
 
-Phase: first-pass.
+Phase: deferred.
 
 #### 3b.3 `metabolites_by_assay` / `assays_by_metabolite`
 
@@ -546,7 +546,7 @@ Phase: first-pass.
 | Proposal | Recommendation | Phase | Blocked by |
 |---|---|---|---|
 | `list_metabolite_assays` | Should-add (P1) | first-pass | — |
-| `metabolite_response_profile` | Pending-definition | first-pass | §4.3.2, §4.3.3, §4.3.5 |
+| `metabolite_response_profile` | DEFER (premature at current scale) | deferred | §4.3.2, §4.3.3, §4.3.5; revisit when scale grows |
 | `metabolites_by_assay` / `assays_by_metabolite` | Should-add (P1) | first-pass | — |
 | `differential_metabolite_abundance` | Pending-definition | first-pass | §4.3.2, §4.3.3, §4.3.4, §4.3.5, §4.3.7 |
 | DM-family extension to Metabolite | Pending-definition | first-pass | §4.3.1, §4.3.6 |
@@ -560,7 +560,7 @@ No new tool proposals from the build phase — the existing first-pass surface (
 | First-pass proposal | Build-derived verdict |
 |---|---|
 | `list_metabolite_assays` | **Validated.** Scenario 8 `measurement` had to use `run_cypher` because no native discovery tool exists for assays. Confirms Should-add (P1). |
-| `metabolite_response_profile` | **Validated.** Scenario 8 illustrates the pattern (per-metabolite × condition aggregation) but it is laborious in raw Cypher. Pending-definition stands. |
+| `metabolite_response_profile` | **Pattern validated, but recommendation flipped to DEFER (premature)** at walkthrough Q&A 2026-05-05. Scenario 8 (`measurement`) demonstrates the per-metabolite × compartment aggregation in run_cypher and it is adequate at the current 10-assay / 92-metabolite / 2-paper scale. Add the dedicated tool only when (a) Part 4 questions resolve AND (b) measurement scale grows materially OR `differential_metabolite_abundance` (3b.4) lands and absorbs part of this surface. |
 | `metabolites_by_assay` / `assays_by_metabolite` | **Validated.** Scenario 8 walks the assay → metabolite path; reverse lookup not exercised but the bidirectional pattern is the right shape. Should-add stands. |
 | `differential_metabolite_abundance` | **Strengthened pending-definition signal.** Scenario 8's raw values are clearly per-replicate concentrations; FC is not the natural summary. Pending-definition stands. |
 | DM-family extension to Metabolite | **Empirical evidence shifted toward Assay-only modelling.** Per Part 1 §1.2, `MetaboliteAssay` already carries the same fields a `DerivedMetric` would (value_kind, metric_type, percentiles, etc.). The KG modellers appear to have answered Part 4 §4.3.1 implicitly: Assay IS the DM-on-Metabolite analog. Recommendation: downgrade DM-family extension from Pending-definition to **Not-needed** — direct any metabolite-level summary work onto `MetaboliteAssay`-anchored tools instead. |
