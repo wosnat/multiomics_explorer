@@ -730,6 +730,19 @@ Together these answer "is metabolite X consistently and detectably present?" —
 
 **Implication for KG asks:** none. KG-MET-001 (normalisation docs) still stands at P1 — separate concern (what does `value` mean per paper, units / log-scale / z-score).
 
+#### 4.3.4 Quantifies vs Flags semantics — separate or merged — RESOLVED (split per DM convention, 2026-05-05)
+
+**Question:** `Assay_quantifies_metabolite` (concentration/intensity) and `Assay_flags_metabolite` (qualitative detection) carry different properties. Should new tools surface them as separate response columns (with `evidence_kind` discriminator) or merge them?
+
+**Resolution:** **Both, by tool layer** — same pattern as the DM family.
+
+- **Drill-down: split.** `metabolites_by_quantifies_assay` (numeric arm) + `metabolites_by_flags_assay` (boolean arm) — separate tools. Per-tool row schemas stay clean (no union sparseness). Empirical justification: 9-field gap between the two edges (Quantifies = 15 fields, Flags = 6); merged drill-down would be 60% sparse for flags rows.
+- **Batch reverse-lookup: merged.** `assays_by_metabolite` — single tool with `evidence_kind: Literal['quantifies', 'flags']` discriminator + polymorphic `value` / `flag_value` columns per row.
+
+This mirrors the DM family precedent (split drill-down across `genes_by_numeric_metric` / `genes_by_boolean_metric` / `genes_by_categorical_metric`; batch reverse-lookup merged in `gene_derived_metrics`).
+
+**Implication for tools:** see Part 3b.3 — three-tool split shipped together as a slice. Already specified.
+
 #### 4.3.1 + 4.3.6 Surface modelling — Assay IS the DM-on-Metabolite analog — RESOLVED (empirically, 2026-05-04 build-derived)
 
 **Question (§4.3.1):** Is `MetaboliteAssay` the *only* measurement surface, or should there also be `DerivedMetric` nodes attached to `Metabolite` (mirroring `DerivedMetric → Gene` for gene-level summaries)?
@@ -752,15 +765,7 @@ Both sub-questions resolved (§4.2.1 direction, §4.2.2 primary substrate) — s
 
 ### 4.3 Metabolomics measurement source
 
-(§4.3.1 + §4.3.2 + §4.3.3 + §4.3.6 resolved — see §4.0.)
-
-#### 4.3.4 Quantifies vs Flags semantics — separate or merged
-
-**Question:** `Assay_quantifies_metabolite` (concentration/intensity) and `Assay_flags_metabolite` (qualitative detection) carry different properties. Should new tools surface them as separate response columns (with `evidence_kind` discriminator) or merge them?
-
-**Current state:** they are structurally distinct edges; the natural shape is to keep them separate but with a unifying `evidence_kind` field.
-
-**Blocks:** Part 3b.4 (DE-shape tool needs to decide how to handle flag-only data).
+(§4.3.1 + §4.3.2 + §4.3.3 + §4.3.4 + §4.3.6 resolved — see §4.0.)
 
 #### 4.3.5 Compartment semantics
 
@@ -792,7 +797,6 @@ Resolved questions live in §4.0 and don't appear here (they don't block anythin
 
 | Question | Blocks proposal |
 |---|---|
-| §4.3.4 Quantifies vs Flags | 3b.4 (DEFER) |
 | §4.3.5 compartment semantics | 3b.2 (DEFER); also gates `list_metabolites.measured_compartments` sparse-field policy (Part 3a) |
 | §4.3.7 coculture attribution | 3b.4 (DEFER) |
 | §4.3.8 temporal axis | 3b.2 (DEFER) |
