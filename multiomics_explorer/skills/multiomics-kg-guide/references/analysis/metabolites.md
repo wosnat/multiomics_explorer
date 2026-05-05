@@ -82,7 +82,7 @@ result = metabolites_by_gene(
 
 **`by_element` semantics — presence-only, not stoichiometric.** Each row carries `metabolite_count` = the count of *distinct compounds in the full match set* that contain that element at all. E.g., `[('H', 6), ('O', 6), ('P', 6), ('C', 5), ('N', 4)]` over 6 distinct compounds means 6 contain H/O/P, 5 contain C, 4 contain N. It does **not** count atoms per compound (stoichiometry lives in `metabolite.formula`, e.g. `HO7P2` for diphosphate), and it is **not** mass-balanced across reactions — the KG intentionally carries no substrate-vs-product role on `Reaction_has_metabolite` (Part 4 §4.1.1 resolved). The per-row `elements` field is the same shape: a set of symbols, no counts. The envelope aggregates over `total_matching`, not the truncated page.
 
-**Caveat — `top_pathways` is NOT KEGG-KO pathways.** The chemistry-side `top_pathways` walks `Reaction → KeggTerm` via reaction-pathway edges (filtered to `KeggTerm.reaction_count >= 3`). This is distinct from gene-KO pathway annotations from `genes_by_ontology(ontology="kegg", ...)`. If the user wants the KO pathway annotation surface, route there instead. Disambiguate explicitly when answering.
+**Caveat — `top_pathways` is metabolite-anchored, NOT KO-anchored.** The chemistry-side `top_pathways` traverses `Metabolite → KeggTerm` via the denormalized `m.pathway_ids` field (sourced from `Metabolite_in_pathway` edges; KG-A5 rollup). Target pathways are filtered by `KeggTerm.reaction_count >= 3` to drop signaling/disease pathways with no chemistry breadth — that's a *gate* on the target node, not part of the traversal. So this rollup answers **"which pathways do my gene's metabolites participate in?"** Naming convention (Option A): treat this as **metabolite_pathways**, distinct from **ko_pathways** (anchored on `Gene → KeggTerm` via the KO hierarchy, surfaced by `genes_by_ontology(ontology="kegg", ...)`, `pathway_enrichment`, etc.). They reach the same KEGG pathway maps but via different membership relations. Disambiguate explicitly when answering.
 
 ---
 
@@ -190,7 +190,12 @@ de = differential_expression_by_gene(
 
 **TCDB substrate-anchored:** for "which genes transport substrate X?", prefer the metabolite-anchored route (`genes_by_metabolite(metabolite_ids=[...], evidence_sources=['transport'])`) over the family-anchored route (`genes_by_ontology(ontology='tcdb', ...)`). The metabolite-anchored route includes all families curating the substrate; the ontology route is family-anchored and misses cross-family substrate hits.
 
-**KEGG pathway-anchored:** for chemistry-pathway discovery (which metabolites are in pathway X), use `list_metabolites(pathway_ids=[...])`. For gene-KO pathway annotations (which genes are annotated to KO terms in pathway X), use `genes_by_ontology(ontology='kegg', ...)`. They are different surfaces — call out the distinction when answering.
+**KEGG pathway-anchored — pick the right surface:**
+- **metabolite_pathways** (compound-anchored): which metabolites are in pathway X → `list_metabolites(pathway_ids=[...])`. Edge: `Metabolite_in_pathway`.
+- **ko_pathways** (gene-KO-anchored): which genes are annotated to KOs in pathway X → `genes_by_ontology(ontology='kegg', ...)`. Edges: `Gene_has_kegg_ko` + `Kegg_term_is_a_kegg_term`.
+- **reaction_pathways** (reaction-anchored, not currently surfaced as a rollup): which reactions a gene catalyses map to pathway X. Reach via `run_cypher` over `Gene_catalyzes_reaction` + `Reaction_in_kegg_pathway`.
+
+The same KEGG pathway map (e.g. `kegg.pathway:ko00910` Nitrogen metabolism) can be reached from all three anchors, but membership relations are different — a gene whose KO is in pathway X may not catalyse any reaction whose metabolites are in pathway X (and vice versa). Always name the anchor when answering.
 
 ---
 
