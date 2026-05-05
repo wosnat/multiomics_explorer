@@ -22,6 +22,9 @@ rows:
   - exponential
   - nutrient_limited
   journal: bioRxiv
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - PROTEOMICS
   - RNASEQ
@@ -57,6 +60,9 @@ rows:
   growth_phases:
   - exponential
   journal: Communications Biology
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - PROTEOMICS
   - RNASEQ
@@ -90,6 +96,9 @@ rows:
   - darkness
   - stationary
   journal: Microbiology Spectrum
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - PROTEOMICS
   organisms:
@@ -127,6 +136,9 @@ rows:
   growth_phases:
   - exponential
   journal: ISME Communications
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - RNASEQ
   organisms:
@@ -161,6 +173,9 @@ rows:
   growth_phases:
   - acclimated_steady_state
   journal: Biotechnology for Biofuels and Bioproducts
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - PROTEOMICS
   - RNASEQ
@@ -193,6 +208,9 @@ rows:
   growth_phases:
   - acclimated_steady_state
   journal: Environmental Microbiology
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - EXOPROTEOMICS
   organisms:
@@ -229,6 +247,9 @@ rows:
   experiment_count: 1
   growth_phases: []
   journal: mSystems
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - RNASEQ
   organisms:
@@ -260,6 +281,9 @@ rows:
   growth_phases:
   - acclimated_steady_state
   journal: Nature Microbiology
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - EXOPROTEOMICS
   organisms:
@@ -288,6 +312,9 @@ rows:
   growth_phases:
   - exponential
   journal: The ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - RNASEQ
   organisms:
@@ -315,6 +342,9 @@ rows:
   growth_phases:
   - exponential
   journal: The ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - RNASEQ
   organisms:
@@ -356,6 +386,9 @@ rows:
   growth_phases:
   - acclimated_steady_state
   journal: The ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - RNASEQ
   organisms:
@@ -387,6 +420,9 @@ rows:
   growth_phases:
   - exponential
   journal: Environmental Microbiology
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - MICROARRAY
   organisms:

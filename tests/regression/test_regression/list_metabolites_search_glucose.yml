@@ -5,6 +5,17 @@ by_evidence_source:
   evidence_source: transport
 - count: 1
   evidence_source: metabolomics
+by_measurement_coverage:
+  by_compartment:
+  - compartment: extracellular
+    count: 1
+  - compartment: whole_cell
+    count: 1
+  by_paper_count:
+  - count: 22
+    paper_count: 0
+  - count: 1
+    paper_count: 2
 case_id: list_metabolites_search_glucose
 mass_stats:
   mass_max: 587.328
@@ -26,6 +37,10 @@ results:
   formula: C6H12O6
   gene_count: 826
   mass: 180.156
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: chebi:14313
   name: glucose
   organism_count: 32
@@ -46,6 +61,10 @@ results:
   formula: C15H22N2O17P2
   gene_count: 733
   mass: 564.286
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00029
   name: UDP-glucose
   organism_count: 32
@@ -81,6 +100,10 @@ results:
   formula: C6H12O6
   gene_count: 328
   mass: 180.156
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00031
   name: D-Glucose
   organism_count: 32
@@ -136,6 +159,10 @@ results:
   formula: C16H24N2O16P2
   gene_count: 143
   mass: 562.314
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00842
   name: dTDP-glucose
   organism_count: 32
@@ -164,6 +191,10 @@ results:
   formula: C16H23N5O15P2
   gene_count: 67
   mass: 587.328
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00498
   name: ADP-glucose
   organism_count: 31
@@ -188,6 +219,10 @@ results:
   formula: C15H23N3O16P2
   gene_count: 14
   mass: 563.302
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00501
   name: CDP-glucose
   organism_count: 8
@@ -210,6 +245,10 @@ results:
   formula: C6H12O6
   gene_count: 151
   mass: 180.156
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00221
   name: beta-D-Glucose
   organism_count: 32
@@ -233,6 +272,10 @@ results:
   formula: C6H12O6
   gene_count: 139
   mass: 180.156
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00267
   name: alpha-D-Glucose
   organism_count: 32
@@ -263,6 +306,16 @@ results:
   formula: C6H11O9P
   gene_count: 153
   mass: 258.119
+  measured_assay_count: 10
+  measured_compartments:
+  - extracellular
+  - whole_cell
+  measured_organisms:
+  - Prochlorococcus MIT0801
+  - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9303
+  - Prochlorococcus MIT9313
+  measured_paper_count: 2
   metabolite_id: kegg.compound:C00092
   name: D-Glucose 6-phosphate
   organism_count: 32
@@ -298,6 +351,10 @@ results:
   formula: C6H11O9P
   gene_count: 220
   mass: 258.119
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00103
   name: D-Glucose 1-phosphate
   organism_count: 32
@@ -332,6 +389,10 @@ results:
   formula: C6H12O5
   gene_count: 19
   mass: 164.157
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00586
   name: 2-Deoxy-D-glucose
   organism_count: 11
@@ -350,6 +411,10 @@ results:
   formula: C6H11O9P
   gene_count: 134
   mass: 258.119
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00668
   name: alpha-D-Glucose 6-phosphate
   organism_count: 32
@@ -381,6 +446,10 @@ results:
   formula: C6H11O9P
   gene_count: 147
   mass: 258.119
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C01172
   name: beta-D-Glucose 6-phosphate
   organism_count: 32
@@ -407,6 +476,10 @@ results:
   formula: C6H11O9P
   gene_count: 16
   mass: 258.119
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00663
   name: beta-D-Glucose 1-phosphate
   organism_count: 15
@@ -425,6 +498,10 @@ results:
   formula: C7H14O6
   gene_count: 16
   mass: 194.183
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: chebi:73918
   name: 3-O-methyl-D-glucose
   organism_count: 11
@@ -444,6 +521,10 @@ results:
   formula: C15H23N3O14P2
   gene_count: 1
   mass: 531.304
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C03598
   name: CDP-3,6-dideoxy-D-glucose
   organism_count: 1
@@ -466,6 +547,10 @@ results:
   formula: C16H22N2O15P2
   gene_count: 100
   mass: 544.299
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C11907
   name: dTDP-4-oxo-6-deoxy-D-glucose
   organism_count: 31
@@ -493,6 +578,10 @@ results:
   formula: C15H21N3O15P2
   gene_count: 26
   mass: 545.287
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C01219
   name: CDP-4-dehydro-6-deoxy-D-glucose
   organism_count: 19
@@ -515,6 +604,10 @@ results:
   formula: C15H21N3O14P2
   gene_count: 20
   mass: 529.288
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C04297
   name: CDP-4-dehydro-3,6-dideoxy-D-glucose
   organism_count: 18
@@ -537,6 +630,10 @@ results:
   formula: C16H26N3O14P2
   gene_count: 1
   mass: 546.339
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C04268
   name: dTDP-4-amino-4,6-dideoxy-D-glucose
   organism_count: 1
@@ -561,6 +658,10 @@ results:
   formula: C12H23O14P
   gene_count: 2
   mass: 422.276
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C04534
   name: 6-Phospho-beta-D-glucosyl-(1,4)-D-glucose
   organism_count: 1
@@ -582,6 +683,10 @@ results:
   formula: C16H25N3O13P2
   gene_count: 1
   mass: 529.332
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C12318
   name: dTDP-3-amino-2,3,6-trideoxy-4-keto-D-glucose
   organism_count: 1
@@ -605,6 +710,10 @@ results:
   formula: C18H32O16
   gene_count: 24
   mass: 504.438
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C05404
   name: D-Gal alpha 1->6D-Gal alpha 1->6D-Glucose
   organism_count: 24

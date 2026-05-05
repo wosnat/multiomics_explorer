@@ -151,6 +151,30 @@ def _rename_freq(freq_list: list[dict], key_name: str) -> list[dict]:
     )
 
 
+def _rename_measurement_coverage(raw: dict | None) -> dict:
+    """Phase 1 §6.6: rename apoc.coll.frequencies output for `by_measurement_coverage`.
+
+    The Cypher emits both sub-rollups as ``[{item, count}, ...]`` lists. The
+    Pydantic boundary expects ``[{paper_count, count}]`` for `by_paper_count`
+    and ``[{compartment, count}]`` for `by_compartment`. Returns the
+    sub-rollups in canonical-order (paper_count ascending; compartment
+    alphabetical) so the response is deterministic.
+    """
+    if not raw:
+        return {"by_paper_count": [], "by_compartment": []}
+    by_pc = sorted(
+        [{"paper_count": f["item"], "count": f["count"]}
+         for f in raw.get("by_paper_count", []) if f.get("item") is not None],
+        key=lambda x: x["paper_count"],
+    )
+    by_comp = sorted(
+        [{"compartment": f["item"], "count": f["count"]}
+         for f in raw.get("by_compartment", []) if f.get("item") is not None],
+        key=lambda x: x["compartment"],
+    )
+    return {"by_paper_count": by_pc, "by_compartment": by_comp}
+
+
 # Regex for blocking write operations in raw Cypher.
 _WRITE_KEYWORDS = re.compile(
     r"\b(CREATE|MERGE|DELETE|DETACH|SET|REMOVE|DROP|FOREACH|CALL\s*\{|CALL\s+\w+\.\w+|LOAD\s+CSV)\b",
@@ -831,7 +855,8 @@ def list_publications(
     Per result (compact): doi, title, authors, year, journal, study_type,
     organisms, experiment_count, treatment_types, background_factors,
     omics_types, clustering_analysis_count, cluster_types, growth_phases,
-    derived_metric_count, derived_metric_value_kinds, compartments.
+    derived_metric_count, derived_metric_value_kinds, compartments,
+    metabolite_count, metabolite_assay_count, metabolite_compartments.
     When verbose=True, also includes abstract, description, cluster_count,
     derived_metric_gene_count, derived_metric_types.
     When search_text is provided, also includes score.
@@ -969,7 +994,8 @@ def list_experiments(
     gene_count, distinct_gene_count, genes_by_status (dict),
     clustering_analysis_count, cluster_types, growth_phases,
     timepoints (list, omitted if not time-course),
-    derived_metric_count, derived_metric_value_kinds, compartment.
+    derived_metric_count, derived_metric_value_kinds, compartment,
+    metabolite_count, metabolite_assay_count, metabolite_compartments.
     Per timepoint dict: timepoint, timepoint_order, timepoint_hours,
     growth_phase (str | None), gene_count, genes_by_status.
     When verbose=True, also includes: publication_title, treatment,
@@ -4899,11 +4925,12 @@ def list_metabolites(
         # Phase 1 plumbing (spec §6.6): pass-through measurement-coverage
         # rollup surfaced by build_list_metabolites_summary. Two sub-rollups:
         # by_paper_count (distribution over m.measured_paper_count) and
-        # by_compartment (frequency over m.measured_compartments). Default
-        # to empty sub-rollups when the builder hasn't emitted the key.
-        "by_measurement_coverage": raw_summary.get(
-            "by_measurement_coverage",
-            {"by_paper_count": [], "by_compartment": []},
+        # by_compartment (frequency over m.measured_compartments). Both come
+        # from apoc.coll.frequencies as [{item, count}] and need renaming to
+        # the {paper_count, count} / {compartment, count} shape Pydantic
+        # expects.
+        "by_measurement_coverage": _rename_measurement_coverage(
+            raw_summary.get("by_measurement_coverage"),
         ),
         "score_max": raw_summary.get("score_max") if search else None,
         "score_median": raw_summary.get("score_median") if search else None,

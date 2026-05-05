@@ -154,11 +154,17 @@ list_filter_values(filter_type="omics_type")
 ```example-response
 {"filter_type": "omics_type", "total_entries": 8, "returned": 8, "truncated": false,
  "results": [
-   {"value": "RNASEQ", "count": 48},
-   {"value": "PROTEOMICS", "count": 14},
-   {"value": "MICROARRAY", "count": 6},
-   {"value": "METABOLOMICS", "count": 8}
+   {"value": "EXOPROTEOMICS", "count": 8},
+   {"value": "METABOLOMICS", "count": 8},
+   {"value": "MICROARRAY", "count": 26},
+   {"value": "PAIRED_RNASEQ_PROTEOME", "count": 1},
+   {"value": "PROTEOMICS", "count": 72},
+   {"value": "RNASEQ", "count": 63},
+   {"value": "VESICLE_DNASEQ", "count": 1},
+   {"value": "VESICLE_PROTEOMICS", "count": 10}
  ]}
+# Returns the full canonical OMICS_TYPE enum (8 values) in alphabetical
+# order. Values absent from current KG data still appear with count=0.
 ```
 
 ### Example 9: Enumerate metabolite evidence sources

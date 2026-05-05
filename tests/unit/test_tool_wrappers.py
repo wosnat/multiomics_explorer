@@ -7218,15 +7218,18 @@ class TestListMetabolitesPhase1PlumbingWrapper:
             "mass_min": None, "mass_median": None, "mass_max": None,
         },
         "score_max": None, "score_median": None,
+        # Post-api-transform shape (the api layer renames apoc.coll.frequencies
+        # `{item, count}` to `{paper_count, count}` / `{compartment, count}`
+        # before this dict reaches the MCP wrapper).
         "by_measurement_coverage": {
             "by_paper_count": [
-                {"paper_count": 0, "n": 3111},
-                {"paper_count": 1, "n": 99},
-                {"paper_count": 2, "n": 8},
+                {"paper_count": 0, "count": 3111},
+                {"paper_count": 1, "count": 99},
+                {"paper_count": 2, "count": 8},
             ],
             "by_compartment": [
-                {"compartment": "whole_cell", "n": 107},
-                {"compartment": "extracellular", "n": 92},
+                {"compartment": "whole_cell", "count": 107},
+                {"compartment": "extracellular", "count": 92},
             ],
         },
         "returned": 1, "offset": 0, "truncated": True,

@@ -25,6 +25,9 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii AD45
   publication_doi: 10.1093/femsml/uqac025
@@ -67,6 +70,9 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii ATCC27126
   publication_doi: 10.1093/femsml/uqac025
@@ -109,6 +115,9 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii BGP6
   publication_doi: 10.1093/femsml/uqac025
@@ -151,6 +160,9 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii BS11
   publication_doi: 10.1093/femsml/uqac025
@@ -193,6 +205,9 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1093/femsml/uqac025
@@ -235,6 +250,9 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii MIT1002
   publication_doi: 10.1093/femsml/uqac025
@@ -279,6 +297,9 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1126/science.1243457
@@ -320,6 +341,9 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: VESICLE_DNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1126/science.1243457
@@ -366,6 +390,9 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MIT9312
   publication_doi: 10.1111/1462-2920.15834
@@ -411,6 +438,9 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1111/1462-2920.15834
@@ -454,6 +484,9 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1126/science.1243457

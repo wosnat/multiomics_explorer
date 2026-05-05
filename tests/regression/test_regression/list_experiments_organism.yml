@@ -20,6 +20,9 @@ rows:
   growth_phases:
   - exponential
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
@@ -65,6 +68,9 @@ rows:
   growth_phases:
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
@@ -139,6 +145,9 @@ rows:
   - death
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
@@ -198,6 +207,9 @@ rows:
   growth_phases:
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
@@ -271,6 +283,9 @@ rows:
   growth_phases:
   - nutrient_limited
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
@@ -316,6 +331,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/spectrum.03275-22
@@ -361,6 +379,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/spectrum.03275-22
@@ -406,6 +427,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/spectrum.03275-22
@@ -451,6 +475,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/spectrum.03275-22
@@ -498,6 +525,9 @@ rows:
   growth_phases:
   - acclimated_steady_state
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.3389/fmicb.2022.1038136
@@ -547,6 +577,9 @@ rows:
   - acute_stress
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2017.88
@@ -604,6 +637,9 @@ rows:
   growth_phases:
   - exponential
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2016.70
@@ -647,6 +683,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
@@ -711,6 +750,9 @@ rows:
   growth_phases:
   - infected
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
@@ -783,6 +825,9 @@ rows:
   growth_phases:
   - infected
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
@@ -841,6 +886,9 @@ rows:
   growth_phases:
   - infected
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
@@ -912,6 +960,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2015.36
@@ -957,6 +1008,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2015.36
@@ -1004,6 +1058,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2015.36
@@ -1051,6 +1108,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2015.36
@@ -1100,6 +1160,9 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1186/1471-2180-14-11
@@ -1143,6 +1206,9 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1126/science.1243457
@@ -1184,6 +1250,9 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: VESICLE_DNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1126/science.1243457
@@ -1222,6 +1291,9 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PAIRED_RNASEQ_PROTEOME
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0043432
@@ -1261,6 +1333,9 @@ rows:
   growth_phases:
   - nutrient_limited
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2011.49
@@ -1307,6 +1382,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2011.49
@@ -1360,6 +1438,9 @@ rows:
   growth_phases:
   - recovery
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2011.49
@@ -1413,6 +1494,9 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0005135
@@ -1459,6 +1543,9 @@ rows:
   growth_phases:
   - infected
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/nature06130
@@ -1553,6 +1640,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06
@@ -1601,6 +1691,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06
@@ -1648,6 +1741,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06
@@ -1699,6 +1795,9 @@ rows:
   growth_phases:
   - exponential
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/msb4100087
@@ -1749,6 +1848,9 @@ rows:
   growth_phases:
   - exponential
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/msb4100087
@@ -1795,6 +1897,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06
@@ -1847,6 +1952,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/msb4100087
@@ -1928,6 +2036,9 @@ rows:
   - exponential
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1073/pnas.0601301103
@@ -2001,6 +2112,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06
@@ -2048,6 +2162,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06

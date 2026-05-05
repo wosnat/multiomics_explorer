@@ -15,6 +15,7 @@ rows:
   closest_ortholog_group_size: 7
   cluster_membership_count: 0
   cluster_types: []
+  evidence_sources: []
   expression_edge_count: 9
   gene_category: Transcription
   gene_name: null
@@ -24,8 +25,11 @@ rows:
   - go_mf
   - pfam
   locus_tag: MIT1002_01809
+  metabolite_count: 0
   numeric_metric_count: 0
   organism_name: Alteromonas macleodii MIT1002
   product: MarR family winged helix-turn-helix transcriptional regulator
+  reaction_count: 0
   significant_down_count: 0
   significant_up_count: 2
+  transporter_count: 0

@@ -5,6 +5,19 @@ by_evidence_source:
   evidence_source: transport
 - count: 107
   evidence_source: metabolomics
+by_measurement_coverage:
+  by_compartment:
+  - compartment: extracellular
+    count: 92
+  - compartment: whole_cell
+    count: 107
+  by_paper_count:
+  - count: 3111
+    paper_count: 0
+  - count: 99
+    paper_count: 1
+  - count: 8
+    paper_count: 2
 case_id: list_metabolites_all
 mass_stats:
   mass_max: 5227.103
@@ -26,6 +39,10 @@ results:
   formula: H2O
   gene_count: 8157
   mass: 18.015
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00001
   name: H2O
   organism_count: 32
@@ -58,6 +75,10 @@ results:
   formula: H
   gene_count: 6045
   mass: 1.0079
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00080
   name: H+
   organism_count: 32
@@ -104,6 +125,10 @@ results:
   formula: C10H12N5O13P3
   gene_count: 4562
   mass: 503.15
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00002
   name: ATP
   organism_count: 32
@@ -154,6 +179,10 @@ results:
   formula: HO4P
   gene_count: 3912
   mass: 95.978
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00009
   name: Orthophosphate
   organism_count: 32
@@ -181,6 +210,10 @@ results:
   formula: HO7P2
   gene_count: 3254
   mass: 174.949
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00013
   name: Diphosphate
   organism_count: 32

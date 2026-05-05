@@ -18,6 +18,7 @@ rows:
   cluster_types:
   - diel
   - time_course
+  evidence_sources: []
   expression_edge_count: 35
   gene_category: Unknown
   gene_name: null
@@ -25,8 +26,11 @@ rows:
   - go_mf
   - pfam
   locus_tag: PMM1428
+  metabolite_count: 0
   numeric_metric_count: 0
   organism_name: Prochlorococcus MED4
   product: EVE domain protein
+  reaction_count: 0
   significant_down_count: 1
   significant_up_count: 4
+  transporter_count: 0

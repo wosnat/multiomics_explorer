@@ -12,6 +12,7 @@ rows:
   gene_count: 0
   genus: Alteromonas
   growth_phases: []
+  measured_metabolite_count: 0
   metabolite_count: 0
   ncbi_taxon_id: 28108
   omics_types: []
@@ -40,6 +41,7 @@ rows:
   growth_phases:
   - darkness
   - stationary
+  measured_metabolite_count: 0
   metabolite_count: 2228
   ncbi_taxon_id: 232
   omics_types:
@@ -70,6 +72,7 @@ rows:
   gene_count: 3929
   genus: Alteromonas
   growth_phases: []
+  measured_metabolite_count: 0
   metabolite_count: 2081
   ncbi_taxon_id: 1004787
   omics_types:
@@ -99,6 +102,7 @@ rows:
   gene_count: 3834
   genus: Alteromonas
   growth_phases: []
+  measured_metabolite_count: 0
   metabolite_count: 2082
   ncbi_taxon_id: 529120
   omics_types:
@@ -128,6 +132,7 @@ rows:
   gene_count: 4063
   genus: Alteromonas
   growth_phases: []
+  measured_metabolite_count: 0
   metabolite_count: 2112
   ncbi_taxon_id: 28108
   omics_types:
@@ -157,6 +162,7 @@ rows:
   gene_count: 3741
   genus: Alteromonas
   growth_phases: []
+  measured_metabolite_count: 0
   metabolite_count: 2057
   ncbi_taxon_id: 1004785
   omics_types:
@@ -192,6 +198,7 @@ rows:
   growth_phases:
   - acclimated_steady_state
   - exponential
+  measured_metabolite_count: 0
   metabolite_count: 2193
   ncbi_taxon_id: 28108
   omics_types:
@@ -230,6 +237,7 @@ rows:
   - death
   - exponential
   - nutrient_limited
+  measured_metabolite_count: 0
   metabolite_count: 2098
   ncbi_taxon_id: 28108
   omics_types:
@@ -271,6 +279,7 @@ rows:
   - darkness
   - diel
   - exponential
+  measured_metabolite_count: 0
   metabolite_count: 2116
   ncbi_taxon_id: 28108
   omics_types:
@@ -301,6 +310,7 @@ rows:
   genus: Escherichia
   growth_phases:
   - acclimated_steady_state
+  measured_metabolite_count: 0
   metabolite_count: 0
   ncbi_taxon_id: 562
   omics_types:
@@ -332,6 +342,7 @@ rows:
   growth_phases:
   - darkness
   - stationary
+  measured_metabolite_count: 0
   metabolite_count: 2093
   ncbi_taxon_id: 225937
   omics_types:
@@ -358,6 +369,7 @@ rows:
   gene_count: 0
   genus: Deinococcus
   growth_phases: []
+  measured_metabolite_count: 0
   metabolite_count: 0
   ncbi_taxon_id: 1299
   omics_types:
@@ -385,6 +397,7 @@ rows:
   gene_count: 2884
   genus: Meiothermus
   growth_phases: []
+  measured_metabolite_count: 0
   metabolite_count: 1837
   ncbi_taxon_id: 172827
   omics_types:
@@ -418,6 +431,7 @@ rows:
   - acute_stress
   - exponential
   - infected
+  measured_metabolite_count: 0
   metabolite_count: 0
   ncbi_taxon_id: 10239
   omics_types:
@@ -448,6 +462,7 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - acclimated_steady_state
+  measured_metabolite_count: 0
   metabolite_count: 1549
   ncbi_taxon_id: 146891
   omics_types:
@@ -496,6 +511,7 @@ rows:
   - nutrient_limited
   - recovery
   - stationary
+  measured_metabolite_count: 0
   metabolite_count: 1572
   ncbi_taxon_id: 59919
   omics_types:
@@ -537,6 +553,7 @@ rows:
   gene_count: 2358
   genus: Prochlorococcus
   growth_phases: []
+  measured_metabolite_count: 92
   metabolite_count: 1565
   ncbi_taxon_id: 1501269
   omics_types:
@@ -568,6 +585,7 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - exponential
+  measured_metabolite_count: 99
   metabolite_count: 1581
   ncbi_taxon_id: 167546
   omics_types:
@@ -599,6 +617,7 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - exponential
+  measured_metabolite_count: 16
   metabolite_count: 1719
   ncbi_taxon_id: 59922
   omics_types:
@@ -635,6 +654,7 @@ rows:
   - acute_stress
   - exponential
   - stationary
+  measured_metabolite_count: 0
   metabolite_count: 1581
   ncbi_taxon_id: 74546
   omics_types:
@@ -677,6 +697,7 @@ rows:
   - exponential
   - nutrient_limited
   - recovery
+  measured_metabolite_count: 100
   metabolite_count: 1666
   ncbi_taxon_id: 74547
   omics_types:
@@ -716,6 +737,7 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - acclimated_steady_state
+  measured_metabolite_count: 0
   metabolite_count: 1570
   ncbi_taxon_id: 167555
   omics_types:
@@ -757,6 +779,7 @@ rows:
   - nutrient_limited
   - recovery
   - stationary
+  measured_metabolite_count: 0
   metabolite_count: 1550
   ncbi_taxon_id: 59920
   omics_types:
@@ -786,6 +809,7 @@ rows:
   gene_count: 1870
   genus: Prochlorococcus
   growth_phases: []
+  measured_metabolite_count: 0
   metabolite_count: 1575
   ncbi_taxon_id: 1924285
   omics_types: []
@@ -817,6 +841,7 @@ rows:
   - darkness
   - exponential
   - stationary
+  measured_metabolite_count: 0
   metabolite_count: 1576
   ncbi_taxon_id: 167539
   omics_types:
@@ -847,6 +872,7 @@ rows:
   genus: Pseudomonas
   growth_phases:
   - exponential
+  measured_metabolite_count: 0
   metabolite_count: 2551
   ncbi_taxon_id: 160488
   omics_types:
@@ -875,6 +901,7 @@ rows:
   genus: Ruegeria
   growth_phases:
   - acclimated_steady_state
+  measured_metabolite_count: 0
   metabolite_count: 2325
   ncbi_taxon_id: 89184
   omics_types:
@@ -902,6 +929,7 @@ rows:
   genus: Shewanella
   growth_phases:
   - acclimated_steady_state
+  measured_metabolite_count: 0
   metabolite_count: 2213
   ncbi_taxon_id: 351745
   omics_types:
@@ -932,6 +960,7 @@ rows:
   genus: Synechococcus
   growth_phases:
   - exponential
+  measured_metabolite_count: 0
   metabolite_count: 1745
   ncbi_taxon_id: 64471
   omics_types:
@@ -960,6 +989,7 @@ rows:
   genus: Picosynechococcus
   growth_phases:
   - acclimated_steady_state
+  measured_metabolite_count: 0
   metabolite_count: 1771
   ncbi_taxon_id: 32049
   omics_types:
@@ -992,6 +1022,7 @@ rows:
   - acclimated_steady_state
   - darkness
   - stationary
+  measured_metabolite_count: 0
   metabolite_count: 1791
   ncbi_taxon_id: 32051
   omics_types:
@@ -1026,6 +1057,7 @@ rows:
   - darkness
   - exponential
   - stationary
+  measured_metabolite_count: 0
   metabolite_count: 1721
   ncbi_taxon_id: 84588
   omics_types:
@@ -1056,6 +1088,7 @@ rows:
   genus: Synechococcus
   growth_phases:
   - exponential
+  measured_metabolite_count: 0
   metabolite_count: 1816
   ncbi_taxon_id: 1140
   omics_types:
@@ -1084,6 +1117,7 @@ rows:
   genus: Synechococcus
   growth_phases:
   - acclimated_steady_state
+  measured_metabolite_count: 0
   metabolite_count: 1821
   ncbi_taxon_id: 1350461
   omics_types:
@@ -1115,6 +1149,7 @@ rows:
   growth_phases:
   - darkness
   - stationary
+  measured_metabolite_count: 0
   metabolite_count: 1671
   ncbi_taxon_id: 313625
   omics_types:
@@ -1142,6 +1177,7 @@ rows:
   gene_count: 2449
   genus: Thermosynechococcus
   growth_phases: []
+  measured_metabolite_count: 0
   metabolite_count: 1608
   ncbi_taxon_id: 197221
   omics_types:
@@ -1170,6 +1206,7 @@ rows:
   genus: Vibrio
   growth_phases:
   - exponential
+  measured_metabolite_count: 0
   metabolite_count: 0
   ncbi_taxon_id: 670
   omics_types:

@@ -457,16 +457,16 @@ class MetNotFound(BaseModel):
 
 class MetPaperCountBucket(BaseModel):
     paper_count: int = Field(description="Number of distinct papers measuring a metabolite (e.g. 0, 1, 2).")
-    n: int = Field(description="Number of metabolites in the matched set with this paper_count value (e.g. 3111 metabolites with paper_count=0).")
+    count: int = Field(description="Number of metabolites in the matched set with this paper_count value (e.g. 3111 metabolites with paper_count=0).")
 
 
 class MetCompartmentBucket(BaseModel):
     compartment: str = Field(description="Wet-lab compartment (e.g. 'whole_cell', 'extracellular').")
-    n: int = Field(description="Number of matched measured metabolites observed in this compartment (e.g. 107 for whole_cell).")
+    count: int = Field(description="Number of matched measured metabolites observed in this compartment (e.g. 107 for whole_cell).")
 
 
 class MetMeasurementCoverage(BaseModel):
-    by_paper_count: list[MetPaperCountBucket] = Field(default_factory=list, description="Frequency distribution of measured_paper_count across the matched metabolite set. E.g. [{paper_count: 0, n: 3111}, {paper_count: 1, n: 99}, {paper_count: 2, n: 8}].")
+    by_paper_count: list[MetPaperCountBucket] = Field(default_factory=list, description="Frequency distribution of measured_paper_count across the matched metabolite set. E.g. [{paper_count: 0, count: 3111}, {paper_count: 1, count: 99}, {paper_count: 2, count: 8}].")
     by_compartment: list[MetCompartmentBucket] = Field(default_factory=list, description="Frequency distribution of measured_compartments values across the matched set (over the 107 measured metabolites). Sums to >= count of measured metabolites because the same metabolite can be measured in multiple compartments.")
 
 

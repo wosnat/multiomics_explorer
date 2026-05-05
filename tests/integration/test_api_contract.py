@@ -98,6 +98,7 @@ class TestGeneOverviewContract:
         assert "has_significant_expression" in result
         assert "has_orthologs" in result
         assert "has_derived_metrics" in result
+        assert "has_chemistry" in result
         assert "returned" in result
         assert "truncated" in result
         assert "offset" in result
@@ -116,6 +117,7 @@ class TestGeneOverviewContract:
             "significant_up_count", "significant_down_count", "closest_ortholog_group_size",
             "closest_ortholog_genera", "cluster_membership_count", "cluster_types",
             "derived_metric_count", "derived_metric_value_kinds",
+            "reaction_count", "metabolite_count", "transporter_count", "evidence_sources",
         }
         assert set(result["results"][0].keys()) == expected_keys
 
@@ -1324,3 +1326,137 @@ class TestListMetabolitesContract:
     def test_empty_search_raises(self, conn):
         with pytest.raises(ValueError, match="search"):
             api.list_metabolites(search="   ", conn=conn)
+
+    def test_phase1_per_row_measurement_fields_present(self, conn):
+        """Phase 1 §6.6: measurement-rollup pass-through fields are
+        emitted on every row (default-empty on unmeasured)."""
+        result = api.list_metabolites(limit=5, conn=conn)
+        assert len(result["results"]) >= 1
+        for row in result["results"]:
+            for key in (
+                "measured_assay_count", "measured_paper_count",
+                "measured_organisms", "measured_compartments",
+            ):
+                assert key in row, f"missing per-row key: {key}"
+            # Defaults: ints are 0, lists are []
+            assert isinstance(row["measured_assay_count"], int)
+            assert isinstance(row["measured_paper_count"], int)
+            assert isinstance(row["measured_organisms"], list)
+            assert isinstance(row["measured_compartments"], list)
+
+    def test_phase1_envelope_by_measurement_coverage_pydantic_shape(self, conn):
+        """Phase 1 §6.6: by_measurement_coverage envelope conforms to the
+        Pydantic boundary contract — sub-rollup rows shaped as
+        `{paper_count, count}` and `{compartment, count}` (NOT apoc's
+        raw `{item, count}` shape). Going through the MCP Pydantic
+        wrapper validates this end-to-end."""
+        from multiomics_explorer.mcp_server.tools import (
+            ListMetabolitesResponse,
+        )
+
+        result = api.list_metabolites(summary=True, conn=conn)
+        assert "by_measurement_coverage" in result
+        cov = result["by_measurement_coverage"]
+        assert "by_paper_count" in cov
+        assert "by_compartment" in cov
+        # Per-bucket key shape (would fail with raw apoc {item, count}).
+        for b in cov["by_paper_count"]:
+            assert set(b.keys()) == {"paper_count", "count"}
+            assert isinstance(b["paper_count"], int)
+            assert isinstance(b["count"], int)
+        for b in cov["by_compartment"]:
+            assert set(b.keys()) == {"compartment", "count"}
+            assert isinstance(b["compartment"], str)
+            assert isinstance(b["count"], int)
+
+        # Final round-trip: full envelope passes Pydantic validation.
+        # This is the boundary the MCP server crosses on every call.
+        validated = ListMetabolitesResponse(**result)
+        assert validated.by_measurement_coverage is not None
+
+    def test_phase1_measurement_coverage_live_kg_counts(self, conn):
+        """Phase 1 §6.6 verification cases: 3111 unmeasured + 99 single-paper
+        + 8 dual-paper = 3218 total metabolites. Live KG sanity-check."""
+        result = api.list_metabolites(summary=True, conn=conn)
+        cov = result["by_measurement_coverage"]
+        buckets = {b["paper_count"]: b["count"] for b in cov["by_paper_count"]}
+        # Allow ±50 tolerance — total can drift between rebuilds.
+        assert buckets.get(0, 0) >= 2900, "≥2900 unmeasured metabolites expected"
+        assert buckets.get(1, 0) >= 50, "≥50 single-paper metabolites expected"
+        assert buckets.get(2, 0) >= 1, "≥1 dual-paper metabolites expected"
+        # Compartment sub-rollup is non-empty (107 measured metabolites).
+        compartments = {b["compartment"] for b in cov["by_compartment"]}
+        assert "whole_cell" in compartments
+        assert "extracellular" in compartments
+
+
+@pytest.mark.kg
+class TestPhase1PlumbingContract:
+    """Cross-tool live-KG verification of Phase 1 P0 plumbing additions
+    (spec §6.1 - §6.6). Catches Cypher / api / Pydantic boundary issues
+    that mocked unit tests miss."""
+
+    def test_gene_overview_evidence_sources_on_transport_only_gene(self, conn):
+        """Spec §6.1: PMM0392 (broad ABC transporter, reaction_count=0)
+        must NOT have 'metabolism' in evidence_sources — the path-existence
+        Cypher correctly distinguishes from metabolite-level rollup."""
+        result = api.gene_overview(["PMM0392"], conn=conn)
+        assert result["total_matching"] == 1
+        row = result["results"][0]
+        assert row["reaction_count"] == 0
+        assert row["transporter_count"] >= 1
+        assert "metabolism" not in row["evidence_sources"], (
+            f"PMM0392 has reaction_count=0 but evidence_sources contains "
+            f"'metabolism' — path-existence Cypher regression. "
+            f"Got: {row['evidence_sources']}"
+        )
+        assert "transport" in row["evidence_sources"]
+
+    def test_gene_overview_evidence_sources_on_reaction_only_gene(self, conn):
+        """Spec §6.1: PMM0001 (housekeeping reaction gene) has
+        evidence_sources=['metabolism']."""
+        result = api.gene_overview(["PMM0001"], conn=conn)
+        row = result["results"][0]
+        assert row["reaction_count"] >= 1
+        assert "metabolism" in row["evidence_sources"]
+
+    def test_gene_overview_envelope_has_chemistry(self, conn):
+        """Spec §6.1: envelope `has_chemistry` counts genes with non-empty
+        evidence_sources."""
+        result = api.gene_overview(
+            ["PMM0392", "PMM0001", "PMM1428"], conn=conn,
+        )
+        # PMM0392 + PMM0001 have chemistry; PMM1428 (EVE domain) does not.
+        assert result["has_chemistry"] == 2
+
+    def test_list_filter_values_omics_type_includes_metabolomics(self, conn):
+        """Spec §6.5: omics_type filter type returns the full canonical
+        enum, including METABOLOMICS."""
+        result = api.list_filter_values(filter_type="omics_type", conn=conn)
+        assert result["filter_type"] == "omics_type"
+        values = {r["value"] for r in result["results"]}
+        assert "METABOLOMICS" in values
+        assert "RNASEQ" in values
+        assert "PROTEOMICS" in values
+
+    def test_list_filter_values_evidence_source_three_values(self, conn):
+        """Spec §6.5: evidence_source filter returns metabolism / transport /
+        metabolomics with non-zero counts."""
+        result = api.list_filter_values(filter_type="evidence_source", conn=conn)
+        values = {r["value"] for r in result["results"]}
+        assert values == {"metabolism", "transport", "metabolomics"}
+        for r in result["results"]:
+            assert r["count"] > 0
+
+    def test_list_organisms_envelope_by_measurement_capability(self, conn):
+        """Spec §6.4: envelope by_measurement_capability is binary
+        {has_metabolomics, no_metabolomics}."""
+        result = api.list_organisms(summary=True, conn=conn)
+        assert "by_measurement_capability" in result
+        cap = result["by_measurement_capability"]
+        assert "has_metabolomics" in cap
+        assert "no_metabolomics" in cap
+        # ≥4 organisms have metabolomics today (MIT9301, MIT9313, MIT0801, MIT9303)
+        assert cap["has_metabolomics"] >= 4
+        # Sums to total
+        assert cap["has_metabolomics"] + cap["no_metabolomics"] == result["total_matching"]

@@ -23,6 +23,9 @@ rows:
   experiment_count: 6
   growth_phases: []
   journal: microLife
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - VESICLE_PROTEOMICS
   organisms:
@@ -64,6 +67,9 @@ rows:
   experiment_count: 2
   growth_phases: []
   journal: Environmental Microbiology
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - VESICLE_PROTEOMICS
   organisms:
@@ -98,6 +104,9 @@ rows:
   experiment_count: 3
   growth_phases: []
   journal: Science
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - VESICLE_DNASEQ
   - VESICLE_PROTEOMICS

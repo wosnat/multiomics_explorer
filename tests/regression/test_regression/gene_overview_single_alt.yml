@@ -11,13 +11,17 @@ rows:
   closest_ortholog_group_size: 1
   cluster_membership_count: 0
   cluster_types: []
+  evidence_sources: []
   expression_edge_count: 0
   gene_category: Unknown
   gene_name: null
   informative_annotation_types: []
   locus_tag: EZ55_00275
+  metabolite_count: 0
   numeric_metric_count: 0
   organism_name: Alteromonas macleodii EZ55
   product: hypothetical protein
+  reaction_count: 0
   significant_down_count: 0
   significant_up_count: 0
+  transporter_count: 0

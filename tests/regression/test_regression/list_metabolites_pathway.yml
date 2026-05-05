@@ -5,6 +5,17 @@ by_evidence_source:
   evidence_source: transport
 - count: 2
   evidence_source: metabolomics
+by_measurement_coverage:
+  by_compartment:
+  - compartment: extracellular
+    count: 2
+  - compartment: whole_cell
+    count: 2
+  by_paper_count:
+  - count: 16
+    paper_count: 0
+  - count: 2
+    paper_count: 1
 case_id: list_metabolites_pathway
 mass_stats:
   mass_max: 146.146
@@ -26,6 +37,10 @@ results:
   formula: CO2
   gene_count: 1926
   mass: 44.009
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00011
   name: CO2
   organism_count: 32
@@ -67,6 +82,10 @@ results:
   formula: H4N
   gene_count: 1766
   mass: 18.039
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00014
   name: Ammonia
   organism_count: 32
@@ -101,6 +120,10 @@ results:
   formula: O2
   gene_count: 1761
   mass: 31.998
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00007
   name: Oxygen
   organism_count: 32
@@ -133,6 +156,15 @@ results:
   formula: C5H10N2O3
   gene_count: 1756
   mass: 146.146
+  measured_assay_count: 8
+  measured_compartments:
+  - extracellular
+  - whole_cell
+  measured_organisms:
+  - Prochlorococcus MIT0801
+  - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9313
+  measured_paper_count: 1
   metabolite_id: kegg.compound:C00064
   name: L-Glutamine
   organism_count: 32
@@ -176,6 +208,15 @@ results:
   formula: C5H8NO4
   gene_count: 1519
   mass: 146.122
+  measured_assay_count: 8
+  measured_compartments:
+  - extracellular
+  - whole_cell
+  measured_organisms:
+  - Prochlorococcus MIT0801
+  - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9313
+  measured_paper_count: 1
   metabolite_id: kegg.compound:C00025
   name: L-Glutamate
   organism_count: 32
@@ -245,6 +286,10 @@ results:
   formula: CHO3
   gene_count: 1026
   mass: 61.016
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00288
   name: HCO3-
   organism_count: 32
@@ -278,6 +323,10 @@ results:
   formula: NO2
   gene_count: 735
   mass: 46.005
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00088
   name: Nitrite
   organism_count: 32
@@ -303,6 +352,10 @@ results:
   formula: CNO
   gene_count: 638
   mass: 42.017
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C01417
   name: Cyanate
   organism_count: 32
@@ -323,6 +376,10 @@ results:
   formula: CHO2
   gene_count: 314
   mass: 45.017
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00058
   name: Formate
   organism_count: 32
@@ -353,6 +410,10 @@ results:
   formula: CH2NO5P
   gene_count: 138
   mass: 139.003
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00169
   name: Carbamoyl phosphate
   organism_count: 32
@@ -380,6 +441,10 @@ results:
   formula: N2O
   gene_count: 105
   mass: 44.013
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00887
   name: Nitrous oxide
   organism_count: 32
@@ -401,6 +466,10 @@ results:
   formula: CH2NO2
   gene_count: 99
   mass: 60.032
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C01563
   name: Carbamate
   organism_count: 32
@@ -421,6 +490,10 @@ results:
   formula: HNO3
   gene_count: 135
   mass: 63.012
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00244
   name: Nitrate
   organism_count: 31
@@ -441,6 +514,10 @@ results:
   formula: CN*
   gene_count: 18
   mass: null
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00726
   name: Nitrile
   organism_count: 17
@@ -461,6 +538,10 @@ results:
   formula: CH3NO
   gene_count: 23
   mass: 45.041
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00488
   name: Formamide
   organism_count: 16
@@ -480,6 +561,10 @@ results:
   formula: 'NO'
   gene_count: 7
   mass: 30.006
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00533
   name: Nitric oxide
   organism_count: 2
@@ -534,6 +619,10 @@ results:
   formula: H3NO
   gene_count: 3
   mass: 33.03
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00192
   name: Hydroxylamine
   organism_count: 2
@@ -552,6 +641,10 @@ results:
   formula: N2
   gene_count: 1
   mass: 28.014
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00697
   name: Nitrogen
   organism_count: 1

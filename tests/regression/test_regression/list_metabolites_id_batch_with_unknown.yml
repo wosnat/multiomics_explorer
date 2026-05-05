@@ -3,6 +3,11 @@ by_evidence_source:
   evidence_source: metabolism
 - count: 1
   evidence_source: transport
+by_measurement_coverage:
+  by_compartment: []
+  by_paper_count:
+  - count: 1
+    paper_count: 0
 case_id: list_metabolites_id_batch_with_unknown
 mass_stats:
   mass_max: 180.156
@@ -26,6 +31,10 @@ results:
   formula: C6H12O6
   gene_count: 328
   mass: 180.156
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00031
   name: D-Glucose
   organism_count: 32

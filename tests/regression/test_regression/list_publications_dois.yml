@@ -17,6 +17,9 @@ rows:
   growth_phases:
   - exponential
   journal: The ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - RNASEQ
   organisms:

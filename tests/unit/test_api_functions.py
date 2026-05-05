@@ -9417,15 +9417,19 @@ class TestListMetabolitesPhase1Plumbing:
         "by_evidence_source": [{"item": "metabolism", "count": 1}],
         "with_chebi": 0, "with_hmdb": 0, "with_mnxm": 0,
         "mass_min": None, "mass_median": None, "mass_max": None,
+        # Raw apoc.coll.frequencies output shape — `{item, count}`. The api
+        # layer's `_rename_measurement_coverage` transforms this into the
+        # Pydantic-expected `{paper_count, count}` / `{compartment, count}`
+        # shape. Tests below assert the post-transform output.
         "by_measurement_coverage": {
             "by_paper_count": [
-                {"paper_count": 0, "n": 3111},
-                {"paper_count": 1, "n": 99},
-                {"paper_count": 2, "n": 8},
+                {"item": 0, "count": 3111},
+                {"item": 1, "count": 99},
+                {"item": 2, "count": 8},
             ],
             "by_compartment": [
-                {"compartment": "whole_cell", "n": 107},
-                {"compartment": "extracellular", "n": 92},
+                {"item": "whole_cell", "count": 107},
+                {"item": "extracellular", "count": 92},
             ],
         },
     }
@@ -9515,14 +9519,15 @@ class TestListMetabolitesPhase1Plumbing:
 
     def test_envelope_coverage_has_paper_count_subkey(self):
         """Spec §6.6: by_measurement_coverage.by_paper_count exposes the
-        live distribution (3111 / 99 / 8)."""
+        live distribution (3111 / 99 / 8). The api layer renames apoc's
+        `{item, count}` to `{paper_count, count}` per Pydantic contract."""
         from multiomics_explorer.api.functions import list_metabolites
         conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
         out = list_metabolites(conn=conn)
         cov = out["by_measurement_coverage"]
         assert "by_paper_count" in cov
         # 3 buckets matching the live KG counts.
-        buckets = {b["paper_count"]: b["n"] for b in cov["by_paper_count"]}
+        buckets = {b["paper_count"]: b["count"] for b in cov["by_paper_count"]}
         assert buckets[0] == 3111
         assert buckets[1] == 99
         assert buckets[2] == 8
