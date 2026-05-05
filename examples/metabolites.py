@@ -580,74 +580,160 @@ def scenario_tcdb_chain() -> None:
 
 
 def scenario_measurement() -> None:
-    """Use this when the user asks 'what metabolites were measured under N starvation?'
+    """[transitional scenario — rewrite when Track B native tools land]
 
-    Sources: metabolomics measurement (no gene anchor).
-    Caveat surfaced: native tools pending — uses `run_cypher`. Read the
-    `Assay_quantifies` vs `Assay_flags` discriminator; compartment matters;
-    targeted panel ≠ full metabolome.
+    Use this when the user asks 'what metabolites change under P stress in MIT9301?'
+
+    Sources: metabolomics measurement (no gene anchor; native tools pending).
+
+    GOAL OF THIS SCENARIO (audit-driven, not a tool spec):
+      1. Walkthrough — runnable demonstration of the metabolomics workflow.
+      2. Scope native tool requirements — each step inline-comments the
+         planned native call, serving as empirical motivation for audit
+         Part 3b proposals (list_metabolite_assays, metabolites_by_assay,
+         metabolite_response_profile, differential_metabolite_abundance).
+      3. Rewrite when tools arrive — explicit transitional artifact;
+         when Track B ships, this scenario should collapse from raw Cypher
+         to ~3 native calls.
+
+    Pose: 'what metabolites change under P stress in MIT9301?'
+    The Kujawinski et al. (10.1128/msystems.01261-22) phosphorus experiments
+    are the only stress-treatment metabolomics in the KG today (no nitrogen
+    metabolomics — A5's N-DE question can't be mirrored here).
+
+    See audit Part 3b for the planned surface; analysis-doc Track B for
+    the user-facing guide.
     """
-    print("=== Scenario: measurement ===")
-    print("Question class: 'what metabolites were measured under condition X?'")
+    print("=== Scenario: measurement (transitional — Track B pending) ===")
+    print("Question class: 'what metabolites change under P stress in MIT9301?'")
     print()
     print(">>> BANNER: native tools pending — using run_cypher.")
-    print(">>> See docs://analysis/metabolites Track B and the audit doc for the planned surface.")
+    print(">>> Each step inline-comments the planned native call (audit Part 3b).")
     print()
 
-    print("Step 1: list_experiments(omics_type=['METABOLOMICS'])")
-    exps = list_experiments(omics_type=["METABOLOMICS"], summary=False, limit=5)
-    print(f"  returned={exps['returned']}  total_matching={exps.get('total_matching')}")
-    for e in exps["results"][:5]:
+    # --- Step 1 -------------------------------------------------------------
+    # Today: list_experiments works.
+    # NATIVE EQUIVALENT (audit 3b.1 — Should-add P1):
+    #   list_metabolite_assays(treatment_types=['phosphorus'], summary=True)
+    # Why per-assay rather than per-experiment: compartment, value_kind, and
+    # metric_type are assay-level properties; metabolomics workflows usually
+    # want assay granularity (each experiment fans out to multiple assays).
+    print("Step 1: list_experiments — find P-stress metabolomics experiments")
+    print("  [native: list_metabolite_assays(treatment_types=['phosphorus']) — audit 3b.1, P1]")
+    exps = list_experiments(
+        omics_type=["METABOLOMICS"],
+        treatment_type=["phosphorus"],
+    )
+    print(f"  → {exps['returned']} P-stress metabolomics experiments")
+    for row in exps["results"]:
         print(
-            f"  {str(e.get('id', '?'))[:55]:<55} "
-            f"treatment={e.get('treatment_type')}  bg={e.get('background_factors')}"
+            f"    {row['experiment_id'][:65]:<65} "
+            f"organism={row.get('organism_name','?'):<28}"
         )
     print()
 
-    print("Step 2: assay → metabolite walk via run_cypher (Quantifies arm)")
+    # --- Step 2 -------------------------------------------------------------
+    # Today: raw Cypher walking ExperimentHasMetaboliteAssay → assay →
+    # Assay_quantifies_metabolite → Metabolite. Filter inlined by experiment.id
+    # (run_cypher does not accept a parameters dict).
+    # NATIVE EQUIVALENT (audit 3b.3 — Should-add P1):
+    #   metabolites_by_assay(assay_ids=[...]) returns one row per
+    #   (assay × metabolite) with value/value_sd/n_replicates/metric_type
+    #   already shaped. The Cypher aggregation below (per-metabolite ×
+    #   compartment count) would then live in the envelope rollup or in a
+    #   downstream metabolite_response_profile (3b.2, pending-definition).
+    exp_ids = [row["experiment_id"] for row in exps["results"]]
+    exp_id_filter = "[" + ", ".join(f"'{eid}'" for eid in exp_ids) + "]"
+    print(f"Step 2: assay → metabolite values for those {len(exp_ids)} experiments (run_cypher)")
+    print("  [native: metabolites_by_assay(assay_ids=[...]) — audit 3b.3, P1]")
     cy = run_cypher(
-        query="""
+        query=f"""
         MATCH (e:Experiment)-[:ExperimentHasMetaboliteAssay]->(a:MetaboliteAssay)
               -[r:Assay_quantifies_metabolite]->(m:Metabolite)
-        RETURN m.preferred_id AS metabolite_id,
-               m.name AS metabolite,
+        WHERE e.id IN {exp_id_filter}
+        RETURN m.id AS metabolite_id,
+               m.name AS metabolite_name,
                a.compartment AS compartment,
-               r.value AS value,
-               r.value_sd AS value_sd,
-               r.n_replicates AS n_replicates,
-               r.metric_type AS metric_type,
-               coalesce(r.condition_label, '') AS condition,
-               e.id AS experiment
-        ORDER BY metabolite_id
+               count(r) AS measurement_count,
+               avg(r.value) AS mean_value,
+               collect(DISTINCT r.metric_type)[0] AS metric_type
+        ORDER BY metabolite_name, compartment
         """,
-        limit=15,
+        limit=300,
     )
     print(f"  returned={cy['returned']}  truncated={cy['truncated']}")
-    print(f"  warnings: {cy.get('warnings', [])}")
+    # Pivot per-metabolite × compartment so the user sees both compartments
+    # side-by-side — a shape that the native metabolite_response_profile
+    # tool (3b.2, pending) would surface natively.
+    by_met: dict[str, dict] = {}
+    for row in cy["results"]:
+        mid = row["metabolite_id"]
+        if mid not in by_met:
+            by_met[mid] = {"name": row["metabolite_name"], "extra": None, "whole": None}
+        if row["compartment"] == "extracellular":
+            by_met[mid]["extra"] = row["mean_value"]
+        elif row["compartment"] == "whole_cell":
+            by_met[mid]["whole"] = row["mean_value"]
+    both_compartments = [
+        (mid, d) for mid, d in by_met.items()
+        if d["extra"] is not None and d["whole"] is not None
+    ]
+    print(
+        f"  {len(by_met)} distinct metabolites measured; "
+        f"{len(both_compartments)} present in BOTH compartments"
+    )
     print()
-    print("First quantified rows (metabolite | compartment | value±sd | metric | experiment):")
-    for row in cy["results"][:15]:
-        v = row.get("value")
-        v_sd = row.get("value_sd")
-        v_str = (
-            f"{v:.3g}±{v_sd:.3g}"
-            if isinstance(v, (int, float)) and isinstance(v_sd, (int, float))
-            else str(v)
-        )
+    print("First 10 metabolites with both compartments (illustrating the comparison shape):")
+    print(f"  {'metabolite':<32}{'extracellular':<18}{'whole_cell':<18}")
+    print(f"  {'-' * 30:<32}{'-' * 16:<18}{'-' * 16:<18}")
+    for mid, d in both_compartments[:10]:
+        e = d["extra"]
+        w = d["whole"]
+        e_str = f"{e:.3g}" if isinstance(e, (int, float)) else "-"
+        w_str = f"{w:.3g}" if isinstance(w, (int, float)) else "-"
+        print(f"  {(d['name'] or '?')[:30]:<32}{e_str:<18}{w_str:<18}")
+    print()
+
+    # --- Step 3 -------------------------------------------------------------
+    # Today: list_metabolites already works for chemistry-layer annotation.
+    # NO NEW TOOL NEEDED — the chemistry layer covers compound-side enrichment
+    # of the measured set. This step demonstrates that even though the
+    # measurement-side tools don't exist, the existing chemistry-anchored
+    # tools can still annotate the measured compound list with names,
+    # formulas, pathway membership, and cross-references.
+    print("Step 3: enrich measured compounds via list_metabolites")
+    print("  [native: list_metabolites already works — chemistry layer is unaffected by Track B gap]")
+    measured_ids = [mid for mid, _ in both_compartments[:10]]
+    chem = list_metabolites(metabolite_ids=measured_ids)
+    print(f"  → annotated {chem['returned']} of {len(measured_ids)} measured compounds")
+    for row in chem["results"][:5]:
         print(
-            f"  {str(row.get('metabolite', '?'))[:30]:<30} "
-            f"{str(row.get('compartment', '?')):<14} "
-            f"{v_str:<18} "
-            f"{str(row.get('metric_type', '?'))[:24]:<24} "
-            f"{str(row.get('experiment', '?'))[:30]}"
+            f"    {row['metabolite_id']:<22} "
+            f"formula={(row.get('formula') or '?'):<14} "
+            f"pathways={row.get('pathway_count')} "
+            f"transporters={row.get('transporter_count')}"
         )
+    print()
+
+    # --- Workflow gaps surfaced ---------------------------------------------
+    print("Workflow gaps surfaced (driving audit Part 3b):")
+    print("  3b.1 list_metabolite_assays — per-assay discovery (Should-add P1)")
+    print("  3b.3 metabolites_by_assay / assays_by_metabolite — drill-down (Should-add P1)")
+    print("  3b.2 metabolite_response_profile — cross-experiment per-metabolite summary (pending)")
+    print("  3b.4 differential_metabolite_abundance — DE-shape on measurement (pending)")
     print()
     print("CAVEATS to surface alongside any answer:")
     print("  - No gene anchor: cannot attribute these to specific genes.")
-    print("  - Quantifies (concentration) vs Flags (qualitative detection).")
-    print("  - Compartment matters — extracellular ≠ whole_cell biology.")
+    print("  - Quantifies (concentration) vs Flags (qualitative detection) — different edge types.")
+    print("  - Compartment matters — extracellular ≠ whole_cell biology (Part 4 §4.3.5).")
     print("  - Targeted panel — absence in measurement ≠ absence in cell.")
-    print("  - 107 of 3218 metabolites measured; 2 papers; 10 assays (KG release 2026-05-05).")
+    print("  - 107 of 3218 metabolites measured; 2 papers; 10 assays; 8 experiments")
+    print("    (KG release 2026-05-05).")
+    print()
+    print("REWRITE TRIGGER: when Track B native tools (3b.1 + 3b.3 first, 3b.2 + 3b.4 later)")
+    print("ship, this scenario should collapse to ~3 native calls; each Cypher block")
+    print("becomes a one-line tool invocation. Until then, treat this as the workflow shape")
+    print("the planned tools must support.")
 
 
 SCENARIOS: dict[str, Callable[[], None]] = {
