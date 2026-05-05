@@ -21,15 +21,18 @@ Each phase is small enough to fit one writing-plans cycle and one cohesive PR. P
 
 | Phase | Theme | Items | Blast radius | KG dep |
 |---|---|---:|---|---|
-| 1 | P0 plumbing — pass-through additions | 7 | non-breaking, additive | none |
+| 1 | P0 plumbing — pass-through additions | 6 | non-breaking, additive | none |
 | 2 | Cross-cutting renames + filter additions | 4 | breaking (controlled call sites) | none |
 | 3 | Compound-anchored tightening + ergonomics | 6 | docstring + minor schema | none |
 | 4 | Docstring-only routing hints | 5 | docs-only | none |
 | 5 | Greenfield assay tools | 4 (new tools) | new surface | none |
+| Backlog | `kg_schema` property-description enrichment + analysis-doc Track B `field_description` callout | 1 | docs-only / introspection | KG-MET-001 (Live, doc-only) |
 
-**Total Live items:** 26 (matches audit Parts 2 + 3a + 3b Live tally).
+**Total items:** 26 (25 Live across phases + 1 in backlog).
 
-**Refresh 2026-05-05 post-rebuild:** the `list_metabolites` measurement-rollup pass-through item moved from Phase 5 → Phase 1 because KG-MET-016 (`Metabolite.measured_compartments`) is now populated by the post-import script, removing the gating dependency. Phase 5 is now pure greenfield (4 new assay tools, no existing-tool plumbing). Phase 1 grows from 6 → 7 items. Total Live items unchanged.
+**Refresh 2026-05-05 post-rebuild:**
+- The `list_metabolites` measurement-rollup pass-through item moved from Phase 5 → Phase 1 because KG-MET-016 (`Metabolite.measured_compartments`) is now populated by the post-import script, removing the gating dependency. Phase 5 is now pure greenfield (4 new assay tools, no existing-tool plumbing).
+- The `kg_schema` property-description enrichment + analysis-doc Track B item (originally Phase 1) was moved to backlog per user decision 2026-05-05. Phase 1 net count: 6 items (was 6 originally; +1 from `list_metabolites` move-in, −1 from `kg_schema` move-out).
 
 ---
 
@@ -49,7 +52,6 @@ Each phase lists items, dependencies, and the open decisions (if any) that must 
 - **`list_organisms`** — per-row `measured_metabolite_count` (pass-through from Organism node) + envelope `by_measurement_capability` as a 2-bucket count `{has_metabolomics: N, no_metabolomics: M}`. *Audit Part 3a P1.*
 - **`list_metabolites`** — per-row `measured_assay_count`, `measured_paper_count`, `measured_organisms`, `measured_compartments` (pass-through from Metabolite node) + envelope `by_measurement_coverage` (counts at 0 / 1 / 2 papers + counts by compartment). *Audit Part 3a P0; **previously gated on KG-MET-016, now unblocked** since the post-import script populates `Metabolite.measured_compartments` on all 107 measured metabolites (verified live 2026-05-05).*
 - **`list_filter_values`** — add `omics_type` filter type (returns canonical list including `METABOLOMICS`); add `evidence_source` filter type (returns `['metabolism', 'transport', 'metabolomics']`) for downstream chemistry-layer routing. The `compartment` filter already returns `extracellular` via `Experiment.compartment` (verified live; 3 records). *Audit Part 2 P2 + Part 3a P1.*
-- **`kg_schema` + analysis docs** — (a) extend `kg/schema.py` introspection to merge a curated static dict of property descriptions (start with `MetaboliteAssay.field_description` and key `Metabolite.*` measurement-rollup descriptions) into the schema response; (b) update `skills/multiomics-kg-guide/references/analysis/metabolites.md` Track B to reference `field_description` as the canonical provenance read. *Audit Part 3a build-derived P1; companion to KG-MET-001.*
 
 **Dependencies:** none. KG-MET-016 (was the gating item for the `list_metabolites` row) is now Closed — see kg-asks §5.B.
 
@@ -167,7 +169,7 @@ Lets the reader verify completeness from either direction.
 | Part 3a P0 — `list_metabolites` measurement-rollup pass-through | 1 (moved from 5; KG-MET-016 closed) |
 | Part 3a P1 — `list_organisms` measurement extension (cross-ref Part 2) | 1 |
 | Part 3a P1 — `list_filter_values` `omics_type` filter type | 1 |
-| Part 3a build-derived P1 — `kg_schema` field_description plumbing | 1 |
+| Part 3a build-derived P1 — `kg_schema` field_description plumbing + analysis-doc Track B callout | Backlog (deferred 2026-05-05) |
 | Part 3b.1 P1 — `list_metabolite_assays` (new) | 5 |
 | Part 3b.3a P1 — `metabolites_by_quantifies_assay` (new) | 5 |
 | Part 3b.3b P1 — `metabolites_by_flags_assay` (new) | 5 |
@@ -198,6 +200,7 @@ Mirrors the audit's drop list. Each item gets a one-line reason for not landing 
 | `differential_metabolite_abundance` (new tool) | DEFER — premature; may never happen. Schema empirically rejects FC; if §4.3.2 confirms, this tool's shape evaporates. |
 | DM-family extension to Metabolite | NOT-NEEDED — `MetaboliteAssay` already carries the DM-equivalent fields; KG modellers answered §4.3.1/§4.3.6 implicitly. |
 | Opinionated `exclude_currency_cofactors=True` default | DEFER — start with primitive `exclude_metabolite_ids` (Phase 2); escalate only if callers re-discover the flooding pattern. |
+| `kg_schema` property-description enrichment + analysis-doc Track B `field_description` callout | DEFER 2026-05-05 — originally Phase 1, moved to backlog per user decision. Will land as a separate slice when re-prioritized. KG-MET-001 (the companion KG-side ask) stays Live. Logged to `project_backlog` memory. |
 
 ---
 

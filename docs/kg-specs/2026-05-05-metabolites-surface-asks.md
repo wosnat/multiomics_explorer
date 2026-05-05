@@ -19,7 +19,7 @@ What remains is one provenance-documentation reshape (P1), one decision-document
 
 | ID | Category | Pri | Phase | Explorer consumer (roadmap phase) |
 |---|---|---|---|---|
-| KG-MET-001 | Documentation (RESHAPED) | P1 | first-pass | `kg_schema` field_description plumbing — Phase 1 |
+| KG-MET-001 | Documentation (RESHAPED) | P1 | first-pass | `kg_schema` field_description plumbing — backlog (deferred 2026-05-05) |
 | KG-MET-002 | Decision + Documentation | P2 | first-pass | docs-only; informs `list_metabolite_assays` (Phase 5) |
 | KG-MET-013 | Documentation (NARROWED) | P2 | first-pass | future cross-omics time-correlated tools (no current consumer) |
 
@@ -57,7 +57,7 @@ Companion fields on the assay node (`value_kind`, `unit`, `metric_type`, `aggreg
 - `config/schema_config.yaml` diff shows the YAML `#` comment on `field_description: str`.
 - `metabolomics-extension.md` (or release notes) calls out the convention explicitly.
 
-**Explorer-side dependency:** roadmap Phase 1 — `kg_schema` field_description plumbing item. Once KG-MET-001 lands, the explorer's `kg_schema` MCP tool surfaces the canonical provenance read in tool docstrings + analysis-doc Track B.
+**Explorer-side dependency:** the explorer-side companion item (`kg_schema` property-description enrichment + analysis-doc Track B `field_description` callout) was deferred to backlog 2026-05-05 to keep Phase 1 focused on pass-through plumbing. KG-MET-001 itself stays Live as a KG-team ask — when both KG-MET-001 lands AND the backlog item is re-prioritized, the explorer's `kg_schema` MCP tool will surface `field_description` as a first-class provenance read.
 
 **Out of scope here:** making the BioCypher property description propagate into the live Neo4j schema for schema-introspection callers — that is a separate, larger ask (touches BioCypher config, not just YAML docs). The YAML `#` comment is the cheapest fix.
 

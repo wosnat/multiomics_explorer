@@ -7,11 +7,11 @@
 
 ## Mode
 
-**Mode B (cross-tool small change).** Spec lists 7 tools; Phase 1 is light (KG iteration done in audit + 2026-05-05 post-rebuild verification; schema unchanged); Phase 2 briefings instruct each implementer to "do tool 1 as template, extend to N within your file."
+**Mode B (cross-tool small change).** Spec lists 6 tools; Phase 1 is light (KG iteration done in audit + 2026-05-05 post-rebuild verification; schema unchanged); Phase 2 briefings instruct each implementer to "do tool 1 as template, extend to N within your file."
 
 ## Purpose
 
-Make existing KG-side metabolite + measurement coverage data visible across the explorer's discovery surface. All seven items are additive, non-breaking, and either pass-through reads of node properties already in the KG or small derived rollups built from existing edges. No KG changes are required — Phase 1 is the "consume what 2026-05 KG release already shipped" pass (KG-MET-006 `is_promiscuous` and KG-MET-016 `Metabolite.measured_compartments` were both confirmed populated post-rebuild on 2026-05-05).
+Make existing KG-side metabolite + measurement coverage data visible across the explorer's discovery surface. All six items are additive, non-breaking, and either pass-through reads of node properties already in the KG or small derived rollups built from existing edges. No KG changes are required — Phase 1 is the "consume what 2026-05 KG release already shipped" pass (KG-MET-006 `is_promiscuous` and KG-MET-016 `Metabolite.measured_compartments` were both confirmed populated post-rebuild on 2026-05-05).
 
 The motivation comes from audit Part 1 §1.2: the KG release shipped per-Publication / per-Experiment / per-OrganismTaxon / per-Metabolite measurement rollups (`metabolite_count`, `metabolite_assay_count`, `metabolite_compartments`, `measured_metabolite_count`, etc.) but the explorer's tool surface ignores them. The empirical consequence is that LLM consumers can't see "this publication has metabolomics data" or "this organism has 92 measured metabolites" without dropping down to `run_cypher`.
 
@@ -30,7 +30,7 @@ The motivation comes from audit Part 1 §1.2: the KG release shipped per-Publica
 - [x] Cypher drafted for the only non-trivial item (`gene_overview` evidence_sources)
 - [x] Cypher re-verified against live KG post-rebuild (5 verification cases in §6.1 all return expected `evidence_sources`)
 - [x] All KG dependencies that previously gated this phase are now Closed (KG-MET-016 confirmed populated by post-import L1166-1177)
-- [ ] Two pending decisions in §9: `transporter_count` field-name confirmation; `kg_schema` description-dict seed scope
+- [x] Pending decisions in §9 closed (Q2 transporter_count = approved 2026-05-05; Q3 kg_schema property-description dict deferred to backlog 2026-05-05)
 - [ ] Frozen spec approved
 - [ ] Ready for Phase 2
 
@@ -71,7 +71,7 @@ The motivation comes from audit Part 1 §1.2: the KG release shipped per-Publica
 
 ## 6. Per-tool changes
 
-Sorted by complexity. Items 6.2 – 6.5 + 6.7 are pure pass-through; 6.6 is a small static-data extension; 6.1 is the only one with non-trivial Cypher.
+Sorted by complexity. Items 6.2 – 6.6 are pure pass-through; 6.1 is the only one with non-trivial Cypher.
 
 ### 6.1 `gene_overview` — chemistry counts + `evidence_sources` per row + `has_chemistry` envelope
 
@@ -303,47 +303,7 @@ RETURN c AS value, count(*) AS count
 
 ---
 
-### 6.6 `kg_schema` — property-description enrichment + analysis-doc Track B update
-
-**What's changing.** Two parts:
-
-**(a) `kg_schema()` property descriptions.** Today `kg_schema()` returns only property names + types. Per audit Part 3a build-derived row + KG-MET-001 venue note, the cheapest explorer-side fix is a static enrichment in `kg/schema.py` that merges a curated dict of property docstrings into the response. Initially seed with high-value descriptions:
-
-```python
-PROPERTY_DESCRIPTIONS = {
-    "MetaboliteAssay": {
-        "field_description": "Canonical normalisation-provenance string for the metabolomics layer. Carries paper-specific processing context (e.g. blank-correction, replicate aggregation, source units). Read this before interpreting `value` / `value_sd`.",
-    },
-    "Metabolite": {
-        "evidence_sources": "Subset of ['metabolism', 'transport', 'metabolomics'] — which Metabolite-source pipelines (KEGG reaction, TCDB transport, MetaboliteAssay measurement) contribute to this metabolite.",
-        "measured_assay_count": "Count of distinct MetaboliteAssay edges to this metabolite. Non-zero on 107 metabolites (out of ~3200) as of 2026-05.",
-        "measured_paper_count": "Count of distinct publications with at least one MetaboliteAssay measuring this metabolite.",
-        "measured_organisms": "List of organism preferred_name values where this metabolite has been measured.",
-    },
-    "TcdbFamily": {
-        "metabolite_count": "Count of distinct metabolites this TCDB family is annotated to transport. May be 0 (family-level annotation only, no curated substrates).",
-        "member_count": "Count of distinct genes annotated to this family across all organisms in KG.",
-    },
-}
-```
-
-The schema dump merges this into each node's properties so each property reads either as `{"type": "string"}` (current behavior) or `{"type": "string", "description": "..."}` (when curated).
-
-**Implementation note (file-ownership).** The merge logic is one helper function in `kg/schema.py`; `mcp_server/tools.py:kg_schema` consumes the enriched dict via the existing schema-fetcher entrypoint. The constant lives in `kg/schema.py` so it's near the introspection layer.
-
-**Out of scope:** automating description discovery from `multiomics_biocypher_kg` config files — that's a KG-side ask (KG-MET-001 venue note). The static dict here is curated, paged-in over time, and tied to the metabolomics surface only.
-
-**(b) Analysis-doc Track B update.** Edit `multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md` Track B section to reference `MetaboliteAssay.field_description` as the canonical provenance read that **precedes** `value` / `value_sd` interpretation. Add the convention as a callout near the top of Track B, with one example field_description value.
-
-**Cypher:** none — this is Python static-data + a markdown edit.
-
-**About-content updates** (`inputs/tools/kg_schema.yaml`):
-- New mistake entry: "Property `description` is sparse — populated only on a curated set of high-value properties (currently `MetaboliteAssay.field_description` and selected `Metabolite.*` / `TcdbFamily.*` rollups). Property *type* is always present."
-- New chaining entry: "kg_schema → for any property carrying `description`, the description text is the canonical semantic read; consult before assuming convention from name alone."
-
----
-
-### 6.7 `list_metabolites` — measurement rollup pass-through
+### 6.6 `list_metabolites` — measurement rollup pass-through
 
 **Why this item lives in Phase 1 now.** Originally roadmap-Phase-5 because the audit identified KG-MET-016 (`Metabolite.measured_compartments`) as a gating dependency. Live verification 2026-05-05 post-rebuild confirmed the post-import script (L1166-1177) populates the property on all 107 measured metabolites and defaults the rest to `[]`. KG-MET-016 closed; the dependency dropped; the item moved into Phase 1's pure-pass-through cohort.
 
@@ -405,12 +365,10 @@ Per the `add-or-update-tool` skill Phase 2 file-ownership convention. Each agent
 
 | Agent | File | Items touched |
 |---|---|---|
-| `query-builder` | `multiomics_explorer/kg/queries_lib.py` | 6.1 (gene_overview Cypher), 6.2 (list_publications), 6.3 (list_experiments), 6.4 (list_organisms detail + summary), 6.5 (list_filter_values branches), 6.7 (list_metabolites detail + summary) |
-| `api-updater` | `multiomics_explorer/api/functions.py` (+ `kg/schema.py` for 6.6) | 6.1–6.5 + 6.7 row-class / response-shape extensions; 6.6 PROPERTY_DESCRIPTIONS dict + merge logic in `kg/schema.py` |
-| `tool-wrapper` | `multiomics_explorer/mcp_server/tools.py` | 6.1–6.5 + 6.7 Pydantic model extensions (response classes); 6.6 schema response shape extension |
-| `doc-updater` | `multiomics_explorer/inputs/tools/{gene_overview,list_publications,list_experiments,list_organisms,list_metabolites,list_filter_values,kg_schema}.yaml` + `multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md` + `CLAUDE.md` tool-table updates | About-content for 7 tools; analysis-doc Track B update; CLAUDE.md tool table touch-ups for the changed surfaces |
-
-**Cross-cutting note.** The `api-updater` agent owns BOTH `api/functions.py` AND `kg/schema.py` for this slice — `kg/schema.py` is the home of the schema-introspection helper, and the only API-layer file that's not `functions.py`. Keep the agent brief explicit about both files so the agent doesn't try to put `PROPERTY_DESCRIPTIONS` in `functions.py`.
+| `query-builder` | `multiomics_explorer/kg/queries_lib.py` | 6.1 (gene_overview Cypher), 6.2 (list_publications), 6.3 (list_experiments), 6.4 (list_organisms detail + summary), 6.5 (list_filter_values branches), 6.6 (list_metabolites detail + summary) |
+| `api-updater` | `multiomics_explorer/api/functions.py` | 6.1–6.6 row-class / response-shape extensions |
+| `tool-wrapper` | `multiomics_explorer/mcp_server/tools.py` | 6.1–6.6 Pydantic model extensions (response classes) |
+| `doc-updater` | `multiomics_explorer/inputs/tools/{gene_overview,list_publications,list_experiments,list_organisms,list_metabolites,list_filter_values}.yaml` + `CLAUDE.md` tool-table updates | About-content for 6 tools; CLAUDE.md tool table touch-ups for the changed surfaces |
 
 ## 8. Test cases (one slice per layer, applied to all 6 tools)
 
@@ -433,14 +391,16 @@ All test patterns follow the `testing` skill conventions. Key patterns per layer
 
 ## 9. Open questions / pending decisions
 
+All resolved as of 2026-05-05.
+
 - [x] **Cypher re-verification after KG rebuild.** ✓ Verified live 2026-05-05 post-rebuild — 5 verification cases in §6.1 all pass. Gene.metabolite_count semantics confirmed by post-import.sh L908: "TCDB-S3 / KG-A2: UNION of catalysis + transport paths" — by design, not a bug. PMM0392 reproduces with 554 / 0 / 8. Path-existence Cypher correctly drops false `metabolism` tags on transport-only genes.
 - [x] **`list_filter_values` extracellular verification.** ✓ Verified live: existing `build_list_compartments()` queries `Experiment.compartment` only, and `Experiment` carries 3 `extracellular` records (the metabolomics-paired experiments). `extracellular` is present in the current `compartment` filter return — no broadening needed.
-- [ ] **Confirm `transporter_count` → `tcdb_family_count` rename direction.** The audit row + CLAUDE.md tool table both reference "transporter_count" as the surfaced field name. The Gene node property is `tcdb_family_count` (the count of TCDB family annotations on the gene). The §6.1 spec proposes surfacing the property as `transporter_count` in the response. **Recommendation: use `transporter_count`** — matches existing CLAUDE.md prose and gives the surface the user-facing-meaning name (a "transporter count" is more readable than a TCDB-specific term). Awaiting user confirm before freeze.
-- [ ] **`kg_schema` curated property dict — initial seed scope.** §6.6 proposes seeding 3 nodes × ~6 properties. Open question whether to also seed `Reaction.*`, `OrganismTaxon.measured_metabolite_count`, and `Publication.metabolite_*` descriptions in the same slice, OR keep the seed minimal (MetaboliteAssay-only) and grow over time. **Recommendation: seed minimal (MetaboliteAssay.field_description + the 4 Metabolite measurement fields)** — narrower scope keeps the dict reviewable; expand in Phases 4 / 5 as those tools land.
+- [x] **`transporter_count` field-name confirmation.** ✓ User decision 2026-05-05: surface as `transporter_count` (matches CLAUDE.md prose; user-facing-meaning name). Source property is `Gene.tcdb_family_count`; alias happens at the response key only.
+- [x] **`kg_schema` property-description enrichment + analysis-doc Track B update.** ✓ User decision 2026-05-05: **deferred to backlog**. Originally proposed as §6.6 of this spec; removed from Phase 1 entirely. KG-MET-001 (the companion KG-side ask) stays Live in `docs/kg-specs/2026-05-05-metabolites-surface-asks.md` — its explorer-side dependency is now "backlog item" rather than "Phase 1". Phase 1 item count reduced from 7 → 6.
 
 ## 10. Acceptance criteria
 
-- All 7 tools surface the new fields per §6.1 – §6.7.
+- All 6 tools surface the new fields per §6.1 – §6.6.
 - Existing fields and shapes are unchanged on every tool (additive only).
 - All unit + KG-integration tests pass (3 pytest invocations).
 - Code review (hard gate per add-or-update-tool skill Stage 3) passes — particular attention to:
@@ -448,5 +408,4 @@ All test patterns follow the `testing` skill conventions. Key patterns per layer
   - Sparse-field / coalesce conventions are consistent with the rest of the codebase.
   - The new `omics_type` filter type returns the canonical enum even when some values have count=0.
 - About-content YAML edits regenerate cleanly via `build_about_content.py`.
-- `metabolites.md` Track B references `field_description` as canonical provenance read.
 - `CLAUDE.md` tool table reflects the new surface fields where the table currently describes per-row content.
