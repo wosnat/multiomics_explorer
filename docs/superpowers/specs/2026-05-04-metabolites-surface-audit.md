@@ -691,6 +691,27 @@ Questions that have been answered during design, build, or walkthrough. Numbered
 
 **Implication for KG asks:** no new retirement. **KG-MET-006 stays alive** — it's a *separate* concept (per-family `is_promiscuous` precompute based on member_count / metabolite_count thresholds, not per-substrate primary ranking). KG-MET-006 still has value for the §4.5 confounder #2 reading; preserved as P2.
 
+#### 4.3.2 Fold-change vs other summary statistics — RESOLVED (FC rejected; replication + detection + rank fields replace it, 2026-05-05)
+
+**Question:** Is fold-change the right summary statistic for metabolomics, or do we need a different convention?
+
+**Resolution:** No. FC is rejected. The schema already provides a richer signal via existing edge fields:
+
+| Field | Source | Tells you |
+|---|---|---|
+| `detection_status` (enum: `detected` / `sporadic` / `not_detected`) | Quantifies edges | curator-graded detection call — three-state nuance beyond binary present/absent |
+| `n_replicates` | Quantifies + Flags edges | sampling intensity |
+| `n_non_zero` | Quantifies edges | detection reliability (how often above LOD) |
+| `n_positive` | Flags edges | qualitative detection frequency |
+| `value_sd` | Quantifies edges | within-condition variability |
+| `metric_percentile` / `metric_bucket` / `rank_by_metric` | Quantifies edges | position within the assay's distribution |
+
+Together these answer "is metabolite X consistently and detectably present?" — what FC would proxy for in transcriptomics. In metabolomics, the absolute-concentration + LOD framing is more honest: many measurements are at LOD (zeros are common), and ratios blow up under those conditions. The `detection_status` enum is particularly informative — it lets the LLM say "metabolite X is `sporadic`" without inventing a threshold.
+
+**Implication for tools:** the 3b.3 quantifies/flags drill-downs already surface these fields per row (verified 2026-05-05 schema probe). Tools just need pass-through, not new statistical convention.
+
+**Implication for proposals:** Part 3b.4 (`differential_metabolite_abundance`) stays DEFER (already so) — its premise weakens further. If a downstream FC-style summary is ever needed, it should be computed by consumers using the raw edge fields, not baked into a tool surface.
+
 #### 4.3.1 + 4.3.6 Surface modelling — Assay IS the DM-on-Metabolite analog — RESOLVED (empirically, 2026-05-04 build-derived)
 
 **Question (§4.3.1):** Is `MetaboliteAssay` the *only* measurement surface, or should there also be `DerivedMetric` nodes attached to `Metabolite` (mirroring `DerivedMetric → Gene` for gene-level summaries)?
@@ -713,15 +734,7 @@ Both sub-questions resolved (§4.2.1 direction, §4.2.2 primary substrate) — s
 
 ### 4.3 Metabolomics measurement source
 
-(§4.3.1 + §4.3.6 resolved — see §4.0.)
-
-#### 4.3.2 Fold-change vs other summary statistics
-
-**Question:** Is fold-change the right summary statistic for metabolomics, or do we need a different convention?
-
-**Empirical note:** Existing edges carry `value` (concentration), `value_sd`, `n_replicates`, `metric_percentile`, `metric_bucket`, `rank_by_metric` — all suggesting the KG modellers have already declined to commit to a single FC-style summary and instead carry raw values + percentile/rank context. **The user's intuition that FC may not apply is empirically supported by the schema.**
-
-**Blocks:** Part 3b.2 (`metabolite_response_profile`), Part 3b.4 (`differential_metabolite_abundance`).
+(§4.3.1 + §4.3.2 + §4.3.6 resolved — see §4.0.)
 
 #### 4.3.3 Replicate rollup convention
 
@@ -769,7 +782,6 @@ Resolved questions live in §4.0 and don't appear here (they don't block anythin
 
 | Question | Blocks proposal |
 |---|---|
-| §4.3.2 FC relevance | 3b.2 (DEFER), 3b.4 (DEFER) |
 | §4.3.3 replicate rollup | 3b.2 (DEFER), 3b.4 (DEFER) |
 | §4.3.4 Quantifies vs Flags | 3b.4 (DEFER) |
 | §4.3.5 compartment semantics | 3b.2 (DEFER); also gates `list_metabolites.measured_compartments` sparse-field policy (Part 3a) |
