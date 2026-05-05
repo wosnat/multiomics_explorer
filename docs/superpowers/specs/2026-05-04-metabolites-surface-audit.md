@@ -660,7 +660,7 @@ Questions that have been answered during design, build, or walkthrough. Numbered
 - Analysis doc Track A1: extend the "involved in" caveat to also call out the reversibility gap.
 - Tracked as a Part 2 build-derived docstring TODO (rows for `metabolites_by_gene` + `genes_by_metabolite` + analysis-doc Track A1).
 
-**Implication for KG asks:** none new. KG-MET-009 (was: add `is_reversible`) becomes moot — annotation upstream is insufficient. Mark KG-MET-009 RETIRED in Part 5 next time we touch it.
+**Implication for KG asks:** KG-MET-009 RETIRED 2026-05-05 — annotation upstream insufficient. See Part 5 5.C.
 
 #### 4.1.3 Multi-subunit enzymes — RESOLVED (annotation data insufficient + no remaining consumer, 2026-05-05)
 
@@ -766,9 +766,9 @@ This mirrors the DM family precedent (split drill-down across `genes_by_numeric_
 
 **Not applicable to current data:** the 2 metabolomics papers in the KG today (Kujawinski et al. 2022 — phosphorus + growth-phase axenic monocultures; chitobiose 2023 — carbon-source axenic) are NOT coculture metabolomics. The question doesn't surface in any current scenario.
 
-**Implication for tools:** none today. When coculture metabolomics papers land, tools should expose per-paper method context (likely via the planned `MetaboliteAssay` properties + Publication-node `processing_notes` field — see KG-MET-008 P3).
+**Implication for tools:** none today. When coculture metabolomics papers land, tools should expose per-paper method context. The KG already carries this on `MetaboliteAssay.field_description` per assay (see KG-MET-001 reshape, Part 5 5.A) — paper-level rollup is low-value redundant.
 
-**Implication for KG asks:** **KG-MET-008** (per-paper processing notes documentation, P3) **stays alive** — it covers this and the wider provenance question. No new ask.
+**Implication for KG asks:** none new. KG-MET-008 CLOSED 2026-05-05 — `MetaboliteAssay.field_description` already covers per-paper processing provenance per assay; folded into KG-MET-001 reshape. See Part 5 5.B.
 
 #### 4.3.8 Replicate / temporal axis — RESOLVED (paper/experiment-design-dependent, 2026-05-05)
 
@@ -778,7 +778,7 @@ This mirrors the DM family precedent (split drill-down across `genes_by_numeric_
 
 **Implication for tools:** when surfacing time-correlated cross-omics views (e.g., "metabolite X concentration ↔ gene Y expression at the same timepoint"), tools must filter or join by `experiment_id` first AND surface the timepoint values explicitly so consumers can verify alignment per case. Don't infer cross-omics co-timing from raw `time_point` matching alone.
 
-**Implication for KG asks:** **KG-MET-013** (was: confirm time_point alignment) reframed but stays alive at P2. Now: document per-experiment which timepoints align across omics modalities (i.e., the `Experiment` node could carry a flag or note when cross-omics samples share collection timepoints). Resolves naturally with KG-MET-008 (per-paper processing notes).
+**Implication for KG asks:** **KG-MET-013** sharpened 2026-05-05 (now Adapter behavior + Documentation, P2) — concrete misalignment found in chitosan paper (`time_point_hours=-1` for `"T=4"` likely an adapter parse miss, not a sentinel). See Part 5 5.A for details. Naturally complements KG-MET-001's `field_description` provenance reshape (which carries per-paper processing context).
 
 #### 4.3.1 + 4.3.6 Surface modelling — Assay IS the DM-on-Metabolite analog — RESOLVED (empirically, 2026-05-04 build-derived)
 
@@ -830,7 +830,7 @@ The cross-feeding bridge (`metabolites_by_gene` → `genes_by_metabolite` across
 
 Items only `multiomics_biocypher_kg` can fix. Each ask carries `{category, priority, phase, why}`. Categories: Data gap / Precompute / Rollup / Index / Schema / Decision / Documentation.
 
-After walkthrough Q&A 2026-05-05, the 15 numbered asks split into three status buckets. **Live** is what the KG team should review; **Closed** and **Retired** are kept for traceability.
+After walkthrough Q&A 2026-05-05, the 16 numbered asks split into three status buckets. **Live** is what the KG team should review; **Closed** and **Retired** are kept for traceability.
 
 ### 5.A Live asks (5 — review-required, KG-state verified 2026-05-05; layer-fixed 2026-05-05 evening)
 
