@@ -4968,19 +4968,14 @@ def list_metabolites(
 _VALID_EVIDENCE_SOURCES_GBM = ("metabolism", "transport")
 
 
-# Sparse-strip: result columns that get dropped when null. Per-arm-specific
-# fields are stripped on rows from the other arm; per-row sparse fields
-# (gene_name, product, etc.) are stripped when null on either arm.
+# Sparse-strip: nullable result columns dropped when null. Per-arm-specific
+# fields (reaction_id, transport_confidence, etc.) are NOT in this set —
+# Phase 3 Item 6.1 keeps them as explicit None on cross-arm rows so every
+# row carries identical keys. Only naturally-sparse fields (gene_name,
+# product, formula, verbose-only IDs) appear here.
 _GBM_SPARSE_FIELDS = (
     "gene_name",
     "product",
-    "transport_confidence",
-    "reaction_id",
-    "reaction_name",
-    "ec_numbers",
-    "mass_balance",
-    "tcdb_family_id",
-    "tcdb_family_name",
     "metabolite_formula",
     "metabolite_mass",
     "metabolite_chebi_id",
@@ -5306,10 +5301,14 @@ def genes_by_metabolite(
         and transport_confidence is None
     ):
         warnings.append(
-            "Majority of transport rows are family_inferred (rolled-up "
-            "from broad TCDB families). Re-run with "
-            "transport_confidence='substrate_confirmed' for "
-            "substrate-curated transporter genes only."
+            f"Most transport rows are `family_inferred` ({transport_fi_total} of "
+            f"{transport_fi_total + transport_sc_total}) — annotations rolled up from "
+            "family-level transport potential. Workflow-dependent: use "
+            "`transport_confidence='substrate_confirmed'` for "
+            "conservative-cast questions (e.g. cross-organism inference); "
+            "keep `family_inferred` for broad-screen candidate enumeration. "
+            "Both tiers are annotations, neither is ground truth — see "
+            "analysis-doc §g."
         )
 
     # 12. Assemble + return envelope.
@@ -5353,8 +5352,10 @@ def genes_by_metabolite(
 _VALID_EVIDENCE_SOURCES_MBG = ("metabolism", "transport")
 
 
-# Sparse-strip set is identical to GBM's: per-arm-specific fields drop on
-# rows from the other arm, and per-row sparse fields drop when null.
+# Sparse-strip set is identical to GBM's: only naturally-sparse fields
+# (gene_name, product, formula, verbose-only IDs) drop when null. Cross-arm
+# fields are intentionally NOT in this set — Phase 3 Item 6.1 keeps them
+# as explicit None on cross-arm rows so every row carries identical keys.
 _MBG_SPARSE_FIELDS = _GBM_SPARSE_FIELDS
 
 
@@ -5878,12 +5879,14 @@ def metabolites_by_gene(
         and transport_confidence is None
     ):
         warnings.append(
-            f"Transport rows in this slice are dominated by "
-            f"`family_inferred` rollup ({transport_fi_total} of "
-            f"{transport_fi_total + transport_sc_total} transport rows). "
-            "For high-precision substrate-curated annotations only, set "
-            "`transport_confidence='substrate_confirmed'` and/or "
-            "`evidence_sources=['transport']`."
+            f"Most transport rows are `family_inferred` ({transport_fi_total} of "
+            f"{transport_fi_total + transport_sc_total}) — annotations rolled up from "
+            "family-level transport potential. Workflow-dependent: use "
+            "`transport_confidence='substrate_confirmed'` for "
+            "conservative-cast questions (e.g. cross-organism inference); "
+            "keep `family_inferred` for broad-screen candidate enumeration. "
+            "Both tiers are annotations, neither is ground truth — see "
+            "analysis-doc §g."
         )
 
     # 14. Assemble + return envelope.

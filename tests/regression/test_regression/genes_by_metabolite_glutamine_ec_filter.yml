@@ -28,51 +28,67 @@ not_matched: []
 offset: 0
 reaction_count_total: 1
 results:
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: ecfA1
   locus_tag: PMM0125
+  mass_balance: null
   metabolite_chebi_id: '13110'
   metabolite_formula: C5H10N2O3
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
   metabolite_name: L-Glutamine
   product: energy-coupling factor transport system ATP-binding protein
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
   transport_confidence: family_inferred
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: murJ
   locus_tag: PMM0261
+  mass_balance: null
   metabolite_chebi_id: '13110'
   metabolite_formula: C5H10N2O3
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
   metabolite_name: L-Glutamine
   product: peptidoglycan lipid II flippase
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:2.A.66.4
   tcdb_family_name: 2.A.66.4
   transport_confidence: family_inferred
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: cbiQ
   locus_tag: PMM0392
+  mass_balance: null
   metabolite_chebi_id: '13110'
   metabolite_formula: C5H10N2O3
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
   metabolite_name: L-Glutamine
   product: transmembrane component of ECF transporter energizing module
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
   transport_confidence: family_inferred
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: ftsE
   locus_tag: PMM0434
+  mass_balance: null
   metabolite_chebi_id: '13110'
   metabolite_formula: C5H10N2O3
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
   metabolite_name: L-Glutamine
   product: ATP-binding protein FtsE
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
   transport_confidence: family_inferred
@@ -91,6 +107,9 @@ results:
   reaction_id: kegg.reaction:R00253
   reaction_name: L-glutamate:ammonia ligase (ADP-forming); ATP + L-Glutamate + Ammonia
     <=> ADP + Orthophosphate + L-Glutamine
+  tcdb_family_id: null
+  tcdb_family_name: null
+  transport_confidence: null
 returned: 5
 row_count: 5
 top_gene_categories:
@@ -210,6 +229,8 @@ total_matching: 14
 transporter_count_total: 2
 truncated: true
 warnings:
-- Majority of transport rows are family_inferred (rolled-up from broad TCDB families).
-  Re-run with transport_confidence='substrate_confirmed' for substrate-curated transporter
-  genes only.
+- 'Most transport rows are `family_inferred` (13 of 13) — annotations rolled up from
+  family-level transport potential. Workflow-dependent: use `transport_confidence=''substrate_confirmed''`
+  for conservative-cast questions (e.g. cross-organism inference); keep `family_inferred`
+  for broad-screen candidate enumeration. Both tiers are annotations, neither is ground
+  truth — see analysis-doc §g.'

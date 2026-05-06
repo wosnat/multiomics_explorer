@@ -28,63 +28,83 @@ not_matched: []
 offset: 0
 reaction_count_total: 0
 results:
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: cynA
   locus_tag: PMM0370
+  mass_balance: null
   metabolite_chebi_id: '14658'
   metabolite_formula: NO2
   metabolite_id: kegg.compound:C00088
   metabolite_mass: 46.005
   metabolite_name: Nitrite
   product: cyanate ABC transporter, substrate-binding protein
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1.16.1
   tcdb_family_name: 3.A.1.16.1
   transport_confidence: substrate_confirmed
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: cynA
   locus_tag: PMM0370
+  mass_balance: null
   metabolite_chebi_id: '14658'
   metabolite_formula: NO2
   metabolite_id: kegg.compound:C00088
   metabolite_mass: 46.005
   metabolite_name: Nitrite
   product: cyanate ABC transporter, substrate-binding protein
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1.16.2
   tcdb_family_name: 3.A.1.16.2
   transport_confidence: substrate_confirmed
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: cynB
   locus_tag: PMM0371
+  mass_balance: null
   metabolite_chebi_id: '14658'
   metabolite_formula: NO2
   metabolite_id: kegg.compound:C00088
   metabolite_mass: 46.005
   metabolite_name: Nitrite
   product: cyanate ABC transporter, permease protein
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1.16.1
   tcdb_family_name: 3.A.1.16.1
   transport_confidence: substrate_confirmed
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: cynB
   locus_tag: PMM0371
+  mass_balance: null
   metabolite_chebi_id: '14658'
   metabolite_formula: NO2
   metabolite_id: kegg.compound:C00088
   metabolite_mass: 46.005
   metabolite_name: Nitrite
   product: cyanate ABC transporter, permease protein
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1.16.2
   tcdb_family_name: 3.A.1.16.2
   transport_confidence: substrate_confirmed
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: cynD
   locus_tag: PMM0372
+  mass_balance: null
   metabolite_chebi_id: '14658'
   metabolite_formula: NO2
   metabolite_id: kegg.compound:C00088
   metabolite_mass: 46.005
   metabolite_name: Nitrite
   product: cyanate ABC transporter ATP-binding protein
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1.16.1
   tcdb_family_name: 3.A.1.16.1
   transport_confidence: substrate_confirmed
@@ -204,6 +224,8 @@ total_matching: 17
 transporter_count_total: 3
 truncated: true
 warnings:
-- Majority of transport rows are family_inferred (rolled-up from broad TCDB families).
-  Re-run with transport_confidence='substrate_confirmed' for substrate-curated transporter
-  genes only.
+- 'Most transport rows are `family_inferred` (12 of 17) — annotations rolled up from
+  family-level transport potential. Workflow-dependent: use `transport_confidence=''substrate_confirmed''`
+  for conservative-cast questions (e.g. cross-organism inference); keep `family_inferred`
+  for broad-screen candidate enumeration. Both tiers are annotations, neither is ground
+  truth — see analysis-doc §g.'

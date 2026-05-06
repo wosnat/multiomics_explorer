@@ -41,6 +41,22 @@ rows from the entire batch first regardless of input position —
 a single ABC-superfamily-only gene at the front of input does
 NOT eat the entire `limit=10` with family_inferred rows.
 
+Per-row schema (union shape):
+    Every row carries the full cross-arm key set. Metabolism-arm rows
+    have `transport_confidence` / `tcdb_family_id` / `tcdb_family_name`
+    = None; transport-arm rows have `reaction_id` / `reaction_name` /
+    `ec_numbers` / `mass_balance` = None. Use `row['key']` (KeyError-free)
+    rather than `row.get('key')` if the difference matters to you.
+
+Reaction-arm framing:
+    Reaction edges are undirected AND carry no reversibility flag —
+    interpret all reaction-arm rows as 'involved in', never 'produces'
+    / 'consumes' / 'reversible'. (KG limitation: KEGG-anchored reactions
+    lack both direction and `is_reversible`; see audit §4.1.1 + §4.1.2.)
+
+**`by_element` envelope:** presence-only element-presence rollup
+(NOT stoichiometric, NOT mass-balanced).
+
 Drill-downs from result rows / envelope rollups:
 - Any `top_metabolites` entry →
   `list_metabolites(metabolite_ids=[...])` for richer per-
@@ -110,7 +126,7 @@ total_matching, returned, offset, truncated, warnings, not_found, not_matched, b
 - **by_gene** (list[MbgByGene]): Per-gene rollup. One entry per input locus_tag that produced ≥1 row.
 - **by_evidence_source** (list[MbgByEvidenceSource]): Frequency over `evidence_source` values present in the slice (≤2 entries).
 - **by_transport_confidence** (list[MbgByTransportConfidence]): Frequency over `transport_confidence` values across transport rows only (≤2 entries; metabolism rows are excluded).
-- **by_element** (list[MbgByElement]): NEW (vs GBM): element-presence rollup across the metabolites the gene set touches. Periodic-table-bounded (~30 elements max in KG); full rollup, not top-N.
+- **by_element** (list[MbgByElement]): NEW (vs GBM): element-presence rollup across the metabolites the gene set touches. Periodic-table-bounded (~30 elements max in KG); full rollup, not top-N. Presence-only — count of distinct compounds containing each element at all. NOT stoichiometric (no atom counts per compound; stoichiometry lives in `metabolite.formula`). NOT mass-balanced (KG carries no substrate-vs-product role on `Reaction_has_metabolite`, see audit §4.1.1).
 - **top_metabolites** (list[MbgTopMetabolite]): Top 10 metabolites by gene reach in the filtered slice. The headline answer to 'what metabolites do my gene set hit most.' Drill into any entry via `list_metabolites(metabolite_ids=[id])`.
 - **top_reactions** (list[MbgTopReaction]): Top 10 reactions by gene_count in the metabolism arm. Drill into any entry via `genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)`.
 - **top_tcdb_families** (list[MbgTopTcdbFamily]): Top 10 TCDB families by gene_count in the transport arm. Drill into any entry via `genes_by_ontology(ontology="tcdb", term_ids=[id], organism=...)`.
@@ -130,8 +146,8 @@ total_matching, returned, offset, truncated, warnings, not_found, not_matched, b
 | product | string \| None (optional) | Annotated gene product description (high-signal short label, e.g. 'ABC-type urea transporter, ATPase component UrtE'). |
 | evidence_source | string ('metabolism', 'transport') | Path through which this row reaches the metabolite. 'metabolism' = `Gene → Reaction → Metabolite`. 'transport' = `Gene → TcdbFamily → Metabolite` (rollup-extended). Metabolomics evidence has no gene anchor and never produces rows here. |
 | transport_confidence | string ('substrate_confirmed', 'family_inferred') \| None (optional) | Set on transport rows only. 'substrate_confirmed' = the TCDB family annotation is at `tc_specificity` level (substrate-curated). 'family_inferred' = annotation is at a coarser TCDB level (rolled up via the substrate edge — gene may or may not move this metabolite). None on metabolism rows (direct catalysis edge is always substrate-confirmed by definition). |
-| reaction_id | string \| None (optional) | Full prefixed Reaction ID (e.g. 'kegg.reaction:R00253'). Metabolism rows only. |
-| reaction_name | string \| None (optional) | Reaction systematic name + KEGG equation (raw KEGG value, can be lengthy; ~32 reactions in the KG have empty `''`). Metabolism rows only. |
+| reaction_id | string \| None (optional) | Full prefixed Reaction ID (e.g. 'kegg.reaction:R00253'). Metabolism rows only — see class-level note on undirected, non-reversible interpretation. |
+| reaction_name | string \| None (optional) | Reaction systematic name + KEGG equation (raw KEGG value, can be lengthy; ~32 reactions in the KG have empty `''`). Metabolism rows only — see class-level note on undirected, non-reversible interpretation. |
 | ec_numbers | list[string] \| None (optional) | EC classification(s) for this reaction. Empty list for ~107/2,349 reactions without EC. None on transport rows. |
 | mass_balance | string ('balanced', 'unbalanced') \| None (optional) | Reaction mass-balance status (no nulls in KG: 1,922 balanced + 427 unbalanced). None on transport rows. |
 | tcdb_family_id | string \| None (optional) | Full prefixed TcdbFamily ID (e.g. 'tcdb:3.A.1.4.5'). Transport rows only. |
@@ -288,7 +304,13 @@ metabolites_by_gene → not_matched (locus_tags with no chemistry edges) → gen
 
 - `'metabolomics'` is NOT accepted in `evidence_sources` here — the Pydantic Literal allows only `('metabolism', 'transport')`. The metabolomics path (DerivedMetric → Metabolite) has no Gene anchor and surfaces only in `list_metabolites` (where `'metabolomics'` is a valid forward-compat filter value). Same divergence as `genes_by_metabolite`.
 
-- family_inferred-dominance blowup is per-gene-side here. The 9 ABC-superfamily-only MED4 genes (PMM0434, PMM0449, PMM0450, PMM0749, PMM0750, PMM0913, PMM0976/0977/0978) each emit 551 family_inferred transport rows via the TCDB substrate-edge rollup — a single one of them in a batch DE input is enough to dominate the result. The precision-tier sort (metabolism → substrate_confirmed → family_inferred) keeps high-precision rows at the top regardless of input position, but `total_matching` and the auto-warning still reflect the blowup. For high-precision transporter-hunting set BOTH `transport_confidence='substrate_confirmed'` AND `evidence_sources=['transport']`.
+- When the auto-warning fires (most transport rows are `family_inferred`), interpret workflow-dependent: use `transport_confidence='substrate_confirmed'` for conservative-cast questions (e.g. cross-organism inference); keep `family_inferred` for broad-screen candidate enumeration (e.g. N-source DE — the real MED4 N-uptake genes are family_inferred-only). Both tiers are annotations, neither is ground truth — see analysis-doc §g.
+
+- Every result row has the same key set — cross-arm fields are explicitly `None` on rows from the other arm (metabolism rows have `transport_confidence`/`tcdb_family_id`/`tcdb_family_name` = None; transport rows have `reaction_id`/`reaction_name`/`ec_numbers`/`mass_balance` = None). Use `row['transport_confidence']` (KeyError-free) rather than `row.get('transport_confidence')` if the difference matters.
+
+- Reaction-arm rows are NOT directional — KG reactions carry neither a substrate-vs-product role on `Reaction_has_metabolite` nor an `is_reversible` flag. Read `evidence_source='metabolism'` rows as 'gene catalyses a reaction *involving* this metabolite,' never as 'produces X' / 'consumes Y' / 'reversibly interconverts'. The KG limitation is permanent (KEGG lacks both upstream).
+
+- `by_element` envelope is presence-only — count of distinct metabolites containing each element at all. NOT stoichiometric (atom counts live in `metabolite.formula`); NOT mass-balanced (KG `Reaction_has_metabolite` is undirected and carries no substrate/product role).
 
 - `gene_categories` filter is partially redundant with `locus_tags` input (since the input already constrains the gene set). It's useful only as further narrowing within a broad batch — e.g. `locus_tags=DE_genes, gene_categories=['Transport and binding']` to slice DE chemistry to transport-classified genes only. Don't use it as the primary anchor.
 
