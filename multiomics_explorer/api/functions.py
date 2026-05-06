@@ -4968,9 +4968,11 @@ def list_metabolites(
 _VALID_EVIDENCE_SOURCES_GBM = ("metabolism", "transport")
 
 
-# Sparse-strip: result columns that get dropped when null. Per-arm-specific
-# fields are stripped on rows from the other arm; per-row sparse fields
-# (gene_name, product, etc.) are stripped when null on either arm.
+# Sparse-strip: nullable result columns dropped when null. Per-arm-specific
+# fields (reaction_id, transport_confidence, etc.) are NOT in this set —
+# Phase 3 Item 6.1 keeps them as explicit None on cross-arm rows so every
+# row carries identical keys. Only naturally-sparse fields (gene_name,
+# product, formula, verbose-only IDs) appear here.
 _GBM_SPARSE_FIELDS = (
     "gene_name",
     "product",
@@ -5350,8 +5352,10 @@ def genes_by_metabolite(
 _VALID_EVIDENCE_SOURCES_MBG = ("metabolism", "transport")
 
 
-# Sparse-strip set is identical to GBM's: per-arm-specific fields drop on
-# rows from the other arm, and per-row sparse fields drop when null.
+# Sparse-strip set is identical to GBM's: only naturally-sparse fields
+# (gene_name, product, formula, verbose-only IDs) drop when null. Cross-arm
+# fields are intentionally NOT in this set — Phase 3 Item 6.1 keeps them
+# as explicit None on cross-arm rows so every row carries identical keys.
 _MBG_SPARSE_FIELDS = _GBM_SPARSE_FIELDS
 
 
