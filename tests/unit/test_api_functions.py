@@ -10056,3 +10056,157 @@ class TestDifferentialExpressionByGenePhase2:
             api.differential_expression_by_gene(
                 organism="MED4", direction="sideways", conn=mock_conn,
             )
+
+
+# ---------------------------------------------------------------------------
+# list_metabolite_assays — Phase 5 (RED stage; impl lands in GREEN)
+# Plan: docs/superpowers/plans/2026-05-06-list-metabolite-assays.md
+# Task 7
+# ---------------------------------------------------------------------------
+
+
+class TestListMetaboliteAssays:
+    """API-layer tests — mocked GraphConnection."""
+
+    def _mock_conn(self, summary_rows, detail_rows):
+        from unittest.mock import MagicMock
+        conn = MagicMock()
+        # 2-query pattern: summary first, detail second
+        conn.execute_query.side_effect = [summary_rows, detail_rows]
+        return conn
+
+    def test_returns_envelope_keys(self):
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        summary_row = [{
+            "total_entries": 10, "total_matching": 10,
+            "metabolite_count_total": 768,
+            "by_organism": [], "by_value_kind": [], "by_compartment": [],
+            "top_metric_types": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_growth_phase": [],
+            "by_detection_status": [],
+        }]
+        result = list_metabolite_assays(conn=self._mock_conn(summary_row, []))
+        for k in [
+            "total_entries", "total_matching", "metabolite_count_total",
+            "by_organism", "by_value_kind", "by_compartment", "top_metric_types",
+            "by_treatment_type", "by_background_factors", "by_growth_phase",
+            "by_detection_status", "returned", "truncated", "offset",
+            "not_found", "results",
+        ]:
+            assert k in result, f"missing envelope key: {k}"
+
+    def test_summary_true_skips_detail_query(self):
+        """summary=True forces limit=0; detail builder isn't executed."""
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        from unittest.mock import MagicMock
+        summary_row = [{
+            "total_entries": 10, "total_matching": 10,
+            "metabolite_count_total": 0,
+            "by_organism": [], "by_value_kind": [], "by_compartment": [],
+            "top_metric_types": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_growth_phase": [],
+            "by_detection_status": [],
+        }]
+        conn = MagicMock()
+        conn.execute_query.return_value = summary_row
+        result = list_metabolite_assays(summary=True, conn=conn)
+        assert conn.execute_query.call_count == 1
+        assert result["results"] == []
+        assert result["truncated"] is True
+
+    def test_truncated_when_total_matching_exceeds_limit(self):
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        summary_row = [{
+            "total_entries": 10, "total_matching": 10,
+            "metabolite_count_total": 768,
+            "by_organism": [], "by_value_kind": [], "by_compartment": [],
+            "top_metric_types": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_growth_phase": [],
+            "by_detection_status": [],
+        }]
+        detail_rows = [{"assay_id": f"a{i}"} for i in range(2)]
+        result = list_metabolite_assays(
+            limit=2, conn=self._mock_conn(summary_row, detail_rows))
+        assert result["returned"] == 2
+        assert result["truncated"] is True
+
+    def test_search_text_empty_raises(self):
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        from unittest.mock import MagicMock
+        conn = MagicMock()
+        try:
+            list_metabolite_assays(search_text="", conn=conn)
+        except ValueError:
+            return
+        raise AssertionError("expected ValueError on empty search_text")
+
+    def test_lucene_retry_on_parse_error(self):
+        """Lucene parse error → escape + retry once."""
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        from unittest.mock import MagicMock
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        summary_row = [{
+            "total_entries": 10, "total_matching": 0,
+            "metabolite_count_total": 0,
+            "by_organism": [], "by_value_kind": [], "by_compartment": [],
+            "top_metric_types": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_growth_phase": [],
+            "by_detection_status": [],
+            "score_max": None, "score_median": None,
+        }]
+        conn = MagicMock()
+        # First call (summary) raises Lucene parse error; retry succeeds
+        conn.execute_query.side_effect = [
+            Neo4jClientError(message="Failed to parse query: chitosan AND"),
+            summary_row,
+            [],
+        ]
+        result = list_metabolite_assays(search_text="chitosan AND", conn=conn)
+        assert result["total_matching"] == 0
+
+    def test_not_found_structured_for_batch_inputs(self):
+        """`not_found` carries per-batch buckets (parent §11 Conv B)."""
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        summary_row = [{
+            "total_entries": 10, "total_matching": 1,
+            "metabolite_count_total": 92,
+            "by_organism": [], "by_value_kind": [], "by_compartment": [],
+            "top_metric_types": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_growth_phase": [],
+            "by_detection_status": [],
+        }]
+        detail_rows = [{
+            "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration",
+        }]
+        result = list_metabolite_assays(
+            assay_ids=[
+                "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration",
+                "non_existent_assay_id",
+            ],
+            conn=self._mock_conn(summary_row, detail_rows))
+        assert "not_found" in result
+        assert "assay_ids" in result["not_found"]
+        assert "non_existent_assay_id" in result["not_found"]["assay_ids"]
+        assert "metabolite_ids" in result["not_found"]
+        assert "experiment_ids" in result["not_found"]
+        assert "publication_doi" in result["not_found"]
+
+    def test_offset_echoed(self):
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        summary_row = [{
+            "total_entries": 10, "total_matching": 10,
+            "metabolite_count_total": 768,
+            "by_organism": [], "by_value_kind": [], "by_compartment": [],
+            "top_metric_types": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_growth_phase": [],
+            "by_detection_status": [],
+        }]
+        result = list_metabolite_assays(
+            offset=5, conn=self._mock_conn(summary_row, []))
+        assert result["offset"] == 5
+
+    def test_importable_from_package(self):
+        """Re-exported from api/__init__.py and multiomics_explorer/__init__.py."""
+        from multiomics_explorer.api import list_metabolite_assays as _api_export
+        from multiomics_explorer import list_metabolite_assays as _root_export
+        assert _api_export is _root_export

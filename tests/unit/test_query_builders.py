@@ -9110,3 +9110,309 @@ class TestBuildDifferentialExpressionByGenePhase2DirectionBoth:
             "r.expression_status IN ['significant_up', 'significant_down']"
             not in cypher
         )
+
+
+# ---------------------------------------------------------------------------
+# list_metabolite_assays — Phase 5 (RED stage; impl lands in GREEN)
+# Plan: docs/superpowers/plans/2026-05-06-list-metabolite-assays.md
+# Tasks 1, 3, 5
+# ---------------------------------------------------------------------------
+
+
+class TestListMetaboliteAssaysWhere:
+    """Tests for the shared WHERE-clause helper (mirrors _list_derived_metrics_where)."""
+
+    def test_no_filters_returns_empty(self):
+        from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
+        conditions, params = _list_metabolite_assays_where()
+        assert conditions == []
+        assert params == {}
+
+    def test_organism_space_split_contains(self):
+        from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
+        conditions, params = _list_metabolite_assays_where(organism="MIT9301")
+        assert len(conditions) == 1
+        assert "ALL(word IN split(toLower($organism), ' ')" in conditions[0]
+        assert "toLower(a.organism_name) CONTAINS word" in conditions[0]
+        assert params == {"organism": "MIT9301"}
+
+    def test_metric_types_list(self):
+        from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
+        conditions, params = _list_metabolite_assays_where(
+            metric_types=["cellular_concentration", "extracellular_concentration"])
+        assert conditions == ["a.metric_type IN $metric_types"]
+        assert params == {"metric_types": ["cellular_concentration", "extracellular_concentration"]}
+
+    def test_value_kind_numeric(self):
+        from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
+        conditions, params = _list_metabolite_assays_where(value_kind="numeric")
+        assert conditions == ["a.value_kind = $value_kind"]
+        assert params == {"value_kind": "numeric"}
+
+    def test_value_kind_boolean(self):
+        from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
+        conditions, params = _list_metabolite_assays_where(value_kind="boolean")
+        assert conditions == ["a.value_kind = $value_kind"]
+        assert params == {"value_kind": "boolean"}
+
+    def test_compartment(self):
+        from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
+        conditions, params = _list_metabolite_assays_where(compartment="whole_cell")
+        assert conditions == ["a.compartment = $compartment"]
+        assert params == {"compartment": "whole_cell"}
+
+    def test_treatment_type_any_lowered(self):
+        from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
+        conditions, params = _list_metabolite_assays_where(treatment_type=["Carbon", "PHOSPHORUS"])
+        assert len(conditions) == 1
+        assert "ANY(t IN coalesce(a.treatment_type, [])" in conditions[0]
+        assert "toLower(t) IN $treatment_types_lower" in conditions[0]
+        assert params == {"treatment_types_lower": ["carbon", "phosphorus"]}
+
+    def test_background_factors_any_lowered_null_safe(self):
+        from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
+        conditions, params = _list_metabolite_assays_where(background_factors=["Axenic"])
+        assert len(conditions) == 1
+        assert "ANY(bf IN coalesce(a.background_factors, [])" in conditions[0]
+        assert params == {"background_factors_lower": ["axenic"]}
+
+    def test_growth_phases_any_lowered(self):
+        from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
+        conditions, params = _list_metabolite_assays_where(growth_phases=["Exponential"])
+        assert len(conditions) == 1
+        assert "ANY(gp IN coalesce(a.growth_phases, [])" in conditions[0]
+        assert params == {"growth_phases_lower": ["exponential"]}
+
+    def test_publication_doi_list(self):
+        from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
+        conditions, params = _list_metabolite_assays_where(
+            publication_doi=["10.1073/pnas.2213271120", "10.1128/msystems.01261-22"])
+        assert conditions == ["a.publication_doi IN $publication_doi"]
+        assert params == {
+            "publication_doi": ["10.1073/pnas.2213271120", "10.1128/msystems.01261-22"]}
+
+    def test_experiment_ids_list(self):
+        from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
+        conditions, params = _list_metabolite_assays_where(experiment_ids=["exp_1"])
+        assert conditions == ["a.experiment_id IN $experiment_ids"]
+        assert params == {"experiment_ids": ["exp_1"]}
+
+    def test_assay_ids_list(self):
+        from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
+        conditions, params = _list_metabolite_assays_where(
+            assay_ids=["metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration"])
+        assert conditions == ["a.id IN $assay_ids"]
+        assert "assay_ids" in params
+
+    def test_metabolite_ids_uses_exists_clause(self):
+        """metabolite_ids filter traverses both arms via EXISTS, not IN-list on a.*."""
+        from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
+        conditions, params = _list_metabolite_assays_where(
+            metabolite_ids=["kegg.compound:C00074"])
+        assert len(conditions) == 1
+        assert "EXISTS {" in conditions[0]
+        assert "Assay_quantifies_metabolite" in conditions[0]
+        assert "Assay_flags_metabolite" in conditions[0]
+        assert "m.id IN $metabolite_ids" in conditions[0]
+        assert params == {"metabolite_ids": ["kegg.compound:C00074"]}
+
+    def test_exclude_metabolite_ids_uses_not_exists(self):
+        """exclude_metabolite_ids is set-difference on the same EXISTS shape."""
+        from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
+        conditions, params = _list_metabolite_assays_where(
+            exclude_metabolite_ids=["kegg.compound:C00031"])
+        assert len(conditions) == 1
+        assert "NOT EXISTS {" in conditions[0]
+        assert "m.id IN $exclude_metabolite_ids" in conditions[0]
+        assert params == {"exclude_metabolite_ids": ["kegg.compound:C00031"]}
+
+    def test_rankable_true_coerces_to_string(self):
+        """Phase 5 D4: API takes bool, Cypher compares to string 'true'."""
+        from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
+        conditions, params = _list_metabolite_assays_where(rankable=True)
+        assert conditions == ["a.rankable = $rankable_str"]
+        assert params == {"rankable_str": "true"}
+
+    def test_rankable_false_coerces_to_string(self):
+        from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
+        conditions, params = _list_metabolite_assays_where(rankable=False)
+        assert conditions == ["a.rankable = $rankable_str"]
+        assert params == {"rankable_str": "false"}
+
+    def test_combined_filters(self):
+        from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
+        conditions, params = _list_metabolite_assays_where(
+            organism="MIT9301", value_kind="boolean", rankable=False)
+        assert len(conditions) == 3
+        assert params.keys() == {"organism", "value_kind", "rankable_str"}
+
+
+class TestBuildListMetaboliteAssaysSummary:
+    """Tests for the summary-mode Cypher builder."""
+
+    def test_no_filters_no_search(self):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays_summary
+        cypher, params = build_list_metabolite_assays_summary()
+        assert "MATCH (a:MetaboliteAssay)" in cypher
+        assert "CALL { MATCH (all_a:MetaboliteAssay) RETURN count(all_a) AS total_entries }" in cypher
+        assert "OPTIONAL MATCH (a)-[r:Assay_quantifies_metabolite]->(:Metabolite)" in cypher
+        assert "[s IN collect(r.detection_status) WHERE s IS NOT NULL]" in cypher
+        assert "apoc.coll.frequencies(orgs) AS by_organism" in cypher
+        assert "apoc.coll.frequencies(vks) AS by_value_kind" in cypher
+        assert "apoc.coll.frequencies(comps) AS by_compartment" in cypher
+        assert "apoc.coll.frequencies(mts) AS top_metric_types" in cypher
+        assert "apoc.coll.frequencies(tts) AS by_treatment_type" in cypher
+        assert "apoc.coll.frequencies(bfs) AS by_background_factors" in cypher
+        assert "apoc.coll.frequencies(gps) AS by_growth_phase" in cypher
+        assert "apoc.coll.frequencies(all_det) AS by_detection_status" in cypher
+        assert "sum(a.total_metabolite_count) AS metabolite_count_total" in cypher
+        assert "WHERE" not in cypher
+        assert params == {}
+
+    def test_with_organism_adds_where(self):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays_summary
+        cypher, params = build_list_metabolite_assays_summary(organism="MIT9313")
+        assert "WHERE ALL(word IN split(toLower($organism), ' ')" in cypher
+        assert "toLower(a.organism_name) CONTAINS word" in cypher
+        assert params == {"organism": "MIT9313"}
+
+    def test_search_text_uses_fulltext_index(self):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays_summary
+        cypher, params = build_list_metabolite_assays_summary(search_text="chitosan")
+        assert "CALL db.index.fulltext.queryNodes('metaboliteAssayFullText'" in cypher
+        assert "YIELD node AS a, score" in cypher
+        assert "max(score) AS score_max" in cypher
+        assert "percentileDisc(score, 0.5) AS score_median" in cypher
+        assert params == {"search_text": "chitosan"}
+
+    def test_search_text_combined_with_filter(self):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays_summary
+        cypher, params = build_list_metabolite_assays_summary(
+            search_text="cellular concentration", value_kind="numeric")
+        assert "metaboliteAssayFullText" in cypher
+        assert "WHERE a.value_kind = $value_kind" in cypher
+        assert params == {"search_text": "cellular concentration", "value_kind": "numeric"}
+
+    def test_shares_where_clause_with_helper(self):
+        """Filters from _list_metabolite_assays_where flow through unchanged."""
+        from multiomics_explorer.kg.queries_lib import (
+            build_list_metabolite_assays_summary,
+            _list_metabolite_assays_where,
+        )
+        cypher, params = build_list_metabolite_assays_summary(
+            organism="MIT9301", rankable=True, value_kind="numeric")
+        helper_conds, helper_params = _list_metabolite_assays_where(
+            organism="MIT9301", rankable=True, value_kind="numeric")
+        for cond in helper_conds:
+            assert cond in cypher
+        assert params == helper_params
+
+    def test_metabolite_count_total_summed(self):
+        """metabolite_count_total is sum across matching assays (cumulative, not distinct)."""
+        from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays_summary
+        cypher, _ = build_list_metabolite_assays_summary()
+        assert "sum(a.total_metabolite_count) AS metabolite_count_total" in cypher
+
+
+class TestBuildListMetaboliteAssays:
+    """Tests for the detail-mode Cypher builder."""
+
+    def test_no_filters_compact(self):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays
+        cypher, params = build_list_metabolite_assays()
+        assert "MATCH (a:MetaboliteAssay)" in cypher
+        # Compact RETURN columns
+        assert "a.id AS assay_id" in cypher
+        assert "a.name AS name" in cypher
+        assert "a.metric_type AS metric_type" in cypher
+        assert "a.value_kind AS value_kind" in cypher
+        assert "(a.rankable = \"true\") AS rankable" in cypher  # bool coercion
+        assert "a.unit AS unit" in cypher
+        assert "a.field_description AS field_description" in cypher
+        assert "a.organism_name AS organism_name" in cypher
+        assert "a.experiment_id AS experiment_id" in cypher
+        assert "a.publication_doi AS publication_doi" in cypher
+        assert "a.compartment AS compartment" in cypher
+        assert "a.omics_type AS omics_type" in cypher
+        assert "coalesce(a.treatment_type, []) AS treatment_type" in cypher
+        assert "coalesce(a.background_factors, []) AS background_factors" in cypher
+        assert "coalesce(a.growth_phases, []) AS growth_phases" in cypher
+        assert "a.total_metabolite_count AS total_metabolite_count" in cypher
+        assert "a.aggregation_method AS aggregation_method" in cypher
+        assert "a.preferred_id AS preferred_id" in cypher
+        assert "a.value_min AS value_min" in cypher
+        assert "a.value_q1 AS value_q1" in cypher
+        assert "a.value_median AS value_median" in cypher
+        assert "a.value_q3 AS value_q3" in cypher
+        assert "a.value_max AS value_max" in cypher
+        # timepoints rollup with sentinel-stripping
+        assert (
+            "[label IN collect(DISTINCT r.time_point) "
+            "WHERE label IS NOT NULL AND label <> \"\" | label]"
+        ) in cypher
+        assert "AS timepoints" in cypher
+        # detection_status_counts rollup
+        assert "apoc.coll.frequencies(detection_statuses)" in cypher
+        assert "AS detection_status_counts" in cypher
+        # Verbose-only fields not present in compact
+        assert "a.treatment AS treatment" not in cypher
+        assert "a.light_condition AS light_condition" not in cypher
+        # Sort key
+        assert "ORDER BY a.organism_name ASC, a.value_kind ASC, a.id ASC" in cypher
+        assert params == {}
+
+    def test_verbose_adds_text_columns(self):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays
+        cypher, _ = build_list_metabolite_assays(verbose=True)
+        assert "a.treatment AS treatment" in cypher
+        assert "a.light_condition AS light_condition" in cypher
+        assert "a.experimental_context AS experimental_context" in cypher
+
+    def test_search_text_uses_fulltext_and_score(self):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays
+        cypher, params = build_list_metabolite_assays(search_text="chitosan")
+        assert "CALL db.index.fulltext.queryNodes('metaboliteAssayFullText'" in cypher
+        assert "YIELD node AS a, score" in cypher
+        assert "score AS score" in cypher
+        # Score-DESC must be the leading sort key when searching
+        assert "ORDER BY score DESC, a.organism_name ASC" in cypher
+        assert params == {"search_text": "chitosan"}
+
+    def test_limit_offset_clauses(self):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays
+        cypher, params = build_list_metabolite_assays(limit=20, offset=5)
+        assert "SKIP $offset" in cypher
+        assert "LIMIT $limit" in cypher
+        assert params == {"limit": 20, "offset": 5}
+
+    def test_limit_none_omits_clauses(self):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays
+        cypher, params = build_list_metabolite_assays(limit=None, offset=0)
+        assert "LIMIT" not in cypher
+        assert "SKIP" not in cypher
+        assert params == {}
+
+    def test_filters_through_helper(self):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays
+        cypher, params = build_list_metabolite_assays(
+            organism="MIT9313", value_kind="numeric", rankable=True)
+        assert "WHERE" in cypher
+        assert "a.value_kind = $value_kind" in cypher
+        assert "a.rankable = $rankable_str" in cypher
+        assert params["value_kind"] == "numeric"
+        assert params["rankable_str"] == "true"
+        assert params["organism"] == "MIT9313"
+
+    def test_rankable_returned_as_bool_via_string_compare(self):
+        """Per Phase 5 D4: per-row rankable is bool, derived from string compare."""
+        from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays
+        cypher, _ = build_list_metabolite_assays()
+        assert "(a.rankable = \"true\") AS rankable" in cypher
+
+    def test_metabolite_ids_filter_appears(self):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays
+        cypher, params = build_list_metabolite_assays(
+            metabolite_ids=["kegg.compound:C00074"])
+        assert "EXISTS {" in cypher
+        assert "Assay_quantifies_metabolite|Assay_flags_metabolite" in cypher
+        assert params == {"metabolite_ids": ["kegg.compound:C00074"]}

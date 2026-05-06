@@ -71,6 +71,7 @@ EXPECTED_TOOLS = [
     "list_metabolites",
     "genes_by_metabolite",
     "metabolites_by_gene",
+    "list_metabolite_assays",
 ]
 
 
@@ -7877,3 +7878,203 @@ class TestDifferentialExpressionByGeneWrapperPhase2:
             )
         kwargs = mock_api.call_args.kwargs
         assert kwargs.get("direction") == "down"
+
+
+# ---------------------------------------------------------------------------
+# list_metabolite_assays — Phase 5 (RED stage; wrapper + Pydantic models
+# land in GREEN stage Task 11). Mirrors TestListDerivedMetricsWrapper.
+# Plan: docs/superpowers/plans/2026-05-06-list-metabolite-assays.md Task 10
+# ---------------------------------------------------------------------------
+
+
+class TestListMetaboliteAssaysWrapper:
+    """MCP wrapper tests — calls api.list_metabolite_assays."""
+
+    _SAMPLE_API_RETURN = {
+        "total_entries": 10,
+        "total_matching": 10,
+        "metabolite_count_total": 768,
+        "by_organism": [{"organism_name": "Prochlorococcus MIT9301", "count": 4}],
+        "by_value_kind": [{"value_kind": "numeric", "count": 8}],
+        "by_compartment": [{"compartment": "whole_cell", "count": 7}],
+        "top_metric_types": [{"metric_type": "cellular_concentration", "count": 5}],
+        "by_treatment_type": [{"treatment_type": "carbon", "count": 2}],
+        "by_background_factors": [{"background_factor": "axenic", "count": 10}],
+        "by_growth_phase": [],
+        "by_detection_status": [
+            {"detection_status": "not_detected", "count": 902},
+            {"detection_status": "detected", "count": 247},
+            {"detection_status": "sporadic", "count": 51},
+        ],
+        "score_max": None, "score_median": None,
+        "returned": 0, "offset": 0, "truncated": True,
+        "not_found": {
+            "assay_ids": [], "metabolite_ids": [],
+            "experiment_ids": [], "publication_doi": [],
+        },
+        "results": [],
+    }
+
+    @pytest.mark.asyncio
+    async def test_summary_returns_response_envelope(self, tool_fns, mock_ctx):
+        """Wrapper returns Pydantic ListMetaboliteAssaysResponse envelope."""
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolite_assays",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["list_metabolite_assays"](mock_ctx, summary=True)
+        assert result.total_entries == 10
+        assert result.total_matching == 10
+        assert result.metabolite_count_total == 768
+        assert len(result.by_organism) == 1
+        assert result.by_organism[0].organism_name == "Prochlorococcus MIT9301"
+        assert result.by_organism[0].count == 4
+        assert len(result.by_value_kind) == 1
+        assert result.by_value_kind[0].value_kind == "numeric"
+        assert len(result.by_detection_status) == 3
+        # detected / sporadic / not_detected all surface on envelope
+        statuses = {b.detection_status for b in result.by_detection_status}
+        assert statuses == {"detected", "sporadic", "not_detected"}
+        assert result.results == []
+
+    @pytest.mark.asyncio
+    async def test_truncation_metadata(self, tool_fns, mock_ctx):
+        """When total_matching > returned → truncated=True."""
+        api_return = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 10,
+            "returned": 2,
+            "truncated": True,
+            "results": [
+                {
+                    "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration",
+                    "name": "MIT9301 intracellular metabolite concentration",
+                    "metric_type": "cellular_concentration",
+                    "value_kind": "numeric",
+                    "rankable": True,
+                    "unit": "mol/cell",
+                    "field_description": "Intracellular metabolite concentration.",
+                    "organism_name": "Prochlorococcus MIT9301",
+                    "experiment_id": "exp:foo",
+                    "publication_doi": "10.1128/msystems.01261-22",
+                    "compartment": "whole_cell",
+                    "omics_type": "METABOLOMICS",
+                    "treatment_type": ["carbon"],
+                    "background_factors": ["axenic"],
+                    "growth_phases": [],
+                    "total_metabolite_count": 92,
+                    "aggregation_method": "mean_across_replicates",
+                    "preferred_id": "metabolite_assay_id",
+                    "value_min": 0.0, "value_q1": 0.001, "value_median": 0.005,
+                    "value_q3": 0.012, "value_max": 0.16,
+                    "timepoints": [],
+                    "detection_status_counts": [
+                        {"detection_status": "detected", "count": 47},
+                        {"detection_status": "not_detected", "count": 45},
+                    ],
+                },
+                {
+                    "assay_id": "metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration",
+                    "name": "MIT9313 chitosan intracellular concentration",
+                    "metric_type": "cellular_concentration",
+                    "value_kind": "numeric",
+                    "rankable": True,
+                    "unit": "fg/cell",
+                    "field_description": "Capovilla 2023 chitosan paper.",
+                    "organism_name": "Prochlorococcus MIT9313",
+                    "experiment_id": "exp:bar",
+                    "publication_doi": "10.1073/pnas.2213271120",
+                    "compartment": "whole_cell",
+                    "omics_type": "METABOLOMICS",
+                    "treatment_type": ["carbon"],
+                    "background_factors": ["axenic"],
+                    "growth_phases": [],
+                    "total_metabolite_count": 64,
+                    "aggregation_method": "mean_across_replicates",
+                    "preferred_id": "metabolite_assay_id",
+                    "value_min": 0.0, "value_q1": 0.0, "value_median": 0.001,
+                    "value_q3": 0.01, "value_max": 0.5,
+                    "timepoints": ["4 days", "6 days"],
+                    "detection_status_counts": [
+                        {"detection_status": "detected", "count": 27},
+                        {"detection_status": "sporadic", "count": 30},
+                        {"detection_status": "not_detected", "count": 7},
+                    ],
+                },
+            ],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolite_assays",
+            return_value=api_return,
+        ):
+            result = await tool_fns["list_metabolite_assays"](mock_ctx, limit=2)
+        assert result.returned == 2
+        assert result.total_matching == 10
+        assert result.truncated is True
+        assert len(result.results) == 2
+        # First row: detection_status_counts surfaces as typed sub-models
+        first = result.results[0]
+        assert first.value_kind == "numeric"
+        assert first.rankable is True
+        assert first.compartment == "whole_cell"
+        assert len(first.detection_status_counts) == 2
+        assert first.timepoints == []
+
+    @pytest.mark.asyncio
+    async def test_value_error_becomes_tool_error(self, tool_fns, mock_ctx):
+        """api raises ValueError → wrapper raises ToolError."""
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolite_assays",
+            side_effect=ValueError("search_text must not be empty if provided."),
+        ):
+            with pytest.raises(ToolError, match="search_text must not be empty"):
+                await tool_fns["list_metabolite_assays"](mock_ctx, search_text="")
+        mock_ctx.warning.assert_awaited()
+
+    @pytest.mark.asyncio
+    async def test_rankable_bool_param(self, tool_fns, mock_ctx):
+        """Tool accepts Python True/False for rankable; api receives same."""
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolite_assays",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["list_metabolite_assays"](
+                mock_ctx, rankable=True,
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs.get("rankable") is True
+
+        # rankable=False also forwarded
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolite_assays",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["list_metabolite_assays"](
+                mock_ctx, rankable=False,
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs.get("rankable") is False
+
+    @pytest.mark.asyncio
+    async def test_structured_not_found(self, tool_fns, mock_ctx):
+        """not_found in response is the structured Pydantic model
+        with all 4 batch-input buckets (assay_ids, metabolite_ids,
+        experiment_ids, publication_doi) — parent §11 Conv B / §13.6."""
+        api_return = {
+            **self._SAMPLE_API_RETURN,
+            "not_found": {
+                "assay_ids": ["nonexistent_assay_id"],
+                "metabolite_ids": ["kegg.compound:C99999"],
+                "experiment_ids": ["bogus_exp"],
+                "publication_doi": ["10.x/bogus"],
+            },
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolite_assays",
+            return_value=api_return,
+        ):
+            result = await tool_fns["list_metabolite_assays"](mock_ctx)
+        assert result.not_found.assay_ids == ["nonexistent_assay_id"]
+        assert result.not_found.metabolite_ids == ["kegg.compound:C99999"]
+        assert result.not_found.experiment_ids == ["bogus_exp"]
+        assert result.not_found.publication_doi == ["10.x/bogus"]
