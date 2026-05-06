@@ -83,10 +83,10 @@ total_entries, total_matching, top_organisms, top_metabolite_pathways, by_eviden
 | chebi_id | string \| None (optional) | ChEBI ID (raw numeric, e.g. '4167'). Populated on 90% of metabolites overall — 100% of the 452 chebi:-IDed transport-only metabolites (extracted from the ID itself), plus the kegg.compound:-IDed metabolites that cross-ref ChEBI. |
 | pathway_ids | list[string] (optional) | KEGG pathway memberships (e.g. ['kegg.pathway:ko00010', 'kegg.pathway:ko01100']). Empty when no Metabolite_in_pathway edges. Drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...). |
 | pathway_count | int (optional) | Distinct count of KEGG pathways this metabolite is in (e.g. 5). Routing signal — when > 0, drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...) for genes annotated to those pathways. Equal to size(pathway_ids). |
-| measured_assay_count | int (optional) | Distinct MetaboliteAssay edges anchored to this metabolite (precomputed Metabolite.measured_assay_count). Non-zero on 107 of ~3200 metabolites today. When > 0, the metabolite has experimental measurement coverage. |
-| measured_paper_count | int (optional) | Distinct papers measuring this metabolite (precomputed). Non-zero on 107; today 8 covered by 2 papers, 99 by 1. |
+| measured_assay_count | int (optional) | Distinct MetaboliteAssay edges anchored to this metabolite (precomputed Metabolite.measured_assay_count). Non-zero on 149 of 3230 metabolites today (~5% coverage; KG release 2026-05-06). When > 0, the metabolite has experimental measurement coverage. |
+| measured_paper_count | int (optional) | Distinct papers (1, 2, or 3) measuring this metabolite (precomputed). Non-zero on 149 metabolites today: 5 measured by all 3 papers, 25 by 2, 119 by 1. |
 | measured_organisms | list[string] (optional) | Organism preferred_names with at least one MetaboliteAssay anchored to this metabolite. Populated when measured_assay_count > 0; [] otherwise. |
-| measured_compartments | list[string] (optional) | Wet-lab compartments observed for this metabolite (subset of {'whole_cell', 'extracellular'}). Populated by post-import on all 107 measured metabolites; [] on the 3111 unmeasured. Use len(measured_compartments) >= 1 to filter for measurement-anchored rows. |
+| measured_compartments | list[string] (optional) | Wet-lab compartments observed for this metabolite (subset of {'whole_cell', 'extracellular', 'vesicle'}). Populated by post-import on all 149 measured metabolites; [] on the 3081 unmeasured. Use len(measured_compartments) >= 1 to filter for measurement-anchored rows. |
 | score | float \| None (optional) | Lucene relevance score (only with `search`). |
 
 **Verbose-only fields** (included when `verbose=True`):
@@ -180,7 +180,7 @@ list_organisms (per-row metabolite_count > 0) → list_metabolites(organism_name
 list_metabolites → genes_by_metabolite(metabolite_ids=[...], organism=...)
 list_metabolites (per-row pathway_ids) → genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...)
 differential_expression_by_gene → gene_metabolic_role(metabolite_elements=['N']) → list_metabolites for chemistry context
-list_metabolites (per-row `measured_assay_count > 0`) → run_cypher to inspect MetaboliteAssay edges (Phase 5 will replace this with `assays_by_metabolite(metabolite_ids=[...])`).
+list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(metabolite_ids=[...]) — reverse lookup of all measurement evidence (numeric + boolean) for the measured compounds (cross-organism by default).
 ```
 
 ## Common mistakes

@@ -44,7 +44,7 @@ After this, drill via:
 | rankable | bool \| None | None | True → assays supporting rank/percentile/bucket on metabolites_by_quantifies_assay's rankable-gated filters. |
 | summary | bool | False | Return summary fields only (results=[]). |
 | verbose | bool | False | Include heavy-text fields per row: treatment, light_condition, experimental_context. |
-| limit | int | 20 | Max results (default 20 covers all 10 assays today). |
+| limit | int | 20 | Max results (default 20 covers all 14 assays today). |
 | offset | int | 0 | Pagination offset (0-indexed). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
@@ -123,12 +123,12 @@ list_metabolite_assays(summary=True)
 ```
 
 ```example-response
-total_entries: 10
-total_matching: 10
-by_value_kind: [{value_kind: numeric, count: 8}, {value_kind: boolean, count: 2}]
-by_compartment: [{compartment: whole_cell, count: 7}, {compartment: extracellular, count: 3}]
-by_organism: [4 organisms across 2 papers]
-by_detection_status: [{not_detected: 902}, {detected: 247}, {sporadic: 51}]
+total_entries: 14
+total_matching: 14
+by_value_kind: [{value_kind: numeric, count: 12}, {value_kind: boolean, count: 2}]
+by_compartment: [{compartment: whole_cell, count: 9}, {compartment: extracellular, count: 3}, {compartment: vesicle, count: 2}]
+by_organism: [5 organisms across 3 papers — MIT9313, MIT9301, MIT9312, MIT0801, MIT9303]
+by_detection_status: [{not_detected: 1046}, {detected: 360}, {sporadic: 74}]
 results: []  # summary=True
 ```
 

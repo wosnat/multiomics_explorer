@@ -154,6 +154,7 @@ list_derived_metrics → gene_derived_metrics(locus_tags, derived_metric_ids)
 list_derived_metrics(value_kind='numeric', rankable=True) → genes_by_numeric_metric(derived_metric_ids, bucket=[...])
 list_derived_metrics(value_kind='boolean') → genes_by_boolean_metric(derived_metric_ids, flag=True)
 list_derived_metrics(value_kind='categorical') → genes_by_categorical_metric(derived_metric_ids, categories=[...])
+list_derived_metrics → genes_by_<kind>_metric → metabolites_by_gene — inspect the chemistry of DM-flagged genes (DM rows don't carry chemistry; chain through the locus_tags returned by the drill-down). See docs://analysis/metabolites Track A1 §c1 / §c2.
 ```
 
 ## Common mistakes
@@ -165,6 +166,8 @@ list_derived_metrics(value_kind='categorical') → genes_by_categorical_metric(d
 - has_p_value=True returns zero rows against today's KG — no DM currently carries p-values. The filter exists for forward-compat; drill-down p-value filters (significant_only, max_adjusted_p_value) will raise with a diagnostic error.
 
 - allowed_categories is non-null only when value_kind='categorical'. For boolean and numeric DMs it is null — not a bug.
+
+- DM rows carry no chemistry — `metabolite_count`, `reaction_count`, `evidence_sources` are not surfaced here by design (DM-anchored is purpose-built; chemistry adds noise). For chemistry context on DM-flagged genes, drill the kind- appropriate `genes_by_<kind>_metric` to harvest locus_tags, then chain to `metabolites_by_gene` (gene-anchored) or `genes_by_metabolite` (metabolite-anchored). See docs://analysis/metabolites Track A1 §c1 + §c2.
 
 ```mistake
 list_derived_metrics(rankable="true")

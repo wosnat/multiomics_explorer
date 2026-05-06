@@ -39,6 +39,7 @@ chaining:
   - "list_derived_metrics(value_kind='numeric', rankable=True) → genes_by_numeric_metric(derived_metric_ids, bucket=[...])"
   - "list_derived_metrics(value_kind='boolean') → genes_by_boolean_metric(derived_metric_ids, flag=True)"
   - "list_derived_metrics(value_kind='categorical') → genes_by_categorical_metric(derived_metric_ids, categories=[...])"
+  - "list_derived_metrics → genes_by_<kind>_metric → metabolites_by_gene — inspect the chemistry of DM-flagged genes (DM rows don't carry chemistry; chain through the locus_tags returned by the drill-down). See docs://analysis/metabolites Track A1 §c1 / §c2."
 
 mistakes:
   - >-
@@ -62,6 +63,13 @@ mistakes:
   - >-
     allowed_categories is non-null only when value_kind='categorical'. For
     boolean and numeric DMs it is null — not a bug.
+  - >-
+    DM rows carry no chemistry — `metabolite_count`, `reaction_count`,
+    `evidence_sources` are not surfaced here by design (DM-anchored is purpose-built;
+    chemistry adds noise). For chemistry context on DM-flagged genes, drill the kind-
+    appropriate `genes_by_<kind>_metric` to harvest locus_tags, then chain to
+    `metabolites_by_gene` (gene-anchored) or `genes_by_metabolite` (metabolite-anchored).
+    See docs://analysis/metabolites Track A1 §c1 + §c2.
   - wrong: list_derived_metrics(rankable="true")
     right: list_derived_metrics(rankable=True)
   - wrong: list_derived_metrics(organism="Prochlorococcus MED4 strain")

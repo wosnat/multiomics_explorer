@@ -97,9 +97,9 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 | derived_metric_count | int (optional) | Number of DerivedMetrics associated with this experiment (e.g. 4) |
 | derived_metric_value_kinds | list[string] (optional) | Distinct DerivedMetric value kinds for this experiment (e.g. ['numeric', 'boolean']) |
 | compartment | string \| None (optional) | Wet-lab fraction this experiment profiles (e.g. 'whole_cell', 'vesicle', 'exoproteome'). Scalar per experiment. |
-| metabolite_count | int (optional) | Distinct metabolites measured in this experiment (precomputed Experiment.metabolite_count). Non-zero on 8 experiments today (the metabolomics-paired ones). |
+| metabolite_count | int (optional) | Distinct metabolites measured in this experiment (precomputed Experiment.metabolite_count). Non-zero on 12 experiments today (the metabolomics-paired ones across the 3 metabolomics papers). |
 | metabolite_assay_count | int (optional) | Distinct MetaboliteAssay edges anchored to this experiment (precomputed). Mirrors metabolite_count today. |
-| metabolite_compartments | list[string] (optional) | Wet-lab compartments measured for metabolomics in this experiment (subset of {'whole_cell', 'extracellular'}). Populated only when metabolite_assay_count > 0. |
+| metabolite_compartments | list[string] (optional) | Wet-lab compartments measured for metabolomics in this experiment (subset of {'whole_cell', 'extracellular', 'vesicle'}). Populated only when metabolite_assay_count > 0. |
 | score | float \| None (optional) | Lucene relevance score, present only when search_text is used (e.g. 2.45) |
 | derived_metric_gene_count | int \| None (optional) | Number of distinct genes with DerivedMetric annotations in this experiment (only with verbose=True, e.g. 450) |
 | derived_metric_types | list[string] \| None (optional) | Distinct DerivedMetric metric_type values for this experiment (only with verbose=True, e.g. ['damping_ratio', 'diel_amplitude']) |
@@ -243,7 +243,7 @@ list_experiments → differential_expression_by_gene
 list_experiments → list_clustering_analyses(experiment_ids=[...])
 list_experiments(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric
 list_filter_values(filter_type='metric_type') → list_experiments(search_text='<metric_type>') to find experiments with that metric
-list_experiments (per-row `metabolite_count > 0`) → run_cypher to inspect MetaboliteAssay nodes for the experiment (Phase 5 will replace this with `list_metabolite_assays(experiment_ids=[...])`).
+list_experiments (per-row `metabolite_count > 0`) → list_metabolite_assays(experiment_ids=[...]) to inspect the experiment's MetaboliteAssay nodes (numeric vs boolean, compartment, detection-status rollup).
 ```
 
 ## Common mistakes

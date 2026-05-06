@@ -195,6 +195,7 @@ ontology_landscape → genes_by_ontology(level=N)
 search_ontology → genes_by_ontology(term_ids=[...])
 genes_by_ontology → pathway_enrichment
 genes_by_ontology → gene_overview
+genes_by_ontology(ontology='tcdb' | 'ec', term_ids=[...]) → genes_by_metabolite (substrate-anchored pivot — see docs://analysis/metabolites Track A2 §f)
 ```
 
 ## Common mistakes
@@ -225,7 +226,9 @@ genes_by_ontology → gene_overview
 
 - CAZy is a small ontology (~64 terms, 6 classes / 58 families). `level=0` gives ~6 class-level rows (GH, GT, PL, CE, AA, CBM); `level=1` gives families. With default `min_gene_set_size=5`, many CAZy terms are filtered out — pass `min_gene_set_size=1` to see all.
 
-- Substrate-anchored TCDB questions ('which genes transport sucrose?') chain via `genes_by_metabolite`, NOT `genes_by_ontology`. Use `genes_by_ontology(ontology='tcdb', term_ids=[...])` for *family*-level questions ('which genes are in voltage-gated ion channels?').
+- Substrate-anchored TCDB questions ('which genes transport sucrose?') chain via `genes_by_metabolite`, NOT `genes_by_ontology`. Use `genes_by_ontology(ontology='tcdb', term_ids=[...])` for *family*-level questions ('which genes are in voltage-gated ion channels?'). The metabolite-anchored route includes all TCDB families curating the substrate; the family-anchored route here is anchored on a single family ID and misses cross-family substrate hits.
+
+- Substrate-anchored EC questions ('which genes catalyse a reaction involving glucose?') chain via `genes_by_metabolite(metabolite_ids=[...], evidence_sources=['metabolism'])`, NOT `genes_by_ontology(ontology='ec', ...)`. The metabolite-anchored route reaches every EC number whose Reaction touches the compound; the EC-anchored route here is anchored on a single EC family and misses promiscuous reactions. See docs://analysis/metabolites Track A2 §f for the full anchor-disambiguation.
 
 ```mistake
 genes_by_ontology(ontology='go_bp', organism='MED4')  # no level or term_ids

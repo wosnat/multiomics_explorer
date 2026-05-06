@@ -204,6 +204,17 @@ mistakes:
     `metabolite.formula`); NOT mass-balanced (KG `Reaction_has_metabolite`
     is undirected and carries no substrate/product role).
   - >-
+    There is no `top_genes` envelope field. The per-gene rollup IS `by_gene`
+    (one entry per input locus_tag, populated identically in summary and detail
+    modes — `rows` / `metabolite_count` / `reaction_count` / `transporter_count`
+    / `metabolism_rows` / `transport_substrate_confirmed_rows` /
+    `transport_family_inferred_rows`). The compound-anchored counterpart
+    `top_metabolites` exists (sorted by gene_count); there's no symmetric
+    `top_genes` because gene-anchored aggregation already lives in `by_gene`.
+    Inspect the actual response shape before assuming a field — don't
+    extrapolate from `genes_by_metabolite.top_genes` (different tool, different
+    shape) or `top_*` patterns on other tools.
+  - >-
     `gene_categories` filter is partially redundant with `locus_tags` input
     (since the input already constrains the gene set). It's useful only as
     further narrowing within a broad batch — e.g. `locus_tags=DE_genes,

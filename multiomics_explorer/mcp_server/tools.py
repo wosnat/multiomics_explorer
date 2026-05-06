@@ -407,10 +407,10 @@ class MetaboliteResult(BaseModel):
     pathway_ids: list[str] = Field(default_factory=list, description="KEGG pathway memberships (e.g. ['kegg.pathway:ko00010', 'kegg.pathway:ko01100']). Empty when no Metabolite_in_pathway edges. Drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...).")
     pathway_count: int = Field(default=0, description="Distinct count of KEGG pathways this metabolite is in (e.g. 5). Routing signal — when > 0, drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...) for genes annotated to those pathways. Equal to size(pathway_ids).")
     # Metabolomics measurement rollup (Phase 1 plumbing — spec §6.6)
-    measured_assay_count: int = Field(default=0, description="Distinct MetaboliteAssay edges anchored to this metabolite (precomputed Metabolite.measured_assay_count). Non-zero on 107 of ~3200 metabolites today. When > 0, the metabolite has experimental measurement coverage.")
-    measured_paper_count: int = Field(default=0, description="Distinct papers measuring this metabolite (precomputed). Non-zero on 107; today 8 covered by 2 papers, 99 by 1.")
+    measured_assay_count: int = Field(default=0, description="Distinct MetaboliteAssay edges anchored to this metabolite (precomputed Metabolite.measured_assay_count). Non-zero on 149 of 3230 metabolites today (~5% coverage; KG release 2026-05-06). When > 0, the metabolite has experimental measurement coverage.")
+    measured_paper_count: int = Field(default=0, description="Distinct papers (1, 2, or 3) measuring this metabolite (precomputed). Non-zero on 149 metabolites today: 5 measured by all 3 papers, 25 by 2, 119 by 1.")
     measured_organisms: list[str] = Field(default_factory=list, description="Organism preferred_names with at least one MetaboliteAssay anchored to this metabolite. Populated when measured_assay_count > 0; [] otherwise.")
-    measured_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments observed for this metabolite (subset of {'whole_cell', 'extracellular'}). Populated by post-import on all 107 measured metabolites; [] on the 3111 unmeasured. Use len(measured_compartments) >= 1 to filter for measurement-anchored rows.")
+    measured_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments observed for this metabolite (subset of {'whole_cell', 'extracellular', 'vesicle'}). Populated by post-import on all 149 measured metabolites; [] on the 3081 unmeasured. Use len(measured_compartments) >= 1 to filter for measurement-anchored rows.")
     score: float | None = Field(default=None, description="Lucene relevance score (only with `search`).")
 
     # verbose
@@ -2550,7 +2550,7 @@ def register_tools(mcp: FastMCP):
         derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Value kinds of DerivedMetrics in this publication (e.g. ['numeric', 'boolean'])")
         compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured in this publication (e.g. ['whole_cell', 'vesicle'])")
         # Metabolomics measurement rollup (Phase 1 plumbing — spec §6.2)
-        metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this publication (precomputed Publication.metabolite_count). Non-zero on the metabolomics-paired papers only (Capovilla 2023, Kujawinski 2023). When > 0 → list_metabolites or run_cypher to inspect MetaboliteAssay nodes.")
+        metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this publication (precomputed Publication.metabolite_count). Non-zero on the 3 metabolomics-paired papers (Capovilla 2023, Kujawinski 2023, plus the vesicle paper 10.1111/1462-2920.15834). When > 0 → list_metabolite_assays(publication_doi=[...]) to inspect the paper's MetaboliteAssay nodes.")
         metabolite_assay_count: int = Field(default=0, description="Distinct MetaboliteAssay edges anchored to this publication (precomputed). Mirrors metabolite_count today; will diverge once a metabolite is measured in multiple compartments per paper.")
         metabolite_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured for metabolomics in this publication (e.g. ['whole_cell', 'extracellular']). Populated only when metabolite_assay_count > 0; [] otherwise.")
         score: float | None = Field(default=None, description="Lucene relevance score (only with search_text)")
@@ -2763,9 +2763,9 @@ def register_tools(mcp: FastMCP):
         derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Distinct DerivedMetric value kinds for this experiment (e.g. ['numeric', 'boolean'])")
         compartment: str | None = Field(default=None, description="Wet-lab fraction this experiment profiles (e.g. 'whole_cell', 'vesicle', 'exoproteome'). Scalar per experiment.")
         # Metabolomics measurement rollup (Phase 1 plumbing — spec §6.3)
-        metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this experiment (precomputed Experiment.metabolite_count). Non-zero on 8 experiments today (the metabolomics-paired ones).")
+        metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this experiment (precomputed Experiment.metabolite_count). Non-zero on 12 experiments today (the metabolomics-paired ones across the 3 metabolomics papers).")
         metabolite_assay_count: int = Field(default=0, description="Distinct MetaboliteAssay edges anchored to this experiment (precomputed). Mirrors metabolite_count today.")
-        metabolite_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured for metabolomics in this experiment (subset of {'whole_cell', 'extracellular'}). Populated only when metabolite_assay_count > 0.")
+        metabolite_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured for metabolomics in this experiment (subset of {'whole_cell', 'extracellular', 'vesicle'}). Populated only when metabolite_assay_count > 0.")
         score: float | None = Field(default=None, description="Lucene relevance score, present only when search_text is used (e.g. 2.45)")
         # verbose-only fields
         publication_title: str | None = Field(default=None, description="Publication title")
@@ -8185,7 +8185,7 @@ def register_tools(mcp: FastMCP):
                         "light_condition, experimental_context.",
         )] = False,
         limit: Annotated[int, Field(
-            description="Max results (default 20 covers all 10 assays "
+            description="Max results (default 20 covers all 14 assays "
                         "today).",
             ge=1,
         )] = 20,
@@ -8753,10 +8753,11 @@ def register_tools(mcp: FastMCP):
         """One bucket of the by_value rollup (true / false counts)."""
         flag_value: bool = Field(
             description="The flag's boolean value. `false` rows are "
-            "tested-absent (real biology — 62% of boolean rows in the live KG).")
+            "tested-absent (real biology — 68.8% of boolean rows in the live KG, "
+            "128 of 186 across the 2 boolean assays).")
         count: int = Field(
             description="Row count for this flag value (e.g. 58 false / "
-            "35 true on the msystems presence-flags assay).")
+            "35 true on the msystems presence_flag_intracellular assay).")
 
     class MfaByAssay(BaseModel):
         assay_id: str = Field(
@@ -8918,7 +8919,7 @@ def register_tools(mcp: FastMCP):
                         "`None` (both). Unlike `genes_by_boolean_metric` "
                         "(positive-only KG storage), `Assay_flags_metabolite` "
                         "stores both true and false flags, so `flag_value=False` "
-                        "returns real rows (62% of boolean rows in the live KG).",
+                        "returns real rows (68.8% of boolean rows in the live KG).",
         )] = None,
         summary: Annotated[bool, Field(
             description="Return summary fields only (results=[]).",
@@ -8938,9 +8939,9 @@ def register_tools(mcp: FastMCP):
         (metabolite × flag-edge).
 
         `flag_value=False` rows are *tested-absent* — assayed and not
-        found, real biology. 62% of boolean rows in the live KG are
-        `flag_value=false`. A missing row means *unmeasured*. Distinct
-        (parent §10).
+        found, real biology. 68.8% of boolean rows in the live KG are
+        `flag_value=false` (128 of 186 across the 2 boolean assays). A
+        missing row means *unmeasured*. Distinct (parent §10).
 
         A row with `value=0` / `flag_value=false` /
         `detection_status='not_detected'` is *tested-absent* (assayed

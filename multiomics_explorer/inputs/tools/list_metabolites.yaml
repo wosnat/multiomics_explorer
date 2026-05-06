@@ -65,7 +65,7 @@ chaining:
   - "list_metabolites → genes_by_metabolite(metabolite_ids=[...], organism=...)"
   - "list_metabolites (per-row pathway_ids) → genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...)"
   - "differential_expression_by_gene → gene_metabolic_role(metabolite_elements=['N']) → list_metabolites for chemistry context"
-  - "list_metabolites (per-row `measured_assay_count > 0`) → run_cypher to inspect MetaboliteAssay edges (Phase 5 will replace this with `assays_by_metabolite(metabolite_ids=[...])`)."
+  - "list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(metabolite_ids=[...]) — reverse lookup of all measurement evidence (numeric + boolean) for the measured compounds (cross-organism by default)."
 
 mistakes:
   - "Direction-agnostic. Joining through Reaction_has_metabolite (catalysis) and Tcdb_family_transports_metabolite (transport) does NOT distinguish substrates from products. KEGG equation order is arbitrary. Layer DE direction (`differential_expression_by_gene`) and functional annotation to disambiguate."

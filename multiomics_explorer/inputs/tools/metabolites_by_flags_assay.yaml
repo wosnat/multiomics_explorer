@@ -27,8 +27,9 @@ examples:
   - title: Tested-absent slice — flag_value=False
     call: metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular"], flag_value=False)
     # 58 rows — the metabolites assayed and explicitly flagged as NOT
-    # detected (matches by_value.false=58). Real biology — 62% of boolean
-    # rows in the live KG are flag_value=false. Don't conflate with missing
+    # detected on this single assay (matches by_value.false=58 per-assay).
+    # Real biology — across both boolean assays (186 rows total), 68.8%
+    # are flag_value=false (128 of 186). Don't conflate with missing
     # rows (those would mean unmeasured, not in this assay's scope).
     # See parent §10.
 
@@ -93,9 +94,10 @@ mistakes:
     right: |
       `genes_by_boolean_metric` returns 0 rows for `flag=False` because the
       DM layer stores positive-only edges (`dm_false_count=0` on every current
-      DM). `Assay_flags_metabolite` stores BOTH true and false flags — 62%
-      of edges in the live KG are `flag_value="false"`. flag_value=False
-      returns real rows here. Distinct KG-storage convention.
+      DM). `Assay_flags_metabolite` stores BOTH true and false flags — 68.8%
+      of edges in the live KG are `flag_value="false"` (128 of 186 across the
+      2 boolean assays). flag_value=False returns real rows here. Distinct
+      KG-storage convention.
 
   - wrong: "excluded_assays / warnings will surface gating diagnostics."
     right: |

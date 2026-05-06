@@ -12,7 +12,7 @@ examples:
       by_flag_value: [{false: 2}]  # boolean subset — 70% of all PEP measurements are tested-absent
       by_organism: [4 organisms — MED4, MIT9301, MIT9303, NATL2A]
       by_compartment: [{whole_cell: 12}, {extracellular: 8}]
-      by_assay: [10 assays — every numeric and boolean assay on the metabolomics layer covers PEP]
+      by_assay: [14 assays — every numeric and boolean assay on the metabolomics layer covers PEP]
       metabolites_with_evidence: ["kegg.compound:C00074"]
       metabolites_without_evidence: []
       metabolites_matched: 1

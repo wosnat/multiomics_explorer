@@ -6,9 +6,9 @@ Drill into boolean MetaboliteAssay edges — one row per
 (metabolite × flag-edge).
 
 `flag_value=False` rows are *tested-absent* — assayed and not
-found, real biology. 62% of boolean rows in the live KG are
-`flag_value=false`. A missing row means *unmeasured*. Distinct
-(parent §10).
+found, real biology. 68.8% of boolean rows in the live KG are
+`flag_value=false` (128 of 186 across the 2 boolean assays). A
+missing row means *unmeasured*. Distinct (parent §10).
 
 A row with `value=0` / `flag_value=false` /
 `detection_status='not_detected'` is *tested-absent* (assayed
@@ -39,7 +39,7 @@ Drill across:
 | treatment_type | list[string] \| None | None | Treatment type(s) (ANY-overlap). |
 | background_factors | list[string] \| None | None | Background factor(s) (ANY-overlap). |
 | growth_phases | list[string] \| None | None | Growth phase(s) (ANY-overlap). Empty `[]` on assays today (KG-MET-017 backfill pending). |
-| flag_value | bool \| None | None | Filter by flag presence — `True` (presence flagged), `False` (absence flagged — *tested-absent*, real biology), `None` (both). Unlike `genes_by_boolean_metric` (positive-only KG storage), `Assay_flags_metabolite` stores both true and false flags, so `flag_value=False` returns real rows (62% of boolean rows in the live KG). |
+| flag_value | bool \| None | None | Filter by flag presence — `True` (presence flagged), `False` (absence flagged — *tested-absent*, real biology), `None` (both). Unlike `genes_by_boolean_metric` (positive-only KG storage), `Assay_flags_metabolite` stores both true and false flags, so `flag_value=False` returns real rows (68.8% of boolean rows in the live KG). |
 | summary | bool | False | Return summary fields only (results=[]). |
 | verbose | bool | False | Include heavy-text fields per row: assay_name, field_description. |
 | limit | int | 5 | Max rows. Paginate with `offset`. |
@@ -205,9 +205,10 @@ flag_value=False returns 0 rows like genes_by_boolean_metric does today.
 ```correction
 `genes_by_boolean_metric` returns 0 rows for `flag=False` because the
 DM layer stores positive-only edges (`dm_false_count=0` on every current
-DM). `Assay_flags_metabolite` stores BOTH true and false flags — 62%
-of edges in the live KG are `flag_value="false"`. flag_value=False
-returns real rows here. Distinct KG-storage convention.
+DM). `Assay_flags_metabolite` stores BOTH true and false flags — 68.8%
+of edges in the live KG are `flag_value="false"` (128 of 186 across the
+2 boolean assays). flag_value=False returns real rows here. Distinct
+KG-storage convention.
 
 ```
 

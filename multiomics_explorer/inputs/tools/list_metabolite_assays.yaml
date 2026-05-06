@@ -6,12 +6,12 @@ examples:
   - title: Orient — what assays exist
     call: list_metabolite_assays(summary=True)
     response: |
-      total_entries: 10
-      total_matching: 10
-      by_value_kind: [{value_kind: numeric, count: 8}, {value_kind: boolean, count: 2}]
-      by_compartment: [{compartment: whole_cell, count: 7}, {compartment: extracellular, count: 3}]
-      by_organism: [4 organisms across 2 papers]
-      by_detection_status: [{not_detected: 902}, {detected: 247}, {sporadic: 51}]
+      total_entries: 14
+      total_matching: 14
+      by_value_kind: [{value_kind: numeric, count: 12}, {value_kind: boolean, count: 2}]
+      by_compartment: [{compartment: whole_cell, count: 9}, {compartment: extracellular, count: 3}, {compartment: vesicle, count: 2}]
+      by_organism: [5 organisms across 3 papers — MIT9313, MIT9301, MIT9312, MIT0801, MIT9303]
+      by_detection_status: [{not_detected: 1046}, {detected: 360}, {sporadic: 74}]
       results: []  # summary=True
 
   - title: Discovery via fulltext (Capovilla chitosan paper)
@@ -21,7 +21,7 @@ examples:
     call: list_metabolite_assays(value_kind="numeric", rankable=True)
 
   - title: Find assays measuring a specific metabolite
-    call: list_metabolite_assays(metabolite_ids=["kegg.compound:C00074"])  # PEP — in all 10 assays
+    call: list_metabolite_assays(metabolite_ids=["kegg.compound:C00074"])  # PEP — covered by all 14 assays
 
   - title: Per-paper inventory
     call: list_metabolite_assays(publication_doi=["10.1073/pnas.2213271120"])

@@ -92,6 +92,7 @@ Step 2: gene_details(locus_tags=["PMM0001"])
 gene_overview → gene_details
 resolve_gene → gene_details
 genes_by_function → gene_details
+gene_details → metabolites_by_gene — drill from this gene's chemistry properties (ec_numbers, ko_terms) into the metabolites its reactions involve / its TCDB family transports. Single-gene chemistry deep-dive. See docs://analysis/metabolites Track A1 §c1 + §c2.
 ```
 
 ## Common mistakes
@@ -101,6 +102,8 @@ genes_by_function → gene_details
 - This returns ALL Gene node properties via g{.*} — for the common case, use gene_overview which returns curated fields
 
 - Sparse fields (ec_numbers, catalytic_activities, ko_terms) are only present when the gene has them — check with gene_overview first. TCDB / CAZy memberships are graph edges, not properties — use gene_overview's annotation_types or traverse Gene_has_tcdb_family / Gene_has_cazy_family.
+
+- Chemistry context lives in three places: (1) ec_numbers / catalytic_activities / ko_terms on the Gene properties returned here (annotation-side); (2) `gene_overview` per-row `reaction_count` / `metabolite_count` / `transporter_count` + `evidence_sources` rollup (routing surface — when non-zero, drill); (3) `metabolites_by_gene` for the actual metabolite list (per-arm: reaction-anchored via Gene → Reaction → Metabolite, transport-anchored via Gene → TcdbFamily → Metabolite). For 'what compounds does this gene's chemistry touch?', chain `gene_details → metabolites_by_gene` (or pre-filter with `gene_overview` first to skip genes with no chemistry).
 
 ```mistake
 gene_details(locus_tags='PMM0001')

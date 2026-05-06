@@ -192,6 +192,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
 ontology_landscape → genes_by_ontology(level=N) → pathway_enrichment
 pathway_enrichment → gene_overview
 differential_expression_by_gene → pathway_enrichment
+pathway_enrichment(ontology='kegg', ...) → list_metabolites(pathway_ids=[<enriched_pathway_id>]) — inspect the chemistry of an enriched KEGG pathway (compound-anchored membership, distinct from the gene-KO membership the enrichment used). See docs://analysis/metabolites Track A1 §f for the pathway-anchor disambiguation.
 See `docs://analysis/enrichment` for the full methodology, including the `informative_only` (default `True` since 2026-05) filter semantics.
 ```
 
@@ -226,6 +227,8 @@ pathway_enrichment(..., background='organism')  # or 'table_scope' (default), or
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
 - For DAG ontologies (`go_*`), `level=N`-only enrichment silently drops biologically-meaningful terms at heterogeneous depths. For narrow research questions, hand-curate a `term_ids` panel via `search_ontology(ontology='go_bp', search_text=...)` and pass it directly. Use `level` only when surveying a whole branch.
+
+- When a KEGG pathway is significantly enriched, drill into its chemistry via `list_metabolites(pathway_ids=[<term_id>])`. This answers 'what compounds does the enriched pathway involve?' — a different anchor than the gene-KO membership the enrichment is built on. The same KEGG pathway map (e.g. `kegg.pathway:ko00910` Nitrogen metabolism) reaches the same map from compound-membership vs gene-KO-membership; a gene whose KO is in pathway X may not catalyse any reaction whose metabolites are in pathway X (and vice versa). See docs://analysis/metabolites Track A1 §f.
 
 ## Package import equivalent
 

@@ -92,8 +92,8 @@ mistakes:
   - wrong: "Apply value_min=0.001 by default to 'clean' the data."
     right: |
       `value_min > 0` strips tested-absent rows (`value=0` /
-      `detection_status='not_detected'`). 75% of numeric edges in the live KG
-      are not_detected (902 of 1200) — value_min would discard the majority of
+      `detection_status='not_detected'`). 70.7% of numeric edges in the live KG
+      are not_detected (1046 of 1480) — value_min would discard the majority of
       measured biology under this KG state. Surface as caller choice, never
       default-on. See parent §10.
 

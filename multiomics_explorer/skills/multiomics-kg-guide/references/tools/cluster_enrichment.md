@@ -159,6 +159,7 @@ list_clustering_analyses → cluster_enrichment
 ontology_landscape → cluster_enrichment
 cluster_enrichment → gene_overview
 cluster_enrichment → genes_in_cluster
+cluster_enrichment(ontology='kegg', ...) → list_metabolites(pathway_ids=[<enriched_pathway_id>]) — inspect the chemistry of an enriched KEGG pathway (compound-anchored membership, distinct from the gene-KO membership the enrichment used). See docs://analysis/metabolites Track A1 §f for the pathway-anchor disambiguation.
 See `docs://analysis/enrichment` for the full methodology, including the `informative_only` (default `True` since 2026-05) filter semantics.
 ```
 
@@ -179,6 +180,8 @@ See `docs://analysis/enrichment` for the full methodology, including the `inform
 - `min/max_gene_set_size` is the pathway M filter (per-cluster, clusterProfiler semantics). `min/max_cluster_size` is the cluster membership filter.
 
 - For BRITE, scope to a specific tree with `tree=`. Use `list_filter_values('brite_tree')` to discover trees.
+
+- When a KEGG pathway is significantly enriched in a cluster, drill into its chemistry via `list_metabolites(pathway_ids=[<term_id>])`. The cluster's gene-KO membership and the pathway's compound-membership reach the same KEGG map via different relations — name the anchor when answering. See docs://analysis/metabolites Track A1 §f.
 
 ```mistake
 cluster_enrichment(..., background='table_scope')  # not valid
