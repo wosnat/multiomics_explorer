@@ -278,7 +278,7 @@ rows:
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
-  experiment_count: 23
+  experiment_count: 27
   gene_count: 1978
   genus: Prochlorococcus
   growth_phases:
@@ -286,10 +286,11 @@ rows:
   - acute_stress
   - exponential
   - stationary
-  measured_metabolite_count: 0
+  measured_metabolite_count: 69
   metabolite_count: 1581
   ncbi_taxon_id: 74546
   omics_types:
+  - METABOLOMICS
   - PROTEOMICS
   - RNASEQ
   - VESICLE_PROTEOMICS
@@ -321,7 +322,7 @@ rows:
   - boolean
   - categorical
   - numeric
-  experiment_count: 34
+  experiment_count: 38
   gene_count: 2948
   genus: Prochlorococcus
   growth_phases:
@@ -329,7 +330,7 @@ rows:
   - exponential
   - nutrient_limited
   - recovery
-  measured_metabolite_count: 100
+  measured_metabolite_count: 145
   metabolite_count: 1666
   ncbi_taxon_id: 74547
   omics_types:

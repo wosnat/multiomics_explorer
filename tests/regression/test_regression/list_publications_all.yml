@@ -1,5 +1,5 @@
 case_id: list_publications_all
-row_count: 41
+row_count: 42
 rows:
 - authors:
   - James I. Mullet
@@ -514,17 +514,21 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - vesicle
+  - whole_cell
   derived_metric_count: 6
   derived_metric_value_kinds:
   - numeric
   doi: 10.1111/1462-2920.15834
-  experiment_count: 2
+  experiment_count: 6
   growth_phases: []
   journal: Environmental Microbiology
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
+  metabolite_assay_count: 4
+  metabolite_compartments:
+  - vesicle
+  - whole_cell
+  metabolite_count: 69
   omics_types:
+  - METABOLOMICS
   - VESICLE_PROTEOMICS
   organisms:
   - Prochlorococcus MIT9312
@@ -1053,6 +1057,39 @@ rows:
     under phosphorus-limited conditions
   treatment_types:
   - phosphorus
+  year: 2015
+- authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - exoproteome
+  derived_metric_count: 4
+  derived_metric_value_kinds:
+  - categorical
+  - numeric
+  doi: 10.1002/pmic.201400562
+  experiment_count: 2
+  growth_phases: []
+  journal: Proteomics
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - EXOPROTEOMICS
+  organisms:
+  - Ruegeria pomeroyi DSS-3
+  - Synechococcus WH7803
+  - Synechococcus WH8102
+  study_type: Exoproteomics
+  title: You produce while I clean up, a strategy revealed by exoproteomics during
+    Synechococcus–Roseobacter interactions
+  treatment_types:
+  - coculture
   year: 2015
 - authors:
   - Anne W. Thompson

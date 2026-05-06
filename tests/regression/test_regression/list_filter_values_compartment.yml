@@ -1,11 +1,11 @@
 case_id: list_filter_values_compartment
 row_count: 4
 rows:
-- count: 167
+- count: 169
   value: whole_cell
-- count: 11
+- count: 13
   value: vesicle
-- count: 8
+- count: 10
   value: exoproteome
 - count: 3
   value: extracellular

@@ -3,21 +3,25 @@ by_evidence_source:
   evidence_source: metabolism
 - count: 1355
   evidence_source: transport
-- count: 107
+- count: 149
   evidence_source: metabolomics
 by_measurement_coverage:
   by_compartment:
   - compartment: extracellular
     count: 92
+  - compartment: vesicle
+    count: 69
   - compartment: whole_cell
-    count: 107
+    count: 149
   by_paper_count:
-  - count: 3111
+  - count: 3081
     paper_count: 0
-  - count: 99
+  - count: 119
     paper_count: 1
-  - count: 8
+  - count: 25
     paper_count: 2
+  - count: 5
+    paper_count: 3
 case_id: list_metabolites_all
 mass_stats:
   mass_max: 5227.103
@@ -228,7 +232,7 @@ row_count: 5
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 1588
+- count: 1589
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
 - count: 596
@@ -279,10 +283,10 @@ top_organisms:
   organism_name: Marinobacter (MarRef v6)
 - count: 2082
   organism_name: Alteromonas macleodii ATCC27126
-total_entries: 3218
-total_matching: 3218
+total_entries: 3230
+total_matching: 3230
 truncated: true
 xref_coverage:
-  with_chebi: 2915
-  with_hmdb: 1481
-  with_mnxm: 3214
+  with_chebi: 2924
+  with_hmdb: 1484
+  with_mnxm: 3221

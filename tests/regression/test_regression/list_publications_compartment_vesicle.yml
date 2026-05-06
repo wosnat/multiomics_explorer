@@ -60,17 +60,21 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - vesicle
+  - whole_cell
   derived_metric_count: 6
   derived_metric_value_kinds:
   - numeric
   doi: 10.1111/1462-2920.15834
-  experiment_count: 2
+  experiment_count: 6
   growth_phases: []
   journal: Environmental Microbiology
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
+  metabolite_assay_count: 4
+  metabolite_compartments:
+  - vesicle
+  - whole_cell
+  metabolite_count: 69
   omics_types:
+  - METABOLOMICS
   - VESICLE_PROTEOMICS
   organisms:
   - Prochlorococcus MIT9312

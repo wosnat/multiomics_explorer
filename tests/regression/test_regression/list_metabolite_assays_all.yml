@@ -1,5 +1,5 @@
 case_id: list_metabolite_assays_all
-row_count: 10
+row_count: 14
 rows:
 - aggregation_method: pre_aggregated
   assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_0801_extracellular:extracellular_concentration
@@ -211,6 +211,139 @@ rows:
   value_min: 0.0
   value_q1: 0.0012
   value_q3: 0.012
+- aggregation_method: pre_aggregated
+  assay_id: metabolite_assay:1462-2920.15834:s7_metabolites_cells_mit9312:relative_peak_area_biovolume_normalized
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  detection_status_counts:
+  - '{''count'': 5, ''detection_status'': ''not_detected''}'
+  - '{''count'': 56, ''detection_status'': ''detected''}'
+  - '{''count'': 9, ''detection_status'': ''sporadic''}'
+  experiment_id: 10.1111/1462-2920.15834_cells_metabolomics_mit9312
+  field_description: Average relative biovolume-normalized peak area for targeted
+    metabolites in MIT9312 whole-cell samples (Biller 2022 Table S7). Cells encode
+    mean (sd), n=N out of 3 biological replicates. Analytical fraction (RPOrgPos /
+    RPAqPos / HILICPos / HILICNeg) lives on the Compound row; see Methods + Table
+    S8 for fraction-specific LC-MS conditions.
+  growth_phases: []
+  metric_type: relative_peak_area_biovolume_normalized
+  name: MIT9312 whole-cell targeted metabolite relative peak area (biovolume-normalized)
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9312
+  preferred_id: metabolite_assay_id
+  publication_doi: 10.1111/1462-2920.15834
+  rankable: true
+  timepoints: []
+  total_metabolite_count: 69
+  treatment_type:
+  - compartment
+  unit: relative peak area / biovolume
+  value_kind: numeric
+  value_max: 1.5
+  value_median: 0.0021
+  value_min: 0.0
+  value_q1: 0.0001
+  value_q3: 0.0063
+- aggregation_method: pre_aggregated
+  assay_id: metabolite_assay:1462-2920.15834:s7_metabolites_vesicles_mit9312:relative_peak_area_biovolume_normalized
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  detection_status_counts:
+  - '{''count'': 2, ''detection_status'': ''detected''}'
+  - '{''count'': 2, ''detection_status'': ''sporadic''}'
+  - '{''count'': 66, ''detection_status'': ''not_detected''}'
+  experiment_id: 10.1111/1462-2920.15834_vesicle_metabolomics_mit9312
+  field_description: Average relative biovolume-normalized peak area for targeted
+    metabolites in MIT9312 purified extracellular vesicles (Biller 2022 Table S7).
+    Most rows are nd (compound below LOD in vesicles); the few detected compounds
+    are pigments and lipid-soluble cofactors (Carotene, trans Retinal, Vitamin K1).
+  growth_phases: []
+  metric_type: relative_peak_area_biovolume_normalized
+  name: MIT9312 vesicle targeted metabolite relative peak area (biovolume-normalized)
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9312
+  preferred_id: metabolite_assay_id
+  publication_doi: 10.1111/1462-2920.15834
+  rankable: true
+  timepoints: []
+  total_metabolite_count: 69
+  treatment_type:
+  - compartment
+  unit: relative peak area / biovolume
+  value_kind: numeric
+  value_max: 0.36
+  value_median: 0.0
+  value_min: 0.0
+  value_q1: 0.0
+  value_q3: 0.0
+- aggregation_method: pre_aggregated
+  assay_id: metabolite_assay:1462-2920.15834:s7_metabolites_cells_mit9313:relative_peak_area_biovolume_normalized
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  detection_status_counts:
+  - '{''count'': 12, ''detection_status'': ''sporadic''}'
+  - '{''count'': 52, ''detection_status'': ''detected''}'
+  - '{''count'': 6, ''detection_status'': ''not_detected''}'
+  experiment_id: 10.1111/1462-2920.15834_cells_metabolomics_mit9313
+  field_description: Average relative biovolume-normalized peak area for targeted
+    metabolites in MIT9313 whole-cell samples (Biller 2022 Table S7). Cells encode
+    mean (sd), n=N out of 3 biological replicates.
+  growth_phases: []
+  metric_type: relative_peak_area_biovolume_normalized
+  name: MIT9313 whole-cell targeted metabolite relative peak area (biovolume-normalized)
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9313
+  preferred_id: metabolite_assay_id
+  publication_doi: 10.1111/1462-2920.15834
+  rankable: true
+  timepoints: []
+  total_metabolite_count: 69
+  treatment_type:
+  - compartment
+  unit: relative peak area / biovolume
+  value_kind: numeric
+  value_max: 32.0
+  value_median: 0.0043
+  value_min: 0.0
+  value_q1: 0.0006
+  value_q3: 0.022
+- aggregation_method: pre_aggregated
+  assay_id: metabolite_assay:1462-2920.15834:s7_metabolites_vesicles_mit9313:relative_peak_area_biovolume_normalized
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  detection_status_counts:
+  - '{''count'': 3, ''detection_status'': ''detected''}'
+  - '{''count'': 67, ''detection_status'': ''not_detected''}'
+  experiment_id: 10.1111/1462-2920.15834_vesicle_metabolomics_mit9313
+  field_description: Average relative biovolume-normalized peak area for targeted
+    metabolites in MIT9313 purified extracellular vesicles (Biller 2022 Table S7).
+  growth_phases: []
+  metric_type: relative_peak_area_biovolume_normalized
+  name: MIT9313 vesicle targeted metabolite relative peak area (biovolume-normalized)
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9313
+  preferred_id: metabolite_assay_id
+  publication_doi: 10.1111/1462-2920.15834
+  rankable: true
+  timepoints: []
+  total_metabolite_count: 69
+  treatment_type:
+  - compartment
+  unit: relative peak area / biovolume
+  value_kind: numeric
+  value_max: 0.54
+  value_median: 0.0
+  value_min: 0.0
+  value_q1: 0.0
+  value_q3: 0.0
 - aggregation_method: pre_aggregated
   assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_9313_extracellular:extracellular_concentration
   background_factors:

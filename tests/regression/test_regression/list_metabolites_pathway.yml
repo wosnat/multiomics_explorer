@@ -713,7 +713,7 @@ top_organisms:
   organism_name: Alteromonas macleodii BS11
 - count: 15
   organism_name: Alteromonas macleodii BGP6
-total_entries: 3218
+total_entries: 3230
 total_matching: 18
 truncated: false
 xref_coverage:

@@ -132,7 +132,7 @@ top_organisms:
   organism_name: Meiothermus ruber
 - count: 1
   organism_name: Alteromonas (MarRef v6)
-total_entries: 3218
+total_entries: 3230
 total_matching: 1
 truncated: false
 xref_coverage:

@@ -576,14 +576,14 @@ class TestListExperiments:
         assert len(result["by_compartment"]) >= 1
 
     def test_compartment_vesicle_returns_11(self, conn):
-        """compartment='vesicle' filter returns exactly 11 experiments (pinned baseline)."""
+        """compartment='vesicle' filter returns experiments (pinned baseline)."""
         result = api.list_experiments(compartment="vesicle", summary=True, conn=conn)
-        assert result["total_matching"] == 11
+        assert result["total_matching"] == 13
 
     def test_compartment_exoproteome_returns_8(self, conn):
-        """compartment='exoproteome' filter returns exactly 8 experiments (pinned baseline)."""
+        """compartment='exoproteome' filter returns experiments (pinned baseline)."""
         result = api.list_experiments(compartment="exoproteome", summary=True, conn=conn)
-        assert result["total_matching"] == 8
+        assert result["total_matching"] == 10
 
     def test_per_row_compartment_field(self, conn):
         """Each result row has 'compartment' field in {whole_cell, vesicle, exoproteome}."""
@@ -1347,14 +1347,14 @@ class TestListDerivedMetrics:
     def test_no_filters_13_dms(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(conn=conn, limit=None)
-        assert out["total_entries"] == 61
-        assert out["total_matching"] == 61
-        assert len(out["results"]) == 61
+        assert out["total_entries"] == 65
+        assert out["total_matching"] == 65
+        assert len(out["results"]) == 65
 
     def test_value_kind_numeric_6(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(value_kind="numeric", conn=conn, limit=None)
-        assert out["total_matching"] == 35
+        assert out["total_matching"] == 37
         assert all(r["value_kind"] == "numeric" for r in out["results"])
         compartments = {r["compartment"] for r in out["results"]}
         assert compartments == {"whole_cell", "vesicle", "exoproteome"}
@@ -1370,7 +1370,7 @@ class TestListDerivedMetrics:
     def test_value_kind_categorical_1(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(value_kind="categorical", conn=conn, limit=None)
-        assert out["total_matching"] == 8
+        assert out["total_matching"] == 10
         metric_types = {r["metric_type"] for r in out["results"]}
         assert "darkness_survival_class" in metric_types
         assert all(r["allowed_categories"] is not None for r in out["results"])
@@ -1378,14 +1378,14 @@ class TestListDerivedMetrics:
     def test_rankable_true_4(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(rankable=True, conn=conn, limit=None)
-        assert out["total_matching"] == 29
+        assert out["total_matching"] == 31
         assert all(r["rankable"] is True for r in out["results"])
 
     def test_rankable_false_9(self, conn):
         """Sanity-checks bool→'false' string coercion path."""
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(rankable=False, conn=conn, limit=None)
-        assert out["total_matching"] == 32
+        assert out["total_matching"] == 34
         metric_types = {r["metric_type"] for r in out["results"]}
         # The two non-rankable numeric DMs are always in this set
         assert "peak_time_protein_h" in metric_types
@@ -1448,7 +1448,7 @@ class TestListDerivedMetrics:
         assert out["results"] == []
         assert out["returned"] == 0
         assert len(out["by_value_kind"]) == 3  # numeric, boolean, categorical
-        assert len(out["by_organism"]) == 11
+        assert len(out["by_organism"]) == 12
 
     def test_verbose_adds_fields(self, conn):
         from multiomics_explorer.api import list_derived_metrics
@@ -2361,19 +2361,19 @@ class TestListMetabolites:
     """Live-KG smoke tests for the list_metabolites api function."""
 
     def test_no_filters_returns_all(self, conn):
-        """Unfiltered query reports 3,218 total Metabolite nodes."""
+        """Unfiltered query reports total Metabolite node count."""
         result = api.list_metabolites(conn=conn)
-        assert result["total_matching"] == 3218
+        assert result["total_matching"] == 3230
 
     def test_elements_n_filter(self, conn):
-        """N-bearing metabolites: 1,644 total."""
+        """N-bearing metabolites total."""
         result = api.list_metabolites(elements=["N"], conn=conn)
-        assert result["total_matching"] == 1644
+        assert result["total_matching"] == 1649
 
     def test_elements_n_and_p_filter(self, conn):
-        """Multi-element AND filter (must contain both N and P): 566."""
+        """Multi-element AND filter (must contain both N and P)."""
         result = api.list_metabolites(elements=["N", "P"], conn=conn)
-        assert result["total_matching"] == 566
+        assert result["total_matching"] == 567
 
     def test_organism_plus_elements_filter(self, conn):
         """MED4 + N elements (the canonical N-source primitive): 813."""
@@ -2431,7 +2431,7 @@ class TestListMetabolites:
         result = api.list_metabolites(summary=True, conn=conn)
         assert result["results"] == []
         assert result["returned"] == 0
-        assert result["total_matching"] == 3218
+        assert result["total_matching"] == 3230
         # Envelope rollups present (lists, possibly empty but typed)
         assert isinstance(result["top_organisms"], list)
         assert isinstance(result["top_metabolite_pathways"], list)
@@ -2704,18 +2704,18 @@ class TestListMetaboliteAssays:
     def test_no_filters_returns_all_10_assays(self, conn):
         from multiomics_explorer.api import list_metabolite_assays
         result = list_metabolite_assays(conn=conn)
-        assert result["total_entries"] == 10
-        assert result["total_matching"] == 10
-        assert result["metabolite_count_total"] == 768  # cumulative-across-assays
-        assert len(result["results"]) == 10
+        assert result["total_entries"] == 14
+        assert result["total_matching"] == 14
+        assert result["metabolite_count_total"] == 1044  # cumulative-across-assays
+        assert len(result["results"]) == 14
 
     def test_value_kind_numeric(self, conn):
         from multiomics_explorer.api import list_metabolite_assays
         result = list_metabolite_assays(value_kind="numeric", conn=conn)
-        assert result["total_matching"] == 8
+        assert result["total_matching"] == 12
         for r in result["results"]:
             assert r["value_kind"] == "numeric"
-            assert r["rankable"] is True  # all 8 numeric are rankable
+            assert r["rankable"] is True  # all numeric assays are rankable
 
     def test_value_kind_boolean(self, conn):
         from multiomics_explorer.api import list_metabolite_assays
@@ -2759,7 +2759,7 @@ class TestListMetaboliteAssays:
     def test_rankable_true_returns_8_numeric(self, conn):
         from multiomics_explorer.api import list_metabolite_assays
         result = list_metabolite_assays(rankable=True, conn=conn)
-        assert result["total_matching"] == 8
+        assert result["total_matching"] == 12
 
     def test_rankable_false_returns_2_boolean(self, conn):
         from multiomics_explorer.api import list_metabolite_assays

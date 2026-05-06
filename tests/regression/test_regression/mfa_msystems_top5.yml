@@ -21,7 +21,7 @@ rows:
   metric_type: presence_flag_intracellular
   n_positive: 1
   n_replicates: 1
-  name: tyrosine
+  name: Tyrosine
   organism_name: Prochlorococcus MIT9301
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell

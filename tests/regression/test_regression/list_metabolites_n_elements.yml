@@ -3,25 +3,29 @@ by_evidence_source:
   evidence_source: metabolism
 - count: 619
   evidence_source: transport
-- count: 78
+- count: 106
   evidence_source: metabolomics
 by_measurement_coverage:
   by_compartment:
   - compartment: extracellular
     count: 71
+  - compartment: vesicle
+    count: 48
   - compartment: whole_cell
-    count: 78
+    count: 106
   by_paper_count:
-  - count: 1566
+  - count: 1543
     paper_count: 0
-  - count: 76
+  - count: 85
     paper_count: 1
-  - count: 2
+  - count: 20
     paper_count: 2
+  - count: 1
+    paper_count: 3
 case_id: list_metabolites_n_elements
 mass_stats:
   mass_max: 5227.103
-  mass_median: 322.799
+  mass_median: 322.166
   mass_min: 18.039
 not_found:
   metabolite_ids: []
@@ -94,14 +98,19 @@ results:
   - P
   evidence_sources:
   - metabolism
+  - metabolomics
   - transport
   formula: C10H12N5O10P2
   gene_count: 2706
   mass: 424.179
-  measured_assay_count: 0
-  measured_compartments: []
-  measured_organisms: []
-  measured_paper_count: 0
+  measured_assay_count: 4
+  measured_compartments:
+  - vesicle
+  - whole_cell
+  measured_organisms:
+  - Prochlorococcus MIT9312
+  - Prochlorococcus MIT9313
+  measured_paper_count: 1
   metabolite_id: kegg.compound:C00008
   name: ADP
   organism_count: 32
@@ -137,14 +146,19 @@ results:
   - P
   evidence_sources:
   - metabolism
+  - metabolomics
   - transport
   formula: C21H26N7O14P2
   gene_count: 2611
   mass: 662.422
-  measured_assay_count: 0
-  measured_compartments: []
-  measured_organisms: []
-  measured_paper_count: 0
+  measured_assay_count: 4
+  measured_compartments:
+  - vesicle
+  - whole_cell
+  measured_organisms:
+  - Prochlorococcus MIT9312
+  - Prochlorococcus MIT9313
+  measured_paper_count: 1
   metabolite_id: kegg.compound:C00003
   name: NAD+
   organism_count: 32
@@ -213,15 +227,17 @@ results:
   formula: C10H12N5O7P
   gene_count: 1871
   mass: 345.208
-  measured_assay_count: 8
+  measured_assay_count: 12
   measured_compartments:
   - extracellular
+  - vesicle
   - whole_cell
   measured_organisms:
   - Prochlorococcus MIT0801
   - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9312
   - Prochlorococcus MIT9313
-  measured_paper_count: 1
+  measured_paper_count: 2
   metabolite_id: kegg.compound:C00020
   name: AMP
   organism_count: 32
@@ -258,7 +274,7 @@ row_count: 5
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 880
+- count: 881
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
 - count: 320
@@ -309,10 +325,10 @@ top_organisms:
   organism_name: Alteromonas macleodii HOT1A3
 - count: 1132
   organism_name: Alteromonas macleodii AD45
-total_entries: 3218
-total_matching: 1644
+total_entries: 3230
+total_matching: 1649
 truncated: true
 xref_coverage:
-  with_chebi: 1465
-  with_hmdb: 878
-  with_mnxm: 1644
+  with_chebi: 1469
+  with_hmdb: 881
+  with_mnxm: 1649

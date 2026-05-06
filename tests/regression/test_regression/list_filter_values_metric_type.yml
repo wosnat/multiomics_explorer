@@ -1,5 +1,5 @@
 case_id: list_filter_values_metric_type
-row_count: 38
+row_count: 40
 rows:
 - count: 6
   value: log2_mv_cell_enrichment
@@ -9,6 +9,10 @@ rows:
   value: prop_abund_mvs_percent
 - count: 2
   value: cell_abundance_biovolume_normalized
+- count: 2
+  value: exoproteome_avg_pct_nsaf
+- count: 2
+  value: exoproteome_detection_status
 - count: 2
   value: log2_vesicle_cell_enrichment
 - count: 2

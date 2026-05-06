@@ -646,7 +646,7 @@ rows:
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
-  experiment_count: 23
+  experiment_count: 27
   gene_count: 1978
   genus: Prochlorococcus
   growth_phases:
@@ -654,10 +654,11 @@ rows:
   - acute_stress
   - exponential
   - stationary
-  measured_metabolite_count: 0
+  measured_metabolite_count: 69
   metabolite_count: 1581
   ncbi_taxon_id: 74546
   omics_types:
+  - METABOLOMICS
   - PROTEOMICS
   - RNASEQ
   - VESICLE_PROTEOMICS
@@ -689,7 +690,7 @@ rows:
   - boolean
   - categorical
   - numeric
-  experiment_count: 34
+  experiment_count: 38
   gene_count: 2948
   genus: Prochlorococcus
   growth_phases:
@@ -697,7 +698,7 @@ rows:
   - exponential
   - nutrient_limited
   - recovery
-  measured_metabolite_count: 100
+  measured_metabolite_count: 145
   metabolite_count: 1666
   ncbi_taxon_id: 74547
   omics_types:
@@ -893,10 +894,13 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 7
+  compartments:
+  - exoproteome
+  derived_metric_count: 4
+  derived_metric_value_kinds:
+  - categorical
+  - numeric
+  experiment_count: 9
   gene_count: 4368
   genus: Ruegeria
   growth_phases:
@@ -908,7 +912,7 @@ rows:
   - EXOPROTEOMICS
   organism_name: Ruegeria pomeroyi DSS-3
   organism_type: genome_strain
-  publication_count: 2
+  publication_count: 3
   reaction_count: 1377
   reference_database: null
   reference_proteome: null
@@ -1015,7 +1019,7 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 67
+  experiment_count: 69
   gene_count: 2621
   genus: Synechococcus
   growth_phases:
@@ -1030,7 +1034,7 @@ rows:
   - PROTEOMICS
   organism_name: Synechococcus WH7803
   organism_type: genome_strain
-  publication_count: 3
+  publication_count: 4
   reaction_count: 1045
   reference_database: null
   reference_proteome: null
@@ -1050,7 +1054,7 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 72
+  experiment_count: 74
   gene_count: 2881
   genus: Parasynechococcus
   growth_phases:
@@ -1061,12 +1065,13 @@ rows:
   metabolite_count: 1721
   ncbi_taxon_id: 84588
   omics_types:
+  - EXOPROTEOMICS
   - MICROARRAY
   - PROTEOMICS
   - RNASEQ
   organism_name: Synechococcus WH8102
   organism_type: genome_strain
-  publication_count: 3
+  publication_count: 4
   reaction_count: 1027
   reference_database: null
   reference_proteome: null

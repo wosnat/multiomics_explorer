@@ -1,5 +1,5 @@
 case_id: list_experiments_all
-row_count: 189
+row_count: 195
 rows:
 - authors:
   - Guadalupe Gómez-Baena
@@ -6180,6 +6180,54 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: null
   compartment: vesicle
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 0
+  experiment_id: 10.1111/1462-2920.15834_vesicle_metabolomics_mit9312
+  experiment_name: MIT9312 extracellular vesicle targeted metabolome (Table S7)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  metabolite_assay_count: 1
+  metabolite_compartments:
+  - vesicle
+  metabolite_count: 69
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9312
+  publication_doi: 10.1111/1462-2920.15834
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: ''
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
+  - Aldo A. Arellano
+  - Anitra E. Ingalls
+  - Benjamin A. S. Van Mooy
+  - Katherine R. Heal
+  - Keven Dooley
+  - Kevin W. Becker
+  - Laura R. Hmelo
+  - Laura T. Carlson
+  - Rachel A. Lundeen
+  - Sallie W. Chisholm
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
@@ -6198,6 +6246,54 @@ rows:
   significant_down_count: 0
   significant_up_count: 0
   table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
+  - Aldo A. Arellano
+  - Anitra E. Ingalls
+  - Benjamin A. S. Van Mooy
+  - Katherine R. Heal
+  - Keven Dooley
+  - Kevin W. Becker
+  - Laura R. Hmelo
+  - Laura T. Carlson
+  - Rachel A. Lundeen
+  - Sallie W. Chisholm
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 0
+  experiment_id: 10.1111/1462-2920.15834_cells_metabolomics_mit9312
+  experiment_name: MIT9312 whole-cell targeted metabolome (Table S7)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  metabolite_assay_count: 1
+  metabolite_compartments:
+  - whole_cell
+  metabolite_count: 69
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9312
+  publication_doi: 10.1111/1462-2920.15834
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: ''
   table_scope_detail: ''
   time_point_count: 0
   time_point_growth_phases: []
@@ -6640,6 +6736,54 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: null
   compartment: vesicle
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 0
+  experiment_id: 10.1111/1462-2920.15834_vesicle_metabolomics_mit9313
+  experiment_name: MIT9313 extracellular vesicle targeted metabolome (Table S7)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  metabolite_assay_count: 1
+  metabolite_compartments:
+  - vesicle
+  metabolite_count: 69
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1111/1462-2920.15834
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: ''
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
+  - Aldo A. Arellano
+  - Anitra E. Ingalls
+  - Benjamin A. S. Van Mooy
+  - Katherine R. Heal
+  - Keven Dooley
+  - Kevin W. Becker
+  - Laura R. Hmelo
+  - Laura T. Carlson
+  - Rachel A. Lundeen
+  - Sallie W. Chisholm
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
@@ -6658,6 +6802,54 @@ rows:
   significant_down_count: 0
   significant_up_count: 0
   table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
+  - Aldo A. Arellano
+  - Anitra E. Ingalls
+  - Benjamin A. S. Van Mooy
+  - Katherine R. Heal
+  - Keven Dooley
+  - Kevin W. Becker
+  - Laura R. Hmelo
+  - Laura T. Carlson
+  - Rachel A. Lundeen
+  - Sallie W. Chisholm
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 0
+  experiment_id: 10.1111/1462-2920.15834_cells_metabolomics_mit9313
+  experiment_name: MIT9313 whole-cell targeted metabolome (Table S7)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  metabolite_assay_count: 1
+  metabolite_compartments:
+  - whole_cell
+  metabolite_count: 69
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1111/1462-2920.15834
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: ''
   table_scope_detail: ''
   time_point_count: 0
   time_point_growth_phases: []
@@ -8624,6 +8816,90 @@ rows:
   - '79'
   time_point_totals:
   - '1724'
+  treatment_type:
+  - coculture
+- authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Synechococcus WH7803
+  compartment: exoproteome
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1002/pmic.201400562_dss3_exoproteome_with_wh7803
+  experiment_name: Ruegeria pomeroyi DSS-3 exoproteome in co-culture with Synechococcus
+    WH7803
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: EXOPROTEOMICS
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1002/pmic.201400562
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: filtered_subset
+  table_scope_detail: Polypeptides detected with two or more unique peptides in the
+    cell-free supernatant
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - coculture
+- authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Synechococcus WH8102
+  compartment: exoproteome
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1002/pmic.201400562_dss3_exoproteome_with_wh8102
+  experiment_name: Ruegeria pomeroyi DSS-3 exoproteome in co-culture with Synechococcus
+    WH8102
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: EXOPROTEOMICS
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1002/pmic.201400562
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: filtered_subset
+  table_scope_detail: Polypeptides detected with two or more unique peptides in the
+    cell-free supernatant
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
   treatment_type:
   - coculture
 - authors:

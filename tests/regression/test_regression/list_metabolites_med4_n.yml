@@ -3,21 +3,25 @@ by_evidence_source:
   evidence_source: metabolism
 - count: 328
   evidence_source: transport
-- count: 66
+- count: 86
   evidence_source: metabolomics
 by_measurement_coverage:
   by_compartment:
   - compartment: extracellular
     count: 62
+  - compartment: vesicle
+    count: 39
   - compartment: whole_cell
-    count: 66
+    count: 86
   by_paper_count:
-  - count: 747
+  - count: 727
     paper_count: 0
-  - count: 64
+  - count: 66
     paper_count: 1
-  - count: 2
+  - count: 19
     paper_count: 2
+  - count: 1
+    paper_count: 3
 case_id: list_metabolites_med4_n
 mass_stats:
   mass_max: 5227.103
@@ -94,14 +98,19 @@ results:
   - P
   evidence_sources:
   - metabolism
+  - metabolomics
   - transport
   formula: C10H12N5O10P2
   gene_count: 2706
   mass: 424.179
-  measured_assay_count: 0
-  measured_compartments: []
-  measured_organisms: []
-  measured_paper_count: 0
+  measured_assay_count: 4
+  measured_compartments:
+  - vesicle
+  - whole_cell
+  measured_organisms:
+  - Prochlorococcus MIT9312
+  - Prochlorococcus MIT9313
+  measured_paper_count: 1
   metabolite_id: kegg.compound:C00008
   name: ADP
   organism_count: 32
@@ -137,14 +146,19 @@ results:
   - P
   evidence_sources:
   - metabolism
+  - metabolomics
   - transport
   formula: C21H26N7O14P2
   gene_count: 2611
   mass: 662.422
-  measured_assay_count: 0
-  measured_compartments: []
-  measured_organisms: []
-  measured_paper_count: 0
+  measured_assay_count: 4
+  measured_compartments:
+  - vesicle
+  - whole_cell
+  measured_organisms:
+  - Prochlorococcus MIT9312
+  - Prochlorococcus MIT9313
+  measured_paper_count: 1
   metabolite_id: kegg.compound:C00003
   name: NAD+
   organism_count: 32
@@ -213,15 +227,17 @@ results:
   formula: C10H12N5O7P
   gene_count: 1871
   mass: 345.208
-  measured_assay_count: 8
+  measured_assay_count: 12
   measured_compartments:
   - extracellular
+  - vesicle
   - whole_cell
   measured_organisms:
   - Prochlorococcus MIT0801
   - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9312
   - Prochlorococcus MIT9313
-  measured_paper_count: 1
+  measured_paper_count: 2
   metabolite_id: kegg.compound:C00020
   name: AMP
   organism_count: 32
@@ -309,7 +325,7 @@ top_organisms:
   organism_name: Prochlorococcus NATL1A
 - count: 780
   organism_name: Prochlorococcus NATL2A
-total_entries: 3218
+total_entries: 3230
 total_matching: 813
 truncated: true
 xref_coverage:

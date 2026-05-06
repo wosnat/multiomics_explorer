@@ -3,19 +3,23 @@ by_evidence_source:
   evidence_source: metabolism
 - count: 8
   evidence_source: transport
-- count: 1
+- count: 3
   evidence_source: metabolomics
 by_measurement_coverage:
   by_compartment:
   - compartment: extracellular
     count: 1
+  - compartment: vesicle
+    count: 3
   - compartment: whole_cell
-    count: 1
+    count: 3
   by_paper_count:
-  - count: 22
+  - count: 20
     paper_count: 0
+  - count: 2
+    paper_count: 1
   - count: 1
-    paper_count: 2
+    paper_count: 3
 case_id: list_metabolites_search_glucose
 mass_stats:
   mass_max: 587.328
@@ -46,7 +50,7 @@ results:
   organism_count: 32
   pathway_count: 0
   pathway_ids: []
-  score: 3.0671
+  score: 3.0689
   transporter_count: 108
 - chebi_id: '13498'
   elements:
@@ -57,14 +61,19 @@ results:
   - P
   evidence_sources:
   - metabolism
+  - metabolomics
   - transport
   formula: C15H22N2O17P2
   gene_count: 733
   mass: 564.286
-  measured_assay_count: 0
-  measured_compartments: []
-  measured_organisms: []
-  measured_paper_count: 0
+  measured_assay_count: 4
+  measured_compartments:
+  - vesicle
+  - whole_cell
+  measured_organisms:
+  - Prochlorococcus MIT9312
+  - Prochlorococcus MIT9313
+  measured_paper_count: 1
   metabolite_id: kegg.compound:C00029
   name: UDP-glucose
   organism_count: 32
@@ -87,7 +96,7 @@ results:
   - kegg.pathway:ko01240
   - kegg.pathway:ko01250
   - kegg.pathway:ko04082
-  score: 2.5784
+  score: 2.5796
   transporter_count: 8
 - chebi_id: '4167'
   elements:
@@ -144,7 +153,7 @@ results:
   - kegg.pathway:ko05111
   - kegg.pathway:ko05230
   - kegg.pathway:ko05415
-  score: 2.5784
+  score: 2.5796
   transporter_count: 23
 - chebi_id: '10526'
   elements:
@@ -177,7 +186,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 2.5784
+  score: 2.5796
   transporter_count: 1
 - chebi_id: '13230'
   elements:
@@ -205,7 +214,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 2.5784
+  score: 2.5796
   transporter_count: 0
 - chebi_id: '13264'
   elements:
@@ -233,7 +242,7 @@ results:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 2.5784
+  score: 2.5796
   transporter_count: 0
 - chebi_id: '10397'
   elements:
@@ -260,7 +269,7 @@ results:
   - kegg.pathway:ko01110
   - kegg.pathway:ko01120
   - kegg.pathway:ko01200
-  score: 2.224
+  score: 2.2248
   transporter_count: 0
 - chebi_id: '10242'
   elements:
@@ -291,7 +300,7 @@ results:
   - kegg.pathway:ko01200
   - kegg.pathway:ko01250
   - kegg.pathway:ko04964
-  score: 2.224
+  score: 2.2248
   transporter_count: 0
 - chebi_id: '14314'
   elements:
@@ -306,16 +315,18 @@ results:
   formula: C6H11O9P
   gene_count: 153
   mass: 258.119
-  measured_assay_count: 10
+  measured_assay_count: 14
   measured_compartments:
   - extracellular
+  - vesicle
   - whole_cell
   measured_organisms:
   - Prochlorococcus MIT0801
   - Prochlorococcus MIT9301
   - Prochlorococcus MIT9303
+  - Prochlorococcus MIT9312
   - Prochlorococcus MIT9313
-  measured_paper_count: 2
+  measured_paper_count: 3
   metabolite_id: kegg.compound:C00092
   name: D-Glucose 6-phosphate
   organism_count: 32
@@ -338,7 +349,7 @@ results:
   - kegg.pathway:ko05111
   - kegg.pathway:ko05230
   - kegg.pathway:ko05415
-  score: 1.9552
+  score: 1.9559
   transporter_count: 6
 - chebi_id: '10246'
   elements:
@@ -348,13 +359,18 @@ results:
   - P
   evidence_sources:
   - metabolism
+  - metabolomics
   formula: C6H11O9P
   gene_count: 220
   mass: 258.119
-  measured_assay_count: 0
-  measured_compartments: []
-  measured_organisms: []
-  measured_paper_count: 0
+  measured_assay_count: 4
+  measured_compartments:
+  - vesicle
+  - whole_cell
+  measured_organisms:
+  - Prochlorococcus MIT9312
+  - Prochlorococcus MIT9313
+  measured_paper_count: 1
   metabolite_id: kegg.compound:C00103
   name: D-Glucose 1-phosphate
   organism_count: 32
@@ -377,7 +393,7 @@ results:
   - kegg.pathway:ko01240
   - kegg.pathway:ko01250
   - kegg.pathway:ko04922
-  score: 1.9552
+  score: 1.9559
   transporter_count: 0
 - chebi_id: '1078'
   elements:
@@ -398,7 +414,7 @@ results:
   organism_count: 11
   pathway_count: 0
   pathway_ids: []
-  score: 1.9552
+  score: 1.9559
   transporter_count: 3
 - chebi_id: '10245'
   elements:
@@ -432,7 +448,7 @@ results:
   - kegg.pathway:ko01250
   - kegg.pathway:ko04152
   - kegg.pathway:ko04922
-  score: 1.7444
+  score: 1.7449
   transporter_count: 0
 - chebi_id: '10399'
   elements:
@@ -463,7 +479,7 @@ results:
   - kegg.pathway:ko01200
   - kegg.pathway:ko04152
   - kegg.pathway:ko04922
-  score: 1.7444
+  score: 1.7449
   transporter_count: 1
 - chebi_id: '10398'
   elements:
@@ -486,7 +502,7 @@ results:
   pathway_count: 1
   pathway_ids:
   - kegg.pathway:ko00500
-  score: 1.7444
+  score: 1.7449
   transporter_count: 0
 - chebi_id: '73918'
   elements:
@@ -507,7 +523,7 @@ results:
   organism_count: 11
   pathway_count: 0
   pathway_ids: []
-  score: 1.7444
+  score: 1.7449
   transporter_count: 1
 - chebi_id: '70785'
   elements:
@@ -533,7 +549,7 @@ results:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 1.7444
+  score: 1.7449
   transporter_count: 0
 - chebi_id: '10510'
   elements:
@@ -564,7 +580,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 1.435
+  score: 1.4353
   transporter_count: 0
 - chebi_id: '13262'
   elements:
@@ -590,7 +606,7 @@ results:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 1.435
+  score: 1.4353
   transporter_count: 0
 - chebi_id: '70783'
   elements:
@@ -616,7 +632,7 @@ results:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 1.435
+  score: 1.4353
   transporter_count: 0
 - chebi_id: '10508'
   elements:
@@ -645,7 +661,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 1.435
+  score: 1.4353
   transporter_count: 0
 - chebi_id: '12230'
   elements:
@@ -669,7 +685,7 @@ results:
   pathway_ids:
   - kegg.pathway:ko00500
   - kegg.pathway:ko02060
-  score: 1.3181
+  score: 1.3183
   transporter_count: 0
 - chebi_id: '32332'
   elements:
@@ -698,7 +714,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 1.2188
+  score: 1.219
   transporter_count: 0
 - chebi_id: '155215'
   elements:
@@ -721,12 +737,12 @@ results:
   pathway_ids:
   - kegg.pathway:ko00052
   - kegg.pathway:ko01100
-  score: 1.1334
+  score: 1.1336
   transporter_count: 0
 returned: 23
 row_count: 23
-score_max: 3.0671024322509766
-score_median: 1.7444241046905518
+score_max: 3.0689032077789307
+score_median: 1.7449045181274414
 top_metabolite_pathways:
 - count: 18
   metabolite_pathway_id: kegg.pathway:ko01100
@@ -779,7 +795,7 @@ top_organisms:
   organism_name: Alteromonas macleodii AD45
 - count: 17
   organism_name: Prochlorococcus MIT9303
-total_entries: 3218
+total_entries: 3230
 total_matching: 23
 truncated: false
 xref_coverage:

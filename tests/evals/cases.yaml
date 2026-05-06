@@ -987,8 +987,8 @@
   params:
     rankable: true
   expect:
-    min_rows: 29
-    max_rows: 29
+    min_rows: 31
+    max_rows: 31
 
 - id: list_derived_metrics_rankable_false
   tool: list_derived_metrics
@@ -996,8 +996,8 @@
   params:
     rankable: false
   expect:
-    min_rows: 32
-    max_rows: 32
+    min_rows: 34
+    max_rows: 34
 
 - id: list_derived_metrics_has_p_value_empty
   tool: list_derived_metrics
@@ -1714,11 +1714,11 @@
 
 - id: list_metabolite_assays_numeric_only
   tool: list_metabolite_assays
-  desc: value_kind=numeric → 8 rows
+  desc: value_kind=numeric → all numeric MetaboliteAssay rows
   params: {value_kind: numeric}
   expect:
-    min_rows: 8
-    max_rows: 8
+    min_rows: 12
+    max_rows: 12
 
 - id: list_metabolite_assays_boolean_only
   tool: list_metabolite_assays

@@ -285,11 +285,12 @@ rows:
   treatment_types:
   - carbon
 - clade: HLII
-  experiment_count: 23
+  experiment_count: 27
   gene_count: 1978
   genus: Prochlorococcus
   ncbi_taxon_id: 74546
   omics_types:
+  - METABOLOMICS
   - PROTEOMICS
   - RNASEQ
   - VESICLE_PROTEOMICS
@@ -304,7 +305,7 @@ rows:
   - phosphorus
   - plastic
 - clade: LLIV
-  experiment_count: 34
+  experiment_count: 38
   gene_count: 2948
   genus: Prochlorococcus
   ncbi_taxon_id: 74547
@@ -399,14 +400,14 @@ rows:
   treatment_types:
   - coculture
 - clade: null
-  experiment_count: 7
+  experiment_count: 9
   gene_count: 4368
   genus: Ruegeria
   ncbi_taxon_id: 89184
   omics_types:
   - EXOPROTEOMICS
   organism_name: Ruegeria pomeroyi DSS-3
-  publication_count: 2
+  publication_count: 3
   species: Ruegeria pomeroyi
   strain: DSS-3
   treatment_types:
@@ -454,7 +455,7 @@ rows:
   - carbon
   - coculture
 - clade: null
-  experiment_count: 67
+  experiment_count: 69
   gene_count: 2621
   genus: Synechococcus
   ncbi_taxon_id: 32051
@@ -462,23 +463,24 @@ rows:
   - EXOPROTEOMICS
   - PROTEOMICS
   organism_name: Synechococcus WH7803
-  publication_count: 3
+  publication_count: 4
   species: null
   strain: WH7803
   treatment_types:
   - carbon
   - coculture
 - clade: null
-  experiment_count: 72
+  experiment_count: 74
   gene_count: 2881
   genus: Parasynechococcus
   ncbi_taxon_id: 84588
   omics_types:
+  - EXOPROTEOMICS
   - MICROARRAY
   - PROTEOMICS
   - RNASEQ
   organism_name: Synechococcus WH8102
-  publication_count: 3
+  publication_count: 4
   species: Parasynechococcus marenigrum
   strain: WH8102
   treatment_types:

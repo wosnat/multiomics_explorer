@@ -1,5 +1,5 @@
 case_id: list_derived_metrics_rankable_false
-row_count: 32
+row_count: 34
 rows:
 - allowed_categories: null
   background_factors:
@@ -767,5 +767,59 @@ rows:
   total_gene_count: 258
   treatment_type:
   - darkness
+  unit: ''
+  value_kind: categorical
+- allowed_categories:
+  - detected
+  - not_detected
+  - sporadic
+  background_factors:
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:pmic.201400562:table_s3_dss3_with_wh7803:exoproteome_detection_status
+  experiment_id: 10.1002/pmic.201400562_dss3_exoproteome_with_wh7803
+  field_description: Detection confidence in the cell-free supernatant of R. pomeroyi
+    DSS-3 when co-cultured with Synechococcus sp. WH7803, derived from the three replicate
+    % NSAF values (A/B/C in the source xlsx). ^detected^ = non-zero in all 3 replicates,
+    ^sporadic^ = non-zero in 1 or 2 replicates, ^not_detected^ = zero or absent in
+    all 3 replicates.
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_detection_status
+  name: Detection status in DSS-3 exoproteome (with WH7803)
+  omics_type: EXOPROTEOMICS
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1002/pmic.201400562
+  rankable: false
+  total_gene_count: 65
+  treatment_type:
+  - coculture
+  unit: ''
+  value_kind: categorical
+- allowed_categories:
+  - detected
+  - not_detected
+  - sporadic
+  background_factors:
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:pmic.201400562:table_s3_dss3_with_wh8102:exoproteome_detection_status
+  experiment_id: 10.1002/pmic.201400562_dss3_exoproteome_with_wh8102
+  field_description: Detection confidence in the cell-free supernatant of R. pomeroyi
+    DSS-3 when co-cultured with Synechococcus sp. WH8102, derived from the three replicate
+    % NSAF values (A/B/C in the source xlsx). ^detected^ = non-zero in all 3 replicates,
+    ^sporadic^ = non-zero in 1 or 2 replicates, ^not_detected^ = zero or absent in
+    all 3 replicates.
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_detection_status
+  name: Detection status in DSS-3 exoproteome (with WH8102)
+  omics_type: EXOPROTEOMICS
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1002/pmic.201400562
+  rankable: false
+  total_gene_count: 65
+  treatment_type:
+  - coculture
   unit: ''
   value_kind: categorical
