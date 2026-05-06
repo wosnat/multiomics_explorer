@@ -7548,6 +7548,7 @@ def build_list_metabolite_assays_summary(
             "YIELD node AS a, score\n"
         )
         params["search_text"] = search_text
+        score_carry = ", score"
         score_extras = (
             ",\n     max(score) AS score_max,\n"
             "     percentileDisc(score, 0.5) AS score_median"
@@ -7555,6 +7556,7 @@ def build_list_metabolite_assays_summary(
         score_return = ",\n       score_max,\n       score_median"
     else:
         match_block = "MATCH (a:MetaboliteAssay)\n"
+        score_carry = ""
         score_extras = ""
         score_return = ""
 
@@ -7567,7 +7569,8 @@ def build_list_metabolite_assays_summary(
         f"{match_block}"
         f"{where_block}"
         "OPTIONAL MATCH (a)-[r:Assay_quantifies_metabolite]->(:Metabolite)\n"
-        "WITH total_entries, a, [s IN collect(r.detection_status) WHERE s IS NOT NULL] AS det\n"
+        "WITH total_entries, a, [s IN collect(r.detection_status) WHERE s IS NOT NULL] AS det"
+        f"{score_carry}\n"
         "WITH total_entries,\n"
         "     collect(a.organism_name) AS orgs,\n"
         "     collect(a.value_kind) AS vks,\n"
