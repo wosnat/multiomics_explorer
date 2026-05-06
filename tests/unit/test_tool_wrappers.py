@@ -6427,10 +6427,14 @@ class TestExpectedToolsUnchangedForTcdbCazy:
         # Bumped 32 → 33 by chemistry slice-1 Tool 3 (metabolites_by_gene),
         # which is a legitimate new MCP tool — separate spec, lands
         # alongside this in the merge into main.
-        assert len(EXPECTED_TOOLS) == 33, (
+        # Bumped 33 → 34 by Phase 5 list_metabolite_assays — likewise a
+        # legitimate new MCP tool (metabolomics-assay discovery surface),
+        # separate spec, parallel addition.
+        assert len(EXPECTED_TOOLS) == 34, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
             "tcdb/cazy adds NO new tools (it's a Mode-B ontology surface "
-            "refresh); MBG legitimately adds one."
+            "refresh); MBG legitimately adds one; "
+            "list_metabolite_assays legitimately adds one."
         )
 
 
@@ -7048,9 +7052,12 @@ class TestExpectedToolsUnchangedForPhase1Plumbing:
         # Phase 1 plumbing must NOT register a new MCP tool — all 6 tools
         # touched are existing surfaces (gene_overview, list_publications,
         # list_experiments, list_organisms, list_filter_values, list_metabolites).
-        assert len(EXPECTED_TOOLS) == 33, (
+        # Bumped 33 → 34 by Phase 5 list_metabolite_assays (legitimate new
+        # MCP tool — metabolomics-assay discovery surface, separate spec).
+        assert len(EXPECTED_TOOLS) == 34, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
-            "Phase 1 plumbing adds no new tools — only field additions."
+            "Phase 1 plumbing adds no new tools — only field additions; "
+            "Phase 5 list_metabolite_assays legitimately adds one."
         )
 
 
