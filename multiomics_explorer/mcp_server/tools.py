@@ -8229,8 +8229,7 @@ def register_tools(mcp: FastMCP):
             results = [ListMetaboliteAssaysResult(
                 **{**r, "detection_status_counts": [
                     LmaDetectionStatusCount(
-                        detection_status=d.get("item",
-                                               d.get("detection_status")),
+                        detection_status=d["detection_status"],
                         count=d["count"],
                     )
                     for d in r.get("detection_status_counts", [])

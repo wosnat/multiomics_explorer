@@ -290,7 +290,7 @@ Default-filtering tested-absent rows would discard the majority of measured biol
 
 ## Track B — Metabolomics measurement (partially tooled)
 
-> **Native tools pending.** No MCP tool surfaces `MetaboliteAssay` data today. Use `run_cypher` patterns below until the metabolomics-DM tools ship. See [audit](../../../../docs/superpowers/specs/2026-05-04-metabolites-surface-audit.md) §3b for the planned surface.
+> **Native tools partially shipped.** `list_metabolite_assays` is the discovery surface for `MetaboliteAssay` nodes — call it first to inspect `value_kind`, `rankable`, `compartment`, and per-row `detection_status_counts`. The 3 drill-down / reverse-lookup tools (`metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`, `assays_by_metabolite`) ship in the next slice; until they land, use the `run_cypher` patterns below for per-edge values. See [audit](../../../../docs/superpowers/specs/2026-05-04-metabolites-surface-audit.md) §3b for the full planned surface.
 
 ### Caveats — always restate when surfacing measurement results
 

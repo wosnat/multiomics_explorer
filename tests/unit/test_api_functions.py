@@ -10165,7 +10165,15 @@ class TestListMetaboliteAssays:
         assert result["total_matching"] == 0
 
     def test_not_found_structured_for_batch_inputs(self):
-        """`not_found` carries per-batch buckets (parent §11 Conv B)."""
+        """`not_found` carries per-batch buckets (parent §11 Conv B).
+
+        After the post-review fix to use existence-check Cyphers per batch
+        input (mirroring list_metabolites' MetNotFound precedent), the api
+        function emits one additional `conn.execute_query` call per non-empty
+        batch. This test passes only `assay_ids`, so the mock provides:
+          [0] summary, [1] detail, [2] existence-check on assay_ids.
+        """
+        from unittest.mock import MagicMock
         from multiomics_explorer.api.functions import list_metabolite_assays
         summary_row = [{
             "total_entries": 10, "total_matching": 1,
@@ -10175,18 +10183,23 @@ class TestListMetaboliteAssays:
             "by_background_factors": [], "by_growth_phase": [],
             "by_detection_status": [],
         }]
-        detail_rows = [{
-            "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration",
-        }]
+        valid_assay_id = "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration"
+        detail_rows = [{"assay_id": valid_assay_id}]
+        existence_check_response = [{"found": [valid_assay_id]}]
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            summary_row, detail_rows, existence_check_response,
+        ]
         result = list_metabolite_assays(
-            assay_ids=[
-                "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration",
-                "non_existent_assay_id",
-            ],
-            conn=self._mock_conn(summary_row, detail_rows))
+            assay_ids=[valid_assay_id, "non_existent_assay_id"],
+            conn=conn,
+        )
         assert "not_found" in result
         assert "assay_ids" in result["not_found"]
         assert "non_existent_assay_id" in result["not_found"]["assay_ids"]
+        # Valid IDs are NOT in not_found (true existence check, not the
+        # broken "if total_matching == 0 then mark all unknown" heuristic).
+        assert valid_assay_id not in result["not_found"]["assay_ids"]
         assert "metabolite_ids" in result["not_found"]
         assert "experiment_ids" in result["not_found"]
         assert "publication_doi" in result["not_found"]

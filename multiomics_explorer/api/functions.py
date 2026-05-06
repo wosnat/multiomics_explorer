@@ -6066,31 +6066,54 @@ def list_metabolite_assays(
                 raise
 
     # ---- not_found (structured per §11 Conv B / §13.6) -------------------
-    matched_assay_ids: set[str] = {
-        r["assay_id"] for r in results if "assay_id" in r
-    }
-    not_found = {
-        "assay_ids": [
-            aid for aid in (assay_ids or []) if aid not in matched_assay_ids
-        ] if assay_ids else [],
+    # One existence-check Cypher per batch input. Mirrors the
+    # `MetNotFound` pattern on list_metabolites (api/functions.py §7
+    # of list_metabolites). Each query is cheap — indexed lookups on
+    # the KG's primary-key properties.
+    not_found: dict[str, list[str]] = {
+        "assay_ids": [],
         "metabolite_ids": [],
         "experiment_ids": [],
         "publication_doi": [],
     }
-    if metabolite_ids or experiment_ids or publication_doi:
-        # For these batches, "not_found" requires a separate lookup —
-        # populate by checking what survived the filter pipeline.
-        # Simplification: since limit may have truncated rows, we compute
-        # not_found against the full matching set, not the returned slice.
-        # For metabolite_ids / experiment_ids / publication_doi, an empty
-        # `total_matching` AND a non-empty input list ⇒ all unmatched.
-        # Fine-grained per-ID validation would need a separate count query;
-        # acceptable simplification per parent §13.6 (multi-batch tools
-        # surface unknown IDs at first call).
-        if total_matching == 0:
-            not_found["metabolite_ids"] = list(metabolite_ids or [])
-            not_found["experiment_ids"] = list(experiment_ids or [])
-            not_found["publication_doi"] = list(publication_doi or [])
+    if assay_ids:
+        rows = conn.execute_query(
+            "MATCH (a:MetaboliteAssay) WHERE a.id IN $ids "
+            "RETURN collect(a.id) AS found",
+            ids=assay_ids,
+        )
+        found = set(rows[0]["found"]) if rows else set()
+        not_found["assay_ids"] = [x for x in assay_ids if x not in found]
+    if metabolite_ids:
+        rows = conn.execute_query(
+            "MATCH (m:Metabolite) WHERE m.id IN $ids "
+            "RETURN collect(m.id) AS found",
+            ids=metabolite_ids,
+        )
+        found = set(rows[0]["found"]) if rows else set()
+        not_found["metabolite_ids"] = [
+            x for x in metabolite_ids if x not in found
+        ]
+    if experiment_ids:
+        rows = conn.execute_query(
+            "MATCH (e:Experiment) WHERE e.id IN $ids "
+            "RETURN collect(e.id) AS found",
+            ids=experiment_ids,
+        )
+        found = set(rows[0]["found"]) if rows else set()
+        not_found["experiment_ids"] = [
+            x for x in experiment_ids if x not in found
+        ]
+    if publication_doi:
+        rows = conn.execute_query(
+            "MATCH (p:Publication) WHERE p.id IN $ids "
+            "RETURN collect(p.id) AS found",
+            ids=publication_doi,
+        )
+        found = set(rows[0]["found"]) if rows else set()
+        not_found["publication_doi"] = [
+            x for x in publication_doi if x not in found
+        ]
 
     return {
         "total_entries": total_entries,
