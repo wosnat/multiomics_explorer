@@ -8298,3 +8298,1036 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             await ctx.error(f"list_metabolite_assays unexpected error: {e}")
             raise ToolError(f"Error in list_metabolite_assays: {e}")
+
+    # ------------------------------------------------------------------
+    # metabolites_by_quantifies_assay — Phase 5 numeric drill-down
+    # (slice spec §4)
+    # ------------------------------------------------------------------
+    class MqaByDetectionStatus(BaseModel):
+        """One bucket of the by_detection_status rollup. Audit §4.3.3
+        primary headline — `not_detected` rows are tested-absent
+        (parent §10)."""
+        detection_status: str = Field(
+            description="One of 'detected', 'sporadic', 'not_detected'. "
+            "'not_detected' = tested-absent (real biology).")
+        count: int = Field(
+            description="Row count for this status (e.g. 7 not_detected "
+            "out of 64 total on the MIT9313 cellular_concentration assay).")
+
+    class MqaByMetricBucket(BaseModel):
+        """One bucket of the metric-rank distribution (rankable rows only)."""
+        bucket: str = Field(
+            description="One of 'top_decile', 'top_quartile', 'mid', 'low'. "
+            "Computed at import time per assay.")
+        count: int = Field(
+            description="Row count in this bucket (e.g. 7 top_decile "
+            "rows out of the rankable subset).")
+
+    class MqaByAssay(BaseModel):
+        assay_id: str = Field(
+            description="Assay id (e.g. "
+            "'metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration').")
+        count: int = Field(
+            description="Row count from this assay in the filtered slice "
+            "(e.g. 64).")
+
+    class MqaByCompartment(BaseModel):
+        compartment: str = Field(
+            description="Sample compartment ('whole_cell' or 'extracellular').")
+        count: int = Field(description="Row count in this compartment.")
+
+    class MqaByOrganism(BaseModel):
+        organism_name: str = Field(
+            description="Full organism name (e.g. 'Prochlorococcus MIT9313').")
+        count: int = Field(description="Row count from this organism.")
+
+    class MqaByMetric(BaseModel):
+        """Per-assay rollup: filtered-slice min/max alongside full-assay
+        precomputed range. Mirrors DM `by_metric`.
+        """
+        assay_id: str = Field(description="Assay id this row summarizes.")
+        name: str = Field(
+            default="",
+            description="Human-readable assay name (e.g. 'MIT9313 "
+            "intracellular metabolite concentration (mol/cell)').")
+        metric_type: str = Field(
+            default="",
+            description="Metric tag (e.g. 'cellular_concentration').")
+        count: int = Field(
+            description="Filtered-slice row count for this assay.")
+        filtered_value_min: float | None = Field(
+            default=None,
+            description="Min value across rows in the filtered slice.")
+        filtered_value_max: float | None = Field(
+            default=None,
+            description="Max value across rows in the filtered slice.")
+        assay_value_min: float | None = Field(
+            default=None,
+            description="Full-assay precomputed min (echoed from the "
+            "assay node, e.g. 0.0).")
+        assay_value_q1: float | None = Field(
+            default=None,
+            description="Full-assay precomputed Q1 (e.g. 0.0012).")
+        assay_value_median: float | None = Field(
+            default=None,
+            description="Full-assay precomputed median.")
+        assay_value_q3: float | None = Field(
+            default=None,
+            description="Full-assay precomputed Q3.")
+        assay_value_max: float | None = Field(
+            default=None,
+            description="Full-assay precomputed max (e.g. 0.16).")
+        rankable: bool = Field(
+            default=False,
+            description="Echoed from parent assay; True iff "
+            "metric_bucket / metric_percentile / rank_by_metric carry data.")
+
+    class MqaNotFound(BaseModel):
+        """Structured per-batch-input unknown IDs (parent §13.6)."""
+        assay_ids: list[str] = Field(
+            default_factory=list,
+            description="Input assay_ids absent from the KG.")
+        metabolite_ids: list[str] = Field(
+            default_factory=list,
+            description="Input metabolite_ids absent from the KG.")
+        experiment_ids: list[str] = Field(
+            default_factory=list,
+            description="Input experiment_ids absent from the KG.")
+        publication_doi: list[str] = Field(
+            default_factory=list,
+            description="Input publication DOIs absent from the KG.")
+
+    class MetabolitesByQuantifiesAssayResult(BaseModel):
+        # Identity / chemistry
+        metabolite_id: str = Field(
+            description="Metabolite node id (e.g. 'kegg.compound:C00074' "
+            "for PEP).")
+        name: str = Field(
+            description="Canonical metabolite name (e.g. "
+            "'Phosphoenolpyruvate').")
+        kegg_compound_id: str | None = Field(
+            default=None,
+            description="KEGG compound id (e.g. 'C00074'); null if no KEGG xref.")
+        # Numeric value (always-available)
+        value: float | None = Field(
+            default=None,
+            description="Raw concentration / intensity (e.g. 0.4465 for a "
+            "top-decile F6P row). Null only on degenerate edges; "
+            "`value=0.0` is *tested-absent*, not missing.")
+        value_sd: float | None = Field(
+            default=None,
+            description="Standard deviation across replicates (when "
+            "available).")
+        n_replicates: int | None = Field(
+            default=None, description="Number of replicates.")
+        n_non_zero: int | None = Field(
+            default=None,
+            description="Number of replicates with non-zero signal. "
+            "`n_non_zero=0` is tested-absent.")
+        metric_type: str = Field(
+            description="Parent assay's metric tag (e.g. "
+            "'cellular_concentration').")
+        # Rankable-gated (sparse on non-rankable rows)
+        metric_bucket: str | None = Field(
+            default=None,
+            description="Bucket label ('top_decile' / 'top_quartile' / "
+            "'mid' / 'low'). Populated only on rankable assays.")
+        metric_percentile: float | None = Field(
+            default=None,
+            description="Percentile (0-100). Populated only on rankable "
+            "assays.")
+        rank_by_metric: int | None = Field(
+            default=None,
+            description="Rank by value (1 = highest). Populated only on "
+            "rankable assays.")
+        # Detection
+        detection_status: str | None = Field(
+            default=None,
+            description="One of 'detected', 'sporadic', 'not_detected'. "
+            "'not_detected' = tested-absent (parent §10). Numeric edge only.")
+        # Timepoint / phase (D3 sentinel-coerced)
+        timepoint: str | None = Field(
+            default=None,
+            description="Timepoint label ('4 days', '6 days'). Null on "
+            "non-temporal experiments (D3 sentinel coercion).")
+        timepoint_hours: float | None = Field(
+            default=None,
+            description="Timepoint in hours. Null on non-temporal "
+            "experiments.")
+        timepoint_order: int | None = Field(
+            default=None,
+            description="Timepoint order index. Null on non-temporal "
+            "experiments.")
+        growth_phase: str | None = Field(
+            default=None,
+            description="Growth phase. Null today — KG-MET-017 backfill "
+            "pending.")
+        condition_label: str | None = Field(
+            default=None,
+            description="Short condition descriptor (e.g. compartment + "
+            "timepoint).")
+        # Provenance
+        assay_id: str = Field(
+            description="Parent MetaboliteAssay id.")
+        organism_name: str = Field(description="Source organism.")
+        compartment: str = Field(
+            description="'whole_cell' or 'extracellular'.")
+        # Verbose-only
+        assay_name: str | None = Field(
+            default=None,
+            description="Human-readable assay name. Verbose only.")
+        field_description: str | None = Field(
+            default=None,
+            description="Canonical provenance description for the assay. "
+            "Verbose only.")
+        experimental_context: str | None = Field(
+            default=None,
+            description="Long-form context. Verbose only.")
+        light_condition: str | None = Field(
+            default=None,
+            description="Light regime (e.g. 'continuous light'). Verbose only.")
+        replicate_values: list[float] | None = Field(
+            default=None,
+            description="Per-replicate values. Verbose only.")
+
+    class MetabolitesByQuantifiesAssayResponse(BaseModel):
+        results: list[MetabolitesByQuantifiesAssayResult] = Field(
+            default_factory=list,
+            description="One row per metabolite × assay-edge. Empty when "
+            "summary=True.")
+        total_matching: int = Field(
+            description="Row count in the filtered slice.")
+        by_detection_status: list[MqaByDetectionStatus] = Field(
+            default_factory=list,
+            description="Counts per detection_status — primary headline "
+            "(audit §4.3.3). 'not_detected' rows are tested-absent (real "
+            "biology, parent §10).")
+        by_metric_bucket: list[MqaByMetricBucket] = Field(
+            default_factory=list,
+            description="Counts per rank-bucket on rankable rows.")
+        by_assay: list[MqaByAssay] = Field(
+            default_factory=list,
+            description="Counts per assay_id. Pass these `assay_id`s to "
+            "`metabolites_by_flags_assay(assay_ids=[...])` for the boolean "
+            "complement.")
+        by_compartment: list[MqaByCompartment] = Field(
+            default_factory=list, description="Counts per compartment.")
+        by_organism: list[MqaByOrganism] = Field(
+            default_factory=list,
+            description="Counts per organism (cross-organism by default).")
+        by_metric: list[MqaByMetric] = Field(
+            default_factory=list,
+            description="Per-assay precomputed-vs-filtered: pairs the "
+            "filtered slice min/max with the full-assay precomputed range "
+            "so the LLM can read 'top-decile slice 0.012-0.16 out of full "
+            "range 0-0.16' inline.")
+        excluded_assays: list[str] = Field(
+            default_factory=list,
+            description="`assay_ids` soft-excluded under rankable-gating "
+            "(non-rankable assays dropped when a rankable filter is set).")
+        warnings: list[str] = Field(
+            default_factory=list,
+            description="Human-readable rankable-gating diagnostics.")
+        not_found: MqaNotFound = Field(
+            default_factory=MqaNotFound,
+            description="Per-batch-input unknown IDs (parent §13.6).")
+        returned: int = Field(description="Length of `results`.")
+        truncated: bool = Field(
+            description="True when total_matching > offset + returned.")
+        offset: int = Field(default=0, description="Pagination offset used.")
+
+    @mcp.tool(
+        tags={"metabolomics", "metabolites", "drill-down", "numeric"},
+        annotations={"readOnlyHint": True, "destructiveHint": False,
+                     "idempotentHint": True, "openWorldHint": False},
+    )
+    async def metabolites_by_quantifies_assay(
+        ctx: Context,
+        assay_ids: Annotated[list[str], Field(
+            description="MetaboliteAssay IDs to drill into (full prefixed). "
+                        "Discover via `list_metabolite_assays(value_kind='numeric')`. "
+                        "E.g. ['metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration']. "
+                        "`not_found.assay_ids` lists IDs absent from the KG.",
+            min_length=1,
+        )],
+        organism: Annotated[str | None, Field(
+            description="Filter to assays from this organism (case-insensitive "
+                        "CONTAINS). Cross-organism is the default; pass to narrow.",
+        )] = None,
+        metabolite_ids: Annotated[list[str] | None, Field(
+            description="Restrict to specific metabolites (full prefixed IDs, "
+                        "e.g. ['kegg.compound:C00074']). `not_found.metabolite_ids` "
+                        "lists IDs absent from the KG; metabolites in the KG but not "
+                        "measured by any selected assay surface as zero rows "
+                        "(unmeasured per parent §10).",
+        )] = None,
+        exclude_metabolite_ids: Annotated[list[str] | None, Field(
+            description="Exclude metabolites with these IDs (set-difference; "
+                        "exclude wins on overlap with `metabolite_ids`).",
+        )] = None,
+        experiment_ids: Annotated[list[str] | None, Field(
+            description="Filter to assays from these experiments.",
+        )] = None,
+        publication_doi: Annotated[list[str] | None, Field(
+            description="Filter by publication DOI(s). Exact match. E.g. "
+                        "['10.1073/pnas.2213271120'].",
+        )] = None,
+        compartment: Annotated[str | None, Field(
+            description="Sample compartment ('whole_cell' or 'extracellular'). "
+                        "Exact match.",
+        )] = None,
+        treatment_type: Annotated[list[str] | None, Field(
+            description="Treatment type(s) (ANY-overlap, case-insensitive). "
+                        "E.g. ['carbon'].",
+        )] = None,
+        background_factors: Annotated[list[str] | None, Field(
+            description="Background factor(s) (ANY-overlap). E.g. ['axenic'].",
+        )] = None,
+        growth_phases: Annotated[list[str] | None, Field(
+            description="Growth phase(s) (ANY-overlap). Empty `[]` on assays "
+                        "today (KG-MET-017 backfill pending).",
+        )] = None,
+        value_min: Annotated[float | None, Field(
+            description="Lower bound on `value` (raw concentration / intensity). "
+                        "**Caution**: `value > 0` strips tested-absent rows "
+                        "(`value=0` / `detection_status='not_detected'`) — use "
+                        "deliberately, never as default. See parent §10.",
+        )] = None,
+        value_max: Annotated[float | None, Field(
+            description="Upper bound on `value`. Always applicable.",
+        )] = None,
+        detection_status: Annotated[list[str] | None, Field(
+            description="Detection-status filter — primary headline per audit "
+                        "§4.3.3. Values: 'detected', 'sporadic', 'not_detected'. "
+                        "Excluding 'not_detected' strips tested-absent rows; "
+                        "surface as caller choice, never default. See parent §10.",
+        )] = None,
+        timepoint: Annotated[list[str] | None, Field(
+            description="Timepoint label(s) — exact match. Live values: "
+                        "['4 days'], ['6 days']. Non-temporal experiments expose "
+                        "no timepoint here (rows surface with `timepoint=null`).",
+        )] = None,
+        metric_bucket: Annotated[list[str] | None, Field(
+            description="Bucket label(s) — subset of "
+                        "{'top_decile','top_quartile','mid','low'}. **Rankable-gated** "
+                        "— raises if every selected assay has `rankable=false`. "
+                        "Soft-excludes non-rankable assays from mixed input "
+                        "(surfaced in envelope `excluded_assays`).",
+        )] = None,
+        metric_percentile_min: Annotated[float | None, Field(
+            description="Lower bound on `metric_percentile` (0-100). "
+                        "**Rankable-gated.**",
+            ge=0, le=100,
+        )] = None,
+        metric_percentile_max: Annotated[float | None, Field(
+            description="Upper bound on `metric_percentile`. **Rankable-gated.**",
+            ge=0, le=100,
+        )] = None,
+        rank_by_metric_max: Annotated[int | None, Field(
+            description="Cap on `rank_by_metric` (1 = highest). Top-N drill-down. "
+                        "**Rankable-gated.**",
+            ge=1,
+        )] = None,
+        summary: Annotated[bool, Field(
+            description="Return summary fields only (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include heavy-text fields per row: assay_name, "
+                        "field_description, experimental_context, light_condition, "
+                        "replicate_values.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max rows. Paginate with `offset`.", ge=1,
+        )] = 5,
+        offset: Annotated[int, Field(
+            description="Pagination offset.", ge=0,
+        )] = 0,
+    ) -> MetabolitesByQuantifiesAssayResponse:
+        """Drill into numeric MetaboliteAssay edges — one row per
+        (metabolite × assay-edge).
+
+        `value` (raw concentration / intensity) is always returned;
+        `metric_bucket` / `metric_percentile` / `rank_by_metric` populated
+        only on rankable-assay rows (mirrors `genes_by_numeric_metric`'s
+        rankable gate). Rankable-gated filters raise if every selected
+        assay has `rankable=false`, soft-exclude on mixed input.
+
+        A row with `value=0` / `flag_value=false` /
+        `detection_status='not_detected'` is *tested-absent* (assayed and
+        not found, kept in results). A missing row is *unmeasured* (not
+        in this assay's scope). Don't conflate.
+
+        Pre-flight: `list_metabolite_assays(rankable=True, value_kind='numeric')`
+        to confirm rankable filters apply.
+
+        Drill across:
+        - `assays_by_metabolite(metabolite_ids=[...])` — same metabolites'
+          boolean evidence + cross-organism reverse view.
+        - `genes_by_metabolite(metabolite_ids=[...], organism=...)` — gene
+          catalysts/transporters of these metabolites.
+        """
+        await ctx.info(
+            f"metabolites_by_quantifies_assay assay_ids={len(assay_ids)} "
+            f"organism={organism} summary={summary} verbose={verbose} "
+            f"limit={limit} offset={offset}"
+        )
+        try:
+            conn = _conn(ctx)
+            data = api.metabolites_by_quantifies_assay(
+                assay_ids=assay_ids,
+                organism=organism,
+                metabolite_ids=metabolite_ids,
+                exclude_metabolite_ids=exclude_metabolite_ids,
+                experiment_ids=experiment_ids,
+                publication_doi=publication_doi,
+                compartment=compartment,
+                treatment_type=treatment_type,
+                background_factors=background_factors,
+                growth_phases=growth_phases,
+                value_min=value_min,
+                value_max=value_max,
+                detection_status=detection_status,
+                timepoint=timepoint,
+                metric_bucket=metric_bucket,
+                metric_percentile_min=metric_percentile_min,
+                metric_percentile_max=metric_percentile_max,
+                rank_by_metric_max=rank_by_metric_max,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                offset=offset,
+                conn=conn,
+            )
+        except ValueError as e:
+            await ctx.warning(f"metabolites_by_quantifies_assay error: {e}")
+            raise ToolError(str(e)) from e
+        except Exception as e:
+            await ctx.error(
+                f"metabolites_by_quantifies_assay unexpected error: {e}")
+            raise ToolError(f"Error in metabolites_by_quantifies_assay: {e}")
+
+        if data.get("excluded_assays"):
+            await ctx.warning(
+                f"{len(data['excluded_assays'])} assay(s) excluded under "
+                "rankable-gating; see envelope `excluded_assays` and "
+                "`warnings`."
+            )
+
+        results = [MetabolitesByQuantifiesAssayResult(**r)
+                   for r in data["results"]]
+        by_detection_status = [
+            MqaByDetectionStatus(**b) for b in data["by_detection_status"]
+        ]
+        by_metric_bucket = [
+            MqaByMetricBucket(**b) for b in data["by_metric_bucket"]
+        ]
+        by_assay = [MqaByAssay(**b) for b in data["by_assay"]]
+        by_compartment = [
+            MqaByCompartment(**b) for b in data["by_compartment"]
+        ]
+        by_organism = [MqaByOrganism(**b) for b in data["by_organism"]]
+        by_metric = [MqaByMetric(**b) for b in data["by_metric"]]
+        not_found = MqaNotFound(**data["not_found"])
+        return MetabolitesByQuantifiesAssayResponse(
+            results=results,
+            total_matching=data["total_matching"],
+            by_detection_status=by_detection_status,
+            by_metric_bucket=by_metric_bucket,
+            by_assay=by_assay,
+            by_compartment=by_compartment,
+            by_organism=by_organism,
+            by_metric=by_metric,
+            excluded_assays=data["excluded_assays"],
+            warnings=data["warnings"],
+            not_found=not_found,
+            returned=data["returned"],
+            truncated=data["truncated"],
+            offset=data["offset"],
+        )
+
+    # ------------------------------------------------------------------
+    # metabolites_by_flags_assay — Phase 5 boolean drill-down
+    # (slice spec §5)
+    # ------------------------------------------------------------------
+    class MfaByValue(BaseModel):
+        """One bucket of the by_value rollup (true / false counts)."""
+        flag_value: bool = Field(
+            description="The flag's boolean value. `false` rows are "
+            "tested-absent (real biology — 62% of boolean rows in the live KG).")
+        count: int = Field(
+            description="Row count for this flag value (e.g. 58 false / "
+            "35 true on the msystems presence-flags assay).")
+
+    class MfaByAssay(BaseModel):
+        assay_id: str = Field(
+            description="Assay id (e.g. "
+            "'metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular').")
+        count: int = Field(description="Row count from this assay.")
+
+    class MfaByCompartment(BaseModel):
+        compartment: str = Field(
+            description="Sample compartment ('whole_cell' or 'extracellular').")
+        count: int = Field(description="Row count in this compartment.")
+
+    class MfaByOrganism(BaseModel):
+        organism_name: str = Field(
+            description="Full organism name (e.g. 'Prochlorococcus MIT9301').")
+        count: int = Field(description="Row count from this organism.")
+
+    class MfaByMetric(BaseModel):
+        """Per-assay rollup for boolean drill-down. Mirrors DM `by_metric`
+        shape; precomputed dm_true_count / dm_false_count are absent
+        today (no diagnostics builder for boolean — best-effort).
+        """
+        assay_id: str = Field(description="Assay id this row summarizes.")
+        count: int = Field(
+            description="Filtered-slice row count for this assay.")
+
+    class MfaNotFound(BaseModel):
+        """Structured per-batch-input unknown IDs (parent §13.6)."""
+        assay_ids: list[str] = Field(default_factory=list)
+        metabolite_ids: list[str] = Field(default_factory=list)
+        experiment_ids: list[str] = Field(default_factory=list)
+        publication_doi: list[str] = Field(default_factory=list)
+
+    class MetabolitesByFlagsAssayResult(BaseModel):
+        # Identity / chemistry
+        metabolite_id: str = Field(
+            description="Metabolite node id.")
+        name: str = Field(description="Canonical metabolite name.")
+        kegg_compound_id: str | None = Field(
+            default=None,
+            description="KEGG compound id (e.g. 'C00019'); null if no KEGG xref.")
+        # Boolean value (always-available)
+        flag_value: bool = Field(
+            description="Boolean flag — `false` is *tested-absent* "
+            "(real biology, parent §10).")
+        n_positive: int | None = Field(
+            default=None,
+            description="Number of replicates flagged positive.")
+        n_replicates: int | None = Field(
+            default=None, description="Number of replicates.")
+        metric_type: str = Field(
+            description="Parent assay's metric tag (e.g. "
+            "'presence_flag_intracellular').")
+        condition_label: str | None = Field(
+            default=None,
+            description="Short condition descriptor (e.g. compartment + "
+            "experiment).")
+        # Provenance
+        assay_id: str = Field(description="Parent MetaboliteAssay id.")
+        organism_name: str = Field(description="Source organism.")
+        compartment: str = Field(
+            description="'whole_cell' or 'extracellular'.")
+        # Verbose-only
+        assay_name: str | None = Field(
+            default=None,
+            description="Human-readable assay name. Verbose only.")
+        field_description: str | None = Field(
+            default=None,
+            description="Canonical provenance description. Verbose only.")
+
+    class MetabolitesByFlagsAssayResponse(BaseModel):
+        results: list[MetabolitesByFlagsAssayResult] = Field(
+            default_factory=list,
+            description="One row per metabolite × flag-edge. Empty when "
+            "summary=True.")
+        total_matching: int = Field(
+            description="Row count in the filtered slice.")
+        by_value: list[MfaByValue] = Field(
+            default_factory=list,
+            description="Counts per flag value (true / false). `false` rows "
+            "are tested-absent (parent §10). Boolean arm has no "
+            "`by_detection_status` — `flag_value` IS the qualitative-detection "
+            "signal here.")
+        by_assay: list[MfaByAssay] = Field(
+            default_factory=list,
+            description="Counts per assay_id.")
+        by_compartment: list[MfaByCompartment] = Field(
+            default_factory=list, description="Counts per compartment.")
+        by_organism: list[MfaByOrganism] = Field(
+            default_factory=list,
+            description="Counts per organism (cross-organism by default).")
+        by_metric: list[MfaByMetric] = Field(
+            default_factory=list,
+            description="Per-assay filtered-slice rollup.")
+        excluded_assays: list[str] = Field(
+            default_factory=list,
+            description="Always `[]` here (no gates) — kept for cross-tool "
+            "envelope-shape consistency.")
+        warnings: list[str] = Field(
+            default_factory=list,
+            description="Always `[]` here (no gates).")
+        not_found: MfaNotFound = Field(
+            default_factory=MfaNotFound,
+            description="Per-batch-input unknown IDs (parent §13.6).")
+        returned: int = Field(description="Length of `results`.")
+        truncated: bool = Field(
+            description="True when total_matching > offset + returned.")
+        offset: int = Field(default=0, description="Pagination offset used.")
+
+    @mcp.tool(
+        tags={"metabolomics", "metabolites", "drill-down", "boolean"},
+        annotations={"readOnlyHint": True, "destructiveHint": False,
+                     "idempotentHint": True, "openWorldHint": False},
+    )
+    async def metabolites_by_flags_assay(
+        ctx: Context,
+        assay_ids: Annotated[list[str], Field(
+            description="MetaboliteAssay IDs to drill into. Discover via "
+                        "`list_metabolite_assays(value_kind='boolean')`. E.g. "
+                        "['metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular']. "
+                        "`not_found.assay_ids` lists IDs absent from the KG.",
+            min_length=1,
+        )],
+        organism: Annotated[str | None, Field(
+            description="Filter to assays from this organism (case-insensitive "
+                        "CONTAINS). Cross-organism is the default.",
+        )] = None,
+        metabolite_ids: Annotated[list[str] | None, Field(
+            description="Restrict to specific metabolites (full prefixed IDs, "
+                        "e.g. ['kegg.compound:C00019']). `not_found.metabolite_ids` "
+                        "lists IDs absent from the KG.",
+        )] = None,
+        exclude_metabolite_ids: Annotated[list[str] | None, Field(
+            description="Exclude metabolites with these IDs (set-difference).",
+        )] = None,
+        experiment_ids: Annotated[list[str] | None, Field(
+            description="Filter to assays from these experiments.",
+        )] = None,
+        publication_doi: Annotated[list[str] | None, Field(
+            description="Filter by publication DOI(s). E.g. "
+                        "['10.1128/msystems.01261-22'].",
+        )] = None,
+        compartment: Annotated[str | None, Field(
+            description="Sample compartment ('whole_cell' or 'extracellular').",
+        )] = None,
+        treatment_type: Annotated[list[str] | None, Field(
+            description="Treatment type(s) (ANY-overlap).",
+        )] = None,
+        background_factors: Annotated[list[str] | None, Field(
+            description="Background factor(s) (ANY-overlap).",
+        )] = None,
+        growth_phases: Annotated[list[str] | None, Field(
+            description="Growth phase(s) (ANY-overlap). Empty `[]` on assays "
+                        "today (KG-MET-017 backfill pending).",
+        )] = None,
+        flag_value: Annotated[bool | None, Field(
+            description="Filter by flag presence — `True` (presence flagged), "
+                        "`False` (absence flagged — *tested-absent*, real biology), "
+                        "`None` (both). Unlike `genes_by_boolean_metric` "
+                        "(positive-only KG storage), `Assay_flags_metabolite` "
+                        "stores both true and false flags, so `flag_value=False` "
+                        "returns real rows (62% of boolean rows in the live KG).",
+        )] = None,
+        summary: Annotated[bool, Field(
+            description="Return summary fields only (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include heavy-text fields per row: assay_name, "
+                        "field_description.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max rows. Paginate with `offset`.", ge=1,
+        )] = 5,
+        offset: Annotated[int, Field(
+            description="Pagination offset.", ge=0,
+        )] = 0,
+    ) -> MetabolitesByFlagsAssayResponse:
+        """Drill into boolean MetaboliteAssay edges — one row per
+        (metabolite × flag-edge).
+
+        `flag_value=False` rows are *tested-absent* — assayed and not
+        found, real biology. 62% of boolean rows in the live KG are
+        `flag_value=false`. A missing row means *unmeasured*. Distinct
+        (parent §10).
+
+        A row with `value=0` / `flag_value=false` /
+        `detection_status='not_detected'` is *tested-absent* (assayed
+        and not found, kept in results). A missing row is *unmeasured*
+        (not in this assay's scope). Don't conflate.
+
+        No `by_detection_status` envelope — that field exists only on
+        the numeric edge. On the boolean arm, `flag_value` IS the
+        qualitative-detection signal; `by_value` is its envelope rollup.
+
+        Drill across:
+        - `assays_by_metabolite(metabolite_ids=[...])` — quantifies-arm
+          complement.
+        - `genes_by_metabolite(metabolite_ids=[...], organism=...)` —
+          chemistry context.
+        """
+        await ctx.info(
+            f"metabolites_by_flags_assay assay_ids={len(assay_ids)} "
+            f"organism={organism} flag_value={flag_value} summary={summary} "
+            f"verbose={verbose} limit={limit} offset={offset}"
+        )
+        try:
+            conn = _conn(ctx)
+            data = api.metabolites_by_flags_assay(
+                assay_ids=assay_ids,
+                organism=organism,
+                metabolite_ids=metabolite_ids,
+                exclude_metabolite_ids=exclude_metabolite_ids,
+                experiment_ids=experiment_ids,
+                publication_doi=publication_doi,
+                compartment=compartment,
+                treatment_type=treatment_type,
+                background_factors=background_factors,
+                growth_phases=growth_phases,
+                flag_value=flag_value,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                offset=offset,
+                conn=conn,
+            )
+        except ValueError as e:
+            await ctx.warning(f"metabolites_by_flags_assay error: {e}")
+            raise ToolError(str(e)) from e
+        except Exception as e:
+            await ctx.error(
+                f"metabolites_by_flags_assay unexpected error: {e}")
+            raise ToolError(f"Error in metabolites_by_flags_assay: {e}")
+
+        results = [MetabolitesByFlagsAssayResult(**r)
+                   for r in data["results"]]
+        by_value = [MfaByValue(**b) for b in data["by_value"]]
+        by_assay = [MfaByAssay(**b) for b in data["by_assay"]]
+        by_compartment = [
+            MfaByCompartment(**b) for b in data["by_compartment"]
+        ]
+        by_organism = [MfaByOrganism(**b) for b in data["by_organism"]]
+        by_metric = [MfaByMetric(**b) for b in data["by_metric"]]
+        not_found = MfaNotFound(**data["not_found"])
+        return MetabolitesByFlagsAssayResponse(
+            results=results,
+            total_matching=data["total_matching"],
+            by_value=by_value,
+            by_assay=by_assay,
+            by_compartment=by_compartment,
+            by_organism=by_organism,
+            by_metric=by_metric,
+            excluded_assays=data["excluded_assays"],
+            warnings=data["warnings"],
+            not_found=not_found,
+            returned=data["returned"],
+            truncated=data["truncated"],
+            offset=data["offset"],
+        )
+
+    # ------------------------------------------------------------------
+    # assays_by_metabolite — Phase 5 polymorphic reverse-lookup
+    # (slice spec §6)
+    # ------------------------------------------------------------------
+    class AbmByEvidenceKind(BaseModel):
+        evidence_kind: Literal["quantifies", "flags"] = Field(
+            description="'quantifies' = numeric arm; 'flags' = boolean arm.")
+        count: int = Field(
+            description="Row count for this arm (e.g. 18 quantifies + 2 "
+            "flags = 20 total for PEP).")
+
+    class AbmByDetectionStatus(BaseModel):
+        """Numeric-row subset only — empty when `evidence_kind='flags'`."""
+        detection_status: str = Field(
+            description="'detected', 'sporadic', or 'not_detected'.")
+        count: int = Field(description="Row count for this status.")
+
+    class AbmByFlagValue(BaseModel):
+        """Boolean-row subset only — empty when `evidence_kind='quantifies'`."""
+        flag_value: bool = Field(description="The flag's boolean value.")
+        count: int = Field(description="Row count for this flag value.")
+
+    class AbmByOrganism(BaseModel):
+        organism_name: str = Field(description="Full organism name.")
+        count: int = Field(description="Row count from this organism.")
+
+    class AbmByCompartment(BaseModel):
+        compartment: str = Field(
+            description="Sample compartment ('whole_cell' or 'extracellular').")
+        count: int = Field(description="Row count in this compartment.")
+
+    class AbmByAssay(BaseModel):
+        assay_id: str = Field(description="Assay id.")
+        count: int = Field(description="Row count from this assay.")
+
+    class AssaysByMetaboliteResult(BaseModel):
+        # Identity (always)
+        metabolite_id: str = Field(
+            description="Metabolite node id (e.g. 'kegg.compound:C00074').")
+        metabolite_name: str = Field(
+            description="Canonical metabolite name (e.g. 'Phosphoenolpyruvate').")
+        assay_id: str = Field(description="Parent MetaboliteAssay id.")
+        assay_name: str = Field(
+            description="Human-readable assay name.")
+        evidence_kind: Literal["quantifies", "flags"] = Field(
+            description="Discriminator: 'quantifies' = numeric arm, "
+            "'flags' = boolean arm.")
+        n_replicates: int | None = Field(
+            default=None, description="Number of replicates.")
+        metric_type: str = Field(
+            description="Parent assay's metric tag.")
+        condition_label: str | None = Field(
+            default=None,
+            description="Short condition descriptor.")
+        organism_name: str = Field(description="Source organism.")
+        compartment: str = Field(
+            description="'whole_cell' or 'extracellular'.")
+        experiment_id: str | None = Field(
+            default=None, description="Parent experiment id.")
+        publication_doi: str | None = Field(
+            default=None, description="Parent publication DOI.")
+        # Numeric-only (sparse on flags rows)
+        value: float | None = Field(
+            default=None,
+            description="Raw concentration / intensity. Numeric arm only.")
+        value_sd: float | None = Field(
+            default=None,
+            description="Standard deviation across replicates. Numeric arm only.")
+        metric_bucket: str | None = Field(
+            default=None,
+            description="Bucket label. Numeric, rankable subset only.")
+        metric_percentile: float | None = Field(
+            default=None,
+            description="Percentile (0-100). Numeric, rankable subset only.")
+        rank_by_metric: int | None = Field(
+            default=None,
+            description="Rank by value (1=highest). Numeric, rankable subset only.")
+        detection_status: str | None = Field(
+            default=None,
+            description="'detected'/'sporadic'/'not_detected'. Numeric arm only.")
+        timepoint: str | None = Field(
+            default=None,
+            description="Timepoint label. Numeric arm only.")
+        timepoint_hours: float | None = Field(
+            default=None,
+            description="Timepoint in hours. Numeric arm only.")
+        timepoint_order: int | None = Field(
+            default=None,
+            description="Timepoint order index. Numeric arm only.")
+        growth_phase: str | None = Field(
+            default=None,
+            description="Growth phase. Numeric arm only — null today "
+            "(KG-MET-017 backfill pending).")
+        # Boolean-only (sparse on quantifies rows)
+        flag_value: bool | None = Field(
+            default=None,
+            description="Boolean flag. Boolean arm only. `false` is "
+            "tested-absent (parent §10).")
+        n_positive: int | None = Field(
+            default=None,
+            description="Number of replicates flagged positive. Boolean arm only.")
+        # Verbose-only
+        assay_field_description: str | None = Field(
+            default=None,
+            description="Canonical provenance description. Verbose only.")
+        replicate_values: list[float] | None = Field(
+            default=None,
+            description="Per-replicate values. Verbose only.")
+        experimental_context: str | None = Field(
+            default=None,
+            description="Long-form context. Verbose only.")
+
+    class AssaysByMetaboliteResponse(BaseModel):
+        results: list[AssaysByMetaboliteResult] = Field(
+            default_factory=list,
+            description="Polymorphic rows: one row per metabolite × assay-edge "
+            "across both arms. Cross-arm fields are explicit `None` "
+            "(union-shape padding). Empty when summary=True.")
+        total_matching: int = Field(
+            description="Row count merged across arms (one row per "
+            "metabolite × assay-edge). Use `metabolites_matched` for "
+            "distinct-metabolite count.")
+        by_evidence_kind: list[AbmByEvidenceKind] = Field(
+            default_factory=list,
+            description="Counts per arm (quantifies / flags).")
+        by_organism: list[AbmByOrganism] = Field(
+            default_factory=list,
+            description="Counts per organism.")
+        by_compartment: list[AbmByCompartment] = Field(
+            default_factory=list, description="Counts per compartment.")
+        by_assay: list[AbmByAssay] = Field(
+            default_factory=list, description="Counts per assay_id.")
+        by_detection_status: list[AbmByDetectionStatus] = Field(
+            default_factory=list,
+            description="Numeric-row subset rollup; empty when "
+            "`evidence_kind='flags'`.")
+        by_flag_value: list[AbmByFlagValue] = Field(
+            default_factory=list,
+            description="Boolean-row subset rollup; empty when "
+            "`evidence_kind='quantifies'`.")
+        metabolites_with_evidence: list[str] = Field(
+            default_factory=list,
+            description="Input `metabolite_ids` with at least one row in "
+            "the filtered slice (parallel to `gene_derived_metrics`'s "
+            "`genes_with_metrics`).")
+        metabolites_without_evidence: list[str] = Field(
+            default_factory=list,
+            description="Input `metabolite_ids` with no row in the filtered "
+            "slice (includes both `not_found` and `not_matched` IDs).")
+        metabolites_matched: int = Field(
+            description="Distinct-metabolite count — use this for unique "
+            "tallies (NOT `total_matching`, which is row-count).")
+        not_found: list[str] = Field(
+            default_factory=list,
+            description="Flat `list[str]` — single-batch reverse-lookup "
+            "(parent §13.6). Input metabolite IDs absent from the KG.")
+        not_matched: list[str] = Field(
+            default_factory=list,
+            description="Flat `list[str]` — IDs in KG with no edge after "
+            "filters (unmeasured for this scope). Distinct from `not_found`.")
+        returned: int = Field(description="Length of `results`.")
+        truncated: bool = Field(
+            description="True when total_matching > offset + returned.")
+        offset: int = Field(default=0, description="Pagination offset used.")
+
+    @mcp.tool(
+        tags={"metabolomics", "metabolites", "batch", "reverse-lookup"},
+        annotations={"readOnlyHint": True, "destructiveHint": False,
+                     "idempotentHint": True, "openWorldHint": False},
+    )
+    async def assays_by_metabolite(
+        ctx: Context,
+        metabolite_ids: Annotated[list[str], Field(
+            description="Metabolite IDs to look up (full prefixed, "
+                        "case-sensitive). E.g. ['kegg.compound:C00074']. "
+                        "`not_found` lists IDs absent from the KG; "
+                        "`not_matched` lists IDs in KG but with no assay "
+                        "edge after filters (unmeasured for this scope, "
+                        "parent §10). Required, non-empty.",
+            min_length=1,
+        )],
+        organism: Annotated[str | None, Field(
+            description="Optional organism filter (case-insensitive CONTAINS). "
+                        "Default `None` = cross-organism (D2 closure: metabolite "
+                        "IDs are organism-agnostic — one Metabolite node shared "
+                        "across organisms).",
+        )] = None,
+        evidence_kind: Annotated[Literal["quantifies", "flags"] | None, Field(
+            description="Filter by edge type. `'quantifies'` = numeric arm "
+                        "only (rows carry value, detection_status, timepoint*). "
+                        "`'flags'` = boolean arm only (rows carry flag_value, "
+                        "n_positive). Default `None` = both arms merged "
+                        "(polymorphic rows; cross-arm fields explicit `None`).",
+        )] = None,
+        exclude_metabolite_ids: Annotated[list[str] | None, Field(
+            description="Exclude metabolites with these IDs (set-difference).",
+        )] = None,
+        metric_types: Annotated[list[str] | None, Field(
+            description="Filter by metric_type tag(s) on the parent assay. "
+                        "E.g. ['cellular_concentration', "
+                        "'extracellular_concentration', "
+                        "'presence_flag_intracellular', "
+                        "'presence_flag_extracellular'].",
+        )] = None,
+        compartment: Annotated[str | None, Field(
+            description="Sample compartment ('whole_cell' or 'extracellular'). "
+                        "Exact match on the parent assay.",
+        )] = None,
+        summary: Annotated[bool, Field(
+            description="Return summary fields only (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include heavy-text fields per row: "
+                        "assay_field_description, replicate_values, "
+                        "experimental_context.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max rows. Paginate with `offset`.", ge=1,
+        )] = 5,
+        offset: Annotated[int, Field(
+            description="Pagination offset.", ge=0,
+        )] = 0,
+    ) -> AssaysByMetaboliteResponse:
+        """Batch reverse-lookup: metabolite IDs → all measurement evidence
+        across both arms (quantifies + flags). Cross-organism by default.
+
+        Polymorphic rows: numeric-arm rows carry `value`, `value_sd`,
+        `detection_status`, `timepoint*`, `metric_bucket`,
+        `metric_percentile`, `rank_by_metric` (rankable subset). Boolean-arm
+        rows carry `flag_value`, `n_positive`. Cross-arm fields are explicit
+        `None` (union-shape padding, parallels Phase 3 decision on
+        `genes_by_metabolite`).
+
+        A row with `value=0` / `flag_value=false` /
+        `detection_status='not_detected'` is *tested-absent* (assayed and
+        not found, kept in results). A missing row is *unmeasured* (not in
+        this assay's scope). Don't conflate.
+
+        Three states for a metabolite (parent §10):
+          1. `not_found` — ID not in the KG. **Unmeasured.**
+          2. `not_matched` — ID in the KG, no assay edge after filters.
+             **Unmeasured for this scope.**
+          3. Row in `results` with `value=0` / `flag_value=false` /
+             `detection_status='not_detected'` — *tested-absent* (assayed
+             and not found). Real biology; counted in `total_matching`.
+
+        Use `summary=True` for batch routing on 50+ metabolite_ids.
+
+        Originates from:
+        - `list_metabolites(metabolite_ids=[...])` — chemistry-layer discovery
+        - `metabolites_by_gene(locus_tags=[...])` — gene-anchored chemistry
+
+        Drill back to numeric details:
+        `metabolites_by_quantifies_assay(assay_ids=[...], metabolite_ids=[...])`.
+        """
+        await ctx.info(
+            f"assays_by_metabolite metabolite_ids={len(metabolite_ids)} "
+            f"organism={organism} evidence_kind={evidence_kind} "
+            f"summary={summary} verbose={verbose} limit={limit} offset={offset}"
+        )
+        try:
+            conn = _conn(ctx)
+            data = api.assays_by_metabolite(
+                metabolite_ids=metabolite_ids,
+                organism=organism,
+                evidence_kind=evidence_kind,
+                exclude_metabolite_ids=exclude_metabolite_ids,
+                metric_types=metric_types,
+                compartment=compartment,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                offset=offset,
+                conn=conn,
+            )
+        except ValueError as e:
+            await ctx.warning(f"assays_by_metabolite error: {e}")
+            raise ToolError(str(e)) from e
+        except Exception as e:
+            await ctx.error(f"assays_by_metabolite unexpected error: {e}")
+            raise ToolError(f"Error in assays_by_metabolite: {e}")
+
+        results = [AssaysByMetaboliteResult(**r) for r in data["results"]]
+        by_evidence_kind = [
+            AbmByEvidenceKind(**b) for b in data["by_evidence_kind"]
+        ]
+        by_organism = [AbmByOrganism(**b) for b in data["by_organism"]]
+        by_compartment = [
+            AbmByCompartment(**b) for b in data["by_compartment"]
+        ]
+        by_assay = [AbmByAssay(**b) for b in data["by_assay"]]
+        by_detection_status = [
+            AbmByDetectionStatus(**b) for b in data["by_detection_status"]
+        ]
+        by_flag_value = [
+            AbmByFlagValue(**b) for b in data["by_flag_value"]
+        ]
+        return AssaysByMetaboliteResponse(
+            results=results,
+            total_matching=data["total_matching"],
+            by_evidence_kind=by_evidence_kind,
+            by_organism=by_organism,
+            by_compartment=by_compartment,
+            by_assay=by_assay,
+            by_detection_status=by_detection_status,
+            by_flag_value=by_flag_value,
+            metabolites_with_evidence=data["metabolites_with_evidence"],
+            metabolites_without_evidence=data["metabolites_without_evidence"],
+            metabolites_matched=data["metabolites_matched"],
+            not_found=data["not_found"],
+            not_matched=data["not_matched"],
+            returned=data["returned"],
+            truncated=data["truncated"],
+            offset=data["offset"],
+        )

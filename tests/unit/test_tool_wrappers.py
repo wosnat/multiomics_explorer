@@ -6433,11 +6433,16 @@ class TestExpectedToolsUnchangedForTcdbCazy:
         # Bumped 33 → 34 by Phase 5 list_metabolite_assays — likewise a
         # legitimate new MCP tool (metabolomics-assay discovery surface),
         # separate spec, parallel addition.
-        assert len(EXPECTED_TOOLS) == 34, (
+        # Bumped 34 → 37 by Phase 5 metabolites-by-assay 3-tool slice
+        # (metabolites_by_quantifies_assay + metabolites_by_flags_assay +
+        # assays_by_metabolite — all legitimate new MCP tools, separate
+        # spec, parallel addition).
+        assert len(EXPECTED_TOOLS) == 37, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
             "tcdb/cazy adds NO new tools (it's a Mode-B ontology surface "
             "refresh); MBG legitimately adds one; "
-            "list_metabolite_assays legitimately adds one."
+            "list_metabolite_assays legitimately adds one; "
+            "metabolites-by-assay 3-tool slice legitimately adds three."
         )
 
 
@@ -7057,10 +7062,14 @@ class TestExpectedToolsUnchangedForPhase1Plumbing:
         # list_experiments, list_organisms, list_filter_values, list_metabolites).
         # Bumped 33 → 34 by Phase 5 list_metabolite_assays (legitimate new
         # MCP tool — metabolomics-assay discovery surface, separate spec).
-        assert len(EXPECTED_TOOLS) == 34, (
+        # Bumped 34 → 37 by Phase 5 metabolites-by-assay 3-tool slice
+        # (metabolites_by_quantifies_assay + metabolites_by_flags_assay +
+        # assays_by_metabolite — all legitimate new MCP tools, separate spec).
+        assert len(EXPECTED_TOOLS) == 37, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
             "Phase 1 plumbing adds no new tools — only field additions; "
-            "Phase 5 list_metabolite_assays legitimately adds one."
+            "Phase 5 list_metabolite_assays legitimately adds one; "
+            "metabolites-by-assay 3-tool slice legitimately adds three."
         )
 
 
