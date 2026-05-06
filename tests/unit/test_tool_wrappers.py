@@ -72,6 +72,9 @@ EXPECTED_TOOLS = [
     "genes_by_metabolite",
     "metabolites_by_gene",
     "list_metabolite_assays",
+    "metabolites_by_quantifies_assay",
+    "metabolites_by_flags_assay",
+    "assays_by_metabolite",
 ]
 
 
@@ -8085,3 +8088,173 @@ class TestListMetaboliteAssaysWrapper:
         assert result.not_found.metabolite_ids == ["kegg.compound:C99999"]
         assert result.not_found.experiment_ids == ["bogus_exp"]
         assert result.not_found.publication_doi == ["10.x/bogus"]
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 metabolites-by-assay slice — 3 tools
+# Tool 1: metabolites_by_quantifies_assay (numeric drill-down)
+# Tool 2: metabolites_by_flags_assay (boolean drill-down)
+# Tool 3: assays_by_metabolite (polymorphic reverse-lookup)
+# ---------------------------------------------------------------------------
+class TestMetabolitesByQuantifiesAssayWrapper:
+    """MCP wrapper tests — calls api.metabolites_by_quantifies_assay (slice spec §4)."""
+
+    _SAMPLE_API_RETURN = {
+        "results": [],
+        "total_matching": 64,
+        "by_detection_status": [
+            {"detection_status": "not_detected", "count": 48},
+            {"detection_status": "detected", "count": 16},
+        ],
+        "by_metric_bucket": [{"bucket": "low", "count": 32}],
+        "by_assay": [{"assay_id": "a1", "count": 64}],
+        "by_compartment": [{"compartment": "whole_cell", "count": 64}],
+        "by_organism": [{"organism_name": "Prochlorococcus MIT9313", "count": 64}],
+        "by_metric": [],
+        "excluded_assays": [],
+        "warnings": [],
+        "not_found": {
+            "assay_ids": [],
+            "metabolite_ids": [],
+            "experiment_ids": [],
+            "publication_doi": [],
+        },
+        "returned": 0,
+        "truncated": True,
+        "offset": 0,
+    }
+
+    def test_registered(self, tool_fns):
+        assert "metabolites_by_quantifies_assay" in tool_fns
+
+    @pytest.mark.asyncio
+    async def test_empty_assay_ids_raises_tool_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_quantifies_assay",
+            side_effect=ValueError("assay_ids must not be empty"),
+        ):
+            with pytest.raises(ToolError, match="assay_ids"):
+                await tool_fns["metabolites_by_quantifies_assay"](
+                    mock_ctx, assay_ids=[])
+
+    @pytest.mark.asyncio
+    async def test_response_model_validates_typical_envelope(
+            self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_quantifies_assay",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["metabolites_by_quantifies_assay"](
+                mock_ctx, assay_ids=["a1"], summary=True)
+        assert result.total_matching == 64
+        assert len(result.by_detection_status) == 2
+        assert result.by_detection_status[0].detection_status == "not_detected"
+        assert result.results == []
+
+
+class TestMetabolitesByFlagsAssayWrapper:
+    """MCP wrapper tests — calls api.metabolites_by_flags_assay (slice spec §5)."""
+
+    _SAMPLE_API_RETURN = {
+        "results": [],
+        "total_matching": 93,
+        "by_value": [
+            {"flag_value": False, "count": 58},
+            {"flag_value": True, "count": 35},
+        ],
+        "by_assay": [{"assay_id": "a1", "count": 93}],
+        "by_compartment": [{"compartment": "whole_cell", "count": 93}],
+        "by_organism": [{"organism_name": "Prochlorococcus MIT9301", "count": 93}],
+        "by_metric": [],
+        "excluded_assays": [],
+        "warnings": [],
+        "not_found": {
+            "assay_ids": [],
+            "metabolite_ids": [],
+            "experiment_ids": [],
+            "publication_doi": [],
+        },
+        "returned": 0,
+        "truncated": True,
+        "offset": 0,
+    }
+
+    def test_registered(self, tool_fns):
+        assert "metabolites_by_flags_assay" in tool_fns
+
+    @pytest.mark.asyncio
+    async def test_empty_assay_ids_raises_tool_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_flags_assay",
+            side_effect=ValueError("assay_ids must not be empty"),
+        ):
+            with pytest.raises(ToolError, match="assay_ids"):
+                await tool_fns["metabolites_by_flags_assay"](
+                    mock_ctx, assay_ids=[])
+
+    @pytest.mark.asyncio
+    async def test_response_model_validates_typical_envelope(
+            self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_flags_assay",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["metabolites_by_flags_assay"](
+                mock_ctx, assay_ids=["a1"], summary=True)
+        assert result.total_matching == 93
+        assert len(result.by_value) == 2
+        assert result.results == []
+
+
+class TestAssaysByMetaboliteWrapper:
+    """MCP wrapper tests — calls api.assays_by_metabolite (slice spec §6)."""
+
+    _SAMPLE_API_RETURN = {
+        "results": [],
+        "total_matching": 20,
+        "by_evidence_kind": [
+            {"evidence_kind": "quantifies", "count": 18},
+            {"evidence_kind": "flags", "count": 2},
+        ],
+        "by_organism": [{"organism_name": "Prochlorococcus MIT9313", "count": 18}],
+        "by_compartment": [{"compartment": "whole_cell", "count": 20}],
+        "by_assay": [{"assay_id": "a1", "count": 18}],
+        "by_detection_status": [{"detection_status": "detected", "count": 12}],
+        "by_flag_value": [{"flag_value": True, "count": 2}],
+        "metabolites_with_evidence": ["kegg.compound:C00074"],
+        "metabolites_without_evidence": [],
+        "metabolites_matched": 1,
+        "not_found": [],
+        "not_matched": [],
+        "returned": 0,
+        "truncated": True,
+        "offset": 0,
+    }
+
+    def test_registered(self, tool_fns):
+        assert "assays_by_metabolite" in tool_fns
+
+    @pytest.mark.asyncio
+    async def test_empty_metabolite_ids_raises_tool_error(
+            self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.assays_by_metabolite",
+            side_effect=ValueError("metabolite_ids must not be empty"),
+        ):
+            with pytest.raises(ToolError, match="metabolite_ids"):
+                await tool_fns["assays_by_metabolite"](
+                    mock_ctx, metabolite_ids=[])
+
+    @pytest.mark.asyncio
+    async def test_response_model_validates_typical_envelope(
+            self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.assays_by_metabolite",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["assays_by_metabolite"](
+                mock_ctx, metabolite_ids=["kegg.compound:C00074"], summary=True)
+        assert result.total_matching == 20
+        # Flat not_found per parent §13.6 (single-batch reverse-lookup)
+        assert isinstance(result.not_found, list)
+        assert result.metabolites_matched == 1

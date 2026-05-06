@@ -10223,3 +10223,293 @@ class TestListMetaboliteAssays:
         from multiomics_explorer.api import list_metabolite_assays as _api_export
         from multiomics_explorer import list_metabolite_assays as _root_export
         assert _api_export is _root_export
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 metabolites-by-assay slice — 3 tools
+# Tool 1: metabolites_by_quantifies_assay (numeric drill-down)
+# Tool 2: metabolites_by_flags_assay (boolean drill-down)
+# Tool 3: assays_by_metabolite (polymorphic reverse-lookup)
+# ---------------------------------------------------------------------------
+class TestMetabolitesByQuantifiesAssay:
+    """Unit tests for api.metabolites_by_quantifies_assay (slice spec §4)."""
+
+    @staticmethod
+    def _diag_rankable(assay_ids=("a1",)):
+        """Diagnostics rows where every assay is rankable."""
+        return [
+            {
+                "assay_id": aid,
+                "name": f"Assay {aid}",
+                "value_kind": "numeric",
+                "rankable": True,
+                "organism_name": "Prochlorococcus MIT9313",
+                "compartment": "whole_cell",
+                "value_min": 0.0,
+                "value_q1": 0.001,
+                "value_median": 0.005,
+                "value_q3": 0.05,
+                "value_max": 0.5,
+            }
+            for aid in assay_ids
+        ]
+
+    @staticmethod
+    def _diag_non_rankable(assay_ids=("a1",)):
+        """Diagnostics rows where every assay is non-rankable."""
+        return [
+            {
+                "assay_id": aid,
+                "name": f"Assay {aid}",
+                "value_kind": "numeric",
+                "rankable": False,
+                "organism_name": "Prochlorococcus MIT9313",
+                "compartment": "whole_cell",
+                "value_min": 0.0,
+                "value_q1": 0.0,
+                "value_median": 0.0,
+                "value_q3": 0.0,
+                "value_max": 1.0,
+            }
+            for aid in assay_ids
+        ]
+
+    @staticmethod
+    def _diag_mixed():
+        return [
+            {
+                "assay_id": "a_rank",
+                "name": "Rankable assay",
+                "value_kind": "numeric",
+                "rankable": True,
+                "organism_name": "Prochlorococcus MIT9313",
+                "compartment": "whole_cell",
+                "value_min": 0.0, "value_q1": 0.001, "value_median": 0.005,
+                "value_q3": 0.05, "value_max": 0.5,
+            },
+            {
+                "assay_id": "a_norank",
+                "name": "Non-rankable assay",
+                "value_kind": "numeric",
+                "rankable": False,
+                "organism_name": "Prochlorococcus MIT9313",
+                "compartment": "whole_cell",
+                "value_min": 0.0, "value_q1": 0.0, "value_median": 0.0,
+                "value_q3": 0.0, "value_max": 1.0,
+            },
+        ]
+
+    @staticmethod
+    def _summary_row():
+        return [{
+            "total_matching": 64,
+            "by_detection_status": [{"item": "not_detected", "count": 48},
+                                    {"item": "detected", "count": 16}],
+            "by_metric_bucket": [{"item": "low", "count": 32}],
+            "by_assay": [{"item": "a1", "count": 64}],
+            "by_compartment": [{"item": "whole_cell", "count": 64}],
+            "by_organism": [{"item": "Prochlorococcus MIT9313", "count": 64}],
+            "filtered_value_min": 0.0,
+            "filtered_value_max": 0.5,
+        }]
+
+    def test_empty_assay_ids_raises(self):
+        from multiomics_explorer.api.functions import metabolites_by_quantifies_assay
+        with pytest.raises(ValueError, match="assay_ids"):
+            metabolites_by_quantifies_assay(assay_ids=[], conn=MagicMock())
+
+    def test_invalid_metric_bucket_raises(self):
+        from multiomics_explorer.api.functions import metabolites_by_quantifies_assay
+        with pytest.raises(ValueError, match="metric_bucket"):
+            metabolites_by_quantifies_assay(
+                assay_ids=["a1"], metric_bucket=["INVALID"], conn=MagicMock())
+
+    def test_invalid_detection_status_raises(self):
+        from multiomics_explorer.api.functions import metabolites_by_quantifies_assay
+        with pytest.raises(ValueError, match="detection_status"):
+            metabolites_by_quantifies_assay(
+                assay_ids=["a1"], detection_status=["INVALID"], conn=MagicMock())
+
+    def test_all_non_rankable_raises_when_rankable_filter_set(self):
+        # All-non-rankable input + rankable-gated filter → ValueError.
+        from multiomics_explorer.api.functions import metabolites_by_quantifies_assay
+        mock_conn = MagicMock()
+        mock_conn.execute_query.return_value = self._diag_non_rankable(("a1",))
+        with pytest.raises(ValueError, match="rankable"):
+            metabolites_by_quantifies_assay(
+                assay_ids=["a1"], metric_bucket=["top_decile"], conn=mock_conn)
+
+    def test_mixed_rankable_soft_excludes(self):
+        # Mixed input: some rankable, some not. Expect excluded surfaced.
+        from multiomics_explorer.api.functions import metabolites_by_quantifies_assay
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            self._diag_mixed(),
+            self._summary_row(),
+            [],
+        ]
+        data = metabolites_by_quantifies_assay(
+            assay_ids=["a_rank", "a_norank"],
+            metric_bucket=["top_decile"],
+            conn=mock_conn,
+        )
+        assert "a_norank" in data["excluded_assays"]
+        assert "a_rank" not in data["excluded_assays"]
+        assert data["warnings"]
+
+    def test_summary_skips_detail_query(self):
+        # summary=True means only diagnostics + summary builders run.
+        from multiomics_explorer.api.functions import metabolites_by_quantifies_assay
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            self._diag_rankable(("a1",)),
+            self._summary_row(),
+        ]
+        data = metabolites_by_quantifies_assay(
+            assay_ids=["a1"], summary=True, conn=mock_conn,
+        )
+        # diag + summary only; detail builder NOT invoked
+        assert mock_conn.execute_query.call_count == 2
+        assert data["results"] == []
+
+
+class TestMetabolitesByFlagsAssay:
+    """Unit tests for api.metabolites_by_flags_assay (slice spec §5)."""
+
+    def test_empty_assay_ids_raises(self):
+        from multiomics_explorer.api.functions import metabolites_by_flags_assay
+        with pytest.raises(ValueError, match="assay_ids"):
+            metabolites_by_flags_assay(assay_ids=[], conn=MagicMock())
+
+    def test_flag_value_bool_to_string_coercion(self):
+        # D4: bool flag_value → string 'true'/'false' for Cypher param.
+        captured: list[dict] = []
+
+        class StubConn:
+            def execute_query(self, cypher, **params):
+                captured.append(dict(params))
+                # Return an empty summary envelope so api/ continues.
+                return [{
+                    "total_matching": 0,
+                    "by_value": [],
+                    "by_assay": [],
+                    "by_compartment": [],
+                    "by_organism": [],
+                }]
+
+        from multiomics_explorer.api.functions import metabolites_by_flags_assay
+        metabolites_by_flags_assay(
+            assay_ids=["a1"], flag_value=True, summary=True, conn=StubConn(),
+        )
+        # At least one query carried flag_value="true"
+        coerced_seen = [p for p in captured if p.get("flag_value") == "true"]
+        assert coerced_seen, (
+            f"Expected flag_value='true' string param, got: {captured}"
+        )
+
+    def test_no_rankable_diagnostics(self):
+        # Boolean tool has no rankable gate; diagnostics builder must NOT be called.
+        # Implementation detail: this asserts via call count — the boolean dispatch
+        # is two queries (summary + detail), not three.
+        from multiomics_explorer.api.functions import metabolites_by_flags_assay
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            [{
+                "total_matching": 0,
+                "by_value": [],
+                "by_assay": [],
+                "by_compartment": [],
+                "by_organism": [],
+            }],
+            [],
+        ]
+        metabolites_by_flags_assay(
+            assay_ids=["a1"], conn=mock_conn,
+        )
+        # Two queries (summary + detail), not three (no diagnostics probe).
+        assert mock_conn.execute_query.call_count == 2
+
+
+class TestAssaysByMetabolite:
+    """Unit tests for api.assays_by_metabolite (slice spec §6, polymorphic reverse-lookup)."""
+
+    def test_empty_metabolite_ids_raises(self):
+        from multiomics_explorer.api.functions import assays_by_metabolite
+        with pytest.raises(ValueError, match="metabolite_ids"):
+            assays_by_metabolite(metabolite_ids=[], conn=MagicMock())
+
+    def test_invalid_evidence_kind_raises(self):
+        from multiomics_explorer.api.functions import assays_by_metabolite
+        with pytest.raises(ValueError, match="evidence_kind"):
+            assays_by_metabolite(
+                metabolite_ids=["m1"], evidence_kind="INVALID", conn=MagicMock())
+
+    def test_not_found_flat_list(self):
+        # Single-batch input → flat list[str] (parent §13.6).
+        # Stubbed: probe returns empty (metabolite ID absent from KG).
+        from multiomics_explorer.api.functions import assays_by_metabolite
+        mock_conn = MagicMock()
+        # 3 queries: existence-probe, summary, detail
+        # existence-probe returns no rows → all input IDs are not_found
+        empty_summary = [{
+            "total_matching": 0,
+            "by_evidence_kind": [],
+            "by_organism": [],
+            "by_compartment": [],
+            "by_assay": [],
+            "by_detection_status": [],
+            "by_flag_value": [],
+            "metabolites_matched": 0,
+        }]
+        mock_conn.execute_query.side_effect = [
+            [],            # existence probe — input ID absent
+            empty_summary, # summary
+            [],            # detail
+        ]
+        data = assays_by_metabolite(
+            metabolite_ids=["kegg.compound:C99999"], conn=mock_conn,
+        )
+        # Flat list[str] per parent §13.6 (single batch input).
+        assert isinstance(data["not_found"], list)
+        assert "kegg.compound:C99999" in data["not_found"]
+
+    def test_metabolites_with_evidence_partition(self):
+        # 2 metabolites in input, 1 has rows, 1 has none.
+        from multiomics_explorer.api.functions import assays_by_metabolite
+        mock_conn = MagicMock()
+        present_id = "kegg.compound:C00074"
+        absent_id = "kegg.compound:C00031"
+        existence_rows = [
+            {"metabolite_id": present_id},
+            {"metabolite_id": absent_id},
+        ]
+        summary_rows = [{
+            "total_matching": 18,
+            "by_evidence_kind": [{"item": "quantifies", "count": 18}],
+            "by_organism": [],
+            "by_compartment": [],
+            "by_assay": [],
+            "by_detection_status": [],
+            "by_flag_value": [],
+            "metabolites_matched": 1,
+        }]
+        detail_rows = [
+            {
+                "metabolite_id": present_id,
+                "metabolite_name": "PEP",
+                "assay_id": "a1",
+                "evidence_kind": "quantifies",
+                "value": 0.05,
+            },
+        ]
+        mock_conn.execute_query.side_effect = [
+            existence_rows,
+            summary_rows,
+            detail_rows,
+        ]
+        data = assays_by_metabolite(
+            metabolite_ids=[present_id, absent_id], conn=mock_conn,
+        )
+        assert present_id in data["metabolites_with_evidence"]
+        assert absent_id in data["metabolites_without_evidence"]
+        assert present_id not in data["metabolites_without_evidence"]
