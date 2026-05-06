@@ -10157,7 +10157,7 @@ class TestListMetaboliteAssays:
         conn = MagicMock()
         # First call (summary) raises Lucene parse error; retry succeeds
         conn.execute_query.side_effect = [
-            Neo4jClientError(message="Failed to parse query: chitosan AND"),
+            Neo4jClientError("Failed to parse query: chitosan AND"),
             summary_row,
             [],
         ]

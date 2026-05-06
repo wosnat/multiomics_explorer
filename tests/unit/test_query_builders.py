@@ -9266,7 +9266,16 @@ class TestBuildListMetaboliteAssaysSummary:
         assert "apoc.coll.frequencies(gps) AS by_growth_phase" in cypher
         assert "apoc.coll.frequencies(all_det) AS by_detection_status" in cypher
         assert "sum(a.total_metabolite_count) AS metabolite_count_total" in cypher
-        assert "WHERE" not in cypher
+        # Scope assertion: no user-filter WHERE block. (NULL-safe inner WHEREs
+        # like `WHERE s IS NOT NULL` per parent §13.7 are mandated, so the
+        # too-broad `assert "WHERE" not in cypher` would conflict with the
+        # NULL-safety convention. Check the param-placeholders that
+        # _list_metabolite_assays_where would inject — no filter ⇒ none.)
+        assert "$organism" not in cypher
+        assert "$value_kind" not in cypher
+        assert "$compartment" not in cypher
+        assert "$rankable_str" not in cypher
+        assert "$metric_types" not in cypher
         assert params == {}
 
     def test_with_organism_adds_where(self):

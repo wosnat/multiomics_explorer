@@ -7684,7 +7684,8 @@ def build_list_metabolite_assays(
         + "\n"
         "WITH a, timepoints,\n"
         "     CASE WHEN size(detection_statuses) = 0 THEN [] "
-        "ELSE apoc.coll.frequencies(detection_statuses) END AS detection_status_counts"
+        "ELSE [x IN apoc.coll.frequencies(detection_statuses) "
+        "| {detection_status: x.item, count: x.count}] END AS detection_status_counts"
         + (",\n     score" if search_text is not None else "")
         + "\n"
         "RETURN\n"
