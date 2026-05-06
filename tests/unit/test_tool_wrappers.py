@@ -5486,6 +5486,114 @@ class TestGenesByMetaboliteWrapper:
     def test_in_expected_tools(self):
         assert "genes_by_metabolite" in EXPECTED_TOOLS
 
+    # ---- Phase 3 Item 6.1 — None-padding lock-in on the wrapper path ----
+
+    @pytest.mark.asyncio
+    async def test_envelope_serializes_none_cross_arm_fields(
+        self, tool_fns, mock_ctx,
+    ):
+        """After Item 6.1: model_dump() of the response must NOT strip
+        None values from cross-arm fields. Default Pydantic v2 behavior
+        preserves None on Optional fields — verify no `exclude_none=True`
+        is added on the wrapper response path.
+
+        This test exists to LOCK the behavior — it should pass green
+        today (Pydantic v2 default) and catch a future regression where
+        someone might accidentally add exclude_none=True on the response
+        path.
+        """
+        # Construct a synthetic raw API response with one metabolism +
+        # one transport row, with cross-arm fields explicitly None
+        # (mirroring the post-Item-6.1 api/-layer output).
+        raw = {
+            "total_matching": 2,
+            "returned": 2,
+            "offset": 0,
+            "truncated": False,
+            "warnings": [],
+            "not_found": {
+                "metabolite_ids": [],
+                "organism": None,
+                "metabolite_pathway_ids": [],
+            },
+            "not_matched": [],
+            "by_metabolite": [],
+            "by_evidence_source": [],
+            "by_transport_confidence": [],
+            "top_reactions": [],
+            "top_tcdb_families": [],
+            "top_gene_categories": [],
+            "top_genes": [],
+            "gene_count_total": 1,
+            "reaction_count_total": 1,
+            "transporter_count_total": 1,
+            "metabolite_count_total": 1,
+            "results": [
+                {
+                    "locus_tag": "PMM0001",
+                    "evidence_source": "metabolism",
+                    "transport_confidence": None,    # None preserved
+                    "reaction_id": "kegg.reaction:R00131",
+                    "reaction_name": "test reaction",
+                    "ec_numbers": ["3.5.1.5"],
+                    "mass_balance": "balanced",
+                    "tcdb_family_id": None,           # None preserved
+                    "tcdb_family_name": None,          # None preserved
+                    "metabolite_id": "kegg.compound:C00086",
+                    "metabolite_name": "Urea",
+                },
+                {
+                    "locus_tag": "PMM0392",
+                    "evidence_source": "transport",
+                    "transport_confidence": "family_inferred",
+                    "reaction_id": None,                # None preserved
+                    "reaction_name": None,               # None preserved
+                    "ec_numbers": None,                   # None preserved
+                    "mass_balance": None,                  # None preserved
+                    "tcdb_family_id": "tcdb:3.A.1",
+                    "tcdb_family_name": "ABC superfamily",
+                    "metabolite_id": "kegg.compound:C00086",
+                    "metabolite_name": "Urea",
+                },
+            ],
+        }
+
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=raw,
+        ):
+            response = await tool_fns["genes_by_metabolite"](
+                mock_ctx,
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+            )
+
+        dumped = response.model_dump()
+
+        metab_row = next(
+            r for r in dumped["results"] if r["evidence_source"] == "metabolism"
+        )
+        transp_row = next(
+            r for r in dumped["results"] if r["evidence_source"] == "transport"
+        )
+
+        # Cross-arm None values must be present, not stripped
+        assert "transport_confidence" in metab_row
+        assert metab_row["transport_confidence"] is None
+        assert "tcdb_family_id" in metab_row
+        assert metab_row["tcdb_family_id"] is None
+        assert "tcdb_family_name" in metab_row
+        assert metab_row["tcdb_family_name"] is None
+
+        assert "reaction_id" in transp_row
+        assert transp_row["reaction_id"] is None
+        assert "reaction_name" in transp_row
+        assert transp_row["reaction_name"] is None
+        assert "ec_numbers" in transp_row
+        assert transp_row["ec_numbers"] is None
+        assert "mass_balance" in transp_row
+        assert transp_row["mass_balance"] is None
+
 
 # ---------------------------------------------------------------------------
 # metabolites_by_gene (MBG) — Tool 3 of chemistry slice 1
@@ -6097,6 +6205,115 @@ class TestMetabolitesByGeneWrapper:
         # `list[GeneReactionMetaboliteTriplet]`
         assert "GeneReactionMetaboliteTriplet" in str(mbg_results_type)
         assert GeneReactionMetaboliteTriplet is not None
+
+    # ---- Phase 3 Item 6.1 — None-padding lock-in on the wrapper path ----
+
+    @pytest.mark.asyncio
+    async def test_envelope_serializes_none_cross_arm_fields(
+        self, tool_fns, mock_ctx,
+    ):
+        """After Item 6.1: model_dump() of the response must NOT strip
+        None values from cross-arm fields. The MBG row class is shared
+        with GBM (GeneReactionMetaboliteTriplet) — this test mirrors
+        the GBM equivalent.
+
+        This test exists to LOCK the behavior — it should pass green
+        today (Pydantic v2 default) and catch a future regression where
+        someone might accidentally add exclude_none=True on the response
+        path.
+        """
+        raw = {
+            "total_matching": 2,
+            "returned": 2,
+            "offset": 0,
+            "truncated": False,
+            "warnings": [],
+            "not_found": {
+                "locus_tags": [],
+                "organism": None,
+                "metabolite_ids": [],
+                "metabolite_pathway_ids": [],
+                "metabolite_elements": [],
+            },
+            "not_matched": [],
+            "by_gene": [],
+            "by_evidence_source": [],
+            "by_transport_confidence": [],
+            "by_element": [],
+            "top_metabolites": [],
+            "top_reactions": [],
+            "top_tcdb_families": [],
+            "top_gene_categories": [],
+            "top_metabolite_pathways": [],
+            "gene_count_total": 1,
+            "reaction_count_total": 1,
+            "transporter_count_total": 1,
+            "metabolite_count_total": 1,
+            "results": [
+                {
+                    "locus_tag": "PMM0963",
+                    "evidence_source": "metabolism",
+                    "transport_confidence": None,    # None preserved
+                    "reaction_id": "kegg.reaction:R00131",
+                    "reaction_name": "test reaction",
+                    "ec_numbers": ["3.5.1.5"],
+                    "mass_balance": "balanced",
+                    "tcdb_family_id": None,           # None preserved
+                    "tcdb_family_name": None,          # None preserved
+                    "metabolite_id": "kegg.compound:C00086",
+                    "metabolite_name": "Urea",
+                },
+                {
+                    "locus_tag": "PMM0913",
+                    "evidence_source": "transport",
+                    "transport_confidence": "family_inferred",
+                    "reaction_id": None,                # None preserved
+                    "reaction_name": None,               # None preserved
+                    "ec_numbers": None,                   # None preserved
+                    "mass_balance": None,                  # None preserved
+                    "tcdb_family_id": "tcdb:3.A.1",
+                    "tcdb_family_name": "ABC superfamily",
+                    "metabolite_id": "kegg.compound:C00086",
+                    "metabolite_name": "Urea",
+                },
+            ],
+        }
+
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            return_value=raw,
+        ):
+            response = await tool_fns["metabolites_by_gene"](
+                mock_ctx,
+                locus_tags=["PMM0963", "PMM0913"],
+                organism="Prochlorococcus MED4",
+            )
+
+        dumped = response.model_dump()
+
+        metab_row = next(
+            r for r in dumped["results"] if r["evidence_source"] == "metabolism"
+        )
+        transp_row = next(
+            r for r in dumped["results"] if r["evidence_source"] == "transport"
+        )
+
+        # Cross-arm None values must be present, not stripped
+        assert "transport_confidence" in metab_row
+        assert metab_row["transport_confidence"] is None
+        assert "tcdb_family_id" in metab_row
+        assert metab_row["tcdb_family_id"] is None
+        assert "tcdb_family_name" in metab_row
+        assert metab_row["tcdb_family_name"] is None
+
+        assert "reaction_id" in transp_row
+        assert transp_row["reaction_id"] is None
+        assert "reaction_name" in transp_row
+        assert transp_row["reaction_name"] is None
+        assert "ec_numbers" in transp_row
+        assert transp_row["ec_numbers"] is None
+        assert "mass_balance" in transp_row
+        assert transp_row["mass_balance"] is None
 
 
 # ---------------------------------------------------------------------------

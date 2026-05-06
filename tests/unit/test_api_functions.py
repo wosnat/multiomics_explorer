@@ -7316,7 +7316,12 @@ class TestGenesByMetabolite:
         """Warning fires when:
         - transport rows present in result AND
         - transport_family_inferred_rows > transport_substrate_confirmed_rows AND
-        - user did NOT set transport_confidence."""
+        - user did NOT set transport_confidence.
+
+        Phase 3 Item 6.3: warning text rewritten to question-shape-aware
+        framing (drops "high-precision" prescription). GBM and MBG now
+        emit byte-identical text (modulo count variables).
+        """
         gbm = self._api()
         conn = self._mock_conn(
             [self._SUMMARY_ROW_FI_DOMINATES],
@@ -7327,9 +7332,40 @@ class TestGenesByMetabolite:
             [{"found": ["kegg.compound:C00088"]}],
         )
         out = gbm(["kegg.compound:C00088"], self._ORG, conn=conn)
-        assert any(
-            "family_inferred" in w for w in out["warnings"]
-        ), f"expected family-inferred warning, got {out['warnings']!r}"
+        warnings = [
+            w for w in out["warnings"] if "family_inferred" in w
+        ]
+        assert warnings, (
+            f"expected family-inferred warning, got {out['warnings']!r}"
+        )
+        warning = warnings[0]
+
+        # Assert the new symmetric warning format (Item 6.3)
+        assert "Most transport rows are `family_inferred`" in warning
+        assert (
+            "annotations rolled up from family-level transport potential"
+            in warning
+        )
+        assert "Workflow-dependent" in warning
+        assert (
+            "Both tiers are annotations, neither is ground truth" in warning
+        )
+        assert "analysis-doc §g" in warning
+
+        # Assert the inline counts ARE present (X of Y format)
+        import re
+        m = re.search(r"\((\d+) of (\d+)\)", warning)
+        assert m, (
+            f"warning must include `(X of Y)` count format; got: {warning}"
+        )
+        fi_count, total = int(m.group(1)), int(m.group(2))
+        assert fi_count > total - fi_count, (
+            "fi_count must dominate (test setup)"
+        )
+
+        # Assert old "high-precision" prescription is GONE
+        assert "high-precision" not in warning
+        assert "substrate-curated transporter genes only" not in warning
 
     def test_no_warning_when_substrate_confirmed_majority(self):
         """sc >= fi → no auto-warning even with default both-arm mode."""
@@ -7886,6 +7922,61 @@ class TestGenesByMetabolite:
         out2 = gbm(self._METS, self._ORG, limit=10, offset=20, conn=conn2)
         assert out2["truncated"] is False
 
+    # ---- Phase 3 Item 6.1 — None-padding for cross-arm fields ----
+
+    def test_cross_arm_fields_none_padded(self):
+        """After Item 6.1 None-padding: every result row carries all 7
+        cross-arm keys; arm-specific fields are explicitly None on rows
+        from the other arm.
+
+        Cross-arm fields:
+        - transport-only (None on metabolism rows): transport_confidence,
+          tcdb_family_id, tcdb_family_name
+        - metabolism-only (None on transport rows): reaction_id,
+          reaction_name, ec_numbers, mass_balance
+        """
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, conn=conn)
+
+        metabolism_rows = [
+            r for r in out["results"] if r["evidence_source"] == "metabolism"
+        ]
+        transport_rows = [
+            r for r in out["results"] if r["evidence_source"] == "transport"
+        ]
+        assert metabolism_rows, (
+            "fixture must include at least one metabolism row"
+        )
+        assert transport_rows, (
+            "fixture must include at least one transport row"
+        )
+
+        # Metabolism rows: transport-arm cross-arm keys present, value None
+        for row in metabolism_rows:
+            assert "transport_confidence" in row
+            assert row["transport_confidence"] is None
+            assert "tcdb_family_id" in row
+            assert row["tcdb_family_id"] is None
+            assert "tcdb_family_name" in row
+            assert row["tcdb_family_name"] is None
+
+        # Transport rows: metabolism-arm cross-arm keys present, value None
+        for row in transport_rows:
+            assert "reaction_id" in row
+            assert row["reaction_id"] is None
+            assert "reaction_name" in row
+            assert row["reaction_name"] is None
+            assert "ec_numbers" in row
+            assert row["ec_numbers"] is None
+            assert "mass_balance" in row
+            assert row["mass_balance"] is None
+
 
 # ---------------------------------------------------------------------------
 # metabolites_by_gene (MBG) — Tool 3 of chemistry slice 1
@@ -8244,7 +8335,12 @@ class TestMetabolitesByGene:
         """Spec § family_inferred-dominance auto-warning. Fires when
         - transport rows present in result AND
         - transport_family_inferred_rows > transport_substrate_confirmed_rows AND
-        - user did NOT set transport_confidence."""
+        - user did NOT set transport_confidence.
+
+        Phase 3 Item 6.3: warning text rewritten to question-shape-aware
+        framing (drops "high-precision" prescription). GBM and MBG now
+        emit byte-identical text (modulo count variables).
+        """
         mbg = self._api()
         conn = self._mock_conn(
             [self._SUMMARY_ROW_FI_DOMINATES],
@@ -8253,9 +8349,40 @@ class TestMetabolitesByGene:
             [{"found": ["PMM0913"]}],
         )
         out = mbg(["PMM0913"], self._ORG, conn=conn)
-        assert any(
-            "family_inferred" in w for w in out["warnings"]
-        ), f"expected family-inferred warning, got {out['warnings']!r}"
+        warnings = [
+            w for w in out["warnings"] if "family_inferred" in w
+        ]
+        assert warnings, (
+            f"expected family-inferred warning, got {out['warnings']!r}"
+        )
+        warning = warnings[0]
+
+        # Assert the new symmetric warning format (Item 6.3)
+        assert "Most transport rows are `family_inferred`" in warning
+        assert (
+            "annotations rolled up from family-level transport potential"
+            in warning
+        )
+        assert "Workflow-dependent" in warning
+        assert (
+            "Both tiers are annotations, neither is ground truth" in warning
+        )
+        assert "analysis-doc §g" in warning
+
+        # Assert the inline counts ARE present (X of Y format)
+        import re
+        m = re.search(r"\((\d+) of (\d+)\)", warning)
+        assert m, (
+            f"warning must include `(X of Y)` count format; got: {warning}"
+        )
+        fi_count, total = int(m.group(1)), int(m.group(2))
+        assert fi_count > total - fi_count, (
+            "fi_count must dominate (test setup)"
+        )
+
+        # Assert old "high-precision" prescription is GONE
+        assert "high-precision" not in warning
+        assert "substrate-curated transporter genes only" not in warning
 
     def test_no_warning_when_substrate_confirmed_majority(self):
         """sc >= fi → no auto-warning."""
@@ -8649,6 +8776,56 @@ class TestMetabolitesByGene:
         assert out["warnings"] == []
         assert set(out["not_matched"]) == {"PMM0005", "PMM0006", "PMM0007"}
         assert out["not_found"]["locus_tags"] == []
+
+    # ---- Phase 3 Item 6.1 — None-padding for cross-arm fields ----
+
+    def test_cross_arm_fields_none_padded(self):
+        """After Item 6.1 None-padding: every result row carries all 7
+        cross-arm keys; arm-specific fields are explicitly None on rows
+        from the other arm. Mirrors the GBM test — the row class
+        `GeneReactionMetaboliteTriplet` is shared between the two tools.
+        """
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(self._LOCUS, self._ORG, conn=conn)
+
+        metabolism_rows = [
+            r for r in out["results"] if r["evidence_source"] == "metabolism"
+        ]
+        transport_rows = [
+            r for r in out["results"] if r["evidence_source"] == "transport"
+        ]
+        assert metabolism_rows, (
+            "fixture must include at least one metabolism row"
+        )
+        assert transport_rows, (
+            "fixture must include at least one transport row"
+        )
+
+        # Metabolism rows: transport-arm cross-arm keys present, value None
+        for row in metabolism_rows:
+            assert "transport_confidence" in row
+            assert row["transport_confidence"] is None
+            assert "tcdb_family_id" in row
+            assert row["tcdb_family_id"] is None
+            assert "tcdb_family_name" in row
+            assert row["tcdb_family_name"] is None
+
+        # Transport rows: metabolism-arm cross-arm keys present, value None
+        for row in transport_rows:
+            assert "reaction_id" in row
+            assert row["reaction_id"] is None
+            assert "reaction_name" in row
+            assert row["reaction_name"] is None
+            assert "ec_numbers" in row
+            assert row["ec_numbers"] is None
+            assert "mass_balance" in row
+            assert row["mass_balance"] is None
 
 
 # ===========================================================================
