@@ -6389,7 +6389,7 @@ def metabolites_by_quantifies_assay(
     by_detection_status = _rename_freq(
         sum_row.get("by_detection_status", []) or [], "detection_status")
     by_metric_bucket = _rename_freq(
-        sum_row.get("by_metric_bucket", []) or [], "metric_bucket")
+        sum_row.get("by_metric_bucket", []) or [], "bucket")
     by_assay_freq = sum_row.get("by_assay", []) or []
     by_assay = _rename_freq(by_assay_freq, "assay_id")
     by_compartment = _rename_freq(
