@@ -1,0 +1,113 @@
+# Human-authored content for metabolites_by_quantifies_assay about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Canonical drill-down — MIT9313 chitosan rankable assay
+    call: metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration"])
+    response: |
+      total_matching: 64
+      by_detection_status: [{detected: 27}, {sporadic: 30}, {not_detected: 7}]
+      by_metric_bucket: [{mid: 32}, {low: 16}, {top_quartile: 9}, {top_decile: 7}]
+      by_assay: [{assay_id: "metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration", count: 64}]
+      by_compartment: [{whole_cell: 64}]
+      by_organism: [{Prochlorococcus MIT9313: 64}]
+      excluded_assays: []
+      warnings: []
+      not_found: {assay_ids: [], metabolite_ids: [], experiment_ids: [], publication_doi: []}
+      results: [F6P top_decile rank 1-3, Citrate top_decile rank 4-5, ...]  # default limit=5
+
+  - title: Top-decile only (rankable filter applies)
+    call: metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration"], metric_bucket=["top_decile"])
+    # 7 rows survive (matches by_metric_bucket.top_decile=7 in the canonical example).
+    # Pre-flight via list_metabolite_assays(rankable=True, value_kind='numeric')
+    # to confirm the filter applies before drilling.
+
+  - title: Tested-absent slice — explicitly ask for "not_detected" rows
+    call: metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration"], detection_status=["not_detected"])
+    # 7 rows — the metabolites assayed and NOT found on this MIT9313 assay
+    # (matches by_detection_status.not_detected=7). Real biology — answers
+    # "is X actually absent under this condition?" Don't conflate with
+    # missing rows (those would mean the metabolite is unmeasured, not in
+    # this assay's scope). See parent §10.
+
+  - title: Timepoint scope — only the 4-day samples
+    call: metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration"], timepoint=["4 days"])
+    # Live timepoint values today: '4 days', '6 days'. Non-temporal
+    # experiments (the 8 boolean-arm flag assays + the cellular_concentration
+    # extracellular subset) expose timepoint=null per D3 sentinel coercion —
+    # they do not match a timepoint filter.
+
+  - title: Summary — distribution context without per-row drill-down
+    call: metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration"], summary=True)
+    # Same envelope as the canonical example but results=[]. Use as the
+    # batch-routing pre-step before deciding which slice to drill in detail.
+
+  - title: Cross-assay drill — multiple numeric assays at once
+    call: metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration", "metabolite_assay:pnas.2213271120:metabolites_extracellular_mit9313:extracellular_concentration"], metric_bucket=["top_decile"])
+    # by_compartment now splits whole_cell vs extracellular; by_assay
+    # carries one row per assay. Useful for comparing intracellular pool
+    # vs spent-media excretion in the same paper.
+
+verbose_fields:
+  - assay_name
+  - field_description
+  - experimental_context
+  - light_condition
+  - replicate_values
+
+chaining:
+  - "list_metabolite_assays(rankable=True, value_kind='numeric') → metabolites_by_quantifies_assay(assay_ids=[...])  # pre-flight: confirm rankable-gated filters apply"
+  - "metabolites_by_quantifies_assay → assays_by_metabolite(metabolite_ids=[...])  # boolean evidence + cross-organism reverse view"
+  - "metabolites_by_quantifies_assay → genes_by_metabolite(metabolite_ids=[...], organism=...)  # gene catalysts/transporters of these metabolites"
+  - "metabolites_by_quantifies_assay → metabolites_by_gene(locus_tags=[...], organism=...)  # gene-anchored chemistry context"
+
+mistakes:
+  - wrong: "Filter out value=0 / flag_value=false rows assuming they are noise."
+    right: |
+      These rows are tested-absent — the metabolite was assayed and not found.
+      They are biology. Keep them unless explicitly investigating presence-only.
+
+  - wrong: "A metabolite missing from results means it was not detected."
+    right: |
+      Missing means unmeasured (out of scope for this assay). For 'tested and
+      not found,' look for a value=0 / flag_value=false / detection_status='not_detected'
+      row.
+
+  - wrong: "metabolites_by_quantifies_assay(assay_ids=[...], metric_bucket=['top_decile'])  # without checking rankable on the assay"
+    right: |
+      Pre-flight via list_metabolite_assays(rankable=True, value_kind='numeric').
+      Tool soft-excludes non-rankable assays from mixed input (surfaces in
+      envelope `excluded_assays` + `warnings`) and raises ValueError if every
+      selected assay is non-rankable.
+
+  - wrong: "Expect not_found to be a flat list[str]."
+    right: |
+      Drill-downs use a structured NotFound (4 keys: assay_ids, metabolite_ids,
+      experiment_ids, publication_doi) per parent spec §13.6 — multi-batch input
+      → structured. Inspect each bucket separately to see which input was bad.
+      Mirrors `MetNotFound` on `list_metabolites` and `GbmNotFound` on
+      `genes_by_metabolite`.
+
+  - wrong: "Apply value_min=0.001 by default to 'clean' the data."
+    right: |
+      `value_min > 0` strips tested-absent rows (`value=0` /
+      `detection_status='not_detected'`). 75% of numeric edges in the live KG
+      are not_detected (902 of 1200) — value_min would discard the majority of
+      measured biology under this KG state. Surface as caller choice, never
+      default-on. See parent §10.
+
+  - wrong: "Treat metric_bucket / metric_percentile / rank_by_metric as always populated."
+    right: |
+      Rankable-gated columns are null on rows whose parent assay has
+      `rankable=false`. Eight of 10 current assays are rankable; the 2 boolean
+      assays surface in `metabolites_by_flags_assay` instead. Per-row null on
+      these columns means "not applicable" not "missing data".
+
+  - wrong: "growth_phase populated on every row."
+    right: |
+      growth_phase is null on every row today — the schema field exists on
+      Experiment, but `time_point_growth_phases[]` is empty for every
+      metabolomics experiment in the current KG (KG-MET-017 backfill pending).
+      Forward-compat surface; values populate without explorer-side code change
+      when the KG ask lands.

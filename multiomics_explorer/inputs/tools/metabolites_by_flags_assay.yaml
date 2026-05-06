@@ -1,0 +1,113 @@
+# Human-authored content for metabolites_by_flags_assay about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Canonical drill-down — msystems intracellular presence-flags
+    call: metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular"])
+    response: |
+      total_matching: 93
+      by_value: [{flag_value: false, count: 58}, {flag_value: true, count: 35}]
+      by_assay: [{assay_id: "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular", count: 93}]
+      by_compartment: [{whole_cell: 93}]
+      by_organism: [{Prochlorococcus MIT9301: 93}]
+      excluded_assays: []
+      warnings: []
+      not_found: {assay_ids: [], metabolite_ids: [], experiment_ids: [], publication_doi: []}
+      results: [S-adenosyl-L-methionine flag=true, tyrosine flag=true, NADH flag=true, AMP flag=true, S-Adenosyl-L-homocysteine flag=true]  # default limit=5
+
+  - title: Presence-only — flag_value=True
+    call: metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular"], flag_value=True)
+    # 35 rows — the metabolites flagged as detected on the msystems
+    # intracellular assay (matches by_value.true=35 in the canonical example).
+    # Unlike `genes_by_boolean_metric` (positive-only KG storage),
+    # `Assay_flags_metabolite` stores both true and false, so flag_value=True
+    # is presence-only (35 of 93 rows), not "all rows".
+
+  - title: Tested-absent slice — flag_value=False
+    call: metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular"], flag_value=False)
+    # 58 rows — the metabolites assayed and explicitly flagged as NOT
+    # detected (matches by_value.false=58). Real biology — 62% of boolean
+    # rows in the live KG are flag_value=false. Don't conflate with missing
+    # rows (those would mean unmeasured, not in this assay's scope).
+    # See parent §10.
+
+  - title: Summary — flag-distribution headline without rows
+    call: metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular"], summary=True)
+    # Same envelope as the canonical example but results=[]. by_value is
+    # the qualitative-detection signal on the boolean arm — no
+    # by_detection_status here (that field exists only on numeric edges).
+
+  - title: Cross-assay — both boolean assays at once (intracellular + extracellular)
+    call: metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular", "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_extracellular"])
+    # by_compartment splits whole_cell vs extracellular; by_assay carries
+    # one row per assay. Useful for asking "does this metabolite show up
+    # inside the cell, outside, or both?" on the msystems panel.
+
+  - title: Metabolite-anchored — does PEP show up at all on the boolean assays?
+    call: metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular", "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_extracellular"], metabolite_ids=["kegg.compound:C00074"])
+    # 2 rows total (1 per assay) — both flag_value=false. PEP is one of
+    # the 14 of 20 measurements (70%) of PEP that are tested-absent
+    # across the live metabolomics layer. Pair with
+    # metabolites_by_quantifies_assay for the 18 numeric edges (see §7
+    # of the slice spec).
+
+verbose_fields:
+  - assay_name
+  - field_description
+
+chaining:
+  - "list_metabolite_assays(value_kind='boolean') → metabolites_by_flags_assay(assay_ids=[...])  # discovery → drill-down"
+  - "metabolites_by_flags_assay → assays_by_metabolite(metabolite_ids=[...])  # quantifies-arm complement (cross-organism reverse view)"
+  - "metabolites_by_flags_assay → genes_by_metabolite(metabolite_ids=[...], organism=...)  # gene catalysts/transporters of these metabolites"
+  - "metabolites_by_flags_assay → metabolites_by_gene(locus_tags=[...], organism=...)  # gene-anchored chemistry context"
+
+mistakes:
+  - wrong: "Filter out value=0 / flag_value=false rows assuming they are noise."
+    right: |
+      These rows are tested-absent — the metabolite was assayed and not found.
+      They are biology. Keep them unless explicitly investigating presence-only.
+
+  - wrong: "A metabolite missing from results means it was not detected."
+    right: |
+      Missing means unmeasured (out of scope for this assay). For 'tested and
+      not found,' look for a value=0 / flag_value=false / detection_status='not_detected'
+      row.
+
+  - wrong: "Expect by_detection_status in the envelope."
+    right: |
+      by_detection_status exists only on the numeric arm (its source field
+      lives on `Assay_quantifies_metabolite` edges). On boolean,
+      `flag_value` IS the qualitative-detection signal; `by_value` is its
+      envelope rollup (true / false counts).
+
+  - wrong: "Expect not_found to be a flat list[str]."
+    right: |
+      Drill-downs use a structured NotFound (4 keys: assay_ids, metabolite_ids,
+      experiment_ids, publication_doi) per parent spec §13.6 — multi-batch input
+      → structured. Inspect each bucket separately to see which input was bad.
+      Mirrors `MetNotFound` on `list_metabolites` and `GbmNotFound` on
+      `genes_by_metabolite`.
+
+  - wrong: "flag_value=False returns 0 rows like genes_by_boolean_metric does today."
+    right: |
+      `genes_by_boolean_metric` returns 0 rows for `flag=False` because the
+      DM layer stores positive-only edges (`dm_false_count=0` on every current
+      DM). `Assay_flags_metabolite` stores BOTH true and false flags — 62%
+      of edges in the live KG are `flag_value="false"`. flag_value=False
+      returns real rows here. Distinct KG-storage convention.
+
+  - wrong: "excluded_assays / warnings will surface gating diagnostics."
+    right: |
+      Always `[]` here (no gates) — kept for cross-tool envelope-shape
+      consistency with `metabolites_by_quantifies_assay`. Boolean assays
+      have no `rankable` gate to probe. Mirrors `genes_by_boolean_metric`
+      vs `genes_by_numeric_metric`.
+
+  - wrong: "growth_phase populated on every row."
+    right: |
+      growth_phase is null on every row today — the schema field exists on
+      Experiment, but `time_point_growth_phases[]` is empty for every
+      metabolomics experiment in the current KG (KG-MET-017 backfill pending).
+      Forward-compat surface; values populate without explorer-side code change
+      when the KG ask lands.

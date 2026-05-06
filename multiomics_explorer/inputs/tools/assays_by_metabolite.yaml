@@ -1,0 +1,119 @@
+# Human-authored content for assays_by_metabolite about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Canonical reverse-lookup — PEP across both arms
+    call: assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
+    response: |
+      total_matching: 20  # 18 quantifies + 2 flags
+      by_evidence_kind: [{quantifies: 18}, {flags: 2}]
+      by_detection_status: [{not_detected: 12}, {detected: 3}, {sporadic: 3}]  # numeric subset
+      by_flag_value: [{false: 2}]  # boolean subset — 70% of all PEP measurements are tested-absent
+      by_organism: [4 organisms — MED4, MIT9301, MIT9303, NATL2A]
+      by_compartment: [{whole_cell: 12}, {extracellular: 8}]
+      by_assay: [10 assays — every numeric and boolean assay on the metabolomics layer covers PEP]
+      metabolites_with_evidence: ["kegg.compound:C00074"]
+      metabolites_without_evidence: []
+      metabolites_matched: 1
+      not_found: []
+      not_matched: []
+      results: [polymorphic — numeric rows carry value/detection_status/timepoint*; boolean rows carry flag_value/n_positive]  # default limit=5
+
+  - title: Numeric arm only — quantifies edges
+    call: assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"], evidence_kind="quantifies")
+    # 18 rows. by_detection_status populated; by_flag_value=[] (the boolean
+    # arm is filtered out, so its rollup has no contributors). Use this to
+    # inspect concentration / detection-status across all 8 numeric assays
+    # without polymorphic-row branching.
+
+  - title: Boolean arm only — flags edges
+    call: assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"], evidence_kind="flags")
+    # 2 rows (1 per boolean assay × the same metabolite). by_flag_value
+    # populated; by_detection_status=[] (numeric arm filtered out).
+    # Symmetric counterpart to the quantifies-only example.
+
+  - title: Single-organism scope — MIT9313 only
+    call: assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"], organism="MIT9313")
+    # Cross-organism is the default since metabolite IDs are organism-agnostic
+    # (one Metabolite node shared across organisms — D2 closure). Pass
+    # `organism` to narrow when comparing per-strain coverage.
+
+  - title: Batch routing — summary with mixed found / not-found IDs
+    call: assays_by_metabolite(metabolite_ids=["kegg.compound:C00074", "kegg.compound:C99999", "kegg.compound:C00031"], summary=True)
+    # `kegg.compound:C99999` lands in `not_found` (not in the KG).
+    # `kegg.compound:C00031` (glucose) may land in `not_matched` if no
+    # MetaboliteAssay measures it (i.e. metabolite is in the KG but
+    # unmeasured for this scope). Distinct buckets, distinct meanings —
+    # see parent §10. PEP rows in `metabolites_with_evidence`.
+
+  - title: Compartment scope — extracellular only
+    call: assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"], compartment="extracellular")
+    # 8 rows (3 extracellular numeric assays × the metabolite's edges).
+    # Useful for asking "what shows up in spent media?" without merging
+    # the intracellular pool view.
+
+verbose_fields:
+  - assay_field_description
+  - replicate_values
+  - experimental_context
+
+chaining:
+  - "list_metabolites(metabolite_ids=[...]) → assays_by_metabolite(metabolite_ids=[...])  # chemistry-layer discovery → measurement evidence"
+  - "metabolites_by_gene(locus_tags=[...]) → assays_by_metabolite(metabolite_ids=[...])  # gene-anchored chemistry → measurement evidence"
+  - "assays_by_metabolite → metabolites_by_quantifies_assay(assay_ids=[...], metabolite_ids=[...])  # drill back to numeric details (rankable filters, edge-level slicing)"
+  - "assays_by_metabolite → metabolites_by_flags_assay(assay_ids=[...], metabolite_ids=[...])  # drill back to boolean details"
+
+mistakes:
+  - wrong: "Filter out value=0 / flag_value=false rows assuming they are noise."
+    right: |
+      These rows are tested-absent — the metabolite was assayed and not found.
+      They are biology. Keep them unless explicitly investigating presence-only.
+
+  - wrong: "A metabolite missing from results means it was not detected."
+    right: |
+      Missing means unmeasured (out of scope for this assay). For 'tested and
+      not found,' look for a value=0 / flag_value=false / detection_status='not_detected'
+      row.
+
+  - wrong: "Use total_matching for unique-metabolite count."
+    right: |
+      `total_matching` is row count (one row per metabolite × assay-edge,
+      merged across both arms). Use `metabolites_matched` for distinct
+      metabolite count. PEP returns total_matching=20 but
+      metabolites_matched=1 — the same compound surfaces 20 times across
+      18 numeric edges + 2 boolean edges.
+
+  - wrong: "Treat polymorphic rows as kind-uniform."
+    right: |
+      Numeric rows carry value / value_sd / detection_status / timepoint /
+      timepoint_hours / timepoint_order / metric_bucket / metric_percentile /
+      rank_by_metric. Boolean rows carry flag_value / n_positive. Cross-arm
+      fields are explicit `None` (union-shape padding) — branch on
+      `evidence_kind` ('quantifies' / 'flags') per row before reading
+      arm-specific columns. Mirrors `gene_derived_metrics`'s polymorphic
+      `value` column.
+
+  - wrong: "assays_by_metabolite(metabolite_ids=[...], evidence_kind='quantifies')  # and expect by_flag_value populated"
+    right: |
+      When `evidence_kind` filters out one arm, that arm's envelope rollup is
+      empty (no rows contribute). `evidence_kind='quantifies'` empties
+      `by_flag_value`; `evidence_kind='flags'` empties `by_detection_status`.
+      Cross-tool envelope shape is preserved (always present), but the
+      filtered-out arm's bucket lists are `[]`.
+
+  - wrong: "Expect not_found to be a structured Pydantic model."
+    right: |
+      Reverse-lookup uses a flat `list[str]` for `not_found` because only
+      `metabolite_ids` is a batch input — single batch → flat per parent §13.6
+      (deviating from the structured `MqaNotFound` / `MfaNotFound` on the
+      drill-downs, where 4 inputs are batch). Both `not_found` and
+      `not_matched` are flat lists here.
+
+  - wrong: "Conflate not_found with not_matched."
+    right: |
+      `not_found` = ID not in the KG (Metabolite node doesn't exist).
+      `not_matched` = ID in the KG but no MetaboliteAssay edge after filters
+      (Metabolite exists but is unmeasured for this scope). Both are
+      *unmeasured* per parent §10, but only `not_matched` IDs are present
+      in the chemistry layer.
