@@ -46,6 +46,9 @@ results:
   product: urease alpha subunit
   reaction_id: kegg.reaction:R00131
   reaction_name: urea amidohydrolase; Urea + H2O <=> CO2 + 2 Ammonia
+  tcdb_family_id: null
+  tcdb_family_name: null
+  transport_confidence: null
 - ec_numbers:
   - 3.5.1.5
   evidence_source: metabolism
@@ -60,6 +63,9 @@ results:
   product: urease beta subunit
   reaction_id: kegg.reaction:R00131
   reaction_name: urea amidohydrolase; Urea + H2O <=> CO2 + 2 Ammonia
+  tcdb_family_id: null
+  tcdb_family_name: null
+  transport_confidence: null
 - ec_numbers:
   - 3.5.1.5
   evidence_source: metabolism
@@ -74,15 +80,22 @@ results:
   product: urease gamma subunit
   reaction_id: kegg.reaction:R00131
   reaction_name: urea amidohydrolase; Urea + H2O <=> CO2 + 2 Ammonia
-- evidence_source: transport
+  tcdb_family_id: null
+  tcdb_family_name: null
+  transport_confidence: null
+- ec_numbers: null
+  evidence_source: transport
   gene_name: urtA
   locus_tag: PMM0970
+  mass_balance: null
   metabolite_chebi_id: '134711'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
   product: ABC-type urea transporter, substrate binding component
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: 3.A.1.4.4
   transport_confidence: substrate_confirmed
@@ -101,6 +114,9 @@ results:
   product: agmatinase
   reaction_id: kegg.reaction:R01157
   reaction_name: agmatine amidinohydrolase; Agmatine + H2O <=> Putrescine + Urea
+  tcdb_family_id: null
+  tcdb_family_name: null
+  transport_confidence: null
 returned: 5
 row_count: 5
 top_gene_categories:
@@ -230,6 +246,8 @@ total_matching: 26
 transporter_count_total: 3
 truncated: true
 warnings:
-- Majority of transport rows are family_inferred (rolled-up from broad TCDB families).
-  Re-run with transport_confidence='substrate_confirmed' for substrate-curated transporter
-  genes only.
+- 'Most transport rows are `family_inferred` (12 of 22) — annotations rolled up from
+  family-level transport potential. Workflow-dependent: use `transport_confidence=''substrate_confirmed''`
+  for conservative-cast questions (e.g. cross-organism inference); keep `family_inferred`
+  for broad-screen candidate enumeration. Both tiers are annotations, neither is ground
+  truth — see analysis-doc §g.'

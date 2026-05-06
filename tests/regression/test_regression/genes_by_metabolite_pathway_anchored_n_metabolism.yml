@@ -69,6 +69,9 @@ results:
   product: carbamoyl-phosphate synthase, large subunit
   reaction_id: kegg.reaction:R00256
   reaction_name: L-glutamine amidohydrolase; L-Glutamine + H2O <=> L-Glutamate + Ammonia
+  tcdb_family_id: null
+  tcdb_family_name: null
+  transport_confidence: null
 - ec_numbers:
   - 6.3.1.2
   evidence_source: metabolism
@@ -84,6 +87,9 @@ results:
   reaction_id: kegg.reaction:R00253
   reaction_name: L-glutamate:ammonia ligase (ADP-forming); ATP + L-Glutamate + Ammonia
     <=> ADP + Orthophosphate + L-Glutamine
+  tcdb_family_id: null
+  tcdb_family_name: null
+  transport_confidence: null
 - ec_numbers:
   - 1.4.1.13
   - 1.4.1.14
@@ -112,6 +118,9 @@ results:
   product: carbamoyl-phosphate synthase small subunit
   reaction_id: kegg.reaction:R00256
   reaction_name: L-glutamine amidohydrolase; L-Glutamine + H2O <=> L-Glutamate + Ammonia
+  tcdb_family_id: null
+  tcdb_family_name: null
+  transport_confidence: null
 - ec_numbers:
   - 6.3.5.1
   evidence_source: metabolism
@@ -127,6 +136,9 @@ results:
   reaction_id: kegg.reaction:R00257
   reaction_name: deamido-NAD+:L-glutamine amido-ligase (AMP-forming); ATP + Deamino-NAD+
     + L-Glutamine + H2O <=> AMP + Diphosphate + NAD+ + L-Glutamate
+  tcdb_family_id: null
+  tcdb_family_name: null
+  transport_confidence: null
 - ec_numbers:
   - 1.4.7.1
   evidence_source: metabolism
@@ -143,6 +155,9 @@ results:
   reaction_name: L-glutamate:ferredoxin oxidoreductase (transaminating); 2 L-Glutamate
     + 2 Oxidized ferredoxin <=> L-Glutamine + 2-Oxoglutarate + 2 Reduced ferredoxin
     + 2 H+
+  tcdb_family_id: null
+  tcdb_family_name: null
+  transport_confidence: null
 returned: 5
 row_count: 5
 top_gene_categories:
@@ -374,6 +389,8 @@ total_matching: 62
 transporter_count_total: 4
 truncated: true
 warnings:
-- Majority of transport rows are family_inferred (rolled-up from broad TCDB families).
-  Re-run with transport_confidence='substrate_confirmed' for substrate-curated transporter
-  genes only.
+- 'Most transport rows are `family_inferred` (25 of 30) — annotations rolled up from
+  family-level transport potential. Workflow-dependent: use `transport_confidence=''substrate_confirmed''`
+  for conservative-cast questions (e.g. cross-organism inference); keep `family_inferred`
+  for broad-screen candidate enumeration. Both tiers are annotations, neither is ground
+  truth — see analysis-doc §g.'
