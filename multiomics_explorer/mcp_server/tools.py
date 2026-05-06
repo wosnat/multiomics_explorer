@@ -651,12 +651,14 @@ class GbmByMetabolite(BaseModel):
         description="Row count for the metabolism arm.")
     transport_substrate_confirmed_rows: int = Field(
         description="Row count for transport rows annotated at TCDB "
-        "`tc_specificity` (substrate-curated). High-precision transport "
-        "evidence.")
+        "`tc_specificity` (substrate-curated tier — leaf-level "
+        "annotation).")
     transport_family_inferred_rows: int = Field(
         description="Row count for transport rows annotated at coarser TCDB "
-        "levels (rolled up via the substrate edge). Lower-precision — the "
-        "gene's actual substrate may differ.")
+        "levels (rollup tier — propagated via the substrate edge; the "
+        "gene's annotated family is known to transport this metabolite, but "
+        "this specific gene's actual substrate may differ). Both tiers are "
+        "annotations — see analysis-doc §g.")
 
 
 class GbmByEvidenceSource(BaseModel):
@@ -762,10 +764,11 @@ class GbmTopGene(BaseModel):
         description="Metabolism-arm row count for this gene.")
     transport_substrate_confirmed_rows: int = Field(
         description="Transport-arm row count for this gene at "
-        "`tc_specificity` level (high-precision).")
+        "`tc_specificity` level (substrate-curated tier).")
     transport_family_inferred_rows: int = Field(
         description="Transport-arm row count for this gene at coarser TCDB "
-        "levels (rolled up via the substrate edge; lower-precision).")
+        "levels (rollup tier — propagated via the substrate edge). Both "
+        "tiers are annotations — see analysis-doc §g.")
 
 
 class GbmNotFound(BaseModel):
@@ -895,12 +898,14 @@ class MbgByGene(BaseModel):
         description="Row count for the metabolism arm.")
     transport_substrate_confirmed_rows: int = Field(
         description="Row count for transport rows annotated at TCDB "
-        "`tc_specificity` (substrate-curated). High-precision transport "
-        "evidence.")
+        "`tc_specificity` (substrate-curated tier — leaf-level "
+        "annotation).")
     transport_family_inferred_rows: int = Field(
         description="Row count for transport rows annotated at coarser "
-        "TCDB levels (rolled up via the substrate edge). Lower-precision — "
-        "the gene's actual substrate may differ.")
+        "TCDB levels (rollup tier — propagated via the substrate edge; "
+        "this gene's annotated family is known to transport the metabolite, "
+        "but this specific gene's actual substrate may differ). Both tiers "
+        "are annotations — see analysis-doc §g.")
 
 
 class MbgByEvidenceSource(BaseModel):
@@ -996,10 +1001,11 @@ class MbgTopMetabolite(BaseModel):
         description="Metabolism-arm row count for this metabolite.")
     transport_substrate_confirmed_rows: int = Field(
         description="Transport-arm row count at `tc_specificity` "
-        "(substrate-curated). High-precision.")
+        "(substrate-curated tier).")
     transport_family_inferred_rows: int = Field(
         description="Transport-arm row count at coarser TCDB levels "
-        "(rolled up; lower-precision).")
+        "(rollup tier — propagated via the substrate edge). Both tiers "
+        "are annotations — see analysis-doc §g.")
 
 
 class MbgTopReaction(BaseModel):
@@ -7720,13 +7726,15 @@ def register_tools(mcp: FastMCP):
         anchor and is not surfaced by gene-anchored chemistry tools —
         see `list_metabolites`.
 
-        **Sort order:** detail rows are globally sorted by precision
-        tier (metabolism → transport_substrate_confirmed →
+        **Sort order:** detail rows are globally sorted by tier
+        (metabolism → transport_substrate_confirmed →
         transport_family_inferred), then by input gene order, then by
-        locus_tag, then by metabolite_id. This surfaces high-precision
-        rows from the entire batch first regardless of input position —
-        a single ABC-superfamily-only gene at the front of input does
-        NOT eat the entire `limit=10` with family_inferred rows.
+        locus_tag, then by metabolite_id. This surfaces metabolism +
+        substrate-curated transport rows from the entire batch first
+        regardless of input position — a single ABC-superfamily-only
+        gene at the front of input does NOT eat the entire `limit=10`
+        with rollup-tier (`family_inferred`) rows. Both transport tiers
+        are annotations — see analysis-doc §g.
 
         Per-row schema (union shape):
             Every row carries the full cross-arm key set. Metabolism-arm rows

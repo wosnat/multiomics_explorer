@@ -6951,7 +6951,7 @@ def build_metabolites_by_gene_metabolism(
 
     Sort: precision_tier (constant 0 for metabolism), then input-gene
     order via apoc.coll.indexOf($locus_tags, locus_tag), then locus_tag,
-    then metabolite_id. Surfaces high-precision rows first when api/
+    then metabolite_id. Surfaces metabolism rows first when api/
     layer concatenates per-arm results into a globally sorted slice.
     """
     conditions, params = _metabolites_by_gene_metabolism_where(

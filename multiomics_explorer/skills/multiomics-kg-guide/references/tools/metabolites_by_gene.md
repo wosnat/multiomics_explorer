@@ -33,13 +33,15 @@ The metabolomics path (DerivedMetric → Metabolite) has no gene
 anchor and is not surfaced by gene-anchored chemistry tools —
 see `list_metabolites`.
 
-**Sort order:** detail rows are globally sorted by precision
-tier (metabolism → transport_substrate_confirmed →
+**Sort order:** detail rows are globally sorted by tier
+(metabolism → transport_substrate_confirmed →
 transport_family_inferred), then by input gene order, then by
-locus_tag, then by metabolite_id. This surfaces high-precision
-rows from the entire batch first regardless of input position —
-a single ABC-superfamily-only gene at the front of input does
-NOT eat the entire `limit=10` with family_inferred rows.
+locus_tag, then by metabolite_id. This surfaces metabolism +
+substrate-curated transport rows from the entire batch first
+regardless of input position — a single ABC-superfamily-only
+gene at the front of input does NOT eat the entire `limit=10`
+with rollup-tier (`family_inferred`) rows. Both transport tiers
+are annotations — see analysis-doc §g.
 
 Per-row schema (union shape):
     Every row carries the full cross-arm key set. Metabolism-arm rows
