@@ -4,7 +4,13 @@
 **Audit (driver):** [docs/superpowers/specs/2026-05-04-metabolites-surface-audit.md](2026-05-04-metabolites-surface-audit.md)
 **KG-side asks (companion):** [docs/kg-specs/2026-05-05-metabolites-surface-asks.md](../../kg-specs/2026-05-05-metabolites-surface-asks.md)
 **Phase 1 frozen spec:** [docs/tool-specs/2026-05-05-phase1-pass-through-plumbing.md](../../tool-specs/2026-05-05-phase1-pass-through-plumbing.md)
-**Status:** Phasing locked; Phase 1 frozen spec drafted (pending user approval); per-phase implementation plans pending for Phases 2-5.
+**Phase 2 frozen spec:** [docs/tool-specs/2026-05-05-phase2-cross-cutting-renames.md](../../tool-specs/2026-05-05-phase2-cross-cutting-renames.md)
+**Phase 2 implementation plan:** [docs/superpowers/plans/2026-05-05-phase2-cross-cutting-renames.md](../plans/2026-05-05-phase2-cross-cutting-renames.md) (gated on Phase 1 landing)
+**Phase 3 frozen spec:** [docs/tool-specs/2026-05-05-phase3-compound-anchored-tightening.md](../../tool-specs/2026-05-05-phase3-compound-anchored-tightening.md) (pending user approval)
+**Phase 5 frozen spec (parent):** [docs/tool-specs/2026-05-05-phase5-greenfield-assay-tools.md](../../tool-specs/2026-05-05-phase5-greenfield-assay-tools.md) (frozen 2026-05-06)
+**Phase 5 ship specs:** [docs/tool-specs/list_metabolite_assays.md](../../tool-specs/list_metabolite_assays.md) (Tool 1, Mode A) + [docs/tool-specs/metabolites_by_assay.md](../../tool-specs/metabolites_by_assay.md) (3-tool Mode B slice)
+**Phase 5 KG-side ask:** KG-MET-017 in [docs/kg-specs/2026-05-06-metabolites-followup-asks.md](../../kg-specs/2026-05-06-metabolites-followup-asks.md)
+**Status:** Phasing locked; **Phase 1 landed on main 2026-05-05**; **Phase 2 landed on main 2026-05-05** (fast-forward merge of 4 commits `12c7068..d99784a`); **Phase 3 frozen-spec drafted 2026-05-05** (pending user approval); **Phase 5 frozen + split into per-ship specs 2026-05-06**; per-phase implementation plans pending for Phase 4 and the two Phase 5 ships.
 **Convention:** each phase below becomes one downstream `writing-plans` cycle.
 
 ---

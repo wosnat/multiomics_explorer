@@ -5,6 +5,8 @@
 **Roadmap (explorer side):** [docs/superpowers/specs/2026-05-05-metabolites-surface-refresh-roadmap.md](../superpowers/specs/2026-05-05-metabolites-surface-refresh-roadmap.md)
 **Status:** 3 Live asks — 1× P1, 2× P2. KG-state verified against the live KG on 2026-05-05 (post-rebuild verification reduced Live count from 5 → 3: KG-MET-006 and KG-MET-016 fulfilled by post-import script; KG-MET-013 partially fixed).
 
+**Followups landing after this delivery snapshot:** see [docs/kg-specs/2026-05-06-metabolites-followup-asks.md](2026-05-06-metabolites-followup-asks.md).
+
 ---
 
 ## 1. Summary
