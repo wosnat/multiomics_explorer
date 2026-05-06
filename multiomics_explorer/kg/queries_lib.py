@@ -7409,3 +7409,309 @@ def build_metabolites_by_gene_summary(
         "       top_metabolite_pathways"
     )
     return cypher, params
+
+
+# ---------------------------------------------------------------------------
+# list_metabolite_assays — Phase 5 greenfield assay-discovery surface
+# ---------------------------------------------------------------------------
+
+def _list_metabolite_assays_where(
+    *,
+    organism: str | None = None,
+    metric_types: list[str] | None = None,
+    value_kind: str | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    assay_ids: list[str] | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    rankable: bool | None = None,
+) -> tuple[list[str], dict]:
+    """Shared WHERE-clause builder for build_list_metabolite_assays{,_summary}.
+
+    Mirrors `_list_derived_metrics_where` but on `a:MetaboliteAssay` instead of
+    `dm:DerivedMetric`. Adds two Phase-5-specific filters that DM lacks:
+    - `metabolite_ids` / `exclude_metabolite_ids` — EXISTS / NOT EXISTS clauses
+      traversing `Assay_quantifies_metabolite | Assay_flags_metabolite` to find
+      assays that measure (or skip) specific compounds.
+
+    Returns:
+        (conditions, params): list of WHERE-clause snippets joined by AND in
+        the caller, plus the parameters dict.
+    """
+    conditions: list[str] = []
+    params: dict = {}
+
+    if organism is not None:
+        conditions.append(
+            "ALL(word IN split(toLower($organism), ' ') "
+            "WHERE toLower(a.organism_name) CONTAINS word)"
+        )
+        params["organism"] = organism
+    if metric_types:
+        conditions.append("a.metric_type IN $metric_types")
+        params["metric_types"] = metric_types
+    if value_kind is not None:
+        conditions.append("a.value_kind = $value_kind")
+        params["value_kind"] = value_kind
+    if compartment is not None:
+        conditions.append("a.compartment = $compartment")
+        params["compartment"] = compartment
+    if treatment_type:
+        conditions.append(
+            "ANY(t IN coalesce(a.treatment_type, []) "
+            "WHERE toLower(t) IN $treatment_types_lower)"
+        )
+        params["treatment_types_lower"] = [t.lower() for t in treatment_type]
+    if background_factors:
+        conditions.append(
+            "ANY(bf IN coalesce(a.background_factors, []) "
+            "WHERE toLower(bf) IN $background_factors_lower)"
+        )
+        params["background_factors_lower"] = [bf.lower() for bf in background_factors]
+    if growth_phases:
+        conditions.append(
+            "ANY(gp IN coalesce(a.growth_phases, []) "
+            "WHERE toLower(gp) IN $growth_phases_lower)"
+        )
+        params["growth_phases_lower"] = [gp.lower() for gp in growth_phases]
+    if publication_doi:
+        conditions.append("a.publication_doi IN $publication_doi")
+        params["publication_doi"] = publication_doi
+    if experiment_ids:
+        conditions.append("a.experiment_id IN $experiment_ids")
+        params["experiment_ids"] = experiment_ids
+    if assay_ids:
+        conditions.append("a.id IN $assay_ids")
+        params["assay_ids"] = assay_ids
+    if metabolite_ids:
+        conditions.append(
+            "EXISTS { MATCH (a)-[:Assay_quantifies_metabolite|Assay_flags_metabolite]"
+            "->(m:Metabolite) WHERE m.id IN $metabolite_ids }"
+        )
+        params["metabolite_ids"] = metabolite_ids
+    if exclude_metabolite_ids:
+        conditions.append(
+            "NOT EXISTS { MATCH (a)-[:Assay_quantifies_metabolite|Assay_flags_metabolite]"
+            "->(m:Metabolite) WHERE m.id IN $exclude_metabolite_ids }"
+        )
+        params["exclude_metabolite_ids"] = exclude_metabolite_ids
+    if rankable is not None:
+        conditions.append("a.rankable = $rankable_str")
+        params["rankable_str"] = "true" if rankable else "false"
+
+    return conditions, params
+
+
+def build_list_metabolite_assays_summary(
+    *,
+    search_text: str | None = None,
+    organism: str | None = None,
+    metric_types: list[str] | None = None,
+    value_kind: str | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    assay_ids: list[str] | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    rankable: bool | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for list_metabolite_assays.
+
+    RETURN keys:
+      total_entries, total_matching, metabolite_count_total,
+      by_organism, by_value_kind, by_compartment, top_metric_types,
+      by_treatment_type, by_background_factors, by_growth_phase,
+      by_detection_status.
+    When `search_text` is set, also returns: score_max, score_median.
+    """
+    conditions, params = _list_metabolite_assays_where(
+        organism=organism, metric_types=metric_types, value_kind=value_kind,
+        compartment=compartment, treatment_type=treatment_type,
+        background_factors=background_factors, growth_phases=growth_phases,
+        publication_doi=publication_doi, experiment_ids=experiment_ids,
+        assay_ids=assay_ids, metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids, rankable=rankable,
+    )
+
+    if search_text is not None:
+        match_block = (
+            "CALL db.index.fulltext.queryNodes('metaboliteAssayFullText', $search_text) "
+            "YIELD node AS a, score\n"
+        )
+        params["search_text"] = search_text
+        score_extras = (
+            ",\n     max(score) AS score_max,\n"
+            "     percentileDisc(score, 0.5) AS score_median"
+        )
+        score_return = ",\n       score_max,\n       score_median"
+    else:
+        match_block = "MATCH (a:MetaboliteAssay)\n"
+        score_extras = ""
+        score_return = ""
+
+    where_block = (
+        "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+    )
+
+    cypher = (
+        "CALL { MATCH (all_a:MetaboliteAssay) RETURN count(all_a) AS total_entries }\n"
+        f"{match_block}"
+        f"{where_block}"
+        "OPTIONAL MATCH (a)-[r:Assay_quantifies_metabolite]->(:Metabolite)\n"
+        "WITH total_entries, a, [s IN collect(r.detection_status) WHERE s IS NOT NULL] AS det\n"
+        "WITH total_entries,\n"
+        "     collect(a.organism_name) AS orgs,\n"
+        "     collect(a.value_kind) AS vks,\n"
+        "     collect(a.compartment) AS comps,\n"
+        "     collect(a.metric_type) AS mts,\n"
+        "     apoc.coll.flatten(collect(coalesce(a.treatment_type, []))) AS tts,\n"
+        "     apoc.coll.flatten(collect(coalesce(a.background_factors, []))) AS bfs,\n"
+        "     apoc.coll.flatten(collect(coalesce(a.growth_phases, []))) AS gps,\n"
+        "     apoc.coll.flatten(collect(det)) AS all_det,\n"
+        "     count(a) AS total_matching,\n"
+        "     sum(a.total_metabolite_count) AS metabolite_count_total"
+        f"{score_extras}\n"
+        "RETURN total_entries, total_matching, metabolite_count_total,\n"
+        "       apoc.coll.frequencies(orgs) AS by_organism,\n"
+        "       apoc.coll.frequencies(vks) AS by_value_kind,\n"
+        "       apoc.coll.frequencies(comps) AS by_compartment,\n"
+        "       apoc.coll.frequencies(mts) AS top_metric_types,\n"
+        "       apoc.coll.frequencies(tts) AS by_treatment_type,\n"
+        "       apoc.coll.frequencies(bfs) AS by_background_factors,\n"
+        "       apoc.coll.frequencies(gps) AS by_growth_phase,\n"
+        "       apoc.coll.frequencies(all_det) AS by_detection_status"
+        f"{score_return}"
+    )
+    return cypher, params
+
+
+def build_list_metabolite_assays(
+    *,
+    search_text: str | None = None,
+    organism: str | None = None,
+    metric_types: list[str] | None = None,
+    value_kind: str | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    assay_ids: list[str] | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    rankable: bool | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build detail Cypher for list_metabolite_assays.
+
+    RETURN keys (compact):
+      assay_id, name, metric_type, value_kind, rankable, unit,
+      field_description, organism_name, experiment_id, publication_doi,
+      compartment, omics_type, treatment_type, background_factors,
+      growth_phases, total_metabolite_count, aggregation_method,
+      preferred_id, value_min, value_q1, value_median, value_q3, value_max,
+      timepoints, detection_status_counts.
+    When `search_text` set: + `score`.
+    Verbose adds: treatment, light_condition, experimental_context.
+    """
+    conditions, params = _list_metabolite_assays_where(
+        organism=organism, metric_types=metric_types, value_kind=value_kind,
+        compartment=compartment, treatment_type=treatment_type,
+        background_factors=background_factors, growth_phases=growth_phases,
+        publication_doi=publication_doi, experiment_ids=experiment_ids,
+        assay_ids=assay_ids, metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids, rankable=rankable,
+    )
+
+    if search_text is not None:
+        match_block = (
+            "CALL db.index.fulltext.queryNodes('metaboliteAssayFullText', $search_text) "
+            "YIELD node AS a, score\n"
+        )
+        params["search_text"] = search_text
+        score_col = ",\n       score AS score"
+        order_by = (
+            "ORDER BY score DESC, a.organism_name ASC, a.value_kind ASC, a.id ASC"
+        )
+    else:
+        match_block = "MATCH (a:MetaboliteAssay)\n"
+        score_col = ""
+        order_by = "ORDER BY a.organism_name ASC, a.value_kind ASC, a.id ASC"
+
+    where_block = (
+        "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+    )
+
+    if verbose:
+        verbose_cols = (
+            ",\n       a.treatment AS treatment,\n"
+            "       a.light_condition AS light_condition,\n"
+            "       a.experimental_context AS experimental_context"
+        )
+    else:
+        verbose_cols = ""
+
+    pagination = ""
+    if limit is not None:
+        params["limit"] = limit
+        params["offset"] = offset
+        pagination = "\nSKIP $offset\nLIMIT $limit"
+
+    cypher = (
+        f"{match_block}"
+        f"{where_block}"
+        "OPTIONAL MATCH (a)-[r:Assay_quantifies_metabolite]->(:Metabolite)\n"
+        "WITH a, "
+        "[label IN collect(DISTINCT r.time_point) "
+        "WHERE label IS NOT NULL AND label <> \"\" | label] AS timepoints,\n"
+        "     [s IN collect(r.detection_status) WHERE s IS NOT NULL] AS detection_statuses"
+        + (",\n     score" if search_text is not None else "")
+        + "\n"
+        "WITH a, timepoints,\n"
+        "     CASE WHEN size(detection_statuses) = 0 THEN [] "
+        "ELSE apoc.coll.frequencies(detection_statuses) END AS detection_status_counts"
+        + (",\n     score" if search_text is not None else "")
+        + "\n"
+        "RETURN\n"
+        "       a.id AS assay_id,\n"
+        "       a.name AS name,\n"
+        "       a.metric_type AS metric_type,\n"
+        "       a.value_kind AS value_kind,\n"
+        "       (a.rankable = \"true\") AS rankable,\n"
+        "       a.unit AS unit,\n"
+        "       a.field_description AS field_description,\n"
+        "       a.organism_name AS organism_name,\n"
+        "       a.experiment_id AS experiment_id,\n"
+        "       a.publication_doi AS publication_doi,\n"
+        "       a.compartment AS compartment,\n"
+        "       a.omics_type AS omics_type,\n"
+        "       coalesce(a.treatment_type, []) AS treatment_type,\n"
+        "       coalesce(a.background_factors, []) AS background_factors,\n"
+        "       coalesce(a.growth_phases, []) AS growth_phases,\n"
+        "       a.total_metabolite_count AS total_metabolite_count,\n"
+        "       a.aggregation_method AS aggregation_method,\n"
+        "       a.preferred_id AS preferred_id,\n"
+        "       a.value_min AS value_min,\n"
+        "       a.value_q1 AS value_q1,\n"
+        "       a.value_median AS value_median,\n"
+        "       a.value_q3 AS value_q3,\n"
+        "       a.value_max AS value_max,\n"
+        "       timepoints,\n"
+        "       detection_status_counts"
+        f"{score_col}{verbose_cols}\n"
+        f"{order_by}"
+        f"{pagination}"
+    )
+    return cypher, params
