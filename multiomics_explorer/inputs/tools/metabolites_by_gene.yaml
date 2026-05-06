@@ -113,17 +113,18 @@ examples:
     # the urease trio, this drops H2O from the {Urea, H2O, CO2, NH3}
     # canonical envelope.
 
-  - title: High-precision transporter slice (mute the 551-row blowup)
+  - title: Conservative-cast transporter slice (mute the 551-row blowup)
     call: metabolites_by_gene(locus_tags=["PMM0434", "PMM0913"], organism="Prochlorococcus MED4", transport_confidence="substrate_confirmed", evidence_sources=["transport"], limit=5)
     # Both inputs are ABC-superfamily-only genes (long-tail p99 = max = 551
     # family_inferred rows each via the TCDB substrate-edge rollup). Default
     # call would emit ~1,100 rows and trip the family_inferred-dominance
     # auto-warning. Pairing `transport_confidence='substrate_confirmed'`
     # (drops family_inferred rows) AND `evidence_sources=['transport']`
-    # (skips metabolism arm) returns 0 high-precision rows for these two
+    # (skips metabolism arm) returns 0 substrate-curated rows for these two
     # genes — exposing that ABC Superfamily-only annotation is too coarse
     # for substrate-level claims. Useful diagnostic for batch DE inputs that
-    # contain ABC-only genes mixed with substrate-curated transporters.
+    # contain ABC-only genes mixed with substrate-curated transporters. See
+    # analysis-doc §g — both tiers are annotations, neither is ground truth.
 
 verbose_fields:
   - gene_category

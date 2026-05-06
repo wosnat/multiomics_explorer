@@ -7364,9 +7364,12 @@ def register_tools(mcp: FastMCP):
                 "confirmed by definition (direct catalysis edge) and carry "
                 "`transport_confidence = None`. To restrict to transport rows "
                 "alone, combine with `evidence_sources=['transport']`. "
-                "**Recommended for high-precision transporter-hunting:** "
-                "`transport_confidence='substrate_confirmed', "
-                "evidence_sources=['transport']`.",
+                "**Workflow-dependent (see analysis-doc §g — both tiers are "
+                "annotations, neither is ground truth):** use "
+                "`substrate_confirmed` for conservative-cast questions "
+                "(e.g. cross-organism inference); keep `family_inferred` "
+                "for broad-screen candidate enumeration (e.g. N-source DE — "
+                "the real MED4 N-uptake genes are family_inferred-only).",
             ),
         ] = None,
         evidence_sources: Annotated[
@@ -7637,11 +7640,12 @@ def register_tools(mcp: FastMCP):
                 "substrate-confirmed by definition (direct catalysis "
                 "edge) and carry `transport_confidence = None`. To "
                 "restrict to transport rows alone, combine with "
-                "`evidence_sources=['transport']`. **Recommended for "
-                "high-precision transporter-hunting in batch DE inputs:** "
-                "`transport_confidence='substrate_confirmed', "
-                "evidence_sources=['transport']` (mutes the ABC-"
-                "superfamily 551-row blowup).",
+                "`evidence_sources=['transport']`. **Workflow-dependent "
+                "(see analysis-doc §g — both tiers are annotations, "
+                "neither is ground truth):** use `substrate_confirmed` "
+                "for conservative-cast questions and to mute the ABC-"
+                "superfamily 551-row blowup in batch DE inputs; keep "
+                "`family_inferred` for broad-screen candidate enumeration.",
             ),
         ] = None,
         evidence_sources: Annotated[
