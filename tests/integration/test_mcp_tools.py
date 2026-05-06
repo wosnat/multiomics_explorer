@@ -2689,3 +2689,138 @@ class TestDifferentialExpressionByGenePhase2:
             assert row["expression_status"] in (
                 "significant_up", "significant_down"
             )
+
+
+# ---------------------------------------------------------------------------
+# list_metabolite_assays — Phase 5 live-KG integration tests
+# Baselines pinned to KG state 2026-05-06 (parent §3 + §12.1 fixtures).
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.kg
+class TestListMetaboliteAssays:
+    """Live-KG integration tests. Baselines from spec §3 + §12.1 fixtures (2026-05-06)."""
+
+    def test_no_filters_returns_all_10_assays(self, conn):
+        from multiomics_explorer.api import list_metabolite_assays
+        result = list_metabolite_assays(conn=conn)
+        assert result["total_entries"] == 10
+        assert result["total_matching"] == 10
+        assert result["metabolite_count_total"] == 768  # cumulative-across-assays
+        assert len(result["results"]) == 10
+
+    def test_value_kind_numeric(self, conn):
+        from multiomics_explorer.api import list_metabolite_assays
+        result = list_metabolite_assays(value_kind="numeric", conn=conn)
+        assert result["total_matching"] == 8
+        for r in result["results"]:
+            assert r["value_kind"] == "numeric"
+            assert r["rankable"] is True  # all 8 numeric are rankable
+
+    def test_value_kind_boolean(self, conn):
+        from multiomics_explorer.api import list_metabolite_assays
+        result = list_metabolite_assays(value_kind="boolean", conn=conn)
+        assert result["total_matching"] == 2
+        for r in result["results"]:
+            assert r["value_kind"] == "boolean"
+            assert r["rankable"] is False
+            assert r["detection_status_counts"] == []
+
+    def test_compartment_extracellular(self, conn):
+        from multiomics_explorer.api import list_metabolite_assays
+        result = list_metabolite_assays(compartment="extracellular", conn=conn)
+        assert result["total_matching"] == 3
+        for r in result["results"]:
+            assert r["compartment"] == "extracellular"
+
+    def test_organism_contains_match(self, conn):
+        from multiomics_explorer.api import list_metabolite_assays
+        result = list_metabolite_assays(organism="MIT9301", conn=conn)
+        assert result["total_matching"] == 4
+        for r in result["results"]:
+            assert "MIT9301" in r["organism_name"]
+
+    def test_metabolite_ids_filter_pep(self, conn):
+        """Phosphoenolpyruvate (C00074) is measured in all 10 assays."""
+        from multiomics_explorer.api import list_metabolite_assays
+        result = list_metabolite_assays(
+            metabolite_ids=["kegg.compound:C00074"], conn=conn)
+        assert result["total_matching"] == 10
+
+    def test_search_text_chitosan(self, conn):
+        from multiomics_explorer.api import list_metabolite_assays
+        result = list_metabolite_assays(search_text="chitosan", conn=conn)
+        # Capovilla 2023 chitosan paper has 2 numeric assays
+        assert result["total_matching"] >= 2
+        assert result["score_max"] is not None
+        for r in result["results"]:
+            assert r["score"] is not None
+
+    def test_rankable_true_returns_8_numeric(self, conn):
+        from multiomics_explorer.api import list_metabolite_assays
+        result = list_metabolite_assays(rankable=True, conn=conn)
+        assert result["total_matching"] == 8
+
+    def test_rankable_false_returns_2_boolean(self, conn):
+        from multiomics_explorer.api import list_metabolite_assays
+        result = list_metabolite_assays(rankable=False, conn=conn)
+        assert result["total_matching"] == 2
+
+    def test_summary_returns_envelope_only(self, conn):
+        from multiomics_explorer.api import list_metabolite_assays
+        result = list_metabolite_assays(summary=True, conn=conn)
+        assert result["results"] == []
+        assert result["truncated"] is True
+        # Envelope rollups populated regardless of summary flag
+        assert len(result["by_organism"]) > 0
+        assert len(result["by_value_kind"]) == 2  # numeric, boolean
+        # by_detection_status: tested-absent dominates (75%+)
+        det_counts = {b["detection_status"]: b["count"] for b in result["by_detection_status"]}
+        assert det_counts.get("not_detected", 0) >= 800
+
+    def test_verbose_adds_text_columns(self, conn):
+        from multiomics_explorer.api import list_metabolite_assays
+        result = list_metabolite_assays(verbose=True, limit=1, conn=conn)
+        r = result["results"][0]
+        assert "treatment" in r
+        assert "light_condition" in r
+        assert "experimental_context" in r
+
+    def test_assay_ids_not_found(self, conn):
+        from multiomics_explorer.api import list_metabolite_assays
+        result = list_metabolite_assays(
+            assay_ids=["nonexistent_assay_id"], conn=conn)
+        assert result["total_matching"] == 0
+        assert "nonexistent_assay_id" in result["not_found"]["assay_ids"]
+
+    def test_capovilla_assay_has_2_timepoints(self, conn):
+        """MIT9313 chitosan assay: timepoints sentinel-stripped to ['4 days', '6 days']."""
+        from multiomics_explorer.api import list_metabolite_assays
+        result = list_metabolite_assays(
+            assay_ids=["metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration"],
+            conn=conn)
+        assert result["total_matching"] == 1
+        r = result["results"][0]
+        assert sorted(r["timepoints"]) == ["4 days", "6 days"]
+        # detection_status_counts has 3 statuses on this assay (27 detected, 30 sporadic, 7 not_detected)
+        statuses = {d["detection_status"]: d["count"] for d in r["detection_status_counts"]}
+        assert statuses.get("detected", 0) == 27
+        assert statuses.get("sporadic", 0) == 30
+        assert statuses.get("not_detected", 0) == 7
+
+    def test_kujawinski_assay_no_timepoints(self, conn):
+        """Kujawinski non-temporal experiment: timepoints == []."""
+        from multiomics_explorer.api import list_metabolite_assays
+        result = list_metabolite_assays(
+            assay_ids=["metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration"],
+            conn=conn)
+        assert result["total_matching"] == 1
+        assert result["results"][0]["timepoints"] == []  # sentinel-stripped
+
+    def test_growth_phases_empty_kg_met_017(self, conn):
+        """KG-MET-017: growth_phases empty on every assay today."""
+        from multiomics_explorer.api import list_metabolite_assays
+        result = list_metabolite_assays(conn=conn)
+        for r in result["results"]:
+            assert r["growth_phases"] == []
+        assert result["by_growth_phase"] == []

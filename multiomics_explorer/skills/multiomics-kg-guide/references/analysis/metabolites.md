@@ -239,9 +239,58 @@ The same KEGG pathway map (e.g. `kegg.pathway:ko00910` Nitrogen metabolism) can 
 
 ---
 
+## Tested-absent vs unmeasured
+
+> **Top-level invariant for the metabolomics layer.** Codified in Phase 5 spec §10 and propagated across the 4 metabolomics tools (`list_metabolite_assays`, `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`, `assays_by_metabolite`). Read this once; it determines how every row of every drill-down output is interpreted.
+
+In metabolomics, **two row states must not be conflated**:
+
+| State | Numeric arm | Boolean arm | What it means |
+|---|---|---|---|
+| Measured-present | `value > 0` and/or `detection_status ∈ {detected, sporadic}` | `flag_value = true` | Metabolite assayed and found. |
+| **Tested-absent** | `value = 0`, `n_non_zero = 0`, `detection_status = 'not_detected'` | `flag_value = false` | Metabolite *assayed and not found*. **Real biological data — keep in `results`, count toward `total_matching` and envelope rollups.** |
+| **Unmeasured** | no row in result; `metabolite_id` in `not_found` / `not_matched` | no row in result | Metabolite *not in this assay's scope*. **No information — do not infer absence.** |
+
+Tested-absent rows answer the biological question "is X actually absent under condition Y." Discarding them silently misreads the question. Unmeasured rows carry zero information either way and must not be conflated with absence.
+
+### Cross-tool implications
+
+| Surface | Behavior |
+|---|---|
+| `total_matching` | Counts measured rows = present + tested-absent. Excludes unmeasured (no row exists to count). |
+| `results` (default) | Includes tested-absent rows by default. |
+| Envelope rollups (`by_detection_status`, `by_value`, `by_flag_value`, `by_assay`, `by_compartment`, `by_organism`, `by_metric`) | Include tested-absent rows. Lets callers see how much of `total_matching` is biological absence. |
+| Edge-level filters (`value_min > 0`, `detection_status` list excluding `not_detected`, `flag_value=True`) | Caller-surfaced; never silently default-on. Each one drops tested-absent rows when set. |
+| `assays_by_metabolite` `not_found` / `not_matched` buckets | **Unmeasured-only**. Tested-absent rows go in `results`, not these buckets. |
+
+### Empirical scale (KG release 2026-05-06)
+
+Audit §4.3.3 named `detection_status` (`detected / sporadic / not_detected`) the primary headline summary for the metabolomics layer. The breakdown shows tested-absent dominates:
+
+- **Numeric arm (8 assays):** 75% of `Assay_quantifies` edges are `not_detected` (902 of 1200 rows). Tested-absent is the majority signal, not an exception.
+- **Boolean arm (2 assays):** 62% of `Assay_flags` edges have `flag_value = false` (58 of 93 rows).
+- **PEP (`kegg.compound:C00074`):** 14 of 20 measurements (70%) are tested-absent across the 10 assays.
+
+Default-filtering tested-absent rows would discard the majority of measured biology under this KG state.
+
+### Tool-specific framing
+
+- **`list_metabolite_assays`** (discovery / pre-flight): envelope `by_detection_status` rollup over numeric assays; per-row `detection_status_counts` on numeric rows. Use this surface to gauge tested-absent share before drilling.
+- **`metabolites_by_quantifies_assay`** (numeric drill-down): `by_detection_status` is the primary headline (audit §4.3.3). Edge-level `value_min > 0` and `detection_status` filters surfaced as caller choices, never default-on.
+- **`metabolites_by_flags_assay`** (boolean drill-down): `by_flag_value` mirror; `flag_value=False` is the explicit way to ask for tested-absent rows.
+- **`assays_by_metabolite`** (reverse lookup): `not_found` / `not_matched` buckets are unmeasured-only — the metabolite was never in the KG's metabolomics scope. Tested-absent rows for IN-scope metabolites are in `results`.
+
+### Cross-references
+
+- Phase 5 spec: `docs/tool-specs/2026-05-05-phase5-greenfield-assay-tools.md` §10.
+- Tool-level YAML mistakes (each carries the wrong/right pair): `inputs/tools/list_metabolite_assays.yaml`, plus the 3 drill-down YAMLs once they ship.
+- Audit history: 2026-05-04 metabolites-surface-audit §4.3.3 (`detection_status` resolution); §4.5 (other interpretation traps).
+
+---
+
 ## Track B — Metabolomics measurement (partially tooled)
 
-> **Native tools pending.** No MCP tool surfaces `MetaboliteAssay` data today. Use `run_cypher` patterns below until the metabolomics-DM tools ship. See [audit](../../../../docs/superpowers/specs/2026-05-04-metabolites-surface-audit.md) §3b for the planned surface.
+> **Native tools partially shipped.** `list_metabolite_assays` is the discovery surface for `MetaboliteAssay` nodes — call it first to inspect `value_kind`, `rankable`, `compartment`, and per-row `detection_status_counts`. The 3 drill-down / reverse-lookup tools (`metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`, `assays_by_metabolite`) ship in the next slice; until they land, use the `run_cypher` patterns below for per-edge values. See [audit](../../../../docs/superpowers/specs/2026-05-04-metabolites-surface-audit.md) §3b for the full planned surface.
 
 ### Caveats — always restate when surfacing measurement results
 

@@ -87,6 +87,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_clustering_analyses_summary,
     build_list_derived_metrics,
     build_list_derived_metrics_summary,
+    build_list_metabolite_assays,
+    build_list_metabolite_assays_summary,
     build_list_metabolites,
     build_list_metabolites_summary,
     build_genes_by_metabolite_metabolism,
@@ -5920,5 +5922,216 @@ def metabolites_by_gene(
         "reaction_count_total": raw_summary.get("reaction_count_total", 0) or 0,
         "transporter_count_total": raw_summary.get("transporter_count_total", 0) or 0,
         "metabolite_count_total": raw_summary.get("metabolite_count_total", 0) or 0,
+        "results": results,
+    }
+
+
+# ---------------------------------------------------------------------------
+# list_metabolite_assays — Phase 5 metabolomics-measurement discovery surface
+# Mirrors list_derived_metrics; 2-query pattern (summary always; detail when
+# limit != 0). Lucene retry on metaboliteAssayFullText parse errors.
+# ---------------------------------------------------------------------------
+
+
+def list_metabolite_assays(
+    search_text: str | None = None,
+    organism: str | None = None,
+    metric_types: list[str] | None = None,
+    value_kind: Literal["numeric", "boolean"] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    assay_ids: list[str] | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    rankable: bool | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """List MetaboliteAssay nodes — discovery surface for the metabolomics
+    measurement layer. Mirrors `list_derived_metrics`.
+
+    Returns dict with envelope keys:
+      total_entries, total_matching, metabolite_count_total,
+      by_organism, by_value_kind, by_compartment, top_metric_types,
+      by_treatment_type, by_background_factors, by_growth_phase,
+      by_detection_status, score_max (opt), score_median (opt),
+      returned, offset, truncated, not_found, results.
+
+    Per-result compact:
+      assay_id, name, metric_type, value_kind, rankable, unit,
+      field_description, organism_name, experiment_id, publication_doi,
+      compartment, omics_type, treatment_type, background_factors,
+      growth_phases, total_metabolite_count, aggregation_method,
+      preferred_id, value_min, value_q1, value_median, value_q3, value_max,
+      timepoints, detection_status_counts (+ score when searching).
+    Verbose adds: treatment, light_condition, experimental_context.
+
+    `not_found` is structured per parent §11 Conv B / §13.6:
+      {assay_ids: [...], metabolite_ids: [...], experiment_ids: [...],
+       publication_doi: [...]} — one bucket per batch input. Empty per field
+      when all matched.
+
+    summary=True forces limit=0 and skips the detail query.
+    """
+    if search_text is not None and not search_text.strip():
+        raise ValueError("search_text must not be empty if provided.")
+
+    conn = _default_conn(conn)
+    if summary:
+        limit = 0
+
+    builder_kwargs = dict(
+        search_text=search_text, organism=organism, metric_types=metric_types,
+        value_kind=value_kind, compartment=compartment,
+        treatment_type=treatment_type, background_factors=background_factors,
+        growth_phases=growth_phases, publication_doi=publication_doi,
+        experiment_ids=experiment_ids, assay_ids=assay_ids,
+        metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids, rankable=rankable,
+    )
+
+    effective_text = search_text
+
+    # ---- Summary query (always runs) -------------------------------------
+    try:
+        sum_cypher, sum_params = build_list_metabolite_assays_summary(
+            **builder_kwargs)
+        sum_result = conn.execute_query(sum_cypher, **sum_params)
+    except Neo4jClientError:
+        if search_text is not None:
+            logger.debug(
+                "list_metabolite_assays summary: Lucene parse error, retrying")
+            effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+            retry_kwargs = {**builder_kwargs, "search_text": effective_text}
+            sum_cypher, sum_params = build_list_metabolite_assays_summary(
+                **retry_kwargs)
+            sum_result = conn.execute_query(sum_cypher, **sum_params)
+        else:
+            raise
+
+    summary_row = sum_result[0] if sum_result else {}
+    total_entries = summary_row.get("total_entries", 0)
+    total_matching = summary_row.get("total_matching", 0)
+    metabolite_count_total = summary_row.get("metabolite_count_total", 0)
+
+    # Rename apoc.coll.frequencies output keys (item/count → domain).
+    by_organism = _rename_freq(
+        summary_row.get("by_organism", []), "organism_name")
+    by_value_kind = _rename_freq(
+        summary_row.get("by_value_kind", []), "value_kind")
+    by_compartment = _rename_freq(
+        summary_row.get("by_compartment", []), "compartment")
+    top_metric_types = _rename_freq(
+        summary_row.get("top_metric_types", []), "metric_type")
+    by_treatment_type = _rename_freq(
+        summary_row.get("by_treatment_type", []), "treatment_type")
+    by_background_factors = _rename_freq(
+        summary_row.get("by_background_factors", []), "background_factor")
+    by_growth_phase = _rename_freq(
+        summary_row.get("by_growth_phase", []), "growth_phase")
+    by_detection_status = _rename_freq(
+        summary_row.get("by_detection_status", []), "detection_status")
+    score_max = summary_row.get("score_max")
+    score_median = summary_row.get("score_median")
+
+    # ---- Detail query (skipped when limit == 0) ---------------------------
+    if limit == 0:
+        results: list[dict] = []
+    else:
+        detail_kwargs = {**builder_kwargs, "search_text": effective_text}
+        try:
+            det_cypher, det_params = build_list_metabolite_assays(
+                **detail_kwargs, verbose=verbose,
+                limit=limit, offset=offset)
+            results = conn.execute_query(det_cypher, **det_params)
+        except Neo4jClientError:
+            if search_text is not None and effective_text == search_text:
+                logger.debug(
+                    "list_metabolite_assays detail: Lucene parse error, retrying")
+                effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+                retry_kwargs = {**builder_kwargs, "search_text": effective_text}
+                det_cypher, det_params = build_list_metabolite_assays(
+                    **retry_kwargs, verbose=verbose,
+                    limit=limit, offset=offset)
+                results = conn.execute_query(det_cypher, **det_params)
+            else:
+                raise
+
+    # ---- not_found (structured per §11 Conv B / §13.6) -------------------
+    # One existence-check Cypher per batch input. Mirrors the
+    # `MetNotFound` pattern on list_metabolites (api/functions.py §7
+    # of list_metabolites). Each query is cheap — indexed lookups on
+    # the KG's primary-key properties.
+    not_found: dict[str, list[str]] = {
+        "assay_ids": [],
+        "metabolite_ids": [],
+        "experiment_ids": [],
+        "publication_doi": [],
+    }
+    if assay_ids:
+        rows = conn.execute_query(
+            "MATCH (a:MetaboliteAssay) WHERE a.id IN $ids "
+            "RETURN collect(a.id) AS found",
+            ids=assay_ids,
+        )
+        found = set(rows[0]["found"]) if rows else set()
+        not_found["assay_ids"] = [x for x in assay_ids if x not in found]
+    if metabolite_ids:
+        rows = conn.execute_query(
+            "MATCH (m:Metabolite) WHERE m.id IN $ids "
+            "RETURN collect(m.id) AS found",
+            ids=metabolite_ids,
+        )
+        found = set(rows[0]["found"]) if rows else set()
+        not_found["metabolite_ids"] = [
+            x for x in metabolite_ids if x not in found
+        ]
+    if experiment_ids:
+        rows = conn.execute_query(
+            "MATCH (e:Experiment) WHERE e.id IN $ids "
+            "RETURN collect(e.id) AS found",
+            ids=experiment_ids,
+        )
+        found = set(rows[0]["found"]) if rows else set()
+        not_found["experiment_ids"] = [
+            x for x in experiment_ids if x not in found
+        ]
+    if publication_doi:
+        rows = conn.execute_query(
+            "MATCH (p:Publication) WHERE p.id IN $ids "
+            "RETURN collect(p.id) AS found",
+            ids=publication_doi,
+        )
+        found = set(rows[0]["found"]) if rows else set()
+        not_found["publication_doi"] = [
+            x for x in publication_doi if x not in found
+        ]
+
+    return {
+        "total_entries": total_entries,
+        "total_matching": total_matching,
+        "metabolite_count_total": metabolite_count_total,
+        "by_organism": by_organism,
+        "by_value_kind": by_value_kind,
+        "by_compartment": by_compartment,
+        "top_metric_types": top_metric_types,
+        "by_treatment_type": by_treatment_type,
+        "by_background_factors": by_background_factors,
+        "by_growth_phase": by_growth_phase,
+        "by_detection_status": by_detection_status,
+        "score_max": score_max,
+        "score_median": score_median,
+        "returned": len(results),
+        "offset": offset,
+        "truncated": total_matching > offset + len(results),
+        "not_found": not_found,
         "results": results,
     }

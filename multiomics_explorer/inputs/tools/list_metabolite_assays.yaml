@@ -1,0 +1,54 @@
+# Human-authored content for list_metabolite_assays about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Orient — what assays exist
+    call: list_metabolite_assays(summary=True)
+    response: |
+      total_entries: 10
+      total_matching: 10
+      by_value_kind: [{value_kind: numeric, count: 8}, {value_kind: boolean, count: 2}]
+      by_compartment: [{compartment: whole_cell, count: 7}, {compartment: extracellular, count: 3}]
+      by_organism: [4 organisms across 2 papers]
+      by_detection_status: [{not_detected: 902}, {detected: 247}, {sporadic: 51}]
+      results: []  # summary=True
+
+  - title: Discovery via fulltext (Capovilla chitosan paper)
+    call: list_metabolite_assays(search_text="chitosan")
+
+  - title: Pre-flight for numeric drill-down
+    call: list_metabolite_assays(value_kind="numeric", rankable=True)
+
+  - title: Find assays measuring a specific metabolite
+    call: list_metabolite_assays(metabolite_ids=["kegg.compound:C00074"])  # PEP — in all 10 assays
+
+  - title: Per-paper inventory
+    call: list_metabolite_assays(publication_doi=["10.1073/pnas.2213271120"])
+
+verbose_fields:
+  - treatment
+  - light_condition
+  - experimental_context
+
+chaining:
+  - "list_metabolite_assays → metabolites_by_quantifies_assay(assay_ids=[...])"
+  - "list_metabolite_assays → metabolites_by_flags_assay(assay_ids=[...])"
+  - "list_metabolite_assays → assays_by_metabolite(metabolite_ids=[...])  # cross-organism reverse view"
+  - "list_metabolite_assays → list_metabolites(metabolite_ids=[...])  # chemistry context for measured compounds"
+
+mistakes:
+  - wrong: "Filter out value=0 / flag_value=false rows on drill-downs assuming they're noise."
+    right: "Those rows are tested-absent — the metabolite was *assayed and not found*. Real biology. Keep them unless explicitly investigating presence-only."
+
+  - wrong: "A metabolite missing from drill-down results means it was not detected."
+    right: "Missing means *unmeasured* (not in the assay's scope). For 'tested and not found,' look for value=0 / flag_value=false / detection_status='not_detected' rows in the drill-down output."
+
+  - wrong: "growth_phases=[] means the assay has no growth-state metadata."
+    right: "growth_phases=[] today reflects unpopulated KG state (KG-MET-017 — KG team backfill pending). The schema field exists; values populate without explorer-side code change when the KG ask lands."
+
+  - wrong: "metabolite_count_total = total distinct metabolites across matching assays."
+    right: "metabolite_count_total is *cumulative*: same metabolite measured by N assays counts N times. For distinct counts route to assays_by_metabolite(metabolite_ids=..., summary=True) → metabolites_matched, or list_metabolites(metabolite_ids=...)."
+
+  - wrong: "Calling metabolites_by_quantifies_assay with bucket / metric_percentile filters before checking assay rankable."
+    right: "Call list_metabolite_assays(value_kind='numeric', rankable=True) first. Drill-down's rankable-gated filters raise if every selected assay has rankable=False, soft-exclude on mixed input."

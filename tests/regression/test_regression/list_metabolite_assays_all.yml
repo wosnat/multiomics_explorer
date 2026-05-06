@@ -1,0 +1,309 @@
+case_id: list_metabolite_assays_all
+row_count: 10
+rows:
+- aggregation_method: pre_aggregated
+  assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_0801_extracellular:extracellular_concentration
+  background_factors:
+  - axenic
+  compartment: extracellular
+  detection_status_counts:
+  - '{''count'': 14, ''detection_status'': ''detected''}'
+  - '{''count'': 78, ''detection_status'': ''not_detected''}'
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_0801_extracellular
+  field_description: Per-cell-equivalent extracellular concentration. Kujawinski 2023
+    cellSpecific KEGG export.
+  growth_phases: []
+  metric_type: extracellular_concentration
+  name: MIT0801 extracellular metabolite concentration (mol/cell)
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT0801
+  preferred_id: metabolite_assay_id
+  publication_doi: 10.1128/msystems.01261-22
+  rankable: true
+  timepoints: []
+  total_metabolite_count: 92
+  treatment_type:
+  - growth_phase
+  unit: mol/cell
+  value_kind: numeric
+  value_max: 0.0
+  value_median: 0.0
+  value_min: 0.0
+  value_q1: 0.0
+  value_q3: 0.0
+- aggregation_method: pre_aggregated
+  assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_0801_intracellular:cellular_concentration
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  detection_status_counts:
+  - '{''count'': 24, ''detection_status'': ''detected''}'
+  - '{''count'': 68, ''detection_status'': ''not_detected''}'
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_0801_whole_cell
+  field_description: Per-cell intracellular concentration. Kujawinski 2023 cellSpecific
+    KEGG export.
+  growth_phases: []
+  metric_type: cellular_concentration
+  name: MIT0801 intracellular metabolite concentration (mol/cell)
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT0801
+  preferred_id: metabolite_assay_id
+  publication_doi: 10.1128/msystems.01261-22
+  rankable: true
+  timepoints: []
+  total_metabolite_count: 92
+  treatment_type:
+  - growth_phase
+  unit: mol/cell
+  value_kind: numeric
+  value_max: 0.0
+  value_median: 0.0
+  value_min: 0.0
+  value_q1: 0.0
+  value_q3: 0.0
+- aggregation_method: mean_across_replicates
+  assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_extracellular
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  detection_status_counts: []
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell
+  field_description: 'Boolean flag: metabolite detected in extracellular pool of any
+    sampled Prochlorococcus strain (Kujawinski 2023 Table S2). Paper-level flag.'
+  growth_phases: []
+  metric_type: presence_flag_extracellular
+  name: Detected in extracellular pool (Kujawinski 2023 Table S2)
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9301
+  preferred_id: metabolite_assay_id
+  publication_doi: 10.1128/msystems.01261-22
+  rankable: false
+  timepoints: []
+  total_metabolite_count: 92
+  treatment_type:
+  - phosphorus
+  unit: ''
+  value_kind: boolean
+  value_max: null
+  value_median: null
+  value_min: null
+  value_q1: null
+  value_q3: null
+- aggregation_method: mean_across_replicates
+  assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  detection_status_counts: []
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell
+  field_description: 'Boolean flag: metabolite detected in intracellular pool of any
+    sampled Prochlorococcus strain (Kujawinski 2023 Table S2). Paper-level flag, anchored
+    to the MIT9301 intracellular Experiment for binding only.'
+  growth_phases: []
+  metric_type: presence_flag_intracellular
+  name: Detected in intracellular pool (Kujawinski 2023 Table S2)
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9301
+  preferred_id: metabolite_assay_id
+  publication_doi: 10.1128/msystems.01261-22
+  rankable: false
+  timepoints: []
+  total_metabolite_count: 92
+  treatment_type:
+  - phosphorus
+  unit: ''
+  value_kind: boolean
+  value_max: null
+  value_median: null
+  value_min: null
+  value_q1: null
+  value_q3: null
+- aggregation_method: pre_aggregated
+  assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_extracellular:extracellular_concentration
+  background_factors:
+  - axenic
+  compartment: extracellular
+  detection_status_counts:
+  - '{''count'': 241, ''detection_status'': ''not_detected''}'
+  - '{''count'': 35, ''detection_status'': ''detected''}'
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_extracellular
+  field_description: Per-cell-equivalent extracellular concentration. Kujawinski 2023
+    cellSpecific KEGG export.
+  growth_phases: []
+  metric_type: extracellular_concentration
+  name: MIT9301 extracellular metabolite concentration (mol/cell)
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9301
+  preferred_id: metabolite_assay_id
+  publication_doi: 10.1128/msystems.01261-22
+  rankable: true
+  timepoints: []
+  total_metabolite_count: 92
+  treatment_type:
+  - phosphorus
+  unit: mol/cell
+  value_kind: numeric
+  value_max: 0.0
+  value_median: 0.0
+  value_min: 0.0
+  value_q1: 0.0
+  value_q3: 0.0
+- aggregation_method: pre_aggregated
+  assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  detection_status_counts:
+  - '{''count'': 216, ''detection_status'': ''not_detected''}'
+  - '{''count'': 60, ''detection_status'': ''detected''}'
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell
+  field_description: Per-cell intracellular concentration; KEGG-tagged; pre-aggregated
+    by authors. Kujawinski 2023 cellSpecific KEGG export.
+  growth_phases: []
+  metric_type: cellular_concentration
+  name: MIT9301 intracellular metabolite concentration (mol/cell)
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9301
+  preferred_id: metabolite_assay_id
+  publication_doi: 10.1128/msystems.01261-22
+  rankable: true
+  timepoints: []
+  total_metabolite_count: 92
+  treatment_type:
+  - phosphorus
+  unit: mol/cell
+  value_kind: numeric
+  value_max: 0.0
+  value_median: 0.0
+  value_min: 0.0
+  value_q1: 0.0
+  value_q3: 0.0
+- aggregation_method: mean_across_replicates
+  assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9303:cellular_concentration
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  detection_status_counts:
+  - '{''count'': 21, ''detection_status'': ''sporadic''}'
+  - '{''count'': 4, ''detection_status'': ''not_detected''}'
+  - '{''count'': 7, ''detection_status'': ''detected''}'
+  experiment_id: 10.1073/pnas.2213271120_chitosan_addition_mit9303_metabolomics
+  field_description: Intracellular metabolite concentration in fg/cell, blank-corrected,
+    replicate-aggregated; Capovilla 2023 Table sd03.
+  growth_phases: []
+  metric_type: cellular_concentration
+  name: MIT9303 cellular metabolite concentration (fg/cell)
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9303
+  preferred_id: metabolite_assay_id
+  publication_doi: 10.1073/pnas.2213271120
+  rankable: true
+  timepoints:
+  - 4 days
+  total_metabolite_count: 16
+  treatment_type:
+  - carbon
+  unit: fg/cell
+  value_kind: numeric
+  value_max: 0.1624
+  value_median: 0.0056
+  value_min: 0.0
+  value_q1: 0.0012
+  value_q3: 0.012
+- aggregation_method: pre_aggregated
+  assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_9313_extracellular:extracellular_concentration
+  background_factors:
+  - axenic
+  compartment: extracellular
+  detection_status_counts:
+  - '{''count'': 154, ''detection_status'': ''not_detected''}'
+  - '{''count'': 30, ''detection_status'': ''detected''}'
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9313_extracellular
+  field_description: Per-cell-equivalent extracellular concentration. Kujawinski 2023
+    cellSpecific KEGG export.
+  growth_phases: []
+  metric_type: extracellular_concentration
+  name: MIT9313 extracellular metabolite concentration (mol/cell)
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9313
+  preferred_id: metabolite_assay_id
+  publication_doi: 10.1128/msystems.01261-22
+  rankable: true
+  timepoints: []
+  total_metabolite_count: 92
+  treatment_type:
+  - growth_phase
+  unit: mol/cell
+  value_kind: numeric
+  value_max: 0.0
+  value_median: 0.0
+  value_min: 0.0
+  value_q1: 0.0
+  value_q3: 0.0
+- aggregation_method: pre_aggregated
+  assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_9313_intracellular:cellular_concentration
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  detection_status_counts:
+  - '{''count'': 134, ''detection_status'': ''not_detected''}'
+  - '{''count'': 50, ''detection_status'': ''detected''}'
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9313_whole_cell
+  field_description: Per-cell intracellular concentration. Kujawinski 2023 cellSpecific
+    KEGG export.
+  growth_phases: []
+  metric_type: cellular_concentration
+  name: MIT9313 intracellular metabolite concentration (mol/cell)
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9313
+  preferred_id: metabolite_assay_id
+  publication_doi: 10.1128/msystems.01261-22
+  rankable: true
+  timepoints: []
+  total_metabolite_count: 92
+  treatment_type:
+  - growth_phase
+  unit: mol/cell
+  value_kind: numeric
+  value_max: 0.0
+  value_median: 0.0
+  value_min: 0.0
+  value_q1: 0.0
+  value_q3: 0.0
+- aggregation_method: mean_across_replicates
+  assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  detection_status_counts:
+  - '{''count'': 27, ''detection_status'': ''detected''}'
+  - '{''count'': 30, ''detection_status'': ''sporadic''}'
+  - '{''count'': 7, ''detection_status'': ''not_detected''}'
+  experiment_id: 10.1073/pnas.2213271120_chitosan_addition_mit9313_metabolomics
+  field_description: Intracellular metabolite concentration in fg/cell; T=4 (3 reps)
+    + T=6 (2 reps); Capovilla 2023 Table sd03. The paper has duplicate "replicate
+    2" labels in the source CSV; pandas auto-renames the second to ".1" — those are
+    the columns with .1 suffix below.
+  growth_phases: []
+  metric_type: cellular_concentration
+  name: MIT9313 cellular metabolite concentration (fg/cell)
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9313
+  preferred_id: metabolite_assay_id
+  publication_doi: 10.1073/pnas.2213271120
+  rankable: true
+  timepoints:
+  - 4 days
+  - 6 days
+  total_metabolite_count: 16
+  treatment_type:
+  - carbon
+  unit: fg/cell
+  value_kind: numeric
+  value_max: 0.4465
+  value_median: 0.0046
+  value_min: 0.0
+  value_q1: 0.001
+  value_q3: 0.0109

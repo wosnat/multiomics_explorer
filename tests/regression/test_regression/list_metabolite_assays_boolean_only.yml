@@ -1,0 +1,60 @@
+case_id: list_metabolite_assays_boolean_only
+row_count: 2
+rows:
+- aggregation_method: mean_across_replicates
+  assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_extracellular
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  detection_status_counts: []
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell
+  field_description: 'Boolean flag: metabolite detected in extracellular pool of any
+    sampled Prochlorococcus strain (Kujawinski 2023 Table S2). Paper-level flag.'
+  growth_phases: []
+  metric_type: presence_flag_extracellular
+  name: Detected in extracellular pool (Kujawinski 2023 Table S2)
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9301
+  preferred_id: metabolite_assay_id
+  publication_doi: 10.1128/msystems.01261-22
+  rankable: false
+  timepoints: []
+  total_metabolite_count: 92
+  treatment_type:
+  - phosphorus
+  unit: ''
+  value_kind: boolean
+  value_max: null
+  value_median: null
+  value_min: null
+  value_q1: null
+  value_q3: null
+- aggregation_method: mean_across_replicates
+  assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  detection_status_counts: []
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell
+  field_description: 'Boolean flag: metabolite detected in intracellular pool of any
+    sampled Prochlorococcus strain (Kujawinski 2023 Table S2). Paper-level flag, anchored
+    to the MIT9301 intracellular Experiment for binding only.'
+  growth_phases: []
+  metric_type: presence_flag_intracellular
+  name: Detected in intracellular pool (Kujawinski 2023 Table S2)
+  omics_type: METABOLOMICS
+  organism_name: Prochlorococcus MIT9301
+  preferred_id: metabolite_assay_id
+  publication_doi: 10.1128/msystems.01261-22
+  rankable: false
+  timepoints: []
+  total_metabolite_count: 92
+  treatment_type:
+  - phosphorus
+  unit: ''
+  value_kind: boolean
+  value_max: null
+  value_median: null
+  value_min: null
+  value_q1: null
+  value_q3: null
