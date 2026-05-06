@@ -58,6 +58,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_experiments,
     build_list_experiments_summary,
     build_list_gene_categories,
+    build_list_metabolite_assays,
+    build_list_metabolite_assays_summary,
     build_list_organisms,
     build_list_publications,
     build_list_publications_summary,
@@ -146,6 +148,10 @@ _KNOWN_MAP_KEYS = {
     #  CogFunctionalCategory, CyanorakRole, TigrRole); coalesce-handled
     # for nodes without the property.
     "is_uninformative",
+    # list_metabolite_assays — RETURN aliases derived from list comprehensions
+    # and aggregations (not direct property accesses on MetaboliteAssay).
+    "timepoints", "detection_status_counts", "metabolite_count_total",
+    "by_detection_status",
 }
 
 # Regex to extract property name from CyVer description:
@@ -232,6 +238,17 @@ _BUILDERS: list[tuple[str, ...]] = [
     ("list_experiments_search", build_list_experiments, {"search_text": "light"}),
     ("list_experiments_summary", build_list_experiments_summary, {}),
     ("list_experiments_summary_search", build_list_experiments_summary, {"search_text": "light"}),
+    # --- list_metabolite_assays (Phase 5) ---
+    ("list_metabolite_assays", build_list_metabolite_assays, {}),
+    ("list_metabolite_assays_search", build_list_metabolite_assays, {"search_text": "chitosan"}),
+    ("list_metabolite_assays_verbose", build_list_metabolite_assays, {"verbose": True}),
+    ("list_metabolite_assays_filtered", build_list_metabolite_assays,
+     {"organism": "MIT9301", "value_kind": "numeric", "rankable": True}),
+    ("list_metabolite_assays_metabolite_ids", build_list_metabolite_assays,
+     {"metabolite_ids": ["kegg.compound:C00074"]}),
+    ("list_metabolite_assays_summary", build_list_metabolite_assays_summary, {}),
+    ("list_metabolite_assays_summary_search", build_list_metabolite_assays_summary,
+     {"search_text": "chitosan"}),
     # --- homolog group search ---
     ("search_homolog_groups_summary", build_search_homolog_groups_summary, {"search_text": "photosystem"}),
     ("search_homolog_groups", build_search_homolog_groups, {"search_text": "photosystem"}),
