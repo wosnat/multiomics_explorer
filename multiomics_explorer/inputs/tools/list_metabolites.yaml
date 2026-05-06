@@ -76,6 +76,7 @@ mistakes:
   - "evidence_sources accepts 'metabolomics' as forward-compat for the future metabolomics-DM spec; no row matches it today."
   - "`measured_compartments` is populated on all 107 measured metabolites (defaults to `[]` on the 3111 unmeasured); use `len(m['measured_compartments']) >= 1` to filter for measurement-anchored rows. Same metabolite measured in both whole_cell and extracellular returns one row with `measured_compartments=['extracellular','whole_cell']` (sorted), not two rows — Metabolite is compartment-agnostic per KG-MET-002."
   - "When the `top_metabolites` rollup is dominated by ATP / ADP / NADH / NADPH / H2O, pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip cofactor noise. Set-difference semantics with `metabolite_ids` — exclude wins on overlap. KG namespace is `kegg.compound:` (not `chebi:`)."
+  - "Per-row `elements` is a presence list — no atom counts per compound. Stoichiometry lives in `formula`. Filter on `elements` (e.g. `elements=['N']` for N-bearing compounds), never on `formula` substring (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N')."
   - wrong: "list_metabolites(elements=['N'], gene_count_min=1)  # gene_count_min isn't a param"
     right: "list_metabolites(elements=['N'])  # then filter rows in code by gene_count > 0"
   - wrong: "list_metabolites(organism_names=['MED4'])  # short name doesn't match"

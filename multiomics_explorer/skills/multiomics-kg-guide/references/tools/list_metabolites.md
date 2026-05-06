@@ -12,6 +12,9 @@ transcriptional evidence (`differential_expression_by_gene`) and
 functional annotation (`gene_overview` Pfam/KO `*-synthase` vs
 `*-permease`).
 
+Per-row `elements` and the `elements=` filter are presence-only
+(presence list, not stoichiometric — atom counts live in formula).
+
 After this tool, drill in via:
 - genes_by_metabolite(metabolite_ids=[id], organism=...) — find the
   catalysts / transporters per organism (replaces what would
@@ -71,7 +74,7 @@ total_entries, total_matching, top_organisms, top_metabolite_pathways, by_eviden
 | metabolite_id | string | Full prefixed ID (e.g. 'kegg.compound:C00031'). 85% kegg.compound, 15% chebi (TCDB-only substrates). |
 | name | string | Metabolite name (e.g. 'D-Glucose', 'L-Glutamate') |
 | formula | string \| None (optional) | Hill-notation chemical formula (e.g. 'C6H12O6'). Null on ~9% of metabolites (mostly TCDB-curated generic substrates). |
-| elements | list[string] (optional) | Sorted unique element symbols present in formula (e.g. ['C','H','O']). Empty when formula is null. Filter on this — never on `formula` substring (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). |
+| elements | list[string] (optional) | Sorted unique element symbols present in formula (e.g. ['C','H','O']). Empty when formula is null. Filter on this — never on `formula` substring (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Presence list (no atom counts; stoichiometry lives in `formula`). |
 | mass | float \| None (optional) | Monoisotopic mass in Da (e.g. 180.156). Null on ~22% of metabolites. |
 | gene_count | int (optional) | Distinct genes reachable via Gene → Reaction → Metabolite OR Gene → TcdbFamily → Metabolite (UNION post-TCDB; e.g. 320 for glucose). When > 0, drill in via genes_by_metabolite(metabolite_ids=[id], organism=...). All metabolites have gene_count > 0 today (post-2026-05-03 transport-arm fix); the future metabolomics-DM spec will introduce metabolites measured without any gene path, which will surface here with gene_count=0 — 0 ≠ 'absent from KG'. |
 | organism_count | int (optional) | Distinct organisms reaching this metabolite via any chemistry path (e.g. 31 for ATP). When > 0, narrow with organism_names filter. |
@@ -197,6 +200,8 @@ list_metabolites (per-row `measured_assay_count > 0`) → run_cypher to inspect 
 - `measured_compartments` is populated on all 107 measured metabolites (defaults to `[]` on the 3111 unmeasured); use `len(m['measured_compartments']) >= 1` to filter for measurement-anchored rows. Same metabolite measured in both whole_cell and extracellular returns one row with `measured_compartments=['extracellular','whole_cell']` (sorted), not two rows — Metabolite is compartment-agnostic per KG-MET-002.
 
 - When the `top_metabolites` rollup is dominated by ATP / ADP / NADH / NADPH / H2O, pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip cofactor noise. Set-difference semantics with `metabolite_ids` — exclude wins on overlap. KG namespace is `kegg.compound:` (not `chebi:`).
+
+- Per-row `elements` is a presence list — no atom counts per compound. Stoichiometry lives in `formula`. Filter on `elements` (e.g. `elements=['N']` for N-bearing compounds), never on `formula` substring (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N').
 
 ```mistake
 list_metabolites(elements=['N'], gene_count_min=1)  # gene_count_min isn't a param

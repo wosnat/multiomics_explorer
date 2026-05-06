@@ -28,7 +28,7 @@ Always restate the row's caveats when the answer touches it. The LLM should neve
 
 ## Track A1 — Reaction (KEGG) annotation
 
-For the chemistry the gene's reaction is involved in via curated KEGG annotations. Always restate inline: KO inference may be putative; reaction direction is **permanently undirected** in this KG (upstream KEGG direction is unreliable); promiscuous enzymes inflate counts.
+For the chemistry the gene's reaction is involved in via curated KEGG annotations. Always restate inline: KO inference may be putative; reaction direction is **permanently undirected** in this KG (upstream KEGG direction is unreliable); promiscuous enzymes inflate counts. Reversibility is also not encoded on `Reaction` nodes — KEGG lacks an `is_reversible` flag upstream, so the KG carries no direction *and* no reversibility on reactions (audit §4.1.2 RESOLVED — permanently unmitigable, not a queued ask).
 
 ### a — Metabolite discovery & filtering
 
@@ -213,7 +213,7 @@ chem = metabolites_by_gene(
     metabolite_elements=["N"],          # presence-only AND-of
     summary=True,
 )
-locus_tags = [g["locus_tag"] for g in chem["top_genes"]]
+locus_tags = [g["locus_tag"] for g in chem["by_gene"]]
 
 # 2. DE under N starvation.
 de = differential_expression_by_gene(

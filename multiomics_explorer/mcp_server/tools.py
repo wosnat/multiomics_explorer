@@ -397,7 +397,7 @@ class MetaboliteResult(BaseModel):
     metabolite_id: str = Field(description="Full prefixed ID (e.g. 'kegg.compound:C00031'). 85% kegg.compound, 15% chebi (TCDB-only substrates).")
     name: str = Field(description="Metabolite name (e.g. 'D-Glucose', 'L-Glutamate')")
     formula: str | None = Field(default=None, description="Hill-notation chemical formula (e.g. 'C6H12O6'). Null on ~9% of metabolites (mostly TCDB-curated generic substrates).")
-    elements: list[str] = Field(default_factory=list, description="Sorted unique element symbols present in formula (e.g. ['C','H','O']). Empty when formula is null. Filter on this — never on `formula` substring (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N').")
+    elements: list[str] = Field(default_factory=list, description="Sorted unique element symbols present in formula (e.g. ['C','H','O']). Empty when formula is null. Filter on this — never on `formula` substring (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Presence list (no atom counts; stoichiometry lives in `formula`).")
     mass: float | None = Field(default=None, description="Monoisotopic mass in Da (e.g. 180.156). Null on ~22% of metabolites.")
     gene_count: int = Field(default=0, description="Distinct genes reachable via Gene → Reaction → Metabolite OR Gene → TcdbFamily → Metabolite (UNION post-TCDB; e.g. 320 for glucose). When > 0, drill in via genes_by_metabolite(metabolite_ids=[id], organism=...). All metabolites have gene_count > 0 today (post-2026-05-03 transport-arm fix); the future metabolomics-DM spec will introduce metabolites measured without any gene path, which will surface here with gene_count=0 — 0 ≠ 'absent from KG'.")
     organism_count: int = Field(default=0, description="Distinct organisms reaching this metabolite via any chemistry path (e.g. 31 for ATP). When > 0, narrow with organism_names filter.")
@@ -504,7 +504,12 @@ class GeneReactionMetaboliteTriplet(BaseModel):
 
     Compact mode: 15 fields including evidence_source +
     transport_confidence. Verbose mode adds 9 more. All per-arm-specific
-    fields are Optional and sparse-stripped at the api/ layer when null.
+    fields are Optional and explicitly `None` on rows from the other arm — every row carries identical keys.
+
+    Reaction edges are undirected AND carry no reversibility flag —
+    interpret all reaction-arm rows as 'involved in', never 'produces' /
+    'consumes' / 'reversible'. (KG limitation: KEGG-anchored reactions
+    lack both direction and `is_reversible`; see audit §4.1.1 + §4.1.2.)
     """
     locus_tag: str = Field(
         description="Gene locus tag (e.g. 'PMM0974' for MED4 urtE).")
@@ -534,12 +539,14 @@ class GeneReactionMetaboliteTriplet(BaseModel):
     reaction_id: str | None = Field(
         default=None,
         description="Full prefixed Reaction ID (e.g. 'kegg.reaction:R00253'). "
-        "Metabolism rows only.")
+        "Metabolism rows only — see class-level note on undirected, "
+        "non-reversible interpretation.")
     reaction_name: str | None = Field(
         default=None,
         description="Reaction systematic name + KEGG equation (raw KEGG "
         "value, can be lengthy; ~32 reactions in the KG have empty `''`). "
-        "Metabolism rows only.")
+        "Metabolism rows only — see class-level note on undirected, "
+        "non-reversible interpretation.")
     ec_numbers: list[str] | None = Field(
         default=None,
         description="EC classification(s) for this reaction. Empty list "
@@ -937,6 +944,12 @@ class MbgByElement(BaseModel):
 
     Answers the C/N/P/S/metal-presence signature question. Anchored on
     `Metabolite.elements` (KG-A3 Hill-parsed presence list).
+
+    Presence-only — count of distinct compounds containing each element
+    at all. NOT stoichiometric (no atom counts per compound; stoichiometry
+    lives in `metabolite.formula`). NOT mass-balanced (KG carries no
+    substrate-vs-product role on `Reaction_has_metabolite`, see audit
+    §4.1.1).
     """
     element: str = Field(
         description="Element symbol (Hill notation, e.g. 'C', 'N', 'P', "
@@ -944,7 +957,9 @@ class MbgByElement(BaseModel):
     metabolite_count: int = Field(
         description="Distinct metabolites in the filtered slice that "
         "contain this element. Empty `m.elements` (31/2,188 metabolites "
-        "without formula) does not contribute.")
+        "without formula) does not contribute. Presence-only count — "
+        "see class docstring for 'not stoichiometric, not mass-balanced' "
+        "semantics.")
 
 
 class MbgTopMetabolite(BaseModel):
@@ -1170,7 +1185,12 @@ class MetabolitesByGeneResponse(BaseModel):
         default_factory=list,
         description="NEW (vs GBM): element-presence rollup across the "
         "metabolites the gene set touches. Periodic-table-bounded "
-        "(~30 elements max in KG); full rollup, not top-N.")
+        "(~30 elements max in KG); full rollup, not top-N. "
+        "Presence-only — count of distinct compounds containing each "
+        "element at all. NOT stoichiometric (no atom counts per compound; "
+        "stoichiometry lives in `metabolite.formula`). NOT mass-balanced "
+        "(KG carries no substrate-vs-product role on "
+        "`Reaction_has_metabolite`, see audit §4.1.1).")
     top_metabolites: list[MbgTopMetabolite] = Field(
         default_factory=list,
         description="Top 10 metabolites by gene reach in the filtered "
@@ -7179,6 +7199,9 @@ def register_tools(mcp: FastMCP):
         functional annotation (`gene_overview` Pfam/KO `*-synthase` vs
         `*-permease`).
 
+        Per-row `elements` and the `elements=` filter are presence-only
+        (presence list, not stoichiometric — atom counts live in formula).
+
         After this tool, drill in via:
         - genes_by_metabolite(metabolite_ids=[id], organism=...) — find the
           catalysts / transporters per organism (replaces what would
@@ -7402,6 +7425,19 @@ def register_tools(mcp: FastMCP):
         **Evidence sources accepted here:** `metabolism`, `transport`. The
         metabolomics path (DerivedMetric → Metabolite) has no gene anchor and is
         not surfaced by gene-anchored chemistry tools — see `list_metabolites`.
+
+        Per-row schema (union shape):
+            Every row carries the full cross-arm key set. Metabolism-arm rows
+            have `transport_confidence` / `tcdb_family_id` / `tcdb_family_name`
+            = None; transport-arm rows have `reaction_id` / `reaction_name` /
+            `ec_numbers` / `mass_balance` = None. Use `row['key']` (KeyError-free)
+            rather than `row.get('key')` if the difference matters to you.
+
+        Reaction-arm framing:
+            Reaction edges are undirected AND carry no reversibility flag —
+            interpret all reaction-arm rows as 'involved in', never 'produces'
+            / 'consumes' / 'reversible'. (KG limitation: KEGG-anchored reactions
+            lack both direction and `is_reversible`; see audit §4.1.1 + §4.1.2.)
 
         Drill-downs from result rows / envelope rollups:
         - Any `top_genes` entry → `differential_expression_by_gene(locus_tags=[...], organism=...)`
@@ -7687,6 +7723,22 @@ def register_tools(mcp: FastMCP):
         rows from the entire batch first regardless of input position —
         a single ABC-superfamily-only gene at the front of input does
         NOT eat the entire `limit=10` with family_inferred rows.
+
+        Per-row schema (union shape):
+            Every row carries the full cross-arm key set. Metabolism-arm rows
+            have `transport_confidence` / `tcdb_family_id` / `tcdb_family_name`
+            = None; transport-arm rows have `reaction_id` / `reaction_name` /
+            `ec_numbers` / `mass_balance` = None. Use `row['key']` (KeyError-free)
+            rather than `row.get('key')` if the difference matters to you.
+
+        Reaction-arm framing:
+            Reaction edges are undirected AND carry no reversibility flag —
+            interpret all reaction-arm rows as 'involved in', never 'produces'
+            / 'consumes' / 'reversible'. (KG limitation: KEGG-anchored reactions
+            lack both direction and `is_reversible`; see audit §4.1.1 + §4.1.2.)
+
+        **`by_element` envelope:** presence-only element-presence rollup
+        (NOT stoichiometric, NOT mass-balanced).
 
         Drill-downs from result rows / envelope rollups:
         - Any `top_metabolites` entry →

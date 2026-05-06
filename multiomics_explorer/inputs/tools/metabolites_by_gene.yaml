@@ -176,17 +176,32 @@ mistakes:
     surfaces only in `list_metabolites` (where `'metabolomics'` is a valid
     forward-compat filter value). Same divergence as `genes_by_metabolite`.
   - >-
-    family_inferred-dominance blowup is per-gene-side here. The 9
-    ABC-superfamily-only MED4 genes (PMM0434, PMM0449, PMM0450, PMM0749,
-    PMM0750, PMM0913, PMM0976/0977/0978) each emit 551 family_inferred
-    transport rows via the TCDB substrate-edge rollup — a single one of
-    them in a batch DE input is enough to dominate the result. The
-    precision-tier sort (metabolism → substrate_confirmed → family_inferred)
-    keeps high-precision rows at the top regardless of input position, but
-    `total_matching` and the auto-warning still reflect the blowup. For
-    high-precision transporter-hunting set BOTH
-    `transport_confidence='substrate_confirmed'` AND
-    `evidence_sources=['transport']`.
+    When the auto-warning fires (most transport rows are `family_inferred`),
+    interpret workflow-dependent: use
+    `transport_confidence='substrate_confirmed'` for conservative-cast
+    questions (e.g. cross-organism inference); keep `family_inferred` for
+    broad-screen candidate enumeration (e.g. N-source DE — the real MED4
+    N-uptake genes are family_inferred-only). Both tiers are annotations,
+    neither is ground truth — see analysis-doc §g.
+  - >-
+    Every result row has the same key set — cross-arm fields are explicitly
+    `None` on rows from the other arm (metabolism rows have
+    `transport_confidence`/`tcdb_family_id`/`tcdb_family_name` = None;
+    transport rows have `reaction_id`/`reaction_name`/`ec_numbers`/`mass_balance`
+    = None). Use `row['transport_confidence']` (KeyError-free) rather than
+    `row.get('transport_confidence')` if the difference matters.
+  - >-
+    Reaction-arm rows are NOT directional — KG reactions carry neither a
+    substrate-vs-product role on `Reaction_has_metabolite` nor an
+    `is_reversible` flag. Read `evidence_source='metabolism'` rows as
+    'gene catalyses a reaction *involving* this metabolite,' never as
+    'produces X' / 'consumes Y' / 'reversibly interconverts'. The KG
+    limitation is permanent (KEGG lacks both upstream).
+  - >-
+    `by_element` envelope is presence-only — count of distinct metabolites
+    containing each element at all. NOT stoichiometric (atom counts live in
+    `metabolite.formula`); NOT mass-balanced (KG `Reaction_has_metabolite`
+    is undirected and carries no substrate/product role).
   - >-
     `gene_categories` filter is partially redundant with `locus_tags` input
     (since the input already constrains the gene set). It's useful only as

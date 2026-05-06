@@ -4974,13 +4974,6 @@ _VALID_EVIDENCE_SOURCES_GBM = ("metabolism", "transport")
 _GBM_SPARSE_FIELDS = (
     "gene_name",
     "product",
-    "transport_confidence",
-    "reaction_id",
-    "reaction_name",
-    "ec_numbers",
-    "mass_balance",
-    "tcdb_family_id",
-    "tcdb_family_name",
     "metabolite_formula",
     "metabolite_mass",
     "metabolite_chebi_id",
@@ -5306,10 +5299,14 @@ def genes_by_metabolite(
         and transport_confidence is None
     ):
         warnings.append(
-            "Majority of transport rows are family_inferred (rolled-up "
-            "from broad TCDB families). Re-run with "
-            "transport_confidence='substrate_confirmed' for "
-            "substrate-curated transporter genes only."
+            f"Most transport rows are `family_inferred` ({transport_fi_total} of "
+            f"{transport_fi_total + transport_sc_total}) — annotations rolled up from "
+            "family-level transport potential. Workflow-dependent: use "
+            "`transport_confidence='substrate_confirmed'` for "
+            "conservative-cast questions (e.g. cross-organism inference); "
+            "keep `family_inferred` for broad-screen candidate enumeration. "
+            "Both tiers are annotations, neither is ground truth — see "
+            "analysis-doc §g."
         )
 
     # 12. Assemble + return envelope.
@@ -5878,12 +5875,14 @@ def metabolites_by_gene(
         and transport_confidence is None
     ):
         warnings.append(
-            f"Transport rows in this slice are dominated by "
-            f"`family_inferred` rollup ({transport_fi_total} of "
-            f"{transport_fi_total + transport_sc_total} transport rows). "
-            "For high-precision substrate-curated annotations only, set "
-            "`transport_confidence='substrate_confirmed'` and/or "
-            "`evidence_sources=['transport']`."
+            f"Most transport rows are `family_inferred` ({transport_fi_total} of "
+            f"{transport_fi_total + transport_sc_total}) — annotations rolled up from "
+            "family-level transport potential. Workflow-dependent: use "
+            "`transport_confidence='substrate_confirmed'` for "
+            "conservative-cast questions (e.g. cross-organism inference); "
+            "keep `family_inferred` for broad-screen candidate enumeration. "
+            "Both tiers are annotations, neither is ground truth — see "
+            "analysis-doc §g."
         )
 
     # 14. Assemble + return envelope.

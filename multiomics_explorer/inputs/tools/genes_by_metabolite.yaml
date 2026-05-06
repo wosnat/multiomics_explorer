@@ -93,14 +93,27 @@ chaining:
 
 mistakes:
   - >-
-    "I want all transporter genes for substrate X." Default fires both arms
-    AND keeps family_inferred transport rows (rolled up from broad TCDB
-    families like ABC superfamily — they appear to "transport" every
-    substrate of every member system). For the precise, substrate-curated
-    set, set BOTH `transport_confidence='substrate_confirmed'` (drops
-    family_inferred rows) AND `evidence_sources=['transport']` (drops
-    metabolism rows). The auto-warning fires when family_inferred dominates
-    transport rows — heed it before reasoning over the result.
+    When the auto-warning fires (most transport rows are `family_inferred`),
+    interpret workflow-dependent: use
+    `transport_confidence='substrate_confirmed'` for conservative-cast
+    questions (e.g. cross-organism inference); keep `family_inferred` for
+    broad-screen candidate enumeration (e.g. N-source DE — the real MED4
+    N-uptake genes are family_inferred-only). Both tiers are annotations,
+    neither is ground truth — see analysis-doc §g.
+  - >-
+    Every result row has the same key set — cross-arm fields are explicitly
+    `None` on rows from the other arm (metabolism rows have
+    `transport_confidence`/`tcdb_family_id`/`tcdb_family_name` = None;
+    transport rows have `reaction_id`/`reaction_name`/`ec_numbers`/`mass_balance`
+    = None). Use `row['transport_confidence']` (KeyError-free) rather than
+    `row.get('transport_confidence')` if the difference matters.
+  - >-
+    Reaction-arm rows are NOT directional — KG reactions carry neither a
+    substrate-vs-product role on `Reaction_has_metabolite` nor an
+    `is_reversible` flag. Read `evidence_source='metabolism'` rows as
+    'gene catalyses a reaction *involving* this metabolite,' never as
+    'produces X' / 'consumes Y' / 'reversibly interconverts'. The KG
+    limitation is permanent (KEGG lacks both upstream).
   - >-
     Filtering by `ec_numbers` does NOT restrict to metabolism only.
     Per-arm filter scope: `ec_numbers` and `mass_balance` narrow the
