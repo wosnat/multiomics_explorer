@@ -1,0 +1,1283 @@
+case_id: mqa_mit9313_top5
+row_count: 64
+rows:
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00085
+  metabolite_id: kegg.compound:C00085
+  metric_bucket: top_decile
+  metric_percentile: 100.0
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: D-Fructose 6-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 1
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.4465
+  value_sd: 0.0643
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00085
+  metabolite_id: kegg.compound:C00085
+  metric_bucket: top_decile
+  metric_percentile: 98.4127
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 3
+  name: D-Fructose 6-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 2
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.289
+  value_sd: 0.2642
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00085
+  metabolite_id: kegg.compound:C00085
+  metric_bucket: top_decile
+  metric_percentile: 96.8254
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: D-Fructose 6-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 3
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.2385
+  value_sd: 0.0375
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00158
+  metabolite_id: kegg.compound:C00158
+  metric_bucket: top_decile
+  metric_percentile: 95.2381
+  metric_type: cellular_concentration
+  n_non_zero: 3
+  n_replicates: 3
+  name: Citrate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 4
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.1915
+  value_sd: 0.152
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00158
+  metabolite_id: kegg.compound:C00158
+  metric_bucket: top_decile
+  metric_percentile: 93.6508
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: Citrate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 5
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.16
+  value_sd: 0.0283
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00158
+  metabolite_id: kegg.compound:C00158
+  metric_bucket: top_decile
+  metric_percentile: 92.0635
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: Citrate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 6
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.1275
+  value_sd: 0.077
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00158
+  metabolite_id: kegg.compound:C00158
+  metric_bucket: top_decile
+  metric_percentile: 90.4762
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 3
+  name: Citrate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 7
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0987
+  value_sd: 0.1555
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00085
+  metabolite_id: kegg.compound:C00085
+  metric_bucket: top_quartile
+  metric_percentile: 88.8889
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 3
+  name: D-Fructose 6-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 8
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0863
+  value_sd: 0.1495
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00092
+  metabolite_id: kegg.compound:C00092
+  metric_bucket: top_quartile
+  metric_percentile: 87.3016
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: D-Glucose 6-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 9
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0442
+  value_sd: 0.0187
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00092
+  metabolite_id: kegg.compound:C00092
+  metric_bucket: top_quartile
+  metric_percentile: 85.7143
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 3
+  name: D-Glucose 6-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 10
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0341
+  value_sd: 0.0298
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00092
+  metabolite_id: kegg.compound:C00092
+  metric_bucket: top_quartile
+  metric_percentile: 84.127
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: D-Glucose 6-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 11
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0294
+  value_sd: 0.0186
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00345
+  metabolite_id: kegg.compound:C00345
+  metric_bucket: top_quartile
+  metric_percentile: 82.5397
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 3
+  name: 6-Phospho-D-gluconate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 12
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0234
+  value_sd: 0.0405
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C01182
+  metabolite_id: kegg.compound:C01182
+  metric_bucket: top_quartile
+  metric_percentile: 80.9524
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 3
+  name: D-Ribulose 1,5-bisphosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 13
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0157
+  value_sd: 0.0237
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00197
+  metabolite_id: kegg.compound:C00197
+  metric_bucket: top_quartile
+  metric_percentile: 79.3651
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 3
+  name: 3-Phospho-D-glycerate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 14
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0157
+  value_sd: 0.0136
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C01674
+  metabolite_id: kegg.compound:C01674
+  metric_bucket: top_quartile
+  metric_percentile: 77.7778
+  metric_type: cellular_concentration
+  n_non_zero: 3
+  n_replicates: 3
+  name: Chitobiose
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 15
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0114
+  value_sd: 0.0082
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C01674
+  metabolite_id: kegg.compound:C01674
+  metric_bucket: top_quartile
+  metric_percentile: 76.1905
+  metric_type: cellular_concentration
+  n_non_zero: 3
+  n_replicates: 3
+  name: Chitobiose
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 16
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0114
+  value_sd: 0.0021
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00092
+  metabolite_id: kegg.compound:C00092
+  metric_bucket: mid
+  metric_percentile: 74.6032
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 3
+  name: D-Glucose 6-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 17
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0109
+  value_sd: 0.0188
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00074
+  metabolite_id: kegg.compound:C00074
+  metric_bucket: mid
+  metric_percentile: 73.0159
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: Phosphoenolpyruvate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 18
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.01
+  value_sd: 0.0023
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00024
+  metabolite_id: kegg.compound:C00024
+  metric_bucket: mid
+  metric_percentile: 71.4286
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: Acetyl-CoA
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 19
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0098
+  value_sd: 0.008
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00197
+  metabolite_id: kegg.compound:C00197
+  metric_bucket: mid
+  metric_percentile: 69.8413
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 3
+  name: 3-Phospho-D-glycerate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 20
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0092
+  value_sd: 0.0159
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C01182
+  metabolite_id: kegg.compound:C01182
+  metric_bucket: mid
+  metric_percentile: 68.254
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: D-Ribulose 1,5-bisphosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 21
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0091
+  value_sd: 0.0078
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00024
+  metabolite_id: kegg.compound:C00024
+  metric_bucket: mid
+  metric_percentile: 66.6667
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: Acetyl-CoA
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 22
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.009
+  value_sd: 0.0013
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00074
+  metabolite_id: kegg.compound:C00074
+  metric_bucket: mid
+  metric_percentile: 65.0794
+  metric_type: cellular_concentration
+  n_non_zero: 3
+  n_replicates: 3
+  name: Phosphoenolpyruvate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 23
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0087
+  value_sd: 0.0034
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00345
+  metabolite_id: kegg.compound:C00345
+  metric_bucket: mid
+  metric_percentile: 63.4921
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 3
+  name: 6-Phospho-D-gluconate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 24
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0085
+  value_sd: 0.0147
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00197
+  metabolite_id: kegg.compound:C00197
+  metric_bucket: mid
+  metric_percentile: 61.9048
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: 3-Phospho-D-glycerate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 25
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0084
+  value_sd: 0.0024
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00345
+  metabolite_id: kegg.compound:C00345
+  metric_bucket: mid
+  metric_percentile: 60.3175
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: 6-Phospho-D-gluconate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 26
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0069
+  value_sd: 0.0032
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00357
+  metabolite_id: kegg.compound:C00357
+  metric_bucket: mid
+  metric_percentile: 58.7302
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: N-Acetyl-D-glucosamine 6-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 27
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0064
+  value_sd: 0.0025
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C01674
+  metabolite_id: kegg.compound:C01674
+  metric_bucket: mid
+  metric_percentile: 57.1429
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: Chitobiose
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 28
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0064
+  value_sd: 0.0008
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00117
+  metabolite_id: kegg.compound:C00117
+  metric_bucket: mid
+  metric_percentile: 55.5556
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: D-Ribose 5-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 29
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0057
+  value_sd: 0.0047
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00352
+  metabolite_id: kegg.compound:C00352
+  metric_bucket: mid
+  metric_percentile: 53.9683
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: D-Glucosamine 6-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 30
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0054
+  value_sd: 0.0035
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00122
+  metabolite_id: kegg.compound:C00122
+  metric_bucket: mid
+  metric_percentile: 52.381
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: Fumarate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 31
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0051
+  value_sd: 0.0021
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00117
+  metabolite_id: kegg.compound:C00117
+  metric_bucket: mid
+  metric_percentile: 50.7937
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: D-Ribose 5-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 32
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0048
+  value_sd: 0.0002
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00357
+  metabolite_id: kegg.compound:C00357
+  metric_bucket: mid
+  metric_percentile: 49.2063
+  metric_type: cellular_concentration
+  n_non_zero: 3
+  n_replicates: 3
+  name: N-Acetyl-D-glucosamine 6-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 33
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0046
+  value_sd: 0.0028
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C01674
+  metabolite_id: kegg.compound:C01674
+  metric_bucket: mid
+  metric_percentile: 47.619
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: Chitobiose
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 34
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0046
+  value_sd: 0.0014
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00074
+  metabolite_id: kegg.compound:C00074
+  metric_bucket: mid
+  metric_percentile: 46.0317
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: Phosphoenolpyruvate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 35
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0045
+  value_sd: 0.0002
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00357
+  metabolite_id: kegg.compound:C00357
+  metric_bucket: mid
+  metric_percentile: 44.4444
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: N-Acetyl-D-glucosamine 6-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 36
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0042
+  value_sd: 0.0001
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00357
+  metabolite_id: kegg.compound:C00357
+  metric_bucket: mid
+  metric_percentile: 42.8571
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 3
+  name: N-Acetyl-D-glucosamine 6-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 37
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0039
+  value_sd: 0.004
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00352
+  metabolite_id: kegg.compound:C00352
+  metric_bucket: mid
+  metric_percentile: 41.2698
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 2
+  name: D-Glucosamine 6-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 38
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0039
+  value_sd: 0.0055
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00117
+  metabolite_id: kegg.compound:C00117
+  metric_bucket: mid
+  metric_percentile: 39.6825
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 3
+  name: D-Ribose 5-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 39
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0032
+  value_sd: 0.0056
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00074
+  metabolite_id: kegg.compound:C00074
+  metric_bucket: mid
+  metric_percentile: 38.0952
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 3
+  name: Phosphoenolpyruvate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 40
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.003
+  value_sd: 0.0051
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C01182
+  metabolite_id: kegg.compound:C01182
+  metric_bucket: mid
+  metric_percentile: 36.5079
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 3
+  name: D-Ribulose 1,5-bisphosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 41
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0026
+  value_sd: 0.0046
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  growth_phase: null
+  kegg_compound_id: C00149
+  metabolite_id: kegg.compound:C00149
+  metric_bucket: mid
+  metric_percentile: 34.9206
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 2
+  name: (S)-Malate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 42
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0026
+  value_sd: 0.0015
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C01182
+  metabolite_id: kegg.compound:C01182
+  metric_bucket: mid
+  metric_percentile: 33.3333
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 2
+  name: D-Ribulose 1,5-bisphosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 43
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0025
+  value_sd: 0.0035
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00122
+  metabolite_id: kegg.compound:C00122
+  metric_bucket: mid
+  metric_percentile: 31.746
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 3
+  name: Fumarate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 44
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0024
+  value_sd: 0.0021
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00122
+  metabolite_id: kegg.compound:C00122
+  metric_bucket: mid
+  metric_percentile: 30.1587
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 2
+  name: Fumarate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 45
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0023
+  value_sd: 0.0033
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00117
+  metabolite_id: kegg.compound:C00117
+  metric_bucket: mid
+  metric_percentile: 28.5714
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 3
+  name: D-Ribose 5-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 46
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0021
+  value_sd: 0.0036
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00197
+  metabolite_id: kegg.compound:C00197
+  metric_bucket: mid
+  metric_percentile: 26.9841
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 2
+  name: 3-Phospho-D-glycerate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 47
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0018
+  value_sd: 0.0026
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00122
+  metabolite_id: kegg.compound:C00122
+  metric_bucket: mid
+  metric_percentile: 25.3968
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 3
+  name: Fumarate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 48
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.001
+  value_sd: 0.0018
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00352
+  metabolite_id: kegg.compound:C00352
+  metric_bucket: low
+  metric_percentile: 23.8095
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 3
+  name: D-Glucosamine 6-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 49
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.001
+  value_sd: 0.0018
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00026
+  metabolite_id: kegg.compound:C00026
+  metric_bucket: low
+  metric_percentile: 22.2222
+  metric_type: cellular_concentration
+  n_non_zero: 2
+  n_replicates: 3
+  name: 2-Oxoglutarate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 50
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0006
+  value_sd: 0.0005
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00149
+  metabolite_id: kegg.compound:C00149
+  metric_bucket: low
+  metric_percentile: 20.6349
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 3
+  name: (S)-Malate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 51
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0003
+  value_sd: 0.0006
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00329
+  metabolite_id: kegg.compound:C00329
+  metric_bucket: low
+  metric_percentile: 19.0476
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 3
+  name: D-Glucosamine
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 52
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0002
+  value_sd: 0.0004
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00026
+  metabolite_id: kegg.compound:C00026
+  metric_bucket: low
+  metric_percentile: 17.4603
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 2
+  name: 2-Oxoglutarate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 53
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0002
+  value_sd: 0.0003
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00329
+  metabolite_id: kegg.compound:C00329
+  metric_bucket: low
+  metric_percentile: 15.873
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 2
+  name: D-Glucosamine
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 54
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0002
+  value_sd: 0.0003
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00329
+  metabolite_id: kegg.compound:C00329
+  metric_bucket: low
+  metric_percentile: 14.2857
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 2
+  name: D-Glucosamine
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 55
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0002
+  value_sd: 0.0002
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00026
+  metabolite_id: kegg.compound:C00026
+  metric_bucket: low
+  metric_percentile: 12.6984
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 2
+  name: 2-Oxoglutarate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 56
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0001
+  value_sd: 0.0002
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: sporadic
+  growth_phase: null
+  kegg_compound_id: C00329
+  metabolite_id: kegg.compound:C00329
+  metric_bucket: low
+  metric_percentile: 11.1111
+  metric_type: cellular_concentration
+  n_non_zero: 1
+  n_replicates: 3
+  name: D-Glucosamine
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 57
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0
+  value_sd: 0.0001
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: not_detected
+  growth_phase: null
+  kegg_compound_id: C00024
+  metabolite_id: kegg.compound:C00024
+  metric_bucket: low
+  metric_percentile: 9.5238
+  metric_type: cellular_concentration
+  n_non_zero: 0
+  n_replicates: 3
+  name: Acetyl-CoA
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 58
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: not_detected
+  growth_phase: null
+  kegg_compound_id: C00024
+  metabolite_id: kegg.compound:C00024
+  metric_bucket: low
+  metric_percentile: 7.9365
+  metric_type: cellular_concentration
+  n_non_zero: 0
+  n_replicates: 3
+  name: Acetyl-CoA
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 59
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: not_detected
+  growth_phase: null
+  kegg_compound_id: C00026
+  metabolite_id: kegg.compound:C00026
+  metric_bucket: low
+  metric_percentile: 6.3492
+  metric_type: cellular_concentration
+  n_non_zero: 0
+  n_replicates: 3
+  name: 2-Oxoglutarate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 60
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: not_detected
+  growth_phase: null
+  kegg_compound_id: C00149
+  metabolite_id: kegg.compound:C00149
+  metric_bucket: low
+  metric_percentile: 4.7619
+  metric_type: cellular_concentration
+  n_non_zero: 0
+  n_replicates: 2
+  name: (S)-Malate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 61
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: control
+  detection_status: not_detected
+  growth_phase: null
+  kegg_compound_id: C00149
+  metabolite_id: kegg.compound:C00149
+  metric_bucket: low
+  metric_percentile: 3.1746
+  metric_type: cellular_concentration
+  n_non_zero: 0
+  n_replicates: 3
+  name: (S)-Malate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 62
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: not_detected
+  growth_phase: null
+  kegg_compound_id: C00345
+  metabolite_id: kegg.compound:C00345
+  metric_bucket: low
+  metric_percentile: 1.5873
+  metric_type: cellular_concentration
+  n_non_zero: 0
+  n_replicates: 2
+  name: 6-Phospho-D-gluconate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 63
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: not_detected
+  growth_phase: null
+  kegg_compound_id: C00352
+  metabolite_id: kegg.compound:C00352
+  metric_bucket: low
+  metric_percentile: 0.0
+  metric_type: cellular_concentration
+  n_non_zero: 0
+  n_replicates: 3
+  name: D-Glucosamine 6-phosphate
+  organism_name: Prochlorococcus MIT9313
+  rank_by_metric: 64
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0
+  value_sd: 0.0

@@ -1735,3 +1735,101 @@
   expect:
     min_rows: 10
     max_rows: 10
+
+# ---------------------------------------------------------------------------
+# metabolites-by-assay 3-tool slice — Phase 5
+# Spec: docs/tool-specs/metabolites_by_assay.md §7 fixtures
+# ---------------------------------------------------------------------------
+
+# ── metabolites_by_quantifies_assay ──
+- id: mqa_mit9313_top5
+  tool: metabolites_by_quantifies_assay
+  desc: |
+    MIT9313 cellular_concentration assay — top-5 detail rows
+    (spec §7: total_matching=64; F6P top_decile rank 1-3, Citrate rank 4-5).
+  params:
+    assay_ids: ["metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration"]
+    limit: 5
+  expect:
+    min_rows: 1
+    columns:
+      [metabolite_id, name, value, detection_status, metric_type, metric_bucket, assay_id]
+
+- id: mqa_mit9313_summary
+  tool: metabolites_by_quantifies_assay_summary
+  desc: |
+    MIT9313 cellular_concentration assay — summary envelope row
+    (spec §7: total_matching=64; by_detection_status detected:27, sporadic:30,
+    not_detected:7).
+  params:
+    assay_ids: ["metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration"]
+  expect:
+    min_rows: 1
+    max_rows: 1
+    row0_check: "total_matching == 64"
+
+# ── metabolites_by_flags_assay ──
+- id: mfa_msystems_top5
+  tool: metabolites_by_flags_assay
+  desc: |
+    msystems intracellular presence flags — top-5 detail rows
+    (spec §7: total_matching=93; first 5 alphabetical with flag_value=true).
+  params:
+    assay_ids: ["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular"]
+    limit: 5
+  expect:
+    min_rows: 1
+    columns:
+      [metabolite_id, name, flag_value, n_positive, n_replicates, assay_id]
+
+- id: mfa_msystems_summary
+  tool: metabolites_by_flags_assay_summary
+  desc: |
+    msystems intracellular presence flags — summary envelope row
+    (spec §7: total_matching=93; by_value false:58, true:35).
+  params:
+    assay_ids: ["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular"]
+  expect:
+    min_rows: 1
+    max_rows: 1
+    row0_check: "total_matching == 93"
+
+# ── assays_by_metabolite ──
+- id: abm_pep_top5
+  tool: assays_by_metabolite
+  desc: |
+    PEP (C00074) reverse lookup — top-5 polymorphic detail rows
+    (spec §7: total_matching=20 = 18 quantifies + 2 flags;
+    metabolites_matched=1).
+  params:
+    metabolite_ids: ["kegg.compound:C00074"]
+    limit: 5
+  expect:
+    min_rows: 1
+    columns:
+      [metabolite_id, assay_id, evidence_kind, organism_name, compartment]
+
+- id: abm_pep_summary
+  tool: assays_by_metabolite_summary
+  desc: |
+    PEP (C00074) reverse lookup — summary envelope row
+    (spec §7: total_matching=20; metabolites_matched=1; 70% tested-absent).
+  params:
+    metabolite_ids: ["kegg.compound:C00074"]
+  expect:
+    min_rows: 1
+    max_rows: 1
+    row0_check: "total_matching == 20 and metabolites_matched == 1"
+
+- id: abm_pep_quantifies_only_summary
+  tool: assays_by_metabolite_summary
+  desc: |
+    PEP (C00074) reverse lookup, evidence_kind='quantifies' — summary envelope
+    (spec §7: 18 numeric rows after scoping out flags arm).
+  params:
+    metabolite_ids: ["kegg.compound:C00074"]
+    evidence_kind: quantifies
+  expect:
+    min_rows: 1
+    max_rows: 1
+    row0_check: "total_matching == 18"

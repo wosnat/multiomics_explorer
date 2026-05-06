@@ -1,0 +1,1026 @@
+case_id: mfa_msystems_top5
+row_count: 93
+rows:
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: null
+  metabolite_id: chebi:142094
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: S-adenosyl-L-methionine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: null
+  metabolite_id: chebi:173245
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: tyrosine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00004
+  metabolite_id: kegg.compound:C00004
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: NADH
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00020
+  metabolite_id: kegg.compound:C00020
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: AMP
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00021
+  metabolite_id: kegg.compound:C00021
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: S-Adenosyl-L-homocysteine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00025
+  metabolite_id: kegg.compound:C00025
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: L-Glutamate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00026
+  metabolite_id: kegg.compound:C00026
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: 2-Oxoglutarate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00062
+  metabolite_id: kegg.compound:C00062
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: L-Arginine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00064
+  metabolite_id: kegg.compound:C00064
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: L-Glutamine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00073
+  metabolite_id: kegg.compound:C00073
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: L-Methionine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00078
+  metabolite_id: kegg.compound:C00078
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: L-Tryptophan
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00079
+  metabolite_id: kegg.compound:C00079
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: L-Phenylalanine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00092
+  metabolite_id: kegg.compound:C00092
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: D-Glucose 6-phosphate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00105
+  metabolite_id: kegg.compound:C00105
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: UMP
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00106
+  metabolite_id: kegg.compound:C00106
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: Uracil
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00111
+  metabolite_id: kegg.compound:C00111
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: Glycerone phosphate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00123
+  metabolite_id: kegg.compound:C00123
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: L-Leucine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00127
+  metabolite_id: kegg.compound:C00127
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: Glutathione disulfide
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00130
+  metabolite_id: kegg.compound:C00130
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: IMP
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00148
+  metabolite_id: kegg.compound:C00148
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: L-Proline
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00170
+  metabolite_id: kegg.compound:C00170
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: 5^-Methylthioadenosine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00183
+  metabolite_id: kegg.compound:C00183
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: L-Valine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00233
+  metabolite_id: kegg.compound:C00233
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: 4-Methyl-2-oxopentanoate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00315
+  metabolite_id: kegg.compound:C00315
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: Spermidine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00327
+  metabolite_id: kegg.compound:C00327
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: L-Citrulline
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00387
+  metabolite_id: kegg.compound:C00387
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: Guanosine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00407
+  metabolite_id: kegg.compound:C00407
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: L-Isoleucine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00568
+  metabolite_id: kegg.compound:C00568
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: 4-Aminobenzoate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00624
+  metabolite_id: kegg.compound:C00624
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: N-Acetyl-L-glutamate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00671
+  metabolite_id: kegg.compound:C00671
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: (S)-3-Methyl-2-oxopentanoic acid
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00719
+  metabolite_id: kegg.compound:C00719
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: Betaine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C00864
+  metabolite_id: kegg.compound:C00864
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: Pantothenate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C01674
+  metabolite_id: kegg.compound:C01674
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: Chitobiose
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C06767
+  metabolite_id: kegg.compound:C06767
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: Hemine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: true
+  kegg_compound_id: C16433
+  metabolite_id: kegg.compound:C16433
+  metric_type: presence_flag_intracellular
+  n_positive: 1
+  n_replicates: 1
+  name: Aspartate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: null
+  metabolite_id: chebi:133737
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: acetyltaurine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: null
+  metabolite_id: chebi:143141
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: chitotriose
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00041
+  metabolite_id: kegg.compound:C00041
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: L-Alanine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00042
+  metabolite_id: kegg.compound:C00042
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Succinate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00065
+  metabolite_id: kegg.compound:C00065
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: L-Serine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00074
+  metabolite_id: kegg.compound:C00074
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Phosphoenolpyruvate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00077
+  metabolite_id: kegg.compound:C00077
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: L-Ornithine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00093
+  metabolite_id: kegg.compound:C00093
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: sn-Glycerol 3-phosphate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00114
+  metabolite_id: kegg.compound:C00114
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Choline
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00120
+  metabolite_id: kegg.compound:C00120
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Biotin
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00122
+  metabolite_id: kegg.compound:C00122
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Fumarate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00127
+  metabolite_id: kegg.compound:C00127
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Glutathione disulfide
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00134
+  metabolite_id: kegg.compound:C00134
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Putrescine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00140
+  metabolite_id: kegg.compound:C00140
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: N-Acetyl-D-glucosamine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00141
+  metabolite_id: kegg.compound:C00141
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: 3-Methyl-2-oxobutanoic acid
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00147
+  metabolite_id: kegg.compound:C00147
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Adenine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00149
+  metabolite_id: kegg.compound:C00149
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: (S)-Malate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00156
+  metabolite_id: kegg.compound:C00156
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: 4-Hydroxybenzoate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00158
+  metabolite_id: kegg.compound:C00158
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Citrate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00188
+  metabolite_id: kegg.compound:C00188
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: L-Threonine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00196
+  metabolite_id: kegg.compound:C00196
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: 2,3-Dihydroxybenzoate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00212
+  metabolite_id: kegg.compound:C00212
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Adenosine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00214
+  metabolite_id: kegg.compound:C00214
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Thymidine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00242
+  metabolite_id: kegg.compound:C00242
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Guanine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00245
+  metabolite_id: kegg.compound:C00245
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Taurine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00255
+  metabolite_id: kegg.compound:C00255
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Riboflavin
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00294
+  metabolite_id: kegg.compound:C00294
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Inosine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00295
+  metabolite_id: kegg.compound:C00295
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Orotate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00314
+  metabolite_id: kegg.compound:C00314
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Pyridoxine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00328
+  metabolite_id: kegg.compound:C00328
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: L-Kynurenine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00334
+  metabolite_id: kegg.compound:C00334
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: 4-Aminobutanoate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00352
+  metabolite_id: kegg.compound:C00352
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: D-Glucosamine 6-phosphate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00378
+  metabolite_id: kegg.compound:C00378
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Thiamine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00380
+  metabolite_id: kegg.compound:C00380
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Cytosine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00385
+  metabolite_id: kegg.compound:C00385
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Xanthine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00398
+  metabolite_id: kegg.compound:C00398
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Tryptamine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00504
+  metabolite_id: kegg.compound:C00504
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Folate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C00954
+  metabolite_id: kegg.compound:C00954
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Indole-3-acetate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C01081
+  metabolite_id: kegg.compound:C01081
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Thiamin monophosphate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C01279
+  metabolite_id: kegg.compound:C01279
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: 4-Amino-5-hydroxymethyl-2-methylpyrimidine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C01705
+  metabolite_id: kegg.compound:C01705
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Glyphosate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C01762
+  metabolite_id: kegg.compound:C01762
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Xanthosine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C01909
+  metabolite_id: kegg.compound:C01909
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Dethiobiotin
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C02713
+  metabolite_id: kegg.compound:C02713
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: N-Acetylmuramate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C03557
+  metabolite_id: kegg.compound:C03557
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: 2-Aminoethylphosphonate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C04022
+  metabolite_id: kegg.compound:C04022
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: S,S-Dimethyl-beta-propiothetin
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C05122
+  metabolite_id: kegg.compound:C05122
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Taurocholate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C05786
+  metabolite_id: kegg.compound:C05786
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: (3Z)-Phycocyanobilin
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C06231
+  metabolite_id: kegg.compound:C06231
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Ectoine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C06454
+  metabolite_id: kegg.compound:C06454
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Fosfomycin
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C06470
+  metabolite_id: kegg.compound:C06470
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Muramic acid
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C07481
+  metabolite_id: kegg.compound:C07481
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Caffeine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C08230
+  metabolite_id: kegg.compound:C08230
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Hydroxocobalamin
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C10833
+  metabolite_id: kegg.compound:C10833
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Syringic acid
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C19675
+  metabolite_id: kegg.compound:C19675
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: (R)-2,3-Dihydroxypropane-1-sulfonate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C20267
+  metabolite_id: kegg.compound:C20267
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: 4-Amino-5-aminomethyl-2-methylpyrimidine
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: C22312
+  metabolite_id: kegg.compound:C22312
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: 3-Sulfanylpropanoate
+  organism_name: Prochlorococcus MIT9301
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  compartment: whole_cell
+  condition_label: ''
+  flag_value: false
+  kegg_compound_id: null
+  metabolite_id: mnx:MNXM1565343
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  name: Cysteine hydrochloride
+  organism_name: Prochlorococcus MIT9301
