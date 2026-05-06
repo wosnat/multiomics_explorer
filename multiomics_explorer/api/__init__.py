@@ -1,6 +1,7 @@
 """Public Python API for the multi-omics knowledge graph."""
 
 from multiomics_explorer.api.functions import (
+    assays_by_metabolite,
     gene_ontology_terms,
     gene_overview,
     genes_by_homolog_group,
@@ -16,7 +17,9 @@ from multiomics_explorer.api.functions import (
     list_metabolite_assays,
     list_metabolites,
     list_organisms,
+    metabolites_by_flags_assay,
     metabolites_by_gene,
+    metabolites_by_quantifies_assay,
     list_publications,
     ontology_landscape,
     resolve_gene,
@@ -38,6 +41,7 @@ from multiomics_explorer.api.functions import (
 )
 
 __all__ = [
+    "assays_by_metabolite",
     "gene_ontology_terms",
     "gene_overview",
     "genes_by_homolog_group",
@@ -53,7 +57,9 @@ __all__ = [
     "list_metabolite_assays",
     "list_metabolites",
     "list_organisms",
+    "metabolites_by_flags_assay",
     "metabolites_by_gene",
+    "metabolites_by_quantifies_assay",
     "list_publications",
     "ontology_landscape",
     "resolve_gene",
