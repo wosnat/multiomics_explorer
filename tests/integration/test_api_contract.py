@@ -1460,3 +1460,183 @@ class TestPhase1PlumbingContract:
         assert cap["has_metabolomics"] >= 4
         # Sums to total
         assert cap["has_metabolomics"] + cap["no_metabolomics"] == result["total_matching"]
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 metabolites-by-assay slice — Pydantic Response contract validation.
+# These tests catch field-name / shape mismatches between the api/ rollup
+# and the wrapper-layer Pydantic Response models. The Response models are
+# defined inside `register_tools()`, so we obtain them via signature
+# introspection on the registered tool functions.
+# ---------------------------------------------------------------------------
+def _response_class_for(tool_name: str):
+    """Return the Pydantic Response class for a tool registered via
+    `register_tools()`. Read off the registered tool's return annotation."""
+    import asyncio
+    import inspect
+    from fastmcp import FastMCP
+    from multiomics_explorer.mcp_server.tools import register_tools
+
+    mcp = FastMCP("contract-probe")
+    register_tools(mcp)
+    tool = asyncio.run(mcp.get_tool(tool_name))
+    return inspect.signature(tool.fn).return_annotation
+
+
+_MIT9313_CHITOSAN_ASSAY = (
+    "metabolite_assay:pnas.2213271120:"
+    "metabolites_intracellular_mit9313:cellular_concentration"
+)
+_MSYSTEMS_PRESENCE_FLAGS_ASSAY = (
+    "metabolite_assay:msystems.01261-22:"
+    "presence_flags_table_s2:presence_flag_intracellular"
+)
+_PEP_ID = "kegg.compound:C00074"
+
+
+@pytest.mark.kg
+class TestMetabolitesByQuantifiesAssayContract:
+    """Pin the api/ envelope shape + verify the wrapper Pydantic Response
+    accepts live-KG output. Catches field-name / sub-model misalignment."""
+
+    EXPECTED_ENVELOPE_KEYS = {
+        "results", "total_matching",
+        "by_detection_status", "by_metric_bucket", "by_assay",
+        "by_compartment", "by_organism", "by_metric",
+        "excluded_assays", "warnings", "not_found",
+        "returned", "offset", "truncated",
+    }  # 14 keys
+
+    def test_envelope_keys(self, conn):
+        result = api.metabolites_by_quantifies_assay(
+            assay_ids=[_MIT9313_CHITOSAN_ASSAY], limit=1, conn=conn)
+        assert set(result.keys()) == self.EXPECTED_ENVELOPE_KEYS
+
+    def test_response_validates_against_live_kg(self, conn):
+        """Full Pydantic Response model accepts live-KG api/ output.
+        Fails if any sub-model field name / type mismatches the api rollup
+        (e.g. the recent `metric_bucket → bucket` rename in MqaByMetricBucket).
+        """
+        ResponseCls = _response_class_for("metabolites_by_quantifies_assay")
+        result = api.metabolites_by_quantifies_assay(
+            assay_ids=[_MIT9313_CHITOSAN_ASSAY], limit=5, conn=conn)
+        validated = ResponseCls(**result)
+        assert validated.total_matching == 64
+        assert validated.returned == 5
+        assert len(validated.by_detection_status) == 3
+        assert len(validated.by_metric_bucket) == 4
+        # by_metric pairs full-assay precomputed range with filtered slice.
+        assert len(validated.by_metric) >= 1
+        bm = validated.by_metric[0]
+        assert bm.assay_id == _MIT9313_CHITOSAN_ASSAY
+        assert bm.assay_value_max == pytest.approx(0.4465, abs=0.01)
+        assert bm.rankable is True
+        # Structured not_found per parent §13.6.
+        assert validated.not_found.assay_ids == []
+        assert validated.not_found.metabolite_ids == []
+
+
+@pytest.mark.kg
+class TestMetabolitesByFlagsAssayContract:
+    """Pin the api/ envelope shape + verify the wrapper Pydantic Response
+    accepts live-KG output (boolean arm)."""
+
+    EXPECTED_ENVELOPE_KEYS = {
+        "results", "total_matching",
+        "by_value", "by_assay", "by_compartment", "by_organism", "by_metric",
+        "excluded_assays", "warnings", "not_found",
+        "returned", "offset", "truncated",
+    }  # 13 keys — note: NO `by_detection_status` (boolean arm has no
+    #              `detection_status` field per slice spec §5.3)
+
+    def test_envelope_keys(self, conn):
+        result = api.metabolites_by_flags_assay(
+            assay_ids=[_MSYSTEMS_PRESENCE_FLAGS_ASSAY], limit=1, conn=conn)
+        assert set(result.keys()) == self.EXPECTED_ENVELOPE_KEYS
+
+    def test_envelope_omits_by_detection_status(self, conn):
+        """Slice spec §5.3 — boolean arm must not surface
+        `by_detection_status` (only the numeric edge has detection_status)."""
+        result = api.metabolites_by_flags_assay(
+            assay_ids=[_MSYSTEMS_PRESENCE_FLAGS_ASSAY],
+            summary=True, conn=conn)
+        assert "by_detection_status" not in result
+
+    def test_response_validates_against_live_kg(self, conn):
+        """Full Pydantic Response model accepts live-KG api/ output.
+        Catches `flag_value: bool` validator coercion failure on the
+        api-layer string `'true'`/`'false'` (V2 default coerces; if a
+        Strict mode lands, this regresses)."""
+        ResponseCls = _response_class_for("metabolites_by_flags_assay")
+        result = api.metabolites_by_flags_assay(
+            assay_ids=[_MSYSTEMS_PRESENCE_FLAGS_ASSAY], limit=5, conn=conn)
+        validated = ResponseCls(**result)
+        assert validated.total_matching == 93
+        assert validated.returned == 5
+        # by_value: 2 buckets (true / false). Pydantic coerces str→bool.
+        assert len(validated.by_value) == 2
+        bv = {b.flag_value: b.count for b in validated.by_value}
+        assert bv[True] == 35
+        assert bv[False] == 58
+        # excluded_assays / warnings always [] on boolean arm (§5.3).
+        assert validated.excluded_assays == []
+        assert validated.warnings == []
+        # Detail rows surface flag_value as Python bool.
+        for r in validated.results:
+            assert isinstance(r.flag_value, bool)
+
+
+@pytest.mark.kg
+class TestAssaysByMetaboliteContract:
+    """Pin the api/ envelope shape + verify the wrapper Pydantic Response
+    accepts live-KG output (polymorphic reverse-lookup)."""
+
+    EXPECTED_ENVELOPE_KEYS = {
+        "results", "total_matching",
+        "by_evidence_kind", "by_organism", "by_compartment", "by_assay",
+        "by_detection_status", "by_flag_value",
+        "metabolites_matched",
+        "metabolites_with_evidence", "metabolites_without_evidence",
+        "not_found", "not_matched",
+        "returned", "offset", "truncated",
+    }  # 16 keys
+
+    def test_envelope_keys(self, conn):
+        result = api.assays_by_metabolite(
+            metabolite_ids=[_PEP_ID], limit=1, conn=conn)
+        assert set(result.keys()) == self.EXPECTED_ENVELOPE_KEYS
+
+    def test_not_found_is_flat_list(self, conn):
+        """Slice spec §6.3 / parent §13.6 — not_found is flat list[str]
+        (single batch input). Distinguishes from the structured
+        `not_found.{assay_ids,...}` shape on the drill-down tools."""
+        result = api.assays_by_metabolite(
+            metabolite_ids=[_PEP_ID, "fake.id:DOESNOTEXIST"],
+            summary=True, conn=conn)
+        assert isinstance(result["not_found"], list)
+        assert result["not_found"] == ["fake.id:DOESNOTEXIST"]
+        assert isinstance(result["not_matched"], list)
+
+    def test_response_validates_against_live_kg(self, conn):
+        """Full Pydantic Response model accepts live-KG api/ output.
+        Catches polymorphic-row sub-model failures (cross-arm-None
+        union-shape padding from UNION ALL)."""
+        ResponseCls = _response_class_for("assays_by_metabolite")
+        result = api.assays_by_metabolite(
+            metabolite_ids=[_PEP_ID], limit=5, conn=conn)
+        validated = ResponseCls(**result)
+        assert validated.total_matching == 20
+        assert validated.metabolites_matched == 1
+        assert validated.returned == 5
+        # by_evidence_kind: quantifies 18 + flags 2.
+        ek = {b.evidence_kind: b.count for b in validated.by_evidence_kind}
+        assert ek == {"quantifies": 18, "flags": 2}
+        # by_detection_status populated (numeric subset).
+        assert len(validated.by_detection_status) == 3
+        # by_flag_value populated (boolean subset).
+        assert len(validated.by_flag_value) == 1
+        # metabolites_with_evidence partition (detail mode).
+        assert validated.metabolites_with_evidence == [_PEP_ID]
+        # not_found / not_matched: flat list[str] (single batch input).
+        assert validated.not_found == []
+        assert validated.not_matched == []

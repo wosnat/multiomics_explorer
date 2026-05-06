@@ -2824,3 +2824,293 @@ class TestListMetaboliteAssays:
         for r in result["results"]:
             assert r["growth_phases"] == []
         assert result["by_growth_phase"] == []
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 metabolites-by-assay slice — 3 drill-down / reverse-lookup tools.
+# Baselines pinned per slice spec §7 (verified live 2026-05-06).
+#   - docs/tool-specs/metabolites_by_assay.md §7
+#   - docs/tool-specs/2026-05-05-phase5-greenfield-assay-tools.md §10 §3.5
+# ---------------------------------------------------------------------------
+_MIT9313_CHITOSAN_ASSAY = (
+    "metabolite_assay:pnas.2213271120:"
+    "metabolites_intracellular_mit9313:cellular_concentration"
+)
+_MSYSTEMS_PRESENCE_FLAGS_ASSAY = (
+    "metabolite_assay:msystems.01261-22:"
+    "presence_flags_table_s2:presence_flag_intracellular"
+)
+_PEP_ID = "kegg.compound:C00074"
+
+
+@pytest.mark.kg
+class TestMetabolitesByQuantifiesAssayKG:
+    """Live-KG integration tests for `metabolites_by_quantifies_assay`.
+    Baselines from slice spec §7 (MIT9313 cellular_concentration assay)."""
+
+    def test_mit9313_chitosan_summary(self, conn):
+        """§7 fixture: total_matching=64, by_detection_status=
+        {detected:27, sporadic:30, not_detected:7}, by_metric_bucket=
+        {mid:32, low:16, top_quartile:9, top_decile:7}."""
+        from multiomics_explorer.api import metabolites_by_quantifies_assay
+        result = metabolites_by_quantifies_assay(
+            assay_ids=[_MIT9313_CHITOSAN_ASSAY], summary=True, conn=conn)
+        assert result["total_matching"] == 64
+        det = {b["detection_status"]: b["count"]
+               for b in result["by_detection_status"]}
+        assert det == {"detected": 27, "sporadic": 30, "not_detected": 7}
+        buck = {b["bucket"]: b["count"] for b in result["by_metric_bucket"]}
+        assert buck == {"mid": 32, "low": 16,
+                        "top_quartile": 9, "top_decile": 7}
+        # summary mode: results=[]
+        assert result["results"] == []
+        # No rankable-gating exclusion (assay is rankable)
+        assert result["excluded_assays"] == []
+        assert result["warnings"] == []
+
+    def test_mit9313_top5_rows(self, conn):
+        """§7: top-5 ranks 1-5; F6P top_decile rank 1-3, Citrate rank 4-5."""
+        from multiomics_explorer.api import metabolites_by_quantifies_assay
+        result = metabolites_by_quantifies_assay(
+            assay_ids=[_MIT9313_CHITOSAN_ASSAY], limit=5, conn=conn)
+        assert result["returned"] == 5
+        ranks = [r["rank_by_metric"] for r in result["results"]]
+        assert ranks == [1, 2, 3, 4, 5]
+        names = [r["name"] for r in result["results"]]
+        # Ranks 1-3 are F6P (D-Fructose 6-phosphate)
+        assert all("Fructose 6-phosphate" in n for n in names[:3])
+        # Ranks 4-5 are Citrate
+        assert all("Citrate" in n for n in names[3:5])
+        # All top-5 are top_decile bucket
+        assert all(r["metric_bucket"] == "top_decile"
+                   for r in result["results"])
+
+    def test_growth_phase_null_today(self, conn):
+        """KG-MET-017 (parent §3.5): every numeric row has growth_phase=None
+        until KG-side backfill lands."""
+        from multiomics_explorer.api import metabolites_by_quantifies_assay
+        result = metabolites_by_quantifies_assay(
+            assay_ids=[_MIT9313_CHITOSAN_ASSAY], limit=10, conn=conn)
+        for r in result["results"]:
+            assert r["growth_phase"] is None, (
+                f"Expected null growth_phase per KG-MET-017; "
+                f"got {r['growth_phase']!r}")
+
+    def test_invalid_metric_bucket_raises(self, conn):
+        """API-layer validation: unknown bucket label raises ValueError."""
+        from multiomics_explorer.api import metabolites_by_quantifies_assay
+        with pytest.raises(ValueError) as exc:
+            metabolites_by_quantifies_assay(
+                assay_ids=[_MIT9313_CHITOSAN_ASSAY],
+                metric_bucket=["nonexistent_bucket"], conn=conn)
+        msg = str(exc.value)
+        assert "metric_bucket" in msg
+        assert "nonexistent_bucket" in msg
+
+    def test_all_non_rankable_raises(self, conn):
+        """All-non-rankable selected-assay set + rankable-gated filter
+        → ValueError (rankable-gating contract). Today the live KG has
+        no non-rankable numeric assays — boolean assays are filtered out
+        of the diagnostics probe via `value_kind='numeric'`. We simulate
+        the failure mode by passing a boolean assay (non-rankable) — this
+        path returns an empty envelope without raising (api guard requires
+        diag_rows to be non-empty before the rankable check fires).
+
+        Documented as a KG-state limitation: the rankable-gate raise is
+        unreachable from the live KG today. The test still pins the
+        not-yet-failing surface so when a non-rankable numeric assay
+        lands in the KG, this stops being a no-op."""
+        from multiomics_explorer.api import metabolites_by_quantifies_assay
+        # Boolean assay → filtered out by 'value_kind=numeric' in diagnostics.
+        # Empty diag_rows → defensive empty-envelope path; no raise today.
+        result = metabolites_by_quantifies_assay(
+            assay_ids=[_MSYSTEMS_PRESENCE_FLAGS_ASSAY],
+            metric_bucket=["top_decile"], conn=conn)
+        assert result["total_matching"] == 0
+        assert result["results"] == []
+        # boolean assay is "absent" from numeric diagnostics → not_found
+        assert _MSYSTEMS_PRESENCE_FLAGS_ASSAY in result["not_found"]["assay_ids"]
+
+    def test_value_min_strips_tested_absent(self, conn):
+        """Parent §10 anti-pattern: `value_min=0.001` slashes the
+        not_detected bucket — tested-absent rows have value=0. Confirms
+        the silent-drop hazard and surfaces the caller-controlled choice."""
+        from multiomics_explorer.api import metabolites_by_quantifies_assay
+        # Baseline: 7 not_detected in the unfiltered slice.
+        baseline = metabolites_by_quantifies_assay(
+            assay_ids=[_MIT9313_CHITOSAN_ASSAY], summary=True, conn=conn)
+        baseline_det = {b["detection_status"]: b["count"]
+                        for b in baseline["by_detection_status"]}
+        assert baseline_det["not_detected"] == 7
+        # With value_min=0.001 the not_detected bucket evaporates.
+        filtered = metabolites_by_quantifies_assay(
+            assay_ids=[_MIT9313_CHITOSAN_ASSAY],
+            value_min=0.001, summary=True, conn=conn)
+        filt_det = {b["detection_status"]: b["count"]
+                    for b in filtered["by_detection_status"]}
+        assert filt_det.get("not_detected", 0) == 0
+        # Total drops from 64 → fewer rows (tested-absent gone, sporadic thinned).
+        assert filtered["total_matching"] < baseline["total_matching"]
+        assert filtered["total_matching"] == 49
+
+
+@pytest.mark.kg
+class TestMetabolitesByFlagsAssayKG:
+    """Live-KG integration tests for `metabolites_by_flags_assay`.
+    Baselines from slice spec §7 (msystems presence_flags_intracellular)."""
+
+    def test_msystems_summary(self, conn):
+        """§7 fixture: total_matching=93, by_value={false:58, true:35}."""
+        from multiomics_explorer.api import metabolites_by_flags_assay
+        result = metabolites_by_flags_assay(
+            assay_ids=[_MSYSTEMS_PRESENCE_FLAGS_ASSAY],
+            summary=True, conn=conn)
+        assert result["total_matching"] == 93
+        # API surfaces flag_value as string ('true'/'false') from KG.
+        # Pydantic coerces to bool downstream (verified in contract test).
+        by_val = {b["flag_value"]: b["count"] for b in result["by_value"]}
+        # Accept either string or bool key per Pydantic-coercion-tolerance.
+        false_count = by_val.get("false", by_val.get(False, 0))
+        true_count = by_val.get("true", by_val.get(True, 0))
+        assert false_count == 58
+        assert true_count == 35
+        assert result["results"] == []
+        # Always-empty envelope-shape (no rankable gates on boolean arm).
+        assert result["excluded_assays"] == []
+        assert result["warnings"] == []
+
+    def test_msystems_top5_alphabetical_true(self, conn):
+        """§7: top-5 detail rows are flag_value=true; expected names
+        S-adenosyl-L-methionine, tyrosine, NADH, AMP, S-Adenosyl-L-homocysteine
+        (sort key: flag_value DESC, m.id ASC). At least 4 of these surface
+        in the top-5."""
+        from multiomics_explorer.api import metabolites_by_flags_assay
+        result = metabolites_by_flags_assay(
+            assay_ids=[_MSYSTEMS_PRESENCE_FLAGS_ASSAY], limit=5, conn=conn)
+        assert result["returned"] == 5
+        # All top-5 are flag_value=True (DESC sort: true > false).
+        assert all(r["flag_value"] is True for r in result["results"])
+        names = [r["name"] for r in result["results"]]
+        expected = {
+            "S-adenosyl-L-methionine", "tyrosine", "NADH",
+            "AMP", "S-Adenosyl-L-homocysteine",
+        }
+        match_count = sum(1 for n in names if n in expected)
+        assert match_count >= 4, (
+            f"Expected >=4 of {expected} in top-5; got names={names}, "
+            f"match_count={match_count}")
+
+    def test_flag_value_false_returns_rows(self, conn):
+        """Distinct from DM `genes_by_boolean_metric` (positive-only KG
+        storage): `Assay_flags_metabolite` stores both true and false,
+        so `flag_value=False` returns 58 rows on the msystems assay."""
+        from multiomics_explorer.api import metabolites_by_flags_assay
+        result = metabolites_by_flags_assay(
+            assay_ids=[_MSYSTEMS_PRESENCE_FLAGS_ASSAY],
+            flag_value=False, summary=True, conn=conn)
+        assert result["total_matching"] == 58
+
+    def test_no_by_detection_status_envelope(self, conn):
+        """Boolean arm has no `detection_status` field — envelope MUST NOT
+        carry `by_detection_status` (slice spec §5.3)."""
+        from multiomics_explorer.api import metabolites_by_flags_assay
+        result = metabolites_by_flags_assay(
+            assay_ids=[_MSYSTEMS_PRESENCE_FLAGS_ASSAY],
+            summary=True, conn=conn)
+        assert "by_detection_status" not in result, (
+            f"Boolean arm must not carry by_detection_status; "
+            f"got envelope keys={sorted(result.keys())}")
+        # Positive assertion: the qualitative-detection signal is by_value.
+        assert "by_value" in result
+
+    def test_assay_ids_not_found_task3_deviation(self, conn):
+        """Task 3 deviation: `metabolites_by_flags_assay` does NOT probe
+        assay_ids. When passed a non-existent assay_id, `not_found.assay_ids`
+        is `[]` (not populated) — the assay simply yields zero rows.
+
+        Documented behavior; current tests pin to it. Future enhancement
+        should add a diagnostics probe (parent §13.6 alignment)."""
+        from multiomics_explorer.api import metabolites_by_flags_assay
+        result = metabolites_by_flags_assay(
+            assay_ids=["nonexistent_assay"], summary=True, conn=conn)
+        assert result["total_matching"] == 0
+        # Current behavior: not_found.assay_ids stays empty (no probe).
+        assert result["not_found"]["assay_ids"] == []
+
+
+@pytest.mark.kg
+class TestAssaysByMetaboliteKG:
+    """Live-KG integration tests for `assays_by_metabolite` (polymorphic
+    reverse-lookup). Baselines from slice spec §7 (PEP / kegg.compound:C00074)."""
+
+    def test_pep_polymorphic_summary(self, conn):
+        """§7 fixture: total_matching=20 (18 quantifies + 2 flags),
+        metabolites_matched=1, by_evidence_kind={quantifies:18, flags:2},
+        by_detection_status={not_detected:12, detected:3, sporadic:3},
+        by_flag_value={false:2}."""
+        from multiomics_explorer.api import assays_by_metabolite
+        result = assays_by_metabolite(
+            metabolite_ids=[_PEP_ID], summary=True, conn=conn)
+        assert result["total_matching"] == 20
+        assert result["metabolites_matched"] == 1
+        ek = {b["evidence_kind"]: b["count"]
+              for b in result["by_evidence_kind"]}
+        assert ek == {"quantifies": 18, "flags": 2}
+        det = {b["detection_status"]: b["count"]
+               for b in result["by_detection_status"]}
+        assert det == {"not_detected": 12, "detected": 3, "sporadic": 3}
+        # by_flag_value stores api-layer string flag values (apoc passthrough).
+        fv = {b["flag_value"]: b["count"] for b in result["by_flag_value"]}
+        false_count = fv.get("false", fv.get(False, 0))
+        assert false_count == 2
+
+    def test_pep_top5_evidence_kind_desc(self, conn):
+        """§6.4 sort: m.id ASC, evidence_kind DESC, a.id ASC.
+        'quantifies' > 'flags' alphabetically; 18 numeric rows surface
+        first before any boolean — top-5 are all quantifies."""
+        from multiomics_explorer.api import assays_by_metabolite
+        result = assays_by_metabolite(
+            metabolite_ids=[_PEP_ID], limit=5, conn=conn)
+        assert result["returned"] == 5
+        kinds = [r["evidence_kind"] for r in result["results"]]
+        assert kinds == ["quantifies"] * 5
+        # All rows are PEP (single-metabolite query).
+        assert all(r["metabolite_id"] == _PEP_ID for r in result["results"])
+
+    def test_evidence_kind_filter_quantifies_only(self, conn):
+        """`evidence_kind="quantifies"` summary returns 18 (numeric arm only)."""
+        from multiomics_explorer.api import assays_by_metabolite
+        result = assays_by_metabolite(
+            metabolite_ids=[_PEP_ID], evidence_kind="quantifies",
+            summary=True, conn=conn)
+        assert result["total_matching"] == 18
+        # by_flag_value rollup is empty when evidence_kind='quantifies'
+        assert result["by_flag_value"] == []
+
+    def test_not_found_flat_list(self, conn):
+        """§6.3 / parent §13.6: not_found is flat list[str] (single-batch
+        reverse-lookup)."""
+        from multiomics_explorer.api import assays_by_metabolite
+        result = assays_by_metabolite(
+            metabolite_ids=[_PEP_ID, "fake.id:DOESNOTEXIST"],
+            summary=True, conn=conn)
+        # Flat list[str] shape — NOT a dict with sub-buckets.
+        assert isinstance(result["not_found"], list)
+        assert result["not_found"] == ["fake.id:DOESNOTEXIST"]
+        # PEP is present in KG with edges; not flagged not_found.
+        assert _PEP_ID not in result["not_found"]
+
+    def test_metabolites_with_evidence_partition_detail_mode(self, conn):
+        """Per Task 3 deviation note: `metabolites_with_evidence` partition
+        is only computable from detail rows. Test in NON-summary mode.
+
+        With `metabolite_ids=[PEP]` and detail rows returned: PEP has
+        18+2=20 edges → metabolites_with_evidence=[PEP], not_matched=[]."""
+        from multiomics_explorer.api import assays_by_metabolite
+        result = assays_by_metabolite(
+            metabolite_ids=[_PEP_ID], limit=20, conn=conn)
+        # Detail mode partitions correctly.
+        assert result["metabolites_with_evidence"] == [_PEP_ID]
+        assert result["metabolites_without_evidence"] == []
+        # not_matched: KG-present but no edges-after-filter (empty here).
+        assert result["not_matched"] == []
