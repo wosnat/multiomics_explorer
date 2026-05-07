@@ -37,7 +37,7 @@ chaining:
   - "gene_clusters_by_gene → genes_in_cluster → differential_expression_by_gene"
 
 mistakes:
-  - "Cluster IDs come from list_clustering_analyses or gene_clusters_by_gene results — they are not gene locus tags"
+  - "cluster_ids come from list_clustering_analyses or gene_clusters_by_gene results — they are not gene locus tags"
   - "Use analysis_id to get ALL genes across ALL clusters in an analysis; use cluster_ids for specific clusters"
   - "not_found_clusters means the ID doesn't exist in the KG; not_matched_clusters means the cluster exists but has no members matching your organism filter"
   - "Results are gene × cluster rows — when querying multiple clusters, a gene in both appears twice. Use by_cluster to see per-cluster counts."

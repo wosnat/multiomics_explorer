@@ -2,24 +2,21 @@
 
 ## What it does
 
-Differential expression framed by ortholog groups.
+Find differential-expression rows framed by ortholog group —
+one row per (group × experiment × timepoint), values are gene counts
+(members responding), not individual gene rows. Cross-organism by
+design. Results sorted by significant gene count.
 
-Cross-organism by design — results at group x experiment x timepoint
-granularity showing how many group members respond. Gene counts,
-not individual genes.
+Each list input (`group_ids`, `organisms`, `experiment_ids`) reports
+both `not_found` (input absent from KG) and `not_matched` (in KG but
+no expression after filters). Tested-absent semantics depend on the
+parent experiment's `table_scope` — `all_detected_genes` keeps
+`not_significant` rows; `significant_only` / `top_n` collapse them
+with not-detected. See `docs://guide/conventions`.
 
-Returns summary statistics (always) + top results sorted by significant
-gene count. Default limit=5 gives a quick overview.
-Set summary=True for counts only, or increase limit for more rows.
-
-Three list filters — each reports not_found + not_matched:
-- group_ids (required): ortholog groups
-- organisms: restrict to specific organisms
-- experiment_ids: restrict to specific experiments
-
-For group discovery, use search_homolog_groups first.
-For group membership without expression, use genes_by_homolog_group.
-For per-gene expression, use differential_expression_by_gene.
+Routing: discover groups via `search_homolog_groups`; group membership
+without expression via `genes_by_homolog_group`; per-gene drill-down
+via `differential_expression_by_gene`.
 
 ## Parameters
 
@@ -58,7 +55,7 @@ total_matching, matching_genes, matching_groups, experiment_count, median_abs_lo
 - **rows_by_treatment_type** (object): Row counts by treatment type
 - **rows_by_background_factors** (object): Row counts by background factor
 - **rows_by_growth_phase** (object): Row counts by growth phase. Growth phase is a timepoint-level condition, not gene-specific.
-- **by_table_scope** (object): Row counts by experiment table_scope
+- **by_table_scope** (object): Row counts by experiment table_scope. `all_detected_genes` keeps tested-absent (`not_significant`) rows; `significant_only` / `top_n` collapse them with not-detected. See `docs://guide/conventions`.
 - **top_groups** (list[DifferentialExpressionByOrthologTopGroup]): Top 5 groups by significant gene count
 - **top_experiments** (list[DifferentialExpressionByOrthologTopExperiment]): Top 5 experiments by significant gene count
 - **not_found_groups** (list[string]): Input group_ids not found in KG
@@ -148,7 +145,7 @@ differential_expression_by_ortholog → scripts/expression_by_ortholog.py (detai
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
-- For cross-experiment summarization patterns see `docs://guide/python_api` § Cross-experiment summarization (covers `response_matrix` for gene × treatment-group pivots and `gene_set_compare` for two-set comparisons).
+- For cross-experiment summarization patterns see `docs://guide/python_api` (Cross-experiment summarization — covers `response_matrix` for gene × treatment-group pivots and `gene_set_compare` for two-set comparisons).
 
 ## Package import equivalent
 

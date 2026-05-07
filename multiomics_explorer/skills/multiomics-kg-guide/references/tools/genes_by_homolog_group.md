@@ -2,18 +2,14 @@
 
 ## What it does
 
-Find member genes of ortholog groups.
+Drill into ortholog group members — one row per (gene × group),
+per organism. Each list input (`group_ids`, `organisms`) reports
+both `not_found` (input absent from KG) and `not_matched` (in KG
+but no member after filters).
 
-Takes group IDs from search_homolog_groups or gene_homologs and
-returns member genes per organism. One row per gene × group.
-
-Two list filters — each reports not_found + not_matched:
-- group_ids: ortholog groups (required)
-- organisms: restrict to specific organisms
-
-For group discovery by text, use search_homolog_groups first.
-For gene → group direction, use gene_homologs.
-For expression by ortholog groups, use differential_expression_by_ortholog.
+Routing: group discovery via `search_homolog_groups`; gene → group
+direction via `gene_homologs`; cross-organism expression view via
+`differential_expression_by_ortholog`.
 
 ## Parameters
 

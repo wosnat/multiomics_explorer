@@ -23,10 +23,8 @@ examples:
     call: differential_expression_by_gene(organism="MED4", direction="both", summary=True)
     # Returns the union of `significant_up` and `significant_down` rows
     # (excludes `not_significant`). Functionally identical to
-    # `direction=None, significant_only=True` — `'both'` is the explicit,
-    # self-documenting spelling and aligns with `pathway_enrichment`'s
-    # `direction='both'` convention. Live KG counts: 51169 significant
-    # rows total (25637 up + 25532 down).
+    # `direction=None, significant_only=True` — pick whichever spelling
+    # is clearer at the call site.
 
   - title: Chaining — find genes then check expression
     steps: |
@@ -64,9 +62,9 @@ mistakes:
     right: "Check the experiment's table_scope — if significant_only or top_n, the gene may simply not have been reported. Only all_detected_genes experiments can distinguish 'not affected' from 'not reported'."
   - wrong: "Mixing organisms in a single call (e.g. MED4 + HOT1A3 locus_tags)"
     right: "Call once per organism — tool enforces single-organism constraint"
-  - "`direction='both'` is functionally identical to `direction=None, significant_only=True` — pick whichever spelling is clearer at the call site. Default `direction=None` is unchanged. KG live counts: 51169 significant (25637 up + 25532 down)."
+  - "`direction='both'` is functionally identical to `direction=None, significant_only=True` — pick whichever spelling is clearer at the call site. Default `direction=None` is unchanged."
   - "expression_status uses publication-specific thresholds, not a uniform padj<0.05"
   - "Use summary=True first to see the landscape, then drill into specific genes/experiments"
   - "Check by_table_scope in the summary to understand data completeness before drawing conclusions"
   - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"
-  - "For cross-experiment summarization (which treatments does this gene set respond to?) see `docs://guide/python_api` § Cross-experiment summarization (`response_matrix` for gene × treatment pivots, `gene_set_compare` for two-set overlap). For pathway-level interpretation chain to `pathway_enrichment` (`docs://analysis/enrichment`)."
+  - "For cross-experiment summarization (which treatments does this gene set respond to?) see `docs://guide/python_api` (Cross-experiment summarization — `response_matrix` for gene × treatment pivots, `gene_set_compare` for two-set overlap). For pathway-level interpretation chain to `pathway_enrichment` (`docs://analysis/enrichment`)."

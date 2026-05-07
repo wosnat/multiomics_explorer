@@ -2,13 +2,14 @@
 
 ## What it does
 
-Find which gene clusters contain the given genes.
+Look up cluster memberships for a gene batch — one row per
+(gene × cluster) with analysis context (`analysis_id`,
+`analysis_name`). Single-organism enforced. Reports `not_found`
+(locus_tag absent from KG) and `not_matched` (in KG but no cluster
+memberships after filters).
 
-Gene-centric lookup: 'what clusters are these genes in?'
-Single organism enforced. One row per gene × cluster.
-
-Use list_clustering_analyses for discovery by text search.
-Use genes_in_cluster to drill into a cluster's full membership.
+Routing: cluster discovery via `list_clustering_analyses`; drill
+into a cluster's full membership via `genes_in_cluster`.
 
 ## Parameters
 

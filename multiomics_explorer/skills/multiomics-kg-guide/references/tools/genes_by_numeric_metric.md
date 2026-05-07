@@ -2,28 +2,32 @@
 
 ## What it does
 
-Pass `derived_metric_ids` XOR `metric_types` (one required); rankable-gated filters (`bucket`, `min/max_percentile`, `max_rank`) raise if every selected DM has `rankable=False` and soft-exclude on mixed input — inspect `list_derived_metrics(value_kind='numeric', rankable=True)` first to see which DMs support which filters.
+Drill into numeric DerivedMetric edges — one row per (gene × DM).
+`value` (float) always populated; `rank_by_metric` / `metric_percentile`
+/ `metric_bucket` populate only on rankable DMs (null otherwise — same
+row shape as `gene_derived_metrics`). Cross-organism by design.
 
-Numeric DM drill-down — one row per gene × DM. `r.value` (float) is
-always returned; `rank_by_metric` / `metric_percentile` /
-`metric_bucket` are populated only on rows from rankable DMs (null
-otherwise — same shape as `gene_derived_metrics`). Cross-organism by
-design; envelope `by_organism` and per-row `organism_name` make
-cross-strain rows self-describing. The `by_metric` envelope rollup
-pairs filtered-slice value distribution with full-DM distribution
-(precomputed) so callers can read "your top-decile slice 12.2-25.3
-out of full DM range 0-28" directly.
+Selection is `derived_metric_ids` XOR `metric_types` (exactly one
+required). Rankable-gated filters (`bucket`, `min/max_percentile`,
+`max_rank`) raise on all-non-rankable selection, soft-exclude on
+mixed input. `has_p_value`-gated filters (`significant_only`,
+`max_adjusted_p_value`) raise in the current KG (no DM carries
+p-values). Pre-flight via
+`list_derived_metrics(value_kind='numeric', rankable=True)`. See
+`docs://guide/conventions` for the full DM family gating contract.
 
-`excluded_derived_metrics` + `warnings` envelope keys are the
-primary diagnostic when a real DM produces zero rows; check these
-before assuming the result is empty for biological reasons.
+The `by_metric` envelope rollup pairs filtered-slice value
+distribution with full-DM distribution (precomputed dm.value_*) so
+callers can read "top-decile slice 12.2-25.3 out of full DM range
+0-28" directly. `excluded_derived_metrics` + `warnings` are the
+primary diagnostic when a real DM produces zero rows.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | derived_metric_ids | list[string] \| None | None | DerivedMetric node IDs to drill into. Use when the same `metric_type` appears across publications / organisms and you need to pin one. Discover IDs via `list_derived_metrics`. Mutually exclusive with `metric_types`. |
-| metric_types | list[string] \| None | None | Metric-type tags (e.g. ['damping_ratio', 'diel_amplitude_protein_log2']). Unions every DM carrying that tag, then narrows by scoping filters. Same tag can appear across organisms (e.g. 'cell_abundance_biovolume_normalized' is on both MIT9312 and MIT9313 today). Mutually exclusive with `derived_metric_ids`. |
+| metric_types | list[string] \| None | None | Metric-type tags (e.g. ['damping_ratio', 'diel_amplitude_protein_log2']). Unions every DM carrying that tag, then narrows by scoping filters. Same tag can span organisms / publications — pin one specific DM via `derived_metric_ids` instead. Mutually exclusive with `derived_metric_ids`. |
 | organism | string \| None | None | Organism to scope the DM set to. Accepts short strain code ('MED4', 'NATL2A', 'MIT9312') or full name. Case-insensitive substring match. Single-organism is **not** enforced — omit to drill across all organisms a metric_type spans. |
 | locus_tags | list[string] \| None | None | Restrict drill-down to a specific gene set (e.g. DE hits from `differential_expression_by_gene`). Filter on `g.locus_tag IN $locus_tags` post-MATCH. Genes with no edge for the selected DM produce no row (silent — surfaced via `total_genes` shortfall). |
 | experiment_ids | list[string] \| None | None | Scope to DMs from one or more experiments. |
@@ -36,9 +40,9 @@ before assuming the result is empty for biological reasons.
 | max_value | float \| None | None | Upper bound on `r.value`. Always applicable. |
 | min_percentile | float \| None | None | Lower bound on `r.metric_percentile` (0-100). **Rankable-gated** — raises if every selected DM has `rankable=False`. Soft-excludes non-rankable DMs from mixed input, surfaced in `excluded_derived_metrics`. |
 | max_percentile | float \| None | None | Upper bound on `r.metric_percentile`. **Rankable-gated.** |
-| bucket | list[string] \| None | None | Bucket label(s) — subset of {'top_decile','top_quartile','mid','low'}. **Rankable-gated.** Today's KG buckets correspond to decile / quartile splits computed at import time per DM. |
+| bucket | list[string] \| None | None | Bucket label(s) — subset of {'top_decile','top_quartile','mid','low'}. **Rankable-gated.** Buckets are decile / quartile splits computed at import time per DM. |
 | max_rank | int \| None | None | Cap on `r.rank_by_metric` (1 = highest). Use for top-N drill-down. **Rankable-gated.** |
-| significant_only | bool | False | Filter to `r.significant=true`. **has_p_value-gated** — raises against today's KG (no DM has p-values yet). Forward-compat surface; check `list_derived_metrics(has_p_value=True)` before using. |
+| significant_only | bool | False | Filter to `r.significant=true`. **has_p_value-gated** — raises in the current KG (no DM has p-values yet). Forward-compat surface; check `list_derived_metrics(has_p_value=True)` before using. |
 | max_adjusted_p_value | float \| None | None | Upper bound on `r.adjusted_p_value`. **has_p_value-gated**. |
 | summary | bool | False | Return summary fields only (counts, breakdowns, by_metric, diagnostics). Sugar for limit=0; results=[]. |
 | verbose | bool | False | Include heavy text fields per row: gene_function_description, gene_summary, plus DM context (metric_type, field_description, unit, compartment, experiment_id, publication_doi, treatment_type, background_factors, treatment, light_condition, experimental_context). p_value (raw) is reserved for future has_p_value DMs. |
@@ -281,15 +285,15 @@ genes_by_numeric_metric → gene_overview(locus_tags=results)
 
 - Non-rankable DM + rankable-gated filter. Calling with `metric_types=['peak_time_transcript_h']` + `bucket=['top_decile']` raises — `peak_time_transcript_h` is non-rankable. Inspect `list_derived_metrics(value_kind='numeric', rankable=True)` to see which DMs support `bucket` / `min_percentile` / `max_percentile` / `max_rank`. Mixed rankable/non-rankable DM sets don't raise — instead the envelope's `excluded_derived_metrics` + `warnings` pinpoint the excluded ones.
 
-- P-value filter on current KG. `significant_only=True` or `max_adjusted_p_value=0.05` raises today because no DM has `has_p_value='true'`. The surface exists for future DMs; check `list_derived_metrics(has_p_value=True)` first.
+- P-value filter on current KG. `significant_only=True` or `max_adjusted_p_value=0.05` raises in the current KG because no DM has `has_p_value='true'`. The surface exists for future DMs; check `list_derived_metrics(has_p_value=True)` first.
 
 - Sparse columns in results. `rank_by_metric` / `metric_percentile` / `metric_bucket` are null in rows from non-rankable DMs (e.g. `peak_time_*_h`); don't treat null as missing data — it's gate-driven. Per-row `rankable` (echoed from the parent DM) tells you which to expect.
 
 - Cross-organism by default. No single-organism enforcement. `metric_types=['cell_abundance_biovolume_normalized']` returns rows from MIT9312 AND MIT9313 (the same metric_type spans both). Use `organism='MIT9312'` to scope; check per-row `organism_name` and envelope `by_organism` for cross-strain rows.
 
-- `by_metric` is per-DM, not per-tag. Each `by_metric` entry is one DerivedMetric (uniquely identified by `derived_metric_id`). The same `metric_type` tag can appear across organisms (4 such tags in current KG). Use the per-DM rollup to disambiguate.
+- `by_metric` is per-DM, not per-tag. Each `by_metric` entry is one DerivedMetric (uniquely identified by `derived_metric_id`). The same `metric_type` tag can span organisms / publications. Use the per-DM rollup to disambiguate.
 
-- Wrong-`value_kind` IDs land in `not_found_ids`, not a typed error. Passing a `derived_metric_ids` of a boolean or categorical DM today produces `not_found_ids=[that_id]` rather than a `value_kind` mismatch error — the diagnostics query hardcodes `value_kind='numeric'`, so non-numeric DMs simply don't appear in the result. Inspect via `list_derived_metrics(derived_metric_ids=[...])` to see the DM's actual `value_kind` and pivot to `genes_by_boolean_metric` or `genes_by_categorical_metric`. Current limitation — a richer 'wrong value_kind' diagnostic is on the roadmap.
+- Wrong-`value_kind` IDs land in `not_found_ids`, not a typed error. Passing a `derived_metric_ids` of a boolean or categorical DM produces `not_found_ids=[that_id]` rather than a `value_kind` mismatch error — the diagnostics query hardcodes `value_kind='numeric'`, so non-numeric DMs simply don't appear in the result. Inspect via `list_derived_metrics(derived_metric_ids=[...])` to see the DM's actual `value_kind` and pivot to `genes_by_boolean_metric` or `genes_by_categorical_metric`.
 
 - Filtered slice vs full DM. `by_metric[i].value_*` describes rows that survived your filters. `by_metric[i].dm_value_*` describes the full DM (precomputed). They're different — your top-decile slice is intentionally narrower than the full DM range.
 

@@ -39,7 +39,7 @@ chaining:
   - "list_derived_metrics(value_kind='numeric', rankable=True) → genes_by_numeric_metric(derived_metric_ids, bucket=[...])"
   - "list_derived_metrics(value_kind='boolean') → genes_by_boolean_metric(derived_metric_ids, flag=True)"
   - "list_derived_metrics(value_kind='categorical') → genes_by_categorical_metric(derived_metric_ids, categories=[...])"
-  - "list_derived_metrics → genes_by_<kind>_metric → metabolites_by_gene — inspect the chemistry of DM-flagged genes (DM rows don't carry chemistry; chain through the locus_tags returned by the drill-down). See docs://analysis/metabolites Track A1 §c1 / §c2."
+  - "list_derived_metrics → genes_by_<kind>_metric → metabolites_by_gene — inspect the chemistry of DM-flagged genes (DM rows don't carry chemistry; chain through the locus_tags returned by the drill-down). See `docs://analysis/metabolites`."
 
 mistakes:
   - >-
@@ -56,7 +56,7 @@ mistakes:
     once for NATL2A and once for MIT1002). Use derived_metric_ids to pin one
     specific DM; use metric_types to union across every DM with that tag.
   - >-
-    has_p_value=True returns zero rows against today's KG — no DM currently
+    has_p_value=True returns zero rows in the current KG — no DM currently
     carries p-values. The filter exists for forward-compat; drill-down p-value
     filters (significant_only, max_adjusted_p_value) will raise with a
     diagnostic error.
@@ -69,7 +69,7 @@ mistakes:
     chemistry adds noise). For chemistry context on DM-flagged genes, drill the kind-
     appropriate `genes_by_<kind>_metric` to harvest locus_tags, then chain to
     `metabolites_by_gene` (gene-anchored) or `genes_by_metabolite` (metabolite-anchored).
-    See docs://analysis/metabolites Track A1 §c1 + §c2.
+    See `docs://analysis/metabolites`.
   - wrong: list_derived_metrics(rankable="true")
     right: list_derived_metrics(rankable=True)
   - wrong: list_derived_metrics(organism="Prochlorococcus MED4 strain")

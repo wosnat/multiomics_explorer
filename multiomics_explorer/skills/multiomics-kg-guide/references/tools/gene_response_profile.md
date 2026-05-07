@@ -2,19 +2,16 @@
 
 ## What it does
 
-Cross-experiment gene response profile.
+Summarize how each gene responds across experiments — one result
+per gene with `response_summary` keyed by treatment type (default)
+or experiment. Each entry reports experiments / timepoints tested,
+responded (up / down), plus rank and log2FC stats for significant
+rows. Sorted by response breadth (most groups first).
 
-Summarizes how each gene responds across all experiments. One result
-per gene with response_summary showing per-treatment (or per-experiment)
-statistics: how many experiments/timepoints the gene was tested in,
-how many it responded in (up/down), and rank/log2fc stats for
-significant responses.
-
-Results sorted by response breadth: genes responding to most groups
-first, then by experiment count, then by timepoint count.
-
-Use differential_expression_by_gene to drill into temporal patterns
-within a specific experiment.
+Routing: drill into a specific experiment's temporal pattern via
+`differential_expression_by_gene(locus_tags=[...], experiment_ids=[id])`.
+See `docs://guide/conventions` for tested-absent semantics
+(`groups_tested_not_responded` vs `groups_not_known`).
 
 ## Parameters
 
@@ -138,7 +135,7 @@ This tool aggregates across timepoints. Use differential_expression_by_gene with
 
 - Single organism enforced — call once per organism
 
-- Two Python wrappers reshape this tool's output into matrix views: `response_matrix(genes, organism)` for a gene × treatment-group pivot, and `gene_set_compare(set_a, set_b)` for two-set overlap / only-A / only-B partitioning. Top-level imports: `from multiomics_explorer import response_matrix, gene_set_compare`. See `docs://guide/python_api` § Cross-experiment summarization.
+- Two Python wrappers reshape this tool's output into matrix views: `response_matrix(genes, organism)` for a gene × treatment-group pivot, and `gene_set_compare(set_a, set_b)` for two-set overlap / only-A / only-B partitioning. Top-level imports: `from multiomics_explorer import response_matrix, gene_set_compare`. See `docs://guide/python_api` (Cross-experiment summarization).
 
 - DataFrame conversion: `to_dataframe(result)` auto-dispatches and returns the unwound gene × treatment-group table. See `docs://guide/python_api`.
 

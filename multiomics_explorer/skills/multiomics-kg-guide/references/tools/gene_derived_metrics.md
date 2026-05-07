@@ -2,21 +2,25 @@
 
 ## What it does
 
-Polymorphic `value` column — branch on `value_kind` per row; consult `list_derived_metrics(value_kind=...)` first to know which DMs exist and whether numeric rows carry rank/percentile/bucket extras (rankable gate) or `adjusted_p_value`/`significant` (has_p_value gate).
+Look up DerivedMetric annotations for a gene batch — one row per
+(gene × DM), polymorphic `value` (float on numeric / `'true'`/`'false'`
+on boolean / category string on categorical). Numeric extras
+(`rank_by_metric`, `metric_percentile`, `metric_bucket`) populate only
+on rankable parent DMs; `adjusted_p_value` / `significant` only on
+has_p_value parent DMs (none in the current KG). Single-organism
+enforced.
 
-Gene-centric batch lookup for DerivedMetric annotations — one row
-per gene × DM. `value` is `float` on numeric rows, `'true'`/'false'`
-on boolean rows, category string on categorical rows. Numeric extras
-(rank_by_metric, metric_percentile, metric_bucket) are populated
-only when the parent DM is rankable; null otherwise. Same gate for
-adjusted_p_value / significant on has_p_value DMs (none in the
-current KG).
+Empty results are diagnosable via `not_found` (locus_tag absent from
+KG) and `not_matched` (in KG but no DM rows after filters — includes
+kind-mismatch when `value_kind` is set). Pre-flight via
+`list_derived_metrics(value_kind=...)` to see which DMs touch your
+genes and whether they are rankable / has_p_value. See
+`docs://guide/conventions` for the full DM family gating contract.
 
-Single organism enforced. not_found (locus_tag absent from KG) and
-not_matched (in KG but no DM rows after filters — includes
-kind-mismatch when value_kind is set) make empty rows diagnosable.
-For edge-level numeric filters (bucket / percentile / rank / value
-thresholds), pivot to genes_by_numeric_metric.
+Routing: edge-level filters (bucket / percentile / rank / value
+thresholds) live on `genes_by_numeric_metric`; flag-level filters on
+`genes_by_boolean_metric`; category filters on
+`genes_by_categorical_metric`.
 
 ## Parameters
 
@@ -78,7 +82,7 @@ total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics
 | rank_by_metric | int \| None (optional) | Rank by metric value (1 = highest). Populated only when parent DM rankable=True. |
 | metric_percentile | float \| None (optional) | Percentile within metric distribution (0-100). Same gate as rank_by_metric. |
 | metric_bucket | string \| None (optional) | Bucket label ('top_decile', 'top_quartile', 'mid', 'low'). Same gate as rank_by_metric. |
-| adjusted_p_value | float \| None (optional) | BH-adjusted p-value. Populated only when parent DM has_p_value=True. No DM in current KG has p-values; Cypher RETURN omits this column today. |
+| adjusted_p_value | float \| None (optional) | BH-adjusted p-value. Populated only when parent DM has_p_value=True. No DM in current KG has p-values; Cypher RETURN omits this column. |
 | significant | bool \| None (optional) | Significance flag at the DM's p_value_threshold. Same gate as adjusted_p_value. |
 
 **Verbose-only fields** (included when `verbose=True`):

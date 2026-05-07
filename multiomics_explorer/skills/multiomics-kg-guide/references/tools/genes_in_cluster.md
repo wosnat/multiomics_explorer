@@ -2,13 +2,13 @@
 
 ## What it does
 
-Get member genes of gene clusters.
+Drill into gene cluster members — one row per (gene × cluster).
+Provide `cluster_ids` OR `analysis_id` (mutually exclusive);
+passing an `analysis_id` returns every cluster's members in one
+call.
 
-Takes cluster IDs or an analysis ID and returns member genes.
-One row per gene × cluster. Provide cluster_ids OR analysis_id (not both).
-
-For analysis discovery, use list_clustering_analyses first.
-For gene → cluster direction, use gene_clusters_by_gene.
+Routing: analysis discovery via `list_clustering_analyses`; gene →
+cluster direction via `gene_clusters_by_gene`.
 
 ## Parameters
 
@@ -39,7 +39,7 @@ total_matching, analysis_name, by_organism, by_cluster, top_categories, genes_pe
 - **top_categories** (list[GenesInClusterCategoryBreakdown]): Top 5 gene categories by count
 - **genes_per_cluster_max** (int): Largest cluster's gene count
 - **genes_per_cluster_median** (float): Median gene count across clusters
-- **not_found_clusters** (list[string]): Cluster IDs not found in KG
+- **not_found_clusters** (list[string]): Input cluster_ids not found in KG
 - **not_matched_clusters** (list[string]): Clusters found but no members after organism filter
 - **not_matched_organism** (string | None): Organism that didn't match any cluster's organism
 - **returned** (int): Results in this response
@@ -113,7 +113,7 @@ gene_clusters_by_gene → genes_in_cluster → differential_expression_by_gene
 
 ## Common mistakes
 
-- Cluster IDs come from list_clustering_analyses or gene_clusters_by_gene results — they are not gene locus tags
+- cluster_ids come from list_clustering_analyses or gene_clusters_by_gene results — they are not gene locus tags
 
 - Use analysis_id to get ALL genes across ALL clusters in an analysis; use cluster_ids for specific clusters
 

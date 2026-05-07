@@ -1988,14 +1988,12 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> GeneHomologsResponse:
-        """Get ortholog group memberships for genes.
+        """Look up ortholog group memberships for a gene batch — flat long
+        format (one row per gene × group), ordered most-specific (curated)
+        to broadest. A gene typically belongs to 1-3 groups.
 
-        Returns which ortholog groups each gene belongs to, ordered from most
-        specific (curated) to broadest. Use for gene characterization and
-        cross-organism bridging. A gene typically belongs to 1-3 groups.
-
-        For member genes within a group, use genes_by_homolog_group.
-        For text search on group names, use search_homolog_groups.
+        Routing: drill into group members via `genes_by_homolog_group`;
+        text-search groups via `search_homolog_groups`.
         """
         await ctx.info(f"gene_homologs locus_tags={locus_tags} source={source} "
                        f"taxonomic_level={taxonomic_level}")
@@ -3213,7 +3211,10 @@ def register_tools(mcp: FastMCP):
         by_table_scope: dict[str, int] = Field(
             description="Row counts by experiment table_scope"
             " (e.g. {'all_detected_genes': 100, 'significant_only': 50})."
-            " Shows data completeness across experiments.",
+            " `all_detected_genes` keeps tested-absent (`not_significant`)"
+            " rows; `significant_only` / `top_n` collapse them with"
+            " not-detected. Check before reading missing rows."
+            " See `docs://guide/conventions`.",
         )
         top_categories: list[ExpressionTopCategory] = Field(
             description="Top gene categories by significant gene count,"
@@ -3263,11 +3264,10 @@ def register_tools(mcp: FastMCP):
         )] = None,
         direction: Annotated[Literal["up", "down", "both"] | None, Field(
             description="Filter by expression direction. `'up'` / `'down'` "
-            "restrict to one arm. `'both'` is the explicit, self-documenting "
-            "spelling for the union of significant up + significant down — "
-            "functionally identical to `direction=None, significant_only=True` "
-            "(per spec §6.4); pick whichever spelling is clearer at the "
-            "call site. Default `None` is unchanged.",
+            "restrict to one arm. `'both'` is the union of significant up + "
+            "significant down — functionally identical to "
+            "`direction=None, significant_only=True`; pick whichever spelling "
+            "is clearer at the call site. Default `None` is unchanged.",
         )] = None,
         significant_only: Annotated[bool, Field(
             description="If true, return only statistically significant"
@@ -3294,24 +3294,24 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> DifferentialExpressionByGeneResponse:
-        """Gene-centric differential expression. One row per gene x experiment x timepoint.
+        """Find differential-expression rows for one organism — one row per
+        (gene × experiment × timepoint), sorted by |log2FC|. Single-organism
+        enforced; at least one of `organism` / `locus_tags` / `experiment_ids`
+        is required. `expression_status` uses each experiment's publication-
+        specific threshold (not a uniform padj<0.05 cutoff).
 
-        Returns summary statistics (always) + top results sorted by |log2FC|
-        (strongest effects first). Default limit=5 gives a quick overview.
-        Set summary=True for counts only, or increase limit for more rows.
+        Tested-absent semantics depend on the parent experiment's
+        `table_scope`: `all_detected_genes` keeps `not_significant` rows
+        (real biology — gene tested but did not respond); `significant_only`
+        and `top_n` collapse tested-absent with not-detected. Always check
+        `by_table_scope` (envelope) and the per-experiment `table_scope`
+        before reading missing rows. See `docs://guide/conventions` for the
+        full tested-absent framing.
 
-        At least one of organism, locus_tags, or experiment_ids is required.
-        All inputs must refer to the same organism — call once per organism.
-
-        When organism is the only filter, it scopes to that organism's full
-        expression data (e.g. MED4 = 47K edges). Combine with summary=True or
-        significant_only=True + limit for manageable results.
-
-        The expression_status field uses the publication-specific threshold from
-        each experiment's original paper (not a uniform padj<0.05 cutoff).
-
-        For cross-organism comparison via ortholog groups, use
-        differential_expression_by_ortholog.
+        Routing: `summary=True` for counts-only landscape; per-gene drill-down
+        to `gene_response_profile`; cross-organism via
+        `differential_expression_by_ortholog`; pathway interpretation via
+        `pathway_enrichment` (`docs://analysis/enrichment`).
         """
         await ctx.info(
             f"differential_expression_by_gene"
@@ -3480,8 +3480,10 @@ def register_tools(mcp: FastMCP):
     async def search_homolog_groups(
         ctx: Context,
         search_text: Annotated[str, Field(
-            description="Search query (Lucene syntax). Searches consensus_product, "
-            "consensus_gene_name, description, functional_description.",
+            description="Search query (Lucene syntax — boolean operators, "
+            "phrase matching, wildcards). Searches consensus_product, "
+            "consensus_gene_name, description, functional_description. "
+            "See `docs://guide/conventions` for Lucene scoring.",
         )],
         source: Annotated[str | None, Field(
             description="Filter by OG source: 'cyanorak' or 'eggnog'.",
@@ -3517,11 +3519,14 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> SearchHomologGroupsResponse:
-        """Search ortholog groups by text (Lucene). Returns group IDs for
-        use with genes_by_homolog_group.
+        """Search ortholog groups by text (Lucene over consensus_product,
+        consensus_gene_name, description, functional_description). Returns
+        group IDs for downstream use.
 
-        Searches across consensus_product, consensus_gene_name, description,
-        and functional_description fields.
+        Routing: drill into member genes via `genes_by_homolog_group`;
+        cross-organism expression view via
+        `differential_expression_by_ortholog`. See `docs://guide/conventions`
+        for Lucene scoring semantics.
         """
         await ctx.info(f"search_homolog_groups search_text={search_text!r} "
                        f"source={source} limit={limit}")
@@ -3665,18 +3670,14 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> GenesByHomologGroupResponse:
-        """Find member genes of ortholog groups.
+        """Drill into ortholog group members — one row per (gene × group),
+        per organism. Each list input (`group_ids`, `organisms`) reports
+        both `not_found` (input absent from KG) and `not_matched` (in KG
+        but no member after filters).
 
-        Takes group IDs from search_homolog_groups or gene_homologs and
-        returns member genes per organism. One row per gene × group.
-
-        Two list filters — each reports not_found + not_matched:
-        - group_ids: ortholog groups (required)
-        - organisms: restrict to specific organisms
-
-        For group discovery by text, use search_homolog_groups first.
-        For gene → group direction, use gene_homologs.
-        For expression by ortholog groups, use differential_expression_by_ortholog.
+        Routing: group discovery via `search_homolog_groups`; gene → group
+        direction via `gene_homologs`; cross-organism expression view via
+        `differential_expression_by_ortholog`.
         """
         await ctx.info(f"genes_by_homolog_group group_ids={group_ids} organisms={organisms}")
         try:
@@ -3901,7 +3902,10 @@ def register_tools(mcp: FastMCP):
             description="Row counts by growth phase. Growth phase is a timepoint-level condition, not gene-specific.",
         )
         by_table_scope: dict[str, int] = Field(
-            description="Row counts by experiment table_scope",
+            description="Row counts by experiment table_scope."
+            " `all_detected_genes` keeps tested-absent (`not_significant`)"
+            " rows; `significant_only` / `top_n` collapse them with"
+            " not-detected. See `docs://guide/conventions`.",
         )
         top_groups: list[DifferentialExpressionByOrthologTopGroup] = Field(
             default_factory=list,
@@ -3985,24 +3989,21 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> DifferentialExpressionByOrthologResponse:
-        """Differential expression framed by ortholog groups.
+        """Find differential-expression rows framed by ortholog group —
+        one row per (group × experiment × timepoint), values are gene counts
+        (members responding), not individual gene rows. Cross-organism by
+        design. Results sorted by significant gene count.
 
-        Cross-organism by design — results at group x experiment x timepoint
-        granularity showing how many group members respond. Gene counts,
-        not individual genes.
+        Each list input (`group_ids`, `organisms`, `experiment_ids`) reports
+        both `not_found` (input absent from KG) and `not_matched` (in KG but
+        no expression after filters). Tested-absent semantics depend on the
+        parent experiment's `table_scope` — `all_detected_genes` keeps
+        `not_significant` rows; `significant_only` / `top_n` collapse them
+        with not-detected. See `docs://guide/conventions`.
 
-        Returns summary statistics (always) + top results sorted by significant
-        gene count. Default limit=5 gives a quick overview.
-        Set summary=True for counts only, or increase limit for more rows.
-
-        Three list filters — each reports not_found + not_matched:
-        - group_ids (required): ortholog groups
-        - organisms: restrict to specific organisms
-        - experiment_ids: restrict to specific experiments
-
-        For group discovery, use search_homolog_groups first.
-        For group membership without expression, use genes_by_homolog_group.
-        For per-gene expression, use differential_expression_by_gene.
+        Routing: discover groups via `search_homolog_groups`; group membership
+        without expression via `genes_by_homolog_group`; per-gene drill-down
+        via `differential_expression_by_gene`.
         """
         await ctx.info(
             f"differential_expression_by_ortholog"
@@ -4141,19 +4142,16 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(description="Max genes returned.", ge=1)] = 50,
         offset: Annotated[int, Field(description="Skip N genes for pagination.", ge=0)] = 0,
     ) -> GeneResponseProfileResponse:
-        """Cross-experiment gene response profile.
+        """Summarize how each gene responds across experiments — one result
+        per gene with `response_summary` keyed by treatment type (default)
+        or experiment. Each entry reports experiments / timepoints tested,
+        responded (up / down), plus rank and log2FC stats for significant
+        rows. Sorted by response breadth (most groups first).
 
-        Summarizes how each gene responds across all experiments. One result
-        per gene with response_summary showing per-treatment (or per-experiment)
-        statistics: how many experiments/timepoints the gene was tested in,
-        how many it responded in (up/down), and rank/log2fc stats for
-        significant responses.
-
-        Results sorted by response breadth: genes responding to most groups
-        first, then by experiment count, then by timepoint count.
-
-        Use differential_expression_by_gene to drill into temporal patterns
-        within a specific experiment.
+        Routing: drill into a specific experiment's temporal pattern via
+        `differential_expression_by_gene(locus_tags=[...], experiment_ids=[id])`.
+        See `docs://guide/conventions` for tested-absent semantics
+        (`groups_tested_not_responded` vs `groups_not_known`).
         """
         await ctx.info(f"gene_response_profile locus_tags={locus_tags} group_by={group_by} limit={limit}")
         try:
@@ -4344,16 +4342,16 @@ def register_tools(mcp: FastMCP):
         offset: Annotated[int, Field(
             description="Number of results to skip for pagination.", ge=0)] = 0,
     ) -> ListClusteringAnalysesResponse:
-        """Browse, search, and filter clustering analyses.
+        """Browse, search, and filter clustering analyses — each analysis
+        groups related gene clusters from one study / organism, with the
+        cluster children inlined per result. Lucene full-text over analysis
+        name, cluster names, descriptions, experimental_context. See
+        `docs://guide/conventions` for Lucene scoring.
 
-        Each analysis groups related gene clusters from one study/organism.
-        Inline clusters are included in each result row.
-
-        After this tool, drill in via:
-        - genes_in_cluster(cluster_ids=[id]) for per-cluster member genes
-        - genes_in_cluster(analysis_id=...) for all clusters from one analysis
-        - gene_clusters_by_gene(locus_tags=[...], analysis_ids=[id]) to scope a
-          per-gene cluster lookup to this analysis
+        Routing: `genes_in_cluster(cluster_ids=[id])` for per-cluster
+        members; `genes_in_cluster(analysis_id=...)` for all clusters in
+        one analysis; `gene_clusters_by_gene(locus_tags=[...],
+        analysis_ids=[id])` to scope a per-gene cluster lookup.
         """
         await ctx.info(f"list_clustering_analyses search_text={search_text!r} "
                        f"organism={organism} limit={limit}")
@@ -4495,7 +4493,7 @@ def register_tools(mcp: FastMCP):
             default=None,
             description="BH-adjusted p-value. Populated only when parent DM "
                         "has_p_value=True. No DM in current KG has p-values; "
-                        "Cypher RETURN omits this column today.")
+                        "Cypher RETURN omits this column.")
         significant: bool | None = Field(
             default=None,
             description="Significance flag at the DM's p_value_threshold. "
@@ -4626,19 +4624,16 @@ def register_tools(mcp: FastMCP):
         rankable: bool = Field(
             description=(
                 "True if this DM supports rank / percentile / bucket analysis "
-                "on genes_by_numeric_metric. When False, the `bucket`, "
-                "`min_percentile`, `max_percentile`, and `max_rank` filters on "
-                "that drill-down do not apply — passing them with only "
-                "non-rankable DMs raises; mixing rankable + non-rankable drops "
-                "the non-rankable ones and lists them in the drill-down's "
-                "`excluded_derived_metrics`."
+                "on `genes_by_numeric_metric`. Rankable-gated filters raise "
+                "if every selected DM is non-rankable, soft-exclude on mixed "
+                "input. See `docs://guide/conventions` (DM family gating)."
             ),
         )
         has_p_value: bool = Field(
             description=(
                 "True if this DM carries statistical p-values, enabling "
-                "`significant_only` and `max_adjusted_p_value` on drill-downs. "
-                "No DM in the current KG has p-values."
+                "`significant_only` / `max_adjusted_p_value` on drill-downs. "
+                "No DM in the current KG carries p-values."
             ),
         )
         unit: str = Field(
@@ -4889,20 +4884,19 @@ def register_tools(mcp: FastMCP):
         rankable: Annotated[bool | None, Field(
             description=(
                 "Filter to DMs that support rank / percentile / bucket "
-                "analysis. Set to True before calling genes_by_numeric_metric "
-                "with `bucket`, `min_percentile`, `max_percentile`, or "
-                "`max_rank` — those filters require rankable=True on every "
-                "selected DM."
+                "analysis. Set to True before calling `genes_by_numeric_metric` "
+                "with `bucket`, `min/max_percentile`, or `max_rank` — those "
+                "filters require rankable=True on every selected DM. See "
+                "`docs://guide/conventions` (DM family gating)."
             ),
         )] = None,
         has_p_value: Annotated[bool | None, Field(
             description=(
                 "Filter to DMs that carry statistical p-values. Set to True "
-                "before using `significant_only` or `max_adjusted_p_value` on "
+                "before using `significant_only` / `max_adjusted_p_value` on "
                 "drill-downs. No DM in the current KG carries p-values, so "
-                "has_p_value=True returns zero rows today — kept available "
-                "because the drill-down p-value filters raise when no "
-                "selected DM supports them."
+                "has_p_value=True returns zero rows — kept because drill-down "
+                "p-value filters raise when no selected DM supports them."
             ),
         )] = None,
         summary: Annotated[bool, Field(
@@ -4927,23 +4921,21 @@ def register_tools(mcp: FastMCP):
         )] = 0,
     ) -> ListDerivedMetricsResponse:
         """Discover DerivedMetric (DM) nodes — column-level scalar summaries
-        of gene behavior (e.g. rhythmicity flags, diel amplitudes,
-        darkness-survival class) that sit alongside DE and gene clusters as
-        non-DE evidence.
+        of gene behavior (rhythmicity flags, diel amplitudes,
+        darkness-survival class) that sit alongside DE and clusters as
+        non-DE evidence. Pre-flight before any DM drill-down.
 
-        Call this first, before `gene_derived_metrics` or the three
-        `genes_by_{kind}_metric` drill-downs. Inspect `value_kind` (routes
-        you to the right drill-down), `rankable` (gates bucket / percentile
-        / rank filters), `has_p_value` (gates significance filters), and
-        `allowed_categories` (for categorical DMs) here — drill-down tools
-        will raise if you pass filters that the selected DM set doesn't
-        support.
+        Inspect `value_kind` (routes to the right drill-down), `rankable`
+        (gates bucket / percentile / rank filters), `has_p_value` (gates
+        significance filters), and `allowed_categories` (categorical DMs)
+        here — drill-down tools raise if a passed filter is not supported
+        by every selected DM. See `docs://guide/conventions` for the full
+        DM family gating contract.
 
-        After this tool, drill in via:
-        - gene_derived_metrics(locus_tags=[...]) for per-gene DM lookup across all kinds
-        - genes_by_numeric_metric(derived_metric_ids=[id], ...) for numeric drill-down
-        - genes_by_boolean_metric(derived_metric_ids=[id], ...) for flag drill-down
-        - genes_by_categorical_metric(derived_metric_ids=[id], ...) for categorical drill-down
+        Routing: `gene_derived_metrics(locus_tags=[...])` for per-gene
+        lookup across all kinds; `genes_by_numeric_metric` /
+        `genes_by_boolean_metric` / `genes_by_categorical_metric` for
+        kind-specific drill-downs.
         """
         await ctx.info(f"list_derived_metrics search_text={search_text!r} "
                        f"organism={organism} limit={limit}")
@@ -5087,13 +5079,14 @@ def register_tools(mcp: FastMCP):
         offset: Annotated[int, Field(
             description="Number of results to skip for pagination.", ge=0)] = 0,
     ) -> GeneClustersByGeneResponse:
-        """Find which gene clusters contain the given genes.
+        """Look up cluster memberships for a gene batch — one row per
+        (gene × cluster) with analysis context (`analysis_id`,
+        `analysis_name`). Single-organism enforced. Reports `not_found`
+        (locus_tag absent from KG) and `not_matched` (in KG but no cluster
+        memberships after filters).
 
-        Gene-centric lookup: 'what clusters are these genes in?'
-        Single organism enforced. One row per gene × cluster.
-
-        Use list_clustering_analyses for discovery by text search.
-        Use genes_in_cluster to drill into a cluster's full membership.
+        Routing: cluster discovery via `list_clustering_analyses`; drill
+        into a cluster's full membership via `genes_in_cluster`.
         """
         await ctx.info(f"gene_clusters_by_gene locus_tags={locus_tags} "
                        f"organism={organism}")
@@ -5218,21 +5211,25 @@ def register_tools(mcp: FastMCP):
             description="Pagination offset (starting row, 0-indexed).", ge=0,
         )] = 0,
     ) -> GeneDerivedMetricsResponse:
-        """Polymorphic `value` column — branch on `value_kind` per row; consult `list_derived_metrics(value_kind=...)` first to know which DMs exist and whether numeric rows carry rank/percentile/bucket extras (rankable gate) or `adjusted_p_value`/`significant` (has_p_value gate).
+        """Look up DerivedMetric annotations for a gene batch — one row per
+        (gene × DM), polymorphic `value` (float on numeric / `'true'`/`'false'`
+        on boolean / category string on categorical). Numeric extras
+        (`rank_by_metric`, `metric_percentile`, `metric_bucket`) populate only
+        on rankable parent DMs; `adjusted_p_value` / `significant` only on
+        has_p_value parent DMs (none in the current KG). Single-organism
+        enforced.
 
-        Gene-centric batch lookup for DerivedMetric annotations — one row
-        per gene × DM. `value` is `float` on numeric rows, `'true'`/'false'`
-        on boolean rows, category string on categorical rows. Numeric extras
-        (rank_by_metric, metric_percentile, metric_bucket) are populated
-        only when the parent DM is rankable; null otherwise. Same gate for
-        adjusted_p_value / significant on has_p_value DMs (none in the
-        current KG).
+        Empty results are diagnosable via `not_found` (locus_tag absent from
+        KG) and `not_matched` (in KG but no DM rows after filters — includes
+        kind-mismatch when `value_kind` is set). Pre-flight via
+        `list_derived_metrics(value_kind=...)` to see which DMs touch your
+        genes and whether they are rankable / has_p_value. See
+        `docs://guide/conventions` for the full DM family gating contract.
 
-        Single organism enforced. not_found (locus_tag absent from KG) and
-        not_matched (in KG but no DM rows after filters — includes
-        kind-mismatch when value_kind is set) make empty rows diagnosable.
-        For edge-level numeric filters (bucket / percentile / rank / value
-        thresholds), pivot to genes_by_numeric_metric.
+        Routing: edge-level filters (bucket / percentile / rank / value
+        thresholds) live on `genes_by_numeric_metric`; flag-level filters on
+        `genes_by_boolean_metric`; category filters on
+        `genes_by_categorical_metric`.
         """
         await ctx.info(f"gene_derived_metrics locus_tags={locus_tags} "
                        f"organism={organism}")
@@ -5350,7 +5347,7 @@ def register_tools(mcp: FastMCP):
         genes_per_cluster_median: float = Field(
             description="Median gene count across clusters")
         not_found_clusters: list[str] = Field(default_factory=list,
-            description="Cluster IDs not found in KG")
+            description="Input cluster_ids not found in KG")
         not_matched_clusters: list[str] = Field(default_factory=list,
             description="Clusters found but no members after organism filter")
         not_matched_organism: str | None = Field(default=None,
@@ -5393,13 +5390,13 @@ def register_tools(mcp: FastMCP):
         offset: Annotated[int, Field(
             description="Number of results to skip for pagination.", ge=0)] = 0,
     ) -> GenesInClusterResponse:
-        """Get member genes of gene clusters.
+        """Drill into gene cluster members — one row per (gene × cluster).
+        Provide `cluster_ids` OR `analysis_id` (mutually exclusive);
+        passing an `analysis_id` returns every cluster's members in one
+        call.
 
-        Takes cluster IDs or an analysis ID and returns member genes.
-        One row per gene × cluster. Provide cluster_ids OR analysis_id (not both).
-
-        For analysis discovery, use list_clustering_analyses first.
-        For gene → cluster direction, use gene_clusters_by_gene.
+        Routing: analysis discovery via `list_clustering_analyses`; gene →
+        cluster direction via `gene_clusters_by_gene`.
         """
         await ctx.info(f"genes_in_cluster cluster_ids={cluster_ids} "
                        f"analysis_id={analysis_id} organism={organism}")
@@ -5858,9 +5855,8 @@ def register_tools(mcp: FastMCP):
         # Full DM (precomputed dm.value_*)
         dm_value_min: float | None = Field(
             default=None,
-            description="Full-DM min (precomputed `dm.value_min`). Always "
-                        "populated for numeric DMs after the 2026-04-26 KG "
-                        "rebuild.")
+            description="Full-DM min (precomputed `dm.value_min`). Populated "
+                        "on every numeric DM.")
         dm_value_q1: float | None = Field(
             default=None,
             description="Full-DM Q1 (precomputed `dm.value_q1`).")
@@ -6067,10 +6063,9 @@ def register_tools(mcp: FastMCP):
             description="Metric-type tags (e.g. ['damping_ratio', "
                         "'diel_amplitude_protein_log2']). Unions every DM "
                         "carrying that tag, then narrows by scoping filters. "
-                        "Same tag can appear across organisms (e.g. "
-                        "'cell_abundance_biovolume_normalized' is on both "
-                        "MIT9312 and MIT9313 today). Mutually exclusive with "
-                        "`derived_metric_ids`.",
+                        "Same tag can span organisms / publications — pin one "
+                        "specific DM via `derived_metric_ids` instead. "
+                        "Mutually exclusive with `derived_metric_ids`.",
         )] = None,
         # ── DM-scoping filters (intersected with selection) ─────────────
         organism: Annotated[str | None, Field(
@@ -6133,9 +6128,8 @@ def register_tools(mcp: FastMCP):
         bucket: Annotated[list[str] | None, Field(
             description="Bucket label(s) — subset of "
                         "{'top_decile','top_quartile','mid','low'}. "
-                        "**Rankable-gated.** Today's KG buckets correspond to "
-                        "decile / quartile splits computed at import time per "
-                        "DM.",
+                        "**Rankable-gated.** Buckets are decile / quartile "
+                        "splits computed at import time per DM.",
         )] = None,
         max_rank: Annotated[int | None, Field(
             description="Cap on `r.rank_by_metric` (1 = highest). Use for "
@@ -6145,7 +6139,7 @@ def register_tools(mcp: FastMCP):
         # ── Edge-level filters: HAS_P_VALUE-GATED ───────────────────────
         significant_only: Annotated[bool, Field(
             description="Filter to `r.significant=true`. **has_p_value-gated** "
-                        "— raises against today's KG (no DM has p-values yet). "
+                        "— raises in the current KG (no DM has p-values yet). "
                         "Forward-compat surface; check "
                         "`list_derived_metrics(has_p_value=True)` before using.",
         )] = False,
@@ -6179,21 +6173,25 @@ def register_tools(mcp: FastMCP):
             ge=0,
         )] = 0,
     ) -> GenesByNumericMetricResponse:
-        """Pass `derived_metric_ids` XOR `metric_types` (one required); rankable-gated filters (`bucket`, `min/max_percentile`, `max_rank`) raise if every selected DM has `rankable=False` and soft-exclude on mixed input — inspect `list_derived_metrics(value_kind='numeric', rankable=True)` first to see which DMs support which filters.
+        """Drill into numeric DerivedMetric edges — one row per (gene × DM).
+        `value` (float) always populated; `rank_by_metric` / `metric_percentile`
+        / `metric_bucket` populate only on rankable DMs (null otherwise — same
+        row shape as `gene_derived_metrics`). Cross-organism by design.
 
-        Numeric DM drill-down — one row per gene × DM. `r.value` (float) is
-        always returned; `rank_by_metric` / `metric_percentile` /
-        `metric_bucket` are populated only on rows from rankable DMs (null
-        otherwise — same shape as `gene_derived_metrics`). Cross-organism by
-        design; envelope `by_organism` and per-row `organism_name` make
-        cross-strain rows self-describing. The `by_metric` envelope rollup
-        pairs filtered-slice value distribution with full-DM distribution
-        (precomputed) so callers can read "your top-decile slice 12.2-25.3
-        out of full DM range 0-28" directly.
+        Selection is `derived_metric_ids` XOR `metric_types` (exactly one
+        required). Rankable-gated filters (`bucket`, `min/max_percentile`,
+        `max_rank`) raise on all-non-rankable selection, soft-exclude on
+        mixed input. `has_p_value`-gated filters (`significant_only`,
+        `max_adjusted_p_value`) raise in the current KG (no DM carries
+        p-values). Pre-flight via
+        `list_derived_metrics(value_kind='numeric', rankable=True)`. See
+        `docs://guide/conventions` for the full DM family gating contract.
 
-        `excluded_derived_metrics` + `warnings` envelope keys are the
-        primary diagnostic when a real DM produces zero rows; check these
-        before assuming the result is empty for biological reasons.
+        The `by_metric` envelope rollup pairs filtered-slice value
+        distribution with full-DM distribution (precomputed dm.value_*) so
+        callers can read "top-decile slice 12.2-25.3 out of full DM range
+        0-28" directly. `excluded_derived_metrics` + `warnings` are the
+        primary diagnostic when a real DM produces zero rows.
         """
         selection_size = (
             len(derived_metric_ids) if derived_metric_ids is not None
@@ -6321,7 +6319,8 @@ def register_tools(mcp: FastMCP):
             description="Rows in filtered slice with r.value='true'.")
         false_count: int = Field(
             description="Rows in filtered slice with r.value='false' "
-                        "(always 0 today — positive-only KG storage).")
+                        "(always 0 in the current KG — positive-only "
+                        "DM storage).")
         # Full DM (precomputed)
         dm_total_gene_count: int = Field(
             description="Full-DM total gene count (precomputed "
@@ -6331,7 +6330,8 @@ def register_tools(mcp: FastMCP):
                         "`dm.flag_true_count`).")
         dm_false_count: int = Field(
             description="Full-DM negative tally (precomputed "
-                        "`dm.flag_false_count` — always 0 today).")
+                        "`dm.flag_false_count` — always 0 in the current KG, "
+                        "positive-only DM storage).")
 
     class GenesByBooleanMetricResult(BaseModel):
         # Identity / routing (5)
@@ -6353,11 +6353,11 @@ def register_tools(mcp: FastMCP):
             description="Always 'boolean' for this tool; kept for cross-tool "
                         "row-shape consistency with `genes_by_numeric_metric`.")
         rankable: bool = Field(
-            description="DM-level rankable flag (always False today for "
-                        "boolean DMs).")
+            description="DM-level rankable flag (always False for boolean "
+                        "DMs in the current KG).")
         has_p_value: bool = Field(
-            description="DM-level p-value flag (always False today for "
-                        "boolean DMs).")
+            description="DM-level p-value flag (always False for boolean "
+                        "DMs in the current KG).")
         # Edge value (1)
         value: str = Field(
             description="'true' or 'false' (string-typed bool — see KG-spec "
@@ -6418,7 +6418,8 @@ def register_tools(mcp: FastMCP):
         by_value: list[GenesByBooleanMetricValueBreakdown] = Field(
             default_factory=list,
             description="Frequency rollup of `r.value` across surviving rows. "
-                        "Today every row is 'true' (positive-only KG storage).")
+                        "Every row is 'true' in the current KG (positive-only "
+                        "DM storage).")
         top_categories: list[GenesByNumericMetricCategoryBreakdown] = Field(
             default_factory=list, description="Top 5 gene categories by count.")
         by_metric: list[GenesByBooleanMetricBreakdown] = Field(
@@ -6484,8 +6485,8 @@ def register_tools(mcp: FastMCP):
                         "['vesicle_proteome_member', "
                         "'periodic_in_coculture_LD']). Unions every DM "
                         "carrying that tag, then narrows by scoping filters. "
-                        "Same tag can appear across organisms (e.g. "
-                        "'vesicle_proteome_member' is on both MED4 + MIT9313). "
+                        "Same tag can span organisms / publications — pin "
+                        "one specific DM via `derived_metric_ids` instead. "
                         "Mutually exclusive with `derived_metric_ids`.",
         )] = None,
         # ── DM-scoping filters (intersected with selection) ─────────────
@@ -6527,12 +6528,11 @@ def register_tools(mcp: FastMCP):
         # ── Edge-level filter (kind-specific) ───────────────────────────
         flag: Annotated[bool | None, Field(
             description="Filter on `r.value`: True keeps `'true'` edges, "
-                        "False keeps `'false'` edges. Coerced to the "
-                        "string-typed bool stored in the KG (BioCypher "
-                        "constraint). **flag=False returns zero rows today** "
-                        "— current KG stores only positive (true) edges; "
-                        "inspect `by_metric[*].dm_false_count` (always 0 "
-                        "today) before assuming a gene is 'not flagged'.",
+                        "False keeps `'false'` edges. **flag=False returns "
+                        "zero rows in the current KG** — DM layer stores only "
+                        "positive (true) edges; inspect "
+                        "`by_metric[*].dm_false_count` (always 0) before "
+                        "assuming a gene is 'not flagged'.",
         )] = None,
         # ── Result-size controls ────────────────────────────────────────
         summary: Annotated[bool, Field(
@@ -6558,25 +6558,30 @@ def register_tools(mcp: FastMCP):
             ge=0,
         )] = 0,
     ) -> GenesByBooleanMetricResponse:
-        """Pass `derived_metric_ids` XOR `metric_types` (one required); wrong-kind IDs (numeric / categorical) surface silently in `not_found_ids` — inspect `list_derived_metrics(value_kind='boolean')` first to pick valid boolean DMs.
+        """Drill into boolean DerivedMetric edges — one row per (gene × DM ×
+        edge value). `value` is the string-typed bool (`'true'` / `'false'`).
+        Cross-organism by design.
 
-        Boolean DM drill-down — one row per gene × DM × edge value. `r.value`
-        is the string-typed bool ('true' / 'false'). Cross-organism by
-        design; envelope `by_organism` and per-row `organism_name` make
-        cross-strain rows self-describing. The `by_metric` envelope rollup
-        pairs filtered-slice true/false tallies with full-DM precomputed
-        counts (`dm_true_count`, `dm_false_count`) so callers can read "32
-        of 32 MED4 vesicle-proteome members" directly.
+        Selection is `derived_metric_ids` XOR `metric_types` (exactly one
+        required); wrong-kind IDs (numeric / categorical) surface silently
+        in `not_found_ids`. Pre-flight via
+        `list_derived_metrics(value_kind='boolean')` to pick valid boolean
+        DMs. See `docs://guide/conventions` for the full DM family gating
+        contract.
 
-        **Positive-only storage gotcha:** every current boolean DM has
-        `dm.flag_false_count=0`; `flag=False` returns zero rows today. The
-        `by_metric[*].dm_false_count` echo makes this self-evident without
-        a follow-up call.
+        **Positive-only storage gotcha:** the DM layer stores only
+        `flag=True` edges, so `flag=False` returns 0 rows; every current
+        boolean DM has `dm.flag_false_count=0`. The `by_metric[*]` rollup
+        echoes that count so absence is self-evident without a follow-up.
+        Tested-absent semantics are not currently representable on the DM
+        side (distinct from the metabolomics layer, which does store both).
+        See `docs://guide/conventions`.
 
-        `excluded_derived_metrics` and `warnings` are always `[]` (no
-        rankable / has_p_value gates apply to boolean DMs); kept as
-        envelope keys for cross-tool shape consistency with
-        `genes_by_numeric_metric`.
+        The `by_metric` envelope rollup pairs filtered-slice true/false
+        tallies with full-DM precomputed counts so callers can read "32 of
+        32 MED4 vesicle-proteome members" directly.
+        `excluded_derived_metrics` / `warnings` are always [] here (no
+        gates apply); kept for envelope-shape consistency.
         """
         selection_size = (
             len(derived_metric_ids) if derived_metric_ids is not None
@@ -6719,11 +6724,11 @@ def register_tools(mcp: FastMCP):
                         "cross-tool row-shape consistency with "
                         "`genes_by_numeric_metric`.")
         rankable: bool = Field(
-            description="DM-level rankable flag (always False today for "
-                        "categorical DMs).")
+            description="DM-level rankable flag (always False for categorical "
+                        "DMs in the current KG).")
         has_p_value: bool = Field(
-            description="DM-level p-value flag (always False today for "
-                        "categorical DMs).")
+            description="DM-level p-value flag (always False for categorical "
+                        "DMs in the current KG).")
         # Edge value (1)
         value: str = Field(
             description="Category label (one of the parent DM's "
@@ -6853,10 +6858,9 @@ def register_tools(mcp: FastMCP):
                         "['predicted_subcellular_localization', "
                         "'darkness_survival_class']). Unions every DM "
                         "carrying that tag, then narrows by scoping filters. "
-                        "Same tag can appear across organisms (e.g. "
-                        "'predicted_subcellular_localization' is on both "
-                        "MED4 + MIT9313). Mutually exclusive with "
-                        "`derived_metric_ids`.",
+                        "Same tag can span organisms / publications — pin "
+                        "one specific DM via `derived_metric_ids` instead. "
+                        "Mutually exclusive with `derived_metric_ids`.",
         )] = None,
         # ── DM-scoping filters (intersected with selection) ─────────────
         organism: Annotated[str | None, Field(
@@ -6925,25 +6929,25 @@ def register_tools(mcp: FastMCP):
             ge=0,
         )] = 0,
     ) -> GenesByCategoricalMetricResponse:
-        """Pass `derived_metric_ids` XOR `metric_types` (one required); `categories` must be a subset of the union of selected DMs' `allowed_categories` (raises with the allowed set listed otherwise) — inspect `list_derived_metrics(value_kind='categorical')` first to see each DM's allowed set.
+        """Drill into categorical DerivedMetric edges — one row per
+        (gene × DM × edge value). `value` is a category label. Cross-organism
+        by design.
 
-        Categorical DM drill-down — one row per gene × DM × edge value.
-        `r.value` is a category label. Cross-organism by design; envelope
-        `by_organism` and per-row `organism_name` make cross-strain rows
-        self-describing. The `by_metric` envelope rollup pairs filtered-slice
-        category histogram (`by_category`) with full-DM precomputed
-        histogram (`dm_by_category`) plus the schema-declared
-        `allowed_categories` so callers can detect declared-but-unobserved
-        categories without an extra call.
+        Selection is `derived_metric_ids` XOR `metric_types` (exactly one
+        required); wrong-kind IDs (numeric / boolean) surface silently in
+        `not_found_ids`. The `categories` filter must be a subset of the
+        union of selected DMs' `allowed_categories` — unknown values raise
+        `ValueError` listing the allowed set. Pre-flight via
+        `list_derived_metrics(value_kind='categorical')` to see each DM's
+        allowed set. See `docs://guide/conventions` for the full DM family
+        gating contract.
 
-        Wrong-kind IDs (numeric / boolean) surface silently in
-        `not_found_ids` — inspect `list_derived_metrics(value_kind='categorical')`
-        first to pick valid categorical DMs.
-
-        `excluded_derived_metrics` and `warnings` are always `[]` (no
-        rankable / has_p_value gates apply to categorical DMs); kept as
-        envelope keys for cross-tool shape consistency with
-        `genes_by_numeric_metric`.
+        The `by_metric` envelope rollup pairs filtered-slice category
+        histogram (`by_category`) with full-DM precomputed histogram
+        (`dm_by_category`) plus the schema-declared `allowed_categories`,
+        so callers can detect declared-but-unobserved categories without an
+        extra call. `excluded_derived_metrics` / `warnings` are always []
+        here (no gates apply); kept for envelope-shape consistency.
         """
         selection_size = (
             len(derived_metric_ids) if derived_metric_ids is not None

@@ -2,32 +2,37 @@
 
 ## What it does
 
-Pass `derived_metric_ids` XOR `metric_types` (one required); wrong-kind IDs (numeric / categorical) surface silently in `not_found_ids` — inspect `list_derived_metrics(value_kind='boolean')` first to pick valid boolean DMs.
+Drill into boolean DerivedMetric edges — one row per (gene × DM ×
+edge value). `value` is the string-typed bool (`'true'` / `'false'`).
+Cross-organism by design.
 
-Boolean DM drill-down — one row per gene × DM × edge value. `r.value`
-is the string-typed bool ('true' / 'false'). Cross-organism by
-design; envelope `by_organism` and per-row `organism_name` make
-cross-strain rows self-describing. The `by_metric` envelope rollup
-pairs filtered-slice true/false tallies with full-DM precomputed
-counts (`dm_true_count`, `dm_false_count`) so callers can read "32
-of 32 MED4 vesicle-proteome members" directly.
+Selection is `derived_metric_ids` XOR `metric_types` (exactly one
+required); wrong-kind IDs (numeric / categorical) surface silently
+in `not_found_ids`. Pre-flight via
+`list_derived_metrics(value_kind='boolean')` to pick valid boolean
+DMs. See `docs://guide/conventions` for the full DM family gating
+contract.
 
-**Positive-only storage gotcha:** every current boolean DM has
-`dm.flag_false_count=0`; `flag=False` returns zero rows today. The
-`by_metric[*].dm_false_count` echo makes this self-evident without
-a follow-up call.
+**Positive-only storage gotcha:** the DM layer stores only
+`flag=True` edges, so `flag=False` returns 0 rows; every current
+boolean DM has `dm.flag_false_count=0`. The `by_metric[*]` rollup
+echoes that count so absence is self-evident without a follow-up.
+Tested-absent semantics are not currently representable on the DM
+side (distinct from the metabolomics layer, which does store both).
+See `docs://guide/conventions`.
 
-`excluded_derived_metrics` and `warnings` are always `[]` (no
-rankable / has_p_value gates apply to boolean DMs); kept as
-envelope keys for cross-tool shape consistency with
-`genes_by_numeric_metric`.
+The `by_metric` envelope rollup pairs filtered-slice true/false
+tallies with full-DM precomputed counts so callers can read "32 of
+32 MED4 vesicle-proteome members" directly.
+`excluded_derived_metrics` / `warnings` are always [] here (no
+gates apply); kept for envelope-shape consistency.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | derived_metric_ids | list[string] \| None | None | Boolean DerivedMetric node IDs. Use when the same `metric_type` appears across organisms / publications and you need to pin one. Discover IDs via `list_derived_metrics(value_kind='boolean')`. Mutually exclusive with `metric_types`. Wrong-kind IDs (numeric / categorical) surface silently in `not_found_ids`. |
-| metric_types | list[string] \| None | None | Boolean metric-type tags (e.g. ['vesicle_proteome_member', 'periodic_in_coculture_LD']). Unions every DM carrying that tag, then narrows by scoping filters. Same tag can appear across organisms (e.g. 'vesicle_proteome_member' is on both MED4 + MIT9313). Mutually exclusive with `derived_metric_ids`. |
+| metric_types | list[string] \| None | None | Boolean metric-type tags (e.g. ['vesicle_proteome_member', 'periodic_in_coculture_LD']). Unions every DM carrying that tag, then narrows by scoping filters. Same tag can span organisms / publications — pin one specific DM via `derived_metric_ids` instead. Mutually exclusive with `derived_metric_ids`. |
 | organism | string \| None | None | Organism to scope the DM set to. Accepts short strain code ('MED4', 'NATL2A', 'MIT9313') or full name. Case-insensitive substring match. Single-organism is **not** enforced — omit to drill across all organisms a metric_type spans. |
 | locus_tags | list[string] \| None | None | Restrict drill-down to a specific gene set (e.g. DE hits from `differential_expression_by_gene`). Filter on `g.locus_tag IN $locus_tags` post-MATCH. Genes with no edge for the selected DM produce no row. |
 | experiment_ids | list[string] \| None | None | Scope to DMs from one or more experiments. |
@@ -36,7 +41,7 @@ envelope keys for cross-tool shape consistency with
 | treatment_type | list[string] \| None | None | Treatment type(s) (e.g. ['diel']). ANY-overlap. Case-insensitive. |
 | background_factors | list[string] \| None | None | Background factor(s) (e.g. ['axenic', 'light']). ANY-overlap. Case-insensitive. |
 | growth_phases | list[string] \| None | None | Growth phase(s). ANY-overlap. Case-insensitive. |
-| flag | bool \| None | None | Filter on `r.value`: True keeps `'true'` edges, False keeps `'false'` edges. Coerced to the string-typed bool stored in the KG (BioCypher constraint). **flag=False returns zero rows today** — current KG stores only positive (true) edges; inspect `by_metric[*].dm_false_count` (always 0 today) before assuming a gene is 'not flagged'. |
+| flag | bool \| None | None | Filter on `r.value`: True keeps `'true'` edges, False keeps `'false'` edges. **flag=False returns zero rows in the current KG** — DM layer stores only positive (true) edges; inspect `by_metric[*].dm_false_count` (always 0) before assuming a gene is 'not flagged'. |
 | summary | bool | False | Return summary fields only (counts, breakdowns, by_metric, diagnostics). Sugar for limit=0; results=[]. |
 | verbose | bool | False | Include heavy text fields per row: gene_function_description, gene_summary, plus DM context (metric_type, field_description, unit, compartment, experiment_id, publication_doi, treatment_type, background_factors, treatment, light_condition, experimental_context). |
 | limit | int | 5 | Max rows to return. Paginate with `offset`. Use `summary=True` for summary-only (sets limit=0). |
@@ -59,7 +64,7 @@ total_matching, total_derived_metrics, total_genes, by_organism, by_compartment,
 - **by_compartment** (list[GenesByNumericMetricCompartmentBreakdown]): Rows per compartment.
 - **by_publication** (list[GenesByNumericMetricPublicationBreakdown]): Rows per publication.
 - **by_experiment** (list[GenesByNumericMetricExperimentBreakdown]): Rows per experiment.
-- **by_value** (list[GenesByBooleanMetricValueBreakdown]): Frequency rollup of `r.value` across surviving rows. Today every row is 'true' (positive-only KG storage).
+- **by_value** (list[GenesByBooleanMetricValueBreakdown]): Frequency rollup of `r.value` across surviving rows. Every row is 'true' in the current KG (positive-only DM storage).
 - **top_categories** (list[GenesByNumericMetricCategoryBreakdown]): Top 5 gene categories by count.
 - **by_metric** (list[GenesByBooleanMetricBreakdown]): Per-DM rollup: filtered-slice true/false counts + full-DM precomputed tallies. Sorted by count desc.
 - **genes_per_metric_max** (int): Largest per-DM gene count.
@@ -87,8 +92,8 @@ total_matching, total_derived_metrics, total_genes, by_organism, by_compartment,
 | derived_metric_id | string | Unique parent-DM id. |
 | name | string | DM human label. |
 | value_kind | string | Always 'boolean' for this tool; kept for cross-tool row-shape consistency with `genes_by_numeric_metric`. |
-| rankable | bool | DM-level rankable flag (always False today for boolean DMs). |
-| has_p_value | bool | DM-level p-value flag (always False today for boolean DMs). |
+| rankable | bool | DM-level rankable flag (always False for boolean DMs in the current KG). |
+| has_p_value | bool | DM-level p-value flag (always False for boolean DMs in the current KG). |
 | value | string | 'true' or 'false' (string-typed bool — see KG-spec BioCypher constraint). |
 
 **Verbose-only fields** (included when `verbose=True`):
@@ -247,9 +252,9 @@ genes_by_boolean_metric (no organism filter) → split via envelope by_organism 
 
 ## Common mistakes
 
-- Positive-only storage in current KG. `flag=False` returns zero rows today because every materialized boolean edge is `r.value="true"` (`dm.flag_false_count=0` on every current DM). Inspect `by_metric[*].dm_false_count` (always 0 today) before assuming a gene is "not flagged false". Mirrors the numeric tool's "p-value filter on current KG" gotcha — surface exists for future DMs.
+- Positive-only DM storage. `flag=False` returns zero rows because every materialized boolean edge is `r.value="true"` (`dm.flag_false_count=0` on every current DM). Inspect `by_metric[*].dm_false_count` before assuming a gene is "not flagged false". Mirrors the numeric tool's "p-value filter" gotcha — surface exists for future DMs. Contrast with metabolomics `metabolites_by_flags_assay`, which stores both true and false.
 
-- Sparse `rankable` / `has_p_value` echoes. Both are always `False` on every row from current boolean DMs — kept for cross-tool row-shape consistency with `genes_by_numeric_metric`, not because this tool reads them as a meaningful signal. Don't gate downstream logic on them.
+- Sparse `rankable` / `has_p_value` echoes. Both are always `False` on every row from boolean DMs in the current KG — kept for cross-tool row-shape consistency with `genes_by_numeric_metric`, not because this tool reads them as a meaningful signal. Don't gate downstream logic on them.
 
 ```mistake
 genes_by_boolean_metric(derived_metric_ids=['derived_metric:...:damping_ratio'])
@@ -259,7 +264,7 @@ genes_by_boolean_metric(derived_metric_ids=['derived_metric:...:damping_ratio'])
 genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
 ```
 
-- See `docs://analysis/derived_metrics` for the DM family overview. Note: `flag=False` returns 0 rows on every current DM (positive-only KG storage); contrast with metabolomics `metabolites_by_flags_assay` which stores both true and false.
+- See `docs://analysis/derived_metrics` for the DM family overview. Note: `flag=False` returns 0 rows on every current DM (positive-only DM storage); contrast with metabolomics `metabolites_by_flags_assay`, which stores both true and false.
 
 ## Package import equivalent
 

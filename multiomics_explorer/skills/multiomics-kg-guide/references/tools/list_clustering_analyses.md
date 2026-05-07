@@ -2,16 +2,16 @@
 
 ## What it does
 
-Browse, search, and filter clustering analyses.
+Browse, search, and filter clustering analyses — each analysis
+groups related gene clusters from one study / organism, with the
+cluster children inlined per result. Lucene full-text over analysis
+name, cluster names, descriptions, experimental_context. See
+`docs://guide/conventions` for Lucene scoring.
 
-Each analysis groups related gene clusters from one study/organism.
-Inline clusters are included in each result row.
-
-After this tool, drill in via:
-- genes_in_cluster(cluster_ids=[id]) for per-cluster member genes
-- genes_in_cluster(analysis_id=...) for all clusters from one analysis
-- gene_clusters_by_gene(locus_tags=[...], analysis_ids=[id]) to scope a
-  per-gene cluster lookup to this analysis
+Routing: `genes_in_cluster(cluster_ids=[id])` for per-cluster
+members; `genes_in_cluster(analysis_id=...)` for all clusters in
+one analysis; `gene_clusters_by_gene(locus_tags=[...],
+analysis_ids=[id])` to scope a per-gene cluster lookup.
 
 ## Parameters
 
