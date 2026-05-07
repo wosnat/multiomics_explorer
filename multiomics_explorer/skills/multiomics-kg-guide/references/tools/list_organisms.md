@@ -2,27 +2,9 @@
 
 ## What it does
 
-List organisms in the knowledge graph, optionally filtered by name or compartment.
+List organisms with taxonomy, data-availability counts, organism_type, DM rollups, chemistry-capability rollups, and metabolomics-coverage rollup.
 
-Returns taxonomy, gene counts, publication counts, and organism_type
-for each organism. organism_type classifies each organism as
-'genome_strain', 'treatment', or 'reference_proteome_match'.
-Reference proteome match organisms also include reference_database
-and reference_proteome fields.
-
-Use the returned organism names as filter values in genes_by_function,
-resolve_gene, genes_by_ontology, list_publications, etc. The organism
-filter on those tools uses partial matching — "MED4",
-"Prochlorococcus MED4", and "Prochlorococcus" all work. The
-organism_names filter on this tool uses exact match (case-
-insensitive) on preferred_name; unknown names are reported in
-not_found.
-
-After this tool, scope deeper queries to the chosen organism: use the
-locus_tags filter on per-gene tools (gene_overview, gene_homologs)
-and the organism filter on gene_ontology_terms, list_experiments,
-and list_publications. Use list_filter_values for categorical
-field enumeration.
+Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Note that `organism_names=` on this tool is exact (case-insensitive) on `preferred_name`, while the `organism=` filter on most other tools is a substring match.
 
 ## Parameters
 
@@ -43,46 +25,46 @@ field enumeration.
 total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind, by_metric_type, by_compartment, by_metabolic_capability, by_measurement_capability, returned, offset, truncated, not_found, results
 ```
 
-- **total_entries** (int): Total organisms in the KG
-- **total_matching** (int): Organisms matching the filter (= total_entries when no filter)
-- **by_cluster_type** (list[OrgClusterTypeBreakdown]): Organism counts per cluster type over the matched set, sorted by count descending
-- **by_organism_type** (list[OrgTypeBreakdown]): Organism counts per type over the matched set, sorted by count descending
-- **by_value_kind** (list[OrgValueKindBreakdown]): DM value_kind frequency rollup across matched organisms. Each entry: {value_kind, count}.
-- **by_metric_type** (list[OrgMetricTypeBreakdown]): DM metric_type frequency rollup across matched organisms. Each entry: {metric_type, count}.
-- **by_compartment** (list[OrgCompartmentBreakdown]): Wet-lab compartment frequency rollup across matched organisms. Each entry: {compartment, count}.
+- **total_entries** (int): Total organisms in the KG.
+- **total_matching** (int): Organisms matching the filter (= total_entries when no filter).
+- **by_cluster_type** (list[OrgClusterTypeBreakdown]): Organism counts per cluster type over the matched set, sorted desc.
+- **by_organism_type** (list[OrgTypeBreakdown]): Organism counts per type over the matched set, sorted desc.
+- **by_value_kind** (list[OrgValueKindBreakdown]): DM value_kind frequency rollup across matched organisms.
+- **by_metric_type** (list[OrgMetricTypeBreakdown]): DM metric_type frequency rollup across matched organisms.
+- **by_compartment** (list[OrgCompartmentBreakdown]): Wet-lab compartment frequency rollup across matched organisms.
 - **by_metabolic_capability** (list[OrgMetabolicCapabilityBreakdown]): Top 10 organisms by metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites.
-- **by_measurement_capability** (OrgMeasurementCapability): Binary rollup of metabolomics measurement coverage across matched organisms: {has_metabolomics, no_metabolomics}. Today 4 organisms carry non-zero measured_metabolite_count out of ~37 total (Phase 1 plumbing — spec §6.4).
-- **returned** (int): Number of results returned
-- **offset** (int): Offset into full result set (e.g. 0)
-- **truncated** (bool): True if total_matching > offset + returned
-- **not_found** (list[string]): organism_names inputs that didn't match any organism (case-insensitive); [] when no filter
+- **by_measurement_capability** (OrgMeasurementCapability): Binary rollup of metabolomics measurement coverage across matched organisms: {has_metabolomics, no_metabolomics} (tool-specific deviation from list_/by_-style frequency rollups elsewhere — exactly two keys).
+- **returned** (int): Number of results returned.
+- **offset** (int): Offset into full result set.
+- **truncated** (bool): True if total_matching > offset + returned.
+- **not_found** (list[string]): organism_names inputs that didn't match any organism (case-insensitive); [] when no filter.
 
 ### Per-result fields
 
 | Field | Type | Description |
 |---|---|---|
 | organism_name | string | Display name (e.g. 'Prochlorococcus MED4'). Use for organism filters in other tools. |
-| organism_type | string | Classification: 'genome_strain', 'treatment', or 'reference_proteome_match' |
-| genus | string \| None (optional) | Genus (e.g. 'Prochlorococcus', 'Alteromonas') |
-| species | string \| None (optional) | Binomial species name (e.g. 'Prochlorococcus marinus') |
-| strain | string \| None (optional) | Strain identifier (e.g. 'MED4', 'EZ55') |
-| clade | string \| None (optional) | Ecotype clade, Prochlorococcus-specific (e.g. 'HLI', 'LLIV') |
-| ncbi_taxon_id | int \| None (optional) | NCBI Taxonomy ID for cross-referencing external databases (e.g. 59919) |
-| gene_count | int | Number of genes in the KG for this organism (e.g. 1976) |
-| publication_count | int | Number of publications studying this organism (e.g. 11) |
-| experiment_count | int | Total experiments across all publications (e.g. 46) |
-| treatment_types | list[string] (optional) | Distinct treatment types studied (e.g. ['coculture', 'light_stress', 'nitrogen_stress']) |
-| background_factors | list[string] (optional) | Distinct background factors across experiments (e.g. ['axenic', 'continuous_light', 'diel_cycle']) |
-| omics_types | list[string] (optional) | Distinct omics types available (e.g. ['RNASEQ', 'PROTEOMICS']) |
-| clustering_analysis_count | int (optional) | Number of clustering analyses for this organism (e.g. 4) |
-| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison', 'diel']) |
-| growth_phases | list[string] (optional) | Distinct growth phases across experiments (e.g. ['exponential', 'nutrient_limited']). Physiological state of the culture at sampling — timepoint-level, not gene-specific. |
-| derived_metric_count | int (optional) | Total DerivedMetric annotations on this organism's experiments (0 when none). |
+| organism_type | string | Classification: 'genome_strain', 'treatment', or 'reference_proteome_match'. |
+| genus | string \| None (optional) | Genus (e.g. 'Prochlorococcus', 'Alteromonas'). |
+| species | string \| None (optional) | Binomial species name (e.g. 'Prochlorococcus marinus'). |
+| strain | string \| None (optional) | Strain identifier (e.g. 'MED4', 'EZ55'). |
+| clade | string \| None (optional) | Ecotype clade, Prochlorococcus-specific (e.g. 'HLI', 'LLIV'). |
+| ncbi_taxon_id | int \| None (optional) | NCBI Taxonomy ID for cross-referencing external databases. |
+| gene_count | int | Number of genes in the KG for this organism. |
+| publication_count | int | Number of publications studying this organism. |
+| experiment_count | int | Total experiments across all publications. |
+| treatment_types | list[string] (optional) | Distinct treatment types studied (e.g. ['coculture', 'light_stress', 'nitrogen_stress']). |
+| background_factors | list[string] (optional) | Distinct background factors across experiments (e.g. ['axenic', 'continuous_light', 'diel_cycle']). |
+| omics_types | list[string] (optional) | Distinct omics types available (e.g. ['RNASEQ', 'PROTEOMICS']). |
+| clustering_analysis_count | int (optional) | Number of clustering analyses for this organism. |
+| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison', 'diel']). |
+| growth_phases | list[string] (optional) | Distinct growth phases across experiments (e.g. ['exponential', 'nutrient_limited']). Timepoint-level condition, not gene-specific. |
+| derived_metric_count | int (optional) | Total DerivedMetric annotations on this organism's experiments. 0 when none. |
 | derived_metric_value_kinds | list[string] (optional) | Subset of {numeric, boolean, categorical} present across this organism's DMs. Use to route to genes_by_{numeric,boolean,categorical}_metric. |
 | compartments | list[string] (optional) | Wet-lab compartments measured for this organism (e.g. ['whole_cell', 'vesicle']). |
-| reaction_count | int (optional) | Distinct reactions catalyzed by genes in this organism (e.g. 943). When > 0, drill in via list_metabolites(organism_names=[organism_name]) to enumerate metabolites this organism is capable of metabolizing. |
-| metabolite_count | int (optional) | Distinct metabolites this organism's genes can act on (e.g. 1039). Capability signal — does NOT mean these metabolites were measured. Today reflects gene catalysis only; will grow to include transport substrates when the TCDB-CAZy ontology ships, with no schema change. When > 0, drill in via list_metabolites(organism_names=[organism_name]). |
-| measured_metabolite_count | int (optional) | Distinct metabolites measured in this organism via any MetaboliteAssay (precomputed OrganismTaxon.measured_metabolite_count). Non-zero on 4 organisms today: MIT9301 (4 assays), MIT9313 (3), MIT0801 (2), MIT9303 (1). Different from metabolite_count (reaction-only chemistry capability). |
+| reaction_count | int (optional) | Distinct reactions catalyzed by genes in this organism. When > 0, drill in via list_metabolites(organism_names=[organism_name]). |
+| metabolite_count | int (optional) | Distinct metabolites this organism's genes can act on. Catalysis-capability signal (Gene → Reaction → Metabolite only); does NOT mean these metabolites were measured, and does NOT include transport-reach. When > 0, drill in via list_metabolites(organism_names=[organism_name]). |
+| measured_metabolite_count | int (optional) | Distinct metabolites measured in this organism via any MetaboliteAssay (precomputed OrganismTaxon.measured_metabolite_count). Different from metabolite_count (reaction-only chemistry capability). When > 0, drill in via list_metabolite_assays(organism=organism_name). |
 | derived_metric_gene_count | int \| None (optional) | Total gene-level DM annotation count (verbose-only). |
 | derived_metric_types | list[string] \| None (optional) | Distinct metric_type tags observed (verbose-only). |
 | reference_database | string \| None (optional) | Reference database used for matching (e.g. 'MarRef v6'). Only on reference_proteome_match organisms. |
@@ -92,14 +74,14 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 
 | Field | Type | Description |
 |---|---|---|
-| family | string \| None (optional) | Taxonomic family (e.g. 'Prochlorococcaceae') |
-| order | string \| None (optional) | Taxonomic order (e.g. 'Synechococcales') |
-| tax_class | string \| None (optional) | Taxonomic class (e.g. 'Cyanophyceae') |
-| phylum | string \| None (optional) | Taxonomic phylum (e.g. 'Cyanobacteriota') |
-| kingdom | string \| None (optional) | Taxonomic kingdom (e.g. 'Bacillati') |
-| superkingdom | string \| None (optional) | Taxonomic superkingdom (e.g. 'Bacteria') |
-| lineage | string \| None (optional) | Full NCBI taxonomy lineage string (e.g. 'cellular organisms; Bacteria; ...; Prochlorococcus marinus') |
-| cluster_count | int \| None (optional) | Total gene clusters across analyses (only with verbose=True, e.g. 35) |
+| family | string \| None (optional) | Taxonomic family (e.g. 'Prochlorococcaceae'). |
+| order | string \| None (optional) | Taxonomic order (e.g. 'Synechococcales'). |
+| tax_class | string \| None (optional) | Taxonomic class (e.g. 'Cyanophyceae'). |
+| phylum | string \| None (optional) | Taxonomic phylum (e.g. 'Cyanobacteriota'). |
+| kingdom | string \| None (optional) | Taxonomic kingdom (e.g. 'Bacillati'). |
+| superkingdom | string \| None (optional) | Taxonomic superkingdom (e.g. 'Bacteria'). |
+| lineage | string \| None (optional) | Full NCBI taxonomy lineage string. |
+| cluster_count | int \| None (optional) | Total gene clusters across analyses (verbose-only). |
 
 ## Few-shot examples
 
@@ -206,27 +188,19 @@ list_organisms (per-row metabolite_count > 0) → list_metabolites(organism_name
 
 - If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this organism.
 
-- gene_count and publication_count are counts of data in the KG, not biological totals
+- gene_count and publication_count are counts of data in the KG, not biological totals.
 
-- Organisms with gene_count=0 are parent/umbrella taxonomy nodes (e.g. genus-level 'Alteromonas')
+- Organisms with gene_count=0 are parent/umbrella taxonomy nodes (e.g. genus-level 'Alteromonas').
 
-- The organism filter in other tools uses partial matching — 'MED4', 'Prochlorococcus MED4', and 'Prochlorococcus' all work
+- reference_database and reference_proteome are sparse — only present on reference_proteome_match organisms, absent from others.
 
-- organism_names on this tool uses exact match (case-insensitive) on preferred_name — short forms like 'MED4' will not match. Pass canonical names from a prior list_organisms call.
+- organism_type values: 'genome_strain' (real genome assembly), 'treatment' (non-genomic coculture partners), 'reference_proteome_match' (identified via reference database matching).
 
-- not_found contains organism_names inputs whose preferred_name didn't match any OrganismTaxon (case-insensitive).
-
-- reference_database and reference_proteome are sparse — only present on reference_proteome_match organisms, absent from others
-
-- organism_type values: 'genome_strain' (real genome assembly), 'treatment' (non-genomic coculture partners), 'reference_proteome_match' (identified via reference database matching)
-
-- growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
-
-- `metabolite_count` counts catalysis capability only — distinct metabolites reachable through Gene → Reaction → Metabolite. Transport-reach (Gene → TcdbFamily → Metabolite) is not aggregated to the organism level here; per-metabolite organism reach including transport is available via `list_metabolites(organism_names=[...])`. Measurement-side coverage is the separate `measured_metabolite_count` field (populated on 4 organisms with metabolomics data). 0 does not mean the metabolite is absent from the KG.
+- `metabolite_count` counts catalysis capability only — distinct metabolites reachable through Gene → Reaction → Metabolite. Transport-reach (Gene → TcdbFamily → Metabolite) is not aggregated to the organism level; per-metabolite organism reach including transport is on `list_metabolites(organism_names=[...])`. Measurement-side coverage is the separate `measured_metabolite_count` field. metabolite_count=0 does not mean the metabolite is absent from the KG.
 
 - by_metabolic_capability is a top-10 ranking sorted by metabolite_count descending; organisms with zero chemistry are excluded. Use it on summary=True calls to identify chemistry-rich organisms before drilling in via list_metabolites(organism_names=[...]).
 
-- `measured_metabolite_count` is the count of distinct metabolites measured in this organism via any MetaboliteAssay — different from `metabolite_count` (reaction-only chemistry capability) and from `metabolite_count` on Gene/Publication/Experiment which are different rollups. The 4 organisms with non-zero `measured_metabolite_count` today are MIT9301 (4 assays), MIT9313 (3), MIT0801 (2), MIT9303 (1).
+- by_measurement_capability is a binary rollup ({has_metabolomics, no_metabolomics}) — tool-specific shape that deviates from the list[{key,count}] frequency rollups elsewhere. See docs://guide/conventions for the standard envelope shape.
 
 ## Package import equivalent
 

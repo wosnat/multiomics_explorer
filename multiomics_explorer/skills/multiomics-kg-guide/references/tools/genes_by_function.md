@@ -2,23 +2,18 @@
 
 ## What it does
 
-Search genes by functional annotation text.
+Free-text search across gene names, products, and functional descriptions. Lucene syntax (see docs://guide/conventions). Results ranked by relevance score.
 
-Full-text search across gene names, products, and functional
-descriptions. Supports Lucene syntax: quoted phrases, AND/OR,
-wildcards (*), fuzzy (~). Results ranked by relevance score.
-
-For ontology-based search, use genes_by_ontology.
-For gene details, use gene_overview.
+Routing: feed `locus_tag`s into `gene_overview` (data-availability triage), `gene_ontology_terms` (annotation drill-down), or `genes_by_ontology` for ontology-anchored search instead.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| search_text | string | — | Free-text query (Lucene syntax supported). E.g. 'photosystem', 'nitrogen AND transport', 'dnaN~'. |
+| search_text | string | — | Free-text query (Lucene syntax: quoted phrases, AND/OR, wildcards `*`, fuzzy `~`). E.g. 'photosystem', 'nitrogen AND transport', 'dnaN~'. See docs://guide/conventions for Lucene scoring details. |
 | organism | string \| None | None | Filter by organism (case-insensitive substring). E.g. 'MED4', 'Prochlorococcus MED4'. Use list_organisms to see valid values. |
 | category | string \| None | None | Filter by gene_category. E.g. 'Photosynthesis', 'Transport'. Use list_filter_values to see valid values. |
-| min_quality | int | 0 | Minimum annotation_quality (0..3 numeric encoding of annotation_state): 0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. Use 2 to require >=1 informative annotation source. Note: this field was redefined in May 2026 KG release. |
+| min_quality | int | 0 | Minimum annotation_quality (0..3 numeric encoding of `Gene.annotation_state`): 0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. Use 2 to skip hypothetical proteins; 3 for high-confidence. [AQ] Definition shifted in 2026-05 KG release; see docs://guide/conventions. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include function_description and gene_summary. |
 | limit | int | 5 | Max results. |
@@ -34,34 +29,34 @@ For gene details, use gene_overview.
 total_search_hits, total_matching, by_organism, by_category, score_max, score_median, returned, offset, truncated, results
 ```
 
-- **total_search_hits** (int): Total genes matching search text (before organism/category/quality filters)
-- **total_matching** (int): Total genes matching search + all filters
-- **by_organism** (list[FunctionOrganismBreakdown]): Gene counts per organism, sorted desc
-- **by_category** (list[FunctionCategoryBreakdown]): Gene counts per category, sorted desc
-- **score_max** (float | None): Highest relevance score (null if 0 matches)
-- **score_median** (float | None): Median relevance score (null if 0 matches)
-- **returned** (int): Number of results returned
-- **offset** (int): Offset into full result set (e.g. 0)
-- **truncated** (bool): True when total_matching > returned
+- **total_search_hits** (int): Total genes matching search text (before organism/category/quality filters).
+- **total_matching** (int): Total genes matching search + all filters.
+- **by_organism** (list[FunctionOrganismBreakdown]): Gene counts per organism, sorted desc.
+- **by_category** (list[FunctionCategoryBreakdown]): Gene counts per category, sorted desc.
+- **score_max** (float | None): Highest relevance score (null if 0 matches).
+- **score_median** (float | None): Median relevance score (null if 0 matches).
+- **returned** (int): Number of results returned.
+- **offset** (int): Offset into full result set.
+- **truncated** (bool): True when total_matching > returned.
 
 ### Per-result fields
 
 | Field | Type | Description |
 |---|---|---|
-| locus_tag | string | Gene locus tag (e.g. 'PMM0001') |
-| gene_name | string \| None (optional) | Gene name (e.g. 'dnaN') |
-| product | string \| None (optional) | Gene product (e.g. 'DNA polymerase III subunit beta') |
-| organism_name | string | Organism name (e.g. 'Prochlorococcus MED4') |
-| gene_category | string \| None (optional) | Functional category (e.g. 'Photosynthesis') |
-| annotation_quality | int | Annotation quality 0-3 (3=best) |
-| score | float | Fulltext relevance score |
+| locus_tag | string | Gene locus tag (e.g. 'PMM0001'). |
+| gene_name | string \| None (optional) | Gene name (e.g. 'dnaN'). |
+| product | string \| None (optional) | Gene product (e.g. 'DNA polymerase III subunit beta'). |
+| organism_name | string | Organism name (e.g. 'Prochlorococcus MED4'). |
+| gene_category | string \| None (optional) | Functional category (e.g. 'Photosynthesis'). |
+| annotation_quality | int | Annotation quality, 0..3 numeric encoding of `Gene.annotation_state` (informative-evidence count). 3=informative_multi, 2=informative_single, 1=catch_all_only, 0=no_evidence. [AQ] Definition shifted in 2026-05 KG release; see docs://guide/conventions. |
+| score | float | Lucene relevance score. |
 
 **Verbose-only fields** (included when `verbose=True`):
 
 | Field | Type | Description |
 |---|---|---|
-| function_description | string \| None (optional) | Functional description text |
-| gene_summary | string \| None (optional) | Combined gene annotation summary |
+| function_description | string \| None (optional) | Functional description text (verbose-only). |
+| gene_summary | string \| None (optional) | Combined gene annotation summary (verbose-only). |
 
 ## Few-shot examples
 
@@ -115,14 +110,14 @@ search_ontology → genes_by_ontology (ontology-first route, alternative to gene
 
 ## Common mistakes
 
-- annotation_quality is a 0..3 numeric encoding of annotation_state (informative-evidence count). 0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. Redefined in May 2026 KG release — old semantics conflated product-name quality. Existing min_quality filters silently shifted meaning.
+- annotation_quality / min_quality semantics shifted in 2026-05 KG release. Existing notebooks using min_quality may select a different gene set than before. See docs://guide/conventions.
 
 ```mistake
 genes_by_function(search_text='GO:0015977')
 ```
 
 ```correction
-genes_by_ontology(ontology='go_bp', organism='MED4', term_ids=['go:0015977']) for ontology term lookup (ontology + organism required); genes_by_function is for free-text search
+genes_by_ontology(ontology='go_bp', organism='MED4', term_ids=['go:0015977']) for ontology term lookup (ontology + organism required); genes_by_function is for free-text search.
 ```
 
 ```mistake
@@ -133,9 +128,9 @@ len(result['results'])  # to count matches
 result['total_matching']  # results may be truncated
 ```
 
-- Use summary=True to get organism/category breakdowns without fetching gene rows
+- Use summary=True to get organism/category breakdowns without fetching gene rows.
 
-- Use min_quality=2 to skip hypothetical proteins and get better-annotated results
+- Use min_quality=2 to skip hypothetical proteins and get better-annotated results.
 
 ## Package import equivalent
 

@@ -2,22 +2,11 @@
 
 ## What it does
 
-List differential expression experiments in the knowledge graph.
+List differential-expression experiments with rich breakdowns (organism, treatment, omics, table_scope, growth_phase, DM rollups, metabolomics rollups). Use `summary=true` to see only breakdowns.
 
-Returns summary breakdowns (by organism, treatment type, omics type,
-table scope) plus individual experiments. Use summary=true to see only
-breakdowns, then drill into detail with filters.
+table_scope is critical for interpreting missing genes — `'all_detected_genes'` keeps tested-absent rows (the `not_significant` bucket reflects real biology); `'significant_only'` collapses them. Use `table_scope=['all_detected_genes']` to restrict to experiments fair for cross-experiment comparison. See `docs://guide/conventions` for the broader tested-absent framing.
 
-table_scope indicates what genes each experiment's source DE table
-contains — critical for interpreting missing genes. Use
-table_scope=['all_detected_genes'] to restrict to experiments that
-report all assayed genes (fair for cross-experiment comparison).
-
-After this tool, drill in via:
-- differential_expression_by_gene(experiment_ids=[id]) for per-gene DE
-- list_clustering_analyses(experiment_ids=[id]) for clusters built from this experiment
-- list_derived_metrics(experiment_ids=[id]) for DM evidence on this experiment
-- pathway_enrichment(experiment_ids=[id]) for ORA on DE results
+Routing: drill via `differential_expression_by_gene(experiment_ids=[id])` for per-gene DE; `list_clustering_analyses(experiment_ids=[id])`; `list_derived_metrics(experiment_ids=[id])`; `pathway_enrichment(experiment_ids=[id])`; `list_metabolite_assays(experiment_ids=[id])` when `metabolite_count > 0`.
 
 ## Parameters
 
@@ -50,75 +39,75 @@ After this tool, drill in via:
 total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_compartment, time_course_count, score_max, score_median, not_found, results
 ```
 
-- **total_entries** (int): Total experiments in the KG (unfiltered)
-- **total_matching** (int): Experiments matching filters
-- **returned** (int): Number of results returned (0 when summary=true)
-- **offset** (int): Offset into full result set (e.g. 0)
-- **truncated** (bool): True if results were truncated by limit or summary=true
-- **by_organism** (list[OrganismBreakdown]): Experiment counts per organism, sorted by count descending
-- **by_treatment_type** (list[TreatmentTypeBreakdown]): Experiment counts per treatment type, sorted by count descending
-- **by_background_factors** (list[BackgroundFactorBreakdown]): Experiment counts per background factor, sorted by count descending
-- **by_omics_type** (list[OmicsTypeBreakdown]): Experiment counts per omics platform, sorted by count descending
-- **by_publication** (list[PublicationBreakdown]): Experiment counts per publication, sorted by count descending
-- **by_table_scope** (list[TableScopeBreakdown]): Experiment counts per table scope, sorted by count descending
-- **by_cluster_type** (list[ClusterTypeBreakdown]): Experiment counts per cluster type, sorted by count descending
-- **by_growth_phase** (list[GrowthPhaseBreakdown]): Experiment counts per growth phase, sorted by count descending
-- **by_value_kind** (list[ExpValueKindBreakdown]): Experiment counts by DerivedMetric value_kind across matching experiments
-- **by_metric_type** (list[ExpMetricTypeBreakdown]): Experiment counts by DerivedMetric metric_type across matching experiments
-- **by_compartment** (list[ExpCompartmentBreakdown]): Experiment counts per wet-lab compartment (e.g. whole_cell, vesicle, exoproteome)
-- **time_course_count** (int): Number of time-course experiments in matching set
-- **score_max** (float | None): Max Lucene relevance score, present only when search_text is used (e.g. 4.52)
-- **score_median** (float | None): Median Lucene relevance score, present only when search_text is used (e.g. 1.23)
-- **not_found** (list[string]): Input experiment_ids that did not match any Experiment node (empty unless experiment_ids was provided)
+- **total_entries** (int): Total experiments in the KG (unfiltered).
+- **total_matching** (int): Experiments matching filters.
+- **returned** (int): Number of results returned (0 when summary=true).
+- **offset** (int): Offset into full result set.
+- **truncated** (bool): True if results were truncated by limit or summary=true.
+- **by_organism** (list[OrganismBreakdown]): Experiment counts per organism, sorted desc.
+- **by_treatment_type** (list[TreatmentTypeBreakdown]): Experiment counts per treatment type, sorted desc.
+- **by_background_factors** (list[BackgroundFactorBreakdown]): Experiment counts per background factor, sorted desc.
+- **by_omics_type** (list[OmicsTypeBreakdown]): Experiment counts per omics platform, sorted desc.
+- **by_publication** (list[PublicationBreakdown]): Experiment counts per publication, sorted desc.
+- **by_table_scope** (list[TableScopeBreakdown]): Experiment counts per table scope, sorted desc.
+- **by_cluster_type** (list[ClusterTypeBreakdown]): Experiment counts per cluster type, sorted desc.
+- **by_growth_phase** (list[GrowthPhaseBreakdown]): Experiment counts per growth phase, sorted desc.
+- **by_value_kind** (list[ExpValueKindBreakdown]): Experiment counts by DerivedMetric value_kind across matching experiments.
+- **by_metric_type** (list[ExpMetricTypeBreakdown]): Experiment counts by DerivedMetric metric_type across matching experiments.
+- **by_compartment** (list[ExpCompartmentBreakdown]): Experiment counts per wet-lab compartment.
+- **time_course_count** (int): Number of time-course experiments in matching set.
+- **score_max** (float | None): Max Lucene relevance score, present only when search_text is used.
+- **score_median** (float | None): Median Lucene relevance score, present only when search_text is used.
+- **not_found** (list[string]): Input experiment_ids that did not match any Experiment node (empty unless experiment_ids was provided).
 
 ### Per-result fields
 
 | Field | Type | Description |
 |---|---|---|
-| experiment_id | string | Experiment identifier (e.g. '10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq') |
-| experiment_name | string | Experiment display name (e.g. 'MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions (RNASEQ)') |
-| publication_doi | string | Publication DOI (e.g. '10.1038/ismej.2016.70') |
-| authors | list[string] (optional) | Publication authors (e.g. ['Smith J', 'Jones K']). Sourced from Publication.authors via the Has_experiment edge — no need to join with list_publications for author attribution. |
-| organism_name | string | Profiled organism (e.g. 'Prochlorococcus MED4') |
-| treatment_type | list[string] | Treatment categories (e.g. ['coculture'], ['nitrogen_stress', 'coculture']) |
+| experiment_id | string | Experiment identifier (e.g. '10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq'). |
+| experiment_name | string | Experiment display name. |
+| publication_doi | string | Publication DOI (e.g. '10.1038/ismej.2016.70'). |
+| authors | list[string] (optional) | Publication authors. Sourced from Publication.authors via the Has_experiment edge — no need to join with list_publications for author attribution. |
+| organism_name | string | Profiled organism (e.g. 'Prochlorococcus MED4'). |
+| treatment_type | list[string] | Treatment categories (e.g. ['coculture'], ['nitrogen_stress', 'coculture']). |
 | background_factors | list[string] (optional) | Background experimental factors (e.g. ['axenic', 'continuous_light']). Empty list when none specified. |
-| coculture_partner | string \| None (optional) | Interacting organism — coculture partner or phage. Null when no interacting organism (e.g. 'Alteromonas macleodii HOT1A3', 'Phage') |
-| omics_type | string | Omics platform (e.g. 'RNASEQ', 'MICROARRAY', 'PROTEOMICS') |
-| is_time_course | bool | Whether experiment has multiple time points |
-| table_scope | string \| None (optional) | What genes the source DE table contains. Values: all_detected_genes, significant_any_timepoint, significant_only, top_n, filtered_subset. Critical for interpreting missing genes. |
-| table_scope_detail | string \| None (optional) | Free-text clarification of table_scope (e.g. 'FDR < 0.05 and |logFC| > 0.8') |
-| gene_count | int | Cumulative row count across timepoints (= sum(time_point_totals) for time-course experiments). For a 6-TP experiment with 1697 genes/TP, gene_count=10182. For non-time-course experiments equals distinct_gene_count. |
-| distinct_gene_count | int | Distinct gene count across the experiment — number of distinct gene IDs with at least one measurement edge, regardless of timepoint. Use for detection-power / pathway-background sizing. distinct_gene_count <= gene_count; for the same 6-TP example, distinct_gene_count=1697 vs gene_count=10182. |
-| genes_by_status | GeneStatusBreakdown | Gene counts by expression status |
+| coculture_partner | string \| None (optional) | Interacting organism — coculture partner or phage. Null when no interacting organism. |
+| omics_type | string | Omics platform (e.g. 'RNASEQ', 'MICROARRAY', 'PROTEOMICS'). |
+| is_time_course | bool | Whether experiment has multiple time points. |
+| table_scope | string \| None (optional) | What genes the source DE table contains. Values: all_detected_genes (tested-absent rows kept — `not_significant` represents real biology), significant_any_timepoint, significant_only (tested-absent rows collapsed), top_n, filtered_subset. Critical for interpreting missing genes — see docs://guide/conventions. |
+| table_scope_detail | string \| None (optional) | Free-text clarification of table_scope (e.g. 'FDR < 0.05 and |logFC| > 0.8'). |
+| gene_count | int | Cumulative row count across timepoints (= sum(time_point_totals) for time-course experiments — a 6-TP experiment with 1697 genes/TP has gene_count=10182). Equals distinct_gene_count for non-time-course experiments. |
+| distinct_gene_count | int | Distinct gene count across the experiment — unique gene IDs with at least one measurement edge, regardless of timepoint. Use for detection-power / pathway-background sizing. distinct_gene_count <= gene_count. |
+| genes_by_status | GeneStatusBreakdown | Gene counts by expression status. |
 | timepoints | list[TimePoint] \| None (optional) | Per-timepoint gene counts. Omitted for non-time-course experiments. |
-| clustering_analysis_count | int (optional) | Number of clustering analyses for this experiment (e.g. 4) |
-| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison']) |
-| growth_phases | list[string] (optional) | Distinct growth phases in this experiment. Physiological state of the culture at sampling — timepoint-level, not gene-specific. |
-| derived_metric_count | int (optional) | Number of DerivedMetrics associated with this experiment (e.g. 4) |
-| derived_metric_value_kinds | list[string] (optional) | Distinct DerivedMetric value kinds for this experiment (e.g. ['numeric', 'boolean']) |
+| clustering_analysis_count | int (optional) | Number of clustering analyses for this experiment. |
+| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison']). |
+| growth_phases | list[string] (optional) | Distinct growth phases in this experiment. Timepoint-level condition, not gene-specific. |
+| derived_metric_count | int (optional) | Number of DerivedMetrics associated with this experiment. |
+| derived_metric_value_kinds | list[string] (optional) | Distinct DerivedMetric value kinds for this experiment (subset of {numeric, boolean, categorical}). Use to route to genes_by_{kind}_metric. |
 | compartment | string \| None (optional) | Wet-lab fraction this experiment profiles (e.g. 'whole_cell', 'vesicle', 'exoproteome'). Scalar per experiment. |
-| metabolite_count | int (optional) | Distinct metabolites measured in this experiment (precomputed Experiment.metabolite_count). Non-zero on 12 experiments today (the metabolomics-paired ones across the 3 metabolomics papers). |
-| metabolite_assay_count | int (optional) | Distinct MetaboliteAssay edges anchored to this experiment (precomputed). Mirrors metabolite_count today. |
+| metabolite_count | int (optional) | Distinct metabolites measured in this experiment (precomputed Experiment.metabolite_count). Non-zero on metabolomics-paired experiments. When > 0, drill via list_metabolite_assays(experiment_ids=[...]). |
+| metabolite_assay_count | int (optional) | Distinct MetaboliteAssay edges anchored to this experiment (precomputed). |
 | metabolite_compartments | list[string] (optional) | Wet-lab compartments measured for metabolomics in this experiment (subset of {'whole_cell', 'extracellular', 'vesicle'}). Populated only when metabolite_assay_count > 0. |
-| score | float \| None (optional) | Lucene relevance score, present only when search_text is used (e.g. 2.45) |
-| derived_metric_gene_count | int \| None (optional) | Number of distinct genes with DerivedMetric annotations in this experiment (only with verbose=True, e.g. 450) |
-| derived_metric_types | list[string] \| None (optional) | Distinct DerivedMetric metric_type values for this experiment (only with verbose=True, e.g. ['damping_ratio', 'diel_amplitude']) |
-| reports_derived_metric_types | list[string] \| None (optional) | DerivedMetric types reported by (not just associated with) this experiment (only with verbose=True) |
+| score | float \| None (optional) | Lucene relevance score, present only when search_text is used. |
+| derived_metric_gene_count | int \| None (optional) | Number of distinct genes with DerivedMetric annotations in this experiment (verbose-only). |
+| derived_metric_types | list[string] \| None (optional) | Distinct DerivedMetric metric_type values for this experiment (verbose-only). |
+| reports_derived_metric_types | list[string] \| None (optional) | DerivedMetric types reported by (not just associated with) this experiment (verbose-only). |
 
 **Verbose-only fields** (included when `verbose=True`):
 
 | Field | Type | Description |
 |---|---|---|
-| publication_title | string \| None (optional) | Publication title |
-| treatment | string \| None (optional) | Treatment description (e.g. 'Coculture with Alteromonas HOT1A3') |
-| control | string \| None (optional) | Control description (e.g. 'Pro99 medium growth conditions') |
-| light_condition | string \| None (optional) | Light regime (e.g. 'continuous light') |
-| light_intensity | string \| None (optional) | Light intensity (e.g. '10 umol photons m-2 s-1') |
-| medium | string \| None (optional) | Growth medium (e.g. 'Pro99') |
-| temperature | string \| None (optional) | Temperature (e.g. '24C') |
-| statistical_test | string \| None (optional) | Statistical method (e.g. 'Rockhopper') |
-| experimental_context | string \| None (optional) | Context summary (e.g. 'in Pro99 medium under continuous light') |
-| cluster_count | int \| None (optional) | Total gene clusters across analyses (only with verbose=True, e.g. 20) |
+| publication_title | string \| None (optional) | Publication title (verbose-only). |
+| treatment | string \| None (optional) | Treatment description (verbose-only, e.g. 'Coculture with Alteromonas HOT1A3'). |
+| control | string \| None (optional) | Control description (verbose-only). |
+| light_condition | string \| None (optional) | Light regime (verbose-only). |
+| light_intensity | string \| None (optional) | Light intensity (verbose-only). |
+| medium | string \| None (optional) | Growth medium (verbose-only). |
+| temperature | string \| None (optional) | Temperature (verbose-only). |
+| statistical_test | string \| None (optional) | Statistical method (verbose-only). |
+| experimental_context | string \| None (optional) | Context summary (verbose-only). |
+| cluster_count | int \| None (optional) | Total gene clusters across analyses (verbose-only). |
 
 ## Few-shot examples
 
@@ -250,21 +239,19 @@ list_experiments (per-row `metabolite_count > 0`) → list_metabolite_assays(exp
 
 - If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this experiment.
 
-- Default is detail (summary=false) — use summary=true to see only breakdowns
+- Default is detail (summary=false) — use summary=true to see only breakdowns. When summary=true, verbose and limit have no effect.
 
-- gene_count is total genes with expression data, not total significant genes — use genes_by_status for the breakdown
+- gene_count is total genes with expression data, not total significant genes — use genes_by_status for the breakdown.
 
-- timepoints is omitted for non-time-course experiments, not an empty list
+- timepoints is omitted for non-time-course experiments, not an empty list.
 
-- When summary=true, verbose and limit have no effect
-
-- Check table_scope before interpreting missing genes — some experiments only include significant genes
-
-- growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
-
-- For time-course experiments, top-level `gene_count` is the **cumulative row count across timepoints** (= `sum(time_point_totals)`). A 6-TP experiment with 1697 genes/TP has `gene_count=10182`. Use `distinct_gene_count` for detection-power or pathway-background reasoning — that's the unique-genes count regardless of timepoint. Per-TP detail lives in `timepoints[].gene_count`.
+- For time-course experiments, top-level `gene_count` is the cumulative row count across timepoints (= `sum(time_point_totals)`). A 6-TP experiment with 1697 genes/TP has `gene_count=10182`. Use `distinct_gene_count` for detection-power or pathway-background reasoning — that's the unique-genes count regardless of timepoint. Per-TP detail lives in `timepoints[].gene_count`.
 
 - `authors` is on every result row — no need to join with list_publications when you only need author attribution. list_publications is still the right call for richer publication metadata (abstract, journal, year).
+
+- `organism=` filters the profiled organism only (case-insensitive substring on `organism_name`). It does NOT match coculture partners — for partner-side filtering use `coculture_partner=`. The two filters AND-compose.
+
+- metabolite_count > 0 indicates a metabolomics-paired experiment. Drill into MetaboliteAssay nodes via list_metabolite_assays(experiment_ids=[...]).
 
 ```mistake
 list_experiments(publication='Biller 2018')
@@ -273,8 +260,6 @@ list_experiments(publication='Biller 2018')
 ```correction
 list_publications(search_text='Biller') then list_experiments(publication_doi=['10.1038/...'])
 ```
-
-- `organism=` filters the profiled organism only (case-insensitive substring on `organism_name`). It does NOT match coculture partners — for partner-side filtering use `coculture_partner=`. Prior versions OR'd the two; if you have notes from earlier sessions assuming the OR-semantics, the count will now be lower (the OR-leak silently included experiments where the queried organism was the coculture partner, not the profiled one).
 
 ```mistake
 result['results'][0]['time_point_growth_phases']

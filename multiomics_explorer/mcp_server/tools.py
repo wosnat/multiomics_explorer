@@ -1263,10 +1263,9 @@ def register_tools(mcp: FastMCP):
         annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def kg_schema(ctx: Context) -> KgSchemaResponse:
-        """Get the knowledge graph schema: node labels with property names/types,
-        and relationship types with source/target labels.
+        """Return the KG schema: node labels with property names/types and relationship types with source/target labels.
 
-        Use this before run_cypher to understand what labels and properties are queryable.
+        Use before `run_cypher` to discover queryable labels/properties. For an entity-level overview see `docs://guide/concepts`; for filter-value enumeration use `list_filter_values`.
         """
         await ctx.info("kg_schema")
         try:
@@ -1278,21 +1277,21 @@ def register_tools(mcp: FastMCP):
 
     class FilterValueResult(BaseModel):
         value: str = Field(
-            description="Filter value (e.g. 'Photosynthesis', 'Transport', 'Unknown')"
+            description="Filter value (e.g. 'Photosynthesis', 'Transport', 'Unknown')."
         )
         count: int = Field(
-            description="Number of genes/items with this value (e.g. 770)"
+            description="Number of items with this value."
         )
         tree_code: str | None = Field(
             default=None,
-            description="BRITE tree code (sparse: only for brite_tree filter, e.g. 'ko01000')",
+            description="BRITE tree code (sparse: only for brite_tree filter, e.g. 'ko01000').",
         )
 
     class ListFilterValuesResponse(BaseModel):
-        filter_type: str = Field(description="The filter type returned (e.g. 'gene_category')")
-        total_entries: int = Field(description="Total distinct values for this filter (e.g. 26)")
-        returned: int = Field(description="Number of results returned (e.g. 26)")
-        truncated: bool = Field(description="True if total_entries > returned")
+        filter_type: str = Field(description="The filter type returned (e.g. 'gene_category').")
+        total_entries: int = Field(description="Total distinct values for this filter.")
+        returned: int = Field(description="Number of results returned.")
+        truncated: bool = Field(description="True if total_entries > returned.")
         results: list[FilterValueResult] = Field(default_factory=list)
 
     @mcp.tool(
@@ -1306,21 +1305,16 @@ def register_tools(mcp: FastMCP):
                     "metric_type", "value_kind", "compartment",
                     "omics_type", "evidence_source"],
             Field(description=(
-                "Which categorical filter to enumerate. "
-                "'gene_category' / 'brite_tree' / 'growth_phase'; "
-                "'metric_type' / 'value_kind' / 'compartment' (DerivedMetric "
-                "discovery); "
-                "'omics_type' (Experiment.omics_type enum incl. METABOLOMICS); "
-                "'evidence_source' (Metabolite.evidence_sources values: "
-                "'metabolism', 'transport', 'metabolomics')."
+                "Which categorical filter to enumerate. See type column "
+                "for the 8 valid values; `omics_type` returns the full "
+                "canonical enum incl. METABOLOMICS; `evidence_source` "
+                "returns Metabolite.evidence_sources values."
             )),
         ] = "gene_category",
     ) -> ListFilterValuesResponse:
-        """List valid values for categorical filters used across tools.
+        """Enumerate valid values + counts for a categorical filter (gene_category, brite_tree, growth_phase, metric_type, value_kind, compartment, omics_type, evidence_source).
 
-        Returns valid values and counts for the requested filter type.
-        Use the returned values as filter parameters in `genes_by_function`
-        (category filter).
+        Routing: feed the returned `value`s into the corresponding filter on the relevant tool — `gene_category` → `genes_by_function(category=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`.
         """
         await ctx.info(f"list_filter_values filter_type={filter_type}")
         try:
@@ -1339,39 +1333,39 @@ def register_tools(mcp: FastMCP):
 
     class OrganismResult(BaseModel):
         organism_name: str = Field(description="Display name (e.g. 'Prochlorococcus MED4'). Use for organism filters in other tools.")
-        organism_type: str = Field(description="Classification: 'genome_strain', 'treatment', or 'reference_proteome_match'")
-        genus: str | None = Field(default=None, description="Genus (e.g. 'Prochlorococcus', 'Alteromonas')")
-        species: str | None = Field(default=None, description="Binomial species name (e.g. 'Prochlorococcus marinus')")
-        strain: str | None = Field(default=None, description="Strain identifier (e.g. 'MED4', 'EZ55')")
-        clade: str | None = Field(default=None, description="Ecotype clade, Prochlorococcus-specific (e.g. 'HLI', 'LLIV')")
-        ncbi_taxon_id: int | None = Field(default=None, description="NCBI Taxonomy ID for cross-referencing external databases (e.g. 59919)")
-        gene_count: int = Field(description="Number of genes in the KG for this organism (e.g. 1976)")
-        publication_count: int = Field(description="Number of publications studying this organism (e.g. 11)")
-        experiment_count: int = Field(description="Total experiments across all publications (e.g. 46)")
-        treatment_types: list[str] = Field(default_factory=list, description="Distinct treatment types studied (e.g. ['coculture', 'light_stress', 'nitrogen_stress'])")
-        background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'continuous_light', 'diel_cycle'])")
-        omics_types: list[str] = Field(default_factory=list, description="Distinct omics types available (e.g. ['RNASEQ', 'PROTEOMICS'])")
-        clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses for this organism (e.g. 4)")
-        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison', 'diel'])")
-        growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases across experiments (e.g. ['exponential', 'nutrient_limited']). Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
+        organism_type: str = Field(description="Classification: 'genome_strain', 'treatment', or 'reference_proteome_match'.")
+        genus: str | None = Field(default=None, description="Genus (e.g. 'Prochlorococcus', 'Alteromonas').")
+        species: str | None = Field(default=None, description="Binomial species name (e.g. 'Prochlorococcus marinus').")
+        strain: str | None = Field(default=None, description="Strain identifier (e.g. 'MED4', 'EZ55').")
+        clade: str | None = Field(default=None, description="Ecotype clade, Prochlorococcus-specific (e.g. 'HLI', 'LLIV').")
+        ncbi_taxon_id: int | None = Field(default=None, description="NCBI Taxonomy ID for cross-referencing external databases.")
+        gene_count: int = Field(description="Number of genes in the KG for this organism.")
+        publication_count: int = Field(description="Number of publications studying this organism.")
+        experiment_count: int = Field(description="Total experiments across all publications.")
+        treatment_types: list[str] = Field(default_factory=list, description="Distinct treatment types studied (e.g. ['coculture', 'light_stress', 'nitrogen_stress']).")
+        background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'continuous_light', 'diel_cycle']).")
+        omics_types: list[str] = Field(default_factory=list, description="Distinct omics types available (e.g. ['RNASEQ', 'PROTEOMICS']).")
+        clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses for this organism.")
+        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison', 'diel']).")
+        growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases across experiments (e.g. ['exponential', 'nutrient_limited']). Timepoint-level condition, not gene-specific.")
         # verbose-only fields
-        family: str | None = Field(default=None, description="Taxonomic family (e.g. 'Prochlorococcaceae')")
-        order: str | None = Field(default=None, description="Taxonomic order (e.g. 'Synechococcales')")
-        tax_class: str | None = Field(default=None, description="Taxonomic class (e.g. 'Cyanophyceae')")
-        phylum: str | None = Field(default=None, description="Taxonomic phylum (e.g. 'Cyanobacteriota')")
-        kingdom: str | None = Field(default=None, description="Taxonomic kingdom (e.g. 'Bacillati')")
-        superkingdom: str | None = Field(default=None, description="Taxonomic superkingdom (e.g. 'Bacteria')")
-        lineage: str | None = Field(default=None, description="Full NCBI taxonomy lineage string (e.g. 'cellular organisms; Bacteria; ...; Prochlorococcus marinus')")
-        cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (only with verbose=True, e.g. 35)")
+        family: str | None = Field(default=None, description="Taxonomic family (e.g. 'Prochlorococcaceae').")
+        order: str | None = Field(default=None, description="Taxonomic order (e.g. 'Synechococcales').")
+        tax_class: str | None = Field(default=None, description="Taxonomic class (e.g. 'Cyanophyceae').")
+        phylum: str | None = Field(default=None, description="Taxonomic phylum (e.g. 'Cyanobacteriota').")
+        kingdom: str | None = Field(default=None, description="Taxonomic kingdom (e.g. 'Bacillati').")
+        superkingdom: str | None = Field(default=None, description="Taxonomic superkingdom (e.g. 'Bacteria').")
+        lineage: str | None = Field(default=None, description="Full NCBI taxonomy lineage string.")
+        cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (verbose-only).")
         # DM compact fields
-        derived_metric_count: int = Field(default=0, description="Total DerivedMetric annotations on this organism's experiments (0 when none).")
+        derived_metric_count: int = Field(default=0, description="Total DerivedMetric annotations on this organism's experiments. 0 when none.")
         derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Subset of {numeric, boolean, categorical} present across this organism's DMs. Use to route to genes_by_{numeric,boolean,categorical}_metric.")
         compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured for this organism (e.g. ['whole_cell', 'vesicle']).")
-        # Chemistry rollups (slice 1)
-        reaction_count: int = Field(default=0, description="Distinct reactions catalyzed by genes in this organism (e.g. 943). When > 0, drill in via list_metabolites(organism_names=[organism_name]) to enumerate metabolites this organism is capable of metabolizing.")
-        metabolite_count: int = Field(default=0, description="Distinct metabolites this organism's genes can act on (e.g. 1039). Capability signal — does NOT mean these metabolites were measured. Today reflects gene catalysis only; will grow to include transport substrates when the TCDB-CAZy ontology ships, with no schema change. When > 0, drill in via list_metabolites(organism_names=[organism_name]).")
-        # Metabolomics measurement rollup (Phase 1 plumbing — spec §6.4)
-        measured_metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this organism via any MetaboliteAssay (precomputed OrganismTaxon.measured_metabolite_count). Non-zero on 4 organisms today: MIT9301 (4 assays), MIT9313 (3), MIT0801 (2), MIT9303 (1). Different from metabolite_count (reaction-only chemistry capability).")
+        # Chemistry rollups
+        reaction_count: int = Field(default=0, description="Distinct reactions catalyzed by genes in this organism. When > 0, drill in via list_metabolites(organism_names=[organism_name]).")
+        metabolite_count: int = Field(default=0, description="Distinct metabolites this organism's genes can act on. Catalysis-capability signal (Gene → Reaction → Metabolite only); does NOT mean these metabolites were measured, and does NOT include transport-reach. When > 0, drill in via list_metabolites(organism_names=[organism_name]).")
+        # Metabolomics measurement rollup
+        measured_metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this organism via any MetaboliteAssay (precomputed OrganismTaxon.measured_metabolite_count). Different from metabolite_count (reaction-only chemistry capability). When > 0, drill in via list_metabolite_assays(organism=organism_name).")
         # DM verbose-only fields
         derived_metric_gene_count: int | None = Field(default=None, description="Total gene-level DM annotation count (verbose-only).")
         derived_metric_types: list[str] | None = Field(default=None, description="Distinct metric_type tags observed (verbose-only).")
@@ -1380,48 +1374,48 @@ def register_tools(mcp: FastMCP):
         reference_proteome: str | None = Field(default=None, description="Accession of matched reference proteome (e.g. 'GCA_003513035.1'). Only on reference_proteome_match organisms.")
 
     class OrgClusterTypeBreakdown(BaseModel):
-        cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison')")
-        count: int = Field(description="Number of organisms with this cluster type (e.g. 4)")
+        cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison').")
+        count: int = Field(description="Number of organisms with this cluster type.")
 
     class OrgTypeBreakdown(BaseModel):
-        organism_type: str = Field(description="Organism type (e.g. 'genome_strain')")
-        count: int = Field(description="Number of organisms of this type (e.g. 25)")
+        organism_type: str = Field(description="Organism type (e.g. 'genome_strain').")
+        count: int = Field(description="Number of organisms of this type.")
 
     class OrgValueKindBreakdown(BaseModel):
-        value_kind: str = Field(description="DerivedMetric value kind (e.g. 'numeric', 'boolean', 'categorical')")
+        value_kind: str = Field(description="DerivedMetric value kind (e.g. 'numeric', 'boolean', 'categorical').")
         count: int = Field(description="Number of DerivedMetrics with this value_kind across matched organisms.")
 
     class OrgMetricTypeBreakdown(BaseModel):
-        metric_type: str = Field(description="DerivedMetric type (e.g. 'diel_rhythmicity', 'darkness_survival_class')")
+        metric_type: str = Field(description="DerivedMetric type (e.g. 'diel_rhythmicity', 'darkness_survival_class').")
         count: int = Field(description="Number of DerivedMetrics with this metric_type across matched organisms.")
 
     class OrgCompartmentBreakdown(BaseModel):
-        compartment: str = Field(description="Wet-lab compartment (e.g. 'whole_cell', 'vesicle')")
+        compartment: str = Field(description="Wet-lab compartment (e.g. 'whole_cell', 'vesicle').")
         count: int = Field(description="Number of DerivedMetrics in this compartment across matched organisms.")
 
     class OrgMetabolicCapabilityBreakdown(BaseModel):
-        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
-        reaction_count: int = Field(description="Distinct reactions catalyzed by this organism's genes (e.g. 943)")
-        metabolite_count: int = Field(description="Distinct metabolites this organism's genes can act on (e.g. 1039). Same semantics as OrganismResult.metabolite_count.")
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4').")
+        reaction_count: int = Field(description="Distinct reactions catalyzed by this organism's genes.")
+        metabolite_count: int = Field(description="Distinct metabolites this organism's genes can act on. Same semantics as OrganismResult.metabolite_count.")
 
     class OrgMeasurementCapability(BaseModel):
-        has_metabolomics: int = Field(default=0, description="Number of matched organisms with measured_metabolite_count > 0 (e.g. 4 across the full set today).")
+        has_metabolomics: int = Field(default=0, description="Number of matched organisms with measured_metabolite_count > 0.")
         no_metabolomics: int = Field(default=0, description="Number of matched organisms with measured_metabolite_count == 0.")
 
     class ListOrganismsResponse(BaseModel):
-        total_entries: int = Field(description="Total organisms in the KG")
-        total_matching: int = Field(description="Organisms matching the filter (= total_entries when no filter)")
-        by_cluster_type: list[OrgClusterTypeBreakdown] = Field(default_factory=list, description="Organism counts per cluster type over the matched set, sorted by count descending")
-        by_organism_type: list[OrgTypeBreakdown] = Field(default_factory=list, description="Organism counts per type over the matched set, sorted by count descending")
-        by_value_kind: list[OrgValueKindBreakdown] = Field(default_factory=list, description="DM value_kind frequency rollup across matched organisms. Each entry: {value_kind, count}.")
-        by_metric_type: list[OrgMetricTypeBreakdown] = Field(default_factory=list, description="DM metric_type frequency rollup across matched organisms. Each entry: {metric_type, count}.")
-        by_compartment: list[OrgCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched organisms. Each entry: {compartment, count}.")
+        total_entries: int = Field(description="Total organisms in the KG.")
+        total_matching: int = Field(description="Organisms matching the filter (= total_entries when no filter).")
+        by_cluster_type: list[OrgClusterTypeBreakdown] = Field(default_factory=list, description="Organism counts per cluster type over the matched set, sorted desc.")
+        by_organism_type: list[OrgTypeBreakdown] = Field(default_factory=list, description="Organism counts per type over the matched set, sorted desc.")
+        by_value_kind: list[OrgValueKindBreakdown] = Field(default_factory=list, description="DM value_kind frequency rollup across matched organisms.")
+        by_metric_type: list[OrgMetricTypeBreakdown] = Field(default_factory=list, description="DM metric_type frequency rollup across matched organisms.")
+        by_compartment: list[OrgCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched organisms.")
         by_metabolic_capability: list[OrgMetabolicCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms by metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites.")
-        by_measurement_capability: OrgMeasurementCapability = Field(default_factory=OrgMeasurementCapability, description="Binary rollup of metabolomics measurement coverage across matched organisms: {has_metabolomics, no_metabolomics}. Today 4 organisms carry non-zero measured_metabolite_count out of ~37 total (Phase 1 plumbing — spec §6.4).")
-        returned: int = Field(description="Number of results returned")
-        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-        truncated: bool = Field(description="True if total_matching > offset + returned")
-        not_found: list[str] = Field(default_factory=list, description="organism_names inputs that didn't match any organism (case-insensitive); [] when no filter")
+        by_measurement_capability: OrgMeasurementCapability = Field(default_factory=OrgMeasurementCapability, description="Binary rollup of metabolomics measurement coverage across matched organisms: {has_metabolomics, no_metabolomics} (tool-specific deviation from list_/by_-style frequency rollups elsewhere — exactly two keys).")
+        returned: int = Field(description="Number of results returned.")
+        offset: int = Field(default=0, description="Offset into full result set.")
+        truncated: bool = Field(description="True if total_matching > offset + returned.")
+        not_found: list[str] = Field(default_factory=list, description="organism_names inputs that didn't match any organism (case-insensitive); [] when no filter.")
         results: list[OrganismResult]
 
     @mcp.tool(
@@ -1455,27 +1449,9 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> ListOrganismsResponse:
-        """List organisms in the knowledge graph, optionally filtered by name or compartment.
+        """List organisms with taxonomy, data-availability counts, organism_type, DM rollups, chemistry-capability rollups, and metabolomics-coverage rollup.
 
-        Returns taxonomy, gene counts, publication counts, and organism_type
-        for each organism. organism_type classifies each organism as
-        'genome_strain', 'treatment', or 'reference_proteome_match'.
-        Reference proteome match organisms also include reference_database
-        and reference_proteome fields.
-
-        Use the returned organism names as filter values in genes_by_function,
-        resolve_gene, genes_by_ontology, list_publications, etc. The organism
-        filter on those tools uses partial matching — "MED4",
-        "Prochlorococcus MED4", and "Prochlorococcus" all work. The
-        organism_names filter on this tool uses exact match (case-
-        insensitive) on preferred_name; unknown names are reported in
-        not_found.
-
-        After this tool, scope deeper queries to the chosen organism: use the
-        locus_tags filter on per-gene tools (gene_overview, gene_homologs)
-        and the organism filter on gene_ontology_terms, list_experiments,
-        and list_publications. Use list_filter_values for categorical
-        field enumeration.
+        Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Note that `organism_names=` on this tool is exact (case-insensitive) on `preferred_name`, while the `organism=` filter on most other tools is a substring match.
         """
         await ctx.info(
             f"list_organisms organism_names={organism_names} compartment={compartment} "
@@ -1540,12 +1516,12 @@ def register_tools(mcp: FastMCP):
         count: int = Field(description="Number of matching genes in this organism (e.g. 1)")
 
     class ResolveGeneResponse(BaseModel):
-        total_matching: int = Field(description="Total genes matching identifier + organism filter (e.g. 3)")
-        by_organism: list[ResolveOrganismBreakdown] = Field(description="Match counts per organism, sorted by count descending")
-        returned: int = Field(description="Genes in this response (e.g. 3)")
-        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-        truncated: bool = Field(description="True if total_matching > returned")
-        results: list[GeneMatch] = Field(description="Matching genes sorted by organism_name, locus_tag")
+        total_matching: int = Field(description="Total genes matching identifier + organism filter.")
+        by_organism: list[ResolveOrganismBreakdown] = Field(description="Match counts per organism, sorted desc.")
+        returned: int = Field(description="Genes in this response.")
+        offset: int = Field(default=0, description="Offset into full result set.")
+        truncated: bool = Field(description="True if total_matching > returned.")
+        results: list[GeneMatch] = Field(description="Matching genes sorted by organism_name, locus_tag.")
 
     @mcp.tool(
         tags={"genes", "discovery"},
@@ -1569,13 +1545,9 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> ResolveGeneResponse:
-        """Resolve a gene identifier to matching genes in the knowledge graph.
+        """Resolve a gene identifier (locus_tag, gene name, old locus_tag, or RefSeq protein ID) to matching Gene nodes. Matching is case-insensitive.
 
-        Matching is case-insensitive — 'pmm0001', 'PMM0001', and 'Pmm0001'
-        all work. Use the returned locus_tags with gene_overview,
-        gene_details, gene_homologs, or gene_ontology_terms. The organism
-        filter uses case-insensitive partial matching — 'MED4' and
-        'Prochlorococcus MED4' both work.
+        Routing: feed returned `locus_tag`s into `gene_overview` (data-availability triage), `gene_details` (full properties), `gene_homologs`, or `gene_ontology_terms`. The optional `organism` filter is a case-insensitive substring on `organism_name`.
         """
         await ctx.info(f"resolve_gene identifier={identifier} organism={organism} offset={offset}")
         try:
@@ -1603,36 +1575,36 @@ def register_tools(mcp: FastMCP):
     # --- genes_by_function ---
 
     class FunctionOrganismBreakdown(BaseModel):
-        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
-        count: int = Field(description="Number of matching genes")
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4').")
+        count: int = Field(description="Number of matching genes.")
 
     class FunctionCategoryBreakdown(BaseModel):
-        category: str = Field(description="Gene category (e.g. 'Photosynthesis')")
-        count: int = Field(description="Number of matching genes")
+        category: str = Field(description="Gene category (e.g. 'Photosynthesis').")
+        count: int = Field(description="Number of matching genes.")
 
     class GenesByFunctionResult(BaseModel):
-        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
-        gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN')")
-        product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III subunit beta')")
-        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
-        gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Photosynthesis')")
-        annotation_quality: int = Field(description="Annotation quality 0-3 (3=best)")
-        score: float = Field(description="Fulltext relevance score")
+        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001').")
+        gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN').")
+        product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III subunit beta').")
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4').")
+        gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Photosynthesis').")
+        annotation_quality: int = Field(description="Annotation quality, 0..3 numeric encoding of `Gene.annotation_state` (informative-evidence count). 3=informative_multi, 2=informative_single, 1=catch_all_only, 0=no_evidence. [AQ] Definition shifted in 2026-05 KG release; see docs://guide/conventions.")
+        score: float = Field(description="Lucene relevance score.")
         # verbose only
-        function_description: str | None = Field(default=None, description="Functional description text")
-        gene_summary: str | None = Field(default=None, description="Combined gene annotation summary")
+        function_description: str | None = Field(default=None, description="Functional description text (verbose-only).")
+        gene_summary: str | None = Field(default=None, description="Combined gene annotation summary (verbose-only).")
 
     class GenesByFunctionResponse(BaseModel):
-        total_search_hits: int = Field(description="Total genes matching search text (before organism/category/quality filters)")
-        total_matching: int = Field(description="Total genes matching search + all filters")
-        by_organism: list[FunctionOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc")
-        by_category: list[FunctionCategoryBreakdown] = Field(description="Gene counts per category, sorted desc")
-        score_max: float | None = Field(default=None, description="Highest relevance score (null if 0 matches)")
-        score_median: float | None = Field(default=None, description="Median relevance score (null if 0 matches)")
-        returned: int = Field(description="Number of results returned")
-        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-        truncated: bool = Field(description="True when total_matching > returned")
-        results: list[GenesByFunctionResult] = Field(description="Gene results ranked by relevance")
+        total_search_hits: int = Field(description="Total genes matching search text (before organism/category/quality filters).")
+        total_matching: int = Field(description="Total genes matching search + all filters.")
+        by_organism: list[FunctionOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc.")
+        by_category: list[FunctionCategoryBreakdown] = Field(description="Gene counts per category, sorted desc.")
+        score_max: float | None = Field(default=None, description="Highest relevance score (null if 0 matches).")
+        score_median: float | None = Field(default=None, description="Median relevance score (null if 0 matches).")
+        returned: int = Field(description="Number of results returned.")
+        offset: int = Field(default=0, description="Offset into full result set.")
+        truncated: bool = Field(description="True when total_matching > returned.")
+        results: list[GenesByFunctionResult] = Field(description="Gene results ranked by relevance.")
 
     @mcp.tool(
         tags={"genes", "discovery"},
@@ -1641,8 +1613,10 @@ def register_tools(mcp: FastMCP):
     async def genes_by_function(
         ctx: Context,
         search_text: Annotated[str, Field(
-            description="Free-text query (Lucene syntax supported). "
-            "E.g. 'photosystem', 'nitrogen AND transport', 'dnaN~'.",
+            description="Free-text query (Lucene syntax: quoted phrases, "
+            "AND/OR, wildcards `*`, fuzzy `~`). E.g. 'photosystem', "
+            "'nitrogen AND transport', 'dnaN~'. See docs://guide/conventions "
+            "for Lucene scoring details.",
         )],
         organism: Annotated[str | None, Field(
             description="Filter by organism (case-insensitive substring). "
@@ -1655,10 +1629,11 @@ def register_tools(mcp: FastMCP):
             "Use list_filter_values to see valid values.",
         )] = None,
         min_quality: Annotated[int, Field(
-            description="Minimum annotation_quality (0..3 numeric encoding of annotation_state): "
-            "0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. "
-            "Use 2 to require >=1 informative annotation source. "
-            "Note: this field was redefined in May 2026 KG release.",
+            description="Minimum annotation_quality (0..3 numeric encoding "
+            "of `Gene.annotation_state`): 0=no_evidence, 1=catch_all_only, "
+            "2=informative_single, 3=informative_multi. Use 2 to skip "
+            "hypothetical proteins; 3 for high-confidence. [AQ] Definition "
+            "shifted in 2026-05 KG release; see docs://guide/conventions.",
             ge=0, le=3,
         )] = 0,
         summary: Annotated[bool, Field(
@@ -1674,14 +1649,9 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> GenesByFunctionResponse:
-        """Search genes by functional annotation text.
+        """Free-text search across gene names, products, and functional descriptions. Lucene syntax (see docs://guide/conventions). Results ranked by relevance score.
 
-        Full-text search across gene names, products, and functional
-        descriptions. Supports Lucene syntax: quoted phrases, AND/OR,
-        wildcards (*), fuzzy (~). Results ranked by relevance score.
-
-        For ontology-based search, use genes_by_ontology.
-        For gene details, use gene_overview.
+        Routing: feed `locus_tag`s into `gene_overview` (data-availability triage), `gene_ontology_terms` (annotation drill-down), or `genes_by_ontology` for ontology-anchored search instead.
         """
         await ctx.info(f"genes_by_function search_text={search_text} organism={organism} "
                        f"category={category} min_quality={min_quality}")
@@ -1720,21 +1690,21 @@ def register_tools(mcp: FastMCP):
     # --- gene_overview ---
 
     class GeneOverviewResult(BaseModel):
-        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
-        gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN')")
-        product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III subunit beta')")
-        gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Replication and repair')")
-        annotation_quality: int | None = Field(default=None, description="Annotation quality score 0-3 (e.g. 3)")
-        organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
+        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001').")
+        gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN').")
+        product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III subunit beta').")
+        gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Replication and repair').")
+        annotation_quality: int | None = Field(default=None, description="0..3 numeric encoding of `Gene.annotation_state` (informative-evidence count). 3=informative_multi, 2=informative_single, 1=catch_all_only, 0=no_evidence. [AQ] Definition shifted in 2026-05 KG release; see docs://guide/conventions.")
+        organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4').")
         annotation_types: list[str] = Field(default_factory=list, description="Ontology source types where this gene has at least one annotation (e.g. ['go_bp', 'ec', 'kegg']). Presence-only — does NOT indicate content informativeness; a 'cog_category' entry may be 'Function unknown'. For term content, call gene_ontology_terms.")
-        annotation_state: str = Field(description="Informativeness state: informative_multi | informative_single | catch_all_only | no_evidence")
-        informative_annotation_types: list[str] = Field(default_factory=list, description="Subset of annotation_types backed by informative (non-catch-all) terms")
-        expression_edge_count: int = Field(default=0, description="Number of expression data points (e.g. 36). When > 0, drill into differential_expression_by_gene or gene_response_profile.")
-        significant_up_count: int = Field(default=0, description="Significant up-regulated DE observations (e.g. 3). When > 0, use differential_expression_by_gene with direction='up' for per-experiment detail.")
-        significant_down_count: int = Field(default=0, description="Significant down-regulated DE observations (e.g. 2). When > 0, use differential_expression_by_gene with direction='down' for per-experiment detail.")
-        closest_ortholog_group_size: int | None = Field(default=None, description="Size of tightest ortholog group (e.g. 9). Use gene_homologs for full per-group membership and source/level metadata.")
+        annotation_state: str = Field(description="Informativeness state: informative_multi | informative_single | catch_all_only | no_evidence.")
+        informative_annotation_types: list[str] = Field(default_factory=list, description="Subset of annotation_types backed by informative (non-catch-all) terms.")
+        expression_edge_count: int = Field(default=0, description="Number of expression data points. When > 0, drill via differential_expression_by_gene(locus_tags=[...]) or gene_response_profile.")
+        significant_up_count: int = Field(default=0, description="Significant up-regulated DE observations. When > 0, drill via differential_expression_by_gene(direction='up').")
+        significant_down_count: int = Field(default=0, description="Significant down-regulated DE observations. When > 0, drill via differential_expression_by_gene(direction='down').")
+        closest_ortholog_group_size: int | None = Field(default=None, description="Size of tightest ortholog group. Use gene_homologs for full per-group membership and source/level metadata.")
         closest_ortholog_genera: list[str] | None = Field(default=None, description="Genera in tightest ortholog group (e.g. ['Prochlorococcus', 'Synechococcus']). Use gene_homologs for full membership; genes_by_homolog_group to expand a specific group.")
-        cluster_membership_count: int = Field(default=0, description="Number of cluster memberships (e.g. 3). When > 0, drill into gene_clusters_by_gene for per-cluster details.")
+        cluster_membership_count: int = Field(default=0, description="Number of cluster memberships. When > 0, drill via gene_clusters_by_gene for per-cluster details.")
         cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison', 'diel']). Use gene_clusters_by_gene with cluster_type filter to scope drill-down.")
         # Compact DM fields (always present)
         derived_metric_count: int = Field(
@@ -1745,75 +1715,75 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="Subset of {numeric, boolean, categorical} where this gene has DM annotations. Use to route to genes_by_{kind}_metric drill-downs.",
         )
-        # Chemistry rollups (Phase 1 plumbing — spec §6.1)
+        # Chemistry rollups
         reaction_count: int = Field(
             default=0,
-            description="Distinct reactions catalysed by this gene (precomputed Gene-side rollup; e.g. 4 for PMM0001). When > 0, drill via metabolites_by_gene(locus_tags=[locus_tag], organism=...).",
+            description="Distinct reactions catalysed by this gene (precomputed Gene-side rollup). When > 0, drill via metabolites_by_gene(locus_tags=[locus_tag], organism=...).",
         )
         metabolite_count: int = Field(
             default=0,
-            description="Distinct metabolites reachable from this gene via reaction OR transport (UNION; e.g. 554 for PMM0392 with reaction_count=0 from 8 TCDB families). Differs from OrganismTaxon.metabolite_count which is reaction-only.",
+            description="Distinct metabolites reachable from this gene via reaction OR transport (UNION). Differs from OrganismTaxon.metabolite_count which is reaction-only — a transport-only gene can have reaction_count=0 with metabolite_count > 0.",
         )
         transporter_count: int = Field(
             default=0,
-            description="Distinct TCDB families annotated to this gene (sourced from Gene.tcdb_family_count; e.g. 8 for PMM0392). When > 0, drill via genes_by_metabolite or metabolites_by_gene with the transport arm.",
+            description="Distinct TCDB families annotated to this gene. When > 0, drill via genes_by_metabolite or metabolites_by_gene with the transport arm.",
         )
         evidence_sources: list[str] = Field(
             default_factory=list,
-            description="Subset of {'metabolism','transport','metabolomics'} describing which kinds of paths exist from this gene to its metabolites. Path-existence semantics — 'metabolism' means at least one Gene→Reaction→Metabolite path exists; 'transport' means at least one Gene→TcdbFamily→Metabolite path exists; 'metabolomics' means at least one reachable metabolite has measurement coverage. Routing hint for chemistry drill-down tools.",
+            description="Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. When non-empty, drill into metabolites_by_gene(locus_tags=[...]). Per-source definitions: see docs://guide/concepts.",
         )
         # verbose-only
-        gene_summary: str | None = Field(default=None, description="Concatenated summary text (e.g. 'prmA :: ribosomal protein L11 methyltransferase :: Methylates ribosomal protein L11')")
-        function_description: str | None = Field(default=None, description="Curated functional description (e.g. 'Methylates ribosomal protein L11'). May be null when no curated text exists.")
-        all_identifiers: list[str] | None = Field(default=None, description="Cross-references: UniProt, CyanorakID, RefSeq, etc. (e.g. ['CK_Pro_MED4_00845', 'Q7V1M0', 'WP_011132479.1'])")
+        gene_summary: str | None = Field(default=None, description="Concatenated summary text (verbose-only, e.g. 'prmA :: ribosomal protein L11 methyltransferase :: Methylates ribosomal protein L11').")
+        function_description: str | None = Field(default=None, description="Curated functional description (verbose-only). May be null when no curated text exists.")
+        all_identifiers: list[str] | None = Field(default=None, description="Cross-references: UniProt, CyanorakID, RefSeq, etc. (verbose-only).")
         # Verbose-only DM fields (None on compact responses)
-        numeric_metric_count: int | None = Field(default=None, description="Numeric DM count (verbose).")
-        boolean_metric_count: int | None = Field(default=None, description="Boolean DM count (verbose).")
-        categorical_metric_count: int | None = Field(default=None, description="Categorical DM count (verbose).")
-        numeric_metric_types_observed: list[str] | None = Field(default=None, description="Numeric metric_types observed (verbose).")
-        boolean_metric_types_observed: list[str] | None = Field(default=None, description="Boolean metric_types observed (verbose).")
-        categorical_metric_types_observed: list[str] | None = Field(default=None, description="Categorical metric_types observed (verbose).")
-        compartments_observed: list[str] | None = Field(default=None, description="DM compartments observed for this gene (verbose).")
+        numeric_metric_count: int | None = Field(default=None, description="Numeric DM count (verbose-only).")
+        boolean_metric_count: int | None = Field(default=None, description="Boolean DM count (verbose-only).")
+        categorical_metric_count: int | None = Field(default=None, description="Categorical DM count (verbose-only).")
+        numeric_metric_types_observed: list[str] | None = Field(default=None, description="Numeric metric_types observed (verbose-only).")
+        boolean_metric_types_observed: list[str] | None = Field(default=None, description="Boolean metric_types observed (verbose-only).")
+        categorical_metric_types_observed: list[str] | None = Field(default=None, description="Categorical metric_types observed (verbose-only).")
+        compartments_observed: list[str] | None = Field(default=None, description="DM compartments observed for this gene (verbose-only).")
 
     class OverviewOrganismBreakdown(BaseModel):
-        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
-        count: int = Field(description="Genes from this organism (e.g. 3)")
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4').")
+        count: int = Field(description="Genes from this organism.")
 
     class OverviewCategoryBreakdown(BaseModel):
-        category: str = Field(description="Gene category (e.g. 'Photosynthesis')")
-        count: int = Field(description="Genes in this category (e.g. 5)")
+        category: str = Field(description="Gene category (e.g. 'Photosynthesis').")
+        count: int = Field(description="Genes in this category.")
 
     class OverviewAnnotationTypeBreakdown(BaseModel):
-        annotation_type: str = Field(description="Ontology type (e.g. 'go_bp', 'ec', 'kegg')")
-        count: int = Field(description="Genes with this annotation type (e.g. 12)")
+        annotation_type: str = Field(description="Ontology type (e.g. 'go_bp', 'ec', 'kegg').")
+        count: int = Field(description="Genes with this annotation type.")
 
     class OverviewAnnotationStateBreakdown(BaseModel):
-        annotation_state: str = Field(description="Informativeness state (e.g. 'informative_multi', 'informative_single', 'catch_all_only', 'no_evidence')")
-        count: int = Field(description="Genes in this state (e.g. 1386)")
+        annotation_state: str = Field(description="Informativeness state (e.g. 'informative_multi', 'informative_single', 'catch_all_only', 'no_evidence').")
+        count: int = Field(description="Genes in this state.")
 
     class GeneOverviewResponse(BaseModel):
-        total_matching: int = Field(description="Genes found in KG from input locus_tags")
-        by_organism: list[OverviewOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc")
-        by_category: list[OverviewCategoryBreakdown] = Field(description="Gene counts per category, sorted desc")
-        by_annotation_type: list[OverviewAnnotationTypeBreakdown] = Field(description="Gene counts per annotation type, sorted desc")
-        by_annotation_state: list[OverviewAnnotationStateBreakdown] = Field(default_factory=list, description="Rollup of annotation_state over result set (e.g. [{'annotation_state': 'informative_multi', 'count': 1386}, ...]). Sorted desc by count, matching existing rollups.")
-        has_expression: int = Field(description="Genes with expression data (expression_edge_count > 0)")
-        has_significant_expression: int = Field(description="Genes with significant DE observations")
-        has_orthologs: int = Field(description="Genes with ortholog group membership")
-        has_clusters: int = Field(description="Genes with cluster membership")
+        total_matching: int = Field(description="Genes found in KG from input locus_tags.")
+        by_organism: list[OverviewOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc.")
+        by_category: list[OverviewCategoryBreakdown] = Field(description="Gene counts per category, sorted desc.")
+        by_annotation_type: list[OverviewAnnotationTypeBreakdown] = Field(description="Gene counts per annotation type, sorted desc.")
+        by_annotation_state: list[OverviewAnnotationStateBreakdown] = Field(default_factory=list, description="Rollup of annotation_state over result set, sorted desc by count.")
+        has_expression: int = Field(description="Genes with expression data (expression_edge_count > 0).")
+        has_significant_expression: int = Field(description="Genes with significant DE observations.")
+        has_orthologs: int = Field(description="Genes with ortholog group membership.")
+        has_clusters: int = Field(description="Genes with cluster membership.")
         has_derived_metrics: int = Field(
             default=0,
             description="Count of requested locus_tags carrying any DM annotation.",
         )
         has_chemistry: int = Field(
             default=0,
-            description="Count of requested locus_tags with non-empty evidence_sources (i.e. participate in at least one reaction-to-metabolite or transport path). Mirrors has_orthologs / has_clusters routing-signal pattern.",
+            description="Count of requested locus_tags with non-empty evidence_sources (participate in at least one reaction-to-metabolite or transport path).",
         )
-        returned: int = Field(description="Results in this response (0 when summary=true)")
-        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-        truncated: bool = Field(description="True if total_matching > returned")
-        not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
-        results: list[GeneOverviewResult] = Field(default_factory=list, description="One row per gene")
+        returned: int = Field(description="Results in this response (0 when summary=true).")
+        offset: int = Field(default=0, description="Offset into full result set.")
+        truncated: bool = Field(description="True if total_matching > returned.")
+        not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG.")
+        results: list[GeneOverviewResult] = Field(default_factory=list, description="One row per gene.")
 
     @mcp.tool(
         tags={"genes"},
@@ -1838,19 +1808,9 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> GeneOverviewResponse:
-        """Get an overview of genes: identity and data availability signals.
+        """Batch gene routing: identity (gene_name, product, gene_category) plus per-gene data-availability signals (annotation_types, expression counts, ortholog/cluster summaries, DM rollups, chemistry rollups).
 
-        Use after resolve_gene, genes_by_function, genes_by_ontology, or
-        gene_homologs to understand what each gene is and what follow-up
-        data exists.
-
-        After this tool, drill into the rich axes when the per-gene signal
-        is present: gene_ontology_terms (when annotation_types is non-empty),
-        gene_homologs (when closest_ortholog_group_size > 0),
-        gene_clusters_by_gene (when cluster_membership_count > 0),
-        differential_expression_by_gene or gene_response_profile (when
-        expression_edge_count > 0), gene_derived_metrics (when
-        derived_metric_count > 0).
+        Routing: drill into each axis when the per-gene signal is non-zero — `gene_ontology_terms` (annotation_types non-empty), `gene_homologs` (closest_ortholog_group_size > 0), `gene_clusters_by_gene` (cluster_membership_count > 0), `differential_expression_by_gene` / `gene_response_profile` (expression_edge_count > 0), `gene_derived_metrics` and `genes_by_{numeric,boolean,categorical}_metric` keyed off `derived_metric_value_kinds`, `metabolites_by_gene` / `genes_by_metabolite` (evidence_sources non-empty). Use `gene_details` for the full Gene-node property dump.
         """
         await ctx.info(f"gene_overview locus_tags={locus_tags} summary={summary}")
         try:
@@ -1893,12 +1853,12 @@ def register_tools(mcp: FastMCP):
             raise ToolError(f"Error in gene_overview: {e}")
 
     class GeneDetailResponse(BaseModel):
-        total_matching: int = Field(description="Genes found from input locus_tags")
-        returned: int = Field(description="Results in this response (0 when summary=true)")
-        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-        truncated: bool = Field(description="True if total_matching > returned")
-        not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
-        results: list[dict] = Field(default_factory=list, description="One row per gene — all Gene node properties via g{.*}. ~30 fields including locus_tag, gene_name, product, organism_name, gene_category, annotation_quality, function_description, catalytic_activities, ec_numbers, etc. Sparse fields only present when populated. TCDB and CAZy memberships traverse Gene_has_tcdb_family / Gene_has_cazy_family edges instead.")
+        total_matching: int = Field(description="Genes found from input locus_tags.")
+        returned: int = Field(description="Results in this response (0 when summary=true).")
+        offset: int = Field(default=0, description="Offset into full result set.")
+        truncated: bool = Field(description="True if total_matching > returned.")
+        not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG.")
+        results: list[dict] = Field(default_factory=list, description="One row per gene — all Gene node properties via g{.*} (~30 fields incl. locus_tag, gene_name, product, organism_name, gene_category, annotation_quality, function_description, catalytic_activities, ec_numbers). Sparse fields only present when populated. annotation_quality is 0..3 (see docs://guide/conventions for the [AQ] redefinition). TCDB and CAZy memberships are graph edges (Gene_has_tcdb_family / Gene_has_cazy_family), not properties.")
 
     @mcp.tool(
         tags={"genes"},
@@ -1920,15 +1880,9 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> GeneDetailResponse:
-        """Get all properties for genes.
+        """All Gene node properties (deep-dive). Use `gene_overview` for the common routing case; this tool dumps every property including sparse fields (catalytic_activities, ec_numbers, ko_terms, etc.). TCDB/CAZy memberships are graph edges, not properties.
 
-        This is a deep-dive tool — use gene_overview for the common case.
-        Returns all Gene node properties including sparse fields
-        (catalytic_activities, ec_numbers, etc.). TCDB and CAZy memberships
-        live on Gene_has_tcdb_family / Gene_has_cazy_family edges instead.
-
-        For organism taxonomy, use list_organisms. For homologs, use
-        gene_homologs. For ontology annotations, use gene_ontology_terms.
+        Routing: prefer `gene_overview` for triage; chain into `metabolites_by_gene` for chemistry, `gene_homologs` for orthologs, `gene_ontology_terms` for annotations, `list_organisms` for taxonomy.
         """
         await ctx.info(f"gene_details locus_tags={locus_tags} summary={summary}")
         try:
@@ -2532,82 +2486,82 @@ def register_tools(mcp: FastMCP):
             raise ToolError(f"Error in gene_ontology_terms: {e}")
 
     class PublicationResult(BaseModel):
-        doi: str
-        title: str
-        authors: list[str]
-        year: int
-        journal: str | None = None
-        study_type: str | None = None
-        organisms: list[str] = Field(default=[], description="Organisms studied in this publication")
-        experiment_count: int = Field(default=0, description="Number of experiments in KG from this publication")
-        treatment_types: list[str] = Field(default=[], description="Experiment treatment types (e.g. coculture, nitrogen_stress)")
-        background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'diel_cycle'])")
-        omics_types: list[str] = Field(default=[], description="Omics data types (e.g. RNASEQ, PROTEOMICS)")
-        clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses from this publication (e.g. 4)")
-        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison'])")
-        growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases across experiments. Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
-        derived_metric_count: int = Field(default=0, description="Number of DerivedMetric nodes from this publication (e.g. 3)")
-        derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Value kinds of DerivedMetrics in this publication (e.g. ['numeric', 'boolean'])")
-        compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured in this publication (e.g. ['whole_cell', 'vesicle'])")
-        # Metabolomics measurement rollup (Phase 1 plumbing — spec §6.2)
-        metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this publication (precomputed Publication.metabolite_count). Non-zero on the 3 metabolomics-paired papers (Capovilla 2023, Kujawinski 2023, plus the vesicle paper 10.1111/1462-2920.15834). When > 0 → list_metabolite_assays(publication_doi=[...]) to inspect the paper's MetaboliteAssay nodes.")
-        metabolite_assay_count: int = Field(default=0, description="Distinct MetaboliteAssay edges anchored to this publication (precomputed). Mirrors metabolite_count today; will diverge once a metabolite is measured in multiple compartments per paper.")
+        doi: str = Field(description="Publication DOI (e.g. '10.1038/s41396-022-01202-1').")
+        title: str = Field(description="Publication title.")
+        authors: list[str] = Field(description="Author list (free-text, semicolon- or comma-delimited).")
+        year: int = Field(description="Publication year (e.g. 2022).")
+        journal: str | None = Field(default=None, description="Journal name (e.g. 'ISME').")
+        study_type: str | None = Field(default=None, description="Study type tag (e.g. 'metabolomics', 'transcriptomics').")
+        organisms: list[str] = Field(default=[], description="Organisms studied in this publication.")
+        experiment_count: int = Field(default=0, description="Number of experiments in KG from this publication.")
+        treatment_types: list[str] = Field(default=[], description="Experiment treatment types (e.g. coculture, nitrogen_stress).")
+        background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'diel_cycle']).")
+        omics_types: list[str] = Field(default=[], description="Omics data types (e.g. RNASEQ, PROTEOMICS).")
+        clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses from this publication.")
+        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison']).")
+        growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases across experiments. Timepoint-level condition, not gene-specific.")
+        derived_metric_count: int = Field(default=0, description="Number of DerivedMetric nodes from this publication.")
+        derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Value kinds of DerivedMetrics in this publication (subset of {numeric, boolean, categorical}). Use to route to genes_by_{kind}_metric.")
+        compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured in this publication (e.g. ['whole_cell', 'vesicle']).")
+        # Metabolomics measurement rollup
+        metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this publication (precomputed Publication.metabolite_count). Non-zero on metabolomics-bearing papers. When > 0, drill via list_metabolite_assays(publication_doi=[...]) to inspect the paper's MetaboliteAssay nodes.")
+        metabolite_assay_count: int = Field(default=0, description="Distinct MetaboliteAssay edges anchored to this publication (precomputed). Diverges from metabolite_count when the same metabolite is measured in multiple compartments per paper.")
         metabolite_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured for metabolomics in this publication (e.g. ['whole_cell', 'extracellular']). Populated only when metabolite_assay_count > 0; [] otherwise.")
-        score: float | None = Field(default=None, description="Lucene relevance score (only with search_text)")
+        score: float | None = Field(default=None, description="Lucene relevance score (only with search_text).")
 
-        abstract: str | None = Field(default=None, description="Publication abstract (only with verbose=True)")
-        description: str | None = Field(default=None, description="Curated study description (only with verbose=True)")
-        cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (only with verbose=True, e.g. 20)")
-        derived_metric_gene_count: int | None = Field(default=None, description="Total genes annotated by DerivedMetrics in this publication (only with verbose=True)")
-        derived_metric_types: list[str] | None = Field(default=None, description="Distinct DerivedMetric types in this publication (only with verbose=True, e.g. ['diel_rhythmicity'])")
+        abstract: str | None = Field(default=None, description="Publication abstract (verbose-only).")
+        description: str | None = Field(default=None, description="Curated study description (verbose-only).")
+        cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (verbose-only).")
+        derived_metric_gene_count: int | None = Field(default=None, description="Total genes annotated by DerivedMetrics in this publication (verbose-only).")
+        derived_metric_types: list[str] | None = Field(default=None, description="Distinct DerivedMetric types in this publication (verbose-only).")
 
     class PubOrganismBreakdown(BaseModel):
-        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
-        count: int = Field(description="Number of publications studying this organism (e.g. 11)")
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4').")
+        count: int = Field(description="Number of publications studying this organism.")
 
     class PubTreatmentTypeBreakdown(BaseModel):
-        treatment_type: str = Field(description="Treatment category (e.g. 'coculture')")
-        count: int = Field(description="Number of publications (e.g. 5)")
+        treatment_type: str = Field(description="Treatment category (e.g. 'coculture').")
+        count: int = Field(description="Number of publications.")
 
     class PubOmicsTypeBreakdown(BaseModel):
-        omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ')")
-        count: int = Field(description="Number of publications (e.g. 12)")
+        omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ').")
+        count: int = Field(description="Number of publications.")
 
     class PubBackgroundFactorBreakdown(BaseModel):
-        background_factor: str = Field(description="Background factor (e.g. 'axenic', 'diel_cycle')")
-        count: int = Field(description="Number of publications (e.g. 5)")
+        background_factor: str = Field(description="Background factor (e.g. 'axenic', 'diel_cycle').")
+        count: int = Field(description="Number of publications.")
 
     class PubClusterTypeBreakdown(BaseModel):
-        cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison')")
-        count: int = Field(description="Number of publications (e.g. 4)")
+        cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison').")
+        count: int = Field(description="Number of publications.")
 
     class PubValueKindBreakdown(BaseModel):
-        value_kind: str = Field(description="DerivedMetric value kind (e.g. 'numeric', 'boolean', 'categorical')")
-        count: int = Field(description="Number of publications with this value kind (e.g. 3)")
+        value_kind: str = Field(description="DerivedMetric value kind (e.g. 'numeric', 'boolean', 'categorical').")
+        count: int = Field(description="Number of publications with this value kind.")
 
     class PubMetricTypeBreakdown(BaseModel):
-        metric_type: str = Field(description="DerivedMetric type (e.g. 'diel_rhythmicity', 'darkness_survival_class')")
-        count: int = Field(description="Number of publications with this metric type (e.g. 2)")
+        metric_type: str = Field(description="DerivedMetric type (e.g. 'diel_rhythmicity', 'darkness_survival_class').")
+        count: int = Field(description="Number of publications with this metric type.")
 
     class PubCompartmentBreakdown(BaseModel):
-        compartment: str = Field(description="Wet-lab compartment (e.g. 'whole_cell', 'vesicle')")
-        count: int = Field(description="Number of publications with this compartment (e.g. 5)")
+        compartment: str = Field(description="Wet-lab compartment (e.g. 'whole_cell', 'vesicle').")
+        count: int = Field(description="Number of publications with this compartment.")
 
     class ListPublicationsResponse(BaseModel):
-        total_entries: int = Field(description="Total publications in KG (unfiltered)")
-        total_matching: int = Field(description="Publications matching filters")
-        by_organism: list[PubOrganismBreakdown] = Field(description="Publication counts per organism, sorted by count descending")
-        by_treatment_type: list[PubTreatmentTypeBreakdown] = Field(description="Publication counts per treatment type, sorted by count descending")
-        by_background_factors: list[PubBackgroundFactorBreakdown] = Field(description="Publication counts per background factor, sorted by count descending")
-        by_omics_type: list[PubOmicsTypeBreakdown] = Field(description="Publication counts per omics platform, sorted by count descending")
-        by_cluster_type: list[PubClusterTypeBreakdown] = Field(default_factory=list, description="Publication counts per cluster type, sorted by count descending")
-        by_value_kind: list[PubValueKindBreakdown] = Field(default_factory=list, description="DerivedMetric value kind frequency rollup across matched publications. Each entry: {value_kind, count}.")
-        by_metric_type: list[PubMetricTypeBreakdown] = Field(default_factory=list, description="DerivedMetric type frequency rollup across matched publications. Each entry: {metric_type, count}.")
-        by_compartment: list[PubCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched publications. Each entry: {compartment, count}.")
-        returned: int = Field(description="Publications in this response")
-        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-        truncated: bool = Field(description="True if total_matching > returned")
-        not_found: list[str] = Field(default_factory=list, description="Input publication_dois that did not match any Publication node (empty unless publication_dois was provided)")
+        total_entries: int = Field(description="Total publications in KG (unfiltered).")
+        total_matching: int = Field(description="Publications matching filters.")
+        by_organism: list[PubOrganismBreakdown] = Field(description="Publication counts per organism, sorted desc.")
+        by_treatment_type: list[PubTreatmentTypeBreakdown] = Field(description="Publication counts per treatment type, sorted desc.")
+        by_background_factors: list[PubBackgroundFactorBreakdown] = Field(description="Publication counts per background factor, sorted desc.")
+        by_omics_type: list[PubOmicsTypeBreakdown] = Field(description="Publication counts per omics platform, sorted desc.")
+        by_cluster_type: list[PubClusterTypeBreakdown] = Field(default_factory=list, description="Publication counts per cluster type, sorted desc.")
+        by_value_kind: list[PubValueKindBreakdown] = Field(default_factory=list, description="DerivedMetric value kind frequency rollup across matched publications.")
+        by_metric_type: list[PubMetricTypeBreakdown] = Field(default_factory=list, description="DerivedMetric type frequency rollup across matched publications.")
+        by_compartment: list[PubCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched publications.")
+        returned: int = Field(description="Publications in this response.")
+        offset: int = Field(default=0, description="Offset into full result set.")
+        truncated: bool = Field(description="True if total_matching > returned.")
+        not_found: list[str] = Field(default_factory=list, description="Input publication_dois that did not match any Publication node (empty unless publication_dois was provided).")
         results: list[PublicationResult]
 
     @mcp.tool(
@@ -2662,16 +2616,9 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> ListPublicationsResponse:
-        """List publications with expression data in the knowledge graph.
+        """List publications with experiment summaries, DM rollups, and metabolomics rollups. Use as the discovery entry point for studies.
 
-        Returns publication metadata and experiment summaries. Use this as
-        an entry point to discover what studies exist.
-
-        After this tool, drill in via:
-        - list_experiments(publication_doi=[doi]) for per-experiment detail
-        - genes_by_function(organism=...) / genes_by_ontology(organism=..., term_ids=...) for gene discovery scoped to the publication's organism(s)
-        - list_clustering_analyses(publication_doi=[doi]) for clustering analyses
-        - list_derived_metrics(publication_doi=[doi]) for non-DE evidence
+        Routing: drill via `list_experiments(publication_doi=[doi])` for per-experiment detail; `list_clustering_analyses(publication_doi=[doi])` for clustering; `list_derived_metrics(publication_doi=[doi])` for non-DE evidence; `list_metabolite_assays(publication_doi=[doi])` when `metabolite_count > 0`. Per-row `derived_metric_value_kinds` routes to `genes_by_{numeric,boolean,categorical}_metric`.
         """
         await ctx.info(f"list_publications organism={organism} treatment_type={treatment_type} "
                        f"growth_phases={growth_phases} search_text={search_text} author={author} "
@@ -2726,128 +2673,128 @@ def register_tools(mcp: FastMCP):
     # --- list_experiments ---
 
     class GeneStatusBreakdown(BaseModel):
-        significant_up: int = Field(default=0, description="Genes with significant upregulation (e.g. 245)")
-        significant_down: int = Field(default=0, description="Genes with significant downregulation (e.g. 178)")
-        not_significant: int = Field(default=0, description="Genes not meeting significance threshold (e.g. 1273)")
+        significant_up: int = Field(default=0, description="Genes with significant upregulation.")
+        significant_down: int = Field(default=0, description="Genes with significant downregulation.")
+        not_significant: int = Field(default=0, description="Genes not meeting significance threshold (tested-absent for the comparison; populated only when table_scope='all_detected_genes' — see docs://guide/conventions).")
 
     class TimePoint(BaseModel):
-        timepoint: str | None = Field(default=None, description="Time point label, null if unlabeled (e.g. '24h', '5h extended darkness (40h)')")
-        timepoint_order: int = Field(description="Sort order within experiment (e.g. 1, 2, 3)")
-        timepoint_hours: float | None = Field(default=None, description="Time in hours, null if unknown (e.g. 24.0)")
+        timepoint: str | None = Field(default=None, description="Time point label, null if unlabeled (e.g. '24h', '5h extended darkness (40h)').")
+        timepoint_order: int = Field(description="Sort order within experiment.")
+        timepoint_hours: float | None = Field(default=None, description="Time in hours, null if unknown.")
         growth_phase: str | None = Field(default=None, description="Growth phase observed at this timepoint (e.g. 'exponential', 'nutrient_limited', 'death'). Null when not annotated.")
-        gene_count: int = Field(description="Total genes with expression data at this time point (e.g. 1696)")
-        genes_by_status: GeneStatusBreakdown = Field(description="Gene counts by expression status at this time point")
+        gene_count: int = Field(description="Total genes with expression data at this time point.")
+        genes_by_status: GeneStatusBreakdown = Field(description="Gene counts by expression status at this time point.")
 
     class ExperimentResult(BaseModel):
         # compact fields (always returned)
-        experiment_id: str = Field(description="Experiment identifier (e.g. '10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq')")
-        experiment_name: str = Field(description="Experiment display name (e.g. 'MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions (RNASEQ)')")
-        publication_doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70')")
-        authors: list[str] = Field(default_factory=list, description="Publication authors (e.g. ['Smith J', 'Jones K']). Sourced from Publication.authors via the Has_experiment edge — no need to join with list_publications for author attribution.")
-        organism_name: str = Field(description="Profiled organism (e.g. 'Prochlorococcus MED4')")
-        treatment_type: list[str] = Field(description="Treatment categories (e.g. ['coculture'], ['nitrogen_stress', 'coculture'])")
+        experiment_id: str = Field(description="Experiment identifier (e.g. '10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq').")
+        experiment_name: str = Field(description="Experiment display name.")
+        publication_doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70').")
+        authors: list[str] = Field(default_factory=list, description="Publication authors. Sourced from Publication.authors via the Has_experiment edge — no need to join with list_publications for author attribution.")
+        organism_name: str = Field(description="Profiled organism (e.g. 'Prochlorococcus MED4').")
+        treatment_type: list[str] = Field(description="Treatment categories (e.g. ['coculture'], ['nitrogen_stress', 'coculture']).")
         background_factors: list[str] = Field(default_factory=list, description="Background experimental factors (e.g. ['axenic', 'continuous_light']). Empty list when none specified.")
-        coculture_partner: str | None = Field(default=None, description="Interacting organism — coculture partner or phage. Null when no interacting organism (e.g. 'Alteromonas macleodii HOT1A3', 'Phage')")
-        omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ', 'MICROARRAY', 'PROTEOMICS')")
-        is_time_course: bool = Field(description="Whether experiment has multiple time points")
-        table_scope: str | None = Field(default=None, description="What genes the source DE table contains. Values: all_detected_genes, significant_any_timepoint, significant_only, top_n, filtered_subset. Critical for interpreting missing genes.")
-        table_scope_detail: str | None = Field(default=None, description="Free-text clarification of table_scope (e.g. 'FDR < 0.05 and |logFC| > 0.8')")
-        gene_count: int = Field(description="Cumulative row count across timepoints (= sum(time_point_totals) for time-course experiments). For a 6-TP experiment with 1697 genes/TP, gene_count=10182. For non-time-course experiments equals distinct_gene_count.")
-        distinct_gene_count: int = Field(description="Distinct gene count across the experiment — number of distinct gene IDs with at least one measurement edge, regardless of timepoint. Use for detection-power / pathway-background sizing. distinct_gene_count <= gene_count; for the same 6-TP example, distinct_gene_count=1697 vs gene_count=10182.")
-        genes_by_status: GeneStatusBreakdown = Field(description="Gene counts by expression status")
+        coculture_partner: str | None = Field(default=None, description="Interacting organism — coculture partner or phage. Null when no interacting organism.")
+        omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ', 'MICROARRAY', 'PROTEOMICS').")
+        is_time_course: bool = Field(description="Whether experiment has multiple time points.")
+        table_scope: str | None = Field(default=None, description="What genes the source DE table contains. Values: all_detected_genes (tested-absent rows kept — `not_significant` represents real biology), significant_any_timepoint, significant_only (tested-absent rows collapsed), top_n, filtered_subset. Critical for interpreting missing genes — see docs://guide/conventions.")
+        table_scope_detail: str | None = Field(default=None, description="Free-text clarification of table_scope (e.g. 'FDR < 0.05 and |logFC| > 0.8').")
+        gene_count: int = Field(description="Cumulative row count across timepoints (= sum(time_point_totals) for time-course experiments — a 6-TP experiment with 1697 genes/TP has gene_count=10182). Equals distinct_gene_count for non-time-course experiments.")
+        distinct_gene_count: int = Field(description="Distinct gene count across the experiment — unique gene IDs with at least one measurement edge, regardless of timepoint. Use for detection-power / pathway-background sizing. distinct_gene_count <= gene_count.")
+        genes_by_status: GeneStatusBreakdown = Field(description="Gene counts by expression status.")
         timepoints: list[TimePoint] | None = Field(default=None, description="Per-timepoint gene counts. Omitted for non-time-course experiments.")
-        clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses for this experiment (e.g. 4)")
-        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison'])")
-        growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases in this experiment. Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
-        derived_metric_count: int = Field(default=0, description="Number of DerivedMetrics associated with this experiment (e.g. 4)")
-        derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Distinct DerivedMetric value kinds for this experiment (e.g. ['numeric', 'boolean'])")
+        clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses for this experiment.")
+        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison']).")
+        growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases in this experiment. Timepoint-level condition, not gene-specific.")
+        derived_metric_count: int = Field(default=0, description="Number of DerivedMetrics associated with this experiment.")
+        derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Distinct DerivedMetric value kinds for this experiment (subset of {numeric, boolean, categorical}). Use to route to genes_by_{kind}_metric.")
         compartment: str | None = Field(default=None, description="Wet-lab fraction this experiment profiles (e.g. 'whole_cell', 'vesicle', 'exoproteome'). Scalar per experiment.")
-        # Metabolomics measurement rollup (Phase 1 plumbing — spec §6.3)
-        metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this experiment (precomputed Experiment.metabolite_count). Non-zero on 12 experiments today (the metabolomics-paired ones across the 3 metabolomics papers).")
-        metabolite_assay_count: int = Field(default=0, description="Distinct MetaboliteAssay edges anchored to this experiment (precomputed). Mirrors metabolite_count today.")
+        # Metabolomics measurement rollup
+        metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this experiment (precomputed Experiment.metabolite_count). Non-zero on metabolomics-paired experiments. When > 0, drill via list_metabolite_assays(experiment_ids=[...]).")
+        metabolite_assay_count: int = Field(default=0, description="Distinct MetaboliteAssay edges anchored to this experiment (precomputed).")
         metabolite_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured for metabolomics in this experiment (subset of {'whole_cell', 'extracellular', 'vesicle'}). Populated only when metabolite_assay_count > 0.")
-        score: float | None = Field(default=None, description="Lucene relevance score, present only when search_text is used (e.g. 2.45)")
+        score: float | None = Field(default=None, description="Lucene relevance score, present only when search_text is used.")
         # verbose-only fields
-        publication_title: str | None = Field(default=None, description="Publication title")
-        treatment: str | None = Field(default=None, description="Treatment description (e.g. 'Coculture with Alteromonas HOT1A3')")
-        control: str | None = Field(default=None, description="Control description (e.g. 'Pro99 medium growth conditions')")
-        light_condition: str | None = Field(default=None, description="Light regime (e.g. 'continuous light')")
-        light_intensity: str | None = Field(default=None, description="Light intensity (e.g. '10 umol photons m-2 s-1')")
-        medium: str | None = Field(default=None, description="Growth medium (e.g. 'Pro99')")
-        temperature: str | None = Field(default=None, description="Temperature (e.g. '24C')")
-        statistical_test: str | None = Field(default=None, description="Statistical method (e.g. 'Rockhopper')")
-        experimental_context: str | None = Field(default=None, description="Context summary (e.g. 'in Pro99 medium under continuous light')")
-        cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (only with verbose=True, e.g. 20)")
-        derived_metric_gene_count: int | None = Field(default=None, description="Number of distinct genes with DerivedMetric annotations in this experiment (only with verbose=True, e.g. 450)")
-        derived_metric_types: list[str] | None = Field(default=None, description="Distinct DerivedMetric metric_type values for this experiment (only with verbose=True, e.g. ['damping_ratio', 'diel_amplitude'])")
-        reports_derived_metric_types: list[str] | None = Field(default=None, description="DerivedMetric types reported by (not just associated with) this experiment (only with verbose=True)")
+        publication_title: str | None = Field(default=None, description="Publication title (verbose-only).")
+        treatment: str | None = Field(default=None, description="Treatment description (verbose-only, e.g. 'Coculture with Alteromonas HOT1A3').")
+        control: str | None = Field(default=None, description="Control description (verbose-only).")
+        light_condition: str | None = Field(default=None, description="Light regime (verbose-only).")
+        light_intensity: str | None = Field(default=None, description="Light intensity (verbose-only).")
+        medium: str | None = Field(default=None, description="Growth medium (verbose-only).")
+        temperature: str | None = Field(default=None, description="Temperature (verbose-only).")
+        statistical_test: str | None = Field(default=None, description="Statistical method (verbose-only).")
+        experimental_context: str | None = Field(default=None, description="Context summary (verbose-only).")
+        cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (verbose-only).")
+        derived_metric_gene_count: int | None = Field(default=None, description="Number of distinct genes with DerivedMetric annotations in this experiment (verbose-only).")
+        derived_metric_types: list[str] | None = Field(default=None, description="Distinct DerivedMetric metric_type values for this experiment (verbose-only).")
+        reports_derived_metric_types: list[str] | None = Field(default=None, description="DerivedMetric types reported by (not just associated with) this experiment (verbose-only).")
 
     class OrganismBreakdown(BaseModel):
-        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
-        count: int = Field(description="Number of experiments for this organism (e.g. 46)")
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4').")
+        count: int = Field(description="Number of experiments for this organism.")
 
     class TreatmentTypeBreakdown(BaseModel):
-        treatment_type: str = Field(description="Treatment category (e.g. 'coculture')")
-        count: int = Field(description="Number of experiments (e.g. 16)")
+        treatment_type: str = Field(description="Treatment category (e.g. 'coculture').")
+        count: int = Field(description="Number of experiments.")
 
     class BackgroundFactorBreakdown(BaseModel):
-        background_factor: str = Field(description="Background factor (e.g. 'axenic', 'diel_cycle')")
-        count: int = Field(description="Number of experiments (e.g. 14)")
+        background_factor: str = Field(description="Background factor (e.g. 'axenic', 'diel_cycle').")
+        count: int = Field(description="Number of experiments.")
 
     class OmicsTypeBreakdown(BaseModel):
-        omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ')")
-        count: int = Field(description="Number of experiments (e.g. 48)")
+        omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ').")
+        count: int = Field(description="Number of experiments.")
 
     class PublicationBreakdown(BaseModel):
-        publication_doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70')")
-        count: int = Field(description="Number of experiments from this publication (e.g. 5)")
+        publication_doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70').")
+        count: int = Field(description="Number of experiments from this publication.")
 
     class TableScopeBreakdown(BaseModel):
-        table_scope: str = Field(description="Table scope value (e.g. 'all_detected_genes', 'significant_only')")
-        count: int = Field(description="Number of experiments with this scope (e.g. 22)")
+        table_scope: str = Field(description="Table scope value (e.g. 'all_detected_genes', 'significant_only').")
+        count: int = Field(description="Number of experiments with this scope.")
 
     class ClusterTypeBreakdown(BaseModel):
-        cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison')")
-        count: int = Field(description="Number of experiments with this cluster type (e.g. 7)")
+        cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison').")
+        count: int = Field(description="Number of experiments with this cluster type.")
 
     class GrowthPhaseBreakdown(BaseModel):
-        growth_phase: str = Field(description="Growth phase (e.g. 'exponential'). Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
-        count: int = Field(description="Number of experiments with this growth phase")
+        growth_phase: str = Field(description="Growth phase (e.g. 'exponential'). Timepoint-level condition, not gene-specific.")
+        count: int = Field(description="Number of experiments with this growth phase.")
 
     class ExpValueKindBreakdown(BaseModel):
-        value_kind: str = Field(description="DerivedMetric value kind (e.g. 'numeric', 'boolean', 'categorical')")
-        count: int = Field(description="Number of experiments whose DMs include this value kind (e.g. 15)")
+        value_kind: str = Field(description="DerivedMetric value kind (e.g. 'numeric', 'boolean', 'categorical').")
+        count: int = Field(description="Number of experiments whose DMs include this value kind.")
 
     class ExpMetricTypeBreakdown(BaseModel):
-        metric_type: str = Field(description="DerivedMetric type name (e.g. 'damping_ratio', 'diel_amplitude_protein_log2')")
-        count: int = Field(description="Number of experiments associated with DMs of this type (e.g. 4)")
+        metric_type: str = Field(description="DerivedMetric type name (e.g. 'damping_ratio', 'diel_amplitude_protein_log2').")
+        count: int = Field(description="Number of experiments associated with DMs of this type.")
 
     class ExpCompartmentBreakdown(BaseModel):
-        compartment: str = Field(description="Wet-lab fraction (e.g. 'whole_cell', 'vesicle', 'exoproteome')")
-        count: int = Field(description="Number of experiments in this compartment (e.g. 160)")
+        compartment: str = Field(description="Wet-lab fraction (e.g. 'whole_cell', 'vesicle', 'exoproteome').")
+        count: int = Field(description="Number of experiments in this compartment.")
 
     class ListExperimentsResponse(BaseModel):
-        total_entries: int = Field(description="Total experiments in the KG (unfiltered)")
-        total_matching: int = Field(description="Experiments matching filters")
-        returned: int = Field(description="Number of results returned (0 when summary=true)")
-        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-        truncated: bool = Field(description="True if results were truncated by limit or summary=true")
-        by_organism: list[OrganismBreakdown] = Field(description="Experiment counts per organism, sorted by count descending")
-        by_treatment_type: list[TreatmentTypeBreakdown] = Field(description="Experiment counts per treatment type, sorted by count descending")
-        by_background_factors: list[BackgroundFactorBreakdown] = Field(description="Experiment counts per background factor, sorted by count descending")
-        by_omics_type: list[OmicsTypeBreakdown] = Field(description="Experiment counts per omics platform, sorted by count descending")
-        by_publication: list[PublicationBreakdown] = Field(description="Experiment counts per publication, sorted by count descending")
-        by_table_scope: list[TableScopeBreakdown] = Field(description="Experiment counts per table scope, sorted by count descending")
-        by_cluster_type: list[ClusterTypeBreakdown] = Field(default_factory=list, description="Experiment counts per cluster type, sorted by count descending")
-        by_growth_phase: list[GrowthPhaseBreakdown] = Field(default_factory=list, description="Experiment counts per growth phase, sorted by count descending")
-        by_value_kind: list[ExpValueKindBreakdown] = Field(default_factory=list, description="Experiment counts by DerivedMetric value_kind across matching experiments")
-        by_metric_type: list[ExpMetricTypeBreakdown] = Field(default_factory=list, description="Experiment counts by DerivedMetric metric_type across matching experiments")
-        by_compartment: list[ExpCompartmentBreakdown] = Field(default_factory=list, description="Experiment counts per wet-lab compartment (e.g. whole_cell, vesicle, exoproteome)")
-        time_course_count: int = Field(description="Number of time-course experiments in matching set")
-        score_max: float | None = Field(default=None, description="Max Lucene relevance score, present only when search_text is used (e.g. 4.52)")
-        score_median: float | None = Field(default=None, description="Median Lucene relevance score, present only when search_text is used (e.g. 1.23)")
-        not_found: list[str] = Field(default_factory=list, description="Input experiment_ids that did not match any Experiment node (empty unless experiment_ids was provided)")
-        results: list[ExperimentResult] = Field(description="Individual experiments (empty when summary=true)")
+        total_entries: int = Field(description="Total experiments in the KG (unfiltered).")
+        total_matching: int = Field(description="Experiments matching filters.")
+        returned: int = Field(description="Number of results returned (0 when summary=true).")
+        offset: int = Field(default=0, description="Offset into full result set.")
+        truncated: bool = Field(description="True if results were truncated by limit or summary=true.")
+        by_organism: list[OrganismBreakdown] = Field(description="Experiment counts per organism, sorted desc.")
+        by_treatment_type: list[TreatmentTypeBreakdown] = Field(description="Experiment counts per treatment type, sorted desc.")
+        by_background_factors: list[BackgroundFactorBreakdown] = Field(description="Experiment counts per background factor, sorted desc.")
+        by_omics_type: list[OmicsTypeBreakdown] = Field(description="Experiment counts per omics platform, sorted desc.")
+        by_publication: list[PublicationBreakdown] = Field(description="Experiment counts per publication, sorted desc.")
+        by_table_scope: list[TableScopeBreakdown] = Field(description="Experiment counts per table scope, sorted desc.")
+        by_cluster_type: list[ClusterTypeBreakdown] = Field(default_factory=list, description="Experiment counts per cluster type, sorted desc.")
+        by_growth_phase: list[GrowthPhaseBreakdown] = Field(default_factory=list, description="Experiment counts per growth phase, sorted desc.")
+        by_value_kind: list[ExpValueKindBreakdown] = Field(default_factory=list, description="Experiment counts by DerivedMetric value_kind across matching experiments.")
+        by_metric_type: list[ExpMetricTypeBreakdown] = Field(default_factory=list, description="Experiment counts by DerivedMetric metric_type across matching experiments.")
+        by_compartment: list[ExpCompartmentBreakdown] = Field(default_factory=list, description="Experiment counts per wet-lab compartment.")
+        time_course_count: int = Field(description="Number of time-course experiments in matching set.")
+        score_max: float | None = Field(default=None, description="Max Lucene relevance score, present only when search_text is used.")
+        score_median: float | None = Field(default=None, description="Median Lucene relevance score, present only when search_text is used.")
+        not_found: list[str] = Field(default_factory=list, description="Input experiment_ids that did not match any Experiment node (empty unless experiment_ids was provided).")
+        results: list[ExperimentResult] = Field(description="Individual experiments (empty when summary=true).")
 
     @mcp.tool(
         tags={"experiments", "expression", "discovery"},
@@ -2937,22 +2884,11 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> ListExperimentsResponse:
-        """List differential expression experiments in the knowledge graph.
+        """List differential-expression experiments with rich breakdowns (organism, treatment, omics, table_scope, growth_phase, DM rollups, metabolomics rollups). Use `summary=true` to see only breakdowns.
 
-        Returns summary breakdowns (by organism, treatment type, omics type,
-        table scope) plus individual experiments. Use summary=true to see only
-        breakdowns, then drill into detail with filters.
+        table_scope is critical for interpreting missing genes — `'all_detected_genes'` keeps tested-absent rows (the `not_significant` bucket reflects real biology); `'significant_only'` collapses them. Use `table_scope=['all_detected_genes']` to restrict to experiments fair for cross-experiment comparison. See `docs://guide/conventions` for the broader tested-absent framing.
 
-        table_scope indicates what genes each experiment's source DE table
-        contains — critical for interpreting missing genes. Use
-        table_scope=['all_detected_genes'] to restrict to experiments that
-        report all assayed genes (fair for cross-experiment comparison).
-
-        After this tool, drill in via:
-        - differential_expression_by_gene(experiment_ids=[id]) for per-gene DE
-        - list_clustering_analyses(experiment_ids=[id]) for clusters built from this experiment
-        - list_derived_metrics(experiment_ids=[id]) for DM evidence on this experiment
-        - pathway_enrichment(experiment_ids=[id]) for ORA on DE results
+        Routing: drill via `differential_expression_by_gene(experiment_ids=[id])` for per-gene DE; `list_clustering_analyses(experiment_ids=[id])`; `list_derived_metrics(experiment_ids=[id])`; `pathway_enrichment(experiment_ids=[id])`; `list_metabolite_assays(experiment_ids=[id])` when `metabolite_count > 0`.
         """
         await ctx.info(f"list_experiments summary={summary} organism={organism} "
                        f"treatment_type={treatment_type} search_text={search_text}")

@@ -2,17 +2,15 @@
 
 ## What it does
 
-List valid values for categorical filters used across tools.
+Enumerate valid values + counts for a categorical filter (gene_category, brite_tree, growth_phase, metric_type, value_kind, compartment, omics_type, evidence_source).
 
-Returns valid values and counts for the requested filter type.
-Use the returned values as filter parameters in `genes_by_function`
-(category filter).
+Routing: feed the returned `value`s into the corresponding filter on the relevant tool — `gene_category` → `genes_by_function(category=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment', 'omics_type', 'evidence_source') | gene_category | Which categorical filter to enumerate. 'gene_category' / 'brite_tree' / 'growth_phase'; 'metric_type' / 'value_kind' / 'compartment' (DerivedMetric discovery); 'omics_type' (Experiment.omics_type enum incl. METABOLOMICS); 'evidence_source' (Metabolite.evidence_sources values: 'metabolism', 'transport', 'metabolomics'). |
+| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment', 'omics_type', 'evidence_source') | gene_category | Which categorical filter to enumerate. See type column for the 8 valid values; `omics_type` returns the full canonical enum incl. METABOLOMICS; `evidence_source` returns Metabolite.evidence_sources values. |
 
 ## Response format
 
@@ -22,18 +20,18 @@ Use the returned values as filter parameters in `genes_by_function`
 filter_type, total_entries, returned, truncated, results
 ```
 
-- **filter_type** (string): The filter type returned (e.g. 'gene_category')
-- **total_entries** (int): Total distinct values for this filter (e.g. 26)
-- **returned** (int): Number of results returned (e.g. 26)
-- **truncated** (bool): True if total_entries > returned
+- **filter_type** (string): The filter type returned (e.g. 'gene_category').
+- **total_entries** (int): Total distinct values for this filter.
+- **returned** (int): Number of results returned.
+- **truncated** (bool): True if total_entries > returned.
 
 ### Per-result fields
 
 | Field | Type | Description |
 |---|---|---|
-| value | string | Filter value (e.g. 'Photosynthesis', 'Transport', 'Unknown') |
-| count | int | Number of genes/items with this value (e.g. 770) |
-| tree_code | string \| None (optional) | BRITE tree code (sparse: only for brite_tree filter, e.g. 'ko01000') |
+| value | string | Filter value (e.g. 'Photosynthesis', 'Transport', 'Unknown'). |
+| count | int | Number of items with this value. |
+| tree_code | string \| None (optional) | BRITE tree code (sparse: only for brite_tree filter, e.g. 'ko01000'). |
 
 ## Few-shot examples
 
