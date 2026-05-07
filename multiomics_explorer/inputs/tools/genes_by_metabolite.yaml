@@ -34,10 +34,10 @@ examples:
 
   - title: Pathway-anchored — N-metabolism only
     call: genes_by_metabolite(metabolite_ids=["kegg.compound:C00086", "kegg.compound:C00064", "kegg.compound:C00088"], organism="Prochlorococcus MED4", metabolite_pathway_ids=["kegg.pathway:ko00910"])
-    # metabolite_pathway_ids narrows BOTH arms uniformly via Metabolite.pathway_ids
-    # (KG-A5 denorm). Result: only rows whose metabolite is annotated to
-    # KEGG nitrogen-metabolism pathway survive — useful when batch-querying
-    # mixed metabolites and you want only the N-pathway slice.
+    # metabolite_pathway_ids narrows BOTH arms uniformly via
+    # Metabolite.pathway_ids. Result: only rows whose metabolite is
+    # annotated to KEGG nitrogen-metabolism pathway survive — useful when
+    # batch-querying mixed metabolites and you want only the N-pathway slice.
 
   - title: Currency-cofactor strip — exclude ATP/ADP/NADH/NADPH/H2O on a multi-metabolite drill
     call: |
@@ -99,7 +99,7 @@ mistakes:
     questions (e.g. cross-organism inference); keep `family_inferred` for
     broad-screen candidate enumeration (e.g. N-source DE — the real MED4
     N-uptake genes are family_inferred-only). Both tiers are annotations,
-    neither is ground truth — see analysis-doc §g.
+    neither is ground truth — see `docs://guide/conventions`.
   - >-
     Every result row has the same key set — cross-arm fields are explicitly
     `None` on rows from the other arm (metabolism rows have

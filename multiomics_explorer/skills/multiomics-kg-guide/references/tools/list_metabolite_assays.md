@@ -2,27 +2,20 @@
 
 ## What it does
 
-Discover MetaboliteAssay nodes — discovery surface for the
-metabolomics measurement layer. Mirrors `list_derived_metrics`.
+Discover MetaboliteAssay nodes — the metabolomics measurement
+layer. Mirrors `list_derived_metrics`. Inspect `value_kind` (routes
+drill-down), `rankable` (gates rankable filters on the numeric
+drill-down), `compartment` (whole_cell vs extracellular), and
+per-row `detection_status_counts` (signals how much of the assay
+is detected / sporadic / not_detected).
 
-Inspect `value_kind` (routes drill-down), `rankable` (gates
-rankable filters on the numeric drill-down), `compartment`
-(whole_cell vs extracellular), and per-row
-`detection_status_counts` (signals how much of the assay is
-detected / sporadic / not_detected — primary headline per audit
-§4.3.3).
-
-A row with `value=0` / `flag_value=false` /
-`detection_status='not_detected'` on the drill-down tools is
-*tested-absent* (assayed and not found, real biology) — distinct
-from a missing row, which is *unmeasured* (not in the assay's
-scope). See parent spec §10.
-
-After this, drill via:
-- metabolites_by_quantifies_assay(assay_ids=[...]) — numeric arm details
-- metabolites_by_flags_assay(assay_ids=[...]) — boolean arm details
-- assays_by_metabolite(metabolite_ids=[...]) — reverse lookup across both arms
-- list_metabolites(metabolite_ids=[...]) — chemistry context for measured compounds
+Routing: drill into `metabolites_by_quantifies_assay(assay_ids=[...])`
+for numeric details, `metabolites_by_flags_assay(assay_ids=[...])`
+for boolean details, `assays_by_metabolite(metabolite_ids=[...])`
+for reverse lookup across both arms, and
+`list_metabolites(metabolite_ids=[...])` for chemistry context. See
+`docs://guide/conventions` for tested-absent semantics and
+`docs://analysis/metabolites` for the metabolomics decision tree.
 
 ## Parameters
 
@@ -35,7 +28,7 @@ After this, drill via:
 | compartment | string \| None | None | 'whole_cell' or 'extracellular'. Exact match. |
 | treatment_type | list[string] \| None | None | ANY-overlap. E.g. ['carbon'], ['phosphorus', 'growth_phase']. |
 | background_factors | list[string] \| None | None | ANY-overlap. E.g. ['axenic', 'light']. |
-| growth_phases | list[string] \| None | None | ANY-overlap. Empty today — KG-MET-017 backfill pending. |
+| growth_phases | list[string] \| None | None | ANY-overlap. Currently unpopulated — KG-side backfill pending. |
 | publication_doi | list[string] \| None | None | DOI(s). Exact match. E.g. ['10.1073/pnas.2213271120', '10.1128/msystems.01261-22']. |
 | experiment_ids | list[string] \| None | None | Experiment node id(s). |
 | assay_ids | list[string] \| None | None | MetaboliteAssay id(s). `not_found.assay_ids` lists unknowns. |
@@ -44,7 +37,7 @@ After this, drill via:
 | rankable | bool \| None | None | True → assays supporting rank/percentile/bucket on metabolites_by_quantifies_assay's rankable-gated filters. |
 | summary | bool | False | Return summary fields only (results=[]). |
 | verbose | bool | False | Include heavy-text fields per row: treatment, light_condition, experimental_context. |
-| limit | int | 20 | Max results (default 20 covers all 14 assays today). |
+| limit | int | 20 | Max results. |
 | offset | int | 0 | Pagination offset (0-indexed). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
@@ -57,23 +50,23 @@ After this, drill via:
 total_entries, total_matching, metabolite_count_total, by_organism, by_value_kind, by_compartment, top_metric_types, by_treatment_type, by_background_factors, by_growth_phase, by_detection_status, score_max, score_median, returned, offset, truncated, not_found, results
 ```
 
-- **total_entries** (int): Total MetaboliteAssay nodes in KG (10 today)
+- **total_entries** (int): Total MetaboliteAssay nodes in KG.
 - **total_matching** (int): Assays matching all filters
-- **metabolite_count_total** (int): Cumulative sum of total_metabolite_count across matching assays. Same metabolite measured by N assays counts N times. For distinct count, use assays_by_metabolite(metabolite_ids=..., summary=True) or list_metabolites(metabolite_ids=...).
+- **metabolite_count_total** (int): Cumulative sum of total_metabolite_count across matching assays — same metabolite measured by N assays counts N times. For distinct count, use assays_by_metabolite(metabolite_ids=..., summary=True) or list_metabolites(metabolite_ids=...).
 - **by_organism** (list[LmaOrganismBreakdown]): Counts per organism, sorted desc
 - **by_value_kind** (list[LmaValueKindBreakdown]): Counts per value_kind. Routes drill-down: numeric → metabolites_by_quantifies_assay, boolean → metabolites_by_flags_assay.
 - **by_compartment** (list[LmaCompartmentBreakdown]): Counts per compartment
 - **top_metric_types** (list[LmaMetricTypeBreakdown]): Counts per metric_type, sorted desc. Pass to metabolites_by_quantifies_assay or metabolites_by_flags_assay (assay-id resolution required first).
 - **by_treatment_type** (list[LmaTreatmentTypeBreakdown])
 - **by_background_factors** (list[LmaBackgroundFactorBreakdown])
-- **by_growth_phase** (list[LmaGrowthPhaseBreakdown]): Empty today — KG-MET-017 backfill pending.
-- **by_detection_status** (list[LmaDetectionStatusBreakdown]): Envelope-level rollup of detection_status across all numeric edges of matching assays. Audit §4.3.3 primary headline. ~75% of numeric edges are not_detected (tested-absent — real biology, see parent §10).
+- **by_growth_phase** (list[LmaGrowthPhaseBreakdown]): Currently unpopulated — KG-side backfill pending.
+- **by_detection_status** (list[LmaDetectionStatusBreakdown]): Envelope-level rollup of detection_status across all numeric edges of matching assays. Primary qualitative headline — about 75% of numeric edges are not_detected (tested-absent: assayed and not found, real biology). See `docs://guide/conventions`.
 - **score_max** (float | None): Max Lucene score (only with search_text)
 - **score_median** (float | None): Median Lucene score (only with search_text)
 - **returned** (int): Rows in this response
 - **offset** (int): Pagination offset used
 - **truncated** (bool): True when total_matching > returned
-- **not_found** (LmaNotFound): Per-batch-input unknown IDs (parent §11 Conv B / §13.6)
+- **not_found** (LmaNotFound): Per-batch-input unknown IDs (4 buckets: assay_ids, metabolite_ids, experiment_ids, publication_doi).
 
 ### Per-result fields
 
@@ -93,7 +86,7 @@ total_entries, total_matching, metabolite_count_total, by_organism, by_value_kin
 | omics_type | string | Always 'METABOLOMICS' for assays |
 | treatment_type | list[string] (optional) | Treatment type(s) (e.g. ['carbon']) |
 | background_factors | list[string] (optional) | Background factor(s) (e.g. ['axenic', 'light']) |
-| growth_phases | list[string] (optional) | Growth phases — empty today (KG-MET-017 backfill pending) |
+| growth_phases | list[string] (optional) | Growth phases. Currently unpopulated — KG-side backfill pending. |
 | total_metabolite_count | int | Distinct metabolites measured by this assay (e.g. 92) |
 | aggregation_method | string | How replicates were aggregated (e.g. 'mean_across_replicates') |
 | preferred_id | string | Xref hint (e.g. 'metabolite_assay_id') |
@@ -102,7 +95,7 @@ total_entries, total_matching, metabolite_count_total, by_organism, by_value_kin
 | value_median | float \| None (optional) | Median (e.g. 0.0056) |
 | value_q3 | float \| None (optional) | Q3 (e.g. 0.012) |
 | value_max | float \| None (optional) | Max (e.g. 0.16) |
-| timepoints | list[string] (optional) | Timepoint labels (e.g. ['4 days', '6 days']). Empty list when the parent experiment is not time-resolved (per Phase 5 D3). |
+| timepoints | list[string] (optional) | Timepoint labels (e.g. ['4 days', '6 days']). Empty list when the parent experiment is not time-resolved (sentinel timepoints stripped). |
 | detection_status_counts | list[LmaDetectionStatusCount] (optional) | Per-status counts over outgoing Assay_quantifies_metabolite edges. Empty list on boolean assays. Lets the LLM route to detection-status-rich assays without a drill-down round-trip. |
 | score | float \| None (optional) | Lucene relevance score (only when search_text was provided) |
 
@@ -188,7 +181,7 @@ growth_phases=[] means the assay has no growth-state metadata.
 ```
 
 ```correction
-growth_phases=[] today reflects unpopulated KG state (KG-MET-017 — KG team backfill pending). The schema field exists; values populate without explorer-side code change when the KG ask lands.
+growth_phases=[] reflects unpopulated KG state (KG-side backfill pending). The schema field exists; values populate without explorer-side code change when the upstream backfill lands.
 ```
 
 ```mistake

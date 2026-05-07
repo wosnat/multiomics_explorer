@@ -3,43 +3,35 @@
 ## What it does
 
 Batch reverse-lookup: metabolite IDs → all measurement evidence
-across both arms (quantifies + flags). Cross-organism by default.
+across both arms (quantifies + flags). Cross-organism by default
+(metabolite IDs are organism-agnostic). Polymorphic rows: numeric-
+arm rows carry `value`, `value_sd`, `detection_status`,
+`timepoint*`, `metric_bucket`, `metric_percentile`,
+`rank_by_metric` (rankable subset). Boolean-arm rows carry
+`flag_value`, `n_positive`. Cross-arm fields are explicit `None`
+(union-shape padding). Three states for a metabolite: `not_found`
+(ID not in KG), `not_matched` (ID in KG, no edge after filters),
+and tested-absent rows surfaced in `results` (`value=0` /
+`flag_value=false` / `detection_status='not_detected'` — real
+biology, kept by default). Use `metabolites_matched` for distinct-
+metabolite count (NOT `total_matching` — that's row count). Use
+`summary=True` on batch routing for 50+ metabolite_ids.
 
-Polymorphic rows: numeric-arm rows carry `value`, `value_sd`,
-`detection_status`, `timepoint*`, `metric_bucket`,
-`metric_percentile`, `rank_by_metric` (rankable subset). Boolean-arm
-rows carry `flag_value`, `n_positive`. Cross-arm fields are explicit
-`None` (union-shape padding, parallels Phase 3 decision on
-`genes_by_metabolite`).
-
-A row with `value=0` / `flag_value=false` /
-`detection_status='not_detected'` is *tested-absent* (assayed and
-not found, kept in results). A missing row is *unmeasured* (not in
-this assay's scope). Don't conflate.
-
-Three states for a metabolite (parent §10):
-  1. `not_found` — ID not in the KG. **Unmeasured.**
-  2. `not_matched` — ID in the KG, no assay edge after filters.
-     **Unmeasured for this scope.**
-  3. Row in `results` with `value=0` / `flag_value=false` /
-     `detection_status='not_detected'` — *tested-absent* (assayed
-     and not found). Real biology; counted in `total_matching`.
-
-Use `summary=True` for batch routing on 50+ metabolite_ids.
-
-Originates from:
-- `list_metabolites(metabolite_ids=[...])` — chemistry-layer discovery
-- `metabolites_by_gene(locus_tags=[...])` — gene-anchored chemistry
-
-Drill back to numeric details:
-`metabolites_by_quantifies_assay(assay_ids=[...], metabolite_ids=[...])`.
+Routing: drill back via
+`metabolites_by_quantifies_assay(assay_ids=[...], metabolite_ids=[...])`
+for numeric details. Upstream from
+`list_metabolites(metabolite_ids=[...])` (chemistry-layer discovery)
+or `metabolites_by_gene(locus_tags=[...])` (gene-anchored
+chemistry). See `docs://guide/conventions` for tested-absent
+semantics and `docs://analysis/metabolites` for the metabolomics
+decision tree.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| metabolite_ids | list[string] | — | Metabolite IDs to look up (full prefixed, case-sensitive). E.g. ['kegg.compound:C00074']. `not_found` lists IDs absent from the KG; `not_matched` lists IDs in KG but with no assay edge after filters (unmeasured for this scope, parent §10). Required, non-empty. |
-| organism | string \| None | None | Optional organism filter (case-insensitive CONTAINS). Default `None` = cross-organism (D2 closure: metabolite IDs are organism-agnostic — one Metabolite node shared across organisms). |
+| metabolite_ids | list[string] | — | Metabolite IDs to look up (full prefixed, case-sensitive). E.g. ['kegg.compound:C00074']. `not_found` lists IDs absent from the KG; `not_matched` lists IDs in KG but with no assay edge after filters (unmeasured for this scope). Required, non-empty. |
+| organism | string \| None | None | Optional organism filter (case-insensitive CONTAINS). Default `None` = cross-organism — metabolite IDs are organism-agnostic (one Metabolite node shared across organisms). |
 | evidence_kind | string ('quantifies', 'flags') \| None | None | Filter by edge type. `'quantifies'` = numeric arm only (rows carry value, detection_status, timepoint*). `'flags'` = boolean arm only (rows carry flag_value, n_positive). Default `None` = both arms merged (polymorphic rows; cross-arm fields explicit `None`). |
 | exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites with these IDs (set-difference). |
 | metric_types | list[string] \| None | None | Filter by metric_type tag(s) on the parent assay. E.g. ['cellular_concentration', 'extracellular_concentration', 'presence_flag_intracellular', 'presence_flag_extracellular']. |
@@ -69,7 +61,7 @@ total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_dete
 - **metabolites_with_evidence** (list[string]): Input `metabolite_ids` with at least one row in the filtered slice (parallel to `gene_derived_metrics`'s `genes_with_metrics`).
 - **metabolites_without_evidence** (list[string]): Input `metabolite_ids` with no row in the filtered slice (includes both `not_found` and `not_matched` IDs).
 - **metabolites_matched** (int): Distinct-metabolite count — use this for unique tallies (NOT `total_matching`, which is row-count).
-- **not_found** (list[string]): Flat `list[str]` — single-batch reverse-lookup (parent §13.6). Input metabolite IDs absent from the KG.
+- **not_found** (list[string]): Flat `list[str]` — single-batch reverse-lookup. Input metabolite IDs absent from the KG.
 - **not_matched** (list[string]): Flat `list[str]` — IDs in KG with no edge after filters (unmeasured for this scope). Distinct from `not_found`.
 - **returned** (int): Length of `results`.
 - **truncated** (bool): True when total_matching > offset + returned.
@@ -100,8 +92,8 @@ total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_dete
 | timepoint | string \| None (optional) | Timepoint label. Numeric arm only. |
 | timepoint_hours | float \| None (optional) | Timepoint in hours. Numeric arm only. |
 | timepoint_order | int \| None (optional) | Timepoint order index. Numeric arm only. |
-| growth_phase | string \| None (optional) | Growth phase. Numeric arm only — null today (KG-MET-017 backfill pending). |
-| flag_value | bool \| None (optional) | Boolean flag. Boolean arm only. `false` is tested-absent (parent §10). |
+| growth_phase | string \| None (optional) | Growth phase. Numeric arm only — currently unpopulated (KG-side backfill pending). |
+| flag_value | bool \| None (optional) | Boolean flag. Boolean arm only. `false` is tested-absent (real biology, kept by default). |
 | n_positive | int \| None (optional) | Number of replicates flagged positive. Boolean arm only. |
 
 **Verbose-only fields** (included when `verbose=True`):
@@ -245,10 +237,10 @@ Expect not_found to be a structured Pydantic model.
 
 ```correction
 Reverse-lookup uses a flat `list[str]` for `not_found` because only
-`metabolite_ids` is a batch input — single batch → flat per parent §13.6
-(deviating from the structured `MqaNotFound` / `MfaNotFound` on the
-drill-downs, where 4 inputs are batch). Both `not_found` and
-`not_matched` are flat lists here.
+`metabolite_ids` is a batch input — single batch → flat (deviating
+from the structured `MqaNotFound` / `MfaNotFound` on the drill-downs,
+where 4 inputs are batch). Both `not_found` and `not_matched` are
+flat lists here.
 
 ```
 
@@ -260,8 +252,8 @@ Conflate not_found with not_matched.
 `not_found` = ID not in the KG (Metabolite node doesn't exist).
 `not_matched` = ID in the KG but no MetaboliteAssay edge after filters
 (Metabolite exists but is unmeasured for this scope). Both are
-*unmeasured* per parent §10, but only `not_matched` IDs are present
-in the chemistry layer.
+*unmeasured*, but only `not_matched` IDs are present in the chemistry
+layer. See `docs://guide/conventions`.
 
 ```
 

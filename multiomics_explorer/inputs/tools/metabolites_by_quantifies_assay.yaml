@@ -29,13 +29,12 @@ examples:
     # (matches by_detection_status.not_detected=7). Real biology — answers
     # "is X actually absent under this condition?" Don't conflate with
     # missing rows (those would mean the metabolite is unmeasured, not in
-    # this assay's scope). See parent §10.
+    # this assay's scope). See `docs://guide/conventions`.
 
   - title: Timepoint scope — only the 4-day samples
     call: metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration"], timepoint=["4 days"])
-    # Live timepoint values today: '4 days', '6 days'. Non-temporal
-    # experiments (the 8 boolean-arm flag assays + the cellular_concentration
-    # extracellular subset) expose timepoint=null per D3 sentinel coercion —
+    # Example timepoint values: '4 days', '6 days'. Non-temporal
+    # experiments expose timepoint=null (sentinel timepoints stripped) —
     # they do not match a timepoint filter.
 
   - title: Summary — distribution context without per-row drill-down
@@ -84,32 +83,32 @@ mistakes:
   - wrong: "Expect not_found to be a flat list[str]."
     right: |
       Drill-downs use a structured NotFound (4 keys: assay_ids, metabolite_ids,
-      experiment_ids, publication_doi) per parent spec §13.6 — multi-batch input
-      → structured. Inspect each bucket separately to see which input was bad.
-      Mirrors `MetNotFound` on `list_metabolites` and `GbmNotFound` on
+      experiment_ids, publication_doi) — multi-batch input → structured.
+      Inspect each bucket separately to see which input was bad. Mirrors
+      `MetNotFound` on `list_metabolites` and `GbmNotFound` on
       `genes_by_metabolite`.
 
   - wrong: "Apply value_min=0.001 by default to 'clean' the data."
     right: |
       `value_min > 0` strips tested-absent rows (`value=0` /
-      `detection_status='not_detected'`). 70.7% of numeric edges in the live KG
-      are not_detected (1046 of 1480) — value_min would discard the majority of
-      measured biology under this KG state. Surface as caller choice, never
-      default-on. See parent §10.
+      `detection_status='not_detected'`). About 75% of numeric edges are
+      not_detected — value_min would discard the majority of measured
+      biology. Surface as caller choice, never default-on. See
+      `docs://guide/conventions`.
 
   - wrong: "Treat metric_bucket / metric_percentile / rank_by_metric as always populated."
     right: |
       Rankable-gated columns are null on rows whose parent assay has
-      `rankable=false`. Eight of 10 current assays are rankable; the 2 boolean
-      assays surface in `metabolites_by_flags_assay` instead. Per-row null on
-      these columns means "not applicable" not "missing data".
+      `rankable=false`. Boolean assays surface in `metabolites_by_flags_assay`
+      instead. Per-row null on these columns means "not applicable" not
+      "missing data".
 
   - wrong: "growth_phase populated on every row."
     right: |
-      growth_phase is null on every row today — the schema field exists on
-      Experiment, but `time_point_growth_phases[]` is empty for every
-      metabolomics experiment in the current KG (KG-MET-017 backfill pending).
-      Forward-compat surface; values populate without explorer-side code change
-      when the KG ask lands.
+      growth_phase is currently null on every row — the schema field exists
+      on Experiment, but `time_point_growth_phases[]` is empty for every
+      metabolomics experiment in the current KG (KG-side backfill pending).
+      Forward-compat surface; values populate without explorer-side code
+      change when the upstream backfill lands.
 
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (75% of numeric edges are not_detected, kept by default)."

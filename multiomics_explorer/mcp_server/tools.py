@@ -500,16 +500,17 @@ class ListMetabolitesResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 class GeneReactionMetaboliteTriplet(BaseModel):
-    """Shared row class with metabolites_by_gene (Tool 3).
+    """Shared row class for genes_by_metabolite and metabolites_by_gene.
 
     Compact mode: 15 fields including evidence_source +
     transport_confidence. Verbose mode adds 9 more. All per-arm-specific
-    fields are Optional and explicitly `None` on rows from the other arm — every row carries identical keys.
+    fields are Optional and explicitly `None` on rows from the other
+    arm — every row carries identical keys.
 
     Reaction edges are undirected AND carry no reversibility flag —
     interpret all reaction-arm rows as 'involved in', never 'produces' /
-    'consumes' / 'reversible'. (KG limitation: KEGG-anchored reactions
-    lack both direction and `is_reversible`; see audit §4.1.1 + §4.1.2.)
+    'consumes' / 'reversible'. KEGG-anchored reactions lack both direction
+    and `is_reversible`. See `docs://guide/conventions`.
     """
     locus_tag: str = Field(
         description="Gene locus tag (e.g. 'PMM0974' for MED4 urtE).")
@@ -524,16 +525,19 @@ class GeneReactionMetaboliteTriplet(BaseModel):
     evidence_source: Literal["metabolism", "transport"] = Field(
         description="Path through which this row reaches the metabolite. "
         "'metabolism' = `Gene → Reaction → Metabolite`. 'transport' = "
-        "`Gene → TcdbFamily → Metabolite` (rollup-extended). Metabolomics "
-        "evidence has no gene anchor and never produces rows here.")
+        "`Gene → TcdbFamily → Metabolite` (includes ancestor TCDB "
+        "families that inherit substrates from descendant leaves). "
+        "Metabolomics evidence has no gene anchor and never produces "
+        "rows here.")
     transport_confidence: Literal["substrate_confirmed", "family_inferred"] | None = Field(
         default=None,
         description="Set on transport rows only. 'substrate_confirmed' = "
         "the TCDB family annotation is at `tc_specificity` level "
         "(substrate-curated). 'family_inferred' = annotation is at a "
         "coarser TCDB level (rolled up via the substrate edge — gene may "
-        "or may not move this metabolite). None on metabolism rows "
-        "(direct catalysis edge is always substrate-confirmed by definition).")
+        "or may not move this metabolite). None on metabolism rows. See "
+        "`docs://guide/conventions` for the full transport-confidence "
+        "discussion.")
 
     # metabolism-arm fields (None on transport rows)
     reaction_id: str | None = Field(
@@ -544,17 +548,16 @@ class GeneReactionMetaboliteTriplet(BaseModel):
     reaction_name: str | None = Field(
         default=None,
         description="Reaction systematic name + KEGG equation (raw KEGG "
-        "value, can be lengthy; ~32 reactions in the KG have empty `''`). "
-        "Metabolism rows only — see class-level note on undirected, "
+        "value, can be lengthy; a small fraction of reactions have empty "
+        "`''`). Metabolism rows only — see class-level note on undirected, "
         "non-reversible interpretation.")
     ec_numbers: list[str] | None = Field(
         default=None,
-        description="EC classification(s) for this reaction. Empty list "
-        "for ~107/2,349 reactions without EC. None on transport rows.")
+        description="EC classification(s) for this reaction. Empty list on "
+        "reactions without an EC annotation. None on transport rows.")
     mass_balance: Literal["balanced", "unbalanced"] | None = Field(
         default=None,
-        description="Reaction mass-balance status (no nulls in KG: 1,922 "
-        "balanced + 427 unbalanced). None on transport rows.")
+        description="Reaction mass-balance status. None on transport rows.")
 
     # transport-arm fields (None on metabolism rows)
     tcdb_family_id: str | None = Field(
@@ -565,7 +568,7 @@ class GeneReactionMetaboliteTriplet(BaseModel):
         default=None,
         description="TCDB family name. For tc_family-level entries this is "
         "human-readable (e.g. 'The ATP-binding Cassette (ABC) Superfamily'); "
-        "for tc_subfamily / tc_specificity falls back to the tcdb_id. "
+        "for tc_subfamily / tc_specificity it falls back to the tcdb_id. "
         "Transport rows only.")
 
     # always-populated metabolite fields
@@ -575,14 +578,14 @@ class GeneReactionMetaboliteTriplet(BaseModel):
         description="Metabolite display name (e.g. 'Urea').")
     metabolite_formula: str | None = Field(
         default=None,
-        description="Hill-notation formula; null on ~9% of metabolites "
-        "(transport-only ChEBI generics).")
+        description="Hill-notation formula; null on a minority of "
+        "metabolites (transport-only ChEBI generics).")
     metabolite_mass: float | None = Field(
         default=None,
-        description="Monoisotopic mass (Da); null on ~22% of metabolites.")
+        description="Monoisotopic mass (Da); null on a minority of metabolites.")
     metabolite_chebi_id: str | None = Field(
         default=None,
-        description="ChEBI numeric ID; populated on ~90% of metabolites.")
+        description="ChEBI numeric ID; populated on most metabolites.")
 
     # verbose-only fields:
     gene_category: str | None = Field(
@@ -591,18 +594,16 @@ class GeneReactionMetaboliteTriplet(BaseModel):
         "'Amino acid metabolism'). Verbose only.")
     metabolite_inchikey: str | None = Field(
         default=None,
-        description="Structural fingerprint; populated on ~78% of "
-        "metabolites. Verbose only.")
+        description="Structural fingerprint. Verbose only.")
     metabolite_smiles: str | None = Field(
         default=None,
-        description="Canonical SMILES; populated on ~84% of metabolites. "
-        "Verbose only.")
+        description="Canonical SMILES. Verbose only.")
     metabolite_mnxm_id: str | None = Field(
         default=None,
-        description="MetaNetX ID (e.g. 'MNXM731'); 100% coverage. Verbose only.")
+        description="MetaNetX ID (e.g. 'MNXM731'). Verbose only.")
     metabolite_hmdb_id: str | None = Field(
         default=None,
-        description="HMDB ID (e.g. 'HMDB0000122'); ~47% coverage. Verbose only.")
+        description="HMDB ID (e.g. 'HMDB0000122'). Verbose only.")
     reaction_mnxr_id: str | None = Field(
         default=None,
         description="Reaction MetaNetX ID. Verbose, metabolism rows only.")
@@ -633,8 +634,8 @@ class GbmByMetabolite(BaseModel):
         description="Metabolite display name (e.g. 'Urea').")
     formula: str | None = Field(
         default=None,
-        description="Hill-notation formula (e.g. 'CH4N2O'); null on transport-"
-        "only ChEBI generics (~9% of metabolites).")
+        description="Hill-notation formula (e.g. 'CH4N2O'); null on "
+        "transport-only ChEBI generics.")
     rows: int = Field(
         description="Total rows for this metabolite across both arms in the "
         "filtered slice.")
@@ -658,7 +659,7 @@ class GbmByMetabolite(BaseModel):
         "levels (rollup tier — propagated via the substrate edge; the "
         "gene's annotated family is known to transport this metabolite, but "
         "this specific gene's actual substrate may differ). Both tiers are "
-        "annotations — see analysis-doc §g.")
+        "annotations — see `docs://guide/conventions`.")
 
 
 class GbmByEvidenceSource(BaseModel):
@@ -694,11 +695,11 @@ class GbmTopReaction(BaseModel):
     reaction_id: str = Field(
         description="Full prefixed Reaction ID (e.g. 'kegg.reaction:R00253').")
     name: str = Field(
-        description="Reaction systematic name + KEGG equation (raw KEGG; may "
-        "be empty `''` for 32 reactions in the KG).")
+        description="Reaction systematic name + KEGG equation (raw KEGG; "
+        "may be empty `''` on a small fraction of reactions).")
     ec_numbers: list[str] = Field(
-        description="EC classification(s) for this reaction; empty list for "
-        "107/2,349 reactions without EC annotation.")
+        description="EC classification(s) for this reaction; empty list "
+        "on reactions without an EC annotation.")
     gene_count: int = Field(
         description="Distinct genes catalyzing this reaction in the filtered "
         "slice.")
@@ -712,10 +713,10 @@ class GbmTopTcdbFamily(BaseModel):
     tcdb_family_id: str = Field(
         description="Full prefixed TcdbFamily ID (e.g. 'tcdb:3.A.1.4.5').")
     tcdb_family_name: str = Field(
-        description="Display name. For tc_family-level entries (~10 in the "
-        "KG) this is human-readable (e.g. 'The ATP-binding Cassette (ABC) "
-        "Superfamily'); for tc_subfamily / tc_specificity levels it falls "
-        "back to the `tcdb_id` value.")
+        description="Display name. For tc_family-level entries this is "
+        "human-readable (e.g. 'The ATP-binding Cassette (ABC) Superfamily'); "
+        "for tc_subfamily / tc_specificity levels it falls back to the "
+        "`tcdb_id` value.")
     level_kind: str = Field(
         description="One of tc_class / tc_subclass / tc_family / "
         "tc_subfamily / tc_specificity. Determines `transport_confidence`.")
@@ -768,7 +769,7 @@ class GbmTopGene(BaseModel):
     transport_family_inferred_rows: int = Field(
         description="Transport-arm row count for this gene at coarser TCDB "
         "levels (rollup tier — propagated via the substrate edge). Both "
-        "tiers are annotations — see analysis-doc §g.")
+        "tiers are annotations — see `docs://guide/conventions`.")
 
 
 class GbmNotFound(BaseModel):
@@ -905,7 +906,7 @@ class MbgByGene(BaseModel):
         "TCDB levels (rollup tier — propagated via the substrate edge; "
         "this gene's annotated family is known to transport the metabolite, "
         "but this specific gene's actual substrate may differ). Both tiers "
-        "are annotations — see analysis-doc §g.")
+        "are annotations — see `docs://guide/conventions`.")
 
 
 class MbgByEvidenceSource(BaseModel):
@@ -918,7 +919,8 @@ class MbgByEvidenceSource(BaseModel):
     evidence_source: Literal["metabolism", "transport"] = Field(
         description="Path through which the gene reaches the metabolite. "
         "'metabolism' = `Gene → Reaction → Metabolite`. 'transport' = "
-        "`Gene → TcdbFamily → Metabolite` (rollup-extended).")
+        "`Gene → TcdbFamily → Metabolite` (includes ancestor families "
+        "that inherit substrates from descendant leaves).")
     count: int = Field(
         description="Row count for this evidence_source in the filtered "
         "slice.")
@@ -943,28 +945,26 @@ class MbgByTransportConfidence(BaseModel):
 
 
 class MbgByElement(BaseModel):
-    """NEW (vs GBM) — Element presence rollup across the metabolites the
-    gene set touches. Periodic-table-bounded (~30 elements max in KG);
-    kept as `by_*` (full rollup, not top-N).
+    """Element-presence rollup across the metabolites the gene set
+    touches. Periodic-table-bounded (~30 elements max in KG); kept as
+    `by_*` (full rollup, not top-N).
 
     Answers the C/N/P/S/metal-presence signature question. Anchored on
-    `Metabolite.elements` (KG-A3 Hill-parsed presence list).
+    `Metabolite.elements` (Hill-parsed presence list).
 
     Presence-only — count of distinct compounds containing each element
     at all. NOT stoichiometric (no atom counts per compound; stoichiometry
     lives in `metabolite.formula`). NOT mass-balanced (KG carries no
-    substrate-vs-product role on `Reaction_has_metabolite`, see audit
-    §4.1.1).
+    substrate-vs-product role on `Reaction_has_metabolite`).
     """
     element: str = Field(
         description="Element symbol (Hill notation, e.g. 'C', 'N', 'P', "
         "'S', 'Fe').")
     metabolite_count: int = Field(
         description="Distinct metabolites in the filtered slice that "
-        "contain this element. Empty `m.elements` (31/2,188 metabolites "
-        "without formula) does not contribute. Presence-only count — "
-        "see class docstring for 'not stoichiometric, not mass-balanced' "
-        "semantics.")
+        "contain this element. Metabolites without a formula do not "
+        "contribute. Presence-only count — see class docstring for "
+        "'not stoichiometric, not mass-balanced' semantics.")
 
 
 class MbgTopMetabolite(BaseModel):
@@ -985,8 +985,8 @@ class MbgTopMetabolite(BaseModel):
         description="Metabolite display name (e.g. 'Urea').")
     formula: str | None = Field(
         default=None,
-        description="Hill-notation formula (e.g. 'CH4N2O'); null on ~9% "
-        "of metabolites (transport-only ChEBI generics).")
+        description="Hill-notation formula (e.g. 'CH4N2O'); null on a "
+        "minority of metabolites (transport-only ChEBI generics).")
     gene_count: int = Field(
         description="Distinct input genes touching this metabolite via "
         "either arm.")
@@ -1005,7 +1005,7 @@ class MbgTopMetabolite(BaseModel):
     transport_family_inferred_rows: int = Field(
         description="Transport-arm row count at coarser TCDB levels "
         "(rollup tier — propagated via the substrate edge). Both tiers "
-        "are annotations — see analysis-doc §g.")
+        "are annotations — see `docs://guide/conventions`.")
 
 
 class MbgTopReaction(BaseModel):
@@ -1021,10 +1021,10 @@ class MbgTopReaction(BaseModel):
         "'kegg.reaction:R00131').")
     name: str = Field(
         description="Reaction systematic name + KEGG equation (raw KEGG; "
-        "may be empty `''` for 32 reactions in the KG).")
+        "may be empty `''` on a small fraction of reactions).")
     ec_numbers: list[str] = Field(
         description="EC classification(s) for this reaction; empty list "
-        "for 107/2,349 reactions without EC annotation.")
+        "on reactions without an EC annotation.")
     gene_count: int = Field(
         description="Distinct input genes catalyzing this reaction in "
         "the filtered slice.")
@@ -1044,10 +1044,10 @@ class MbgTopTcdbFamily(BaseModel):
     tcdb_family_id: str = Field(
         description="Full prefixed TcdbFamily ID (e.g. 'tcdb:3.A.1.4.5').")
     tcdb_family_name: str = Field(
-        description="Display name. For tc_family-level entries (~10 in "
-        "the KG) this is human-readable (e.g. 'The ATP-binding Cassette "
-        "(ABC) Superfamily'); for tc_subfamily / tc_specificity falls "
-        "back to the `tcdb_id` value.")
+        description="Display name. For tc_family-level entries this is "
+        "human-readable (e.g. 'The ATP-binding Cassette (ABC) Superfamily'); "
+        "for tc_subfamily / tc_specificity it falls back to the `tcdb_id` "
+        "value.")
     level_kind: str = Field(
         description="One of tc_class / tc_subclass / tc_family / "
         "tc_subfamily / tc_specificity. Determines `transport_confidence`.")
@@ -1079,18 +1079,19 @@ class MbgTopGeneCategory(BaseModel):
 
 
 class MbgTopPathway(BaseModel):
-    """NEW (vs GBM) — Top-N (truncated to 10) KEGG pathways the gene
-    set's chemistry reaches. Pathway namespace explicitly distinct from
-    gene-KO pathway annotations available via
-    `genes_by_ontology(ontology="kegg")` (where pathway membership is
-    asserted by the gene's KO assignment, not by chemistry reach).
+    """Top-N (truncated to 10) KEGG pathways the gene set's chemistry
+    reaches. Pathway namespace explicitly distinct from gene-KO pathway
+    annotations available via `genes_by_ontology(ontology="kegg")`
+    (where pathway membership is asserted by the gene's KO assignment,
+    not by chemistry reach).
 
     Source: UNION of `Reaction_in_kegg_pathway` (reaction-side) +
     `Metabolite_in_pathway` (metabolite-side, via reaction-arm
-    metabolites OR transport-arm metabolites). Filter
-    `WHERE p.reaction_count >= 3` drops signaling/disease pathways with
-    no chemistry breadth. Rank: `gene_count DESC, p.reaction_count ASC`
-    (more genes hitting + more focused pathway).
+    metabolites OR transport-arm metabolites). Pathways with fewer than
+    3 reactions in the KG are dropped to filter out signaling/disease
+    pathways with no chemistry breadth. Rank: `gene_count DESC,
+    pathway_reaction_count ASC` (more genes hitting + more focused
+    pathway).
 
     Drill-down: pass any `pathway_id` to
     `list_metabolites(pathway_ids=[...])` for the full metabolite roster
@@ -1111,12 +1112,10 @@ class MbgTopPathway(BaseModel):
         description="Distinct input genes with ≥1 chemistry edge into "
         "this pathway (via reaction-side or metabolite-side).")
     pathway_reaction_count: int = Field(
-        description="Total reactions in this pathway in the KG (KG-4 "
-        "rollup, 100% on pathway-level entries). At-a-glance pathway "
-        "sizing.")
+        description="Total reactions in this pathway in the KG. "
+        "At-a-glance pathway sizing.")
     pathway_metabolite_count: int = Field(
-        description="Total metabolites in this pathway in the KG (KG-4 "
-        "rollup).")
+        description="Total metabolites in this pathway in the KG.")
 
 
 class MbgNotFound(BaseModel):
@@ -1165,7 +1164,7 @@ class MetabolitesByGeneResponse(BaseModel):
         description="Diagnostic strings. Currently emitted: "
         "family-inferred-dominance auto-warning when transport rows are "
         "family-inferred majority and `transport_confidence` was not set "
-        "explicitly (mirror of GBM behavior).")
+        "explicitly (mirrors `genes_by_metabolite`).")
     not_found: MbgNotFound = Field(
         default_factory=MbgNotFound,
         description="Inputs that did not resolve to a KG node — see model.")
@@ -1189,14 +1188,13 @@ class MetabolitesByGeneResponse(BaseModel):
         "transport rows only (≤2 entries; metabolism rows are excluded).")
     by_element: list[MbgByElement] = Field(
         default_factory=list,
-        description="NEW (vs GBM): element-presence rollup across the "
-        "metabolites the gene set touches. Periodic-table-bounded "
-        "(~30 elements max in KG); full rollup, not top-N. "
-        "Presence-only — count of distinct compounds containing each "
-        "element at all. NOT stoichiometric (no atom counts per compound; "
-        "stoichiometry lives in `metabolite.formula`). NOT mass-balanced "
-        "(KG carries no substrate-vs-product role on "
-        "`Reaction_has_metabolite`, see audit §4.1.1).")
+        description="Element-presence rollup across the metabolites the "
+        "gene set touches. Periodic-table-bounded (~30 elements max in "
+        "KG); full rollup, not top-N. Presence-only — count of distinct "
+        "compounds containing each element at all. NOT stoichiometric "
+        "(no atom counts per compound; stoichiometry lives in "
+        "`metabolite.formula`). NOT mass-balanced (KG carries no "
+        "substrate-vs-product role on `Reaction_has_metabolite`).")
     top_metabolites: list[MbgTopMetabolite] = Field(
         default_factory=list,
         description="Top 10 metabolites by gene reach in the filtered "
@@ -7259,8 +7257,8 @@ def register_tools(mcp: FastMCP):
             description="Filter to rows where the **metabolite** is in any of "
             "these KEGG pathways (`KeggTerm.id`, e.g. ['kegg.pathway:ko00910'] "
             "for nitrogen metabolism). Anchored on `Metabolite.pathway_ids` "
-            "(KG-A5 denorm, transport-extended), so applies uniformly to both "
-            "arms. **Not gene-anchored** — for filtering by genes' KEGG-pathway "
+            "(transport-extended), so applies uniformly to both arms. "
+            "**Not gene-anchored** — for filtering by genes' KEGG-pathway "
             "annotations, route through `genes_by_ontology(ontology=\"kegg\", "
             "term_ids=[pathway_id], organism=...)` first to obtain locus_tags. "
             "`not_found.metabolite_pathway_ids` lists IDs that don't exist as "
@@ -7280,21 +7278,18 @@ def register_tools(mcp: FastMCP):
         transport_confidence: Annotated[
             Literal["substrate_confirmed", "family_inferred"] | None,
             Field(
-                description="Narrow transport rows by TCDB-annotation specificity. "
-                "`substrate_confirmed` restricts transport rows to those annotated "
-                "at TCDB `tc_specificity` (substrate-curated). `family_inferred` "
-                "restricts to transport rows annotated at coarser TCDB levels "
-                "(rolled up via the substrate edge). **Transport arm only — does "
-                "not affect metabolism rows**, which are always substrate-"
-                "confirmed by definition (direct catalysis edge) and carry "
-                "`transport_confidence = None`. To restrict to transport rows "
-                "alone, combine with `evidence_sources=['transport']`. "
-                "**Workflow-dependent (see analysis-doc §g — both tiers are "
-                "annotations, neither is ground truth):** use "
-                "`substrate_confirmed` for conservative-cast questions "
-                "(e.g. cross-organism inference); keep `family_inferred` "
-                "for broad-screen candidate enumeration (e.g. N-source DE — "
-                "the real MED4 N-uptake genes are family_inferred-only).",
+                description="Narrow transport rows by TCDB-annotation "
+                "specificity. `substrate_confirmed` restricts transport "
+                "rows to those annotated at TCDB `tc_specificity` "
+                "(substrate-curated). `family_inferred` restricts to "
+                "transport rows annotated at coarser TCDB levels (rolled "
+                "up via the substrate edge). **Transport arm only — does "
+                "not affect metabolism rows**, which are always "
+                "substrate-confirmed by definition (direct catalysis "
+                "edge) and carry `transport_confidence = None`. Combine "
+                "with `evidence_sources=['transport']` to restrict to "
+                "transport rows alone. See `docs://guide/conventions` "
+                "for when to pick which tier.",
             ),
         ] = None,
         evidence_sources: Annotated[
@@ -7328,52 +7323,27 @@ def register_tools(mcp: FastMCP):
         )] = 0,
     ) -> GenesByMetaboliteResponse:
         """Find genes connected to specified metabolites in one organism.
+        Two arms — metabolism (`Gene → Reaction → Metabolite`) and transport
+        (`Gene → TcdbFamily → Metabolite`, includes ancestor families that
+        inherit substrates from descendant leaves). Some genes annotated
+        only to broad TCDB families (notably ABC transporters) emit large
+        numbers of family_inferred rows; the auto-warning fires when
+        family_inferred dominates the transport arm. Direction-agnostic
+        (KEGG equation order is unreliable upstream — joins through
+        Reaction_has_metabolite and Tcdb_family_transports_metabolite
+        return both produced and consumed metabolites identically). Per-row
+        union shape: cross-arm fields are explicitly None on rows from the
+        other arm.
 
-        **Direction-agnostic.** Joins through `Reaction_has_metabolite` (metabolism)
-        and `Tcdb_family_transports_metabolite` (transport) are direction-agnostic —
-        a gene that *produces* a metabolite and a gene that *consumes* it surface
-        identically. KEGG equation order is arbitrary. To distinguish, layer
-        transcriptional evidence (`differential_expression_by_gene`) and gene
-        functional annotation (`gene_overview` Pfam / KEGG KO names like
-        `*-synthase` vs `*-permease`).
-
-        **Transport-confidence semantics (transport arm only).** Transport rows
-        ride a TCDB substrate-edge rollup that propagates leaf-curated substrates
-        up the hierarchy. A `family_inferred` transport row means *the gene is
-        annotated to a TCDB family that contains members curated as moving this
-        metabolite* — not that this gene is curated as such. ABC Superfamily–level
-        annotations make every ABC gene appear to "transport urea" through the
-        rollup. Filter `transport_confidence='substrate_confirmed'` (paired with
-        `evidence_sources=['transport']` if you want the transport arm in
-        isolation) for the precise set; the default fires both arms and flags
-        `family_inferred` in `warnings` when it dominates the result. Metabolism
-        rows are not subject to this concern — direct catalysis edges are
-        always substrate-confirmed — and their `transport_confidence` is None.
-
-        **Evidence sources accepted here:** `metabolism`, `transport`. The
-        metabolomics path (DerivedMetric → Metabolite) has no gene anchor and is
-        not surfaced by gene-anchored chemistry tools — see `list_metabolites`.
-
-        Per-row schema (union shape):
-            Every row carries the full cross-arm key set. Metabolism-arm rows
-            have `transport_confidence` / `tcdb_family_id` / `tcdb_family_name`
-            = None; transport-arm rows have `reaction_id` / `reaction_name` /
-            `ec_numbers` / `mass_balance` = None. Use `row['key']` (KeyError-free)
-            rather than `row.get('key')` if the difference matters to you.
-
-        Reaction-arm framing:
-            Reaction edges are undirected AND carry no reversibility flag —
-            interpret all reaction-arm rows as 'involved in', never 'produces'
-            / 'consumes' / 'reversible'. (KG limitation: KEGG-anchored reactions
-            lack both direction and `is_reversible`; see audit §4.1.1 + §4.1.2.)
-
-        Drill-downs from result rows / envelope rollups:
-        - Any `top_genes` entry → `differential_expression_by_gene(locus_tags=[...], organism=...)`
-          for transcriptional response, or `gene_overview` for richer context.
-        - Any `top_tcdb_families` entry → `genes_by_ontology(ontology="tcdb", term_ids=[id], organism=...)`
-          for sibling genes in the same family.
-        - Any `top_reactions` entry → `genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)`
-          for genes in adjacent reactions, or `pathway_enrichment` for context.
+        Routing: from `top_genes` drill into
+        `differential_expression_by_gene(locus_tags=[...], organism=...)` or
+        `gene_overview`; from `top_tcdb_families` to
+        `genes_by_ontology(ontology="tcdb", term_ids=[id], organism=...)`;
+        from `top_reactions` to
+        `genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)` or
+        `pathway_enrichment`. See `docs://guide/conventions` for
+        transport-confidence and direction-agnostic semantics, and
+        `docs://analysis/metabolites` for the chemistry-layer decision tree.
         """
         await ctx.info(
             f"genes_by_metabolite metabolite_ids={metabolite_ids} "
@@ -7527,13 +7497,13 @@ def register_tools(mcp: FastMCP):
             description="Filter to rows where the **metabolite** is in "
             "any of these KEGG pathways (`KeggTerm.id`, e.g. "
             "['kegg.pathway:ko00910'] for nitrogen metabolism). Anchored "
-            "on `Metabolite.pathway_ids` (KG-A5 denorm, transport-"
-            "extended), so applies uniformly to both arms. **Not "
-            "gene-anchored** — for filtering by genes' KEGG-pathway "
-            "annotations, route through `genes_by_ontology(ontology="
-            "\"kegg\", term_ids=[pathway_id], organism=...)` first to "
-            "obtain locus_tags. `not_found.metabolite_pathway_ids` "
-            "lists IDs that don't exist as a KeggTerm.",
+            "on `Metabolite.pathway_ids` (transport-extended), so "
+            "applies uniformly to both arms. **Not gene-anchored** — for "
+            "filtering by genes' KEGG-pathway annotations, route through "
+            "`genes_by_ontology(ontology=\"kegg\", term_ids=[pathway_id], "
+            "organism=...)` first to obtain locus_tags. "
+            "`not_found.metabolite_pathway_ids` lists IDs that don't "
+            "exist as a KeggTerm.",
         )] = None,
         mass_balance: Annotated[
             Literal["balanced", "unbalanced"] | None, Field(
@@ -7563,14 +7533,12 @@ def register_tools(mcp: FastMCP):
                 "up via the substrate edge). **Transport arm only — does "
                 "not affect metabolism rows**, which are always "
                 "substrate-confirmed by definition (direct catalysis "
-                "edge) and carry `transport_confidence = None`. To "
-                "restrict to transport rows alone, combine with "
-                "`evidence_sources=['transport']`. **Workflow-dependent "
-                "(see analysis-doc §g — both tiers are annotations, "
-                "neither is ground truth):** use `substrate_confirmed` "
-                "for conservative-cast questions and to mute the ABC-"
-                "superfamily 551-row blowup in batch DE inputs; keep "
-                "`family_inferred` for broad-screen candidate enumeration.",
+                "edge) and carry `transport_confidence = None`. Combine "
+                "with `evidence_sources=['transport']` to restrict to "
+                "transport rows alone. Use `substrate_confirmed` to mute "
+                "the long-tail row blowup from ABC-only-annotated genes "
+                "in batch DE inputs. See `docs://guide/conventions` for "
+                "when to pick which tier.",
             ),
         ] = None,
         evidence_sources: Annotated[
@@ -7601,10 +7569,8 @@ def register_tools(mcp: FastMCP):
             "(transport rows). Same field set as `genes_by_metabolite`.",
         )] = False,
         limit: Annotated[int, Field(
-            description="Max results in `results`. Default 10 covers "
-            "~p70 of single-gene UNION row distributions (median 6, p75 "
-            "12 in MED4). Long-tail genes (ABC-superfamily-only) emit "
-            "up to 551 rows — use "
+            description="Max results in `results`. Long-tail genes "
+            "(ABC-only annotations) can emit large numbers of rows — use "
             "`transport_confidence='substrate_confirmed'` to mute, or "
             "`offset` to page.",
             ge=1,
@@ -7614,91 +7580,34 @@ def register_tools(mcp: FastMCP):
             ge=0,
         )] = 0,
     ) -> MetabolitesByGeneResponse:
-        """Find metabolites the input gene set's chemistry reaches in one organism.
+        """Find metabolites the input gene set's chemistry reaches in one
+        organism. Symmetric counterpart to `genes_by_metabolite` — same
+        two arms (metabolism and transport, including ancestor TCDB
+        families that inherit substrates from descendant leaves), same
+        per-row union shape, same direction-agnostic semantics. Some
+        genes (notably ABC-only annotations) emit large numbers of
+        family_inferred rows; the global precision-tier sort
+        (metabolism → substrate_confirmed → family_inferred) prevents
+        one gene from consuming `limit`. The `metabolite_elements`
+        filter is the N-source workflow primitive (presence-only AND-of,
+        e.g. `['N']`). The `by_element` envelope is presence-only — not
+        stoichiometric, not mass-balanced. Use `summary=True` on batch
+        DE inputs (50+ locus_tags).
 
-        **Direction-agnostic.** Joins through `Reaction_has_metabolite`
-        (metabolism) and `Tcdb_family_transports_metabolite` (transport)
-        are direction-agnostic — a gene that *produces* a metabolite and
-        a gene that *consumes* it surface identically. KEGG equation
-        order is arbitrary. To distinguish, layer transcriptional
-        evidence (`differential_expression_by_gene`) and gene functional
-        annotation (`gene_overview` Pfam / KEGG KO names like
-        `*-synthase` vs `*-permease`).
-
-        **Transport-confidence semantics (transport arm only).** Identical
-        model to `genes_by_metabolite`: `family_inferred` rows ride a
-        TCDB substrate-edge rollup that propagates leaf-curated
-        substrates up the hierarchy. The ABC Superfamily long tail
-        (9 MED4 genes annotated only at `tcdb:3.A.1` emit 551
-        family_inferred rows each via the rollup) means batch DE inputs
-        can explode in row count. Filter
-        `transport_confidence='substrate_confirmed'` (paired with
-        `evidence_sources=['transport']` for the transport arm in
-        isolation) for the precise set; the default fires both arms and
-        flags `family_inferred` in `warnings` when it dominates.
-        Metabolism rows are not subject to this concern — direct
-        catalysis edges are always substrate-confirmed — and their
-        `transport_confidence` is None.
-
-        **Evidence sources accepted here:** `metabolism`, `transport`.
-        The metabolomics path (DerivedMetric → Metabolite) has no gene
-        anchor and is not surfaced by gene-anchored chemistry tools —
-        see `list_metabolites`.
-
-        **Sort order:** detail rows are globally sorted by tier
-        (metabolism → transport_substrate_confirmed →
-        transport_family_inferred), then by input gene order, then by
-        locus_tag, then by metabolite_id. This surfaces metabolism +
-        substrate-curated transport rows from the entire batch first
-        regardless of input position — a single ABC-superfamily-only
-        gene at the front of input does NOT eat the entire `limit=10`
-        with rollup-tier (`family_inferred`) rows. Both transport tiers
-        are annotations — see analysis-doc §g.
-
-        Per-row schema (union shape):
-            Every row carries the full cross-arm key set. Metabolism-arm rows
-            have `transport_confidence` / `tcdb_family_id` / `tcdb_family_name`
-            = None; transport-arm rows have `reaction_id` / `reaction_name` /
-            `ec_numbers` / `mass_balance` = None. Use `row['key']` (KeyError-free)
-            rather than `row.get('key')` if the difference matters to you.
-
-        Reaction-arm framing:
-            Reaction edges are undirected AND carry no reversibility flag —
-            interpret all reaction-arm rows as 'involved in', never 'produces'
-            / 'consumes' / 'reversible'. (KG limitation: KEGG-anchored reactions
-            lack both direction and `is_reversible`; see audit §4.1.1 + §4.1.2.)
-
-        **`by_element` envelope:** presence-only element-presence rollup
-        (NOT stoichiometric, NOT mass-balanced).
-
-        Drill-downs from result rows / envelope rollups:
-        - Any `top_metabolites` entry →
-          `list_metabolites(metabolite_ids=[...])` for richer per-
-          metabolite cross-refs, or
-          `list_metabolites(metabolite_ids=[...], organism_names=[partner])`
-          for cross-organism presence (cross-feeding primitive).
-        - Any `top_metabolite_pathways` entry →
-          `list_metabolites(pathway_ids=[...])` for the full metabolite
-          roster of the pathway (not just gene-set hits), or
-          `genes_by_ontology(ontology="kegg", term_ids=[id], organism=...)`
-          for gene-KO-mediated pathway annotations (different surface —
-          see naming disambiguation below).
-        - Any `top_reactions` entry →
-          `genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)`
-          for genes in adjacent reactions, or `pathway_enrichment` for
-          context.
-        - Any `top_tcdb_families` entry →
-          `genes_by_ontology(ontology="tcdb", term_ids=[id], organism=...)`
-          for sibling genes in the same family.
-
-        **`top_metabolite_pathways` naming disambiguation.** Despite this being a
-        gene-anchored tool, `top_metabolite_pathways` here means *KEGG pathways the
-        gene set's chemistry reaches* — via `Reaction_in_kegg_pathway`
-        and `Metabolite_in_pathway`. Distinct from the **gene-KO-
-        mediated** pathway annotations available via
-        `genes_by_ontology(ontology="kegg")` (where pathway membership
-        is asserted by the gene's KO assignment). For metabolic pathway
-        analysis with a hypothesis test, use `pathway_enrichment`.
+        Routing: from `top_metabolites` drill into
+        `list_metabolites(metabolite_ids=[...])` for cross-refs OR
+        `genes_by_metabolite(metabolite_ids=[...], organism=PARTNER)`
+        for the cross-feeding bridge; from `top_metabolite_pathways` to
+        `list_metabolites(pathway_ids=[...])` (chemistry-pathway rollup,
+        distinct from gene-KO pathway annotations on
+        `genes_by_ontology(ontology="kegg")`); from `top_reactions` to
+        `genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)`
+        or `pathway_enrichment`; from `top_tcdb_families` to
+        `genes_by_ontology(ontology="tcdb", term_ids=[id],
+        organism=...)`; from `not_matched` to `gene_overview`. See
+        `docs://guide/conventions` for transport-confidence and
+        direction-agnostic semantics, and `docs://analysis/metabolites`
+        for the chemistry-layer decision tree.
         """
         await ctx.info(
             f"metabolites_by_gene locus_tags={locus_tags} "
@@ -7799,7 +7708,7 @@ def register_tools(mcp: FastMCP):
             raise ToolError(f"Error in metabolites_by_gene: {e}")
 
     # ------------------------------------------------------------------
-    # list_metabolite_assays — Phase 5 metabolomics-assay discovery surface
+    # list_metabolite_assays — metabolomics-assay discovery surface
     # ------------------------------------------------------------------
     class LmaOrganismBreakdown(BaseModel):
         organism_name: str = Field(
@@ -7833,21 +7742,20 @@ def register_tools(mcp: FastMCP):
 
     class LmaGrowthPhaseBreakdown(BaseModel):
         growth_phase: str = Field(
-            description="Growth phase (e.g. 'exponential'). Empty list "
-            "today — KG-MET-017 backfill pending.")
+            description="Growth phase (e.g. 'exponential'). Currently "
+            "unpopulated — KG-side backfill pending.")
         count: int = Field(description="Assay count for this growth phase")
 
     class LmaDetectionStatusBreakdown(BaseModel):
         detection_status: str = Field(
             description="Detection status: 'detected', 'sporadic', "
-            "'not_detected'. Numeric edges only — not_detected = "
-            "tested-absent (parent §10).")
+            "'not_detected'. Numeric edges only — `not_detected` is "
+            "tested-absent (real biology). See `docs://guide/conventions`.")
         count: int = Field(
-            description="Edge count across matching numeric assays "
-            "(e.g. 902 not_detected = 75% — tested-absent dominates)")
+            description="Edge count across matching numeric assays.")
 
     class LmaNotFound(BaseModel):
-        """Per-batch-input unknown IDs (parent §11 Conv B / §13.6)."""
+        """Per-batch-input unknown IDs."""
         assay_ids: list[str] = Field(
             default_factory=list,
             description="Input assay_ids not in the KG")
@@ -7914,8 +7822,8 @@ def register_tools(mcp: FastMCP):
             description="Background factor(s) (e.g. ['axenic', 'light'])")
         growth_phases: list[str] = Field(
             default_factory=list,
-            description="Growth phases — empty today (KG-MET-017 backfill "
-            "pending)")
+            description="Growth phases. Currently unpopulated — KG-side "
+            "backfill pending.")
         total_metabolite_count: int = Field(
             description="Distinct metabolites measured by this assay "
             "(e.g. 92)")
@@ -7944,7 +7852,7 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="Timepoint labels (e.g. ['4 days', '6 days']). "
             "Empty list when the parent experiment is not time-resolved "
-            "(per Phase 5 D3).")
+            "(sentinel timepoints stripped).")
         detection_status_counts: list[LmaDetectionStatusCount] = Field(
             default_factory=list,
             description="Per-status counts over outgoing "
@@ -7969,12 +7877,12 @@ def register_tools(mcp: FastMCP):
 
     class ListMetaboliteAssaysResponse(BaseModel):
         total_entries: int = Field(
-            description="Total MetaboliteAssay nodes in KG (10 today)")
+            description="Total MetaboliteAssay nodes in KG.")
         total_matching: int = Field(
             description="Assays matching all filters")
         metabolite_count_total: int = Field(
             description="Cumulative sum of total_metabolite_count across "
-            "matching assays. Same metabolite measured by N assays counts "
+            "matching assays — same metabolite measured by N assays counts "
             "N times. For distinct count, use "
             "assays_by_metabolite(metabolite_ids=..., summary=True) or "
             "list_metabolites(metabolite_ids=...).")
@@ -8001,13 +7909,14 @@ def register_tools(mcp: FastMCP):
             default_factory=list)
         by_growth_phase: list[LmaGrowthPhaseBreakdown] = Field(
             default_factory=list,
-            description="Empty today — KG-MET-017 backfill pending.")
+            description="Currently unpopulated — KG-side backfill pending.")
         by_detection_status: list[LmaDetectionStatusBreakdown] = Field(
             default_factory=list,
             description="Envelope-level rollup of detection_status across "
-            "all numeric edges of matching assays. Audit §4.3.3 primary "
-            "headline. ~75% of numeric edges are not_detected "
-            "(tested-absent — real biology, see parent §10).")
+            "all numeric edges of matching assays. Primary qualitative "
+            "headline — about 75% of numeric edges are not_detected "
+            "(tested-absent: assayed and not found, real biology). See "
+            "`docs://guide/conventions`.")
         score_max: float | None = Field(
             default=None,
             description="Max Lucene score (only with search_text)")
@@ -8020,8 +7929,8 @@ def register_tools(mcp: FastMCP):
             description="True when total_matching > returned")
         not_found: LmaNotFound = Field(
             default_factory=LmaNotFound,
-            description="Per-batch-input unknown IDs (parent §11 Conv B "
-            "/ §13.6)")
+            description="Per-batch-input unknown IDs (4 buckets: "
+            "assay_ids, metabolite_ids, experiment_ids, publication_doi).")
         results: list[ListMetaboliteAssaysResult] = Field(default_factory=list)
 
     @mcp.tool(
@@ -8064,8 +7973,8 @@ def register_tools(mcp: FastMCP):
             description="ANY-overlap. E.g. ['axenic', 'light'].",
         )] = None,
         growth_phases: Annotated[list[str] | None, Field(
-            description="ANY-overlap. Empty today — KG-MET-017 backfill "
-                        "pending.",
+            description="ANY-overlap. Currently unpopulated — KG-side "
+                        "backfill pending.",
         )] = None,
         publication_doi: Annotated[list[str] | None, Field(
             description="DOI(s). Exact match. E.g. "
@@ -8104,35 +8013,27 @@ def register_tools(mcp: FastMCP):
                         "light_condition, experimental_context.",
         )] = False,
         limit: Annotated[int, Field(
-            description="Max results (default 20 covers all 14 assays "
-                        "today).",
+            description="Max results.",
             ge=1,
         )] = 20,
         offset: Annotated[int, Field(
             description="Pagination offset (0-indexed).", ge=0,
         )] = 0,
     ) -> ListMetaboliteAssaysResponse:
-        """Discover MetaboliteAssay nodes — discovery surface for the
-        metabolomics measurement layer. Mirrors `list_derived_metrics`.
+        """Discover MetaboliteAssay nodes — the metabolomics measurement
+        layer. Mirrors `list_derived_metrics`. Inspect `value_kind` (routes
+        drill-down), `rankable` (gates rankable filters on the numeric
+        drill-down), `compartment` (whole_cell vs extracellular), and
+        per-row `detection_status_counts` (signals how much of the assay
+        is detected / sporadic / not_detected).
 
-        Inspect `value_kind` (routes drill-down), `rankable` (gates
-        rankable filters on the numeric drill-down), `compartment`
-        (whole_cell vs extracellular), and per-row
-        `detection_status_counts` (signals how much of the assay is
-        detected / sporadic / not_detected — primary headline per audit
-        §4.3.3).
-
-        A row with `value=0` / `flag_value=false` /
-        `detection_status='not_detected'` on the drill-down tools is
-        *tested-absent* (assayed and not found, real biology) — distinct
-        from a missing row, which is *unmeasured* (not in the assay's
-        scope). See parent spec §10.
-
-        After this, drill via:
-        - metabolites_by_quantifies_assay(assay_ids=[...]) — numeric arm details
-        - metabolites_by_flags_assay(assay_ids=[...]) — boolean arm details
-        - assays_by_metabolite(metabolite_ids=[...]) — reverse lookup across both arms
-        - list_metabolites(metabolite_ids=[...]) — chemistry context for measured compounds
+        Routing: drill into `metabolites_by_quantifies_assay(assay_ids=[...])`
+        for numeric details, `metabolites_by_flags_assay(assay_ids=[...])`
+        for boolean details, `assays_by_metabolite(metabolite_ids=[...])`
+        for reverse lookup across both arms, and
+        `list_metabolites(metabolite_ids=[...])` for chemistry context. See
+        `docs://guide/conventions` for tested-absent semantics and
+        `docs://analysis/metabolites` for the metabolomics decision tree.
         """
         await ctx.info(
             f"list_metabolite_assays search_text={search_text} "
@@ -8219,13 +8120,11 @@ def register_tools(mcp: FastMCP):
             raise ToolError(f"Error in list_metabolite_assays: {e}")
 
     # ------------------------------------------------------------------
-    # metabolites_by_quantifies_assay — Phase 5 numeric drill-down
-    # (slice spec §4)
+    # metabolites_by_quantifies_assay — numeric drill-down
     # ------------------------------------------------------------------
     class MqaByDetectionStatus(BaseModel):
-        """One bucket of the by_detection_status rollup. Audit §4.3.3
-        primary headline — `not_detected` rows are tested-absent
-        (parent §10)."""
+        """One bucket of the by_detection_status rollup. Primary
+        qualitative headline — `not_detected` rows are tested-absent."""
         detection_status: str = Field(
             description="One of 'detected', 'sporadic', 'not_detected'. "
             "'not_detected' = tested-absent (real biology).")
@@ -8302,7 +8201,7 @@ def register_tools(mcp: FastMCP):
             "metric_bucket / metric_percentile / rank_by_metric carry data.")
 
     class MqaNotFound(BaseModel):
-        """Structured per-batch-input unknown IDs (parent §13.6)."""
+        """Structured per-batch-input unknown IDs (4 buckets)."""
         assay_ids: list[str] = Field(
             default_factory=list,
             description="Input assay_ids absent from the KG.")
@@ -8363,12 +8262,13 @@ def register_tools(mcp: FastMCP):
         detection_status: str | None = Field(
             default=None,
             description="One of 'detected', 'sporadic', 'not_detected'. "
-            "'not_detected' = tested-absent (parent §10). Numeric edge only.")
-        # Timepoint / phase (D3 sentinel-coerced)
+            "'not_detected' = tested-absent (real biology, kept by "
+            "default). Numeric edge only.")
+        # Timepoint / phase (sentinel-coerced)
         timepoint: str | None = Field(
             default=None,
             description="Timepoint label ('4 days', '6 days'). Null on "
-            "non-temporal experiments (D3 sentinel coercion).")
+            "non-temporal experiments (sentinel timepoints stripped).")
         timepoint_hours: float | None = Field(
             default=None,
             description="Timepoint in hours. Null on non-temporal "
@@ -8379,8 +8279,8 @@ def register_tools(mcp: FastMCP):
             "experiments.")
         growth_phase: str | None = Field(
             default=None,
-            description="Growth phase. Null today — KG-MET-017 backfill "
-            "pending.")
+            description="Growth phase. Currently unpopulated — KG-side "
+            "backfill pending.")
         condition_label: str | None = Field(
             default=None,
             description="Short condition descriptor (e.g. compartment + "
@@ -8418,9 +8318,9 @@ def register_tools(mcp: FastMCP):
             description="Row count in the filtered slice.")
         by_detection_status: list[MqaByDetectionStatus] = Field(
             default_factory=list,
-            description="Counts per detection_status — primary headline "
-            "(audit §4.3.3). 'not_detected' rows are tested-absent (real "
-            "biology, parent §10).")
+            description="Counts per detection_status — primary qualitative "
+            "headline. 'not_detected' rows are tested-absent (real "
+            "biology, kept by default — about 75% of numeric edges).")
         by_metric_bucket: list[MqaByMetricBucket] = Field(
             default_factory=list,
             description="Counts per rank-bucket on rankable rows.")
@@ -8449,7 +8349,8 @@ def register_tools(mcp: FastMCP):
             description="Human-readable rankable-gating diagnostics.")
         not_found: MqaNotFound = Field(
             default_factory=MqaNotFound,
-            description="Per-batch-input unknown IDs (parent §13.6).")
+            description="Per-batch-input unknown IDs (4 buckets: "
+            "assay_ids, metabolite_ids, experiment_ids, publication_doi).")
         returned: int = Field(description="Length of `results`.")
         truncated: bool = Field(
             description="True when total_matching > offset + returned.")
@@ -8476,9 +8377,9 @@ def register_tools(mcp: FastMCP):
         metabolite_ids: Annotated[list[str] | None, Field(
             description="Restrict to specific metabolites (full prefixed IDs, "
                         "e.g. ['kegg.compound:C00074']). `not_found.metabolite_ids` "
-                        "lists IDs absent from the KG; metabolites in the KG but not "
-                        "measured by any selected assay surface as zero rows "
-                        "(unmeasured per parent §10).",
+                        "lists IDs absent from the KG; metabolites in the KG "
+                        "but not measured by any selected assay surface as "
+                        "zero rows (unmeasured — distinct from tested-absent).",
         )] = None,
         exclude_metabolite_ids: Annotated[list[str] | None, Field(
             description="Exclude metabolites with these IDs (set-difference; "
@@ -8503,28 +8404,31 @@ def register_tools(mcp: FastMCP):
             description="Background factor(s) (ANY-overlap). E.g. ['axenic'].",
         )] = None,
         growth_phases: Annotated[list[str] | None, Field(
-            description="Growth phase(s) (ANY-overlap). Empty `[]` on assays "
-                        "today (KG-MET-017 backfill pending).",
+            description="Growth phase(s) (ANY-overlap). Currently "
+                        "unpopulated — KG-side backfill pending.",
         )] = None,
         value_min: Annotated[float | None, Field(
             description="Lower bound on `value` (raw concentration / intensity). "
                         "**Caution**: `value > 0` strips tested-absent rows "
                         "(`value=0` / `detection_status='not_detected'`) — use "
-                        "deliberately, never as default. See parent §10.",
+                        "deliberately, never as default. See "
+                        "`docs://guide/conventions`.",
         )] = None,
         value_max: Annotated[float | None, Field(
             description="Upper bound on `value`. Always applicable.",
         )] = None,
         detection_status: Annotated[list[str] | None, Field(
-            description="Detection-status filter — primary headline per audit "
-                        "§4.3.3. Values: 'detected', 'sporadic', 'not_detected'. "
-                        "Excluding 'not_detected' strips tested-absent rows; "
-                        "surface as caller choice, never default. See parent §10.",
+            description="Detection-status filter — primary qualitative "
+                        "headline. Values: 'detected', 'sporadic', "
+                        "'not_detected'. Excluding 'not_detected' strips "
+                        "tested-absent rows; surface as caller choice, "
+                        "never default. See `docs://guide/conventions`.",
         )] = None,
         timepoint: Annotated[list[str] | None, Field(
-            description="Timepoint label(s) — exact match. Live values: "
-                        "['4 days'], ['6 days']. Non-temporal experiments expose "
-                        "no timepoint here (rows surface with `timepoint=null`).",
+            description="Timepoint label(s) — exact match. E.g. "
+                        "['4 days'], ['6 days']. Non-temporal experiments "
+                        "expose no timepoint here (rows surface with "
+                        "`timepoint=null`).",
         )] = None,
         metric_bucket: Annotated[list[str] | None, Field(
             description="Bucket label(s) — subset of "
@@ -8563,27 +8467,23 @@ def register_tools(mcp: FastMCP):
         )] = 0,
     ) -> MetabolitesByQuantifiesAssayResponse:
         """Drill into numeric MetaboliteAssay edges — one row per
-        (metabolite × assay-edge).
-
-        `value` (raw concentration / intensity) is always returned;
-        `metric_bucket` / `metric_percentile` / `rank_by_metric` populated
-        only on rankable-assay rows (mirrors `genes_by_numeric_metric`'s
+        (metabolite × assay-edge). `value` (raw concentration /
+        intensity) is always returned; `metric_bucket` /
+        `metric_percentile` / `rank_by_metric` populated only on
+        rankable-assay rows (mirrors `genes_by_numeric_metric`'s
         rankable gate). Rankable-gated filters raise if every selected
-        assay has `rankable=false`, soft-exclude on mixed input.
+        assay has `rankable=false`, soft-exclude on mixed input. Tested-
+        absent rows (`value=0` / `detection_status='not_detected'`) are
+        real biology and kept by default. Cross-organism by design.
+        Pre-flight via
+        `list_metabolite_assays(value_kind='numeric', rankable=True)`.
 
-        A row with `value=0` / `flag_value=false` /
-        `detection_status='not_detected'` is *tested-absent* (assayed and
-        not found, kept in results). A missing row is *unmeasured* (not
-        in this assay's scope). Don't conflate.
-
-        Pre-flight: `list_metabolite_assays(rankable=True, value_kind='numeric')`
-        to confirm rankable filters apply.
-
-        Drill across:
-        - `assays_by_metabolite(metabolite_ids=[...])` — same metabolites'
-          boolean evidence + cross-organism reverse view.
-        - `genes_by_metabolite(metabolite_ids=[...], organism=...)` — gene
-          catalysts/transporters of these metabolites.
+        Routing: drill across to `assays_by_metabolite(metabolite_ids=[...])`
+        for the boolean-arm complement and the cross-organism reverse view,
+        or `genes_by_metabolite(metabolite_ids=[...], organism=...)` for
+        gene catalysts/transporters. See `docs://guide/conventions` for
+        tested-absent semantics and `docs://analysis/metabolites` for
+        the metabolomics decision tree.
         """
         await ctx.info(
             f"metabolites_by_quantifies_assay assay_ids={len(assay_ids)} "
@@ -8665,15 +8565,13 @@ def register_tools(mcp: FastMCP):
         )
 
     # ------------------------------------------------------------------
-    # metabolites_by_flags_assay — Phase 5 boolean drill-down
-    # (slice spec §5)
+    # metabolites_by_flags_assay — boolean drill-down
     # ------------------------------------------------------------------
     class MfaByValue(BaseModel):
         """One bucket of the by_value rollup (true / false counts)."""
         flag_value: bool = Field(
             description="The flag's boolean value. `false` rows are "
-            "tested-absent (real biology — 68.8% of boolean rows in the live KG, "
-            "128 of 186 across the 2 boolean assays).")
+            "tested-absent (real biology — about 62% of boolean rows).")
         count: int = Field(
             description="Row count for this flag value (e.g. 58 false / "
             "35 true on the msystems presence_flag_intracellular assay).")
@@ -8696,15 +8594,15 @@ def register_tools(mcp: FastMCP):
 
     class MfaByMetric(BaseModel):
         """Per-assay rollup for boolean drill-down. Mirrors DM `by_metric`
-        shape; precomputed dm_true_count / dm_false_count are absent
-        today (no diagnostics builder for boolean — best-effort).
+        shape; precomputed dm_true_count / dm_false_count are not currently
+        emitted (no diagnostics builder for boolean — best-effort).
         """
         assay_id: str = Field(description="Assay id this row summarizes.")
         count: int = Field(
             description="Filtered-slice row count for this assay.")
 
     class MfaNotFound(BaseModel):
-        """Structured per-batch-input unknown IDs (parent §13.6)."""
+        """Structured per-batch-input unknown IDs (4 buckets)."""
         assay_ids: list[str] = Field(default_factory=list)
         metabolite_ids: list[str] = Field(default_factory=list)
         experiment_ids: list[str] = Field(default_factory=list)
@@ -8721,7 +8619,7 @@ def register_tools(mcp: FastMCP):
         # Boolean value (always-available)
         flag_value: bool = Field(
             description="Boolean flag — `false` is *tested-absent* "
-            "(real biology, parent §10).")
+            "(real biology, kept by default).")
         n_positive: int | None = Field(
             default=None,
             description="Number of replicates flagged positive.")
@@ -8757,9 +8655,9 @@ def register_tools(mcp: FastMCP):
         by_value: list[MfaByValue] = Field(
             default_factory=list,
             description="Counts per flag value (true / false). `false` rows "
-            "are tested-absent (parent §10). Boolean arm has no "
-            "`by_detection_status` — `flag_value` IS the qualitative-detection "
-            "signal here.")
+            "are tested-absent (real biology, kept by default). Boolean "
+            "arm has no `by_detection_status` — `flag_value` IS the "
+            "qualitative-detection signal here.")
         by_assay: list[MfaByAssay] = Field(
             default_factory=list,
             description="Counts per assay_id.")
@@ -8773,14 +8671,16 @@ def register_tools(mcp: FastMCP):
             description="Per-assay filtered-slice rollup.")
         excluded_assays: list[str] = Field(
             default_factory=list,
-            description="Always `[]` here (no gates) — kept for cross-tool "
-            "envelope-shape consistency.")
+            description="Always `[]` here (no gates apply). Kept for "
+            "envelope-shape consistency with the numeric drill-down.")
         warnings: list[str] = Field(
             default_factory=list,
-            description="Always `[]` here (no gates).")
+            description="Always `[]` here (no gates apply). Kept for "
+            "envelope-shape consistency with the numeric drill-down.")
         not_found: MfaNotFound = Field(
             default_factory=MfaNotFound,
-            description="Per-batch-input unknown IDs (parent §13.6).")
+            description="Per-batch-input unknown IDs (4 buckets: "
+            "assay_ids, metabolite_ids, experiment_ids, publication_doi).")
         returned: int = Field(description="Length of `results`.")
         truncated: bool = Field(
             description="True when total_matching > offset + returned.")
@@ -8829,8 +8729,8 @@ def register_tools(mcp: FastMCP):
             description="Background factor(s) (ANY-overlap).",
         )] = None,
         growth_phases: Annotated[list[str] | None, Field(
-            description="Growth phase(s) (ANY-overlap). Empty `[]` on assays "
-                        "today (KG-MET-017 backfill pending).",
+            description="Growth phase(s) (ANY-overlap). Currently "
+                        "unpopulated — KG-side backfill pending.",
         )] = None,
         flag_value: Annotated[bool | None, Field(
             description="Filter by flag presence — `True` (presence flagged), "
@@ -8838,7 +8738,7 @@ def register_tools(mcp: FastMCP):
                         "`None` (both). Unlike `genes_by_boolean_metric` "
                         "(positive-only KG storage), `Assay_flags_metabolite` "
                         "stores both true and false flags, so `flag_value=False` "
-                        "returns real rows (68.8% of boolean rows in the live KG).",
+                        "returns real rows (about 62% of boolean rows).",
         )] = None,
         summary: Annotated[bool, Field(
             description="Return summary fields only (results=[]).",
@@ -8855,27 +8755,21 @@ def register_tools(mcp: FastMCP):
         )] = 0,
     ) -> MetabolitesByFlagsAssayResponse:
         """Drill into boolean MetaboliteAssay edges — one row per
-        (metabolite × flag-edge).
+        (metabolite × flag-edge). `flag_value=False` rows are
+        *tested-absent* (assayed and not found, real biology, kept by
+        default — about 62% of boolean rows). Unlike
+        `genes_by_boolean_metric` which returns 0 rows for `False` (DM
+        positive-only storage), this tool stores both true and false.
+        Cross-organism by design. No `by_detection_status` envelope — on
+        the boolean arm, `flag_value` IS the qualitative-detection
+        signal; `by_value` is its envelope rollup.
 
-        `flag_value=False` rows are *tested-absent* — assayed and not
-        found, real biology. 68.8% of boolean rows in the live KG are
-        `flag_value=false` (128 of 186 across the 2 boolean assays). A
-        missing row means *unmeasured*. Distinct (parent §10).
-
-        A row with `value=0` / `flag_value=false` /
-        `detection_status='not_detected'` is *tested-absent* (assayed
-        and not found, kept in results). A missing row is *unmeasured*
-        (not in this assay's scope). Don't conflate.
-
-        No `by_detection_status` envelope — that field exists only on
-        the numeric edge. On the boolean arm, `flag_value` IS the
-        qualitative-detection signal; `by_value` is its envelope rollup.
-
-        Drill across:
-        - `assays_by_metabolite(metabolite_ids=[...])` — quantifies-arm
-          complement.
-        - `genes_by_metabolite(metabolite_ids=[...], organism=...)` —
-          chemistry context.
+        Routing: drill across to `assays_by_metabolite(metabolite_ids=[...])`
+        for the quantifies-arm complement, or
+        `genes_by_metabolite(metabolite_ids=[...], organism=...)` for
+        gene chemistry context. See `docs://guide/conventions` for
+        tested-absent semantics and `docs://analysis/metabolites` for
+        the metabolomics decision tree.
         """
         await ctx.info(
             f"metabolites_by_flags_assay assay_ids={len(assay_ids)} "
@@ -8937,8 +8831,7 @@ def register_tools(mcp: FastMCP):
         )
 
     # ------------------------------------------------------------------
-    # assays_by_metabolite — Phase 5 polymorphic reverse-lookup
-    # (slice spec §6)
+    # assays_by_metabolite — polymorphic reverse-lookup
     # ------------------------------------------------------------------
     class AbmByEvidenceKind(BaseModel):
         evidence_kind: Literal["quantifies", "flags"] = Field(
@@ -9027,13 +8920,13 @@ def register_tools(mcp: FastMCP):
             description="Timepoint order index. Numeric arm only.")
         growth_phase: str | None = Field(
             default=None,
-            description="Growth phase. Numeric arm only — null today "
-            "(KG-MET-017 backfill pending).")
+            description="Growth phase. Numeric arm only — currently "
+            "unpopulated (KG-side backfill pending).")
         # Boolean-only (sparse on quantifies rows)
         flag_value: bool | None = Field(
             default=None,
             description="Boolean flag. Boolean arm only. `false` is "
-            "tested-absent (parent §10).")
+            "tested-absent (real biology, kept by default).")
         n_positive: int | None = Field(
             default=None,
             description="Number of replicates flagged positive. Boolean arm only.")
@@ -9090,8 +8983,8 @@ def register_tools(mcp: FastMCP):
             "tallies (NOT `total_matching`, which is row-count).")
         not_found: list[str] = Field(
             default_factory=list,
-            description="Flat `list[str]` — single-batch reverse-lookup "
-            "(parent §13.6). Input metabolite IDs absent from the KG.")
+            description="Flat `list[str]` — single-batch reverse-lookup. "
+            "Input metabolite IDs absent from the KG.")
         not_matched: list[str] = Field(
             default_factory=list,
             description="Flat `list[str]` — IDs in KG with no edge after "
@@ -9113,15 +9006,15 @@ def register_tools(mcp: FastMCP):
                         "case-sensitive). E.g. ['kegg.compound:C00074']. "
                         "`not_found` lists IDs absent from the KG; "
                         "`not_matched` lists IDs in KG but with no assay "
-                        "edge after filters (unmeasured for this scope, "
-                        "parent §10). Required, non-empty.",
+                        "edge after filters (unmeasured for this scope). "
+                        "Required, non-empty.",
             min_length=1,
         )],
         organism: Annotated[str | None, Field(
-            description="Optional organism filter (case-insensitive CONTAINS). "
-                        "Default `None` = cross-organism (D2 closure: metabolite "
-                        "IDs are organism-agnostic — one Metabolite node shared "
-                        "across organisms).",
+            description="Optional organism filter (case-insensitive "
+                        "CONTAINS). Default `None` = cross-organism — "
+                        "metabolite IDs are organism-agnostic (one "
+                        "Metabolite node shared across organisms).",
         )] = None,
         evidence_kind: Annotated[Literal["quantifies", "flags"] | None, Field(
             description="Filter by edge type. `'quantifies'` = numeric arm "
@@ -9160,36 +9053,28 @@ def register_tools(mcp: FastMCP):
         )] = 0,
     ) -> AssaysByMetaboliteResponse:
         """Batch reverse-lookup: metabolite IDs → all measurement evidence
-        across both arms (quantifies + flags). Cross-organism by default.
+        across both arms (quantifies + flags). Cross-organism by default
+        (metabolite IDs are organism-agnostic). Polymorphic rows: numeric-
+        arm rows carry `value`, `value_sd`, `detection_status`,
+        `timepoint*`, `metric_bucket`, `metric_percentile`,
+        `rank_by_metric` (rankable subset). Boolean-arm rows carry
+        `flag_value`, `n_positive`. Cross-arm fields are explicit `None`
+        (union-shape padding). Three states for a metabolite: `not_found`
+        (ID not in KG), `not_matched` (ID in KG, no edge after filters),
+        and tested-absent rows surfaced in `results` (`value=0` /
+        `flag_value=false` / `detection_status='not_detected'` — real
+        biology, kept by default). Use `metabolites_matched` for distinct-
+        metabolite count (NOT `total_matching` — that's row count). Use
+        `summary=True` on batch routing for 50+ metabolite_ids.
 
-        Polymorphic rows: numeric-arm rows carry `value`, `value_sd`,
-        `detection_status`, `timepoint*`, `metric_bucket`,
-        `metric_percentile`, `rank_by_metric` (rankable subset). Boolean-arm
-        rows carry `flag_value`, `n_positive`. Cross-arm fields are explicit
-        `None` (union-shape padding, parallels Phase 3 decision on
-        `genes_by_metabolite`).
-
-        A row with `value=0` / `flag_value=false` /
-        `detection_status='not_detected'` is *tested-absent* (assayed and
-        not found, kept in results). A missing row is *unmeasured* (not in
-        this assay's scope). Don't conflate.
-
-        Three states for a metabolite (parent §10):
-          1. `not_found` — ID not in the KG. **Unmeasured.**
-          2. `not_matched` — ID in the KG, no assay edge after filters.
-             **Unmeasured for this scope.**
-          3. Row in `results` with `value=0` / `flag_value=false` /
-             `detection_status='not_detected'` — *tested-absent* (assayed
-             and not found). Real biology; counted in `total_matching`.
-
-        Use `summary=True` for batch routing on 50+ metabolite_ids.
-
-        Originates from:
-        - `list_metabolites(metabolite_ids=[...])` — chemistry-layer discovery
-        - `metabolites_by_gene(locus_tags=[...])` — gene-anchored chemistry
-
-        Drill back to numeric details:
-        `metabolites_by_quantifies_assay(assay_ids=[...], metabolite_ids=[...])`.
+        Routing: drill back via
+        `metabolites_by_quantifies_assay(assay_ids=[...], metabolite_ids=[...])`
+        for numeric details. Upstream from
+        `list_metabolites(metabolite_ids=[...])` (chemistry-layer discovery)
+        or `metabolites_by_gene(locus_tags=[...])` (gene-anchored
+        chemistry). See `docs://guide/conventions` for tested-absent
+        semantics and `docs://analysis/metabolites` for the metabolomics
+        decision tree.
         """
         await ctx.info(
             f"assays_by_metabolite metabolite_ids={len(metabolite_ids)} "

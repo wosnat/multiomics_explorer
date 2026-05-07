@@ -3,27 +3,23 @@
 ## What it does
 
 Drill into numeric MetaboliteAssay edges — one row per
-(metabolite × assay-edge).
-
-`value` (raw concentration / intensity) is always returned;
-`metric_bucket` / `metric_percentile` / `rank_by_metric` populated
-only on rankable-assay rows (mirrors `genes_by_numeric_metric`'s
+(metabolite × assay-edge). `value` (raw concentration /
+intensity) is always returned; `metric_bucket` /
+`metric_percentile` / `rank_by_metric` populated only on
+rankable-assay rows (mirrors `genes_by_numeric_metric`'s
 rankable gate). Rankable-gated filters raise if every selected
-assay has `rankable=false`, soft-exclude on mixed input.
+assay has `rankable=false`, soft-exclude on mixed input. Tested-
+absent rows (`value=0` / `detection_status='not_detected'`) are
+real biology and kept by default. Cross-organism by design.
+Pre-flight via
+`list_metabolite_assays(value_kind='numeric', rankable=True)`.
 
-A row with `value=0` / `flag_value=false` /
-`detection_status='not_detected'` is *tested-absent* (assayed and
-not found, kept in results). A missing row is *unmeasured* (not
-in this assay's scope). Don't conflate.
-
-Pre-flight: `list_metabolite_assays(rankable=True, value_kind='numeric')`
-to confirm rankable filters apply.
-
-Drill across:
-- `assays_by_metabolite(metabolite_ids=[...])` — same metabolites'
-  boolean evidence + cross-organism reverse view.
-- `genes_by_metabolite(metabolite_ids=[...], organism=...)` — gene
-  catalysts/transporters of these metabolites.
+Routing: drill across to `assays_by_metabolite(metabolite_ids=[...])`
+for the boolean-arm complement and the cross-organism reverse view,
+or `genes_by_metabolite(metabolite_ids=[...], organism=...)` for
+gene catalysts/transporters. See `docs://guide/conventions` for
+tested-absent semantics and `docs://analysis/metabolites` for
+the metabolomics decision tree.
 
 ## Parameters
 
@@ -31,18 +27,18 @@ Drill across:
 |---|---|---|---|
 | assay_ids | list[string] | — | MetaboliteAssay IDs to drill into (full prefixed). Discover via `list_metabolite_assays(value_kind='numeric')`. E.g. ['metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration']. `not_found.assay_ids` lists IDs absent from the KG. |
 | organism | string \| None | None | Filter to assays from this organism (case-insensitive CONTAINS). Cross-organism is the default; pass to narrow. |
-| metabolite_ids | list[string] \| None | None | Restrict to specific metabolites (full prefixed IDs, e.g. ['kegg.compound:C00074']). `not_found.metabolite_ids` lists IDs absent from the KG; metabolites in the KG but not measured by any selected assay surface as zero rows (unmeasured per parent §10). |
+| metabolite_ids | list[string] \| None | None | Restrict to specific metabolites (full prefixed IDs, e.g. ['kegg.compound:C00074']). `not_found.metabolite_ids` lists IDs absent from the KG; metabolites in the KG but not measured by any selected assay surface as zero rows (unmeasured — distinct from tested-absent). |
 | exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites with these IDs (set-difference; exclude wins on overlap with `metabolite_ids`). |
 | experiment_ids | list[string] \| None | None | Filter to assays from these experiments. |
 | publication_doi | list[string] \| None | None | Filter by publication DOI(s). Exact match. E.g. ['10.1073/pnas.2213271120']. |
 | compartment | string \| None | None | Sample compartment ('whole_cell' or 'extracellular'). Exact match. |
 | treatment_type | list[string] \| None | None | Treatment type(s) (ANY-overlap, case-insensitive). E.g. ['carbon']. |
 | background_factors | list[string] \| None | None | Background factor(s) (ANY-overlap). E.g. ['axenic']. |
-| growth_phases | list[string] \| None | None | Growth phase(s) (ANY-overlap). Empty `[]` on assays today (KG-MET-017 backfill pending). |
-| value_min | float \| None | None | Lower bound on `value` (raw concentration / intensity). **Caution**: `value > 0` strips tested-absent rows (`value=0` / `detection_status='not_detected'`) — use deliberately, never as default. See parent §10. |
+| growth_phases | list[string] \| None | None | Growth phase(s) (ANY-overlap). Currently unpopulated — KG-side backfill pending. |
+| value_min | float \| None | None | Lower bound on `value` (raw concentration / intensity). **Caution**: `value > 0` strips tested-absent rows (`value=0` / `detection_status='not_detected'`) — use deliberately, never as default. See `docs://guide/conventions`. |
 | value_max | float \| None | None | Upper bound on `value`. Always applicable. |
-| detection_status | list[string] \| None | None | Detection-status filter — primary headline per audit §4.3.3. Values: 'detected', 'sporadic', 'not_detected'. Excluding 'not_detected' strips tested-absent rows; surface as caller choice, never default. See parent §10. |
-| timepoint | list[string] \| None | None | Timepoint label(s) — exact match. Live values: ['4 days'], ['6 days']. Non-temporal experiments expose no timepoint here (rows surface with `timepoint=null`). |
+| detection_status | list[string] \| None | None | Detection-status filter — primary qualitative headline. Values: 'detected', 'sporadic', 'not_detected'. Excluding 'not_detected' strips tested-absent rows; surface as caller choice, never default. See `docs://guide/conventions`. |
+| timepoint | list[string] \| None | None | Timepoint label(s) — exact match. E.g. ['4 days'], ['6 days']. Non-temporal experiments expose no timepoint here (rows surface with `timepoint=null`). |
 | metric_bucket | list[string] \| None | None | Bucket label(s) — subset of {'top_decile','top_quartile','mid','low'}. **Rankable-gated** — raises if every selected assay has `rankable=false`. Soft-excludes non-rankable assays from mixed input (surfaced in envelope `excluded_assays`). |
 | metric_percentile_min | float \| None | None | Lower bound on `metric_percentile` (0-100). **Rankable-gated.** |
 | metric_percentile_max | float \| None | None | Upper bound on `metric_percentile`. **Rankable-gated.** |
@@ -63,7 +59,7 @@ total_matching, by_detection_status, by_metric_bucket, by_assay, by_compartment,
 ```
 
 - **total_matching** (int): Row count in the filtered slice.
-- **by_detection_status** (list[MqaByDetectionStatus]): Counts per detection_status — primary headline (audit §4.3.3). 'not_detected' rows are tested-absent (real biology, parent §10).
+- **by_detection_status** (list[MqaByDetectionStatus]): Counts per detection_status — primary qualitative headline. 'not_detected' rows are tested-absent (real biology, kept by default — about 75% of numeric edges).
 - **by_metric_bucket** (list[MqaByMetricBucket]): Counts per rank-bucket on rankable rows.
 - **by_assay** (list[MqaByAssay]): Counts per assay_id. Pass these `assay_id`s to `metabolites_by_flags_assay(assay_ids=[...])` for the boolean complement.
 - **by_compartment** (list[MqaByCompartment]): Counts per compartment.
@@ -71,7 +67,7 @@ total_matching, by_detection_status, by_metric_bucket, by_assay, by_compartment,
 - **by_metric** (list[MqaByMetric]): Per-assay precomputed-vs-filtered: pairs the filtered slice min/max with the full-assay precomputed range so the LLM can read 'top-decile slice 0.012-0.16 out of full range 0-0.16' inline.
 - **excluded_assays** (list[string]): `assay_ids` soft-excluded under rankable-gating (non-rankable assays dropped when a rankable filter is set).
 - **warnings** (list[string]): Human-readable rankable-gating diagnostics.
-- **not_found** (MqaNotFound): Per-batch-input unknown IDs (parent §13.6).
+- **not_found** (MqaNotFound): Per-batch-input unknown IDs (4 buckets: assay_ids, metabolite_ids, experiment_ids, publication_doi).
 - **returned** (int): Length of `results`.
 - **truncated** (bool): True when total_matching > offset + returned.
 - **offset** (int): Pagination offset used.
@@ -91,11 +87,11 @@ total_matching, by_detection_status, by_metric_bucket, by_assay, by_compartment,
 | metric_bucket | string \| None (optional) | Bucket label ('top_decile' / 'top_quartile' / 'mid' / 'low'). Populated only on rankable assays. |
 | metric_percentile | float \| None (optional) | Percentile (0-100). Populated only on rankable assays. |
 | rank_by_metric | int \| None (optional) | Rank by value (1 = highest). Populated only on rankable assays. |
-| detection_status | string \| None (optional) | One of 'detected', 'sporadic', 'not_detected'. 'not_detected' = tested-absent (parent §10). Numeric edge only. |
-| timepoint | string \| None (optional) | Timepoint label ('4 days', '6 days'). Null on non-temporal experiments (D3 sentinel coercion). |
+| detection_status | string \| None (optional) | One of 'detected', 'sporadic', 'not_detected'. 'not_detected' = tested-absent (real biology, kept by default). Numeric edge only. |
+| timepoint | string \| None (optional) | Timepoint label ('4 days', '6 days'). Null on non-temporal experiments (sentinel timepoints stripped). |
 | timepoint_hours | float \| None (optional) | Timepoint in hours. Null on non-temporal experiments. |
 | timepoint_order | int \| None (optional) | Timepoint order index. Null on non-temporal experiments. |
-| growth_phase | string \| None (optional) | Growth phase. Null today — KG-MET-017 backfill pending. |
+| growth_phase | string \| None (optional) | Growth phase. Currently unpopulated — KG-side backfill pending. |
 | condition_label | string \| None (optional) | Short condition descriptor (e.g. compartment + timepoint). |
 | assay_id | string | Parent MetaboliteAssay id. |
 | organism_name | string | Source organism. |
@@ -212,9 +208,9 @@ Expect not_found to be a flat list[str].
 
 ```correction
 Drill-downs use a structured NotFound (4 keys: assay_ids, metabolite_ids,
-experiment_ids, publication_doi) per parent spec §13.6 — multi-batch input
-→ structured. Inspect each bucket separately to see which input was bad.
-Mirrors `MetNotFound` on `list_metabolites` and `GbmNotFound` on
+experiment_ids, publication_doi) — multi-batch input → structured.
+Inspect each bucket separately to see which input was bad. Mirrors
+`MetNotFound` on `list_metabolites` and `GbmNotFound` on
 `genes_by_metabolite`.
 
 ```
@@ -225,10 +221,10 @@ Apply value_min=0.001 by default to 'clean' the data.
 
 ```correction
 `value_min > 0` strips tested-absent rows (`value=0` /
-`detection_status='not_detected'`). 70.7% of numeric edges in the live KG
-are not_detected (1046 of 1480) — value_min would discard the majority of
-measured biology under this KG state. Surface as caller choice, never
-default-on. See parent §10.
+`detection_status='not_detected'`). About 75% of numeric edges are
+not_detected — value_min would discard the majority of measured
+biology. Surface as caller choice, never default-on. See
+`docs://guide/conventions`.
 
 ```
 
@@ -238,9 +234,9 @@ Treat metric_bucket / metric_percentile / rank_by_metric as always populated.
 
 ```correction
 Rankable-gated columns are null on rows whose parent assay has
-`rankable=false`. Eight of 10 current assays are rankable; the 2 boolean
-assays surface in `metabolites_by_flags_assay` instead. Per-row null on
-these columns means "not applicable" not "missing data".
+`rankable=false`. Boolean assays surface in `metabolites_by_flags_assay`
+instead. Per-row null on these columns means "not applicable" not
+"missing data".
 
 ```
 
@@ -249,11 +245,11 @@ growth_phase populated on every row.
 ```
 
 ```correction
-growth_phase is null on every row today — the schema field exists on
-Experiment, but `time_point_growth_phases[]` is empty for every
-metabolomics experiment in the current KG (KG-MET-017 backfill pending).
-Forward-compat surface; values populate without explorer-side code change
-when the KG ask lands.
+growth_phase is currently null on every row — the schema field exists
+on Experiment, but `time_point_growth_phases[]` is empty for every
+metabolomics experiment in the current KG (KG-side backfill pending).
+Forward-compat surface; values populate without explorer-side code
+change when the upstream backfill lands.
 
 ```
 

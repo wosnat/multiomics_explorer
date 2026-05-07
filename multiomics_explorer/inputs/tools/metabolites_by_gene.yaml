@@ -6,12 +6,12 @@ examples:
   - title: Single-gene drill-down — urease subunit (Workflow D)
     call: metabolites_by_gene(locus_tags=["PMM0913"], organism="Prochlorococcus MED4", limit=5)
     # Workflow D: single-gene mode. Envelope rollups are mostly noise at n=1;
-    # detail rows + total_matching do the work. PMM0913 (salY) is one of the
-    # 9 ABC-superfamily-only MED4 genes — pure transport-arm family_inferred,
-    # ~551 rows total. Auto-warning fires (family_inferred dominates).
-    # `limit=5` caps the regression baseline; pair with
-    # `transport_confidence='substrate_confirmed'` in real workflows to mute
-    # the rollup blowup.
+    # detail rows + total_matching do the work. PMM0913 (salY) is one of
+    # the ABC-superfamily-only MED4 genes — pure transport-arm
+    # family_inferred, large row count via the rollup. Auto-warning
+    # fires (family_inferred dominates). `limit=5` caps the regression
+    # baseline; pair with `transport_confidence='substrate_confirmed'`
+    # in real workflows to mute the rollup blowup.
 
   - title: Urease subunits (canonical detail-row example)
     call: metabolites_by_gene(locus_tags=["PMM0963", "PMM0964", "PMM0965"], organism="Prochlorococcus MED4", limit=5)
@@ -19,12 +19,12 @@ examples:
     # {Urea, H2O, CO2, NH3}); zero transport rows because the ureA/B/C trio
     # carry no Gene_has_tcdb_family edges. Detail rows surface the catalysis
     # triplets; envelope `top_metabolites` ranks {Urea, H2O, CO2, NH3} by
-    # gene reach, `top_metabolite_pathways` (with the chemistry-pathway filter
-    # `reaction_count >= 3`) ranks Nitrogen cycle, Cyanoamino acid metabolism,
-    # Biotin metabolism, Calvin cycle, Nitrogen metabolism, Arginine
-    # biosynthesis, Alanine/aspartate/glutamate metabolism (no signaling/
-    # disease pathways pollute the top 10), `by_element` returns
-    # [{H,3},{O,3},{C,2},{N,2}].
+    # gene reach, `top_metabolite_pathways` (chemistry-pathway-filtered to
+    # pathways with at least 3 reactions in the KG) ranks Nitrogen cycle,
+    # Cyanoamino acid metabolism, Biotin metabolism, Calvin cycle, Nitrogen
+    # metabolism, Arginine biosynthesis, Alanine/aspartate/glutamate
+    # metabolism (no signaling/disease pathways pollute the top 10),
+    # `by_element` returns [{H,3},{O,3},{C,2},{N,2}].
 
   - title: Workflow A (N-source marquee) — DE batch with element filter
     steps: |
@@ -66,7 +66,7 @@ examples:
       Step 3 (optional): list_metabolites(pathway_ids=[<top_metabolite_pathway_id>])
               → full metabolite roster of the pathway (not just gene-set hits).
 
-  - title: Workflow B' (cross-feeding) — MBG → GBM bridge
+  - title: Cross-feeding workflow — MBG → GBM bridge
     steps: |
       Step 1: differential_expression_by_gene(
                 organism="Prochlorococcus MED4",
@@ -113,18 +113,19 @@ examples:
     # the urease trio, this drops H2O from the {Urea, H2O, CO2, NH3}
     # canonical envelope.
 
-  - title: Conservative-cast transporter slice (mute the 551-row blowup)
+  - title: Conservative-cast transporter slice (mute the rollup blowup)
     call: metabolites_by_gene(locus_tags=["PMM0434", "PMM0913"], organism="Prochlorococcus MED4", transport_confidence="substrate_confirmed", evidence_sources=["transport"], limit=5)
-    # Both inputs are ABC-superfamily-only genes (long-tail p99 = max = 551
-    # family_inferred rows each via the TCDB substrate-edge rollup). Default
-    # call would emit ~1,100 rows and trip the family_inferred-dominance
+    # Both inputs are ABC-superfamily-only genes (long-tail family_inferred
+    # rows each via the TCDB substrate-edge rollup). Default call would
+    # emit a large number of rows and trip the family_inferred-dominance
     # auto-warning. Pairing `transport_confidence='substrate_confirmed'`
     # (drops family_inferred rows) AND `evidence_sources=['transport']`
     # (skips metabolism arm) returns 0 substrate-curated rows for these two
     # genes — exposing that ABC Superfamily-only annotation is too coarse
-    # for substrate-level claims. Useful diagnostic for batch DE inputs that
-    # contain ABC-only genes mixed with substrate-curated transporters. See
-    # analysis-doc §g — both tiers are annotations, neither is ground truth.
+    # for substrate-level claims. Useful diagnostic for batch DE inputs
+    # that contain ABC-only genes mixed with substrate-curated
+    # transporters. See `docs://guide/conventions` — both tiers are
+    # annotations, neither is ground truth.
 
 verbose_fields:
   - gene_category
@@ -146,8 +147,8 @@ chaining:
 
   # downstream from envelope — top_metabolites
   - "metabolites_by_gene → top_metabolites → list_metabolites(metabolite_ids=[top_metabolite_ids]) for richer per-metabolite cross-refs (mass, formula, full pathway names)"
-  - "metabolites_by_gene → top_metabolites → list_metabolites(metabolite_ids=[top_metabolite_ids], organism_names=[partner_organism]) for cross-organism presence (Workflow B' cross-feeding seed)"
-  - "metabolites_by_gene → top_metabolites → genes_by_metabolite(metabolite_ids=[top_metabolite_ids], organism=PARTNER_ORGANISM) (Workflow B' cross-feeding bridge — catalysts + transporters in partner)"
+  - "metabolites_by_gene → top_metabolites → list_metabolites(metabolite_ids=[top_metabolite_ids], organism_names=[partner_organism]) for cross-organism presence (cross-feeding seed)"
+  - "metabolites_by_gene → top_metabolites → genes_by_metabolite(metabolite_ids=[top_metabolite_ids], organism=PARTNER_ORGANISM) (cross-feeding bridge — catalysts + transporters in partner)"
 
   # downstream from envelope — top_metabolite_pathways (chemistry-pathway-filtered)
   - "metabolites_by_gene → top_metabolite_pathways → list_metabolites(pathway_ids=[metabolite_pathway_id]) for the full metabolite roster of the pathway (not just gene-set hits)"
@@ -165,7 +166,7 @@ mistakes:
   - >-
     Single-organism enforced (mirrors `differential_expression_by_gene` and
     `genes_by_metabolite`). There is no `organisms` list. For
-    cross-organism / cross-feeding work, use Workflow B': call MBG once on
+    cross-organism / cross-feeding work: call MBG once on
     the focal organism, take `top_metabolites`, then route to
     `genes_by_metabolite(metabolite_ids=[...], organism=partner)` (or
     `list_metabolites(metabolite_ids=[...], organism_names=[partner])` for
@@ -185,7 +186,7 @@ mistakes:
     questions (e.g. cross-organism inference); keep `family_inferred` for
     broad-screen candidate enumeration (e.g. N-source DE — the real MED4
     N-uptake genes are family_inferred-only). Both tiers are annotations,
-    neither is ground truth — see analysis-doc §g.
+    neither is ground truth — see `docs://guide/conventions`.
   - >-
     Every result row has the same key set — cross-arm fields are explicitly
     `None` on rows from the other arm (metabolism rows have
@@ -259,8 +260,8 @@ mistakes:
     locus_tags that don't resolve to any Gene in the requested organism
     (typo, wrong organism, gene removed in KG rebuild). `not_matched` =
     locus_tags that DO resolve to a Gene but have zero chemistry edges
-    (no `Gene_catalyzes_reaction` AND no `Gene_has_tcdb_family`). In MED4
-    1,366/1,976 genes (69%) fall into the `not_matched` bucket — most are
+    (no `Gene_catalyzes_reaction` AND no `Gene_has_tcdb_family`). The
+    majority of MED4 genes fall into the `not_matched` bucket — most are
     richly-annotated non-chemistry genes (DNA gyrase, queG, signaling
     modules), not annotation gaps. Pivot via
     `gene_overview(locus_tags=not_matched)` for annotation context.

@@ -28,10 +28,9 @@ examples:
     call: metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular"], flag_value=False)
     # 58 rows — the metabolites assayed and explicitly flagged as NOT
     # detected on this single assay (matches by_value.false=58 per-assay).
-    # Real biology — across both boolean assays (186 rows total), 68.8%
-    # are flag_value=false (128 of 186). Don't conflate with missing
-    # rows (those would mean unmeasured, not in this assay's scope).
-    # See parent §10.
+    # Real biology — about 62% of boolean rows are flag_value=false. Don't
+    # conflate with missing rows (those would mean unmeasured, not in this
+    # assay's scope). See `docs://guide/conventions`.
 
   - title: Summary — flag-distribution headline without rows
     call: metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular"], summary=True)
@@ -47,11 +46,9 @@ examples:
 
   - title: Metabolite-anchored — does PEP show up at all on the boolean assays?
     call: metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular", "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_extracellular"], metabolite_ids=["kegg.compound:C00074"])
-    # 2 rows total (1 per assay) — both flag_value=false. PEP is one of
-    # the 14 of 20 measurements (70%) of PEP that are tested-absent
-    # across the live metabolomics layer. Pair with
-    # metabolites_by_quantifies_assay for the 18 numeric edges (see §7
-    # of the slice spec).
+    # 2 rows total (1 per assay) — both flag_value=false. Most PEP
+    # measurements across the metabolomics layer are tested-absent. Pair
+    # with metabolites_by_quantifies_assay for the numeric-arm edges.
 
 verbose_fields:
   - assay_name
@@ -85,19 +82,18 @@ mistakes:
   - wrong: "Expect not_found to be a flat list[str]."
     right: |
       Drill-downs use a structured NotFound (4 keys: assay_ids, metabolite_ids,
-      experiment_ids, publication_doi) per parent spec §13.6 — multi-batch input
-      → structured. Inspect each bucket separately to see which input was bad.
-      Mirrors `MetNotFound` on `list_metabolites` and `GbmNotFound` on
+      experiment_ids, publication_doi) — multi-batch input → structured.
+      Inspect each bucket separately to see which input was bad. Mirrors
+      `MetNotFound` on `list_metabolites` and `GbmNotFound` on
       `genes_by_metabolite`.
 
-  - wrong: "flag_value=False returns 0 rows like genes_by_boolean_metric does today."
+  - wrong: "flag_value=False returns 0 rows like genes_by_boolean_metric does."
     right: |
       `genes_by_boolean_metric` returns 0 rows for `flag=False` because the
       DM layer stores positive-only edges (`dm_false_count=0` on every current
-      DM). `Assay_flags_metabolite` stores BOTH true and false flags — 68.8%
-      of edges in the live KG are `flag_value="false"` (128 of 186 across the
-      2 boolean assays). flag_value=False returns real rows here. Distinct
-      KG-storage convention.
+      DM). `Assay_flags_metabolite` stores BOTH true and false flags — about
+      62% of boolean rows are `flag_value=false`. flag_value=False returns
+      real rows here. Distinct KG-storage convention.
 
   - wrong: "excluded_assays / warnings will surface gating diagnostics."
     right: |
@@ -108,10 +104,10 @@ mistakes:
 
   - wrong: "growth_phase populated on every row."
     right: |
-      growth_phase is null on every row today — the schema field exists on
-      Experiment, but `time_point_growth_phases[]` is empty for every
-      metabolomics experiment in the current KG (KG-MET-017 backfill pending).
-      Forward-compat surface; values populate without explorer-side code change
-      when the KG ask lands.
+      growth_phase is currently null on every row — the schema field exists
+      on Experiment, but `time_point_growth_phases[]` is empty for every
+      metabolomics experiment in the current KG (KG-side backfill pending).
+      Forward-compat surface; values populate without explorer-side code
+      change when the upstream backfill lands.
 
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (62% of boolean rows are flag_value=False, kept by default — unlike DM boolean which is positive-only)."

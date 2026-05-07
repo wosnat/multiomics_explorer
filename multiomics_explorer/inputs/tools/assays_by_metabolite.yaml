@@ -35,9 +35,9 @@ examples:
 
   - title: Single-organism scope — MIT9313 only
     call: assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"], organism="MIT9313")
-    # Cross-organism is the default since metabolite IDs are organism-agnostic
-    # (one Metabolite node shared across organisms — D2 closure). Pass
-    # `organism` to narrow when comparing per-strain coverage.
+    # Cross-organism is the default since metabolite IDs are
+    # organism-agnostic (one Metabolite node shared across organisms).
+    # Pass `organism` to narrow when comparing per-strain coverage.
 
   - title: Batch routing — summary with mixed found / not-found IDs
     call: assays_by_metabolite(metabolite_ids=["kegg.compound:C00074", "kegg.compound:C99999", "kegg.compound:C00031"], summary=True)
@@ -45,7 +45,8 @@ examples:
     # `kegg.compound:C00031` (glucose) may land in `not_matched` if no
     # MetaboliteAssay measures it (i.e. metabolite is in the KG but
     # unmeasured for this scope). Distinct buckets, distinct meanings —
-    # see parent §10. PEP rows in `metabolites_with_evidence`.
+    # see `docs://guide/conventions`. PEP rows in
+    # `metabolites_with_evidence`.
 
   - title: Compartment scope — extracellular only
     call: assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"], compartment="extracellular")
@@ -105,17 +106,17 @@ mistakes:
   - wrong: "Expect not_found to be a structured Pydantic model."
     right: |
       Reverse-lookup uses a flat `list[str]` for `not_found` because only
-      `metabolite_ids` is a batch input — single batch → flat per parent §13.6
-      (deviating from the structured `MqaNotFound` / `MfaNotFound` on the
-      drill-downs, where 4 inputs are batch). Both `not_found` and
-      `not_matched` are flat lists here.
+      `metabolite_ids` is a batch input — single batch → flat (deviating
+      from the structured `MqaNotFound` / `MfaNotFound` on the drill-downs,
+      where 4 inputs are batch). Both `not_found` and `not_matched` are
+      flat lists here.
 
   - wrong: "Conflate not_found with not_matched."
     right: |
       `not_found` = ID not in the KG (Metabolite node doesn't exist).
       `not_matched` = ID in the KG but no MetaboliteAssay edge after filters
       (Metabolite exists but is unmeasured for this scope). Both are
-      *unmeasured* per parent §10, but only `not_matched` IDs are present
-      in the chemistry layer.
+      *unmeasured*, but only `not_matched` IDs are present in the chemistry
+      layer. See `docs://guide/conventions`.
 
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for the not_found vs not_matched convention across batch tools."

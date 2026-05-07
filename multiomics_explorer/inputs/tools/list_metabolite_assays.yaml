@@ -45,7 +45,7 @@ mistakes:
     right: "Missing means *unmeasured* (not in the assay's scope). For 'tested and not found,' look for value=0 / flag_value=false / detection_status='not_detected' rows in the drill-down output."
 
   - wrong: "growth_phases=[] means the assay has no growth-state metadata."
-    right: "growth_phases=[] today reflects unpopulated KG state (KG-MET-017 — KG team backfill pending). The schema field exists; values populate without explorer-side code change when the KG ask lands."
+    right: "growth_phases=[] reflects unpopulated KG state (KG-side backfill pending). The schema field exists; values populate without explorer-side code change when the upstream backfill lands."
 
   - wrong: "metabolite_count_total = total distinct metabolites across matching assays."
     right: "metabolite_count_total is *cumulative*: same metabolite measured by N assays counts N times. For distinct counts route to assays_by_metabolite(metabolite_ids=..., summary=True) → metabolites_matched, or list_metabolites(metabolite_ids=...)."

@@ -3,27 +3,21 @@
 ## What it does
 
 Drill into boolean MetaboliteAssay edges — one row per
-(metabolite × flag-edge).
+(metabolite × flag-edge). `flag_value=False` rows are
+*tested-absent* (assayed and not found, real biology, kept by
+default — about 62% of boolean rows). Unlike
+`genes_by_boolean_metric` which returns 0 rows for `False` (DM
+positive-only storage), this tool stores both true and false.
+Cross-organism by design. No `by_detection_status` envelope — on
+the boolean arm, `flag_value` IS the qualitative-detection
+signal; `by_value` is its envelope rollup.
 
-`flag_value=False` rows are *tested-absent* — assayed and not
-found, real biology. 68.8% of boolean rows in the live KG are
-`flag_value=false` (128 of 186 across the 2 boolean assays). A
-missing row means *unmeasured*. Distinct (parent §10).
-
-A row with `value=0` / `flag_value=false` /
-`detection_status='not_detected'` is *tested-absent* (assayed
-and not found, kept in results). A missing row is *unmeasured*
-(not in this assay's scope). Don't conflate.
-
-No `by_detection_status` envelope — that field exists only on
-the numeric edge. On the boolean arm, `flag_value` IS the
-qualitative-detection signal; `by_value` is its envelope rollup.
-
-Drill across:
-- `assays_by_metabolite(metabolite_ids=[...])` — quantifies-arm
-  complement.
-- `genes_by_metabolite(metabolite_ids=[...], organism=...)` —
-  chemistry context.
+Routing: drill across to `assays_by_metabolite(metabolite_ids=[...])`
+for the quantifies-arm complement, or
+`genes_by_metabolite(metabolite_ids=[...], organism=...)` for
+gene chemistry context. See `docs://guide/conventions` for
+tested-absent semantics and `docs://analysis/metabolites` for
+the metabolomics decision tree.
 
 ## Parameters
 
@@ -38,8 +32,8 @@ Drill across:
 | compartment | string \| None | None | Sample compartment ('whole_cell' or 'extracellular'). |
 | treatment_type | list[string] \| None | None | Treatment type(s) (ANY-overlap). |
 | background_factors | list[string] \| None | None | Background factor(s) (ANY-overlap). |
-| growth_phases | list[string] \| None | None | Growth phase(s) (ANY-overlap). Empty `[]` on assays today (KG-MET-017 backfill pending). |
-| flag_value | bool \| None | None | Filter by flag presence — `True` (presence flagged), `False` (absence flagged — *tested-absent*, real biology), `None` (both). Unlike `genes_by_boolean_metric` (positive-only KG storage), `Assay_flags_metabolite` stores both true and false flags, so `flag_value=False` returns real rows (68.8% of boolean rows in the live KG). |
+| growth_phases | list[string] \| None | None | Growth phase(s) (ANY-overlap). Currently unpopulated — KG-side backfill pending. |
+| flag_value | bool \| None | None | Filter by flag presence — `True` (presence flagged), `False` (absence flagged — *tested-absent*, real biology), `None` (both). Unlike `genes_by_boolean_metric` (positive-only KG storage), `Assay_flags_metabolite` stores both true and false flags, so `flag_value=False` returns real rows (about 62% of boolean rows). |
 | summary | bool | False | Return summary fields only (results=[]). |
 | verbose | bool | False | Include heavy-text fields per row: assay_name, field_description. |
 | limit | int | 5 | Max rows. Paginate with `offset`. |
@@ -56,14 +50,14 @@ total_matching, by_value, by_assay, by_compartment, by_organism, by_metric, excl
 ```
 
 - **total_matching** (int): Row count in the filtered slice.
-- **by_value** (list[MfaByValue]): Counts per flag value (true / false). `false` rows are tested-absent (parent §10). Boolean arm has no `by_detection_status` — `flag_value` IS the qualitative-detection signal here.
+- **by_value** (list[MfaByValue]): Counts per flag value (true / false). `false` rows are tested-absent (real biology, kept by default). Boolean arm has no `by_detection_status` — `flag_value` IS the qualitative-detection signal here.
 - **by_assay** (list[MfaByAssay]): Counts per assay_id.
 - **by_compartment** (list[MfaByCompartment]): Counts per compartment.
 - **by_organism** (list[MfaByOrganism]): Counts per organism (cross-organism by default).
 - **by_metric** (list[MfaByMetric]): Per-assay filtered-slice rollup.
-- **excluded_assays** (list[string]): Always `[]` here (no gates) — kept for cross-tool envelope-shape consistency.
-- **warnings** (list[string]): Always `[]` here (no gates).
-- **not_found** (MfaNotFound): Per-batch-input unknown IDs (parent §13.6).
+- **excluded_assays** (list[string]): Always `[]` here (no gates apply). Kept for envelope-shape consistency with the numeric drill-down.
+- **warnings** (list[string]): Always `[]` here (no gates apply). Kept for envelope-shape consistency with the numeric drill-down.
+- **not_found** (MfaNotFound): Per-batch-input unknown IDs (4 buckets: assay_ids, metabolite_ids, experiment_ids, publication_doi).
 - **returned** (int): Length of `results`.
 - **truncated** (bool): True when total_matching > offset + returned.
 - **offset** (int): Pagination offset used.
@@ -75,7 +69,7 @@ total_matching, by_value, by_assay, by_compartment, by_organism, by_metric, excl
 | metabolite_id | string | Metabolite node id. |
 | name | string | Canonical metabolite name. |
 | kegg_compound_id | string \| None (optional) | KEGG compound id (e.g. 'C00019'); null if no KEGG xref. |
-| flag_value | bool | Boolean flag — `false` is *tested-absent* (real biology, parent §10). |
+| flag_value | bool | Boolean flag — `false` is *tested-absent* (real biology, kept by default). |
 | n_positive | int \| None (optional) | Number of replicates flagged positive. |
 | n_replicates | int \| None (optional) | Number of replicates. |
 | metric_type | string | Parent assay's metric tag (e.g. 'presence_flag_intracellular'). |
@@ -191,24 +185,23 @@ Expect not_found to be a flat list[str].
 
 ```correction
 Drill-downs use a structured NotFound (4 keys: assay_ids, metabolite_ids,
-experiment_ids, publication_doi) per parent spec §13.6 — multi-batch input
-→ structured. Inspect each bucket separately to see which input was bad.
-Mirrors `MetNotFound` on `list_metabolites` and `GbmNotFound` on
+experiment_ids, publication_doi) — multi-batch input → structured.
+Inspect each bucket separately to see which input was bad. Mirrors
+`MetNotFound` on `list_metabolites` and `GbmNotFound` on
 `genes_by_metabolite`.
 
 ```
 
 ```mistake
-flag_value=False returns 0 rows like genes_by_boolean_metric does today.
+flag_value=False returns 0 rows like genes_by_boolean_metric does.
 ```
 
 ```correction
 `genes_by_boolean_metric` returns 0 rows for `flag=False` because the
 DM layer stores positive-only edges (`dm_false_count=0` on every current
-DM). `Assay_flags_metabolite` stores BOTH true and false flags — 68.8%
-of edges in the live KG are `flag_value="false"` (128 of 186 across the
-2 boolean assays). flag_value=False returns real rows here. Distinct
-KG-storage convention.
+DM). `Assay_flags_metabolite` stores BOTH true and false flags — about
+62% of boolean rows are `flag_value=false`. flag_value=False returns
+real rows here. Distinct KG-storage convention.
 
 ```
 
@@ -229,11 +222,11 @@ growth_phase populated on every row.
 ```
 
 ```correction
-growth_phase is null on every row today — the schema field exists on
-Experiment, but `time_point_growth_phases[]` is empty for every
-metabolomics experiment in the current KG (KG-MET-017 backfill pending).
-Forward-compat surface; values populate without explorer-side code change
-when the KG ask lands.
+growth_phase is currently null on every row — the schema field exists
+on Experiment, but `time_point_growth_phases[]` is empty for every
+metabolomics experiment in the current KG (KG-side backfill pending).
+Forward-compat surface; values populate without explorer-side code
+change when the upstream backfill lands.
 
 ```
 
