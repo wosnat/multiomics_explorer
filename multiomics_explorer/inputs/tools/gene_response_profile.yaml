@@ -40,3 +40,5 @@ mistakes:
     right: "This tool aggregates across timepoints. Use differential_expression_by_gene with a specific experiment to see temporal patterns."
   - "Results are sorted by response breadth — genes responding to more treatments appear first"
   - "Single organism enforced — call once per organism"
+  - "Two Python wrappers reshape this tool's output into matrix views: `response_matrix(genes, organism)` for a gene × treatment-group pivot, and `gene_set_compare(set_a, set_b)` for two-set overlap / only-A / only-B partitioning. Top-level imports: `from multiomics_explorer import response_matrix, gene_set_compare`. See `docs://guide/python_api` § Cross-experiment summarization."
+  - "DataFrame conversion: `to_dataframe(result)` auto-dispatches and returns the unwound gene × treatment-group table. See `docs://guide/python_api`."

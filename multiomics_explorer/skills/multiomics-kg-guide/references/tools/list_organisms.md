@@ -222,7 +222,7 @@ list_organisms (per-row metabolite_count > 0) → list_metabolites(organism_name
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
-- metabolite_count counts capability via gene catalysis — distinct metabolites reachable through Gene → Reaction → Metabolite. Does NOT include transport substrates (until TCDB-CAZy ships) or measured metabolites (until metabolomics-DM ships). 0 does not mean the metabolite is absent from the KG.
+- `metabolite_count` counts catalysis capability only — distinct metabolites reachable through Gene → Reaction → Metabolite. Transport-reach (Gene → TcdbFamily → Metabolite) is not aggregated to the organism level here; per-metabolite organism reach including transport is available via `list_metabolites(organism_names=[...])`. Measurement-side coverage is the separate `measured_metabolite_count` field (populated on 4 organisms with metabolomics data). 0 does not mean the metabolite is absent from the KG.
 
 - by_metabolic_capability is a top-10 ranking sorted by metabolite_count descending; organisms with zero chemistry are excluded. Use it on summary=True calls to identify chemistry-rich organisms before drilling in via list_metabolites(organism_names=[...]).
 

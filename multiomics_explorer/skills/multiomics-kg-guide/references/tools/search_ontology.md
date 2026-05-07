@@ -204,6 +204,8 @@ search_ontology(search_text='PMM0845', ontology='go_bp')  # searching for a gene
 resolve_gene(identifier='PMM0845')  # use resolve_gene for gene lookups
 ```
 
+- Use this to assemble a custom `term_ids=[...]` list for `pathway_enrichment` / `cluster_enrichment`. Both tools accept either `level=N` (test all terms at one hierarchy depth) or `term_ids=[...]` (test a specific set you chose). Custom term sets are useful when relevant terms live at different depths — e.g. in GO, a term at level 3 may be more specific than one at level 4 because GO is graph-shaped, not strictly tree-shaped. See `docs://analysis/enrichment` §10.
+
 ## Package import equivalent
 
 ```python

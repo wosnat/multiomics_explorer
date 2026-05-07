@@ -50,6 +50,12 @@ from multiomics_explorer.api.functions import (
     cluster_enrichment,
     pathway_enrichment,
 )
+from multiomics_explorer.analysis.expression import (
+    gene_set_compare,
+    response_matrix,
+)
+from multiomics_explorer.analysis.frames import to_dataframe
+from multiomics_explorer.kg.connection import GraphConnection
 
 __all__ = [
     "EnrichmentInputs",
@@ -98,4 +104,8 @@ __all__ = [
     "genes_in_cluster",
     "cluster_enrichment",
     "pathway_enrichment",
+    "response_matrix",
+    "gene_set_compare",
+    "to_dataframe",
+    "GraphConnection",
 ]

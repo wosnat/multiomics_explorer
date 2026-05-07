@@ -259,6 +259,8 @@ genes_by_boolean_metric(derived_metric_ids=['derived_metric:...:damping_ratio'])
 genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
 ```
 
+- See `docs://analysis/derived_metrics` for the DM family overview. Note: `flag=False` returns 0 rows on every current DM (positive-only KG storage); contrast with metabolomics `metabolites_by_flags_assay` which stores both true and false.
+
 ## Package import equivalent
 
 ```python

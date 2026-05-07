@@ -207,6 +207,8 @@ resolve_gene → gene_ontology_terms
 
 - TCDB substrate-level questions ('which genes does this metabolite bind to?') chain via `genes_by_metabolite`, NOT this tool. Use `gene_ontology_terms(ontology='tcdb')` for *family*-level annotations (e.g. 'what TCDB family does PMM1129 belong to?').
 
+- Reverse-lookup of `genes_by_ontology` — same ontology surface, gene-anchored. For enrichment workflows the forward direction (`genes_by_ontology` → TERM2GENE → `pathway_enrichment` / `cluster_enrichment`) is canonical; see `docs://analysis/enrichment` §2 + §4.
+
 ## Package import equivalent
 
 ```python

@@ -304,7 +304,7 @@ metabolites_by_gene → not_matched (locus_tags with no chemistry edges) → gen
 
 - Single-organism enforced (mirrors `differential_expression_by_gene` and `genes_by_metabolite`). There is no `organisms` list. For cross-organism / cross-feeding work, use Workflow B': call MBG once on the focal organism, take `top_metabolites`, then route to `genes_by_metabolite(metabolite_ids=[...], organism=partner)` (or `list_metabolites(metabolite_ids=[...], organism_names=[partner])` for presence-only).
 
-- `'metabolomics'` is NOT accepted in `evidence_sources` here — the Pydantic Literal allows only `('metabolism', 'transport')`. The metabolomics path (DerivedMetric → Metabolite) has no Gene anchor and surfaces only in `list_metabolites` (where `'metabolomics'` is a valid forward-compat filter value). Same divergence as `genes_by_metabolite`.
+- `'metabolomics'` is NOT accepted in `evidence_sources` here — the Pydantic Literal allows only `('metabolism', 'transport')`. The metabolomics path (`MetaboliteAssay → Metabolite`) has no Gene anchor, so a metabolomics-only metabolite contributes no rows from this tool. For measurement evidence, use `list_metabolite_assays` / `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay`. Same divergence as `genes_by_metabolite`.
 
 - When the auto-warning fires (most transport rows are `family_inferred`), interpret workflow-dependent: use `transport_confidence='substrate_confirmed'` for conservative-cast questions (e.g. cross-organism inference); keep `family_inferred` for broad-screen candidate enumeration (e.g. N-source DE — the real MED4 N-uptake genes are family_inferred-only). Both tiers are annotations, neither is ground truth — see analysis-doc §g.
 
@@ -331,6 +331,8 @@ metabolites_by_gene → not_matched (locus_tags with no chemistry edges) → gen
 - When `top_metabolites` is dominated by ATP / ADP / NADH / NADPH / H2O, pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip the currency-cofactor noise. Set-difference semantics with `metabolite_ids` — exclude wins on overlap (silent). Per-arm scope: exclude applies on BOTH metabolism + transport arms (mirrors `metabolite_ids`). KG namespace is `kegg.compound:` (not `chebi:`).
 
 - Detail rows are direction-agnostic. The transport edge (`Tcdb_family_transports_metabolite`) does not distinguish substrate from product, and the metabolism arm's `Reaction_has_metabolite` edge doesn't either (KEGG equation order is arbitrary). To distinguish, layer transcriptional evidence (`differential_expression_by_gene`) and functional annotation (`gene_overview` Pfam / KEGG KO names like `*-synthase` vs `*-permease`).
+
+- See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/concepts` for the chemistry layer overview.
 
 ## Package import equivalent
 

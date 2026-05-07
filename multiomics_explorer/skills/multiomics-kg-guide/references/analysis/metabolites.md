@@ -23,7 +23,7 @@ The `Metabolite.evidence_sources` list field on each Metabolite node already ind
 Always restate the row's caveats when the answer touches it. The LLM should never claim:
 
 - "This gene produces X" — only "this gene catalyses a reaction involving X". This is the permanent convention: upstream KEGG annotation direction is unreliable, so the KG intentionally stays undirected (Part 4 §4.1.1 resolved 2026-05-04).
-- "This gene transports X" without qualifying tier — say "this gene's TCDB family is curated as transporting X (family-inferred)" when `transport_confidence='family_inferred'`.
+- "This gene transports X" without qualifying tier — when `transport_confidence='family_inferred'`, the gene is annotated to a non-leaf TCDB family whose curated substrate set was rolled up from descendant leaves; we don't know which specific subfamily (and thus which specific substrate set) applies. Say "this gene belongs to a TCDB family that includes leaf-level transporters of X — we can't tell from the annotation which leaf, so X is candidate-only".
 - "Metabolite X was not produced under condition Y" based on metabolomics absence — say "X was not detected in the targeted panel under condition Y" (targeted ≠ comprehensive).
 
 ---

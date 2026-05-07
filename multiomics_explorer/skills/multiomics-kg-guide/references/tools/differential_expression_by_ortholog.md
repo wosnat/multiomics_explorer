@@ -148,6 +148,8 @@ differential_expression_by_ortholog → scripts/expression_by_ortholog.py (detai
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
+- For cross-experiment summarization patterns see `docs://guide/python_api` § Cross-experiment summarization (covers `response_matrix` for gene × treatment-group pivots and `gene_set_compare` for two-set comparisons).
+
 ## Package import equivalent
 
 ```python

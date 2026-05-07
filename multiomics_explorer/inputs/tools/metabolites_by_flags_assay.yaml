@@ -113,3 +113,5 @@ mistakes:
       metabolomics experiment in the current KG (KG-MET-017 backfill pending).
       Forward-compat surface; values populate without explorer-side code change
       when the KG ask lands.
+
+  - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (62% of boolean rows are flag_value=False, kept by default — unlike DM boolean which is positive-only)."

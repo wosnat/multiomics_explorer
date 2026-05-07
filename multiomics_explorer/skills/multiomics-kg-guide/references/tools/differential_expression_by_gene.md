@@ -204,6 +204,8 @@ Call once per organism — tool enforces single-organism constraint
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
+- For cross-experiment summarization (which treatments does this gene set respond to?) see `docs://guide/python_api` § Cross-experiment summarization (`response_matrix` for gene × treatment pivots, `gene_set_compare` for two-set overlap). For pathway-level interpretation chain to `pathway_enrichment` (`docs://analysis/enrichment`).
+
 ## Package import equivalent
 
 ```python

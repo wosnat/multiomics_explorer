@@ -173,6 +173,8 @@ gene_derived_metrics(locus_tags=[])
 locus_tags must be non-empty (raises ValueError).
 ```
 
+- See `docs://analysis/derived_metrics` for the DM family overview (numeric / boolean / categorical drill-downs, rankable / has_p_value semantics).
+
 ## Package import equivalent
 
 ```python

@@ -190,7 +190,12 @@ class TestAnalysisAboutContent:
                 if not kwargs:
                     continue
 
-                valid_params = set(inspect.signature(fn).parameters.keys())
+                # Pydantic BaseModel subclasses report `**data` as the
+                # only signature parameter — fall back to model_fields.
+                if hasattr(fn, "model_fields"):
+                    valid_params = set(fn.model_fields.keys())
+                else:
+                    valid_params = set(inspect.signature(fn).parameters.keys())
                 invalid = kwargs - valid_params
                 if invalid:
                     errors.append(

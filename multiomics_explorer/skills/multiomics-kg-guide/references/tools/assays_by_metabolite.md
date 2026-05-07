@@ -265,6 +265,8 @@ in the chemistry layer.
 
 ```
 
+- See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for the not_found vs not_matched convention across batch tools.
+
 ## Package import equivalent
 
 ```python

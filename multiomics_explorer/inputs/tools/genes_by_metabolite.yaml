@@ -131,11 +131,12 @@ mistakes:
   - >-
     `'metabolomics'` is NOT accepted in `evidence_sources` here — the
     Pydantic Literal allows only `('metabolism', 'transport')`. The
-    metabolomics path (DerivedMetric → Metabolite) has no Gene anchor and
-    surfaces only in `list_metabolites` (where `'metabolomics'` is a valid
-    forward-compat filter value). Same `_VALID_EVIDENCE_SOURCES`
-    validator pattern, intentionally divergent value set per the tool's
-    biology.
+    metabolomics path (`MetaboliteAssay → Metabolite`) has no Gene anchor,
+    so a metabolomics-only metabolite returns no rows from this tool.
+    To inspect measurement evidence, use `list_metabolite_assays` /
+    `assays_by_metabolite` instead. Same `_VALID_EVIDENCE_SOURCES`
+    validator pattern as `list_metabolites`, intentionally divergent
+    value set per the tool's biology.
   - >-
     TCDB-class filtering does NOT belong here. There is no
     `tcdb_class_ids` parameter. TCDB is now a first-class ontology — for
@@ -167,3 +168,4 @@ mistakes:
     transcriptional evidence (`differential_expression_by_gene`) and
     functional annotation (`gene_overview` Pfam / KEGG KO names like
     `*-synthase` vs `*-permease`).
+  - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/concepts` for the chemistry layer overview."

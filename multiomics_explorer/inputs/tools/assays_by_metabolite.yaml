@@ -117,3 +117,5 @@ mistakes:
       (Metabolite exists but is unmeasured for this scope). Both are
       *unmeasured* per parent §10, but only `not_matched` IDs are present
       in the chemistry layer.
+
+  - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for the not_found vs not_matched convention across batch tools."

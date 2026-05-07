@@ -119,3 +119,4 @@ mistakes:
 
   - wrong: "result['results'][0]['time_point_growth_phases']"
     right: "[tp['growth_phase'] for tp in result['results'][0]['timepoints']]"
+  - "DataFrame conversion: `to_dataframe(result)` auto-dispatches and returns one row per experiment × timepoint (with `timepoints` unwound and `genes_by_status` inlined at both experiment + timepoint level). See `docs://guide/python_api`."

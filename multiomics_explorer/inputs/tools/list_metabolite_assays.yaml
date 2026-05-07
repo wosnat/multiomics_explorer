@@ -52,3 +52,5 @@ mistakes:
 
   - wrong: "Calling metabolites_by_quantifies_assay with bucket / metric_percentile filters before checking assay rankable."
     right: "Call list_metabolite_assays(value_kind='numeric', rankable=True) first. Drill-down's rankable-gated filters raise if every selected assay has rankable=False, soft-exclude on mixed input."
+
+  - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/conventions` for tested-absent semantics across the metabolomics layer."

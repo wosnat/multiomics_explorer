@@ -263,37 +263,28 @@ class TestToDataFrameWarnings:
         assert "data" not in df.columns
         assert any(issubclass(w.category, UserWarning) for w in caught)
 
-    def test_response_summary_suggests_dedicated_function(self):
-        result = {
-            "results": [
-                {
-                    "gene": "MIT9313_0001",
-                    "response_summary": {"responded": 3, "details": [1, 2, 3]},
-                },
-            ]
-        }
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always")
-            df = to_dataframe(result)
-        assert "response_summary" not in df.columns
-        messages = [str(w.message) for w in caught if issubclass(w.category, UserWarning)]
-        assert any("profile_summary_to_dataframe()" in m for m in messages)
+    def test_response_summary_dispatches_to_profile_summary(self):
+        """Result with response_summary dispatches to profile_summary_to_dataframe.
 
-    def test_timepoints_suggests_dedicated_function(self):
-        result = {
-            "results": [
-                {
-                    "gene": "MIT9313_0001",
-                    "timepoints": [{"t": 0, "val": 1.0}, {"t": 30, "val": 2.0}],
-                },
-            ]
-        }
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always")
-            df = to_dataframe(result)
+        Auto-dispatch unwinds the per-gene response_summary dict into one
+        row per gene × group rather than warning and dropping the column.
+        """
+        df = to_dataframe(_PROFILE_RESULT)
+        # Dispatched output has gene × group rows + the dedicated columns.
+        assert "group" in df.columns
+        assert "experiments_total" in df.columns
+        assert df.shape[0] >= 1
+
+    def test_timepoints_dispatches_to_experiments(self):
+        """Result with timepoints dispatches to experiments_to_dataframe.
+
+        Auto-dispatch unwinds per-row timepoints into one row per
+        experiment × timepoint rather than warning and dropping the column.
+        """
+        df = to_dataframe(_EXPERIMENTS_RESULT)
+        # Dispatched output has timepoint columns prefixed tp_.
+        assert any(c.startswith("tp_") for c in df.columns)
         assert "timepoints" not in df.columns
-        messages = [str(w.message) for w in caught if issubclass(w.category, UserWarning)]
-        assert any("experiments_to_dataframe()" in m for m in messages)
 
     def test_unknown_nested_generic_warning(self):
         result = {

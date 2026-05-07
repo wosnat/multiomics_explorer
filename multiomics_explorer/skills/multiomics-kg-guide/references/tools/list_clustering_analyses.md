@@ -148,6 +148,8 @@ response['total_matching']  # use total, not len — results may be truncated
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
+- DataFrame conversion: `to_dataframe(result)` auto-dispatches and returns one row per analysis × cluster (compact: cluster_id / cluster_name / cluster_member_count; verbose=True adds cluster descriptions). See `docs://guide/python_api`.
+
 ## Package import equivalent
 
 ```python

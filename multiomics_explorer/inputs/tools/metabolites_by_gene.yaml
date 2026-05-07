@@ -173,9 +173,11 @@ mistakes:
   - >-
     `'metabolomics'` is NOT accepted in `evidence_sources` here — the
     Pydantic Literal allows only `('metabolism', 'transport')`. The
-    metabolomics path (DerivedMetric → Metabolite) has no Gene anchor and
-    surfaces only in `list_metabolites` (where `'metabolomics'` is a valid
-    forward-compat filter value). Same divergence as `genes_by_metabolite`.
+    metabolomics path (`MetaboliteAssay → Metabolite`) has no Gene anchor,
+    so a metabolomics-only metabolite contributes no rows from this tool.
+    For measurement evidence, use `list_metabolite_assays` /
+    `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay`.
+    Same divergence as `genes_by_metabolite`.
   - >-
     When the auto-warning fires (most transport rows are `family_inferred`),
     interpret workflow-dependent: use
@@ -277,3 +279,4 @@ mistakes:
     layer transcriptional evidence (`differential_expression_by_gene`) and
     functional annotation (`gene_overview` Pfam / KEGG KO names like
     `*-synthase` vs `*-permease`).
+  - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/concepts` for the chemistry layer overview."

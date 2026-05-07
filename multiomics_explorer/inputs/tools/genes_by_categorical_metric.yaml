@@ -163,3 +163,4 @@ mistakes:
     them.
   - wrong: genes_by_categorical_metric(derived_metric_ids=['derived_metric:...:damping_ratio'])  # numeric DM
     right: genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'])  # discover IDs via list_derived_metrics(value_kind='categorical') first
+  - "See `docs://analysis/derived_metrics` for the DM family overview (numeric / boolean / categorical drill-downs)."

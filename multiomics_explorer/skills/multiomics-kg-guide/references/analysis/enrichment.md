@@ -34,7 +34,8 @@ path (including the MCP tool) is a convenience layer on top.
 
 ## 2. Building blocks (Python API)
 
-All four names are importable from `multiomics_explorer` directly:
+All names below are importable from the top-level `multiomics_explorer`
+namespace (see `docs://guide/python_api` for the full surface):
 
 ```python
 from multiomics_explorer import (
@@ -42,9 +43,9 @@ from multiomics_explorer import (
     fisher_ora,
     signed_enrichment_score,
     EnrichmentInputs,
+    genes_by_ontology,
+    to_dataframe,
 )
-from multiomics_explorer.api import genes_by_ontology
-from multiomics_explorer.analysis.frames import to_dataframe
 ```
 
 ### `de_enrichment_inputs(experiment_ids, organism, direction, significant_only, timepoint_filter)`
@@ -60,14 +61,19 @@ Calls `differential_expression_by_gene` and partitions the result into clusters 
 - `not_found`, `not_matched`, `no_expression` — partial-failure buckets (individual
   experiments with problems do not raise; they are collected here).
 
-### `fisher_ora(gene_sets, background, term2gene, min_gene_set_size=5, max_gene_set_size=500)`
+### `fisher_ora(inputs: EnrichmentInputs, term2gene, *, min_gene_set_size=5, max_gene_set_size=500)`
 
-Pure Fisher + Benjamini-Hochberg primitive. Direction-agnostic. Accepts any gene-list source —
-not just DE results. `background` may be a per-cluster dict or a shared list. Returns a long
-DataFrame (one row per cluster × term pair) with compareCluster-compatible columns.
+Pure Fisher + Benjamini-Hochberg primitive. Direction-agnostic.
+Accepts any gene-set source — not just DE results: construct
+`EnrichmentInputs(gene_sets=..., background=..., organism_name=...,
+cluster_metadata=...)` directly when you have hand-curated sets
+(`cluster_metadata` can be `{cluster_key: {}}` if you have no per-cluster
+context to attach). Returns an `EnrichmentResult` object (see §18)
+carrying a long DataFrame (one row per cluster × term pair) with
+compareCluster-compatible columns at `result.results`.
 
-The size filter acts on **M** (pathway members within the cluster's background), not the global
-pathway size. See §12 Gotchas.
+The size filter acts on **M** (pathway members within the cluster's
+background), not the global pathway size. See §12 Gotchas.
 
 ### `signed_enrichment_score(df, direction_col='direction', padj_col='p_adjust')`
 
@@ -93,8 +99,7 @@ sizes. Genome coverage is required — term-size distributions alone mislead (th
 cause of B1's original over-reliance on a single ontology level without checking coverage).
 
 ```python
-from multiomics_explorer.api import ontology_landscape
-from multiomics_explorer.analysis.frames import to_dataframe
+from multiomics_explorer import ontology_landscape, to_dataframe
 
 # Survey all ontologies for MED4.
 # Supply experiment_ids to weight coverage by the experiments you plan to use.
@@ -124,9 +129,8 @@ The standard enrichment pipeline for differential expression results:
 ```python
 from multiomics_explorer import (
     de_enrichment_inputs, fisher_ora, signed_enrichment_score,
+    genes_by_ontology, to_dataframe,
 )
-from multiomics_explorer.api import genes_by_ontology
-from multiomics_explorer.analysis.frames import to_dataframe
 
 # Step 1: build gene sets from DE results.
 inputs = de_enrichment_inputs(
@@ -148,10 +152,11 @@ gbo = genes_by_ontology(
 term2gene = to_dataframe(gbo)   # columns: term_id, term_name, locus_tag, level, ...
 
 # Step 3: run Fisher ORA (BH applied per cluster).
-df = fisher_ora(
-    inputs.gene_sets, inputs.background, term2gene,
+result = fisher_ora(
+    inputs, term2gene,
     min_gene_set_size=5, max_gene_set_size=500,
 )
+df = result.results.copy()
 
 # Step 4: attach direction and compute signed score.
 df["direction"] = df["cluster"].map(
@@ -170,11 +175,10 @@ co-expression clustering. The background is the analysis universe (all genes tha
 clustered), not the full genome.
 
 ```python
-from multiomics_explorer.api import (
+from multiomics_explorer import (
     list_clustering_analyses, genes_in_cluster, genes_by_ontology,
+    EnrichmentInputs, fisher_ora, to_dataframe,
 )
-from multiomics_explorer.analysis.frames import to_dataframe
-from multiomics_explorer import fisher_ora
 
 # Fetch an analysis and its clusters.
 analyses = list_clustering_analyses(organism="MED4")
@@ -196,7 +200,14 @@ background = {c: list(all_genes) for c in gene_sets}  # shared universe
 term2gene = to_dataframe(
     genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
 )
-df = fisher_ora(gene_sets, background, term2gene)
+inputs = EnrichmentInputs(
+    gene_sets=gene_sets,
+    background=background,
+    organism_name="MED4",
+    cluster_metadata={c: {} for c in gene_sets},
+)
+result = fisher_ora(inputs, term2gene)
+df = result.results
 ```
 
 **MCP convenience:** The `cluster_enrichment` tool automates this pipeline in a single
@@ -211,11 +222,10 @@ Use `genes_by_homolog_group` to turn ortholog group memberships into gene sets, 
 against the full organism gene set as background.
 
 ```python
-from multiomics_explorer.api import (
+from multiomics_explorer import (
     genes_by_homolog_group, list_organisms, genes_by_ontology,
+    EnrichmentInputs, fisher_ora, to_dataframe,
 )
-from multiomics_explorer.analysis.frames import to_dataframe
-from multiomics_explorer import fisher_ora
 
 # Gene sets: genes belonging to each ortholog group of interest.
 homolog_result = genes_by_homolog_group(
@@ -235,7 +245,14 @@ organism_genes = org_entry["locus_tags"]   # full genome gene set
 term2gene = to_dataframe(
     genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
 )
-df = fisher_ora(gene_sets, organism_genes, term2gene)
+inputs = EnrichmentInputs(
+    gene_sets=gene_sets,
+    background=organism_genes,    # shared list[str] across all clusters
+    organism_name="MED4",
+    cluster_metadata={c: {} for c in gene_sets},
+)
+result = fisher_ora(inputs, term2gene)
+df = result.results
 ```
 
 ---
@@ -245,9 +262,9 @@ df = fisher_ora(gene_sets, organism_genes, term2gene)
 Any dict of locus_tags works. Caller supplies the background.
 
 ```python
-from multiomics_explorer.api import genes_by_ontology
-from multiomics_explorer.analysis.frames import to_dataframe
-from multiomics_explorer import fisher_ora
+from multiomics_explorer import (
+    genes_by_ontology, EnrichmentInputs, fisher_ora, to_dataframe,
+)
 
 # Hand-curated or upstream-analysis gene sets.
 gene_sets = {
@@ -260,7 +277,14 @@ background = my_candidate_universe   # list[str] — shared across all clusters
 term2gene = to_dataframe(
     genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
 )
-df = fisher_ora(gene_sets, background, term2gene)
+inputs = EnrichmentInputs(
+    gene_sets=gene_sets,
+    background=background,
+    organism_name="MED4",
+    cluster_metadata={c: {} for c in gene_sets},
+)
+result = fisher_ora(inputs, term2gene)
+df = result.results
 ```
 
 ---
@@ -277,11 +301,10 @@ dominated by enzymes (~1,776 terms at level 3), drowning out signal from smaller
 ### Worked example: transporter enrichment
 
 ```python
-from multiomics_explorer.api import (
+from multiomics_explorer import (
     list_filter_values, ontology_landscape, genes_by_ontology,
+    de_enrichment_inputs, fisher_ora, to_dataframe,
 )
-from multiomics_explorer import de_enrichment_inputs, fisher_ora
-from multiomics_explorer.analysis.frames import to_dataframe
 
 # Step 1: Discover available BRITE trees.
 trees = list_filter_values("brite_tree")
@@ -307,7 +330,8 @@ inputs = de_enrichment_inputs(
     experiment_ids=["exp1"], organism="MED4",
     direction="both", significant_only=True,
 )
-df = fisher_ora(inputs.gene_sets, inputs.background, term2gene)
+result = fisher_ora(inputs, term2gene)
+df = result.results
 ```
 
 The MCP tool supports the same workflow in a single call:

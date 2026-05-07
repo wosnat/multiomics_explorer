@@ -70,6 +70,9 @@ _EXPECTED_TOOL_RESOURCES = {
 _EXPECTED_ANALYSIS_RESOURCES = {
     f"docs://analysis/{p.stem}" for p in (_SKILLS_DIR / "analysis").glob("*.md")
 }
+_EXPECTED_GUIDE_RESOURCES = {
+    f"docs://guide/{p.stem}" for p in (_SKILLS_DIR / "guide").glob("*.md")
+}
 # Example scripts served explicitly (not auto-discovered from .md files)
 _EXPECTED_EXAMPLE_RESOURCES = {
     "docs://examples/pathway_enrichment.py",
@@ -78,6 +81,7 @@ _EXPECTED_EXAMPLE_RESOURCES = {
 _EXPECTED_RESOURCES = (
     _EXPECTED_TOOL_RESOURCES
     | _EXPECTED_ANALYSIS_RESOURCES
+    | _EXPECTED_GUIDE_RESOURCES
     | _EXPECTED_EXAMPLE_RESOURCES
 )
 

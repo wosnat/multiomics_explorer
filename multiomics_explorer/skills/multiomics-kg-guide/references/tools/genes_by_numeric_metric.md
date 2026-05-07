@@ -293,6 +293,8 @@ genes_by_numeric_metric → gene_overview(locus_tags=results)
 
 - Filtered slice vs full DM. `by_metric[i].value_*` describes rows that survived your filters. `by_metric[i].dm_value_*` describes the full DM (precomputed). They're different — your top-decile slice is intentionally narrower than the full DM range.
 
+- See `docs://analysis/derived_metrics` for the DM family overview and `docs://guide/conventions` for rankable-gated filter semantics.
+
 ## Package import equivalent
 
 ```python

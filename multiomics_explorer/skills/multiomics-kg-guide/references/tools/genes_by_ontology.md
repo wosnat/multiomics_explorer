@@ -246,6 +246,8 @@ len(response.results)  # wrong — that's the row count after limit
 response.total_genes  # distinct genes across all matches
 ```
 
+- TERM2GENE source for enrichment. Pass the result through `to_dataframe(...)` and feed it directly into `fisher_ora` / `pathway_enrichment` / `cluster_enrichment` — no manual column renaming. See `docs://analysis/enrichment` §2 + §4 for the building blocks and the worked DE-path code example.
+
 ## Package import equivalent
 
 ```python

@@ -269,6 +269,8 @@ genes_by_categorical_metric(derived_metric_ids=['derived_metric:...:damping_rati
 genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'])
 ```
 
+- See `docs://analysis/derived_metrics` for the DM family overview (numeric / boolean / categorical drill-downs).
+
 ## Package import equivalent
 
 ```python

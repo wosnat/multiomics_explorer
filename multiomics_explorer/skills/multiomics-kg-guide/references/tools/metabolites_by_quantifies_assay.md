@@ -257,6 +257,8 @@ when the KG ask lands.
 
 ```
 
+- See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (75% of numeric edges are not_detected, kept by default).
+
 ## Package import equivalent
 
 ```python

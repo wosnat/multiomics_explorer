@@ -399,10 +399,10 @@ class MetaboliteResult(BaseModel):
     formula: str | None = Field(default=None, description="Hill-notation chemical formula (e.g. 'C6H12O6'). Null on ~9% of metabolites (mostly TCDB-curated generic substrates).")
     elements: list[str] = Field(default_factory=list, description="Sorted unique element symbols present in formula (e.g. ['C','H','O']). Empty when formula is null. Filter on this — never on `formula` substring (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Presence list (no atom counts; stoichiometry lives in `formula`).")
     mass: float | None = Field(default=None, description="Monoisotopic mass in Da (e.g. 180.156). Null on ~22% of metabolites.")
-    gene_count: int = Field(default=0, description="Distinct genes reachable via Gene → Reaction → Metabolite OR Gene → TcdbFamily → Metabolite (UNION post-TCDB; e.g. 320 for glucose). When > 0, drill in via genes_by_metabolite(metabolite_ids=[id], organism=...). All metabolites have gene_count > 0 today (post-2026-05-03 transport-arm fix); the future metabolomics-DM spec will introduce metabolites measured without any gene path, which will surface here with gene_count=0 — 0 ≠ 'absent from KG'.")
+    gene_count: int = Field(default=0, description="Distinct genes reachable via Gene → Reaction → Metabolite OR Gene → TcdbFamily → Metabolite (UNION post-TCDB; e.g. 320 for glucose). When > 0, drill in via genes_by_metabolite(metabolite_ids=[id], organism=...). 0 indicates a metabolomics-only metabolite — measured by mass spec (`MetaboliteAssay`) but not reachable via any gene catalysis or transport path. 22 metabolites are gene_count=0 today; check evidence_sources to confirm — 0 ≠ 'absent from KG'.")
     organism_count: int = Field(default=0, description="Distinct organisms reaching this metabolite via any chemistry path (e.g. 31 for ATP). When > 0, narrow with organism_names filter.")
     transporter_count: int = Field(default=0, description="Distinct `tc_specificity` leaf TcdbFamily nodes annotated as transporting this metabolite (e.g. 17 for glucose, 229 for sodium). Scoped to leaves so the count reflects 'actual transporter systems' rather than counting ancestor families that inherit the substrate via the 2026-05-03 rollup. Source: TCDB-CAZy ontology.")
-    evidence_sources: list[str] = Field(default_factory=list, description="Path provenance — values from {'metabolism', 'transport'}. 'metabolism' = at least one Reaction in KG involves this compound; 'transport' = at least one TcdbFamily curates this as substrate. 'metabolomics' is reserved for the future metabolomics-DM spec — no row carries it today. E.g. ['metabolism', 'transport'].")
+    evidence_sources: list[str] = Field(default_factory=list, description="Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. 'metabolism' = at least one Reaction in KG involves this compound; 'transport' = at least one TcdbFamily curates this as substrate; 'metabolomics' = at least one MetaboliteAssay measures this compound (149 metabolites today). E.g. ['metabolism', 'transport'] or ['metabolism', 'metabolomics'].")
     chebi_id: str | None = Field(default=None, description="ChEBI ID (raw numeric, e.g. '4167'). Populated on 90% of metabolites overall — 100% of the 452 chebi:-IDed transport-only metabolites (extracted from the ID itself), plus the kegg.compound:-IDed metabolites that cross-ref ChEBI.")
     pathway_ids: list[str] = Field(default_factory=list, description="KEGG pathway memberships (e.g. ['kegg.pathway:ko00010', 'kegg.pathway:ko01100']). Empty when no Metabolite_in_pathway edges. Drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...).")
     pathway_count: int = Field(default=0, description="Distinct count of KEGG pathways this metabolite is in (e.g. 5). Routing signal — when > 0, drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...) for genes annotated to those pathways. Equal to size(pathway_ids).")
@@ -5622,13 +5622,16 @@ def register_tools(mcp: FastMCP):
             "term set (rebaselines may differ).",
         )] = True,
     ) -> OntologyLandscapeResponse:
-        """Rank (ontology x level) combinations by enrichment suitability.
+        """Rank (ontology x level) combinations by enrichment suitability —
+        pre-flight for `pathway_enrichment` / `cluster_enrichment`.
 
         Per-(ontology x level) stats: term-size distribution, genome coverage,
         best-effort share (GO). Ranked by coverage x size_factor(median) with
-        sweet-spot [5, 50] median genes-per-term. Default ontology=None surveys
-        all 9 ontologies. Pass experiment_ids to weight by coverage of those
-        experiments' quantified genes. See docs://tools/ontology_landscape.
+        sweet-spot [5, 50] median genes-per-term; `relevance_rank` is the
+        composite score (rank 1 = best). Default ontology=None surveys all
+        12 ontology keys (GO BP/MF/CC + 9 others). Pass experiment_ids to
+        weight by coverage of those experiments' quantified genes. See
+        docs://analysis/enrichment §3 + §10 for narrative + worked example.
         """
         await ctx.info(f"ontology_landscape organism={organism} ontology={ontology}")
         try:
@@ -7175,10 +7178,9 @@ def register_tools(mcp: FastMCP):
                 description="Filter by evidence path. Set-membership ANY semantics "
                 "— ['transport'] returns transport-only AND dual (1,097 today). "
                 "Valid values: 'metabolism' (catalysis-reachable), 'transport' "
-                "(TCDB-curated substrate). `'metabolomics'` is accepted as a "
-                "filter value for forward-compat with the future metabolomics-DM "
-                "spec; no row matches yet. Other values raise at the MCP "
-                "boundary (Pydantic Literal validation).",
+                "(TCDB-curated substrate), 'metabolomics' (measured by a "
+                "MetaboliteAssay; 149 metabolites today). Other values raise "
+                "at the MCP boundary (Pydantic Literal validation).",
             ),
         ] = None,
         summary: Annotated[bool, Field(
@@ -7212,7 +7214,7 @@ def register_tools(mcp: FastMCP):
         - genes_by_metabolite(metabolite_ids=[id], organism=...) — find the
           catalysts / transporters per organism (replaces what would
           otherwise be an inline per-row top-N gene list here)
-        - gene_metabolic_role(locus_tags=[...], organism=..., metabolite_elements=...) — gene-centric chemistry
+        - metabolites_by_gene(locus_tags=[...], organism=..., metabolite_elements=...) — gene-centric chemistry
         - genes_by_ontology(ontology="kegg", term_ids=[pathway_id], organism=...) — pathway → genes
         """
         await ctx.info(

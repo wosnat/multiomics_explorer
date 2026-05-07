@@ -73,3 +73,4 @@ mistakes:
       pivot to genes_by_numeric_metric(derived_metric_ids=[...], min_value=1.0)
   - wrong: gene_derived_metrics(locus_tags=[])
     right: locus_tags must be non-empty (raises ValueError).
+  - "See `docs://analysis/derived_metrics` for the DM family overview (numeric / boolean / categorical drill-downs, rankable / has_p_value semantics)."

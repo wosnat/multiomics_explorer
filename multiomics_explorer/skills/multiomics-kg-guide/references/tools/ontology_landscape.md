@@ -2,13 +2,16 @@
 
 ## What it does
 
-Rank (ontology x level) combinations by enrichment suitability.
+Rank (ontology x level) combinations by enrichment suitability —
+pre-flight for `pathway_enrichment` / `cluster_enrichment`.
 
 Per-(ontology x level) stats: term-size distribution, genome coverage,
 best-effort share (GO). Ranked by coverage x size_factor(median) with
-sweet-spot [5, 50] median genes-per-term. Default ontology=None surveys
-all 9 ontologies. Pass experiment_ids to weight by coverage of those
-experiments' quantified genes. See docs://tools/ontology_landscape.
+sweet-spot [5, 50] median genes-per-term; `relevance_rank` is the
+composite score (rank 1 = best). Default ontology=None surveys all
+12 ontology keys (GO BP/MF/CC + 9 others). Pass experiment_ids to
+weight by coverage of those experiments' quantified genes. See
+docs://analysis/enrichment §3 + §10 for narrative + worked example.
 
 ## Parameters
 
