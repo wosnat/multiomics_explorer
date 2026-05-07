@@ -2,25 +2,9 @@
 
 ## What it does
 
-Browse and filter metabolites in the chemistry layer.
+Browse and filter metabolites in the chemistry layer (KEGG-curated metabolism + TCDB-curated transport substrates + measured by MetaboliteAssay).
 
-**Direction-agnostic.** Joins through `Reaction_has_metabolite` and
-(post-TCDB) `Tcdb_family_transports_metabolite` are direction-agnostic —
-a metabolite that is *produced* and one that is *consumed* surface
-identically. KEGG equation order is arbitrary. To distinguish, layer
-transcriptional evidence (`differential_expression_by_gene`) and
-functional annotation (`gene_overview` Pfam/KO `*-synthase` vs
-`*-permease`).
-
-Per-row `elements` and the `elements=` filter are presence-only
-(presence list, not stoichiometric — atom counts live in formula).
-
-After this tool, drill in via:
-- genes_by_metabolite(metabolite_ids=[id], organism=...) — find the
-  catalysts / transporters per organism (replaces what would
-  otherwise be an inline per-row top-N gene list here)
-- metabolites_by_gene(locus_tags=[...], organism=..., metabolite_elements=...) — gene-centric chemistry
-- genes_by_ontology(ontology="kegg", term_ids=[pathway_id], organism=...) — pathway → genes
+Routing: drill into `genes_by_metabolite(metabolite_ids=[...])` for catalysts/transporters per organism, `assays_by_metabolite(metabolite_ids=[...])` for measurement evidence, `genes_by_ontology(ontology='kegg', term_ids=[pathway_id])` for pathway → genes. See `docs://guide/conventions` for direction-agnosticism (KEGG equation order is unreliable upstream — joins through Reaction_has_metabolite and Tcdb_family_transports_metabolite return both produced and consumed metabolites identically). See `docs://analysis/metabolites` for the 3 source pipelines decision tree.
 
 ## Parameters
 
@@ -33,12 +17,12 @@ After this tool, drill in via:
 | chebi_ids | list[string] \| None | None | Filter by raw ChEBI numeric IDs (e.g. ['4167', '15422']). 90% of Metabolite nodes carry a `chebi_id`. |
 | hmdb_ids | list[string] \| None | None | Filter by raw HMDB IDs (e.g. ['HMDB0000122']). 47% coverage. |
 | mnxm_ids | list[string] \| None | None | Filter by raw MetaNetX IDs (e.g. ['MNXM1364061']). 100% coverage — every Metabolite has a `mnxm_id`. |
-| elements | list[string] \| None | None | Element-presence filter (Hill-notation symbols). AND of presence — ['N', 'P'] matches metabolites containing BOTH. Replaces error-prone formula-substring matching. Empty/null formula metabolites (~10%) never match. E.g. ['N'] for nitrogen-containing metabolites (yields 1,563 today). |
+| elements | list[string] \| None | None | Element-presence filter (Hill-notation symbols). AND of presence — ['N', 'P'] matches metabolites containing BOTH. Use this rather than substring-matching on `formula` (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Empty/null formula metabolites never match. |
 | mass_min | float \| None | None | Minimum monoisotopic mass (Da). Excludes metabolites with null `mass` (~22%). E.g. 60.0. |
 | mass_max | float \| None | None | Maximum monoisotopic mass (Da). E.g. 1000.0. |
-| organism_names | list[string] \| None | None | Restrict to metabolites reachable by these organisms (case-insensitive on `preferred_name`). UNION semantics — a metabolite reached by ANY listed organism qualifies. Joined via `Organism_has_metabolite` (catalysis OR transport post-TCDB). E.g. ['Prochlorococcus MED4']. `not_found.organism_names` lists any unknown names. |
-| pathway_ids | list[string] \| None | None | Filter by KEGG pathway membership (`KeggTerm.id`). E.g. ['kegg.pathway:ko00910'] for nitrogen metabolism. Joined via `Metabolite_in_pathway` (transport-extended post-TCDB; 395 distinct pathways are metabolite-reachable). `not_found.pathway_ids` lists any IDs that don't exist as a KeggTerm. |
-| evidence_sources | list[string ('metabolism', 'transport', 'metabolomics')] \| None | None | Filter by evidence path. Set-membership ANY semantics — ['transport'] returns transport-only AND dual (1,097 today). Valid values: 'metabolism' (catalysis-reachable), 'transport' (TCDB-curated substrate), 'metabolomics' (measured by a MetaboliteAssay; 149 metabolites today). Other values raise at the MCP boundary (Pydantic Literal validation). |
+| organism_names | list[string] \| None | None | Restrict to metabolites reachable by these organisms (case-insensitive on `preferred_name`). UNION semantics — a metabolite reached by ANY listed organism qualifies. Joined via `Organism_has_metabolite` (catalysis OR transport). E.g. ['Prochlorococcus MED4']. `not_found.organism_names` lists any unknown names. |
+| pathway_ids | list[string] \| None | None | Filter by KEGG pathway membership (`KeggTerm.id`). E.g. ['kegg.pathway:ko00910'] for nitrogen metabolism. Joined via `Metabolite_in_pathway`. `not_found.pathway_ids` lists unknown IDs. |
+| evidence_sources | list[string ('metabolism', 'transport', 'metabolomics')] \| None | None | Filter by evidence path. Set-membership ANY semantics — ['transport'] returns transport-only AND dual. Valid values: 'metabolism' (catalysis-reachable), 'transport' (TCDB-curated substrate), 'metabolomics' (measured by a MetaboliteAssay). Other values raise at the MCP boundary. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include heavy-text and structural-fingerprint fields (inchikey, smiles, mnxm_id, hmdb_id, pathway_names). |
 | limit | int | 5 | Max results. |
@@ -52,41 +36,41 @@ After this tool, drill in via:
 total_entries, total_matching, top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, score_max, score_median, returned, offset, truncated, not_found, results
 ```
 
-- **total_entries** (int): Total Metabolite nodes in KG (unfiltered, 3,025 today)
-- **total_matching** (int): Metabolites matching filters
-- **top_organisms** (list[MetTopOrganism]): Top 10 organisms by metabolite count (within matched set), sorted desc
+- **total_entries** (int): Total Metabolite nodes in KG (unfiltered).
+- **total_matching** (int): Metabolites matching filters.
+- **top_organisms** (list[MetTopOrganism]): Top 10 organisms by metabolite count (within matched set), sorted desc.
 - **top_metabolite_pathways** (list[MetTopPathway]): Top 10 pathways by metabolite count (within matched set), sorted desc. Metabolite-pathway rollup (distinct from KO-pathway annotations on `genes_by_ontology`).
-- **by_evidence_source** (list[MetEvidenceSourceBreakdown]): Frequency of evidence_sources values across matched set. Today: at most 2 entries (metabolism, transport).
-- **xref_coverage** (MetXrefCoverage): Cross-ref ID coverage within matched set
-- **mass_stats** (MetMassStats): Mass distribution within matched set
-- **by_measurement_coverage** (MetMeasurementCoverage): Metabolomics measurement coverage rollup across matched metabolites. Two sub-rollups: by_paper_count (frequency by measured_paper_count value) + by_compartment (frequency by measured_compartments value). Phase 1 plumbing — spec §6.6.
-- **score_max** (float | None): Max Lucene score (only with search)
-- **score_median** (float | None): Median Lucene score (only with search)
-- **returned** (int): Metabolites in this response
-- **offset** (int): Offset into full result set (e.g. 0)
-- **truncated** (bool): True if total_matching > returned
-- **not_found** (MetNotFound): Per-filter buckets for unknown input IDs
+- **by_evidence_source** (list[MetEvidenceSourceBreakdown]): Frequency of evidence_sources values across matched set. Bounded by the {metabolism, transport, metabolomics} domain.
+- **xref_coverage** (MetXrefCoverage): Cross-ref ID coverage within matched set.
+- **mass_stats** (MetMassStats): Mass distribution within matched set.
+- **by_measurement_coverage** (MetMeasurementCoverage): Metabolomics measurement coverage rollup across matched metabolites. Two sub-rollups: by_paper_count (frequency by measured_paper_count value) + by_compartment (frequency by measured_compartments value).
+- **score_max** (float | None): Max Lucene score (only with search).
+- **score_median** (float | None): Median Lucene score (only with search).
+- **returned** (int): Metabolites in this response.
+- **offset** (int): Offset into full result set.
+- **truncated** (bool): True if total_matching > returned.
+- **not_found** (MetNotFound): Per-filter buckets for unknown input IDs.
 
 ### Per-result fields
 
 | Field | Type | Description |
 |---|---|---|
-| metabolite_id | string | Full prefixed ID (e.g. 'kegg.compound:C00031'). 85% kegg.compound, 15% chebi (TCDB-only substrates). |
-| name | string | Metabolite name (e.g. 'D-Glucose', 'L-Glutamate') |
-| formula | string \| None (optional) | Hill-notation chemical formula (e.g. 'C6H12O6'). Null on ~9% of metabolites (mostly TCDB-curated generic substrates). |
+| metabolite_id | string | Full prefixed ID (e.g. 'kegg.compound:C00031'). Most carry the kegg.compound: namespace; a smaller set carry chebi: (TCDB-curated transport-only substrates). |
+| name | string | Metabolite name (e.g. 'D-Glucose', 'L-Glutamate'). |
+| formula | string \| None (optional) | Hill-notation chemical formula (e.g. 'C6H12O6'). Null on a minority of metabolites (mostly TCDB-curated generic substrates). |
 | elements | list[string] (optional) | Sorted unique element symbols present in formula (e.g. ['C','H','O']). Empty when formula is null. Filter on this — never on `formula` substring (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Presence list (no atom counts; stoichiometry lives in `formula`). |
-| mass | float \| None (optional) | Monoisotopic mass in Da (e.g. 180.156). Null on ~22% of metabolites. |
-| gene_count | int (optional) | Distinct genes reachable via Gene → Reaction → Metabolite OR Gene → TcdbFamily → Metabolite (UNION post-TCDB; e.g. 320 for glucose). When > 0, drill in via genes_by_metabolite(metabolite_ids=[id], organism=...). 0 indicates a metabolomics-only metabolite — measured by mass spec (`MetaboliteAssay`) but not reachable via any gene catalysis or transport path. 22 metabolites are gene_count=0 today; check evidence_sources to confirm — 0 ≠ 'absent from KG'. |
-| organism_count | int (optional) | Distinct organisms reaching this metabolite via any chemistry path (e.g. 31 for ATP). When > 0, narrow with organism_names filter. |
-| transporter_count | int (optional) | Distinct `tc_specificity` leaf TcdbFamily nodes annotated as transporting this metabolite (e.g. 17 for glucose, 229 for sodium). Scoped to leaves so the count reflects 'actual transporter systems' rather than counting ancestor families that inherit the substrate via the 2026-05-03 rollup. Source: TCDB-CAZy ontology. |
-| evidence_sources | list[string] (optional) | Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. 'metabolism' = at least one Reaction in KG involves this compound; 'transport' = at least one TcdbFamily curates this as substrate; 'metabolomics' = at least one MetaboliteAssay measures this compound (149 metabolites today). E.g. ['metabolism', 'transport'] or ['metabolism', 'metabolomics']. |
-| chebi_id | string \| None (optional) | ChEBI ID (raw numeric, e.g. '4167'). Populated on 90% of metabolites overall — 100% of the 452 chebi:-IDed transport-only metabolites (extracted from the ID itself), plus the kegg.compound:-IDed metabolites that cross-ref ChEBI. |
+| mass | float \| None (optional) | Monoisotopic mass in Da (e.g. 180.156). Null on a minority of metabolites. |
+| gene_count | int (optional) | Distinct genes reachable via Gene → Reaction → Metabolite OR Gene → TcdbFamily → Metabolite (UNION). When > 0, drill in via genes_by_metabolite(metabolite_ids=[id], organism=...). 0 indicates a metabolomics-only metabolite — measured by mass spec but not reachable via any gene catalysis or transport path; check evidence_sources to confirm. |
+| organism_count | int (optional) | Distinct organisms reaching this metabolite via any chemistry path. When > 0, narrow with organism_names filter. |
+| transporter_count | int (optional) | Distinct tc_specificity leaf TcdbFamily nodes annotated as transporting this metabolite. Scoped to leaves — the count reflects actual transporter systems rather than counting ancestor families that inherit the substrate via the rollup. Source: TCDB-CAZy ontology. |
+| evidence_sources | list[string] (optional) | Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. 'metabolism' = at least one Reaction in KG involves this compound; 'transport' = at least one TcdbFamily curates this as substrate; 'metabolomics' = at least one MetaboliteAssay measures this compound. E.g. ['metabolism', 'transport']. |
+| chebi_id | string \| None (optional) | ChEBI ID (raw numeric, e.g. '4167'). Populated on most metabolites — 100% of chebi:-IDed transport-only metabolites (extracted from the ID itself), plus the kegg.compound:-IDed metabolites that cross-ref ChEBI. |
 | pathway_ids | list[string] (optional) | KEGG pathway memberships (e.g. ['kegg.pathway:ko00010', 'kegg.pathway:ko01100']). Empty when no Metabolite_in_pathway edges. Drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...). |
 | pathway_count | int (optional) | Distinct count of KEGG pathways this metabolite is in (e.g. 5). Routing signal — when > 0, drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...) for genes annotated to those pathways. Equal to size(pathway_ids). |
-| measured_assay_count | int (optional) | Distinct MetaboliteAssay edges anchored to this metabolite (precomputed Metabolite.measured_assay_count). Non-zero on 149 of 3230 metabolites today (~5% coverage; KG release 2026-05-06). When > 0, the metabolite has experimental measurement coverage. |
-| measured_paper_count | int (optional) | Distinct papers (1, 2, or 3) measuring this metabolite (precomputed). Non-zero on 149 metabolites today: 5 measured by all 3 papers, 25 by 2, 119 by 1. |
+| measured_assay_count | int (optional) | Distinct MetaboliteAssay edges anchored to this metabolite (precomputed Metabolite.measured_assay_count). When > 0, the metabolite has experimental measurement coverage. |
+| measured_paper_count | int (optional) | Distinct papers measuring this metabolite (precomputed). Non-zero on metabolites with metabolomics evidence. |
 | measured_organisms | list[string] (optional) | Organism preferred_names with at least one MetaboliteAssay anchored to this metabolite. Populated when measured_assay_count > 0; [] otherwise. |
-| measured_compartments | list[string] (optional) | Wet-lab compartments observed for this metabolite (subset of {'whole_cell', 'extracellular', 'vesicle'}). Populated by post-import on all 149 measured metabolites; [] on the 3081 unmeasured. Use len(measured_compartments) >= 1 to filter for measurement-anchored rows. |
+| measured_compartments | list[string] (optional) | Wet-lab compartments observed for this metabolite (subset of {'whole_cell', 'extracellular', 'vesicle'}). Empty on unmeasured metabolites — use len(measured_compartments) >= 1 to filter for measurement-anchored rows. |
 | score | float \| None (optional) | Lucene relevance score (only with `search`). |
 
 **Verbose-only fields** (included when `verbose=True`):
@@ -185,23 +169,19 @@ list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(m
 
 ## Common mistakes
 
-- Direction-agnostic. Joining through Reaction_has_metabolite (catalysis) and Tcdb_family_transports_metabolite (transport) does NOT distinguish substrates from products. KEGG equation order is arbitrary. Layer DE direction (`differential_expression_by_gene`) and functional annotation to disambiguate.
+- Direction-agnostic — KEGG equation order is unreliable upstream, so joins through Reaction_has_metabolite (catalysis) and Tcdb_family_transports_metabolite (transport) do NOT distinguish substrates from products. Layer DE direction (`differential_expression_by_gene`) and functional annotation to disambiguate. See docs://guide/conventions.
 
-- elements is presence-only, AND-of. ['N','P'] requires BOTH N and P to be present. Use the `elements` filter — never substring-match on `formula` (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N').
-
-- gene_count = 0 does not mean the metabolite is absent from the KG — it indicates a metabolomics-only metabolite (measured by mass spec but not reachable via any gene catalysis or transport path). 22 such metabolites today. Check `evidence_sources` to confirm: a gene_count=0 metabolite carries `['metabolomics']` only.
+- gene_count = 0 does not mean the metabolite is absent from the KG — it indicates a metabolomics-only metabolite (measured by mass spec but not reachable via any gene catalysis or transport path). Check `evidence_sources`: a gene_count=0 metabolite carries `['metabolomics']` only.
 
 - organism_names with multiple values is UNION, not intersection. To find metabolites BOTH organisms reach, run two single-org calls and intersect by metabolite_id (or filter per-row by organism_count and inspect `m.organism_names` for the full UNION list).
 
 - metaboliteFullText covers Metabolite.name only — NOT formula. For element/composition queries, use `elements` (presence list).
 
-- evidence_sources='metabolomics' selects metabolites measured by a MetaboliteAssay (149 today). Drill in via list_metabolite_assays(metabolite_ids=[...]) or assays_by_metabolite to inspect the measurement evidence.
+- evidence_sources='metabolomics' selects metabolites measured by a MetaboliteAssay. Drill in via list_metabolite_assays(metabolite_ids=[...]) or assays_by_metabolite to inspect the measurement evidence.
 
-- `measured_compartments` is populated on all 107 measured metabolites (defaults to `[]` on the 3111 unmeasured); use `len(m['measured_compartments']) >= 1` to filter for measurement-anchored rows. Same metabolite measured in both whole_cell and extracellular returns one row with `measured_compartments=['extracellular','whole_cell']` (sorted), not two rows — Metabolite is compartment-agnostic per KG-MET-002.
+- Same metabolite measured in both whole_cell and extracellular returns one row with `measured_compartments=['extracellular','whole_cell']` (sorted), not two rows — Metabolite is compartment-agnostic.
 
-- When the `top_metabolites` rollup is dominated by ATP / ADP / NADH / NADPH / H2O, pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip cofactor noise. Set-difference semantics with `metabolite_ids` — exclude wins on overlap. KG namespace is `kegg.compound:` (not `chebi:`).
-
-- Per-row `elements` is a presence list — no atom counts per compound. Stoichiometry lives in `formula`. Filter on `elements` (e.g. `elements=['N']` for N-bearing compounds), never on `formula` substring (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N').
+- When the `top_metabolites` rollup is dominated by ATP / ADP / NADH / NADPH / H2O, pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip cofactor noise. KG namespace is `kegg.compound:` (not `chebi:`).
 
 ```mistake
 list_metabolites(elements=['N'], gene_count_min=1)  # gene_count_min isn't a param
