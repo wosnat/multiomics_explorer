@@ -63,7 +63,7 @@ verbose_fields:
   - example_terms
 
 chaining:
-  - "ontology_landscape -> genes_by_ontology(level=N) -> pathway_enrichment (Phase 2)"
+  - "ontology_landscape -> genes_by_ontology(level=N) -> pathway_enrichment"
   - "list_experiments -> ontology_landscape(experiment_ids=...)"
 
 mistakes:

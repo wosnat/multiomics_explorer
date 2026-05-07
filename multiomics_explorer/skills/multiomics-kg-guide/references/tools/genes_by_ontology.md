@@ -5,13 +5,21 @@
 Find (gene × term) pairs for an ontology, scoped by terms and/or level.
 
 Three modes:
-- term_ids only → gene discovery by pathway (walk DOWN).
-- level only → pathway definitions at level N (walk UP).
-- level + term_ids → scoped rollup (walk UP, restrict to given terms).
+- `term_ids` only — gene discovery by pathway (walk DOWN from each term).
+- `level` only — pathway definitions at level N (walk UP from leaves).
+- `level` + `term_ids` — scoped rollup (walk UP, restrict to given terms).
 
 Single-organism enforced. Default `limit=500` because this tool feeds
-enrichment (pathway_enrichment). For term discovery, chain from
-search_ontology. For per-gene ontology details, use gene_ontology_terms.
+enrichment via TERM2GENE. `min/max_gene_set_size` is organism-scoped
+(matches `ontology_landscape`).
+
+Routing: pipe `results` into `pathway_enrichment` / `cluster_enrichment`
+as TERM2GENE; chain from `search_ontology` for term discovery;
+`gene_ontology_terms` for per-gene reverse lookup. For
+substrate-anchored TCDB / EC questions ("which genes transport / act
+on compound X?"), use `genes_by_metabolite` instead. See
+docs://guide/conventions for the hierarchy `level` and BRITE-tree
+conventions; docs://analysis/enrichment for the enrichment workflow.
 
 ## Parameters
 
@@ -19,11 +27,11 @@ search_ontology. For per-gene ontology details, use gene_ontology_terms.
 |---|---|---|---|
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy') | — | Ontology for these term_ids / this level. |
 | organism | string | — | Organism (case-insensitive substring match, e.g. 'MED4'). Required — single-valued. Use list_organisms for valid values. |
-| tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. |
-| level | int \| None | None | Hierarchy level to roll UP to. 0 = broadest. At least one of `level` or `term_ids` must be provided. |
-| term_ids | list[string] \| None | None | Ontology term IDs (from search_ontology). Mode 1 (no `level`): expand DOWN from each input term. Mode 3 (with `level`): scope rollup to these level-N terms. |
-| min_gene_set_size | int | 5 | Exclude terms with fewer organism-scoped genes than this. |
-| max_gene_set_size | int | 500 | Exclude terms with more organism-scoped genes than this. |
+| tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
+| level | int \| None | None | Hierarchy level to roll UP to (0 = broadest). At least one of `level` or `term_ids` must be provided. See docs://guide/conventions. |
+| term_ids | list[string] \| None | None | Ontology term IDs (from search_ontology). Without `level`: expand DOWN from each input term. With `level`: scope rollup to these level-N terms. |
+| min_gene_set_size | int | 5 | Exclude terms with fewer organism-scoped genes than this. Matches `ontology_landscape`'s organism-scoped convention. |
+| max_gene_set_size | int | 500 | Exclude terms with more organism-scoped genes than this. Matches `ontology_landscape`'s organism-scoped convention. |
 | informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' go:0008150). Term-side filter only — never restricts the gene set. Default False (opt-in). |
 | summary | bool | False | If true, omit `results` (envelope only). |
 | verbose | bool | False | Include function_description and sparse level_is_best_effort. |
@@ -58,7 +66,7 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 - **n_best_effort_terms** (int): Distinct best-effort terms (GO-only marker; 0 for other ontologies)
 - **not_found** (list[string]): Input term_ids absent from the KG entirely
 - **wrong_ontology** (list[string]): Input term_ids present but in a different ontology label
-- **wrong_level** (list[string]): Input term_ids in the ontology but at wrong level (Mode 3 only)
+- **wrong_level** (list[string]): Input term_ids in the ontology but at wrong level (only when level + term_ids both set)
 - **filtered_out** (list[string]): Input term_ids valid but outside [min, max]_gene_set_size
 - **returned** (int): Rows in this response
 - **offset** (int): Offset into full result set
@@ -195,7 +203,7 @@ ontology_landscape → genes_by_ontology(level=N)
 search_ontology → genes_by_ontology(term_ids=[...])
 genes_by_ontology → pathway_enrichment
 genes_by_ontology → gene_overview
-genes_by_ontology(ontology='tcdb' | 'ec', term_ids=[...]) → genes_by_metabolite (substrate-anchored pivot — see docs://analysis/metabolites Track A2 §f)
+genes_by_ontology(ontology='tcdb' | 'ec', term_ids=[...]) → genes_by_metabolite (substrate-anchored pivot — see docs://analysis/metabolites)
 ```
 
 ## Common mistakes
@@ -228,7 +236,7 @@ genes_by_ontology(ontology='tcdb' | 'ec', term_ids=[...]) → genes_by_metabolit
 
 - Substrate-anchored TCDB questions ('which genes transport sucrose?') chain via `genes_by_metabolite`, NOT `genes_by_ontology`. Use `genes_by_ontology(ontology='tcdb', term_ids=[...])` for *family*-level questions ('which genes are in voltage-gated ion channels?'). The metabolite-anchored route includes all TCDB families curating the substrate; the family-anchored route here is anchored on a single family ID and misses cross-family substrate hits.
 
-- Substrate-anchored EC questions ('which genes catalyse a reaction involving glucose?') chain via `genes_by_metabolite(metabolite_ids=[...], evidence_sources=['metabolism'])`, NOT `genes_by_ontology(ontology='ec', ...)`. The metabolite-anchored route reaches every EC number whose Reaction touches the compound; the EC-anchored route here is anchored on a single EC family and misses promiscuous reactions. See docs://analysis/metabolites Track A2 §f for the full anchor-disambiguation.
+- Substrate-anchored EC questions ('which genes catalyse a reaction involving glucose?') chain via `genes_by_metabolite(metabolite_ids=[...], evidence_sources=['metabolism'])`, NOT `genes_by_ontology(ontology='ec', ...)`. The metabolite-anchored route reaches every EC number whose Reaction touches the compound; the EC-anchored route here is anchored on a single EC family and misses promiscuous reactions. See docs://analysis/metabolites for the full anchor-disambiguation.
 
 ```mistake
 genes_by_ontology(ontology='go_bp', organism='MED4')  # no level or term_ids
@@ -246,7 +254,7 @@ len(response.results)  # wrong — that's the row count after limit
 response.total_genes  # distinct genes across all matches
 ```
 
-- TERM2GENE source for enrichment. Pass the result through `to_dataframe(...)` and feed it directly into `fisher_ora` / `pathway_enrichment` / `cluster_enrichment` — no manual column renaming. See `docs://analysis/enrichment` §2 + §4 for the building blocks and the worked DE-path code example.
+- TERM2GENE source for enrichment. Pass the result through `to_dataframe(...)` and feed it directly into `fisher_ora` / `pathway_enrichment` / `cluster_enrichment` — no manual column renaming. See `docs://analysis/enrichment` for the building blocks and the worked DE-path code example.
 
 ## Package import equivalent
 

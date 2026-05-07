@@ -34,7 +34,7 @@ verbose_fields:
   - cluster_member_count
 
 response_notes:
-  - title: "`informative_only` filter (default 2026-05)"
+  - title: "`informative_only` filter"
     body: |
       When True (default), exclude ontology terms flagged uninformative
       in the KG (e.g. KEGG map00001 'metabolic pathways', GO root
@@ -50,11 +50,11 @@ chaining:
   - "ontology_landscape → cluster_enrichment"
   - "cluster_enrichment → gene_overview"
   - "cluster_enrichment → genes_in_cluster"
-  - "cluster_enrichment(ontology='kegg', ...) → list_metabolites(pathway_ids=[<enriched_pathway_id>]) — inspect the chemistry of an enriched KEGG pathway (compound-anchored membership, distinct from the gene-KO membership the enrichment used). See docs://analysis/metabolites Track A1 §f for the pathway-anchor disambiguation."
-  - "See `docs://analysis/enrichment` for the full methodology, including the `informative_only` (default `True` since 2026-05) filter semantics."
+  - "cluster_enrichment(ontology='kegg', ...) → list_metabolites(pathway_ids=[<enriched_pathway_id>]) — inspect the chemistry of an enriched KEGG pathway (compound-anchored membership, distinct from the gene-KO membership the enrichment used). See docs://analysis/metabolites for the pathway-anchor disambiguation."
+  - "See `docs://analysis/enrichment` for the full methodology and the `informative_only` filter semantics."
 
 mistakes:
-  - "Caller pinning row counts from pre-2026-05 runs sees fewer rows by default. Pass `informative_only=False` to restore old behavior, or accept the new default (recommended)."
+  - "[ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions."
   - "Default background is `cluster_union` (union of all clustered genes, including size-filtered). Use `'organism'` only when clustering covers the full genome."
   - "BH correction is per-cluster, NOT across clusters."
   - "Single-organism enforced."
@@ -62,6 +62,6 @@ mistakes:
   - "At least one of `level` or `term_ids` must be provided."
   - "`min/max_gene_set_size` is the pathway M filter (per-cluster, clusterProfiler semantics). `min/max_cluster_size` is the cluster membership filter."
   - "For BRITE, scope to a specific tree with `tree=`. Use `list_filter_values('brite_tree')` to discover trees."
-  - "When a KEGG pathway is significantly enriched in a cluster, drill into its chemistry via `list_metabolites(pathway_ids=[<term_id>])`. The cluster's gene-KO membership and the pathway's compound-membership reach the same KEGG map via different relations — name the anchor when answering. See docs://analysis/metabolites Track A1 §f."
+  - "When a KEGG pathway is significantly enriched in a cluster, drill into its chemistry via `list_metabolites(pathway_ids=[<term_id>])`. The cluster's gene-KO membership and the pathway's compound-membership reach the same KEGG map via different relations — name the anchor when answering. See docs://analysis/metabolites."
   - wrong: "cluster_enrichment(..., background='table_scope')  # not valid"
     right: "cluster_enrichment(..., background='cluster_union')  # or 'organism', or a locus_tag list"

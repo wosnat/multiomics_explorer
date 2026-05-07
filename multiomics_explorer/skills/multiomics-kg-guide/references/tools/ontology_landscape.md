@@ -2,24 +2,30 @@
 
 ## What it does
 
-Rank (ontology x level) combinations by enrichment suitability —
-pre-flight for `pathway_enrichment` / `cluster_enrichment`.
+Rank (ontology x level) combinations by enrichment suitability — pre-flight for enrichment.
 
 Per-(ontology x level) stats: term-size distribution, genome coverage,
 best-effort share (GO). Ranked by coverage x size_factor(median) with
 sweet-spot [5, 50] median genes-per-term; `relevance_rank` is the
-composite score (rank 1 = best). Default ontology=None surveys all
-12 ontology keys (GO BP/MF/CC + 9 others). Pass experiment_ids to
-weight by coverage of those experiments' quantified genes. See
-docs://analysis/enrichment §3 + §10 for narrative + worked example.
+composite score (rank 1 = best). `ontology=None` surveys every key
+(GO BP/MF/CC + 9 others); BRITE rows break down per tree (scope with
+`tree=`). Pass `experiment_ids=` to weight by coverage of those
+experiments' quantified genes.
+
+Routing: pick an `(ontology, level)` row, then call
+`pathway_enrichment(ontology=..., level=...)` or
+`cluster_enrichment(ontology=..., level=...)`. See
+docs://analysis/enrichment for the pre-flight role and a worked
+example, and docs://guide/conventions for the hierarchy `level`
+and BRITE-tree scoping conventions.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | organism | string | — | Organism (fuzzy match, e.g. 'MED4'). |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy') \| None | None | If None, surveys all 12 ontologies. |
-| tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy') \| None | None | If None, surveys all ontologies. |
+| tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | experiment_ids | list[string] \| None | None | Restrict coverage computation to genes quantified in these experiments. |
 | summary | bool | False | If true, omit per-row results (by_ontology only). |
 | verbose | bool | False | Include example_terms (top 3 terms per level). |
@@ -166,7 +172,7 @@ Step 2: ontology_landscape(
 ## Chaining patterns
 
 ```
-ontology_landscape -> genes_by_ontology(level=N) -> pathway_enrichment (Phase 2)
+ontology_landscape -> genes_by_ontology(level=N) -> pathway_enrichment
 list_experiments -> ontology_landscape(experiment_ids=...)
 ```
 

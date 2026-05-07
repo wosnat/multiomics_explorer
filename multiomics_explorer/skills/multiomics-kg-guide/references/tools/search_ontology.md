@@ -2,22 +2,23 @@
 
 ## What it does
 
-Browse ontology terms by text search (fuzzy, Lucene syntax).
+Search ontology terms by text — Lucene over term names only (no hierarchy traversal).
 
-Returns term IDs for use with genes_by_ontology. Supports fuzzy (~),
-wildcards (*), exact phrases ("..."), boolean (AND, OR).
+Returns term IDs and `level` for use with `genes_by_ontology`. Supports
+fuzzy (~), wildcards (*), exact phrases ("..."), boolean (AND, OR) —
+see docs://guide/conventions for syntax + scoring.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| search_text | string | — | Search query (Lucene syntax). E.g. 'replication', 'oxido*', 'transport AND membrane'. |
+| search_text | string | — | Lucene query over term names. E.g. 'replication', 'oxido*', 'transport AND membrane'. See docs://guide/conventions for Lucene scoring. |
 | ontology | string | — | Ontology to search: 'go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy'. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | limit | int | 5 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
-| level | int \| None | None | Filter to terms at this hierarchy level. 0 = broadest. |
-| tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. |
+| level | int \| None | None | Hierarchy level filter (0 = broadest). See docs://guide/conventions for the level convention. |
+| tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' go:0008150). Term-side filter only — never restricts the gene set. Default False (opt-in). |
 
 ## Response format
@@ -204,7 +205,7 @@ search_ontology(search_text='PMM0845', ontology='go_bp')  # searching for a gene
 resolve_gene(identifier='PMM0845')  # use resolve_gene for gene lookups
 ```
 
-- Use this to assemble a custom `term_ids=[...]` list for `pathway_enrichment` / `cluster_enrichment`. Both tools accept either `level=N` (test all terms at one hierarchy depth) or `term_ids=[...]` (test a specific set you chose). Custom term sets are useful when relevant terms live at different depths — e.g. in GO, a term at level 3 may be more specific than one at level 4 because GO is graph-shaped, not strictly tree-shaped. See `docs://analysis/enrichment` §10.
+- Use this to assemble a custom `term_ids=[...]` list for `pathway_enrichment` / `cluster_enrichment`. Both tools accept either `level=N` (test all terms at one hierarchy depth) or `term_ids=[...]` (test a specific set you chose). Custom term sets are useful when relevant terms live at different depths — e.g. in GO, a term at level 3 may be more specific than one at level 4 because GO is graph-shaped, not strictly tree-shaped. See `docs://analysis/enrichment`.
 
 ## Package import equivalent
 

@@ -2064,11 +2064,12 @@ def register_tools(mcp: FastMCP):
             ge=1,
         )] = 25,
     ) -> RunCypherResponse:
-        """Execute a raw Cypher query against the knowledge graph (read-only).
+        """Run a raw Cypher query (read-only escape hatch when other tools don't cover the question).
 
-        Use this as an escape hatch when other tools don't cover your query.
-        Write operations are blocked. Queries are validated for syntax and schema
-        correctness before execution — warnings are returned in the response.
+        Write operations are blocked. Queries are syntax- and schema-validated
+        before execution — non-blocking warnings come back in the response.
+        Validate against `kg_schema` first to avoid label / property typos;
+        see docs://guide/concepts for the KG data model.
         """
         await ctx.info(f"run_cypher limit={limit}")
         try:
@@ -2117,8 +2118,9 @@ def register_tools(mcp: FastMCP):
     async def search_ontology(
         ctx: Context,
         search_text: Annotated[str, Field(
-            description="Search query (Lucene syntax). "
-            "E.g. 'replication', 'oxido*', 'transport AND membrane'.",
+            description="Lucene query over term names. "
+            "E.g. 'replication', 'oxido*', 'transport AND membrane'. "
+            "See docs://guide/conventions for Lucene scoring.",
         )],
         ontology: Annotated[str, Field(
             description="Ontology to search: 'go_bp', 'go_mf', 'go_cc', "
@@ -2135,12 +2137,14 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
         level: Annotated[int | None, Field(
-            description="Filter to terms at this hierarchy level. 0 = broadest.",
+            description="Hierarchy level filter (0 = broadest). "
+            "See docs://guide/conventions for the level convention.",
             ge=0,
         )] = None,
         tree: Annotated[str | None, Field(
             description="BRITE tree name filter (e.g. 'transporters'). "
-            "Only valid when ontology='brite'.",
+            "Only valid when ontology='brite'. See docs://guide/conventions for "
+            "the BRITE-tree scoping rule.",
         )] = None,
         informative_only: Annotated[bool, Field(
             description="When True, exclude terms flagged uninformative in KG "
@@ -2149,10 +2153,11 @@ def register_tools(mcp: FastMCP):
             "Default False (opt-in).",
         )] = False,
     ) -> SearchOntologyResponse:
-        """Browse ontology terms by text search (fuzzy, Lucene syntax).
+        """Search ontology terms by text — Lucene over term names only (no hierarchy traversal).
 
-        Returns term IDs for use with genes_by_ontology. Supports fuzzy (~),
-        wildcards (*), exact phrases ("..."), boolean (AND, OR).
+        Returns term IDs and `level` for use with `genes_by_ontology`. Supports
+        fuzzy (~), wildcards (*), exact phrases ("..."), boolean (AND, OR) —
+        see docs://guide/conventions for syntax + scoring.
         """
         await ctx.info(f"search_ontology search_text={search_text!r} ontology={ontology}")
         try:
@@ -2240,7 +2245,7 @@ def register_tools(mcp: FastMCP):
         wrong_ontology: list[str] = Field(default_factory=list,
             description="Input term_ids present but in a different ontology label")
         wrong_level: list[str] = Field(default_factory=list,
-            description="Input term_ids in the ontology but at wrong level (Mode 3 only)")
+            description="Input term_ids in the ontology but at wrong level (only when level + term_ids both set)")
         filtered_out: list[str] = Field(default_factory=list,
             description="Input term_ids valid but outside [min, max]_gene_set_size")
         returned: int = Field(description="Rows in this response")
@@ -2269,24 +2274,28 @@ def register_tools(mcp: FastMCP):
                         "Required — single-valued. Use list_organisms for valid values.",
         )],
         tree: Annotated[str | None, Field(
-            description="BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'.",
+            description="BRITE tree name filter (e.g. 'transporters'). Only valid when "
+                        "ontology='brite'. See docs://guide/conventions for the BRITE-tree "
+                        "scoping rule.",
         )] = None,
         level: Annotated[int | None, Field(
-            description="Hierarchy level to roll UP to. 0 = broadest. "
-                        "At least one of `level` or `term_ids` must be provided.",
+            description="Hierarchy level to roll UP to (0 = broadest). At least one of "
+                        "`level` or `term_ids` must be provided. See docs://guide/conventions.",
             ge=0,
         )] = None,
         term_ids: Annotated[list[str] | None, Field(
             description="Ontology term IDs (from search_ontology). "
-                        "Mode 1 (no `level`): expand DOWN from each input term. "
-                        "Mode 3 (with `level`): scope rollup to these level-N terms.",
+                        "Without `level`: expand DOWN from each input term. "
+                        "With `level`: scope rollup to these level-N terms.",
         )] = None,
         min_gene_set_size: Annotated[int, Field(
-            description="Exclude terms with fewer organism-scoped genes than this.",
+            description="Exclude terms with fewer organism-scoped genes than this. "
+                        "Matches `ontology_landscape`'s organism-scoped convention.",
             ge=0,
         )] = 5,
         max_gene_set_size: Annotated[int, Field(
-            description="Exclude terms with more organism-scoped genes than this.",
+            description="Exclude terms with more organism-scoped genes than this. "
+                        "Matches `ontology_landscape`'s organism-scoped convention.",
             ge=1,
         )] = 500,
         informative_only: Annotated[bool, Field(
@@ -2312,13 +2321,21 @@ def register_tools(mcp: FastMCP):
         """Find (gene × term) pairs for an ontology, scoped by terms and/or level.
 
         Three modes:
-        - term_ids only → gene discovery by pathway (walk DOWN).
-        - level only → pathway definitions at level N (walk UP).
-        - level + term_ids → scoped rollup (walk UP, restrict to given terms).
+        - `term_ids` only — gene discovery by pathway (walk DOWN from each term).
+        - `level` only — pathway definitions at level N (walk UP from leaves).
+        - `level` + `term_ids` — scoped rollup (walk UP, restrict to given terms).
 
         Single-organism enforced. Default `limit=500` because this tool feeds
-        enrichment (pathway_enrichment). For term discovery, chain from
-        search_ontology. For per-gene ontology details, use gene_ontology_terms.
+        enrichment via TERM2GENE. `min/max_gene_set_size` is organism-scoped
+        (matches `ontology_landscape`).
+
+        Routing: pipe `results` into `pathway_enrichment` / `cluster_enrichment`
+        as TERM2GENE; chain from `search_ontology` for term discovery;
+        `gene_ontology_terms` for per-gene reverse lookup. For
+        substrate-anchored TCDB / EC questions ("which genes transport / act
+        on compound X?"), use `genes_by_metabolite` instead. See
+        docs://guide/conventions for the hierarchy `level` and BRITE-tree
+        conventions; docs://analysis/enrichment for the enrichment workflow.
         """
         await ctx.info(
             f"genes_by_ontology ontology={ontology} organism={organism} "
@@ -2420,12 +2437,14 @@ def register_tools(mcp: FastMCP):
                         "'rollup' walks up to ancestors at the given level.",
         )] = "leaf",
         level: Annotated[int | None, Field(
-            description="Hierarchy level. In leaf mode: filter to leaves at this level. "
-                        "In rollup mode: required — target ancestor level (0 = broadest).",
+            description="Hierarchy level (0 = broadest). In leaf mode: filter to leaves "
+                        "at this level. In rollup mode: required — target ancestor level. "
+                        "See docs://guide/conventions.",
             ge=0,
         )] = None,
         tree: Annotated[str | None, Field(
-            description="BRITE tree name filter. Only valid when ontology='brite'.",
+            description="BRITE tree name filter. Only valid when ontology='brite'. "
+                        "See docs://guide/conventions for the BRITE-tree scoping rule.",
         )] = None,
         informative_only: Annotated[bool, Field(
             description="When True, exclude terms flagged uninformative in KG "
@@ -2446,15 +2465,15 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> GeneOntologyTermsResponse:
-        """Get ontology annotations for genes. One row per gene × term.
+        """Reverse-lookup: gene locus_tags → ontology annotations (one row per gene × term).
 
-        In leaf mode (default), returns the most specific annotations only —
-        redundant ancestor terms are excluded. In rollup mode, walks up to
-        ancestors at the given level.
+        `mode='leaf'` (default) returns the most specific annotations only —
+        redundant ancestors are excluded. `mode='rollup'` walks UP to ancestors
+        at the given level. Single-organism enforced.
 
-        Use ontology param to filter to one type, or omit for all.
-        For the reverse direction (find genes annotated to a term, with hierarchy
-        expansion), use genes_by_ontology. Use search_ontology to find terms by text.
+        Routing: for the forward direction (term → genes, with hierarchy
+        expansion) use `genes_by_ontology`; for term discovery by text use
+        `search_ontology`.
         """
         await ctx.info(
             f"gene_ontology_terms locus_tags={locus_tags} organism={organism} "
@@ -5515,10 +5534,12 @@ def register_tools(mcp: FastMCP):
             Literal["go_bp", "go_mf", "go_cc", "ec", "kegg",
                     "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
                     "tcdb", "cazy"] | None,
-            Field(description="If None, surveys all 12 ontologies."),
+            Field(description="If None, surveys all ontologies."),
         ] = None,
         tree: Annotated[str | None, Field(
-            description="BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'.",
+            description="BRITE tree name filter (e.g. 'transporters'). "
+            "Only valid when ontology='brite'. See docs://guide/conventions for "
+            "the BRITE-tree scoping rule.",
         )] = None,
         experiment_ids: Annotated[
             list[str] | None,
@@ -5553,16 +5574,22 @@ def register_tools(mcp: FastMCP):
             "term set (rebaselines may differ).",
         )] = True,
     ) -> OntologyLandscapeResponse:
-        """Rank (ontology x level) combinations by enrichment suitability —
-        pre-flight for `pathway_enrichment` / `cluster_enrichment`.
+        """Rank (ontology x level) combinations by enrichment suitability — pre-flight for enrichment.
 
         Per-(ontology x level) stats: term-size distribution, genome coverage,
         best-effort share (GO). Ranked by coverage x size_factor(median) with
         sweet-spot [5, 50] median genes-per-term; `relevance_rank` is the
-        composite score (rank 1 = best). Default ontology=None surveys all
-        12 ontology keys (GO BP/MF/CC + 9 others). Pass experiment_ids to
-        weight by coverage of those experiments' quantified genes. See
-        docs://analysis/enrichment §3 + §10 for narrative + worked example.
+        composite score (rank 1 = best). `ontology=None` surveys every key
+        (GO BP/MF/CC + 9 others); BRITE rows break down per tree (scope with
+        `tree=`). Pass `experiment_ids=` to weight by coverage of those
+        experiments' quantified genes.
+
+        Routing: pick an `(ontology, level)` row, then call
+        `pathway_enrichment(ontology=..., level=...)` or
+        `cluster_enrichment(ontology=..., level=...)`. See
+        docs://analysis/enrichment for the pre-flight role and a worked
+        example, and docs://guide/conventions for the hierarchy `level`
+        and BRITE-tree scoping conventions.
         """
         await ctx.info(f"ontology_landscape organism={organism} ontology={ontology}")
         try:
@@ -5607,10 +5634,13 @@ def register_tools(mcp: FastMCP):
             description="Ontology for pathway definitions. Run ontology_landscape first to rank by relevance.",
         )],
         tree: Annotated[str | None, Field(
-            description="BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'.",
+            description="BRITE tree name filter (e.g. 'transporters'). Only valid when "
+                        "ontology='brite'. See docs://guide/conventions for the BRITE-tree "
+                        "scoping rule.",
         )] = None,
         level: Annotated[int | None, Field(
-            description="Hierarchy level (0 = root). At least one of level or term_ids required.",
+            description="Hierarchy level (0 = root). At least one of `level` or `term_ids` "
+                        "required. See docs://guide/conventions.",
             ge=0,
         )] = None,
         term_ids: Annotated[list[str] | None, Field(
@@ -5623,7 +5653,9 @@ def register_tools(mcp: FastMCP):
             description="If true, only significant DE rows count as foreground.",
         )] = True,
         background: Annotated[str | list[str], Field(
-            description="'table_scope' (default, per-cluster), 'organism', or explicit locus_tag list.",
+            description="'table_scope' (default, per-cluster quantified set), 'organism' "
+                        "(full genome — inflates denominator), or explicit locus_tag list. "
+                        "See docs://analysis/enrichment for the full background semantics.",
         )] = "table_scope",
         min_gene_set_size: Annotated[int, Field(
             description="Per-cluster M filter: drop pathways with fewer members in the background.",
@@ -5661,15 +5693,26 @@ def register_tools(mcp: FastMCP):
                 "the KG (e.g. KEGG map00001 'metabolic pathways', GO root go:0008150). "
                 "Term-side filter — never restricts the gene set, background, or DE "
                 "inputs. Pass False to include uninformative terms; per-row "
-                "is_informative still surfaces in either mode."
+                "is_informative still surfaces in either mode. [ENR] Default flipped "
+                "to True in 2026-05 KG release; see docs://guide/conventions."
             ),
         )] = True,
     ) -> PathwayEnrichmentResponse:
-        """Pathway over-representation analysis from DE results (Fisher + BH).
+        """Run pathway over-representation analysis from DE results (Fisher + BH).
 
-        See docs://analysis/enrichment for methodology;
-        docs://examples/pathway_enrichment.py for runnable code (covers
-        EnrichmentResult accessors, custom term2gene, compareCluster export).
+        Single-organism enforced. `direction='both'` runs up + down per
+        experiment × timepoint cluster. Three background modes — `table_scope`
+        (default, per-cluster quantified set), `organism` (full genome), or an
+        explicit locus_tag list — drive the Fisher denominator and matter more
+        than the ontology choice.
+
+        Routing: pre-flight via `ontology_landscape` to pick `(ontology, level)`;
+        chain `differential_expression_by_gene` for raw DE inputs; drill enriched
+        terms via `gene_overview` or, for KEGG, `list_metabolites(pathway_ids=...)`
+        to inspect compound-anchored membership of an enriched pathway.
+        See docs://analysis/enrichment for Fisher + BH methodology and
+        background semantics; docs://examples/pathway_enrichment.py for runnable
+        code (EnrichmentResult accessors, custom term2gene, compareCluster export).
         """
         await ctx.info(
             f"pathway_enrichment organism={organism} experiments={len(experiment_ids)} "
@@ -5733,10 +5776,18 @@ def register_tools(mcp: FastMCP):
             "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
             "tcdb", "cazy",
         ], Field(description="Ontology for pathway definitions. Run ontology_landscape first.")],
-        tree: Annotated[str | None, Field(description="BRITE tree name filter. Only valid when ontology='brite'.")] = None,
-        level: Annotated[int | None, Field(description="Hierarchy level (0 = root). At least one of level or term_ids required.", ge=0)] = None,
+        tree: Annotated[str | None, Field(
+            description="BRITE tree name filter. Only valid when ontology='brite'. "
+                        "See docs://guide/conventions for the BRITE-tree scoping rule.")] = None,
+        level: Annotated[int | None, Field(
+            description="Hierarchy level (0 = root). At least one of `level` or `term_ids` "
+                        "required. See docs://guide/conventions.", ge=0)] = None,
         term_ids: Annotated[list[str] | None, Field(description="Specific term IDs to test.")] = None,
-        background: Annotated[str | list[str], Field(description="'cluster_union' (default), 'organism', or explicit locus_tag list.")] = "cluster_union",
+        background: Annotated[str | list[str], Field(
+            description="'cluster_union' (default — union of all clustered genes; differs "
+                        "from `pathway_enrichment`'s 'table_scope' default), 'organism', or "
+                        "explicit locus_tag list. See docs://analysis/enrichment for the "
+                        "full background semantics.")] = "cluster_union",
         min_gene_set_size: Annotated[int, Field(description="Per-cluster M filter: drop pathways with fewer members.", ge=0)] = 5,
         max_gene_set_size: Annotated[int | None, Field(description="Per-cluster M filter upper bound. None disables.", ge=1)] = 500,
         min_cluster_size: Annotated[int, Field(description="Skip clusters with fewer members than this.", ge=0)] = 3,
@@ -5751,18 +5802,26 @@ def register_tools(mcp: FastMCP):
                 "the KG (e.g. KEGG map00001 'metabolic pathways', GO root go:0008150). "
                 "Term-side filter — never restricts the gene set, background, or DE "
                 "inputs. Pass False to include uninformative terms; per-row "
-                "is_informative still surfaces in either mode."
+                "is_informative still surfaces in either mode. [ENR] Default flipped "
+                "to True in 2026-05 KG release; see docs://guide/conventions."
             ),
         )] = True,
     ) -> ClusterEnrichmentResponse:
-        """Cluster-membership over-representation analysis (Fisher + BH).
+        """Run cluster-membership over-representation analysis (Fisher + BH) — one ORA per cluster in a clustering analysis.
 
-        Runs ORA on every cluster in a clustering analysis. Use
-        list_clustering_analyses to find analysis IDs. Background
-        defaults to the union of all clustered genes.
-        See docs://analysis/enrichment for methodology;
-        docs://examples/pathway_enrichment.py for runnable code (the custom
-        term2gene path covers cluster-membership enrichment).
+        Single-organism enforced. Background defaults to `cluster_union` (union
+        of all clustered genes — differs from `pathway_enrichment`'s
+        `table_scope` default); `organism` or an explicit locus_tag list are
+        also accepted. Background drives the Fisher denominator and matters
+        more than the ontology choice.
+
+        Routing: pre-flight via `list_clustering_analyses` for `analysis_id`
+        and `ontology_landscape` for `(ontology, level)`; drill enriched terms
+        via `gene_overview`, `genes_in_cluster`, or for KEGG
+        `list_metabolites(pathway_ids=...)` for compound-anchored membership.
+        See docs://analysis/enrichment for Fisher + BH methodology and
+        background semantics; docs://examples/pathway_enrichment.py for
+        runnable code (custom term2gene path covers cluster-membership ORA).
         """
         await ctx.info(
             f"cluster_enrichment analysis_id={analysis_id} "

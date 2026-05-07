@@ -2,11 +2,21 @@
 
 ## What it does
 
-Pathway over-representation analysis from DE results (Fisher + BH).
+Run pathway over-representation analysis from DE results (Fisher + BH).
 
-See docs://analysis/enrichment for methodology;
-docs://examples/pathway_enrichment.py for runnable code (covers
-EnrichmentResult accessors, custom term2gene, compareCluster export).
+Single-organism enforced. `direction='both'` runs up + down per
+experiment × timepoint cluster. Three background modes — `table_scope`
+(default, per-cluster quantified set), `organism` (full genome), or an
+explicit locus_tag list — drive the Fisher denominator and matter more
+than the ontology choice.
+
+Routing: pre-flight via `ontology_landscape` to pick `(ontology, level)`;
+chain `differential_expression_by_gene` for raw DE inputs; drill enriched
+terms via `gene_overview` or, for KEGG, `list_metabolites(pathway_ids=...)`
+to inspect compound-anchored membership of an enriched pathway.
+See docs://analysis/enrichment for Fisher + BH methodology and
+background semantics; docs://examples/pathway_enrichment.py for runnable
+code (EnrichmentResult accessors, custom term2gene, compareCluster export).
 
 ## Parameters
 
@@ -15,12 +25,12 @@ EnrichmentResult accessors, custom term2gene, compareCluster export).
 | organism | string | — | Organism (case-insensitive fuzzy match, e.g. 'MED4'). Single-organism enforced. |
 | experiment_ids | list[string] | — | Experiments to pull DE from. Get IDs from list_experiments. |
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy') | — | Ontology for pathway definitions. Run ontology_landscape first to rank by relevance. |
-| tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. |
-| level | int \| None | None | Hierarchy level (0 = root). At least one of level or term_ids required. |
+| tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
+| level | int \| None | None | Hierarchy level (0 = root). At least one of `level` or `term_ids` required. See docs://guide/conventions. |
 | term_ids | list[string] \| None | None | Specific term IDs to test. Combines with level to scope rollup. |
 | direction | string ('up', 'down', 'both') | both | DE direction(s) to include in gene_sets. |
 | significant_only | bool | True | If true, only significant DE rows count as foreground. |
-| background | string | table_scope | 'table_scope' (default, per-cluster), 'organism', or explicit locus_tag list. |
+| background | string | table_scope | 'table_scope' (default, per-cluster quantified set), 'organism' (full genome — inflates denominator), or explicit locus_tag list. See docs://analysis/enrichment for the full background semantics. |
 | min_gene_set_size | int | 5 | Per-cluster M filter: drop pathways with fewer members in the background. |
 | max_gene_set_size | int \| None | 500 | Per-cluster M filter upper bound. None disables. |
 | pvalue_cutoff | float | 0.05 | Significance threshold for `p_adjust`. |
@@ -29,7 +39,7 @@ EnrichmentResult accessors, custom term2gene, compareCluster export).
 | summary | bool | False | If true, omit results (envelope only). |
 | limit | int | 100 | Max rows returned. Default 100 — top hits by p_adjust globally. |
 | offset | int | 0 | Skip N rows before limit. |
-| informative_only | bool | True | When True (default), exclude ontology terms flagged uninformative in the KG (e.g. KEGG map00001 'metabolic pathways', GO root go:0008150). Term-side filter — never restricts the gene set, background, or DE inputs. Pass False to include uninformative terms; per-row is_informative still surfaces in either mode. |
+| informative_only | bool | True | When True (default), exclude ontology terms flagged uninformative in the KG (e.g. KEGG map00001 'metabolic pathways', GO root go:0008150). Term-side filter — never restricts the gene set, background, or DE inputs. Pass False to include uninformative terms; per-row is_informative still surfaces in either mode. [ENR] Default flipped to True in 2026-05 KG release; see docs://guide/conventions. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -104,7 +114,7 @@ organism_name, ontology, level, total_matching, returned, truncated, offset, n_s
 | foreground_gene_ids | list[string] \| None (optional) | Verbose only: the k DE genes in this pathway (clusterProfiler: geneID split) |
 | background_gene_ids | list[string] \| None (optional) | Verbose only: pathway members in background NOT in DE set (non-overlapping complement) |
 
-### `informative_only` filter (default 2026-05)
+### `informative_only` filter
 
 When True (default), exclude ontology terms flagged uninformative
 in the KG (e.g. KEGG map00001 'metabolic pathways', GO root
@@ -192,13 +202,13 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
 ontology_landscape → genes_by_ontology(level=N) → pathway_enrichment
 pathway_enrichment → gene_overview
 differential_expression_by_gene → pathway_enrichment
-pathway_enrichment(ontology='kegg', ...) → list_metabolites(pathway_ids=[<enriched_pathway_id>]) — inspect the chemistry of an enriched KEGG pathway (compound-anchored membership, distinct from the gene-KO membership the enrichment used). See docs://analysis/metabolites Track A1 §f for the pathway-anchor disambiguation.
-See `docs://analysis/enrichment` for the full methodology, including the `informative_only` (default `True` since 2026-05) filter semantics.
+pathway_enrichment(ontology='kegg', ...) → list_metabolites(pathway_ids=[<enriched_pathway_id>]) — inspect the chemistry of an enriched KEGG pathway (compound-anchored membership, distinct from the gene-KO membership the enrichment used). See docs://analysis/metabolites for the pathway-anchor disambiguation.
+See `docs://analysis/enrichment` for the full methodology and the `informative_only` filter semantics.
 ```
 
 ## Common mistakes
 
-- Caller pinning row counts from pre-2026-05 runs sees fewer rows by default. Pass `informative_only=False` to restore old behavior, or accept the new default (recommended).
+- [ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions.
 
 - Default background is `table_scope` (per-experiment quantified set). `'organism'` inflates the denominator and underestimates enrichment. See `docs://analysis/enrichment` for the full methodology note.
 
@@ -228,7 +238,7 @@ pathway_enrichment(..., background='organism')  # or 'table_scope' (default), or
 
 - For DAG ontologies (`go_*`), `level=N`-only enrichment silently drops biologically-meaningful terms at heterogeneous depths. For narrow research questions, hand-curate a `term_ids` panel via `search_ontology(ontology='go_bp', search_text=...)` and pass it directly. Use `level` only when surveying a whole branch.
 
-- When a KEGG pathway is significantly enriched, drill into its chemistry via `list_metabolites(pathway_ids=[<term_id>])`. This answers 'what compounds does the enriched pathway involve?' — a different anchor than the gene-KO membership the enrichment is built on. The same KEGG pathway map (e.g. `kegg.pathway:ko00910` Nitrogen metabolism) reaches the same map from compound-membership vs gene-KO-membership; a gene whose KO is in pathway X may not catalyse any reaction whose metabolites are in pathway X (and vice versa). See docs://analysis/metabolites Track A1 §f.
+- When a KEGG pathway is significantly enriched, drill into its chemistry via `list_metabolites(pathway_ids=[<term_id>])`. This answers 'what compounds does the enriched pathway involve?' — a different anchor than the gene-KO membership the enrichment is built on. The same KEGG pathway map (e.g. `kegg.pathway:ko00910` Nitrogen metabolism) reaches the same map from compound-membership vs gene-KO-membership; a gene whose KO is in pathway X may not catalyse any reaction whose metabolites are in pathway X (and vice versa). See docs://analysis/metabolites.
 
 ## Package import equivalent
 

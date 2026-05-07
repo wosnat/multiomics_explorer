@@ -2,11 +2,12 @@
 
 ## What it does
 
-Execute a raw Cypher query against the knowledge graph (read-only).
+Run a raw Cypher query (read-only escape hatch when other tools don't cover the question).
 
-Use this as an escape hatch when other tools don't cover your query.
-Write operations are blocked. Queries are validated for syntax and schema
-correctness before execution — warnings are returned in the response.
+Write operations are blocked. Queries are syntax- and schema-validated
+before execution — non-blocking warnings come back in the response.
+Validate against `kg_schema` first to avoid label / property typos;
+see docs://guide/concepts for the KG data model.
 
 ## Parameters
 

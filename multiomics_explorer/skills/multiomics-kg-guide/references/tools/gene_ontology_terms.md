@@ -2,15 +2,15 @@
 
 ## What it does
 
-Get ontology annotations for genes. One row per gene × term.
+Reverse-lookup: gene locus_tags → ontology annotations (one row per gene × term).
 
-In leaf mode (default), returns the most specific annotations only —
-redundant ancestor terms are excluded. In rollup mode, walks up to
-ancestors at the given level.
+`mode='leaf'` (default) returns the most specific annotations only —
+redundant ancestors are excluded. `mode='rollup'` walks UP to ancestors
+at the given level. Single-organism enforced.
 
-Use ontology param to filter to one type, or omit for all.
-For the reverse direction (find genes annotated to a term, with hierarchy
-expansion), use genes_by_ontology. Use search_ontology to find terms by text.
+Routing: for the forward direction (term → genes, with hierarchy
+expansion) use `genes_by_ontology`; for term discovery by text use
+`search_ontology`.
 
 ## Parameters
 
@@ -20,8 +20,8 @@ expansion), use genes_by_ontology. Use search_ontology to find terms by text.
 | organism | string | — | Organism (case-insensitive substring match, e.g. 'MED4'). Required — single-valued. |
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy') \| None | None | Filter to one ontology. None returns all. |
 | mode | string ('leaf', 'rollup') | leaf | 'leaf' returns most-specific annotations (default). 'rollup' walks up to ancestors at the given level. |
-| level | int \| None | None | Hierarchy level. In leaf mode: filter to leaves at this level. In rollup mode: required — target ancestor level (0 = broadest). |
-| tree | string \| None | None | BRITE tree name filter. Only valid when ontology='brite'. |
+| level | int \| None | None | Hierarchy level (0 = broadest). In leaf mode: filter to leaves at this level. In rollup mode: required — target ancestor level. See docs://guide/conventions. |
+| tree | string \| None | None | BRITE tree name filter. Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' go:0008150). Term-side filter only — never restricts the gene set. Default False (opt-in). |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include organism_name per row. |
@@ -207,7 +207,7 @@ resolve_gene → gene_ontology_terms
 
 - TCDB substrate-level questions ('which genes does this metabolite bind to?') chain via `genes_by_metabolite`, NOT this tool. Use `gene_ontology_terms(ontology='tcdb')` for *family*-level annotations (e.g. 'what TCDB family does PMM1129 belong to?').
 
-- Reverse-lookup of `genes_by_ontology` — same ontology surface, gene-anchored. For enrichment workflows the forward direction (`genes_by_ontology` → TERM2GENE → `pathway_enrichment` / `cluster_enrichment`) is canonical; see `docs://analysis/enrichment` §2 + §4.
+- Reverse-lookup of `genes_by_ontology` — same ontology surface, gene-anchored. For enrichment workflows the forward direction (`genes_by_ontology` → TERM2GENE → `pathway_enrichment` / `cluster_enrichment`) is canonical; see `docs://analysis/enrichment`.
 
 ## Package import equivalent
 
