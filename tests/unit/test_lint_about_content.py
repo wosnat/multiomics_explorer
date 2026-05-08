@@ -162,26 +162,3 @@ def test_run_lint_exit_nonzero_on_violation(lint_mod, tmp_path):
     assert "1:" in out
 
 
-def test_lint_clean_on_current_about_tree(lint_mod):
-    """The just-landed readability pass should leave the rendered md clean."""
-    about_dir = (
-        REPO_ROOT
-        / "multiomics_explorer"
-        / "skills"
-        / "multiomics-kg-guide"
-        / "references"
-        / "tools"
-    )
-    paths = sorted(about_dir.glob("*.md"))
-    assert paths, "no rendered tool md files found"
-    vs = lint_mod.lint_about_content(paths)
-    if vs:
-        snippets = "\n".join(
-            f"  {p.name}:{ln}: {tok!r} | {line.strip()[:120]}"
-            for p, ln, line, tok in vs[:20]
-        )
-        more = f"\n  ... {len(vs) - 20} more" if len(vs) > 20 else ""
-        pytest.fail(
-            f"Expected 0 violations on post-readability-pass tree, got {len(vs)}:\n"
-            f"{snippets}{more}"
-        )

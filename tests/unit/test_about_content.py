@@ -256,3 +256,37 @@ class TestAboutContentConsistency:
                 f"  In about but not schema: {about_params - schema_params}\n"
                 f"  In schema but not about: {schema_params - about_params}"
             )
+
+
+@pytest.mark.parametrize(
+    "about_path",
+    _get_about_files(),
+    ids=lambda p: p.stem,
+)
+def test_about_content_lint_clean(about_path):
+    """Each tool's rendered md passes the outfacing-doc readability lint.
+
+    Catches reintroductions of time-stamped counts, internal-history
+    shorthand (§, parent §, Phase N, audit, KG-XXX-NNN, Mode-X,
+    Cluster X), and bare ISO date stamps. [AQ] / [ENR] drift markers
+    are exempt.
+    """
+    from scripts.build_about_content import lint_about_content
+
+    violations = lint_about_content([about_path])
+    if violations:
+        snippets = "\n".join(
+            f"  line {ln}: {tok!r} | {line.strip()[:120]}"
+            for _, ln, line, tok in violations[:10]
+        )
+        more = (
+            f"\n  ... {len(violations) - 10} more"
+            if len(violations) > 10
+            else ""
+        )
+        pytest.fail(
+            f"{len(violations)} outfacing-doc style violation(s) in "
+            f"{about_path.name}:\n{snippets}{more}\n"
+            "See docs/superpowers/specs/"
+            "2026-05-07-mcp-docs-readability-pass-design.md"
+        )
