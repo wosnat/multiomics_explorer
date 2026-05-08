@@ -31,8 +31,10 @@ extracted from Pydantic models in ``mcp_server/tools.py``.
 
 import argparse
 import asyncio
+import re
 import sys
 from pathlib import Path
+from typing import TextIO
 
 import yaml
 
@@ -481,6 +483,81 @@ def generate_skeleton(tool_name: str, schema: dict) -> str:
     return "\n".join(lines)
 
 
+LINT_PATTERN = re.compile(
+    r"\d{4}-\d{2}-\d{2}"     # ISO date stamp
+    r"| today\b"              # stale "today" count
+    r"|Phase [0-9]"           # internal phase tag
+    r"|§"                     # cross-ref shorthand
+    r"|\baudit\b"             # internal audit ref
+    r"|KG-[A-Z]+-[0-9]"       # KG-XXX-NNN ticket ID
+    r"|Mode-[A-Z]\b"          # Mode-A / Mode-B template tag
+    r"|Cluster [A-Z]\b"       # Cluster A / Cluster B internal tag
+    r"|parent §"              # cross-ref shorthand
+)
+# F1/F2 and D2/D8 internal slice tags were excluded from the regex —
+# they collide with marine-microbiology vocabulary (Photosystem II D1
+# protein, F-class proteins, D3 timepoints) and the readability-pass
+# commits show only 6 hits across all slice-tag patterns vs 148 for the
+# rest of rule 2. The other patterns carry the signal.
+
+# Drift-marker carveout. The [AQ] (annotation_quality redefinition) and
+# [ENR] (informative_only=True default flip) markers stay as 1-line inline
+# notes on affected tools — see rule 3 carveout in the readability-pass spec.
+CARVEOUT_PATTERN = re.compile(r"\[AQ\]|\[ENR\]")
+
+
+def lint_about_content(
+    paths: list[Path],
+) -> list[tuple[Path, int, str, str]]:
+    """Scan rendered md for outfacing-doc style-rule violations.
+
+    Returns ``(path, line_no, line, matched_token)`` per violation.
+    Lines containing ``[AQ]`` / ``[ENR]`` drift markers are exempt.
+    """
+    violations: list[tuple[Path, int, str, str]] = []
+    for path in paths:
+        try:
+            text = path.read_text()
+        except OSError as e:
+            print(f"  SKIP {path}: {e}", file=sys.stderr)
+            continue
+        for i, line in enumerate(text.splitlines(), 1):
+            if CARVEOUT_PATTERN.search(line):
+                continue
+            m = LINT_PATTERN.search(line)
+            if m:
+                violations.append((path, i, line, m.group(0)))
+    return violations
+
+
+def run_lint(paths: list[Path], stream: TextIO | None = None) -> int:
+    """Print violations and return a process exit code (0 clean, 1 dirty)."""
+    if stream is None:
+        stream = sys.stdout
+    violations = lint_about_content(paths)
+    cwd = Path.cwd()
+    for path, line_no, line, token in violations:
+        try:
+            shown = path.relative_to(cwd)
+        except ValueError:
+            shown = path
+        print(f"{shown}:{line_no}: {token!r} in: {line.strip()}", file=stream)
+    if violations:
+        files = len({v[0] for v in violations})
+        print(
+            f"\n{len(violations)} violation(s) across {files} file(s).",
+            file=stream,
+        )
+        print(
+            "See docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md "
+            "for the 9 outfacing-doc style rules.",
+            file=stream,
+        )
+        return 1
+    print("Lint clean.", file=stream)
+    return 0
+
+
 def build_tool(tool_name: str, schemas: dict) -> bool:
     """Build about content for a single tool. Returns True if successful."""
     if tool_name not in schemas:
@@ -509,7 +586,31 @@ def main():
     parser.add_argument("tools", nargs="*", help="Tool names to build (default: all with input files)")
     parser.add_argument("--skeleton", metavar="TOOL", help="Generate input YAML skeleton for a tool")
     parser.add_argument("--all", action="store_true", help="Build for all registered tools")
+    parser.add_argument(
+        "--lint",
+        action="store_true",
+        help=(
+            "Scan rendered md for outfacing-doc style-rule violations. "
+            "With positional tool names, scopes to those tools' md. "
+            "Exit 1 if any violation, 0 if clean."
+        ),
+    )
     args = parser.parse_args()
+
+    if args.lint:
+        if args.tools:
+            paths = [OUTPUT_DIR / f"{name}.md" for name in args.tools]
+            missing = [p for p in paths if not p.exists()]
+            if missing:
+                names = ", ".join(p.stem for p in missing)
+                print(f"Error: no rendered md for: {names}", file=sys.stderr)
+                sys.exit(2)
+        else:
+            paths = sorted(OUTPUT_DIR.glob("*.md"))
+            if not paths:
+                print(f"Error: no md files found under {OUTPUT_DIR}", file=sys.stderr)
+                sys.exit(2)
+        sys.exit(run_lint(paths))
 
     if args.skeleton:
         schemas = get_tool_schemas()
