@@ -157,9 +157,48 @@ Diff `multiomics_explorer/skills/multiomics-kg-guide/references/tools/`
 to confirm the rendered md reflects the source edits and nothing
 else moved.
 
-`scripts/build_about_content.py` itself is **out of scope**. The
-renderer is correct; only its inputs need editing. (Optional follow-up:
-a `--lint` mode that warns on style violations — separate ticket.)
+`scripts/build_about_content.py` itself is **out of scope** for the
+prose-rewrite work. The renderer is correct; only its inputs need
+editing.
+
+### `--lint` mode (shipped as a follow-up, living regex)
+
+A `--lint` mode lives in `scripts/build_about_content.py` and runs
+the rule-1..4 regexes (ISO date, " today", `Phase N`, `§`,
+`audit`, `KG-XXX-NNN`, `Mode-X`, `Cluster X`, `parent §`) against
+all rendered tool md, exiting non-zero on any hit. `[AQ]` and
+`[ENR]` lines are exempt. A parametrized pytest in
+`tests/unit/test_about_content.py::test_about_content_lint_clean`
+runs the same check per tool so regressions pinpoint the bad tool.
+
+The regex is **non-exhaustive by design** — it encodes only the
+shorthand patterns that occurred in the readability-pass deletions
+(99 violations across 25 files at commit `1a7d708`, bucketed across
+all rule families). New tools may introduce new internal shorthand
+that the regex doesn't catch.
+
+**Extension contract.** When the code reviewer or author spots a
+recurring stale-language pattern (internal shorthand, time-stamped
+count, dated reference, archaeology jargon) that the lint did NOT
+flag:
+
+1. Add the pattern to `LINT_PATTERN` in
+   `scripts/build_about_content.py`.
+2. Add a unit test in `tests/unit/test_lint_about_content.py` —
+   one positive case (the new pattern fires) and, if the pattern
+   risks false-positives against domain vocabulary (gene names,
+   protein families, timepoint labels), one negative case.
+3. Cite the source violation in the PR description as evidence.
+4. Do **not** just delete the bad text without growing the regex
+   — the next tool will reintroduce the pattern.
+
+Judgment carveout: not every one-off term warrants a regex pattern.
+A `\bD[0-9]\b` slice-tag pattern was tried and dropped — it
+collided with marine-microbiology vocabulary (Photosystem II D1
+protein, D3 timepoints) and the deletion stream showed only 6 hits
+across all slice-tag patterns. The other patterns carried the
+signal. Use the same calculus for new candidates: signal vs.
+false-positive risk against the domain.
 
 ---
 

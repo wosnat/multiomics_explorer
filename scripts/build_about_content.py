@@ -483,6 +483,12 @@ def generate_skeleton(tool_name: str, schema: dict) -> str:
     return "\n".join(lines)
 
 
+# Non-exhaustive by design — encodes shorthand patterns observed in the
+# readability-pass deletions. Extension contract: when reviewer or author
+# spots a recurring stale-language pattern this regex did NOT catch, add
+# a pattern here and a unit test in tests/unit/test_lint_about_content.py
+# in the same PR. See docs/superpowers/specs/2026-05-07-mcp-docs-
+# readability-pass-design.md ("--lint mode") for the full contract.
 LINT_PATTERN = re.compile(
     r"\d{4}-\d{2}-\d{2}"     # ISO date stamp
     r"| today\b"              # stale "today" count
@@ -498,7 +504,8 @@ LINT_PATTERN = re.compile(
 # they collide with marine-microbiology vocabulary (Photosystem II D1
 # protein, F-class proteins, D3 timepoints) and the readability-pass
 # commits show only 6 hits across all slice-tag patterns vs 148 for the
-# rest of rule 2. The other patterns carry the signal.
+# rest of rule 2. Use the same signal-vs-domain-collision calculus when
+# evaluating new patterns.
 
 # Drift-marker carveout. The [AQ] (annotation_quality redefinition) and
 # [ENR] (informative_only=True default flip) markers stay as 1-line inline
