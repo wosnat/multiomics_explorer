@@ -14,7 +14,7 @@ skills for TDD, parallel dispatch, and code review.
 References:
 - [field-rubric](references/field-rubric.md) — response-schema quality criteria
 - [checklist](references/checklist.md) — per-layer file paths + templates
-- `layer-rules` skill — Cypher conventions, file ownership, rename cascades
+- `layer-rules` skill — Cypher conventions, file ownership, rename cascades, outfacing-doc style rules + `--lint` workflow
 - `testing` skill — per-layer test patterns, EXPECTED_TOOLS, TOOL_BUILDERS, fixtures
 
 ## Two execution modes
@@ -118,10 +118,21 @@ Each agent reports `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` per `superpowers:su
 
 Once all 4 agents report green:
 
-1. **Background**: dispatch the standard `code-reviewer` subagent via `superpowers:requesting-code-review` against the diff + spec. **Hard gate, not optional** — mocked unit tests can't validate actual Cypher (the mock returns fake rows regardless of label correctness in the query string), and only the reviewer reading the live Cypher catches things like wrong node labels in `MATCH` clauses, wrong relationship directions, or filter clauses that match-everything. The list_metabolites smoke test caught a `MATCH (o:Organism)` typo (label is `OrganismTaxon`) that all 1676 unit tests missed.
-2. **Foreground**: `pytest tests/unit/ -q`
-3. **Foreground**: `pytest tests/integration/ -m kg -q`
-4. **Foreground**: `pytest tests/regression/ -m kg -q`
+1. **Foreground**: `uv run python scripts/build_about_content.py --lint`. Mechanical backstop for the outfacing-doc style rules (rules 1-4 in the readability-pass spec — ISO dates, "today" counts, internal-history shorthand, `§` / `parent §`). Hard gate — non-zero exit blocks the rest of Stage 3. If the lint flags a domain-vocabulary false-positive (gene name, protein family, timepoint label colliding with a regex pattern), extend the regex (don't suppress) per the [readability-pass spec](../../../docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md).
+2. **Background**: dispatch the standard `code-reviewer` subagent via `superpowers:requesting-code-review` against the diff + spec. **Hard gate, not optional** — mocked unit tests can't validate actual Cypher (the mock returns fake rows regardless of label correctness in the query string), and only the reviewer reading the live Cypher catches things like wrong node labels in `MATCH` clauses, wrong relationship directions, or filter clauses that match-everything. The list_metabolites smoke test caught a `MATCH (o:Organism)` typo (label is `OrganismTaxon`) that all 1676 unit tests missed.
+
+   **Brief the reviewer with outfacing-doc style checks** in addition to layer-correctness checks (the `--lint` in step 1 catches mechanical violations; the reviewer catches the judgment-call subset):
+   - Tool docstring opens with an action verb and ends with a `Routing: ...` sentence.
+   - Pydantic `Field(description=...)` strings are ≤ 250 chars (tooltip ceiling).
+   - `[AQ]` / `[ENR]` drift markers (where applicable) are 1-line inline, not multi-paragraph.
+   - All `docs://...` cross-links resolve to existing files.
+   - **Lint-extension watch:** did the reviewer spot a recurring stale-language pattern (internal shorthand, time-stamped count, dated reference, archaeology jargon) that the `--lint` regex did NOT flag? If yes, propose extending `LINT_PATTERN` in `scripts/build_about_content.py` and adding a unit test in `tests/unit/test_lint_about_content.py` in the same PR — cite the source violation. The lint is non-exhaustive by design; new tool patterns extend it. Don't just delete the bad text without growing the regex.
+
+   See the [readability-pass spec](../../../docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md) for the full 9 outfacing-doc style rules + the lint extension contract.
+
+3. **Foreground**: `pytest tests/unit/ -q`
+4. **Foreground**: `pytest tests/integration/ -m kg -q`
+5. **Foreground**: `pytest tests/regression/ -m kg -q`
    If the spec declared new or renamed columns, run `pytest tests/regression/ --force-regen -m kg -q` first, then verify.
 
 Code review report returns alongside or after the KG gates. Findings either land clean or trigger one fix loop (re-dispatch the relevant agent with feedback as additional brief).
