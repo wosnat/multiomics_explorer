@@ -416,7 +416,7 @@ Which surfaces are agent-facing (style rules apply) vs internal:
 | Source location | Outfacing? | Style rules apply? |
 |---|---|---|
 | `kg/queries_lib.py` docstrings | No (developer-internal) | No |
-| `api/functions.py` docstrings | Indirect (Python API users) | Best-effort |
+| `api/functions.py` docstrings | **Yes** — Python API users (`help(gene_overview)`) and LLM agents via the rendered md's "Package import equivalent" path | Yes (Python-API audience accent — dict keys, raised exceptions) |
 | `mcp_server/tools.py` tool docstring | **Yes** — FastMCP `description`, agent sees at tool-listing | Yes |
 | `mcp_server/tools.py` Pydantic `Field(description=...)` | **Yes** — params + per-result tables in rendered md | Yes |
 | `mcp_server/tools.py` Python `# ...` comments | No | No |
