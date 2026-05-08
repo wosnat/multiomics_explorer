@@ -38,6 +38,15 @@ from typing import TextIO
 
 import yaml
 
+from multiomics_explorer._outfacing_lint import (
+    CARVEOUT_PATTERN,
+    LINT_PATTERN,
+    lint_about_content,
+    lint_lines,
+    lint_python_docstrings,
+    run_lint,
+)
+
 # Paths
 INPUTS_DIR = Path(__file__).resolve().parent.parent / "multiomics_explorer" / "inputs" / "tools"
 OUTPUT_DIR = (
@@ -483,88 +492,6 @@ def generate_skeleton(tool_name: str, schema: dict) -> str:
     return "\n".join(lines)
 
 
-# Non-exhaustive by design — encodes shorthand patterns observed in the
-# readability-pass deletions. Extension contract: when reviewer or author
-# spots a recurring stale-language pattern this regex did NOT catch, add
-# a pattern here and a unit test in tests/unit/test_lint_about_content.py
-# in the same PR. See docs/superpowers/specs/2026-05-07-mcp-docs-
-# readability-pass-design.md ("--lint mode") for the full contract.
-LINT_PATTERN = re.compile(
-    r"\d{4}-\d{2}-\d{2}"     # ISO date stamp
-    r"| today\b"              # stale "today" count
-    r"|Phase [0-9]"           # internal phase tag
-    r"|§"                     # cross-ref shorthand
-    r"|\baudit\b"             # internal audit ref
-    r"|KG-[A-Z]+-[0-9]"       # KG-XXX-NNN ticket ID
-    r"|Mode-[A-Z]\b"          # Mode-A / Mode-B template tag
-    r"|Cluster [A-Z]\b"       # Cluster A / Cluster B internal tag
-    r"|parent §"              # cross-ref shorthand
-)
-# F1/F2 and D2/D8 internal slice tags were excluded from the regex —
-# they collide with marine-microbiology vocabulary (Photosystem II D1
-# protein, F-class proteins, D3 timepoints) and the readability-pass
-# commits show only 6 hits across all slice-tag patterns vs 148 for the
-# rest of rule 2. Use the same signal-vs-domain-collision calculus when
-# evaluating new patterns.
-
-# Drift-marker carveout. The [AQ] (annotation_quality redefinition) and
-# [ENR] (informative_only=True default flip) markers stay as 1-line inline
-# notes on affected tools — see rule 3 carveout in the readability-pass spec.
-CARVEOUT_PATTERN = re.compile(r"\[AQ\]|\[ENR\]")
-
-
-def lint_about_content(
-    paths: list[Path],
-) -> list[tuple[Path, int, str, str]]:
-    """Scan rendered md for outfacing-doc style-rule violations.
-
-    Returns ``(path, line_no, line, matched_token)`` per violation.
-    Lines containing ``[AQ]`` / ``[ENR]`` drift markers are exempt.
-    """
-    violations: list[tuple[Path, int, str, str]] = []
-    for path in paths:
-        try:
-            text = path.read_text()
-        except OSError as e:
-            print(f"  SKIP {path}: {e}", file=sys.stderr)
-            continue
-        for i, line in enumerate(text.splitlines(), 1):
-            if CARVEOUT_PATTERN.search(line):
-                continue
-            m = LINT_PATTERN.search(line)
-            if m:
-                violations.append((path, i, line, m.group(0)))
-    return violations
-
-
-def run_lint(paths: list[Path], stream: TextIO | None = None) -> int:
-    """Print violations and return a process exit code (0 clean, 1 dirty)."""
-    if stream is None:
-        stream = sys.stdout
-    violations = lint_about_content(paths)
-    cwd = Path.cwd()
-    for path, line_no, line, token in violations:
-        try:
-            shown = path.relative_to(cwd)
-        except ValueError:
-            shown = path
-        print(f"{shown}:{line_no}: {token!r} in: {line.strip()}", file=stream)
-    if violations:
-        files = len({v[0] for v in violations})
-        print(
-            f"\n{len(violations)} violation(s) across {files} file(s).",
-            file=stream,
-        )
-        print(
-            "See docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md "
-            "for the 9 outfacing-doc style rules.",
-            file=stream,
-        )
-        return 1
-    print("Lint clean.", file=stream)
-    return 0
-
-
 def build_tool(tool_name: str, schemas: dict) -> bool:
     """Build about content for a single tool. Returns True if successful."""
     if tool_name not in schemas:
@@ -606,16 +533,41 @@ def main():
 
     if args.lint:
         if args.tools:
-            paths = [OUTPUT_DIR / f"{name}.md" for name in args.tools]
-            missing = [p for p in paths if not p.exists()]
-            if missing:
-                names = ", ".join(p.stem for p in missing)
-                print(f"Error: no rendered md for: {names}", file=sys.stderr)
-                sys.exit(2)
+            paths: list[Path] = []
+            for name in args.tools:
+                p = Path(name)
+                if p.exists():
+                    paths.append(p)
+                else:
+                    md_path = OUTPUT_DIR / f"{name}.md"
+                    if not md_path.exists():
+                        print(
+                            f"Error: '{name}' is neither a file nor a registered tool md",
+                            file=sys.stderr,
+                        )
+                        sys.exit(2)
+                    paths.append(md_path)
         else:
-            paths = sorted(OUTPUT_DIR.glob("*.md"))
+            repo_root = Path(__file__).resolve().parent.parent
+            skills_refs = (
+                repo_root
+                / "multiomics_explorer"
+                / "skills"
+                / "multiomics-kg-guide"
+                / "references"
+            )
+            paths = (
+                sorted(OUTPUT_DIR.glob("*.md"))
+                + sorted((skills_refs / "guide").glob("*.md"))
+                + sorted((skills_refs / "analysis").glob("*.md"))
+                + [repo_root / "multiomics_explorer" / "api" / "functions.py"]
+                + sorted((repo_root / "multiomics_explorer" / "analysis").glob("*.py"))
+                + sorted((repo_root / "examples").glob("*.py"))
+                + [repo_root / "examples" / "README.md"]
+            )
+            paths = [p for p in paths if p.exists()]
             if not paths:
-                print(f"Error: no md files found under {OUTPUT_DIR}", file=sys.stderr)
+                print("Error: no scannable files found", file=sys.stderr)
                 sys.exit(2)
         sys.exit(run_lint(paths))
 

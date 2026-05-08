@@ -10513,3 +10513,55 @@ class TestAssaysByMetabolite:
         assert present_id in data["metabolites_with_evidence"]
         assert absent_id in data["metabolites_without_evidence"]
         assert present_id not in data["metabolites_without_evidence"]
+
+
+# ---------------------------------------------------------------------------
+# Outfacing-doc lint gate for api/functions.py docstrings
+# ---------------------------------------------------------------------------
+# See docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md
+# for the 9 style rules. Gate is per-function so cleanup progress is visible
+# in the test report.
+
+import ast
+import inspect
+from pathlib import Path
+
+from multiomics_explorer._outfacing_lint import lint_python_docstrings
+
+_API_FILE = Path(inspect.getsourcefile(api)).resolve()
+
+
+def _api_public_function_names() -> list[str]:
+    """Top-level public functions in api/functions.py via AST walk."""
+    tree = ast.parse(_API_FILE.read_text())
+    names = []
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if not node.name.startswith("_"):
+                names.append(node.name)
+    return names
+
+
+def _api_function_line_range(name: str) -> tuple[int, int]:
+    """Line range of `name` in api/functions.py (1-indexed, inclusive)."""
+    tree = ast.parse(_API_FILE.read_text())
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if node.name == name:
+                return node.lineno, node.end_lineno
+    raise LookupError(f"function {name!r} not found in {_API_FILE}")
+
+
+@pytest.mark.parametrize("fn_name", _api_public_function_names())
+def test_api_function_docstring_lint_clean(fn_name: str):
+    """Each public function in api/functions.py has a clean docstring."""
+    start, end = _api_function_line_range(fn_name)
+    violations = lint_python_docstrings([_API_FILE])
+    fn_violations = [v for v in violations if start <= v[1] <= end]
+    if fn_violations:
+        msg_lines = [
+            f"{fn_name} ({_API_FILE.name}:{start}-{end}) has outfacing-doc violations:",
+        ]
+        for path, line_no, line, token in fn_violations:
+            msg_lines.append(f"  {path.name}:{line_no}: {token!r} in: {line.strip()}")
+        pytest.fail("\n".join(msg_lines))
