@@ -108,6 +108,10 @@ Dispatch the 4 implementer agents in **one** message, in parallel. Each owns a d
 
 Each agent is briefed with: the frozen spec, its file(s), a pointer to `layer-rules` skill, "tests are red in your scope; make them green," and its scoped self-verify command.
 
+**`api-updater` outfacing-surface brief addendum.** Function docstrings on `api/functions.py` AND `multiomics_explorer/analysis/*.py` are agent-outfacing — they reach Python users via `help()` and LLM agents via the rendered tool md's "Package import equivalent" path and via `docs://analysis/{name}`. The 9 outfacing-doc style rules from the [round-1 readability-pass spec](../../../docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md) apply with a Python-API audience accent: dict keys, raised exceptions, return shape — not agent-routing language. Run `uv run python scripts/build_about_content.py --lint` after editing.
+
+**`doc-updater` outfacing-surface brief addendum.** Analysis md (`references/analysis/*.md`) and example .py files (`examples/*.py`) are agent-outfacing — served at `docs://analysis/{name}` and `docs://examples/{file}`. The 9 rules apply with audience accents: analysis = cross-tool methodology with biological precision; examples = task-oriented runnable code where comments explain the pattern, not biology lore. Run `uv run python scripts/build_about_content.py --lint` after editing.
+
 **Anti-scope-creep guardrail (mandatory in every brief):** "ADD only — do NOT modify, rename, or rebaseline any existing test, case, or yml. If an unrelated test fails in your environment, REPORT AS A CONCERN; do not silently retune. Pinned baselines are KG-state guards." Without this, agents that observe pre-existing failures (e.g. from a stale base, KG drift, or sibling work) will "fix" them by editing baselines downward — silently masking real signals.
 
 For Mode B (cross-tool), each brief gains: "Implement tool 1 as the template within your file, then extend to tools 2..N."
@@ -118,7 +122,7 @@ Each agent reports `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` per `superpowers:su
 
 Once all 4 agents report green:
 
-1. **Foreground**: `uv run python scripts/build_about_content.py --lint`. Mechanical backstop for the outfacing-doc style rules (rules 1-4 in the readability-pass spec — ISO dates, "today" counts, internal-history shorthand, `§` / `parent §`). Hard gate — non-zero exit blocks the rest of Stage 3. If the lint flags a domain-vocabulary false-positive (gene name, protein family, timepoint label colliding with a regex pattern), extend the regex (don't suppress) per the [readability-pass spec](../../../docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md).
+1. **Foreground**: `uv run python scripts/build_about_content.py --lint`. Mechanical backstop for the outfacing-doc style rules (rules 1-4 in the readability-pass spec — ISO dates, "today" counts, internal-history shorthand, `§` / `parent §`). Now covers MCP md, api docstrings, analysis docstrings, hand-authored md (analysis + guide), and `examples/*.py`. Hard gate — non-zero exit blocks the rest of Stage 3. If the lint flags a domain-vocabulary false-positive (gene name, protein family, timepoint label colliding with a regex pattern), extend the regex (don't suppress) per the [readability-pass spec](../../../docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md).
 2. **Background**: dispatch the standard `code-reviewer` subagent via `superpowers:requesting-code-review` against the diff + spec. **Hard gate, not optional** — mocked unit tests can't validate actual Cypher (the mock returns fake rows regardless of label correctness in the query string), and only the reviewer reading the live Cypher catches things like wrong node labels in `MATCH` clauses, wrong relationship directions, or filter clauses that match-everything. The list_metabolites smoke test caught a `MATCH (o:Organism)` typo (label is `OrganismTaxon`) that all 1676 unit tests missed.
 
    **Brief the reviewer with outfacing-doc style checks** in addition to layer-correctness checks (the `--lint` in step 1 catches mechanical violations; the reviewer catches the judgment-call subset):
@@ -126,7 +130,7 @@ Once all 4 agents report green:
    - Pydantic `Field(description=...)` strings are ≤ 250 chars (tooltip ceiling).
    - `[AQ]` / `[ENR]` drift markers (where applicable) are 1-line inline, not multi-paragraph.
    - All `docs://...` cross-links resolve to existing files.
-   - **Lint-extension watch:** did the reviewer spot a recurring stale-language pattern (internal shorthand, time-stamped count, dated reference, archaeology jargon) that the `--lint` regex did NOT flag? If yes, propose extending `LINT_PATTERN` in `scripts/build_about_content.py` and adding a unit test in `tests/unit/test_lint_about_content.py` in the same PR — cite the source violation. The lint is non-exhaustive by design; new tool patterns extend it. Don't just delete the bad text without growing the regex.
+   - **Lint-extension watch:** did the reviewer spot a recurring stale-language pattern (internal shorthand, time-stamped count, dated reference, archaeology jargon) that the `--lint` regex did NOT flag? If yes, propose extending `LINT_PATTERN` in `multiomics_explorer/_outfacing_lint.py` and adding a unit test in `tests/unit/test_outfacing_lint.py` in the same PR — cite the source violation. The lint is non-exhaustive by design; new tool patterns extend it. Don't just delete the bad text without growing the regex.
 
    See the [readability-pass spec](../../../docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md) for the full 9 outfacing-doc style rules + the lint extension contract.
 
