@@ -417,14 +417,24 @@ Which surfaces are agent-facing (style rules apply) vs internal:
 |---|---|---|
 | `kg/queries_lib.py` docstrings | No (developer-internal) | No |
 | `api/functions.py` docstrings | **Yes** — Python API users (`help(gene_overview)`) and LLM agents via the rendered md's "Package import equivalent" path | Yes (Python-API audience accent — dict keys, raised exceptions) |
+| `multiomics_explorer/analysis/*.py` docstrings | **Yes** — Python API users (`help(response_matrix)`) and LLM agents via the rendered analysis md | Yes (Python-API audience accent — same as `api/functions.py`) |
 | `mcp_server/tools.py` tool docstring | **Yes** — FastMCP `description`, agent sees at tool-listing | Yes |
 | `mcp_server/tools.py` Pydantic `Field(description=...)` | **Yes** — params + per-result tables in rendered md | Yes |
 | `mcp_server/tools.py` Python `# ...` comments | No | No |
 | `inputs/tools/*.yaml` examples / mistakes / chaining | **Yes** — rendered into per-tool md | Yes |
 | `skills/.../references/tools/*.md` | Auto-generated — never hand-edit | N/A — edit upstream |
-| `skills/.../references/guide/*.md` | **Yes** — hand-authored | Yes (rare edits) |
-| `skills/.../references/analysis/*.md` | **Yes** — hand-authored | Yes (best-effort) |
+| `skills/.../references/guide/*.md` | **Yes** — hand-authored | Yes |
+| `skills/.../references/analysis/*.md` | **Yes** — hand-authored | Yes |
+| `examples/*.py` | **Yes** — served at `docs://examples/{file}`; agents read whole file | Yes (whole-file scan: comments ARE outfacing here) |
+| `examples/README.md` | **Yes** — served at `docs://examples/{file}` | Yes |
 | `CLAUDE.md` tool table | No (internal-team notes) | No |
+
+**Scanner notes (lint mode per surface):**
+
+- Tool docstring + Pydantic `Field(description=...)`: caught indirectly via the rendered tool-md scan.
+- `api/functions.py` and `multiomics_explorer/analysis/*.py` docstrings: AST-extracted; `# ...` comments are not scanned (per the surface-map rows above).
+- `examples/*.py`: whole file scanned line-by-line — comments ARE outfacing here, since the file IS the artifact.
+- Hand-authored md (`analysis/`, `guide/`, `examples/README.md`): line-by-line.
 
 ---
 
