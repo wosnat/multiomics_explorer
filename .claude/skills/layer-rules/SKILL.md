@@ -41,6 +41,10 @@ Thin wrapper — calls api/, validates via `Response(**data)`.
 Same params as api/ (minus `conn`, plus `ctx`). Adds default `limit`
 (small, e.g. 5). `async def` with `await ctx.info/warning/error()`.
 Pydantic response models → FastMCP auto-generates `outputSchema`.
+Tool docstrings + every `Field(description=...)` are agent-outfacing
+— follow the 9 outfacing-doc rules (see [layer boundaries](references/layer-boundaries.md)
+and [readability-pass spec](../../../docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md)).
+Inline `# ...` Python comments are not.
 
 ## Layer 4: Skills (MCP resources)
 
@@ -48,7 +52,9 @@ Per-tool about content auto-generated from Pydantic models + input
 YAML (`inputs/tools/{name}.yaml`) via `scripts/build_about_content.py`.
 Served at `docs://tools/{tool-name}`. Update YAML when tool behavior
 changes, then rebuild — the generator writes directly to the skills
-tree.
+tree. **Never hand-edit rendered md.** YAML examples / mistakes /
+chaining follow the same 9 outfacing-doc rules as Layer 3. After regen,
+run `uv run python scripts/build_about_content.py --lint {tool_name}`.
 
 ## Analysis utilities (`analysis/expression.py`)
 
