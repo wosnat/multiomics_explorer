@@ -84,7 +84,7 @@ Deeper paths (`multiomics_explorer.api`, `multiomics_explorer.analysis`,
 `multiomics_explorer.analysis.enrichment`,
 `multiomics_explorer.analysis.expression`,
 `multiomics_explorer.kg.connection`) are internal implementation
-detail. They work today because the public surface re-exports them, but
+detail. They are reachable because the public surface re-exports them, but
 **don't import from them in user code** — the top-level re-export
 contract is what's stable.
 
@@ -140,7 +140,7 @@ result = pathway_enrichment(
 ```
 
 `fisher_ora` returns the same object when called directly with custom
-gene sets / TERM2GENE. See `docs://analysis/enrichment` §18 for the
+gene sets / TERM2GENE. See `docs://analysis/enrichment` for the
 full accessor reference.
 
 ### 3. `pandas.DataFrame` (2 analysis utilities: `response_matrix`, `gene_set_compare`)
@@ -462,7 +462,7 @@ collapsed = signed_enrichment_score(df)
 collapsed.to_csv("enrichment.csv", index=False)
 ```
 
-`docs://analysis/enrichment` §4 has the same recipe with full
+`docs://analysis/enrichment` has the same recipe with full
 narrative, plus variants for cluster-membership enrichment, ortholog
 groups, and custom gene lists. Runnable: `docs://examples/pathway_enrichment.py`.
 

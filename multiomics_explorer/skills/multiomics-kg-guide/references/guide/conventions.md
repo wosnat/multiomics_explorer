@@ -265,7 +265,7 @@ consistent across all three:
 - **Rankable-gated filters** (`metric_bucket`, `metric_percentile_*`, `rank_by_metric_max`) — only meaningful on DMs with `rankable=True`.
   - Mixed-rankability input → soft-exclude non-rankable DMs, surface them in the envelope's `excluded_derived_metrics` + `warnings`.
   - All-non-rankable input + a rankable-gated filter → raises.
-- **`has_p_value`-gated filters** — analogous; raises today on missing p-values.
+- **`has_p_value`-gated filters** — analogous; raises on missing p-values.
 
 Inspect `rankable` / `has_p_value` / `value_kind` / `allowed_categories`
 on `list_derived_metrics` results before drill-down. The same shape
@@ -380,7 +380,7 @@ modes:
   for hand-defined backgrounds.
 
 The choice of background matters more than the choice of ontology.
-`docs://analysis/enrichment` §9 has the full discussion.
+`docs://analysis/enrichment` has the full discussion.
 
 ---
 
