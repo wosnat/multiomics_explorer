@@ -1136,7 +1136,7 @@ class EnrichmentResult:
     """Rich wrapper around Fisher ORA output.
 
     Returned by ``pathway_enrichment``, ``cluster_enrichment``, and
-    ``fisher_ora``. See ``docs://analysis/enrichment`` §18 for the full
+    ``fisher_ora``. See ``docs://analysis/enrichment`` for the full
     accessor reference.
 
     Attributes
@@ -1149,7 +1149,7 @@ class EnrichmentResult:
         One row per (cluster × term). Columns include cluster, term_id,
         term_name, count, bg_count, gene_ratio, bg_ratio, fold_enrichment,
         rich_factor, pvalue, p_adjust, ... — see docs://analysis/enrichment
-        §15 for the full list. The MCP wrappers thread additional context
+        for the full list. The MCP wrappers thread additional context
         columns (direction, omics_type, etc.); signed_score is added by
         the optional signed_enrichment_score() helper.
     inputs : EnrichmentInputs
@@ -1158,7 +1158,7 @@ class EnrichmentResult:
         One row per (term, gene). Required columns: term_id, term_name,
         locus_tag. Optional: gene_name, product. Contextual columns flow
         through from the source — e.g. genes_by_ontology adds level,
-        gene_category. See docs://analysis/enrichment §18 for the column
+        gene_category. See docs://analysis/enrichment for the column
         contract.
     term_validation : dict
         Per-input-term_id buckets: not_found, wrong_ontology, wrong_level,
