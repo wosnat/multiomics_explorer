@@ -161,7 +161,7 @@ def _rename_freq(freq_list: list[dict], key_name: str) -> list[dict]:
 
 
 def _rename_measurement_coverage(raw: dict | None) -> dict:
-    """Phase 1 §6.6: rename apoc.coll.frequencies output for `by_measurement_coverage`.
+    """Rename apoc.coll.frequencies output for `by_measurement_coverage`.
 
     The Cypher emits both sub-rollups as ``[{item, count}, ...]`` lists. The
     Pydantic boundary expects ``[{paper_count, count}]`` for `by_paper_count`
@@ -618,9 +618,9 @@ def list_filter_values(
       - ``compartment``: Experiment.compartment values.
       - ``omics_type``: Experiment.omics_type values; result merges the
         canonical OMICS_TYPE enum (8 values) so METABOLOMICS surfaces with
-        count=0 even when no experiments of that type exist (spec §6.5).
+        count=0 even when no experiments of that type exist.
       - ``evidence_source``: Metabolite.evidence_sources buckets
-        (metabolism / transport / metabolomics; spec §6.5).
+        (metabolism / transport / metabolomics).
     """
     conn = _default_conn(conn)
     if filter_type == "gene_category":
@@ -1013,8 +1013,8 @@ def list_experiments(
     derived_metric_gene_count, derived_metric_types,
     reports_derived_metric_types.
     Both derived_metric_types and reports_derived_metric_types source
-    from the same KG property today (e.reports_derived_metric_types) and
-    are identical in current data. Both are emitted for forward-compat
+    from the same KG property (e.reports_derived_metric_types) and are
+    identical in current data. Both are emitted for forward-compat
     with a future KG distinction between "DMs reported by this experiment"
     and "DMs associated with this experiment" (slice-2 D5).
     When search_text is provided, detail results include score.
@@ -2140,8 +2140,8 @@ def differential_expression_by_gene(
     direction: ``'up'`` / ``'down'`` / ``'both'`` / ``None``. ``'both'`` is
         the explicit, self-documenting spelling for "return rows with
         ``expression_status`` ∈ {``'significant_up'``, ``'significant_down'``}"
-        — functionally equivalent to ``direction=None, significant_only=True``
-        (per spec §6.4); pick whichever spelling is clearer at the call site.
+        — functionally equivalent to ``direction=None, significant_only=True``;
+        pick whichever spelling is clearer at the call site.
         Default ``None`` is unchanged.
 
     Raises:
@@ -3073,14 +3073,14 @@ def gene_derived_metrics(
     by_value_kind, by_metric_type, by_metric, by_compartment,
     by_treatment_type, by_background_factors, by_publication,
     returned, offset, truncated, results.
-    Per result (compact, 13 Pydantic fields; 11 emitted by Cypher today):
-    locus_tag, gene_name, derived_metric_id, value_kind, name, value,
-    rankable, has_p_value, rank_by_metric, metric_percentile,
-    metric_bucket, adjusted_p_value (None today), significant (None today).
-    Per result (verbose adds, 12 Pydantic; 11 emitted today): metric_type,
+    Per result (compact, 13 Pydantic fields; 11 emitted by Cypher in the
+    current KG): locus_tag, gene_name, derived_metric_id, value_kind, name,
+    value, rankable, has_p_value, rank_by_metric, metric_percentile,
+    metric_bucket, adjusted_p_value (None), significant (None).
+    Per result (verbose adds, 12 Pydantic; 11 emitted): metric_type,
     field_description, unit, allowed_categories, compartment,
     treatment_type, background_factors, publication_doi, treatment,
-    light_condition, experimental_context, p_value (None today).
+    light_condition, experimental_context, p_value (None).
 
     summary=True: results=[], summary fields only.
 
@@ -4792,7 +4792,7 @@ def list_metabolites(
     When verbose=True, also includes: inchikey, smiles, mnxm_id, hmdb_id,
     pathway_names. (For per-organism gene tallies, drill into
     genes_by_metabolite — slice-1 Tool #2.)
-    by_measurement_coverage envelope (spec §6.6): sub-rollups
+    by_measurement_coverage envelope: sub-rollups
     {by_paper_count: [{paper_count, n}], by_compartment: [{compartment, n}]}
     over the matched metabolite set.
     When search_text is provided, also includes score (per row) +
@@ -5381,7 +5381,7 @@ def _build_mbg_top_pathways_query(
     gene_categories: list[str] | None,
     transport_confidence: str | None,
 ) -> tuple[str, dict]:
-    """Build the spec § 5 verified 3-branch top_pathways UNION query.
+    """Build the verified 3-branch top_pathways UNION query.
 
     Branches:
       1. reaction-side via metabolism arm (`Reaction → Reaction_in_kegg_pathway`)
@@ -5521,7 +5521,7 @@ def _build_mbg_top_pathways_query(
 def _mbg_sort_key(row: dict, locus_index: dict[str, int]) -> tuple:
     """Global sort key for metabolites_by_gene detail rows.
 
-    Sort spec (per `docs/tool-specs/metabolites_by_gene.md` § "Sort order"):
+    Sort order:
       1. precision_tier: 0 = metabolism, 1 = transport_substrate_confirmed,
          2 = transport_family_inferred
       2. input gene order via `apoc.coll.indexOf` equivalent
@@ -5981,9 +5981,9 @@ def list_metabolite_assays(
       timepoints, detection_status_counts (+ score when searching).
     Verbose adds: treatment, light_condition, experimental_context.
 
-    `not_found` is structured per parent §11 Conv B / §13.6:
+    `not_found` is a structured dict, one bucket per batch input:
       {assay_ids: [...], metabolite_ids: [...], experiment_ids: [...],
-       publication_doi: [...]} — one bucket per batch input. Empty per field
+       publication_doi: [...]}. Empty per field
       when all matched.
 
     summary=True forces limit=0 and skips the detail query.
@@ -6247,7 +6247,7 @@ def metabolites_by_quantifies_assay(
     offset: int = 0,
     conn: GraphConnection | None = None,
 ) -> dict:
-    """Drill into numeric MetaboliteAssay edges (slice spec §4).
+    """Drill into numeric MetaboliteAssay edges.
 
     Three-query dispatch per `genes_by_numeric_metric` precedent:
       1. diagnostics — probe rankable + per-assay precomputed range
@@ -6258,11 +6258,10 @@ def metabolites_by_quantifies_assay(
 
     Tested-absent rows (`detection_status='not_detected'` / `value=0`)
     are real biology — kept in `results`, counted in `total_matching`
-    and `by_detection_status` rollups (parent §10).
+    and `by_detection_status` rollups.
 
-    `not_found` is structured per parent §13.6: one bucket per batch
-    input (`assay_ids`, `metabolite_ids`, `experiment_ids`,
-    `publication_doi`).
+    `not_found` is a structured dict, one bucket per batch input
+    (`assay_ids`, `metabolite_ids`, `experiment_ids`, `publication_doi`).
 
     Raises:
         ValueError: empty `assay_ids`; `metric_bucket` / `detection_status`
@@ -6479,23 +6478,23 @@ def metabolites_by_flags_assay(
     offset: int = 0,
     conn: GraphConnection | None = None,
 ) -> dict:
-    """Drill into boolean MetaboliteAssay edges (slice spec §5).
+    """Drill into boolean MetaboliteAssay edges.
 
     Two-query dispatch (no diagnostics — boolean tool has no rankable
-    gate per parent §13.1):
+    gate):
       1. summary — envelope rollups.
       2. detail — top-N rows; skipped when `summary=True`.
 
-    D4 / parent §11 Conv K: API coerces `flag_value: bool | None` →
-    string `'true'` / `'false'` for Cypher (KG stores boolean as string).
+    The API coerces `flag_value: bool | None` to string `'true'` /
+    `'false'` for Cypher (KG stores boolean as string).
     `flag_value=False` returns rows in this slice (KG stores both true
     and false flags; differs from DM `genes_by_boolean_metric`).
 
     Tested-absent rows (`flag_value=False`) are real biology — 62% of
-    boolean rows in the live KG. Don't default-filter (parent §10).
+    boolean rows in the live KG. Don't default-filter.
 
     `excluded_assays` and `warnings` always `[]` here (no gates) — kept
-    for cross-tool envelope-shape consistency (parent §11).
+    for cross-tool envelope-shape consistency.
 
     Raises:
         ValueError: empty `assay_ids`.
@@ -6625,10 +6624,11 @@ def assays_by_metabolite(
     conn: GraphConnection | None = None,
 ) -> dict:
     """Polymorphic reverse-lookup: metabolite IDs → measurement evidence
-    across both arms (quantifies + flags) (slice spec §6).
+    across both arms (quantifies + flags).
 
-    Cross-organism by default (D2 closure). Three-query dispatch:
-      1. existence-probe — populate flat `not_found` per parent §13.6.
+    Cross-organism by default (metabolite IDs are organism-agnostic).
+    Three-query dispatch:
+      1. existence-probe — populate flat `not_found`.
       2. summary — UNION ALL envelope rollups.
       3. detail — polymorphic rows; skipped when `summary=True`.
 
@@ -6636,15 +6636,15 @@ def assays_by_metabolite(
     timepoint*; boolean-arm rows carry flag_value/n_positive. Cross-arm
     fields explicit `None` (UNION ALL union-shape padding).
 
-    Three states for a metabolite (parent §10):
+    Three states for a metabolite:
       1. `not_found` — ID not in the KG (unmeasured).
       2. `not_matched` — ID in KG, no assay edge after filters
          (unmeasured for this scope).
       3. Row in `results` with `value=0` / `flag_value=False` /
          `detection_status='not_detected'` — *tested-absent* (real biology).
 
-    `not_found` is FLAT `list[str]` per parent §13.6 (single batch
-    input — `metabolite_ids` only). `not_matched` likewise flat.
+    `not_found` is a flat `list[str]` (single batch input —
+    `metabolite_ids` only). `not_matched` likewise flat.
 
     Raises:
         ValueError: empty `metabolite_ids`; `evidence_kind` not in
