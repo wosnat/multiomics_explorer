@@ -26,9 +26,8 @@ Notes:
   (metabolism rows have reaction_id/ec_numbers; transport rows have
   transport_confidence/tcdb_family_id; cross-arm fields default to explicit None).
 - list_metabolites passes through `measured_assay_count`, `measured_paper_count`,
-  `measured_organisms`, `measured_compartments` per row (Phase 1 measurement-rollup
-  pass-through, KG release 2026-05). Use these to find measured-and-transport-able
-  metabolites in one call.
+  `measured_organisms`, `measured_compartments` per row. Use these to find
+  measured-and-transport-able metabolites in one call.
 """
 from __future__ import annotations
 
@@ -250,8 +249,8 @@ def scenario_cross_feeding() -> None:
        the highest-reach metabolites are universal cofactors (H2O, ATP, ADP,
        Pi, PPi, NAD(P)(H)). Mitigation: pass CURRENCY_METABOLITES_MIN8 directly
        as `exclude_metabolite_ids=` on metabolites_by_gene / genes_by_metabolite
-       (Phase 2 tool-side filter — set-difference, exclude wins on overlap;
-       envelope rollups also benefit). Extend the blacklist if H+, glutamate/
+       (tool-side set-difference; exclude wins on overlap; envelope rollups
+       also benefit). Extend the blacklist if H+, glutamate/
        glutamine, or coenzyme A dominate results in your seed. The printed
        output deliberately keeps H+ outside the minimal-8 blacklist — proton
        channels (MotA/TolQ/ExbB family) surface in the transport arm and
@@ -260,9 +259,9 @@ def scenario_cross_feeding() -> None:
        annotations propagate ~554 metabolites per MED4 gene at low confidence.
        Mitigation: transport_confidence='substrate_confirmed' on Step 2.
     3. Transport polarity not encoded — TCDB annotation says 'transports X'
-       without import/export direction (KG-MET-011 retired; permanently
-       unmitigable). Even with clean filters, the result is 'compatible
-       with cross-feeding', never confirmed.
+       without import/export direction (permanently unmitigable). Even
+       with clean filters, the result is 'compatible with cross-feeding',
+       never confirmed.
 
     Seed choice: 6 MED4 N-metabolism genes derived live from
     genes_by_ontology(ontology='kegg', term_ids=['kegg.pathway:ko00910']).
@@ -346,8 +345,8 @@ def scenario_cross_feeding() -> None:
     print("  CAVEATS — Workflow B′ is 'compatible with cross-feeding', never confirmed:")
     print("    1. Currency cofactors blacklisted above (mitigated)")
     print("    2. transport_confidence filter applied (mitigated for ABC plateau)")
-    print("    3. Transport polarity not encoded — KG-MET-011 retired (permanently")
-    print("       unmitigable; TCDB lacks direction upstream). The Track-B measurement")
+    print("    3. Transport polarity not encoded (permanently unmitigable;")
+    print("       TCDB lacks direction upstream). The Track-B measurement")
     print("       layer can corroborate (extracellular elevation in coculture) but")
     print("       cannot confirm causality.")
     print()
@@ -505,8 +504,8 @@ def scenario_tcdb_chain() -> None:
       - Family-anchored is the right primitive for 'what does this family
         transport?' or 'which genes are in this family?' — different shape.
       - The substrate_confirmed vs no-filter call is question-shape-dependent
-        per analysis-doc §g (annotations ≠ ground truth; transporter
-        specificity is often promiscuous in nature).
+        (annotations are not ground truth; transporter specificity is often
+        promiscuous in nature).
     """
     print("=== Scenario: tcdb_chain ===")
     print("Question class: 'which genes transport this substrate?' "
@@ -586,17 +585,17 @@ def scenario_tcdb_chain() -> None:
     print(f"  - For 'what does family Y transport?' or 'which genes are in family Y?' — use C.")
     print()
     print("Filter call (substrate_confirmed vs no filter) is question-shape-dependent.")
-    print("See analysis-doc §g — both tiers are annotations, neither is ground truth;")
-    print("transporter specificity is often promiscuous or under-characterized in nature.")
+    print("Both tiers are annotations, neither is ground truth; transporter")
+    print("specificity is often promiscuous or under-characterized in nature.")
 
 
 def scenario_measurement() -> None:
     """Use this when the user asks 'what metabolites change under P stress in MIT9301?'
 
     Sources: metabolomics measurement (mass-spec layer; no gene anchor).
-    Caveats surfaced: tested-absent vs unmeasured (parent §10); compartment matters;
-    targeted panel ≠ full metabolome; replicate / normalisation conventions vary
-    by paper.
+    Caveats surfaced: tested-absent vs unmeasured; compartment matters;
+    targeted panel is not the full metabolome; replicate / normalisation
+    conventions vary by paper.
 
     Demonstrates the four Track-B native tools end-to-end:
       list_metabolite_assays → metabolites_by_quantifies_assay (numeric arm)
@@ -605,7 +604,7 @@ def scenario_measurement() -> None:
     plus list_metabolites for chemistry-layer enrichment of the measured set.
 
     The Kujawinski et al. (10.1128/msystems.01261-22) phosphorus experiments
-    on MIT9301 are the only P-stress metabolomics today; the chitin paper
+    on MIT9301 are the only P-stress metabolomics in the KG; the chitin paper
     (10.1073/pnas.2213271120) and vesicle paper (10.1111/1462-2920.15834)
     cover other treatments.
     """
@@ -628,7 +627,7 @@ def scenario_measurement() -> None:
     print(f"  by_value_kind: {[(v.get('value_kind'), v.get('count')) for v in (p_assays.get('by_value_kind') or [])]}")
     print(f"  by_compartment: {[(c.get('compartment'), c.get('count')) for c in (p_assays.get('by_compartment') or [])]}")
     print(
-        "  by_detection_status (numeric arm — primary headline per audit §4.3.3): "
+        "  by_detection_status (numeric arm primary headline): "
         f"{[(d.get('detection_status'), d.get('count')) for d in (p_assays.get('by_detection_status') or [])]}"
     )
     print()
@@ -726,11 +725,11 @@ def scenario_measurement() -> None:
     print("  - No gene anchor — measurement says nothing about which gene produced/consumed it.")
     print("  - Quantifies (concentration) vs Flags (qualitative detection) — different drill-downs.")
     print("  - Compartment matters — whole_cell ≠ extracellular ≠ vesicle biology.")
-    print("  - Tested-absent ≠ unmeasured (parent §10) — value=0 / detection_status='not_detected'")
-    print("    / flag_value=False rows are biology, kept by default; missing rows are unmeasured.")
-    print("  - Targeted panel — absence in measurement ≠ absence in cell.")
-    print("  - 149 of 3230 metabolites measured; 3 papers; 14 assays (12 numeric + 2 boolean);")
-    print("    12 experiments (KG release 2026-05-06).")
+    print("  - Tested-absent is not the same as unmeasured — value=0 /")
+    print("    detection_status='not_detected' / flag_value=False rows are biology,")
+    print("    kept by default; missing rows are unmeasured.")
+    print("  - Targeted panel — absence in measurement is not absence in cell.")
+    print("  - 149 of 3230 metabolites measured; 3 papers; 14 assays (12 numeric + 2 boolean).")
 
 
 SCENARIOS: dict[str, Callable[[], None]] = {
