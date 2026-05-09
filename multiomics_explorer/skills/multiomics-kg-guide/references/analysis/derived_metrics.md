@@ -79,8 +79,8 @@ if "categorical" in row["derived_metric_value_kinds"]:
 **Search-text reach:** `list_experiments(search_text="diel amplitude")` and
 `list_publications(search_text="vesicle proteome")` route through DM tokens
 (name, metric_type, field_description, compartment) because the fulltext index
-was enriched in the 2026-04-27 KG build. `genes_by_function` is NOT enriched
-with DM tokens — measuring `damping_ratio` on a gene does not make it part of the
+is enriched with DM tokens. `genes_by_function` is NOT enriched with DM
+tokens — measuring `damping_ratio` on a gene does not make it part of the
 gene's function.
 
 ---
@@ -150,10 +150,11 @@ result = api.genes_by_numeric_metric(
 
 ## Notes on current KG constraints
 
-- `genes_by_boolean_metric(flag=False)` returns 0 rows today — the KG stores only
-  positive (True) flag edges. `dm_false_count=0` on every current DM.
-- `genes_by_numeric_metric` with `has_p_value=True` gate raises today — no numeric
-  DM currently has p-values. Check `has_p_value` on `list_derived_metrics` output
-  before using the p-value filter.
+- `genes_by_boolean_metric(flag=False)` returns 0 rows in the current KG —
+  the KG stores only positive (True) flag edges. `dm_false_count=0` on every
+  current DM.
+- `genes_by_numeric_metric` with `has_p_value=True` gate raises in the current
+  KG — no numeric DM currently has p-values. Check `has_p_value` on
+  `list_derived_metrics` output before using the p-value filter.
 - `compartment` on `DerivedMetric` is a property of the DM node (the wet-lab
   fraction the measurement came from), not a per-gene property.

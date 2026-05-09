@@ -22,7 +22,7 @@ The `Metabolite.evidence_sources` list field on each Metabolite node already ind
 
 Always restate the row's caveats when the answer touches it. The LLM should never claim:
 
-- "This gene produces X" — only "this gene catalyses a reaction involving X". This is the permanent convention: upstream KEGG annotation direction is unreliable, so the KG intentionally stays undirected (Part 4 §4.1.1 resolved 2026-05-04).
+- "This gene produces X" — only "this gene catalyses a reaction involving X". This is the permanent convention: upstream KEGG annotation direction is unreliable, so the KG intentionally stays undirected.
 - "This gene transports X" without qualifying tier — when `transport_confidence='family_inferred'`, the gene is annotated to a non-leaf TCDB family whose curated substrate set was rolled up from descendant leaves; we don't know which specific subfamily (and thus which specific substrate set) applies. Say "this gene belongs to a TCDB family that includes leaf-level transporters of X — we can't tell from the annotation which leaf, so X is candidate-only".
 - "Metabolite X was not produced under condition Y" based on metabolomics absence — say "X was not detected in the targeted panel under condition Y" (targeted ≠ comprehensive).
 
@@ -30,7 +30,7 @@ Always restate the row's caveats when the answer touches it. The LLM should neve
 
 ## Track A1 — Reaction (KEGG) annotation
 
-For the chemistry the gene's reaction is involved in via curated KEGG annotations. Always restate inline: KO inference may be putative; reaction direction is **permanently undirected** in this KG (upstream KEGG direction is unreliable); promiscuous enzymes inflate counts. Reversibility is also not encoded on `Reaction` nodes — KEGG lacks an `is_reversible` flag upstream, so the KG carries no direction *and* no reversibility on reactions (audit §4.1.2 RESOLVED — permanently unmitigable, not a queued ask).
+For the chemistry the gene's reaction is involved in via curated KEGG annotations. Always restate inline: KO inference may be putative; reaction direction is **permanently undirected** in this KG (upstream KEGG direction is unreliable); promiscuous enzymes inflate counts. Reversibility is also not encoded on `Reaction` nodes — KEGG lacks an `is_reversible` flag upstream, so the KG carries no direction *and* no reversibility on reactions (permanently unmitigable).
 
 ### a — Metabolite discovery & filtering
 
@@ -82,9 +82,9 @@ result = metabolites_by_gene(
 # (chemistry-pathway distinction — see caveat below).
 ```
 
-**`by_element` semantics — presence-only, not stoichiometric.** Each row carries `metabolite_count` = the count of *distinct compounds in the full match set* that contain that element at all. E.g., `[('H', 6), ('O', 6), ('P', 6), ('C', 5), ('N', 4)]` over 6 distinct compounds means 6 contain H/O/P, 5 contain C, 4 contain N. It does **not** count atoms per compound (stoichiometry lives in `metabolite.formula`, e.g. `HO7P2` for diphosphate), and it is **not** mass-balanced across reactions — the KG intentionally carries no substrate-vs-product role on `Reaction_has_metabolite` (Part 4 §4.1.1 resolved). The per-row `elements` field is the same shape: a set of symbols, no counts. The envelope aggregates over `total_matching`, not the truncated page.
+**`by_element` semantics — presence-only, not stoichiometric.** Each row carries `metabolite_count` = the count of *distinct compounds in the full match set* that contain that element at all. E.g., `[('H', 6), ('O', 6), ('P', 6), ('C', 5), ('N', 4)]` over 6 distinct compounds means 6 contain H/O/P, 5 contain C, 4 contain N. It does **not** count atoms per compound (stoichiometry lives in `metabolite.formula`, e.g. `HO7P2` for diphosphate), and it is **not** mass-balanced across reactions — the KG intentionally carries no substrate-vs-product role on `Reaction_has_metabolite`. The per-row `elements` field is the same shape: a set of symbols, no counts. The envelope aggregates over `total_matching`, not the truncated page.
 
-**Caveat — `top_metabolite_pathways` is metabolite-anchored, NOT KO-anchored.** The chemistry-side `top_metabolite_pathways` traverses `Metabolite → KeggTerm` via the denormalized `m.pathway_ids` field (sourced from `Metabolite_in_pathway` edges; KG-A5 rollup). Target pathways are filtered by `KeggTerm.reaction_count >= 3` to drop signaling/disease pathways with no chemistry breadth — that's a *gate* on the target node, not part of the traversal. So this rollup answers **"which pathways do my gene's metabolites participate in?"** Naming convention (Option A, locked Phase 2): the envelope key is **`top_metabolite_pathways`** with per-element keys `metabolite_pathway_id` / `metabolite_pathway_name`, distinct from **ko-pathway** annotations (anchored on `Gene → KeggTerm` via the KO hierarchy, surfaced by `genes_by_ontology(ontology="kegg", ...)`, `pathway_enrichment`, etc.). They reach the same KEGG pathway maps but via different membership relations. Disambiguate explicitly when answering.
+**Caveat — `top_metabolite_pathways` is metabolite-anchored, NOT KO-anchored.** The chemistry-side `top_metabolite_pathways` traverses `Metabolite → KeggTerm` via the denormalized `m.pathway_ids` field (sourced from `Metabolite_in_pathway` edges). Target pathways are filtered by `KeggTerm.reaction_count >= 3` to drop signaling/disease pathways with no chemistry breadth — that's a *gate* on the target node, not part of the traversal. So this rollup answers **"which pathways do my gene's metabolites participate in?"** The envelope key is **`top_metabolite_pathways`** with per-element keys `metabolite_pathway_id` / `metabolite_pathway_name`, distinct from **ko-pathway** annotations (anchored on `Gene → KeggTerm` via the KO hierarchy, surfaced by `genes_by_ontology(ontology="kegg", ...)`, `pathway_enrichment`, etc.). They reach the same KEGG pathway maps but via different membership relations. Disambiguate explicitly when answering.
 
 ---
 
@@ -131,11 +131,11 @@ Both tiers are annotations, not ground truth. `substrate_confirmed` reflects "a 
 
 - **`transport_confidence='substrate_confirmed'`** — narrower, more conservative cast. Use when the downstream inference is fragile (cross-organism cross-feeding) or when over-claiming specific substrates would mislead.
 - **No filter / both tiers** — broader cast that includes family-level potential. Use for screening questions ("which transporters could plausibly act on N substrates?") where you'd rather over-include and let downstream evidence (e.g. DE response) anchor the functional interpretation. Real N-uptake transporters in MED4 (PMM0263 amt1, PMM0628 gltS) are family_inferred — `substrate_confirmed` would silently exclude them.
-- **Pivot** for a single transporter family: `genes_by_ontology(ontology="tcdb", term_ids=[...])`. (But for substrate-anchored questions — "which genes transport X" — prefer the metabolite-anchored route in §b2.)
+- **Pivot** for a single transporter family: `genes_by_ontology(ontology="tcdb", term_ids=[...])`. (But for substrate-anchored questions — "which genes transport X" — prefer the metabolite-anchored route under "Track A2 — Transport (TCDB) annotation".)
 
 The family_inferred-dominance auto-warning is informational, not a defect signal: it tells you most rows came from family-level inheritance so you can pick a confidence tier deliberately.
 
-Empirical scale (KG release 2026-05-05 post-TCDB-bug-fix): per-gene metabolite count via transport — median 4, p90 48, max **992**. In MED4 specifically, **12 genes** sit at the ABC-superfamily plateau (554 metabolites each): PMM0125, PMM0392, PMM0434, PMM0449, PMM0450, PMM0666, PMM0749, PMM0750, PMM0913, PMM0976, PMM0977, PMM0978. Expect family_inferred-dominance warnings when querying common metabolites against MED4.
+Empirical scale: per-gene metabolite count via transport — median 4, p90 48, max **992**. In MED4 specifically, **12 genes** sit at the ABC-superfamily plateau (554 metabolites each): PMM0125, PMM0392, PMM0434, PMM0449, PMM0450, PMM0666, PMM0749, PMM0750, PMM0913, PMM0976, PMM0977, PMM0978. Expect family_inferred-dominance warnings when querying common metabolites against MED4.
 
 ---
 
@@ -151,9 +151,9 @@ Workflows that cross both reaction and transport arms, or that consume the annot
 
 | # | Confounder | Arm | Mitigation |
 |---|---|---|---|
-| 1 | **Currency cofactors flood the rollup.** `top_metabolites` is sorted by gene_count, which is exactly the wrong sort for cross-feeding because the highest-reach metabolites are universal (H2O, ATP/ADP/AMP, Pi, PPi, NAD(P)(H), CO2). | metabolism | Pass `exclude_metabolite_ids=CURRENCY_METABOLITES_MIN8` directly on the next call (Phase 2 tool-side filter — pushes the mitigation into the query so envelope rollups also benefit; available on `list_metabolites`, `genes_by_metabolite`, `metabolites_by_gene`). Minimal-8 (H2O, CO2, ATP, ADP, AMP, Pi, PPi, NAD(P)(H)) is the conservative default — see `examples/metabolites.py::CURRENCY_METABOLITES_MIN8`. Extend with H+, Glu/Gln, CoA, FAD if the seed pulls them in (these are borderline and depend on whether you care about central-N flux as a signal). Set-difference semantics with `metabolite_ids` — exclude wins on overlap. |
-| 2 | **Family-level transport casts a wide net.** Broad-substrate TCDB families (especially ABC superfamily) inherit ~554 substrates per MED4 gene via family rollup. Substrate specificity is often unknown or context-dependent in nature — `family_inferred` reflects family-level potential, not measured per-substrate confirmation. For cross-feeding *inferences* (which over-claim a specific substrate flowing between organisms), the conservative `substrate_confirmed` cast is preferable. | transport | `transport_confidence='substrate_confirmed'` on the Step-2 `genes_by_metabolite` call. Empirical: in a 7-metabolite N-cross test against ALT this narrowed transport rows 1426 → 185, leaving the curated CmpA/NrtA-family nitrate transporters. **Note:** for *broad-screen* questions (e.g. "which transporters could plausibly act on N?", scenario `n_source_de`) the opposite call applies — drop the filter so family_inferred biology is included; see §g. |
-| 3 | **Transport polarity not encoded.** TCDB annotation says "transports X" without import/export direction — KG-MET-011 retired (TCDB lacks direction upstream; permanently unmitigable, not a queued ask). Even with clean filters, "MED4 has cynA, ALT has nrtA" tells you both touch the substrate, not who's the producer. | both | None on the annotation side — surface the limitation in the answer ("compatible with", not "confirmed"). The Track-B measurement layer can corroborate (extracellular elevation in coculture) but cannot confirm causality. |
+| 1 | **Currency cofactors flood the rollup.** `top_metabolites` is sorted by gene_count, which is exactly the wrong sort for cross-feeding because the highest-reach metabolites are universal (H2O, ATP/ADP/AMP, Pi, PPi, NAD(P)(H), CO2). | metabolism | Pass `exclude_metabolite_ids=CURRENCY_METABOLITES_MIN8` directly on the next call (tool-side filter — pushes the mitigation into the query so envelope rollups also benefit; available on `list_metabolites`, `genes_by_metabolite`, `metabolites_by_gene`). Minimal-8 (H2O, CO2, ATP, ADP, AMP, Pi, PPi, NAD(P)(H)) is the conservative default — see `examples/metabolites.py::CURRENCY_METABOLITES_MIN8`. Extend with H+, Glu/Gln, CoA, FAD if the seed pulls them in (these are borderline and depend on whether you care about central-N flux as a signal). Set-difference semantics with `metabolite_ids` — exclude wins on overlap. |
+| 2 | **Family-level transport casts a wide net.** Broad-substrate TCDB families (especially ABC superfamily) inherit ~554 substrates per MED4 gene via family rollup. Substrate specificity is often unknown or context-dependent in nature — `family_inferred` reflects family-level potential, not measured per-substrate confirmation. For cross-feeding *inferences* (which over-claim a specific substrate flowing between organisms), the conservative `substrate_confirmed` cast is preferable. | transport | `transport_confidence='substrate_confirmed'` on the Step-2 `genes_by_metabolite` call. Empirical: in a 7-metabolite N-cross test against ALT this narrowed transport rows 1426 → 185, leaving the curated CmpA/NrtA-family nitrate transporters. **Note:** for *broad-screen* questions (e.g. "which transporters could plausibly act on N?", scenario `n_source_de`) the opposite call applies — drop the filter so family_inferred biology is included; see the broad-screen note below. |
+| 3 | **Transport polarity not encoded.** TCDB annotation says "transports X" without import/export direction (TCDB lacks direction upstream; permanently unmitigable). Even with clean filters, "MED4 has cynA, ALT has nrtA" tells you both touch the substrate, not who's the producer. | both | None on the annotation side — surface the limitation in the answer ("compatible with", not "confirmed"). The Track-B measurement layer can corroborate (extracellular elevation in coculture) but cannot confirm causality. |
 
 **Pattern (two-step, with all three mitigations applied):**
 
@@ -176,7 +176,7 @@ seed_locus_tags = sorted({r["locus_tag"] for r in seed["results"]})
 # 1. Harvest MED4-side metabolite IDs from gene-anchored chemistry. Apply
 #    confounder #1 mitigation at the tool level via `exclude_metabolite_ids`
 #    so the envelope's `top_metabolites` rollup itself is currency-free
-#    (Phase 2 tool-side filter; set-difference semantics, exclude wins on overlap).
+#    (tool-side set-difference; exclude wins on overlap).
 med4_chem = metabolites_by_gene(
     locus_tags=seed_locus_tags,
     organism="MED4",
@@ -202,7 +202,7 @@ alt_metab = genes_by_metabolite(
     evidence_sources=["metabolism"],
     exclude_metabolite_ids=CURRENCY,
 )
-# Frame results as "compatible with cross-feeding" — confounder #3 unmitigable today.
+# Frame results as "compatible with cross-feeding" — confounder #3 is unmitigable.
 ```
 
 See `examples/metabolites.py --scenario cross_feeding` for the runnable end-to-end with both arms printed and the cyn-cluster + glnA + glsF seed.
@@ -247,7 +247,7 @@ The same KEGG pathway map (e.g. `kegg.pathway:ko00910` Nitrogen metabolism) can 
 
 ## Tested-absent vs unmeasured
 
-> **Top-level invariant for the metabolomics layer.** Codified in Phase 5 spec §10 and propagated across the 4 metabolomics tools (`list_metabolite_assays`, `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`, `assays_by_metabolite`). Read this once; it determines how every row of every drill-down output is interpreted.
+> **Top-level invariant for the metabolomics layer.** Propagated across the 4 metabolomics tools (`list_metabolite_assays`, `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`, `assays_by_metabolite`). Read this once; it determines how every row of every drill-down output is interpreted.
 
 In metabolomics, **two row states must not be conflated**:
 
@@ -269,9 +269,9 @@ Tested-absent rows answer the biological question "is X actually absent under co
 | Edge-level filters (`value_min > 0`, `detection_status` list excluding `not_detected`, `flag_value=True`) | Caller-surfaced; never silently default-on. Each one drops tested-absent rows when set. |
 | `assays_by_metabolite` `not_found` / `not_matched` buckets | **Unmeasured-only**. Tested-absent rows go in `results`, not these buckets. |
 
-### Empirical scale (KG release 2026-05-06)
+### Empirical scale
 
-Audit §4.3.3 named `detection_status` (`detected / sporadic / not_detected`) the primary headline summary for the metabolomics layer. The breakdown shows tested-absent dominates:
+`detection_status` (`detected / sporadic / not_detected`) is the primary headline summary for the metabolomics layer. The breakdown shows tested-absent dominates:
 
 - **Numeric arm (12 assays):** 70.7% of `Assay_quantifies` edges are `not_detected` (1046 of 1480 rows). Tested-absent is the majority signal, not an exception.
 - **Boolean arm (2 assays, 186 rows total):** 68.8% have `flag_value = false` (128 of 186 rows).
@@ -282,15 +282,13 @@ Default-filtering tested-absent rows would discard the majority of measured biol
 ### Tool-specific framing
 
 - **`list_metabolite_assays`** (discovery / pre-flight): envelope `by_detection_status` rollup over numeric assays; per-row `detection_status_counts` on numeric rows. Use this surface to gauge tested-absent share before drilling.
-- **`metabolites_by_quantifies_assay`** (numeric drill-down): `by_detection_status` is the primary headline (audit §4.3.3). Edge-level `value_min > 0` and `detection_status` filters surfaced as caller choices, never default-on.
+- **`metabolites_by_quantifies_assay`** (numeric drill-down): `by_detection_status` is the primary headline. Edge-level `value_min > 0` and `detection_status` filters surfaced as caller choices, never default-on.
 - **`metabolites_by_flags_assay`** (boolean drill-down): `by_flag_value` mirror; `flag_value=False` is the explicit way to ask for tested-absent rows.
 - **`assays_by_metabolite`** (reverse lookup): `not_found` / `not_matched` buckets are unmeasured-only — the metabolite was never in the KG's metabolomics scope. Tested-absent rows for IN-scope metabolites are in `results`.
 
 ### Cross-references
 
-- Phase 5 spec: `docs/tool-specs/2026-05-05-phase5-greenfield-assay-tools.md` §10.
-- Tool-level YAML mistakes (each carries the wrong/right pair): `inputs/tools/list_metabolite_assays.yaml`, plus the 3 drill-down YAMLs once they ship.
-- Audit history: 2026-05-04 metabolites-surface-audit §4.3.3 (`detection_status` resolution); §4.5 (other interpretation traps).
+- Tool-level YAML mistakes (each carries the wrong/right pair): `inputs/tools/list_metabolite_assays.yaml`, plus the 3 drill-down YAMLs.
 
 ---
 
@@ -299,7 +297,7 @@ Default-filtering tested-absent rows would discard the majority of measured biol
 Four native tools cover the measurement layer (no `run_cypher` needed):
 
 - **`list_metabolite_assays`** — discovery surface. Inspect `value_kind` (numeric/boolean → routes drill-down), `rankable` (gates `metric_bucket` / `metric_percentile_*` / `rank_by_metric_max` on the numeric drill-down), `compartment`, and per-row `detection_status_counts` (numeric assays) before drilling.
-- **`metabolites_by_quantifies_assay`** — numeric-arm drill-down. One row per (metabolite × assay-edge) with `value`, `detection_status`, `timepoint*` and rankable-gated `metric_bucket` / `metric_percentile` / `rank_by_metric`. `by_detection_status` is the primary headline (audit §4.3.3).
+- **`metabolites_by_quantifies_assay`** — numeric-arm drill-down. One row per (metabolite × assay-edge) with `value`, `detection_status`, `timepoint*` and rankable-gated `metric_bucket` / `metric_percentile` / `rank_by_metric`. `by_detection_status` is the primary headline.
 - **`metabolites_by_flags_assay`** — boolean-arm drill-down. Edge filter `flag_value` (`True` = presence flagged, `False` = tested-absent — real biology, 68.8% of boolean rows in the live KG).
 - **`assays_by_metabolite`** — polymorphic reverse lookup. Cross-organism by default. Numeric rows carry `value` / `detection_status` / `timepoint*`; boolean rows carry `flag_value` / `n_positive`. Cross-arm fields explicit `None` (union-shape padding).
 
@@ -310,7 +308,7 @@ Four native tools cover the measurement layer (no `run_cypher` needed):
 - **Compartment matters.** `whole_cell` measures pool; `extracellular` measures excretion / uptake / spent media; `vesicle` measures cargo packaged into extracellular vesicles. Filter via the `compartment=` kwarg on every Track-B tool.
 - **Targeted panel ≠ full metabolome.** Absence in measurement ≠ absence in cell. The current KG covers 149 distinct metabolites across 14 assays in 3 papers — out of 3230 metabolites total, so ~95% have no measurement coverage.
 - **Replicate / normalisation conventions vary by paper.** Read `value_sd` and `n_replicates` on the edge, plus `field_description` on the parent assay (canonical provenance read — `verbose=True` surfaces it). The `value` itself is processed per the paper's pipeline.
-- **Tested-absent vs unmeasured.** See "Tested-absent vs unmeasured" above — the §10 invariant. Tested-absent rows (`value=0` / `detection_status='not_detected'` / `flag_value=false`) are biology, not noise; default-filtering them strips the majority of the layer.
+- **Tested-absent vs unmeasured.** See "Tested-absent vs unmeasured" above — the top-level invariant. Tested-absent rows (`value=0` / `detection_status='not_detected'` / `flag_value=false`) are biology, not noise; default-filtering them strips the majority of the layer.
 
 ### Discovery
 
@@ -329,7 +327,7 @@ p_assays = list_metabolite_assays(treatment_type=["phosphorus"], rankable=True)
 # excluded_assays if you pass rankable-gated filters with mixed input).
 ```
 
-Live KG state (2026-05-06):
+Current KG state:
 
 | Paper | Assays | Compartments | Value kinds | Note |
 |---|---|---|---|---|
@@ -382,7 +380,7 @@ result = assays_by_metabolite(
 # flag_value / n_positive. Cross-arm fields are explicit None.
 # Envelope: by_evidence_kind (quantifies vs flags split), by_detection_status,
 # by_flag_value, by_assay, by_organism, by_compartment.
-# Three states per metabolite (parent §10):
+# Three states per metabolite:
 #   1. id in `not_found`      → not in KG (unmeasured)
 #   2. id in `not_matched`    → in KG, no edge after filters (unmeasured for this scope)
 #   3. row in `results` with `value=0` / `flag_value=false` → tested-absent (real biology)
@@ -411,14 +409,14 @@ mvals = metabolites_by_quantifies_assay(
 )
 
 # 2. Expression evidence — which P-acting genes responded under N starvation
-#    (or P-stress). Follow Track A combined §e (metabolites_by_gene
-#    metabolite_elements=['P'] → differential_expression_by_gene).
+#    (or P-stress). Follow the chemistry-filtered DE pattern below
+#    (metabolites_by_gene metabolite_elements=['P'] → differential_expression_by_gene).
 
 # 3. Surface both with their caveats; do not conflate "metabolite changed" with
 #    "metabolite caused effect" or vice versa.
 ```
 
-Time-point alignment between metabolomics and expression assays still varies by paper — confirm experiment `id` matches before joining (today's metabolomics has no nitrogen-stress experiments, so the canonical N-DE workflow can't be mirrored on the metabolite side; phosphorus and carbon are the available stress-treatment cross-omics pairings).
+Time-point alignment between metabolomics and expression assays still varies by paper — confirm experiment `id` matches before joining (the current KG has no nitrogen-stress metabolomics experiments, so the canonical N-DE workflow can't be mirrored on the metabolite side; phosphorus and carbon are the available stress-treatment cross-omics pairings).
 
 ---
 
@@ -433,9 +431,9 @@ User asks about a metabolite or chemistry
 ├─ "Which metabolites does gene X act on?" → metabolites_by_gene
 ├─ "Find metabolite by name → metabolite_id" → list_metabolites(search_text="...")  ← name-search hook; precedes any compound-anchored chain
 ├─ "Find metabolites by element / pathway / mass" → list_metabolites
-├─ "Cross-feeding between organisms" → Track A combined §d
-├─ "N-source / chemistry-filtered DE" → Track A combined §e
-├─ "Genes that transport substrate X" → Track A combined §f (metabolite-anchored)
+├─ "Cross-feeding between organisms" → Track A "Cross-feeding inferences" workflow
+├─ "N-source / chemistry-filtered DE" → Track A "Chemistry-filtered DE" workflow
+├─ "Genes that transport substrate X" → Track A metabolite-anchored transport route
 ├─ "Genes annotated to TCDB family / KEGG term" → genes_by_ontology
 ├─ "What metabolomics assays exist for treatment / paper / organism?" → list_metabolite_assays  (Track B discovery)
 ├─ "Was metabolite M measured? At what level?" → assays_by_metabolite (cross-organism reverse lookup)

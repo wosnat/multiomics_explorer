@@ -56,7 +56,7 @@ Calls `differential_expression_by_gene` and partitions the result into clusters 
 - `gene_sets` — dict of cluster → significant DE locus_tags (respects `direction` and
   `significant_only`).
 - `background` — dict of cluster → all quantified locus_tags for that experiment/timepoint
-  (the `table_scope` universe; see §9).
+  (the `table_scope` universe; see "Background" below).
 - `cluster_metadata` — dict of cluster → experiment context fields.
 - `not_found`, `not_matched`, `no_expression` — partial-failure buckets (individual
   experiments with problems do not raise; they are collected here).
@@ -68,12 +68,12 @@ Accepts any gene-set source — not just DE results: construct
 `EnrichmentInputs(gene_sets=..., background=..., organism_name=...,
 cluster_metadata=...)` directly when you have hand-curated sets
 (`cluster_metadata` can be `{cluster_key: {}}` if you have no per-cluster
-context to attach). Returns an `EnrichmentResult` object (see §18)
+context to attach). Returns an `EnrichmentResult` object (see "EnrichmentResult accessors" below)
 carrying a long DataFrame (one row per cluster × term pair) with
 compareCluster-compatible columns at `result.results`.
 
 The size filter acts on **M** (pathway members within the cluster's
-background), not the global pathway size. See §12 Gotchas.
+background), not the global pathway size. See "Gotchas" below.
 
 ### `signed_enrichment_score(df, direction_col='direction', padj_col='p_adjust')`
 
@@ -118,7 +118,7 @@ df_landscape.sort_values("relevance_rank").head(10)
 ```
 
 `relevance_rank` bakes in both genome coverage and median term size; experiment-specific
-coverage is incorporated when you supply `experiment_ids`. See §10 for the full narrative.
+coverage is incorporated when you supply `experiment_ids`. See "Choosing an ontology and level" below for the full narrative.
 
 ---
 
@@ -406,8 +406,8 @@ buckets that "enrich" trivially in any DE set:
   are similarly genome-spanning.
 
 Surfacing such terms at the top of an enrichment ranking is misleading and crowds out
-the smaller, more diagnostic terms below them. The `2026-05` default flip aligns enrichment
-with the rest of the F1 informativeness work in Cluster A — `ontology_landscape`,
+the smaller, more diagnostic terms below them. The default `informative_only=True` aligns
+enrichment with the rest of the informativeness surface — `ontology_landscape`,
 `search_ontology`, `genes_by_ontology`, and `gene_ontology_terms` all default to
 `informative_only=True`. Without this default, "discovery says X is rank-1 (uninformative
 excluded), enrichment includes it anyway" creates a tool inconsistency callers would
@@ -472,7 +472,7 @@ are flagged, prior enrichment runs become non-reproducible — the term set that
 
 ## 10. Choosing an ontology and level (narrative)
 
-Use `ontology_landscape` (§3) to scout before committing to an ontology and level. The key
+Use `ontology_landscape` to scout before committing to an ontology and level. The key
 signals are:
 
 - **`genome_coverage`** — fraction of the organism's genes that appear in at least one term at
@@ -586,7 +586,7 @@ collect the per-cluster `pvalue` values and apply BH across the full table manua
 
 The column names `gene_ratio`, `bg_ratio`, `rich_factor`, `fold_enrichment`, `count`, and
 `bg_count` are deliberately clusterProfiler-compatible; `cluster` maps to clusterProfiler's
-`Cluster`; `term_id` / `term_name` map to `ID` / `Description`. See §15 for the full mapping.
+`Cluster`; `term_id` / `term_name` map to `ID` / `Description`. See "Output schema" below for the full mapping.
 
 ---
 
@@ -598,7 +598,7 @@ The column names `gene_ratio`, `bg_ratio`, `rich_factor`, `fold_enrichment`, `co
 ORA from experiment IDs without writing Python.
 
 For cluster-membership enrichment, use the `cluster_enrichment` MCP tool — it automates the
-pattern from §5 in a single call. For ortholog groups or custom gene lists, use the Python
+end-to-end pattern in a single call. For ortholog groups or custom gene lists, use the Python
 primitives directly.
 
 Examples, parameter details, and chaining patterns are in `docs://tools/pathway_enrichment`.
@@ -752,5 +752,4 @@ in the Python API (`.explain()` / accessors).
   3292–3320 (2024). doi:10.1038/s41596-024-01020-z
 - Yu, G. et al. clusterProfiler: an R Package for Comparing Biological Themes Among Gene
   Clusters. *OMICS* **16**, 284–287 (2012).
-- B1 analysis: `multiomics_research/analyses/2026-04-09-1713-pathway_enrichment_b1/`
 - Runnable examples: `docs://examples/pathway_enrichment.py`
