@@ -2,10 +2,9 @@
 
 ## What it does
 
-Get the knowledge graph schema: node labels with property names/types,
-and relationship types with source/target labels.
+Return the KG schema: node labels with property names/types and relationship types with source/target labels.
 
-Use this before run_cypher to understand what labels and properties are queryable.
+Use before `run_cypher` to discover queryable labels/properties. For an entity-level overview see `docs://guide/concepts`; for filter-value enumeration use `list_filter_values`.
 
 ## Parameters
 

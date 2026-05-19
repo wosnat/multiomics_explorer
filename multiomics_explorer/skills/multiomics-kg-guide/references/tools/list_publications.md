@@ -2,16 +2,9 @@
 
 ## What it does
 
-List publications with expression data in the knowledge graph.
+List publications with experiment summaries, DM rollups, and metabolomics rollups. Use as the discovery entry point for studies.
 
-Returns publication metadata and experiment summaries. Use this as
-an entry point to discover what studies exist.
-
-After this tool, drill in via:
-- list_experiments(publication_doi=[doi]) for per-experiment detail
-- genes_by_function(organism=...) / genes_by_ontology(organism=..., term_ids=...) for gene discovery scoped to the publication's organism(s)
-- list_clustering_analyses(publication_doi=[doi]) for clustering analyses
-- list_derived_metrics(publication_doi=[doi]) for non-DE evidence
+Routing: drill via `list_experiments(publication_doi=[doi])` for per-experiment detail; `list_clustering_analyses(publication_doi=[doi])` for clustering; `list_derived_metrics(publication_doi=[doi])` for non-DE evidence; `list_metabolite_assays(publication_doi=[doi])` when `metabolite_count > 0`. Per-row `derived_metric_value_kinds` routes to `genes_by_{numeric,boolean,categorical}_metric`.
 
 ## Parameters
 
@@ -39,53 +32,56 @@ After this tool, drill in via:
 total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, by_value_kind, by_metric_type, by_compartment, returned, offset, truncated, not_found, results
 ```
 
-- **total_entries** (int): Total publications in KG (unfiltered)
-- **total_matching** (int): Publications matching filters
-- **by_organism** (list[PubOrganismBreakdown]): Publication counts per organism, sorted by count descending
-- **by_treatment_type** (list[PubTreatmentTypeBreakdown]): Publication counts per treatment type, sorted by count descending
-- **by_background_factors** (list[PubBackgroundFactorBreakdown]): Publication counts per background factor, sorted by count descending
-- **by_omics_type** (list[PubOmicsTypeBreakdown]): Publication counts per omics platform, sorted by count descending
-- **by_cluster_type** (list[PubClusterTypeBreakdown]): Publication counts per cluster type, sorted by count descending
-- **by_value_kind** (list[PubValueKindBreakdown]): DerivedMetric value kind frequency rollup across matched publications. Each entry: {value_kind, count}.
-- **by_metric_type** (list[PubMetricTypeBreakdown]): DerivedMetric type frequency rollup across matched publications. Each entry: {metric_type, count}.
-- **by_compartment** (list[PubCompartmentBreakdown]): Wet-lab compartment frequency rollup across matched publications. Each entry: {compartment, count}.
-- **returned** (int): Publications in this response
-- **offset** (int): Offset into full result set (e.g. 0)
-- **truncated** (bool): True if total_matching > returned
-- **not_found** (list[string]): Input publication_dois that did not match any Publication node (empty unless publication_dois was provided)
+- **total_entries** (int): Total publications in KG (unfiltered).
+- **total_matching** (int): Publications matching filters.
+- **by_organism** (list[PubOrganismBreakdown]): Publication counts per organism, sorted desc.
+- **by_treatment_type** (list[PubTreatmentTypeBreakdown]): Publication counts per treatment type, sorted desc.
+- **by_background_factors** (list[PubBackgroundFactorBreakdown]): Publication counts per background factor, sorted desc.
+- **by_omics_type** (list[PubOmicsTypeBreakdown]): Publication counts per omics platform, sorted desc.
+- **by_cluster_type** (list[PubClusterTypeBreakdown]): Publication counts per cluster type, sorted desc.
+- **by_value_kind** (list[PubValueKindBreakdown]): DerivedMetric value kind frequency rollup across matched publications.
+- **by_metric_type** (list[PubMetricTypeBreakdown]): DerivedMetric type frequency rollup across matched publications.
+- **by_compartment** (list[PubCompartmentBreakdown]): Wet-lab compartment frequency rollup across matched publications.
+- **returned** (int): Publications in this response.
+- **offset** (int): Offset into full result set.
+- **truncated** (bool): True if total_matching > returned.
+- **not_found** (list[string]): Input publication_dois that did not match any Publication node (empty unless publication_dois was provided).
 
 ### Per-result fields
 
 | Field | Type | Description |
 |---|---|---|
-| doi | string |  |
-| title | string |  |
-| authors | list[string] |  |
-| year | int |  |
-| journal | string \| None (optional) |  |
-| study_type | string \| None (optional) |  |
-| organisms | list[string] (optional) | Organisms studied in this publication |
-| experiment_count | int (optional) | Number of experiments in KG from this publication |
-| treatment_types | list[string] (optional) | Experiment treatment types (e.g. coculture, nitrogen_stress) |
-| background_factors | list[string] (optional) | Distinct background factors across experiments (e.g. ['axenic', 'diel_cycle']) |
-| omics_types | list[string] (optional) | Omics data types (e.g. RNASEQ, PROTEOMICS) |
-| clustering_analysis_count | int (optional) | Number of clustering analyses from this publication (e.g. 4) |
-| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison']) |
-| growth_phases | list[string] (optional) | Distinct growth phases across experiments. Physiological state of the culture at sampling — timepoint-level, not gene-specific. |
-| derived_metric_count | int (optional) | Number of DerivedMetric nodes from this publication (e.g. 3) |
-| derived_metric_value_kinds | list[string] (optional) | Value kinds of DerivedMetrics in this publication (e.g. ['numeric', 'boolean']) |
-| compartments | list[string] (optional) | Wet-lab compartments measured in this publication (e.g. ['whole_cell', 'vesicle']) |
-| score | float \| None (optional) | Lucene relevance score (only with search_text) |
-| derived_metric_gene_count | int \| None (optional) | Total genes annotated by DerivedMetrics in this publication (only with verbose=True) |
-| derived_metric_types | list[string] \| None (optional) | Distinct DerivedMetric types in this publication (only with verbose=True, e.g. ['diel_rhythmicity']) |
+| doi | string | Publication DOI (e.g. '10.1038/s41396-022-01202-1'). |
+| title | string | Publication title. |
+| authors | list[string] | Author list (free-text, semicolon- or comma-delimited). |
+| year | int | Publication year (e.g. 2022). |
+| journal | string \| None (optional) | Journal name (e.g. 'ISME'). |
+| study_type | string \| None (optional) | Study type tag (e.g. 'metabolomics', 'transcriptomics'). |
+| organisms | list[string] (optional) | Organisms studied in this publication. |
+| experiment_count | int (optional) | Number of experiments in KG from this publication. |
+| treatment_types | list[string] (optional) | Experiment treatment types (e.g. coculture, nitrogen_stress). |
+| background_factors | list[string] (optional) | Distinct background factors across experiments (e.g. ['axenic', 'diel_cycle']). |
+| omics_types | list[string] (optional) | Omics data types (e.g. RNASEQ, PROTEOMICS). |
+| clustering_analysis_count | int (optional) | Number of clustering analyses from this publication. |
+| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison']). |
+| growth_phases | list[string] (optional) | Distinct growth phases across experiments. Timepoint-level condition, not gene-specific. |
+| derived_metric_count | int (optional) | Number of DerivedMetric nodes from this publication. |
+| derived_metric_value_kinds | list[string] (optional) | Value kinds of DerivedMetrics in this publication (subset of {numeric, boolean, categorical}). Use to route to genes_by_{kind}_metric. |
+| compartments | list[string] (optional) | Wet-lab compartments measured in this publication (e.g. ['whole_cell', 'vesicle']). |
+| metabolite_count | int (optional) | Distinct metabolites measured in this publication (precomputed Publication.metabolite_count). Non-zero on metabolomics-bearing papers. When > 0, drill via list_metabolite_assays(publication_doi=[...]) to inspect the paper's MetaboliteAssay nodes. |
+| metabolite_assay_count | int (optional) | Distinct MetaboliteAssay edges anchored to this publication (precomputed). Diverges from metabolite_count when the same metabolite is measured in multiple compartments per paper. |
+| metabolite_compartments | list[string] (optional) | Wet-lab compartments measured for metabolomics in this publication (e.g. ['whole_cell', 'extracellular']). Populated only when metabolite_assay_count > 0; [] otherwise. |
+| score | float \| None (optional) | Lucene relevance score (only with search_text). |
+| derived_metric_gene_count | int \| None (optional) | Total genes annotated by DerivedMetrics in this publication (verbose-only). |
+| derived_metric_types | list[string] \| None (optional) | Distinct DerivedMetric types in this publication (verbose-only). |
 
 **Verbose-only fields** (included when `verbose=True`):
 
 | Field | Type | Description |
 |---|---|---|
-| abstract | string \| None (optional) | Publication abstract (only with verbose=True) |
-| description | string \| None (optional) | Curated study description (only with verbose=True) |
-| cluster_count | int \| None (optional) | Total gene clusters across analyses (only with verbose=True, e.g. 20) |
+| abstract | string \| None (optional) | Publication abstract (verbose-only). |
+| description | string \| None (optional) | Curated study description (verbose-only). |
+| cluster_count | int \| None (optional) | Total gene clusters across analyses (verbose-only). |
 
 ## Few-shot examples
 
@@ -148,6 +144,20 @@ list_publications(compartment="vesicle")
  ]}
 ```
 
+### Example 6: Find metabolomics-bearing publications
+
+```example-call
+list_publications(search_text="metabolite")
+```
+
+```example-response
+{"total_matching": 2, "returned": 2, "truncated": false, "offset": 0,
+ "results": [
+   {"doi": "10.1038/s41396-023-01394-0", "title": "Capovilla 2023 metabolomics study", "year": 2023, "metabolite_count": 92, "metabolite_assay_count": 184, "metabolite_compartments": ["extracellular", "whole_cell"]},
+   {"doi": "10.1038/s41396-023-01415-y", "title": "Kujawinski 2023 metabolomics study", "year": 2023, "metabolite_count": 15, "metabolite_assay_count": 15, "metabolite_compartments": ["whole_cell"]}
+ ]}
+```
+
 ## Chaining patterns
 
 ```
@@ -157,17 +167,20 @@ list_publications → list_clustering_analyses(publication_doi=[...])
 list_publications(search_text=..., verbose=True) → classify → list_publications(publication_dois=[...]) for the picked subset
 list_publications(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric
 list_filter_values(filter_type='metric_type') → list_publications(search_text='<metric_type>') to find publications with that metric
+list_publications (per-row `metabolite_count > 0`) → list_metabolite_assays(publication_doi=[...]) to inspect the paper's MetaboliteAssay nodes (numeric vs boolean, compartment, detection-status rollup).
 ```
 
 ## Common mistakes
 
 - If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this publication.
 
-- treatment_type is a string filter, not a list — use treatment_type='coculture' not treatment_type=['coculture']
+- treatment_type is a string filter, not a list — use treatment_type='coculture' not treatment_type=['coculture'].
 
-- Use the dedicated author param for author filtering (e.g. author='Biller'), not search_text — search_text searches title, abstract, and description only
+- Use the dedicated author param for author filtering (e.g. author='Biller'), not search_text — search_text searches title, abstract, and description only.
 
-- experiment_count is per-publication — a publication with experiment_count=10 may span multiple organisms and treatment types
+- experiment_count is per-publication — a publication with experiment_count=10 may span multiple organisms and treatment types.
+
+- metabolite_count > 0 indicates a metabolomics-bearing publication. Drill into MetaboliteAssay nodes via list_metabolite_assays(publication_doi=[...]); inspect compartments via metabolite_compartments per row.
 
 ```mistake
 list_experiments(publication='Biller 2018')
@@ -176,8 +189,6 @@ list_experiments(publication='Biller 2018')
 ```correction
 list_publications(search_text='Biller') then list_experiments(publication_doi=['10.1038/...'])
 ```
-
-- growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
 ## Package import equivalent
 

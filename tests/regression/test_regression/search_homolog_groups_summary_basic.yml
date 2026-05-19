@@ -4,36 +4,36 @@ rows:
 - by_level:
   - '{''count'': 1, ''item'': ''Alteromonadaceae''}'
   - '{''count'': 2, ''item'': ''Proteobacteria''}'
-  - '{''count'': 300, ''item'': ''Bacteria''}'
+  - '{''count'': 298, ''item'': ''Bacteria''}'
   - '{''count'': 352, ''item'': ''Synechococcus''}'
-  - '{''count'': 395, ''item'': ''Prochloraceae''}'
-  - '{''count'': 420, ''item'': ''curated''}'
+  - '{''count'': 393, ''item'': ''Prochloraceae''}'
+  - '{''count'': 422, ''item'': ''curated''}'
   - '{''count'': 498, ''item'': ''Cyanobacteria''}'
   by_source:
-  - '{''count'': 1548, ''item'': ''eggnog''}'
-  - '{''count'': 420, ''item'': ''cyanorak''}'
-  score_max: 6.6389
-  score_median: 1.0722
+  - '{''count'': 1544, ''item'': ''eggnog''}'
+  - '{''count'': 422, ''item'': ''cyanorak''}'
+  score_max: 6.6411
+  score_median: 1.0734
   top_cog_categories:
-  - '{''id'': ''cog.category:C'', ''count'': 615, ''name'': ''Energy production and
+  - '{''id'': ''cog.category:C'', ''count'': 619, ''name'': ''Energy production and
     conversion''}'
   - '{''id'': ''cog.category:G'', ''count'': 91, ''name'': ''Carbohydrate transport
     and metabolism''}'
   - '{''id'': ''cog.category:H'', ''count'': 86, ''name'': ''Coenzyme transport and
     metabolism''}'
-  - '{''id'': ''cog.category:S'', ''count'': 755, ''name'': ''Function unknown''}'
+  - '{''id'': ''cog.category:S'', ''count'': 748, ''name'': ''Function unknown''}'
   - '{''id'': ''cog.category:U'', ''count'': 67, ''name'': ''Intracellular trafficking,
     secretion, and vesicular transport''}'
   top_cyanorak_roles:
-  - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 235, ''name'': ''Cellular processes
+  - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 232, ''name'': ''Cellular processes
     > Adaptation/acclimation to atypical conditions and detoxification > Light''}'
-  - '{''id'': ''cyanorak.role:G.2'', ''count'': 219, ''name'': ''Energy metabolism
+  - '{''id'': ''cyanorak.role:G.2'', ''count'': 218, ''name'': ''Energy metabolism
     > Electron transport''}'
-  - '{''id'': ''cyanorak.role:J'', ''count'': 168, ''name'': ''Photosynthesis and
+  - '{''id'': ''cyanorak.role:J'', ''count'': 165, ''name'': ''Photosynthesis and
     respiration''}'
   - '{''id'': ''cyanorak.role:J.2'', ''count'': 169, ''name'': ''Photosynthesis and
     respiration > CO2 fixation''}'
   - '{''id'': ''cyanorak.role:J.8'', ''count'': 228, ''name'': ''Photosynthesis and
     respiration > Photosystem II''}'
-  total_entries: 46170
-  total_matching: 1124
+  total_entries: 46438
+  total_matching: 1123

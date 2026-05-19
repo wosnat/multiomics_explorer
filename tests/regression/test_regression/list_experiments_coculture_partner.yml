@@ -20,6 +20,9 @@ rows:
   growth_phases:
   - exponential
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
@@ -63,6 +66,9 @@ rows:
   growth_phases:
   - exponential
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2016.70
@@ -106,6 +112,9 @@ rows:
   growth_phases:
   - exponential
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1038/ismej.2016.70
@@ -149,6 +158,9 @@ rows:
   growth_phases:
   - exponential
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1038/ismej.2016.70
@@ -193,6 +205,9 @@ rows:
   growth_phases:
   - exponential
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus NATL2A
   publication_doi: 10.1038/ismej.2016.82

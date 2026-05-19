@@ -71,6 +71,15 @@ class PathwayEnrichmentResult(BaseModel):
     level: int | None = Field(
         default=None, description="Hierarchy depth of the term (0 = root)"
     )
+    is_informative: bool = Field(
+        description=(
+            "True if the term is not flagged is_uninformative in the KG. Always "
+            "present, regardless of informative_only setting, so callers can "
+            "post-filter or diagnose. With default informative_only=True, all rows "
+            "have is_informative=True by construction; pass informative_only=False "
+            "to opt out and see uninformative terms."
+        ),
+    )
     tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
     tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
     gene_ratio: str = Field(
@@ -270,6 +279,15 @@ class ClusterEnrichmentResult(BaseModel):
     term_id: str = Field(description="Ontology term ID")
     term_name: str = Field(description="Ontology term display name")
     level: int | None = Field(default=None, description="Hierarchy depth (0 = root)")
+    is_informative: bool = Field(
+        description=(
+            "True if the term is not flagged is_uninformative in the KG. Always "
+            "present, regardless of informative_only setting, so callers can "
+            "post-filter or diagnose. With default informative_only=True, all rows "
+            "have is_informative=True by construction; pass informative_only=False "
+            "to opt out and see uninformative terms."
+        ),
+    )
     tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
     tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
     gene_ratio: str = Field(
@@ -376,18 +394,23 @@ class ClusterEnrichmentResponse(BaseModel):
 
 class MetaboliteResult(BaseModel):
     # compact
-    metabolite_id: str = Field(description="Full prefixed ID (e.g. 'kegg.compound:C00031'). 85% kegg.compound, 15% chebi (TCDB-only substrates).")
-    name: str = Field(description="Metabolite name (e.g. 'D-Glucose', 'L-Glutamate')")
-    formula: str | None = Field(default=None, description="Hill-notation chemical formula (e.g. 'C6H12O6'). Null on ~9% of metabolites (mostly TCDB-curated generic substrates).")
-    elements: list[str] = Field(default_factory=list, description="Sorted unique element symbols present in formula (e.g. ['C','H','O']). Empty when formula is null. Filter on this — never on `formula` substring (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N').")
-    mass: float | None = Field(default=None, description="Monoisotopic mass in Da (e.g. 180.156). Null on ~22% of metabolites.")
-    gene_count: int = Field(default=0, description="Distinct genes reachable via Gene → Reaction → Metabolite OR Gene → TcdbFamily → Metabolite (UNION post-TCDB; e.g. 320 for glucose). When > 0, drill in via genes_by_metabolite(metabolite_ids=[id], organism=...). All metabolites have gene_count > 0 today (post-2026-05-03 transport-arm fix); the future metabolomics-DM spec will introduce metabolites measured without any gene path, which will surface here with gene_count=0 — 0 ≠ 'absent from KG'.")
-    organism_count: int = Field(default=0, description="Distinct organisms reaching this metabolite via any chemistry path (e.g. 31 for ATP). When > 0, narrow with organism_names filter.")
-    transporter_count: int = Field(default=0, description="Distinct `tc_specificity` leaf TcdbFamily nodes annotated as transporting this metabolite (e.g. 17 for glucose, 229 for sodium). Scoped to leaves so the count reflects 'actual transporter systems' rather than counting ancestor families that inherit the substrate via the 2026-05-03 rollup. Source: TCDB-CAZy ontology.")
-    evidence_sources: list[str] = Field(default_factory=list, description="Path provenance — values from {'metabolism', 'transport'}. 'metabolism' = at least one Reaction in KG involves this compound; 'transport' = at least one TcdbFamily curates this as substrate. 'metabolomics' is reserved for the future metabolomics-DM spec — no row carries it today. E.g. ['metabolism', 'transport'].")
-    chebi_id: str | None = Field(default=None, description="ChEBI ID (raw numeric, e.g. '4167'). Populated on 90% of metabolites overall — 100% of the 452 chebi:-IDed transport-only metabolites (extracted from the ID itself), plus the kegg.compound:-IDed metabolites that cross-ref ChEBI.")
+    metabolite_id: str = Field(description="Full prefixed ID (e.g. 'kegg.compound:C00031'). Most carry the kegg.compound: namespace; a smaller set carry chebi: (TCDB-curated transport-only substrates).")
+    name: str = Field(description="Metabolite name (e.g. 'D-Glucose', 'L-Glutamate').")
+    formula: str | None = Field(default=None, description="Hill-notation chemical formula (e.g. 'C6H12O6'). Null on a minority of metabolites (mostly TCDB-curated generic substrates).")
+    elements: list[str] = Field(default_factory=list, description="Sorted unique element symbols present in formula (e.g. ['C','H','O']). Empty when formula is null. Filter on this — never on `formula` substring (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Presence list (no atom counts; stoichiometry lives in `formula`).")
+    mass: float | None = Field(default=None, description="Monoisotopic mass in Da (e.g. 180.156). Null on a minority of metabolites.")
+    gene_count: int = Field(default=0, description="Distinct genes reachable via Gene → Reaction → Metabolite OR Gene → TcdbFamily → Metabolite (UNION). When > 0, drill in via genes_by_metabolite(metabolite_ids=[id], organism=...). 0 indicates a metabolomics-only metabolite — measured by mass spec but not reachable via any gene catalysis or transport path; check evidence_sources to confirm.")
+    organism_count: int = Field(default=0, description="Distinct organisms reaching this metabolite via any chemistry path. When > 0, narrow with organism_names filter.")
+    transporter_count: int = Field(default=0, description="Distinct tc_specificity leaf TcdbFamily nodes annotated as transporting this metabolite. Scoped to leaves — the count reflects actual transporter systems rather than counting ancestor families that inherit the substrate via the rollup. Source: TCDB-CAZy ontology.")
+    evidence_sources: list[str] = Field(default_factory=list, description="Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. 'metabolism' = at least one Reaction in KG involves this compound; 'transport' = at least one TcdbFamily curates this as substrate; 'metabolomics' = at least one MetaboliteAssay measures this compound. E.g. ['metabolism', 'transport'].")
+    chebi_id: str | None = Field(default=None, description="ChEBI ID (raw numeric, e.g. '4167'). Populated on most metabolites — 100% of chebi:-IDed transport-only metabolites (extracted from the ID itself), plus the kegg.compound:-IDed metabolites that cross-ref ChEBI.")
     pathway_ids: list[str] = Field(default_factory=list, description="KEGG pathway memberships (e.g. ['kegg.pathway:ko00010', 'kegg.pathway:ko01100']). Empty when no Metabolite_in_pathway edges. Drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...).")
     pathway_count: int = Field(default=0, description="Distinct count of KEGG pathways this metabolite is in (e.g. 5). Routing signal — when > 0, drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...) for genes annotated to those pathways. Equal to size(pathway_ids).")
+    # Metabolomics measurement rollup (Phase 1 plumbing — spec §6.6)
+    measured_assay_count: int = Field(default=0, description="Distinct MetaboliteAssay edges anchored to this metabolite (precomputed Metabolite.measured_assay_count). When > 0, the metabolite has experimental measurement coverage.")
+    measured_paper_count: int = Field(default=0, description="Distinct papers measuring this metabolite (precomputed). Non-zero on metabolites with metabolomics evidence.")
+    measured_organisms: list[str] = Field(default_factory=list, description="Organism preferred_names with at least one MetaboliteAssay anchored to this metabolite. Populated when measured_assay_count > 0; [] otherwise.")
+    measured_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments observed for this metabolite (subset of {'whole_cell', 'extracellular', 'vesicle'}). Empty on unmeasured metabolites — use len(measured_compartments) >= 1 to filter for measurement-anchored rows.")
     score: float | None = Field(default=None, description="Lucene relevance score (only with `search`).")
 
     # verbose
@@ -399,31 +422,31 @@ class MetaboliteResult(BaseModel):
 
 
 class MetTopOrganism(BaseModel):
-    organism_name: str = Field(description="Organism name (e.g. 'Ruegeria pomeroyi DSS-3')")
-    count: int = Field(description="Number of matched metabolites this organism reaches (e.g. 1271)")
+    organism_name: str = Field(description="Organism name (e.g. 'Ruegeria pomeroyi DSS-3').")
+    count: int = Field(description="Number of matched metabolites this organism reaches.")
 
 
 class MetTopPathway(BaseModel):
-    pathway_id: str = Field(description="KEGG pathway ID (e.g. 'kegg.pathway:ko01100')")
-    pathway_name: str = Field(description="Pathway name (e.g. 'Metabolic pathways')")
-    count: int = Field(description="Number of matched metabolites in this pathway (e.g. 870)")
+    metabolite_pathway_id: str = Field(description="KEGG pathway ID (e.g. 'kegg.pathway:ko01100'). Metabolite-pathway rollup (distinct from KO-pathway annotations on `genes_by_ontology`).")
+    metabolite_pathway_name: str = Field(description="Pathway name (e.g. 'Metabolic pathways'). Metabolite-pathway rollup (distinct from KO-pathway annotations on `genes_by_ontology`).")
+    count: int = Field(description="Number of matched metabolites in this pathway.")
 
 
 class MetEvidenceSourceBreakdown(BaseModel):
-    evidence_source: str = Field(description="Evidence path (e.g. 'metabolism', 'transport')")
-    count: int = Field(description="Number of matched metabolites with this evidence source (e.g. 1212). Sums to > total_matching when metabolites carry multiple sources.")
+    evidence_source: str = Field(description="Evidence path (e.g. 'metabolism', 'transport').")
+    count: int = Field(description="Number of matched metabolites with this evidence source. Sums to > total_matching when metabolites carry multiple sources.")
 
 
 class MetXrefCoverage(BaseModel):
-    with_chebi: int = Field(description="Matched metabolites with chebi_id (e.g. 1386)")
-    with_hmdb: int = Field(description="Matched metabolites with hmdb_id (e.g. 849)")
-    with_mnxm: int = Field(description="Matched metabolites with mnxm_id (e.g. 1563 — typically full coverage)")
+    with_chebi: int = Field(description="Matched metabolites with chebi_id.")
+    with_hmdb: int = Field(description="Matched metabolites with hmdb_id.")
+    with_mnxm: int = Field(description="Matched metabolites with mnxm_id (typically full coverage).")
 
 
 class MetMassStats(BaseModel):
-    mass_min: float | None = Field(default=None, description="Minimum mass across matched metabolites (e.g. 18.039). Null when no matched metabolite has a mass.")
-    mass_median: float | None = Field(default=None, description="Median mass (e.g. 328.192).")
-    mass_max: float | None = Field(default=None, description="Maximum mass (e.g. 5227.103).")
+    mass_min: float | None = Field(default=None, description="Minimum monoisotopic mass (Da) across matched metabolites. Null when no matched metabolite has a mass.")
+    mass_median: float | None = Field(default=None, description="Median monoisotopic mass (Da).")
+    mass_max: float | None = Field(default=None, description="Maximum monoisotopic mass (Da).")
 
 
 class MetNotFound(BaseModel):
@@ -432,20 +455,36 @@ class MetNotFound(BaseModel):
     pathway_ids: list[str] = Field(default_factory=list, description="Input pathway_ids with no matching KeggTerm (e.g. ['kegg.pathway:bogus']).")
 
 
+class MetPaperCountBucket(BaseModel):
+    paper_count: int = Field(description="Number of distinct papers measuring a metabolite (e.g. 0, 1, 2).")
+    count: int = Field(description="Number of metabolites in the matched set with this paper_count value.")
+
+
+class MetCompartmentBucket(BaseModel):
+    compartment: str = Field(description="Wet-lab compartment (e.g. 'whole_cell', 'extracellular').")
+    count: int = Field(description="Number of matched measured metabolites observed in this compartment.")
+
+
+class MetMeasurementCoverage(BaseModel):
+    by_paper_count: list[MetPaperCountBucket] = Field(default_factory=list, description="Frequency distribution of measured_paper_count across the matched metabolite set.")
+    by_compartment: list[MetCompartmentBucket] = Field(default_factory=list, description="Frequency distribution of measured_compartments values across the matched set. Sums to >= count of measured metabolites because the same metabolite can be measured in multiple compartments.")
+
+
 class ListMetabolitesResponse(BaseModel):
-    total_entries: int = Field(description="Total Metabolite nodes in KG (unfiltered, 3,025 today)")
-    total_matching: int = Field(description="Metabolites matching filters")
-    top_organisms: list[MetTopOrganism] = Field(default_factory=list, description="Top 10 organisms by metabolite count (within matched set), sorted desc")
-    top_pathways: list[MetTopPathway] = Field(default_factory=list, description="Top 10 pathways by metabolite count (within matched set), sorted desc")
-    by_evidence_source: list[MetEvidenceSourceBreakdown] = Field(default_factory=list, description="Frequency of evidence_sources values across matched set. Today: at most 2 entries (metabolism, transport).")
-    xref_coverage: MetXrefCoverage = Field(description="Cross-ref ID coverage within matched set")
-    mass_stats: MetMassStats = Field(description="Mass distribution within matched set")
-    score_max: float | None = Field(default=None, description="Max Lucene score (only with search)")
-    score_median: float | None = Field(default=None, description="Median Lucene score (only with search)")
-    returned: int = Field(description="Metabolites in this response")
-    offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-    truncated: bool = Field(description="True if total_matching > returned")
-    not_found: MetNotFound = Field(default_factory=MetNotFound, description="Per-filter buckets for unknown input IDs")
+    total_entries: int = Field(description="Total Metabolite nodes in KG (unfiltered).")
+    total_matching: int = Field(description="Metabolites matching filters.")
+    top_organisms: list[MetTopOrganism] = Field(default_factory=list, description="Top 10 organisms by metabolite count (within matched set), sorted desc.")
+    top_metabolite_pathways: list[MetTopPathway] = Field(default_factory=list, description="Top 10 pathways by metabolite count (within matched set), sorted desc. Metabolite-pathway rollup (distinct from KO-pathway annotations on `genes_by_ontology`).")
+    by_evidence_source: list[MetEvidenceSourceBreakdown] = Field(default_factory=list, description="Frequency of evidence_sources values across matched set. Bounded by the {metabolism, transport, metabolomics} domain.")
+    xref_coverage: MetXrefCoverage = Field(description="Cross-ref ID coverage within matched set.")
+    mass_stats: MetMassStats = Field(description="Mass distribution within matched set.")
+    by_measurement_coverage: MetMeasurementCoverage = Field(default_factory=MetMeasurementCoverage, description="Metabolomics measurement coverage rollup across matched metabolites. Two sub-rollups: by_paper_count (frequency by measured_paper_count value) + by_compartment (frequency by measured_compartments value).")
+    score_max: float | None = Field(default=None, description="Max Lucene score (only with search).")
+    score_median: float | None = Field(default=None, description="Median Lucene score (only with search).")
+    returned: int = Field(description="Metabolites in this response.")
+    offset: int = Field(default=0, description="Offset into full result set.")
+    truncated: bool = Field(description="True if total_matching > returned.")
+    not_found: MetNotFound = Field(default_factory=MetNotFound, description="Per-filter buckets for unknown input IDs.")
     results: list[MetaboliteResult] = Field(default_factory=list)
 
 
@@ -461,11 +500,17 @@ class ListMetabolitesResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 class GeneReactionMetaboliteTriplet(BaseModel):
-    """Shared row class with metabolites_by_gene (Tool 3).
+    """Shared row class for genes_by_metabolite and metabolites_by_gene.
 
     Compact mode: 15 fields including evidence_source +
     transport_confidence. Verbose mode adds 9 more. All per-arm-specific
-    fields are Optional and sparse-stripped at the api/ layer when null.
+    fields are Optional and explicitly `None` on rows from the other
+    arm — every row carries identical keys.
+
+    Reaction edges are undirected AND carry no reversibility flag —
+    interpret all reaction-arm rows as 'involved in', never 'produces' /
+    'consumes' / 'reversible'. KEGG-anchored reactions lack both direction
+    and `is_reversible`. See `docs://guide/conventions`.
     """
     locus_tag: str = Field(
         description="Gene locus tag (e.g. 'PMM0974' for MED4 urtE).")
@@ -480,35 +525,39 @@ class GeneReactionMetaboliteTriplet(BaseModel):
     evidence_source: Literal["metabolism", "transport"] = Field(
         description="Path through which this row reaches the metabolite. "
         "'metabolism' = `Gene → Reaction → Metabolite`. 'transport' = "
-        "`Gene → TcdbFamily → Metabolite` (rollup-extended). Metabolomics "
-        "evidence has no gene anchor and never produces rows here.")
+        "`Gene → TcdbFamily → Metabolite` (includes ancestor TCDB "
+        "families that inherit substrates from descendant leaves). "
+        "Metabolomics evidence has no gene anchor and never produces "
+        "rows here.")
     transport_confidence: Literal["substrate_confirmed", "family_inferred"] | None = Field(
         default=None,
         description="Set on transport rows only. 'substrate_confirmed' = "
         "the TCDB family annotation is at `tc_specificity` level "
         "(substrate-curated). 'family_inferred' = annotation is at a "
         "coarser TCDB level (rolled up via the substrate edge — gene may "
-        "or may not move this metabolite). None on metabolism rows "
-        "(direct catalysis edge is always substrate-confirmed by definition).")
+        "or may not move this metabolite). None on metabolism rows. See "
+        "`docs://guide/conventions` for the full transport-confidence "
+        "discussion.")
 
     # metabolism-arm fields (None on transport rows)
     reaction_id: str | None = Field(
         default=None,
         description="Full prefixed Reaction ID (e.g. 'kegg.reaction:R00253'). "
-        "Metabolism rows only.")
+        "Metabolism rows only — see class-level note on undirected, "
+        "non-reversible interpretation.")
     reaction_name: str | None = Field(
         default=None,
         description="Reaction systematic name + KEGG equation (raw KEGG "
-        "value, can be lengthy; ~32 reactions in the KG have empty `''`). "
-        "Metabolism rows only.")
+        "value, can be lengthy; a small fraction of reactions have empty "
+        "`''`). Metabolism rows only — see class-level note on undirected, "
+        "non-reversible interpretation.")
     ec_numbers: list[str] | None = Field(
         default=None,
-        description="EC classification(s) for this reaction. Empty list "
-        "for ~107/2,349 reactions without EC. None on transport rows.")
+        description="EC classification(s) for this reaction. Empty list on "
+        "reactions without an EC annotation. None on transport rows.")
     mass_balance: Literal["balanced", "unbalanced"] | None = Field(
         default=None,
-        description="Reaction mass-balance status (no nulls in KG: 1,922 "
-        "balanced + 427 unbalanced). None on transport rows.")
+        description="Reaction mass-balance status. None on transport rows.")
 
     # transport-arm fields (None on metabolism rows)
     tcdb_family_id: str | None = Field(
@@ -519,7 +568,7 @@ class GeneReactionMetaboliteTriplet(BaseModel):
         default=None,
         description="TCDB family name. For tc_family-level entries this is "
         "human-readable (e.g. 'The ATP-binding Cassette (ABC) Superfamily'); "
-        "for tc_subfamily / tc_specificity falls back to the tcdb_id. "
+        "for tc_subfamily / tc_specificity it falls back to the tcdb_id. "
         "Transport rows only.")
 
     # always-populated metabolite fields
@@ -529,14 +578,14 @@ class GeneReactionMetaboliteTriplet(BaseModel):
         description="Metabolite display name (e.g. 'Urea').")
     metabolite_formula: str | None = Field(
         default=None,
-        description="Hill-notation formula; null on ~9% of metabolites "
-        "(transport-only ChEBI generics).")
+        description="Hill-notation formula; null on a minority of "
+        "metabolites (transport-only ChEBI generics).")
     metabolite_mass: float | None = Field(
         default=None,
-        description="Monoisotopic mass (Da); null on ~22% of metabolites.")
+        description="Monoisotopic mass (Da); null on a minority of metabolites.")
     metabolite_chebi_id: str | None = Field(
         default=None,
-        description="ChEBI numeric ID; populated on ~90% of metabolites.")
+        description="ChEBI numeric ID; populated on most metabolites.")
 
     # verbose-only fields:
     gene_category: str | None = Field(
@@ -545,18 +594,16 @@ class GeneReactionMetaboliteTriplet(BaseModel):
         "'Amino acid metabolism'). Verbose only.")
     metabolite_inchikey: str | None = Field(
         default=None,
-        description="Structural fingerprint; populated on ~78% of "
-        "metabolites. Verbose only.")
+        description="Structural fingerprint. Verbose only.")
     metabolite_smiles: str | None = Field(
         default=None,
-        description="Canonical SMILES; populated on ~84% of metabolites. "
-        "Verbose only.")
+        description="Canonical SMILES. Verbose only.")
     metabolite_mnxm_id: str | None = Field(
         default=None,
-        description="MetaNetX ID (e.g. 'MNXM731'); 100% coverage. Verbose only.")
+        description="MetaNetX ID (e.g. 'MNXM731'). Verbose only.")
     metabolite_hmdb_id: str | None = Field(
         default=None,
-        description="HMDB ID (e.g. 'HMDB0000122'); ~47% coverage. Verbose only.")
+        description="HMDB ID (e.g. 'HMDB0000122'). Verbose only.")
     reaction_mnxr_id: str | None = Field(
         default=None,
         description="Reaction MetaNetX ID. Verbose, metabolism rows only.")
@@ -587,8 +634,8 @@ class GbmByMetabolite(BaseModel):
         description="Metabolite display name (e.g. 'Urea').")
     formula: str | None = Field(
         default=None,
-        description="Hill-notation formula (e.g. 'CH4N2O'); null on transport-"
-        "only ChEBI generics (~9% of metabolites).")
+        description="Hill-notation formula (e.g. 'CH4N2O'); null on "
+        "transport-only ChEBI generics.")
     rows: int = Field(
         description="Total rows for this metabolite across both arms in the "
         "filtered slice.")
@@ -605,12 +652,14 @@ class GbmByMetabolite(BaseModel):
         description="Row count for the metabolism arm.")
     transport_substrate_confirmed_rows: int = Field(
         description="Row count for transport rows annotated at TCDB "
-        "`tc_specificity` (substrate-curated). High-precision transport "
-        "evidence.")
+        "`tc_specificity` (substrate-curated tier — leaf-level "
+        "annotation).")
     transport_family_inferred_rows: int = Field(
         description="Row count for transport rows annotated at coarser TCDB "
-        "levels (rolled up via the substrate edge). Lower-precision — the "
-        "gene's actual substrate may differ.")
+        "levels (rollup tier — propagated via the substrate edge; the "
+        "gene's annotated family is known to transport this metabolite, but "
+        "this specific gene's actual substrate may differ). Both tiers are "
+        "annotations — see `docs://guide/conventions`.")
 
 
 class GbmByEvidenceSource(BaseModel):
@@ -646,11 +695,11 @@ class GbmTopReaction(BaseModel):
     reaction_id: str = Field(
         description="Full prefixed Reaction ID (e.g. 'kegg.reaction:R00253').")
     name: str = Field(
-        description="Reaction systematic name + KEGG equation (raw KEGG; may "
-        "be empty `''` for 32 reactions in the KG).")
+        description="Reaction systematic name + KEGG equation (raw KEGG; "
+        "may be empty `''` on a small fraction of reactions).")
     ec_numbers: list[str] = Field(
-        description="EC classification(s) for this reaction; empty list for "
-        "107/2,349 reactions without EC annotation.")
+        description="EC classification(s) for this reaction; empty list "
+        "on reactions without an EC annotation.")
     gene_count: int = Field(
         description="Distinct genes catalyzing this reaction in the filtered "
         "slice.")
@@ -664,10 +713,10 @@ class GbmTopTcdbFamily(BaseModel):
     tcdb_family_id: str = Field(
         description="Full prefixed TcdbFamily ID (e.g. 'tcdb:3.A.1.4.5').")
     tcdb_family_name: str = Field(
-        description="Display name. For tc_family-level entries (~10 in the "
-        "KG) this is human-readable (e.g. 'The ATP-binding Cassette (ABC) "
-        "Superfamily'); for tc_subfamily / tc_specificity levels it falls "
-        "back to the `tcdb_id` value.")
+        description="Display name. For tc_family-level entries this is "
+        "human-readable (e.g. 'The ATP-binding Cassette (ABC) Superfamily'); "
+        "for tc_subfamily / tc_specificity levels it falls back to the "
+        "`tcdb_id` value.")
     level_kind: str = Field(
         description="One of tc_class / tc_subclass / tc_family / "
         "tc_subfamily / tc_specificity. Determines `transport_confidence`.")
@@ -716,10 +765,11 @@ class GbmTopGene(BaseModel):
         description="Metabolism-arm row count for this gene.")
     transport_substrate_confirmed_rows: int = Field(
         description="Transport-arm row count for this gene at "
-        "`tc_specificity` level (high-precision).")
+        "`tc_specificity` level (substrate-curated tier).")
     transport_family_inferred_rows: int = Field(
         description="Transport-arm row count for this gene at coarser TCDB "
-        "levels (rolled up via the substrate edge; lower-precision).")
+        "levels (rollup tier — propagated via the substrate edge). Both "
+        "tiers are annotations — see `docs://guide/conventions`.")
 
 
 class GbmNotFound(BaseModel):
@@ -811,7 +861,7 @@ class GenesByMetaboliteResponse(BaseModel):
 #
 # Naming convention: tool-anchored `Mbg*` prefix because the envelope mixes
 # entity types (gene-anchored `by_gene`, element-anchored `by_element`,
-# metabolite-anchored `top_metabolites`, pathway-anchored `top_pathways`).
+# metabolite-anchored `top_metabolites`, pathway-anchored `top_metabolite_pathways`).
 # `GeneReactionMetaboliteTriplet` is REUSED VERBATIM from
 # `genes_by_metabolite` (defined above at module level) — the per-row payload
 # is identical regardless of which side anchored the query.
@@ -849,12 +899,14 @@ class MbgByGene(BaseModel):
         description="Row count for the metabolism arm.")
     transport_substrate_confirmed_rows: int = Field(
         description="Row count for transport rows annotated at TCDB "
-        "`tc_specificity` (substrate-curated). High-precision transport "
-        "evidence.")
+        "`tc_specificity` (substrate-curated tier — leaf-level "
+        "annotation).")
     transport_family_inferred_rows: int = Field(
         description="Row count for transport rows annotated at coarser "
-        "TCDB levels (rolled up via the substrate edge). Lower-precision — "
-        "the gene's actual substrate may differ.")
+        "TCDB levels (rollup tier — propagated via the substrate edge; "
+        "this gene's annotated family is known to transport the metabolite, "
+        "but this specific gene's actual substrate may differ). Both tiers "
+        "are annotations — see `docs://guide/conventions`.")
 
 
 class MbgByEvidenceSource(BaseModel):
@@ -867,7 +919,8 @@ class MbgByEvidenceSource(BaseModel):
     evidence_source: Literal["metabolism", "transport"] = Field(
         description="Path through which the gene reaches the metabolite. "
         "'metabolism' = `Gene → Reaction → Metabolite`. 'transport' = "
-        "`Gene → TcdbFamily → Metabolite` (rollup-extended).")
+        "`Gene → TcdbFamily → Metabolite` (includes ancestor families "
+        "that inherit substrates from descendant leaves).")
     count: int = Field(
         description="Row count for this evidence_source in the filtered "
         "slice.")
@@ -892,20 +945,26 @@ class MbgByTransportConfidence(BaseModel):
 
 
 class MbgByElement(BaseModel):
-    """NEW (vs GBM) — Element presence rollup across the metabolites the
-    gene set touches. Periodic-table-bounded (~30 elements max in KG);
-    kept as `by_*` (full rollup, not top-N).
+    """Element-presence rollup across the metabolites the gene set
+    touches. Periodic-table-bounded (~30 elements max in KG); kept as
+    `by_*` (full rollup, not top-N).
 
     Answers the C/N/P/S/metal-presence signature question. Anchored on
-    `Metabolite.elements` (KG-A3 Hill-parsed presence list).
+    `Metabolite.elements` (Hill-parsed presence list).
+
+    Presence-only — count of distinct compounds containing each element
+    at all. NOT stoichiometric (no atom counts per compound; stoichiometry
+    lives in `metabolite.formula`). NOT mass-balanced (KG carries no
+    substrate-vs-product role on `Reaction_has_metabolite`).
     """
     element: str = Field(
         description="Element symbol (Hill notation, e.g. 'C', 'N', 'P', "
         "'S', 'Fe').")
     metabolite_count: int = Field(
         description="Distinct metabolites in the filtered slice that "
-        "contain this element. Empty `m.elements` (31/2,188 metabolites "
-        "without formula) does not contribute.")
+        "contain this element. Metabolites without a formula do not "
+        "contribute. Presence-only count — see class docstring for "
+        "'not stoichiometric, not mass-balanced' semantics.")
 
 
 class MbgTopMetabolite(BaseModel):
@@ -926,8 +985,8 @@ class MbgTopMetabolite(BaseModel):
         description="Metabolite display name (e.g. 'Urea').")
     formula: str | None = Field(
         default=None,
-        description="Hill-notation formula (e.g. 'CH4N2O'); null on ~9% "
-        "of metabolites (transport-only ChEBI generics).")
+        description="Hill-notation formula (e.g. 'CH4N2O'); null on a "
+        "minority of metabolites (transport-only ChEBI generics).")
     gene_count: int = Field(
         description="Distinct input genes touching this metabolite via "
         "either arm.")
@@ -942,10 +1001,11 @@ class MbgTopMetabolite(BaseModel):
         description="Metabolism-arm row count for this metabolite.")
     transport_substrate_confirmed_rows: int = Field(
         description="Transport-arm row count at `tc_specificity` "
-        "(substrate-curated). High-precision.")
+        "(substrate-curated tier).")
     transport_family_inferred_rows: int = Field(
         description="Transport-arm row count at coarser TCDB levels "
-        "(rolled up; lower-precision).")
+        "(rollup tier — propagated via the substrate edge). Both tiers "
+        "are annotations — see `docs://guide/conventions`.")
 
 
 class MbgTopReaction(BaseModel):
@@ -961,10 +1021,10 @@ class MbgTopReaction(BaseModel):
         "'kegg.reaction:R00131').")
     name: str = Field(
         description="Reaction systematic name + KEGG equation (raw KEGG; "
-        "may be empty `''` for 32 reactions in the KG).")
+        "may be empty `''` on a small fraction of reactions).")
     ec_numbers: list[str] = Field(
         description="EC classification(s) for this reaction; empty list "
-        "for 107/2,349 reactions without EC annotation.")
+        "on reactions without an EC annotation.")
     gene_count: int = Field(
         description="Distinct input genes catalyzing this reaction in "
         "the filtered slice.")
@@ -984,10 +1044,10 @@ class MbgTopTcdbFamily(BaseModel):
     tcdb_family_id: str = Field(
         description="Full prefixed TcdbFamily ID (e.g. 'tcdb:3.A.1.4.5').")
     tcdb_family_name: str = Field(
-        description="Display name. For tc_family-level entries (~10 in "
-        "the KG) this is human-readable (e.g. 'The ATP-binding Cassette "
-        "(ABC) Superfamily'); for tc_subfamily / tc_specificity falls "
-        "back to the `tcdb_id` value.")
+        description="Display name. For tc_family-level entries this is "
+        "human-readable (e.g. 'The ATP-binding Cassette (ABC) Superfamily'); "
+        "for tc_subfamily / tc_specificity it falls back to the `tcdb_id` "
+        "value.")
     level_kind: str = Field(
         description="One of tc_class / tc_subclass / tc_family / "
         "tc_subfamily / tc_specificity. Determines `transport_confidence`.")
@@ -1019,18 +1079,19 @@ class MbgTopGeneCategory(BaseModel):
 
 
 class MbgTopPathway(BaseModel):
-    """NEW (vs GBM) — Top-N (truncated to 10) KEGG pathways the gene
-    set's chemistry reaches. Pathway namespace explicitly distinct from
-    gene-KO pathway annotations available via
-    `genes_by_ontology(ontology="kegg")` (where pathway membership is
-    asserted by the gene's KO assignment, not by chemistry reach).
+    """Top-N (truncated to 10) KEGG pathways the gene set's chemistry
+    reaches. Pathway namespace explicitly distinct from gene-KO pathway
+    annotations available via `genes_by_ontology(ontology="kegg")`
+    (where pathway membership is asserted by the gene's KO assignment,
+    not by chemistry reach).
 
     Source: UNION of `Reaction_in_kegg_pathway` (reaction-side) +
     `Metabolite_in_pathway` (metabolite-side, via reaction-arm
-    metabolites OR transport-arm metabolites). Filter
-    `WHERE p.reaction_count >= 3` drops signaling/disease pathways with
-    no chemistry breadth. Rank: `gene_count DESC, p.reaction_count ASC`
-    (more genes hitting + more focused pathway).
+    metabolites OR transport-arm metabolites). Pathways with fewer than
+    3 reactions in the KG are dropped to filter out signaling/disease
+    pathways with no chemistry breadth. Rank: `gene_count DESC,
+    pathway_reaction_count ASC` (more genes hitting + more focused
+    pathway).
 
     Drill-down: pass any `pathway_id` to
     `list_metabolites(pathway_ids=[...])` for the full metabolite roster
@@ -1039,21 +1100,22 @@ class MbgTopPathway(BaseModel):
     for gene-KO-mediated pathway annotations. For metabolic pathway
     analysis with a hypothesis test, use `pathway_enrichment`.
     """
-    pathway_id: str = Field(
+    metabolite_pathway_id: str = Field(
         description="Full prefixed KEGG pathway ID (e.g. "
-        "'kegg.pathway:ko00910').")
-    pathway_name: str = Field(
-        description="Pathway display name (e.g. 'Nitrogen metabolism').")
+        "'kegg.pathway:ko00910'). Metabolite-pathway rollup (distinct "
+        "from KO-pathway annotations on `genes_by_ontology`).")
+    metabolite_pathway_name: str = Field(
+        description="Pathway display name (e.g. 'Nitrogen metabolism'). "
+        "Metabolite-pathway rollup (distinct from KO-pathway "
+        "annotations on `genes_by_ontology`).")
     gene_count: int = Field(
         description="Distinct input genes with ≥1 chemistry edge into "
         "this pathway (via reaction-side or metabolite-side).")
     pathway_reaction_count: int = Field(
-        description="Total reactions in this pathway in the KG (KG-4 "
-        "rollup, 100% on pathway-level entries). At-a-glance pathway "
-        "sizing.")
+        description="Total reactions in this pathway in the KG. "
+        "At-a-glance pathway sizing.")
     pathway_metabolite_count: int = Field(
-        description="Total metabolites in this pathway in the KG (KG-4 "
-        "rollup).")
+        description="Total metabolites in this pathway in the KG.")
 
 
 class MbgNotFound(BaseModel):
@@ -1102,7 +1164,7 @@ class MetabolitesByGeneResponse(BaseModel):
         description="Diagnostic strings. Currently emitted: "
         "family-inferred-dominance auto-warning when transport rows are "
         "family-inferred majority and `transport_confidence` was not set "
-        "explicitly (mirror of GBM behavior).")
+        "explicitly (mirrors `genes_by_metabolite`).")
     not_found: MbgNotFound = Field(
         default_factory=MbgNotFound,
         description="Inputs that did not resolve to a KG node — see model.")
@@ -1126,9 +1188,13 @@ class MetabolitesByGeneResponse(BaseModel):
         "transport rows only (≤2 entries; metabolism rows are excluded).")
     by_element: list[MbgByElement] = Field(
         default_factory=list,
-        description="NEW (vs GBM): element-presence rollup across the "
-        "metabolites the gene set touches. Periodic-table-bounded "
-        "(~30 elements max in KG); full rollup, not top-N.")
+        description="Element-presence rollup across the metabolites the "
+        "gene set touches. Periodic-table-bounded (~30 elements max in "
+        "KG); full rollup, not top-N. Presence-only — count of distinct "
+        "compounds containing each element at all. NOT stoichiometric "
+        "(no atom counts per compound; stoichiometry lives in "
+        "`metabolite.formula`). NOT mass-balanced (KG carries no "
+        "substrate-vs-product role on `Reaction_has_metabolite`).")
     top_metabolites: list[MbgTopMetabolite] = Field(
         default_factory=list,
         description="Top 10 metabolites by gene reach in the filtered "
@@ -1151,13 +1217,13 @@ class MetabolitesByGeneResponse(BaseModel):
         default_factory=list,
         description="Top 10 gene categories by gene_count across both "
         "arms.")
-    top_pathways: list[MbgTopPathway] = Field(
+    top_metabolite_pathways: list[MbgTopPathway] = Field(
         default_factory=list,
         description="NEW (vs GBM): top 10 KEGG pathways the gene set's "
-        "chemistry reaches. Distinct from gene-KO pathway annotations "
-        "(`genes_by_ontology(ontology=\"kegg\")`) — see model docstring "
-        "for naming disambiguation. Drill into any entry via "
-        "`list_metabolites(pathway_ids=[id])`.")
+        "chemistry reaches. Metabolite-pathway rollup (distinct from "
+        "KO-pathway annotations on `genes_by_ontology(ontology=\"kegg\")`) "
+        "— see model docstring for naming disambiguation. Drill into "
+        "any entry via `list_metabolites(pathway_ids=[id])`.")
     gene_count_total: int = Field(
         description="Distinct input genes in the filtered slice (across "
         "both arms).")
@@ -1195,10 +1261,9 @@ def register_tools(mcp: FastMCP):
         annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def kg_schema(ctx: Context) -> KgSchemaResponse:
-        """Get the knowledge graph schema: node labels with property names/types,
-        and relationship types with source/target labels.
+        """Return the KG schema: node labels with property names/types and relationship types with source/target labels.
 
-        Use this before run_cypher to understand what labels and properties are queryable.
+        Use before `run_cypher` to discover queryable labels/properties. For an entity-level overview see `docs://guide/concepts`; for filter-value enumeration use `list_filter_values`.
         """
         await ctx.info("kg_schema")
         try:
@@ -1210,21 +1275,21 @@ def register_tools(mcp: FastMCP):
 
     class FilterValueResult(BaseModel):
         value: str = Field(
-            description="Filter value (e.g. 'Photosynthesis', 'Transport', 'Unknown')"
+            description="Filter value (e.g. 'Photosynthesis', 'Transport', 'Unknown')."
         )
         count: int = Field(
-            description="Number of genes/items with this value (e.g. 770)"
+            description="Number of items with this value."
         )
         tree_code: str | None = Field(
             default=None,
-            description="BRITE tree code (sparse: only for brite_tree filter, e.g. 'ko01000')",
+            description="BRITE tree code (sparse: only for brite_tree filter, e.g. 'ko01000').",
         )
 
     class ListFilterValuesResponse(BaseModel):
-        filter_type: str = Field(description="The filter type returned (e.g. 'gene_category')")
-        total_entries: int = Field(description="Total distinct values for this filter (e.g. 26)")
-        returned: int = Field(description="Number of results returned (e.g. 26)")
-        truncated: bool = Field(description="True if total_entries > returned")
+        filter_type: str = Field(description="The filter type returned (e.g. 'gene_category').")
+        total_entries: int = Field(description="Total distinct values for this filter.")
+        returned: int = Field(description="Number of results returned.")
+        truncated: bool = Field(description="True if total_entries > returned.")
         results: list[FilterValueResult] = Field(default_factory=list)
 
     @mcp.tool(
@@ -1235,20 +1300,19 @@ def register_tools(mcp: FastMCP):
         ctx: Context,
         filter_type: Annotated[
             Literal["gene_category", "brite_tree", "growth_phase",
-                    "metric_type", "value_kind", "compartment"],
+                    "metric_type", "value_kind", "compartment",
+                    "omics_type", "evidence_source"],
             Field(description=(
-                "Which categorical filter to enumerate. "
-                "'gene_category' / 'brite_tree' / 'growth_phase'; "
-                "'metric_type' / 'value_kind' / 'compartment' (DerivedMetric "
-                "discovery)."
+                "Which categorical filter to enumerate. See type column "
+                "for the 8 valid values; `omics_type` returns the full "
+                "canonical enum incl. METABOLOMICS; `evidence_source` "
+                "returns Metabolite.evidence_sources values."
             )),
         ] = "gene_category",
     ) -> ListFilterValuesResponse:
-        """List valid values for categorical filters used across tools.
+        """Enumerate valid values + counts for a categorical filter (gene_category, brite_tree, growth_phase, metric_type, value_kind, compartment, omics_type, evidence_source).
 
-        Returns valid values and counts for the requested filter type.
-        Use the returned values as filter parameters in `genes_by_function`
-        (category filter).
+        Routing: feed the returned `value`s into the corresponding filter on the relevant tool — `gene_category` → `genes_by_function(category=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`.
         """
         await ctx.info(f"list_filter_values filter_type={filter_type}")
         try:
@@ -1267,37 +1331,39 @@ def register_tools(mcp: FastMCP):
 
     class OrganismResult(BaseModel):
         organism_name: str = Field(description="Display name (e.g. 'Prochlorococcus MED4'). Use for organism filters in other tools.")
-        organism_type: str = Field(description="Classification: 'genome_strain', 'treatment', or 'reference_proteome_match'")
-        genus: str | None = Field(default=None, description="Genus (e.g. 'Prochlorococcus', 'Alteromonas')")
-        species: str | None = Field(default=None, description="Binomial species name (e.g. 'Prochlorococcus marinus')")
-        strain: str | None = Field(default=None, description="Strain identifier (e.g. 'MED4', 'EZ55')")
-        clade: str | None = Field(default=None, description="Ecotype clade, Prochlorococcus-specific (e.g. 'HLI', 'LLIV')")
-        ncbi_taxon_id: int | None = Field(default=None, description="NCBI Taxonomy ID for cross-referencing external databases (e.g. 59919)")
-        gene_count: int = Field(description="Number of genes in the KG for this organism (e.g. 1976)")
-        publication_count: int = Field(description="Number of publications studying this organism (e.g. 11)")
-        experiment_count: int = Field(description="Total experiments across all publications (e.g. 46)")
-        treatment_types: list[str] = Field(default_factory=list, description="Distinct treatment types studied (e.g. ['coculture', 'light_stress', 'nitrogen_stress'])")
-        background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'continuous_light', 'diel_cycle'])")
-        omics_types: list[str] = Field(default_factory=list, description="Distinct omics types available (e.g. ['RNASEQ', 'PROTEOMICS'])")
-        clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses for this organism (e.g. 4)")
-        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison', 'diel'])")
-        growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases across experiments (e.g. ['exponential', 'nutrient_limited']). Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
+        organism_type: str = Field(description="Classification: 'genome_strain', 'treatment', or 'reference_proteome_match'.")
+        genus: str | None = Field(default=None, description="Genus (e.g. 'Prochlorococcus', 'Alteromonas').")
+        species: str | None = Field(default=None, description="Binomial species name (e.g. 'Prochlorococcus marinus').")
+        strain: str | None = Field(default=None, description="Strain identifier (e.g. 'MED4', 'EZ55').")
+        clade: str | None = Field(default=None, description="Ecotype clade, Prochlorococcus-specific (e.g. 'HLI', 'LLIV').")
+        ncbi_taxon_id: int | None = Field(default=None, description="NCBI Taxonomy ID for cross-referencing external databases.")
+        gene_count: int = Field(description="Number of genes in the KG for this organism.")
+        publication_count: int = Field(description="Number of publications studying this organism.")
+        experiment_count: int = Field(description="Total experiments across all publications.")
+        treatment_types: list[str] = Field(default_factory=list, description="Distinct treatment types studied (e.g. ['coculture', 'light_stress', 'nitrogen_stress']).")
+        background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'continuous_light', 'diel_cycle']).")
+        omics_types: list[str] = Field(default_factory=list, description="Distinct omics types available (e.g. ['RNASEQ', 'PROTEOMICS']).")
+        clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses for this organism.")
+        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison', 'diel']).")
+        growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases across experiments (e.g. ['exponential', 'nutrient_limited']). Timepoint-level condition, not gene-specific.")
         # verbose-only fields
-        family: str | None = Field(default=None, description="Taxonomic family (e.g. 'Prochlorococcaceae')")
-        order: str | None = Field(default=None, description="Taxonomic order (e.g. 'Synechococcales')")
-        tax_class: str | None = Field(default=None, description="Taxonomic class (e.g. 'Cyanophyceae')")
-        phylum: str | None = Field(default=None, description="Taxonomic phylum (e.g. 'Cyanobacteriota')")
-        kingdom: str | None = Field(default=None, description="Taxonomic kingdom (e.g. 'Bacillati')")
-        superkingdom: str | None = Field(default=None, description="Taxonomic superkingdom (e.g. 'Bacteria')")
-        lineage: str | None = Field(default=None, description="Full NCBI taxonomy lineage string (e.g. 'cellular organisms; Bacteria; ...; Prochlorococcus marinus')")
-        cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (only with verbose=True, e.g. 35)")
+        family: str | None = Field(default=None, description="Taxonomic family (e.g. 'Prochlorococcaceae').")
+        order: str | None = Field(default=None, description="Taxonomic order (e.g. 'Synechococcales').")
+        tax_class: str | None = Field(default=None, description="Taxonomic class (e.g. 'Cyanophyceae').")
+        phylum: str | None = Field(default=None, description="Taxonomic phylum (e.g. 'Cyanobacteriota').")
+        kingdom: str | None = Field(default=None, description="Taxonomic kingdom (e.g. 'Bacillati').")
+        superkingdom: str | None = Field(default=None, description="Taxonomic superkingdom (e.g. 'Bacteria').")
+        lineage: str | None = Field(default=None, description="Full NCBI taxonomy lineage string.")
+        cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (verbose-only).")
         # DM compact fields
-        derived_metric_count: int = Field(default=0, description="Total DerivedMetric annotations on this organism's experiments (0 when none).")
+        derived_metric_count: int = Field(default=0, description="Total DerivedMetric annotations on this organism's experiments. 0 when none.")
         derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Subset of {numeric, boolean, categorical} present across this organism's DMs. Use to route to genes_by_{numeric,boolean,categorical}_metric.")
         compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured for this organism (e.g. ['whole_cell', 'vesicle']).")
-        # Chemistry rollups (slice 1)
-        reaction_count: int = Field(default=0, description="Distinct reactions catalyzed by genes in this organism (e.g. 943). When > 0, drill in via list_metabolites(organism_names=[organism_name]) to enumerate metabolites this organism is capable of metabolizing.")
-        metabolite_count: int = Field(default=0, description="Distinct metabolites this organism's genes can act on (e.g. 1039). Capability signal — does NOT mean these metabolites were measured. Today reflects gene catalysis only; will grow to include transport substrates when the TCDB-CAZy ontology ships, with no schema change. When > 0, drill in via list_metabolites(organism_names=[organism_name]).")
+        # Chemistry rollups
+        reaction_count: int = Field(default=0, description="Distinct reactions catalyzed by genes in this organism. When > 0, drill in via list_metabolites(organism_names=[organism_name]).")
+        metabolite_count: int = Field(default=0, description="Distinct metabolites this organism's genes can act on. Catalysis-capability signal (Gene → Reaction → Metabolite only); does NOT mean these metabolites were measured, and does NOT include transport-reach. When > 0, drill in via list_metabolites(organism_names=[organism_name]).")
+        # Metabolomics measurement rollup
+        measured_metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this organism via any MetaboliteAssay (precomputed OrganismTaxon.measured_metabolite_count). Different from metabolite_count (reaction-only chemistry capability). When > 0, drill in via list_metabolite_assays(organism=organism_name).")
         # DM verbose-only fields
         derived_metric_gene_count: int | None = Field(default=None, description="Total gene-level DM annotation count (verbose-only).")
         derived_metric_types: list[str] | None = Field(default=None, description="Distinct metric_type tags observed (verbose-only).")
@@ -1306,43 +1372,48 @@ def register_tools(mcp: FastMCP):
         reference_proteome: str | None = Field(default=None, description="Accession of matched reference proteome (e.g. 'GCA_003513035.1'). Only on reference_proteome_match organisms.")
 
     class OrgClusterTypeBreakdown(BaseModel):
-        cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison')")
-        count: int = Field(description="Number of organisms with this cluster type (e.g. 4)")
+        cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison').")
+        count: int = Field(description="Number of organisms with this cluster type.")
 
     class OrgTypeBreakdown(BaseModel):
-        organism_type: str = Field(description="Organism type (e.g. 'genome_strain')")
-        count: int = Field(description="Number of organisms of this type (e.g. 25)")
+        organism_type: str = Field(description="Organism type (e.g. 'genome_strain').")
+        count: int = Field(description="Number of organisms of this type.")
 
     class OrgValueKindBreakdown(BaseModel):
-        value_kind: str = Field(description="DerivedMetric value kind (e.g. 'numeric', 'boolean', 'categorical')")
+        value_kind: str = Field(description="DerivedMetric value kind (e.g. 'numeric', 'boolean', 'categorical').")
         count: int = Field(description="Number of DerivedMetrics with this value_kind across matched organisms.")
 
     class OrgMetricTypeBreakdown(BaseModel):
-        metric_type: str = Field(description="DerivedMetric type (e.g. 'diel_rhythmicity', 'darkness_survival_class')")
+        metric_type: str = Field(description="DerivedMetric type (e.g. 'diel_rhythmicity', 'darkness_survival_class').")
         count: int = Field(description="Number of DerivedMetrics with this metric_type across matched organisms.")
 
     class OrgCompartmentBreakdown(BaseModel):
-        compartment: str = Field(description="Wet-lab compartment (e.g. 'whole_cell', 'vesicle')")
+        compartment: str = Field(description="Wet-lab compartment (e.g. 'whole_cell', 'vesicle').")
         count: int = Field(description="Number of DerivedMetrics in this compartment across matched organisms.")
 
     class OrgMetabolicCapabilityBreakdown(BaseModel):
-        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
-        reaction_count: int = Field(description="Distinct reactions catalyzed by this organism's genes (e.g. 943)")
-        metabolite_count: int = Field(description="Distinct metabolites this organism's genes can act on (e.g. 1039). Same semantics as OrganismResult.metabolite_count.")
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4').")
+        reaction_count: int = Field(description="Distinct reactions catalyzed by this organism's genes.")
+        metabolite_count: int = Field(description="Distinct metabolites this organism's genes can act on. Same semantics as OrganismResult.metabolite_count.")
+
+    class OrgMeasurementCapability(BaseModel):
+        has_metabolomics: int = Field(default=0, description="Number of matched organisms with measured_metabolite_count > 0.")
+        no_metabolomics: int = Field(default=0, description="Number of matched organisms with measured_metabolite_count == 0.")
 
     class ListOrganismsResponse(BaseModel):
-        total_entries: int = Field(description="Total organisms in the KG")
-        total_matching: int = Field(description="Organisms matching the filter (= total_entries when no filter)")
-        by_cluster_type: list[OrgClusterTypeBreakdown] = Field(default_factory=list, description="Organism counts per cluster type over the matched set, sorted by count descending")
-        by_organism_type: list[OrgTypeBreakdown] = Field(default_factory=list, description="Organism counts per type over the matched set, sorted by count descending")
-        by_value_kind: list[OrgValueKindBreakdown] = Field(default_factory=list, description="DM value_kind frequency rollup across matched organisms. Each entry: {value_kind, count}.")
-        by_metric_type: list[OrgMetricTypeBreakdown] = Field(default_factory=list, description="DM metric_type frequency rollup across matched organisms. Each entry: {metric_type, count}.")
-        by_compartment: list[OrgCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched organisms. Each entry: {compartment, count}.")
+        total_entries: int = Field(description="Total organisms in the KG.")
+        total_matching: int = Field(description="Organisms matching the filter (= total_entries when no filter).")
+        by_cluster_type: list[OrgClusterTypeBreakdown] = Field(default_factory=list, description="Organism counts per cluster type over the matched set, sorted desc.")
+        by_organism_type: list[OrgTypeBreakdown] = Field(default_factory=list, description="Organism counts per type over the matched set, sorted desc.")
+        by_value_kind: list[OrgValueKindBreakdown] = Field(default_factory=list, description="DM value_kind frequency rollup across matched organisms.")
+        by_metric_type: list[OrgMetricTypeBreakdown] = Field(default_factory=list, description="DM metric_type frequency rollup across matched organisms.")
+        by_compartment: list[OrgCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched organisms.")
         by_metabolic_capability: list[OrgMetabolicCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms by metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites.")
-        returned: int = Field(description="Number of results returned")
-        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-        truncated: bool = Field(description="True if total_matching > offset + returned")
-        not_found: list[str] = Field(default_factory=list, description="organism_names inputs that didn't match any organism (case-insensitive); [] when no filter")
+        by_measurement_capability: OrgMeasurementCapability = Field(default_factory=OrgMeasurementCapability, description="Binary rollup of metabolomics measurement coverage across matched organisms: {has_metabolomics, no_metabolomics} (tool-specific deviation from list_/by_-style frequency rollups elsewhere — exactly two keys).")
+        returned: int = Field(description="Number of results returned.")
+        offset: int = Field(default=0, description="Offset into full result set.")
+        truncated: bool = Field(description="True if total_matching > offset + returned.")
+        not_found: list[str] = Field(default_factory=list, description="organism_names inputs that didn't match any organism (case-insensitive); [] when no filter.")
         results: list[OrganismResult]
 
     @mcp.tool(
@@ -1376,27 +1447,9 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> ListOrganismsResponse:
-        """List organisms in the knowledge graph, optionally filtered by name or compartment.
+        """List organisms with taxonomy, data-availability counts, organism_type, DM rollups, chemistry-capability rollups, and metabolomics-coverage rollup.
 
-        Returns taxonomy, gene counts, publication counts, and organism_type
-        for each organism. organism_type classifies each organism as
-        'genome_strain', 'treatment', or 'reference_proteome_match'.
-        Reference proteome match organisms also include reference_database
-        and reference_proteome fields.
-
-        Use the returned organism names as filter values in genes_by_function,
-        resolve_gene, genes_by_ontology, list_publications, etc. The organism
-        filter on those tools uses partial matching — "MED4",
-        "Prochlorococcus MED4", and "Prochlorococcus" all work. The
-        organism_names filter on this tool uses exact match (case-
-        insensitive) on preferred_name; unknown names are reported in
-        not_found.
-
-        After this tool, scope deeper queries to the chosen organism: use the
-        locus_tags filter on per-gene tools (gene_overview, gene_homologs)
-        and the organism filter on gene_ontology_terms, list_experiments,
-        and list_publications. Use list_filter_values for categorical
-        field enumeration.
+        Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Note that `organism_names=` on this tool is exact (case-insensitive) on `preferred_name`, while the `organism=` filter on most other tools is a substring match.
         """
         await ctx.info(
             f"list_organisms organism_names={organism_names} compartment={compartment} "
@@ -1423,6 +1476,8 @@ def register_tools(mcp: FastMCP):
                 OrgMetabolicCapabilityBreakdown(**b)
                 for b in result.get("by_metabolic_capability", [])
             ]
+            measurement_cap_data = result.get("by_measurement_capability") or {}
+            by_measurement_capability = OrgMeasurementCapability(**measurement_cap_data)
             response = ListOrganismsResponse(
                 total_entries=result["total_entries"],
                 total_matching=result["total_matching"],
@@ -1432,6 +1487,7 @@ def register_tools(mcp: FastMCP):
                 by_metric_type=by_metric_type,
                 by_compartment=by_compartment,
                 by_metabolic_capability=by_metabolic_capability,
+                by_measurement_capability=by_measurement_capability,
                 returned=result["returned"],
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],
@@ -1458,12 +1514,12 @@ def register_tools(mcp: FastMCP):
         count: int = Field(description="Number of matching genes in this organism (e.g. 1)")
 
     class ResolveGeneResponse(BaseModel):
-        total_matching: int = Field(description="Total genes matching identifier + organism filter (e.g. 3)")
-        by_organism: list[ResolveOrganismBreakdown] = Field(description="Match counts per organism, sorted by count descending")
-        returned: int = Field(description="Genes in this response (e.g. 3)")
-        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-        truncated: bool = Field(description="True if total_matching > returned")
-        results: list[GeneMatch] = Field(description="Matching genes sorted by organism_name, locus_tag")
+        total_matching: int = Field(description="Total genes matching identifier + organism filter.")
+        by_organism: list[ResolveOrganismBreakdown] = Field(description="Match counts per organism, sorted desc.")
+        returned: int = Field(description="Genes in this response.")
+        offset: int = Field(default=0, description="Offset into full result set.")
+        truncated: bool = Field(description="True if total_matching > returned.")
+        results: list[GeneMatch] = Field(description="Matching genes sorted by organism_name, locus_tag.")
 
     @mcp.tool(
         tags={"genes", "discovery"},
@@ -1487,13 +1543,9 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> ResolveGeneResponse:
-        """Resolve a gene identifier to matching genes in the knowledge graph.
+        """Resolve a gene identifier (locus_tag, gene name, old locus_tag, or RefSeq protein ID) to matching Gene nodes. Matching is case-insensitive.
 
-        Matching is case-insensitive — 'pmm0001', 'PMM0001', and 'Pmm0001'
-        all work. Use the returned locus_tags with gene_overview,
-        gene_details, gene_homologs, or gene_ontology_terms. The organism
-        filter uses case-insensitive partial matching — 'MED4' and
-        'Prochlorococcus MED4' both work.
+        Routing: feed returned `locus_tag`s into `gene_overview` (data-availability triage), `gene_details` (full properties), `gene_homologs`, or `gene_ontology_terms`. The optional `organism` filter is a case-insensitive substring on `organism_name`.
         """
         await ctx.info(f"resolve_gene identifier={identifier} organism={organism} offset={offset}")
         try:
@@ -1521,36 +1573,36 @@ def register_tools(mcp: FastMCP):
     # --- genes_by_function ---
 
     class FunctionOrganismBreakdown(BaseModel):
-        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
-        count: int = Field(description="Number of matching genes")
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4').")
+        count: int = Field(description="Number of matching genes.")
 
     class FunctionCategoryBreakdown(BaseModel):
-        category: str = Field(description="Gene category (e.g. 'Photosynthesis')")
-        count: int = Field(description="Number of matching genes")
+        category: str = Field(description="Gene category (e.g. 'Photosynthesis').")
+        count: int = Field(description="Number of matching genes.")
 
     class GenesByFunctionResult(BaseModel):
-        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
-        gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN')")
-        product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III subunit beta')")
-        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
-        gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Photosynthesis')")
-        annotation_quality: int = Field(description="Annotation quality 0-3 (3=best)")
-        score: float = Field(description="Fulltext relevance score")
+        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001').")
+        gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN').")
+        product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III subunit beta').")
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4').")
+        gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Photosynthesis').")
+        annotation_quality: int = Field(description="Annotation quality, 0..3 numeric encoding of `Gene.annotation_state` (informative-evidence count). 3=informative_multi, 2=informative_single, 1=catch_all_only, 0=no_evidence. [AQ] Definition shifted in 2026-05 KG release; see docs://guide/conventions.")
+        score: float = Field(description="Lucene relevance score.")
         # verbose only
-        function_description: str | None = Field(default=None, description="Functional description text")
-        gene_summary: str | None = Field(default=None, description="Combined gene annotation summary")
+        function_description: str | None = Field(default=None, description="Functional description text (verbose-only).")
+        gene_summary: str | None = Field(default=None, description="Combined gene annotation summary (verbose-only).")
 
     class GenesByFunctionResponse(BaseModel):
-        total_search_hits: int = Field(description="Total genes matching search text (before organism/category/quality filters)")
-        total_matching: int = Field(description="Total genes matching search + all filters")
-        by_organism: list[FunctionOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc")
-        by_category: list[FunctionCategoryBreakdown] = Field(description="Gene counts per category, sorted desc")
-        score_max: float | None = Field(default=None, description="Highest relevance score (null if 0 matches)")
-        score_median: float | None = Field(default=None, description="Median relevance score (null if 0 matches)")
-        returned: int = Field(description="Number of results returned")
-        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-        truncated: bool = Field(description="True when total_matching > returned")
-        results: list[GenesByFunctionResult] = Field(description="Gene results ranked by relevance")
+        total_search_hits: int = Field(description="Total genes matching search text (before organism/category/quality filters).")
+        total_matching: int = Field(description="Total genes matching search + all filters.")
+        by_organism: list[FunctionOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc.")
+        by_category: list[FunctionCategoryBreakdown] = Field(description="Gene counts per category, sorted desc.")
+        score_max: float | None = Field(default=None, description="Highest relevance score (null if 0 matches).")
+        score_median: float | None = Field(default=None, description="Median relevance score (null if 0 matches).")
+        returned: int = Field(description="Number of results returned.")
+        offset: int = Field(default=0, description="Offset into full result set.")
+        truncated: bool = Field(description="True when total_matching > returned.")
+        results: list[GenesByFunctionResult] = Field(description="Gene results ranked by relevance.")
 
     @mcp.tool(
         tags={"genes", "discovery"},
@@ -1559,8 +1611,10 @@ def register_tools(mcp: FastMCP):
     async def genes_by_function(
         ctx: Context,
         search_text: Annotated[str, Field(
-            description="Free-text query (Lucene syntax supported). "
-            "E.g. 'photosystem', 'nitrogen AND transport', 'dnaN~'.",
+            description="Free-text query (Lucene syntax: quoted phrases, "
+            "AND/OR, wildcards `*`, fuzzy `~`). E.g. 'photosystem', "
+            "'nitrogen AND transport', 'dnaN~'. See docs://guide/conventions "
+            "for Lucene scoring details.",
         )],
         organism: Annotated[str | None, Field(
             description="Filter by organism (case-insensitive substring). "
@@ -1573,9 +1627,11 @@ def register_tools(mcp: FastMCP):
             "Use list_filter_values to see valid values.",
         )] = None,
         min_quality: Annotated[int, Field(
-            description="Minimum annotation_quality (0-3). "
-            "0=hypothetical, 1=has description, 2=named product, "
-            "3=well-annotated. Use 2 to skip hypothetical proteins.",
+            description="Minimum annotation_quality (0..3 numeric encoding "
+            "of `Gene.annotation_state`): 0=no_evidence, 1=catch_all_only, "
+            "2=informative_single, 3=informative_multi. Use 2 to skip "
+            "hypothetical proteins; 3 for high-confidence. [AQ] Definition "
+            "shifted in 2026-05 KG release; see docs://guide/conventions.",
             ge=0, le=3,
         )] = 0,
         summary: Annotated[bool, Field(
@@ -1591,14 +1647,9 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> GenesByFunctionResponse:
-        """Search genes by functional annotation text.
+        """Free-text search across gene names, products, and functional descriptions. Lucene syntax (see docs://guide/conventions). Results ranked by relevance score.
 
-        Full-text search across gene names, products, and functional
-        descriptions. Supports Lucene syntax: quoted phrases, AND/OR,
-        wildcards (*), fuzzy (~). Results ranked by relevance score.
-
-        For ontology-based search, use genes_by_ontology.
-        For gene details, use gene_overview.
+        Routing: feed `locus_tag`s into `gene_overview` (data-availability triage), `gene_ontology_terms` (annotation drill-down), or `genes_by_ontology` for ontology-anchored search instead.
         """
         await ctx.info(f"genes_by_function search_text={search_text} organism={organism} "
                        f"category={category} min_quality={min_quality}")
@@ -1637,19 +1688,21 @@ def register_tools(mcp: FastMCP):
     # --- gene_overview ---
 
     class GeneOverviewResult(BaseModel):
-        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
-        gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN')")
-        product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III subunit beta')")
-        gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Replication and repair')")
-        annotation_quality: int | None = Field(default=None, description="Annotation quality score 0-3 (e.g. 3)")
-        organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
+        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001').")
+        gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN').")
+        product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III subunit beta').")
+        gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Replication and repair').")
+        annotation_quality: int | None = Field(default=None, description="0..3 numeric encoding of `Gene.annotation_state` (informative-evidence count). 3=informative_multi, 2=informative_single, 1=catch_all_only, 0=no_evidence. [AQ] Definition shifted in 2026-05 KG release; see docs://guide/conventions.")
+        organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4').")
         annotation_types: list[str] = Field(default_factory=list, description="Ontology source types where this gene has at least one annotation (e.g. ['go_bp', 'ec', 'kegg']). Presence-only — does NOT indicate content informativeness; a 'cog_category' entry may be 'Function unknown'. For term content, call gene_ontology_terms.")
-        expression_edge_count: int = Field(default=0, description="Number of expression data points (e.g. 36). When > 0, drill into differential_expression_by_gene or gene_response_profile.")
-        significant_up_count: int = Field(default=0, description="Significant up-regulated DE observations (e.g. 3). When > 0, use differential_expression_by_gene with direction='up' for per-experiment detail.")
-        significant_down_count: int = Field(default=0, description="Significant down-regulated DE observations (e.g. 2). When > 0, use differential_expression_by_gene with direction='down' for per-experiment detail.")
-        closest_ortholog_group_size: int | None = Field(default=None, description="Size of tightest ortholog group (e.g. 9). Use gene_homologs for full per-group membership and source/level metadata.")
+        annotation_state: str = Field(description="Informativeness state: informative_multi | informative_single | catch_all_only | no_evidence.")
+        informative_annotation_types: list[str] = Field(default_factory=list, description="Subset of annotation_types backed by informative (non-catch-all) terms.")
+        expression_edge_count: int = Field(default=0, description="Number of expression data points. When > 0, drill via differential_expression_by_gene(locus_tags=[...]) or gene_response_profile.")
+        significant_up_count: int = Field(default=0, description="Significant up-regulated DE observations. When > 0, drill via differential_expression_by_gene(direction='up').")
+        significant_down_count: int = Field(default=0, description="Significant down-regulated DE observations. When > 0, drill via differential_expression_by_gene(direction='down').")
+        closest_ortholog_group_size: int | None = Field(default=None, description="Size of tightest ortholog group. Use gene_homologs for full per-group membership and source/level metadata.")
         closest_ortholog_genera: list[str] | None = Field(default=None, description="Genera in tightest ortholog group (e.g. ['Prochlorococcus', 'Synechococcus']). Use gene_homologs for full membership; genes_by_homolog_group to expand a specific group.")
-        cluster_membership_count: int = Field(default=0, description="Number of cluster memberships (e.g. 3). When > 0, drill into gene_clusters_by_gene for per-cluster details.")
+        cluster_membership_count: int = Field(default=0, description="Number of cluster memberships. When > 0, drill via gene_clusters_by_gene for per-cluster details.")
         cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison', 'diel']). Use gene_clusters_by_gene with cluster_type filter to scope drill-down.")
         # Compact DM fields (always present)
         derived_metric_count: int = Field(
@@ -1660,49 +1713,75 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="Subset of {numeric, boolean, categorical} where this gene has DM annotations. Use to route to genes_by_{kind}_metric drill-downs.",
         )
+        # Chemistry rollups
+        reaction_count: int = Field(
+            default=0,
+            description="Distinct reactions catalysed by this gene (precomputed Gene-side rollup). When > 0, drill via metabolites_by_gene(locus_tags=[locus_tag], organism=...).",
+        )
+        metabolite_count: int = Field(
+            default=0,
+            description="Distinct metabolites reachable from this gene via reaction OR transport (UNION). Differs from OrganismTaxon.metabolite_count which is reaction-only — a transport-only gene can have reaction_count=0 with metabolite_count > 0.",
+        )
+        transporter_count: int = Field(
+            default=0,
+            description="Distinct TCDB families annotated to this gene. When > 0, drill via genes_by_metabolite or metabolites_by_gene with the transport arm.",
+        )
+        evidence_sources: list[str] = Field(
+            default_factory=list,
+            description="Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. When non-empty, drill into metabolites_by_gene(locus_tags=[...]). Per-source definitions: see docs://guide/concepts.",
+        )
         # verbose-only
-        gene_summary: str | None = Field(default=None, description="Concatenated summary text (e.g. 'prmA :: ribosomal protein L11 methyltransferase :: Methylates ribosomal protein L11')")
-        function_description: str | None = Field(default=None, description="Curated functional description (e.g. 'Methylates ribosomal protein L11'). May be null when no curated text exists.")
-        all_identifiers: list[str] | None = Field(default=None, description="Cross-references: UniProt, CyanorakID, RefSeq, etc. (e.g. ['CK_Pro_MED4_00845', 'Q7V1M0', 'WP_011132479.1'])")
+        gene_summary: str | None = Field(default=None, description="Concatenated summary text (verbose-only, e.g. 'prmA :: ribosomal protein L11 methyltransferase :: Methylates ribosomal protein L11').")
+        function_description: str | None = Field(default=None, description="Curated functional description (verbose-only). May be null when no curated text exists.")
+        all_identifiers: list[str] | None = Field(default=None, description="Cross-references: UniProt, CyanorakID, RefSeq, etc. (verbose-only).")
         # Verbose-only DM fields (None on compact responses)
-        numeric_metric_count: int | None = Field(default=None, description="Numeric DM count (verbose).")
-        boolean_metric_count: int | None = Field(default=None, description="Boolean DM count (verbose).")
-        categorical_metric_count: int | None = Field(default=None, description="Categorical DM count (verbose).")
-        numeric_metric_types_observed: list[str] | None = Field(default=None, description="Numeric metric_types observed (verbose).")
-        boolean_metric_types_observed: list[str] | None = Field(default=None, description="Boolean metric_types observed (verbose).")
-        categorical_metric_types_observed: list[str] | None = Field(default=None, description="Categorical metric_types observed (verbose).")
-        compartments_observed: list[str] | None = Field(default=None, description="DM compartments observed for this gene (verbose).")
+        numeric_metric_count: int | None = Field(default=None, description="Numeric DM count (verbose-only).")
+        boolean_metric_count: int | None = Field(default=None, description="Boolean DM count (verbose-only).")
+        categorical_metric_count: int | None = Field(default=None, description="Categorical DM count (verbose-only).")
+        numeric_metric_types_observed: list[str] | None = Field(default=None, description="Numeric metric_types observed (verbose-only).")
+        boolean_metric_types_observed: list[str] | None = Field(default=None, description="Boolean metric_types observed (verbose-only).")
+        categorical_metric_types_observed: list[str] | None = Field(default=None, description="Categorical metric_types observed (verbose-only).")
+        compartments_observed: list[str] | None = Field(default=None, description="DM compartments observed for this gene (verbose-only).")
 
     class OverviewOrganismBreakdown(BaseModel):
-        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
-        count: int = Field(description="Genes from this organism (e.g. 3)")
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4').")
+        count: int = Field(description="Genes from this organism.")
 
     class OverviewCategoryBreakdown(BaseModel):
-        category: str = Field(description="Gene category (e.g. 'Photosynthesis')")
-        count: int = Field(description="Genes in this category (e.g. 5)")
+        category: str = Field(description="Gene category (e.g. 'Photosynthesis').")
+        count: int = Field(description="Genes in this category.")
 
     class OverviewAnnotationTypeBreakdown(BaseModel):
-        annotation_type: str = Field(description="Ontology type (e.g. 'go_bp', 'ec', 'kegg')")
-        count: int = Field(description="Genes with this annotation type (e.g. 12)")
+        annotation_type: str = Field(description="Ontology type (e.g. 'go_bp', 'ec', 'kegg').")
+        count: int = Field(description="Genes with this annotation type.")
+
+    class OverviewAnnotationStateBreakdown(BaseModel):
+        annotation_state: str = Field(description="Informativeness state (e.g. 'informative_multi', 'informative_single', 'catch_all_only', 'no_evidence').")
+        count: int = Field(description="Genes in this state.")
 
     class GeneOverviewResponse(BaseModel):
-        total_matching: int = Field(description="Genes found in KG from input locus_tags")
-        by_organism: list[OverviewOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc")
-        by_category: list[OverviewCategoryBreakdown] = Field(description="Gene counts per category, sorted desc")
-        by_annotation_type: list[OverviewAnnotationTypeBreakdown] = Field(description="Gene counts per annotation type, sorted desc")
-        has_expression: int = Field(description="Genes with expression data (expression_edge_count > 0)")
-        has_significant_expression: int = Field(description="Genes with significant DE observations")
-        has_orthologs: int = Field(description="Genes with ortholog group membership")
-        has_clusters: int = Field(description="Genes with cluster membership")
+        total_matching: int = Field(description="Genes found in KG from input locus_tags.")
+        by_organism: list[OverviewOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc.")
+        by_category: list[OverviewCategoryBreakdown] = Field(description="Gene counts per category, sorted desc.")
+        by_annotation_type: list[OverviewAnnotationTypeBreakdown] = Field(description="Gene counts per annotation type, sorted desc.")
+        by_annotation_state: list[OverviewAnnotationStateBreakdown] = Field(default_factory=list, description="Rollup of annotation_state over result set, sorted desc by count.")
+        has_expression: int = Field(description="Genes with expression data (expression_edge_count > 0).")
+        has_significant_expression: int = Field(description="Genes with significant DE observations.")
+        has_orthologs: int = Field(description="Genes with ortholog group membership.")
+        has_clusters: int = Field(description="Genes with cluster membership.")
         has_derived_metrics: int = Field(
             default=0,
             description="Count of requested locus_tags carrying any DM annotation.",
         )
-        returned: int = Field(description="Results in this response (0 when summary=true)")
-        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-        truncated: bool = Field(description="True if total_matching > returned")
-        not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
-        results: list[GeneOverviewResult] = Field(default_factory=list, description="One row per gene")
+        has_chemistry: int = Field(
+            default=0,
+            description="Count of requested locus_tags with non-empty evidence_sources (participate in at least one reaction-to-metabolite or transport path).",
+        )
+        returned: int = Field(description="Results in this response (0 when summary=true).")
+        offset: int = Field(default=0, description="Offset into full result set.")
+        truncated: bool = Field(description="True if total_matching > returned.")
+        not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG.")
+        results: list[GeneOverviewResult] = Field(default_factory=list, description="One row per gene.")
 
     @mcp.tool(
         tags={"genes"},
@@ -1727,19 +1806,9 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> GeneOverviewResponse:
-        """Get an overview of genes: identity and data availability signals.
+        """Batch gene routing: identity (gene_name, product, gene_category) plus per-gene data-availability signals (annotation_types, expression counts, ortholog/cluster summaries, DM rollups, chemistry rollups).
 
-        Use after resolve_gene, genes_by_function, genes_by_ontology, or
-        gene_homologs to understand what each gene is and what follow-up
-        data exists.
-
-        After this tool, drill into the rich axes when the per-gene signal
-        is present: gene_ontology_terms (when annotation_types is non-empty),
-        gene_homologs (when closest_ortholog_group_size > 0),
-        gene_clusters_by_gene (when cluster_membership_count > 0),
-        differential_expression_by_gene or gene_response_profile (when
-        expression_edge_count > 0), gene_derived_metrics (when
-        derived_metric_count > 0).
+        Routing: drill into each axis when the per-gene signal is non-zero — `gene_ontology_terms` (annotation_types non-empty), `gene_homologs` (closest_ortholog_group_size > 0), `gene_clusters_by_gene` (cluster_membership_count > 0), `differential_expression_by_gene` / `gene_response_profile` (expression_edge_count > 0), `gene_derived_metrics` and `genes_by_{numeric,boolean,categorical}_metric` keyed off `derived_metric_value_kinds`, `metabolites_by_gene` / `genes_by_metabolite` (evidence_sources non-empty). Use `gene_details` for the full Gene-node property dump.
         """
         await ctx.info(f"gene_overview locus_tags={locus_tags} summary={summary}")
         try:
@@ -1751,17 +1820,23 @@ def register_tools(mcp: FastMCP):
             by_organism = [OverviewOrganismBreakdown(**b) for b in data["by_organism"]]
             by_category = [OverviewCategoryBreakdown(**b) for b in data["by_category"]]
             by_annotation_type = [OverviewAnnotationTypeBreakdown(**b) for b in data["by_annotation_type"]]
+            by_annotation_state = [
+                OverviewAnnotationStateBreakdown(**b)
+                for b in data.get("by_annotation_state", [])
+            ]
             results = [GeneOverviewResult(**r) for r in data["results"]]
             return GeneOverviewResponse(
                 total_matching=data["total_matching"],
                 by_organism=by_organism,
                 by_category=by_category,
                 by_annotation_type=by_annotation_type,
+                by_annotation_state=by_annotation_state,
                 has_expression=data["has_expression"],
                 has_significant_expression=data["has_significant_expression"],
                 has_orthologs=data["has_orthologs"],
                 has_clusters=data["has_clusters"],
                 has_derived_metrics=data["has_derived_metrics"],
+                has_chemistry=data.get("has_chemistry", 0),
                 returned=data["returned"],
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],
@@ -1776,12 +1851,12 @@ def register_tools(mcp: FastMCP):
             raise ToolError(f"Error in gene_overview: {e}")
 
     class GeneDetailResponse(BaseModel):
-        total_matching: int = Field(description="Genes found from input locus_tags")
-        returned: int = Field(description="Results in this response (0 when summary=true)")
-        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-        truncated: bool = Field(description="True if total_matching > returned")
-        not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
-        results: list[dict] = Field(default_factory=list, description="One row per gene — all Gene node properties via g{.*}. ~30 fields including locus_tag, gene_name, product, organism_name, gene_category, annotation_quality, function_description, catalytic_activities, ec_numbers, etc. Sparse fields only present when populated. TCDB and CAZy memberships traverse Gene_has_tcdb_family / Gene_has_cazy_family edges instead.")
+        total_matching: int = Field(description="Genes found from input locus_tags.")
+        returned: int = Field(description="Results in this response (0 when summary=true).")
+        offset: int = Field(default=0, description="Offset into full result set.")
+        truncated: bool = Field(description="True if total_matching > returned.")
+        not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG.")
+        results: list[dict] = Field(default_factory=list, description="One row per gene — all Gene node properties via g{.*} (~30 fields incl. locus_tag, gene_name, product, organism_name, gene_category, annotation_quality, function_description, catalytic_activities, ec_numbers). Sparse fields only present when populated. annotation_quality is 0..3 (see docs://guide/conventions for the [AQ] redefinition). TCDB and CAZy memberships are graph edges (Gene_has_tcdb_family / Gene_has_cazy_family), not properties.")
 
     @mcp.tool(
         tags={"genes"},
@@ -1803,15 +1878,9 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> GeneDetailResponse:
-        """Get all properties for genes.
+        """All Gene node properties (deep-dive). Use `gene_overview` for the common routing case; this tool dumps every property including sparse fields (catalytic_activities, ec_numbers, ko_terms, etc.). TCDB/CAZy memberships are graph edges, not properties.
 
-        This is a deep-dive tool — use gene_overview for the common case.
-        Returns all Gene node properties including sparse fields
-        (catalytic_activities, ec_numbers, etc.). TCDB and CAZy memberships
-        live on Gene_has_tcdb_family / Gene_has_cazy_family edges instead.
-
-        For organism taxonomy, use list_organisms. For homologs, use
-        gene_homologs. For ontology annotations, use gene_ontology_terms.
+        Routing: prefer `gene_overview` for triage; chain into `metabolites_by_gene` for chemistry, `gene_homologs` for orthologs, `gene_ontology_terms` for annotations, `list_organisms` for taxonomy.
         """
         await ctx.info(f"gene_details locus_tags={locus_tags} summary={summary}")
         try:
@@ -1919,14 +1988,12 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> GeneHomologsResponse:
-        """Get ortholog group memberships for genes.
+        """Look up ortholog group memberships for a gene batch — flat long
+        format (one row per gene × group), ordered most-specific (curated)
+        to broadest. A gene typically belongs to 1-3 groups.
 
-        Returns which ortholog groups each gene belongs to, ordered from most
-        specific (curated) to broadest. Use for gene characterization and
-        cross-organism bridging. A gene typically belongs to 1-3 groups.
-
-        For member genes within a group, use genes_by_homolog_group.
-        For text search on group names, use search_homolog_groups.
+        Routing: drill into group members via `genes_by_homolog_group`;
+        text-search groups via `search_homolog_groups`.
         """
         await ctx.info(f"gene_homologs locus_tags={locus_tags} source={source} "
                        f"taxonomic_level={taxonomic_level}")
@@ -1997,11 +2064,12 @@ def register_tools(mcp: FastMCP):
             ge=1,
         )] = 25,
     ) -> RunCypherResponse:
-        """Execute a raw Cypher query against the knowledge graph (read-only).
+        """Run a raw Cypher query (read-only escape hatch when other tools don't cover the question).
 
-        Use this as an escape hatch when other tools don't cover your query.
-        Write operations are blocked. Queries are validated for syntax and schema
-        correctness before execution — warnings are returned in the response.
+        Write operations are blocked. Queries are syntax- and schema-validated
+        before execution — non-blocking warnings come back in the response.
+        Validate against `kg_schema` first to avoid label / property typos;
+        see docs://guide/concepts for the KG data model.
         """
         await ctx.info(f"run_cypher limit={limit}")
         try:
@@ -2027,6 +2095,7 @@ def register_tools(mcp: FastMCP):
         name: str = Field(description="Term name (e.g. 'DNA replication')")
         score: float = Field(description="Fulltext relevance score (e.g. 5.23)")
         level: int = Field(description="Hierarchy level of this term (0 = broadest)")
+        is_informative: bool = Field(description="True iff term is not flagged is_uninformative (positive framing; coerced from sparse '<term>.is_uninformative' KG flag)")
         tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
         tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
 
@@ -2049,8 +2118,9 @@ def register_tools(mcp: FastMCP):
     async def search_ontology(
         ctx: Context,
         search_text: Annotated[str, Field(
-            description="Search query (Lucene syntax). "
-            "E.g. 'replication', 'oxido*', 'transport AND membrane'.",
+            description="Lucene query over term names. "
+            "E.g. 'replication', 'oxido*', 'transport AND membrane'. "
+            "See docs://guide/conventions for Lucene scoring.",
         )],
         ontology: Annotated[str, Field(
             description="Ontology to search: 'go_bp', 'go_mf', 'go_cc', "
@@ -2067,18 +2137,27 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
         level: Annotated[int | None, Field(
-            description="Filter to terms at this hierarchy level. 0 = broadest.",
+            description="Hierarchy level filter (0 = broadest). "
+            "See docs://guide/conventions for the level convention.",
             ge=0,
         )] = None,
         tree: Annotated[str | None, Field(
             description="BRITE tree name filter (e.g. 'transporters'). "
-            "Only valid when ontology='brite'.",
+            "Only valid when ontology='brite'. See docs://guide/conventions for "
+            "the BRITE-tree scoping rule.",
         )] = None,
+        informative_only: Annotated[bool, Field(
+            description="When True, exclude terms flagged uninformative in KG "
+            "(e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' "
+            "go:0008150). Term-side filter only — never restricts the gene set. "
+            "Default False (opt-in).",
+        )] = False,
     ) -> SearchOntologyResponse:
-        """Browse ontology terms by text search (fuzzy, Lucene syntax).
+        """Search ontology terms by text — Lucene over term names only (no hierarchy traversal).
 
-        Returns term IDs for use with genes_by_ontology. Supports fuzzy (~),
-        wildcards (*), exact phrases ("..."), boolean (AND, OR).
+        Returns term IDs and `level` for use with `genes_by_ontology`. Supports
+        fuzzy (~), wildcards (*), exact phrases ("..."), boolean (AND, OR) —
+        see docs://guide/conventions for syntax + scoring.
         """
         await ctx.info(f"search_ontology search_text={search_text!r} ontology={ontology}")
         try:
@@ -2086,7 +2165,9 @@ def register_tools(mcp: FastMCP):
             data = api.search_ontology(
                 search_text, ontology, summary=summary,
                 limit=limit, offset=offset,
-                level=level, tree=tree, conn=conn,
+                level=level, tree=tree,
+                informative_only=informative_only,
+                conn=conn,
             )
             results = [SearchOntologyResult(**r) for r in data["results"]]
             return SearchOntologyResponse(**{**data, "results": results})
@@ -2110,6 +2191,7 @@ def register_tools(mcp: FastMCP):
         term_id: str = Field(description="Ontology term ID (e.g. 'go:0050896')")
         term_name: str = Field(description="Term name (e.g. 'response to stimulus')")
         level: int = Field(description="Hierarchy level of this term (0 = broadest)")
+        is_informative: bool = Field(description="True iff term is not flagged is_uninformative (positive framing; coerced from sparse '<term>.is_uninformative' KG flag)")
         tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
         tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
         # verbose only
@@ -2134,6 +2216,8 @@ def register_tools(mcp: FastMCP):
         term_id: str = Field(description="Term ID (e.g. 'go:0050896')")
         term_name: str = Field(description="Term name (e.g. 'response to stimulus')")
         count: int = Field(description="Distinct gene count (e.g. 152)")
+        is_informative: bool = Field(
+            description="True iff term is not flagged is_uninformative")
 
     class GenesByOntologyResponse(BaseModel):
         ontology: str = Field(description="Echo of input ontology (e.g. 'go_bp')")
@@ -2161,7 +2245,7 @@ def register_tools(mcp: FastMCP):
         wrong_ontology: list[str] = Field(default_factory=list,
             description="Input term_ids present but in a different ontology label")
         wrong_level: list[str] = Field(default_factory=list,
-            description="Input term_ids in the ontology but at wrong level (Mode 3 only)")
+            description="Input term_ids in the ontology but at wrong level (only when level + term_ids both set)")
         filtered_out: list[str] = Field(default_factory=list,
             description="Input term_ids valid but outside [min, max]_gene_set_size")
         returned: int = Field(description="Rows in this response")
@@ -2190,26 +2274,36 @@ def register_tools(mcp: FastMCP):
                         "Required — single-valued. Use list_organisms for valid values.",
         )],
         tree: Annotated[str | None, Field(
-            description="BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'.",
+            description="BRITE tree name filter (e.g. 'transporters'). Only valid when "
+                        "ontology='brite'. See docs://guide/conventions for the BRITE-tree "
+                        "scoping rule.",
         )] = None,
         level: Annotated[int | None, Field(
-            description="Hierarchy level to roll UP to. 0 = broadest. "
-                        "At least one of `level` or `term_ids` must be provided.",
+            description="Hierarchy level to roll UP to (0 = broadest). At least one of "
+                        "`level` or `term_ids` must be provided. See docs://guide/conventions.",
             ge=0,
         )] = None,
         term_ids: Annotated[list[str] | None, Field(
             description="Ontology term IDs (from search_ontology). "
-                        "Mode 1 (no `level`): expand DOWN from each input term. "
-                        "Mode 3 (with `level`): scope rollup to these level-N terms.",
+                        "Without `level`: expand DOWN from each input term. "
+                        "With `level`: scope rollup to these level-N terms.",
         )] = None,
         min_gene_set_size: Annotated[int, Field(
-            description="Exclude terms with fewer organism-scoped genes than this.",
+            description="Exclude terms with fewer organism-scoped genes than this. "
+                        "Matches `ontology_landscape`'s organism-scoped convention.",
             ge=0,
         )] = 5,
         max_gene_set_size: Annotated[int, Field(
-            description="Exclude terms with more organism-scoped genes than this.",
+            description="Exclude terms with more organism-scoped genes than this. "
+                        "Matches `ontology_landscape`'s organism-scoped convention.",
             ge=1,
         )] = 500,
+        informative_only: Annotated[bool, Field(
+            description="When True, exclude terms flagged uninformative in KG "
+            "(e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' "
+            "go:0008150). Term-side filter only — never restricts the gene set. "
+            "Default False (opt-in).",
+        )] = False,
         summary: Annotated[bool, Field(
             description="If true, omit `results` (envelope only).",
         )] = False,
@@ -2227,13 +2321,21 @@ def register_tools(mcp: FastMCP):
         """Find (gene × term) pairs for an ontology, scoped by terms and/or level.
 
         Three modes:
-        - term_ids only → gene discovery by pathway (walk DOWN).
-        - level only → pathway definitions at level N (walk UP).
-        - level + term_ids → scoped rollup (walk UP, restrict to given terms).
+        - `term_ids` only — gene discovery by pathway (walk DOWN from each term).
+        - `level` only — pathway definitions at level N (walk UP from leaves).
+        - `level` + `term_ids` — scoped rollup (walk UP, restrict to given terms).
 
         Single-organism enforced. Default `limit=500` because this tool feeds
-        enrichment (pathway_enrichment). For term discovery, chain from
-        search_ontology. For per-gene ontology details, use gene_ontology_terms.
+        enrichment via TERM2GENE. `min/max_gene_set_size` is organism-scoped
+        (matches `ontology_landscape`).
+
+        Routing: pipe `results` into `pathway_enrichment` / `cluster_enrichment`
+        as TERM2GENE; chain from `search_ontology` for term discovery;
+        `gene_ontology_terms` for per-gene reverse lookup. For
+        substrate-anchored TCDB / EC questions ("which genes transport / act
+        on compound X?"), use `genes_by_metabolite` instead. See
+        docs://guide/conventions for the hierarchy `level` and BRITE-tree
+        conventions; docs://analysis/enrichment for the enrichment workflow.
         """
         await ctx.info(
             f"genes_by_ontology ontology={ontology} organism={organism} "
@@ -2246,6 +2348,7 @@ def register_tools(mcp: FastMCP):
                 level=level, term_ids=term_ids,
                 min_gene_set_size=min_gene_set_size,
                 max_gene_set_size=max_gene_set_size,
+                informative_only=informative_only,
                 summary=summary, verbose=verbose,
                 limit=limit, offset=offset,
                 tree=tree, conn=conn,
@@ -2273,6 +2376,7 @@ def register_tools(mcp: FastMCP):
         term_id: str = Field(description="Ontology term ID (e.g. 'go:0006260')")
         term_name: str = Field(description="Term name (e.g. 'DNA replication')")
         level: int = Field(description="Hierarchy level of this term (0 = broadest)")
+        is_informative: bool = Field(description="True iff term is not flagged is_uninformative (positive framing; coerced from sparse '<term>.is_uninformative' KG flag)")
         ontology_type: str | None = Field(default=None, description="Ontology type when querying all (e.g. 'go_bp')")
         tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
         tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
@@ -2333,13 +2437,21 @@ def register_tools(mcp: FastMCP):
                         "'rollup' walks up to ancestors at the given level.",
         )] = "leaf",
         level: Annotated[int | None, Field(
-            description="Hierarchy level. In leaf mode: filter to leaves at this level. "
-                        "In rollup mode: required — target ancestor level (0 = broadest).",
+            description="Hierarchy level (0 = broadest). In leaf mode: filter to leaves "
+                        "at this level. In rollup mode: required — target ancestor level. "
+                        "See docs://guide/conventions.",
             ge=0,
         )] = None,
         tree: Annotated[str | None, Field(
-            description="BRITE tree name filter. Only valid when ontology='brite'.",
+            description="BRITE tree name filter. Only valid when ontology='brite'. "
+                        "See docs://guide/conventions for the BRITE-tree scoping rule.",
         )] = None,
+        informative_only: Annotated[bool, Field(
+            description="When True, exclude terms flagged uninformative in KG "
+            "(e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' "
+            "go:0008150). Term-side filter only — never restricts the gene set. "
+            "Default False (opt-in).",
+        )] = False,
         summary: Annotated[bool, Field(
             description="When true, return only summary fields (results=[]).",
         )] = False,
@@ -2353,15 +2465,15 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> GeneOntologyTermsResponse:
-        """Get ontology annotations for genes. One row per gene × term.
+        """Reverse-lookup: gene locus_tags → ontology annotations (one row per gene × term).
 
-        In leaf mode (default), returns the most specific annotations only —
-        redundant ancestor terms are excluded. In rollup mode, walks up to
-        ancestors at the given level.
+        `mode='leaf'` (default) returns the most specific annotations only —
+        redundant ancestors are excluded. `mode='rollup'` walks UP to ancestors
+        at the given level. Single-organism enforced.
 
-        Use ontology param to filter to one type, or omit for all.
-        For the reverse direction (find genes annotated to a term, with hierarchy
-        expansion), use genes_by_ontology. Use search_ontology to find terms by text.
+        Routing: for the forward direction (term → genes, with hierarchy
+        expansion) use `genes_by_ontology`; for term discovery by text use
+        `search_ontology`.
         """
         await ctx.info(
             f"gene_ontology_terms locus_tags={locus_tags} organism={organism} "
@@ -2372,6 +2484,7 @@ def register_tools(mcp: FastMCP):
             data = api.gene_ontology_terms(
                 locus_tags, organism=organism, ontology=ontology,
                 mode=mode, level=level, tree=tree,
+                informative_only=informative_only,
                 summary=summary, verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
             results = [OntologyTermRow(**r) for r in data["results"]]
@@ -2388,78 +2501,82 @@ def register_tools(mcp: FastMCP):
             raise ToolError(f"Error in gene_ontology_terms: {e}")
 
     class PublicationResult(BaseModel):
-        doi: str
-        title: str
-        authors: list[str]
-        year: int
-        journal: str | None = None
-        study_type: str | None = None
-        organisms: list[str] = Field(default=[], description="Organisms studied in this publication")
-        experiment_count: int = Field(default=0, description="Number of experiments in KG from this publication")
-        treatment_types: list[str] = Field(default=[], description="Experiment treatment types (e.g. coculture, nitrogen_stress)")
-        background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'diel_cycle'])")
-        omics_types: list[str] = Field(default=[], description="Omics data types (e.g. RNASEQ, PROTEOMICS)")
-        clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses from this publication (e.g. 4)")
-        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison'])")
-        growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases across experiments. Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
-        derived_metric_count: int = Field(default=0, description="Number of DerivedMetric nodes from this publication (e.g. 3)")
-        derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Value kinds of DerivedMetrics in this publication (e.g. ['numeric', 'boolean'])")
-        compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured in this publication (e.g. ['whole_cell', 'vesicle'])")
-        score: float | None = Field(default=None, description="Lucene relevance score (only with search_text)")
+        doi: str = Field(description="Publication DOI (e.g. '10.1038/s41396-022-01202-1').")
+        title: str = Field(description="Publication title.")
+        authors: list[str] = Field(description="Author list (free-text, semicolon- or comma-delimited).")
+        year: int = Field(description="Publication year (e.g. 2022).")
+        journal: str | None = Field(default=None, description="Journal name (e.g. 'ISME').")
+        study_type: str | None = Field(default=None, description="Study type tag (e.g. 'metabolomics', 'transcriptomics').")
+        organisms: list[str] = Field(default=[], description="Organisms studied in this publication.")
+        experiment_count: int = Field(default=0, description="Number of experiments in KG from this publication.")
+        treatment_types: list[str] = Field(default=[], description="Experiment treatment types (e.g. coculture, nitrogen_stress).")
+        background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'diel_cycle']).")
+        omics_types: list[str] = Field(default=[], description="Omics data types (e.g. RNASEQ, PROTEOMICS).")
+        clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses from this publication.")
+        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison']).")
+        growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases across experiments. Timepoint-level condition, not gene-specific.")
+        derived_metric_count: int = Field(default=0, description="Number of DerivedMetric nodes from this publication.")
+        derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Value kinds of DerivedMetrics in this publication (subset of {numeric, boolean, categorical}). Use to route to genes_by_{kind}_metric.")
+        compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured in this publication (e.g. ['whole_cell', 'vesicle']).")
+        # Metabolomics measurement rollup
+        metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this publication (precomputed Publication.metabolite_count). Non-zero on metabolomics-bearing papers. When > 0, drill via list_metabolite_assays(publication_doi=[...]) to inspect the paper's MetaboliteAssay nodes.")
+        metabolite_assay_count: int = Field(default=0, description="Distinct MetaboliteAssay edges anchored to this publication (precomputed). Diverges from metabolite_count when the same metabolite is measured in multiple compartments per paper.")
+        metabolite_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured for metabolomics in this publication (e.g. ['whole_cell', 'extracellular']). Populated only when metabolite_assay_count > 0; [] otherwise.")
+        score: float | None = Field(default=None, description="Lucene relevance score (only with search_text).")
 
-        abstract: str | None = Field(default=None, description="Publication abstract (only with verbose=True)")
-        description: str | None = Field(default=None, description="Curated study description (only with verbose=True)")
-        cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (only with verbose=True, e.g. 20)")
-        derived_metric_gene_count: int | None = Field(default=None, description="Total genes annotated by DerivedMetrics in this publication (only with verbose=True)")
-        derived_metric_types: list[str] | None = Field(default=None, description="Distinct DerivedMetric types in this publication (only with verbose=True, e.g. ['diel_rhythmicity'])")
+        abstract: str | None = Field(default=None, description="Publication abstract (verbose-only).")
+        description: str | None = Field(default=None, description="Curated study description (verbose-only).")
+        cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (verbose-only).")
+        derived_metric_gene_count: int | None = Field(default=None, description="Total genes annotated by DerivedMetrics in this publication (verbose-only).")
+        derived_metric_types: list[str] | None = Field(default=None, description="Distinct DerivedMetric types in this publication (verbose-only).")
 
     class PubOrganismBreakdown(BaseModel):
-        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
-        count: int = Field(description="Number of publications studying this organism (e.g. 11)")
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4').")
+        count: int = Field(description="Number of publications studying this organism.")
 
     class PubTreatmentTypeBreakdown(BaseModel):
-        treatment_type: str = Field(description="Treatment category (e.g. 'coculture')")
-        count: int = Field(description="Number of publications (e.g. 5)")
+        treatment_type: str = Field(description="Treatment category (e.g. 'coculture').")
+        count: int = Field(description="Number of publications.")
 
     class PubOmicsTypeBreakdown(BaseModel):
-        omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ')")
-        count: int = Field(description="Number of publications (e.g. 12)")
+        omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ').")
+        count: int = Field(description="Number of publications.")
 
     class PubBackgroundFactorBreakdown(BaseModel):
-        background_factor: str = Field(description="Background factor (e.g. 'axenic', 'diel_cycle')")
-        count: int = Field(description="Number of publications (e.g. 5)")
+        background_factor: str = Field(description="Background factor (e.g. 'axenic', 'diel_cycle').")
+        count: int = Field(description="Number of publications.")
 
     class PubClusterTypeBreakdown(BaseModel):
-        cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison')")
-        count: int = Field(description="Number of publications (e.g. 4)")
+        cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison').")
+        count: int = Field(description="Number of publications.")
 
     class PubValueKindBreakdown(BaseModel):
-        value_kind: str = Field(description="DerivedMetric value kind (e.g. 'numeric', 'boolean', 'categorical')")
-        count: int = Field(description="Number of publications with this value kind (e.g. 3)")
+        value_kind: str = Field(description="DerivedMetric value kind (e.g. 'numeric', 'boolean', 'categorical').")
+        count: int = Field(description="Number of publications with this value kind.")
 
     class PubMetricTypeBreakdown(BaseModel):
-        metric_type: str = Field(description="DerivedMetric type (e.g. 'diel_rhythmicity', 'darkness_survival_class')")
-        count: int = Field(description="Number of publications with this metric type (e.g. 2)")
+        metric_type: str = Field(description="DerivedMetric type (e.g. 'diel_rhythmicity', 'darkness_survival_class').")
+        count: int = Field(description="Number of publications with this metric type.")
 
     class PubCompartmentBreakdown(BaseModel):
-        compartment: str = Field(description="Wet-lab compartment (e.g. 'whole_cell', 'vesicle')")
-        count: int = Field(description="Number of publications with this compartment (e.g. 5)")
+        compartment: str = Field(description="Wet-lab compartment (e.g. 'whole_cell', 'vesicle').")
+        count: int = Field(description="Number of publications with this compartment.")
 
     class ListPublicationsResponse(BaseModel):
-        total_entries: int = Field(description="Total publications in KG (unfiltered)")
-        total_matching: int = Field(description="Publications matching filters")
-        by_organism: list[PubOrganismBreakdown] = Field(description="Publication counts per organism, sorted by count descending")
-        by_treatment_type: list[PubTreatmentTypeBreakdown] = Field(description="Publication counts per treatment type, sorted by count descending")
-        by_background_factors: list[PubBackgroundFactorBreakdown] = Field(description="Publication counts per background factor, sorted by count descending")
-        by_omics_type: list[PubOmicsTypeBreakdown] = Field(description="Publication counts per omics platform, sorted by count descending")
-        by_cluster_type: list[PubClusterTypeBreakdown] = Field(default_factory=list, description="Publication counts per cluster type, sorted by count descending")
-        by_value_kind: list[PubValueKindBreakdown] = Field(default_factory=list, description="DerivedMetric value kind frequency rollup across matched publications. Each entry: {value_kind, count}.")
-        by_metric_type: list[PubMetricTypeBreakdown] = Field(default_factory=list, description="DerivedMetric type frequency rollup across matched publications. Each entry: {metric_type, count}.")
-        by_compartment: list[PubCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched publications. Each entry: {compartment, count}.")
-        returned: int = Field(description="Publications in this response")
-        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-        truncated: bool = Field(description="True if total_matching > returned")
-        not_found: list[str] = Field(default_factory=list, description="Input publication_dois that did not match any Publication node (empty unless publication_dois was provided)")
+        total_entries: int = Field(description="Total publications in KG (unfiltered).")
+        total_matching: int = Field(description="Publications matching filters.")
+        by_organism: list[PubOrganismBreakdown] = Field(description="Publication counts per organism, sorted desc.")
+        by_treatment_type: list[PubTreatmentTypeBreakdown] = Field(description="Publication counts per treatment type, sorted desc.")
+        by_background_factors: list[PubBackgroundFactorBreakdown] = Field(description="Publication counts per background factor, sorted desc.")
+        by_omics_type: list[PubOmicsTypeBreakdown] = Field(description="Publication counts per omics platform, sorted desc.")
+        by_cluster_type: list[PubClusterTypeBreakdown] = Field(default_factory=list, description="Publication counts per cluster type, sorted desc.")
+        by_value_kind: list[PubValueKindBreakdown] = Field(default_factory=list, description="DerivedMetric value kind frequency rollup across matched publications.")
+        by_metric_type: list[PubMetricTypeBreakdown] = Field(default_factory=list, description="DerivedMetric type frequency rollup across matched publications.")
+        by_compartment: list[PubCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched publications.")
+        returned: int = Field(description="Publications in this response.")
+        offset: int = Field(default=0, description="Offset into full result set.")
+        truncated: bool = Field(description="True if total_matching > returned.")
+        not_found: list[str] = Field(default_factory=list, description="Input publication_dois that did not match any Publication node (empty unless publication_dois was provided).")
         results: list[PublicationResult]
 
     @mcp.tool(
@@ -2514,16 +2631,9 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> ListPublicationsResponse:
-        """List publications with expression data in the knowledge graph.
+        """List publications with experiment summaries, DM rollups, and metabolomics rollups. Use as the discovery entry point for studies.
 
-        Returns publication metadata and experiment summaries. Use this as
-        an entry point to discover what studies exist.
-
-        After this tool, drill in via:
-        - list_experiments(publication_doi=[doi]) for per-experiment detail
-        - genes_by_function(organism=...) / genes_by_ontology(organism=..., term_ids=...) for gene discovery scoped to the publication's organism(s)
-        - list_clustering_analyses(publication_doi=[doi]) for clustering analyses
-        - list_derived_metrics(publication_doi=[doi]) for non-DE evidence
+        Routing: drill via `list_experiments(publication_doi=[doi])` for per-experiment detail; `list_clustering_analyses(publication_doi=[doi])` for clustering; `list_derived_metrics(publication_doi=[doi])` for non-DE evidence; `list_metabolite_assays(publication_doi=[doi])` when `metabolite_count > 0`. Per-row `derived_metric_value_kinds` routes to `genes_by_{numeric,boolean,categorical}_metric`.
         """
         await ctx.info(f"list_publications organism={organism} treatment_type={treatment_type} "
                        f"growth_phases={growth_phases} search_text={search_text} author={author} "
@@ -2578,124 +2688,128 @@ def register_tools(mcp: FastMCP):
     # --- list_experiments ---
 
     class GeneStatusBreakdown(BaseModel):
-        significant_up: int = Field(default=0, description="Genes with significant upregulation (e.g. 245)")
-        significant_down: int = Field(default=0, description="Genes with significant downregulation (e.g. 178)")
-        not_significant: int = Field(default=0, description="Genes not meeting significance threshold (e.g. 1273)")
+        significant_up: int = Field(default=0, description="Genes with significant upregulation.")
+        significant_down: int = Field(default=0, description="Genes with significant downregulation.")
+        not_significant: int = Field(default=0, description="Genes not meeting significance threshold (tested-absent for the comparison; populated only when table_scope='all_detected_genes' — see docs://guide/conventions).")
 
     class TimePoint(BaseModel):
-        timepoint: str | None = Field(default=None, description="Time point label, null if unlabeled (e.g. '24h', '5h extended darkness (40h)')")
-        timepoint_order: int = Field(description="Sort order within experiment (e.g. 1, 2, 3)")
-        timepoint_hours: float | None = Field(default=None, description="Time in hours, null if unknown (e.g. 24.0)")
+        timepoint: str | None = Field(default=None, description="Time point label, null if unlabeled (e.g. '24h', '5h extended darkness (40h)').")
+        timepoint_order: int = Field(description="Sort order within experiment.")
+        timepoint_hours: float | None = Field(default=None, description="Time in hours, null if unknown.")
         growth_phase: str | None = Field(default=None, description="Growth phase observed at this timepoint (e.g. 'exponential', 'nutrient_limited', 'death'). Null when not annotated.")
-        gene_count: int = Field(description="Total genes with expression data at this time point (e.g. 1696)")
-        genes_by_status: GeneStatusBreakdown = Field(description="Gene counts by expression status at this time point")
+        gene_count: int = Field(description="Total genes with expression data at this time point.")
+        genes_by_status: GeneStatusBreakdown = Field(description="Gene counts by expression status at this time point.")
 
     class ExperimentResult(BaseModel):
         # compact fields (always returned)
-        experiment_id: str = Field(description="Experiment identifier (e.g. '10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq')")
-        experiment_name: str = Field(description="Experiment display name (e.g. 'MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions (RNASEQ)')")
-        publication_doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70')")
-        authors: list[str] = Field(default_factory=list, description="Publication authors (e.g. ['Smith J', 'Jones K']). Sourced from Publication.authors via the Has_experiment edge — no need to join with list_publications for author attribution.")
-        organism_name: str = Field(description="Profiled organism (e.g. 'Prochlorococcus MED4')")
-        treatment_type: list[str] = Field(description="Treatment categories (e.g. ['coculture'], ['nitrogen_stress', 'coculture'])")
+        experiment_id: str = Field(description="Experiment identifier (e.g. '10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq').")
+        experiment_name: str = Field(description="Experiment display name.")
+        publication_doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70').")
+        authors: list[str] = Field(default_factory=list, description="Publication authors. Sourced from Publication.authors via the Has_experiment edge — no need to join with list_publications for author attribution.")
+        organism_name: str = Field(description="Profiled organism (e.g. 'Prochlorococcus MED4').")
+        treatment_type: list[str] = Field(description="Treatment categories (e.g. ['coculture'], ['nitrogen_stress', 'coculture']).")
         background_factors: list[str] = Field(default_factory=list, description="Background experimental factors (e.g. ['axenic', 'continuous_light']). Empty list when none specified.")
-        coculture_partner: str | None = Field(default=None, description="Interacting organism — coculture partner or phage. Null when no interacting organism (e.g. 'Alteromonas macleodii HOT1A3', 'Phage')")
-        omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ', 'MICROARRAY', 'PROTEOMICS')")
-        is_time_course: bool = Field(description="Whether experiment has multiple time points")
-        table_scope: str | None = Field(default=None, description="What genes the source DE table contains. Values: all_detected_genes, significant_any_timepoint, significant_only, top_n, filtered_subset. Critical for interpreting missing genes.")
-        table_scope_detail: str | None = Field(default=None, description="Free-text clarification of table_scope (e.g. 'FDR < 0.05 and |logFC| > 0.8')")
-        gene_count: int = Field(description="Cumulative row count across timepoints (= sum(time_point_totals) for time-course experiments). For a 6-TP experiment with 1697 genes/TP, gene_count=10182. For non-time-course experiments equals distinct_gene_count.")
-        distinct_gene_count: int = Field(description="Distinct gene count across the experiment — number of distinct gene IDs with at least one measurement edge, regardless of timepoint. Use for detection-power / pathway-background sizing. distinct_gene_count <= gene_count; for the same 6-TP example, distinct_gene_count=1697 vs gene_count=10182.")
-        genes_by_status: GeneStatusBreakdown = Field(description="Gene counts by expression status")
+        coculture_partner: str | None = Field(default=None, description="Interacting organism — coculture partner or phage. Null when no interacting organism.")
+        omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ', 'MICROARRAY', 'PROTEOMICS').")
+        is_time_course: bool = Field(description="Whether experiment has multiple time points.")
+        table_scope: str | None = Field(default=None, description="What genes the source DE table contains. Values: all_detected_genes (tested-absent rows kept — `not_significant` represents real biology), significant_any_timepoint, significant_only (tested-absent rows collapsed), top_n, filtered_subset. Critical for interpreting missing genes — see docs://guide/conventions.")
+        table_scope_detail: str | None = Field(default=None, description="Free-text clarification of table_scope (e.g. 'FDR < 0.05 and |logFC| > 0.8').")
+        gene_count: int = Field(description="Cumulative row count across timepoints (= sum(time_point_totals) for time-course experiments — a 6-TP experiment with 1697 genes/TP has gene_count=10182). Equals distinct_gene_count for non-time-course experiments.")
+        distinct_gene_count: int = Field(description="Distinct gene count across the experiment — unique gene IDs with at least one measurement edge, regardless of timepoint. Use for detection-power / pathway-background sizing. distinct_gene_count <= gene_count.")
+        genes_by_status: GeneStatusBreakdown = Field(description="Gene counts by expression status.")
         timepoints: list[TimePoint] | None = Field(default=None, description="Per-timepoint gene counts. Omitted for non-time-course experiments.")
-        clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses for this experiment (e.g. 4)")
-        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison'])")
-        growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases in this experiment. Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
-        derived_metric_count: int = Field(default=0, description="Number of DerivedMetrics associated with this experiment (e.g. 4)")
-        derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Distinct DerivedMetric value kinds for this experiment (e.g. ['numeric', 'boolean'])")
+        clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses for this experiment.")
+        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison']).")
+        growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases in this experiment. Timepoint-level condition, not gene-specific.")
+        derived_metric_count: int = Field(default=0, description="Number of DerivedMetrics associated with this experiment.")
+        derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Distinct DerivedMetric value kinds for this experiment (subset of {numeric, boolean, categorical}). Use to route to genes_by_{kind}_metric.")
         compartment: str | None = Field(default=None, description="Wet-lab fraction this experiment profiles (e.g. 'whole_cell', 'vesicle', 'exoproteome'). Scalar per experiment.")
-        score: float | None = Field(default=None, description="Lucene relevance score, present only when search_text is used (e.g. 2.45)")
+        # Metabolomics measurement rollup
+        metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this experiment (precomputed Experiment.metabolite_count). Non-zero on metabolomics-paired experiments. When > 0, drill via list_metabolite_assays(experiment_ids=[...]).")
+        metabolite_assay_count: int = Field(default=0, description="Distinct MetaboliteAssay edges anchored to this experiment (precomputed).")
+        metabolite_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured for metabolomics in this experiment (subset of {'whole_cell', 'extracellular', 'vesicle'}). Populated only when metabolite_assay_count > 0.")
+        score: float | None = Field(default=None, description="Lucene relevance score, present only when search_text is used.")
         # verbose-only fields
-        publication_title: str | None = Field(default=None, description="Publication title")
-        treatment: str | None = Field(default=None, description="Treatment description (e.g. 'Coculture with Alteromonas HOT1A3')")
-        control: str | None = Field(default=None, description="Control description (e.g. 'Pro99 medium growth conditions')")
-        light_condition: str | None = Field(default=None, description="Light regime (e.g. 'continuous light')")
-        light_intensity: str | None = Field(default=None, description="Light intensity (e.g. '10 umol photons m-2 s-1')")
-        medium: str | None = Field(default=None, description="Growth medium (e.g. 'Pro99')")
-        temperature: str | None = Field(default=None, description="Temperature (e.g. '24C')")
-        statistical_test: str | None = Field(default=None, description="Statistical method (e.g. 'Rockhopper')")
-        experimental_context: str | None = Field(default=None, description="Context summary (e.g. 'in Pro99 medium under continuous light')")
-        cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (only with verbose=True, e.g. 20)")
-        derived_metric_gene_count: int | None = Field(default=None, description="Number of distinct genes with DerivedMetric annotations in this experiment (only with verbose=True, e.g. 450)")
-        derived_metric_types: list[str] | None = Field(default=None, description="Distinct DerivedMetric metric_type values for this experiment (only with verbose=True, e.g. ['damping_ratio', 'diel_amplitude'])")
-        reports_derived_metric_types: list[str] | None = Field(default=None, description="DerivedMetric types reported by (not just associated with) this experiment (only with verbose=True)")
+        publication_title: str | None = Field(default=None, description="Publication title (verbose-only).")
+        treatment: str | None = Field(default=None, description="Treatment description (verbose-only, e.g. 'Coculture with Alteromonas HOT1A3').")
+        control: str | None = Field(default=None, description="Control description (verbose-only).")
+        light_condition: str | None = Field(default=None, description="Light regime (verbose-only).")
+        light_intensity: str | None = Field(default=None, description="Light intensity (verbose-only).")
+        medium: str | None = Field(default=None, description="Growth medium (verbose-only).")
+        temperature: str | None = Field(default=None, description="Temperature (verbose-only).")
+        statistical_test: str | None = Field(default=None, description="Statistical method (verbose-only).")
+        experimental_context: str | None = Field(default=None, description="Context summary (verbose-only).")
+        cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (verbose-only).")
+        derived_metric_gene_count: int | None = Field(default=None, description="Number of distinct genes with DerivedMetric annotations in this experiment (verbose-only).")
+        derived_metric_types: list[str] | None = Field(default=None, description="Distinct DerivedMetric metric_type values for this experiment (verbose-only).")
+        reports_derived_metric_types: list[str] | None = Field(default=None, description="DerivedMetric types reported by (not just associated with) this experiment (verbose-only).")
 
     class OrganismBreakdown(BaseModel):
-        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
-        count: int = Field(description="Number of experiments for this organism (e.g. 46)")
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4').")
+        count: int = Field(description="Number of experiments for this organism.")
 
     class TreatmentTypeBreakdown(BaseModel):
-        treatment_type: str = Field(description="Treatment category (e.g. 'coculture')")
-        count: int = Field(description="Number of experiments (e.g. 16)")
+        treatment_type: str = Field(description="Treatment category (e.g. 'coculture').")
+        count: int = Field(description="Number of experiments.")
 
     class BackgroundFactorBreakdown(BaseModel):
-        background_factor: str = Field(description="Background factor (e.g. 'axenic', 'diel_cycle')")
-        count: int = Field(description="Number of experiments (e.g. 14)")
+        background_factor: str = Field(description="Background factor (e.g. 'axenic', 'diel_cycle').")
+        count: int = Field(description="Number of experiments.")
 
     class OmicsTypeBreakdown(BaseModel):
-        omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ')")
-        count: int = Field(description="Number of experiments (e.g. 48)")
+        omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ').")
+        count: int = Field(description="Number of experiments.")
 
     class PublicationBreakdown(BaseModel):
-        publication_doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70')")
-        count: int = Field(description="Number of experiments from this publication (e.g. 5)")
+        publication_doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70').")
+        count: int = Field(description="Number of experiments from this publication.")
 
     class TableScopeBreakdown(BaseModel):
-        table_scope: str = Field(description="Table scope value (e.g. 'all_detected_genes', 'significant_only')")
-        count: int = Field(description="Number of experiments with this scope (e.g. 22)")
+        table_scope: str = Field(description="Table scope value (e.g. 'all_detected_genes', 'significant_only').")
+        count: int = Field(description="Number of experiments with this scope.")
 
     class ClusterTypeBreakdown(BaseModel):
-        cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison')")
-        count: int = Field(description="Number of experiments with this cluster type (e.g. 7)")
+        cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison').")
+        count: int = Field(description="Number of experiments with this cluster type.")
 
     class GrowthPhaseBreakdown(BaseModel):
-        growth_phase: str = Field(description="Growth phase (e.g. 'exponential'). Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
-        count: int = Field(description="Number of experiments with this growth phase")
+        growth_phase: str = Field(description="Growth phase (e.g. 'exponential'). Timepoint-level condition, not gene-specific.")
+        count: int = Field(description="Number of experiments with this growth phase.")
 
     class ExpValueKindBreakdown(BaseModel):
-        value_kind: str = Field(description="DerivedMetric value kind (e.g. 'numeric', 'boolean', 'categorical')")
-        count: int = Field(description="Number of experiments whose DMs include this value kind (e.g. 15)")
+        value_kind: str = Field(description="DerivedMetric value kind (e.g. 'numeric', 'boolean', 'categorical').")
+        count: int = Field(description="Number of experiments whose DMs include this value kind.")
 
     class ExpMetricTypeBreakdown(BaseModel):
-        metric_type: str = Field(description="DerivedMetric type name (e.g. 'damping_ratio', 'diel_amplitude_protein_log2')")
-        count: int = Field(description="Number of experiments associated with DMs of this type (e.g. 4)")
+        metric_type: str = Field(description="DerivedMetric type name (e.g. 'damping_ratio', 'diel_amplitude_protein_log2').")
+        count: int = Field(description="Number of experiments associated with DMs of this type.")
 
     class ExpCompartmentBreakdown(BaseModel):
-        compartment: str = Field(description="Wet-lab fraction (e.g. 'whole_cell', 'vesicle', 'exoproteome')")
-        count: int = Field(description="Number of experiments in this compartment (e.g. 160)")
+        compartment: str = Field(description="Wet-lab fraction (e.g. 'whole_cell', 'vesicle', 'exoproteome').")
+        count: int = Field(description="Number of experiments in this compartment.")
 
     class ListExperimentsResponse(BaseModel):
-        total_entries: int = Field(description="Total experiments in the KG (unfiltered)")
-        total_matching: int = Field(description="Experiments matching filters")
-        returned: int = Field(description="Number of results returned (0 when summary=true)")
-        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-        truncated: bool = Field(description="True if results were truncated by limit or summary=true")
-        by_organism: list[OrganismBreakdown] = Field(description="Experiment counts per organism, sorted by count descending")
-        by_treatment_type: list[TreatmentTypeBreakdown] = Field(description="Experiment counts per treatment type, sorted by count descending")
-        by_background_factors: list[BackgroundFactorBreakdown] = Field(description="Experiment counts per background factor, sorted by count descending")
-        by_omics_type: list[OmicsTypeBreakdown] = Field(description="Experiment counts per omics platform, sorted by count descending")
-        by_publication: list[PublicationBreakdown] = Field(description="Experiment counts per publication, sorted by count descending")
-        by_table_scope: list[TableScopeBreakdown] = Field(description="Experiment counts per table scope, sorted by count descending")
-        by_cluster_type: list[ClusterTypeBreakdown] = Field(default_factory=list, description="Experiment counts per cluster type, sorted by count descending")
-        by_growth_phase: list[GrowthPhaseBreakdown] = Field(default_factory=list, description="Experiment counts per growth phase, sorted by count descending")
-        by_value_kind: list[ExpValueKindBreakdown] = Field(default_factory=list, description="Experiment counts by DerivedMetric value_kind across matching experiments")
-        by_metric_type: list[ExpMetricTypeBreakdown] = Field(default_factory=list, description="Experiment counts by DerivedMetric metric_type across matching experiments")
-        by_compartment: list[ExpCompartmentBreakdown] = Field(default_factory=list, description="Experiment counts per wet-lab compartment (e.g. whole_cell, vesicle, exoproteome)")
-        time_course_count: int = Field(description="Number of time-course experiments in matching set")
-        score_max: float | None = Field(default=None, description="Max Lucene relevance score, present only when search_text is used (e.g. 4.52)")
-        score_median: float | None = Field(default=None, description="Median Lucene relevance score, present only when search_text is used (e.g. 1.23)")
-        not_found: list[str] = Field(default_factory=list, description="Input experiment_ids that did not match any Experiment node (empty unless experiment_ids was provided)")
-        results: list[ExperimentResult] = Field(description="Individual experiments (empty when summary=true)")
+        total_entries: int = Field(description="Total experiments in the KG (unfiltered).")
+        total_matching: int = Field(description="Experiments matching filters.")
+        returned: int = Field(description="Number of results returned (0 when summary=true).")
+        offset: int = Field(default=0, description="Offset into full result set.")
+        truncated: bool = Field(description="True if results were truncated by limit or summary=true.")
+        by_organism: list[OrganismBreakdown] = Field(description="Experiment counts per organism, sorted desc.")
+        by_treatment_type: list[TreatmentTypeBreakdown] = Field(description="Experiment counts per treatment type, sorted desc.")
+        by_background_factors: list[BackgroundFactorBreakdown] = Field(description="Experiment counts per background factor, sorted desc.")
+        by_omics_type: list[OmicsTypeBreakdown] = Field(description="Experiment counts per omics platform, sorted desc.")
+        by_publication: list[PublicationBreakdown] = Field(description="Experiment counts per publication, sorted desc.")
+        by_table_scope: list[TableScopeBreakdown] = Field(description="Experiment counts per table scope, sorted desc.")
+        by_cluster_type: list[ClusterTypeBreakdown] = Field(default_factory=list, description="Experiment counts per cluster type, sorted desc.")
+        by_growth_phase: list[GrowthPhaseBreakdown] = Field(default_factory=list, description="Experiment counts per growth phase, sorted desc.")
+        by_value_kind: list[ExpValueKindBreakdown] = Field(default_factory=list, description="Experiment counts by DerivedMetric value_kind across matching experiments.")
+        by_metric_type: list[ExpMetricTypeBreakdown] = Field(default_factory=list, description="Experiment counts by DerivedMetric metric_type across matching experiments.")
+        by_compartment: list[ExpCompartmentBreakdown] = Field(default_factory=list, description="Experiment counts per wet-lab compartment.")
+        time_course_count: int = Field(description="Number of time-course experiments in matching set.")
+        score_max: float | None = Field(default=None, description="Max Lucene relevance score, present only when search_text is used.")
+        score_median: float | None = Field(default=None, description="Median Lucene relevance score, present only when search_text is used.")
+        not_found: list[str] = Field(default_factory=list, description="Input experiment_ids that did not match any Experiment node (empty unless experiment_ids was provided).")
+        results: list[ExperimentResult] = Field(description="Individual experiments (empty when summary=true).")
 
     @mcp.tool(
         tags={"experiments", "expression", "discovery"},
@@ -2785,22 +2899,11 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> ListExperimentsResponse:
-        """List differential expression experiments in the knowledge graph.
+        """List differential-expression experiments with rich breakdowns (organism, treatment, omics, table_scope, growth_phase, DM rollups, metabolomics rollups). Use `summary=true` to see only breakdowns.
 
-        Returns summary breakdowns (by organism, treatment type, omics type,
-        table scope) plus individual experiments. Use summary=true to see only
-        breakdowns, then drill into detail with filters.
+        table_scope is critical for interpreting missing genes — `'all_detected_genes'` keeps tested-absent rows (the `not_significant` bucket reflects real biology); `'significant_only'` collapses them. Use `table_scope=['all_detected_genes']` to restrict to experiments fair for cross-experiment comparison. See `docs://guide/conventions` for the broader tested-absent framing.
 
-        table_scope indicates what genes each experiment's source DE table
-        contains — critical for interpreting missing genes. Use
-        table_scope=['all_detected_genes'] to restrict to experiments that
-        report all assayed genes (fair for cross-experiment comparison).
-
-        After this tool, drill in via:
-        - differential_expression_by_gene(experiment_ids=[id]) for per-gene DE
-        - list_clustering_analyses(experiment_ids=[id]) for clusters built from this experiment
-        - list_derived_metrics(experiment_ids=[id]) for DM evidence on this experiment
-        - pathway_enrichment(experiment_ids=[id]) for ORA on DE results
+        Routing: drill via `differential_expression_by_gene(experiment_ids=[id])` for per-gene DE; `list_clustering_analyses(experiment_ids=[id])`; `list_derived_metrics(experiment_ids=[id])`; `pathway_enrichment(experiment_ids=[id])`; `list_metabolite_assays(experiment_ids=[id])` when `metabolite_count > 0`.
         """
         await ctx.info(f"list_experiments summary={summary} organism={organism} "
                        f"treatment_type={treatment_type} search_text={search_text}")
@@ -3127,7 +3230,10 @@ def register_tools(mcp: FastMCP):
         by_table_scope: dict[str, int] = Field(
             description="Row counts by experiment table_scope"
             " (e.g. {'all_detected_genes': 100, 'significant_only': 50})."
-            " Shows data completeness across experiments.",
+            " `all_detected_genes` keeps tested-absent (`not_significant`)"
+            " rows; `significant_only` / `top_n` collapse them with"
+            " not-detected. Check before reading missing rows."
+            " See `docs://guide/conventions`.",
         )
         top_categories: list[ExpressionTopCategory] = Field(
             description="Top gene categories by significant gene count,"
@@ -3175,8 +3281,12 @@ def register_tools(mcp: FastMCP):
             description="Experiment IDs to restrict to. "
                         "Get these from list_experiments.",
         )] = None,
-        direction: Annotated[Literal["up", "down"] | None, Field(
-            description="Filter by expression direction.",
+        direction: Annotated[Literal["up", "down", "both"] | None, Field(
+            description="Filter by expression direction. `'up'` / `'down'` "
+            "restrict to one arm. `'both'` is the union of significant up + "
+            "significant down — functionally identical to "
+            "`direction=None, significant_only=True`; pick whichever spelling "
+            "is clearer at the call site. Default `None` is unchanged.",
         )] = None,
         significant_only: Annotated[bool, Field(
             description="If true, return only statistically significant"
@@ -3203,24 +3313,24 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> DifferentialExpressionByGeneResponse:
-        """Gene-centric differential expression. One row per gene x experiment x timepoint.
+        """Find differential-expression rows for one organism — one row per
+        (gene × experiment × timepoint), sorted by |log2FC|. Single-organism
+        enforced; at least one of `organism` / `locus_tags` / `experiment_ids`
+        is required. `expression_status` uses each experiment's publication-
+        specific threshold (not a uniform padj<0.05 cutoff).
 
-        Returns summary statistics (always) + top results sorted by |log2FC|
-        (strongest effects first). Default limit=5 gives a quick overview.
-        Set summary=True for counts only, or increase limit for more rows.
+        Tested-absent semantics depend on the parent experiment's
+        `table_scope`: `all_detected_genes` keeps `not_significant` rows
+        (real biology — gene tested but did not respond); `significant_only`
+        and `top_n` collapse tested-absent with not-detected. Always check
+        `by_table_scope` (envelope) and the per-experiment `table_scope`
+        before reading missing rows. See `docs://guide/conventions` for the
+        full tested-absent framing.
 
-        At least one of organism, locus_tags, or experiment_ids is required.
-        All inputs must refer to the same organism — call once per organism.
-
-        When organism is the only filter, it scopes to that organism's full
-        expression data (e.g. MED4 = 47K edges). Combine with summary=True or
-        significant_only=True + limit for manageable results.
-
-        The expression_status field uses the publication-specific threshold from
-        each experiment's original paper (not a uniform padj<0.05 cutoff).
-
-        For cross-organism comparison via ortholog groups, use
-        differential_expression_by_ortholog.
+        Routing: `summary=True` for counts-only landscape; per-gene drill-down
+        to `gene_response_profile`; cross-organism via
+        `differential_expression_by_ortholog`; pathway interpretation via
+        `pathway_enrichment` (`docs://analysis/enrichment`).
         """
         await ctx.info(
             f"differential_expression_by_gene"
@@ -3389,8 +3499,10 @@ def register_tools(mcp: FastMCP):
     async def search_homolog_groups(
         ctx: Context,
         search_text: Annotated[str, Field(
-            description="Search query (Lucene syntax). Searches consensus_product, "
-            "consensus_gene_name, description, functional_description.",
+            description="Search query (Lucene syntax — boolean operators, "
+            "phrase matching, wildcards). Searches consensus_product, "
+            "consensus_gene_name, description, functional_description. "
+            "See `docs://guide/conventions` for Lucene scoring.",
         )],
         source: Annotated[str | None, Field(
             description="Filter by OG source: 'cyanorak' or 'eggnog'.",
@@ -3426,11 +3538,14 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> SearchHomologGroupsResponse:
-        """Search ortholog groups by text (Lucene). Returns group IDs for
-        use with genes_by_homolog_group.
+        """Search ortholog groups by text (Lucene over consensus_product,
+        consensus_gene_name, description, functional_description). Returns
+        group IDs for downstream use.
 
-        Searches across consensus_product, consensus_gene_name, description,
-        and functional_description fields.
+        Routing: drill into member genes via `genes_by_homolog_group`;
+        cross-organism expression view via
+        `differential_expression_by_ortholog`. See `docs://guide/conventions`
+        for Lucene scoring semantics.
         """
         await ctx.info(f"search_homolog_groups search_text={search_text!r} "
                        f"source={source} limit={limit}")
@@ -3574,18 +3689,14 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> GenesByHomologGroupResponse:
-        """Find member genes of ortholog groups.
+        """Drill into ortholog group members — one row per (gene × group),
+        per organism. Each list input (`group_ids`, `organisms`) reports
+        both `not_found` (input absent from KG) and `not_matched` (in KG
+        but no member after filters).
 
-        Takes group IDs from search_homolog_groups or gene_homologs and
-        returns member genes per organism. One row per gene × group.
-
-        Two list filters — each reports not_found + not_matched:
-        - group_ids: ortholog groups (required)
-        - organisms: restrict to specific organisms
-
-        For group discovery by text, use search_homolog_groups first.
-        For gene → group direction, use gene_homologs.
-        For expression by ortholog groups, use differential_expression_by_ortholog.
+        Routing: group discovery via `search_homolog_groups`; gene → group
+        direction via `gene_homologs`; cross-organism expression view via
+        `differential_expression_by_ortholog`.
         """
         await ctx.info(f"genes_by_homolog_group group_ids={group_ids} organisms={organisms}")
         try:
@@ -3810,7 +3921,10 @@ def register_tools(mcp: FastMCP):
             description="Row counts by growth phase. Growth phase is a timepoint-level condition, not gene-specific.",
         )
         by_table_scope: dict[str, int] = Field(
-            description="Row counts by experiment table_scope",
+            description="Row counts by experiment table_scope."
+            " `all_detected_genes` keeps tested-absent (`not_significant`)"
+            " rows; `significant_only` / `top_n` collapse them with"
+            " not-detected. See `docs://guide/conventions`.",
         )
         top_groups: list[DifferentialExpressionByOrthologTopGroup] = Field(
             default_factory=list,
@@ -3894,24 +4008,21 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> DifferentialExpressionByOrthologResponse:
-        """Differential expression framed by ortholog groups.
+        """Find differential-expression rows framed by ortholog group —
+        one row per (group × experiment × timepoint), values are gene counts
+        (members responding), not individual gene rows. Cross-organism by
+        design. Results sorted by significant gene count.
 
-        Cross-organism by design — results at group x experiment x timepoint
-        granularity showing how many group members respond. Gene counts,
-        not individual genes.
+        Each list input (`group_ids`, `organisms`, `experiment_ids`) reports
+        both `not_found` (input absent from KG) and `not_matched` (in KG but
+        no expression after filters). Tested-absent semantics depend on the
+        parent experiment's `table_scope` — `all_detected_genes` keeps
+        `not_significant` rows; `significant_only` / `top_n` collapse them
+        with not-detected. See `docs://guide/conventions`.
 
-        Returns summary statistics (always) + top results sorted by significant
-        gene count. Default limit=5 gives a quick overview.
-        Set summary=True for counts only, or increase limit for more rows.
-
-        Three list filters — each reports not_found + not_matched:
-        - group_ids (required): ortholog groups
-        - organisms: restrict to specific organisms
-        - experiment_ids: restrict to specific experiments
-
-        For group discovery, use search_homolog_groups first.
-        For group membership without expression, use genes_by_homolog_group.
-        For per-gene expression, use differential_expression_by_gene.
+        Routing: discover groups via `search_homolog_groups`; group membership
+        without expression via `genes_by_homolog_group`; per-gene drill-down
+        via `differential_expression_by_gene`.
         """
         await ctx.info(
             f"differential_expression_by_ortholog"
@@ -4050,19 +4161,16 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(description="Max genes returned.", ge=1)] = 50,
         offset: Annotated[int, Field(description="Skip N genes for pagination.", ge=0)] = 0,
     ) -> GeneResponseProfileResponse:
-        """Cross-experiment gene response profile.
+        """Summarize how each gene responds across experiments — one result
+        per gene with `response_summary` keyed by treatment type (default)
+        or experiment. Each entry reports experiments / timepoints tested,
+        responded (up / down), plus rank and log2FC stats for significant
+        rows. Sorted by response breadth (most groups first).
 
-        Summarizes how each gene responds across all experiments. One result
-        per gene with response_summary showing per-treatment (or per-experiment)
-        statistics: how many experiments/timepoints the gene was tested in,
-        how many it responded in (up/down), and rank/log2fc stats for
-        significant responses.
-
-        Results sorted by response breadth: genes responding to most groups
-        first, then by experiment count, then by timepoint count.
-
-        Use differential_expression_by_gene to drill into temporal patterns
-        within a specific experiment.
+        Routing: drill into a specific experiment's temporal pattern via
+        `differential_expression_by_gene(locus_tags=[...], experiment_ids=[id])`.
+        See `docs://guide/conventions` for tested-absent semantics
+        (`groups_tested_not_responded` vs `groups_not_known`).
         """
         await ctx.info(f"gene_response_profile locus_tags={locus_tags} group_by={group_by} limit={limit}")
         try:
@@ -4253,16 +4361,16 @@ def register_tools(mcp: FastMCP):
         offset: Annotated[int, Field(
             description="Number of results to skip for pagination.", ge=0)] = 0,
     ) -> ListClusteringAnalysesResponse:
-        """Browse, search, and filter clustering analyses.
+        """Browse, search, and filter clustering analyses — each analysis
+        groups related gene clusters from one study / organism, with the
+        cluster children inlined per result. Lucene full-text over analysis
+        name, cluster names, descriptions, experimental_context. See
+        `docs://guide/conventions` for Lucene scoring.
 
-        Each analysis groups related gene clusters from one study/organism.
-        Inline clusters are included in each result row.
-
-        After this tool, drill in via:
-        - genes_in_cluster(cluster_ids=[id]) for per-cluster member genes
-        - genes_in_cluster(analysis_id=...) for all clusters from one analysis
-        - gene_clusters_by_gene(locus_tags=[...], analysis_ids=[id]) to scope a
-          per-gene cluster lookup to this analysis
+        Routing: `genes_in_cluster(cluster_ids=[id])` for per-cluster
+        members; `genes_in_cluster(analysis_id=...)` for all clusters in
+        one analysis; `gene_clusters_by_gene(locus_tags=[...],
+        analysis_ids=[id])` to scope a per-gene cluster lookup.
         """
         await ctx.info(f"list_clustering_analyses search_text={search_text!r} "
                        f"organism={organism} limit={limit}")
@@ -4404,7 +4512,7 @@ def register_tools(mcp: FastMCP):
             default=None,
             description="BH-adjusted p-value. Populated only when parent DM "
                         "has_p_value=True. No DM in current KG has p-values; "
-                        "Cypher RETURN omits this column today.")
+                        "Cypher RETURN omits this column.")
         significant: bool | None = Field(
             default=None,
             description="Significance flag at the DM's p_value_threshold. "
@@ -4535,19 +4643,16 @@ def register_tools(mcp: FastMCP):
         rankable: bool = Field(
             description=(
                 "True if this DM supports rank / percentile / bucket analysis "
-                "on genes_by_numeric_metric. When False, the `bucket`, "
-                "`min_percentile`, `max_percentile`, and `max_rank` filters on "
-                "that drill-down do not apply — passing them with only "
-                "non-rankable DMs raises; mixing rankable + non-rankable drops "
-                "the non-rankable ones and lists them in the drill-down's "
-                "`excluded_derived_metrics`."
+                "on `genes_by_numeric_metric`. Rankable-gated filters raise "
+                "if every selected DM is non-rankable, soft-exclude on mixed "
+                "input. See `docs://guide/conventions` (DM family gating)."
             ),
         )
         has_p_value: bool = Field(
             description=(
                 "True if this DM carries statistical p-values, enabling "
-                "`significant_only` and `max_adjusted_p_value` on drill-downs. "
-                "No DM in the current KG has p-values."
+                "`significant_only` / `max_adjusted_p_value` on drill-downs. "
+                "No DM in the current KG carries p-values."
             ),
         )
         unit: str = Field(
@@ -4798,20 +4903,19 @@ def register_tools(mcp: FastMCP):
         rankable: Annotated[bool | None, Field(
             description=(
                 "Filter to DMs that support rank / percentile / bucket "
-                "analysis. Set to True before calling genes_by_numeric_metric "
-                "with `bucket`, `min_percentile`, `max_percentile`, or "
-                "`max_rank` — those filters require rankable=True on every "
-                "selected DM."
+                "analysis. Set to True before calling `genes_by_numeric_metric` "
+                "with `bucket`, `min/max_percentile`, or `max_rank` — those "
+                "filters require rankable=True on every selected DM. See "
+                "`docs://guide/conventions` (DM family gating)."
             ),
         )] = None,
         has_p_value: Annotated[bool | None, Field(
             description=(
                 "Filter to DMs that carry statistical p-values. Set to True "
-                "before using `significant_only` or `max_adjusted_p_value` on "
+                "before using `significant_only` / `max_adjusted_p_value` on "
                 "drill-downs. No DM in the current KG carries p-values, so "
-                "has_p_value=True returns zero rows today — kept available "
-                "because the drill-down p-value filters raise when no "
-                "selected DM supports them."
+                "has_p_value=True returns zero rows — kept because drill-down "
+                "p-value filters raise when no selected DM supports them."
             ),
         )] = None,
         summary: Annotated[bool, Field(
@@ -4836,23 +4940,21 @@ def register_tools(mcp: FastMCP):
         )] = 0,
     ) -> ListDerivedMetricsResponse:
         """Discover DerivedMetric (DM) nodes — column-level scalar summaries
-        of gene behavior (e.g. rhythmicity flags, diel amplitudes,
-        darkness-survival class) that sit alongside DE and gene clusters as
-        non-DE evidence.
+        of gene behavior (rhythmicity flags, diel amplitudes,
+        darkness-survival class) that sit alongside DE and clusters as
+        non-DE evidence. Pre-flight before any DM drill-down.
 
-        Call this first, before `gene_derived_metrics` or the three
-        `genes_by_{kind}_metric` drill-downs. Inspect `value_kind` (routes
-        you to the right drill-down), `rankable` (gates bucket / percentile
-        / rank filters), `has_p_value` (gates significance filters), and
-        `allowed_categories` (for categorical DMs) here — drill-down tools
-        will raise if you pass filters that the selected DM set doesn't
-        support.
+        Inspect `value_kind` (routes to the right drill-down), `rankable`
+        (gates bucket / percentile / rank filters), `has_p_value` (gates
+        significance filters), and `allowed_categories` (categorical DMs)
+        here — drill-down tools raise if a passed filter is not supported
+        by every selected DM. See `docs://guide/conventions` for the full
+        DM family gating contract.
 
-        After this tool, drill in via:
-        - gene_derived_metrics(locus_tags=[...]) for per-gene DM lookup across all kinds
-        - genes_by_numeric_metric(derived_metric_ids=[id], ...) for numeric drill-down
-        - genes_by_boolean_metric(derived_metric_ids=[id], ...) for flag drill-down
-        - genes_by_categorical_metric(derived_metric_ids=[id], ...) for categorical drill-down
+        Routing: `gene_derived_metrics(locus_tags=[...])` for per-gene
+        lookup across all kinds; `genes_by_numeric_metric` /
+        `genes_by_boolean_metric` / `genes_by_categorical_metric` for
+        kind-specific drill-downs.
         """
         await ctx.info(f"list_derived_metrics search_text={search_text!r} "
                        f"organism={organism} limit={limit}")
@@ -4996,13 +5098,14 @@ def register_tools(mcp: FastMCP):
         offset: Annotated[int, Field(
             description="Number of results to skip for pagination.", ge=0)] = 0,
     ) -> GeneClustersByGeneResponse:
-        """Find which gene clusters contain the given genes.
+        """Look up cluster memberships for a gene batch — one row per
+        (gene × cluster) with analysis context (`analysis_id`,
+        `analysis_name`). Single-organism enforced. Reports `not_found`
+        (locus_tag absent from KG) and `not_matched` (in KG but no cluster
+        memberships after filters).
 
-        Gene-centric lookup: 'what clusters are these genes in?'
-        Single organism enforced. One row per gene × cluster.
-
-        Use list_clustering_analyses for discovery by text search.
-        Use genes_in_cluster to drill into a cluster's full membership.
+        Routing: cluster discovery via `list_clustering_analyses`; drill
+        into a cluster's full membership via `genes_in_cluster`.
         """
         await ctx.info(f"gene_clusters_by_gene locus_tags={locus_tags} "
                        f"organism={organism}")
@@ -5127,21 +5230,25 @@ def register_tools(mcp: FastMCP):
             description="Pagination offset (starting row, 0-indexed).", ge=0,
         )] = 0,
     ) -> GeneDerivedMetricsResponse:
-        """Polymorphic `value` column — branch on `value_kind` per row; consult `list_derived_metrics(value_kind=...)` first to know which DMs exist and whether numeric rows carry rank/percentile/bucket extras (rankable gate) or `adjusted_p_value`/`significant` (has_p_value gate).
+        """Look up DerivedMetric annotations for a gene batch — one row per
+        (gene × DM), polymorphic `value` (float on numeric / `'true'`/`'false'`
+        on boolean / category string on categorical). Numeric extras
+        (`rank_by_metric`, `metric_percentile`, `metric_bucket`) populate only
+        on rankable parent DMs; `adjusted_p_value` / `significant` only on
+        has_p_value parent DMs (none in the current KG). Single-organism
+        enforced.
 
-        Gene-centric batch lookup for DerivedMetric annotations — one row
-        per gene × DM. `value` is `float` on numeric rows, `'true'`/'false'`
-        on boolean rows, category string on categorical rows. Numeric extras
-        (rank_by_metric, metric_percentile, metric_bucket) are populated
-        only when the parent DM is rankable; null otherwise. Same gate for
-        adjusted_p_value / significant on has_p_value DMs (none in the
-        current KG).
+        Empty results are diagnosable via `not_found` (locus_tag absent from
+        KG) and `not_matched` (in KG but no DM rows after filters — includes
+        kind-mismatch when `value_kind` is set). Pre-flight via
+        `list_derived_metrics(value_kind=...)` to see which DMs touch your
+        genes and whether they are rankable / has_p_value. See
+        `docs://guide/conventions` for the full DM family gating contract.
 
-        Single organism enforced. not_found (locus_tag absent from KG) and
-        not_matched (in KG but no DM rows after filters — includes
-        kind-mismatch when value_kind is set) make empty rows diagnosable.
-        For edge-level numeric filters (bucket / percentile / rank / value
-        thresholds), pivot to genes_by_numeric_metric.
+        Routing: edge-level filters (bucket / percentile / rank / value
+        thresholds) live on `genes_by_numeric_metric`; flag-level filters on
+        `genes_by_boolean_metric`; category filters on
+        `genes_by_categorical_metric`.
         """
         await ctx.info(f"gene_derived_metrics locus_tags={locus_tags} "
                        f"organism={organism}")
@@ -5259,7 +5366,7 @@ def register_tools(mcp: FastMCP):
         genes_per_cluster_median: float = Field(
             description="Median gene count across clusters")
         not_found_clusters: list[str] = Field(default_factory=list,
-            description="Cluster IDs not found in KG")
+            description="Input cluster_ids not found in KG")
         not_matched_clusters: list[str] = Field(default_factory=list,
             description="Clusters found but no members after organism filter")
         not_matched_organism: str | None = Field(default=None,
@@ -5302,13 +5409,13 @@ def register_tools(mcp: FastMCP):
         offset: Annotated[int, Field(
             description="Number of results to skip for pagination.", ge=0)] = 0,
     ) -> GenesInClusterResponse:
-        """Get member genes of gene clusters.
+        """Drill into gene cluster members — one row per (gene × cluster).
+        Provide `cluster_ids` OR `analysis_id` (mutually exclusive);
+        passing an `analysis_id` returns every cluster's members in one
+        call.
 
-        Takes cluster IDs or an analysis ID and returns member genes.
-        One row per gene × cluster. Provide cluster_ids OR analysis_id (not both).
-
-        For analysis discovery, use list_clustering_analyses first.
-        For gene → cluster direction, use gene_clusters_by_gene.
+        Routing: analysis discovery via `list_clustering_analyses`; gene →
+        cluster direction via `gene_clusters_by_gene`.
         """
         await ctx.info(f"genes_in_cluster cluster_ids={cluster_ids} "
                        f"analysis_id={analysis_id} organism={organism}")
@@ -5427,10 +5534,12 @@ def register_tools(mcp: FastMCP):
             Literal["go_bp", "go_mf", "go_cc", "ec", "kegg",
                     "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
                     "tcdb", "cazy"] | None,
-            Field(description="If None, surveys all 12 ontologies."),
+            Field(description="If None, surveys all ontologies."),
         ] = None,
         tree: Annotated[str | None, Field(
-            description="BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'.",
+            description="BRITE tree name filter (e.g. 'transporters'). "
+            "Only valid when ontology='brite'. See docs://guide/conventions for "
+            "the BRITE-tree scoping rule.",
         )] = None,
         experiment_ids: Annotated[
             list[str] | None,
@@ -5457,14 +5566,30 @@ def register_tools(mcp: FastMCP):
             description="Exclude terms with more genes than this (default 500).",
             ge=1,
         )] = 500,
+        informative_only: Annotated[bool, Field(
+            description="When True (default), exclude terms flagged uninformative "
+            "in KG (e.g. KEGG 'metabolic pathways' map00001, GO root "
+            "'biological_process' go:0008150). Term-side filter only — never "
+            "restricts the gene set. Pass False to opt out and survey the full "
+            "term set (rebaselines may differ).",
+        )] = True,
     ) -> OntologyLandscapeResponse:
-        """Rank (ontology x level) combinations by enrichment suitability.
+        """Rank (ontology x level) combinations by enrichment suitability — pre-flight for enrichment.
 
         Per-(ontology x level) stats: term-size distribution, genome coverage,
         best-effort share (GO). Ranked by coverage x size_factor(median) with
-        sweet-spot [5, 50] median genes-per-term. Default ontology=None surveys
-        all 9 ontologies. Pass experiment_ids to weight by coverage of those
-        experiments' quantified genes. See docs://tools/ontology_landscape.
+        sweet-spot [5, 50] median genes-per-term; `relevance_rank` is the
+        composite score (rank 1 = best). `ontology=None` surveys every key
+        (GO BP/MF/CC + 9 others); BRITE rows break down per tree (scope with
+        `tree=`). Pass `experiment_ids=` to weight by coverage of those
+        experiments' quantified genes.
+
+        Routing: pick an `(ontology, level)` row, then call
+        `pathway_enrichment(ontology=..., level=...)` or
+        `cluster_enrichment(ontology=..., level=...)`. See
+        docs://analysis/enrichment for the pre-flight role and a worked
+        example, and docs://guide/conventions for the hierarchy `level`
+        and BRITE-tree scoping conventions.
         """
         await ctx.info(f"ontology_landscape organism={organism} ontology={ontology}")
         try:
@@ -5476,7 +5601,9 @@ def register_tools(mcp: FastMCP):
                 limit=limit, offset=offset,
                 min_gene_set_size=min_gene_set_size,
                 max_gene_set_size=max_gene_set_size,
-                tree=tree, conn=conn,
+                tree=tree,
+                informative_only=informative_only,
+                conn=conn,
             )
             return OntologyLandscapeResponse(**data)
         except ValueError as e:
@@ -5507,10 +5634,13 @@ def register_tools(mcp: FastMCP):
             description="Ontology for pathway definitions. Run ontology_landscape first to rank by relevance.",
         )],
         tree: Annotated[str | None, Field(
-            description="BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'.",
+            description="BRITE tree name filter (e.g. 'transporters'). Only valid when "
+                        "ontology='brite'. See docs://guide/conventions for the BRITE-tree "
+                        "scoping rule.",
         )] = None,
         level: Annotated[int | None, Field(
-            description="Hierarchy level (0 = root). At least one of level or term_ids required.",
+            description="Hierarchy level (0 = root). At least one of `level` or `term_ids` "
+                        "required. See docs://guide/conventions.",
             ge=0,
         )] = None,
         term_ids: Annotated[list[str] | None, Field(
@@ -5523,7 +5653,9 @@ def register_tools(mcp: FastMCP):
             description="If true, only significant DE rows count as foreground.",
         )] = True,
         background: Annotated[str | list[str], Field(
-            description="'table_scope' (default, per-cluster), 'organism', or explicit locus_tag list.",
+            description="'table_scope' (default, per-cluster quantified set), 'organism' "
+                        "(full genome — inflates denominator), or explicit locus_tag list. "
+                        "See docs://analysis/enrichment for the full background semantics.",
         )] = "table_scope",
         min_gene_set_size: Annotated[int, Field(
             description="Per-cluster M filter: drop pathways with fewer members in the background.",
@@ -5555,12 +5687,32 @@ def register_tools(mcp: FastMCP):
             description="Skip N rows before limit.",
             ge=0,
         )] = 0,
+        informative_only: Annotated[bool, Field(
+            description=(
+                "When True (default), exclude ontology terms flagged uninformative in "
+                "the KG (e.g. KEGG map00001 'metabolic pathways', GO root go:0008150). "
+                "Term-side filter — never restricts the gene set, background, or DE "
+                "inputs. Pass False to include uninformative terms; per-row "
+                "is_informative still surfaces in either mode. [ENR] Default flipped "
+                "to True in 2026-05 KG release; see docs://guide/conventions."
+            ),
+        )] = True,
     ) -> PathwayEnrichmentResponse:
-        """Pathway over-representation analysis from DE results (Fisher + BH).
+        """Run pathway over-representation analysis from DE results (Fisher + BH).
 
-        See docs://analysis/enrichment for methodology;
-        docs://examples/pathway_enrichment.py for runnable code (covers
-        EnrichmentResult accessors, custom term2gene, compareCluster export).
+        Single-organism enforced. `direction='both'` runs up + down per
+        experiment × timepoint cluster. Three background modes — `table_scope`
+        (default, per-cluster quantified set), `organism` (full genome), or an
+        explicit locus_tag list — drive the Fisher denominator and matter more
+        than the ontology choice.
+
+        Routing: pre-flight via `ontology_landscape` to pick `(ontology, level)`;
+        chain `differential_expression_by_gene` for raw DE inputs; drill enriched
+        terms via `gene_overview` or, for KEGG, `list_metabolites(pathway_ids=...)`
+        to inspect compound-anchored membership of an enriched pathway.
+        See docs://analysis/enrichment for Fisher + BH methodology and
+        background semantics; docs://examples/pathway_enrichment.py for runnable
+        code (EnrichmentResult accessors, custom term2gene, compareCluster export).
         """
         await ctx.info(
             f"pathway_enrichment organism={organism} experiments={len(experiment_ids)} "
@@ -5583,6 +5735,7 @@ def register_tools(mcp: FastMCP):
                 timepoint_filter=timepoint_filter,
                 growth_phases=growth_phases,
                 tree=tree,
+                informative_only=informative_only,
                 conn=conn,
             )
         except ValueError as e:
@@ -5623,10 +5776,18 @@ def register_tools(mcp: FastMCP):
             "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
             "tcdb", "cazy",
         ], Field(description="Ontology for pathway definitions. Run ontology_landscape first.")],
-        tree: Annotated[str | None, Field(description="BRITE tree name filter. Only valid when ontology='brite'.")] = None,
-        level: Annotated[int | None, Field(description="Hierarchy level (0 = root). At least one of level or term_ids required.", ge=0)] = None,
+        tree: Annotated[str | None, Field(
+            description="BRITE tree name filter. Only valid when ontology='brite'. "
+                        "See docs://guide/conventions for the BRITE-tree scoping rule.")] = None,
+        level: Annotated[int | None, Field(
+            description="Hierarchy level (0 = root). At least one of `level` or `term_ids` "
+                        "required. See docs://guide/conventions.", ge=0)] = None,
         term_ids: Annotated[list[str] | None, Field(description="Specific term IDs to test.")] = None,
-        background: Annotated[str | list[str], Field(description="'cluster_union' (default), 'organism', or explicit locus_tag list.")] = "cluster_union",
+        background: Annotated[str | list[str], Field(
+            description="'cluster_union' (default — union of all clustered genes; differs "
+                        "from `pathway_enrichment`'s 'table_scope' default), 'organism', or "
+                        "explicit locus_tag list. See docs://analysis/enrichment for the "
+                        "full background semantics.")] = "cluster_union",
         min_gene_set_size: Annotated[int, Field(description="Per-cluster M filter: drop pathways with fewer members.", ge=0)] = 5,
         max_gene_set_size: Annotated[int | None, Field(description="Per-cluster M filter upper bound. None disables.", ge=1)] = 500,
         min_cluster_size: Annotated[int, Field(description="Skip clusters with fewer members than this.", ge=0)] = 3,
@@ -5635,15 +5796,32 @@ def register_tools(mcp: FastMCP):
         summary: Annotated[bool, Field(description="If true, omit results (envelope only).")] = False,
         limit: Annotated[int, Field(description="Max rows returned.", ge=1)] = 5,
         offset: Annotated[int, Field(description="Skip N rows before limit.", ge=0)] = 0,
+        informative_only: Annotated[bool, Field(
+            description=(
+                "When True (default), exclude ontology terms flagged uninformative in "
+                "the KG (e.g. KEGG map00001 'metabolic pathways', GO root go:0008150). "
+                "Term-side filter — never restricts the gene set, background, or DE "
+                "inputs. Pass False to include uninformative terms; per-row "
+                "is_informative still surfaces in either mode. [ENR] Default flipped "
+                "to True in 2026-05 KG release; see docs://guide/conventions."
+            ),
+        )] = True,
     ) -> ClusterEnrichmentResponse:
-        """Cluster-membership over-representation analysis (Fisher + BH).
+        """Run cluster-membership over-representation analysis (Fisher + BH) — one ORA per cluster in a clustering analysis.
 
-        Runs ORA on every cluster in a clustering analysis. Use
-        list_clustering_analyses to find analysis IDs. Background
-        defaults to the union of all clustered genes.
-        See docs://analysis/enrichment for methodology;
-        docs://examples/pathway_enrichment.py for runnable code (the custom
-        term2gene path covers cluster-membership enrichment).
+        Single-organism enforced. Background defaults to `cluster_union` (union
+        of all clustered genes — differs from `pathway_enrichment`'s
+        `table_scope` default); `organism` or an explicit locus_tag list are
+        also accepted. Background drives the Fisher denominator and matters
+        more than the ontology choice.
+
+        Routing: pre-flight via `list_clustering_analyses` for `analysis_id`
+        and `ontology_landscape` for `(ontology, level)`; drill enriched terms
+        via `gene_overview`, `genes_in_cluster`, or for KEGG
+        `list_metabolites(pathway_ids=...)` for compound-anchored membership.
+        See docs://analysis/enrichment for Fisher + BH methodology and
+        background semantics; docs://examples/pathway_enrichment.py for
+        runnable code (custom term2gene path covers cluster-membership ORA).
         """
         await ctx.info(
             f"cluster_enrichment analysis_id={analysis_id} "
@@ -5664,6 +5842,7 @@ def register_tools(mcp: FastMCP):
                 min_cluster_size=min_cluster_size,
                 max_cluster_size=max_cluster_size,
                 pvalue_cutoff=pvalue_cutoff,
+                informative_only=informative_only,
                 conn=conn,
             )
         except ValueError as e:
@@ -5735,9 +5914,8 @@ def register_tools(mcp: FastMCP):
         # Full DM (precomputed dm.value_*)
         dm_value_min: float | None = Field(
             default=None,
-            description="Full-DM min (precomputed `dm.value_min`). Always "
-                        "populated for numeric DMs after the 2026-04-26 KG "
-                        "rebuild.")
+            description="Full-DM min (precomputed `dm.value_min`). Populated "
+                        "on every numeric DM.")
         dm_value_q1: float | None = Field(
             default=None,
             description="Full-DM Q1 (precomputed `dm.value_q1`).")
@@ -5944,10 +6122,9 @@ def register_tools(mcp: FastMCP):
             description="Metric-type tags (e.g. ['damping_ratio', "
                         "'diel_amplitude_protein_log2']). Unions every DM "
                         "carrying that tag, then narrows by scoping filters. "
-                        "Same tag can appear across organisms (e.g. "
-                        "'cell_abundance_biovolume_normalized' is on both "
-                        "MIT9312 and MIT9313 today). Mutually exclusive with "
-                        "`derived_metric_ids`.",
+                        "Same tag can span organisms / publications — pin one "
+                        "specific DM via `derived_metric_ids` instead. "
+                        "Mutually exclusive with `derived_metric_ids`.",
         )] = None,
         # ── DM-scoping filters (intersected with selection) ─────────────
         organism: Annotated[str | None, Field(
@@ -6010,9 +6187,8 @@ def register_tools(mcp: FastMCP):
         bucket: Annotated[list[str] | None, Field(
             description="Bucket label(s) — subset of "
                         "{'top_decile','top_quartile','mid','low'}. "
-                        "**Rankable-gated.** Today's KG buckets correspond to "
-                        "decile / quartile splits computed at import time per "
-                        "DM.",
+                        "**Rankable-gated.** Buckets are decile / quartile "
+                        "splits computed at import time per DM.",
         )] = None,
         max_rank: Annotated[int | None, Field(
             description="Cap on `r.rank_by_metric` (1 = highest). Use for "
@@ -6022,7 +6198,7 @@ def register_tools(mcp: FastMCP):
         # ── Edge-level filters: HAS_P_VALUE-GATED ───────────────────────
         significant_only: Annotated[bool, Field(
             description="Filter to `r.significant=true`. **has_p_value-gated** "
-                        "— raises against today's KG (no DM has p-values yet). "
+                        "— raises in the current KG (no DM has p-values yet). "
                         "Forward-compat surface; check "
                         "`list_derived_metrics(has_p_value=True)` before using.",
         )] = False,
@@ -6056,21 +6232,25 @@ def register_tools(mcp: FastMCP):
             ge=0,
         )] = 0,
     ) -> GenesByNumericMetricResponse:
-        """Pass `derived_metric_ids` XOR `metric_types` (one required); rankable-gated filters (`bucket`, `min/max_percentile`, `max_rank`) raise if every selected DM has `rankable=False` and soft-exclude on mixed input — inspect `list_derived_metrics(value_kind='numeric', rankable=True)` first to see which DMs support which filters.
+        """Drill into numeric DerivedMetric edges — one row per (gene × DM).
+        `value` (float) always populated; `rank_by_metric` / `metric_percentile`
+        / `metric_bucket` populate only on rankable DMs (null otherwise — same
+        row shape as `gene_derived_metrics`). Cross-organism by design.
 
-        Numeric DM drill-down — one row per gene × DM. `r.value` (float) is
-        always returned; `rank_by_metric` / `metric_percentile` /
-        `metric_bucket` are populated only on rows from rankable DMs (null
-        otherwise — same shape as `gene_derived_metrics`). Cross-organism by
-        design; envelope `by_organism` and per-row `organism_name` make
-        cross-strain rows self-describing. The `by_metric` envelope rollup
-        pairs filtered-slice value distribution with full-DM distribution
-        (precomputed) so callers can read "your top-decile slice 12.2-25.3
-        out of full DM range 0-28" directly.
+        Selection is `derived_metric_ids` XOR `metric_types` (exactly one
+        required). Rankable-gated filters (`bucket`, `min/max_percentile`,
+        `max_rank`) raise on all-non-rankable selection, soft-exclude on
+        mixed input. `has_p_value`-gated filters (`significant_only`,
+        `max_adjusted_p_value`) raise in the current KG (no DM carries
+        p-values). Pre-flight via
+        `list_derived_metrics(value_kind='numeric', rankable=True)`. See
+        `docs://guide/conventions` for the full DM family gating contract.
 
-        `excluded_derived_metrics` + `warnings` envelope keys are the
-        primary diagnostic when a real DM produces zero rows; check these
-        before assuming the result is empty for biological reasons.
+        The `by_metric` envelope rollup pairs filtered-slice value
+        distribution with full-DM distribution (precomputed dm.value_*) so
+        callers can read "top-decile slice 12.2-25.3 out of full DM range
+        0-28" directly. `excluded_derived_metrics` + `warnings` are the
+        primary diagnostic when a real DM produces zero rows.
         """
         selection_size = (
             len(derived_metric_ids) if derived_metric_ids is not None
@@ -6198,7 +6378,8 @@ def register_tools(mcp: FastMCP):
             description="Rows in filtered slice with r.value='true'.")
         false_count: int = Field(
             description="Rows in filtered slice with r.value='false' "
-                        "(always 0 today — positive-only KG storage).")
+                        "(always 0 in the current KG — positive-only "
+                        "DM storage).")
         # Full DM (precomputed)
         dm_total_gene_count: int = Field(
             description="Full-DM total gene count (precomputed "
@@ -6208,7 +6389,8 @@ def register_tools(mcp: FastMCP):
                         "`dm.flag_true_count`).")
         dm_false_count: int = Field(
             description="Full-DM negative tally (precomputed "
-                        "`dm.flag_false_count` — always 0 today).")
+                        "`dm.flag_false_count` — always 0 in the current KG, "
+                        "positive-only DM storage).")
 
     class GenesByBooleanMetricResult(BaseModel):
         # Identity / routing (5)
@@ -6230,11 +6412,11 @@ def register_tools(mcp: FastMCP):
             description="Always 'boolean' for this tool; kept for cross-tool "
                         "row-shape consistency with `genes_by_numeric_metric`.")
         rankable: bool = Field(
-            description="DM-level rankable flag (always False today for "
-                        "boolean DMs).")
+            description="DM-level rankable flag (always False for boolean "
+                        "DMs in the current KG).")
         has_p_value: bool = Field(
-            description="DM-level p-value flag (always False today for "
-                        "boolean DMs).")
+            description="DM-level p-value flag (always False for boolean "
+                        "DMs in the current KG).")
         # Edge value (1)
         value: str = Field(
             description="'true' or 'false' (string-typed bool — see KG-spec "
@@ -6295,7 +6477,8 @@ def register_tools(mcp: FastMCP):
         by_value: list[GenesByBooleanMetricValueBreakdown] = Field(
             default_factory=list,
             description="Frequency rollup of `r.value` across surviving rows. "
-                        "Today every row is 'true' (positive-only KG storage).")
+                        "Every row is 'true' in the current KG (positive-only "
+                        "DM storage).")
         top_categories: list[GenesByNumericMetricCategoryBreakdown] = Field(
             default_factory=list, description="Top 5 gene categories by count.")
         by_metric: list[GenesByBooleanMetricBreakdown] = Field(
@@ -6361,8 +6544,8 @@ def register_tools(mcp: FastMCP):
                         "['vesicle_proteome_member', "
                         "'periodic_in_coculture_LD']). Unions every DM "
                         "carrying that tag, then narrows by scoping filters. "
-                        "Same tag can appear across organisms (e.g. "
-                        "'vesicle_proteome_member' is on both MED4 + MIT9313). "
+                        "Same tag can span organisms / publications — pin "
+                        "one specific DM via `derived_metric_ids` instead. "
                         "Mutually exclusive with `derived_metric_ids`.",
         )] = None,
         # ── DM-scoping filters (intersected with selection) ─────────────
@@ -6404,12 +6587,11 @@ def register_tools(mcp: FastMCP):
         # ── Edge-level filter (kind-specific) ───────────────────────────
         flag: Annotated[bool | None, Field(
             description="Filter on `r.value`: True keeps `'true'` edges, "
-                        "False keeps `'false'` edges. Coerced to the "
-                        "string-typed bool stored in the KG (BioCypher "
-                        "constraint). **flag=False returns zero rows today** "
-                        "— current KG stores only positive (true) edges; "
-                        "inspect `by_metric[*].dm_false_count` (always 0 "
-                        "today) before assuming a gene is 'not flagged'.",
+                        "False keeps `'false'` edges. **flag=False returns "
+                        "zero rows in the current KG** — DM layer stores only "
+                        "positive (true) edges; inspect "
+                        "`by_metric[*].dm_false_count` (always 0) before "
+                        "assuming a gene is 'not flagged'.",
         )] = None,
         # ── Result-size controls ────────────────────────────────────────
         summary: Annotated[bool, Field(
@@ -6435,25 +6617,30 @@ def register_tools(mcp: FastMCP):
             ge=0,
         )] = 0,
     ) -> GenesByBooleanMetricResponse:
-        """Pass `derived_metric_ids` XOR `metric_types` (one required); wrong-kind IDs (numeric / categorical) surface silently in `not_found_ids` — inspect `list_derived_metrics(value_kind='boolean')` first to pick valid boolean DMs.
+        """Drill into boolean DerivedMetric edges — one row per (gene × DM ×
+        edge value). `value` is the string-typed bool (`'true'` / `'false'`).
+        Cross-organism by design.
 
-        Boolean DM drill-down — one row per gene × DM × edge value. `r.value`
-        is the string-typed bool ('true' / 'false'). Cross-organism by
-        design; envelope `by_organism` and per-row `organism_name` make
-        cross-strain rows self-describing. The `by_metric` envelope rollup
-        pairs filtered-slice true/false tallies with full-DM precomputed
-        counts (`dm_true_count`, `dm_false_count`) so callers can read "32
-        of 32 MED4 vesicle-proteome members" directly.
+        Selection is `derived_metric_ids` XOR `metric_types` (exactly one
+        required); wrong-kind IDs (numeric / categorical) surface silently
+        in `not_found_ids`. Pre-flight via
+        `list_derived_metrics(value_kind='boolean')` to pick valid boolean
+        DMs. See `docs://guide/conventions` for the full DM family gating
+        contract.
 
-        **Positive-only storage gotcha:** every current boolean DM has
-        `dm.flag_false_count=0`; `flag=False` returns zero rows today. The
-        `by_metric[*].dm_false_count` echo makes this self-evident without
-        a follow-up call.
+        **Positive-only storage gotcha:** the DM layer stores only
+        `flag=True` edges, so `flag=False` returns 0 rows; every current
+        boolean DM has `dm.flag_false_count=0`. The `by_metric[*]` rollup
+        echoes that count so absence is self-evident without a follow-up.
+        Tested-absent semantics are not currently representable on the DM
+        side (distinct from the metabolomics layer, which does store both).
+        See `docs://guide/conventions`.
 
-        `excluded_derived_metrics` and `warnings` are always `[]` (no
-        rankable / has_p_value gates apply to boolean DMs); kept as
-        envelope keys for cross-tool shape consistency with
-        `genes_by_numeric_metric`.
+        The `by_metric` envelope rollup pairs filtered-slice true/false
+        tallies with full-DM precomputed counts so callers can read "32 of
+        32 MED4 vesicle-proteome members" directly.
+        `excluded_derived_metrics` / `warnings` are always [] here (no
+        gates apply); kept for envelope-shape consistency.
         """
         selection_size = (
             len(derived_metric_ids) if derived_metric_ids is not None
@@ -6596,11 +6783,11 @@ def register_tools(mcp: FastMCP):
                         "cross-tool row-shape consistency with "
                         "`genes_by_numeric_metric`.")
         rankable: bool = Field(
-            description="DM-level rankable flag (always False today for "
-                        "categorical DMs).")
+            description="DM-level rankable flag (always False for categorical "
+                        "DMs in the current KG).")
         has_p_value: bool = Field(
-            description="DM-level p-value flag (always False today for "
-                        "categorical DMs).")
+            description="DM-level p-value flag (always False for categorical "
+                        "DMs in the current KG).")
         # Edge value (1)
         value: str = Field(
             description="Category label (one of the parent DM's "
@@ -6730,10 +6917,9 @@ def register_tools(mcp: FastMCP):
                         "['predicted_subcellular_localization', "
                         "'darkness_survival_class']). Unions every DM "
                         "carrying that tag, then narrows by scoping filters. "
-                        "Same tag can appear across organisms (e.g. "
-                        "'predicted_subcellular_localization' is on both "
-                        "MED4 + MIT9313). Mutually exclusive with "
-                        "`derived_metric_ids`.",
+                        "Same tag can span organisms / publications — pin "
+                        "one specific DM via `derived_metric_ids` instead. "
+                        "Mutually exclusive with `derived_metric_ids`.",
         )] = None,
         # ── DM-scoping filters (intersected with selection) ─────────────
         organism: Annotated[str | None, Field(
@@ -6802,25 +6988,25 @@ def register_tools(mcp: FastMCP):
             ge=0,
         )] = 0,
     ) -> GenesByCategoricalMetricResponse:
-        """Pass `derived_metric_ids` XOR `metric_types` (one required); `categories` must be a subset of the union of selected DMs' `allowed_categories` (raises with the allowed set listed otherwise) — inspect `list_derived_metrics(value_kind='categorical')` first to see each DM's allowed set.
+        """Drill into categorical DerivedMetric edges — one row per
+        (gene × DM × edge value). `value` is a category label. Cross-organism
+        by design.
 
-        Categorical DM drill-down — one row per gene × DM × edge value.
-        `r.value` is a category label. Cross-organism by design; envelope
-        `by_organism` and per-row `organism_name` make cross-strain rows
-        self-describing. The `by_metric` envelope rollup pairs filtered-slice
-        category histogram (`by_category`) with full-DM precomputed
-        histogram (`dm_by_category`) plus the schema-declared
-        `allowed_categories` so callers can detect declared-but-unobserved
-        categories without an extra call.
+        Selection is `derived_metric_ids` XOR `metric_types` (exactly one
+        required); wrong-kind IDs (numeric / boolean) surface silently in
+        `not_found_ids`. The `categories` filter must be a subset of the
+        union of selected DMs' `allowed_categories` — unknown values raise
+        `ValueError` listing the allowed set. Pre-flight via
+        `list_derived_metrics(value_kind='categorical')` to see each DM's
+        allowed set. See `docs://guide/conventions` for the full DM family
+        gating contract.
 
-        Wrong-kind IDs (numeric / boolean) surface silently in
-        `not_found_ids` — inspect `list_derived_metrics(value_kind='categorical')`
-        first to pick valid categorical DMs.
-
-        `excluded_derived_metrics` and `warnings` are always `[]` (no
-        rankable / has_p_value gates apply to categorical DMs); kept as
-        envelope keys for cross-tool shape consistency with
-        `genes_by_numeric_metric`.
+        The `by_metric` envelope rollup pairs filtered-slice category
+        histogram (`by_category`) with full-DM precomputed histogram
+        (`dm_by_category`) plus the schema-declared `allowed_categories`,
+        so callers can detect declared-but-unobserved categories without an
+        extra call. `excluded_derived_metrics` / `warnings` are always []
+        here (no gates apply); kept for envelope-shape consistency.
         """
         selection_size = (
             len(derived_metric_ids) if derived_metric_ids is not None
@@ -6917,7 +7103,7 @@ def register_tools(mcp: FastMCP):
     )
     async def list_metabolites(
         ctx: Context,
-        search: Annotated[str | None, Field(
+        search_text: Annotated[str | None, Field(
             description="Free-text search on metabolite name (Lucene syntax). "
             "Index covers Metabolite.name only — element/formula composition "
             "is filtered through `elements` (presence list), not search. "
@@ -6929,6 +7115,14 @@ def register_tools(mcp: FastMCP):
             "Combines with other filters via AND. `not_found.metabolite_ids` "
             "lists any IDs that don't exist in the KG.",
         )] = None,
+        exclude_metabolite_ids: Annotated[
+            list[str] | None,
+            Field(
+                description="Exclude metabolites with these IDs. Set-difference "
+                "semantics with `metabolite_ids` — exclude wins on overlap. "
+                "Empty list is no-op.",
+            ),
+        ] = None,
         kegg_compound_ids: Annotated[list[str] | None, Field(
             description="Filter by raw KEGG C-numbers (e.g. ['C00031']). "
             "Convenience over `metabolite_ids` when working with KEGG-anchored "
@@ -6949,9 +7143,9 @@ def register_tools(mcp: FastMCP):
         elements: Annotated[list[str] | None, Field(
             description="Element-presence filter (Hill-notation symbols). "
             "AND of presence — ['N', 'P'] matches metabolites containing BOTH. "
-            "Replaces error-prone formula-substring matching. Empty/null "
-            "formula metabolites (~10%) never match. E.g. ['N'] for "
-            "nitrogen-containing metabolites (yields 1,563 today).",
+            "Use this rather than substring-matching on `formula` (Hill "
+            "notation has element-clash footguns: 'Cl' contains 'C', "
+            "'Na' contains 'N'). Empty/null formula metabolites never match.",
         )] = None,
         mass_min: Annotated[float | None, Field(
             description="Minimum monoisotopic mass (Da). Excludes metabolites "
@@ -6964,27 +7158,23 @@ def register_tools(mcp: FastMCP):
             description="Restrict to metabolites reachable by these organisms "
             "(case-insensitive on `preferred_name`). UNION semantics — a "
             "metabolite reached by ANY listed organism qualifies. Joined via "
-            "`Organism_has_metabolite` (catalysis OR transport post-TCDB). "
+            "`Organism_has_metabolite` (catalysis OR transport). "
             "E.g. ['Prochlorococcus MED4']. `not_found.organism_names` lists "
             "any unknown names.",
         )] = None,
         pathway_ids: Annotated[list[str] | None, Field(
             description="Filter by KEGG pathway membership (`KeggTerm.id`). "
             "E.g. ['kegg.pathway:ko00910'] for nitrogen metabolism. Joined via "
-            "`Metabolite_in_pathway` (transport-extended post-TCDB; 395 distinct "
-            "pathways are metabolite-reachable). `not_found.pathway_ids` lists "
-            "any IDs that don't exist as a KeggTerm.",
+            "`Metabolite_in_pathway`. `not_found.pathway_ids` lists unknown IDs.",
         )] = None,
         evidence_sources: Annotated[
             list[Literal["metabolism", "transport", "metabolomics"]] | None,
             Field(
-                description="Filter by evidence path. Set-membership ANY semantics "
-                "— ['transport'] returns transport-only AND dual (1,097 today). "
+                description="Filter by evidence path. Set-membership ANY "
+                "semantics — ['transport'] returns transport-only AND dual. "
                 "Valid values: 'metabolism' (catalysis-reachable), 'transport' "
-                "(TCDB-curated substrate). `'metabolomics'` is accepted as a "
-                "filter value for forward-compat with the future metabolomics-DM "
-                "spec; no row matches yet. Other values raise at the MCP "
-                "boundary (Pydantic Literal validation).",
+                "(TCDB-curated substrate), 'metabolomics' (measured by a "
+                "MetaboliteAssay). Other values raise at the MCP boundary.",
             ),
         ] = None,
         summary: Annotated[bool, Field(
@@ -7001,25 +7191,14 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> ListMetabolitesResponse:
-        """Browse and filter metabolites in the chemistry layer.
+        """Browse and filter metabolites in the chemistry layer (KEGG-curated metabolism + TCDB-curated transport substrates + measured by MetaboliteAssay).
 
-        **Direction-agnostic.** Joins through `Reaction_has_metabolite` and
-        (post-TCDB) `Tcdb_family_transports_metabolite` are direction-agnostic —
-        a metabolite that is *produced* and one that is *consumed* surface
-        identically. KEGG equation order is arbitrary. To distinguish, layer
-        transcriptional evidence (`differential_expression_by_gene`) and
-        functional annotation (`gene_overview` Pfam/KO `*-synthase` vs
-        `*-permease`).
-
-        After this tool, drill in via:
-        - genes_by_metabolite(metabolite_ids=[id], organism=...) — find the
-          catalysts / transporters per organism (replaces what would
-          otherwise be an inline per-row top-N gene list here)
-        - gene_metabolic_role(locus_tags=[...], organism=..., metabolite_elements=...) — gene-centric chemistry
-        - genes_by_ontology(ontology="kegg", term_ids=[pathway_id], organism=...) — pathway → genes
+        Routing: drill into `genes_by_metabolite(metabolite_ids=[...])` for catalysts/transporters per organism, `assays_by_metabolite(metabolite_ids=[...])` for measurement evidence, `genes_by_ontology(ontology='kegg', term_ids=[pathway_id])` for pathway → genes. See `docs://guide/conventions` for direction-agnosticism (KEGG equation order is unreliable upstream — joins through Reaction_has_metabolite and Tcdb_family_transports_metabolite return both produced and consumed metabolites identically). See `docs://analysis/metabolites` for the 3 source pipelines decision tree.
         """
         await ctx.info(
-            f"list_metabolites search={search} metabolite_ids={metabolite_ids} "
+            f"list_metabolites search_text={search_text} "
+            f"metabolite_ids={metabolite_ids} "
+            f"exclude_metabolite_ids={exclude_metabolite_ids} "
             f"elements={elements} organism_names={organism_names} "
             f"pathway_ids={pathway_ids} evidence_sources={evidence_sources} "
             f"summary={summary} verbose={verbose} limit={limit} offset={offset}"
@@ -7027,8 +7206,9 @@ def register_tools(mcp: FastMCP):
         try:
             conn = _conn(ctx)
             result = api.list_metabolites(
-                search=search,
+                search_text=search_text,
                 metabolite_ids=metabolite_ids,
+                exclude_metabolite_ids=exclude_metabolite_ids,
                 kegg_compound_ids=kegg_compound_ids,
                 chebi_ids=chebi_ids,
                 hmdb_ids=hmdb_ids,
@@ -7047,22 +7227,36 @@ def register_tools(mcp: FastMCP):
             )
             results = [MetaboliteResult(**r) for r in result["results"]]
             top_organisms = [MetTopOrganism(**b) for b in result["top_organisms"]]
-            top_pathways = [MetTopPathway(**b) for b in result["top_pathways"]]
+            top_metabolite_pathways = [
+                MetTopPathway(**b) for b in result["top_metabolite_pathways"]
+            ]
             by_evidence_source = [
                 MetEvidenceSourceBreakdown(**b)
                 for b in result["by_evidence_source"]
             ]
             xref_coverage = MetXrefCoverage(**result["xref_coverage"])
             mass_stats = MetMassStats(**result["mass_stats"])
+            measurement_coverage_data = result.get("by_measurement_coverage") or {}
+            by_measurement_coverage = MetMeasurementCoverage(
+                by_paper_count=[
+                    MetPaperCountBucket(**b)
+                    for b in measurement_coverage_data.get("by_paper_count", [])
+                ],
+                by_compartment=[
+                    MetCompartmentBucket(**b)
+                    for b in measurement_coverage_data.get("by_compartment", [])
+                ],
+            )
             not_found = MetNotFound(**result["not_found"])
             response = ListMetabolitesResponse(
                 total_entries=result["total_entries"],
                 total_matching=result["total_matching"],
                 top_organisms=top_organisms,
-                top_pathways=top_pathways,
+                top_metabolite_pathways=top_metabolite_pathways,
                 by_evidence_source=by_evidence_source,
                 xref_coverage=xref_coverage,
                 mass_stats=mass_stats,
+                by_measurement_coverage=by_measurement_coverage,
                 score_max=result.get("score_max"),
                 score_median=result.get("score_median"),
                 returned=result["returned"],
@@ -7107,6 +7301,14 @@ def register_tools(mcp: FastMCP):
             "name resolves to zero matching genes.",
             min_length=1,
         )],
+        exclude_metabolite_ids: Annotated[
+            list[str] | None,
+            Field(
+                description="Exclude metabolites with these IDs. Set-difference "
+                "semantics with `metabolite_ids` — exclude wins on overlap. "
+                "Empty list is no-op.",
+            ),
+        ] = None,
         ec_numbers: Annotated[list[str] | None, Field(
             description="Narrow metabolism rows to those whose Reaction carries "
             "any of these EC numbers. **Metabolism arm only — does not affect "
@@ -7118,8 +7320,8 @@ def register_tools(mcp: FastMCP):
             description="Filter to rows where the **metabolite** is in any of "
             "these KEGG pathways (`KeggTerm.id`, e.g. ['kegg.pathway:ko00910'] "
             "for nitrogen metabolism). Anchored on `Metabolite.pathway_ids` "
-            "(KG-A5 denorm, transport-extended), so applies uniformly to both "
-            "arms. **Not gene-anchored** — for filtering by genes' KEGG-pathway "
+            "(transport-extended), so applies uniformly to both arms. "
+            "**Not gene-anchored** — for filtering by genes' KEGG-pathway "
             "annotations, route through `genes_by_ontology(ontology=\"kegg\", "
             "term_ids=[pathway_id], organism=...)` first to obtain locus_tags. "
             "`not_found.metabolite_pathway_ids` lists IDs that don't exist as "
@@ -7139,18 +7341,18 @@ def register_tools(mcp: FastMCP):
         transport_confidence: Annotated[
             Literal["substrate_confirmed", "family_inferred"] | None,
             Field(
-                description="Narrow transport rows by TCDB-annotation specificity. "
-                "`substrate_confirmed` restricts transport rows to those annotated "
-                "at TCDB `tc_specificity` (substrate-curated). `family_inferred` "
-                "restricts to transport rows annotated at coarser TCDB levels "
-                "(rolled up via the substrate edge). **Transport arm only — does "
-                "not affect metabolism rows**, which are always substrate-"
-                "confirmed by definition (direct catalysis edge) and carry "
-                "`transport_confidence = None`. To restrict to transport rows "
-                "alone, combine with `evidence_sources=['transport']`. "
-                "**Recommended for high-precision transporter-hunting:** "
-                "`transport_confidence='substrate_confirmed', "
-                "evidence_sources=['transport']`.",
+                description="Narrow transport rows by TCDB-annotation "
+                "specificity. `substrate_confirmed` restricts transport "
+                "rows to those annotated at TCDB `tc_specificity` "
+                "(substrate-curated). `family_inferred` restricts to "
+                "transport rows annotated at coarser TCDB levels (rolled "
+                "up via the substrate edge). **Transport arm only — does "
+                "not affect metabolism rows**, which are always "
+                "substrate-confirmed by definition (direct catalysis "
+                "edge) and carry `transport_confidence = None`. Combine "
+                "with `evidence_sources=['transport']` to restrict to "
+                "transport rows alone. See `docs://guide/conventions` "
+                "for when to pick which tier.",
             ),
         ] = None,
         evidence_sources: Annotated[
@@ -7184,39 +7386,27 @@ def register_tools(mcp: FastMCP):
         )] = 0,
     ) -> GenesByMetaboliteResponse:
         """Find genes connected to specified metabolites in one organism.
+        Two arms — metabolism (`Gene → Reaction → Metabolite`) and transport
+        (`Gene → TcdbFamily → Metabolite`, includes ancestor families that
+        inherit substrates from descendant leaves). Some genes annotated
+        only to broad TCDB families (notably ABC transporters) emit large
+        numbers of family_inferred rows; the auto-warning fires when
+        family_inferred dominates the transport arm. Direction-agnostic
+        (KEGG equation order is unreliable upstream — joins through
+        Reaction_has_metabolite and Tcdb_family_transports_metabolite
+        return both produced and consumed metabolites identically). Per-row
+        union shape: cross-arm fields are explicitly None on rows from the
+        other arm.
 
-        **Direction-agnostic.** Joins through `Reaction_has_metabolite` (metabolism)
-        and `Tcdb_family_transports_metabolite` (transport) are direction-agnostic —
-        a gene that *produces* a metabolite and a gene that *consumes* it surface
-        identically. KEGG equation order is arbitrary. To distinguish, layer
-        transcriptional evidence (`differential_expression_by_gene`) and gene
-        functional annotation (`gene_overview` Pfam / KEGG KO names like
-        `*-synthase` vs `*-permease`).
-
-        **Transport-confidence semantics (transport arm only).** Transport rows
-        ride a TCDB substrate-edge rollup that propagates leaf-curated substrates
-        up the hierarchy. A `family_inferred` transport row means *the gene is
-        annotated to a TCDB family that contains members curated as moving this
-        metabolite* — not that this gene is curated as such. ABC Superfamily–level
-        annotations make every ABC gene appear to "transport urea" through the
-        rollup. Filter `transport_confidence='substrate_confirmed'` (paired with
-        `evidence_sources=['transport']` if you want the transport arm in
-        isolation) for the precise set; the default fires both arms and flags
-        `family_inferred` in `warnings` when it dominates the result. Metabolism
-        rows are not subject to this concern — direct catalysis edges are
-        always substrate-confirmed — and their `transport_confidence` is None.
-
-        **Evidence sources accepted here:** `metabolism`, `transport`. The
-        metabolomics path (DerivedMetric → Metabolite) has no gene anchor and is
-        not surfaced by gene-anchored chemistry tools — see `list_metabolites`.
-
-        Drill-downs from result rows / envelope rollups:
-        - Any `top_genes` entry → `differential_expression_by_gene(locus_tags=[...], organism=...)`
-          for transcriptional response, or `gene_overview` for richer context.
-        - Any `top_tcdb_families` entry → `genes_by_ontology(ontology="tcdb", term_ids=[id], organism=...)`
-          for sibling genes in the same family.
-        - Any `top_reactions` entry → `genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)`
-          for genes in adjacent reactions, or `pathway_enrichment` for context.
+        Routing: from `top_genes` drill into
+        `differential_expression_by_gene(locus_tags=[...], organism=...)` or
+        `gene_overview`; from `top_tcdb_families` to
+        `genes_by_ontology(ontology="tcdb", term_ids=[id], organism=...)`;
+        from `top_reactions` to
+        `genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)` or
+        `pathway_enrichment`. See `docs://guide/conventions` for
+        transport-confidence and direction-agnostic semantics, and
+        `docs://analysis/metabolites` for the chemistry-layer decision tree.
         """
         await ctx.info(
             f"genes_by_metabolite metabolite_ids={metabolite_ids} "
@@ -7231,6 +7421,7 @@ def register_tools(mcp: FastMCP):
             conn = _conn(ctx)
             result = api.genes_by_metabolite(
                 metabolite_ids=metabolite_ids,
+                exclude_metabolite_ids=exclude_metabolite_ids,
                 organism=organism,
                 ec_numbers=ec_numbers,
                 metabolite_pathway_ids=metabolite_pathway_ids,
@@ -7349,6 +7540,14 @@ def register_tools(mcp: FastMCP):
             "partner organism via `genes_by_metabolite` with these IDs. "
             "Applies uniformly to both arms.",
         )] = None,
+        exclude_metabolite_ids: Annotated[
+            list[str] | None,
+            Field(
+                description="Exclude metabolites with these IDs. Set-difference "
+                "semantics with `metabolite_ids` — exclude wins on overlap. "
+                "Empty list is no-op.",
+            ),
+        ] = None,
         ec_numbers: Annotated[list[str] | None, Field(
             description="Narrow metabolism rows to those whose Reaction "
             "carries any of these EC numbers. **Metabolism arm only — "
@@ -7361,13 +7560,13 @@ def register_tools(mcp: FastMCP):
             description="Filter to rows where the **metabolite** is in "
             "any of these KEGG pathways (`KeggTerm.id`, e.g. "
             "['kegg.pathway:ko00910'] for nitrogen metabolism). Anchored "
-            "on `Metabolite.pathway_ids` (KG-A5 denorm, transport-"
-            "extended), so applies uniformly to both arms. **Not "
-            "gene-anchored** — for filtering by genes' KEGG-pathway "
-            "annotations, route through `genes_by_ontology(ontology="
-            "\"kegg\", term_ids=[pathway_id], organism=...)` first to "
-            "obtain locus_tags. `not_found.metabolite_pathway_ids` "
-            "lists IDs that don't exist as a KeggTerm.",
+            "on `Metabolite.pathway_ids` (transport-extended), so "
+            "applies uniformly to both arms. **Not gene-anchored** — for "
+            "filtering by genes' KEGG-pathway annotations, route through "
+            "`genes_by_ontology(ontology=\"kegg\", term_ids=[pathway_id], "
+            "organism=...)` first to obtain locus_tags. "
+            "`not_found.metabolite_pathway_ids` lists IDs that don't "
+            "exist as a KeggTerm.",
         )] = None,
         mass_balance: Annotated[
             Literal["balanced", "unbalanced"] | None, Field(
@@ -7397,13 +7596,12 @@ def register_tools(mcp: FastMCP):
                 "up via the substrate edge). **Transport arm only — does "
                 "not affect metabolism rows**, which are always "
                 "substrate-confirmed by definition (direct catalysis "
-                "edge) and carry `transport_confidence = None`. To "
-                "restrict to transport rows alone, combine with "
-                "`evidence_sources=['transport']`. **Recommended for "
-                "high-precision transporter-hunting in batch DE inputs:** "
-                "`transport_confidence='substrate_confirmed', "
-                "evidence_sources=['transport']` (mutes the ABC-"
-                "superfamily 551-row blowup).",
+                "edge) and carry `transport_confidence = None`. Combine "
+                "with `evidence_sources=['transport']` to restrict to "
+                "transport rows alone. Use `substrate_confirmed` to mute "
+                "the long-tail row blowup from ABC-only-annotated genes "
+                "in batch DE inputs. See `docs://guide/conventions` for "
+                "when to pick which tier.",
             ),
         ] = None,
         evidence_sources: Annotated[
@@ -7422,7 +7620,7 @@ def register_tools(mcp: FastMCP):
             description="When true, return only summary fields "
             "(results=[]). **Strongly recommended for batch DE inputs** "
             "(50+ locus_tags) — envelope rollups (top_metabolites, "
-            "top_pathways, top_reactions, top_tcdb_families, "
+            "top_metabolite_pathways, top_reactions, top_tcdb_families, "
             "by_element, by_gene, top_gene_categories) are the actually-"
             "useful artifact at that scale; detail rows can exceed 1,000 "
             "quickly.",
@@ -7434,10 +7632,8 @@ def register_tools(mcp: FastMCP):
             "(transport rows). Same field set as `genes_by_metabolite`.",
         )] = False,
         limit: Annotated[int, Field(
-            description="Max results in `results`. Default 10 covers "
-            "~p70 of single-gene UNION row distributions (median 6, p75 "
-            "12 in MED4). Long-tail genes (ABC-superfamily-only) emit "
-            "up to 551 rows — use "
+            description="Max results in `results`. Long-tail genes "
+            "(ABC-only annotations) can emit large numbers of rows — use "
             "`transport_confidence='substrate_confirmed'` to mute, or "
             "`offset` to page.",
             ge=1,
@@ -7447,73 +7643,34 @@ def register_tools(mcp: FastMCP):
             ge=0,
         )] = 0,
     ) -> MetabolitesByGeneResponse:
-        """Find metabolites the input gene set's chemistry reaches in one organism.
+        """Find metabolites the input gene set's chemistry reaches in one
+        organism. Symmetric counterpart to `genes_by_metabolite` — same
+        two arms (metabolism and transport, including ancestor TCDB
+        families that inherit substrates from descendant leaves), same
+        per-row union shape, same direction-agnostic semantics. Some
+        genes (notably ABC-only annotations) emit large numbers of
+        family_inferred rows; the global precision-tier sort
+        (metabolism → substrate_confirmed → family_inferred) prevents
+        one gene from consuming `limit`. The `metabolite_elements`
+        filter is the N-source workflow primitive (presence-only AND-of,
+        e.g. `['N']`). The `by_element` envelope is presence-only — not
+        stoichiometric, not mass-balanced. Use `summary=True` on batch
+        DE inputs (50+ locus_tags).
 
-        **Direction-agnostic.** Joins through `Reaction_has_metabolite`
-        (metabolism) and `Tcdb_family_transports_metabolite` (transport)
-        are direction-agnostic — a gene that *produces* a metabolite and
-        a gene that *consumes* it surface identically. KEGG equation
-        order is arbitrary. To distinguish, layer transcriptional
-        evidence (`differential_expression_by_gene`) and gene functional
-        annotation (`gene_overview` Pfam / KEGG KO names like
-        `*-synthase` vs `*-permease`).
-
-        **Transport-confidence semantics (transport arm only).** Identical
-        model to `genes_by_metabolite`: `family_inferred` rows ride a
-        TCDB substrate-edge rollup that propagates leaf-curated
-        substrates up the hierarchy. The ABC Superfamily long tail
-        (9 MED4 genes annotated only at `tcdb:3.A.1` emit 551
-        family_inferred rows each via the rollup) means batch DE inputs
-        can explode in row count. Filter
-        `transport_confidence='substrate_confirmed'` (paired with
-        `evidence_sources=['transport']` for the transport arm in
-        isolation) for the precise set; the default fires both arms and
-        flags `family_inferred` in `warnings` when it dominates.
-        Metabolism rows are not subject to this concern — direct
-        catalysis edges are always substrate-confirmed — and their
-        `transport_confidence` is None.
-
-        **Evidence sources accepted here:** `metabolism`, `transport`.
-        The metabolomics path (DerivedMetric → Metabolite) has no gene
-        anchor and is not surfaced by gene-anchored chemistry tools —
-        see `list_metabolites`.
-
-        **Sort order:** detail rows are globally sorted by precision
-        tier (metabolism → transport_substrate_confirmed →
-        transport_family_inferred), then by input gene order, then by
-        locus_tag, then by metabolite_id. This surfaces high-precision
-        rows from the entire batch first regardless of input position —
-        a single ABC-superfamily-only gene at the front of input does
-        NOT eat the entire `limit=10` with family_inferred rows.
-
-        Drill-downs from result rows / envelope rollups:
-        - Any `top_metabolites` entry →
-          `list_metabolites(metabolite_ids=[...])` for richer per-
-          metabolite cross-refs, or
-          `list_metabolites(metabolite_ids=[...], organism_names=[partner])`
-          for cross-organism presence (cross-feeding primitive).
-        - Any `top_pathways` entry →
-          `list_metabolites(pathway_ids=[...])` for the full metabolite
-          roster of the pathway (not just gene-set hits), or
-          `genes_by_ontology(ontology="kegg", term_ids=[id], organism=...)`
-          for gene-KO-mediated pathway annotations (different surface —
-          see naming disambiguation below).
-        - Any `top_reactions` entry →
-          `genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)`
-          for genes in adjacent reactions, or `pathway_enrichment` for
-          context.
-        - Any `top_tcdb_families` entry →
-          `genes_by_ontology(ontology="tcdb", term_ids=[id], organism=...)`
-          for sibling genes in the same family.
-
-        **`top_pathways` naming disambiguation.** Despite this being a
-        gene-anchored tool, `top_pathways` here means *KEGG pathways the
-        gene set's chemistry reaches* — via `Reaction_in_kegg_pathway`
-        and `Metabolite_in_pathway`. Distinct from the **gene-KO-
-        mediated** pathway annotations available via
-        `genes_by_ontology(ontology="kegg")` (where pathway membership
-        is asserted by the gene's KO assignment). For metabolic pathway
-        analysis with a hypothesis test, use `pathway_enrichment`.
+        Routing: from `top_metabolites` drill into
+        `list_metabolites(metabolite_ids=[...])` for cross-refs OR
+        `genes_by_metabolite(metabolite_ids=[...], organism=PARTNER)`
+        for the cross-feeding bridge; from `top_metabolite_pathways` to
+        `list_metabolites(pathway_ids=[...])` (chemistry-pathway rollup,
+        distinct from gene-KO pathway annotations on
+        `genes_by_ontology(ontology="kegg")`); from `top_reactions` to
+        `genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)`
+        or `pathway_enrichment`; from `top_tcdb_families` to
+        `genes_by_ontology(ontology="tcdb", term_ids=[id],
+        organism=...)`; from `not_matched` to `gene_overview`. See
+        `docs://guide/conventions` for transport-confidence and
+        direction-agnostic semantics, and `docs://analysis/metabolites`
+        for the chemistry-layer decision tree.
         """
         await ctx.info(
             f"metabolites_by_gene locus_tags={locus_tags} "
@@ -7534,6 +7691,7 @@ def register_tools(mcp: FastMCP):
                 organism=organism,
                 metabolite_elements=metabolite_elements,
                 metabolite_ids=metabolite_ids,
+                exclude_metabolite_ids=exclude_metabolite_ids,
                 ec_numbers=ec_numbers,
                 metabolite_pathway_ids=metabolite_pathway_ids,
                 mass_balance=mass_balance,
@@ -7572,8 +7730,9 @@ def register_tools(mcp: FastMCP):
                 MbgTopGeneCategory(**b)
                 for b in result["top_gene_categories"]
             ]
-            top_pathways = [
-                MbgTopPathway(**b) for b in result["top_pathways"]
+            top_metabolite_pathways = [
+                MbgTopPathway(**b)
+                for b in result["top_metabolite_pathways"]
             ]
             not_found = MbgNotFound(**result["not_found"])
             response = MetabolitesByGeneResponse(
@@ -7592,7 +7751,7 @@ def register_tools(mcp: FastMCP):
                 top_reactions=top_reactions,
                 top_tcdb_families=top_tcdb_families,
                 top_gene_categories=top_gene_categories,
-                top_pathways=top_pathways,
+                top_metabolite_pathways=top_metabolite_pathways,
                 gene_count_total=result["gene_count_total"],
                 reaction_count_total=result["reaction_count_total"],
                 transporter_count_total=result["transporter_count_total"],
@@ -7610,3 +7769,1433 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             await ctx.error(f"metabolites_by_gene unexpected error: {e}")
             raise ToolError(f"Error in metabolites_by_gene: {e}")
+
+    # ------------------------------------------------------------------
+    # list_metabolite_assays — metabolomics-assay discovery surface
+    # ------------------------------------------------------------------
+    class LmaOrganismBreakdown(BaseModel):
+        organism_name: str = Field(
+            description="Organism (e.g. 'Prochlorococcus MIT9301')")
+        count: int = Field(description="Assay count for this organism (e.g. 4)")
+
+    class LmaValueKindBreakdown(BaseModel):
+        value_kind: str = Field(description="Value kind ('numeric' or 'boolean')")
+        count: int = Field(description="Assay count (e.g. 8)")
+
+    class LmaCompartmentBreakdown(BaseModel):
+        compartment: str = Field(
+            description="Compartment ('whole_cell' or 'extracellular')")
+        count: int = Field(description="Assay count (e.g. 7)")
+
+    class LmaMetricTypeBreakdown(BaseModel):
+        metric_type: str = Field(
+            description="Metric type (e.g. 'cellular_concentration')")
+        count: int = Field(description="Assay count (e.g. 5)")
+
+    class LmaTreatmentTypeBreakdown(BaseModel):
+        treatment_type: str = Field(
+            description="Treatment type (e.g. 'carbon')")
+        count: int = Field(
+            description="Assay count for this treatment (e.g. 2)")
+
+    class LmaBackgroundFactorBreakdown(BaseModel):
+        background_factor: str = Field(
+            description="Background factor (e.g. 'axenic')")
+        count: int = Field(description="Assay count (e.g. 10)")
+
+    class LmaGrowthPhaseBreakdown(BaseModel):
+        growth_phase: str = Field(
+            description="Growth phase (e.g. 'exponential'). Currently "
+            "unpopulated — KG-side backfill pending.")
+        count: int = Field(description="Assay count for this growth phase")
+
+    class LmaDetectionStatusBreakdown(BaseModel):
+        detection_status: str = Field(
+            description="Detection status: 'detected', 'sporadic', "
+            "'not_detected'. Numeric edges only — `not_detected` is "
+            "tested-absent (real biology). See `docs://guide/conventions`.")
+        count: int = Field(
+            description="Edge count across matching numeric assays.")
+
+    class LmaNotFound(BaseModel):
+        """Per-batch-input unknown IDs."""
+        assay_ids: list[str] = Field(
+            default_factory=list,
+            description="Input assay_ids not in the KG")
+        metabolite_ids: list[str] = Field(
+            default_factory=list,
+            description="Input metabolite_ids that yielded no matching assay")
+        experiment_ids: list[str] = Field(
+            default_factory=list,
+            description="Input experiment_ids that yielded no matching assay")
+        publication_doi: list[str] = Field(
+            default_factory=list,
+            description="Input publication DOIs that yielded no matching assay")
+
+    class LmaDetectionStatusCount(BaseModel):
+        detection_status: str = Field(
+            description="'detected', 'sporadic', or 'not_detected'")
+        count: int = Field(
+            description="Edge count for this status on the assay")
+
+    class ListMetaboliteAssaysResult(BaseModel):
+        assay_id: str = Field(
+            description="Unique id (e.g. "
+            "'metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration'). "
+            "Pass to drill-downs.")
+        name: str = Field(
+            description="Human-readable assay name (e.g. 'MIT9301 "
+            "intracellular metabolite concentration (mol/cell)')")
+        metric_type: str = Field(
+            description="Category tag (e.g. 'cellular_concentration', "
+            "'extracellular_concentration', "
+            "'presence_flag_intracellular')")
+        value_kind: Literal["numeric", "boolean"] = Field(
+            description="Routes drill-down: 'numeric' → "
+            "metabolites_by_quantifies_assay, 'boolean' → "
+            "metabolites_by_flags_assay")
+        rankable: bool = Field(
+            description="True if metric_bucket / metric_percentile / "
+            "rank_by_metric filters apply on the numeric drill-down "
+            "(rankable=False on boolean assays)")
+        unit: str = Field(
+            description="Measurement unit (e.g. 'mol/cell', 'fg/cell'); "
+            "empty string on boolean assays")
+        field_description: str = Field(
+            description="Canonical provenance description for the assay "
+            "(e.g. 'Intracellular metabolite concentration in fg/cell, "
+            "blank-corrected, replicate-aggregated; Capovilla 2023 Table "
+            "sd03.')")
+        organism_name: str = Field(
+            description="Full organism name (e.g. 'Prochlorococcus MIT9313')")
+        experiment_id: str = Field(
+            description="Parent Experiment node id")
+        publication_doi: str = Field(
+            description="Parent publication DOI (e.g. "
+            "'10.1073/pnas.2213271120')")
+        compartment: str = Field(
+            description="'whole_cell' or 'extracellular'")
+        omics_type: str = Field(
+            description="Always 'METABOLOMICS' for assays")
+        treatment_type: list[str] = Field(
+            default_factory=list,
+            description="Treatment type(s) (e.g. ['carbon'])")
+        background_factors: list[str] = Field(
+            default_factory=list,
+            description="Background factor(s) (e.g. ['axenic', 'light'])")
+        growth_phases: list[str] = Field(
+            default_factory=list,
+            description="Growth phases. Currently unpopulated — KG-side "
+            "backfill pending.")
+        total_metabolite_count: int = Field(
+            description="Distinct metabolites measured by this assay "
+            "(e.g. 92)")
+        aggregation_method: str = Field(
+            description="How replicates were aggregated (e.g. "
+            "'mean_across_replicates')")
+        preferred_id: str = Field(
+            description="Xref hint (e.g. 'metabolite_assay_id')")
+        value_min: float | None = Field(
+            default=None,
+            description="Min observed value across all measurements on "
+            "this assay (e.g. 0.0)")
+        value_q1: float | None = Field(
+            default=None,
+            description="Q1 of values (e.g. 0.0012)")
+        value_median: float | None = Field(
+            default=None,
+            description="Median (e.g. 0.0056)")
+        value_q3: float | None = Field(
+            default=None,
+            description="Q3 (e.g. 0.012)")
+        value_max: float | None = Field(
+            default=None,
+            description="Max (e.g. 0.16)")
+        timepoints: list[str] = Field(
+            default_factory=list,
+            description="Timepoint labels (e.g. ['4 days', '6 days']). "
+            "Empty list when the parent experiment is not time-resolved "
+            "(sentinel timepoints stripped).")
+        detection_status_counts: list[LmaDetectionStatusCount] = Field(
+            default_factory=list,
+            description="Per-status counts over outgoing "
+            "Assay_quantifies_metabolite edges. Empty list on boolean "
+            "assays. Lets the LLM route to detection-status-rich assays "
+            "without a drill-down round-trip.")
+        score: float | None = Field(
+            default=None,
+            description="Lucene relevance score (only when search_text "
+            "was provided)")
+        # Verbose-only:
+        treatment: str | None = Field(
+            default=None,
+            description="Treatment description (verbose only)")
+        light_condition: str | None = Field(
+            default=None,
+            description="Light condition (verbose only, e.g. "
+            "'continuous light')")
+        experimental_context: str | None = Field(
+            default=None,
+            description="Long-form context (verbose only)")
+
+    class ListMetaboliteAssaysResponse(BaseModel):
+        total_entries: int = Field(
+            description="Total MetaboliteAssay nodes in KG.")
+        total_matching: int = Field(
+            description="Assays matching all filters")
+        metabolite_count_total: int = Field(
+            description="Cumulative sum of total_metabolite_count across "
+            "matching assays — same metabolite measured by N assays counts "
+            "N times. For distinct count, use "
+            "assays_by_metabolite(metabolite_ids=..., summary=True) or "
+            "list_metabolites(metabolite_ids=...).")
+        by_organism: list[LmaOrganismBreakdown] = Field(
+            default_factory=list,
+            description="Counts per organism, sorted desc")
+        by_value_kind: list[LmaValueKindBreakdown] = Field(
+            default_factory=list,
+            description="Counts per value_kind. Routes drill-down: "
+            "numeric → metabolites_by_quantifies_assay, boolean → "
+            "metabolites_by_flags_assay.")
+        by_compartment: list[LmaCompartmentBreakdown] = Field(
+            default_factory=list,
+            description="Counts per compartment")
+        top_metric_types: list[LmaMetricTypeBreakdown] = Field(
+            default_factory=list,
+            description="Counts per metric_type, sorted desc. Pass to "
+            "metabolites_by_quantifies_assay or "
+            "metabolites_by_flags_assay (assay-id resolution required "
+            "first).")
+        by_treatment_type: list[LmaTreatmentTypeBreakdown] = Field(
+            default_factory=list)
+        by_background_factors: list[LmaBackgroundFactorBreakdown] = Field(
+            default_factory=list)
+        by_growth_phase: list[LmaGrowthPhaseBreakdown] = Field(
+            default_factory=list,
+            description="Currently unpopulated — KG-side backfill pending.")
+        by_detection_status: list[LmaDetectionStatusBreakdown] = Field(
+            default_factory=list,
+            description="Envelope-level rollup of detection_status across "
+            "all numeric edges of matching assays. Primary qualitative "
+            "headline — about 75% of numeric edges are not_detected "
+            "(tested-absent: assayed and not found, real biology). See "
+            "`docs://guide/conventions`.")
+        score_max: float | None = Field(
+            default=None,
+            description="Max Lucene score (only with search_text)")
+        score_median: float | None = Field(
+            default=None,
+            description="Median Lucene score (only with search_text)")
+        returned: int = Field(description="Rows in this response")
+        offset: int = Field(default=0, description="Pagination offset used")
+        truncated: bool = Field(
+            description="True when total_matching > returned")
+        not_found: LmaNotFound = Field(
+            default_factory=LmaNotFound,
+            description="Per-batch-input unknown IDs (4 buckets: "
+            "assay_ids, metabolite_ids, experiment_ids, publication_doi).")
+        results: list[ListMetaboliteAssaysResult] = Field(default_factory=list)
+
+    @mcp.tool(
+        tags={"metabolomics", "discovery", "catalog"},
+        annotations={"readOnlyHint": True, "destructiveHint": False,
+                     "idempotentHint": True, "openWorldHint": False},
+    )
+    async def list_metabolite_assays(
+        ctx: Context,
+        search_text: Annotated[str | None, Field(
+            description="Full-text search over MetaboliteAssay name, "
+                        "field_description, treatment, "
+                        "experimental_context. E.g. 'chitosan', "
+                        "'cellular concentration', 'KEGG export'.",
+        )] = None,
+        organism: Annotated[str | None, Field(
+            description="Organism (case-insensitive substring CONTAINS). "
+                        "E.g. 'MIT9301', 'Prochlorococcus MIT9313'.",
+        )] = None,
+        metric_types: Annotated[list[str] | None, Field(
+            description="Filter by metric_type tags. Live values: "
+                        "'cellular_concentration', "
+                        "'extracellular_concentration', "
+                        "'presence_flag_intracellular', "
+                        "'presence_flag_extracellular'.",
+        )] = None,
+        value_kind: Annotated[Literal["numeric", "boolean"] | None, Field(
+            description="'numeric' → metabolites_by_quantifies_assay "
+                        "drill-down; 'boolean' → "
+                        "metabolites_by_flags_assay.",
+        )] = None,
+        compartment: Annotated[str | None, Field(
+            description="'whole_cell' or 'extracellular'. Exact match.",
+        )] = None,
+        treatment_type: Annotated[list[str] | None, Field(
+            description="ANY-overlap. E.g. ['carbon'], ['phosphorus', "
+                        "'growth_phase'].",
+        )] = None,
+        background_factors: Annotated[list[str] | None, Field(
+            description="ANY-overlap. E.g. ['axenic', 'light'].",
+        )] = None,
+        growth_phases: Annotated[list[str] | None, Field(
+            description="ANY-overlap. Currently unpopulated — KG-side "
+                        "backfill pending.",
+        )] = None,
+        publication_doi: Annotated[list[str] | None, Field(
+            description="DOI(s). Exact match. E.g. "
+                        "['10.1073/pnas.2213271120', "
+                        "'10.1128/msystems.01261-22'].",
+        )] = None,
+        experiment_ids: Annotated[list[str] | None, Field(
+            description="Experiment node id(s).",
+        )] = None,
+        assay_ids: Annotated[list[str] | None, Field(
+            description="MetaboliteAssay id(s). `not_found.assay_ids` "
+                        "lists unknowns.",
+        )] = None,
+        metabolite_ids: Annotated[list[str] | None, Field(
+            description="Restrict to assays measuring at least one of "
+                        "these metabolites (1-hop via "
+                        "Assay_quantifies_metabolite | "
+                        "Assay_flags_metabolite). Full prefixed IDs, "
+                        "e.g. ['kegg.compound:C00074'].",
+        )] = None,
+        exclude_metabolite_ids: Annotated[list[str] | None, Field(
+            description="Exclude assays measuring any of these "
+                        "metabolites (set-difference cross-tool "
+                        "convention).",
+        )] = None,
+        rankable: Annotated[bool | None, Field(
+            description="True → assays supporting rank/percentile/bucket "
+                        "on metabolites_by_quantifies_assay's "
+                        "rankable-gated filters.",
+        )] = None,
+        summary: Annotated[bool, Field(
+            description="Return summary fields only (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include heavy-text fields per row: treatment, "
+                        "light_condition, experimental_context.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max results.",
+            ge=1,
+        )] = 20,
+        offset: Annotated[int, Field(
+            description="Pagination offset (0-indexed).", ge=0,
+        )] = 0,
+    ) -> ListMetaboliteAssaysResponse:
+        """Discover MetaboliteAssay nodes — the metabolomics measurement
+        layer. Mirrors `list_derived_metrics`. Inspect `value_kind` (routes
+        drill-down), `rankable` (gates rankable filters on the numeric
+        drill-down), `compartment` (whole_cell vs extracellular), and
+        per-row `detection_status_counts` (signals how much of the assay
+        is detected / sporadic / not_detected).
+
+        Routing: drill into `metabolites_by_quantifies_assay(assay_ids=[...])`
+        for numeric details, `metabolites_by_flags_assay(assay_ids=[...])`
+        for boolean details, `assays_by_metabolite(metabolite_ids=[...])`
+        for reverse lookup across both arms, and
+        `list_metabolites(metabolite_ids=[...])` for chemistry context. See
+        `docs://guide/conventions` for tested-absent semantics and
+        `docs://analysis/metabolites` for the metabolomics decision tree.
+        """
+        await ctx.info(
+            f"list_metabolite_assays search_text={search_text} "
+            f"organism={organism} value_kind={value_kind} "
+            f"compartment={compartment} summary={summary} "
+            f"verbose={verbose} limit={limit} offset={offset}"
+        )
+        try:
+            conn = _conn(ctx)
+            data = api.list_metabolite_assays(
+                search_text=search_text, organism=organism,
+                metric_types=metric_types, value_kind=value_kind,
+                compartment=compartment, treatment_type=treatment_type,
+                background_factors=background_factors,
+                growth_phases=growth_phases,
+                publication_doi=publication_doi,
+                experiment_ids=experiment_ids,
+                assay_ids=assay_ids, metabolite_ids=metabolite_ids,
+                exclude_metabolite_ids=exclude_metabolite_ids,
+                rankable=rankable,
+                summary=summary, verbose=verbose, limit=limit,
+                offset=offset,
+                conn=conn,
+            )
+            results = [ListMetaboliteAssaysResult(
+                **{**r, "detection_status_counts": [
+                    LmaDetectionStatusCount(
+                        detection_status=d["detection_status"],
+                        count=d["count"],
+                    )
+                    for d in r.get("detection_status_counts", [])
+                ]}
+            ) for r in data["results"]]
+            by_organism = [
+                LmaOrganismBreakdown(**b) for b in data["by_organism"]
+            ]
+            by_value_kind = [
+                LmaValueKindBreakdown(**b) for b in data["by_value_kind"]
+            ]
+            by_compartment = [
+                LmaCompartmentBreakdown(**b) for b in data["by_compartment"]
+            ]
+            top_metric_types = [
+                LmaMetricTypeBreakdown(**b) for b in data["top_metric_types"]
+            ]
+            by_treatment_type = [
+                LmaTreatmentTypeBreakdown(**b)
+                for b in data["by_treatment_type"]
+            ]
+            by_background_factors = [
+                LmaBackgroundFactorBreakdown(**b)
+                for b in data["by_background_factors"]
+            ]
+            by_growth_phase = [
+                LmaGrowthPhaseBreakdown(**b) for b in data["by_growth_phase"]
+            ]
+            by_detection_status = [
+                LmaDetectionStatusBreakdown(**b)
+                for b in data["by_detection_status"]
+            ]
+            not_found = LmaNotFound(**data["not_found"])
+            return ListMetaboliteAssaysResponse(
+                total_entries=data["total_entries"],
+                total_matching=data["total_matching"],
+                metabolite_count_total=data["metabolite_count_total"],
+                by_organism=by_organism, by_value_kind=by_value_kind,
+                by_compartment=by_compartment,
+                top_metric_types=top_metric_types,
+                by_treatment_type=by_treatment_type,
+                by_background_factors=by_background_factors,
+                by_growth_phase=by_growth_phase,
+                by_detection_status=by_detection_status,
+                score_max=data.get("score_max"),
+                score_median=data.get("score_median"),
+                returned=data["returned"], offset=data["offset"],
+                truncated=data["truncated"], not_found=not_found,
+                results=results,
+            )
+        except ValueError as e:
+            await ctx.warning(f"list_metabolite_assays error: {e}")
+            raise ToolError(str(e))
+        except Exception as e:
+            await ctx.error(f"list_metabolite_assays unexpected error: {e}")
+            raise ToolError(f"Error in list_metabolite_assays: {e}")
+
+    # ------------------------------------------------------------------
+    # metabolites_by_quantifies_assay — numeric drill-down
+    # ------------------------------------------------------------------
+    class MqaByDetectionStatus(BaseModel):
+        """One bucket of the by_detection_status rollup. Primary
+        qualitative headline — `not_detected` rows are tested-absent."""
+        detection_status: str = Field(
+            description="One of 'detected', 'sporadic', 'not_detected'. "
+            "'not_detected' = tested-absent (real biology).")
+        count: int = Field(
+            description="Row count for this status (e.g. 7 not_detected "
+            "out of 64 total on the MIT9313 cellular_concentration assay).")
+
+    class MqaByMetricBucket(BaseModel):
+        """One bucket of the metric-rank distribution (rankable rows only)."""
+        bucket: str = Field(
+            description="One of 'top_decile', 'top_quartile', 'mid', 'low'. "
+            "Computed at import time per assay.")
+        count: int = Field(
+            description="Row count in this bucket (e.g. 7 top_decile "
+            "rows out of the rankable subset).")
+
+    class MqaByAssay(BaseModel):
+        assay_id: str = Field(
+            description="Assay id (e.g. "
+            "'metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration').")
+        count: int = Field(
+            description="Row count from this assay in the filtered slice "
+            "(e.g. 64).")
+
+    class MqaByCompartment(BaseModel):
+        compartment: str = Field(
+            description="Sample compartment ('whole_cell' or 'extracellular').")
+        count: int = Field(description="Row count in this compartment.")
+
+    class MqaByOrganism(BaseModel):
+        organism_name: str = Field(
+            description="Full organism name (e.g. 'Prochlorococcus MIT9313').")
+        count: int = Field(description="Row count from this organism.")
+
+    class MqaByMetric(BaseModel):
+        """Per-assay rollup: filtered-slice min/max alongside full-assay
+        precomputed range. Mirrors DM `by_metric`.
+        """
+        assay_id: str = Field(description="Assay id this row summarizes.")
+        name: str = Field(
+            default="",
+            description="Human-readable assay name (e.g. 'MIT9313 "
+            "intracellular metabolite concentration (mol/cell)').")
+        metric_type: str = Field(
+            default="",
+            description="Metric tag (e.g. 'cellular_concentration').")
+        count: int = Field(
+            description="Filtered-slice row count for this assay.")
+        filtered_value_min: float | None = Field(
+            default=None,
+            description="Min value across rows in the filtered slice.")
+        filtered_value_max: float | None = Field(
+            default=None,
+            description="Max value across rows in the filtered slice.")
+        assay_value_min: float | None = Field(
+            default=None,
+            description="Full-assay precomputed min (echoed from the "
+            "assay node, e.g. 0.0).")
+        assay_value_q1: float | None = Field(
+            default=None,
+            description="Full-assay precomputed Q1 (e.g. 0.0012).")
+        assay_value_median: float | None = Field(
+            default=None,
+            description="Full-assay precomputed median.")
+        assay_value_q3: float | None = Field(
+            default=None,
+            description="Full-assay precomputed Q3.")
+        assay_value_max: float | None = Field(
+            default=None,
+            description="Full-assay precomputed max (e.g. 0.16).")
+        rankable: bool = Field(
+            default=False,
+            description="Echoed from parent assay; True iff "
+            "metric_bucket / metric_percentile / rank_by_metric carry data.")
+
+    class MqaNotFound(BaseModel):
+        """Structured per-batch-input unknown IDs (4 buckets)."""
+        assay_ids: list[str] = Field(
+            default_factory=list,
+            description="Input assay_ids absent from the KG.")
+        metabolite_ids: list[str] = Field(
+            default_factory=list,
+            description="Input metabolite_ids absent from the KG.")
+        experiment_ids: list[str] = Field(
+            default_factory=list,
+            description="Input experiment_ids absent from the KG.")
+        publication_doi: list[str] = Field(
+            default_factory=list,
+            description="Input publication DOIs absent from the KG.")
+
+    class MetabolitesByQuantifiesAssayResult(BaseModel):
+        # Identity / chemistry
+        metabolite_id: str = Field(
+            description="Metabolite node id (e.g. 'kegg.compound:C00074' "
+            "for PEP).")
+        name: str = Field(
+            description="Canonical metabolite name (e.g. "
+            "'Phosphoenolpyruvate').")
+        kegg_compound_id: str | None = Field(
+            default=None,
+            description="KEGG compound id (e.g. 'C00074'); null if no KEGG xref.")
+        # Numeric value (always-available)
+        value: float | None = Field(
+            default=None,
+            description="Raw concentration / intensity (e.g. 0.4465 for a "
+            "top-decile F6P row). Null only on degenerate edges; "
+            "`value=0.0` is *tested-absent*, not missing.")
+        value_sd: float | None = Field(
+            default=None,
+            description="Standard deviation across replicates (when "
+            "available).")
+        n_replicates: int | None = Field(
+            default=None, description="Number of replicates.")
+        n_non_zero: int | None = Field(
+            default=None,
+            description="Number of replicates with non-zero signal. "
+            "`n_non_zero=0` is tested-absent.")
+        metric_type: str = Field(
+            description="Parent assay's metric tag (e.g. "
+            "'cellular_concentration').")
+        # Rankable-gated (sparse on non-rankable rows)
+        metric_bucket: str | None = Field(
+            default=None,
+            description="Bucket label ('top_decile' / 'top_quartile' / "
+            "'mid' / 'low'). Populated only on rankable assays.")
+        metric_percentile: float | None = Field(
+            default=None,
+            description="Percentile (0-100). Populated only on rankable "
+            "assays.")
+        rank_by_metric: int | None = Field(
+            default=None,
+            description="Rank by value (1 = highest). Populated only on "
+            "rankable assays.")
+        # Detection
+        detection_status: str | None = Field(
+            default=None,
+            description="One of 'detected', 'sporadic', 'not_detected'. "
+            "'not_detected' = tested-absent (real biology, kept by "
+            "default). Numeric edge only.")
+        # Timepoint / phase (sentinel-coerced)
+        timepoint: str | None = Field(
+            default=None,
+            description="Timepoint label ('4 days', '6 days'). Null on "
+            "non-temporal experiments (sentinel timepoints stripped).")
+        timepoint_hours: float | None = Field(
+            default=None,
+            description="Timepoint in hours. Null on non-temporal "
+            "experiments.")
+        timepoint_order: int | None = Field(
+            default=None,
+            description="Timepoint order index. Null on non-temporal "
+            "experiments.")
+        growth_phase: str | None = Field(
+            default=None,
+            description="Growth phase. Currently unpopulated — KG-side "
+            "backfill pending.")
+        condition_label: str | None = Field(
+            default=None,
+            description="Short condition descriptor (e.g. compartment + "
+            "timepoint).")
+        # Provenance
+        assay_id: str = Field(
+            description="Parent MetaboliteAssay id.")
+        organism_name: str = Field(description="Source organism.")
+        compartment: str = Field(
+            description="'whole_cell' or 'extracellular'.")
+        # Verbose-only
+        assay_name: str | None = Field(
+            default=None,
+            description="Human-readable assay name. Verbose only.")
+        field_description: str | None = Field(
+            default=None,
+            description="Canonical provenance description for the assay. "
+            "Verbose only.")
+        experimental_context: str | None = Field(
+            default=None,
+            description="Long-form context. Verbose only.")
+        light_condition: str | None = Field(
+            default=None,
+            description="Light regime (e.g. 'continuous light'). Verbose only.")
+        replicate_values: list[float] | None = Field(
+            default=None,
+            description="Per-replicate values. Verbose only.")
+
+    class MetabolitesByQuantifiesAssayResponse(BaseModel):
+        results: list[MetabolitesByQuantifiesAssayResult] = Field(
+            default_factory=list,
+            description="One row per metabolite × assay-edge. Empty when "
+            "summary=True.")
+        total_matching: int = Field(
+            description="Row count in the filtered slice.")
+        by_detection_status: list[MqaByDetectionStatus] = Field(
+            default_factory=list,
+            description="Counts per detection_status — primary qualitative "
+            "headline. 'not_detected' rows are tested-absent (real "
+            "biology, kept by default — about 75% of numeric edges).")
+        by_metric_bucket: list[MqaByMetricBucket] = Field(
+            default_factory=list,
+            description="Counts per rank-bucket on rankable rows.")
+        by_assay: list[MqaByAssay] = Field(
+            default_factory=list,
+            description="Counts per assay_id. Pass these `assay_id`s to "
+            "`metabolites_by_flags_assay(assay_ids=[...])` for the boolean "
+            "complement.")
+        by_compartment: list[MqaByCompartment] = Field(
+            default_factory=list, description="Counts per compartment.")
+        by_organism: list[MqaByOrganism] = Field(
+            default_factory=list,
+            description="Counts per organism (cross-organism by default).")
+        by_metric: list[MqaByMetric] = Field(
+            default_factory=list,
+            description="Per-assay precomputed-vs-filtered: pairs the "
+            "filtered slice min/max with the full-assay precomputed range "
+            "so the LLM can read 'top-decile slice 0.012-0.16 out of full "
+            "range 0-0.16' inline.")
+        excluded_assays: list[str] = Field(
+            default_factory=list,
+            description="`assay_ids` soft-excluded under rankable-gating "
+            "(non-rankable assays dropped when a rankable filter is set).")
+        warnings: list[str] = Field(
+            default_factory=list,
+            description="Human-readable rankable-gating diagnostics.")
+        not_found: MqaNotFound = Field(
+            default_factory=MqaNotFound,
+            description="Per-batch-input unknown IDs (4 buckets: "
+            "assay_ids, metabolite_ids, experiment_ids, publication_doi).")
+        returned: int = Field(description="Length of `results`.")
+        truncated: bool = Field(
+            description="True when total_matching > offset + returned.")
+        offset: int = Field(default=0, description="Pagination offset used.")
+
+    @mcp.tool(
+        tags={"metabolomics", "metabolites", "drill-down", "numeric"},
+        annotations={"readOnlyHint": True, "destructiveHint": False,
+                     "idempotentHint": True, "openWorldHint": False},
+    )
+    async def metabolites_by_quantifies_assay(
+        ctx: Context,
+        assay_ids: Annotated[list[str], Field(
+            description="MetaboliteAssay IDs to drill into (full prefixed). "
+                        "Discover via `list_metabolite_assays(value_kind='numeric')`. "
+                        "E.g. ['metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration']. "
+                        "`not_found.assay_ids` lists IDs absent from the KG.",
+            min_length=1,
+        )],
+        organism: Annotated[str | None, Field(
+            description="Filter to assays from this organism (case-insensitive "
+                        "CONTAINS). Cross-organism is the default; pass to narrow.",
+        )] = None,
+        metabolite_ids: Annotated[list[str] | None, Field(
+            description="Restrict to specific metabolites (full prefixed IDs, "
+                        "e.g. ['kegg.compound:C00074']). `not_found.metabolite_ids` "
+                        "lists IDs absent from the KG; metabolites in the KG "
+                        "but not measured by any selected assay surface as "
+                        "zero rows (unmeasured — distinct from tested-absent).",
+        )] = None,
+        exclude_metabolite_ids: Annotated[list[str] | None, Field(
+            description="Exclude metabolites with these IDs (set-difference; "
+                        "exclude wins on overlap with `metabolite_ids`).",
+        )] = None,
+        experiment_ids: Annotated[list[str] | None, Field(
+            description="Filter to assays from these experiments.",
+        )] = None,
+        publication_doi: Annotated[list[str] | None, Field(
+            description="Filter by publication DOI(s). Exact match. E.g. "
+                        "['10.1073/pnas.2213271120'].",
+        )] = None,
+        compartment: Annotated[str | None, Field(
+            description="Sample compartment ('whole_cell' or 'extracellular'). "
+                        "Exact match.",
+        )] = None,
+        treatment_type: Annotated[list[str] | None, Field(
+            description="Treatment type(s) (ANY-overlap, case-insensitive). "
+                        "E.g. ['carbon'].",
+        )] = None,
+        background_factors: Annotated[list[str] | None, Field(
+            description="Background factor(s) (ANY-overlap). E.g. ['axenic'].",
+        )] = None,
+        growth_phases: Annotated[list[str] | None, Field(
+            description="Growth phase(s) (ANY-overlap). Currently "
+                        "unpopulated — KG-side backfill pending.",
+        )] = None,
+        value_min: Annotated[float | None, Field(
+            description="Lower bound on `value` (raw concentration / intensity). "
+                        "**Caution**: `value > 0` strips tested-absent rows "
+                        "(`value=0` / `detection_status='not_detected'`) — use "
+                        "deliberately, never as default. See "
+                        "`docs://guide/conventions`.",
+        )] = None,
+        value_max: Annotated[float | None, Field(
+            description="Upper bound on `value`. Always applicable.",
+        )] = None,
+        detection_status: Annotated[list[str] | None, Field(
+            description="Detection-status filter — primary qualitative "
+                        "headline. Values: 'detected', 'sporadic', "
+                        "'not_detected'. Excluding 'not_detected' strips "
+                        "tested-absent rows; surface as caller choice, "
+                        "never default. See `docs://guide/conventions`.",
+        )] = None,
+        timepoint: Annotated[list[str] | None, Field(
+            description="Timepoint label(s) — exact match. E.g. "
+                        "['4 days'], ['6 days']. Non-temporal experiments "
+                        "expose no timepoint here (rows surface with "
+                        "`timepoint=null`).",
+        )] = None,
+        metric_bucket: Annotated[list[str] | None, Field(
+            description="Bucket label(s) — subset of "
+                        "{'top_decile','top_quartile','mid','low'}. **Rankable-gated** "
+                        "— raises if every selected assay has `rankable=false`. "
+                        "Soft-excludes non-rankable assays from mixed input "
+                        "(surfaced in envelope `excluded_assays`).",
+        )] = None,
+        metric_percentile_min: Annotated[float | None, Field(
+            description="Lower bound on `metric_percentile` (0-100). "
+                        "**Rankable-gated.**",
+            ge=0, le=100,
+        )] = None,
+        metric_percentile_max: Annotated[float | None, Field(
+            description="Upper bound on `metric_percentile`. **Rankable-gated.**",
+            ge=0, le=100,
+        )] = None,
+        rank_by_metric_max: Annotated[int | None, Field(
+            description="Cap on `rank_by_metric` (1 = highest). Top-N drill-down. "
+                        "**Rankable-gated.**",
+            ge=1,
+        )] = None,
+        summary: Annotated[bool, Field(
+            description="Return summary fields only (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include heavy-text fields per row: assay_name, "
+                        "field_description, experimental_context, light_condition, "
+                        "replicate_values.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max rows. Paginate with `offset`.", ge=1,
+        )] = 5,
+        offset: Annotated[int, Field(
+            description="Pagination offset.", ge=0,
+        )] = 0,
+    ) -> MetabolitesByQuantifiesAssayResponse:
+        """Drill into numeric MetaboliteAssay edges — one row per
+        (metabolite × assay-edge). `value` (raw concentration /
+        intensity) is always returned; `metric_bucket` /
+        `metric_percentile` / `rank_by_metric` populated only on
+        rankable-assay rows (mirrors `genes_by_numeric_metric`'s
+        rankable gate). Rankable-gated filters raise if every selected
+        assay has `rankable=false`, soft-exclude on mixed input. Tested-
+        absent rows (`value=0` / `detection_status='not_detected'`) are
+        real biology and kept by default. Cross-organism by design.
+        Pre-flight via
+        `list_metabolite_assays(value_kind='numeric', rankable=True)`.
+
+        Routing: drill across to `assays_by_metabolite(metabolite_ids=[...])`
+        for the boolean-arm complement and the cross-organism reverse view,
+        or `genes_by_metabolite(metabolite_ids=[...], organism=...)` for
+        gene catalysts/transporters. See `docs://guide/conventions` for
+        tested-absent semantics and `docs://analysis/metabolites` for
+        the metabolomics decision tree.
+        """
+        await ctx.info(
+            f"metabolites_by_quantifies_assay assay_ids={len(assay_ids)} "
+            f"organism={organism} summary={summary} verbose={verbose} "
+            f"limit={limit} offset={offset}"
+        )
+        try:
+            conn = _conn(ctx)
+            data = api.metabolites_by_quantifies_assay(
+                assay_ids=assay_ids,
+                organism=organism,
+                metabolite_ids=metabolite_ids,
+                exclude_metabolite_ids=exclude_metabolite_ids,
+                experiment_ids=experiment_ids,
+                publication_doi=publication_doi,
+                compartment=compartment,
+                treatment_type=treatment_type,
+                background_factors=background_factors,
+                growth_phases=growth_phases,
+                value_min=value_min,
+                value_max=value_max,
+                detection_status=detection_status,
+                timepoint=timepoint,
+                metric_bucket=metric_bucket,
+                metric_percentile_min=metric_percentile_min,
+                metric_percentile_max=metric_percentile_max,
+                rank_by_metric_max=rank_by_metric_max,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                offset=offset,
+                conn=conn,
+            )
+        except ValueError as e:
+            await ctx.warning(f"metabolites_by_quantifies_assay error: {e}")
+            raise ToolError(str(e)) from e
+        except Exception as e:
+            await ctx.error(
+                f"metabolites_by_quantifies_assay unexpected error: {e}")
+            raise ToolError(f"Error in metabolites_by_quantifies_assay: {e}")
+
+        if data.get("excluded_assays"):
+            await ctx.warning(
+                f"{len(data['excluded_assays'])} assay(s) excluded under "
+                "rankable-gating; see envelope `excluded_assays` and "
+                "`warnings`."
+            )
+
+        results = [MetabolitesByQuantifiesAssayResult(**r)
+                   for r in data["results"]]
+        by_detection_status = [
+            MqaByDetectionStatus(**b) for b in data["by_detection_status"]
+        ]
+        by_metric_bucket = [
+            MqaByMetricBucket(**b) for b in data["by_metric_bucket"]
+        ]
+        by_assay = [MqaByAssay(**b) for b in data["by_assay"]]
+        by_compartment = [
+            MqaByCompartment(**b) for b in data["by_compartment"]
+        ]
+        by_organism = [MqaByOrganism(**b) for b in data["by_organism"]]
+        by_metric = [MqaByMetric(**b) for b in data["by_metric"]]
+        not_found = MqaNotFound(**data["not_found"])
+        return MetabolitesByQuantifiesAssayResponse(
+            results=results,
+            total_matching=data["total_matching"],
+            by_detection_status=by_detection_status,
+            by_metric_bucket=by_metric_bucket,
+            by_assay=by_assay,
+            by_compartment=by_compartment,
+            by_organism=by_organism,
+            by_metric=by_metric,
+            excluded_assays=data["excluded_assays"],
+            warnings=data["warnings"],
+            not_found=not_found,
+            returned=data["returned"],
+            truncated=data["truncated"],
+            offset=data["offset"],
+        )
+
+    # ------------------------------------------------------------------
+    # metabolites_by_flags_assay — boolean drill-down
+    # ------------------------------------------------------------------
+    class MfaByValue(BaseModel):
+        """One bucket of the by_value rollup (true / false counts)."""
+        flag_value: bool = Field(
+            description="The flag's boolean value. `false` rows are "
+            "tested-absent (real biology — about 62% of boolean rows).")
+        count: int = Field(
+            description="Row count for this flag value (e.g. 58 false / "
+            "35 true on the msystems presence_flag_intracellular assay).")
+
+    class MfaByAssay(BaseModel):
+        assay_id: str = Field(
+            description="Assay id (e.g. "
+            "'metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular').")
+        count: int = Field(description="Row count from this assay.")
+
+    class MfaByCompartment(BaseModel):
+        compartment: str = Field(
+            description="Sample compartment ('whole_cell' or 'extracellular').")
+        count: int = Field(description="Row count in this compartment.")
+
+    class MfaByOrganism(BaseModel):
+        organism_name: str = Field(
+            description="Full organism name (e.g. 'Prochlorococcus MIT9301').")
+        count: int = Field(description="Row count from this organism.")
+
+    class MfaByMetric(BaseModel):
+        """Per-assay rollup for boolean drill-down. Mirrors DM `by_metric`
+        shape; precomputed dm_true_count / dm_false_count are not currently
+        emitted (no diagnostics builder for boolean — best-effort).
+        """
+        assay_id: str = Field(description="Assay id this row summarizes.")
+        count: int = Field(
+            description="Filtered-slice row count for this assay.")
+
+    class MfaNotFound(BaseModel):
+        """Structured per-batch-input unknown IDs (4 buckets)."""
+        assay_ids: list[str] = Field(default_factory=list)
+        metabolite_ids: list[str] = Field(default_factory=list)
+        experiment_ids: list[str] = Field(default_factory=list)
+        publication_doi: list[str] = Field(default_factory=list)
+
+    class MetabolitesByFlagsAssayResult(BaseModel):
+        # Identity / chemistry
+        metabolite_id: str = Field(
+            description="Metabolite node id.")
+        name: str = Field(description="Canonical metabolite name.")
+        kegg_compound_id: str | None = Field(
+            default=None,
+            description="KEGG compound id (e.g. 'C00019'); null if no KEGG xref.")
+        # Boolean value (always-available)
+        flag_value: bool = Field(
+            description="Boolean flag — `false` is *tested-absent* "
+            "(real biology, kept by default).")
+        n_positive: int | None = Field(
+            default=None,
+            description="Number of replicates flagged positive.")
+        n_replicates: int | None = Field(
+            default=None, description="Number of replicates.")
+        metric_type: str = Field(
+            description="Parent assay's metric tag (e.g. "
+            "'presence_flag_intracellular').")
+        condition_label: str | None = Field(
+            default=None,
+            description="Short condition descriptor (e.g. compartment + "
+            "experiment).")
+        # Provenance
+        assay_id: str = Field(description="Parent MetaboliteAssay id.")
+        organism_name: str = Field(description="Source organism.")
+        compartment: str = Field(
+            description="'whole_cell' or 'extracellular'.")
+        # Verbose-only
+        assay_name: str | None = Field(
+            default=None,
+            description="Human-readable assay name. Verbose only.")
+        field_description: str | None = Field(
+            default=None,
+            description="Canonical provenance description. Verbose only.")
+
+    class MetabolitesByFlagsAssayResponse(BaseModel):
+        results: list[MetabolitesByFlagsAssayResult] = Field(
+            default_factory=list,
+            description="One row per metabolite × flag-edge. Empty when "
+            "summary=True.")
+        total_matching: int = Field(
+            description="Row count in the filtered slice.")
+        by_value: list[MfaByValue] = Field(
+            default_factory=list,
+            description="Counts per flag value (true / false). `false` rows "
+            "are tested-absent (real biology, kept by default). Boolean "
+            "arm has no `by_detection_status` — `flag_value` IS the "
+            "qualitative-detection signal here.")
+        by_assay: list[MfaByAssay] = Field(
+            default_factory=list,
+            description="Counts per assay_id.")
+        by_compartment: list[MfaByCompartment] = Field(
+            default_factory=list, description="Counts per compartment.")
+        by_organism: list[MfaByOrganism] = Field(
+            default_factory=list,
+            description="Counts per organism (cross-organism by default).")
+        by_metric: list[MfaByMetric] = Field(
+            default_factory=list,
+            description="Per-assay filtered-slice rollup.")
+        excluded_assays: list[str] = Field(
+            default_factory=list,
+            description="Always `[]` here (no gates apply). Kept for "
+            "envelope-shape consistency with the numeric drill-down.")
+        warnings: list[str] = Field(
+            default_factory=list,
+            description="Always `[]` here (no gates apply). Kept for "
+            "envelope-shape consistency with the numeric drill-down.")
+        not_found: MfaNotFound = Field(
+            default_factory=MfaNotFound,
+            description="Per-batch-input unknown IDs (4 buckets: "
+            "assay_ids, metabolite_ids, experiment_ids, publication_doi).")
+        returned: int = Field(description="Length of `results`.")
+        truncated: bool = Field(
+            description="True when total_matching > offset + returned.")
+        offset: int = Field(default=0, description="Pagination offset used.")
+
+    @mcp.tool(
+        tags={"metabolomics", "metabolites", "drill-down", "boolean"},
+        annotations={"readOnlyHint": True, "destructiveHint": False,
+                     "idempotentHint": True, "openWorldHint": False},
+    )
+    async def metabolites_by_flags_assay(
+        ctx: Context,
+        assay_ids: Annotated[list[str], Field(
+            description="MetaboliteAssay IDs to drill into. Discover via "
+                        "`list_metabolite_assays(value_kind='boolean')`. E.g. "
+                        "['metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular']. "
+                        "`not_found.assay_ids` lists IDs absent from the KG.",
+            min_length=1,
+        )],
+        organism: Annotated[str | None, Field(
+            description="Filter to assays from this organism (case-insensitive "
+                        "CONTAINS). Cross-organism is the default.",
+        )] = None,
+        metabolite_ids: Annotated[list[str] | None, Field(
+            description="Restrict to specific metabolites (full prefixed IDs, "
+                        "e.g. ['kegg.compound:C00019']). `not_found.metabolite_ids` "
+                        "lists IDs absent from the KG.",
+        )] = None,
+        exclude_metabolite_ids: Annotated[list[str] | None, Field(
+            description="Exclude metabolites with these IDs (set-difference).",
+        )] = None,
+        experiment_ids: Annotated[list[str] | None, Field(
+            description="Filter to assays from these experiments.",
+        )] = None,
+        publication_doi: Annotated[list[str] | None, Field(
+            description="Filter by publication DOI(s). E.g. "
+                        "['10.1128/msystems.01261-22'].",
+        )] = None,
+        compartment: Annotated[str | None, Field(
+            description="Sample compartment ('whole_cell' or 'extracellular').",
+        )] = None,
+        treatment_type: Annotated[list[str] | None, Field(
+            description="Treatment type(s) (ANY-overlap).",
+        )] = None,
+        background_factors: Annotated[list[str] | None, Field(
+            description="Background factor(s) (ANY-overlap).",
+        )] = None,
+        growth_phases: Annotated[list[str] | None, Field(
+            description="Growth phase(s) (ANY-overlap). Currently "
+                        "unpopulated — KG-side backfill pending.",
+        )] = None,
+        flag_value: Annotated[bool | None, Field(
+            description="Filter by flag presence — `True` (presence flagged), "
+                        "`False` (absence flagged — *tested-absent*, real biology), "
+                        "`None` (both). Unlike `genes_by_boolean_metric` "
+                        "(positive-only KG storage), `Assay_flags_metabolite` "
+                        "stores both true and false flags, so `flag_value=False` "
+                        "returns real rows (about 62% of boolean rows).",
+        )] = None,
+        summary: Annotated[bool, Field(
+            description="Return summary fields only (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include heavy-text fields per row: assay_name, "
+                        "field_description.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max rows. Paginate with `offset`.", ge=1,
+        )] = 5,
+        offset: Annotated[int, Field(
+            description="Pagination offset.", ge=0,
+        )] = 0,
+    ) -> MetabolitesByFlagsAssayResponse:
+        """Drill into boolean MetaboliteAssay edges — one row per
+        (metabolite × flag-edge). `flag_value=False` rows are
+        *tested-absent* (assayed and not found, real biology, kept by
+        default — about 62% of boolean rows). Unlike
+        `genes_by_boolean_metric` which returns 0 rows for `False` (DM
+        positive-only storage), this tool stores both true and false.
+        Cross-organism by design. No `by_detection_status` envelope — on
+        the boolean arm, `flag_value` IS the qualitative-detection
+        signal; `by_value` is its envelope rollup.
+
+        Routing: drill across to `assays_by_metabolite(metabolite_ids=[...])`
+        for the quantifies-arm complement, or
+        `genes_by_metabolite(metabolite_ids=[...], organism=...)` for
+        gene chemistry context. See `docs://guide/conventions` for
+        tested-absent semantics and `docs://analysis/metabolites` for
+        the metabolomics decision tree.
+        """
+        await ctx.info(
+            f"metabolites_by_flags_assay assay_ids={len(assay_ids)} "
+            f"organism={organism} flag_value={flag_value} summary={summary} "
+            f"verbose={verbose} limit={limit} offset={offset}"
+        )
+        try:
+            conn = _conn(ctx)
+            data = api.metabolites_by_flags_assay(
+                assay_ids=assay_ids,
+                organism=organism,
+                metabolite_ids=metabolite_ids,
+                exclude_metabolite_ids=exclude_metabolite_ids,
+                experiment_ids=experiment_ids,
+                publication_doi=publication_doi,
+                compartment=compartment,
+                treatment_type=treatment_type,
+                background_factors=background_factors,
+                growth_phases=growth_phases,
+                flag_value=flag_value,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                offset=offset,
+                conn=conn,
+            )
+        except ValueError as e:
+            await ctx.warning(f"metabolites_by_flags_assay error: {e}")
+            raise ToolError(str(e)) from e
+        except Exception as e:
+            await ctx.error(
+                f"metabolites_by_flags_assay unexpected error: {e}")
+            raise ToolError(f"Error in metabolites_by_flags_assay: {e}")
+
+        results = [MetabolitesByFlagsAssayResult(**r)
+                   for r in data["results"]]
+        by_value = [MfaByValue(**b) for b in data["by_value"]]
+        by_assay = [MfaByAssay(**b) for b in data["by_assay"]]
+        by_compartment = [
+            MfaByCompartment(**b) for b in data["by_compartment"]
+        ]
+        by_organism = [MfaByOrganism(**b) for b in data["by_organism"]]
+        by_metric = [MfaByMetric(**b) for b in data["by_metric"]]
+        not_found = MfaNotFound(**data["not_found"])
+        return MetabolitesByFlagsAssayResponse(
+            results=results,
+            total_matching=data["total_matching"],
+            by_value=by_value,
+            by_assay=by_assay,
+            by_compartment=by_compartment,
+            by_organism=by_organism,
+            by_metric=by_metric,
+            excluded_assays=data["excluded_assays"],
+            warnings=data["warnings"],
+            not_found=not_found,
+            returned=data["returned"],
+            truncated=data["truncated"],
+            offset=data["offset"],
+        )
+
+    # ------------------------------------------------------------------
+    # assays_by_metabolite — polymorphic reverse-lookup
+    # ------------------------------------------------------------------
+    class AbmByEvidenceKind(BaseModel):
+        evidence_kind: Literal["quantifies", "flags"] = Field(
+            description="'quantifies' = numeric arm; 'flags' = boolean arm.")
+        count: int = Field(
+            description="Row count for this arm (e.g. 18 quantifies + 2 "
+            "flags = 20 total for PEP).")
+
+    class AbmByDetectionStatus(BaseModel):
+        """Numeric-row subset only — empty when `evidence_kind='flags'`."""
+        detection_status: str = Field(
+            description="'detected', 'sporadic', or 'not_detected'.")
+        count: int = Field(description="Row count for this status.")
+
+    class AbmByFlagValue(BaseModel):
+        """Boolean-row subset only — empty when `evidence_kind='quantifies'`."""
+        flag_value: bool = Field(description="The flag's boolean value.")
+        count: int = Field(description="Row count for this flag value.")
+
+    class AbmByOrganism(BaseModel):
+        organism_name: str = Field(description="Full organism name.")
+        count: int = Field(description="Row count from this organism.")
+
+    class AbmByCompartment(BaseModel):
+        compartment: str = Field(
+            description="Sample compartment ('whole_cell' or 'extracellular').")
+        count: int = Field(description="Row count in this compartment.")
+
+    class AbmByAssay(BaseModel):
+        assay_id: str = Field(description="Assay id.")
+        count: int = Field(description="Row count from this assay.")
+
+    class AssaysByMetaboliteResult(BaseModel):
+        # Identity (always)
+        metabolite_id: str = Field(
+            description="Metabolite node id (e.g. 'kegg.compound:C00074').")
+        metabolite_name: str = Field(
+            description="Canonical metabolite name (e.g. 'Phosphoenolpyruvate').")
+        assay_id: str = Field(description="Parent MetaboliteAssay id.")
+        assay_name: str = Field(
+            description="Human-readable assay name.")
+        evidence_kind: Literal["quantifies", "flags"] = Field(
+            description="Discriminator: 'quantifies' = numeric arm, "
+            "'flags' = boolean arm.")
+        n_replicates: int | None = Field(
+            default=None, description="Number of replicates.")
+        metric_type: str = Field(
+            description="Parent assay's metric tag.")
+        condition_label: str | None = Field(
+            default=None,
+            description="Short condition descriptor.")
+        organism_name: str = Field(description="Source organism.")
+        compartment: str = Field(
+            description="'whole_cell' or 'extracellular'.")
+        experiment_id: str | None = Field(
+            default=None, description="Parent experiment id.")
+        publication_doi: str | None = Field(
+            default=None, description="Parent publication DOI.")
+        # Numeric-only (sparse on flags rows)
+        value: float | None = Field(
+            default=None,
+            description="Raw concentration / intensity. Numeric arm only.")
+        value_sd: float | None = Field(
+            default=None,
+            description="Standard deviation across replicates. Numeric arm only.")
+        metric_bucket: str | None = Field(
+            default=None,
+            description="Bucket label. Numeric, rankable subset only.")
+        metric_percentile: float | None = Field(
+            default=None,
+            description="Percentile (0-100). Numeric, rankable subset only.")
+        rank_by_metric: int | None = Field(
+            default=None,
+            description="Rank by value (1=highest). Numeric, rankable subset only.")
+        detection_status: str | None = Field(
+            default=None,
+            description="'detected'/'sporadic'/'not_detected'. Numeric arm only.")
+        timepoint: str | None = Field(
+            default=None,
+            description="Timepoint label. Numeric arm only.")
+        timepoint_hours: float | None = Field(
+            default=None,
+            description="Timepoint in hours. Numeric arm only.")
+        timepoint_order: int | None = Field(
+            default=None,
+            description="Timepoint order index. Numeric arm only.")
+        growth_phase: str | None = Field(
+            default=None,
+            description="Growth phase. Numeric arm only — currently "
+            "unpopulated (KG-side backfill pending).")
+        # Boolean-only (sparse on quantifies rows)
+        flag_value: bool | None = Field(
+            default=None,
+            description="Boolean flag. Boolean arm only. `false` is "
+            "tested-absent (real biology, kept by default).")
+        n_positive: int | None = Field(
+            default=None,
+            description="Number of replicates flagged positive. Boolean arm only.")
+        # Verbose-only
+        assay_field_description: str | None = Field(
+            default=None,
+            description="Canonical provenance description. Verbose only.")
+        replicate_values: list[float] | None = Field(
+            default=None,
+            description="Per-replicate values. Verbose only.")
+        experimental_context: str | None = Field(
+            default=None,
+            description="Long-form context. Verbose only.")
+
+    class AssaysByMetaboliteResponse(BaseModel):
+        results: list[AssaysByMetaboliteResult] = Field(
+            default_factory=list,
+            description="Polymorphic rows: one row per metabolite × assay-edge "
+            "across both arms. Cross-arm fields are explicit `None` "
+            "(union-shape padding). Empty when summary=True.")
+        total_matching: int = Field(
+            description="Row count merged across arms (one row per "
+            "metabolite × assay-edge). Use `metabolites_matched` for "
+            "distinct-metabolite count.")
+        by_evidence_kind: list[AbmByEvidenceKind] = Field(
+            default_factory=list,
+            description="Counts per arm (quantifies / flags).")
+        by_organism: list[AbmByOrganism] = Field(
+            default_factory=list,
+            description="Counts per organism.")
+        by_compartment: list[AbmByCompartment] = Field(
+            default_factory=list, description="Counts per compartment.")
+        by_assay: list[AbmByAssay] = Field(
+            default_factory=list, description="Counts per assay_id.")
+        by_detection_status: list[AbmByDetectionStatus] = Field(
+            default_factory=list,
+            description="Numeric-row subset rollup; empty when "
+            "`evidence_kind='flags'`.")
+        by_flag_value: list[AbmByFlagValue] = Field(
+            default_factory=list,
+            description="Boolean-row subset rollup; empty when "
+            "`evidence_kind='quantifies'`.")
+        metabolites_with_evidence: list[str] = Field(
+            default_factory=list,
+            description="Input `metabolite_ids` with at least one row in "
+            "the filtered slice (parallel to `gene_derived_metrics`'s "
+            "`genes_with_metrics`).")
+        metabolites_without_evidence: list[str] = Field(
+            default_factory=list,
+            description="Input `metabolite_ids` with no row in the filtered "
+            "slice (includes both `not_found` and `not_matched` IDs).")
+        metabolites_matched: int = Field(
+            description="Distinct-metabolite count — use this for unique "
+            "tallies (NOT `total_matching`, which is row-count).")
+        not_found: list[str] = Field(
+            default_factory=list,
+            description="Flat `list[str]` — single-batch reverse-lookup. "
+            "Input metabolite IDs absent from the KG.")
+        not_matched: list[str] = Field(
+            default_factory=list,
+            description="Flat `list[str]` — IDs in KG with no edge after "
+            "filters (unmeasured for this scope). Distinct from `not_found`.")
+        returned: int = Field(description="Length of `results`.")
+        truncated: bool = Field(
+            description="True when total_matching > offset + returned.")
+        offset: int = Field(default=0, description="Pagination offset used.")
+
+    @mcp.tool(
+        tags={"metabolomics", "metabolites", "batch", "reverse-lookup"},
+        annotations={"readOnlyHint": True, "destructiveHint": False,
+                     "idempotentHint": True, "openWorldHint": False},
+    )
+    async def assays_by_metabolite(
+        ctx: Context,
+        metabolite_ids: Annotated[list[str], Field(
+            description="Metabolite IDs to look up (full prefixed, "
+                        "case-sensitive). E.g. ['kegg.compound:C00074']. "
+                        "`not_found` lists IDs absent from the KG; "
+                        "`not_matched` lists IDs in KG but with no assay "
+                        "edge after filters (unmeasured for this scope). "
+                        "Required, non-empty.",
+            min_length=1,
+        )],
+        organism: Annotated[str | None, Field(
+            description="Optional organism filter (case-insensitive "
+                        "CONTAINS). Default `None` = cross-organism — "
+                        "metabolite IDs are organism-agnostic (one "
+                        "Metabolite node shared across organisms).",
+        )] = None,
+        evidence_kind: Annotated[Literal["quantifies", "flags"] | None, Field(
+            description="Filter by edge type. `'quantifies'` = numeric arm "
+                        "only (rows carry value, detection_status, timepoint*). "
+                        "`'flags'` = boolean arm only (rows carry flag_value, "
+                        "n_positive). Default `None` = both arms merged "
+                        "(polymorphic rows; cross-arm fields explicit `None`).",
+        )] = None,
+        exclude_metabolite_ids: Annotated[list[str] | None, Field(
+            description="Exclude metabolites with these IDs (set-difference).",
+        )] = None,
+        metric_types: Annotated[list[str] | None, Field(
+            description="Filter by metric_type tag(s) on the parent assay. "
+                        "E.g. ['cellular_concentration', "
+                        "'extracellular_concentration', "
+                        "'presence_flag_intracellular', "
+                        "'presence_flag_extracellular'].",
+        )] = None,
+        compartment: Annotated[str | None, Field(
+            description="Sample compartment ('whole_cell' or 'extracellular'). "
+                        "Exact match on the parent assay.",
+        )] = None,
+        summary: Annotated[bool, Field(
+            description="Return summary fields only (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include heavy-text fields per row: "
+                        "assay_field_description, replicate_values, "
+                        "experimental_context.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max rows. Paginate with `offset`.", ge=1,
+        )] = 5,
+        offset: Annotated[int, Field(
+            description="Pagination offset.", ge=0,
+        )] = 0,
+    ) -> AssaysByMetaboliteResponse:
+        """Batch reverse-lookup: metabolite IDs → all measurement evidence
+        across both arms (quantifies + flags). Cross-organism by default
+        (metabolite IDs are organism-agnostic). Polymorphic rows: numeric-
+        arm rows carry `value`, `value_sd`, `detection_status`,
+        `timepoint*`, `metric_bucket`, `metric_percentile`,
+        `rank_by_metric` (rankable subset). Boolean-arm rows carry
+        `flag_value`, `n_positive`. Cross-arm fields are explicit `None`
+        (union-shape padding). Three states for a metabolite: `not_found`
+        (ID not in KG), `not_matched` (ID in KG, no edge after filters),
+        and tested-absent rows surfaced in `results` (`value=0` /
+        `flag_value=false` / `detection_status='not_detected'` — real
+        biology, kept by default). Use `metabolites_matched` for distinct-
+        metabolite count (NOT `total_matching` — that's row count). Use
+        `summary=True` on batch routing for 50+ metabolite_ids.
+
+        Routing: drill back via
+        `metabolites_by_quantifies_assay(assay_ids=[...], metabolite_ids=[...])`
+        for numeric details. Upstream from
+        `list_metabolites(metabolite_ids=[...])` (chemistry-layer discovery)
+        or `metabolites_by_gene(locus_tags=[...])` (gene-anchored
+        chemistry). See `docs://guide/conventions` for tested-absent
+        semantics and `docs://analysis/metabolites` for the metabolomics
+        decision tree.
+        """
+        await ctx.info(
+            f"assays_by_metabolite metabolite_ids={len(metabolite_ids)} "
+            f"organism={organism} evidence_kind={evidence_kind} "
+            f"summary={summary} verbose={verbose} limit={limit} offset={offset}"
+        )
+        try:
+            conn = _conn(ctx)
+            data = api.assays_by_metabolite(
+                metabolite_ids=metabolite_ids,
+                organism=organism,
+                evidence_kind=evidence_kind,
+                exclude_metabolite_ids=exclude_metabolite_ids,
+                metric_types=metric_types,
+                compartment=compartment,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                offset=offset,
+                conn=conn,
+            )
+        except ValueError as e:
+            await ctx.warning(f"assays_by_metabolite error: {e}")
+            raise ToolError(str(e)) from e
+        except Exception as e:
+            await ctx.error(f"assays_by_metabolite unexpected error: {e}")
+            raise ToolError(f"Error in assays_by_metabolite: {e}")
+
+        results = [AssaysByMetaboliteResult(**r) for r in data["results"]]
+        by_evidence_kind = [
+            AbmByEvidenceKind(**b) for b in data["by_evidence_kind"]
+        ]
+        by_organism = [AbmByOrganism(**b) for b in data["by_organism"]]
+        by_compartment = [
+            AbmByCompartment(**b) for b in data["by_compartment"]
+        ]
+        by_assay = [AbmByAssay(**b) for b in data["by_assay"]]
+        by_detection_status = [
+            AbmByDetectionStatus(**b) for b in data["by_detection_status"]
+        ]
+        by_flag_value = [
+            AbmByFlagValue(**b) for b in data["by_flag_value"]
+        ]
+        return AssaysByMetaboliteResponse(
+            results=results,
+            total_matching=data["total_matching"],
+            by_evidence_kind=by_evidence_kind,
+            by_organism=by_organism,
+            by_compartment=by_compartment,
+            by_assay=by_assay,
+            by_detection_status=by_detection_status,
+            by_flag_value=by_flag_value,
+            metabolites_with_evidence=data["metabolites_with_evidence"],
+            metabolites_without_evidence=data["metabolites_without_evidence"],
+            metabolites_matched=data["metabolites_matched"],
+            not_found=data["not_found"],
+            not_matched=data["not_matched"],
+            returned=data["returned"],
+            truncated=data["truncated"],
+            offset=data["offset"],
+        )

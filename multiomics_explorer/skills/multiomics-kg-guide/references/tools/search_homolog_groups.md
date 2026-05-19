@@ -2,17 +2,20 @@
 
 ## What it does
 
-Search ortholog groups by text (Lucene). Returns group IDs for
-use with genes_by_homolog_group.
+Search ortholog groups by text (Lucene over consensus_product,
+consensus_gene_name, description, functional_description). Returns
+group IDs for downstream use.
 
-Searches across consensus_product, consensus_gene_name, description,
-and functional_description fields.
+Routing: drill into member genes via `genes_by_homolog_group`;
+cross-organism expression view via
+`differential_expression_by_ortholog`. See `docs://guide/conventions`
+for Lucene scoring semantics.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| search_text | string | — | Search query (Lucene syntax). Searches consensus_product, consensus_gene_name, description, functional_description. |
+| search_text | string | — | Search query (Lucene syntax — boolean operators, phrase matching, wildcards). Searches consensus_product, consensus_gene_name, description, functional_description. See `docs://guide/conventions` for Lucene scoring. |
 | source | string \| None | None | Filter by OG source: 'cyanorak' or 'eggnog'. |
 | taxonomic_level | string \| None | None | Filter by taxonomic level. E.g. 'curated', 'Prochloraceae', 'Bacteria'. |
 | max_specificity_rank | int \| None | None | Cap group breadth. 0=curated only, 1=+family, 2=+order, 3=+domain (all). |

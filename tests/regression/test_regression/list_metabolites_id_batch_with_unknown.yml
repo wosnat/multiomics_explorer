@@ -3,6 +3,11 @@ by_evidence_source:
   evidence_source: metabolism
 - count: 1
   evidence_source: transport
+by_measurement_coverage:
+  by_compartment: []
+  by_paper_count:
+  - count: 1
+    paper_count: 0
 case_id: list_metabolites_id_batch_with_unknown
 mass_stats:
   mass_max: 180.156
@@ -24,11 +29,15 @@ results:
   - metabolism
   - transport
   formula: C6H12O6
-  gene_count: 320
+  gene_count: 328
   mass: 180.156
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00031
   name: D-Glucose
-  organism_count: 31
+  organism_count: 32
   pathway_count: 35
   pathway_ids:
   - kegg.pathway:ko00010
@@ -66,11 +75,42 @@ results:
   - kegg.pathway:ko05111
   - kegg.pathway:ko05230
   - kegg.pathway:ko05415
-  transporter_count: 17
+  transporter_count: 23
 returned: 1
 row_count: 1
 score_max: null
 score_median: null
+top_metabolite_pathways:
+- count: 1
+  metabolite_pathway_id: kegg.pathway:ko00030
+  metabolite_pathway_name: Pentose phosphate pathway
+- count: 1
+  metabolite_pathway_id: kegg.pathway:ko00052
+  metabolite_pathway_name: Galactose metabolism
+- count: 1
+  metabolite_pathway_id: kegg.pathway:ko00074
+  metabolite_pathway_name: Mycolic acid biosynthesis
+- count: 1
+  metabolite_pathway_id: kegg.pathway:ko00500
+  metabolite_pathway_name: Starch and sucrose metabolism
+- count: 1
+  metabolite_pathway_id: kegg.pathway:ko00520
+  metabolite_pathway_name: Amino sugar and nucleotide sugar metabolism
+- count: 1
+  metabolite_pathway_id: kegg.pathway:ko00521
+  metabolite_pathway_name: Streptomycin biosynthesis
+- count: 1
+  metabolite_pathway_id: kegg.pathway:ko00524
+  metabolite_pathway_name: Neomycin, kanamycin and gentamicin biosynthesis
+- count: 1
+  metabolite_pathway_id: kegg.pathway:ko00566
+  metabolite_pathway_name: Sulfoquinovose metabolism
+- count: 1
+  metabolite_pathway_id: kegg.pathway:ko00901
+  metabolite_pathway_name: Indole alkaloid biosynthesis
+- count: 1
+  metabolite_pathway_id: kegg.pathway:ko00010
+  metabolite_pathway_name: Glycolysis / Gluconeogenesis
 top_organisms:
 - count: 1
   organism_name: Alteromonas macleodii AD45
@@ -92,38 +132,7 @@ top_organisms:
   organism_name: Meiothermus ruber
 - count: 1
   organism_name: Alteromonas (MarRef v6)
-top_pathways:
-- count: 1
-  pathway_id: kegg.pathway:ko00030
-  pathway_name: Pentose phosphate pathway
-- count: 1
-  pathway_id: kegg.pathway:ko00052
-  pathway_name: Galactose metabolism
-- count: 1
-  pathway_id: kegg.pathway:ko00074
-  pathway_name: Mycolic acid biosynthesis
-- count: 1
-  pathway_id: kegg.pathway:ko00500
-  pathway_name: Starch and sucrose metabolism
-- count: 1
-  pathway_id: kegg.pathway:ko00520
-  pathway_name: Amino sugar and nucleotide sugar metabolism
-- count: 1
-  pathway_id: kegg.pathway:ko00521
-  pathway_name: Streptomycin biosynthesis
-- count: 1
-  pathway_id: kegg.pathway:ko00524
-  pathway_name: Neomycin, kanamycin and gentamicin biosynthesis
-- count: 1
-  pathway_id: kegg.pathway:ko00566
-  pathway_name: Sulfoquinovose metabolism
-- count: 1
-  pathway_id: kegg.pathway:ko00901
-  pathway_name: Indole alkaloid biosynthesis
-- count: 1
-  pathway_id: kegg.pathway:ko00010
-  pathway_name: Glycolysis / Gluconeogenesis
-total_entries: 3025
+total_entries: 3230
 total_matching: 1
 truncated: false
 xref_coverage:

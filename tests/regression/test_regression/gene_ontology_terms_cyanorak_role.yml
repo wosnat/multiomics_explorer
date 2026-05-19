@@ -1,7 +1,8 @@
 case_id: gene_ontology_terms_cyanorak_role
 row_count: 1
 rows:
-- level: 1
+- is_informative: true
+  level: 1
   locus_tag: PMM0001
   term_id: cyanorak.role:F.1
   term_name: DNA metabolism > DNA replication, recombination, and repair

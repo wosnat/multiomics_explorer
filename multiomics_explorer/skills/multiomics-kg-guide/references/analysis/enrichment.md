@@ -34,7 +34,8 @@ path (including the MCP tool) is a convenience layer on top.
 
 ## 2. Building blocks (Python API)
 
-All four names are importable from `multiomics_explorer` directly:
+All names below are importable from the top-level `multiomics_explorer`
+namespace (see `docs://guide/python_api` for the full surface):
 
 ```python
 from multiomics_explorer import (
@@ -42,9 +43,9 @@ from multiomics_explorer import (
     fisher_ora,
     signed_enrichment_score,
     EnrichmentInputs,
+    genes_by_ontology,
+    to_dataframe,
 )
-from multiomics_explorer.api import genes_by_ontology
-from multiomics_explorer.analysis.frames import to_dataframe
 ```
 
 ### `de_enrichment_inputs(experiment_ids, organism, direction, significant_only, timepoint_filter)`
@@ -55,19 +56,24 @@ Calls `differential_expression_by_gene` and partitions the result into clusters 
 - `gene_sets` — dict of cluster → significant DE locus_tags (respects `direction` and
   `significant_only`).
 - `background` — dict of cluster → all quantified locus_tags for that experiment/timepoint
-  (the `table_scope` universe; see §9).
+  (the `table_scope` universe; see "Background" below).
 - `cluster_metadata` — dict of cluster → experiment context fields.
 - `not_found`, `not_matched`, `no_expression` — partial-failure buckets (individual
   experiments with problems do not raise; they are collected here).
 
-### `fisher_ora(gene_sets, background, term2gene, min_gene_set_size=5, max_gene_set_size=500)`
+### `fisher_ora(inputs: EnrichmentInputs, term2gene, *, min_gene_set_size=5, max_gene_set_size=500)`
 
-Pure Fisher + Benjamini-Hochberg primitive. Direction-agnostic. Accepts any gene-list source —
-not just DE results. `background` may be a per-cluster dict or a shared list. Returns a long
-DataFrame (one row per cluster × term pair) with compareCluster-compatible columns.
+Pure Fisher + Benjamini-Hochberg primitive. Direction-agnostic.
+Accepts any gene-set source — not just DE results: construct
+`EnrichmentInputs(gene_sets=..., background=..., organism_name=...,
+cluster_metadata=...)` directly when you have hand-curated sets
+(`cluster_metadata` can be `{cluster_key: {}}` if you have no per-cluster
+context to attach). Returns an `EnrichmentResult` object (see "EnrichmentResult accessors" below)
+carrying a long DataFrame (one row per cluster × term pair) with
+compareCluster-compatible columns at `result.results`.
 
-The size filter acts on **M** (pathway members within the cluster's background), not the global
-pathway size. See §12 Gotchas.
+The size filter acts on **M** (pathway members within the cluster's
+background), not the global pathway size. See "Gotchas" below.
 
 ### `signed_enrichment_score(df, direction_col='direction', padj_col='p_adjust')`
 
@@ -93,8 +99,7 @@ sizes. Genome coverage is required — term-size distributions alone mislead (th
 cause of B1's original over-reliance on a single ontology level without checking coverage).
 
 ```python
-from multiomics_explorer.api import ontology_landscape
-from multiomics_explorer.analysis.frames import to_dataframe
+from multiomics_explorer import ontology_landscape, to_dataframe
 
 # Survey all ontologies for MED4.
 # Supply experiment_ids to weight coverage by the experiments you plan to use.
@@ -113,7 +118,7 @@ df_landscape.sort_values("relevance_rank").head(10)
 ```
 
 `relevance_rank` bakes in both genome coverage and median term size; experiment-specific
-coverage is incorporated when you supply `experiment_ids`. See §10 for the full narrative.
+coverage is incorporated when you supply `experiment_ids`. See "Choosing an ontology and level" below for the full narrative.
 
 ---
 
@@ -124,9 +129,8 @@ The standard enrichment pipeline for differential expression results:
 ```python
 from multiomics_explorer import (
     de_enrichment_inputs, fisher_ora, signed_enrichment_score,
+    genes_by_ontology, to_dataframe,
 )
-from multiomics_explorer.api import genes_by_ontology
-from multiomics_explorer.analysis.frames import to_dataframe
 
 # Step 1: build gene sets from DE results.
 inputs = de_enrichment_inputs(
@@ -148,10 +152,11 @@ gbo = genes_by_ontology(
 term2gene = to_dataframe(gbo)   # columns: term_id, term_name, locus_tag, level, ...
 
 # Step 3: run Fisher ORA (BH applied per cluster).
-df = fisher_ora(
-    inputs.gene_sets, inputs.background, term2gene,
+result = fisher_ora(
+    inputs, term2gene,
     min_gene_set_size=5, max_gene_set_size=500,
 )
+df = result.results.copy()
 
 # Step 4: attach direction and compute signed score.
 df["direction"] = df["cluster"].map(
@@ -170,11 +175,10 @@ co-expression clustering. The background is the analysis universe (all genes tha
 clustered), not the full genome.
 
 ```python
-from multiomics_explorer.api import (
+from multiomics_explorer import (
     list_clustering_analyses, genes_in_cluster, genes_by_ontology,
+    EnrichmentInputs, fisher_ora, to_dataframe,
 )
-from multiomics_explorer.analysis.frames import to_dataframe
-from multiomics_explorer import fisher_ora
 
 # Fetch an analysis and its clusters.
 analyses = list_clustering_analyses(organism="MED4")
@@ -196,7 +200,14 @@ background = {c: list(all_genes) for c in gene_sets}  # shared universe
 term2gene = to_dataframe(
     genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
 )
-df = fisher_ora(gene_sets, background, term2gene)
+inputs = EnrichmentInputs(
+    gene_sets=gene_sets,
+    background=background,
+    organism_name="MED4",
+    cluster_metadata={c: {} for c in gene_sets},
+)
+result = fisher_ora(inputs, term2gene)
+df = result.results
 ```
 
 **MCP convenience:** The `cluster_enrichment` tool automates this pipeline in a single
@@ -211,11 +222,10 @@ Use `genes_by_homolog_group` to turn ortholog group memberships into gene sets, 
 against the full organism gene set as background.
 
 ```python
-from multiomics_explorer.api import (
+from multiomics_explorer import (
     genes_by_homolog_group, list_organisms, genes_by_ontology,
+    EnrichmentInputs, fisher_ora, to_dataframe,
 )
-from multiomics_explorer.analysis.frames import to_dataframe
-from multiomics_explorer import fisher_ora
 
 # Gene sets: genes belonging to each ortholog group of interest.
 homolog_result = genes_by_homolog_group(
@@ -235,7 +245,14 @@ organism_genes = org_entry["locus_tags"]   # full genome gene set
 term2gene = to_dataframe(
     genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
 )
-df = fisher_ora(gene_sets, organism_genes, term2gene)
+inputs = EnrichmentInputs(
+    gene_sets=gene_sets,
+    background=organism_genes,    # shared list[str] across all clusters
+    organism_name="MED4",
+    cluster_metadata={c: {} for c in gene_sets},
+)
+result = fisher_ora(inputs, term2gene)
+df = result.results
 ```
 
 ---
@@ -245,9 +262,9 @@ df = fisher_ora(gene_sets, organism_genes, term2gene)
 Any dict of locus_tags works. Caller supplies the background.
 
 ```python
-from multiomics_explorer.api import genes_by_ontology
-from multiomics_explorer.analysis.frames import to_dataframe
-from multiomics_explorer import fisher_ora
+from multiomics_explorer import (
+    genes_by_ontology, EnrichmentInputs, fisher_ora, to_dataframe,
+)
 
 # Hand-curated or upstream-analysis gene sets.
 gene_sets = {
@@ -260,7 +277,14 @@ background = my_candidate_universe   # list[str] — shared across all clusters
 term2gene = to_dataframe(
     genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
 )
-df = fisher_ora(gene_sets, background, term2gene)
+inputs = EnrichmentInputs(
+    gene_sets=gene_sets,
+    background=background,
+    organism_name="MED4",
+    cluster_metadata={c: {} for c in gene_sets},
+)
+result = fisher_ora(inputs, term2gene)
+df = result.results
 ```
 
 ---
@@ -277,11 +301,10 @@ dominated by enzymes (~1,776 terms at level 3), drowning out signal from smaller
 ### Worked example: transporter enrichment
 
 ```python
-from multiomics_explorer.api import (
+from multiomics_explorer import (
     list_filter_values, ontology_landscape, genes_by_ontology,
+    de_enrichment_inputs, fisher_ora, to_dataframe,
 )
-from multiomics_explorer import de_enrichment_inputs, fisher_ora
-from multiomics_explorer.analysis.frames import to_dataframe
 
 # Step 1: Discover available BRITE trees.
 trees = list_filter_values("brite_tree")
@@ -307,7 +330,8 @@ inputs = de_enrichment_inputs(
     experiment_ids=["exp1"], organism="MED4",
     direction="both", significant_only=True,
 )
-df = fisher_ora(inputs.gene_sets, inputs.background, term2gene)
+result = fisher_ora(inputs, term2gene)
+df = result.results
 ```
 
 The MCP tool supports the same workflow in a single call:
@@ -363,9 +387,92 @@ that *could* have been selected for the foreground by the same process that prod
 
 ---
 
+## Informative-only filtering (default 2026-05)
+
+As of the 2026-05 KG release, both `pathway_enrichment` and `cluster_enrichment` default to
+`informative_only=True`. Uninformative ontology terms — those flagged
+`is_uninformative='true'` in the KG — are excluded from the Fisher tests by default.
+
+### Rationale
+
+Uninformative terms are noise in over-representation testing. They are large catch-all
+buckets that "enrich" trivially in any DE set:
+
+- **KEGG `map00001`** ("metabolic pathways") covers 800+ MED4 genes — roughly 40% of the
+  genome. Almost any nontrivial DE set passes Fisher significance against it.
+- **GO root `go:0008150`** ("biological_process") covers approximately every annotated
+  gene. It is by definition uninformative as an ORA hit.
+- **GO root `go:0003674`** ("molecular_function") and **`go:0005575`** ("cellular_component")
+  are similarly genome-spanning.
+
+Surfacing such terms at the top of an enrichment ranking is misleading and crowds out
+the smaller, more diagnostic terms below them. The default `informative_only=True` aligns
+enrichment with the rest of the informativeness surface — `ontology_landscape`,
+`search_ontology`, `genes_by_ontology`, and `gene_ontology_terms` all default to
+`informative_only=True`. Without this default, "discovery says X is rank-1 (uninformative
+excluded), enrichment includes it anyway" creates a tool inconsistency callers would
+have to remember.
+
+### Term-side-only semantics
+
+The filter applies to the term2gene table only. The gene set, the background, and the DE
+inputs are all unaffected:
+
+- The DE foreground (significant locus_tags per cluster) is computed independent of any
+  ontology terms.
+- The background (`table_scope` per cluster, or `'organism'`, or a custom list) is computed
+  independent of any ontology terms.
+- Only the term2gene mapping fed into Fisher loses rows when `informative_only=True`.
+
+This is the same contract enforced on `genes_by_ontology` and `gene_ontology_terms` —
+filtering happens at the term-MATCH stage in Cypher (`coalesce(t.is_uninformative, '') <>
+'true'`), before any gene-side aggregation. No Fisher 2×2 cell shifts because the term set
+shrank; only the set of (cluster, term) pairs tested shrinks.
+
+### Fisher denominator behavior
+
+The implicit denominator for Benjamini-Hochberg correction within a cluster is the number
+of terms tested in that cluster. With default `informative_only=True`, that number is the
+informative-only term set. With `informative_only=False`, that number is the full term set
+including uninformative terms.
+
+This means BH-adjusted p-values are reproducible only when the `informative_only` setting
+is held constant. Comparing `p_adjust` across two runs that differ in this setting is not
+meaningful — the test family changed.
+
+The raw `pvalue` column is unaffected by the setting (Fisher is per-pair; the per-pair test
+does not depend on the number of other tests in the family).
+
+### Opt-out guidance
+
+Pass `informative_only=False` for browse-mode enrichment when you explicitly want to see
+uninformative trivially-enriched terms — for example, to confirm that `go:0008150` does
+indeed appear at the top, or to inspect the size of the catch-all signal before deciding to
+exclude it. The per-row `is_informative` column is present in either mode, so a single
+opt-out call gives you both views simultaneously (filter the DataFrame post-hoc on
+`is_informative` to recover the default-True ranking).
+
+`docs://examples/pathway_enrichment.py` (`demo_informative_only`) shows the side-by-side
+pattern.
+
+### KG drift caveat
+
+The `is_uninformative` flag is KG-side state. If a future KG release changes which terms
+are flagged, prior enrichment runs become non-reproducible — the term set that defined the
+2026-05-default cluster denominator may no longer match. Two practical mitigations:
+
+1. **Pin via param:** if reproducibility matters (paper figures, locked baselines), pass
+   `informative_only=False` and post-filter on the per-row `is_informative` column. This
+   captures the full term set; downstream filtering is then independent of KG state.
+2. **Record `result.params`:** the `informative_only` setting is recorded in
+   `result.params` for both `pathway_enrichment` and `cluster_enrichment`, so a saved
+   `EnrichmentResult` documents which mode produced it.
+
+---
+
 ## 10. Choosing an ontology and level (narrative)
 
-Use `ontology_landscape` (§3) to scout before committing to an ontology and level. The key
+Use `ontology_landscape` to scout before committing to an ontology and level. The key
 signals are:
 
 - **`genome_coverage`** — fraction of the organism's genes that appear in at least one term at
@@ -479,7 +586,7 @@ collect the per-cluster `pvalue` values and apply BH across the full table manua
 
 The column names `gene_ratio`, `bg_ratio`, `rich_factor`, `fold_enrichment`, `count`, and
 `bg_count` are deliberately clusterProfiler-compatible; `cluster` maps to clusterProfiler's
-`Cluster`; `term_id` / `term_name` map to `ID` / `Description`. See §15 for the full mapping.
+`Cluster`; `term_id` / `term_name` map to `ID` / `Description`. See "Output schema" below for the full mapping.
 
 ---
 
@@ -491,7 +598,7 @@ The column names `gene_ratio`, `bg_ratio`, `rich_factor`, `fold_enrichment`, `co
 ORA from experiment IDs without writing Python.
 
 For cluster-membership enrichment, use the `cluster_enrichment` MCP tool — it automates the
-pattern from §5 in a single call. For ortholog groups or custom gene lists, use the Python
+end-to-end pattern in a single call. For ortholog groups or custom gene lists, use the Python
 primitives directly.
 
 Examples, parameter details, and chaining patterns are in `docs://tools/pathway_enrichment`.
@@ -645,5 +752,4 @@ in the Python API (`.explain()` / accessors).
   3292–3320 (2024). doi:10.1038/s41596-024-01020-z
 - Yu, G. et al. clusterProfiler: an R Package for Comparing Biological Themes Among Gene
   Clusters. *OMICS* **16**, 284–287 (2012).
-- B1 analysis: `multiomics_research/analyses/2026-04-09-1713-pathway_enrichment_b1/`
 - Runnable examples: `docs://examples/pathway_enrichment.py`

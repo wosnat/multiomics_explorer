@@ -1,5 +1,5 @@
 case_id: list_derived_metrics_rankable_true
-row_count: 29
+row_count: 31
 rows:
 - allowed_categories: null
   background_factors:
@@ -658,4 +658,50 @@ rows:
   treatment_type:
   - compartment
   unit: log2 ratio
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:pmic.201400562:table_s3_dss3_with_wh7803:exoproteome_avg_pct_nsaf
+  experiment_id: 10.1002/pmic.201400562_dss3_exoproteome_with_wh7803
+  field_description: Average % NSAF (Normalized Spectral Abundance Factor) of this
+    protein in the cell-free supernatant of R. pomeroyi DSS-3 when co-cultured with
+    Synechococcus sp. WH7803, averaged across three biological replicates (% NSAF
+    A/B/C in the source xlsx). Higher values indicate more abundant exoproteome representation.
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_avg_pct_nsaf
+  name: Avg % NSAF in DSS-3 exoproteome (with WH7803)
+  omics_type: EXOPROTEOMICS
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1002/pmic.201400562
+  rankable: true
+  total_gene_count: 50
+  treatment_type:
+  - coculture
+  unit: '% NSAF'
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:pmic.201400562:table_s3_dss3_with_wh8102:exoproteome_avg_pct_nsaf
+  experiment_id: 10.1002/pmic.201400562_dss3_exoproteome_with_wh8102
+  field_description: Average % NSAF (Normalized Spectral Abundance Factor) of this
+    protein in the cell-free supernatant of R. pomeroyi DSS-3 when co-cultured with
+    Synechococcus sp. WH8102, averaged across three biological replicates (% NSAF
+    A/B/C in the source xlsx). Higher values indicate more abundant exoproteome representation.
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_avg_pct_nsaf
+  name: Avg % NSAF in DSS-3 exoproteome (with WH8102)
+  omics_type: EXOPROTEOMICS
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1002/pmic.201400562
+  rankable: true
+  total_gene_count: 39
+  treatment_type:
+  - coculture
+  unit: '% NSAF'
   value_kind: numeric

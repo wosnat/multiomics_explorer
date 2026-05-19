@@ -22,6 +22,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -68,6 +71,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -114,6 +120,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -159,6 +168,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -205,6 +217,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -251,6 +266,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -297,6 +315,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -342,6 +363,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -388,6 +412,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -434,6 +461,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -480,6 +510,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -525,6 +558,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -571,6 +607,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -617,6 +656,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -663,6 +705,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -709,6 +754,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -755,6 +803,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -801,6 +852,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -847,6 +901,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -893,6 +950,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -939,6 +999,9 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas macleodii EZ55
   publication_doi: 10.1101/2025.05.28.656624
@@ -977,6 +1040,9 @@ rows:
   growth_phases:
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
@@ -1050,6 +1116,9 @@ rows:
   growth_phases:
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
@@ -1103,6 +1172,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1150,6 +1222,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1197,6 +1272,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1244,6 +1322,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1291,6 +1372,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1338,6 +1422,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1385,6 +1472,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1431,6 +1521,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1478,6 +1571,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1525,6 +1621,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1572,6 +1671,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1619,6 +1721,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1666,6 +1771,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1713,6 +1821,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1760,6 +1871,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1807,6 +1921,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1854,6 +1971,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1901,6 +2021,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1948,6 +2071,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -1995,6 +2121,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
@@ -2041,6 +2170,9 @@ rows:
   growth_phases:
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
@@ -2115,6 +2247,9 @@ rows:
   - death
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
@@ -2174,6 +2309,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/spectrum.03275-22
@@ -2219,6 +2357,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/spectrum.03275-22
@@ -2264,6 +2405,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/spectrum.03275-22
@@ -2309,6 +2453,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/spectrum.03275-22
@@ -2353,6 +2500,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MIT9312
   publication_doi: 10.1186/2046-9063-8-7
@@ -2398,6 +2548,9 @@ rows:
   growth_phases:
   - exponential
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus NATL2A
   publication_doi: 10.1186/2046-9063-8-7
@@ -2444,6 +2597,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   publication_doi: 10.1128/spectrum.03275-22
@@ -2489,6 +2645,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   publication_doi: 10.1128/spectrum.03275-22
@@ -2534,6 +2693,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   publication_doi: 10.1128/spectrum.03275-22
@@ -2579,6 +2741,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   publication_doi: 10.1128/spectrum.03275-22
@@ -2626,6 +2791,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   publication_doi: 10.1128/mSystems.00008-17
@@ -2670,6 +2838,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   publication_doi: 10.1186/2046-9063-8-7
@@ -2720,6 +2891,9 @@ rows:
   growth_phases:
   - exponential
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Pseudomonas putida KT2440
   publication_doi: 10.1038/s42003-024-06098-5
@@ -2765,6 +2939,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Synechococcus WH7803
   publication_doi: 10.1128/spectrum.03275-22
@@ -2810,6 +2987,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Synechococcus WH7803
   publication_doi: 10.1128/spectrum.03275-22
@@ -2855,6 +3035,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Synechococcus WH7803
   publication_doi: 10.1128/spectrum.03275-22
@@ -2900,6 +3083,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Synechococcus WH7803
   publication_doi: 10.1128/spectrum.03275-22
@@ -2945,6 +3131,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Synechococcus WH8102
   publication_doi: 10.1128/spectrum.03275-22
@@ -2990,6 +3179,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Synechococcus WH8102
   publication_doi: 10.1128/spectrum.03275-22
@@ -3035,6 +3227,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Synechococcus WH8102
   publication_doi: 10.1128/spectrum.03275-22
@@ -3080,6 +3275,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Synechococcus WH8102
   publication_doi: 10.1128/spectrum.03275-22
@@ -3129,6 +3327,9 @@ rows:
   growth_phases:
   - exponential
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Synechococcus elongatus PCC 7942
   publication_doi: 10.1038/s42003-024-06098-5
@@ -3176,6 +3377,9 @@ rows:
   growth_phases:
   - acclimated_steady_state
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Synechococcus elongatus UTEX 2973
   publication_doi: 10.1186/s13068-022-02163-5
@@ -3222,6 +3426,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Synechococcus sp. BL107
   publication_doi: 10.1128/spectrum.03275-22
@@ -3267,6 +3474,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Synechococcus sp. BL107
   publication_doi: 10.1128/spectrum.03275-22
@@ -3312,6 +3522,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Synechococcus sp. BL107
   publication_doi: 10.1128/spectrum.03275-22
@@ -3357,6 +3570,9 @@ rows:
   growth_phases:
   - stationary
   is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Synechococcus sp. BL107
   publication_doi: 10.1128/spectrum.03275-22

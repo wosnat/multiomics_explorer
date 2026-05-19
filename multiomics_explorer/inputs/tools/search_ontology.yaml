@@ -64,6 +64,24 @@ examples:
   - title: Browse CAZy glycoside hydrolase families
     call: search_ontology(search_text="GH13", ontology="cazy")
 
+  - title: Filter out uninformative terms (term-side, opt-in)
+    call: search_ontology(search_text="transport", ontology="kegg", informative_only=True)
+    response: |
+      # `informative_only=True` drops terms flagged `is_uninformative='true'`
+      # (~224 sparsely-flagged terms genome-wide, mostly KEGG catch-all
+      # modules + a handful of Cyanorak / TIGR / GO / COG entries — Pfam is
+      # not flagged in the current KG). Each result row carries
+      # `is_informative: bool` (always populated). Use this when seeding
+      # term IDs into `genes_by_ontology` for enrichment so catch-all KEGG
+      # buckets don't dominate the term set.
+      {
+        "total_entries": 18000,
+        "total_matching": 22,
+        "results": [
+          {"id": "kegg:K02035", "name": "ABC.PE.S; peptide/nickel transport system substrate-binding protein", "score": 2.81, "level": 3, "is_informative": true}
+        ]
+      }
+
   - title: From search to gene discovery
     steps: |
       Step 1: search_ontology(search_text="replication", ontology="go_bp")
@@ -91,3 +109,4 @@ mistakes:
   - "TCDB is family-level transporter classification (e.g. `tcdb:1.A.1` voltage-gated ion channels). For substrate-anchored questions ('which genes transport sucrose?'), chain via `genes_by_metabolite` instead — that tool surfaces the TCDB substrate edges directly. Use `search_ontology(ontology='tcdb')` for *family*-level browsing."
   - wrong: "search_ontology(search_text='PMM0845', ontology='go_bp')  # searching for a gene"
     right: "resolve_gene(identifier='PMM0845')  # use resolve_gene for gene lookups"
+  - "Use this to assemble a custom `term_ids=[...]` list for `pathway_enrichment` / `cluster_enrichment`. Both tools accept either `level=N` (test all terms at one hierarchy depth) or `term_ids=[...]` (test a specific set you chose). Custom term sets are useful when relevant terms live at different depths — e.g. in GO, a term at level 3 may be more specific than one at level 4 because GO is graph-shaped, not strictly tree-shaped. See `docs://analysis/enrichment`."

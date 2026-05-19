@@ -2,13 +2,9 @@
 
 ## What it does
 
-Resolve a gene identifier to matching genes in the knowledge graph.
+Resolve a gene identifier (locus_tag, gene name, old locus_tag, or RefSeq protein ID) to matching Gene nodes. Matching is case-insensitive.
 
-Matching is case-insensitive — 'pmm0001', 'PMM0001', and 'Pmm0001'
-all work. Use the returned locus_tags with gene_overview,
-gene_details, gene_homologs, or gene_ontology_terms. The organism
-filter uses case-insensitive partial matching — 'MED4' and
-'Prochlorococcus MED4' both work.
+Routing: feed returned `locus_tag`s into `gene_overview` (data-availability triage), `gene_details` (full properties), `gene_homologs`, or `gene_ontology_terms`. The optional `organism` filter is a case-insensitive substring on `organism_name`.
 
 ## Parameters
 
@@ -29,11 +25,11 @@ filter uses case-insensitive partial matching — 'MED4' and
 total_matching, by_organism, returned, offset, truncated, results
 ```
 
-- **total_matching** (int): Total genes matching identifier + organism filter (e.g. 3)
-- **by_organism** (list[ResolveOrganismBreakdown]): Match counts per organism, sorted by count descending
-- **returned** (int): Genes in this response (e.g. 3)
-- **offset** (int): Offset into full result set (e.g. 0)
-- **truncated** (bool): True if total_matching > returned
+- **total_matching** (int): Total genes matching identifier + organism filter.
+- **by_organism** (list[ResolveOrganismBreakdown]): Match counts per organism, sorted desc.
+- **returned** (int): Genes in this response.
+- **offset** (int): Offset into full result set.
+- **truncated** (bool): True if total_matching > returned.
 
 ### Per-result fields
 

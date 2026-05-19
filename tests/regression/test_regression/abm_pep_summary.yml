@@ -1,0 +1,33 @@
+case_id: abm_pep_summary
+row_count: 1
+rows:
+- by_assay:
+  - '{''count'': 1, ''item'': ''metabolite_assay:msystems.01261-22:metabolites_kegg_export_0801_extracellular:extracellular_concentration''}'
+  - '{''count'': 1, ''item'': ''metabolite_assay:msystems.01261-22:metabolites_kegg_export_0801_intracellular:cellular_concentration''}'
+  - '{''count'': 1, ''item'': ''metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_extracellular''}'
+  - '{''count'': 1, ''item'': ''metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular''}'
+  - '{''count'': 2, ''item'': ''metabolite_assay:msystems.01261-22:metabolites_kegg_export_9313_extracellular:extracellular_concentration''}'
+  - '{''count'': 2, ''item'': ''metabolite_assay:msystems.01261-22:metabolites_kegg_export_9313_intracellular:cellular_concentration''}'
+  - '{''count'': 2, ''item'': ''metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9303:cellular_concentration''}'
+  - '{''count'': 3, ''item'': ''metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_extracellular:extracellular_concentration''}'
+  - '{''count'': 3, ''item'': ''metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration''}'
+  - '{''count'': 4, ''item'': ''metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration''}'
+  by_compartment:
+  - '{''count'': 14, ''item'': ''whole_cell''}'
+  - '{''count'': 6, ''item'': ''extracellular''}'
+  by_detection_status:
+  - '{''count'': 12, ''item'': ''not_detected''}'
+  - '{''count'': 3, ''item'': ''detected''}'
+  - '{''count'': 3, ''item'': ''sporadic''}'
+  by_evidence_kind:
+  - '{''count'': 18, ''item'': ''quantifies''}'
+  - '{''count'': 2, ''item'': ''flags''}'
+  by_flag_value:
+  - '{''count'': 2, ''item'': ''false''}'
+  by_organism:
+  - '{''count'': 2, ''item'': ''Prochlorococcus MIT0801''}'
+  - '{''count'': 2, ''item'': ''Prochlorococcus MIT9303''}'
+  - '{''count'': 8, ''item'': ''Prochlorococcus MIT9301''}'
+  - '{''count'': 8, ''item'': ''Prochlorococcus MIT9313''}'
+  metabolites_matched: 1
+  total_matching: 20

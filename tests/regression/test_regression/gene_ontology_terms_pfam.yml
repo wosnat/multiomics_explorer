@@ -1,19 +1,22 @@
 case_id: gene_ontology_terms_pfam
 row_count: 3
 rows:
-- level: 1
+- is_informative: true
+  level: 1
   locus_tag: PMM0001
   term_id: pfam:PF00712
   term_name: DNA polymerase III beta subunit, N-terminal domain
   tree: null
   tree_code: null
-- level: 1
+- is_informative: true
+  level: 1
   locus_tag: PMM0001
   term_id: pfam:PF02767
   term_name: DNA polymerase III beta subunit, central domain
   tree: null
   tree_code: null
-- level: 1
+- is_informative: true
+  level: 1
   locus_tag: PMM0001
   term_id: pfam:PF02768
   term_name: DNA polymerase III beta subunit, C-terminal domain

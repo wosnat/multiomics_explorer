@@ -34,10 +34,29 @@ examples:
 
   - title: Pathway-anchored — N-metabolism only
     call: genes_by_metabolite(metabolite_ids=["kegg.compound:C00086", "kegg.compound:C00064", "kegg.compound:C00088"], organism="Prochlorococcus MED4", metabolite_pathway_ids=["kegg.pathway:ko00910"])
-    # metabolite_pathway_ids narrows BOTH arms uniformly via Metabolite.pathway_ids
-    # (KG-A5 denorm). Result: only rows whose metabolite is annotated to
-    # KEGG nitrogen-metabolism pathway survive — useful when batch-querying
-    # mixed metabolites and you want only the N-pathway slice.
+    # metabolite_pathway_ids narrows BOTH arms uniformly via
+    # Metabolite.pathway_ids. Result: only rows whose metabolite is
+    # annotated to KEGG nitrogen-metabolism pathway survive — useful when
+    # batch-querying mixed metabolites and you want only the N-pathway slice.
+
+  - title: Currency-cofactor strip — exclude ATP/ADP/NADH/NADPH/H2O on a multi-metabolite drill
+    call: |
+      genes_by_metabolite(
+        metabolite_ids=["kegg.compound:C00064", "kegg.compound:C00086"],
+        organism="Prochlorococcus MED4",
+        exclude_metabolite_ids=[
+          "kegg.compound:C00002",  # ATP
+          "kegg.compound:C00008",  # ADP
+          "kegg.compound:C00004",  # NADH
+          "kegg.compound:C00005",  # NADPH
+          "kegg.compound:C00001",  # H2O
+        ],
+      )
+    # Set-difference semantics with `metabolite_ids` — exclude wins on
+    # overlap (silent). Per-arm scope: exclude applies on BOTH the
+    # metabolism arm and the transport arm (mirrors `metabolite_ids`).
+    # Useful when the include set inadvertently pulls cofactor-heavy
+    # reactions into the result.
 
   - title: EC-anchored metabolism narrowing (transport rows still returned)
     call: genes_by_metabolite(metabolite_ids=["kegg.compound:C00064"], organism="Prochlorococcus MED4", ec_numbers=["6.3.1.2"])
@@ -74,14 +93,27 @@ chaining:
 
 mistakes:
   - >-
-    "I want all transporter genes for substrate X." Default fires both arms
-    AND keeps family_inferred transport rows (rolled up from broad TCDB
-    families like ABC superfamily — they appear to "transport" every
-    substrate of every member system). For the precise, substrate-curated
-    set, set BOTH `transport_confidence='substrate_confirmed'` (drops
-    family_inferred rows) AND `evidence_sources=['transport']` (drops
-    metabolism rows). The auto-warning fires when family_inferred dominates
-    transport rows — heed it before reasoning over the result.
+    When the auto-warning fires (most transport rows are `family_inferred`),
+    interpret workflow-dependent: use
+    `transport_confidence='substrate_confirmed'` for conservative-cast
+    questions (e.g. cross-organism inference); keep `family_inferred` for
+    broad-screen candidate enumeration (e.g. N-source DE — the real MED4
+    N-uptake genes are family_inferred-only). Both tiers are annotations,
+    neither is ground truth — see `docs://guide/conventions`.
+  - >-
+    Every result row has the same key set — cross-arm fields are explicitly
+    `None` on rows from the other arm (metabolism rows have
+    `transport_confidence`/`tcdb_family_id`/`tcdb_family_name` = None;
+    transport rows have `reaction_id`/`reaction_name`/`ec_numbers`/`mass_balance`
+    = None). Use `row['transport_confidence']` (KeyError-free) rather than
+    `row.get('transport_confidence')` if the difference matters.
+  - >-
+    Reaction-arm rows are NOT directional — KG reactions carry neither a
+    substrate-vs-product role on `Reaction_has_metabolite` nor an
+    `is_reversible` flag. Read `evidence_source='metabolism'` rows as
+    'gene catalyses a reaction *involving* this metabolite,' never as
+    'produces X' / 'consumes Y' / 'reversibly interconverts'. The KG
+    limitation is permanent (KEGG lacks both upstream).
   - >-
     Filtering by `ec_numbers` does NOT restrict to metabolism only.
     Per-arm filter scope: `ec_numbers` and `mass_balance` narrow the
@@ -99,11 +131,12 @@ mistakes:
   - >-
     `'metabolomics'` is NOT accepted in `evidence_sources` here — the
     Pydantic Literal allows only `('metabolism', 'transport')`. The
-    metabolomics path (DerivedMetric → Metabolite) has no Gene anchor and
-    surfaces only in `list_metabolites` (where `'metabolomics'` is a valid
-    forward-compat filter value). Same `_VALID_EVIDENCE_SOURCES`
-    validator pattern, intentionally divergent value set per the tool's
-    biology.
+    metabolomics path (`MetaboliteAssay → Metabolite`) has no Gene anchor,
+    so a metabolomics-only metabolite returns no rows from this tool.
+    To inspect measurement evidence, use `list_metabolite_assays` /
+    `assays_by_metabolite` instead. Same `_VALID_EVIDENCE_SOURCES`
+    validator pattern as `list_metabolites`, intentionally divergent
+    value set per the tool's biology.
   - >-
     TCDB-class filtering does NOT belong here. There is no
     `tcdb_class_ids` parameter. TCDB is now a first-class ontology — for
@@ -120,6 +153,14 @@ mistakes:
     conflate them — `not_matched` may go to zero by relaxing filters or
     swapping organism; `not_found` won't.
   - >-
+    When the result is dominated by ATP / ADP / NADH / NADPH / H2O
+    (currency cofactors that catalysts and transporters touch ubiquitously),
+    pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip them.
+    Set-difference semantics with `metabolite_ids` — exclude wins on overlap
+    (silent). Per-arm scope: exclude applies on BOTH metabolism + transport
+    arms (mirrors `metabolite_ids`). KG namespace is `kegg.compound:` (not
+    `chebi:`).
+  - >-
     Transport rows are direction-agnostic. The `Tcdb_family_transports_metabolite`
     edge does not distinguish substrate from product, and the metabolism
     arm's `Reaction_has_metabolite` edge doesn't either (KEGG equation
@@ -127,3 +168,4 @@ mistakes:
     transcriptional evidence (`differential_expression_by_gene`) and
     functional annotation (`gene_overview` Pfam / KEGG KO names like
     `*-synthase` vs `*-permease`).
+  - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/concepts` for the chemistry layer overview."

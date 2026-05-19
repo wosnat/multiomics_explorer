@@ -39,3 +39,4 @@ mistakes:
   - "This tool does NOT enforce single organism — that is the point"
   - "Results are group × experiment × timepoint (gene counts), not individual genes. Use the script for per-gene detail."
   - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"
+  - "For cross-experiment summarization patterns see `docs://guide/python_api` (Cross-experiment summarization — covers `response_matrix` for gene × treatment-group pivots and `gene_set_compare` for two-set comparisons)."

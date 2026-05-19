@@ -2,14 +2,21 @@
 
 ## What it does
 
-Cluster-membership over-representation analysis (Fisher + BH).
+Run cluster-membership over-representation analysis (Fisher + BH) — one ORA per cluster in a clustering analysis.
 
-Runs ORA on every cluster in a clustering analysis. Use
-list_clustering_analyses to find analysis IDs. Background
-defaults to the union of all clustered genes.
-See docs://analysis/enrichment for methodology;
-docs://examples/pathway_enrichment.py for runnable code (the custom
-term2gene path covers cluster-membership enrichment).
+Single-organism enforced. Background defaults to `cluster_union` (union
+of all clustered genes — differs from `pathway_enrichment`'s
+`table_scope` default); `organism` or an explicit locus_tag list are
+also accepted. Background drives the Fisher denominator and matters
+more than the ontology choice.
+
+Routing: pre-flight via `list_clustering_analyses` for `analysis_id`
+and `ontology_landscape` for `(ontology, level)`; drill enriched terms
+via `gene_overview`, `genes_in_cluster`, or for KEGG
+`list_metabolites(pathway_ids=...)` for compound-anchored membership.
+See docs://analysis/enrichment for Fisher + BH methodology and
+background semantics; docs://examples/pathway_enrichment.py for
+runnable code (custom term2gene path covers cluster-membership ORA).
 
 ## Parameters
 
@@ -18,10 +25,10 @@ term2gene path covers cluster-membership enrichment).
 | analysis_id | string | — | Clustering analysis ID. Get from list_clustering_analyses. |
 | organism | string | — | Organism (case-insensitive fuzzy match). Single-organism enforced. |
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy') | — | Ontology for pathway definitions. Run ontology_landscape first. |
-| tree | string \| None | None | BRITE tree name filter. Only valid when ontology='brite'. |
-| level | int \| None | None | Hierarchy level (0 = root). At least one of level or term_ids required. |
+| tree | string \| None | None | BRITE tree name filter. Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
+| level | int \| None | None | Hierarchy level (0 = root). At least one of `level` or `term_ids` required. See docs://guide/conventions. |
 | term_ids | list[string] \| None | None | Specific term IDs to test. |
-| background | string | cluster_union | 'cluster_union' (default), 'organism', or explicit locus_tag list. |
+| background | string | cluster_union | 'cluster_union' (default — union of all clustered genes; differs from `pathway_enrichment`'s 'table_scope' default), 'organism', or explicit locus_tag list. See docs://analysis/enrichment for the full background semantics. |
 | min_gene_set_size | int | 5 | Per-cluster M filter: drop pathways with fewer members. |
 | max_gene_set_size | int \| None | 500 | Per-cluster M filter upper bound. None disables. |
 | min_cluster_size | int | 3 | Skip clusters with fewer members than this. |
@@ -30,6 +37,7 @@ term2gene path covers cluster-membership enrichment).
 | summary | bool | False | If true, omit results (envelope only). |
 | limit | int | 5 | Max rows returned. |
 | offset | int | 0 | Skip N rows before limit. |
+| informative_only | bool | True | When True (default), exclude ontology terms flagged uninformative in the KG (e.g. KEGG map00001 'metabolic pathways', GO root go:0008150). Term-side filter — never restricts the gene set, background, or DE inputs. Pass False to include uninformative terms; per-row is_informative still surfaces in either mode. [ENR] Default flipped to True in 2026-05 KG release; see docs://guide/conventions. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -77,6 +85,7 @@ analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_t
 | term_id | string | Ontology term ID |
 | term_name | string | Ontology term display name |
 | level | int \| None (optional) | Hierarchy depth (0 = root) |
+| is_informative | bool | True if the term is not flagged is_uninformative in the KG. Always present, regardless of informative_only setting, so callers can post-filter or diagnose. With default informative_only=True, all rows have is_informative=True by construction; pass informative_only=False to opt out and see uninformative terms. |
 | tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
 | tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
 | gene_ratio | string | 'k/n' string — cluster genes in pathway over total cluster genes (clusterProfiler: GeneRatio) |
@@ -98,6 +107,18 @@ analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_t
 | cluster_expression_dynamics | string \| None (optional) | Verbose: expression dynamics of cluster |
 | cluster_temporal_pattern | string \| None (optional) | Verbose: temporal pattern of cluster |
 | cluster_member_count | int \| None (optional) | Verbose: total genes in this cluster |
+
+### `informative_only` filter
+
+When True (default), exclude ontology terms flagged uninformative
+in the KG (e.g. KEGG map00001 'metabolic pathways', GO root
+go:0008150). Term-side filter — never restricts the gene set,
+background, or DE inputs. Pass False to include uninformative terms;
+per-row `is_informative` still surfaces in either mode.
+
+See `docs://analysis/enrichment` (section "Informative-only filtering")
+for rationale, Fisher denominator behavior, and opt-out guidance.
+
 
 ## Few-shot examples
 
@@ -145,9 +166,13 @@ list_clustering_analyses → cluster_enrichment
 ontology_landscape → cluster_enrichment
 cluster_enrichment → gene_overview
 cluster_enrichment → genes_in_cluster
+cluster_enrichment(ontology='kegg', ...) → list_metabolites(pathway_ids=[<enriched_pathway_id>]) — inspect the chemistry of an enriched KEGG pathway (compound-anchored membership, distinct from the gene-KO membership the enrichment used). See docs://analysis/metabolites for the pathway-anchor disambiguation.
+See `docs://analysis/enrichment` for the full methodology and the `informative_only` filter semantics.
 ```
 
 ## Common mistakes
+
+- [ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions.
 
 - Default background is `cluster_union` (union of all clustered genes, including size-filtered). Use `'organism'` only when clustering covers the full genome.
 
@@ -162,6 +187,8 @@ cluster_enrichment → genes_in_cluster
 - `min/max_gene_set_size` is the pathway M filter (per-cluster, clusterProfiler semantics). `min/max_cluster_size` is the cluster membership filter.
 
 - For BRITE, scope to a specific tree with `tree=`. Use `list_filter_values('brite_tree')` to discover trees.
+
+- When a KEGG pathway is significantly enriched in a cluster, drill into its chemistry via `list_metabolites(pathway_ids=[<term_id>])`. The cluster's gene-KO membership and the pathway's compound-membership reach the same KEGG map via different relations — name the anchor when answering. See docs://analysis/metabolites.
 
 ```mistake
 cluster_enrichment(..., background='table_scope')  # not valid

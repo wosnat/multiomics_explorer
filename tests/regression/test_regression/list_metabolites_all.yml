@@ -1,12 +1,31 @@
 by_evidence_source:
 - count: 2188
   evidence_source: metabolism
-- count: 1097
+- count: 1355
   evidence_source: transport
+- count: 149
+  evidence_source: metabolomics
+by_measurement_coverage:
+  by_compartment:
+  - compartment: extracellular
+    count: 92
+  - compartment: vesicle
+    count: 69
+  - compartment: whole_cell
+    count: 149
+  by_paper_count:
+  - count: 3081
+    paper_count: 0
+  - count: 119
+    paper_count: 1
+  - count: 25
+    paper_count: 2
+  - count: 5
+    paper_count: 3
 case_id: list_metabolites_all
 mass_stats:
   mass_max: 5227.103
-  mass_median: 243.219
+  mass_median: 242.231
   mass_min: 1.00794
 not_found:
   metabolite_ids: []
@@ -22,11 +41,15 @@ results:
   - metabolism
   - transport
   formula: H2O
-  gene_count: 7971
+  gene_count: 8157
   mass: 18.015
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00001
   name: H2O
-  organism_count: 31
+  organism_count: 32
   pathway_count: 17
   pathway_ids:
   - kegg.pathway:ko00190
@@ -46,7 +69,7 @@ results:
   - kegg.pathway:ko05022
   - kegg.pathway:ko05208
   - kegg.pathway:ko05415
-  transporter_count: 107
+  transporter_count: 117
 - chebi_id: '10744'
   elements:
   - H
@@ -54,11 +77,15 @@ results:
   - metabolism
   - transport
   formula: H
-  gene_count: 5296
+  gene_count: 6045
   mass: 1.0079
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00080
   name: H+
-  organism_count: 31
+  organism_count: 32
   pathway_count: 27
   pathway_ids:
   - kegg.pathway:ko00190
@@ -88,7 +115,7 @@ results:
   - kegg.pathway:ko05120
   - kegg.pathway:ko05164
   - kegg.pathway:ko05323
-  transporter_count: 289
+  transporter_count: 437
 - chebi_id: '10789'
   elements:
   - C
@@ -100,11 +127,15 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O13P3
-  gene_count: 4432
+  gene_count: 4562
   mass: 503.15
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00002
   name: ATP
-  organism_count: 31
+  organism_count: 32
   pathway_count: 33
   pathway_ids:
   - kegg.pathway:ko00190
@@ -140,7 +171,7 @@ results:
   - kegg.pathway:ko05133
   - kegg.pathway:ko05410
   - kegg.pathway:ko05415
-  transporter_count: 18
+  transporter_count: 47
 - chebi_id: '14791'
   elements:
   - H
@@ -150,11 +181,15 @@ results:
   - metabolism
   - transport
   formula: HO4P
-  gene_count: 3722
+  gene_count: 3912
   mass: 95.978
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00009
   name: Orthophosphate
-  organism_count: 31
+  organism_count: 32
   pathway_count: 10
   pathway_ids:
   - kegg.pathway:ko00190
@@ -167,7 +202,7 @@ results:
   - kegg.pathway:ko04978
   - kegg.pathway:ko05012
   - kegg.pathway:ko05022
-  transporter_count: 39
+  transporter_count: 109
 - chebi_id: '13420'
   elements:
   - H
@@ -177,77 +212,81 @@ results:
   - metabolism
   - transport
   formula: HO7P2
-  gene_count: 3162
+  gene_count: 3254
   mass: 174.949
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
   metabolite_id: kegg.compound:C00013
   name: Diphosphate
-  organism_count: 31
+  organism_count: 32
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00190
   - kegg.pathway:ko05012
   - kegg.pathway:ko05022
-  transporter_count: 2
+  transporter_count: 5
 returned: 5
 row_count: 5
 score_max: null
 score_median: null
-top_organisms:
-- count: 2294
-  organism_name: Ruegeria pomeroyi DSS-3
-- count: 2258
-  organism_name: Pseudomonas putida KT2440
-- count: 2212
-  organism_name: Alteromonas (MarRef v6)
-- count: 2186
-  organism_name: Shewanella sp. W3-18-1
-- count: 2172
-  organism_name: Alteromonas macleodii EZ55
-- count: 2095
-  organism_name: Alteromonas macleodii MIT1002
-- count: 2092
-  organism_name: Alteromonas macleodii BGP6
-- count: 2079
-  organism_name: Alteromonas macleodii HOT1A3
-- count: 2062
-  organism_name: Alteromonas macleodii ATCC27126
-- count: 2061
-  organism_name: Alteromonas macleodii AD45
-top_pathways:
-- count: 1564
-  pathway_id: kegg.pathway:ko01100
-  pathway_name: Metabolic pathways
-- count: 585
-  pathway_id: kegg.pathway:ko01110
-  pathway_name: Biosynthesis of secondary metabolites
-- count: 578
-  pathway_id: kegg.pathway:ko01120
-  pathway_name: Microbial metabolism in diverse environments
-- count: 283
-  pathway_id: kegg.pathway:ko01240
-  pathway_name: Biosynthesis of cofactors
-- count: 142
-  pathway_id: kegg.pathway:ko01220
-  pathway_name: Degradation of aromatic compounds
+top_metabolite_pathways:
+- count: 1589
+  metabolite_pathway_id: kegg.pathway:ko01100
+  metabolite_pathway_name: Metabolic pathways
+- count: 596
+  metabolite_pathway_id: kegg.pathway:ko01110
+  metabolite_pathway_name: Biosynthesis of secondary metabolites
+- count: 587
+  metabolite_pathway_id: kegg.pathway:ko01120
+  metabolite_pathway_name: Microbial metabolism in diverse environments
+- count: 286
+  metabolite_pathway_id: kegg.pathway:ko01240
+  metabolite_pathway_name: Biosynthesis of cofactors
+- count: 146
+  metabolite_pathway_id: kegg.pathway:ko01220
+  metabolite_pathway_name: Degradation of aromatic compounds
 - count: 125
-  pathway_id: kegg.pathway:ko01230
-  pathway_name: Biosynthesis of amino acids
+  metabolite_pathway_id: kegg.pathway:ko01230
+  metabolite_pathway_name: Biosynthesis of amino acids
 - count: 117
-  pathway_id: kegg.pathway:ko02010
-  pathway_name: ABC transporters
+  metabolite_pathway_id: kegg.pathway:ko02010
+  metabolite_pathway_name: ABC transporters
 - count: 103
-  pathway_id: kegg.pathway:ko01200
-  pathway_name: Carbon metabolism
+  metabolite_pathway_id: kegg.pathway:ko01200
+  metabolite_pathway_name: Carbon metabolism
 - count: 103
-  pathway_id: kegg.pathway:ko01250
-  pathway_name: Biosynthesis of nucleotide sugars
+  metabolite_pathway_id: kegg.pathway:ko01250
+  metabolite_pathway_name: Biosynthesis of nucleotide sugars
 - count: 90
-  pathway_id: kegg.pathway:ko00860
-  pathway_name: Porphyrin metabolism
-total_entries: 3025
-total_matching: 3025
+  metabolite_pathway_id: kegg.pathway:ko00860
+  metabolite_pathway_name: Porphyrin metabolism
+top_organisms:
+- count: 2551
+  organism_name: Pseudomonas putida KT2440
+- count: 2325
+  organism_name: Ruegeria pomeroyi DSS-3
+- count: 2228
+  organism_name: Alteromonas (MarRef v6)
+- count: 2213
+  organism_name: Shewanella sp. W3-18-1
+- count: 2193
+  organism_name: Alteromonas macleodii EZ55
+- count: 2116
+  organism_name: Alteromonas macleodii MIT1002
+- count: 2112
+  organism_name: Alteromonas macleodii BGP6
+- count: 2098
+  organism_name: Alteromonas macleodii HOT1A3
+- count: 2093
+  organism_name: Marinobacter (MarRef v6)
+- count: 2082
+  organism_name: Alteromonas macleodii ATCC27126
+total_entries: 3230
+total_matching: 3230
 truncated: true
 xref_coverage:
-  with_chebi: 2724
-  with_hmdb: 1425
-  with_mnxm: 3025
+  with_chebi: 2924
+  with_hmdb: 1484
+  with_mnxm: 3221

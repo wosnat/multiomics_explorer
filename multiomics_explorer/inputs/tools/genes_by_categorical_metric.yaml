@@ -157,9 +157,10 @@ mistakes:
     inspect them together before assuming a category exists in the data.
   - >-
     Sparse `rankable` / `has_p_value` echoes. Both are always `False` on
-    every row from current categorical DMs — kept for cross-tool row-shape
-    consistency with `genes_by_numeric_metric`, not because this tool
-    reads them as a meaningful signal. Don't gate downstream logic on
+    every row from categorical DMs in the current KG — kept for cross-tool
+    row-shape consistency with `genes_by_numeric_metric`, not because this
+    tool reads them as a meaningful signal. Don't gate downstream logic on
     them.
   - wrong: genes_by_categorical_metric(derived_metric_ids=['derived_metric:...:damping_ratio'])  # numeric DM
     right: genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'])  # discover IDs via list_derived_metrics(value_kind='categorical') first
+  - "See `docs://analysis/derived_metrics` for the DM family overview (numeric / boolean / categorical drill-downs)."

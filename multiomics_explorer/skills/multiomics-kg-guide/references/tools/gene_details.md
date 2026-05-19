@@ -2,15 +2,9 @@
 
 ## What it does
 
-Get all properties for genes.
+All Gene node properties (deep-dive). Use `gene_overview` for the common routing case; this tool dumps every property including sparse fields (catalytic_activities, ec_numbers, ko_terms, etc.). TCDB/CAZy memberships are graph edges, not properties.
 
-This is a deep-dive tool — use gene_overview for the common case.
-Returns all Gene node properties including sparse fields
-(catalytic_activities, ec_numbers, etc.). TCDB and CAZy memberships
-live on Gene_has_tcdb_family / Gene_has_cazy_family edges instead.
-
-For organism taxonomy, use list_organisms. For homologs, use
-gene_homologs. For ontology annotations, use gene_ontology_terms.
+Routing: prefer `gene_overview` for triage; chain into `metabolites_by_gene` for chemistry, `gene_homologs` for orthologs, `gene_ontology_terms` for annotations, `list_organisms` for taxonomy.
 
 ## Parameters
 
@@ -29,11 +23,11 @@ gene_homologs. For ontology annotations, use gene_ontology_terms.
 total_matching, returned, offset, truncated, not_found, results
 ```
 
-- **total_matching** (int): Genes found from input locus_tags
-- **returned** (int): Results in this response (0 when summary=true)
-- **offset** (int): Offset into full result set (e.g. 0)
-- **truncated** (bool): True if total_matching > returned
-- **not_found** (list[string]): Input locus_tags not in KG
+- **total_matching** (int): Genes found from input locus_tags.
+- **returned** (int): Results in this response (0 when summary=true).
+- **offset** (int): Offset into full result set.
+- **truncated** (bool): True if total_matching > returned.
+- **not_found** (list[string]): Input locus_tags not in KG.
 
 ## Few-shot examples
 
@@ -92,13 +86,18 @@ Step 2: gene_details(locus_tags=["PMM0001"])
 gene_overview → gene_details
 resolve_gene → gene_details
 genes_by_function → gene_details
+gene_details → metabolites_by_gene — drill from this gene's chemistry properties (ec_numbers, ko_terms) into the metabolites its reactions involve / its TCDB family transports. Single-gene chemistry deep-dive. See docs://analysis/metabolites.
 ```
 
 ## Common mistakes
 
-- This returns ALL Gene node properties via g{.*} — for the common case, use gene_overview which returns curated fields
+- annotation_quality / min_quality semantics shifted in 2026-05 KG release. Existing notebooks using min_quality may select a different gene set than before. See docs://guide/conventions.
+
+- This returns ALL Gene node properties via g{.*} — for the common case, use gene_overview which returns curated fields with routing signals.
 
 - Sparse fields (ec_numbers, catalytic_activities, ko_terms) are only present when the gene has them — check with gene_overview first. TCDB / CAZy memberships are graph edges, not properties — use gene_overview's annotation_types or traverse Gene_has_tcdb_family / Gene_has_cazy_family.
+
+- Chemistry context lives in three places: (1) ec_numbers / catalytic_activities / ko_terms on the Gene properties returned here (annotation-side); (2) `gene_overview` per-row `reaction_count` / `metabolite_count` / `transporter_count` + `evidence_sources` rollup (routing surface — when non-zero, drill); (3) `metabolites_by_gene` for the actual metabolite list (per-arm: reaction-anchored via Gene → Reaction → Metabolite, transport-anchored via Gene → TcdbFamily → Metabolite). For 'what compounds does this gene's chemistry touch?', chain `gene_details → metabolites_by_gene` (or pre-filter with `gene_overview` first to skip genes with no chemistry).
 
 ```mistake
 gene_details(locus_tags='PMM0001')

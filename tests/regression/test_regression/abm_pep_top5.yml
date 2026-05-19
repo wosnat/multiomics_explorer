@@ -1,0 +1,463 @@
+case_id: abm_pep_top5
+row_count: 20
+rows:
+- assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_0801_extracellular:extracellular_concentration
+  assay_name: MIT0801 extracellular metabolite concentration (mol/cell)
+  compartment: extracellular
+  condition_label: replete_light_10
+  detection_status: not_detected
+  evidence_kind: quantifies
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_0801_extracellular
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 68.1319
+  metric_type: extracellular_concentration
+  n_positive: null
+  n_replicates: 1
+  organism_name: Prochlorococcus MIT0801
+  publication_doi: 10.1128/msystems.01261-22
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: null
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_0801_intracellular:cellular_concentration
+  assay_name: MIT0801 intracellular metabolite concentration (mol/cell)
+  compartment: whole_cell
+  condition_label: replete_light_10
+  detection_status: not_detected
+  evidence_kind: quantifies
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_0801_whole_cell
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 67.033
+  metric_type: cellular_concentration
+  n_positive: null
+  n_replicates: 1
+  organism_name: Prochlorococcus MIT0801
+  publication_doi: 10.1128/msystems.01261-22
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: null
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_extracellular:extracellular_concentration
+  assay_name: MIT9301 extracellular metabolite concentration (mol/cell)
+  compartment: extracellular
+  condition_label: P_limited_light_50
+  detection_status: not_detected
+  evidence_kind: quantifies
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_extracellular
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 71.2727
+  metric_type: extracellular_concentration
+  n_positive: null
+  n_replicates: 1
+  organism_name: Prochlorococcus MIT9301
+  publication_doi: 10.1128/msystems.01261-22
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: null
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_extracellular:extracellular_concentration
+  assay_name: MIT9301 extracellular metabolite concentration (mol/cell)
+  compartment: extracellular
+  condition_label: replete_light_50
+  detection_status: not_detected
+  evidence_kind: quantifies
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_extracellular
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 70.9091
+  metric_type: extracellular_concentration
+  n_positive: null
+  n_replicates: 1
+  organism_name: Prochlorococcus MIT9301
+  publication_doi: 10.1128/msystems.01261-22
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: null
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_extracellular:extracellular_concentration
+  assay_name: MIT9301 extracellular metabolite concentration (mol/cell)
+  compartment: extracellular
+  condition_label: replete_light_10
+  detection_status: not_detected
+  evidence_kind: quantifies
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_extracellular
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 70.5455
+  metric_type: extracellular_concentration
+  n_positive: null
+  n_replicates: 1
+  organism_name: Prochlorococcus MIT9301
+  publication_doi: 10.1128/msystems.01261-22
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: null
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration
+  assay_name: MIT9301 intracellular metabolite concentration (mol/cell)
+  compartment: whole_cell
+  condition_label: P_limited_light_50
+  detection_status: not_detected
+  evidence_kind: quantifies
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 70.1818
+  metric_type: cellular_concentration
+  n_positive: null
+  n_replicates: 1
+  organism_name: Prochlorococcus MIT9301
+  publication_doi: 10.1128/msystems.01261-22
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: null
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration
+  assay_name: MIT9301 intracellular metabolite concentration (mol/cell)
+  compartment: whole_cell
+  condition_label: replete_light_50
+  detection_status: not_detected
+  evidence_kind: quantifies
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 69.8182
+  metric_type: cellular_concentration
+  n_positive: null
+  n_replicates: 1
+  organism_name: Prochlorococcus MIT9301
+  publication_doi: 10.1128/msystems.01261-22
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: null
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration
+  assay_name: MIT9301 intracellular metabolite concentration (mol/cell)
+  compartment: whole_cell
+  condition_label: replete_light_10
+  detection_status: not_detected
+  evidence_kind: quantifies
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 69.4545
+  metric_type: cellular_concentration
+  n_positive: null
+  n_replicates: 1
+  organism_name: Prochlorococcus MIT9301
+  publication_doi: 10.1128/msystems.01261-22
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: null
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_extracellular
+  assay_name: Detected in extracellular pool (Kujawinski 2023 Table S2)
+  compartment: whole_cell
+  condition_label: ''
+  detection_status: null
+  evidence_kind: flags
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell
+  flag_value: false
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: null
+  metric_percentile: null
+  metric_type: presence_flag_extracellular
+  n_positive: 0
+  n_replicates: 1
+  organism_name: Prochlorococcus MIT9301
+  publication_doi: 10.1128/msystems.01261-22
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: null
+  value: null
+  value_sd: null
+- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
+  assay_name: Detected in intracellular pool (Kujawinski 2023 Table S2)
+  compartment: whole_cell
+  condition_label: ''
+  detection_status: null
+  evidence_kind: flags
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell
+  flag_value: false
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: null
+  metric_percentile: null
+  metric_type: presence_flag_intracellular
+  n_positive: 0
+  n_replicates: 1
+  organism_name: Prochlorococcus MIT9301
+  publication_doi: 10.1128/msystems.01261-22
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: null
+  value: null
+  value_sd: null
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9303:cellular_concentration
+  assay_name: MIT9303 cellular metabolite concentration (fg/cell)
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  evidence_kind: quantifies
+  experiment_id: 10.1073/pnas.2213271120_chitosan_addition_mit9303_metabolomics
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 64.5161
+  metric_type: cellular_concentration
+  n_positive: null
+  n_replicates: 3
+  organism_name: Prochlorococcus MIT9303
+  publication_doi: 10.1073/pnas.2213271120
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0086
+  value_sd: 0.015
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9303:cellular_concentration
+  assay_name: MIT9303 cellular metabolite concentration (fg/cell)
+  compartment: whole_cell
+  condition_label: control
+  detection_status: sporadic
+  evidence_kind: quantifies
+  experiment_id: 10.1073/pnas.2213271120_chitosan_addition_mit9303_metabolomics
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 32.2581
+  metric_type: cellular_concentration
+  n_positive: null
+  n_replicates: 3
+  organism_name: Prochlorococcus MIT9303
+  publication_doi: 10.1073/pnas.2213271120
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0019
+  value_sd: 0.0034
+- assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_9313_extracellular:extracellular_concentration
+  assay_name: MIT9313 extracellular metabolite concentration (mol/cell)
+  compartment: extracellular
+  condition_label: replete_light_10
+  detection_status: not_detected
+  evidence_kind: quantifies
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9313_extracellular
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 68.306
+  metric_type: extracellular_concentration
+  n_positive: null
+  n_replicates: 1
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1128/msystems.01261-22
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: null
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_9313_extracellular:extracellular_concentration
+  assay_name: MIT9313 extracellular metabolite concentration (mol/cell)
+  compartment: extracellular
+  condition_label: replete_light_5
+  detection_status: not_detected
+  evidence_kind: quantifies
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9313_extracellular
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 67.7596
+  metric_type: extracellular_concentration
+  n_positive: null
+  n_replicates: 1
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1128/msystems.01261-22
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: null
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_9313_intracellular:cellular_concentration
+  assay_name: MIT9313 intracellular metabolite concentration (mol/cell)
+  compartment: whole_cell
+  condition_label: replete_light_10
+  detection_status: not_detected
+  evidence_kind: quantifies
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9313_whole_cell
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 65.0273
+  metric_type: cellular_concentration
+  n_positive: null
+  n_replicates: 1
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1128/msystems.01261-22
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: null
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:msystems.01261-22:metabolites_kegg_export_9313_intracellular:cellular_concentration
+  assay_name: MIT9313 intracellular metabolite concentration (mol/cell)
+  compartment: whole_cell
+  condition_label: replete_light_5
+  detection_status: not_detected
+  evidence_kind: quantifies
+  experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9313_whole_cell
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 64.4809
+  metric_type: cellular_concentration
+  n_positive: null
+  n_replicates: 1
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1128/msystems.01261-22
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: null
+  value: 0.0
+  value_sd: 0.0
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  assay_name: MIT9313 cellular metabolite concentration (fg/cell)
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: sporadic
+  evidence_kind: quantifies
+  experiment_id: 10.1073/pnas.2213271120_chitosan_addition_mit9313_metabolomics
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 38.0952
+  metric_type: cellular_concentration
+  n_positive: null
+  n_replicates: 3
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1073/pnas.2213271120
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.003
+  value_sd: 0.0051
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  assay_name: MIT9313 cellular metabolite concentration (fg/cell)
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  evidence_kind: quantifies
+  experiment_id: 10.1073/pnas.2213271120_chitosan_addition_mit9313_metabolomics
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 65.0794
+  metric_type: cellular_concentration
+  n_positive: null
+  n_replicates: 3
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1073/pnas.2213271120
+  timepoint: 4 days
+  timepoint_hours: 96.0
+  timepoint_order: 1
+  value: 0.0087
+  value_sd: 0.0034
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  assay_name: MIT9313 cellular metabolite concentration (fg/cell)
+  compartment: whole_cell
+  condition_label: chitosan
+  detection_status: detected
+  evidence_kind: quantifies
+  experiment_id: 10.1073/pnas.2213271120_chitosan_addition_mit9313_metabolomics
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 46.0317
+  metric_type: cellular_concentration
+  n_positive: null
+  n_replicates: 2
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1073/pnas.2213271120
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.0045
+  value_sd: 0.0002
+- assay_id: metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration
+  assay_name: MIT9313 cellular metabolite concentration (fg/cell)
+  compartment: whole_cell
+  condition_label: control
+  detection_status: detected
+  evidence_kind: quantifies
+  experiment_id: 10.1073/pnas.2213271120_chitosan_addition_mit9313_metabolomics
+  flag_value: null
+  growth_phase: null
+  metabolite_id: kegg.compound:C00074
+  metabolite_name: Phosphoenolpyruvate
+  metric_bucket: mid
+  metric_percentile: 73.0159
+  metric_type: cellular_concentration
+  n_positive: null
+  n_replicates: 2
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1073/pnas.2213271120
+  timepoint: 6 days
+  timepoint_hours: 144.0
+  timepoint_order: 2
+  value: 0.01
+  value_sd: 0.0023

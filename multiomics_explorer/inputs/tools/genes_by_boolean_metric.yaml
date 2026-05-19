@@ -134,18 +134,19 @@ chaining:
 
 mistakes:
   - >-
-    Positive-only storage in current KG. `flag=False` returns zero rows
-    today because every materialized boolean edge is `r.value="true"`
+    Positive-only DM storage. `flag=False` returns zero rows because every
+    materialized boolean edge is `r.value="true"`
     (`dm.flag_false_count=0` on every current DM). Inspect
-    `by_metric[*].dm_false_count` (always 0 today)
-    before assuming a gene is "not flagged false". Mirrors the numeric
-    tool's "p-value filter on current KG" gotcha — surface exists for
-    future DMs.
+    `by_metric[*].dm_false_count` before assuming a gene is "not flagged
+    false". Mirrors the numeric tool's "p-value filter" gotcha — surface
+    exists for future DMs. Contrast with metabolomics
+    `metabolites_by_flags_assay`, which stores both true and false.
   - >-
     Sparse `rankable` / `has_p_value` echoes. Both are always `False` on
-    every row from current boolean DMs — kept for cross-tool row-shape
-    consistency with `genes_by_numeric_metric`, not because this tool
-    reads them as a meaningful signal. Don't gate downstream logic on
+    every row from boolean DMs in the current KG — kept for cross-tool
+    row-shape consistency with `genes_by_numeric_metric`, not because this
+    tool reads them as a meaningful signal. Don't gate downstream logic on
     them.
   - wrong: genes_by_boolean_metric(derived_metric_ids=['derived_metric:...:damping_ratio'])  # numeric DM
     right: genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])  # discover IDs via list_derived_metrics(value_kind='boolean') first
+  - "See `docs://analysis/derived_metrics` for the DM family overview. Note: `flag=False` returns 0 rows on every current DM (positive-only DM storage); contrast with metabolomics `metabolites_by_flags_assay`, which stores both true and false."

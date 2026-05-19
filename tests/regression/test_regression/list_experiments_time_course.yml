@@ -22,6 +22,9 @@ rows:
   growth_phases:
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
@@ -74,6 +77,9 @@ rows:
   growth_phases:
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
@@ -147,6 +153,9 @@ rows:
   growth_phases:
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
@@ -206,6 +215,9 @@ rows:
   growth_phases:
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
@@ -288,6 +300,9 @@ rows:
   growth_phases:
   - diel
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Alteromonas macleodii MIT1002
   publication_doi: 10.1093/ismeco/ycae131
@@ -377,6 +392,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Alteromonas macleodii MIT1002
   publication_doi: 10.1128/mSystems.00040-18
@@ -430,6 +448,9 @@ rows:
   - death
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
@@ -489,6 +510,9 @@ rows:
   growth_phases:
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
@@ -562,6 +586,9 @@ rows:
   growth_phases:
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
@@ -639,6 +666,9 @@ rows:
   - acute_stress
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2017.88
@@ -696,6 +726,9 @@ rows:
   growth_phases:
   - infected
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
@@ -767,6 +800,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
@@ -832,6 +868,9 @@ rows:
   growth_phases:
   - infected
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
@@ -890,6 +929,9 @@ rows:
   growth_phases:
   - infected
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
@@ -964,6 +1006,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2011.49
@@ -1024,6 +1069,9 @@ rows:
   growth_phases:
   - infected
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/nature06130
@@ -1124,6 +1172,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/msb4100087
@@ -1205,6 +1256,9 @@ rows:
   - exponential
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1073/pnas.0601301103
@@ -1285,6 +1339,9 @@ rows:
   growth_phases:
   - exponential
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1111/1462-2920.14513
@@ -1389,6 +1446,9 @@ rows:
   - acute_stress
   - nutrient_limited
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1038/ismej.2011.49
@@ -1454,6 +1514,9 @@ rows:
   growth_phases:
   - acute_stress
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1038/msb4100087
@@ -1534,6 +1597,9 @@ rows:
   - acute_stress
   - exponential
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1073/pnas.0601301103
@@ -1610,6 +1676,9 @@ rows:
   growth_phases:
   - diel
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus NATL2A
   publication_doi: 10.1093/ismeco/ycae131
@@ -1700,6 +1769,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus NATL2A
   publication_doi: 10.1128/mSystems.00040-18
@@ -1761,6 +1833,9 @@ rows:
   growth_phases:
   - darkness
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus NATL2A
   publication_doi: 10.1128/mSystems.00040-18
@@ -1819,6 +1894,9 @@ rows:
   growth_phases:
   - exponential
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus NATL2A
   publication_doi: 10.1038/ismej.2016.82
@@ -1906,6 +1984,9 @@ rows:
   - nutrient_limited
   - recovery
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus NATL2A
   publication_doi: 10.1111/1462-2920.13104
@@ -1986,6 +2067,9 @@ rows:
   - nutrient_limited
   - recovery
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus NATL2A
   publication_doi: 10.1111/1462-2920.13104
@@ -2081,6 +2165,9 @@ rows:
   growth_phases:
   - acclimated_steady_state
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: EXOPROTEOMICS
   organism_name: Ruegeria pomeroyi DSS-3
   publication_doi: 10.1111/1462-2920.14012
@@ -2170,6 +2257,9 @@ rows:
   growth_phases:
   - acclimated_steady_state
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: EXOPROTEOMICS
   organism_name: Ruegeria pomeroyi DSS-3
   publication_doi: 10.1111/1462-2920.14012
@@ -2259,6 +2349,9 @@ rows:
   growth_phases:
   - acclimated_steady_state
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: EXOPROTEOMICS
   organism_name: Synechococcus WH7803
   publication_doi: 10.1111/1462-2920.14012
@@ -2348,6 +2441,9 @@ rows:
   growth_phases:
   - acclimated_steady_state
   is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_type: EXOPROTEOMICS
   organism_name: Synechococcus WH7803
   publication_doi: 10.1111/1462-2920.14012

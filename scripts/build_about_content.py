@@ -31,10 +31,21 @@ extracted from Pydantic models in ``mcp_server/tools.py``.
 
 import argparse
 import asyncio
+import re
 import sys
 from pathlib import Path
+from typing import TextIO
 
 import yaml
+
+from multiomics_explorer._outfacing_lint import (
+    CARVEOUT_PATTERN,
+    LINT_PATTERN,
+    lint_about_content,
+    lint_lines,
+    lint_python_docstrings,
+    run_lint,
+)
 
 # Paths
 INPUTS_DIR = Path(__file__).resolve().parent.parent / "multiomics_explorer" / "inputs" / "tools"
@@ -509,7 +520,56 @@ def main():
     parser.add_argument("tools", nargs="*", help="Tool names to build (default: all with input files)")
     parser.add_argument("--skeleton", metavar="TOOL", help="Generate input YAML skeleton for a tool")
     parser.add_argument("--all", action="store_true", help="Build for all registered tools")
+    parser.add_argument(
+        "--lint",
+        action="store_true",
+        help=(
+            "Scan rendered md for outfacing-doc style-rule violations. "
+            "With positional tool names, scopes to those tools' md. "
+            "Exit 1 if any violation, 0 if clean."
+        ),
+    )
     args = parser.parse_args()
+
+    if args.lint:
+        if args.tools:
+            paths: list[Path] = []
+            for name in args.tools:
+                p = Path(name)
+                if p.exists():
+                    paths.append(p)
+                else:
+                    md_path = OUTPUT_DIR / f"{name}.md"
+                    if not md_path.exists():
+                        print(
+                            f"Error: '{name}' is neither a file nor a registered tool md",
+                            file=sys.stderr,
+                        )
+                        sys.exit(2)
+                    paths.append(md_path)
+        else:
+            repo_root = Path(__file__).resolve().parent.parent
+            skills_refs = (
+                repo_root
+                / "multiomics_explorer"
+                / "skills"
+                / "multiomics-kg-guide"
+                / "references"
+            )
+            paths = (
+                sorted(OUTPUT_DIR.glob("*.md"))
+                + sorted((skills_refs / "guide").glob("*.md"))
+                + sorted((skills_refs / "analysis").glob("*.md"))
+                + [repo_root / "multiomics_explorer" / "api" / "functions.py"]
+                + sorted((repo_root / "multiomics_explorer" / "analysis").glob("*.py"))
+                + sorted((repo_root / "examples").glob("*.py"))
+                + [repo_root / "examples" / "README.md"]
+            )
+            paths = [p for p in paths if p.exists()]
+            if not paths:
+                print("Error: no scannable files found", file=sys.stderr)
+                sys.exit(2)
+        sys.exit(run_lint(paths))
 
     if args.skeleton:
         schemas = get_tool_schemas()

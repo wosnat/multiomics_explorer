@@ -2,180 +2,210 @@ case_id: search_ontology_ec
 row_count: 30
 rows:
 - id: ec:1.1.1.328
+  is_informative: true
   level: 3
   name: nicotine blue oxidoreductase
   score: 2.722
   tree: null
   tree_code: null
 - id: ec:1.1.98.4
+  is_informative: true
   level: 3
   name: F420H2:quinone oxidoreductase
   score: 2.722
   tree: null
   tree_code: null
 - id: ec:1.1.99.28
+  is_informative: true
   level: 3
   name: glucose-fructose oxidoreductase
   score: 2.722
   tree: null
   tree_code: null
 - id: ec:1.12.5.1
+  is_informative: true
   level: 3
   name: hydrogen:quinone oxidoreductase
   score: 3.0869
   tree: null
   tree_code: null
 - id: ec:1.2.7.10
+  is_informative: true
   level: 3
   name: oxalate oxidoreductase
   score: 3.0869
   tree: null
   tree_code: null
 - id: ec:1.2.7.11
+  is_informative: true
   level: 3
   name: 2-oxoacid oxidoreductase (ferredoxin)
   score: 2.4343
   tree: null
   tree_code: null
 - id: ec:1.2.7.5
+  is_informative: true
   level: 3
   name: aldehyde ferredoxin oxidoreductase
   score: 2.722
   tree: null
   tree_code: null
 - id: ec:1.2.7.8
+  is_informative: true
   level: 3
   name: indolepyruvate ferredoxin oxidoreductase
   score: 2.722
   tree: null
   tree_code: null
 - id: ec:1.3.7.2
+  is_informative: true
   level: 3
   name: 15,16-dihydrobiliverdin:ferredoxin oxidoreductase
   score: 2.722
   tree: null
   tree_code: null
 - id: ec:1.3.7.3
+  is_informative: true
   level: 3
   name: phycoerythrobilin:ferredoxin oxidoreductase
   score: 3.0869
   tree: null
   tree_code: null
 - id: ec:1.3.7.4
+  is_informative: true
   level: 3
   name: phytochromobilin:ferredoxin oxidoreductase
   score: 3.0869
   tree: null
   tree_code: null
 - id: ec:1.3.7.5
+  is_informative: true
   level: 3
   name: phycocyanobilin:ferredoxin oxidoreductase
   score: 3.0869
   tree: null
   tree_code: null
 - id: ec:1.3.99.16
+  is_informative: true
   level: 3
   name: isoquinoline 1-oxidoreductase
   score: 2.722
   tree: null
   tree_code: null
 - id: ec:1.3.99.17
+  is_informative: true
   level: 3
   name: quinoline 2-oxidoreductase
   score: 2.722
   tree: null
   tree_code: null
 - id: ec:1.3.99.18
+  is_informative: true
   level: 3
   name: quinaldate 4-oxidoreductase
   score: 2.722
   tree: null
   tree_code: null
 - id: ec:1.3.99.19
+  is_informative: true
   level: 3
   name: quinoline-4-carboxylate 2-oxidoreductase
   score: 2.2016
   tree: null
   tree_code: null
 - id: ec:1.5.1.40
+  is_informative: true
   level: 3
   name: 8-hydroxy-5-deazaflavin:NADPH oxidoreductase
   score: 2.2016
   tree: null
   tree_code: null
 - id: ec:1.5.3.23
+  is_informative: true
   level: 3
   name: glyphosate oxidoreductase
   score: 3.0869
   tree: null
   tree_code: null
 - id: ec:1.5.7.2
+  is_informative: true
   level: 3
   name: coenzyme F420 oxidoreductase (ferredoxin)
   score: 2.4343
   tree: null
   tree_code: null
 - id: ec:1.8.1.18
+  is_informative: true
   level: 3
   name: NAD(P)H sulfur oxidoreductase (CoA-dependent)
   score: 1.8482
   tree: null
   tree_code: null
 - id: ec:1.8.2.6
+  is_informative: true
   level: 3
   name: S-disulfanyl-L-cysteine oxidoreductase
   score: 2.2016
   tree: null
   tree_code: null
 - id: ec:1.8.4.15
+  is_informative: true
   level: 3
   name: protein dithiol oxidoreductase (disulfide-forming)
   score: 2.2016
   tree: null
   tree_code: null
 - id: ec:1.8.5.8
+  is_informative: true
   level: 3
   name: eukaryotic sulfide quinone oxidoreductase
   score: 2.4343
   tree: null
   tree_code: null
 - id: ec:1.8.5.9
+  is_informative: true
   level: 3
   name: protein dithiol:quinone oxidoreductase DsbB
   score: 2.4343
   tree: null
   tree_code: null
 - id: ec:1.97.1.13
+  is_informative: true
   level: 3
   name: aliphatic sulfonate oxidoreductase
   score: 2.722
   tree: null
   tree_code: null
 - id: ec:7.1.1.-
+  is_informative: true
   level: 2
   name: Hydron translocation or charge separation linked to oxidoreductase reactions
   score: 1.5925
   tree: null
   tree_code: null
 - id: ec:7.1.1.10
+  is_informative: true
   level: 3
   name: ferredoxin--quinone oxidoreductase (H(+)-translocating)
   score: 2.2016
   tree: null
   tree_code: null
 - id: ec:7.1.1.11
+  is_informative: true
   level: 3
   name: ferredoxin--NAD(+) oxidoreductase (H(+)-transporting)
   score: 2.2016
   tree: null
   tree_code: null
 - id: ec:7.2.1.-
+  is_informative: true
   level: 2
   name: Linked to oxidoreductase reactions
   score: 2.4343
   tree: null
   tree_code: null
 - id: ec:7.2.1.2
+  is_informative: true
   level: 3
   name: ferredoxin--NAD(+) oxidoreductase (Na(+)-transporting)
   score: 2.2016

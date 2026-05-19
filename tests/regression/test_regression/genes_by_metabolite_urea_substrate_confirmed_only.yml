@@ -26,123 +26,163 @@ not_matched: []
 offset: 0
 reaction_count_total: 0
 results:
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: urtA
   locus_tag: PMM0970
+  mass_balance: null
   metabolite_chebi_id: '134711'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
   product: ABC-type urea transporter, substrate binding component
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: 3.A.1.4.4
   transport_confidence: substrate_confirmed
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: urtA
   locus_tag: PMM0970
+  mass_balance: null
   metabolite_chebi_id: '134711'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
   product: ABC-type urea transporter, substrate binding component
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: 3.A.1.4.5
   transport_confidence: substrate_confirmed
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: urtB
   locus_tag: PMM0971
+  mass_balance: null
   metabolite_chebi_id: '134711'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
   product: ABC-type urea transporter, permease component
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: 3.A.1.4.4
   transport_confidence: substrate_confirmed
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: urtB
   locus_tag: PMM0971
+  mass_balance: null
   metabolite_chebi_id: '134711'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
   product: ABC-type urea transporter, permease component
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: 3.A.1.4.5
   transport_confidence: substrate_confirmed
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: urtC
   locus_tag: PMM0972
+  mass_balance: null
   metabolite_chebi_id: '134711'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
   product: ABC-type urea transporter, membrane component
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: 3.A.1.4.4
   transport_confidence: substrate_confirmed
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: urtC
   locus_tag: PMM0972
+  mass_balance: null
   metabolite_chebi_id: '134711'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
   product: ABC-type urea transporter, membrane component
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: 3.A.1.4.5
   transport_confidence: substrate_confirmed
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: urtD
   locus_tag: PMM0973
+  mass_balance: null
   metabolite_chebi_id: '134711'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
   product: ABC-type urea transporter, ATP-binding component UrtD
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: 3.A.1.4.4
   transport_confidence: substrate_confirmed
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: urtD
   locus_tag: PMM0973
+  mass_balance: null
   metabolite_chebi_id: '134711'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
   product: ABC-type urea transporter, ATP-binding component UrtD
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: 3.A.1.4.5
   transport_confidence: substrate_confirmed
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: urtE
   locus_tag: PMM0974
+  mass_balance: null
   metabolite_chebi_id: '134711'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
   product: ABC-type urea transporter, ATPase component UrtE
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: 3.A.1.4.4
   transport_confidence: substrate_confirmed
-- evidence_source: transport
+- ec_numbers: null
+  evidence_source: transport
   gene_name: urtE
   locus_tag: PMM0974
+  mass_balance: null
   metabolite_chebi_id: '134711'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
   product: ABC-type urea transporter, ATPase component UrtE
+  reaction_id: null
+  reaction_name: null
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: 3.A.1.4.5
   transport_confidence: substrate_confirmed

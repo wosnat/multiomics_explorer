@@ -1387,7 +1387,8 @@ class TestGenesByOntology:
         """Mock Query A output. Each term = (id, name, level, be, n_genes, cat_freqs)."""
         return [
             {"term_id": tid, "term_name": name, "level": lvl,
-             "best_effort": be, "n_genes": n, "cat_freqs": freqs}
+             "best_effort": be, "n_genes": n, "cat_freqs": freqs,
+             "is_informative": True}
             for tid, name, lvl, be, n, freqs in terms
         ]
 
@@ -5829,6 +5830,230 @@ class TestPathwayEnrichment:
 
 
 # ---------------------------------------------------------------------------
+# A3 — pathway_enrichment.informative_only (frozen spec 2026-05-04)
+# ---------------------------------------------------------------------------
+
+
+class TestPathwayEnrichmentInformativeOnly:
+    """A3 spec § Decisions locked: default `informative_only=True`,
+    per-row `is_informative` carried through to result.results.
+
+    Each test uses mocked genes_by_ontology rows with a mix of informative
+    and uninformative terms, then checks (a) which rows survive (informative
+    side controls inclusion), (b) `result.params['informative_only']` records
+    the requested value, (c) the `is_informative` column is present on
+    result.results.
+    """
+
+    @staticmethod
+    def _stub_de_result():
+        # Field names align with `de_enrichment_inputs` consumption:
+        # log2fc / padj (or log2_fc / p_adjust), `significant` flag, `direction`
+        # ('up'|'down'). Two significant-up rows over the same exp/timepoint
+        # so cluster `exp1|T0|up` gets 2 foreground genes.
+        return {
+            "organism_name": "MED4",
+            "results": [
+                {"locus_tag": "PMM0001", "experiment_id": "exp1",
+                 "timepoint": "T0", "direction": "up",
+                 "log2fc": 2.0, "padj": 0.001, "significant": True,
+                 "name": "exp1", "omics_type": "transcriptomics",
+                 "table_scope": "rnaseq",
+                 "treatment_type": ["light_dark"],
+                 "background_factors": [], "is_time_course": False,
+                 "growth_phase": None, "timepoint_hours": 0.0,
+                 "timepoint_order": 0},
+                {"locus_tag": "PMM0002", "experiment_id": "exp1",
+                 "timepoint": "T0", "direction": "up",
+                 "log2fc": 1.5, "padj": 0.001, "significant": True,
+                 "name": "exp1", "omics_type": "transcriptomics",
+                 "table_scope": "rnaseq",
+                 "treatment_type": ["light_dark"],
+                 "background_factors": [], "is_time_course": False,
+                 "growth_phase": None, "timepoint_hours": 0.0,
+                 "timepoint_order": 0},
+            ],
+            "not_found": [], "not_matched": [], "no_expression": [],
+        }
+
+    @staticmethod
+    def _gbo_rows_mixed_informativeness():
+        """Two terms — one informative (TERM_OK), one uninformative
+        (TERM_ROOT). Each has 2 gene members in the foreground."""
+        return [
+            # Informative term (e.g. a real pathway) — kept under default True.
+            {"term_id": "CR:OK", "term_name": "Real Pathway",
+             "locus_tag": "PMM0001", "level": 1,
+             "is_informative": True},
+            {"term_id": "CR:OK", "term_name": "Real Pathway",
+             "locus_tag": "PMM0002", "level": 1,
+             "is_informative": True},
+            # Uninformative term (e.g. KEGG map00001) — excluded under default.
+            {"term_id": "CR:ROOT", "term_name": "Metabolic pathways",
+             "locus_tag": "PMM0001", "level": 0,
+             "is_informative": False},
+            {"term_id": "CR:ROOT", "term_name": "Metabolic pathways",
+             "locus_tag": "PMM0002", "level": 0,
+             "is_informative": False},
+        ]
+
+    def _gbo_factory(self, captured, *, filter_uninformative_when_true):
+        """Return a genes_by_ontology stub that mimics KG-side filtering.
+
+        When `informative_only=True` is in the call kwargs, the stub emits
+        only the informative subset of `_gbo_rows_mixed_informativeness()`,
+        matching the real KG-side semantics (filter happens server-side).
+        When False, all rows pass through.
+        """
+        rows = self._gbo_rows_mixed_informativeness()
+
+        def _gbo(**kwargs):
+            captured.update(kwargs)
+            io = kwargs.get("informative_only", False)
+            if filter_uninformative_when_true and io:
+                kept = [r for r in rows if r["is_informative"]]
+            else:
+                kept = list(rows)
+            return {
+                "ontology": "cyanorak_role", "organism_name": "MED4",
+                "results": kept,
+                "not_found": [], "wrong_ontology": [],
+                "wrong_level": [], "filtered_out": [],
+            }
+
+        return _gbo
+
+    # --- (a) default informative_only=True excludes uninformative term rows ---
+    def test_default_excludes_uninformative_term_rows(self, monkeypatch):
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+
+        captured: dict = {}
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory(captured, filter_uninformative_when_true=True),
+        )
+
+        result = pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        # Default carried into the genes_by_ontology call.
+        assert captured.get("informative_only") is True
+        # No uninformative term row in the Fisher result.
+        if not result.results.empty:
+            term_ids = set(result.results["term_id"])
+            assert "CR:ROOT" not in term_ids, (
+                "Default informative_only=True must exclude uninformative term"
+            )
+            assert "CR:OK" in term_ids
+
+    # --- (b) informative_only=False includes them -----------------------
+    def test_explicit_false_includes_uninformative_term_rows(self, monkeypatch):
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+
+        captured: dict = {}
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory(captured, filter_uninformative_when_true=True),
+        )
+
+        result = pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+            informative_only=False,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert captured.get("informative_only") is False
+        if not result.results.empty:
+            term_ids = set(result.results["term_id"])
+            assert "CR:ROOT" in term_ids, (
+                "informative_only=False must include uninformative term rows"
+            )
+            assert "CR:OK" in term_ids
+
+    # --- (c) result.params['informative_only'] recorded -----------------
+    def test_params_records_informative_only_default(self, monkeypatch):
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory({}, filter_uninformative_when_true=True),
+        )
+        result = pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert "informative_only" in result.params
+        assert result.params["informative_only"] is True
+
+    def test_params_records_informative_only_false(self, monkeypatch):
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory({}, filter_uninformative_when_true=True),
+        )
+        result = pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+            informative_only=False,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert result.params["informative_only"] is False
+
+    # --- (d) is_informative column present in result.results DataFrame ---
+    def test_is_informative_column_present_in_results(self, monkeypatch):
+        """fisher_ora auto-passes through any term2gene column other than
+        term_id/term_name/locus_tag (analysis/enrichment.py:367-374). The
+        `is_informative` column must therefore appear on result.results."""
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(),
+        )
+        # Use False so both informative and uninformative rows survive
+        # to the result.results DataFrame.
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory({}, filter_uninformative_when_true=False),
+        )
+        result = pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+            informative_only=False,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert not result.results.empty, (
+            "Fixture should yield Fisher rows (gene_set ⊆ background, M >= 1)"
+        )
+        assert "is_informative" in result.results.columns
+
+
+# ---------------------------------------------------------------------------
 # cluster_enrichment_inputs
 # ---------------------------------------------------------------------------
 class TestClusterEnrichmentInputs:
@@ -6205,6 +6430,202 @@ class TestClusterEnrichment:
         assert skips[0].cluster_name == "Cluster B"
 
 
+# ---------------------------------------------------------------------------
+# A3 — cluster_enrichment.informative_only (frozen spec 2026-05-04)
+# ---------------------------------------------------------------------------
+
+
+class TestClusterEnrichmentInformativeOnly:
+    """Parallel of TestPathwayEnrichmentInformativeOnly for cluster_enrichment.
+
+    Mode-B template-and-extend: same param, same threading pattern, same
+    `is_informative` field placement.
+    """
+
+    @staticmethod
+    def _stub_inputs():
+        from multiomics_explorer.analysis.enrichment import EnrichmentInputs
+        # Cluster A has 2 foreground genes ⊆ background of 3.
+        return EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={"Cluster A": ["PMM0001", "PMM0002"]},
+            background={"Cluster A": ["PMM0001", "PMM0002", "PMM0003"]},
+            cluster_metadata={"Cluster A": {
+                "cluster_id": "gc:1", "cluster_name": "Cluster A",
+                "member_count": 2,
+            }},
+            not_found=[], not_matched=[], no_expression=[],
+            clusters_skipped=[],
+            analysis_metadata={
+                "analysis_id": "ca:test", "analysis_name": "Test",
+                "cluster_method": "kmeans", "cluster_type": "diel_cycle",
+                "omics_type": "transcriptomics",
+                "treatment_type": ["light_dark"],
+                "background_factors": [], "growth_phases": [],
+                "experiment_ids": ["exp:1"],
+            },
+        )
+
+    @staticmethod
+    def _gbo_rows_mixed_informativeness():
+        return [
+            {"term_id": "CR:OK", "term_name": "Real Pathway",
+             "locus_tag": "PMM0001", "level": 1,
+             "is_informative": True},
+            {"term_id": "CR:OK", "term_name": "Real Pathway",
+             "locus_tag": "PMM0002", "level": 1,
+             "is_informative": True},
+            {"term_id": "CR:ROOT", "term_name": "Metabolic pathways",
+             "locus_tag": "PMM0001", "level": 0,
+             "is_informative": False},
+            {"term_id": "CR:ROOT", "term_name": "Metabolic pathways",
+             "locus_tag": "PMM0002", "level": 0,
+             "is_informative": False},
+        ]
+
+    def _gbo_factory(self, captured, *, filter_uninformative_when_true):
+        rows = self._gbo_rows_mixed_informativeness()
+
+        def _gbo(**kwargs):
+            captured.update(kwargs)
+            io = kwargs.get("informative_only", False)
+            if filter_uninformative_when_true and io:
+                kept = [r for r in rows if r["is_informative"]]
+            else:
+                kept = list(rows)
+            return {
+                "ontology": "cyanorak_role", "organism_name": "MED4",
+                "results": kept,
+                "not_found": [], "wrong_ontology": [],
+                "wrong_level": [], "filtered_out": [],
+            }
+
+        return _gbo
+
+    # --- (a) default informative_only=True excludes uninformative rows ---
+    def test_default_excludes_uninformative_term_rows(self, monkeypatch):
+        from multiomics_explorer.api import cluster_enrichment
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+
+        captured: dict = {}
+        monkeypatch.setattr(
+            enr, "cluster_enrichment_inputs",
+            lambda **_: self._stub_inputs(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory(captured, filter_uninformative_when_true=True),
+        )
+
+        result = cluster_enrichment(
+            analysis_id="ca:test", organism="MED4",
+            ontology="cyanorak_role", level=1,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert captured.get("informative_only") is True
+        if not result.results.empty:
+            term_ids = set(result.results["term_id"])
+            assert "CR:ROOT" not in term_ids
+            assert "CR:OK" in term_ids
+
+    # --- (b) informative_only=False includes them -----------------------
+    def test_explicit_false_includes_uninformative_term_rows(self, monkeypatch):
+        from multiomics_explorer.api import cluster_enrichment
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+
+        captured: dict = {}
+        monkeypatch.setattr(
+            enr, "cluster_enrichment_inputs",
+            lambda **_: self._stub_inputs(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory(captured, filter_uninformative_when_true=True),
+        )
+
+        result = cluster_enrichment(
+            analysis_id="ca:test", organism="MED4",
+            ontology="cyanorak_role", level=1,
+            informative_only=False,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert captured.get("informative_only") is False
+        if not result.results.empty:
+            term_ids = set(result.results["term_id"])
+            assert "CR:ROOT" in term_ids
+            assert "CR:OK" in term_ids
+
+    # --- (c) result.params['informative_only'] recorded -----------------
+    def test_params_records_informative_only_default(self, monkeypatch):
+        from multiomics_explorer.api import cluster_enrichment
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+
+        monkeypatch.setattr(
+            enr, "cluster_enrichment_inputs",
+            lambda **_: self._stub_inputs(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory({}, filter_uninformative_when_true=True),
+        )
+        result = cluster_enrichment(
+            analysis_id="ca:test", organism="MED4",
+            ontology="cyanorak_role", level=1,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert "informative_only" in result.params
+        assert result.params["informative_only"] is True
+
+    def test_params_records_informative_only_false(self, monkeypatch):
+        from multiomics_explorer.api import cluster_enrichment
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+
+        monkeypatch.setattr(
+            enr, "cluster_enrichment_inputs",
+            lambda **_: self._stub_inputs(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory({}, filter_uninformative_when_true=True),
+        )
+        result = cluster_enrichment(
+            analysis_id="ca:test", organism="MED4",
+            ontology="cyanorak_role", level=1,
+            informative_only=False,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert result.params["informative_only"] is False
+
+    # --- (d) is_informative column present in result.results DataFrame ---
+    def test_is_informative_column_present_in_results(self, monkeypatch):
+        from multiomics_explorer.api import cluster_enrichment
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+
+        monkeypatch.setattr(
+            enr, "cluster_enrichment_inputs",
+            lambda **_: self._stub_inputs(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            self._gbo_factory({}, filter_uninformative_when_true=False),
+        )
+        result = cluster_enrichment(
+            analysis_id="ca:test", organism="MED4",
+            ontology="cyanorak_role", level=1,
+            informative_only=False,
+            min_gene_set_size=1, pvalue_cutoff=0.99,
+        )
+        assert not result.results.empty, (
+            "Fixture should yield Fisher rows (gene_set ⊆ background, M >= 1)"
+        )
+        assert "is_informative" in result.results.columns
+
+
 class TestListDerivedMetrics:
     """Tests for api.list_derived_metrics."""
 
@@ -6352,10 +6773,10 @@ class TestListMetabolites:
         "top_organisms": [
             {"organism_name": "Prochlorococcus MED4", "count": 1},
         ],
-        "top_pathways": [
+        "top_metabolite_pathways": [
             {
-                "pathway_id": "kegg.pathway:ko01100",
-                "pathway_name": "Metabolic pathways",
+                "metabolite_pathway_id": "kegg.pathway:ko01100",
+                "metabolite_pathway_name": "Metabolic pathways",
                 "count": 1,
             },
         ],
@@ -6398,7 +6819,8 @@ class TestListMetabolites:
         assert out["total_entries"] == 3025
         assert out["total_matching"] == 1
         assert "top_organisms" in out
-        assert "top_pathways" in out
+        # Phase 2 Item 2 rename: top_pathways → top_metabolite_pathways
+        assert "top_metabolite_pathways" in out
         assert "by_evidence_source" in out
         assert "xref_coverage" in out
         assert "mass_stats" in out
@@ -6426,7 +6848,7 @@ class TestListMetabolites:
             [self._SUMMARY_ROW],
             [self._DETAIL_ROW],
         ]
-        out = list_metabolites(search="glucose*", conn=conn)
+        out = list_metabolites(search_text="glucose*", conn=conn)
         assert out["total_matching"] == 1
         assert conn.execute_query.call_count == 3
 
@@ -6439,9 +6861,9 @@ class TestListMetabolites:
     def test_search_empty_validation(self):
         from multiomics_explorer.api.functions import list_metabolites
         with pytest.raises(ValueError):
-            list_metabolites(search="")
+            list_metabolites(search_text="")
         with pytest.raises(ValueError):
-            list_metabolites(search="   ")
+            list_metabolites(search_text="   ")
 
     def test_organism_names_lowercased(self):
         """organism_names is lowercased before being passed as
@@ -6894,7 +7316,12 @@ class TestGenesByMetabolite:
         """Warning fires when:
         - transport rows present in result AND
         - transport_family_inferred_rows > transport_substrate_confirmed_rows AND
-        - user did NOT set transport_confidence."""
+        - user did NOT set transport_confidence.
+
+        Phase 3 Item 6.3: warning text rewritten to question-shape-aware
+        framing (drops "high-precision" prescription). GBM and MBG now
+        emit byte-identical text (modulo count variables).
+        """
         gbm = self._api()
         conn = self._mock_conn(
             [self._SUMMARY_ROW_FI_DOMINATES],
@@ -6905,9 +7332,40 @@ class TestGenesByMetabolite:
             [{"found": ["kegg.compound:C00088"]}],
         )
         out = gbm(["kegg.compound:C00088"], self._ORG, conn=conn)
-        assert any(
-            "family_inferred" in w for w in out["warnings"]
-        ), f"expected family-inferred warning, got {out['warnings']!r}"
+        warnings = [
+            w for w in out["warnings"] if "family_inferred" in w
+        ]
+        assert warnings, (
+            f"expected family-inferred warning, got {out['warnings']!r}"
+        )
+        warning = warnings[0]
+
+        # Assert the new symmetric warning format (Item 6.3)
+        assert "Most transport rows are `family_inferred`" in warning
+        assert (
+            "annotations rolled up from family-level transport potential"
+            in warning
+        )
+        assert "Workflow-dependent" in warning
+        assert (
+            "Both tiers are annotations, neither is ground truth" in warning
+        )
+        assert "analysis-doc §g" in warning
+
+        # Assert the inline counts ARE present (X of Y format)
+        import re
+        m = re.search(r"\((\d+) of (\d+)\)", warning)
+        assert m, (
+            f"warning must include `(X of Y)` count format; got: {warning}"
+        )
+        fi_count, total = int(m.group(1)), int(m.group(2))
+        assert fi_count > total - fi_count, (
+            "fi_count must dominate (test setup)"
+        )
+
+        # Assert old "high-precision" prescription is GONE
+        assert "high-precision" not in warning
+        assert "substrate-curated transporter genes only" not in warning
 
     def test_no_warning_when_substrate_confirmed_majority(self):
         """sc >= fi → no auto-warning even with default both-arm mode."""
@@ -7464,6 +7922,61 @@ class TestGenesByMetabolite:
         out2 = gbm(self._METS, self._ORG, limit=10, offset=20, conn=conn2)
         assert out2["truncated"] is False
 
+    # ---- Phase 3 Item 6.1 — None-padding for cross-arm fields ----
+
+    def test_cross_arm_fields_none_padded(self):
+        """After Item 6.1 None-padding: every result row carries all 7
+        cross-arm keys; arm-specific fields are explicitly None on rows
+        from the other arm.
+
+        Cross-arm fields:
+        - transport-only (None on metabolism rows): transport_confidence,
+          tcdb_family_id, tcdb_family_name
+        - metabolism-only (None on transport rows): reaction_id,
+          reaction_name, ec_numbers, mass_balance
+        """
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, conn=conn)
+
+        metabolism_rows = [
+            r for r in out["results"] if r["evidence_source"] == "metabolism"
+        ]
+        transport_rows = [
+            r for r in out["results"] if r["evidence_source"] == "transport"
+        ]
+        assert metabolism_rows, (
+            "fixture must include at least one metabolism row"
+        )
+        assert transport_rows, (
+            "fixture must include at least one transport row"
+        )
+
+        # Metabolism rows: transport-arm cross-arm keys present, value None
+        for row in metabolism_rows:
+            assert "transport_confidence" in row
+            assert row["transport_confidence"] is None
+            assert "tcdb_family_id" in row
+            assert row["tcdb_family_id"] is None
+            assert "tcdb_family_name" in row
+            assert row["tcdb_family_name"] is None
+
+        # Transport rows: metabolism-arm cross-arm keys present, value None
+        for row in transport_rows:
+            assert "reaction_id" in row
+            assert row["reaction_id"] is None
+            assert "reaction_name" in row
+            assert row["reaction_name"] is None
+            assert "ec_numbers" in row
+            assert row["ec_numbers"] is None
+            assert "mass_balance" in row
+            assert row["mass_balance"] is None
+
 
 # ---------------------------------------------------------------------------
 # metabolites_by_gene (MBG) — Tool 3 of chemistry slice 1
@@ -7551,7 +8064,8 @@ class TestMetabolitesByGene:
         "top_reactions": [],
         "top_tcdb_families": [],
         "top_gene_categories": [],
-        "top_pathways": [],
+        # Phase 2 Item 2 rename: top_pathways → top_metabolite_pathways
+        "top_metabolite_pathways": [],
         "by_element": [],
     }
 
@@ -7684,7 +8198,8 @@ class TestMetabolitesByGene:
         assert "top_reactions" in out
         assert "top_tcdb_families" in out
         assert "top_gene_categories" in out
-        assert "top_pathways" in out    # NEW vs GBM
+        # Phase 2 Item 2 rename: top_pathways → top_metabolite_pathways
+        assert "top_metabolite_pathways" in out
         assert "not_found" in out
         assert "not_matched" in out
         assert "warnings" in out
@@ -7820,7 +8335,12 @@ class TestMetabolitesByGene:
         """Spec § family_inferred-dominance auto-warning. Fires when
         - transport rows present in result AND
         - transport_family_inferred_rows > transport_substrate_confirmed_rows AND
-        - user did NOT set transport_confidence."""
+        - user did NOT set transport_confidence.
+
+        Phase 3 Item 6.3: warning text rewritten to question-shape-aware
+        framing (drops "high-precision" prescription). GBM and MBG now
+        emit byte-identical text (modulo count variables).
+        """
         mbg = self._api()
         conn = self._mock_conn(
             [self._SUMMARY_ROW_FI_DOMINATES],
@@ -7829,9 +8349,40 @@ class TestMetabolitesByGene:
             [{"found": ["PMM0913"]}],
         )
         out = mbg(["PMM0913"], self._ORG, conn=conn)
-        assert any(
-            "family_inferred" in w for w in out["warnings"]
-        ), f"expected family-inferred warning, got {out['warnings']!r}"
+        warnings = [
+            w for w in out["warnings"] if "family_inferred" in w
+        ]
+        assert warnings, (
+            f"expected family-inferred warning, got {out['warnings']!r}"
+        )
+        warning = warnings[0]
+
+        # Assert the new symmetric warning format (Item 6.3)
+        assert "Most transport rows are `family_inferred`" in warning
+        assert (
+            "annotations rolled up from family-level transport potential"
+            in warning
+        )
+        assert "Workflow-dependent" in warning
+        assert (
+            "Both tiers are annotations, neither is ground truth" in warning
+        )
+        assert "analysis-doc §g" in warning
+
+        # Assert the inline counts ARE present (X of Y format)
+        import re
+        m = re.search(r"\((\d+) of (\d+)\)", warning)
+        assert m, (
+            f"warning must include `(X of Y)` count format; got: {warning}"
+        )
+        fi_count, total = int(m.group(1)), int(m.group(2))
+        assert fi_count > total - fi_count, (
+            "fi_count must dominate (test setup)"
+        )
+
+        # Assert old "high-precision" prescription is GONE
+        assert "high-precision" not in warning
+        assert "substrate-curated transporter genes only" not in warning
 
     def test_no_warning_when_substrate_confirmed_majority(self):
         """sc >= fi → no auto-warning."""
@@ -8135,33 +8686,35 @@ class TestMetabolitesByGene:
         assert elements == {"H", "O", "C", "N"}
 
     def test_envelope_carries_top_pathways_rollup(self):
-        """top_pathways envelope rollup with Mbg-shaped fields
-        (pathway_id, pathway_name, gene_count, pathway_reaction_count,
-        pathway_metabolite_count). Per S1 fix, top_pathways is sourced from
-        a dedicated post-existence-probe 3-branch UNION query (spec § 5),
-        not from the summary builder. Mock the dedicated call separately."""
+        """top_metabolite_pathways envelope rollup with Mbg-shaped fields
+        (metabolite_pathway_id, metabolite_pathway_name, gene_count,
+        pathway_reaction_count, pathway_metabolite_count). Phase 2 Item 2:
+        top_metabolite_pathways is now sourced directly from the summary
+        builder (no dedicated post-existence-probe UNION query)."""
         mbg = self._api()
-        top_pathways_response = [
-            {
-                "pathway_id": "kegg.pathway:ko00910",
-                "pathway_name": "Nitrogen metabolism",
-                "gene_count": 3,
-                "pathway_reaction_count": 23,
-                "pathway_metabolite_count": 35,
-            },
-        ]
+        summary_with_pathways = {
+            **self._SUMMARY_ROW_BOTH_ARMS,
+            "top_metabolite_pathways": [
+                {
+                    "metabolite_pathway_id": "kegg.pathway:ko00910",
+                    "metabolite_pathway_name": "Nitrogen metabolism",
+                    "gene_count": 3,
+                    "pathway_reaction_count": 23,
+                    "pathway_metabolite_count": 35,
+                },
+            ],
+        }
         conn = self._mock_conn(
-            [self._SUMMARY_ROW_BOTH_ARMS],
+            [summary_with_pathways],
             [self._METAB_ROW],
             [self._TRANS_ROW_SC],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
-            top_pathways_response,
         )
         out = mbg(self._LOCUS, self._ORG, conn=conn)
-        assert len(out["top_pathways"]) == 1
-        p = out["top_pathways"][0]
-        assert p["pathway_id"] == "kegg.pathway:ko00910"
-        assert p["pathway_name"] == "Nitrogen metabolism"
+        assert len(out["top_metabolite_pathways"]) == 1
+        p = out["top_metabolite_pathways"][0]
+        assert p["metabolite_pathway_id"] == "kegg.pathway:ko00910"
+        assert p["metabolite_pathway_name"] == "Nitrogen metabolism"
         assert p["gene_count"] == 3
         assert p["pathway_reaction_count"] == 23
         assert p["pathway_metabolite_count"] == 35
@@ -8204,7 +8757,7 @@ class TestMetabolitesByGene:
             "rows_by_transport_confidence": [],
             "by_gene": [],
             "by_element": [],
-            "top_pathways": [],
+            "top_metabolite_pathways": [],
             "top_metabolites": [],
             "top_reactions": [],
             "top_tcdb_families": [],
@@ -8223,3 +8776,1792 @@ class TestMetabolitesByGene:
         assert out["warnings"] == []
         assert set(out["not_matched"]) == {"PMM0005", "PMM0006", "PMM0007"}
         assert out["not_found"]["locus_tags"] == []
+
+    # ---- Phase 3 Item 6.1 — None-padding for cross-arm fields ----
+
+    def test_cross_arm_fields_none_padded(self):
+        """After Item 6.1 None-padding: every result row carries all 7
+        cross-arm keys; arm-specific fields are explicitly None on rows
+        from the other arm. Mirrors the GBM test — the row class
+        `GeneReactionMetaboliteTriplet` is shared between the two tools.
+        """
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(self._LOCUS, self._ORG, conn=conn)
+
+        metabolism_rows = [
+            r for r in out["results"] if r["evidence_source"] == "metabolism"
+        ]
+        transport_rows = [
+            r for r in out["results"] if r["evidence_source"] == "transport"
+        ]
+        assert metabolism_rows, (
+            "fixture must include at least one metabolism row"
+        )
+        assert transport_rows, (
+            "fixture must include at least one transport row"
+        )
+
+        # Metabolism rows: transport-arm cross-arm keys present, value None
+        for row in metabolism_rows:
+            assert "transport_confidence" in row
+            assert row["transport_confidence"] is None
+            assert "tcdb_family_id" in row
+            assert row["tcdb_family_id"] is None
+            assert "tcdb_family_name" in row
+            assert row["tcdb_family_name"] is None
+
+        # Transport rows: metabolism-arm cross-arm keys present, value None
+        for row in transport_rows:
+            assert "reaction_id" in row
+            assert row["reaction_id"] is None
+            assert "reaction_name" in row
+            assert row["reaction_name"] is None
+            assert "ec_numbers" in row
+            assert row["ec_numbers"] is None
+            assert "mass_balance" in row
+            assert row["mass_balance"] is None
+
+
+# ===========================================================================
+# Cluster A — F1 informativeness surface (frozen spec 2026-05-04)
+# ===========================================================================
+# API-layer pass-through: the new fields appear in results, the new
+# `informative_only` param reaches the underlying builder.
+
+
+class TestGeneOverviewF1Surface:
+    """gene_overview adds annotation_state + informative_annotation_types
+    to results and `by_annotation_state` to the envelope."""
+
+    def _summary_with_annotation_state(self):
+        return [{
+            "total_matching": 1,
+            "by_organism": [{"item": "Prochlorococcus MED4", "count": 1}],
+            "by_category": [{"item": "DNA replication", "count": 1}],
+            "by_annotation_type": [{"item": "go_mf", "count": 1}],
+            "by_annotation_state": [
+                {"item": "informative_multi", "count": 1},
+            ],
+            "has_expression": 1,
+            "has_significant_expression": 1,
+            "has_orthologs": 1,
+            "has_clusters": 0,
+            "has_derived_metrics": 0,
+            "not_found": [],
+        }]
+
+    def _detail_with_state(self):
+        return [{
+            "locus_tag": "PMM1428", "gene_name": "test",
+            "product": "DNA polymerase III subunit beta",
+            "gene_category": "DNA replication",
+            "annotation_quality": 3,
+            "organism_name": "Prochlorococcus MED4",
+            "annotation_types": ["go_mf", "pfam"],
+            "expression_edge_count": 0,
+            "significant_up_count": 0, "significant_down_count": 0,
+            "closest_ortholog_group_size": 9,
+            "closest_ortholog_genera": ["Prochlorococcus"],
+            "cluster_membership_count": 0, "cluster_types": [],
+            "numeric_metric_count": 0,
+            "boolean_metric_count": 0,
+            "categorical_metric_count": 0,
+            # New fields:
+            "annotation_state": "informative_multi",
+            "informative_annotation_types": ["go_mf", "pfam"],
+        }]
+
+    def test_envelope_contains_by_annotation_state(self, mock_conn):
+        """Spec § envelope: by_annotation_state added (rollup over results)."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_annotation_state(),
+            self._detail_with_state(),
+        ]
+        result = api.gene_overview(["PMM1428"], conn=mock_conn)
+        assert "by_annotation_state" in result
+        # _rename_freq path: APOC {item,count} → {annotation_state,count}.
+        assert isinstance(result["by_annotation_state"], list)
+        assert len(result["by_annotation_state"]) == 1
+        first = result["by_annotation_state"][0]
+        assert first["count"] == 1
+        # The renamed key holds the state value.
+        assert first.get("annotation_state") == "informative_multi"
+
+    def test_results_pass_through_annotation_state(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_annotation_state(),
+            self._detail_with_state(),
+        ]
+        result = api.gene_overview(["PMM1428"], conn=mock_conn)
+        row = result["results"][0]
+        assert row["annotation_state"] == "informative_multi"
+        assert row["informative_annotation_types"] == ["go_mf", "pfam"]
+
+
+class TestGeneOntologyTermsF1Surface:
+    """gene_ontology_terms threads `informative_only` to builders + returns
+    is_informative on rows."""
+
+    def _exist_found(self, *locus_tags):
+        return [{"lt": lt, "found": True} for lt in locus_tags]
+
+    def _summary_row(self):
+        return [{
+            "gene_count": 1, "term_count": 1,
+            "by_term": [{"term_id": "go:0006260", "term_name": "DNA replication",
+                         "level": 5, "count": 1}],
+            "gene_term_counts": [{"locus_tag": "PMM0001", "term_count": 1}],
+        }]
+
+    def _detail_rows(self):
+        return [{"locus_tag": "PMM0001", "term_id": "go:0006260",
+                 "term_name": "DNA replication", "level": 5,
+                 "is_informative": True}]
+
+    @patch("multiomics_explorer.api.functions._validate_organism_inputs",
+           return_value="Prochlorococcus MED4")
+    def test_informative_only_reaches_summary_builder(self, _val, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._exist_found("PMM0001"),
+            self._summary_row(),
+            self._detail_rows(),
+        ]
+        api.gene_ontology_terms(
+            ["PMM0001"], organism="MED4", ontology="go_bp",
+            informative_only=True, conn=mock_conn,
+        )
+        # Summary call (the 2nd execute_query call) should carry the
+        # builder's informative_only=True propagation. We assert by
+        # cypher contents — the builder emits the WHERE filter when True.
+        summary_cypher = mock_conn.execute_query.call_args_list[1].args[0]
+        assert "AND coalesce(t.is_uninformative, '') <> 'true'" in summary_cypher
+
+    @patch("multiomics_explorer.api.functions._validate_organism_inputs",
+           return_value="Prochlorococcus MED4")
+    def test_informative_only_reaches_detail_builder(self, _val, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._exist_found("PMM0001"),
+            self._summary_row(),
+            self._detail_rows(),
+        ]
+        api.gene_ontology_terms(
+            ["PMM0001"], organism="MED4", ontology="go_bp",
+            informative_only=True, conn=mock_conn,
+        )
+        # Detail call (3rd) — informative_only=True forces WHERE filter.
+        detail_cypher = mock_conn.execute_query.call_args_list[2].args[0]
+        assert "AND coalesce(t.is_uninformative, '') <> 'true'" in detail_cypher
+
+    @patch("multiomics_explorer.api.functions._validate_organism_inputs",
+           return_value="Prochlorococcus MED4")
+    def test_default_informative_only_is_false(self, _val, mock_conn):
+        """No filter when default param is left untouched."""
+        mock_conn.execute_query.side_effect = [
+            self._exist_found("PMM0001"),
+            self._summary_row(),
+            self._detail_rows(),
+        ]
+        api.gene_ontology_terms(
+            ["PMM0001"], organism="MED4", ontology="go_bp", conn=mock_conn,
+        )
+        for call in mock_conn.execute_query.call_args_list[1:]:
+            cypher = call.args[0]
+            assert "AND coalesce(t.is_uninformative, '') <> 'true'" not in cypher
+
+    @patch("multiomics_explorer.api.functions._validate_organism_inputs",
+           return_value="Prochlorococcus MED4")
+    def test_is_informative_flows_through_to_results(self, _val, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._exist_found("PMM0001"),
+            self._summary_row(),
+            self._detail_rows(),
+        ]
+        result = api.gene_ontology_terms(
+            ["PMM0001"], organism="MED4", ontology="go_bp", conn=mock_conn,
+        )
+        assert result["results"][0]["is_informative"] is True
+
+
+class TestGenesByOntologyF1Surface:
+    """genes_by_ontology threads informative_only to detail/per_term/per_gene."""
+
+    def _org_resolve(self):
+        return [{"organisms": ["Prochlorococcus MED4"]}]
+
+    def _per_term_rows(self):
+        return [{
+            "term_id": "go:0050896", "term_name": "response to stimulus",
+            "level": 1, "best_effort": False, "n_genes": 7,
+            "cat_freqs": [{"item": "Stress", "count": 7}],
+            "is_informative": True,
+        }]
+
+    def _per_gene_rows(self):
+        return [{"locus_tag": "PMM0001", "gene_category": "Stress",
+                 "n_terms": 1, "levels_hit": [1]}]
+
+    def _detail_rows(self):
+        return [{"locus_tag": "PMM0001", "gene_name": None,
+                 "product": None, "gene_category": "Stress",
+                 "term_id": "go:0050896",
+                 "term_name": "response to stimulus", "level": 1,
+                 "is_informative": True}]
+
+    def test_informative_only_threads_to_per_term_per_gene_detail(self, mock_conn):
+        """Default param routes through helper into all three builders'
+        match-stage. Per spec: detail/per_term/per_gene inherit via helper."""
+        mock_conn.execute_query.side_effect = [
+            self._org_resolve(),
+            self._per_term_rows(),
+            self._per_gene_rows(),
+            self._detail_rows(),
+        ]
+        api.genes_by_ontology(
+            ontology="go_bp", organism="Prochlorococcus MED4",
+            level=1, informative_only=True, conn=mock_conn,
+        )
+        # Calls 2,3,4 are per_term, per_gene, detail. Each must have the filter.
+        for call in mock_conn.execute_query.call_args_list[1:]:
+            cypher = call.args[0]
+            assert "coalesce(t.is_uninformative, '') <> 'true'" in cypher, (
+                f"informative_only=True did not reach builder:\n{cypher}"
+            )
+
+    def test_default_informative_only_no_filter(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._org_resolve(),
+            self._per_term_rows(),
+            self._per_gene_rows(),
+            self._detail_rows(),
+        ]
+        api.genes_by_ontology(
+            ontology="go_bp", organism="Prochlorococcus MED4",
+            level=1, conn=mock_conn,
+        )
+        # Detail (last call) should still have RETURN-side coalesce only,
+        # not the WHERE-side filter, because default informative_only=False.
+        # Distinguish WHERE-side `AND coalesce(...)` from RETURN-side
+        # `coalesce(...) AS is_informative` since per_term/detail builders
+        # always emit the RETURN-side form unconditionally.
+        for call in mock_conn.execute_query.call_args_list[1:]:
+            cypher = call.args[0]
+            assert "AND coalesce(t.is_uninformative, '') <> 'true'" not in cypher
+
+    def test_results_carry_is_informative(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._org_resolve(),
+            self._per_term_rows(),
+            self._per_gene_rows(),
+            self._detail_rows(),
+        ]
+        result = api.genes_by_ontology(
+            ontology="go_bp", organism="Prochlorococcus MED4",
+            level=1, conn=mock_conn,
+        )
+        assert result["results"][0]["is_informative"] is True
+
+
+class TestSearchOntologyF1Surface:
+    """search_ontology threads informative_only + returns is_informative."""
+
+    def _summary_result(self):
+        return [{
+            "total_entries": 847, "total_matching": 1,
+            "score_max": 5.0, "score_median": 5.0,
+        }]
+
+    def _detail_rows(self):
+        return [{"id": "go:0006260", "name": "DNA replication", "score": 5.0,
+                 "level": 5, "is_informative": True}]
+
+    def test_informative_only_reaches_builder(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        api.search_ontology(
+            "DNA replication", "go_bp",
+            informative_only=True, conn=mock_conn,
+        )
+        # Summary + detail Cypher both should carry the where-side filter.
+        for call in mock_conn.execute_query.call_args_list:
+            cypher = call.args[0]
+            assert "coalesce(t.is_uninformative, '') <> 'true'" in cypher
+
+    def test_default_informative_only_no_where_filter(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        api.search_ontology(
+            "DNA replication", "go_bp", conn=mock_conn,
+        )
+        # Summary builder doesn't have a RETURN-side coalesce either, so
+        # any appearance in the summary cypher would be the where-side filter.
+        sum_cypher = mock_conn.execute_query.call_args_list[0].args[0]
+        assert "coalesce(t.is_uninformative, '') <> 'true'" not in sum_cypher
+
+    def test_is_informative_flows_through(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        result = api.search_ontology(
+            "DNA replication", "go_bp", conn=mock_conn,
+        )
+        assert result["results"][0]["is_informative"] is True
+
+
+class TestOntologyLandscapeF1Surface:
+    """ontology_landscape threads informative_only (default-on)."""
+
+    def _conn(self, gene_count, per_ont_rows):
+        conn = MagicMock()
+
+        def run(cypher, **params):
+            if "RETURN collect(DISTINCT e.organism_name)" in cypher:
+                return [{"organisms": ["Prochlorococcus MED4"]}]
+            if "count(g) AS total_genes" in cypher:
+                return [{"total_genes": gene_count}]
+            from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+            for ont, rows in per_ont_rows.items():
+                cfg = ONTOLOGY_CONFIG[ont]
+                if cfg["gene_rel"] in cypher and f":{cfg['label']}" in cypher:
+                    return rows
+            raise AssertionError(f"no mock for cypher:\n{cypher[:200]}")
+
+        conn.execute_query.side_effect = run
+        return conn
+
+    def test_default_filters_uninformative(self):
+        """Default param: filter present in landscape Cypher (not opt-out)."""
+        per_ont_rows = {"cyanorak_role": []}
+        conn = self._conn(gene_count=1976, per_ont_rows=per_ont_rows)
+        api.ontology_landscape(
+            organism="Prochlorococcus MED4", ontology="cyanorak_role", conn=conn,
+        )
+        # Find the landscape-builder call.
+        cyphers = [c.args[0] for c in conn.execute_query.call_args_list]
+        landscape_cyphers = [c for c in cyphers if "n_terms_with_genes" in c]
+        assert landscape_cyphers, "expected at least one landscape cypher"
+        for c in landscape_cyphers:
+            assert "coalesce(t.is_uninformative, '') <> 'true'" in c, (
+                "default informative_only=True should emit WHERE filter"
+            )
+
+    def test_opt_out_omits_filter(self):
+        per_ont_rows = {"cyanorak_role": []}
+        conn = self._conn(gene_count=1976, per_ont_rows=per_ont_rows)
+        api.ontology_landscape(
+            organism="Prochlorococcus MED4", ontology="cyanorak_role",
+            informative_only=False, conn=conn,
+        )
+        cyphers = [c.args[0] for c in conn.execute_query.call_args_list]
+        landscape_cyphers = [c for c in cyphers if "n_terms_with_genes" in c]
+        for c in landscape_cyphers:
+            assert "coalesce(t.is_uninformative, '') <> 'true'" not in c
+
+
+# ===========================================================================
+# Phase 1 — P0 pass-through plumbing (metabolites surface refresh)
+# Spec: docs/tool-specs/2026-05-05-phase1-pass-through-plumbing.md
+# 6 tools, all additive. Verification cases per spec §6.1 (gene_overview).
+# ===========================================================================
+
+
+class TestGeneOverviewPhase1Plumbing:
+    """gene_overview adds reaction_count + metabolite_count + transporter_count
+    + evidence_sources per row, plus has_chemistry envelope. Verification cases
+    per spec §6.1 (PMM1428 / PMM0001 / PMM0392 / PMM0628 / PMM0263)."""
+
+    def _summary_with_chemistry(self, total=1, has_chemistry=0, not_found=None):
+        return [{
+            "total_matching": total,
+            "by_organism": [{"item": "Prochlorococcus MED4", "count": total}],
+            "by_category": [],
+            "by_annotation_type": [],
+            "has_expression": 0,
+            "has_significant_expression": 0,
+            "has_orthologs": 0,
+            "has_clusters": 0,
+            "has_derived_metrics": 0,
+            "has_chemistry": has_chemistry,
+            "not_found": not_found or [],
+        }]
+
+    def _detail_row(self, locus_tag, **chem_overrides):
+        """Default row carries no chemistry; overrides for verification cases."""
+        row = {
+            "locus_tag": locus_tag, "gene_name": None,
+            "product": "test", "gene_category": "Unknown",
+            "annotation_quality": 0,
+            "organism_name": "Prochlorococcus MED4",
+            "annotation_types": [],
+            "expression_edge_count": 0,
+            "significant_up_count": 0, "significant_down_count": 0,
+            "closest_ortholog_group_size": 0,
+            "closest_ortholog_genera": [],
+            "cluster_membership_count": 0, "cluster_types": [],
+            "numeric_metric_count": 0,
+            "boolean_metric_count": 0,
+            "categorical_metric_count": 0,
+            "reaction_count": 0,
+            "metabolite_count": 0,
+            "transporter_count": 0,
+            "evidence_sources": [],
+        }
+        row.update(chem_overrides)
+        return row
+
+    def test_pmm1428_no_chemistry_zeros_and_empty(self, mock_conn):
+        """PMM1428 (EVE domain) — all zeros / empty list per spec §6.1."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_chemistry(total=1, has_chemistry=0),
+            [self._detail_row("PMM1428")],
+        ]
+        result = api.gene_overview(["PMM1428"], conn=mock_conn)
+        row = result["results"][0]
+        assert row["reaction_count"] == 0
+        assert row["metabolite_count"] == 0
+        assert row["transporter_count"] == 0
+        assert row["evidence_sources"] == []
+
+    def test_pmm0001_metabolism_only(self, mock_conn):
+        """PMM0001: 4 reactions, 6 metabolites, 0 transporters, ['metabolism']."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_chemistry(total=1, has_chemistry=1),
+            [self._detail_row(
+                "PMM0001",
+                reaction_count=4, metabolite_count=6, transporter_count=0,
+                evidence_sources=["metabolism"],
+            )],
+        ]
+        result = api.gene_overview(["PMM0001"], conn=mock_conn)
+        row = result["results"][0]
+        assert row["reaction_count"] == 4
+        assert row["metabolite_count"] == 6
+        assert row["transporter_count"] == 0
+        assert row["evidence_sources"] == ["metabolism"]
+
+    def test_pmm0392_transport_and_metabolomics(self, mock_conn):
+        """PMM0392: 0 reactions, 554 metabolites (TCDB-reachable),
+        8 transporters, ['transport', 'metabolomics'].
+        Critical reproducer: reaction_count=0 must NOT promote 'metabolism'."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_chemistry(total=1, has_chemistry=1),
+            [self._detail_row(
+                "PMM0392",
+                reaction_count=0, metabolite_count=554, transporter_count=8,
+                evidence_sources=["transport", "metabolomics"],
+            )],
+        ]
+        result = api.gene_overview(["PMM0392"], conn=mock_conn)
+        row = result["results"][0]
+        assert row["reaction_count"] == 0
+        assert row["metabolite_count"] == 554
+        assert row["transporter_count"] == 8
+        assert row["evidence_sources"] == ["transport", "metabolomics"]
+        assert "metabolism" not in row["evidence_sources"]
+
+    def test_pmm0628_transport_with_measurement(self, mock_conn):
+        """PMM0628: 0 / 5 / 1 / ['transport', 'metabolomics']."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_chemistry(total=1, has_chemistry=1),
+            [self._detail_row(
+                "PMM0628",
+                reaction_count=0, metabolite_count=5, transporter_count=1,
+                evidence_sources=["transport", "metabolomics"],
+            )],
+        ]
+        result = api.gene_overview(["PMM0628"], conn=mock_conn)
+        row = result["results"][0]
+        assert row["transporter_count"] == 1
+        assert row["evidence_sources"] == ["transport", "metabolomics"]
+
+    def test_pmm0263_transport_only_no_measured(self, mock_conn):
+        """PMM0263: 0 / 7 / 1 / ['transport'] — single reachable metabolite
+        not in 107 measured, so 'metabolomics' correctly drops out."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_chemistry(total=1, has_chemistry=1),
+            [self._detail_row(
+                "PMM0263",
+                reaction_count=0, metabolite_count=7, transporter_count=1,
+                evidence_sources=["transport"],
+            )],
+        ]
+        result = api.gene_overview(["PMM0263"], conn=mock_conn)
+        row = result["results"][0]
+        assert row["evidence_sources"] == ["transport"]
+        assert "metabolomics" not in row["evidence_sources"]
+
+    def test_envelope_has_chemistry_present(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_chemistry(total=1, has_chemistry=1),
+            [self._detail_row(
+                "PMM0001", reaction_count=4, evidence_sources=["metabolism"],
+            )],
+        ]
+        result = api.gene_overview(["PMM0001"], conn=mock_conn)
+        assert "has_chemistry" in result
+        assert result["has_chemistry"] == 1
+
+    def test_envelope_has_chemistry_zero(self, mock_conn):
+        """Empty evidence_sources => has_chemistry stays at 0."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_chemistry(total=1, has_chemistry=0),
+            [self._detail_row("PMM1428")],
+        ]
+        result = api.gene_overview(["PMM1428"], conn=mock_conn)
+        assert result["has_chemistry"] == 0
+
+    def test_evidence_sources_defaults_empty_when_absent(self, mock_conn):
+        """Per spec — when chemistry edges are absent, evidence_sources is
+        a list (possibly empty), never null on the response row."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_with_chemistry(total=1, has_chemistry=0),
+            [self._detail_row("PMM1428")],  # default factory sets [] above
+        ]
+        result = api.gene_overview(["PMM1428"], conn=mock_conn)
+        row = result["results"][0]
+        assert row["evidence_sources"] == []
+
+
+class TestListPublicationsPhase1Plumbing:
+    """list_publications adds 3 metabolite measurement pass-through fields
+    per row (spec §6.2). Pure pass-through — no envelope change."""
+
+    _PUB_BASE = {
+        "doi": "10.1234/test", "title": "Test", "authors": ["A"],
+        "year": 2024, "journal": "J", "study_type": "S",
+        "organisms": ["MED4"], "experiment_count": 1,
+        "treatment_types": ["coculture"], "background_factors": [],
+        "omics_types": ["RNASEQ"],
+        "clustering_analysis_count": 0, "cluster_types": [],
+    }
+
+    def test_metabolite_count_passes_through(self, mock_conn):
+        row = {**self._PUB_BASE, "metabolite_count": 42,
+               "metabolite_assay_count": 18, "metabolite_compartments": ["whole_cell"]}
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 1, "total_matching": 1}], [row],
+        ]
+        result = api.list_publications(conn=mock_conn)
+        r = result["results"][0]
+        assert r["metabolite_count"] == 42
+        assert r["metabolite_assay_count"] == 18
+        assert r["metabolite_compartments"] == ["whole_cell"]
+
+    def test_zero_when_no_measurement(self, mock_conn):
+        """Publication without metabolomics data — fields default to 0/[]."""
+        row = {**self._PUB_BASE, "metabolite_count": 0,
+               "metabolite_assay_count": 0, "metabolite_compartments": []}
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 1, "total_matching": 1}], [row],
+        ]
+        result = api.list_publications(conn=mock_conn)
+        r = result["results"][0]
+        assert r["metabolite_count"] == 0
+        assert r["metabolite_assay_count"] == 0
+        assert r["metabolite_compartments"] == []
+
+    def test_dual_compartment_publication(self, mock_conn):
+        """Capovilla 2023 / Kujawinski 2023 example: papers measuring multiple
+        compartments — list comes through as-is."""
+        row = {**self._PUB_BASE, "metabolite_count": 92,
+               "metabolite_assay_count": 92,
+               "metabolite_compartments": ["extracellular", "whole_cell"]}
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 1, "total_matching": 1}], [row],
+        ]
+        result = api.list_publications(conn=mock_conn)
+        r = result["results"][0]
+        assert r["metabolite_compartments"] == ["extracellular", "whole_cell"]
+
+
+class TestListExperimentsPhase1Plumbing:
+    """list_experiments adds 3 metabolite measurement pass-through fields
+    per row (spec §6.3). Symmetric with list_publications."""
+
+    def _summary_result(self):
+        return [{
+            "total_matching": 1, "time_course_count": 0,
+            "by_organism": [{"item": "MED4", "count": 1}],
+            "by_treatment_type": [],
+            "by_background_factors": [],
+            "by_omics_type": [{"item": "METABOLOMICS", "count": 1}],
+            "by_publication": [],
+            "by_table_scope": [],
+            "by_cluster_type": [],
+            "by_growth_phase": [],
+        }]
+
+    def _exp_row(self, **overrides):
+        row = {
+            "experiment_id": "exp_a", "experiment_name": "A",
+            "publication_doi": "10.1234/a",
+            "organism_name": "MED4", "treatment_type": ["control"],
+            "coculture_partner": None, "omics_type": "METABOLOMICS",
+            "is_time_course": "false",
+            "table_scope": "all_detected_genes",
+            "table_scope_detail": None,
+            "gene_count": 0, "distinct_gene_count": 0,
+            "significant_up_count": 0, "significant_down_count": 0,
+            "time_point_count": 1, "time_point_labels": ["20h"],
+            "time_point_orders": [1], "time_point_hours": [20.0],
+            "time_point_totals": [0], "time_point_significant_up": [0],
+            "time_point_significant_down": [0],
+            "clustering_analysis_count": 0, "cluster_types": [],
+            "metabolite_count": 0,
+            "metabolite_assay_count": 0,
+            "metabolite_compartments": [],
+        }
+        row.update(overrides)
+        return row
+
+    def test_metabolite_count_passes_through(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),  # filtered summary
+            self._summary_result(),  # unfiltered total_entries
+            [self._exp_row(metabolite_count=42, metabolite_assay_count=18,
+                           metabolite_compartments=["whole_cell"])],
+        ]
+        result = api.list_experiments(conn=mock_conn)
+        r = result["results"][0]
+        assert r["metabolite_count"] == 42
+        assert r["metabolite_assay_count"] == 18
+        assert r["metabolite_compartments"] == ["whole_cell"]
+
+    def test_zero_when_no_measurement(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+            [self._exp_row()],
+        ]
+        result = api.list_experiments(conn=mock_conn)
+        r = result["results"][0]
+        assert r["metabolite_count"] == 0
+        assert r["metabolite_assay_count"] == 0
+        assert r["metabolite_compartments"] == []
+
+
+class TestListOrganismsPhase1Plumbing:
+    """list_organisms adds measured_metabolite_count per row + binary
+    by_measurement_capability envelope (spec §6.4)."""
+
+    _ROW_HIGH = {
+        "organism_name": "Prochlorococcus MIT9301", "organism_type": "genome_strain",
+        "genus": "Prochlorococcus", "species": "Prochlorococcus marinus",
+        "strain": "MIT9301", "clade": "HLII", "ncbi_taxon_id": 167546,
+        "gene_count": 1900, "publication_count": 5, "experiment_count": 12,
+        "treatment_types": [], "background_factors": [],
+        "omics_types": ["METABOLOMICS"], "clustering_analysis_count": 0,
+        "cluster_types": [], "derived_metric_count": 0,
+        "derived_metric_value_kinds": [], "compartments": [],
+        "reaction_count": 0, "metabolite_count": 0,
+        "measured_metabolite_count": 4,
+    }
+    _ROW_NONE = {
+        "organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain",
+        "genus": "Prochlorococcus", "species": "Prochlorococcus marinus",
+        "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919,
+        "gene_count": 1976, "publication_count": 11, "experiment_count": 46,
+        "treatment_types": [], "background_factors": [],
+        "omics_types": ["RNASEQ"], "clustering_analysis_count": 0,
+        "cluster_types": [], "derived_metric_count": 0,
+        "derived_metric_value_kinds": [], "compartments": [],
+        "reaction_count": 0, "metabolite_count": 0,
+        "measured_metabolite_count": 0,
+    }
+    _SUMMARY_ROW = {
+        "total_entries": 2, "total_matching": 2,
+        "by_value_kind": [], "by_metric_type": [],
+        "by_compartment": [],
+        "by_cluster_type": [], "by_organism_type": [],
+        "by_measurement_capability": {
+            "has_metabolomics": 1, "no_metabolomics": 1,
+        },
+    }
+
+    def test_measured_metabolite_count_per_row(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW], [self._ROW_HIGH, self._ROW_NONE],
+        ]
+        result = api.list_organisms(conn=mock_conn)
+        # Row order isn't strict here — assert by name lookup.
+        by_name = {r["organism_name"]: r for r in result["results"]}
+        assert by_name["Prochlorococcus MIT9301"]["measured_metabolite_count"] == 4
+        assert by_name["Prochlorococcus MED4"]["measured_metabolite_count"] == 0
+
+    def test_envelope_has_by_measurement_capability(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW], [self._ROW_HIGH, self._ROW_NONE],
+        ]
+        result = api.list_organisms(conn=mock_conn)
+        assert "by_measurement_capability" in result
+
+    def test_envelope_binary_buckets_sum_to_total(self, mock_conn):
+        """Spec §6.4: has_metabolomics + no_metabolomics == total organisms."""
+        mock_conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW], [self._ROW_HIGH, self._ROW_NONE],
+        ]
+        result = api.list_organisms(conn=mock_conn)
+        cap = result["by_measurement_capability"]
+        # The shape is a dict per spec ({has_metabolomics, no_metabolomics}).
+        assert isinstance(cap, dict)
+        assert cap["has_metabolomics"] == 1
+        assert cap["no_metabolomics"] == 1
+        assert cap["has_metabolomics"] + cap["no_metabolomics"] == 2
+
+    def test_envelope_summary_mode(self, mock_conn):
+        """summary=True still surfaces by_measurement_capability."""
+        mock_conn.execute_query.return_value = [self._SUMMARY_ROW]
+        result = api.list_organisms(summary=True, conn=mock_conn)
+        assert "by_measurement_capability" in result
+
+
+class TestListFilterValuesPhase1Plumbing:
+    """list_filter_values gains two new filter_type values: omics_type and
+    evidence_source (spec §6.5)."""
+
+    def test_dispatches_omics_type(self, mock_conn):
+        """omics_type returns canonical OMICS_TYPE enum (8 values)."""
+        # Mock returns 7 of 8 values present in KG; the function must merge
+        # canonical METABOLOMICS even at count=0.
+        mock_conn.execute_query.return_value = [
+            {"value": "RNASEQ", "count": 80},
+            {"value": "PROTEOMICS", "count": 30},
+            {"value": "MICROARRAY", "count": 12},
+            {"value": "EXOPROTEOMICS", "count": 5},
+            {"value": "VESICLE_DNASEQ", "count": 4},
+            {"value": "VESICLE_PROTEOMICS", "count": 4},
+            {"value": "PAIRED_RNASEQ_PROTEOME", "count": 2},
+            {"value": "METABOLOMICS", "count": 1},
+        ]
+        result = api.list_filter_values(filter_type="omics_type", conn=mock_conn)
+        assert result["filter_type"] == "omics_type"
+        # 8 distinct OMICS_TYPE enum values per spec §6.5.
+        values = {r["value"] for r in result["results"]}
+        assert "METABOLOMICS" in values
+        assert "RNASEQ" in values
+        assert "PROTEOMICS" in values
+        assert len(values) == 8
+
+    def test_omics_type_includes_metabolomics_even_when_zero(self, mock_conn):
+        """Spec §6.5 — METABOLOMICS must appear even when no Experiment carries it.
+        Canonical enum is merged in Python after the Cypher count."""
+        # Cypher returns count rows for some omics types but NOT METABOLOMICS.
+        mock_conn.execute_query.return_value = [
+            {"value": "RNASEQ", "count": 80},
+            {"value": "PROTEOMICS", "count": 30},
+        ]
+        result = api.list_filter_values(filter_type="omics_type", conn=mock_conn)
+        values = {r["value"] for r in result["results"]}
+        assert "METABOLOMICS" in values
+        # The METABOLOMICS row must surface count=0 for backward-consistency.
+        metab_row = next(r for r in result["results"] if r["value"] == "METABOLOMICS")
+        assert metab_row["count"] == 0
+
+    def test_dispatches_evidence_source(self, mock_conn):
+        """evidence_source returns 3 values: metabolism / transport / metabolomics."""
+        mock_conn.execute_query.return_value = [
+            {"value": "metabolism", "count": 2188},
+            {"value": "transport", "count": 1355},
+            {"value": "metabolomics", "count": 107},
+        ]
+        result = api.list_filter_values(
+            filter_type="evidence_source", conn=mock_conn,
+        )
+        assert result["filter_type"] == "evidence_source"
+        assert result["total_entries"] == 3
+        values = {r["value"] for r in result["results"]}
+        assert values == {"metabolism", "transport", "metabolomics"}
+        by_value = {r["value"]: r["count"] for r in result["results"]}
+        assert by_value["metabolism"] == 2188
+        assert by_value["transport"] == 1355
+        assert by_value["metabolomics"] == 107
+
+
+class TestListMetabolitesPhase1Plumbing:
+    """list_metabolites adds 4 measurement pass-through fields per row +
+    by_measurement_coverage envelope (spec §6.6). All KG fields populated
+    by post-import — KG-MET-016 closed."""
+
+    _SUMMARY_ROW = {
+        "total_entries": 3218, "total_matching": 1,
+        "top_organisms": [],
+        "top_metabolite_pathways": [],
+        "by_evidence_source": [{"item": "metabolism", "count": 1}],
+        "with_chebi": 0, "with_hmdb": 0, "with_mnxm": 0,
+        "mass_min": None, "mass_median": None, "mass_max": None,
+        # Raw apoc.coll.frequencies output shape — `{item, count}`. The api
+        # layer's `_rename_measurement_coverage` transforms this into the
+        # Pydantic-expected `{paper_count, count}` / `{compartment, count}`
+        # shape. Tests below assert the post-transform output.
+        "by_measurement_coverage": {
+            "by_paper_count": [
+                {"item": 0, "count": 3111},
+                {"item": 1, "count": 99},
+                {"item": 2, "count": 8},
+            ],
+            "by_compartment": [
+                {"item": "whole_cell", "count": 107},
+                {"item": "extracellular", "count": 92},
+            ],
+        },
+    }
+
+    _DETAIL_ROW = {
+        "metabolite_id": "kegg.compound:C00031",
+        "name": "D-Glucose",
+        "formula": "C6H12O6",
+        "elements": ["C", "H", "O"],
+        "mass": 180.156,
+        "gene_count": 320,
+        "organism_count": 31,
+        "transporter_count": 17,
+        "evidence_sources": ["metabolism", "metabolomics"],
+        "chebi_id": "4167",
+        "pathway_ids": ["kegg.pathway:ko00010"],
+        "pathway_count": 1,
+        # New measurement fields:
+        "measured_assay_count": 4,
+        "measured_paper_count": 1,
+        "measured_organisms": ["Prochlorococcus MIT9301"],
+        "measured_compartments": ["whole_cell"],
+    }
+
+    def _mock_conn(self, summary_row, detail_rows, *extra):
+        conn = MagicMock()
+        side_effect = [[summary_row], detail_rows]
+        side_effect.extend(extra)
+        conn.execute_query.side_effect = side_effect
+        return conn
+
+    def test_per_row_measured_assay_count(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(conn=conn)
+        r = out["results"][0]
+        assert r["measured_assay_count"] == 4
+
+    def test_per_row_measured_paper_count(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(conn=conn)
+        r = out["results"][0]
+        assert r["measured_paper_count"] == 1
+
+    def test_per_row_measured_organisms(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(conn=conn)
+        r = out["results"][0]
+        assert r["measured_organisms"] == ["Prochlorococcus MIT9301"]
+
+    def test_per_row_measured_compartments(self):
+        """KG-MET-016 closed: populated on all 107 measured metabolites."""
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(conn=conn)
+        r = out["results"][0]
+        assert r["measured_compartments"] == ["whole_cell"]
+
+    def test_unmeasured_metabolite_zero_and_empty(self):
+        """3111 unmeasured metabolites: assay_count=0, paper_count=0,
+        organisms=[], compartments=[] — never None per KG default-empty
+        convention (spec §6.6)."""
+        from multiomics_explorer.api.functions import list_metabolites
+        unmeasured_row = {
+            **self._DETAIL_ROW,
+            "evidence_sources": ["metabolism"],
+            "measured_assay_count": 0,
+            "measured_paper_count": 0,
+            "measured_organisms": [],
+            "measured_compartments": [],
+        }
+        conn = self._mock_conn(self._SUMMARY_ROW, [unmeasured_row])
+        out = list_metabolites(conn=conn)
+        r = out["results"][0]
+        assert r["measured_assay_count"] == 0
+        assert r["measured_paper_count"] == 0
+        assert r["measured_organisms"] == []
+        assert r["measured_compartments"] == []
+
+    def test_envelope_has_by_measurement_coverage(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(conn=conn)
+        assert "by_measurement_coverage" in out
+
+    def test_envelope_coverage_has_paper_count_subkey(self):
+        """Spec §6.6: by_measurement_coverage.by_paper_count exposes the
+        live distribution (3111 / 99 / 8). The api layer renames apoc's
+        `{item, count}` to `{paper_count, count}` per Pydantic contract."""
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(conn=conn)
+        cov = out["by_measurement_coverage"]
+        assert "by_paper_count" in cov
+        # 3 buckets matching the live KG counts.
+        buckets = {b["paper_count"]: b["count"] for b in cov["by_paper_count"]}
+        assert buckets[0] == 3111
+        assert buckets[1] == 99
+        assert buckets[2] == 8
+
+    def test_envelope_coverage_has_compartment_subkey(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(conn=conn)
+        cov = out["by_measurement_coverage"]
+        assert "by_compartment" in cov
+
+
+# ===========================================================================
+# Phase 2 — Cross-cutting renames + filter additions (frozen spec
+# 2026-05-05-phase2-cross-cutting-renames.md). Stage 1 RED — failing tests.
+# ===========================================================================
+
+
+class TestListMetabolitesPhase2:
+    """API-layer tests for Phase 2 items 2 and 3 on list_metabolites.
+
+    Item 1 (search → search_text) is exercised structurally by the
+    existing `test_lucene_retry_on_parse_error` and
+    `test_search_empty_validation` tests, which were renamed in place.
+    """
+
+    _SUMMARY_ROW = {
+        "total_entries": 3025,
+        "total_matching": 1,
+        "top_organisms": [],
+        # Phase 2 Item 2: renamed envelope key + per-element keys.
+        "top_metabolite_pathways": [
+            {
+                "metabolite_pathway_id": "kegg.pathway:ko01100",
+                "metabolite_pathway_name": "Metabolic pathways",
+                "count": 1,
+            },
+        ],
+        "by_evidence_source": [{"item": "metabolism", "count": 1}],
+        "with_chebi": 1,
+        "with_hmdb": 0,
+        "with_mnxm": 1,
+        "mass_min": 180.156,
+        "mass_median": 180.156,
+        "mass_max": 180.156,
+    }
+
+    _DETAIL_ROW = {
+        "metabolite_id": "kegg.compound:C00031",
+        "name": "D-Glucose",
+        "formula": "C6H12O6",
+        "elements": ["C", "H", "O"],
+        "mass": 180.156,
+        "gene_count": 320,
+        "organism_count": 31,
+        "transporter_count": 17,
+        "evidence_sources": ["metabolism"],
+        "chebi_id": "4167",
+        "pathway_ids": ["kegg.pathway:ko00010"],
+        "pathway_count": 1,
+    }
+
+    def _mock_conn(self, summary_row, detail_rows):
+        conn = MagicMock()
+        conn.execute_query.side_effect = [[summary_row], detail_rows]
+        return conn
+
+    def test_envelope_top_metabolite_pathways_propagated(self):
+        """Phase 2 Item 2: api passes through renamed envelope rollup."""
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(conn=conn)
+        assert "top_metabolite_pathways" in out
+        assert len(out["top_metabolite_pathways"]) == 1
+        entry = out["top_metabolite_pathways"][0]
+        assert entry["metabolite_pathway_id"] == "kegg.pathway:ko01100"
+        assert entry["metabolite_pathway_name"] == "Metabolic pathways"
+        assert entry["count"] == 1
+
+    def test_exclude_metabolite_ids_passed(self):
+        """Phase 2 Item 3: api forwards exclude_metabolite_ids to builder."""
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        list_metabolites(
+            exclude_metabolite_ids=[
+                "kegg.compound:C00002", "kegg.compound:C00008",
+            ],
+            conn=conn,
+        )
+        # Inspect the summary call (first call) — kwargs should carry
+        # the exclude list through to the builder.
+        summary_call = conn.execute_query.call_args_list[0]
+        kw = summary_call.kwargs
+        # The builder param `exclude_metabolite_ids` is passed as a
+        # Cypher param of the same name — so it appears in execute_query
+        # kwargs.
+        assert kw.get("exclude_metabolite_ids") == [
+            "kegg.compound:C00002", "kegg.compound:C00008",
+        ]
+
+    def test_exclude_metabolite_ids_default_none(self):
+        """Default (no exclude param) → no exclude_metabolite_ids in
+        builder kwargs."""
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        list_metabolites(conn=conn)
+        summary_call = conn.execute_query.call_args_list[0]
+        kw = summary_call.kwargs
+        assert "exclude_metabolite_ids" not in kw
+
+
+class TestGenesByMetabolitePhase2:
+    """API-layer tests for Phase 2 item 3 on genes_by_metabolite."""
+
+    _METS = ["kegg.compound:C00086"]
+    _ORG = "Prochlorococcus MED4"
+
+    _SUMMARY_ROW = {
+        "total_matching": 0,
+        "gene_count_total": 0,
+        "reaction_count_total": 0,
+        "transporter_count_total": 0,
+        "metabolite_count_total": 0,
+        "rows_by_evidence_source": [],
+        "rows_by_transport_confidence": [],
+        "by_metabolite": [],
+        "top_reactions": [],
+        "top_tcdb_families": [],
+        "top_gene_categories": [],
+        "top_genes": [],
+    }
+
+    def _mock_conn(self):
+        """Provide a wide buffer of empty results to satisfy probes."""
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW],
+        ] + [[]] * 10
+        return conn
+
+    def test_exclude_metabolite_ids_passed(self):
+        from multiomics_explorer.api.functions import genes_by_metabolite
+        conn = self._mock_conn()
+        genes_by_metabolite(
+            metabolite_ids=self._METS, organism=self._ORG,
+            exclude_metabolite_ids=["kegg.compound:C00002"],
+            summary=True, conn=conn,
+        )
+        summary_call = conn.execute_query.call_args_list[0]
+        kw = summary_call.kwargs
+        assert kw.get("exclude_metabolite_ids") == ["kegg.compound:C00002"]
+
+    def test_exclude_metabolite_ids_default_none(self):
+        from multiomics_explorer.api.functions import genes_by_metabolite
+        conn = self._mock_conn()
+        genes_by_metabolite(
+            metabolite_ids=self._METS, organism=self._ORG,
+            summary=True, conn=conn,
+        )
+        summary_call = conn.execute_query.call_args_list[0]
+        kw = summary_call.kwargs
+        assert "exclude_metabolite_ids" not in kw
+
+
+class TestMetabolitesByGenePhase2:
+    """API-layer tests for Phase 2 items 2 + 3 on metabolites_by_gene."""
+
+    _LOCUS = ["PMM0963", "PMM0964", "PMM0965"]
+    _ORG = "Prochlorococcus MED4"
+
+    _SUMMARY_ROW = {
+        "total_matching": 0,
+        "gene_count_total": 0,
+        "reaction_count_total": 0,
+        "transporter_count_total": 0,
+        "metabolite_count_total": 0,
+        "rows_by_evidence_source": [],
+        "rows_by_transport_confidence": [],
+        "by_gene": [],
+        "top_metabolites": [],
+        "top_reactions": [],
+        "top_tcdb_families": [],
+        "top_gene_categories": [],
+        # Phase 2 Item 2: renamed envelope key.
+        "top_metabolite_pathways": [
+            {
+                "metabolite_pathway_id": "kegg.pathway:ko00910",
+                "metabolite_pathway_name": "Nitrogen metabolism",
+                "gene_count": 3,
+                "pathway_reaction_count": 23,
+                "pathway_metabolite_count": 35,
+            },
+        ],
+        "by_element": [],
+    }
+
+    def _mock_conn(self):
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW],
+        ] + [[]] * 10
+        return conn
+
+    def test_envelope_top_metabolite_pathways_propagated(self):
+        """Phase 2 Item 2: api passes through renamed envelope rollup."""
+        from multiomics_explorer.api.functions import metabolites_by_gene
+        conn = self._mock_conn()
+        out = metabolites_by_gene(
+            self._LOCUS, self._ORG, summary=True, conn=conn,
+        )
+        assert "top_metabolite_pathways" in out
+        assert len(out["top_metabolite_pathways"]) == 1
+        entry = out["top_metabolite_pathways"][0]
+        assert entry["metabolite_pathway_id"] == "kegg.pathway:ko00910"
+        assert entry["metabolite_pathway_name"] == "Nitrogen metabolism"
+        # Other element keys unchanged
+        assert entry["gene_count"] == 3
+        assert entry["pathway_reaction_count"] == 23
+        assert entry["pathway_metabolite_count"] == 35
+
+    def test_exclude_metabolite_ids_passed(self):
+        from multiomics_explorer.api.functions import metabolites_by_gene
+        conn = self._mock_conn()
+        metabolites_by_gene(
+            self._LOCUS, self._ORG,
+            exclude_metabolite_ids=["kegg.compound:C00002"],
+            summary=True, conn=conn,
+        )
+        summary_call = conn.execute_query.call_args_list[0]
+        kw = summary_call.kwargs
+        assert kw.get("exclude_metabolite_ids") == ["kegg.compound:C00002"]
+
+    def test_exclude_metabolite_ids_default_none(self):
+        from multiomics_explorer.api.functions import metabolites_by_gene
+        conn = self._mock_conn()
+        metabolites_by_gene(
+            self._LOCUS, self._ORG, summary=True, conn=conn,
+        )
+        summary_call = conn.execute_query.call_args_list[0]
+        kw = summary_call.kwargs
+        assert "exclude_metabolite_ids" not in kw
+
+
+class TestDifferentialExpressionByGenePhase2:
+    """API-layer tests for Phase 2 item 4 — direction='both'."""
+
+    def _organism_result(self, orgs=None):
+        if orgs is None:
+            orgs = ["Prochlorococcus MED4"]
+        return [{"organisms": orgs}]
+
+    def _global_summary(self):
+        return [{
+            "total_matching": 6,
+            "matching_genes": 4,
+            "rows_by_status": [
+                {"item": "significant_up", "count": 3},
+                {"item": "significant_down", "count": 3},
+            ],
+            "rows_by_treatment_type": [
+                {"item": "nitrogen_stress", "count": 6},
+            ],
+            "rows_by_background_factors": [],
+            "by_table_scope": [
+                {"item": "all_detected_genes", "count": 6},
+            ],
+            "median_abs_log2fc": 1.5,
+            "max_abs_log2fc": 3.5,
+        }]
+
+    def _experiment_summary(self):
+        return [{
+            "organism_name": "Prochlorococcus MED4",
+            "experiments": [],
+        }]
+
+    def _diagnostics_summary(self):
+        return [{
+            "top_categories": [],
+            "not_found": [],
+            "no_expression": [],
+        }]
+
+    def _detail_rows(self):
+        return [
+            {
+                "locus_tag": "PMM0001", "gene_name": "dnaN",
+                "experiment_id": "exp1", "treatment_type": "nitrogen_stress",
+                "timepoint": "day 18", "timepoint_hours": 432.0,
+                "timepoint_order": 1,
+                "log2fc": 3.5, "padj": 1e-12, "rank": 1,
+                "expression_status": "significant_up",
+            },
+            {
+                "locus_tag": "PMM0002", "gene_name": "rpoA",
+                "experiment_id": "exp1", "treatment_type": "nitrogen_stress",
+                "timepoint": "day 18", "timepoint_hours": 432.0,
+                "timepoint_order": 1,
+                "log2fc": -2.5, "padj": 1e-9, "rank": 2,
+                "expression_status": "significant_down",
+            },
+        ]
+
+    def test_direction_both_accepted(self):
+        """direction='both' must NOT raise; passes validation."""
+        import multiomics_explorer.api.functions as api
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            self._organism_result(),
+            self._global_summary(),
+            self._experiment_summary(),
+            self._diagnostics_summary(),
+            self._detail_rows(),
+        ]
+        # Should not raise on 'both'
+        result = api.differential_expression_by_gene(
+            organism="MED4", direction="both", conn=mock_conn,
+        )
+        assert result["total_matching"] == 6
+
+    def test_direction_both_returns_both_statuses(self):
+        """direction='both' returns both up + down rows."""
+        import multiomics_explorer.api.functions as api
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            self._organism_result(),
+            self._global_summary(),
+            self._experiment_summary(),
+            self._diagnostics_summary(),
+            self._detail_rows(),
+        ]
+        result = api.differential_expression_by_gene(
+            organism="MED4", direction="both", conn=mock_conn,
+        )
+        statuses = {r["expression_status"] for r in result["results"]}
+        assert "significant_up" in statuses
+        assert "significant_down" in statuses
+
+    def test_invalid_direction_still_raises(self):
+        """Invalid direction values still raise even with 'both' support."""
+        import multiomics_explorer.api.functions as api
+        mock_conn = MagicMock()
+        with pytest.raises(ValueError, match="Invalid direction"):
+            api.differential_expression_by_gene(
+                organism="MED4", direction="sideways", conn=mock_conn,
+            )
+
+
+# ---------------------------------------------------------------------------
+# list_metabolite_assays — Phase 5 (RED stage; impl lands in GREEN)
+# Plan: docs/superpowers/plans/2026-05-06-list-metabolite-assays.md
+# Task 7
+# ---------------------------------------------------------------------------
+
+
+class TestListMetaboliteAssays:
+    """API-layer tests — mocked GraphConnection."""
+
+    def _mock_conn(self, summary_rows, detail_rows):
+        from unittest.mock import MagicMock
+        conn = MagicMock()
+        # 2-query pattern: summary first, detail second
+        conn.execute_query.side_effect = [summary_rows, detail_rows]
+        return conn
+
+    def test_returns_envelope_keys(self):
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        summary_row = [{
+            "total_entries": 10, "total_matching": 10,
+            "metabolite_count_total": 768,
+            "by_organism": [], "by_value_kind": [], "by_compartment": [],
+            "top_metric_types": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_growth_phase": [],
+            "by_detection_status": [],
+        }]
+        result = list_metabolite_assays(conn=self._mock_conn(summary_row, []))
+        for k in [
+            "total_entries", "total_matching", "metabolite_count_total",
+            "by_organism", "by_value_kind", "by_compartment", "top_metric_types",
+            "by_treatment_type", "by_background_factors", "by_growth_phase",
+            "by_detection_status", "returned", "truncated", "offset",
+            "not_found", "results",
+        ]:
+            assert k in result, f"missing envelope key: {k}"
+
+    def test_summary_true_skips_detail_query(self):
+        """summary=True forces limit=0; detail builder isn't executed."""
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        from unittest.mock import MagicMock
+        summary_row = [{
+            "total_entries": 10, "total_matching": 10,
+            "metabolite_count_total": 0,
+            "by_organism": [], "by_value_kind": [], "by_compartment": [],
+            "top_metric_types": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_growth_phase": [],
+            "by_detection_status": [],
+        }]
+        conn = MagicMock()
+        conn.execute_query.return_value = summary_row
+        result = list_metabolite_assays(summary=True, conn=conn)
+        assert conn.execute_query.call_count == 1
+        assert result["results"] == []
+        assert result["truncated"] is True
+
+    def test_truncated_when_total_matching_exceeds_limit(self):
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        summary_row = [{
+            "total_entries": 10, "total_matching": 10,
+            "metabolite_count_total": 768,
+            "by_organism": [], "by_value_kind": [], "by_compartment": [],
+            "top_metric_types": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_growth_phase": [],
+            "by_detection_status": [],
+        }]
+        detail_rows = [{"assay_id": f"a{i}"} for i in range(2)]
+        result = list_metabolite_assays(
+            limit=2, conn=self._mock_conn(summary_row, detail_rows))
+        assert result["returned"] == 2
+        assert result["truncated"] is True
+
+    def test_search_text_empty_raises(self):
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        from unittest.mock import MagicMock
+        conn = MagicMock()
+        try:
+            list_metabolite_assays(search_text="", conn=conn)
+        except ValueError:
+            return
+        raise AssertionError("expected ValueError on empty search_text")
+
+    def test_lucene_retry_on_parse_error(self):
+        """Lucene parse error → escape + retry once."""
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        from unittest.mock import MagicMock
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        summary_row = [{
+            "total_entries": 10, "total_matching": 0,
+            "metabolite_count_total": 0,
+            "by_organism": [], "by_value_kind": [], "by_compartment": [],
+            "top_metric_types": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_growth_phase": [],
+            "by_detection_status": [],
+            "score_max": None, "score_median": None,
+        }]
+        conn = MagicMock()
+        # First call (summary) raises Lucene parse error; retry succeeds
+        conn.execute_query.side_effect = [
+            Neo4jClientError("Failed to parse query: chitosan AND"),
+            summary_row,
+            [],
+        ]
+        result = list_metabolite_assays(search_text="chitosan AND", conn=conn)
+        assert result["total_matching"] == 0
+
+    def test_not_found_structured_for_batch_inputs(self):
+        """`not_found` carries per-batch buckets (parent §11 Conv B).
+
+        After the post-review fix to use existence-check Cyphers per batch
+        input (mirroring list_metabolites' MetNotFound precedent), the api
+        function emits one additional `conn.execute_query` call per non-empty
+        batch. This test passes only `assay_ids`, so the mock provides:
+          [0] summary, [1] detail, [2] existence-check on assay_ids.
+        """
+        from unittest.mock import MagicMock
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        summary_row = [{
+            "total_entries": 10, "total_matching": 1,
+            "metabolite_count_total": 92,
+            "by_organism": [], "by_value_kind": [], "by_compartment": [],
+            "top_metric_types": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_growth_phase": [],
+            "by_detection_status": [],
+        }]
+        valid_assay_id = "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration"
+        detail_rows = [{"assay_id": valid_assay_id}]
+        existence_check_response = [{"found": [valid_assay_id]}]
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            summary_row, detail_rows, existence_check_response,
+        ]
+        result = list_metabolite_assays(
+            assay_ids=[valid_assay_id, "non_existent_assay_id"],
+            conn=conn,
+        )
+        assert "not_found" in result
+        assert "assay_ids" in result["not_found"]
+        assert "non_existent_assay_id" in result["not_found"]["assay_ids"]
+        # Valid IDs are NOT in not_found (true existence check, not the
+        # broken "if total_matching == 0 then mark all unknown" heuristic).
+        assert valid_assay_id not in result["not_found"]["assay_ids"]
+        assert "metabolite_ids" in result["not_found"]
+        assert "experiment_ids" in result["not_found"]
+        assert "publication_doi" in result["not_found"]
+
+    def test_offset_echoed(self):
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        summary_row = [{
+            "total_entries": 10, "total_matching": 10,
+            "metabolite_count_total": 768,
+            "by_organism": [], "by_value_kind": [], "by_compartment": [],
+            "top_metric_types": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_growth_phase": [],
+            "by_detection_status": [],
+        }]
+        result = list_metabolite_assays(
+            offset=5, conn=self._mock_conn(summary_row, []))
+        assert result["offset"] == 5
+
+    def test_importable_from_package(self):
+        """Re-exported from api/__init__.py and multiomics_explorer/__init__.py."""
+        from multiomics_explorer.api import list_metabolite_assays as _api_export
+        from multiomics_explorer import list_metabolite_assays as _root_export
+        assert _api_export is _root_export
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 metabolites-by-assay slice — 3 tools
+# Tool 1: metabolites_by_quantifies_assay (numeric drill-down)
+# Tool 2: metabolites_by_flags_assay (boolean drill-down)
+# Tool 3: assays_by_metabolite (polymorphic reverse-lookup)
+# ---------------------------------------------------------------------------
+class TestMetabolitesByQuantifiesAssay:
+    """Unit tests for api.metabolites_by_quantifies_assay (slice spec §4)."""
+
+    @staticmethod
+    def _diag_rankable(assay_ids=("a1",)):
+        """Diagnostics rows where every assay is rankable."""
+        return [
+            {
+                "assay_id": aid,
+                "name": f"Assay {aid}",
+                "value_kind": "numeric",
+                "rankable": True,
+                "organism_name": "Prochlorococcus MIT9313",
+                "compartment": "whole_cell",
+                "value_min": 0.0,
+                "value_q1": 0.001,
+                "value_median": 0.005,
+                "value_q3": 0.05,
+                "value_max": 0.5,
+            }
+            for aid in assay_ids
+        ]
+
+    @staticmethod
+    def _diag_non_rankable(assay_ids=("a1",)):
+        """Diagnostics rows where every assay is non-rankable."""
+        return [
+            {
+                "assay_id": aid,
+                "name": f"Assay {aid}",
+                "value_kind": "numeric",
+                "rankable": False,
+                "organism_name": "Prochlorococcus MIT9313",
+                "compartment": "whole_cell",
+                "value_min": 0.0,
+                "value_q1": 0.0,
+                "value_median": 0.0,
+                "value_q3": 0.0,
+                "value_max": 1.0,
+            }
+            for aid in assay_ids
+        ]
+
+    @staticmethod
+    def _diag_mixed():
+        return [
+            {
+                "assay_id": "a_rank",
+                "name": "Rankable assay",
+                "value_kind": "numeric",
+                "rankable": True,
+                "organism_name": "Prochlorococcus MIT9313",
+                "compartment": "whole_cell",
+                "value_min": 0.0, "value_q1": 0.001, "value_median": 0.005,
+                "value_q3": 0.05, "value_max": 0.5,
+            },
+            {
+                "assay_id": "a_norank",
+                "name": "Non-rankable assay",
+                "value_kind": "numeric",
+                "rankable": False,
+                "organism_name": "Prochlorococcus MIT9313",
+                "compartment": "whole_cell",
+                "value_min": 0.0, "value_q1": 0.0, "value_median": 0.0,
+                "value_q3": 0.0, "value_max": 1.0,
+            },
+        ]
+
+    @staticmethod
+    def _summary_row():
+        return [{
+            "total_matching": 64,
+            "by_detection_status": [{"item": "not_detected", "count": 48},
+                                    {"item": "detected", "count": 16}],
+            "by_metric_bucket": [{"item": "low", "count": 32}],
+            "by_assay": [{"item": "a1", "count": 64}],
+            "by_compartment": [{"item": "whole_cell", "count": 64}],
+            "by_organism": [{"item": "Prochlorococcus MIT9313", "count": 64}],
+            "filtered_value_min": 0.0,
+            "filtered_value_max": 0.5,
+        }]
+
+    def test_empty_assay_ids_raises(self):
+        from multiomics_explorer.api.functions import metabolites_by_quantifies_assay
+        with pytest.raises(ValueError, match="assay_ids"):
+            metabolites_by_quantifies_assay(assay_ids=[], conn=MagicMock())
+
+    def test_invalid_metric_bucket_raises(self):
+        from multiomics_explorer.api.functions import metabolites_by_quantifies_assay
+        with pytest.raises(ValueError, match="metric_bucket"):
+            metabolites_by_quantifies_assay(
+                assay_ids=["a1"], metric_bucket=["INVALID"], conn=MagicMock())
+
+    def test_invalid_detection_status_raises(self):
+        from multiomics_explorer.api.functions import metabolites_by_quantifies_assay
+        with pytest.raises(ValueError, match="detection_status"):
+            metabolites_by_quantifies_assay(
+                assay_ids=["a1"], detection_status=["INVALID"], conn=MagicMock())
+
+    def test_all_non_rankable_raises_when_rankable_filter_set(self):
+        # All-non-rankable input + rankable-gated filter → ValueError.
+        from multiomics_explorer.api.functions import metabolites_by_quantifies_assay
+        mock_conn = MagicMock()
+        mock_conn.execute_query.return_value = self._diag_non_rankable(("a1",))
+        with pytest.raises(ValueError, match="rankable"):
+            metabolites_by_quantifies_assay(
+                assay_ids=["a1"], metric_bucket=["top_decile"], conn=mock_conn)
+
+    def test_mixed_rankable_soft_excludes(self):
+        # Mixed input: some rankable, some not. Expect excluded surfaced.
+        from multiomics_explorer.api.functions import metabolites_by_quantifies_assay
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            self._diag_mixed(),
+            self._summary_row(),
+            [],
+        ]
+        data = metabolites_by_quantifies_assay(
+            assay_ids=["a_rank", "a_norank"],
+            metric_bucket=["top_decile"],
+            conn=mock_conn,
+        )
+        assert "a_norank" in data["excluded_assays"]
+        assert "a_rank" not in data["excluded_assays"]
+        assert data["warnings"]
+
+    def test_summary_skips_detail_query(self):
+        # summary=True means only diagnostics + summary builders run.
+        from multiomics_explorer.api.functions import metabolites_by_quantifies_assay
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            self._diag_rankable(("a1",)),
+            self._summary_row(),
+        ]
+        data = metabolites_by_quantifies_assay(
+            assay_ids=["a1"], summary=True, conn=mock_conn,
+        )
+        # diag + summary only; detail builder NOT invoked
+        assert mock_conn.execute_query.call_count == 2
+        assert data["results"] == []
+
+
+class TestMetabolitesByFlagsAssay:
+    """Unit tests for api.metabolites_by_flags_assay (slice spec §5)."""
+
+    def test_empty_assay_ids_raises(self):
+        from multiomics_explorer.api.functions import metabolites_by_flags_assay
+        with pytest.raises(ValueError, match="assay_ids"):
+            metabolites_by_flags_assay(assay_ids=[], conn=MagicMock())
+
+    def test_flag_value_bool_to_string_coercion(self):
+        # D4: bool flag_value → string 'true'/'false' for Cypher param.
+        captured: list[dict] = []
+
+        class StubConn:
+            def execute_query(self, cypher, **params):
+                captured.append(dict(params))
+                # Return an empty summary envelope so api/ continues.
+                return [{
+                    "total_matching": 0,
+                    "by_value": [],
+                    "by_assay": [],
+                    "by_compartment": [],
+                    "by_organism": [],
+                }]
+
+        from multiomics_explorer.api.functions import metabolites_by_flags_assay
+        metabolites_by_flags_assay(
+            assay_ids=["a1"], flag_value=True, summary=True, conn=StubConn(),
+        )
+        # At least one query carried flag_value="true"
+        coerced_seen = [p for p in captured if p.get("flag_value") == "true"]
+        assert coerced_seen, (
+            f"Expected flag_value='true' string param, got: {captured}"
+        )
+
+    def test_no_rankable_diagnostics(self):
+        # Boolean tool has no rankable gate; diagnostics builder must NOT be called.
+        # Implementation detail: this asserts via call count — the boolean dispatch
+        # is two queries (summary + detail), not three.
+        from multiomics_explorer.api.functions import metabolites_by_flags_assay
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            [{
+                "total_matching": 0,
+                "by_value": [],
+                "by_assay": [],
+                "by_compartment": [],
+                "by_organism": [],
+            }],
+            [],
+        ]
+        metabolites_by_flags_assay(
+            assay_ids=["a1"], conn=mock_conn,
+        )
+        # Two queries (summary + detail), not three (no diagnostics probe).
+        assert mock_conn.execute_query.call_count == 2
+
+
+class TestAssaysByMetabolite:
+    """Unit tests for api.assays_by_metabolite (slice spec §6, polymorphic reverse-lookup)."""
+
+    def test_empty_metabolite_ids_raises(self):
+        from multiomics_explorer.api.functions import assays_by_metabolite
+        with pytest.raises(ValueError, match="metabolite_ids"):
+            assays_by_metabolite(metabolite_ids=[], conn=MagicMock())
+
+    def test_invalid_evidence_kind_raises(self):
+        from multiomics_explorer.api.functions import assays_by_metabolite
+        with pytest.raises(ValueError, match="evidence_kind"):
+            assays_by_metabolite(
+                metabolite_ids=["m1"], evidence_kind="INVALID", conn=MagicMock())
+
+    def test_not_found_flat_list(self):
+        # Single-batch input → flat list[str] (parent §13.6).
+        # Stubbed: probe returns empty (metabolite ID absent from KG).
+        from multiomics_explorer.api.functions import assays_by_metabolite
+        mock_conn = MagicMock()
+        # 3 queries: existence-probe, summary, detail
+        # existence-probe returns no rows → all input IDs are not_found
+        empty_summary = [{
+            "total_matching": 0,
+            "by_evidence_kind": [],
+            "by_organism": [],
+            "by_compartment": [],
+            "by_assay": [],
+            "by_detection_status": [],
+            "by_flag_value": [],
+            "metabolites_matched": 0,
+        }]
+        mock_conn.execute_query.side_effect = [
+            [],            # existence probe — input ID absent
+            empty_summary, # summary
+            [],            # detail
+        ]
+        data = assays_by_metabolite(
+            metabolite_ids=["kegg.compound:C99999"], conn=mock_conn,
+        )
+        # Flat list[str] per parent §13.6 (single batch input).
+        assert isinstance(data["not_found"], list)
+        assert "kegg.compound:C99999" in data["not_found"]
+
+    def test_metabolites_with_evidence_partition(self):
+        # 2 metabolites in input, 1 has rows, 1 has none.
+        from multiomics_explorer.api.functions import assays_by_metabolite
+        mock_conn = MagicMock()
+        present_id = "kegg.compound:C00074"
+        absent_id = "kegg.compound:C00031"
+        existence_rows = [
+            {"metabolite_id": present_id},
+            {"metabolite_id": absent_id},
+        ]
+        summary_rows = [{
+            "total_matching": 18,
+            "by_evidence_kind": [{"item": "quantifies", "count": 18}],
+            "by_organism": [],
+            "by_compartment": [],
+            "by_assay": [],
+            "by_detection_status": [],
+            "by_flag_value": [],
+            "metabolites_matched": 1,
+        }]
+        detail_rows = [
+            {
+                "metabolite_id": present_id,
+                "metabolite_name": "PEP",
+                "assay_id": "a1",
+                "evidence_kind": "quantifies",
+                "value": 0.05,
+            },
+        ]
+        mock_conn.execute_query.side_effect = [
+            existence_rows,
+            summary_rows,
+            detail_rows,
+        ]
+        data = assays_by_metabolite(
+            metabolite_ids=[present_id, absent_id], conn=mock_conn,
+        )
+        assert present_id in data["metabolites_with_evidence"]
+        assert absent_id in data["metabolites_without_evidence"]
+        assert present_id not in data["metabolites_without_evidence"]
+
+
+# ---------------------------------------------------------------------------
+# Outfacing-doc lint gate for api/functions.py docstrings
+# ---------------------------------------------------------------------------
+# See docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md
+# for the 9 style rules. Gate is per-function so cleanup progress is visible
+# in the test report.
+
+import ast
+import inspect
+from pathlib import Path
+
+from multiomics_explorer._outfacing_lint import lint_python_docstrings
+
+_API_FILE = Path(inspect.getsourcefile(api)).resolve()
+
+
+def _api_public_function_names() -> list[str]:
+    """Top-level public functions in api/functions.py via AST walk."""
+    tree = ast.parse(_API_FILE.read_text())
+    names = []
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if not node.name.startswith("_"):
+                names.append(node.name)
+    return names
+
+
+def _api_function_line_range(name: str) -> tuple[int, int]:
+    """Line range of `name` in api/functions.py (1-indexed, inclusive)."""
+    tree = ast.parse(_API_FILE.read_text())
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if node.name == name:
+                return node.lineno, node.end_lineno
+    raise LookupError(f"function {name!r} not found in {_API_FILE}")
+
+
+@pytest.mark.parametrize("fn_name", _api_public_function_names())
+def test_api_function_docstring_lint_clean(fn_name: str):
+    """Each public function in api/functions.py has a clean docstring."""
+    start, end = _api_function_line_range(fn_name)
+    violations = lint_python_docstrings([_API_FILE])
+    fn_violations = [v for v in violations if start <= v[1] <= end]
+    if fn_violations:
+        msg_lines = [
+            f"{fn_name} ({_API_FILE.name}:{start}-{end}) has outfacing-doc violations:",
+        ]
+        for path, line_no, line, token in fn_violations:
+            msg_lines.append(f"  {path.name}:{line_no}: {token!r} in: {line.strip()}")
+        pytest.fail("\n".join(msg_lines))

@@ -2,14 +2,12 @@
 
 ## What it does
 
-Get ortholog group memberships for genes.
+Look up ortholog group memberships for a gene batch — flat long
+format (one row per gene × group), ordered most-specific (curated)
+to broadest. A gene typically belongs to 1-3 groups.
 
-Returns which ortholog groups each gene belongs to, ordered from most
-specific (curated) to broadest. Use for gene characterization and
-cross-organism bridging. A gene typically belongs to 1-3 groups.
-
-For member genes within a group, use genes_by_homolog_group.
-For text search on group names, use search_homolog_groups.
+Routing: drill into group members via `genes_by_homolog_group`;
+text-search groups via `search_homolog_groups`.
 
 ## Parameters
 

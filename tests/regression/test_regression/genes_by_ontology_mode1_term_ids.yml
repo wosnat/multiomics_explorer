@@ -29,6 +29,7 @@ organism_name: Prochlorococcus MED4
 results:
 - gene_category: Replication and repair
   gene_name: dnaN
+  is_informative: true
   level: 6
   locus_tag: PMM0001
   product: DNA polymerase III, beta subunit
@@ -36,6 +37,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: rarA
+  is_informative: true
   level: 6
   locus_tag: PMM0077
   product: recombination factor
@@ -43,6 +45,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: holB
+  is_informative: true
   level: 6
   locus_tag: PMM0129
   product: DNA polymerase III, delta^ subunit
@@ -50,6 +53,7 @@ results:
   term_name: DNA replication
 - gene_category: Transcription
   gene_name: rnhA
+  is_informative: true
   level: 6
   locus_tag: PMM0200
   product: ribonuclease HI
@@ -57,6 +61,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: topA
+  is_informative: true
   level: 6
   locus_tag: PMM0436
   product: DNA topoisomerase I, omega subunit
@@ -64,6 +69,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: priA
+  is_informative: true
   level: 6
   locus_tag: PMM0497
   product: primosomal protein N^
@@ -71,6 +77,7 @@ results:
   term_name: DNA replication
 - gene_category: Transport
   gene_name: ycf41
+  is_informative: true
   level: 6
   locus_tag: PMM0502
   product: possible single-stranded DNA-binding protein
@@ -78,6 +85,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: dnaA
+  is_informative: true
   level: 6
   locus_tag: PMM0565
   product: chromosomal replication initiator protein
@@ -85,6 +93,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: dnaQ
+  is_informative: true
   level: 6
   locus_tag: PMM0621
   product: exonuclease family protein
@@ -92,6 +101,7 @@ results:
   term_name: DNA replication
 - gene_category: Coenzyme metabolism
   gene_name: nrdJ
+  is_informative: true
   level: 6
   locus_tag: PMM0661
   product: ribonucleoside-diphosphate reductase
@@ -99,6 +109,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: lig
+  is_informative: true
   level: 6
   locus_tag: PMM0729
   product: ATP-dependent DNA ligase
@@ -106,6 +117,7 @@ results:
   term_name: DNA replication
 - gene_category: Post-translational modification
   gene_name: dnaK2
+  is_informative: true
   level: 6
   locus_tag: PMM0897
   product: chaperone protein DnaK
@@ -113,6 +125,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: umuD
+  is_informative: true
   level: 6
   locus_tag: PMM0936
   product: DNA polymerase V, subunit D
@@ -120,6 +133,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: umuC
+  is_informative: true
   level: 6
   locus_tag: PMM0937
   product: DNA polymerase V, subunit C
@@ -127,6 +141,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: dnaG
+  is_informative: true
   level: 6
   locus_tag: PMM0939
   product: DNA primase
@@ -134,6 +149,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: ruvA
+  is_informative: true
   level: 6
   locus_tag: PMM0942
   product: holliday junction ATP-dependent DNA helicase RuvA
@@ -141,6 +157,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: dnaE
+  is_informative: true
   level: 6
   locus_tag: PMM0945
   product: DNA polymerase III, alpha subunit
@@ -148,6 +165,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: ruvC
+  is_informative: true
   level: 6
   locus_tag: PMM1054
   product: crossover junction endodeoxyribonuclease RuvC
@@ -155,6 +173,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: gyrA
+  is_informative: true
   level: 6
   locus_tag: PMM1063
   product: DNA gyrase, A subunit
@@ -162,6 +181,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: polA
+  is_informative: true
   level: 6
   locus_tag: PMM1140
   product: DNA polymerase I
@@ -169,6 +189,7 @@ results:
   term_name: DNA replication
 - gene_category: Regulatory functions
   gene_name: lexA
+  is_informative: true
   level: 6
   locus_tag: PMM1262
   product: SOS-response transcriptional repressor
@@ -176,6 +197,7 @@ results:
   term_name: DNA replication
 - gene_category: Post-translational modification
   gene_name: dnaK1
+  is_informative: true
   level: 6
   locus_tag: PMM1432
   product: chaperone protein DnaK
@@ -183,6 +205,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: recF
+  is_informative: true
   level: 6
   locus_tag: PMM1573
   product: DNA replication and repair protein recF
@@ -190,6 +213,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: ruvB
+  is_informative: true
   level: 6
   locus_tag: PMM1615
   product: holliday junction ATP-dependent DNA helicase RuvB
@@ -197,6 +221,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: ssb
+  is_informative: true
   level: 6
   locus_tag: PMM1623
   product: single-stranded DNA-binding protein
@@ -204,6 +229,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: gyrB
+  is_informative: true
   level: 6
   locus_tag: PMM1634
   product: DNA gyrase, B subunit
@@ -211,6 +237,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: holA
+  is_informative: true
   level: 6
   locus_tag: PMM1647
   product: DNA polymerase III, delta subunit
@@ -218,6 +245,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: dnaX
+  is_informative: true
   level: 6
   locus_tag: PMM1658
   product: DNA polymerase III, gamma and tau subunits
@@ -225,6 +253,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: dnaB
+  is_informative: true
   level: 6
   locus_tag: PMM1674
   product: replicative DNA helicase
@@ -232,6 +261,7 @@ results:
   term_name: DNA replication
 - gene_category: Replication and repair
   gene_name: ligA
+  is_informative: true
   level: 6
   locus_tag: PMM1679
   product: ATP-dependent DNA ligase
@@ -244,6 +274,7 @@ terms_per_gene_median: 1.0
 terms_per_gene_min: 1
 top_terms:
 - count: 30
+  is_informative: true
   term_id: go:0006260
   term_name: DNA replication
 total_categories: 6

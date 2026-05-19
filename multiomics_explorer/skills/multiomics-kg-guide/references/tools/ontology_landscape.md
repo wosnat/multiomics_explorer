@@ -2,21 +2,30 @@
 
 ## What it does
 
-Rank (ontology x level) combinations by enrichment suitability.
+Rank (ontology x level) combinations by enrichment suitability — pre-flight for enrichment.
 
 Per-(ontology x level) stats: term-size distribution, genome coverage,
 best-effort share (GO). Ranked by coverage x size_factor(median) with
-sweet-spot [5, 50] median genes-per-term. Default ontology=None surveys
-all 9 ontologies. Pass experiment_ids to weight by coverage of those
-experiments' quantified genes. See docs://tools/ontology_landscape.
+sweet-spot [5, 50] median genes-per-term; `relevance_rank` is the
+composite score (rank 1 = best). `ontology=None` surveys every key
+(GO BP/MF/CC + 9 others); BRITE rows break down per tree (scope with
+`tree=`). Pass `experiment_ids=` to weight by coverage of those
+experiments' quantified genes.
+
+Routing: pick an `(ontology, level)` row, then call
+`pathway_enrichment(ontology=..., level=...)` or
+`cluster_enrichment(ontology=..., level=...)`. See
+docs://analysis/enrichment for the pre-flight role and a worked
+example, and docs://guide/conventions for the hierarchy `level`
+and BRITE-tree scoping conventions.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | organism | string | — | Organism (fuzzy match, e.g. 'MED4'). |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy') \| None | None | If None, surveys all 12 ontologies. |
-| tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy') \| None | None | If None, surveys all ontologies. |
+| tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | experiment_ids | list[string] \| None | None | Restrict coverage computation to genes quantified in these experiments. |
 | summary | bool | False | If true, omit per-row results (by_ontology only). |
 | verbose | bool | False | Include example_terms (top 3 terms per level). |
@@ -24,6 +33,7 @@ experiments' quantified genes. See docs://tools/ontology_landscape.
 | offset | int | 0 | Skip N rows before limit |
 | min_gene_set_size | int | 5 | Exclude terms with fewer genes than this (default 5). |
 | max_gene_set_size | int | 500 | Exclude terms with more genes than this (default 500). |
+| informative_only | bool | True | When True (default), exclude terms flagged uninformative in KG (e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' go:0008150). Term-side filter only — never restricts the gene set. Pass False to opt out and survey the full term set (rebaselines may differ). |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -124,7 +134,28 @@ ontology_landscape(organism="MED4")
  ]}
 ```
 
-### Example 5: Weight by experiments (coverage of quantified genes)
+### Example 5: Opt out of informative-only filtering (browse all terms, including catch-alls)
+
+```example-call
+ontology_landscape(organism="MED4", informative_only=False)
+```
+
+```example-response
+# `ontology_landscape` defaults to `informative_only=True` — the
+# ranking surface for enrichment should reflect informative terms
+# only (~224 KG-wide terms flagged `is_uninformative='true'` are
+# excluded by default). Pass `informative_only=False` when you need
+# an unfiltered census, e.g. when triaging coverage gaps in
+# KEGG / Cyanorak / TIGR or comparing unfiltered vs filtered
+# genome_coverage. Term-set sizes and genome_coverage will be
+# slightly higher than the default (delta ≈ 30 KEGG rows in MED4).
+{"organism_name": "Prochlorococcus MED4", "n_ontologies": 12,
+ "results": [
+   {"ontology_type": "kegg", "level": 3, "n_terms_with_genes": 1017, "genome_coverage": 0.61}
+ ]}
+```
+
+### Example 6: Weight by experiments (coverage of quantified genes)
 
 ```
 Step 1: list_experiments(organism="MED4", table_scope=["all_detected_genes"])
@@ -141,7 +172,7 @@ Step 2: ontology_landscape(
 ## Chaining patterns
 
 ```
-ontology_landscape -> genes_by_ontology(level=N) -> pathway_enrichment (Phase 2)
+ontology_landscape -> genes_by_ontology(level=N) -> pathway_enrichment
 list_experiments -> ontology_landscape(experiment_ids=...)
 ```
 

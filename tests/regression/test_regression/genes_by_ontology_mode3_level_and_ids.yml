@@ -19,6 +19,7 @@ organism_name: Prochlorococcus MED4
 results:
 - gene_category: Amino acid metabolism
   gene_name: aroK
+  is_informative: true
   level: 1
   locus_tag: PMM0107
   product: shikimate kinase
@@ -26,6 +27,7 @@ results:
   term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
 - gene_category: Amino acid metabolism
   gene_name: trpB
+  is_informative: true
   level: 1
   locus_tag: PMM0164
   product: tryptophan synthase, beta subunit
@@ -33,6 +35,7 @@ results:
   term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
 - gene_category: Amino acid metabolism
   gene_name: aroC
+  is_informative: true
   level: 1
   locus_tag: PMM0224
   product: chorismate synthase
@@ -40,6 +43,7 @@ results:
   term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
 - gene_category: Amino acid metabolism
   gene_name: aroQ
+  is_informative: true
   level: 1
   locus_tag: PMM0387
   product: 3-dehydroquinate dehydratase, type II
@@ -47,6 +51,7 @@ results:
   term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
 - gene_category: Amino acid metabolism
   gene_name: trpF
+  is_informative: true
   level: 1
   locus_tag: PMM0537
   product: N-(5^phosphoribosyl)anthranilate isomerase
@@ -54,6 +59,7 @@ results:
   term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
 - gene_category: Amino acid metabolism
   gene_name: trpA
+  is_informative: true
   level: 1
   locus_tag: PMM0572
   product: tryptophan synthase, alpha subunit
@@ -61,6 +67,7 @@ results:
   term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
 - gene_category: Amino acid metabolism
   gene_name: aroA
+  is_informative: true
   level: 1
   locus_tag: PMM0613
   product: 3-phosphoshikimate 1-carboxyvinyltransferase
@@ -68,6 +75,7 @@ results:
   term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
 - gene_category: Amino acid metabolism
   gene_name: aroB
+  is_informative: true
   level: 1
   locus_tag: PMM0682
   product: 3-dehydroquinate synthase
@@ -75,6 +83,7 @@ results:
   term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
 - gene_category: Amino acid metabolism
   gene_name: trpD
+  is_informative: true
   level: 1
   locus_tag: PMM0952
   product: anthranilate phosphoribosyltransferase
@@ -82,6 +91,7 @@ results:
   term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
 - gene_category: Amino acid metabolism
   gene_name: aroH
+  is_informative: true
   level: 1
   locus_tag: PMM1181
   product: chorismate mutase
@@ -89,6 +99,7 @@ results:
   term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
 - gene_category: Amino acid metabolism
   gene_name: trpC
+  is_informative: true
   level: 1
   locus_tag: PMM1297
   product: indole-3-glycerol phosphate synthase
@@ -96,6 +107,7 @@ results:
   term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
 - gene_category: Amino acid metabolism
   gene_name: pheA
+  is_informative: true
   level: 1
   locus_tag: PMM1504
   product: prephenate dehydratase
@@ -103,6 +115,7 @@ results:
   term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
 - gene_category: Amino acid metabolism
   gene_name: trpE
+  is_informative: true
   level: 1
   locus_tag: PMM1577
   product: anthranilate synthase component I
@@ -110,6 +123,7 @@ results:
   term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
 - gene_category: Amino acid metabolism
   gene_name: aroF
+  is_informative: true
   level: 1
   locus_tag: PMM1699
   product: 3-deoxy-7-phosphoheptulonate synthase
@@ -117,6 +131,7 @@ results:
   term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
 - gene_category: Amino acid metabolism
   gene_name: aroE
+  is_informative: true
   level: 1
   locus_tag: PMM1705
   product: shikimate 5-dehydrogenase
@@ -129,6 +144,7 @@ terms_per_gene_median: 1.0
 terms_per_gene_min: 1
 top_terms:
 - count: 15
+  is_informative: true
   term_id: cyanorak.role:A.1
   term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
 total_categories: 1

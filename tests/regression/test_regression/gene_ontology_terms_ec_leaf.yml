@@ -1,7 +1,8 @@
 case_id: gene_ontology_terms_ec_leaf
 row_count: 1
 rows:
-- level: 3
+- is_informative: true
+  level: 3
   locus_tag: PMM0001
   term_id: ec:2.7.7.7
   term_name: DNA-directed DNA polymerase

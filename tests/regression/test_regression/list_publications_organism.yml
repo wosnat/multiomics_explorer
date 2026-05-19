@@ -22,6 +22,9 @@ rows:
   - exponential
   - nutrient_limited
   journal: bioRxiv
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - PROTEOMICS
   - RNASEQ
@@ -56,6 +59,9 @@ rows:
   - darkness
   - stationary
   journal: Microbiology Spectrum
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - PROTEOMICS
   organisms:
@@ -93,6 +99,9 @@ rows:
   growth_phases:
   - acclimated_steady_state
   journal: Frontiers in Microbiology
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - RNASEQ
   organisms:
@@ -126,6 +135,9 @@ rows:
   - acute_stress
   - nutrient_limited
   journal: The ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - RNASEQ
   organisms:
@@ -157,6 +169,9 @@ rows:
   - acute_stress
   - infected
   journal: PLOS ONE
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - RNASEQ
   organisms:
@@ -185,6 +200,9 @@ rows:
   growth_phases:
   - exponential
   journal: The ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - RNASEQ
   organisms:
@@ -216,6 +234,9 @@ rows:
   growth_phases:
   - acute_stress
   journal: ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - MICROARRAY
   organisms:
@@ -248,6 +269,9 @@ rows:
   experiment_count: 3
   growth_phases: []
   journal: Science
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - VESICLE_DNASEQ
   - VESICLE_PROTEOMICS
@@ -281,6 +305,9 @@ rows:
   experiment_count: 1
   growth_phases: []
   journal: BMC Microbiology
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - RNASEQ
   organisms:
@@ -309,6 +336,9 @@ rows:
   experiment_count: 1
   growth_phases: []
   journal: PLoS ONE
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - PAIRED_RNASEQ_PROTEOME
   organisms:
@@ -341,6 +371,9 @@ rows:
   - nutrient_limited
   - recovery
   journal: The ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - MICROARRAY
   organisms:
@@ -379,6 +412,9 @@ rows:
   experiment_count: 1
   growth_phases: []
   journal: PLOS ONE
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - MICROARRAY
   organisms:
@@ -416,6 +452,9 @@ rows:
   growth_phases:
   - infected
   journal: Nature
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - MICROARRAY
   organisms:
@@ -447,6 +486,9 @@ rows:
   growth_phases:
   - acute_stress
   journal: Journal of Bacteriology
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - MICROARRAY
   organisms:
@@ -481,6 +523,9 @@ rows:
   - acute_stress
   - exponential
   journal: Molecular Systems Biology
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - MICROARRAY
   organisms:
@@ -512,6 +557,9 @@ rows:
   - exponential
   - nutrient_limited
   journal: PNAS
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - MICROARRAY
   organisms:

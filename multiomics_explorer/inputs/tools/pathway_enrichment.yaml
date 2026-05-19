@@ -37,6 +37,17 @@ verbose_fields:
   - background_gene_ids
 
 response_notes:
+  - title: "`informative_only` filter"
+    body: |
+      When True (default), exclude ontology terms flagged uninformative
+      in the KG (e.g. KEGG map00001 'metabolic pathways', GO root
+      go:0008150). Term-side filter — never restricts the gene set,
+      background, or DE inputs. Pass False to include uninformative terms;
+      per-row `is_informative` still surfaces in either mode.
+
+      See `docs://analysis/enrichment` (section "Informative-only filtering")
+      for rationale, Fisher denominator behavior, and opt-out guidance.
+
   - title: "Cluster naming"
     body: |
       Cluster IDs returned in `results[].cluster` follow the canonical format:
@@ -62,8 +73,11 @@ chaining:
   - "ontology_landscape → genes_by_ontology(level=N) → pathway_enrichment"
   - "pathway_enrichment → gene_overview"
   - "differential_expression_by_gene → pathway_enrichment"
+  - "pathway_enrichment(ontology='kegg', ...) → list_metabolites(pathway_ids=[<enriched_pathway_id>]) — inspect the chemistry of an enriched KEGG pathway (compound-anchored membership, distinct from the gene-KO membership the enrichment used). See docs://analysis/metabolites for the pathway-anchor disambiguation."
+  - "See `docs://analysis/enrichment` for the full methodology and the `informative_only` filter semantics."
 
 mistakes:
+  - "[ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions."
   - "Default background is `table_scope` (per-experiment quantified set). `'organism'` inflates the denominator and underestimates enrichment. See `docs://analysis/enrichment` for the full methodology note."
   - "BH correction is per-cluster (experiment × timepoint × direction), NOT across clusters. Cross-experiment FDR is biological replication, not statistical."
   - "Single-organism enforced. Run separate calls per organism."
@@ -76,3 +90,4 @@ mistakes:
     right: "pathway_enrichment(..., background='organism')  # or 'table_scope' (default), or a locus_tag list"
   - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"
   - "For DAG ontologies (`go_*`), `level=N`-only enrichment silently drops biologically-meaningful terms at heterogeneous depths. For narrow research questions, hand-curate a `term_ids` panel via `search_ontology(ontology='go_bp', search_text=...)` and pass it directly. Use `level` only when surveying a whole branch."
+  - "When a KEGG pathway is significantly enriched, drill into its chemistry via `list_metabolites(pathway_ids=[<term_id>])`. This answers 'what compounds does the enriched pathway involve?' — a different anchor than the gene-KO membership the enrichment is built on. The same KEGG pathway map (e.g. `kegg.pathway:ko00910` Nitrogen metabolism) reaches the same map from compound-membership vs gene-KO-membership; a gene whose KO is in pathway X may not catalyse any reaction whose metabolites are in pathway X (and vice versa). See docs://analysis/metabolites."

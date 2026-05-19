@@ -58,6 +58,15 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_experiments,
     build_list_experiments_summary,
     build_list_gene_categories,
+    build_list_metabolite_assays,
+    build_list_metabolite_assays_summary,
+    build_metabolites_by_quantifies_assay,
+    build_metabolites_by_quantifies_assay_summary,
+    build_metabolites_by_quantifies_assay_diagnostics,
+    build_metabolites_by_flags_assay,
+    build_metabolites_by_flags_assay_summary,
+    build_assays_by_metabolite,
+    build_assays_by_metabolite_summary,
     build_list_organisms,
     build_list_publications,
     build_list_publications_summary,
@@ -141,6 +150,22 @@ _KNOWN_MAP_KEYS = {
     # BRITE-only properties — present on BriteCategory nodes,
     # absent on all other ontology labels (returns null)
     "tree", "tree_code",
+    # F1 informativeness flag — sparse on 7 ontology types
+    # (KeggTerm, BiologicalProcess, MolecularFunction, CellularComponent,
+    #  CogFunctionalCategory, CyanorakRole, TigrRole); coalesce-handled
+    # for nodes without the property.
+    "is_uninformative",
+    # list_metabolite_assays — RETURN aliases derived from list comprehensions
+    # and aggregations (not direct property accesses on MetaboliteAssay).
+    "timepoints", "detection_status_counts", "metabolite_count_total",
+    "by_detection_status",
+    # Phase 5 metabolites-by-assay slice — UNION ALL aliases (parent §12.4):
+    # `det` / `flag` are per-branch null-padded discriminator scalars;
+    # `evidence_kind` is the branch label; cross-arm fields (metabolite_id,
+    # assay_id, organism_name, compartment, etc.) flow through CALL{} as
+    # aliases not property accesses.
+    "evidence_kind", "det", "flag",
+    "metabolite_id", "metabolite_name", "assay_id", "assay_name",
 }
 
 # Regex to extract property name from CyVer description:
@@ -227,6 +252,38 @@ _BUILDERS: list[tuple[str, ...]] = [
     ("list_experiments_search", build_list_experiments, {"search_text": "light"}),
     ("list_experiments_summary", build_list_experiments_summary, {}),
     ("list_experiments_summary_search", build_list_experiments_summary, {"search_text": "light"}),
+    # --- list_metabolite_assays (Phase 5) ---
+    ("list_metabolite_assays", build_list_metabolite_assays, {}),
+    ("list_metabolite_assays_search", build_list_metabolite_assays, {"search_text": "chitosan"}),
+    ("list_metabolite_assays_verbose", build_list_metabolite_assays, {"verbose": True}),
+    ("list_metabolite_assays_filtered", build_list_metabolite_assays,
+     {"organism": "MIT9301", "value_kind": "numeric", "rankable": True}),
+    ("list_metabolite_assays_metabolite_ids", build_list_metabolite_assays,
+     {"metabolite_ids": ["kegg.compound:C00074"]}),
+    ("list_metabolite_assays_summary", build_list_metabolite_assays_summary, {}),
+    ("list_metabolite_assays_summary_search", build_list_metabolite_assays_summary,
+     {"search_text": "chitosan"}),
+    # --- metabolomics drill-downs (Phase 5 slice) ---
+    ("metabolites_by_quantifies_assay_diag", build_metabolites_by_quantifies_assay_diagnostics,
+     {"assay_ids": ["a1"]}),
+    ("metabolites_by_quantifies_assay_summary", build_metabolites_by_quantifies_assay_summary,
+     {"assay_ids": ["a1"]}),
+    ("metabolites_by_quantifies_assay", build_metabolites_by_quantifies_assay,
+     {"assay_ids": ["a1"]}),
+    ("metabolites_by_quantifies_assay_verbose", build_metabolites_by_quantifies_assay,
+     {"assay_ids": ["a1"], "verbose": True}),
+    ("metabolites_by_flags_assay_summary", build_metabolites_by_flags_assay_summary,
+     {"assay_ids": ["a1"]}),
+    ("metabolites_by_flags_assay", build_metabolites_by_flags_assay,
+     {"assay_ids": ["a1"]}),
+    ("metabolites_by_flags_assay_verbose", build_metabolites_by_flags_assay,
+     {"assay_ids": ["a1"], "verbose": True}),
+    ("assays_by_metabolite_summary", build_assays_by_metabolite_summary,
+     {"metabolite_ids": ["kegg.compound:C00074"]}),
+    ("assays_by_metabolite", build_assays_by_metabolite,
+     {"metabolite_ids": ["kegg.compound:C00074"]}),
+    ("assays_by_metabolite_verbose", build_assays_by_metabolite,
+     {"metabolite_ids": ["kegg.compound:C00074"], "verbose": True}),
     # --- homolog group search ---
     ("search_homolog_groups_summary", build_search_homolog_groups_summary, {"search_text": "photosystem"}),
     ("search_homolog_groups", build_search_homolog_groups, {"search_text": "photosystem"}),

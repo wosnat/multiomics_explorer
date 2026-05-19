@@ -2,378 +2,441 @@ case_id: search_ontology_go_cc
 row_count: 63
 rows:
 - id: go:0000139
+  is_informative: true
   level: 4
   name: Golgi membrane
   score: 1.0495
   tree: null
   tree_code: null
 - id: go:0000329
+  is_informative: true
   level: 6
   name: fungal-type vacuole membrane
   score: 0.8098
   tree: null
   tree_code: null
 - id: go:0005741
+  is_informative: true
   level: 4
   name: mitochondrial outer membrane
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0005743
+  is_informative: true
   level: 4
   name: mitochondrial inner membrane
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0005765
+  is_informative: true
   level: 6
   name: lysosomal membrane
   score: 1.0495
   tree: null
   tree_code: null
 - id: go:0005774
+  is_informative: true
   level: 4
   name: vacuolar membrane
   score: 1.0495
   tree: null
   tree_code: null
 - id: go:0005789
+  is_informative: true
   level: 4
   name: endoplasmic reticulum membrane
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0005886
+  is_informative: true
   level: 3
   name: plasma membrane
   score: 1.0495
   tree: null
   tree_code: null
 - id: go:0009279
+  is_informative: true
   level: 3
   name: cell outer membrane
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0009528
+  is_informative: true
   level: 4
   name: plastid inner membrane
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0009535
+  is_informative: true
   level: 4
   name: chloroplast thylakoid membrane
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0009706
+  is_informative: true
   level: 5
   name: chloroplast inner membrane
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0009897
+  is_informative: true
   level: 3
   name: external side of plasma membrane
   score: 0.7268
   tree: null
   tree_code: null
 - id: go:0009898
+  is_informative: true
   level: 4
   name: cytoplasmic side of plasma membrane
   score: 0.7268
   tree: null
   tree_code: null
 - id: go:0016020
+  is_informative: true
   level: 2
   name: membrane
   score: 1.2318
   tree: null
   tree_code: null
 - id: go:0019866
+  is_informative: true
   level: 3
   name: organelle inner membrane
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0019867
+  is_informative: true
   level: 3
   name: outer membrane
   score: 1.0495
   tree: null
   tree_code: null
 - id: go:0019897
+  is_informative: true
   level: 3
   name: extrinsic component of plasma membrane
   score: 0.7268
   tree: null
   tree_code: null
 - id: go:0019898
+  is_informative: true
   level: 2
   name: extrinsic component of membrane
   score: 0.8098
   tree: null
   tree_code: null
 - id: go:0030077
+  is_informative: true
   level: 3
   name: plasma membrane light-harvesting complex
   score: 0.7268
   tree: null
   tree_code: null
 - id: go:0030094
+  is_informative: true
   level: 3
   name: plasma membrane-derived photosystem I
   score: 0.7268
   tree: null
   tree_code: null
 - id: go:0030096
+  is_informative: true
   level: 3
   name: plasma membrane-derived thylakoid photosystem II
   score: 0.6592
   tree: null
   tree_code: null
 - id: go:0030288
+  is_informative: true
   level: 3
   name: outer membrane-bounded periplasmic space
   score: 0.7268
   tree: null
   tree_code: null
 - id: go:0031090
+  is_informative: true
   level: 3
   name: organelle membrane
   score: 1.0495
   tree: null
   tree_code: null
 - id: go:0031232
+  is_informative: true
   level: 4
   name: extrinsic component of external side of plasma membrane
   score: 0.5559
   tree: null
   tree_code: null
 - id: go:0031234
+  is_informative: true
   level: 4
   name: extrinsic component of cytoplasmic side of plasma membrane
   score: 0.5559
   tree: null
   tree_code: null
 - id: go:0031236
+  is_informative: true
   level: 5
   name: extrinsic component of periplasmic side of plasma membrane
   score: 0.5559
   tree: null
   tree_code: null
 - id: go:0031240
+  is_informative: true
   level: 3
   name: external side of cell outer membrane
   score: 0.6592
   tree: null
   tree_code: null
 - id: go:0031241
+  is_informative: true
   level: 3
   name: periplasmic side of cell outer membrane
   score: 0.6592
   tree: null
   tree_code: null
 - id: go:0031676
+  is_informative: true
   level: 4
   name: plasma membrane-derived thylakoid membrane
   score: 1.0572
   tree: null
   tree_code: null
 - id: go:0031966
+  is_informative: true
   level: 4
   name: mitochondrial membrane
   score: 1.0495
   tree: null
   tree_code: null
 - id: go:0031968
+  is_informative: true
   level: 3
   name: organelle outer membrane
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0031969
+  is_informative: true
   level: 5
   name: chloroplast membrane
   score: 1.0495
   tree: null
   tree_code: null
 - id: go:0031974
+  is_informative: true
   level: 2
   name: membrane-enclosed lumen
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0031979
+  is_informative: true
   level: 3
   name: plasma membrane-derived thylakoid lumen
   score: 0.7268
   tree: null
   tree_code: null
 - id: go:0032588
+  is_informative: true
   level: 4
   name: trans-Golgi network membrane
   score: 0.8098
   tree: null
   tree_code: null
 - id: go:0033644
+  is_informative: true
   level: 5
   name: host cell membrane
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0034357
+  is_informative: true
   level: 3
   name: photosynthetic membrane
   score: 1.0495
   tree: null
   tree_code: null
 - id: go:0042170
+  is_informative: true
   level: 4
   name: plastid membrane
   score: 1.0495
   tree: null
   tree_code: null
 - id: go:0042175
+  is_informative: true
   level: 3
   name: nuclear outer membrane-endoplasmic reticulum membrane network
   score: 0.92
   tree: null
   tree_code: null
 - id: go:0042651
+  is_informative: true
   level: 4
   name: thylakoid membrane
   score: 1.0495
   tree: null
   tree_code: null
 - id: go:0042716
+  is_informative: true
   level: 2
   name: plasma membrane-derived chromatophore
   score: 0.8098
   tree: null
   tree_code: null
 - id: go:0042717
+  is_informative: true
   level: 3
   name: plasma membrane-derived chromatophore membrane
   score: 1.0572
   tree: null
   tree_code: null
 - id: go:0043227
+  is_informative: true
   level: 3
   name: membrane-bounded organelle
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0043231
+  is_informative: true
   level: 4
   name: intracellular membrane-bounded organelle
   score: 0.8098
   tree: null
   tree_code: null
 - id: go:0044384
+  is_informative: true
   level: 6
   name: host outer membrane
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0044853
+  is_informative: true
   level: 4
   name: plasma membrane raft
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0045121
+  is_informative: true
   level: 4
   name: membrane raft
   score: 1.0495
   tree: null
   tree_code: null
 - id: go:0048501
+  is_informative: true
   level: 4
   name: signal recognition particle, plasma membrane targeting
   score: 0.6592
   tree: null
   tree_code: null
 - id: go:0055035
+  is_informative: true
   level: 5
   name: plastid thylakoid membrane
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0098552
+  is_informative: true
   level: 2
   name: side of membrane
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0098562
+  is_informative: true
   level: 3
   name: cytoplasmic side of membrane
   score: 0.8098
   tree: null
   tree_code: null
 - id: go:0098567
+  is_informative: true
   level: 4
   name: periplasmic side of plasma membrane
   score: 0.7268
   tree: null
   tree_code: null
 - id: go:0098588
+  is_informative: true
   level: 4
   name: bounding membrane of organelle
   score: 0.8098
   tree: null
   tree_code: null
 - id: go:0098590
+  is_informative: true
   level: 3
   name: plasma membrane region
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0098796
+  is_informative: true
   level: 2
   name: membrane protein complex
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0098797
+  is_informative: true
   level: 3
   name: plasma membrane protein complex
   score: 0.8098
   tree: null
   tree_code: null
 - id: go:0098800
+  is_informative: true
   level: 3
   name: inner mitochondrial membrane protein complex
   score: 0.7268
   tree: null
   tree_code: null
 - id: go:0098802
+  is_informative: true
   level: 3
   name: plasma membrane signaling receptor complex
   score: 0.7268
   tree: null
   tree_code: null
 - id: go:0098807
+  is_informative: true
   level: 3
   name: chloroplast thylakoid membrane protein complex
   score: 0.7268
   tree: null
   tree_code: null
 - id: go:0098852
+  is_informative: true
   level: 5
   name: lytic vacuole membrane
   score: 0.9142
   tree: null
   tree_code: null
 - id: go:0098857
+  is_informative: true
   level: 3
   name: membrane microdomain
   score: 1.0495
   tree: null
   tree_code: null
 - id: go:0120025
+  is_informative: true
   level: 3
   name: plasma membrane bounded cell projection
   score: 0.7268

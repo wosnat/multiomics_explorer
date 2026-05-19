@@ -1,5 +1,5 @@
 case_id: resolve_gene_by_name
-row_count: 31
+row_count: 32
 rows:
 - gene_name: dnaN
   locus_tag: A9601_00001
@@ -33,6 +33,10 @@ rows:
   locus_tag: DEH24_01275
   organism_name: Alteromonas (MarRef v6)
   product: DNA polymerase III subunit beta
+- gene_name: dnaN
+  locus_tag: EW15_0002
+  organism_name: Prochlorococcus MIT0801
+  product: DNA polymerase III, beta subunit
 - gene_name: dnaN
   locus_tag: EZ55_00002
   organism_name: Alteromonas macleodii EZ55

@@ -1,0 +1,13 @@
+case_id: mfa_msystems_summary
+row_count: 1
+rows:
+- by_assay:
+  - '{''count'': 93, ''item'': ''metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular''}'
+  by_compartment:
+  - '{''count'': 93, ''item'': ''whole_cell''}'
+  by_organism:
+  - '{''count'': 93, ''item'': ''Prochlorococcus MIT9301''}'
+  by_value:
+  - '{''count'': 35, ''item'': ''true''}'
+  - '{''count'': 58, ''item'': ''false''}'
+  total_matching: 93

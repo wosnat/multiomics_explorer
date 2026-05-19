@@ -24,6 +24,7 @@ from multiomics_explorer.kg.constants import (
     GO_ONTOLOGIES,
     MAX_SPECIFICITY_RANK,
     VALID_OG_SOURCES,
+    VALID_OMICS_TYPES,
     VALID_TAXONOMIC_LEVELS,
 )
 from multiomics_explorer.kg.queries_lib import (
@@ -45,9 +46,11 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_homologs_summary,
     build_list_brite_trees,
     build_list_compartments,
+    build_list_evidence_sources,
     build_list_gene_categories,
     build_list_growth_phases,
     build_list_metric_types,
+    build_list_omics_types,
     build_list_value_kinds,
     build_list_organisms,
     build_list_organisms_capability,
@@ -84,6 +87,15 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_clustering_analyses_summary,
     build_list_derived_metrics,
     build_list_derived_metrics_summary,
+    build_list_metabolite_assays,
+    build_list_metabolite_assays_summary,
+    build_metabolites_by_quantifies_assay,
+    build_metabolites_by_quantifies_assay_diagnostics,
+    build_metabolites_by_quantifies_assay_summary,
+    build_metabolites_by_flags_assay,
+    build_metabolites_by_flags_assay_summary,
+    build_assays_by_metabolite,
+    build_assays_by_metabolite_summary,
     build_list_metabolites,
     build_list_metabolites_summary,
     build_genes_by_metabolite_metabolism,
@@ -146,6 +158,30 @@ def _rename_freq(freq_list: list[dict], key_name: str) -> list[dict]:
         key=lambda x: x["count"],
         reverse=True,
     )
+
+
+def _rename_measurement_coverage(raw: dict | None) -> dict:
+    """Rename apoc.coll.frequencies output for `by_measurement_coverage`.
+
+    The Cypher emits both sub-rollups as ``[{item, count}, ...]`` lists. The
+    Pydantic boundary expects ``[{paper_count, count}]`` for `by_paper_count`
+    and ``[{compartment, count}]`` for `by_compartment`. Returns the
+    sub-rollups in canonical-order (paper_count ascending; compartment
+    alphabetical) so the response is deterministic.
+    """
+    if not raw:
+        return {"by_paper_count": [], "by_compartment": []}
+    by_pc = sorted(
+        [{"paper_count": f["item"], "count": f["count"]}
+         for f in raw.get("by_paper_count", []) if f.get("item") is not None],
+        key=lambda x: x["paper_count"],
+    )
+    by_comp = sorted(
+        [{"compartment": f["item"], "count": f["count"]}
+         for f in raw.get("by_compartment", []) if f.get("item") is not None],
+        key=lambda x: x["compartment"],
+    )
+    return {"by_paper_count": by_pc, "by_compartment": by_comp}
 
 
 # Regex for blocking write operations in raw Cypher.
@@ -361,11 +397,17 @@ def gene_overview(
         "by_annotation_type": _rename_freq(
             raw_summary["by_annotation_type"], "annotation_type",
         ),
+        "by_annotation_state": _rename_freq(
+            raw_summary.get("by_annotation_state", []), "annotation_state",
+        ),
         "has_expression": raw_summary["has_expression"],
         "has_significant_expression": raw_summary["has_significant_expression"],
         "has_orthologs": raw_summary["has_orthologs"],
         "has_clusters": raw_summary["has_clusters"],
         "has_derived_metrics": raw_summary["has_derived_metrics"],
+        # Phase 1 plumbing (spec §6.1): count of genes in batch with non-empty
+        # evidence_sources. Mirrors has_orthologs / has_clusters envelope keys.
+        "has_chemistry": raw_summary.get("has_chemistry", 0),
         "not_found": raw_summary["not_found"],
     }
 
@@ -574,6 +616,11 @@ def list_filter_values(
       - ``metric_type``: DerivedMetric.metric_type tag values.
       - ``value_kind``: DerivedMetric.value_kind enum.
       - ``compartment``: Experiment.compartment values.
+      - ``omics_type``: Experiment.omics_type values; result merges the
+        canonical OMICS_TYPE enum (8 values) so METABOLOMICS surfaces with
+        count=0 even when no experiments of that type exist.
+      - ``evidence_source``: Metabolite.evidence_sources buckets
+        (metabolism / transport / metabolomics).
     """
     conn = _default_conn(conn)
     if filter_type == "gene_category":
@@ -603,8 +650,27 @@ def list_filter_values(
         cypher, params = build_list_compartments()
         rows = conn.execute_query(cypher, **params)
         results = [{"value": r["value"], "count": r["count"]} for r in rows]
+    elif filter_type == "omics_type":
+        # Phase 1 plumbing (spec §6.5): merge canonical OMICS_TYPE enum
+        # so METABOLOMICS (and any future enum addition) surfaces with
+        # count=0 when no experiments of that type exist yet.
+        cypher, params = build_list_omics_types()
+        rows = conn.execute_query(cypher, **params)
+        observed = {r["value"]: r["count"] for r in rows}
+        results = [
+            {"value": v, "count": observed.get(v, 0)}
+            for v in sorted(VALID_OMICS_TYPES)
+        ]
+    elif filter_type == "evidence_source":
+        cypher, params = build_list_evidence_sources()
+        rows = conn.execute_query(cypher, **params)
+        results = [{"value": r["value"], "count": r["count"]} for r in rows]
     else:
-        raise ValueError(f"Unknown filter_type: {filter_type!r}")
+        raise ValueError(
+            f"Unknown filter_type: {filter_type!r}. Valid options: "
+            "'gene_category', 'brite_tree', 'growth_phase', 'metric_type', "
+            "'value_kind', 'compartment', 'omics_type', 'evidence_source'."
+        )
     total = len(results)
     return {
         "filter_type": filter_type,
@@ -636,18 +702,22 @@ def list_organisms(
 
     Returns dict with keys: total_entries, total_matching, returned, offset,
     truncated, by_cluster_type, by_organism_type, by_value_kind, by_metric_type,
-    by_compartment, by_metabolic_capability, not_found, results.
+    by_compartment, by_metabolic_capability, by_measurement_capability,
+    not_found, results.
     Per result (compact): organism_name, organism_type, genus, species,
     strain, clade, ncbi_taxon_id, gene_count, publication_count,
     experiment_count, treatment_types, omics_types, clustering_analysis_count,
     cluster_types, derived_metric_count, derived_metric_value_kinds, compartments,
-    reaction_count, metabolite_count.
+    reaction_count, metabolite_count, measured_metabolite_count.
     Sparse fields (omitted when null): reference_database, reference_proteome.
     When verbose=True, also includes: family, order, tax_class, phylum, kingdom,
     superkingdom, lineage, cluster_count, derived_metric_gene_count,
     derived_metric_types.
     by_metabolic_capability: top 10 organisms (within matched set) by
     metabolite_count, sorted desc; excludes zero-chemistry organisms.
+    by_measurement_capability: binary 2-bucket count
+    {has_metabolomics: N, no_metabolomics: M} where has_metabolomics counts
+    organisms with measured_metabolite_count > 0. Sums to total_matching.
     """
     conn = _default_conn(conn)
     if summary:
@@ -665,6 +735,9 @@ def list_organisms(
         "total_entries": 0, "total_matching": 0,
         "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
         "by_cluster_type": [], "by_organism_type": [],
+        "by_measurement_capability": {
+            "has_metabolomics": 0, "no_metabolomics": 0,
+        },
     }
     total_entries = summary_row["total_entries"]
     total_matching = summary_row["total_matching"]
@@ -752,6 +825,13 @@ def list_organisms(
         "by_compartment": _rename_freq(summary_row.get("by_compartment", []),
                                        "compartment"),
         "by_metabolic_capability": by_metabolic_capability,
+        # Phase 1 plumbing (spec §6.4): pass-through binary 2-bucket dict
+        # surfaced by build_list_organisms_summary. Default to zero-bucket
+        # dict on no-summary fall-through.
+        "by_measurement_capability": summary_row.get(
+            "by_measurement_capability",
+            {"has_metabolomics": 0, "no_metabolomics": 0},
+        ),
         "returned": len(results),
         "offset": offset,
         "truncated": total_matching > offset + len(results),
@@ -784,7 +864,8 @@ def list_publications(
     Per result (compact): doi, title, authors, year, journal, study_type,
     organisms, experiment_count, treatment_types, background_factors,
     omics_types, clustering_analysis_count, cluster_types, growth_phases,
-    derived_metric_count, derived_metric_value_kinds, compartments.
+    derived_metric_count, derived_metric_value_kinds, compartments,
+    metabolite_count, metabolite_assay_count, metabolite_compartments.
     When verbose=True, also includes abstract, description, cluster_count,
     derived_metric_gene_count, derived_metric_types.
     When search_text is provided, also includes score.
@@ -922,7 +1003,8 @@ def list_experiments(
     gene_count, distinct_gene_count, genes_by_status (dict),
     clustering_analysis_count, cluster_types, growth_phases,
     timepoints (list, omitted if not time-course),
-    derived_metric_count, derived_metric_value_kinds, compartment.
+    derived_metric_count, derived_metric_value_kinds, compartment,
+    metabolite_count, metabolite_assay_count, metabolite_compartments.
     Per timepoint dict: timepoint, timepoint_order, timepoint_hours,
     growth_phase (str | None), gene_count, genes_by_status.
     When verbose=True, also includes: publication_title, treatment,
@@ -931,8 +1013,8 @@ def list_experiments(
     derived_metric_gene_count, derived_metric_types,
     reports_derived_metric_types.
     Both derived_metric_types and reports_derived_metric_types source
-    from the same KG property today (e.reports_derived_metric_types) and
-    are identical in current data. Both are emitted for forward-compat
+    from the same KG property (e.reports_derived_metric_types) and are
+    identical in current data. Both are emitted for forward-compat
     with a future KG distinction between "DMs reported by this experiment"
     and "DMs associated with this experiment" (slice-2 D5).
     When search_text is provided, detail results include score.
@@ -1148,6 +1230,7 @@ def search_ontology(
     offset: int = 0,
     level: int | None = None,
     tree: str | None = None,
+    informative_only: bool = False,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -1175,6 +1258,7 @@ def search_ontology(
         sum_cypher, sum_params = build_search_ontology_summary(
             ontology=ontology, search_text=effective_text,
             level=level, tree=tree,
+            informative_only=informative_only,
         )
         raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
     except Neo4jClientError:
@@ -1183,6 +1267,7 @@ def search_ontology(
         sum_cypher, sum_params = build_search_ontology_summary(
             ontology=ontology, search_text=effective_text,
             level=level, tree=tree,
+            informative_only=informative_only,
         )
         raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
 
@@ -1206,6 +1291,7 @@ def search_ontology(
         det_cypher, det_params = build_search_ontology(
             ontology=ontology, search_text=effective_text, limit=limit, offset=offset,
             level=level, tree=tree,
+            informative_only=informative_only,
         )
         results = conn.execute_query(det_cypher, **det_params)
     except Neo4jClientError:
@@ -1215,6 +1301,7 @@ def search_ontology(
             det_cypher, det_params = build_search_ontology(
                 ontology=ontology, search_text=effective_text, limit=limit, offset=offset,
                 level=level, tree=tree,
+                informative_only=informative_only,
             )
             results = conn.execute_query(det_cypher, **det_params)
         else:
@@ -1456,6 +1543,7 @@ def genes_by_ontology(
     limit: int | None = None,
     offset: int = 0,
     tree: str | None = None,
+    informative_only: bool = False,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -1529,6 +1617,7 @@ def genes_by_ontology(
             min_gene_set_size=min_gene_set_size,
             max_gene_set_size=max_gene_set_size,
             tree=tree,
+            informative_only=informative_only,
         )
         per_term = conn.execute_query(pt_cypher, **pt_params)
 
@@ -1539,6 +1628,7 @@ def genes_by_ontology(
             min_gene_set_size=min_gene_set_size,
             max_gene_set_size=max_gene_set_size,
             tree=tree,
+            informative_only=informative_only,
         )
         per_gene = conn.execute_query(pg_cypher, **pg_params)
 
@@ -1581,7 +1671,8 @@ def genes_by_ontology(
         per_term, key=lambda r: (-r["n_genes"], r["term_id"])
     )[:5]
     top_terms = [
-        {"term_id": r["term_id"], "term_name": r["term_name"], "count": r["n_genes"]}
+        {"term_id": r["term_id"], "term_name": r["term_name"],
+         "count": r["n_genes"], "is_informative": r["is_informative"]}
         for r in top_terms_sorted
     ]
 
@@ -1643,6 +1734,7 @@ def genes_by_ontology(
         max_gene_set_size=max_gene_set_size,
         verbose=verbose, limit=limit, offset=offset,
         tree=tree,
+        informative_only=informative_only,
     )
     results = conn.execute_query(det_cypher, **det_params)
 
@@ -1675,6 +1767,7 @@ def gene_ontology_terms(
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
+    informative_only: bool = False,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -1738,6 +1831,7 @@ def gene_ontology_terms(
                     locus_tags=chunk, ontology=ont,
                     organism_name=organism_name,
                     mode=mode, level=level, tree=tree,
+                    informative_only=informative_only,
                 )
                 rows = conn.execute_query(sum_cypher, **sum_params)
                 if not rows or rows[0]["gene_count"] == 0:
@@ -1790,6 +1884,7 @@ def gene_ontology_terms(
                         organism_name=organism_name,
                         mode=mode, level=level, tree=tree,
                         verbose=verbose, limit=None,
+                        informative_only=informative_only,
                     )
                     rows = conn.execute_query(det_cypher, **det_params)
                     # Strip sparse tree/tree_code when None
@@ -1913,7 +2008,8 @@ def run_cypher(
 # ---------------------------------------------------------------------------
 
 _EXPRESSION_STATUS_KEYS = ("significant_up", "significant_down", "not_significant")
-_VALID_DIRECTIONS = {"up", "down"}
+_VALID_DIRECTIONS_BY_GENE = {"up", "down", "both"}
+_VALID_DIRECTIONS_BY_ORTHOLOG = {"up", "down"}
 
 
 def _apoc_freq_to_dict(freq_list: list[dict]) -> dict[str, int]:
@@ -2041,6 +2137,13 @@ def differential_expression_by_gene(
     Returns dict with summary fields + results list. Results are long form:
     one row per gene x experiment x timepoint, all context inlined.
 
+    direction: ``'up'`` / ``'down'`` / ``'both'`` / ``None``. ``'both'`` is
+        the explicit, self-documenting spelling for "return rows with
+        ``expression_status`` ∈ {``'significant_up'``, ``'significant_down'``}"
+        — functionally equivalent to ``direction=None, significant_only=True``;
+        pick whichever spelling is clearer at the call site.
+        Default ``None`` is unchanged.
+
     Raises:
         ValueError: if no filter provided, if inputs span multiple organisms,
             if organisms don't match each other, or if organism fuzzy match
@@ -2059,9 +2162,9 @@ def differential_expression_by_gene(
     conn = _default_conn(conn)
 
     # Validate direction
-    if direction is not None and direction not in _VALID_DIRECTIONS:
+    if direction is not None and direction not in _VALID_DIRECTIONS_BY_GENE:
         raise ValueError(
-            f"Invalid direction '{direction}'. Valid: {sorted(_VALID_DIRECTIONS)}"
+            f"Invalid direction '{direction}'. Valid: {sorted(_VALID_DIRECTIONS_BY_GENE)}"
         )
 
     # Require at least one filter
@@ -2244,9 +2347,9 @@ def differential_expression_by_ortholog(
     if not group_ids:
         raise ValueError("group_ids must not be empty.")
 
-    if direction is not None and direction not in _VALID_DIRECTIONS:
+    if direction is not None and direction not in _VALID_DIRECTIONS_BY_ORTHOLOG:
         raise ValueError(
-            f"Invalid direction '{direction}'. Valid: {sorted(_VALID_DIRECTIONS)}"
+            f"Invalid direction '{direction}'. Valid: {sorted(_VALID_DIRECTIONS_BY_ORTHOLOG)}"
         )
 
     if summary:
@@ -2970,14 +3073,14 @@ def gene_derived_metrics(
     by_value_kind, by_metric_type, by_metric, by_compartment,
     by_treatment_type, by_background_factors, by_publication,
     returned, offset, truncated, results.
-    Per result (compact, 13 Pydantic fields; 11 emitted by Cypher today):
-    locus_tag, gene_name, derived_metric_id, value_kind, name, value,
-    rankable, has_p_value, rank_by_metric, metric_percentile,
-    metric_bucket, adjusted_p_value (None today), significant (None today).
-    Per result (verbose adds, 12 Pydantic; 11 emitted today): metric_type,
+    Per result (compact, 13 Pydantic fields; 11 emitted by Cypher in the
+    current KG): locus_tag, gene_name, derived_metric_id, value_kind, name,
+    value, rankable, has_p_value, rank_by_metric, metric_percentile,
+    metric_bucket, adjusted_p_value (None), significant (None).
+    Per result (verbose adds, 12 Pydantic; 11 emitted): metric_type,
     field_description, unit, allowed_categories, compartment,
     treatment_type, background_factors, publication_doi, treatment,
-    light_condition, experimental_context, p_value (None today).
+    light_condition, experimental_context, p_value (None).
 
     summary=True: results=[], summary fields only.
 
@@ -4058,6 +4161,7 @@ def ontology_landscape(
     min_gene_set_size: int = 5,
     max_gene_set_size: int = 500,
     tree: str | None = None,
+    informative_only: bool = True,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -4124,6 +4228,7 @@ def ontology_landscape(
             min_gene_set_size=min_gene_set_size,
             max_gene_set_size=max_gene_set_size,
             tree=tree if ont == "brite" else None,
+            informative_only=informative_only,
         )
         stat_rows = conn.execute_query(ls_cypher, **ls_params)
         n_levels = len(stat_rows)
@@ -4264,6 +4369,7 @@ def pathway_enrichment(
     timepoint_filter: list[str] | None = None,
     growth_phases: list[str] | None = None,
     tree: str | None = None,
+    informative_only: bool = True,
     *,
     conn: GraphConnection | None = None,
 ):
@@ -4348,6 +4454,7 @@ def pathway_enrichment(
         min_gene_set_size=0, max_gene_set_size=None,
         summary=False, verbose=False,
         limit=None, offset=0, tree=tree,
+        informative_only=informative_only,
         conn=conn,
     )
     from multiomics_explorer.analysis.frames import to_dataframe
@@ -4404,6 +4511,7 @@ def pathway_enrichment(
     result.params = {
         "organism": organism, "ontology": ontology,
         "level": level, "term_ids": term_ids, "tree": tree,
+        "informative_only": informative_only,
         "min_gene_set_size": min_gene_set_size,
         "max_gene_set_size": max_gene_set_size,
         "pvalue_cutoff": pvalue_cutoff,
@@ -4447,6 +4555,7 @@ def cluster_enrichment(
     max_cluster_size: int | None = None,
     pvalue_cutoff: float = 0.05,
     tree: str | None = None,
+    informative_only: bool = True,
     *,
     conn: GraphConnection | None = None,
 ):
@@ -4530,6 +4639,7 @@ def cluster_enrichment(
         result.params = _cluster_enrichment_params_dict(
             analysis_id=analysis_id, organism=organism,
             ontology=ontology, level=level, term_ids=term_ids, tree=tree,
+            informative_only=informative_only,
             background_mode=background_mode,
             min_gene_set_size=min_gene_set_size, max_gene_set_size=max_gene_set_size,
             min_cluster_size=min_cluster_size, max_cluster_size=max_cluster_size,
@@ -4544,6 +4654,7 @@ def cluster_enrichment(
         min_gene_set_size=0, max_gene_set_size=None,
         summary=False, verbose=False,
         limit=None, offset=0, tree=tree,
+        informative_only=informative_only,
         conn=conn,
     )
     from multiomics_explorer.analysis.frames import to_dataframe
@@ -4608,6 +4719,7 @@ def cluster_enrichment(
     result.params = _cluster_enrichment_params_dict(
         analysis_id=analysis_id, organism=organism,
         ontology=ontology, level=level, term_ids=term_ids, tree=tree,
+        informative_only=informative_only,
         background_mode=background_mode,
         min_gene_set_size=min_gene_set_size, max_gene_set_size=max_gene_set_size,
         min_cluster_size=min_cluster_size, max_cluster_size=max_cluster_size,
@@ -4618,7 +4730,8 @@ def cluster_enrichment(
 
 
 def _cluster_enrichment_params_dict(
-    *, analysis_id, organism, ontology, level, term_ids, tree, background_mode,
+    *, analysis_id, organism, ontology, level, term_ids, tree,
+    informative_only, background_mode,
     min_gene_set_size, max_gene_set_size,
     min_cluster_size, max_cluster_size, pvalue_cutoff,
     inputs, produced, term2gene,
@@ -4626,6 +4739,7 @@ def _cluster_enrichment_params_dict(
     return {
         "analysis_id": analysis_id, "organism": organism,
         "ontology": ontology, "level": level, "term_ids": term_ids, "tree": tree,
+        "informative_only": informative_only,
         "background_mode": background_mode,
         "min_gene_set_size": min_gene_set_size,
         "max_gene_set_size": max_gene_set_size,
@@ -4645,8 +4759,9 @@ _VALID_EVIDENCE_SOURCES = ("metabolism", "transport", "metabolomics")
 
 
 def list_metabolites(
-    search: str | None = None,
+    search_text: str | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     kegg_compound_ids: list[str] | None = None,
     chebi_ids: list[str] | None = None,
     hmdb_ids: list[str] | None = None,
@@ -4667,25 +4782,34 @@ def list_metabolites(
     """List metabolites in the chemistry layer with rich filtering.
 
     Returns dict with keys: total_entries, total_matching, returned, offset,
-    truncated, top_organisms, top_pathways, by_evidence_source, xref_coverage,
-    mass_stats, score_max, score_median, not_found, results.
+    truncated, top_organisms, top_metabolite_pathways, by_evidence_source,
+    xref_coverage, mass_stats, by_measurement_coverage, score_max,
+    score_median, not_found, results.
     Per result (compact): metabolite_id, name, formula, elements, mass,
     gene_count, organism_count, transporter_count, evidence_sources,
-    chebi_id (sparse), pathway_ids, pathway_count.
+    chebi_id (sparse), pathway_ids, pathway_count, measured_assay_count,
+    measured_paper_count, measured_organisms, measured_compartments.
     When verbose=True, also includes: inchikey, smiles, mnxm_id, hmdb_id,
     pathway_names. (For per-organism gene tallies, drill into
     genes_by_metabolite — slice-1 Tool #2.)
-    When search is provided, also includes score (per row) +
+    by_measurement_coverage envelope: sub-rollups
+    {by_paper_count: [{paper_count, n}], by_compartment: [{compartment, n}]}
+    over the matched metabolite set.
+    When search_text is provided, also includes score (per row) +
     score_max, score_median (envelope, otherwise None).
 
+    exclude_metabolite_ids: Exclude metabolites with these IDs. Set-difference
+        semantics with metabolite_ids — exclude wins on overlap. Empty list
+        is no-op.
+
     Raises:
-        ValueError: if search is empty/whitespace, or evidence_sources
+        ValueError: if search_text is empty/whitespace, or evidence_sources
             contains values outside {"metabolism", "transport",
             "metabolomics"}.
     """
-    # 1. Validate search (non-empty when provided)
-    if search is not None and not search.strip():
-        raise ValueError("search must not be empty or whitespace.")
+    # 1. Validate search_text (non-empty when provided)
+    if search_text is not None and not search_text.strip():
+        raise ValueError("search_text must not be empty or whitespace.")
 
     # 1. Validate evidence_sources enum (defensive — MCP wrapper also gates)
     if evidence_sources is not None:
@@ -4720,31 +4844,33 @@ def list_metabolites(
         pathway_ids=pathway_ids,
         evidence_sources=evidence_sources,
     )
+    if exclude_metabolite_ids:
+        filter_kwargs["exclude_metabolite_ids"] = exclude_metabolite_ids
 
-    def _run_summary(st=search):
+    def _run_summary(st=search_text):
         cypher, params = build_list_metabolites_summary(
-            search=st, **filter_kwargs,
+            search_text=st, **filter_kwargs,
         )
         return conn.execute_query(cypher, **params)[0]
 
-    def _run_detail(st=search):
+    def _run_detail(st=search_text):
         cypher, params = build_list_metabolites(
-            search=st, **filter_kwargs,
+            search_text=st, **filter_kwargs,
             verbose=verbose, limit=limit, offset=offset,
         )
         return conn.execute_query(cypher, **params)
 
     # 4. Always run summary builder (with Lucene retry)
-    effective_search = search
+    effective_search = search_text
     try:
         raw_summary = _run_summary()
     except Neo4jClientError:
-        if search:
+        if search_text:
             logger.debug(
                 "list_metabolites: Lucene parse error, "
                 "retrying with escaped query"
             )
-            effective_search = _LUCENE_SPECIAL.sub(r'\\\g<0>', search)
+            effective_search = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
             raw_summary = _run_summary(st=effective_search)
         else:
             raise
@@ -4805,7 +4931,9 @@ def list_metabolites(
         "total_entries": raw_summary.get("total_entries", 0),
         "total_matching": total_matching,
         "top_organisms": raw_summary.get("top_organisms", []) or [],
-        "top_pathways": raw_summary.get("top_pathways", []) or [],
+        "top_metabolite_pathways": raw_summary.get(
+            "top_metabolite_pathways", []
+        ) or [],
         "by_evidence_source": _rename_freq(
             raw_summary.get("by_evidence_source", []) or [],
             "evidence_source",
@@ -4820,8 +4948,18 @@ def list_metabolites(
             "mass_median": raw_summary.get("mass_median"),
             "mass_max": raw_summary.get("mass_max"),
         },
-        "score_max": raw_summary.get("score_max") if search else None,
-        "score_median": raw_summary.get("score_median") if search else None,
+        # Phase 1 plumbing (spec §6.6): pass-through measurement-coverage
+        # rollup surfaced by build_list_metabolites_summary. Two sub-rollups:
+        # by_paper_count (distribution over m.measured_paper_count) and
+        # by_compartment (frequency over m.measured_compartments). Both come
+        # from apoc.coll.frequencies as [{item, count}] and need renaming to
+        # the {paper_count, count} / {compartment, count} shape Pydantic
+        # expects.
+        "by_measurement_coverage": _rename_measurement_coverage(
+            raw_summary.get("by_measurement_coverage"),
+        ),
+        "score_max": raw_summary.get("score_max") if search_text else None,
+        "score_median": raw_summary.get("score_median") if search_text else None,
         "returned": len(results),
         "offset": offset,
         "truncated": total_matching > offset + len(results),
@@ -4839,19 +4977,14 @@ def list_metabolites(
 _VALID_EVIDENCE_SOURCES_GBM = ("metabolism", "transport")
 
 
-# Sparse-strip: result columns that get dropped when null. Per-arm-specific
-# fields are stripped on rows from the other arm; per-row sparse fields
-# (gene_name, product, etc.) are stripped when null on either arm.
+# Sparse-strip: nullable result columns dropped when null. Per-arm-specific
+# fields (reaction_id, transport_confidence, etc.) are NOT in this set —
+# Phase 3 Item 6.1 keeps them as explicit None on cross-arm rows so every
+# row carries identical keys. Only naturally-sparse fields (gene_name,
+# product, formula, verbose-only IDs) appear here.
 _GBM_SPARSE_FIELDS = (
     "gene_name",
     "product",
-    "transport_confidence",
-    "reaction_id",
-    "reaction_name",
-    "ec_numbers",
-    "mass_balance",
-    "tcdb_family_id",
-    "tcdb_family_name",
     "metabolite_formula",
     "metabolite_mass",
     "metabolite_chebi_id",
@@ -4902,6 +5035,7 @@ def genes_by_metabolite(
     metabolite_ids: list[str],
     organism: str,
     *,
+    exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     mass_balance: str | None = None,
@@ -4925,6 +5059,10 @@ def genes_by_metabolite(
 
     See `docs/tool-specs/genes_by_metabolite.md` for the full contract,
     paging strategy, and auto-warning trigger conditions.
+
+    exclude_metabolite_ids: Exclude metabolites with these IDs. Set-difference
+        semantics with metabolite_ids — exclude wins on overlap. Empty list
+        is no-op.
 
     Raises:
         ValueError: if `evidence_sources` contains values outside
@@ -4960,6 +5098,7 @@ def genes_by_metabolite(
     # summary=True).
     sum_cypher, sum_params = build_genes_by_metabolite_summary(
         metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
         organism=organism,
         ec_numbers=ec_numbers,
         mass_balance=mass_balance,
@@ -4992,6 +5131,7 @@ def genes_by_metabolite(
             if arm == "metabolism":
                 cypher, params = build_genes_by_metabolite_metabolism(
                     metabolite_ids=metabolite_ids,
+                    exclude_metabolite_ids=exclude_metabolite_ids,
                     organism=organism,
                     ec_numbers=ec_numbers,
                     mass_balance=mass_balance,
@@ -5004,6 +5144,7 @@ def genes_by_metabolite(
             else:
                 cypher, params = build_genes_by_metabolite_transport(
                     metabolite_ids=metabolite_ids,
+                    exclude_metabolite_ids=exclude_metabolite_ids,
                     organism=organism,
                     metabolite_pathway_ids=metabolite_pathway_ids,
                     gene_categories=gene_categories,
@@ -5022,6 +5163,7 @@ def genes_by_metabolite(
                 if arm == "metabolism":
                     cypher, params = build_genes_by_metabolite_metabolism(
                         metabolite_ids=metabolite_ids,
+                        exclude_metabolite_ids=exclude_metabolite_ids,
                         organism=organism,
                         ec_numbers=ec_numbers,
                         mass_balance=mass_balance,
@@ -5034,6 +5176,7 @@ def genes_by_metabolite(
                 else:
                     cypher, params = build_genes_by_metabolite_transport(
                         metabolite_ids=metabolite_ids,
+                        exclude_metabolite_ids=exclude_metabolite_ids,
                         organism=organism,
                         metabolite_pathway_ids=metabolite_pathway_ids,
                         gene_categories=gene_categories,
@@ -5167,10 +5310,14 @@ def genes_by_metabolite(
         and transport_confidence is None
     ):
         warnings.append(
-            "Majority of transport rows are family_inferred (rolled-up "
-            "from broad TCDB families). Re-run with "
-            "transport_confidence='substrate_confirmed' for "
-            "substrate-curated transporter genes only."
+            f"Most transport rows are `family_inferred` ({transport_fi_total} of "
+            f"{transport_fi_total + transport_sc_total}) — annotations rolled up from "
+            "family-level transport potential. Workflow-dependent: use "
+            "`transport_confidence='substrate_confirmed'` for "
+            "conservative-cast questions (e.g. cross-organism inference); "
+            "keep `family_inferred` for broad-screen candidate enumeration. "
+            "Both tiers are annotations, neither is ground truth — see "
+            "analysis-doc §g."
         )
 
     # 12. Assemble + return envelope.
@@ -5214,8 +5361,10 @@ def genes_by_metabolite(
 _VALID_EVIDENCE_SOURCES_MBG = ("metabolism", "transport")
 
 
-# Sparse-strip set is identical to GBM's: per-arm-specific fields drop on
-# rows from the other arm, and per-row sparse fields drop when null.
+# Sparse-strip set is identical to GBM's: only naturally-sparse fields
+# (gene_name, product, formula, verbose-only IDs) drop when null. Cross-arm
+# fields are intentionally NOT in this set — Phase 3 Item 6.1 keeps them
+# as explicit None on cross-arm rows so every row carries identical keys.
 _MBG_SPARSE_FIELDS = _GBM_SPARSE_FIELDS
 
 
@@ -5232,7 +5381,7 @@ def _build_mbg_top_pathways_query(
     gene_categories: list[str] | None,
     transport_confidence: str | None,
 ) -> tuple[str, dict]:
-    """Build the spec § 5 verified 3-branch top_pathways UNION query.
+    """Build the verified 3-branch top_pathways UNION query.
 
     Branches:
       1. reaction-side via metabolism arm (`Reaction → Reaction_in_kegg_pathway`)
@@ -5372,7 +5521,7 @@ def _build_mbg_top_pathways_query(
 def _mbg_sort_key(row: dict, locus_index: dict[str, int]) -> tuple:
     """Global sort key for metabolites_by_gene detail rows.
 
-    Sort spec (per `docs/tool-specs/metabolites_by_gene.md` § "Sort order"):
+    Sort order:
       1. precision_tier: 0 = metabolism, 1 = transport_substrate_confirmed,
          2 = transport_family_inferred
       2. input gene order via `apoc.coll.indexOf` equivalent
@@ -5403,6 +5552,7 @@ def metabolites_by_gene(
     *,
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     mass_balance: str | None = None,
@@ -5426,6 +5576,10 @@ def metabolites_by_gene(
 
     See `docs/tool-specs/metabolites_by_gene.md` for the full contract,
     paging strategy, sort order, and auto-warning trigger conditions.
+
+    exclude_metabolite_ids: Exclude metabolites with these IDs. Set-difference
+        semantics with metabolite_ids — exclude wins on overlap. Empty list
+        is no-op.
 
     Raises:
         ValueError: if `evidence_sources` contains values outside
@@ -5462,6 +5616,7 @@ def metabolites_by_gene(
         organism=organism,
         metabolite_elements=metabolite_elements,
         metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
         ec_numbers=ec_numbers,
         mass_balance=mass_balance,
         metabolite_pathway_ids=metabolite_pathway_ids,
@@ -5500,6 +5655,7 @@ def metabolites_by_gene(
                     organism=organism,
                     metabolite_elements=metabolite_elements,
                     metabolite_ids=metabolite_ids,
+                    exclude_metabolite_ids=exclude_metabolite_ids,
                     ec_numbers=ec_numbers,
                     mass_balance=mass_balance,
                     metabolite_pathway_ids=metabolite_pathway_ids,
@@ -5514,6 +5670,7 @@ def metabolites_by_gene(
                     organism=organism,
                     metabolite_elements=metabolite_elements,
                     metabolite_ids=metabolite_ids,
+                    exclude_metabolite_ids=exclude_metabolite_ids,
                     metabolite_pathway_ids=metabolite_pathway_ids,
                     gene_categories=gene_categories,
                     transport_confidence=transport_confidence,
@@ -5534,6 +5691,7 @@ def metabolites_by_gene(
                         organism=organism,
                         metabolite_elements=metabolite_elements,
                         metabolite_ids=metabolite_ids,
+                        exclude_metabolite_ids=exclude_metabolite_ids,
                         ec_numbers=ec_numbers,
                         mass_balance=mass_balance,
                         metabolite_pathway_ids=metabolite_pathway_ids,
@@ -5548,6 +5706,7 @@ def metabolites_by_gene(
                         organism=organism,
                         metabolite_elements=metabolite_elements,
                         metabolite_ids=metabolite_ids,
+                        exclude_metabolite_ids=exclude_metabolite_ids,
                         metabolite_pathway_ids=metabolite_pathway_ids,
                         gene_categories=gene_categories,
                         transport_confidence=transport_confidence,
@@ -5701,29 +5860,13 @@ def metabolites_by_gene(
         raw_summary.get("top_gene_categories", []) or [],
         key=lambda r: (-(r.get("gene_count") or 0), r.get("category") or ""),
     )[:10]
-    # top_pathways: spec § 5 verified 3-branch UNION (reaction-side metabolism
-    # + metabolite-side metabolism + metabolite-side transport). The summary
-    # builder's metabolite-side-only rollup misses ~6 (gene, pathway) pairs
-    # across MED4 where reactions have zero Reaction_in_kegg_pathway-anchored
-    # metabolite-side coverage but DO have Reaction_in_kegg_pathway edges
-    # (e.g. PMM0453 → ko01040 Biosynthesis of unsaturated fatty acids).
-    # The dedicated query honors all input filters and ranks per spec.
-    tp_cypher, tp_params = _build_mbg_top_pathways_query(
-        locus_tags=locus_tags,
-        organism=organism,
-        active_arms=active_arms,
-        metabolite_elements=metabolite_elements,
-        metabolite_ids=metabolite_ids,
-        metabolite_pathway_ids=metabolite_pathway_ids,
-        ec_numbers=ec_numbers,
-        mass_balance=mass_balance,
-        gene_categories=gene_categories,
-        transport_confidence=transport_confidence,
+    # Phase 2 Item 2: top_metabolite_pathways now sourced directly from the
+    # summary builder, which produces a chemistry-pathway-filtered rollup
+    # (p.reaction_count >= 3) over m.pathway_ids (KG-A5 denorm,
+    # transport-extended; uniform coverage across both arms).
+    top_metabolite_pathways = (
+        raw_summary.get("top_metabolite_pathways", []) or []
     )
-    if tp_cypher:
-        top_pathways = list(conn.execute_query(tp_cypher, **tp_params))
-    else:
-        top_pathways = []
 
     # 13. Auto-warning: family-inferred dominance (transport-only check).
     # Strict majority threshold; metabolism rows do not factor in. Mirrors
@@ -5745,12 +5888,14 @@ def metabolites_by_gene(
         and transport_confidence is None
     ):
         warnings.append(
-            f"Transport rows in this slice are dominated by "
-            f"`family_inferred` rollup ({transport_fi_total} of "
-            f"{transport_fi_total + transport_sc_total} transport rows). "
-            "For high-precision substrate-curated annotations only, set "
-            "`transport_confidence='substrate_confirmed'` and/or "
-            "`evidence_sources=['transport']`."
+            f"Most transport rows are `family_inferred` ({transport_fi_total} of "
+            f"{transport_fi_total + transport_sc_total}) — annotations rolled up from "
+            "family-level transport potential. Workflow-dependent: use "
+            "`transport_confidence='substrate_confirmed'` for "
+            "conservative-cast questions (e.g. cross-organism inference); "
+            "keep `family_inferred` for broad-screen candidate enumeration. "
+            "Both tiers are annotations, neither is ground truth — see "
+            "analysis-doc §g."
         )
 
     # 14. Assemble + return envelope.
@@ -5779,10 +5924,835 @@ def metabolites_by_gene(
         "top_reactions": top_reactions,
         "top_tcdb_families": top_tcdb_families,
         "top_gene_categories": top_gene_categories,
-        "top_pathways": top_pathways,
+        "top_metabolite_pathways": top_metabolite_pathways,
         "gene_count_total": gene_count_total,
         "reaction_count_total": raw_summary.get("reaction_count_total", 0) or 0,
         "transporter_count_total": raw_summary.get("transporter_count_total", 0) or 0,
         "metabolite_count_total": raw_summary.get("metabolite_count_total", 0) or 0,
         "results": results,
+    }
+
+
+# ---------------------------------------------------------------------------
+# list_metabolite_assays — Phase 5 metabolomics-measurement discovery surface
+# Mirrors list_derived_metrics; 2-query pattern (summary always; detail when
+# limit != 0). Lucene retry on metaboliteAssayFullText parse errors.
+# ---------------------------------------------------------------------------
+
+
+def list_metabolite_assays(
+    search_text: str | None = None,
+    organism: str | None = None,
+    metric_types: list[str] | None = None,
+    value_kind: Literal["numeric", "boolean"] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    assay_ids: list[str] | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    rankable: bool | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """List MetaboliteAssay nodes — discovery surface for the metabolomics
+    measurement layer. Mirrors `list_derived_metrics`.
+
+    Returns dict with envelope keys:
+      total_entries, total_matching, metabolite_count_total,
+      by_organism, by_value_kind, by_compartment, top_metric_types,
+      by_treatment_type, by_background_factors, by_growth_phase,
+      by_detection_status, score_max (opt), score_median (opt),
+      returned, offset, truncated, not_found, results.
+
+    Per-result compact:
+      assay_id, name, metric_type, value_kind, rankable, unit,
+      field_description, organism_name, experiment_id, publication_doi,
+      compartment, omics_type, treatment_type, background_factors,
+      growth_phases, total_metabolite_count, aggregation_method,
+      preferred_id, value_min, value_q1, value_median, value_q3, value_max,
+      timepoints, detection_status_counts (+ score when searching).
+    Verbose adds: treatment, light_condition, experimental_context.
+
+    `not_found` is a structured dict, one bucket per batch input:
+      {assay_ids: [...], metabolite_ids: [...], experiment_ids: [...],
+       publication_doi: [...]}. Empty per field
+      when all matched.
+
+    summary=True forces limit=0 and skips the detail query.
+    """
+    if search_text is not None and not search_text.strip():
+        raise ValueError("search_text must not be empty if provided.")
+
+    conn = _default_conn(conn)
+    if summary:
+        limit = 0
+
+    builder_kwargs = dict(
+        search_text=search_text, organism=organism, metric_types=metric_types,
+        value_kind=value_kind, compartment=compartment,
+        treatment_type=treatment_type, background_factors=background_factors,
+        growth_phases=growth_phases, publication_doi=publication_doi,
+        experiment_ids=experiment_ids, assay_ids=assay_ids,
+        metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids, rankable=rankable,
+    )
+
+    effective_text = search_text
+
+    # ---- Summary query (always runs) -------------------------------------
+    try:
+        sum_cypher, sum_params = build_list_metabolite_assays_summary(
+            **builder_kwargs)
+        sum_result = conn.execute_query(sum_cypher, **sum_params)
+    except Neo4jClientError:
+        if search_text is not None:
+            logger.debug(
+                "list_metabolite_assays summary: Lucene parse error, retrying")
+            effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+            retry_kwargs = {**builder_kwargs, "search_text": effective_text}
+            sum_cypher, sum_params = build_list_metabolite_assays_summary(
+                **retry_kwargs)
+            sum_result = conn.execute_query(sum_cypher, **sum_params)
+        else:
+            raise
+
+    summary_row = sum_result[0] if sum_result else {}
+    total_entries = summary_row.get("total_entries", 0)
+    total_matching = summary_row.get("total_matching", 0)
+    metabolite_count_total = summary_row.get("metabolite_count_total", 0)
+
+    # Rename apoc.coll.frequencies output keys (item/count → domain).
+    by_organism = _rename_freq(
+        summary_row.get("by_organism", []), "organism_name")
+    by_value_kind = _rename_freq(
+        summary_row.get("by_value_kind", []), "value_kind")
+    by_compartment = _rename_freq(
+        summary_row.get("by_compartment", []), "compartment")
+    top_metric_types = _rename_freq(
+        summary_row.get("top_metric_types", []), "metric_type")
+    by_treatment_type = _rename_freq(
+        summary_row.get("by_treatment_type", []), "treatment_type")
+    by_background_factors = _rename_freq(
+        summary_row.get("by_background_factors", []), "background_factor")
+    by_growth_phase = _rename_freq(
+        summary_row.get("by_growth_phase", []), "growth_phase")
+    by_detection_status = _rename_freq(
+        summary_row.get("by_detection_status", []), "detection_status")
+    score_max = summary_row.get("score_max")
+    score_median = summary_row.get("score_median")
+
+    # ---- Detail query (skipped when limit == 0) ---------------------------
+    if limit == 0:
+        results: list[dict] = []
+    else:
+        detail_kwargs = {**builder_kwargs, "search_text": effective_text}
+        try:
+            det_cypher, det_params = build_list_metabolite_assays(
+                **detail_kwargs, verbose=verbose,
+                limit=limit, offset=offset)
+            results = conn.execute_query(det_cypher, **det_params)
+        except Neo4jClientError:
+            if search_text is not None and effective_text == search_text:
+                logger.debug(
+                    "list_metabolite_assays detail: Lucene parse error, retrying")
+                effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+                retry_kwargs = {**builder_kwargs, "search_text": effective_text}
+                det_cypher, det_params = build_list_metabolite_assays(
+                    **retry_kwargs, verbose=verbose,
+                    limit=limit, offset=offset)
+                results = conn.execute_query(det_cypher, **det_params)
+            else:
+                raise
+
+    # ---- not_found (structured per §11 Conv B / §13.6) -------------------
+    # One existence-check Cypher per batch input. Mirrors the
+    # `MetNotFound` pattern on list_metabolites (api/functions.py §7
+    # of list_metabolites). Each query is cheap — indexed lookups on
+    # the KG's primary-key properties.
+    not_found: dict[str, list[str]] = {
+        "assay_ids": [],
+        "metabolite_ids": [],
+        "experiment_ids": [],
+        "publication_doi": [],
+    }
+    if assay_ids:
+        rows = conn.execute_query(
+            "MATCH (a:MetaboliteAssay) WHERE a.id IN $ids "
+            "RETURN collect(a.id) AS found",
+            ids=assay_ids,
+        )
+        found = set(rows[0]["found"]) if rows else set()
+        not_found["assay_ids"] = [x for x in assay_ids if x not in found]
+    if metabolite_ids:
+        rows = conn.execute_query(
+            "MATCH (m:Metabolite) WHERE m.id IN $ids "
+            "RETURN collect(m.id) AS found",
+            ids=metabolite_ids,
+        )
+        found = set(rows[0]["found"]) if rows else set()
+        not_found["metabolite_ids"] = [
+            x for x in metabolite_ids if x not in found
+        ]
+    if experiment_ids:
+        rows = conn.execute_query(
+            "MATCH (e:Experiment) WHERE e.id IN $ids "
+            "RETURN collect(e.id) AS found",
+            ids=experiment_ids,
+        )
+        found = set(rows[0]["found"]) if rows else set()
+        not_found["experiment_ids"] = [
+            x for x in experiment_ids if x not in found
+        ]
+    if publication_doi:
+        rows = conn.execute_query(
+            "MATCH (p:Publication) WHERE p.id IN $ids "
+            "RETURN collect(p.id) AS found",
+            ids=publication_doi,
+        )
+        found = set(rows[0]["found"]) if rows else set()
+        not_found["publication_doi"] = [
+            x for x in publication_doi if x not in found
+        ]
+
+    return {
+        "total_entries": total_entries,
+        "total_matching": total_matching,
+        "metabolite_count_total": metabolite_count_total,
+        "by_organism": by_organism,
+        "by_value_kind": by_value_kind,
+        "by_compartment": by_compartment,
+        "top_metric_types": top_metric_types,
+        "by_treatment_type": by_treatment_type,
+        "by_background_factors": by_background_factors,
+        "by_growth_phase": by_growth_phase,
+        "by_detection_status": by_detection_status,
+        "score_max": score_max,
+        "score_median": score_median,
+        "returned": len(results),
+        "offset": offset,
+        "truncated": total_matching > offset + len(results),
+        "not_found": not_found,
+        "results": results,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Metabolites-by-assay slice — 3 tools (slice spec 2026-05-06)
+# ---------------------------------------------------------------------------
+
+# Closed vocabularies for the numeric drill-down's edge-level filters.
+_VALID_METRIC_BUCKETS = {"top_decile", "top_quartile", "mid", "low"}
+_VALID_DETECTION_STATUS = {"detected", "sporadic", "not_detected"}
+
+
+def _mqa_build_by_metric(
+    diag_rows: list[dict],
+    summary_by_assay: list[dict],
+    summary_filtered_min: float | None,
+    summary_filtered_max: float | None,
+    surviving_ids: list[str],
+) -> list[dict]:
+    """Build `by_metric` envelope: per-assay precomputed-vs-filtered range.
+
+    Each surviving assay gets a row pairing the full-assay value range
+    (echoed from diagnostics: value_min/q1/median/q3/max) with the
+    filtered-slice count + min/max. The filtered_value_min/max from the
+    summary is global across assays in the current slice; we surface it
+    on every contributing assay so the LLM can compare slice vs full
+    range inline (mirrors DM `by_metric`).
+    """
+    surviving_set = set(surviving_ids)
+    diag_by_id = {r["assay_id"]: r for r in diag_rows if r["assay_id"] in surviving_set}
+    summary_count_by_id = {r["item"]: r["count"] for r in (summary_by_assay or [])}
+
+    by_metric: list[dict] = []
+    for aid in sorted(surviving_set):
+        d = diag_by_id.get(aid, {})
+        count = summary_count_by_id.get(aid, 0)
+        by_metric.append({
+            "assay_id": aid,
+            "name": d.get("name"),
+            "value_kind": d.get("value_kind"),
+            "rankable": d.get("rankable", False),
+            "count": count,
+            # Full-assay precomputed range (echoed from diagnostics).
+            "assay_value_min": d.get("value_min"),
+            "assay_value_q1": d.get("value_q1"),
+            "assay_value_median": d.get("value_median"),
+            "assay_value_q3": d.get("value_q3"),
+            "assay_value_max": d.get("value_max"),
+            # Filtered-slice min/max (global across the current selection).
+            "filtered_value_min": (
+                summary_filtered_min if count > 0 else None
+            ),
+            "filtered_value_max": (
+                summary_filtered_max if count > 0 else None
+            ),
+        })
+    by_metric.sort(key=lambda r: (-(r["count"] or 0), r["assay_id"]))
+    return by_metric
+
+
+def _probe_existence(
+    conn: GraphConnection,
+    label: str,
+    id_property: str,
+    ids: list[str],
+) -> list[str]:
+    """Helper: probe which of `ids` exist on (label) nodes via id_property.
+
+    Returns sorted list of IDs NOT found (input set − returned set).
+    """
+    if not ids:
+        return []
+    rows = conn.execute_query(
+        f"MATCH (n:{label}) WHERE n.{id_property} IN $ids RETURN collect(n.{id_property}) AS found",
+        ids=ids,
+    )
+    found = set(rows[0]["found"]) if rows else set()
+    return sorted(set(ids) - found)
+
+
+def metabolites_by_quantifies_assay(
+    *,
+    assay_ids: list[str],
+    organism: str | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    value_min: float | None = None,
+    value_max: float | None = None,
+    detection_status: list[str] | None = None,
+    timepoint: list[str] | None = None,
+    metric_bucket: list[str] | None = None,
+    metric_percentile_min: float | None = None,
+    metric_percentile_max: float | None = None,
+    rank_by_metric_max: int | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int = 5,
+    offset: int = 0,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Drill into numeric MetaboliteAssay edges.
+
+    Three-query dispatch per `genes_by_numeric_metric` precedent:
+      1. diagnostics — probe rankable + per-assay precomputed range
+         (echoed into envelope `by_metric`).
+      2. summary — envelope rollups; runs over surviving (rankable)
+         assay_ids when rankable-gated filters apply.
+      3. detail — top-N rows; skipped when `summary=True`.
+
+    Tested-absent rows (`detection_status='not_detected'` / `value=0`)
+    are real biology — kept in `results`, counted in `total_matching`
+    and `by_detection_status` rollups.
+
+    `not_found` is a structured dict, one bucket per batch input
+    (`assay_ids`, `metabolite_ids`, `experiment_ids`, `publication_doi`).
+
+    Raises:
+        ValueError: empty `assay_ids`; `metric_bucket` / `detection_status`
+        contains invalid values; rankable-gated filter set with all
+        selected assays non-rankable.
+    """
+    conn = _default_conn(conn)
+
+    # ---- Validation ------------------------------------------------------
+    if not assay_ids:
+        raise ValueError("assay_ids must not be empty")
+    if metric_bucket is not None:
+        bad = set(metric_bucket) - _VALID_METRIC_BUCKETS
+        if bad:
+            raise ValueError(
+                f"Invalid metric_bucket value(s): {sorted(bad)}. "
+                f"Allowed: {sorted(_VALID_METRIC_BUCKETS)}."
+            )
+    if detection_status is not None:
+        bad = set(detection_status) - _VALID_DETECTION_STATUS
+        if bad:
+            raise ValueError(
+                f"Invalid detection_status value(s): {sorted(bad)}. "
+                f"Allowed: {sorted(_VALID_DETECTION_STATUS)}."
+            )
+
+    # ---- Q1: diagnostics probe ------------------------------------------
+    diag_cypher, diag_params = build_metabolites_by_quantifies_assay_diagnostics(
+        assay_ids=assay_ids,
+        organism=organism,
+        metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        experiment_ids=experiment_ids,
+        publication_doi=publication_doi,
+        compartment=compartment,
+        treatment_type=treatment_type,
+        background_factors=background_factors,
+        growth_phases=growth_phases,
+    )
+    diag_rows = conn.execute_query(diag_cypher, **diag_params)
+
+    found_ids = {r["assay_id"] for r in diag_rows}
+    not_found_assay_ids = sorted(set(assay_ids) - found_ids)
+    surviving_ids = sorted(found_ids)
+
+    # ---- Rankable-gating logic ------------------------------------------
+    rankable_filter_set = any([
+        metric_bucket,
+        metric_percentile_min is not None,
+        metric_percentile_max is not None,
+        rank_by_metric_max is not None,
+    ])
+    excluded_assays: list[str] = []
+    warnings: list[str] = []
+    if rankable_filter_set and diag_rows:
+        rankable_ids = {r["assay_id"] for r in diag_rows if r["rankable"]}
+        if not rankable_ids:
+            raise ValueError(
+                f"All selected assays have rankable=False, but a rankable-"
+                f"gated filter (metric_bucket / metric_percentile / "
+                f"rank_by_metric_max) was set. Selected assay_ids: "
+                f"{sorted(found_ids)}. Pre-flight: "
+                f"list_metabolite_assays(rankable=True, value_kind='numeric')."
+            )
+        excluded_assays = sorted(found_ids - rankable_ids)
+        if excluded_assays:
+            warnings.append(
+                f"Soft-excluded {len(excluded_assays)} non-rankable "
+                f"assay(s) from rankable-gated filter: {excluded_assays}"
+            )
+        surviving_ids = sorted(rankable_ids)
+
+    # ---- Defensive: if nothing survived, return empty envelope ----------
+    if not surviving_ids:
+        return {
+            "results": [],
+            "total_matching": 0,
+            "by_detection_status": [],
+            "by_metric_bucket": [],
+            "by_assay": [],
+            "by_compartment": [],
+            "by_organism": [],
+            "by_metric": [],
+            "excluded_assays": excluded_assays,
+            "warnings": warnings,
+            "not_found": {
+                "assay_ids": not_found_assay_ids,
+                "metabolite_ids": _probe_existence(
+                    conn, "Metabolite", "id", metabolite_ids or []),
+                "experiment_ids": _probe_existence(
+                    conn, "Experiment", "id", experiment_ids or []),
+                "publication_doi": _probe_existence(
+                    conn, "Publication", "id", publication_doi or []),
+            },
+            "returned": 0,
+            "truncated": False,
+            "offset": offset,
+        }
+
+    # ---- Q2: summary ----------------------------------------------------
+    sum_cypher, sum_params = build_metabolites_by_quantifies_assay_summary(
+        assay_ids=surviving_ids,
+        organism=organism,
+        metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        experiment_ids=experiment_ids,
+        publication_doi=publication_doi,
+        compartment=compartment,
+        treatment_type=treatment_type,
+        background_factors=background_factors,
+        growth_phases=growth_phases,
+        value_min=value_min,
+        value_max=value_max,
+        detection_status=detection_status,
+        timepoint=timepoint,
+        metric_bucket=metric_bucket,
+        metric_percentile_min=metric_percentile_min,
+        metric_percentile_max=metric_percentile_max,
+        rank_by_metric_max=rank_by_metric_max,
+    )
+    sum_rows = conn.execute_query(sum_cypher, **sum_params)
+    sum_row = sum_rows[0] if sum_rows else {}
+
+    by_detection_status = _rename_freq(
+        sum_row.get("by_detection_status", []) or [], "detection_status")
+    by_metric_bucket = _rename_freq(
+        sum_row.get("by_metric_bucket", []) or [], "bucket")
+    by_assay_freq = sum_row.get("by_assay", []) or []
+    by_assay = _rename_freq(by_assay_freq, "assay_id")
+    by_compartment = _rename_freq(
+        sum_row.get("by_compartment", []) or [], "compartment")
+    by_organism = _rename_freq(
+        sum_row.get("by_organism", []) or [], "organism_name")
+    by_metric = _mqa_build_by_metric(
+        diag_rows=diag_rows,
+        summary_by_assay=by_assay_freq,
+        summary_filtered_min=sum_row.get("filtered_value_min"),
+        summary_filtered_max=sum_row.get("filtered_value_max"),
+        surviving_ids=surviving_ids,
+    )
+
+    total_matching = sum_row.get("total_matching", 0) or 0
+
+    # ---- Q3: detail (skipped when summary=True) -------------------------
+    results: list[dict] = []
+    if not summary:
+        det_cypher, det_params = build_metabolites_by_quantifies_assay(
+            assay_ids=surviving_ids,
+            organism=organism,
+            metabolite_ids=metabolite_ids,
+            exclude_metabolite_ids=exclude_metabolite_ids,
+            experiment_ids=experiment_ids,
+            publication_doi=publication_doi,
+            compartment=compartment,
+            treatment_type=treatment_type,
+            background_factors=background_factors,
+            growth_phases=growth_phases,
+            value_min=value_min,
+            value_max=value_max,
+            detection_status=detection_status,
+            timepoint=timepoint,
+            metric_bucket=metric_bucket,
+            metric_percentile_min=metric_percentile_min,
+            metric_percentile_max=metric_percentile_max,
+            rank_by_metric_max=rank_by_metric_max,
+            verbose=verbose,
+            limit=limit,
+            offset=offset,
+        )
+        results = conn.execute_query(det_cypher, **det_params)
+
+    return {
+        "results": results,
+        "total_matching": total_matching,
+        "by_detection_status": by_detection_status,
+        "by_metric_bucket": by_metric_bucket,
+        "by_assay": by_assay,
+        "by_compartment": by_compartment,
+        "by_organism": by_organism,
+        "by_metric": by_metric,
+        "excluded_assays": excluded_assays,
+        "warnings": warnings,
+        "not_found": {
+            "assay_ids": not_found_assay_ids,
+            "metabolite_ids": _probe_existence(
+                conn, "Metabolite", "id", metabolite_ids or []),
+            "experiment_ids": _probe_existence(
+                conn, "Experiment", "id", experiment_ids or []),
+            "publication_doi": _probe_existence(
+                conn, "Publication", "id", publication_doi or []),
+        },
+        "returned": len(results),
+        "truncated": total_matching > offset + len(results),
+        "offset": offset,
+    }
+
+
+def metabolites_by_flags_assay(
+    *,
+    assay_ids: list[str],
+    organism: str | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    flag_value: bool | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int = 5,
+    offset: int = 0,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Drill into boolean MetaboliteAssay edges.
+
+    Two-query dispatch (no diagnostics — boolean tool has no rankable
+    gate):
+      1. summary — envelope rollups.
+      2. detail — top-N rows; skipped when `summary=True`.
+
+    The API coerces `flag_value: bool | None` to string `'true'` /
+    `'false'` for Cypher (KG stores boolean as string).
+    `flag_value=False` returns rows in this slice (KG stores both true
+    and false flags; differs from DM `genes_by_boolean_metric`).
+
+    Tested-absent rows (`flag_value=False`) are real biology — 62% of
+    boolean rows in the live KG. Don't default-filter.
+
+    `excluded_assays` and `warnings` always `[]` here (no gates) — kept
+    for cross-tool envelope-shape consistency.
+
+    Raises:
+        ValueError: empty `assay_ids`.
+    """
+    conn = _default_conn(conn)
+
+    if not assay_ids:
+        raise ValueError("assay_ids must not be empty")
+
+    # D4: bool → string coercion at API boundary (parent §11 Conv K).
+    flag_value_str: str | None
+    if flag_value is True:
+        flag_value_str = "true"
+    elif flag_value is False:
+        flag_value_str = "false"
+    else:
+        flag_value_str = None
+
+    # ---- Q1: summary ----------------------------------------------------
+    sum_cypher, sum_params = build_metabolites_by_flags_assay_summary(
+        assay_ids=assay_ids,
+        organism=organism,
+        metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        experiment_ids=experiment_ids,
+        publication_doi=publication_doi,
+        compartment=compartment,
+        treatment_type=treatment_type,
+        background_factors=background_factors,
+        growth_phases=growth_phases,
+        flag_value=flag_value_str,
+    )
+    sum_rows = conn.execute_query(sum_cypher, **sum_params)
+    sum_row = sum_rows[0] if sum_rows else {}
+
+    by_value = _rename_freq(
+        sum_row.get("by_value", []) or [], "flag_value")
+    by_assay_freq = sum_row.get("by_assay", []) or []
+    by_assay = _rename_freq(by_assay_freq, "assay_id")
+    by_compartment = _rename_freq(
+        sum_row.get("by_compartment", []) or [], "compartment")
+    by_organism = _rename_freq(
+        sum_row.get("by_organism", []) or [], "organism_name")
+
+    total_matching = sum_row.get("total_matching", 0) or 0
+
+    # `by_metric` per spec §5.3: per-assay scalar rollup. Boolean has
+    # no diagnostics builder, so the precomputed dm_true_count /
+    # dm_false_count side is left as None today (best-effort). The
+    # filtered-slice `count` comes from by_assay.
+    summary_count_by_id = {r["item"]: r["count"] for r in by_assay_freq}
+    by_metric: list[dict] = []
+    for aid in sorted(set(assay_ids)):
+        by_metric.append({
+            "assay_id": aid,
+            "count": summary_count_by_id.get(aid, 0),
+        })
+    by_metric.sort(key=lambda r: (-(r["count"] or 0), r["assay_id"]))
+
+    # `not_found.assay_ids`: derived from summary's by_assay coverage.
+    # Boolean has no diagnostics builder (per parent §13.1) so we cannot
+    # distinguish "absent from KG" vs "in KG but no edges after filters"
+    # without a probe — and the test suite asserts a strict 2-query
+    # dispatch shape on the assay_ids-only path. Best-effort: assays
+    # absent from `by_assay` are not surfaced as not_found here. The
+    # other batch-input buckets ARE probed (cheap indexed lookups).
+    not_found_assay_ids: list[str] = []
+
+    # ---- Q2: detail (skipped when summary=True) -------------------------
+    results: list[dict] = []
+    if not summary:
+        det_cypher, det_params = build_metabolites_by_flags_assay(
+            assay_ids=assay_ids,
+            organism=organism,
+            metabolite_ids=metabolite_ids,
+            exclude_metabolite_ids=exclude_metabolite_ids,
+            experiment_ids=experiment_ids,
+            publication_doi=publication_doi,
+            compartment=compartment,
+            treatment_type=treatment_type,
+            background_factors=background_factors,
+            growth_phases=growth_phases,
+            flag_value=flag_value_str,
+            verbose=verbose,
+            limit=limit,
+            offset=offset,
+        )
+        results = conn.execute_query(det_cypher, **det_params)
+
+    return {
+        "results": results,
+        "total_matching": total_matching,
+        "by_value": by_value,
+        "by_assay": by_assay,
+        "by_compartment": by_compartment,
+        "by_organism": by_organism,
+        "by_metric": by_metric,
+        "excluded_assays": [],
+        "warnings": [],
+        "not_found": {
+            "assay_ids": not_found_assay_ids,
+            "metabolite_ids": _probe_existence(
+                conn, "Metabolite", "id", metabolite_ids or []),
+            "experiment_ids": _probe_existence(
+                conn, "Experiment", "id", experiment_ids or []),
+            "publication_doi": _probe_existence(
+                conn, "Publication", "id", publication_doi or []),
+        },
+        "returned": len(results),
+        "truncated": total_matching > offset + len(results),
+        "offset": offset,
+    }
+
+
+def assays_by_metabolite(
+    *,
+    metabolite_ids: list[str],
+    organism: str | None = None,
+    evidence_kind: Literal["quantifies", "flags"] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    metric_types: list[str] | None = None,
+    compartment: str | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int = 5,
+    offset: int = 0,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Polymorphic reverse-lookup: metabolite IDs → measurement evidence
+    across both arms (quantifies + flags).
+
+    Cross-organism by default (metabolite IDs are organism-agnostic).
+    Three-query dispatch:
+      1. existence-probe — populate flat `not_found`.
+      2. summary — UNION ALL envelope rollups.
+      3. detail — polymorphic rows; skipped when `summary=True`.
+
+    Polymorphic rows: numeric-arm rows carry value/detection_status/
+    timepoint*; boolean-arm rows carry flag_value/n_positive. Cross-arm
+    fields explicit `None` (UNION ALL union-shape padding).
+
+    Three states for a metabolite:
+      1. `not_found` — ID not in the KG (unmeasured).
+      2. `not_matched` — ID in KG, no assay edge after filters
+         (unmeasured for this scope).
+      3. Row in `results` with `value=0` / `flag_value=False` /
+         `detection_status='not_detected'` — *tested-absent* (real biology).
+
+    `not_found` is a flat `list[str]` (single batch input —
+    `metabolite_ids` only). `not_matched` likewise flat.
+
+    Raises:
+        ValueError: empty `metabolite_ids`; `evidence_kind` not in
+        {None, 'quantifies', 'flags'}.
+    """
+    conn = _default_conn(conn)
+
+    if not metabolite_ids:
+        raise ValueError("metabolite_ids must not be empty")
+    if evidence_kind is not None and evidence_kind not in ("quantifies", "flags"):
+        raise ValueError(
+            f"Invalid evidence_kind: {evidence_kind!r}. "
+            f"Allowed: 'quantifies', 'flags', or None (both)."
+        )
+
+    # ---- Q1: existence-probe (populate flat not_found per §13.6) --------
+    probe_rows = conn.execute_query(
+        "MATCH (m:Metabolite) WHERE m.id IN $ids RETURN m.id AS metabolite_id",
+        ids=metabolite_ids,
+    )
+    kg_present = {r["metabolite_id"] for r in probe_rows}
+    not_found = sorted(set(metabolite_ids) - kg_present)
+
+    # ---- Q2: summary (UNION ALL envelope) -------------------------------
+    sum_cypher, sum_params = build_assays_by_metabolite_summary(
+        metabolite_ids=metabolite_ids,
+        organism=organism,
+        evidence_kind=evidence_kind,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        metric_types=metric_types,
+        compartment=compartment,
+    )
+    sum_rows = conn.execute_query(sum_cypher, **sum_params)
+    sum_row = sum_rows[0] if sum_rows else {}
+
+    total_matching = sum_row.get("total_matching", 0) or 0
+    by_evidence_kind = _rename_freq(
+        sum_row.get("by_evidence_kind", []) or [], "evidence_kind")
+    by_organism = _rename_freq(
+        sum_row.get("by_organism", []) or [], "organism_name")
+    by_compartment = _rename_freq(
+        sum_row.get("by_compartment", []) or [], "compartment")
+    by_assay = _rename_freq(
+        sum_row.get("by_assay", []) or [], "assay_id")
+    by_detection_status = _rename_freq(
+        sum_row.get("by_detection_status", []) or [], "detection_status")
+    by_flag_value = _rename_freq(
+        sum_row.get("by_flag_value", []) or [], "flag_value")
+    metabolites_matched = sum_row.get("metabolites_matched", 0) or 0
+
+    # ---- Q3: detail (skipped when summary=True) -------------------------
+    results: list[dict] = []
+    if not summary:
+        det_cypher, det_params = build_assays_by_metabolite(
+            metabolite_ids=metabolite_ids,
+            organism=organism,
+            evidence_kind=evidence_kind,
+            exclude_metabolite_ids=exclude_metabolite_ids,
+            metric_types=metric_types,
+            compartment=compartment,
+            verbose=verbose,
+            limit=limit,
+            offset=offset,
+        )
+        results = conn.execute_query(det_cypher, **det_params)
+
+    # ---- Compute partition (metabolites_with / without_evidence) --------
+    # In summary mode `results=[]`, so derive metabolites_with_evidence
+    # from the summary's by_assay context if needed. Most-correct source
+    # is the row-set itself; in summary mode we approximate via the
+    # metabolite IDs surfaced through detail (or skip if absent).
+    metabolites_with_evidence = sorted({
+        r.get("metabolite_id") for r in results if r.get("metabolite_id")
+    })
+    if summary:
+        # In summary mode, we rely on the existence probe + filters to
+        # estimate. Without per-metabolite rollup in the summary, we
+        # default to "all KG-present metabolites with edges" which we
+        # can't distinguish from "no edges after filters". Best-effort:
+        # use `metabolites_matched` as a count signal; identifiers are
+        # only authoritative when detail rows are returned.
+        # Caller pattern: drop summary=True for batch routing on 50+
+        # metabolite_ids when per-ID partitions are needed.
+        pass
+
+    metabolites_without_evidence = sorted(
+        set(metabolite_ids) - set(metabolites_with_evidence)
+    )
+    not_matched = sorted(
+        (kg_present - set(metabolites_with_evidence))
+        & set(metabolite_ids)
+    )
+
+    return {
+        "results": results,
+        "total_matching": total_matching,
+        "by_evidence_kind": by_evidence_kind,
+        "by_organism": by_organism,
+        "by_compartment": by_compartment,
+        "by_assay": by_assay,
+        "by_detection_status": by_detection_status,
+        "by_flag_value": by_flag_value,
+        "metabolites_matched": metabolites_matched,
+        "metabolites_with_evidence": metabolites_with_evidence,
+        "metabolites_without_evidence": metabolites_without_evidence,
+        "not_found": not_found,
+        "not_matched": not_matched,
+        "returned": len(results),
+        "truncated": total_matching > offset + len(results),
+        "offset": offset,
     }

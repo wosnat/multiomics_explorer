@@ -98,6 +98,7 @@ class TestGeneOverviewContract:
         assert "has_significant_expression" in result
         assert "has_orthologs" in result
         assert "has_derived_metrics" in result
+        assert "has_chemistry" in result
         assert "returned" in result
         assert "truncated" in result
         assert "offset" in result
@@ -111,10 +112,12 @@ class TestGeneOverviewContract:
         expected_keys = {
             "locus_tag", "gene_name", "product",
             "gene_category", "annotation_quality", "organism_name",
-            "annotation_types", "expression_edge_count",
+            "annotation_types", "annotation_state", "informative_annotation_types",
+            "expression_edge_count",
             "significant_up_count", "significant_down_count", "closest_ortholog_group_size",
             "closest_ortholog_genera", "cluster_membership_count", "cluster_types",
             "derived_metric_count", "derived_metric_value_kinds",
+            "reaction_count", "metabolite_count", "transporter_count", "evidence_sources",
         }
         assert set(result["results"][0].keys()) == expected_keys
 
@@ -250,7 +253,7 @@ class TestSearchOntologyContract:
 
     def test_result_keys(self, conn):
         result = api.search_ontology("DNA replication", "go_bp", conn=conn)
-        expected_keys = {"id", "name", "score", "level"}
+        expected_keys = {"id", "name", "score", "level", "is_informative"}
         assert len(result["results"]) >= 1
         assert set(result["results"][0].keys()) == expected_keys
 
@@ -288,7 +291,7 @@ class TestGenesByOntologyContract:
         )
         expected_keys = {
             "locus_tag", "gene_name", "product", "gene_category",
-            "term_id", "term_name", "level",
+            "term_id", "term_name", "level", "is_informative",
         }
         assert set(result["results"][0].keys()) == expected_keys
 
@@ -1209,7 +1212,7 @@ class TestListMetabolitesContract:
 
     EXPECTED_ENVELOPE_KEYS = {
         "total_entries", "total_matching",
-        "top_organisms", "top_pathways", "by_evidence_source",
+        "top_organisms", "top_metabolite_pathways", "by_evidence_source",
         "xref_coverage", "mass_stats",
         "score_max", "score_median",
         "returned", "offset", "truncated", "not_found", "results",
@@ -1294,7 +1297,7 @@ class TestListMetabolitesContract:
 
     def test_search_populates_score_fields(self, conn):
         """Search mode adds `score` per row + score_max/score_median envelope."""
-        result = api.list_metabolites(search="glucose", conn=conn)
+        result = api.list_metabolites(search_text="glucose", conn=conn)
         assert len(result["results"]) >= 1
         assert "score" in result["results"][0]
         assert result["score_max"] is not None
@@ -1322,4 +1325,318 @@ class TestListMetabolitesContract:
 
     def test_empty_search_raises(self, conn):
         with pytest.raises(ValueError, match="search"):
-            api.list_metabolites(search="   ", conn=conn)
+            api.list_metabolites(search_text="   ", conn=conn)
+
+    def test_phase1_per_row_measurement_fields_present(self, conn):
+        """Phase 1 §6.6: measurement-rollup pass-through fields are
+        emitted on every row (default-empty on unmeasured)."""
+        result = api.list_metabolites(limit=5, conn=conn)
+        assert len(result["results"]) >= 1
+        for row in result["results"]:
+            for key in (
+                "measured_assay_count", "measured_paper_count",
+                "measured_organisms", "measured_compartments",
+            ):
+                assert key in row, f"missing per-row key: {key}"
+            # Defaults: ints are 0, lists are []
+            assert isinstance(row["measured_assay_count"], int)
+            assert isinstance(row["measured_paper_count"], int)
+            assert isinstance(row["measured_organisms"], list)
+            assert isinstance(row["measured_compartments"], list)
+
+    def test_phase1_envelope_by_measurement_coverage_pydantic_shape(self, conn):
+        """Phase 1 §6.6: by_measurement_coverage envelope conforms to the
+        Pydantic boundary contract — sub-rollup rows shaped as
+        `{paper_count, count}` and `{compartment, count}` (NOT apoc's
+        raw `{item, count}` shape). Going through the MCP Pydantic
+        wrapper validates this end-to-end."""
+        from multiomics_explorer.mcp_server.tools import (
+            ListMetabolitesResponse,
+        )
+
+        result = api.list_metabolites(summary=True, conn=conn)
+        assert "by_measurement_coverage" in result
+        cov = result["by_measurement_coverage"]
+        assert "by_paper_count" in cov
+        assert "by_compartment" in cov
+        # Per-bucket key shape (would fail with raw apoc {item, count}).
+        for b in cov["by_paper_count"]:
+            assert set(b.keys()) == {"paper_count", "count"}
+            assert isinstance(b["paper_count"], int)
+            assert isinstance(b["count"], int)
+        for b in cov["by_compartment"]:
+            assert set(b.keys()) == {"compartment", "count"}
+            assert isinstance(b["compartment"], str)
+            assert isinstance(b["count"], int)
+
+        # Final round-trip: full envelope passes Pydantic validation.
+        # This is the boundary the MCP server crosses on every call.
+        validated = ListMetabolitesResponse(**result)
+        assert validated.by_measurement_coverage is not None
+
+    def test_phase1_measurement_coverage_live_kg_counts(self, conn):
+        """Phase 1 §6.6 verification cases: 3111 unmeasured + 99 single-paper
+        + 8 dual-paper = 3218 total metabolites. Live KG sanity-check."""
+        result = api.list_metabolites(summary=True, conn=conn)
+        cov = result["by_measurement_coverage"]
+        buckets = {b["paper_count"]: b["count"] for b in cov["by_paper_count"]}
+        # Allow ±50 tolerance — total can drift between rebuilds.
+        assert buckets.get(0, 0) >= 2900, "≥2900 unmeasured metabolites expected"
+        assert buckets.get(1, 0) >= 50, "≥50 single-paper metabolites expected"
+        assert buckets.get(2, 0) >= 1, "≥1 dual-paper metabolites expected"
+        # Compartment sub-rollup is non-empty (107 measured metabolites).
+        compartments = {b["compartment"] for b in cov["by_compartment"]}
+        assert "whole_cell" in compartments
+        assert "extracellular" in compartments
+
+
+@pytest.mark.kg
+class TestPhase1PlumbingContract:
+    """Cross-tool live-KG verification of Phase 1 P0 plumbing additions
+    (spec §6.1 - §6.6). Catches Cypher / api / Pydantic boundary issues
+    that mocked unit tests miss."""
+
+    def test_gene_overview_evidence_sources_on_transport_only_gene(self, conn):
+        """Spec §6.1: PMM0392 (broad ABC transporter, reaction_count=0)
+        must NOT have 'metabolism' in evidence_sources — the path-existence
+        Cypher correctly distinguishes from metabolite-level rollup."""
+        result = api.gene_overview(["PMM0392"], conn=conn)
+        assert result["total_matching"] == 1
+        row = result["results"][0]
+        assert row["reaction_count"] == 0
+        assert row["transporter_count"] >= 1
+        assert "metabolism" not in row["evidence_sources"], (
+            f"PMM0392 has reaction_count=0 but evidence_sources contains "
+            f"'metabolism' — path-existence Cypher regression. "
+            f"Got: {row['evidence_sources']}"
+        )
+        assert "transport" in row["evidence_sources"]
+
+    def test_gene_overview_evidence_sources_on_reaction_only_gene(self, conn):
+        """Spec §6.1: PMM0001 (housekeeping reaction gene) has
+        evidence_sources=['metabolism']."""
+        result = api.gene_overview(["PMM0001"], conn=conn)
+        row = result["results"][0]
+        assert row["reaction_count"] >= 1
+        assert "metabolism" in row["evidence_sources"]
+
+    def test_gene_overview_envelope_has_chemistry(self, conn):
+        """Spec §6.1: envelope `has_chemistry` counts genes with non-empty
+        evidence_sources."""
+        result = api.gene_overview(
+            ["PMM0392", "PMM0001", "PMM1428"], conn=conn,
+        )
+        # PMM0392 + PMM0001 have chemistry; PMM1428 (EVE domain) does not.
+        assert result["has_chemistry"] == 2
+
+    def test_list_filter_values_omics_type_includes_metabolomics(self, conn):
+        """Spec §6.5: omics_type filter type returns the full canonical
+        enum, including METABOLOMICS."""
+        result = api.list_filter_values(filter_type="omics_type", conn=conn)
+        assert result["filter_type"] == "omics_type"
+        values = {r["value"] for r in result["results"]}
+        assert "METABOLOMICS" in values
+        assert "RNASEQ" in values
+        assert "PROTEOMICS" in values
+
+    def test_list_filter_values_evidence_source_three_values(self, conn):
+        """Spec §6.5: evidence_source filter returns metabolism / transport /
+        metabolomics with non-zero counts."""
+        result = api.list_filter_values(filter_type="evidence_source", conn=conn)
+        values = {r["value"] for r in result["results"]}
+        assert values == {"metabolism", "transport", "metabolomics"}
+        for r in result["results"]:
+            assert r["count"] > 0
+
+    def test_list_organisms_envelope_by_measurement_capability(self, conn):
+        """Spec §6.4: envelope by_measurement_capability is binary
+        {has_metabolomics, no_metabolomics}."""
+        result = api.list_organisms(summary=True, conn=conn)
+        assert "by_measurement_capability" in result
+        cap = result["by_measurement_capability"]
+        assert "has_metabolomics" in cap
+        assert "no_metabolomics" in cap
+        # ≥4 organisms have metabolomics today (MIT9301, MIT9313, MIT0801, MIT9303)
+        assert cap["has_metabolomics"] >= 4
+        # Sums to total
+        assert cap["has_metabolomics"] + cap["no_metabolomics"] == result["total_matching"]
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 metabolites-by-assay slice — Pydantic Response contract validation.
+# These tests catch field-name / shape mismatches between the api/ rollup
+# and the wrapper-layer Pydantic Response models. The Response models are
+# defined inside `register_tools()`, so we obtain them via signature
+# introspection on the registered tool functions.
+# ---------------------------------------------------------------------------
+def _response_class_for(tool_name: str):
+    """Return the Pydantic Response class for a tool registered via
+    `register_tools()`. Read off the registered tool's return annotation."""
+    import asyncio
+    import inspect
+    from fastmcp import FastMCP
+    from multiomics_explorer.mcp_server.tools import register_tools
+
+    mcp = FastMCP("contract-probe")
+    register_tools(mcp)
+    tool = asyncio.run(mcp.get_tool(tool_name))
+    return inspect.signature(tool.fn).return_annotation
+
+
+_MIT9313_CHITOSAN_ASSAY = (
+    "metabolite_assay:pnas.2213271120:"
+    "metabolites_intracellular_mit9313:cellular_concentration"
+)
+_MSYSTEMS_PRESENCE_FLAGS_ASSAY = (
+    "metabolite_assay:msystems.01261-22:"
+    "presence_flags_table_s2:presence_flag_intracellular"
+)
+_PEP_ID = "kegg.compound:C00074"
+
+
+@pytest.mark.kg
+class TestMetabolitesByQuantifiesAssayContract:
+    """Pin the api/ envelope shape + verify the wrapper Pydantic Response
+    accepts live-KG output. Catches field-name / sub-model misalignment."""
+
+    EXPECTED_ENVELOPE_KEYS = {
+        "results", "total_matching",
+        "by_detection_status", "by_metric_bucket", "by_assay",
+        "by_compartment", "by_organism", "by_metric",
+        "excluded_assays", "warnings", "not_found",
+        "returned", "offset", "truncated",
+    }  # 14 keys
+
+    def test_envelope_keys(self, conn):
+        result = api.metabolites_by_quantifies_assay(
+            assay_ids=[_MIT9313_CHITOSAN_ASSAY], limit=1, conn=conn)
+        assert set(result.keys()) == self.EXPECTED_ENVELOPE_KEYS
+
+    def test_response_validates_against_live_kg(self, conn):
+        """Full Pydantic Response model accepts live-KG api/ output.
+        Fails if any sub-model field name / type mismatches the api rollup
+        (e.g. the recent `metric_bucket → bucket` rename in MqaByMetricBucket).
+        """
+        ResponseCls = _response_class_for("metabolites_by_quantifies_assay")
+        result = api.metabolites_by_quantifies_assay(
+            assay_ids=[_MIT9313_CHITOSAN_ASSAY], limit=5, conn=conn)
+        validated = ResponseCls(**result)
+        assert validated.total_matching == 64
+        assert validated.returned == 5
+        assert len(validated.by_detection_status) == 3
+        assert len(validated.by_metric_bucket) == 4
+        # by_metric pairs full-assay precomputed range with filtered slice.
+        assert len(validated.by_metric) >= 1
+        bm = validated.by_metric[0]
+        assert bm.assay_id == _MIT9313_CHITOSAN_ASSAY
+        assert bm.assay_value_max == pytest.approx(0.4465, abs=0.01)
+        assert bm.rankable is True
+        # Structured not_found per parent §13.6.
+        assert validated.not_found.assay_ids == []
+        assert validated.not_found.metabolite_ids == []
+
+
+@pytest.mark.kg
+class TestMetabolitesByFlagsAssayContract:
+    """Pin the api/ envelope shape + verify the wrapper Pydantic Response
+    accepts live-KG output (boolean arm)."""
+
+    EXPECTED_ENVELOPE_KEYS = {
+        "results", "total_matching",
+        "by_value", "by_assay", "by_compartment", "by_organism", "by_metric",
+        "excluded_assays", "warnings", "not_found",
+        "returned", "offset", "truncated",
+    }  # 13 keys — note: NO `by_detection_status` (boolean arm has no
+    #              `detection_status` field per slice spec §5.3)
+
+    def test_envelope_keys(self, conn):
+        result = api.metabolites_by_flags_assay(
+            assay_ids=[_MSYSTEMS_PRESENCE_FLAGS_ASSAY], limit=1, conn=conn)
+        assert set(result.keys()) == self.EXPECTED_ENVELOPE_KEYS
+
+    def test_envelope_omits_by_detection_status(self, conn):
+        """Slice spec §5.3 — boolean arm must not surface
+        `by_detection_status` (only the numeric edge has detection_status)."""
+        result = api.metabolites_by_flags_assay(
+            assay_ids=[_MSYSTEMS_PRESENCE_FLAGS_ASSAY],
+            summary=True, conn=conn)
+        assert "by_detection_status" not in result
+
+    def test_response_validates_against_live_kg(self, conn):
+        """Full Pydantic Response model accepts live-KG api/ output.
+        Catches `flag_value: bool` validator coercion failure on the
+        api-layer string `'true'`/`'false'` (V2 default coerces; if a
+        Strict mode lands, this regresses)."""
+        ResponseCls = _response_class_for("metabolites_by_flags_assay")
+        result = api.metabolites_by_flags_assay(
+            assay_ids=[_MSYSTEMS_PRESENCE_FLAGS_ASSAY], limit=5, conn=conn)
+        validated = ResponseCls(**result)
+        assert validated.total_matching == 93
+        assert validated.returned == 5
+        # by_value: 2 buckets (true / false). Pydantic coerces str→bool.
+        assert len(validated.by_value) == 2
+        bv = {b.flag_value: b.count for b in validated.by_value}
+        assert bv[True] == 35
+        assert bv[False] == 58
+        # excluded_assays / warnings always [] on boolean arm (§5.3).
+        assert validated.excluded_assays == []
+        assert validated.warnings == []
+        # Detail rows surface flag_value as Python bool.
+        for r in validated.results:
+            assert isinstance(r.flag_value, bool)
+
+
+@pytest.mark.kg
+class TestAssaysByMetaboliteContract:
+    """Pin the api/ envelope shape + verify the wrapper Pydantic Response
+    accepts live-KG output (polymorphic reverse-lookup)."""
+
+    EXPECTED_ENVELOPE_KEYS = {
+        "results", "total_matching",
+        "by_evidence_kind", "by_organism", "by_compartment", "by_assay",
+        "by_detection_status", "by_flag_value",
+        "metabolites_matched",
+        "metabolites_with_evidence", "metabolites_without_evidence",
+        "not_found", "not_matched",
+        "returned", "offset", "truncated",
+    }  # 16 keys
+
+    def test_envelope_keys(self, conn):
+        result = api.assays_by_metabolite(
+            metabolite_ids=[_PEP_ID], limit=1, conn=conn)
+        assert set(result.keys()) == self.EXPECTED_ENVELOPE_KEYS
+
+    def test_not_found_is_flat_list(self, conn):
+        """Slice spec §6.3 / parent §13.6 — not_found is flat list[str]
+        (single batch input). Distinguishes from the structured
+        `not_found.{assay_ids,...}` shape on the drill-down tools."""
+        result = api.assays_by_metabolite(
+            metabolite_ids=[_PEP_ID, "fake.id:DOESNOTEXIST"],
+            summary=True, conn=conn)
+        assert isinstance(result["not_found"], list)
+        assert result["not_found"] == ["fake.id:DOESNOTEXIST"]
+        assert isinstance(result["not_matched"], list)
+
+    def test_response_validates_against_live_kg(self, conn):
+        """Full Pydantic Response model accepts live-KG api/ output.
+        Catches polymorphic-row sub-model failures (cross-arm-None
+        union-shape padding from UNION ALL)."""
+        ResponseCls = _response_class_for("assays_by_metabolite")
+        result = api.assays_by_metabolite(
+            metabolite_ids=[_PEP_ID], limit=5, conn=conn)
+        validated = ResponseCls(**result)
+        assert validated.total_matching == 20
+        assert validated.metabolites_matched == 1
+        assert validated.returned == 5
+        # by_evidence_kind: quantifies 18 + flags 2.
+        ek = {b.evidence_kind: b.count for b in validated.by_evidence_kind}
+        assert ek == {"quantifies": 18, "flags": 2}
+        # by_detection_status populated (numeric subset).
+        assert len(validated.by_detection_status) == 3
+        # by_flag_value populated (boolean subset).
+        assert len(validated.by_flag_value) == 1
+        # metabolites_with_evidence partition (detail mode).
+        assert validated.metabolites_with_evidence == [_PEP_ID]
+        # not_found / not_matched: flat list[str] (single batch input).
+        assert validated.not_found == []
+        assert validated.not_matched == []

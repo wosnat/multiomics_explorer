@@ -1,5 +1,5 @@
 case_id: list_publications_author
-row_count: 17
+row_count: 18
 rows:
 - authors:
   - James I. Mullet
@@ -23,6 +23,9 @@ rows:
   growth_phases:
   - exponential
   journal: bioRxiv
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - RNASEQ
   organisms:
@@ -60,6 +63,9 @@ rows:
   growth_phases:
   - diel
   journal: ISME Communications
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - RNASEQ
   organisms:
@@ -100,11 +106,16 @@ rows:
   derived_metric_count: 0
   derived_metric_value_kinds: []
   doi: 10.1073/pnas.2213271120
-  experiment_count: 2
+  experiment_count: 4
   growth_phases:
   - exponential
   journal: Proceedings of the National Academy of Sciences
+  metabolite_assay_count: 2
+  metabolite_compartments:
+  - whole_cell
+  metabolite_count: 16
   omics_types:
+  - METABOLOMICS
   - RNASEQ
   organisms:
   - Prochlorococcus MIT9303
@@ -114,6 +125,46 @@ rows:
     lifestyle
   treatment_types:
   - carbon
+  year: 2023
+- authors:
+  - Elizabeth B. Kujawinski
+  - Gretchen J. Swarr
+  - Jamie W. Becker
+  - Kathryn Halloran
+  - Keven Dooley
+  - Krista Longnecker
+  - Melissa C. Kido Soule
+  - Rogier Braakman
+  - Sallie W. Chisholm
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - extracellular
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  doi: 10.1128/msystems.01261-22
+  experiment_count: 6
+  growth_phases: []
+  journal: mSystems
+  metabolite_assay_count: 8
+  metabolite_compartments:
+  - extracellular
+  - whole_cell
+  metabolite_count: 99
+  omics_types:
+  - METABOLOMICS
+  organisms:
+  - Prochlorococcus MIT0801
+  - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9313
+  study_type: Metabolomics
+  title: Metabolite diversity among representatives of divergent Prochlorococcus ecotypes
+  treatment_types:
+  - growth_phase
+  - phosphorus
   year: 2023
 - authors:
   - Aldo A. Arellano
@@ -134,14 +185,21 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - vesicle
+  - whole_cell
   derived_metric_count: 6
   derived_metric_value_kinds:
   - numeric
   doi: 10.1111/1462-2920.15834
-  experiment_count: 2
+  experiment_count: 6
   growth_phases: []
   journal: Environmental Microbiology
+  metabolite_assay_count: 4
+  metabolite_compartments:
+  - vesicle
+  - whole_cell
+  metabolite_count: 69
   omics_types:
+  - METABOLOMICS
   - VESICLE_PROTEOMICS
   organisms:
   - Prochlorococcus MIT9312
@@ -174,6 +232,9 @@ rows:
   growth_phases:
   - darkness
   journal: mSystems
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - RNASEQ
   organisms:
@@ -208,6 +269,9 @@ rows:
   - acute_stress
   - nutrient_limited
   journal: The ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - RNASEQ
   organisms:
@@ -239,6 +303,9 @@ rows:
   - acute_stress
   - infected
   journal: PLOS ONE
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - RNASEQ
   organisms:
@@ -268,6 +335,9 @@ rows:
   growth_phases:
   - exponential
   journal: The ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - RNASEQ
   organisms:
@@ -298,6 +368,9 @@ rows:
   growth_phases:
   - acute_stress
   journal: ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - MICROARRAY
   organisms:
@@ -330,6 +403,9 @@ rows:
   experiment_count: 3
   growth_phases: []
   journal: Science
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - VESICLE_DNASEQ
   - VESICLE_PROTEOMICS
@@ -359,6 +435,9 @@ rows:
   experiment_count: 1
   growth_phases: []
   journal: PLoS ONE
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - PAIRED_RNASEQ_PROTEOME
   organisms:
@@ -391,6 +470,9 @@ rows:
   - nutrient_limited
   - recovery
   journal: The ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - MICROARRAY
   organisms:
@@ -429,6 +511,9 @@ rows:
   experiment_count: 1
   growth_phases: []
   journal: PLOS ONE
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - MICROARRAY
   organisms:
@@ -466,6 +551,9 @@ rows:
   growth_phases:
   - infected
   journal: Nature
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - MICROARRAY
   organisms:
@@ -497,6 +585,9 @@ rows:
   growth_phases:
   - acute_stress
   journal: Journal of Bacteriology
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - MICROARRAY
   organisms:
@@ -531,6 +622,9 @@ rows:
   - acute_stress
   - exponential
   journal: Molecular Systems Biology
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - MICROARRAY
   organisms:
@@ -562,6 +656,9 @@ rows:
   - exponential
   - nutrient_limited
   journal: PNAS
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
   omics_types:
   - MICROARRAY
   organisms:

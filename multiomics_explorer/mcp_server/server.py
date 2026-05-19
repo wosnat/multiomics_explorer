@@ -41,11 +41,26 @@ async def lifespan(server: FastMCP):
 mcp = FastMCP(
     "multiomics-kg",
     instructions=(
-        "Multi-omics knowledge graph for Prochlorococcus and Alteromonas. "
-        "For detailed usage guides on any tool, read the resource at "
-        "docs://tools/{tool_name} (e.g. docs://tools/list_publications). "
-        "For analysis utility guides, read docs://analysis/{name} "
-        "(e.g. docs://analysis/response_matrix)."
+        "Multi-omics knowledge graph for Prochlorococcus and Alteromonas "
+        "(37 tools across gene/expression/ortholog/ontology/cluster/"
+        "chemistry/metabolomics/enrichment).\n\n"
+        "Start here:\n"
+        "  docs://guide/start_here  — pick the right tool for your question\n"
+        "  docs://guide/concepts    — KG data model (Gene, Experiment, "
+        "DerivedMetric, Metabolite, MetaboliteAssay, Reaction, ontology terms)\n"
+        "  docs://guide/conventions — cross-tool semantics: not_found vs "
+        "not_matched, tested-absent rows, exclude-wins-on-overlap, "
+        "rankable-gated filters, AQ / informative_only defaults\n"
+        "  docs://guide/python_api  — scripting against the Python package: "
+        "import topology, return shapes, DataFrames, connection management, "
+        "worked recipes\n\n"
+        "Per-tool: docs://tools/{tool_name}     "
+        "(e.g. docs://tools/differential_expression_by_gene)\n"
+        "Analysis: docs://analysis/{name}       "
+        "(e.g. docs://analysis/enrichment, docs://analysis/metabolites)\n"
+        "Examples: docs://examples/{file}       "
+        "(e.g. docs://examples/pathway_enrichment.py, "
+        "docs://examples/metabolites.py)"
     ),
     lifespan=lifespan,
 )
@@ -66,6 +81,7 @@ _SKILLS_DIR = (
 _DOC_DIRS = {
     "docs://tools": (_SKILLS_DIR / "tools", "Usage guide for the {stem} tool"),
     "docs://analysis": (_SKILLS_DIR / "analysis", "Usage guide for the {stem} analysis utility"),
+    "docs://guide": (_SKILLS_DIR / "guide", "Cross-tool guide: {stem}"),
 }
 
 for uri_prefix, (doc_dir, desc_template) in _DOC_DIRS.items():
@@ -88,15 +104,22 @@ for uri_prefix, (doc_dir, desc_template) in _DOC_DIRS.items():
 # --- Static resources: example scripts (not auto-discovered from .md files) ---
 _EXAMPLES_DIR = Path(__file__).resolve().parent.parent.parent / "examples"
 
-mcp.add_resource(
-    FunctionResource.from_function(
-        fn=(lambda p: lambda: p.read_text())(_EXAMPLES_DIR / "pathway_enrichment.py"),
-        uri="docs://examples/pathway_enrichment.py",
-        name="pathway_enrichment.py",
-        description="Runnable example script for pathway enrichment",
-        mime_type="text/x-python",
+for example_name, example_description in [
+    ("pathway_enrichment.py", "Runnable example script for pathway enrichment"),
+    (
+        "metabolites.py",
+        "Runnable metabolites workflow examples (3 source pipelines × 7 scenarios)",
+    ),
+]:
+    mcp.add_resource(
+        FunctionResource.from_function(
+            fn=(lambda p: lambda: p.read_text())(_EXAMPLES_DIR / example_name),
+            uri=f"docs://examples/{example_name}",
+            name=example_name,
+            description=example_description,
+            mime_type="text/x-python",
+        )
     )
-)
 
 
 def main():

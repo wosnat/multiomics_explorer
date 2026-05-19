@@ -12,6 +12,7 @@ from multiomics_explorer.analysis.enrichment import (
     EnrichmentExplanation,
 )
 from multiomics_explorer.api.functions import (
+    assays_by_metabolite,
     gene_ontology_terms,
     gene_overview,
     genes_by_homolog_group,
@@ -24,9 +25,12 @@ from multiomics_explorer.api.functions import (
     list_experiments,
     list_clustering_analyses,
     list_derived_metrics,
+    list_metabolite_assays,
     list_metabolites,
     list_organisms,
+    metabolites_by_flags_assay,
     metabolites_by_gene,
+    metabolites_by_quantifies_assay,
     list_publications,
     ontology_landscape,
     resolve_gene,
@@ -46,6 +50,12 @@ from multiomics_explorer.api.functions import (
     cluster_enrichment,
     pathway_enrichment,
 )
+from multiomics_explorer.analysis.expression import (
+    gene_set_compare,
+    response_matrix,
+)
+from multiomics_explorer.analysis.frames import to_dataframe
+from multiomics_explorer.kg.connection import GraphConnection
 
 __all__ = [
     "EnrichmentInputs",
@@ -57,6 +67,7 @@ __all__ = [
     "DEStats",
     "GeneRef",
     "EnrichmentExplanation",
+    "assays_by_metabolite",
     "gene_ontology_terms",
     "gene_overview",
     "genes_by_homolog_group",
@@ -69,9 +80,12 @@ __all__ = [
     "list_experiments",
     "list_clustering_analyses",
     "list_derived_metrics",
+    "list_metabolite_assays",
     "list_metabolites",
     "list_organisms",
+    "metabolites_by_flags_assay",
     "metabolites_by_gene",
+    "metabolites_by_quantifies_assay",
     "list_publications",
     "ontology_landscape",
     "resolve_gene",
@@ -90,4 +104,8 @@ __all__ = [
     "genes_in_cluster",
     "cluster_enrichment",
     "pathway_enrichment",
+    "response_matrix",
+    "gene_set_compare",
+    "to_dataframe",
+    "GraphConnection",
 ]

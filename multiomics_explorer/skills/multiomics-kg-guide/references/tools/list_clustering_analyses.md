@@ -2,16 +2,16 @@
 
 ## What it does
 
-Browse, search, and filter clustering analyses.
+Browse, search, and filter clustering analyses — each analysis
+groups related gene clusters from one study / organism, with the
+cluster children inlined per result. Lucene full-text over analysis
+name, cluster names, descriptions, experimental_context. See
+`docs://guide/conventions` for Lucene scoring.
 
-Each analysis groups related gene clusters from one study/organism.
-Inline clusters are included in each result row.
-
-After this tool, drill in via:
-- genes_in_cluster(cluster_ids=[id]) for per-cluster member genes
-- genes_in_cluster(analysis_id=...) for all clusters from one analysis
-- gene_clusters_by_gene(locus_tags=[...], analysis_ids=[id]) to scope a
-  per-gene cluster lookup to this analysis
+Routing: `genes_in_cluster(cluster_ids=[id])` for per-cluster
+members; `genes_in_cluster(analysis_id=...)` for all clusters in
+one analysis; `gene_clusters_by_gene(locus_tags=[...],
+analysis_ids=[id])` to scope a per-gene cluster lookup.
 
 ## Parameters
 
@@ -23,7 +23,7 @@ After this tool, drill in via:
 | treatment_type | list[string] \| None | None | Filter by treatment type(s). E.g. ['nitrogen_stress']. |
 | background_factors | list[string] \| None | None | Filter by background factors. E.g. ['axenic', 'diel_cycle']. |
 | growth_phases | list[string] \| None | None | Filter by growth phase(s) (case-insensitive). Physiological state of the culture at sampling time. E.g. ['exponential', 'nutrient_limited']. |
-| omics_type | string \| None | None | Filter: 'EXOPROTEOMICS', 'MICROARRAY', 'PAIRED_RNASEQ_PROTEOME', 'PROTEOMICS', 'RNASEQ', 'VESICLE_DNASEQ', 'VESICLE_PROTEOMICS'. |
+| omics_type | string \| None | None | Filter: 'EXOPROTEOMICS', 'METABOLOMICS', 'MICROARRAY', 'PAIRED_RNASEQ_PROTEOME', 'PROTEOMICS', 'RNASEQ', 'VESICLE_DNASEQ', 'VESICLE_PROTEOMICS'. |
 | publication_doi | list[string] \| None | None | Filter by publication DOI(s). |
 | experiment_ids | list[string] \| None | None | Filter by experiment IDs. |
 | analysis_ids | list[string] \| None | None | Filter by analysis IDs. |
@@ -147,6 +147,8 @@ response['total_matching']  # use total, not len — results may be truncated
 ```
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
+
+- DataFrame conversion: `to_dataframe(result)` auto-dispatches and returns one row per analysis × cluster (compact: cluster_id / cluster_name / cluster_member_count; verbose=True adds cluster descriptions). See `docs://guide/python_api`.
 
 ## Package import equivalent
 

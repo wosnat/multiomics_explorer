@@ -2,17 +2,15 @@
 
 ## What it does
 
-List valid values for categorical filters used across tools.
+Enumerate valid values + counts for a categorical filter (gene_category, brite_tree, growth_phase, metric_type, value_kind, compartment, omics_type, evidence_source).
 
-Returns valid values and counts for the requested filter type.
-Use the returned values as filter parameters in `genes_by_function`
-(category filter).
+Routing: feed the returned `value`s into the corresponding filter on the relevant tool — `gene_category` → `genes_by_function(category=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment') | gene_category | Which categorical filter to enumerate. 'gene_category' / 'brite_tree' / 'growth_phase'; 'metric_type' / 'value_kind' / 'compartment' (DerivedMetric discovery). |
+| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment', 'omics_type', 'evidence_source') | gene_category | Which categorical filter to enumerate. See type column for the 8 valid values; `omics_type` returns the full canonical enum incl. METABOLOMICS; `evidence_source` returns Metabolite.evidence_sources values. |
 
 ## Response format
 
@@ -22,18 +20,18 @@ Use the returned values as filter parameters in `genes_by_function`
 filter_type, total_entries, returned, truncated, results
 ```
 
-- **filter_type** (string): The filter type returned (e.g. 'gene_category')
-- **total_entries** (int): Total distinct values for this filter (e.g. 26)
-- **returned** (int): Number of results returned (e.g. 26)
-- **truncated** (bool): True if total_entries > returned
+- **filter_type** (string): The filter type returned (e.g. 'gene_category').
+- **total_entries** (int): Total distinct values for this filter.
+- **returned** (int): Number of results returned.
+- **truncated** (bool): True if total_entries > returned.
 
 ### Per-result fields
 
 | Field | Type | Description |
 |---|---|---|
-| value | string | Filter value (e.g. 'Photosynthesis', 'Transport', 'Unknown') |
-| count | int | Number of genes/items with this value (e.g. 770) |
-| tree_code | string \| None (optional) | BRITE tree code (sparse: only for brite_tree filter, e.g. 'ko01000') |
+| value | string | Filter value (e.g. 'Photosynthesis', 'Transport', 'Unknown'). |
+| count | int | Number of items with this value. |
+| tree_code | string \| None (optional) | BRITE tree code (sparse: only for brite_tree filter, e.g. 'ko01000'). |
 
 ## Few-shot examples
 
@@ -145,6 +143,43 @@ list_filter_values(filter_type="compartment")
  ]}
 ```
 
+### Example 8: Enumerate omics types (for experiment / publication filtering)
+
+```example-call
+list_filter_values(filter_type="omics_type")
+```
+
+```example-response
+{"filter_type": "omics_type", "total_entries": 8, "returned": 8, "truncated": false,
+ "results": [
+   {"value": "EXOPROTEOMICS", "count": 8},
+   {"value": "METABOLOMICS", "count": 8},
+   {"value": "MICROARRAY", "count": 26},
+   {"value": "PAIRED_RNASEQ_PROTEOME", "count": 1},
+   {"value": "PROTEOMICS", "count": 72},
+   {"value": "RNASEQ", "count": 63},
+   {"value": "VESICLE_DNASEQ", "count": 1},
+   {"value": "VESICLE_PROTEOMICS", "count": 10}
+ ]}
+# Returns the full canonical OMICS_TYPE enum (8 values) in alphabetical
+# order. Values absent from current KG data still appear with count=0.
+```
+
+### Example 9: Enumerate metabolite evidence sources
+
+```example-call
+list_filter_values(filter_type="evidence_source")
+```
+
+```example-response
+{"filter_type": "evidence_source", "total_entries": 3, "returned": 3, "truncated": false,
+ "results": [
+   {"value": "metabolism", "count": 2188},
+   {"value": "transport", "count": 1355},
+   {"value": "metabolomics", "count": 107}
+ ]}
+```
+
 ## Chaining patterns
 
 ```
@@ -152,6 +187,8 @@ list_filter_values → genes_by_function(category=...)
 list_filter_values('brite_tree') → ontology_landscape(tree=...) → pathway_enrichment(tree=...)
 list_filter_values(filter_type='metric_type') → list_derived_metrics(metric_types=[...]) → genes_by_{kind}_metric
 list_filter_values(filter_type='compartment') → list_experiments(compartment=...) / list_organisms(compartment=...) / list_publications(compartment=...)
+list_filter_values(filter_type='evidence_source') → list_metabolites(evidence_sources=[...]) for slicing by evidence type.
+list_filter_values(filter_type='omics_type') → list_experiments(omics_type=...) for filtering by experiment type.
 ```
 
 ## Common mistakes

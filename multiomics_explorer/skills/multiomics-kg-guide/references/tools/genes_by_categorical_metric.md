@@ -2,32 +2,32 @@
 
 ## What it does
 
-Pass `derived_metric_ids` XOR `metric_types` (one required); `categories` must be a subset of the union of selected DMs' `allowed_categories` (raises with the allowed set listed otherwise) — inspect `list_derived_metrics(value_kind='categorical')` first to see each DM's allowed set.
+Drill into categorical DerivedMetric edges — one row per
+(gene × DM × edge value). `value` is a category label. Cross-organism
+by design.
 
-Categorical DM drill-down — one row per gene × DM × edge value.
-`r.value` is a category label. Cross-organism by design; envelope
-`by_organism` and per-row `organism_name` make cross-strain rows
-self-describing. The `by_metric` envelope rollup pairs filtered-slice
-category histogram (`by_category`) with full-DM precomputed
-histogram (`dm_by_category`) plus the schema-declared
-`allowed_categories` so callers can detect declared-but-unobserved
-categories without an extra call.
+Selection is `derived_metric_ids` XOR `metric_types` (exactly one
+required); wrong-kind IDs (numeric / boolean) surface silently in
+`not_found_ids`. The `categories` filter must be a subset of the
+union of selected DMs' `allowed_categories` — unknown values raise
+`ValueError` listing the allowed set. Pre-flight via
+`list_derived_metrics(value_kind='categorical')` to see each DM's
+allowed set. See `docs://guide/conventions` for the full DM family
+gating contract.
 
-Wrong-kind IDs (numeric / boolean) surface silently in
-`not_found_ids` — inspect `list_derived_metrics(value_kind='categorical')`
-first to pick valid categorical DMs.
-
-`excluded_derived_metrics` and `warnings` are always `[]` (no
-rankable / has_p_value gates apply to categorical DMs); kept as
-envelope keys for cross-tool shape consistency with
-`genes_by_numeric_metric`.
+The `by_metric` envelope rollup pairs filtered-slice category
+histogram (`by_category`) with full-DM precomputed histogram
+(`dm_by_category`) plus the schema-declared `allowed_categories`,
+so callers can detect declared-but-unobserved categories without an
+extra call. `excluded_derived_metrics` / `warnings` are always []
+here (no gates apply); kept for envelope-shape consistency.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | derived_metric_ids | list[string] \| None | None | Categorical DerivedMetric node IDs. Use when the same `metric_type` appears across organisms / publications and you need to pin one. Discover IDs via `list_derived_metrics(value_kind='categorical')`. Mutually exclusive with `metric_types`. Wrong-kind IDs (numeric / boolean) surface silently in `not_found_ids`. |
-| metric_types | list[string] \| None | None | Categorical metric-type tags (e.g. ['predicted_subcellular_localization', 'darkness_survival_class']). Unions every DM carrying that tag, then narrows by scoping filters. Same tag can appear across organisms (e.g. 'predicted_subcellular_localization' is on both MED4 + MIT9313). Mutually exclusive with `derived_metric_ids`. |
+| metric_types | list[string] \| None | None | Categorical metric-type tags (e.g. ['predicted_subcellular_localization', 'darkness_survival_class']). Unions every DM carrying that tag, then narrows by scoping filters. Same tag can span organisms / publications — pin one specific DM via `derived_metric_ids` instead. Mutually exclusive with `derived_metric_ids`. |
 | organism | string \| None | None | Organism to scope the DM set to. Accepts short strain code ('MED4', 'NATL2A', 'MIT9313') or full name. Case-insensitive substring match. Single-organism is **not** enforced — omit to drill across all organisms a metric_type spans. |
 | locus_tags | list[string] \| None | None | Restrict drill-down to a specific gene set (e.g. DE hits from `differential_expression_by_gene`). Filter on `g.locus_tag IN $locus_tags` post-MATCH. Genes with no edge for the selected DM produce no row. |
 | experiment_ids | list[string] \| None | None | Scope to DMs from one or more experiments. |
@@ -87,8 +87,8 @@ total_matching, total_derived_metrics, total_genes, by_organism, by_compartment,
 | derived_metric_id | string | Unique parent-DM id. |
 | name | string | DM human label. |
 | value_kind | string | Always 'categorical' for this tool; kept for cross-tool row-shape consistency with `genes_by_numeric_metric`. |
-| rankable | bool | DM-level rankable flag (always False today for categorical DMs). |
-| has_p_value | bool | DM-level p-value flag (always False today for categorical DMs). |
+| rankable | bool | DM-level rankable flag (always False for categorical DMs in the current KG). |
+| has_p_value | bool | DM-level p-value flag (always False for categorical DMs in the current KG). |
 | value | string | Category label (one of the parent DM's `allowed_categories`). |
 
 **Verbose-only fields** (included when `verbose=True`):
@@ -259,7 +259,7 @@ genes_by_categorical_metric (no organism filter) → split via envelope by_organ
 
 - `allowed_categories` ⊋ `dm_by_category`. A category may be declared in `allowed_categories` (schema-level) but unobserved in any gene (absent from `dm_by_category`). Example: MED4 PSORTb declares `Extracellular` but no gene is classified that way — `dm_by_category` omits it. Both per-DM context fields appear in each `by_metric` row; inspect them together before assuming a category exists in the data.
 
-- Sparse `rankable` / `has_p_value` echoes. Both are always `False` on every row from current categorical DMs — kept for cross-tool row-shape consistency with `genes_by_numeric_metric`, not because this tool reads them as a meaningful signal. Don't gate downstream logic on them.
+- Sparse `rankable` / `has_p_value` echoes. Both are always `False` on every row from categorical DMs in the current KG — kept for cross-tool row-shape consistency with `genes_by_numeric_metric`, not because this tool reads them as a meaningful signal. Don't gate downstream logic on them.
 
 ```mistake
 genes_by_categorical_metric(derived_metric_ids=['derived_metric:...:damping_ratio'])
@@ -268,6 +268,8 @@ genes_by_categorical_metric(derived_metric_ids=['derived_metric:...:damping_rati
 ```correction
 genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'])
 ```
+
+- See `docs://analysis/derived_metrics` for the DM family overview (numeric / boolean / categorical drill-downs).
 
 ## Package import equivalent
 

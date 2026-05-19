@@ -2,24 +2,24 @@
 
 ## What it does
 
-Gene-centric differential expression. One row per gene x experiment x timepoint.
+Find differential-expression rows for one organism — one row per
+(gene × experiment × timepoint), sorted by |log2FC|. Single-organism
+enforced; at least one of `organism` / `locus_tags` / `experiment_ids`
+is required. `expression_status` uses each experiment's publication-
+specific threshold (not a uniform padj<0.05 cutoff).
 
-Returns summary statistics (always) + top results sorted by |log2FC|
-(strongest effects first). Default limit=5 gives a quick overview.
-Set summary=True for counts only, or increase limit for more rows.
+Tested-absent semantics depend on the parent experiment's
+`table_scope`: `all_detected_genes` keeps `not_significant` rows
+(real biology — gene tested but did not respond); `significant_only`
+and `top_n` collapse tested-absent with not-detected. Always check
+`by_table_scope` (envelope) and the per-experiment `table_scope`
+before reading missing rows. See `docs://guide/conventions` for the
+full tested-absent framing.
 
-At least one of organism, locus_tags, or experiment_ids is required.
-All inputs must refer to the same organism — call once per organism.
-
-When organism is the only filter, it scopes to that organism's full
-expression data (e.g. MED4 = 47K edges). Combine with summary=True or
-significant_only=True + limit for manageable results.
-
-The expression_status field uses the publication-specific threshold from
-each experiment's original paper (not a uniform padj<0.05 cutoff).
-
-For cross-organism comparison via ortholog groups, use
-differential_expression_by_ortholog.
+Routing: `summary=True` for counts-only landscape; per-gene drill-down
+to `gene_response_profile`; cross-organism via
+`differential_expression_by_ortholog`; pathway interpretation via
+`pathway_enrichment` (`docs://analysis/enrichment`).
 
 ## Parameters
 
@@ -28,7 +28,7 @@ differential_expression_by_ortholog.
 | organism | string \| None | None | Organism name or partial match (e.g. 'MED4', 'Prochlorococcus MED4'). Fuzzy word-based matching (same as list_experiments). Get valid names from list_organisms. |
 | locus_tags | list[string] \| None | None | Gene locus tags. E.g. ['PMM0001', 'PMM0845']. Get these from resolve_gene / gene_overview. |
 | experiment_ids | list[string] \| None | None | Experiment IDs to restrict to. Get these from list_experiments. |
-| direction | string ('up', 'down') \| None | None | Filter by expression direction. |
+| direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` is unchanged. |
 | significant_only | bool | False | If true, return only statistically significant results. |
 | growth_phases | list[string] \| None | None | Filter by growth phase(s) at sampling time (case-insensitive, edge-level). Isolates specific-phase rows from multi-phase experiments. E.g. ['exponential']. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
@@ -56,7 +56,7 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 - **rows_by_treatment_type** (object): Row counts by treatment type (e.g. {'nitrogen_stress': 15})
 - **rows_by_background_factors** (object): Row counts by background factor (e.g. {'axenic': 10, 'diel_cycle': 5})
 - **rows_by_growth_phase** (object): Row counts by growth phase. Growth phase is a timepoint-level condition, not gene-specific.
-- **by_table_scope** (object): Row counts by experiment table_scope (e.g. {'all_detected_genes': 100, 'significant_only': 50}). Shows data completeness across experiments.
+- **by_table_scope** (object): Row counts by experiment table_scope (e.g. {'all_detected_genes': 100, 'significant_only': 50}). `all_detected_genes` keeps tested-absent (`not_significant`) rows; `significant_only` / `top_n` collapse them with not-detected. Check before reading missing rows. See `docs://guide/conventions`.
 - **top_categories** (list[ExpressionTopCategory]): Top gene categories by significant gene count, max 5
 - **experiments** (list[ExpressionByExperiment]): Per-experiment summary with nested timepoint breakdown, sorted by significant row count desc
 - **not_found** (list[string]): Input locus_tags not found in KG
@@ -132,7 +132,13 @@ differential_expression_by_gene(locus_tags=["ACZ81_01830", "ACZ81_15555"], exper
 {"organism_name": "Alteromonas macleodii HOT1A3", "matching_genes": 2, "total_matching": 6, "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 4}, "median_abs_log2fc": 2.78, "max_abs_log2fc": 3.591, "experiment_count": 1, "rows_by_treatment_type": {"nutrient_starvation": 6}, "by_table_scope": {"all_detected_genes": 6}, "top_categories": [{"category": "Inorganic ion transport", "total_genes": 1, "significant_genes": 1}, {"category": "Signal transduction", "total_genes": 1, "significant_genes": 1}], "experiments": [{"experiment_id": "10.1101/...", "experiment_name": "HOT1A3 PRO99-lowN nutrient starvation (RNASEQ)", "treatment_type": "nutrient_starvation", "omics_type": "RNASEQ", "coculture_partner": null, "is_time_course": "true", "table_scope": "all_detected_genes", "table_scope_detail": null, "matching_genes": 2, "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 4}, "timepoints": [{"timepoint": "day 18", "timepoint_hours": 432.0, "timepoint_order": 1, "matching_genes": 2, "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 2}}]}], "not_found": [], "no_expression": [], "returned": 5, "truncated": true, "offset": 0, "results": [{"locus_tag": "ACZ81_01830", "gene_name": "amtB", "experiment_id": "...", "treatment_type": "nutrient_starvation", "timepoint": "days 60+89", "timepoint_hours": null, "timepoint_order": 3, "log2fc": 3.591, "padj": 1.13e-12, "rank": 77, "rank_up": 1, "rank_down": null, "expression_status": "significant_up"}]}
 ```
 
-### Example 5: Chaining — find genes then check expression
+### Example 5: Both significant directions in one call (direction='both')
+
+```example-call
+differential_expression_by_gene(organism="MED4", direction="both", summary=True)
+```
+
+### Example 6: Chaining — find genes then check expression
 
 ```
 Step 1: genes_by_function(search_text="nitrogen transport", organism="HOT1A3")
@@ -188,6 +194,8 @@ Mixing organisms in a single call (e.g. MED4 + HOT1A3 locus_tags)
 Call once per organism — tool enforces single-organism constraint
 ```
 
+- `direction='both'` is functionally identical to `direction=None, significant_only=True` — pick whichever spelling is clearer at the call site. Default `direction=None` is unchanged.
+
 - expression_status uses publication-specific thresholds, not a uniform padj<0.05
 
 - Use summary=True first to see the landscape, then drill into specific genes/experiments
@@ -195,6 +203,8 @@ Call once per organism — tool enforces single-organism constraint
 - Check by_table_scope in the summary to understand data completeness before drawing conclusions
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
+
+- For cross-experiment summarization (which treatments does this gene set respond to?) see `docs://guide/python_api` (Cross-experiment summarization — `response_matrix` for gene × treatment pivots, `gene_set_compare` for two-set overlap). For pathway-level interpretation chain to `pathway_enrichment` (`docs://analysis/enrichment`).
 
 ## Package import equivalent
 

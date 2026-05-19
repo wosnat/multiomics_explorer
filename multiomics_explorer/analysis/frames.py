@@ -1,13 +1,19 @@
 """DataFrame conversion utilities for multiomics_explorer API results.
 
-The primary entry point is :func:`to_dataframe`, which converts the
-``{"results": [...]}`` dict returned by API functions into a tidy
-:class:`pandas.DataFrame`.
+The single entry point is :func:`to_dataframe`. It returns the right
+shape automatically for any tool result:
 
-Object-typed columns are processed automatically:
-- List values are joined with ``" | "`` (space-pipe-space).
-- Dict values are expanded into ``{col}_{key}`` columns.
-- Mixed or nested complex values are dropped with a :class:`UserWarning`.
+- ``gene_response_profile()`` → one row per gene × treatment group.
+- ``list_experiments()`` → one row per experiment × timepoint.
+- ``list_clustering_analyses()`` → one row per analysis × cluster.
+- Anything else → flat one-row-per-result conversion (list columns
+  joined by ``" | "``, dict columns expanded into ``{col}_{key}``,
+  remaining nested columns dropped with a :class:`UserWarning`).
+
+The dedicated functions :func:`profile_summary_to_dataframe`,
+:func:`experiments_to_dataframe`, and :func:`analyses_to_dataframe`
+are public for direct use, but most callers should just reach for
+:func:`to_dataframe`.
 """
 
 from __future__ import annotations
@@ -23,14 +29,6 @@ import pandas as pd
 # ---------------------------------------------------------------------------
 
 _LIST_DELIMITER = " | "
-
-# Columns with dedicated conversion functions get a helpful suggestion in the
-# drop warning rather than the generic "file an issue" message.
-_DEDICATED_FUNCTIONS: dict[str, str] = {
-    "response_summary": "profile_summary_to_dataframe()",
-    "timepoints": "experiments_to_dataframe()",
-    "clusters": "analyses_to_dataframe()",
-}
 
 
 # ---------------------------------------------------------------------------
@@ -204,8 +202,33 @@ def analyses_to_dataframe(result: dict) -> pd.DataFrame:
     return _flatten_columns(df)
 
 
+# Dispatch table — maps a key present in ``result["results"][0]`` to the
+# dedicated converter. Order matters only when keys could collide
+# (currently none do).
+_DISPATCH_BY_KEY: dict[str, Any] = {
+    "response_summary": profile_summary_to_dataframe,
+    "timepoints": experiments_to_dataframe,
+    "clusters": analyses_to_dataframe,
+}
+
+
 def to_dataframe(result: dict[str, Any]) -> pd.DataFrame:
-    """Convert an API result dict to a :class:`pandas.DataFrame`.
+    """Convert any API result dict to a :class:`pandas.DataFrame`.
+
+    The output shape adapts to which tool produced the result:
+
+    - ``gene_response_profile()`` → one row per gene × treatment group.
+    - ``list_experiments()`` → one row per experiment × timepoint
+      (non-time-course experiments get one row).
+    - ``list_clustering_analyses()`` → one row per analysis × cluster.
+    - Anything else → one row per ``result["results"]`` entry, with
+      list columns joined by ``" | "``, dict columns expanded into
+      ``{col}_{key}``, and any remaining nested columns dropped with
+      a :class:`UserWarning`.
+
+    For an ``EnrichmentResult`` (returned by ``pathway_enrichment`` /
+    ``cluster_enrichment`` / ``fisher_ora``), use ``result.results``
+    directly — it is already a DataFrame.
 
     Parameters
     ----------
@@ -215,7 +238,7 @@ def to_dataframe(result: dict[str, Any]) -> pd.DataFrame:
     Returns
     -------
     pd.DataFrame
-        One row per result item, object columns processed.
+        Shape depends on the tool that produced the result; see above.
 
     Raises
     ------
@@ -229,7 +252,14 @@ def to_dataframe(result: dict[str, Any]) -> pd.DataFrame:
             "gene_response_profile())."
         )
 
-    df = pd.DataFrame(result["results"])
+    rows = result["results"]
+    if rows and isinstance(rows[0], dict):
+        first_keys = rows[0].keys()
+        for key, dispatched_fn in _DISPATCH_BY_KEY.items():
+            if key in first_keys:
+                return dispatched_fn(result)
+
+    df = pd.DataFrame(rows)
     if df.empty:
         return df
 
@@ -323,18 +353,17 @@ def _is_scalar_nan(value: Any) -> bool:
 
 
 def _drop_with_warning(df: pd.DataFrame, col: str) -> None:
-    """Warn and drop *col* from *df* in-place."""
-    dedicated = _DEDICATED_FUNCTIONS.get(col)
-    if dedicated:
-        suggestion = (
-            f"Column '{col}' contains nested data. "
-            f"Use {dedicated} to convert this column instead."
-        )
-    else:
-        suggestion = (
-            f"Column '{col}' contains nested data that cannot be flattened "
-            "automatically. The column has been dropped. "
-            "If you need this data, please file an issue."
-        )
+    """Warn and drop *col* from *df* in-place.
+
+    The three dispatch keys (``response_summary``, ``timepoints``,
+    ``clusters``) never reach this path — :func:`to_dataframe`
+    auto-dispatches before the flat conversion runs. This warning fires
+    only for unrecognized nested columns.
+    """
+    suggestion = (
+        f"Column '{col}' contains nested data that cannot be flattened "
+        "automatically. The column has been dropped. "
+        "If you need this data, please file an issue."
+    )
     warnings.warn(suggestion, UserWarning, stacklevel=4)
     df.drop(columns=[col], inplace=True)

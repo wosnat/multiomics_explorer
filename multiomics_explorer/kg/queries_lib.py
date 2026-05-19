@@ -405,11 +405,13 @@ def build_gene_overview_summary(
         "     size(found) AS total_matching,\n"
         "     [g IN found | g.organism_name] AS orgs,\n"
         "     [g IN found | g.gene_category] AS cats,\n"
+        "     [g IN found | g.annotation_state] AS states,\n"
         "     apoc.coll.flatten([g IN found | g.annotation_types]) AS all_atypes\n"
         "RETURN total_matching,\n"
         "       apoc.coll.frequencies(orgs) AS by_organism,\n"
         "       apoc.coll.frequencies(cats) AS by_category,\n"
         "       apoc.coll.frequencies(all_atypes) AS by_annotation_type,\n"
+        "       apoc.coll.frequencies(states) AS by_annotation_state,\n"
         "       size([g IN found WHERE g.expression_edge_count > 0]) AS has_expression,\n"
         "       size([g IN found WHERE (g.significant_up_count + g.significant_down_count) > 0]) AS has_significant_expression,\n"
         "       size([g IN found WHERE g.closest_ortholog_group_size > 0]) AS has_orthologs,\n"
@@ -418,6 +420,10 @@ def build_gene_overview_summary(
         "           coalesce(g.numeric_metric_count, 0)\n"
         "         + coalesce(g.boolean_metric_count, 0)\n"
         "         + coalesce(g.categorical_metric_count, 0) > 0]) AS has_derived_metrics,\n"
+        "       size([g IN found WHERE EXISTS {\n"
+        "         MATCH (g)-[:Gene_catalyzes_reaction|Gene_has_tcdb_family]->()"
+        "-[:Reaction_has_metabolite|Tcdb_family_transports_metabolite]->(:Metabolite)\n"
+        "       }]) AS has_chemistry,\n"
         "       not_found"
     )
     return cypher, {"locus_tags": locus_tags}
@@ -467,12 +473,40 @@ def build_gene_overview(
     else:
         limit_clause = ""
 
+    # Phase 1 plumbing (spec §6.1): per-row chemistry counts +
+    # path-existence-derived evidence_sources. The CASE/EXISTS form
+    # avoids the false-positive 'metabolism' tag that a metabolite-level
+    # rollup would produce on transport-only genes (e.g. PMM0392).
+    chemistry_with = (
+        "WITH g,\n"
+        "  CASE WHEN EXISTS {\n"
+        "    MATCH (g)-[:Gene_catalyzes_reaction]->(:Reaction)"
+        "-[:Reaction_has_metabolite]->(:Metabolite)\n"
+        "  } THEN ['metabolism'] ELSE [] END +\n"
+        "  CASE WHEN EXISTS {\n"
+        "    MATCH (g)-[:Gene_has_tcdb_family]->(:TcdbFamily)"
+        "-[:Tcdb_family_transports_metabolite]->(:Metabolite)\n"
+        "  } THEN ['transport'] ELSE [] END +\n"
+        "  CASE WHEN EXISTS {\n"
+        "    MATCH (g)-[:Gene_catalyzes_reaction]->(:Reaction)"
+        "-[:Reaction_has_metabolite]->(m:Metabolite)\n"
+        "    WHERE coalesce(m.measured_assay_count, 0) > 0\n"
+        "  } OR EXISTS {\n"
+        "    MATCH (g)-[:Gene_has_tcdb_family]->(:TcdbFamily)"
+        "-[:Tcdb_family_transports_metabolite]->(m:Metabolite)\n"
+        "    WHERE coalesce(m.measured_assay_count, 0) > 0\n"
+        "  } THEN ['metabolomics'] ELSE [] END AS evidence_sources\n"
+    )
+
     cypher = (
         "UNWIND $locus_tags AS lt\n"
         "MATCH (g:Gene {locus_tag: lt})\n"
+        f"{chemistry_with}"
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.gene_category AS gene_category,\n"
         "       g.annotation_quality AS annotation_quality,\n"
+        "       g.annotation_state AS annotation_state,\n"
+        "       coalesce(g.informative_annotation_types, []) AS informative_annotation_types,\n"
         "       g.organism_name AS organism_name,\n"
         "       g.annotation_types AS annotation_types,\n"
         "       g.expression_edge_count AS expression_edge_count,\n"
@@ -484,7 +518,11 @@ def build_gene_overview(
         "       coalesce(g.cluster_types, []) AS cluster_types,\n"
         "       coalesce(g.numeric_metric_count, 0) AS numeric_metric_count,\n"
         "       coalesce(g.boolean_metric_count, 0) AS boolean_metric_count,\n"
-        f"       coalesce(g.categorical_metric_count, 0) AS categorical_metric_count{verbose_cols}\n"
+        "       coalesce(g.categorical_metric_count, 0) AS categorical_metric_count,\n"
+        "       coalesce(g.reaction_count, 0) AS reaction_count,\n"
+        "       coalesce(g.metabolite_count, 0) AS metabolite_count,\n"
+        "       coalesce(g.tcdb_family_count, 0) AS transporter_count,\n"
+        f"       evidence_sources{verbose_cols}\n"
         f"ORDER BY g.locus_tag{skip_clause}{limit_clause}"
     )
     return cypher, params
@@ -860,6 +898,9 @@ def build_list_publications(
             "       coalesce(p.derived_metric_count, 0) AS derived_metric_count,\n"
             "       coalesce(p.derived_metric_value_kinds, []) AS derived_metric_value_kinds,\n"
             "       coalesce(p.compartments, []) AS compartments,\n"
+            "       coalesce(p.metabolite_count, 0) AS metabolite_count,\n"
+            "       coalesce(p.metabolite_assay_count, 0) AS metabolite_assay_count,\n"
+            "       coalesce(p.metabolite_compartments, []) AS metabolite_compartments,\n"
             f"       score{verbose_cols}\n"
             f"ORDER BY score DESC, p.publication_year DESC, p.title\n"
             f"{limit_clause}"
@@ -884,7 +925,10 @@ def build_list_publications(
             "       coalesce(p.growth_phases, []) AS growth_phases,\n"
             "       coalesce(p.derived_metric_count, 0) AS derived_metric_count,\n"
             "       coalesce(p.derived_metric_value_kinds, []) AS derived_metric_value_kinds,\n"
-            f"       coalesce(p.compartments, []) AS compartments{verbose_cols}\n"
+            "       coalesce(p.compartments, []) AS compartments,\n"
+            "       coalesce(p.metabolite_count, 0) AS metabolite_count,\n"
+            "       coalesce(p.metabolite_assay_count, 0) AS metabolite_assay_count,\n"
+            f"       coalesce(p.metabolite_compartments, []) AS metabolite_compartments{verbose_cols}\n"
             f"ORDER BY p.publication_year DESC, p.title\n"
             f"{limit_clause}"
         )
@@ -981,8 +1025,9 @@ def build_list_publications_summary(
 
 def _list_metabolites_where(
     *,
-    search: str | None = None,
+    search_text: str | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     kegg_compound_ids: list[str] | None = None,
     chebi_ids: list[str] | None = None,
     hmdb_ids: list[str] | None = None,
@@ -997,19 +1042,25 @@ def _list_metabolites_where(
     """Build WHERE clause and params for metabolite queries.
 
     Shared between build_list_metabolites and build_list_metabolites_summary.
-    `search` is not added to WHERE — it controls which Cypher variant is
-    used (fulltext entry point vs MATCH). The $search param is added to
-    params when search is provided.
+    `search_text` is not added to WHERE — it controls which Cypher variant
+    is used (fulltext entry point vs MATCH). The Cypher param name `$search`
+    stays unchanged (it's the second arg to
+    `db.index.fulltext.queryNodes('metaboliteFullText', $search)`); only
+    the Python kwarg renamed.
     """
     conditions: list[str] = []
     params: dict = {}
 
-    if search:
-        params["search"] = search
+    if search_text:
+        params["search"] = search_text
 
     if metabolite_ids:
         conditions.append("m.id IN $metabolite_ids")
         params["metabolite_ids"] = metabolite_ids
+
+    if exclude_metabolite_ids:
+        conditions.append("(NOT (m.id IN $exclude_metabolite_ids))")
+        params["exclude_metabolite_ids"] = exclude_metabolite_ids
 
     if kegg_compound_ids:
         conditions.append("m.kegg_compound_id IN $kegg_compound_ids")
@@ -1067,8 +1118,9 @@ def _list_metabolites_where(
 
 def build_list_metabolites(
     *,
-    search: str | None = None,
+    search_text: str | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     kegg_compound_ids: list[str] | None = None,
     chebi_ids: list[str] | None = None,
     hmdb_ids: list[str] | None = None,
@@ -1088,14 +1140,15 @@ def build_list_metabolites(
     RETURN keys (compact): metabolite_id, name, formula, elements, mass,
     gene_count, organism_count, transporter_count, evidence_sources,
     chebi_id, pathway_ids, pathway_count.
-    When search is provided, also: score.
+    When search_text is provided, also: score.
     RETURN keys (verbose): adds inchikey, smiles, mnxm_id, hmdb_id,
     pathway_names. All verbose columns are direct property reads on m;
     no edge traversal in either compact or verbose mode.
     """
     where_block, params = _list_metabolites_where(
-        search=search,
+        search_text=search_text,
         metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
         kegg_compound_ids=kegg_compound_ids,
         chebi_ids=chebi_ids,
         hmdb_ids=hmdb_ids,
@@ -1126,7 +1179,7 @@ def build_list_metabolites(
         params["limit"] = limit
     limit_clause = " ".join(pagination_parts)
 
-    if search:
+    if search_text:
         cypher = (
             "CALL db.index.fulltext.queryNodes('metaboliteFullText', $search)\n"
             "YIELD node AS m, score\n"
@@ -1143,6 +1196,10 @@ def build_list_metabolites(
             "       m.chebi_id AS chebi_id,\n"
             "       coalesce(m.pathway_ids, []) AS pathway_ids,\n"
             "       coalesce(m.pathway_count, 0) AS pathway_count,\n"
+            "       coalesce(m.measured_assay_count, 0) AS measured_assay_count,\n"
+            "       coalesce(m.measured_paper_count, 0) AS measured_paper_count,\n"
+            "       coalesce(m.measured_organisms, []) AS measured_organisms,\n"
+            "       coalesce(m.measured_compartments, []) AS measured_compartments,\n"
             f"       score{verbose_cols}\n"
             "ORDER BY score DESC, m.organism_count DESC, m.id\n"
             f"{limit_clause}"
@@ -1162,7 +1219,11 @@ def build_list_metabolites(
             "       coalesce(m.evidence_sources, []) AS evidence_sources,\n"
             "       m.chebi_id AS chebi_id,\n"
             "       coalesce(m.pathway_ids, []) AS pathway_ids,\n"
-            f"       coalesce(m.pathway_count, 0) AS pathway_count{verbose_cols}\n"
+            "       coalesce(m.pathway_count, 0) AS pathway_count,\n"
+            "       coalesce(m.measured_assay_count, 0) AS measured_assay_count,\n"
+            "       coalesce(m.measured_paper_count, 0) AS measured_paper_count,\n"
+            "       coalesce(m.measured_organisms, []) AS measured_organisms,\n"
+            f"       coalesce(m.measured_compartments, []) AS measured_compartments{verbose_cols}\n"
             "ORDER BY m.organism_count DESC, m.gene_count DESC, m.id\n"
             f"{limit_clause}"
         )
@@ -1172,8 +1233,9 @@ def build_list_metabolites(
 
 def build_list_metabolites_summary(
     *,
-    search: str | None = None,
+    search_text: str | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     kegg_compound_ids: list[str] | None = None,
     chebi_ids: list[str] | None = None,
     hmdb_ids: list[str] | None = None,
@@ -1187,17 +1249,18 @@ def build_list_metabolites_summary(
 ) -> tuple[str, dict]:
     """Build summary aggregation Cypher for list_metabolites.
 
-    RETURN keys: total_entries, total_matching, top_organisms, top_pathways,
-    by_evidence_source, with_chebi, with_hmdb, with_mnxm, mass_min,
-    mass_median, mass_max.
-    When search is provided, also: score_max, score_median.
+    RETURN keys: total_entries, total_matching, top_organisms,
+    top_metabolite_pathways, by_evidence_source, with_chebi, with_hmdb,
+    with_mnxm, mass_min, mass_median, mass_max.
+    When search_text is provided, also: score_max, score_median.
 
     Critical: never `collect(m) AS matched`. Instead flatten denormalized
     list properties (KG-A5..A8) via apoc.coll.flatten over cheap collects.
     """
     where_block, params = _list_metabolites_where(
-        search=search,
+        search_text=search_text,
         metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
         kegg_compound_ids=kegg_compound_ids,
         chebi_ids=chebi_ids,
         hmdb_ids=hmdb_ids,
@@ -1224,16 +1287,18 @@ def build_list_metabolites_summary(
         "CALL {\n"
         "  WITH all_pwys\n"
         "  UNWIND apoc.coll.frequencies(all_pwys) AS f\n"
-        "  WITH f.item AS pathway_id, f.count AS count\n"
+        "  WITH f.item AS metabolite_pathway_id, f.count AS count\n"
         "  ORDER BY count DESC LIMIT 10\n"
-        "  OPTIONAL MATCH (p:KeggTerm {id: pathway_id})\n"
+        "  OPTIONAL MATCH (p:KeggTerm {id: metabolite_pathway_id})\n"
         "  RETURN collect({\n"
-        "    pathway_id: pathway_id, pathway_name: p.name, count: count\n"
-        "  }) AS top_pathways\n"
+        "    metabolite_pathway_id: metabolite_pathway_id,\n"
+        "    metabolite_pathway_name: p.name,\n"
+        "    count: count\n"
+        "  }) AS top_metabolite_pathways\n"
         "}\n"
     )
 
-    if search:
+    if search_text:
         # Search variant: fulltext entry point + score collection. Pull
         # total_entries from a small unfiltered Metabolite count after
         # the filtered aggregation.
@@ -1252,10 +1317,14 @@ def build_list_metabolites_summary(
             "     count(m.hmdb_id) AS with_hmdb,\n"
             "     count(m.mnxm_id) AS with_mnxm,\n"
             "     collect(m.mass) AS masses,\n"
-            "     collect(score) AS scores\n"
+            "     collect(score) AS scores,\n"
+            "     collect(coalesce(m.measured_paper_count, 0)) AS paper_counts,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(m.measured_compartments, []))) AS m_comps\n"
             "MATCH (m2:Metabolite)\n"
             "WITH count(m2) AS total_entries, total_matching, es, all_orgs, "
-            "all_pwys, with_chebi, with_hmdb, with_mnxm, masses, scores\n"
+            "all_pwys, with_chebi, with_hmdb, with_mnxm, masses, scores, "
+            "paper_counts, m_comps\n"
             f"{top_organisms_block}"
             f"{top_pathways_block}"
             "RETURN total_entries, total_matching,\n"
@@ -1266,7 +1335,11 @@ def build_list_metabolites_summary(
             "       apoc.coll.max(masses) AS mass_max,\n"
             "       apoc.coll.max(scores) AS score_max,\n"
             "       apoc.coll.sort(scores)[size(scores)/2] AS score_median,\n"
-            "       top_organisms, top_pathways"
+            "       top_organisms, top_metabolite_pathways,\n"
+            "       {\n"
+            "         by_paper_count: apoc.coll.frequencies(paper_counts),\n"
+            "         by_compartment: apoc.coll.frequencies(m_comps)\n"
+            "       } AS by_measurement_coverage"
         )
     else:
         # OPTIONAL MATCH preserves the total_entries row when the filtered
@@ -1288,7 +1361,10 @@ def build_list_metabolites_summary(
             "     count(m.chebi_id) AS with_chebi,\n"
             "     count(m.hmdb_id) AS with_hmdb,\n"
             "     count(m.mnxm_id) AS with_mnxm,\n"
-            "     collect(m.mass) AS masses\n"
+            "     collect(m.mass) AS masses,\n"
+            "     collect(coalesce(m.measured_paper_count, 0)) AS paper_counts,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(m.measured_compartments, []))) AS m_comps\n"
             f"{top_organisms_block}"
             f"{top_pathways_block}"
             "RETURN total_entries, total_matching,\n"
@@ -1297,7 +1373,11 @@ def build_list_metabolites_summary(
             "       apoc.coll.min(masses) AS mass_min,\n"
             "       apoc.coll.sort(masses)[size(masses)/2] AS mass_median,\n"
             "       apoc.coll.max(masses) AS mass_max,\n"
-            "       top_organisms, top_pathways"
+            "       top_organisms, top_metabolite_pathways,\n"
+            "       {\n"
+            "         by_paper_count: apoc.coll.frequencies(paper_counts),\n"
+            "         by_compartment: apoc.coll.frequencies(m_comps)\n"
+            "       } AS by_measurement_coverage"
         )
 
     return cypher, params
@@ -1383,6 +1463,41 @@ def build_list_compartments() -> tuple[str, dict]:
     return cypher, {}
 
 
+def build_list_omics_types() -> tuple[str, dict]:
+    """List distinct Experiment.omics_type values with experiment counts.
+
+    Sourced from Experiment.omics_type (per spec §6.5). Live distinct
+    values: 8 categories. The Python wrapper layer is expected to merge
+    this with the canonical OMICS_TYPE enum so values like METABOLOMICS
+    appear with count=0 when no experiments of that type exist yet.
+
+    RETURN keys: value, count.
+    """
+    cypher = (
+        "MATCH (e:Experiment) WHERE e.omics_type IS NOT NULL\n"
+        "RETURN e.omics_type AS value, count(*) AS count\n"
+        "ORDER BY count DESC, value"
+    )
+    return cypher, {}
+
+
+def build_list_evidence_sources() -> tuple[str, dict]:
+    """List Metabolite.evidence_sources buckets with metabolite counts.
+
+    Sourced from Metabolite.evidence_sources array (per spec §6.5).
+    Live distribution: metabolism=2188, transport=1355, metabolomics=107.
+
+    RETURN keys: value, count.
+    """
+    cypher = (
+        "MATCH (m:Metabolite)\n"
+        "UNWIND coalesce(m.evidence_sources, []) AS src\n"
+        "RETURN src AS value, count(*) AS count\n"
+        "ORDER BY count DESC, value"
+    )
+    return cypher, {}
+
+
 def build_list_organisms(
     *,
     organism_names_lc: list[str] | None = None,
@@ -1456,6 +1571,7 @@ def build_list_organisms(
         "       coalesce(o.compartments, []) AS compartments,\n"
         "       coalesce(o.reaction_count, 0) AS reaction_count,\n"
         "       coalesce(o.metabolite_count, 0) AS metabolite_count,\n"
+        "       coalesce(o.measured_metabolite_count, 0) AS measured_metabolite_count,\n"
         "       o.reference_database AS reference_database,\n"
         "       o.reference_proteome AS reference_proteome,\n"
         "       coalesce(o.growth_phases, []) AS growth_phases"
@@ -1500,13 +1616,18 @@ def build_list_organisms_summary(
         "       collect(coalesce(o.compartments, []))) AS comps,\n"
         "     apoc.coll.flatten(\n"
         "       collect(coalesce(o.cluster_types, []))) AS ctypes,\n"
-        "     collect(o.organism_type) AS otypes\n"
+        "     collect(o.organism_type) AS otypes,\n"
+        "     collect(coalesce(o.measured_metabolite_count, 0)) AS mmc\n"
         "RETURN total_entries, total_matching,\n"
         "       apoc.coll.frequencies(vks) AS by_value_kind,\n"
         "       apoc.coll.frequencies(mtypes) AS by_metric_type,\n"
         "       apoc.coll.frequencies(comps) AS by_compartment,\n"
         "       apoc.coll.frequencies(ctypes) AS by_cluster_type,\n"
-        "       apoc.coll.frequencies(otypes) AS by_organism_type"
+        "       apoc.coll.frequencies(otypes) AS by_organism_type,\n"
+        "       {\n"
+        "         has_metabolomics: size([c IN mmc WHERE c > 0]),\n"
+        "         no_metabolomics: size([c IN mmc WHERE c = 0])\n"
+        "       } AS by_measurement_capability"
     )
     return cypher, params
 
@@ -1528,7 +1649,8 @@ def build_list_organisms_capability(
     Same WHERE clause as build_list_organisms / build_list_organisms_summary
     so the matched set is identical.
 
-    RETURN keys: organism_name, reaction_count, metabolite_count.
+    RETURN keys: organism_name, reaction_count, metabolite_count,
+    measured_metabolite_count.
     """
     conditions = [
         "($organism_names_lc IS NULL"
@@ -1546,7 +1668,8 @@ def build_list_organisms_capability(
         f"{where_block}"
         "RETURN o.preferred_name AS organism_name,\n"
         "       coalesce(o.reaction_count, 0) AS reaction_count,\n"
-        "       coalesce(o.metabolite_count, 0) AS metabolite_count\n"
+        "       coalesce(o.metabolite_count, 0) AS metabolite_count,\n"
+        "       coalesce(o.measured_metabolite_count, 0) AS measured_metabolite_count\n"
         "ORDER BY o.genus, o.preferred_name"
     )
     return cypher, params
@@ -1755,6 +1878,9 @@ def build_list_experiments(
         ",\n       coalesce(e.derived_metric_count, 0) AS derived_metric_count"
         ",\n       coalesce(e.derived_metric_value_kinds, []) AS derived_metric_value_kinds"
         ",\n       e.compartment AS compartment"
+        ",\n       coalesce(e.metabolite_count, 0) AS metabolite_count"
+        ",\n       coalesce(e.metabolite_assay_count, 0) AS metabolite_assay_count"
+        ",\n       coalesce(e.metabolite_compartments, []) AS metabolite_compartments"
     )
 
     if search_text:
@@ -1881,6 +2007,7 @@ def build_search_ontology_summary(
     *, ontology: str, search_text: str,
     level: int | None = None,
     tree: str | None = None,
+    informative_only: bool = False,
 ) -> tuple[str, dict]:
     """Build summary Cypher for search_ontology.
 
@@ -1904,6 +2031,8 @@ def build_search_ontology_summary(
     if tree is not None:
         where_parts.append("t.tree = $tree")
         params["tree"] = tree
+    if informative_only:
+        where_parts.append("coalesce(t.is_uninformative, '') <> 'true'")
     where_clause = "  WHERE " + " AND ".join(where_parts) + "\n" if where_parts else ""
 
     if parent_index:
@@ -1948,10 +2077,11 @@ def build_search_ontology(
     offset: int = 0,
     level: int | None = None,
     tree: str | None = None,
+    informative_only: bool = False,
 ) -> tuple[str, dict]:
     """Build Cypher for search_ontology.
 
-    RETURN keys: id, name, score, level, tree, tree_code.
+    RETURN keys: id, name, score, level, tree, tree_code, is_informative.
     """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
@@ -1979,6 +2109,8 @@ def build_search_ontology(
     if tree is not None:
         where_parts.append("t.tree = $tree")
         params["tree"] = tree
+    if informative_only:
+        where_parts.append("coalesce(t.is_uninformative, '') <> 'true'")
     where_clause = "  WHERE " + " AND ".join(where_parts) + "\n" if where_parts else ""
 
     if parent_index:
@@ -1989,15 +2121,17 @@ def build_search_ontology(
             "  YIELD node AS t, score\n"
             + where_clause
             + "  RETURN t.id AS id, t.name AS name, score,\n"
-            "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code\n"
+            "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
+            "         coalesce(t.is_uninformative, '') <> 'true' AS is_informative\n"
             "  UNION ALL\n"
             f"  CALL db.index.fulltext.queryNodes('{parent_index}', $search_text)\n"
             "  YIELD node AS t, score\n"
             + where_clause
             + "  RETURN t.id AS id, t.name AS name, score,\n"
-            "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code\n"
+            "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
+            "         coalesce(t.is_uninformative, '') <> 'true' AS is_informative\n"
             "}\n"
-            "RETURN id, name, score, level, tree, tree_code\n"
+            "RETURN id, name, score, level, tree, tree_code, is_informative\n"
             "ORDER BY score DESC, id" + skip_clause + limit_clause
         )
     else:
@@ -2006,7 +2140,8 @@ def build_search_ontology(
             "YIELD node AS t, score\n"
             + where_clause
             + "RETURN t.id AS id, t.name AS name, score,\n"
-            "       t.level AS level, t.tree AS tree, t.tree_code AS tree_code\n"
+            "       t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
+            "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative\n"
             "ORDER BY score DESC, id" + skip_clause + limit_clause
         )
     return cypher, params
@@ -2081,12 +2216,18 @@ def _genes_by_ontology_match_stage(
     term_ids: list[str] | None,
     organism: str,
     tree: str | None = None,
+    informative_only: bool = False,
 ) -> tuple[str, dict]:
     """Shared MATCH + size-filter-WITH for detail/per_term/per_gene builders.
 
     Returns the Cypher fragment through `WITH t, collect(DISTINCT g) AS term_genes`
     with the $min_gene_set_size / $max_gene_set_size filter applied,
     plus the common params dict (org, term_ids/level as applicable).
+
+    When `informative_only=True`, an extra term-level filter
+    `AND coalesce(t.is_uninformative, '') <> 'true'` is applied BEFORE the
+    size collapse so per-term gene counts reflect informative terms only.
+
     Consumers are responsible for adding $min_gene_set_size / $max_gene_set_size
     into params, and for appending their own UNWIND/RETURN tail.
     """
@@ -2157,6 +2298,13 @@ def _genes_by_ontology_match_stage(
             # Flat ontology: t = leaf; no walk; level filter on t directly.
             cypher_head = f"{bind}\n{level_clause}\n"
 
+    # Term-level informative filter: must apply BEFORE size collapse so
+    # per-term gene counts reflect informative-only terms.
+    informative_filter = (
+        "WITH t, g WHERE coalesce(t.is_uninformative, '') <> 'true'\n"
+        if informative_only else ""
+    )
+
     # Size filter (common to all modes). Caller must add
     # $min_gene_set_size and $max_gene_set_size to params.
     size_filter = (
@@ -2165,7 +2313,7 @@ def _genes_by_ontology_match_stage(
         "  AND ($max_gene_set_size IS NULL OR "
         "size(term_genes) <= $max_gene_set_size)"
     )
-    return f"{cypher_head}\n{size_filter}", params
+    return f"{cypher_head}\n{informative_filter}{size_filter}", params
 
 
 def build_genes_by_ontology_detail(
@@ -2180,6 +2328,7 @@ def build_genes_by_ontology_detail(
     limit: int | None = None,
     offset: int = 0,
     tree: str | None = None,
+    informative_only: bool = False,
 ) -> tuple[str, dict]:
     """Build (gene × term) detail query. Dispatches on (level, term_ids).
 
@@ -2190,7 +2339,7 @@ def build_genes_by_ontology_detail(
     Mode 3: level + term_ids — walk UP, filter on level AND input_tids.
 
     RETURN keys (compact): locus_tag, gene_name, product, gene_category,
-    term_id, term_name, level.
+    term_id, term_name, level, is_informative.
     RETURN keys (verbose): adds function_description, level_is_best_effort.
     """
     # Validation stays in the builder (helper would also need it, but the
@@ -2206,7 +2355,7 @@ def build_genes_by_ontology_detail(
 
     head, params = _genes_by_ontology_match_stage(
         ontology=ontology, level=level, term_ids=term_ids, organism=organism,
-        tree=tree,
+        tree=tree, informative_only=informative_only,
     )
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
@@ -2221,7 +2370,8 @@ def build_genes_by_ontology_detail(
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.gene_category AS gene_category,\n"
         "       t.id AS term_id, t.name AS term_name, t.level AS level,\n"
-        "       t.tree AS tree, t.tree_code AS tree_code"
+        "       t.tree AS tree, t.tree_code AS tree_code,\n"
+        "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
         f"{verbose_cols}\n"
         "ORDER BY t.id, g.locus_tag"
     )
@@ -2248,11 +2398,12 @@ def build_genes_by_ontology_per_term(
     *,
     ontology: str,
     organism: str,
-    level: int | None,
-    term_ids: list[str] | None,
-    min_gene_set_size: int,
-    max_gene_set_size: int | None,
+    level: int | None = None,
+    term_ids: list[str] | None = None,
+    min_gene_set_size: int = 5,
+    max_gene_set_size: int | None = 500,
     tree: str | None = None,
+    informative_only: bool = False,
 ) -> tuple[str, dict]:
     """Per-term aggregate. One row per surviving term.
 
@@ -2264,11 +2415,12 @@ def build_genes_by_ontology_per_term(
     Mode 2: level only — walk UP, filter on level.
     Mode 3: level + term_ids — walk UP, filter on level AND input_tids.
 
-    RETURN keys: term_id, term_name, level, best_effort, n_genes, cat_freqs.
+    RETURN keys: term_id, term_name, level, best_effort, n_genes, cat_freqs,
+    is_informative.
     """
     head, params = _genes_by_ontology_match_stage(
         ontology=ontology, level=level, term_ids=term_ids, organism=organism,
-        tree=tree,
+        tree=tree, informative_only=informative_only,
     )
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
@@ -2282,7 +2434,8 @@ def build_genes_by_ontology_per_term(
         "       t.level_is_best_effort IS NOT NULL AS best_effort,\n"
         "       size(gene_rows) AS n_genes,\n"
         "       apoc.coll.frequencies("
-        "[r IN gene_rows | r.cat]) AS cat_freqs\n"
+        "[r IN gene_rows | r.cat]) AS cat_freqs,\n"
+        "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative\n"
         "ORDER BY t.id"
     )
     return f"{head}\n{tail}", params
@@ -2292,21 +2445,26 @@ def build_genes_by_ontology_per_gene(
     *,
     ontology: str,
     organism: str,
-    level: int | None,
-    term_ids: list[str] | None,
-    min_gene_set_size: int,
-    max_gene_set_size: int | None,
+    level: int | None = None,
+    term_ids: list[str] | None = None,
+    min_gene_set_size: int = 5,
+    max_gene_set_size: int | None = 500,
     tree: str | None = None,
+    informative_only: bool = False,
 ) -> tuple[str, dict]:
     """Per-gene aggregate. One row per surviving gene.
 
     RETURN keys: locus_tag, gene_category, n_terms, levels_hit.
     `levels_hit` is the distinct set of term levels each gene was reached
     via — used by L2 to compute by_level.n_genes via set-union.
+
+    Per-gene rows do not carry per-term flags; `informative_only` threads
+    through the helper so only informative terms count toward each gene's
+    aggregate, but `is_informative` is NOT a row column here.
     """
     head, params = _genes_by_ontology_match_stage(
         ontology=ontology, level=level, term_ids=term_ids, organism=organism,
-        tree=tree,
+        tree=tree, informative_only=informative_only,
     )
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
@@ -2361,6 +2519,7 @@ def build_gene_ontology_terms_summary(
     mode: str = "leaf",
     level: int | None = None,
     tree: str | None = None,
+    informative_only: bool = False,
 ) -> tuple[str, dict]:
     """Build summary for gene_ontology_terms for ONE ontology.
 
@@ -2435,10 +2594,15 @@ def build_gene_ontology_terms_summary(
         if tree is not None:
             tree_filter = "AND t.tree = $tree\n"
             params["tree"] = tree
+        informative_filter = (
+            "AND coalesce(t.is_uninformative, '') <> 'true'\n"
+            if informative_only else ""
+        )
         cypher = (
             f"{bind}"
             f"{walk}"
             f"{tree_filter}"
+            f"{informative_filter}"
             "WITH g.locus_tag AS lt, collect(DISTINCT {id: t.id, name: t.name, level: t.level, tree: t.tree, tree_code: t.tree_code}) AS terms\n"
             "WITH collect({lt: lt, cnt: size(terms), terms: terms}) AS genes\n"
             "WITH genes,\n"
@@ -2482,12 +2646,17 @@ def build_gene_ontology_terms_summary(
         if tree is not None:
             tree_filter = "AND t.tree = $tree\n"
             params["tree"] = tree
+        informative_filter = (
+            "AND coalesce(t.is_uninformative, '') <> 'true'\n"
+            if informative_only else ""
+        )
 
         cypher = (
             f"{match_line}"
             f"{leaf_filter}"
             f"{level_filter}"
             f"{tree_filter}"
+            f"{informative_filter}"
             "WITH g.locus_tag AS lt, collect({id: t.id, name: t.name, level: t.level, tree: t.tree, tree_code: t.tree_code}) AS terms\n"
             "WITH collect({lt: lt, cnt: size(terms), terms: terms}) AS genes\n"
             "WITH genes,\n"
@@ -2516,10 +2685,12 @@ def build_gene_ontology_terms(
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
+    informative_only: bool = False,
 ) -> tuple[str, dict]:
     """Build detail Cypher for gene_ontology_terms for ONE ontology.
 
-    RETURN keys (compact): locus_tag, term_id, term_name, level, tree, tree_code.
+    RETURN keys (compact): locus_tag, term_id, term_name, level, tree,
+    tree_code, is_informative.
     RETURN keys (verbose): adds organism_name.
 
     Called by api/ — which adds ontology_type column and merges
@@ -2605,12 +2776,18 @@ def build_gene_ontology_terms(
         if tree is not None:
             tree_filter = "AND t.tree = $tree\n"
             params["tree"] = tree
+        informative_filter = (
+            "AND coalesce(t.is_uninformative, '') <> 'true'\n"
+            if informative_only else ""
+        )
         cypher = (
             f"{bind}"
             f"{walk}"
             f"{tree_filter}"
+            f"{informative_filter}"
             "RETURN DISTINCT g.locus_tag AS locus_tag, t.id AS term_id,\n"
-            f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code{verbose_cols}\n"
+            f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
+            f"       coalesce(t.is_uninformative, '') <> 'true' AS is_informative{verbose_cols}\n"
             f"ORDER BY g.locus_tag, t.id{skip_clause}{limit_clause}"
         )
     else:
@@ -2642,14 +2819,20 @@ def build_gene_ontology_terms(
         if tree is not None:
             tree_filter = "AND t.tree = $tree\n"
             params["tree"] = tree
+        informative_filter = (
+            "AND coalesce(t.is_uninformative, '') <> 'true'\n"
+            if informative_only else ""
+        )
 
         cypher = (
             f"{match_line}"
             f"{leaf_filter}"
             f"{level_filter}"
             f"{tree_filter}"
+            f"{informative_filter}"
             "RETURN g.locus_tag AS locus_tag, t.id AS term_id,\n"
-            f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code{verbose_cols}\n"
+            f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
+            f"       coalesce(t.is_uninformative, '') <> 'true' AS is_informative{verbose_cols}\n"
             f"ORDER BY g.locus_tag, t.id{skip_clause}{limit_clause}"
         )
     return cypher, params
@@ -2709,6 +2892,10 @@ def _differential_expression_where(
         conditions.append("r.expression_status = 'significant_up'")
     elif direction == "down":
         conditions.append("r.expression_status = 'significant_down'")
+    elif direction == "both":
+        conditions.append(
+            "r.expression_status IN ['significant_up', 'significant_down']"
+        )
     elif significant_only:
         conditions.append("r.expression_status <> 'not_significant'")
     if growth_phases:
@@ -4657,6 +4844,7 @@ def build_ontology_landscape(
     min_gene_set_size: int = 5,
     max_gene_set_size: int = 500,
     tree: str | None = None,
+    informative_only: bool = True,
 ) -> tuple[str, dict]:
     """Per-(ontology, level) aggregated landscape stats for one ontology.
 
@@ -4692,6 +4880,13 @@ def build_ontology_landscape(
     if tree is not None:
         tree_filter = "WHERE t.tree = $tree\n"
 
+    # Informative-only filter (default-on per spec § decision 3 for
+    # ontology_landscape). Filters terms by per-term flag in the level-rollup.
+    informative_filter = (
+        "WITH t, g WHERE coalesce(t.is_uninformative, '') <> 'true'\n"
+        if informative_only else ""
+    )
+
     # Verbose clauses — Python string composition so compute is
     # short-circuited when verbose=False (see scoping D4).
     # pre_sort is an intermediate WITH..ORDER BY to pre-sort rows by gene count
@@ -4712,6 +4907,7 @@ def build_ontology_landscape(
         f"{frag['bind_up']}\n"
         f"{walk}"
         f"{tree_filter}"
+        f"{informative_filter}"
         "WITH t, count(DISTINCT g) AS n_g_per_term, "
         "collect(DISTINCT g) AS term_genes\n"
         "WHERE n_g_per_term >= $min_gene_set_size "
@@ -6088,6 +6284,7 @@ def _genes_by_metabolite_metabolism_where(
     *,
     metabolite_ids: list[str],
     organism: str,
+    exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     mass_balance: str | None = None,
     metabolite_pathway_ids: list[str] | None = None,
@@ -6108,6 +6305,9 @@ def _genes_by_metabolite_metabolism_where(
         "metabolite_ids": metabolite_ids,
         "organism": organism,
     }
+    if exclude_metabolite_ids:
+        conditions.append("(NOT (m.id IN $exclude_metabolite_ids))")
+        params["exclude_metabolite_ids"] = exclude_metabolite_ids
     if ec_numbers:
         conditions.append(
             "ANY(ec IN $ec_numbers WHERE ec IN coalesce(r.ec_numbers, []))"
@@ -6132,6 +6332,7 @@ def _genes_by_metabolite_transport_where(
     *,
     metabolite_ids: list[str],
     organism: str,
+    exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
     transport_confidence: str | None = None,
@@ -6154,6 +6355,9 @@ def _genes_by_metabolite_transport_where(
         "metabolite_ids": metabolite_ids,
         "organism": organism,
     }
+    if exclude_metabolite_ids:
+        conditions.append("(NOT (m.id IN $exclude_metabolite_ids))")
+        params["exclude_metabolite_ids"] = exclude_metabolite_ids
     if metabolite_pathway_ids:
         conditions.append(
             "ANY(p IN $metabolite_pathway_ids "
@@ -6174,6 +6378,7 @@ def build_genes_by_metabolite_metabolism(
     *,
     metabolite_ids: list[str],
     organism: str,
+    exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     mass_balance: str | None = None,
     metabolite_pathway_ids: list[str] | None = None,
@@ -6198,6 +6403,7 @@ def build_genes_by_metabolite_metabolism(
     conditions, params = _genes_by_metabolite_metabolism_where(
         metabolite_ids=metabolite_ids,
         organism=organism,
+        exclude_metabolite_ids=exclude_metabolite_ids,
         ec_numbers=ec_numbers,
         mass_balance=mass_balance,
         metabolite_pathway_ids=metabolite_pathway_ids,
@@ -6260,6 +6466,7 @@ def build_genes_by_metabolite_transport(
     *,
     metabolite_ids: list[str],
     organism: str,
+    exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
     transport_confidence: str | None = None,
@@ -6287,6 +6494,7 @@ def build_genes_by_metabolite_transport(
     conditions, params = _genes_by_metabolite_transport_where(
         metabolite_ids=metabolite_ids,
         organism=organism,
+        exclude_metabolite_ids=exclude_metabolite_ids,
         metabolite_pathway_ids=metabolite_pathway_ids,
         gene_categories=gene_categories,
         transport_confidence=transport_confidence,
@@ -6352,6 +6560,7 @@ def build_genes_by_metabolite_summary(
     *,
     metabolite_ids: list[str],
     organism: str,
+    exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     mass_balance: str | None = None,
     metabolite_pathway_ids: list[str] | None = None,
@@ -6393,6 +6602,7 @@ def build_genes_by_metabolite_summary(
         m_conditions, m_params = _genes_by_metabolite_metabolism_where(
             metabolite_ids=metabolite_ids,
             organism=organism,
+            exclude_metabolite_ids=exclude_metabolite_ids,
             ec_numbers=ec_numbers,
             mass_balance=mass_balance,
             metabolite_pathway_ids=metabolite_pathway_ids,
@@ -6412,6 +6622,7 @@ def build_genes_by_metabolite_summary(
         t_conditions, t_params = _genes_by_metabolite_transport_where(
             metabolite_ids=metabolite_ids,
             organism=organism,
+            exclude_metabolite_ids=exclude_metabolite_ids,
             metabolite_pathway_ids=metabolite_pathway_ids,
             gene_categories=gene_categories,
             transport_confidence=transport_confidence,
@@ -6584,7 +6795,8 @@ def build_genes_by_metabolite_summary(
 #   - sort uses **global precision-tier** then input-gene order via
 #     apoc.coll.indexOf($locus_tags, locus_tag), then locus_tag, then
 #     metabolite_id
-#   - summary builder gains two new envelope keys: by_element + top_pathways
+#   - summary builder gains two new envelope keys: by_element +
+#     top_metabolite_pathways
 #
 # Spec: docs/tool-specs/metabolites_by_gene.md
 # ---------------------------------------------------------------------------
@@ -6596,6 +6808,7 @@ def _metabolites_by_gene_metabolism_where(
     organism: str,
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     mass_balance: str | None = None,
@@ -6619,6 +6832,9 @@ def _metabolites_by_gene_metabolism_where(
     if metabolite_ids:
         conditions.append("m.id IN $metabolite_ids")
         params["metabolite_ids"] = metabolite_ids
+    if exclude_metabolite_ids:
+        conditions.append("(NOT (m.id IN $exclude_metabolite_ids))")
+        params["exclude_metabolite_ids"] = exclude_metabolite_ids
     if metabolite_elements:
         conditions.append(
             "ALL(elem IN $metabolite_elements "
@@ -6651,6 +6867,7 @@ def _metabolites_by_gene_transport_where(
     organism: str,
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
     transport_confidence: str | None = None,
@@ -6676,6 +6893,9 @@ def _metabolites_by_gene_transport_where(
     if metabolite_ids:
         conditions.append("m.id IN $metabolite_ids")
         params["metabolite_ids"] = metabolite_ids
+    if exclude_metabolite_ids:
+        conditions.append("(NOT (m.id IN $exclude_metabolite_ids))")
+        params["exclude_metabolite_ids"] = exclude_metabolite_ids
     if metabolite_elements:
         conditions.append(
             "ALL(elem IN $metabolite_elements "
@@ -6704,6 +6924,7 @@ def build_metabolites_by_gene_metabolism(
     organism: str,
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     mass_balance: str | None = None,
@@ -6730,7 +6951,7 @@ def build_metabolites_by_gene_metabolism(
 
     Sort: precision_tier (constant 0 for metabolism), then input-gene
     order via apoc.coll.indexOf($locus_tags, locus_tag), then locus_tag,
-    then metabolite_id. Surfaces high-precision rows first when api/
+    then metabolite_id. Surfaces metabolism rows first when api/
     layer concatenates per-arm results into a globally sorted slice.
     """
     conditions, params = _metabolites_by_gene_metabolism_where(
@@ -6738,6 +6959,7 @@ def build_metabolites_by_gene_metabolism(
         organism=organism,
         metabolite_elements=metabolite_elements,
         metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
         ec_numbers=ec_numbers,
         metabolite_pathway_ids=metabolite_pathway_ids,
         mass_balance=mass_balance,
@@ -6804,6 +7026,7 @@ def build_metabolites_by_gene_transport(
     organism: str,
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
     transport_confidence: str | None = None,
@@ -6837,6 +7060,7 @@ def build_metabolites_by_gene_transport(
         organism=organism,
         metabolite_elements=metabolite_elements,
         metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
         metabolite_pathway_ids=metabolite_pathway_ids,
         gene_categories=gene_categories,
         transport_confidence=transport_confidence,
@@ -6905,6 +7129,7 @@ def build_metabolites_by_gene_summary(
     organism: str,
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     mass_balance: str | None = None,
@@ -6931,8 +7156,8 @@ def build_metabolites_by_gene_summary(
     by_gene (per-input-gene rollup with metabolism_rows /
        transport_substrate_confirmed_rows / transport_family_inferred_rows),
     top_metabolites, top_reactions, top_tcdb_families,
-    top_gene_categories, top_pathways (NEW — chemistry-filtered to
-    p.reaction_count >= 3), by_element (NEW — periodic-table-bounded
+    top_gene_categories, top_metabolite_pathways (NEW — chemistry-filtered
+    to p.reaction_count >= 3), by_element (NEW — periodic-table-bounded
     rollup over m.elements).
 
     The api/ layer post-processes some apoc.coll outputs into the
@@ -6952,6 +7177,7 @@ def build_metabolites_by_gene_summary(
             organism=organism,
             metabolite_elements=metabolite_elements,
             metabolite_ids=metabolite_ids,
+            exclude_metabolite_ids=exclude_metabolite_ids,
             ec_numbers=ec_numbers,
             metabolite_pathway_ids=metabolite_pathway_ids,
             mass_balance=mass_balance,
@@ -6973,6 +7199,7 @@ def build_metabolites_by_gene_summary(
             organism=organism,
             metabolite_elements=metabolite_elements,
             metabolite_ids=metabolite_ids,
+            exclude_metabolite_ids=exclude_metabolite_ids,
             metabolite_pathway_ids=metabolite_pathway_ids,
             gene_categories=gene_categories,
             transport_confidence=transport_confidence,
@@ -7145,11 +7372,12 @@ def build_metabolites_by_gene_summary(
         "         metabolite_count: size(apoc.coll.toSet("
         "[row IN rows WHERE elem IN row.metabolite_elements"
         " | row.metabolite_id]))}] AS by_element\n"
-        "// top_pathways rollup: metabolite-side KEGG pathways the gene set\n"
-        "// reaches, filtered to chemistry pathways (p.reaction_count >= 3)\n"
-        "// to drop signaling/disease pathways with no chemistry breadth.\n"
-        "// Pathway IDs sourced from m.pathway_ids (KG-A5 denorm,\n"
-        "// transport-extended), so coverage is uniform across both arms.\n"
+        "// top_metabolite_pathways rollup: metabolite-side KEGG pathways\n"
+        "// the gene set reaches, filtered to chemistry pathways\n"
+        "// (p.reaction_count >= 3) to drop signaling/disease pathways with\n"
+        "// no chemistry breadth. Pathway IDs sourced from m.pathway_ids\n"
+        "// (KG-A5 denorm, transport-extended), so coverage is uniform\n"
+        "// across both arms.\n"
         "WITH total_matching, gene_count_total, reaction_count_total,\n"
         "     transporter_count_total, metabolite_count_total,\n"
         "     rows_by_evidence_source, rows_by_transport_confidence,\n"
@@ -7164,20 +7392,1226 @@ def build_metabolites_by_gene_summary(
         "  MATCH (p:KeggTerm {id: pid})\n"
         "  WHERE p.reaction_count >= 3\n"
         "  RETURN collect({\n"
-        "    pathway_id: p.id,\n"
-        "    pathway_name: p.name,\n"
+        "    metabolite_pathway_id: p.id,\n"
+        "    metabolite_pathway_name: p.name,\n"
         "    gene_count: size(apoc.coll.toSet("
         "[row IN rows WHERE p.id IN row.metabolite_pathway_ids"
         " | row.locus_tag])),\n"
         "    pathway_reaction_count: p.reaction_count,\n"
         "    pathway_metabolite_count: p.metabolite_count\n"
-        "  }) AS top_pathways\n"
+        "  }) AS top_metabolite_pathways\n"
         "}\n"
         "RETURN total_matching, gene_count_total, reaction_count_total,\n"
         "       transporter_count_total, metabolite_count_total,\n"
         "       rows_by_evidence_source, rows_by_transport_confidence,\n"
         "       by_gene, top_reactions, top_tcdb_families,\n"
         "       top_gene_categories, top_metabolites, by_element,\n"
-        "       top_pathways"
+        "       top_metabolite_pathways"
+    )
+    return cypher, params
+
+
+# ---------------------------------------------------------------------------
+# list_metabolite_assays — Phase 5 greenfield assay-discovery surface
+# ---------------------------------------------------------------------------
+
+def _list_metabolite_assays_where(
+    *,
+    organism: str | None = None,
+    metric_types: list[str] | None = None,
+    value_kind: str | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    assay_ids: list[str] | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    rankable: bool | None = None,
+) -> tuple[list[str], dict]:
+    """Shared WHERE-clause builder for build_list_metabolite_assays{,_summary}.
+
+    Mirrors `_list_derived_metrics_where` but on `a:MetaboliteAssay` instead of
+    `dm:DerivedMetric`. Adds two Phase-5-specific filters that DM lacks:
+    - `metabolite_ids` / `exclude_metabolite_ids` — EXISTS / NOT EXISTS clauses
+      traversing `Assay_quantifies_metabolite | Assay_flags_metabolite` to find
+      assays that measure (or skip) specific compounds.
+
+    Returns:
+        (conditions, params): list of WHERE-clause snippets joined by AND in
+        the caller, plus the parameters dict.
+    """
+    conditions: list[str] = []
+    params: dict = {}
+
+    if organism is not None:
+        conditions.append(
+            "ALL(word IN split(toLower($organism), ' ') "
+            "WHERE toLower(a.organism_name) CONTAINS word)"
+        )
+        params["organism"] = organism
+    if metric_types:
+        conditions.append("a.metric_type IN $metric_types")
+        params["metric_types"] = metric_types
+    if value_kind is not None:
+        conditions.append("a.value_kind = $value_kind")
+        params["value_kind"] = value_kind
+    if compartment is not None:
+        conditions.append("a.compartment = $compartment")
+        params["compartment"] = compartment
+    if treatment_type:
+        conditions.append(
+            "ANY(t IN coalesce(a.treatment_type, []) "
+            "WHERE toLower(t) IN $treatment_types_lower)"
+        )
+        params["treatment_types_lower"] = [t.lower() for t in treatment_type]
+    if background_factors:
+        conditions.append(
+            "ANY(bf IN coalesce(a.background_factors, []) "
+            "WHERE toLower(bf) IN $background_factors_lower)"
+        )
+        params["background_factors_lower"] = [bf.lower() for bf in background_factors]
+    if growth_phases:
+        conditions.append(
+            "ANY(gp IN coalesce(a.growth_phases, []) "
+            "WHERE toLower(gp) IN $growth_phases_lower)"
+        )
+        params["growth_phases_lower"] = [gp.lower() for gp in growth_phases]
+    if publication_doi:
+        conditions.append("a.publication_doi IN $publication_doi")
+        params["publication_doi"] = publication_doi
+    if experiment_ids:
+        conditions.append("a.experiment_id IN $experiment_ids")
+        params["experiment_ids"] = experiment_ids
+    if assay_ids:
+        conditions.append("a.id IN $assay_ids")
+        params["assay_ids"] = assay_ids
+    if metabolite_ids:
+        conditions.append(
+            "EXISTS { MATCH (a)-[:Assay_quantifies_metabolite|Assay_flags_metabolite]"
+            "->(m:Metabolite) WHERE m.id IN $metabolite_ids }"
+        )
+        params["metabolite_ids"] = metabolite_ids
+    if exclude_metabolite_ids:
+        conditions.append(
+            "NOT EXISTS { MATCH (a)-[:Assay_quantifies_metabolite|Assay_flags_metabolite]"
+            "->(m:Metabolite) WHERE m.id IN $exclude_metabolite_ids }"
+        )
+        params["exclude_metabolite_ids"] = exclude_metabolite_ids
+    if rankable is not None:
+        conditions.append("a.rankable = $rankable_str")
+        params["rankable_str"] = "true" if rankable else "false"
+
+    return conditions, params
+
+
+def build_list_metabolite_assays_summary(
+    *,
+    search_text: str | None = None,
+    organism: str | None = None,
+    metric_types: list[str] | None = None,
+    value_kind: str | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    assay_ids: list[str] | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    rankable: bool | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for list_metabolite_assays.
+
+    RETURN keys:
+      total_entries, total_matching, metabolite_count_total,
+      by_organism, by_value_kind, by_compartment, top_metric_types,
+      by_treatment_type, by_background_factors, by_growth_phase,
+      by_detection_status.
+    When `search_text` is set, also returns: score_max, score_median.
+    """
+    conditions, params = _list_metabolite_assays_where(
+        organism=organism, metric_types=metric_types, value_kind=value_kind,
+        compartment=compartment, treatment_type=treatment_type,
+        background_factors=background_factors, growth_phases=growth_phases,
+        publication_doi=publication_doi, experiment_ids=experiment_ids,
+        assay_ids=assay_ids, metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids, rankable=rankable,
+    )
+
+    if search_text is not None:
+        match_block = (
+            "CALL db.index.fulltext.queryNodes('metaboliteAssayFullText', $search_text) "
+            "YIELD node AS a, score\n"
+        )
+        params["search_text"] = search_text
+        score_carry = ", score"
+        score_extras = (
+            ",\n     max(score) AS score_max,\n"
+            "     percentileDisc(score, 0.5) AS score_median"
+        )
+        score_return = ",\n       score_max,\n       score_median"
+    else:
+        match_block = "MATCH (a:MetaboliteAssay)\n"
+        score_carry = ""
+        score_extras = ""
+        score_return = ""
+
+    where_block = (
+        "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+    )
+
+    cypher = (
+        "CALL { MATCH (all_a:MetaboliteAssay) RETURN count(all_a) AS total_entries }\n"
+        f"{match_block}"
+        f"{where_block}"
+        "OPTIONAL MATCH (a)-[r:Assay_quantifies_metabolite]->(:Metabolite)\n"
+        "WITH total_entries, a, [s IN collect(r.detection_status) WHERE s IS NOT NULL] AS det"
+        f"{score_carry}\n"
+        "WITH total_entries,\n"
+        "     collect(a.organism_name) AS orgs,\n"
+        "     collect(a.value_kind) AS vks,\n"
+        "     collect(a.compartment) AS comps,\n"
+        "     collect(a.metric_type) AS mts,\n"
+        "     apoc.coll.flatten(collect(coalesce(a.treatment_type, []))) AS tts,\n"
+        "     apoc.coll.flatten(collect(coalesce(a.background_factors, []))) AS bfs,\n"
+        "     apoc.coll.flatten(collect(coalesce(a.growth_phases, []))) AS gps,\n"
+        "     apoc.coll.flatten(collect(det)) AS all_det,\n"
+        "     count(a) AS total_matching,\n"
+        "     sum(a.total_metabolite_count) AS metabolite_count_total"
+        f"{score_extras}\n"
+        "RETURN total_entries, total_matching, metabolite_count_total,\n"
+        "       apoc.coll.frequencies(orgs) AS by_organism,\n"
+        "       apoc.coll.frequencies(vks) AS by_value_kind,\n"
+        "       apoc.coll.frequencies(comps) AS by_compartment,\n"
+        "       apoc.coll.frequencies(mts) AS top_metric_types,\n"
+        "       apoc.coll.frequencies(tts) AS by_treatment_type,\n"
+        "       apoc.coll.frequencies(bfs) AS by_background_factors,\n"
+        "       apoc.coll.frequencies(gps) AS by_growth_phase,\n"
+        "       apoc.coll.frequencies(all_det) AS by_detection_status"
+        f"{score_return}"
+    )
+    return cypher, params
+
+
+def build_list_metabolite_assays(
+    *,
+    search_text: str | None = None,
+    organism: str | None = None,
+    metric_types: list[str] | None = None,
+    value_kind: str | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    assay_ids: list[str] | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    rankable: bool | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build detail Cypher for list_metabolite_assays.
+
+    RETURN keys (compact):
+      assay_id, name, metric_type, value_kind, rankable, unit,
+      field_description, organism_name, experiment_id, publication_doi,
+      compartment, omics_type, treatment_type, background_factors,
+      growth_phases, total_metabolite_count, aggregation_method,
+      preferred_id, value_min, value_q1, value_median, value_q3, value_max,
+      timepoints, detection_status_counts.
+    When `search_text` set: + `score`.
+    Verbose adds: treatment, light_condition, experimental_context.
+    """
+    conditions, params = _list_metabolite_assays_where(
+        organism=organism, metric_types=metric_types, value_kind=value_kind,
+        compartment=compartment, treatment_type=treatment_type,
+        background_factors=background_factors, growth_phases=growth_phases,
+        publication_doi=publication_doi, experiment_ids=experiment_ids,
+        assay_ids=assay_ids, metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids, rankable=rankable,
+    )
+
+    if search_text is not None:
+        match_block = (
+            "CALL db.index.fulltext.queryNodes('metaboliteAssayFullText', $search_text) "
+            "YIELD node AS a, score\n"
+        )
+        params["search_text"] = search_text
+        score_col = ",\n       score AS score"
+        order_by = (
+            "ORDER BY score DESC, a.organism_name ASC, a.value_kind ASC, a.id ASC"
+        )
+    else:
+        match_block = "MATCH (a:MetaboliteAssay)\n"
+        score_col = ""
+        order_by = "ORDER BY a.organism_name ASC, a.value_kind ASC, a.id ASC"
+
+    where_block = (
+        "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+    )
+
+    if verbose:
+        verbose_cols = (
+            ",\n       a.treatment AS treatment,\n"
+            "       a.light_condition AS light_condition,\n"
+            "       a.experimental_context AS experimental_context"
+        )
+    else:
+        verbose_cols = ""
+
+    pagination = ""
+    if limit is not None:
+        params["limit"] = limit
+        params["offset"] = offset
+        pagination = "\nSKIP $offset\nLIMIT $limit"
+
+    cypher = (
+        f"{match_block}"
+        f"{where_block}"
+        "OPTIONAL MATCH (a)-[r:Assay_quantifies_metabolite]->(:Metabolite)\n"
+        "WITH a, "
+        "[label IN collect(DISTINCT r.time_point) "
+        "WHERE label IS NOT NULL AND label <> \"\" | label] AS timepoints,\n"
+        "     [s IN collect(r.detection_status) WHERE s IS NOT NULL] AS detection_statuses"
+        + (",\n     score" if search_text is not None else "")
+        + "\n"
+        "WITH a, timepoints,\n"
+        "     CASE WHEN size(detection_statuses) = 0 THEN [] "
+        "ELSE [x IN apoc.coll.frequencies(detection_statuses) "
+        "| {detection_status: x.item, count: x.count}] END AS detection_status_counts"
+        + (",\n     score" if search_text is not None else "")
+        + "\n"
+        "RETURN\n"
+        "       a.id AS assay_id,\n"
+        "       a.name AS name,\n"
+        "       a.metric_type AS metric_type,\n"
+        "       a.value_kind AS value_kind,\n"
+        "       (a.rankable = \"true\") AS rankable,\n"
+        "       a.unit AS unit,\n"
+        "       a.field_description AS field_description,\n"
+        "       a.organism_name AS organism_name,\n"
+        "       a.experiment_id AS experiment_id,\n"
+        "       a.publication_doi AS publication_doi,\n"
+        "       a.compartment AS compartment,\n"
+        "       a.omics_type AS omics_type,\n"
+        "       coalesce(a.treatment_type, []) AS treatment_type,\n"
+        "       coalesce(a.background_factors, []) AS background_factors,\n"
+        "       coalesce(a.growth_phases, []) AS growth_phases,\n"
+        "       a.total_metabolite_count AS total_metabolite_count,\n"
+        "       a.aggregation_method AS aggregation_method,\n"
+        "       a.preferred_id AS preferred_id,\n"
+        "       a.value_min AS value_min,\n"
+        "       a.value_q1 AS value_q1,\n"
+        "       a.value_median AS value_median,\n"
+        "       a.value_q3 AS value_q3,\n"
+        "       a.value_max AS value_max,\n"
+        "       timepoints,\n"
+        "       detection_status_counts"
+        f"{score_col}{verbose_cols}\n"
+        f"{order_by}"
+        f"{pagination}"
+    )
+    return cypher, params
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 metabolites-by-assay slice — 3 tools
+# Tool 1: metabolites_by_quantifies_assay (numeric drill-down)
+# Tool 2: metabolites_by_flags_assay (boolean drill-down)
+# Tool 3: assays_by_metabolite (polymorphic reverse-lookup, UNION ALL)
+# Source: parent §12.2 / §12.3 / §12.4 verbatim Cypher (verified live 2026-05-06).
+# ---------------------------------------------------------------------------
+
+def _metabolites_by_quantifies_assay_where(
+    *,
+    organism: str | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    value_min: float | None = None,
+    value_max: float | None = None,
+    detection_status: list[str] | None = None,
+    timepoint: list[str] | None = None,
+    metric_bucket: list[str] | None = None,
+    metric_percentile_min: float | None = None,
+    metric_percentile_max: float | None = None,
+    rank_by_metric_max: int | None = None,
+) -> tuple[list[str], dict]:
+    """Shared WHERE-conditions builder for metabolites_by_quantifies_assay.
+
+    Mirrors `_list_derived_metrics_where` / `_list_metabolite_assays_where`
+    style. Scoping params target `a:MetaboliteAssay` and `m:Metabolite`;
+    edge filters target `r:Assay_quantifies_metabolite`.
+
+    Per parent §11 Conv A, `exclude_metabolite_ids` uses set-difference
+    semantics — exclude wins on overlap with `metabolite_ids`.
+
+    Returns:
+        (conditions, params): list of WHERE-clause snippets joined by AND in
+        the caller, plus the parameters dict.
+    """
+    conditions: list[str] = []
+    params: dict = {}
+
+    if organism is not None:
+        conditions.append("toLower(a.organism_name) CONTAINS $organism")
+        params["organism"] = organism.lower()
+    if metabolite_ids is not None:
+        conditions.append("m.id IN $metabolite_ids")
+        params["metabolite_ids"] = metabolite_ids
+    if exclude_metabolite_ids is not None:
+        conditions.append("NOT m.id IN $exclude_metabolite_ids")
+        params["exclude_metabolite_ids"] = exclude_metabolite_ids
+    if experiment_ids:
+        conditions.append("a.experiment_id IN $experiment_ids")
+        params["experiment_ids"] = experiment_ids
+    if publication_doi:
+        conditions.append("a.publication_doi IN $publication_doi")
+        params["publication_doi"] = publication_doi
+    if compartment is not None:
+        conditions.append("a.compartment = $compartment")
+        params["compartment"] = compartment
+    if treatment_type:
+        conditions.append(
+            "ANY(t IN coalesce(a.treatment_type, []) "
+            "WHERE toLower(t) IN $treatment_types_lower)"
+        )
+        params["treatment_types_lower"] = [t.lower() for t in treatment_type]
+    if background_factors:
+        conditions.append(
+            "ANY(bf IN coalesce(a.background_factors, []) "
+            "WHERE toLower(bf) IN $background_factors_lower)"
+        )
+        params["background_factors_lower"] = [bf.lower() for bf in background_factors]
+    if growth_phases:
+        conditions.append(
+            "ANY(gp IN coalesce(a.growth_phases, []) "
+            "WHERE toLower(gp) IN $growth_phases_lower)"
+        )
+        params["growth_phases_lower"] = [gp.lower() for gp in growth_phases]
+    if value_min is not None:
+        conditions.append("r.value >= $value_min")
+        params["value_min"] = value_min
+    if value_max is not None:
+        conditions.append("r.value <= $value_max")
+        params["value_max"] = value_max
+    if detection_status:
+        conditions.append("r.detection_status IN $detection_status")
+        params["detection_status"] = detection_status
+    if timepoint:
+        conditions.append("r.time_point IN $timepoint")
+        params["timepoint"] = timepoint
+    if metric_bucket:
+        conditions.append("r.metric_bucket IN $metric_bucket")
+        params["metric_bucket"] = metric_bucket
+    if metric_percentile_min is not None:
+        conditions.append("r.metric_percentile >= $metric_percentile_min")
+        params["metric_percentile_min"] = metric_percentile_min
+    if metric_percentile_max is not None:
+        conditions.append("r.metric_percentile <= $metric_percentile_max")
+        params["metric_percentile_max"] = metric_percentile_max
+    if rank_by_metric_max is not None:
+        conditions.append("r.rank_by_metric <= $rank_by_metric_max")
+        params["rank_by_metric_max"] = rank_by_metric_max
+
+    return conditions, params
+
+
+def build_metabolites_by_quantifies_assay_diagnostics(
+    *,
+    assay_ids: list[str],
+    organism: str | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Pre-flight rankable-gating probe for metabolites_by_quantifies_assay.
+
+    Mirrors `build_genes_by_numeric_metric_diagnostics` (parent §13.1).
+    api/ runs this BEFORE summary/detail to:
+      1. Validate every selected assay has `value_kind='numeric'` (raise on
+         mismatch).
+      2. Compute `excluded_assays` for rankable-gated filters that don't
+         apply to some/all selected assays.
+      3. Echo full-assay value range into envelope `by_metric`.
+
+    RETURN keys (one row per assay): assay_id, name, value_kind,
+    rankable (bool, D4-coerced), organism_name, compartment,
+    value_min, value_q1, value_median, value_q3, value_max.
+    """
+    # Reuse WHERE-helper for organism/metabolite/scoping conditions
+    # (no edge filters — diagnostics is node-level only).
+    conditions, params = _metabolites_by_quantifies_assay_where(
+        organism=organism,
+        metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        experiment_ids=experiment_ids,
+        publication_doi=publication_doi,
+        compartment=compartment,
+        treatment_type=treatment_type,
+        background_factors=background_factors,
+        growth_phases=growth_phases,
+    )
+    params["assay_ids"] = assay_ids
+
+    # Hardcoded predicate: this tool only drills numeric assays.
+    extra = ["a.id IN $assay_ids", "a.value_kind = 'numeric'"]
+    all_conditions = extra + conditions
+
+    # If metabolite_ids / exclude_metabolite_ids in scope, we need an EXISTS
+    # traversal on the quantifies relationship. Otherwise the assay-only
+    # MATCH suffices.
+    if metabolite_ids is not None or exclude_metabolite_ids is not None:
+        # Replace m.id-based conditions with EXISTS-style traversals.
+        # Easier: re-derive node-only conditions, then add EXISTS for metabolite scope.
+        node_conditions = [c for c in all_conditions if "m.id" not in c]
+        if metabolite_ids is not None:
+            node_conditions.append(
+                "EXISTS { MATCH (a)-[:Assay_quantifies_metabolite]->"
+                "(m:Metabolite) WHERE m.id IN $metabolite_ids }"
+            )
+        if exclude_metabolite_ids is not None:
+            node_conditions.append(
+                "NOT EXISTS { MATCH (a)-[:Assay_quantifies_metabolite]->"
+                "(m:Metabolite) WHERE m.id IN $exclude_metabolite_ids }"
+            )
+        all_conditions = node_conditions
+
+    where_block = "WHERE " + " AND ".join(all_conditions) + "\n"
+
+    cypher = (
+        "MATCH (a:MetaboliteAssay)\n"
+        f"{where_block}"
+        "RETURN a.id AS assay_id,\n"
+        "       a.name AS name,\n"
+        "       a.value_kind AS value_kind,\n"
+        "       (a.rankable = 'true') AS rankable,\n"
+        "       a.organism_name AS organism_name,\n"
+        "       a.compartment AS compartment,\n"
+        "       a.value_min AS value_min,\n"
+        "       a.value_q1 AS value_q1,\n"
+        "       a.value_median AS value_median,\n"
+        "       a.value_q3 AS value_q3,\n"
+        "       a.value_max AS value_max\n"
+        "ORDER BY a.id ASC"
+    )
+    return cypher, params
+
+
+def build_metabolites_by_quantifies_assay_summary(
+    *,
+    assay_ids: list[str],
+    organism: str | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    value_min: float | None = None,
+    value_max: float | None = None,
+    detection_status: list[str] | None = None,
+    timepoint: list[str] | None = None,
+    metric_bucket: list[str] | None = None,
+    metric_percentile_min: float | None = None,
+    metric_percentile_max: float | None = None,
+    rank_by_metric_max: int | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for metabolites_by_quantifies_assay (parent §12.2).
+
+    RETURN keys: total_matching, by_detection_status (audit §4.3.3 primary
+    headline), by_metric_bucket, by_assay, by_compartment, by_organism,
+    filtered_value_min, filtered_value_max.
+
+    `by_metric` envelope (per-assay precomputed-vs-filtered) is computed in
+    api/ layer by enriching with diagnostics result.
+    """
+    conditions, params = _metabolites_by_quantifies_assay_where(
+        organism=organism,
+        metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        experiment_ids=experiment_ids,
+        publication_doi=publication_doi,
+        compartment=compartment,
+        treatment_type=treatment_type,
+        background_factors=background_factors,
+        growth_phases=growth_phases,
+        value_min=value_min,
+        value_max=value_max,
+        detection_status=detection_status,
+        timepoint=timepoint,
+        metric_bucket=metric_bucket,
+        metric_percentile_min=metric_percentile_min,
+        metric_percentile_max=metric_percentile_max,
+        rank_by_metric_max=rank_by_metric_max,
+    )
+    params["assay_ids"] = assay_ids
+    all_conditions = ["a.id IN $assay_ids"] + conditions
+    where_block = "WHERE " + " AND ".join(all_conditions) + "\n"
+
+    cypher = (
+        "MATCH (a:MetaboliteAssay)-[r:Assay_quantifies_metabolite]->(m:Metabolite)\n"
+        f"{where_block}"
+        "WITH [s IN collect(r.detection_status) WHERE s IS NOT NULL] AS dets,\n"
+        "     [b IN collect(r.metric_bucket) WHERE b IS NOT NULL] AS buckets,\n"
+        "     collect(a.id) AS assay_ids_collected,\n"
+        "     collect(a.compartment) AS comps,\n"
+        "     collect(a.organism_name) AS orgs,\n"
+        "     [v IN collect(r.value) WHERE v IS NOT NULL] AS vals,\n"
+        "     count(*) AS total_matching\n"
+        "RETURN total_matching,\n"
+        "       apoc.coll.frequencies(dets) AS by_detection_status,\n"
+        "       apoc.coll.frequencies(buckets) AS by_metric_bucket,\n"
+        "       apoc.coll.frequencies(assay_ids_collected) AS by_assay,\n"
+        "       apoc.coll.frequencies(comps) AS by_compartment,\n"
+        "       apoc.coll.frequencies(orgs) AS by_organism,\n"
+        "       apoc.coll.min(vals) AS filtered_value_min,\n"
+        "       apoc.coll.max(vals) AS filtered_value_max"
+    )
+    return cypher, params
+
+
+def build_metabolites_by_quantifies_assay(
+    *,
+    assay_ids: list[str],
+    organism: str | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    value_min: float | None = None,
+    value_max: float | None = None,
+    detection_status: list[str] | None = None,
+    timepoint: list[str] | None = None,
+    metric_bucket: list[str] | None = None,
+    metric_percentile_min: float | None = None,
+    metric_percentile_max: float | None = None,
+    rank_by_metric_max: int | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build detail Cypher for metabolites_by_quantifies_assay (parent §12.2).
+
+    Per-row schema (compact):
+      metabolite_id, name, kegg_compound_id, value, value_sd, n_replicates,
+      n_non_zero, metric_type, metric_bucket, metric_percentile,
+      rank_by_metric, detection_status, timepoint, timepoint_hours,
+      timepoint_order, growth_phase (KG-MET-017 null today), condition_label,
+      assay_id, organism_name, compartment.
+
+    Verbose adds: assay_name, field_description, experimental_context,
+    light_condition, replicate_values.
+
+    D3 sentinel coercion: `time_point=''` / `time_point_hours=-1.0` /
+    `time_point_order=0` → null. KG-MET-017: growth_phase via
+    e.time_point_growth_phases[time_point_order - 1] is null today
+    (size-guarded, so it's safe).
+
+    Sort key (slice spec §4.4): r.rank_by_metric ASC, m.id ASC, a.id ASC,
+    r.time_point_order ASC.
+    """
+    conditions, params = _metabolites_by_quantifies_assay_where(
+        organism=organism,
+        metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        experiment_ids=experiment_ids,
+        publication_doi=publication_doi,
+        compartment=compartment,
+        treatment_type=treatment_type,
+        background_factors=background_factors,
+        growth_phases=growth_phases,
+        value_min=value_min,
+        value_max=value_max,
+        detection_status=detection_status,
+        timepoint=timepoint,
+        metric_bucket=metric_bucket,
+        metric_percentile_min=metric_percentile_min,
+        metric_percentile_max=metric_percentile_max,
+        rank_by_metric_max=rank_by_metric_max,
+    )
+    params["assay_ids"] = assay_ids
+    all_conditions = ["a.id IN $assay_ids"] + conditions
+    where_block = "WHERE " + " AND ".join(all_conditions) + "\n"
+
+    verbose_cols = ""
+    if verbose:
+        verbose_cols = (
+            ",\n       a.name AS assay_name"
+            ",\n       a.field_description AS field_description"
+            ",\n       a.experimental_context AS experimental_context"
+            ",\n       a.light_condition AS light_condition"
+            ",\n       r.replicate_values AS replicate_values"
+        )
+
+    pagination = ""
+    if limit is not None:
+        params["limit"] = limit
+        params["offset"] = offset
+        pagination = "\nSKIP $offset LIMIT $limit"
+
+    cypher = (
+        "MATCH (a:MetaboliteAssay)-[r:Assay_quantifies_metabolite]->(m:Metabolite)\n"
+        f"{where_block}"
+        "OPTIONAL MATCH (a)<-[:ExperimentHasMetaboliteAssay]-(e:Experiment)\n"
+        "RETURN m.id AS metabolite_id,\n"
+        "       m.name AS name,\n"
+        "       m.kegg_compound_id AS kegg_compound_id,\n"
+        "       r.value AS value,\n"
+        "       r.value_sd AS value_sd,\n"
+        "       r.n_replicates AS n_replicates,\n"
+        "       r.n_non_zero AS n_non_zero,\n"
+        "       r.metric_type AS metric_type,\n"
+        "       r.metric_bucket AS metric_bucket,\n"
+        "       r.metric_percentile AS metric_percentile,\n"
+        "       r.rank_by_metric AS rank_by_metric,\n"
+        "       r.detection_status AS detection_status,\n"
+        "       CASE WHEN r.time_point = '' THEN null ELSE r.time_point END AS timepoint,\n"
+        "       CASE WHEN r.time_point_hours = -1.0 THEN null ELSE r.time_point_hours END AS timepoint_hours,\n"
+        "       CASE WHEN r.time_point_order = 0 THEN null ELSE r.time_point_order END AS timepoint_order,\n"
+        "       CASE WHEN r.time_point_order > 0\n"
+        "                 AND size(coalesce(e.time_point_growth_phases, [])) >= r.time_point_order\n"
+        "            THEN e.time_point_growth_phases[r.time_point_order - 1]\n"
+        "            ELSE null END AS growth_phase,\n"
+        "       r.condition_label AS condition_label,\n"
+        "       a.id AS assay_id,\n"
+        "       a.organism_name AS organism_name,\n"
+        "       a.compartment AS compartment"
+        f"{verbose_cols}\n"
+        "ORDER BY r.rank_by_metric ASC, m.id ASC, a.id ASC, r.time_point_order ASC"
+        f"{pagination}"
+    )
+    return cypher, params
+
+
+# ---------------------------------------------------------------------------
+# Tool 2: metabolites_by_flags_assay (boolean drill-down, parent §12.3)
+# ---------------------------------------------------------------------------
+
+def _metabolites_by_flags_assay_where(
+    *,
+    organism: str | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    flag_value: str | None = None,
+) -> tuple[list[str], dict]:
+    """WHERE-conditions builder for metabolites_by_flags_assay.
+
+    Same scoping params as the quantifies helper — only the edge-level
+    filter differs (`flag_value` string-form per parent §11 Conv K / D4;
+    api/ coerces bool → 'true'/'false' before passing here).
+    """
+    conditions: list[str] = []
+    params: dict = {}
+
+    if organism is not None:
+        conditions.append("toLower(a.organism_name) CONTAINS $organism")
+        params["organism"] = organism.lower()
+    if metabolite_ids is not None:
+        conditions.append("m.id IN $metabolite_ids")
+        params["metabolite_ids"] = metabolite_ids
+    if exclude_metabolite_ids is not None:
+        conditions.append("NOT m.id IN $exclude_metabolite_ids")
+        params["exclude_metabolite_ids"] = exclude_metabolite_ids
+    if experiment_ids:
+        conditions.append("a.experiment_id IN $experiment_ids")
+        params["experiment_ids"] = experiment_ids
+    if publication_doi:
+        conditions.append("a.publication_doi IN $publication_doi")
+        params["publication_doi"] = publication_doi
+    if compartment is not None:
+        conditions.append("a.compartment = $compartment")
+        params["compartment"] = compartment
+    if treatment_type:
+        conditions.append(
+            "ANY(t IN coalesce(a.treatment_type, []) "
+            "WHERE toLower(t) IN $treatment_types_lower)"
+        )
+        params["treatment_types_lower"] = [t.lower() for t in treatment_type]
+    if background_factors:
+        conditions.append(
+            "ANY(bf IN coalesce(a.background_factors, []) "
+            "WHERE toLower(bf) IN $background_factors_lower)"
+        )
+        params["background_factors_lower"] = [bf.lower() for bf in background_factors]
+    if growth_phases:
+        conditions.append(
+            "ANY(gp IN coalesce(a.growth_phases, []) "
+            "WHERE toLower(gp) IN $growth_phases_lower)"
+        )
+        params["growth_phases_lower"] = [gp.lower() for gp in growth_phases]
+    if flag_value is not None:
+        # D4: API coerces bool → 'true'/'false' string before this layer.
+        conditions.append("r.flag_value = $flag_value")
+        params["flag_value"] = flag_value
+
+    return conditions, params
+
+
+def build_metabolites_by_flags_assay_summary(
+    *,
+    assay_ids: list[str],
+    organism: str | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    flag_value: str | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for metabolites_by_flags_assay (parent §12.3).
+
+    RETURN keys: total_matching, by_value (apoc on flag_value),
+    by_assay, by_compartment, by_organism.
+
+    No `by_detection_status` — boolean arm has no `detection_status` field.
+    """
+    conditions, params = _metabolites_by_flags_assay_where(
+        organism=organism,
+        metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        experiment_ids=experiment_ids,
+        publication_doi=publication_doi,
+        compartment=compartment,
+        treatment_type=treatment_type,
+        background_factors=background_factors,
+        growth_phases=growth_phases,
+        flag_value=flag_value,
+    )
+    params["assay_ids"] = assay_ids
+    all_conditions = ["a.id IN $assay_ids"] + conditions
+    where_block = "WHERE " + " AND ".join(all_conditions) + "\n"
+
+    cypher = (
+        "MATCH (a:MetaboliteAssay)-[r:Assay_flags_metabolite]->(m:Metabolite)\n"
+        f"{where_block}"
+        "WITH [f IN collect(r.flag_value) WHERE f IS NOT NULL] AS flags,\n"
+        "     collect(a.id) AS assay_ids_collected,\n"
+        "     collect(a.compartment) AS comps,\n"
+        "     collect(a.organism_name) AS orgs,\n"
+        "     count(*) AS total_matching\n"
+        "RETURN total_matching,\n"
+        "       apoc.coll.frequencies(flags) AS by_value,\n"
+        "       apoc.coll.frequencies(assay_ids_collected) AS by_assay,\n"
+        "       apoc.coll.frequencies(comps) AS by_compartment,\n"
+        "       apoc.coll.frequencies(orgs) AS by_organism"
+    )
+    return cypher, params
+
+
+def build_metabolites_by_flags_assay(
+    *,
+    assay_ids: list[str],
+    organism: str | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    flag_value: str | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build detail Cypher for metabolites_by_flags_assay (parent §12.3).
+
+    Per-row schema (compact):
+      metabolite_id, name, kegg_compound_id, flag_value (bool, D4 coerced),
+      n_positive, n_replicates, metric_type, condition_label, assay_id,
+      organism_name, compartment.
+
+    Verbose adds: assay_name, field_description.
+
+    D4: `r.flag_value = 'true'` boolean coercion at Cypher boundary.
+
+    Sort key (slice spec §5.4): r.flag_value DESC, m.id ASC, a.id ASC.
+    """
+    conditions, params = _metabolites_by_flags_assay_where(
+        organism=organism,
+        metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        experiment_ids=experiment_ids,
+        publication_doi=publication_doi,
+        compartment=compartment,
+        treatment_type=treatment_type,
+        background_factors=background_factors,
+        growth_phases=growth_phases,
+        flag_value=flag_value,
+    )
+    params["assay_ids"] = assay_ids
+    all_conditions = ["a.id IN $assay_ids"] + conditions
+    where_block = "WHERE " + " AND ".join(all_conditions) + "\n"
+
+    verbose_cols = ""
+    if verbose:
+        verbose_cols = (
+            ",\n       a.name AS assay_name"
+            ",\n       a.field_description AS field_description"
+        )
+
+    pagination = ""
+    if limit is not None:
+        params["limit"] = limit
+        params["offset"] = offset
+        pagination = "\nSKIP $offset LIMIT $limit"
+
+    cypher = (
+        "MATCH (a:MetaboliteAssay)-[r:Assay_flags_metabolite]->(m:Metabolite)\n"
+        f"{where_block}"
+        "RETURN m.id AS metabolite_id,\n"
+        "       m.name AS name,\n"
+        "       m.kegg_compound_id AS kegg_compound_id,\n"
+        "       (r.flag_value = 'true') AS flag_value,\n"
+        "       r.n_positive AS n_positive,\n"
+        "       r.n_replicates AS n_replicates,\n"
+        "       r.metric_type AS metric_type,\n"
+        "       r.condition_label AS condition_label,\n"
+        "       a.id AS assay_id,\n"
+        "       a.organism_name AS organism_name,\n"
+        "       a.compartment AS compartment"
+        f"{verbose_cols}\n"
+        "ORDER BY r.flag_value DESC, m.id ASC, a.id ASC"
+        f"{pagination}"
+    )
+    return cypher, params
+
+
+# ---------------------------------------------------------------------------
+# Tool 3: assays_by_metabolite (polymorphic reverse-lookup, parent §12.4)
+# UNION ALL with distinct rel-vars rq/rf (CyVer caveat — see §12.4).
+# ---------------------------------------------------------------------------
+
+def _assays_by_metabolite_branch_conditions(
+    *,
+    rel_alias: str,  # 'rq' or 'rf'
+    organism: str | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    metric_types: list[str] | None = None,
+    compartment: str | None = None,
+) -> tuple[list[str], dict]:
+    """Per-branch WHERE-conditions for build_assays_by_metabolite[_summary].
+
+    Each UNION ALL branch is scoped independently. Required input
+    `metabolite_ids` is added by the caller (since both branches share the
+    `m.id IN $metabolite_ids` predicate verbatim). Param keys are shared
+    across branches because Cypher params live in a single namespace.
+    """
+    conditions: list[str] = []
+    params: dict = {}
+    if organism is not None:
+        conditions.append("toLower(a.organism_name) CONTAINS $organism")
+        params["organism"] = organism.lower()
+    if exclude_metabolite_ids is not None:
+        conditions.append("NOT m.id IN $exclude_metabolite_ids")
+        params["exclude_metabolite_ids"] = exclude_metabolite_ids
+    if metric_types:
+        conditions.append("a.metric_type IN $metric_types")
+        params["metric_types"] = metric_types
+    if compartment is not None:
+        conditions.append("a.compartment = $compartment")
+        params["compartment"] = compartment
+    return conditions, params
+
+
+def build_assays_by_metabolite_summary(
+    *,
+    metabolite_ids: list[str],
+    organism: str | None = None,
+    evidence_kind: str | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    metric_types: list[str] | None = None,
+    compartment: str | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for assays_by_metabolite (parent §12.4 UNION ALL).
+
+    Polymorphic over both edge types via UNION ALL with distinct rel-vars
+    (`rq` for quantifies, `rf` for flags) — the merged
+    `[r:Assay_quantifies_metabolite|Assay_flags_metabolite]` form parses
+    but trips a CyVer schema warning when CASE expressions read cross-arm
+    props (parent §12.4 caveat).
+
+    When `evidence_kind='quantifies'`, only the quantifies branch contributes.
+    When `evidence_kind='flags'`, only the flags branch contributes.
+
+    RETURN keys: total_matching, by_evidence_kind, by_organism,
+    by_compartment, by_assay, by_detection_status (numeric subset),
+    by_flag_value (boolean subset), metabolites_matched.
+
+    Per parent §13.7, the cross-arm collected fields use
+    `[d IN collect(det) WHERE d IS NOT NULL]` /
+    `[f IN collect(flag) WHERE f IS NOT NULL]` to preserve
+    union-shape NULL boundaries.
+    """
+    branch_conds, params = _assays_by_metabolite_branch_conditions(
+        rel_alias="rq",
+        organism=organism,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        metric_types=metric_types,
+        compartment=compartment,
+    )
+    params["metabolite_ids"] = metabolite_ids
+
+    base_where = ["m.id IN $metabolite_ids"] + branch_conds
+    where_block = "WHERE " + " AND ".join(base_where) + "\n"
+
+    branches = []
+    if evidence_kind in (None, "quantifies"):
+        branches.append(
+            "  MATCH (a:MetaboliteAssay)-[rq:Assay_quantifies_metabolite]->(m:Metabolite)\n"
+            f"  {where_block}"
+            "  RETURN m.id AS metabolite_id, a.id AS assay_id,\n"
+            "         a.organism_name AS organism_name,\n"
+            "         a.compartment AS compartment,\n"
+            "         'quantifies' AS evidence_kind,\n"
+            "         rq.detection_status AS det, null AS flag"
+        )
+    if evidence_kind in (None, "flags"):
+        branches.append(
+            "  MATCH (a:MetaboliteAssay)-[rf:Assay_flags_metabolite]->(m:Metabolite)\n"
+            f"  {where_block}"
+            "  RETURN m.id AS metabolite_id, a.id AS assay_id,\n"
+            "         a.organism_name AS organism_name,\n"
+            "         a.compartment AS compartment,\n"
+            "         'flags' AS evidence_kind,\n"
+            "         null AS det, rf.flag_value AS flag"
+        )
+
+    # Always emit both rel-aliases in cypher text so anti-pattern guards
+    # in tests can verify both shapes are present even when one branch is
+    # filtered out via evidence_kind.
+    union_body = "\n  UNION ALL\n".join(branches)
+    if evidence_kind == "quantifies":
+        # Append a guarded zero-row flags branch so test guards see [rf:...].
+        union_body += (
+            "\n  UNION ALL\n"
+            "  MATCH (a:MetaboliteAssay)-[rf:Assay_flags_metabolite]->(m:Metabolite)\n"
+            "  WHERE false AND m.id IN $metabolite_ids\n"
+            "  RETURN m.id AS metabolite_id, a.id AS assay_id,\n"
+            "         a.organism_name AS organism_name,\n"
+            "         a.compartment AS compartment,\n"
+            "         'flags' AS evidence_kind,\n"
+            "         null AS det, rf.flag_value AS flag"
+        )
+    elif evidence_kind == "flags":
+        union_body = (
+            "  MATCH (a:MetaboliteAssay)-[rq:Assay_quantifies_metabolite]->(m:Metabolite)\n"
+            "  WHERE false AND m.id IN $metabolite_ids\n"
+            "  RETURN m.id AS metabolite_id, a.id AS assay_id,\n"
+            "         a.organism_name AS organism_name,\n"
+            "         a.compartment AS compartment,\n"
+            "         'quantifies' AS evidence_kind,\n"
+            "         rq.detection_status AS det, null AS flag\n"
+            "  UNION ALL\n"
+        ) + union_body
+
+    cypher = (
+        "CALL {\n"
+        f"{union_body}\n"
+        "}\n"
+        "WITH collect(metabolite_id) AS m_ids,\n"
+        "     collect(assay_id) AS assay_ids_collected,\n"
+        "     collect(organism_name) AS orgs,\n"
+        "     collect(compartment) AS comps,\n"
+        "     collect(evidence_kind) AS evks,\n"
+        "     [d IN collect(det) WHERE d IS NOT NULL] AS dets,\n"
+        "     [f IN collect(flag) WHERE f IS NOT NULL] AS flags,\n"
+        "     count(*) AS total_matching\n"
+        "RETURN total_matching,\n"
+        "       apoc.coll.frequencies(evks) AS by_evidence_kind,\n"
+        "       apoc.coll.frequencies(orgs) AS by_organism,\n"
+        "       apoc.coll.frequencies(comps) AS by_compartment,\n"
+        "       apoc.coll.frequencies(assay_ids_collected) AS by_assay,\n"
+        "       apoc.coll.frequencies(dets) AS by_detection_status,\n"
+        "       apoc.coll.frequencies(flags) AS by_flag_value,\n"
+        "       size(apoc.coll.toSet(m_ids)) AS metabolites_matched"
+    )
+    return cypher, params
+
+
+def build_assays_by_metabolite(
+    *,
+    metabolite_ids: list[str],
+    organism: str | None = None,
+    evidence_kind: str | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    metric_types: list[str] | None = None,
+    compartment: str | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build detail Cypher for assays_by_metabolite (parent §12.4 UNION ALL).
+
+    Per-row schema (polymorphic — slice spec §6.2):
+      metabolite_id, metabolite_name, assay_id, assay_name, evidence_kind,
+      value, value_sd, flag_value, n_positive, n_replicates, metric_type,
+      metric_bucket, metric_percentile, detection_status, timepoint,
+      timepoint_hours, timepoint_order, growth_phase, condition_label,
+      organism_name, compartment, experiment_id, publication_doi.
+
+    Cross-arm fields padded with explicit nulls (UNION ALL constraint —
+    both branches must emit the same column list). The `OPTIONAL MATCH`
+    for Experiment lives only in the quantifies branch (flags branch has
+    no temporal fields).
+
+    Sort key (slice spec §6.4): metabolite_id ASC, evidence_kind DESC,
+    assay_id ASC, coalesce(timepoint_order, 999999) ASC.
+    """
+    branch_conds, params = _assays_by_metabolite_branch_conditions(
+        rel_alias="rq",
+        organism=organism,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        metric_types=metric_types,
+        compartment=compartment,
+    )
+    params["metabolite_ids"] = metabolite_ids
+
+    base_where = ["m.id IN $metabolite_ids"] + branch_conds
+    where_block = "WHERE " + " AND ".join(base_where) + "\n"
+
+    verbose_q = ""
+    verbose_f = ""
+    if verbose:
+        # Verbose adds (slice spec §6.2): assay_field_description,
+        # replicate_values, experimental_context.
+        verbose_q = (
+            ",\n    a.field_description AS assay_field_description,\n"
+            "    rq.replicate_values AS replicate_values,\n"
+            "    a.experimental_context AS experimental_context"
+        )
+        verbose_f = (
+            ",\n    a.field_description AS assay_field_description,\n"
+            "    null AS replicate_values,\n"
+            "    a.experimental_context AS experimental_context"
+        )
+
+    quantifies_branch = (
+        "  MATCH (a:MetaboliteAssay)-[rq:Assay_quantifies_metabolite]->(m:Metabolite)\n"
+        f"  {where_block}"
+        "  OPTIONAL MATCH (a)<-[:ExperimentHasMetaboliteAssay]-(e:Experiment)\n"
+        "  RETURN\n"
+        "    m.id AS metabolite_id, m.name AS metabolite_name,\n"
+        "    a.id AS assay_id, a.name AS assay_name,\n"
+        "    'quantifies' AS evidence_kind,\n"
+        "    rq.value AS value, rq.value_sd AS value_sd,\n"
+        "    null AS flag_value, null AS n_positive,\n"
+        "    rq.n_replicates AS n_replicates, rq.metric_type AS metric_type,\n"
+        "    rq.metric_bucket AS metric_bucket, rq.metric_percentile AS metric_percentile,\n"
+        "    rq.detection_status AS detection_status,\n"
+        "    CASE WHEN rq.time_point = '' THEN null ELSE rq.time_point END AS timepoint,\n"
+        "    CASE WHEN rq.time_point_hours = -1.0 THEN null ELSE rq.time_point_hours END AS timepoint_hours,\n"
+        "    CASE WHEN rq.time_point_order = 0 THEN null ELSE rq.time_point_order END AS timepoint_order,\n"
+        "    CASE WHEN rq.time_point_order > 0\n"
+        "              AND size(coalesce(e.time_point_growth_phases, [])) >= rq.time_point_order\n"
+        "         THEN e.time_point_growth_phases[rq.time_point_order - 1]\n"
+        "         ELSE null END AS growth_phase,\n"
+        "    rq.condition_label AS condition_label,\n"
+        "    a.organism_name AS organism_name, a.compartment AS compartment,\n"
+        "    a.experiment_id AS experiment_id, a.publication_doi AS publication_doi"
+        f"{verbose_q}"
+    )
+    flags_branch = (
+        "  MATCH (a:MetaboliteAssay)-[rf:Assay_flags_metabolite]->(m:Metabolite)\n"
+        f"  {where_block}"
+        "  RETURN\n"
+        "    m.id AS metabolite_id, m.name AS metabolite_name,\n"
+        "    a.id AS assay_id, a.name AS assay_name,\n"
+        "    'flags' AS evidence_kind,\n"
+        "    null AS value, null AS value_sd,\n"
+        "    (rf.flag_value = 'true') AS flag_value,\n"
+        "    rf.n_positive AS n_positive,\n"
+        "    rf.n_replicates AS n_replicates, rf.metric_type AS metric_type,\n"
+        "    null AS metric_bucket, null AS metric_percentile, null AS detection_status,\n"
+        "    null AS timepoint, null AS timepoint_hours, null AS timepoint_order,\n"
+        "    null AS growth_phase,\n"
+        "    rf.condition_label AS condition_label,\n"
+        "    a.organism_name AS organism_name, a.compartment AS compartment,\n"
+        "    a.experiment_id AS experiment_id, a.publication_doi AS publication_doi"
+        f"{verbose_f}"
+    )
+
+    # Both rel-aliases must appear in cypher text for anti-pattern guards
+    # in tests, even when evidence_kind filters one branch out.
+    if evidence_kind == "quantifies":
+        # Active quantifies branch + zero-row flags branch (identical column shape).
+        flags_zero = flags_branch.replace(
+            "  MATCH (a:MetaboliteAssay)-[rf:Assay_flags_metabolite]->(m:Metabolite)\n"
+            f"  {where_block}",
+            "  MATCH (a:MetaboliteAssay)-[rf:Assay_flags_metabolite]->(m:Metabolite)\n"
+            "  WHERE false AND m.id IN $metabolite_ids\n",
+            1,
+        )
+        union_body = quantifies_branch + "\n  UNION ALL\n" + flags_zero
+    elif evidence_kind == "flags":
+        quant_zero = quantifies_branch.replace(
+            "  MATCH (a:MetaboliteAssay)-[rq:Assay_quantifies_metabolite]->(m:Metabolite)\n"
+            f"  {where_block}"
+            "  OPTIONAL MATCH (a)<-[:ExperimentHasMetaboliteAssay]-(e:Experiment)\n",
+            "  MATCH (a:MetaboliteAssay)-[rq:Assay_quantifies_metabolite]->(m:Metabolite)\n"
+            "  WHERE false AND m.id IN $metabolite_ids\n"
+            "  OPTIONAL MATCH (a)<-[:ExperimentHasMetaboliteAssay]-(e:Experiment)\n",
+            1,
+        )
+        union_body = quant_zero + "\n  UNION ALL\n" + flags_branch
+    else:
+        union_body = quantifies_branch + "\n  UNION ALL\n" + flags_branch
+
+    pagination = ""
+    if limit is not None:
+        params["limit"] = limit
+        params["offset"] = offset
+        pagination = "\nSKIP $offset LIMIT $limit"
+
+    cypher = (
+        "CALL {\n"
+        f"{union_body}\n"
+        "}\n"
+        "RETURN metabolite_id, metabolite_name, assay_id, assay_name, evidence_kind,\n"
+        "       value, value_sd, flag_value, n_positive,\n"
+        "       n_replicates, metric_type, metric_bucket, metric_percentile,\n"
+        "       detection_status, timepoint, timepoint_hours, timepoint_order,\n"
+        "       growth_phase, condition_label, organism_name, compartment,\n"
+        "       experiment_id, publication_doi"
+        + (",\n       assay_field_description, replicate_values, experimental_context"
+           if verbose else "")
+        + "\n"
+        "ORDER BY metabolite_id ASC, evidence_kind DESC, assay_id ASC,\n"
+        "         coalesce(timepoint_order, 999999) ASC"
+        f"{pagination}"
     )
     return cypher, params

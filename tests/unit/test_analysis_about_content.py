@@ -190,7 +190,12 @@ class TestAnalysisAboutContent:
                 if not kwargs:
                     continue
 
-                valid_params = set(inspect.signature(fn).parameters.keys())
+                # Pydantic BaseModel subclasses report `**data` as the
+                # only signature parameter — fall back to model_fields.
+                if hasattr(fn, "model_fields"):
+                    valid_params = set(fn.model_fields.keys())
+                else:
+                    valid_params = set(inspect.signature(fn).parameters.keys())
                 invalid = kwargs - valid_params
                 if invalid:
                     errors.append(
@@ -236,3 +241,74 @@ class TestAnalysisAboutContent:
                         f"API functions"
                     )
         assert not errors, f"{path.name}:\n" + "\n".join(f"  - {e}" for e in errors)
+
+
+# ---------------------------------------------------------------------------
+# Outfacing-doc lint gates: analysis md + analysis function docstrings
+# ---------------------------------------------------------------------------
+
+from multiomics_explorer._outfacing_lint import (
+    lint_lines as _lint_lines,
+    lint_python_docstrings as _lint_py,
+)
+
+_ANALYSIS_PKG_DIR = (
+    Path(__file__).resolve().parent.parent.parent
+    / "multiomics_explorer" / "analysis"
+)
+
+
+def _analysis_md_files() -> list[Path]:
+    return sorted(ABOUT_DIR.glob("*.md"))
+
+
+def _analysis_public_functions() -> list[tuple[str, Path, int, int]]:
+    """Top-level public functions and classes across analysis/*.py.
+
+    Returns (name, source_file, start_line, end_line) tuples. Classes
+    are included because their docstrings (e.g. ``EnrichmentResult``)
+    are also part of the Python-API outfacing surface.
+    """
+    out = []
+    target_types = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+    for py_file in sorted(_ANALYSIS_PKG_DIR.glob("*.py")):
+        if py_file.name == "__init__.py":
+            continue
+        tree = ast.parse(py_file.read_text())
+        for node in tree.body:
+            if isinstance(node, target_types):
+                if not node.name.startswith("_"):
+                    out.append((node.name, py_file, node.lineno, node.end_lineno))
+    return out
+
+
+@pytest.mark.parametrize(
+    "md_path",
+    _analysis_md_files(),
+    ids=lambda p: p.stem,
+)
+def test_analysis_md_lint_clean(md_path: Path):
+    violations = _lint_lines([md_path])
+    if violations:
+        msg_lines = [f"{md_path.name} has outfacing-doc violations:"]
+        for path, line_no, line, token in violations:
+            msg_lines.append(f"  {path.name}:{line_no}: {token!r} in: {line.strip()}")
+        pytest.fail("\n".join(msg_lines))
+
+
+@pytest.mark.parametrize(
+    "spec",
+    _analysis_public_functions(),
+    ids=lambda spec: f"{spec[1].stem}.{spec[0]}",
+)
+def test_analysis_function_docstring_lint_clean(spec):
+    name, src_file, start, end = spec
+    violations = _lint_py([src_file])
+    fn_violations = [v for v in violations if start <= v[1] <= end]
+    if fn_violations:
+        msg_lines = [
+            f"{name} ({src_file.name}:{start}-{end}) has outfacing-doc violations:",
+        ]
+        for path, line_no, line, token in fn_violations:
+            msg_lines.append(f"  {path.name}:{line_no}: {token!r} in: {line.strip()}")
+        pytest.fail("\n".join(msg_lines))
