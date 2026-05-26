@@ -165,6 +165,37 @@ Always inspect both. An empty `results` plus a populated `not_found` or
 
 ---
 
+## Empty per-gene results: "no hit" vs "out of scope"
+
+A per-gene tool returning nothing for a gene (`gene_homologs`
+`no_groups`, `gene_ontology_terms` zero rows, `gene_clusters_by_gene` /
+`gene_derived_metrics` `not_matched`) does **not** by itself mean the
+biology is absent. Three cases collapse into "empty":
+
+- the gene exists and the upstream source ran but found nothing
+  ("no hit"),
+- the gene exists but the source never applied to it ("out of scope"),
+- the gene isn't in the KG (`not_found` — already distinguished above).
+
+Don't read an empty result as a biological negative. The actionable
+signal is already on `gene_overview`: **`annotation_state`**
+(`no_evidence` / `catch_all_only` / `informative_single` /
+`informative_multi`) tells you whether the gene has informative
+evidence at all. For the rarer "ran-but-empty vs never-ran"
+distinction, the Gene node also carries **`contributing_sources`**
+(`{ncbi, cyanorak, uniprot, eggnog}`) — the data sources that
+contributed at least one field.
+
+**Cross-organism caveat:** `cyanorak`-derived annotations (Cyanorak
+roles, curated products, many ortholog groups) apply to
+**Prochlorococcus / Synechococcus only**. Heterotroph genes
+(Alteromonas, Pseudomonas, Marinobacter, Meiothermus, …) lack them
+**by design** — out-of-scope, not a data gap. Don't infer that a
+heterotroph clade is "poorly annotated" from missing Cyanorak /
+ortholog coverage.
+
+---
+
 ## Tested-absent rows are real biology
 
 In the metabolomics layer (`MetaboliteAssay` edges), the KG stores
