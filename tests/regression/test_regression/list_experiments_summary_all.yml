@@ -3,12 +3,12 @@ row_count: 1
 rows:
 - by_background_factors:
   - '{''count'': 1, ''item'': ''chemical''}'
-  - '{''count'': 12, ''item'': ''diel''}'
   - '{''count'': 123, ''item'': ''light''}'
+  - '{''count'': 14, ''item'': ''diel''}'
   - '{''count'': 2, ''item'': ''viral''}'
   - '{''count'': 37, ''item'': ''darkness''}'
   - '{''count'': 55, ''item'': ''coculture''}'
-  - '{''count'': 80, ''item'': ''axenic''}'
+  - '{''count'': 82, ''item'': ''axenic''}'
   by_cluster_type:
   - '{''count'': 2, ''item'': ''condition_comparison''}'
   - '{''count'': 2, ''item'': ''diel''}'
@@ -16,13 +16,13 @@ rows:
   by_compartment:
   - '{''count'': 10, ''item'': ''exoproteome''}'
   - '{''count'': 13, ''item'': ''vesicle''}'
-  - '{''count'': 169, ''item'': ''whole_cell''}'
+  - '{''count'': 171, ''item'': ''whole_cell''}'
   - '{''count'': 3, ''item'': ''extracellular''}'
   by_growth_phase:
   - '{''count'': 1, ''item'': ''death''}'
   - '{''count'': 14, ''item'': ''nutrient_limited''}'
   - '{''count'': 2, ''item'': ''diel''}'
-  - '{''count'': 21, ''item'': ''acclimated_steady_state''}'
+  - '{''count'': 23, ''item'': ''acclimated_steady_state''}'
   - '{''count'': 23, ''item'': ''acute_stress''}'
   - '{''count'': 32, ''item'': ''stationary''}'
   - '{''count'': 33, ''item'': ''darkness''}'
@@ -78,7 +78,7 @@ rows:
   - '{''count'': 12, ''item'': ''METABOLOMICS''}'
   - '{''count'': 26, ''item'': ''MICROARRAY''}'
   - '{''count'': 63, ''item'': ''RNASEQ''}'
-  - '{''count'': 72, ''item'': ''PROTEOMICS''}'
+  - '{''count'': 74, ''item'': ''PROTEOMICS''}'
   by_organism:
   - '{''count'': 1, ''item'': ''Alteromonas macleodii AD45''}'
   - '{''count'': 1, ''item'': ''Alteromonas macleodii ATCC27126''}'
@@ -99,9 +99,9 @@ rows:
   - '{''count'': 20, ''item'': ''Marinobacter (MarRef v6)''}'
   - '{''count'': 3, ''item'': ''Shewanella sp. W3-18-1''}'
   - '{''count'': 3, ''item'': ''Synechococcus PCC 7002''}'
-  - '{''count'': 39, ''item'': ''Prochlorococcus MED4''}'
   - '{''count'': 4, ''item'': ''Prochlorococcus MIT9301''}'
   - '{''count'': 4, ''item'': ''Synechococcus sp. BL107''}'
+  - '{''count'': 41, ''item'': ''Prochlorococcus MED4''}'
   - '{''count'': 5, ''item'': ''Alteromonas macleodii MIT1002''}'
   - '{''count'': 5, ''item'': ''Ruegeria pomeroyi DSS-3''}'
   - '{''count'': 6, ''item'': ''Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)''}'
@@ -126,6 +126,7 @@ rows:
   - '{''count'': 10, ''item'': ''10.1101/2025.11.24.690089''}'
   - '{''count'': 11, ''item'': ''10.1038/s43705-022-00197-2''}'
   - '{''count'': 2, ''item'': ''10.1002/pmic.201400562''}'
+  - '{''count'': 2, ''item'': ''10.1021/pr060460c''}'
   - '{''count'': 2, ''item'': ''10.1073/pnas.0601301103''}'
   - '{''count'': 2, ''item'': ''10.1093/ismeco/ycae131''}'
   - '{''count'': 2, ''item'': ''10.1101/2025.05.28.656624''}'
@@ -159,9 +160,10 @@ rows:
   - '{''count'': 19, ''item'': ''filtered_subset''}'
   - '{''count'': 42, ''item'': ''significant_only''}'
   - '{''count'': 7, ''item'': ''top_n''}'
-  - '{''count'': 97, ''item'': ''all_detected_genes''}'
+  - '{''count'': 99, ''item'': ''all_detected_genes''}'
   by_treatment_type:
   - '{''count'': 1, ''item'': ''temperature''}'
+  - '{''count'': 11, ''item'': ''light''}'
   - '{''count'': 16, ''item'': ''nitrogen''}'
   - '{''count'': 17, ''item'': ''compartment''}'
   - '{''count'': 2, ''item'': ''diel''}'
@@ -173,11 +175,10 @@ rows:
   - '{''count'': 6, ''item'': ''growth_phase''}'
   - '{''count'': 78, ''item'': ''carbon''}'
   - '{''count'': 79, ''item'': ''coculture''}'
-  - '{''count'': 9, ''item'': ''light''}'
   - '{''count'': 9, ''item'': ''phosphorus''}'
   by_value_kind:
   - '{''count'': 16, ''item'': ''numeric''}'
   - '{''count'': 8, ''item'': ''boolean''}'
   - '{''count'': 8, ''item'': ''categorical''}'
   time_course_count: 32
-  total_matching: 195
+  total_matching: 197

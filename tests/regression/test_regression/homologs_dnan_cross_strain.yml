@@ -26,7 +26,7 @@ rows:
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
 - consensus_gene_name: dnaN
-  consensus_product: DNA polymerase III subunit beta
+  consensus_product: DNA polymerase III, beta subunit
   group_id: eggnog:COG0592@2
   locus_tag: PMM0001
   organism_name: Prochlorococcus MED4

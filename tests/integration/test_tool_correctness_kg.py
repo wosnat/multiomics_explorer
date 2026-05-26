@@ -235,7 +235,9 @@ class TestGeneOverviewCorrectnessKG:
         assert set(r["annotation_types"]) >= {"go_mf", "pfam", "cog_category", "tigr_role"}
         assert r["expression_edge_count"] == 35
         assert r["significant_up_count"] + r["significant_down_count"] == 5
-        assert r["closest_ortholog_group_size"] == 14
+        # 14 → 20 after the 2026-05 KG rebuild added 6 Prochlorococcus strains,
+        # all of which joined this gene's cyanorak ortholog group.
+        assert r["closest_ortholog_group_size"] == 20
         assert set(r["closest_ortholog_genera"]) == {"Prochlorococcus", "Synechococcus"}
 
     def test_single_gene_alt(self, conn):
@@ -433,7 +435,7 @@ class TestListOrganismsCorrectnessKG:
         assert len(strain_organisms) > 0, "No organisms with strains found"
         for r in strain_organisms:
             assert r["gene_count"] > 0, (
-                f"Organism '{r['name']}' has gene_count={r['gene_count']}"
+                f"Organism '{r['organism_name']}' has gene_count={r['gene_count']}"
             )
 
     def test_clade_populated_for_prochlorococcus(self, conn):
@@ -444,7 +446,7 @@ class TestListOrganismsCorrectnessKG:
         assert len(pro_strains) > 0, "No Prochlorococcus strains found"
         for r in pro_strains:
             assert r["clade"] is not None, (
-                f"Prochlorococcus strain '{r['name']}' has null clade"
+                f"Prochlorococcus strain '{r['organism_name']}' has null clade"
             )
 
     def test_clade_null_for_alteromonas(self, conn):
@@ -454,19 +456,38 @@ class TestListOrganismsCorrectnessKG:
         alt_strains = [r for r in results if r["genus"] == "Alteromonas"]
         for r in alt_strains:
             assert r["clade"] is None, (
-                f"Alteromonas strain '{r['name']}' has unexpected clade={r['clade']}"
+                f"Alteromonas strain '{r['organism_name']}' has unexpected clade={r['clade']}"
             )
 
-    def test_clade_null_for_synechococcus(self, conn):
-        """Synechococcus/Parasynechococcus strains should not have a clade."""
+    def test_clade_for_synechococcus(self, conn):
+        """Marine Synechococcus/Parasynechococcus carry ecotype clades where
+        available (added in the 2026-05 KG); freshwater Synechococcus elongatus
+        and Thermosynechococcus carry none."""
         cypher, params = build_list_organisms()
         results = conn.execute_query(cypher, **params)
         syn_strains = [r for r in results if "synechococcus" in (r["genus"] or "").lower()
                        or "parasynechococcus" in (r["genus"] or "").lower()]
+        assert syn_strains, "No Synechococcus strains found"
+
+        # Freshwater / thermophilic cyanobacteria carry no marine ecotype clade.
         for r in syn_strains:
-            assert r["clade"] is None, (
-                f"Synechococcus strain '{r['name']}' has unexpected clade={r['clade']}"
-            )
+            if ("elongatus" in r["organism_name"].lower()
+                    or "thermosynechococcus" in (r["genus"] or "").lower()):
+                assert r["clade"] is None, (
+                    f"Freshwater cyanobacterium '{r['organism_name']}' "
+                    f"unexpectedly has clade={r['clade']}"
+                )
+
+        # The enhancement: marine picocyanobacteria now carry clades where available.
+        marine = [r for r in syn_strains
+                  if "elongatus" not in r["organism_name"].lower()
+                  and "thermosynechococcus" not in (r["genus"] or "").lower()
+                  and "picosynechococcus" not in (r["genus"] or "").lower()]
+        assert any(r["clade"] is not None for r in marine), (
+            "Expected at least one marine Synechococcus to carry a clade "
+            f"(clades added where available); got "
+            f"{[(r['organism_name'], r['clade']) for r in marine]}"
+        )
 
     def test_minimum_organisms(self, conn):
         """At least 10 organisms should be returned."""

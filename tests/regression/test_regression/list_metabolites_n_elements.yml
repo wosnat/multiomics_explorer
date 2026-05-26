@@ -1,7 +1,7 @@
 by_evidence_source:
-- count: 1212
+- count: 1227
   evidence_source: metabolism
-- count: 619
+- count: 656
   evidence_source: transport
 - count: 106
   evidence_source: metabolomics
@@ -14,7 +14,7 @@ by_measurement_coverage:
   - compartment: whole_cell
     count: 106
   by_paper_count:
-  - count: 1543
+  - count: 1584
     paper_count: 0
   - count: 85
     paper_count: 1
@@ -25,7 +25,7 @@ by_measurement_coverage:
 case_id: list_metabolites_n_elements
 mass_stats:
   mass_max: 5227.103
-  mass_median: 322.166
+  mass_median: 323.132
   mass_min: 18.039
 not_found:
   metabolite_ids: []
@@ -44,7 +44,7 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O13P3
-  gene_count: 4562
+  gene_count: 5652
   mass: 503.15
   measured_assay_count: 0
   measured_compartments: []
@@ -52,7 +52,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00002
   name: ATP
-  organism_count: 32
+  organism_count: 40
   pathway_count: 33
   pathway_ids:
   - kegg.pathway:ko00190
@@ -101,7 +101,7 @@ results:
   - metabolomics
   - transport
   formula: C10H12N5O10P2
-  gene_count: 2706
+  gene_count: 3343
   mass: 424.179
   measured_assay_count: 4
   measured_compartments:
@@ -113,7 +113,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00008
   name: ADP
-  organism_count: 32
+  organism_count: 40
   pathway_count: 20
   pathway_ids:
   - kegg.pathway:ko00190
@@ -149,7 +149,7 @@ results:
   - metabolomics
   - transport
   formula: C21H26N7O14P2
-  gene_count: 2611
+  gene_count: 3138
   mass: 662.422
   measured_assay_count: 4
   measured_compartments:
@@ -161,7 +161,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00003
   name: NAD+
-  organism_count: 32
+  organism_count: 40
   pathway_count: 14
   pathway_ids:
   - kegg.pathway:ko00190
@@ -191,7 +191,7 @@ results:
   - metabolomics
   - transport
   formula: C21H27N7O14P2
-  gene_count: 2401
+  gene_count: 2867
   mass: 663.43
   measured_assay_count: 8
   measured_compartments:
@@ -204,7 +204,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00004
   name: NADH
-  organism_count: 32
+  organism_count: 40
   pathway_count: 5
   pathway_ids:
   - kegg.pathway:ko00190
@@ -225,7 +225,7 @@ results:
   - metabolomics
   - transport
   formula: C10H12N5O7P
-  gene_count: 1871
+  gene_count: 2312
   mass: 345.208
   measured_assay_count: 12
   measured_compartments:
@@ -240,7 +240,7 @@ results:
   measured_paper_count: 2
   metabolite_id: kegg.compound:C00020
   name: AMP
-  organism_count: 32
+  organism_count: 40
   pathway_count: 25
   pathway_ids:
   - kegg.pathway:ko00230
@@ -274,13 +274,13 @@ row_count: 5
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 881
+- count: 893
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-- count: 320
+- count: 323
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
-- count: 199
+- count: 204
   metabolite_pathway_id: kegg.pathway:ko01120
   metabolite_pathway_name: Microbial metabolism in diverse environments
 - count: 182
@@ -290,11 +290,11 @@ top_metabolite_pathways:
   metabolite_pathway_id: kegg.pathway:ko00860
   metabolite_pathway_name: Porphyrin metabolism
 - count: 78
-  metabolite_pathway_id: kegg.pathway:ko01230
-  metabolite_pathway_name: Biosynthesis of amino acids
-- count: 77
   metabolite_pathway_id: kegg.pathway:ko01250
   metabolite_pathway_name: Biosynthesis of nucleotide sugars
+- count: 78
+  metabolite_pathway_id: kegg.pathway:ko01230
+  metabolite_pathway_name: Biosynthesis of amino acids
 - count: 71
   metabolite_pathway_id: kegg.pathway:ko00230
   metabolite_pathway_name: Purine metabolism
@@ -313,22 +313,22 @@ top_organisms:
   organism_name: Alteromonas (MarRef v6)
 - count: 1196
   organism_name: Shewanella sp. W3-18-1
+- count: 1156
+  organism_name: Alteromonas mediterranea AltDE1
 - count: 1146
   organism_name: Alteromonas macleodii EZ55
 - count: 1146
   organism_name: Alteromonas macleodii MIT1002
+- count: 1142
+  organism_name: Alteromonas mediterranea AltDE
 - count: 1141
   organism_name: Alteromonas macleodii ATCC27126
 - count: 1140
   organism_name: Alteromonas macleodii BGP6
-- count: 1139
-  organism_name: Alteromonas macleodii HOT1A3
-- count: 1132
-  organism_name: Alteromonas macleodii AD45
-total_entries: 3230
-total_matching: 1649
+total_entries: 3353
+total_matching: 1690
 truncated: true
 xref_coverage:
-  with_chebi: 1469
-  with_hmdb: 881
-  with_mnxm: 1649
+  with_chebi: 1505
+  with_hmdb: 893
+  with_mnxm: 1690

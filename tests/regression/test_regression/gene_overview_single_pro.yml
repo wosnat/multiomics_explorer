@@ -13,7 +13,7 @@ rows:
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
-  closest_ortholog_group_size: 14
+  closest_ortholog_group_size: 20
   cluster_membership_count: 2
   cluster_types:
   - diel

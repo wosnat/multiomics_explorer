@@ -1,5 +1,5 @@
 case_id: list_organisms
-row_count: 37
+row_count: 45
 rows:
 - background_factors: []
   clade: null
@@ -297,6 +297,54 @@ rows:
   - coculture
   - compartment
   - darkness
+- background_factors: []
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  experiment_count: 0
+  gene_count: 3817
+  genus: Alteromonas
+  growth_phases: []
+  measured_metabolite_count: 0
+  metabolite_count: 2062
+  ncbi_taxon_id: 1774373
+  omics_types: []
+  organism_name: Alteromonas mediterranea AltDE
+  organism_type: genome_strain
+  publication_count: 0
+  reaction_count: 1206
+  reference_database: null
+  reference_proteome: null
+  species: Alteromonas mediterranea
+  strain: AltDE
+  treatment_types: []
+- background_factors: []
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  experiment_count: 0
+  gene_count: 4238
+  genus: Alteromonas
+  growth_phases: []
+  measured_metabolite_count: 0
+  metabolite_count: 2098
+  ncbi_taxon_id: 1004786
+  omics_types: []
+  organism_name: Alteromonas mediterranea AltDE1
+  organism_type: genome_strain
+  publication_count: 0
+  reaction_count: 1249
+  reference_database: null
+  reference_proteome: null
+  species: Alteromonas mediterranea
+  strain: AltDE1
+  treatment_types: []
 - background_factors:
   - light
   clade: null
@@ -498,7 +546,7 @@ rows:
   - boolean
   - categorical
   - numeric
-  experiment_count: 112
+  experiment_count: 114
   gene_count: 1976
   genus: Prochlorococcus
   growth_phases:
@@ -523,7 +571,7 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MED4
   organism_type: genome_strain
-  publication_count: 16
+  publication_count: 17
   reaction_count: 943
   reference_database: null
   reference_proteome: null
@@ -541,6 +589,30 @@ rows:
   - phosphorus
   - salt
   - viral
+- background_factors: []
+  clade: HLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  experiment_count: 0
+  gene_count: 2137
+  genus: Prochlorococcus
+  growth_phases: []
+  measured_metabolite_count: 0
+  metabolite_count: 1553
+  ncbi_taxon_id: 1501268
+  omics_types: []
+  organism_name: Prochlorococcus MIT0604
+  organism_type: genome_strain
+  publication_count: 0
+  reaction_count: 930
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: MIT0604
+  treatment_types: []
 - background_factors:
   - axenic
   clade: LLI
@@ -569,6 +641,54 @@ rows:
   treatment_types:
   - growth_phase
   - phosphorus
+- background_factors: []
+  clade: HLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  experiment_count: 0
+  gene_count: 2027
+  genus: Prochlorococcus
+  growth_phases: []
+  measured_metabolite_count: 0
+  metabolite_count: 1566
+  ncbi_taxon_id: 93058
+  omics_types: []
+  organism_name: Prochlorococcus MIT9202
+  organism_type: genome_strain
+  publication_count: 0
+  reaction_count: 921
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: MIT9202
+  treatment_types: []
+- background_factors: []
+  clade: HLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  experiment_count: 0
+  gene_count: 2030
+  genus: Prochlorococcus
+  growth_phases: []
+  measured_metabolite_count: 0
+  metabolite_count: 1581
+  ncbi_taxon_id: 93060
+  omics_types: []
+  organism_name: Prochlorococcus MIT9215
+  organism_type: genome_strain
+  publication_count: 0
+  reaction_count: 950
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: MIT9215
+  treatment_types: []
 - background_factors:
   - axenic
   - diel
@@ -724,10 +844,34 @@ rows:
   - nitrogen
   - phosphorus
   - viral
+- background_factors: []
+  clade: HLI
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  experiment_count: 0
+  gene_count: 1949
+  genus: Prochlorococcus
+  growth_phases: []
+  measured_metabolite_count: 0
+  metabolite_count: 1552
+  ncbi_taxon_id: 167542
+  omics_types: []
+  organism_name: Prochlorococcus MIT9515
+  organism_type: genome_strain
+  publication_count: 0
+  reaction_count: 926
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: MIT9515
+  treatment_types: []
 - background_factors:
   - axenic
   - light
-  clade: LLII
+  clade: LLI
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
@@ -759,7 +903,7 @@ rows:
   - diel
   - light
   - viral
-  clade: LLII
+  clade: LLI
   cluster_types:
   - diel
   clustering_analysis_count: 2
@@ -800,6 +944,30 @@ rows:
   - phosphorus
   - plastic
 - background_factors: []
+  clade: LLI
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  experiment_count: 0
+  gene_count: 2370
+  genus: Prochlorococcus
+  growth_phases: []
+  measured_metabolite_count: 0
+  metabolite_count: 1600
+  ncbi_taxon_id: 59924
+  omics_types: []
+  organism_name: Prochlorococcus PAC1
+  organism_type: genome_strain
+  publication_count: 0
+  reaction_count: 959
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: PAC1
+  treatment_types: []
+- background_factors: []
   clade: HLI
   cluster_types: []
   clustering_analysis_count: 0
@@ -822,6 +990,30 @@ rows:
   reference_proteome: null
   species: null
   strain: RSP50
+  treatment_types: []
+- background_factors: []
+  clade: HLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  experiment_count: 0
+  gene_count: 1977
+  genus: Prochlorococcus
+  growth_phases: []
+  measured_metabolite_count: 0
+  metabolite_count: 1552
+  ncbi_taxon_id: 59926
+  omics_types: []
+  organism_name: Prochlorococcus SB
+  organism_type: genome_strain
+  publication_count: 0
+  reaction_count: 931
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: SB
   treatment_types: []
 - background_factors:
   - axenic
@@ -953,7 +1145,7 @@ rows:
   - axenic
   - coculture
   - light
-  clade: null
+  clade: I
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
@@ -1013,7 +1205,7 @@ rows:
   - coculture
   - darkness
   - light
-  clade: null
+  clade: V
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
@@ -1048,7 +1240,7 @@ rows:
   - coculture
   - darkness
   - light
-  clade: null
+  clade: III
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
@@ -1142,7 +1334,7 @@ rows:
   - coculture
   - darkness
   - light
-  clade: null
+  clade: IV
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []

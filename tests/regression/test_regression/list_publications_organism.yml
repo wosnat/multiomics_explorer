@@ -1,5 +1,5 @@
 case_id: list_publications_organism
-row_count: 16
+row_count: 17
 rows:
 - authors:
   - Daniel Sher
@@ -425,6 +425,37 @@ rows:
   treatment_types:
   - diel
   year: 2009
+- authors:
+  - Catherine A. Biggs
+  - Jagroop Pandhal
+  - Phillip C. Wright
+  background_factors:
+  - axenic
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  doi: 10.1021/pr060460c
+  experiment_count: 2
+  growth_phases:
+  - acclimated_steady_state
+  journal: Journal of Proteome Research
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - PROTEOMICS
+  organisms:
+  - Prochlorococcus MED4
+  study_type: Proteomics
+  title: A Quantitative Proteomic Analysis of Light Adaptation in a Globally Significant
+    Marine Cyanobacterium Prochlorococcus marinus MED4
+  treatment_types:
+  - light
+  year: 2007
 - authors:
   - Debbie Lindell
   - George M. Church

@@ -1,5 +1,5 @@
 case_id: differential_expression_by_ortholog_basic
-row_count: 65
+row_count: 67
 rows:
 - background_factors:
   - axenic
@@ -20,6 +20,44 @@ rows:
   timepoint_order: 1
   treatment_type:
   - salt
+- background_factors:
+  - axenic
+  - diel
+  coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1021/pr060460c_light_HL_vs_LL_med4_proteomics
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: acclimated_steady_state
+  not_significant: 1
+  organism_name: Prochlorococcus MED4
+  significant_down: 0
+  significant_up: 0
+  timepoint: acclimated mid-exponential
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type:
+  - light
+- background_factors:
+  - axenic
+  - diel
+  coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1021/pr060460c_light_ML_vs_LL_med4_proteomics
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: acclimated_steady_state
+  not_significant: 1
+  organism_name: Prochlorococcus MED4
+  significant_down: 0
+  significant_up: 0
+  timepoint: acclimated mid-exponential
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type:
+  - light
 - background_factors:
   - axenic
   - light

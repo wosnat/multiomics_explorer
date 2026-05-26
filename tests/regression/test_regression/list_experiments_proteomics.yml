@@ -1,5 +1,5 @@
 case_id: list_experiments_proteomics
-row_count: 72
+row_count: 74
 rows:
 - authors:
   - Guadalupe Gómez-Baena
@@ -2480,6 +2480,103 @@ rows:
   - '327'
   treatment_type:
   - carbon
+- authors:
+  - Catherine A. Biggs
+  - Jagroop Pandhal
+  - Phillip C. Wright
+  background_factors:
+  - axenic
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 179
+  experiment_id: 10.1021/pr060460c_light_HL_vs_LL_med4_proteomics
+  experiment_name: 'MED4 proteomics: high light (100 uE) vs low light (20 uE) (iTRAQ)'
+  gene_count: 179
+  growth_phases:
+  - acclimated_steady_state
+  is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1021/pr060460c
+  significant_down_count: 5
+  significant_up_count: 11
+  table_scope: all_detected_genes
+  table_scope_detail: All proteins quantified in either iTRAQ1 or iTRAQ2 are reported
+    (~184 unique proteins; ~11% of MED4 coding genes); only ~15 reach the paper^s
+    combined logFC + p-value + error-factor + relative-variance significance criteria.
+  time_point_count: 1
+  time_point_growth_phases:
+  - acclimated_steady_state
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - acclimated mid-exponential
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '5'
+  time_point_significant_up:
+  - '11'
+  time_point_totals:
+  - '179'
+  treatment_type:
+  - light
+- authors:
+  - Catherine A. Biggs
+  - Jagroop Pandhal
+  - Phillip C. Wright
+  background_factors:
+  - axenic
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 178
+  experiment_id: 10.1021/pr060460c_light_ML_vs_LL_med4_proteomics
+  experiment_name: 'MED4 proteomics: medium light (60 uE) vs low light (20 uE) (iTRAQ)'
+  gene_count: 178
+  growth_phases:
+  - acclimated_steady_state
+  is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1021/pr060460c
+  significant_down_count: 6
+  significant_up_count: 12
+  table_scope: all_detected_genes
+  table_scope_detail: All proteins quantified in either iTRAQ1 or iTRAQ2 are reported
+    (~184 unique proteins; ~11% of MED4 coding genes).
+  time_point_count: 1
+  time_point_growth_phases:
+  - acclimated_steady_state
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - acclimated mid-exponential
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '6'
+  time_point_significant_up:
+  - '12'
+  time_point_totals:
+  - '178'
+  treatment_type:
+  - light
 - authors:
   - Catherine A Biggs
   - Matthew A Fuszard

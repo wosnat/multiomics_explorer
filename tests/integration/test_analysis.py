@@ -6,8 +6,13 @@ from multiomics_explorer.analysis import (
     gene_set_compare,
     response_matrix,
     to_dataframe,
-    profile_summary_to_dataframe,
+)
+
+# De-exposed from the public package API in commit 8d85962 (Python API
+# simplification); still callable at the .frames submodule for tests/internal use.
+from multiomics_explorer.analysis.frames import (
     experiments_to_dataframe,
+    profile_summary_to_dataframe,
 )
 from multiomics_explorer.api import functions as api
 

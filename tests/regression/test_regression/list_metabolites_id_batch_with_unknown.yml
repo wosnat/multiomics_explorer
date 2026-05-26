@@ -29,7 +29,7 @@ results:
   - metabolism
   - transport
   formula: C6H12O6
-  gene_count: 328
+  gene_count: 383
   mass: 180.156
   measured_assay_count: 0
   measured_compartments: []
@@ -37,7 +37,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00031
   name: D-Glucose
-  organism_count: 32
+  organism_count: 40
   pathway_count: 35
   pathway_ids:
   - kegg.pathway:ko00010
@@ -127,12 +127,12 @@ top_organisms:
 - count: 1
   organism_name: Alteromonas macleodii MIT1002
 - count: 1
-  organism_name: Marinobacter (MarRef v6)
+  organism_name: Alteromonas mediterranea AltDE
 - count: 1
-  organism_name: Meiothermus ruber
+  organism_name: Alteromonas mediterranea AltDE1
 - count: 1
   organism_name: Alteromonas (MarRef v6)
-total_entries: 3230
+total_entries: 3353
 total_matching: 1
 truncated: false
 xref_coverage:

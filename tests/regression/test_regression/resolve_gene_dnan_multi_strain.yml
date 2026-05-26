@@ -1,5 +1,5 @@
 case_id: resolve_gene_dnan_multi_strain
-row_count: 32
+row_count: 40
 rows:
 - gene_name: dnaN
   locus_tag: A9601_00001
@@ -34,6 +34,18 @@ rows:
   organism_name: Alteromonas (MarRef v6)
   product: DNA polymerase III subunit beta
 - gene_name: dnaN
+  locus_tag: EV02_1236
+  organism_name: Prochlorococcus SB
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EV03_1138
+  organism_name: Prochlorococcus PAC1
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EW14_0001
+  organism_name: Prochlorococcus MIT0604
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
   locus_tag: EW15_0002
   organism_name: Prochlorococcus MIT0801
   product: DNA polymerase III, beta subunit
@@ -58,6 +70,10 @@ rows:
   organism_name: Pseudomonas putida KT2440
   product: DNA polymerase III subunit beta
 - gene_name: dnaN
+  locus_tag: MADE_1000015
+  organism_name: Alteromonas mediterranea AltDE
+  product: DNA polymerase III subunit beta
+- gene_name: dnaN
   locus_tag: MASE_00010
   organism_name: Alteromonas macleodii ATCC27126
   product: DNA polymerase III subunit beta
@@ -70,12 +86,24 @@ rows:
   organism_name: Prochlorococcus NATL1A
   product: DNA polymerase III, beta subunit
 - gene_name: dnaN
+  locus_tag: P9202_979
+  organism_name: Prochlorococcus MIT9202
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: P9215_00001
+  organism_name: Prochlorococcus MIT9215
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
   locus_tag: P9301_00001
   organism_name: Prochlorococcus MIT9301
   product: DNA polymerase III, beta subunit
 - gene_name: dnaN
   locus_tag: P9303_00001
   organism_name: Prochlorococcus MIT9303
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: P9515_00001
+  organism_name: Prochlorococcus MIT9515
   product: DNA polymerase III, beta subunit
 - gene_name: dnaN
   locus_tag: PMM0001
@@ -121,6 +149,10 @@ rows:
   locus_tag: SynWH7803_0001
   organism_name: Synechococcus WH7803
   product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: amad1_00015
+  organism_name: Alteromonas mediterranea AltDE1
+  product: DNA polymerase III subunit beta
 - gene_name: dnaN
   locus_tag: sync_0001
   organism_name: Synechococcus CC9311

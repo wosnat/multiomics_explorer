@@ -2363,17 +2363,17 @@ class TestListMetabolites:
     def test_no_filters_returns_all(self, conn):
         """Unfiltered query reports total Metabolite node count."""
         result = api.list_metabolites(conn=conn)
-        assert result["total_matching"] == 3230
+        assert result["total_matching"] == 3353
 
     def test_elements_n_filter(self, conn):
         """N-bearing metabolites total."""
         result = api.list_metabolites(elements=["N"], conn=conn)
-        assert result["total_matching"] == 1649
+        assert result["total_matching"] == 1690
 
     def test_elements_n_and_p_filter(self, conn):
         """Multi-element AND filter (must contain both N and P)."""
         result = api.list_metabolites(elements=["N", "P"], conn=conn)
-        assert result["total_matching"] == 567
+        assert result["total_matching"] == 582
 
     def test_organism_plus_elements_filter(self, conn):
         """MED4 + N elements (the canonical N-source primitive): 813."""
@@ -2420,18 +2420,18 @@ class TestListMetabolites:
         assert "score" in result["results"][0]
 
     def test_evidence_sources_transport_filter(self, conn):
-        """transport-only evidence filter: 1,355 metabolites."""
+        """transport-only evidence filter: 1,462 metabolites."""
         result = api.list_metabolites(
             evidence_sources=["transport"], conn=conn,
         )
-        assert result["total_matching"] == 1355
+        assert result["total_matching"] == 1462
 
     def test_summary_mode_empty_results_envelope_populated(self, conn):
         """summary=True returns no result rows but envelope is populated."""
         result = api.list_metabolites(summary=True, conn=conn)
         assert result["results"] == []
         assert result["returned"] == 0
-        assert result["total_matching"] == 3230
+        assert result["total_matching"] == 3353
         # Envelope rollups present (lists, possibly empty but typed)
         assert isinstance(result["top_organisms"], list)
         assert isinstance(result["top_metabolite_pathways"], list)
