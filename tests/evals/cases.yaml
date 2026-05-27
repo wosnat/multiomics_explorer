@@ -1833,3 +1833,32 @@
     min_rows: 1
     max_rows: 1
     row0_check: "total_matching == 18"
+
+# ── Sequence & genomic context ──────────────────────────
+
+- id: gene_aa_sequence_alteromonas
+  tool: gene_aa_sequence
+  desc: |
+    AA sequences for two Alteromonas genes (detail rows; SYNW1755-style
+    no-sequence genes are filtered by `g.sequence IS NOT NULL`).
+  params:
+    locus_tags: [ACZ81_08855, ACZ81_08860]
+  expect:
+    min_rows: 1
+    columns:
+      [locus_tag, organism_name, gene_name, product, protein_id,
+       sequence_length, sequence]
+
+- id: gene_neighbors_alteromonas
+  tool: gene_neighbors
+  desc: |
+    Genomic neighborhood of ACZ81_08860 (window 2 → signed rank_offset,
+    bp_gap, same_strand; same-contig positional adjacency only).
+  params:
+    locus_tags: [ACZ81_08860]
+    window: 2
+  expect:
+    min_rows: 1
+    columns:
+      [anchor_locus_tag, neighbor_locus_tag, rank_offset, bp_gap, strand,
+       same_strand, product, gene_name, gene_category]

@@ -59,7 +59,22 @@ WITH d ORDER BY d.start ASC LIMIT 5 RETURN collect(d);
 
 ## Status
 
-- [ ] Spec reviewed with user
-- [ ] Index added in KG repo (post-import step)
-- [ ] KG rebuilt
-- [ ] Verification queries pass (index ONLINE + plan uses it)
+- [x] Spec reviewed with user
+- [x] Index added in KG repo (post-import step) — `gene_org_contig_start_idx` added to both `scripts/post-import.sh` and `scripts/post-import.cypher` (kept in sync); KG validity tests added in `tests/kg_validity/test_post_import.py`; documented in `CLAUDE.md`.
+- [x] Index applied live (no full rebuild needed — composite RANGE index built online via `CREATE INDEX ... IF NOT EXISTS` + `db.awaitIndexes`; ONLINE). Persisted in post-import so it survives future rebuilds.
+- [x] Verification queries pass (index ONLINE + plan uses it).
+
+### Verification result (2026-05-26, live graph)
+
+`SHOW INDEXES` → `gene_org_contig_start_idx` | `[organism_name, contig, start]` | `RANGE` | `ONLINE`.
+
+`EXPLAIN` of the neighbor subquery now seeks the composite index, with the contig equality **and** the `start` range folded into the seek (the old full-organism `NodeIndexSeek(organism_name)` + separate `Filter` is gone):
+
+```
+NodeIndexSeek | RANGE INDEX d:Gene(organism_name, contig, start)
+               WHERE organism_name = a.organism_name AND contig = a.contig AND start > a.start
+```
+
+Two notes vs. the idealized "Example Cypher" above:
+- Modern Neo4j labels this `NodeIndexSeek` (range form), not a distinct `NodeIndexSeekByRange` operator — the range predicate (`start > …`) is folded into `NodeIndexSeek` and confirmed in its `Details`.
+- A bounded `Top` (LIMIT-k top-heap) remains over the seeked window. That is over the small same-contig downstream/upstream candidate set the seek returns — not a full-organism in-memory sort — so the headline goal (seek the window, don't scan the organism) holds.

@@ -29,7 +29,11 @@ from multiomics_explorer.kg.constants import (
 )
 from multiomics_explorer.kg.queries_lib import (
     ONTOLOGY_CONFIG,
+    build_gene_aa_sequence,
+    build_gene_aa_sequence_summary,
     build_gene_existence_check,
+    build_gene_neighbors,
+    build_gene_neighbors_summary,
     build_gene_ontology_terms,
     build_gene_ontology_terms_summary,
     build_gene_overview,
@@ -6755,4 +6759,290 @@ def assays_by_metabolite(
         "returned": len(results),
         "truncated": total_matching > offset + len(results),
         "offset": offset,
+    }
+
+
+# ---------------------------------------------------------------------------
+# gene_aa_sequence
+# ---------------------------------------------------------------------------
+
+
+def gene_aa_sequence(
+    locus_tags: list[str],
+    fasta: bool = False,
+    summary: bool = False,
+    limit: int = 25,
+    offset: int = 0,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Fetch amino-acid sequences for a batch of genes, export-optimized.
+
+    Resolves each input locus_tag, keeps genes that carry a non-null
+    ``sequence``, and assembles a paginated detail list plus full-match
+    summary statistics. Use ``fasta=True`` to receive one multi-FASTA blob
+    instead of per-row sequences (the two carriers are mutually exclusive —
+    a sequence is never emitted in both).
+
+    Returns a dict with keys: total_matching, returned, truncated,
+    by_organism, sequence_length_stats, not_found, not_matched, fasta,
+    results.
+
+    - total_matching: input locus_tags resolving to a gene with a sequence.
+    - by_organism: list of {organism_name, count} over matched genes.
+    - sequence_length_stats: {count, min, q1, median, q3, max, mean} over all
+      matched genes (full match, not just the page — stable across limit and
+      offset).
+    - not_found: input locus_tags absent from the KG.
+    - not_matched: locus_tags whose gene exists but has a null sequence.
+    - fasta: multi-FASTA blob (non-empty only when fasta=True), else "".
+
+    Per result: locus_tag, organism_name, gene_name, product, protein_id,
+    sequence_length, sequence. When fasta=False the sequence carries the
+    amino-acid string; when fasta=True it is None and the envelope fasta
+    blob carries the sequences instead.
+
+    Summary fields cover the full match and are page-independent. summary=True
+    returns the envelope with results=[] (sugar for limit=0).
+
+    Raises ValueError if locus_tags is empty.
+    """
+    if not locus_tags:
+        raise ValueError("locus_tags must not be empty.")
+    if summary:
+        limit = 0
+
+    conn = _default_conn(conn)
+
+    # Step 1: gene existence check (reused primitive)
+    exist_cypher, exist_params = build_gene_existence_check(locus_tags=locus_tags)
+    exist_rows = conn.execute_query(exist_cypher, **exist_params)
+    not_found = [r["lt"] for r in exist_rows if not r["found"]]
+    found_tags = [r["lt"] for r in exist_rows if r["found"]]
+
+    # Step 2: summary builder — always runs (cheap, no sequences transferred)
+    sum_cypher, sum_params = build_gene_aa_sequence_summary(locus_tags=locus_tags)
+    sum_rows = conn.execute_query(sum_cypher, **sum_params)
+    summary_row = sum_rows[0] if sum_rows else {}
+    total_matching = summary_row.get("total_matching", 0) or 0
+    matched_tags = summary_row.get("matched_tags") or []
+    # Zero-match: aggregates are undefined. apoc.agg.percentiles over an empty set
+    # returns a variable-length all-null list, so emit explicit None stats rather
+    # than indexing into it.
+    if total_matching == 0:
+        sequence_length_stats = {
+            "count": 0, "min": None, "q1": None, "median": None,
+            "q3": None, "max": None, "mean": None,
+        }
+    else:
+        len_pcts = summary_row.get("len_pcts") or [None, None, None]
+        sequence_length_stats = {
+            "count": total_matching,
+            "min": summary_row.get("len_min"),
+            "q1": len_pcts[0],
+            "median": len_pcts[1],
+            "q3": len_pcts[2],
+            "max": summary_row.get("len_max"),
+            "mean": summary_row.get("len_mean"),
+        }
+    by_organism = _rename_freq(summary_row.get("by_organism") or [], "organism_name")
+    not_matched = [t for t in found_tags if t not in matched_tags]
+
+    # Step 3: detail builder — skip when summary-only
+    results: list[dict] = []
+    if not (summary or limit == 0):
+        det_cypher, det_params = build_gene_aa_sequence(
+            locus_tags=locus_tags, limit=limit, offset=offset,
+        )
+        results = conn.execute_query(det_cypher, **det_params)
+
+    fasta_blob = ""
+    if fasta and results:
+        lines = []
+        for row in results:
+            header = (
+                f">{row['locus_tag']} {row.get('organism_name') or ''}"
+                f"|{row.get('protein_id') or ''}|{row.get('product') or ''}"
+            )
+            lines.append(header)
+            lines.append(row.get("sequence") or "")
+        fasta_blob = "\n".join(lines) + "\n"
+        for row in results:
+            row["sequence"] = None
+
+    returned = len(results)
+    return {
+        "total_matching": total_matching,
+        "returned": returned,
+        "truncated": offset + returned < total_matching,
+        "by_organism": by_organism,
+        "sequence_length_stats": sequence_length_stats,
+        "not_found": not_found,
+        "not_matched": not_matched,
+        "fasta": fasta_blob,
+        "results": results,
+    }
+
+
+# ---------------------------------------------------------------------------
+# gene_neighbors
+# ---------------------------------------------------------------------------
+
+
+def gene_neighbors(
+    locus_tags: list[str],
+    window: int = 5,
+    max_bp_distance: int | None = None,
+    same_strand: bool | None = None,
+    summary: bool = False,
+    limit: int = 25,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Fetch each gene's genomic neighborhood for operon or synteny reasoning.
+
+    For every anchor locus_tag, returns the closest ``window`` genes upstream
+    and downstream on the same contig and organism, with strand orientation
+    and intergenic distance. Neighbors are positional only (same-contig
+    adjacency) — not co-expression. Fragmented assemblies yield fewer or no
+    neighbors near contig ends.
+
+    Returns a dict with keys: total_matching, returned, truncated, anchors,
+    by_organism, not_found, not_matched, warnings, results.
+
+    - total_matching: neighbor rows after max_bp_distance and same_strand
+      filters (pre-limit).
+    - anchors: list of per-anchor blocks {locus_tag, organism_name, contig,
+      start, end, strand, product, neighbors_returned, dropped_null_strand}.
+    - by_organism: list of {organism_name, count} over neighbor rows.
+    - not_found: anchor locus_tags absent from the KG.
+    - not_matched: anchors that exist but lack coordinates (no neighborhood).
+    - warnings: e.g. same_strand requested but an anchor's own strand is null,
+      so its neighbors are returned unfiltered.
+
+    Per result (flat long, one row per anchor × neighbor): anchor_locus_tag,
+    neighbor_locus_tag, rank_offset (signed, negative = upstream by start),
+    bp_gap (unsigned intergenic distance, 0 if intervals overlap), strand,
+    same_strand (True/False/None — None when either strand is null), product,
+    gene_name, gene_category.
+
+    same_strand=None returns all neighbors; True keeps co-oriented only; False
+    keeps opposite-strand only. When set, null-strand neighbors are dropped and
+    counted into the anchor's dropped_null_strand, except when the anchor's own
+    strand is null — then all its neighbors are kept and a warning is added.
+    summary=True returns the envelope with results=[] (sugar for limit=0).
+
+    Raises ValueError if locus_tags is empty.
+    """
+    if not locus_tags:
+        raise ValueError("locus_tags must not be empty.")
+    if summary:
+        limit = 0
+
+    conn = _default_conn(conn)
+
+    # Step 1: gene existence check (reused primitive)
+    exist_cypher, exist_params = build_gene_existence_check(locus_tags=locus_tags)
+    exist_rows = conn.execute_query(exist_cypher, **exist_params)
+    not_found = [r["lt"] for r in exist_rows if not r["found"]]
+
+    # Step 2: anchor metadata over existing anchors
+    anc_cypher, anc_params = build_gene_neighbors_summary(locus_tags=locus_tags)
+    anc_rows = conn.execute_query(anc_cypher, **anc_params)
+    not_matched = [r["anchor_locus_tag"] for r in anc_rows if not r["has_coords"]]
+
+    # anchor strand lookup for same_strand handling; build anchor blocks
+    anchor_strand: dict[str, str | None] = {}
+    anchors: list[dict] = []
+    for r in anc_rows:
+        if not r["has_coords"]:
+            continue
+        lt = r["anchor_locus_tag"]
+        anchor_strand[lt] = r.get("strand")
+        anchors.append({
+            "locus_tag": lt,
+            "organism_name": r.get("organism_name"),
+            "contig": r.get("contig"),
+            "start": r.get("start"),
+            "end": r.get("end"),
+            "strand": r.get("strand"),
+            "product": r.get("product"),
+            "neighbors_returned": 0,
+            "dropped_null_strand": 0,
+        })
+
+    # Step 3: detail builder — skip when summary-only
+    warnings: list[str] = []
+    filtered: list[dict] = []
+    anchor_by_tag = {a["locus_tag"]: a for a in anchors}
+    if not (summary or limit == 0):
+        det_cypher, det_params = build_gene_neighbors(
+            locus_tags=locus_tags, window=window, max_bp_distance=max_bp_distance,
+        )
+        detail_rows = conn.execute_query(det_cypher, **det_params)
+
+        # same_strand filter applied in Python, per anchor
+        per_anchor: dict[str, list[dict]] = {}
+        for row in detail_rows:
+            per_anchor.setdefault(row["anchor_locus_tag"], []).append(row)
+
+        warned_null_anchor: set[str] = set()
+        for anchor_tag, rows in per_anchor.items():
+            block = anchor_by_tag.get(anchor_tag)
+            if same_strand is None:
+                kept = rows
+            elif anchor_strand.get(anchor_tag) is None:
+                # Anchor's own strand is null → filter unappliable; keep all.
+                kept = rows
+                if anchor_tag not in warned_null_anchor:
+                    warnings.append(
+                        f"same_strand requested but anchor {anchor_tag} has a "
+                        f"null strand; its neighbors are returned unfiltered."
+                    )
+                    warned_null_anchor.add(anchor_tag)
+            else:
+                kept = []
+                dropped_null = 0
+                for row in rows:
+                    if row.get("same_strand") == same_strand:
+                        kept.append(row)
+                    elif row.get("strand") is None:
+                        dropped_null += 1
+                if block is not None:
+                    block["dropped_null_strand"] = dropped_null
+            if block is not None:
+                block["neighbors_returned"] = len(kept)
+            filtered.extend(kept)
+
+        filtered.sort(key=lambda r: (r["anchor_locus_tag"], r["rank_offset"]))
+
+    total_matching = len(filtered)
+    results = filtered[:limit] if limit else filtered
+
+    # by_organism rolls up neighbor rows over the post-filter set. Neighbor
+    # rows are same-contig/organism as their anchor, so the organism comes
+    # from the anchor block.
+    anchor_org = {a["locus_tag"]: a["organism_name"] for a in anchors}
+    org_counts: dict[str, int] = {}
+    for row in filtered:
+        org = anchor_org.get(row["anchor_locus_tag"])
+        if org is not None:
+            org_counts[org] = org_counts.get(org, 0) + 1
+    by_organism = sorted(
+        [{"organism_name": org, "count": cnt} for org, cnt in org_counts.items()],
+        key=lambda x: x["count"],
+        reverse=True,
+    )
+
+    returned = len(results)
+    return {
+        "total_matching": total_matching,
+        "returned": returned,
+        "truncated": total_matching > returned,
+        "anchors": anchors,
+        "by_organism": by_organism,
+        "not_found": not_found,
+        "not_matched": not_matched,
+        "warnings": warnings,
+        "results": results,
     }

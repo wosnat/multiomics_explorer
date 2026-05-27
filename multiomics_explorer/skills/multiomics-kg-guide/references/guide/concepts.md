@@ -85,7 +85,12 @@ and `list_organisms`. Discover valid values with
   `cluster_membership_count`, `closest_ortholog_group_size`,
   `reaction_count`, `metabolite_count`, `tcdb_family_count`,
   `cazy_family_count`, `compartments_observed`, `annotation_quality`
-  (0..3 — see `docs://guide/conventions`).
+  (0..3 — see `docs://guide/conventions`). Each Gene also carries an
+  amino-acid `sequence` and genomic coordinates (`contig`, `start`,
+  `end`, `strand`) — all co-populated; null only on the ~3% of
+  expression-only genes with no genome match. Exposed by
+  `gene_aa_sequence` (sequences) and `gene_neighbors` (coordinates →
+  positional neighborhood).
 - **`Protein`** / **`Polypeptide`** — each Gene has at most one
   Protein (`Gene_encodes_protein`). Few tools surface Protein directly;
   it is mostly a backbone node.

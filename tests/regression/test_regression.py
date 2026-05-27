@@ -17,9 +17,11 @@ import multiomics_explorer.api.functions as api
 from multiomics_explorer.kg.queries_lib import (
     build_differential_expression_by_gene,
     build_differential_expression_by_ortholog_results,
+    build_gene_aa_sequence,
     build_gene_derived_metrics,
     build_gene_derived_metrics_summary,
     build_gene_details,
+    build_gene_neighbors,
     build_genes_by_boolean_metric,
     build_genes_by_boolean_metric_summary,
     build_genes_by_categorical_metric,
@@ -72,6 +74,8 @@ TOOL_BUILDERS = {
     "gene_overview": build_gene_overview,
     "gene_details": build_gene_details,
     "gene_homologs": build_gene_homologs,
+    "gene_aa_sequence": build_gene_aa_sequence,
+    "gene_neighbors": build_gene_neighbors,
     "list_organisms": build_list_organisms,
     "search_ontology": build_search_ontology,
     # genes_by_ontology: dispatched via api (L2) — returns envelope, not flat rows

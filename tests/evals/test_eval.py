@@ -20,8 +20,10 @@ from functools import partial
 from multiomics_explorer.api import functions as api
 from multiomics_explorer.kg.queries_lib import (
     build_differential_expression_by_gene,
+    build_gene_aa_sequence,
     build_gene_derived_metrics,
     build_gene_derived_metrics_summary,
+    build_gene_neighbors,
     build_gene_ontology_terms,
     build_gene_overview,
     build_gene_stub,
@@ -71,6 +73,8 @@ TOOL_BUILDERS = {
     "gene_overview": build_gene_overview,
     "gene_details": build_gene_details,
     "gene_homologs": build_gene_homologs,
+    "gene_aa_sequence": build_gene_aa_sequence,
+    "gene_neighbors": build_gene_neighbors,
     "list_organisms": build_list_organisms,
     "search_ontology": build_search_ontology,
     # genes_by_ontology / ontology_landscape: dispatched via api (L2) —

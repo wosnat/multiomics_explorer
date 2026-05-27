@@ -8,9 +8,13 @@ import pytest
 from multiomics_explorer.kg.constants import ALL_ONTOLOGIES, GO_ONTOLOGIES
 from multiomics_explorer.kg.queries_lib import (
     ONTOLOGY_CONFIG,
+    build_gene_aa_sequence,
+    build_gene_aa_sequence_summary,
     build_gene_existence_check,
     build_gene_homologs,
     build_gene_homologs_summary,
+    build_gene_neighbors,
+    build_gene_neighbors_summary,
     build_gene_ontology_terms,
     build_gene_ontology_terms_summary,
     build_gene_overview,
@@ -2397,6 +2401,236 @@ class TestBuildGeneExistenceCheck:
         """params dict includes locus_tags."""
         _, params = build_gene_existence_check(locus_tags=["PMM0001", "PMM0002"])
         assert params == {"locus_tags": ["PMM0001", "PMM0002"]}
+
+
+# ---------------------------------------------------------------------------
+# gene_aa_sequence
+# ---------------------------------------------------------------------------
+class TestBuildGeneAaSequence:
+    def test_returns_expected_columns(self):
+        """Detail RETURN exposes the export columns."""
+        cypher, _ = build_gene_aa_sequence(locus_tags=["ACZ81_08860"])
+        for col in [
+            "locus_tag",
+            "organism_name",
+            "gene_name",
+            "product",
+            "protein_id",
+            "sequence_length",
+            "sequence",
+        ]:
+            assert col in cypher
+
+    def test_sequence_not_null_filter(self):
+        """Only genes with a non-null sequence are returned."""
+        cypher, _ = build_gene_aa_sequence(locus_tags=["ACZ81_08860"])
+        assert "g.sequence IS NOT NULL" in cypher
+
+    def test_matches_locus_tags_in_list(self):
+        """WHERE filters on the locus_tags param."""
+        cypher, params = build_gene_aa_sequence(locus_tags=["ACZ81_08860", "PMM0001"])
+        assert "g.locus_tag IN $locus_tags" in cypher
+        assert params["locus_tags"] == ["ACZ81_08860", "PMM0001"]
+
+    def test_sequence_length_uses_size(self):
+        """sequence_length derived from size(g.sequence)."""
+        cypher, _ = build_gene_aa_sequence(locus_tags=["ACZ81_08860"])
+        assert "size(g.sequence)" in cypher
+
+    def test_order_by(self):
+        """Deterministic sort by organism_name then locus_tag."""
+        cypher, _ = build_gene_aa_sequence(locus_tags=["ACZ81_08860"])
+        assert "ORDER BY g.organism_name, g.locus_tag" in cypher
+
+    def test_limit_clause(self):
+        """LIMIT $limit appended when limit set."""
+        cypher, params = build_gene_aa_sequence(locus_tags=["ACZ81_08860"], limit=25)
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 25
+
+    def test_offset_emits_skip_before_limit(self):
+        """offset > 0 emits SKIP $offset before LIMIT — push the cut into Cypher."""
+        cypher, params = build_gene_aa_sequence(
+            locus_tags=["ACZ81_08860"], limit=25, offset=10,
+        )
+        assert "SKIP $offset" in cypher
+        assert params["offset"] == 10
+        assert cypher.index("SKIP") < cypher.index("LIMIT")
+
+    def test_offset_zero_no_skip(self):
+        """offset == 0 emits no SKIP clause."""
+        cypher, params = build_gene_aa_sequence(
+            locus_tags=["ACZ81_08860"], limit=25, offset=0,
+        )
+        assert "SKIP" not in cypher
+        assert "offset" not in params
+
+
+class TestBuildGeneAaSequenceSummary:
+    def test_single_row_aggregate_columns(self):
+        """Summary RETURN exposes the aggregate keys (single summary row)."""
+        cypher, _ = build_gene_aa_sequence_summary(locus_tags=["ACZ81_08860"])
+        for col in [
+            "total_matching",
+            "matched_tags",
+            "by_organism",
+            "len_min",
+            "len_max",
+            "len_mean",
+            "len_pcts",
+        ]:
+            assert col in cypher
+
+    def test_sequence_not_null_filter(self):
+        """Summary also gates on non-null sequence."""
+        cypher, _ = build_gene_aa_sequence_summary(locus_tags=["ACZ81_08860"])
+        assert "g.sequence IS NOT NULL" in cypher
+
+    def test_uses_apoc_aggregates(self):
+        """Percentiles + organism frequencies computed in Cypher via apoc."""
+        cypher, _ = build_gene_aa_sequence_summary(locus_tags=["ACZ81_08860"])
+        assert "apoc.agg.percentiles(" in cypher
+        assert "apoc.coll.frequencies(" in cypher
+
+    def test_order_by_before_collect(self):
+        """ORDER BY precedes collect() so matched_tags is deterministic."""
+        cypher, _ = build_gene_aa_sequence_summary(locus_tags=["ACZ81_08860"])
+        assert "ORDER BY" in cypher
+        assert "collect(" in cypher
+        assert cypher.index("ORDER BY") < cypher.index("collect(")
+
+    def test_params_include_locus_tags(self):
+        _, params = build_gene_aa_sequence_summary(
+            locus_tags=["ACZ81_08860", "PMM0001"],
+        )
+        assert params["locus_tags"] == ["ACZ81_08860", "PMM0001"]
+
+
+# ---------------------------------------------------------------------------
+# gene_neighbors
+# ---------------------------------------------------------------------------
+class TestBuildGeneNeighbors:
+    def test_returns_expected_columns(self):
+        """Detail RETURN exposes the flat-long neighbor columns."""
+        cypher, _ = build_gene_neighbors(locus_tags=["ACZ81_08860"], window=5)
+        for col in [
+            "anchor_locus_tag",
+            "neighbor_locus_tag",
+            "rank_offset",
+            "bp_gap",
+            "strand",
+            "same_strand",
+            "product",
+            "gene_name",
+            "gene_category",
+        ]:
+            assert col in cypher
+
+    def test_two_correlated_subqueries_with_inner_collect(self):
+        """Two CALL {} subqueries each with collect() INSIDE (boundary-safe)."""
+        cypher, _ = build_gene_neighbors(locus_tags=["ACZ81_08860"], window=5)
+        assert cypher.count("CALL {") == 2
+        # collect() inside each subquery → empty list (not dropped anchor) at contig edges.
+        assert "collect(u)" in cypher
+        assert "collect(d)" in cypher
+
+    def test_upstream_downstream_ordered_limit_window(self):
+        """Upstream ORDER BY start DESC, downstream ASC, each LIMIT $window."""
+        cypher, params = build_gene_neighbors(locus_tags=["ACZ81_08860"], window=3)
+        assert "ORDER BY u.start DESC LIMIT $window" in cypher
+        assert "ORDER BY d.start ASC LIMIT $window" in cypher
+        assert params["window"] == 3
+
+    def test_rank_offset_signed(self):
+        """rank_offset is signed: negative upstream, positive downstream."""
+        cypher, _ = build_gene_neighbors(locus_tags=["ACZ81_08860"], window=5)
+        # upstream offsets negative, downstream positive
+        assert "-(i+1)" in cypher
+        assert "(i+1)" in cypher
+
+    def test_bp_gap_case_expression(self):
+        """bp_gap computed via CASE on overlap/up/downstream intervals."""
+        cypher, _ = build_gene_neighbors(locus_tags=["ACZ81_08860"], window=5)
+        assert "CASE" in cypher
+        assert "bp_gap" in cypher
+
+    def test_same_strand_expression(self):
+        """same_strand = (nb.strand = a.strand)."""
+        cypher, _ = build_gene_neighbors(locus_tags=["ACZ81_08860"], window=5)
+        assert "(nb.strand = a.strand)" in cypher
+
+    def test_window_filter_anchor_has_coords(self):
+        """Anchors gated on non-null contig + start before windowing."""
+        cypher, _ = build_gene_neighbors(locus_tags=["ACZ81_08860"], window=5)
+        assert "a.contig IS NOT NULL" in cypher
+        assert "a.start IS NOT NULL" in cypher
+
+    def test_order_by(self):
+        """Deterministic sort by anchor then signed rank_offset."""
+        cypher, _ = build_gene_neighbors(locus_tags=["ACZ81_08860"], window=5)
+        assert "ORDER BY anchor_locus_tag, rank_offset" in cypher
+
+    def test_no_max_bp_distance_clause_when_none(self):
+        """max_bp_distance=None → no bp_gap WHERE filter, no param."""
+        cypher, params = build_gene_neighbors(
+            locus_tags=["ACZ81_08860"], window=5, max_bp_distance=None,
+        )
+        assert "bp_gap <= $max_bp_distance" not in cypher
+        assert "max_bp_distance" not in params
+
+    def test_max_bp_distance_appends_where(self):
+        """max_bp_distance set → bp_gap <= $max_bp_distance filter + param."""
+        cypher, params = build_gene_neighbors(
+            locus_tags=["ACZ81_08860"], window=5, max_bp_distance=400,
+        )
+        assert "bp_gap <= $max_bp_distance" in cypher
+        assert params["max_bp_distance"] == 400
+
+    def test_params_include_locus_tags(self):
+        _, params = build_gene_neighbors(
+            locus_tags=["ACZ81_08860", "ACZ81_00010"], window=2,
+        )
+        assert params["locus_tags"] == ["ACZ81_08860", "ACZ81_00010"]
+
+
+class TestBuildGeneNeighborsSummary:
+    def test_returns_expected_columns(self):
+        """Anchor-metadata RETURN exposes identity + has_coords."""
+        cypher, _ = build_gene_neighbors_summary(locus_tags=["ACZ81_08860"])
+        for col in [
+            "anchor_locus_tag",
+            "organism_name",
+            "contig",
+            "start",
+            "end",
+            "strand",
+            "product",
+            "has_coords",
+        ]:
+            assert col in cypher
+
+    def test_uses_match_not_optional_match(self):
+        """MATCH (not OPTIONAL MATCH) → only existing anchors return rows."""
+        cypher, _ = build_gene_neighbors_summary(locus_tags=["ACZ81_08860"])
+        assert "MATCH" in cypher
+        assert "OPTIONAL MATCH" not in cypher
+
+    def test_has_coords_expression(self):
+        """has_coords derived from non-null contig + start."""
+        cypher, _ = build_gene_neighbors_summary(locus_tags=["ACZ81_08860"])
+        assert "a.contig IS NOT NULL" in cypher
+        assert "a.start IS NOT NULL" in cypher
+        assert "has_coords" in cypher
+
+    def test_order_by(self):
+        cypher, _ = build_gene_neighbors_summary(locus_tags=["ACZ81_08860"])
+        assert "ORDER BY anchor_locus_tag" in cypher
+
+    def test_params_include_locus_tags(self):
+        _, params = build_gene_neighbors_summary(
+            locus_tags=["ACZ81_08860", "SYNW1755"],
+        )
+        assert params["locus_tags"] == ["ACZ81_08860", "SYNW1755"]
 
 
 # ---------------------------------------------------------------------------

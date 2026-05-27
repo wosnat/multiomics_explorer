@@ -9199,3 +9199,184 @@ def register_tools(mcp: FastMCP):
             truncated=data["truncated"],
             offset=data["offset"],
         )
+
+    # -------------------------------------------------------------------
+    # gene_aa_sequence
+    # -------------------------------------------------------------------
+    class SequenceLengthStats(BaseModel):
+        count: int = Field(description="Genes with a sequence in the matched set (full match, not just the page). E.g. 2.")
+        min: int | None = Field(default=None, description="Shortest amino-acid length in the matched set; None when count=0. E.g. 178.")
+        q1: float | None = Field(default=None, description="25th-percentile amino-acid length; None when count=0. E.g. 178.0.")
+        median: float | None = Field(default=None, description="Median amino-acid length; None when count=0. E.g. 332.5.")
+        q3: float | None = Field(default=None, description="75th-percentile amino-acid length; None when count=0. E.g. 487.0.")
+        max: int | None = Field(default=None, description="Longest amino-acid length in the matched set; None when count=0. E.g. 487.")
+        mean: float | None = Field(default=None, description="Mean amino-acid length across the matched set; None when count=0. E.g. 332.5.")
+
+    class OrganismCount(BaseModel):
+        organism_name: str = Field(description="Organism the matched genes belong to. E.g. 'Alteromonas macleodii HOT1A3'.")
+        count: int = Field(description="Number of matched genes from this organism. E.g. 2.")
+
+    class GeneAaSequenceResult(BaseModel):
+        locus_tag: str = Field(description="Gene locus tag (globally unique). E.g. 'ACZ81_08860'.")
+        organism_name: str = Field(description="Organism the gene belongs to. E.g. 'Alteromonas macleodii HOT1A3'.")
+        gene_name: str | None = Field(default=None, description="Short gene name, often null. E.g. 'dnaN'.")
+        product: str | None = Field(default=None, description="Protein product description. E.g. 'DNA polymerase III subunit beta'.")
+        protein_id: str | None = Field(default=None, description="Protein accession used in the FASTA header. E.g. 'WP_011469022.1'.")
+        sequence_length: int = Field(description="Amino-acid length of the sequence. E.g. 487.")
+        sequence: str | None = Field(default=None, description="Amino-acid sequence string. Null when fasta=true (carried by the envelope `fasta` blob instead). E.g. 'MKFTI...'.")
+
+    class GeneAaSequenceResponse(BaseModel):
+        total_matching: int = Field(description="Input locus_tags resolving to a gene with a sequence. E.g. 2.")
+        returned: int = Field(description="Rows in this response (0 when summary=true). E.g. 2.")
+        truncated: bool = Field(description="True when more matched rows exist beyond this page (offset + returned < total_matching).")
+        by_organism: list["OrganismCount"] = Field(default_factory=list, description="Matched-gene count per organism, sorted desc. E.g. [{'organism_name': 'Alteromonas macleodii HOT1A3', 'count': 2}].")
+        sequence_length_stats: "SequenceLengthStats" = Field(description="Amino-acid-length distribution over ALL matched genes (page-independent — stable across limit/offset).")
+        not_found: list[str] = Field(default_factory=list, description="Input locus_tags absent from the KG. Distinct from not_matched (those exist but lack a sequence). E.g. ['NOTAREAL'].")
+        not_matched: list[str] = Field(default_factory=list, description="Locus_tags whose gene exists but has a null sequence (expression-only, no genome match). Distinct from not_found. E.g. ['SYNW1755'].")
+        fasta: str = Field(default="", description="Multi-FASTA blob covering the returned page (non-empty only when fasta=true; '' otherwise). Header: '>{locus_tag} {organism_name}|{protein_id}|{product}'.")
+        results: list["GeneAaSequenceResult"] = Field(default_factory=list, description="One row per matched gene, sorted by organism_name then locus_tag. Empty when summary=true.")
+
+    @mcp.tool(tags={"gene", "sequence"}, annotations={"readOnlyHint": True})
+    async def gene_aa_sequence(
+        ctx: Context,
+        locus_tags: Annotated[list[str], Field(
+            description="Gene locus tags. Cross-organism OK (globally unique). E.g. ['ACZ81_08860', 'PMM0001'].")],
+        fasta: Annotated[bool, Field(
+            description="If true, omit per-row `sequence` and return one multi-FASTA blob in the envelope instead (no duplication).")] = False,
+        summary: Annotated[bool, Field(
+            description="If true, return envelope only (results=[]); sugar for limit=0.")] = False,
+        limit: Annotated[int, Field(description="Max results.", ge=1)] = 25,
+        offset: Annotated[int, Field(description="Rows to skip for pagination.", ge=0)] = 0,
+    ) -> GeneAaSequenceResponse:
+        """Return amino-acid sequences for a batch of genes, export-optimized for BLAST / HMMER / alignment. Set fasta=true for one multi-FASTA blob; sequence-length stats cover the full match (page-independent). not_found = locus_tag absent from KG; not_matched = gene exists but its sequence is null.
+
+        Routing: feed locus_tags from `resolve_gene` / `gene_overview` / `genes_by_function`; this is the terminal export step (pair with fasta=true for external tools).
+        """
+        await ctx.info(
+            f"gene_aa_sequence locus_tags={len(locus_tags)} fasta={fasta} "
+            f"summary={summary} limit={limit} offset={offset}"
+        )
+        try:
+            conn = _conn(ctx)
+            data = api.gene_aa_sequence(
+                locus_tags,
+                fasta=fasta,
+                summary=summary,
+                limit=limit,
+                offset=offset,
+                conn=conn,
+            )
+        except ValueError as e:
+            await ctx.warning(f"gene_aa_sequence error: {e}")
+            raise ToolError(str(e)) from e
+        except Exception as e:
+            await ctx.error(f"gene_aa_sequence unexpected error: {e}")
+            raise ToolError(f"Error in gene_aa_sequence: {e}")
+
+        by_organism = [OrganismCount(**b) for b in data["by_organism"]]
+        sequence_length_stats = SequenceLengthStats(**data["sequence_length_stats"])
+        results = [GeneAaSequenceResult(**r) for r in data["results"]]
+        return GeneAaSequenceResponse(
+            total_matching=data["total_matching"],
+            returned=data["returned"],
+            truncated=data["truncated"],
+            by_organism=by_organism,
+            sequence_length_stats=sequence_length_stats,
+            not_found=data["not_found"],
+            not_matched=data["not_matched"],
+            fasta=data["fasta"],
+            results=results,
+        )
+
+    # -------------------------------------------------------------------
+    # gene_neighbors
+    # -------------------------------------------------------------------
+    class GeneNeighborsResult(BaseModel):
+        anchor_locus_tag: str = Field(description="Anchor gene the neighbor is reported relative to. E.g. 'ACZ81_08860'.")
+        neighbor_locus_tag: str = Field(description="Adjacent gene on the same contig. E.g. 'ACZ81_08850'.")
+        rank_offset: int = Field(description="Signed positional offset by start order; negative = upstream, positive = downstream; anchor itself excluded. E.g. -1.")
+        bp_gap: int = Field(description="Unsigned intergenic distance (bp) between anchor and neighbor; 0 if their intervals overlap. E.g. 10.")
+        strand: str | None = Field(default=None, description="Neighbor strand, '+' or '-' (genes with coordinates carry a strand; rarely null). E.g. '+'.")
+        same_strand: bool | None = Field(default=None, description="True if neighbor and anchor share a strand, False if opposite; None when either strand is null. E.g. True.")
+        product: str | None = Field(default=None, description="Neighbor protein product. E.g. 'hypothetical protein'.")
+        gene_name: str | None = Field(default=None, description="Neighbor short gene name, often null. E.g. 'dnaA'.")
+        gene_category: str | None = Field(default=None, description="Neighbor functional category. E.g. 'unknown'.")
+
+    class AnchorBlock(BaseModel):
+        locus_tag: str = Field(description="Anchor gene locus tag. E.g. 'ACZ81_08860'.")
+        organism_name: str = Field(description="Organism the anchor belongs to (scopes the neighbor window). E.g. 'Alteromonas macleodii HOT1A3'.")
+        contig: str = Field(description="Contig the anchor sits on; neighbors are on this same contig. E.g. 'contig1'.")
+        start: int = Field(description="Anchor genomic start coordinate. E.g. 1000.")
+        end: int = Field(description="Anchor genomic end coordinate. E.g. 1500.")
+        strand: str | None = Field(default=None, description="Anchor strand, '+' or '-'; rarely null (would make same_strand unappliable → see warnings). E.g. '+'.")
+        product: str | None = Field(default=None, description="Anchor protein product. E.g. 'DNA polymerase III subunit beta'.")
+        neighbors_returned: int = Field(description="Neighbor rows kept for this anchor after filters, before the response-level `limit` (so the per-anchor count can exceed rows shown). E.g. 2.")
+        dropped_null_strand: int = Field(description="Neighbors dropped because their strand was null while same_strand was set. E.g. 0.")
+
+    class GeneNeighborsResponse(BaseModel):
+        total_matching: int = Field(description="Neighbor rows after max_bp_distance + same_strand filters (pre-limit). E.g. 2.")
+        returned: int = Field(description="Rows in this response (0 when summary=true). E.g. 2.")
+        truncated: bool = Field(description="True when total_matching > returned (more neighbor rows than this page).")
+        anchors: list["AnchorBlock"] = Field(default_factory=list, description="One block per anchor that has coordinates, with anchor metadata and per-anchor neighbor counts.")
+        by_organism: list["OrganismCount"] = Field(default_factory=list, description="Neighbor-row count per organism, sorted desc. E.g. [{'organism_name': 'Alteromonas macleodii HOT1A3', 'count': 2}].")
+        not_found: list[str] = Field(default_factory=list, description="Anchor locus_tags absent from the KG. Distinct from not_matched (those exist but lack coordinates). E.g. ['NOTAREAL'].")
+        not_matched: list[str] = Field(default_factory=list, description="Anchors that exist but lack genomic coordinates (null start/contig) → no neighborhood. Distinct from not_found. E.g. ['SYNW1755'].")
+        warnings: list[str] = Field(default_factory=list, description="Advisory notes, e.g. same_strand requested but an anchor's own strand is null → its neighbors returned unfiltered.")
+        results: list["GeneNeighborsResult"] = Field(default_factory=list, description="One row per anchor × neighbor, sorted by anchor_locus_tag then rank_offset. Empty when summary=true.")
+
+    @mcp.tool(tags={"gene", "genome"}, annotations={"readOnlyHint": True})
+    async def gene_neighbors(
+        ctx: Context,
+        locus_tags: Annotated[list[str], Field(
+            description="Anchor gene locus tags. Cross-organism OK. E.g. ['ACZ81_08860'].")],
+        window: Annotated[int, Field(
+            description="Number of genes upstream AND downstream on the same contig (±N by start order).", ge=1)] = 5,
+        max_bp_distance: Annotated[int | None, Field(
+            description="Optional cap: drop neighbors whose intergenic gap to the anchor exceeds this many bp.")] = None,
+        same_strand: Annotated[bool | None, Field(
+            description="None=all neighbors; True=co-oriented only; False=opposite-strand only. Null-strand neighbors dropped when set.")] = None,
+        summary: Annotated[bool, Field(
+            description="If true, return envelope only (results=[]); sugar for limit=0.")] = False,
+        limit: Annotated[int, Field(description="Max neighbor rows.", ge=1)] = 25,
+    ) -> GeneNeighborsResponse:
+        """Return each anchor gene's genomic neighborhood — genes adjacent on the same contig and organism — for operon / synteny reasoning, with strand orientation and intergenic gap. Positional only (not co-expression); fragmented assemblies yield fewer neighbors near contig ends. not_found = anchor absent from KG; not_matched = anchor exists but lacks coordinates.
+
+        Routing: feed anchors from `differential_expression_by_gene` or `genes_by_metabolite`, then chain the returned neighbor locus_tags into `gene_overview` / `gene_aa_sequence` / `differential_expression_by_gene` for operon context.
+        """
+        await ctx.info(
+            f"gene_neighbors locus_tags={len(locus_tags)} window={window} "
+            f"max_bp_distance={max_bp_distance} same_strand={same_strand} "
+            f"summary={summary} limit={limit}"
+        )
+        try:
+            conn = _conn(ctx)
+            data = api.gene_neighbors(
+                locus_tags,
+                window=window,
+                max_bp_distance=max_bp_distance,
+                same_strand=same_strand,
+                summary=summary,
+                limit=limit,
+                conn=conn,
+            )
+        except ValueError as e:
+            await ctx.warning(f"gene_neighbors error: {e}")
+            raise ToolError(str(e)) from e
+        except Exception as e:
+            await ctx.error(f"gene_neighbors unexpected error: {e}")
+            raise ToolError(f"Error in gene_neighbors: {e}")
+
+        anchors = [AnchorBlock(**a) for a in data["anchors"]]
+        by_organism = [OrganismCount(**b) for b in data["by_organism"]]
+        results = [GeneNeighborsResult(**r) for r in data["results"]]
+        return GeneNeighborsResponse(
+            total_matching=data["total_matching"],
+            returned=data["returned"],
+            truncated=data["truncated"],
+            anchors=anchors,
+            by_organism=by_organism,
+            not_found=data["not_found"],
+            not_matched=data["not_matched"],
+            warnings=data["warnings"],
+            results=results,
+        )

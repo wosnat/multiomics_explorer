@@ -75,6 +75,8 @@ EXPECTED_TOOLS = [
     "metabolites_by_quantifies_assay",
     "metabolites_by_flags_assay",
     "assays_by_metabolite",
+    "gene_aa_sequence",
+    "gene_neighbors",
 ]
 
 
@@ -6437,12 +6439,16 @@ class TestExpectedToolsUnchangedForTcdbCazy:
         # (metabolites_by_quantifies_assay + metabolites_by_flags_assay +
         # assays_by_metabolite — all legitimate new MCP tools, separate
         # spec, parallel addition).
-        assert len(EXPECTED_TOOLS) == 37, (
+        # Bumped 37 → 39 by the gene-sequence-neighbors slice
+        # (gene_aa_sequence + gene_neighbors — both legitimate new MCP tools,
+        # separate spec, parallel addition).
+        assert len(EXPECTED_TOOLS) == 39, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
             "tcdb/cazy adds NO new tools (it's a Mode-B ontology surface "
             "refresh); MBG legitimately adds one; "
             "list_metabolite_assays legitimately adds one; "
-            "metabolites-by-assay 3-tool slice legitimately adds three."
+            "metabolites-by-assay 3-tool slice legitimately adds three; "
+            "gene_aa_sequence + gene_neighbors legitimately add two."
         )
 
 
@@ -7065,11 +7071,15 @@ class TestExpectedToolsUnchangedForPhase1Plumbing:
         # Bumped 34 → 37 by Phase 5 metabolites-by-assay 3-tool slice
         # (metabolites_by_quantifies_assay + metabolites_by_flags_assay +
         # assays_by_metabolite — all legitimate new MCP tools, separate spec).
-        assert len(EXPECTED_TOOLS) == 37, (
+        # Bumped 37 → 39 by the gene-sequence-neighbors slice
+        # (gene_aa_sequence + gene_neighbors — both legitimate new MCP tools,
+        # separate spec).
+        assert len(EXPECTED_TOOLS) == 39, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
             "Phase 1 plumbing adds no new tools — only field additions; "
             "Phase 5 list_metabolite_assays legitimately adds one; "
-            "metabolites-by-assay 3-tool slice legitimately adds three."
+            "metabolites-by-assay 3-tool slice legitimately adds three; "
+            "gene_aa_sequence + gene_neighbors legitimately add two."
         )
 
 
@@ -8267,3 +8277,306 @@ class TestAssaysByMetaboliteWrapper:
         # Flat not_found per parent §13.6 (single-batch reverse-lookup)
         assert isinstance(result.not_found, list)
         assert result.metabolites_matched == 1
+
+
+# ---------------------------------------------------------------------------
+# gene_aa_sequence
+# ---------------------------------------------------------------------------
+class TestGeneAaSequenceWrapper:
+    _SAMPLE_API_RETURN = {
+        "total_matching": 2,
+        "returned": 2,
+        "truncated": False,
+        "by_organism": [{"organism_name": "Alteromonas macleodii HOT1A3", "count": 2}],
+        "sequence_length_stats": {
+            "count": 2, "min": 178, "q1": 178.0, "median": 178.0,
+            "q3": 487.0, "max": 487, "mean": 332.5,
+        },
+        "not_found": [],
+        "not_matched": [],
+        "fasta": "",
+        "results": [
+            {"locus_tag": "ACZ81_08855", "organism_name": "Alteromonas macleodii HOT1A3",
+             "gene_name": None, "product": "hypothetical protein",
+             "protein_id": "WP_001", "sequence_length": 178, "sequence": "M" * 178},
+            {"locus_tag": "ACZ81_08860", "organism_name": "Alteromonas macleodii HOT1A3",
+             "gene_name": "dnaN", "product": "DNA polymerase III subunit beta",
+             "protein_id": "WP_002", "sequence_length": 487, "sequence": "M" * 487},
+        ],
+    }
+
+    @pytest.mark.asyncio
+    async def test_returns_response_envelope(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_aa_sequence",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["gene_aa_sequence"](
+                mock_ctx, locus_tags=["ACZ81_08855", "ACZ81_08860"],
+            )
+        assert result.total_matching == 2
+        assert result.returned == 2
+        assert result.truncated is False
+        assert len(result.results) == 2
+        r = result.results[0]
+        assert r.locus_tag == "ACZ81_08855"
+        assert r.sequence_length == 178
+
+    @pytest.mark.asyncio
+    async def test_empty_results(self, tool_fns, mock_ctx):
+        data = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 0,
+            "returned": 0,
+            "by_organism": [],
+            "not_found": ["NOTAREAL"],
+            "results": [],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_aa_sequence",
+            return_value=data,
+        ):
+            result = await tool_fns["gene_aa_sequence"](
+                mock_ctx, locus_tags=["NOTAREAL"],
+            )
+        assert result.results == []
+        assert result.returned == 0
+        assert "NOTAREAL" in result.not_found
+
+    @pytest.mark.asyncio
+    async def test_zero_match_none_stats_no_crash(self, tool_fns, mock_ctx):
+        """Zero-match all-None sequence_length_stats must validate (nullable fields),
+        not raise ToolError. Regression guard for the empty-batch BLOCKER."""
+        data = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 0, "returned": 0, "by_organism": [],
+            "sequence_length_stats": {
+                "count": 0, "min": None, "q1": None, "median": None,
+                "q3": None, "max": None, "mean": None,
+            },
+            "not_found": ["NOTAREAL"], "results": [],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_aa_sequence",
+            return_value=data,
+        ):
+            result = await tool_fns["gene_aa_sequence"](
+                mock_ctx, locus_tags=["NOTAREAL"],
+            )
+        assert result.sequence_length_stats.count == 0
+        assert result.sequence_length_stats.min is None
+        assert result.sequence_length_stats.median is None
+        assert result.results == []
+
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_aa_sequence",
+            return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["gene_aa_sequence"](
+                mock_ctx,
+                locus_tags=["ACZ81_08860"],
+                fasta=True,
+                summary=False,
+                limit=10,
+                offset=5,
+            )
+        mock_api.assert_called_once()
+        call = mock_api.call_args
+        assert call.args[0] == ["ACZ81_08860"]
+        assert call.kwargs["fasta"] is True
+        assert call.kwargs["summary"] is False
+        assert call.kwargs["limit"] == 10
+        assert call.kwargs["offset"] == 5
+
+    @pytest.mark.asyncio
+    async def test_fasta_blob_surfaced(self, tool_fns, mock_ctx):
+        data = {
+            **self._SAMPLE_API_RETURN,
+            "fasta": ">ACZ81_08860 Alteromonas macleodii HOT1A3|WP_002|DNA polymerase III subunit beta\nMMM",
+            "results": [
+                {**self._SAMPLE_API_RETURN["results"][0], "sequence": None},
+                {**self._SAMPLE_API_RETURN["results"][1], "sequence": None},
+            ],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_aa_sequence",
+            return_value=data,
+        ):
+            result = await tool_fns["gene_aa_sequence"](
+                mock_ctx, locus_tags=["ACZ81_08855", "ACZ81_08860"], fasta=True,
+            )
+        assert result.fasta.startswith(">ACZ81_08860")
+        for r in result.results:
+            assert r.sequence is None
+
+    @pytest.mark.asyncio
+    async def test_truncation_metadata(self, tool_fns, mock_ctx):
+        data = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 10,
+            "returned": 2,
+            "truncated": True,
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_aa_sequence",
+            return_value=data,
+        ):
+            result = await tool_fns["gene_aa_sequence"](
+                mock_ctx, locus_tags=["ACZ81_08860"],
+            )
+        assert result.total_matching == 10
+        assert result.returned == 2
+        assert result.truncated is True
+
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_aa_sequence",
+            side_effect=ValueError("locus_tags must not be empty"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["gene_aa_sequence"](mock_ctx, locus_tags=[])
+
+
+# ---------------------------------------------------------------------------
+# gene_neighbors
+# ---------------------------------------------------------------------------
+class TestGeneNeighborsWrapper:
+    _SAMPLE_API_RETURN = {
+        "total_matching": 2,
+        "returned": 2,
+        "truncated": False,
+        "anchors": [
+            {"locus_tag": "ACZ81_08860", "organism_name": "Alteromonas macleodii HOT1A3",
+             "contig": "contig1", "start": 1000, "end": 1500, "strand": "+",
+             "product": "DNA polymerase III subunit beta",
+             "neighbors_returned": 2, "dropped_null_strand": 0},
+        ],
+        "by_organism": [{"organism_name": "Alteromonas macleodii HOT1A3", "count": 2}],
+        "not_found": [],
+        "not_matched": [],
+        "warnings": [],
+        "results": [
+            {"anchor_locus_tag": "ACZ81_08860", "neighbor_locus_tag": "ACZ81_08850",
+             "rank_offset": -1, "bp_gap": 10, "strand": "+", "same_strand": True,
+             "product": "hypothetical protein", "gene_name": None, "gene_category": "unknown"},
+            {"anchor_locus_tag": "ACZ81_08860", "neighbor_locus_tag": "ACZ81_08870",
+             "rank_offset": 1, "bp_gap": 335, "strand": "-", "same_strand": False,
+             "product": "hypothetical protein", "gene_name": None, "gene_category": "unknown"},
+        ],
+    }
+
+    @pytest.mark.asyncio
+    async def test_returns_response_envelope(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_neighbors",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["gene_neighbors"](
+                mock_ctx, locus_tags=["ACZ81_08860"],
+            )
+        assert result.total_matching == 2
+        assert result.returned == 2
+        assert result.truncated is False
+        assert len(result.results) == 2
+        r = result.results[0]
+        assert r.anchor_locus_tag == "ACZ81_08860"
+        assert r.neighbor_locus_tag == "ACZ81_08850"
+        assert r.rank_offset == -1
+        assert r.bp_gap == 10
+        assert r.same_strand is True
+        assert len(result.anchors) == 1
+        assert result.anchors[0].locus_tag == "ACZ81_08860"
+
+    @pytest.mark.asyncio
+    async def test_empty_results(self, tool_fns, mock_ctx):
+        data = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 0,
+            "returned": 0,
+            "anchors": [],
+            "by_organism": [],
+            "not_found": ["NOTAREAL"],
+            "results": [],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_neighbors",
+            return_value=data,
+        ):
+            result = await tool_fns["gene_neighbors"](
+                mock_ctx, locus_tags=["NOTAREAL"],
+            )
+        assert result.results == []
+        assert result.returned == 0
+        assert "NOTAREAL" in result.not_found
+
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_neighbors",
+            return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["gene_neighbors"](
+                mock_ctx,
+                locus_tags=["ACZ81_08860"],
+                window=3,
+                max_bp_distance=400,
+                same_strand=True,
+                summary=False,
+                limit=10,
+            )
+        mock_api.assert_called_once()
+        call = mock_api.call_args
+        assert call.args[0] == ["ACZ81_08860"]
+        assert call.kwargs["window"] == 3
+        assert call.kwargs["max_bp_distance"] == 400
+        assert call.kwargs["same_strand"] is True
+        assert call.kwargs["summary"] is False
+        assert call.kwargs["limit"] == 10
+
+    @pytest.mark.asyncio
+    async def test_not_matched_and_warnings_surfaced(self, tool_fns, mock_ctx):
+        data = {
+            **self._SAMPLE_API_RETURN,
+            "not_matched": ["SYNW1755"],
+            "warnings": ["same_strand requested but anchor ACZ81_08865 has null strand; returned unfiltered"],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_neighbors",
+            return_value=data,
+        ):
+            result = await tool_fns["gene_neighbors"](
+                mock_ctx, locus_tags=["ACZ81_08860", "SYNW1755"], same_strand=True,
+            )
+        assert "SYNW1755" in result.not_matched
+        assert len(result.warnings) == 1
+
+    @pytest.mark.asyncio
+    async def test_truncation_metadata(self, tool_fns, mock_ctx):
+        data = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 10,
+            "returned": 2,
+            "truncated": True,
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_neighbors",
+            return_value=data,
+        ):
+            result = await tool_fns["gene_neighbors"](
+                mock_ctx, locus_tags=["ACZ81_08860"],
+            )
+        assert result.total_matching == 10
+        assert result.returned == 2
+        assert result.truncated is True
+
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_neighbors",
+            side_effect=ValueError("locus_tags must not be empty"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["gene_neighbors"](mock_ctx, locus_tags=[])

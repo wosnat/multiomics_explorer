@@ -2854,6 +2854,176 @@ def build_gene_existence_check(
 
 
 # ---------------------------------------------------------------------------
+# gene_aa_sequence
+# ---------------------------------------------------------------------------
+
+
+def build_gene_aa_sequence(
+    *,
+    locus_tags: list[str],
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build detail query for gene_aa_sequence (amino-acid export).
+
+    Only genes with a non-null `sequence` are returned. Pagination is
+    pushed into Cypher (`SKIP $offset LIMIT $limit`) so sequences for
+    off-page rows are never transferred.
+
+    RETURN keys: locus_tag, organism_name, gene_name, product, protein_id,
+    sequence_length, sequence.
+    """
+    cypher = (
+        "MATCH (g:Gene)\n"
+        "WHERE g.locus_tag IN $locus_tags AND g.sequence IS NOT NULL\n"
+        "RETURN g.locus_tag AS locus_tag,\n"
+        "       g.organism_name AS organism_name,\n"
+        "       g.gene_name AS gene_name,\n"
+        "       g.product AS product,\n"
+        "       g.protein_id AS protein_id,\n"
+        "       size(g.sequence) AS sequence_length,\n"
+        "       g.sequence AS sequence\n"
+        "ORDER BY g.organism_name, g.locus_tag"
+    )
+    params: dict = {"locus_tags": locus_tags}
+    if limit is not None:
+        if offset:
+            cypher += "\nSKIP $offset LIMIT $limit"
+            params["offset"] = offset
+        else:
+            cypher += "\nLIMIT $limit"
+        params["limit"] = limit
+    return cypher, params
+
+
+def build_gene_aa_sequence_summary(
+    *,
+    locus_tags: list[str],
+) -> tuple[str, dict]:
+    """Build single-row aggregate summary for gene_aa_sequence.
+
+    Stats are computed in Cypher (no sequences transferred). `ORDER BY`
+    precedes `collect()` so `matched_tags` is deterministic for snapshots.
+
+    RETURN keys: total_matching, matched_tags, by_organism, len_min,
+    len_max, len_mean, len_pcts.
+    """
+    cypher = (
+        "MATCH (g:Gene)\n"
+        "WHERE g.locus_tag IN $locus_tags AND g.sequence IS NOT NULL\n"
+        "WITH g ORDER BY g.organism_name, g.locus_tag\n"
+        "WITH g.organism_name AS org, size(g.sequence) AS len, g.locus_tag AS lt\n"
+        "WITH collect(lt) AS matched_tags, collect(org) AS orgs, count(*) AS total_matching,\n"
+        "     min(len) AS len_min, max(len) AS len_max, avg(len) AS len_mean,\n"
+        "     apoc.agg.percentiles(len, [0.25, 0.5, 0.75]) AS len_pcts\n"
+        "RETURN total_matching,\n"
+        "       matched_tags,\n"
+        "       apoc.coll.frequencies(orgs) AS by_organism,\n"
+        "       len_min, len_max, len_mean, len_pcts"
+    )
+    return cypher, {"locus_tags": locus_tags}
+
+
+# ---------------------------------------------------------------------------
+# gene_neighbors
+# ---------------------------------------------------------------------------
+
+
+def build_gene_neighbors(
+    *,
+    locus_tags: list[str],
+    window: int = 5,
+    max_bp_distance: int | None = None,
+) -> tuple[str, dict]:
+    """Build detail (bounded-window) query for gene_neighbors.
+
+    Two correlated `CALL {}` subqueries each fetch the closest <= `$window`
+    genes on the same contig/organism (upstream by descending start,
+    downstream by ascending start). `collect()` is INSIDE each subquery so a
+    contig-edge anchor (no upstream/downstream) yields an empty list rather
+    than being dropped (5.15 has no OPTIONAL CALL). The `max_bp_distance`
+    filter is appended as a Cypher WHERE on the computed `bp_gap` only when set.
+
+    RETURN keys: anchor_locus_tag, neighbor_locus_tag, rank_offset, bp_gap,
+    strand, same_strand, product, gene_name, gene_category.
+    """
+    bp_where = (
+        "WHERE bp_gap <= $max_bp_distance\n"
+        if max_bp_distance is not None
+        else ""
+    )
+    cypher = (
+        "UNWIND $locus_tags AS lt\n"
+        "MATCH (a:Gene {locus_tag: lt})\n"
+        "WHERE a.contig IS NOT NULL AND a.start IS NOT NULL\n"
+        "CALL {\n"
+        "  WITH a\n"
+        "  MATCH (u:Gene)\n"
+        "  WHERE u.organism_name = a.organism_name AND u.contig = a.contig"
+        " AND u.start < a.start\n"
+        "  WITH u ORDER BY u.start DESC LIMIT $window\n"
+        "  RETURN collect(u) AS ups\n"
+        "}\n"
+        "CALL {\n"
+        "  WITH a\n"
+        "  MATCH (d:Gene)\n"
+        "  WHERE d.organism_name = a.organism_name AND d.contig = a.contig"
+        " AND d.start > a.start\n"
+        "  WITH d ORDER BY d.start ASC LIMIT $window\n"
+        "  RETURN collect(d) AS downs\n"
+        "}\n"
+        "WITH a, [i IN range(0, size(ups)-1)   | {nb: ups[i],   ro: -(i+1)}]\n"
+        "      + [i IN range(0, size(downs)-1) | {nb: downs[i], ro:  (i+1)}] AS pairs\n"
+        "UNWIND pairs AS p\n"
+        "WITH a, p.nb AS nb, p.ro AS rank_offset,\n"
+        "     CASE WHEN p.nb.end  < a.start THEN a.start  - p.nb.end  - 1\n"
+        "          WHEN p.nb.start > a.end  THEN p.nb.start - a.end   - 1\n"
+        "          ELSE 0 END AS bp_gap\n"
+        f"{bp_where}"
+        "RETURN a.locus_tag AS anchor_locus_tag,\n"
+        "       nb.locus_tag AS neighbor_locus_tag,\n"
+        "       rank_offset, bp_gap,\n"
+        "       nb.strand AS strand,\n"
+        "       (nb.strand = a.strand) AS same_strand,\n"
+        "       nb.product AS product,\n"
+        "       nb.gene_name AS gene_name,\n"
+        "       nb.gene_category AS gene_category\n"
+        "ORDER BY anchor_locus_tag, rank_offset"
+    )
+    params: dict = {"locus_tags": locus_tags, "window": window}
+    if max_bp_distance is not None:
+        params["max_bp_distance"] = max_bp_distance
+    return cypher, params
+
+
+def build_gene_neighbors_summary(
+    *,
+    locus_tags: list[str],
+) -> tuple[str, dict]:
+    """Build anchor-metadata query for gene_neighbors.
+
+    `MATCH` (not `OPTIONAL MATCH`) → only existing anchors return rows;
+    existence/`not_found` is handled by the reused `build_gene_existence_check`.
+    API derives `not_matched` from `has_coords=false` rows and builds the
+    `anchors` envelope blocks.
+
+    RETURN keys: anchor_locus_tag, organism_name, contig, start, end, strand,
+    product, has_coords.
+    """
+    cypher = (
+        "UNWIND $locus_tags AS lt\n"
+        "MATCH (a:Gene {locus_tag: lt})\n"
+        "RETURN lt AS anchor_locus_tag,\n"
+        "       a.organism_name AS organism_name,\n"
+        "       a.contig AS contig, a.start AS start, a.end AS end,\n"
+        "       a.strand AS strand, a.product AS product,\n"
+        "       (a.contig IS NOT NULL AND a.start IS NOT NULL) AS has_coords\n"
+        "ORDER BY anchor_locus_tag"
+    )
+    return cypher, {"locus_tags": locus_tags}
+
+
+# ---------------------------------------------------------------------------
 # Differential expression helpers
 # ---------------------------------------------------------------------------
 

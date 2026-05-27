@@ -1,0 +1,39 @@
+case_id: gene_neighbors_alteromonas
+row_count: 4
+rows:
+- anchor_locus_tag: ACZ81_08860
+  bp_gap: 556
+  gene_category: Inorganic ion transport
+  gene_name: null
+  neighbor_locus_tag: ACZ81_08850
+  product: TonB-dependent siderophore receptor
+  rank_offset: -2
+  same_strand: true
+  strand: +
+- anchor_locus_tag: ACZ81_08860
+  bp_gap: 10
+  gene_category: Unknown
+  gene_name: null
+  neighbor_locus_tag: ACZ81_08855
+  product: hypothetical protein
+  rank_offset: -1
+  same_strand: true
+  strand: +
+- anchor_locus_tag: ACZ81_08860
+  bp_gap: 335
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  neighbor_locus_tag: ACZ81_08865
+  product: demethoxyubiquinone hydroxylase family protein
+  rank_offset: 1
+  same_strand: false
+  strand: '-'
+- anchor_locus_tag: ACZ81_08860
+  bp_gap: 1119
+  gene_category: Carbohydrate metabolism
+  gene_name: null
+  neighbor_locus_tag: ACZ81_08870
+  product: strictosidine synthase family protein
+  rank_offset: 2
+  same_strand: true
+  strand: +

@@ -1,7 +1,7 @@
 # Start here — picking the right tool
 
-This MCP server exposes 37 tools over a Prochlorococcus/Alteromonas multi-omics
-knowledge graph. Tools cluster into seven families. Before calling anything,
+This MCP server exposes 39 tools over a Prochlorococcus/Alteromonas multi-omics
+knowledge graph. Tools cluster into nine families. Before calling anything,
 match your question to a family below, then read the entry-point tool's full
 doc at `docs://tools/{name}`.
 
@@ -21,7 +21,7 @@ worked recipes), read `docs://guide/python_api`.
 
 ---
 
-## The eight tool families
+## The nine tool families
 
 | Family | Anchor concept | Entry-point tool(s) | Drill-down |
 |---|---|---|---|
@@ -33,6 +33,7 @@ worked recipes), read `docs://guide/python_api`.
 | **Enrichment** | "I have a gene set or DE result; what pathways / functional categories are enriched?" | `pathway_enrichment` (DE-driven), `cluster_enrichment` (clustering-driven) | Pre-flight: `ontology_landscape` (pick a defensible ontology + level). Methodology: `docs://analysis/enrichment` |
 | **Derived metrics** | "I want non-DE column-level evidence (rhythmicity, amplitudes, traits)" | `list_derived_metrics` | `gene_derived_metrics`, `genes_by_{numeric,boolean,categorical}_metric` |
 | **Chemistry / metabolomics** | "I have a metabolite, an element, a transport substrate, or measurement data" | `list_metabolites`, `list_metabolite_assays` | `genes_by_metabolite`, `metabolites_by_gene`, `metabolites_by_{quantifies,flags}_assay`, `assays_by_metabolite`. Methodology: `docs://analysis/metabolites` |
+| **Sequence & genomic context** | "I have a gene; I want its protein sequence, or what sits next to it on the genome" | `gene_aa_sequence`, `gene_neighbors` | — (terminal export / positional lookup; chain neighbor locus_tags into the gene families above) |
 
 Plus three orthogonal helpers:
 
@@ -49,7 +50,7 @@ Plus three orthogonal helpers:
 
 ---
 
-## Decision tree: 12 common question shapes
+## Decision tree: 14 common question shapes
 
 ### "What does gene X do? / Show me everything about gene X."
 1. `resolve_gene(query="X")` if the input is a name or partial label.
@@ -102,6 +103,12 @@ Plus three orthogonal helpers:
 ### "Which genes belong to BRITE category / TCDB family / CAZy family X?"
 - `genes_by_ontology(ontology=..., term_ids=[...], organism=...)` works for all 10 ontologies (GO, KEGG, EC, COG, Cyanorak, TIGR, Pfam, BRITE, TCDB, CAZy). For BRITE, scope with `tree=` (use `list_filter_values(filter_type='brite_tree')` to discover trees).
 
+### "Get the protein/AA sequence of gene X (for BLAST/alignment)."
+- `gene_aa_sequence(locus_tags=[...], fasta=True)` — returns amino-acid sequences (no nucleotide). `fasta=True` gives one multi-FASTA blob ready to paste into an external aligner / search tool.
+
+### "What genes sit next to X on the genome / is X in an operon?"
+- `gene_neighbors(locus_tags=["X"], window=5)` — genes flanking the anchor on the same contig, with `rank_offset`, `bp_gap`, and `same_strand`. Positional only — co-regulation must be confirmed via the expression tools, not inferred from adjacency.
+
 ### "I want raw Cypher."
 - `run_cypher(query="...")`. Read-only; write operations blocked. Validate against `kg_schema` first. Almost always there is a typed tool that fits — reach for Cypher only when you are sure none does.
 
@@ -109,7 +116,7 @@ Plus three orthogonal helpers:
 
 ## When to call `summary=True` first
 
-**Nearly universal: 31 of 37 tools accept `summary=True`** — discovery,
+**Nearly universal: 33 of 39 tools accept `summary=True`** — discovery,
 drill-down, gene-anchored, ontology, enrichment, all of it. With
 `summary=True` the call returns only the envelope rollups
 (`by_organism`, `by_treatment_type`, `top_*`, counts) and an empty

@@ -42,7 +42,7 @@ mcp = FastMCP(
     "multiomics-kg",
     instructions=(
         "Multi-omics knowledge graph for Prochlorococcus and Alteromonas "
-        "(37 tools across gene/expression/ortholog/ontology/cluster/"
+        "(39 tools across gene/sequence/expression/ortholog/ontology/cluster/"
         "chemistry/metabolomics/enrichment).\n\n"
         "Start here:\n"
         "  docs://guide/start_here  — pick the right tool for your question\n"

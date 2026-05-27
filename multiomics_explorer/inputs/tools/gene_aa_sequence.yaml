@@ -1,0 +1,71 @@
+# Human-authored content for gene_aa_sequence about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Amino-acid sequences for a batch of genes (rows carry the sequence)
+    call: gene_aa_sequence(locus_tags=["ACZ81_08860", "ACZ81_08855"])
+    response: |
+      {
+        "total_matching": 2, "returned": 2, "truncated": false,
+        "by_organism": [{"organism_name": "Alteromonas macleodii HOT1A3", "count": 2}],
+        "sequence_length_stats": {"count": 2, "min": 178, "q1": 178, "median": 178, "q3": 487, "max": 487, "mean": 332.5},
+        "not_found": [], "not_matched": [], "fasta": "",
+        "results": [
+          {"locus_tag": "ACZ81_08855", "organism_name": "Alteromonas macleodii HOT1A3", "gene_name": null, "product": "hypothetical protein", "protein_id": "WP_049586664.1", "sequence_length": 178, "sequence": "MLSV...CIP"},
+          {"locus_tag": "ACZ81_08860", "organism_name": "Alteromonas macleodii HOT1A3", "gene_name": null, "product": "PepSY-associated TM helix domain-containing protein", "protein_id": "WP_061485747.1", "sequence_length": 487, "sequence": "MDKI...VVE"}
+        ]
+      }
+
+  - title: Export-ready multi-FASTA (fasta=True moves the sequence to the envelope blob)
+    call: gene_aa_sequence(locus_tags=["ACZ81_08860", "ACZ81_08855"], fasta=True)
+    response: |
+      # With fasta=True the per-row `sequence` is null and the envelope `fasta`
+      # field carries one multi-FASTA blob for the page (no duplication).
+      # Header shape: >{locus_tag} {organism_name}|{protein_id}|{product}
+      {
+        "total_matching": 2, "returned": 2, "truncated": false,
+        "fasta": ">ACZ81_08855 Alteromonas macleodii HOT1A3|WP_012345678.1|hypothetical protein\nMSEQ...VKL\n>ACZ81_08860 Alteromonas macleodii HOT1A3|WP_012345679.1|ABC transporter permease\nMNRT...GEY\n",
+        "results": [
+          {"locus_tag": "ACZ81_08855", "sequence": null, "sequence_length": 178},
+          {"locus_tag": "ACZ81_08860", "sequence": null, "sequence_length": 487}
+        ]
+      }
+
+  - title: not_found vs not_matched (missing gene vs gene with no sequence)
+    call: gene_aa_sequence(locus_tags=["ACZ81_08860", "A9601_09441", "NOTAREAL"])
+    response: |
+      # A9601_09441 exists but has no stored sequence (expression-only gene, no
+      # genome match) -> not_matched. NOTAREAL is absent from the KG -> not_found.
+      {
+        "total_matching": 1,
+        "not_found": ["NOTAREAL"],
+        "not_matched": ["A9601_09441"],
+        "results": [
+          {"locus_tag": "ACZ81_08860", "organism_name": "Alteromonas macleodii HOT1A3", "sequence_length": 487, "sequence": "MDKI...VVE"}
+        ]
+      }
+
+  - title: Length stats only, no sequences transferred (summary=True)
+    call: gene_aa_sequence(locus_tags=["ACZ81_08860", "ACZ81_08855"], summary=True)
+
+  - title: From a text search to exported sequences
+    steps: |
+      Step 1: genes_by_function(search_text="ABC transporter", organism="Alteromonas macleodii HOT1A3")
+              -> collect locus_tags from results
+
+      Step 2: gene_aa_sequence(locus_tags=[...], fasta=True)
+              -> copy the envelope `fasta` blob straight into BLAST / HMMER / an aligner
+
+chaining:
+  - "resolve_gene → gene_aa_sequence(fasta=True) (resolve a name, then export the sequence)"
+  - "genes_by_function → gene_aa_sequence (text hit list → AA sequences for external alignment/search)"
+  - "gene_overview → gene_aa_sequence (confirm identity, then pull the sequence)"
+
+mistakes:
+  - "Sequences are amino-acid only — the KG stores no nucleotide sequence. There is no DNA/CDS export here."
+  - "fasta carries the sequence in exactly one place: rows when fasta=False, the envelope `fasta` blob when fasta=True (rows then have sequence=null). Never both — do not expect the row `sequence` to be populated when fasta=True."
+  - "sequence_length_stats and by_organism cover the full match, not just the returned page — they are stable across limit / offset. Page with `offset` to walk a large batch."
+  - "not_matched (gene exists but `sequence` is null, ~3% of genes — expression-only, no genome match) is distinct from not_found (locus_tag absent from the KG). See docs://guide/conventions."
+
+# python_returns: dict

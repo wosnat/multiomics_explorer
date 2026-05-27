@@ -2,6 +2,8 @@
 
 from multiomics_explorer.api.functions import (
     assays_by_metabolite,
+    gene_aa_sequence,
+    gene_neighbors,
     gene_ontology_terms,
     gene_overview,
     genes_by_homolog_group,
@@ -42,6 +44,8 @@ from multiomics_explorer.api.functions import (
 
 __all__ = [
     "assays_by_metabolite",
+    "gene_aa_sequence",
+    "gene_neighbors",
     "gene_ontology_terms",
     "gene_overview",
     "genes_by_homolog_group",

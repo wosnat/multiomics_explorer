@@ -10516,6 +10516,474 @@ class TestAssaysByMetabolite:
 
 
 # ---------------------------------------------------------------------------
+# gene_aa_sequence
+# ---------------------------------------------------------------------------
+class TestGeneAaSequence:
+    """gene_aa_sequence orchestration (existence + summary + detail)."""
+
+    _ENVELOPE_KEYS = {
+        "total_matching", "returned", "truncated", "by_organism",
+        "sequence_length_stats", "not_found", "not_matched", "fasta", "results",
+    }
+
+    def _exist(self, found, not_found=()):
+        rows = [{"lt": lt, "found": True} for lt in found]
+        rows += [{"lt": lt, "found": False} for lt in not_found]
+        return rows
+
+    def _summary_row(self, *, matched_tags, by_organism, total_matching,
+                     len_min=178, len_max=487, len_mean=332.5,
+                     len_pcts=(178.0, 178.0, 487.0)):
+        return [{
+            "total_matching": total_matching,
+            "matched_tags": list(matched_tags),
+            "by_organism": by_organism,
+            "len_min": len_min,
+            "len_max": len_max,
+            "len_mean": len_mean,
+            "len_pcts": list(len_pcts),
+        }]
+
+    def _detail_rows(self):
+        return [
+            {"locus_tag": "ACZ81_08855", "organism_name": "Alteromonas macleodii HOT1A3",
+             "gene_name": None, "product": "hypothetical protein",
+             "protein_id": "WP_001", "sequence_length": 178, "sequence": "M" * 178},
+            {"locus_tag": "ACZ81_08860", "organism_name": "Alteromonas macleodii HOT1A3",
+             "gene_name": "dnaN", "product": "DNA polymerase III subunit beta",
+             "protein_id": "WP_002", "sequence_length": 487, "sequence": "M" * 487},
+        ]
+
+    def test_returns_dict_with_envelope_keys(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08855", "ACZ81_08860"]),
+            self._summary_row(
+                matched_tags=["ACZ81_08855", "ACZ81_08860"],
+                by_organism=[{"item": "Alteromonas macleodii HOT1A3", "count": 2}],
+                total_matching=2,
+            ),
+            self._detail_rows(),
+        ]
+        result = api.gene_aa_sequence(
+            locus_tags=["ACZ81_08855", "ACZ81_08860"], conn=mock_conn,
+        )
+        assert isinstance(result, dict)
+        assert set(result.keys()) == self._ENVELOPE_KEYS
+
+    def test_total_matching_from_summary(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08855", "ACZ81_08860"]),
+            self._summary_row(
+                matched_tags=["ACZ81_08855", "ACZ81_08860"],
+                by_organism=[{"item": "Alteromonas macleodii HOT1A3", "count": 2}],
+                total_matching=2,
+            ),
+            self._detail_rows(),
+        ]
+        result = api.gene_aa_sequence(
+            locus_tags=["ACZ81_08855", "ACZ81_08860"], conn=mock_conn,
+        )
+        assert result["total_matching"] == 2
+        assert result["returned"] == 2
+        assert result["truncated"] is False
+
+    def test_sequence_length_stats_assembled(self, mock_conn):
+        """sequence_length_stats built from summary aggregates (no Python recompute)."""
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08855", "ACZ81_08860"]),
+            self._summary_row(
+                matched_tags=["ACZ81_08855", "ACZ81_08860"],
+                by_organism=[{"item": "Alteromonas macleodii HOT1A3", "count": 2}],
+                total_matching=2,
+                len_min=178, len_max=487, len_mean=332.5,
+                len_pcts=(178.0, 178.0, 487.0),
+            ),
+            self._detail_rows(),
+        ]
+        result = api.gene_aa_sequence(
+            locus_tags=["ACZ81_08855", "ACZ81_08860"], conn=mock_conn,
+        )
+        stats = result["sequence_length_stats"]
+        assert stats["count"] == 2
+        assert stats["min"] == 178
+        assert stats["max"] == 487
+        assert stats["mean"] == 332.5
+        assert stats["q1"] == 178.0
+        assert stats["median"] == 178.0
+        assert stats["q3"] == 487.0
+
+    def test_zero_match_returns_none_stats(self, mock_conn):
+        """All inputs not_found/no-sequence: stats are None, not a crash.
+
+        Guards the zero-match summary row — apoc.agg.percentiles over an empty set
+        returns an all-null list, and min/max/avg are null. The envelope must carry
+        count=0 + None stats (the MCP SequenceLengthStats fields are nullable).
+        """
+        mock_conn.execute_query.side_effect = [
+            self._exist([], not_found=["NOTAREAL"]),
+            self._summary_row(
+                matched_tags=[], by_organism=[], total_matching=0,
+                len_min=None, len_max=None, len_mean=None,
+                len_pcts=(None, None, None, None, None, None),
+            ),
+            [],  # detail builder runs (limit>0) but matches nothing
+        ]
+        result = api.gene_aa_sequence(locus_tags=["NOTAREAL"], conn=mock_conn)
+        assert result["total_matching"] == 0
+        assert result["not_found"] == ["NOTAREAL"]
+        assert result["results"] == []
+        assert result["sequence_length_stats"] == {
+            "count": 0, "min": None, "q1": None, "median": None,
+            "q3": None, "max": None, "mean": None,
+        }
+
+    def test_by_organism_renamed(self, mock_conn):
+        """by_organism item/count renamed to organism_name/count."""
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08855", "ACZ81_08860"]),
+            self._summary_row(
+                matched_tags=["ACZ81_08855", "ACZ81_08860"],
+                by_organism=[{"item": "Alteromonas macleodii HOT1A3", "count": 2}],
+                total_matching=2,
+            ),
+            self._detail_rows(),
+        ]
+        result = api.gene_aa_sequence(
+            locus_tags=["ACZ81_08855", "ACZ81_08860"], conn=mock_conn,
+        )
+        assert result["by_organism"] == [
+            {"organism_name": "Alteromonas macleodii HOT1A3", "count": 2},
+        ]
+
+    def test_not_found_populated(self, mock_conn):
+        """Locus tag absent from KG → not_found."""
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08860"], not_found=["NOTAREAL"]),
+            self._summary_row(
+                matched_tags=["ACZ81_08860"],
+                by_organism=[{"item": "Alteromonas macleodii HOT1A3", "count": 1}],
+                total_matching=1,
+            ),
+            [self._detail_rows()[1]],
+        ]
+        result = api.gene_aa_sequence(
+            locus_tags=["ACZ81_08860", "NOTAREAL"], conn=mock_conn,
+        )
+        assert result["not_found"] == ["NOTAREAL"]
+
+    def test_not_matched_derived_from_found_minus_matched(self, mock_conn):
+        """Gene exists but sequence null → not_matched (found_tags − matched_tags)."""
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08860", "SYNW1755"], not_found=["NOTAREAL"]),
+            self._summary_row(
+                matched_tags=["ACZ81_08860"],
+                by_organism=[{"item": "Alteromonas macleodii HOT1A3", "count": 1}],
+                total_matching=1,
+            ),
+            [self._detail_rows()[1]],
+        ]
+        result = api.gene_aa_sequence(
+            locus_tags=["ACZ81_08860", "SYNW1755", "NOTAREAL"], conn=mock_conn,
+        )
+        assert result["not_found"] == ["NOTAREAL"]
+        assert result["not_matched"] == ["SYNW1755"]
+        assert "SYNW1755" not in result["not_found"]
+        assert "NOTAREAL" not in result["not_matched"]
+
+    def test_fasta_false_rows_carry_sequence(self, mock_conn):
+        """fasta=False → rows carry sequence; envelope fasta is empty string."""
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08855", "ACZ81_08860"]),
+            self._summary_row(
+                matched_tags=["ACZ81_08855", "ACZ81_08860"],
+                by_organism=[{"item": "Alteromonas macleodii HOT1A3", "count": 2}],
+                total_matching=2,
+            ),
+            self._detail_rows(),
+        ]
+        result = api.gene_aa_sequence(
+            locus_tags=["ACZ81_08855", "ACZ81_08860"], fasta=False, conn=mock_conn,
+        )
+        assert result["fasta"] == ""
+        for row in result["results"]:
+            assert row["sequence"] is not None
+            assert isinstance(row["sequence"], str)
+
+    def test_fasta_true_blob_and_rows_nulled(self, mock_conn):
+        """fasta=True → rows have sequence=None and envelope fasta non-empty (no dup)."""
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08855", "ACZ81_08860"]),
+            self._summary_row(
+                matched_tags=["ACZ81_08855", "ACZ81_08860"],
+                by_organism=[{"item": "Alteromonas macleodii HOT1A3", "count": 2}],
+                total_matching=2,
+            ),
+            self._detail_rows(),
+        ]
+        result = api.gene_aa_sequence(
+            locus_tags=["ACZ81_08855", "ACZ81_08860"], fasta=True, conn=mock_conn,
+        )
+        assert result["fasta"] != ""
+        assert ">ACZ81_08860" in result["fasta"]
+        for row in result["results"]:
+            assert row["sequence"] is None
+
+    def test_summary_returns_empty_results(self, mock_conn):
+        """summary=True → results=[], stats still present."""
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08855", "ACZ81_08860"]),
+            self._summary_row(
+                matched_tags=["ACZ81_08855", "ACZ81_08860"],
+                by_organism=[{"item": "Alteromonas macleodii HOT1A3", "count": 2}],
+                total_matching=2,
+            ),
+        ]
+        result = api.gene_aa_sequence(
+            locus_tags=["ACZ81_08855", "ACZ81_08860"], summary=True, conn=mock_conn,
+        )
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["total_matching"] == 2
+        assert result["sequence_length_stats"]["count"] == 2
+
+    def test_limit_caps_and_truncates(self, mock_conn):
+        """limit smaller than total_matching → truncated True."""
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08855", "ACZ81_08860"]),
+            self._summary_row(
+                matched_tags=["ACZ81_08855", "ACZ81_08860"],
+                by_organism=[{"item": "Alteromonas macleodii HOT1A3", "count": 2}],
+                total_matching=2,
+            ),
+            [self._detail_rows()[0]],
+        ]
+        result = api.gene_aa_sequence(
+            locus_tags=["ACZ81_08855", "ACZ81_08860"], limit=1, conn=mock_conn,
+        )
+        assert result["total_matching"] == 2
+        assert result["returned"] == 1
+        assert result["truncated"] is True
+
+    def test_empty_locus_tags_raises(self, mock_conn):
+        with pytest.raises(ValueError):
+            api.gene_aa_sequence(locus_tags=[], conn=mock_conn)
+
+    def test_importable_from_package(self):
+        from multiomics_explorer import gene_aa_sequence
+        assert gene_aa_sequence is api.gene_aa_sequence
+
+
+# ---------------------------------------------------------------------------
+# gene_neighbors
+# ---------------------------------------------------------------------------
+class TestGeneNeighbors:
+    """gene_neighbors orchestration (existence + anchor metadata + detail)."""
+
+    _ENVELOPE_KEYS = {
+        "total_matching", "returned", "truncated", "anchors", "by_organism",
+        "not_found", "not_matched", "warnings", "results",
+    }
+
+    def _exist(self, found, not_found=()):
+        rows = [{"lt": lt, "found": True} for lt in found]
+        rows += [{"lt": lt, "found": False} for lt in not_found]
+        return rows
+
+    def _anchor_rows(self, *rows):
+        """Each row: (locus_tag, has_coords, strand)."""
+        out = []
+        for lt, has_coords, strand in rows:
+            out.append({
+                "anchor_locus_tag": lt,
+                "organism_name": "Alteromonas macleodii HOT1A3",
+                "contig": "contig1" if has_coords else None,
+                "start": 1000 if has_coords else None,
+                "end": 1500 if has_coords else None,
+                "strand": strand,
+                "product": "DNA polymerase III subunit beta",
+                "has_coords": has_coords,
+            })
+        return out
+
+    def _neighbor_row(self, anchor, neighbor, rank_offset, bp_gap, strand, same_strand):
+        return {
+            "anchor_locus_tag": anchor,
+            "neighbor_locus_tag": neighbor,
+            "rank_offset": rank_offset,
+            "bp_gap": bp_gap,
+            "strand": strand,
+            "same_strand": same_strand,
+            "product": "hypothetical protein",
+            "gene_name": None,
+            "gene_category": "unknown",
+        }
+
+    def test_returns_dict_with_envelope_keys(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08860"]),
+            self._anchor_rows(("ACZ81_08860", True, "+")),
+            [
+                self._neighbor_row("ACZ81_08860", "ACZ81_08850", -1, 10, "+", True),
+                self._neighbor_row("ACZ81_08860", "ACZ81_08870", 1, 335, "-", False),
+            ],
+        ]
+        result = api.gene_neighbors(locus_tags=["ACZ81_08860"], conn=mock_conn)
+        assert isinstance(result, dict)
+        assert set(result.keys()) == self._ENVELOPE_KEYS
+
+    def test_total_matching_from_detail_set(self, mock_conn):
+        """total_matching derived from the (bounded) detail set, not the summary query."""
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08860"]),
+            self._anchor_rows(("ACZ81_08860", True, "+")),
+            [
+                self._neighbor_row("ACZ81_08860", "ACZ81_08850", -1, 10, "+", True),
+                self._neighbor_row("ACZ81_08860", "ACZ81_08870", 1, 335, "-", False),
+            ],
+        ]
+        result = api.gene_neighbors(locus_tags=["ACZ81_08860"], conn=mock_conn)
+        assert result["total_matching"] == 2
+        assert result["returned"] == 2
+        assert result["truncated"] is False
+
+    def test_not_found_populated(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08860"], not_found=["NOTAREAL"]),
+            self._anchor_rows(("ACZ81_08860", True, "+")),
+            [self._neighbor_row("ACZ81_08860", "ACZ81_08850", -1, 10, "+", True)],
+        ]
+        result = api.gene_neighbors(
+            locus_tags=["ACZ81_08860", "NOTAREAL"], conn=mock_conn,
+        )
+        assert result["not_found"] == ["NOTAREAL"]
+
+    def test_not_matched_from_missing_coords(self, mock_conn):
+        """Anchor exists but lacks coordinates (has_coords=false) → not_matched."""
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08860", "SYNW1755"], not_found=["NOTAREAL"]),
+            self._anchor_rows(
+                ("ACZ81_08860", True, "+"),
+                ("SYNW1755", False, None),
+            ),
+            [self._neighbor_row("ACZ81_08860", "ACZ81_08850", -1, 10, "+", True)],
+        ]
+        result = api.gene_neighbors(
+            locus_tags=["ACZ81_08860", "SYNW1755", "NOTAREAL"], conn=mock_conn,
+        )
+        assert result["not_found"] == ["NOTAREAL"]
+        assert result["not_matched"] == ["SYNW1755"]
+
+    def test_contig_boundary_anchor_present_in_anchors(self, mock_conn):
+        """Anchor alone-ish on contig → fewer neighbor rows but still in anchors."""
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_00010"]),
+            self._anchor_rows(("ACZ81_00010", True, "+")),
+            [
+                self._neighbor_row("ACZ81_00010", "ACZ81_00020", 1, 50, "+", True),
+                self._neighbor_row("ACZ81_00010", "ACZ81_00030", 2, 120, "+", True),
+            ],
+        ]
+        result = api.gene_neighbors(locus_tags=["ACZ81_00010"], conn=mock_conn)
+        anchor_tags = [a["locus_tag"] for a in result["anchors"]]
+        assert "ACZ81_00010" in anchor_tags
+        # only downstream offsets present (boundary handled)
+        offsets = sorted(r["rank_offset"] for r in result["results"])
+        assert offsets == [1, 2]
+
+    def test_same_strand_true_keeps_co_oriented_drops_null(self, mock_conn):
+        """same_strand=True keeps co-oriented, drops null-strand neighbors, counts dropped."""
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08860"]),
+            self._anchor_rows(("ACZ81_08860", True, "+")),
+            [
+                self._neighbor_row("ACZ81_08860", "ACZ81_08850", -1, 10, "+", True),
+                self._neighbor_row("ACZ81_08860", "ACZ81_08855", -2, 556, None, None),
+                self._neighbor_row("ACZ81_08860", "ACZ81_08870", 1, 335, "-", False),
+            ],
+        ]
+        result = api.gene_neighbors(
+            locus_tags=["ACZ81_08860"], same_strand=True, conn=mock_conn,
+        )
+        kept = {r["neighbor_locus_tag"] for r in result["results"]}
+        assert kept == {"ACZ81_08850"}
+        assert result["total_matching"] == 1
+        anchor = next(a for a in result["anchors"] if a["locus_tag"] == "ACZ81_08860")
+        assert anchor["dropped_null_strand"] == 1
+
+    def test_null_strand_anchor_with_same_strand_warns_unfiltered(self, mock_conn):
+        """Anchor's own strand null + same_strand set → unfiltered + warning, dropped=0."""
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08865"]),
+            self._anchor_rows(("ACZ81_08865", True, None)),
+            [
+                self._neighbor_row("ACZ81_08865", "ACZ81_08860", -1, 10, "+", None),
+                self._neighbor_row("ACZ81_08865", "ACZ81_08870", 1, 335, "-", None),
+            ],
+        ]
+        result = api.gene_neighbors(
+            locus_tags=["ACZ81_08865"], same_strand=True, conn=mock_conn,
+        )
+        # unfiltered: both neighbors kept
+        assert result["total_matching"] == 2
+        assert len(result["warnings"]) >= 1
+        anchor = next(a for a in result["anchors"] if a["locus_tag"] == "ACZ81_08865")
+        assert anchor["dropped_null_strand"] == 0
+
+    def test_max_bp_distance_passed_to_builder(self, mock_conn):
+        """max_bp_distance forwarded into the detail builder call."""
+        with patch(
+            "multiomics_explorer.api.functions.build_gene_neighbors",
+            wraps=None,
+        ) as mock_builder:
+            mock_builder.return_value = ("MATCH (a:Gene) RETURN a", {})
+            mock_conn.execute_query.side_effect = [
+                self._exist(["ACZ81_08860"]),
+                self._anchor_rows(("ACZ81_08860", True, "+")),
+                [],
+            ]
+            api.gene_neighbors(
+                locus_tags=["ACZ81_08860"], max_bp_distance=400, conn=mock_conn,
+            )
+        mock_builder.assert_called_once()
+        assert mock_builder.call_args.kwargs.get("max_bp_distance") == 400
+
+    def test_summary_returns_empty_results(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08860"]),
+            self._anchor_rows(("ACZ81_08860", True, "+")),
+        ]
+        result = api.gene_neighbors(
+            locus_tags=["ACZ81_08860"], summary=True, conn=mock_conn,
+        )
+        assert result["results"] == []
+        assert result["returned"] == 0
+
+    def test_limit_caps_and_truncates(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._exist(["ACZ81_08860"]),
+            self._anchor_rows(("ACZ81_08860", True, "+")),
+            [
+                self._neighbor_row("ACZ81_08860", "ACZ81_08850", -1, 10, "+", True),
+                self._neighbor_row("ACZ81_08860", "ACZ81_08870", 1, 335, "+", True),
+            ],
+        ]
+        result = api.gene_neighbors(
+            locus_tags=["ACZ81_08860"], limit=1, conn=mock_conn,
+        )
+        assert result["total_matching"] == 2
+        assert result["returned"] == 1
+        assert result["truncated"] is True
+
+    def test_empty_locus_tags_raises(self, mock_conn):
+        with pytest.raises(ValueError):
+            api.gene_neighbors(locus_tags=[], conn=mock_conn)
+
+    def test_importable_from_package(self):
+        from multiomics_explorer import gene_neighbors
+        assert gene_neighbors is api.gene_neighbors
+
+
+# ---------------------------------------------------------------------------
 # Outfacing-doc lint gate for api/functions.py docstrings
 # ---------------------------------------------------------------------------
 # See docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md
