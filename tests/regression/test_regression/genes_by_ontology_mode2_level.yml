@@ -47,7 +47,7 @@ by_level:
 - level: 1
   n_genes: 1438
   n_terms: 69
-  row_count: 1806
+  row_count: 1761
 case_id: genes_by_ontology_mode2_level
 filtered_out: []
 genes_per_term_max: 340
@@ -158,15 +158,6 @@ results:
   product: peptide methionine-R-sulfoxide reductase
   term_id: cyanorak.role:L.2
   term_name: Protein fate > Protein modification and repair
-- gene_category: Stress response and adaptation
-  gene_name: grpE
-  is_informative: true
-  level: 1
-  locus_tag: PMM0016
-  product: chaperone protein GrpE
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
 - gene_category: Stress response and adaptation
   gene_name: grpE
   is_informative: true
@@ -666,24 +657,6 @@ results:
   level: 1
   locus_tag: PMM0070
   product: cysteine desulfurase / selenocysteine lyase
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Amino acid metabolism
-  gene_name: sufS1
-  is_informative: true
-  level: 1
-  locus_tag: PMM0070
-  product: cysteine desulfurase / selenocysteine lyase
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Amino acid metabolism
-  gene_name: sufS1
-  is_informative: true
-  level: 1
-  locus_tag: PMM0070
-  product: cysteine desulfurase / selenocysteine lyase
   term_id: cyanorak.role:E.7
   term_name: Central intermediary metabolism > Sulfur metabolism
 - gene_category: Stress response and adaptation
@@ -701,26 +674,8 @@ results:
   level: 1
   locus_tag: PMM0071
   product: ABC transporter involved in Fe-S cluster assembly, permease component
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Stress response and adaptation
-  gene_name: sufD
-  is_informative: true
-  level: 1
-  locus_tag: PMM0071
-  product: ABC transporter involved in Fe-S cluster assembly, permease component
   term_id: cyanorak.role:E.7
   term_name: Central intermediary metabolism > Sulfur metabolism
-- gene_category: Stress response and adaptation
-  gene_name: sufC
-  is_informative: true
-  level: 1
-  locus_tag: PMM0072
-  product: ABC transporter involved in Fe-S cluster assembly, ATPase component
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
 - gene_category: Stress response and adaptation
   gene_name: sufC
   is_informative: true
@@ -746,15 +701,6 @@ results:
   product: ABC transporter involved in Fe-S cluster assembly, permease component
   term_id: cyanorak.role:B.11
   term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Other
-- gene_category: Coenzyme metabolism
-  gene_name: sufB
-  is_informative: true
-  level: 1
-  locus_tag: PMM0073
-  product: ABC transporter involved in Fe-S cluster assembly, permease component
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
 - gene_category: Coenzyme metabolism
   gene_name: sufB
   is_informative: true
@@ -829,15 +775,6 @@ results:
   term_id: cyanorak.role:D.1
   term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
     detoxification
-- gene_category: Stress response and adaptation
-  gene_name: prxQ
-  is_informative: true
-  level: 1
-  locus_tag: PMM0079
-  product: 2-Cys peroxiredoxin
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
 - gene_category: Central intermediary metabolism
   gene_name: cysH
   is_informative: true
@@ -895,15 +832,6 @@ results:
   product: ABC transport system ATP-binding/permease protein, Uup family
   term_id: cyanorak.role:Q.9
   term_name: Transport and binding proteins > Unknown substrate
-- gene_category: Stress response and adaptation
-  gene_name: hli
-  is_informative: true
-  level: 1
-  locus_tag: PMM0093
-  product: high light inducible protein
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
 - gene_category: Stress response and adaptation
   gene_name: hli
   is_informative: true
@@ -1080,14 +1008,6 @@ results:
   product: uroporphyrinogen-III synthase
   term_id: cyanorak.role:B.10
   term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Vitamins
-- gene_category: Coenzyme metabolism
-  gene_name: hemD
-  is_informative: true
-  level: 1
-  locus_tag: PMM0113
-  product: uroporphyrinogen-III synthase
-  term_id: cyanorak.role:B.5
-  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
 - gene_category: Coenzyme metabolism
   gene_name: hemD
   is_informative: true
@@ -1748,15 +1668,6 @@ results:
   level: 1
   locus_tag: PMM0191
   product: bifunctional GTP diphosphokinase / guanosine-3^,5^-bis(diphosphate) 3^-diphosphatase
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Stress response and adaptation
-  gene_name: spoT
-  is_informative: true
-  level: 1
-  locus_tag: PMM0191
-  product: bifunctional GTP diphosphokinase / guanosine-3^,5^-bis(diphosphate) 3^-diphosphatase
   term_id: cyanorak.role:M.3
   term_name: Purines, pyrimidines, nucleosides, and nucleotides > Purine ribonucleotide
     biosynthesis
@@ -1923,15 +1834,6 @@ results:
   level: 1
   locus_tag: PMM0211
   product: thioredoxin-disulfide reductase (NTR system)
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Coenzyme metabolism
-  gene_name: trxB
-  is_informative: true
-  level: 1
-  locus_tag: PMM0211
-  product: thioredoxin-disulfide reductase (NTR system)
   term_id: cyanorak.role:D.4
   term_name: Cellular processes > Chaperones
 - gene_category: Regulatory functions
@@ -1966,14 +1868,6 @@ results:
   product: delta-aminolevulinic acid dehydratase
   term_id: cyanorak.role:B.10
   term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Vitamins
-- gene_category: Coenzyme metabolism
-  gene_name: hemB
-  is_informative: true
-  level: 1
-  locus_tag: PMM0215
-  product: delta-aminolevulinic acid dehydratase
-  term_id: cyanorak.role:B.5
-  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
 - gene_category: Coenzyme metabolism
   gene_name: hemB
   is_informative: true
@@ -2497,15 +2391,6 @@ results:
   product: thioredoxin domain-containing protein
   term_id: cyanorak.role:G.2
   term_name: Energy metabolism > Electron transport
-- gene_category: Stress response and adaptation
-  gene_name: phrA
-  is_informative: true
-  level: 1
-  locus_tag: PMM0285
-  product: deoxyribodipyrimidine photolyase (DNA photolyase) (photoreactivating enzyme)
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
 - gene_category: Stress response and adaptation
   gene_name: phrA
   is_informative: true
@@ -3551,15 +3436,6 @@ results:
   level: 1
   locus_tag: PMM0425
   product: deoxyribodipyrimidine photolyase-like, FAD-domain containing protein
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Stress response and adaptation
-  gene_name: null
-  is_informative: true
-  level: 1
-  locus_tag: PMM0425
-  product: deoxyribodipyrimidine photolyase-like, FAD-domain containing protein
   term_id: cyanorak.role:F.1
   term_name: DNA metabolism > DNA replication, recombination, and repair
 - gene_category: Translation
@@ -4010,14 +3886,6 @@ results:
   product: glutamate-1-semialdehyde-2,1-aminomutase
   term_id: cyanorak.role:B.5
   term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
-- gene_category: Coenzyme metabolism
-  gene_name: hemL
-  is_informative: true
-  level: 1
-  locus_tag: PMM0483
-  product: glutamate-1-semialdehyde-2,1-aminomutase
-  term_id: cyanorak.role:B.5
-  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
 - gene_category: Stress response and adaptation
   gene_name: xthA
   is_informative: true
@@ -4124,14 +3992,6 @@ results:
   product: porphobilinogen deaminase
   term_id: cyanorak.role:B.10
   term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Vitamins
-- gene_category: Coenzyme metabolism
-  gene_name: hemC
-  is_informative: true
-  level: 1
-  locus_tag: PMM0495
-  product: porphobilinogen deaminase
-  term_id: cyanorak.role:B.5
-  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
 - gene_category: Coenzyme metabolism
   gene_name: hemC
   is_informative: true
@@ -4475,15 +4335,6 @@ results:
   product: metallopeptidase M50 family protein
   term_id: cyanorak.role:L.2
   term_name: Protein fate > Protein modification and repair
-- gene_category: Stress response and adaptation
-  gene_name: psaM
-  is_informative: true
-  level: 1
-  locus_tag: PMM0540
-  product: photosystem I reaction centre subunit XII
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
 - gene_category: Stress response and adaptation
   gene_name: psaM
   is_informative: true
@@ -4844,24 +4695,6 @@ results:
   level: 1
   locus_tag: PMM0580
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Stress response and adaptation
-  gene_name: clpB1
-  is_informative: true
-  level: 1
-  locus_tag: PMM0580
-  product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Stress response and adaptation
-  gene_name: clpB1
-  is_informative: true
-  level: 1
-  locus_tag: PMM0580
-  product: ATP-dependent Clp protease ATP-binding subunit ClpB
   term_id: cyanorak.role:D.4
   term_name: Cellular processes > Chaperones
 - gene_category: Stress response and adaptation
@@ -4897,14 +4730,6 @@ results:
   product: plastocyanin
   term_id: cyanorak.role:J.10
   term_name: Photosynthesis and respiration > Soluble electron carriers
-- gene_category: Coenzyme metabolism
-  gene_name: hemE
-  is_informative: true
-  level: 1
-  locus_tag: PMM0583
-  product: uroporphyrinogen decarboxylase
-  term_id: cyanorak.role:B.5
-  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
 - gene_category: Coenzyme metabolism
   gene_name: hemE
   is_informative: true
@@ -5905,15 +5730,6 @@ results:
   term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
     detoxification
 - gene_category: Stress response and adaptation
-  gene_name: som
-  is_informative: true
-  level: 1
-  locus_tag: PMM0709
-  product: outer membrane porin
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Stress response and adaptation
   gene_name: pstS
   is_informative: true
   level: 1
@@ -5938,15 +5754,6 @@ results:
   product: phosphate ABC transporter, phosphate-binding protein PstS
   term_id: cyanorak.role:Q.2
   term_name: Transport and binding proteins > Anions
-- gene_category: Stress response and adaptation
-  gene_name: chrA
-  is_informative: true
-  level: 1
-  locus_tag: PMM0711
-  product: chromate transporter
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
 - gene_category: Stress response and adaptation
   gene_name: chrA
   is_informative: true
@@ -6444,14 +6251,6 @@ results:
   level: 1
   locus_tag: PMM0768
   product: glutamyl-tRNA reductase
-  term_id: cyanorak.role:B.5
-  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
-- gene_category: Coenzyme metabolism
-  gene_name: hemA
-  is_informative: true
-  level: 1
-  locus_tag: PMM0768
-  product: glutamyl-tRNA reductase
   term_id: cyanorak.role:D.1
   term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
     detoxification
@@ -6817,15 +6616,6 @@ results:
   level: 1
   locus_tag: PMM0806
   product: possible transcriptional regulator of iron metabolism, Crp/Fnr family protein
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Stress response and adaptation
-  gene_name: null
-  is_informative: true
-  level: 1
-  locus_tag: PMM0806
-  product: possible transcriptional regulator of iron metabolism, Crp/Fnr family protein
   term_id: cyanorak.role:N.1
   term_name: Regulatory functions > DNA interactions
 - gene_category: Unknown
@@ -7175,15 +6965,6 @@ results:
   term_id: cyanorak.role:D.1
   term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
     detoxification
-- gene_category: Stress response and adaptation
-  gene_name: ahpC
-  is_informative: true
-  level: 1
-  locus_tag: PMM0856
-  product: 2-Cys peroxiredoxin
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
 - gene_category: Coenzyme metabolism
   gene_name: null
   is_informative: false
@@ -7362,14 +7143,6 @@ results:
   product: PHP domain-containing protein
   term_id: cyanorak.role:R.3
   term_name: Other > Enzymes of unknown specificity
-- gene_category: Coenzyme metabolism
-  gene_name: hemJ
-  is_informative: true
-  level: 1
-  locus_tag: PMM0881
-  product: protoporphyrinogen IX oxidase
-  term_id: cyanorak.role:B.5
-  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
 - gene_category: Coenzyme metabolism
   gene_name: hemJ
   is_informative: true
@@ -7618,14 +7391,6 @@ results:
   product: photosystem I reaction center subunit X
   term_id: cyanorak.role:J.7
   term_name: Photosynthesis and respiration > Photosystem I
-- gene_category: Coenzyme metabolism
-  gene_name: dxs
-  is_informative: true
-  level: 1
-  locus_tag: PMM0907
-  product: 1-deoxy-D-xylulose-5-phosphate synthase
-  term_id: cyanorak.role:B.10
-  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Vitamins
 - gene_category: Coenzyme metabolism
   gene_name: dxs
   is_informative: true
@@ -8489,15 +8254,6 @@ results:
   level: 1
   locus_tag: PMM1001
   product: metallo-hydrolase/oxidoreductase
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Stress response and adaptation
-  gene_name: null
-  is_informative: true
-  level: 1
-  locus_tag: PMM1001
-  product: metallo-hydrolase/oxidoreductase
   term_id: cyanorak.role:R.3
   term_name: Other > Enzymes of unknown specificity
 - gene_category: Stress response and adaptation
@@ -8830,15 +8586,6 @@ results:
   product: homoserine dehydrogenase
   term_id: cyanorak.role:A.6
   term_name: Amino acid biosynthesis > Serine family (Ser, Gly, Cys)
-- gene_category: Stress response and adaptation
-  gene_name: sufE
-  is_informative: true
-  level: 1
-  locus_tag: PMM1052
-  product: sulfur acceptor for SufS cysteine desulfurase
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
 - gene_category: Stress response and adaptation
   gene_name: sufE
   is_informative: true
@@ -9400,15 +9147,6 @@ results:
   term_id: cyanorak.role:D.1
   term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
     detoxification
-- gene_category: Stress response and adaptation
-  gene_name: som
-  is_informative: true
-  level: 1
-  locus_tag: PMM1119
-  product: outer membrane porin
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
 - gene_category: Unknown
   gene_name: null
   is_informative: false
@@ -9417,15 +9155,6 @@ results:
   product: TPR repeat-containing protein
   term_id: cyanorak.role:R.2
   term_name: Other > Conserved hypothetical proteins
-- gene_category: Stress response and adaptation
-  gene_name: som
-  is_informative: true
-  level: 1
-  locus_tag: PMM1121
-  product: outer membrane porin
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
 - gene_category: Stress response and adaptation
   gene_name: som
   is_informative: true
@@ -9695,16 +9424,6 @@ results:
   locus_tag: PMM1150
   product: thioredoxin reductase fused with a thioredoxin domain (large NTR System
     or NTRC)
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Coenzyme metabolism
-  gene_name: trxB
-  is_informative: true
-  level: 1
-  locus_tag: PMM1150
-  product: thioredoxin reductase fused with a thioredoxin domain (large NTR System
-    or NTRC)
   term_id: cyanorak.role:G.2
   term_name: Energy metabolism > Electron transport
 - gene_category: Translation
@@ -9860,15 +9579,6 @@ results:
   level: 1
   locus_tag: PMM1164
   product: iron deficiency-induced protein A
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Stress response and adaptation
-  gene_name: idiA2
-  is_informative: true
-  level: 1
-  locus_tag: PMM1164
-  product: iron deficiency-induced protein A
   term_id: cyanorak.role:Q.4
   term_name: Transport and binding proteins > Cations and iron carrying compounds
 - gene_category: Translation
@@ -9920,15 +9630,6 @@ results:
   product: conserved hypothetical protein (DUF3386)
   term_id: cyanorak.role:R.2
   term_name: Other > Conserved hypothetical proteins
-- gene_category: Stress response and adaptation
-  gene_name: isiB
-  is_informative: true
-  level: 1
-  locus_tag: PMM1171
-  product: flavodoxin
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
 - gene_category: Stress response and adaptation
   gene_name: isiB
   is_informative: true
@@ -10604,30 +10305,12 @@ results:
     detoxification
 - gene_category: Stress response and adaptation
   gene_name: null
-  is_informative: true
-  level: 1
-  locus_tag: PMM1283
-  product: uncharacterized membrane protein
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Stress response and adaptation
-  gene_name: null
   is_informative: false
   level: 1
   locus_tag: PMM1283
   product: uncharacterized membrane protein
   term_id: cyanorak.role:R.2
   term_name: Other > Conserved hypothetical proteins
-- gene_category: Stress response and adaptation
-  gene_name: phoH
-  is_informative: true
-  level: 1
-  locus_tag: PMM1284
-  product: phosphate starvation-inducible protein
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
 - gene_category: Stress response and adaptation
   gene_name: phoH
   is_informative: true
@@ -10833,14 +10516,6 @@ results:
   product: cell division protein FtsZ
   term_id: cyanorak.role:D.2
   term_name: Cellular processes > Cell division
-- gene_category: Coenzyme metabolism
-  gene_name: hemN
-  is_informative: true
-  level: 1
-  locus_tag: PMM1311
-  product: oxygen-independent coproporphyrinogen III oxidase
-  term_id: cyanorak.role:B.5
-  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
 - gene_category: Coenzyme metabolism
   gene_name: hemN
   is_informative: true
@@ -11619,15 +11294,6 @@ results:
   level: 1
   locus_tag: PMM1436
   product: chaperonin GroEL
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Stress response and adaptation
-  gene_name: groL1
-  is_informative: true
-  level: 1
-  locus_tag: PMM1436
-  product: chaperonin GroEL
   term_id: cyanorak.role:D.4
   term_name: Cellular processes > Chaperones
 - gene_category: Stress response and adaptation
@@ -11638,24 +11304,6 @@ results:
   product: chaperonin GroEL
   term_id: cyanorak.role:L.3
   term_name: Protein fate > Protein folding and stabilization
-- gene_category: Stress response and adaptation
-  gene_name: groES
-  is_informative: true
-  level: 1
-  locus_tag: PMM1437
-  product: co-chaperonin GroES
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Stress response and adaptation
-  gene_name: groES
-  is_informative: true
-  level: 1
-  locus_tag: PMM1437
-  product: co-chaperonin GroES
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
 - gene_category: Stress response and adaptation
   gene_name: groES
   is_informative: true
@@ -11852,15 +11500,6 @@ results:
   product: cell division protein FtsW
   term_id: cyanorak.role:D.2
   term_name: Cellular processes > Cell division
-- gene_category: Stress response and adaptation
-  gene_name: ccsC1
-  is_informative: true
-  level: 1
-  locus_tag: PMM1459
-  product: cytochrome c-type biogenesis protein
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
 - gene_category: Stress response and adaptation
   gene_name: ccsC1
   is_informative: true
@@ -12348,26 +11987,8 @@ results:
   level: 1
   locus_tag: PMM1519
   product: photosystem I reaction centre subunit XI
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Stress response and adaptation
-  gene_name: psaL
-  is_informative: true
-  level: 1
-  locus_tag: PMM1519
-  product: photosystem I reaction centre subunit XI
   term_id: cyanorak.role:J.7
   term_name: Photosynthesis and respiration > Photosystem I
-- gene_category: Stress response and adaptation
-  gene_name: psaI
-  is_informative: true
-  level: 1
-  locus_tag: PMM1520
-  product: photosystem I reaction center subunit VIII
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
 - gene_category: Stress response and adaptation
   gene_name: psaI
   is_informative: true
@@ -12877,14 +12498,6 @@ results:
   product: nucleotide-binding protein
   term_id: cyanorak.role:B.10
   term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Vitamins
-- gene_category: Coenzyme metabolism
-  gene_name: hemF
-  is_informative: true
-  level: 1
-  locus_tag: PMM1582
-  product: coproporphyrinogen-III oxidase
-  term_id: cyanorak.role:B.5
-  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
 - gene_category: Coenzyme metabolism
   gene_name: hemF
   is_informative: true
@@ -13905,15 +13518,6 @@ results:
   level: 1
   locus_tag: PMM1704
   product: chaperone protein DnaK
-  term_id: cyanorak.role:D.1
-  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
-    detoxification
-- gene_category: Stress response and adaptation
-  gene_name: dnaK3
-  is_informative: true
-  level: 1
-  locus_tag: PMM1704
-  product: chaperone protein DnaK
   term_id: cyanorak.role:L.3
   term_name: Protein fate > Protein folding and stabilization
 - gene_category: Amino acid metabolism
@@ -14895,8 +14499,8 @@ results:
   term_id: cyanorak.role:D.1
   term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
     detoxification
-returned: 1806
-row_count: 1806
+returned: 1761
+row_count: 1761
 terms_per_gene_max: 3
 terms_per_gene_median: 1.0
 terms_per_gene_min: 1
@@ -14905,12 +14509,12 @@ top_terms:
   is_informative: false
   term_id: cyanorak.role:R.2
   term_name: Other > Conserved hypothetical proteins
-- count: 248
+- count: 213
   is_informative: true
   term_id: cyanorak.role:D.1
   term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
     detoxification
-- count: 64
+- count: 63
   is_informative: true
   term_id: cyanorak.role:B.10
   term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Vitamins
@@ -14924,7 +14528,7 @@ top_terms:
   term_name: DNA metabolism > DNA replication, recombination, and repair
 total_categories: 22
 total_genes: 1438
-total_matching: 1806
+total_matching: 1761
 total_terms: 69
 truncated: false
 wrong_level: []

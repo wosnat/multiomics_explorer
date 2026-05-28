@@ -15,12 +15,12 @@ by_level:
 - level: 6
   n_genes: 30
   n_terms: 1
-  row_count: 50
+  row_count: 30
 case_id: genes_by_ontology_mode1_term_ids
 filtered_out: []
-genes_per_term_max: 50
-genes_per_term_median: 50.0
-genes_per_term_min: 50
+genes_per_term_max: 30
+genes_per_term_median: 30.0
+genes_per_term_min: 30
 n_best_effort_terms: 1
 not_found: []
 offset: 0
@@ -36,43 +36,11 @@ results:
   term_id: go:0006260
   term_name: DNA replication
 - gene_category: Replication and repair
-  gene_name: dnaN
-  is_informative: true
-  level: 6
-  locus_tag: PMM0001
-  product: DNA polymerase III, beta subunit
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
   gene_name: rarA
   is_informative: true
   level: 6
   locus_tag: PMM0077
   product: recombination factor
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
-  gene_name: rarA
-  is_informative: true
-  level: 6
-  locus_tag: PMM0077
-  product: recombination factor
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
-  gene_name: rarA
-  is_informative: true
-  level: 6
-  locus_tag: PMM0077
-  product: recombination factor
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
-  gene_name: holB
-  is_informative: true
-  level: 6
-  locus_tag: PMM0129
-  product: DNA polymerase III, delta^ subunit
   term_id: go:0006260
   term_name: DNA replication
 - gene_category: Replication and repair
@@ -107,52 +75,12 @@ results:
   product: primosomal protein N^
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
-  gene_name: priA
-  is_informative: true
-  level: 6
-  locus_tag: PMM0497
-  product: primosomal protein N^
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
-  gene_name: priA
-  is_informative: true
-  level: 6
-  locus_tag: PMM0497
-  product: primosomal protein N^
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
-  gene_name: priA
-  is_informative: true
-  level: 6
-  locus_tag: PMM0497
-  product: primosomal protein N^
-  term_id: go:0006260
-  term_name: DNA replication
 - gene_category: Transport
   gene_name: ycf41
   is_informative: true
   level: 6
   locus_tag: PMM0502
   product: possible single-stranded DNA-binding protein
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
-  gene_name: dnaA
-  is_informative: true
-  level: 6
-  locus_tag: PMM0565
-  product: chromosomal replication initiator protein
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
-  gene_name: dnaA
-  is_informative: true
-  level: 6
-  locus_tag: PMM0565
-  product: chromosomal replication initiator protein
   term_id: go:0006260
   term_name: DNA replication
 - gene_category: Replication and repair
@@ -212,22 +140,6 @@ results:
   term_id: go:0006260
   term_name: DNA replication
 - gene_category: Replication and repair
-  gene_name: umuC
-  is_informative: true
-  level: 6
-  locus_tag: PMM0937
-  product: DNA polymerase V, subunit C
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
-  gene_name: dnaG
-  is_informative: true
-  level: 6
-  locus_tag: PMM0939
-  product: DNA primase
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
   gene_name: dnaG
   is_informative: true
   level: 6
@@ -260,51 +172,11 @@ results:
   term_id: go:0006260
   term_name: DNA replication
 - gene_category: Replication and repair
-  gene_name: ruvC
-  is_informative: true
-  level: 6
-  locus_tag: PMM1054
-  product: crossover junction endodeoxyribonuclease RuvC
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
-  gene_name: ruvC
-  is_informative: true
-  level: 6
-  locus_tag: PMM1054
-  product: crossover junction endodeoxyribonuclease RuvC
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
-  gene_name: ruvC
-  is_informative: true
-  level: 6
-  locus_tag: PMM1054
-  product: crossover junction endodeoxyribonuclease RuvC
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
-  gene_name: ruvC
-  is_informative: true
-  level: 6
-  locus_tag: PMM1054
-  product: crossover junction endodeoxyribonuclease RuvC
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
   gene_name: gyrA
   is_informative: true
   level: 6
   locus_tag: PMM1063
   product: DNA gyrase, A subunit
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
-  gene_name: polA
-  is_informative: true
-  level: 6
-  locus_tag: PMM1140
-  product: DNA polymerase I
   term_id: go:0006260
   term_name: DNA replication
 - gene_category: Replication and repair
@@ -372,43 +244,11 @@ results:
   term_id: go:0006260
   term_name: DNA replication
 - gene_category: Replication and repair
-  gene_name: holA
-  is_informative: true
-  level: 6
-  locus_tag: PMM1647
-  product: DNA polymerase III, delta subunit
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
   gene_name: dnaX
   is_informative: true
   level: 6
   locus_tag: PMM1658
   product: DNA polymerase III, gamma and tau subunits
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
-  gene_name: dnaX
-  is_informative: true
-  level: 6
-  locus_tag: PMM1658
-  product: DNA polymerase III, gamma and tau subunits
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
-  gene_name: dnaB
-  is_informative: true
-  level: 6
-  locus_tag: PMM1674
-  product: replicative DNA helicase
-  term_id: go:0006260
-  term_name: DNA replication
-- gene_category: Replication and repair
-  gene_name: dnaB
-  is_informative: true
-  level: 6
-  locus_tag: PMM1674
-  product: replicative DNA helicase
   term_id: go:0006260
   term_name: DNA replication
 - gene_category: Replication and repair
@@ -427,19 +267,19 @@ results:
   product: ATP-dependent DNA ligase
   term_id: go:0006260
   term_name: DNA replication
-returned: 50
-row_count: 50
+returned: 30
+row_count: 30
 terms_per_gene_max: 1
 terms_per_gene_median: 1.0
 terms_per_gene_min: 1
 top_terms:
-- count: 50
+- count: 30
   is_informative: true
   term_id: go:0006260
   term_name: DNA replication
 total_categories: 6
 total_genes: 30
-total_matching: 50
+total_matching: 30
 total_terms: 1
 truncated: false
 wrong_level: []
