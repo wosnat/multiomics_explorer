@@ -8316,7 +8316,7 @@ class TestBuildGenesByOntologyF1Surface:
         assert "coalesce(t.is_uninformative, '') <> 'true'" in cypher
 
     def test_match_stage_filter_before_size_collapse(self):
-        """Filter must apply BEFORE the `WITH t, collect(DISTINCT {g: g, r: r}) AS term_genes`
+        """Filter must apply BEFORE the `WITH t, collect(DISTINCT g) AS term_genes`
         size-collapse stage (otherwise it would filter on collapsed nodes)."""
         from multiomics_explorer.kg.queries_lib import (
             _genes_by_ontology_match_stage,
@@ -8326,7 +8326,7 @@ class TestBuildGenesByOntologyF1Surface:
             level=1, term_ids=None, informative_only=True,
         )
         idx_filter = cypher.find("coalesce(t.is_uninformative, '') <> 'true'")
-        idx_collapse = cypher.find("collect(DISTINCT {g: g, r: r}) AS term_genes")
+        idx_collapse = cypher.find("collect(DISTINCT g) AS term_genes")
         assert idx_filter != -1 and idx_collapse != -1
         assert idx_filter < idx_collapse
 
@@ -10167,8 +10167,8 @@ class TestMatchStageRelBinding:
     """`_genes_by_ontology_match_stage` must bind `r` in BOTH mode-1
     walk-down (where bind happens inside the helper) and modes 2/3
     walk-up (where bind comes from `_hierarchy_walk.bind_up`). The
-    final collect must collect `{g: g, r: r}` records so the detail
-    builder can project edge properties."""
+    final collect uses bare `g` (not records) so multi-edge ontologies
+    don't inflate term-size counts."""
 
     def test_mode_1_walk_down_binds_r_for_flat_ontology(self):
         """Mode 1 (term_ids only) for subcellular_localization."""
@@ -10200,47 +10200,41 @@ class TestMatchStageRelBinding:
         )
         assert "[r:Gene_has_signal_peptide_type]" in cypher
 
-    def test_collect_emits_g_r_records(self):
-        """The final collect step must produce {g, r} records, not bare g."""
+    def test_collect_emits_bare_g(self):
+        """The collect step produces distinct genes (not records),
+        so multi-edge ontologies don't inflate the term-size."""
         from multiomics_explorer.kg.queries_lib import _genes_by_ontology_match_stage
         cypher, _ = _genes_by_ontology_match_stage(
             ontology="tcdb",
             level=None, term_ids=["tcdb:1.A.1"],
             organism="MED4",
         )
-        # New shape — drops the legacy `collect(DISTINCT g) AS term_genes`
-        assert "collect(DISTINCT {g: g, r: r}) AS term_genes" in cypher
-        # Guard the legacy shape doesn't linger
-        assert "collect(DISTINCT g) AS term_genes" not in cypher
+        assert "collect(DISTINCT g) AS term_genes" in cypher
+        # Guard the broken {g, r} shape doesn't return
+        assert "collect(DISTINCT {g: g, r: r})" not in cypher
 
 
 class TestPerTermPerGeneUnwindShape:
-    """After Task 4's collect-shape change, per_term and per_gene must
-    UNWIND `{g, r}` records and alias `pair.g AS g` so their downstream
-    Cypher is identical."""
+    """After the fix, per_term and per_gene UNWIND bare `g` (not records)."""
 
-    def test_per_term_unwinds_pair_with_g_alias(self):
+    def test_per_term_unwinds_bare_g(self):
         from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_per_term
         cypher, _ = build_genes_by_ontology_per_term(
             ontology="tcdb", organism="MED4",
             level=None, term_ids=["tcdb:1.A.1"],
         )
-        # New: unwind to pair, alias to g (and r — even if unused — to
-        # preserve symmetry)
-        assert "UNWIND term_genes AS pair" in cypher
-        assert "pair.g AS g" in cypher
-        # Guard: bare-g UNWIND must be gone
-        assert "UNWIND term_genes AS g\n" not in cypher
+        assert "UNWIND term_genes AS g" in cypher
+        # Guard the pair/alias pattern is gone
+        assert "UNWIND term_genes AS pair" not in cypher
 
-    def test_per_gene_unwinds_pair_with_g_alias(self):
+    def test_per_gene_unwinds_bare_g(self):
         from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_per_gene
         cypher, _ = build_genes_by_ontology_per_gene(
             ontology="cog_category", organism="MED4",
             level=0, term_ids=None,
         )
-        assert "UNWIND term_genes AS pair" in cypher
-        assert "pair.g AS g" in cypher
-        assert "UNWIND term_genes AS g\n" not in cypher
+        assert "UNWIND term_genes AS g" in cypher
+        assert "UNWIND term_genes AS pair" not in cypher
 
 
 class TestGenesByOntologyDetailEdgeProps:
@@ -10289,18 +10283,41 @@ class TestGenesByOntologyDetailEdgeProps:
         assert "r.score" not in cypher
         assert "r.probability" not in cypher
 
-    def test_detail_unwinds_pair_with_g_r_alias(self):
-        """After Task 4's collect change, detail must UNWIND `pair` and
-        alias `pair.g AS g, pair.r AS r`."""
+    def test_detail_unwinds_bare_g(self):
+        """Detail builder uses UNWIND term_genes AS g — re-bind r happens
+        via OPTIONAL MATCH only when needed."""
         from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
         cypher, _ = build_genes_by_ontology_detail(
             ontology="tcdb",
             organism="MED4",
             term_ids=["tcdb:1.A.1"],
         )
-        assert "UNWIND term_genes AS pair" in cypher
-        assert "pair.g AS g" in cypher
-        assert "pair.r AS r" in cypher
+        assert "UNWIND term_genes AS g" in cypher
+        assert "UNWIND term_genes AS pair" not in cypher
+
+    def test_detail_owner_ontology_optional_match_rebinds_r(self):
+        """For PSORTb (owner ontology with edge_props), the detail builder
+        inserts OPTIONAL MATCH to re-bind r for the (g, t) pair."""
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="subcellular_localization",
+            organism="MED4",
+            term_ids=["psortb_OuterMembrane"],
+        )
+        assert "OPTIONAL MATCH (g)-[r:Gene_has_subcellular_localization]->(t)" in cypher
+        assert "r.score AS localization_score" in cypher
+
+    def test_detail_non_owner_no_optional_match(self):
+        """For pfam (no edge_props), no OPTIONAL MATCH is emitted."""
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="pfam",
+            organism="MED4",
+            term_ids=["pfam:PF00001"],
+        )
+        assert "OPTIONAL MATCH (g)-[r:" not in cypher
+        # Still emits the null columns
+        assert "null AS localization_score" in cypher
 
 
 class TestGeneOntologyTermsRelBindingAndEdgeProps:

@@ -2359,14 +2359,17 @@ def _genes_by_ontology_match_stage(
     # Term-level informative filter: must apply BEFORE size collapse so
     # per-term gene counts reflect informative-only terms.
     informative_filter = (
-        "WITH t, g, r WHERE coalesce(t.is_uninformative, '') <> 'true'\n"
+        "WITH t, g WHERE coalesce(t.is_uninformative, '') <> 'true'\n"
         if informative_only else ""
     )
 
     # Size filter (common to all modes). Caller must add
     # $min_gene_set_size and $max_gene_set_size to params.
+    # Collect DISTINCT g (not records) so multi-edge ontologies don't
+    # inflate term-size counts — r is re-bound via OPTIONAL MATCH in
+    # the detail builder when needed.
     size_filter = (
-        "WITH t, collect(DISTINCT {g: g, r: r}) AS term_genes\n"
+        "WITH t, collect(DISTINCT g) AS term_genes\n"
         "WHERE size(term_genes) >= $min_gene_set_size\n"
         "  AND ($max_gene_set_size IS NULL OR "
         "size(term_genes) <= $max_gene_set_size)"
@@ -2445,10 +2448,22 @@ def build_genes_by_ontology_detail(
         limit_clause = "\nLIMIT $limit"
         params["limit"] = limit
 
+    # Re-bind r for edge-prop projection. Only emitted when ontology has
+    # edge_props — for other ontologies the RETURN block emits nulls so the
+    # rel is unused. Skipping the OPTIONAL MATCH avoids multi-edge fan-out
+    # on ontologies where a gene has multiple annotation edges.
+    cfg = ONTOLOGY_CONFIG[ontology]
+    if cfg.get("edge_props"):
+        edge_rebind = (
+            f"OPTIONAL MATCH (g)-[r:{cfg['gene_rel']}]->(t)\n"
+        )
+    else:
+        edge_rebind = ""
+
     cypher = (
         f"{head}\n"
-        f"UNWIND term_genes AS pair\n"
-        f"WITH t, pair.g AS g, pair.r AS r\n"
+        f"UNWIND term_genes AS g\n"
+        f"{edge_rebind}"
         f"{return_block}{skip_clause}{limit_clause}"
     )
     return cypher, params
@@ -2486,8 +2501,7 @@ def build_genes_by_ontology_per_term(
     params["max_gene_set_size"] = max_gene_set_size
 
     tail = (
-        "UNWIND term_genes AS pair\n"
-        "WITH t, pair.g AS g, pair.r AS r\n"
+        "UNWIND term_genes AS g\n"
         "WITH t, collect({lt: g.locus_tag, "
         "cat: coalesce(g.gene_category, 'Unknown')}) AS gene_rows\n"
         "RETURN t.id AS term_id, t.name AS term_name, t.level AS level,\n"
@@ -2495,7 +2509,7 @@ def build_genes_by_ontology_per_term(
         "       t.level_is_best_effort IS NOT NULL AS best_effort,\n"
         "       size(gene_rows) AS n_genes,\n"
         "       apoc.coll.frequencies("
-        "[row IN gene_rows | row.cat]) AS cat_freqs,\n"
+        "[r IN gene_rows | r.cat]) AS cat_freqs,\n"
         "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative\n"
         "ORDER BY t.id"
     )
@@ -2530,8 +2544,7 @@ def build_genes_by_ontology_per_gene(
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
     tail = (
-        "UNWIND term_genes AS pair\n"
-        "WITH t, pair.g AS g, pair.r AS r\n"
+        "UNWIND term_genes AS g\n"
         "WITH g, collect(DISTINCT t.id) AS gene_terms, "
         "collect(DISTINCT t.level) AS gene_levels\n"
         "RETURN g.locus_tag AS locus_tag,\n"
