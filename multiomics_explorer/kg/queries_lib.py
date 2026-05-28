@@ -95,6 +95,24 @@ ONTOLOGY_CONFIG = {
         "hierarchy_rels": ["Cazy_family_is_a_cazy_family"],
         "fulltext_index": "cazyFamilyFullText",
     },
+    "subcellular_localization": {
+        "label": "SubcellularLocalization",
+        "gene_rel": "Gene_has_subcellular_localization",
+        "hierarchy_rels": [],
+        "fulltext_index": "subcellularLocalizationFullText",
+        "edge_props": [("score", "localization_score")],
+    },
+    "signal_peptide_type": {
+        "label": "SignalPeptideType",
+        "gene_rel": "Gene_has_signal_peptide_type",
+        "hierarchy_rels": [],
+        "fulltext_index": "signalPeptideTypeFullText",
+        "edge_props": [
+            ("probability", "signal_peptide_probability"),
+            ("cleavage_site", "signal_peptide_cleavage_site"),
+            ("cleavage_probability", "signal_peptide_cleavage_probability"),
+        ],
+    },
 }
 
 def _hierarchy_walk(

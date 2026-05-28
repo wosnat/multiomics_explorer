@@ -306,6 +306,83 @@ class TestHierarchyWalkCazy:
         )
 
 
+class TestOntologyConfigSubcellularLocalization:
+    """subcellular_localization (PSORTb) ontology added to ONTOLOGY_CONFIG."""
+
+    def test_subcellular_localization_in_ontology_config(self):
+        from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+        assert "subcellular_localization" in ONTOLOGY_CONFIG
+        cfg = ONTOLOGY_CONFIG["subcellular_localization"]
+        assert cfg["label"] == "SubcellularLocalization"
+        assert cfg["gene_rel"] == "Gene_has_subcellular_localization"
+        assert cfg["hierarchy_rels"] == []  # flat — no hierarchy
+        assert cfg["fulltext_index"] == "subcellularLocalizationFullText"
+        assert "bridge" not in cfg
+        assert "parent_label" not in cfg
+        # edge_props: list of (neo4j_prop, output_column) pairs
+        assert cfg["edge_props"] == [("score", "localization_score")]
+
+    def test_subcellular_localization_in_all_ontologies(self):
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        assert "subcellular_localization" in ALL_ONTOLOGIES
+
+    def test_subcellular_localization_appended_after_cazy(self):
+        """Order is load-bearing for regression-fixture determinism."""
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        assert ALL_ONTOLOGIES.index("subcellular_localization") > \
+               ALL_ONTOLOGIES.index("cazy")
+
+
+class TestOntologyConfigSignalPeptideType:
+    """signal_peptide_type (SignalP) ontology added to ONTOLOGY_CONFIG."""
+
+    def test_signal_peptide_type_in_ontology_config(self):
+        from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+        assert "signal_peptide_type" in ONTOLOGY_CONFIG
+        cfg = ONTOLOGY_CONFIG["signal_peptide_type"]
+        assert cfg["label"] == "SignalPeptideType"
+        assert cfg["gene_rel"] == "Gene_has_signal_peptide_type"
+        assert cfg["hierarchy_rels"] == []  # flat
+        assert cfg["fulltext_index"] == "signalPeptideTypeFullText"
+        assert "bridge" not in cfg
+        assert "parent_label" not in cfg
+        assert cfg["edge_props"] == [
+            ("probability", "signal_peptide_probability"),
+            ("cleavage_site", "signal_peptide_cleavage_site"),
+            ("cleavage_probability", "signal_peptide_cleavage_probability"),
+        ]
+
+    def test_signal_peptide_type_in_all_ontologies(self):
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        assert "signal_peptide_type" in ALL_ONTOLOGIES
+
+    def test_signal_peptide_type_appended_after_subcellular_localization(self):
+        """Order is load-bearing."""
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        assert ALL_ONTOLOGIES.index("signal_peptide_type") > \
+               ALL_ONTOLOGIES.index("subcellular_localization")
+
+
+class TestEdgePropsAbsentOnOtherOntologies:
+    """The `edge_props` field is optional. Existing 12 ontologies should
+    not carry it (or carry empty list) so they emit nulls for the new
+    edge-prop columns."""
+
+    @pytest.mark.parametrize("ontology", [
+        "go_bp", "go_mf", "go_cc", "ec", "kegg",
+        "cog_category", "cyanorak_role", "tigr_role", "pfam",
+        "brite", "tcdb", "cazy",
+    ])
+    def test_no_edge_props_on_pre_existing_ontologies(self, ontology):
+        from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+        cfg = ONTOLOGY_CONFIG[ontology]
+        # Either absent or empty list — both signal "no edge props to surface"
+        assert cfg.get("edge_props", []) == [], (
+            f"Pre-existing ontology {ontology!r} unexpectedly has edge_props; "
+            "only psortb/signalp should carry this field"
+        )
+
+
 class TestBuildResolveGene:
     def test_basic(self):
         cypher, params = build_resolve_gene(identifier="PMM0001")
@@ -1185,6 +1262,7 @@ class TestOntologyConfig:
             "go_bp", "go_mf", "go_cc", "ec", "kegg",
             "cog_category", "cyanorak_role", "tigr_role", "pfam",
             "brite", "tcdb", "cazy",
+            "subcellular_localization", "signal_peptide_type",
         }
 
     def test_required_fields_present(self):
@@ -5033,6 +5111,7 @@ def test_all_ontologies_matches_config_keys():
         "go_bp", "go_mf", "go_cc", "ec", "kegg",
         "cog_category", "cyanorak_role", "tigr_role", "pfam",
         "brite", "tcdb", "cazy",
+        "subcellular_localization", "signal_peptide_type",
     ]
 
 
