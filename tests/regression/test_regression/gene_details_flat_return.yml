@@ -77,6 +77,8 @@ rows:
   - cyanorak
   - eggnog
   - ncbi
+  - psortb
+  - signalp
   - uniprot
   end: 1331
   expression_edge_count: 31
@@ -135,4 +137,5 @@ rows:
   significant_up_count: 3
   start: 174
   strand: +
+  subcellular_localization: Cytoplasmic
   tcdb_family_count: 0
