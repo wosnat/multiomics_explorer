@@ -3114,3 +3114,127 @@ class TestAssaysByMetaboliteKG:
         assert result["metabolites_without_evidence"] == []
         # not_matched: KG-present but no edges-after-filter (empty here).
         assert result["not_matched"] == []
+
+
+# ---------------------------------------------------------------------------
+# PSORTb / SignalP ontology smoke tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.kg
+class TestOntologyToolsPsortbSignalpLive:
+    """Smoke tests for psortb/signalp surfacing against live KG.
+    Asserts only:
+      - non-empty results where applicable
+      - edge-prop columns populated on owner ontology
+      - edge-prop columns absent on non-owner ontology
+    NOT biological correctness (the KG-side is the source of truth for that)."""
+
+    ORGANISM = "MED4"
+
+    def test_search_ontology_psortb(self, conn):
+        result = api.search_ontology(
+            "outer", "subcellular_localization", conn=conn,
+        )
+        assert result["total_matching"] >= 1
+        assert any(r["id"] == "psortb_OuterMembrane" for r in result["results"])
+
+    def test_search_ontology_signalp(self, conn):
+        result = api.search_ontology(
+            "lipo", "signal_peptide_type", conn=conn,
+        )
+        assert result["total_matching"] >= 1
+        result_ids = {r["id"] for r in result["results"]}
+        assert "signalp_LIPO" in result_ids or "signalp_TATLIPO" in result_ids
+
+    def test_genes_by_ontology_psortb_surfaces_score(self, conn):
+        result = api.genes_by_ontology(
+            ontology="subcellular_localization",
+            term_ids=["psortb_OuterMembrane"],
+            organism=self.ORGANISM,
+            conn=conn,
+        )
+        assert result["total_matching"] > 0
+        rows = result["results"]
+        assert rows, "Expected at least one PMM* gene with OuterMembrane call"
+        for row in rows:
+            # Owner column populated, range [7.5, 10.0]
+            assert "localization_score" in row, row
+            assert 7.5 <= row["localization_score"] <= 10.0
+            # Non-owner columns absent (stripped sparse-null)
+            assert "signal_peptide_probability" not in row
+            assert "signal_peptide_cleavage_site" not in row
+            assert "signal_peptide_cleavage_probability" not in row
+
+    def test_genes_by_ontology_signalp_surfaces_probability(self, conn):
+        result = api.genes_by_ontology(
+            ontology="signal_peptide_type",
+            term_ids=["signalp_LIPO"],
+            organism=self.ORGANISM,
+            conn=conn,
+        )
+        rows = result["results"]
+        if rows:
+            for row in rows:
+                assert "signal_peptide_probability" in row
+                assert 0.0 <= row["signal_peptide_probability"] <= 1.0
+                # cleavage_site may or may not be present (depends on the gene);
+                # both states must not crash
+                assert "localization_score" not in row
+
+    def test_genes_by_ontology_pfam_strips_edge_prop_columns(self, conn):
+        """Pre-existing ontology should NOT have the 4 edge-prop columns
+        in its rows."""
+        result = api.genes_by_ontology(
+            ontology="pfam",
+            level=1,
+            organism=self.ORGANISM,
+            min_gene_set_size=5,
+            limit=5,
+            conn=conn,
+        )
+        for row in result["results"]:
+            assert "localization_score" not in row
+            assert "signal_peptide_probability" not in row
+            assert "signal_peptide_cleavage_site" not in row
+            assert "signal_peptide_cleavage_probability" not in row
+
+    def test_ontology_landscape_includes_new_ontologies(self, conn):
+        """All-ontologies fan-out includes the two new flat ontologies."""
+        from multiomics_explorer.api.functions import ontology_landscape
+        result = ontology_landscape(organism=self.ORGANISM, conn=conn)
+        # by_ontology is a dict keyed by ontology type; results rows carry ontology_type
+        ontologies_seen = set(result["by_ontology"].keys())
+        assert "subcellular_localization" in ontologies_seen
+        assert "signal_peptide_type" in ontologies_seen
+        # Both new ontologies are flat (level=0 only) — verify in results rows
+        for row in result["results"]:
+            if row["ontology_type"] in ("subcellular_localization", "signal_peptide_type"):
+                assert row["level"] == 0
+
+    def test_gene_ontology_terms_signalp_handles_cleavage_absence(self, conn):
+        """For a SignalP-PILIN gene (typically no cleavage site), the row
+        emits null cleavage fields cleanly — both states must not crash."""
+        # Find a PILIN gene first via genes_by_ontology
+        sp_search = api.genes_by_ontology(
+            ontology="signal_peptide_type",
+            term_ids=["signalp_PILIN"],
+            organism=self.ORGANISM,
+            limit=3,
+            conn=conn,
+        )
+        if not sp_search["results"]:
+            pytest.skip("No PILIN genes in MED4 — skip cleavage-absence test")
+        pilin_lts = [r["locus_tag"] for r in sp_search["results"]][:2]
+        result = api.gene_ontology_terms(
+            locus_tags=pilin_lts,
+            ontology="signal_peptide_type",
+            organism=self.ORGANISM,
+            mode="leaf",
+            conn=conn,
+        )
+        for row in result["results"]:
+            assert row["term_id"] == "signalp_PILIN"
+            assert "signal_peptide_probability" in row
+            # cleavage_site / cleavage_probability may be absent (stripped null)
+            # or present (rare); both fine
