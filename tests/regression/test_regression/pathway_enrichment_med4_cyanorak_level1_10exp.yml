@@ -144,7 +144,7 @@ enrichment_params:
   organism: MED4
   pvalue_cutoff: 0.05
   significant_only: true
-  term2gene_row_count: 1487
+  term2gene_row_count: 1532
   term_ids: null
   timepoint_filter: null
   tree: null

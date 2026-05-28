@@ -3,7 +3,11 @@ row_count: 1
 rows:
 - is_informative: true
   level: 3
+  localization_score: null
   locus_tag: MIT1002_03493
+  signal_peptide_cleavage_probability: null
+  signal_peptide_cleavage_site: null
+  signal_peptide_probability: null
   term_id: kegg.orthology:K03402
   term_name: argR, ahrC; transcriptional regulator of arginine metabolism
   tree: null

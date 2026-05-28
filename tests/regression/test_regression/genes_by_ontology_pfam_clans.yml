@@ -1,12 +1,12 @@
 by_category:
 - category: Coenzyme metabolism
-  count: 118
+  count: 119
 - category: Stress response and adaptation
-  count: 94
+  count: 97
 - category: Translation
-  count: 86
+  count: 88
 - category: Unknown
-  count: 77
+  count: 83
 - category: Amino acid metabolism
   count: 72
 - category: Cell wall and membrane
@@ -14,26 +14,26 @@ by_category:
 - category: Carbohydrate metabolism
   count: 56
 - category: Replication and repair
-  count: 51
+  count: 56
 - category: Transport
-  count: 43
+  count: 44
 - category: Post-translational modification
-  count: 38
+  count: 40
 - category: Nucleotide metabolism
   count: 27
 - category: Transcription
-  count: 25
+  count: 26
 - category: Photosynthesis
   count: 19
 - category: Lipid metabolism
-  count: 17
+  count: 18
 - category: Central intermediary metabolism
   count: 17
+- category: Cellular processes
+  count: 14
 - category: Regulatory functions
   count: 12
 - category: Cell cycle and division
-  count: 11
-- category: Cellular processes
   count: 11
 - category: Energy production
   count: 10
@@ -49,13 +49,13 @@ by_category:
   count: 1
 by_level:
 - level: 0
-  n_genes: 864
-  n_terms: 77
-  row_count: 1063
+  n_genes: 889
+  n_terms: 90
+  row_count: 1372
 case_id: genes_by_ontology_pfam_clans
 filtered_out: []
-genes_per_term_max: 146
-genes_per_term_median: 7.0
+genes_per_term_max: 202
+genes_per_term_median: 8.0
 genes_per_term_min: 5
 n_best_effort_terms: 0
 not_found: []
@@ -71,6 +71,46 @@ results:
   product: amidophosphoribosyltransferase
   term_id: pfam.clan:CL0533
   term_name: PRTase-like
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0006
+  product: tetratricopeptide repeat family protein
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0006
+  product: tetratricopeptide repeat family protein
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0006
+  product: tetratricopeptide repeat family protein
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0006
+  product: tetratricopeptide repeat family protein
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0006
+  product: tetratricopeptide repeat family protein
+  term_id: pfam.clan:CL0020
+  term_name: TPR
 - gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -167,6 +207,14 @@ results:
   product: translation elongation factor P
   term_id: pfam.clan:CL0021
   term_name: OB
+- gene_category: Translation
+  gene_name: efp
+  is_informative: true
+  level: 0
+  locus_tag: PMM0026
+  product: translation elongation factor P
+  term_id: pfam.clan:CL0021
+  term_name: OB
 - gene_category: Lipid metabolism
   gene_name: accB
   is_informative: true
@@ -183,6 +231,38 @@ results:
   product: uncharacterized conserved NADP-binding domain-containing protein
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Carbohydrate metabolism
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0029
+  product: uncharacterized conserved NADP-binding domain-containing protein
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Carbohydrate metabolism
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0029
+  product: uncharacterized conserved NADP-binding domain-containing protein
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Replication and repair
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0031
+  product: HNH endonuclease family protein
+  term_id: pfam.clan:CL0263
+  term_name: His-Me_finger
+- gene_category: Replication and repair
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0031
+  product: HNH endonuclease family protein
+  term_id: pfam.clan:CL0263
+  term_name: His-Me_finger
 - gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -207,6 +287,14 @@ results:
   product: GMP synthase (glutamine-hydrolyzing), N-terminal domain
   term_id: pfam.clan:CL0014
   term_name: Glutaminase_I
+- gene_category: Nucleotide metabolism
+  gene_name: guaA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0037
+  product: GMP synthase (glutamine-hydrolyzing), N-terminal domain
+  term_id: pfam.clan:CL0039
+  term_name: HUP
 - gene_category: Nucleotide metabolism
   gene_name: guaA
   is_informative: true
@@ -241,6 +329,22 @@ results:
   term_id: pfam.clan:CL0381
   term_name: Metallo-HOrase
 - gene_category: Carbohydrate metabolism
+  gene_name: flv1
+  is_informative: true
+  level: 0
+  locus_tag: PMM0042
+  product: flavoprotein involved in Mehler reaction
+  term_id: pfam.clan:CL0381
+  term_name: Metallo-HOrase
+- gene_category: Carbohydrate metabolism
+  gene_name: flv3
+  is_informative: true
+  level: 0
+  locus_tag: PMM0043
+  product: flavoprotein involved in Mehler reaction
+  term_id: pfam.clan:CL0381
+  term_name: Metallo-HOrase
+- gene_category: Carbohydrate metabolism
   gene_name: flv3
   is_informative: true
   level: 0
@@ -256,6 +360,14 @@ results:
   product: alanyl-tRNA synthetase
   term_id: pfam.clan:CL0040
   term_name: tRNA_synt_II
+- gene_category: Translation
+  gene_name: alaS
+  is_informative: true
+  level: 0
+  locus_tag: PMM0044
+  product: alanyl-tRNA synthetase
+  term_id: pfam.clan:CL0094
+  term_name: Peptidase_ME
 - gene_category: Central intermediary metabolism
   gene_name: speA
   is_informative: true
@@ -286,6 +398,14 @@ results:
   level: 0
   locus_tag: PMM0049
   product: dephospho-CoA kinase
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
+- gene_category: Cell cycle and division
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0051
+  product: cobQ/CobB/MinD/ParA nucleotide binding domain protein
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
 - gene_category: Cell cycle and division
@@ -400,6 +520,46 @@ results:
   product: phosphoglucomutase
   term_id: pfam.clan:CL0407
   term_name: TBP-like
+- gene_category: Carbohydrate metabolism
+  gene_name: pgmA2
+  is_informative: true
+  level: 0
+  locus_tag: PMM0076
+  product: phosphoglucomutase
+  term_id: pfam.clan:CL0407
+  term_name: TBP-like
+- gene_category: Carbohydrate metabolism
+  gene_name: pgmA2
+  is_informative: true
+  level: 0
+  locus_tag: PMM0076
+  product: phosphoglucomutase
+  term_id: pfam.clan:CL0754
+  term_name: PGM_I-III
+- gene_category: Carbohydrate metabolism
+  gene_name: pgmA2
+  is_informative: true
+  level: 0
+  locus_tag: PMM0076
+  product: phosphoglucomutase
+  term_id: pfam.clan:CL0754
+  term_name: PGM_I-III
+- gene_category: Carbohydrate metabolism
+  gene_name: pgmA2
+  is_informative: true
+  level: 0
+  locus_tag: PMM0076
+  product: phosphoglucomutase
+  term_id: pfam.clan:CL0754
+  term_name: PGM_I-III
+- gene_category: Replication and repair
+  gene_name: rarA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0077
+  product: recombination factor
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Replication and repair
   gene_name: rarA
   is_informative: true
@@ -448,6 +608,14 @@ results:
   product: type 2 NADH dehydrogenase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Carbohydrate metabolism
+  gene_name: ndbB
+  is_informative: true
+  level: 0
+  locus_tag: PMM0082
+  product: type 2 NADH dehydrogenase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Transport
   gene_name: ktrA
   is_informative: true
@@ -464,6 +632,14 @@ results:
   product: conserved hypothetical protein
   term_id: pfam.clan:CL0057
   term_name: Met_repress
+- gene_category: Transport
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0089
+  product: ABC transport system ATP-binding/permease protein, Uup family
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Transport
   gene_name: null
   is_informative: true
@@ -560,6 +736,14 @@ results:
   product: shikimate kinase
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0109
+  product: uncharacterized conserved secreted protein
+  term_id: pfam.clan:CL0209
+  term_name: Bet_v_1_like
 - gene_category: Coenzyme metabolism
   gene_name: gst
   is_informative: true
@@ -569,11 +753,43 @@ results:
   term_id: pfam.clan:CL0172
   term_name: Thioredoxin
 - gene_category: Coenzyme metabolism
+  gene_name: gst
+  is_informative: true
+  level: 0
+  locus_tag: PMM0110
+  product: glutathione S-transferase, rho class
+  term_id: pfam.clan:CL0497
+  term_name: GST_C
+- gene_category: Coenzyme metabolism
+  gene_name: gst
+  is_informative: true
+  level: 0
+  locus_tag: PMM0110
+  product: glutathione S-transferase, rho class
+  term_id: pfam.clan:CL0497
+  term_name: GST_C
+- gene_category: Cellular processes
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0114
+  product: polyketide cyclase / aromatase
+  term_id: pfam.clan:CL0209
+  term_name: Bet_v_1_like
+- gene_category: Coenzyme metabolism
   gene_name: crtQ
   is_informative: true
   level: 0
   locus_tag: PMM0115
   product: 9,9^-di-cis-zeta-carotene desaturase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Cell cycle and division
+  gene_name: sulA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0120
+  product: cell division inhibitor
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
 - gene_category: Cell cycle and division
@@ -664,6 +880,46 @@ results:
   product: photosystem I assembly protein Ycf3
   term_id: pfam.clan:CL0020
   term_name: TPR
+- gene_category: Photosynthesis
+  gene_name: ycf3
+  is_informative: true
+  level: 0
+  locus_tag: PMM0132
+  product: photosystem I assembly protein Ycf3
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Photosynthesis
+  gene_name: ycf3
+  is_informative: true
+  level: 0
+  locus_tag: PMM0132
+  product: photosystem I assembly protein Ycf3
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Photosynthesis
+  gene_name: ycf3
+  is_informative: true
+  level: 0
+  locus_tag: PMM0132
+  product: photosystem I assembly protein Ycf3
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Photosynthesis
+  gene_name: ycf3
+  is_informative: true
+  level: 0
+  locus_tag: PMM0132
+  product: photosystem I assembly protein Ycf3
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Replication and repair
+  gene_name: radA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0133
+  product: DNA repair protein Sms/RadA
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Replication and repair
   gene_name: radA
   is_informative: true
@@ -817,6 +1073,22 @@ results:
   term_id: pfam.clan:CL0344
   term_name: 4Fe-4S
 - gene_category: Carbohydrate metabolism
+  gene_name: ndhI
+  is_informative: true
+  level: 0
+  locus_tag: PMM0159
+  product: NADH dehydrogenase I subunit NdhI
+  term_id: pfam.clan:CL0344
+  term_name: 4Fe-4S
+- gene_category: Carbohydrate metabolism
+  gene_name: ndhI
+  is_informative: true
+  level: 0
+  locus_tag: PMM0159
+  product: NADH dehydrogenase I subunit NdhI
+  term_id: pfam.clan:CL0344
+  term_name: 4Fe-4S
+- gene_category: Carbohydrate metabolism
   gene_name: ndhA
   is_informative: true
   level: 0
@@ -848,6 +1120,22 @@ results:
   product: adenylylsulfate kinase
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Coenzyme metabolism
+  gene_name: chlM
+  is_informative: true
+  level: 0
+  locus_tag: PMM0168
+  product: magnesium protoporphyrin O-methyltransferase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Coenzyme metabolism
+  gene_name: chlM
+  is_informative: true
+  level: 0
+  locus_tag: PMM0168
+  product: magnesium protoporphyrin O-methyltransferase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Coenzyme metabolism
   gene_name: chlM
   is_informative: true
@@ -888,6 +1176,22 @@ results:
   product: 16S rRNA (cytosine(1402)-N(4))-methyltransferase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Coenzyme metabolism
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0173
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  term_id: pfam.clan:CL0050
+  term_name: HotDog
+- gene_category: Coenzyme metabolism
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0173
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  term_id: pfam.clan:CL0050
+  term_name: HotDog
 - gene_category: Coenzyme metabolism
   gene_name: menC
   is_informative: true
@@ -1049,6 +1353,14 @@ results:
   term_id: pfam.clan:CL0492
   term_name: S4
 - gene_category: Translation
+  gene_name: rluD
+  is_informative: true
+  level: 0
+  locus_tag: PMM0193
+  product: 23S rRNA pseudouridine synthase
+  term_id: pfam.clan:CL0649
+  term_name: PseudoU_synth
+- gene_category: Translation
   gene_name: rbgA
   is_informative: true
   level: 0
@@ -1056,6 +1368,14 @@ results:
   product: ribosome biogenesis GTPase A
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Cell wall and membrane
+  gene_name: murG
+  is_informative: true
+  level: 0
+  locus_tag: PMM0197
+  product: undecaprenyldiphospho-muramoylpentapeptide beta-N-acetylglucosaminyltransferase
+  term_id: pfam.clan:CL0113
+  term_name: GT-B
 - gene_category: Cell wall and membrane
   gene_name: murG
   is_informative: true
@@ -1110,6 +1430,22 @@ results:
   level: 0
   locus_tag: PMM0207
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
+- gene_category: Post-translational modification
+  gene_name: clpB2
+  is_informative: true
+  level: 0
+  locus_tag: PMM0207
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  term_id: pfam.clan:CL0671
+  term_name: AAA_lid
+- gene_category: Post-translational modification
+  gene_name: clpB2
+  is_informative: true
+  level: 0
+  locus_tag: PMM0207
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
   term_id: pfam.clan:CL0671
   term_name: AAA_lid
 - gene_category: Carbohydrate metabolism
@@ -1128,6 +1464,14 @@ results:
   product: ABC1 family protein
   term_id: pfam.clan:CL0016
   term_name: PKinase
+- gene_category: Coenzyme metabolism
+  gene_name: trxB
+  is_informative: true
+  level: 0
+  locus_tag: PMM0211
+  product: thioredoxin-disulfide reductase (NTR system)
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Coenzyme metabolism
   gene_name: trxB
   is_informative: true
@@ -1176,6 +1520,22 @@ results:
   product: glutathionyl-hydroquinone reductase
   term_id: pfam.clan:CL0172
   term_name: Thioredoxin
+- gene_category: Stress response and adaptation
+  gene_name: yqjG
+  is_informative: true
+  level: 0
+  locus_tag: PMM0221
+  product: glutathionyl-hydroquinone reductase
+  term_id: pfam.clan:CL0497
+  term_name: GST_C
+- gene_category: Stress response and adaptation
+  gene_name: yqjG
+  is_informative: true
+  level: 0
+  locus_tag: PMM0221
+  product: glutathionyl-hydroquinone reductase
+  term_id: pfam.clan:CL0497
+  term_name: GST_C
 - gene_category: Amino acid metabolism
   gene_name: aspA
   is_informative: true
@@ -1305,6 +1665,30 @@ results:
   product: phosphoglucosamine mutase
   term_id: pfam.clan:CL0407
   term_name: TBP-like
+- gene_category: Cell wall and membrane
+  gene_name: glmM
+  is_informative: true
+  level: 0
+  locus_tag: PMM0241
+  product: phosphoglucosamine mutase
+  term_id: pfam.clan:CL0754
+  term_name: PGM_I-III
+- gene_category: Cell wall and membrane
+  gene_name: glmM
+  is_informative: true
+  level: 0
+  locus_tag: PMM0241
+  product: phosphoglucosamine mutase
+  term_id: pfam.clan:CL0754
+  term_name: PGM_I-III
+- gene_category: Cell wall and membrane
+  gene_name: glmM
+  is_informative: true
+  level: 0
+  locus_tag: PMM0241
+  product: phosphoglucosamine mutase
+  term_id: pfam.clan:CL0754
+  term_name: PGM_I-III
 - gene_category: Energy production
   gene_name: txlA
   is_informative: true
@@ -1385,6 +1769,14 @@ results:
   product: two-component sensor histidine kinase
   term_id: pfam.clan:CL0025
   term_name: His_Kinase_A
+- gene_category: Signal transduction
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0269
+  product: two-component sensor histidine kinase
+  term_id: pfam.clan:CL0025
+  term_name: His_Kinase_A
 - gene_category: Translation
   gene_name: tgt
   is_informative: true
@@ -1401,6 +1793,14 @@ results:
   product: NAD(P)-binding oxidoreductase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Unknown
+  gene_name: mviM
+  is_informative: true
+  level: 0
+  locus_tag: PMM0273
+  product: NAD(P)-binding oxidoreductase
+  term_id: pfam.clan:CL0139
+  term_name: GADPH_aa-bio_dh
 - gene_category: Unknown
   gene_name: mviM
   is_informative: true
@@ -1449,6 +1849,30 @@ results:
   product: phosphoglucomutase
   term_id: pfam.clan:CL0407
   term_name: TBP-like
+- gene_category: Carbohydrate metabolism
+  gene_name: pgmA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0278
+  product: phosphoglucomutase
+  term_id: pfam.clan:CL0754
+  term_name: PGM_I-III
+- gene_category: Carbohydrate metabolism
+  gene_name: pgmA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0278
+  product: phosphoglucomutase
+  term_id: pfam.clan:CL0754
+  term_name: PGM_I-III
+- gene_category: Carbohydrate metabolism
+  gene_name: pgmA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0278
+  product: phosphoglucomutase
+  term_id: pfam.clan:CL0754
+  term_name: PGM_I-III
 - gene_category: Coenzyme metabolism
   gene_name: diox1
   is_informative: true
@@ -1473,6 +1897,14 @@ results:
   product: enoyl-(acyl-carrier-protein) reductase (ENR)
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Stress response and adaptation
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0283
+  product: thioredoxin domain-containing protein
+  term_id: pfam.clan:CL0172
+  term_name: Thioredoxin
 - gene_category: Stress response and adaptation
   gene_name: null
   is_informative: true
@@ -1577,6 +2009,22 @@ results:
   product: DNA-dependent ATPase I and helicase II
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Replication and repair
+  gene_name: uvrD
+  is_informative: true
+  level: 0
+  locus_tag: PMM0304
+  product: DNA-dependent ATPase I and helicase II
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
+- gene_category: Central intermediary metabolism
+  gene_name: xylB
+  is_informative: true
+  level: 0
+  locus_tag: PMM0310
+  product: carbohydrate kinase, FGGY family
+  term_id: pfam.clan:CL0108
+  term_name: Actin_ATPase
 - gene_category: Central intermediary metabolism
   gene_name: xylB
   is_informative: true
@@ -1609,6 +2057,30 @@ results:
   product: protein-(glutamine-N5) methyltransferase, release factor-specific
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Translation
+  gene_name: prmC
+  is_informative: true
+  level: 0
+  locus_tag: PMM0318
+  product: protein-(glutamine-N5) methyltransferase, release factor-specific
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Cell cycle and division
+  gene_name: minD
+  is_informative: true
+  level: 0
+  locus_tag: PMM0321
+  product: septum site-determining protein MinD
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
+- gene_category: Cell cycle and division
+  gene_name: minD
+  is_informative: true
+  level: 0
+  locus_tag: PMM0321
+  product: septum site-determining protein MinD
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Cell cycle and division
   gene_name: minD
   is_informative: true
@@ -1641,6 +2113,22 @@ results:
   product: carboxy-terminal processing peptidase
   term_id: pfam.clan:CL0466
   term_name: PDZ-like
+- gene_category: Post-translational modification
+  gene_name: ctp
+  is_informative: true
+  level: 0
+  locus_tag: PMM0324
+  product: carboxy-terminal processing peptidase
+  term_id: pfam.clan:CL0466
+  term_name: PDZ-like
+- gene_category: Post-translational modification
+  gene_name: ctp
+  is_informative: true
+  level: 0
+  locus_tag: PMM0324
+  product: carboxy-terminal processing peptidase
+  term_id: pfam.clan:CL0466
+  term_name: PDZ-like
 - gene_category: Replication and repair
   gene_name: mutM
   is_informative: true
@@ -1665,6 +2153,22 @@ results:
   product: acetyltransferase family protein
   term_id: pfam.clan:CL0257
   term_name: Acetyltrans
+- gene_category: Transcription
+  gene_name: rimI
+  is_informative: true
+  level: 0
+  locus_tag: PMM0333
+  product: acetyltransferase family protein
+  term_id: pfam.clan:CL0257
+  term_name: Acetyltrans
+- gene_category: Transcription
+  gene_name: rimI
+  is_informative: true
+  level: 0
+  locus_tag: PMM0333
+  product: acetyltransferase family protein
+  term_id: pfam.clan:CL0257
+  term_name: Acetyltrans
 - gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -1681,6 +2185,22 @@ results:
   product: plastoquinol terminal oxidase
   term_id: pfam.clan:CL0044
   term_name: Ferritin
+- gene_category: Coenzyme metabolism
+  gene_name: T8L23.23
+  is_informative: true
+  level: 0
+  locus_tag: PMM0339
+  product: carotenoid isomerase protein family
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Coenzyme metabolism
+  gene_name: T8L23.23
+  is_informative: true
+  level: 0
+  locus_tag: PMM0339
+  product: carotenoid isomerase protein family
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Coenzyme metabolism
   gene_name: T8L23.23
   is_informative: true
@@ -1787,6 +2307,14 @@ results:
   term_id: pfam.clan:CL0177
   term_name: PBP
 - gene_category: Central intermediary metabolism
+  gene_name: cynA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0370
+  product: cyanate ABC transporter, substrate-binding protein
+  term_id: pfam.clan:CL0177
+  term_name: PBP
+- gene_category: Central intermediary metabolism
   gene_name: cynB
   is_informative: true
   level: 0
@@ -1845,6 +2373,15 @@ results:
     and N6-adenine DNA methyltransferase activity
   term_id: pfam.clan:CL0236
   term_name: PDDEXK
+- gene_category: Replication and repair
+  gene_name: spnII1interrupted1C
+  is_informative: true
+  level: 0
+  locus_tag: PMM0384
+  product: Putative Type IIC bifunctional restriction-modification protein with endonuclease
+    and N6-adenine DNA methyltransferase activity
+  term_id: pfam.clan:CL0236
+  term_name: PDDEXK
 - gene_category: Translation
   gene_name: miaE
   is_informative: true
@@ -1885,6 +2422,30 @@ results:
   product: pyrroline-5-carboxylate reductase
   term_id: pfam.clan:CL0106
   term_name: 6PGD_C
+- gene_category: Cell wall and membrane
+  gene_name: dgdA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0397
+  product: digalactosyldiacylglycerol (DGDG) synthase
+  term_id: pfam.clan:CL0113
+  term_name: GT-B
+- gene_category: Cell wall and membrane
+  gene_name: dgdA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0397
+  product: digalactosyldiacylglycerol (DGDG) synthase
+  term_id: pfam.clan:CL0113
+  term_name: GT-B
+- gene_category: Cell wall and membrane
+  gene_name: dgdA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0397
+  product: digalactosyldiacylglycerol (DGDG) synthase
+  term_id: pfam.clan:CL0113
+  term_name: GT-B
 - gene_category: Cell wall and membrane
   gene_name: dgdA
   is_informative: true
@@ -1973,6 +2534,14 @@ results:
   product: 30S ribosomal protein S4
   term_id: pfam.clan:CL0492
   term_name: S4
+- gene_category: Translation
+  gene_name: rpsD
+  is_informative: true
+  level: 0
+  locus_tag: PMM0410
+  product: 30S ribosomal protein S4
+  term_id: pfam.clan:CL0492
+  term_name: S4
 - gene_category: Nucleotide metabolism
   gene_name: null
   is_informative: true
@@ -2043,6 +2612,14 @@ results:
   level: 0
   locus_tag: PMM0420
   product: GTP-binding protein LepA
+  term_id: pfam.clan:CL0437
+  term_name: EF-G_C
+- gene_category: Cell wall and membrane
+  gene_name: lepA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0420
+  product: GTP-binding protein LepA
   term_id: pfam.clan:CL0866
   term_name: ALR_C-like
 - gene_category: Transport
@@ -2053,6 +2630,14 @@ results:
   product: ABC-type oligopeptide transporter, membrane component
   term_id: pfam.clan:CL0404
   term_name: BPD_transp_1
+- gene_category: Translation
+  gene_name: trmH
+  is_informative: true
+  level: 0
+  locus_tag: PMM0422
+  product: tRNA guanosine-2^-O-methyltransferase
+  term_id: pfam.clan:CL0098
+  term_name: SPOUT
 - gene_category: Translation
   gene_name: trmH
   is_informative: true
@@ -2150,6 +2735,14 @@ results:
   product: NADH dehydrogenase I subunit NdhB (chain 2 or N)
   term_id: pfam.clan:CL0425
   term_name: ComplexI-N
+- gene_category: Replication and repair
+  gene_name: topA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0436
+  product: DNA topoisomerase I, omega subunit
+  term_id: pfam.clan:CL0413
+  term_name: Toprim-like
 - gene_category: Amino acid metabolism
   gene_name: null
   is_informative: true
@@ -2206,6 +2799,14 @@ results:
   product: beta-ketoacyl-(acyl-carrier-protein) reductase (KR)
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Lipid metabolism
+  gene_name: fabG
+  is_informative: true
+  level: 0
+  locus_tag: PMM0453
+  product: beta-ketoacyl-(acyl-carrier-protein) reductase (KR)
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Coenzyme metabolism
   gene_name: ispD
   is_informative: true
@@ -2246,6 +2847,14 @@ results:
   product: exopolyphosphatase
   term_id: pfam.clan:CL0108
   term_name: Actin_ATPase
+- gene_category: Central intermediary metabolism
+  gene_name: ppx
+  is_informative: true
+  level: 0
+  locus_tag: PMM0457
+  product: exopolyphosphatase
+  term_id: pfam.clan:CL0237
+  term_name: HD_PDEase
 - gene_category: Central intermediary metabolism
   gene_name: ppx
   is_informative: true
@@ -2335,6 +2944,15 @@ results:
     MgdE
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Lipid metabolism
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0478
+  product: C-terminal Rossman-fold domain of the monoglucosyldiacylglycerol epimerase
+    MgdE
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Energy production
   gene_name: pta
   is_informative: true
@@ -2399,6 +3017,30 @@ results:
   product: major RNA polymerase sigma factor, type I
   term_id: pfam.clan:CL0123
   term_name: HTH
+- gene_category: Stress response and adaptation
+  gene_name: rpoD1
+  is_informative: true
+  level: 0
+  locus_tag: PMM0496
+  product: major RNA polymerase sigma factor, type I
+  term_id: pfam.clan:CL0123
+  term_name: HTH
+- gene_category: Stress response and adaptation
+  gene_name: rpoD1
+  is_informative: true
+  level: 0
+  locus_tag: PMM0496
+  product: major RNA polymerase sigma factor, type I
+  term_id: pfam.clan:CL0123
+  term_name: HTH
+- gene_category: Replication and repair
+  gene_name: priA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0497
+  product: primosomal protein N^
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Replication and repair
   gene_name: priA
   is_informative: true
@@ -2455,6 +3097,22 @@ results:
   product: putative arsenate reductase
   term_id: pfam.clan:CL0172
   term_name: Thioredoxin
+- gene_category: Stress response and adaptation
+  gene_name: arsC
+  is_informative: true
+  level: 0
+  locus_tag: PMM0512
+  product: putative arsenate reductase
+  term_id: pfam.clan:CL0172
+  term_name: Thioredoxin
+- gene_category: Post-translational modification
+  gene_name: lepB
+  is_informative: true
+  level: 0
+  locus_tag: PMM0513
+  product: signal peptidase I
+  term_id: pfam.clan:CL0299
+  term_name: Peptidase_SF
 - gene_category: Post-translational modification
   gene_name: lepB
   is_informative: true
@@ -2487,6 +3145,38 @@ results:
   product: transaldolase
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
+- gene_category: Coenzyme metabolism
+  gene_name: fixC
+  is_informative: true
+  level: 0
+  locus_tag: PMM0520
+  product: geranylgeranyl reductase family protein
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Coenzyme metabolism
+  gene_name: fixC
+  is_informative: true
+  level: 0
+  locus_tag: PMM0520
+  product: geranylgeranyl reductase family protein
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Coenzyme metabolism
+  gene_name: fixC
+  is_informative: true
+  level: 0
+  locus_tag: PMM0520
+  product: geranylgeranyl reductase family protein
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Coenzyme metabolism
+  gene_name: fixC
+  is_informative: true
+  level: 0
+  locus_tag: PMM0520
+  product: geranylgeranyl reductase family protein
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Coenzyme metabolism
   gene_name: fixC
   is_informative: true
@@ -2533,8 +3223,32 @@ results:
   level: 0
   locus_tag: PMM0526
   product: acetolactate synthase, large subunit, biosynthetic type
+  term_id: pfam.clan:CL0167
+  term_name: Zn_Beta_Ribbon
+- gene_category: Amino acid metabolism
+  gene_name: ilvB
+  is_informative: true
+  level: 0
+  locus_tag: PMM0526
+  product: acetolactate synthase, large subunit, biosynthetic type
   term_id: pfam.clan:CL0254
   term_name: THDP-binding
+- gene_category: Amino acid metabolism
+  gene_name: ilvB
+  is_informative: true
+  level: 0
+  locus_tag: PMM0526
+  product: acetolactate synthase, large subunit, biosynthetic type
+  term_id: pfam.clan:CL0254
+  term_name: THDP-binding
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0529
+  product: conserved hypothetical protein
+  term_id: pfam.clan:CL0219
+  term_name: RNase_H
 - gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -2559,6 +3273,22 @@ results:
   product: long-chain fatty aldehyde decarbonylase/aldehyde-deformylating oxygenase
   term_id: pfam.clan:CL0044
   term_name: Ferritin
+- gene_category: Lipid metabolism
+  gene_name: aar
+  is_informative: true
+  level: 0
+  locus_tag: PMM0533
+  product: long-chain fatty acyl-ACP reductase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Lipid metabolism
+  gene_name: aar
+  is_informative: true
+  level: 0
+  locus_tag: PMM0533
+  product: long-chain fatty acyl-ACP reductase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Lipid metabolism
   gene_name: aar
   is_informative: true
@@ -2607,6 +3337,22 @@ results:
   product: metallopeptidase M50 family protein
   term_id: pfam.clan:CL0126
   term_name: Peptidase_MA
+- gene_category: Post-translational modification
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0538
+  product: metallopeptidase M50 family protein
+  term_id: pfam.clan:CL0126
+  term_name: Peptidase_MA
+- gene_category: Coenzyme metabolism
+  gene_name: lplA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0539
+  product: lipoate---protein ligase
+  term_id: pfam.clan:CL0040
+  term_name: tRNA_synt_II
 - gene_category: Coenzyme metabolism
   gene_name: lplA
   is_informative: true
@@ -2688,6 +3434,14 @@ results:
   product: hydroxyacylglutathione hydrolase
   term_id: pfam.clan:CL0381
   term_name: Metallo-HOrase
+- gene_category: Stress response and adaptation
+  gene_name: glx2
+  is_informative: true
+  level: 0
+  locus_tag: PMM0559
+  product: hydroxyacylglutathione hydrolase
+  term_id: pfam.clan:CL0381
+  term_name: Metallo-HOrase
 - gene_category: Amino acid metabolism
   gene_name: hisG
   is_informative: true
@@ -2712,6 +3466,14 @@ results:
   product: putative ABC multidrug efflux transporter
   term_id: pfam.clan:CL0241
   term_name: ABC_membrane
+- gene_category: Transcription
+  gene_name: ycf52
+  is_informative: true
+  level: 0
+  locus_tag: PMM0562
+  product: uncharacterized acyl-CoA N-acetyltransferase
+  term_id: pfam.clan:CL0257
+  term_name: Acetyltrans
 - gene_category: Transcription
   gene_name: ycf52
   is_informative: true
@@ -2761,6 +3523,30 @@ results:
   term_id: pfam.clan:CL0172
   term_name: Thioredoxin
 - gene_category: Coenzyme metabolism
+  gene_name: gst
+  is_informative: true
+  level: 0
+  locus_tag: PMM0566
+  product: glutathione S-transferase
+  term_id: pfam.clan:CL0172
+  term_name: Thioredoxin
+- gene_category: Coenzyme metabolism
+  gene_name: gst
+  is_informative: true
+  level: 0
+  locus_tag: PMM0566
+  product: glutathione S-transferase
+  term_id: pfam.clan:CL0497
+  term_name: GST_C
+- gene_category: Coenzyme metabolism
+  gene_name: gor
+  is_informative: true
+  level: 0
+  locus_tag: PMM0567
+  product: glutathione reductase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Coenzyme metabolism
   gene_name: gor
   is_informative: true
   level: 0
@@ -2800,6 +3586,22 @@ results:
   product: RNA polymerase sigma factor, type II
   term_id: pfam.clan:CL0123
   term_name: HTH
+- gene_category: Transcription
+  gene_name: rpoD7
+  is_informative: true
+  level: 0
+  locus_tag: PMM0577
+  product: RNA polymerase sigma factor, type II
+  term_id: pfam.clan:CL0123
+  term_name: HTH
+- gene_category: Transcription
+  gene_name: rpoD7
+  is_informative: true
+  level: 0
+  locus_tag: PMM0577
+  product: RNA polymerase sigma factor, type II
+  term_id: pfam.clan:CL0123
+  term_name: HTH
 - gene_category: Cellular processes
   gene_name: null
   is_informative: true
@@ -2808,6 +3610,14 @@ results:
   product: putative 6-pyruvoyl tetrahydropterin synthase
   term_id: pfam.clan:CL0334
   term_name: THBO-biosyn
+- gene_category: Stress response and adaptation
+  gene_name: clpB1
+  is_informative: true
+  level: 0
+  locus_tag: PMM0580
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Stress response and adaptation
   gene_name: clpB1
   is_informative: true
@@ -2880,6 +3690,22 @@ results:
   product: alpha/beta hydrolase fold family protein
   term_id: pfam.clan:CL0028
   term_name: AB_hydrolase
+- gene_category: Lipid metabolism
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0592
+  product: alpha/beta hydrolase fold family protein
+  term_id: pfam.clan:CL0028
+  term_name: AB_hydrolase
+- gene_category: Lipid metabolism
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0592
+  product: alpha/beta hydrolase fold family protein
+  term_id: pfam.clan:CL0028
+  term_name: AB_hydrolase
 - gene_category: Post-translational modification
   gene_name: prlC
   is_informative: true
@@ -2929,6 +3755,14 @@ results:
   term_id: pfam.clan:CL0072
   term_name: Ubiquitin
 - gene_category: Translation
+  gene_name: thrS
+  is_informative: true
+  level: 0
+  locus_tag: PMM0597
+  product: threonyl-tRNA synthetase
+  term_id: pfam.clan:CL0094
+  term_name: Peptidase_ME
+- gene_category: Translation
   gene_name: trpS
   is_informative: true
   level: 0
@@ -2968,6 +3802,14 @@ results:
   product: signal peptidase I
   term_id: pfam.clan:CL0299
   term_name: Peptidase_SF
+- gene_category: Post-translational modification
+  gene_name: lepB
+  is_informative: true
+  level: 0
+  locus_tag: PMM0606
+  product: signal peptidase I
+  term_id: pfam.clan:CL0299
+  term_name: Peptidase_SF
 - gene_category: Coenzyme metabolism
   gene_name: menD
   is_informative: true
@@ -2985,6 +3827,14 @@ results:
   term_id: pfam.clan:CL0254
   term_name: THDP-binding
 - gene_category: Coenzyme metabolism
+  gene_name: menD
+  is_informative: true
+  level: 0
+  locus_tag: PMM0607
+  product: 2-succinyl-5-enolpyruvyl-6-hydroxy-3- cyclohexene-1-carboxylic-acid synthase
+  term_id: pfam.clan:CL0254
+  term_name: THDP-binding
+- gene_category: Coenzyme metabolism
   gene_name: menB
   is_informative: true
   level: 0
@@ -2992,6 +3842,14 @@ results:
   product: naphthoate synthase
   term_id: pfam.clan:CL0127
   term_name: ClpP_crotonase
+- gene_category: Carbohydrate metabolism
+  gene_name: glgA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0609
+  product: glycogen synthase
+  term_id: pfam.clan:CL0113
+  term_name: GT-B
 - gene_category: Carbohydrate metabolism
   gene_name: glgA
   is_informative: true
@@ -3090,6 +3948,14 @@ results:
   product: glutathione S-transferase
   term_id: pfam.clan:CL0172
   term_name: Thioredoxin
+- gene_category: Coenzyme metabolism
+  gene_name: gst
+  is_informative: true
+  level: 0
+  locus_tag: PMM0630
+  product: glutathione S-transferase
+  term_id: pfam.clan:CL0497
+  term_name: GST_C
 - gene_category: Lipid metabolism
   gene_name: null
   is_informative: true
@@ -3186,6 +4052,30 @@ results:
   product: FAD binding domain protein
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Amino acid metabolism
+  gene_name: cetA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0648
+  product: FAD binding domain protein
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Amino acid metabolism
+  gene_name: cetA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0648
+  product: FAD binding domain protein
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0649
+  product: pentapeptide repeats family protein
+  term_id: pfam.clan:CL0505
+  term_name: Pentapeptide
 - gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -3202,6 +4092,14 @@ results:
   product: pseudouridine synthase
   term_id: pfam.clan:CL0492
   term_name: S4
+- gene_category: Translation
+  gene_name: rsuA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0658
+  product: pseudouridine synthase
+  term_id: pfam.clan:CL0649
+  term_name: PseudoU_synth
 - gene_category: Replication and repair
   gene_name: null
   is_informative: true
@@ -3226,6 +4124,22 @@ results:
   product: methyltransferase domain protein
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0662
+  product: methyltransferase domain protein
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0662
+  product: methyltransferase domain protein
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Stress response and adaptation
   gene_name: prfC
   is_informative: true
@@ -3240,8 +4154,32 @@ results:
   level: 0
   locus_tag: PMM0663
   product: peptide chain release factor 3
+  term_id: pfam.clan:CL0437
+  term_name: EF-G_C
+- gene_category: Stress response and adaptation
+  gene_name: prfC
+  is_informative: true
+  level: 0
+  locus_tag: PMM0663
+  product: peptide chain release factor 3
   term_id: pfam.clan:CL0866
   term_name: ALR_C-like
+- gene_category: Stress response and adaptation
+  gene_name: prfC
+  is_informative: true
+  level: 0
+  locus_tag: PMM0663
+  product: peptide chain release factor 3
+  term_id: pfam.clan:CL0866
+  term_name: ALR_C-like
+- gene_category: Transport
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0666
+  product: ABC transporter family protein
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Transport
   gene_name: null
   is_informative: true
@@ -3314,6 +4252,14 @@ results:
   product: photosystem II D1 protein carboxyl-terminal processing peptidase
   term_id: pfam.clan:CL0127
   term_name: ClpP_crotonase
+- gene_category: Post-translational modification
+  gene_name: ctpA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0677
+  product: photosystem II D1 protein carboxyl-terminal processing peptidase
+  term_id: pfam.clan:CL0466
+  term_name: PDZ-like
 - gene_category: Post-translational modification
   gene_name: ctpA
   is_informative: true
@@ -3418,6 +4364,22 @@ results:
   product: two-component system sensor histidine kinase, phosphate sensing PhoR
   term_id: pfam.clan:CL0025
   term_name: His_Kinase_A
+- gene_category: Stress response and adaptation
+  gene_name: phoR
+  is_informative: true
+  level: 0
+  locus_tag: PMM0706
+  product: two-component system sensor histidine kinase, phosphate sensing PhoR
+  term_id: pfam.clan:CL0025
+  term_name: His_Kinase_A
+- gene_category: Stress response and adaptation
+  gene_name: phoR
+  is_informative: true
+  level: 0
+  locus_tag: PMM0706
+  product: two-component system sensor histidine kinase, phosphate sensing PhoR
+  term_id: pfam.clan:CL0183
+  term_name: PAS_Fold
 - gene_category: Secondary metabolites
   gene_name: null
   is_informative: true
@@ -3435,6 +4397,14 @@ results:
   term_id: pfam.clan:CL0193
   term_name: MBB
 - gene_category: Stress response and adaptation
+  gene_name: som
+  is_informative: true
+  level: 0
+  locus_tag: PMM0709
+  product: outer membrane porin
+  term_id: pfam.clan:CL0193
+  term_name: MBB
+- gene_category: Stress response and adaptation
   gene_name: pstS
   is_informative: true
   level: 0
@@ -3442,6 +4412,14 @@ results:
   product: phosphate ABC transporter, phosphate-binding protein PstS
   term_id: pfam.clan:CL0177
   term_name: PBP
+- gene_category: Stress response and adaptation
+  gene_name: arsJ
+  is_informative: true
+  level: 0
+  locus_tag: PMM0712
+  product: multidrug efflux transporter, MFS family
+  term_id: pfam.clan:CL0015
+  term_name: MFS
 - gene_category: Stress response and adaptation
   gene_name: gap3
   is_informative: true
@@ -3536,6 +4514,14 @@ results:
   level: 0
   locus_tag: PMM0728
   product: ATP-dependent Lhr-N-terminus-like helicase
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
+- gene_category: Replication and repair
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0728
+  product: ATP-dependent Lhr-N-terminus-like helicase
   term_id: pfam.clan:CL0123
   term_name: HTH
 - gene_category: Replication and repair
@@ -3602,6 +4588,38 @@ results:
   product: activator of the histidine kinase NblS
   term_id: pfam.clan:CL0010
   term_name: SH3
+- gene_category: Post-translational modification
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0745
+  product: metallopeptidase, M16 family
+  term_id: pfam.clan:CL0094
+  term_name: Peptidase_ME
+- gene_category: Post-translational modification
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0745
+  product: metallopeptidase, M16 family
+  term_id: pfam.clan:CL0094
+  term_name: Peptidase_ME
+- gene_category: Post-translational modification
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0746
+  product: peptidase M16 inactive domain protein
+  term_id: pfam.clan:CL0094
+  term_name: Peptidase_ME
+- gene_category: Post-translational modification
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0746
+  product: peptidase M16 inactive domain protein
+  term_id: pfam.clan:CL0094
+  term_name: Peptidase_ME
 - gene_category: Transport
   gene_name: devC
   is_informative: true
@@ -3642,6 +4660,14 @@ results:
   product: ATP-dependent DNA helicase
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Replication and repair
+  gene_name: recG
+  is_informative: true
+  level: 0
+  locus_tag: PMM0756
+  product: ATP-dependent DNA helicase
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Translation
   gene_name: glyS
   is_informative: true
@@ -3666,6 +4692,14 @@ results:
   product: GTP-binding protein TypA/BipA
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Translation
+  gene_name: typA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0762
+  product: GTP-binding protein TypA/BipA
+  term_id: pfam.clan:CL0437
+  term_name: EF-G_C
 - gene_category: Translation
   gene_name: typA
   is_informative: true
@@ -3746,6 +4780,14 @@ results:
   product: putative uracil phosphoribosyltransferase
   term_id: pfam.clan:CL0533
   term_name: PRTase-like
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0777
+  product: pentapeptide repeats family protein
+  term_id: pfam.clan:CL0505
+  term_name: Pentapeptide
 - gene_category: Coenzyme metabolism
   gene_name: cobW
   is_informative: true
@@ -3819,6 +4861,14 @@ results:
   product: UDP-3-O-[3-hydroxymyristoyl] glucosamine N-acyltransferase
   term_id: pfam.clan:CL0536
   term_name: HEXAPEP
+- gene_category: Cell wall and membrane
+  gene_name: lpxD
+  is_informative: true
+  level: 0
+  locus_tag: PMM0787
+  product: UDP-3-O-[3-hydroxymyristoyl] glucosamine N-acyltransferase
+  term_id: pfam.clan:CL0536
+  term_name: HEXAPEP
 - gene_category: Amino acid metabolism
   gene_name: proB
   is_informative: true
@@ -3827,6 +4877,14 @@ results:
   product: glutamate 5-kinase
   term_id: pfam.clan:CL0178
   term_name: PUA
+- gene_category: Cellular processes
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0789
+  product: haloacid dehalogenase (HAD) family phosphatase
+  term_id: pfam.clan:CL0137
+  term_name: HAD
 - gene_category: Cellular processes
   gene_name: null
   is_informative: true
@@ -3884,6 +4942,14 @@ results:
   product: endonuclease III
   term_id: pfam.clan:CL0198
   term_name: HHH
+- gene_category: Replication and repair
+  gene_name: nth
+  is_informative: true
+  level: 0
+  locus_tag: PMM0802
+  product: endonuclease III
+  term_id: pfam.clan:CL0198
+  term_name: HHH
 - gene_category: Stress response and adaptation
   gene_name: futC
   is_informative: true
@@ -3924,6 +4990,22 @@ results:
   product: ABC transporter family protein
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Cellular processes
+  gene_name: PcCAO
+  is_informative: true
+  level: 0
+  locus_tag: PMM0808
+  product: chlorophyll b synthase / chlorophyllide a oxygenase
+  term_id: pfam.clan:CL0209
+  term_name: Bet_v_1_like
+- gene_category: Cellular processes
+  gene_name: PcCAO
+  is_informative: true
+  level: 0
+  locus_tag: PMM0808
+  product: chlorophyll b synthase / chlorophyllide a oxygenase
+  term_id: pfam.clan:CL0209
+  term_name: Bet_v_1_like
 - gene_category: Translation
   gene_name: rsfS
   is_informative: true
@@ -3932,6 +5014,14 @@ results:
   product: oligomerisation domain protein
   term_id: pfam.clan:CL0260
   term_name: NTP_transf
+- gene_category: Nucleotide metabolism
+  gene_name: carB
+  is_informative: true
+  level: 0
+  locus_tag: PMM0825
+  product: carbamoyl-phosphate synthase, large subunit
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Nucleotide metabolism
   gene_name: carB
   is_informative: true
@@ -4036,6 +5126,14 @@ results:
   product: transcription-repair coupling factor
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Replication and repair
+  gene_name: mfd
+  is_informative: true
+  level: 0
+  locus_tag: PMM0839
+  product: transcription-repair coupling factor
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Photosynthesis
   gene_name: terC
   is_informative: true
@@ -4052,6 +5150,22 @@ results:
   product: Mg-protoporphyrin IX monomethylester oxidative cyclase
   term_id: pfam.clan:CL0044
   term_name: Ferritin
+- gene_category: Transcription
+  gene_name: vacB
+  is_informative: true
+  level: 0
+  locus_tag: PMM0847
+  product: exoribonuclease R
+  term_id: pfam.clan:CL0021
+  term_name: OB
+- gene_category: Transcription
+  gene_name: vacB
+  is_informative: true
+  level: 0
+  locus_tag: PMM0847
+  product: exoribonuclease R
+  term_id: pfam.clan:CL0021
+  term_name: OB
 - gene_category: Transcription
   gene_name: vacB
   is_informative: true
@@ -4154,6 +5268,22 @@ results:
   level: 0
   locus_tag: PMM0867
   product: methionine--tRNA ligase
+  term_id: pfam.clan:CL0039
+  term_name: HUP
+- gene_category: Translation
+  gene_name: metG
+  is_informative: true
+  level: 0
+  locus_tag: PMM0867
+  product: methionine--tRNA ligase
+  term_id: pfam.clan:CL0258
+  term_name: DALR
+- gene_category: Translation
+  gene_name: metG
+  is_informative: true
+  level: 0
+  locus_tag: PMM0867
+  product: methionine--tRNA ligase
   term_id: pfam.clan:CL0258
   term_name: DALR
 - gene_category: Transcription
@@ -4220,6 +5350,14 @@ results:
   product: methionine synthase
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
+- gene_category: Amino acid metabolism
+  gene_name: metH
+  is_informative: true
+  level: 0
+  locus_tag: PMM0877
+  product: methionine synthase
+  term_id: pfam.clan:CL0036
+  term_name: TIM_barrel
 - gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -4228,6 +5366,14 @@ results:
   product: PHP domain-containing protein
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
+- gene_category: Replication and repair
+  gene_name: uvrC
+  is_informative: true
+  level: 0
+  locus_tag: PMM0882
+  product: excinuclease UvrABC complex, endonuclease subunit
+  term_id: pfam.clan:CL0198
+  term_name: HHH
 - gene_category: Replication and repair
   gene_name: uvrC
   is_informative: true
@@ -4276,6 +5422,14 @@ results:
   product: cysteine desulfurase
   term_id: pfam.clan:CL0061
   term_name: PLP_aminotran
+- gene_category: Translation
+  gene_name: leuS
+  is_informative: true
+  level: 0
+  locus_tag: PMM0889
+  product: leucine--tRNA ligase
+  term_id: pfam.clan:CL0039
+  term_name: HUP
 - gene_category: Translation
   gene_name: leuS
   is_informative: true
@@ -4349,6 +5503,14 @@ results:
   term_id: pfam.clan:CL0025
   term_name: His_Kinase_A
 - gene_category: Stress response and adaptation
+  gene_name: htpG
+  is_informative: true
+  level: 0
+  locus_tag: PMM0901
+  product: molecular chaperone HtpG
+  term_id: pfam.clan:CL0025
+  term_name: His_Kinase_A
+- gene_category: Stress response and adaptation
   gene_name: prxQ
   is_informative: true
   level: 0
@@ -4356,6 +5518,14 @@ results:
   product: 2-Cys peroxiredoxin
   term_id: pfam.clan:CL0172
   term_name: Thioredoxin
+- gene_category: Coenzyme metabolism
+  gene_name: dxs
+  is_informative: true
+  level: 0
+  locus_tag: PMM0907
+  product: 1-deoxy-D-xylulose-5-phosphate synthase
+  term_id: pfam.clan:CL0254
+  term_name: THDP-binding
 - gene_category: Coenzyme metabolism
   gene_name: dxs
   is_informative: true
@@ -4444,6 +5614,14 @@ results:
   product: alanine--glyoxylate aminotransferase
   term_id: pfam.clan:CL0061
   term_name: PLP_aminotran
+- gene_category: Stress response and adaptation
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0921
+  product: S-adenosyl-L-methionine-dependent methyltransferase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Stress response and adaptation
   gene_name: null
   is_informative: true
@@ -4548,6 +5726,22 @@ results:
   product: DNA primase
   term_id: pfam.clan:CL0167
   term_name: Zn_Beta_Ribbon
+- gene_category: Replication and repair
+  gene_name: dnaG
+  is_informative: true
+  level: 0
+  locus_tag: PMM0939
+  product: DNA primase
+  term_id: pfam.clan:CL0413
+  term_name: Toprim-like
+- gene_category: Replication and repair
+  gene_name: dnaG
+  is_informative: true
+  level: 0
+  locus_tag: PMM0939
+  product: DNA primase
+  term_id: pfam.clan:CL0413
+  term_name: Toprim-like
 - gene_category: Transport
   gene_name: null
   is_informative: true
@@ -4685,6 +5879,14 @@ results:
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
 - gene_category: Stress response and adaptation
+  gene_name: ureC
+  is_informative: true
+  level: 0
+  locus_tag: PMM0963
+  product: urease alpha subunit
+  term_id: pfam.clan:CL0036
+  term_name: TIM_barrel
+- gene_category: Stress response and adaptation
   gene_name: ureG
   is_informative: true
   level: 0
@@ -4708,6 +5910,14 @@ results:
   product: ABC-type urea transporter, membrane component
   term_id: pfam.clan:CL0142
   term_name: Membrane_trans
+- gene_category: Stress response and adaptation
+  gene_name: urtD
+  is_informative: true
+  level: 0
+  locus_tag: PMM0973
+  product: ABC-type urea transporter, ATP-binding component UrtD
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Stress response and adaptation
   gene_name: urtD
   is_informative: true
@@ -4748,6 +5958,22 @@ results:
   product: sulfite exporter TauE/SafE family protein
   term_id: pfam.clan:CL0292
   term_name: LysE
+- gene_category: Replication and repair
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0982
+  product: HNH endonuclease
+  term_id: pfam.clan:CL0263
+  term_name: His-Me_finger
+- gene_category: Replication and repair
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0982
+  product: HNH endonuclease
+  term_id: pfam.clan:CL0263
+  term_name: His-Me_finger
 - gene_category: Replication and repair
   gene_name: null
   is_informative: true
@@ -4818,6 +6044,14 @@ results:
   level: 0
   locus_tag: PMM1002
   product: aminopeptidase N
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Stress response and adaptation
+  gene_name: pepN
+  is_informative: true
+  level: 0
+  locus_tag: PMM1002
+  product: aminopeptidase N
   term_id: pfam.clan:CL0126
   term_name: Peptidase_MA
 - gene_category: Nucleotide metabolism
@@ -4844,6 +6078,22 @@ results:
   product: TIM-barrel , nifR3 family protein
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1012
+  product: thioesterase superfamily protein
+  term_id: pfam.clan:CL0050
+  term_name: HotDog
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1012
+  product: thioesterase superfamily protein
+  term_id: pfam.clan:CL0050
+  term_name: HotDog
 - gene_category: Replication and repair
   gene_name: null
   is_informative: true
@@ -4912,10 +6162,42 @@ results:
   gene_name: null
   is_informative: true
   level: 0
+  locus_tag: PMM1034
+  product: WD40-repeat-containing protein
+  term_id: pfam.clan:CL0186
+  term_name: Beta_propeller
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1034
+  product: WD40-repeat-containing protein
+  term_id: pfam.clan:CL0186
+  term_name: Beta_propeller
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
   locus_tag: PMM1038
   product: A circularly permuted ATPgrasp family protein
   term_id: pfam.clan:CL0179
   term_name: ATP-grasp
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1038
+  product: A circularly permuted ATPgrasp family protein
+  term_id: pfam.clan:CL0179
+  term_name: ATP-grasp
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1042
+  product: pentapeptide repeats family protein
+  term_id: pfam.clan:CL0505
+  term_name: Pentapeptide
 - gene_category: Carbohydrate metabolism
   gene_name: rbsK
   is_informative: true
@@ -4924,6 +6206,38 @@ results:
   product: ribokinase
   term_id: pfam.clan:CL0118
   term_name: Ribokinase
+- gene_category: Stress response and adaptation
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1046
+  product: multidrug efflux transporter, MFS family
+  term_id: pfam.clan:CL0015
+  term_name: MFS
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1047
+  product: alpha/beta hydrolase
+  term_id: pfam.clan:CL0028
+  term_name: AB_hydrolase
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1047
+  product: alpha/beta hydrolase
+  term_id: pfam.clan:CL0028
+  term_name: AB_hydrolase
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1047
+  product: alpha/beta hydrolase
+  term_id: pfam.clan:CL0028
+  term_name: AB_hydrolase
 - gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -5101,6 +6415,14 @@ results:
   product: hydrogenobyrinic acid a,c-diamide synthase (glutamine-hydrolysing)
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Coenzyme metabolism
+  gene_name: cobB
+  is_informative: true
+  level: 0
+  locus_tag: PMM1072
+  product: hydrogenobyrinic acid a,c-diamide synthase (glutamine-hydrolysing)
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Cellular processes
   gene_name: opcA
   is_informative: true
@@ -5141,6 +6463,22 @@ results:
   product: ferredoxin--NADP+ reductase (FNR)
   term_id: pfam.clan:CL0866
   term_name: ALR_C-like
+- gene_category: Cellular processes
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1076
+  product: Conserved hypothetical protein
+  term_id: pfam.clan:CL0209
+  term_name: Bet_v_1_like
+- gene_category: Carbohydrate metabolism
+  gene_name: sasA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1077
+  product: adaptive-response sensory kinase
+  term_id: pfam.clan:CL0025
+  term_name: His_Kinase_A
 - gene_category: Carbohydrate metabolism
   gene_name: sasA
   is_informative: true
@@ -5157,6 +6495,14 @@ results:
   product: adaptive-response sensory kinase
   term_id: pfam.clan:CL0172
   term_name: Thioredoxin
+- gene_category: Carbohydrate metabolism
+  gene_name: prsA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1080
+  product: ribose-phosphate pyrophosphokinase
+  term_id: pfam.clan:CL0533
+  term_name: PRTase-like
 - gene_category: Carbohydrate metabolism
   gene_name: prsA
   is_informative: true
@@ -5206,6 +6552,22 @@ results:
   term_id: pfam.clan:CL0028
   term_name: AB_hydrolase
 - gene_category: Stress response and adaptation
+  gene_name: todF
+  is_informative: true
+  level: 0
+  locus_tag: PMM1086
+  product: esterase family protein
+  term_id: pfam.clan:CL0028
+  term_name: AB_hydrolase
+- gene_category: Stress response and adaptation
+  gene_name: clpC
+  is_informative: true
+  level: 0
+  locus_tag: PMM1088
+  product: ATP-dependent Clp protease ATP-binding subunit ClpC
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
+- gene_category: Stress response and adaptation
   gene_name: clpC
   is_informative: true
   level: 0
@@ -5221,6 +6583,30 @@ results:
   product: ATP-dependent Clp protease ATP-binding subunit ClpC
   term_id: pfam.clan:CL0671
   term_name: AAA_lid
+- gene_category: Stress response and adaptation
+  gene_name: clpC
+  is_informative: true
+  level: 0
+  locus_tag: PMM1088
+  product: ATP-dependent Clp protease ATP-binding subunit ClpC
+  term_id: pfam.clan:CL0671
+  term_name: AAA_lid
+- gene_category: Stress response and adaptation
+  gene_name: clpC
+  is_informative: true
+  level: 0
+  locus_tag: PMM1088
+  product: ATP-dependent Clp protease ATP-binding subunit ClpC
+  term_id: pfam.clan:CL0671
+  term_name: AAA_lid
+- gene_category: Translation
+  gene_name: rimI
+  is_informative: true
+  level: 0
+  locus_tag: PMM1089
+  product: ribosomal-protein-alanine acetyltransferase
+  term_id: pfam.clan:CL0257
+  term_name: Acetyltrans
 - gene_category: Translation
   gene_name: rimI
   is_informative: true
@@ -5283,6 +6669,14 @@ results:
   level: 0
   locus_tag: PMM1097
   product: recombination protein RecR
+  term_id: pfam.clan:CL0413
+  term_name: Toprim-like
+- gene_category: Replication and repair
+  gene_name: recR
+  is_informative: true
+  level: 0
+  locus_tag: PMM1097
+  product: recombination protein RecR
   term_id: pfam.clan:CL0839
   term_name: Tbcl_zf
 - gene_category: Transport
@@ -5309,12 +6703,44 @@ results:
   product: cyanobacterial RNA helicase
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Stress response and adaptation
+  gene_name: crhR
+  is_informative: true
+  level: 0
+  locus_tag: PMM1101
+  product: cyanobacterial RNA helicase
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Replication and repair
   gene_name: recD
   is_informative: true
   level: 0
   locus_tag: PMM1102
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
+- gene_category: Replication and repair
+  gene_name: recD
+  is_informative: true
+  level: 0
+  locus_tag: PMM1102
+  product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
+- gene_category: Replication and repair
+  gene_name: recD
+  is_informative: true
+  level: 0
+  locus_tag: PMM1102
+  product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
+- gene_category: Replication and repair
+  gene_name: recB
+  is_informative: true
+  level: 0
+  locus_tag: PMM1103
+  product: exodeoxyribonuclease V (RecBCD complex), beta subunit
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
 - gene_category: Replication and repair
@@ -5381,6 +6807,22 @@ results:
   product: carotenoid isomerase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Coenzyme metabolism
+  gene_name: crtH
+  is_informative: true
+  level: 0
+  locus_tag: PMM1115
+  product: carotenoid isomerase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Coenzyme metabolism
+  gene_name: crtH
+  is_informative: true
+  level: 0
+  locus_tag: PMM1115
+  product: carotenoid isomerase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Translation
   gene_name: trmFO
   is_informative: true
@@ -5397,6 +6839,14 @@ results:
   product: outer membrane porin
   term_id: pfam.clan:CL0193
   term_name: MBB
+- gene_category: Stress response and adaptation
+  gene_name: som
+  is_informative: true
+  level: 0
+  locus_tag: PMM1119
+  product: outer membrane porin
+  term_id: pfam.clan:CL0193
+  term_name: MBB
 - gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -5405,6 +6855,38 @@ results:
   product: TPR repeat-containing protein
   term_id: pfam.clan:CL0020
   term_name: TPR
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1120
+  product: TPR repeat-containing protein
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1120
+  product: TPR repeat-containing protein
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1120
+  product: TPR repeat-containing protein
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1120
+  product: TPR repeat-containing protein
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -5507,8 +6989,24 @@ results:
   level: 0
   locus_tag: PMM1141
   product: cysteinyl-tRNA synthetase
+  term_id: pfam.clan:CL0039
+  term_name: HUP
+- gene_category: Translation
+  gene_name: cysS
+  is_informative: true
+  level: 0
+  locus_tag: PMM1141
+  product: cysteinyl-tRNA synthetase
   term_id: pfam.clan:CL0258
   term_name: DALR
+- gene_category: Coenzyme metabolism
+  gene_name: dxr
+  is_informative: true
+  level: 0
+  locus_tag: PMM1142
+  product: 1-deoxy-D-xylulose 5-phosphate reductoisomerase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Coenzyme metabolism
   gene_name: dxr
   is_informative: true
@@ -5533,6 +7031,22 @@ results:
   product: alpha/beta hydrolase
   term_id: pfam.clan:CL0028
   term_name: AB_hydrolase
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1144
+  product: alpha/beta hydrolase
+  term_id: pfam.clan:CL0028
+  term_name: AB_hydrolase
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1144
+  product: alpha/beta hydrolase
+  term_id: pfam.clan:CL0028
+  term_name: AB_hydrolase
 - gene_category: Coenzyme metabolism
   gene_name: pntB
   is_informative: true
@@ -5547,6 +7061,23 @@ results:
   level: 0
   locus_tag: PMM1147
   product: pyridine nucleotide transhydrogenase, subunit alpha1 (A1)
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Coenzyme metabolism
+  gene_name: pntA1
+  is_informative: true
+  level: 0
+  locus_tag: PMM1147
+  product: pyridine nucleotide transhydrogenase, subunit alpha1 (A1)
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Coenzyme metabolism
+  gene_name: trxB
+  is_informative: true
+  level: 0
+  locus_tag: PMM1150
+  product: thioredoxin reductase fused with a thioredoxin domain (large NTR System
+    or NTRC)
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
 - gene_category: Coenzyme metabolism
@@ -5583,6 +7114,14 @@ results:
   product: photosystem II assembly factor Ycf39
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Photosynthesis
+  gene_name: ycf39
+  is_informative: true
+  level: 0
+  locus_tag: PMM1152
+  product: photosystem II assembly factor Ycf39
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Lipid metabolism
   gene_name: null
   is_informative: true
@@ -5591,6 +7130,38 @@ results:
   product: epoxide hydrolase-like protein
   term_id: pfam.clan:CL0028
   term_name: AB_hydrolase
+- gene_category: Lipid metabolism
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1153
+  product: epoxide hydrolase-like protein
+  term_id: pfam.clan:CL0028
+  term_name: AB_hydrolase
+- gene_category: Amino acid metabolism
+  gene_name: ilvN
+  is_informative: true
+  level: 0
+  locus_tag: PMM1154
+  product: acetolactate synthase, small subunit
+  term_id: pfam.clan:CL0070
+  term_name: ACT
+- gene_category: Amino acid metabolism
+  gene_name: ilvN
+  is_informative: true
+  level: 0
+  locus_tag: PMM1154
+  product: acetolactate synthase, small subunit
+  term_id: pfam.clan:CL0070
+  term_name: ACT
+- gene_category: Amino acid metabolism
+  gene_name: ilvN
+  is_informative: true
+  level: 0
+  locus_tag: PMM1154
+  product: acetolactate synthase, small subunit
+  term_id: pfam.clan:CL0070
+  term_name: ACT
 - gene_category: Amino acid metabolism
   gene_name: ilvN
   is_informative: true
@@ -5615,6 +7186,14 @@ results:
   product: cobyric acid synthase
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Coenzyme metabolism
+  gene_name: cobQ
+  is_informative: true
+  level: 0
+  locus_tag: PMM1160
+  product: cobyric acid synthase
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Stress response and adaptation
   gene_name: petF
   is_informative: true
@@ -5623,6 +7202,14 @@ results:
   product: 2Fe-2S ferredoxin
   term_id: pfam.clan:CL0486
   term_name: Fer2
+- gene_category: Stress response and adaptation
+  gene_name: idiA2
+  is_informative: true
+  level: 0
+  locus_tag: PMM1164
+  product: iron deficiency-induced protein A
+  term_id: pfam.clan:CL0177
+  term_name: PBP
 - gene_category: Stress response and adaptation
   gene_name: idiA2
   is_informative: true
@@ -5672,6 +7259,14 @@ results:
     of PMT family
   term_id: pfam.clan:CL0111
   term_name: GT-C
+- gene_category: Cell wall and membrane
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1178
+  product: glycosyl transferase family GT1
+  term_id: pfam.clan:CL0113
+  term_name: GT-B
 - gene_category: Cell wall and membrane
   gene_name: null
   is_informative: true
@@ -5750,6 +7345,14 @@ results:
   level: 0
   locus_tag: PMM1191
   product: polyribonucleotide nucleotidyltransferase
+  term_id: pfam.clan:CL0007
+  term_name: KH
+- gene_category: Transcription
+  gene_name: pnp
+  is_informative: true
+  level: 0
+  locus_tag: PMM1191
+  product: polyribonucleotide nucleotidyltransferase
   term_id: pfam.clan:CL0021
   term_name: OB
 - gene_category: Transcription
@@ -5796,6 +7399,14 @@ results:
   gene_name: null
   is_informative: true
   level: 0
+  locus_tag: PMM1198
+  product: conserved hypothetical protein
+  term_id: pfam.clan:CL0111
+  term_name: GT-C
+- gene_category: Cell wall and membrane
+  gene_name: null
+  is_informative: true
+  level: 0
   locus_tag: PMM1199
   product: beta-glycosyltransferase, family 2
   term_id: pfam.clan:CL0110
@@ -5816,12 +7427,28 @@ results:
   product: CDP-paratose 2-epimerase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Cell wall and membrane
+  gene_name: rfbE
+  is_informative: true
+  level: 0
+  locus_tag: PMM1201
+  product: CDP-paratose 2-epimerase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Carbohydrate metabolism
   gene_name: null
   is_informative: true
   level: 0
   locus_tag: PMM1202
   product: NAD dependent epimerase/dehydratase family protein
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Cell wall and membrane
+  gene_name: rfbG
+  is_informative: true
+  level: 0
+  locus_tag: PMM1203
+  product: CDP-glucose 4,6-dehydratase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
 - gene_category: Cell wall and membrane
@@ -5864,6 +7491,14 @@ results:
   product: conserved hypothetical protein
   term_id: pfam.clan:CL0111
   term_name: GT-C
+- gene_category: Cell wall and membrane
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1206
+  product: conserved hypothetical protein
+  term_id: pfam.clan:CL0111
+  term_name: GT-C
 - gene_category: Central intermediary metabolism
   gene_name: wcaG
   is_informative: true
@@ -5878,6 +7513,22 @@ results:
   level: 0
   locus_tag: PMM1208
   product: GDP-mannose 4,6-dehydratase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Cell wall and membrane
+  gene_name: gmd
+  is_informative: true
+  level: 0
+  locus_tag: PMM1208
+  product: GDP-mannose 4,6-dehydratase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Carbohydrate metabolism
+  gene_name: galE
+  is_informative: true
+  level: 0
+  locus_tag: PMM1209
+  product: UDP-glucose 4-epimerase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
 - gene_category: Carbohydrate metabolism
@@ -5897,6 +7548,14 @@ results:
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
 - gene_category: Cell wall and membrane
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1210
+  product: nucleotide sugar epimerase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Cell wall and membrane
   gene_name: kpsD
   is_informative: true
   level: 0
@@ -5904,6 +7563,14 @@ results:
   product: polysaccharide biosynthesis/export family protein
   term_id: pfam.clan:CL0072
   term_name: Ubiquitin
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1212
+  product: S-adenosyl-L-methionine-dependent methyltransferase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -5936,6 +7603,14 @@ results:
   product: D-glycero-D-manno-heptose 1,7-bisphosphate phosphatase
   term_id: pfam.clan:CL0137
   term_name: HAD
+- gene_category: Cell wall and membrane
+  gene_name: gmhB
+  is_informative: true
+  level: 0
+  locus_tag: PMM1214
+  product: D-glycero-D-manno-heptose 1,7-bisphosphate phosphatase
+  term_id: pfam.clan:CL0137
+  term_name: HAD
 - gene_category: Energy production
   gene_name: lhgO
   is_informative: true
@@ -5944,6 +7619,14 @@ results:
   product: FAD/NAD-binding oxidoreductase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Translation
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1216
+  product: mobA-like NTP transferase domain protein
+  term_id: pfam.clan:CL0110
+  term_name: GT-A
 - gene_category: Translation
   gene_name: null
   is_informative: true
@@ -6009,6 +7692,14 @@ results:
   term_id: pfam.clan:CL0113
   term_name: GT-B
 - gene_category: Cell wall and membrane
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1223
+  product: possible alpha-glycosyltransferase, family 4
+  term_id: pfam.clan:CL0113
+  term_name: GT-B
+- gene_category: Cell wall and membrane
   gene_name: kpsD3
   is_informative: true
   level: 0
@@ -6016,6 +7707,14 @@ results:
   product: polysaccharide biosynthesis/export protein
   term_id: pfam.clan:CL0072
   term_name: Ubiquitin
+- gene_category: Cell cycle and division
+  gene_name: wzc
+  is_informative: true
+  level: 0
+  locus_tag: PMM1225
+  product: P-loop containing nucleoside triphosphate hydrolase
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Cell cycle and division
   gene_name: wzc
   is_informative: true
@@ -6054,6 +7753,14 @@ results:
   level: 0
   locus_tag: PMM1230
   product: dehydrogenase E1 component beta subunit
+  term_id: pfam.clan:CL0254
+  term_name: THDP-binding
+- gene_category: Energy production
+  gene_name: bfmBA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1230
+  product: dehydrogenase E1 component beta subunit
   term_id: pfam.clan:CL0591
   term_name: TKC_like
 - gene_category: Carbohydrate metabolism
@@ -6064,6 +7771,14 @@ results:
   product: conserved hypothetical protein
   term_id: pfam.clan:CL0029
   term_name: Cupin
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1232
+  product: S-adenosyl-L-methionine-dependent methyltransferase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -6160,6 +7875,30 @@ results:
   product: conserved hypothetical protein
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Cell wall and membrane
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1241
+  product: conserved hypothetical protein
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Secondary metabolites
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1243
+  product: putative methyltransferase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Secondary metabolites
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1243
+  product: putative methyltransferase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Secondary metabolites
   gene_name: null
   is_informative: true
@@ -6216,6 +7955,38 @@ results:
   product: possible acetyltransferase
   term_id: pfam.clan:CL0536
   term_name: HEXAPEP
+- gene_category: Unknown
+  gene_name: pssR
+  is_informative: true
+  level: 0
+  locus_tag: PMM1252
+  product: possible acetyltransferase
+  term_id: pfam.clan:CL0536
+  term_name: HEXAPEP
+- gene_category: Secondary metabolites
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1253
+  product: S-adenosyl-L-methionine-dependent methyltransferase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Secondary metabolites
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1253
+  product: S-adenosyl-L-methionine-dependent methyltransferase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Secondary metabolites
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1253
+  product: S-adenosyl-L-methionine-dependent methyltransferase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Secondary metabolites
   gene_name: null
   is_informative: true
@@ -6248,6 +8019,14 @@ results:
   product: possible dTDP-glucose 4,6-dehydratase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Cell wall and membrane
+  gene_name: rfbB
+  is_informative: true
+  level: 0
+  locus_tag: PMM1257
+  product: possible dTDP-glucose 4,6-dehydratase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Central intermediary metabolism
   gene_name: rfbE
   is_informative: true
@@ -6264,6 +8043,14 @@ results:
   product: perosamine synthetase protein family
   term_id: pfam.clan:CL0061
   term_name: PLP_aminotran
+- gene_category: Central intermediary metabolism
+  gene_name: uxs
+  is_informative: true
+  level: 0
+  locus_tag: PMM1260
+  product: UDP-glucuronate decarboxylase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Central intermediary metabolism
   gene_name: uxs
   is_informative: true
@@ -6352,6 +8139,22 @@ results:
   product: precorrin-6Y C5,15-methyltransferase (decarboxylating)
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Coenzyme metabolism
+  gene_name: cobL
+  is_informative: true
+  level: 0
+  locus_tag: PMM1268
+  product: precorrin-6Y C5,15-methyltransferase (decarboxylating)
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Coenzyme metabolism
+  gene_name: cobL
+  is_informative: true
+  level: 0
+  locus_tag: PMM1268
+  product: precorrin-6Y C5,15-methyltransferase (decarboxylating)
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Translation
   gene_name: pheS
   is_informative: true
@@ -6415,6 +8218,14 @@ results:
   level: 0
   locus_tag: PMM1281
   product: GTP-binding protein Era
+  term_id: pfam.clan:CL0007
+  term_name: KH
+- gene_category: Transcription
+  gene_name: era
+  is_informative: true
+  level: 0
+  locus_tag: PMM1281
+  product: GTP-binding protein Era
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
 - gene_category: Stress response and adaptation
@@ -6455,6 +8266,14 @@ results:
   level: 0
   locus_tag: PMM1287
   product: cell division protein ZipN
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Cell cycle and division
+  gene_name: zipN
+  is_informative: true
+  level: 0
+  locus_tag: PMM1287
+  product: cell division protein ZipN
   term_id: pfam.clan:CL0392
   term_name: Chaperone-J
 - gene_category: Carbohydrate metabolism
@@ -6465,6 +8284,22 @@ results:
   product: pyruvate dehydrogenase E1 component complex alpha subunit
   term_id: pfam.clan:CL0254
   term_name: THDP-binding
+- gene_category: Transcription
+  gene_name: rpoD6
+  is_informative: true
+  level: 0
+  locus_tag: PMM1289
+  product: RNA polymerase sigma factor, type II
+  term_id: pfam.clan:CL0123
+  term_name: HTH
+- gene_category: Transcription
+  gene_name: rpoD6
+  is_informative: true
+  level: 0
+  locus_tag: PMM1289
+  product: RNA polymerase sigma factor, type II
+  term_id: pfam.clan:CL0123
+  term_name: HTH
 - gene_category: Transcription
   gene_name: rpoD6
   is_informative: true
@@ -6521,6 +8356,14 @@ results:
   product: dihydrolipoamide dehydrogenase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Amino acid metabolism
+  gene_name: lpdA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1298
+  product: dihydrolipoamide dehydrogenase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Translation
   gene_name: spoU
   is_informative: true
@@ -6545,6 +8388,14 @@ results:
   product: bifunctional dihydrofolate synthase / folylpolyglutamate synthase
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Amino acid metabolism
+  gene_name: codA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1304
+  product: cytosine deaminase
+  term_id: pfam.clan:CL0036
+  term_name: TIM_barrel
 - gene_category: Amino acid metabolism
   gene_name: codA
   is_informative: true
@@ -6673,6 +8524,14 @@ results:
   product: isoamylase
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
+- gene_category: Transport
+  gene_name: glcH
+  is_informative: true
+  level: 0
+  locus_tag: PMM1323
+  product: glucose transporter
+  term_id: pfam.clan:CL0015
+  term_name: MFS
 - gene_category: Nucleotide metabolism
   gene_name: pyrF
   is_informative: true
@@ -6713,6 +8572,14 @@ results:
   product: acyl-[acyl-carrier-protein]-UDP-N- acetylglucosamine O-acyltransferase
   term_id: pfam.clan:CL0536
   term_name: HEXAPEP
+- gene_category: Lipid metabolism
+  gene_name: fabZ
+  is_informative: true
+  level: 0
+  locus_tag: PMM1336
+  product: beta-hydroxy-acyl-(acyl-carrier-protein) dehydratase (DH)
+  term_id: pfam.clan:CL0050
+  term_name: HotDog
 - gene_category: Cell wall and membrane
   gene_name: lpxC
   is_informative: true
@@ -6761,6 +8628,30 @@ results:
   product: two component sensor, signal transduction histidine kinase
   term_id: pfam.clan:CL0025
   term_name: His_Kinase_A
+- gene_category: Signal transduction
+  gene_name: nblS
+  is_informative: true
+  level: 0
+  locus_tag: PMM1341
+  product: two component sensor, signal transduction histidine kinase
+  term_id: pfam.clan:CL0025
+  term_name: His_Kinase_A
+- gene_category: Signal transduction
+  gene_name: nblS
+  is_informative: true
+  level: 0
+  locus_tag: PMM1341
+  product: two component sensor, signal transduction histidine kinase
+  term_id: pfam.clan:CL0183
+  term_name: PAS_Fold
+- gene_category: Signal transduction
+  gene_name: nblS
+  is_informative: true
+  level: 0
+  locus_tag: PMM1341
+  product: two component sensor, signal transduction histidine kinase
+  term_id: pfam.clan:CL0183
+  term_name: PAS_Fold
 - gene_category: Cellular processes
   gene_name: kaiC
   is_informative: true
@@ -6793,6 +8684,30 @@ results:
   product: tRNA pseudouridine(55) synthase
   term_id: pfam.clan:CL0178
   term_name: PUA
+- gene_category: Translation
+  gene_name: truB
+  is_informative: true
+  level: 0
+  locus_tag: PMM1347
+  product: tRNA pseudouridine(55) synthase
+  term_id: pfam.clan:CL0178
+  term_name: PUA
+- gene_category: Translation
+  gene_name: truB
+  is_informative: true
+  level: 0
+  locus_tag: PMM1347
+  product: tRNA pseudouridine(55) synthase
+  term_id: pfam.clan:CL0649
+  term_name: PseudoU_synth
+- gene_category: Translation
+  gene_name: truB
+  is_informative: true
+  level: 0
+  locus_tag: PMM1347
+  product: tRNA pseudouridine(55) synthase
+  term_id: pfam.clan:CL0649
+  term_name: PseudoU_synth
 - gene_category: Transcription
   gene_name: rnz
   is_informative: true
@@ -6801,6 +8716,22 @@ results:
   product: ribonuclease Z
   term_id: pfam.clan:CL0381
   term_name: Metallo-HOrase
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1350
+  product: pentapeptide repeats family protein
+  term_id: pfam.clan:CL0505
+  term_name: Pentapeptide
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1350
+  product: pentapeptide repeats family protein
+  term_id: pfam.clan:CL0505
+  term_name: Pentapeptide
 - gene_category: Stress response and adaptation
   gene_name: petF
   is_informative: true
@@ -6815,6 +8746,14 @@ results:
   level: 0
   locus_tag: PMM1353
   product: ribosomal protein L11 methyltransferase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Amino acid metabolism
+  gene_name: serA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1354
+  product: D-3-phosphoglycerate dehydrogenase (PGDH)
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
 - gene_category: Amino acid metabolism
@@ -6873,6 +8812,14 @@ results:
   product: pirin-like protein
   term_id: pfam.clan:CL0029
   term_name: Cupin
+- gene_category: Stress response and adaptation
+  gene_name: pirA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1366
+  product: pirin-like protein
+  term_id: pfam.clan:CL0029
+  term_name: Cupin
 - gene_category: Signal transduction
   gene_name: null
   is_informative: true
@@ -6881,6 +8828,30 @@ results:
   product: GAF domain-containing protein
   term_id: pfam.clan:CL0025
   term_name: His_Kinase_A
+- gene_category: Signal transduction
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1369
+  product: GAF domain-containing protein
+  term_id: pfam.clan:CL0025
+  term_name: His_Kinase_A
+- gene_category: Signal transduction
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1369
+  product: GAF domain-containing protein
+  term_id: pfam.clan:CL0183
+  term_name: PAS_Fold
+- gene_category: Signal transduction
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1369
+  product: GAF domain-containing protein
+  term_id: pfam.clan:CL0183
+  term_name: PAS_Fold
 - gene_category: Signal transduction
   gene_name: null
   is_informative: true
@@ -6985,6 +8956,22 @@ results:
   product: 2-oxoglutarate/iron-dependent dioxygenase
   term_id: pfam.clan:CL0029
   term_name: Cupin
+- gene_category: Replication and repair
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1403
+  product: HNH endonuclease family protein
+  term_id: pfam.clan:CL0263
+  term_name: His-Me_finger
+- gene_category: Replication and repair
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1403
+  product: HNH endonuclease family protein
+  term_id: pfam.clan:CL0263
+  term_name: His-Me_finger
 - gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -7009,6 +8996,22 @@ results:
   product: conserved hypothetical protein (DUF3303)
   term_id: pfam.clan:CL0032
   term_name: Dim_A_B_barrel
+- gene_category: Secondary metabolites
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1415
+  product: possible UBX domain
+  term_id: pfam.clan:CL0028
+  term_name: AB_hydrolase
+- gene_category: Secondary metabolites
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1415
+  product: possible UBX domain
+  term_id: pfam.clan:CL0028
+  term_name: AB_hydrolase
 - gene_category: Secondary metabolites
   gene_name: null
   is_informative: true
@@ -7057,6 +9060,14 @@ results:
   product: conserved hypothetical protein (DUF2811)
   term_id: pfam.clan:CL0057
   term_name: Met_repress
+- gene_category: Post-translational modification
+  gene_name: dnaK1
+  is_informative: true
+  level: 0
+  locus_tag: PMM1432
+  product: chaperone protein DnaK
+  term_id: pfam.clan:CL0108
+  term_name: Actin_ATPase
 - gene_category: Post-translational modification
   gene_name: dnaK1
   is_informative: true
@@ -7185,6 +9196,14 @@ results:
   product: ATP-dependent DNA/RNA helicase, superfamily 1/2
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Replication and repair
+  gene_name: ski2
+  is_informative: true
+  level: 0
+  locus_tag: PMM1467
+  product: ATP-dependent DNA/RNA helicase, superfamily 1/2
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Coenzyme metabolism
   gene_name: bioF
   is_informative: true
@@ -7201,6 +9220,14 @@ results:
   product: pimeloyl-[acyl-carrier protein] methyl ester esterase
   term_id: pfam.clan:CL0028
   term_name: AB_hydrolase
+- gene_category: Coenzyme metabolism
+  gene_name: bioC
+  is_informative: true
+  level: 0
+  locus_tag: PMM1470
+  product: malonyl-CoA O-methyltransferase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Coenzyme metabolism
   gene_name: bioC
   is_informative: true
@@ -7257,6 +9284,22 @@ results:
   product: 3Fe-4S ferredoxin
   term_id: pfam.clan:CL0344
   term_name: 4Fe-4S
+- gene_category: Stress response and adaptation
+  gene_name: fer
+  is_informative: true
+  level: 0
+  locus_tag: PMM1477
+  product: 3Fe-4S ferredoxin
+  term_id: pfam.clan:CL0344
+  term_name: 4Fe-4S
+- gene_category: Post-translational modification
+  gene_name: iaiH
+  is_informative: true
+  level: 0
+  locus_tag: PMM1480
+  product: PBS lyase HEAT-like repeat domain-containing protein
+  term_id: pfam.clan:CL0020
+  term_name: TPR
 - gene_category: Post-translational modification
   gene_name: iaiH
   is_informative: true
@@ -7305,6 +9348,30 @@ results:
   product: photosystem II assembly factor
   term_id: pfam.clan:CL0466
   term_name: PDZ-like
+- gene_category: Transcription
+  gene_name: nusA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1492
+  product: transcription termination factor NusA
+  term_id: pfam.clan:CL0007
+  term_name: KH
+- gene_category: Transcription
+  gene_name: nusA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1492
+  product: transcription termination factor NusA
+  term_id: pfam.clan:CL0007
+  term_name: KH
+- gene_category: Transcription
+  gene_name: nusA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1492
+  product: transcription termination factor NusA
+  term_id: pfam.clan:CL0007
+  term_name: KH
 - gene_category: Translation
   gene_name: infB
   is_informative: true
@@ -7337,6 +9404,30 @@ results:
   product: dolichyl-phosphate-mannose-mannosyltransferase family protein
   term_id: pfam.clan:CL0111
   term_name: GT-C
+- gene_category: Cell wall and membrane
+  gene_name: wcaA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1497
+  product: Glycosyltransferase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Cell wall and membrane
+  gene_name: wcaA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1497
+  product: Glycosyltransferase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Cell wall and membrane
+  gene_name: wcaA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1497
+  product: Glycosyltransferase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Cell wall and membrane
   gene_name: wcaA
   is_informative: true
@@ -7455,6 +9546,22 @@ results:
   level: 0
   locus_tag: PMM1509
   product: elongation factor G
+  term_id: pfam.clan:CL0437
+  term_name: EF-G_C
+- gene_category: Translation
+  gene_name: fusA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1509
+  product: elongation factor G
+  term_id: pfam.clan:CL0437
+  term_name: EF-G_C
+- gene_category: Translation
+  gene_name: fusA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1509
+  product: elongation factor G
   term_id: pfam.clan:CL0866
   term_name: ALR_C-like
 - gene_category: Translation
@@ -7465,6 +9572,14 @@ results:
   product: 30S ribosomal protein S12
   term_id: pfam.clan:CL0021
   term_name: OB
+- gene_category: Stress response and adaptation
+  gene_name: glsF
+  is_informative: true
+  level: 0
+  locus_tag: PMM1512
+  product: ferredoxin-dependent glutamate synthase
+  term_id: pfam.clan:CL0036
+  term_name: TIM_barrel
 - gene_category: Stress response and adaptation
   gene_name: glsF
   is_informative: true
@@ -7529,6 +9644,14 @@ results:
   product: putative imidazoleglycerol-phosphate dehydratase
   term_id: pfam.clan:CL0137
   term_name: HAD
+- gene_category: Unknown
+  gene_name: hisB
+  is_informative: true
+  level: 0
+  locus_tag: PMM1526
+  product: putative imidazoleglycerol-phosphate dehydratase
+  term_id: pfam.clan:CL0137
+  term_name: HAD
 - gene_category: Amino acid metabolism
   gene_name: alr
   is_informative: true
@@ -7545,6 +9668,22 @@ results:
   product: alanine racemase
   term_id: pfam.clan:CL0866
   term_name: ALR_C-like
+- gene_category: Replication and repair
+  gene_name: mcrA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1528
+  product: HNH endonuclease family protein
+  term_id: pfam.clan:CL0263
+  term_name: His-Me_finger
+- gene_category: Replication and repair
+  gene_name: mcrA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1528
+  product: HNH endonuclease family protein
+  term_id: pfam.clan:CL0263
+  term_name: His-Me_finger
 - gene_category: Translation
   gene_name: rpsI
   is_informative: true
@@ -7553,6 +9692,14 @@ results:
   product: 30S ribosomal protein S9
   term_id: pfam.clan:CL0329
   term_name: S5
+- gene_category: Translation
+  gene_name: truA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1533
+  product: tRNA pseudouridine(38-40) synthase
+  term_id: pfam.clan:CL0649
+  term_name: PseudoU_synth
 - gene_category: Transcription
   gene_name: rpoA
   is_informative: true
@@ -7586,6 +9733,14 @@ results:
   term_id: pfam.clan:CL0010
   term_name: SH3
 - gene_category: Translation
+  gene_name: rplX
+  is_informative: true
+  level: 0
+  locus_tag: PMM1547
+  product: 50S ribosomal protein L24
+  term_id: pfam.clan:CL0010
+  term_name: SH3
+- gene_category: Translation
   gene_name: rpsQ
   is_informative: true
   level: 0
@@ -7601,6 +9756,14 @@ results:
   product: 50S ribosomal protein L16
   term_id: pfam.clan:CL0021
   term_name: OB
+- gene_category: Translation
+  gene_name: rpsC
+  is_informative: true
+  level: 0
+  locus_tag: PMM1552
+  product: 30S ribosomal protein S3
+  term_id: pfam.clan:CL0007
+  term_name: KH
 - gene_category: Translation
   gene_name: rplB
   is_informative: true
@@ -7641,6 +9804,30 @@ results:
   product: light dependent period protein
   term_id: pfam.clan:CL0344
   term_name: 4Fe-4S
+- gene_category: Energy production
+  gene_name: ldpA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1560
+  product: light dependent period protein
+  term_id: pfam.clan:CL0344
+  term_name: 4Fe-4S
+- gene_category: Energy production
+  gene_name: ldpA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1560
+  product: light dependent period protein
+  term_id: pfam.clan:CL0344
+  term_name: 4Fe-4S
+- gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1561
+  product: haloacid dehalogenase-like hydrolase family protein
+  term_id: pfam.clan:CL0137
+  term_name: HAD
 - gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -7689,6 +9876,14 @@ results:
   product: C-3^,4^ desaturase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Coenzyme metabolism
+  gene_name: crtD
+  is_informative: true
+  level: 0
+  locus_tag: PMM1566
+  product: C-3^,4^ desaturase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Carbohydrate metabolism
   gene_name: null
   is_informative: true
@@ -7721,6 +9916,14 @@ results:
   product: cob(I)alamin adenosyltransferase family protein
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Unknown
+  gene_name: larE
+  is_informative: true
+  level: 0
+  locus_tag: PMM1571
+  product: possible pyridinium-3,5-biscarboxylic acid mononucleotide sulfurtransferase
+  term_id: pfam.clan:CL0039
+  term_name: HUP
 - gene_category: Unknown
   gene_name: larE
   is_informative: true
@@ -7777,6 +9980,14 @@ results:
   product: nucleotide-binding protein
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Coenzyme metabolism
+  gene_name: abpC
+  is_informative: true
+  level: 0
+  locus_tag: PMM1581
+  product: nucleotide-binding protein
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Transcription
   gene_name: rnd
   is_informative: true
@@ -7809,6 +10020,14 @@ results:
   product: low molecular weight protein-tyrosine-phosphatase
   term_id: pfam.clan:CL0031
   term_name: Phosphatase
+- gene_category: Stress response and adaptation
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1599
+  product: alpha/beta hydrolase fold family protein
+  term_id: pfam.clan:CL0028
+  term_name: AB_hydrolase
 - gene_category: Stress response and adaptation
   gene_name: null
   is_informative: true
@@ -7857,6 +10076,22 @@ results:
   product: photosystem I iron-sulfur center subunit VII PsaC
   term_id: pfam.clan:CL0344
   term_name: 4Fe-4S
+- gene_category: Photosynthesis
+  gene_name: psaC
+  is_informative: true
+  level: 0
+  locus_tag: PMM1607
+  product: photosystem I iron-sulfur center subunit VII PsaC
+  term_id: pfam.clan:CL0344
+  term_name: 4Fe-4S
+- gene_category: Carbohydrate metabolism
+  gene_name: tktA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1610
+  product: transketolase
+  term_id: pfam.clan:CL0254
+  term_name: THDP-binding
 - gene_category: Carbohydrate metabolism
   gene_name: tktA
   is_informative: true
@@ -7873,6 +10108,14 @@ results:
   product: transketolase
   term_id: pfam.clan:CL0591
   term_name: TKC_like
+- gene_category: Carbohydrate metabolism
+  gene_name: tktA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1610
+  product: transketolase
+  term_id: pfam.clan:CL0591
+  term_name: TKC_like
 - gene_category: Coenzyme metabolism
   gene_name: thiC
   is_informative: true
@@ -7881,6 +10124,38 @@ results:
   product: thiamine biosynthesis protein
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
+- gene_category: Cell motility
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1614
+  product: TPR repeat family protein
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Cell motility
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1614
+  product: TPR repeat family protein
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Cell motility
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1614
+  product: TPR repeat family protein
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Cell motility
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1614
+  product: TPR repeat family protein
+  term_id: pfam.clan:CL0020
+  term_name: TPR
 - gene_category: Cell motility
   gene_name: null
   is_informative: true
@@ -7961,6 +10236,14 @@ results:
   product: adenosylhomocysteinase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Carbohydrate metabolism
+  gene_name: ahcY
+  is_informative: true
+  level: 0
+  locus_tag: PMM1625
+  product: adenosylhomocysteinase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
 - gene_category: Translation
   gene_name: tsaE
   is_informative: true
@@ -7985,6 +10268,22 @@ results:
   product: alpha/beta hydrolase fold family protein
   term_id: pfam.clan:CL0028
   term_name: AB_hydrolase
+- gene_category: Stress response and adaptation
+  gene_name: rpoD8
+  is_informative: true
+  level: 0
+  locus_tag: PMM1629
+  product: RNA polymerase sigma factor, type II
+  term_id: pfam.clan:CL0123
+  term_name: HTH
+- gene_category: Stress response and adaptation
+  gene_name: rpoD8
+  is_informative: true
+  level: 0
+  locus_tag: PMM1629
+  product: RNA polymerase sigma factor, type II
+  term_id: pfam.clan:CL0123
+  term_name: HTH
 - gene_category: Stress response and adaptation
   gene_name: rpoD8
   is_informative: true
@@ -8025,6 +10324,14 @@ results:
   product: DNA gyrase, B subunit
   term_id: pfam.clan:CL0329
   term_name: S5
+- gene_category: Replication and repair
+  gene_name: gyrB
+  is_informative: true
+  level: 0
+  locus_tag: PMM1634
+  product: DNA gyrase, B subunit
+  term_id: pfam.clan:CL0413
+  term_name: Toprim-like
 - gene_category: Translation
   gene_name: miaA
   is_informative: true
@@ -8057,6 +10364,22 @@ results:
   product: preprotein translocase SecA subunit
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Post-translational modification
+  gene_name: secA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1639
+  product: preprotein translocase SecA subunit
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
+- gene_category: Transcription
+  gene_name: wecD
+  is_informative: true
+  level: 0
+  locus_tag: PMM1640
+  product: acetyltransferase family protein
+  term_id: pfam.clan:CL0257
+  term_name: Acetyltrans
 - gene_category: Transcription
   gene_name: wecD
   is_informative: true
@@ -8089,6 +10412,38 @@ results:
   product: aspartate kinase, monofunctional class
   term_id: pfam.clan:CL0070
   term_name: ACT
+- gene_category: Amino acid metabolism
+  gene_name: lysC
+  is_informative: true
+  level: 0
+  locus_tag: PMM1648
+  product: aspartate kinase, monofunctional class
+  term_id: pfam.clan:CL0070
+  term_name: ACT
+- gene_category: Amino acid metabolism
+  gene_name: lysC
+  is_informative: true
+  level: 0
+  locus_tag: PMM1648
+  product: aspartate kinase, monofunctional class
+  term_id: pfam.clan:CL0070
+  term_name: ACT
+- gene_category: Replication and repair
+  gene_name: uvrB
+  is_informative: true
+  level: 0
+  locus_tag: PMM1649
+  product: excinuclease UvrABC complex, helicase subunit
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
+- gene_category: Replication and repair
+  gene_name: uvrB
+  is_informative: true
+  level: 0
+  locus_tag: PMM1649
+  product: excinuclease UvrABC complex, helicase subunit
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - gene_category: Replication and repair
   gene_name: uvrB
   is_informative: true
@@ -8209,6 +10564,46 @@ results:
   product: monoglycosyldiacylglycerol (MGlcDG) synthase
   term_id: pfam.clan:CL0110
   term_name: GT-A
+- gene_category: Cell wall and membrane
+  gene_name: mgdA
+  is_informative: true
+  level: 0
+  locus_tag: PMM1659
+  product: monoglycosyldiacylglycerol (MGlcDG) synthase
+  term_id: pfam.clan:CL0110
+  term_name: GT-A
+- gene_category: Photosynthesis
+  gene_name: ycf37
+  is_informative: true
+  level: 0
+  locus_tag: PMM1663
+  product: photosystem I assembly protein Ycf37
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Photosynthesis
+  gene_name: ycf37
+  is_informative: true
+  level: 0
+  locus_tag: PMM1663
+  product: photosystem I assembly protein Ycf37
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Photosynthesis
+  gene_name: ycf37
+  is_informative: true
+  level: 0
+  locus_tag: PMM1663
+  product: photosystem I assembly protein Ycf37
+  term_id: pfam.clan:CL0020
+  term_name: TPR
+- gene_category: Photosynthesis
+  gene_name: ycf37
+  is_informative: true
+  level: 0
+  locus_tag: PMM1663
+  product: photosystem I assembly protein Ycf37
+  term_id: pfam.clan:CL0020
+  term_name: TPR
 - gene_category: Photosynthesis
   gene_name: ycf37
   is_informative: true
@@ -8249,6 +10644,30 @@ results:
   product: sulfoquinovosyldiacylglycerol synthase
   term_id: pfam.clan:CL0113
   term_name: GT-B
+- gene_category: Cell wall and membrane
+  gene_name: sqdX
+  is_informative: true
+  level: 0
+  locus_tag: PMM1666
+  product: sulfoquinovosyldiacylglycerol synthase
+  term_id: pfam.clan:CL0113
+  term_name: GT-B
+- gene_category: Cell wall and membrane
+  gene_name: sqdX
+  is_informative: true
+  level: 0
+  locus_tag: PMM1666
+  product: sulfoquinovosyldiacylglycerol synthase
+  term_id: pfam.clan:CL0113
+  term_name: GT-B
+- gene_category: Amino acid metabolism
+  gene_name: gcvP
+  is_informative: true
+  level: 0
+  locus_tag: PMM1668
+  product: glycine dehydrogenase
+  term_id: pfam.clan:CL0061
+  term_name: PLP_aminotran
 - gene_category: Amino acid metabolism
   gene_name: gcvP
   is_informative: true
@@ -8409,6 +10828,38 @@ results:
   product: 7-cyano-7-deazaguanine synthase
   term_id: pfam.clan:CL0039
   term_name: HUP
+- gene_category: Stress response and adaptation
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1695
+  product: multidrug efflux transporter, MFS family
+  term_id: pfam.clan:CL0015
+  term_name: MFS
+- gene_category: Stress response and adaptation
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1695
+  product: multidrug efflux transporter, MFS family
+  term_id: pfam.clan:CL0015
+  term_name: MFS
+- gene_category: Transcription
+  gene_name: rpoD4
+  is_informative: true
+  level: 0
+  locus_tag: PMM1697
+  product: RNA polymerase sigma factor, type II
+  term_id: pfam.clan:CL0123
+  term_name: HTH
+- gene_category: Transcription
+  gene_name: rpoD4
+  is_informative: true
+  level: 0
+  locus_tag: PMM1697
+  product: RNA polymerase sigma factor, type II
+  term_id: pfam.clan:CL0123
+  term_name: HTH
 - gene_category: Transcription
   gene_name: rpoD4
   is_informative: true
@@ -8489,6 +10940,30 @@ results:
   product: argininosuccinate synthase
   term_id: pfam.clan:CL0039
   term_name: HUP
+- gene_category: Carbohydrate metabolism
+  gene_name: sps
+  is_informative: true
+  level: 0
+  locus_tag: PMM1711
+  product: sucrose phosphate synthase
+  term_id: pfam.clan:CL0113
+  term_name: GT-B
+- gene_category: Carbohydrate metabolism
+  gene_name: sps
+  is_informative: true
+  level: 0
+  locus_tag: PMM1711
+  product: sucrose phosphate synthase
+  term_id: pfam.clan:CL0113
+  term_name: GT-B
+- gene_category: Carbohydrate metabolism
+  gene_name: sps
+  is_informative: true
+  level: 0
+  locus_tag: PMM1711
+  product: sucrose phosphate synthase
+  term_id: pfam.clan:CL0113
+  term_name: GT-B
 - gene_category: Carbohydrate metabolism
   gene_name: sps
   is_informative: true
@@ -8585,36 +11060,36 @@ results:
   product: putative sxtK
   term_id: pfam.clan:CL0184
   term_name: DMT
-returned: 1063
-row_count: 1063
+returned: 1372
+row_count: 1372
 terms_per_gene_max: 4
 terms_per_gene_median: 1.0
 terms_per_gene_min: 1
 top_terms:
-- count: 146
+- count: 202
   is_informative: true
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
-- count: 130
+- count: 159
   is_informative: true
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
-- count: 69
+- count: 73
   is_informative: true
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
-- count: 35
+- count: 45
   is_informative: true
   term_id: pfam.clan:CL0123
   term_name: HTH
-- count: 29
+- count: 34
   is_informative: true
-  term_id: pfam.clan:CL0021
-  term_name: OB
+  term_id: pfam.clan:CL0020
+  term_name: TPR
 total_categories: 24
-total_genes: 864
-total_matching: 1063
-total_terms: 77
+total_genes: 889
+total_matching: 1372
+total_terms: 90
 truncated: false
 wrong_level: []
 wrong_ontology: []
