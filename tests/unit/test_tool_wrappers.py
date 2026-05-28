@@ -8580,3 +8580,108 @@ class TestGeneNeighborsWrapper:
         ):
             with pytest.raises(ToolError):
                 await tool_fns["gene_neighbors"](mock_ctx, locus_tags=[])
+
+
+class TestOntologyLiteralAcceptsPsortbSignalp:
+    """The closed Literal[...] enums on the 5 ontology wrappers must accept
+    'subcellular_localization' and 'signal_peptide_type'. Mirrors
+    TestOntologyLiteralAcceptsTcdbCazy."""
+
+    @staticmethod
+    def _ontology_hint_str(tool_fns, tool_name: str) -> str:
+        import typing
+        fn = tool_fns[tool_name]
+        hints = typing.get_type_hints(fn, include_extras=True)
+        ontology_hint = hints.get("ontology")
+        assert ontology_hint is not None, (
+            f"ontology parameter not found in type hints for {tool_name}"
+        )
+        return str(ontology_hint)
+
+    def test_genes_by_ontology_literal_includes_new_keys(self, tool_fns):
+        hint_str = self._ontology_hint_str(tool_fns, "genes_by_ontology")
+        assert "'subcellular_localization'" in hint_str
+        assert "'signal_peptide_type'" in hint_str
+
+    def test_gene_ontology_terms_literal_includes_new_keys(self, tool_fns):
+        hint_str = self._ontology_hint_str(tool_fns, "gene_ontology_terms")
+        assert "'subcellular_localization'" in hint_str
+        assert "'signal_peptide_type'" in hint_str
+
+    def test_ontology_landscape_literal_includes_new_keys(self, tool_fns):
+        hint_str = self._ontology_hint_str(tool_fns, "ontology_landscape")
+        assert "'subcellular_localization'" in hint_str
+        assert "'signal_peptide_type'" in hint_str
+
+    def test_pathway_enrichment_literal_includes_new_keys(self, tool_fns):
+        hint_str = self._ontology_hint_str(tool_fns, "pathway_enrichment")
+        assert "'subcellular_localization'" in hint_str
+        assert "'signal_peptide_type'" in hint_str
+
+    def test_cluster_enrichment_literal_includes_new_keys(self, tool_fns):
+        hint_str = self._ontology_hint_str(tool_fns, "cluster_enrichment")
+        assert "'subcellular_localization'" in hint_str
+        assert "'signal_peptide_type'" in hint_str
+
+    def test_search_ontology_description_mentions_new_keys(self, tool_fns):
+        import typing
+        fn = tool_fns["search_ontology"]
+        hints = typing.get_type_hints(fn, include_extras=True)
+        ontology_hint = hints.get("ontology")
+        assert ontology_hint is not None
+        descriptions = [
+            getattr(meta, "description", None) for meta in
+            getattr(ontology_hint, "__metadata__", ())
+        ]
+        joined = " ".join(d for d in descriptions if d)
+        assert "subcellular_localization" in joined
+        assert "signal_peptide_type" in joined
+
+
+class TestEdgePropFieldsOnRowModels:
+    """The GenesByOntologyResult and OntologyTermRow Pydantic classes
+    must carry the 4 optional edge-prop fields (default=None, sparse)."""
+
+    def test_genes_by_ontology_result_has_edge_prop_fields(self):
+        from multiomics_explorer.mcp_server.tools import register_tools
+        import inspect
+        src = inspect.getsource(register_tools)
+        idx = src.index("class GenesByOntologyResult(BaseModel):")
+        end_idx = src.index("class OntologyCategoryBreakdown(BaseModel):", idx)
+        section = src[idx:end_idx]
+        assert "localization_score:" in section, (
+            "localization_score must be a field on GenesByOntologyResult"
+        )
+        assert "signal_peptide_probability:" in section
+        assert "signal_peptide_cleavage_site:" in section
+        assert "signal_peptide_cleavage_probability:" in section
+
+    def test_ontology_term_row_has_edge_prop_fields(self):
+        from multiomics_explorer.mcp_server.tools import register_tools
+        import inspect
+        src = inspect.getsource(register_tools)
+        idx = src.index("class OntologyTermRow(BaseModel):")
+        end_idx = src.index("class OntologyTypeBreakdown(BaseModel):", idx)
+        section = src[idx:end_idx]
+        assert "localization_score:" in section
+        assert "signal_peptide_probability:" in section
+        assert "signal_peptide_cleavage_site:" in section
+        assert "signal_peptide_cleavage_probability:" in section
+
+
+class TestExpectedToolsUnchangedForPsortbSignalp:
+    """Adding subcellular_localization/signal_peptide_type as ontology
+    dimensions does NOT add new tool entries."""
+
+    def test_no_new_tools_added(self, tool_fns):
+        assert "subcellular_localization" not in tool_fns
+        assert "signal_peptide_type" not in tool_fns
+        assert "psortb" not in tool_fns
+        assert "signalp" not in tool_fns
+
+    def test_expected_tools_size_unchanged_at_39(self):
+        # No new tool — only ontology surface refresh.
+        assert len(EXPECTED_TOOLS) == 39, (
+            f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
+            "psortb/signalp adds NO new tools (Mode-B ontology surface refresh)."
+        )

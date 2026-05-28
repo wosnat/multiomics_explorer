@@ -2125,7 +2125,7 @@ def register_tools(mcp: FastMCP):
         ontology: Annotated[str, Field(
             description="Ontology to search: 'go_bp', 'go_mf', 'go_cc', "
             "'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', "
-            "'tcdb', 'cazy'.",
+            "'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type'.",
         )],
         summary: Annotated[bool, Field(
             description="When true, return only summary fields (results=[]).",
@@ -2194,6 +2194,21 @@ def register_tools(mcp: FastMCP):
         is_informative: bool = Field(description="True iff term is not flagged is_uninformative (positive framing; coerced from sparse '<term>.is_uninformative' KG flag)")
         tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
         tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
+        # Edge-prop columns (sparse — only set when matching ontology)
+        localization_score: float | None = Field(default=None,
+            description="PSORTb confidence score (sparse: only set when "
+                        "ontology='subcellular_localization'). Range 7.5–10.0.")
+        signal_peptide_probability: float | None = Field(default=None,
+            description="SignalP winning-class probability (sparse: only set "
+                        "when ontology='signal_peptide_type'). Range 0–1.")
+        signal_peptide_cleavage_site: int | None = Field(default=None,
+            description="SignalP-predicted cleavage residue position (sparse: "
+                        "only set when ontology='signal_peptide_type'; absent "
+                        "when SignalP reports no cleavage site).")
+        signal_peptide_cleavage_probability: float | None = Field(default=None,
+            description="SignalP cleavage-site probability (sparse: only set "
+                        "when ontology='signal_peptide_type' and cleavage_site "
+                        "present).")
         # verbose only
         function_description: str | None = Field(default=None,
             description="Curated functional description (verbose only)")
@@ -2266,6 +2281,7 @@ def register_tools(mcp: FastMCP):
             "go_bp", "go_mf", "go_cc", "ec", "kegg",
             "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
             "tcdb", "cazy",
+            "subcellular_localization", "signal_peptide_type",
         ], Field(
             description="Ontology for these term_ids / this level.",
         )],
@@ -2380,6 +2396,21 @@ def register_tools(mcp: FastMCP):
         ontology_type: str | None = Field(default=None, description="Ontology type when querying all (e.g. 'go_bp')")
         tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
         tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
+        # Edge-prop columns (sparse — only set when matching ontology)
+        localization_score: float | None = Field(default=None,
+            description="PSORTb confidence score (sparse: only set when "
+                        "ontology='subcellular_localization'). Range 7.5–10.0.")
+        signal_peptide_probability: float | None = Field(default=None,
+            description="SignalP winning-class probability (sparse: only set "
+                        "when ontology='signal_peptide_type'). Range 0–1.")
+        signal_peptide_cleavage_site: int | None = Field(default=None,
+            description="SignalP-predicted cleavage residue position (sparse: "
+                        "only set when ontology='signal_peptide_type'; absent "
+                        "when SignalP reports no cleavage site).")
+        signal_peptide_cleavage_probability: float | None = Field(default=None,
+            description="SignalP cleavage-site probability (sparse: only set "
+                        "when ontology='signal_peptide_type' and cleavage_site "
+                        "present).")
         # verbose-only
         organism_name: str | None = Field(default=None, description="Organism (e.g. 'Prochlorococcus MED4')")
 
@@ -2429,7 +2460,8 @@ def register_tools(mcp: FastMCP):
         ontology: Annotated[
             Literal["go_bp", "go_mf", "go_cc", "kegg", "ec",
                     "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
-                    "tcdb", "cazy"] | None,
+                    "tcdb", "cazy",
+                    "subcellular_localization", "signal_peptide_type"] | None,
             Field(description="Filter to one ontology. None returns all."),
         ] = None,
         mode: Annotated[Literal["leaf", "rollup"], Field(
@@ -5533,7 +5565,8 @@ def register_tools(mcp: FastMCP):
         ontology: Annotated[
             Literal["go_bp", "go_mf", "go_cc", "ec", "kegg",
                     "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
-                    "tcdb", "cazy"] | None,
+                    "tcdb", "cazy",
+                    "subcellular_localization", "signal_peptide_type"] | None,
             Field(description="If None, surveys all ontologies."),
         ] = None,
         tree: Annotated[str | None, Field(
@@ -5630,6 +5663,7 @@ def register_tools(mcp: FastMCP):
             "go_bp", "go_mf", "go_cc", "ec", "kegg",
             "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
             "tcdb", "cazy",
+            "subcellular_localization", "signal_peptide_type",
         ], Field(
             description="Ontology for pathway definitions. Run ontology_landscape first to rank by relevance.",
         )],
@@ -5775,6 +5809,7 @@ def register_tools(mcp: FastMCP):
             "go_bp", "go_mf", "go_cc", "ec", "kegg",
             "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
             "tcdb", "cazy",
+            "subcellular_localization", "signal_peptide_type",
         ], Field(description="Ontology for pathway definitions. Run ontology_landscape first.")],
         tree: Annotated[str | None, Field(
             description="BRITE tree name filter. Only valid when ontology='brite'. "
