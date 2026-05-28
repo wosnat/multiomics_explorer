@@ -2308,7 +2308,7 @@ def _genes_by_ontology_match_stage(
                 "WITH input_tid, coalesce(tp, tc) AS t\n"
                 "OPTIONAL MATCH (t)<-[:Pfam_in_pfam_clan*0..1]-(leaf:Pfam)\n"
                 "WITH t, coalesce(leaf, t) AS leaf\n"
-                "MATCH (g:Gene {organism_name: $org})-[:Gene_has_pfam]->(leaf)\n"
+                "MATCH (g:Gene {organism_name: $org})-[r:Gene_has_pfam]->(leaf)\n"
                 "WHERE t:Pfam OR t:PfamClan\n"
             )
         else:
@@ -2323,7 +2323,7 @@ def _genes_by_ontology_match_stage(
                     f"MATCH (t:{leaf} {{id: input_tid}})\n"
                     f"{walk}\n"
                     f"MATCH (g:Gene {{organism_name: $org}})"
-                    f"-[:{frag['gene_rel']}]->(leaf)\n"
+                    f"-[r:{frag['gene_rel']}]->(leaf)\n"
                 )
             else:
                 # Flat: t = leaf; still the "input term's genes"
@@ -2331,7 +2331,7 @@ def _genes_by_ontology_match_stage(
                     "UNWIND $term_ids AS input_tid\n"
                     f"MATCH (t:{leaf} {{id: input_tid}})\n"
                     f"MATCH (g:Gene {{organism_name: $org}})"
-                    f"-[:{frag['gene_rel']}]->(t)\n"
+                    f"-[r:{frag['gene_rel']}]->(t)\n"
                 )
     else:
         # Mode 2/3 — walk UP, filter on level (and optionally term_ids).
@@ -2359,14 +2359,14 @@ def _genes_by_ontology_match_stage(
     # Term-level informative filter: must apply BEFORE size collapse so
     # per-term gene counts reflect informative-only terms.
     informative_filter = (
-        "WITH t, g WHERE coalesce(t.is_uninformative, '') <> 'true'\n"
+        "WITH t, g, r WHERE coalesce(t.is_uninformative, '') <> 'true'\n"
         if informative_only else ""
     )
 
     # Size filter (common to all modes). Caller must add
     # $min_gene_set_size and $max_gene_set_size to params.
     size_filter = (
-        "WITH t, collect(DISTINCT g) AS term_genes\n"
+        "WITH t, collect(DISTINCT {g: g, r: r}) AS term_genes\n"
         "WHERE size(term_genes) >= $min_gene_set_size\n"
         "  AND ($max_gene_set_size IS NULL OR "
         "size(term_genes) <= $max_gene_set_size)"

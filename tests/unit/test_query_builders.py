@@ -8316,7 +8316,7 @@ class TestBuildGenesByOntologyF1Surface:
         assert "coalesce(t.is_uninformative, '') <> 'true'" in cypher
 
     def test_match_stage_filter_before_size_collapse(self):
-        """Filter must apply BEFORE the `WITH t, collect(DISTINCT g) AS term_genes`
+        """Filter must apply BEFORE the `WITH t, collect(DISTINCT {g: g, r: r}) AS term_genes`
         size-collapse stage (otherwise it would filter on collapsed nodes)."""
         from multiomics_explorer.kg.queries_lib import (
             _genes_by_ontology_match_stage,
@@ -8326,7 +8326,7 @@ class TestBuildGenesByOntologyF1Surface:
             level=1, term_ids=None, informative_only=True,
         )
         idx_filter = cypher.find("coalesce(t.is_uninformative, '') <> 'true'")
-        idx_collapse = cypher.find("collect(DISTINCT g) AS term_genes")
+        idx_collapse = cypher.find("collect(DISTINCT {g: g, r: r}) AS term_genes")
         assert idx_filter != -1 and idx_collapse != -1
         assert idx_filter < idx_collapse
 
@@ -10161,3 +10161,54 @@ class TestHierarchyWalkRelBinding:
     def test_pfam_binds_r(self):
         frag = _hierarchy_walk("pfam", direction="up")
         assert "[r:Gene_has_pfam]" in frag["bind_up"]
+
+
+class TestMatchStageRelBinding:
+    """`_genes_by_ontology_match_stage` must bind `r` in BOTH mode-1
+    walk-down (where bind happens inside the helper) and modes 2/3
+    walk-up (where bind comes from `_hierarchy_walk.bind_up`). The
+    final collect must collect `{g: g, r: r}` records so the detail
+    builder can project edge properties."""
+
+    def test_mode_1_walk_down_binds_r_for_flat_ontology(self):
+        """Mode 1 (term_ids only) for subcellular_localization."""
+        from multiomics_explorer.kg.queries_lib import _genes_by_ontology_match_stage
+        cypher, _ = _genes_by_ontology_match_stage(
+            ontology="subcellular_localization",
+            level=None, term_ids=["psortb_OuterMembrane"],
+            organism="MED4",
+        )
+        assert "[r:Gene_has_subcellular_localization]" in cypher
+
+    def test_mode_1_walk_down_binds_r_for_single_label_tree(self):
+        """Mode 1 for tcdb (single-label tree)."""
+        from multiomics_explorer.kg.queries_lib import _genes_by_ontology_match_stage
+        cypher, _ = _genes_by_ontology_match_stage(
+            ontology="tcdb",
+            level=None, term_ids=["tcdb:1.A.1"],
+            organism="MED4",
+        )
+        assert "[r:Gene_has_tcdb_family]" in cypher
+
+    def test_mode_2_walk_up_binds_r_via_bind_up(self):
+        """Mode 2 (level only) — bind_up from _hierarchy_walk carries r."""
+        from multiomics_explorer.kg.queries_lib import _genes_by_ontology_match_stage
+        cypher, _ = _genes_by_ontology_match_stage(
+            ontology="signal_peptide_type",
+            level=0, term_ids=None,
+            organism="MED4",
+        )
+        assert "[r:Gene_has_signal_peptide_type]" in cypher
+
+    def test_collect_emits_g_r_records(self):
+        """The final collect step must produce {g, r} records, not bare g."""
+        from multiomics_explorer.kg.queries_lib import _genes_by_ontology_match_stage
+        cypher, _ = _genes_by_ontology_match_stage(
+            ontology="tcdb",
+            level=None, term_ids=["tcdb:1.A.1"],
+            organism="MED4",
+        )
+        # New shape — drops the legacy `collect(DISTINCT g) AS term_genes`
+        assert "collect(DISTINCT {g: g, r: r}) AS term_genes" in cypher
+        # Guard the legacy shape doesn't linger
+        assert "collect(DISTINCT g) AS term_genes" not in cypher
