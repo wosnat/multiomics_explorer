@@ -83,7 +83,7 @@ class TestHierarchyWalk:
         assert "Biological_process_is_a_biological_process" in frag["rel_union"]
         assert "Biological_process_part_of_biological_process" in frag["rel_union"]
         # Up walk binds gene → leaf, then leaf → ancestor
-        assert "(g:Gene {organism_name: $org})-[:Gene_involved_in_biological_process]->(leaf:BiologicalProcess)" in frag["bind_up"]
+        assert "(g:Gene {organism_name: $org})-[r:Gene_involved_in_biological_process]->(leaf:BiologicalProcess)" in frag["bind_up"]
         assert "(leaf)-[:" in frag["walk_up"]
         assert "]->(t:BiologicalProcess)" in frag["walk_up"]
 
@@ -98,7 +98,7 @@ class TestHierarchyWalk:
         # Flat: t = leaf; walk_up is empty; bind goes directly to t
         assert frag["rel_union"] == ""
         assert frag["walk_up"] == ""
-        assert "(g:Gene {organism_name: $org})-[:Gene_in_cog_category]->(t:CogFunctionalCategory)" in frag["bind_up"]
+        assert "(g:Gene {organism_name: $org})-[r:Gene_in_cog_category]->(t:CogFunctionalCategory)" in frag["bind_up"]
 
     def test_tigr_role_flat(self):
         frag = _hierarchy_walk("tigr_role", direction="up")
@@ -251,7 +251,7 @@ class TestHierarchyWalkTcdb:
         assert frag["rel_union"] == "Tcdb_family_is_a_tcdb_family"
         # Bind: gene → leaf
         assert (
-            "(g:Gene {organism_name: $org})-[:Gene_has_tcdb_family]->(leaf:TcdbFamily)"
+            "(g:Gene {organism_name: $org})-[r:Gene_has_tcdb_family]->(leaf:TcdbFamily)"
             in frag["bind_up"]
         )
         # Walk up: leaf → ancestor at any level via *0..
@@ -285,7 +285,7 @@ class TestHierarchyWalkCazy:
         assert frag["gene_rel"] == "Gene_has_cazy_family"
         assert frag["rel_union"] == "Cazy_family_is_a_cazy_family"
         assert (
-            "(g:Gene {organism_name: $org})-[:Gene_has_cazy_family]->(leaf:CazyFamily)"
+            "(g:Gene {organism_name: $org})-[r:Gene_has_cazy_family]->(leaf:CazyFamily)"
             in frag["bind_up"]
         )
         assert "Cazy_family_is_a_cazy_family*0.." in frag["walk_up"]
@@ -1585,7 +1585,7 @@ class TestBuildGenesByOntologyDetail:
         assert params["level"] == 1
         assert "$term_ids" not in cypher  # no term_ids clause
         # Mode 2: bind gene → leaf, walk leaf → ancestor
-        assert "(g:Gene {organism_name: $org})-[:Gene_involved_in_biological_process]->(leaf:BiologicalProcess)" in cypher
+        assert "(g:Gene {organism_name: $org})-[r:Gene_involved_in_biological_process]->(leaf:BiologicalProcess)" in cypher
         assert "(leaf)-[:" in cypher
         assert "]->(t:BiologicalProcess)" in cypher
         assert "WHERE t.level = $level" in cypher
@@ -1682,7 +1682,7 @@ class TestBuildGenesByOntologyDetail:
             max_gene_set_size=500,
         )
         # Flat: t = leaf; no walk between leaf and t
-        assert "(g:Gene {organism_name: $org})-[:Gene_in_cog_category]->(t:CogFunctionalCategory)" in cypher
+        assert "(g:Gene {organism_name: $org})-[r:Gene_in_cog_category]->(t:CogFunctionalCategory)" in cypher
         # No explicit leaf→t walk
         assert "(leaf)-[:" not in cypher
 
@@ -1807,7 +1807,7 @@ class TestBuildGenesByOntologyPerTerm:
             max_gene_set_size=500,
         )
         # Flat ontology: t = leaf, no walk
-        assert "(g:Gene {organism_name: $org})-[:Gene_has_tigr_role]->(t:TigrRole)" in cypher
+        assert "(g:Gene {organism_name: $org})-[r:Gene_has_tigr_role]->(t:TigrRole)" in cypher
         assert "(leaf)-[:" not in cypher
 
 
@@ -1875,7 +1875,7 @@ class TestBuildGenesByOntologyPerGene:
             max_gene_set_size=500,
         )
         # Flat: t = leaf, no walk
-        assert "(g:Gene {organism_name: $org})-[:Gene_in_cog_category]->(t:CogFunctionalCategory)" in cypher
+        assert "(g:Gene {organism_name: $org})-[r:Gene_in_cog_category]->(t:CogFunctionalCategory)" in cypher
         assert "(leaf)-[:" not in cypher
 
 
@@ -2292,7 +2292,7 @@ class TestBuildGenesByOntologyTcdbCazy:
         )
         # Mode 2: gene → leaf, walk leaf → ancestor
         assert (
-            "(g:Gene {organism_name: $org})-[:Gene_has_cazy_family]->(leaf:CazyFamily)"
+            "(g:Gene {organism_name: $org})-[r:Gene_has_cazy_family]->(leaf:CazyFamily)"
             in cypher
         )
         assert "(leaf)-[:" in cypher
@@ -2366,7 +2366,7 @@ class TestBuildGenesByOntologyTcdbCazy:
             max_gene_set_size=500,
         )
         assert (
-            "(g:Gene {organism_name: $org})-[:Gene_has_tcdb_family]->(leaf:TcdbFamily)"
+            "(g:Gene {organism_name: $org})-[r:Gene_has_tcdb_family]->(leaf:TcdbFamily)"
             in cypher
         )
 
@@ -2383,7 +2383,7 @@ class TestBuildGenesByOntologyTcdbCazy:
             max_gene_set_size=500,
         )
         assert (
-            "(g:Gene {organism_name: $org})-[:Gene_has_cazy_family]->(leaf:CazyFamily)"
+            "(g:Gene {organism_name: $org})-[r:Gene_has_cazy_family]->(leaf:CazyFamily)"
             in cypher
         )
 
@@ -10120,3 +10120,44 @@ class TestEdgePropColumnHelper:
         # No r.* projections for non-owner ontologies
         assert "r.score" not in cypher
         assert "r.probability" not in cypher
+
+
+class TestHierarchyWalkRelBinding:
+    """`_hierarchy_walk`'s `bind_up` fragment must bind the gene→leaf
+    relationship as `r` so consumers can project edge properties.
+    Applies to all variants: single-label, flat, bridge, pfam."""
+
+    def test_single_label_binds_r(self):
+        """e.g. tcdb (single-label tree)."""
+        frag = _hierarchy_walk("tcdb", direction="up")
+        assert "[r:Gene_has_tcdb_family]" in frag["bind_up"], (
+            f"Expected [r:Gene_has_tcdb_family] in bind_up; "
+            f"got: {frag['bind_up']!r}"
+        )
+
+    def test_flat_ontology_binds_r(self):
+        """e.g. cog_category (flat) — also covers the new
+        subcellular_localization and signal_peptide_type."""
+        frag = _hierarchy_walk("cog_category", direction="up")
+        assert "[r:Gene_in_cog_category]" in frag["bind_up"]
+
+    def test_subcellular_localization_binds_r(self):
+        frag = _hierarchy_walk("subcellular_localization", direction="up")
+        assert "[r:Gene_has_subcellular_localization]" in frag["bind_up"]
+
+    def test_signal_peptide_type_binds_r(self):
+        frag = _hierarchy_walk("signal_peptide_type", direction="up")
+        assert "[r:Gene_has_signal_peptide_type]" in frag["bind_up"]
+
+    def test_bridge_binds_r_on_first_hop(self):
+        """BRITE (bridge: gene→KeggTerm→BriteCategory). Bind r on the
+        gene→kegg-term edge (the gene_rel), not the bridge edge."""
+        frag = _hierarchy_walk("brite", direction="up")
+        assert "[r:Gene_has_kegg_ko]" in frag["bind_up"], (
+            f"Expected [r:Gene_has_kegg_ko] (the gene_rel) bound in bridge "
+            f"bind_up; got: {frag['bind_up']!r}"
+        )
+
+    def test_pfam_binds_r(self):
+        frag = _hierarchy_walk("pfam", direction="up")
+        assert "[r:Gene_has_pfam]" in frag["bind_up"]

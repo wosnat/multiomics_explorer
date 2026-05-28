@@ -203,7 +203,7 @@ def _hierarchy_walk(
     if ontology == "pfam":
         bind_up = (
             f"MATCH (g:Gene {{organism_name: $org}})"
-            f"-[:{gene_rel}]->(leaf:Pfam)"
+            f"-[r:{gene_rel}]->(leaf:Pfam)"
         )
         # *0..1 because Pfam.level=1 (t=leaf) OR PfamClan.level=0 (t=clan)
         walk_up = (
@@ -254,7 +254,7 @@ def _hierarchy_walk(
         bridge_node = bridge["node_label"]
         bind_up = (
             f"MATCH (g:Gene {{organism_name: $org}})"
-            f"-[:{gene_rel}]->(ko:{bridge_node})"
+            f"-[r:{gene_rel}]->(ko:{bridge_node})"
             f"-[:{bridge_edge}]->(leaf:{leaf_label})"
         )
         walk_up = f"MATCH (leaf)-[:{rel_union}*0..]->(t:{leaf_label})"
@@ -274,7 +274,7 @@ def _hierarchy_walk(
     if not hierarchy_rels:
         bind_up = (
             f"MATCH (g:Gene {{organism_name: $org}})"
-            f"-[:{gene_rel}]->(t:{leaf_label})"
+            f"-[r:{gene_rel}]->(t:{leaf_label})"
         )
         return {
             "leaf_label": leaf_label,
@@ -288,7 +288,7 @@ def _hierarchy_walk(
     # --- Single-label tree ontologies (GO BP/MF/CC, EC, KEGG, CyanoRak) ---
     bind_up = (
         f"MATCH (g:Gene {{organism_name: $org}})"
-        f"-[:{gene_rel}]->(leaf:{leaf_label})"
+        f"-[r:{gene_rel}]->(leaf:{leaf_label})"
     )
     walk_up = f"MATCH (leaf)-[:{rel_union}*0..]->(t:{leaf_label})"
     walk_down = (
