@@ -10068,3 +10068,55 @@ class TestBuildAssaysByMetabolite:
         cypher, params = build_assays_by_metabolite(
             metabolite_ids=["kegg.compound:C00074"], organism="MIT9313")
         assert params.get("organism") == "mit9313"
+
+
+class TestEdgePropColumnHelper:
+    """`_edge_prop_return_columns()` is the single source of truth for
+    the ordered set of edge-prop output columns across all ontologies.
+    Returns a list of (output_column, neo4j_prop, owner_ontology) tuples
+    so the Cypher RETURN-builder can emit `r.<prop> AS <col>` for the
+    owner and `null AS <col>` for non-owners.
+    """
+
+    def test_helper_returns_union_in_config_order(self):
+        from multiomics_explorer.kg.queries_lib import _edge_prop_return_columns
+        cols = _edge_prop_return_columns()
+        # Order: subcellular_localization (1 col), then signal_peptide_type (3 cols)
+        assert cols == [
+            ("localization_score", "score", "subcellular_localization"),
+            ("signal_peptide_probability", "probability", "signal_peptide_type"),
+            ("signal_peptide_cleavage_site", "cleavage_site", "signal_peptide_type"),
+            ("signal_peptide_cleavage_probability", "cleavage_probability",
+             "signal_peptide_type"),
+        ]
+
+    def test_owner_cypher_for_psortb(self):
+        """For the owner ontology, emit `r.<neo4j_prop> AS <output_column>`."""
+        from multiomics_explorer.kg.queries_lib import _edge_prop_return_cypher
+        cypher = _edge_prop_return_cypher("subcellular_localization")
+        # Owner column: r.score AS localization_score
+        # Non-owner columns: null AS <col>
+        assert "r.score AS localization_score" in cypher
+        assert "null AS signal_peptide_probability" in cypher
+        assert "null AS signal_peptide_cleavage_site" in cypher
+        assert "null AS signal_peptide_cleavage_probability" in cypher
+
+    def test_owner_cypher_for_signalp(self):
+        from multiomics_explorer.kg.queries_lib import _edge_prop_return_cypher
+        cypher = _edge_prop_return_cypher("signal_peptide_type")
+        assert "null AS localization_score" in cypher
+        assert "r.probability AS signal_peptide_probability" in cypher
+        assert "r.cleavage_site AS signal_peptide_cleavage_site" in cypher
+        assert "r.cleavage_probability AS signal_peptide_cleavage_probability" \
+            in cypher
+
+    def test_non_owner_cypher_is_all_nulls(self):
+        from multiomics_explorer.kg.queries_lib import _edge_prop_return_cypher
+        cypher = _edge_prop_return_cypher("pfam")
+        assert "null AS localization_score" in cypher
+        assert "null AS signal_peptide_probability" in cypher
+        assert "null AS signal_peptide_cleavage_site" in cypher
+        assert "null AS signal_peptide_cleavage_probability" in cypher
+        # No r.* projections for non-owner ontologies
+        assert "r.score" not in cypher
+        assert "r.probability" not in cypher

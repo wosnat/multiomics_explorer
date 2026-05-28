@@ -115,6 +115,46 @@ ONTOLOGY_CONFIG = {
     },
 }
 
+
+def _edge_prop_return_columns() -> list[tuple[str, str, str]]:
+    """Union of edge-prop columns across ONTOLOGY_CONFIG, in config order.
+
+    Returns ordered list of (output_column, neo4j_prop, owner_ontology)
+    triples. The list is the source of truth for column count, ordering,
+    and column names — every ontology row must include each of these
+    columns (with `r.<prop>` for the owner, `null` for non-owners) so
+    the row schema is uniform across all ontologies.
+    """
+    cols: list[tuple[str, str, str]] = []
+    for ont_key, cfg in ONTOLOGY_CONFIG.items():
+        for neo4j_prop, output_col in cfg.get("edge_props", []):
+            cols.append((output_col, neo4j_prop, ont_key))
+    return cols
+
+
+def _edge_prop_return_cypher(ontology: str) -> str:
+    """Return a comma-prefixed Cypher fragment projecting edge-prop columns.
+
+    For the owner ontology of each column, emits `r.<neo4j_prop> AS <col>`.
+    For non-owner ontologies, emits `null AS <col>`. The relationship
+    variable is assumed to be named `r` in the surrounding Cypher.
+
+    Returned string starts with `,\n       ` so it can be appended directly
+    after another RETURN-block column. Empty string if no edge_props are
+    defined anywhere (defensive).
+    """
+    cols = _edge_prop_return_columns()
+    if not cols:
+        return ""
+    parts: list[str] = []
+    for output_col, neo4j_prop, owner in cols:
+        if owner == ontology:
+            parts.append(f"r.{neo4j_prop} AS {output_col}")
+        else:
+            parts.append(f"null AS {output_col}")
+    return ",\n       " + ",\n       ".join(parts)
+
+
 def _hierarchy_walk(
     ontology: str,
     direction: Literal["up", "down"],
