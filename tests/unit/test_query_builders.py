@@ -10241,3 +10241,63 @@ class TestPerTermPerGeneUnwindShape:
         assert "UNWIND term_genes AS pair" in cypher
         assert "pair.g AS g" in cypher
         assert "UNWIND term_genes AS g\n" not in cypher
+
+
+class TestGenesByOntologyDetailEdgeProps:
+    """build_genes_by_ontology_detail must emit edge-prop columns:
+    `r.<prop> AS <output_col>` on the owner ontology, `null AS <col>`
+    on all other ontologies. Row schema is uniform across all 14
+    ontologies."""
+
+    def test_subcellular_localization_emits_localization_score(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="subcellular_localization",
+            organism="MED4",
+            term_ids=["psortb_OuterMembrane"],
+        )
+        assert "r.score AS localization_score" in cypher
+        # Other-ontology columns are null on this query
+        assert "null AS signal_peptide_probability" in cypher
+        assert "null AS signal_peptide_cleavage_site" in cypher
+        assert "null AS signal_peptide_cleavage_probability" in cypher
+
+    def test_signal_peptide_type_emits_three_signalp_cols(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="signal_peptide_type",
+            organism="MED4",
+            term_ids=["signalp_LIPO"],
+        )
+        assert "r.probability AS signal_peptide_probability" in cypher
+        assert "r.cleavage_site AS signal_peptide_cleavage_site" in cypher
+        assert "r.cleavage_probability AS signal_peptide_cleavage_probability" in cypher
+        assert "null AS localization_score" in cypher
+
+    def test_pfam_emits_all_nulls(self):
+        """Non-owner ontology — all 4 edge-prop columns null."""
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="pfam",
+            organism="MED4",
+            term_ids=["pfam:PF00001"],
+        )
+        assert "null AS localization_score" in cypher
+        assert "null AS signal_peptide_probability" in cypher
+        assert "null AS signal_peptide_cleavage_site" in cypher
+        assert "null AS signal_peptide_cleavage_probability" in cypher
+        assert "r.score" not in cypher
+        assert "r.probability" not in cypher
+
+    def test_detail_unwinds_pair_with_g_r_alias(self):
+        """After Task 4's collect change, detail must UNWIND `pair` and
+        alias `pair.g AS g, pair.r AS r`."""
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="tcdb",
+            organism="MED4",
+            term_ids=["tcdb:1.A.1"],
+        )
+        assert "UNWIND term_genes AS pair" in cypher
+        assert "pair.g AS g" in cypher
+        assert "pair.r AS r" in cypher

@@ -2424,13 +2424,14 @@ def build_genes_by_ontology_detail(
         "       t.level_is_best_effort IS NOT NULL AS level_is_best_effort"
         if verbose else ""
     )
+    edge_prop_cols = _edge_prop_return_cypher(ontology)
     return_block = (
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.gene_category AS gene_category,\n"
         "       t.id AS term_id, t.name AS term_name, t.level AS level,\n"
         "       t.tree AS tree, t.tree_code AS tree_code,\n"
         "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
-        f"{verbose_cols}\n"
+        f"{verbose_cols}{edge_prop_cols}\n"
         "ORDER BY t.id, g.locus_tag"
     )
 
@@ -2446,7 +2447,8 @@ def build_genes_by_ontology_detail(
 
     cypher = (
         f"{head}\n"
-        f"UNWIND term_genes AS g\n"
+        f"UNWIND term_genes AS pair\n"
+        f"WITH t, pair.g AS g, pair.r AS r\n"
         f"{return_block}{skip_clause}{limit_clause}"
     )
     return cypher, params
