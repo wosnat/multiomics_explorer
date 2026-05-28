@@ -10301,3 +10301,82 @@ class TestGenesByOntologyDetailEdgeProps:
         assert "UNWIND term_genes AS pair" in cypher
         assert "pair.g AS g" in cypher
         assert "pair.r AS r" in cypher
+
+
+class TestGeneOntologyTermsRelBindingAndEdgeProps:
+    """build_gene_ontology_terms binds r and emits edge-prop columns in
+    BOTH leaf and rollup modes."""
+
+    # --- leaf mode ---
+
+    def test_leaf_mode_binds_r(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="subcellular_localization",
+            organism_name="MED4", mode="leaf",
+        )
+        assert "[r:Gene_has_subcellular_localization]" in cypher
+
+    def test_leaf_mode_emits_owner_edge_prop(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="signal_peptide_type",
+            organism_name="MED4", mode="leaf",
+        )
+        assert "r.probability AS signal_peptide_probability" in cypher
+        assert "r.cleavage_site AS signal_peptide_cleavage_site" in cypher
+        assert "r.cleavage_probability AS signal_peptide_cleavage_probability" in cypher
+        assert "null AS localization_score" in cypher
+
+    def test_leaf_mode_non_owner_emits_all_nulls(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="pfam",
+            organism_name="MED4", mode="leaf",
+        )
+        assert "null AS localization_score" in cypher
+        assert "null AS signal_peptide_probability" in cypher
+        assert "null AS signal_peptide_cleavage_site" in cypher
+        assert "null AS signal_peptide_cleavage_probability" in cypher
+        assert "r.score" not in cypher
+        assert "r.probability" not in cypher
+
+    # --- rollup mode ---
+
+    def test_rollup_mode_binds_r(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="subcellular_localization",
+            organism_name="MED4", mode="rollup", level=0,
+        )
+        assert "[r:Gene_has_subcellular_localization]" in cypher
+
+    def test_rollup_mode_emits_owner_edge_prop(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="subcellular_localization",
+            organism_name="MED4", mode="rollup", level=0,
+        )
+        assert "r.score AS localization_score" in cypher
+
+    def test_rollup_mode_flat_keeps_r_in_with_scope(self):
+        """The flat-branch rollup `walk` includes a WITH stage; r must
+        be preserved through it so the RETURN can project r.score."""
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="subcellular_localization",
+            organism_name="MED4", mode="rollup", level=0,
+        )
+        # Must keep r through the WITH stage (otherwise RETURN r.score crashes)
+        assert "WITH g, t, r" in cypher
+        # Guard the legacy 2-var WITH doesn't linger
+        assert "WITH g, t\nWHERE" not in cypher
+
+    def test_rollup_mode_non_owner_emits_all_nulls(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="tcdb",
+            organism_name="MED4", mode="rollup", level=0,
+        )
+        assert "null AS localization_score" in cypher
+        assert "null AS signal_peptide_probability" in cypher

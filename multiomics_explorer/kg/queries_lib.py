@@ -2774,6 +2774,7 @@ def build_gene_ontology_terms(
         ",\n       g.organism_name AS organism_name"
         if verbose else ""
     )
+    edge_prop_cols = _edge_prop_return_cypher(ontology)
 
     if offset:
         skip_clause = "\nSKIP $offset"
@@ -2796,7 +2797,7 @@ def build_gene_ontology_terms(
             bridge_node = bridge["node_label"]
             bind = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
-                f"-[:{gene_rel}]->(ko:{bridge_node})"
+                f"-[r:{gene_rel}]->(ko:{bridge_node})"
                 f"-[:{bridge_edge}]->(leaf:{label})\n"
                 "WHERE g.locus_tag IN $locus_tags\n"
             )
@@ -2809,14 +2810,14 @@ def build_gene_ontology_terms(
             # flat: leaf = term
             bind = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
-                f"-[:{gene_rel}]->(t:{label})\n"
+                f"-[r:{gene_rel}]->(t:{label})\n"
                 "WHERE g.locus_tag IN $locus_tags\n"
             )
-            walk = "WITH g, t\nWHERE t.level = $level\n"
+            walk = "WITH g, t, r\nWHERE t.level = $level\n"
         elif ontology == "pfam":
             bind = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
-                f"-[:{gene_rel}]->(leaf:Pfam)\n"
+                f"-[r:{gene_rel}]->(leaf:Pfam)\n"
                 "WHERE g.locus_tag IN $locus_tags\n"
             )
             walk = (
@@ -2827,7 +2828,7 @@ def build_gene_ontology_terms(
             rel_union = "|".join(cfg["hierarchy_rels"])
             bind = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
-                f"-[:{gene_rel}]->(leaf:{label})\n"
+                f"-[r:{gene_rel}]->(leaf:{label})\n"
                 "WHERE g.locus_tag IN $locus_tags\n"
             )
             walk = (
@@ -2849,7 +2850,7 @@ def build_gene_ontology_terms(
             f"{informative_filter}"
             "RETURN DISTINCT g.locus_tag AS locus_tag, t.id AS term_id,\n"
             f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
-            f"       coalesce(t.is_uninformative, '') <> 'true' AS is_informative{verbose_cols}\n"
+            f"       coalesce(t.is_uninformative, '') <> 'true' AS is_informative{verbose_cols}{edge_prop_cols}\n"
             f"ORDER BY g.locus_tag, t.id{skip_clause}{limit_clause}"
         )
     else:
@@ -2859,13 +2860,13 @@ def build_gene_ontology_terms(
         if bridge:
             match_line = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
-                f"-[:{gene_rel}]->(:{bridge['node_label']})"
+                f"-[r:{gene_rel}]->(:{bridge['node_label']})"
                 f"-[:{bridge['edge']}]->(t:{label})\n"
                 "WHERE g.locus_tag IN $locus_tags\n"
             )
         else:
             match_line = (
-                f"MATCH (g:Gene {{organism_name: $org}})-[:{gene_rel}]->(t:{label})\n"
+                f"MATCH (g:Gene {{organism_name: $org}})-[r:{gene_rel}]->(t:{label})\n"
                 "WHERE g.locus_tag IN $locus_tags\n"
             )
 
@@ -2894,7 +2895,7 @@ def build_gene_ontology_terms(
             f"{informative_filter}"
             "RETURN g.locus_tag AS locus_tag, t.id AS term_id,\n"
             f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
-            f"       coalesce(t.is_uninformative, '') <> 'true' AS is_informative{verbose_cols}\n"
+            f"       coalesce(t.is_uninformative, '') <> 'true' AS is_informative{verbose_cols}{edge_prop_cols}\n"
             f"ORDER BY g.locus_tag, t.id{skip_clause}{limit_clause}"
         )
     return cypher, params
