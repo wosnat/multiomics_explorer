@@ -10212,3 +10212,32 @@ class TestMatchStageRelBinding:
         assert "collect(DISTINCT {g: g, r: r}) AS term_genes" in cypher
         # Guard the legacy shape doesn't linger
         assert "collect(DISTINCT g) AS term_genes" not in cypher
+
+
+class TestPerTermPerGeneUnwindShape:
+    """After Task 4's collect-shape change, per_term and per_gene must
+    UNWIND `{g, r}` records and alias `pair.g AS g` so their downstream
+    Cypher is identical."""
+
+    def test_per_term_unwinds_pair_with_g_alias(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_per_term
+        cypher, _ = build_genes_by_ontology_per_term(
+            ontology="tcdb", organism="MED4",
+            level=None, term_ids=["tcdb:1.A.1"],
+        )
+        # New: unwind to pair, alias to g (and r — even if unused — to
+        # preserve symmetry)
+        assert "UNWIND term_genes AS pair" in cypher
+        assert "pair.g AS g" in cypher
+        # Guard: bare-g UNWIND must be gone
+        assert "UNWIND term_genes AS g\n" not in cypher
+
+    def test_per_gene_unwinds_pair_with_g_alias(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_per_gene
+        cypher, _ = build_genes_by_ontology_per_gene(
+            ontology="cog_category", organism="MED4",
+            level=0, term_ids=None,
+        )
+        assert "UNWIND term_genes AS pair" in cypher
+        assert "pair.g AS g" in cypher
+        assert "UNWIND term_genes AS g\n" not in cypher

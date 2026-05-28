@@ -2484,7 +2484,8 @@ def build_genes_by_ontology_per_term(
     params["max_gene_set_size"] = max_gene_set_size
 
     tail = (
-        "UNWIND term_genes AS g\n"
+        "UNWIND term_genes AS pair\n"
+        "WITH t, pair.g AS g, pair.r AS r\n"
         "WITH t, collect({lt: g.locus_tag, "
         "cat: coalesce(g.gene_category, 'Unknown')}) AS gene_rows\n"
         "RETURN t.id AS term_id, t.name AS term_name, t.level AS level,\n"
@@ -2492,7 +2493,7 @@ def build_genes_by_ontology_per_term(
         "       t.level_is_best_effort IS NOT NULL AS best_effort,\n"
         "       size(gene_rows) AS n_genes,\n"
         "       apoc.coll.frequencies("
-        "[r IN gene_rows | r.cat]) AS cat_freqs,\n"
+        "[row IN gene_rows | row.cat]) AS cat_freqs,\n"
         "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative\n"
         "ORDER BY t.id"
     )
@@ -2527,7 +2528,8 @@ def build_genes_by_ontology_per_gene(
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
     tail = (
-        "UNWIND term_genes AS g\n"
+        "UNWIND term_genes AS pair\n"
+        "WITH t, pair.g AS g, pair.r AS r\n"
         "WITH g, collect(DISTINCT t.id) AS gene_terms, "
         "collect(DISTINCT t.level) AS gene_levels\n"
         "RETURN g.locus_tag AS locus_tag,\n"
