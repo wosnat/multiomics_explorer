@@ -25,7 +25,7 @@ conventions; docs://analysis/enrichment for the enrichment workflow.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy') | — | Ontology for these term_ids / this level. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type') | — | Ontology for these term_ids / this level. |
 | organism | string | — | Organism (case-insensitive substring match, e.g. 'MED4'). Required — single-valued. Use list_organisms for valid values. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | level | int \| None | None | Hierarchy level to roll UP to (0 = broadest). At least one of `level` or `term_ids` must be provided. See docs://guide/conventions. |
@@ -86,6 +86,10 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 | is_informative | bool | True iff term is not flagged is_uninformative (positive framing; coerced from sparse '<term>.is_uninformative' KG flag) |
 | tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
 | tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
+| localization_score | float \| None (optional) | PSORTb confidence score (sparse: only set when ontology='subcellular_localization'). Range 7.5–10.0. |
+| signal_peptide_probability | float \| None (optional) | SignalP winning-class probability (sparse: only set when ontology='signal_peptide_type'). Range 0–1. |
+| signal_peptide_cleavage_site | int \| None (optional) | SignalP-predicted cleavage residue position (sparse: only set when ontology='signal_peptide_type'; absent when SignalP reports no cleavage site). |
+| signal_peptide_cleavage_probability | float \| None (optional) | SignalP cleavage-site probability (sparse: only set when ontology='signal_peptide_type' and cleavage_site present). |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -160,7 +164,49 @@ genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:1.A.1"])
 genes_by_ontology(ontology="cazy", organism="MED4", level=0)
 ```
 
-### Example 9: Filter out uninformative terms (term-side filter, opt-in)
+### Example 9: PSORTb outer-membrane proteins with confidence score
+
+```example-call
+genes_by_ontology(ontology="subcellular_localization", term_ids=["psortb_OuterMembrane"], organism="MED4")
+```
+
+```example-response
+{
+  "ontology": "subcellular_localization",
+  "organism_name": "MED4",
+  "total_matching": 45,
+  "...": "...",
+  "results": [
+    {"locus_tag": "PMM0001", "gene_name": "...",
+     "term_id": "psortb_OuterMembrane",
+     "term_name": "Outer membrane", "level": 0,
+     "is_informative": true,
+     "localization_score": 9.93}
+  ]
+}
+```
+
+### Example 10: SignalP lipoproteins with cleavage info
+
+```example-call
+genes_by_ontology(ontology="signal_peptide_type", term_ids=["signalp_LIPO"], organism="MED4")
+```
+
+```example-response
+{
+  "...": "...",
+  "results": [
+    {"locus_tag": "PMM0123",
+     "term_id": "signalp_LIPO", "term_name": "Lipoprotein signal peptide (Sec/SPII)",
+     "level": 0, "is_informative": true,
+     "signal_peptide_probability": 0.97,
+     "signal_peptide_cleavage_site": 22,
+     "signal_peptide_cleavage_probability": 0.91}
+  ]
+}
+```
+
+### Example 11: Filter out uninformative terms (term-side filter, opt-in)
 
 ```example-call
 genes_by_ontology(ontology="kegg", organism="MED4", level=3, informative_only=True)
@@ -183,7 +229,7 @@ genes_by_ontology(ontology="kegg", organism="MED4", level=3, informative_only=Tr
 }
 ```
 
-### Example 10: From level-survey to pathway defs
+### Example 12: From level-survey to pathway defs
 
 ```
 Step 1: ontology_landscape(organism="MED4")
@@ -204,6 +250,7 @@ search_ontology → genes_by_ontology(term_ids=[...])
 genes_by_ontology → pathway_enrichment
 genes_by_ontology → gene_overview
 genes_by_ontology(ontology='tcdb' | 'ec', term_ids=[...]) → genes_by_metabolite (substrate-anchored pivot — see docs://analysis/metabolites)
+From PSORTb-filtered genes → differential_expression_by_gene to ask: are outer-membrane proteins enriched in the up-regulated set?
 ```
 
 ## Common mistakes
@@ -255,6 +302,10 @@ response.total_genes  # distinct genes across all matches
 ```
 
 - TERM2GENE source for enrichment. Pass the result through `to_dataframe(...)` and feed it directly into `fisher_ora` / `pathway_enrichment` / `cluster_enrichment` — no manual column renaming. See `docs://analysis/enrichment` for the building blocks and the worked DE-path code example.
+
+- `localization_score` / `signal_peptide_probability` are **edge** properties — they appear in rows only when querying their owner ontology. Other ontology queries omit those columns entirely (sparse-null stripping at the api layer).
+
+- PSORTb and SignalP are 1:1 (≤1 edge per gene). Don't expect multiple rows per gene for the same ontology. Some genes will have **no** edge (no confident call); those genes are absent from the result set entirely.
 
 ## Package import equivalent
 

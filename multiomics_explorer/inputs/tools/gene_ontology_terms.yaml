@@ -66,6 +66,25 @@ examples:
         ]
       }
 
+  - title: Per-gene SignalP call with cleavage info
+    call: gene_ontology_terms(locus_tags=["PMM0001", "PMM0123"], ontology="signal_peptide_type", organism="MED4", mode="leaf")
+    response: |
+      {
+        "...": "...",
+        "results": [
+          {"locus_tag": "PMM0001", "term_id": "signalp_SP",
+           "term_name": "Signal peptide (Sec/SPI)", "level": 0,
+           "is_informative": true,
+           "signal_peptide_probability": 0.93,
+           "signal_peptide_cleavage_site": 25,
+           "signal_peptide_cleavage_probability": 0.85},
+          {"locus_tag": "PMM0123", "term_id": "signalp_PILIN",
+           "term_name": "Pilin-like signal peptide (Sec/SPIII)", "level": 0,
+           "is_informative": true,
+           "signal_peptide_probability": 0.78}
+        ]
+      }
+
   - title: From overview to ontology details
     steps: |
       Step 1: gene_overview(locus_tags=["PMM0001"])
