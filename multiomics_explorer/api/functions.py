@@ -197,9 +197,12 @@ _WRITE_KEYWORDS = re.compile(
 # Regex for escaping Lucene special characters on retry.
 _LUCENE_SPECIAL = re.compile(r'[+\-!(){}\[\]^"~*?:\\/]')
 
-# Edge-prop columns added by Tasks 6/7 query builders.  Owner ontology
-# populates its column(s); all others emit NULL.  The api/ layer strips the
-# nulls so non-owner rows carry no extra keys.
+# Sparse-null strip list for ontology-row edge properties. Owner ontology
+# (PSORTb / SignalP today) populates its column(s); non-owner ontologies emit
+# NULL. The api/ layer strips the nulls so non-owner rows carry no extra keys.
+# MUST stay in sync with the `edge_props` field on ONTOLOGY_CONFIG entries in
+# kg/queries_lib.py — if a future ontology adds new edge-prop columns, append
+# them here.
 _EDGE_PROP_COLS: tuple[str, ...] = (
     "localization_score",
     "signal_peptide_probability",

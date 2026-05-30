@@ -11054,14 +11054,14 @@ class TestGenesByOntologyEdgePropStripping:
             "level": 1,
             "localization_score": None,
             "signal_peptide_probability": 0.992,
-            "signal_peptide_cleavage_site": "AFA-QP",
+            "signal_peptide_cleavage_site": 22,
             "signal_peptide_cleavage_probability": 0.841,
         }]
         result = self._run_strip(rows)
         row = result[0]
         assert "localization_score" not in row
         assert row["signal_peptide_probability"] == 0.992
-        assert row["signal_peptide_cleavage_site"] == "AFA-QP"
+        assert row["signal_peptide_cleavage_site"] == 22
         assert row["signal_peptide_cleavage_probability"] == 0.841
 
     def test_edge_prop_cols_constant_has_four_members(self):
@@ -11170,7 +11170,7 @@ class TestGeneOntologyTermsEdgePropStripping:
                 "level": 1,
                 "localization_score": None,
                 "signal_peptide_probability": 0.992,
-                "signal_peptide_cleavage_site": "AFA-QP",
+                "signal_peptide_cleavage_site": 22,
                 "signal_peptide_cleavage_probability": 0.841,
             },
         ]
@@ -11178,7 +11178,7 @@ class TestGeneOntologyTermsEdgePropStripping:
         row = result[0]
         assert "localization_score" not in row
         assert row["signal_peptide_probability"] == 0.992
-        assert row["signal_peptide_cleavage_site"] == "AFA-QP"
+        assert row["signal_peptide_cleavage_site"] == 22
         assert row["signal_peptide_cleavage_probability"] == 0.841
 
     def test_chunk_without_edge_prop_keys_unaffected(self):
