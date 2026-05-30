@@ -417,18 +417,22 @@ The choice of background matters more than the choice of ontology.
 
 ## Hierarchy `level` convention (ontology tools)
 
-For all 10 supported ontologies, `level: int` follows the same convention:
+For all 14 supported ontologies, `level: int` follows the same convention:
 
 - **`level=0`** = root (broadest term).
 - Higher integers = more specific.
-- Tree-shaped ontologies (Cyanorak, TIGR, COG, EC) have exact level
+- Tree-shaped ontologies (Cyanorak, TIGR, COG, EC, TCDB, CAZy) have exact level
   semantics.
 - DAG-shaped ontologies (GO, sometimes KEGG) use min-path-from-root
   with a sparse `level_is_best_effort='true'` flag on affected terms.
+- Flat ontologies (PSORTb `subcellular_localization`, SignalP
+  `signal_peptide_type`) have **`level=0` only** — no hierarchy, 5 terms each.
+  Passing `level=1` or higher returns no rows.
 
 `ontology_landscape` ranks (ontology × level) combinations by
 `relevance_rank` baking in genome coverage and median term size; use it
-to pick a defensible level before enrichment.
+to pick a defensible level before enrichment. Flat ontologies contribute
+exactly one row per organism (level=0).
 
 ---
 

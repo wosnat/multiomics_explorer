@@ -101,7 +101,13 @@ Plus three orthogonal helpers:
 4. Reverse: `assays_by_metabolite(metabolite_ids=[...])` collects all measurement evidence (numeric + boolean) for given metabolites.
 
 ### "Which genes belong to BRITE category / TCDB family / CAZy family X?"
-- `genes_by_ontology(ontology=..., term_ids=[...], organism=...)` works for all 10 ontologies (GO, KEGG, EC, COG, Cyanorak, TIGR, Pfam, BRITE, TCDB, CAZy). For BRITE, scope with `tree=` (use `list_filter_values(filter_type='brite_tree')` to discover trees).
+- `genes_by_ontology(ontology=..., term_ids=[...], organism=...)` works for all 14 ontologies (GO, KEGG, EC, COG, Cyanorak, TIGR, Pfam, BRITE, TCDB, CAZy, plus the two structural ontologies below). For BRITE, scope with `tree=` (use `list_filter_values(filter_type='brite_tree')` to discover trees).
+
+### "Where in the cell does gene X live? / Is gene X secreted (signal peptide)?"
+- `genes_by_ontology(ontology="subcellular_localization", term_ids=["psortb_OuterMembrane"|"psortb_CytoplasmicMembrane"|...], organism=...)` for PSORTb-predicted localization; row carries `localization_score` (∈[7.5, 10.0]).
+- `genes_by_ontology(ontology="signal_peptide_type", term_ids=["signalp_SP"|"signalp_LIPO"|"signalp_TAT"|"signalp_PILIN"|"signalp_TATLIPO"], organism=...)` for SignalP-predicted signal-peptide type; row carries `signal_peptide_probability`, `signal_peptide_cleavage_site`, `signal_peptide_cleavage_probability`.
+- Both are **flat** (5 nodes each, `level=0` only) and **structural** — they describe where the protein lives / how it's handled, not what it does. Don't fold into `annotation_quality` reasoning.
+- Per-gene lookup: `gene_ontology_terms(locus_tags=[...], ontology="subcellular_localization"|"signal_peptide_type", organism=..., mode="leaf")` returns the call (and confidence) for each input gene.
 
 ### "Get the protein/AA sequence of gene X (for BLAST/alignment)."
 - `gene_aa_sequence(locus_tags=[...], fasta=True)` — returns amino-acid sequences (no nucleotide). `fasta=True` gives one multi-FASTA blob ready to paste into an external aligner / search tool.

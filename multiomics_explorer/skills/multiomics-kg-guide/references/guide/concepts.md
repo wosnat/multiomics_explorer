@@ -160,12 +160,14 @@ and `list_organisms`. Discover valid values with
   Family-inferred dominates by volume — see
   `docs://analysis/metabolites`.
 
-### Ontology nodes (10 ontologies)
+### Ontology nodes (14 ontologies)
 
 All ontology nodes share a `level: int` property
 (0 = root / broadest, higher = more specific) and most carry
 `level_kind` and a sparse `level_is_best_effort` flag for DAG-shaped
-ontologies. The ten supported ontologies:
+ontologies. The two structural ontologies at the bottom (PSORTb,
+SignalP) are flat — `level=0` only, no `level_kind`. The fourteen
+supported ontologies:
 
 | Ontology | Node label | Notes |
 |---|---|---|
@@ -179,10 +181,22 @@ ontologies. The ten supported ontologies:
 | BRITE | `BriteCategory` | Multi-tree — **always scope with `tree=`** |
 | TCDB | `TcdbFamily` | Transporter classification (also doubles as a chemistry node — see above) |
 | CAZy | `CazyFamily` | Carbohydrate-active enzymes |
+| PSORTb subcellular localization | `SubcellularLocalization` | Flat, 5 nodes (Cytoplasmic, CytoplasmicMembrane, OuterMembrane, Periplasmic, Extracellular). Scored edge: `localization_score: float` ∈[7.5, 10.0]. 1:1 (≤1 edge per gene). **Structural** — where the protein lives, not what it does. |
+| SignalP signal-peptide type | `SignalPeptideType` | Flat, 5 nodes (SP, LIPO, TAT, TATLIPO, PILIN). Scored edge: `probability: float` ∈[0, 1], plus optional `cleavage_site: int` / `cleavage_probability: float`. 1:1. **Structural** — how the protein is handled at the membrane. |
 
 Two reverse-mode ontology tools — `genes_by_ontology` (term → genes) and
-`gene_ontology_terms` (genes → terms) — operate on all 10 uniformly,
-with hierarchy expansion. For methodology see `docs://analysis/enrichment`.
+`gene_ontology_terms` (genes → terms) — operate on all 14 uniformly
+(with hierarchy expansion where applicable; PSORTb / SignalP are flat
+so there's nothing to expand). For methodology see `docs://analysis/enrichment`.
+
+PSORTb and SignalP are deliberately **NOT** folded into
+`Gene.annotation_types` / `informative_annotation_types` /
+`annotation_quality` — localization and signal-peptide presence describe
+*how/where* a gene's product lives, not *what it does*, so folding would
+skew `genes_by_function` `min_quality` reasoning. Routing strings
+`Gene.subcellular_localization` and `Gene.signal_peptide_type` surface
+the call directly via `gene_details` for 1:1 lookup without an ontology
+tool call.
 
 ### Anchors that aren't measurement
 
@@ -233,6 +247,8 @@ or every named entity and are not used by tools directly.
    Gene ──[Gene_enables_molecular_function]──► MolecularFunction (GO MF)
    Gene ──[Gene_located_in_cellular_component]──► CellularComponent (GO CC)
    Gene ──[Gene_catalyzes_ec_number]──► EcNumber
+   Gene ──[Gene_has_subcellular_localization {score}]──► SubcellularLocalization (PSORTb)
+   Gene ──[Gene_has_signal_peptide_type {probability, cleavage_site}]──► SignalPeptideType (SignalP)
 ```
 
 The Gene node is the central hub. Almost every tool either finds genes
