@@ -64,6 +64,42 @@ examples:
   - title: Browse CAZy glycoside hydrolase families
     call: search_ontology(search_text="GH13", ontology="cazy")
 
+  - title: Find PSORTb subcellular localizations
+    call: search_ontology(search_text="outer", ontology="subcellular_localization")
+    response: |
+      {
+        "total_entries": 5,
+        "total_matching": 1,
+        "score_max": 2.42,
+        "score_median": 2.42,
+        "returned": 1,
+        "truncated": false,
+        "offset": 0,
+        "results": [
+          {"id": "psortb_OuterMembrane", "name": "Outer membrane",
+           "score": 2.42, "level": 0}
+        ]
+      }
+
+  - title: Find SignalP lipoprotein signal-peptide types
+    call: search_ontology(search_text="lipo", ontology="signal_peptide_type")
+    response: |
+      {
+        "total_entries": 5,
+        "total_matching": 2,
+        "score_max": 3.1,
+        "score_median": 2.6,
+        "returned": 2,
+        "truncated": false,
+        "offset": 0,
+        "results": [
+          {"id": "signalp_LIPO", "name": "Lipoprotein signal peptide (Sec/SPII)",
+           "score": 3.1, "level": 0},
+          {"id": "signalp_TATLIPO", "name": "TAT lipoprotein signal peptide (Tat/SPII)",
+           "score": 2.6, "level": 0}
+        ]
+      }
+
   - title: Filter out uninformative terms (term-side, opt-in)
     call: search_ontology(search_text="transport", ontology="kegg", informative_only=True)
     response: |
@@ -110,3 +146,9 @@ mistakes:
   - wrong: "search_ontology(search_text='PMM0845', ontology='go_bp')  # searching for a gene"
     right: "resolve_gene(identifier='PMM0845')  # use resolve_gene for gene lookups"
   - "Use this to assemble a custom `term_ids=[...]` list for `pathway_enrichment` / `cluster_enrichment`. Both tools accept either `level=N` (test all terms at one hierarchy depth) or `term_ids=[...]` (test a specific set you chose). Custom term sets are useful when relevant terms live at different depths — e.g. in GO, a term at level 3 may be more specific than one at level 4 because GO is graph-shaped, not strictly tree-shaped. See `docs://analysis/enrichment`."
+  - "PSORTb and SignalP ontologies are **flat** (5 nodes each, single `level=0`).
+     Don't pass `level=1` or higher — the search returns nothing because no
+     terms exist at those levels."
+  - "PSORTb / SignalP are **structural** ontologies (where a gene's product is /
+     how it's handled). Use them for localization / secretion questions, not
+     for functional-annotation `genes_by_function`-style proxies."

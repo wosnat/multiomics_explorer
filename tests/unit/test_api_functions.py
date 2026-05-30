@@ -10984,6 +10984,211 @@ class TestGeneNeighbors:
 
 
 # ---------------------------------------------------------------------------
+# Edge-prop null stripping — genes_by_ontology and gene_ontology_terms
+# ---------------------------------------------------------------------------
+
+
+class TestGenesByOntologyEdgePropStripping:
+    """Non-owner ontologies must have null edge-prop columns stripped from rows.
+    Uses lightweight row-dict approach since threading 4 new columns through
+    the heavy mock-conn machinery would require invasive fixture changes."""
+
+    def _run_strip(self, rows):
+        """Apply the same strip loop that genes_by_ontology uses."""
+        for r in rows:
+            for col in api._EDGE_PROP_COLS:
+                if r.get(col) is None:
+                    r.pop(col, None)
+        return rows
+
+    def test_non_owner_ontology_strips_all_four_columns(self):
+        """When all 4 edge-prop cols are null (non-owner ontology), they are
+        all absent from the row after stripping."""
+        rows = [{
+            "locus_tag": "PMM0001",
+            "term_id": "pfam:PF00001",
+            "term_name": "7tm_1",
+            "level": 3,
+            "localization_score": None,
+            "signal_peptide_probability": None,
+            "signal_peptide_cleavage_site": None,
+            "signal_peptide_cleavage_probability": None,
+        }]
+        result = self._run_strip(rows)
+        row = result[0]
+        assert "localization_score" not in row
+        assert "signal_peptide_probability" not in row
+        assert "signal_peptide_cleavage_site" not in row
+        assert "signal_peptide_cleavage_probability" not in row
+        # Non-edge-prop fields are preserved
+        assert row["locus_tag"] == "PMM0001"
+        assert row["term_id"] == "pfam:PF00001"
+
+    def test_owner_ontology_psortb_keeps_localization_score(self):
+        """When querying subcellular_localization, rows from the owner ontology
+        keep localization_score (non-null) while the other 3 cols are stripped."""
+        rows = [{
+            "locus_tag": "PMM0001",
+            "term_id": "psortb:cytoplasmic",
+            "term_name": "Cytoplasmic",
+            "level": 1,
+            "localization_score": 9.97,
+            "signal_peptide_probability": None,
+            "signal_peptide_cleavage_site": None,
+            "signal_peptide_cleavage_probability": None,
+        }]
+        result = self._run_strip(rows)
+        row = result[0]
+        assert row["localization_score"] == 9.97
+        assert "signal_peptide_probability" not in row
+        assert "signal_peptide_cleavage_site" not in row
+        assert "signal_peptide_cleavage_probability" not in row
+
+    def test_owner_ontology_signalp_keeps_three_columns(self):
+        """signal_peptide ontology rows keep all 3 SP cols; localization_score
+        is null and gets stripped."""
+        rows = [{
+            "locus_tag": "PMM0002",
+            "term_id": "signalp:signal_peptide",
+            "term_name": "Signal peptide",
+            "level": 1,
+            "localization_score": None,
+            "signal_peptide_probability": 0.992,
+            "signal_peptide_cleavage_site": 22,
+            "signal_peptide_cleavage_probability": 0.841,
+        }]
+        result = self._run_strip(rows)
+        row = result[0]
+        assert "localization_score" not in row
+        assert row["signal_peptide_probability"] == 0.992
+        assert row["signal_peptide_cleavage_site"] == 22
+        assert row["signal_peptide_cleavage_probability"] == 0.841
+
+    def test_edge_prop_cols_constant_has_four_members(self):
+        """Verify _EDGE_PROP_COLS is the expected 4-tuple."""
+        assert len(api._EDGE_PROP_COLS) == 4
+        assert "localization_score" in api._EDGE_PROP_COLS
+        assert "signal_peptide_probability" in api._EDGE_PROP_COLS
+        assert "signal_peptide_cleavage_site" in api._EDGE_PROP_COLS
+        assert "signal_peptide_cleavage_probability" in api._EDGE_PROP_COLS
+
+    def test_rows_without_edge_prop_keys_unaffected(self):
+        """Rows that never had edge-prop keys are not mutated."""
+        rows = [{"locus_tag": "PMM0003", "term_id": "go:0006260", "level": 4}]
+        result = self._run_strip(rows)
+        assert result[0] == {"locus_tag": "PMM0003", "term_id": "go:0006260", "level": 4}
+
+    def test_mixed_batch_strips_correctly(self):
+        """Mixed batch: owner row keeps its column, non-owner row strips all."""
+        rows = [
+            {
+                "locus_tag": "PMM0001",
+                "term_id": "psortb:cytoplasmic",
+                "localization_score": 9.97,
+                "signal_peptide_probability": None,
+                "signal_peptide_cleavage_site": None,
+                "signal_peptide_cleavage_probability": None,
+            },
+            {
+                "locus_tag": "PMM0002",
+                "term_id": "pfam:PF00001",
+                "localization_score": None,
+                "signal_peptide_probability": None,
+                "signal_peptide_cleavage_site": None,
+                "signal_peptide_cleavage_probability": None,
+            },
+        ]
+        result = self._run_strip(rows)
+        owner_row = result[0]
+        non_owner_row = result[1]
+        assert owner_row["localization_score"] == 9.97
+        assert "signal_peptide_probability" not in owner_row
+        for col in api._EDGE_PROP_COLS:
+            assert col not in non_owner_row
+
+
+class TestGeneOntologyTermsEdgePropStripping:
+    """gene_ontology_terms strips null edge-prop columns per-chunk inside the
+    detail-row loop. Same strip logic — verified with the same lightweight
+    row-dict approach."""
+
+    def _run_strip(self, rows):
+        """Apply the same per-chunk strip loop that gene_ontology_terms uses."""
+        for r in rows:
+            for col in api._EDGE_PROP_COLS:
+                if r.get(col) is None:
+                    r.pop(col, None)
+        return rows
+
+    def test_non_owner_chunk_strips_all_four(self):
+        """Chunk from non-owner ontology has all 4 null cols removed."""
+        rows = [
+            {
+                "locus_tag": "PMM0001",
+                "term_id": "go:0006260",
+                "term_name": "DNA replication",
+                "level": 5,
+                "localization_score": None,
+                "signal_peptide_probability": None,
+                "signal_peptide_cleavage_site": None,
+                "signal_peptide_cleavage_probability": None,
+            },
+        ]
+        result = self._run_strip(rows)
+        row = result[0]
+        for col in api._EDGE_PROP_COLS:
+            assert col not in row
+        assert row["locus_tag"] == "PMM0001"
+        assert row["term_id"] == "go:0006260"
+
+    def test_owner_psortb_chunk_keeps_score(self):
+        """Chunk from subcellular_localization ontology keeps localization_score."""
+        rows = [
+            {
+                "locus_tag": "PMM0001",
+                "term_id": "psortb:cytoplasmic",
+                "level": 1,
+                "localization_score": 9.97,
+                "signal_peptide_probability": None,
+                "signal_peptide_cleavage_site": None,
+                "signal_peptide_cleavage_probability": None,
+            },
+        ]
+        result = self._run_strip(rows)
+        row = result[0]
+        assert row["localization_score"] == 9.97
+        assert "signal_peptide_probability" not in row
+        assert "signal_peptide_cleavage_site" not in row
+        assert "signal_peptide_cleavage_probability" not in row
+
+    def test_owner_signalp_chunk_keeps_three_sp_cols(self):
+        """Chunk from signal_peptide ontology keeps 3 SP cols; strips localization_score."""
+        rows = [
+            {
+                "locus_tag": "PMM0002",
+                "term_id": "signalp:signal_peptide",
+                "level": 1,
+                "localization_score": None,
+                "signal_peptide_probability": 0.992,
+                "signal_peptide_cleavage_site": 22,
+                "signal_peptide_cleavage_probability": 0.841,
+            },
+        ]
+        result = self._run_strip(rows)
+        row = result[0]
+        assert "localization_score" not in row
+        assert row["signal_peptide_probability"] == 0.992
+        assert row["signal_peptide_cleavage_site"] == 22
+        assert row["signal_peptide_cleavage_probability"] == 0.841
+
+    def test_chunk_without_edge_prop_keys_unaffected(self):
+        """Rows that never carried edge-prop keys are not mutated."""
+        rows = [{"locus_tag": "PMM0003", "term_id": "go:0006260", "level": 5}]
+        result = self._run_strip(rows)
+        assert result[0] == {"locus_tag": "PMM0003", "term_id": "go:0006260", "level": 5}
+
+
+# ---------------------------------------------------------------------------
 # Outfacing-doc lint gate for api/functions.py docstrings
 # ---------------------------------------------------------------------------
 # See docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md

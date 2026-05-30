@@ -37,6 +37,38 @@ examples:
   - title: CAZy class roll-up — genes by glycoside hydrolase / glycosyltransferase class
     call: genes_by_ontology(ontology="cazy", organism="MED4", level=0)
 
+  - title: PSORTb outer-membrane proteins with confidence score
+    call: genes_by_ontology(ontology="subcellular_localization", term_ids=["psortb_OuterMembrane"], organism="MED4")
+    response: |
+      {
+        "ontology": "subcellular_localization",
+        "organism_name": "MED4",
+        "total_matching": 45,
+        "...": "...",
+        "results": [
+          {"locus_tag": "PMM0001", "gene_name": "...",
+           "term_id": "psortb_OuterMembrane",
+           "term_name": "Outer membrane", "level": 0,
+           "is_informative": true,
+           "localization_score": 9.93}
+        ]
+      }
+
+  - title: SignalP lipoproteins with cleavage info
+    call: genes_by_ontology(ontology="signal_peptide_type", term_ids=["signalp_LIPO"], organism="MED4")
+    response: |
+      {
+        "...": "...",
+        "results": [
+          {"locus_tag": "PMM0123",
+           "term_id": "signalp_LIPO", "term_name": "Lipoprotein signal peptide (Sec/SPII)",
+           "level": 0, "is_informative": true,
+           "signal_peptide_probability": 0.97,
+           "signal_peptide_cleavage_site": 22,
+           "signal_peptide_cleavage_probability": 0.91}
+        ]
+      }
+
   - title: Filter out uninformative terms (term-side filter, opt-in)
     call: genes_by_ontology(ontology="kegg", organism="MED4", level=3, informative_only=True)
     response: |
@@ -76,6 +108,8 @@ chaining:
   - "genes_by_ontology → pathway_enrichment"
   - "genes_by_ontology → gene_overview"
   - "genes_by_ontology(ontology='tcdb' | 'ec', term_ids=[...]) → genes_by_metabolite (substrate-anchored pivot — see docs://analysis/metabolites)"
+  - "From PSORTb-filtered genes → differential_expression_by_gene to ask: are
+     outer-membrane proteins enriched in the up-regulated set?"
 
 mistakes:
   - "At least one of `level` or `term_ids` must be set — calling without either is an error."
@@ -98,3 +132,9 @@ mistakes:
   - wrong: "len(response.results)  # wrong — that's the row count after limit"
     right: "response.total_genes  # distinct genes across all matches"
   - "TERM2GENE source for enrichment. Pass the result through `to_dataframe(...)` and feed it directly into `fisher_ora` / `pathway_enrichment` / `cluster_enrichment` — no manual column renaming. See `docs://analysis/enrichment` for the building blocks and the worked DE-path code example."
+  - "`localization_score` / `signal_peptide_probability` are **edge** properties —
+     they appear in rows only when querying their owner ontology. Other ontology
+     queries omit those columns entirely (sparse-null stripping at the api layer)."
+  - "PSORTb and SignalP are 1:1 (≤1 edge per gene). Don't expect multiple rows
+     per gene for the same ontology. Some genes will have **no** edge (no
+     confident call); those genes are absent from the result set entirely."

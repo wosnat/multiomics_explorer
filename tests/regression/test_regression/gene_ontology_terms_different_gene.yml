@@ -3,14 +3,22 @@ row_count: 2
 rows:
 - is_informative: true
   level: 6
+  localization_score: null
   locus_tag: PMM0001
+  signal_peptide_cleavage_probability: null
+  signal_peptide_cleavage_site: null
+  signal_peptide_probability: null
   term_id: go:0006260
   term_name: DNA replication
   tree: null
   tree_code: null
 - is_informative: true
   level: 7
+  localization_score: null
   locus_tag: PMM0001
+  signal_peptide_cleavage_probability: null
+  signal_peptide_cleavage_site: null
+  signal_peptide_probability: null
   term_id: go:0006271
   term_name: DNA strand elongation involved in DNA replication
   tree: null

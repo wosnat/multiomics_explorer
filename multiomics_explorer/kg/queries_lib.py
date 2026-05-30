@@ -95,7 +95,65 @@ ONTOLOGY_CONFIG = {
         "hierarchy_rels": ["Cazy_family_is_a_cazy_family"],
         "fulltext_index": "cazyFamilyFullText",
     },
+    "subcellular_localization": {
+        "label": "SubcellularLocalization",
+        "gene_rel": "Gene_has_subcellular_localization",
+        "hierarchy_rels": [],
+        "fulltext_index": "subcellularLocalizationFullText",
+        "edge_props": [("score", "localization_score")],
+    },
+    "signal_peptide_type": {
+        "label": "SignalPeptideType",
+        "gene_rel": "Gene_has_signal_peptide_type",
+        "hierarchy_rels": [],
+        "fulltext_index": "signalPeptideTypeFullText",
+        "edge_props": [
+            ("probability", "signal_peptide_probability"),
+            ("cleavage_site", "signal_peptide_cleavage_site"),
+            ("cleavage_probability", "signal_peptide_cleavage_probability"),
+        ],
+    },
 }
+
+
+def _edge_prop_return_columns() -> list[tuple[str, str, str]]:
+    """Union of edge-prop columns across ONTOLOGY_CONFIG, in config order.
+
+    Returns ordered list of (output_column, neo4j_prop, owner_ontology)
+    triples. The list is the source of truth for column count, ordering,
+    and column names — every ontology row must include each of these
+    columns (with `r.<prop>` for the owner, `null` for non-owners) so
+    the row schema is uniform across all ontologies.
+    """
+    cols: list[tuple[str, str, str]] = []
+    for ont_key, cfg in ONTOLOGY_CONFIG.items():
+        for neo4j_prop, output_col in cfg.get("edge_props", []):
+            cols.append((output_col, neo4j_prop, ont_key))
+    return cols
+
+
+def _edge_prop_return_cypher(ontology: str) -> str:
+    """Return a comma-prefixed Cypher fragment projecting edge-prop columns.
+
+    For the owner ontology of each column, emits `r.<neo4j_prop> AS <col>`.
+    For non-owner ontologies, emits `null AS <col>`. The relationship
+    variable is assumed to be named `r` in the surrounding Cypher.
+
+    Returned string starts with `,\n       ` so it can be appended directly
+    after another RETURN-block column. Empty string if no edge_props are
+    defined anywhere (defensive).
+    """
+    cols = _edge_prop_return_columns()
+    if not cols:
+        return ""
+    parts: list[str] = []
+    for output_col, neo4j_prop, owner in cols:
+        if owner == ontology:
+            parts.append(f"r.{neo4j_prop} AS {output_col}")
+        else:
+            parts.append(f"null AS {output_col}")
+    return ",\n       " + ",\n       ".join(parts)
+
 
 def _hierarchy_walk(
     ontology: str,
@@ -145,7 +203,7 @@ def _hierarchy_walk(
     if ontology == "pfam":
         bind_up = (
             f"MATCH (g:Gene {{organism_name: $org}})"
-            f"-[:{gene_rel}]->(leaf:Pfam)"
+            f"-[r:{gene_rel}]->(leaf:Pfam)"
         )
         # *0..1 because Pfam.level=1 (t=leaf) OR PfamClan.level=0 (t=clan)
         walk_up = (
@@ -196,7 +254,7 @@ def _hierarchy_walk(
         bridge_node = bridge["node_label"]
         bind_up = (
             f"MATCH (g:Gene {{organism_name: $org}})"
-            f"-[:{gene_rel}]->(ko:{bridge_node})"
+            f"-[r:{gene_rel}]->(ko:{bridge_node})"
             f"-[:{bridge_edge}]->(leaf:{leaf_label})"
         )
         walk_up = f"MATCH (leaf)-[:{rel_union}*0..]->(t:{leaf_label})"
@@ -216,7 +274,7 @@ def _hierarchy_walk(
     if not hierarchy_rels:
         bind_up = (
             f"MATCH (g:Gene {{organism_name: $org}})"
-            f"-[:{gene_rel}]->(t:{leaf_label})"
+            f"-[r:{gene_rel}]->(t:{leaf_label})"
         )
         return {
             "leaf_label": leaf_label,
@@ -230,7 +288,7 @@ def _hierarchy_walk(
     # --- Single-label tree ontologies (GO BP/MF/CC, EC, KEGG, CyanoRak) ---
     bind_up = (
         f"MATCH (g:Gene {{organism_name: $org}})"
-        f"-[:{gene_rel}]->(leaf:{leaf_label})"
+        f"-[r:{gene_rel}]->(leaf:{leaf_label})"
     )
     walk_up = f"MATCH (leaf)-[:{rel_union}*0..]->(t:{leaf_label})"
     walk_down = (
@@ -2250,7 +2308,7 @@ def _genes_by_ontology_match_stage(
                 "WITH input_tid, coalesce(tp, tc) AS t\n"
                 "OPTIONAL MATCH (t)<-[:Pfam_in_pfam_clan*0..1]-(leaf:Pfam)\n"
                 "WITH t, coalesce(leaf, t) AS leaf\n"
-                "MATCH (g:Gene {organism_name: $org})-[:Gene_has_pfam]->(leaf)\n"
+                "MATCH (g:Gene {organism_name: $org})-[r:Gene_has_pfam]->(leaf)\n"
                 "WHERE t:Pfam OR t:PfamClan\n"
             )
         else:
@@ -2265,7 +2323,7 @@ def _genes_by_ontology_match_stage(
                     f"MATCH (t:{leaf} {{id: input_tid}})\n"
                     f"{walk}\n"
                     f"MATCH (g:Gene {{organism_name: $org}})"
-                    f"-[:{frag['gene_rel']}]->(leaf)\n"
+                    f"-[r:{frag['gene_rel']}]->(leaf)\n"
                 )
             else:
                 # Flat: t = leaf; still the "input term's genes"
@@ -2273,7 +2331,7 @@ def _genes_by_ontology_match_stage(
                     "UNWIND $term_ids AS input_tid\n"
                     f"MATCH (t:{leaf} {{id: input_tid}})\n"
                     f"MATCH (g:Gene {{organism_name: $org}})"
-                    f"-[:{frag['gene_rel']}]->(t)\n"
+                    f"-[r:{frag['gene_rel']}]->(t)\n"
                 )
     else:
         # Mode 2/3 — walk UP, filter on level (and optionally term_ids).
@@ -2307,6 +2365,9 @@ def _genes_by_ontology_match_stage(
 
     # Size filter (common to all modes). Caller must add
     # $min_gene_set_size and $max_gene_set_size to params.
+    # Collect DISTINCT g (not records) so multi-edge ontologies don't
+    # inflate term-size counts — r is re-bound via OPTIONAL MATCH in
+    # the detail builder when needed.
     size_filter = (
         "WITH t, collect(DISTINCT g) AS term_genes\n"
         "WHERE size(term_genes) >= $min_gene_set_size\n"
@@ -2366,13 +2427,14 @@ def build_genes_by_ontology_detail(
         "       t.level_is_best_effort IS NOT NULL AS level_is_best_effort"
         if verbose else ""
     )
+    edge_prop_cols = _edge_prop_return_cypher(ontology)
     return_block = (
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.gene_category AS gene_category,\n"
         "       t.id AS term_id, t.name AS term_name, t.level AS level,\n"
         "       t.tree AS tree, t.tree_code AS tree_code,\n"
         "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
-        f"{verbose_cols}\n"
+        f"{verbose_cols}{edge_prop_cols}\n"
         "ORDER BY t.id, g.locus_tag"
     )
 
@@ -2386,9 +2448,22 @@ def build_genes_by_ontology_detail(
         limit_clause = "\nLIMIT $limit"
         params["limit"] = limit
 
+    # Re-bind r for edge-prop projection. Only emitted when ontology has
+    # edge_props — for other ontologies the RETURN block emits nulls so the
+    # rel is unused. Skipping the OPTIONAL MATCH avoids multi-edge fan-out
+    # on ontologies where a gene has multiple annotation edges.
+    cfg = ONTOLOGY_CONFIG[ontology]
+    if cfg.get("edge_props"):
+        edge_rebind = (
+            f"OPTIONAL MATCH (g)-[r:{cfg['gene_rel']}]->(t)\n"
+        )
+    else:
+        edge_rebind = ""
+
     cypher = (
         f"{head}\n"
         f"UNWIND term_genes AS g\n"
+        f"{edge_rebind}"
         f"{return_block}{skip_clause}{limit_clause}"
     )
     return cypher, params
@@ -2712,6 +2787,7 @@ def build_gene_ontology_terms(
         ",\n       g.organism_name AS organism_name"
         if verbose else ""
     )
+    edge_prop_cols = _edge_prop_return_cypher(ontology)
 
     if offset:
         skip_clause = "\nSKIP $offset"
@@ -2734,7 +2810,7 @@ def build_gene_ontology_terms(
             bridge_node = bridge["node_label"]
             bind = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
-                f"-[:{gene_rel}]->(ko:{bridge_node})"
+                f"-[r:{gene_rel}]->(ko:{bridge_node})"
                 f"-[:{bridge_edge}]->(leaf:{label})\n"
                 "WHERE g.locus_tag IN $locus_tags\n"
             )
@@ -2747,14 +2823,14 @@ def build_gene_ontology_terms(
             # flat: leaf = term
             bind = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
-                f"-[:{gene_rel}]->(t:{label})\n"
+                f"-[r:{gene_rel}]->(t:{label})\n"
                 "WHERE g.locus_tag IN $locus_tags\n"
             )
-            walk = "WITH g, t\nWHERE t.level = $level\n"
+            walk = "WITH g, t, r\nWHERE t.level = $level\n"
         elif ontology == "pfam":
             bind = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
-                f"-[:{gene_rel}]->(leaf:Pfam)\n"
+                f"-[r:{gene_rel}]->(leaf:Pfam)\n"
                 "WHERE g.locus_tag IN $locus_tags\n"
             )
             walk = (
@@ -2765,7 +2841,7 @@ def build_gene_ontology_terms(
             rel_union = "|".join(cfg["hierarchy_rels"])
             bind = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
-                f"-[:{gene_rel}]->(leaf:{label})\n"
+                f"-[r:{gene_rel}]->(leaf:{label})\n"
                 "WHERE g.locus_tag IN $locus_tags\n"
             )
             walk = (
@@ -2787,7 +2863,7 @@ def build_gene_ontology_terms(
             f"{informative_filter}"
             "RETURN DISTINCT g.locus_tag AS locus_tag, t.id AS term_id,\n"
             f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
-            f"       coalesce(t.is_uninformative, '') <> 'true' AS is_informative{verbose_cols}\n"
+            f"       coalesce(t.is_uninformative, '') <> 'true' AS is_informative{verbose_cols}{edge_prop_cols}\n"
             f"ORDER BY g.locus_tag, t.id{skip_clause}{limit_clause}"
         )
     else:
@@ -2797,13 +2873,13 @@ def build_gene_ontology_terms(
         if bridge:
             match_line = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
-                f"-[:{gene_rel}]->(:{bridge['node_label']})"
+                f"-[r:{gene_rel}]->(:{bridge['node_label']})"
                 f"-[:{bridge['edge']}]->(t:{label})\n"
                 "WHERE g.locus_tag IN $locus_tags\n"
             )
         else:
             match_line = (
-                f"MATCH (g:Gene {{organism_name: $org}})-[:{gene_rel}]->(t:{label})\n"
+                f"MATCH (g:Gene {{organism_name: $org}})-[r:{gene_rel}]->(t:{label})\n"
                 "WHERE g.locus_tag IN $locus_tags\n"
             )
 
@@ -2832,7 +2908,7 @@ def build_gene_ontology_terms(
             f"{informative_filter}"
             "RETURN g.locus_tag AS locus_tag, t.id AS term_id,\n"
             f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
-            f"       coalesce(t.is_uninformative, '') <> 'true' AS is_informative{verbose_cols}\n"
+            f"       coalesce(t.is_uninformative, '') <> 'true' AS is_informative{verbose_cols}{edge_prop_cols}\n"
             f"ORDER BY g.locus_tag, t.id{skip_clause}{limit_clause}"
         )
     return cypher, params

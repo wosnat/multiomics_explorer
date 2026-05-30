@@ -197,6 +197,19 @@ _WRITE_KEYWORDS = re.compile(
 # Regex for escaping Lucene special characters on retry.
 _LUCENE_SPECIAL = re.compile(r'[+\-!(){}\[\]^"~*?:\\/]')
 
+# Sparse-null strip list for ontology-row edge properties. Owner ontology
+# (PSORTb / SignalP today) populates its column(s); non-owner ontologies emit
+# NULL. The api/ layer strips the nulls so non-owner rows carry no extra keys.
+# MUST stay in sync with the `edge_props` field on ONTOLOGY_CONFIG entries in
+# kg/queries_lib.py — if a future ontology adds new edge-prop columns, append
+# them here.
+_EDGE_PROP_COLS: tuple[str, ...] = (
+    "localization_score",
+    "signal_peptide_probability",
+    "signal_peptide_cleavage_site",
+    "signal_peptide_cleavage_probability",
+)
+
 
 def kg_schema(
     *,
@@ -1754,6 +1767,13 @@ def genes_by_ontology(
             r.pop("tree", None)
             r.pop("tree_code", None)
 
+    # Strip sparse edge-prop columns when their value is null. Owner ontology
+    # keeps its non-null column; non-owner rows shed all of them.
+    for r in results:
+        for col in _EDGE_PROP_COLS:
+            if r.get(col) is None:
+                r.pop(col, None)
+
     envelope["returned"] = len(results)
     envelope["truncated"] = total_matching > offset + len(results)
     envelope["results"] = results
@@ -1897,6 +1917,11 @@ def gene_ontology_terms(
                             r.pop("tree", None)
                         if r.get("tree_code") is None:
                             r.pop("tree_code", None)
+                    # Strip sparse edge-prop columns when their value is null.
+                    for r in rows:
+                        for col in _EDGE_PROP_COLS:
+                            if r.get(col) is None:
+                                r.pop(col, None)
                     if ontology is None:
                         for r in rows:
                             r["ontology_type"] = ont

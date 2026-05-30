@@ -47,6 +47,19 @@ examples:
          {"ontology_type": "kegg", "level": 3, "n_terms_with_genes": 1017, "genome_coverage": 0.61}
        ]}
 
+  - title: PSORTb + SignalP appear at level=0
+    call: ontology_landscape(organism="MED4")
+    response: |
+      {
+        "by_ontology": [
+          "...",
+          {"ontology": "subcellular_localization", "level": 0, "level_kind": null,
+           "n_terms_with_genes": 5, "min_g": 30, "max_g": 1100, "...": "..."},
+          {"ontology": "signal_peptide_type", "level": 0, "level_kind": null,
+           "n_terms_with_genes": 3, "min_g": 5, "max_g": 220, "...": "..."}
+        ]
+      }
+
   - title: Weight by experiments (coverage of quantified genes)
     steps: |
       Step 1: list_experiments(organism="MED4", table_scope=["all_detected_genes"])
@@ -81,3 +94,8 @@ mistakes:
   - wrong: "result['total_rows']  # KeyError"
     right: "result['total_matching']"
   - "Default `limit=None` returns all rows; if you set an explicit integer, check the response envelope's `truncated` field to know whether more rows exist beyond what was returned."
+  - "PSORTb / SignalP are flat (single `level=0`) — they contribute exactly one
+     row to `by_ontology` per organism. If only 1-2 of the 5 nodes pass the
+     default `min_gene_set_size=5` filter, the small N is expected (categories
+     range from ~30 to ~50,000 genes genome-wide; per-organism it's much
+     smaller)."

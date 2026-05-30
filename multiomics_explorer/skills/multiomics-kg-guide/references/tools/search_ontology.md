@@ -13,7 +13,7 @@ see docs://guide/conventions for syntax + scoring.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string | — | Lucene query over term names. E.g. 'replication', 'oxido*', 'transport AND membrane'. See docs://guide/conventions for Lucene scoring. |
-| ontology | string | — | Ontology to search: 'go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy'. |
+| ontology | string | — | Ontology to search: 'go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type'. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | limit | int | 5 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
@@ -136,7 +136,53 @@ search_ontology(search_text="sucrose", ontology="tcdb")
 search_ontology(search_text="GH13", ontology="cazy")
 ```
 
-### Example 7: Filter out uninformative terms (term-side, opt-in)
+### Example 7: Find PSORTb subcellular localizations
+
+```example-call
+search_ontology(search_text="outer", ontology="subcellular_localization")
+```
+
+```example-response
+{
+  "total_entries": 5,
+  "total_matching": 1,
+  "score_max": 2.42,
+  "score_median": 2.42,
+  "returned": 1,
+  "truncated": false,
+  "offset": 0,
+  "results": [
+    {"id": "psortb_OuterMembrane", "name": "Outer membrane",
+     "score": 2.42, "level": 0}
+  ]
+}
+```
+
+### Example 8: Find SignalP lipoprotein signal-peptide types
+
+```example-call
+search_ontology(search_text="lipo", ontology="signal_peptide_type")
+```
+
+```example-response
+{
+  "total_entries": 5,
+  "total_matching": 2,
+  "score_max": 3.1,
+  "score_median": 2.6,
+  "returned": 2,
+  "truncated": false,
+  "offset": 0,
+  "results": [
+    {"id": "signalp_LIPO", "name": "Lipoprotein signal peptide (Sec/SPII)",
+     "score": 3.1, "level": 0},
+    {"id": "signalp_TATLIPO", "name": "TAT lipoprotein signal peptide (Tat/SPII)",
+     "score": 2.6, "level": 0}
+  ]
+}
+```
+
+### Example 9: Filter out uninformative terms (term-side, opt-in)
 
 ```example-call
 search_ontology(search_text="transport", ontology="kegg", informative_only=True)
@@ -159,7 +205,7 @@ search_ontology(search_text="transport", ontology="kegg", informative_only=True)
 }
 ```
 
-### Example 8: From search to gene discovery
+### Example 10: From search to gene discovery
 
 ```
 Step 1: search_ontology(search_text="replication", ontology="go_bp")
@@ -206,6 +252,10 @@ resolve_gene(identifier='PMM0845')  # use resolve_gene for gene lookups
 ```
 
 - Use this to assemble a custom `term_ids=[...]` list for `pathway_enrichment` / `cluster_enrichment`. Both tools accept either `level=N` (test all terms at one hierarchy depth) or `term_ids=[...]` (test a specific set you chose). Custom term sets are useful when relevant terms live at different depths — e.g. in GO, a term at level 3 may be more specific than one at level 4 because GO is graph-shaped, not strictly tree-shaped. See `docs://analysis/enrichment`.
+
+- PSORTb and SignalP ontologies are **flat** (5 nodes each, single `level=0`). Don't pass `level=1` or higher — the search returns nothing because no terms exist at those levels.
+
+- PSORTb / SignalP are **structural** ontologies (where a gene's product is / how it's handled). Use them for localization / secretion questions, not for functional-annotation `genes_by_function`-style proxies.
 
 ## Package import equivalent
 

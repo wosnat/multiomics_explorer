@@ -24,7 +24,7 @@ runnable code (custom term2gene path covers cluster-membership ORA).
 |---|---|---|---|
 | analysis_id | string | — | Clustering analysis ID. Get from list_clustering_analyses. |
 | organism | string | — | Organism (case-insensitive fuzzy match). Single-organism enforced. |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy') | — | Ontology for pathway definitions. Run ontology_landscape first. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type') | — | Ontology for pathway definitions. Run ontology_landscape first. |
 | tree | string \| None | None | BRITE tree name filter. Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | level | int \| None | None | Hierarchy level (0 = root). At least one of `level` or `term_ids` required. See docs://guide/conventions. |
 | term_ids | list[string] \| None | None | Specific term IDs to test. |

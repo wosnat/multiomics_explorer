@@ -3,21 +3,33 @@ row_count: 3
 rows:
 - is_informative: true
   level: 1
+  localization_score: null
   locus_tag: PMM0001
+  signal_peptide_cleavage_probability: null
+  signal_peptide_cleavage_site: null
+  signal_peptide_probability: null
   term_id: pfam:PF00712
   term_name: DNA polymerase III beta subunit, N-terminal domain
   tree: null
   tree_code: null
 - is_informative: true
   level: 1
+  localization_score: null
   locus_tag: PMM0001
+  signal_peptide_cleavage_probability: null
+  signal_peptide_cleavage_site: null
+  signal_peptide_probability: null
   term_id: pfam:PF02767
   term_name: DNA polymerase III beta subunit, central domain
   tree: null
   tree_code: null
 - is_informative: true
   level: 1
+  localization_score: null
   locus_tag: PMM0001
+  signal_peptide_cleavage_probability: null
+  signal_peptide_cleavage_site: null
+  signal_peptide_probability: null
   term_id: pfam:PF02768
   term_name: DNA polymerase III beta subunit, C-terminal domain
   tree: null

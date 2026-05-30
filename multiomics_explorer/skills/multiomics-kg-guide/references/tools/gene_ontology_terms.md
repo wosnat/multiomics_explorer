@@ -18,7 +18,7 @@ expansion) use `genes_by_ontology`; for term discovery by text use
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags to look up. E.g. ['PMM0001', 'PMM0845']. |
 | organism | string | — | Organism (case-insensitive substring match, e.g. 'MED4'). Required — single-valued. |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy') \| None | None | Filter to one ontology. None returns all. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type') \| None | None | Filter to one ontology. None returns all. |
 | mode | string ('leaf', 'rollup') | leaf | 'leaf' returns most-specific annotations (default). 'rollup' walks up to ancestors at the given level. |
 | level | int \| None | None | Hierarchy level (0 = broadest). In leaf mode: filter to leaves at this level. In rollup mode: required — target ancestor level. See docs://guide/conventions. |
 | tree | string \| None | None | BRITE tree name filter. Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
@@ -64,6 +64,10 @@ total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_m
 | ontology_type | string \| None (optional) | Ontology type when querying all (e.g. 'go_bp') |
 | tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
 | tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
+| localization_score | float \| None (optional) | PSORTb confidence score (sparse: only set when ontology='subcellular_localization'). Range 7.5–10.0. |
+| signal_peptide_probability | float \| None (optional) | SignalP winning-class probability (sparse: only set when ontology='signal_peptide_type'). Range 0–1. |
+| signal_peptide_cleavage_site | int \| None (optional) | SignalP-predicted cleavage residue position (sparse: only set when ontology='signal_peptide_type'; absent when SignalP reports no cleavage site). |
+| signal_peptide_cleavage_probability | float \| None (optional) | SignalP cleavage-site probability (sparse: only set when ontology='signal_peptide_type' and cleavage_site present). |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -163,7 +167,31 @@ gene_ontology_terms(locus_tags=["PMM0001"], organism="Prochlorococcus MED4", ont
 }
 ```
 
-### Example 8: From overview to ontology details
+### Example 8: Per-gene SignalP call with cleavage info
+
+```example-call
+gene_ontology_terms(locus_tags=["PMM0001", "PMM0123"], ontology="signal_peptide_type", organism="MED4", mode="leaf")
+```
+
+```example-response
+{
+  "...": "...",
+  "results": [
+    {"locus_tag": "PMM0001", "term_id": "signalp_SP",
+     "term_name": "Signal peptide (Sec/SPI)", "level": 0,
+     "is_informative": true,
+     "signal_peptide_probability": 0.93,
+     "signal_peptide_cleavage_site": 25,
+     "signal_peptide_cleavage_probability": 0.85},
+    {"locus_tag": "PMM0123", "term_id": "signalp_PILIN",
+     "term_name": "Pilin-like signal peptide (Sec/SPIII)", "level": 0,
+     "is_informative": true,
+     "signal_peptide_probability": 0.78}
+  ]
+}
+```
+
+### Example 9: From overview to ontology details
 
 ```
 Step 1: gene_overview(locus_tags=["PMM0001"])

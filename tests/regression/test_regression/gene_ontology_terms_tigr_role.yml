@@ -3,7 +3,11 @@ row_count: 1
 rows:
 - is_informative: true
   level: 0
+  localization_score: null
   locus_tag: PMM0001
+  signal_peptide_cleavage_probability: null
+  signal_peptide_cleavage_site: null
+  signal_peptide_probability: null
   term_id: tigr.role:132
   term_name: DNA metabolism / DNA replication, recombination, and repair
   tree: null

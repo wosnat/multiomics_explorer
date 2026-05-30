@@ -83,7 +83,7 @@ class TestHierarchyWalk:
         assert "Biological_process_is_a_biological_process" in frag["rel_union"]
         assert "Biological_process_part_of_biological_process" in frag["rel_union"]
         # Up walk binds gene → leaf, then leaf → ancestor
-        assert "(g:Gene {organism_name: $org})-[:Gene_involved_in_biological_process]->(leaf:BiologicalProcess)" in frag["bind_up"]
+        assert "(g:Gene {organism_name: $org})-[r:Gene_involved_in_biological_process]->(leaf:BiologicalProcess)" in frag["bind_up"]
         assert "(leaf)-[:" in frag["walk_up"]
         assert "]->(t:BiologicalProcess)" in frag["walk_up"]
 
@@ -98,7 +98,7 @@ class TestHierarchyWalk:
         # Flat: t = leaf; walk_up is empty; bind goes directly to t
         assert frag["rel_union"] == ""
         assert frag["walk_up"] == ""
-        assert "(g:Gene {organism_name: $org})-[:Gene_in_cog_category]->(t:CogFunctionalCategory)" in frag["bind_up"]
+        assert "(g:Gene {organism_name: $org})-[r:Gene_in_cog_category]->(t:CogFunctionalCategory)" in frag["bind_up"]
 
     def test_tigr_role_flat(self):
         frag = _hierarchy_walk("tigr_role", direction="up")
@@ -251,7 +251,7 @@ class TestHierarchyWalkTcdb:
         assert frag["rel_union"] == "Tcdb_family_is_a_tcdb_family"
         # Bind: gene → leaf
         assert (
-            "(g:Gene {organism_name: $org})-[:Gene_has_tcdb_family]->(leaf:TcdbFamily)"
+            "(g:Gene {organism_name: $org})-[r:Gene_has_tcdb_family]->(leaf:TcdbFamily)"
             in frag["bind_up"]
         )
         # Walk up: leaf → ancestor at any level via *0..
@@ -285,7 +285,7 @@ class TestHierarchyWalkCazy:
         assert frag["gene_rel"] == "Gene_has_cazy_family"
         assert frag["rel_union"] == "Cazy_family_is_a_cazy_family"
         assert (
-            "(g:Gene {organism_name: $org})-[:Gene_has_cazy_family]->(leaf:CazyFamily)"
+            "(g:Gene {organism_name: $org})-[r:Gene_has_cazy_family]->(leaf:CazyFamily)"
             in frag["bind_up"]
         )
         assert "Cazy_family_is_a_cazy_family*0.." in frag["walk_up"]
@@ -303,6 +303,83 @@ class TestHierarchyWalkCazy:
         frag = _hierarchy_walk("cazy", direction="up")
         assert frag["bind_up"].startswith(
             "MATCH (g:Gene {organism_name: $org})"
+        )
+
+
+class TestOntologyConfigSubcellularLocalization:
+    """subcellular_localization (PSORTb) ontology added to ONTOLOGY_CONFIG."""
+
+    def test_subcellular_localization_in_ontology_config(self):
+        from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+        assert "subcellular_localization" in ONTOLOGY_CONFIG
+        cfg = ONTOLOGY_CONFIG["subcellular_localization"]
+        assert cfg["label"] == "SubcellularLocalization"
+        assert cfg["gene_rel"] == "Gene_has_subcellular_localization"
+        assert cfg["hierarchy_rels"] == []  # flat — no hierarchy
+        assert cfg["fulltext_index"] == "subcellularLocalizationFullText"
+        assert "bridge" not in cfg
+        assert "parent_label" not in cfg
+        # edge_props: list of (neo4j_prop, output_column) pairs
+        assert cfg["edge_props"] == [("score", "localization_score")]
+
+    def test_subcellular_localization_in_all_ontologies(self):
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        assert "subcellular_localization" in ALL_ONTOLOGIES
+
+    def test_subcellular_localization_appended_after_cazy(self):
+        """Order is load-bearing for regression-fixture determinism."""
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        assert ALL_ONTOLOGIES.index("subcellular_localization") > \
+               ALL_ONTOLOGIES.index("cazy")
+
+
+class TestOntologyConfigSignalPeptideType:
+    """signal_peptide_type (SignalP) ontology added to ONTOLOGY_CONFIG."""
+
+    def test_signal_peptide_type_in_ontology_config(self):
+        from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+        assert "signal_peptide_type" in ONTOLOGY_CONFIG
+        cfg = ONTOLOGY_CONFIG["signal_peptide_type"]
+        assert cfg["label"] == "SignalPeptideType"
+        assert cfg["gene_rel"] == "Gene_has_signal_peptide_type"
+        assert cfg["hierarchy_rels"] == []  # flat
+        assert cfg["fulltext_index"] == "signalPeptideTypeFullText"
+        assert "bridge" not in cfg
+        assert "parent_label" not in cfg
+        assert cfg["edge_props"] == [
+            ("probability", "signal_peptide_probability"),
+            ("cleavage_site", "signal_peptide_cleavage_site"),
+            ("cleavage_probability", "signal_peptide_cleavage_probability"),
+        ]
+
+    def test_signal_peptide_type_in_all_ontologies(self):
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        assert "signal_peptide_type" in ALL_ONTOLOGIES
+
+    def test_signal_peptide_type_appended_after_subcellular_localization(self):
+        """Order is load-bearing."""
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        assert ALL_ONTOLOGIES.index("signal_peptide_type") > \
+               ALL_ONTOLOGIES.index("subcellular_localization")
+
+
+class TestEdgePropsAbsentOnOtherOntologies:
+    """The `edge_props` field is optional. Existing 12 ontologies should
+    not carry it (or carry empty list) so they emit nulls for the new
+    edge-prop columns."""
+
+    @pytest.mark.parametrize("ontology", [
+        "go_bp", "go_mf", "go_cc", "ec", "kegg",
+        "cog_category", "cyanorak_role", "tigr_role", "pfam",
+        "brite", "tcdb", "cazy",
+    ])
+    def test_no_edge_props_on_pre_existing_ontologies(self, ontology):
+        from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+        cfg = ONTOLOGY_CONFIG[ontology]
+        # Either absent or empty list — both signal "no edge props to surface"
+        assert cfg.get("edge_props", []) == [], (
+            f"Pre-existing ontology {ontology!r} unexpectedly has edge_props; "
+            "only psortb/signalp should carry this field"
         )
 
 
@@ -1185,6 +1262,7 @@ class TestOntologyConfig:
             "go_bp", "go_mf", "go_cc", "ec", "kegg",
             "cog_category", "cyanorak_role", "tigr_role", "pfam",
             "brite", "tcdb", "cazy",
+            "subcellular_localization", "signal_peptide_type",
         }
 
     def test_required_fields_present(self):
@@ -1507,7 +1585,7 @@ class TestBuildGenesByOntologyDetail:
         assert params["level"] == 1
         assert "$term_ids" not in cypher  # no term_ids clause
         # Mode 2: bind gene → leaf, walk leaf → ancestor
-        assert "(g:Gene {organism_name: $org})-[:Gene_involved_in_biological_process]->(leaf:BiologicalProcess)" in cypher
+        assert "(g:Gene {organism_name: $org})-[r:Gene_involved_in_biological_process]->(leaf:BiologicalProcess)" in cypher
         assert "(leaf)-[:" in cypher
         assert "]->(t:BiologicalProcess)" in cypher
         assert "WHERE t.level = $level" in cypher
@@ -1604,7 +1682,7 @@ class TestBuildGenesByOntologyDetail:
             max_gene_set_size=500,
         )
         # Flat: t = leaf; no walk between leaf and t
-        assert "(g:Gene {organism_name: $org})-[:Gene_in_cog_category]->(t:CogFunctionalCategory)" in cypher
+        assert "(g:Gene {organism_name: $org})-[r:Gene_in_cog_category]->(t:CogFunctionalCategory)" in cypher
         # No explicit leaf→t walk
         assert "(leaf)-[:" not in cypher
 
@@ -1729,7 +1807,7 @@ class TestBuildGenesByOntologyPerTerm:
             max_gene_set_size=500,
         )
         # Flat ontology: t = leaf, no walk
-        assert "(g:Gene {organism_name: $org})-[:Gene_has_tigr_role]->(t:TigrRole)" in cypher
+        assert "(g:Gene {organism_name: $org})-[r:Gene_has_tigr_role]->(t:TigrRole)" in cypher
         assert "(leaf)-[:" not in cypher
 
 
@@ -1797,7 +1875,7 @@ class TestBuildGenesByOntologyPerGene:
             max_gene_set_size=500,
         )
         # Flat: t = leaf, no walk
-        assert "(g:Gene {organism_name: $org})-[:Gene_in_cog_category]->(t:CogFunctionalCategory)" in cypher
+        assert "(g:Gene {organism_name: $org})-[r:Gene_in_cog_category]->(t:CogFunctionalCategory)" in cypher
         assert "(leaf)-[:" not in cypher
 
 
@@ -2214,7 +2292,7 @@ class TestBuildGenesByOntologyTcdbCazy:
         )
         # Mode 2: gene → leaf, walk leaf → ancestor
         assert (
-            "(g:Gene {organism_name: $org})-[:Gene_has_cazy_family]->(leaf:CazyFamily)"
+            "(g:Gene {organism_name: $org})-[r:Gene_has_cazy_family]->(leaf:CazyFamily)"
             in cypher
         )
         assert "(leaf)-[:" in cypher
@@ -2288,7 +2366,7 @@ class TestBuildGenesByOntologyTcdbCazy:
             max_gene_set_size=500,
         )
         assert (
-            "(g:Gene {organism_name: $org})-[:Gene_has_tcdb_family]->(leaf:TcdbFamily)"
+            "(g:Gene {organism_name: $org})-[r:Gene_has_tcdb_family]->(leaf:TcdbFamily)"
             in cypher
         )
 
@@ -2305,7 +2383,7 @@ class TestBuildGenesByOntologyTcdbCazy:
             max_gene_set_size=500,
         )
         assert (
-            "(g:Gene {organism_name: $org})-[:Gene_has_cazy_family]->(leaf:CazyFamily)"
+            "(g:Gene {organism_name: $org})-[r:Gene_has_cazy_family]->(leaf:CazyFamily)"
             in cypher
         )
 
@@ -5033,6 +5111,7 @@ def test_all_ontologies_matches_config_keys():
         "go_bp", "go_mf", "go_cc", "ec", "kegg",
         "cog_category", "cyanorak_role", "tigr_role", "pfam",
         "brite", "tcdb", "cazy",
+        "subcellular_localization", "signal_peptide_type",
     ]
 
 
@@ -9989,3 +10068,332 @@ class TestBuildAssaysByMetabolite:
         cypher, params = build_assays_by_metabolite(
             metabolite_ids=["kegg.compound:C00074"], organism="MIT9313")
         assert params.get("organism") == "mit9313"
+
+
+class TestEdgePropColumnHelper:
+    """`_edge_prop_return_columns()` is the single source of truth for
+    the ordered set of edge-prop output columns across all ontologies.
+    Returns a list of (output_column, neo4j_prop, owner_ontology) tuples
+    so the Cypher RETURN-builder can emit `r.<prop> AS <col>` for the
+    owner and `null AS <col>` for non-owners.
+    """
+
+    def test_helper_returns_union_in_config_order(self):
+        from multiomics_explorer.kg.queries_lib import _edge_prop_return_columns
+        cols = _edge_prop_return_columns()
+        # Order: subcellular_localization (1 col), then signal_peptide_type (3 cols)
+        assert cols == [
+            ("localization_score", "score", "subcellular_localization"),
+            ("signal_peptide_probability", "probability", "signal_peptide_type"),
+            ("signal_peptide_cleavage_site", "cleavage_site", "signal_peptide_type"),
+            ("signal_peptide_cleavage_probability", "cleavage_probability",
+             "signal_peptide_type"),
+        ]
+
+    def test_owner_cypher_for_psortb(self):
+        """For the owner ontology, emit `r.<neo4j_prop> AS <output_column>`."""
+        from multiomics_explorer.kg.queries_lib import _edge_prop_return_cypher
+        cypher = _edge_prop_return_cypher("subcellular_localization")
+        # Owner column: r.score AS localization_score
+        # Non-owner columns: null AS <col>
+        assert "r.score AS localization_score" in cypher
+        assert "null AS signal_peptide_probability" in cypher
+        assert "null AS signal_peptide_cleavage_site" in cypher
+        assert "null AS signal_peptide_cleavage_probability" in cypher
+
+    def test_owner_cypher_for_signalp(self):
+        from multiomics_explorer.kg.queries_lib import _edge_prop_return_cypher
+        cypher = _edge_prop_return_cypher("signal_peptide_type")
+        assert "null AS localization_score" in cypher
+        assert "r.probability AS signal_peptide_probability" in cypher
+        assert "r.cleavage_site AS signal_peptide_cleavage_site" in cypher
+        assert "r.cleavage_probability AS signal_peptide_cleavage_probability" \
+            in cypher
+
+    def test_non_owner_cypher_is_all_nulls(self):
+        from multiomics_explorer.kg.queries_lib import _edge_prop_return_cypher
+        cypher = _edge_prop_return_cypher("pfam")
+        assert "null AS localization_score" in cypher
+        assert "null AS signal_peptide_probability" in cypher
+        assert "null AS signal_peptide_cleavage_site" in cypher
+        assert "null AS signal_peptide_cleavage_probability" in cypher
+        # No r.* projections for non-owner ontologies
+        assert "r.score" not in cypher
+        assert "r.probability" not in cypher
+
+
+class TestHierarchyWalkRelBinding:
+    """`_hierarchy_walk`'s `bind_up` fragment must bind the gene→leaf
+    relationship as `r` so consumers can project edge properties.
+    Applies to all variants: single-label, flat, bridge, pfam."""
+
+    def test_single_label_binds_r(self):
+        """e.g. tcdb (single-label tree)."""
+        frag = _hierarchy_walk("tcdb", direction="up")
+        assert "[r:Gene_has_tcdb_family]" in frag["bind_up"], (
+            f"Expected [r:Gene_has_tcdb_family] in bind_up; "
+            f"got: {frag['bind_up']!r}"
+        )
+
+    def test_flat_ontology_binds_r(self):
+        """e.g. cog_category (flat) — also covers the new
+        subcellular_localization and signal_peptide_type."""
+        frag = _hierarchy_walk("cog_category", direction="up")
+        assert "[r:Gene_in_cog_category]" in frag["bind_up"]
+
+    def test_subcellular_localization_binds_r(self):
+        frag = _hierarchy_walk("subcellular_localization", direction="up")
+        assert "[r:Gene_has_subcellular_localization]" in frag["bind_up"]
+
+    def test_signal_peptide_type_binds_r(self):
+        frag = _hierarchy_walk("signal_peptide_type", direction="up")
+        assert "[r:Gene_has_signal_peptide_type]" in frag["bind_up"]
+
+    def test_bridge_binds_r_on_first_hop(self):
+        """BRITE (bridge: gene→KeggTerm→BriteCategory). Bind r on the
+        gene→kegg-term edge (the gene_rel), not the bridge edge."""
+        frag = _hierarchy_walk("brite", direction="up")
+        assert "[r:Gene_has_kegg_ko]" in frag["bind_up"], (
+            f"Expected [r:Gene_has_kegg_ko] (the gene_rel) bound in bridge "
+            f"bind_up; got: {frag['bind_up']!r}"
+        )
+
+    def test_pfam_binds_r(self):
+        frag = _hierarchy_walk("pfam", direction="up")
+        assert "[r:Gene_has_pfam]" in frag["bind_up"]
+
+
+class TestMatchStageRelBinding:
+    """`_genes_by_ontology_match_stage` must bind `r` in BOTH mode-1
+    walk-down (where bind happens inside the helper) and modes 2/3
+    walk-up (where bind comes from `_hierarchy_walk.bind_up`). The
+    final collect uses bare `g` (not records) so multi-edge ontologies
+    don't inflate term-size counts."""
+
+    def test_mode_1_walk_down_binds_r_for_flat_ontology(self):
+        """Mode 1 (term_ids only) for subcellular_localization."""
+        from multiomics_explorer.kg.queries_lib import _genes_by_ontology_match_stage
+        cypher, _ = _genes_by_ontology_match_stage(
+            ontology="subcellular_localization",
+            level=None, term_ids=["psortb_OuterMembrane"],
+            organism="MED4",
+        )
+        assert "[r:Gene_has_subcellular_localization]" in cypher
+
+    def test_mode_1_walk_down_binds_r_for_single_label_tree(self):
+        """Mode 1 for tcdb (single-label tree)."""
+        from multiomics_explorer.kg.queries_lib import _genes_by_ontology_match_stage
+        cypher, _ = _genes_by_ontology_match_stage(
+            ontology="tcdb",
+            level=None, term_ids=["tcdb:1.A.1"],
+            organism="MED4",
+        )
+        assert "[r:Gene_has_tcdb_family]" in cypher
+
+    def test_mode_2_walk_up_binds_r_via_bind_up(self):
+        """Mode 2 (level only) — bind_up from _hierarchy_walk carries r."""
+        from multiomics_explorer.kg.queries_lib import _genes_by_ontology_match_stage
+        cypher, _ = _genes_by_ontology_match_stage(
+            ontology="signal_peptide_type",
+            level=0, term_ids=None,
+            organism="MED4",
+        )
+        assert "[r:Gene_has_signal_peptide_type]" in cypher
+
+    def test_collect_emits_bare_g(self):
+        """The collect step produces distinct genes (not records),
+        so multi-edge ontologies don't inflate the term-size."""
+        from multiomics_explorer.kg.queries_lib import _genes_by_ontology_match_stage
+        cypher, _ = _genes_by_ontology_match_stage(
+            ontology="tcdb",
+            level=None, term_ids=["tcdb:1.A.1"],
+            organism="MED4",
+        )
+        assert "collect(DISTINCT g) AS term_genes" in cypher
+        # Guard the broken {g, r} shape doesn't return
+        assert "collect(DISTINCT {g: g, r: r})" not in cypher
+
+
+class TestPerTermPerGeneUnwindShape:
+    """After the fix, per_term and per_gene UNWIND bare `g` (not records)."""
+
+    def test_per_term_unwinds_bare_g(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_per_term
+        cypher, _ = build_genes_by_ontology_per_term(
+            ontology="tcdb", organism="MED4",
+            level=None, term_ids=["tcdb:1.A.1"],
+        )
+        assert "UNWIND term_genes AS g" in cypher
+        # Guard the pair/alias pattern is gone
+        assert "UNWIND term_genes AS pair" not in cypher
+
+    def test_per_gene_unwinds_bare_g(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_per_gene
+        cypher, _ = build_genes_by_ontology_per_gene(
+            ontology="cog_category", organism="MED4",
+            level=0, term_ids=None,
+        )
+        assert "UNWIND term_genes AS g" in cypher
+        assert "UNWIND term_genes AS pair" not in cypher
+
+
+class TestGenesByOntologyDetailEdgeProps:
+    """build_genes_by_ontology_detail must emit edge-prop columns:
+    `r.<prop> AS <output_col>` on the owner ontology, `null AS <col>`
+    on all other ontologies. Row schema is uniform across all 14
+    ontologies."""
+
+    def test_subcellular_localization_emits_localization_score(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="subcellular_localization",
+            organism="MED4",
+            term_ids=["psortb_OuterMembrane"],
+        )
+        assert "r.score AS localization_score" in cypher
+        # Other-ontology columns are null on this query
+        assert "null AS signal_peptide_probability" in cypher
+        assert "null AS signal_peptide_cleavage_site" in cypher
+        assert "null AS signal_peptide_cleavage_probability" in cypher
+
+    def test_signal_peptide_type_emits_three_signalp_cols(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="signal_peptide_type",
+            organism="MED4",
+            term_ids=["signalp_LIPO"],
+        )
+        assert "r.probability AS signal_peptide_probability" in cypher
+        assert "r.cleavage_site AS signal_peptide_cleavage_site" in cypher
+        assert "r.cleavage_probability AS signal_peptide_cleavage_probability" in cypher
+        assert "null AS localization_score" in cypher
+
+    def test_pfam_emits_all_nulls(self):
+        """Non-owner ontology — all 4 edge-prop columns null."""
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="pfam",
+            organism="MED4",
+            term_ids=["pfam:PF00001"],
+        )
+        assert "null AS localization_score" in cypher
+        assert "null AS signal_peptide_probability" in cypher
+        assert "null AS signal_peptide_cleavage_site" in cypher
+        assert "null AS signal_peptide_cleavage_probability" in cypher
+        assert "r.score" not in cypher
+        assert "r.probability" not in cypher
+
+    def test_detail_unwinds_bare_g(self):
+        """Detail builder uses UNWIND term_genes AS g — re-bind r happens
+        via OPTIONAL MATCH only when needed."""
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="tcdb",
+            organism="MED4",
+            term_ids=["tcdb:1.A.1"],
+        )
+        assert "UNWIND term_genes AS g" in cypher
+        assert "UNWIND term_genes AS pair" not in cypher
+
+    def test_detail_owner_ontology_optional_match_rebinds_r(self):
+        """For PSORTb (owner ontology with edge_props), the detail builder
+        inserts OPTIONAL MATCH to re-bind r for the (g, t) pair."""
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="subcellular_localization",
+            organism="MED4",
+            term_ids=["psortb_OuterMembrane"],
+        )
+        assert "OPTIONAL MATCH (g)-[r:Gene_has_subcellular_localization]->(t)" in cypher
+        assert "r.score AS localization_score" in cypher
+
+    def test_detail_non_owner_no_optional_match(self):
+        """For pfam (no edge_props), no OPTIONAL MATCH is emitted."""
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="pfam",
+            organism="MED4",
+            term_ids=["pfam:PF00001"],
+        )
+        assert "OPTIONAL MATCH (g)-[r:" not in cypher
+        # Still emits the null columns
+        assert "null AS localization_score" in cypher
+
+
+class TestGeneOntologyTermsRelBindingAndEdgeProps:
+    """build_gene_ontology_terms binds r and emits edge-prop columns in
+    BOTH leaf and rollup modes."""
+
+    # --- leaf mode ---
+
+    def test_leaf_mode_binds_r(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="subcellular_localization",
+            organism_name="MED4", mode="leaf",
+        )
+        assert "[r:Gene_has_subcellular_localization]" in cypher
+
+    def test_leaf_mode_emits_owner_edge_prop(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="signal_peptide_type",
+            organism_name="MED4", mode="leaf",
+        )
+        assert "r.probability AS signal_peptide_probability" in cypher
+        assert "r.cleavage_site AS signal_peptide_cleavage_site" in cypher
+        assert "r.cleavage_probability AS signal_peptide_cleavage_probability" in cypher
+        assert "null AS localization_score" in cypher
+
+    def test_leaf_mode_non_owner_emits_all_nulls(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="pfam",
+            organism_name="MED4", mode="leaf",
+        )
+        assert "null AS localization_score" in cypher
+        assert "null AS signal_peptide_probability" in cypher
+        assert "null AS signal_peptide_cleavage_site" in cypher
+        assert "null AS signal_peptide_cleavage_probability" in cypher
+        assert "r.score" not in cypher
+        assert "r.probability" not in cypher
+
+    # --- rollup mode ---
+
+    def test_rollup_mode_binds_r(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="subcellular_localization",
+            organism_name="MED4", mode="rollup", level=0,
+        )
+        assert "[r:Gene_has_subcellular_localization]" in cypher
+
+    def test_rollup_mode_emits_owner_edge_prop(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="subcellular_localization",
+            organism_name="MED4", mode="rollup", level=0,
+        )
+        assert "r.score AS localization_score" in cypher
+
+    def test_rollup_mode_flat_keeps_r_in_with_scope(self):
+        """The flat-branch rollup `walk` includes a WITH stage; r must
+        be preserved through it so the RETURN can project r.score."""
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="subcellular_localization",
+            organism_name="MED4", mode="rollup", level=0,
+        )
+        # Must keep r through the WITH stage (otherwise RETURN r.score crashes)
+        assert "WITH g, t, r" in cypher
+        # Guard the legacy 2-var WITH doesn't linger
+        assert "WITH g, t\nWHERE" not in cypher
+
+    def test_rollup_mode_non_owner_emits_all_nulls(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="tcdb",
+            organism_name="MED4", mode="rollup", level=0,
+        )
+        assert "null AS localization_score" in cypher
+        assert "null AS signal_peptide_probability" in cypher

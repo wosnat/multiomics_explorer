@@ -24,7 +24,7 @@ and BRITE-tree scoping conventions.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | organism | string | — | Organism (fuzzy match, e.g. 'MED4'). |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy') \| None | None | If None, surveys all ontologies. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type') \| None | None | If None, surveys all ontologies. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | experiment_ids | list[string] \| None | None | Restrict coverage computation to genes quantified in these experiments. |
 | summary | bool | False | If true, omit per-row results (by_ontology only). |
@@ -155,7 +155,25 @@ ontology_landscape(organism="MED4", informative_only=False)
  ]}
 ```
 
-### Example 6: Weight by experiments (coverage of quantified genes)
+### Example 6: PSORTb + SignalP appear at level=0
+
+```example-call
+ontology_landscape(organism="MED4")
+```
+
+```example-response
+{
+  "by_ontology": [
+    "...",
+    {"ontology": "subcellular_localization", "level": 0, "level_kind": null,
+     "n_terms_with_genes": 5, "min_g": 30, "max_g": 1100, "...": "..."},
+    {"ontology": "signal_peptide_type", "level": 0, "level_kind": null,
+     "n_terms_with_genes": 3, "min_g": 5, "max_g": 220, "...": "..."}
+  ]
+}
+```
+
+### Example 7: Weight by experiments (coverage of quantified genes)
 
 ```
 Step 1: list_experiments(organism="MED4", table_scope=["all_detected_genes"])
@@ -213,6 +231,8 @@ result['total_matching']
 ```
 
 - Default `limit=None` returns all rows; if you set an explicit integer, check the response envelope's `truncated` field to know whether more rows exist beyond what was returned.
+
+- PSORTb / SignalP are flat (single `level=0`) — they contribute exactly one row to `by_ontology` per organism. If only 1-2 of the 5 nodes pass the default `min_gene_set_size=5` filter, the small N is expected (categories range from ~30 to ~50,000 genes genome-wide; per-organism it's much smaller).
 
 ## Package import equivalent
 
