@@ -25,7 +25,8 @@
       "mcp__multiomics-kg__gene_aa_sequence",
       "mcp__multiomics-kg__gene_neighbors",
       "Bash(git -C /home/osnat/github/multiomics_explorer add multiomics_explorer/kg/constants.py multiomics_explorer/kg/queries_lib.py tests/unit/test_query_builders.py)",
-      "Bash(git -C /home/osnat/github/multiomics_explorer commit -m ' *)"
+      "Bash(git -C /home/osnat/github/multiomics_explorer commit -m ' *)",
+      "Edit(/.claude/skills/release-explorer/**)"
     ]
   },
   "enabledPlugins": {
