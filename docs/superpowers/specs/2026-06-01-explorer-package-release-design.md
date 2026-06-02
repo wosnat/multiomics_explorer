@@ -52,6 +52,8 @@ No plugin layer here (the research repo owns that). No skill handling here (skil
 | README primary audience | End users (alpha testers) | Dev material moved to a clearly-marked Development section at the bottom. |
 | Dev surface | `.mcp.json` at repo root, simplified | Contributors get a working MCP server pointing at their own checkout via `uv run multiomics-kg-mcp`. End users never see it. |
 | MCP env block syntax | Literal `${VAR}` in `.mcp.json` (late-expanded by Claude Code at MCP launch), not pre-expanded `--env VAR=$VAR` | Verified 2026-06-01: Claude Code re-expands `${VAR}` from host env at launch; unset vars cause a parse failure (no silent empty-string passthrough). Late expansion lets the user set env vars in their shell *after* registration. |
+| Neo4j auth env var names | `NEO4J_USERNAME` canonical (matches Neo4j BKM — Aura's "Connect" credential file, Cypher Shell, GraphAcademy); `NEO4J_USER` accepted as back-compat alias via `AliasChoices` | Anyone pasting credentials from Aura's UI Just Works; existing `.env` files keep working. Decided 2026-06-02 during review. |
+| Neo4j database env var | `NEO4J_DATABASE` (default `"neo4j"`); plumbed through to `driver.session(database=...)` | Forward-compatible: today's KG uses the default `neo4j` DB so it's a no-op, but a future release on a non-default DB will not silently fail. Closes a silent-no-op surfaced in review (KG MCP guide already documents `NEO4J_DATABASE`, but the explorer was ignoring it). |
 
 ## 4. Package hygiene (pyproject.toml)
 
@@ -85,6 +87,13 @@ Two prunes — dead LangChain-agent settings, and the now-removed CLI:
 
 **No other code/import prune needed.** Verified 2026-06-01: no `langchain` imports anywhere in [multiomics_explorer/](../../../multiomics_explorer/); no `agents/` directory. After the two prunes above, `typer` and `rich` have zero importers.
 
+**Neo4j Settings shape (align with Neo4j BKM + fix silent-no-op on `NEO4J_DATABASE`):**
+- **[multiomics_explorer/config/settings.py:15](../../../multiomics_explorer/config/settings.py#L15)** — rename field `neo4j_user` → `neo4j_username`; declare `AliasChoices("NEO4J_USERNAME", "NEO4J_USER")` so both env-var names resolve. `NEO4J_USERNAME` becomes canonical (Neo4j BKM); `NEO4J_USER` is back-compat.
+- **[settings.py](../../../multiomics_explorer/config/settings.py)** — add `neo4j_database: str = "neo4j"`.
+- **[multiomics_explorer/kg/connection.py:46](../../../multiomics_explorer/kg/connection.py#L46)** — change `self.driver.session()` to `self.driver.session(database=self._settings.neo4j_database)`.
+- **[.env.example](../../../.env.example)** — rename `NEO4J_USER=` → `NEO4J_USERNAME=`; add a commented `# NEO4J_DATABASE=neo4j` (default).
+- **Test sync:** update tests that construct `Settings(neo4j_user=...)` to `neo4j_username=...`.
+
 Acceptance for this section: `pytest tests/unit/ -v` green after the prunes; `ruff check multiomics_explorer/` clean; `uv lock` shows `typer` and `rich` no longer in the resolved tree.
 
 ## 6. Credentials model
@@ -92,8 +101,8 @@ Acceptance for this section: `pytest tests/unit/ -v` green after the prunes; `ru
 `config/settings.py` (pydantic-settings) reads from **OS environment variables** and an `.env` file, with **env vars taking priority** (pydantic-settings default precedence).
 
 **User install model — env vars only:**
-- Users set `NEO4J_URI` / `NEO4J_USER` / `NEO4J_PASSWORD` in their shell profile (bash/zsh) or Windows User Environment Variables (PowerShell).
-- For MCP registration, the env block on `claude mcp add --env NEO4J_URI=$NEO4J_URI ...` (or the equivalent in the research-repo plugin manifest) passes them through to the spawned MCP process.
+- Users set `NEO4J_URI` / `NEO4J_USERNAME` / `NEO4J_PASSWORD` (and optionally `NEO4J_DATABASE`, default `"neo4j"`) in their shell profile (bash/zsh) or Windows User Environment Variables (PowerShell). `NEO4J_USER` is accepted as a back-compat alias for `NEO4J_USERNAME`.
+- For MCP registration, the env block in `.mcp.json` (or the equivalent in the research-repo template) passes them through to the spawned MCP process via literal `${VAR}` expansion (§3, §10 step 9).
 - No `.env` file involved.
 
 **Dev model — `.env` supported in the clone:**
@@ -102,7 +111,7 @@ Acceptance for this section: `pytest tests/unit/ -v` green after the prunes; `ru
 - `.env` remains gitignored ([.gitignore:109](../../../.gitignore#L109)).
 
 **`.env.example` trim** ([.env.example](../../../.env.example)):
-- Keep: the four `NEO4J_*` lines; the commented `KG_REPO_PATH` line.
+- Keep + rename: `NEO4J_URI`, `NEO4J_USERNAME` (renamed from `NEO4J_USER` per §5), `NEO4J_PASSWORD`, and a new commented `# NEO4J_DATABASE=neo4j` (default). The commented `KG_REPO_PATH` line stays.
 - Drop: `MODEL`, `MODEL_PROVIDER`, `MODEL_TEMPERATURE`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` (their backing Settings fields go in §5).
 
 **Env passthrough mechanics — verified 2026-06-01.** Claude Code supports `${VAR}` and `${VAR:-default}` syntax in `.mcp.json` `env` blocks; the substitution is late-bound (re-evaluated against the host environment at MCP launch time, not at registration time). If a referenced `${VAR}` is unset and no default is given, **Claude Code fails to parse the config** — it does *not* silently pass an empty string. So:
@@ -145,7 +154,9 @@ Acceptance for this section: `pytest tests/unit/ -v` green after the prunes; `ru
   ```
   Drops the `${MULTIOMICS_EXPLORER_DIR}` indirection (no longer needed — `uv run` from CWD picks up the project venv automatically when Claude Code launches from the clone). Documented in the Development section as "trust this on first prompt; it gives you a live MCP server against your in-tree code."
 
-End users never see either file — their MCP registration comes from the research-repo plugin or `claude mcp add` in their own project.
+  This dev-in-repo form deliberately has **no env block** — it relies on `.env` in the repo root (§6 dev model). The user-facing form (literal `${VAR}` env block, no `.env`) is described in §6 user model and produced by the `multiomics_research` template, not by this file.
+
+End users never see either file — their MCP registration comes from the research-repo template or `claude mcp add` in their own project.
 
 ## 9. README structure
 
@@ -157,8 +168,8 @@ Outline (the actual README is a follow-up implementation per this outline):
 # multiomics-explorer
 
 [One paragraph: read-only query toolkit for a Prochlorococcus/Alteromonas multi-omics
-knowledge graph (Neo4j). Three surfaces: Python API, MCP server (for Claude Code),
-CLI. Designed to be installed as a dependency, not cloned.]
+knowledge graph (Neo4j). Two surfaces: Python API and MCP server (for Claude Code).
+Designed to be installed as a dependency, not cloned.]
 
 ## Install
 
@@ -183,11 +194,14 @@ For using the library or MCP server in your own Python project:
 ## Configure Neo4j credentials
 bash/zsh (~/.bashrc, ~/.zshrc):
     export NEO4J_URI=neo4j+s://your-kg-host:7687
-    export NEO4J_USER=explorer
+    export NEO4J_USERNAME=explorer
     export NEO4J_PASSWORD=...
+    # Optional, defaults to "neo4j":
+    # export NEO4J_DATABASE=neo4j
 Windows (PowerShell):
     [Environment]::SetEnvironmentVariable("NEO4J_URI", "neo4j+s://...", "User")
     ...
+(NEO4J_USER is accepted as a back-compat alias for NEO4J_USERNAME.)
 
 ## Use as a Python library
     from multiomics_explorer import gene_overview, GraphConnection
@@ -246,6 +260,8 @@ shipped with the install.
 7. **README readability check.** A reader unfamiliar with the project can follow the user-facing section top-to-bottom and end up with: `uv add` succeeded, env vars set, MCP registered in their own project, and a Python-API example run successfully — without scrolling into the Development section.
 8. **`uv add git+...` round-trip from a different machine** (or `/tmp` checkout): create an empty project, `uv add git+https://github.com/wosnat/multiomics_explorer.git`, confirm the same import + MCP-binary works. Proves the install path the README promises actually works.
 9. **MCP env passthrough.** Register the MCP with literal `${NEO4J_URI}` in `.mcp.json`; confirm Claude Code launches the server with the host-shell value (late expansion). Confirm that an unset `${NEO4J_URI}` produces a parse-time error rather than a silent empty-string passthrough (verified behavior — §6).
+10. **Env var alias resolution.** Set only `NEO4J_USERNAME` in the shell, start the MCP, confirm auth succeeds. Then set only `NEO4J_USER` (no `NEO4J_USERNAME`), restart, confirm auth still succeeds. Both should round-trip via the `AliasChoices` added in §5.
+11. **Database passthrough.** With `NEO4J_DATABASE` unset, confirm the driver session uses the default `neo4j` database (today's KG). Set `NEO4J_DATABASE=neo4j` explicitly, confirm same result. The non-default-DB path will be exercised when a future KG release ships on one; this step proves the wire is live.
 
 ## 11. Resolution log
 
@@ -259,6 +275,8 @@ All six items from the draft are closed; nothing blocks implementation. Recorded
 | 4 | `Schema_info.mcp_min_version` check tool | **Out of scope.** Separate feature work; suggested shape noted in §2. Contract verified live on the dev KG 2026-06-01 (`Schema_info.mcp_min_version="0.1.0"`). | §2 out-of-scope, §7 |
 | 5 | CLI scope | **Dropped entirely.** No users today, no plans. CLI directory deleted, `typer`/`rich`/`pytest` removed from runtime deps, `multiomics-explorer` console script removed. | §3, §4, §5, §9, §10 |
 | 6 | Unset-`${VAR}` empty-string passthrough | **Verified.** Claude Code supports `${VAR}`/`${VAR:-default}` late expansion in `.mcp.json`; unset vars with no default cause a parse failure (no silent empty-string). Recommended: literal `${VAR}` in `.mcp.json`, not pre-expanded `--env`. | §3, §6, §9 README outline, §10 acceptance step 9 |
+| 7 | Neo4j auth env var names (review, 2026-06-02) | **`NEO4J_USERNAME` canonical (Neo4j BKM); `NEO4J_USER` back-compat alias** via `AliasChoices`. Settings field renamed `neo4j_user` → `neo4j_username`. Aura's "Connect" credential file pastes cleanly; existing `.env` files keep working. | §3, §5, §6, §10 acceptance step 10 |
+| 8 | `NEO4J_DATABASE` plumbing (review, 2026-06-02) | **Add `neo4j_database: str = "neo4j"` to Settings; plumb to `driver.session(database=...)`.** Today's KG uses the default `neo4j` DB (no-op); forward-compatible for future non-default-DB releases. Closes a silent-no-op surfaced during review (KG MCP guide already documents `NEO4J_DATABASE`, but the explorer was ignoring it). | §3, §5, §6, §10 acceptance step 11 |
 
 ## 12. Verification log
 

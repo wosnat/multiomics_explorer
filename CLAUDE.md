@@ -105,7 +105,7 @@ Already in `.claude/settings.json`. Update the `--directory` path if needed:
 ## Neo4j Connection
 
 - Default: `bolt://localhost:7687` (no auth)
-- Configure via `.env`: `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD`
+- Configure via `.env`: `NEO4J_URI`, `NEO4J_USERNAME` (or back-compat alias `NEO4J_USER`), `NEO4J_PASSWORD`, optional `NEO4J_DATABASE` (default `neo4j`)
 - KG deployed via Docker from `multiomics_biocypher_kg` repo
 
 ## Key Files

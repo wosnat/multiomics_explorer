@@ -417,7 +417,8 @@ with GraphConnection() as conn:
 ```
 
 `GraphConnection()` reads connection settings from `.env` /
-environment variables (`NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD`).
+environment variables (`NEO4J_URI`, `NEO4J_USERNAME` — or back-compat
+alias `NEO4J_USER` — `NEO4J_PASSWORD`, optional `NEO4J_DATABASE`).
 Pass an explicit `Settings` object only when overriding programmatically.
 
 ---

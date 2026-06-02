@@ -2,7 +2,7 @@
   "mcpServers": {
     "multiomics-kg": {
       "command": "uv",
-      "args": ["run", "--directory", "${MULTIOMICS_EXPLORER_DIR}", "multiomics-kg-mcp"]
+      "args": ["run", "multiomics-kg-mcp"]
     }
   }
 }

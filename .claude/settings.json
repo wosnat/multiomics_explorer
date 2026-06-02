@@ -32,16 +32,5 @@
     "superpowers@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
     "example-skills@anthropic-agent-skills": true
-  },
-  "mcpServers": {
-    "multiomics-kg": {
-      "command": "uv",
-      "args": [
-        "run",
-        "--directory",
-        "/home/osnat/github/multiomics_explorer",
-        "multiomics-kg-mcp"
-      ]
-    }
   }
 }

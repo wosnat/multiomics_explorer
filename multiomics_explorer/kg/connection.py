@@ -43,7 +43,7 @@ class GraphConnection:
     def execute_query(self, cypher: str, timeout: float = 30, **params: Any) -> list[dict]:
         """Execute a read-only Cypher query and return results as list of dicts."""
         logger.debug("Cypher: %s | params: %s", cypher, params)
-        with self.driver.session() as session:
+        with self.driver.session(database=self._settings.neo4j_database) as session:
             result = session.execute_read(
                 lambda tx: tx.run(cypher, timeout=timeout, **params).data()
             )

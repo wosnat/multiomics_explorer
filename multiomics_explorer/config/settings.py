@@ -4,25 +4,23 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    """Configuration for the multiomics explorer agent."""
+    """Configuration for the multiomics explorer."""
 
-    # Neo4j connection
+    # Neo4j connection. NEO4J_USERNAME is the canonical name (Neo4j BKM —
+    # matches the Aura "Connect" credential file). NEO4J_USER is accepted
+    # as a back-compat alias.
     neo4j_uri: str = "bolt://localhost:7687"
-    neo4j_user: str = ""
+    neo4j_username: str = Field(
+        default="",
+        validation_alias=AliasChoices("NEO4J_USERNAME", "NEO4J_USER"),
+    )
     neo4j_password: str = ""
-
-    # LLM configuration (used with langchain init_chat_model)
-    model: str = "claude-sonnet-4-5-20250929"
-    model_provider: str = "anthropic"
-    model_temperature: float = 0.0
-
-    # API keys
-    anthropic_api_key: str = ""
-    openai_api_key: str = ""
+    neo4j_database: str = "neo4j"
 
     # Optional: path to KG builder repo for richer schema metadata
     kg_repo_path: Optional[str] = None
@@ -31,13 +29,14 @@ class Settings(BaseSettings):
         "env_file": ".env",
         "env_file_encoding": "utf-8",
         "extra": "ignore",
+        "populate_by_name": True,
     }
 
     @property
     def neo4j_auth(self) -> tuple[str, str] | None:
         """Return auth tuple for Neo4j driver, or None if no auth configured."""
-        if self.neo4j_user and self.neo4j_password:
-            return (self.neo4j_user, self.neo4j_password)
+        if self.neo4j_username and self.neo4j_password:
+            return (self.neo4j_username, self.neo4j_password)
         return None
 
     @property
