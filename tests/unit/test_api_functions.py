@@ -11238,3 +11238,50 @@ def test_api_function_docstring_lint_clean(fn_name: str):
         for path, line_no, line, token in fn_violations:
             msg_lines.append(f"  {path.name}:{line_no}: {token!r} in: {line.strip()}")
         pytest.fail("\n".join(msg_lines))
+
+
+# ---------------------------------------------------------------------------
+# _evaluate_version_compat
+# ---------------------------------------------------------------------------
+class TestEvaluateVersionCompat:
+    """The version_compat assert dict, including PEP 440 pre-release semantics."""
+
+    def test_kg_min_none_fails(self):
+        from multiomics_explorer.api.functions import _evaluate_version_compat
+        result = _evaluate_version_compat("0.1.0", None)
+        assert result["name"] == "version_compat"
+        assert result["kind"] == "version_compat"
+        assert result["passed"] is False
+        assert "did not declare mcp_min_version" in result["detail"]
+
+    def test_pre_release_explorer_against_stable_min_fails(self):
+        """The load-bearing case: explorer 0.1.0a1 against KG mcp_min_version 0.1.0.
+        PEP 440 says 0.1.0a1 < 0.1.0 (pre-release ordering)."""
+        from multiomics_explorer.api.functions import _evaluate_version_compat
+        result = _evaluate_version_compat("0.1.0a1", "0.1.0")
+        assert result["passed"] is False
+        assert "0.1.0a1" in result["detail"]
+        assert "0.1.0" in result["detail"]
+        assert "PEP 440" in result["detail"]
+
+    def test_equal_versions_pass(self):
+        from multiomics_explorer.api.functions import _evaluate_version_compat
+        result = _evaluate_version_compat("0.1.0", "0.1.0")
+        assert result["passed"] is True
+        assert result["detail"] is None
+
+    def test_explorer_newer_than_min_passes(self):
+        from multiomics_explorer.api.functions import _evaluate_version_compat
+        result = _evaluate_version_compat("0.2.0", "0.1.0")
+        assert result["passed"] is True
+
+    def test_matching_pre_releases_pass(self):
+        from multiomics_explorer.api.functions import _evaluate_version_compat
+        result = _evaluate_version_compat("0.1.0a1", "0.1.0a1")
+        assert result["passed"] is True
+
+    def test_invalid_version_string_fails_gracefully(self):
+        from multiomics_explorer.api.functions import _evaluate_version_compat
+        result = _evaluate_version_compat("not-a-version", "0.1.0")
+        assert result["passed"] is False
+        assert "Could not parse" in result["detail"]

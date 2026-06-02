@@ -12,7 +12,11 @@ import logging
 import os
 import re
 import statistics
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _pkg_version
 from typing import Literal
+
+from packaging.version import InvalidVersion, Version
 
 from CyVer import PropertiesValidator, SchemaValidator, SyntaxValidator
 
@@ -7070,4 +7074,52 @@ def gene_neighbors(
         "not_matched": not_matched,
         "warnings": warnings,
         "results": results,
+    }
+
+
+# --- kg_release_info helpers (compat check) ----------------------------------
+
+_KG_IDENTITY_FIELDS = (
+    "version", "built_at", "mcp_min_version", "git_sha_short", "git_branch",
+    "gene_count", "experiment_count", "paper_count", "organism_count",
+    "expression_edge_count", "release_notes_url",
+)
+
+
+def _get_explorer_version() -> str:
+    """Return the installed multiomics-explorer version via importlib.metadata.
+
+    Returns 'unknown' if the package metadata cannot be located (rare —
+    only when running against a tree that was never installed via uv/pip)."""
+    try:
+        return _pkg_version("multiomics-explorer")
+    except PackageNotFoundError:
+        return "unknown"
+
+
+def _evaluate_version_compat(explorer_version: str, kg_min: str | None) -> dict:
+    """Build the version_compat assert dict.
+
+    PEP 440 semantics — `0.1.0a1 < 0.1.0` (pre-release < release).
+    This is the explorer↔KG coordination edge case the CHANGELOG flagged.
+    """
+    name = "version_compat"
+    if kg_min is None:
+        return {
+            "name": name, "kind": "version_compat", "passed": False,
+            "detail": "KG did not declare mcp_min_version.",
+        }
+    try:
+        ev = Version(explorer_version)
+        kv = Version(kg_min)
+    except InvalidVersion as e:
+        return {
+            "name": name, "kind": "version_compat", "passed": False,
+            "detail": f"Could not parse a version: {e}.",
+        }
+    if ev >= kv:
+        return {"name": name, "kind": "version_compat", "passed": True, "detail": None}
+    return {
+        "name": name, "kind": "version_compat", "passed": False,
+        "detail": f"Explorer {explorer_version} < KG mcp_min_version {kg_min} (PEP 440).",
     }
