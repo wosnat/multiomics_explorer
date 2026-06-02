@@ -39,3 +39,38 @@ VALID_OMICS_TYPES: set[str] = {
     "VESICLE_DNASEQ",
     "VESICLE_PROTEOMICS",
 }
+
+
+# Schema-shape contract for the KG ↔ explorer compatibility check
+# (api/functions.kg_release_info). Five buckets, all small. Bucket 5
+# (version compatibility) is computed in api/functions.py, not stored here.
+# See docs/superpowers/specs/2026-06-02-kg-compatibility-check-design.md §5.
+EXPECTED_KG_SHAPE: dict[str, tuple[str, ...]] = {
+    # 1. The contract surface — Schema_info must exist and carry these properties.
+    "schema_info_required_props": (
+        "version",
+        "built_at",
+        "mcp_min_version",
+        "gene_count",
+        "experiment_count",
+    ),
+    # 2. Foundational node labels every tool family touches.
+    "required_node_labels": (
+        "Schema_info",
+        "Gene",
+        "Experiment",
+        "OrthologGroup",
+        "Publication",
+    ),
+    # 3. Foundational relationship types.
+    "required_relationship_types": (
+        "Changes_expression_of",
+        "Gene_in_ortholog_group",
+        "Has_experiment",
+    ),
+    # 4. Counts that must be non-zero (catches "connected to empty DB").
+    "required_nonzero_counts": (
+        "gene_count",
+        "experiment_count",
+    ),
+}
