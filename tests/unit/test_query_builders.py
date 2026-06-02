@@ -10397,3 +10397,40 @@ class TestGeneOntologyTermsRelBindingAndEdgeProps:
         )
         assert "null AS localization_score" in cypher
         assert "null AS signal_peptide_probability" in cypher
+
+
+class TestBuildKGReleaseInfoQuery:
+    """Layer-1 builder for the kg_release_info compatibility check."""
+
+    def test_returns_cypher_and_empty_params(self):
+        from multiomics_explorer.kg.queries_lib import build_kg_release_info
+
+        cypher, params = build_kg_release_info()
+        assert isinstance(cypher, str)
+        assert params == {}
+
+    def test_cypher_pulls_schema_info_optional_match(self):
+        from multiomics_explorer.kg.queries_lib import build_kg_release_info
+
+        cypher, _ = build_kg_release_info()
+        # OPTIONAL MATCH is load-bearing: pre-2026-05-31 KGs have no
+        # Schema_info node and we want a null row, not an empty result.
+        assert "OPTIONAL MATCH (s:Schema_info" in cypher
+        assert "id: 'schema_info'" in cypher
+
+    def test_cypher_collects_labels_and_relationship_types(self):
+        from multiomics_explorer.kg.queries_lib import build_kg_release_info
+
+        cypher, _ = build_kg_release_info()
+        assert "CALL db.labels()" in cypher
+        assert "CALL db.relationshipTypes()" in cypher
+
+    def test_cypher_returns_three_aliases(self):
+        from multiomics_explorer.kg.queries_lib import build_kg_release_info
+
+        cypher, _ = build_kg_release_info()
+        # Three top-level RETURN aliases that api/functions.kg_release_info
+        # destructures: schema_info, labels, rel_types.
+        assert "AS schema_info" in cypher
+        assert "AS labels" in cypher
+        assert "AS rel_types" in cypher

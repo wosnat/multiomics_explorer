@@ -8861,3 +8861,24 @@ def build_assays_by_metabolite(
         f"{pagination}"
     )
     return cypher, params
+
+
+def build_kg_release_info() -> tuple[str, dict]:
+    """Cypher for the KG release identity + schema-shape compat check.
+
+    Single round-trip; OPTIONAL MATCH on Schema_info so pre-2026-05-31
+    KGs (no Schema_info node) return a null `schema_info` rather than
+    zero rows. The api-layer caller treats null as verdict='unknown'.
+
+    See docs/superpowers/specs/2026-06-02-kg-compatibility-check-design.md §6.
+    """
+    cypher = """CALL {
+  OPTIONAL MATCH (s:Schema_info {id: 'schema_info'})
+  RETURN s { .* } AS schema_info
+}
+CALL { CALL db.labels() YIELD label
+       RETURN collect(label) AS labels }
+CALL { CALL db.relationshipTypes() YIELD relationshipType
+       RETURN collect(relationshipType) AS rel_types }
+RETURN schema_info, labels, rel_types"""
+    return cypher.strip(), {}
