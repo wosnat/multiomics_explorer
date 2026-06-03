@@ -20,6 +20,13 @@ def _conn(ctx: Context) -> GraphConnection:
     return ctx.request_context.lifespan_context.conn
 
 
+def _kg_compat_report(ctx: Context) -> dict:
+    """Get the cached KG compatibility report from lifespan context.
+
+    Computed once in mcp_server/server.py:lifespan; the kg_release_info
+    tool reads from this cache."""
+    return ctx.request_context.lifespan_context.kg_compat_report
+
 
 # ---------------------------------------------------------------------------
 # pathway_enrichment response models (module-level for direct importability)
@@ -1242,6 +1249,78 @@ class MetabolitesByGeneResponse(BaseModel):
         "same Pydantic class.")
 
 
+# ---------------------------------------------------------------------------
+# kg_release_info response models (module-level for direct importability)
+# ---------------------------------------------------------------------------
+
+class KGAssert(BaseModel):
+    """One element of the kg_release_info schema-shape assertion checklist."""
+    name: str = Field(
+        description=(
+            "Stable identifier in `{kind}:{value}` format (e.g. 'node_label:Gene', "
+            "'schema_info_prop:gene_count', 'nonzero_count:gene_count'). "
+            "The bare `version_compat` assert is the one exception — only one of its kind exists."
+        ),
+    )
+    kind: Literal[
+        "schema_info_prop", "node_label", "relationship_type",
+        "nonzero_count", "version_compat",
+    ] = Field(
+        description=(
+            "Assertion family. "
+            "'schema_info_prop' = the named Schema_info property is present and non-null on the live KG; "
+            "'node_label' = the named node label exists in db.labels(); "
+            "'relationship_type' = the named relationship type exists in db.relationshipTypes(); "
+            "'nonzero_count' = the named Schema_info count property is a positive int; "
+            "'version_compat' = installed explorer version satisfies KG.mcp_min_version under PEP 440."
+        ),
+    )
+    passed: bool = Field(description="True if the assertion held against the live KG.")
+    detail: str | None = Field(
+        default=None,
+        description="Human-readable explanation when failed; null when passed.",
+    )
+
+
+class KGIdentity(BaseModel):
+    """Schema_info node properties — the KG's self-declared release identity.
+    Mostly-null on verdict='unknown'."""
+    version: str | None = Field(default=None, description="KG release version (e.g. '0.1.0-alpha.1'); '0.0.0-dev' on dev builds.")
+    built_at: str | None = Field(default=None, description="ISO-8601 UTC build timestamp.")
+    mcp_min_version: str | None = Field(
+        default=None,
+        description=(
+            "Minimum compatible explorer-MCP version (PEP 440 / semver). The contract surface — "
+            "if `verdict='warn'` and the failing assert is `version_compat`, the user must either "
+            "upgrade their installed explorer-MCP, or downgrade to a KG release whose "
+            "mcp_min_version is satisfied by their explorer."
+        ),
+    )
+    git_sha_short: str | None = Field(default=None, description="Short git SHA of the KG build.")
+    git_branch: str | None = Field(default=None, description="Git branch of the KG build.")
+    gene_count: int | None = Field(default=None, description="Number of Gene nodes in the KG.")
+    experiment_count: int | None = Field(default=None, description="Number of Experiment nodes in the KG.")
+    paper_count: int | None = Field(default=None, description="Number of Publication nodes in the KG.")
+    organism_count: int | None = Field(default=None, description="Number of OrganismTaxon nodes in the KG.")
+    expression_edge_count: int | None = Field(default=None, description="Number of Changes_expression_of edges in the KG.")
+    release_notes_url: str | None = Field(default=None, description="URL of the KG release notes, when stamped.")
+
+
+class KGReleaseInfoResponse(BaseModel):
+    """Response for the kg_release_info tool — release identity + compat verdict."""
+    verdict: Literal["ok", "warn", "unknown"] = Field(
+        description=(
+            "'ok' = explorer version satisfies KG.mcp_min_version AND all schema asserts pass. "
+            "'warn' = at least one assert failed; tools still work but may emit confusing errors. "
+            "'unknown' = check could not be evaluated (Schema_info missing — pre-2026-05-31 KG, or wrong DB)."
+        )
+    )
+    explorer_version: str = Field(description="Installed multiomics-explorer version (PEP 440 form, e.g. '0.1.0a1').")
+    kg: KGIdentity = Field(description="The KG's self-declared release identity.")
+    asserts: list[KGAssert] = Field(description="Every assertion evaluated, pass + fail. Filter `passed=False` for the failure list.")
+    summary: str = Field(description="One-line human-readable verdict.")
+
+
 def register_tools(mcp: FastMCP):
     """Register all KG tools with the MCP server."""
 
@@ -1272,6 +1351,38 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             await ctx.error(f"kg_schema unexpected error: {e}")
             raise ToolError(f"Error in kg_schema: {e}")
+
+    @mcp.tool(
+        tags={"utility", "schema", "compatibility"},
+        annotations={
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+    )
+    async def kg_release_info(ctx: Context) -> KGReleaseInfoResponse:
+        """Return the KG's release identity (`Schema_info` properties) and a compatibility verdict against this explorer-MCP version.
+
+        **Call this first** in any new session — verifies the explorer's installed version satisfies the KG's declared `mcp_min_version`, and that the load-bearing schema shape (foundational labels, relationship types, `Schema_info` properties, non-zero gene/experiment counts) is present. The result is computed once at MCP server startup and cached; re-call is instant.
+
+        Verdict semantics:
+        - `ok`     — explorer satisfies KG min-version + all schema asserts pass.
+        - `warn`   — at least one assert failed; tools still serve but may emit confusing errors against the affected shapes. Filter `asserts` on `passed=False` for the failure list.
+        - `unknown` — could not evaluate (no `Schema_info` node in the KG — pre-2026-05-31 build, or wrong database).
+
+        On non-`ok` verdicts, the tool emits `ctx.warning(summary)` so the surrounding MCP client surfaces it to the user. See `docs://guide/conventions` for cross-tool semantics.
+        """
+        await ctx.info("kg_release_info")
+        try:
+            report = _kg_compat_report(ctx)
+            response = KGReleaseInfoResponse(**report)
+            if response.verdict != "ok":
+                await ctx.warning(response.summary)
+            return response
+        except Exception as e:
+            await ctx.error(f"kg_release_info unexpected error: {e}")
+            raise ToolError(f"Error in kg_release_info: {e}")
 
     class FilterValueResult(BaseModel):
         value: str = Field(

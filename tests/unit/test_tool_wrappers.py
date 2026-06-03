@@ -47,7 +47,7 @@ def _conn_from(ctx):
 
 
 EXPECTED_TOOLS = [
-    "kg_schema", "list_filter_values", "list_organisms", "resolve_gene",
+    "kg_schema", "kg_release_info", "list_filter_values", "list_organisms", "resolve_gene",
     "genes_by_function", "gene_overview", "gene_details",
     "gene_homologs", "run_cypher",
     "search_ontology", "search_homolog_groups", "genes_by_homolog_group",
@@ -6442,7 +6442,8 @@ class TestExpectedToolsUnchangedForTcdbCazy:
         # Bumped 37 → 39 by the gene-sequence-neighbors slice
         # (gene_aa_sequence + gene_neighbors — both legitimate new MCP tools,
         # separate spec, parallel addition).
-        assert len(EXPECTED_TOOLS) == 39, (
+        # Bumped 39 → 40 by kg_release_info (KG compatibility check tool).
+        assert len(EXPECTED_TOOLS) == 40, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
             "tcdb/cazy adds NO new tools (it's a Mode-B ontology surface "
             "refresh); MBG legitimately adds one; "
@@ -7074,7 +7075,8 @@ class TestExpectedToolsUnchangedForPhase1Plumbing:
         # Bumped 37 → 39 by the gene-sequence-neighbors slice
         # (gene_aa_sequence + gene_neighbors — both legitimate new MCP tools,
         # separate spec).
-        assert len(EXPECTED_TOOLS) == 39, (
+        # Bumped 39 → 40 by kg_release_info (KG compatibility check tool).
+        assert len(EXPECTED_TOOLS) == 40, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
             "Phase 1 plumbing adds no new tools — only field additions; "
             "Phase 5 list_metabolite_assays legitimately adds one; "
@@ -8679,9 +8681,79 @@ class TestExpectedToolsUnchangedForPsortbSignalp:
         assert "psortb" not in tool_fns
         assert "signalp" not in tool_fns
 
-    def test_expected_tools_size_unchanged_at_39(self):
+    def test_expected_tools_size_unchanged_at_40(self):
         # No new tool — only ontology surface refresh.
-        assert len(EXPECTED_TOOLS) == 39, (
+        # Bumped 39 → 40 by kg_release_info (KG compatibility check tool).
+        assert len(EXPECTED_TOOLS) == 40, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
-            "psortb/signalp adds NO new tools (Mode-B ontology surface refresh)."
+            "psortb/signalp adds NO new tools (Mode-B ontology surface refresh); "
+            "kg_release_info legitimately adds one."
         )
+
+
+class TestKGReleaseInfoTool:
+    """Layer-3 wrapper for kg_release_info — Pydantic shape validation."""
+
+    def _ok_report(self):
+        return {
+            "verdict": "ok",
+            "explorer_version": "0.1.0a1",
+            "kg": {
+                "version": "0.1.0",
+                "built_at": "2026-06-02T00:00:00Z",
+                "mcp_min_version": "0.0.1",
+                "git_sha_short": "deadbee",
+                "git_branch": "main",
+                "gene_count": 100,
+                "experiment_count": 5,
+                "paper_count": 3,
+                "organism_count": 2,
+                "expression_edge_count": 500,
+                "release_notes_url": None,
+            },
+            "asserts": [
+                {"name": "version_compat", "kind": "version_compat", "passed": True, "detail": None},
+            ],
+            "summary": "OK: explorer 0.1.0a1 satisfies KG mcp_min_version 0.0.1; 1/1 asserts pass.",
+        }
+
+    def test_response_validates_ok_shape(self):
+        from multiomics_explorer.mcp_server.tools import KGReleaseInfoResponse
+        response = KGReleaseInfoResponse(**self._ok_report())
+        assert response.verdict == "ok"
+        assert response.kg.version == "0.1.0"
+        assert len(response.asserts) == 1
+
+    def test_response_validates_warn_shape(self):
+        from multiomics_explorer.mcp_server.tools import KGReleaseInfoResponse
+        report = self._ok_report()
+        report["verdict"] = "warn"
+        report["asserts"] = [
+            {"name": "version_compat", "kind": "version_compat", "passed": False,
+             "detail": "Explorer 0.1.0a1 < KG mcp_min_version 99.99.99 (PEP 440)."},
+        ]
+        response = KGReleaseInfoResponse(**report)
+        assert response.verdict == "warn"
+        assert response.asserts[0].passed is False
+
+    def test_response_validates_unknown_shape(self):
+        from multiomics_explorer.mcp_server.tools import KGReleaseInfoResponse
+        unknown = {
+            "verdict": "unknown",
+            "explorer_version": "0.1.0a1",
+            "kg": {},  # all defaults to None
+            "asserts": [],
+            "summary": "UNKNOWN: Schema_info node not found.",
+        }
+        response = KGReleaseInfoResponse(**unknown)
+        assert response.verdict == "unknown"
+        assert response.kg.version is None
+        assert response.asserts == []
+
+    def test_response_rejects_unknown_verdict(self):
+        from pydantic import ValidationError
+        from multiomics_explorer.mcp_server.tools import KGReleaseInfoResponse
+        bad = self._ok_report()
+        bad["verdict"] = "bogus"
+        with pytest.raises(ValidationError):
+            KGReleaseInfoResponse(**bad)
