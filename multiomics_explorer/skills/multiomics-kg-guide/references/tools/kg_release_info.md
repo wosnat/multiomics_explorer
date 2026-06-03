@@ -41,7 +41,7 @@ kg_release_info()
 ```
 
 ```example-response
-{"verdict": "ok", "explorer_version": "0.1.0a1", "kg": {"version": "0.1.0-alpha.1", "gene_count": 120416, "organism_count": 45, "experiment_count": 312}, "asserts": [{"name": "gene_label_exists", "passed": true, "detail": null}, ...], "summary": "OK: explorer 0.1.0a1 satisfies KG mcp_min_version 0.1.0; 16/16 schema asserts pass."}
+{"verdict": "ok", "explorer_version": "0.1.0a1", "kg": {"version": "0.1.0-alpha.1", "mcp_min_version": "0.1.0a1", "gene_count": 120416, "organism_count": 45, "experiment_count": 312}, "asserts": [{"name": "node_label:Gene", "kind": "node_label", "passed": true, "detail": null}, "...15 more entries..."], "summary": "OK: explorer 0.1.0a1 satisfies KG mcp_min_version 0.1.0a1; 16/16 schema asserts pass."}
 ```
 
 ### Example 2: Diagnose a warn verdict
