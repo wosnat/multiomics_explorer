@@ -22,6 +22,18 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 ## [Unreleased]
 
 ### Added
+- `kg_release_info` MCP tool: returns the KG's release identity
+  (`Schema_info` properties — version, built_at, counts, git identity)
+  and a three-valued compatibility verdict (`ok` / `warn` / `unknown`)
+  against the installed explorer version. Run by the MCP server lifespan
+  at startup; cached on `KGContext`; tool reads from cache. PEP 440
+  version comparison via `packaging.version.Version` (catches the
+  pre-release-vs-release coordination case). 16 asserts in the v1
+  EXPECTED_KG_SHAPE check (5 Schema_info properties + 5 node labels +
+  3 relationship types + 2 non-zero counts + 1 version compat). See
+  `docs/superpowers/specs/2026-06-02-kg-compatibility-check-design.md`.
+- MCP server `instructions` updated to point agents at `kg_release_info`
+  as a first call in any new session.
 - Read-only Python toolkit for the Prochlorococcus/Alteromonas multi-omics
   knowledge graph (Neo4j). Two surfaces shipped:
   - **Python API** (`multiomics_explorer.api.functions`) — programmatic
