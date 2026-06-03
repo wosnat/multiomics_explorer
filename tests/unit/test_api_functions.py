@@ -11285,3 +11285,115 @@ class TestEvaluateVersionCompat:
         result = _evaluate_version_compat("not-a-version", "0.1.0")
         assert result["passed"] is False
         assert "Could not parse" in result["detail"]
+
+    def test_explorer_version_unknown_fails_with_actionable_message(self):
+        """Distinguish 'package not installed' from 'malformed version string'."""
+        from multiomics_explorer.api.functions import _evaluate_version_compat
+        result = _evaluate_version_compat("unknown", "0.1.0")
+        assert result["passed"] is False
+        assert "Explorer version unknown" in result["detail"]
+        assert "uv/pip" in result["detail"]
+
+
+class TestKGReleaseInfo:
+    """The api-layer kg_release_info function — 4 scenarios via mocked conn."""
+
+    def _make_conn(self, schema_info, labels, rel_types):
+        """Build a fake conn whose execute_query returns one row of the
+        build_kg_release_info() shape."""
+        from unittest.mock import MagicMock
+        conn = MagicMock()
+        conn.execute_query.return_value = [{
+            "schema_info": schema_info,
+            "labels": labels,
+            "rel_types": rel_types,
+        }]
+        return conn
+
+    def _ok_schema_info(self, **overrides):
+        si = {
+            "version": "0.1.0",
+            "built_at": "2026-06-02T00:00:00Z",
+            "mcp_min_version": "0.0.1",
+            "git_sha_short": "deadbee",
+            "git_branch": "main",
+            "gene_count": 100,
+            "experiment_count": 5,
+            "paper_count": 3,
+            "organism_count": 2,
+            "expression_edge_count": 500,
+            "release_notes_url": None,
+        }
+        si.update(overrides)
+        return si
+
+    def _ok_labels(self):
+        return ["Schema_info", "Gene", "Experiment", "OrthologGroup", "Publication", "Other"]
+
+    def _ok_rel_types(self):
+        return ["Changes_expression_of", "Gene_in_ortholog_group", "Has_experiment", "Other"]
+
+    def test_ok_verdict_when_everything_passes(self):
+        from multiomics_explorer.api.functions import kg_release_info
+        conn = self._make_conn(self._ok_schema_info(), self._ok_labels(), self._ok_rel_types())
+
+        report = kg_release_info(conn)
+
+        assert report["verdict"] == "ok"
+        # 5 + 5 + 3 + 2 + 1 = 16 asserts
+        assert len(report["asserts"]) == 16
+        assert all(a["passed"] for a in report["asserts"])
+        assert "OK:" in report["summary"]
+        assert report["kg"]["version"] == "0.1.0"
+        assert report["explorer_version"]  # populated, real value
+
+    def test_warn_verdict_on_version_mismatch(self):
+        from multiomics_explorer.api.functions import kg_release_info
+        # KG demands a version higher than anything the explorer could be
+        si = self._ok_schema_info(mcp_min_version="99.99.99")
+        conn = self._make_conn(si, self._ok_labels(), self._ok_rel_types())
+
+        report = kg_release_info(conn)
+
+        assert report["verdict"] == "warn"
+        version_assert = next(a for a in report["asserts"] if a["kind"] == "version_compat")
+        assert version_assert["passed"] is False
+        assert "99.99.99" in version_assert["detail"]
+        assert "WARN:" in report["summary"]
+
+    def test_warn_verdict_on_missing_label(self):
+        from multiomics_explorer.api.functions import kg_release_info
+        labels = ["Schema_info", "Gene", "Experiment", "OrthologGroup"]  # Publication missing
+        conn = self._make_conn(self._ok_schema_info(), labels, self._ok_rel_types())
+
+        report = kg_release_info(conn)
+
+        assert report["verdict"] == "warn"
+        pub_assert = next(a for a in report["asserts"] if a["name"] == "node_label:Publication")
+        assert pub_assert["passed"] is False
+
+    def test_unknown_verdict_when_schema_info_missing(self):
+        from multiomics_explorer.api.functions import kg_release_info
+        conn = self._make_conn(None, [], [])
+
+        report = kg_release_info(conn)
+
+        assert report["verdict"] == "unknown"
+        assert report["kg"] == {}
+        assert report["asserts"] == []
+        assert "UNKNOWN:" in report["summary"]
+        assert "Schema_info node not found" in report["summary"]
+        assert report["explorer_version"]  # still populated
+
+    def test_kg_identity_only_carries_known_fields(self):
+        """KGIdentity is the curated subset, not all Schema_info props."""
+        from multiomics_explorer.api.functions import kg_release_info
+        si = self._ok_schema_info()
+        si["some_extra_prop"] = "should-not-appear"
+        conn = self._make_conn(si, self._ok_labels(), self._ok_rel_types())
+
+        report = kg_release_info(conn)
+
+        assert "some_extra_prop" not in report["kg"]
+        assert "version" in report["kg"]
+        assert "gene_count" in report["kg"]

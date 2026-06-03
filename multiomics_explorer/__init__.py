@@ -51,6 +51,7 @@ from multiomics_explorer.api.functions import (
     genes_in_cluster,
     cluster_enrichment,
     pathway_enrichment,
+    kg_release_info,
 )
 from multiomics_explorer.analysis.expression import (
     gene_set_compare,
@@ -108,6 +109,7 @@ __all__ = [
     "genes_in_cluster",
     "cluster_enrichment",
     "pathway_enrichment",
+    "kg_release_info",
     "response_matrix",
     "gene_set_compare",
     "to_dataframe",

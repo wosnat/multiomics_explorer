@@ -25,6 +25,7 @@ from neo4j.exceptions import ClientError as Neo4jClientError
 from multiomics_explorer.kg.connection import GraphConnection
 from multiomics_explorer.kg.constants import (
     ALL_ONTOLOGIES,
+    EXPECTED_KG_SHAPE,
     GO_ONTOLOGIES,
     MAX_SPECIFICITY_RANK,
     VALID_OG_SOURCES,
@@ -91,6 +92,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_differential_expression_by_ortholog_diagnostics,
     build_gene_response_profile_envelope,
     build_gene_response_profile,
+    build_kg_release_info,
     build_list_clustering_analyses,
     build_list_clustering_analyses_summary,
     build_list_derived_metrics,
@@ -7104,6 +7106,14 @@ def _evaluate_version_compat(explorer_version: str, kg_min: str | None) -> dict:
     This is the explorer↔KG coordination edge case the CHANGELOG flagged.
     """
     name = "version_compat"
+    if explorer_version == "unknown":
+        return {
+            "name": name, "kind": "version_compat", "passed": False,
+            "detail": (
+                "Explorer version unknown (package metadata not installed via "
+                "uv/pip); cannot evaluate compatibility."
+            ),
+        }
     if kg_min is None:
         return {
             "name": name, "kind": "version_compat", "passed": False,
@@ -7122,4 +7132,110 @@ def _evaluate_version_compat(explorer_version: str, kg_min: str | None) -> dict:
     return {
         "name": name, "kind": "version_compat", "passed": False,
         "detail": f"Explorer {explorer_version} < KG mcp_min_version {kg_min} (PEP 440).",
+    }
+
+
+def kg_release_info(conn: GraphConnection) -> dict:
+    """Compute the KG release identity + compatibility verdict.
+
+    One Cypher round-trip; pure Python evaluation of EXPECTED_KG_SHAPE.
+    Returns a dict matching the KGReleaseInfoResponse Pydantic shape
+    (verdict, explorer_version, kg, asserts, summary). Cached by the
+    MCP server at lifespan startup; the kg_release_info MCP tool reads
+    from cache.
+
+    See docs/superpowers/specs/2026-06-02-kg-compatibility-check-design.md §7.
+    """
+    cypher, params = build_kg_release_info()
+    rows = conn.execute_query(cypher, **params)
+    row = rows[0] if rows else {"schema_info": None, "labels": [], "rel_types": []}
+
+    schema_info = row.get("schema_info")
+    labels = set(row.get("labels") or [])
+    rel_types = set(row.get("rel_types") or [])
+
+    explorer_version = _get_explorer_version()
+
+    # No Schema_info node -> verdict='unknown', short-circuit
+    if schema_info is None:
+        return {
+            "verdict": "unknown",
+            "explorer_version": explorer_version,
+            "kg": {},
+            "asserts": [],
+            "summary": (
+                "UNKNOWN: Schema_info node not found "
+                "(pre-2026-05-31 KG, or wrong database?)."
+            ),
+        }
+
+    asserts: list[dict] = []
+
+    for prop in EXPECTED_KG_SHAPE["schema_info_required_props"]:
+        present = prop in schema_info and schema_info[prop] is not None
+        asserts.append({
+            "name": f"schema_info_prop:{prop}",
+            "kind": "schema_info_prop",
+            "passed": present,
+            "detail": None if present else f"Schema_info is missing or null on '{prop}'.",
+        })
+
+    for label in EXPECTED_KG_SHAPE["required_node_labels"]:
+        passed = label in labels
+        asserts.append({
+            "name": f"node_label:{label}",
+            "kind": "node_label",
+            "passed": passed,
+            "detail": None if passed else f"Node label '{label}' not found in db.labels().",
+        })
+
+    for rt in EXPECTED_KG_SHAPE["required_relationship_types"]:
+        passed = rt in rel_types
+        asserts.append({
+            "name": f"relationship_type:{rt}",
+            "kind": "relationship_type",
+            "passed": passed,
+            "detail": None if passed else f"Relationship type '{rt}' not found in db.relationshipTypes().",
+        })
+
+    for count_prop in EXPECTED_KG_SHAPE["required_nonzero_counts"]:
+        value = schema_info.get(count_prop)
+        passed = isinstance(value, int) and value > 0
+        asserts.append({
+            "name": f"nonzero_count:{count_prop}",
+            "kind": "nonzero_count",
+            "passed": passed,
+            "detail": None if passed else f"Schema_info.{count_prop} is {value!r}, expected positive int.",
+        })
+
+    kg_min = schema_info.get("mcp_min_version")
+    asserts.append(_evaluate_version_compat(explorer_version, kg_min))
+
+    failed = [a for a in asserts if not a["passed"]]
+    verdict = "ok" if not failed else "warn"
+
+    if verdict == "ok":
+        summary = (
+            f"OK: explorer {explorer_version} satisfies KG mcp_min_version "
+            f"{kg_min}; {len(asserts)}/{len(asserts)} schema asserts pass."
+        )
+    else:
+        version_fail = next((a for a in failed if a["kind"] == "version_compat"), None)
+        shape_fails = [a for a in failed if a["kind"] != "version_compat"]
+        parts: list[str] = []
+        if version_fail:
+            parts.append(version_fail["detail"].rstrip("."))
+        if shape_fails:
+            kinds = sorted({a["kind"] for a in shape_fails})
+            parts.append(
+                f"{len(shape_fails)} schema assert(s) failed ({', '.join(kinds)})"
+            )
+        summary = "WARN: " + "; ".join(parts) + "."
+
+    return {
+        "verdict": verdict,
+        "explorer_version": explorer_version,
+        "kg": {k: schema_info.get(k) for k in _KG_IDENTITY_FIELDS},
+        "asserts": asserts,
+        "summary": summary,
     }
