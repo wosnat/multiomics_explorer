@@ -7143,8 +7143,6 @@ def kg_release_info(conn: GraphConnection) -> dict:
     (verdict, explorer_version, kg, asserts, summary). Cached by the
     MCP server at lifespan startup; the kg_release_info MCP tool reads
     from cache.
-
-    See docs/superpowers/specs/2026-06-02-kg-compatibility-check-design.md §7.
     """
     cypher, params = build_kg_release_info()
     rows = conn.execute_query(cypher, **params)

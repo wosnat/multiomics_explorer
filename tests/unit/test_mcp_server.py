@@ -13,8 +13,18 @@ class TestKGContext:
     def test_holds_connection(self):
         """KGContext dataclass should store the connection reference."""
         mock_conn = MagicMock()
-        ctx = KGContext(conn=mock_conn)
+        ctx = KGContext(conn=mock_conn, kg_compat_report={"verdict": "ok"})
         assert ctx.conn is mock_conn
+
+    def test_holds_compat_report(self):
+        """KGContext dataclass should store the kg_compat_report reference."""
+        mock_conn = MagicMock()
+        report = {"verdict": "ok", "summary": "all good"}
+        ctx = KGContext(conn=mock_conn, kg_compat_report=report)
+        assert ctx.kg_compat_report is report
+
+
+_FAKE_REPORT = {"verdict": "ok", "summary": "KG matches", "kg": {}, "asserts": []}
 
 
 class TestLifespan:
@@ -30,13 +40,60 @@ class TestLifespan:
         ), patch(
             "multiomics_explorer.mcp_server.server.get_settings",
             return_value=MagicMock(),
+        ), patch(
+            "multiomics_explorer.mcp_server.server.kg_release_info",
+            return_value=_FAKE_REPORT,
         ):
             mock_server = MagicMock()
             async with lifespan(mock_server) as ctx:
                 assert isinstance(ctx, KGContext)
                 assert ctx.conn is mock_conn
+                assert ctx.kg_compat_report is _FAKE_REPORT
 
             mock_conn.close.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_compat_report_cached_on_context(self):
+        """Lifespan should cache the kg_release_info report on KGContext."""
+        mock_conn = MagicMock()
+        mock_conn.verify_connectivity.return_value = True
+        custom_report = {"verdict": "warn", "summary": "minor mismatch", "kg": {}, "asserts": []}
+
+        with patch(
+            "multiomics_explorer.mcp_server.server.GraphConnection",
+            return_value=mock_conn,
+        ), patch(
+            "multiomics_explorer.mcp_server.server.get_settings",
+            return_value=MagicMock(),
+        ), patch(
+            "multiomics_explorer.mcp_server.server.kg_release_info",
+            return_value=custom_report,
+        ):
+            async with lifespan(MagicMock()) as ctx:
+                assert ctx.kg_compat_report["verdict"] == "warn"
+
+    @pytest.mark.asyncio
+    async def test_compat_report_falls_back_on_exception(self):
+        """Lifespan should cache a fallback report when kg_release_info raises."""
+        mock_conn = MagicMock()
+        mock_conn.verify_connectivity.return_value = True
+
+        with patch(
+            "multiomics_explorer.mcp_server.server.GraphConnection",
+            return_value=mock_conn,
+        ), patch(
+            "multiomics_explorer.mcp_server.server.get_settings",
+            return_value=MagicMock(),
+        ), patch(
+            "multiomics_explorer.mcp_server.server.kg_release_info",
+            side_effect=RuntimeError("boom"),
+        ), patch(
+            "multiomics_explorer.mcp_server.server._get_explorer_version",
+            return_value="0.0.0",
+        ):
+            async with lifespan(MagicMock()) as ctx:
+                assert ctx.kg_compat_report["verdict"] == "unknown"
+                assert "boom" in ctx.kg_compat_report["summary"]
 
     @pytest.mark.asyncio
     async def test_raises_when_neo4j_unreachable(self):

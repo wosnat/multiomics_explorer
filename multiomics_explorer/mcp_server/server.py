@@ -11,6 +11,7 @@ from dataclasses import dataclass
 
 from fastmcp import FastMCP
 
+from multiomics_explorer.api.functions import _get_explorer_version, kg_release_info
 from multiomics_explorer.config.settings import get_settings
 from multiomics_explorer.kg.connection import GraphConnection
 from multiomics_explorer.mcp_server.tools import register_tools
@@ -21,18 +22,44 @@ logger = logging.getLogger(__name__)
 @dataclass
 class KGContext:
     conn: GraphConnection
+    kg_compat_report: dict  # api.kg_release_info shape, cached at lifespan startup
 
 
 @asynccontextmanager
 async def lifespan(server: FastMCP):
-    """Manage Neo4j connection lifecycle."""
+    """Manage Neo4j connection lifecycle.
+
+    Also runs the KG↔explorer compatibility check once at startup and
+    caches the report on KGContext. The kg_release_info MCP tool reads
+    from this cache. Per design spec
+    docs/superpowers/specs/2026-06-02-kg-compatibility-check-design.md §9.
+    """
     settings = get_settings()
     conn = GraphConnection(settings)
     if not conn.verify_connectivity():
         raise RuntimeError(f"Cannot connect to Neo4j at {settings.neo4j_uri}")
     logger.info("Connected to Neo4j at %s", settings.neo4j_uri)
+
+    # KG compatibility check — defensive: never block startup on this.
     try:
-        yield KGContext(conn=conn)
+        report = kg_release_info(conn)
+    except Exception as e:
+        logger.warning("KG compatibility check failed to evaluate: %s", e)
+        report = {
+            "verdict": "unknown",
+            "summary": f"Check could not run: {e}",
+            "explorer_version": _get_explorer_version(),
+            "kg": {},
+            "asserts": [],
+        }
+
+    if report["verdict"] == "ok":
+        logger.info("KG compat: %s", report["summary"])
+    else:
+        logger.warning("KG compat: %s", report["summary"])
+
+    try:
+        yield KGContext(conn=conn, kg_compat_report=report)
     finally:
         conn.close()
         logger.info("Neo4j connection closed")
@@ -42,8 +69,11 @@ mcp = FastMCP(
     "multiomics-kg",
     instructions=(
         "Multi-omics knowledge graph for Prochlorococcus and Alteromonas "
-        "(39 tools across gene/sequence/expression/ortholog/ontology/cluster/"
+        "(40 tools across gene/sequence/expression/ortholog/ontology/cluster/"
         "chemistry/metabolomics/enrichment).\n\n"
+        "First call: kg_release_info — verifies your KG release matches what this "
+        "explorer-MCP version expects. Surfaces the KG's identity (version, "
+        "built_at, counts) and a verdict (ok / warn / unknown).\n\n"
         "Start here:\n"
         "  docs://guide/start_here  — pick the right tool for your question\n"
         "  docs://guide/concepts    — KG data model (Gene, Experiment, "
