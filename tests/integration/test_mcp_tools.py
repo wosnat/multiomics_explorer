@@ -730,6 +730,22 @@ class TestDifferentialExpressionByGene:
         assert summary["total_matching"] == detail["total_matching"]
         assert summary["total_matching"] == len(detail["results"])
 
+    def test_experiment_with_no_expression_edges(self, conn):
+        """Experiment without any Changes_expression_of edges returns empty
+        envelope, not IndexError. Vesicle-proteomics experiments live in the
+        KG but never wire up DE edges."""
+        result = api.differential_expression_by_gene(
+            experiment_ids=["10.1126/science.1243457_vesicle_proteomics_med4"],
+            significant_only=True,
+            conn=conn,
+        )
+        assert result["total_matching"] == 0
+        assert result["matching_genes"] == 0
+        assert result["results"] == []
+        assert result["top_categories"] == []
+        assert result["not_found"] == []
+        assert result["no_expression"] == []
+
 
 @pytest.mark.kg
 class TestDifferentialExpressionByOrtholog:

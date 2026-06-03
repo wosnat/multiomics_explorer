@@ -3338,6 +3338,11 @@ def build_differential_expression_by_gene_summary_diagnostics(
         where_block = (
             "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
         )
+        # Intermediate `WITH collect(...) AS top_categories` (pure aggregation,
+        # no grouping key) guarantees one row even when the MATCH is empty —
+        # without it, RETURN with literal grouping keys (`[] AS not_found`)
+        # collapses to zero rows when the experiment has no DE edges and
+        # callers IndexError on diag_raw[0].
         cypher = (
             "MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)\n"
             f"{where_block}"
@@ -3346,10 +3351,10 @@ def build_differential_expression_by_gene_summary_diagnostics(
             "     count(DISTINCT CASE WHEN r.expression_status <> 'not_significant'\n"
             "                         THEN g.locus_tag END) AS significant_genes\n"
             "ORDER BY significant_genes DESC\n"
-            "RETURN [] AS not_found, [] AS no_expression,\n"
-            "       collect({category: category, total_genes: total_genes,\n"
-            "                significant_genes: significant_genes})[0..5]"
-            " AS top_categories"
+            "WITH collect({category: category, total_genes: total_genes,\n"
+            "              significant_genes: significant_genes})[0..5]"
+            " AS top_categories\n"
+            "RETURN [] AS not_found, [] AS no_expression, top_categories"
         )
         return cypher, params
 
