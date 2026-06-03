@@ -1,0 +1,31 @@
+# Human-authored content for kg_release_info about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: First call in a new session
+    call: kg_release_info()
+    response: |
+      {"verdict": "ok", "explorer_version": "0.1.0a1", "kg": {"version": "0.1.0-alpha.1", "gene_count": 120416, "organism_count": 45, "experiment_count": 312}, "asserts": [{"name": "gene_label_exists", "passed": true, "detail": null}, ...], "summary": "OK: explorer 0.1.0a1 satisfies KG mcp_min_version 0.1.0; 16/16 schema asserts pass."}
+
+  - title: Diagnose a warn verdict
+    steps: |
+      Step 1: kg_release_info()
+              → check verdict field; if "warn", inspect the asserts list
+
+      Step 2: filter for failed asserts
+              failures = [a for a in report["asserts"] if not a["passed"]]
+
+      Step 3: read each failure's detail string
+              Common causes: KG upgraded but explorer is older (version_compat fails);
+              connected to a non-KG Neo4j database (most node-label asserts fail).
+
+chaining:
+  - "kg_release_info → kg_schema (verify compat, then introspect schema)"
+  - "kg_release_info → any analysis tool (if verdict != 'ok', surface warning before running real analysis)"
+
+mistakes:
+  - wrong: "Calling kg_release_info on every tool invocation"
+    right: "The check runs once at MCP server startup and caches the result. One call per session is enough — calling it 100 times returns the same answer 100 times."
+  - wrong: "Expecting kg_release_info to catch ontology-label mismatches (KeggTerm, EcTerm, TcdbFamily, etc.)"
+    right: "EXPECTED_KG_SHAPE only asserts the load-bearing core labels (Gene, Experiment, OrthologGroup, Publication, Schema_info). Ontology-specific labels are not asserted — they fail gracefully at query time. If verdict='ok' but a specific ontology tool errors, the issue is tool-side, not compat-check-side."

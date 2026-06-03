@@ -7163,7 +7163,7 @@ def kg_release_info(conn: GraphConnection) -> dict:
             "asserts": [],
             "summary": (
                 "UNKNOWN: Schema_info node not found "
-                "(pre-2026-05-31 KG, or wrong database?)."
+                "(legacy KG build without release metadata, or wrong database?)."
             ),
         }
 

@@ -1312,7 +1312,7 @@ class KGReleaseInfoResponse(BaseModel):
         description=(
             "'ok' = explorer version satisfies KG.mcp_min_version AND all schema asserts pass. "
             "'warn' = at least one assert failed; tools still work but may emit confusing errors. "
-            "'unknown' = check could not be evaluated (Schema_info missing — pre-2026-05-31 KG, or wrong DB)."
+            "'unknown' = check could not be evaluated (Schema_info missing — legacy KG build without release metadata, or wrong DB)."
         )
     )
     explorer_version: str = Field(description="Installed multiomics-explorer version (PEP 440 form, e.g. '0.1.0a1').")
@@ -1369,7 +1369,7 @@ def register_tools(mcp: FastMCP):
         Verdict semantics:
         - `ok`     — explorer satisfies KG min-version + all schema asserts pass.
         - `warn`   — at least one assert failed; tools still serve but may emit confusing errors against the affected shapes. Filter `asserts` on `passed=False` for the failure list.
-        - `unknown` — could not evaluate (no `Schema_info` node in the KG — pre-2026-05-31 build, or wrong database).
+        - `unknown` — could not evaluate (no `Schema_info` node in the KG — legacy build without release metadata, or wrong database).
 
         On non-`ok` verdicts, the tool emits `ctx.warning(summary)` so the surrounding MCP client surfaces it to the user. See `docs://guide/conventions` for cross-tool semantics.
         """
