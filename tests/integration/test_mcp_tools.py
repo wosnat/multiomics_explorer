@@ -3238,3 +3238,48 @@ class TestOntologyToolsPsortbSignalpLive:
             assert "signal_peptide_probability" in row
             # cleavage_site / cleavage_probability may be absent (stripped null)
             # or present (rare); both fine
+
+
+# ---------------------------------------------------------------------------
+# kg_release_info — MCP wrapper smoke (exercises full lifespan path)
+# ---------------------------------------------------------------------------
+
+
+def _ctx_with_kg_report(conn):
+    """Build an AsyncMock Context with the real GraphConnection and a live
+    kg_compat_report injected — mirrors what lifespan sets on KGContext."""
+    report = api.kg_release_info(conn)
+    ctx = AsyncMock()
+    ctx.request_context.lifespan_context.conn = conn
+    ctx.request_context.lifespan_context.kg_compat_report = report
+    return ctx
+
+
+@pytest.mark.kg
+class TestKGReleaseInfoMCPSmoke:
+    """Live-KG smoke through the MCP tool wrapper layer.
+
+    The tool reads kg_compat_report from KGContext (cached at lifespan startup
+    in production). Here we mirror that by calling api.kg_release_info(conn)
+    directly and injecting the result — this exercises the Pydantic response
+    model and the wrapper's KGReleaseInfoResponse(**report) path end-to-end.
+    """
+
+    @pytest.mark.asyncio
+    async def test_tool_returns_verdict_and_identity(self, tool_fns, conn):
+        """Exercises the wrapper: KGReleaseInfoResponse Pydantic model validates,
+        the tool returns a structured response with verdict + kg identity."""
+        ctx = _ctx_with_kg_report(conn)
+        response = await tool_fns["kg_release_info"](ctx)
+
+        # Pydantic model attribute access — not dict subscript
+        assert response.verdict in ("ok", "warn", "unknown"), (
+            f"Unexpected verdict={response.verdict!r}"
+        )
+        assert response.explorer_version  # non-empty string
+        assert response.kg.version  # KG declares a version string
+        assert response.kg.gene_count is not None and response.kg.gene_count > 0, (
+            f"gene_count should be a positive int, got {response.kg.gene_count!r}"
+        )
+        assert isinstance(response.asserts, list) and len(response.asserts) > 0
+        assert response.summary  # non-empty one-liner

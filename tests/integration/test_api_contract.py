@@ -1640,3 +1640,51 @@ class TestAssaysByMetaboliteContract:
         # not_found / not_matched: flat list[str] (single batch input).
         assert validated.not_found == []
         assert validated.not_matched == []
+
+
+# ---------------------------------------------------------------------------
+# kg_release_info — live-KG smoke
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.kg
+class TestKGReleaseInfoLive:
+    """Live-KG smoke for api/functions.kg_release_info."""
+
+    def test_returns_ok_verdict_against_dev_kg(self, conn):
+        """The dev KG at localhost:7687 should always satisfy the
+        installed explorer's compatibility check. If this fails,
+        EITHER:
+          1. The dev KG floated past the explorer's installed version.
+          2. EXPECTED_KG_SHAPE drifted from the dev KG schema
+             (the drift tests in test_kg_constants_drift.py will tell
+             you which assert failed).
+        """
+        from multiomics_explorer import kg_release_info
+
+        report = kg_release_info(conn)
+
+        if report["verdict"] != "ok":
+            pytest.fail(
+                f"Expected verdict='ok' against dev KG; got "
+                f"verdict={report['verdict']!r}, summary={report['summary']!r}.\n"
+                f"Failed asserts: "
+                f"{[a['name'] for a in report['asserts'] if not a['passed']]}"
+            )
+
+    def test_explorer_version_matches_importlib(self, conn):
+        """The reported explorer_version mirrors importlib.metadata exactly."""
+        from importlib.metadata import version
+        from multiomics_explorer import kg_release_info
+
+        report = kg_release_info(conn)
+        assert report["explorer_version"] == version("multiomics-explorer")
+
+    def test_kg_identity_has_real_counts(self, conn):
+        """The KG identity carries plausible counts (catches 'connected to empty DB')."""
+        from multiomics_explorer import kg_release_info
+
+        report = kg_release_info(conn)
+        assert report["kg"]["gene_count"] > 0
+        assert report["kg"]["experiment_count"] > 0
+        assert report["kg"]["version"]  # any non-empty string

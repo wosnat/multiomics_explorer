@@ -130,6 +130,7 @@ class TestExpressionConstants:
         )
 
 
+from multiomics_explorer.kg.constants import EXPECTED_KG_SHAPE
 from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
 
 
@@ -225,4 +226,68 @@ class TestOntologyConfig:
             f"ONTOLOGY_CONFIG['{key}']['parent_fulltext_index'] = '{idx}' — "
             f"fulltext index query failed. "
             f"Update ONTOLOGY_CONFIG in kg/queries_lib.py."
+        )
+
+
+# ---------------------------------------------------------------------------
+# EXPECTED_KG_SHAPE drift tests
+# ---------------------------------------------------------------------------
+
+
+class TestExpectedKGShape:
+    """Verify every entry in EXPECTED_KG_SHAPE is satisfied by the live KG.
+
+    These tests catch schema drift: renamed/dropped node labels, missing
+    relationship types, and stale Schema_info property expectations.
+
+    Failure remediation: update EXPECTED_KG_SHAPE in kg/constants.py
+    (drop the dead entry, or add the renamed one).
+    """
+
+    def test_expected_kg_shape_labels_present_in_kg(self, run_query):
+        """Every node label in EXPECTED_KG_SHAPE['required_node_labels']
+        must exist in the live KG. Drift catches: KG renamed a label, KG
+        dropped a label we expected.
+
+        Failure remediation: update EXPECTED_KG_SHAPE in kg/constants.py
+        (drop the dead label, or add the renamed one)."""
+        results = run_query("CALL db.labels() YIELD label RETURN collect(label) AS labels")
+        live_labels = set(results[0]["labels"])
+        expected = set(EXPECTED_KG_SHAPE["required_node_labels"])
+        missing = expected - live_labels
+        assert not missing, (
+            f"EXPECTED_KG_SHAPE['required_node_labels'] in kg/constants.py "
+            f"is out of sync with the live KG.\n  Missing from db.labels(): {missing}\n"
+            f"  Update kg/constants.py to drop the dead labels, or rebuild the KG."
+        )
+
+    def test_expected_kg_shape_relationship_types_present_in_kg(self, run_query):
+        """Every relationship type in EXPECTED_KG_SHAPE must exist."""
+        results = run_query(
+            "CALL db.relationshipTypes() YIELD relationshipType "
+            "RETURN collect(relationshipType) AS rt"
+        )
+        live_rts = set(results[0]["rt"])
+        expected = set(EXPECTED_KG_SHAPE["required_relationship_types"])
+        missing = expected - live_rts
+        assert not missing, (
+            f"EXPECTED_KG_SHAPE['required_relationship_types'] in kg/constants.py "
+            f"is out of sync with the live KG.\n  Missing from db.relationshipTypes(): {missing}\n"
+            f"  Update kg/constants.py to drop the dead rel types, or rebuild the KG."
+        )
+
+    def test_expected_kg_shape_schema_info_props_present_in_kg(self, run_query):
+        """Every property in EXPECTED_KG_SHAPE['schema_info_required_props']
+        must exist as a non-null Schema_info property in the live KG."""
+        results = run_query(
+            "MATCH (s:Schema_info {id: 'schema_info'}) RETURN s { .* } AS si"
+        )
+        assert results, "Schema_info node not found in live KG."
+        si = results[0]["si"]
+        expected = set(EXPECTED_KG_SHAPE["schema_info_required_props"])
+        missing = {p for p in expected if si.get(p) is None}
+        assert not missing, (
+            f"EXPECTED_KG_SHAPE['schema_info_required_props'] in kg/constants.py "
+            f"is out of sync with the live KG.\n  Missing or null on Schema_info: {missing}\n"
+            f"  Update kg/constants.py to drop the dead props, or rebuild the KG."
         )
