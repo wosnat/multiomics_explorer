@@ -3395,6 +3395,20 @@ def register_tools(mcp: FastMCP):
             description="Locus tags in KG but with no expression data"
             " matching filters",
         )
+        not_found_experiments: list[str] = Field(
+            default_factory=list,
+            description="Input experiment_ids not found in KG"
+            " (empty unless experiment_ids was provided)",
+        )
+        not_matched_experiments: list[str] = Field(
+            default_factory=list,
+            description="experiment_ids in KG but with no"
+            " Changes_expression_of edges satisfying the active filters"
+            " (e.g. vesicle proteomics / metabolomics experiments that"
+            " never wire up DE edges; or experiments where no row passes"
+            " direction / significant_only / growth_phases)."
+            " Empty unless experiment_ids was provided.",
+        )
         returned: int = Field(
             description="Rows in results (e.g. 5)",
         )
@@ -3551,6 +3565,8 @@ def register_tools(mcp: FastMCP):
                 experiments=exp_models,
                 not_found=data["not_found"],
                 no_expression=data["no_expression"],
+                not_found_experiments=data["not_found_experiments"],
+                not_matched_experiments=data["not_matched_experiments"],
                 returned=data["returned"],
                 truncated=data["truncated"],
                 results=result_models,

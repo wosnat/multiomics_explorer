@@ -1284,6 +1284,8 @@ class TestDiffExprByGeneCorrectness:
                 ],
                 "not_found": [],
                 "no_expression": [],
+                "not_found_experiments": [],
+                "not_matched_experiments": [],
                 "returned": 3,
                 "truncated": False,
                 "results": [
@@ -1355,6 +1357,8 @@ class TestDiffExprByGeneCorrectness:
                 ],
                 "not_found": [],
                 "no_expression": [],
+                "not_found_experiments": [],
+                "not_matched_experiments": [],
                 "returned": 1,
                 "truncated": False,
                 "results": [
@@ -1396,6 +1400,8 @@ class TestDiffExprByGeneCorrectness:
                 "experiments": [],
                 "not_found": ["FAKE_GENE"],
                 "no_expression": ["PMM9999"],
+                "not_found_experiments": [],
+                "not_matched_experiments": [],
                 "returned": 0,
                 "truncated": False,
                 "results": [],

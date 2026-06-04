@@ -733,9 +733,11 @@ class TestDifferentialExpressionByGene:
     def test_experiment_with_no_expression_edges(self, conn):
         """Experiment without any Changes_expression_of edges returns empty
         envelope, not IndexError. Vesicle-proteomics experiments live in the
-        KG but never wire up DE edges."""
+        KG but never wire up DE edges — they surface in
+        not_matched_experiments, not not_found_experiments."""
+        eid = "10.1126/science.1243457_vesicle_proteomics_med4"
         result = api.differential_expression_by_gene(
-            experiment_ids=["10.1126/science.1243457_vesicle_proteomics_med4"],
+            experiment_ids=[eid],
             significant_only=True,
             conn=conn,
         )
@@ -745,6 +747,31 @@ class TestDifferentialExpressionByGene:
         assert result["top_categories"] == []
         assert result["not_found"] == []
         assert result["no_expression"] == []
+        assert result["not_found_experiments"] == []
+        assert result["not_matched_experiments"] == [eid]
+
+    def test_experiment_not_found_in_mixed_input(self, conn):
+        """A bogus experiment_id mixed with a valid one surfaces in
+        not_found_experiments. (All-bogus input is rejected upfront by
+        single-organism validation before diagnostics run — that's
+        pre-existing behavior, not what this diagnostic targets.)"""
+        bogus = "does-not-exist-experiment-id"
+        valid = "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic"
+        result = api.differential_expression_by_gene(
+            experiment_ids=[bogus, valid],
+            summary=True,
+            conn=conn,
+        )
+        assert result["not_found_experiments"] == [bogus]
+        assert result["not_matched_experiments"] == []
+
+    def test_experiment_diagnostics_empty_without_experiment_ids(self, conn):
+        """Without experiment_ids the two diagnostic buckets stay empty."""
+        result = api.differential_expression_by_gene(
+            locus_tags=["PMM0001"], summary=True, conn=conn,
+        )
+        assert result["not_found_experiments"] == []
+        assert result["not_matched_experiments"] == []
 
 
 @pytest.mark.kg

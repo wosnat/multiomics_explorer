@@ -43,7 +43,7 @@ to `gene_response_profile`; cross-organism via
 ### Envelope
 
 ```expected-keys
-organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_categories, experiments, not_found, no_expression, returned, offset, truncated, results
+organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_categories, experiments, not_found, no_expression, not_found_experiments, not_matched_experiments, returned, offset, truncated, results
 ```
 
 - **organism_name** (string): Single organism for all results (e.g. 'Alteromonas macleodii HOT1A3')
@@ -61,6 +61,8 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 - **experiments** (list[ExpressionByExperiment]): Per-experiment summary with nested timepoint breakdown, sorted by significant row count desc
 - **not_found** (list[string]): Input locus_tags not found in KG
 - **no_expression** (list[string]): Locus tags in KG but with no expression data matching filters
+- **not_found_experiments** (list[string]): Input experiment_ids not found in KG (empty unless experiment_ids was provided)
+- **not_matched_experiments** (list[string]): experiment_ids in KG but with no Changes_expression_of edges satisfying the active filters (e.g. vesicle proteomics / metabolomics experiments that never wire up DE edges; or experiments where no row passes direction / significant_only / growth_phases). Empty unless experiment_ids was provided.
 - **returned** (int): Rows in results (e.g. 5)
 - **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
@@ -129,16 +131,26 @@ differential_expression_by_gene(locus_tags=["ACZ81_01830", "ACZ81_15555"], exper
 ```
 
 ```example-response
-{"organism_name": "Alteromonas macleodii HOT1A3", "matching_genes": 2, "total_matching": 6, "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 4}, "median_abs_log2fc": 2.78, "max_abs_log2fc": 3.591, "experiment_count": 1, "rows_by_treatment_type": {"nutrient_starvation": 6}, "by_table_scope": {"all_detected_genes": 6}, "top_categories": [{"category": "Inorganic ion transport", "total_genes": 1, "significant_genes": 1}, {"category": "Signal transduction", "total_genes": 1, "significant_genes": 1}], "experiments": [{"experiment_id": "10.1101/...", "experiment_name": "HOT1A3 PRO99-lowN nutrient starvation (RNASEQ)", "treatment_type": "nutrient_starvation", "omics_type": "RNASEQ", "coculture_partner": null, "is_time_course": "true", "table_scope": "all_detected_genes", "table_scope_detail": null, "matching_genes": 2, "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 4}, "timepoints": [{"timepoint": "day 18", "timepoint_hours": 432.0, "timepoint_order": 1, "matching_genes": 2, "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 2}}]}], "not_found": [], "no_expression": [], "returned": 5, "truncated": true, "offset": 0, "results": [{"locus_tag": "ACZ81_01830", "gene_name": "amtB", "experiment_id": "...", "treatment_type": "nutrient_starvation", "timepoint": "days 60+89", "timepoint_hours": null, "timepoint_order": 3, "log2fc": 3.591, "padj": 1.13e-12, "rank": 77, "rank_up": 1, "rank_down": null, "expression_status": "significant_up"}]}
+{"organism_name": "Alteromonas macleodii HOT1A3", "matching_genes": 2, "total_matching": 6, "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 4}, "median_abs_log2fc": 2.78, "max_abs_log2fc": 3.591, "experiment_count": 1, "rows_by_treatment_type": {"nutrient_starvation": 6}, "by_table_scope": {"all_detected_genes": 6}, "top_categories": [{"category": "Inorganic ion transport", "total_genes": 1, "significant_genes": 1}, {"category": "Signal transduction", "total_genes": 1, "significant_genes": 1}], "experiments": [{"experiment_id": "10.1101/...", "experiment_name": "HOT1A3 PRO99-lowN nutrient starvation (RNASEQ)", "treatment_type": "nutrient_starvation", "omics_type": "RNASEQ", "coculture_partner": null, "is_time_course": "true", "table_scope": "all_detected_genes", "table_scope_detail": null, "matching_genes": 2, "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 4}, "timepoints": [{"timepoint": "day 18", "timepoint_hours": 432.0, "timepoint_order": 1, "matching_genes": 2, "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 2}}]}], "not_found": [], "no_expression": [], "not_found_experiments": [], "not_matched_experiments": [], "returned": 5, "truncated": true, "offset": 0, "results": [{"locus_tag": "ACZ81_01830", "gene_name": "amtB", "experiment_id": "...", "treatment_type": "nutrient_starvation", "timepoint": "days 60+89", "timepoint_hours": null, "timepoint_order": 3, "log2fc": 3.591, "padj": 1.13e-12, "rank": 77, "rank_up": 1, "rank_down": null, "expression_status": "significant_up"}]}
 ```
 
-### Example 5: Both significant directions in one call (direction='both')
+### Example 5: Experiment without DE edges (vesicle proteomics / metabolomics)
+
+```example-call
+differential_expression_by_gene(experiment_ids=["10.1126/science.1243457_vesicle_proteomics_med4"], significant_only=True)
+```
+
+```example-response
+{"organism_name": "Prochlorococcus MED4", "matching_genes": 0, "total_matching": 0, "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 0}, "median_abs_log2fc": null, "max_abs_log2fc": null, "experiment_count": 0, "rows_by_treatment_type": {}, "rows_by_background_factors": {}, "rows_by_growth_phase": {}, "by_table_scope": {}, "top_categories": [], "experiments": [], "not_found": [], "no_expression": [], "not_found_experiments": [], "not_matched_experiments": ["10.1126/science.1243457_vesicle_proteomics_med4"], "returned": 0, "offset": 0, "truncated": false, "results": []}
+```
+
+### Example 6: Both significant directions in one call (direction='both')
 
 ```example-call
 differential_expression_by_gene(organism="MED4", direction="both", summary=True)
 ```
 
-### Example 6: Chaining — find genes then check expression
+### Example 7: Chaining — find genes then check expression
 
 ```
 Step 1: genes_by_function(search_text="nitrogen transport", organism="HOT1A3")
@@ -179,6 +191,14 @@ no_expression means no data available — gene may not have been profiled in tho
 ```
 
 ```mistake
+Reading an empty `results=[]` as 'no DE response' when experiment_ids was passed
+```
+
+```correction
+Check not_found_experiments (typo'd id) and not_matched_experiments (id real but no edges satisfy the filter — e.g. vesicle proteomics, or a too-strict significant_only). Empty results + non-empty not_matched_experiments means the filter eliminated every row, not that the gene didn't respond.
+```
+
+```mistake
 Interpreting a missing gene as 'not affected' without checking table_scope
 ```
 
@@ -212,7 +232,7 @@ Call once per organism — tool enforces single-organism constraint
 from multiomics_explorer import differential_expression_by_gene
 
 result = differential_expression_by_gene()
-# returns dict with keys: organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_categories, experiments, not_found, no_expression, offset, results
+# returns dict with keys: organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_categories, experiments, not_found, no_expression, not_found_experiments, not_matched_experiments, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

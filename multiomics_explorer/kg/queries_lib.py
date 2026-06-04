@@ -3403,6 +3403,58 @@ def build_differential_expression_by_gene_summary_diagnostics(
 
 
 # ---------------------------------------------------------------------------
+# Differential expression by gene — experiment diagnostics
+# ---------------------------------------------------------------------------
+
+
+def build_differential_expression_by_gene_experiment_diagnostics(
+    *,
+    experiment_ids: list[str],
+    organism: str | None = None,
+    locus_tags: list[str] | None = None,
+    direction: str | None = None,
+    significant_only: bool = False,
+    growth_phases: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Validate experiment IDs against KG + expression edges for DE-by-gene.
+
+    Mirrors `_build_de_by_ortholog_experiment_diagnostics` without the
+    ortholog-group join. RETURN keys: not_found_experiments,
+    not_matched_experiments. `not_matched` applies the other active
+    filters (organism, locus_tags, direction, significant_only,
+    growth_phases) so it reflects "no DE edges satisfy the user's query
+    on this experiment" rather than just "no edges at all".
+    """
+    # WHERE conditions WITHOUT experiment_ids filter (already via UNWIND)
+    conditions_no_eid, params = _differential_expression_where(
+        organism=organism, locus_tags=locus_tags,
+        experiment_ids=None, direction=direction,
+        significant_only=significant_only, growth_phases=growth_phases,
+    )
+    params["experiment_ids"] = experiment_ids
+
+    extra_and = (
+        " AND " + " AND ".join(conditions_no_eid)
+        if conditions_no_eid else ""
+    )
+
+    cypher = (
+        "UNWIND $experiment_ids AS eid\n"
+        "OPTIONAL MATCH (e:Experiment {id: eid})\n"
+        "WITH eid, e, CASE WHEN e IS NULL THEN true ELSE false END AS missing\n"
+        "OPTIONAL MATCH (e)-[r:Changes_expression_of]->(g:Gene)\n"
+        f"WHERE NOT missing{extra_and}\n"
+        "WITH eid, missing, count(r) AS matched_count\n"
+        "WITH collect(CASE WHEN missing THEN eid END) AS nf_raw,\n"
+        "     collect(CASE WHEN NOT missing AND matched_count = 0\n"
+        "             THEN eid END) AS nm_raw\n"
+        "RETURN [x IN nf_raw WHERE x IS NOT NULL] AS not_found_experiments,\n"
+        "       [x IN nm_raw WHERE x IS NOT NULL] AS not_matched_experiments"
+    )
+    return cypher, params
+
+
+# ---------------------------------------------------------------------------
 # Differential expression detail builder
 # ---------------------------------------------------------------------------
 

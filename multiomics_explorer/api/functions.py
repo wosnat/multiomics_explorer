@@ -80,6 +80,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_differential_expression_by_gene_summary_global,
     build_differential_expression_by_gene_summary_by_experiment,
     build_differential_expression_by_gene_summary_diagnostics,
+    build_differential_expression_by_gene_experiment_diagnostics,
     build_resolve_organism_for_organism,
     build_resolve_organism_for_locus_tags,
     build_resolve_organism_for_experiments,
@@ -2189,7 +2190,10 @@ def differential_expression_by_gene(
         rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count,
         rows_by_treatment_type, rows_by_background_factors, by_table_scope,
         rows_by_growth_phase, top_categories, experiments,
-        returned, truncated, not_found, no_expression, results.
+        returned, truncated, not_found, no_expression,
+        not_found_experiments, not_matched_experiments, results.
+        not_found_experiments/not_matched_experiments are populated only
+        when experiment_ids is provided (empty lists otherwise).
 
     growth_phases: if provided, restricts DE rows to those whose edge-level
     growth_phase property matches any of the specified values (case-insensitive).
@@ -2302,6 +2306,27 @@ def differential_expression_by_gene(
     not_found = diag_raw["not_found"]
     no_expression = diag_raw["no_expression"]
 
+    # --- Experiment diagnostics (only when experiment_ids provided) ---
+    if experiment_ids:
+        exp_diag_cypher, exp_diag_params = (
+            build_differential_expression_by_gene_experiment_diagnostics(
+                experiment_ids=experiment_ids,
+                organism=organism,
+                locus_tags=locus_tags,
+                direction=direction,
+                significant_only=significant_only,
+                growth_phases=growth_phases,
+            )
+        )
+        exp_diag_raw = conn.execute_query(
+            exp_diag_cypher, **exp_diag_params
+        )[0]
+        not_found_experiments = exp_diag_raw["not_found_experiments"]
+        not_matched_experiments = exp_diag_raw["not_matched_experiments"]
+    else:
+        not_found_experiments = []
+        not_matched_experiments = []
+
     # --- Detail query (skip when limit=0) ---
     if limit == 0:
         results = []
@@ -2328,6 +2353,8 @@ def differential_expression_by_gene(
         "experiments": experiments,
         "not_found": not_found,
         "no_expression": no_expression,
+        "not_found_experiments": not_found_experiments,
+        "not_matched_experiments": not_matched_experiments,
         "returned": returned,
         "offset": offset,
         "truncated": total_matching > offset + returned,

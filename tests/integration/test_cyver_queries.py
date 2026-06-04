@@ -29,6 +29,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_differential_expression_by_gene_summary_by_experiment,
     build_differential_expression_by_gene_summary_diagnostics,
     build_differential_expression_by_gene_summary_global,
+    build_differential_expression_by_gene_experiment_diagnostics,
     build_differential_expression_by_ortholog_diagnostics,
     build_differential_expression_by_ortholog_group_check,
     build_differential_expression_by_ortholog_membership_counts,
@@ -318,6 +319,7 @@ _BUILDERS: list[tuple[str, ...]] = [
     ("de_by_gene_summary_by_experiment", build_differential_expression_by_gene_summary_by_experiment, {}),
     ("de_by_gene_summary_diagnostics", build_differential_expression_by_gene_summary_diagnostics, {}),
     ("de_by_gene_summary_diagnostics_batch", build_differential_expression_by_gene_summary_diagnostics, {"locus_tags": _LOCUS}),
+    ("de_by_gene_experiment_diagnostics", build_differential_expression_by_gene_experiment_diagnostics, {"experiment_ids": _EIDS}),
     ("de_by_gene", build_differential_expression_by_gene, {}),
     # --- organism pre-validation ---
     ("resolve_organism_for_organism", build_resolve_organism_for_organism, {"organism": "Prochlorococcus"}),
