@@ -2844,6 +2844,8 @@ class TestDifferentialExpressionByGeneWrapper:
         ],
         "not_found": [],
         "no_expression": [],
+        "not_found_experiments": [],
+        "not_matched_experiments": [],
         "returned": 1,
         "truncated": True,
         "results": [
@@ -7828,6 +7830,8 @@ class TestDifferentialExpressionByGeneWrapperPhase2:
         "experiments": [],
         "not_found": [],
         "no_expression": [],
+        "not_found_experiments": [],
+        "not_matched_experiments": [],
         "returned": 0,
         "truncated": True,
         "results": [],

@@ -681,7 +681,9 @@ class TestDocstringCoverage:
         import multiomics_explorer as me
         for name, sections in self.REQUIRED_SECTIONS.items():
             obj = getattr(me, name)
-            doc = obj.__doc__ or ""
+            # Dedent via getdoc so anchored section headers (``^Parameters``)
+            # match indented numpydoc docstrings.
+            doc = inspect.getdoc(obj) or ""
             for section in sections:
                 pattern = rf"^{re.escape(section)}\s*$\s*^-+\s*$"
                 assert re.search(pattern, doc, re.MULTILINE), (

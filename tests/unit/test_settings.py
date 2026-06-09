@@ -5,7 +5,9 @@ from multiomics_explorer.config.settings import Settings
 
 def test_default_settings():
     """Default settings should have sensible values."""
-    s = Settings()
+    # _env_file=None isolates from a developer's local .env (which legitimately
+    # points at a real, possibly remote KG) so this tests true code defaults.
+    s = Settings(_env_file=None)
     assert s.neo4j_uri == "bolt://localhost:7687"
     assert s.neo4j_database == "neo4j"
     assert s.neo4j_auth is None  # no username/password by default
@@ -19,7 +21,7 @@ def test_neo4j_auth_when_set():
 
 def test_kg_repo_path_none_by_default():
     """KG repo path should be None by default."""
-    s = Settings()
+    s = Settings(_env_file=None)  # isolate from local .env (see test_default_settings)
     assert s.kg_repo is None
 
 
