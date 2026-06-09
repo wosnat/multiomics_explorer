@@ -22,6 +22,13 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [0.1.0-alpha.1] - 2026-06-09
+### Added
 - `kg_release_info` MCP tool: returns the KG's release identity
   (`Schema_info` properties — version, built_at, counts, git identity)
   and a three-valued compatibility verdict (`ok` / `warn` / `unknown`)
