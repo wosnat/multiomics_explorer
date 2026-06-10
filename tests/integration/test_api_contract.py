@@ -410,6 +410,7 @@ class TestDifferentialExpressionByGeneContract:
             "rows_by_background_factors", "rows_by_growth_phase",
             "by_table_scope",
             "top_categories", "experiments", "not_found", "no_expression",
+            "not_found_experiments", "not_matched_experiments",
             "returned", "truncated", "offset", "results",
         }
         assert set(result.keys()) == expected_keys

@@ -80,6 +80,7 @@ rows:
   - psortb
   - signalp
   - uniprot
+  discussed_in_publication_count: 0
   end: 1331
   expression_edge_count: 31
   function_description: Confers DNA tethering and processivity to DNA polymerases

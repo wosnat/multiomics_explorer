@@ -64,6 +64,7 @@ rows:
   - psortb
   - signalp
   - uniprot
+  discussed_in_publication_count: 0
   end: 304589
   expression_edge_count: 5
   function_description: Acts as a processive, ATP-dependent zinc metallopeptidase
