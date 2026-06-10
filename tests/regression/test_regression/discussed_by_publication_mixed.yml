@@ -1,13 +1,13 @@
 by_entity_kind:
 - count: 29
-  item: gene
+  entity_kind: gene
 - count: 8
-  item: kegg_pathway
+  entity_kind: kegg_pathway
 by_prominence:
-- count: 17
-  item: central
 - count: 20
-  item: peripheral
+  prominence: peripheral
+- count: 17
+  prominence: central
 case_id: discussed_by_publication_mixed
 not_found:
 - 10.0000/garbage

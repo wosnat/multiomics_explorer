@@ -11450,8 +11450,13 @@ class TestDiscussedByPublication:
         assert isinstance(result, dict)
         assert result["total_entries"] == 4
         assert result["total_matching"] == 4
-        assert "by_entity_kind" in result
-        assert "by_prominence" in result
+        # APOC {item, count} frequency rows must be renamed to the semantic key
+        # the MCP breakdown models expect (entity_kind / prominence), not passed
+        # through raw — a raw `item` key fails Pydantic validation at the wrapper.
+        assert result["by_entity_kind"][0]["entity_kind"] in ("gene", "kegg_pathway")
+        assert "item" not in result["by_entity_kind"][0]
+        assert result["by_prominence"][0]["prominence"] in ("central", "peripheral")
+        assert "item" not in result["by_prominence"][0]
         assert "top_kegg_pathways" in result
         assert "top_publications" in result
         assert result["results"][0]["entity_id"] == "PMT1030"

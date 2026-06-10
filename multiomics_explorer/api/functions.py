@@ -574,8 +574,14 @@ def discussed_by_publication(
     envelope: dict = {
         "total_entries": raw_summary["total_entries"],
         "total_matching": total_matching,
-        "by_entity_kind": raw_summary.get("by_entity_kind", []),
-        "by_prominence": raw_summary.get("by_prominence", []),
+        # Rename APOC {item, count} frequency rows to the semantic key the MCP
+        # breakdown models expect (parallels by_organism -> organism_name etc.).
+        "by_entity_kind": _rename_freq(
+            raw_summary.get("by_entity_kind", []), "entity_kind",
+        ),
+        "by_prominence": _rename_freq(
+            raw_summary.get("by_prominence", []), "prominence",
+        ),
         "top_kegg_pathways": raw_summary.get("top_kegg_pathways", []),
         "top_publications": raw_summary.get("top_publications", []),
         "not_found": not_found,
