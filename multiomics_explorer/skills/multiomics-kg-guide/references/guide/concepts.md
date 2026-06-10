@@ -101,7 +101,25 @@ and `list_organisms`. Discover valid values with
 ### Experiments and publications
 
 - **`Publication`** (42 nodes) — paper-level metadata (authors, DOI,
-  abstract). Connected to experiments via `Has_experiment`.
+  abstract). Connected to experiments via `Has_experiment`. Two
+  additional edge types index what each paper **names in prose** — a
+  recall-biased narrative literature index, distinct from the
+  supplementary DE-table expression data:
+  - `Publication_discusses_gene` (→ Gene) — genes the paper names in
+    text (regulators, model genes).
+  - `Publication_discusses_kegg_pathway` (→ KeggTerm, pathway-level) —
+    KEGG pathways the paper names.
+
+  Both edges carry `prominence` (`central` | `peripheral`) and an
+  extraction `evidence` quote. This is a **router, not exhaustive
+  coverage** — 935 distinct genes named across the whole corpus (out of
+  ~100k), spread over 40 of the 43 publications. Precomputed counts live
+  on the nodes (`Publication.discussed_gene_count` /
+  `.discussed_pathway_count`, `Gene.discussed_in_publication_count`).
+  Forward lookup: `discussed_by_publication` (paper → named genes +
+  pathways). Reverse signals are folded inline — `gene_overview` carries
+  per-gene `discussed_in_publication_count` + the discussing DOIs, and
+  `search_ontology` carries per-KEGG-term `discussed_by_n_publications`.
 - **`Experiment`** (~200 nodes) — one experimental contrast. Carries
   `treatment_type` (list[str], e.g. `['nutrient_stress']`),
   `background_factors` (list[str]|None), `omics_type` (e.g. `RNASEQ`,
@@ -323,6 +341,12 @@ To save you from asking:
 - **Full paper text.** `Publication` nodes carry metadata (title,
   authors, DOI, journal, year) and an abstract — but **not** the full
   body, figures, or supplementary materials. For the actual paper,
-  follow the DOI link to the publisher.
+  follow the DOI link to the publisher. Note: prose *mentions* of genes
+  and KEGG pathways ARE indexed best-effort via the
+  `Publication_discusses_gene` / `Publication_discusses_kegg_pathway`
+  edges (see "Experiments and publications" above) — so you can ask
+  "what does this paper discuss?" even though the full text is not
+  stored. That index is recall-biased, not a substitute for reading the
+  paper.
 
 For raw counts and property lists, call `kg_schema`.

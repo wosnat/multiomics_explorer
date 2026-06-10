@@ -29,7 +29,7 @@ Routing: drill via `list_experiments(publication_doi=[doi])` for per-experiment 
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, by_value_kind, by_metric_type, by_compartment, returned, offset, truncated, not_found, results
+total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, by_value_kind, by_metric_type, by_compartment, by_discusses_coverage, returned, offset, truncated, not_found, results
 ```
 
 - **total_entries** (int): Total publications in KG (unfiltered).
@@ -42,6 +42,7 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 - **by_value_kind** (list[PubValueKindBreakdown]): DerivedMetric value kind frequency rollup across matched publications.
 - **by_metric_type** (list[PubMetricTypeBreakdown]): DerivedMetric type frequency rollup across matched publications.
 - **by_compartment** (list[PubCompartmentBreakdown]): Wet-lab compartment frequency rollup across matched publications.
+- **by_discusses_coverage** (PubDiscussesCoverageBreakdown): Binary split {has_discusses, no_discusses} of matched publications by whether they carry a narrative 'discusses' literature index (40 vs 3 in the current KG).
 - **returned** (int): Publications in this response.
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if total_matching > returned.
@@ -71,6 +72,8 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 | metabolite_count | int (optional) | Distinct metabolites measured in this publication (precomputed Publication.metabolite_count). Non-zero on metabolomics-bearing papers. When > 0, drill via list_metabolite_assays(publication_doi=[...]) to inspect the paper's MetaboliteAssay nodes. |
 | metabolite_assay_count | int (optional) | Distinct MetaboliteAssay edges anchored to this publication (precomputed). Diverges from metabolite_count when the same metabolite is measured in multiple compartments per paper. |
 | metabolite_compartments | list[string] (optional) | Wet-lab compartments measured for metabolomics in this publication (e.g. ['whole_cell', 'extracellular']). Populated only when metabolite_assay_count > 0; [] otherwise. |
+| discussed_gene_count | int (optional) | Distinct genes this publication discusses in prose (precomputed Publication.discussed_gene_count). Recall-biased narrative index, NOT DE-table expression. When > 0, drill via discussed_by_publication(publication_dois=[doi]). |
+| discussed_pathway_count | int (optional) | Distinct KEGG pathways this publication discusses in prose (precomputed Publication.discussed_pathway_count). When > 0, drill via discussed_by_publication(publication_dois=[doi], entity_kind='kegg_pathway'). |
 | score | float \| None (optional) | Lucene relevance score (only with search_text). |
 | derived_metric_gene_count | int \| None (optional) | Total genes annotated by DerivedMetrics in this publication (verbose-only). |
 | derived_metric_types | list[string] \| None (optional) | Distinct DerivedMetric types in this publication (verbose-only). |
@@ -158,6 +161,26 @@ list_publications(search_text="metabolite")
  ]}
 ```
 
+### Example 7: Find publications with a narrative literature index
+
+```example-call
+list_publications()
+```
+
+```example-response
+# Per-row discussed_gene_count / discussed_pathway_count expose the
+# paper's prose literature index — the genes + KEGG pathways it names
+# in text. The envelope by_discusses_coverage splits the corpus into
+# has_discusses (40) vs no_discusses (3). Drill into a paper's named
+# entities via discussed_by_publication.
+{"total_matching": 21,
+ "by_discusses_coverage": {"has_discusses": 40, "no_discusses": 3},
+ "returned": 5, "truncated": true, "offset": 0,
+ "results": [
+   {"doi": "10.1038/ismej.2016.70", "title": "Transcriptional response of Prochlorococcus...", "year": 2016, "discussed_gene_count": 29, "discussed_pathway_count": 8}
+ ]}
+```
+
 ## Chaining patterns
 
 ```
@@ -168,6 +191,7 @@ list_publications(search_text=..., verbose=True) → classify → list_publicati
 list_publications(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric
 list_filter_values(filter_type='metric_type') → list_publications(search_text='<metric_type>') to find publications with that metric
 list_publications (per-row `metabolite_count > 0`) → list_metabolite_assays(publication_doi=[...]) to inspect the paper's MetaboliteAssay nodes (numeric vs boolean, compartment, detection-status rollup).
+list_publications (per-row `discussed_gene_count` or `discussed_pathway_count` > 0) → discussed_by_publication(publication_dois=[...]) to list the genes + KEGG pathways the paper names in prose.
 ```
 
 ## Common mistakes
@@ -181,6 +205,8 @@ list_publications (per-row `metabolite_count > 0`) → list_metabolite_assays(pu
 - experiment_count is per-publication — a publication with experiment_count=10 may span multiple organisms and treatment types.
 
 - metabolite_count > 0 indicates a metabolomics-bearing publication. Drill into MetaboliteAssay nodes via list_metabolite_assays(publication_doi=[...]); inspect compartments via metabolite_compartments per row.
+
+- discussed_gene_count / discussed_pathway_count are the paper's prose literature index — the genes + KEGG pathways it names in text (recall-biased, NOT exhaustive, NOT DE-table expression). 0 on both means no narrative index (3 such publications). Drill into the named entities via discussed_by_publication(publication_dois=[...]).
 
 ```mistake
 list_experiments(publication='Biller 2018')
@@ -196,7 +222,7 @@ list_publications(search_text='Biller') then list_experiments(publication_doi=['
 from multiomics_explorer import list_publications
 
 result = list_publications()
-# returns dict with keys: total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, by_value_kind, by_metric_type, by_compartment, offset, not_found, results
+# returns dict with keys: total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, by_value_kind, by_metric_type, by_compartment, by_discusses_coverage, offset, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

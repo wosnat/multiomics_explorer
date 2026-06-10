@@ -1,0 +1,82 @@
+by_entity_kind:
+- count: 29
+  item: gene
+- count: 8
+  item: kegg_pathway
+by_prominence:
+- count: 17
+  item: central
+- count: 20
+  item: peripheral
+case_id: discussed_by_publication_mixed
+not_found:
+- 10.0000/garbage
+not_matched:
+- 10.1126/science.1243457
+offset: 0
+results:
+- doi: 10.1038/ismej.2016.70
+  entity_id: PMT0238
+  entity_kind: gene
+  entity_name: bacteriocin-type signal sequence
+  organism: Prochlorococcus MIT9313
+  prominence: central
+- doi: 10.1038/ismej.2016.70
+  entity_id: PMT0246
+  entity_kind: gene
+  entity_name: possible Profilin
+  organism: Prochlorococcus MIT9313
+  prominence: central
+- doi: 10.1038/ismej.2016.70
+  entity_id: PMT0923
+  entity_kind: gene
+  entity_name: bacteriocin-type signal sequence
+  organism: Prochlorococcus MIT9313
+  prominence: central
+- doi: 10.1038/ismej.2016.70
+  entity_id: PMT0925
+  entity_kind: gene
+  entity_name: conserved hypothetical protein
+  organism: Prochlorococcus MIT9313
+  prominence: central
+- doi: 10.1038/ismej.2016.70
+  entity_id: PMT0928
+  entity_kind: gene
+  entity_name: bacteriocin-type signal sequence
+  organism: Prochlorococcus MIT9313
+  prominence: central
+returned: 5
+row_count: 5
+top_kegg_pathways:
+- id: kegg.pathway:ko00010
+  n: 1
+  name: Glycolysis / Gluconeogenesis
+- id: kegg.pathway:ko00710
+  n: 1
+  name: Carbon fixation by Calvin cycle
+- id: kegg.pathway:ko00030
+  n: 1
+  name: Pentose phosphate pathway
+- id: kegg.pathway:ko00061
+  n: 1
+  name: Fatty acid biosynthesis
+- id: kegg.pathway:ko00860
+  n: 1
+  name: Porphyrin metabolism
+- id: kegg.pathway:ko00230
+  n: 1
+  name: Purine metabolism
+- id: kegg.pathway:ko01230
+  n: 1
+  name: Biosynthesis of amino acids
+- id: kegg.pathway:ko00195
+  n: 1
+  name: Photosynthesis
+top_publications:
+- doi: 10.1038/ismej.2016.70
+  n: 37
+  title: 'Transcriptional response of Prochlorococcus to co-culture with a marine
+    Alteromonas: differences between strains and the involvement of putative infochemicals'
+total_entries: 37
+total_matching: 37
+truncated: true

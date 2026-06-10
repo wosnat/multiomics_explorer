@@ -12,6 +12,8 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  discussed_gene_count: 29
+  discussed_pathway_count: 8
   doi: 10.1038/ismej.2016.70
   experiment_count: 5
   growth_phases:

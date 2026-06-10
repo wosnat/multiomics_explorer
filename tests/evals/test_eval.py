@@ -53,6 +53,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_search_homolog_groups_summary,
     build_search_ontology,
     build_differential_expression_by_ortholog_results,
+    build_discussed_by_publication,
+    build_discussed_by_publication_summary,
 )
 
 # ---------------------------------------------------------------------------
@@ -84,6 +86,8 @@ TOOL_BUILDERS = {
     "ontology_landscape": None,
     "gene_ontology_terms": build_gene_ontology_terms,
     "list_publications": build_list_publications,
+    "discussed_by_publication": build_discussed_by_publication,
+    "discussed_by_publication_summary": build_discussed_by_publication_summary,
     "list_metabolites": build_list_metabolites,
     "list_metabolite_assays": build_list_metabolite_assays,
     "genes_by_metabolite": build_genes_by_metabolite_metabolism,

@@ -15,6 +15,7 @@ rows:
   closest_ortholog_group_size: 9
   cluster_membership_count: 0
   cluster_types: []
+  discussed_in_publication_count: 0
   evidence_sources: []
   expression_edge_count: 9
   gene_category: Transcription

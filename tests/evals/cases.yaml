@@ -1862,3 +1862,18 @@
     columns:
       [anchor_locus_tag, neighbor_locus_tag, rank_offset, bp_gap, strand,
        same_strand, product, gene_name, gene_category]
+
+# ── Publication "discusses" literature index ─────────────
+
+- id: discussed_by_publication_mixed
+  tool: discussed_by_publication
+  desc: Forward lookup over mixed valid / edgeless / garbage DOIs (pins not_found / not_matched)
+  params:
+    publication_dois:
+      - "10.1038/ismej.2016.70"
+      - "10.1126/science.1243457"
+      - "10.0000/garbage"
+    limit: 5
+  expect:
+    min_rows: 1
+    columns: [doi, entity_kind, entity_id, entity_name, prominence]

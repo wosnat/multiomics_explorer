@@ -21,7 +21,7 @@ Routing: drill into each axis when the per-gene signal is non-zero — `gene_ont
 ### Envelope
 
 ```expected-keys
-total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, has_chemistry, returned, offset, truncated, not_found, results
+total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, has_chemistry, has_discussed, top_discussing_publications, returned, offset, truncated, not_found, results
 ```
 
 - **total_matching** (int): Genes found in KG from input locus_tags.
@@ -35,6 +35,8 @@ total_matching, by_organism, by_category, by_annotation_type, by_annotation_stat
 - **has_clusters** (int): Genes with cluster membership.
 - **has_derived_metrics** (int): Count of requested locus_tags carrying any DM annotation.
 - **has_chemistry** (int): Count of requested locus_tags with non-empty evidence_sources (participate in at least one reaction-to-metabolite or transport path).
+- **has_discussed** (int): Count of requested locus_tags discussed in prose by at least one publication (discussed_in_publication_count > 0).
+- **top_discussing_publications** (list[OverviewDiscussingPublication]): Publications ranked by how many of the queried genes they discuss (batch set-coverage — recovers 'which one paper covers most of my gene set'). Feed a doi into discussed_by_publication for that paper's full discussed set.
 - **returned** (int): Results in this response (0 when summary=true).
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if total_matching > returned.
@@ -66,6 +68,7 @@ total_matching, by_organism, by_category, by_annotation_type, by_annotation_stat
 | metabolite_count | int (optional) | Distinct metabolites reachable from this gene via reaction OR transport (UNION). Differs from OrganismTaxon.metabolite_count which is reaction-only — a transport-only gene can have reaction_count=0 with metabolite_count > 0. |
 | transporter_count | int (optional) | Distinct TCDB families annotated to this gene. When > 0, drill via genes_by_metabolite or metabolites_by_gene with the transport arm. |
 | evidence_sources | list[string] (optional) | Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. When non-empty, drill into metabolites_by_gene(locus_tags=[...]). Per-source definitions: see docs://guide/concepts. |
+| discussed_in_publication_count | int (optional) | Distinct publications that discuss this gene in prose (precomputed Gene.discussed_in_publication_count). Recall-biased narrative mention, NOT DE-table expression. When > 0, set verbose=True for the per-paper DOI list, or call discussed_by_publication for a paper's full discussed set. |
 | numeric_metric_count | int \| None (optional) | Numeric DM count (verbose-only). |
 | boolean_metric_count | int \| None (optional) | Boolean DM count (verbose-only). |
 | categorical_metric_count | int \| None (optional) | Categorical DM count (verbose-only). |
@@ -78,6 +81,7 @@ total_matching, by_organism, by_category, by_annotation_type, by_annotation_stat
 
 | Field | Type | Description |
 |---|---|---|
+| discussed_in_publications | list[DiscussedPublicationRef] \| None (optional) | Per-paper {doi, prominence, evidence} for papers discussing this gene (verbose-only; avg ~1, max 6 per gene). The evidence quote explains the mention inline. Call discussed_by_publication for a paper's full discussed set. |
 | gene_summary | string \| None (optional) | Concatenated summary text (verbose-only, e.g. 'prmA :: ribosomal protein L11 methyltransferase :: Methylates ribosomal protein L11'). |
 | function_description | string \| None (optional) | Curated functional description (verbose-only). May be null when no curated text exists. |
 | all_identifiers | list[string] \| None (optional) | Cross-references: UniProt, CyanorakID, RefSeq, etc. (verbose-only). |
@@ -156,6 +160,28 @@ gene_overview(locus_tags=["PMM0392"])
  ]}
 ```
 
+### Example 7: Genes named in the literature — which paper discusses them
+
+```example-call
+gene_overview(locus_tags=["PMT2118", "PMT_1030"])
+```
+
+```example-response
+# Per-row discussed_in_publication_count flags genes a paper names in
+# prose (avg 1.18, max 6 per gene). The envelope has_discussed counts
+# input genes with >=1 discussing pub; top_discussing_publications
+# ranks papers by how many of the queried genes they discuss
+# (batch set-coverage — "which one paper covers most of my gene set").
+{"total_matching": 2, "has_discussed": 2, "returned": 2, "truncated": false, "offset": 0, "not_found": [],
+ "top_discussing_publications": [
+   {"doi": "10.1038/ismej.2016.70", "title": "Transcriptional response of Prochlorococcus...", "n_genes": 2}
+ ],
+ "results": [
+   {"locus_tag": "PMT2118", "gene_name": null, "product": "Hypothetical protein", "organism_name": "Prochlorococcus MIT9313", "discussed_in_publication_count": 1},
+   {"locus_tag": "PMT_1030", "gene_name": null, "product": "possible Glucose-6-phosphate dehydrogenase, C-ter", "organism_name": "Prochlorococcus MIT9313", "discussed_in_publication_count": 1}
+ ]}
+```
+
 ## Chaining patterns
 
 ```
@@ -168,6 +194,7 @@ gene_overview → gene_clusters_by_gene
 gene_overview(locus_tags=...) → for genes with derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric; for ['numeric'] use genes_by_numeric_metric; for ['categorical'] use genes_by_categorical_metric
 gene_overview(verbose=True) → see compartments_observed for vesicle/whole-cell triage
 gene_overview (per-row `evidence_sources` non-empty) → metabolites_by_gene OR genes_by_metabolite for chemistry drill-down.
+gene_overview (per-row `discussed_in_publication_count` > 0) → use verbose=True for the per-gene {doi, prominence, evidence} list, or discussed_by_publication(publication_dois=[...]) for the paper's full discussed set.
 ```
 
 ## Common mistakes
@@ -179,6 +206,8 @@ gene_overview (per-row `evidence_sources` non-empty) → metabolites_by_gene OR 
 - annotation_types lists which ontology types have data — use gene_ontology_terms to get the actual terms.
 
 - When `evidence_sources` is non-empty, drill via `metabolites_by_gene` (gene-anchored) or `genes_by_metabolite` (metabolite-anchored). Values are subset of {'metabolism', 'transport', 'metabolomics'} — 'metabolomics' means at least one of the gene's reachable metabolites has measurement coverage.
+
+- discussed_in_publication_count > 0 means at least one publication names this gene in prose (a recall-biased literature index, NOT DE-table expression). At ~1 pub/gene the answer is usually inline: verbose=True returns discussed_in_publications as {doi, prominence, evidence} per gene. Use discussed_by_publication for a paper's full discussed set.
 
 ```mistake
 gene_overview(locus_tags=['PMM0845'], verbose=True)  # just to see the gene
@@ -194,7 +223,7 @@ gene_overview(locus_tags=['PMM0845'])  # verbose only needed for gene_summary te
 from multiomics_explorer import gene_overview
 
 result = gene_overview(locus_tags=...)
-# returns dict with keys: total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, has_chemistry, offset, not_found, results
+# returns dict with keys: total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, has_chemistry, has_discussed, top_discussing_publications, offset, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

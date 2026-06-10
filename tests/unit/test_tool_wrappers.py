@@ -77,6 +77,7 @@ EXPECTED_TOOLS = [
     "assays_by_metabolite",
     "gene_aa_sequence",
     "gene_neighbors",
+    "discussed_by_publication",
 ]
 
 
@@ -6445,13 +6446,16 @@ class TestExpectedToolsUnchangedForTcdbCazy:
         # (gene_aa_sequence + gene_neighbors — both legitimate new MCP tools,
         # separate spec, parallel addition).
         # Bumped 39 → 40 by kg_release_info (KG compatibility check tool).
-        assert len(EXPECTED_TOOLS) == 40, (
+        # Bumped 40 → 41 by discussed_by_publication (literature-index forward
+        # tool; the 3 sibling extensions add fields only, no new tool).
+        assert len(EXPECTED_TOOLS) == 41, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
             "tcdb/cazy adds NO new tools (it's a Mode-B ontology surface "
             "refresh); MBG legitimately adds one; "
             "list_metabolite_assays legitimately adds one; "
             "metabolites-by-assay 3-tool slice legitimately adds three; "
-            "gene_aa_sequence + gene_neighbors legitimately add two."
+            "gene_aa_sequence + gene_neighbors legitimately add two; "
+            "discussed_by_publication legitimately adds one."
         )
 
 
@@ -7078,7 +7082,9 @@ class TestExpectedToolsUnchangedForPhase1Plumbing:
         # (gene_aa_sequence + gene_neighbors — both legitimate new MCP tools,
         # separate spec).
         # Bumped 39 → 40 by kg_release_info (KG compatibility check tool).
-        assert len(EXPECTED_TOOLS) == 40, (
+        # Bumped 40 → 41 by discussed_by_publication (literature-index forward
+        # tool; its 3 sibling extensions add fields only, no new tool).
+        assert len(EXPECTED_TOOLS) == 41, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
             "Phase 1 plumbing adds no new tools — only field additions; "
             "Phase 5 list_metabolite_assays legitimately adds one; "
@@ -8688,7 +8694,9 @@ class TestExpectedToolsUnchangedForPsortbSignalp:
     def test_expected_tools_size_unchanged_at_40(self):
         # No new tool — only ontology surface refresh.
         # Bumped 39 → 40 by kg_release_info (KG compatibility check tool).
-        assert len(EXPECTED_TOOLS) == 40, (
+        # Bumped 40 → 41 by discussed_by_publication (literature-index forward
+        # tool; its 3 sibling extensions add fields only, no new tool).
+        assert len(EXPECTED_TOOLS) == 41, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
             "psortb/signalp adds NO new tools (Mode-B ontology surface refresh); "
             "kg_release_info legitimately adds one."
@@ -8761,3 +8769,380 @@ class TestKGReleaseInfoTool:
         bad["verdict"] = "bogus"
         with pytest.raises(ValidationError):
             KGReleaseInfoResponse(**bad)
+
+
+# ===========================================================================
+# Publication "discusses" literature-index surface
+# (docs/tool-specs/publication-discusses-surface.md)
+# ===========================================================================
+
+
+class TestDiscussedByPublicationWrapper:
+    """New tool wrapper: discussed_by_publication. Polymorphic rows (gene +
+    kegg_pathway via union padding). Pydantic response model
+    DiscussedByPublicationResponse."""
+
+    _SAMPLE_API_RETURN = {
+        "total_entries": 4,
+        "total_matching": 4,
+        "returned": 2,
+        "offset": 0,
+        "truncated": True,
+        "by_entity_kind": [{"entity_kind": "gene", "count": 3},
+                           {"entity_kind": "kegg_pathway", "count": 1}],
+        "by_prominence": [{"prominence": "central", "count": 2},
+                          {"prominence": "peripheral", "count": 2}],
+        "top_kegg_pathways": [
+            {"id": "kegg.pathway:ko00710", "name": "Carbon fixation", "n": 1}],
+        "top_publications": [
+            {"doi": "10.1038/ismej.2016.70", "title": "Paper A", "n": 4}],
+        "not_found": [],
+        "not_matched": [],
+        "results": [
+            {"doi": "10.1038/ismej.2016.70", "entity_kind": "gene",
+             "entity_id": "PMT1030", "entity_name": "psbA",
+             "organism": "Prochlorococcus MED4", "prominence": "central"},
+            {"doi": "10.1038/ismej.2016.70", "entity_kind": "kegg_pathway",
+             "entity_id": "kegg.pathway:ko00710", "entity_name": "Carbon fixation",
+             "organism": None, "prominence": "peripheral"},
+        ],
+    }
+
+    @pytest.mark.asyncio
+    async def test_returns_response_model(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.discussed_by_publication",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["discussed_by_publication"](
+                mock_ctx, publication_dois=["10.1038/ismej.2016.70"],
+            )
+        assert result.total_entries == 4
+        assert result.total_matching == 4
+        assert result.returned == 2
+        assert result.truncated is True
+        assert len(result.results) == 2
+        r = result.results[0]
+        assert r.doi == "10.1038/ismej.2016.70"
+        assert r.entity_kind == "gene"
+        assert r.entity_id == "PMT1030"
+        assert r.prominence == "central"
+
+    @pytest.mark.asyncio
+    async def test_pathway_row_organism_none(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.discussed_by_publication",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["discussed_by_publication"](
+                mock_ctx, publication_dois=["10.1038/ismej.2016.70"],
+            )
+        pathway = [r for r in result.results if r.entity_kind == "kegg_pathway"][0]
+        assert pathway.organism is None
+
+    @pytest.mark.asyncio
+    async def test_envelope_rollups(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.discussed_by_publication",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["discussed_by_publication"](
+                mock_ctx, publication_dois=["10.1038/ismej.2016.70"],
+            )
+        assert result.by_entity_kind is not None
+        assert result.by_prominence is not None
+        assert result.top_kegg_pathways is not None
+        assert result.top_publications is not None
+
+    @pytest.mark.asyncio
+    async def test_not_found_and_not_matched(self, tool_fns, mock_ctx):
+        data = {**self._SAMPLE_API_RETURN,
+                "not_found": ["10.0/missing"], "not_matched": ["10.1/empty"]}
+        with patch(
+            "multiomics_explorer.api.functions.discussed_by_publication",
+            return_value=data,
+        ):
+            result = await tool_fns["discussed_by_publication"](
+                mock_ctx, publication_dois=["10.1038/ismej.2016.70"],
+            )
+        assert "10.0/missing" in result.not_found
+        assert "10.1/empty" in result.not_matched
+
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.discussed_by_publication",
+            return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["discussed_by_publication"](
+                mock_ctx,
+                publication_dois=["10.1038/ismej.2016.70"],
+                entity_kind="gene",
+                prominence="central",
+                summary=False,
+                verbose=True,
+                limit=10,
+                offset=5,
+            )
+        mock_api.assert_called_once()
+        call = mock_api.call_args
+        assert call.kwargs["entity_kind"] == "gene"
+        assert call.kwargs["prominence"] == "central"
+        assert call.kwargs["verbose"] is True
+        assert call.kwargs["limit"] == 10
+        assert call.kwargs["offset"] == 5
+
+    @pytest.mark.asyncio
+    async def test_verbose_row_carries_evidence(self, tool_fns, mock_ctx):
+        data = {
+            **self._SAMPLE_API_RETURN,
+            "results": [
+                {"doi": "10.1038/ismej.2016.70", "entity_kind": "gene",
+                 "entity_id": "PMT1030", "entity_name": "psbA",
+                 "organism": "Prochlorococcus MED4", "prominence": "central",
+                 "evidence": "psbA is the model gene"},
+            ],
+            "returned": 1,
+        }
+        with patch(
+            "multiomics_explorer.api.functions.discussed_by_publication",
+            return_value=data,
+        ):
+            result = await tool_fns["discussed_by_publication"](
+                mock_ctx, publication_dois=["10.1038/ismej.2016.70"], verbose=True,
+            )
+        assert result.results[0].evidence == "psbA is the model gene"
+
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.discussed_by_publication",
+            side_effect=ValueError("publication_dois must not be empty"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["discussed_by_publication"](
+                    mock_ctx, publication_dois=[],
+                )
+
+    @pytest.mark.asyncio
+    async def test_unexpected_error_raises_tool_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.discussed_by_publication",
+            side_effect=RuntimeError("boom"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["discussed_by_publication"](
+                    mock_ctx, publication_dois=["10.1/x"],
+                )
+
+
+class TestDiscussedPublicationRefModel:
+    """Shared submodel DiscussedPublicationRef (doi, prominence, evidence),
+    reused by gene_overview + search_ontology verbose discussed lists."""
+
+    def test_model_importable_and_shape(self):
+        from multiomics_explorer.mcp_server.tools import DiscussedPublicationRef
+        ref = DiscussedPublicationRef(
+            doi="10.1038/ismej.2016.70", prominence="central",
+            evidence="psbA is the model gene",
+        )
+        assert ref.doi == "10.1038/ismej.2016.70"
+        assert ref.prominence == "central"
+        assert ref.evidence == "psbA is the model gene"
+
+
+class TestGeneOverviewWrapperDiscusses:
+    """Extension 1: gene_overview response gains per-row
+    discussed_in_publication_count + discussed_in_publications, envelope
+    has_discussed + top_discussing_publications."""
+
+    def _api_return(self, verbose=False):
+        row = {
+            "locus_tag": "PMT1030", "gene_name": "psbA", "product": "PSII",
+            "gene_category": "Photosynthesis", "annotation_quality": 3,
+            "organism_name": "Prochlorococcus MED4",
+            "annotation_types": [], "annotation_state": "informative_multi",
+            "informative_annotation_types": [],
+            "expression_edge_count": 0,
+            "significant_up_count": 0, "significant_down_count": 0,
+            "closest_ortholog_group_size": 1, "closest_ortholog_genera": [],
+            "cluster_membership_count": 0, "cluster_types": [],
+            "derived_metric_count": 0, "derived_metric_value_kinds": [],
+            "discussed_in_publication_count": 2,
+        }
+        if verbose:
+            row["discussed_in_publications"] = [
+                {"doi": "10.1038/ismej.2016.70", "prominence": "central",
+                 "evidence": "psbA is the model gene"},
+            ]
+        return {
+            "total_matching": 1,
+            "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
+            "by_category": [], "by_annotation_type": [], "by_annotation_state": [],
+            "has_expression": 0, "has_significant_expression": 0,
+            "has_orthologs": 0, "has_clusters": 0, "has_derived_metrics": 0,
+            "has_chemistry": 0,
+            "has_discussed": 1,
+            "top_discussing_publications": [
+                {"doi": "10.1038/ismej.2016.70", "title": "Paper A", "n_genes": 1}],
+            "returned": 1, "offset": 0, "truncated": False,
+            "not_found": [],
+            "results": [row],
+        }
+
+    @pytest.mark.asyncio
+    async def test_compact_row_has_discussed_count(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=self._api_return(),
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["PMT1030"],
+            )
+        assert result.results[0].discussed_in_publication_count == 2
+
+    @pytest.mark.asyncio
+    async def test_envelope_has_discussed(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=self._api_return(),
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["PMT1030"],
+            )
+        assert result.has_discussed == 1
+
+    @pytest.mark.asyncio
+    async def test_envelope_top_discussing_publications(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=self._api_return(),
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["PMT1030"],
+            )
+        assert result.top_discussing_publications[0].doi == "10.1038/ismej.2016.70"
+        assert result.top_discussing_publications[0].n_genes == 1
+
+    @pytest.mark.asyncio
+    async def test_verbose_row_discussed_publications(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=self._api_return(verbose=True),
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["PMT1030"], verbose=True,
+            )
+        refs = result.results[0].discussed_in_publications
+        assert refs[0].doi == "10.1038/ismej.2016.70"
+        assert refs[0].prominence == "central"
+        assert refs[0].evidence == "psbA is the model gene"
+
+
+class TestSearchOntologyWrapperDiscusses:
+    """Extension 2: search_ontology wrapper gains a verbose param + per-KEGG-row
+    discussed_by_n_publications + discussed_in_publications."""
+
+    def _api_return(self, verbose=False):
+        row = {
+            "id": "kegg.pathway:ko00710", "name": "Carbon fixation",
+            "score": 5.0, "level": 2, "is_informative": True,
+            "discussed_by_n_publications": 19,
+        }
+        if verbose:
+            row["discussed_in_publications"] = [
+                {"doi": "10.1038/ismej.2016.70", "prominence": "central",
+                 "evidence": "carbon fixation is discussed"},
+            ]
+        return {
+            "total_entries": 1, "total_matching": 1,
+            "score_max": 5.0, "score_median": 5.0,
+            "returned": 1, "truncated": False, "results": [row],
+        }
+
+    @pytest.mark.asyncio
+    async def test_wrapper_accepts_verbose_param(self, tool_fns, mock_ctx):
+        """search_ontology wrapper must accept the new verbose kwarg and forward
+        it to the api function."""
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value=self._api_return(),
+        ) as mock_api:
+            await tool_fns["search_ontology"](
+                mock_ctx, search_text="carbon", ontology="kegg", verbose=True,
+            )
+        assert mock_api.call_args.kwargs.get("verbose") is True
+
+    @pytest.mark.asyncio
+    async def test_kegg_row_has_discussed_count(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value=self._api_return(),
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, search_text="carbon", ontology="kegg",
+            )
+        assert result.results[0].discussed_by_n_publications == 19
+
+    @pytest.mark.asyncio
+    async def test_kegg_verbose_row_has_discussed_list(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value=self._api_return(verbose=True),
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, search_text="carbon", ontology="kegg", verbose=True,
+            )
+        refs = result.results[0].discussed_in_publications
+        assert refs[0].doi == "10.1038/ismej.2016.70"
+        assert refs[0].evidence == "carbon fixation is discussed"
+
+
+class TestListPublicationsWrapperDiscusses:
+    """Extension 3: list_publications response gains per-row discussed_gene_count
+    + discussed_pathway_count and envelope by_discusses_coverage."""
+
+    def _api_return(self):
+        return {
+            "total_entries": 1, "total_matching": 1,
+            "by_organism": [], "by_treatment_type": [], "by_background_factors": [],
+            "by_omics_type": [], "by_cluster_type": [], "by_value_kind": [],
+            "by_metric_type": [], "by_compartment": [],
+            "by_discusses_coverage": {"has_discusses": 1, "no_discusses": 0},
+            "returned": 1, "offset": 0, "truncated": False, "not_found": [],
+            "results": [
+                {"doi": "10.1038/ismej.2016.70", "title": "Paper A", "authors": ["A"],
+                 "year": 2016, "journal": "ISMEJ", "study_type": "S",
+                 "organisms": ["MED4"], "experiment_count": 1,
+                 "treatment_types": ["coculture"], "background_factors": [],
+                 "omics_types": ["RNASEQ"],
+                 "clustering_analysis_count": 0, "cluster_types": [],
+                 "growth_phases": [],
+                 "derived_metric_count": 0, "derived_metric_value_kinds": [],
+                 "compartments": [],
+                 "metabolite_count": 0, "metabolite_assay_count": 0,
+                 "metabolite_compartments": [],
+                 "discussed_gene_count": 25, "discussed_pathway_count": 4},
+            ],
+        }
+
+    @pytest.mark.asyncio
+    async def test_row_has_discussed_counts(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value=self._api_return(),
+        ):
+            result = await tool_fns["list_publications"](mock_ctx)
+        r = result.results[0]
+        assert r.discussed_gene_count == 25
+        assert r.discussed_pathway_count == 4
+
+    @pytest.mark.asyncio
+    async def test_envelope_by_discusses_coverage(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value=self._api_return(),
+        ):
+            result = await tool_fns["list_publications"](mock_ctx)
+        assert result.by_discusses_coverage.has_discusses == 1
+        assert result.by_discusses_coverage.no_discusses == 0

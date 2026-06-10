@@ -20,6 +20,7 @@ see docs://guide/conventions for syntax + scoring.
 | level | int \| None | None | Hierarchy level filter (0 = broadest). See docs://guide/conventions for the level convention. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' go:0008150). Term-side filter only — never restricts the gene set. Default False (opt-in). |
+| verbose | bool | False | Include the per-row discussed_in_publications {doi, prominence, evidence} list (KEGG pathways only). Default compact. |
 
 ## Response format
 
@@ -48,6 +49,13 @@ total_entries, total_matching, score_max, score_median, returned, offset, trunca
 | is_informative | bool | True iff term is not flagged is_uninformative (positive framing; coerced from sparse '<term>.is_uninformative' KG flag) |
 | tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
 | tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
+| discussed_by_n_publications | int \| None (optional) | Publications that discuss this KEGG pathway in prose (KEGG only; None on other ontologies). Recall-biased narrative mention, NOT gene annotation. When > 0, set verbose=True for the per-paper DOI list, or call discussed_by_publication. |
+
+**Verbose-only fields** (included when `verbose=True`):
+
+| Field | Type | Description |
+|---|---|---|
+| discussed_in_publications | list[DiscussedPublicationRef] \| None (optional) | Per-paper {doi, prominence, evidence} for papers discussing this KEGG pathway (verbose-only; KEGG only). Call discussed_by_publication for a paper's full discussed set. |
 
 ## Few-shot examples
 
@@ -205,7 +213,48 @@ search_ontology(search_text="transport", ontology="kegg", informative_only=True)
 }
 ```
 
-### Example 10: From search to gene discovery
+### Example 10: Which papers discuss a KEGG pathway (literature index)
+
+```example-call
+search_ontology(search_text="calvin", ontology="kegg")
+```
+
+```example-response
+# KEGG terms carry discussed_by_n_publications — how many publications
+# name the pathway in prose. This column is present ONLY for the kegg
+# ontology; other ontologies omit it (no per-row subquery is paid).
+# Pass verbose=True to expand the list of {doi, prominence, evidence}.
+{
+  "total_matching": 3,
+  "score_max": 3.2,
+  "score_median": 2.4,
+  "returned": 3,
+  "truncated": false,
+  "offset": 0,
+  "results": [
+    {"id": "kegg.pathway:ko00710", "name": "Carbon fixation by Calvin cycle", "score": 3.2, "level": 2, "discussed_by_n_publications": 19}
+  ]
+}
+```
+
+### Example 11: Read the discussing-paper DOIs for a KEGG term (verbose)
+
+```example-call
+search_ontology(search_text="glycolysis", ontology="kegg", verbose=True)
+```
+
+```example-response
+# verbose adds discussed_in_publications — the per-term list of
+# {doi, prominence, evidence}. Pathways fan out more than genes
+# (e.g. ko00710 → 19 papers, ko00010 → 4).
+{"total_matching": 1, "returned": 1, "truncated": false, "offset": 0,
+ "results": [
+   {"id": "kegg.pathway:ko00010", "name": "Glycolysis / Gluconeogenesis", "score": 3.4, "level": 2, "discussed_by_n_publications": 4,
+    "discussed_in_publications": [{"doi": "10.1038/ismej.2016.70", "prominence": "peripheral", "evidence": "...glycolytic genes..."}]}
+ ]}
+```
+
+### Example 12: From search to gene discovery
 
 ```
 Step 1: search_ontology(search_text="replication", ontology="go_bp")
@@ -225,6 +274,7 @@ Step 3: gene_overview(locus_tags=["PMM0845", ...])
 search_ontology → genes_by_ontology
 search_ontology → genes_by_ontology → gene_overview
 list_filter_values('brite_tree') → search_ontology(ontology='brite', tree=...)
+search_ontology(ontology='kegg', verbose=True) → read per-term discussed_in_publications DOIs → list_publications(publication_dois=[...]) for paper metadata, or discussed_by_publication(publication_dois=[...]) for the paper's full discussed set
 ```
 
 ## Common mistakes
@@ -256,6 +306,8 @@ resolve_gene(identifier='PMM0845')  # use resolve_gene for gene lookups
 - PSORTb and SignalP ontologies are **flat** (5 nodes each, single `level=0`). Don't pass `level=1` or higher — the search returns nothing because no terms exist at those levels.
 
 - PSORTb / SignalP are **structural** ontologies (where a gene's product is / how it's handled). Use them for localization / secretion questions, not for functional-annotation `genes_by_function`-style proxies.
+
+- discussed_by_n_publications (how many papers name the pathway in prose) is present only for ontology='kegg' — other ontologies omit it. It is a recall-biased literature index, NOT DE-table expression. Pass verbose=True for the per-term discussed_in_publications list of {doi, prominence, evidence}, then route DOIs into discussed_by_publication.
 
 ## Package import equivalent
 

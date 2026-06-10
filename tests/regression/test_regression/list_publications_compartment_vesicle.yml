@@ -19,6 +19,8 @@ rows:
   derived_metric_count: 18
   derived_metric_value_kinds:
   - numeric
+  discussed_gene_count: 33
+  discussed_pathway_count: 0
   doi: 10.1093/femsml/uqac025
   experiment_count: 6
   growth_phases: []
@@ -64,6 +66,8 @@ rows:
   derived_metric_count: 6
   derived_metric_value_kinds:
   - numeric
+  discussed_gene_count: 13
+  discussed_pathway_count: 0
   doi: 10.1111/1462-2920.15834
   experiment_count: 6
   growth_phases: []
@@ -104,6 +108,8 @@ rows:
   - boolean
   - categorical
   - numeric
+  discussed_gene_count: 0
+  discussed_pathway_count: 0
   doi: 10.1126/science.1243457
   experiment_count: 3
   growth_phases: []

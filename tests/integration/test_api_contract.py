@@ -118,6 +118,8 @@ class TestGeneOverviewContract:
             "closest_ortholog_genera", "cluster_membership_count", "cluster_types",
             "derived_metric_count", "derived_metric_value_kinds",
             "reaction_count", "metabolite_count", "transporter_count", "evidence_sources",
+            # Literature "discusses" arm (Extension 1): always-present compact count.
+            "discussed_in_publication_count",
         }
         assert set(result["results"][0].keys()) == expected_keys
 

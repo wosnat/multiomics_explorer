@@ -11397,3 +11397,322 @@ class TestKGReleaseInfo:
         assert "some_extra_prop" not in report["kg"]
         assert "version" in report["kg"]
         assert "gene_count" in report["kg"]
+
+
+# ===========================================================================
+# Publication "discusses" literature-index surface
+# (docs/tool-specs/publication-discusses-surface.md)
+# ===========================================================================
+
+
+class TestDiscussedByPublication:
+    """New forward tool api fn: discussed_by_publication. Batch tool over DOIs.
+    Two-query orchestration (summary + detail); not_found vs not_matched;
+    offset slicing; summary=True ⇒ limit=0."""
+
+    def _summary(self, **over):
+        row = {
+            "total_entries": 4,
+            "total_matching": 4,
+            "by_entity_kind": [{"item": "gene", "count": 3},
+                               {"item": "kegg_pathway", "count": 1}],
+            "by_prominence": [{"item": "central", "count": 2},
+                              {"item": "peripheral", "count": 2}],
+            "top_kegg_pathways": [
+                {"id": "kegg.pathway:ko00710", "name": "Carbon fixation", "n": 1}],
+            "top_publications": [
+                {"doi": "10.1038/ismej.2016.70", "title": "Paper A", "n": 4}],
+            # The summary builder returns resolved_dois (input DOIs that resolve
+            # to a Publication) + matched_dois (DOIs with >=1 edge after
+            # filters), both lowercased; the api diffs them into not_found /
+            # not_matched. Defaults reflect the single fully-matched DOI.
+            "resolved_dois": ["10.1038/ismej.2016.70"],
+            "matched_dois": ["10.1038/ismej.2016.70"],
+        }
+        row.update(over)
+        return [row]
+
+    def _detail(self):
+        return [
+            {"doi": "10.1038/ismej.2016.70", "entity_kind": "gene",
+             "entity_id": "PMT1030", "entity_name": "psbA",
+             "organism": "Prochlorococcus MED4", "prominence": "central"},
+            {"doi": "10.1038/ismej.2016.70", "entity_kind": "kegg_pathway",
+             "entity_id": "kegg.pathway:ko00710", "entity_name": "Carbon fixation",
+             "organism": None, "prominence": "peripheral"},
+        ]
+
+    def test_returns_envelope_and_results(self, mock_conn):
+        mock_conn.execute_query.side_effect = [self._summary(), self._detail()]
+        result = api.discussed_by_publication(
+            publication_dois=["10.1038/ismej.2016.70"], conn=mock_conn,
+        )
+        assert isinstance(result, dict)
+        assert result["total_entries"] == 4
+        assert result["total_matching"] == 4
+        assert "by_entity_kind" in result
+        assert "by_prominence" in result
+        assert "top_kegg_pathways" in result
+        assert "top_publications" in result
+        assert result["results"][0]["entity_id"] == "PMT1030"
+
+    def test_pathway_row_organism_none(self, mock_conn):
+        mock_conn.execute_query.side_effect = [self._summary(), self._detail()]
+        result = api.discussed_by_publication(
+            publication_dois=["10.1038/ismej.2016.70"], conn=mock_conn,
+        )
+        pathway_row = [r for r in result["results"]
+                       if r["entity_kind"] == "kegg_pathway"][0]
+        assert pathway_row["organism"] is None
+
+    def test_not_found_and_not_matched(self, mock_conn):
+        # 10.1038/ismej.2016.70 resolves + has edges; 10.1/empty resolves but
+        # has no edges (not_matched); 10.0000/missing never resolves (not_found).
+        mock_conn.execute_query.side_effect = [
+            self._summary(
+                resolved_dois=["10.1038/ismej.2016.70", "10.1/empty"],
+                matched_dois=["10.1038/ismej.2016.70"],
+            ),
+            self._detail(),
+        ]
+        result = api.discussed_by_publication(
+            publication_dois=["10.1038/ismej.2016.70", "10.0000/missing", "10.1/empty"],
+            conn=mock_conn,
+        )
+        assert result["not_found"] == ["10.0000/missing"]
+        assert result["not_matched"] == ["10.1/empty"]
+
+    def test_summary_true_empty_results(self, mock_conn):
+        mock_conn.execute_query.side_effect = [self._summary()]
+        result = api.discussed_by_publication(
+            publication_dois=["10.1038/ismej.2016.70"], summary=True, conn=mock_conn,
+        )
+        assert result["results"] == []
+        assert result["returned"] == 0
+
+    def test_limit_caps_returned(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary(total_entries=20, total_matching=20), self._detail()[:1],
+        ]
+        result = api.discussed_by_publication(
+            publication_dois=["10.1038/ismej.2016.70"], limit=1, conn=mock_conn,
+        )
+        assert result["returned"] == 1
+        assert result["truncated"] is True
+
+    def test_offset_passes_to_envelope(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary(total_entries=20, total_matching=20), self._detail(),
+        ]
+        result = api.discussed_by_publication(
+            publication_dois=["10.1038/ismej.2016.70"], limit=10, offset=5,
+            conn=mock_conn,
+        )
+        assert result["offset"] == 5
+
+    def test_empty_dois_raises(self, mock_conn):
+        with pytest.raises(ValueError):
+            api.discussed_by_publication(publication_dois=[], conn=mock_conn)
+
+    def test_invalid_entity_kind_raises(self, mock_conn):
+        with pytest.raises(ValueError):
+            api.discussed_by_publication(
+                publication_dois=["10.1/x"], entity_kind="bogus", conn=mock_conn,
+            )
+
+    def test_invalid_prominence_raises(self, mock_conn):
+        with pytest.raises(ValueError):
+            api.discussed_by_publication(
+                publication_dois=["10.1/x"], prominence="loud", conn=mock_conn,
+            )
+
+    def test_top_level_export(self):
+        from multiomics_explorer import discussed_by_publication as exported
+        assert exported is api.discussed_by_publication
+
+
+class TestGeneOverviewDiscusses:
+    """Extension 1: gene_overview per-row discussed_in_publication_count
+    (compact) + discussed_in_publications (verbose); envelope has_discussed +
+    top_discussing_publications."""
+
+    def _summary(self, has_discussed=1):
+        return [{
+            "total_matching": 1,
+            "by_organism": [{"item": "Prochlorococcus MED4", "count": 1}],
+            "by_category": [],
+            "by_annotation_type": [],
+            "by_annotation_state": [],
+            "has_expression": 0,
+            "has_significant_expression": 0,
+            "has_orthologs": 0,
+            "has_clusters": 0,
+            "has_derived_metrics": 0,
+            "has_chemistry": 0,
+            "has_discussed": has_discussed,
+            "not_found": [],
+        }]
+
+    def _detail(self, verbose=False):
+        row = {
+            "locus_tag": "PMT1030", "gene_name": "psbA", "product": "PSII",
+            "gene_category": "Photosynthesis", "annotation_quality": 3,
+            "organism_name": "Prochlorococcus MED4",
+            "annotation_types": [], "annotation_state": "informative_multi",
+            "informative_annotation_types": [],
+            "expression_edge_count": 0,
+            "significant_up_count": 0, "significant_down_count": 0,
+            "closest_ortholog_group_size": 1, "closest_ortholog_genera": [],
+            "cluster_membership_count": 0, "cluster_types": [],
+            "numeric_metric_count": 0, "boolean_metric_count": 0,
+            "categorical_metric_count": 0,
+            "reaction_count": 0, "metabolite_count": 0, "transporter_count": 0,
+            "evidence_sources": [],
+            "discussed_in_publication_count": 2,
+        }
+        if verbose:
+            row["discussed_in_publications"] = [
+                {"doi": "10.1038/ismej.2016.70", "prominence": "central",
+                 "evidence": "psbA is the model gene"},
+            ]
+        return [row]
+
+    def _top_discussing(self):
+        return [{"doi": "10.1038/ismej.2016.70", "title": "Paper A", "n_genes": 1}]
+
+    def test_compact_row_has_discussed_count(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary(), self._detail(), self._top_discussing(),
+        ]
+        result = api.gene_overview(["PMT1030"], conn=mock_conn)
+        assert result["results"][0]["discussed_in_publication_count"] == 2
+
+    def test_envelope_has_discussed(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary(has_discussed=1), self._detail(), self._top_discussing(),
+        ]
+        result = api.gene_overview(["PMT1030"], conn=mock_conn)
+        assert result["has_discussed"] == 1
+
+    def test_envelope_top_discussing_publications(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary(), self._detail(), self._top_discussing(),
+        ]
+        result = api.gene_overview(["PMT1030"], conn=mock_conn)
+        assert "top_discussing_publications" in result
+        assert result["top_discussing_publications"][0]["doi"] == (
+            "10.1038/ismej.2016.70")
+        assert result["top_discussing_publications"][0]["n_genes"] == 1
+
+    def test_verbose_row_has_discussed_publications_list(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary(), self._detail(verbose=True), self._top_discussing(),
+        ]
+        result = api.gene_overview(["PMT1030"], verbose=True, conn=mock_conn)
+        row = result["results"][0]
+        assert row["discussed_in_publications"][0]["doi"] == (
+            "10.1038/ismej.2016.70")
+        assert row["discussed_in_publications"][0]["prominence"] == "central"
+        assert "evidence" in row["discussed_in_publications"][0]
+
+
+class TestSearchOntologyDiscusses:
+    """Extension 2: search_ontology gains verbose param + KEGG-only per-row
+    discussed_by_n_publications (compact) + discussed_in_publications (verbose)."""
+
+    def _summary(self):
+        return [{
+            "total_entries": 1, "total_matching": 1,
+            "score_max": 5.0, "score_median": 5.0,
+        }]
+
+    def _kegg_detail(self, verbose=False):
+        row = {
+            "id": "kegg.pathway:ko00710", "name": "Carbon fixation",
+            "score": 5.0, "level": 2, "tree": None, "tree_code": None,
+            "is_informative": True,
+            "discussed_by_n_publications": 19,
+        }
+        if verbose:
+            row["discussed_in_publications"] = [
+                {"doi": "10.1038/ismej.2016.70", "prominence": "central",
+                 "evidence": "carbon fixation is discussed"},
+            ]
+        return [row]
+
+    def test_kegg_row_has_discussed_count(self, mock_conn):
+        mock_conn.execute_query.side_effect = [self._summary(), self._kegg_detail()]
+        result = api.search_ontology(
+            search_text="carbon", ontology="kegg", limit=10, conn=mock_conn,
+        )
+        assert result["results"][0]["discussed_by_n_publications"] == 19
+
+    def test_kegg_verbose_row_has_discussed_list(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary(), self._kegg_detail(verbose=True),
+        ]
+        result = api.search_ontology(
+            search_text="carbon", ontology="kegg", limit=10, verbose=True,
+            conn=mock_conn,
+        )
+        row = result["results"][0]
+        assert row["discussed_in_publications"][0]["doi"] == (
+            "10.1038/ismej.2016.70")
+        assert "evidence" in row["discussed_in_publications"][0]
+
+    def test_verbose_param_accepted(self, mock_conn):
+        """search_ontology must now accept a verbose kwarg (new interface add)."""
+        mock_conn.execute_query.side_effect = [self._summary(), self._kegg_detail()]
+        # Should not raise TypeError for unexpected kwarg.
+        api.search_ontology(
+            search_text="x", ontology="kegg", limit=5, verbose=False, conn=mock_conn,
+        )
+
+
+class TestListPublicationsDiscusses:
+    """Extension 3: list_publications per-row discussed_gene_count +
+    discussed_pathway_count; envelope by_discusses_coverage."""
+
+    _PUB_BASE = {
+        "doi": "10.1038/ismej.2016.70", "title": "Paper A", "authors": ["A"],
+        "year": 2016, "journal": "ISMEJ", "study_type": "S",
+        "organisms": ["MED4"], "experiment_count": 1,
+        "treatment_types": ["coculture"], "background_factors": [],
+        "omics_types": ["RNASEQ"],
+        "clustering_analysis_count": 0, "cluster_types": [],
+        "metabolite_count": 0, "metabolite_assay_count": 0,
+        "metabolite_compartments": [],
+    }
+
+    def _summary(self, **over):
+        # by_discusses_coverage is a single {has_discusses, no_discusses} map
+        # (binary split), not a frequency list — matches the builder RETURN.
+        row = {"total_entries": 1, "total_matching": 1,
+               "by_discusses_coverage": {"has_discusses": 1, "no_discusses": 0}}
+        row.update(over)
+        return [row]
+
+    def test_row_has_discussed_counts(self, mock_conn):
+        row = {**self._PUB_BASE, "discussed_gene_count": 25,
+               "discussed_pathway_count": 4}
+        mock_conn.execute_query.side_effect = [self._summary(), [row]]
+        result = api.list_publications(conn=mock_conn)
+        r = result["results"][0]
+        assert r["discussed_gene_count"] == 25
+        assert r["discussed_pathway_count"] == 4
+
+    def test_envelope_by_discusses_coverage(self, mock_conn):
+        row = {**self._PUB_BASE, "discussed_gene_count": 25,
+               "discussed_pathway_count": 4}
+        mock_conn.execute_query.side_effect = [self._summary(), [row]]
+        result = api.list_publications(conn=mock_conn)
+        assert result["by_discusses_coverage"] == {"has_discusses": 1, "no_discusses": 0}
+
+    def test_zero_discusses_pub(self, mock_conn):
+        row = {**self._PUB_BASE, "discussed_gene_count": 0,
+               "discussed_pathway_count": 0}
+        mock_conn.execute_query.side_effect = [self._summary(), [row]]
+        result = api.list_publications(conn=mock_conn)
+        r = result["results"][0]
+        assert r["discussed_gene_count"] == 0
+        assert r["discussed_pathway_count"] == 0
