@@ -61,6 +61,7 @@ from multiomics_explorer import (
     # 37 API functions — same names as the MCP tools.
     list_metabolites, gene_overview,
     differential_expression_by_gene, pathway_enrichment,
+    discussed_by_publication,  # paper → discussed genes + KEGG pathways
 
     # Enrichment building blocks (9 names — see docs://analysis/enrichment).
     EnrichmentInputs, EnrichmentResult,

@@ -58,6 +58,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_search_homolog_groups,
     build_search_homolog_groups_summary,
     build_search_ontology,
+    build_discussed_by_publication,
+    build_discussed_by_publication_summary,
 )
 
 # ---------------------------------------------------------------------------
@@ -82,6 +84,8 @@ TOOL_BUILDERS = {
     "genes_by_ontology": None,
     "gene_ontology_terms": build_gene_ontology_terms,
     "list_publications": build_list_publications,
+    "discussed_by_publication": build_discussed_by_publication,
+    "discussed_by_publication_summary": build_discussed_by_publication_summary,
     "list_metabolites": build_list_metabolites,
     "list_metabolite_assays": build_list_metabolite_assays,
     "genes_by_metabolite": build_genes_by_metabolite_metabolism,
@@ -264,6 +268,21 @@ def test_regression(conn, case, data_regression):
         # Dispatch via api (L2) — organism_names lowercasing + summary/detail
         # split + not_found computation live above the builder.
         data = api.list_metabolites(**params, conn=conn)
+        normalized_rows = _normalize(data.get("results", []))
+        envelope = {k: v for k, v in data.items() if k != "results"}
+        envelope["results"] = normalized_rows
+        envelope["row_count"] = len(normalized_rows)
+        data_regression.check(
+            {"case_id": case["id"], **envelope},
+            basename=case["id"],
+        )
+        return
+    elif tool == "discussed_by_publication":
+        # Dispatch via api (L2) — case-insensitive DOI lowering + summary/detail
+        # split + not_found / not_matched diff (resolved vs matched DOIs) live
+        # above the builders. Mixed valid / edgeless / garbage DOIs pin the full
+        # envelope incl. not_found / not_matched / top_publications.
+        data = api.discussed_by_publication(**params, conn=conn)
         normalized_rows = _normalize(data.get("results", []))
         envelope = {k: v for k, v in data.items() if k != "results"}
         envelope["results"] = normalized_rows

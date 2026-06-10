@@ -1,0 +1,92 @@
+# Human-authored content for discussed_by_publication about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: What does a paper discuss?
+    call: discussed_by_publication(publication_dois=["10.1038/ismej.2016.70"])
+    response: |
+      # Recall-biased narrative index — the genes and KEGG pathways this
+      # paper names in prose (regulators, model genes, pathways discussed
+      # in text), NOT the supplementary DE-table expression data. Use
+      # differential_expression_by_gene for expression.
+      {
+        "total_entries": 37,
+        "total_matching": 37,
+        "by_entity_kind": {"gene": 29, "kegg_pathway": 8},
+        "by_prominence": {"central": 14, "peripheral": 23},
+        "top_kegg_pathways": [
+          {"id": "kegg.pathway:ko00195", "name": "Photosynthesis", "n": 1}, ...
+        ],
+        "top_publications": [
+          {"doi": "10.1038/ismej.2016.70", "title": "Transcriptional response of Prochlorococcus to co-culture...", "n": 37}
+        ],
+        "returned": 5, "truncated": true, "offset": 0,
+        "not_found": [], "not_matched": [],
+        "results": [
+          {"doi": "10.1038/ismej.2016.70", "entity_kind": "gene", "entity_id": "PMT2118", "entity_name": "Hypothetical protein", "organism": "Prochlorococcus MIT9313", "prominence": "central"},
+          {"doi": "10.1038/ismej.2016.70", "entity_kind": "kegg_pathway", "entity_id": "kegg.pathway:ko00195", "entity_name": "Photosynthesis", "organism": null, "prominence": "central"}
+        ]
+      }
+
+  - title: Restrict to the KEGG-pathway arm only
+    call: discussed_by_publication(publication_dois=["10.1038/ismej.2016.70"], entity_kind="kegg_pathway")
+    response: |
+      {"total_entries": 37, "total_matching": 8,
+       "by_entity_kind": {"gene": 0, "kegg_pathway": 8},
+       "by_prominence": {"central": 2, "peripheral": 6},
+       "returned": 5, "truncated": true, "offset": 0, "not_found": [], "not_matched": [],
+       "results": [
+         {"doi": "10.1038/ismej.2016.70", "entity_kind": "kegg_pathway", "entity_id": "kegg.pathway:ko00710", "entity_name": "Carbon fixation by Calvin cycle", "organism": null, "prominence": "peripheral"}
+       ]}
+
+  - title: Only the prominently-discussed (central) entities
+    call: discussed_by_publication(publication_dois=["10.1038/ismej.2016.70"], prominence="central")
+
+  - title: Summary only (no detail rows)
+    call: discussed_by_publication(publication_dois=["10.1038/ismej.2016.70"], summary=True)
+
+  - title: See why a paper discusses each entity (verbose evidence quote)
+    call: discussed_by_publication(publication_dois=["10.1038/ismej.2016.70"], entity_kind="kegg_pathway", verbose=True)
+    response: |
+      # verbose adds the extraction `evidence` quote — the sentence in the
+      # paper that names the entity.
+      {"total_matching": 8, "returned": 5, "truncated": true, "offset": 0,
+       "results": [
+         {"doi": "10.1038/ismej.2016.70", "entity_kind": "kegg_pathway", "entity_id": "kegg.pathway:ko00195", "entity_name": "Photosynthesis", "organism": null, "prominence": "central", "evidence": "...photosynthesis genes were downregulated in co-culture..."}
+       ]}
+
+  - title: From paper to discussed entities to drill-down
+    steps: |
+      Step 1: list_publications(search_text="co-culture")
+              → find the paper, copy its doi
+
+      Step 2: discussed_by_publication(publication_dois=["10.1038/ismej.2016.70"])
+              → the genes + KEGG pathways the paper names in prose
+
+      Step 3a: gene_overview(locus_tags=["PMT2118", "PMT_1030"])
+              → data-availability rollup for the discussed genes
+
+      Step 3b: genes_by_ontology(ontology="kegg", organism="Prochlorococcus MIT9313", term_ids=["kegg.pathway:ko00710"])
+              → expand a discussed pathway to its member genes
+              (this tool does NOT expand pathways — it returns the terms verbatim)
+
+verbose_fields:
+  - evidence
+
+chaining:
+  - "list_publications → discussed_by_publication"
+  - "discussed_by_publication → gene_overview"
+  - "discussed_by_publication → genes_by_ontology(ontology='kegg', term_ids=[...])"
+  - "discussed_by_publication(entity_kind='gene') → gene_overview → differential_expression_by_gene"
+  - "discussed_by_publication(entity_kind='kegg_pathway') → genes_by_ontology(ontology='kegg', term_ids=[pathway_id]) → pathway_enrichment"
+
+mistakes:
+  - "This is a recall-biased narrative literature index — the genes and pathways a paper names in prose, NOT exhaustive coverage and NOT the supplementary DE-table expression data. Only 935 distinct genes are named across the whole corpus (out of ~100k). For expression, use differential_expression_by_gene."
+  - "It returns the KEGG pathway terms the paper discusses verbatim — it does NOT expand a pathway to its member genes. To get genes in a discussed pathway, chain into genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...)."
+  - "entity_id is the raw node id: gene rows carry the bare locus_tag (e.g. PMT2118); kegg_pathway rows carry the prefixed id (e.g. kegg.pathway:ko00710). Feed gene ids to gene_overview, pathway ids to genes_by_ontology(ontology='kegg')."
+  - "Rows are polymorphic: organism is populated only on gene rows; on kegg_pathway rows it is null (union padding). Likewise entity_name is the gene's gene_name (falling back to product) on gene rows and the pathway name on pathway rows."
+  - "total_entries counts all discusses edges from the matched DOIs before any entity_kind / prominence filter; total_matching reflects the filtered set. A small total_matching with a large total_entries means your filter is narrow, not that the paper is sparse."
+  - "not_found means the DOI is absent from the KG; not_matched means the DOI exists but has no discusses edge (3 such publications exist). DOI matching is case-insensitive."
+  - wrong: "discussed_by_publication(publication_dois=['10.1038/ismej.2016.70'])  # to get DE results for the paper"
+    right: "list_experiments(publication_doi=['10.1038/ismej.2016.70']) then differential_expression_by_gene(experiment_ids=[...])  # discusses edges are prose mentions, not expression data"

@@ -46,6 +46,7 @@ ONTOLOGY_CONFIG = {
         "gene_rel": "Gene_has_kegg_ko",
         "hierarchy_rels": ["Kegg_term_is_a_kegg_term"],
         "fulltext_index": "keggFullText",
+        "discusses_rel": "Publication_discusses_kegg_pathway",
     },
     "cog_category": {
         "label": "CogFunctionalCategory",
@@ -449,7 +450,8 @@ def build_gene_overview_summary(
 
     RETURN keys: total_matching, by_organism, by_category,
     by_annotation_type, has_expression, has_significant_expression,
-    has_orthologs, has_clusters, not_found.
+    has_orthologs, has_clusters, has_derived_metrics, has_chemistry,
+    has_discussed, not_found.
     """
     cypher = (
         "UNWIND $locus_tags AS lt\n"
@@ -482,6 +484,11 @@ def build_gene_overview_summary(
         "         MATCH (g)-[:Gene_catalyzes_reaction|Gene_has_tcdb_family]->()"
         "-[:Reaction_has_metabolite|Tcdb_family_transports_metabolite]->(:Metabolite)\n"
         "       }]) AS has_chemistry,\n"
+        # Literature "discusses" arm (Extension 1): count of input genes with
+        # >=1 discussing publication. Drives the top_discussing_publications
+        # envelope rollup gate in the api layer.
+        "       size([g IN found WHERE\n"
+        "           coalesce(g.discussed_in_publication_count, 0) > 0]) AS has_discussed,\n"
         "       not_found"
     )
     return cypher, {"locus_tags": locus_tags}
@@ -517,6 +524,11 @@ def build_gene_overview(
         ",\n       coalesce(g.boolean_metric_types_observed, []) AS boolean_metric_types_observed"
         ",\n       coalesce(g.categorical_metric_types_observed, []) AS categorical_metric_types_observed"
         ",\n       coalesce(g.compartments_observed, []) AS compartments_observed"
+        # Publication "discusses" verbose list — pattern comprehension yields []
+        # for a gene with no discussing publication (no CASE-NULL row needed).
+        ",\n       [(g)<-[rdp:Publication_discusses_gene]-(pdp:Publication)"
+        " | {doi: pdp.doi, prominence: rdp.prominence, evidence: rdp.evidence}]"
+        " AS discussed_in_publications"
         if verbose else ""
     )
 
@@ -580,6 +592,7 @@ def build_gene_overview(
         "       coalesce(g.reaction_count, 0) AS reaction_count,\n"
         "       coalesce(g.metabolite_count, 0) AS metabolite_count,\n"
         "       coalesce(g.tcdb_family_count, 0) AS transporter_count,\n"
+        "       coalesce(g.discussed_in_publication_count, 0) AS discussed_in_publication_count,\n"
         f"       evidence_sources{verbose_cols}\n"
         f"ORDER BY g.locus_tag{skip_clause}{limit_clause}"
     )
@@ -959,6 +972,8 @@ def build_list_publications(
             "       coalesce(p.metabolite_count, 0) AS metabolite_count,\n"
             "       coalesce(p.metabolite_assay_count, 0) AS metabolite_assay_count,\n"
             "       coalesce(p.metabolite_compartments, []) AS metabolite_compartments,\n"
+            "       coalesce(p.discussed_gene_count, 0) AS discussed_gene_count,\n"
+            "       coalesce(p.discussed_pathway_count, 0) AS discussed_pathway_count,\n"
             f"       score{verbose_cols}\n"
             f"ORDER BY score DESC, p.publication_year DESC, p.title\n"
             f"{limit_clause}"
@@ -986,7 +1001,9 @@ def build_list_publications(
             "       coalesce(p.compartments, []) AS compartments,\n"
             "       coalesce(p.metabolite_count, 0) AS metabolite_count,\n"
             "       coalesce(p.metabolite_assay_count, 0) AS metabolite_assay_count,\n"
-            f"       coalesce(p.metabolite_compartments, []) AS metabolite_compartments{verbose_cols}\n"
+            "       coalesce(p.metabolite_compartments, []) AS metabolite_compartments,\n"
+            "       coalesce(p.discussed_gene_count, 0) AS discussed_gene_count,\n"
+            f"       coalesce(p.discussed_pathway_count, 0) AS discussed_pathway_count{verbose_cols}\n"
             f"ORDER BY p.publication_year DESC, p.title\n"
             f"{limit_clause}"
         )
@@ -1038,7 +1055,12 @@ def build_list_publications_summary(
         "     apoc.coll.flatten(\n"
         "       collect(coalesce(p.compartments, []))) AS comps,\n"
         "     apoc.coll.flatten(\n"
-        "       collect(coalesce(p.cluster_types, []))) AS ctypes"
+        "       collect(coalesce(p.cluster_types, []))) AS ctypes,\n"
+        # Binary discusses-coverage split: a publication has a narrative
+        # literature index when either precomputed discussed count is > 0.
+        "     collect(CASE WHEN coalesce(p.discussed_gene_count, 0)\n"
+        "                       + coalesce(p.discussed_pathway_count, 0) > 0\n"
+        "                  THEN 'has_discusses' ELSE 'no_discusses' END) AS disc_cov"
     )
     return_cols = (
         "       apoc.coll.frequencies(orgs) AS by_organism,\n"
@@ -1048,7 +1070,10 @@ def build_list_publications_summary(
         "       apoc.coll.frequencies(vks) AS by_value_kind,\n"
         "       apoc.coll.frequencies(mtypes) AS by_metric_type,\n"
         "       apoc.coll.frequencies(comps) AS by_compartment,\n"
-        "       apoc.coll.frequencies(ctypes) AS by_cluster_type"
+        "       apoc.coll.frequencies(ctypes) AS by_cluster_type,\n"
+        "       {has_discusses: size([x IN disc_cov WHERE x = 'has_discusses']),\n"
+        "        no_discusses: size([x IN disc_cov WHERE x = 'no_discusses'])}\n"
+        "         AS by_discusses_coverage"
     )
 
     if search_text:
@@ -1079,6 +1104,216 @@ def build_list_publications_summary(
         )
 
     return cypher, params
+
+
+# --- Publication "discusses" literature-index surface -----------------------
+
+_DISCUSSES_ENTITY_KINDS = ("gene", "kegg_pathway")
+_DISCUSSES_PROMINENCE = ("central", "peripheral")
+
+
+def _validate_discusses_filters(
+    entity_kind: str | None, prominence: str | None,
+) -> None:
+    """Validate the closed-Literal filters shared by the discusses builders."""
+    if entity_kind is not None and entity_kind not in _DISCUSSES_ENTITY_KINDS:
+        raise ValueError(
+            f"Invalid entity_kind '{entity_kind}'. "
+            f"Valid: {list(_DISCUSSES_ENTITY_KINDS)}"
+        )
+    if prominence is not None and prominence not in _DISCUSSES_PROMINENCE:
+        raise ValueError(
+            f"Invalid prominence '{prominence}'. "
+            f"Valid: {list(_DISCUSSES_PROMINENCE)}"
+        )
+
+
+def build_discussed_by_publication(
+    *,
+    publication_dois: list[str],
+    entity_kind: str | None = None,
+    prominence: str | None = None,
+    verbose: bool = False,
+    limit: int | None = 50,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build detail Cypher for discussed_by_publication (forward lookup).
+
+    UNION ALL over Publication_discusses_gene + Publication_discusses_kegg_pathway
+    with distinct edge variables (rg / rk) — reusing one variable across both
+    rel types raises a CyVer conflicting-labels error.
+
+    RETURN keys (compact): doi, entity_kind, entity_id, entity_name, organism,
+    prominence. Verbose adds: evidence.
+
+    `entity_kind` drops the unwanted UNION branch (conditional assembly).
+    `prominence` filters edges inline in each arm. DOI match is case-insensitive
+    (`toLower(p.doi) IN $publication_dois` — caller lowercases the param).
+    Global ORDER BY doi, entity_kind, prominence (central first), entity_id;
+    SKIP $offset; LIMIT $limit.
+    """
+    _validate_discusses_filters(entity_kind, prominence)
+
+    # `prominence` is bound unconditionally (even when None): the Cypher always
+    # references `$prominence` via `($prominence IS NULL OR ...)`, and Neo4j
+    # raises ParameterMissing if a referenced param is absent from the dict.
+    params: dict = {"publication_dois": publication_dois, "prominence": prominence}
+
+    gene_evidence = ",\n       rg.evidence AS evidence" if verbose else ""
+    pathway_evidence = ",\n       rk.evidence AS evidence" if verbose else ""
+
+    gene_arm = (
+        "MATCH (p:Publication)-[rg:Publication_discusses_gene]->(g:Gene)\n"
+        "WHERE toLower(p.doi) IN $publication_dois\n"
+        "  AND ($prominence IS NULL OR rg.prominence = $prominence)\n"
+        "RETURN p.doi AS doi, 'gene' AS entity_kind, g.locus_tag AS entity_id,\n"
+        "       coalesce(g.gene_name, g.product) AS entity_name,\n"
+        "       g.organism_name AS organism,\n"
+        f"       rg.prominence AS prominence{gene_evidence}"
+    )
+    pathway_arm = (
+        "MATCH (p:Publication)-[rk:Publication_discusses_kegg_pathway]->(k:KeggTerm)\n"
+        "WHERE toLower(p.doi) IN $publication_dois\n"
+        "  AND ($prominence IS NULL OR rk.prominence = $prominence)\n"
+        "RETURN p.doi AS doi, 'kegg_pathway' AS entity_kind, k.id AS entity_id,\n"
+        "       k.name AS entity_name, NULL AS organism,\n"
+        f"       rk.prominence AS prominence{pathway_evidence}"
+    )
+
+    if entity_kind == "gene":
+        body = gene_arm
+    elif entity_kind == "kegg_pathway":
+        body = pathway_arm
+    else:
+        body = gene_arm + "\nUNION ALL\n" + pathway_arm
+
+    # Wrap so the ORDER BY / SKIP / LIMIT apply globally across the union.
+    # central-first via a CASE ordinal on prominence.
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
+
+    cypher = (
+        "CALL {\n"
+        f"{body}\n"
+        "}\n"
+        "RETURN *\n"
+        "ORDER BY doi, entity_kind,\n"
+        "         CASE prominence WHEN 'central' THEN 0 ELSE 1 END,\n"
+        f"         entity_id{skip_clause}{limit_clause}"
+    )
+    return cypher, params
+
+
+def build_discussed_by_publication_summary(
+    *,
+    publication_dois: list[str],
+    entity_kind: str | None = None,
+    prominence: str | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for discussed_by_publication.
+
+    RETURN keys: total_entries, total_matching, by_entity_kind, by_prominence,
+    top_kegg_pathways, top_publications, resolved_dois, matched_dois.
+
+    total_entries is UNFILTERED — sums the precomputed
+    Publication.discussed_gene_count + discussed_pathway_count over the matched
+    DOIs (NOT a re-count of the filtered detail query). Every other rollup
+    reflects the FILTERED (entity_kind / prominence) set.
+
+    `resolved_dois` (input DOIs that resolve to a Publication) and `matched_dois`
+    (input DOIs with >=1 edge after filters), both lowercased, let the api layer
+    diff them into not_found / not_matched. Filtered rows are built via pattern
+    comprehensions (which always yield a list, possibly empty) rather than a
+    correlated `CALL {}` subquery, so the summary returns exactly one row even
+    when zero input DOIs have any edge (all-edgeless / all-garbage input).
+    """
+    _validate_discusses_filters(entity_kind, prominence)
+
+    # `prominence` bound unconditionally — the pattern-comprehension predicates
+    # always reference `$prominence` (see C1 note on the detail builder).
+    params: dict = {"publication_dois": publication_dois, "prominence": prominence}
+
+    gene_rows = (
+        "[ (p:Publication)-[rg:Publication_discusses_gene]->(g:Gene)\n"
+        "  WHERE toLower(p.doi) IN $publication_dois\n"
+        "    AND ($prominence IS NULL OR rg.prominence = $prominence)\n"
+        "  | {doi: p.doi, entity_kind: 'gene', entity_id: g.locus_tag,\n"
+        "     entity_name: coalesce(g.gene_name, g.product),\n"
+        "     prominence: rg.prominence} ]"
+    )
+    pathway_rows = (
+        "[ (p:Publication)-[rk:Publication_discusses_kegg_pathway]->(k:KeggTerm)\n"
+        "  WHERE toLower(p.doi) IN $publication_dois\n"
+        "    AND ($prominence IS NULL OR rk.prominence = $prominence)\n"
+        "  | {doi: p.doi, entity_kind: 'kegg_pathway', entity_id: k.id,\n"
+        "     entity_name: k.name, prominence: rk.prominence} ]"
+    )
+    if entity_kind == "gene":
+        rows_expr = gene_rows
+    elif entity_kind == "kegg_pathway":
+        rows_expr = pathway_rows
+    else:
+        rows_expr = f"{gene_rows}\n     + {pathway_rows}"
+
+    cypher = (
+        # resolved DOIs + total_entries (unfiltered, precomputed counts) + a
+        # doi->title map for top_publications. Aggregations yield one row even
+        # when no Publication matches (resolved_dois -> [], total_entries -> 0).
+        "MATCH (p0:Publication)\n"
+        "WHERE toLower(p0.doi) IN $publication_dois\n"
+        "WITH collect(DISTINCT toLower(p0.doi)) AS resolved_dois,\n"
+        "     apoc.map.fromPairs(collect([p0.doi, p0.title])) AS title_by_doi,\n"
+        "     sum(coalesce(p0.discussed_gene_count, 0)\n"
+        "         + coalesce(p0.discussed_pathway_count, 0)) AS total_entries\n"
+        f"WITH resolved_dois, title_by_doi, total_entries,\n     {rows_expr} AS rows\n"
+        "RETURN total_entries,\n"
+        "       resolved_dois,\n"
+        "       apoc.coll.toSet([r IN rows | toLower(r.doi)]) AS matched_dois,\n"
+        "       size(rows) AS total_matching,\n"
+        "       apoc.coll.frequencies([r IN rows | r.entity_kind]) AS by_entity_kind,\n"
+        "       apoc.coll.frequencies([r IN rows | r.prominence]) AS by_prominence,\n"
+        "       apoc.coll.sortMaps(\n"
+        "         [f IN apoc.coll.frequencies(\n"
+        "            [r IN rows WHERE r.entity_kind = 'kegg_pathway'\n"
+        "             | r.entity_id + ' | ' + coalesce(r.entity_name, '')])\n"
+        "          | {id: split(f.item, ' | ')[0],\n"
+        "             name: split(f.item, ' | ')[1], n: f.count}],\n"
+        "         'n')[0..10] AS top_kegg_pathways,\n"
+        "       apoc.coll.sortMaps(\n"
+        "         [f IN apoc.coll.frequencies([r IN rows | r.doi])\n"
+        "          | {doi: f.item, title: title_by_doi[f.item], n: f.count}],\n"
+        "         'n')[0..10] AS top_publications"
+    )
+    return cypher, params
+
+
+def build_gene_overview_top_discussing_publications(
+    *, locus_tags: list[str],
+) -> tuple[str, dict]:
+    """Build the gene_overview envelope rollup `top_discussing_publications`.
+
+    Ranks publications by how many of the QUERIED genes they discuss (distinct
+    gene count) — the batch set-coverage signal the per-gene rows cannot yield.
+
+    RETURN keys: doi, title, n_genes.
+    """
+    cypher = (
+        "MATCH (g:Gene)<-[:Publication_discusses_gene]-(p:Publication)\n"
+        "WHERE g.locus_tag IN $locus_tags\n"
+        "WITH p, count(DISTINCT g) AS n_genes\n"
+        "RETURN p.doi AS doi, p.title AS title, n_genes\n"
+        "ORDER BY n_genes DESC, p.doi\n"
+        "LIMIT 10"
+    )
+    return cypher, {"locus_tags": locus_tags}
 
 
 def _list_metabolites_where(
@@ -2136,10 +2371,16 @@ def build_search_ontology(
     level: int | None = None,
     tree: str | None = None,
     informative_only: bool = False,
+    verbose: bool = False,
 ) -> tuple[str, dict]:
     """Build Cypher for search_ontology.
 
     RETURN keys: id, name, score, level, tree, tree_code, is_informative.
+    When the selected ontology's ONTOLOGY_CONFIG entry declares `discusses_rel`
+    (KEGG only today), an extra per-row `discussed_by_n_publications`
+    pattern-count column is emitted, and verbose adds the
+    `discussed_in_publications` list of {doi, prominence, evidence}. Other
+    ontologies pay no per-row subquery — the columns are simply absent.
     """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
@@ -2148,6 +2389,29 @@ def build_search_ontology(
     cfg = ONTOLOGY_CONFIG[ontology]
     index_name = cfg["fulltext_index"]
     parent_index = cfg.get("parent_fulltext_index")
+
+    # Publication "discusses" columns — config-gated (only ontologies whose
+    # config declares `discusses_rel`, i.e. KEGG). Rel-type read from config,
+    # never inlined as a literal, mirroring gene_rel / fulltext_index plumbing.
+    discusses_rel = cfg.get("discusses_rel")
+    if discusses_rel:
+        discusses_count_col = (
+            ",\n         size([(t)<-[:" + discusses_rel + "]-() | 1])"
+            " AS discussed_by_n_publications"
+        )
+        discusses_verbose_col = (
+            ",\n         [(t)<-[rdp:" + discusses_rel + "]-(pdp:Publication)"
+            " | {doi: pdp.doi, prominence: rdp.prominence, evidence: rdp.evidence}]"
+            " AS discussed_in_publications"
+            if verbose else ""
+        )
+        discusses_outer = ",\n       discussed_by_n_publications" + (
+            ", discussed_in_publications" if verbose else ""
+        )
+    else:
+        discusses_count_col = ""
+        discusses_verbose_col = ""
+        discusses_outer = ""
 
     params: dict = {"search_text": search_text}
     if offset:
@@ -2171,6 +2435,8 @@ def build_search_ontology(
         where_parts.append("coalesce(t.is_uninformative, '') <> 'true'")
     where_clause = "  WHERE " + " AND ".join(where_parts) + "\n" if where_parts else ""
 
+    inner_discusses = discusses_count_col + discusses_verbose_col
+
     if parent_index:
         # UNION search across both indexes (e.g. Pfam domain + clan)
         cypher = (
@@ -2180,16 +2446,19 @@ def build_search_ontology(
             + where_clause
             + "  RETURN t.id AS id, t.name AS name, score,\n"
             "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
-            "         coalesce(t.is_uninformative, '') <> 'true' AS is_informative\n"
+            "         coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
+            + inner_discusses + "\n"
             "  UNION ALL\n"
             f"  CALL db.index.fulltext.queryNodes('{parent_index}', $search_text)\n"
             "  YIELD node AS t, score\n"
             + where_clause
             + "  RETURN t.id AS id, t.name AS name, score,\n"
             "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
-            "         coalesce(t.is_uninformative, '') <> 'true' AS is_informative\n"
+            "         coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
+            + inner_discusses + "\n"
             "}\n"
-            "RETURN id, name, score, level, tree, tree_code, is_informative\n"
+            "RETURN id, name, score, level, tree, tree_code, is_informative"
+            + discusses_outer + "\n"
             "ORDER BY score DESC, id" + skip_clause + limit_clause
         )
     else:
@@ -2199,7 +2468,8 @@ def build_search_ontology(
             + where_clause
             + "RETURN t.id AS id, t.name AS name, score,\n"
             "       t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
-            "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative\n"
+            "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
+            + inner_discusses + "\n"
             "ORDER BY score DESC, id" + skip_clause + limit_clause
         )
     return cypher, params

@@ -70,7 +70,8 @@ Across tools the convention is consistent — but the exact meaning depends
 on what's being filtered:
 
 - **List filters that select rows by ID** (`metabolite_ids=[...]`,
-  `experiment_ids=[...]`, `publication_doi=[...]`, `assay_ids=[...]`,
+  `experiment_ids=[...]`, `publication_doi=[...]`,
+  `publication_dois=[...]`, `assay_ids=[...]`,
   `analysis_ids=[...]`, `cluster_ids=[...]`, `derived_metric_ids=[...]`,
   `term_ids=[...]`, `group_ids=[...]`, `locus_tags=[...]`,
   `organism_names=[...]`) — **UNION** on the filtered set: a row matches
@@ -112,7 +113,8 @@ Cross-organism (operate over the whole graph, no organism scope):
 - `genes_by_numeric_metric`, `genes_by_boolean_metric`,
   `genes_by_categorical_metric`, `metabolites_by_quantifies_assay`,
   `metabolites_by_flags_assay`, `assays_by_metabolite`,
-  `differential_expression_by_ortholog`.
+  `differential_expression_by_ortholog`, `discussed_by_publication`
+  (DOIs are organism-agnostic; gene rows still carry per-row `organism`).
 
 Cross-organism with `organism_names=[...]` filter:
 
@@ -151,14 +153,17 @@ raising:
   multi-batch tools: e.g. `not_found.metabolite_ids`,
   `not_found.organism_names`, `not_found.publication_dois`,
   `not_found.experiment_ids`, `not_found.locus_tags`. On
-  single-batch-input tools (`assays_by_metabolite`) it's a flat list.
+  single-batch-input tools (`assays_by_metabolite`,
+  `discussed_by_publication`) it's a flat list.
 - **`not_matched`** — the input ID exists in the KG but has no edge to
   the target after filters. E.g. a Metabolite ID with no
   `Reaction_has_metabolite` edge in the queried organism (in
   `genes_by_metabolite`); a locus_tag in a different organism (in
   single-organism drill-downs); a DM ID whose `value_kind` doesn't
-  match the tool (in `gene_derived_metrics`). Diagnostic: the row
-  exists, but the question doesn't apply.
+  match the tool (in `gene_derived_metrics`); a DOI that exists but
+  names no genes or pathways in prose (in `discussed_by_publication` —
+  3 such publications). Diagnostic: the row exists, but the question
+  doesn't apply.
 
 Always inspect both. An empty `results` plus a populated `not_found` or
 `not_matched` is *not* "no biology" — it's a routing problem.

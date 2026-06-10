@@ -34,6 +34,8 @@ from multiomics_explorer.kg.constants import (
 )
 from multiomics_explorer.kg.queries_lib import (
     ONTOLOGY_CONFIG,
+    build_discussed_by_publication,
+    build_discussed_by_publication_summary,
     build_gene_aa_sequence,
     build_gene_aa_sequence_summary,
     build_gene_existence_check,
@@ -43,6 +45,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_ontology_terms_summary,
     build_gene_overview,
     build_gene_overview_summary,
+    build_gene_overview_top_discussing_publications,
     build_genes_by_function,
     build_genes_by_function_summary,
     build_genes_by_ontology_detail,
@@ -381,13 +384,16 @@ def gene_overview(
 
     Returns dict with keys: total_matching, by_organism, by_category,
     by_annotation_type, has_expression, has_significant_expression,
-    has_orthologs, has_clusters, returned, truncated, not_found, results.
+    has_orthologs, has_clusters, has_discussed, top_discussing_publications,
+    returned, truncated, not_found, results.
     Per result: locus_tag, gene_name, product, gene_category,
     annotation_quality, organism_name, annotation_types,
     expression_edge_count, significant_up_count, significant_down_count,
     closest_ortholog_group_size, closest_ortholog_genera,
-    cluster_membership_count, cluster_types.
-    Verbose adds: gene_summary, function_description, all_identifiers.
+    cluster_membership_count, cluster_types, discussed_in_publication_count.
+    Verbose adds: gene_summary, function_description, all_identifiers,
+    discussed_in_publications (list of {doi, prominence, evidence}; see
+    discussed_by_publication for a paper's full discussed set).
 
     Raises ValueError if locus_tags is empty.
     """
@@ -432,6 +438,9 @@ def gene_overview(
         # Phase 1 plumbing (spec §6.1): count of genes in batch with non-empty
         # evidence_sources. Mirrors has_orthologs / has_clusters envelope keys.
         "has_chemistry": raw_summary.get("has_chemistry", 0),
+        # Literature "discusses" arm (spec Extension 1): count of input genes
+        # with >=1 discussing publication. Mirrors has_expression / has_chemistry.
+        "has_discussed": raw_summary.get("has_discussed", 0),
         "not_found": raw_summary["not_found"],
     }
 
@@ -441,12 +450,28 @@ def gene_overview(
         envelope["offset"] = offset
         envelope["truncated"] = total_matching > 0
         envelope["results"] = []
+        envelope["top_discussing_publications"] = []
         return envelope
 
     det_cypher, det_params = build_gene_overview(
         locus_tags=locus_tags, verbose=verbose, limit=limit, offset=offset,
     )
     results = conn.execute_query(det_cypher, **det_params)
+
+    # Envelope rollup `top_discussing_publications` (spec Extension 1): one extra
+    # builder call ranking publications by distinct queried-gene count — the
+    # batch set-coverage signal the per-gene rows cannot yield. Same multi-query
+    # orchestration shape as gene_ontology_terms. Skipped (empty rollup) when no
+    # queried gene has a discussing publication — no edges to rank.
+    if envelope["has_discussed"]:
+        td_cypher, td_params = build_gene_overview_top_discussing_publications(
+            locus_tags=locus_tags,
+        )
+        envelope["top_discussing_publications"] = conn.execute_query(
+            td_cypher, **td_params,
+        )
+    else:
+        envelope["top_discussing_publications"] = []
 
     # Synthesize compact DM fields; strip verbose-only fields in compact mode
     for r in results:
@@ -456,6 +481,120 @@ def gene_overview(
         if not verbose:
             for f in _VERBOSE_DM_FIELDS:
                 r.pop(f, None)
+
+    envelope["returned"] = len(results)
+    envelope["offset"] = offset
+    envelope["truncated"] = total_matching > offset + len(results)
+    envelope["results"] = results
+    return envelope
+
+
+_DISCUSSES_ENTITY_KINDS = ("gene", "kegg_pathway")
+_DISCUSSES_PROMINENCE = ("central", "peripheral")
+
+
+def discussed_by_publication(
+    publication_dois: list[str],
+    entity_kind: str | None = None,
+    prominence: str | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int = 50,
+    offset: int = 0,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """List the genes and KEGG pathways each publication discusses in prose.
+
+    Recall-biased narrative literature router over the two `discusses` edge
+    types (prose mentions with prominence + evidence quote) — NOT exhaustive
+    coverage and NOT DE-table expression data (use differential_expression_by_gene
+    for that). Batch tool over DOIs; DOI match is case-insensitive.
+
+    Args:
+        publication_dois: Publication DOIs (case-insensitive match).
+        entity_kind: Restrict to one arm: 'gene' or 'kegg_pathway'. None = both.
+        prominence: Filter edges by prominence: 'central' or 'peripheral'.
+        summary: Return only summary fields (forces limit=0, empty results).
+        verbose: Include the full `evidence` extraction quote per row.
+        limit: Max detail rows (default 50).
+        offset: Skip this many detail rows (pagination).
+        conn: Optional graph connection (defaults to the shared connection).
+
+    Returns dict with keys: total_entries (all discusses edges from matched DOIs,
+    before entity_kind/prominence filters), total_matching (rows after filters),
+    returned, offset, truncated, by_entity_kind, by_prominence, top_kegg_pathways,
+    top_publications, not_found (DOIs absent from the KG), not_matched (DOIs
+    present but with no discusses edge after filters), results.
+    Per result (compact): doi, entity_kind, entity_id, entity_name, organism
+    (gene-only; None on pathway rows), prominence. Verbose adds: evidence.
+
+    Raises ValueError if publication_dois is empty, or entity_kind / prominence
+    is not a recognized value.
+    """
+    if not publication_dois:
+        raise ValueError("publication_dois must not be empty.")
+    if entity_kind is not None and entity_kind not in _DISCUSSES_ENTITY_KINDS:
+        raise ValueError(
+            f"Invalid entity_kind '{entity_kind}'. "
+            f"Valid: {list(_DISCUSSES_ENTITY_KINDS)}"
+        )
+    if prominence is not None and prominence not in _DISCUSSES_PROMINENCE:
+        raise ValueError(
+            f"Invalid prominence '{prominence}'. "
+            f"Valid: {list(_DISCUSSES_PROMINENCE)}"
+        )
+    if summary:
+        limit = 0
+
+    conn = _default_conn(conn)
+
+    # DOIs are matched case-insensitively (toLower(p.doi) IN $publication_dois).
+    lowered = [d.lower() for d in publication_dois]
+
+    # Summary query — always runs.
+    sum_cypher, sum_params = build_discussed_by_publication_summary(
+        publication_dois=lowered, entity_kind=entity_kind, prominence=prominence,
+    )
+    raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+
+    total_matching = raw_summary["total_matching"]
+
+    # not_found / not_matched — computed in the API by diffing the input DOIs
+    # against the summary builder's resolved_dois (DOIs that resolve to a
+    # Publication) and matched_dois (DOIs with >=1 edge after filters). Both
+    # builder sets are lowercased; `lowered` is already lowercased. not_found =
+    # never resolved; not_matched = resolved but no surviving edge.
+    resolved = set(raw_summary.get("resolved_dois", []))
+    matched = set(raw_summary.get("matched_dois", []))
+    unique_lowered = list(dict.fromkeys(lowered))
+    not_found = [d for d in unique_lowered if d not in resolved]
+    not_matched = [d for d in unique_lowered if d in resolved and d not in matched]
+
+    envelope: dict = {
+        "total_entries": raw_summary["total_entries"],
+        "total_matching": total_matching,
+        "by_entity_kind": raw_summary.get("by_entity_kind", []),
+        "by_prominence": raw_summary.get("by_prominence", []),
+        "top_kegg_pathways": raw_summary.get("top_kegg_pathways", []),
+        "top_publications": raw_summary.get("top_publications", []),
+        "not_found": not_found,
+        "not_matched": not_matched,
+    }
+
+    # Detail query — skip when limit=0 (summary mode).
+    if limit == 0:
+        envelope["returned"] = 0
+        envelope["offset"] = offset
+        envelope["truncated"] = total_matching > 0
+        envelope["results"] = []
+        return envelope
+
+    det_cypher, det_params = build_discussed_by_publication(
+        publication_dois=lowered, entity_kind=entity_kind, prominence=prominence,
+        verbose=verbose, limit=limit, offset=offset,
+    )
+    results = conn.execute_query(det_cypher, **det_params)
 
     envelope["returned"] = len(results)
     envelope["offset"] = offset
@@ -884,12 +1023,14 @@ def list_publications(
     Returns dict with keys: total_entries, total_matching, returned, offset,
     truncated, by_organism, by_treatment_type, by_background_factors,
     by_omics_type, by_cluster_type, by_value_kind, by_metric_type,
-    by_compartment, not_found, results.
+    by_compartment, by_discusses_coverage, not_found, results.
     Per result (compact): doi, title, authors, year, journal, study_type,
     organisms, experiment_count, treatment_types, background_factors,
     omics_types, clustering_analysis_count, cluster_types, growth_phases,
     derived_metric_count, derived_metric_value_kinds, compartments,
-    metabolite_count, metabolite_assay_count, metabolite_compartments.
+    metabolite_count, metabolite_assay_count, metabolite_compartments,
+    discussed_gene_count, discussed_pathway_count (narrative-index rollups; see
+    discussed_by_publication).
     When verbose=True, also includes abstract, description, cluster_count,
     derived_metric_gene_count, derived_metric_types.
     When search_text is provided, also includes score.
@@ -982,6 +1123,9 @@ def list_publications(
             summary.get("by_metric_type", []), "metric_type"),
         "by_compartment": _rename_freq(
             summary.get("by_compartment", []), "compartment"),
+        # Literature "discusses" coverage (spec Extension 3): binary
+        # {has_discusses, no_discusses} split across the matched publications.
+        "by_discusses_coverage": summary.get("by_discusses_coverage", {}),
         "returned": len(results),
         "offset": offset,
         "truncated": summary["total_matching"] > offset + len(results),
@@ -1255,14 +1399,32 @@ def search_ontology(
     level: int | None = None,
     tree: str | None = None,
     informative_only: bool = False,
+    verbose: bool = False,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
     """Browse ontology terms by text search.
 
+    Args:
+        search_text: Lucene fulltext query over ontology term names.
+        ontology: Ontology key (e.g. 'kegg', 'go', 'ec'); see ONTOLOGY_CONFIG.
+        summary: Return only summary fields (forces limit=0, empty results).
+        limit: Max detail rows.
+        offset: Skip this many detail rows (pagination).
+        level: Restrict to terms at this hierarchy level.
+        tree: BRITE-only sub-tree filter.
+        informative_only: Drop uninformative (root / catch-all) terms.
+        verbose: Include the per-term `discussed_in_publications` DOI list
+            (KEGG only — list of {doi, prominence, evidence}).
+        conn: Optional graph connection (defaults to the shared connection).
+
     Returns dict with keys: total_entries, total_matching, score_max,
     score_median, returned, truncated, results.
     Per result: id, name, score, level, tree (sparse), tree_code (sparse).
+    For KEGG, each result also carries discussed_by_n_publications (count of
+    publications that discuss this pathway in prose). Verbose adds, for KEGG,
+    discussed_in_publications (list of {doi, prominence, evidence}; see
+    discussed_by_publication for a paper's full discussed set).
     """
     if not search_text or not search_text.strip():
         raise ValueError("search_text must not be empty.")
@@ -1315,7 +1477,7 @@ def search_ontology(
         det_cypher, det_params = build_search_ontology(
             ontology=ontology, search_text=effective_text, limit=limit, offset=offset,
             level=level, tree=tree,
-            informative_only=informative_only,
+            informative_only=informative_only, verbose=verbose,
         )
         results = conn.execute_query(det_cypher, **det_params)
     except Neo4jClientError:
@@ -1325,7 +1487,7 @@ def search_ontology(
             det_cypher, det_params = build_search_ontology(
                 ontology=ontology, search_text=effective_text, limit=limit, offset=offset,
                 level=level, tree=tree,
-                informative_only=informative_only,
+                informative_only=informative_only, verbose=verbose,
             )
             results = conn.execute_query(det_cypher, **det_params)
         else:

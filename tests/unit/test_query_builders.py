@@ -10434,3 +10434,307 @@ class TestBuildKGReleaseInfoQuery:
         assert "AS schema_info" in cypher
         assert "AS labels" in cypher
         assert "AS rel_types" in cypher
+
+
+# ===========================================================================
+# Publication "discusses" literature-index surface
+# (docs/tool-specs/publication-discusses-surface.md)
+# ===========================================================================
+
+
+class TestBuildDiscussedByPublication:
+    """New forward tool: discussed_by_publication detail builder.
+
+    UNION ALL over Publication_discusses_gene + Publication_discusses_kegg_pathway,
+    distinct edge vars (rg / rk). Per spec § 'Verified Cypher'.
+    """
+
+    def _build(self, **kw):
+        from multiomics_explorer.kg.queries_lib import build_discussed_by_publication
+        kw.setdefault("publication_dois", ["10.1038/ismej.2016.70"])
+        return build_discussed_by_publication(**kw)
+
+    def test_basic_matches_both_arms(self):
+        cypher, params = self._build()
+        assert "Publication_discusses_gene" in cypher
+        assert "Publication_discusses_kegg_pathway" in cypher
+        assert "UNION ALL" in cypher
+        assert params["publication_dois"] == ["10.1038/ismej.2016.70"]
+
+    def test_distinct_edge_vars(self):
+        """Distinct edge variables rg / rk — reusing one var raises a CyVer
+        conflicting-labels error (spec note)."""
+        cypher, _ = self._build()
+        assert "rg:Publication_discusses_gene" in cypher
+        assert "rk:Publication_discusses_kegg_pathway" in cypher
+
+    def test_case_insensitive_doi_match(self):
+        cypher, _ = self._build()
+        assert "toLower(p.doi) IN $publication_dois" in cypher
+
+    def test_returns_compact_columns(self):
+        cypher, _ = self._build()
+        for col in ["doi", "entity_kind", "entity_id", "entity_name",
+                    "organism", "prominence"]:
+            assert f"AS {col}" in cypher, f"Missing compact column '{col}'"
+
+    def test_gene_entity_name_coalesces_gene_name_product(self):
+        cypher, _ = self._build()
+        assert "coalesce(g.gene_name, g.product) AS entity_name" in cypher
+
+    def test_pathway_organism_is_null_padding(self):
+        """Pathway arm pads organism with explicit NULL (union shape)."""
+        cypher, _ = self._build()
+        assert "NULL AS organism" in cypher
+
+    def test_pathway_entity_id_is_kegg_term_id(self):
+        cypher, _ = self._build()
+        assert "k.id AS entity_id" in cypher
+        assert "'kegg_pathway' AS entity_kind" in cypher
+
+    def test_gene_arm_literal_entity_kind(self):
+        cypher, _ = self._build()
+        assert "'gene' AS entity_kind" in cypher
+
+    def test_compact_omits_evidence(self):
+        cypher, _ = self._build(verbose=False)
+        assert "evidence" not in cypher
+
+    def test_verbose_adds_evidence(self):
+        cypher, _ = self._build(verbose=True)
+        assert "rg.evidence AS evidence" in cypher
+        assert "rk.evidence AS evidence" in cypher
+
+    def test_entity_kind_gene_drops_pathway_arm(self):
+        """entity_kind='gene' emits only the gene UNION branch."""
+        cypher, _ = self._build(entity_kind="gene")
+        assert "Publication_discusses_gene" in cypher
+        assert "Publication_discusses_kegg_pathway" not in cypher
+        assert "UNION ALL" not in cypher
+
+    def test_entity_kind_kegg_drops_gene_arm(self):
+        cypher, _ = self._build(entity_kind="kegg_pathway")
+        assert "Publication_discusses_kegg_pathway" in cypher
+        assert "Publication_discusses_gene" not in cypher
+        assert "UNION ALL" not in cypher
+
+    def test_entity_kind_none_keeps_both(self):
+        cypher, _ = self._build(entity_kind=None)
+        assert "UNION ALL" in cypher
+
+    def test_prominence_filter_in_params_and_where(self):
+        cypher, params = self._build(prominence="central")
+        assert params["prominence"] == "central"
+        assert "$prominence" in cypher
+
+    def test_prominence_none_no_param(self):
+        cypher, params = self._build(prominence=None)
+        # Filter is null-tolerant; builder may still emit the predicate guarded
+        # by ($prominence IS NULL OR ...). Param is None when unset.
+        assert params.get("prominence") in (None,)
+
+    def test_order_by_deterministic(self):
+        """Sort key: doi, entity_kind, prominence (central first), entity_id."""
+        cypher, _ = self._build()
+        assert "ORDER BY" in cypher
+        order_tail = cypher[cypher.rindex("ORDER BY"):]
+        assert "doi" in order_tail
+        assert "entity_kind" in order_tail
+        assert "prominence" in order_tail
+        assert "entity_id" in order_tail
+
+    def test_limit_clause(self):
+        cypher, params = self._build(limit=50)
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 50
+
+    def test_offset_emits_skip(self):
+        cypher, params = self._build(limit=50, offset=10)
+        assert "SKIP $offset" in cypher
+        assert params["offset"] == 10
+        assert cypher.index("SKIP") < cypher.index("LIMIT")
+
+    def test_offset_zero_no_skip(self):
+        cypher, params = self._build(limit=50, offset=0)
+        assert "SKIP" not in cypher
+        assert "offset" not in params
+
+    def test_invalid_entity_kind_raises(self):
+        with pytest.raises(ValueError):
+            self._build(entity_kind="bogus")
+
+    def test_invalid_prominence_raises(self):
+        with pytest.raises(ValueError):
+            self._build(prominence="loud")
+
+
+class TestBuildDiscussedByPublicationSummary:
+    """Summary builder: total_entries is UNFILTERED (sum of precomputed
+    Publication.discussed_gene_count + discussed_pathway_count); every other
+    rollup reflects the filtered set. Per spec § Summary fields."""
+
+    def _build(self, **kw):
+        from multiomics_explorer.kg.queries_lib import (
+            build_discussed_by_publication_summary,
+        )
+        kw.setdefault("publication_dois", ["10.1038/ismej.2016.70"])
+        return build_discussed_by_publication_summary(**kw)
+
+    def test_returns_summary_keys(self):
+        cypher, params = self._build()
+        for key in ["total_entries", "total_matching", "by_entity_kind",
+                    "by_prominence", "top_kegg_pathways", "top_publications"]:
+            assert key in cypher, f"Missing summary key '{key}'"
+        assert params["publication_dois"] == ["10.1038/ismej.2016.70"]
+
+    def test_total_entries_uses_precomputed_node_counts(self):
+        """total_entries sums discussed_gene_count + discussed_pathway_count —
+        NOT re-running the detail query (spec § total_entries is unfiltered)."""
+        cypher, _ = self._build()
+        assert "discussed_gene_count" in cypher
+        assert "discussed_pathway_count" in cypher
+
+    def test_total_entries_unaffected_by_prominence_filter(self):
+        """total_entries derivation must not apply prominence — only the
+        filtered rollups do."""
+        cypher_plain, _ = self._build()
+        cypher_filt, params = self._build(prominence="central")
+        # the prominence filter param flows for the filtered rollups
+        assert params["prominence"] == "central"
+        # precomputed-count expression present in both
+        assert "discussed_gene_count" in cypher_filt
+
+    def test_case_insensitive_doi_match(self):
+        cypher, _ = self._build()
+        assert "toLower(p.doi) IN $publication_dois" in cypher
+
+    def test_invalid_entity_kind_raises(self):
+        with pytest.raises(ValueError):
+            self._build(entity_kind="bogus")
+
+    def test_invalid_prominence_raises(self):
+        with pytest.raises(ValueError):
+            self._build(prominence="loud")
+
+
+class TestBuildGeneOverviewDiscusses:
+    """Extension 1: gene_overview gains per-row discussed_in_publication_count
+    (compact, precomputed) + discussed_in_publications (verbose, {doi,
+    prominence, evidence} list). Per spec § Extension 1."""
+
+    def test_compact_includes_discussed_count(self):
+        cypher, _ = build_gene_overview(locus_tags=["PMM1428"], verbose=False)
+        assert "discussed_in_publication_count" in cypher
+
+    def test_compact_omits_verbose_discussed_list(self):
+        cypher, _ = build_gene_overview(locus_tags=["PMM1428"], verbose=False)
+        assert "discussed_in_publications" not in cypher
+
+    def test_verbose_adds_discussed_publications_list(self):
+        cypher, _ = build_gene_overview(locus_tags=["PMM1428"], verbose=True)
+        assert "discussed_in_publications" in cypher
+
+    def test_verbose_collects_doi_prominence_evidence(self):
+        cypher, _ = build_gene_overview(locus_tags=["PMM1428"], verbose=True)
+        assert "Publication_discusses_gene" in cypher
+        assert "prominence" in cypher
+        assert "evidence" in cypher
+
+
+class TestBuildGeneOverviewTopDiscussingPublications:
+    """gene_overview envelope rollup builder: top_discussing_publications ranks
+    publications by distinct queried-gene count. Per spec § Extension 1
+    'Verified envelope Cypher'."""
+
+    def _build(self, **kw):
+        from multiomics_explorer.kg.queries_lib import (
+            build_gene_overview_top_discussing_publications,
+        )
+        kw.setdefault("locus_tags", ["PMM1428"])
+        return build_gene_overview_top_discussing_publications(**kw)
+
+    def test_ranks_by_distinct_gene_count(self):
+        cypher, params = self._build()
+        assert "Publication_discusses_gene" in cypher
+        assert "count(DISTINCT g)" in cypher
+        assert "n_genes" in cypher
+        assert params["locus_tags"] == ["PMM1428"]
+
+    def test_returns_doi_title_n_genes(self):
+        cypher, _ = self._build()
+        assert "doi" in cypher
+        assert "title" in cypher
+        assert "n_genes" in cypher
+
+    def test_order_by_n_genes_desc(self):
+        cypher, _ = self._build()
+        assert "ORDER BY n_genes DESC" in cypher
+
+
+class TestBuildSearchOntologyDiscusses:
+    """Extension 2: search_ontology gains discussed_by_n_publications
+    (pattern-count, KEGG-only via ONTOLOGY_CONFIG discusses_rel gate) +
+    verbose param + discussed_in_publications list. Per spec § Extension 2."""
+
+    def test_kegg_config_declares_discusses_rel(self):
+        """Gate driver: ONTOLOGY_CONFIG['kegg'] declares discusses_rel."""
+        assert ONTOLOGY_CONFIG["kegg"].get("discusses_rel") == (
+            "Publication_discusses_kegg_pathway"
+        )
+
+    def test_kegg_emits_pattern_count_column(self):
+        cypher, _ = build_search_ontology(ontology="kegg", search_text="photosynthesis")
+        assert "discussed_by_n_publications" in cypher
+        assert "Publication_discusses_kegg_pathway" in cypher
+
+    def test_pattern_count_reads_rel_from_config_not_inlined(self):
+        """The builder reads the rel-type from config — non-kegg ontologies
+        whose config lacks discusses_rel must NOT emit the column."""
+        cypher, _ = build_search_ontology(ontology="go_bp", search_text="test")
+        assert "discussed_by_n_publications" not in cypher
+        assert "Publication_discusses_kegg_pathway" not in cypher
+
+    def test_ec_does_not_emit_column(self):
+        cypher, _ = build_search_ontology(ontology="ec", search_text="kinase")
+        assert "discussed_by_n_publications" not in cypher
+
+    def test_verbose_default_false_omits_discussed_list(self):
+        cypher, _ = build_search_ontology(ontology="kegg", search_text="x")
+        assert "discussed_in_publications" not in cypher
+
+    def test_verbose_true_adds_discussed_list_on_kegg(self):
+        cypher, _ = build_search_ontology(
+            ontology="kegg", search_text="x", verbose=True,
+        )
+        assert "discussed_in_publications" in cypher
+
+    def test_verbose_true_non_kegg_no_discussed_list(self):
+        """verbose carries the DOI list only where the discusses gate fires."""
+        cypher, _ = build_search_ontology(
+            ontology="go_bp", search_text="x", verbose=True,
+        )
+        assert "discussed_in_publications" not in cypher
+
+
+class TestBuildListPublicationsDiscusses:
+    """Extension 3: list_publications gains per-row discussed_gene_count +
+    discussed_pathway_count (precomputed node props). Per spec § Extension 3."""
+
+    def test_row_includes_discussed_counts(self):
+        cypher, _ = build_list_publications()
+        assert "discussed_gene_count" in cypher
+        assert "discussed_pathway_count" in cypher
+
+
+class TestBuildListPublicationsSummaryDiscusses:
+    """list_publications summary envelope gains by_discusses_coverage
+    {has_discusses, no_discusses}. Per spec § Extension 3."""
+
+    def test_summary_has_by_discusses_coverage(self):
+        cypher, _ = build_list_publications_summary()
+        assert "by_discusses_coverage" in cypher
+
+    def test_coverage_splits_on_discussed_counts(self):
+        cypher, _ = build_list_publications_summary()
+        assert "has_discusses" in cypher
+        assert "no_discusses" in cypher

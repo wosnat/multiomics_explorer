@@ -102,9 +102,10 @@ async def discussed_by_publication(
 
 **Per-result columns (compact):** `doi`, `entity_kind` (`gene`|`kegg_pathway`),
 `entity_id` (locus_tag or `kegg.pathway:koXXXXX`), `entity_name`
-(gene `product` / pathway `name` — consistently the entity's readable name),
-`organism` (gene `organism_name`; explicit `None` on pathway rows — union padding),
-`prominence`.
+(gene **`gene_name`**, falling back to `product` when the gene has no symbol —
+`coalesce(g.gene_name, g.product)`; pathway `name` — consistently the entity's
+readable name), `organism` (gene `organism_name`; explicit `None` on pathway rows
+— union padding), `prominence`.
 **Verbose adds:** `evidence` (the extraction quote).
 
 ## Result-size controls — Option B (batch input)
@@ -113,11 +114,11 @@ async def discussed_by_publication(
 
 | Field | Type | Description |
 |---|---|---|
-| total_entries | int | All discusses edges from matched DOIs (unfiltered) |
+| total_entries | int | All discusses edges from matched DOIs, **before** `entity_kind`/`prominence` filters |
 | total_matching | int | Rows after `entity_kind` / `prominence` filters |
 | returned, truncated | int/bool | Standard envelope |
-| by_entity_kind | dict | `{gene, kegg_pathway}` row counts |
-| by_prominence | dict | `{central, peripheral}` row counts |
+| by_entity_kind | dict | `{gene, kegg_pathway}` row counts of the **filtered** (`total_matching`) set |
+| by_prominence | dict | `{central, peripheral}` row counts of the **filtered** (`total_matching`) set |
 | top_kegg_pathways | list | discussed KEGG pathways across the input DOIs, by mention count (id, name, n) |
 | top_publications | list | input DOIs ranked by their discussed-edge count (gene + pathway), surfacing the densest narrative index in a batch (doi, title, n) |
 | not_found | list[str] | DOIs absent from the KG |
@@ -128,6 +129,13 @@ async def discussed_by_publication(
 **Default limit:** 50. `summary=True` ⇒ `limit=0`. **`offset`:** default 0; `SKIP $offset`
 applied after the global ORDER BY, before `LIMIT`. `returned`/`truncated` reflect the
 offset slice; `total_matching` stays the full filtered count.
+
+**`total_entries` is unfiltered** — compute it in `build_discussed_by_publication_summary`
+by summing the precomputed `Publication.discussed_gene_count + discussed_pathway_count`
+over the matched DOIs, NOT by re-running the detail query without filters. The summary
+builder therefore does **not** apply `entity_kind`/`prominence` when deriving
+`total_entries`; every other summary rollup (`total_matching`, `by_entity_kind`,
+`by_prominence`, `top_kegg_pathways`, `top_publications`) reflects the **filtered** set.
 
 ## Verified Cypher (UNION ALL, distinct edge vars)
 
@@ -202,12 +210,23 @@ RETURN p.doi AS doi, p.title AS title, n_genes ORDER BY n_genes DESC, p.doi LIMI
 
 Pathway arm of the (dropped) reverse lookup. KEGG terms only; null/0 for other ontologies.
 
-- **NEW PARAM** — `search_ontology` gains a `verbose: bool = False` param. It has **none
-  today** (only `limit` / `level` / `tree`). This is a real interface addition, not just a
-  field add — the implementer adds the param across api + MCP layers. Without `verbose`,
-  only the compact count below is returned.
+- **NEW PARAM** — `search_ontology` gains a `verbose: bool = False` param. It has **no
+  `verbose` today** (current params: `search_text`/`ontology`/`summary`/`limit`/`offset`/
+  `level`/`tree`/`informative_only`). This is a real interface addition, not just a field
+  add — the implementer adds the param across api + MCP layers. Slot `verbose` alongside
+  the existing flags; do not remove any current param. Without `verbose`, only the compact
+  count below is returned.
 - **Compact** per-row: `discussed_by_n_publications` via pattern-count
   `size([(k)<-[:Publication_discusses_kegg_pathway]-() | 1])` (no precomputed prop).
+- **Gate the pattern-count off `ONTOLOGY_CONFIG`, not a hardcoded `ontology == 'kegg'`.**
+  Add an optional `"discusses_rel": "Publication_discusses_kegg_pathway"` key to the
+  `kegg` entry in `ONTOLOGY_CONFIG` (`kg/queries_lib.py:10`). The `search_ontology`
+  builder emits the pattern-count column **only when the selected ontology's config
+  declares `discusses_rel`** (and reads the rel-type name from it rather than inlining
+  the literal). For every other ontology (GO/EC/COG/Pfam/…) the column is omitted —
+  no per-row subquery is paid on those hot generic searches, and `discussed_by_n_publications`
+  is simply absent / `None`. This mirrors how `gene_rel` / `hierarchy_rels` / `fulltext_index`
+  are already config-driven per ontology.
 - **Verbose** per-row: `discussed_in_publications` — list of `{doi, prominence, evidence}`
   (pathways fan out more — ko00710 → 19; evidence quotes verbose-gated). Field
   description signposts `discussed_by_publication`.
@@ -238,9 +257,14 @@ Pathway arm of the (dropped) reverse lookup. KEGG terms only; null/0 for other o
 - **Exports** — new api fn `discussed_by_publication` → `api/__init__.py` +
   `multiomics_explorer/__init__.py` `__all__`. New builder `build_discussed_by_publication`
   (+ `build_discussed_by_publication_summary`) → `TOOL_BUILDERS`. New tool → `EXPECTED_TOOLS`.
-- **search_ontology gains a `verbose` param** — it has none today (only `limit`/`level`/
-  `tree`). Adding it touches the api function signature + MCP wrapper + the builder's
-  RETURN-column gating. gene_overview and list_publications already have `verbose`.
+- **search_ontology gains a `verbose` param** — it has no `verbose` today (current params
+  are `search_text`/`ontology`/`summary`/`limit`/`offset`/`level`/`tree`/`informative_only`).
+  Adding it touches the api function signature + MCP wrapper + the builder's RETURN-column
+  gating. gene_overview and list_publications already have `verbose`.
+- **search_ontology discusses pattern-count is `ONTOLOGY_CONFIG`-gated** — add a
+  `"discusses_rel"` key to the `kegg` config entry; the builder emits
+  `discussed_by_n_publications` (and reads the rel-type from config) only for ontologies
+  whose config declares it. No subquery on non-KEGG searches. See Extension 2.
 - **`discussed_by_publication` polymorphic rows** — `entity_name` (gene `product` /
   pathway `name`) and `organism` (gene-only; explicit `None` on pathway rows) are union
   padding, mirroring the Phase-3 polymorphic-row precedent (`genes_by_metabolite`).

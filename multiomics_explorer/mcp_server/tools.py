@@ -1321,6 +1321,21 @@ class KGReleaseInfoResponse(BaseModel):
     summary: str = Field(description="One-line human-readable verdict.")
 
 
+class DiscussedPublicationRef(BaseModel):
+    """Shared sub-model: one publication that discusses an entity (gene or
+    KEGG pathway) in prose. Reused verbatim by the gene_overview and
+    search_ontology verbose `discussed_in_publications` lists.
+
+    Recall-biased narrative mention (prose, not DE-table expression). The
+    `evidence` quote answers 'why does this paper discuss the entity' inline.
+    For a paper's full discussed set, call discussed_by_publication.
+    """
+    doi: str = Field(description="Discussing publication DOI (e.g. '10.1038/ismej.2016.70').")
+    prominence: Literal["central", "peripheral"] = Field(
+        description="How prominently the paper discusses the entity: 'central' (a focus) or 'peripheral' (a passing mention).")
+    evidence: str = Field(description="Extraction quote from the paper text supporting the mention.")
+
+
 def register_tools(mcp: FastMCP):
     """Register all KG tools with the MCP server."""
 
@@ -1841,7 +1856,16 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. When non-empty, drill into metabolites_by_gene(locus_tags=[...]). Per-source definitions: see docs://guide/concepts.",
         )
+        # Literature 'discusses' rollup
+        discussed_in_publication_count: int = Field(
+            default=0,
+            description="Distinct publications that discuss this gene in prose (precomputed Gene.discussed_in_publication_count). Recall-biased narrative mention, NOT DE-table expression. When > 0, set verbose=True for the per-paper DOI list, or call discussed_by_publication for a paper's full discussed set.",
+        )
         # verbose-only
+        discussed_in_publications: list[DiscussedPublicationRef] | None = Field(
+            default=None,
+            description="Per-paper {doi, prominence, evidence} for papers discussing this gene (verbose-only; avg ~1, max 6 per gene). The evidence quote explains the mention inline. Call discussed_by_publication for a paper's full discussed set.",
+        )
         gene_summary: str | None = Field(default=None, description="Concatenated summary text (verbose-only, e.g. 'prmA :: ribosomal protein L11 methyltransferase :: Methylates ribosomal protein L11').")
         function_description: str | None = Field(default=None, description="Curated functional description (verbose-only). May be null when no curated text exists.")
         all_identifiers: list[str] | None = Field(default=None, description="Cross-references: UniProt, CyanorakID, RefSeq, etc. (verbose-only).")
@@ -1870,6 +1894,11 @@ def register_tools(mcp: FastMCP):
         annotation_state: str = Field(description="Informativeness state (e.g. 'informative_multi', 'informative_single', 'catch_all_only', 'no_evidence').")
         count: int = Field(description="Genes in this state.")
 
+    class OverviewDiscussingPublication(BaseModel):
+        doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70').")
+        title: str | None = Field(default=None, description="Publication title.")
+        n_genes: int = Field(description="Number of the queried genes this publication discusses (batch set-coverage — which one paper covers most of your gene set).")
+
     class GeneOverviewResponse(BaseModel):
         total_matching: int = Field(description="Genes found in KG from input locus_tags.")
         by_organism: list[OverviewOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc.")
@@ -1887,6 +1916,14 @@ def register_tools(mcp: FastMCP):
         has_chemistry: int = Field(
             default=0,
             description="Count of requested locus_tags with non-empty evidence_sources (participate in at least one reaction-to-metabolite or transport path).",
+        )
+        has_discussed: int = Field(
+            default=0,
+            description="Count of requested locus_tags discussed in prose by at least one publication (discussed_in_publication_count > 0).",
+        )
+        top_discussing_publications: list[OverviewDiscussingPublication] = Field(
+            default_factory=list,
+            description="Publications ranked by how many of the queried genes they discuss (batch set-coverage — recovers 'which one paper covers most of my gene set'). Feed a doi into discussed_by_publication for that paper's full discussed set.",
         )
         returned: int = Field(description="Results in this response (0 when summary=true).")
         offset: int = Field(default=0, description="Offset into full result set.")
@@ -1936,6 +1973,10 @@ def register_tools(mcp: FastMCP):
                 for b in data.get("by_annotation_state", [])
             ]
             results = [GeneOverviewResult(**r) for r in data["results"]]
+            top_discussing_publications = [
+                OverviewDiscussingPublication(**p)
+                for p in data.get("top_discussing_publications", [])
+            ]
             return GeneOverviewResponse(
                 total_matching=data["total_matching"],
                 by_organism=by_organism,
@@ -1948,6 +1989,8 @@ def register_tools(mcp: FastMCP):
                 has_clusters=data["has_clusters"],
                 has_derived_metrics=data["has_derived_metrics"],
                 has_chemistry=data.get("has_chemistry", 0),
+                has_discussed=data.get("has_discussed", 0),
+                top_discussing_publications=top_discussing_publications,
                 returned=data["returned"],
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],
@@ -2209,6 +2252,12 @@ def register_tools(mcp: FastMCP):
         is_informative: bool = Field(description="True iff term is not flagged is_uninformative (positive framing; coerced from sparse '<term>.is_uninformative' KG flag)")
         tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
         tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
+        discussed_by_n_publications: int | None = Field(
+            default=None,
+            description="Publications that discuss this KEGG pathway in prose (KEGG only; None on other ontologies). Recall-biased narrative mention, NOT gene annotation. When > 0, set verbose=True for the per-paper DOI list, or call discussed_by_publication.")
+        discussed_in_publications: list[DiscussedPublicationRef] | None = Field(
+            default=None,
+            description="Per-paper {doi, prominence, evidence} for papers discussing this KEGG pathway (verbose-only; KEGG only). Call discussed_by_publication for a paper's full discussed set.")
 
     class SearchOntologyResponse(BaseModel):
         total_entries: int = Field(description="Total terms in this ontology (e.g. 847)")
@@ -2263,6 +2312,10 @@ def register_tools(mcp: FastMCP):
             "go:0008150). Term-side filter only — never restricts the gene set. "
             "Default False (opt-in).",
         )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include the per-row discussed_in_publications {doi, prominence, "
+            "evidence} list (KEGG pathways only). Default compact.",
+        )] = False,
     ) -> SearchOntologyResponse:
         """Search ontology terms by text — Lucene over term names only (no hierarchy traversal).
 
@@ -2278,6 +2331,7 @@ def register_tools(mcp: FastMCP):
                 limit=limit, offset=offset,
                 level=level, tree=tree,
                 informative_only=informative_only,
+                verbose=verbose,
                 conn=conn,
             )
             results = [SearchOntologyResult(**r) for r in data["results"]]
@@ -2665,6 +2719,9 @@ def register_tools(mcp: FastMCP):
         metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this publication (precomputed Publication.metabolite_count). Non-zero on metabolomics-bearing papers. When > 0, drill via list_metabolite_assays(publication_doi=[...]) to inspect the paper's MetaboliteAssay nodes.")
         metabolite_assay_count: int = Field(default=0, description="Distinct MetaboliteAssay edges anchored to this publication (precomputed). Diverges from metabolite_count when the same metabolite is measured in multiple compartments per paper.")
         metabolite_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured for metabolomics in this publication (e.g. ['whole_cell', 'extracellular']). Populated only when metabolite_assay_count > 0; [] otherwise.")
+        # Literature 'discusses' rollup
+        discussed_gene_count: int = Field(default=0, description="Distinct genes this publication discusses in prose (precomputed Publication.discussed_gene_count). Recall-biased narrative index, NOT DE-table expression. When > 0, drill via discussed_by_publication(publication_dois=[doi]).")
+        discussed_pathway_count: int = Field(default=0, description="Distinct KEGG pathways this publication discusses in prose (precomputed Publication.discussed_pathway_count). When > 0, drill via discussed_by_publication(publication_dois=[doi], entity_kind='kegg_pathway').")
         score: float | None = Field(default=None, description="Lucene relevance score (only with search_text).")
 
         abstract: str | None = Field(default=None, description="Publication abstract (verbose-only).")
@@ -2705,6 +2762,10 @@ def register_tools(mcp: FastMCP):
         compartment: str = Field(description="Wet-lab compartment (e.g. 'whole_cell', 'vesicle').")
         count: int = Field(description="Number of publications with this compartment.")
 
+    class PubDiscussesCoverageBreakdown(BaseModel):
+        has_discusses: int = Field(default=0, description="Matched publications carrying >=1 discussed gene or pathway (a narrative 'discusses' literature index).")
+        no_discusses: int = Field(default=0, description="Matched publications with no 'discusses' edges.")
+
     class ListPublicationsResponse(BaseModel):
         total_entries: int = Field(description="Total publications in KG (unfiltered).")
         total_matching: int = Field(description="Publications matching filters.")
@@ -2716,6 +2777,7 @@ def register_tools(mcp: FastMCP):
         by_value_kind: list[PubValueKindBreakdown] = Field(default_factory=list, description="DerivedMetric value kind frequency rollup across matched publications.")
         by_metric_type: list[PubMetricTypeBreakdown] = Field(default_factory=list, description="DerivedMetric type frequency rollup across matched publications.")
         by_compartment: list[PubCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched publications.")
+        by_discusses_coverage: PubDiscussesCoverageBreakdown = Field(default_factory=PubDiscussesCoverageBreakdown, description="Binary split {has_discusses, no_discusses} of matched publications by whether they carry a narrative 'discusses' literature index (40 vs 3 in the current KG).")
         returned: int = Field(description="Publications in this response.")
         offset: int = Field(default=0, description="Offset into full result set.")
         truncated: bool = Field(description="True if total_matching > returned.")
@@ -2801,6 +2863,7 @@ def register_tools(mcp: FastMCP):
             by_value_kind = [PubValueKindBreakdown(**b) for b in result.get("by_value_kind", [])]
             by_metric_type = [PubMetricTypeBreakdown(**b) for b in result.get("by_metric_type", [])]
             by_compartment = [PubCompartmentBreakdown(**b) for b in result.get("by_compartment", [])]
+            by_discusses_coverage = PubDiscussesCoverageBreakdown(**(result.get("by_discusses_coverage") or {}))
             response = ListPublicationsResponse(
                 total_entries=result["total_entries"],
                 total_matching=result["total_matching"],
@@ -2812,6 +2875,7 @@ def register_tools(mcp: FastMCP):
                 by_value_kind=by_value_kind,
                 by_metric_type=by_metric_type,
                 by_compartment=by_compartment,
+                by_discusses_coverage=by_discusses_coverage,
                 returned=result["returned"],
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],
@@ -9540,5 +9604,114 @@ def register_tools(mcp: FastMCP):
             not_found=data["not_found"],
             not_matched=data["not_matched"],
             warnings=data["warnings"],
+            results=results,
+        )
+
+    # -----------------------------------------------------------------
+    # discussed_by_publication — literature 'discusses' forward lookup
+    # -----------------------------------------------------------------
+
+    class DiscussedByPublicationResult(BaseModel):
+        doi: str = Field(description="Publication DOI that discusses this entity (e.g. '10.1038/ismej.2016.70').")
+        entity_kind: Literal["gene", "kegg_pathway"] = Field(description="Discussed entity type: 'gene' or 'kegg_pathway'.")
+        entity_id: str = Field(description="Verbatim node id — bare gene locus_tag (e.g. 'PMT1030') or prefixed KEGG pathway id (e.g. 'kegg.pathway:ko00710').")
+        entity_name: str = Field(description="Readable entity name — gene gene_name (falls back to product) or KEGG pathway name.")
+        organism: str | None = Field(default=None, description="Organism of the gene (e.g. 'Prochlorococcus MED4'); explicit None on kegg_pathway rows (union padding).")
+        prominence: Literal["central", "peripheral"] = Field(description="How prominently the paper discusses the entity: 'central' (a focus) or 'peripheral' (a passing mention).")
+        evidence: str | None = Field(default=None, description="Extraction quote supporting the mention (verbose-only; None compact).")
+
+    class DiscussedByEntityKindBreakdown(BaseModel):
+        entity_kind: str = Field(description="Entity type ('gene' or 'kegg_pathway').")
+        count: int = Field(description="Filtered rows of this entity kind.")
+
+    class DiscussedByProminenceBreakdown(BaseModel):
+        prominence: str = Field(description="Prominence ('central' or 'peripheral').")
+        count: int = Field(description="Filtered rows at this prominence.")
+
+    class DiscussedTopKeggPathway(BaseModel):
+        id: str = Field(description="KEGG pathway id, prefixed verbatim (e.g. 'kegg.pathway:ko00710').")
+        name: str = Field(description="KEGG pathway name (e.g. 'Carbon fixation').")
+        n: int = Field(description="Mention count across the input DOIs (filtered).")
+
+    class DiscussedTopPublication(BaseModel):
+        doi: str = Field(description="Input publication DOI.")
+        title: str | None = Field(default=None, description="Publication title.")
+        n: int = Field(description="Discussed-edge count (gene + pathway) for this DOI — surfaces the densest narrative index in a batch.")
+
+    class DiscussedByPublicationResponse(BaseModel):
+        total_entries: int = Field(description="All discusses edges from matched DOIs, BEFORE entity_kind / prominence filters.")
+        total_matching: int = Field(description="Rows after entity_kind / prominence filters (full filtered count, not the offset slice).")
+        returned: int = Field(description="Detail rows in this response (0 when summary=true).")
+        offset: int = Field(default=0, description="Offset into the filtered result set (pagination).")
+        truncated: bool = Field(description="True if total_matching > returned.")
+        by_entity_kind: list[DiscussedByEntityKindBreakdown] = Field(default_factory=list, description="Row counts per entity kind over the filtered set.")
+        by_prominence: list[DiscussedByProminenceBreakdown] = Field(default_factory=list, description="Row counts per prominence over the filtered set.")
+        top_kegg_pathways: list[DiscussedTopKeggPathway] = Field(default_factory=list, description="Discussed KEGG pathways across the input DOIs, ranked by mention count. Feed an id into genes_by_ontology(ontology='kegg').")
+        top_publications: list[DiscussedTopPublication] = Field(default_factory=list, description="Input DOIs ranked by their discussed-edge count — surfaces the densest narrative index in a batch.")
+        not_found: list[str] = Field(default_factory=list, description="Input DOIs absent from the KG.")
+        not_matched: list[str] = Field(default_factory=list, description="Input DOIs present but with no discusses edge after filters.")
+        results: list[DiscussedByPublicationResult] = Field(default_factory=list, description="One row per discussed entity (gene or KEGG pathway).")
+
+    @mcp.tool(tags={"publications", "literature"}, annotations={"readOnlyHint": True})
+    async def discussed_by_publication(
+        ctx: Context,
+        publication_dois: Annotated[list[str], Field(
+            description="Publication DOIs (e.g. ['10.1038/ismej.2016.70']).")],
+        entity_kind: Annotated[Literal["gene", "kegg_pathway"] | None, Field(
+            description="Restrict to one arm: 'gene' or 'kegg_pathway'. None = both.")] = None,
+        prominence: Annotated[Literal["central", "peripheral"] | None, Field(
+            description="Filter edges by prominence: 'central' or 'peripheral'.")] = None,
+        summary: Annotated[bool, Field(description="Return only summary fields.")] = False,
+        verbose: Annotated[bool, Field(description="Include the full evidence quote.")] = False,
+        limit: Annotated[int, Field(description="Max detail rows.", ge=0)] = 50,
+        offset: Annotated[int, Field(description="Skip this many detail rows (pagination).", ge=0)] = 0,
+    ) -> DiscussedByPublicationResponse:
+        """List the genes and KEGG pathways a publication discusses in prose.
+
+        Recall-biased literature router (narrative mentions, NOT exhaustive, NOT DE-table
+        expression data). Routing: feed DOIs from list_publications; drill returned genes
+        into gene_overview and pathways into genes_by_ontology(ontology='kegg').
+        """
+        await ctx.info(
+            f"discussed_by_publication publication_dois={len(publication_dois)} "
+            f"entity_kind={entity_kind} prominence={prominence} "
+            f"summary={summary} verbose={verbose} offset={offset}"
+        )
+        try:
+            conn = _conn(ctx)
+            data = api.discussed_by_publication(
+                publication_dois,
+                entity_kind=entity_kind,
+                prominence=prominence,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                offset=offset,
+                conn=conn,
+            )
+        except ValueError as e:
+            await ctx.warning(f"discussed_by_publication error: {e}")
+            raise ToolError(str(e)) from e
+        except Exception as e:
+            await ctx.error(f"discussed_by_publication unexpected error: {e}")
+            raise ToolError(f"Error in discussed_by_publication: {e}")
+
+        results = [DiscussedByPublicationResult(**r) for r in data["results"]]
+        by_entity_kind = [DiscussedByEntityKindBreakdown(**b) for b in data.get("by_entity_kind", [])]
+        by_prominence = [DiscussedByProminenceBreakdown(**b) for b in data.get("by_prominence", [])]
+        top_kegg_pathways = [DiscussedTopKeggPathway(**p) for p in data.get("top_kegg_pathways", [])]
+        top_publications = [DiscussedTopPublication(**p) for p in data.get("top_publications", [])]
+        return DiscussedByPublicationResponse(
+            total_entries=data["total_entries"],
+            total_matching=data["total_matching"],
+            returned=data["returned"],
+            offset=data.get("offset", 0),
+            truncated=data["truncated"],
+            by_entity_kind=by_entity_kind,
+            by_prominence=by_prominence,
+            top_kegg_pathways=top_kegg_pathways,
+            top_publications=top_publications,
+            not_found=data.get("not_found", []),
+            not_matched=data.get("not_matched", []),
             results=results,
         )

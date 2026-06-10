@@ -52,10 +52,28 @@ examples:
          {"locus_tag": "PMM0392", "gene_name": null, "product": "ABC transporter, ATP-binding protein", "organism_name": "Prochlorococcus MED4", "reaction_count": 0, "metabolite_count": 554, "transporter_count": 8, "evidence_sources": ["transport", "metabolomics"]}
        ]}
 
+  - title: Genes named in the literature — which paper discusses them
+    call: gene_overview(locus_tags=["PMT2118", "PMT_1030"])
+    response: |
+      # Per-row discussed_in_publication_count flags genes a paper names in
+      # prose (avg 1.18, max 6 per gene). The envelope has_discussed counts
+      # input genes with >=1 discussing pub; top_discussing_publications
+      # ranks papers by how many of the queried genes they discuss
+      # (batch set-coverage — "which one paper covers most of my gene set").
+      {"total_matching": 2, "has_discussed": 2, "returned": 2, "truncated": false, "offset": 0, "not_found": [],
+       "top_discussing_publications": [
+         {"doi": "10.1038/ismej.2016.70", "title": "Transcriptional response of Prochlorococcus...", "n_genes": 2}
+       ],
+       "results": [
+         {"locus_tag": "PMT2118", "gene_name": null, "product": "Hypothetical protein", "organism_name": "Prochlorococcus MIT9313", "discussed_in_publication_count": 1},
+         {"locus_tag": "PMT_1030", "gene_name": null, "product": "possible Glucose-6-phosphate dehydrogenase, C-ter", "organism_name": "Prochlorococcus MIT9313", "discussed_in_publication_count": 1}
+       ]}
+
 verbose_fields:
   - gene_summary
   - function_description
   - all_identifiers
+  - discussed_in_publications
 
 chaining:
   - "resolve_gene → gene_overview"
@@ -67,11 +85,13 @@ chaining:
   - "gene_overview(locus_tags=...) → for genes with derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric; for ['numeric'] use genes_by_numeric_metric; for ['categorical'] use genes_by_categorical_metric"
   - "gene_overview(verbose=True) → see compartments_observed for vesicle/whole-cell triage"
   - "gene_overview (per-row `evidence_sources` non-empty) → metabolites_by_gene OR genes_by_metabolite for chemistry drill-down."
+  - "gene_overview (per-row `discussed_in_publication_count` > 0) → use verbose=True for the per-gene {doi, prominence, evidence} list, or discussed_by_publication(publication_dois=[...]) for the paper's full discussed set."
 
 mistakes:
   - "annotation_quality / min_quality semantics shifted in 2026-05 KG release. Existing notebooks using min_quality may select a different gene set than before. See docs://guide/conventions."
   - "If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this gene."
   - "annotation_types lists which ontology types have data — use gene_ontology_terms to get the actual terms."
   - "When `evidence_sources` is non-empty, drill via `metabolites_by_gene` (gene-anchored) or `genes_by_metabolite` (metabolite-anchored). Values are subset of {'metabolism', 'transport', 'metabolomics'} — 'metabolomics' means at least one of the gene's reachable metabolites has measurement coverage."
+  - "discussed_in_publication_count > 0 means at least one publication names this gene in prose (a recall-biased literature index, NOT DE-table expression). At ~1 pub/gene the answer is usually inline: verbose=True returns discussed_in_publications as {doi, prominence, evidence} per gene. Use discussed_by_publication for a paper's full discussed set."
   - wrong: "gene_overview(locus_tags=['PMM0845'], verbose=True)  # just to see the gene"
     right: "gene_overview(locus_tags=['PMM0845'])  # verbose only needed for gene_summary text"

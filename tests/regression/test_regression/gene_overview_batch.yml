@@ -11,6 +11,7 @@ rows:
   closest_ortholog_group_size: 2
   cluster_membership_count: 0
   cluster_types: []
+  discussed_in_publication_count: 0
   evidence_sources: []
   expression_edge_count: 0
   gene_category: Unknown
@@ -42,6 +43,7 @@ rows:
   cluster_types:
   - diel
   - time_course
+  discussed_in_publication_count: 0
   evidence_sources: []
   expression_edge_count: 35
   gene_category: Unknown

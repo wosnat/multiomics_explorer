@@ -50,7 +50,7 @@ Plus three orthogonal helpers:
 
 ---
 
-## Decision tree: 14 common question shapes
+## Decision tree: 15 common question shapes
 
 ### "What does gene X do? / Show me everything about gene X."
 1. `resolve_gene(query="X")` if the input is a name or partial label.
@@ -115,6 +115,15 @@ Plus three orthogonal helpers:
 ### "What genes sit next to X on the genome / is X in an operon?"
 - `gene_neighbors(locus_tags=["X"], window=5)` — genes flanking the anchor on the same contig, with `rank_offset`, `bp_gap`, and `same_strand`. Positional only — co-regulation must be confirmed via the expression tools, not inferred from adjacency.
 
+### "What does paper Y discuss? / Which papers discuss gene or pathway X?"
+This is the **literature axis** — a recall-biased index of the genes and
+KEGG pathways each paper names in prose (with `prominence` + an
+`evidence` quote), distinct from DE-table expression data.
+- Paper → named entities: `discussed_by_publication(publication_dois=[...])`. Chains from `list_publications` (find DOIs) into `gene_overview` (drill genes) / `genes_by_ontology(ontology='kegg', term_ids=[...])` (expand pathways).
+- Gene → discussing papers: `gene_overview(locus_tags=[...])` carries per-gene `discussed_in_publication_count` and (verbose) the discussing DOIs. No separate tool — genes are named by ~1 paper on average.
+- KEGG pathway → discussing papers: `search_ontology(ontology='kegg', verbose=True)` carries per-term `discussed_by_n_publications` and the DOI list.
+This index is a router, NOT exhaustive and NOT expression — use `differential_expression_by_gene` for DE.
+
 ### "I want raw Cypher."
 - `run_cypher(query="...")`. Read-only; write operations blocked. Validate against `kg_schema` first. Almost always there is a typed tool that fits — reach for Cypher only when you are sure none does.
 
@@ -150,7 +159,7 @@ tool** (returns envelope + per-row routing fields) with one or more
 | Discovery | Drill-down(s) |
 |---|---|
 | `list_experiments` | `differential_expression_by_gene`, `pathway_enrichment`, `list_metabolite_assays(experiment_ids=...)` |
-| `list_publications` | `list_experiments(publication_doi=...)`, `list_metabolite_assays(publication_doi=...)` |
+| `list_publications` | `list_experiments(publication_doi=...)`, `list_metabolite_assays(publication_doi=...)`, `discussed_by_publication(publication_dois=...)` |
 | `list_metabolites` | `genes_by_metabolite`, `assays_by_metabolite`, `genes_by_ontology(ontology='kegg', term_ids=[pathway_id])` |
 | `list_metabolite_assays` | `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`, `assays_by_metabolite` |
 | `list_derived_metrics` | `gene_derived_metrics`, `genes_by_{numeric,boolean,categorical}_metric` |
