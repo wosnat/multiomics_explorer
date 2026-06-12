@@ -69,7 +69,7 @@ mcp = FastMCP(
     "multiomics-kg",
     instructions=(
         "Multi-omics knowledge graph for Prochlorococcus and Alteromonas "
-        "(40 tools across gene/sequence/expression/ortholog/ontology/cluster/"
+        "(41 tools across gene/sequence/expression/ortholog/ontology/cluster/"
         "chemistry/metabolomics/enrichment).\n\n"
         "First call: kg_release_info — verifies your KG release matches what this "
         "explorer-MCP version expects. Surfaces the KG's identity (version, "

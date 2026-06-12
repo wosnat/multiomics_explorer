@@ -230,7 +230,7 @@ metabolites_by_gene(locus_tags=["PMM0434", "PMM0913"], organism="Prochlorococcus
 ```
 differential_expression_by_gene(organism=..., direction='up') → metabolites_by_gene(locus_tags=DE_genes, organism=..., metabolite_elements=['N']) (Workflow A — N-source marquee)
 genes_in_cluster(cluster_ids=...) → metabolites_by_gene(locus_tags=cluster_genes, organism=...) (Workflow C — cluster chemistry characterization)
-genes_by_function(query=..., organism=...) → metabolites_by_gene(locus_tags=function_hit_genes, organism=...) (Workflow C variant — function-search chemistry)
+genes_by_function(search_text=..., organism=...) → metabolites_by_gene(locus_tags=function_hit_genes, organism=...) (Workflow C variant — function-search chemistry)
 gene_overview(locus_tags=[...]) → per-row reaction_count/metabolite_count > 0 → metabolites_by_gene(locus_tags=chemistry_genes, organism=...)
 metabolites_by_gene → top_metabolites → list_metabolites(metabolite_ids=[top_metabolite_ids]) for richer per-metabolite cross-refs (mass, formula, full pathway names)
 metabolites_by_gene → top_metabolites → list_metabolites(metabolite_ids=[top_metabolite_ids], organism_names=[partner_organism]) for cross-organism presence (cross-feeding seed)

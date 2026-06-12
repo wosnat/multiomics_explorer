@@ -96,6 +96,173 @@ def _extract_param_names_from_about(content: str) -> list[str]:
     return names
 
 
+# --- Drift guards: validate call kwargs and tool-count claims against the live
+#     registry, across the hand-authored YAML inputs and guide/analysis docs
+#     (the generated tool md is already covered by TestAboutContentConsistency). ---
+
+_ROOT = Path(__file__).resolve().parent.parent.parent
+_INPUTS_DIR = _ROOT / "multiomics_explorer" / "inputs" / "tools"
+_GUIDE_DIR = (
+    _ROOT / "multiomics_explorer" / "skills" / "multiomics-kg-guide"
+    / "references" / "guide"
+)
+_ANALYSIS_DIR = (
+    _ROOT / "multiomics_explorer" / "skills" / "multiomics-kg-guide"
+    / "references" / "analysis"
+)
+_CLAUDE_MD = _ROOT / "CLAUDE.md"
+_SERVER_PY = _ROOT / "multiomics_explorer" / "mcp_server" / "server.py"
+
+# Kwargs valid in Python-package call examples but absent from MCP tool schemas
+# (the package functions take a connection; the MCP layer injects it).
+_NON_MCP_KWARGS = {"conn"}
+
+
+def _top_level_kwargs(arg: str) -> list[str]:
+    """Names of top-level `name=` kwargs in a call's argument string."""
+    parts, cur, depth = [], "", 0
+    for ch in arg:
+        if ch in "([{":
+            depth += 1
+            cur += ch
+        elif ch in ")]}":
+            depth -= 1
+            cur += ch
+        elif ch == "," and depth == 0:
+            parts.append(cur)
+            cur = ""
+        else:
+            cur += ch
+    if cur.strip():
+        parts.append(cur)
+    names = []
+    for p in parts:
+        m = re.match(r"\s*([A-Za-z_]\w*)\s*=(?!=)", p)
+        if m:
+            names.append(m.group(1))
+    return names
+
+
+def _iter_tool_calls(text: str, tool_names: set[str]):
+    """Yield (tool_name, [kwarg, ...]) for each `name(...)` whose name is a tool."""
+    for m in re.finditer(r"\b([a-z_][a-z0-9_]*)\(", text):
+        name = m.group(1)
+        if name not in tool_names:
+            continue
+        i = m.end() - 1
+        depth, j = 0, i
+        while j < len(text):
+            ch = text[j]
+            if ch == "(":
+                depth += 1
+            elif ch == ")":
+                depth -= 1
+                if depth == 0:
+                    break
+            j += 1
+        yield name, _top_level_kwargs(text[i + 1 : j])
+
+
+def test_yaml_example_kwargs_valid(tool_schemas):
+    """Kwargs in YAML example/steps/chaining calls are real params.
+
+    `mistakes:` is excluded — it deliberately contains wrong calls.
+    """
+    import yaml
+
+    tool_names = set(tool_schemas)
+    failures = []
+    for yf in sorted(_INPUTS_DIR.glob("*.yaml")):
+        data = yaml.safe_load(yf.read_text()) or {}
+        texts: list[str] = []
+        for ex in data.get("examples") or []:
+            texts.append(str(ex.get("call") or ""))
+            texts.append(str(ex.get("steps") or ""))
+        for c in data.get("chaining") or []:
+            if isinstance(c, str):
+                texts.append(c)
+        for text in texts:
+            for name, kwargs in _iter_tool_calls(text, tool_names):
+                params = set(
+                    (tool_schemas[name]["parameters"].get("properties") or {})
+                ) | _NON_MCP_KWARGS
+                for kw in kwargs:
+                    if kw not in params:
+                        failures.append(f"{yf.name}: {name}(... {kw}=...) is not a param")
+    assert not failures, "Stale example-call kwargs:\n" + "\n".join(failures)
+
+
+def test_guide_and_analysis_kwargs_valid(tool_schemas):
+    """Tool calls in guide/ and analysis/ docs use real params (`conn` allowed)."""
+    tool_names = set(tool_schemas)
+    failures = []
+    for doc_dir in (_GUIDE_DIR, _ANALYSIS_DIR):
+        for md in sorted(doc_dir.glob("*.md")):
+            for name, kwargs in _iter_tool_calls(md.read_text(), tool_names):
+                params = set(
+                    (tool_schemas[name]["parameters"].get("properties") or {})
+                ) | _NON_MCP_KWARGS
+                for kw in kwargs:
+                    if kw not in params:
+                        failures.append(
+                            f"{md.parent.name}/{md.name}: {name}(... {kw}=...) is not a param"
+                        )
+    assert not failures, "Stale doc-call kwargs:\n" + "\n".join(failures)
+
+
+def test_every_tool_has_yaml_doc_and_claude_row(tool_schemas):
+    """Each registered tool has a YAML input, a generated doc, and a CLAUDE.md row
+    — and there are no orphan YAML/doc files for nonexistent tools."""
+    tool_names = set(tool_schemas)
+    yaml_stems = {p.stem for p in _INPUTS_DIR.glob("*.yaml")}
+    doc_stems = {p.stem for p in _get_about_files()}
+    claude_rows = set(re.findall(r"^\| `([a-z_]+)` \|", _CLAUDE_MD.read_text(), re.M))
+
+    problems = []
+    for t in sorted(tool_names):
+        if t not in yaml_stems:
+            problems.append(f"{t}: missing inputs/tools/{t}.yaml")
+        if t not in doc_stems:
+            problems.append(f"{t}: missing references/tools/{t}.md")
+        if t not in claude_rows:
+            problems.append(f"{t}: missing CLAUDE.md tool-table row")
+    for orphan in sorted(yaml_stems - tool_names):
+        problems.append(f"orphan YAML for unregistered tool: {orphan}")
+    for orphan in sorted(doc_stems - tool_names):
+        problems.append(f"orphan doc for unregistered tool: {orphan}")
+    assert not problems, "Tool/doc registry drift:\n" + "\n".join(problems)
+
+
+def test_tool_count_claims_match_registry(tool_schemas):
+    """Hard-coded 'N tools' / 'X of N tools accept summary' claims in guide docs and
+    the server instructions stay in sync with the live registry."""
+    total = len(tool_schemas)
+    with_summary = sum(
+        1
+        for s in tool_schemas.values()
+        if "summary" in (s["parameters"].get("properties") or {})
+    )
+    without_summary = total - with_summary
+    valid_before_tools = {total, without_summary}
+
+    failures = []
+    for f in list(_GUIDE_DIR.glob("*.md")) + [_SERVER_PY]:
+        text = f.read_text()
+        for n in re.findall(r"(\d+)\s+tools\b", text):
+            if int(n) not in valid_before_tools:
+                failures.append(
+                    f"{f.name}: '{n} tools' — expected one of "
+                    f"{sorted(valid_before_tools)} (total / without-summary)"
+                )
+        for x in re.findall(r"(\d+)\s+of\s+\d+\s+tools", text):
+            if int(x) != with_summary:
+                failures.append(
+                    f"{f.name}: '{x} of N tools' — expected {with_summary} "
+                    "(tools accepting summary=)"
+                )
+    assert not failures, "Tool-count claim drift:\n" + "\n".join(failures)
+
+
 def test_python_returns_override():
     """When YAML carries `python_returns: <Class>`, the package-import
     block emits an object-shape example, not `returns dict`. B2 #5."""

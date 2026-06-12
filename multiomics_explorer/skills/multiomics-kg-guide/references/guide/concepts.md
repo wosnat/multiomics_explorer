@@ -10,6 +10,13 @@ For the live, full schema with property lists, call `kg_schema` —
 that's the source of truth. This doc explains *meaning*; the schema
 explains *structure*.
 
+> **Node/edge counts in this doc are an illustrative snapshot and lag the
+> live KG** — the graph is rebuilt periodically and every count grows. Use
+> them for rough orientation only; for current figures call
+> `kg_release_info` (headline gene / experiment / paper / organism counts),
+> `list_organisms`, or `kg_schema`. Never quote a count from this page as
+> ground truth.
+
 ---
 
 ## Four evidence layers
@@ -100,7 +107,7 @@ and `list_organisms`. Discover valid values with
 
 ### Experiments and publications
 
-- **`Publication`** (42 nodes) — paper-level metadata (authors, DOI,
+- **`Publication`** — paper-level metadata (authors, DOI,
   abstract). Connected to experiments via `Has_experiment`. Two
   additional edge types index what each paper **names in prose** — a
   recall-biased narrative literature index, distinct from the
@@ -299,26 +306,18 @@ discriminator on each row (or in filters / rollups), and the
 
 ---
 
-## Cardinalities (current KG snapshot)
+## Cardinalities
 
-| | Count |
-|---|---|
-| Organisms | 37 |
-| Genes | ~99 871 |
-| Publications | 42 |
-| Experiments | ~195 |
-| ClusteringAnalyses | 13 |
-| GeneClusters | 117 |
-| DerivedMetrics | 65 |
-| MetaboliteAssays | 14 |
-| Reactions | 2 349 |
-| Metabolites | 3 230 (~149 measured by metabolomics) |
-| TcdbFamilies | ~12 883 |
-| OrthologGroups | 46 438 |
+Exact counts are intentionally **not** listed here — they change with every
+KG rebuild and a table reads as ground truth. To get current cardinalities,
+call the tools that compute them live:
 
-These are pre-computed counts surfaced via `list_organisms`,
-`kg_schema`, and per-tool envelope rollups. Do not memorize them — call
-the tools.
+- **`kg_release_info`** — headline gene / experiment / paper / organism
+  counts plus the release identity (version, built_at).
+- **`list_organisms`** — per-organism gene / publication / experiment counts.
+- **`kg_schema`** — node-label and relationship-type inventory.
+- **Per-tool envelope rollups** (`by_organism`, `total_matching`, `top_*`)
+  — counts scoped to whatever you just queried.
 
 ---
 

@@ -1,6 +1,6 @@
 # Start here — picking the right tool
 
-This MCP server exposes 39 tools over a Prochlorococcus/Alteromonas multi-omics
+This MCP server exposes 41 tools over a Prochlorococcus/Alteromonas multi-omics
 knowledge graph. Tools cluster into nine families. Before calling anything,
 match your question to a family below, then read the entry-point tool's full
 doc at `docs://tools/{name}`.
@@ -53,13 +53,13 @@ Plus three orthogonal helpers:
 ## Decision tree: 15 common question shapes
 
 ### "What does gene X do? / Show me everything about gene X."
-1. `resolve_gene(query="X")` if the input is a name or partial label.
+1. `resolve_gene(identifier="X")` if the input is a name or partial label.
 2. `gene_overview(locus_tags=[...])` for a one-shot identity + data-availability rollup. The result tells you which drill-downs have evidence (`expression_edge_count`, `cluster_membership_count`, `derived_metric_count`, `evidence_sources`).
 3. Drill into whichever signals are non-zero: `differential_expression_by_gene`, `gene_clusters_by_gene`, `gene_derived_metrics`, `gene_ontology_terms`, `metabolites_by_gene`, `gene_homologs`.
 
 ### "Find genes related to {keyword / function}."
-1. `genes_by_function(query="...")` — Lucene over functional annotations. Best when you have a free-text description.
-2. Or `search_ontology(query="...", ontology=...)` then `genes_by_ontology(term_ids=[...], organism=...)` when the keyword maps to a known ontology term (more precise than text search).
+1. `genes_by_function(search_text="...")` — Lucene over functional annotations. Best when you have a free-text description.
+2. Or `search_ontology(search_text="...", ontology=...)` then `genes_by_ontology(term_ids=[...], organism=...)` when the keyword maps to a known ontology term (more precise than text search).
 
 ### "What pathways / functional categories are enriched in my DE set?"
 - `pathway_enrichment(experiment_ids=[...], organism=..., ontology=..., level=...)`. See `docs://analysis/enrichment` for methodology, background semantics, and the `informative_only` default.
@@ -131,7 +131,7 @@ This index is a router, NOT exhaustive and NOT expression — use `differential_
 
 ## When to call `summary=True` first
 
-**Nearly universal: 33 of 39 tools accept `summary=True`** — discovery,
+**Nearly universal: 34 of 41 tools accept `summary=True`** — discovery,
 drill-down, gene-anchored, ontology, enrichment, all of it. With
 `summary=True` the call returns only the envelope rollups
 (`by_organism`, `by_treatment_type`, `top_*`, counts) and an empty
@@ -142,9 +142,10 @@ committing to a slice.
 Pattern: `summary=True` → look at rollups → narrow with filters → drop
 `summary=True` to fetch detail rows.
 
-The 6 tools without `summary=`: `kg_schema`, `list_filter_values`,
-`resolve_gene`, `list_publications`, `gene_response_profile`,
-`run_cypher`. These either return small fixed sets, are themselves
+The 7 tools without `summary=`: `kg_schema`, `kg_release_info`,
+`list_filter_values`, `resolve_gene`, `list_publications`,
+`gene_response_profile`, `run_cypher`. These either return small fixed
+sets, are themselves
 summaries (`gene_response_profile`), or have raw / shape-specific
 output (`run_cypher`, `kg_schema`).
 

@@ -1,11 +1,16 @@
 # Cross-tool conventions
 
-Patterns that hold across most or all 37 tools. If you've read a single
+Patterns that hold across most or all 41 tools. If you've read a single
 tool's doc, these are the things you'd otherwise have to re-learn each
 time you read another.
 
 For node and edge meanings see `docs://guide/concepts`.
 For tool-by-tool routing see `docs://guide/start_here`.
+
+> **Numbers in example responses are illustrative snapshots.** The `response:`
+> blocks in per-tool docs (counts, `total_matching`, rollup values, example IDs)
+> were captured from one KG build and are not kept in sync with the live graph —
+> they show response *shape*, not current values. For real counts, run the call.
 
 ---
 
@@ -39,7 +44,7 @@ most tools) and `offset`.
 
 ### `summary=True` mode
 
-**31 of 37 tools accept `summary=True`** — nearly universal across
+**34 of 41 tools accept `summary=True`** — nearly universal across
 discovery, drill-down, gene-anchored, ontology, and enrichment surfaces.
 With `summary=True` the call returns only the envelope (`results=[]`,
 `returned=0`, `truncated=true`). Use this as the **first call** for
@@ -47,9 +52,10 @@ any question that doesn't already specify exact IDs — the rollups
 characterize the full matched set before you commit to a slice.
 Pattern: `summary=True` → narrow filters → drop `summary=True` for detail.
 
-The 6 tools without `summary=`: `kg_schema`, `list_filter_values`,
-`resolve_gene`, `list_publications`, `gene_response_profile`,
-`run_cypher`. These either return small fixed sets, are themselves
+The 7 tools without `summary=`: `kg_schema`, `kg_release_info`,
+`list_filter_values`, `resolve_gene`, `list_publications`,
+`gene_response_profile`, `run_cypher`. These either return small fixed
+sets, are themselves
 summaries (`gene_response_profile`), or have raw / shape-specific
 output (`run_cypher`, `kg_schema`).
 

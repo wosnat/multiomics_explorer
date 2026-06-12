@@ -4,13 +4,18 @@ LLM-facing decision-tree guide for metabolite questions. The KG models metabolit
 
 Runnable companion: `docs://examples/metabolites.py` (7 scenarios).
 
+> **Counts and per-gene distributions below are an illustrative snapshot** and
+> drift with each KG rebuild. Use them for rough scale only; call
+> `list_metabolites`, `list_metabolite_assays`, or `kg_release_info` for current
+> figures.
+
 ## Source disambiguation
 
 | `evidence_source` | Path in KG | Question it answers | Native tools | Key caveats |
 |---|---|---|---|---|
 | `metabolism` | `Gene → Reaction → Metabolite` (KEGG-derived) | "Which metabolites is this gene's reaction involved in?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['metabolism']`) | KO inference may be putative; `Reaction_has_metabolite` is undirected — upstream KEGG direction is unreliable, so the convention is permanent: use "involved in" framing, never "produces"/"consumes"; promiscuous enzymes inflate counts |
-| `transport` | `Gene → TcdbFamily → Metabolite` (TCDB-derived) | "Which metabolites does this gene transport (or could transport, family-inferred)?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['transport']`) | family_inferred ≫ substrate_confirmed (per-gene median = 6 metabolites, p90 = 90, max = 551 via ABC superfamily); auto-warning fires when this skews; no import/export direction |
-| `metabolomics` | `MetaboliteAssay → Metabolite` (mass-spec) | "Which metabolites were measured under this condition?" | `list_metabolite_assays` (discovery), `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay` (per-arm drill-down), `assays_by_metabolite` (reverse lookup) — see Track B | No gene anchor; `Assay_quantifies` (concentration/intensity) ≠ `Assay_flags` (qualitative detection); compartment matters (`whole_cell` / `extracellular` / `vesicle`); 149 of 3230 metabolites measured (95% are annotation-only); 3 papers, 14 assays (12 numeric + 2 boolean), 12 experiments; replicate / normalisation conventions vary by paper |
+| `transport` | `Gene → TcdbFamily → Metabolite` (TCDB-derived) | "Which metabolites does this gene transport (or could transport, family-inferred)?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['transport']`) | family_inferred ≫ substrate_confirmed (per-gene median ≈ 4 metabolites, p90 ≈ 48, max ≈ 992 via ABC superfamily); auto-warning fires when this skews; no import/export direction |
+| `metabolomics` | `MetaboliteAssay → Metabolite` (mass-spec) | "Which metabolites were measured under this condition?" | `list_metabolite_assays` (discovery), `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay` (per-arm drill-down), `assays_by_metabolite` (reverse lookup) — see Track B | No gene anchor; `Assay_quantifies` (concentration/intensity) ≠ `Assay_flags` (qualitative detection); compartment matters (`whole_cell` / `extracellular` / `vesicle`); ~149 of ~3.3k metabolites measured (~95% are annotation-only); 3 papers, 14 assays (12 numeric + 2 boolean), 12 experiments; replicate / normalisation conventions vary by paper |
 
 The `metabolism` and `transport` rows share tools — the `evidence_source` field on result rows is the discriminator, and `transport_confidence ∈ {substrate_confirmed, family_inferred}` further qualifies transport rows. The `metabolomics` row has dedicated tools — see Track B.
 
@@ -306,7 +311,7 @@ Four native tools cover the measurement layer (no `run_cypher` needed):
 - **No gene anchor.** A metabolite measurement says nothing about which gene produced/consumed it.
 - **`Assay_quantifies` vs `Assay_flags`.** Quantifies = concentration/intensity (with `value`, `value_sd`, `n_replicates`, `metric_percentile`, `rank_by_metric`); Flags = qualitative detection (with `flag_value`, `n_positive`, `n_replicates`). Their downstream interpretation differs — split per DM convention into two drill-down tools.
 - **Compartment matters.** `whole_cell` measures pool; `extracellular` measures excretion / uptake / spent media; `vesicle` measures cargo packaged into extracellular vesicles. Filter via the `compartment=` kwarg on every Track-B tool.
-- **Targeted panel ≠ full metabolome.** Absence in measurement ≠ absence in cell. The current KG covers 149 distinct metabolites across 14 assays in 3 papers — out of 3230 metabolites total, so ~95% have no measurement coverage.
+- **Targeted panel ≠ full metabolome.** Absence in measurement ≠ absence in cell. The current KG covers ~149 distinct metabolites across 14 assays in 3 papers — out of ~3.3k metabolites total, so ~95% have no measurement coverage.
 - **Replicate / normalisation conventions vary by paper.** Read `value_sd` and `n_replicates` on the edge, plus `field_description` on the parent assay (canonical provenance read — `verbose=True` surfaces it). The `value` itself is processed per the paper's pipeline.
 - **Tested-absent vs unmeasured.** See "Tested-absent vs unmeasured" above — the top-level invariant. Tested-absent rows (`value=0` / `detection_status='not_detected'` / `flag_value=false`) are biology, not noise; default-filtering them strips the majority of the layer.
 

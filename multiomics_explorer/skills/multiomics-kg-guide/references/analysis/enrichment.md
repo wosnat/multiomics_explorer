@@ -683,7 +683,7 @@ The following approaches are not implemented but are natural next steps:
 
 ---
 
-## 18. `EnrichmentResult` — rich return type
+## 17. `EnrichmentResult` — rich return type
 
 Both `pathway_enrichment` and `cluster_enrichment` return an `EnrichmentResult`
 object (not a dict). `fisher_ora` also returns one when called directly.
@@ -744,7 +744,7 @@ in the Python API (`.explain()` / accessors).
 
 ---
 
-## 19. References
+## 18. References
 
 - **yulab-smu biomedical knowledge mining book:**
   https://yulab-smu.top/biomedical-knowledge-mining-book/

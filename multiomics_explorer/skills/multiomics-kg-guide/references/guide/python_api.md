@@ -1,6 +1,6 @@
 # Using the Python API
 
-The `multiomics_explorer` package exposes the same 37 tools available
+The `multiomics_explorer` package exposes the same 41 tools available
 via MCP, plus a handful of analysis utilities, as ordinary Python
 functions. Use the package when you need bulk extraction, multi-step
 pipelines, custom plotting, or DataFrame workflows. Use MCP when you
@@ -162,7 +162,7 @@ based on the result shape:
 from multiomics_explorer import to_dataframe, genes_by_function
 
 # Most tools — flat one-row-per-result conversion.
-df = to_dataframe(genes_by_function(query="nitrogen", organism="MED4"))
+df = to_dataframe(genes_by_function(search_text="nitrogen", organism="MED4"))
 
 # gene_response_profile result — auto-unwound to gene × treatment group.
 df = to_dataframe(gene_response_profile(locus_tags=["PMM0370"]))
