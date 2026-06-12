@@ -11398,6 +11398,52 @@ class TestKGReleaseInfo:
         assert "version" in report["kg"]
         assert "gene_count" in report["kg"]
 
+    def test_kg_identity_carries_release_highlights_and_breaking_changes(self):
+        """The preflight change-list fields pass through into kg{} when stamped."""
+        from multiomics_explorer.api.functions import kg_release_info
+        si = self._ok_schema_info(
+            release_highlights="- Publication discusses-edges\n- +8 organisms",
+            breaking_changes="- annotation_quality redefined to 0..3",
+        )
+        conn = self._make_conn(si, self._ok_labels(), self._ok_rel_types())
+
+        report = kg_release_info(conn)
+
+        assert report["kg"]["release_highlights"] == "- Publication discusses-edges\n- +8 organisms"
+        assert report["kg"]["breaking_changes"] == "- annotation_quality redefined to 0..3"
+
+    def test_dev_build_leaves_change_list_fields_null_and_summary_clean(self):
+        """A KG built without the fields (dev build) -> None, summary unchanged."""
+        from multiomics_explorer.api.functions import kg_release_info
+        # _ok_schema_info omits both keys, mirroring a dev build.
+        conn = self._make_conn(self._ok_schema_info(), self._ok_labels(), self._ok_rel_types())
+
+        report = kg_release_info(conn)
+
+        assert report["kg"]["release_highlights"] is None
+        assert report["kg"]["breaking_changes"] is None
+        assert "Breaking" not in report["summary"]
+        assert "release_highlights" not in report["summary"]
+
+    def test_summary_points_to_breaking_changes_when_present(self):
+        from multiomics_explorer.api.functions import kg_release_info
+        si = self._ok_schema_info(breaking_changes="- annotation_quality redefined")
+        conn = self._make_conn(si, self._ok_labels(), self._ok_rel_types())
+
+        report = kg_release_info(conn)
+
+        assert "Breaking" in report["summary"]
+        assert "kg.breaking_changes" in report["summary"]
+
+    def test_summary_points_to_release_highlights_when_present(self):
+        from multiomics_explorer.api.functions import kg_release_info
+        si = self._ok_schema_info(release_highlights="- Publication discusses-edges")
+        conn = self._make_conn(si, self._ok_labels(), self._ok_rel_types())
+
+        report = kg_release_info(conn)
+
+        assert "kg.release_highlights" in report["summary"]
+
 
 # ===========================================================================
 # Publication "discusses" literature-index surface

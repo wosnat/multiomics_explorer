@@ -8770,6 +8770,23 @@ class TestKGReleaseInfoTool:
         with pytest.raises(ValidationError):
             KGReleaseInfoResponse(**bad)
 
+    def test_kg_identity_carries_change_list_fields(self):
+        """KGIdentity accepts the optional preflight change-list strings."""
+        from multiomics_explorer.mcp_server.tools import KGReleaseInfoResponse
+        report = self._ok_report()
+        report["kg"]["release_highlights"] = "- Publication discusses-edges"
+        report["kg"]["breaking_changes"] = "- annotation_quality redefined"
+        response = KGReleaseInfoResponse(**report)
+        assert response.kg.release_highlights == "- Publication discusses-edges"
+        assert response.kg.breaking_changes == "- annotation_quality redefined"
+
+    def test_kg_identity_change_list_fields_default_none(self):
+        """Absent on dev builds -> default None, no validation error."""
+        from multiomics_explorer.mcp_server.tools import KGReleaseInfoResponse
+        response = KGReleaseInfoResponse(**self._ok_report())
+        assert response.kg.release_highlights is None
+        assert response.kg.breaking_changes is None
+
 
 # ===========================================================================
 # Publication "discusses" literature-index surface

@@ -7280,6 +7280,7 @@ _KG_IDENTITY_FIELDS = (
     "version", "built_at", "mcp_min_version", "git_sha_short", "git_branch",
     "gene_count", "experiment_count", "paper_count", "organism_count",
     "expression_edge_count", "release_notes_url",
+    "release_highlights", "breaking_changes",
 )
 
 
@@ -7424,6 +7425,14 @@ def kg_release_info(conn: GraphConnection) -> dict:
                 f"{len(shape_fails)} schema assert(s) failed ({', '.join(kinds)})"
             )
         summary = "WARN: " + "; ".join(parts) + "."
+
+    # Preflight change-list pointers (nullable, absent on dev builds). Keep the
+    # one-liner short — point at the full markdown carried in kg{}. Breaking
+    # changes first: the higher-value field a user most needs at preflight.
+    if schema_info.get("breaking_changes"):
+        summary += " ⚠ Breaking changes in this release — see kg.breaking_changes."
+    if schema_info.get("release_highlights"):
+        summary += " New in this release — see kg.release_highlights."
 
     return {
         "verdict": verdict,

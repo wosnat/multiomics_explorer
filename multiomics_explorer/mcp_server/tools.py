@@ -1304,6 +1304,23 @@ class KGIdentity(BaseModel):
     organism_count: int | None = Field(default=None, description="Number of OrganismTaxon nodes in the KG.")
     expression_edge_count: int | None = Field(default=None, description="Number of Changes_expression_of edges in the KG.")
     release_notes_url: str | None = Field(default=None, description="URL of the KG release notes, when stamped.")
+    release_highlights: str | None = Field(
+        default=None,
+        description=(
+            "Preflight 'what can I now ask?' — short markdown bullets of the user-facing "
+            "capability/data changes in this KG release. Null on dev builds and legacy KGs "
+            "(stamped only on official releases). The `summary` points here when present."
+        ),
+    )
+    breaking_changes: str | None = Field(
+        default=None,
+        description=(
+            "Preflight 'did anything change meaning under me?' — short markdown bullets of "
+            "semantics changes that alter results without erroring (redefinitions, repurposed "
+            "fields, default-behavior flips; e.g. the annotation_quality 0..3 redefinition). "
+            "Null when none / on dev builds. The higher-value field; `summary` flags it when present."
+        ),
+    )
 
 
 class KGReleaseInfoResponse(BaseModel):
