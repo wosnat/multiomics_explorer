@@ -1,5 +1,5 @@
 case_id: list_organisms
-row_count: 45
+row_count: 47
 rows:
 - background_factors: []
   clade: null
@@ -641,6 +641,54 @@ rows:
   treatment_types:
   - growth_phase
   - phosphorus
+- background_factors: []
+  clade: HLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  experiment_count: 0
+  gene_count: 1883
+  genus: Prochlorococcus
+  growth_phases: []
+  measured_metabolite_count: 0
+  metabolite_count: 1558
+  ncbi_taxon_id: 3096220
+  omics_types: []
+  organism_name: Prochlorococcus MIT1314
+  organism_type: genome_strain
+  publication_count: 0
+  reaction_count: 928
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: MIT1314
+  treatment_types: []
+- background_factors: []
+  clade: LLIV
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  experiment_count: 0
+  gene_count: 2452
+  genus: Prochlorococcus
+  growth_phases: []
+  measured_metabolite_count: 0
+  metabolite_count: 1672
+  ncbi_taxon_id: 1801626
+  omics_types: []
+  organism_name: Prochlorococcus MIT1327
+  organism_type: genome_strain
+  publication_count: 0
+  reaction_count: 956
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: MIT1327
+  treatment_types: []
 - background_factors: []
   clade: HLII
   cluster_types: []

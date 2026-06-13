@@ -2,14 +2,15 @@ case_id: genes_by_homolog_group_summary_basic
 row_count: 1
 rows:
 - by_category_raw:
-  - '{''count'': 20, ''item'': ''Photosynthesis''}'
+  - '{''count'': 21, ''item'': ''Photosynthesis''}'
   by_group_raw:
-  - '{''count'': 20, ''item'': ''cyanorak:CK_00000570''}'
+  - '{''count'': 21, ''item'': ''cyanorak:CK_00000570''}'
   by_organism:
   - '{''count'': 1, ''item'': ''Prochlorococcus AS9601''}'
   - '{''count'': 1, ''item'': ''Prochlorococcus MED4''}'
   - '{''count'': 1, ''item'': ''Prochlorococcus MIT0604''}'
   - '{''count'': 1, ''item'': ''Prochlorococcus MIT0801''}'
+  - '{''count'': 1, ''item'': ''Prochlorococcus MIT1327''}'
   - '{''count'': 1, ''item'': ''Prochlorococcus MIT9202''}'
   - '{''count'': 1, ''item'': ''Prochlorococcus MIT9215''}'
   - '{''count'': 1, ''item'': ''Prochlorococcus MIT9301''}'
@@ -29,5 +30,5 @@ rows:
   not_found_groups: []
   not_matched_groups: []
   total_categories: 1
-  total_genes: 20
-  total_matching: 20
+  total_genes: 21
+  total_matching: 21

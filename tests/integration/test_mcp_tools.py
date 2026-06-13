@@ -2406,17 +2406,17 @@ class TestListMetabolites:
     def test_no_filters_returns_all(self, conn):
         """Unfiltered query reports total Metabolite node count."""
         result = api.list_metabolites(conn=conn)
-        assert result["total_matching"] == 3353
+        assert result["total_matching"] == 3356
 
     def test_elements_n_filter(self, conn):
         """N-bearing metabolites total."""
         result = api.list_metabolites(elements=["N"], conn=conn)
-        assert result["total_matching"] == 1690
+        assert result["total_matching"] == 1693
 
     def test_elements_n_and_p_filter(self, conn):
         """Multi-element AND filter (must contain both N and P)."""
         result = api.list_metabolites(elements=["N", "P"], conn=conn)
-        assert result["total_matching"] == 582
+        assert result["total_matching"] == 583
 
     def test_organism_plus_elements_filter(self, conn):
         """MED4 + N elements (the canonical N-source primitive): 813."""
@@ -2474,7 +2474,7 @@ class TestListMetabolites:
         result = api.list_metabolites(summary=True, conn=conn)
         assert result["results"] == []
         assert result["returned"] == 0
-        assert result["total_matching"] == 3353
+        assert result["total_matching"] == 3356
         # Envelope rollups present (lists, possibly empty but typed)
         assert isinstance(result["top_organisms"], list)
         assert isinstance(result["top_metabolite_pathways"], list)

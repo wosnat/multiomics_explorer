@@ -4,24 +4,24 @@ rows:
 - by_level:
   - '{''count'': 1, ''item'': ''Alteromonadaceae''}'
   - '{''count'': 2, ''item'': ''Proteobacteria''}'
-  - '{''count'': 322, ''item'': ''Bacteria''}'
+  - '{''count'': 317, ''item'': ''Bacteria''}'
   - '{''count'': 352, ''item'': ''Synechococcus''}'
   - '{''count'': 400, ''item'': ''Prochloraceae''}'
-  - '{''count'': 422, ''item'': ''curated''}'
-  - '{''count'': 500, ''item'': ''Cyanobacteria''}'
+  - '{''count'': 425, ''item'': ''curated''}'
+  - '{''count'': 499, ''item'': ''Cyanobacteria''}'
   by_source:
-  - '{''count'': 1577, ''item'': ''eggnog''}'
-  - '{''count'': 422, ''item'': ''cyanorak''}'
-  score_max: 6.6639
-  score_median: 1.0798
+  - '{''count'': 1571, ''item'': ''eggnog''}'
+  - '{''count'': 425, ''item'': ''cyanorak''}'
+  score_max: 6.6668
+  score_median: 1.0816
   top_cog_categories:
-  - '{''id'': ''cog.category:C'', ''count'': 633, ''name'': ''Energy production and
+  - '{''id'': ''cog.category:C'', ''count'': 630, ''name'': ''Energy production and
     conversion''}'
-  - '{''id'': ''cog.category:G'', ''count'': 99, ''name'': ''Carbohydrate transport
+  - '{''id'': ''cog.category:G'', ''count'': 96, ''name'': ''Carbohydrate transport
     and metabolism''}'
   - '{''id'': ''cog.category:H'', ''count'': 86, ''name'': ''Coenzyme transport and
     metabolism''}'
-  - '{''id'': ''cog.category:S'', ''count'': 755, ''name'': ''Function unknown''}'
+  - '{''id'': ''cog.category:S'', ''count'': 757, ''name'': ''Function unknown''}'
   - '{''id'': ''cog.category:U'', ''count'': 69, ''name'': ''Intracellular trafficking,
     secretion, and vesicular transport''}'
   top_cyanorak_roles:
@@ -33,7 +33,7 @@ rows:
     respiration''}'
   - '{''id'': ''cyanorak.role:J.2'', ''count'': 173, ''name'': ''Photosynthesis and
     respiration > CO2 fixation''}'
-  - '{''id'': ''cyanorak.role:J.8'', ''count'': 230, ''name'': ''Photosynthesis and
+  - '{''id'': ''cyanorak.role:J.8'', ''count'': 229, ''name'': ''Photosynthesis and
     respiration > Photosystem II''}'
-  total_entries: 48230
-  total_matching: 1139
+  total_entries: 48388
+  total_matching: 1136

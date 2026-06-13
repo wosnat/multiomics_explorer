@@ -1,5 +1,5 @@
 case_id: list_organisms_raw
-row_count: 45
+row_count: 47
 rows:
 - clade: null
   experiment_count: 0
@@ -287,6 +287,28 @@ rows:
   treatment_types:
   - growth_phase
   - phosphorus
+- clade: HLII
+  experiment_count: 0
+  gene_count: 1883
+  genus: Prochlorococcus
+  ncbi_taxon_id: 3096220
+  omics_types: []
+  organism_name: Prochlorococcus MIT1314
+  publication_count: 0
+  species: null
+  strain: MIT1314
+  treatment_types: []
+- clade: LLIV
+  experiment_count: 0
+  gene_count: 2452
+  genus: Prochlorococcus
+  ncbi_taxon_id: 1801626
+  omics_types: []
+  organism_name: Prochlorococcus MIT1327
+  publication_count: 0
+  species: Prochlorococcus marinus
+  strain: MIT1327
+  treatment_types: []
 - clade: HLII
   experiment_count: 0
   gene_count: 2027

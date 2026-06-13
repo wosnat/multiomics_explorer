@@ -2,11 +2,11 @@ case_id: search_homolog_groups_summary_source_filter
 row_count: 1
 rows:
 - by_level:
-  - '{''count'': 422, ''item'': ''curated''}'
+  - '{''count'': 425, ''item'': ''curated''}'
   by_source:
-  - '{''count'': 422, ''item'': ''cyanorak''}'
-  score_max: 3.9097
-  score_median: 1.0798
+  - '{''count'': 425, ''item'': ''cyanorak''}'
+  score_max: 3.9123
+  score_median: 1.0816
   top_cog_categories:
   - '{''id'': ''cog.category:C'', ''count'': 153, ''name'': ''Energy production and
     conversion''}'
@@ -23,9 +23,9 @@ rows:
   - '{''id'': ''cyanorak.role:G.2'', ''count'': 52, ''name'': ''Energy metabolism
     > Electron transport''}'
   - '{''id'': ''cyanorak.role:J'', ''count'': 35, ''name'': ''Photosynthesis and respiration''}'
-  - '{''id'': ''cyanorak.role:J.2'', ''count'': 40, ''name'': ''Photosynthesis and
+  - '{''id'': ''cyanorak.role:J.2'', ''count'': 41, ''name'': ''Photosynthesis and
     respiration > CO2 fixation''}'
   - '{''id'': ''cyanorak.role:J.8'', ''count'': 41, ''name'': ''Photosynthesis and
     respiration > Photosystem II''}'
-  total_entries: 48230
-  total_matching: 240
+  total_entries: 48388
+  total_matching: 241

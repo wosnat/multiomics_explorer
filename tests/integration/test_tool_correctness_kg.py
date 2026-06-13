@@ -236,8 +236,9 @@ class TestGeneOverviewCorrectnessKG:
         assert r["expression_edge_count"] == 35
         assert r["significant_up_count"] + r["significant_down_count"] == 5
         # 14 → 20 after the 2026-05 KG rebuild added 6 Prochlorococcus strains,
-        # all of which joined this gene's cyanorak ortholog group.
-        assert r["closest_ortholog_group_size"] == 20
+        # all of which joined this gene's cyanorak ortholog group; 20 → 21 after
+        # the 2026-06-13 rebuild added 2 more organisms.
+        assert r["closest_ortholog_group_size"] == 21
         assert set(r["closest_ortholog_genera"]) == {"Prochlorococcus", "Synechococcus"}
 
     def test_single_gene_alt(self, conn):

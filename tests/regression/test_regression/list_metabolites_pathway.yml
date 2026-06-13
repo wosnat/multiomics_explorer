@@ -35,7 +35,7 @@ results:
   - metabolism
   - transport
   formula: CO2
-  gene_count: 2318
+  gene_count: 2411
   mass: 44.009
   measured_assay_count: 0
   measured_compartments: []
@@ -43,7 +43,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00011
   name: CO2
-  organism_count: 40
+  organism_count: 42
   pathway_count: 25
   pathway_ids:
   - kegg.pathway:ko00220
@@ -80,7 +80,7 @@ results:
   - metabolism
   - transport
   formula: H4N
-  gene_count: 2135
+  gene_count: 2215
   mass: 18.039
   measured_assay_count: 0
   measured_compartments: []
@@ -88,7 +88,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00014
   name: Ammonia
-  organism_count: 40
+  organism_count: 42
   pathway_count: 19
   pathway_ids:
   - kegg.pathway:ko00220
@@ -118,7 +118,7 @@ results:
   - metabolism
   - transport
   formula: O2
-  gene_count: 2113
+  gene_count: 2195
   mass: 31.998
   measured_assay_count: 0
   measured_compartments: []
@@ -126,7 +126,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00007
   name: Oxygen
-  organism_count: 40
+  organism_count: 42
   pathway_count: 13
   pathway_ids:
   - kegg.pathway:ko00190
@@ -154,7 +154,7 @@ results:
   - metabolomics
   - transport
   formula: C5H10N2O3
-  gene_count: 2086
+  gene_count: 2173
   mass: 146.146
   measured_assay_count: 8
   measured_compartments:
@@ -167,7 +167,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00064
   name: L-Glutamine
-  organism_count: 40
+  organism_count: 42
   pathway_count: 24
   pathway_ids:
   - kegg.pathway:ko00220
@@ -206,7 +206,7 @@ results:
   - metabolomics
   - transport
   formula: C5H8NO4
-  gene_count: 1845
+  gene_count: 1924
   mass: 146.122
   measured_assay_count: 8
   measured_compartments:
@@ -219,7 +219,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00025
   name: L-Glutamate
-  organism_count: 40
+  organism_count: 42
   pathway_count: 52
   pathway_ids:
   - kegg.pathway:ko00220
@@ -284,7 +284,7 @@ results:
   - metabolism
   - transport
   formula: CHO3
-  gene_count: 1223
+  gene_count: 1270
   mass: 61.016
   measured_assay_count: 0
   measured_compartments: []
@@ -292,7 +292,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00288
   name: HCO3-
-  organism_count: 40
+  organism_count: 42
   pathway_count: 17
   pathway_ids:
   - kegg.pathway:ko00220
@@ -321,7 +321,7 @@ results:
   - metabolism
   - transport
   formula: NO2
-  gene_count: 875
+  gene_count: 901
   mass: 46.005
   measured_assay_count: 0
   measured_compartments: []
@@ -329,7 +329,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00088
   name: Nitrite
-  organism_count: 40
+  organism_count: 42
   pathway_count: 8
   pathway_ids:
   - kegg.pathway:ko00910
@@ -350,7 +350,7 @@ results:
   - metabolism
   - transport
   formula: CNO
-  gene_count: 751
+  gene_count: 776
   mass: 42.017
   measured_assay_count: 0
   measured_compartments: []
@@ -358,7 +358,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C01417
   name: Cyanate
-  organism_count: 40
+  organism_count: 42
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00910
@@ -374,7 +374,7 @@ results:
   - metabolism
   - transport
   formula: CHO2
-  gene_count: 371
+  gene_count: 384
   mass: 45.017
   measured_assay_count: 0
   measured_compartments: []
@@ -382,7 +382,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00058
   name: Formate
-  organism_count: 40
+  organism_count: 42
   pathway_count: 11
   pathway_ids:
   - kegg.pathway:ko00440
@@ -408,7 +408,7 @@ results:
   - metabolism
   - transport
   formula: CH2NO5P
-  gene_count: 171
+  gene_count: 179
   mass: 139.003
   measured_assay_count: 0
   measured_compartments: []
@@ -416,7 +416,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00169
   name: Carbamoyl phosphate
-  organism_count: 40
+  organism_count: 42
   pathway_count: 11
   pathway_ids:
   - kegg.pathway:ko00220
@@ -439,7 +439,7 @@ results:
   - metabolism
   - transport
   formula: N2O
-  gene_count: 133
+  gene_count: 137
   mass: 44.013
   measured_assay_count: 0
   measured_compartments: []
@@ -447,7 +447,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00887
   name: Nitrous oxide
-  organism_count: 40
+  organism_count: 42
   pathway_count: 4
   pathway_ids:
   - kegg.pathway:ko00910
@@ -464,7 +464,7 @@ results:
   evidence_sources:
   - metabolism
   formula: CH2NO2
-  gene_count: 122
+  gene_count: 126
   mass: 60.032
   measured_assay_count: 0
   measured_compartments: []
@@ -472,7 +472,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C01563
   name: Carbamate
-  organism_count: 40
+  organism_count: 42
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00240
@@ -488,7 +488,7 @@ results:
   - metabolism
   - transport
   formula: HNO3
-  gene_count: 169
+  gene_count: 171
   mass: 63.012
   measured_assay_count: 0
   measured_compartments: []
@@ -496,7 +496,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00244
   name: Nitrate
-  organism_count: 39
+  organism_count: 41
   pathway_count: 6
   pathway_ids:
   - kegg.pathway:ko00910
@@ -714,7 +714,7 @@ top_organisms:
   organism_name: Alteromonas mediterranea AltDE1
 - count: 15
   organism_name: Alteromonas macleodii BGP6
-total_entries: 3353
+total_entries: 3356
 total_matching: 18
 truncated: false
 xref_coverage:

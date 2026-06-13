@@ -6,7 +6,7 @@ rows:
   is_informative: true
   level: 0
   name: Metabolism
-  score: 2.9584
+  score: 2.9605
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -14,7 +14,7 @@ rows:
   is_informative: true
   level: 3
   name: argR, ahrC; transcriptional regulator of arginine metabolism
-  score: 1.8918
+  score: 1.8929
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -22,7 +22,7 @@ rows:
   is_informative: true
   level: 2
   name: Fructose and mannose metabolism
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -30,7 +30,7 @@ rows:
   is_informative: true
   level: 2
   name: Galactose metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 2
@@ -38,7 +38,7 @@ rows:
   is_informative: true
   level: 2
   name: Ascorbate and aldarate metabolism
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 3
@@ -46,7 +46,7 @@ rows:
   is_informative: true
   level: 2
   name: Purine metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -54,7 +54,7 @@ rows:
   is_informative: true
   level: 2
   name: Caffeine metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 1
@@ -62,7 +62,7 @@ rows:
   is_informative: true
   level: 2
   name: Pyrimidine metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 1
@@ -70,7 +70,7 @@ rows:
   is_informative: true
   level: 2
   name: Alanine, aspartate and glutamate metabolism
-  score: 2.1502
+  score: 2.1515
   tree: null
   tree_code: null
 - discussed_by_n_publications: 1
@@ -78,7 +78,7 @@ rows:
   is_informative: true
   level: 2
   name: Glycine, serine and threonine metabolism
-  score: 2.1502
+  score: 2.1515
   tree: null
   tree_code: null
 - discussed_by_n_publications: 3
@@ -86,7 +86,7 @@ rows:
   is_informative: true
   level: 2
   name: Cysteine and methionine metabolism
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 3
@@ -94,7 +94,7 @@ rows:
   is_informative: true
   level: 2
   name: Arginine and proline metabolism
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -102,7 +102,7 @@ rows:
   is_informative: true
   level: 2
   name: Histidine metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -110,7 +110,7 @@ rows:
   is_informative: true
   level: 2
   name: Tyrosine metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -118,7 +118,7 @@ rows:
   is_informative: true
   level: 2
   name: Phenylalanine metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -126,7 +126,7 @@ rows:
   is_informative: true
   level: 2
   name: Tryptophan metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -134,7 +134,7 @@ rows:
   is_informative: true
   level: 2
   name: beta-Alanine metabolism
-  score: 2.4903
+  score: 2.492
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -142,7 +142,7 @@ rows:
   is_informative: true
   level: 2
   name: Taurine and hypotaurine metabolism
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -150,7 +150,7 @@ rows:
   is_informative: true
   level: 2
   name: Phosphonate and phosphinate metabolism
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -158,7 +158,7 @@ rows:
   is_informative: true
   level: 2
   name: Selenocompound metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -166,7 +166,7 @@ rows:
   is_informative: true
   level: 2
   name: Cyanoamino acid metabolism
-  score: 2.4903
+  score: 2.492
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -174,7 +174,7 @@ rows:
   is_informative: true
   level: 2
   name: D-Amino acid metabolism
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 1
@@ -182,7 +182,7 @@ rows:
   is_informative: true
   level: 2
   name: Glutathione metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 2
@@ -190,7 +190,7 @@ rows:
   is_informative: true
   level: 2
   name: Starch and sucrose metabolism
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -198,7 +198,7 @@ rows:
   is_informative: true
   level: 2
   name: Amino sugar and nucleotide sugar metabolism
-  score: 2.0127
+  score: 2.014
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -206,7 +206,7 @@ rows:
   is_informative: true
   level: 2
   name: Glycerolipid metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -214,7 +214,7 @@ rows:
   is_informative: true
   level: 2
   name: Inositol phosphate metabolism
-  score: 2.4903
+  score: 2.492
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -222,7 +222,7 @@ rows:
   is_informative: true
   level: 2
   name: Glycerophospholipid metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -230,7 +230,7 @@ rows:
   is_informative: true
   level: 2
   name: Ether lipid metabolism
-  score: 2.4903
+  score: 2.492
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -238,7 +238,7 @@ rows:
   is_informative: true
   level: 2
   name: Sulfoquinovose metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -246,7 +246,7 @@ rows:
   is_informative: true
   level: 2
   name: Arachidonic acid metabolism
-  score: 2.4903
+  score: 2.492
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -254,7 +254,7 @@ rows:
   is_informative: true
   level: 2
   name: Linoleic acid metabolism
-  score: 2.4903
+  score: 2.492
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -262,7 +262,7 @@ rows:
   is_informative: true
   level: 2
   name: alpha-Linolenic acid metabolism
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -270,7 +270,7 @@ rows:
   is_informative: true
   level: 2
   name: Sphingolipid metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 5
@@ -278,7 +278,7 @@ rows:
   is_informative: true
   level: 2
   name: Pyruvate metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 5
@@ -286,7 +286,7 @@ rows:
   is_informative: true
   level: 2
   name: Glyoxylate and dicarboxylate metabolism
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 1
@@ -294,7 +294,7 @@ rows:
   is_informative: true
   level: 2
   name: Propanoate metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -302,7 +302,7 @@ rows:
   is_informative: true
   level: 2
   name: Butanoate metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -310,7 +310,7 @@ rows:
   is_informative: true
   level: 2
   name: C5-Branched dibasic acid metabolism
-  score: 2.1502
+  score: 2.1515
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -318,7 +318,7 @@ rows:
   is_informative: true
   level: 2
   name: Methane metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 1
@@ -326,7 +326,7 @@ rows:
   is_informative: true
   level: 2
   name: Thiamine metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 1
@@ -334,7 +334,7 @@ rows:
   is_informative: true
   level: 2
   name: Riboflavin metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -342,7 +342,7 @@ rows:
   is_informative: true
   level: 2
   name: Vitamin B6 metabolism
-  score: 2.4903
+  score: 2.492
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -350,7 +350,7 @@ rows:
   is_informative: true
   level: 2
   name: Nicotinate and nicotinamide metabolism
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -358,7 +358,7 @@ rows:
   is_informative: true
   level: 2
   name: Biotin metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 1
@@ -366,7 +366,7 @@ rows:
   is_informative: true
   level: 2
   name: Lipoic acid metabolism
-  score: 2.4903
+  score: 2.492
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -374,7 +374,7 @@ rows:
   is_informative: true
   level: 2
   name: Retinol metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 4
@@ -382,7 +382,7 @@ rows:
   is_informative: true
   level: 2
   name: Porphyrin metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 7
@@ -390,7 +390,7 @@ rows:
   is_informative: true
   level: 2
   name: Nitrogen metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -398,7 +398,7 @@ rows:
   is_informative: true
   level: 2
   name: Sulfur metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -406,7 +406,7 @@ rows:
   is_informative: true
   level: 2
   name: Metabolism of xenobiotics by cytochrome P450
-  score: 2.0127
+  score: 2.014
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -414,7 +414,7 @@ rows:
   is_informative: true
   level: 2
   name: Drug metabolism - cytochrome P450
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -422,7 +422,7 @@ rows:
   is_informative: true
   level: 2
   name: Drug metabolism - other enzymes
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -430,7 +430,7 @@ rows:
   is_informative: true
   level: 2
   name: Microbial metabolism in diverse environments
-  score: 2.1502
+  score: 2.1515
   tree: null
   tree_code: null
 - discussed_by_n_publications: 2
@@ -438,7 +438,7 @@ rows:
   is_informative: true
   level: 2
   name: Carbon metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -446,7 +446,7 @@ rows:
   is_informative: true
   level: 2
   name: 2-Oxocarboxylic acid metabolism
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -454,7 +454,7 @@ rows:
   is_informative: true
   level: 2
   name: Fatty acid metabolism
-  score: 2.4903
+  score: 2.492
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -462,7 +462,7 @@ rows:
   is_informative: true
   level: 2
   name: Nucleotide metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -470,7 +470,7 @@ rows:
   is_informative: true
   level: 2
   name: Cholesterol metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -478,7 +478,7 @@ rows:
   is_informative: true
   level: 2
   name: Cobalamin transport and metabolism
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -486,7 +486,7 @@ rows:
   is_informative: true
   level: 2
   name: Folate transport and metabolism
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -494,7 +494,7 @@ rows:
   is_informative: true
   level: 2
   name: Central carbon metabolism in cancer
-  score: 2.1502
+  score: 2.1515
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -502,7 +502,7 @@ rows:
   is_informative: true
   level: 2
   name: Choline metabolism in cancer
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -510,7 +510,7 @@ rows:
   is_informative: true
   level: 1
   name: Carbohydrate metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -518,7 +518,7 @@ rows:
   is_informative: true
   level: 1
   name: Energy metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -526,7 +526,7 @@ rows:
   is_informative: true
   level: 1
   name: Lipid metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -534,7 +534,7 @@ rows:
   is_informative: true
   level: 1
   name: Nucleotide metabolism
-  score: 2.7043
+  score: 2.7061
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -542,7 +542,7 @@ rows:
   is_informative: true
   level: 1
   name: Amino acid metabolism
-  score: 2.4903
+  score: 2.492
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -550,7 +550,7 @@ rows:
   is_informative: true
   level: 1
   name: Metabolism of other amino acids
-  score: 2.1502
+  score: 2.1515
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -558,7 +558,7 @@ rows:
   is_informative: true
   level: 1
   name: Glycan biosynthesis and metabolism
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -566,7 +566,7 @@ rows:
   is_informative: true
   level: 1
   name: Metabolism of cofactors and vitamins
-  score: 2.1502
+  score: 2.1515
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -574,7 +574,7 @@ rows:
   is_informative: true
   level: 1
   name: Metabolism of terpenoids and polyketides
-  score: 2.1502
+  score: 2.1515
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
@@ -582,6 +582,6 @@ rows:
   is_informative: true
   level: 1
   name: Xenobiotics biodegradation and metabolism
-  score: 2.3078
+  score: 2.3093
   tree: null
   tree_code: null

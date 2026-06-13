@@ -1,5 +1,5 @@
 by_evidence_source:
-- count: 1227
+- count: 1230
   evidence_source: metabolism
 - count: 656
   evidence_source: transport
@@ -14,7 +14,7 @@ by_measurement_coverage:
   - compartment: whole_cell
     count: 106
   by_paper_count:
-  - count: 1584
+  - count: 1587
     paper_count: 0
   - count: 85
     paper_count: 1
@@ -44,7 +44,7 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O13P3
-  gene_count: 5652
+  gene_count: 5914
   mass: 503.15
   measured_assay_count: 0
   measured_compartments: []
@@ -52,7 +52,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00002
   name: ATP
-  organism_count: 40
+  organism_count: 42
   pathway_count: 33
   pathway_ids:
   - kegg.pathway:ko00190
@@ -101,7 +101,7 @@ results:
   - metabolomics
   - transport
   formula: C10H12N5O10P2
-  gene_count: 3343
+  gene_count: 3491
   mass: 424.179
   measured_assay_count: 4
   measured_compartments:
@@ -113,7 +113,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00008
   name: ADP
-  organism_count: 40
+  organism_count: 42
   pathway_count: 20
   pathway_ids:
   - kegg.pathway:ko00190
@@ -149,7 +149,7 @@ results:
   - metabolomics
   - transport
   formula: C21H26N7O14P2
-  gene_count: 3138
+  gene_count: 3247
   mass: 662.422
   measured_assay_count: 4
   measured_compartments:
@@ -161,7 +161,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00003
   name: NAD+
-  organism_count: 40
+  organism_count: 42
   pathway_count: 14
   pathway_ids:
   - kegg.pathway:ko00190
@@ -191,7 +191,7 @@ results:
   - metabolomics
   - transport
   formula: C21H27N7O14P2
-  gene_count: 2867
+  gene_count: 2964
   mass: 663.43
   measured_assay_count: 8
   measured_compartments:
@@ -204,7 +204,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00004
   name: NADH
-  organism_count: 40
+  organism_count: 42
   pathway_count: 5
   pathway_ids:
   - kegg.pathway:ko00190
@@ -225,7 +225,7 @@ results:
   - metabolomics
   - transport
   formula: C10H12N5O7P
-  gene_count: 2312
+  gene_count: 2412
   mass: 345.208
   measured_assay_count: 12
   measured_compartments:
@@ -240,7 +240,7 @@ results:
   measured_paper_count: 2
   metabolite_id: kegg.compound:C00020
   name: AMP
-  organism_count: 40
+  organism_count: 42
   pathway_count: 25
   pathway_ids:
   - kegg.pathway:ko00230
@@ -274,10 +274,10 @@ row_count: 5
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 893
+- count: 896
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-- count: 323
+- count: 325
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
 - count: 204
@@ -289,7 +289,7 @@ top_metabolite_pathways:
 - count: 85
   metabolite_pathway_id: kegg.pathway:ko00860
   metabolite_pathway_name: Porphyrin metabolism
-- count: 78
+- count: 79
   metabolite_pathway_id: kegg.pathway:ko01250
   metabolite_pathway_name: Biosynthesis of nucleotide sugars
 - count: 78
@@ -325,10 +325,10 @@ top_organisms:
   organism_name: Alteromonas macleodii ATCC27126
 - count: 1140
   organism_name: Alteromonas macleodii BGP6
-total_entries: 3353
-total_matching: 1690
+total_entries: 3356
+total_matching: 1693
 truncated: true
 xref_coverage:
-  with_chebi: 1505
+  with_chebi: 1508
   with_hmdb: 893
-  with_mnxm: 1690
+  with_mnxm: 1693
