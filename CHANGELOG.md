@@ -22,6 +22,13 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [0.1.0-alpha.2] - 2026-06-13
+### Added
 - `discussed_by_publication` MCP tool — forward literature-index lookup
   (publication DOIs → genes + KEGG pathways the paper names in prose).
   `UNION ALL` over `Publication_discusses_gene` +
