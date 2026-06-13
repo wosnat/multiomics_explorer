@@ -7280,7 +7280,7 @@ _KG_IDENTITY_FIELDS = (
     "version", "built_at", "mcp_min_version", "git_sha_short", "git_branch",
     "gene_count", "experiment_count", "paper_count", "organism_count",
     "expression_edge_count", "release_notes_url",
-    "release_highlights", "breaking_changes",
+    "release_highlights", "breaking_changes", "deployment_role",
 )
 
 

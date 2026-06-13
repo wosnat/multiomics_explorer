@@ -11444,6 +11444,27 @@ class TestKGReleaseInfo:
 
         assert "kg.release_highlights" in report["summary"]
 
+    def test_kg_identity_carries_deployment_role(self):
+        """The KG self-declared deployment_role passes through into kg{}."""
+        from multiomics_explorer.api.functions import kg_release_info
+        si = self._ok_schema_info(deployment_role="production")
+        conn = self._make_conn(si, self._ok_labels(), self._ok_rel_types())
+
+        report = kg_release_info(conn)
+
+        assert report["kg"]["deployment_role"] == "production"
+
+    def test_deployment_role_null_when_absent(self):
+        """Legacy KG built before deployment_role -> None (unknown), no crash."""
+        from multiomics_explorer.api.functions import kg_release_info
+        # _ok_schema_info omits deployment_role, mirroring a pre-2026-06 KG.
+        conn = self._make_conn(self._ok_schema_info(), self._ok_labels(), self._ok_rel_types())
+
+        report = kg_release_info(conn)
+
+        assert report["kg"]["deployment_role"] is None
+        assert report["verdict"] == "ok"  # absence is not a compat failure
+
 
 # ===========================================================================
 # Publication "discusses" literature-index surface

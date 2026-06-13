@@ -6,7 +6,12 @@ examples:
   - title: First call in a new session
     call: kg_release_info()
     response: |
-      {"verdict": "ok", "explorer_version": "0.1.0a1", "kg": {"version": "0.1.0-alpha.1", "mcp_min_version": "0.1.0a1", "gene_count": 120416, "organism_count": 45, "experiment_count": 312}, "asserts": [{"name": "node_label:Gene", "kind": "node_label", "passed": true, "detail": null}, "...15 more entries..."], "summary": "OK: explorer 0.1.0a1 satisfies KG mcp_min_version 0.1.0a1; 16/16 schema asserts pass."}
+      {"verdict": "ok", "explorer_version": "0.1.0a1", "kg": {"version": "0.1.0-alpha.1", "mcp_min_version": "0.1.0a1", "deployment_role": "local-dev", "gene_count": 120416, "organism_count": 45, "experiment_count": 312}, "asserts": [{"name": "node_label:Gene", "kind": "node_label", "passed": true, "detail": null}, "...15 more entries..."], "summary": "OK: explorer 0.1.0a1 satisfies KG mcp_min_version 0.1.0a1; 16/16 schema asserts pass."}
+
+      # kg.deployment_role is the KG's self-declared environment ('local-dev' |
+      # 'staging' | 'production'), stamped at build time. null on legacy KGs
+      # built before the property existed — treat null as unknown. The explorer
+      # reads this verbatim rather than inferring dev-vs-prod from host/port.
 
   - title: Diagnose a warn verdict
     steps: |

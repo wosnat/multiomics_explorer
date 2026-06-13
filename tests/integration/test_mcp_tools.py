@@ -3326,3 +3326,23 @@ class TestKGReleaseInfoMCPSmoke:
         )
         assert isinstance(response.asserts, list) and len(response.asserts) > 0
         assert response.summary  # non-empty one-liner
+
+    @pytest.mark.asyncio
+    async def test_deployment_role_surfaced_from_live_kg(self, tool_fns, conn):
+        """The live dev KG self-declares deployment_role='local-dev'; the tool
+        echoes it verbatim (KG is source of truth — no host/port inference).
+
+        deployment_role is str|None: None means the KG predates the property
+        (unknown). On the current dev KG it is the stamped 'local-dev'.
+        """
+        ctx = _ctx_with_kg_report(conn)
+        response = await tool_fns["kg_release_info"](ctx)
+
+        assert response.kg.deployment_role in (
+            "local-dev", "staging", "production", None
+        ), f"Unexpected deployment_role={response.kg.deployment_role!r}"
+        # The dev KG at bolt://localhost:7687 stamps 'local-dev'.
+        assert response.kg.deployment_role == "local-dev", (
+            "Dev KG should self-declare deployment_role='local-dev'; got "
+            f"{response.kg.deployment_role!r}"
+        )

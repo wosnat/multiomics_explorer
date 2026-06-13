@@ -1298,6 +1298,17 @@ class KGIdentity(BaseModel):
     )
     git_sha_short: str | None = Field(default=None, description="Short git SHA of the KG build.")
     git_branch: str | None = Field(default=None, description="Git branch of the KG build.")
+    deployment_role: str | None = Field(
+        default=None,
+        description=(
+            "KG's self-declared deployment identity, stamped at build time from the "
+            "KG_DEPLOYMENT_ROLE env var: 'local-dev' (plain `docker compose up`), "
+            "'staging', or 'production' (set by the KG's /release-kg deploy). The KG is "
+            "the source of truth here — the explorer no longer infers dev-vs-prod from "
+            "the Neo4j host/port. Null on KGs built before this property existed; treat "
+            "null as unknown."
+        ),
+    )
     gene_count: int | None = Field(default=None, description="Number of Gene nodes in the KG.")
     experiment_count: int | None = Field(default=None, description="Number of Experiment nodes in the KG.")
     paper_count: int | None = Field(default=None, description="Number of Publication nodes in the KG.")

@@ -1691,3 +1691,15 @@ class TestKGReleaseInfoLive:
         assert report["kg"]["gene_count"] > 0
         assert report["kg"]["experiment_count"] > 0
         assert report["kg"]["version"]  # any non-empty string
+
+    def test_kg_identity_carries_deployment_role(self, conn):
+        """The KG self-declares deployment_role; the dev KG stamps 'local-dev'.
+
+        Key is always present in kg{} (it's in _KG_IDENTITY_FIELDS); the value
+        is None only on KGs built before the property existed (unknown).
+        """
+        from multiomics_explorer import kg_release_info
+
+        report = kg_release_info(conn)
+        assert "deployment_role" in report["kg"]
+        assert report["kg"]["deployment_role"] == "local-dev"

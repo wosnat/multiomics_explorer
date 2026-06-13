@@ -8787,6 +8787,20 @@ class TestKGReleaseInfoTool:
         assert response.kg.release_highlights is None
         assert response.kg.breaking_changes is None
 
+    def test_kg_identity_carries_deployment_role(self):
+        """KGIdentity echoes the KG's self-declared deployment_role."""
+        from multiomics_explorer.mcp_server.tools import KGReleaseInfoResponse
+        report = self._ok_report()
+        report["kg"]["deployment_role"] = "local-dev"
+        response = KGReleaseInfoResponse(**report)
+        assert response.kg.deployment_role == "local-dev"
+
+    def test_kg_identity_deployment_role_defaults_none(self):
+        """Absent (legacy KG) -> default None, rendered as unknown, no error."""
+        from multiomics_explorer.mcp_server.tools import KGReleaseInfoResponse
+        response = KGReleaseInfoResponse(**self._ok_report())
+        assert response.kg.deployment_role is None
+
 
 # ===========================================================================
 # Publication "discusses" literature-index surface
