@@ -39,7 +39,9 @@
       "Bash(git -C /home/osnat/github/multiomics_explorer commit -m 'docs\\(changelog\\): record kg_release_info compat-check feature under [Unreleased]')",
       "Bash(git -C /home/osnat/github/multiomics_explorer log --oneline -12)",
       "mcp__multiomics-kg__kg_release_info",
-      "mcp__multiomics-kg__discussed_by_publication"
+      "mcp__multiomics-kg__discussed_by_publication",
+      "Skill(release-explorer)",
+      "Skill(release-explorer:*)"
     ]
   },
   "enabledPlugins": {

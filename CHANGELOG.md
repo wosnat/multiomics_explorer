@@ -22,10 +22,55 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 ## [Unreleased]
 
 ### Added
+- `discussed_by_publication` MCP tool — forward literature-index lookup
+  (publication DOIs → genes + KEGG pathways the paper names in prose).
+  `UNION ALL` over `Publication_discusses_gene` +
+  `Publication_discusses_kegg_pathway`; polymorphic rows
+  (`entity_kind` / `entity_id` / `entity_name` / `prominence`, union-padded
+  organism), summary rollups (`by_entity_kind`, `by_prominence`,
+  `top_kegg_pathways`, `top_publications`), case-insensitive DOI matching,
+  `not_found` / `not_matched`, offset pagination. Recall-biased narrative
+  router — NOT exhaustive, NOT DE-table expression.
+- Discusses literature-index surfaced across 3 existing discovery tools:
+  `gene_overview` (per-gene `discussed_in_publication_count`, envelope
+  `has_discussed` + `top_discussing_publications`; verbose
+  `discussed_in_publications`), `list_publications` (per-row
+  `discussed_gene_count` / `discussed_pathway_count`, envelope
+  `by_discusses_coverage`), `search_ontology` (KEGG-only
+  `discussed_by_n_publications`; verbose per-term `discussed_in_publications`).
+- `kg_release_info` surfaces `Schema_info.release_highlights` +
+  `breaking_changes` — passthrough of two optional properties the KG stamps
+  on official (non-dev) releases. `KGIdentity` gains both fields (`str | None`,
+  `None` on dev/legacy builds); `summary` appends short pointers when present.
+  Kept passive by design (no recurring `ctx.warning`).
+- `kg_release_info` surfaces `Schema_info.deployment_role`
+  (`local-dev` | `staging` | `production`), stamped by the KG at build time.
+  Flows through `_KG_IDENTITY_FIELDS` + `KGIdentity` like other identity
+  fields; `null` → rendered as unknown on legacy KGs.
 
 ### Changed
+- Correctness pass on the LLM-facing doc surface (guides, analysis docs, tool
+  YAMLs, `CLAUDE.md`, server instructions) reconciled with the current
+  41-tool set and live KG: tool count normalized to 41, stale `query=` alias
+  removed from 5 example calls, missing `kg_release_info` row + summary stats
+  added, enrichment/metabolites/concepts/conventions doc fixes.
+- Anti-drift guards added (`tests/unit/test_about_content.py`): validate every
+  example/steps/chaining kwarg against the live tool schema; assert every
+  registered tool has a YAML + doc + `CLAUDE.md` row; assert hard-coded
+  "N tools" claims match the live registry. Removed the stale
+  experiment-characterization skill.
 
 ### Fixed
+- `discussed_by_publication`: rename APOC frequency keys
+  (`by_entity_kind` / `by_prominence`) to the semantic keys the Pydantic
+  breakdown models require — a mock-invisible Pydantic validation error that
+  only surfaced on live MCP calls.
+
+### Tests / Internal
+- Reconcile counts + regression goldens for the 2026-06-13 KG rebuild
+  (+2 genome-only organisms, 45→47: Prochlorococcus MIT1314 / MIT1327): 5
+  hard-coded integration assertions updated, 43 regression goldens
+  regenerated (verified pure data drift, no structural changes).
 
 ## [0.1.0-alpha.1] - 2026-06-09
 ### Added
