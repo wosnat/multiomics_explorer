@@ -26,6 +26,15 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 ### Changed
 
 ### Fixed
+- Organism resolution no longer requires expression data. The shared
+  `_validate_organism_inputs` resolver matched `Experiment` nodes with
+  `gene_count > 0`, so genome-only (`experiment_count=0`) and
+  metabolomics-only strains were unresolvable — every single-organism
+  genomic tool (`genes_by_ontology`, `gene_ontology_terms`, …) raised
+  `no organism matching '<name>' found` for them. Now matches
+  `OrganismTaxon.preferred_name` (the canonical registry), so any real
+  organism resolves; expression-only tools return empty results for
+  genome-only strains instead of a misleading not-found error.
 
 ## [0.1.0-alpha.2] - 2026-06-13
 ### Added
