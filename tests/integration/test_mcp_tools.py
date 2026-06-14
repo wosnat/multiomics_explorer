@@ -3225,6 +3225,7 @@ class TestOntologyToolsPsortbSignalpLive:
                 # both states must not crash
                 assert "localization_score" not in row
 
+
     def test_genes_by_ontology_pfam_strips_edge_prop_columns(self, conn):
         """Pre-existing ontology should NOT have the 4 edge-prop columns
         in its rows."""
@@ -3281,6 +3282,41 @@ class TestOntologyToolsPsortbSignalpLive:
             assert "signal_peptide_probability" in row
             # cleavage_site / cleavage_probability may be absent (stripped null)
             # or present (rare); both fine
+
+
+@pytest.mark.kg
+class TestOrganismResolverGenomeOnlyLive:
+    """Resolving an organism is a genomic-identity question — it must not gate
+    on the presence of expression experiments. Regression for the friction-log
+    bug where genome-only strains (experiment_count=0) raised
+    'no organism matching ... found' from the shared _validate_organism_inputs
+    resolver, blocking every single-organism genomic tool."""
+
+    # Prochlorococcus MIT9515: 1949 genes, 0 expression experiments.
+    GENOME_ONLY_ORGANISM = "MIT9515"
+
+    def test_genes_by_ontology_resolves_genome_only_strain(self, conn):
+        # Previously raised ValueError("no organism matching 'MIT9515' found").
+        result = api.genes_by_ontology(
+            ontology="cyanorak_role",
+            term_ids=["cyanorak.role:D.1.5"],
+            organism=self.GENOME_ONLY_ORGANISM,
+            conn=conn,
+        )
+        # 29 D.1.5 genes confirmed via run_cypher for this strain.
+        gene_ids = {r["locus_tag"] for r in result["results"]}
+        assert len(gene_ids) == 29
+
+    def test_resolver_returns_genome_only_organism_name(self, conn):
+        from multiomics_explorer.api.functions import _validate_organism_inputs
+
+        resolved = _validate_organism_inputs(
+            organism=self.GENOME_ONLY_ORGANISM,
+            locus_tags=None,
+            experiment_ids=None,
+            conn=conn,
+        )
+        assert resolved == "Prochlorococcus MIT9515"
 
 
 # ---------------------------------------------------------------------------

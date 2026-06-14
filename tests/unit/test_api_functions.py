@@ -5350,7 +5350,7 @@ class TestOntologyLandscape:
         conn = MagicMock()
 
         def run(cypher, **params):
-            if "RETURN collect(DISTINCT e.organism_name)" in cypher:
+            if "RETURN collect(DISTINCT o.preferred_name)" in cypher:
                 return [{"organisms": ["Prochlorococcus MED4"]}]
             if "count(g) AS total_genes" in cypher:
                 return [{"total_genes": gene_count}]
@@ -5370,7 +5370,7 @@ class TestOntologyLandscape:
         conn = MagicMock()
 
         def run(cypher, **params):
-            if "RETURN collect(DISTINCT e.organism_name)" in cypher:
+            if "RETURN collect(DISTINCT o.preferred_name)" in cypher:
                 return [{"organisms": ["Prochlorococcus MED4"]}]
             if "count(g) AS total_genes" in cypher:
                 return [{"total_genes": gene_count}]
@@ -5647,7 +5647,7 @@ class TestApiAcceptsTcdbCazy:
         conn = MagicMock()
 
         def run(cypher, **params):
-            if "RETURN collect(DISTINCT e.organism_name)" in cypher:
+            if "RETURN collect(DISTINCT o.preferred_name)" in cypher:
                 return [{"organisms": ["Prochlorococcus MED4"]}]
             if "count(g) AS total_genes" in cypher:
                 return [{"total_genes": 1976}]
@@ -9125,7 +9125,7 @@ class TestOntologyLandscapeF1Surface:
         conn = MagicMock()
 
         def run(cypher, **params):
-            if "RETURN collect(DISTINCT e.organism_name)" in cypher:
+            if "RETURN collect(DISTINCT o.preferred_name)" in cypher:
                 return [{"organisms": ["Prochlorococcus MED4"]}]
             if "count(g) AS total_genes" in cypher:
                 return [{"total_genes": gene_count}]

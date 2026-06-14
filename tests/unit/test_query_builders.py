@@ -3406,9 +3406,18 @@ class TestBuildListExperimentsDmRollup:
 class TestBuildResolveOrganismForOrganism:
     def test_basic(self):
         cypher, params = build_resolve_organism_for_organism(organism="MED4")
-        assert "e.gene_count > 0" in cypher
+        assert "(o:OrganismTaxon)" in cypher
+        assert "o.preferred_name" in cypher
         assert "organisms" in cypher
         assert params["organism"] == "MED4"
+
+    def test_does_not_gate_on_expression(self):
+        # Resolving an organism is a genomic-identity question; it must not
+        # require expression experiments. Genome-only / metabolomics-only
+        # strains have genes but no Experiment with gene_count > 0.
+        cypher, _ = build_resolve_organism_for_organism(organism="MIT9515")
+        assert "gene_count" not in cypher
+        assert "Experiment" not in cypher
 
     def test_fuzzy_match(self):
         cypher, _ = build_resolve_organism_for_organism(organism="MED4")
