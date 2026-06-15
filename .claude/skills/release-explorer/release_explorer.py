@@ -31,6 +31,10 @@ DIST_DIR = REPO_ROOT / "dist"
 VERSION_RE = re.compile(r"^\d+\.\d+\.\d+(-(alpha|beta|rc)\.\d+)?$")
 TAG_PREFIX = "v"
 
+# Files Phase 3 stages + commits. On --resume these are expected to be dirty
+# (the Phase-2 cut left them so); preflight tolerates them without --allow-dirty.
+RESUME_OWNED_PATHS = {"CHANGELOG.md", "pyproject.toml"}
+
 
 # --------------------------------------------------------------------------- helpers
 
@@ -132,10 +136,26 @@ def phase_1_preflight(args, ctx: dict) -> None:
     dirty = bool(porcelain.strip())
 
     if dirty and not args.allow_dirty:
-        fail(
-            f"Working tree dirty:\n{porcelain}\n"
-            f"Commit, stash, or use --allow-dirty."
-        )
+        # On --resume, the Phase-2 CHANGELOG cut (and any prose the operator
+        # polished during the pause) is intentionally left uncommitted —
+        # Phase 3 stages + commits exactly these files. Tolerate them being
+        # dirty without forcing --allow-dirty; any *other* stray change still
+        # aborts so accidental edits don't ride along into the release commit.
+        dirty_paths = {
+            line[3:].strip() for line in porcelain.splitlines() if line.strip()
+        }
+        unexpected = dirty_paths - RESUME_OWNED_PATHS if args.resume else dirty_paths
+        if unexpected:
+            hint = "Commit, stash, or use --allow-dirty."
+            if args.resume and dirty_paths & RESUME_OWNED_PATHS:
+                hint = (
+                    "On --resume only CHANGELOG.md / pyproject.toml may be dirty "
+                    "(Phase 3 commits them); the rest must be clean.\n"
+                    f"  Unexpected: {', '.join(sorted(unexpected))}\n"
+                    "  Commit, stash, or use --allow-dirty."
+                )
+            fail(f"Working tree dirty:\n{porcelain}\n{hint}")
+        log("resume: only CHANGELOG/pyproject dirty (Phase 3 commits them)", "ok")
 
     # In-sync-with-origin check (real runs only)
     if not args.dry_run:
