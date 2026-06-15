@@ -121,3 +121,28 @@ sites. The DE-empty-entity crash class, if it exists in this repo, must be at a
 non-`execute_query(...)[0]` indexing site (pandas `.iloc[0]`, post-fetch
 `rows[0]`, or dict/list indexing on api-return structures) — flagged above for a
 follow-up sweep, but out of scope for this task.
+
+## Live-probe addendum (controller, 2026-06-15)
+
+The static `[0]` sweep found **0 RISK sites**. To confirm the known
+"`Changes_expression_of` index error when no experiments" is not lurking in a
+different shape, the DE/enrichment family was probed live against the two
+empty-expression fixtures — `Prochlorococcus MIT9515` (genome-only, 0
+experiments) and `Prochlorococcus MIT0801` (6 experiments, METABOLOMICS-only,
+0 `Changes_expression_of` edges) — at **both** the api layer and the MCP
+wrapper (Pydantic) layer:
+
+| Tool | api layer | wrapper layer |
+|---|---|---|
+| `differential_expression_by_gene` | OK (`total_matching=0`) | OK |
+| `gene_response_profile` | OK | OK |
+| `pathway_enrichment` (level=1, kegg) | OK (`EnrichmentResult`) | OK |
+
+No crash reproduced. The `.iloc[0]` sites in `analysis/enrichment.py`
+(1189, 1237) are both guarded by `if rows.empty:` immediately above. Conclusion:
+the `[0]`/empty-DE crash class is **clean at all probed surfaces** — the known
+bug is already fixed or never reached these paths. Phases 1–4 (the harness)
+provide the durable, exhaustive guard so any residual instance (e.g. in tools
+not hand-probed here) is caught and cannot regress.
+
+**Phase 0 outcome:** no RISK fixes required (Tasks 0.2 / 0.3 are no-ops).
