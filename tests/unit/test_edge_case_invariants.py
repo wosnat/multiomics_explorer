@@ -38,3 +38,19 @@ class TestBatchDiagnostics:
         inv.assert_batch_diagnostics(
             "t", _resp(not_found=_resp(metabolite_ids=["z"]), not_matched=[]),
             input_ids=["x"])
+
+
+class TestEmptyLayerShape:
+    def test_empty_layer_total_zero_ok(self):
+        inv.assert_empty_layer_shape("t", _resp(results=[], total_matching=0))
+
+    def test_empty_layer_with_nonzero_total_fails(self):
+        with pytest.raises(AssertionError):
+            inv.assert_empty_layer_shape(
+                "t", _resp(results=[], total_matching=5))
+
+    def test_empty_page_with_offset_skipped(self):
+        # Empty page past end of a populated layer is NOT an empty layer:
+        # total_matching legitimately > 0 when offset > 0.
+        inv.assert_empty_layer_shape(
+            "t", _resp(results=[], total_matching=46893), offset=10_000_000)

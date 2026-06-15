@@ -59,10 +59,17 @@ def assert_batch_diagnostics(label, resp, input_ids):
         )
 
 
-def assert_empty_layer_shape(label, resp):
+def assert_empty_layer_shape(label, resp, offset=0):
     """An empty data layer yields an empty, well-formed envelope — not a crash
     and not a malformed shape. (Crash-freedom is asserted by the call site;
-    here we assert the shape is the canonical empty one.)"""
+    here we assert the shape is the canonical empty one.)
+
+    Skipped when ``offset`` is non-zero: an empty *page* past the end of a
+    populated layer is not an empty *layer* (total_matching is legitimately
+    > 0 there).
+    """
+    if offset:
+        return
     results = _get(resp, "results")
     total_matching = _get(resp, "total_matching")
     if results == [] and total_matching is not None:
