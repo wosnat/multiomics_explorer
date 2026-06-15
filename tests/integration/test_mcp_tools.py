@@ -2734,6 +2734,22 @@ class TestDifferentialExpressionByGenePhase2:
             )
 
 
+@pytest.mark.kg
+class TestDifferentialExpressionByGeneMcpWrapper:
+    """Wrapper-level integration tests for differential_expression_by_gene."""
+
+    @pytest.mark.asyncio
+    async def test_de_by_gene_all_genes_no_de_no_crash(self, tool_fns, conn):
+        # PMM1720: valid MED4 gene with zero Changes_expression_of edges.
+        # Previously crashed: synthetic null-category row violated the
+        # non-nullable ExpressionTopCategory.category model.
+        ctx = _ctx_with_conn(conn)
+        resp = await tool_fns["differential_expression_by_gene"](
+            ctx, locus_tags=["PMM1720"], organism="Prochlorococcus MED4")
+        assert resp.total_matching == 0
+        assert all(c.category is not None for c in resp.top_categories)
+
+
 # ---------------------------------------------------------------------------
 # list_metabolite_assays — Phase 5 live-KG integration tests
 # Baselines pinned to KG state 2026-05-06 (parent §3 + §12.1 fixtures).

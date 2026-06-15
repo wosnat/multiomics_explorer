@@ -3625,8 +3625,9 @@ def build_differential_expression_by_gene_summary_diagnostics(
             "     count(DISTINCT CASE WHEN r.expression_status <> 'not_significant'\n"
             "                         THEN g.locus_tag END) AS significant_genes\n"
             "ORDER BY significant_genes DESC\n"
-            "WITH collect({category: category, total_genes: total_genes,\n"
-            "              significant_genes: significant_genes})[0..5]"
+            "WITH [c IN collect({category: category, total_genes: total_genes,\n"
+            "                    significant_genes: significant_genes})\n"
+            "      WHERE c.category IS NOT NULL][0..5]"
             " AS top_categories\n"
             "RETURN [] AS not_found, [] AS no_expression, top_categories"
         )
@@ -3669,8 +3670,9 @@ def build_differential_expression_by_gene_summary_diagnostics(
         "                         THEN g.locus_tag END) AS significant_genes\n"
         "ORDER BY significant_genes DESC\n"
         "RETURN not_found, no_expression,\n"
-        "       collect({category: category, total_genes: total_genes,\n"
-        "                significant_genes: significant_genes})[0..5]"
+        "       [c IN collect({category: category, total_genes: total_genes,\n"
+        "                      significant_genes: significant_genes})\n"
+        "        WHERE c.category IS NOT NULL][0..5]"
         " AS top_categories"
     )
     return cypher, params

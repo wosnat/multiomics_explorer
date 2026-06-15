@@ -3588,6 +3588,9 @@ class TestBuildDifferentialExpressionByGeneSummaryDiagnostics:
         assert "[] AS no_expression" in cypher
         assert "top_categories" in cypher
         assert "UNWIND $locus_tags" not in cypher
+        # Null gene_category rows must never reach the non-nullable
+        # ExpressionTopCategory.category model.
+        assert "WHERE c.category IS NOT NULL" in cypher
 
     def test_with_locus_tags(self):
         """With locus_tags, uses UNWIND for batch diagnostics."""
@@ -3601,6 +3604,9 @@ class TestBuildDifferentialExpressionByGeneSummaryDiagnostics:
         assert "no_expression" in cypher
         assert "top_categories" in cypher
         assert params["locus_tags"] == ["PMM0001", "FAKE_TAG"]
+        # Synthetic null-category row (emitted when no input gene has DE
+        # edges) must be filtered out — non-nullable model contract.
+        assert "WHERE c.category IS NOT NULL" in cypher
 
     def test_with_locus_tags_and_experiment_ids(self):
         """Experiment filter is in where_block_no_lt."""
