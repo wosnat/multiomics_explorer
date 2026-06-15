@@ -423,6 +423,162 @@ def search_homolog_groups_scenarios():
     ]
 
 
+# --- Batch C (Task 4.2): discovery / list / search tools ------------------
+#
+# Cross-organism discovery surfaces with optional filters. Degenerate axes:
+# filter-yields-empty (genome-only organism with no pubs/exps/clusters/DMs/
+# metabolites), unknown-id filter, pagination past end, and (for the search
+# surfaces) a no-hit Lucene query. The empty-data-layer probe stresses the
+# envelope rollups (by_organism, by_value_kind, top_*) — these must build a
+# well-formed empty envelope, never crash or malform on the filtered-empty set.
+
+
+def list_publications_scenarios():
+    # Cross-organism. FLAT not_found on publication_dois -> input_ids set.
+    # genome-only organism has 0 publications -> empty layer, rollups empty.
+    return [
+        Scenario(
+            "genome_only_organism",
+            dict(organism=fx.GENOME_ONLY_ORGANISM)),
+        Scenario(
+            "unknown_publication_doi",
+            dict(publication_dois=[fx.UNKNOWN_PUBLICATION_DOI]),
+            input_ids=[fx.UNKNOWN_PUBLICATION_DOI]),
+        Scenario(
+            "offset_past_end",
+            dict(offset=fx.OFFSET_PAST_END)),
+    ]
+
+
+def list_experiments_scenarios():
+    # Cross-organism. FLAT not_found on experiment_ids -> input_ids set.
+    # genome-only organism has 0 experiments -> empty layer. summary path also
+    # builds breakdowns from an empty set; probe it too.
+    return [
+        Scenario(
+            "genome_only_organism",
+            dict(organism=fx.GENOME_ONLY_ORGANISM)),
+        Scenario(
+            "genome_only_organism_summary",
+            dict(organism=fx.GENOME_ONLY_ORGANISM, summary=True)),
+        Scenario(
+            "unknown_experiment_id",
+            dict(experiment_ids=[fx.UNKNOWN_EXPERIMENT_ID]),
+            input_ids=[fx.UNKNOWN_EXPERIMENT_ID]),
+        Scenario(
+            "offset_past_end",
+            dict(offset=fx.OFFSET_PAST_END)),
+    ]
+
+
+def list_clustering_analyses_scenarios():
+    # Cross-organism. NO not_found/not_matched on this response model -> no
+    # input_ids; empty-layer shape + crash-freedom are the checks. genome-only
+    # organism (MIT9515) has 0 clustering analyses (verified). analysis_ids
+    # filter on an unknown id also bottoms out at total_matching=0.
+    return [
+        Scenario(
+            "genome_only_organism",
+            dict(organism=fx.GENOME_ONLY_ORGANISM)),
+        Scenario(
+            "unknown_analysis_id",
+            dict(analysis_ids=[fx.UNKNOWN_CLUSTER_ID])),
+        Scenario(
+            "offset_past_end",
+            dict(offset=fx.OFFSET_PAST_END)),
+    ]
+
+
+def list_derived_metrics_scenarios():
+    # Cross-organism. NO flat not_found (derived_metric_ids filter just yields
+    # empty) -> no input_ids. genome-only organism has no DMs (no expression
+    # layer). The DM-rich rollups (by_value_kind, by_metric_type, by_compartment)
+    # must build empty on the filtered-empty set.
+    return [
+        Scenario(
+            "genome_only_organism",
+            dict(organism=fx.GENOME_ONLY_ORGANISM)),
+        Scenario(
+            "unknown_derived_metric_id",
+            dict(derived_metric_ids=[fx.UNKNOWN_DERIVED_METRIC_ID])),
+        Scenario(
+            "offset_past_end",
+            dict(offset=fx.OFFSET_PAST_END)),
+    ]
+
+
+def list_metabolites_scenarios():
+    # Cross-organism. Structured not_found (MetNotFound buckets) -> oracle
+    # batch-diagnostic auto-skips, input_ids omitted. unknown metabolite_ids
+    # -> empty layer; organism_names filter on genome-only organism (no
+    # metabolomics) -> empty; search_text no-hit; offset past end.
+    return [
+        Scenario(
+            "unknown_metabolite_id",
+            dict(metabolite_ids=[fx.UNKNOWN_METABOLITE_ID])),
+        Scenario(
+            "genome_only_organism",
+            dict(organism_names=[fx.GENOME_ONLY_ORGANISM])),
+        Scenario(
+            "no_hits_search",
+            dict(search_text="zzzznonexistentmetabolitezzz")),
+    ]
+
+
+def list_metabolite_assays_scenarios():
+    # Cross-organism. Structured not_found (LmaNotFound buckets) -> oracle
+    # batch-diagnostic auto-skips, input_ids omitted. genome-only organism has
+    # no MetaboliteAssay nodes -> empty layer; the rich rollups (by_organism,
+    # by_value_kind, by_detection_status) must build empty. unknown assay_ids
+    # and offset round out the axes.
+    return [
+        Scenario(
+            "genome_only_organism",
+            dict(organism=fx.GENOME_ONLY_ORGANISM)),
+        Scenario(
+            "unknown_assay_id",
+            dict(assay_ids=["assay_does_not_exist"])),
+        Scenario(
+            "offset_past_end",
+            dict(offset=fx.OFFSET_PAST_END)),
+    ]
+
+
+def search_ontology_scenarios():
+    # Free-text Lucene search; no batch ID input. Degenerate axes: a query
+    # that matches no term (empty-layer shape: total_entries>0 but
+    # total_matching=0) and offset past end of a populated result set.
+    return [
+        Scenario(
+            "no_hits_search",
+            dict(search_text="zzzznonexistentontologytermzzz", ontology="kegg")),
+        Scenario(
+            "offset_past_end",
+            dict(search_text="transport", ontology="kegg",
+                 offset=fx.OFFSET_PAST_END)),
+    ]
+
+
+def ontology_landscape_scenarios():
+    # organism is REQUIRED. genome-only organism (genome present, no
+    # expression layer) is the key probe: experiment-weighted coverage paths
+    # must not crash when there are no quantified genes. unknown experiment_ids
+    # weighting on a control organism also bottoms out at empty weighting.
+    return [
+        Scenario(
+            "genome_only_organism",
+            dict(organism=fx.GENOME_ONLY_ORGANISM, ontology="kegg")),
+        Scenario(
+            "genome_only_organism_experiment_weighted",
+            dict(organism=fx.GENOME_ONLY_ORGANISM, ontology="kegg",
+                 experiment_ids=[fx.UNKNOWN_EXPERIMENT_ID])),
+        Scenario(
+            "unknown_experiment_weighting",
+            dict(organism=fx.CONTROL_ORGANISM, ontology="kegg",
+                 experiment_ids=[fx.UNKNOWN_EXPERIMENT_ID])),
+    ]
+
+
 # Registry: tool name -> builder. Phase 4 fills the rest.
 SCENARIO_BUILDERS = {
     "genes_by_ontology": genes_by_ontology_scenarios,
@@ -447,4 +603,13 @@ SCENARIO_BUILDERS = {
     "genes_by_homolog_group": genes_by_homolog_group_scenarios,
     "genes_in_cluster": genes_in_cluster_scenarios,
     "search_homolog_groups": search_homolog_groups_scenarios,
+    # Batch C
+    "list_publications": list_publications_scenarios,
+    "list_experiments": list_experiments_scenarios,
+    "list_clustering_analyses": list_clustering_analyses_scenarios,
+    "list_derived_metrics": list_derived_metrics_scenarios,
+    "list_metabolites": list_metabolites_scenarios,
+    "list_metabolite_assays": list_metabolite_assays_scenarios,
+    "search_ontology": search_ontology_scenarios,
+    "ontology_landscape": ontology_landscape_scenarios,
 }
