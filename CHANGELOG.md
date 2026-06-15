@@ -22,10 +22,24 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 ## [Unreleased]
 
 ### Added
+- Corner-case verification harness (`tests/integration/edge_cases/` +
+  `tests/integration/test_edge_case_contracts.py`): every MCP tool is exercised
+  against degenerate-but-valid inputs (genome-only / expression-empty
+  organisms, missing & mixed batches, pagination/filter-empty boundaries) and
+  checked against structural invariants (no crash, schema validity, count
+  consistency, batch-diagnostic subsetting, empty-layer shape). A self-validating
+  fixture bank re-pins after KG rebuilds, and a coverage gate fails if a
+  registered tool has no edge-case scenarios.
 
 ### Changed
 
 ### Fixed
+- `differential_expression_by_gene` no longer crashes on genes with zero
+  differential-expression edges. The batch `top_categories` builder leaked a
+  synthetic `{category: null, …}` row that violated the non-nullable
+  `ExpressionTopCategory.category` model (raising a `ToolError`); null
+  categories are now filtered out in both the batch and global builders.
+  Surfaced by the new corner-case harness.
 - Organism resolution no longer requires expression data. The shared
   `_validate_organism_inputs` resolver matched `Experiment` nodes with
   `gene_count > 0`, so genome-only (`experiment_count=0`) and
