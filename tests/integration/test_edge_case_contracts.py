@@ -1,7 +1,26 @@
 import pytest
 from tests.integration.test_mcp_tools import tool_fns, _ctx_with_conn  # noqa: F401
+from tests.unit.test_tool_wrappers import EXPECTED_TOOLS
 from tests.integration.edge_cases import invariants as inv
 from tests.integration.edge_cases.scenarios import SCENARIO_BUILDERS
+
+# Tools with no meaningful degenerate entity input (pure schema / static
+# echo / raw escape hatch). Each exemption is justified inline.
+_EXEMPT = {
+    "kg_schema",           # static schema dump, no entity input
+    "kg_release_info",     # release identity, no entity input
+    "run_cypher",          # raw escape hatch, arbitrary query
+    "list_filter_values",  # static categorical lists, no entity input
+}
+
+
+def test_every_tool_has_edge_scenarios():
+    """Coverage gate: every registered tool must have edge-case scenarios
+    (or be explicitly exempted). Mirrors the EXPECTED_TOOLS registration gate
+    so corner-case coverage cannot silently lapse when a tool is added."""
+    covered = set(SCENARIO_BUILDERS) | _EXEMPT
+    missing = set(EXPECTED_TOOLS) - covered
+    assert not missing, f"tools missing edge-case scenarios: {sorted(missing)}"
 
 _CASES = [
     (tool, sc)
