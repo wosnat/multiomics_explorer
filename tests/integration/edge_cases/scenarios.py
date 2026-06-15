@@ -579,6 +579,171 @@ def ontology_landscape_scenarios():
     ]
 
 
+# --- Batch D (Task 4.2): metabolite/assay drill-downs + discusses ---------
+#
+# Real IDs discovered against the live KG (2026-06-15, branch
+# fix/organism-resolver-genome-only):
+#   Metabolites:
+#     kegg.compound:C00086  urea — gene catalysts + transporters in MED4
+#     kegg.compound:C00074  PEP — measured (18 quantifies + 2 flags edges)
+#     kegg.compound:C00001  H2O — EXISTS as Metabolite, ZERO assay edges
+#                                  (assays_by_metabolite not_matched probe)
+#   Assays (from test_mcp_tools.py §7 baselines):
+#     metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:
+#       cellular_concentration                       (numeric, 64 edges)
+#     metabolite_assay:msystems.01261-22:presence_flags_table_s2:
+#       presence_flag_intracellular                  (boolean, 93 edges)
+#   Publications:
+#     10.1038/ismej.2016.70  discusses genes + pathways (baseline)
+#     10.1126/science.1243457 / 10.1128/mbio.03425-22 /
+#       10.1128/mSystems.00008-17  present but NO discusses edge (not_matched)
+#
+# Chemistry is genome-derived and present in every organism with genes (even
+# the genome-only MIT9515 has 1222 catalyzing genes), so an "empty chemistry
+# layer via organism" probe is not achievable — the empty-shape probes here
+# lean on unknown/unlinked metabolite IDs and offset-past-end instead. The
+# genome-only-organism probe still exercises the single-organism drill-down
+# path on a no-DE strain (crash-freedom).
+
+_UREA_ID = "kegg.compound:C00086"          # gene catalysts + transporters (MED4)
+_PEP_ID = "kegg.compound:C00074"           # measured: 18 quantifies + 2 flags
+_H2O_NO_ASSAY_ID = "kegg.compound:C00001"  # Metabolite node, zero assay edges
+_NUMERIC_ASSAY = (
+    "metabolite_assay:pnas.2213271120:"
+    "metabolites_intracellular_mit9313:cellular_concentration")
+_BOOLEAN_ASSAY = (
+    "metabolite_assay:msystems.01261-22:"
+    "presence_flags_table_s2:presence_flag_intracellular")
+_DISCUSSES_DOI = "10.1038/ismej.2016.70"          # discusses genes + pathways
+_NO_DISCUSSES_DOI = "10.1126/science.1243457"     # present, no discusses edge
+_UNKNOWN_ASSAY_ID = "metabolite_assay:does_not_exist"
+
+
+def genes_by_metabolite_scenarios():
+    # metabolite IDs -> gene catalysts/transporters. SINGLE-ORGANISM enforced
+    # (organism required). Structured not_found (GbmNotFound) + flat
+    # not_matched — the oracle's batch-diagnostic only handles flat not_found,
+    # so input_ids is omitted (structured not_found auto-skips); crash-freedom
+    # + empty-shape are the real checks. Urea on the genome-only (no-DE) strain
+    # exercises the drill-down path on a strain that still has chemistry.
+    return [
+        Scenario(
+            "unknown_metabolite",
+            dict(metabolite_ids=[fx.UNKNOWN_METABOLITE_ID],
+                 organism=fx.CONTROL_ORGANISM)),
+        Scenario(
+            "genome_only_organism",
+            dict(metabolite_ids=[_UREA_ID],
+                 organism=fx.GENOME_ONLY_ORGANISM)),
+        Scenario(
+            "offset_past_end",
+            dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
+                 offset=fx.OFFSET_PAST_END)),
+    ]
+
+
+def metabolites_by_gene_scenarios():
+    # gene locus_tags -> metabolites. SINGLE-ORGANISM enforced. Structured
+    # not_found (MbgNotFound) -> input_ids omitted. PMM1720 (the no-DE gene)
+    # has zero chemistry edges (verified) -> not_matched probe on a real gene.
+    return [
+        Scenario(
+            "unknown_locus",
+            dict(locus_tags=[fx.UNKNOWN_LOCUS], organism=fx.CONTROL_ORGANISM)),
+        Scenario(
+            "gene_no_chemistry",
+            dict(locus_tags=[fx.GENE_NO_DE], organism=fx.CONTROL_ORGANISM)),
+        Scenario(
+            "genome_only_organism",
+            dict(locus_tags=["PMM0001"], organism=fx.GENOME_ONLY_ORGANISM)),
+        Scenario(
+            "offset_past_end",
+            dict(locus_tags=["PMM0963"], organism=fx.CONTROL_ORGANISM,
+                 offset=fx.OFFSET_PAST_END)),
+    ]
+
+
+def metabolites_by_quantifies_assay_scenarios():
+    # Numeric drill-down on Assay_quantifies_metabolite. Cross-organism;
+    # needs assay_ids or metabolite_ids. Structured not_found (MqaNotFound) ->
+    # input_ids omitted. Unknown assay -> empty layer; unknown metabolite is a
+    # filter on a real assay that strips every row -> empty filtered set
+    # (assay_ids is required at the wrapper layer, so metabolite-only is not a
+    # valid call — scenario fix); offset past end of a populated assay.
+    return [
+        Scenario(
+            "unknown_assay",
+            dict(assay_ids=[_UNKNOWN_ASSAY_ID])),
+        Scenario(
+            "unknown_metabolite_filter",
+            dict(assay_ids=[_NUMERIC_ASSAY],
+                 metabolite_ids=[fx.UNKNOWN_METABOLITE_ID])),
+        Scenario(
+            "offset_past_end",
+            dict(assay_ids=[_NUMERIC_ASSAY], offset=fx.OFFSET_PAST_END)),
+    ]
+
+
+def metabolites_by_flags_assay_scenarios():
+    # Boolean drill-down on Assay_flags_metabolite. Cross-organism. Structured
+    # not_found (MfaNotFound) -> input_ids omitted. Unknown assay -> empty;
+    # unknown metabolite is a filter on a real assay that strips every row
+    # (assay_ids required at the wrapper layer -> metabolite-only not a valid
+    # call, scenario fix); offset past end of a populated boolean assay.
+    return [
+        Scenario(
+            "unknown_assay",
+            dict(assay_ids=[_UNKNOWN_ASSAY_ID])),
+        Scenario(
+            "unknown_metabolite_filter",
+            dict(assay_ids=[_BOOLEAN_ASSAY],
+                 metabolite_ids=[fx.UNKNOWN_METABOLITE_ID])),
+        Scenario(
+            "offset_past_end",
+            dict(assay_ids=[_BOOLEAN_ASSAY], offset=fx.OFFSET_PAST_END)),
+    ]
+
+
+def assays_by_metabolite_scenarios():
+    # metabolite IDs -> all measurement evidence (both arms). Cross-organism.
+    # FLAT not_found (list[str]) + flat not_matched -> input_ids SET. H2O
+    # (C00001) exists as a Metabolite but has zero assay edges -> not_matched
+    # (the empty-after-filter probe). Unknown id -> not_found.
+    return [
+        Scenario(
+            "unknown_metabolite",
+            dict(metabolite_ids=[fx.UNKNOWN_METABOLITE_ID]),
+            input_ids=[fx.UNKNOWN_METABOLITE_ID]),
+        Scenario(
+            "metabolite_no_measurement",
+            dict(metabolite_ids=[_H2O_NO_ASSAY_ID]),
+            input_ids=[_H2O_NO_ASSAY_ID]),
+        Scenario(
+            "offset_past_end",
+            dict(metabolite_ids=[_PEP_ID], offset=fx.OFFSET_PAST_END)),
+    ]
+
+
+def discussed_by_publication_scenarios():
+    # publication DOIs -> discussed genes/pathways. Cross-organism. FLAT
+    # not_found + not_matched (list[str]) -> input_ids SET. Three real pubs
+    # have no discusses edge (not_matched); unknown DOI -> not_found; offset
+    # past end of a discussing pub.
+    return [
+        Scenario(
+            "unknown_doi",
+            dict(publication_dois=[fx.UNKNOWN_PUBLICATION_DOI]),
+            input_ids=[fx.UNKNOWN_PUBLICATION_DOI]),
+        Scenario(
+            "doi_no_discusses_edge",
+            dict(publication_dois=[_NO_DISCUSSES_DOI]),
+            input_ids=[_NO_DISCUSSES_DOI]),
+        Scenario(
+            "offset_past_end",
+            dict(publication_dois=[_DISCUSSES_DOI], offset=fx.OFFSET_PAST_END)),
+    ]
+
+
 # Registry: tool name -> builder. Phase 4 fills the rest.
 SCENARIO_BUILDERS = {
     "genes_by_ontology": genes_by_ontology_scenarios,
@@ -612,4 +777,11 @@ SCENARIO_BUILDERS = {
     "list_metabolite_assays": list_metabolite_assays_scenarios,
     "search_ontology": search_ontology_scenarios,
     "ontology_landscape": ontology_landscape_scenarios,
+    # Batch D
+    "genes_by_metabolite": genes_by_metabolite_scenarios,
+    "metabolites_by_gene": metabolites_by_gene_scenarios,
+    "metabolites_by_quantifies_assay": metabolites_by_quantifies_assay_scenarios,
+    "metabolites_by_flags_assay": metabolites_by_flags_assay_scenarios,
+    "assays_by_metabolite": assays_by_metabolite_scenarios,
+    "discussed_by_publication": discussed_by_publication_scenarios,
 }
