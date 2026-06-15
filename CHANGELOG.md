@@ -25,7 +25,8 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 - Corner-case verification harness (`tests/integration/edge_cases/` +
   `tests/integration/test_edge_case_contracts.py`): every MCP tool is exercised
   against degenerate-but-valid inputs (genome-only / expression-empty
-  organisms, missing & mixed batches, pagination/filter-empty boundaries) and
+  organisms, missing & mixed batches, pagination/filter-empty boundaries,
+  null-valued properties such as coordinate-less genes) and
   checked against structural invariants (no crash, schema validity, count
   consistency, batch-diagnostic subsetting, empty-layer shape). A self-validating
   fixture bank re-pins after KG rebuilds, and a coverage gate fails if a
@@ -46,9 +47,11 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
   metabolomics-only strains were unresolvable — every single-organism
   genomic tool (`genes_by_ontology`, `gene_ontology_terms`, …) raised
   `no organism matching '<name>' found` for them. Now matches
-  `OrganismTaxon.preferred_name` (the canonical registry), so any real
-  organism resolves; expression-only tools return empty results for
-  genome-only strains instead of a misleading not-found error.
+  `OrganismTaxon` with `gene_count > 0` (genomic presence, not expression),
+  so any real organism — including genome-only / metabolomics-only strains —
+  resolves, while gene-less higher-rank taxonomy nodes (genus / phage /
+  non-target species) still raise a clear not-found instead of silently
+  returning empty results.
 
 ## [0.1.0-alpha.2] - 2026-06-13
 ### Added

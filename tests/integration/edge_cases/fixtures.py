@@ -36,6 +36,15 @@ UNKNOWN_LOCUS = "PMM_DOES_NOT_EXIST"
 # Real + fake mix for not_found correctness (single organism).
 MIXED_LOCUS_BATCH = ["PMM0001", "PMM_DOES_NOT_EXIST"]
 
+# --- Null-property fixtures (axis 4) --------------------------------------
+
+# A valid gene with NULL genomic coordinates (strand / start / contig all
+# null) — 3872 such genes exist. Positional tools (gene_neighbors) cannot
+# place it, so it must land in not_matched, never crash. Organism: NATL1A.
+# MATCH (g:Gene) WHERE g.strand IS NULL AND g.start IS NULL AND g.contig IS NULL
+#   RETURN g.locus_tag LIMIT 1
+GENE_NO_COORDINATES = "NATL1_09771"
+
 # --- Other unknown IDs (for not_found buckets) ----------------------------
 
 UNKNOWN_EXPERIMENT_ID = "exp_does_not_exist"

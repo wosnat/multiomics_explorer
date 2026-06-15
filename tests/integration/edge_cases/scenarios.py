@@ -173,6 +173,18 @@ def gene_neighbors_scenarios():
             "mixed_batch",
             dict(locus_tags=fx.MIXED_LOCUS_BATCH),
             input_ids=fx.MIXED_LOCUS_BATCH),
+        # Axis 4 (null props): a valid gene whose strand/start/contig are null
+        # cannot be positioned — must land in not_matched, never crash.
+        Scenario(
+            "anchor_null_coordinates",
+            dict(locus_tags=[fx.GENE_NO_COORDINATES]),
+            input_ids=[fx.GENE_NO_COORDINATES]),
+        # And the documented same_strand path on a null-strand anchor must not
+        # crash (warn + unfiltered).
+        Scenario(
+            "anchor_null_strand_same_strand_filter",
+            dict(locus_tags=[fx.GENE_NO_COORDINATES], same_strand=True),
+            input_ids=[fx.GENE_NO_COORDINATES]),
     ]
 
 

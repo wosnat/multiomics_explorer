@@ -3434,13 +3434,17 @@ def build_resolve_organism_for_organism(
     Matches against ``OrganismTaxon`` (the canonical organism registry, whose
     ``preferred_name`` equals ``Gene.organism_name``) using the same word-based
     CONTAINS matching as list_experiments. Resolving an organism is a genomic-
-    identity question, so it must NOT gate on expression experiments — genome-
-    only and metabolomics-only strains have genes but no Experiment with
-    gene_count > 0, and were previously unresolvable.
+    identity question, so it gates on the presence of GENES
+    (``gene_count > 0``), never on expression EXPERIMENTS — genome-only and
+    metabolomics-only strains have genes but no Changes_expression_of edges and
+    must still resolve, whereas gene-less higher-rank taxonomy nodes
+    (genus / phage / non-target species) should not resolve (they would only
+    yield empty downstream results with a confusing success).
     """
     cypher = (
         "MATCH (o:OrganismTaxon)\n"
-        "WHERE ALL(word IN split(toLower($organism), ' ')"
+        "WHERE coalesce(o.gene_count, 0) > 0\n"
+        "  AND ALL(word IN split(toLower($organism), ' ')"
         " WHERE toLower(o.preferred_name) CONTAINS word)\n"
         "RETURN collect(DISTINCT o.preferred_name) AS organisms"
     )

@@ -3411,13 +3411,16 @@ class TestBuildResolveOrganismForOrganism:
         assert "organisms" in cypher
         assert params["organism"] == "MED4"
 
-    def test_does_not_gate_on_expression(self):
-        # Resolving an organism is a genomic-identity question; it must not
-        # require expression experiments. Genome-only / metabolomics-only
-        # strains have genes but no Experiment with gene_count > 0.
+    def test_gates_on_genomic_presence_not_expression(self):
+        # Resolving an organism is a genomic-identity question: gate on the
+        # presence of GENES (gene_count > 0), never on expression EXPERIMENTS.
+        # Genome-only / metabolomics-only strains have genes but no
+        # Changes_expression_of edges, so they must still resolve; gene-less
+        # higher-rank taxonomy nodes (genus/phage/non-target species) must not.
         cypher, _ = build_resolve_organism_for_organism(organism="MIT9515")
-        assert "gene_count" not in cypher
         assert "Experiment" not in cypher
+        assert "gene_count" in cypher
+        assert "> 0" in cypher
 
     def test_fuzzy_match(self):
         cypher, _ = build_resolve_organism_for_organism(organism="MED4")

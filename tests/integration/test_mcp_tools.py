@@ -3302,11 +3302,13 @@ class TestOntologyToolsPsortbSignalpLive:
 
 @pytest.mark.kg
 class TestOrganismResolverGenomeOnlyLive:
-    """Resolving an organism is a genomic-identity question — it must not gate
-    on the presence of expression experiments. Regression for the friction-log
-    bug where genome-only strains (experiment_count=0) raised
-    'no organism matching ... found' from the shared _validate_organism_inputs
-    resolver, blocking every single-organism genomic tool."""
+    """Resolving an organism is a genomic-identity question — it gates on the
+    presence of genes (gene_count > 0), never on expression experiments.
+    Regression for the friction-log bug where genome-only strains
+    (experiment_count=0) raised 'no organism matching ... found' from the
+    shared _validate_organism_inputs resolver, blocking every single-organism
+    genomic tool. Gene-less higher-rank taxonomy nodes still (correctly) do
+    not resolve."""
 
     # Prochlorococcus MIT9515: 1949 genes, 0 expression experiments.
     GENOME_ONLY_ORGANISM = "MIT9515"
@@ -3333,6 +3335,28 @@ class TestOrganismResolverGenomeOnlyLive:
             conn=conn,
         )
         assert resolved == "Prochlorococcus MIT9515"
+
+    def test_gene_less_taxon_does_not_resolve(self, conn):
+        # A higher-rank taxonomy node with no genes (genus / phage / non-target
+        # species, gene_count=0) must NOT resolve — resolving it would only
+        # yield confusing empty downstream results. The resolver gates on
+        # genomic presence (gene_count > 0), not on expression experiments.
+        from multiomics_explorer.api.functions import _validate_organism_inputs
+
+        rows = conn.execute_query(
+            "MATCH (o:OrganismTaxon) WHERE coalesce(o.gene_count, 0) = 0 "
+            "RETURN o.preferred_name AS name LIMIT 1"
+        )
+        if not rows:
+            pytest.skip("no gene-less OrganismTaxon in current KG")
+        gene_less = rows[0]["name"]
+        with pytest.raises(ValueError, match="no organism matching"):
+            _validate_organism_inputs(
+                organism=gene_less,
+                locus_tags=None,
+                experiment_ids=None,
+                conn=conn,
+            )
 
 
 # ---------------------------------------------------------------------------
