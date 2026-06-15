@@ -744,6 +744,107 @@ def discussed_by_publication_scenarios():
     ]
 
 
+# --- Batch E (Task 4.2): DerivedMetric drill-downs ------------------------
+#
+# DM gate properties discovered against the live KG (2026-06-15, branch
+# fix/organism-resolver-genome-only):
+#   genes_by_numeric_metric:
+#     damping_ratio        rankable=True,  has_p_value=False, value_max=25.3
+#     peak_time_protein_h  rankable=False, has_p_value=False (bucket -> raise)
+#     (NO DM in the KG carries p-values -> significant_only=True -> raise)
+#   genes_by_boolean_metric:
+#     vesicle_proteome_member  (positive-only storage; flag=False -> 0 rows)
+#   genes_by_categorical_metric:
+#     predicted_subcellular_localization
+#       allowed_categories incl. 'Outer Membrane','Periplasmic','Cytoplasmic',
+#       'Unknown', ... ; an unknown category -> ValueError -> ToolError.
+#
+# All three tools surface unknown / wrong-kind DM IDs as `not_found_ids`
+# (NOT a flat not_found/not_matched the batch oracle understands), so
+# input_ids is left empty on every scenario. Gated-filter raises
+# (rankable bucket on non-rankable DM, significant_only with no p-value DM,
+# unknown category) are DOCUMENTED contract -> expects_error=ToolError.
+# Impossible value thresholds / flag=False are CORRECT empty results, not
+# raises — they stress the by_metric / by_value rollups on an empty slice.
+
+_DM_RANKABLE_NUMERIC = "damping_ratio"        # rankable=True, value_max=25.3
+_DM_NONRANKABLE_NUMERIC = "peak_time_protein_h"  # rankable=False -> bucket raises
+_DM_BOOLEAN = "vesicle_proteome_member"       # positive-only storage
+_DM_CATEGORICAL = "predicted_subcellular_localization"
+
+
+def genes_by_numeric_metric_scenarios():
+    return [
+        Scenario(
+            # Unknown DM id -> not_found_ids (no raise), empty results.
+            "unknown_derived_metric_id",
+            dict(derived_metric_ids=[fx.UNKNOWN_DERIVED_METRIC_ID])),
+        Scenario(
+            # Valid rankable DM, impossible value threshold -> empty slice,
+            # well-formed envelope (by_metric rollup on zero rows). NOT a raise.
+            "impossible_value_threshold",
+            dict(metric_types=[_DM_RANKABLE_NUMERIC], min_value=1.0e9)),
+        Scenario(
+            # rankable-GATED bucket on an all-non-rankable DM -> documented raise.
+            "rankable_filter_non_rankable_dm",
+            dict(metric_types=[_DM_NONRANKABLE_NUMERIC], bucket=["top_decile"]),
+            expects_error=ToolError),
+        Scenario(
+            # has_p_value-GATED significance filter, no DM carries p-values ->
+            # documented raise ("raises today").
+            "p_value_filter_unsupported",
+            dict(metric_types=[_DM_RANKABLE_NUMERIC], significant_only=True),
+            expects_error=ToolError),
+        Scenario(
+            "offset_past_end",
+            dict(metric_types=[_DM_RANKABLE_NUMERIC], offset=fx.OFFSET_PAST_END)),
+    ]
+
+
+def genes_by_boolean_metric_scenarios():
+    return [
+        Scenario(
+            # Unknown DM id -> not_found_ids, empty results (no raise).
+            "unknown_derived_metric_id",
+            dict(derived_metric_ids=[fx.UNKNOWN_DERIVED_METRIC_ID])),
+        Scenario(
+            # flag=False -> 0 rows (positive-only KG storage today). CORRECT
+            # empty result, stresses by_value rollup on an empty slice.
+            "flag_false_empty",
+            dict(metric_types=[_DM_BOOLEAN], flag=False)),
+        Scenario(
+            "offset_past_end",
+            dict(metric_types=[_DM_BOOLEAN], offset=fx.OFFSET_PAST_END)),
+    ]
+
+
+def genes_by_categorical_metric_scenarios():
+    return [
+        Scenario(
+            # Unknown DM id -> not_found_ids, empty results (no raise).
+            "unknown_derived_metric_id",
+            dict(derived_metric_ids=[fx.UNKNOWN_DERIVED_METRIC_ID])),
+        Scenario(
+            # Unknown category -> ValueError -> ToolError (documented; message
+            # lists the allowed-category union).
+            "unknown_category_raises",
+            dict(metric_types=[_DM_CATEGORICAL], categories=["nonsense_category"]),
+            expects_error=ToolError),
+        Scenario(
+            # Valid DM + valid category + a locus_tag set with no membership ->
+            # empty slice, well-formed by_category rollup. NOT a raise.
+            "valid_category_empty_slice",
+            dict(metric_types=[_DM_CATEGORICAL],
+                 categories=["Outer Membrane"],
+                 locus_tags=[fx.UNKNOWN_LOCUS])),
+        Scenario(
+            "offset_past_end",
+            dict(metric_types=[_DM_CATEGORICAL],
+                 categories=["Outer Membrane", "Periplasmic"],
+                 offset=fx.OFFSET_PAST_END)),
+    ]
+
+
 # Registry: tool name -> builder. Phase 4 fills the rest.
 SCENARIO_BUILDERS = {
     "genes_by_ontology": genes_by_ontology_scenarios,
@@ -784,4 +885,8 @@ SCENARIO_BUILDERS = {
     "metabolites_by_flags_assay": metabolites_by_flags_assay_scenarios,
     "assays_by_metabolite": assays_by_metabolite_scenarios,
     "discussed_by_publication": discussed_by_publication_scenarios,
+    # Batch E
+    "genes_by_numeric_metric": genes_by_numeric_metric_scenarios,
+    "genes_by_boolean_metric": genes_by_boolean_metric_scenarios,
+    "genes_by_categorical_metric": genes_by_categorical_metric_scenarios,
 }
