@@ -22,6 +22,13 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [0.1.0-alpha.3] - 2026-06-15
+### Added
 - Corner-case verification harness (`tests/integration/edge_cases/` +
   `tests/integration/test_edge_case_contracts.py`): every MCP tool is exercised
   against degenerate-but-valid inputs (genome-only / expression-empty
