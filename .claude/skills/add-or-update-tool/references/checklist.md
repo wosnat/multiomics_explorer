@@ -17,6 +17,8 @@
 | IT | `tests/integration/test_mcp_tools.py` | Smoke test against live KG |
 | IT | `tests/integration/test_tool_correctness_kg.py` | Update `TestBuild{Name}CorrectnessKG` if exists |
 | IT | `tests/integration/test_api_contract.py` | Add/update `Test{Name}Contract` — **update whenever return shape changes** |
+| IT | `tests/integration/edge_cases/scenarios.py` | Add `{name}_scenarios()` builder + register in `SCENARIO_BUILDERS` (coverage gate enforces) |
+| IT | `tests/integration/edge_cases/fixtures.py` + `test_fixture_guards.py` | Only if the tool needs an empty-layer / null degenerate fixture not already present — add the constant (with discovery cypher) + a guard |
 | RG | `tests/evals/cases.yaml` | Eval cases |
 | RG | `tests/evals/test_eval.py` | Add to `TOOL_BUILDERS` |
 | RG | `tests/regression/test_regression.py` | Add to `TOOL_BUILDERS` |
@@ -390,6 +392,7 @@ Pattern: `gene_ontology_terms` (9 ontologies × batch genes).
 
 - Forgetting to add to `__init__.py` exports (both `api/` and package root)
 - Forgetting to update `EXPECTED_TOOLS` list in `test_tool_wrappers.py`
+- Forgetting to add `{name}_scenarios()` + `SCENARIO_BUILDERS` entry in `tests/integration/edge_cases/scenarios.py` — the `test_every_tool_has_edge_scenarios` gate fails (or add to `_EXEMPT` for a no-entity-input tool)
 - Forgetting to add builder to `TOOL_BUILDERS` in `test_regression.py` AND `test_eval.py` (both have their own dict)
 - Forgetting to update `CLAUDE.md` tool table
 - Forgetting to update `test_tool_correctness_kg.py` when builder signature changes

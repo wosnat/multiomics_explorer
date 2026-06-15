@@ -56,6 +56,34 @@ tree. **Never hand-edit rendered md.** YAML examples / mistakes /
 chaining follow the same 9 outfacing-doc rules as Layer 3. After regen,
 run `uv run python scripts/build_about_content.py --lint {tool_name}`.
 
+## Cross-layer: empty-data-layer safety
+
+The KG holds entities that exist genomically but lack a data layer —
+genome-only / metabolomics-only organisms (no expression), genes with no
+DE / orthologs / chemistry / DMs, coordinate-less genes. Every tool must
+return a well-formed **empty** envelope for these — never crash, never mislead:
+
+- **Layer 1 (builders):** summary/stat queries must aggregate
+  (`count` / `collect` / `apoc.coll.frequencies`) so they return exactly one
+  row even on empty input — never a bare per-row projection that a Layer-2
+  `[0]` would index into. When a projected value feeds a **non-nullable**
+  Pydantic field, filter nulls in the builder
+  (`[x IN collect({...}) WHERE x.field IS NOT NULL]`) — a synthetic null (e.g.
+  from `UNWIND CASE WHEN size(xs)>0 THEN xs ELSE [null] END`) crashes model
+  construction at Layer 3.
+- **Layer 2 (api):** index query results empty-safe (`rows[0] if rows else {}`);
+  default counts to `0`, lists to `[]`. Entity/organism resolvers gate on
+  *genomic* presence (e.g. `OrganismTaxon.gene_count > 0`), never on
+  *expression* (`Experiment`) data — gating genomic lookups on expression made
+  genome-only strains unresolvable.
+- **Layer 3 (wrappers):** an empty data layer is a normal result
+  (`total_matching=0`, `results=[]`), not a `ToolError`.
+
+Enforced by the corner-case harness (`tests/integration/edge_cases/` +
+`test_edge_case_contracts.py`): every tool has degenerate-input scenarios
+checked against structural invariants, with a coverage gate. See the `testing`
+skill and the `add-or-update-tool` skill (Stage 1) for how to add scenarios.
+
 ## Analysis utilities (`analysis/expression.py`)
 
 Compose API results into DataFrames. Reference docs live in

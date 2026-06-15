@@ -24,6 +24,8 @@ and [regression guide](references/regression-guide.md) for golden-file tests.
 | `tests/integration/test_mcp_tools.py` | MCP smoke tests | Yes |
 | `tests/integration/test_api_contract.py` | API return-type contracts (shape + keys) | Yes |
 | `tests/integration/test_about_examples.py` | About-content examples execute against KG | Yes |
+| `tests/integration/test_edge_case_contracts.py` | Corner-case matrix: every tool × degenerate inputs vs. structural invariants + coverage gate | Yes |
+| `tests/integration/edge_cases/test_fixture_guards.py` | Degenerate-fixture self-validation (re-pin after KG rebuild) | Yes |
 | `tests/regression/test_regression.py` | Golden-file comparison | Yes |
 
 ## Test commands
@@ -80,6 +82,27 @@ When adding a new query builder, add it to the `_BUILDERS` list in
 If the builder introduces new map projection keys (e.g. `{alias: g.property}`),
 add the alias to `_KNOWN_MAP_KEYS`. Ontology-dependent builders auto-expand
 via the `ONTOLOGY_CONFIG` loop — no per-ontology entries needed.
+
+## Important: corner-case scenarios
+
+When adding a tool, add a `{name}_scenarios()` builder and register it in
+`SCENARIO_BUILDERS` in `tests/integration/edge_cases/scenarios.py`. The
+`test_every_tool_has_edge_scenarios` coverage gate fails until the tool is
+registered (or added to `_EXEMPT` for a no-entity-input tool like `kg_schema`).
+
+- A `Scenario(label, kwargs, expects_error=None, input_ids=[])` runs the MCP
+  wrapper with `kwargs` and checks the response against the invariant oracle
+  (`edge_cases/invariants.py`): no crash, schema-valid, count-consistent,
+  `not_found`/`not_matched` ⊆ inputs, empty-layer shape (offset-aware).
+- Pick degenerate inputs from `edge_cases/fixtures.py` across the four axes:
+  empty data layer (genome-only / expression-empty organism, no-DE /
+  coordinate-less gene), missing & mixed batch, pagination/filter-empty,
+  null props. Set `expects_error=ToolError` for documented raises; set
+  `input_ids` only when the tool exposes a FLAT `not_found`/`not_matched` list.
+- Add a new fixture (+ a guard in `test_fixture_guards.py`) only if no existing
+  degenerate fixture fits; pin it with its discovery cypher in a comment.
+
+This enforces the `layer-rules` "empty-data-layer safety" convention.
 
 ## Important: KG char escaping
 

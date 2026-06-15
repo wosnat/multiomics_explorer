@@ -15,7 +15,8 @@ References:
 - [field-rubric](references/field-rubric.md) — response-schema quality criteria
 - [checklist](references/checklist.md) — per-layer file paths + templates
 - `layer-rules` skill — Cypher conventions, file ownership, rename cascades, outfacing-doc style rules + `--lint` workflow
-- `testing` skill — per-layer test patterns, EXPECTED_TOOLS, TOOL_BUILDERS, fixtures
+- `testing` skill — per-layer test patterns, EXPECTED_TOOLS, TOOL_BUILDERS, fixtures, corner-case harness
+- `tests/integration/edge_cases/` — corner-case verification harness (degenerate-input scenarios + invariant oracle + coverage gate); every new tool needs scenarios there
 
 ## Two execution modes
 
@@ -91,7 +92,7 @@ Phase 2 is three stages. Pytest invocations in the orchestrator: 3 (plus scoped 
 
 ### Stage 1 — RED
 
-Dispatch `test-updater` agent with the frozen spec. It writes failing tests across `test_query_builders.py`, `test_api_functions.py`, `test_tool_wrappers.py` and updates `EXPECTED_TOOLS` and `TOOL_BUILDERS`.
+Dispatch `test-updater` agent with the frozen spec. It writes failing tests across `test_query_builders.py`, `test_api_functions.py`, `test_tool_wrappers.py` and updates `EXPECTED_TOOLS` and `TOOL_BUILDERS`. It also authors the tool's **corner-case scenarios**: a `{name}_scenarios()` builder + `SCENARIO_BUILDERS` registration in `tests/integration/edge_cases/scenarios.py` (new degenerate fixtures in `edge_cases/fixtures.py` + a guard in `test_fixture_guards.py` only if the tool needs an empty-layer/null fixture not already present). The `test_every_tool_has_edge_scenarios` coverage gate fails until the tool is registered there (or added to `_EXEMPT` for a no-entity-input tool). Pick degenerate inputs from the axes that apply — empty data layer, missing/mixed batch, pagination/filter-empty, null props — and set `expects_error=ToolError` for documented raises. See the `layer-rules` "empty-data-layer safety" convention.
 
 Run `pytest tests/unit/ -q --tb=no`. Expect exactly the new tests red, rest green. Unrelated red → halt and investigate.
 
@@ -135,7 +136,7 @@ Once all 4 agents report green:
    See the [readability-pass spec](../../../docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md) for the full 9 outfacing-doc style rules + the lint extension contract.
 
 3. **Foreground**: `pytest tests/unit/ -q`
-4. **Foreground**: `pytest tests/integration/ -m kg -q`
+4. **Foreground**: `pytest tests/integration/ -m kg -q` — includes the corner-case matrix (`test_edge_case_contracts.py`) + the `test_every_tool_has_edge_scenarios` coverage gate. A tool with no edge-case scenarios, or one that crashes / malforms its envelope on a degenerate input, fails here.
 5. **Foreground**: `pytest tests/regression/ -m kg -q`
    If the spec declared new or renamed columns, run `pytest tests/regression/ --force-regen -m kg -q` first, then verify.
 
