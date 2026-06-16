@@ -504,11 +504,11 @@ def build_tool(tool_name: str, schemas: dict) -> bool:
 
     input_data = None
     if input_path.exists():
-        input_data = yaml.safe_load(input_path.read_text())
+        input_data = yaml.safe_load(input_path.read_text(encoding="utf-8"))
 
     markdown = render_about(tool_name, schema, input_data)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(markdown)
+    output_path.write_text(markdown, encoding="utf-8")
 
     status = "built" if input_data else "built (no input YAML — TODOs remain)"
     print(f"  OK   {tool_name}: {output_path.relative_to(Path.cwd())} [{status}]")
@@ -583,7 +583,7 @@ def main():
         if out_path.exists():
             print(f"Error: {out_path} already exists. Delete it first to regenerate.")
             sys.exit(1)
-        out_path.write_text(skeleton)
+        out_path.write_text(skeleton, encoding="utf-8")
         print(f"Generated skeleton: {out_path.relative_to(Path.cwd())}")
         return
 

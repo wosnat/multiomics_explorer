@@ -120,7 +120,7 @@ for uri_prefix, (doc_dir, desc_template) in _DOC_DIRS.items():
         uri = f"{uri_prefix}/{stem}"
 
         def _make_reader(path: Path):
-            return lambda: path.read_text()
+            return lambda: path.read_text(encoding="utf-8")
 
         resource = FunctionResource.from_function(
             fn=_make_reader(md_file),
@@ -143,7 +143,7 @@ for example_name, example_description in [
 ]:
     mcp.add_resource(
         FunctionResource.from_function(
-            fn=(lambda p: lambda: p.read_text())(_EXAMPLES_DIR / example_name),
+            fn=(lambda p: lambda: p.read_text(encoding="utf-8"))(_EXAMPLES_DIR / example_name),
             uri=f"docs://examples/{example_name}",
             name=example_name,
             description=example_description,

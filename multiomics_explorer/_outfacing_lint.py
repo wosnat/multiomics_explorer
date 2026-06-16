@@ -47,7 +47,7 @@ def lint_lines(paths: list[Path]) -> list[Violation]:
     violations: list[Violation] = []
     for path in paths:
         try:
-            text = path.read_text()
+            text = path.read_text(encoding="utf-8")
         except OSError as e:
             print(f"  SKIP {path}: {e}", file=sys.stderr)
             continue
@@ -75,7 +75,7 @@ def lint_python_docstrings(paths: list[Path]) -> list[Violation]:
     violations: list[Violation] = []
     for path in paths:
         try:
-            text = path.read_text()
+            text = path.read_text(encoding="utf-8")
         except OSError as e:
             print(f"  SKIP {path}: {e}", file=sys.stderr)
             continue

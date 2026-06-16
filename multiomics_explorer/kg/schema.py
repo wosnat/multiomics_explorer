@@ -176,13 +176,13 @@ def save_baseline(schema: GraphSchema, path: Path = BASELINE_PATH) -> Path:
         "schema": schema.to_dict(),
     }
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(yaml.dump(data, default_flow_style=False, sort_keys=False))
+    path.write_text(yaml.dump(data, default_flow_style=False, sort_keys=False), encoding="utf-8")
     return path
 
 
 def load_baseline(path: Path = BASELINE_PATH) -> tuple[GraphSchema, dict]:
     """Load baseline schema from YAML. Returns (schema, metadata)."""
-    data = yaml.safe_load(path.read_text())
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
     schema = GraphSchema.from_dict(data["schema"])
     return schema, {"version": data.get("version"), "captured_at": data.get("captured_at")}
 
