@@ -26,6 +26,12 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 ### Changed
 
 ### Fixed
+- `to_dataframe()` no longer drops the polymorphic `value` column from
+  `gene_derived_metrics` results when a query mixes metric kinds (e.g. numeric
+  + boolean + categorical). Such columns hold mixed scalar Python types, which
+  pandas types as `object`; the flattener previously treated any non-list/dict
+  `object` column as unflattenable and dropped it with a warning. Mixed-scalar
+  columns are now kept as-is. Columns with genuine nesting still drop as before.
 
 ## [0.1.0-alpha.3] - 2026-06-15
 ### Added

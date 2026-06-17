@@ -335,7 +335,15 @@ def _process_object_column(df: pd.DataFrame, col: str) -> pd.DataFrame:
             df.insert(col_pos + i, new_col, expanded_df[new_col])
         return df
 
-    # Mixed types — drop with warning.
+    # All non-null values are scalars of mixed Python type (e.g. the
+    # polymorphic DerivedMetric `value` column: float + 'true'/'false' +
+    # category string). Pandas infers object dtype, but the column is
+    # already flat — keep it as-is rather than dropping data.
+    if all(not isinstance(v, (list, dict)) for v in non_null):
+        return df
+
+    # Genuinely unflattenable: a mix of scalars and containers, or
+    # containers of differing kind — drop with warning.
     _drop_with_warning(df, col)
     return df
 

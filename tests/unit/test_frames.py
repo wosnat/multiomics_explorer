@@ -247,6 +247,59 @@ class TestToDataFrameDictColumns:
         assert any(issubclass(w.category, UserWarning) for w in caught)
 
 
+class TestToDataFramePolymorphicScalarColumn:
+    """Mixed-scalar-type columns (no nesting) are kept, not dropped.
+
+    The motivating case is the ``gene_derived_metrics`` ``value`` column,
+    which is polymorphic: float for numeric DMs, 'true'/'false' for boolean
+    DMs, category string for categorical DMs. When several metric kinds are
+    returned together the column holds mixed scalar Python types and pandas
+    infers ``object`` dtype — but the values are scalars and must survive.
+    """
+
+    def test_mixed_scalar_value_column_kept(self):
+        result = {
+            "results": [
+                {"locus_tag": "PMM0001", "value_kind": "numeric", "value": 2.5},
+                {"locus_tag": "PMM0002", "value_kind": "boolean", "value": "true"},
+                {"locus_tag": "PMM0003", "value_kind": "categorical", "value": "sensitive"},
+            ]
+        }
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            df = to_dataframe(result)
+        assert "value" in df.columns
+        assert df["value"].tolist() == [2.5, "true", "sensitive"]
+        assert not any(issubclass(w.category, UserWarning) for w in caught), (
+            f"Unexpected warnings: {[str(w.message) for w in caught]}"
+        )
+
+    def test_mixed_scalar_with_none_kept(self):
+        result = {
+            "results": [
+                {"gene": "PMM0001", "value": 2.5},
+                {"gene": "PMM0002", "value": "true"},
+                {"gene": "PMM0003", "value": None},
+            ]
+        }
+        df = to_dataframe(result)
+        assert "value" in df.columns
+        assert df["value"].iloc[0] == 2.5
+        assert df["value"].iloc[1] == "true"
+        assert pd.isna(df["value"].iloc[2])
+
+    def test_mixed_scalar_int_and_str_kept(self):
+        result = {
+            "results": [
+                {"gene": "PMM0001", "value": 3},
+                {"gene": "PMM0002", "value": "absent"},
+            ]
+        }
+        df = to_dataframe(result)
+        assert "value" in df.columns
+        assert df["value"].tolist() == [3, "absent"]
+
+
 class TestToDataFrameWarnings:
     """Dropped columns produce meaningful UserWarning messages."""
 
