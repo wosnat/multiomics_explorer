@@ -33,7 +33,8 @@ not_found:
   pathway_ids: []
 offset: 0
 results:
-- chebi_id: '10789'
+- catalyst_gene_count: 5906
+  chebi_id: '10789'
   elements:
   - C
   - H
@@ -44,7 +45,6 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O13P3
-  gene_count: 5914
   mass: 503.15
   measured_assay_count: 0
   measured_compartments: []
@@ -88,8 +88,9 @@ results:
   - kegg.pathway:ko05133
   - kegg.pathway:ko05410
   - kegg.pathway:ko05415
-  transporter_count: 47
-- chebi_id: '13222'
+  transporter_count: 15
+- catalyst_gene_count: 3486
+  chebi_id: '13222'
   elements:
   - C
   - H
@@ -101,7 +102,6 @@ results:
   - metabolomics
   - transport
   formula: C10H12N5O10P2
-  gene_count: 3491
   mass: 424.179
   measured_assay_count: 4
   measured_compartments:
@@ -136,8 +136,9 @@ results:
   - kegg.pathway:ko05012
   - kegg.pathway:ko05014
   - kegg.pathway:ko05022
-  transporter_count: 45
-- chebi_id: '13393'
+  transporter_count: 5
+- catalyst_gene_count: 3242
+  chebi_id: '13393'
   elements:
   - C
   - H
@@ -149,7 +150,6 @@ results:
   - metabolomics
   - transport
   formula: C21H26N7O14P2
-  gene_count: 3247
   mass: 662.422
   measured_assay_count: 4
   measured_compartments:
@@ -178,8 +178,9 @@ results:
   - kegg.pathway:ko04936
   - kegg.pathway:ko04977
   - kegg.pathway:ko05208
-  transporter_count: 10
-- chebi_id: '13395'
+  transporter_count: 4
+- catalyst_gene_count: 2963
+  chebi_id: '13395'
   elements:
   - C
   - H
@@ -191,7 +192,6 @@ results:
   - metabolomics
   - transport
   formula: C21H27N7O14P2
-  gene_count: 2964
   mass: 663.43
   measured_assay_count: 8
   measured_compartments:
@@ -212,8 +212,9 @@ results:
   - kegg.pathway:ko04020
   - kegg.pathway:ko04714
   - kegg.pathway:ko04925
-  transporter_count: 1
-- chebi_id: '12056'
+  transporter_count: 2
+- catalyst_gene_count: 2411
+  chebi_id: '12056'
   elements:
   - C
   - H
@@ -225,7 +226,6 @@ results:
   - metabolomics
   - transport
   formula: C10H12N5O7P
-  gene_count: 2412
   mass: 345.208
   measured_assay_count: 12
   measured_compartments:
@@ -268,7 +268,7 @@ results:
   - kegg.pathway:ko05012
   - kegg.pathway:ko05022
   - kegg.pathway:ko05032
-  transporter_count: 8
+  transporter_count: 2
 returned: 5
 row_count: 5
 score_max: null
@@ -305,26 +305,26 @@ top_metabolite_pathways:
   metabolite_pathway_id: kegg.pathway:ko00330
   metabolite_pathway_name: Arginine and proline metabolism
 top_organisms:
-- count: 1360
+- count: 1334
   organism_name: Pseudomonas putida KT2440
-- count: 1281
+- count: 1329
   organism_name: Ruegeria pomeroyi DSS-3
-- count: 1209
+- count: 1274
   organism_name: Alteromonas (MarRef v6)
-- count: 1196
-  organism_name: Shewanella sp. W3-18-1
-- count: 1156
+- count: 1272
   organism_name: Alteromonas mediterranea AltDE1
-- count: 1146
+- count: 1262
   organism_name: Alteromonas macleodii EZ55
-- count: 1146
+- count: 1262
   organism_name: Alteromonas macleodii MIT1002
-- count: 1142
+- count: 1258
   organism_name: Alteromonas mediterranea AltDE
-- count: 1141
-  organism_name: Alteromonas macleodii ATCC27126
-- count: 1140
+- count: 1258
   organism_name: Alteromonas macleodii BGP6
+- count: 1257
+  organism_name: Alteromonas macleodii ATCC27126
+- count: 1255
+  organism_name: Alteromonas macleodii HOT1A3
 total_entries: 3356
 total_matching: 1693
 truncated: true

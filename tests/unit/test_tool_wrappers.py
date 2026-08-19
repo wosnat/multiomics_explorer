@@ -499,11 +499,12 @@ class TestListOrganismsWrapper:
 
     @pytest.mark.asyncio
     async def test_per_row_chemistry_fields_present(self, tool_fns, mock_ctx):
-        """Each result row includes reaction_count and metabolite_count."""
+        """Each result row includes reaction_count and
+        catalyzed_metabolite_count (catalysis-arm rename, KG-SYNC-001)."""
         sample_org_with_chem = {
             **self._SAMPLE_ORG,
             "reaction_count": 943,
-            "metabolite_count": 1039,
+            "catalyzed_metabolite_count": 1039,
         }
         with patch(
             "multiomics_explorer.api.functions.list_organisms",
@@ -517,7 +518,7 @@ class TestListOrganismsWrapper:
             result = await tool_fns["list_organisms"](mock_ctx)
         org = result.results[0]
         assert org.reaction_count == 943
-        assert org.metabolite_count == 1039
+        assert org.catalyzed_metabolite_count == 1039
 
     @pytest.mark.asyncio
     async def test_by_metabolic_capability_envelope(self, tool_fns, mock_ctx):
@@ -530,9 +531,11 @@ class TestListOrganismsWrapper:
                 "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
                 "by_metabolic_capability": [
                     {"organism_name": "Alteromonas macleodii EZ55",
-                     "reaction_count": 1348, "metabolite_count": 1428},
+                     "reaction_count": 1348,
+                     "catalyzed_metabolite_count": 1428},
                     {"organism_name": "Prochlorococcus MED4",
-                     "reaction_count": 943, "metabolite_count": 1039},
+                     "reaction_count": 943,
+                     "catalyzed_metabolite_count": 1039},
                 ],
             },
         ):
@@ -541,7 +544,7 @@ class TestListOrganismsWrapper:
         top = result.by_metabolic_capability[0]
         assert top.organism_name == "Alteromonas macleodii EZ55"
         assert top.reaction_count == 1348
-        assert top.metabolite_count == 1428
+        assert top.catalyzed_metabolite_count == 1428
 
 
 # ---------------------------------------------------------------------------
@@ -4822,7 +4825,7 @@ _LM_SAMPLE_RESULT = {
     "formula": "C6H12O6",
     "elements": ["C", "H", "O"],
     "mass": 180.156,
-    "gene_count": 320,
+    "catalyst_gene_count": 320,
     "organism_count": 31,
     "transporter_count": 17,
     "evidence_sources": ["metabolism", "transport"],
@@ -4898,7 +4901,7 @@ class TestListMetabolitesWrapper:
         assert r.name == "D-Glucose"
         assert r.formula == "C6H12O6"
         assert r.elements == ["C", "H", "O"]
-        assert r.gene_count == 320
+        assert r.catalyst_gene_count == 320
         assert r.organism_count == 31
         assert r.transporter_count == 17
         assert r.evidence_sources == ["metabolism", "transport"]
@@ -7094,13 +7097,16 @@ class TestExpectedToolsUnchangedForPhase1Plumbing:
 
 
 class TestGeneOverviewPhase1PlumbingWrapper:
-    """Pydantic GeneOverviewResult adds reaction_count, metabolite_count,
-    transporter_count, evidence_sources. GeneOverviewResponse adds
-    has_chemistry envelope key (spec §6.1)."""
+    """Pydantic GeneOverviewResult adds reaction_count,
+    catalyzed_metabolite_count, transporter_count, evidence_sources.
+    GeneOverviewResponse adds has_chemistry envelope key (spec §6.1).
+    Catalysis-arm rename (KG-SYNC-001): metabolite_count →
+    catalyzed_metabolite_count — catalysis-only count; transport-only
+    genes carry 0 (discriminate via transporter_count / evidence_sources)."""
 
     def _api_return_with_chem(self, locus_tag, **chem):
         defaults = {
-            "reaction_count": 0, "metabolite_count": 0,
+            "reaction_count": 0, "catalyzed_metabolite_count": 0,
             "transporter_count": 0, "evidence_sources": [],
         }
         defaults.update(chem)
@@ -7139,10 +7145,13 @@ class TestGeneOverviewPhase1PlumbingWrapper:
 
     @pytest.mark.asyncio
     async def test_pmm0392_transport_metabolomics_validates(self, tool_fns, mock_ctx):
-        """Spec §6.1 verification: PMM0392 → 0 / 554 / 8 / [transport, metabolomics]."""
+        """Spec §6.1 verification: PMM0392 → 0 / 0 catalyzed / 8 /
+        [transport, metabolomics] — transport-only gene has
+        catalyzed_metabolite_count 0 post-rename (live-KG verified)."""
         api_return = self._api_return_with_chem(
             "PMM0392",
-            reaction_count=0, metabolite_count=554, transporter_count=8,
+            reaction_count=0, catalyzed_metabolite_count=0,
+            transporter_count=8,
             evidence_sources=["transport", "metabolomics"],
         )
         with patch(
@@ -7154,7 +7163,7 @@ class TestGeneOverviewPhase1PlumbingWrapper:
             )
         r = result.results[0]
         assert r.reaction_count == 0
-        assert r.metabolite_count == 554
+        assert r.catalyzed_metabolite_count == 0
         assert r.transporter_count == 8
         assert r.evidence_sources == ["transport", "metabolomics"]
 
@@ -7171,16 +7180,18 @@ class TestGeneOverviewPhase1PlumbingWrapper:
             )
         r = result.results[0]
         assert r.reaction_count == 0
-        assert r.metabolite_count == 0
+        assert r.catalyzed_metabolite_count == 0
         assert r.transporter_count == 0
         assert r.evidence_sources == []
 
     @pytest.mark.asyncio
     async def test_pmm0001_metabolism_only_validates(self, tool_fns, mock_ctx):
-        """Spec §6.1 verification: PMM0001 → 4 / 6 / 0 / ['metabolism']."""
+        """Spec §6.1 verification: PMM0001 → 4 / 6 catalyzed / 0 /
+        ['metabolism']."""
         api_return = self._api_return_with_chem(
             "PMM0001",
-            reaction_count=4, metabolite_count=6, transporter_count=0,
+            reaction_count=4, catalyzed_metabolite_count=6,
+            transporter_count=0,
             evidence_sources=["metabolism"],
         )
         with patch(
@@ -7192,7 +7203,7 @@ class TestGeneOverviewPhase1PlumbingWrapper:
             )
         r = result.results[0]
         assert r.reaction_count == 4
-        assert r.metabolite_count == 6
+        assert r.catalyzed_metabolite_count == 6
         assert r.evidence_sources == ["metabolism"]
 
     @pytest.mark.asyncio
@@ -7479,7 +7490,7 @@ class TestListMetabolitesPhase1PlumbingWrapper:
         "formula": "C6H12O6",
         "elements": ["C", "H", "O"],
         "mass": 180.156,
-        "gene_count": 320,
+        "catalyst_gene_count": 320,
         "organism_count": 31,
         "transporter_count": 17,
         "evidence_sources": ["metabolism", "metabolomics"],

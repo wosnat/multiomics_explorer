@@ -406,7 +406,7 @@ class MetaboliteResult(BaseModel):
     formula: str | None = Field(default=None, description="Hill-notation chemical formula (e.g. 'C6H12O6'). Null on a minority of metabolites (mostly TCDB-curated generic substrates).")
     elements: list[str] = Field(default_factory=list, description="Sorted unique element symbols present in formula (e.g. ['C','H','O']). Empty when formula is null. Filter on this — never on `formula` substring (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Presence list (no atom counts; stoichiometry lives in `formula`).")
     mass: float | None = Field(default=None, description="Monoisotopic mass in Da (e.g. 180.156). Null on a minority of metabolites.")
-    gene_count: int = Field(default=0, description="Distinct genes reachable via Gene → Reaction → Metabolite OR Gene → TcdbFamily → Metabolite (UNION). When > 0, drill in via genes_by_metabolite(metabolite_ids=[id], organism=...). 0 indicates a metabolomics-only metabolite — measured by mass spec but not reachable via any gene catalysis or transport path; check evidence_sources to confirm.")
+    catalyst_gene_count: int = Field(default=0, description="Distinct catalyst genes via Gene → Reaction → Metabolite (catalysis arm only). Transport-only metabolites also read 0 — evidence_sources==['metabolomics'] means no gene path; transporter_count>0 means transport arm. Drill in via genes_by_metabolite.")
     organism_count: int = Field(default=0, description="Distinct organisms reaching this metabolite via any chemistry path. When > 0, narrow with organism_names filter.")
     transporter_count: int = Field(default=0, description="Distinct tc_specificity leaf TcdbFamily nodes annotated as transporting this metabolite. Scoped to leaves — the count reflects actual transporter systems rather than counting ancestor families that inherit the substrate via the rollup. Source: TCDB-CAZy ontology.")
     evidence_sources: list[str] = Field(default_factory=list, description="Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. 'metabolism' = at least one Reaction in KG involves this compound; 'transport' = at least one TcdbFamily curates this as substrate; 'metabolomics' = at least one MetaboliteAssay measures this compound. E.g. ['metabolism', 'transport'].")
@@ -1515,9 +1515,9 @@ def register_tools(mcp: FastMCP):
         compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured for this organism (e.g. ['whole_cell', 'vesicle']).")
         # Chemistry rollups
         reaction_count: int = Field(default=0, description="Distinct reactions catalyzed by genes in this organism. When > 0, drill in via list_metabolites(organism_names=[organism_name]).")
-        metabolite_count: int = Field(default=0, description="Distinct metabolites this organism's genes can act on. Catalysis-capability signal (Gene → Reaction → Metabolite only); does NOT mean these metabolites were measured, and does NOT include transport-reach. When > 0, drill in via list_metabolites(organism_names=[organism_name]).")
+        catalyzed_metabolite_count: int = Field(default=0, description="Distinct metabolites this organism's genes can catalyze reactions on (Gene → Reaction → Metabolite; catalysis arm only — transport-reach excluded). Does NOT mean measured. When > 0, drill in via list_metabolites(organism_names=[organism_name]).")
         # Metabolomics measurement rollup
-        measured_metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this organism via any MetaboliteAssay (precomputed OrganismTaxon.measured_metabolite_count). Different from metabolite_count (reaction-only chemistry capability). When > 0, drill in via list_metabolite_assays(organism=organism_name).")
+        measured_metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this organism via any MetaboliteAssay (precomputed OrganismTaxon.measured_metabolite_count). Different from catalyzed_metabolite_count (catalysis-arm chemistry capability). When > 0, drill in via list_metabolite_assays(organism=organism_name).")
         # DM verbose-only fields
         derived_metric_gene_count: int | None = Field(default=None, description="Total gene-level DM annotation count (verbose-only).")
         derived_metric_types: list[str] | None = Field(default=None, description="Distinct metric_type tags observed (verbose-only).")
@@ -1548,7 +1548,7 @@ def register_tools(mcp: FastMCP):
     class OrgMetabolicCapabilityBreakdown(BaseModel):
         organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4').")
         reaction_count: int = Field(description="Distinct reactions catalyzed by this organism's genes.")
-        metabolite_count: int = Field(description="Distinct metabolites this organism's genes can act on. Same semantics as OrganismResult.metabolite_count.")
+        catalyzed_metabolite_count: int = Field(description="Distinct metabolites reachable via catalysis (Gene → Reaction → Metabolite). Same semantics as OrganismResult.catalyzed_metabolite_count.")
 
     class OrgMeasurementCapability(BaseModel):
         has_metabolomics: int = Field(default=0, description="Number of matched organisms with measured_metabolite_count > 0.")
@@ -1562,7 +1562,7 @@ def register_tools(mcp: FastMCP):
         by_value_kind: list[OrgValueKindBreakdown] = Field(default_factory=list, description="DM value_kind frequency rollup across matched organisms.")
         by_metric_type: list[OrgMetricTypeBreakdown] = Field(default_factory=list, description="DM metric_type frequency rollup across matched organisms.")
         by_compartment: list[OrgCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched organisms.")
-        by_metabolic_capability: list[OrgMetabolicCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms by metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites.")
+        by_metabolic_capability: list[OrgMetabolicCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms by catalyzed_metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites.")
         by_measurement_capability: OrgMeasurementCapability = Field(default_factory=OrgMeasurementCapability, description="Binary rollup of metabolomics measurement coverage across matched organisms: {has_metabolomics, no_metabolomics} (tool-specific deviation from list_/by_-style frequency rollups elsewhere — exactly two keys).")
         returned: int = Field(description="Number of results returned.")
         offset: int = Field(default=0, description="Offset into full result set.")
@@ -1603,7 +1603,7 @@ def register_tools(mcp: FastMCP):
     ) -> ListOrganismsResponse:
         """List organisms with taxonomy, data-availability counts, organism_type, DM rollups, chemistry-capability rollups, and metabolomics-coverage rollup.
 
-        Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Note that `organism_names=` on this tool is exact (case-insensitive) on `preferred_name`, while the `organism=` filter on most other tools is a substring match.
+        Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `catalyzed_metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Note that `organism_names=` on this tool is exact (case-insensitive) on `preferred_name`, while the `organism=` filter on most other tools is a substring match.
         """
         await ctx.info(
             f"list_organisms organism_names={organism_names} compartment={compartment} "
@@ -1872,9 +1872,9 @@ def register_tools(mcp: FastMCP):
             default=0,
             description="Distinct reactions catalysed by this gene (precomputed Gene-side rollup). When > 0, drill via metabolites_by_gene(locus_tags=[locus_tag], organism=...).",
         )
-        metabolite_count: int = Field(
+        catalyzed_metabolite_count: int = Field(
             default=0,
-            description="Distinct metabolites reachable from this gene via reaction OR transport (UNION). Differs from OrganismTaxon.metabolite_count which is reaction-only — a transport-only gene can have reaction_count=0 with metabolite_count > 0.",
+            description="Distinct metabolites reachable via catalysis only (Gene_catalyzes_reaction → Reaction_has_metabolite). Transport-only genes read 0 — check transporter_count>0 / 'transport' in evidence_sources (e.g. ABC transporter PMM0392: 0 here, 8 TCDB families).",
         )
         transporter_count: int = Field(
             default=0,

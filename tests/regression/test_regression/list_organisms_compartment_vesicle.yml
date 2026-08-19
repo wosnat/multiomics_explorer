@@ -4,6 +4,7 @@ rows:
 - background_factors:
   - axenic
   - darkness
+  catalyzed_metabolite_count: 1328
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -17,7 +18,6 @@ rows:
   genus: Alteromonas
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 2081
   ncbi_taxon_id: 1004787
   omics_types:
   - VESICLE_PROTEOMICS
@@ -34,6 +34,7 @@ rows:
 - background_factors:
   - axenic
   - darkness
+  catalyzed_metabolite_count: 1309
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -47,7 +48,6 @@ rows:
   genus: Alteromonas
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 2082
   ncbi_taxon_id: 529120
   omics_types:
   - VESICLE_PROTEOMICS
@@ -64,6 +64,7 @@ rows:
 - background_factors:
   - axenic
   - darkness
+  catalyzed_metabolite_count: 1341
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -77,7 +78,6 @@ rows:
   genus: Alteromonas
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 2112
   ncbi_taxon_id: 28108
   omics_types:
   - VESICLE_PROTEOMICS
@@ -94,6 +94,7 @@ rows:
 - background_factors:
   - axenic
   - darkness
+  catalyzed_metabolite_count: 1282
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -107,7 +108,6 @@ rows:
   genus: Alteromonas
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 2057
   ncbi_taxon_id: 1004785
   omics_types:
   - VESICLE_PROTEOMICS
@@ -126,6 +126,7 @@ rows:
   - coculture
   - darkness
   - light
+  catalyzed_metabolite_count: 1336
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -142,7 +143,6 @@ rows:
   - exponential
   - nutrient_limited
   measured_metabolite_count: 0
-  metabolite_count: 2098
   ncbi_taxon_id: 28108
   omics_types:
   - PROTEOMICS
@@ -166,6 +166,7 @@ rows:
   - darkness
   - diel
   - light
+  catalyzed_metabolite_count: 1354
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -184,7 +185,6 @@ rows:
   - diel
   - exponential
   measured_metabolite_count: 0
-  metabolite_count: 2116
   ncbi_taxon_id: 28108
   omics_types:
   - RNASEQ
@@ -201,6 +201,7 @@ rows:
   - coculture
   - compartment
   - darkness
+  - growth_phase
 - background_factors:
   - axenic
   - chemical
@@ -209,6 +210,7 @@ rows:
   - diel
   - light
   - viral
+  catalyzed_metabolite_count: 1039
   clade: HLI
   cluster_types:
   - diel
@@ -236,7 +238,6 @@ rows:
   - recovery
   - stationary
   measured_metabolite_count: 0
-  metabolite_count: 1572
   ncbi_taxon_id: 59919
   omics_types:
   - MICROARRAY
@@ -270,6 +271,7 @@ rows:
   - coculture
   - diel
   - light
+  catalyzed_metabolite_count: 1047
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
@@ -287,7 +289,6 @@ rows:
   - exponential
   - stationary
   measured_metabolite_count: 69
-  metabolite_count: 1581
   ncbi_taxon_id: 74546
   omics_types:
   - METABOLOMICS
@@ -311,6 +312,7 @@ rows:
 - background_factors:
   - axenic
   - light
+  catalyzed_metabolite_count: 1081
   clade: LLIV
   cluster_types:
   - time_course
@@ -331,7 +333,6 @@ rows:
   - nutrient_limited
   - recovery
   measured_metabolite_count: 145
-  metabolite_count: 1666
   ncbi_taxon_id: 74547
   omics_types:
   - METABOLOMICS

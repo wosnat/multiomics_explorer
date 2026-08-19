@@ -9,6 +9,7 @@ rows:
   - diel
   - light
   - viral
+  catalyzed_metabolite_count: 1039
   clade: HLI
   cluster_types:
   - diel
@@ -36,7 +37,6 @@ rows:
   - recovery
   - stationary
   measured_metabolite_count: 0
-  metabolite_count: 1572
   ncbi_taxon_id: 59919
   omics_types:
   - MICROARRAY
@@ -69,6 +69,7 @@ rows:
   - axenic
   - diel
   - light
+  catalyzed_metabolite_count: 1052
   clade: HLII
   cluster_types:
   - condition_comparison
@@ -82,7 +83,6 @@ rows:
   growth_phases:
   - exponential
   measured_metabolite_count: 99
-  metabolite_count: 1581
   ncbi_taxon_id: 167546
   omics_types:
   - METABOLOMICS

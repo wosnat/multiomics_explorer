@@ -590,7 +590,7 @@ def build_gene_overview(
         "       coalesce(g.boolean_metric_count, 0) AS boolean_metric_count,\n"
         "       coalesce(g.categorical_metric_count, 0) AS categorical_metric_count,\n"
         "       coalesce(g.reaction_count, 0) AS reaction_count,\n"
-        "       coalesce(g.metabolite_count, 0) AS metabolite_count,\n"
+        "       coalesce(g.catalyzed_metabolite_count, 0) AS catalyzed_metabolite_count,\n"
         "       coalesce(g.tcdb_family_count, 0) AS transporter_count,\n"
         "       coalesce(g.discussed_in_publication_count, 0) AS discussed_in_publication_count,\n"
         f"       evidence_sources{verbose_cols}\n"
@@ -1431,7 +1431,7 @@ def build_list_metabolites(
     """Build Cypher for listing metabolites.
 
     RETURN keys (compact): metabolite_id, name, formula, elements, mass,
-    gene_count, organism_count, transporter_count, evidence_sources,
+    catalyst_gene_count, organism_count, transporter_count, evidence_sources,
     chebi_id, pathway_ids, pathway_count.
     When search_text is provided, also: score.
     RETURN keys (verbose): adds inchikey, smiles, mnxm_id, hmdb_id,
@@ -1482,7 +1482,7 @@ def build_list_metabolites(
             "       m.formula AS formula,\n"
             "       coalesce(m.elements, []) AS elements,\n"
             "       m.mass AS mass,\n"
-            "       coalesce(m.gene_count, 0) AS gene_count,\n"
+            "       coalesce(m.catalyst_gene_count, 0) AS catalyst_gene_count,\n"
             "       coalesce(m.organism_count, 0) AS organism_count,\n"
             "       coalesce(m.transporter_count, 0) AS transporter_count,\n"
             "       coalesce(m.evidence_sources, []) AS evidence_sources,\n"
@@ -1506,7 +1506,7 @@ def build_list_metabolites(
             "       m.formula AS formula,\n"
             "       coalesce(m.elements, []) AS elements,\n"
             "       m.mass AS mass,\n"
-            "       coalesce(m.gene_count, 0) AS gene_count,\n"
+            "       coalesce(m.catalyst_gene_count, 0) AS catalyst_gene_count,\n"
             "       coalesce(m.organism_count, 0) AS organism_count,\n"
             "       coalesce(m.transporter_count, 0) AS transporter_count,\n"
             "       coalesce(m.evidence_sources, []) AS evidence_sources,\n"
@@ -1517,7 +1517,7 @@ def build_list_metabolites(
             "       coalesce(m.measured_paper_count, 0) AS measured_paper_count,\n"
             "       coalesce(m.measured_organisms, []) AS measured_organisms,\n"
             f"       coalesce(m.measured_compartments, []) AS measured_compartments{verbose_cols}\n"
-            "ORDER BY m.organism_count DESC, m.gene_count DESC, m.id\n"
+            "ORDER BY m.organism_count DESC, m.catalyst_gene_count DESC, m.id\n"
             f"{limit_clause}"
         )
 
@@ -1810,7 +1810,7 @@ def build_list_organisms(
     experiment_count, treatment_types, background_factors, omics_types,
     clustering_analysis_count, cluster_types, derived_metric_count,
     derived_metric_value_kinds, compartments, reaction_count,
-    metabolite_count, reference_database, reference_proteome,
+    catalyzed_metabolite_count, reference_database, reference_proteome,
     growth_phases.
     RETURN keys (verbose): adds family, order, tax_class, phylum, kingdom,
     superkingdom, lineage, cluster_count, derived_metric_gene_count,
@@ -1863,7 +1863,7 @@ def build_list_organisms(
         "       coalesce(o.derived_metric_value_kinds, []) AS derived_metric_value_kinds,\n"
         "       coalesce(o.compartments, []) AS compartments,\n"
         "       coalesce(o.reaction_count, 0) AS reaction_count,\n"
-        "       coalesce(o.metabolite_count, 0) AS metabolite_count,\n"
+        "       coalesce(o.catalyzed_metabolite_count, 0) AS catalyzed_metabolite_count,\n"
         "       coalesce(o.measured_metabolite_count, 0) AS measured_metabolite_count,\n"
         "       o.reference_database AS reference_database,\n"
         "       o.reference_proteome AS reference_proteome,\n"
@@ -1933,7 +1933,7 @@ def build_list_organisms_capability(
     """Build Cypher for the small chemistry-capability projection used by
     list_organisms's by_metabolic_capability envelope rollup in summary mode.
 
-    Returns only (organism_name, reaction_count, metabolite_count) per matched
+    Returns only (organism_name, reaction_count, catalyzed_metabolite_count) per matched
     organism — the minimum needed to compute the rollup without pulling the
     full detail row set. Used when limit=0 so the summary fast path stays
     cheap; detail-mode callers (limit>0) source the same data from the
@@ -1942,7 +1942,7 @@ def build_list_organisms_capability(
     Same WHERE clause as build_list_organisms / build_list_organisms_summary
     so the matched set is identical.
 
-    RETURN keys: organism_name, reaction_count, metabolite_count,
+    RETURN keys: organism_name, reaction_count, catalyzed_metabolite_count,
     measured_metabolite_count.
     """
     conditions = [
@@ -1961,7 +1961,7 @@ def build_list_organisms_capability(
         f"{where_block}"
         "RETURN o.preferred_name AS organism_name,\n"
         "       coalesce(o.reaction_count, 0) AS reaction_count,\n"
-        "       coalesce(o.metabolite_count, 0) AS metabolite_count,\n"
+        "       coalesce(o.catalyzed_metabolite_count, 0) AS catalyzed_metabolite_count,\n"
         "       coalesce(o.measured_metabolite_count, 0) AS measured_metabolite_count\n"
         "ORDER BY o.genus, o.preferred_name"
     )

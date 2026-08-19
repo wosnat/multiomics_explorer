@@ -60,7 +60,7 @@ total_entries, total_matching, top_organisms, top_metabolite_pathways, by_eviden
 | formula | string \| None (optional) | Hill-notation chemical formula (e.g. 'C6H12O6'). Null on a minority of metabolites (mostly TCDB-curated generic substrates). |
 | elements | list[string] (optional) | Sorted unique element symbols present in formula (e.g. ['C','H','O']). Empty when formula is null. Filter on this — never on `formula` substring (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Presence list (no atom counts; stoichiometry lives in `formula`). |
 | mass | float \| None (optional) | Monoisotopic mass in Da (e.g. 180.156). Null on a minority of metabolites. |
-| gene_count | int (optional) | Distinct genes reachable via Gene → Reaction → Metabolite OR Gene → TcdbFamily → Metabolite (UNION). When > 0, drill in via genes_by_metabolite(metabolite_ids=[id], organism=...). 0 indicates a metabolomics-only metabolite — measured by mass spec but not reachable via any gene catalysis or transport path; check evidence_sources to confirm. |
+| catalyst_gene_count | int (optional) | Distinct catalyst genes via Gene → Reaction → Metabolite (catalysis arm only). Transport-only metabolites also read 0 — evidence_sources==['metabolomics'] means no gene path; transporter_count>0 means transport arm. Drill in via genes_by_metabolite. |
 | organism_count | int (optional) | Distinct organisms reaching this metabolite via any chemistry path. When > 0, narrow with organism_names filter. |
 | transporter_count | int (optional) | Distinct tc_specificity leaf TcdbFamily nodes annotated as transporting this metabolite. Scoped to leaves — the count reflects actual transporter systems rather than counting ancestor families that inherit the substrate via the rollup. Source: TCDB-CAZy ontology. |
 | evidence_sources | list[string] (optional) | Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. 'metabolism' = at least one Reaction in KG involves this compound; 'transport' = at least one TcdbFamily curates this as substrate; 'metabolomics' = at least one MetaboliteAssay measures this compound. E.g. ['metabolism', 'transport']. |
@@ -160,7 +160,7 @@ list_metabolites(
 ## Chaining patterns
 
 ```
-list_organisms (per-row metabolite_count > 0) → list_metabolites(organism_names=[...])
+list_organisms (per-row catalyzed_metabolite_count > 0) → list_metabolites(organism_names=[...])
 list_metabolites → genes_by_metabolite(metabolite_ids=[...], organism=...)
 list_metabolites (per-row pathway_ids) → genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...)
 differential_expression_by_gene → metabolites_by_gene(metabolite_elements=['N']) → list_metabolites for chemistry context
@@ -171,7 +171,7 @@ list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(m
 
 - Direction-agnostic — KEGG equation order is unreliable upstream, so joins through Reaction_has_metabolite (catalysis) and Tcdb_family_transports_metabolite (transport) do NOT distinguish substrates from products. Layer DE direction (`differential_expression_by_gene`) and functional annotation to disambiguate. See docs://guide/conventions.
 
-- gene_count = 0 does not mean the metabolite is absent from the KG — it indicates a metabolomics-only metabolite (measured by mass spec but not reachable via any gene catalysis or transport path). Check `evidence_sources`: a gene_count=0 metabolite carries `['metabolomics']` only.
+- catalyst_gene_count counts the catalysis arm only (genes reaching the metabolite via Gene → Reaction → Metabolite). catalyst_gene_count = 0 does NOT mean metabolomics-only: transport-only metabolites (TCDB substrates with no local catalysis) also read 0. Discriminate via `evidence_sources` — a `['metabolomics']`-only list means no gene path at all — or `transporter_count > 0` (transport arm exists).
 
 - organism_names with multiple values is UNION, not intersection. To find metabolites BOTH organisms reach, run two single-org calls and intersect by metabolite_id (or filter per-row by organism_count and inspect `m.organism_names` for the full UNION list).
 
@@ -184,11 +184,11 @@ list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(m
 - When the `top_metabolites` rollup is dominated by ATP / ADP / NADH / NADPH / H2O, pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip cofactor noise. KG namespace is `kegg.compound:` (not `chebi:`).
 
 ```mistake
-list_metabolites(elements=['N'], gene_count_min=1)  # gene_count_min isn't a param
+list_metabolites(elements=['N'], catalyst_gene_count_min=1)  # catalyst_gene_count_min isn't a param
 ```
 
 ```correction
-list_metabolites(elements=['N'])  # then filter rows in code by gene_count > 0
+list_metabolites(elements=['N'])  # then filter rows in code by catalyst_gene_count > 0
 ```
 
 ```mistake

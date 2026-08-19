@@ -399,22 +399,24 @@ class TestListOrganisms:
         for org_name in ("Prochlorococcus MED4", "Alteromonas macleodii EZ55"):
             row = names[org_name]
             assert "reaction_count" in row
-            assert "metabolite_count" in row
+            assert "catalyzed_metabolite_count" in row
             assert row["reaction_count"] > 0
-            assert row["metabolite_count"] > 0
+            assert row["catalyzed_metabolite_count"] > 0
 
     def test_by_metabolic_capability_top_organisms(self, conn):
         """by_metabolic_capability is populated with top organisms in summary mode,
-        sorted desc by metabolite_count, excluding zero-chemistry organisms."""
+        sorted desc by catalyzed_metabolite_count, excluding zero-chemistry
+        organisms (catalysis-arm rename, KG-SYNC-001)."""
         result = api.list_organisms(summary=True, conn=conn)
         cap = result["by_metabolic_capability"]
         assert len(cap) > 0 and len(cap) <= 10
-        # Sorted descending by metabolite_count
-        metabolite_counts = [r["metabolite_count"] for r in cap]
-        assert metabolite_counts == sorted(metabolite_counts, reverse=True)
+        # Sorted descending by catalyzed_metabolite_count
+        catalyzed_counts = [r["catalyzed_metabolite_count"] for r in cap]
+        assert catalyzed_counts == sorted(catalyzed_counts, reverse=True)
         # All entries have non-zero chemistry
         for entry in cap:
-            assert entry["metabolite_count"] > 0 or entry["reaction_count"] > 0
+            assert (entry["catalyzed_metabolite_count"] > 0
+                    or entry["reaction_count"] > 0)
 
 
 @pytest.mark.kg

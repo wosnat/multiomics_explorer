@@ -6,9 +6,11 @@ rows:
   annotation_types:
   - cog_category
   - go_mf
+  - interpro
   - pfam
   - tigr_role
   boolean_metric_count: 0
+  catalyzed_metabolite_count: 0
   categorical_metric_count: 2
   closest_ortholog_genera:
   - Prochlorococcus
@@ -20,18 +22,17 @@ rows:
   - time_course
   discussed_in_publication_count: 0
   evidence_sources: []
-  expression_edge_count: 35
+  expression_edge_count: 37
   gene_category: Unknown
   gene_name: null
   informative_annotation_types:
   - go_mf
   - pfam
   locus_tag: PMM1428
-  metabolite_count: 0
   numeric_metric_count: 0
   organism_name: Prochlorococcus MED4
   product: EVE domain protein
   reaction_count: 0
-  significant_down_count: 1
+  significant_down_count: 2
   significant_up_count: 4
   transporter_count: 0

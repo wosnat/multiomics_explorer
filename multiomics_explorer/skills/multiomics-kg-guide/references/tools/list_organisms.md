@@ -4,7 +4,7 @@
 
 List organisms with taxonomy, data-availability counts, organism_type, DM rollups, chemistry-capability rollups, and metabolomics-coverage rollup.
 
-Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Note that `organism_names=` on this tool is exact (case-insensitive) on `preferred_name`, while the `organism=` filter on most other tools is a substring match.
+Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `catalyzed_metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Note that `organism_names=` on this tool is exact (case-insensitive) on `preferred_name`, while the `organism=` filter on most other tools is a substring match.
 
 ## Parameters
 
@@ -32,7 +32,7 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 - **by_value_kind** (list[OrgValueKindBreakdown]): DM value_kind frequency rollup across matched organisms.
 - **by_metric_type** (list[OrgMetricTypeBreakdown]): DM metric_type frequency rollup across matched organisms.
 - **by_compartment** (list[OrgCompartmentBreakdown]): Wet-lab compartment frequency rollup across matched organisms.
-- **by_metabolic_capability** (list[OrgMetabolicCapabilityBreakdown]): Top 10 organisms by metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites.
+- **by_metabolic_capability** (list[OrgMetabolicCapabilityBreakdown]): Top 10 organisms by catalyzed_metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites.
 - **by_measurement_capability** (OrgMeasurementCapability): Binary rollup of metabolomics measurement coverage across matched organisms: {has_metabolomics, no_metabolomics} (tool-specific deviation from list_/by_-style frequency rollups elsewhere — exactly two keys).
 - **returned** (int): Number of results returned.
 - **offset** (int): Offset into full result set.
@@ -63,8 +63,8 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 | derived_metric_value_kinds | list[string] (optional) | Subset of {numeric, boolean, categorical} present across this organism's DMs. Use to route to genes_by_{numeric,boolean,categorical}_metric. |
 | compartments | list[string] (optional) | Wet-lab compartments measured for this organism (e.g. ['whole_cell', 'vesicle']). |
 | reaction_count | int (optional) | Distinct reactions catalyzed by genes in this organism. When > 0, drill in via list_metabolites(organism_names=[organism_name]). |
-| metabolite_count | int (optional) | Distinct metabolites this organism's genes can act on. Catalysis-capability signal (Gene → Reaction → Metabolite only); does NOT mean these metabolites were measured, and does NOT include transport-reach. When > 0, drill in via list_metabolites(organism_names=[organism_name]). |
-| measured_metabolite_count | int (optional) | Distinct metabolites measured in this organism via any MetaboliteAssay (precomputed OrganismTaxon.measured_metabolite_count). Different from metabolite_count (reaction-only chemistry capability). When > 0, drill in via list_metabolite_assays(organism=organism_name). |
+| catalyzed_metabolite_count | int (optional) | Distinct metabolites this organism's genes can catalyze reactions on (Gene → Reaction → Metabolite; catalysis arm only — transport-reach excluded). Does NOT mean measured. When > 0, drill in via list_metabolites(organism_names=[organism_name]). |
+| measured_metabolite_count | int (optional) | Distinct metabolites measured in this organism via any MetaboliteAssay (precomputed OrganismTaxon.measured_metabolite_count). Different from catalyzed_metabolite_count (catalysis-arm chemistry capability). When > 0, drill in via list_metabolite_assays(organism=organism_name). |
 | derived_metric_gene_count | int \| None (optional) | Total gene-level DM annotation count (verbose-only). |
 | derived_metric_types | list[string] \| None (optional) | Distinct metric_type tags observed (verbose-only). |
 | reference_database | string \| None (optional) | Reference database used for matching (e.g. 'MarRef v6'). Only on reference_proteome_match organisms. |
@@ -105,7 +105,7 @@ list_organisms()
   "offset": 0,
   "not_found": [],
   "results": [
-    {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 16, "experiment_count": 112, "treatment_types": ["coculture", "carbon", "nitrogen", ...], "omics_types": ["RNASEQ", "PROTEOMICS"], "clustering_analysis_count": 4, "cluster_types": ["diel", "time_course"], "reaction_count": 943, "metabolite_count": 1039}
+    {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 16, "experiment_count": 112, "treatment_types": ["coculture", "carbon", "nitrogen", ...], "omics_types": ["RNASEQ", "PROTEOMICS"], "clustering_analysis_count": 4, "cluster_types": ["diel", "time_course"], "reaction_count": 943, "catalyzed_metabolite_count": 1039}
   ]
 }
 ```
@@ -123,7 +123,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
 ```
 
 ```example-response
-{"total_entries": 36, "total_matching": 2, "returned": 2, "truncated": false, "not_found": ["Bogus organism"], "by_organism_type": [{"organism_type": "genome_strain", "count": 2}], "by_metabolic_capability": [{"organism_name": "Prochlorococcus MED4", "reaction_count": 943, "metabolite_count": 1039}, {"organism_name": "Prochlorococcus MIT9301", "reaction_count": 916, "metabolite_count": 1018}], "results": [{"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "gene_count": 1976, "reaction_count": 943, "metabolite_count": 1039, ...}, {"organism_name": "Prochlorococcus MIT9301", "organism_type": "genome_strain", "gene_count": 1935, "reaction_count": 916, "metabolite_count": 1018, ...}]}
+{"total_entries": 36, "total_matching": 2, "returned": 2, "truncated": false, "not_found": ["Bogus organism"], "by_organism_type": [{"organism_type": "genome_strain", "count": 2}], "by_metabolic_capability": [{"organism_name": "Prochlorococcus MED4", "reaction_count": 943, "catalyzed_metabolite_count": 1039}, {"organism_name": "Prochlorococcus MIT9301", "reaction_count": 916, "catalyzed_metabolite_count": 1018}], "results": [{"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "gene_count": 1976, "reaction_count": 943, "catalyzed_metabolite_count": 1039, ...}, {"organism_name": "Prochlorococcus MIT9301", "organism_type": "genome_strain", "gene_count": 1935, "reaction_count": 916, "catalyzed_metabolite_count": 1018, ...}]}
 ```
 
 ### Example 4: Chaining to genes and publications
@@ -148,7 +148,7 @@ list_organisms(compartment="vesicle")
 ```example-response
 {"total_matching": 3, "by_compartment": [{"compartment": "vesicle", "count": 3}, {"compartment": "whole_cell", "count": 1}], "returned": 3, "truncated": false, "offset": 0, "not_found": [],
  "results": [
-   {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "derived_metric_count": 17, "derived_metric_value_kinds": ["boolean", "categorical", "numeric"], "compartments": ["vesicle", "whole_cell"], "reaction_count": 943, "metabolite_count": 1039}
+   {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "derived_metric_count": 17, "derived_metric_value_kinds": ["boolean", "categorical", "numeric"], "compartments": ["vesicle", "whole_cell"], "reaction_count": 943, "catalyzed_metabolite_count": 1039}
  ]}
 ```
 
@@ -159,7 +159,7 @@ list_organisms(summary=True)
 ```
 
 ```example-response
-{"total_entries": 36, "total_matching": 36, "by_metabolic_capability": [{"organism_name": "Pseudomonas putida KT2440", "reaction_count": 1449, "metabolite_count": 1490}, {"organism_name": "Ruegeria pomeroyi DSS-3", "reaction_count": 1377, "metabolite_count": 1468}, {"organism_name": "Alteromonas macleodii EZ55", "reaction_count": 1348, "metabolite_count": 1428}], "returned": 0, "truncated": true, "offset": 0, "not_found": [], "results": []}
+{"total_entries": 36, "total_matching": 36, "by_metabolic_capability": [{"organism_name": "Pseudomonas putida KT2440", "reaction_count": 1449, "catalyzed_metabolite_count": 1490}, {"organism_name": "Ruegeria pomeroyi DSS-3", "reaction_count": 1377, "catalyzed_metabolite_count": 1468}, {"organism_name": "Alteromonas macleodii EZ55", "reaction_count": 1348, "catalyzed_metabolite_count": 1428}], "returned": 0, "truncated": true, "offset": 0, "not_found": [], "results": []}
 ```
 
 ### Example 7: Survey measurement coverage across organisms
@@ -181,7 +181,7 @@ list_organisms → resolve_gene
 list_organisms → genes_by_ontology
 list_organisms → list_clustering_analyses(organism=...)
 list_organisms(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric
-list_organisms (per-row metabolite_count > 0) → list_metabolites(organism_names=[organism_name]) for chemistry drill-down
+list_organisms (per-row catalyzed_metabolite_count > 0) → list_metabolites(organism_names=[organism_name]) for chemistry drill-down
 ```
 
 ## Good to know
@@ -196,9 +196,9 @@ list_organisms (per-row metabolite_count > 0) → list_metabolites(organism_name
 
 - organism_type values: 'genome_strain' (real genome assembly), 'treatment' (non-genomic coculture partners), 'reference_proteome_match' (identified via reference database matching).
 
-- `metabolite_count` counts catalysis capability only — distinct metabolites reachable through Gene → Reaction → Metabolite. Transport-reach (Gene → TcdbFamily → Metabolite) is not aggregated to the organism level; per-metabolite organism reach including transport is on `list_metabolites(organism_names=[...])`. Measurement-side coverage is the separate `measured_metabolite_count` field. metabolite_count=0 does not mean the metabolite is absent from the KG.
+- `catalyzed_metabolite_count` counts catalysis capability only — distinct metabolites reachable through Gene → Reaction → Metabolite. Transport-reach (Gene → TcdbFamily → Metabolite) is not aggregated to the organism level; per-metabolite organism reach including transport is on `list_metabolites(organism_names=[...])`. Measurement-side coverage is the separate `measured_metabolite_count` field. catalyzed_metabolite_count=0 means no catalysis path in this organism, not that chemistry is absent from the KG.
 
-- by_metabolic_capability is a top-10 ranking sorted by metabolite_count descending; organisms with zero chemistry are excluded. Use it on summary=True calls to identify chemistry-rich organisms before drilling in via list_metabolites(organism_names=[...]).
+- by_metabolic_capability is a top-10 ranking sorted by catalyzed_metabolite_count descending; organisms with zero chemistry are excluded. Use it on summary=True calls to identify chemistry-rich organisms before drilling in via list_metabolites(organism_names=[...]).
 
 - by_measurement_capability is a binary rollup ({has_metabolomics, no_metabolomics}) — tool-specific shape that deviates from the list[{key,count}] frequency rollups elsewhere. See docs://guide/conventions for the standard envelope shape.
 

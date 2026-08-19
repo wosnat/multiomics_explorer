@@ -1075,10 +1075,14 @@ class TestListOrganisms:
         assert result["total_matching"] == 2
 
     # Chemistry rollup propagation + by_metabolic_capability envelope (slice 1)
+    # Catalysis-arm rename (KG-SYNC-001): metabolite_count →
+    # catalyzed_metabolite_count on rows AND by_metabolic_capability entries.
 
     _CHEMISTRY_ROWS = [
-        {**dict(_ROWS[0]), "reaction_count": 943, "metabolite_count": 1039},
-        {**dict(_ROWS[1]), "reaction_count": 1348, "metabolite_count": 1428},
+        {**dict(_ROWS[0]),
+         "reaction_count": 943, "catalyzed_metabolite_count": 1039},
+        {**dict(_ROWS[1]),
+         "reaction_count": 1348, "catalyzed_metabolite_count": 1428},
     ]
 
     def test_reaction_count_propagates_to_results(self, mock_conn):
@@ -1089,31 +1093,35 @@ class TestListOrganisms:
         assert result["results"][0]["reaction_count"] == 943
         assert result["results"][1]["reaction_count"] == 1348
 
-    def test_metabolite_count_propagates_to_results(self, mock_conn):
+    def test_catalyzed_metabolite_count_propagates_to_results(self, mock_conn):
         mock_conn.execute_query.side_effect = [
             [self._SUMMARY_ROW], self._CHEMISTRY_ROWS,
         ]
         result = api.list_organisms(conn=mock_conn)
-        assert result["results"][0]["metabolite_count"] == 1039
-        assert result["results"][1]["metabolite_count"] == 1428
+        assert result["results"][0]["catalyzed_metabolite_count"] == 1039
+        assert result["results"][1]["catalyzed_metabolite_count"] == 1428
 
-    def test_by_metabolic_capability_sorted_desc_by_metabolite_count(self, mock_conn):
+    def test_by_metabolic_capability_sorted_desc_by_catalyzed_metabolite_count(
+        self, mock_conn,
+    ):
         mock_conn.execute_query.side_effect = [
             [self._SUMMARY_ROW], self._CHEMISTRY_ROWS,
         ]
         result = api.list_organisms(conn=mock_conn)
         cap = result["by_metabolic_capability"]
         assert len(cap) == 2
-        # EZ55 has higher metabolite_count (1428 > 1039) — should be first
+        # EZ55 has higher catalyzed_metabolite_count (1428 > 1039) — first
         assert cap[0]["organism_name"] == "Alteromonas macleodii EZ55"
-        assert cap[0]["metabolite_count"] == 1428
+        assert cap[0]["catalyzed_metabolite_count"] == 1428
         assert cap[0]["reaction_count"] == 1348
         assert cap[1]["organism_name"] == "Prochlorococcus MED4"
 
     def test_by_metabolic_capability_excludes_zero_chemistry(self, mock_conn):
         rows = [
-            {**dict(self._ROWS[0]), "reaction_count": 943, "metabolite_count": 1039},
-            {**dict(self._ROWS[1]), "reaction_count": 0, "metabolite_count": 0},
+            {**dict(self._ROWS[0]),
+             "reaction_count": 943, "catalyzed_metabolite_count": 1039},
+            {**dict(self._ROWS[1]),
+             "reaction_count": 0, "catalyzed_metabolite_count": 0},
         ]
         mock_conn.execute_query.side_effect = [[self._SUMMARY_ROW], rows]
         result = api.list_organisms(conn=mock_conn)
@@ -1134,7 +1142,7 @@ class TestListOrganisms:
         capability_rows = [
             {"organism_name": r["organism_name"],
              "reaction_count": r["reaction_count"],
-             "metabolite_count": r["metabolite_count"]}
+             "catalyzed_metabolite_count": r["catalyzed_metabolite_count"]}
             for r in self._CHEMISTRY_ROWS
         ]
         mock_conn.execute_query.side_effect = [
@@ -1143,12 +1151,13 @@ class TestListOrganisms:
         result = api.list_organisms(summary=True, conn=mock_conn)
         assert result["results"] == []
         assert len(result["by_metabolic_capability"]) == 2
-        assert result["by_metabolic_capability"][0]["metabolite_count"] == 1428
+        assert (result["by_metabolic_capability"][0]
+                ["catalyzed_metabolite_count"]) == 1428
         # Exactly 2 Cypher calls: summary + capability. No detail builder.
         assert mock_conn.execute_query.call_count == 2
         # Verify the second call used the capability builder (3-column projection)
         second_cypher = mock_conn.execute_query.call_args_list[1][0][0]
-        assert "metabolite_count" in second_cypher
+        assert "catalyzed_metabolite_count" in second_cypher
         # Capability builder doesn't pull verbose detail columns
         assert "lineage" not in second_cypher
         assert "derived_metric_count" not in second_cypher
@@ -1164,18 +1173,18 @@ class TestListOrganisms:
                 "clustering_analysis_count": 0, "cluster_types": [],
                 "derived_metric_count": 0, "derived_metric_value_kinds": [],
                 "compartments": [], "background_factors": [],
-                "reaction_count": i, "metabolite_count": i * 10,
+                "reaction_count": i, "catalyzed_metabolite_count": i * 10,
             }
-            for i in range(15)  # 15 organisms; org00 has metabolite_count=0 so excluded
+            for i in range(15)  # 15 organisms; org00 has count=0 so excluded
         ]
         summary = {**self._SUMMARY_ROW, "total_entries": 15, "total_matching": 15}
         mock_conn.execute_query.side_effect = [[summary], rows]
         result = api.list_organisms(conn=mock_conn)
         cap = result["by_metabolic_capability"]
         assert len(cap) == 10  # capped
-        # Top entry should be Org14 (highest metabolite_count = 140)
+        # Top entry should be Org14 (highest catalyzed_metabolite_count = 140)
         assert cap[0]["organism_name"] == "Org14"
-        assert cap[0]["metabolite_count"] == 140
+        assert cap[0]["catalyzed_metabolite_count"] == 140
 
     def test_summary_flag_zeros_results(self, mock_conn):
         """summary=True → results=[], summary fields populated from summary builder."""
@@ -6795,7 +6804,7 @@ class TestListMetabolites:
         "formula": "C6H12O6",
         "elements": ["C", "H", "O"],
         "mass": 180.156,
-        "gene_count": 320,
+        "catalyst_gene_count": 320,
         "organism_count": 31,
         "transporter_count": 17,
         "evidence_sources": ["metabolism", "transport"],
@@ -9176,9 +9185,12 @@ class TestOntologyLandscapeF1Surface:
 
 
 class TestGeneOverviewPhase1Plumbing:
-    """gene_overview adds reaction_count + metabolite_count + transporter_count
-    + evidence_sources per row, plus has_chemistry envelope. Verification cases
-    per spec §6.1 (PMM1428 / PMM0001 / PMM0392 / PMM0628 / PMM0263)."""
+    """gene_overview adds reaction_count + catalyzed_metabolite_count +
+    transporter_count + evidence_sources per row, plus has_chemistry envelope.
+    Verification cases per spec §6.1 (PMM1428 / PMM0001 / PMM0392 / PMM0628 /
+    PMM0263). Catalysis-arm rename (KG-SYNC-001): metabolite_count →
+    catalyzed_metabolite_count — catalysis-only, so transport-only genes
+    carry 0 (discriminate via transporter_count / evidence_sources)."""
 
     def _summary_with_chemistry(self, total=1, has_chemistry=0, not_found=None):
         return [{
@@ -9212,7 +9224,7 @@ class TestGeneOverviewPhase1Plumbing:
             "boolean_metric_count": 0,
             "categorical_metric_count": 0,
             "reaction_count": 0,
-            "metabolite_count": 0,
+            "catalyzed_metabolite_count": 0,
             "transporter_count": 0,
             "evidence_sources": [],
         }
@@ -9228,54 +9240,60 @@ class TestGeneOverviewPhase1Plumbing:
         result = api.gene_overview(["PMM1428"], conn=mock_conn)
         row = result["results"][0]
         assert row["reaction_count"] == 0
-        assert row["metabolite_count"] == 0
+        assert row["catalyzed_metabolite_count"] == 0
         assert row["transporter_count"] == 0
         assert row["evidence_sources"] == []
 
     def test_pmm0001_metabolism_only(self, mock_conn):
-        """PMM0001: 4 reactions, 6 metabolites, 0 transporters, ['metabolism']."""
+        """PMM0001: 4 reactions, 6 catalyzed metabolites, 0 transporters,
+        ['metabolism']."""
         mock_conn.execute_query.side_effect = [
             self._summary_with_chemistry(total=1, has_chemistry=1),
             [self._detail_row(
                 "PMM0001",
-                reaction_count=4, metabolite_count=6, transporter_count=0,
+                reaction_count=4, catalyzed_metabolite_count=6,
+                transporter_count=0,
                 evidence_sources=["metabolism"],
             )],
         ]
         result = api.gene_overview(["PMM0001"], conn=mock_conn)
         row = result["results"][0]
         assert row["reaction_count"] == 4
-        assert row["metabolite_count"] == 6
+        assert row["catalyzed_metabolite_count"] == 6
         assert row["transporter_count"] == 0
         assert row["evidence_sources"] == ["metabolism"]
 
     def test_pmm0392_transport_and_metabolomics(self, mock_conn):
-        """PMM0392: 0 reactions, 554 metabolites (TCDB-reachable),
+        """PMM0392: 0 reactions, 0 catalyzed metabolites (transport-only —
+        catalysis-arm count is 0 post-rename, live-KG verified),
         8 transporters, ['transport', 'metabolomics'].
         Critical reproducer: reaction_count=0 must NOT promote 'metabolism'."""
         mock_conn.execute_query.side_effect = [
             self._summary_with_chemistry(total=1, has_chemistry=1),
             [self._detail_row(
                 "PMM0392",
-                reaction_count=0, metabolite_count=554, transporter_count=8,
+                reaction_count=0, catalyzed_metabolite_count=0,
+                transporter_count=8,
                 evidence_sources=["transport", "metabolomics"],
             )],
         ]
         result = api.gene_overview(["PMM0392"], conn=mock_conn)
         row = result["results"][0]
         assert row["reaction_count"] == 0
-        assert row["metabolite_count"] == 554
+        assert row["catalyzed_metabolite_count"] == 0
         assert row["transporter_count"] == 8
         assert row["evidence_sources"] == ["transport", "metabolomics"]
         assert "metabolism" not in row["evidence_sources"]
 
     def test_pmm0628_transport_with_measurement(self, mock_conn):
-        """PMM0628: 0 / 5 / 1 / ['transport', 'metabolomics']."""
+        """PMM0628: 0 / 0 catalyzed / 1 transporter /
+        ['transport', 'metabolomics'] (transport-only → catalyzed count 0)."""
         mock_conn.execute_query.side_effect = [
             self._summary_with_chemistry(total=1, has_chemistry=1),
             [self._detail_row(
                 "PMM0628",
-                reaction_count=0, metabolite_count=5, transporter_count=1,
+                reaction_count=0, catalyzed_metabolite_count=0,
+                transporter_count=1,
                 evidence_sources=["transport", "metabolomics"],
             )],
         ]
@@ -9285,13 +9303,15 @@ class TestGeneOverviewPhase1Plumbing:
         assert row["evidence_sources"] == ["transport", "metabolomics"]
 
     def test_pmm0263_transport_only_no_measured(self, mock_conn):
-        """PMM0263: 0 / 7 / 1 / ['transport'] — single reachable metabolite
-        not in 107 measured, so 'metabolomics' correctly drops out."""
+        """PMM0263: 0 / 0 catalyzed / 1 transporter / ['transport'] —
+        transport-only reachable metabolites not in 107 measured, so
+        'metabolomics' correctly drops out (catalysis-arm count 0)."""
         mock_conn.execute_query.side_effect = [
             self._summary_with_chemistry(total=1, has_chemistry=1),
             [self._detail_row(
                 "PMM0263",
-                reaction_count=0, metabolite_count=7, transporter_count=1,
+                reaction_count=0, catalyzed_metabolite_count=0,
+                transporter_count=1,
                 evidence_sources=["transport"],
             )],
         ]
@@ -9463,7 +9483,7 @@ class TestListOrganismsPhase1Plumbing:
         "omics_types": ["METABOLOMICS"], "clustering_analysis_count": 0,
         "cluster_types": [], "derived_metric_count": 0,
         "derived_metric_value_kinds": [], "compartments": [],
-        "reaction_count": 0, "metabolite_count": 0,
+        "reaction_count": 0, "catalyzed_metabolite_count": 0,
         "measured_metabolite_count": 4,
     }
     _ROW_NONE = {
@@ -9475,7 +9495,7 @@ class TestListOrganismsPhase1Plumbing:
         "omics_types": ["RNASEQ"], "clustering_analysis_count": 0,
         "cluster_types": [], "derived_metric_count": 0,
         "derived_metric_value_kinds": [], "compartments": [],
-        "reaction_count": 0, "metabolite_count": 0,
+        "reaction_count": 0, "catalyzed_metabolite_count": 0,
         "measured_metabolite_count": 0,
     }
     _SUMMARY_ROW = {
@@ -9622,7 +9642,7 @@ class TestListMetabolitesPhase1Plumbing:
         "formula": "C6H12O6",
         "elements": ["C", "H", "O"],
         "mass": 180.156,
-        "gene_count": 320,
+        "catalyst_gene_count": 320,
         "organism_count": 31,
         "transporter_count": 17,
         "evidence_sources": ["metabolism", "metabolomics"],
@@ -9763,7 +9783,7 @@ class TestListMetabolitesPhase2:
         "formula": "C6H12O6",
         "elements": ["C", "H", "O"],
         "mass": 180.156,
-        "gene_count": 320,
+        "catalyst_gene_count": 320,
         "organism_count": 31,
         "transporter_count": 17,
         "evidence_sources": ["metabolism"],

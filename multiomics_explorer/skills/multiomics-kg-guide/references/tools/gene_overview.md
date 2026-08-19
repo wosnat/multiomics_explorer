@@ -65,7 +65,7 @@ total_matching, by_organism, by_category, by_annotation_type, by_annotation_stat
 | derived_metric_count | int (optional) | Total DerivedMetric annotations on this gene (sum across numeric/boolean/categorical kinds). |
 | derived_metric_value_kinds | list[string] (optional) | Subset of {numeric, boolean, categorical} where this gene has DM annotations. Use to route to genes_by_{kind}_metric drill-downs. |
 | reaction_count | int (optional) | Distinct reactions catalysed by this gene (precomputed Gene-side rollup). When > 0, drill via metabolites_by_gene(locus_tags=[locus_tag], organism=...). |
-| metabolite_count | int (optional) | Distinct metabolites reachable from this gene via reaction OR transport (UNION). Differs from OrganismTaxon.metabolite_count which is reaction-only — a transport-only gene can have reaction_count=0 with metabolite_count > 0. |
+| catalyzed_metabolite_count | int (optional) | Distinct metabolites reachable via catalysis only (Gene_catalyzes_reaction → Reaction_has_metabolite). Transport-only genes read 0 — check transporter_count>0 / 'transport' in evidence_sources (e.g. ABC transporter PMM0392: 0 here, 8 TCDB families). |
 | transporter_count | int (optional) | Distinct TCDB families annotated to this gene. When > 0, drill via genes_by_metabolite or metabolites_by_gene with the transport arm. |
 | evidence_sources | list[string] (optional) | Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. When non-empty, drill into metabolites_by_gene(locus_tags=[...]). Per-source definitions: see docs://guide/concepts. |
 | discussed_in_publication_count | int (optional) | Distinct publications that discuss this gene in prose (precomputed Gene.discussed_in_publication_count). Recall-biased narrative mention, NOT DE-table expression. When > 0, set verbose=True for the per-paper DOI list, or call discussed_by_publication for a paper's full discussed set. |
@@ -147,16 +147,20 @@ gene_overview(locus_tags=["MIT1002_01809"])
  ]}
 ```
 
-### Example 6: Chemistry-rich gene — broad ABC transporter with measurement coverage
+### Example 6: Transport-only gene — ABC transporter with zero catalysis reach
 
 ```example-call
 gene_overview(locus_tags=["PMM0392"])
 ```
 
 ```example-response
+# catalyzed_metabolite_count counts the catalysis arm only
+# (Gene → Reaction → Metabolite). This transporter reads 0 there,
+# yet has chemistry: transporter_count=8 and 'transport' in
+# evidence_sources mark the transport arm.
 {"total_matching": 1, "has_expression": 1, "has_chemistry": 1, "returned": 1, "truncated": false, "offset": 0, "not_found": [],
  "results": [
-   {"locus_tag": "PMM0392", "gene_name": null, "product": "ABC transporter, ATP-binding protein", "organism_name": "Prochlorococcus MED4", "reaction_count": 0, "metabolite_count": 554, "transporter_count": 8, "evidence_sources": ["transport", "metabolomics"]}
+   {"locus_tag": "PMM0392", "gene_name": null, "product": "ABC transporter, ATP-binding protein", "organism_name": "Prochlorococcus MED4", "reaction_count": 0, "catalyzed_metabolite_count": 0, "transporter_count": 8, "evidence_sources": ["transport", "metabolomics"]}
  ]}
 ```
 
@@ -206,6 +210,8 @@ gene_overview (per-row `discussed_in_publication_count` > 0) → use verbose=Tru
 - annotation_types lists which ontology types have data — use gene_ontology_terms to get the actual terms.
 
 - When `evidence_sources` is non-empty, drill via `metabolites_by_gene` (gene-anchored) or `genes_by_metabolite` (metabolite-anchored). Values are subset of {'metabolism', 'transport', 'metabolomics'} — 'metabolomics' means at least one of the gene's reachable metabolites has measurement coverage.
+
+- `catalyzed_metabolite_count` counts the catalysis arm only (distinct metabolites via Gene → Reaction → Metabolite). It is NOT a total chemistry reach: a transport-only gene reads 0 here while `transporter_count > 0` and 'transport' appears in `evidence_sources`. Use `evidence_sources` to see which arms exist before interpreting a 0.
 
 - discussed_in_publication_count > 0 means at least one publication names this gene in prose (a recall-biased literature index, NOT DE-table expression). At ~1 pub/gene the answer is usually inline: verbose=True returns discussed_in_publications as {doi, prominence, evidence} per gene. Use discussed_by_publication for a paper's full discussed set.
 

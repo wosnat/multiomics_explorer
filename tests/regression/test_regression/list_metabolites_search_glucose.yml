@@ -31,7 +31,8 @@ not_found:
   pathway_ids: []
 offset: 0
 results:
-- chebi_id: '14313'
+- catalyst_gene_count: 0
+  chebi_id: '14313'
   elements:
   - C
   - H
@@ -39,7 +40,6 @@ results:
   evidence_sources:
   - transport
   formula: C6H12O6
-  gene_count: 993
   mass: 180.156
   measured_assay_count: 0
   measured_compartments: []
@@ -51,8 +51,9 @@ results:
   pathway_count: 0
   pathway_ids: []
   score: 3.0912
-  transporter_count: 108
-- chebi_id: '13498'
+  transporter_count: 18
+- catalyst_gene_count: 295
+  chebi_id: '13498'
   elements:
   - C
   - H
@@ -64,7 +65,6 @@ results:
   - metabolomics
   - transport
   formula: C15H22N2O17P2
-  gene_count: 933
   mass: 564.286
   measured_assay_count: 4
   measured_compartments:
@@ -97,8 +97,9 @@ results:
   - kegg.pathway:ko01250
   - kegg.pathway:ko04082
   score: 2.5975
-  transporter_count: 8
-- chebi_id: '4167'
+  transporter_count: 3
+- catalyst_gene_count: 277
+  chebi_id: '4167'
   elements:
   - C
   - H
@@ -107,7 +108,6 @@ results:
   - metabolism
   - transport
   formula: C6H12O6
-  gene_count: 393
   mass: 180.156
   measured_assay_count: 0
   measured_compartments: []
@@ -154,8 +154,9 @@ results:
   - kegg.pathway:ko05230
   - kegg.pathway:ko05415
   score: 2.5975
-  transporter_count: 23
-- chebi_id: '10526'
+  transporter_count: 10
+- catalyst_gene_count: 191
+  chebi_id: '10526'
   elements:
   - C
   - H
@@ -166,7 +167,6 @@ results:
   - metabolism
   - transport
   formula: C16H24N2O16P2
-  gene_count: 193
   mass: 562.314
   measured_assay_count: 0
   measured_compartments: []
@@ -188,7 +188,8 @@ results:
   - kegg.pathway:ko01250
   score: 2.5975
   transporter_count: 1
-- chebi_id: '13230'
+- catalyst_gene_count: 87
+  chebi_id: '13230'
   elements:
   - C
   - H
@@ -198,7 +199,6 @@ results:
   evidence_sources:
   - metabolism
   formula: C16H23N5O15P2
-  gene_count: 87
   mass: 587.328
   measured_assay_count: 0
   measured_compartments: []
@@ -216,7 +216,8 @@ results:
   - kegg.pathway:ko01250
   score: 2.5975
   transporter_count: 0
-- chebi_id: '13264'
+- catalyst_gene_count: 18
+  chebi_id: '13264'
   elements:
   - C
   - H
@@ -226,7 +227,6 @@ results:
   evidence_sources:
   - metabolism
   formula: C15H23N3O16P2
-  gene_count: 18
   mass: 563.302
   measured_assay_count: 0
   measured_compartments: []
@@ -244,7 +244,8 @@ results:
   - kegg.pathway:ko01250
   score: 2.5975
   transporter_count: 0
-- chebi_id: '10397'
+- catalyst_gene_count: 188
+  chebi_id: '10397'
   elements:
   - C
   - H
@@ -252,7 +253,6 @@ results:
   evidence_sources:
   - metabolism
   formula: C6H12O6
-  gene_count: 188
   mass: 180.156
   measured_assay_count: 0
   measured_compartments: []
@@ -271,7 +271,8 @@ results:
   - kegg.pathway:ko01200
   score: 2.2397
   transporter_count: 0
-- chebi_id: '10242'
+- catalyst_gene_count: 178
+  chebi_id: '10242'
   elements:
   - C
   - H
@@ -279,7 +280,6 @@ results:
   evidence_sources:
   - metabolism
   formula: C6H12O6
-  gene_count: 178
   mass: 180.156
   measured_assay_count: 0
   measured_compartments: []
@@ -302,7 +302,8 @@ results:
   - kegg.pathway:ko04964
   score: 2.2397
   transporter_count: 0
-- chebi_id: '14314'
+- catalyst_gene_count: 190
+  chebi_id: '14314'
   elements:
   - C
   - H
@@ -313,7 +314,6 @@ results:
   - metabolomics
   - transport
   formula: C6H11O9P
-  gene_count: 199
   mass: 258.119
   measured_assay_count: 14
   measured_compartments:
@@ -350,8 +350,9 @@ results:
   - kegg.pathway:ko05230
   - kegg.pathway:ko05415
   score: 1.9686
-  transporter_count: 6
-- chebi_id: '10246'
+  transporter_count: 2
+- catalyst_gene_count: 282
+  chebi_id: '10246'
   elements:
   - C
   - H
@@ -361,7 +362,6 @@ results:
   - metabolism
   - metabolomics
   formula: C6H11O9P
-  gene_count: 282
   mass: 258.119
   measured_assay_count: 4
   measured_compartments:
@@ -395,7 +395,8 @@ results:
   - kegg.pathway:ko04922
   score: 1.9686
   transporter_count: 0
-- chebi_id: '1078'
+- catalyst_gene_count: 0
+  chebi_id: '1078'
   elements:
   - C
   - H
@@ -403,7 +404,6 @@ results:
   evidence_sources:
   - transport
   formula: C6H12O5
-  gene_count: 22
   mass: 164.157
   measured_assay_count: 0
   measured_compartments: []
@@ -411,12 +411,34 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00586
   name: 2-Deoxy-D-glucose
-  organism_count: 13
+  organism_count: 42
   pathway_count: 0
   pathway_ids: []
   score: 1.9686
-  transporter_count: 3
-- chebi_id: '10245'
+  transporter_count: 2
+- catalyst_gene_count: 0
+  chebi_id: '73918'
+  elements:
+  - C
+  - H
+  - O
+  evidence_sources:
+  - transport
+  formula: C7H14O6
+  mass: 194.183
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
+  metabolite_id: chebi:73918
+  name: 3-O-methyl-D-glucose
+  organism_count: 42
+  pathway_count: 0
+  pathway_ids: []
+  score: 1.756
+  transporter_count: 1
+- catalyst_gene_count: 171
+  chebi_id: '10245'
   elements:
   - C
   - H
@@ -426,7 +448,6 @@ results:
   - metabolism
   - transport
   formula: C6H11O9P
-  gene_count: 171
   mass: 258.119
   measured_assay_count: 0
   measured_compartments: []
@@ -450,8 +471,9 @@ results:
   - kegg.pathway:ko04152
   - kegg.pathway:ko04922
   score: 1.756
-  transporter_count: 0
-- chebi_id: '10399'
+  transporter_count: 1
+- catalyst_gene_count: 183
+  chebi_id: '10399'
   elements:
   - C
   - H
@@ -461,7 +483,6 @@ results:
   - metabolism
   - transport
   formula: C6H11O9P
-  gene_count: 187
   mass: 258.119
   measured_assay_count: 0
   measured_compartments: []
@@ -481,8 +502,9 @@ results:
   - kegg.pathway:ko04152
   - kegg.pathway:ko04922
   score: 1.756
-  transporter_count: 1
-- chebi_id: '10398'
+  transporter_count: 2
+- catalyst_gene_count: 19
+  chebi_id: '10398'
   elements:
   - C
   - H
@@ -491,7 +513,6 @@ results:
   evidence_sources:
   - metabolism
   formula: C6H11O9P
-  gene_count: 19
   mass: 258.119
   measured_assay_count: 0
   measured_compartments: []
@@ -505,28 +526,8 @@ results:
   - kegg.pathway:ko00500
   score: 1.756
   transporter_count: 0
-- chebi_id: '73918'
-  elements:
-  - C
-  - H
-  - O
-  evidence_sources:
-  - transport
-  formula: C7H14O6
-  gene_count: 19
-  mass: 194.183
-  measured_assay_count: 0
-  measured_compartments: []
-  measured_organisms: []
-  measured_paper_count: 0
-  metabolite_id: chebi:73918
-  name: 3-O-methyl-D-glucose
-  organism_count: 13
-  pathway_count: 0
-  pathway_ids: []
-  score: 1.756
-  transporter_count: 1
-- chebi_id: '70785'
+- catalyst_gene_count: 1
+  chebi_id: '70785'
   elements:
   - C
   - H
@@ -536,7 +537,6 @@ results:
   evidence_sources:
   - metabolism
   formula: C15H23N3O14P2
-  gene_count: 1
   mass: 531.304
   measured_assay_count: 0
   measured_compartments: []
@@ -552,7 +552,8 @@ results:
   - kegg.pathway:ko01250
   score: 1.756
   transporter_count: 0
-- chebi_id: '10510'
+- catalyst_gene_count: 133
+  chebi_id: '10510'
   elements:
   - C
   - H
@@ -562,7 +563,6 @@ results:
   evidence_sources:
   - metabolism
   formula: C16H22N2O15P2
-  gene_count: 133
   mass: 544.299
   measured_assay_count: 0
   measured_compartments: []
@@ -583,7 +583,8 @@ results:
   - kegg.pathway:ko01250
   score: 1.4441
   transporter_count: 0
-- chebi_id: '13262'
+- catalyst_gene_count: 32
+  chebi_id: '13262'
   elements:
   - C
   - H
@@ -593,7 +594,6 @@ results:
   evidence_sources:
   - metabolism
   formula: C15H21N3O15P2
-  gene_count: 32
   mass: 545.287
   measured_assay_count: 0
   measured_compartments: []
@@ -609,7 +609,8 @@ results:
   - kegg.pathway:ko01250
   score: 1.4441
   transporter_count: 0
-- chebi_id: '70783'
+- catalyst_gene_count: 24
+  chebi_id: '70783'
   elements:
   - C
   - H
@@ -619,7 +620,6 @@ results:
   evidence_sources:
   - metabolism
   formula: C15H21N3O14P2
-  gene_count: 24
   mass: 529.288
   measured_assay_count: 0
   measured_compartments: []
@@ -635,7 +635,8 @@ results:
   - kegg.pathway:ko01250
   score: 1.4441
   transporter_count: 0
-- chebi_id: '10508'
+- catalyst_gene_count: 1
+  chebi_id: '10508'
   elements:
   - C
   - H
@@ -645,7 +646,6 @@ results:
   evidence_sources:
   - metabolism
   formula: C16H26N3O14P2
-  gene_count: 1
   mass: 546.339
   measured_assay_count: 0
   measured_compartments: []
@@ -664,7 +664,8 @@ results:
   - kegg.pathway:ko01250
   score: 1.4441
   transporter_count: 0
-- chebi_id: '12230'
+- catalyst_gene_count: 2
+  chebi_id: '12230'
   elements:
   - C
   - H
@@ -673,7 +674,6 @@ results:
   evidence_sources:
   - metabolism
   formula: C12H23O14P
-  gene_count: 2
   mass: 422.276
   measured_assay_count: 0
   measured_compartments: []
@@ -688,7 +688,8 @@ results:
   - kegg.pathway:ko02060
   score: 1.3263
   transporter_count: 0
-- chebi_id: '32332'
+- catalyst_gene_count: 1
+  chebi_id: '32332'
   elements:
   - C
   - H
@@ -698,7 +699,6 @@ results:
   evidence_sources:
   - metabolism
   formula: C16H25N3O13P2
-  gene_count: 1
   mass: 529.332
   measured_assay_count: 0
   measured_compartments: []
@@ -717,7 +717,8 @@ results:
   - kegg.pathway:ko01250
   score: 1.2263
   transporter_count: 0
-- chebi_id: '155215'
+- catalyst_gene_count: 32
+  chebi_id: '155215'
   elements:
   - C
   - H
@@ -725,7 +726,6 @@ results:
   evidence_sources:
   - metabolism
   formula: C18H32O16
-  gene_count: 32
   mass: 504.438
   measured_assay_count: 0
   measured_compartments: []
@@ -776,26 +776,26 @@ top_metabolite_pathways:
   metabolite_pathway_id: kegg.pathway:ko00521
   metabolite_pathway_name: Streptomycin biosynthesis
 top_organisms:
+- count: 20
+  organism_name: Prochlorococcus MED4
+- count: 19
+  organism_name: Prochlorococcus MIT9515
+- count: 19
+  organism_name: Synechococcus elongatus PCC 7942
+- count: 19
+  organism_name: Synechococcus elongatus UTEX 2973
+- count: 19
+  organism_name: Prochlorococcus MIT9303
+- count: 18
+  organism_name: Synechococcus CC9311
 - count: 18
   organism_name: Shewanella sp. W3-18-1
 - count: 18
-  organism_name: Prochlorococcus MED4
-- count: 17
-  organism_name: Alteromonas macleodii ATCC27126
-- count: 17
-  organism_name: Alteromonas (MarRef v6)
-- count: 17
-  organism_name: Alteromonas macleodii EZ55
-- count: 17
-  organism_name: Alteromonas macleodii HOT1A3
-- count: 17
-  organism_name: Alteromonas macleodii BGP6
-- count: 17
-  organism_name: Alteromonas macleodii MIT1002
-- count: 17
-  organism_name: Alteromonas macleodii AD45
-- count: 17
-  organism_name: Prochlorococcus MIT9303
+  organism_name: Synechococcus WH8102
+- count: 18
+  organism_name: Prochlorococcus MIT1327
+- count: 18
+  organism_name: Meiothermus ruber
 total_entries: 3356
 total_matching: 23
 truncated: false

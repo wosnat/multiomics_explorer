@@ -141,7 +141,7 @@ or zero-valued routing fields mean no evidence — calling the
 drill-down anyway returns no rows.
 
 Examples:
-- `list_metabolites.results[].gene_count > 0` → `genes_by_metabolite(metabolite_ids=...)`
+- `list_metabolites.results[].catalyst_gene_count > 0` → `genes_by_metabolite(metabolite_ids=...)`
 - `list_metabolites.results[].pathway_count > 0` → `genes_by_ontology(ontology='kegg', term_ids=[pathway_id])`
 - `gene_overview.results[].evidence_sources` includes `metabolism` → `metabolites_by_gene(locus_tags=...)`
 - `list_experiments.results[].metabolite_count > 0` → `list_metabolite_assays(experiment_ids=...)`

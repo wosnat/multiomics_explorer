@@ -61,7 +61,7 @@ verbose_fields:
   - pathway_names
 
 chaining:
-  - "list_organisms (per-row metabolite_count > 0) → list_metabolites(organism_names=[...])"
+  - "list_organisms (per-row catalyzed_metabolite_count > 0) → list_metabolites(organism_names=[...])"
   - "list_metabolites → genes_by_metabolite(metabolite_ids=[...], organism=...)"
   - "list_metabolites (per-row pathway_ids) → genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...)"
   - "differential_expression_by_gene → metabolites_by_gene(metabolite_elements=['N']) → list_metabolites for chemistry context"
@@ -69,14 +69,14 @@ chaining:
 
 mistakes:
   - "Direction-agnostic — KEGG equation order is unreliable upstream, so joins through Reaction_has_metabolite (catalysis) and Tcdb_family_transports_metabolite (transport) do NOT distinguish substrates from products. Layer DE direction (`differential_expression_by_gene`) and functional annotation to disambiguate. See docs://guide/conventions."
-  - "gene_count = 0 does not mean the metabolite is absent from the KG — it indicates a metabolomics-only metabolite (measured by mass spec but not reachable via any gene catalysis or transport path). Check `evidence_sources`: a gene_count=0 metabolite carries `['metabolomics']` only."
+  - "catalyst_gene_count counts the catalysis arm only (genes reaching the metabolite via Gene → Reaction → Metabolite). catalyst_gene_count = 0 does NOT mean metabolomics-only: transport-only metabolites (TCDB substrates with no local catalysis) also read 0. Discriminate via `evidence_sources` — a `['metabolomics']`-only list means no gene path at all — or `transporter_count > 0` (transport arm exists)."
   - "organism_names with multiple values is UNION, not intersection. To find metabolites BOTH organisms reach, run two single-org calls and intersect by metabolite_id (or filter per-row by organism_count and inspect `m.organism_names` for the full UNION list)."
   - "metaboliteFullText covers Metabolite.name only — NOT formula. For element/composition queries, use `elements` (presence list)."
   - "evidence_sources='metabolomics' selects metabolites measured by a MetaboliteAssay. Drill in via list_metabolite_assays(metabolite_ids=[...]) or assays_by_metabolite to inspect the measurement evidence."
   - "Same metabolite measured in both whole_cell and extracellular returns one row with `measured_compartments=['extracellular','whole_cell']` (sorted), not two rows — Metabolite is compartment-agnostic."
   - "When the `top_metabolites` rollup is dominated by ATP / ADP / NADH / NADPH / H2O, pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip cofactor noise. KG namespace is `kegg.compound:` (not `chebi:`)."
-  - wrong: "list_metabolites(elements=['N'], gene_count_min=1)  # gene_count_min isn't a param"
-    right: "list_metabolites(elements=['N'])  # then filter rows in code by gene_count > 0"
+  - wrong: "list_metabolites(elements=['N'], catalyst_gene_count_min=1)  # catalyst_gene_count_min isn't a param"
+    right: "list_metabolites(elements=['N'])  # then filter rows in code by catalyst_gene_count > 0"
   - wrong: "list_metabolites(organism_names=['MED4'])  # short name doesn't match"
     right: "list_metabolites(organism_names=['Prochlorococcus MED4'])  # full preferred_name"
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/concepts` for the chemistry layer overview."

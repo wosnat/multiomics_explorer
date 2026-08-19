@@ -28,6 +28,14 @@ LINT_PATTERN = re.compile(
     r"|Mode-[A-Z]\b"          # Mode-A / Mode-B template tag
     r"|Cluster [A-Z]\b"       # Cluster A / Cluster B internal tag
     r"|parent §"              # cross-ref shorthand
+    # Retired catalysis-arm names (2026-08 KG rename). Context-anchored on
+    # purpose: bare gene_count / metabolite_count stay legitimate elsewhere
+    # (ontology-node gene_count, Experiment/Publication measured counts).
+    # Source violations: guide/conventions.md results[].gene_count routing
+    # example; dotted retired-property forms in guide/concepts.md.
+    r"|\b(?:Gene|OrganismTaxon)\.metabolite_count\b"
+    r"|\bMetabolite\.gene_count\b"
+    r"|results\[\]\.gene_count"
 )
 
 # Drift-marker carveout. The [AQ] (annotation_quality redefinition) and

@@ -33,7 +33,8 @@ not_found:
   pathway_ids: []
 offset: 0
 results:
-- chebi_id: '10743'
+- catalyst_gene_count: 10052
+  chebi_id: '10743'
   elements:
   - H
   - O
@@ -41,7 +42,6 @@ results:
   - metabolism
   - transport
   formula: H2O
-  gene_count: 10236
   mass: 18.015
   measured_assay_count: 0
   measured_compartments: []
@@ -69,54 +69,9 @@ results:
   - kegg.pathway:ko05022
   - kegg.pathway:ko05208
   - kegg.pathway:ko05415
-  transporter_count: 117
-- chebi_id: '10744'
-  elements:
-  - H
-  evidence_sources:
-  - metabolism
-  - transport
-  formula: H
-  gene_count: 7517
-  mass: 1.0079
-  measured_assay_count: 0
-  measured_compartments: []
-  measured_organisms: []
-  measured_paper_count: 0
-  metabolite_id: kegg.compound:C00080
-  name: H+
-  organism_count: 42
-  pathway_count: 27
-  pathway_ids:
-  - kegg.pathway:ko00190
-  - kegg.pathway:ko00195
-  - kegg.pathway:ko01100
-  - kegg.pathway:ko04024
-  - kegg.pathway:ko04075
-  - kegg.pathway:ko04260
-  - kegg.pathway:ko04261
-  - kegg.pathway:ko04371
-  - kegg.pathway:ko04714
-  - kegg.pathway:ko04721
-  - kegg.pathway:ko04742
-  - kegg.pathway:ko04750
-  - kegg.pathway:ko04919
-  - kegg.pathway:ko04964
-  - kegg.pathway:ko04966
-  - kegg.pathway:ko04970
-  - kegg.pathway:ko04971
-  - kegg.pathway:ko04972
-  - kegg.pathway:ko04974
-  - kegg.pathway:ko04976
-  - kegg.pathway:ko04977
-  - kegg.pathway:ko04978
-  - kegg.pathway:ko04981
-  - kegg.pathway:ko05110
-  - kegg.pathway:ko05120
-  - kegg.pathway:ko05164
-  - kegg.pathway:ko05323
-  transporter_count: 437
-- chebi_id: '10789'
+  transporter_count: 14
+- catalyst_gene_count: 5906
+  chebi_id: '10789'
   elements:
   - C
   - H
@@ -127,7 +82,6 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O13P3
-  gene_count: 5914
   mass: 503.15
   measured_assay_count: 0
   measured_compartments: []
@@ -171,8 +125,79 @@ results:
   - kegg.pathway:ko05133
   - kegg.pathway:ko05410
   - kegg.pathway:ko05415
-  transporter_count: 47
-- chebi_id: '14791'
+  transporter_count: 15
+- catalyst_gene_count: 5666
+  chebi_id: '10744'
+  elements:
+  - H
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: H
+  mass: 1.0079
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
+  metabolite_id: kegg.compound:C00080
+  name: H+
+  organism_count: 42
+  pathway_count: 27
+  pathway_ids:
+  - kegg.pathway:ko00190
+  - kegg.pathway:ko00195
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko04024
+  - kegg.pathway:ko04075
+  - kegg.pathway:ko04260
+  - kegg.pathway:ko04261
+  - kegg.pathway:ko04371
+  - kegg.pathway:ko04714
+  - kegg.pathway:ko04721
+  - kegg.pathway:ko04742
+  - kegg.pathway:ko04750
+  - kegg.pathway:ko04919
+  - kegg.pathway:ko04964
+  - kegg.pathway:ko04966
+  - kegg.pathway:ko04970
+  - kegg.pathway:ko04971
+  - kegg.pathway:ko04972
+  - kegg.pathway:ko04974
+  - kegg.pathway:ko04976
+  - kegg.pathway:ko04977
+  - kegg.pathway:ko04978
+  - kegg.pathway:ko04981
+  - kegg.pathway:ko05110
+  - kegg.pathway:ko05120
+  - kegg.pathway:ko05164
+  - kegg.pathway:ko05323
+  transporter_count: 123
+- catalyst_gene_count: 4228
+  chebi_id: '13420'
+  elements:
+  - H
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: HO7P2
+  mass: 174.949
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
+  metabolite_id: kegg.compound:C00013
+  name: Diphosphate
+  organism_count: 42
+  pathway_count: 3
+  pathway_ids:
+  - kegg.pathway:ko00190
+  - kegg.pathway:ko05012
+  - kegg.pathway:ko05022
+  transporter_count: 3
+- catalyst_gene_count: 3983
+  chebi_id: '14791'
   elements:
   - H
   - O
@@ -181,7 +206,6 @@ results:
   - metabolism
   - transport
   formula: HO4P
-  gene_count: 4978
   mass: 95.978
   measured_assay_count: 0
   measured_compartments: []
@@ -202,31 +226,7 @@ results:
   - kegg.pathway:ko04978
   - kegg.pathway:ko05012
   - kegg.pathway:ko05022
-  transporter_count: 109
-- chebi_id: '13420'
-  elements:
-  - H
-  - O
-  - P
-  evidence_sources:
-  - metabolism
-  - transport
-  formula: HO7P2
-  gene_count: 4230
-  mass: 174.949
-  measured_assay_count: 0
-  measured_compartments: []
-  measured_organisms: []
-  measured_paper_count: 0
-  metabolite_id: kegg.compound:C00013
-  name: Diphosphate
-  organism_count: 42
-  pathway_count: 3
-  pathway_ids:
-  - kegg.pathway:ko00190
-  - kegg.pathway:ko05012
-  - kegg.pathway:ko05022
-  transporter_count: 5
+  transporter_count: 15
 returned: 5
 row_count: 5
 score_max: null
@@ -263,26 +263,26 @@ top_metabolite_pathways:
   metabolite_pathway_id: kegg.pathway:ko00860
   metabolite_pathway_name: Porphyrin metabolism
 top_organisms:
-- count: 2551
+- count: 2514
   organism_name: Pseudomonas putida KT2440
-- count: 2325
-  organism_name: Ruegeria pomeroyi DSS-3
-- count: 2228
-  organism_name: Alteromonas (MarRef v6)
-- count: 2213
-  organism_name: Shewanella sp. W3-18-1
-- count: 2193
+- count: 2464
   organism_name: Alteromonas macleodii EZ55
-- count: 2116
+- count: 2461
+  organism_name: Ruegeria pomeroyi DSS-3
+- count: 2409
+  organism_name: Alteromonas (MarRef v6)
+- count: 2401
   organism_name: Alteromonas macleodii MIT1002
-- count: 2112
+- count: 2391
   organism_name: Alteromonas macleodii BGP6
-- count: 2098
+- count: 2387
   organism_name: Alteromonas macleodii HOT1A3
-- count: 2098
-  organism_name: Alteromonas mediterranea AltDE1
-- count: 2093
+- count: 2378
+  organism_name: Alteromonas macleodii AD45
+- count: 2374
   organism_name: Marinobacter (MarRef v6)
+- count: 2365
+  organism_name: Alteromonas mediterranea AltDE1
 total_entries: 3356
 total_matching: 3356
 truncated: true

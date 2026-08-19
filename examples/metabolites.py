@@ -94,12 +94,12 @@ def scenario_discover() -> None:
     print(f"top_organisms: {[(o.get('organism_name'), o.get('count')) for o in top_orgs][:5]}")
     print(f"xref_coverage: {result.get('xref_coverage')}")
     print()
-    print("First metabolites (id | name | gene_count | transporter_count | evidence_sources):")
+    print("First metabolites (id | name | catalyst_gene_count | transporter_count | evidence_sources):")
     for row in result["results"][:5]:
         print(
             f"  {str(row.get('metabolite_id', '?'))[:18]:<18} "
             f"{str(row.get('name', '?'))[:30]:<30} "
-            f"gene_count={row.get('gene_count')}  "
+            f"catalyst_gene_count={row.get('catalyst_gene_count')}  "
             f"transporter_count={row.get('transporter_count')}  "
             f"evidence={row.get('evidence_sources')}"
         )

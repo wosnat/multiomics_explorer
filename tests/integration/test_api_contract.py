@@ -117,7 +117,7 @@ class TestGeneOverviewContract:
             "significant_up_count", "significant_down_count", "closest_ortholog_group_size",
             "closest_ortholog_genera", "cluster_membership_count", "cluster_types",
             "derived_metric_count", "derived_metric_value_kinds",
-            "reaction_count", "metabolite_count", "transporter_count", "evidence_sources",
+            "reaction_count", "catalyzed_metabolite_count", "transporter_count", "evidence_sources",
             # Literature "discusses" arm (Extension 1): always-present compact count.
             "discussed_in_publication_count",
         }
@@ -1223,7 +1223,7 @@ class TestListMetabolitesContract:
 
     EXPECTED_COMPACT_RESULT_KEYS = {
         "metabolite_id", "name", "formula", "elements", "mass",
-        "gene_count", "organism_count", "transporter_count",
+        "catalyst_gene_count", "organism_count", "transporter_count",
         "evidence_sources", "pathway_ids", "pathway_count",
     }
 

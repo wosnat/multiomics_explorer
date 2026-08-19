@@ -25,6 +25,25 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 
 ### Changed
 
+- **Breaking:** `gene_overview` row field `metabolite_count` renamed to
+  `catalyzed_metabolite_count`. Driven by KG-SYNC-001
+  (`docs/kg-specs/2026-08-19-presync-kg-asks.md`): the KG retired the union
+  (reaction OR transport) `Gene.metabolite_count` in favor of a
+  catalysis-arm-only count (`Gene → Reaction → Metabolite`). A transport-only
+  gene now reads 0 here with `transporter_count > 0` and `'transport'` in
+  `evidence_sources`. Transport-arm row fields arrive in a later slice.
+- **Breaking:** `list_organisms` row field `metabolite_count` and the
+  `by_metabolic_capability[].metabolite_count` envelope key renamed to
+  `catalyzed_metabolite_count` (KG-SYNC-001). Semantics unchanged in spirit
+  (this count was already catalysis-only) — the name now says so and matches
+  the KG property 1:1.
+- **Breaking:** `list_metabolites` row field `gene_count` renamed to
+  `catalyst_gene_count` (KG-SYNC-001), now counting the catalysis arm only.
+  The old guidance "`gene_count = 0` means metabolomics-only" no longer holds:
+  transport-only metabolites also read 0. Discriminate via `evidence_sources`
+  (`['metabolomics']`-only means no gene path at all) or `transporter_count > 0`
+  (transport arm exists). Transport-arm row fields arrive in a later slice.
+
 ### Fixed
 
 ## [0.1.0-alpha.4] - 2026-06-17

@@ -50,7 +50,7 @@ mistakes:
   - >-
     Chemistry context lives in three places: (1) ec_numbers / catalytic_activities /
     ko_terms on the Gene properties returned here (annotation-side); (2)
-    `gene_overview` per-row `reaction_count` / `metabolite_count` / `transporter_count`
+    `gene_overview` per-row `reaction_count` / `catalyzed_metabolite_count` / `transporter_count`
     + `evidence_sources` rollup (routing surface — when non-zero, drill); (3) `metabolites_by_gene`
     for the actual metabolite list (per-arm: reaction-anchored via Gene → Reaction → Metabolite,
     transport-anchored via Gene → TcdbFamily → Metabolite). For 'what compounds does this

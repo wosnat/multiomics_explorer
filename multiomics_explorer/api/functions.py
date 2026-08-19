@@ -877,13 +877,17 @@ def list_organisms(
     strain, clade, ncbi_taxon_id, gene_count, publication_count,
     experiment_count, treatment_types, omics_types, clustering_analysis_count,
     cluster_types, derived_metric_count, derived_metric_value_kinds, compartments,
-    reaction_count, metabolite_count, measured_metabolite_count.
+    reaction_count, catalyzed_metabolite_count, measured_metabolite_count.
     Sparse fields (omitted when null): reference_database, reference_proteome.
     When verbose=True, also includes: family, order, tax_class, phylum, kingdom,
     superkingdom, lineage, cluster_count, derived_metric_gene_count,
     derived_metric_types.
     by_metabolic_capability: top 10 organisms (within matched set) by
-    metabolite_count, sorted desc; excludes zero-chemistry organisms.
+    catalyzed_metabolite_count, sorted desc; excludes zero-chemistry
+    organisms. Counts the catalysis arm only (metabolites reached via
+    Gene -> Reaction) — transport-substrate metabolites are NOT included,
+    so a transport-only organism reads 0 here. To see transport capability,
+    check per-gene transporter_count / evidence_sources via gene_overview.
     by_measurement_capability: binary 2-bucket count
     {has_metabolomics: N, no_metabolomics: M} where has_metabolomics counts
     organisms with measured_metabolite_count > 0. Sums to total_matching.
@@ -952,18 +956,21 @@ def list_organisms(
                                      "derived_metric_types")}
                        for r in results]
 
-    # by_metabolic_capability: top 10 organisms by metabolite_count in the
-    # matched set; excludes zero-chemistry rows.
+    # by_metabolic_capability: top 10 organisms by catalyzed_metabolite_count
+    # in the matched set; excludes zero-chemistry rows.
     chemistry_capable = [
         {
             "organism_name": r["organism_name"],
             "reaction_count": r.get("reaction_count", 0),
-            "metabolite_count": r.get("metabolite_count", 0),
+            "catalyzed_metabolite_count": r.get("catalyzed_metabolite_count", 0),
         }
         for r in capability_rows
-        if r.get("metabolite_count", 0) > 0 or r.get("reaction_count", 0) > 0
+        if r.get("catalyzed_metabolite_count", 0) > 0
+        or r.get("reaction_count", 0) > 0
     ]
-    chemistry_capable.sort(key=lambda r: r["metabolite_count"], reverse=True)
+    chemistry_capable.sort(
+        key=lambda r: r["catalyzed_metabolite_count"], reverse=True,
+    )
     by_metabolic_capability = chemistry_capable[:10]
 
     # not_found: input names that didn't match any OrganismTaxon
@@ -5016,7 +5023,11 @@ def list_metabolites(
     xref_coverage, mass_stats, by_measurement_coverage, score_max,
     score_median, not_found, results.
     Per result (compact): metabolite_id, name, formula, elements, mass,
-    gene_count, organism_count, transporter_count, evidence_sources,
+    catalyst_gene_count (genes reaching this metabolite via Reaction —
+    catalysis arm only; a transport-only metabolite reads 0 here, so use
+    evidence_sources or transporter_count > 0, NOT catalyst_gene_count == 0,
+    to spot metabolomics-only metabolites), organism_count,
+    transporter_count, evidence_sources,
     chebi_id (sparse), pathway_ids, pathway_count, measured_assay_count,
     measured_paper_count, measured_organisms, measured_compartments.
     When verbose=True, also includes: inchikey, smiles, mnxm_id, hmdb_id,

@@ -170,7 +170,7 @@ tool** (returns envelope + per-row routing fields) with one or more
 | `gene_overview` | family-specific drill-downs based on per-row availability signals |
 
 Per-row routing fields on the discovery output (e.g.
-`expression_edge_count`, `derived_metric_count`, `metabolite_count`,
+`expression_edge_count`, `derived_metric_count`, `catalyzed_metabolite_count`,
 `evidence_sources`, `compartments_observed`) tell you which drill-downs
 have evidence for that row. **Use the routing fields** — calling a
 drill-down on a row with `expression_edge_count=0` returns no

@@ -27,7 +27,8 @@ not_found:
   pathway_ids: []
 offset: 0
 results:
-- chebi_id: '13282'
+- catalyst_gene_count: 2337
+  chebi_id: '13282'
   elements:
   - C
   - O
@@ -35,7 +36,6 @@ results:
   - metabolism
   - transport
   formula: CO2
-  gene_count: 2411
   mass: 44.009
   measured_assay_count: 0
   measured_compartments: []
@@ -71,8 +71,9 @@ results:
   - kegg.pathway:ko04973
   - kegg.pathway:ko04974
   - kegg.pathway:ko04976
-  transporter_count: 21
-- chebi_id: '13405'
+  transporter_count: 8
+- catalyst_gene_count: 2063
+  chebi_id: '13405'
   elements:
   - H
   - N
@@ -80,7 +81,6 @@ results:
   - metabolism
   - transport
   formula: H4N
-  gene_count: 2215
   mass: 18.039
   measured_assay_count: 0
   measured_compartments: []
@@ -110,92 +110,9 @@ results:
   - kegg.pathway:ko04974
   - kegg.pathway:ko05110
   - kegg.pathway:ko05120
-  transporter_count: 58
-- chebi_id: '10745'
-  elements:
-  - O
-  evidence_sources:
-  - metabolism
-  - transport
-  formula: O2
-  gene_count: 2195
-  mass: 31.998
-  measured_assay_count: 0
-  measured_compartments: []
-  measured_organisms: []
-  measured_paper_count: 0
-  metabolite_id: kegg.compound:C00007
-  name: Oxygen
-  organism_count: 42
-  pathway_count: 13
-  pathway_ids:
-  - kegg.pathway:ko00190
-  - kegg.pathway:ko00195
-  - kegg.pathway:ko00630
-  - kegg.pathway:ko00910
-  - kegg.pathway:ko01100
-  - kegg.pathway:ko01110
-  - kegg.pathway:ko02020
-  - kegg.pathway:ko02024
-  - kegg.pathway:ko04066
-  - kegg.pathway:ko04918
-  - kegg.pathway:ko05012
-  - kegg.pathway:ko05208
-  - kegg.pathway:ko05211
-  transporter_count: 4
-- chebi_id: '13110'
-  elements:
-  - C
-  - H
-  - N
-  - O
-  evidence_sources:
-  - metabolism
-  - metabolomics
-  - transport
-  formula: C5H10N2O3
-  gene_count: 2173
-  mass: 146.146
-  measured_assay_count: 8
-  measured_compartments:
-  - extracellular
-  - whole_cell
-  measured_organisms:
-  - Prochlorococcus MIT0801
-  - Prochlorococcus MIT9301
-  - Prochlorococcus MIT9313
-  measured_paper_count: 1
-  metabolite_id: kegg.compound:C00064
-  name: L-Glutamine
-  organism_count: 42
-  pathway_count: 24
-  pathway_ids:
-  - kegg.pathway:ko00220
-  - kegg.pathway:ko00230
-  - kegg.pathway:ko00240
-  - kegg.pathway:ko00250
-  - kegg.pathway:ko00470
-  - kegg.pathway:ko00630
-  - kegg.pathway:ko00750
-  - kegg.pathway:ko00910
-  - kegg.pathway:ko00970
-  - kegg.pathway:ko01100
-  - kegg.pathway:ko01110
-  - kegg.pathway:ko01120
-  - kegg.pathway:ko01230
-  - kegg.pathway:ko01232
-  - kegg.pathway:ko01240
-  - kegg.pathway:ko02010
-  - kegg.pathway:ko02020
-  - kegg.pathway:ko04382
-  - kegg.pathway:ko04724
-  - kegg.pathway:ko04727
-  - kegg.pathway:ko04964
-  - kegg.pathway:ko04974
-  - kegg.pathway:ko04978
-  - kegg.pathway:ko05230
-  transporter_count: 29
-- chebi_id: '13107'
+  transporter_count: 9
+- catalyst_gene_count: 1866
+  chebi_id: '13107'
   elements:
   - C
   - H
@@ -206,7 +123,6 @@ results:
   - metabolomics
   - transport
   formula: C5H8NO4
-  gene_count: 1924
   mass: 146.122
   measured_assay_count: 8
   measured_compartments:
@@ -274,8 +190,93 @@ results:
   - kegg.pathway:ko05034
   - kegg.pathway:ko05215
   - kegg.pathway:ko05230
-  transporter_count: 15
-- chebi_id: '13351'
+  transporter_count: 5
+- catalyst_gene_count: 1351
+  chebi_id: '10745'
+  elements:
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: O2
+  mass: 31.998
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
+  metabolite_id: kegg.compound:C00007
+  name: Oxygen
+  organism_count: 42
+  pathway_count: 13
+  pathway_ids:
+  - kegg.pathway:ko00190
+  - kegg.pathway:ko00195
+  - kegg.pathway:ko00630
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko02020
+  - kegg.pathway:ko02024
+  - kegg.pathway:ko04066
+  - kegg.pathway:ko04918
+  - kegg.pathway:ko05012
+  - kegg.pathway:ko05208
+  - kegg.pathway:ko05211
+  transporter_count: 4
+- catalyst_gene_count: 1072
+  chebi_id: '13110'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  evidence_sources:
+  - metabolism
+  - metabolomics
+  - transport
+  formula: C5H10N2O3
+  mass: 146.146
+  measured_assay_count: 8
+  measured_compartments:
+  - extracellular
+  - whole_cell
+  measured_organisms:
+  - Prochlorococcus MIT0801
+  - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9313
+  measured_paper_count: 1
+  metabolite_id: kegg.compound:C00064
+  name: L-Glutamine
+  organism_count: 42
+  pathway_count: 24
+  pathway_ids:
+  - kegg.pathway:ko00220
+  - kegg.pathway:ko00230
+  - kegg.pathway:ko00240
+  - kegg.pathway:ko00250
+  - kegg.pathway:ko00470
+  - kegg.pathway:ko00630
+  - kegg.pathway:ko00750
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko00970
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01230
+  - kegg.pathway:ko01232
+  - kegg.pathway:ko01240
+  - kegg.pathway:ko02010
+  - kegg.pathway:ko02020
+  - kegg.pathway:ko04382
+  - kegg.pathway:ko04724
+  - kegg.pathway:ko04727
+  - kegg.pathway:ko04964
+  - kegg.pathway:ko04974
+  - kegg.pathway:ko04978
+  - kegg.pathway:ko05230
+  transporter_count: 12
+- catalyst_gene_count: 453
+  chebi_id: '13351'
   elements:
   - C
   - H
@@ -284,7 +285,6 @@ results:
   - metabolism
   - transport
   formula: CHO3
-  gene_count: 1270
   mass: 61.016
   measured_assay_count: 0
   measured_compartments: []
@@ -312,60 +312,9 @@ results:
   - kegg.pathway:ko04972
   - kegg.pathway:ko04976
   - kegg.pathway:ko04978
-  transporter_count: 45
-- chebi_id: '14658'
-  elements:
-  - N
-  - O
-  evidence_sources:
-  - metabolism
-  - transport
-  formula: NO2
-  gene_count: 901
-  mass: 46.005
-  measured_assay_count: 0
-  measured_compartments: []
-  measured_organisms: []
-  measured_paper_count: 0
-  metabolite_id: kegg.compound:C00088
-  name: Nitrite
-  organism_count: 42
-  pathway_count: 8
-  pathway_ids:
-  - kegg.pathway:ko00910
-  - kegg.pathway:ko00998
-  - kegg.pathway:ko01100
-  - kegg.pathway:ko01110
-  - kegg.pathway:ko01120
-  - kegg.pathway:ko01310
-  - kegg.pathway:ko02010
-  - kegg.pathway:ko02020
-  transporter_count: 21
-- chebi_id: '14037'
-  elements:
-  - C
-  - N
-  - O
-  evidence_sources:
-  - metabolism
-  - transport
-  formula: CNO
-  gene_count: 776
-  mass: 42.017
-  measured_assay_count: 0
-  measured_compartments: []
-  measured_organisms: []
-  measured_paper_count: 0
-  metabolite_id: kegg.compound:C01417
-  name: Cyanate
-  organism_count: 42
-  pathway_count: 3
-  pathway_ids:
-  - kegg.pathway:ko00910
-  - kegg.pathway:ko01100
-  - kegg.pathway:ko02010
-  transporter_count: 3
-- chebi_id: '14276'
+  transporter_count: 13
+- catalyst_gene_count: 366
+  chebi_id: '14276'
   elements:
   - C
   - H
@@ -374,7 +323,6 @@ results:
   - metabolism
   - transport
   formula: CHO2
-  gene_count: 384
   mass: 45.017
   measured_assay_count: 0
   measured_compartments: []
@@ -396,8 +344,9 @@ results:
   - kegg.pathway:ko01120
   - kegg.pathway:ko01200
   - kegg.pathway:ko01220
-  transporter_count: 11
-- chebi_id: '13942'
+  transporter_count: 5
+- catalyst_gene_count: 178
+  chebi_id: '13942'
   elements:
   - C
   - H
@@ -408,7 +357,6 @@ results:
   - metabolism
   - transport
   formula: CH2NO5P
-  gene_count: 179
   mass: 139.003
   measured_assay_count: 0
   measured_compartments: []
@@ -431,7 +379,111 @@ results:
   - kegg.pathway:ko01230
   - kegg.pathway:ko01240
   transporter_count: 1
-- chebi_id: '14661'
+- catalyst_gene_count: 126
+  chebi_id: '13941'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  evidence_sources:
+  - metabolism
+  formula: CH2NO2
+  mass: 60.032
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
+  metabolite_id: kegg.compound:C01563
+  name: Carbamate
+  organism_count: 42
+  pathway_count: 3
+  pathway_ids:
+  - kegg.pathway:ko00240
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  transporter_count: 0
+- catalyst_gene_count: 96
+  chebi_id: '14658'
+  elements:
+  - N
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: NO2
+  mass: 46.005
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
+  metabolite_id: kegg.compound:C00088
+  name: Nitrite
+  organism_count: 42
+  pathway_count: 8
+  pathway_ids:
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko00998
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01310
+  - kegg.pathway:ko02010
+  - kegg.pathway:ko02020
+  transporter_count: 8
+- catalyst_gene_count: 32
+  chebi_id: '25545'
+  elements:
+  - H
+  - N
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: HNO3
+  mass: 63.012
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
+  metabolite_id: kegg.compound:C00244
+  name: Nitrate
+  organism_count: 42
+  pathway_count: 6
+  pathway_ids:
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01310
+  - kegg.pathway:ko02010
+  - kegg.pathway:ko02020
+  transporter_count: 8
+- catalyst_gene_count: 25
+  chebi_id: '14037'
+  elements:
+  - C
+  - N
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: CNO
+  mass: 42.017
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
+  metabolite_id: kegg.compound:C01417
+  name: Cyanate
+  organism_count: 42
+  pathway_count: 3
+  pathway_ids:
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko02010
+  transporter_count: 3
+- catalyst_gene_count: 7
+  chebi_id: '14661'
   elements:
   - N
   - O
@@ -439,7 +491,6 @@ results:
   - metabolism
   - transport
   formula: N2O
-  gene_count: 137
   mass: 44.013
   measured_assay_count: 0
   measured_compartments: []
@@ -455,64 +506,13 @@ results:
   - kegg.pathway:ko01120
   - kegg.pathway:ko01310
   transporter_count: 2
-- chebi_id: '13941'
+- catalyst_gene_count: 20
   elements:
-  - C
-  - H
-  - N
-  - O
-  evidence_sources:
-  - metabolism
-  formula: CH2NO2
-  gene_count: 126
-  mass: 60.032
-  measured_assay_count: 0
-  measured_compartments: []
-  measured_organisms: []
-  measured_paper_count: 0
-  metabolite_id: kegg.compound:C01563
-  name: Carbamate
-  organism_count: 42
-  pathway_count: 3
-  pathway_ids:
-  - kegg.pathway:ko00240
-  - kegg.pathway:ko00910
-  - kegg.pathway:ko01100
-  transporter_count: 0
-- chebi_id: '25545'
-  elements:
-  - H
-  - N
-  - O
-  evidence_sources:
-  - metabolism
-  - transport
-  formula: HNO3
-  gene_count: 171
-  mass: 63.012
-  measured_assay_count: 0
-  measured_compartments: []
-  measured_organisms: []
-  measured_paper_count: 0
-  metabolite_id: kegg.compound:C00244
-  name: Nitrate
-  organism_count: 41
-  pathway_count: 6
-  pathway_ids:
-  - kegg.pathway:ko00910
-  - kegg.pathway:ko01100
-  - kegg.pathway:ko01120
-  - kegg.pathway:ko01310
-  - kegg.pathway:ko02010
-  - kegg.pathway:ko02020
-  transporter_count: 11
-- elements:
   - C
   - N
   evidence_sources:
   - metabolism
   formula: CN*
-  gene_count: 20
   mass: null
   measured_assay_count: 0
   measured_compartments: []
@@ -526,7 +526,8 @@ results:
   - kegg.pathway:ko00910
   - kegg.pathway:ko01100
   transporter_count: 0
-- chebi_id: '14275'
+- catalyst_gene_count: 18
+  chebi_id: '14275'
   elements:
   - C
   - H
@@ -536,7 +537,6 @@ results:
   - metabolism
   - transport
   formula: CH3NO
-  gene_count: 25
   mass: 45.041
   measured_assay_count: 0
   measured_compartments: []
@@ -544,7 +544,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00488
   name: Formamide
-  organism_count: 18
+  organism_count: 19
   pathway_count: 4
   pathway_ids:
   - kegg.pathway:ko00460
@@ -552,14 +552,14 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01200
   transporter_count: 2
-- chebi_id: '14657'
+- catalyst_gene_count: 7
+  chebi_id: '14657'
   elements:
   - N
   - O
   evidence_sources:
   - metabolism
   formula: 'NO'
-  gene_count: 7
   mass: 30.006
   measured_assay_count: 0
   measured_compartments: []
@@ -609,7 +609,8 @@ results:
   - kegg.pathway:ko05415
   - kegg.pathway:ko05418
   transporter_count: 0
-- chebi_id: '10793'
+- catalyst_gene_count: 3
+  chebi_id: '10793'
   elements:
   - H
   - N
@@ -618,7 +619,6 @@ results:
   - metabolism
   - transport
   formula: H3NO
-  gene_count: 3
   mass: 33.03
   measured_assay_count: 0
   measured_compartments: []
@@ -633,14 +633,14 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01120
   - kegg.pathway:ko01310
-  transporter_count: 0
-- chebi_id: '13388'
+  transporter_count: 1
+- catalyst_gene_count: 1
+  chebi_id: '13388'
   elements:
   - N
   evidence_sources:
   - metabolism
   formula: N2
-  gene_count: 1
   mass: 28.014
   measured_assay_count: 0
   measured_compartments: []

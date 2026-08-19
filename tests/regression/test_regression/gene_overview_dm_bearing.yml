@@ -7,8 +7,10 @@ rows:
   - cog_category
   - go_bp
   - go_mf
+  - interpro
   - pfam
   boolean_metric_count: 1
+  catalyzed_metabolite_count: 0
   categorical_metric_count: 0
   closest_ortholog_genera:
   - Alteromonas
@@ -26,7 +28,6 @@ rows:
   - go_mf
   - pfam
   locus_tag: MIT1002_01809
-  metabolite_count: 0
   numeric_metric_count: 0
   organism_name: Alteromonas macleodii MIT1002
   product: MarR family winged helix-turn-helix transcriptional regulator

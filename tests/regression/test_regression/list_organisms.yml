@@ -2,6 +2,7 @@ case_id: list_organisms
 row_count: 47
 rows:
 - background_factors: []
+  catalyzed_metabolite_count: 0
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -13,7 +14,6 @@ rows:
   genus: Alteromonas
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 0
   ncbi_taxon_id: 28108
   omics_types: []
   organism_name: Alteromonas
@@ -29,6 +29,7 @@ rows:
   - coculture
   - darkness
   - light
+  catalyzed_metabolite_count: 1359
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -42,7 +43,6 @@ rows:
   - darkness
   - stationary
   measured_metabolite_count: 0
-  metabolite_count: 2228
   ncbi_taxon_id: 232
   omics_types:
   - PROTEOMICS
@@ -60,6 +60,7 @@ rows:
 - background_factors:
   - axenic
   - darkness
+  catalyzed_metabolite_count: 1328
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -73,7 +74,6 @@ rows:
   genus: Alteromonas
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 2081
   ncbi_taxon_id: 1004787
   omics_types:
   - VESICLE_PROTEOMICS
@@ -90,6 +90,7 @@ rows:
 - background_factors:
   - axenic
   - darkness
+  catalyzed_metabolite_count: 1309
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -103,7 +104,6 @@ rows:
   genus: Alteromonas
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 2082
   ncbi_taxon_id: 529120
   omics_types:
   - VESICLE_PROTEOMICS
@@ -120,6 +120,7 @@ rows:
 - background_factors:
   - axenic
   - darkness
+  catalyzed_metabolite_count: 1341
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -133,7 +134,6 @@ rows:
   genus: Alteromonas
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 2112
   ncbi_taxon_id: 28108
   omics_types:
   - VESICLE_PROTEOMICS
@@ -150,6 +150,7 @@ rows:
 - background_factors:
   - axenic
   - darkness
+  catalyzed_metabolite_count: 1282
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -163,7 +164,6 @@ rows:
   genus: Alteromonas
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 2057
   ncbi_taxon_id: 1004785
   omics_types:
   - VESICLE_PROTEOMICS
@@ -182,16 +182,16 @@ rows:
   - coculture
   - diel
   - light
+  catalyzed_metabolite_count: 1428
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
   compartments:
   - exoproteome
   - whole_cell
-  derived_metric_count: 10
+  derived_metric_count: 14
   derived_metric_value_kinds:
   - boolean
-  - numeric
   experiment_count: 16
   gene_count: 4136
   genus: Alteromonas
@@ -199,7 +199,6 @@ rows:
   - acclimated_steady_state
   - exponential
   measured_metabolite_count: 0
-  metabolite_count: 2193
   ncbi_taxon_id: 28108
   omics_types:
   - EXOPROTEOMICS
@@ -222,6 +221,7 @@ rows:
   - coculture
   - darkness
   - light
+  catalyzed_metabolite_count: 1336
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -238,7 +238,6 @@ rows:
   - exponential
   - nutrient_limited
   measured_metabolite_count: 0
-  metabolite_count: 2098
   ncbi_taxon_id: 28108
   omics_types:
   - PROTEOMICS
@@ -262,6 +261,7 @@ rows:
   - darkness
   - diel
   - light
+  catalyzed_metabolite_count: 1354
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -280,7 +280,6 @@ rows:
   - diel
   - exponential
   measured_metabolite_count: 0
-  metabolite_count: 2116
   ncbi_taxon_id: 28108
   omics_types:
   - RNASEQ
@@ -297,7 +296,9 @@ rows:
   - coculture
   - compartment
   - darkness
+  - growth_phase
 - background_factors: []
+  catalyzed_metabolite_count: 1306
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -309,7 +310,6 @@ rows:
   genus: Alteromonas
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 2062
   ncbi_taxon_id: 1774373
   omics_types: []
   organism_name: Alteromonas mediterranea AltDE
@@ -322,6 +322,7 @@ rows:
   strain: AltDE
   treatment_types: []
 - background_factors: []
+  catalyzed_metabolite_count: 1326
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -333,7 +334,6 @@ rows:
   genus: Alteromonas
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 2098
   ncbi_taxon_id: 1004786
   omics_types: []
   organism_name: Alteromonas mediterranea AltDE1
@@ -347,6 +347,7 @@ rows:
   treatment_types: []
 - background_factors:
   - light
+  catalyzed_metabolite_count: 0
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -359,7 +360,6 @@ rows:
   growth_phases:
   - acclimated_steady_state
   measured_metabolite_count: 0
-  metabolite_count: 0
   ncbi_taxon_id: 562
   omics_types:
   - PROTEOMICS
@@ -378,6 +378,7 @@ rows:
   - coculture
   - darkness
   - light
+  catalyzed_metabolite_count: 1346
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -391,7 +392,6 @@ rows:
   - darkness
   - stationary
   measured_metabolite_count: 0
-  metabolite_count: 2093
   ncbi_taxon_id: 225937
   omics_types:
   - PROTEOMICS
@@ -407,6 +407,7 @@ rows:
   - carbon
   - coculture
 - background_factors: []
+  catalyzed_metabolite_count: 0
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -418,7 +419,6 @@ rows:
   genus: Deinococcus
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 0
   ncbi_taxon_id: 1299
   omics_types:
   - RNASEQ
@@ -434,6 +434,7 @@ rows:
   - coculture
   - light
 - background_factors: []
+  catalyzed_metabolite_count: 1215
   clade: null
   cluster_types:
   - condition_comparison
@@ -446,7 +447,6 @@ rows:
   genus: Meiothermus
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 1837
   ncbi_taxon_id: 172827
   omics_types:
   - RNASEQ
@@ -466,6 +466,7 @@ rows:
   - darkness
   - light
   - viral
+  catalyzed_metabolite_count: 0
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -480,7 +481,6 @@ rows:
   - exponential
   - infected
   measured_metabolite_count: 0
-  metabolite_count: 0
   ncbi_taxon_id: 10239
   omics_types:
   - MICROARRAY
@@ -499,6 +499,7 @@ rows:
 - background_factors:
   - axenic
   - light
+  catalyzed_metabolite_count: 1017
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
@@ -511,7 +512,6 @@ rows:
   growth_phases:
   - acclimated_steady_state
   measured_metabolite_count: 0
-  metabolite_count: 1549
   ncbi_taxon_id: 146891
   omics_types:
   - RNASEQ
@@ -533,6 +533,7 @@ rows:
   - diel
   - light
   - viral
+  catalyzed_metabolite_count: 1039
   clade: HLI
   cluster_types:
   - diel
@@ -560,7 +561,6 @@ rows:
   - recovery
   - stationary
   measured_metabolite_count: 0
-  metabolite_count: 1572
   ncbi_taxon_id: 59919
   omics_types:
   - MICROARRAY
@@ -590,6 +590,7 @@ rows:
   - salt
   - viral
 - background_factors: []
+  catalyzed_metabolite_count: 1022
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
@@ -601,7 +602,6 @@ rows:
   genus: Prochlorococcus
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 1553
   ncbi_taxon_id: 1501268
   omics_types: []
   organism_name: Prochlorococcus MIT0604
@@ -615,6 +615,7 @@ rows:
   treatment_types: []
 - background_factors:
   - axenic
+  catalyzed_metabolite_count: 1036
   clade: LLI
   cluster_types: []
   clustering_analysis_count: 0
@@ -626,7 +627,6 @@ rows:
   genus: Prochlorococcus
   growth_phases: []
   measured_metabolite_count: 92
-  metabolite_count: 1565
   ncbi_taxon_id: 1501269
   omics_types:
   - METABOLOMICS
@@ -642,6 +642,7 @@ rows:
   - growth_phase
   - phosphorus
 - background_factors: []
+  catalyzed_metabolite_count: 1027
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
@@ -653,7 +654,6 @@ rows:
   genus: Prochlorococcus
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 1558
   ncbi_taxon_id: 3096220
   omics_types: []
   organism_name: Prochlorococcus MIT1314
@@ -666,6 +666,7 @@ rows:
   strain: MIT1314
   treatment_types: []
 - background_factors: []
+  catalyzed_metabolite_count: 1084
   clade: LLIV
   cluster_types: []
   clustering_analysis_count: 0
@@ -677,7 +678,6 @@ rows:
   genus: Prochlorococcus
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 1672
   ncbi_taxon_id: 1801626
   omics_types: []
   organism_name: Prochlorococcus MIT1327
@@ -690,6 +690,7 @@ rows:
   strain: MIT1327
   treatment_types: []
 - background_factors: []
+  catalyzed_metabolite_count: 1014
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
@@ -701,7 +702,6 @@ rows:
   genus: Prochlorococcus
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 1566
   ncbi_taxon_id: 93058
   omics_types: []
   organism_name: Prochlorococcus MIT9202
@@ -714,6 +714,7 @@ rows:
   strain: MIT9202
   treatment_types: []
 - background_factors: []
+  catalyzed_metabolite_count: 1048
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
@@ -725,7 +726,6 @@ rows:
   genus: Prochlorococcus
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 1581
   ncbi_taxon_id: 93060
   omics_types: []
   organism_name: Prochlorococcus MIT9215
@@ -741,6 +741,7 @@ rows:
   - axenic
   - diel
   - light
+  catalyzed_metabolite_count: 1052
   clade: HLII
   cluster_types:
   - condition_comparison
@@ -754,7 +755,6 @@ rows:
   growth_phases:
   - exponential
   measured_metabolite_count: 99
-  metabolite_count: 1581
   ncbi_taxon_id: 167546
   omics_types:
   - METABOLOMICS
@@ -774,6 +774,7 @@ rows:
 - background_factors:
   - axenic
   - light
+  catalyzed_metabolite_count: 1135
   clade: LLIV
   cluster_types: []
   clustering_analysis_count: 0
@@ -786,7 +787,6 @@ rows:
   growth_phases:
   - exponential
   measured_metabolite_count: 16
-  metabolite_count: 1719
   ncbi_taxon_id: 59922
   omics_types:
   - METABOLOMICS
@@ -806,6 +806,7 @@ rows:
   - coculture
   - diel
   - light
+  catalyzed_metabolite_count: 1047
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
@@ -823,7 +824,6 @@ rows:
   - exponential
   - stationary
   measured_metabolite_count: 69
-  metabolite_count: 1581
   ncbi_taxon_id: 74546
   omics_types:
   - METABOLOMICS
@@ -847,6 +847,7 @@ rows:
 - background_factors:
   - axenic
   - light
+  catalyzed_metabolite_count: 1081
   clade: LLIV
   cluster_types:
   - time_course
@@ -867,7 +868,6 @@ rows:
   - nutrient_limited
   - recovery
   measured_metabolite_count: 145
-  metabolite_count: 1666
   ncbi_taxon_id: 74547
   omics_types:
   - METABOLOMICS
@@ -893,6 +893,7 @@ rows:
   - phosphorus
   - viral
 - background_factors: []
+  catalyzed_metabolite_count: 1018
   clade: HLI
   cluster_types: []
   clustering_analysis_count: 0
@@ -904,7 +905,6 @@ rows:
   genus: Prochlorococcus
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 1552
   ncbi_taxon_id: 167542
   omics_types: []
   organism_name: Prochlorococcus MIT9515
@@ -919,6 +919,7 @@ rows:
 - background_factors:
   - axenic
   - light
+  catalyzed_metabolite_count: 1039
   clade: LLI
   cluster_types: []
   clustering_analysis_count: 0
@@ -931,7 +932,6 @@ rows:
   growth_phases:
   - acclimated_steady_state
   measured_metabolite_count: 0
-  metabolite_count: 1570
   ncbi_taxon_id: 167555
   omics_types:
   - RNASEQ
@@ -951,6 +951,7 @@ rows:
   - diel
   - light
   - viral
+  catalyzed_metabolite_count: 1029
   clade: LLI
   cluster_types:
   - diel
@@ -973,7 +974,6 @@ rows:
   - recovery
   - stationary
   measured_metabolite_count: 0
-  metabolite_count: 1550
   ncbi_taxon_id: 59920
   omics_types:
   - PROTEOMICS
@@ -989,9 +989,11 @@ rows:
   treatment_types:
   - coculture
   - darkness
+  - growth_phase
   - phosphorus
   - plastic
 - background_factors: []
+  catalyzed_metabolite_count: 1076
   clade: LLI
   cluster_types: []
   clustering_analysis_count: 0
@@ -1003,7 +1005,6 @@ rows:
   genus: Prochlorococcus
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 1600
   ncbi_taxon_id: 59924
   omics_types: []
   organism_name: Prochlorococcus PAC1
@@ -1016,6 +1017,7 @@ rows:
   strain: PAC1
   treatment_types: []
 - background_factors: []
+  catalyzed_metabolite_count: 1043
   clade: HLI
   cluster_types: []
   clustering_analysis_count: 0
@@ -1027,7 +1029,6 @@ rows:
   genus: Prochlorococcus
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 1575
   ncbi_taxon_id: 1924285
   omics_types: []
   organism_name: Prochlorococcus RSP50
@@ -1040,6 +1041,7 @@ rows:
   strain: RSP50
   treatment_types: []
 - background_factors: []
+  catalyzed_metabolite_count: 1025
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
@@ -1051,7 +1053,6 @@ rows:
   genus: Prochlorococcus
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 1552
   ncbi_taxon_id: 59926
   omics_types: []
   organism_name: Prochlorococcus SB
@@ -1068,6 +1069,7 @@ rows:
   - coculture
   - darkness
   - light
+  catalyzed_metabolite_count: 1046
   clade: LLII
   cluster_types: []
   clustering_analysis_count: 0
@@ -1083,7 +1085,6 @@ rows:
   - exponential
   - stationary
   measured_metabolite_count: 0
-  metabolite_count: 1576
   ncbi_taxon_id: 167539
   omics_types:
   - PROTEOMICS
@@ -1102,6 +1103,7 @@ rows:
   - phosphorus
 - background_factors:
   - light
+  catalyzed_metabolite_count: 1490
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -1114,7 +1116,6 @@ rows:
   growth_phases:
   - exponential
   measured_metabolite_count: 0
-  metabolite_count: 2551
   ncbi_taxon_id: 160488
   omics_types:
   - PROTEOMICS
@@ -1131,6 +1132,7 @@ rows:
   - coculture
 - background_factors:
   - light
+  catalyzed_metabolite_count: 1468
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -1146,7 +1148,6 @@ rows:
   growth_phases:
   - acclimated_steady_state
   measured_metabolite_count: 0
-  metabolite_count: 2325
   ncbi_taxon_id: 89184
   omics_types:
   - EXOPROTEOMICS
@@ -1162,6 +1163,7 @@ rows:
   - coculture
 - background_factors:
   - light
+  catalyzed_metabolite_count: 1306
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -1174,7 +1176,6 @@ rows:
   growth_phases:
   - acclimated_steady_state
   measured_metabolite_count: 0
-  metabolite_count: 2213
   ncbi_taxon_id: 351745
   omics_types:
   - RNASEQ
@@ -1193,6 +1194,7 @@ rows:
   - axenic
   - coculture
   - light
+  catalyzed_metabolite_count: 1129
   clade: I
   cluster_types: []
   clustering_analysis_count: 0
@@ -1205,7 +1207,6 @@ rows:
   growth_phases:
   - exponential
   measured_metabolite_count: 0
-  metabolite_count: 1745
   ncbi_taxon_id: 64471
   omics_types:
   - RNASEQ
@@ -1222,6 +1223,7 @@ rows:
   - coculture
 - background_factors:
   - light
+  catalyzed_metabolite_count: 1105
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -1234,7 +1236,6 @@ rows:
   growth_phases:
   - acclimated_steady_state
   measured_metabolite_count: 0
-  metabolite_count: 1771
   ncbi_taxon_id: 32049
   omics_types:
   - RNASEQ
@@ -1253,6 +1254,7 @@ rows:
   - coculture
   - darkness
   - light
+  catalyzed_metabolite_count: 1145
   clade: V
   cluster_types: []
   clustering_analysis_count: 0
@@ -1267,7 +1269,6 @@ rows:
   - darkness
   - stationary
   measured_metabolite_count: 0
-  metabolite_count: 1791
   ncbi_taxon_id: 32051
   omics_types:
   - EXOPROTEOMICS
@@ -1288,6 +1289,7 @@ rows:
   - coculture
   - darkness
   - light
+  catalyzed_metabolite_count: 1120
   clade: III
   cluster_types: []
   clustering_analysis_count: 0
@@ -1302,7 +1304,6 @@ rows:
   - exponential
   - stationary
   measured_metabolite_count: 0
-  metabolite_count: 1721
   ncbi_taxon_id: 84588
   omics_types:
   - EXOPROTEOMICS
@@ -1322,6 +1323,7 @@ rows:
   - coculture
 - background_factors:
   - light
+  catalyzed_metabolite_count: 1170
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -1334,7 +1336,6 @@ rows:
   growth_phases:
   - exponential
   measured_metabolite_count: 0
-  metabolite_count: 1816
   ncbi_taxon_id: 1140
   omics_types:
   - PROTEOMICS
@@ -1351,6 +1352,7 @@ rows:
   - coculture
 - background_factors:
   - light
+  catalyzed_metabolite_count: 1175
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -1363,7 +1365,6 @@ rows:
   growth_phases:
   - acclimated_steady_state
   measured_metabolite_count: 0
-  metabolite_count: 1821
   ncbi_taxon_id: 1350461
   omics_types:
   - PROTEOMICS
@@ -1382,6 +1383,7 @@ rows:
   - coculture
   - darkness
   - light
+  catalyzed_metabolite_count: 1068
   clade: IV
   cluster_types: []
   clustering_analysis_count: 0
@@ -1395,7 +1397,6 @@ rows:
   - darkness
   - stationary
   measured_metabolite_count: 0
-  metabolite_count: 1671
   ncbi_taxon_id: 313625
   omics_types:
   - PROTEOMICS
@@ -1411,6 +1412,7 @@ rows:
   - carbon
   - coculture
 - background_factors: []
+  catalyzed_metabolite_count: 1003
   clade: null
   cluster_types:
   - condition_comparison
@@ -1423,7 +1425,6 @@ rows:
   genus: Thermosynechococcus
   growth_phases: []
   measured_metabolite_count: 0
-  metabolite_count: 1608
   ncbi_taxon_id: 197221
   omics_types:
   - RNASEQ
@@ -1440,6 +1441,7 @@ rows:
   - light
 - background_factors:
   - light
+  catalyzed_metabolite_count: 0
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -1452,7 +1454,6 @@ rows:
   growth_phases:
   - exponential
   measured_metabolite_count: 0
-  metabolite_count: 0
   ncbi_taxon_id: 670
   omics_types:
   - MICROARRAY

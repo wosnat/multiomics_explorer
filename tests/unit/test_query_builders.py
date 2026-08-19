@@ -1183,13 +1183,15 @@ class TestBuildListOrganisms:
         assert params["compartment"] == "vesicle"
 
     def test_compact_returns_chemistry_rollups(self):
-        """Chemistry rollups (reaction_count, metabolite_count) are surfaced
-        as compact RETURN columns, coalesced to 0 for organisms without
-        chemistry coverage."""
+        """Chemistry rollups (reaction_count, catalyzed_metabolite_count) are
+        surfaced as compact RETURN columns, coalesced to 0 for organisms
+        without chemistry coverage. Catalysis-arm rename (KG-SYNC-001):
+        o.metabolite_count → o.catalyzed_metabolite_count."""
         from multiomics_explorer.kg.queries_lib import build_list_organisms
         cypher, _ = build_list_organisms()
         assert "coalesce(o.reaction_count, 0) AS reaction_count" in cypher
-        assert "coalesce(o.metabolite_count, 0) AS metabolite_count" in cypher
+        assert ("coalesce(o.catalyzed_metabolite_count, 0) "
+                "AS catalyzed_metabolite_count") in cypher
 
 
 class TestBuildListOrganismsCapability:
@@ -1202,7 +1204,8 @@ class TestBuildListOrganismsCapability:
         cypher, _ = build_list_organisms_capability()
         assert "o.preferred_name AS organism_name" in cypher
         assert "coalesce(o.reaction_count, 0) AS reaction_count" in cypher
-        assert "coalesce(o.metabolite_count, 0) AS metabolite_count" in cypher
+        assert ("coalesce(o.catalyzed_metabolite_count, 0) "
+                "AS catalyzed_metabolite_count") in cypher
         # Stays small — no verbose / DM / cluster / reference columns
         for absent in ("lineage", "derived_metric_count", "cluster_count",
                         "reference_database", "treatment_types"):
@@ -7039,7 +7042,7 @@ class TestBuildListMetabolites:
             "m.formula AS formula",
             "coalesce(m.elements, []) AS elements",
             "m.mass AS mass",
-            "coalesce(m.gene_count, 0) AS gene_count",
+            "coalesce(m.catalyst_gene_count, 0) AS catalyst_gene_count",
             "coalesce(m.organism_count, 0) AS organism_count",
             "coalesce(m.transporter_count, 0) AS transporter_count",
             "coalesce(m.evidence_sources, []) AS evidence_sources",
@@ -7075,10 +7078,12 @@ class TestBuildListMetabolites:
         assert "CALL{" not in cypher
 
     def test_order_by(self):
-        """No-search ORDER BY: organism_count DESC, gene_count DESC, m.id."""
+        """No-search ORDER BY: organism_count DESC, catalyst_gene_count DESC,
+        m.id. Catalysis-arm rename (KG-SYNC-001): the tiebreaker reads
+        m.catalyst_gene_count."""
         cypher, _ = self._build()
         assert (
-            "ORDER BY m.organism_count DESC, m.gene_count DESC, m.id"
+            "ORDER BY m.organism_count DESC, m.catalyst_gene_count DESC, m.id"
             in cypher
         )
 
@@ -8710,19 +8715,22 @@ class TestClusterEnrichmentBuilderInformativeOnly:
 
 
 class TestBuildGeneOverviewPhase1Plumbing:
-    """gene_overview detail: adds reaction_count + metabolite_count +
+    """gene_overview detail: adds reaction_count + catalyzed_metabolite_count +
     transporter_count + evidence_sources per row. Path-existence subqueries
-    derive evidence_sources (NOT a metabolite-level rollup) — see spec §6.1."""
+    derive evidence_sources (NOT a metabolite-level rollup) — see spec §6.1.
+    Catalysis-arm rename (2026-08-19): metabolite_count →
+    catalyzed_metabolite_count (KG-SYNC-001; catalysis-arm-only count)."""
 
     def test_compact_returns_reaction_count(self):
         cypher, _ = build_gene_overview(locus_tags=["PMM0001"])
         assert "coalesce(g.reaction_count, 0) AS reaction_count" in cypher
 
-    def test_compact_returns_metabolite_count(self):
-        """metabolite_count is reaction-OR-transport reachable, sourced from
-        precomputed Gene.metabolite_count."""
+    def test_compact_returns_catalyzed_metabolite_count(self):
+        """catalyzed_metabolite_count is catalysis-arm-only (reaction path),
+        sourced from precomputed Gene.catalyzed_metabolite_count."""
         cypher, _ = build_gene_overview(locus_tags=["PMM0001"])
-        assert "coalesce(g.metabolite_count, 0) AS metabolite_count" in cypher
+        assert ("coalesce(g.catalyzed_metabolite_count, 0) "
+                "AS catalyzed_metabolite_count") in cypher
 
     def test_compact_returns_transporter_count(self):
         """transporter_count surface alias of g.tcdb_family_count (spec §6.1)."""
@@ -8756,7 +8764,7 @@ class TestBuildGeneOverviewPhase1Plumbing:
         """Verbose mode keeps all the new chemistry columns."""
         cypher, _ = build_gene_overview(locus_tags=["PMM0001"], verbose=True)
         assert "reaction_count" in cypher
-        assert "metabolite_count" in cypher
+        assert "catalyzed_metabolite_count" in cypher
         assert "transporter_count" in cypher
         assert "evidence_sources" in cypher
 

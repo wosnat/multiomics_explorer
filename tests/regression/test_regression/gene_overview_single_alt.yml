@@ -5,6 +5,7 @@ rows:
   annotation_state: no_evidence
   annotation_types: []
   boolean_metric_count: 0
+  catalyzed_metabolite_count: 0
   categorical_metric_count: 0
   closest_ortholog_genera:
   - Alteromonas
@@ -18,7 +19,6 @@ rows:
   gene_name: null
   informative_annotation_types: []
   locus_tag: EZ55_00275
-  metabolite_count: 0
   numeric_metric_count: 0
   organism_name: Alteromonas macleodii EZ55
   product: hypothetical protein

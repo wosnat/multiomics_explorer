@@ -165,7 +165,7 @@ list_derived_metrics → genes_by_<kind>_metric → metabolites_by_gene — insp
 
 - allowed_categories is non-null only when value_kind='categorical'. For boolean and numeric DMs it is null — not a bug.
 
-- DM rows carry no chemistry — `metabolite_count`, `reaction_count`, `evidence_sources` are not surfaced here by design (DM-anchored is purpose-built; chemistry adds noise). For chemistry context on DM-flagged genes, drill the kind- appropriate `genes_by_<kind>_metric` to harvest locus_tags, then chain to `metabolites_by_gene` (gene-anchored) or `genes_by_metabolite` (metabolite-anchored). See `docs://analysis/metabolites`.
+- DM rows carry no chemistry — `catalyzed_metabolite_count`, `reaction_count`, `evidence_sources` are not surfaced here by design (DM-anchored is purpose-built; chemistry adds noise). For chemistry context on DM-flagged genes, drill the kind- appropriate `genes_by_<kind>_metric` to harvest locus_tags, then chain to `metabolites_by_gene` (gene-anchored) or `genes_by_metabolite` (metabolite-anchored). See `docs://analysis/metabolites`.
 
 ```mistake
 list_derived_metrics(rankable="true")

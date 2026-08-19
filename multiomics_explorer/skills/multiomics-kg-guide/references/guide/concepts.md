@@ -90,7 +90,7 @@ and `list_organisms`. Discover valid values with
   rollups: `expression_edge_count`, `numeric_metric_count` /
   `boolean_metric_count` / `categorical_metric_count`,
   `cluster_membership_count`, `closest_ortholog_group_size`,
-  `reaction_count`, `metabolite_count`, `tcdb_family_count`,
+  `reaction_count`, `catalyzed_metabolite_count`, `tcdb_family_count`,
   `cazy_family_count`, `compartments_observed`, `annotation_quality`
   (0..3 — see `docs://guide/conventions`). Each Gene also carries an
   amino-acid `sequence` and genomic coordinates (`contig`, `start`,

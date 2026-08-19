@@ -105,6 +105,31 @@ def test_lint_catches_parent_section(lint_mod, tmp_path):
     assert len(vs) >= 1
 
 
+def test_lint_catches_retired_catalysis_arm_names(lint_mod, tmp_path):
+    """Retired 2026-08 KG names: dotted property forms + routing example."""
+    md = tmp_path / "t.md"
+    md.write_text(
+        "Reads Gene.metabolite_count for the rollup.\n"
+        "OrganismTaxon.metabolite_count ranks organisms.\n"
+        "Metabolite.gene_count routes to genes_by_metabolite.\n"
+        "Chain via results[].gene_count > 0.\n"
+    )
+    vs = lint_mod.lint_about_content([md])
+    assert len(vs) == 4
+
+
+def test_lint_ignores_legitimate_count_names(lint_mod, tmp_path):
+    """Bare gene_count / measured metabolite_count remain valid elsewhere."""
+    md = tmp_path / "t.md"
+    md.write_text(
+        "Ontology-node gene_count means genes annotated to the term.\n"
+        "Per-row metabolite_count counts measured metabolites.\n"
+        "catalyzed_metabolite_count and catalyst_gene_count are the arms.\n"
+    )
+    vs = lint_mod.lint_about_content([md])
+    assert vs == []
+
+
 def test_lint_carveout_aq_marker(lint_mod, tmp_path):
     md = tmp_path / "t.md"
     md.write_text("[AQ] redefined 2026-05-01: annotation_state encoding.\n")
