@@ -339,6 +339,7 @@ rows:
   - Sallie W Chisholm
   - Steven J Biller
   background_factors:
+  - coculture
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -366,6 +367,7 @@ rows:
     Prochlorococcus'
   treatment_types:
   - coculture
+  - growth_phase
   year: 2016
 - authors:
   - Sallie W Chisholm

@@ -1,5 +1,5 @@
 case_id: list_filter_values_metric_type
-row_count: 40
+row_count: 44
 rows:
 - count: 6
   value: log2_mv_cell_enrichment
@@ -52,7 +52,11 @@ rows:
 - count: 1
   value: enrichment_tonb_associated_genes
 - count: 1
-  value: exoproteome_detection_replicates
+  value: exoproteome_detected_ancestor
+- count: 1
+  value: exoproteome_detected_evolved_400ppm
+- count: 1
+  value: exoproteome_detected_evolved_800ppm
 - count: 1
   value: expression_change_high_light_shock
 - count: 1
@@ -80,4 +84,8 @@ rows:
 - count: 1
   value: vesicle_dna_avg_read_coverage
 - count: 1
-  value: whole_cell_detection_replicates
+  value: whole_cell_detected_ancestor
+- count: 1
+  value: whole_cell_detected_evolved_400ppm
+- count: 1
+  value: whole_cell_detected_evolved_800ppm

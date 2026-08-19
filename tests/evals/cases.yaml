@@ -996,8 +996,11 @@
   params:
     rankable: false
   expect:
-    min_rows: 34
-    max_rows: 34
+    # 34 -> 38 (verified live 2026-08-20): Lu 2026 DM rewiring replaced
+    # 2 non-rankable numeric DMs with 6 non-rankable boolean per-strain
+    # detection metrics (net +4).
+    min_rows: 38
+    max_rows: 38
 
 - id: list_derived_metrics_has_p_value_empty
   tool: list_derived_metrics

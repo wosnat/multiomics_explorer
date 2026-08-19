@@ -185,7 +185,7 @@ rows:
   score: 2.7061
   tree: null
   tree_code: null
-- discussed_by_n_publications: 2
+- discussed_by_n_publications: 3
   id: kegg.pathway:ko00500
   is_informative: true
   level: 2

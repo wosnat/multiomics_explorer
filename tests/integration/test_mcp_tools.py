@@ -1390,16 +1390,20 @@ class TestListDerivedMetrics:
     """Live-KG integration tests for list_derived_metrics."""
 
     def test_no_filters_13_dms(self, conn):
+        # 65 → 69 (verified live 2026-08-20): Lu 2026 DM rewiring replaced
+        # 2 numeric DMs with 6 boolean per-strain detection metrics (net +4).
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(conn=conn, limit=None)
-        assert out["total_entries"] == 65
-        assert out["total_matching"] == 65
-        assert len(out["results"]) == 65
+        assert out["total_entries"] == 69
+        assert out["total_matching"] == 69
+        assert len(out["results"]) == 69
 
     def test_value_kind_numeric_6(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(value_kind="numeric", conn=conn, limit=None)
-        assert out["total_matching"] == 37
+        # 37 → 35 (verified live 2026-08-20): Lu 2026 DM rewiring removed
+        # 2 numeric DMs (replaced by boolean per-strain detection metrics).
+        assert out["total_matching"] == 35
         assert all(r["value_kind"] == "numeric" for r in out["results"])
         compartments = {r["compartment"] for r in out["results"]}
         assert compartments == {"whole_cell", "vesicle", "exoproteome"}
@@ -1407,7 +1411,9 @@ class TestListDerivedMetrics:
     def test_value_kind_boolean_6(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(value_kind="boolean", conn=conn, limit=None)
-        assert out["total_matching"] == 18
+        # 18 → 24 (verified live 2026-08-20): Lu 2026 DM rewiring added
+        # 6 boolean per-strain detection metrics.
+        assert out["total_matching"] == 24
         organisms = {r["organism_name"] for r in out["results"]}
         assert "Prochlorococcus NATL2A" in organisms
         assert "Alteromonas macleodii MIT1002" in organisms
@@ -1430,7 +1436,10 @@ class TestListDerivedMetrics:
         """Sanity-checks bool→'false' string coercion path."""
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(rankable=False, conn=conn, limit=None)
-        assert out["total_matching"] == 34
+        # 34 → 38 (verified live 2026-08-20): Lu 2026 DM rewiring — the 6 new
+        # boolean per-strain detection metrics are non-rankable, the 2 removed
+        # numeric DMs were also non-rankable (net +4; rankable=True stays 31).
+        assert out["total_matching"] == 38
         metric_types = {r["metric_type"] for r in out["results"]}
         # The two non-rankable numeric DMs are always in this set
         assert "peak_time_protein_h" in metric_types
@@ -2421,13 +2430,19 @@ class TestListMetabolites:
         assert result["total_matching"] == 583
 
     def test_organism_plus_elements_filter(self, conn):
-        """MED4 + N elements (the canonical N-source primitive): 813."""
+        """MED4 + N elements (the canonical N-source primitive): 992.
+
+        813 → 992 (verified live 2026-08-20): InterPro Layer-B GO/EC
+        enrichment (new Gene→Reaction links) + the 2026-08 TCDB rebuild
+        expanded MED4's chemistry-reachable metabolite set
+        (by_evidence_source now: metabolism 659, transport 510,
+        metabolomics 90)."""
         result = api.list_metabolites(
             organism_names=["Prochlorococcus MED4"],
             elements=["N"],
             conn=conn,
         )
-        assert result["total_matching"] == 813
+        assert result["total_matching"] == 992
 
     def test_pathway_id_filter(self, conn):
         """Nitrogen metabolism pathway (ko00910) has 18 metabolites."""
@@ -2511,8 +2526,18 @@ class TestGenesByMetabolite:
     drift during the genes_by_metabolite Phase 2 build, 2026-05-03.)
     """
 
+    @pytest.mark.xfail(
+        reason="slice-2: transport_confidence must migrate to substrate_depth "
+               "(KG 2026-08 TCDB upgrade)",
+        strict=False,
+    )
     def test_urea_med4_both_arms_round_trip(self, conn):
         """Urea × MED4: both arms exercised, fi > sc post-2026-05-05 rebuild.
+
+        XFAIL (2026-08-20): pins the substrate_confirmed / family_inferred
+        split, which the 2026-08 TCDB rebuild broke (level_kind
+        classification); re-pin in slice 2 after the substrate_depth
+        migration — do not bake interim values.
 
         Pins live-KG snapshot (verified 2026-05-05 post-rebuild):
         total_matching=26, gene_count_total=21, metabolism_rows=4,
@@ -2541,8 +2566,17 @@ class TestGenesByMetabolite:
         assert urea_row.transport_family_inferred_rows == 12
         assert any("family_inferred" in w for w in model.warnings)
 
+    @pytest.mark.xfail(
+        reason="slice-2: transport_confidence must migrate to substrate_depth "
+               "(KG 2026-08 TCDB upgrade)",
+        strict=False,
+    )
     def test_nitrite_med4_transport_only_warning_fires(self, conn):
         """Nitrite × MED4: transport-only, fi > sc, auto-warning fires.
+
+        XFAIL (2026-08-20): the family_inferred-dominance warning derives
+        from the broken level_kind classification post-TCDB-rebuild; re-pin
+        in slice 2 after the substrate_depth migration.
 
         Pins live-KG snapshot (verified 2026-05-05 post-rebuild):
         total_matching=17, no metabolism rows, substrate_confirmed=5,

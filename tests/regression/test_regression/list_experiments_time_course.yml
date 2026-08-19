@@ -1,6 +1,67 @@
 case_id: list_experiments_time_course
-row_count: 32
+row_count: 35
 rows:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Prochlorococcus MED4
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 3947
+  experiment_id: 10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq
+  experiment_name: HOT1A3 Coculture with Prochlorococcus MED4 vs Axenic (RNASEQ)
+  gene_count: 11841
+  growth_phases:
+  - exponential
+  - nutrient_limited
+  is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii HOT1A3
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_down_count: 548
+  significant_up_count: 518
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 3
+  time_point_growth_phases:
+  - exponential
+  - nutrient_limited
+  - nutrient_limited
+  time_point_hours:
+  - '264.0'
+  - '432.0'
+  - '744.0'
+  time_point_labels:
+  - day 11
+  - day 18
+  - day 31
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  time_point_significant_down:
+  - '163'
+  - '175'
+  - '210'
+  time_point_significant_up:
+  - '111'
+  - '179'
+  - '228'
+  time_point_totals:
+  - '3947'
+  - '3947'
+  - '3947'
+  treatment_type:
+  - coculture
 - authors:
   - Daniel Sher
   - Dikla Aharonovich
@@ -431,6 +492,60 @@ rows:
   - Dikla Aharonovich
   - Osnat Weissberg
   background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Alteromonas macleodii HOT1A3
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 1849
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
+  gene_count: 3698
+  growth_phases:
+  - exponential
+  - nutrient_limited
+  is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_down_count: 321
+  significant_up_count: 465
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 2
+  time_point_growth_phases:
+  - exponential
+  - nutrient_limited
+  time_point_hours:
+  - '264.0'
+  - '432.0'
+  time_point_labels:
+  - day 11
+  - day 18
+  time_point_orders:
+  - '1'
+  - '2'
+  time_point_significant_down:
+  - '3'
+  - '318'
+  time_point_significant_up:
+  - '406'
+  - '59'
+  time_point_totals:
+  - '1849'
+  - '1849'
+  treatment_type:
+  - coculture
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -563,6 +678,61 @@ rows:
   - '1424'
   - '1424'
   - '1424'
+  treatment_type:
+  - nitrogen
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 1849
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (RNASEQ)
+  gene_count: 3698
+  growth_phases:
+  - nutrient_limited
+  is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_down_count: 640
+  significant_up_count: 602
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 2
+  time_point_growth_phases:
+  - nutrient_limited
+  - nutrient_limited
+  time_point_hours:
+  - '-1.0'
+  - '336.0'
+  time_point_labels:
+  - day 14
+  - days 60+89
+  time_point_orders:
+  - '1'
+  - '2'
+  time_point_significant_down:
+  - '168'
+  - '472'
+  time_point_significant_up:
+  - '197'
+  - '405'
+  time_point_totals:
+  - '1849'
+  - '1849'
   treatment_type:
   - nitrogen
 - authors:

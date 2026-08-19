@@ -2,6 +2,42 @@ case_id: list_publications_all
 row_count: 43
 rows:
 - authors:
+  - J. Jeffrey Morris
+  - James Kizziah
+  - Steven J. Biller
+  - Sydney Plummer
+  - Zhiying Lu
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - exoproteome
+  - whole_cell
+  derived_metric_count: 6
+  derived_metric_value_kinds:
+  - boolean
+  discussed_gene_count: 2
+  discussed_pathway_count: 2
+  doi: 10.1128/aem.00798-26
+  experiment_count: 2
+  growth_phases: []
+  journal: Applied and Environmental Microbiology
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - EXOPROTEOMICS
+  - PROTEOMICS
+  organisms:
+  - Alteromonas macleodii EZ55
+  study_type: co-culture experiments with experimental evolution
+  title: Vesicle-associated exudates from Alteromonas enhance growth and survival
+    of Prochlorococcus in batch culture
+  treatment_types:
+  - compartment
+  year: 2026
+- authors:
   - James I. Mullet
   - Katelyn G. Jones
   - Kurt G. Castro
@@ -36,42 +72,6 @@ rows:
   title: Biofilm formation and dynamics in the marine cyanobacterium Prochlorococcus
   treatment_types:
   - growth_phase
-  year: 2025
-- authors:
-  - J. Jeffrey Morris
-  - James Kizziah
-  - Steven J. Biller
-  - Sydney Plummer
-  - Zhiying Lu
-  background_factors:
-  - axenic
-  cluster_types: []
-  clustering_analysis_count: 0
-  compartments:
-  - exoproteome
-  - whole_cell
-  derived_metric_count: 2
-  derived_metric_value_kinds:
-  - numeric
-  discussed_gene_count: 2
-  discussed_pathway_count: 1
-  doi: 10.1101/2025.05.28.656624
-  experiment_count: 2
-  growth_phases: []
-  journal: bioRxiv
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_types:
-  - EXOPROTEOMICS
-  - PROTEOMICS
-  organisms:
-  - Alteromonas macleodii EZ55
-  study_type: Proteomics; Microbial interactions; Vesicle analysis
-  title: Enzymatically active exudates from Alteromonas facilitate Prochlorococcus
-    survival in stationary phase
-  treatment_types:
-  - compartment
   year: 2025
 - authors:
   - Daniel Sher
@@ -954,6 +954,7 @@ rows:
   - Sallie W Chisholm
   - Steven J Biller
   background_factors:
+  - coculture
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -981,6 +982,7 @@ rows:
     Prochlorococcus'
   treatment_types:
   - coculture
+  - growth_phase
   year: 2016
 - authors:
   - Daniel Sher

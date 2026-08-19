@@ -233,8 +233,10 @@ class TestGeneOverviewCorrectnessKG:
         r = results[0]
         assert r["locus_tag"] == "PMM1428"
         assert set(r["annotation_types"]) >= {"go_mf", "pfam", "cog_category", "tigr_role"}
-        assert r["expression_edge_count"] == 35
-        assert r["significant_up_count"] + r["significant_down_count"] == 5
+        # 35 → 37 edges, 5 → 6 significant (verified live 2026-08-20):
+        # Weissberg 2025 added new contrasts touching this gene (up=4, down=2).
+        assert r["expression_edge_count"] == 37
+        assert r["significant_up_count"] + r["significant_down_count"] == 6
         # 14 → 20 after the 2026-05 KG rebuild added 6 Prochlorococcus strains,
         # all of which joined this gene's cyanorak ortholog group; 20 → 21 after
         # the 2026-06-13 rebuild added 2 more organisms.
@@ -639,15 +641,18 @@ class TestGenesByOntologyCorrectnessKG:
             min_gene_set_size=5,
             max_gene_set_size=500,
         )
-        # Verified 2026-04-14 against live KG.
-        assert r["total_matching"] == 410
-        assert r["total_genes"] == 332
+        # Verified 2026-04-14; recounted 2026-08-20: 410 → 429 rows,
+        # 332 → 349 genes (+17) after InterPro Layer-B GO enrichment added
+        # ~45K GO edges; term count unchanged (8), same +17 gene delta as
+        # test_mode1_mixed_levels L1 — Layer-B-consistent.
+        assert r["total_matching"] == 429
+        assert r["total_genes"] == 349
         assert r["total_terms"] == 8
         # by_level is a single entry at level 1
         assert len(r["by_level"]) == 1
         assert r["by_level"][0]["level"] == 1
-        assert r["by_level"][0]["n_genes"] == 332
-        assert r["by_level"][0]["row_count"] == 410
+        assert r["by_level"][0]["n_genes"] == 349
+        assert r["by_level"][0]["row_count"] == 429
         # All validation buckets empty (Mode 2)
         assert r["not_found"] == []
         assert r["wrong_ontology"] == []
@@ -663,11 +668,14 @@ class TestGenesByOntologyCorrectnessKG:
             min_gene_set_size=5,
             max_gene_set_size=2000,
         )
-        assert r["total_matching"] == 1068  # 1038 + 30
+        # 1068 → 1085 (verified live 2026-08-20): InterPro Layer-B GO
+        # enrichment grew L1 (cellular process) 1038 → 1055 (+17, matching
+        # the mode-2 gene delta); L6 (DNA replication) unchanged at 30.
+        assert r["total_matching"] == 1085  # 1055 + 30
         levels_in_result = {e["level"] for e in r["by_level"]}
         assert levels_in_result == {1, 6}
         by_level = {e["level"]: e for e in r["by_level"]}
-        assert by_level[1]["n_genes"] == 1038
+        assert by_level[1]["n_genes"] == 1055
         assert by_level[6]["n_genes"] == 30
 
     def test_mode3_wrong_level_bucket(self):

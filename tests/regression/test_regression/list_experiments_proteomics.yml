@@ -990,11 +990,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: null
   compartment: whole_cell
-  derived_metric_count: 1
+  derived_metric_count: 3
   derived_metric_value_kinds:
-  - numeric
+  - boolean
   distinct_gene_count: 0
-  experiment_id: 10.1101/2025.05.28.656624_ez55_whole_cell_proteome
+  experiment_id: 10.1128/aem.00798-26_ez55_whole_cell_proteome
   experiment_name: EZ55 whole-cell proteome (crude cell lysate)
   gene_count: 0
   growth_phases: []
@@ -1004,7 +1004,7 @@ rows:
   metabolite_count: 0
   omics_type: PROTEOMICS
   organism_name: Alteromonas macleodii EZ55
-  publication_doi: 10.1101/2025.05.28.656624
+  publication_doi: 10.1128/aem.00798-26
   significant_down_count: 0
   significant_up_count: 0
   table_scope: all_detected_genes

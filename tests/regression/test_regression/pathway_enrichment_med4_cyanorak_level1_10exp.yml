@@ -1,10 +1,10 @@
 by_direction:
 - direction: down
   n_significant: 16
-  n_tests: 1104
+  n_tests: 1171
 - direction: up
-  n_significant: 20
-  n_tests: 1104
+  n_significant: 26
+  n_tests: 1171
 by_experiment:
 - background_factors: null
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
@@ -31,9 +31,9 @@ by_experiment:
 - background_factors: null
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   is_time_course: null
-  n_clusters: 2
-  n_significant: 1
-  n_tests: 134
+  n_clusters: 4
+  n_significant: 7
+  n_tests: 268
   name: null
   omics_type: null
   table_scope: null
@@ -97,8 +97,8 @@ by_experiment:
 by_omics_type: []
 case_id: pathway_enrichment_med4_cyanorak_level1_10exp
 cluster_summary:
-  n_clusters: 36
-  n_significant_max: 5
+  n_clusters: 38
+  n_significant_max: 6
   n_significant_median: 0.5
   n_significant_min: 0
   n_tests_max: 67
@@ -136,9 +136,9 @@ enrichment_params:
   max_gene_set_size: 500
   min_gene_set_size: 5
   multitest_method: fdr_bh
-  n_clusters_input: 40
+  n_clusters_input: 42
   n_clusters_skipped: 4
-  n_clusters_tested: 36
+  n_clusters_tested: 38
   n_unique_terms: 106
   ontology: cyanorak_role
   organism: MED4
@@ -149,7 +149,7 @@ enrichment_params:
   timepoint_filter: null
   tree: null
 level: 1
-n_significant: 36
+n_significant: 42
 no_expression: []
 not_found: []
 not_matched: []
@@ -191,6 +191,40 @@ results:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- background_factors: null
+  bg_count: 61
+  bg_ratio: 61/1849
+  bg_ratio_numeric: 0.033
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 44
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 3.285
+  gene_category: Translation
+  gene_name: rimO
+  gene_ratio: 44/406
+  gene_ratio_numeric: 0.1084
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.0
+  product: ribosomal protein S12 methylthiotransferase
+  pvalue: 0.0
+  rich_factor: 0.7213
+  signed_score: 14.8578
+  table_scope: null
+  term_id: cyanorak.role:K.2
+  term_name: 'Protein synthesis > Ribosomal proteins: synthesis and modification'
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
 - background_factors: null
   bg_count: 27
   bg_ratio: 27/1424
@@ -396,6 +430,40 @@ results:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- background_factors: null
+  bg_count: 10
+  bg_ratio: 10/1849
+  bg_ratio_numeric: 0.0054
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 10
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 4.5542
+  gene_category: Photosynthesis
+  gene_name: atpB
+  gene_ratio: 10/406
+  gene_ratio_numeric: 0.0246
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.0
+  product: ATP synthase beta chain
+  pvalue: 0.0
+  rich_factor: 1.0
+  signed_score: 5.097
+  table_scope: null
+  term_id: cyanorak.role:J.1
+  term_name: Photosynthesis and respiration > ATP synthase
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
 - background_factors: null
   bg_count: 10
   bg_ratio: 10/1424
@@ -668,6 +736,74 @@ results:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- background_factors: null
+  bg_count: 17
+  bg_ratio: 17/1849
+  bg_ratio_numeric: 0.0092
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 12
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 3.2147
+  gene_category: Photosynthesis
+  gene_name: ycf3
+  gene_ratio: 12/406
+  gene_ratio_numeric: 0.0296
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.0005
+  product: photosystem I assembly protein Ycf3
+  pvalue: 0.0
+  rich_factor: 0.7059
+  signed_score: 3.2942
+  table_scope: null
+  term_id: cyanorak.role:J.7
+  term_name: Photosynthesis and respiration > Photosystem I
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 30
+  bg_ratio: 30/1849
+  bg_ratio_numeric: 0.0162
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 17
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 2.5807
+  gene_category: Photosynthesis
+  gene_name: psbX
+  gene_ratio: 17/406
+  gene_ratio_numeric: 0.0419
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.0005
+  product: photosystem II PsbX protein
+  pvalue: 0.0
+  rich_factor: 0.5667
+  signed_score: 3.2668
+  table_scope: null
+  term_id: cyanorak.role:J.8
+  term_name: Photosynthesis and respiration > Photosystem II
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
 - background_factors: null
   bg_count: 22
   bg_ratio: 22/1424
@@ -1112,6 +1248,40 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
+  bg_count: 21
+  bg_ratio: 21/1849
+  bg_ratio_numeric: 0.0114
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 11
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 2.3855
+  gene_category: Carbohydrate metabolism
+  gene_name: gap2
+  gene_ratio: 11/406
+  gene_ratio_numeric: 0.0271
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.0275
+  product: glyceraldehyde-3-phosphate dehydrogenase
+  pvalue: 0.0021
+  rich_factor: 0.5238
+  signed_score: 1.5606
+  table_scope: null
+  term_id: cyanorak.role:J.2
+  term_name: Photosynthesis and respiration > CO2 fixation
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
   bg_count: 168
   bg_ratio: 168/1424
   bg_ratio_numeric: 0.118
@@ -1283,6 +1453,40 @@ results:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- background_factors: null
+  bg_count: 48
+  bg_ratio: 48/1849
+  bg_ratio_numeric: 0.026
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 19
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.8027
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 19/406
+  gene_ratio_numeric: 0.0468
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.044
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 0.0039
+  rich_factor: 0.3958
+  signed_score: 1.357
+  table_scope: null
+  term_id: cyanorak.role:B.5
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
 - background_factors: null
   bg_count: 11
   bg_ratio: 11/1424
@@ -1728,6 +1932,74 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
+  bg_count: 18
+  bg_ratio: 18/1849
+  bg_ratio_numeric: 0.0097
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 9
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 2.9072
+  gene_category: Carbohydrate metabolism
+  gene_name: ndhO
+  gene_ratio: 9/318
+  gene_ratio_numeric: 0.0283
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.0901
+  product: NADH dehydrogenase I subunit NdhO
+  pvalue: 0.0013
+  rich_factor: 0.5
+  signed_score: -1.0453
+  table_scope: null
+  term_id: cyanorak.role:J.6
+  term_name: Photosynthesis and respiration > NADH dehydrogenase
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 10
+  bg_ratio: 10/1849
+  bg_ratio_numeric: 0.0054
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 6
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 2.7325
+  gene_category: Translation
+  gene_name: efp
+  gene_ratio: 6/406
+  gene_ratio_numeric: 0.0148
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.0967
+  product: translation elongation factor P
+  pvalue: 0.0101
+  rich_factor: 0.6
+  signed_score: 1.0148
+  table_scope: null
+  term_id: cyanorak.role:K.4
+  term_name: Protein synthesis > Translation factors
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
   bg_count: 14
   bg_ratio: 14/1424
   bg_ratio_numeric: 0.0098
@@ -1965,6 +2237,74 @@ results:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- background_factors: null
+  bg_count: 8
+  bg_ratio: 8/1849
+  bg_ratio_numeric: 0.0043
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 2.8464
+  gene_category: Regulatory functions
+  gene_name: pedR
+  gene_ratio: 5/406
+  gene_ratio_numeric: 0.0123
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.1294
+  product: redox-responsive LuxR-type transcriptional regulator PedR
+  pvalue: 0.0155
+  rich_factor: 0.625
+  signed_score: 0.888
+  table_scope: null
+  term_id: cyanorak.role:P.3
+  term_name: Transcription > Transcription factors
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 11
+  bg_ratio: 11/1849
+  bg_ratio_numeric: 0.0059
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 6
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 2.4841
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 6/406
+  gene_ratio_numeric: 0.0148
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.1352
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 0.0182
+  rich_factor: 0.5455
+  signed_score: 0.8691
+  table_scope: null
+  term_id: cyanorak.role:J.3
+  term_name: Photosynthesis and respiration > Cytochrome b6/f complex
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
 - background_factors: null
   bg_count: 22
   bg_ratio: 22/1424
@@ -3059,6 +3399,40 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
+  bg_count: 28
+  bg_ratio: 28/1849
+  bg_ratio_numeric: 0.0151
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 10
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.6265
+  gene_category: Stress response and adaptation
+  gene_name: grpE
+  gene_ratio: 10/406
+  gene_ratio_numeric: 0.0246
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.4478
+  product: chaperone protein GrpE
+  pvalue: 0.0668
+  rich_factor: 0.3571
+  signed_score: 0.3489
+  table_scope: null
+  term_id: cyanorak.role:L.3
+  term_name: Protein fate > Protein folding and stabilization
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
   bg_count: 6
   bg_ratio: 6/1849
   bg_ratio_numeric: 0.0032
@@ -3706,6 +4080,40 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
+  bg_count: 12
+  bg_ratio: 12/1849
+  bg_ratio_numeric: 0.0065
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.8976
+  gene_category: Amino acid metabolism
+  gene_name: sufS1
+  gene_ratio: 5/406
+  gene_ratio_numeric: 0.0123
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.6137
+  product: cysteine desulfurase / selenocysteine lyase
+  pvalue: 0.1008
+  rich_factor: 0.4167
+  signed_score: 0.2121
+  table_scope: null
+  term_id: cyanorak.role:E.7
+  term_name: Central intermediary metabolism > Sulfur metabolism
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
   bg_count: 28
   bg_ratio: 28/1849
   bg_ratio_numeric: 0.0151
@@ -4113,6 +4521,75 @@ results:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- background_factors: null
+  bg_count: 16
+  bg_ratio: 16/1849
+  bg_ratio_numeric: 0.0087
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 6
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.7078
+  gene_category: Amino acid metabolism
+  gene_name: PSTA
+  gene_ratio: 6/406
+  gene_ratio_numeric: 0.0148
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.6534
+  product: 3-phosphoserine transaminase
+  pvalue: 0.117
+  rich_factor: 0.375
+  signed_score: 0.1848
+  table_scope: null
+  term_id: cyanorak.role:A.6
+  term_name: Amino acid biosynthesis > Serine family (Ser, Gly, Cys)
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 20
+  bg_ratio: 20/1849
+  bg_ratio_numeric: 0.0108
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 7
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.594
+  gene_category: Amino acid metabolism
+  gene_name: aspA
+  gene_ratio: 7/406
+  gene_ratio_numeric: 0.0172
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.6592
+  product: aspartoacylase
+  pvalue: 0.1279
+  rich_factor: 0.35
+  signed_score: 0.181
+  table_scope: null
+  term_id: cyanorak.role:A.2
+  term_name: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile, Lys, Met,
+    Thr)
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
 - background_factors: null
   bg_count: 11
   bg_ratio: 11/1424
@@ -4967,6 +5444,74 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
+  bg_count: 14
+  bg_ratio: 14/1849
+  bg_ratio_numeric: 0.0076
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.6265
+  gene_category: Central intermediary metabolism
+  gene_name: ppx
+  gene_ratio: 5/406
+  gene_ratio_numeric: 0.0123
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.8171
+  product: exopolyphosphatase
+  pvalue: 0.1746
+  rich_factor: 0.3571
+  signed_score: 0.0877
+  table_scope: null
+  term_id: cyanorak.role:E.3
+  term_name: Central intermediary metabolism > Phosphorus metabolism
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/1849
+  bg_ratio_numeric: 0.0038
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 3
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.9518
+  gene_category: Transcription
+  gene_name: rpoZ
+  gene_ratio: 3/406
+  gene_ratio_numeric: 0.0074
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.8171
+  product: DNA-directed RNA polymerase omega subunit
+  pvalue: 0.1829
+  rich_factor: 0.4286
+  signed_score: 0.0877
+  table_scope: null
+  term_id: cyanorak.role:P.2
+  term_name: Transcription > DNA-dependent RNA polymerase
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
   bg_count: 15
   bg_ratio: 15/1849
   bg_ratio_numeric: 0.0081
@@ -5809,6 +6354,74 @@ results:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- background_factors: null
+  bg_count: 27
+  bg_ratio: 27/1849
+  bg_ratio_numeric: 0.0146
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 8
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.3494
+  gene_category: Carbohydrate metabolism
+  gene_name: pgmA2
+  gene_ratio: 8/406
+  gene_ratio_numeric: 0.0197
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.8867
+  product: phosphoglucomutase
+  pvalue: 0.225
+  rich_factor: 0.2963
+  signed_score: 0.0522
+  table_scope: null
+  term_id: cyanorak.role:G.8
+  term_name: Energy metabolism > Glycogen and sugar metabolism
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 23
+  bg_ratio: 23/1849
+  bg_ratio_numeric: 0.0124
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 7
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.3861
+  gene_category: Lipid metabolism
+  gene_name: accB
+  gene_ratio: 7/406
+  gene_ratio_numeric: 0.0172
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.8867
+  product: acetyl-CoA carboxylase, biotin carboxyl carrier protein
+  pvalue: 0.2248
+  rich_factor: 0.3043
+  signed_score: 0.0522
+  table_scope: null
+  term_id: cyanorak.role:H.2
+  term_name: Fatty acid, phospholipid and sterol metabolism > Fatty acid metabolism
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
 - background_factors: null
   bg_count: 27
   bg_ratio: 27/1849
@@ -6850,6 +7463,74 @@ results:
   treatment_type:
   - carbon
 - background_factors: null
+  bg_count: 20
+  bg_ratio: 20/1849
+  bg_ratio_numeric: 0.0108
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 7
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 2.0351
+  gene_category: Cell wall and membrane
+  gene_name: murB
+  gene_ratio: 7/318
+  gene_ratio_numeric: 0.022
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.9456
+  product: UDP-N-acetylenolpyruvoylglucosamine reductase
+  pvalue: 0.0423
+  rich_factor: 0.35
+  signed_score: -0.0243
+  table_scope: null
+  term_id: cyanorak.role:C.2
+  term_name: Cell envelope > Murein sacculus and peptidoglycan
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 44
+  bg_ratio: 44/1849
+  bg_ratio_numeric: 0.0238
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 13
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.7179
+  gene_category: Carbohydrate metabolism
+  gene_name: .nan
+  gene_ratio: 13/318
+  gene_ratio_numeric: 0.0409
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.9456
+  product: NADPH-dependent FMN reductase family protein
+  pvalue: 0.0286
+  rich_factor: 0.2955
+  signed_score: -0.0243
+  table_scope: null
+  term_id: cyanorak.role:G.2
+  term_name: Energy metabolism > Electron transport
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
   bg_count: 15
   bg_ratio: 15/1424
   bg_ratio_numeric: 0.0105
@@ -7636,6 +8317,40 @@ results:
   timepoint_order: 1
   treatment_type:
   - carbon
+- background_factors: null
+  bg_count: 16
+  bg_ratio: 16/1849
+  bg_ratio_numeric: 0.0087
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.4232
+  gene_category: Carbohydrate metabolism
+  gene_name: gap2
+  gene_ratio: 5/406
+  gene_ratio_numeric: 0.0123
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.9796
+  product: glyceraldehyde-3-phosphate dehydrogenase
+  pvalue: 0.2632
+  rich_factor: 0.3125
+  signed_score: 0.009
+  table_scope: null
+  term_id: cyanorak.role:G.4
+  term_name: Energy metabolism > Glycolysis/gluconeogenesis
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
 - background_factors: null
   bg_count: 11
   bg_ratio: 11/1424
@@ -20992,6 +21707,3869 @@ results:
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 15
+  bg_ratio: 15/1849
+  bg_ratio_numeric: 0.0081
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 2
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.7753
+  gene_category: Amino acid metabolism
+  gene_name: aroK
+  gene_ratio: 2/318
+  gene_ratio_numeric: 0.0063
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: shikimate kinase
+  pvalue: 0.7585
+  rich_factor: 0.1333
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:A.1
+  term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 20
+  bg_ratio: 20/1849
+  bg_ratio_numeric: 0.0108
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 0
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Amino acid metabolism
+  gene_name: aspA
+  gene_ratio: 0/318
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: aspartoacylase
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:A.2
+  term_name: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile, Lys, Met,
+    Thr)
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 16
+  bg_ratio: 16/1849
+  bg_ratio_numeric: 0.0087
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 2
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.7268
+  gene_category: Amino acid metabolism
+  gene_name: argH
+  gene_ratio: 2/318
+  gene_ratio_numeric: 0.0063
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: argininosuccinate lyase
+  pvalue: 0.7902
+  rich_factor: 0.125
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:A.3
+  term_name: Amino acid biosynthesis > Glutamate family (Arg, Gln, Glu, Pro)
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/1849
+  bg_ratio_numeric: 0.0032
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 1
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.9691
+  gene_category: Amino acid metabolism
+  gene_name: hisB
+  gene_ratio: 1/318
+  gene_ratio_numeric: 0.0031
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: imidazoleglycerol-phosphate dehydratase family protein
+  pvalue: 0.6783
+  rich_factor: 0.1667
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:A.4
+  term_name: Amino acid biosynthesis > Histidine family
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 16
+  bg_ratio: 16/1849
+  bg_ratio_numeric: 0.0087
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 2
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.7268
+  gene_category: Amino acid metabolism
+  gene_name: leuD
+  gene_ratio: 2/318
+  gene_ratio_numeric: 0.0063
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: 3-isopropylmalate dehydratase small subunit
+  pvalue: 0.7902
+  rich_factor: 0.125
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:A.5
+  term_name: Amino acid biosynthesis > Pyruvate family (Ala, Val, Leu)
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 16
+  bg_ratio: 16/1849
+  bg_ratio_numeric: 0.0087
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 2
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.7268
+  gene_category: Amino acid metabolism
+  gene_name: PSTA
+  gene_ratio: 2/318
+  gene_ratio_numeric: 0.0063
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: 3-phosphoserine transaminase
+  pvalue: 0.7902
+  rich_factor: 0.125
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:A.6
+  term_name: Amino acid biosynthesis > Serine family (Ser, Gly, Cys)
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 63
+  bg_ratio: 63/1849
+  bg_ratio_numeric: 0.0341
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 12
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.1075
+  gene_category: Coenzyme metabolism
+  gene_name: rsgA
+  gene_ratio: 12/318
+  gene_ratio_numeric: 0.0377
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ribosome biogenesis GTPase / thiamine phosphate phosphatase
+  pvalue: 0.398
+  rich_factor: 0.1905
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:B.10
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Vitamins
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 10
+  bg_ratio: 10/1849
+  bg_ratio_numeric: 0.0054
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 3
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.7443
+  gene_category: Coenzyme metabolism
+  gene_name: sufB
+  gene_ratio: 3/318
+  gene_ratio_numeric: 0.0094
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ABC transporter involved in Fe-S cluster assembly, permease component
+  pvalue: 0.2394
+  rich_factor: 0.3
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:B.11
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Other
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 14
+  bg_ratio: 14/1849
+  bg_ratio_numeric: 0.0076
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 4
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.6613
+  gene_category: Coenzyme metabolism
+  gene_name: .nan
+  gene_ratio: 4/318
+  gene_ratio_numeric: 0.0126
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  pvalue: 0.2092
+  rich_factor: 0.2857
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:B.2
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Plastoquinone,
+    menaquinone and ubiquinone
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 48
+  bg_ratio: 48/1849
+  bg_ratio_numeric: 0.026
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.6057
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 5/318
+  gene_ratio_numeric: 0.0157
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 0.9354
+  rich_factor: 0.1042
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:B.5
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 9
+  bg_ratio: 9/1849
+  bg_ratio_numeric: 0.0049
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 0
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Coenzyme metabolism
+  gene_name: nadB
+  gene_ratio: 0/318
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: L-aspartate oxidase
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:B.6
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pyridine
+    nucleotides (NAD, NADP)
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/1849
+  bg_ratio_numeric: 0.0032
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 1
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.9691
+  gene_category: Coenzyme metabolism
+  gene_name: ribD2
+  gene_ratio: 1/318
+  gene_ratio_numeric: 0.0031
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: 5-amino-6-(5-phosphoribosylamino)uracil reductase
+  pvalue: 0.6783
+  rich_factor: 0.1667
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:B.7
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Riboflavin,
+    FMN and FAD
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 16
+  bg_ratio: 16/1849
+  bg_ratio_numeric: 0.0087
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 2
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.7268
+  gene_category: Coenzyme metabolism
+  gene_name: gst
+  gene_ratio: 2/318
+  gene_ratio_numeric: 0.0063
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: glutathione S-transferase, rho class
+  pvalue: 0.7902
+  rich_factor: 0.125
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:B.9
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Thioredoxin,
+    glutaredoxin and glutathione
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 28
+  bg_ratio: 28/1849
+  bg_ratio_numeric: 0.0151
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 7
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.4536
+  gene_category: Cell wall and membrane
+  gene_name: .nan
+  gene_ratio: 7/318
+  gene_ratio_numeric: 0.022
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: lipid A disaccharide synthase family protein
+  pvalue: 0.1931
+  rich_factor: 0.25
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:C.3
+  term_name: Cell envelope > Surface polysaccharides and lipopolysaccharides
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 205
+  bg_ratio: 205/1849
+  bg_ratio_numeric: 0.1109
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 38
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.0778
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 38/318
+  gene_ratio_numeric: 0.1195
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 0.3251
+  rich_factor: 0.1854
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 17
+  bg_ratio: 17/1849
+  bg_ratio_numeric: 0.0092
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 2
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.6841
+  gene_category: Cell cycle and division
+  gene_name: smc
+  gene_ratio: 2/318
+  gene_ratio_numeric: 0.0063
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: chromosome segregation protein
+  pvalue: 0.8181
+  rich_factor: 0.1176
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:D.2
+  term_name: Cellular processes > Cell division
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 13
+  bg_ratio: 13/1849
+  bg_ratio_numeric: 0.007
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 1
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.4473
+  gene_category: Stress response and adaptation
+  gene_name: grpE
+  gene_ratio: 1/318
+  gene_ratio_numeric: 0.0031
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: chaperone protein GrpE
+  pvalue: 0.9148
+  rich_factor: 0.0769
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:D.4
+  term_name: Cellular processes > Chaperones
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/1849
+  bg_ratio_numeric: 0.0032
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 1
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.9691
+  gene_category: Cellular processes
+  gene_name: .nan
+  gene_ratio: 1/318
+  gene_ratio_numeric: 0.0031
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: polyketide cyclase / aromatase
+  pvalue: 0.6783
+  rich_factor: 0.1667
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:D.8
+  term_name: Cellular processes > Toxin production and resistance
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/1849
+  bg_ratio_numeric: 0.0038
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 1
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.8306
+  gene_category: Central intermediary metabolism
+  gene_name: cugP
+  gene_ratio: 1/318
+  gene_ratio_numeric: 0.0031
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: mannose-1-phosphate guanylyltransferase
+  pvalue: 0.7338
+  rich_factor: 0.1429
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:E.1
+  term_name: Central intermediary metabolism > Amino sugars
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 14
+  bg_ratio: 14/1849
+  bg_ratio_numeric: 0.0076
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 2
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.8306
+  gene_category: Central intermediary metabolism
+  gene_name: ppx
+  gene_ratio: 2/318
+  gene_ratio_numeric: 0.0063
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: exopolyphosphatase
+  pvalue: 0.7228
+  rich_factor: 0.1429
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:E.3
+  term_name: Central intermediary metabolism > Phosphorus metabolism
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 28
+  bg_ratio: 28/1849
+  bg_ratio_numeric: 0.0151
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 8
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.6613
+  gene_category: Stress response and adaptation
+  gene_name: ntcA
+  gene_ratio: 8/318
+  gene_ratio_numeric: 0.0252
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: global nitrogen regulatory protein
+  pvalue: 0.0928
+  rich_factor: 0.2857
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:E.4
+  term_name: Central intermediary metabolism > Nitrogen metabolism
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 12
+  bg_ratio: 12/1849
+  bg_ratio_numeric: 0.0065
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 2
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.9691
+  gene_category: Amino acid metabolism
+  gene_name: sufS1
+  gene_ratio: 2/318
+  gene_ratio_numeric: 0.0063
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: cysteine desulfurase / selenocysteine lyase
+  pvalue: 0.6381
+  rich_factor: 0.1667
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:E.7
+  term_name: Central intermediary metabolism > Sulfur metabolism
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 60
+  bg_ratio: 60/1849
+  bg_ratio_numeric: 0.0324
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 12
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.1629
+  gene_category: Replication and repair
+  gene_name: dnaN
+  gene_ratio: 12/318
+  gene_ratio_numeric: 0.0377
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: DNA polymerase III, beta subunit
+  pvalue: 0.33
+  rich_factor: 0.2
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:F.1
+  term_name: DNA metabolism > DNA replication, recombination, and repair
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/1849
+  bg_ratio_numeric: 0.0027
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 1
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.1629
+  gene_category: Replication and repair
+  gene_name: .nan
+  gene_ratio: 1/318
+  gene_ratio_numeric: 0.0031
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: putative restriction endonuclease
+  pvalue: 0.6112
+  rich_factor: 0.2
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:F.2
+  term_name: DNA metabolism > Restriction/modification
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/1849
+  bg_ratio_numeric: 0.0027
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 0
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Amino acid metabolism
+  gene_name: metK
+  gene_ratio: 0/318
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: methionine adenosyltransferase
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:G.1
+  term_name: Energy metabolism > Amino acids and amines (catabolism)
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 16
+  bg_ratio: 16/1849
+  bg_ratio_numeric: 0.0087
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 0
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Carbohydrate metabolism
+  gene_name: gap2
+  gene_ratio: 0/318
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: glyceraldehyde-3-phosphate dehydrogenase
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:G.4
+  term_name: Energy metabolism > Glycolysis/gluconeogenesis
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 16
+  bg_ratio: 16/1849
+  bg_ratio_numeric: 0.0087
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 3
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.0902
+  gene_category: Carbohydrate metabolism
+  gene_name: pgmA2
+  gene_ratio: 3/318
+  gene_ratio_numeric: 0.0094
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: phosphoglucomutase
+  pvalue: 0.5368
+  rich_factor: 0.1875
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:G.5
+  term_name: Energy metabolism > Pentose phosphate pathway
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 27
+  bg_ratio: 27/1849
+  bg_ratio_numeric: 0.0146
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 7
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.5075
+  gene_category: Carbohydrate metabolism
+  gene_name: pgmA2
+  gene_ratio: 7/318
+  gene_ratio_numeric: 0.022
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: phosphoglucomutase
+  pvalue: 0.168
+  rich_factor: 0.2593
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:G.8
+  term_name: Energy metabolism > Glycogen and sugar metabolism
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 9
+  bg_ratio: 9/1849
+  bg_ratio_numeric: 0.0049
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 2
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.2921
+  gene_category: Carbohydrate metabolism
+  gene_name: gltA
+  gene_ratio: 2/318
+  gene_ratio_numeric: 0.0063
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: citrate synthase
+  pvalue: 0.4754
+  rich_factor: 0.2222
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:G.9
+  term_name: Energy metabolism > TCA cycle
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 23
+  bg_ratio: 23/1849
+  bg_ratio_numeric: 0.0124
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 3
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.7584
+  gene_category: Lipid metabolism
+  gene_name: accB
+  gene_ratio: 3/318
+  gene_ratio_numeric: 0.0094
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: acetyl-CoA carboxylase, biotin carboxyl carrier protein
+  pvalue: 0.7843
+  rich_factor: 0.1304
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:H.2
+  term_name: Fatty acid, phospholipid and sterol metabolism > Fatty acid metabolism
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/1849
+  bg_ratio_numeric: 0.0027
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 0
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Lipid metabolism
+  gene_name: ggpP
+  gene_ratio: 0/318
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: glucosylglycerol 3-phosphatase
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:H.3
+  term_name: Fatty acid, phospholipid and sterol metabolism > Glycerolipid metabolism
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 10
+  bg_ratio: 10/1849
+  bg_ratio_numeric: 0.0054
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 0
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Photosynthesis
+  gene_name: atpB
+  gene_ratio: 0/318
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ATP synthase beta chain
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.1
+  term_name: Photosynthesis and respiration > ATP synthase
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 10
+  bg_ratio: 10/1849
+  bg_ratio_numeric: 0.0054
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 1
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.5814
+  gene_category: Carbohydrate metabolism
+  gene_name: flv1
+  gene_ratio: 1/318
+  gene_ratio_numeric: 0.0031
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: flavoprotein involved in Mehler reaction
+  pvalue: 0.8493
+  rich_factor: 0.1
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.10
+  term_name: Photosynthesis and respiration > Soluble electron carriers
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 21
+  bg_ratio: 21/1849
+  bg_ratio_numeric: 0.0114
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 2
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.5538
+  gene_category: Carbohydrate metabolism
+  gene_name: gap2
+  gene_ratio: 2/318
+  gene_ratio_numeric: 0.0063
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: glyceraldehyde-3-phosphate dehydrogenase
+  pvalue: 0.8994
+  rich_factor: 0.0952
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.2
+  term_name: Photosynthesis and respiration > CO2 fixation
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 11
+  bg_ratio: 11/1849
+  bg_ratio_numeric: 0.0059
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 0
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 0/318
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.3
+  term_name: Photosynthesis and respiration > Cytochrome b6/f complex
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 17
+  bg_ratio: 17/1849
+  bg_ratio_numeric: 0.0092
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 0
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Photosynthesis
+  gene_name: ycf3
+  gene_ratio: 0/318
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem I assembly protein Ycf3
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.7
+  term_name: Photosynthesis and respiration > Photosystem I
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 30
+  bg_ratio: 30/1849
+  bg_ratio_numeric: 0.0162
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 1
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.1938
+  gene_category: Photosynthesis
+  gene_name: psbX
+  gene_ratio: 1/318
+  gene_ratio_numeric: 0.0031
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem II PsbX protein
+  pvalue: 0.9967
+  rich_factor: 0.0333
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.8
+  term_name: Photosynthesis and respiration > Photosystem II
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 23
+  bg_ratio: 23/1849
+  bg_ratio_numeric: 0.0124
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 0
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Translation
+  gene_name: alaS
+  gene_ratio: 0/318
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: alanyl-tRNA synthetase
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:K.1
+  term_name: Protein synthesis > tRNA aminoacylation
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 61
+  bg_ratio: 61/1849
+  bg_ratio_numeric: 0.033
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 1
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0953
+  gene_category: Translation
+  gene_name: rimO
+  gene_ratio: 1/318
+  gene_ratio_numeric: 0.0031
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ribosomal protein S12 methylthiotransferase
+  pvalue: 1.0
+  rich_factor: 0.0164
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:K.2
+  term_name: 'Protein synthesis > Ribosomal proteins: synthesis and modification'
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 32
+  bg_ratio: 32/1849
+  bg_ratio_numeric: 0.0173
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.9085
+  gene_category: Translation
+  gene_name: queG
+  gene_ratio: 5/318
+  gene_ratio_numeric: 0.0157
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: epoxyqueuosine reductase
+  pvalue: 0.6673
+  rich_factor: 0.1562
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:K.3
+  term_name: Protein synthesis > tRNA and rRNA base modification
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 10
+  bg_ratio: 10/1849
+  bg_ratio_numeric: 0.0054
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 2
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.1629
+  gene_category: Translation
+  gene_name: efp
+  gene_ratio: 2/318
+  gene_ratio_numeric: 0.0063
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: translation elongation factor P
+  pvalue: 0.5344
+  rich_factor: 0.2
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:K.4
+  term_name: Protein synthesis > Translation factors
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 12
+  bg_ratio: 12/1849
+  bg_ratio_numeric: 0.0065
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 1
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.4845
+  gene_category: Post-translational modification
+  gene_name: ftsY
+  gene_ratio: 1/318
+  gene_ratio_numeric: 0.0031
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: signal recognition particle-docking protein FtsY
+  pvalue: 0.8969
+  rich_factor: 0.0833
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:L.1
+  term_name: Protein fate > Protein and peptide secretion and trafficking
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 13
+  bg_ratio: 13/1849
+  bg_ratio_numeric: 0.007
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 1
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.4473
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 1/318
+  gene_ratio_numeric: 0.0031
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 0.9148
+  rich_factor: 0.0769
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:L.2
+  term_name: Protein fate > Protein modification and repair
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 28
+  bg_ratio: 28/1849
+  bg_ratio_numeric: 0.0151
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 2
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.4153
+  gene_category: Stress response and adaptation
+  gene_name: grpE
+  gene_ratio: 2/318
+  gene_ratio_numeric: 0.0063
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: chaperone protein GrpE
+  pvalue: 0.9664
+  rich_factor: 0.0714
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:L.3
+  term_name: Protein fate > Protein folding and stabilization
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 22
+  bg_ratio: 22/1849
+  bg_ratio_numeric: 0.0119
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.3215
+  gene_category: Post-translational modification
+  gene_name: dap2
+  gene_ratio: 5/318
+  gene_ratio_numeric: 0.0157
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: prolyl oligopeptidase/peptidase S9-like domain containing protein
+  pvalue: 0.3237
+  rich_factor: 0.2273
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:L.4
+  term_name: Protein fate > Degradation of proteins, peptides, and glycopeptides
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/1849
+  bg_ratio_numeric: 0.0032
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 3
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 2.9072
+  gene_category: Replication and repair
+  gene_name: .nan
+  gene_ratio: 3/318
+  gene_ratio_numeric: 0.0094
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: HNH endonuclease family protein
+  pvalue: 0.0672
+  rich_factor: 0.5
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:M.1
+  term_name: Purines, pyrimidines, nucleosides, and nucleotides > 2^-Deoxyribonucleotide
+    metabolism
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/1849
+  bg_ratio_numeric: 0.0032
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 0
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Nucleotide metabolism
+  gene_name: gmk
+  gene_ratio: 0/318
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: guanylate kinase
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:M.2
+  term_name: Purines, pyrimidines, nucleosides, and nucleotides > Nucleotide and nucleoside
+    interconversions
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 24
+  bg_ratio: 24/1849
+  bg_ratio_numeric: 0.013
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.4536
+  gene_category: Nucleotide metabolism
+  gene_name: purL
+  gene_ratio: 6/318
+  gene_ratio_numeric: 0.0189
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: phosphoribosylformylglycinamidine synthase, synthetase domain
+  pvalue: 0.2196
+  rich_factor: 0.25
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:M.3
+  term_name: Purines, pyrimidines, nucleosides, and nucleotides > Purine ribonucleotide
+    biosynthesis
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 11
+  bg_ratio: 11/1849
+  bg_ratio_numeric: 0.0059
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 0
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Nucleotide metabolism
+  gene_name: ndk
+  gene_ratio: 0/318
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: nucleoside diphosphate kinase
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:M.4
+  term_name: Purines, pyrimidines, nucleosides, and nucleotides > Pyrimidine ribonucleotide
+    biosynthesis
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/1849
+  bg_ratio_numeric: 0.0027
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 2
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 2.3258
+  gene_category: Nucleotide metabolism
+  gene_name: nudF
+  gene_ratio: 2/318
+  gene_ratio_numeric: 0.0063
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ADP-ribose diphosphatase, NUDIX hydrolase superfamily
+  pvalue: 0.2064
+  rich_factor: 0.4
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:M.5
+  term_name: Purines, pyrimidines, nucleosides, and nucleotides > Salvage of nucleosides
+    and nucleotides
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 18
+  bg_ratio: 18/1849
+  bg_ratio_numeric: 0.0097
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 4
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.2921
+  gene_category: Photosynthesis
+  gene_name: rbcR
+  gene_ratio: 4/318
+  gene_ratio_numeric: 0.0126
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: possible RuBisCO operon transcriptional regulator
+  pvalue: 0.3756
+  rich_factor: 0.2222
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:N.1
+  term_name: Regulatory functions > DNA interactions
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/1849
+  bg_ratio_numeric: 0.0027
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 0
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Regulatory functions
+  gene_name: .nan
+  gene_ratio: 0/318
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: possible regulator of sodium-dependent bicarbonate transport
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:N.3
+  term_name: Regulatory functions > Protein interactions
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 12
+  bg_ratio: 12/1849
+  bg_ratio_numeric: 0.0065
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 1
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.4845
+  gene_category: Signal transduction
+  gene_name: rpaA
+  gene_ratio: 1/318
+  gene_ratio_numeric: 0.0031
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: two-component system response regulator RR class II (RRII)-CheY-OmpR
+  pvalue: 0.8969
+  rich_factor: 0.0833
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:O.1
+  term_name: Signal transduction > Two-component systems
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 9
+  bg_ratio: 9/1849
+  bg_ratio_numeric: 0.0049
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 1
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.6461
+  gene_category: Transcription
+  gene_name: rnhA
+  gene_ratio: 1/318
+  gene_ratio_numeric: 0.0031
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ribonuclease HI
+  pvalue: 0.8178
+  rich_factor: 0.1111
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:P.1
+  term_name: Transcription > Degradation of RNA
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/1849
+  bg_ratio_numeric: 0.0038
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 0
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Transcription
+  gene_name: rpoZ
+  gene_ratio: 0/318
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: DNA-directed RNA polymerase omega subunit
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:P.2
+  term_name: Transcription > DNA-dependent RNA polymerase
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 8
+  bg_ratio: 8/1849
+  bg_ratio_numeric: 0.0043
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 1
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.7268
+  gene_category: Regulatory functions
+  gene_name: pedR
+  gene_ratio: 1/318
+  gene_ratio_numeric: 0.0031
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: redox-responsive LuxR-type transcriptional regulator PedR
+  pvalue: 0.7797
+  rich_factor: 0.125
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:P.3
+  term_name: Transcription > Transcription factors
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 13
+  bg_ratio: 13/1849
+  bg_ratio_numeric: 0.007
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 4
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.7891
+  gene_category: Transcription
+  gene_name: pcnB
+  gene_ratio: 4/318
+  gene_ratio_numeric: 0.0126
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: tRNA nucleotidyltransferase (CCA-adding enzyme)
+  pvalue: 0.1713
+  rich_factor: 0.3077
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:P.4
+  term_name: Transcription > RNA processing
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 10
+  bg_ratio: 10/1849
+  bg_ratio_numeric: 0.0054
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 3
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.7443
+  gene_category: Transport
+  gene_name: ddpD
+  gene_ratio: 3/318
+  gene_ratio_numeric: 0.0094
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide/nickel ABC transport system, ATP-binding component
+  pvalue: 0.2394
+  rich_factor: 0.3
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.1
+  term_name: Transport and binding proteins > Amino acids, peptides and amines
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 9
+  bg_ratio: 9/1849
+  bg_ratio_numeric: 0.0049
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 1
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.6461
+  gene_category: Transport
+  gene_name: sul3
+  gene_ratio: 1/318
+  gene_ratio_numeric: 0.0031
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: sulfate transporter family protein
+  pvalue: 0.8178
+  rich_factor: 0.1111
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.2
+  term_name: Transport and binding proteins > Anions
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 23
+  bg_ratio: 23/1849
+  bg_ratio_numeric: 0.0124
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.5168
+  gene_category: Transport
+  gene_name: citT
+  gene_ratio: 6/318
+  gene_ratio_numeric: 0.0189
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: putative sodium/potassium/sulfate transporter, DASS family
+  pvalue: 0.1904
+  rich_factor: 0.2609
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.4
+  term_name: Transport and binding proteins > Cations and iron carrying compounds
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 12
+  bg_ratio: 12/1849
+  bg_ratio_numeric: 0.0065
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 2
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.9691
+  gene_category: Transport
+  gene_name: mcyH
+  gene_ratio: 2/318
+  gene_ratio_numeric: 0.0063
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ABC transporter, ATPase component
+  pvalue: 0.6381
+  rich_factor: 0.1667
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.7
+  term_name: Transport and binding proteins > Sugars
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/1849
+  bg_ratio_numeric: 0.0032
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 2
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.9382
+  gene_category: Transport
+  gene_name: ecfA1
+  gene_ratio: 2/318
+  gene_ratio_numeric: 0.0063
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: energy-coupling factor transport system ATP-binding protein
+  pvalue: 0.276
+  rich_factor: 0.3333
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.8
+  term_name: Transport and binding proteins > Other
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 14
+  bg_ratio: 14/1849
+  bg_ratio_numeric: 0.0076
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 3
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.246
+  gene_category: Lipid metabolism
+  gene_name: .nan
+  gene_ratio: 3/318
+  gene_ratio_numeric: 0.0094
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: putative 4^-phosphopantetheinyl transferase family domain protein
+  pvalue: 0.4424
+  rich_factor: 0.2143
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.9
+  term_name: Transport and binding proteins > Unknown substrate
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 56
+  bg_ratio: 56/1849
+  bg_ratio_numeric: 0.0303
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|down
+  count: 9
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.9345
+  gene_category: Carbohydrate metabolism
+  gene_name: .nan
+  gene_ratio: 9/318
+  gene_ratio_numeric: 0.0283
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: uncharacterized conserved NADP-binding domain-containing protein
+  pvalue: 0.646
+  rich_factor: 0.1607
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:R.3
+  term_name: Other > Enzymes of unknown specificity
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 15
+  bg_ratio: 15/1849
+  bg_ratio_numeric: 0.0081
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 3
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.9108
+  gene_category: Amino acid metabolism
+  gene_name: aroK
+  gene_ratio: 3/406
+  gene_ratio_numeric: 0.0074
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: shikimate kinase
+  pvalue: 0.6726
+  rich_factor: 0.2
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:A.1
+  term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 16
+  bg_ratio: 16/1849
+  bg_ratio_numeric: 0.0087
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 2
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.5693
+  gene_category: Amino acid metabolism
+  gene_name: argH
+  gene_ratio: 2/406
+  gene_ratio_numeric: 0.0049
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: argininosuccinate lyase
+  pvalue: 0.8968
+  rich_factor: 0.125
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:A.3
+  term_name: Amino acid biosynthesis > Glutamate family (Arg, Gln, Glu, Pro)
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/1849
+  bg_ratio_numeric: 0.0032
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 0
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Amino acid metabolism
+  gene_name: hisB
+  gene_ratio: 0/406
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: imidazoleglycerol-phosphate dehydratase family protein
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:A.4
+  term_name: Amino acid biosynthesis > Histidine family
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 16
+  bg_ratio: 16/1849
+  bg_ratio_numeric: 0.0087
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 4
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.1385
+  gene_category: Amino acid metabolism
+  gene_name: leuD
+  gene_ratio: 4/406
+  gene_ratio_numeric: 0.0099
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: 3-isopropylmalate dehydratase small subunit
+  pvalue: 0.4801
+  rich_factor: 0.25
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:A.5
+  term_name: Amino acid biosynthesis > Pyruvate family (Ala, Val, Leu)
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 63
+  bg_ratio: 63/1849
+  bg_ratio_numeric: 0.0341
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 7
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.506
+  gene_category: Coenzyme metabolism
+  gene_name: rsgA
+  gene_ratio: 7/406
+  gene_ratio_numeric: 0.0172
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ribosome biogenesis GTPase / thiamine phosphate phosphatase
+  pvalue: 0.9924
+  rich_factor: 0.1111
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:B.10
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Vitamins
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 10
+  bg_ratio: 10/1849
+  bg_ratio_numeric: 0.0054
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 2
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.9108
+  gene_category: Coenzyme metabolism
+  gene_name: sufB
+  gene_ratio: 2/406
+  gene_ratio_numeric: 0.0049
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ABC transporter involved in Fe-S cluster assembly, permease component
+  pvalue: 0.6811
+  rich_factor: 0.2
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:B.11
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Other
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 14
+  bg_ratio: 14/1849
+  bg_ratio_numeric: 0.0076
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 1
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.3253
+  gene_category: Coenzyme metabolism
+  gene_name: .nan
+  gene_ratio: 1/406
+  gene_ratio_numeric: 0.0025
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  pvalue: 0.9693
+  rich_factor: 0.0714
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:B.2
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Plastoquinone,
+    menaquinone and ubiquinone
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 9
+  bg_ratio: 9/1849
+  bg_ratio_numeric: 0.0049
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 0
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Coenzyme metabolism
+  gene_name: nadB
+  gene_ratio: 0/406
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: L-aspartate oxidase
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:B.6
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pyridine
+    nucleotides (NAD, NADP)
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/1849
+  bg_ratio_numeric: 0.0032
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 1
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.759
+  gene_category: Coenzyme metabolism
+  gene_name: ribD2
+  gene_ratio: 1/406
+  gene_ratio_numeric: 0.0025
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: 5-amino-6-(5-phosphoribosylamino)uracil reductase
+  pvalue: 0.7746
+  rich_factor: 0.1667
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:B.7
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Riboflavin,
+    FMN and FAD
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 16
+  bg_ratio: 16/1849
+  bg_ratio_numeric: 0.0087
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 1
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.2846
+  gene_category: Coenzyme metabolism
+  gene_name: gst
+  gene_ratio: 1/406
+  gene_ratio_numeric: 0.0025
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: glutathione S-transferase, rho class
+  pvalue: 0.9814
+  rich_factor: 0.0625
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:B.9
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Thioredoxin,
+    glutaredoxin and glutathione
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 20
+  bg_ratio: 20/1849
+  bg_ratio_numeric: 0.0108
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 0
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Cell wall and membrane
+  gene_name: murB
+  gene_ratio: 0/406
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: UDP-N-acetylenolpyruvoylglucosamine reductase
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:C.2
+  term_name: Cell envelope > Murein sacculus and peptidoglycan
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 28
+  bg_ratio: 28/1849
+  bg_ratio_numeric: 0.0151
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 3
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.4879
+  gene_category: Cell wall and membrane
+  gene_name: .nan
+  gene_ratio: 3/406
+  gene_ratio_numeric: 0.0074
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: lipid A disaccharide synthase family protein
+  pvalue: 0.9635
+  rich_factor: 0.1071
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:C.3
+  term_name: Cell envelope > Surface polysaccharides and lipopolysaccharides
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 205
+  bg_ratio: 205/1849
+  bg_ratio_numeric: 0.1109
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 45
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.9997
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 45/406
+  gene_ratio_numeric: 0.1108
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 0.5314
+  rich_factor: 0.2195
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 17
+  bg_ratio: 17/1849
+  bg_ratio_numeric: 0.0092
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 1
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.2679
+  gene_category: Cell cycle and division
+  gene_name: smc
+  gene_ratio: 1/406
+  gene_ratio_numeric: 0.0025
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: chromosome segregation protein
+  pvalue: 0.9855
+  rich_factor: 0.0588
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.2
+  term_name: Cellular processes > Cell division
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 13
+  bg_ratio: 13/1849
+  bg_ratio_numeric: 0.007
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 4
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.4013
+  gene_category: Stress response and adaptation
+  gene_name: grpE
+  gene_ratio: 4/406
+  gene_ratio_numeric: 0.0099
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: chaperone protein GrpE
+  pvalue: 0.3144
+  rich_factor: 0.3077
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.4
+  term_name: Cellular processes > Chaperones
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/1849
+  bg_ratio_numeric: 0.0032
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 2
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.5181
+  gene_category: Cellular processes
+  gene_name: .nan
+  gene_ratio: 2/406
+  gene_ratio_numeric: 0.0049
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: polyketide cyclase / aromatase
+  pvalue: 0.3927
+  rich_factor: 0.3333
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.8
+  term_name: Cellular processes > Toxin production and resistance
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/1849
+  bg_ratio_numeric: 0.0038
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 0
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Central intermediary metabolism
+  gene_name: cugP
+  gene_ratio: 0/406
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: mannose-1-phosphate guanylyltransferase
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:E.1
+  term_name: Central intermediary metabolism > Amino sugars
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 28
+  bg_ratio: 28/1849
+  bg_ratio_numeric: 0.0151
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 4
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.6506
+  gene_category: Stress response and adaptation
+  gene_name: ntcA
+  gene_ratio: 4/406
+  gene_ratio_numeric: 0.0099
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: global nitrogen regulatory protein
+  pvalue: 0.8938
+  rich_factor: 0.1429
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:E.4
+  term_name: Central intermediary metabolism > Nitrogen metabolism
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 60
+  bg_ratio: 60/1849
+  bg_ratio_numeric: 0.0324
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 8
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.6072
+  gene_category: Replication and repair
+  gene_name: dnaN
+  gene_ratio: 8/406
+  gene_ratio_numeric: 0.0197
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: DNA polymerase III, beta subunit
+  pvalue: 0.97
+  rich_factor: 0.1333
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:F.1
+  term_name: DNA metabolism > DNA replication, recombination, and repair
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/1849
+  bg_ratio_numeric: 0.0027
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 0
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Replication and repair
+  gene_name: .nan
+  gene_ratio: 0/406
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: putative restriction endonuclease
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:F.2
+  term_name: DNA metabolism > Restriction/modification
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/1849
+  bg_ratio_numeric: 0.0027
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 2
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.8217
+  gene_category: Amino acid metabolism
+  gene_name: metK
+  gene_ratio: 2/406
+  gene_ratio_numeric: 0.0049
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: methionine adenosyltransferase
+  pvalue: 0.3032
+  rich_factor: 0.4
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:G.1
+  term_name: Energy metabolism > Amino acids and amines (catabolism)
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 44
+  bg_ratio: 44/1849
+  bg_ratio_numeric: 0.0238
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 7
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.7245
+  gene_category: Carbohydrate metabolism
+  gene_name: .nan
+  gene_ratio: 7/406
+  gene_ratio_numeric: 0.0172
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: NADPH-dependent FMN reductase family protein
+  pvalue: 0.8812
+  rich_factor: 0.1591
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:G.2
+  term_name: Energy metabolism > Electron transport
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 16
+  bg_ratio: 16/1849
+  bg_ratio_numeric: 0.0087
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 4
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.1385
+  gene_category: Carbohydrate metabolism
+  gene_name: pgmA2
+  gene_ratio: 4/406
+  gene_ratio_numeric: 0.0099
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: phosphoglucomutase
+  pvalue: 0.4801
+  rich_factor: 0.25
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:G.5
+  term_name: Energy metabolism > Pentose phosphate pathway
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 9
+  bg_ratio: 9/1849
+  bg_ratio_numeric: 0.0049
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 1
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.506
+  gene_category: Carbohydrate metabolism
+  gene_name: gltA
+  gene_ratio: 1/406
+  gene_ratio_numeric: 0.0025
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: citrate synthase
+  pvalue: 0.8932
+  rich_factor: 0.1111
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:G.9
+  term_name: Energy metabolism > TCA cycle
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/1849
+  bg_ratio_numeric: 0.0027
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 0
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Lipid metabolism
+  gene_name: ggpP
+  gene_ratio: 0/406
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: glucosylglycerol 3-phosphatase
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:H.3
+  term_name: Fatty acid, phospholipid and sterol metabolism > Glycerolipid metabolism
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 10
+  bg_ratio: 10/1849
+  bg_ratio_numeric: 0.0054
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 3
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.3663
+  gene_category: Carbohydrate metabolism
+  gene_name: flv1
+  gene_ratio: 3/406
+  gene_ratio_numeric: 0.0074
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: flavoprotein involved in Mehler reaction
+  pvalue: 0.3818
+  rich_factor: 0.3
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:J.10
+  term_name: Photosynthesis and respiration > Soluble electron carriers
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 18
+  bg_ratio: 18/1849
+  bg_ratio_numeric: 0.0097
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 0
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Carbohydrate metabolism
+  gene_name: ndhO
+  gene_ratio: 0/406
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: NADH dehydrogenase I subunit NdhO
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:J.6
+  term_name: Photosynthesis and respiration > NADH dehydrogenase
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 23
+  bg_ratio: 23/1849
+  bg_ratio_numeric: 0.0124
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 1
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.198
+  gene_category: Translation
+  gene_name: alaS
+  gene_ratio: 1/406
+  gene_ratio_numeric: 0.0025
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: alanyl-tRNA synthetase
+  pvalue: 0.9968
+  rich_factor: 0.0435
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:K.1
+  term_name: Protein synthesis > tRNA aminoacylation
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 32
+  bg_ratio: 32/1849
+  bg_ratio_numeric: 0.0173
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 4
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.5693
+  gene_category: Translation
+  gene_name: queG
+  gene_ratio: 4/406
+  gene_ratio_numeric: 0.0099
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: epoxyqueuosine reductase
+  pvalue: 0.9442
+  rich_factor: 0.125
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:K.3
+  term_name: Protein synthesis > tRNA and rRNA base modification
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 12
+  bg_ratio: 12/1849
+  bg_ratio_numeric: 0.0065
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 3
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.1385
+  gene_category: Post-translational modification
+  gene_name: ftsY
+  gene_ratio: 3/406
+  gene_ratio_numeric: 0.0074
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: signal recognition particle-docking protein FtsY
+  pvalue: 0.5103
+  rich_factor: 0.25
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:L.1
+  term_name: Protein fate > Protein and peptide secretion and trafficking
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 13
+  bg_ratio: 13/1849
+  bg_ratio_numeric: 0.007
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 2
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.7006
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 2/406
+  gene_ratio_numeric: 0.0049
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 0.8154
+  rich_factor: 0.1538
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:L.2
+  term_name: Protein fate > Protein modification and repair
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 22
+  bg_ratio: 22/1849
+  bg_ratio_numeric: 0.0119
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 4
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.828
+  gene_category: Post-translational modification
+  gene_name: dap2
+  gene_ratio: 4/406
+  gene_ratio_numeric: 0.0099
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: prolyl oligopeptidase/peptidase S9-like domain containing protein
+  pvalue: 0.7458
+  rich_factor: 0.1818
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:L.4
+  term_name: Protein fate > Degradation of proteins, peptides, and glycopeptides
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/1849
+  bg_ratio_numeric: 0.0032
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 1
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.759
+  gene_category: Replication and repair
+  gene_name: .nan
+  gene_ratio: 1/406
+  gene_ratio_numeric: 0.0025
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: HNH endonuclease family protein
+  pvalue: 0.7746
+  rich_factor: 0.1667
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:M.1
+  term_name: Purines, pyrimidines, nucleosides, and nucleotides > 2^-Deoxyribonucleotide
+    metabolism
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/1849
+  bg_ratio_numeric: 0.0032
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 0
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Nucleotide metabolism
+  gene_name: gmk
+  gene_ratio: 0/406
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: guanylate kinase
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:M.2
+  term_name: Purines, pyrimidines, nucleosides, and nucleotides > Nucleotide and nucleoside
+    interconversions
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 24
+  bg_ratio: 24/1849
+  bg_ratio_numeric: 0.013
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.9488
+  gene_category: Nucleotide metabolism
+  gene_name: purL
+  gene_ratio: 5/406
+  gene_ratio_numeric: 0.0123
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: phosphoribosylformylglycinamidine synthase, synthetase domain
+  pvalue: 0.6332
+  rich_factor: 0.2083
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:M.3
+  term_name: Purines, pyrimidines, nucleosides, and nucleotides > Purine ribonucleotide
+    biosynthesis
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 11
+  bg_ratio: 11/1849
+  bg_ratio_numeric: 0.0059
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 2
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.828
+  gene_category: Nucleotide metabolism
+  gene_name: ndk
+  gene_ratio: 2/406
+  gene_ratio_numeric: 0.0049
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: nucleoside diphosphate kinase
+  pvalue: 0.733
+  rich_factor: 0.1818
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:M.4
+  term_name: Purines, pyrimidines, nucleosides, and nucleotides > Pyrimidine ribonucleotide
+    biosynthesis
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/1849
+  bg_ratio_numeric: 0.0027
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 1
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.9108
+  gene_category: Nucleotide metabolism
+  gene_name: nudF
+  gene_ratio: 1/406
+  gene_ratio_numeric: 0.0025
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ADP-ribose diphosphatase, NUDIX hydrolase superfamily
+  pvalue: 0.7109
+  rich_factor: 0.2
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:M.5
+  term_name: Purines, pyrimidines, nucleosides, and nucleotides > Salvage of nucleosides
+    and nucleotides
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 18
+  bg_ratio: 18/1849
+  bg_ratio_numeric: 0.0097
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 1
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.253
+  gene_category: Photosynthesis
+  gene_name: rbcR
+  gene_ratio: 1/406
+  gene_ratio_numeric: 0.0025
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: possible RuBisCO operon transcriptional regulator
+  pvalue: 0.9887
+  rich_factor: 0.0556
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:N.1
+  term_name: Regulatory functions > DNA interactions
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/1849
+  bg_ratio_numeric: 0.0027
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 1
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.9108
+  gene_category: Regulatory functions
+  gene_name: .nan
+  gene_ratio: 1/406
+  gene_ratio_numeric: 0.0025
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: possible regulator of sodium-dependent bicarbonate transport
+  pvalue: 0.7109
+  rich_factor: 0.2
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:N.3
+  term_name: Regulatory functions > Protein interactions
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 12
+  bg_ratio: 12/1849
+  bg_ratio_numeric: 0.0065
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 3
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.1385
+  gene_category: Signal transduction
+  gene_name: rpaA
+  gene_ratio: 3/406
+  gene_ratio_numeric: 0.0074
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: two-component system response regulator RR class II (RRII)-CheY-OmpR
+  pvalue: 0.5103
+  rich_factor: 0.25
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:O.1
+  term_name: Signal transduction > Two-component systems
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 9
+  bg_ratio: 9/1849
+  bg_ratio_numeric: 0.0049
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 2
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.012
+  gene_category: Transcription
+  gene_name: rnhA
+  gene_ratio: 2/406
+  gene_ratio_numeric: 0.0049
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ribonuclease HI
+  pvalue: 0.6212
+  rich_factor: 0.2222
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:P.1
+  term_name: Transcription > Degradation of RNA
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 13
+  bg_ratio: 13/1849
+  bg_ratio_numeric: 0.007
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 3
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.051
+  gene_category: Transcription
+  gene_name: pcnB
+  gene_ratio: 3/406
+  gene_ratio_numeric: 0.0074
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: tRNA nucleotidyltransferase (CCA-adding enzyme)
+  pvalue: 0.5691
+  rich_factor: 0.2308
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:P.4
+  term_name: Transcription > RNA processing
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 10
+  bg_ratio: 10/1849
+  bg_ratio_numeric: 0.0054
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 0
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Transport
+  gene_name: ddpD
+  gene_ratio: 0/406
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide/nickel ABC transport system, ATP-binding component
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.1
+  term_name: Transport and binding proteins > Amino acids, peptides and amines
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 9
+  bg_ratio: 9/1849
+  bg_ratio_numeric: 0.0049
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 3
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.5181
+  gene_category: Transport
+  gene_name: sul3
+  gene_ratio: 3/406
+  gene_ratio_numeric: 0.0074
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: sulfate transporter family protein
+  pvalue: 0.3144
+  rich_factor: 0.3333
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.2
+  term_name: Transport and binding proteins > Anions
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 23
+  bg_ratio: 23/1849
+  bg_ratio_numeric: 0.0124
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 2
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.396
+  gene_category: Transport
+  gene_name: citT
+  gene_ratio: 2/406
+  gene_ratio_numeric: 0.0049
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: putative sodium/potassium/sulfate transporter, DASS family
+  pvalue: 0.9757
+  rich_factor: 0.087
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.4
+  term_name: Transport and binding proteins > Cations and iron carrying compounds
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 12
+  bg_ratio: 12/1849
+  bg_ratio_numeric: 0.0065
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 0
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Transport
+  gene_name: mcyH
+  gene_ratio: 0/406
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ABC transporter, ATPase component
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.7
+  term_name: Transport and binding proteins > Sugars
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/1849
+  bg_ratio_numeric: 0.0032
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 0
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.0
+  gene_category: Transport
+  gene_name: ecfA1
+  gene_ratio: 0/406
+  gene_ratio_numeric: 0.0
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: energy-coupling factor transport system ATP-binding protein
+  pvalue: 1.0
+  rich_factor: 0.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.8
+  term_name: Transport and binding proteins > Other
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 14
+  bg_ratio: 14/1849
+  bg_ratio_numeric: 0.0076
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 3
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.9759
+  gene_category: Lipid metabolism
+  gene_name: .nan
+  gene_ratio: 3/406
+  gene_ratio_numeric: 0.0074
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: putative 4^-phosphopantetheinyl transferase family domain protein
+  pvalue: 0.6233
+  rich_factor: 0.2143
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.9
+  term_name: Transport and binding proteins > Unknown substrate
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 56
+  bg_ratio: 56/1849
+  bg_ratio_numeric: 0.0303
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 0.4066
+  gene_category: Carbohydrate metabolism
+  gene_name: .nan
+  gene_ratio: 5/406
+  gene_ratio_numeric: 0.0123
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: uncharacterized conserved NADP-binding domain-containing protein
+  pvalue: 0.9974
+  rich_factor: 0.0893
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.3
+  term_name: Other > Enzymes of unknown specificity
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
   treatment_type:
   - coculture
 - background_factors: null
@@ -75465,8 +80043,8 @@ results:
   timepoint_order: 1
   treatment_type:
   - carbon
-returned: 2208
-row_count: 2208
+returned: 2342
+row_count: 2342
 term_validation:
   filtered_out: []
   not_found: []
@@ -75491,6 +80069,24 @@ top_clusters_by_min_padj:
   treatment_type:
   - nitrogen
   universe_size: 1424
+- background_factors: null
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  is_time_course: null
+  min_padj: 1.3872803221176627e-15
+  n_significant: 6
+  n_tests: 67
+  name: null
+  omics_type: null
+  table_scope: null
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+  universe_size: 1849
 - background_factors: null
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
     18|up
@@ -75545,29 +80141,17 @@ top_clusters_by_min_padj:
   treatment_type:
   - nitrogen
   universe_size: 1424
-- background_factors: null
-  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
-    60|up
-  direction: up
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  is_time_course: null
-  min_padj: 1.9026460875665353e-08
-  n_significant: 5
-  n_tests: 64
-  name: null
-  omics_type: null
-  table_scope: null
-  timepoint: day 60
-  timepoint_hours: 1440.0
-  timepoint_order: 3
-  treatment_type:
-  - nitrogen
-  universe_size: 1424
 top_pathways_by_padj:
 - cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
     31|down
   p_adjust: 2.835683142790077e-23
   signed_score: -22.5473422985333
+  term_id: cyanorak.role:K.2
+  term_name: 'Protein synthesis > Ribosomal proteins: synthesis and modification'
+- cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  p_adjust: 1.3872803221176627e-15
+  signed_score: 14.857835773931736
   term_id: cyanorak.role:K.2
   term_name: 'Protein synthesis > Ribosomal proteins: synthesis and modification'
 - cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
@@ -75607,23 +80191,17 @@ top_pathways_by_padj:
   term_id: cyanorak.role:D.1
   term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
     detoxification
+- cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  p_adjust: 7.998486878022056e-06
+  signed_score: 5.096992163342952
+  term_id: cyanorak.role:J.1
+  term_name: Photosynthesis and respiration > ATP synthase
 - cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
     31|up
   p_adjust: 4.604514658271464e-05
   signed_score: 4.336816140134432
   term_id: cyanorak.role:Q.1
   term_name: Transport and binding proteins > Amino acids, peptides and amines
-- cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
-    18|up
-  p_adjust: 4.943349164841224e-05
-  signed_score: 4.305978712823005
-  term_id: cyanorak.role:Q.1
-  term_name: Transport and binding proteins > Amino acids, peptides and amines
-- cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
-    11|up
-  p_adjust: 8.397322427465294e-05
-  signed_score: 4.0758591711227785
-  term_id: cyanorak.role:E.4
-  term_name: Central intermediary metabolism > Nitrogen metabolism
-total_matching: 2208
+total_matching: 2342
 truncated: false

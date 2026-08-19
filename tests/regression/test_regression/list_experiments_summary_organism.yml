@@ -24,7 +24,7 @@ rows:
   - '{''count'': 3, ''item'': ''acclimated_steady_state''}'
   - '{''count'': 4, ''item'': ''infected''}'
   - '{''count'': 5, ''item'': ''exponential''}'
-  - '{''count'': 7, ''item'': ''nutrient_limited''}'
+  - '{''count'': 8, ''item'': ''nutrient_limited''}'
   by_metric_type:
   - '{''count'': 1, ''item'': ''damping_ratio''}'
   - '{''count'': 1, ''item'': ''diel_amplitude_protein_log2''}'
@@ -93,5 +93,5 @@ rows:
   - '{''count'': 3, ''item'': ''boolean''}'
   - '{''count'': 3, ''item'': ''numeric''}'
   - '{''count'': 4, ''item'': ''categorical''}'
-  time_course_count: 12
+  time_course_count: 14
   total_matching: 41

@@ -21,7 +21,15 @@ rows:
   - '[eggnog] Acts as a processive, ATP-dependent zinc metallopeptidase for both cytoplasmic
     and membrane proteins. Plays a role in the quality control of integral membrane
     proteins'
+  - '[hamap] ATP-dependent zinc metalloprotease FtsH [ftsH].'
+  - '[interpro] AAA ATPase, AAA+ lid domain'
+  - '[interpro] AAA+ ATPase domain'
+  - '[interpro] ATP-dependent zinc metalloprotease, FtsH'
+  - '[interpro] ATPase, AAA-type, core'
+  - '[interpro] Peptidase M41'
+  - '[interpro] Peptidase M41, FtsH extracellular'
   - '[ncbi] ATP-dependent zinc metalloprotease FtsH3'
+  - '[ncbifam] ATP-dependent zinc metalloprotease FtsH'
   - '[pfam] AAA: ATPase family associated with various cellular activities (AAA)'
   - '[pfam] AAA_lid_3: AAA+ lid domain'
   - '[pfam] FtsH_ext: FtsH Extracellular'
@@ -41,11 +49,15 @@ rows:
   - go_bp
   - go_cc
   - go_mf
+  - interpro
   - kegg
+  - ncbifam
   - pfam
+  - tcdb
   - tigr_role
   boolean_metric_count: 0
   boolean_metric_types_observed: []
+  catalyzed_metabolite_count: 0
   categorical_metric_count: 0
   categorical_metric_types_observed: []
   cazy_family_count: 0
@@ -60,9 +72,12 @@ rows:
   contributing_sources:
   - cyanorak
   - eggnog
+  - interproscan
+  - merops_diamond
   - ncbi
   - psortb
   - signalp
+  - tcdb_diamond
   - uniprot
   discussed_in_publication_count: 0
   end: 304589
@@ -89,10 +104,16 @@ rows:
   - go_cc
   - go_mf
   - kegg
+  - ncbifam
   - pfam
   - tigr_role
+  - transporter
+  interpro_entry_count: 9
   locus_tag: SYNW0305
-  metabolite_count: 0
+  merops_classes:
+  - peptidase
+  merops_family_count: 1
+  ncbifam_family_count: 1
   numeric_metric_count: 0
   numeric_metric_types_observed: []
   organism_name: Synechococcus WH8102
@@ -109,4 +130,7 @@ rows:
   start: 302742
   strand: +
   subcellular_localization: CytoplasmicMembrane
-  tcdb_family_count: 0
+  tcdb_evidence_score_max: 0.2
+  tcdb_family_count: 3
+  transport_substrate_resolution: resolved
+  transported_metabolite_count: 2

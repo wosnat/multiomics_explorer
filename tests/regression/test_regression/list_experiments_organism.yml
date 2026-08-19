@@ -16,34 +16,42 @@ rows:
   distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
-  gene_count: 1849
+  gene_count: 3698
   growth_phases:
   - exponential
-  is_time_course: 'false'
+  - nutrient_limited
+  is_time_course: 'true'
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 3
-  significant_up_count: 59
+  significant_down_count: 321
+  significant_up_count: 465
   table_scope: all_detected_genes
   table_scope_detail: ''
-  time_point_count: 1
+  time_point_count: 2
   time_point_growth_phases:
   - exponential
+  - nutrient_limited
   time_point_hours:
   - '264.0'
+  - '432.0'
   time_point_labels:
   - day 11
+  - day 18
   time_point_orders:
   - '1'
+  - '2'
   time_point_significant_down:
   - '3'
+  - '318'
   time_point_significant_up:
+  - '406'
   - '59'
   time_point_totals:
+  - '1849'
   - '1849'
   treatment_type:
   - coculture
@@ -279,34 +287,41 @@ rows:
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (RNASEQ)
-  gene_count: 1849
+  gene_count: 3698
   growth_phases:
   - nutrient_limited
-  is_time_course: 'false'
+  is_time_course: 'true'
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 472
-  significant_up_count: 405
+  significant_down_count: 640
+  significant_up_count: 602
   table_scope: all_detected_genes
   table_scope_detail: ''
-  time_point_count: 1
+  time_point_count: 2
   time_point_growth_phases:
   - nutrient_limited
+  - nutrient_limited
   time_point_hours:
+  - '-1.0'
   - '336.0'
   time_point_labels:
   - day 14
+  - days 60+89
   time_point_orders:
   - '1'
+  - '2'
   time_point_significant_down:
+  - '168'
   - '472'
   time_point_significant_up:
+  - '197'
   - '405'
   time_point_totals:
+  - '1849'
   - '1849'
   treatment_type:
   - nitrogen

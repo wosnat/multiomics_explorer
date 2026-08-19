@@ -8,7 +8,7 @@ by_category:
 - category: Unknown
   count: 77
 - category: Amino acid metabolism
-  count: 72
+  count: 73
 - category: Cell wall and membrane
   count: 60
 - category: Carbohydrate metabolism
@@ -16,7 +16,7 @@ by_category:
 - category: Replication and repair
   count: 51
 - category: Transport
-  count: 43
+  count: 44
 - category: Post-translational modification
   count: 38
 - category: Nucleotide metabolism
@@ -25,12 +25,12 @@ by_category:
   count: 25
 - category: Photosynthesis
   count: 19
+- category: Central intermediary metabolism
+  count: 18
 - category: Lipid metabolism
   count: 17
-- category: Central intermediary metabolism
-  count: 17
 - category: Regulatory functions
-  count: 12
+  count: 13
 - category: Cell cycle and division
   count: 11
 - category: Cellular processes
@@ -49,12 +49,12 @@ by_category:
   count: 1
 by_level:
 - level: 0
-  n_genes: 864
-  n_terms: 77
-  row_count: 1063
+  n_genes: 868
+  n_terms: 78
+  row_count: 1081
 case_id: genes_by_ontology_pfam_clans
 filtered_out: []
-genes_per_term_max: 146
+genes_per_term_max: 148
 genes_per_term_median: 7.0
 genes_per_term_min: 5
 n_best_effort_terms: 0
@@ -135,6 +135,14 @@ results:
   product: UDP-N-acetylmuramate-alanine ligase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Cell wall and membrane
+  gene_name: murC
+  is_informative: true
+  level: 0
+  locus_tag: PMM0022
+  product: UDP-N-acetylmuramate-alanine ligase
+  term_id: pfam.clan:CL0794
+  term_name: Mur_ligase_C_sf
 - gene_category: Carbohydrate metabolism
   gene_name: gap2
   is_informative: true
@@ -1367,6 +1375,14 @@ results:
   level: 0
   locus_tag: PMM0262
   product: sugar fermentation stimulation protein
+  term_id: pfam.clan:CL0021
+  term_name: OB
+- gene_category: Energy production
+  gene_name: sfsA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0262
+  product: sugar fermentation stimulation protein
   term_id: pfam.clan:CL0236
   term_name: PDDEXK
 - gene_category: Unknown
@@ -1505,6 +1521,14 @@ results:
   product: protoporphyrin IX Mg-chelatase, subunit ChlD
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Coenzyme metabolism
+  gene_name: chlD
+  is_informative: true
+  level: 0
+  locus_tag: PMM0288
+  product: protoporphyrin IX Mg-chelatase, subunit ChlD
+  term_id: pfam.clan:CL0671
+  term_name: AAA_lid
 - gene_category: Transport
   gene_name: mkl
   is_informative: true
@@ -1593,6 +1617,14 @@ results:
   product: 30S ribosomal protein S1
   term_id: pfam.clan:CL0021
   term_name: OB
+- gene_category: Regulatory functions
+  gene_name: nrdR
+  is_informative: true
+  level: 0
+  locus_tag: PMM0313
+  product: transcriptional regulator, NrdR family
+  term_id: pfam.clan:CL0167
+  term_name: Zn_Beta_Ribbon
 - gene_category: Stress response and adaptation
   gene_name: petF
   is_informative: true
@@ -1802,6 +1834,14 @@ results:
   product: cyanate ABC transporter ATP-binding protein
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Central intermediary metabolism
+  gene_name: cynS
+  is_informative: true
+  level: 0
+  locus_tag: PMM0373
+  product: cyanate hydratase
+  term_id: pfam.clan:CL0123
+  term_name: HTH
 - gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -1997,6 +2037,14 @@ results:
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Cell wall and membrane
+  gene_name: murE
+  is_informative: true
+  level: 0
+  locus_tag: PMM0413
+  product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
+  term_id: pfam.clan:CL0794
+  term_name: Mur_ligase_C_sf
 - gene_category: Lipid metabolism
   gene_name: null
   is_informative: true
@@ -3017,6 +3065,14 @@ results:
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
 - gene_category: Cell wall and membrane
+  gene_name: murF
+  is_informative: true
+  level: 0
+  locus_tag: PMM0610
+  product: UDP-N-acetylmuramoyl-tripeptide--D-alanyl-D-alanine ligase
+  term_id: pfam.clan:CL0794
+  term_name: Mur_ligase_C_sf
+- gene_category: Cell wall and membrane
   gene_name: glmU
   is_informative: true
   level: 0
@@ -3603,6 +3659,14 @@ results:
   term_id: pfam.clan:CL0010
   term_name: SH3
 - gene_category: Transport
+  gene_name: devB
+  is_informative: true
+  level: 0
+  locus_tag: PMM0748
+  product: ABC exporter membrane fusion, DevB family
+  term_id: pfam.clan:CL0105
+  term_name: Hybrid
+- gene_category: Transport
   gene_name: devC
   is_informative: true
   level: 0
@@ -3738,6 +3802,14 @@ results:
   product: 6-phosphogluconolactonase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- gene_category: Amino acid metabolism
+  gene_name: ilvD
+  is_informative: true
+  level: 0
+  locus_tag: PMM0774
+  product: dihydroxy-acid dehydratase
+  term_id: pfam.clan:CL0364
+  term_name: Leu-IlvD
 - gene_category: Transport
   gene_name: upp
   is_informative: true
@@ -3795,6 +3867,14 @@ results:
   product: acetyl-CoA carboxylase, carboxyl transferase beta subunit
   term_id: pfam.clan:CL0127
   term_name: ClpP_crotonase
+- gene_category: Lipid metabolism
+  gene_name: accD
+  is_informative: true
+  level: 0
+  locus_tag: PMM0784
+  product: acetyl-CoA carboxylase, carboxyl transferase beta subunit
+  term_id: pfam.clan:CL0167
+  term_name: Zn_Beta_Ribbon
 - gene_category: Carbohydrate metabolism
   gene_name: prkB
   is_informative: true
@@ -4188,6 +4268,14 @@ results:
   product: phenylalanine--tRNA ligase, beta subunit
   term_id: pfam.clan:CL0021
   term_name: OB
+- gene_category: Translation
+  gene_name: pheT
+  is_informative: true
+  level: 0
+  locus_tag: PMM0871
+  product: phenylalanine--tRNA ligase, beta subunit
+  term_id: pfam.clan:CL0040
+  term_name: tRNA_synt_II
 - gene_category: Translation
   gene_name: pheT
   is_informative: true
@@ -4826,6 +4914,22 @@ results:
   level: 0
   locus_tag: PMM1004
   product: formate-dependent phosphoribosyl glycinamide formyl transferase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Nucleotide metabolism
+  gene_name: purT
+  is_informative: true
+  level: 0
+  locus_tag: PMM1004
+  product: formate-dependent phosphoribosyl glycinamide formyl transferase
+  term_id: pfam.clan:CL0105
+  term_name: Hybrid
+- gene_category: Nucleotide metabolism
+  gene_name: purT
+  is_informative: true
+  level: 0
+  locus_tag: PMM1004
+  product: formate-dependent phosphoribosyl glycinamide formyl transferase
   term_id: pfam.clan:CL0179
   term_name: ATP-grasp
 - gene_category: Coenzyme metabolism
@@ -5254,7 +5358,7 @@ results:
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
 - gene_category: Unknown
-  gene_name: null
+  gene_name: trhO
   is_informative: true
   level: 0
   locus_tag: PMM1094
@@ -6545,6 +6649,14 @@ results:
   product: bifunctional dihydrofolate synthase / folylpolyglutamate synthase
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Coenzyme metabolism
+  gene_name: folC
+  is_informative: true
+  level: 0
+  locus_tag: PMM1302
+  product: bifunctional dihydrofolate synthase / folylpolyglutamate synthase
+  term_id: pfam.clan:CL0794
+  term_name: Mur_ligase_C_sf
 - gene_category: Amino acid metabolism
   gene_name: codA
   is_informative: true
@@ -6865,6 +6977,22 @@ results:
   product: UDP-N-acetylmuramoylalanine--D-glutamate ligase
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- gene_category: Cell wall and membrane
+  gene_name: murD
+  is_informative: true
+  level: 0
+  locus_tag: PMM1364
+  product: UDP-N-acetylmuramoylalanine--D-glutamate ligase
+  term_id: pfam.clan:CL0063
+  term_name: NADP_Rossmann
+- gene_category: Cell wall and membrane
+  gene_name: murD
+  is_informative: true
+  level: 0
+  locus_tag: PMM1364
+  product: UDP-N-acetylmuramoylalanine--D-glutamate ligase
+  term_id: pfam.clan:CL0794
+  term_name: Mur_ligase_C_sf
 - gene_category: Stress response and adaptation
   gene_name: pirA
   is_informative: true
@@ -7273,6 +7401,14 @@ results:
   product: 23S rRNA (adenine2503-C2)-methyltransferase
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
+- gene_category: Translation
+  gene_name: rlmN
+  is_informative: true
+  level: 0
+  locus_tag: PMM1481
+  product: 23S rRNA (adenine2503-C2)-methyltransferase
+  term_id: pfam.clan:CL0198
+  term_name: HHH
 - gene_category: Translation
   gene_name: rlmN
   is_informative: true
@@ -7905,6 +8041,14 @@ results:
   product: holliday junction ATP-dependent DNA helicase RuvB
   term_id: pfam.clan:CL0123
   term_name: HTH
+- gene_category: Replication and repair
+  gene_name: ruvB
+  is_informative: true
+  level: 0
+  locus_tag: PMM1615
+  product: holliday junction ATP-dependent DNA helicase RuvB
+  term_id: pfam.clan:CL0671
+  term_name: AAA_lid
 - gene_category: Translation
   gene_name: lysS
   is_informative: true
@@ -8585,13 +8729,13 @@ results:
   product: putative sxtK
   term_id: pfam.clan:CL0184
   term_name: DMT
-returned: 1063
-row_count: 1063
+returned: 1081
+row_count: 1081
 terms_per_gene_max: 4
 terms_per_gene_median: 1.0
 terms_per_gene_min: 1
 top_terms:
-- count: 146
+- count: 148
   is_informative: true
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
@@ -8603,18 +8747,18 @@ top_terms:
   is_informative: true
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
-- count: 35
+- count: 36
   is_informative: true
   term_id: pfam.clan:CL0123
   term_name: HTH
-- count: 29
+- count: 30
   is_informative: true
   term_id: pfam.clan:CL0021
   term_name: OB
 total_categories: 24
-total_genes: 864
-total_matching: 1063
-total_terms: 77
+total_genes: 868
+total_matching: 1081
+total_terms: 78
 truncated: false
 wrong_level: []
 wrong_ontology: []

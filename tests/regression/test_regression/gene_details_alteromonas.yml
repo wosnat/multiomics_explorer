@@ -5,17 +5,25 @@ rows:
   - WP_197047964.1
   alternate_functional_descriptions:
   - '[eggnog] Winged helix-turn helix'
+  - '[interpro] Tc1-like transposase, DDE domain'
+  - '[interpro] Transposase IS630-like'
+  - '[interpro] Uncharacterized protein y4pG/y4sC, wHTH domain'
   - '[ncbi] IS630 family transposase'
   - '[pfam] DDE_3: DDE superfamily endonuclease'
+  - '[pfam] HTH_23: Homeodomain-like domain'
   - '[pfam] HTH_32: Homeodomain-like domain'
+  - '[pfam] HTH_33: Winged helix-turn helix'
   annotation_quality: 3
   annotation_state: informative_multi
   annotation_types:
   - cog_category
   - go_mf
+  - interpro
+  - ncbifam
   - pfam
   boolean_metric_count: 0
   boolean_metric_types_observed: []
+  catalyzed_metabolite_count: 0
   categorical_metric_count: 0
   categorical_metric_types_observed: []
   cazy_family_count: 0
@@ -28,6 +36,7 @@ rows:
   contig: NZ_OX359241.1
   contributing_sources:
   - eggnog
+  - interproscan
   - ncbi
   - psortb
   - signalp
@@ -41,9 +50,13 @@ rows:
   informative_annotation_types:
   - cog_category
   - go_mf
+  - ncbifam
   - pfam
+  interpro_entry_count: 5
   locus_tag: ALT831_RS00180
-  metabolite_count: 0
+  merops_classes: []
+  merops_family_count: 0
+  ncbifam_family_count: 1
   numeric_metric_count: 0
   numeric_metric_types_observed: []
   organism_name: Alteromonas macleodii MIT1002
@@ -60,3 +73,4 @@ rows:
   strand: '-'
   subcellular_localization: Cytoplasmic
   tcdb_family_count: 0
+  transported_metabolite_count: 0

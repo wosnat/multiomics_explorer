@@ -166,6 +166,12 @@ With 003 settled, the §6 sequencing condition is met: **KG may land the 001+002
 
 ---
 
+## 9. Post-batch observation from the slice-1 golden diff-review (2026-08-20) — non-blocking
+
+While tracing all 47 regenerated regression fixtures to known KG causes (all traced; nothing unexplainable), one data-quality soft spot surfaced for a future KG batch, not for alpha.7: **`SYNW0305` (ATP-dependent zinc metalloprotease FtsH) carries `transport_substrate_resolution: 'resolved'` with `tcdb_evidence_score_max: 0.2` and `tcdb_family_count: 3`.** A protease reading as a "resolved" transporter at 0.2 composite evidence suggests `transport_substrate_resolution` may deserve a floor on the evidence composite (or the tcdb-diamond tier) before asserting `resolved` — per §7.4 of the TCDB contract, resolution is deliberately breadth-not-confidence, so this is a design question, not a bug report. Filed here so it rides into the slice-2 (TCDB migration) dialog.
+
+---
+
 ## 8. KG-side: batch LANDED (2026-08-19) — verified live
 
 001 + 002 + 004 are implemented and deployed on a full Docker rebuild (build → import → post-process, exit 0; import.report clean). Live verification against the rebuilt graph:

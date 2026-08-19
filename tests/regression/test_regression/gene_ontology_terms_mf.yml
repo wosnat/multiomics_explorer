@@ -1,5 +1,5 @@
 case_id: gene_ontology_terms_mf
-row_count: 4
+row_count: 5
 rows:
 - is_informative: true
   level: 5
@@ -10,6 +10,17 @@ rows:
   signal_peptide_probability: null
   term_id: go:0000987
   term_name: cis-regulatory region sequence-specific DNA binding
+  tree: null
+  tree_code: null
+- is_informative: true
+  level: 2
+  localization_score: null
+  locus_tag: MIT1002_03493
+  signal_peptide_cleavage_probability: null
+  signal_peptide_cleavage_site: null
+  signal_peptide_probability: null
+  term_id: go:0003700
+  term_name: DNA-binding transcription factor activity
   tree: null
   tree_code: null
 - is_informative: true
