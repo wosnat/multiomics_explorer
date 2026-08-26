@@ -117,7 +117,11 @@ class TestGeneOverviewContract:
             "significant_up_count", "significant_down_count", "closest_ortholog_group_size",
             "closest_ortholog_genera", "cluster_membership_count", "cluster_types",
             "derived_metric_count", "derived_metric_value_kinds",
-            "reaction_count", "catalyzed_metabolite_count", "transporter_count", "evidence_sources",
+            "reaction_count", "catalyzed_metabolite_count", "evidence_sources",
+            # TCDB substrate_depth migration (2026-08): gene-level TCDB surface
+            # replaces transporter_count.
+            "tcdb_evidence_score_max", "transported_metabolite_count",
+            "transport_substrate_resolution",
             # Literature "discusses" arm (Extension 1): always-present compact count.
             "discussed_in_publication_count",
         }
@@ -1224,6 +1228,7 @@ class TestListMetabolitesContract:
     EXPECTED_COMPACT_RESULT_KEYS = {
         "metabolite_id", "name", "formula", "elements", "mass",
         "catalyst_gene_count", "organism_count", "transporter_count",
+        "transporter_gene_count",
         "evidence_sources", "pathway_ids", "pathway_count",
     }
 
@@ -1407,7 +1412,10 @@ class TestPhase1PlumbingContract:
         assert result["total_matching"] == 1
         row = result["results"][0]
         assert row["reaction_count"] == 0
-        assert row["transporter_count"] >= 1
+        assert "transporter_count" not in row
+        assert row["tcdb_evidence_score_max"] == 0.8
+        assert row["transported_metabolite_count"] == 13
+        assert row["transport_substrate_resolution"] == "resolved"
         assert "metabolism" not in row["evidence_sources"], (
             f"PMM0392 has reaction_count=0 but evidence_sources contains "
             f"'metabolism' — path-existence Cypher regression. "

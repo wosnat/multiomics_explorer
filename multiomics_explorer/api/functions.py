@@ -390,7 +390,16 @@ def gene_overview(
     annotation_quality, organism_name, annotation_types,
     expression_edge_count, significant_up_count, significant_down_count,
     closest_ortholog_group_size, closest_ortholog_genera,
-    cluster_membership_count, cluster_types, discussed_in_publication_count.
+    cluster_membership_count, cluster_types, discussed_in_publication_count,
+    plus the chemistry signals reaction_count, catalyzed_metabolite_count,
+    evidence_sources and the TCDB gene-level trio: tcdb_evidence_score_max
+    (float | None — None means no TCDB call at all; 0 is an uncorroborated
+    hit; rank with it, don't filter), transported_metabolite_count (distinct
+    substrates over the gene's deepest TCDB attachments — the same set
+    metabolites_by_gene's transport rows enumerate), and
+    transport_substrate_resolution ('resolved' | 'family_inferred' | None;
+    'resolved' means at least one non-lumping attachment, 'family_inferred'
+    means breadth is reachability, not capability).
     Verbose adds: gene_summary, function_description, all_identifiers,
     discussed_in_publications (list of {doi, prominence, evidence}; see
     discussed_by_publication for a paper's full discussed set).
@@ -877,17 +886,20 @@ def list_organisms(
     strain, clade, ncbi_taxon_id, gene_count, publication_count,
     experiment_count, treatment_types, omics_types, clustering_analysis_count,
     cluster_types, derived_metric_count, derived_metric_value_kinds, compartments,
-    reaction_count, catalyzed_metabolite_count, measured_metabolite_count.
+    reaction_count, catalyzed_metabolite_count, transported_metabolite_count
+    (distinct substrates reached via the organism's genes' deepest TCDB
+    attachments), measured_metabolite_count.
     Sparse fields (omitted when null): reference_database, reference_proteome.
     When verbose=True, also includes: family, order, tax_class, phylum, kingdom,
     superkingdom, lineage, cluster_count, derived_metric_gene_count,
     derived_metric_types.
     by_metabolic_capability: top 10 organisms (within matched set) by
     catalyzed_metabolite_count, sorted desc; excludes zero-chemistry
-    organisms. Counts the catalysis arm only (metabolites reached via
-    Gene -> Reaction) — transport-substrate metabolites are NOT included,
-    so a transport-only organism reads 0 here. To see transport capability,
-    check per-gene transporter_count / evidence_sources via gene_overview.
+    organisms. Ranks on the catalysis arm only (metabolites reached via
+    Gene -> Reaction); each entry also carries transported_metabolite_count
+    as a column, so a transport-heavy organism is visible without changing
+    the ranking. For per-gene transport trust, read tcdb_evidence_score_max
+    / transport_substrate_resolution via gene_overview.
     by_measurement_capability: binary 2-bucket count
     {has_metabolomics: N, no_metabolomics: M} where has_metabolomics counts
     organisms with measured_metabolite_count > 0. Sums to total_matching.
@@ -957,12 +969,15 @@ def list_organisms(
                        for r in results]
 
     # by_metabolic_capability: top 10 organisms by catalyzed_metabolite_count
-    # in the matched set; excludes zero-chemistry rows.
+    # in the matched set; excludes zero-chemistry rows. transported_metabolite_count
+    # rides along as a column (ranking unchanged — catalysis arm).
     chemistry_capable = [
         {
             "organism_name": r["organism_name"],
             "reaction_count": r.get("reaction_count", 0),
             "catalyzed_metabolite_count": r.get("catalyzed_metabolite_count", 0),
+            "transported_metabolite_count": r.get(
+                "transported_metabolite_count", 0) or 0,
         }
         for r in capability_rows
         if r.get("catalyzed_metabolite_count", 0) > 0
@@ -5025,8 +5040,11 @@ def list_metabolites(
     Per result (compact): metabolite_id, name, formula, elements, mass,
     catalyst_gene_count (genes reaching this metabolite via Reaction —
     catalysis arm only; a transport-only metabolite reads 0 here, so use
-    evidence_sources or transporter_count > 0, NOT catalyst_gene_count == 0,
-    to spot metabolomics-only metabolites), organism_count,
+    evidence_sources or transporter_gene_count > 0, NOT
+    catalyst_gene_count == 0, to spot metabolomics-only metabolites),
+    transporter_gene_count (genes reaching this metabolite through a
+    deepest TCDB attachment — the same set genes_by_metabolite's transport
+    rows enumerate, summed across organisms), organism_count,
     transporter_count, evidence_sources,
     chebi_id (sparse), pathway_ids, pathway_count, measured_assay_count,
     measured_paper_count, measured_organisms, measured_compartments.
@@ -5243,22 +5261,75 @@ _GBM_SPARSE_FIELDS = (
 )
 
 
+_VALID_SUBSTRATE_DEPTHS = ("most_specific", "inherited")
+
+# Retired `transport_confidence` value strings → their `substrate_depth`
+# replacement. Used only to build the rename pointer in the ValueError.
+_RETIRED_TRANSPORT_CONFIDENCE = {
+    "substrate_confirmed": "most_specific",
+    "family_inferred": "inherited",
+}
+
+
+def _validate_substrate_depth(substrate_depth: list[str] | None) -> None:
+    """Raise ValueError on unknown `substrate_depth` values.
+
+    The two retired `transport_confidence` strings get a rename pointer so a
+    caller migrating from the old param lands on the right value.
+    """
+    if substrate_depth is None:
+        return
+    for value in substrate_depth:
+        if value in _VALID_SUBSTRATE_DEPTHS:
+            continue
+        replacement = _RETIRED_TRANSPORT_CONFIDENCE.get(value)
+        if replacement is not None:
+            raise ValueError(
+                f"substrate_depth value '{value}' was renamed: use "
+                f"substrate_depth=['{replacement}'] instead. Valid values: "
+                f"{list(_VALID_SUBSTRATE_DEPTHS)}."
+            )
+        raise ValueError(
+            f"substrate_depth contains invalid value '{value}'; "
+            f"allowed: {list(_VALID_SUBSTRATE_DEPTHS)}."
+        )
+
+
+def _sorted_by_substrate_depth(rows_by_sd: list[dict]) -> list[dict]:
+    """`by_substrate_depth` rollup: `{substrate_depth, count}` entries sorted
+    count desc, then value asc (deterministic across APOC's unordered sets)."""
+    return sorted(
+        [
+            {"substrate_depth": e["substrate_depth"], "count": e["count"]}
+            for e in rows_by_sd
+        ],
+        key=lambda r: (-r["count"], r["substrate_depth"]),
+    )
+
+
+def _substrate_depth_priority(row: dict) -> int:
+    """0 for `most_specific` or None (metabolism rows); 1 for `inherited`."""
+    return 1 if row.get("substrate_depth") == "inherited" else 0
+
+
 def _gbm_sort_key(row: dict) -> tuple:
     """Global sort key for genes_by_metabolite detail rows.
 
-    Sort by: (metabolite_id, evidence_source, transport_confidence_priority,
-              secondary_id, locus_tag).
+    Sort by: (metabolite_id, evidence_source, substrate_depth_priority,
+              -tcdb_evidence_score, secondary_id, locus_tag).
 
-    `transport_confidence_priority`:
-      - 0 for `substrate_confirmed` OR None (metabolism rows)
-      - 1 for `family_inferred`
+    `substrate_depth_priority`:
+      - 0 for `most_specific` OR None (metabolism rows)
+      - 1 for `inherited`
+
+    `tcdb_evidence_score` desc ranks rows within a transport depth tier;
+    metabolism rows carry None (treated as 0 — they never mix with
+    transport rows because evidence_source sorts first).
 
     `secondary_id`: `reaction_id` for metabolism rows, `tcdb_family_id` for
     transport rows. Acts as deterministic tiebreaker within each
-    (metabolite, evidence_source, confidence) group.
+    (metabolite, evidence_source, depth, score) group.
     """
-    tconf = row.get("transport_confidence")
-    priority = 1 if tconf == "family_inferred" else 0
     if row.get("evidence_source") == "metabolism":
         secondary = row.get("reaction_id") or ""
     else:
@@ -5266,7 +5337,8 @@ def _gbm_sort_key(row: dict) -> tuple:
     return (
         row.get("metabolite_id") or "",
         row.get("evidence_source") or "",
-        priority,
+        _substrate_depth_priority(row),
+        -(row.get("tcdb_evidence_score") or 0.0),
         secondary,
         row.get("locus_tag") or "",
     )
@@ -5281,7 +5353,7 @@ def genes_by_metabolite(
     metabolite_pathway_ids: list[str] | None = None,
     mass_balance: str | None = None,
     gene_categories: list[str] | None = None,
-    transport_confidence: str | None = None,
+    substrate_depth: list[str] | None = None,
     evidence_sources: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
@@ -5293,13 +5365,44 @@ def genes_by_metabolite(
 
     Two evidence arms (joined api-side, not via Cypher UNION):
       - metabolism: `Gene → Reaction → Metabolite`
-      - transport:  `Gene → TcdbFamily → Metabolite` (rollup-extended)
+      - transport:  `Gene → TcdbFamily → Metabolite`, over each gene's
+        deepest TCDB attachments only (an attachment is superseded when the
+        same gene is also attached to a descendant family). Transport rows
+        are therefore projections of the same (gene, metabolite) set as the
+        KG's `transported_metabolite_count` / `transporter_gene_count`.
 
     Path-scoped filters narrow only their own arm; the other arm runs
     unfiltered. Use `evidence_sources` to suppress an entire arm.
 
-    See `docs/tool-specs/genes_by_metabolite.md` for the full contract,
-    paging strategy, and auto-warning trigger conditions.
+    Transport rows carry two TCDB facts (both None on metabolism rows):
+      - `substrate_depth` (`most_specific` | `inherited`): the most specific
+        surviving transporter node for this substrate, relative to the
+        gene-pruned hierarchy — not a curation level. `inherited` rows reach
+        the substrate through a broader family's substrate list.
+      - `tcdb_evidence_score` (float, 0..1): the KG's composite evidence for
+        the gene × family call. Rank with it, don't filter on it — 0 means
+        an uncorroborated DIAMOND hit, not "absent".
+
+    substrate_depth: Transport-arm filter, list of `most_specific` /
+        `inherited`. Unknown values raise ValueError; the retired
+        `transport_confidence` strings raise with a rename pointer.
+
+    Envelope: `by_substrate_depth` rollup, per-metabolite
+    `transport_most_specific_rows` / `transport_inherited_rows`, and
+    `top_genes[]` entries carrying the gene-level
+    `transport_substrate_resolution` (`resolved` | `family_inferred` | None)
+    + `tcdb_evidence_score_max`. Both are raw gene properties: None when
+    the gene has no TCDB call at all (independent of which rows it
+    contributes here — a gene with only metabolism rows for this metabolite
+    can still carry a score for other substrates). `resolved` means at
+    least one non-lumping deepest attachment — a resolved gene can still
+    contribute `inherited` rows.
+
+    Detail sort: metabolism → `most_specific` → `inherited`; within a
+    transport tier `tcdb_evidence_score` desc, then family / locus_tag.
+
+    Auto-warning: when `inherited` rows outnumber `most_specific` rows on the
+    transport arm and `substrate_depth` was not set explicitly.
 
     exclude_metabolite_ids: Exclude metabolites with these IDs. Set-difference
         semantics with metabolite_ids — exclude wins on overlap. Empty list
@@ -5309,9 +5412,9 @@ def genes_by_metabolite(
         ValueError: if `evidence_sources` contains values outside
             ``("metabolism", "transport")``. Note this diverges from
             `list_metabolites` — gene-anchored tools reject
-            ``"metabolomics"``.
+            ``"metabolomics"``. Also on unknown `substrate_depth` values.
     """
-    # 1. Defense-in-depth validator on evidence_sources.
+    # 1. Defense-in-depth validators (before any Cypher executes).
     if evidence_sources is not None:
         invalid = [
             s for s in evidence_sources
@@ -5322,6 +5425,7 @@ def genes_by_metabolite(
                 f"evidence_sources contains invalid value(s) {invalid}; "
                 f"allowed: {list(_VALID_EVIDENCE_SOURCES_GBM)}."
             )
+    _validate_substrate_depth(substrate_depth)
 
     conn = _default_conn(conn)
 
@@ -5345,7 +5449,7 @@ def genes_by_metabolite(
         mass_balance=mass_balance,
         metabolite_pathway_ids=metabolite_pathway_ids,
         gene_categories=gene_categories,
-        transport_confidence=transport_confidence,
+        substrate_depth=substrate_depth,
         arms=active_arms,
     )
     summary_rows = conn.execute_query(sum_cypher, **sum_params)
@@ -5389,7 +5493,7 @@ def genes_by_metabolite(
                     organism=organism,
                     metabolite_pathway_ids=metabolite_pathway_ids,
                     gene_categories=gene_categories,
-                    transport_confidence=transport_confidence,
+                    substrate_depth=substrate_depth,
                     verbose=verbose,
                     limit=limit,
                     offset=offset,
@@ -5421,7 +5525,7 @@ def genes_by_metabolite(
                         organism=organism,
                         metabolite_pathway_ids=metabolite_pathway_ids,
                         gene_categories=gene_categories,
-                        transport_confidence=transport_confidence,
+                        substrate_depth=substrate_depth,
                         verbose=verbose,
                         limit=per_arm_fetch,
                         offset=0,
@@ -5483,7 +5587,7 @@ def genes_by_metabolite(
     # APOC's coll.toSet() yields unordered arrays — we sort api-side for
     # deterministic snapshots, and slice top_* arrays to the spec'd top-10.
     rows_by_es = raw_summary.get("rows_by_evidence_source", []) or []
-    rows_by_tc = raw_summary.get("rows_by_transport_confidence", []) or []
+    rows_by_sd = raw_summary.get("rows_by_substrate_depth", []) or []
 
     by_evidence_source = sorted(
         [
@@ -5492,13 +5596,7 @@ def genes_by_metabolite(
         ],
         key=lambda r: (-r["count"], r["evidence_source"]),
     )
-    by_transport_confidence = sorted(
-        [
-            {"transport_confidence": e["transport_confidence"], "count": e["count"]}
-            for e in rows_by_tc
-        ],
-        key=lambda r: (-r["count"], r["transport_confidence"]),
-    )
+    by_substrate_depth = _sorted_by_substrate_depth(rows_by_sd)
 
     # by_metabolite: bounded by input size; sort by metabolite_id asc, no slice.
     by_metabolite = sorted(
@@ -5525,40 +5623,54 @@ def genes_by_metabolite(
     # top_genes ranked by combined reaction + transporter breadth (per spec
     # § "Return envelope" line 366 / GbmTopGene docstring), with locus_tag
     # tiebreaker (gene_name may be None and would TypeError on sort).
+    # Entries pass through the gene-level TCDB facts
+    # (transport_substrate_resolution / tcdb_evidence_score_max) from the
+    # summary builder; raw gene props, explicit None when the gene has no
+    # TCDB call at all, so every entry carries identical keys.
     top_genes = sorted(
-        raw_summary.get("top_genes", []) or [],
+        [
+            {
+                **r,
+                "transport_substrate_resolution": r.get(
+                    "transport_substrate_resolution"),
+                "tcdb_evidence_score_max": r.get("tcdb_evidence_score_max"),
+            }
+            for r in (raw_summary.get("top_genes", []) or [])
+        ],
         key=lambda r: (
             -((r.get("reaction_count") or 0) + (r.get("transporter_count") or 0)),
             r.get("locus_tag") or "",
         ),
     )[:10]
 
-    # 11. Auto-warning: family-inferred dominance (transport-only check).
-    # Strict majority threshold; metabolism rows do not factor in.
+    # 11. Auto-warning: `inherited` dominance over deepest-attachment
+    # transport rows. Strict majority threshold; metabolism rows do not
+    # factor in; suppressed when the caller set substrate_depth explicitly.
     warnings: list[str] = []
-    transport_sc_total = sum(
-        (entry.get("transport_substrate_confirmed_rows") or 0)
+    transport_ms_total = sum(
+        (entry.get("transport_most_specific_rows") or 0)
         for entry in by_metabolite
     )
-    transport_fi_total = sum(
-        (entry.get("transport_family_inferred_rows") or 0)
+    transport_inh_total = sum(
+        (entry.get("transport_inherited_rows") or 0)
         for entry in by_metabolite
     )
-    transport_rows_present = (transport_sc_total + transport_fi_total) > 0
+    transport_rows_present = (transport_ms_total + transport_inh_total) > 0
     if (
         transport_rows_present
-        and transport_fi_total > transport_sc_total
-        and transport_confidence is None
+        and transport_inh_total > transport_ms_total
+        and substrate_depth is None
     ):
         warnings.append(
-            f"Most transport rows are `family_inferred` ({transport_fi_total} of "
-            f"{transport_fi_total + transport_sc_total}) — annotations rolled up from "
-            "family-level transport potential. Workflow-dependent: use "
-            "`transport_confidence='substrate_confirmed'` for "
-            "conservative-cast questions (e.g. cross-organism inference); "
-            "keep `family_inferred` for broad-screen candidate enumeration. "
-            "Both tiers are annotations, neither is ground truth — see "
-            "analysis-doc §g."
+            f"Most transport rows are `inherited` ({transport_inh_total} of "
+            f"{transport_inh_total + transport_ms_total}) — the substrate is "
+            "reached through a broader family's substrate list, not the "
+            "gene's most specific surviving node. Use "
+            "substrate_depth=['most_specific'] for conservative-cast "
+            "questions (e.g. cross-organism inference); keep `inherited` "
+            "rows for broad-screen candidate enumeration, and rank within a "
+            "tier by `tcdb_evidence_score`. Per-gene trust lives in "
+            "`top_genes[].transport_substrate_resolution`."
         )
 
     # 12. Assemble + return envelope.
@@ -5580,7 +5692,7 @@ def genes_by_metabolite(
         "not_matched": not_matched,
         "by_metabolite": by_metabolite,
         "by_evidence_source": by_evidence_source,
-        "by_transport_confidence": by_transport_confidence,
+        "by_substrate_depth": by_substrate_depth,
         "top_reactions": top_reactions,
         "top_tcdb_families": top_tcdb_families,
         "top_gene_categories": top_gene_categories,
@@ -5609,178 +5721,28 @@ _VALID_EVIDENCE_SOURCES_MBG = ("metabolism", "transport")
 _MBG_SPARSE_FIELDS = _GBM_SPARSE_FIELDS
 
 
-def _build_mbg_top_pathways_query(
-    *,
-    locus_tags: list[str],
-    organism: str,
-    active_arms: tuple[str, ...],
-    metabolite_elements: list[str] | None,
-    metabolite_ids: list[str] | None,
-    metabolite_pathway_ids: list[str] | None,
-    ec_numbers: list[str] | None,
-    mass_balance: str | None,
-    gene_categories: list[str] | None,
-    transport_confidence: str | None,
-) -> tuple[str, dict]:
-    """Build the verified 3-branch top_pathways UNION query.
-
-    Branches:
-      1. reaction-side via metabolism arm (`Reaction → Reaction_in_kegg_pathway`)
-      2. metabolite-side via metabolism arm (`Reaction → Reaction_has_metabolite → Metabolite_in_pathway`)
-      3. metabolite-side via transport arm (`TcdbFamily → Tcdb_family_transports_metabolite → Metabolite_in_pathway`)
-
-    Branch 1 is load-bearing across MED4 — measurement found 6 (gene, pathway)
-    pairs that the metabolite-side-only summary builder misses. Branches 2+3
-    are also load-bearing because R00131-style reactions (zero
-    Reaction_in_kegg_pathway edges) are pathway-reachable only via metabolites.
-
-    Filter scope (mirrors per-arm rules; for branch 1, metabolite-anchored
-    filters apply via EXISTS subquery since `m` is not bound on the main
-    path):
-      - locus_tags + organism: all branches
-      - gene_categories: all branches (uniform)
-      - ec_numbers, mass_balance: branches 1+2 (metabolism arm)
-      - transport_confidence: branch 3 (transport arm)
-      - metabolite_elements/ids/pathway_ids: branches 2+3 directly;
-        branch 1 via EXISTS predicate
-    """
-    params: dict = {"locus_tags": locus_tags, "organism": organism}
-
-    org_clause = (
-        "ALL(word IN split(toLower($organism), ' ')"
-        " WHERE toLower(g.organism_name) CONTAINS word)"
-    )
-
-    # Build the metabolite-anchored EXISTS predicate fragment (used in branch 1)
-    # AND the matching standalone WHERE conditions (used in branches 2+3).
-    metab_anchored_conds: list[str] = []
-    if metabolite_ids:
-        metab_anchored_conds.append("m.id IN $metabolite_ids")
-        params["metabolite_ids"] = metabolite_ids
-    if metabolite_elements:
-        metab_anchored_conds.append(
-            "ALL(elem IN $metabolite_elements"
-            " WHERE elem IN coalesce(m.elements, []))"
-        )
-        params["metabolite_elements"] = metabolite_elements
-    if metabolite_pathway_ids:
-        metab_anchored_conds.append(
-            "ANY(pid IN $metabolite_pathway_ids"
-            " WHERE pid IN coalesce(m.pathway_ids, []))"
-        )
-        params["metabolite_pathway_ids"] = metabolite_pathway_ids
-
-    branches: list[str] = []
-
-    if "metabolism" in active_arms:
-        # Branch 1: reaction-side via metabolism arm
-        b1_conds = ["g.locus_tag IN $locus_tags", org_clause]
-        if ec_numbers:
-            b1_conds.append(
-                "ANY(ec IN $ec_numbers WHERE ec IN coalesce(r.ec_numbers, []))"
-            )
-            params["ec_numbers"] = ec_numbers
-        if mass_balance is not None:
-            b1_conds.append("r.mass_balance = $mass_balance")
-            params["mass_balance"] = mass_balance
-        if gene_categories:
-            b1_conds.append("g.gene_category IN $gene_categories")
-            params["gene_categories"] = gene_categories
-        if metab_anchored_conds:
-            exists_inner = " AND ".join(metab_anchored_conds)
-            b1_conds.append(
-                "EXISTS { (r)-[:Reaction_has_metabolite]->(m:Metabolite)"
-                f" WHERE {exists_inner} }}"
-            )
-        b1_where = " AND ".join(b1_conds)
-        branches.append(
-            "  MATCH (g:Gene)-[:Gene_catalyzes_reaction]->"
-            "(r:Reaction)-[:Reaction_in_kegg_pathway]->(p:KeggTerm)\n"
-            f"  WHERE {b1_where}\n"
-            "  RETURN g.locus_tag AS locus_tag, p.id AS pathway_id"
-        )
-
-        # Branch 2: metabolite-side via metabolism arm
-        b2_conds = ["g.locus_tag IN $locus_tags", org_clause]
-        if ec_numbers:
-            b2_conds.append(
-                "ANY(ec IN $ec_numbers WHERE ec IN coalesce(r.ec_numbers, []))"
-            )
-        if mass_balance is not None:
-            b2_conds.append("r.mass_balance = $mass_balance")
-        if gene_categories:
-            b2_conds.append("g.gene_category IN $gene_categories")
-        b2_conds.extend(metab_anchored_conds)
-        b2_where = " AND ".join(b2_conds)
-        branches.append(
-            "  MATCH (g:Gene)-[:Gene_catalyzes_reaction]->(r:Reaction)"
-            "-[:Reaction_has_metabolite]->(m:Metabolite)"
-            "-[:Metabolite_in_pathway]->(p:KeggTerm)\n"
-            f"  WHERE {b2_where}\n"
-            "  RETURN g.locus_tag AS locus_tag, p.id AS pathway_id"
-        )
-
-    if "transport" in active_arms:
-        # Branch 3: metabolite-side via transport arm
-        b3_conds = ["g.locus_tag IN $locus_tags", org_clause]
-        if gene_categories:
-            b3_conds.append("g.gene_category IN $gene_categories")
-        if transport_confidence == "substrate_confirmed":
-            b3_conds.append("tf.level_kind = 'tc_specificity'")
-        elif transport_confidence == "family_inferred":
-            b3_conds.append("tf.level_kind <> 'tc_specificity'")
-        b3_conds.extend(metab_anchored_conds)
-        b3_where = " AND ".join(b3_conds)
-        branches.append(
-            "  MATCH (g:Gene)-[:Gene_has_tcdb_family]->(tf:TcdbFamily)"
-            "-[:Tcdb_family_transports_metabolite]->(m:Metabolite)"
-            "-[:Metabolite_in_pathway]->(p:KeggTerm)\n"
-            f"  WHERE {b3_where}\n"
-            "  RETURN g.locus_tag AS locus_tag, p.id AS pathway_id"
-        )
-
-    if not branches:
-        return "", {}
-
-    union_body = "\n  UNION\n".join(branches)
-    cypher = (
-        "CALL {\n"
-        f"{union_body}\n"
-        "}\n"
-        "WITH pathway_id, count(DISTINCT locus_tag) AS gene_count\n"
-        "MATCH (p:KeggTerm {id: pathway_id})\n"
-        "WHERE p.reaction_count >= 3\n"
-        "RETURN p.id AS pathway_id, p.name AS pathway_name, gene_count,\n"
-        "       p.reaction_count AS pathway_reaction_count,\n"
-        "       p.metabolite_count AS pathway_metabolite_count\n"
-        "ORDER BY gene_count DESC, p.reaction_count ASC, p.id ASC\n"
-        "LIMIT 10"
-    )
-    return cypher, params
-
-
 def _mbg_sort_key(row: dict, locus_index: dict[str, int]) -> tuple:
     """Global sort key for metabolites_by_gene detail rows.
 
     Sort order:
-      1. precision_tier: 0 = metabolism, 1 = transport_substrate_confirmed,
-         2 = transport_family_inferred
-      2. input gene order via `apoc.coll.indexOf` equivalent
-      3. locus_tag (deterministic tiebreaker)
-      4. metabolite_id (final tiebreaker)
+      1. precision_tier: 0 = metabolism, 1 = transport `most_specific`,
+         2 = transport `inherited`
+      2. tcdb_evidence_score desc (None → 0; metabolism rows all tie)
+      3. input gene order via `apoc.coll.indexOf` equivalent
+      4. locus_tag (deterministic tiebreaker)
+      5. metabolite_id (final tiebreaker)
     """
     if row.get("evidence_source") == "metabolism":
         precision_tier = 0
-    elif row.get("transport_confidence") == "substrate_confirmed":
-        precision_tier = 1
     else:
-        precision_tier = 2
+        precision_tier = 1 + _substrate_depth_priority(row)
     locus = row.get("locus_tag") or ""
     # Genes not in the input list (shouldn't happen but be defensive) sort
     # last within their precision tier.
     input_pos = locus_index.get(locus, len(locus_index))
     return (
         precision_tier,
+        -(row.get("tcdb_evidence_score") or 0.0),
         input_pos,
         locus,
         row.get("metabolite_id") or "",
@@ -5798,7 +5760,7 @@ def metabolites_by_gene(
     metabolite_pathway_ids: list[str] | None = None,
     mass_balance: str | None = None,
     gene_categories: list[str] | None = None,
-    transport_confidence: str | None = None,
+    substrate_depth: list[str] | None = None,
     evidence_sources: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
@@ -5810,13 +5772,47 @@ def metabolites_by_gene(
 
     Two evidence arms (joined api-side, not via Cypher UNION):
       - metabolism: `Gene → Reaction → Metabolite`
-      - transport:  `Gene → TcdbFamily → Metabolite` (rollup-extended)
+      - transport:  `Gene → TcdbFamily → Metabolite`, over each gene's
+        deepest TCDB attachments only (an attachment is superseded when the
+        same gene is also attached to a descendant family). Transport rows
+        are therefore projections of the same (gene, metabolite) set as the
+        KG's `transported_metabolite_count` on `gene_overview`.
 
     Path-scoped filters narrow only their own arm; the other arm runs
     unfiltered. Use `evidence_sources` to suppress an entire arm.
 
-    See `docs/tool-specs/metabolites_by_gene.md` for the full contract,
-    paging strategy, sort order, and auto-warning trigger conditions.
+    Transport rows carry two TCDB facts (both None on metabolism rows):
+      - `substrate_depth` (`most_specific` | `inherited`): the most specific
+        surviving transporter node for this substrate, relative to the
+        gene-pruned hierarchy — not a curation level.
+      - `tcdb_evidence_score` (float, 0..1): the KG's composite evidence for
+        the gene × family call. Rank with it, don't filter on it — 0 means
+        an uncorroborated DIAMOND hit, not "absent".
+
+    substrate_depth: Transport-arm filter, list of `most_specific` /
+        `inherited`. Unknown values raise ValueError; the retired
+        `transport_confidence` strings raise with a rename pointer.
+
+    Envelope: `by_substrate_depth` rollup, and `by_gene[]` entries carrying
+    `transport_most_specific_rows` / `transport_inherited_rows` plus the
+    gene-level `transport_substrate_resolution` (`resolved` |
+    `family_inferred` | None) + `tcdb_evidence_score_max`. Both are raw
+    gene properties: None when the gene has no TCDB call at all
+    (independent of which rows it contributes here). `resolved` means at
+    least one non-lumping deepest attachment — a resolved gene can still
+    contribute `inherited` rows; read per-row `substrate_depth` to separate
+    them.
+
+    Detail sort: metabolism → `most_specific` → `inherited` globally (so a
+    single ABC-only gene can't eat `limit`); within a transport tier
+    `tcdb_evidence_score` desc, then input gene order.
+
+    Auto-warning: per gene, when `by_gene[].transport_substrate_resolution`
+    is `family_inferred` — that gene's substrate breadth is reachability,
+    not capability. Such a gene still emits `most_specific` rows (substrates
+    positioned at the superfamily itself), so `substrate_depth` does not
+    guard against it; the resolution field does. Suppressed when
+    `substrate_depth` was set explicitly.
 
     exclude_metabolite_ids: Exclude metabolites with these IDs. Set-difference
         semantics with metabolite_ids — exclude wins on overlap. Empty list
@@ -5825,9 +5821,10 @@ def metabolites_by_gene(
     Raises:
         ValueError: if `evidence_sources` contains values outside
             ``("metabolism", "transport")``. Mirrors `genes_by_metabolite`
-            — gene-anchored tools reject ``"metabolomics"``.
+            — gene-anchored tools reject ``"metabolomics"``. Also on
+            unknown `substrate_depth` values.
     """
-    # 1. Defense-in-depth validator on evidence_sources.
+    # 1. Defense-in-depth validators (before any Cypher executes).
     if evidence_sources is not None:
         invalid = [
             s for s in evidence_sources
@@ -5838,6 +5835,7 @@ def metabolites_by_gene(
                 f"evidence_sources contains invalid value(s) {invalid}; "
                 f"allowed: {list(_VALID_EVIDENCE_SOURCES_MBG)}."
             )
+    _validate_substrate_depth(substrate_depth)
 
     conn = _default_conn(conn)
 
@@ -5862,7 +5860,7 @@ def metabolites_by_gene(
         mass_balance=mass_balance,
         metabolite_pathway_ids=metabolite_pathway_ids,
         gene_categories=gene_categories,
-        transport_confidence=transport_confidence,
+        substrate_depth=substrate_depth,
         arms=active_arms,
     )
     summary_rows = conn.execute_query(sum_cypher, **sum_params)
@@ -5914,7 +5912,7 @@ def metabolites_by_gene(
                     exclude_metabolite_ids=exclude_metabolite_ids,
                     metabolite_pathway_ids=metabolite_pathway_ids,
                     gene_categories=gene_categories,
-                    transport_confidence=transport_confidence,
+                    substrate_depth=substrate_depth,
                     verbose=verbose,
                     limit=limit,
                     offset=offset,
@@ -5950,7 +5948,7 @@ def metabolites_by_gene(
                         exclude_metabolite_ids=exclude_metabolite_ids,
                         metabolite_pathway_ids=metabolite_pathway_ids,
                         gene_categories=gene_categories,
-                        transport_confidence=transport_confidence,
+                        substrate_depth=substrate_depth,
                         verbose=verbose,
                         limit=per_arm_fetch,
                         offset=0,
@@ -6041,7 +6039,7 @@ def metabolites_by_gene(
 
     # 12. Build envelope rollups from the summary builder output.
     rows_by_es = raw_summary.get("rows_by_evidence_source", []) or []
-    rows_by_tc = raw_summary.get("rows_by_transport_confidence", []) or []
+    rows_by_sd = raw_summary.get("rows_by_substrate_depth", []) or []
 
     by_evidence_source = sorted(
         [
@@ -6050,18 +6048,23 @@ def metabolites_by_gene(
         ],
         key=lambda r: (-r["count"], r["evidence_source"]),
     )
-    by_transport_confidence = sorted(
-        [
-            {"transport_confidence": e["transport_confidence"], "count": e["count"]}
-            for e in rows_by_tc
-        ],
-        key=lambda r: (-r["count"], r["transport_confidence"]),
-    )
+    by_substrate_depth = _sorted_by_substrate_depth(rows_by_sd)
 
     # by_gene: bounded by input list; sort by input order (mirror builder
-    # ORDER BY apoc.coll.indexOf), then locus_tag for stability.
+    # ORDER BY apoc.coll.indexOf), then locus_tag for stability. Entries
+    # pass through the gene-level TCDB facts (raw gene props; explicit None
+    # when the gene has no TCDB call at all, so every entry carries
+    # identical keys).
     by_gene = sorted(
-        by_gene,
+        [
+            {
+                **r,
+                "transport_substrate_resolution": r.get(
+                    "transport_substrate_resolution"),
+                "tcdb_evidence_score_max": r.get("tcdb_evidence_score_max"),
+            }
+            for r in by_gene
+        ],
         key=lambda r: (
             locus_index.get(r.get("locus_tag") or "", len(locus_index)),
             r.get("locus_tag") or "",
@@ -6109,34 +6112,32 @@ def metabolites_by_gene(
         raw_summary.get("top_metabolite_pathways", []) or []
     )
 
-    # 13. Auto-warning: family-inferred dominance (transport-only check).
-    # Strict majority threshold; metabolism rows do not factor in. Mirrors
-    # GBM but drives off `by_gene` rollup (the gene-anchored equivalent of
-    # GBM's per-metabolite rollup).
+    # 13. Auto-warning: gene-anchored, keyed on the KG-authoritative
+    # `transport_substrate_resolution = 'family_inferred'` (every deepest
+    # attachment is a lumping family), NOT on a row-share threshold.
+    # Suppressed when the caller set substrate_depth explicitly.
     warnings: list[str] = []
-    transport_sc_total = sum(
-        (entry.get("transport_substrate_confirmed_rows") or 0)
-        for entry in by_gene
-    )
-    transport_fi_total = sum(
-        (entry.get("transport_family_inferred_rows") or 0)
-        for entry in by_gene
-    )
-    transport_rows_present = (transport_sc_total + transport_fi_total) > 0
-    if (
-        transport_rows_present
-        and transport_fi_total > transport_sc_total
-        and transport_confidence is None
-    ):
+    family_inferred_genes = [
+        entry["locus_tag"] for entry in by_gene
+        if entry.get("transport_substrate_resolution") == "family_inferred"
+        and entry.get("locus_tag")
+    ]
+    if family_inferred_genes and substrate_depth is None:
+        listed = ", ".join(family_inferred_genes[:10])
+        if len(family_inferred_genes) > 10:
+            listed += f", … ({len(family_inferred_genes)} genes)"
         warnings.append(
-            f"Most transport rows are `family_inferred` ({transport_fi_total} of "
-            f"{transport_fi_total + transport_sc_total}) — annotations rolled up from "
-            "family-level transport potential. Workflow-dependent: use "
-            "`transport_confidence='substrate_confirmed'` for "
-            "conservative-cast questions (e.g. cross-organism inference); "
-            "keep `family_inferred` for broad-screen candidate enumeration. "
-            "Both tiers are annotations, neither is ground truth — see "
-            "analysis-doc §g."
+            f"transport_substrate_resolution is `family_inferred` for "
+            f"{listed}: substrate breadth is reachability, not capability "
+            "for these genes — their deepest attachment is a lumping "
+            "superfamily (e.g. 3.A.1), so even their most_specific rows are "
+            "superfamily-level positions, not subfamily calls. "
+            "substrate_depth=['most_specific'] does NOT filter these out; "
+            "the gene's transport_substrate_resolution is the only guard. "
+            "Treat them as candidates, not calls; rank by "
+            "`tcdb_evidence_score`. Note that resolved means at least one "
+            "non-lumping attachment (not all) — resolved genes can still "
+            "contribute `inherited` rows (read per-row `substrate_depth`)."
         )
 
     # 14. Assemble + return envelope.
@@ -6159,7 +6160,7 @@ def metabolites_by_gene(
         "not_matched": not_matched,
         "by_gene": by_gene,
         "by_evidence_source": by_evidence_source,
-        "by_transport_confidence": by_transport_confidence,
+        "by_substrate_depth": by_substrate_depth,
         "by_element": by_element,
         "top_metabolites": top_metabolites,
         "top_reactions": top_reactions,

@@ -532,10 +532,12 @@ class TestListOrganismsWrapper:
                 "by_metabolic_capability": [
                     {"organism_name": "Alteromonas macleodii EZ55",
                      "reaction_count": 1348,
-                     "catalyzed_metabolite_count": 1428},
+                     "catalyzed_metabolite_count": 1428,
+                     "transported_metabolite_count": 95},
                     {"organism_name": "Prochlorococcus MED4",
                      "reaction_count": 943,
-                     "catalyzed_metabolite_count": 1039},
+                     "catalyzed_metabolite_count": 1039,
+                     "transported_metabolite_count": 120},
                 ],
             },
         ):
@@ -545,6 +547,32 @@ class TestListOrganismsWrapper:
         assert top.organism_name == "Alteromonas macleodii EZ55"
         assert top.reaction_count == 1348
         assert top.catalyzed_metabolite_count == 1428
+        # substrate_depth migration: entries carry transported_metabolite_count
+        # (ranking unchanged — EZ55 leads on catalyzed_metabolite_count)
+        assert top.transported_metabolite_count == 95
+        assert result.by_metabolic_capability[1].transported_metabolite_count == 120
+
+    @pytest.mark.asyncio
+    async def test_row_transported_metabolite_count(self, tool_fns, mock_ctx):
+        """substrate_depth migration: OrganismResult gains
+        transported_metabolite_count (deepest-attachment transport breadth)."""
+        sample = {
+            **self._SAMPLE_ORG,
+            "reaction_count": 943,
+            "catalyzed_metabolite_count": 1039,
+            "transported_metabolite_count": 120,
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 1, "total_matching": 1, "returned": 1,
+                "truncated": False, "not_found": [], "results": [sample],
+                "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
+                "by_metabolic_capability": [],
+            },
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        assert result.results[0].transported_metabolite_count == 120
 
 
 # ---------------------------------------------------------------------------
@@ -4828,6 +4856,7 @@ _LM_SAMPLE_RESULT = {
     "catalyst_gene_count": 320,
     "organism_count": 31,
     "transporter_count": 17,
+    "transporter_gene_count": 3051,
     "evidence_sources": ["metabolism", "transport"],
     "chebi_id": "4167",
     "pathway_ids": ["kegg.pathway:ko00010"],
@@ -4904,6 +4933,9 @@ class TestListMetabolitesWrapper:
         assert r.catalyst_gene_count == 320
         assert r.organism_count == 31
         assert r.transporter_count == 17
+        # substrate_depth migration: deepest-attachment transporter genes
+        # (closes the transport-only trap loop: catalyst 0 / transporter > 0)
+        assert r.transporter_gene_count == 3051
         assert r.evidence_sources == ["metabolism", "transport"]
         assert r.pathway_ids == ["kegg.pathway:ko00010"]
         assert r.pathway_count == 1
@@ -5075,7 +5107,8 @@ _GBM_TRANS_ROW = {
     "gene_name": "urtE",
     "product": "ABC-type urea transporter",
     "evidence_source": "transport",
-    "transport_confidence": "substrate_confirmed",
+    "substrate_depth": "most_specific",
+    "tcdb_evidence_score": 0.8,
     "tcdb_family_id": "tcdb:3.A.1.4.5",
     "tcdb_family_name": "tcdb:3.A.1.4.5",
     "metabolite_id": "kegg.compound:C00086",
@@ -5107,17 +5140,17 @@ _GBM_SAMPLE_API_RETURN = {
             "reaction_count": 4,
             "transporter_count": 14,
             "metabolism_rows": 4,
-            "transport_substrate_confirmed_rows": 10,
-            "transport_family_inferred_rows": 9,
+            "transport_most_specific_rows": 10,
+            "transport_inherited_rows": 9,
         },
     ],
     "by_evidence_source": [
         {"evidence_source": "metabolism", "count": 4},
         {"evidence_source": "transport", "count": 19},
     ],
-    "by_transport_confidence": [
-        {"transport_confidence": "substrate_confirmed", "count": 10},
-        {"transport_confidence": "family_inferred", "count": 9},
+    "by_substrate_depth": [
+        {"substrate_depth": "most_specific", "count": 10},
+        {"substrate_depth": "inherited", "count": 9},
     ],
     "top_reactions": [
         {
@@ -5133,7 +5166,7 @@ _GBM_SAMPLE_API_RETURN = {
             "tcdb_family_id": "tcdb:3.A.1.4.5",
             "tcdb_family_name": "tcdb:3.A.1.4.5",
             "level_kind": "tc_specificity",
-            "transport_confidence": "substrate_confirmed",
+            "substrate_depth": "most_specific",
             "gene_count": 5,
             "metabolite_count": 1,
         },
@@ -5149,8 +5182,10 @@ _GBM_SAMPLE_API_RETURN = {
             "transporter_count": 1,
             "metabolite_count": 1,
             "metabolism_rows": 0,
-            "transport_substrate_confirmed_rows": 2,
-            "transport_family_inferred_rows": 0,
+            "transport_most_specific_rows": 2,
+            "transport_inherited_rows": 0,
+            "transport_substrate_resolution": "resolved",
+            "tcdb_evidence_score_max": 0.8,
         },
     ],
     "gene_count_total": 18,
@@ -5207,11 +5242,13 @@ class TestGenesByMetaboliteWrapper:
         # Sparse: per-arm-specific fields on the OTHER arm are None
         assert metab.tcdb_family_id is None
         assert metab.tcdb_family_name is None
-        assert metab.transport_confidence is None
+        assert metab.substrate_depth is None
+        assert metab.tcdb_evidence_score is None
+        assert not hasattr(metab, "transport_confidence")
 
     @pytest.mark.asyncio
     async def test_compact_transport_row_fields(self, tool_fns, mock_ctx):
-        """Transport row populates tcdb_*, transport_confidence; metabolism
+        """Transport row populates tcdb_*, substrate_depth; metabolism
         per-arm-specific fields are None."""
         with patch(
             "multiomics_explorer.api.functions.genes_by_metabolite",
@@ -5227,7 +5264,8 @@ class TestGenesByMetaboliteWrapper:
         )
         assert trans.locus_tag == "PMM0974"
         assert trans.tcdb_family_id == "tcdb:3.A.1.4.5"
-        assert trans.transport_confidence == "substrate_confirmed"
+        assert trans.substrate_depth == "most_specific"
+        assert trans.tcdb_evidence_score == 0.8
         # Sparse: metabolism-specific fields are None on transport rows
         assert trans.reaction_id is None
         assert trans.reaction_name is None
@@ -5353,18 +5391,19 @@ class TestGenesByMetaboliteWrapper:
         assert len(result.by_metabolite) == 1
         assert result.by_metabolite[0].metabolite_id == "kegg.compound:C00086"
         assert result.by_metabolite[0].metabolism_rows == 4
-        assert result.by_metabolite[0].transport_substrate_confirmed_rows == 10
-        assert result.by_metabolite[0].transport_family_inferred_rows == 9
+        assert result.by_metabolite[0].transport_most_specific_rows == 10
+        assert result.by_metabolite[0].transport_inherited_rows == 9
+        assert not hasattr(result.by_metabolite[0], "transport_substrate_confirmed_rows")
 
         assert len(result.by_evidence_source) == 2
         es_set = {e.evidence_source for e in result.by_evidence_source}
         assert es_set == {"metabolism", "transport"}
 
-        assert len(result.by_transport_confidence) == 2
+        assert len(result.by_substrate_depth) == 2
         tc_set = {
-            e.transport_confidence for e in result.by_transport_confidence
+            e.substrate_depth for e in result.by_substrate_depth
         }
-        assert tc_set == {"substrate_confirmed", "family_inferred"}
+        assert tc_set == {"most_specific", "inherited"}
 
         assert len(result.top_reactions) == 1
         assert result.top_reactions[0].reaction_id == "kegg.reaction:R00131"
@@ -5374,8 +5413,8 @@ class TestGenesByMetaboliteWrapper:
             result.top_tcdb_families[0].tcdb_family_id == "tcdb:3.A.1.4.5"
         )
         assert (
-            result.top_tcdb_families[0].transport_confidence
-            == "substrate_confirmed"
+            result.top_tcdb_families[0].substrate_depth
+            == "most_specific"
         )
 
         assert len(result.top_gene_categories) == 1
@@ -5383,6 +5422,8 @@ class TestGenesByMetaboliteWrapper:
 
         assert len(result.top_genes) == 1
         assert result.top_genes[0].locus_tag == "PMM0974"
+        assert result.top_genes[0].transport_substrate_resolution == "resolved"
+        assert result.top_genes[0].tcdb_evidence_score_max == 0.8
 
     @pytest.mark.asyncio
     async def test_total_count_fields(self, tool_fns, mock_ctx):
@@ -5416,16 +5457,15 @@ class TestGenesByMetaboliteWrapper:
         assert result.warnings == []
 
     @pytest.mark.asyncio
-    async def test_warnings_field_carries_family_inferred_string(
+    async def test_warnings_field_carries_inherited_string(
         self, tool_fns, mock_ctx,
     ):
         api_return = {
             **self._SAMPLE_API_RETURN,
             "warnings": [
-                "Majority of transport rows are family_inferred (rolled-up "
-                "from broad TCDB families). Re-run with "
-                "transport_confidence='substrate_confirmed' for substrate-"
-                "curated transporter genes only."
+                "Most transport rows are `inherited` (23 of 29) — rolled up "
+                "from family-level transport potential. Use "
+                "substrate_depth=['most_specific'] to narrow."
             ],
         }
         with patch(
@@ -5437,7 +5477,134 @@ class TestGenesByMetaboliteWrapper:
                 metabolite_ids=["kegg.compound:C00088"],
                 organism="Prochlorococcus MED4",
             )
-        assert any("family_inferred" in w for w in result.warnings)
+        assert any("inherited" in w for w in result.warnings)
+
+    # ---- substrate_depth migration (spec 2026-08-20) ----
+
+    @pytest.mark.asyncio
+    async def test_substrate_depth_forwarded_as_list(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["genes_by_metabolite"](
+                mock_ctx,
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+                substrate_depth=["most_specific", "inherited"],
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs["substrate_depth"] == ["most_specific", "inherited"]
+        assert "transport_confidence" not in kwargs
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("old_value", ["substrate_confirmed", "family_inferred"])
+    async def test_substrate_depth_old_value_strings_raise_tool_error(
+        self, tool_fns, mock_ctx, old_value,
+    ):
+        """Retired `transport_confidence` value strings surface as ToolError
+        with a rename pointer (api ValueError → ToolError)."""
+        pointer = {"substrate_confirmed": "most_specific",
+                   "family_inferred": "inherited"}[old_value]
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            side_effect=ValueError(
+                f"substrate_depth value {old_value!r} was renamed to "
+                f"{pointer!r}; valid values: ['most_specific', 'inherited']"
+            ),
+        ):
+            with pytest.raises(ToolError, match=pointer):
+                await tool_fns["genes_by_metabolite"](
+                    mock_ctx,
+                    metabolite_ids=["kegg.compound:C00086"],
+                    organism="Prochlorococcus MED4",
+                    substrate_depth=[old_value],
+                )
+
+    @pytest.mark.asyncio
+    async def test_transport_confidence_kwarg_rejected(self, tool_fns, mock_ctx):
+        """The old parameter name is gone from the wrapper signature."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            with pytest.raises(TypeError):
+                await tool_fns["genes_by_metabolite"](
+                    mock_ctx,
+                    metabolite_ids=["kegg.compound:C00086"],
+                    organism="Prochlorococcus MED4",
+                    transport_confidence="substrate_confirmed",
+                )
+
+    def test_substrate_depth_param_literal(self, tool_fns):
+        """Wrapper param is `list[Literal['most_specific','inherited']] | None`."""
+        import inspect
+        import typing
+        sig = inspect.signature(tool_fns["genes_by_metabolite"])
+        assert "transport_confidence" not in sig.parameters
+        ann = sig.parameters["substrate_depth"].annotation
+        # Annotated[list[Literal[...]] | None, Field(...)] → unwrap
+        inner = typing.get_args(ann)[0] if typing.get_origin(ann) is typing.Annotated else ann
+        assert "most_specific" in repr(inner) and "inherited" in repr(inner)
+        assert "substrate_confirmed" not in repr(inner)
+        assert sig.parameters["substrate_depth"].default is None
+
+    def test_row_model_fields(self):
+        """GeneReactionMetaboliteTriplet: `transport_confidence` gone;
+        `substrate_depth` (Literal | None) + `tcdb_evidence_score`
+        (float | None) present, both defaulting to None (metabolism rows)."""
+        from multiomics_explorer.mcp_server.tools import (
+            GeneReactionMetaboliteTriplet,
+        )
+        fields = GeneReactionMetaboliteTriplet.model_fields
+        assert "transport_confidence" not in fields
+        assert "substrate_depth" in fields
+        assert "tcdb_evidence_score" in fields
+        row = GeneReactionMetaboliteTriplet(
+            locus_tag="PMM0001", evidence_source="metabolism",
+            metabolite_id="kegg.compound:C00086", metabolite_name="Urea",
+        )
+        assert row.substrate_depth is None
+        assert row.tcdb_evidence_score is None
+        assert "substrate_depth" in row.model_dump()
+        assert "tcdb_evidence_score" in row.model_dump()
+        with pytest.raises(Exception):
+            GeneReactionMetaboliteTriplet(
+                locus_tag="PMM0001", evidence_source="transport",
+                metabolite_id="kegg.compound:C00086", metabolite_name="Urea",
+                substrate_depth="substrate_confirmed",
+            )
+
+    def test_gbm_envelope_models(self):
+        """GbmBySubstrateDepth (key `substrate_depth`) replaces
+        GbmByTransportConfidence; GbmByMetabolite / GbmTopGene carry the
+        renamed counters; GbmTopGene gains the gene-level TCDB facts;
+        GbmTopTcdbFamily derives `substrate_depth`, not transport_confidence."""
+        import multiomics_explorer.mcp_server.tools as tools_mod
+        assert not hasattr(tools_mod, "GbmByTransportConfidence")
+        depth_fields = tools_mod.GbmBySubstrateDepth.model_fields
+        assert set(depth_fields) == {"substrate_depth", "count"}
+        assert "by_substrate_depth" in tools_mod.GenesByMetaboliteResponse.model_fields
+        assert "by_transport_confidence" not in tools_mod.GenesByMetaboliteResponse.model_fields
+        for model in (tools_mod.GbmByMetabolite, tools_mod.GbmTopGene):
+            f = model.model_fields
+            assert "transport_most_specific_rows" in f
+            assert "transport_inherited_rows" in f
+            assert "transport_substrate_confirmed_rows" not in f
+            assert "transport_family_inferred_rows" not in f
+        tg = tools_mod.GbmTopGene.model_fields
+        assert "transport_substrate_resolution" in tg
+        assert "tcdb_evidence_score_max" in tg
+        entry = tools_mod.GbmTopGene(
+            locus_tag="PMM0001", reaction_count=1, transporter_count=0,
+            metabolite_count=1, metabolism_rows=1,
+            transport_most_specific_rows=0, transport_inherited_rows=0,
+        )
+        assert entry.transport_substrate_resolution is None
+        assert entry.tcdb_evidence_score_max is None
+        tf = tools_mod.GbmTopTcdbFamily.model_fields
+        assert "substrate_depth" in tf
+        assert "transport_confidence" not in tf
 
     @pytest.mark.asyncio
     async def test_params_forwarded(self, tool_fns, mock_ctx):
@@ -5454,7 +5621,7 @@ class TestGenesByMetaboliteWrapper:
                 metabolite_pathway_ids=["kegg.pathway:ko00910"],
                 mass_balance="balanced",
                 gene_categories=["Transport"],
-                transport_confidence="substrate_confirmed",
+                substrate_depth=["most_specific"],
                 evidence_sources=["transport"],
                 summary=False,
                 verbose=True,
@@ -5471,7 +5638,7 @@ class TestGenesByMetaboliteWrapper:
         )
         assert kwargs["mass_balance"] == "balanced"
         assert kwargs["gene_categories"] == ["Transport"]
-        assert kwargs["transport_confidence"] == "substrate_confirmed"
+        assert kwargs["substrate_depth"] == ["most_specific"]
         assert kwargs["evidence_sources"] == ["transport"]
         assert kwargs["verbose"] is True
         assert kwargs["limit"] == 10
@@ -5531,7 +5698,7 @@ class TestGenesByMetaboliteWrapper:
             "not_matched": [],
             "by_metabolite": [],
             "by_evidence_source": [],
-            "by_transport_confidence": [],
+            "by_substrate_depth": [],
             "top_reactions": [],
             "top_tcdb_families": [],
             "top_gene_categories": [],
@@ -5544,7 +5711,8 @@ class TestGenesByMetaboliteWrapper:
                 {
                     "locus_tag": "PMM0001",
                     "evidence_source": "metabolism",
-                    "transport_confidence": None,    # None preserved
+                    "substrate_depth": None,    # None preserved
+                    "tcdb_evidence_score": None,  # None preserved
                     "reaction_id": "kegg.reaction:R00131",
                     "reaction_name": "test reaction",
                     "ec_numbers": ["3.5.1.5"],
@@ -5557,7 +5725,8 @@ class TestGenesByMetaboliteWrapper:
                 {
                     "locus_tag": "PMM0392",
                     "evidence_source": "transport",
-                    "transport_confidence": "family_inferred",
+                    "substrate_depth": "inherited",
+                    "tcdb_evidence_score": 0.2,
                     "reaction_id": None,                # None preserved
                     "reaction_name": None,               # None preserved
                     "ec_numbers": None,                   # None preserved
@@ -5590,8 +5759,11 @@ class TestGenesByMetaboliteWrapper:
         )
 
         # Cross-arm None values must be present, not stripped
-        assert "transport_confidence" in metab_row
-        assert metab_row["transport_confidence"] is None
+        assert "substrate_depth" in metab_row
+        assert metab_row["substrate_depth"] is None
+        assert "tcdb_evidence_score" in metab_row
+        assert metab_row["tcdb_evidence_score"] is None
+        assert "transport_confidence" not in metab_row
         assert "tcdb_family_id" in metab_row
         assert metab_row["tcdb_family_id"] is None
         assert "tcdb_family_name" in metab_row
@@ -5640,7 +5812,8 @@ _MBG_TRANS_ROW = {
     "gene_name": "urtE",
     "product": "ABC-type urea transporter",
     "evidence_source": "transport",
-    "transport_confidence": "substrate_confirmed",
+    "substrate_depth": "most_specific",
+    "tcdb_evidence_score": 0.8,
     "tcdb_family_id": "tcdb:3.A.1.4.5",
     "tcdb_family_name": "tcdb:3.A.1.4.5",
     "metabolite_id": "kegg.compound:C00086",
@@ -5674,17 +5847,19 @@ _MBG_SAMPLE_API_RETURN = {
             "reaction_count": 1,
             "transporter_count": 1,
             "metabolism_rows": 4,
-            "transport_substrate_confirmed_rows": 1,
-            "transport_family_inferred_rows": 0,
+            "transport_most_specific_rows": 1,
+            "transport_inherited_rows": 0,
+            "transport_substrate_resolution": "resolved",
+            "tcdb_evidence_score_max": 0.8,
         },
     ],
     "by_evidence_source": [
         {"evidence_source": "metabolism", "count": 12},
         {"evidence_source": "transport", "count": 3},
     ],
-    "by_transport_confidence": [
-        {"transport_confidence": "substrate_confirmed", "count": 2},
-        {"transport_confidence": "family_inferred", "count": 1},
+    "by_substrate_depth": [
+        {"substrate_depth": "most_specific", "count": 2},
+        {"substrate_depth": "inherited", "count": 1},
     ],
     "by_element": [
         {"element": "H", "metabolite_count": 3},
@@ -5701,8 +5876,8 @@ _MBG_SAMPLE_API_RETURN = {
             "reaction_count": 1,
             "transporter_count": 1,
             "metabolism_rows": 12,
-            "transport_substrate_confirmed_rows": 2,
-            "transport_family_inferred_rows": 1,
+            "transport_most_specific_rows": 2,
+            "transport_inherited_rows": 1,
         },
     ],
     "top_reactions": [
@@ -5719,7 +5894,7 @@ _MBG_SAMPLE_API_RETURN = {
             "tcdb_family_id": "tcdb:3.A.1.4.5",
             "tcdb_family_name": "tcdb:3.A.1.4.5",
             "level_kind": "tc_specificity",
-            "transport_confidence": "substrate_confirmed",
+            "substrate_depth": "most_specific",
             "gene_count": 1,
             "metabolite_count": 1,
         },
@@ -5793,7 +5968,9 @@ class TestMetabolitesByGeneWrapper:
         # Sparse: per-arm-specific transport fields are None
         assert metab.tcdb_family_id is None
         assert metab.tcdb_family_name is None
-        assert metab.transport_confidence is None
+        assert metab.substrate_depth is None
+        assert metab.tcdb_evidence_score is None
+        assert not hasattr(metab, "transport_confidence")
 
     @pytest.mark.asyncio
     async def test_compact_transport_row_fields(self, tool_fns, mock_ctx):
@@ -5811,7 +5988,8 @@ class TestMetabolitesByGeneWrapper:
         )
         assert trans.locus_tag == "PMM0974"
         assert trans.tcdb_family_id == "tcdb:3.A.1.4.5"
-        assert trans.transport_confidence == "substrate_confirmed"
+        assert trans.substrate_depth == "most_specific"
+        assert trans.tcdb_evidence_score == 0.8
         # Sparse: metabolism-specific fields are None on transport rows
         assert trans.reaction_id is None
         assert trans.reaction_name is None
@@ -5942,17 +6120,19 @@ class TestMetabolitesByGeneWrapper:
         assert len(result.by_gene) == 1
         assert result.by_gene[0].locus_tag == "PMM0963"
         assert result.by_gene[0].metabolism_rows == 4
-        assert result.by_gene[0].transport_substrate_confirmed_rows == 1
+        assert result.by_gene[0].transport_most_specific_rows == 1
+        assert result.by_gene[0].transport_substrate_resolution == "resolved"
+        assert result.by_gene[0].tcdb_evidence_score_max == 0.8
 
         assert len(result.by_evidence_source) == 2
         es_set = {e.evidence_source for e in result.by_evidence_source}
         assert es_set == {"metabolism", "transport"}
 
-        assert len(result.by_transport_confidence) == 2
+        assert len(result.by_substrate_depth) == 2
         tc_set = {
-            e.transport_confidence for e in result.by_transport_confidence
+            e.substrate_depth for e in result.by_substrate_depth
         }
-        assert tc_set == {"substrate_confirmed", "family_inferred"}
+        assert tc_set == {"most_specific", "inherited"}
 
         # NEW MBG: by_element rollup
         assert len(result.by_element) == 4
@@ -5975,8 +6155,8 @@ class TestMetabolitesByGeneWrapper:
             result.top_tcdb_families[0].tcdb_family_id == "tcdb:3.A.1.4.5"
         )
         assert (
-            result.top_tcdb_families[0].transport_confidence
-            == "substrate_confirmed"
+            result.top_tcdb_families[0].substrate_depth
+            == "most_specific"
         )
 
         assert len(result.top_gene_categories) == 1
@@ -6022,17 +6202,16 @@ class TestMetabolitesByGeneWrapper:
         assert result.warnings == []
 
     @pytest.mark.asyncio
-    async def test_warnings_field_carries_family_inferred_string(
+    async def test_warnings_field_carries_inherited_string(
         self, tool_fns, mock_ctx,
     ):
         api_return = {
             **self._SAMPLE_API_RETURN,
             "warnings": [
-                "Transport rows in this slice are dominated by `family_inferred` "
-                "rollup (551 of 551 transport rows). For high-precision "
-                "substrate-curated annotations only, set "
-                "transport_confidence='substrate_confirmed' and/or "
-                "evidence_sources=['transport']."
+                "1 gene (PMM0913) carries transport_substrate_resolution="
+                "'family_inferred' — substrate breadth is reachability, not "
+                "capability for these genes (resolved means at least one "
+                "non-lumping attachment)."
             ],
         }
         with patch(
@@ -6045,6 +6224,101 @@ class TestMetabolitesByGeneWrapper:
                 organism="Prochlorococcus MED4",
             )
         assert any("family_inferred" in w for w in result.warnings)
+
+    # ---- substrate_depth migration (spec 2026-08-20; mirrors GBM) ----
+
+    @pytest.mark.asyncio
+    async def test_substrate_depth_forwarded_as_list(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["metabolites_by_gene"](
+                mock_ctx,
+                locus_tags=["PMM0963"],
+                organism="Prochlorococcus MED4",
+                substrate_depth=["inherited"],
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs["substrate_depth"] == ["inherited"]
+        assert "transport_confidence" not in kwargs
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("old_value", ["substrate_confirmed", "family_inferred"])
+    async def test_substrate_depth_old_value_strings_raise_tool_error(
+        self, tool_fns, mock_ctx, old_value,
+    ):
+        pointer = {"substrate_confirmed": "most_specific",
+                   "family_inferred": "inherited"}[old_value]
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            side_effect=ValueError(
+                f"substrate_depth value {old_value!r} was renamed to "
+                f"{pointer!r}; valid values: ['most_specific', 'inherited']"
+            ),
+        ):
+            with pytest.raises(ToolError, match=pointer):
+                await tool_fns["metabolites_by_gene"](
+                    mock_ctx,
+                    locus_tags=["PMM0963"],
+                    organism="Prochlorococcus MED4",
+                    substrate_depth=[old_value],
+                )
+
+    @pytest.mark.asyncio
+    async def test_transport_confidence_kwarg_rejected(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            with pytest.raises(TypeError):
+                await tool_fns["metabolites_by_gene"](
+                    mock_ctx,
+                    locus_tags=["PMM0963"],
+                    organism="Prochlorococcus MED4",
+                    transport_confidence="substrate_confirmed",
+                )
+
+    def test_substrate_depth_param_literal(self, tool_fns):
+        import inspect
+        import typing
+        sig = inspect.signature(tool_fns["metabolites_by_gene"])
+        assert "transport_confidence" not in sig.parameters
+        ann = sig.parameters["substrate_depth"].annotation
+        inner = typing.get_args(ann)[0] if typing.get_origin(ann) is typing.Annotated else ann
+        assert "most_specific" in repr(inner) and "inherited" in repr(inner)
+        assert "substrate_confirmed" not in repr(inner)
+        assert sig.parameters["substrate_depth"].default is None
+
+    def test_mbg_envelope_models(self):
+        """MbgBySubstrateDepth (key `substrate_depth`) replaces
+        MbgByTransportConfidence; MbgByGene / MbgTopMetabolite carry the
+        renamed counters; MbgByGene gains the gene-level TCDB facts;
+        MbgTopTcdbFamily derives `substrate_depth`."""
+        import multiomics_explorer.mcp_server.tools as tools_mod
+        assert not hasattr(tools_mod, "MbgByTransportConfidence")
+        assert set(tools_mod.MbgBySubstrateDepth.model_fields) == {
+            "substrate_depth", "count",
+        }
+        resp = tools_mod.MetabolitesByGeneResponse.model_fields
+        assert "by_substrate_depth" in resp
+        assert "by_transport_confidence" not in resp
+        for model in (tools_mod.MbgByGene, tools_mod.MbgTopMetabolite):
+            f = model.model_fields
+            assert "transport_most_specific_rows" in f
+            assert "transport_inherited_rows" in f
+            assert "transport_substrate_confirmed_rows" not in f
+            assert "transport_family_inferred_rows" not in f
+        entry = tools_mod.MbgByGene(
+            locus_tag="PMM0001", rows=1, metabolite_count=1, reaction_count=1,
+            transporter_count=0, metabolism_rows=1,
+            transport_most_specific_rows=0, transport_inherited_rows=0,
+        )
+        assert entry.transport_substrate_resolution is None
+        assert entry.tcdb_evidence_score_max is None
+        tf = tools_mod.MbgTopTcdbFamily.model_fields
+        assert "substrate_depth" in tf
+        assert "transport_confidence" not in tf
 
     @pytest.mark.asyncio
     async def test_params_forwarded(self, tool_fns, mock_ctx):
@@ -6063,7 +6337,7 @@ class TestMetabolitesByGeneWrapper:
                 metabolite_pathway_ids=["kegg.pathway:ko00910"],
                 mass_balance="balanced",
                 gene_categories=["Amino acid metabolism"],
-                transport_confidence="substrate_confirmed",
+                substrate_depth=["most_specific"],
                 evidence_sources=["transport"],
                 summary=False,
                 verbose=True,
@@ -6082,7 +6356,7 @@ class TestMetabolitesByGeneWrapper:
         )
         assert kwargs["mass_balance"] == "balanced"
         assert kwargs["gene_categories"] == ["Amino acid metabolism"]
-        assert kwargs["transport_confidence"] == "substrate_confirmed"
+        assert kwargs["substrate_depth"] == ["most_specific"]
         assert kwargs["evidence_sources"] == ["transport"]
         assert kwargs["verbose"] is True
         assert kwargs["limit"] == 10
@@ -6120,7 +6394,7 @@ class TestMetabolitesByGeneWrapper:
         for required in [
             "total_matching", "returned", "offset", "truncated",
             "warnings", "not_found", "not_matched",
-            "by_gene", "by_evidence_source", "by_transport_confidence",
+            "by_gene", "by_evidence_source", "by_substrate_depth",
             "by_element",          # NEW vs GBM
             "top_metabolites", "top_reactions", "top_tcdb_families",
             "top_gene_categories",
@@ -6138,7 +6412,7 @@ class TestMetabolitesByGeneWrapper:
         for name in [
             "MbgByGene",
             "MbgByEvidenceSource",
-            "MbgByTransportConfidence",
+            "MbgBySubstrateDepth",
             "MbgByElement",            # NEW vs GBM
             "MbgTopMetabolite",
             "MbgTopReaction",
@@ -6179,10 +6453,17 @@ class TestMetabolitesByGeneWrapper:
             "locus_tag", "gene_name", "product",
             "rows", "metabolite_count", "reaction_count",
             "transporter_count", "metabolism_rows",
+            "transport_most_specific_rows",
+            "transport_inherited_rows",
+            "transport_substrate_resolution",
+            "tcdb_evidence_score_max",
+        ]:
+            assert required in fields, f"missing MbgByGene field: {required}"
+        for retired in [
             "transport_substrate_confirmed_rows",
             "transport_family_inferred_rows",
         ]:
-            assert required in fields, f"missing MbgByGene field: {required}"
+            assert retired not in fields, f"retired MbgByGene field: {retired}"
 
     def test_mbg_not_found_fields(self):
         """MbgNotFound has all five buckets per spec."""
@@ -6250,7 +6531,7 @@ class TestMetabolitesByGeneWrapper:
             "not_matched": [],
             "by_gene": [],
             "by_evidence_source": [],
-            "by_transport_confidence": [],
+            "by_substrate_depth": [],
             "by_element": [],
             "top_metabolites": [],
             "top_reactions": [],
@@ -6265,7 +6546,8 @@ class TestMetabolitesByGeneWrapper:
                 {
                     "locus_tag": "PMM0963",
                     "evidence_source": "metabolism",
-                    "transport_confidence": None,    # None preserved
+                    "substrate_depth": None,    # None preserved
+                    "tcdb_evidence_score": None,  # None preserved
                     "reaction_id": "kegg.reaction:R00131",
                     "reaction_name": "test reaction",
                     "ec_numbers": ["3.5.1.5"],
@@ -6278,7 +6560,8 @@ class TestMetabolitesByGeneWrapper:
                 {
                     "locus_tag": "PMM0913",
                     "evidence_source": "transport",
-                    "transport_confidence": "family_inferred",
+                    "substrate_depth": "inherited",
+                    "tcdb_evidence_score": 0.2,
                     "reaction_id": None,                # None preserved
                     "reaction_name": None,               # None preserved
                     "ec_numbers": None,                   # None preserved
@@ -6311,8 +6594,11 @@ class TestMetabolitesByGeneWrapper:
         )
 
         # Cross-arm None values must be present, not stripped
-        assert "transport_confidence" in metab_row
-        assert metab_row["transport_confidence"] is None
+        assert "substrate_depth" in metab_row
+        assert metab_row["substrate_depth"] is None
+        assert "tcdb_evidence_score" in metab_row
+        assert metab_row["tcdb_evidence_score"] is None
+        assert "transport_confidence" not in metab_row
         assert "tcdb_family_id" in metab_row
         assert metab_row["tcdb_family_id"] is None
         assert "tcdb_family_name" in metab_row
@@ -7098,16 +7384,21 @@ class TestExpectedToolsUnchangedForPhase1Plumbing:
 
 class TestGeneOverviewPhase1PlumbingWrapper:
     """Pydantic GeneOverviewResult adds reaction_count,
-    catalyzed_metabolite_count, transporter_count, evidence_sources.
+    catalyzed_metabolite_count, evidence_sources, and (substrate_depth
+    migration 2026-08) tcdb_evidence_score_max / transported_metabolite_count /
+    transport_substrate_resolution in place of transporter_count.
     GeneOverviewResponse adds has_chemistry envelope key (spec §6.1).
     Catalysis-arm rename (KG-SYNC-001): metabolite_count →
     catalyzed_metabolite_count — catalysis-only count; transport-only
-    genes carry 0 (discriminate via transporter_count / evidence_sources)."""
+    genes carry 0 (discriminate via tcdb_evidence_score_max / evidence_sources)."""
 
     def _api_return_with_chem(self, locus_tag, **chem):
         defaults = {
             "reaction_count": 0, "catalyzed_metabolite_count": 0,
-            "transporter_count": 0, "evidence_sources": [],
+            "tcdb_evidence_score_max": None,
+            "transported_metabolite_count": 0,
+            "transport_substrate_resolution": None,
+            "evidence_sources": [],
         }
         defaults.update(chem)
         return {
@@ -7145,13 +7436,15 @@ class TestGeneOverviewPhase1PlumbingWrapper:
 
     @pytest.mark.asyncio
     async def test_pmm0392_transport_metabolomics_validates(self, tool_fns, mock_ctx):
-        """Spec §6.1 verification: PMM0392 → 0 / 0 catalyzed / 8 /
-        [transport, metabolomics] — transport-only gene has
-        catalyzed_metabolite_count 0 post-rename (live-KG verified)."""
+        """PMM0392 → 0 / 0 catalyzed / tcdb_evidence_score_max 0.8 /
+        transported_metabolite_count 13 / 'resolved' /
+        [transport, metabolomics] (live-verified 2026-08-26)."""
         api_return = self._api_return_with_chem(
             "PMM0392",
             reaction_count=0, catalyzed_metabolite_count=0,
-            transporter_count=8,
+            tcdb_evidence_score_max=0.8,
+            transported_metabolite_count=13,
+            transport_substrate_resolution="resolved",
             evidence_sources=["transport", "metabolomics"],
         )
         with patch(
@@ -7164,7 +7457,10 @@ class TestGeneOverviewPhase1PlumbingWrapper:
         r = result.results[0]
         assert r.reaction_count == 0
         assert r.catalyzed_metabolite_count == 0
-        assert r.transporter_count == 8
+        assert not hasattr(r, "transporter_count")
+        assert r.tcdb_evidence_score_max == 0.8
+        assert r.transported_metabolite_count == 13
+        assert r.transport_substrate_resolution == "resolved"
         assert r.evidence_sources == ["transport", "metabolomics"]
 
     @pytest.mark.asyncio
@@ -7181,17 +7477,19 @@ class TestGeneOverviewPhase1PlumbingWrapper:
         r = result.results[0]
         assert r.reaction_count == 0
         assert r.catalyzed_metabolite_count == 0
-        assert r.transporter_count == 0
+        assert not hasattr(r, "transporter_count")
+        assert r.tcdb_evidence_score_max is None
+        assert r.transported_metabolite_count == 0
+        assert r.transport_substrate_resolution is None
         assert r.evidence_sources == []
 
     @pytest.mark.asyncio
     async def test_pmm0001_metabolism_only_validates(self, tool_fns, mock_ctx):
-        """Spec §6.1 verification: PMM0001 → 4 / 6 catalyzed / 0 /
-        ['metabolism']."""
+        """Spec §6.1 verification: PMM0001 → 4 / 6 catalyzed / no TCDB call
+        (null / 0 / null, live-verified 2026-08-20) / ['metabolism']."""
         api_return = self._api_return_with_chem(
             "PMM0001",
             reaction_count=4, catalyzed_metabolite_count=6,
-            transporter_count=0,
             evidence_sources=["metabolism"],
         )
         with patch(
@@ -7204,6 +7502,11 @@ class TestGeneOverviewPhase1PlumbingWrapper:
         r = result.results[0]
         assert r.reaction_count == 4
         assert r.catalyzed_metabolite_count == 6
+        # no TCDB call: null score / 0 transported / null resolution
+        assert not hasattr(r, "transporter_count")
+        assert r.tcdb_evidence_score_max is None
+        assert r.transported_metabolite_count == 0
+        assert r.transport_substrate_resolution is None
         assert r.evidence_sources == ["metabolism"]
 
     @pytest.mark.asyncio
@@ -7220,6 +7523,31 @@ class TestGeneOverviewPhase1PlumbingWrapper:
             )
         assert hasattr(result, "has_chemistry")
         assert result.has_chemistry == 1
+
+    @pytest.mark.asyncio
+    async def test_gene_overview_result_model_fields(self, tool_fns, mock_ctx):
+        """GeneOverviewResult (nested in register_tools): transporter_count
+        removed; the three gene-level TCDB fields present with
+        null-means-no-call defaults (score/resolution nullable, count int)."""
+        api_return = self._api_return_with_chem("PMM0001")
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=api_return,
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["PMM0001"],
+            )
+        row = result.results[0]
+        fields = type(row).model_fields
+        assert "transporter_count" not in fields
+        for name in ("tcdb_evidence_score_max", "transported_metabolite_count",
+                     "transport_substrate_resolution"):
+            assert name in fields, f"missing GeneOverviewResult field: {name}"
+        dumped = row.model_dump()
+        assert "transporter_count" not in dumped
+        assert dumped["tcdb_evidence_score_max"] is None
+        assert dumped["transported_metabolite_count"] == 0
+        assert dumped["transport_substrate_resolution"] is None
 
 
 class TestListPublicationsPhase1PlumbingWrapper:

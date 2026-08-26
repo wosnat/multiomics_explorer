@@ -112,8 +112,15 @@ TOOL_BUILDERS = {
 }
 
 
-def run_case(conn, tool: str, params: dict) -> list[dict]:
+def run_case(conn, tool: str, params: dict, dispatch: str | None = None) -> list[dict]:
     """Execute a case using the shared query builders."""
+    if dispatch == "api":
+        # Generic api (L2) dispatch, opted in per case via `dispatch: api`
+        # (mirrors tests/regression/test_regression.py) — for tools whose
+        # TOOL_BUILDERS entry is builder-only / absent (metabolites_by_gene,
+        # list_organisms summary=True). Eval cases assert on envelope rows.
+        return getattr(api, tool)(**params, conn=conn).get("results", [])
+
     if tool == "raw_cypher":
         return conn.execute_query(params["query"])
 
@@ -259,5 +266,5 @@ def test_eval(conn, case):
     params = case.get("params", {})
     expect = case.get("expect", {})
 
-    results = run_case(conn, tool, params)
+    results = run_case(conn, tool, params, dispatch=case.get("dispatch"))
     check_expectations(results, expect or {}, case["id"])

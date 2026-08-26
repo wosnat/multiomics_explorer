@@ -15,8 +15,20 @@ examples:
   - title: Lucene search by name
     call: list_metabolites(search_text="glucose", limit=3)
 
-  - title: Transport-only metabolites (TCDB-curated substrates without local catalysis)
+  - title: Transport-only metabolites (TCDB substrates without local catalysis)
     call: list_metabolites(evidence_sources=["transport"], summary=True)
+
+  - title: Transport-only metabolite by ID — reading the two gene counts together
+    call: list_metabolites(metabolite_ids=["chebi:14313"])
+    response: |
+      # glucose (ChEBI) is reached only through TCDB substrate edges:
+      # catalyst_gene_count 0 (no Gene → Reaction → Metabolite path) with
+      # transporter_gene_count 3051 (distinct genes over their deepest TCDB
+      # attachments, all organisms) and evidence_sources ['transport'].
+      {"total_matching": 1, "returned": 1, "truncated": false, "offset": 0,
+       "results": [
+         {"metabolite_id": "chebi:14313", "name": "glucose", "catalyst_gene_count": 0, "transporter_gene_count": 3051, "evidence_sources": ["transport"]}
+       ]}
 
   - title: Measured metabolites — measurement coverage envelope
     call: list_metabolites(evidence_sources=["metabolomics"], summary=True)
@@ -63,13 +75,14 @@ verbose_fields:
 chaining:
   - "list_organisms (per-row catalyzed_metabolite_count > 0) → list_metabolites(organism_names=[...])"
   - "list_metabolites → genes_by_metabolite(metabolite_ids=[...], organism=...)"
+  - "list_metabolites (per-row `transporter_gene_count > 0`) → genes_by_metabolite(metabolite_ids=[...], organism=..., evidence_sources=['transport']) — distinct genes in the transport rows, summed over organisms, equal transporter_gene_count"
   - "list_metabolites (per-row pathway_ids) → genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...)"
   - "differential_expression_by_gene → metabolites_by_gene(metabolite_elements=['N']) → list_metabolites for chemistry context"
   - "list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(metabolite_ids=[...]) — reverse lookup of all measurement evidence (numeric + boolean) for the measured compounds (cross-organism by default)."
 
 mistakes:
   - "Direction-agnostic — KEGG equation order is unreliable upstream, so joins through Reaction_has_metabolite (catalysis) and Tcdb_family_transports_metabolite (transport) do NOT distinguish substrates from products. Layer DE direction (`differential_expression_by_gene`) and functional annotation to disambiguate. See docs://guide/conventions."
-  - "catalyst_gene_count counts the catalysis arm only (genes reaching the metabolite via Gene → Reaction → Metabolite). catalyst_gene_count = 0 does NOT mean metabolomics-only: transport-only metabolites (TCDB substrates with no local catalysis) also read 0. Discriminate via `evidence_sources` — a `['metabolomics']`-only list means no gene path at all — or `transporter_count > 0` (transport arm exists)."
+  - "catalyst_gene_count counts the catalysis arm only (genes reaching the metabolite via Gene → Reaction → Metabolite). catalyst_gene_count = 0 does NOT mean metabolomics-only: transport-only metabolites (TCDB substrates with no local catalysis) also read 0. Discriminate via the paired counts: catalyst_gene_count = 0 with `transporter_gene_count > 0` is transport-only; both 0 with `evidence_sources == ['metabolomics']` is measurement-only (no gene path). `transporter_gene_count` counts distinct genes over their deepest TCDB attachments, all organisms — it equals the distinct genes `genes_by_metabolite` returns in transport rows, summed over organisms."
   - "organism_names with multiple values is UNION, not intersection. To find metabolites BOTH organisms reach, run two single-org calls and intersect by metabolite_id (or filter per-row by organism_count and inspect `m.organism_names` for the full UNION list)."
   - "metaboliteFullText covers Metabolite.name only — NOT formula. For element/composition queries, use `elements` (presence list)."
   - "evidence_sources='metabolomics' selects metabolites measured by a MetaboliteAssay. Drill in via list_metabolite_assays(metabolite_ids=[...]) or assays_by_metabolite to inspect the measurement evidence."

@@ -3,15 +3,30 @@
 # come from Pydantic models via scripts/build_about_content.py.
 
 examples:
-  - title: Single-gene drill-down — urease subunit (Workflow D)
-    call: metabolites_by_gene(locus_tags=["PMM0913"], organism="Prochlorococcus MED4", limit=5)
+  - title: Single-gene drill-down — resolved transporter (Workflow D)
+    call: metabolites_by_gene(locus_tags=["PMM0392"], organism="Prochlorococcus MED4", evidence_sources=["transport"])
     # Workflow D: single-gene mode. Envelope rollups are mostly noise at n=1;
-    # detail rows + total_matching do the work. PMM0913 (salY) is one of
-    # the ABC-superfamily-only MED4 genes — pure transport-arm
-    # family_inferred, large row count via the rollup. Auto-warning
-    # fires (family_inferred dominates). `limit=5` caps the regression
-    # baseline; pair with `transport_confidence='substrate_confirmed'`
-    # in real workflows to mute the rollup blowup.
+    # detail rows + total_matching do the work. PMM0392 (ECF transporter
+    # energizing module) is attached to the ABC superfamily AND to seven
+    # of its subfamilies, so rows come only from the subfamilies
+    # (deepest-attachment projection): 13 distinct metabolites, matching
+    # `gene_overview.transported_metabolite_count`. `by_gene[0]` reads
+    # transport_substrate_resolution='resolved', tcdb_evidence_score_max=0.8.
+
+  - title: Single-gene drill-down — superfamily-only gene (reachability, not capability)
+    call: metabolites_by_gene(locus_tags=["PMM0913"], organism="Prochlorococcus MED4", limit=5)
+    # PMM0913 (salY) is one of the ABC-superfamily-only MED4 genes: its
+    # deepest TCDB attachment IS the superfamily (tcdb:3.A.1), so
+    # `by_gene[0]` reads transport_substrate_resolution='family_inferred'
+    # (score_max 0.8) and the auto-warning fires — 554 transport rows of
+    # reachability through a lumping family, not capability. Note the
+    # split: 312 rows are inherited, but 242 are most_specific AT the
+    # superfamily — substrates no kept child of tcdb:3.A.1 carries. That
+    # is a superfamily-level position, not a subfamily call, so
+    # `substrate_depth=['most_specific']` does NOT remove this gene (it
+    # still returns 242 rows, no warning). The gene-level resolution is
+    # the only guard against reading its substrates. `limit=5` caps the
+    # row blowup.
 
   - title: Urease subunits (canonical detail-row example)
     call: metabolites_by_gene(locus_tags=["PMM0963", "PMM0964", "PMM0965"], organism="Prochlorococcus MED4", limit=5)
@@ -44,7 +59,9 @@ examples:
               → top_metabolites ranks N-bearing compounds by gene reach;
                 top_metabolite_pathways concentrates Nitrogen metabolism,
                 Arginine biosynthesis, Alanine/aspartate/glutamate metabolism;
-                by_element confirms N-presence dominance.
+                by_element confirms N-presence dominance;
+                by_gene[].transport_substrate_resolution separates genes whose
+                N-substrate breadth is a real call from superfamily reachability.
 
       Step 3 (optional): list_metabolites(metabolite_ids=[top_N_metabolite_ids])
               → cross-refs, mass, formula, full pathway names.
@@ -114,18 +131,20 @@ examples:
     # canonical envelope.
 
   - title: Conservative-cast transporter slice (mute the rollup blowup)
-    call: metabolites_by_gene(locus_tags=["PMM0434", "PMM0913"], organism="Prochlorococcus MED4", transport_confidence="substrate_confirmed", evidence_sources=["transport"], limit=5)
-    # Both inputs are ABC-superfamily-only genes (long-tail family_inferred
-    # rows each via the TCDB substrate-edge rollup). Default call would
-    # emit a large number of rows and trip the family_inferred-dominance
-    # auto-warning. Pairing `transport_confidence='substrate_confirmed'`
-    # (drops family_inferred rows) AND `evidence_sources=['transport']`
-    # (skips metabolism arm) returns 0 substrate-curated rows for these two
-    # genes — exposing that ABC Superfamily-only annotation is too coarse
-    # for substrate-level claims. Useful diagnostic for batch DE inputs
-    # that contain ABC-only genes mixed with substrate-curated
-    # transporters. See `docs://guide/conventions` — both tiers are
-    # annotations, neither is ground truth.
+    call: metabolites_by_gene(locus_tags=["PMM0434", "PMM0913"], organism="Prochlorococcus MED4", substrate_depth=["most_specific"], evidence_sources=["transport"], limit=5)
+    # Both inputs are ABC-superfamily-only genes: the unfiltered transport
+    # call returns 1108 rows (554 each: 312 inherited + 242 most_specific
+    # at tcdb:3.A.1) and trips the auto-warning because both read
+    # transport_substrate_resolution='family_inferred'. Pairing
+    # `substrate_depth=['most_specific']` AND `evidence_sources=['transport']`
+    # drops the inherited rows but still returns 484 rows (242 per gene)
+    # with no warning — the filter mutes the rollup, it does not judge the
+    # genes. most_specific at a lumping superfamily is a superfamily-level
+    # position, not a subfamily call; read `by_gene[].transport_substrate_resolution`
+    # before trusting any of these substrates. Useful diagnostic for batch
+    # DE inputs that mix superfamily-only genes with resolved transporters.
+    # See `docs://guide/conventions` — both depths are annotations,
+    # neither is ground truth.
 
 verbose_fields:
   - gene_category
@@ -144,6 +163,7 @@ chaining:
   - "genes_in_cluster(cluster_ids=...) → metabolites_by_gene(locus_tags=cluster_genes, organism=...) (Workflow C — cluster chemistry characterization)"
   - "genes_by_function(search_text=..., organism=...) → metabolites_by_gene(locus_tags=function_hit_genes, organism=...) (Workflow C variant — function-search chemistry)"
   - "gene_overview(locus_tags=[...]) → per-row reaction_count/catalyzed_metabolite_count > 0 → metabolites_by_gene(locus_tags=chemistry_genes, organism=...)"
+  - "gene_overview(locus_tags=[...]) → per-row transport_substrate_resolution='resolved' (read tcdb_evidence_score_max first) → metabolites_by_gene(locus_tags=[...], organism=..., evidence_sources=['transport']) — distinct metabolites in the rows equal transported_metabolite_count"
 
   # downstream from envelope — top_metabolites
   - "metabolites_by_gene → top_metabolites → list_metabolites(metabolite_ids=[top_metabolite_ids]) for richer per-metabolite cross-refs (mass, formula, full pathway names)"
@@ -158,6 +178,7 @@ chaining:
   # downstream from envelope — top_reactions / top_tcdb_families
   - "metabolites_by_gene → top_reactions → genes_by_ontology(ontology='ec', term_ids=[ec_number], organism=...) for genes in adjacent reactions"
   - "metabolites_by_gene → top_tcdb_families → genes_by_ontology(ontology='tcdb', term_ids=[tcdb_family_id], organism=...) for sibling genes in the same family"
+  - "metabolites_by_gene → by_gene (transport_substrate_resolution='family_inferred') → gene_ontology_terms(locus_tags=[...], ontology='tcdb', organism=...) to see every TCDB family the gene is attached to, including ancestors superseded in the rows here"
 
   # downstream from not_matched (annotation-context drill-out)
   - "metabolites_by_gene → not_matched (locus_tags with no chemistry edges) → gene_overview(locus_tags=not_matched) for annotation context (most are richly-annotated non-chemistry genes — DNA gyrase, signaling, etc. — not annotation gaps)"
@@ -180,20 +201,51 @@ mistakes:
     `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay`.
     Same divergence as `genes_by_metabolite`.
   - >-
-    When the auto-warning fires (most transport rows are `family_inferred`),
-    interpret workflow-dependent: use
-    `transport_confidence='substrate_confirmed'` for conservative-cast
-    questions (e.g. cross-organism inference); keep `family_inferred` for
-    broad-screen candidate enumeration (e.g. N-source DE — the real MED4
-    N-uptake genes are family_inferred-only). Both tiers are annotations,
-    neither is ground truth — see `docs://guide/conventions`.
+    Read transport evidence as a three-level trust ladder, top down.
+    (1) `tcdb_evidence_score` (row) / `tcdb_evidence_score_max` (gene, in
+    `by_gene`) — how corroborated the gene × family call is. Rank by it,
+    never filter by it; 0 means an uncorroborated hit, not an absent call
+    (absent is `tcdb_evidence_score_max = None`). (2) Gene-level
+    `transport_substrate_resolution` in `by_gene` — `family_inferred`
+    means the gene's substrate breadth is reachability through a lumping
+    family, not capability; `resolved` means AT LEAST ONE of the gene's
+    deepest attachments is non-lumping, not all of them — a gene attached
+    at both a specific family and the ABC superfamily is `resolved` and
+    still carries the superfamily rollup in its rows. (3) Per-row
+    `substrate_depth` — `most_specific` is the most specific SURVIVING
+    transporter node for this substrate relative to the gene-pruned
+    hierarchy; it can be a family node and it is not a curation level.
+    `inherited` rows came down from an ancestor's substrate set.
+  - >-
+    When the auto-warning fires (input genes read
+    `transport_substrate_resolution='family_inferred'`), their substrate
+    breadth is reachability, not capability — and `substrate_depth=['most_specific']`
+    does NOT remove them (substrates no kept child of the superfamily
+    carries are most_specific AT the superfamily; PMM0913 keeps 242 such
+    rows). Only the gene-level resolution guards against reading their
+    substrates. Choose the depth filter by question shape:
+    `substrate_depth=['most_specific']` for conservative casts
+    (cross-organism inference); no filter for broad-screen candidate
+    enumeration (N-source DE), where inherited rows on real uptake genes
+    are the biology you want. Both depths are annotations, neither is
+    ground truth — see `docs://guide/conventions`.
+  - >-
+    Transport rows are deepest-attachment projections. A gene attached to
+    a TCDB family AND to one of that family's descendants contributes rows
+    only through the descendant; the ancestor's substrate rollup is
+    intentionally absent. Consequently distinct metabolites across a gene's
+    transport rows equal `gene_overview.transported_metabolite_count`
+    (PMM0392: 13, not the ABC-superfamily plateau), and metabolite-side
+    distinct genes equal `list_metabolites.transporter_gene_count`. To see
+    a gene's full family membership including superseded ancestors, use
+    `gene_ontology_terms(ontology='tcdb')`.
   - >-
     Every result row has the same key set — cross-arm fields are explicitly
     `None` on rows from the other arm (metabolism rows have
-    `transport_confidence`/`tcdb_family_id`/`tcdb_family_name` = None;
-    transport rows have `reaction_id`/`reaction_name`/`ec_numbers`/`mass_balance`
-    = None). Use `row['transport_confidence']` (KeyError-free) rather than
-    `row.get('transport_confidence')` if the difference matters.
+    `substrate_depth`/`tcdb_evidence_score`/`tcdb_family_id`/`tcdb_family_name`
+    = None; transport rows have `reaction_id`/`reaction_name`/`ec_numbers`/`mass_balance`
+    = None). Use `row['substrate_depth']` (KeyError-free) rather than
+    `row.get('substrate_depth')` if the difference matters.
   - >-
     Reaction-arm rows are NOT directional — KG reactions carry neither a
     substrate-vs-product role on `Reaction_has_metabolite` nor an
@@ -210,8 +262,9 @@ mistakes:
     There is no `top_genes` envelope field. The per-gene rollup IS `by_gene`
     (one entry per input locus_tag, populated identically in summary and detail
     modes — `rows` / `metabolite_count` / `reaction_count` / `transporter_count`
-    / `metabolism_rows` / `transport_substrate_confirmed_rows` /
-    `transport_family_inferred_rows`). The compound-anchored counterpart
+    / `metabolism_rows` / `transport_most_specific_rows` /
+    `transport_inherited_rows` / `transport_substrate_resolution` /
+    `tcdb_evidence_score_max`). The compound-anchored counterpart
     `top_metabolites` exists (sorted by gene_count); there's no symmetric
     `top_genes` because gene-anchored aggregation already lives in `by_gene`.
     Inspect the actual response shape before assuming a field — don't
@@ -227,7 +280,7 @@ mistakes:
     `ec_numbers` and `mass_balance` are metabolism-arm-only filters — they
     DO NOT suppress transport rows. Transport rows pass through unchanged.
     To restrict to metabolism alone, combine with
-    `evidence_sources=['metabolism']`. Symmetrically, `transport_confidence`
+    `evidence_sources=['metabolism']`. Symmetrically, `substrate_depth`
     narrows transport rows only and metabolism rows are unaffected. Per-arm
     filter scope is predictable + composable; it is NOT soft-exclude.
     `metabolite_elements`, `metabolite_ids`, `metabolite_pathway_ids`, and
@@ -251,7 +304,7 @@ mistakes:
     filter, never grep `formula`.
   - >-
     Use `summary=True` for batch DE inputs (50+ locus_tags). Detail rows
-    can exceed 1,000 quickly even after the precision-tier sort; the
+    can exceed 1,000 quickly even after the depth-tier sort; the
     envelope rollups (top_metabolites, top_metabolite_pathways,
     top_reactions, top_tcdb_families, by_element, by_gene,
     top_gene_categories) are the actually-useful artifact at that scale.
@@ -280,4 +333,6 @@ mistakes:
     layer transcriptional evidence (`differential_expression_by_gene`) and
     functional annotation (`gene_overview` Pfam / KEGG KO names like
     `*-synthase` vs `*-permease`).
-  - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/concepts` for the chemistry layer overview."
+  - wrong: "metabolites_by_gene(locus_tags=[...], organism=..., substrate_depth=['family_inferred'])  # retired value — raises with a rename pointer"
+    right: "metabolites_by_gene(locus_tags=[...], organism=..., substrate_depth=['inherited'])  # valid values: most_specific, inherited"
+  - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and the transport trust ladder, and `docs://guide/concepts` for the chemistry layer overview."

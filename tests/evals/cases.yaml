@@ -1558,7 +1558,8 @@
   expect:
     min_rows: 1
     columns: [metabolite_id, name, formula, elements, catalyst_gene_count,
-              organism_count, transporter_count, evidence_sources, pathway_ids]
+              organism_count, transporter_count, transporter_gene_count,
+              evidence_sources, pathway_ids]
 
 - id: list_metabolites_n_elements
   tool: list_metabolites
@@ -1600,9 +1601,10 @@
 - id: genes_by_metabolite_urea_med4_default
   tool: genes_by_metabolite
   desc: |
-    urea × MED4 default — both arms exercised; both transport_confidence
-    levels present (10 sc + 9 fi); auto-warning does NOT fire (sc > fi for
-    urea). 23 rows total (4 metabolism + 19 transport).
+    urea × MED4 default — both arms exercised; both substrate_depth
+    levels present under the deepest-attachment predicate (10 most_specific
+    + 20 inherited); inherited-dominance auto-warning fires. 34 rows total
+    (4 metabolism + 30 transport). Live-pinned 2026-08-26.
   params:
     metabolite_ids: [kegg.compound:C00086]
     organism: Prochlorococcus MED4
@@ -1615,40 +1617,42 @@
 - id: genes_by_metabolite_nitrite_med4_warning
   tool: genes_by_metabolite
   desc: |
-    nitrite × MED4 default — transport-only (no metabolism rows; 5 sc + 9 fi).
-    Family-inferred-dominance auto-warning DOES fire (fi > sc).
+    nitrite × MED4 default — transport-only (no metabolism rows; 6
+    most_specific + 23 inherited, 27 genes under the deepest-attachment
+    predicate). Inherited-dominance auto-warning DOES fire.
   params:
     metabolite_ids: [kegg.compound:C00088]
     organism: Prochlorococcus MED4
     limit: 5
   expect:
     min_rows: 1
-    columns: [locus_tag, evidence_source, transport_confidence]
+    columns: [locus_tag, evidence_source, substrate_depth, tcdb_evidence_score]
 
-- id: genes_by_metabolite_urea_substrate_confirmed_only
+- id: genes_by_metabolite_urea_most_specific_only
   tool: genes_by_metabolite
   desc: |
-    urea × MED4 with transport_confidence=substrate_confirmed +
-    evidence_sources=[transport] — high-precision transporter hunt;
-    returns 10 rows (5 distinct genes urtA-urtE × 2 specificity-leaf
-    annotations); no auto-warning.
+    urea × MED4 with substrate_depth=[most_specific] +
+    evidence_sources=[transport] — most-specific-surviving-node transporter
+    hunt; returns 10 rows (5 distinct genes urtA-urtE × 2 subfamily
+    annotations 3.A.1.4.4 / 3.A.1.4.5), ranked by tcdb_evidence_score desc
+    (urtBCDE 0.8 before urtA 0.6); no auto-warning.
   params:
     metabolite_ids: [kegg.compound:C00086]
     organism: Prochlorococcus MED4
-    transport_confidence: substrate_confirmed
+    substrate_depth: [most_specific]
     evidence_sources: [transport]
     limit: 10
   expect:
     min_rows: 1
-    columns: [locus_tag, evidence_source, transport_confidence]
+    columns: [locus_tag, evidence_source, substrate_depth, tcdb_evidence_score]
 
 - id: genes_by_metabolite_glutamine_ec_filter
   tool: genes_by_metabolite
   desc: |
     glutamine × MED4 with ec_numbers=['6.3.1.2'] (glutamine synthetase) —
     metabolism arm narrows to 1 row (glnA × glutamine, R00253) while
-    transport rows (10 family_inferred ABC) are returned UNCHANGED. Auto-
-    warning fires (10 fi > 0 sc on transport).
+    transport rows (inherited ABC, deepest-attachment only) are returned
+    UNCHANGED. Inherited-dominance auto-warning fires.
   params:
     metabolite_ids: [kegg.compound:C00064]
     organism: Prochlorococcus MED4
@@ -1670,6 +1674,97 @@
     limit: 5
   expect:
     min_rows: 1
+
+# ── TCDB substrate_depth migration (spec 2026-08-20) — golden-diff coverage ──
+# `dispatch: api` captures the full api envelope (warnings, by_gene[],
+# by_metabolic_capability) instead of builder rows.
+- id: metabolites_by_gene_pmm0392_med4_transport
+  tool: metabolites_by_gene
+  dispatch: api
+  desc: |
+    PMM0392 (ABC transporter, resolved) × MED4 — pins the MBG rename surface
+    (substrate_depth / tcdb_evidence_score rows, by_substrate_depth,
+    transport_most_specific_rows / transport_inherited_rows) and by_gene[]
+    transport_substrate_resolution='resolved' + tcdb_evidence_score_max=0.8.
+    13 deepest-attachment transport rows (== gene_overview
+    transported_metabolite_count; the all-edges walk gave 554).
+  params:
+    locus_tags: [PMM0392]
+    organism: Prochlorococcus MED4
+    limit: 20
+  expect:
+    min_rows: 13
+    max_rows: 13
+    columns: [locus_tag, evidence_source, substrate_depth, tcdb_evidence_score,
+              tcdb_family_id, metabolite_id]
+
+- id: metabolites_by_gene_pmm0913_family_inferred_warning
+  tool: metabolites_by_gene
+  dispatch: api
+  desc: |
+    PMM0913 (ABC-superfamily-only, transport_substrate_resolution=
+    'family_inferred') × MED4, transport arm — pins the per-gene warning
+    (KG-authoritative resolution; literal phrases "reachability, not
+    capability" + "resolved means at least one non-lumping attachment")
+    and the 554-row envelope: 242 most_specific / 312 inherited.
+  params:
+    locus_tags: [PMM0913]
+    organism: Prochlorococcus MED4
+    evidence_sources: [transport]
+    limit: 10
+  expect:
+    min_rows: 10
+    max_rows: 10
+    columns: [locus_tag, evidence_source, substrate_depth, tcdb_evidence_score]
+
+- id: metabolites_by_gene_pmm0913_most_specific_filter
+  tool: metabolites_by_gene
+  dispatch: api
+  desc: |
+    Same gene with substrate_depth=[most_specific] — the depth filter is a
+    row filter, NOT a gene filter: the superfamily-only gene stays (242
+    most_specific rows on 3.A.1) and no warning fires (user set the filter).
+  params:
+    locus_tags: [PMM0913]
+    organism: Prochlorococcus MED4
+    evidence_sources: [transport]
+    substrate_depth: [most_specific]
+    limit: 10
+  expect:
+    min_rows: 10
+    max_rows: 10
+    columns: [locus_tag, evidence_source, substrate_depth, tcdb_evidence_score]
+
+- id: gene_overview_tcdb_pair
+  tool: gene_overview
+  dispatch: api
+  desc: |
+    PMM0001 (no TCDB call → tcdb_evidence_score_max None /
+    transported_metabolite_count 0 / transport_substrate_resolution None)
+    vs PMM0392 (0.8 / 13 / resolved). Pins the null-vs-non-null score path,
+    transporter_count removal, and the deepest-attachment-scoped
+    evidence_sources / has_chemistry.
+  params:
+    locus_tags: [PMM0001, PMM0392]
+  expect:
+    min_rows: 2
+    max_rows: 2
+    columns: [locus_tag, reaction_count, catalyzed_metabolite_count,
+              tcdb_evidence_score_max, transported_metabolite_count,
+              transport_substrate_resolution, evidence_sources]
+
+- id: list_organisms_summary_capability
+  tool: list_organisms
+  dispatch: api
+  desc: |
+    list_organisms(summary=True) — pins by_metabolic_capability entries
+    (top 10 by catalyzed_metabolite_count, ranking unchanged) now carrying
+    transported_metabolite_count, plus by_measurement_capability.
+  params:
+    summary: true
+  expect:
+    min_rows: 0
+    max_rows: 0
 
 - id: genes_by_metabolite_alcohol_alteromonas_not_matched
   tool: genes_by_metabolite

@@ -34,4 +34,6 @@ rows:
   reaction_count: 0
   significant_down_count: 0
   significant_up_count: 2
-  transporter_count: 0
+  tcdb_evidence_score_max: null
+  transport_substrate_resolution: null
+  transported_metabolite_count: 0

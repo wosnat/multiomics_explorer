@@ -65,6 +65,14 @@ def test_lint_catches_audit_word(lint_mod, tmp_path):
     assert len(vs) >= 1
 
 
+def test_lint_catches_capitalized_audit(lint_mod, tmp_path):
+    """'Audit Part 3a P0' in examples/metabolites.py slipped the lowercase-only pattern."""
+    md = tmp_path / "t.md"
+    md.write_text("Build-derived note (Audit Part 3a P0).\n")
+    vs = lint_mod.lint_about_content([md])
+    assert len(vs) >= 1
+
+
 def test_lint_catches_kg_ticket(lint_mod, tmp_path):
     md = tmp_path / "t.md"
     md.write_text("Pending KG-MET-002 backfill.\n")
@@ -116,6 +124,17 @@ def test_lint_catches_retired_catalysis_arm_names(lint_mod, tmp_path):
     )
     vs = lint_mod.lint_about_content([md])
     assert len(vs) == 4
+
+
+def test_lint_catches_retired_tcdb_trust_vocabulary(lint_mod, tmp_path):
+    """Retired 2026-08 TCDB terms: precision-tier label, family-inferred dominance."""
+    md = tmp_path / "t.md"
+    md.write_text(
+        "See section g (precision-tier) for the split.\n"
+        "Warn on family_inferred dominance of transport rows.\n"
+    )
+    vs = lint_mod.lint_about_content([md])
+    assert len(vs) == 2
 
 
 def test_lint_ignores_legitimate_count_names(lint_mod, tmp_path):

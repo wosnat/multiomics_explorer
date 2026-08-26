@@ -172,17 +172,17 @@ and `list_organisms`. Discover valid values with
   vs product.
 - **`TcdbFamily`** (~13k nodes) — TCDB transporter family hierarchy.
   Genes connect via `Gene_has_tcdb_family`; substrates via
-  `Tcdb_family_transports_metabolite`. Substrates are curated at the
-  **leaf** (`tc_specificity`) level and rolled **up** the hierarchy —
-  every ancestor family carries the union of substrates from its
-  descendant leaves. Why: transport-substrate specificity is
-  biologically uncertain, so genes annotated to broad families still
-  surface candidate substrates. Transport edges carry a
-  `transport_confidence` discriminator: `substrate_confirmed` (gene
-  annotated to the curated leaf itself) vs `family_inferred` (gene
-  annotated to an ancestor; some descendant leaf carries the
-  curation, but not necessarily the one matching this gene).
-  Family-inferred dominates by volume — see
+  `Tcdb_family_transports_metabolite`. Substrates attach to family
+  nodes and are inherited **down** the hierarchy, so genes annotated to
+  broad families still surface candidate substrates. Each substrate edge
+  carries `substrate_depth`: `most_specific` (the most specific
+  surviving node for that substrate in the gene-pruned hierarchy — not a
+  curation level) or `inherited`. Each gene × family edge carries a
+  composite `evidence_score` on `[0, 1]`; genes carry
+  `tcdb_evidence_score_max`, `transported_metabolite_count` and
+  `transport_substrate_resolution` (`resolved` / `family_inferred`),
+  all computed over the gene's deepest attachments only. Inherited rows
+  dominate by volume — see the trust ladder in
   `docs://analysis/metabolites`.
 
 ### Ontology nodes (14 ontologies)
@@ -292,8 +292,8 @@ independent pipelines, indicated by `Metabolite.evidence_sources`:
    evidence; direction-agnostic (KEGG equation order is unreliable, so
    we do not encode produced vs consumed).
 2. **`transport`** — `Gene → TcdbFamily → Metabolite` from TCDB. Transport
-   substrate evidence; `transport_confidence` discriminates curated leaf
-   vs inherited-from-ancestor.
+   substrate evidence; `substrate_depth` (`most_specific` / `inherited`)
+   and `tcdb_evidence_score` qualify each transport row.
 3. **`metabolomics`** — `MetaboliteAssay → Metabolite`. Mass-spec
    measurement evidence; *no gene anchor* — the measurement is on the
    compound, not the gene.

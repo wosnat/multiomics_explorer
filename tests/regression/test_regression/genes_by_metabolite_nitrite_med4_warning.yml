@@ -1,24 +1,24 @@
 by_evidence_source:
-- count: 17
+- count: 29
   evidence_source: transport
 by_metabolite:
 - formula: NO2
-  gene_count: 15
+  gene_count: 27
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00088
   name: Nitrite
   reaction_count: 0
-  rows: 17
-  transport_family_inferred_rows: 12
-  transport_substrate_confirmed_rows: 5
-  transporter_count: 3
-by_transport_confidence:
-- count: 12
-  transport_confidence: family_inferred
-- count: 5
-  transport_confidence: substrate_confirmed
+  rows: 29
+  transport_inherited_rows: 23
+  transport_most_specific_rows: 6
+  transporter_count: 5
+by_substrate_depth:
+- count: 23
+  substrate_depth: inherited
+- count: 6
+  substrate_depth: most_specific
 case_id: genes_by_metabolite_nitrite_med4_warning
-gene_count_total: 15
+gene_count_total: 27
 metabolite_count_total: 1
 not_found:
   metabolite_ids: []
@@ -41,9 +41,10 @@ results:
   product: cyanate ABC transporter, substrate-binding protein
   reaction_id: null
   reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.6
   tcdb_family_id: tcdb:3.A.1.16.1
-  tcdb_family_name: 3.A.1.16.1
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: Four component nitrate/nitrite porter.
 - ec_numbers: null
   evidence_source: transport
   gene_name: cynA
@@ -57,9 +58,10 @@ results:
   product: cyanate ABC transporter, substrate-binding protein
   reaction_id: null
   reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.6
   tcdb_family_id: tcdb:3.A.1.16.2
-  tcdb_family_name: 3.A.1.16.2
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: Bispecific cyanate/nitrite transporter.
 - ec_numbers: null
   evidence_source: transport
   gene_name: cynB
@@ -73,9 +75,10 @@ results:
   product: cyanate ABC transporter, permease protein
   reaction_id: null
   reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.16.1
-  tcdb_family_name: 3.A.1.16.1
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: Four component nitrate/nitrite porter.
 - ec_numbers: null
   evidence_source: transport
   gene_name: cynB
@@ -89,9 +92,10 @@ results:
   product: cyanate ABC transporter, permease protein
   reaction_id: null
   reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.16.2
-  tcdb_family_name: 3.A.1.16.2
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: Bispecific cyanate/nitrite transporter.
 - ec_numbers: null
   evidence_source: transport
   gene_name: cynD
@@ -105,19 +109,32 @@ results:
   product: cyanate ABC transporter ATP-binding protein
   reaction_id: null
   reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.16.1
-  tcdb_family_name: 3.A.1.16.1
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: Four component nitrate/nitrite porter.
 returned: 5
 row_count: 5
 top_gene_categories:
 - category: Transport
-  gene_count: 8
+  gene_count: 10
+- category: Stress response and adaptation
+  gene_count: 5
 - category: Central intermediary metabolism
   gene_count: 3
-- category: Stress response and adaptation
-  gene_count: 3
+- category: Amino acid metabolism
+  gene_count: 1
+- category: Carbohydrate metabolism
+  gene_count: 1
+- category: Cell cycle and division
+  gene_count: 1
 - category: Cellular processes
+  gene_count: 1
+- category: Coenzyme metabolism
+  gene_count: 1
+- category: Lipid metabolism
+  gene_count: 1
+- category: Post-translational modification
   gene_count: 1
 top_genes:
 - gene_name: cynA
@@ -125,107 +142,139 @@ top_genes:
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 0
-  transport_substrate_confirmed_rows: 2
+  tcdb_evidence_score_max: 0.6
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 2
+  transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: cynB
   locus_tag: PMM0371
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 0
-  transport_substrate_confirmed_rows: 2
+  tcdb_evidence_score_max: 0.8
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 2
+  transport_substrate_resolution: resolved
   transporter_count: 2
-- gene_name: ecfA1
-  locus_tag: PMM0125
+- gene_name: sufC
+  locus_tag: PMM0072
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
+  tcdb_evidence_score_max: 0.4
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: resolved
+  transporter_count: 1
+- gene_name: null
+  locus_tag: PMM0089
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  tcdb_evidence_score_max: 0.4
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: resolved
+  transporter_count: 1
+- gene_name: tolC
+  locus_tag: PMM0097
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  tcdb_evidence_score_max: 0.4
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: resolved
+  transporter_count: 1
+- gene_name: cgtA
+  locus_tag: PMM0218
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  tcdb_evidence_score_max: 0.0
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: resolved
+  transporter_count: 1
+- gene_name: minD
+  locus_tag: PMM0321
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  tcdb_evidence_score_max: 0.2
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: resolved
   transporter_count: 1
 - gene_name: cynD
   locus_tag: PMM0372
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 0
-  transport_substrate_confirmed_rows: 1
+  tcdb_evidence_score_max: 0.8
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transport_substrate_resolution: resolved
   transporter_count: 1
-- gene_name: cbiQ
-  locus_tag: PMM0392
+- gene_name: fadD
+  locus_tag: PMM0402
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
+  tcdb_evidence_score_max: 0.8
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: resolved
   transporter_count: 1
 - gene_name: ftsE
   locus_tag: PMM0434
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
-  transporter_count: 1
-- gene_name: ccmA
-  locus_tag: PMM0449
-  metabolism_rows: 0
-  metabolite_count: 1
-  reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
-  transporter_count: 1
-- gene_name: ycf38
-  locus_tag: PMM0450
-  metabolism_rows: 0
-  metabolite_count: 1
-  reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
-  transporter_count: 1
-- gene_name: null
-  locus_tag: PMM0666
-  metabolism_rows: 0
-  metabolite_count: 1
-  reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
-  transporter_count: 1
-- gene_name: devC
-  locus_tag: PMM0749
-  metabolism_rows: 0
-  metabolite_count: 1
-  reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
+  tcdb_evidence_score_max: 0.8
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: family_inferred
   transporter_count: 1
 top_reactions: []
 top_tcdb_families:
-- gene_count: 12
+- gene_count: 20
   level_kind: tc_family
   metabolite_count: 1
+  substrate_depth: inherited
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
-  transport_confidence: family_inferred
+- gene_count: 3
+  level_kind: tc_family
+  metabolite_count: 1
+  substrate_depth: inherited
+  tcdb_family_id: tcdb:2.A.1
+  tcdb_family_name: The Major Facilitator Superfamily (MFS)
 - gene_count: 3
   level_kind: tc_specificity
   metabolite_count: 1
+  substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.16.1
-  tcdb_family_name: 3.A.1.16.1
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: Four component nitrate/nitrite porter.
 - gene_count: 2
   level_kind: tc_specificity
   metabolite_count: 1
+  substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.16.2
-  tcdb_family_name: 3.A.1.16.2
-  transport_confidence: substrate_confirmed
-total_matching: 17
-transporter_count_total: 3
+  tcdb_family_name: Bispecific cyanate/nitrite transporter.
+- gene_count: 1
+  level_kind: tc_family
+  metabolite_count: 1
+  substrate_depth: most_specific
+  tcdb_family_id: tcdb:2.A.16
+  tcdb_family_name: The Telurite-resistance/Dicarboxylate Transporter (TDT) Family
+total_matching: 29
+transporter_count_total: 5
 truncated: true
 warnings:
-- 'Most transport rows are `family_inferred` (12 of 17) — annotations rolled up from
-  family-level transport potential. Workflow-dependent: use `transport_confidence=''substrate_confirmed''`
-  for conservative-cast questions (e.g. cross-organism inference); keep `family_inferred`
-  for broad-screen candidate enumeration. Both tiers are annotations, neither is ground
-  truth — see analysis-doc §g.'
+- Most transport rows are `inherited` (23 of 29) — the substrate is reached through
+  a broader family's substrate list, not the gene's most specific surviving node.
+  Use substrate_depth=['most_specific'] for conservative-cast questions (e.g. cross-organism
+  inference); keep `inherited` rows for broad-screen candidate enumeration, and rank
+  within a tier by `tcdb_evidence_score`. Per-gene trust lives in `top_genes[].transport_substrate_resolution`.

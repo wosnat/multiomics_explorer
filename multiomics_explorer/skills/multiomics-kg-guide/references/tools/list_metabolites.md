@@ -60,9 +60,10 @@ total_entries, total_matching, top_organisms, top_metabolite_pathways, by_eviden
 | formula | string \| None (optional) | Hill-notation chemical formula (e.g. 'C6H12O6'). Null on a minority of metabolites (mostly TCDB-curated generic substrates). |
 | elements | list[string] (optional) | Sorted unique element symbols present in formula (e.g. ['C','H','O']). Empty when formula is null. Filter on this — never on `formula` substring (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Presence list (no atom counts; stoichiometry lives in `formula`). |
 | mass | float \| None (optional) | Monoisotopic mass in Da (e.g. 180.156). Null on a minority of metabolites. |
-| catalyst_gene_count | int (optional) | Distinct catalyst genes via Gene → Reaction → Metabolite (catalysis arm only). Transport-only metabolites also read 0 — evidence_sources==['metabolomics'] means no gene path; transporter_count>0 means transport arm. Drill in via genes_by_metabolite. |
+| catalyst_gene_count | int (optional) | Distinct catalyst genes via Gene → Reaction → Metabolite (catalysis arm only). Transport-only metabolites read 0 here with transporter_gene_count > 0; evidence_sources==['metabolomics'] means no gene path at all. Drill in via genes_by_metabolite. |
 | organism_count | int (optional) | Distinct organisms reaching this metabolite via any chemistry path. When > 0, narrow with organism_names filter. |
-| transporter_count | int (optional) | Distinct tc_specificity leaf TcdbFamily nodes annotated as transporting this metabolite. Scoped to leaves — the count reflects actual transporter systems rather than counting ancestor families that inherit the substrate via the rollup. Source: TCDB-CAZy ontology. |
+| transporter_count | int (optional) | Distinct transporter systems (TcdbFamily nodes) whose substrate edge to this metabolite is substrate_depth='most_specific'. Systems, not genes — pair with transporter_gene_count and catalyst_gene_count; drill via genes_by_metabolite. |
+| transporter_gene_count | int (optional) | Distinct genes (all organisms) whose deepest TCDB attachment transports this metabolite (precomputed Metabolite.transporter_gene_count). catalyst_gene_count=0 with transporter_gene_count>0 = transport-only; drill via genes_by_metabolite. |
 | evidence_sources | list[string] (optional) | Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. 'metabolism' = at least one Reaction in KG involves this compound; 'transport' = at least one TcdbFamily curates this as substrate; 'metabolomics' = at least one MetaboliteAssay measures this compound. E.g. ['metabolism', 'transport']. |
 | chebi_id | string \| None (optional) | ChEBI ID (raw numeric, e.g. '4167'). Populated on most metabolites — 100% of chebi:-IDed transport-only metabolites (extracted from the ID itself), plus the kegg.compound:-IDed metabolites that cross-ref ChEBI. |
 | pathway_ids | list[string] (optional) | KEGG pathway memberships (e.g. ['kegg.pathway:ko00010', 'kegg.pathway:ko01100']). Empty when no Metabolite_in_pathway edges. Drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...). |
@@ -109,13 +110,30 @@ list_metabolites(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii 
 list_metabolites(search_text="glucose", limit=3)
 ```
 
-### Example 5: Transport-only metabolites (TCDB-curated substrates without local catalysis)
+### Example 5: Transport-only metabolites (TCDB substrates without local catalysis)
 
 ```example-call
 list_metabolites(evidence_sources=["transport"], summary=True)
 ```
 
-### Example 6: Measured metabolites — measurement coverage envelope
+### Example 6: Transport-only metabolite by ID — reading the two gene counts together
+
+```example-call
+list_metabolites(metabolite_ids=["chebi:14313"])
+```
+
+```example-response
+# glucose (ChEBI) is reached only through TCDB substrate edges:
+# catalyst_gene_count 0 (no Gene → Reaction → Metabolite path) with
+# transporter_gene_count 3051 (distinct genes over their deepest TCDB
+# attachments, all organisms) and evidence_sources ['transport'].
+{"total_matching": 1, "returned": 1, "truncated": false, "offset": 0,
+ "results": [
+   {"metabolite_id": "chebi:14313", "name": "glucose", "catalyst_gene_count": 0, "transporter_gene_count": 3051, "evidence_sources": ["transport"]}
+ ]}
+```
+
+### Example 7: Measured metabolites — measurement coverage envelope
 
 ```example-call
 list_metabolites(evidence_sources=["metabolomics"], summary=True)
@@ -130,7 +148,7 @@ list_metabolites(evidence_sources=["metabolomics"], summary=True)
  "returned": 0, "truncated": true, "offset": 0, "results": []}
 ```
 
-### Example 7: Multi-step — find N-metabolites then drill into catalysts
+### Example 8: Multi-step — find N-metabolites then drill into catalysts
 
 ```
 Step 1: list_metabolites(organism_names=["Prochlorococcus MED4"], elements=["N"], limit=10)
@@ -140,7 +158,7 @@ Step 2: genes_by_metabolite(metabolite_ids=[chosen_ids], organism="Prochlorococc
         → catalysing genes per metabolite
 ```
 
-### Example 8: Currency-cofactor strip — exclude ATP/ADP/NADH/NADPH/H2O when top_metabolites is dominated by them
+### Example 9: Currency-cofactor strip — exclude ATP/ADP/NADH/NADPH/H2O when top_metabolites is dominated by them
 
 ```example-call
 list_metabolites(
@@ -162,6 +180,7 @@ list_metabolites(
 ```
 list_organisms (per-row catalyzed_metabolite_count > 0) → list_metabolites(organism_names=[...])
 list_metabolites → genes_by_metabolite(metabolite_ids=[...], organism=...)
+list_metabolites (per-row `transporter_gene_count > 0`) → genes_by_metabolite(metabolite_ids=[...], organism=..., evidence_sources=['transport']) — distinct genes in the transport rows, summed over organisms, equal transporter_gene_count
 list_metabolites (per-row pathway_ids) → genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...)
 differential_expression_by_gene → metabolites_by_gene(metabolite_elements=['N']) → list_metabolites for chemistry context
 list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(metabolite_ids=[...]) — reverse lookup of all measurement evidence (numeric + boolean) for the measured compounds (cross-organism by default).
@@ -171,7 +190,7 @@ list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(m
 
 - Direction-agnostic — KEGG equation order is unreliable upstream, so joins through Reaction_has_metabolite (catalysis) and Tcdb_family_transports_metabolite (transport) do NOT distinguish substrates from products. Layer DE direction (`differential_expression_by_gene`) and functional annotation to disambiguate. See docs://guide/conventions.
 
-- catalyst_gene_count counts the catalysis arm only (genes reaching the metabolite via Gene → Reaction → Metabolite). catalyst_gene_count = 0 does NOT mean metabolomics-only: transport-only metabolites (TCDB substrates with no local catalysis) also read 0. Discriminate via `evidence_sources` — a `['metabolomics']`-only list means no gene path at all — or `transporter_count > 0` (transport arm exists).
+- catalyst_gene_count counts the catalysis arm only (genes reaching the metabolite via Gene → Reaction → Metabolite). catalyst_gene_count = 0 does NOT mean metabolomics-only: transport-only metabolites (TCDB substrates with no local catalysis) also read 0. Discriminate via the paired counts: catalyst_gene_count = 0 with `transporter_gene_count > 0` is transport-only; both 0 with `evidence_sources == ['metabolomics']` is measurement-only (no gene path). `transporter_gene_count` counts distinct genes over their deepest TCDB attachments, all organisms — it equals the distinct genes `genes_by_metabolite` returns in transport rows, summed over organisms.
 
 - organism_names with multiple values is UNION, not intersection. To find metabolites BOTH organisms reach, run two single-org calls and intersect by metabolite_id (or filter per-row by organism_count and inspect `m.organism_names` for the full UNION list).
 

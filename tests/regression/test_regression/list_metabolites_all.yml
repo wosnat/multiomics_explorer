@@ -70,6 +70,7 @@ results:
   - kegg.pathway:ko05208
   - kegg.pathway:ko05415
   transporter_count: 14
+  transporter_gene_count: 1822
 - catalyst_gene_count: 5906
   chebi_id: '10789'
   elements:
@@ -126,6 +127,7 @@ results:
   - kegg.pathway:ko05410
   - kegg.pathway:ko05415
   transporter_count: 15
+  transporter_gene_count: 2177
 - catalyst_gene_count: 5666
   chebi_id: '10744'
   elements:
@@ -172,6 +174,7 @@ results:
   - kegg.pathway:ko05164
   - kegg.pathway:ko05323
   transporter_count: 123
+  transporter_gene_count: 7889
 - catalyst_gene_count: 4228
   chebi_id: '13420'
   elements:
@@ -196,6 +199,7 @@ results:
   - kegg.pathway:ko05012
   - kegg.pathway:ko05022
   transporter_count: 3
+  transporter_gene_count: 98
 - catalyst_gene_count: 3983
   chebi_id: '14791'
   elements:
@@ -227,6 +231,7 @@ results:
   - kegg.pathway:ko05012
   - kegg.pathway:ko05022
   transporter_count: 15
+  transporter_gene_count: 2826
 returned: 5
 row_count: 5
 score_max: null

@@ -65,8 +65,10 @@ total_matching, by_organism, by_category, by_annotation_type, by_annotation_stat
 | derived_metric_count | int (optional) | Total DerivedMetric annotations on this gene (sum across numeric/boolean/categorical kinds). |
 | derived_metric_value_kinds | list[string] (optional) | Subset of {numeric, boolean, categorical} where this gene has DM annotations. Use to route to genes_by_{kind}_metric drill-downs. |
 | reaction_count | int (optional) | Distinct reactions catalysed by this gene (precomputed Gene-side rollup). When > 0, drill via metabolites_by_gene(locus_tags=[locus_tag], organism=...). |
-| catalyzed_metabolite_count | int (optional) | Distinct metabolites reachable via catalysis only (Gene_catalyzes_reaction → Reaction_has_metabolite). Transport-only genes read 0 — check transporter_count>0 / 'transport' in evidence_sources (e.g. ABC transporter PMM0392: 0 here, 8 TCDB families). |
-| transporter_count | int (optional) | Distinct TCDB families annotated to this gene. When > 0, drill via genes_by_metabolite or metabolites_by_gene with the transport arm. |
+| catalyzed_metabolite_count | int (optional) | Distinct metabolites reachable via catalysis only (Gene_catalyzes_reaction → Reaction_has_metabolite). Transport-only genes read 0 — check transported_metabolite_count / 'transport' in evidence_sources (e.g. PMM0392: 0 here, 13 transported). |
+| tcdb_evidence_score_max | float \| None (optional) | Max KG 5-signal composite evidence_score over this gene's TCDB calls, in [0,1]. Rank with it, don't filter: 0 = uncorroborated DIAMOND hit, not absent. None = no TCDB call (never a sentinel). |
+| transported_metabolite_count | int (optional) | Distinct metabolites this gene transports via its deepest TCDB attachments (precomputed Gene.transported_metabolite_count). Pairs with catalyzed_metabolite_count. When > 0, drill via metabolites_by_gene(locus_tags=[...]). |
+| transport_substrate_resolution | string \| None (optional) | 'resolved' = at least one non-lumping deepest TCDB attachment (not all); 'family_inferred' = transported_metabolite_count is reachability, not capability. None = no TCDB call. Read the score; if resolved, drill into substrates. |
 | evidence_sources | list[string] (optional) | Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. When non-empty, drill into metabolites_by_gene(locus_tags=[...]). Per-source definitions: see docs://guide/concepts. |
 | discussed_in_publication_count | int (optional) | Distinct publications that discuss this gene in prose (precomputed Gene.discussed_in_publication_count). Recall-biased narrative mention, NOT DE-table expression. When > 0, set verbose=True for the per-paper DOI list, or call discussed_by_publication for a paper's full discussed set. |
 | numeric_metric_count | int \| None (optional) | Numeric DM count (verbose-only). |
@@ -147,20 +149,25 @@ gene_overview(locus_tags=["MIT1002_01809"])
  ]}
 ```
 
-### Example 6: Transport-only gene — ABC transporter with zero catalysis reach
+### Example 6: Transport-only gene — resolved transporter with zero catalysis reach
 
 ```example-call
-gene_overview(locus_tags=["PMM0392"])
+gene_overview(locus_tags=["PMM0392", "PMM0001"])
 ```
 
 ```example-response
 # catalyzed_metabolite_count counts the catalysis arm only
-# (Gene → Reaction → Metabolite). This transporter reads 0 there,
-# yet has chemistry: transporter_count=8 and 'transport' in
-# evidence_sources mark the transport arm.
-{"total_matching": 1, "has_expression": 1, "has_chemistry": 1, "returned": 1, "truncated": false, "offset": 0, "not_found": [],
+# (Gene → Reaction → Metabolite). PMM0392 reads 0 there, yet has
+# chemistry: 'transport' in evidence_sources, tcdb_evidence_score_max
+# 0.8 (how corroborated its best TCDB call is), transported_metabolite_count
+# 13 (substrate breadth over its deepest TCDB attachments) and
+# transport_substrate_resolution 'resolved' (at least one non-lumping
+# attachment, so that breadth is a real call). PMM0001 has no TCDB
+# call at all: score null, count 0, resolution null.
+{"total_matching": 2, "has_expression": 2, "has_chemistry": 2, "returned": 2, "truncated": false, "offset": 0, "not_found": [],
  "results": [
-   {"locus_tag": "PMM0392", "gene_name": null, "product": "ABC transporter, ATP-binding protein", "organism_name": "Prochlorococcus MED4", "reaction_count": 0, "catalyzed_metabolite_count": 0, "transporter_count": 8, "evidence_sources": ["transport", "metabolomics"]}
+   {"locus_tag": "PMM0392", "gene_name": "cbiQ", "product": "transmembrane component of ECF transporter energizing module", "organism_name": "Prochlorococcus MED4", "reaction_count": 0, "catalyzed_metabolite_count": 0, "tcdb_evidence_score_max": 0.8, "transported_metabolite_count": 13, "transport_substrate_resolution": "resolved", "evidence_sources": ["transport", "metabolomics"]},
+   {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_name": "Prochlorococcus MED4", "reaction_count": 4, "catalyzed_metabolite_count": 6, "tcdb_evidence_score_max": null, "transported_metabolite_count": 0, "transport_substrate_resolution": null, "evidence_sources": ["metabolism", "metabolomics"]}
  ]}
 ```
 
@@ -198,6 +205,7 @@ gene_overview → gene_clusters_by_gene
 gene_overview(locus_tags=...) → for genes with derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric; for ['numeric'] use genes_by_numeric_metric; for ['categorical'] use genes_by_categorical_metric
 gene_overview(verbose=True) → see compartments_observed for vesicle/whole-cell triage
 gene_overview (per-row `evidence_sources` non-empty) → metabolites_by_gene OR genes_by_metabolite for chemistry drill-down.
+gene_overview (per-row `transport_substrate_resolution='resolved'`, after reading `tcdb_evidence_score_max`) → metabolites_by_gene(locus_tags=[...], organism=..., evidence_sources=['transport']) — distinct metabolites in the rows equal `transported_metabolite_count`.
 gene_overview (per-row `discussed_in_publication_count` > 0) → use verbose=True for the per-gene {doi, prominence, evidence} list, or discussed_by_publication(publication_dois=[...]) for the paper's full discussed set.
 ```
 
@@ -211,7 +219,9 @@ gene_overview (per-row `discussed_in_publication_count` > 0) → use verbose=Tru
 
 - When `evidence_sources` is non-empty, drill via `metabolites_by_gene` (gene-anchored) or `genes_by_metabolite` (metabolite-anchored). Values are subset of {'metabolism', 'transport', 'metabolomics'} — 'metabolomics' means at least one of the gene's reachable metabolites has measurement coverage.
 
-- `catalyzed_metabolite_count` counts the catalysis arm only (distinct metabolites via Gene → Reaction → Metabolite). It is NOT a total chemistry reach: a transport-only gene reads 0 here while `transporter_count > 0` and 'transport' appears in `evidence_sources`. Use `evidence_sources` to see which arms exist before interpreting a 0.
+- `catalyzed_metabolite_count` counts the catalysis arm only (distinct metabolites via Gene → Reaction → Metabolite). It is NOT a total chemistry reach: a transport-only gene reads 0 here while `transported_metabolite_count > 0` and 'transport' appears in `evidence_sources`. Use `evidence_sources` to see which arms exist before interpreting a 0.
+
+- TCDB routing rule: read the score; if resolved, drill into substrates. `tcdb_evidence_score_max` is the gene's most corroborated TCDB call (null = no TCDB call; 0 = an uncorroborated hit, not absence) — rank by it, never filter by it. `transport_substrate_resolution='family_inferred'` means `transported_metabolite_count` is reachability through a lumping family, not capability; `'resolved'` means at least one deepest attachment is non-lumping (not all of them — a superfamily rollup can still sit inside the count). Per-row `substrate_depth` in `metabolites_by_gene` separates the two.
 
 - discussed_in_publication_count > 0 means at least one publication names this gene in prose (a recall-biased literature index, NOT DE-table expression). At ~1 pub/gene the answer is usually inline: verbose=True returns discussed_in_publications as {doi, prominence, evidence} per gene. Use discussed_by_publication for a paper's full discussed set.
 

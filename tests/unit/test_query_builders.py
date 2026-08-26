@@ -3,6 +3,8 @@
 Verifies Cypher structure and parameter correctness.
 """
 
+import re
+
 import pytest
 
 from multiomics_explorer.kg.constants import ALL_ONTOLOGIES, GO_ONTOLOGIES
@@ -1206,6 +1208,10 @@ class TestBuildListOrganismsCapability:
         assert "coalesce(o.reaction_count, 0) AS reaction_count" in cypher
         assert ("coalesce(o.catalyzed_metabolite_count, 0) "
                 "AS catalyzed_metabolite_count") in cypher
+        # substrate_depth migration: by_metabolic_capability[] entries carry
+        # transported_metabolite_count (ranking unchanged)
+        assert ("coalesce(o.transported_metabolite_count, 0) "
+                "AS transported_metabolite_count") in cypher
         # Stays small — no verbose / DM / cluster / reference columns
         for absent in ("lineage", "derived_metric_count", "cluster_count",
                         "reference_database", "treatment_types"):
@@ -7045,6 +7051,10 @@ class TestBuildListMetabolites:
             "coalesce(m.catalyst_gene_count, 0) AS catalyst_gene_count",
             "coalesce(m.organism_count, 0) AS organism_count",
             "coalesce(m.transporter_count, 0) AS transporter_count",
+            # substrate_depth migration: deepest-attachment transporter genes
+            # (closes the trap loop: catalyst_gene_count=0,
+            # transporter_gene_count>0 = transport-only)
+            "coalesce(m.transporter_gene_count, 0) AS transporter_gene_count",
             "coalesce(m.evidence_sources, []) AS evidence_sources",
             "m.chebi_id AS chebi_id",
             "coalesce(m.pathway_ids, []) AS pathway_ids",
@@ -7219,6 +7229,36 @@ class TestBuildListMetabolitesSummary:
 # ---------------------------------------------------------------------------
 
 
+
+# ---------------------------------------------------------------------------
+# TCDB substrate_depth migration (frozen spec
+# docs/tool-specs/2026-08-20-tcdb-substrate-depth-migration.md, decisions 1–5).
+# Shared helpers: whitespace-normalised deepest-attachment predicate
+# (decision 4) that every transport-arm traversal must carry.
+# ---------------------------------------------------------------------------
+
+def _norm_ws(s: str) -> str:
+    return " ".join(s.split())
+
+
+_DEEPEST_PREDICATE = _norm_ws(
+    "NOT EXISTS { MATCH (g)-[:Gene_has_tcdb_family]->(d:TcdbFamily) "
+    "WHERE (d)-[:Tcdb_family_is_a_tcdb_family*1..4]->(tf) }"
+)
+
+_TRANSPORT_ARM_PATTERN = (
+    "-[gt:Gene_has_tcdb_family]->(tf:TcdbFamily)"
+    "-[r:Tcdb_family_transports_metabolite]->(m:Metabolite)"
+)
+
+
+def _assert_deepest_predicate(cypher: str, min_count: int = 1) -> None:
+    n = _norm_ws(cypher).count(_DEEPEST_PREDICATE)
+    assert n >= min_count, (
+        f"expected >= {min_count} deepest-attachment predicate(s), got {n}"
+    )
+
+
 class TestBuildGenesByMetaboliteMetabolism:
     """Detail-builder tests for the metabolism arm of genes_by_metabolite.
 
@@ -7290,14 +7330,15 @@ class TestBuildGenesByMetaboliteMetabolism:
 
     def test_compact_return_columns(self):
         """Compact RETURN list per spec — 13 entries plus the two
-        per-arm-null padding columns (transport_confidence, tcdb_*)."""
+        per-arm-null padding columns (substrate_depth, tcdb_evidence_score, tcdb_*)."""
         cypher, _ = self._build()
         for col in [
             "g.locus_tag AS locus_tag",
             "g.gene_name AS gene_name",
             "g.product AS product",
             "'metabolism' AS evidence_source",
-            "null AS transport_confidence",
+            "null AS substrate_depth",
+            "null AS tcdb_evidence_score",
             "r.id AS reaction_id",
             "r.name AS reaction_name",
             "coalesce(r.ec_numbers, []) AS ec_numbers",
@@ -7343,11 +7384,17 @@ class TestBuildGenesByMetaboliteMetabolism:
         assert params["limit"] == 10
         assert params["offset"] == 5
 
-    def test_no_transport_confidence_param(self):
-        """Metabolism arm must not accept transport_confidence — that is
+    def test_no_substrate_depth_param(self):
+        """Metabolism arm must not accept substrate_depth — that is
         a transport-arm-only filter per the per-arm filter scope rule."""
         with pytest.raises(TypeError):
-            self._build(transport_confidence="substrate_confirmed")
+            self._build(substrate_depth=["most_specific"])
+
+    def test_no_old_transport_confidence_column(self):
+        """Decision 1: the explorer-invented vocabulary is gone from the
+        metabolism arm too (no `transport_confidence` padding column)."""
+        cypher, _ = self._build()
+        assert "transport_confidence" not in cypher
 
 
 class TestBuildGenesByMetaboliteTransport:
@@ -7365,13 +7412,18 @@ class TestBuildGenesByMetaboliteTransport:
         return build_genes_by_metabolite_transport(**kwargs)
 
     def test_match_path_transport_arm(self):
-        """Transport arm: Gene → TcdbFamily → Metabolite (single-hop, post-rollup)."""
+        """Transport arm: Gene → TcdbFamily → Metabolite (single-hop,
+        post-rollup). Both edges are bound: `gt` (evidence_score) and `r`
+        (substrate_depth)."""
         cypher, _ = self._build()
-        assert (
-            "(g:Gene)-[:Gene_has_tcdb_family]->"
-            "(tf:TcdbFamily)-[:Tcdb_family_transports_metabolite]->(m:Metabolite)"
-            in cypher
-        )
+        assert "(g:Gene)" + _TRANSPORT_ARM_PATTERN in cypher
+
+    def test_deepest_attachment_predicate(self):
+        """Decision 4: the transport arm walks only the gene's deepest TCDB
+        attachments (an attachment to `tf` is superseded when the same gene
+        is attached to a descendant of `tf`)."""
+        cypher, _ = self._build()
+        _assert_deepest_predicate(cypher)
 
     def test_metabolite_ids_in_where(self):
         cypher, params = self._build()
@@ -7400,31 +7452,33 @@ class TestBuildGenesByMetaboliteTransport:
         assert "g.gene_category IN $gene_categories" in cypher
         assert params["gene_categories"] == ["Transport"]
 
-    def test_transport_confidence_substrate_confirmed(self):
-        """substrate_confirmed → tf.level_kind = 'tc_specificity'."""
-        cypher, _ = self._build(transport_confidence="substrate_confirmed")
-        assert "tf.level_kind = 'tc_specificity'" in cypher
+    def test_substrate_depth_filter_single(self):
+        """substrate_depth=['most_specific'] → `r.substrate_depth IN
+        $substrate_depth` on the transport edge (KG edge property)."""
+        cypher, params = self._build(substrate_depth=["most_specific"])
+        assert "r.substrate_depth IN $substrate_depth" in cypher
+        assert params["substrate_depth"] == ["most_specific"]
 
-    def test_transport_confidence_family_inferred(self):
-        """family_inferred → tf.level_kind <> 'tc_specificity'."""
-        cypher, _ = self._build(transport_confidence="family_inferred")
-        assert "tf.level_kind <> 'tc_specificity'" in cypher
+    def test_substrate_depth_filter_multiple(self):
+        cypher, params = self._build(
+            substrate_depth=["most_specific", "inherited"],
+        )
+        assert "r.substrate_depth IN $substrate_depth" in cypher
+        assert params["substrate_depth"] == ["most_specific", "inherited"]
 
-    def test_no_transport_confidence_filter_when_none(self):
-        """Default (no transport_confidence) → no level_kind WHERE clause.
+    def test_no_substrate_depth_filter_when_none(self):
+        """Default (no substrate_depth) → no depth predicate, no param."""
+        cypher, params = self._build()
+        assert "$substrate_depth" not in cypher
+        assert "substrate_depth" not in params
 
-        The substring `tf.level_kind = 'tc_specificity'` legitimately appears
-        twice in the unconditional cypher (RETURN CASE + ORDER BY CASE per
-        spec), so substring-absence is too coarse. We pin: WHERE block has
-        no level_kind predicate; the substring count stays at 2 in default
-        mode (vs. 3 when `transport_confidence='substrate_confirmed'` adds a
-        WHERE clause).
-        """
-        cypher, _ = self._build()
-        where_block = cypher.split("RETURN")[0]
-        assert "tf.level_kind" not in where_block
-        assert cypher.count("tf.level_kind = 'tc_specificity'") == 2
-        assert "tf.level_kind <> 'tc_specificity'" not in cypher
+    def test_no_tc_specificity_predicate_anywhere(self):
+        """Grep acceptance: `level_kind = 'tc_specificity'` no longer drives
+        any filter or derivation. Bare `tf.level_kind AS tcdb_level_kind`
+        projections are the only level_kind reference allowed."""
+        cypher, _ = self._build(verbose=True)
+        assert "tc_specificity" not in cypher
+        assert "tf.level_kind AS tcdb_level_kind" in cypher
 
     def test_no_metabolism_filters(self):
         """Transport arm must not accept metabolism-arm-only filters."""
@@ -7451,6 +7505,8 @@ class TestBuildGenesByMetaboliteTransport:
             "g.gene_name AS gene_name",
             "g.product AS product",
             "'transport' AS evidence_source",
+            "r.substrate_depth AS substrate_depth",
+            "gt.evidence_score AS tcdb_evidence_score",
             "tf.id AS tcdb_family_id",
             "tf.name AS tcdb_family_name",
             "null AS reaction_id",
@@ -7483,27 +7539,28 @@ class TestBuildGenesByMetaboliteTransport:
         ]:
             assert col in cypher, f"missing verbose column: {col}"
 
-    def test_transport_confidence_case_expression_in_return(self):
-        """`transport_confidence` is a derived column from level_kind."""
-        cypher, _ = self._build()
-        # Per spec:
-        #   CASE WHEN tf.level_kind = 'tc_specificity'
-        #        THEN 'substrate_confirmed' ELSE 'family_inferred' END AS transport_confidence
-        assert "tf.level_kind = 'tc_specificity'" in cypher
-        assert "'substrate_confirmed'" in cypher
-        assert "'family_inferred'" in cypher
-        assert "AS transport_confidence" in cypher
+    def test_old_vocabulary_absent(self):
+        """Decision 1: no `transport_confidence` column and none of the
+        explorer-invented tier strings anywhere in the Cypher."""
+        cypher, _ = self._build(verbose=True)
+        assert "transport_confidence" not in cypher
+        assert "substrate_confirmed" not in cypher
+        assert "family_inferred" not in cypher
 
-    def test_order_by_substrate_confirmed_first(self):
-        """Per spec: ORDER BY metabolite_id, CASE…tc_specificity = 0 else 1,
-        tcdb_family_id, locus_tag — ensures substrate_confirmed transports
-        sort ahead of family_inferred within each metabolite group."""
+    def test_order_by_most_specific_first_then_score_desc(self):
+        """Detail sort: ORDER BY metabolite_id, depth tier (most_specific
+        before inherited), tcdb_evidence_score DESC within the tier, then the
+        existing tiebreakers (tcdb_family_id, locus_tag)."""
         cypher, _ = self._build()
-        assert "ORDER BY metabolite_id" in cypher
-        # The CASE-on-tc_specificity inside ORDER BY block
-        assert "CASE WHEN tf.level_kind = 'tc_specificity' THEN 0 ELSE 1 END" in cypher
-        assert "tcdb_family_id" in cypher
-        assert "locus_tag" in cypher
+        order_by = cypher.split("ORDER BY", 1)[1]
+        assert order_by.lstrip().startswith("metabolite_id")
+        depth_case = "CASE WHEN r.substrate_depth = 'most_specific' THEN 0 ELSE 1 END"
+        assert depth_case in order_by
+        m = re.search(r"(tcdb_evidence_score|gt\.evidence_score) DESC", order_by)
+        assert m, f"score DESC missing from ORDER BY: {order_by!r}"
+        assert order_by.index(depth_case) < m.start()
+        assert m.start() < order_by.index("tcdb_family_id")
+        assert order_by.index("tcdb_family_id") < order_by.rindex("locus_tag")
 
     def test_limit_and_offset_clauses(self):
         cypher, params = self._build(limit=10, offset=5)
@@ -7537,12 +7594,32 @@ class TestBuildGenesByMetaboliteSummary:
             "(r:Reaction)-[:Reaction_has_metabolite]->(m:Metabolite)"
             in cypher
         )
-        assert (
-            "(g:Gene)-[:Gene_has_tcdb_family]->"
-            "(tf:TcdbFamily)-[:Tcdb_family_transports_metabolite]->(m:Metabolite)"
-            in cypher
-        )
+        assert "(g:Gene)-[gt:Gene_has_tcdb_family]->(tf:TcdbFamily)" in cypher
         assert "UNION" in cypher
+
+    def test_transport_arm_deepest_attachment_predicate(self):
+        """Decision 4: the summary's transport arm walks deepest attachments
+        only, so envelope counts and detail rows project one set."""
+        cypher, _ = self._build()
+        _assert_deepest_predicate(cypher)
+
+    def test_transport_arm_carries_substrate_depth_and_score(self):
+        """Row maps carry `substrate_depth` (edge) + the gene-level
+        `transport_substrate_resolution` / `tcdb_evidence_score_max`
+        needed by `top_genes[]`; `top_tcdb_families` derives from the
+        collected substrate_depth, not level_kind."""
+        cypher, _ = self._build()
+        assert re.search(r"\.substrate_depth IN \$substrate_depth", cypher) is None
+        assert "substrate_depth" in cypher
+        assert "g.transport_substrate_resolution" in cypher
+        assert "g.tcdb_evidence_score_max" in cypher
+        assert "gt.evidence_score" in cypher
+        assert "transport_most_specific_rows" in cypher
+        assert "transport_inherited_rows" in cypher
+        assert "transport_substrate_confirmed_rows" not in cypher
+        assert "transport_family_inferred_rows" not in cypher
+        assert "tc_specificity" not in cypher
+        assert "transport_confidence" not in cypher
 
     def test_returns_envelope_keys(self):
         """Per spec § build_genes_by_metabolite_summary."""
@@ -7554,7 +7631,7 @@ class TestBuildGenesByMetaboliteSummary:
             "transporter_count_total",
             "metabolite_count_total",
             "rows_by_evidence_source",
-            "rows_by_transport_confidence",
+            "rows_by_substrate_depth",
             "by_metabolite",
             "top_reactions",
             "top_tcdb_families",
@@ -7585,9 +7662,13 @@ class TestBuildGenesByMetaboliteSummary:
         assert params["mass_balance"] == "balanced"
 
     def test_transport_only_filter_propagates_to_transport_arm(self):
-        """transport_confidence reaches the WHERE block (transport-arm only)."""
-        cypher, _ = self._build(transport_confidence="substrate_confirmed")
-        assert "tf.level_kind = 'tc_specificity'" in cypher
+        """substrate_depth reaches the WHERE block (transport-arm only)."""
+        cypher, params = self._build(substrate_depth=["most_specific"])
+        assert re.search(r"\.substrate_depth IN \$substrate_depth", cypher)
+        assert params["substrate_depth"] == ["most_specific"]
+        # metabolism arm is untouched by the transport-only filter
+        metab_arm = cypher.split("Gene_has_tcdb_family")[0]
+        assert "$substrate_depth" not in metab_arm
 
     def test_uniform_filters_propagate_to_both_arms(self):
         """metabolite_pathway_ids and gene_categories narrow both arms."""
@@ -7622,12 +7703,12 @@ class TestBuildGenesByMetaboliteSummary:
 #   - anchor flips to locus_tags + organism (single-organism enforced)
 #   - new metabolite_elements filter (uniform across both arms)
 #   - per-arm filter scope identical to GBM (ec_numbers / mass_balance →
-#     metabolism only; transport_confidence → transport only;
+#     metabolism only; substrate_depth → transport only;
 #     metabolite_pathway_ids / gene_categories / metabolite_ids /
 #     metabolite_elements → uniform across both arms)
-#   - sort uses **global precision-tier** (metabolism → transport_substrate_
-#     confirmed → transport_family_inferred), then input-gene order, then
-#     locus_tag, then metabolite_id
+#   - sort uses **global precision-tier** (metabolism → most_specific →
+#     inherited; tcdb_evidence_score desc within a transport tier), then
+#     input-gene order, then locus_tag, then metabolite_id
 #   - summary builder gains two new envelope keys: by_element + top_pathways
 #
 # Spec: docs/tool-specs/metabolites_by_gene.md
@@ -7742,7 +7823,8 @@ class TestBuildMetabolitesByGeneMetabolism:
             "g.gene_name AS gene_name",
             "g.product AS product",
             "'metabolism' AS evidence_source",
-            "null AS transport_confidence",
+            "null AS substrate_depth",
+            "null AS tcdb_evidence_score",
             "r.id AS reaction_id",
             "r.name AS reaction_name",
             "coalesce(r.ec_numbers, []) AS ec_numbers",
@@ -7801,11 +7883,15 @@ class TestBuildMetabolitesByGeneMetabolism:
         assert params["limit"] == 10
         assert params["offset"] == 5
 
-    def test_no_transport_confidence_param(self):
+    def test_no_substrate_depth_param(self):
         """Per per-arm filter scope rule: metabolism arm does NOT accept
-        transport_confidence — that's a transport-arm-only filter."""
+        substrate_depth — that's a transport-arm-only filter."""
         with pytest.raises(TypeError):
-            self._build(transport_confidence="substrate_confirmed")
+            self._build(substrate_depth=["most_specific"])
+
+    def test_no_old_transport_confidence_column(self):
+        cypher, _ = self._build()
+        assert "transport_confidence" not in cypher
 
 
 class TestBuildMetabolitesByGeneTransport:
@@ -7823,13 +7909,18 @@ class TestBuildMetabolitesByGeneTransport:
         return build_metabolites_by_gene_transport(**kwargs)
 
     def test_match_path_transport_arm(self):
-        """Transport arm: Gene → TcdbFamily → Metabolite (single-hop, post-rollup)."""
+        """Transport arm: Gene → TcdbFamily → Metabolite (single-hop,
+        post-rollup). Both edges bound: `gt` (evidence_score) + `r`
+        (substrate_depth). Mirrors GBM."""
         cypher, _ = self._build()
-        assert (
-            "(g:Gene)-[:Gene_has_tcdb_family]->"
-            "(tf:TcdbFamily)-[:Tcdb_family_transports_metabolite]->(m:Metabolite)"
-            in cypher
-        )
+        assert "(g:Gene)" + _TRANSPORT_ARM_PATTERN in cypher
+
+    def test_deepest_attachment_predicate(self):
+        """Decision 4 (mirror GBM): deepest TCDB attachments only — PMM0392
+        must yield 13 distinct metabolites, not the 554-substrate `3.A.1`
+        superfamily rollup."""
+        cypher, _ = self._build()
+        _assert_deepest_predicate(cypher)
 
     def test_locus_tags_in_where(self):
         cypher, params = self._build()
@@ -7875,27 +7966,27 @@ class TestBuildMetabolitesByGeneTransport:
         )
         assert params["metabolite_elements"] == ["N"]
 
-    def test_transport_confidence_substrate_confirmed(self):
-        """substrate_confirmed → tf.level_kind = 'tc_specificity'."""
-        cypher, _ = self._build(transport_confidence="substrate_confirmed")
-        assert "tf.level_kind = 'tc_specificity'" in cypher
+    def test_substrate_depth_filter_single(self):
+        cypher, params = self._build(substrate_depth=["most_specific"])
+        assert "r.substrate_depth IN $substrate_depth" in cypher
+        assert params["substrate_depth"] == ["most_specific"]
 
-    def test_transport_confidence_family_inferred(self):
-        """family_inferred → tf.level_kind <> 'tc_specificity'."""
-        cypher, _ = self._build(transport_confidence="family_inferred")
-        assert "tf.level_kind <> 'tc_specificity'" in cypher
+    def test_substrate_depth_filter_multiple(self):
+        cypher, params = self._build(
+            substrate_depth=["most_specific", "inherited"],
+        )
+        assert "r.substrate_depth IN $substrate_depth" in cypher
+        assert params["substrate_depth"] == ["most_specific", "inherited"]
 
-    def test_no_transport_confidence_filter_when_none(self):
-        """Default (no transport_confidence) → no level_kind WHERE clause.
+    def test_no_substrate_depth_filter_when_none(self):
+        cypher, params = self._build()
+        assert "$substrate_depth" not in cypher
+        assert "substrate_depth" not in params
 
-        Mirrors the GBM transport-arm contract: the substring
-        `tf.level_kind = 'tc_specificity'` legitimately appears twice in
-        unconditional cypher (RETURN CASE + ORDER BY CASE per spec).
-        """
-        cypher, _ = self._build()
-        where_block = cypher.split("RETURN")[0]
-        assert "tf.level_kind" not in where_block
-        assert "tf.level_kind <> 'tc_specificity'" not in cypher
+    def test_no_tc_specificity_predicate_anywhere(self):
+        cypher, _ = self._build(verbose=True)
+        assert "tc_specificity" not in cypher
+        assert "tf.level_kind AS tcdb_level_kind" in cypher
 
     def test_no_metabolism_filters(self):
         """Per per-arm filter scope: transport arm rejects ec_numbers /
@@ -7923,6 +8014,8 @@ class TestBuildMetabolitesByGeneTransport:
             "g.gene_name AS gene_name",
             "g.product AS product",
             "'transport' AS evidence_source",
+            "r.substrate_depth AS substrate_depth",
+            "gt.evidence_score AS tcdb_evidence_score",
             "tf.id AS tcdb_family_id",
             "tf.name AS tcdb_family_name",
             "null AS reaction_id",
@@ -7955,26 +8048,25 @@ class TestBuildMetabolitesByGeneTransport:
         ]:
             assert col in cypher, f"missing verbose column: {col}"
 
-    def test_transport_confidence_case_expression_in_return(self):
-        """`transport_confidence` is a derived column from level_kind."""
-        cypher, _ = self._build()
-        assert "tf.level_kind = 'tc_specificity'" in cypher
-        assert "'substrate_confirmed'" in cypher
-        assert "'family_inferred'" in cypher
-        assert "AS transport_confidence" in cypher
+    def test_old_vocabulary_absent(self):
+        cypher, _ = self._build(verbose=True)
+        assert "transport_confidence" not in cypher
+        assert "substrate_confirmed" not in cypher
+        assert "family_inferred" not in cypher
 
     def test_order_by_uses_input_index(self):
-        """Per MBG spec: ORDER BY uses apoc.coll.indexOf($locus_tags, ...)
-        for input-gene-order. Transport arm's per-precision sort is
-        substrate_confirmed-first within the transport tier."""
+        """Per MBG spec: ORDER BY depth tier (most_specific first), then
+        tcdb_evidence_score DESC within the tier, then
+        apoc.coll.indexOf($locus_tags, ...) for input-gene-order."""
         cypher, _ = self._build()
-        # Input-gene-order term — load-bearing for the global merge in api/
-        assert "apoc.coll.indexOf($locus_tags" in cypher
-        # substrate_confirmed-first ordering inside transport tier
-        assert (
-            "CASE WHEN tf.level_kind = 'tc_specificity' THEN 0 ELSE 1 END"
-            in cypher
-        )
+        order_by = cypher.split("ORDER BY", 1)[1]
+        depth_case = "CASE WHEN r.substrate_depth = 'most_specific' THEN 0 ELSE 1 END"
+        assert depth_case in order_by
+        m = re.search(r"(tcdb_evidence_score|gt\.evidence_score) DESC", order_by)
+        assert m, f"score DESC missing from ORDER BY: {order_by!r}"
+        assert "apoc.coll.indexOf($locus_tags" in order_by
+        assert order_by.index(depth_case) < m.start()
+        assert m.start() < order_by.index("apoc.coll.indexOf($locus_tags")
 
     def test_limit_and_offset_clauses(self):
         cypher, params = self._build(limit=10, offset=5)
@@ -8010,12 +8102,28 @@ class TestBuildMetabolitesByGeneSummary:
             "(r:Reaction)-[:Reaction_has_metabolite]->(m:Metabolite)"
             in cypher
         )
-        assert (
-            "(g:Gene)-[:Gene_has_tcdb_family]->"
-            "(tf:TcdbFamily)-[:Tcdb_family_transports_metabolite]->(m:Metabolite)"
-            in cypher
-        )
+        assert "(g:Gene)-[gt:Gene_has_tcdb_family]->(tf:TcdbFamily)" in cypher
         assert "UNION" in cypher
+
+    def test_transport_arm_deepest_attachment_predicate(self):
+        cypher, _ = self._build()
+        _assert_deepest_predicate(cypher)
+
+    def test_transport_arm_carries_substrate_depth_and_score(self):
+        """Row maps carry `substrate_depth`; `by_gene[]` sources the
+        gene-level `transport_substrate_resolution` / `tcdb_evidence_score_max`
+        (drives the gene-anchored auto-warning)."""
+        cypher, _ = self._build()
+        assert "substrate_depth" in cypher
+        assert "g.transport_substrate_resolution" in cypher
+        assert "g.tcdb_evidence_score_max" in cypher
+        assert "gt.evidence_score" in cypher
+        assert "transport_most_specific_rows" in cypher
+        assert "transport_inherited_rows" in cypher
+        assert "transport_substrate_confirmed_rows" not in cypher
+        assert "transport_family_inferred_rows" not in cypher
+        assert "tc_specificity" not in cypher
+        assert "transport_confidence" not in cypher
 
     def test_returns_envelope_keys(self):
         """Per spec § build_metabolites_by_gene_summary RETURN keys.
@@ -8032,7 +8140,7 @@ class TestBuildMetabolitesByGeneSummary:
             "transporter_count_total",
             "metabolite_count_total",
             "rows_by_evidence_source",
-            "rows_by_transport_confidence",
+            "rows_by_substrate_depth",
             "by_gene",
             "top_reactions",
             "top_tcdb_families",
@@ -8064,9 +8172,12 @@ class TestBuildMetabolitesByGeneSummary:
         assert params["mass_balance"] == "balanced"
 
     def test_transport_only_filter_propagates_to_transport_arm(self):
-        """transport_confidence reaches only the transport arm WHERE."""
-        cypher, _ = self._build(transport_confidence="substrate_confirmed")
-        assert "tf.level_kind = 'tc_specificity'" in cypher
+        """substrate_depth reaches only the transport arm WHERE."""
+        cypher, params = self._build(substrate_depth=["most_specific"])
+        assert re.search(r"\.substrate_depth IN \$substrate_depth", cypher)
+        assert params["substrate_depth"] == ["most_specific"]
+        metab_arm = cypher.split("Gene_has_tcdb_family")[0]
+        assert "$substrate_depth" not in metab_arm
 
     def test_uniform_filters_propagate_to_both_arms(self):
         """metabolite_pathway_ids, gene_categories, metabolite_ids,
@@ -8716,7 +8827,9 @@ class TestClusterEnrichmentBuilderInformativeOnly:
 
 class TestBuildGeneOverviewPhase1Plumbing:
     """gene_overview detail: adds reaction_count + catalyzed_metabolite_count +
-    transporter_count + evidence_sources per row. Path-existence subqueries
+    evidence_sources per row, plus the TCDB gene-level surface
+    (tcdb_evidence_score_max / transported_metabolite_count /
+    transport_substrate_resolution — substrate_depth migration 2026-08). Path-existence subqueries
     derive evidence_sources (NOT a metabolite-level rollup) — see spec §6.1.
     Catalysis-arm rename (2026-08-19): metabolite_count →
     catalyzed_metabolite_count (KG-SYNC-001; catalysis-arm-only count)."""
@@ -8732,10 +8845,38 @@ class TestBuildGeneOverviewPhase1Plumbing:
         assert ("coalesce(g.catalyzed_metabolite_count, 0) "
                 "AS catalyzed_metabolite_count") in cypher
 
-    def test_compact_returns_transporter_count(self):
-        """transporter_count surface alias of g.tcdb_family_count (spec §6.1)."""
+    def test_transporter_count_removed(self):
+        """substrate_depth migration: `transporter_count` (= all TCDB
+        attachments incl. superseded ancestors) is the wrong multiplicity
+        under the deepest-attachment rule and is removed."""
+        cypher, _ = build_gene_overview(locus_tags=["PMM0001"], verbose=True)
+        assert "transporter_count" not in cypher
+        assert "tcdb_family_count" not in cypher
+
+    def test_compact_returns_tcdb_evidence_score_max_uncoalesced(self):
+        """null = no TCDB call — sparse KG property surfaced as null, never
+        coalesced to a sentinel."""
         cypher, _ = build_gene_overview(locus_tags=["PMM0001"])
-        assert "coalesce(g.tcdb_family_count, 0) AS transporter_count" in cypher
+        assert "g.tcdb_evidence_score_max AS tcdb_evidence_score_max" in cypher
+        assert "coalesce(g.tcdb_evidence_score_max" not in cypher
+
+    def test_compact_returns_transported_metabolite_count(self):
+        cypher, _ = build_gene_overview(locus_tags=["PMM0001"])
+        assert ("coalesce(g.transported_metabolite_count, 0) "
+                "AS transported_metabolite_count") in cypher
+
+    def test_compact_returns_transport_substrate_resolution(self):
+        cypher, _ = build_gene_overview(locus_tags=["PMM0001"])
+        assert ("g.transport_substrate_resolution "
+                "AS transport_substrate_resolution") in cypher
+        assert "coalesce(g.transport_substrate_resolution" not in cypher
+
+    def test_evidence_sources_tcdb_arm_uses_deepest_attachment(self):
+        """Decision 4: the evidence_sources path-existence traversal's TCDB
+        arm carries the deepest-attachment predicate so `'transport'` and
+        `'metabolomics'` agree with the KG's transport counts."""
+        cypher, _ = build_gene_overview(locus_tags=["PMM0001"])
+        _assert_deepest_predicate(cypher)
 
     def test_compact_returns_evidence_sources(self):
         """evidence_sources column present in RETURN."""
@@ -8765,7 +8906,9 @@ class TestBuildGeneOverviewPhase1Plumbing:
         cypher, _ = build_gene_overview(locus_tags=["PMM0001"], verbose=True)
         assert "reaction_count" in cypher
         assert "catalyzed_metabolite_count" in cypher
-        assert "transporter_count" in cypher
+        assert "tcdb_evidence_score_max" in cypher
+        assert "transported_metabolite_count" in cypher
+        assert "transport_substrate_resolution" in cypher
         assert "evidence_sources" in cypher
 
 
@@ -8775,6 +8918,12 @@ class TestBuildGeneOverviewSummaryPhase1Plumbing:
     def test_summary_returns_has_chemistry(self):
         cypher, _ = build_gene_overview_summary(locus_tags=["PMM0001"])
         assert "has_chemistry" in cypher
+
+    def test_has_chemistry_tcdb_arm_uses_deepest_attachment(self):
+        """Decision 4: has_chemistry's TCDB arm walks deepest attachments
+        only (same predicate as the detail traversal)."""
+        cypher, _ = build_gene_overview_summary(locus_tags=["PMM0001"])
+        _assert_deepest_predicate(cypher)
 
 
 class TestBuildListPublicationsPhase1Plumbing:
@@ -8846,6 +8995,16 @@ class TestBuildListOrganismsPhase1Plumbing:
         cypher, _ = build_list_organisms()
         assert (
             "coalesce(o.measured_metabolite_count, 0) AS measured_metabolite_count"
+            in cypher
+        )
+
+    def test_detail_returns_transported_metabolite_count(self):
+        """substrate_depth migration: per-row transported_metabolite_count
+        (deepest-attachment transport breadth; pairs with
+        catalyzed_metabolite_count)."""
+        cypher, _ = build_list_organisms()
+        assert (
+            "coalesce(o.transported_metabolite_count, 0) AS transported_metabolite_count"
             in cypher
         )
 

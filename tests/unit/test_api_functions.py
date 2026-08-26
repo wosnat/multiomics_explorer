@@ -1080,10 +1080,22 @@ class TestListOrganisms:
 
     _CHEMISTRY_ROWS = [
         {**dict(_ROWS[0]),
-         "reaction_count": 943, "catalyzed_metabolite_count": 1039},
+         "reaction_count": 943, "catalyzed_metabolite_count": 1039,
+         "transported_metabolite_count": 120},
         {**dict(_ROWS[1]),
-         "reaction_count": 1348, "catalyzed_metabolite_count": 1428},
+         "reaction_count": 1348, "catalyzed_metabolite_count": 1428,
+         "transported_metabolite_count": 95},
     ]
+
+    def test_transported_metabolite_count_propagates_to_results(self, mock_conn):
+        """substrate_depth migration: per-row transported_metabolite_count
+        (deepest-attachment transport breadth) passes through."""
+        mock_conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW], self._CHEMISTRY_ROWS,
+        ]
+        result = api.list_organisms(conn=mock_conn)
+        assert result["results"][0]["transported_metabolite_count"] == 120
+        assert result["results"][1]["transported_metabolite_count"] == 95
 
     def test_reaction_count_propagates_to_results(self, mock_conn):
         mock_conn.execute_query.side_effect = [
@@ -1116,6 +1128,26 @@ class TestListOrganisms:
         assert cap[0]["reaction_count"] == 1348
         assert cap[1]["organism_name"] == "Prochlorococcus MED4"
 
+    def test_by_metabolic_capability_entries_carry_transported_metabolite_count(
+        self, mock_conn,
+    ):
+        """substrate_depth migration: by_metabolic_capability[] entries gain
+        transported_metabolite_count as a column; ranking stays
+        catalyzed_metabolite_count desc (EZ55 first despite lower transport
+        breadth)."""
+        mock_conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW], self._CHEMISTRY_ROWS,
+        ]
+        result = api.list_organisms(conn=mock_conn)
+        cap = result["by_metabolic_capability"]
+        assert cap[0]["organism_name"] == "Alteromonas macleodii EZ55"
+        assert cap[0]["transported_metabolite_count"] == 95
+        assert cap[1]["transported_metabolite_count"] == 120
+        assert set(cap[0]) == {
+            "organism_name", "reaction_count", "catalyzed_metabolite_count",
+            "transported_metabolite_count",
+        }
+
     def test_by_metabolic_capability_excludes_zero_chemistry(self, mock_conn):
         rows = [
             {**dict(self._ROWS[0]),
@@ -1142,7 +1174,8 @@ class TestListOrganisms:
         capability_rows = [
             {"organism_name": r["organism_name"],
              "reaction_count": r["reaction_count"],
-             "catalyzed_metabolite_count": r["catalyzed_metabolite_count"]}
+             "catalyzed_metabolite_count": r["catalyzed_metabolite_count"],
+             "transported_metabolite_count": r["transported_metabolite_count"]}
             for r in self._CHEMISTRY_ROWS
         ]
         mock_conn.execute_query.side_effect = [
@@ -1153,6 +1186,8 @@ class TestListOrganisms:
         assert len(result["by_metabolic_capability"]) == 2
         assert (result["by_metabolic_capability"][0]
                 ["catalyzed_metabolite_count"]) == 1428
+        assert (result["by_metabolic_capability"][0]
+                ["transported_metabolite_count"]) == 95
         # Exactly 2 Cypher calls: summary + capability. No detail builder.
         assert mock_conn.execute_query.call_count == 2
         # Verify the second call used the capability builder (3-column projection)
@@ -6807,6 +6842,7 @@ class TestListMetabolites:
         "catalyst_gene_count": 320,
         "organism_count": 31,
         "transporter_count": 17,
+        "transporter_gene_count": 3051,
         "evidence_sources": ["metabolism", "transport"],
         "chebi_id": "4167",
         "pathway_ids": ["kegg.pathway:ko00010"],
@@ -7015,11 +7051,11 @@ class TestGenesByMetabolite:
             {"evidence_source": "metabolism", "count": 4},
             {"evidence_source": "transport", "count": 19},
         ],
-        # 10 substrate_confirmed + 9 family_inferred (transport-only — 23 total
+        # 10 most_specific + 9 inherited (transport-only — 23 total
         # transport-confidence rows)
-        "rows_by_transport_confidence": [
-            {"transport_confidence": "substrate_confirmed", "count": 10},
-            {"transport_confidence": "family_inferred", "count": 9},
+        "rows_by_substrate_depth": [
+            {"substrate_depth": "most_specific", "count": 10},
+            {"substrate_depth": "inherited", "count": 9},
         ],
         "by_metabolite": [
             {
@@ -7031,8 +7067,8 @@ class TestGenesByMetabolite:
                 "reaction_count": 4,
                 "transporter_count": 14,
                 "metabolism_rows": 4,
-                "transport_substrate_confirmed_rows": 10,
-                "transport_family_inferred_rows": 9,
+                "transport_most_specific_rows": 10,
+                "transport_inherited_rows": 9,
             },
         ],
         "top_reactions": [],
@@ -7042,7 +7078,7 @@ class TestGenesByMetabolite:
     }
 
     # Family-inferred dominates — for the auto-warning trigger test
-    _SUMMARY_ROW_FI_DOMINATES = {
+    _SUMMARY_ROW_INHERITED_DOMINATES = {
         **_SUMMARY_ROW_BOTH_ARMS,
         "total_matching": 14,
         "gene_count_total": 14,
@@ -7052,9 +7088,9 @@ class TestGenesByMetabolite:
         "rows_by_evidence_source": [
             {"evidence_source": "transport", "count": 14},
         ],
-        "rows_by_transport_confidence": [
-            {"transport_confidence": "substrate_confirmed", "count": 5},
-            {"transport_confidence": "family_inferred", "count": 9},
+        "rows_by_substrate_depth": [
+            {"substrate_depth": "most_specific", "count": 5},
+            {"substrate_depth": "inherited", "count": 9},
         ],
         "by_metabolite": [
             {
@@ -7066,19 +7102,20 @@ class TestGenesByMetabolite:
                 "reaction_count": 0,
                 "transporter_count": 14,
                 "metabolism_rows": 0,
-                "transport_substrate_confirmed_rows": 5,
-                "transport_family_inferred_rows": 9,
+                "transport_most_specific_rows": 5,
+                "transport_inherited_rows": 9,
             },
         ],
     }
 
-    # Sample metabolism-arm detail row (substrate_confirmed-by-definition)
+    # Sample metabolism-arm detail row (most_specific-by-definition)
     _METAB_ROW = {
         "locus_tag": "PMM0944",
         "gene_name": "ureC",
         "product": "urease",
         "evidence_source": "metabolism",
-        "transport_confidence": None,
+        "substrate_depth": None,
+        "tcdb_evidence_score": None,
         "reaction_id": "kegg.reaction:R00131",
         "reaction_name": "Urea + 2H2O => CO2 + 2NH3",
         "ec_numbers": ["3.5.1.5"],
@@ -7092,13 +7129,14 @@ class TestGenesByMetabolite:
         "metabolite_chebi_id": "16199",
     }
 
-    # Sample transport-arm detail row (substrate_confirmed)
-    _TRANS_ROW_SC = {
+    # Sample transport-arm detail row (most_specific)
+    _TRANS_ROW_MS = {
         "locus_tag": "PMM0974",
         "gene_name": "urtE",
         "product": "ABC-type urea transporter, ATPase component",
         "evidence_source": "transport",
-        "transport_confidence": "substrate_confirmed",
+        "substrate_depth": "most_specific",
+        "tcdb_evidence_score": 0.8,
         "reaction_id": None,
         "reaction_name": None,
         "ec_numbers": None,
@@ -7112,13 +7150,14 @@ class TestGenesByMetabolite:
         "metabolite_chebi_id": "16199",
     }
 
-    # Sample transport-arm detail row (family_inferred)
-    _TRANS_ROW_FI = {
+    # Sample transport-arm detail row (inherited)
+    _TRANS_ROW_INH = {
         "locus_tag": "PMM0234",
         "gene_name": None,
         "product": "ABC superfamily ATP-binding cassette transporter",
         "evidence_source": "transport",
-        "transport_confidence": "family_inferred",
+        "substrate_depth": "inherited",
+        "tcdb_evidence_score": 0.4,
         "reaction_id": None,
         "reaction_name": None,
         "ec_numbers": None,
@@ -7152,7 +7191,7 @@ class TestGenesByMetabolite:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(self._METS, self._ORG, conn=conn)
@@ -7160,7 +7199,7 @@ class TestGenesByMetabolite:
         assert out["total_matching"] == 23
         assert "by_metabolite" in out
         assert "by_evidence_source" in out
-        assert "by_transport_confidence" in out
+        assert "by_substrate_depth" in out
         assert "top_reactions" in out
         assert "top_tcdb_families" in out
         assert "top_gene_categories" in out
@@ -7176,7 +7215,7 @@ class TestGenesByMetabolite:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(self._METS, self._ORG, conn=conn)
@@ -7210,7 +7249,7 @@ class TestGenesByMetabolite:
         gbm = self._api()
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(
@@ -7228,7 +7267,7 @@ class TestGenesByMetabolite:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],   # metabolism arm narrowed but row returned
-            [self._TRANS_ROW_SC],  # transport arm UNCHANGED
+            [self._TRANS_ROW_MS],  # transport arm UNCHANGED
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(
@@ -7246,7 +7285,7 @@ class TestGenesByMetabolite:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(
@@ -7256,140 +7295,125 @@ class TestGenesByMetabolite:
         evidence = {r["evidence_source"] for r in out["results"]}
         assert "transport" in evidence
 
-    def test_transport_confidence_substrate_confirmed_no_warning(self):
-        """transport_confidence='substrate_confirmed' narrows transport arm
+    def test_substrate_depth_most_specific_no_warning(self):
+        """substrate_depth='most_specific' narrows transport arm
         only AND suppresses the family-inferred-dominance warning (since user
         chose explicitly)."""
         gbm = self._api()
         # SC-only summary so transport rows are exclusively SC
         sc_summary = {
             **self._SUMMARY_ROW_BOTH_ARMS,
-            "rows_by_transport_confidence": [
-                {"transport_confidence": "substrate_confirmed", "count": 10},
+            "rows_by_substrate_depth": [
+                {"substrate_depth": "most_specific", "count": 10},
             ],
             "by_metabolite": [
                 {
                     **self._SUMMARY_ROW_BOTH_ARMS["by_metabolite"][0],
-                    "transport_substrate_confirmed_rows": 10,
-                    "transport_family_inferred_rows": 0,
+                    "transport_most_specific_rows": 10,
+                    "transport_inherited_rows": 0,
                 },
             ],
         }
         conn = self._mock_conn(
             [sc_summary],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(
             self._METS, self._ORG,
-            transport_confidence="substrate_confirmed", conn=conn,
+            substrate_depth=["most_specific"], conn=conn,
         )
-        # Metabolism rows still present (transport_confidence does NOT touch
+        # Metabolism rows still present (substrate_depth does NOT touch
         # metabolism arm)
         evidence = {r["evidence_source"] for r in out["results"]}
         assert evidence == {"metabolism", "transport"}
-        # No auto-warning (user explicitly set transport_confidence)
+        # No auto-warning (user explicitly set substrate_depth)
         assert out["warnings"] == []
 
-    def test_transport_confidence_family_inferred_no_warning(self):
-        """transport_confidence='family_inferred' likewise suppresses the
+    def test_substrate_depth_inherited_no_warning(self):
+        """substrate_depth='inherited' likewise suppresses the
         auto-warning (user chose explicitly)."""
         gbm = self._api()
         fi_summary = {
             **self._SUMMARY_ROW_BOTH_ARMS,
-            "rows_by_transport_confidence": [
-                {"transport_confidence": "family_inferred", "count": 9},
+            "rows_by_substrate_depth": [
+                {"substrate_depth": "inherited", "count": 9},
             ],
             "by_metabolite": [
                 {
                     **self._SUMMARY_ROW_BOTH_ARMS["by_metabolite"][0],
-                    "transport_substrate_confirmed_rows": 0,
-                    "transport_family_inferred_rows": 9,
+                    "transport_most_specific_rows": 0,
+                    "transport_inherited_rows": 9,
                 },
             ],
         }
         conn = self._mock_conn(
             [fi_summary],
             [self._METAB_ROW],
-            [self._TRANS_ROW_FI],
+            [self._TRANS_ROW_INH],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(
             self._METS, self._ORG,
-            transport_confidence="family_inferred", conn=conn,
+            substrate_depth=["inherited"], conn=conn,
         )
         assert out["warnings"] == []
 
-    def test_family_inferred_dominance_warning_fires(self):
+    def test_inherited_dominance_warning_fires(self):
         """Warning fires when:
         - transport rows present in result AND
-        - transport_family_inferred_rows > transport_substrate_confirmed_rows AND
-        - user did NOT set transport_confidence.
+        - transport_inherited_rows > transport_most_specific_rows AND
+        - user did NOT set substrate_depth.
 
-        Phase 3 Item 6.3: warning text rewritten to question-shape-aware
-        framing (drops "high-precision" prescription). GBM and MBG now
-        emit byte-identical text (modulo count variables).
+        substrate_depth migration: keyed on `inherited` dominance over
+        deepest-attachment rows only; the message names
+        `substrate_depth=['most_specific']` as the narrowing filter and
+        no longer uses the retired substrate_confirmed / family_inferred
+        vocabulary.
         """
         gbm = self._api()
         conn = self._mock_conn(
-            [self._SUMMARY_ROW_FI_DOMINATES],
-            # Note: transport-only — no metabolism rows from spec § probe:
-            # "MED4 has no nitrite-anchored metabolism reactions today"
-            [],  # metabolism arm fires but returns nothing
-            [self._TRANS_ROW_FI],
+            [self._SUMMARY_ROW_INHERITED_DOMINATES],
+            # transport-only — MED4 has no nitrite-anchored metabolism
+            [],
+            [self._TRANS_ROW_INH],
             [{"found": ["kegg.compound:C00088"]}],
         )
         out = gbm(["kegg.compound:C00088"], self._ORG, conn=conn)
-        warnings = [
-            w for w in out["warnings"] if "family_inferred" in w
-        ]
+        warnings = [w for w in out["warnings"] if "inherited" in w]
         assert warnings, (
-            f"expected family-inferred warning, got {out['warnings']!r}"
+            f"expected inherited-dominance warning, got {out['warnings']!r}"
         )
         warning = warnings[0]
-
-        # Assert the new symmetric warning format (Item 6.3)
-        assert "Most transport rows are `family_inferred`" in warning
-        assert (
-            "annotations rolled up from family-level transport potential"
-            in warning
-        )
-        assert "Workflow-dependent" in warning
-        assert (
-            "Both tiers are annotations, neither is ground truth" in warning
-        )
-        assert "analysis-doc §g" in warning
-
-        # Assert the inline counts ARE present (X of Y format)
+        assert "substrate_depth=['most_specific']" in warning
+        # Inline counts `(X of Y)` — X = inherited rows, Y = transport rows
         import re
         m = re.search(r"\((\d+) of (\d+)\)", warning)
         assert m, (
             f"warning must include `(X of Y)` count format; got: {warning}"
         )
-        fi_count, total = int(m.group(1)), int(m.group(2))
-        assert fi_count > total - fi_count, (
-            "fi_count must dominate (test setup)"
-        )
+        inh_count, total = int(m.group(1)), int(m.group(2))
+        assert (inh_count, total) == (9, 14)
+        # Retired vocabulary must not leak into the message
+        assert "family_inferred" not in warning
+        assert "substrate_confirmed" not in warning
+        assert "transport_confidence" not in warning
 
-        # Assert old "high-precision" prescription is GONE
-        assert "high-precision" not in warning
-        assert "substrate-curated transporter genes only" not in warning
-
-    def test_no_warning_when_substrate_confirmed_majority(self):
+    def test_no_warning_when_most_specific_majority(self):
         """sc >= fi → no auto-warning even with default both-arm mode."""
         gbm = self._api()
         # urea slice: 10 SC > 9 FI on transport
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(self._METS, self._ORG, conn=conn)
         # 10 SC > 9 FI — no warning
         assert all(
-            "family_inferred" not in w for w in out["warnings"]
+            "inherited" not in w for w in out["warnings"]
         )
 
     def test_no_warning_when_no_transport_rows(self):
@@ -7401,12 +7425,12 @@ class TestGenesByMetabolite:
             "rows_by_evidence_source": [
                 {"evidence_source": "metabolism", "count": 4},
             ],
-            "rows_by_transport_confidence": [],
+            "rows_by_substrate_depth": [],
             "by_metabolite": [
                 {
                     **self._SUMMARY_ROW_BOTH_ARMS["by_metabolite"][0],
-                    "transport_substrate_confirmed_rows": 0,
-                    "transport_family_inferred_rows": 0,
+                    "transport_most_specific_rows": 0,
+                    "transport_inherited_rows": 0,
                 },
             ],
         }
@@ -7428,7 +7452,7 @@ class TestGenesByMetabolite:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             # Existence probe returns only one of the two as found
             [{"found": ["kegg.compound:C00086"]}],
         )
@@ -7447,7 +7471,7 @@ class TestGenesByMetabolite:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             # Both IDs exist in KG
             [{"found": ["kegg.compound:C00086", "kegg.compound:C00001"]}],
         )
@@ -7469,7 +7493,7 @@ class TestGenesByMetabolite:
             "total_matching": 0,
             "gene_count_total": 0,
             "rows_by_evidence_source": [],
-            "rows_by_transport_confidence": [],
+            "rows_by_substrate_depth": [],
             "by_metabolite": [],
         }
         conn = self._mock_conn(
@@ -7487,7 +7511,7 @@ class TestGenesByMetabolite:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(self._METS, self._ORG, conn=conn)
@@ -7500,7 +7524,7 @@ class TestGenesByMetabolite:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             # metabolite_id existence probe
             [{"found": ["kegg.compound:C00086"]}],
             # pathway-id existence probe
@@ -7566,13 +7590,13 @@ class TestGenesByMetabolite:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC, self._TRANS_ROW_FI],
+            [self._TRANS_ROW_MS, self._TRANS_ROW_INH],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(self._METS, self._ORG, limit=2, offset=0, conn=conn)
         assert len(out["results"]) == 2
         # Sort key: metabolite_id, evidence_source ('metabolism' < 'transport'),
-        # transport_confidence_priority — first row metab, second transport.
+        # substrate_depth_priority — first row metab, second transport.
         assert out["results"][0]["evidence_source"] == "metabolism"
         assert out["results"][1]["evidence_source"] == "transport"
 
@@ -7582,7 +7606,7 @@ class TestGenesByMetabolite:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],  # total_matching=23
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(self._METS, self._ORG, limit=2, conn=conn)
@@ -7593,7 +7617,7 @@ class TestGenesByMetabolite:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(self._METS, self._ORG, offset=3, conn=conn)
@@ -7609,7 +7633,7 @@ class TestGenesByMetabolite:
             mock_instance.execute_query.side_effect = [
                 [self._SUMMARY_ROW_BOTH_ARMS],
                 [self._METAB_ROW],
-                [self._TRANS_ROW_SC],
+                [self._TRANS_ROW_MS],
                 [{"found": ["kegg.compound:C00086"]}],
             ]
             out = gbm(self._METS, self._ORG)
@@ -7657,8 +7681,8 @@ class TestGenesByMetabolite:
                 "tcdb_family_id": f"tcdb:3.A.1.{i}.1",
                 "tcdb_family_name": f"Family {i}",
                 "level_kind": "tc_specificity" if i % 2 == 0 else "tc_family",
-                "transport_confidence": (
-                    "substrate_confirmed" if i % 2 == 0 else "family_inferred"
+                "substrate_depth": (
+                    "most_specific" if i % 2 == 0 else "inherited"
                 ),
                 "gene_count": gc,
                 "metabolite_count": 1,
@@ -7686,8 +7710,11 @@ class TestGenesByMetabolite:
                 "transporter_count": tc,
                 "metabolite_count": 1,
                 "metabolism_rows": rc,
-                "transport_substrate_confirmed_rows": tc,
-                "transport_family_inferred_rows": 0,
+                "transport_most_specific_rows": tc,
+                "transport_inherited_rows": 0,
+                # gene-level TCDB facts (null on metabolism-only genes)
+                "transport_substrate_resolution": "resolved" if tc else None,
+                "tcdb_evidence_score_max": 0.8 if tc else None,
             }
             for i, rc, tc in [
                 (101, 2, 1),    # 3
@@ -7717,7 +7744,7 @@ class TestGenesByMetabolite:
         conn = self._mock_conn(
             [self._summary_with_top_arrays()],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(self._METS, self._ORG, conn=conn)
@@ -7737,7 +7764,7 @@ class TestGenesByMetabolite:
         conn = self._mock_conn(
             [self._summary_with_top_arrays()],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(self._METS, self._ORG, conn=conn)
@@ -7747,7 +7774,7 @@ class TestGenesByMetabolite:
         # New contract fields present
         first = out["top_tcdb_families"][0]
         assert "level_kind" in first
-        assert "transport_confidence" in first
+        assert "substrate_depth" in first
         assert "metabolite_count" in first
 
     def test_top_gene_categories_sorted_and_truncated_to_10(self):
@@ -7755,7 +7782,7 @@ class TestGenesByMetabolite:
         conn = self._mock_conn(
             [self._summary_with_top_arrays()],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(self._METS, self._ORG, conn=conn)
@@ -7766,6 +7793,164 @@ class TestGenesByMetabolite:
         assert "category" in out["top_gene_categories"][0]
         assert "gene_category" not in out["top_gene_categories"][0]
 
+    # ---- substrate_depth migration (spec 2026-08-20) ----
+
+    def test_substrate_depth_unknown_value_raises_listing_valid(self):
+        """Unknown values raise ValueError listing the valid ones, before
+        any Cypher executes."""
+        gbm = self._api()
+        conn = MagicMock()
+        with pytest.raises(ValueError) as exc:
+            gbm(self._METS, self._ORG, substrate_depth=["bogus"], conn=conn)
+        msg = str(exc.value)
+        assert "bogus" in msg
+        assert "most_specific" in msg and "inherited" in msg
+        conn.execute_query.assert_not_called()
+
+    @pytest.mark.parametrize("old_value,new_value", [
+        ("substrate_confirmed", "most_specific"),
+        ("family_inferred", "inherited"),
+    ])
+    def test_substrate_depth_old_value_strings_raise_with_rename_pointer(
+        self, old_value, new_value,
+    ):
+        """The two retired `transport_confidence` value strings raise with a
+        rename pointer naming the replacement value."""
+        gbm = self._api()
+        conn = MagicMock()
+        with pytest.raises(ValueError) as exc:
+            gbm(self._METS, self._ORG, substrate_depth=[old_value], conn=conn)
+        msg = str(exc.value)
+        assert old_value in msg
+        assert new_value in msg
+        assert "substrate_depth" in msg
+        conn.execute_query.assert_not_called()
+
+    def test_substrate_depth_forwarded_to_transport_builders(self):
+        """The list flows into the transport-arm detail + summary builders
+        as `$substrate_depth`; the metabolism arm never sees it."""
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_MS],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        gbm(self._METS, self._ORG, substrate_depth=["most_specific"], conn=conn)
+        calls = conn.execute_query.call_args_list
+        summary_kwargs = calls[0].kwargs
+        assert summary_kwargs.get("substrate_depth") == ["most_specific"]
+        metab_cypher, metab_kwargs = calls[1].args[0], calls[1].kwargs
+        assert "$substrate_depth" not in metab_cypher
+        assert "substrate_depth" not in metab_kwargs
+        trans_kwargs = calls[2].kwargs
+        assert trans_kwargs.get("substrate_depth") == ["most_specific"]
+
+    def test_no_transport_confidence_kwarg(self):
+        """The old parameter name is gone (TypeError, not silently ignored)."""
+        gbm = self._api()
+        with pytest.raises(TypeError):
+            gbm(self._METS, self._ORG, transport_confidence="substrate_confirmed",
+                conn=MagicMock())
+
+    def test_sort_score_desc_within_depth_tier(self):
+        """Within a transport depth tier rows rank by tcdb_evidence_score
+        desc; most_specific always precedes inherited regardless of score;
+        metabolism rows precede all transport rows."""
+        gbm = self._api()
+        low_ms = {**self._TRANS_ROW_MS, "locus_tag": "PMM0970",
+                  "tcdb_evidence_score": 0.6}
+        high_ms = {**self._TRANS_ROW_MS, "locus_tag": "PMM0971",
+                   "tcdb_evidence_score": 0.8}
+        high_inh = {**self._TRANS_ROW_INH, "locus_tag": "PMM0001",
+                    "tcdb_evidence_score": 1.0}
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [high_inh, low_ms, high_ms],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, limit=10, conn=conn)
+        order = [(r["evidence_source"], r.get("substrate_depth"), r["locus_tag"])
+                 for r in out["results"]]
+        assert order == [
+            ("metabolism", None, "PMM0944"),
+            ("transport", "most_specific", "PMM0971"),   # 0.8
+            ("transport", "most_specific", "PMM0970"),   # 0.6
+            ("transport", "inherited", "PMM0001"),        # 1.0 but inherited
+        ]
+
+    def test_sort_key_tiebreakers_after_score(self):
+        """Equal score inside a tier → existing tiebreakers (tcdb_family_id,
+        locus_tag) — the api sort key is
+        (metabolite_id, evidence_source, substrate_depth_priority, -score,
+        secondary_id, locus_tag)."""
+        from multiomics_explorer.api.functions import _gbm_sort_key
+        a = {**self._TRANS_ROW_MS, "locus_tag": "PMM0972"}
+        b = {**self._TRANS_ROW_MS, "locus_tag": "PMM0971"}
+        assert _gbm_sort_key(b) < _gbm_sort_key(a)
+        inh = {**self._TRANS_ROW_INH, "tcdb_evidence_score": 1.0}
+        assert _gbm_sort_key(a) < _gbm_sort_key(inh)
+        assert _gbm_sort_key(self._METAB_ROW) < _gbm_sort_key(b)
+
+    def test_top_genes_carry_resolution_and_score_max(self):
+        """top_genes[] entries gain transport_substrate_resolution +
+        tcdb_evidence_score_max (null on metabolism-only genes)."""
+        gbm = self._api()
+        summary = self._summary_with_top_arrays()
+        # PMM0103 (rc=1, tc=0) is the fixture's only metabolism-only gene but
+        # ranks 12/12 and falls outside the [:10] slice — lift its reaction
+        # breadth locally so the null-contract probe sits inside top_genes.
+        summary["top_genes"] = [
+            {**g, "reaction_count": 9, "metabolism_rows": 9}
+            if g["locus_tag"] == "PMM0103" else g
+            for g in summary["top_genes"]
+        ]
+        conn = self._mock_conn(
+            [summary],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_MS],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, conn=conn)
+        by_lt = {g["locus_tag"]: g for g in out["top_genes"]}
+        assert by_lt["PMM0104"]["transport_substrate_resolution"] == "resolved"
+        assert by_lt["PMM0104"]["tcdb_evidence_score_max"] == 0.8
+        metab_only = by_lt["PMM0103"]   # rc=9, tc=0 → breadth 9, in slice
+        assert "transport_substrate_resolution" in metab_only
+        assert metab_only["transport_substrate_resolution"] is None
+        assert "tcdb_evidence_score_max" in metab_only
+        assert metab_only["tcdb_evidence_score_max"] is None
+
+    def test_envelope_uses_substrate_depth_names_only(self):
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_MS],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, conn=conn)
+        assert "by_transport_confidence" not in out
+        assert {e["substrate_depth"] for e in out["by_substrate_depth"]} == {
+            "most_specific", "inherited",
+        }
+        bm = out["by_metabolite"][0]
+        assert bm["transport_most_specific_rows"] == 10
+        assert bm["transport_inherited_rows"] == 9
+        assert "transport_substrate_confirmed_rows" not in bm
+        assert "transport_family_inferred_rows" not in bm
+        for row in out["results"]:
+            assert "transport_confidence" not in row
+            assert "substrate_depth" in row
+            assert "tcdb_evidence_score" in row
+        metab = next(r for r in out["results"] if r["evidence_source"] == "metabolism")
+        assert metab["substrate_depth"] is None
+        assert metab["tcdb_evidence_score"] is None
+        trans = next(r for r in out["results"] if r["evidence_source"] == "transport")
+        assert trans["substrate_depth"] == "most_specific"
+        assert trans["tcdb_evidence_score"] == 0.8
+
     def test_top_genes_ranked_by_combined_breadth_not_gene_count(self):
         """Per spec § GbmTopGene: ranked by (reaction_count + transporter_count)
         desc, with locus_tag tiebreaker. gene_count is not even a field."""
@@ -7773,7 +7958,7 @@ class TestGenesByMetabolite:
         conn = self._mock_conn(
             [self._summary_with_top_arrays()],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(self._METS, self._ORG, conn=conn)
@@ -7805,8 +7990,8 @@ class TestGenesByMetabolite:
                     "transporter_count": 3,
                     "metabolite_count": 1,
                     "metabolism_rows": 2,
-                    "transport_substrate_confirmed_rows": 3,
-                    "transport_family_inferred_rows": 0,
+                    "transport_most_specific_rows": 3,
+                    "transport_inherited_rows": 0,
                 },
                 {
                     "locus_tag": "PMM0001",
@@ -7815,15 +8000,15 @@ class TestGenesByMetabolite:
                     "transporter_count": 0,
                     "metabolite_count": 1,
                     "metabolism_rows": 5,
-                    "transport_substrate_confirmed_rows": 0,
-                    "transport_family_inferred_rows": 0,
+                    "transport_most_specific_rows": 0,
+                    "transport_inherited_rows": 0,
                 },
             ],
         }
         conn = self._mock_conn(
             [tied_summary],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(self._METS, self._ORG, conn=conn)
@@ -7846,8 +8031,8 @@ class TestGenesByMetabolite:
                     "formula": "Z",
                     "rows": 1, "gene_count": 1, "reaction_count": 1,
                     "transporter_count": 0, "metabolism_rows": 1,
-                    "transport_substrate_confirmed_rows": 0,
-                    "transport_family_inferred_rows": 0,
+                    "transport_most_specific_rows": 0,
+                    "transport_inherited_rows": 0,
                 },
                 {
                     "metabolite_id": "kegg.compound:C00086",
@@ -7855,15 +8040,15 @@ class TestGenesByMetabolite:
                     "formula": "CH4N2O",
                     "rows": 23, "gene_count": 18, "reaction_count": 4,
                     "transporter_count": 14, "metabolism_rows": 4,
-                    "transport_substrate_confirmed_rows": 10,
-                    "transport_family_inferred_rows": 9,
+                    "transport_most_specific_rows": 10,
+                    "transport_inherited_rows": 9,
                 },
             ],
         }
         conn = self._mock_conn(
             [multi_metab_summary],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": [
                 "kegg.compound:C00086", "kegg.compound:C99999",
             ]}],
@@ -7876,7 +8061,7 @@ class TestGenesByMetabolite:
             "kegg.compound:C00086", "kegg.compound:C99999",
         ]
 
-    def test_by_evidence_source_and_by_transport_confidence_sorted(self):
+    def test_by_evidence_source_and_by_substrate_depth_sorted(self):
         """Both rollups sorted by count desc, then key asc."""
         gbm = self._api()
         # Provide rollups in non-canonical order to exercise the sort.
@@ -7886,25 +8071,25 @@ class TestGenesByMetabolite:
                 {"evidence_source": "transport", "count": 4},
                 {"evidence_source": "metabolism", "count": 19},
             ],
-            "rows_by_transport_confidence": [
-                {"transport_confidence": "substrate_confirmed", "count": 3},
-                {"transport_confidence": "family_inferred", "count": 9},
+            "rows_by_substrate_depth": [
+                {"substrate_depth": "most_specific", "count": 3},
+                {"substrate_depth": "inherited", "count": 9},
             ],
         }
         conn = self._mock_conn(
             [scrambled],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(self._METS, self._ORG, conn=conn)
         # by_evidence_source: highest count first
         assert out["by_evidence_source"][0]["evidence_source"] == "metabolism"
         assert out["by_evidence_source"][0]["count"] == 19
-        # by_transport_confidence: highest count first
+        # by_substrate_depth: highest count first
         assert (
-            out["by_transport_confidence"][0]["transport_confidence"]
-            == "family_inferred"
+            out["by_substrate_depth"][0]["substrate_depth"]
+            == "inherited"
         )
 
     def test_truncated_uses_offset_plus_limit_formula(self):
@@ -7915,7 +8100,7 @@ class TestGenesByMetabolite:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],  # total_matching=23
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(self._METS, self._ORG, limit=10, offset=10, conn=conn)
@@ -7925,7 +8110,7 @@ class TestGenesByMetabolite:
         conn2 = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out2 = gbm(self._METS, self._ORG, limit=10, offset=20, conn=conn2)
@@ -7939,7 +8124,7 @@ class TestGenesByMetabolite:
         from the other arm.
 
         Cross-arm fields:
-        - transport-only (None on metabolism rows): transport_confidence,
+        - transport-only (None on metabolism rows): substrate_depth,
           tcdb_family_id, tcdb_family_name
         - metabolism-only (None on transport rows): reaction_id,
           reaction_name, ec_numbers, mass_balance
@@ -7948,7 +8133,7 @@ class TestGenesByMetabolite:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["kegg.compound:C00086"]}],
         )
         out = gbm(self._METS, self._ORG, conn=conn)
@@ -7968,8 +8153,8 @@ class TestGenesByMetabolite:
 
         # Metabolism rows: transport-arm cross-arm keys present, value None
         for row in metabolism_rows:
-            assert "transport_confidence" in row
-            assert row["transport_confidence"] is None
+            assert "substrate_depth" in row
+            assert row["substrate_depth"] is None
             assert "tcdb_family_id" in row
             assert row["tcdb_family_id"] is None
             assert "tcdb_family_name" in row
@@ -8027,9 +8212,9 @@ class TestMetabolitesByGene:
             {"evidence_source": "metabolism", "count": 12},
             {"evidence_source": "transport", "count": 3},
         ],
-        "rows_by_transport_confidence": [
-            {"transport_confidence": "substrate_confirmed", "count": 2},
-            {"transport_confidence": "family_inferred", "count": 1},
+        "rows_by_substrate_depth": [
+            {"substrate_depth": "most_specific", "count": 2},
+            {"substrate_depth": "inherited", "count": 1},
         ],
         "by_gene": [
             {
@@ -8041,8 +8226,10 @@ class TestMetabolitesByGene:
                 "reaction_count": 1,
                 "transporter_count": 1,
                 "metabolism_rows": 4,
-                "transport_substrate_confirmed_rows": 1,
-                "transport_family_inferred_rows": 0,
+                "transport_most_specific_rows": 1,
+                "transport_inherited_rows": 0,
+                "transport_substrate_resolution": "resolved",
+                "tcdb_evidence_score_max": 0.8,
             },
             {
                 "locus_tag": "PMM0964",
@@ -8053,8 +8240,10 @@ class TestMetabolitesByGene:
                 "reaction_count": 1,
                 "transporter_count": 1,
                 "metabolism_rows": 4,
-                "transport_substrate_confirmed_rows": 1,
-                "transport_family_inferred_rows": 0,
+                "transport_most_specific_rows": 1,
+                "transport_inherited_rows": 0,
+                "transport_substrate_resolution": "resolved",
+                "tcdb_evidence_score_max": 0.8,
             },
             {
                 "locus_tag": "PMM0965",
@@ -8065,8 +8254,12 @@ class TestMetabolitesByGene:
                 "reaction_count": 1,
                 "transporter_count": 1,
                 "metabolism_rows": 4,
-                "transport_substrate_confirmed_rows": 0,
-                "transport_family_inferred_rows": 1,
+                "transport_most_specific_rows": 0,
+                "transport_inherited_rows": 1,
+                # decision 5: resolved = at least one non-lumping deepest
+                # attachment (this gene still carries an inherited row)
+                "transport_substrate_resolution": "resolved",
+                "tcdb_evidence_score_max": 0.6,
             },
         ],
         "top_metabolites": [],
@@ -8079,7 +8272,7 @@ class TestMetabolitesByGene:
     }
 
     # Family-inferred dominates — for the auto-warning trigger
-    _SUMMARY_ROW_FI_DOMINATES = {
+    _SUMMARY_ROW_INHERITED_DOMINATES = {
         **_SUMMARY_ROW_BOTH_ARMS,
         "total_matching": 551,
         "gene_count_total": 1,
@@ -8089,9 +8282,9 @@ class TestMetabolitesByGene:
         "rows_by_evidence_source": [
             {"evidence_source": "transport", "count": 551},
         ],
-        "rows_by_transport_confidence": [
-            {"transport_confidence": "substrate_confirmed", "count": 0},
-            {"transport_confidence": "family_inferred", "count": 551},
+        "rows_by_substrate_depth": [
+            {"substrate_depth": "most_specific", "count": 0},
+            {"substrate_depth": "inherited", "count": 551},
         ],
         "by_gene": [
             {
@@ -8103,19 +8296,23 @@ class TestMetabolitesByGene:
                 "reaction_count": 0,
                 "transporter_count": 1,
                 "metabolism_rows": 0,
-                "transport_substrate_confirmed_rows": 0,
-                "transport_family_inferred_rows": 551,
+                "transport_most_specific_rows": 0,
+                "transport_inherited_rows": 551,
+                # KG-authoritative: ABC-superfamily-only attachment
+                "transport_substrate_resolution": "family_inferred",
+                "tcdb_evidence_score_max": 0.2,
             },
         ],
     }
 
-    # Sample metabolism-arm detail row (substrate_confirmed-by-definition)
+    # Sample metabolism-arm detail row (most_specific-by-definition)
     _METAB_ROW = {
         "locus_tag": "PMM0963",
         "gene_name": "ureA",
         "product": "urease gamma subunit",
         "evidence_source": "metabolism",
-        "transport_confidence": None,
+        "substrate_depth": None,
+        "tcdb_evidence_score": None,
         "reaction_id": "kegg.reaction:R00131",
         "reaction_name": "Urea + 2H2O => CO2 + 2NH3",
         "ec_numbers": ["3.5.1.5"],
@@ -8129,13 +8326,14 @@ class TestMetabolitesByGene:
         "metabolite_chebi_id": "16199",
     }
 
-    # Sample transport-arm detail row (substrate_confirmed)
-    _TRANS_ROW_SC = {
+    # Sample transport-arm detail row (most_specific)
+    _TRANS_ROW_MS = {
         "locus_tag": "PMM0963",
         "gene_name": "ureA",
         "product": "urease gamma subunit",
         "evidence_source": "transport",
-        "transport_confidence": "substrate_confirmed",
+        "substrate_depth": "most_specific",
+        "tcdb_evidence_score": 0.8,
         "reaction_id": None,
         "reaction_name": None,
         "ec_numbers": None,
@@ -8149,13 +8347,14 @@ class TestMetabolitesByGene:
         "metabolite_chebi_id": "16199",
     }
 
-    # Sample transport-arm detail row (family_inferred)
-    _TRANS_ROW_FI = {
+    # Sample transport-arm detail row (inherited)
+    _TRANS_ROW_INH = {
         "locus_tag": "PMM0913",
         "gene_name": "salY",
         "product": "ABC superfamily ATP-binding cassette transporter",
         "evidence_source": "transport",
-        "transport_confidence": "family_inferred",
+        "substrate_depth": "inherited",
+        "tcdb_evidence_score": 0.4,
         "reaction_id": None,
         "reaction_name": None,
         "ec_numbers": None,
@@ -8192,7 +8391,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
         )
         out = mbg(self._LOCUS, self._ORG, conn=conn)
@@ -8201,7 +8400,7 @@ class TestMetabolitesByGene:
         # MBG envelope keys
         assert "by_gene" in out
         assert "by_evidence_source" in out
-        assert "by_transport_confidence" in out
+        assert "by_substrate_depth" in out
         assert "by_element" in out      # NEW vs GBM
         assert "top_metabolites" in out
         assert "top_reactions" in out
@@ -8220,7 +8419,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
         )
         out = mbg(self._LOCUS, self._ORG, conn=conn)
@@ -8248,7 +8447,7 @@ class TestMetabolitesByGene:
         mbg = self._api()
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
         )
         out = mbg(
@@ -8266,7 +8465,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
         )
         out = mbg(
@@ -8282,7 +8481,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
         )
         out = mbg(
@@ -8292,119 +8491,124 @@ class TestMetabolitesByGene:
         evidence = {r["evidence_source"] for r in out["results"]}
         assert "transport" in evidence
 
-    def test_transport_confidence_substrate_confirmed_no_warning(self):
-        """transport_confidence='substrate_confirmed' suppresses the
-        family-inferred-dominance warning (user chose explicitly)."""
+    def test_substrate_depth_most_specific_no_warning(self):
+        """substrate_depth=['most_specific'] narrows the transport arm only;
+        fixture genes are all `resolved` → no gene-anchored warning."""
         mbg = self._api()
         sc_summary = {
             **self._SUMMARY_ROW_BOTH_ARMS,
-            "rows_by_transport_confidence": [
-                {"transport_confidence": "substrate_confirmed", "count": 2},
+            "rows_by_substrate_depth": [
+                {"substrate_depth": "most_specific", "count": 2},
             ],
         }
         conn = self._mock_conn(
             [sc_summary],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
         )
         out = mbg(
             self._LOCUS, self._ORG,
-            transport_confidence="substrate_confirmed", conn=conn,
+            substrate_depth=["most_specific"], conn=conn,
         )
         # Metabolism rows still present (per-arm scope)
         evidence = {r["evidence_source"] for r in out["results"]}
         assert evidence == {"metabolism", "transport"}
-        # No auto-warning (user explicitly set transport_confidence)
+        # No auto-warning (user explicitly set substrate_depth)
         assert out["warnings"] == []
 
-    def test_transport_confidence_family_inferred_no_warning(self):
-        """transport_confidence='family_inferred' likewise suppresses
-        the auto-warning (user chose explicitly)."""
+    def test_substrate_depth_inherited_no_warning(self):
+        """substrate_depth=['inherited'] narrows the transport arm only;
+        fixture genes are all `resolved` → no gene-anchored warning."""
         mbg = self._api()
         fi_summary = {
             **self._SUMMARY_ROW_BOTH_ARMS,
-            "rows_by_transport_confidence": [
-                {"transport_confidence": "family_inferred", "count": 1},
+            "rows_by_substrate_depth": [
+                {"substrate_depth": "inherited", "count": 1},
             ],
         }
         conn = self._mock_conn(
             [fi_summary],
             [self._METAB_ROW],
-            [self._TRANS_ROW_FI],
+            [self._TRANS_ROW_INH],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
         )
         out = mbg(
             self._LOCUS, self._ORG,
-            transport_confidence="family_inferred", conn=conn,
+            substrate_depth=["inherited"], conn=conn,
         )
         assert out["warnings"] == []
 
-    def test_family_inferred_dominance_warning_fires(self):
-        """Spec § family_inferred-dominance auto-warning. Fires when
-        - transport rows present in result AND
-        - transport_family_inferred_rows > transport_substrate_confirmed_rows AND
-        - user did NOT set transport_confidence.
-
-        Phase 3 Item 6.3: warning text rewritten to question-shape-aware
-        framing (drops "high-precision" prescription). GBM and MBG now
-        emit byte-identical text (modulo count variables).
+    def test_family_inferred_resolution_warning_fires(self):
+        """substrate_depth migration (gene-anchored warning): fires per gene
+        from the KG-authoritative `by_gene[].transport_substrate_resolution
+        == 'family_inferred'` (the 9 ABC-only MED4 genes carry it), NOT from
+        a row-share threshold. Message states that substrate breadth is
+        reachability, not capability, names the flagged gene(s), and carries
+        the decision-5 caveat (resolved = at least one non-lumping
+        attachment).
         """
         mbg = self._api()
         conn = self._mock_conn(
-            [self._SUMMARY_ROW_FI_DOMINATES],
+            [self._SUMMARY_ROW_INHERITED_DOMINATES],
             [],   # metabolism arm fires but returns nothing (PMM0913 transport-only)
-            [self._TRANS_ROW_FI],
+            [self._TRANS_ROW_INH],
             [{"found": ["PMM0913"]}],
         )
         out = mbg(["PMM0913"], self._ORG, conn=conn)
-        warnings = [
-            w for w in out["warnings"] if "family_inferred" in w
-        ]
+        warnings = [w for w in out["warnings"] if "family_inferred" in w]
         assert warnings, (
-            f"expected family-inferred warning, got {out['warnings']!r}"
+            f"expected family_inferred-resolution warning, got {out['warnings']!r}"
         )
         warning = warnings[0]
+        assert "PMM0913" in warning
+        assert "reachability, not capability" in warning
+        assert "resolved means at least one non-lumping attachment" in warning
+        # Retired vocabulary / param must not leak into the message
+        assert "substrate_confirmed" not in warning
+        assert "transport_confidence" not in warning
 
-        # Assert the new symmetric warning format (Item 6.3)
-        assert "Most transport rows are `family_inferred`" in warning
-        assert (
-            "annotations rolled up from family-level transport potential"
-            in warning
+    def test_no_warning_when_every_gene_resolved(self):
+        """All by_gene entries `resolved` → no gene-anchored warning even
+        when inherited rows outnumber most_specific rows (row share is no
+        longer the trigger)."""
+        mbg = self._api()
+        resolved_but_inherited_heavy = {
+            **self._SUMMARY_ROW_BOTH_ARMS,
+            "rows_by_substrate_depth": [
+                {"substrate_depth": "most_specific", "count": 1},
+                {"substrate_depth": "inherited", "count": 5},
+            ],
+            "by_gene": [
+                {
+                    **self._SUMMARY_ROW_BOTH_ARMS["by_gene"][0],
+                    "transport_most_specific_rows": 1,
+                    "transport_inherited_rows": 5,
+                    "transport_substrate_resolution": "resolved",
+                },
+            ],
+        }
+        conn = self._mock_conn(
+            [resolved_but_inherited_heavy],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_INH],
+            [{"found": ["PMM0963"]}],
         )
-        assert "Workflow-dependent" in warning
-        assert (
-            "Both tiers are annotations, neither is ground truth" in warning
-        )
-        assert "analysis-doc §g" in warning
+        out = mbg(["PMM0963"], self._ORG, conn=conn)
+        assert not [w for w in out["warnings"] if "family_inferred" in w]
 
-        # Assert the inline counts ARE present (X of Y format)
-        import re
-        m = re.search(r"\((\d+) of (\d+)\)", warning)
-        assert m, (
-            f"warning must include `(X of Y)` count format; got: {warning}"
-        )
-        fi_count, total = int(m.group(1)), int(m.group(2))
-        assert fi_count > total - fi_count, (
-            "fi_count must dominate (test setup)"
-        )
-
-        # Assert old "high-precision" prescription is GONE
-        assert "high-precision" not in warning
-        assert "substrate-curated transporter genes only" not in warning
-
-    def test_no_warning_when_substrate_confirmed_majority(self):
-        """sc >= fi → no auto-warning."""
+    def test_no_warning_when_most_specific_majority(self):
+        """All fixture genes resolved, ms >= inherited → no auto-warning."""
         mbg = self._api()
         # 2 SC > 1 FI on transport in default summary
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
         )
         out = mbg(self._LOCUS, self._ORG, conn=conn)
-        assert all("family_inferred" not in w for w in out["warnings"])
+        assert all("inherited" not in w for w in out["warnings"])
 
     def test_not_found_locus_tags(self):
         """Input locus_tags that don't resolve to any Gene in the requested
@@ -8413,7 +8617,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             # Existence probe returns only 3 of the 4 (PMM9999 missing)
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
         )
@@ -8432,7 +8636,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             # All four locus_tags exist in organism
             [{"found": ["PMM0963", "PMM0964", "PMM0965", "PMM0005"]}],
         )
@@ -8455,7 +8659,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             # Existence probe finds 0963 + 0005, not 9999
             [{"found": ["PMM0963", "PMM0005"]}],
         )
@@ -8475,7 +8679,7 @@ class TestMetabolitesByGene:
             "total_matching": 0,
             "gene_count_total": 0,
             "rows_by_evidence_source": [],
-            "rows_by_transport_confidence": [],
+            "rows_by_substrate_depth": [],
             "by_gene": [],
         }
         conn = self._mock_conn(
@@ -8493,7 +8697,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
         )
         out = mbg(self._LOCUS, self._ORG, conn=conn)
@@ -8505,7 +8709,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             # locus_tag existence probe
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
             # pathway-id existence probe
@@ -8530,7 +8734,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             # locus_tag existence probe
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
             # element existence probe — only 'N' is real
@@ -8549,7 +8753,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             # locus_tag existence probe
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
             # metabolite-id existence probe
@@ -8609,7 +8813,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],   # total_matching=15
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
         )
         out = mbg(self._LOCUS, self._ORG, limit=2, conn=conn)
@@ -8620,7 +8824,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
         )
         out = mbg(self._LOCUS, self._ORG, offset=3, conn=conn)
@@ -8633,7 +8837,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
         )
         out = mbg(self._LOCUS, self._ORG, conn=conn)
@@ -8654,7 +8858,7 @@ class TestMetabolitesByGene:
             mock_instance.execute_query.side_effect = [
                 [self._SUMMARY_ROW_BOTH_ARMS],
                 [self._METAB_ROW],
-                [self._TRANS_ROW_SC],
+                [self._TRANS_ROW_MS],
                 [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
                 [],
             ]
@@ -8687,7 +8891,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [with_by_element],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
         )
         out = mbg(self._LOCUS, self._ORG, conn=conn)
@@ -8716,7 +8920,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [summary_with_pathways],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
         )
         out = mbg(self._LOCUS, self._ORG, conn=conn)
@@ -8735,7 +8939,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
         )
         out = mbg(self._LOCUS, self._ORG, conn=conn)
@@ -8748,8 +8952,157 @@ class TestMetabolitesByGene:
         assert "reaction_count" in first
         assert "transporter_count" in first
         assert "metabolism_rows" in first
-        assert "transport_substrate_confirmed_rows" in first
-        assert "transport_family_inferred_rows" in first
+        assert "transport_most_specific_rows" in first
+        assert "transport_inherited_rows" in first
+
+    # ---- substrate_depth migration (spec 2026-08-20; mirrors GBM) ----
+
+    def test_substrate_depth_unknown_value_raises_listing_valid(self):
+        mbg = self._api()
+        conn = MagicMock()
+        with pytest.raises(ValueError) as exc:
+            mbg(self._LOCUS, self._ORG, substrate_depth=["bogus"], conn=conn)
+        msg = str(exc.value)
+        assert "bogus" in msg
+        assert "most_specific" in msg and "inherited" in msg
+        conn.execute_query.assert_not_called()
+
+    @pytest.mark.parametrize("old_value,new_value", [
+        ("substrate_confirmed", "most_specific"),
+        ("family_inferred", "inherited"),
+    ])
+    def test_substrate_depth_old_value_strings_raise_with_rename_pointer(
+        self, old_value, new_value,
+    ):
+        mbg = self._api()
+        conn = MagicMock()
+        with pytest.raises(ValueError) as exc:
+            mbg(self._LOCUS, self._ORG, substrate_depth=[old_value], conn=conn)
+        msg = str(exc.value)
+        assert old_value in msg
+        assert new_value in msg
+        assert "substrate_depth" in msg
+        conn.execute_query.assert_not_called()
+
+    def test_substrate_depth_forwarded_to_transport_builders(self):
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_MS],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        mbg(self._LOCUS, self._ORG, substrate_depth=["most_specific"], conn=conn)
+        calls = conn.execute_query.call_args_list
+        assert calls[0].kwargs.get("substrate_depth") == ["most_specific"]
+        metab_cypher, metab_kwargs = calls[1].args[0], calls[1].kwargs
+        assert "$substrate_depth" not in metab_cypher
+        assert "substrate_depth" not in metab_kwargs
+        assert calls[2].kwargs.get("substrate_depth") == ["most_specific"]
+
+    def test_no_transport_confidence_kwarg(self):
+        mbg = self._api()
+        with pytest.raises(TypeError):
+            mbg(self._LOCUS, self._ORG, transport_confidence="substrate_confirmed",
+                conn=MagicMock())
+
+    def test_sort_precision_tier_then_score_desc(self):
+        """Global precision tier (metabolism → most_specific → inherited),
+        then tcdb_evidence_score desc within a transport tier, then
+        input-gene order."""
+        mbg = self._api()
+        low_ms = {**self._TRANS_ROW_MS, "locus_tag": "PMM0963",
+                  "metabolite_id": "kegg.compound:C00001",
+                  "tcdb_evidence_score": 0.6}
+        high_ms = {**self._TRANS_ROW_MS, "locus_tag": "PMM0965",
+                   "metabolite_id": "kegg.compound:C00002",
+                   "tcdb_evidence_score": 0.8}
+        high_inh = {**self._TRANS_ROW_INH, "locus_tag": "PMM0963",
+                    "tcdb_evidence_score": 1.0}
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [high_inh, low_ms, high_ms],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(self._LOCUS, self._ORG, limit=10, conn=conn)
+        order = [(r["evidence_source"], r.get("substrate_depth"), r["locus_tag"])
+                 for r in out["results"]]
+        assert order == [
+            ("metabolism", None, "PMM0963"),
+            # 0.8 beats 0.6 even though PMM0965 is later in input order
+            ("transport", "most_specific", "PMM0965"),
+            ("transport", "most_specific", "PMM0963"),
+            ("transport", "inherited", "PMM0963"),
+        ]
+
+    def test_sort_key_tiebreakers_after_score(self):
+        from multiomics_explorer.api.functions import _mbg_sort_key
+        idx = {lt: i for i, lt in enumerate(self._LOCUS)}
+        a = {**self._TRANS_ROW_MS, "locus_tag": "PMM0965"}
+        b = {**self._TRANS_ROW_MS, "locus_tag": "PMM0963"}
+        # equal score → input order decides
+        assert _mbg_sort_key(b, idx) < _mbg_sort_key(a, idx)
+        inh = {**self._TRANS_ROW_INH, "locus_tag": "PMM0963",
+               "tcdb_evidence_score": 1.0}
+        assert _mbg_sort_key(a, idx) < _mbg_sort_key(inh, idx)
+        assert _mbg_sort_key(self._METAB_ROW, idx) < _mbg_sort_key(b, idx)
+
+    def test_by_gene_carries_resolution_and_score_max(self):
+        """by_gene[] entries gain transport_substrate_resolution +
+        tcdb_evidence_score_max (pass-through from the summary builder;
+        null on metabolism-only genes)."""
+        mbg = self._api()
+        summary = {
+            **self._SUMMARY_ROW_BOTH_ARMS,
+            "by_gene": [
+                *self._SUMMARY_ROW_BOTH_ARMS["by_gene"],
+                {
+                    "locus_tag": "PMM0001", "gene_name": None, "product": None,
+                    "rows": 1, "metabolite_count": 1, "reaction_count": 1,
+                    "transporter_count": 0, "metabolism_rows": 1,
+                    "transport_most_specific_rows": 0,
+                    "transport_inherited_rows": 0,
+                    "transport_substrate_resolution": None,
+                    "tcdb_evidence_score_max": None,
+                },
+            ],
+        }
+        conn = self._mock_conn(
+            [summary],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_MS],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965", "PMM0001"]}],
+        )
+        out = mbg([*self._LOCUS, "PMM0001"], self._ORG, conn=conn)
+        by_lt = {g["locus_tag"]: g for g in out["by_gene"]}
+        assert by_lt["PMM0963"]["transport_substrate_resolution"] == "resolved"
+        assert by_lt["PMM0963"]["tcdb_evidence_score_max"] == 0.8
+        assert by_lt["PMM0001"]["transport_substrate_resolution"] is None
+        assert by_lt["PMM0001"]["tcdb_evidence_score_max"] is None
+        assert "transport_substrate_confirmed_rows" not in by_lt["PMM0963"]
+        assert "transport_family_inferred_rows" not in by_lt["PMM0963"]
+
+    def test_envelope_uses_substrate_depth_names_only(self):
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_MS],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(self._LOCUS, self._ORG, conn=conn)
+        assert "by_transport_confidence" not in out
+        assert {e["substrate_depth"] for e in out["by_substrate_depth"]} == {
+            "most_specific", "inherited",
+        }
+        for row in out["results"]:
+            assert "transport_confidence" not in row
+            assert "substrate_depth" in row
+            assert "tcdb_evidence_score" in row
+        trans = next(r for r in out["results"] if r["evidence_source"] == "transport")
+        assert trans["substrate_depth"] == "most_specific"
+        assert trans["tcdb_evidence_score"] == 0.8
 
     def test_empty_inputs_zero_rollups(self):
         """All locus_tags in not_matched (resolved but zero chemistry)
@@ -8763,7 +9116,7 @@ class TestMetabolitesByGene:
             "transporter_count_total": 0,
             "metabolite_count_total": 0,
             "rows_by_evidence_source": [],
-            "rows_by_transport_confidence": [],
+            "rows_by_substrate_depth": [],
             "by_gene": [],
             "by_element": [],
             "top_metabolite_pathways": [],
@@ -8798,7 +9151,7 @@ class TestMetabolitesByGene:
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
             [self._METAB_ROW],
-            [self._TRANS_ROW_SC],
+            [self._TRANS_ROW_MS],
             [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
         )
         out = mbg(self._LOCUS, self._ORG, conn=conn)
@@ -8818,8 +9171,8 @@ class TestMetabolitesByGene:
 
         # Metabolism rows: transport-arm cross-arm keys present, value None
         for row in metabolism_rows:
-            assert "transport_confidence" in row
-            assert row["transport_confidence"] is None
+            assert "substrate_depth" in row
+            assert row["substrate_depth"] is None
             assert "tcdb_family_id" in row
             assert row["tcdb_family_id"] is None
             assert "tcdb_family_name" in row
@@ -9186,11 +9539,14 @@ class TestOntologyLandscapeF1Surface:
 
 class TestGeneOverviewPhase1Plumbing:
     """gene_overview adds reaction_count + catalyzed_metabolite_count +
-    transporter_count + evidence_sources per row, plus has_chemistry envelope.
+    evidence_sources per row, plus has_chemistry envelope; the TCDB
+    substrate_depth migration (2026-08) replaces transporter_count with
+    tcdb_evidence_score_max / transported_metabolite_count /
+    transport_substrate_resolution (pass-through; null = no TCDB call).
     Verification cases per spec §6.1 (PMM1428 / PMM0001 / PMM0392 / PMM0628 /
     PMM0263). Catalysis-arm rename (KG-SYNC-001): metabolite_count →
     catalyzed_metabolite_count — catalysis-only, so transport-only genes
-    carry 0 (discriminate via transporter_count / evidence_sources)."""
+    carry 0 (discriminate via tcdb_evidence_score_max / evidence_sources)."""
 
     def _summary_with_chemistry(self, total=1, has_chemistry=0, not_found=None):
         return [{
@@ -9225,7 +9581,9 @@ class TestGeneOverviewPhase1Plumbing:
             "categorical_metric_count": 0,
             "reaction_count": 0,
             "catalyzed_metabolite_count": 0,
-            "transporter_count": 0,
+            "tcdb_evidence_score_max": None,
+            "transported_metabolite_count": 0,
+            "transport_substrate_resolution": None,
             "evidence_sources": [],
         }
         row.update(chem_overrides)
@@ -9241,18 +9599,21 @@ class TestGeneOverviewPhase1Plumbing:
         row = result["results"][0]
         assert row["reaction_count"] == 0
         assert row["catalyzed_metabolite_count"] == 0
-        assert row["transporter_count"] == 0
+        assert "transporter_count" not in row
+        assert row["tcdb_evidence_score_max"] is None
+        assert row["transported_metabolite_count"] == 0
+        assert row["transport_substrate_resolution"] is None
         assert row["evidence_sources"] == []
 
     def test_pmm0001_metabolism_only(self, mock_conn):
-        """PMM0001: 4 reactions, 6 catalyzed metabolites, 0 transporters,
-        ['metabolism']."""
+        """PMM0001: 4 reactions, 6 catalyzed metabolites, no TCDB call
+        (score null / transported 0 / resolution null — live-verified
+        2026-08-20), ['metabolism']."""
         mock_conn.execute_query.side_effect = [
             self._summary_with_chemistry(total=1, has_chemistry=1),
             [self._detail_row(
                 "PMM0001",
                 reaction_count=4, catalyzed_metabolite_count=6,
-                transporter_count=0,
                 evidence_sources=["metabolism"],
             )],
         ]
@@ -9260,20 +9621,26 @@ class TestGeneOverviewPhase1Plumbing:
         row = result["results"][0]
         assert row["reaction_count"] == 4
         assert row["catalyzed_metabolite_count"] == 6
-        assert row["transporter_count"] == 0
+        assert "transporter_count" not in row
+        assert row["tcdb_evidence_score_max"] is None
+        assert row["transported_metabolite_count"] == 0
+        assert row["transport_substrate_resolution"] is None
         assert row["evidence_sources"] == ["metabolism"]
 
     def test_pmm0392_transport_and_metabolomics(self, mock_conn):
         """PMM0392: 0 reactions, 0 catalyzed metabolites (transport-only —
         catalysis-arm count is 0 post-rename, live-KG verified),
-        8 transporters, ['transport', 'metabolomics'].
+        tcdb_evidence_score_max 0.8 / transported_metabolite_count 13 /
+        'resolved' (live-verified 2026-08-26), ['transport', 'metabolomics'].
         Critical reproducer: reaction_count=0 must NOT promote 'metabolism'."""
         mock_conn.execute_query.side_effect = [
             self._summary_with_chemistry(total=1, has_chemistry=1),
             [self._detail_row(
                 "PMM0392",
                 reaction_count=0, catalyzed_metabolite_count=0,
-                transporter_count=8,
+                tcdb_evidence_score_max=0.8,
+                transported_metabolite_count=13,
+                transport_substrate_resolution="resolved",
                 evidence_sources=["transport", "metabolomics"],
             )],
         ]
@@ -9281,29 +9648,36 @@ class TestGeneOverviewPhase1Plumbing:
         row = result["results"][0]
         assert row["reaction_count"] == 0
         assert row["catalyzed_metabolite_count"] == 0
-        assert row["transporter_count"] == 8
+        assert "transporter_count" not in row
+        assert row["tcdb_evidence_score_max"] == 0.8
+        assert row["transported_metabolite_count"] == 13
+        assert row["transport_substrate_resolution"] == "resolved"
         assert row["evidence_sources"] == ["transport", "metabolomics"]
         assert "metabolism" not in row["evidence_sources"]
 
     def test_pmm0628_transport_with_measurement(self, mock_conn):
-        """PMM0628: 0 / 0 catalyzed / 1 transporter /
+        """PMM0628: 0 / 0 catalyzed / TCDB call present /
         ['transport', 'metabolomics'] (transport-only → catalyzed count 0)."""
         mock_conn.execute_query.side_effect = [
             self._summary_with_chemistry(total=1, has_chemistry=1),
             [self._detail_row(
                 "PMM0628",
                 reaction_count=0, catalyzed_metabolite_count=0,
-                transporter_count=1,
+                tcdb_evidence_score_max=0.6,
+                transported_metabolite_count=1,
+                transport_substrate_resolution="resolved",
                 evidence_sources=["transport", "metabolomics"],
             )],
         ]
         result = api.gene_overview(["PMM0628"], conn=mock_conn)
         row = result["results"][0]
-        assert row["transporter_count"] == 1
+        assert row["tcdb_evidence_score_max"] == 0.6
+        assert row["transported_metabolite_count"] == 1
+        assert row["transport_substrate_resolution"] == "resolved"
         assert row["evidence_sources"] == ["transport", "metabolomics"]
 
     def test_pmm0263_transport_only_no_measured(self, mock_conn):
-        """PMM0263: 0 / 0 catalyzed / 1 transporter / ['transport'] —
+        """PMM0263: 0 / 0 catalyzed / TCDB call present / ['transport'] —
         transport-only reachable metabolites not in 107 measured, so
         'metabolomics' correctly drops out (catalysis-arm count 0)."""
         mock_conn.execute_query.side_effect = [
@@ -9311,7 +9685,9 @@ class TestGeneOverviewPhase1Plumbing:
             [self._detail_row(
                 "PMM0263",
                 reaction_count=0, catalyzed_metabolite_count=0,
-                transporter_count=1,
+                tcdb_evidence_score_max=0.4,
+                transported_metabolite_count=1,
+                transport_substrate_resolution="family_inferred",
                 evidence_sources=["transport"],
             )],
         ]
@@ -9854,7 +10230,7 @@ class TestGenesByMetabolitePhase2:
         "transporter_count_total": 0,
         "metabolite_count_total": 0,
         "rows_by_evidence_source": [],
-        "rows_by_transport_confidence": [],
+        "rows_by_substrate_depth": [],
         "by_metabolite": [],
         "top_reactions": [],
         "top_tcdb_families": [],
@@ -9907,7 +10283,7 @@ class TestMetabolitesByGenePhase2:
         "transporter_count_total": 0,
         "metabolite_count_total": 0,
         "rows_by_evidence_source": [],
-        "rows_by_transport_confidence": [],
+        "rows_by_substrate_depth": [],
         "by_gene": [],
         "top_metabolites": [],
         "top_reactions": [],

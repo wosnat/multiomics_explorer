@@ -1,6 +1,6 @@
 by_evidence_source: []
 by_metabolite: []
-by_transport_confidence: []
+by_substrate_depth: []
 case_id: genes_by_metabolite_alcohol_alteromonas_not_matched
 gene_count_total: 0
 metabolite_count_total: 0

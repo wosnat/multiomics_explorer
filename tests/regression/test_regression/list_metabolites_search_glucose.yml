@@ -52,6 +52,7 @@ results:
   pathway_ids: []
   score: 3.0912
   transporter_count: 18
+  transporter_gene_count: 3051
 - catalyst_gene_count: 295
   chebi_id: '13498'
   elements:
@@ -98,6 +99,7 @@ results:
   - kegg.pathway:ko04082
   score: 2.5975
   transporter_count: 3
+  transporter_gene_count: 1684
 - catalyst_gene_count: 277
   chebi_id: '4167'
   elements:
@@ -155,6 +157,7 @@ results:
   - kegg.pathway:ko05415
   score: 2.5975
   transporter_count: 10
+  transporter_gene_count: 1422
 - catalyst_gene_count: 191
   chebi_id: '10526'
   elements:
@@ -188,6 +191,7 @@ results:
   - kegg.pathway:ko01250
   score: 2.5975
   transporter_count: 1
+  transporter_gene_count: 243
 - catalyst_gene_count: 87
   chebi_id: '13230'
   elements:
@@ -216,6 +220,7 @@ results:
   - kegg.pathway:ko01250
   score: 2.5975
   transporter_count: 0
+  transporter_gene_count: 0
 - catalyst_gene_count: 18
   chebi_id: '13264'
   elements:
@@ -244,6 +249,7 @@ results:
   - kegg.pathway:ko01250
   score: 2.5975
   transporter_count: 0
+  transporter_gene_count: 0
 - catalyst_gene_count: 188
   chebi_id: '10397'
   elements:
@@ -271,6 +277,7 @@ results:
   - kegg.pathway:ko01200
   score: 2.2397
   transporter_count: 0
+  transporter_gene_count: 0
 - catalyst_gene_count: 178
   chebi_id: '10242'
   elements:
@@ -302,6 +309,7 @@ results:
   - kegg.pathway:ko04964
   score: 2.2397
   transporter_count: 0
+  transporter_gene_count: 0
 - catalyst_gene_count: 190
   chebi_id: '14314'
   elements:
@@ -351,6 +359,7 @@ results:
   - kegg.pathway:ko05415
   score: 1.9686
   transporter_count: 2
+  transporter_gene_count: 856
 - catalyst_gene_count: 282
   chebi_id: '10246'
   elements:
@@ -395,6 +404,7 @@ results:
   - kegg.pathway:ko04922
   score: 1.9686
   transporter_count: 0
+  transporter_gene_count: 0
 - catalyst_gene_count: 0
   chebi_id: '1078'
   elements:
@@ -416,6 +426,7 @@ results:
   pathway_ids: []
   score: 1.9686
   transporter_count: 2
+  transporter_gene_count: 600
 - catalyst_gene_count: 0
   chebi_id: '73918'
   elements:
@@ -437,6 +448,7 @@ results:
   pathway_ids: []
   score: 1.756
   transporter_count: 1
+  transporter_gene_count: 580
 - catalyst_gene_count: 171
   chebi_id: '10245'
   elements:
@@ -472,6 +484,7 @@ results:
   - kegg.pathway:ko04922
   score: 1.756
   transporter_count: 1
+  transporter_gene_count: 0
 - catalyst_gene_count: 183
   chebi_id: '10399'
   elements:
@@ -503,6 +516,7 @@ results:
   - kegg.pathway:ko04922
   score: 1.756
   transporter_count: 2
+  transporter_gene_count: 577
 - catalyst_gene_count: 19
   chebi_id: '10398'
   elements:
@@ -526,6 +540,7 @@ results:
   - kegg.pathway:ko00500
   score: 1.756
   transporter_count: 0
+  transporter_gene_count: 0
 - catalyst_gene_count: 1
   chebi_id: '70785'
   elements:
@@ -552,6 +567,7 @@ results:
   - kegg.pathway:ko01250
   score: 1.756
   transporter_count: 0
+  transporter_gene_count: 0
 - catalyst_gene_count: 133
   chebi_id: '10510'
   elements:
@@ -583,6 +599,7 @@ results:
   - kegg.pathway:ko01250
   score: 1.4441
   transporter_count: 0
+  transporter_gene_count: 0
 - catalyst_gene_count: 32
   chebi_id: '13262'
   elements:
@@ -609,6 +626,7 @@ results:
   - kegg.pathway:ko01250
   score: 1.4441
   transporter_count: 0
+  transporter_gene_count: 0
 - catalyst_gene_count: 24
   chebi_id: '70783'
   elements:
@@ -635,6 +653,7 @@ results:
   - kegg.pathway:ko01250
   score: 1.4441
   transporter_count: 0
+  transporter_gene_count: 0
 - catalyst_gene_count: 1
   chebi_id: '10508'
   elements:
@@ -664,6 +683,7 @@ results:
   - kegg.pathway:ko01250
   score: 1.4441
   transporter_count: 0
+  transporter_gene_count: 0
 - catalyst_gene_count: 2
   chebi_id: '12230'
   elements:
@@ -688,6 +708,7 @@ results:
   - kegg.pathway:ko02060
   score: 1.3263
   transporter_count: 0
+  transporter_gene_count: 0
 - catalyst_gene_count: 1
   chebi_id: '32332'
   elements:
@@ -717,6 +738,7 @@ results:
   - kegg.pathway:ko01250
   score: 1.2263
   transporter_count: 0
+  transporter_gene_count: 0
 - catalyst_gene_count: 32
   chebi_id: '155215'
   elements:
@@ -740,6 +762,7 @@ results:
   - kegg.pathway:ko01100
   score: 1.1403
   transporter_count: 0
+  transporter_gene_count: 0
 returned: 23
 row_count: 23
 score_max: 3.091231346130371

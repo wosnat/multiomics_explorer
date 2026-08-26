@@ -1,0 +1,159 @@
+by_annotation_state:
+- annotation_state: informative_multi
+  count: 2
+by_annotation_type:
+- annotation_type: go_bp
+  count: 2
+- annotation_type: go_cc
+  count: 2
+- annotation_type: pfam
+  count: 2
+- annotation_type: cog_category
+  count: 2
+- annotation_type: kegg
+  count: 2
+- annotation_type: brite
+  count: 2
+- annotation_type: cyanorak_role
+  count: 2
+- annotation_type: tigr_role
+  count: 2
+- annotation_type: interpro
+  count: 2
+- annotation_type: go_mf
+  count: 1
+- annotation_type: ec
+  count: 1
+- annotation_type: ncbifam
+  count: 1
+- annotation_type: tcdb
+  count: 1
+by_category:
+- category: Replication and repair
+  count: 1
+- category: Transport
+  count: 1
+by_organism:
+- count: 2
+  organism_name: Prochlorococcus MED4
+case_id: gene_overview_tcdb_pair
+has_chemistry: 2
+has_clusters: 2
+has_derived_metrics: 2
+has_discussed: 0
+has_expression: 2
+has_orthologs: 2
+has_significant_expression: 2
+not_found: []
+offset: 0
+results:
+- annotation_quality: 3
+  annotation_state: informative_multi
+  annotation_types:
+  - brite
+  - cog_category
+  - cyanorak_role
+  - ec
+  - go_bp
+  - go_cc
+  - go_mf
+  - interpro
+  - kegg
+  - ncbifam
+  - pfam
+  - tigr_role
+  catalyzed_metabolite_count: 6
+  closest_ortholog_genera:
+  - Prochlorococcus
+  - Synechococcus
+  closest_ortholog_group_size: 21
+  cluster_membership_count: 1
+  cluster_types:
+  - diel
+  derived_metric_count: 8
+  derived_metric_value_kinds:
+  - categorical
+  - numeric
+  discussed_in_publication_count: 0
+  evidence_sources:
+  - metabolism
+  expression_edge_count: 33
+  gene_category: Replication and repair
+  gene_name: dnaN
+  informative_annotation_types:
+  - brite
+  - cog_category
+  - cyanorak_role
+  - ec
+  - go_bp
+  - go_cc
+  - go_mf
+  - kegg
+  - ncbifam
+  - pfam
+  - reaction
+  - tigr_role
+  locus_tag: PMM0001
+  organism_name: Prochlorococcus MED4
+  product: DNA polymerase III, beta subunit
+  reaction_count: 4
+  significant_down_count: 1
+  significant_up_count: 3
+  tcdb_evidence_score_max: null
+  transport_substrate_resolution: null
+  transported_metabolite_count: 0
+- annotation_quality: 3
+  annotation_state: informative_multi
+  annotation_types:
+  - brite
+  - cog_category
+  - cyanorak_role
+  - go_bp
+  - go_cc
+  - interpro
+  - kegg
+  - pfam
+  - tcdb
+  - tigr_role
+  catalyzed_metabolite_count: 0
+  closest_ortholog_genera:
+  - Prochlorococcus
+  - Synechococcus
+  closest_ortholog_group_size: 21
+  cluster_membership_count: 1
+  cluster_types:
+  - diel
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  discussed_in_publication_count: 0
+  evidence_sources:
+  - metabolomics
+  - transport
+  expression_edge_count: 26
+  gene_category: Transport
+  gene_name: cbiQ
+  informative_annotation_types:
+  - brite
+  - cog_category
+  - cyanorak_role
+  - go_bp
+  - go_cc
+  - kegg
+  - pfam
+  - tigr_role
+  - transporter
+  locus_tag: PMM0392
+  organism_name: Prochlorococcus MED4
+  product: transmembrane component of ECF transporter energizing module
+  reaction_count: 0
+  significant_down_count: 1
+  significant_up_count: 0
+  tcdb_evidence_score_max: 0.8
+  transport_substrate_resolution: resolved
+  transported_metabolite_count: 13
+returned: 2
+row_count: 2
+top_discussing_publications: []
+total_matching: 2
+truncated: false

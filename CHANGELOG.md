@@ -23,15 +23,61 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 
 ### Added
 
+- `genes_by_metabolite` / `metabolites_by_gene` transport rows carry
+  `tcdb_evidence_score` (the KG's 5-signal composite on the gene × family
+  edge, float in [0, 1]); rows rank by it within a depth tier. No score
+  filter param by design — rank, don't filter. Envelope per-gene entries
+  (`top_genes[]` / `by_gene[]`) gain `transport_substrate_resolution` and
+  `tcdb_evidence_score_max`.
+- `gene_overview` rows: `tcdb_evidence_score_max` (float | null; null = no
+  TCDB call, never coalesced), `transported_metabolite_count` (int) and
+  `transport_substrate_resolution` (`resolved` | `family_inferred` | null).
+- `list_metabolites` rows: `transporter_gene_count` (distinct genes over
+  deepest TCDB attachments, all organisms) — pairs with `catalyst_gene_count`
+  so transport-only reads `0 / >0`.
+- `list_organisms` rows and `by_metabolic_capability[]` entries:
+  `transported_metabolite_count`.
+- Spec: `docs/tool-specs/2026-08-20-tcdb-substrate-depth-migration.md`.
+
 ### Changed
+
+- **Breaking:** `genes_by_metabolite` / `metabolites_by_gene` param
+  `transport_confidence` renamed to `substrate_depth`
+  (`list['most_specific' | 'inherited']`, transport arm only). The retired
+  values `substrate_confirmed` / `family_inferred` raise `ValueError` with a
+  rename pointer. Row field `transport_confidence` → `substrate_depth`
+  (straight from the KG edge). Envelope renames: `by_transport_confidence`
+  → `by_substrate_depth` (key `substrate_depth`),
+  `transport_substrate_confirmed_rows` / `transport_family_inferred_rows` →
+  `transport_most_specific_rows` / `transport_inherited_rows`. Detail sort is
+  now metabolism → `most_specific` → `inherited`, then `tcdb_evidence_score`
+  descending. The old explorer-derived vocabulary (from
+  `level_kind = 'tc_specificity'`) no longer matched the KG's substrate
+  edges; see the spec above.
+- **Breaking:** `gene_overview` row field `transporter_count` removed. It
+  counted every TCDB attachment including ancestors superseded by a more
+  specific call on the same gene — the wrong multiplicity under the
+  deepest-attachment rule. Use `tcdb_evidence_score_max` (any call, how
+  corroborated) + `transport_substrate_resolution` + `transported_metabolite_count`.
+- Transport-arm rows in `genes_by_metabolite` / `metabolites_by_gene`, and
+  the traversal behind `gene_overview.evidence_sources` / `has_chemistry`,
+  are now deepest-attachment projections: an attachment to a TCDB family is
+  skipped when the same gene is also attached to one of its descendants.
+  Rows and the KG's precomputed counts (`transported_metabolite_count`,
+  `transporter_gene_count`) are projections of one (gene, metabolite) set
+  and agree by construction (PMM0392: 13 metabolites in both places, not
+  554). Superseded ancestor rows are intentionally absent; ancestor
+  membership remains visible via `gene_ontology_terms(ontology='tcdb')`.
+  Rationale and live verification:
+  `docs/kg-specs/2026-08-26-review-tcdb-substrate-depth-migration.md`.
 
 - **Breaking:** `gene_overview` row field `metabolite_count` renamed to
   `catalyzed_metabolite_count`. Driven by KG-SYNC-001
   (`docs/kg-specs/2026-08-19-presync-kg-asks.md`): the KG retired the union
   (reaction OR transport) `Gene.metabolite_count` in favor of a
   catalysis-arm-only count (`Gene → Reaction → Metabolite`). A transport-only
-  gene now reads 0 here with `transporter_count > 0` and `'transport'` in
-  `evidence_sources`. Transport-arm row fields arrive in a later slice.
+  gene now reads 0 here with `'transport'` in `evidence_sources` (and, as of
+  the TCDB substrate-depth migration below, `transported_metabolite_count > 0`).
 - **Breaking:** `list_organisms` row field `metabolite_count` and the
   `by_metabolic_capability[].metabolite_count` envelope key renamed to
   `catalyzed_metabolite_count` (KG-SYNC-001). Semantics unchanged in spirit
@@ -41,8 +87,8 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
   `catalyst_gene_count` (KG-SYNC-001), now counting the catalysis arm only.
   The old guidance "`gene_count = 0` means metabolomics-only" no longer holds:
   transport-only metabolites also read 0. Discriminate via `evidence_sources`
-  (`['metabolomics']`-only means no gene path at all) or `transporter_count > 0`
-  (transport arm exists). Transport-arm row fields arrive in a later slice.
+  (`['metabolomics']`-only means no gene path at all) or, as of the TCDB
+  substrate-depth migration below, `transporter_gene_count > 0`.
 
 ### Fixed
 

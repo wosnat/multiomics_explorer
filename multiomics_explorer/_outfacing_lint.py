@@ -23,7 +23,7 @@ LINT_PATTERN = re.compile(
     r"| today\b"              # stale "today" count
     r"|Phase [0-9]"           # internal phase tag
     r"|§"                     # cross-ref shorthand
-    r"|\baudit\b"             # internal audit ref
+    r"|\b[Aa]udit\b"         # internal audit ref (either case; "Audit Part 3a" slipped through)
     r"|KG-[A-Z]+-[0-9]"       # KG-XXX-NNN ticket ID
     r"|Mode-[A-Z]\b"          # Mode-A / Mode-B template tag
     r"|Cluster [A-Z]\b"       # Cluster A / Cluster B internal tag
@@ -36,6 +36,11 @@ LINT_PATTERN = re.compile(
     r"|\b(?:Gene|OrganismTaxon)\.metabolite_count\b"
     r"|\bMetabolite\.gene_count\b"
     r"|results\[\]\.gene_count"
+    # Retired TCDB trust vocabulary (2026-08 substrate_depth migration).
+    # Source violations: analysis/metabolites.md decision-tree label
+    # "g (precision-tier)"; the pre-migration warning concept.
+    r"|precision[ -]tier"
+    r"|family[ _-]inferred[ _-]dominance"
 )
 
 # Drift-marker carveout. The [AQ] (annotation_quality redefinition) and

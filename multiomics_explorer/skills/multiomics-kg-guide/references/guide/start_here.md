@@ -87,8 +87,8 @@ Plus three orthogonal helpers:
 
 ### "What metabolites does this gene catalyse / transport?"
 1. `gene_overview(locus_tags=[...])` first — the `evidence_sources` rollup tells you whether `metabolism` and/or `transport` apply.
-2. `metabolites_by_gene(locus_tags=[...], organism=...)`. Inspect per-row `evidence_source` (`metabolism` / `transport`) and `transport_confidence` (`substrate_confirmed` / `family_inferred`).
-3. See `docs://analysis/metabolites` — direction is **never** decidable from the KG alone (KEGG reactions are stored undirected; family-inferred transport substrates dominate). Layer DE direction to discriminate produced vs consumed.
+2. `metabolites_by_gene(locus_tags=[...], organism=...)`. Inspect per-row `evidence_source` (`metabolism` / `transport`), `substrate_depth` (`most_specific` / `inherited`) and `tcdb_evidence_score`; gene-level `transport_substrate_resolution` sits in `by_gene`.
+3. See `docs://analysis/metabolites` — direction is **never** decidable from the KG alone (KEGG reactions are stored undirected; inherited transport substrates dominate). Layer DE direction to discriminate produced vs consumed.
 
 ### "What genes catalyse / transport / measure metabolite Y?"
 1. `list_metabolites(search_text="Y")` or `list_metabolites(metabolite_ids=["kegg.compound:C..."])` to confirm the metabolite exists and inspect organism reach.

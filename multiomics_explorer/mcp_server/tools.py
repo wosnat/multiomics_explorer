@@ -406,9 +406,10 @@ class MetaboliteResult(BaseModel):
     formula: str | None = Field(default=None, description="Hill-notation chemical formula (e.g. 'C6H12O6'). Null on a minority of metabolites (mostly TCDB-curated generic substrates).")
     elements: list[str] = Field(default_factory=list, description="Sorted unique element symbols present in formula (e.g. ['C','H','O']). Empty when formula is null. Filter on this — never on `formula` substring (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Presence list (no atom counts; stoichiometry lives in `formula`).")
     mass: float | None = Field(default=None, description="Monoisotopic mass in Da (e.g. 180.156). Null on a minority of metabolites.")
-    catalyst_gene_count: int = Field(default=0, description="Distinct catalyst genes via Gene → Reaction → Metabolite (catalysis arm only). Transport-only metabolites also read 0 — evidence_sources==['metabolomics'] means no gene path; transporter_count>0 means transport arm. Drill in via genes_by_metabolite.")
+    catalyst_gene_count: int = Field(default=0, description="Distinct catalyst genes via Gene → Reaction → Metabolite (catalysis arm only). Transport-only metabolites read 0 here with transporter_gene_count > 0; evidence_sources==['metabolomics'] means no gene path at all. Drill in via genes_by_metabolite.")
     organism_count: int = Field(default=0, description="Distinct organisms reaching this metabolite via any chemistry path. When > 0, narrow with organism_names filter.")
-    transporter_count: int = Field(default=0, description="Distinct tc_specificity leaf TcdbFamily nodes annotated as transporting this metabolite. Scoped to leaves — the count reflects actual transporter systems rather than counting ancestor families that inherit the substrate via the rollup. Source: TCDB-CAZy ontology.")
+    transporter_count: int = Field(default=0, description="Distinct transporter systems (TcdbFamily nodes) whose substrate edge to this metabolite is substrate_depth='most_specific'. Systems, not genes — pair with transporter_gene_count and catalyst_gene_count; drill via genes_by_metabolite.")
+    transporter_gene_count: int = Field(default=0, description="Distinct genes (all organisms) whose deepest TCDB attachment transports this metabolite (precomputed Metabolite.transporter_gene_count). catalyst_gene_count=0 with transporter_gene_count>0 = transport-only; drill via genes_by_metabolite.")
     evidence_sources: list[str] = Field(default_factory=list, description="Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. 'metabolism' = at least one Reaction in KG involves this compound; 'transport' = at least one TcdbFamily curates this as substrate; 'metabolomics' = at least one MetaboliteAssay measures this compound. E.g. ['metabolism', 'transport'].")
     chebi_id: str | None = Field(default=None, description="ChEBI ID (raw numeric, e.g. '4167'). Populated on most metabolites — 100% of chebi:-IDed transport-only metabolites (extracted from the ID itself), plus the kegg.compound:-IDed metabolites that cross-ref ChEBI.")
     pathway_ids: list[str] = Field(default_factory=list, description="KEGG pathway memberships (e.g. ['kegg.pathway:ko00010', 'kegg.pathway:ko01100']). Empty when no Metabolite_in_pathway edges. Drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...).")
@@ -509,10 +510,13 @@ class ListMetabolitesResponse(BaseModel):
 class GeneReactionMetaboliteTriplet(BaseModel):
     """Shared row class for genes_by_metabolite and metabolites_by_gene.
 
-    Compact mode: 15 fields including evidence_source +
-    transport_confidence. Verbose mode adds 9 more. All per-arm-specific
-    fields are Optional and explicitly `None` on rows from the other
-    arm — every row carries identical keys.
+    Compact mode: 16 fields including evidence_source, substrate_depth
+    and tcdb_evidence_score. Verbose mode adds 9 more. All
+    per-arm-specific fields are Optional and explicitly `None` on rows
+    from the other arm — every row carries identical keys. Transport rows
+    are deepest-attachment projections (a gene attached to a family AND
+    one of its descendants contributes rows only via the descendant), so
+    row sets agree with the KG's precomputed transport counts.
 
     Reaction edges are undirected AND carry no reversibility flag —
     interpret all reaction-arm rows as 'involved in', never 'produces' /
@@ -532,19 +536,21 @@ class GeneReactionMetaboliteTriplet(BaseModel):
     evidence_source: Literal["metabolism", "transport"] = Field(
         description="Path through which this row reaches the metabolite. "
         "'metabolism' = `Gene → Reaction → Metabolite`. 'transport' = "
-        "`Gene → TcdbFamily → Metabolite` (includes ancestor TCDB "
-        "families that inherit substrates from descendant leaves). "
-        "Metabolomics evidence has no gene anchor and never produces "
-        "rows here.")
-    transport_confidence: Literal["substrate_confirmed", "family_inferred"] | None = Field(
+        "`Gene → TcdbFamily → Metabolite` via the gene's deepest TCDB "
+        "attachments only. Metabolomics evidence has no gene anchor here.")
+    substrate_depth: Literal["most_specific", "inherited"] | None = Field(
         default=None,
-        description="Set on transport rows only. 'substrate_confirmed' = "
-        "the TCDB family annotation is at `tc_specificity` level "
-        "(substrate-curated). 'family_inferred' = annotation is at a "
-        "coarser TCDB level (rolled up via the substrate edge — gene may "
-        "or may not move this metabolite). None on metabolism rows. See "
-        "`docs://guide/conventions` for the full transport-confidence "
-        "discussion.")
+        description="Transport rows only (None on metabolism rows). "
+        "'most_specific' = this family is the most specific surviving "
+        "transporter node for this substrate, relative to the gene-pruned "
+        "hierarchy — not a curation level. 'inherited' = rolled up from a "
+        "descendant.")
+    tcdb_evidence_score: float | None = Field(
+        default=None,
+        description="Transport rows only (None on metabolism rows). "
+        "KG 5-signal composite for the gene×family call, in [0,1]. Rank "
+        "with it, don't filter: 0 = uncorroborated DIAMOND hit, not "
+        "absent. Rows within a depth tier sort by it desc.")
 
     # metabolism-arm fields (None on transport rows)
     reaction_id: str | None = Field(
@@ -620,9 +626,10 @@ class GeneReactionMetaboliteTriplet(BaseModel):
     tcdb_level_kind: Literal["tc_class", "tc_subclass", "tc_family",
                              "tc_subfamily", "tc_specificity"] | None = Field(
         default=None,
-        description="TCDB hierarchy level of the annotation. Verbose, "
-        "transport rows only. `tc_specificity` ⇔ "
-        "transport_confidence='substrate_confirmed'.")
+        description="TCDB hierarchy level of the annotated family "
+        "(ontology convention). Verbose, transport rows only. Does NOT "
+        "drive `substrate_depth` — a family-level node can be "
+        "'most_specific' for a substrate.")
     tc_class_id: str | None = Field(
         default=None,
         description="TCDB class ancestor (e.g. 'tcdb:3' for Primary Active "
@@ -657,16 +664,14 @@ class GbmByMetabolite(BaseModel):
         "metabolite is reachable only via the metabolism arm.")
     metabolism_rows: int = Field(
         description="Row count for the metabolism arm.")
-    transport_substrate_confirmed_rows: int = Field(
-        description="Row count for transport rows annotated at TCDB "
-        "`tc_specificity` (substrate-curated tier — leaf-level "
-        "annotation).")
-    transport_family_inferred_rows: int = Field(
-        description="Row count for transport rows annotated at coarser TCDB "
-        "levels (rollup tier — propagated via the substrate edge; the "
-        "gene's annotated family is known to transport this metabolite, but "
-        "this specific gene's actual substrate may differ). Both tiers are "
-        "annotations — see `docs://guide/conventions`.")
+    transport_most_specific_rows: int = Field(
+        description="Transport rows with `substrate_depth='most_specific'` "
+        "(family is the most specific surviving transporter node for this "
+        "substrate in the gene-pruned hierarchy).")
+    transport_inherited_rows: int = Field(
+        description="Transport rows with `substrate_depth='inherited'` "
+        "(substrate rolled up from a descendant family — reachability, "
+        "not a capability claim for this gene).")
 
 
 class GbmByEvidenceSource(BaseModel):
@@ -681,19 +686,19 @@ class GbmByEvidenceSource(BaseModel):
         description="Row count for this evidence_source in the filtered slice.")
 
 
-class GbmByTransportConfidence(BaseModel):
-    """Frequency rollup over `transport_confidence` for transport rows only.
+class GbmBySubstrateDepth(BaseModel):
+    """Frequency rollup over `substrate_depth` for transport rows only.
 
-    ≤2 entries — `substrate_confirmed` and/or `family_inferred`. Metabolism
-    rows are excluded from this rollup (their `transport_confidence` is None).
+    ≤2 entries — `most_specific` and/or `inherited`. Metabolism rows are
+    excluded from this rollup (their `substrate_depth` is None).
     """
-    transport_confidence: Literal["substrate_confirmed", "family_inferred"] = Field(
-        description="TCDB-annotation specificity behind the transport edge. "
-        "`substrate_confirmed` = annotated at `tc_specificity` (leaf, "
-        "substrate-curated). `family_inferred` = annotated at a coarser "
-        "TCDB level (rolled up; gene may not move this metabolite).")
+    substrate_depth: Literal["most_specific", "inherited"] = Field(
+        description="Edge-level depth: 'most_specific' = most specific "
+        "surviving transporter node for the substrate in the gene-pruned "
+        "hierarchy (not a curation level); 'inherited' = rolled up from a "
+        "descendant family.")
     count: int = Field(
-        description="Transport-row count for this confidence level in the "
+        description="Transport-row count for this substrate_depth in the "
         "filtered slice.")
 
 
@@ -726,14 +731,16 @@ class GbmTopTcdbFamily(BaseModel):
         "`tcdb_id` value.")
     level_kind: str = Field(
         description="One of tc_class / tc_subclass / tc_family / "
-        "tc_subfamily / tc_specificity. Determines `transport_confidence`.")
-    transport_confidence: Literal["substrate_confirmed", "family_inferred"] = Field(
-        description="Derived from level_kind: 'substrate_confirmed' iff "
-        "level_kind == 'tc_specificity'. Pre-computed for at-a-glance "
-        "filtering of the rollup.")
+        "tc_subfamily / tc_specificity (ontology convention; does not "
+        "determine `substrate_depth`).")
+    substrate_depth: Literal["most_specific", "inherited"] = Field(
+        description="Depth of this family's substrate edges in the slice: "
+        "'most_specific' = most specific surviving transporter node for "
+        "the substrate (gene-pruned hierarchy, not a curation level); "
+        "'inherited' = rolled up from a descendant.")
     gene_count: int = Field(
-        description="Distinct genes annotated to this TCDB family in the "
-        "filtered transport-row slice.")
+        description="Distinct genes deepest-attached to this TCDB family "
+        "in the filtered transport-row slice.")
     metabolite_count: int = Field(
         description="Distinct input metabolites this family transports.")
 
@@ -770,13 +777,25 @@ class GbmTopGene(BaseModel):
         "arm.")
     metabolism_rows: int = Field(
         description="Metabolism-arm row count for this gene.")
-    transport_substrate_confirmed_rows: int = Field(
-        description="Transport-arm row count for this gene at "
-        "`tc_specificity` level (substrate-curated tier).")
-    transport_family_inferred_rows: int = Field(
-        description="Transport-arm row count for this gene at coarser TCDB "
-        "levels (rollup tier — propagated via the substrate edge). Both "
-        "tiers are annotations — see `docs://guide/conventions`.")
+    transport_most_specific_rows: int = Field(
+        description="Transport-arm rows for this gene with "
+        "`substrate_depth='most_specific'`.")
+    transport_inherited_rows: int = Field(
+        description="Transport-arm rows for this gene with "
+        "`substrate_depth='inherited'` (rolled up from a descendant "
+        "family).")
+    transport_substrate_resolution: str | None = Field(
+        default=None,
+        description="Gene-level `Gene.transport_substrate_resolution`: "
+        "'resolved' = at least one non-lumping deepest attachment (not "
+        "all); 'family_inferred' = substrate breadth is reachability, not "
+        "capability. None = no TCDB call.")
+    tcdb_evidence_score_max: float | None = Field(
+        default=None,
+        description="Gene-level max of the KG 5-signal composite "
+        "`evidence_score` over its TCDB calls, in [0,1]. Rank, don't "
+        "filter; 0 = uncorroborated DIAMOND hit. None = no TCDB call "
+        "(never a sentinel).")
 
 
 class GbmNotFound(BaseModel):
@@ -812,9 +831,10 @@ class GenesByMetaboliteResponse(BaseModel):
         description="True when `offset + limit < total_matching`.")
     warnings: list[str] = Field(
         default_factory=list,
-        description="Diagnostic strings. Currently emitted: family-inferred-"
-        "dominance auto-warning when transport rows are family-inferred "
-        "majority and `transport_confidence` was not set explicitly.")
+        description="Diagnostic strings. Currently emitted: inherited-"
+        "dominance auto-warning when `substrate_depth='inherited'` rows "
+        "are the transport-arm majority and `substrate_depth` was not set "
+        "explicitly.")
     not_found: GbmNotFound = Field(
         default_factory=GbmNotFound,
         description="Inputs that did not resolve to a KG node — see model.")
@@ -832,9 +852,9 @@ class GenesByMetaboliteResponse(BaseModel):
         default_factory=list,
         description="Frequency over `evidence_source` values present in "
         "the slice (≤2 entries).")
-    by_transport_confidence: list[GbmByTransportConfidence] = Field(
+    by_substrate_depth: list[GbmBySubstrateDepth] = Field(
         default_factory=list,
-        description="Frequency over `transport_confidence` values across "
+        description="Frequency over `substrate_depth` values across "
         "transport rows only (≤2 entries; metabolism rows are excluded).")
     top_reactions: list[GbmTopReaction] = Field(
         default_factory=list,
@@ -904,16 +924,26 @@ class MbgByGene(BaseModel):
         "metabolism arm.")
     metabolism_rows: int = Field(
         description="Row count for the metabolism arm.")
-    transport_substrate_confirmed_rows: int = Field(
-        description="Row count for transport rows annotated at TCDB "
-        "`tc_specificity` (substrate-curated tier — leaf-level "
-        "annotation).")
-    transport_family_inferred_rows: int = Field(
-        description="Row count for transport rows annotated at coarser "
-        "TCDB levels (rollup tier — propagated via the substrate edge; "
-        "this gene's annotated family is known to transport the metabolite, "
-        "but this specific gene's actual substrate may differ). Both tiers "
-        "are annotations — see `docs://guide/conventions`.")
+    transport_most_specific_rows: int = Field(
+        description="Transport rows with `substrate_depth='most_specific'` "
+        "(family is the most specific surviving transporter node for the "
+        "substrate in the gene-pruned hierarchy).")
+    transport_inherited_rows: int = Field(
+        description="Transport rows with `substrate_depth='inherited'` "
+        "(substrate rolled up from a descendant family — reachability, "
+        "not a capability claim for this gene).")
+    transport_substrate_resolution: str | None = Field(
+        default=None,
+        description="Gene-level `Gene.transport_substrate_resolution`: "
+        "'resolved' = at least one non-lumping deepest attachment (not "
+        "all); 'family_inferred' = substrate breadth is reachability, not "
+        "capability. None = no TCDB call.")
+    tcdb_evidence_score_max: float | None = Field(
+        default=None,
+        description="Gene-level max of the KG 5-signal composite "
+        "`evidence_score` over its TCDB calls, in [0,1]. Rank, don't "
+        "filter; 0 = uncorroborated DIAMOND hit. None = no TCDB call "
+        "(never a sentinel).")
 
 
 class MbgByEvidenceSource(BaseModel):
@@ -926,28 +956,27 @@ class MbgByEvidenceSource(BaseModel):
     evidence_source: Literal["metabolism", "transport"] = Field(
         description="Path through which the gene reaches the metabolite. "
         "'metabolism' = `Gene → Reaction → Metabolite`. 'transport' = "
-        "`Gene → TcdbFamily → Metabolite` (includes ancestor families "
-        "that inherit substrates from descendant leaves).")
+        "`Gene → TcdbFamily → Metabolite` via the gene's deepest TCDB "
+        "attachments only.")
     count: int = Field(
         description="Row count for this evidence_source in the filtered "
         "slice.")
 
 
-class MbgByTransportConfidence(BaseModel):
-    """Frequency rollup over `transport_confidence` for transport rows only.
+class MbgBySubstrateDepth(BaseModel):
+    """Frequency rollup over `substrate_depth` for transport rows only.
 
-    ≤2 entries — `substrate_confirmed` and/or `family_inferred`. Identical
-    shape to GBM's `GbmByTransportConfidence`. Metabolism rows are
-    excluded from this rollup (their `transport_confidence` is None).
+    ≤2 entries — `most_specific` and/or `inherited`. Identical shape to
+    GBM's `GbmBySubstrateDepth`. Metabolism rows are excluded from this
+    rollup (their `substrate_depth` is None).
     """
-    transport_confidence: Literal[
-        "substrate_confirmed", "family_inferred"] = Field(
-        description="TCDB-annotation specificity behind the transport "
-        "edge. `substrate_confirmed` = annotated at `tc_specificity` "
-        "(leaf, substrate-curated). `family_inferred` = annotated at a "
-        "coarser TCDB level (rolled up; gene may not move this metabolite).")
+    substrate_depth: Literal["most_specific", "inherited"] = Field(
+        description="Edge-level depth: 'most_specific' = most specific "
+        "surviving transporter node for the substrate in the gene-pruned "
+        "hierarchy (not a curation level); 'inherited' = rolled up from a "
+        "descendant family.")
     count: int = Field(
-        description="Transport-row count for this confidence level in the "
+        description="Transport-row count for this substrate_depth in the "
         "filtered slice.")
 
 
@@ -1006,13 +1035,12 @@ class MbgTopMetabolite(BaseModel):
         "reachable only via the metabolism arm.")
     metabolism_rows: int = Field(
         description="Metabolism-arm row count for this metabolite.")
-    transport_substrate_confirmed_rows: int = Field(
-        description="Transport-arm row count at `tc_specificity` "
-        "(substrate-curated tier).")
-    transport_family_inferred_rows: int = Field(
-        description="Transport-arm row count at coarser TCDB levels "
-        "(rollup tier — propagated via the substrate edge). Both tiers "
-        "are annotations — see `docs://guide/conventions`.")
+    transport_most_specific_rows: int = Field(
+        description="Transport-arm rows with "
+        "`substrate_depth='most_specific'` for this metabolite.")
+    transport_inherited_rows: int = Field(
+        description="Transport-arm rows with `substrate_depth='inherited'` "
+        "for this metabolite (rolled up from a descendant family).")
 
 
 class MbgTopReaction(BaseModel):
@@ -1057,15 +1085,16 @@ class MbgTopTcdbFamily(BaseModel):
         "value.")
     level_kind: str = Field(
         description="One of tc_class / tc_subclass / tc_family / "
-        "tc_subfamily / tc_specificity. Determines `transport_confidence`.")
-    transport_confidence: Literal[
-        "substrate_confirmed", "family_inferred"] = Field(
-        description="Derived from level_kind: 'substrate_confirmed' iff "
-        "level_kind == 'tc_specificity'. Pre-computed for at-a-glance "
-        "filtering of the rollup.")
+        "tc_subfamily / tc_specificity (ontology convention; does not "
+        "determine `substrate_depth`).")
+    substrate_depth: Literal["most_specific", "inherited"] = Field(
+        description="Depth of this family's substrate edges in the slice: "
+        "'most_specific' = most specific surviving transporter node for "
+        "the substrate (gene-pruned hierarchy, not a curation level); "
+        "'inherited' = rolled up from a descendant.")
     gene_count: int = Field(
-        description="Distinct input genes annotated to this TCDB family "
-        "in the filtered transport-row slice.")
+        description="Distinct input genes deepest-attached to this TCDB "
+        "family in the filtered transport-row slice.")
     metabolite_count: int = Field(
         description="Distinct metabolites this family transports in the "
         "filtered slice.")
@@ -1168,10 +1197,10 @@ class MetabolitesByGeneResponse(BaseModel):
         description="True when `offset + limit < total_matching`.")
     warnings: list[str] = Field(
         default_factory=list,
-        description="Diagnostic strings. Currently emitted: "
-        "family-inferred-dominance auto-warning when transport rows are "
-        "family-inferred majority and `transport_confidence` was not set "
-        "explicitly (mirrors `genes_by_metabolite`).")
+        description="Diagnostic strings. Currently emitted: gene-anchored "
+        "auto-warning naming input genes whose "
+        "`transport_substrate_resolution='family_inferred'` — their "
+        "substrate breadth is reachability, not capability.")
     not_found: MbgNotFound = Field(
         default_factory=MbgNotFound,
         description="Inputs that did not resolve to a KG node — see model.")
@@ -1189,9 +1218,9 @@ class MetabolitesByGeneResponse(BaseModel):
         default_factory=list,
         description="Frequency over `evidence_source` values present in "
         "the slice (≤2 entries).")
-    by_transport_confidence: list[MbgByTransportConfidence] = Field(
+    by_substrate_depth: list[MbgBySubstrateDepth] = Field(
         default_factory=list,
-        description="Frequency over `transport_confidence` values across "
+        description="Frequency over `substrate_depth` values across "
         "transport rows only (≤2 entries; metabolism rows are excluded).")
     by_element: list[MbgByElement] = Field(
         default_factory=list,
@@ -1516,6 +1545,7 @@ def register_tools(mcp: FastMCP):
         # Chemistry rollups
         reaction_count: int = Field(default=0, description="Distinct reactions catalyzed by genes in this organism. When > 0, drill in via list_metabolites(organism_names=[organism_name]).")
         catalyzed_metabolite_count: int = Field(default=0, description="Distinct metabolites this organism's genes can catalyze reactions on (Gene → Reaction → Metabolite; catalysis arm only — transport-reach excluded). Does NOT mean measured. When > 0, drill in via list_metabolites(organism_names=[organism_name]).")
+        transported_metabolite_count: int = Field(default=0, description="Distinct metabolites this organism's genes transport via their deepest TCDB attachments (precomputed OrganismTaxon.transported_metabolite_count). Pairs with catalyzed_metabolite_count; 0 when no TCDB calls.")
         # Metabolomics measurement rollup
         measured_metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this organism via any MetaboliteAssay (precomputed OrganismTaxon.measured_metabolite_count). Different from catalyzed_metabolite_count (catalysis-arm chemistry capability). When > 0, drill in via list_metabolite_assays(organism=organism_name).")
         # DM verbose-only fields
@@ -1549,6 +1579,7 @@ def register_tools(mcp: FastMCP):
         organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4').")
         reaction_count: int = Field(description="Distinct reactions catalyzed by this organism's genes.")
         catalyzed_metabolite_count: int = Field(description="Distinct metabolites reachable via catalysis (Gene → Reaction → Metabolite). Same semantics as OrganismResult.catalyzed_metabolite_count.")
+        transported_metabolite_count: int = Field(default=0, description="Distinct metabolites transported via deepest TCDB attachments. Same semantics as OrganismResult.transported_metabolite_count. Column only — ranking stays on catalyzed_metabolite_count.")
 
     class OrgMeasurementCapability(BaseModel):
         has_metabolomics: int = Field(default=0, description="Number of matched organisms with measured_metabolite_count > 0.")
@@ -1874,11 +1905,19 @@ def register_tools(mcp: FastMCP):
         )
         catalyzed_metabolite_count: int = Field(
             default=0,
-            description="Distinct metabolites reachable via catalysis only (Gene_catalyzes_reaction → Reaction_has_metabolite). Transport-only genes read 0 — check transporter_count>0 / 'transport' in evidence_sources (e.g. ABC transporter PMM0392: 0 here, 8 TCDB families).",
+            description="Distinct metabolites reachable via catalysis only (Gene_catalyzes_reaction → Reaction_has_metabolite). Transport-only genes read 0 — check transported_metabolite_count / 'transport' in evidence_sources (e.g. PMM0392: 0 here, 13 transported).",
         )
-        transporter_count: int = Field(
+        tcdb_evidence_score_max: float | None = Field(
+            default=None,
+            description="Max KG 5-signal composite evidence_score over this gene's TCDB calls, in [0,1]. Rank with it, don't filter: 0 = uncorroborated DIAMOND hit, not absent. None = no TCDB call (never a sentinel).",
+        )
+        transported_metabolite_count: int = Field(
             default=0,
-            description="Distinct TCDB families annotated to this gene. When > 0, drill via genes_by_metabolite or metabolites_by_gene with the transport arm.",
+            description="Distinct metabolites this gene transports via its deepest TCDB attachments (precomputed Gene.transported_metabolite_count). Pairs with catalyzed_metabolite_count. When > 0, drill via metabolites_by_gene(locus_tags=[...]).",
+        )
+        transport_substrate_resolution: str | None = Field(
+            default=None,
+            description="'resolved' = at least one non-lumping deepest TCDB attachment (not all); 'family_inferred' = transported_metabolite_count is reachability, not capability. None = no TCDB call. Read the score; if resolved, drill into substrates.",
         )
         evidence_sources: list[str] = Field(
             default_factory=list,
@@ -7592,21 +7631,13 @@ def register_tools(mcp: FastMCP):
             "both arms uniformly). Use `list_filter_values(filter_type=\"gene_category\")` "
             "to discover valid values.",
         )] = None,
-        transport_confidence: Annotated[
-            Literal["substrate_confirmed", "family_inferred"] | None,
+        substrate_depth: Annotated[
+            list[Literal["most_specific", "inherited"]] | None,
             Field(
-                description="Narrow transport rows by TCDB-annotation "
-                "specificity. `substrate_confirmed` restricts transport "
-                "rows to those annotated at TCDB `tc_specificity` "
-                "(substrate-curated). `family_inferred` restricts to "
-                "transport rows annotated at coarser TCDB levels (rolled "
-                "up via the substrate edge). **Transport arm only — does "
-                "not affect metabolism rows**, which are always "
-                "substrate-confirmed by definition (direct catalysis "
-                "edge) and carry `transport_confidence = None`. Combine "
-                "with `evidence_sources=['transport']` to restrict to "
-                "transport rows alone. See `docs://guide/conventions` "
-                "for when to pick which tier.",
+                description="Keep transport rows whose edge `substrate_depth` "
+                "is in this list. 'most_specific' = most specific surviving "
+                "transporter node for the substrate (gene-pruned hierarchy, "
+                "not a curation level). Transport arm only.",
             ),
         ] = None,
         evidence_sources: Annotated[
@@ -7641,25 +7672,31 @@ def register_tools(mcp: FastMCP):
     ) -> GenesByMetaboliteResponse:
         """Find genes connected to specified metabolites in one organism.
         Two arms — metabolism (`Gene → Reaction → Metabolite`) and transport
-        (`Gene → TcdbFamily → Metabolite`, includes ancestor families that
-        inherit substrates from descendant leaves). Some genes annotated
-        only to broad TCDB families (notably ABC transporters) emit large
-        numbers of family_inferred rows; the auto-warning fires when
-        family_inferred dominates the transport arm. Direction-agnostic
-        (KEGG equation order is unreliable upstream — joins through
-        Reaction_has_metabolite and Tcdb_family_transports_metabolite
-        return both produced and consumed metabolites identically). Per-row
-        union shape: cross-arm fields are explicitly None on rows from the
-        other arm.
+        (`Gene → TcdbFamily → Metabolite` over each gene's deepest TCDB
+        attachments only, so rows agree with the KG's precomputed transport
+        counts). Transport rows carry `substrate_depth` ('most_specific' =
+        most specific surviving transporter node for the substrate in the
+        gene-pruned hierarchy, not a curation level; 'inherited' = rolled
+        up from a descendant) and `tcdb_evidence_score` (5-signal composite
+        [0,1]; rank by it, don't filter — 0 = uncorroborated, not absent).
+        Detail sort: metabolism → most_specific → inherited, score desc
+        within a tier. The auto-warning fires when `inherited` dominates
+        the transport arm. Direction-agnostic (KEGG equation order is
+        unreliable upstream — joins through Reaction_has_metabolite and
+        Tcdb_family_transports_metabolite return both produced and consumed
+        metabolites identically). Per-row union shape: cross-arm fields are
+        explicitly None on rows from the other arm.
 
-        Routing: from `top_genes` drill into
-        `differential_expression_by_gene(locus_tags=[...], organism=...)` or
-        `gene_overview`; from `top_tcdb_families` to
+        Routing: narrow with `substrate_depth=['most_specific']` when
+        inherited rows dominate; from `top_genes` (read
+        `transport_substrate_resolution` / `tcdb_evidence_score_max`) drill
+        into `differential_expression_by_gene(locus_tags=[...],
+        organism=...)` or `gene_overview`; from `top_tcdb_families` to
         `genes_by_ontology(ontology="tcdb", term_ids=[id], organism=...)`;
         from `top_reactions` to
         `genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)` or
         `pathway_enrichment`. See `docs://guide/conventions` for
-        transport-confidence and direction-agnostic semantics, and
+        substrate-depth and direction-agnostic semantics, and
         `docs://analysis/metabolites` for the chemistry-layer decision tree.
         """
         await ctx.info(
@@ -7667,7 +7704,7 @@ def register_tools(mcp: FastMCP):
             f"organism={organism} ec_numbers={ec_numbers} "
             f"metabolite_pathway_ids={metabolite_pathway_ids} "
             f"mass_balance={mass_balance} gene_categories={gene_categories} "
-            f"transport_confidence={transport_confidence} "
+            f"substrate_depth={substrate_depth} "
             f"evidence_sources={evidence_sources} summary={summary} "
             f"verbose={verbose} limit={limit} offset={offset}"
         )
@@ -7681,7 +7718,7 @@ def register_tools(mcp: FastMCP):
                 metabolite_pathway_ids=metabolite_pathway_ids,
                 mass_balance=mass_balance,
                 gene_categories=gene_categories,
-                transport_confidence=transport_confidence,
+                substrate_depth=substrate_depth,
                 evidence_sources=evidence_sources,
                 summary=summary,
                 verbose=verbose,
@@ -7698,9 +7735,9 @@ def register_tools(mcp: FastMCP):
             by_evidence_source = [
                 GbmByEvidenceSource(**b) for b in result["by_evidence_source"]
             ]
-            by_transport_confidence = [
-                GbmByTransportConfidence(**b)
-                for b in result["by_transport_confidence"]
+            by_substrate_depth = [
+                GbmBySubstrateDepth(**b)
+                for b in result["by_substrate_depth"]
             ]
             top_reactions = [
                 GbmTopReaction(**b) for b in result["top_reactions"]
@@ -7723,7 +7760,7 @@ def register_tools(mcp: FastMCP):
                 not_matched=result.get("not_matched", []),
                 by_metabolite=by_metabolite,
                 by_evidence_source=by_evidence_source,
-                by_transport_confidence=by_transport_confidence,
+                by_substrate_depth=by_substrate_depth,
                 top_reactions=top_reactions,
                 top_tcdb_families=top_tcdb_families,
                 top_gene_categories=top_gene_categories,
@@ -7839,23 +7876,13 @@ def register_tools(mcp: FastMCP):
             "input; useful when locus_tags is a broad batch and you want "
             "chemistry from specific functional categories only.",
         )] = None,
-        transport_confidence: Annotated[
-            Literal["substrate_confirmed", "family_inferred"] | None,
+        substrate_depth: Annotated[
+            list[Literal["most_specific", "inherited"]] | None,
             Field(
-                description="Narrow transport rows by TCDB-annotation "
-                "specificity. `substrate_confirmed` restricts transport "
-                "rows to those annotated at TCDB `tc_specificity` "
-                "(substrate-curated). `family_inferred` restricts to "
-                "transport rows annotated at coarser TCDB levels (rolled "
-                "up via the substrate edge). **Transport arm only — does "
-                "not affect metabolism rows**, which are always "
-                "substrate-confirmed by definition (direct catalysis "
-                "edge) and carry `transport_confidence = None`. Combine "
-                "with `evidence_sources=['transport']` to restrict to "
-                "transport rows alone. Use `substrate_confirmed` to mute "
-                "the long-tail row blowup from ABC-only-annotated genes "
-                "in batch DE inputs. See `docs://guide/conventions` for "
-                "when to pick which tier.",
+                description="Keep transport rows whose edge `substrate_depth` "
+                "is in this list. 'most_specific' = most specific surviving "
+                "transporter node for the substrate (gene-pruned hierarchy, "
+                "not a curation level). Transport arm only; mutes ABC tails.",
             ),
         ] = None,
         evidence_sources: Annotated[
@@ -7888,7 +7915,7 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(
             description="Max results in `results`. Long-tail genes "
             "(ABC-only annotations) can emit large numbers of rows — use "
-            "`transport_confidence='substrate_confirmed'` to mute, or "
+            "`substrate_depth=['most_specific']` to mute, or "
             "`offset` to page.",
             ge=1,
         )] = 10,
@@ -7899,19 +7926,25 @@ def register_tools(mcp: FastMCP):
     ) -> MetabolitesByGeneResponse:
         """Find metabolites the input gene set's chemistry reaches in one
         organism. Symmetric counterpart to `genes_by_metabolite` — same
-        two arms (metabolism and transport, including ancestor TCDB
-        families that inherit substrates from descendant leaves), same
-        per-row union shape, same direction-agnostic semantics. Some
-        genes (notably ABC-only annotations) emit large numbers of
-        family_inferred rows; the global precision-tier sort
-        (metabolism → substrate_confirmed → family_inferred) prevents
-        one gene from consuming `limit`. The `metabolite_elements`
-        filter is the N-source workflow primitive (presence-only AND-of,
-        e.g. `['N']`). The `by_element` envelope is presence-only — not
-        stoichiometric, not mass-balanced. Use `summary=True` on batch
-        DE inputs (50+ locus_tags).
+        two arms (metabolism and transport over each gene's deepest TCDB
+        attachments only, so distinct transport metabolites equal
+        `gene_overview.transported_metabolite_count`), same per-row union
+        shape with `substrate_depth` + `tcdb_evidence_score`, same
+        direction-agnostic semantics. Genes with only lumping attachments
+        (notably ABC-only) emit many `inherited` rows; the global sort
+        (metabolism → most_specific → inherited, score desc within a tier)
+        prevents one gene from consuming `limit`, and the auto-warning
+        names input genes whose `transport_substrate_resolution` is
+        'family_inferred' (breadth is reachability, not capability;
+        'resolved' means at least one non-lumping attachment, not all).
+        The `metabolite_elements` filter is the N-source workflow
+        primitive (presence-only AND-of, e.g. `['N']`). The `by_element`
+        envelope is presence-only — not stoichiometric, not
+        mass-balanced. Use `summary=True` on batch DE inputs (50+
+        locus_tags).
 
-        Routing: from `top_metabolites` drill into
+        Routing: narrow with `substrate_depth=['most_specific']` to mute
+        inherited long tails; from `top_metabolites` drill into
         `list_metabolites(metabolite_ids=[...])` for cross-refs OR
         `genes_by_metabolite(metabolite_ids=[...], organism=PARTNER)`
         for the cross-feeding bridge; from `top_metabolite_pathways` to
@@ -7922,7 +7955,7 @@ def register_tools(mcp: FastMCP):
         or `pathway_enrichment`; from `top_tcdb_families` to
         `genes_by_ontology(ontology="tcdb", term_ids=[id],
         organism=...)`; from `not_matched` to `gene_overview`. See
-        `docs://guide/conventions` for transport-confidence and
+        `docs://guide/conventions` for substrate-depth and
         direction-agnostic semantics, and `docs://analysis/metabolites`
         for the chemistry-layer decision tree.
         """
@@ -7934,7 +7967,7 @@ def register_tools(mcp: FastMCP):
             f"metabolite_pathway_ids={metabolite_pathway_ids} "
             f"mass_balance={mass_balance} "
             f"gene_categories={gene_categories} "
-            f"transport_confidence={transport_confidence} "
+            f"substrate_depth={substrate_depth} "
             f"evidence_sources={evidence_sources} summary={summary} "
             f"verbose={verbose} limit={limit} offset={offset}"
         )
@@ -7950,7 +7983,7 @@ def register_tools(mcp: FastMCP):
                 metabolite_pathway_ids=metabolite_pathway_ids,
                 mass_balance=mass_balance,
                 gene_categories=gene_categories,
-                transport_confidence=transport_confidence,
+                substrate_depth=substrate_depth,
                 evidence_sources=evidence_sources,
                 summary=summary,
                 verbose=verbose,
@@ -7966,9 +7999,9 @@ def register_tools(mcp: FastMCP):
                 MbgByEvidenceSource(**b)
                 for b in result["by_evidence_source"]
             ]
-            by_transport_confidence = [
-                MbgByTransportConfidence(**b)
-                for b in result["by_transport_confidence"]
+            by_substrate_depth = [
+                MbgBySubstrateDepth(**b)
+                for b in result["by_substrate_depth"]
             ]
             by_element = [MbgByElement(**b) for b in result["by_element"]]
             top_metabolites = [
@@ -7999,7 +8032,7 @@ def register_tools(mcp: FastMCP):
                 not_matched=result.get("not_matched", []),
                 by_gene=by_gene,
                 by_evidence_source=by_evidence_source,
-                by_transport_confidence=by_transport_confidence,
+                by_substrate_depth=by_substrate_depth,
                 by_element=by_element,
                 top_metabolites=top_metabolites,
                 top_reactions=top_reactions,

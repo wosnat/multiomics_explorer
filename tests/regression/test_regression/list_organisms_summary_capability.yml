@@ -1,0 +1,170 @@
+by_cluster_type:
+- cluster_type: condition_comparison
+  count: 3
+- cluster_type: diel
+  count: 2
+- cluster_type: time_course
+  count: 2
+by_compartment:
+- compartment: vesicle
+  count: 9
+- compartment: whole_cell
+  count: 4
+- compartment: exoproteome
+  count: 2
+by_measurement_capability:
+  has_metabolomics: 5
+  no_metabolomics: 42
+by_metabolic_capability:
+- catalyzed_metabolite_count: 1490
+  organism_name: Pseudomonas putida KT2440
+  reaction_count: 1449
+  transported_metabolite_count: 1260
+- catalyzed_metabolite_count: 1468
+  organism_name: Ruegeria pomeroyi DSS-3
+  reaction_count: 1377
+  transported_metabolite_count: 1213
+- catalyzed_metabolite_count: 1428
+  organism_name: Alteromonas macleodii EZ55
+  reaction_count: 1348
+  transported_metabolite_count: 1266
+- catalyzed_metabolite_count: 1359
+  organism_name: Alteromonas (MarRef v6)
+  reaction_count: 1263
+  transported_metabolite_count: 1265
+- catalyzed_metabolite_count: 1354
+  organism_name: Alteromonas macleodii MIT1002
+  reaction_count: 1288
+  transported_metabolite_count: 1267
+- catalyzed_metabolite_count: 1346
+  organism_name: Marinobacter (MarRef v6)
+  reaction_count: 1278
+  transported_metabolite_count: 1232
+- catalyzed_metabolite_count: 1341
+  organism_name: Alteromonas macleodii BGP6
+  reaction_count: 1275
+  transported_metabolite_count: 1269
+- catalyzed_metabolite_count: 1336
+  organism_name: Alteromonas macleodii HOT1A3
+  reaction_count: 1266
+  transported_metabolite_count: 1269
+- catalyzed_metabolite_count: 1328
+  organism_name: Alteromonas macleodii AD45
+  reaction_count: 1259
+  transported_metabolite_count: 1266
+- catalyzed_metabolite_count: 1326
+  organism_name: Alteromonas mediterranea AltDE1
+  reaction_count: 1249
+  transported_metabolite_count: 1256
+by_metric_type:
+- count: 6
+  metric_type: log2_mv_cell_enrichment
+- count: 6
+  metric_type: prop_abund_cells_percent
+- count: 6
+  metric_type: prop_abund_mvs_percent
+- count: 2
+  metric_type: mascot_identification_probability
+- count: 2
+  metric_type: predicted_subcellular_localization
+- count: 2
+  metric_type: vesicle_proteome_member
+- count: 2
+  metric_type: cell_abundance_biovolume_normalized
+- count: 2
+  metric_type: log2_vesicle_cell_enrichment
+- count: 2
+  metric_type: vesicle_abundance_biovolume_normalized
+- count: 2
+  metric_type: periodic_in_coculture_LD
+- count: 2
+  metric_type: periodic_in_coculture_extended_darkness
+- count: 1
+  metric_type: damping_ratio
+- count: 1
+  metric_type: diel_amplitude_protein_log2
+- count: 1
+  metric_type: diel_amplitude_transcript_log2
+- count: 1
+  metric_type: expression_change_high_light_shock
+- count: 1
+  metric_type: expression_change_low_co2_no_o2_shock
+- count: 1
+  metric_type: expression_change_low_co2_shock
+- count: 1
+  metric_type: expression_level_class
+- count: 1
+  metric_type: pangenome_membership
+- count: 1
+  metric_type: peak_time_protein_h
+- count: 1
+  metric_type: peak_time_transcript_h
+- count: 1
+  metric_type: protein_transcript_lag_h
+- count: 1
+  metric_type: rapid_recovery_low_co2_no_o2_shock
+- count: 1
+  metric_type: rapid_recovery_low_co2_shock
+- count: 1
+  metric_type: vesicle_dna_avg_read_coverage
+- count: 1
+  metric_type: darkness_survival_class
+- count: 1
+  metric_type: periodic_in_axenic_LD
+- count: 1
+  metric_type: periodic_in_axenic_extended_darkness
+- count: 1
+  metric_type: enrichment_bacterial_chemotaxis
+- count: 1
+  metric_type: enrichment_biosynthesis_of_amino_acids
+- count: 1
+  metric_type: enrichment_carbon_metabolism
+- count: 1
+  metric_type: enrichment_fatty_acid_metabolism
+- count: 1
+  metric_type: enrichment_flagellar_assembly
+- count: 1
+  metric_type: enrichment_redox_genes
+- count: 1
+  metric_type: enrichment_ribosome
+- count: 1
+  metric_type: enrichment_tonb_associated_genes
+- count: 1
+  metric_type: exoproteome_detected_ancestor
+- count: 1
+  metric_type: exoproteome_detected_evolved_400ppm
+- count: 1
+  metric_type: exoproteome_detected_evolved_800ppm
+- count: 1
+  metric_type: whole_cell_detected_ancestor
+- count: 1
+  metric_type: whole_cell_detected_evolved_400ppm
+- count: 1
+  metric_type: whole_cell_detected_evolved_800ppm
+- count: 1
+  metric_type: exoproteome_avg_pct_nsaf
+- count: 1
+  metric_type: exoproteome_detection_status
+by_organism_type:
+- count: 40
+  organism_type: genome_strain
+- count: 5
+  organism_type: treatment
+- count: 2
+  organism_type: reference_proteome_match
+by_value_kind:
+- count: 10
+  value_kind: numeric
+- count: 5
+  value_kind: boolean
+- count: 4
+  value_kind: categorical
+case_id: list_organisms_summary_capability
+not_found: []
+offset: 0
+results: []
+returned: 0
+row_count: 0
+total_entries: 47
+total_matching: 47
+truncated: true

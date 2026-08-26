@@ -29,6 +29,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: AD45
+  transported_metabolite_count: 1266
   treatment_types:
   - compartment
 - background_factors:
@@ -59,6 +60,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: ATCC27126
+  transported_metabolite_count: 1267
   treatment_types:
   - compartment
 - background_factors:
@@ -89,6 +91,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: BGP6
+  transported_metabolite_count: 1269
   treatment_types:
   - compartment
 - background_factors:
@@ -119,6 +122,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: BS11
+  transported_metabolite_count: 1265
   treatment_types:
   - compartment
 - background_factors:
@@ -156,6 +160,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: HOT1A3
+  transported_metabolite_count: 1269
   treatment_types:
   - coculture
   - compartment
@@ -197,6 +202,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: MIT1002
+  transported_metabolite_count: 1267
   treatment_types:
   - coculture
   - compartment
@@ -254,6 +260,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MED4
+  transported_metabolite_count: 1069
   treatment_types:
   - carbon
   - coculture
@@ -303,6 +310,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9312
+  transported_metabolite_count: 1061
   treatment_types:
   - carbon
   - coculture
@@ -348,6 +356,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9313
+  transported_metabolite_count: 1154
   treatment_types:
   - carbon
   - coculture

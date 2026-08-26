@@ -25,7 +25,9 @@ rows:
   reaction_count: 0
   significant_down_count: 0
   significant_up_count: 0
-  transporter_count: 0
+  tcdb_evidence_score_max: null
+  transport_substrate_resolution: null
+  transported_metabolite_count: 0
 - annotation_quality: 3
   annotation_state: informative_multi
   annotation_types:
@@ -60,4 +62,6 @@ rows:
   reaction_count: 0
   significant_down_count: 2
   significant_up_count: 4
-  transporter_count: 0
+  tcdb_evidence_score_max: null
+  transport_substrate_resolution: null
+  transported_metabolite_count: 0

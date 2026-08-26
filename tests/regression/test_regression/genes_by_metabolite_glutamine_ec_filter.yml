@@ -1,24 +1,26 @@
 by_evidence_source:
-- count: 13
+- count: 25
   evidence_source: transport
 - count: 1
   evidence_source: metabolism
 by_metabolite:
 - formula: C5H10N2O3
-  gene_count: 14
+  gene_count: 26
   metabolism_rows: 1
   metabolite_id: kegg.compound:C00064
   name: L-Glutamine
   reaction_count: 1
-  rows: 14
-  transport_family_inferred_rows: 13
-  transport_substrate_confirmed_rows: 0
-  transporter_count: 2
-by_transport_confidence:
-- count: 13
-  transport_confidence: family_inferred
+  rows: 26
+  transport_inherited_rows: 24
+  transport_most_specific_rows: 1
+  transporter_count: 3
+by_substrate_depth:
+- count: 24
+  substrate_depth: inherited
+- count: 1
+  substrate_depth: most_specific
 case_id: genes_by_metabolite_glutamine_ec_filter
-gene_count_total: 14
+gene_count_total: 26
 metabolite_count_total: 1
 not_found:
   metabolite_ids: []
@@ -28,22 +30,6 @@ not_matched: []
 offset: 0
 reaction_count_total: 1
 results:
-- ec_numbers: null
-  evidence_source: transport
-  gene_name: ecfA1
-  locus_tag: PMM0125
-  mass_balance: null
-  metabolite_chebi_id: '13110'
-  metabolite_formula: C5H10N2O3
-  metabolite_id: kegg.compound:C00064
-  metabolite_mass: 146.146
-  metabolite_name: L-Glutamine
-  product: energy-coupling factor transport system ATP-binding protein
-  reaction_id: null
-  reaction_name: null
-  tcdb_family_id: tcdb:3.A.1
-  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
-  transport_confidence: family_inferred
 - ec_numbers: null
   evidence_source: transport
   gene_name: murJ
@@ -57,25 +43,10 @@ results:
   product: peptidoglycan lipid II flippase
   reaction_id: null
   reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:2.A.66.4
-  tcdb_family_name: 2.A.66.4
-  transport_confidence: family_inferred
-- ec_numbers: null
-  evidence_source: transport
-  gene_name: cbiQ
-  locus_tag: PMM0392
-  mass_balance: null
-  metabolite_chebi_id: '13110'
-  metabolite_formula: C5H10N2O3
-  metabolite_id: kegg.compound:C00064
-  metabolite_mass: 146.146
-  metabolite_name: L-Glutamine
-  product: transmembrane component of ECF transporter energizing module
-  reaction_id: null
-  reaction_name: null
-  tcdb_family_id: tcdb:3.A.1
-  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
-  transport_confidence: family_inferred
+  tcdb_family_name: The Mouse Virulence Factor (MVF) Family
 - ec_numbers: null
   evidence_source: transport
   gene_name: ftsE
@@ -89,9 +60,44 @@ results:
   product: ATP-binding protein FtsE
   reaction_id: null
   reaction_name: null
+  substrate_depth: inherited
+  tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
-  transport_confidence: family_inferred
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: ccmA
+  locus_tag: PMM0449
+  mass_balance: null
+  metabolite_chebi_id: '13110'
+  metabolite_formula: C5H10N2O3
+  metabolite_id: kegg.compound:C00064
+  metabolite_mass: 146.146
+  metabolite_name: L-Glutamine
+  product: ABC-type multidrug transport system, ATPase component
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: inherited
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1
+  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: ycf38
+  locus_tag: PMM0450
+  mass_balance: null
+  metabolite_chebi_id: '13110'
+  metabolite_formula: C5H10N2O3
+  metabolite_id: kegg.compound:C00064
+  metabolite_mass: 146.146
+  metabolite_name: L-Glutamine
+  product: ABC-2 type transporter family protein
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: inherited
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1
+  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
 - ec_numbers:
   - 6.3.1.2
   evidence_source: metabolism
@@ -107,102 +113,133 @@ results:
   reaction_id: kegg.reaction:R00253
   reaction_name: L-glutamate:ammonia ligase (ADP-forming); ATP + L-Glutamate + Ammonia
     <=> ADP + Orthophosphate + L-Glutamine
+  substrate_depth: null
+  tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
-  transport_confidence: null
 returned: 5
 row_count: 5
 top_gene_categories:
 - category: Transport
-  gene_count: 8
+  gene_count: 13
 - category: Stress response and adaptation
-  gene_count: 3
+  gene_count: 4
+- category: Translation
+  gene_count: 2
 - category: Amino acid metabolism
+  gene_count: 1
+- category: Cell cycle and division
   gene_count: 1
 - category: Cell wall and membrane
   gene_count: 1
 - category: Cellular processes
   gene_count: 1
+- category: Coenzyme metabolism
+  gene_count: 1
+- category: Post-translational modification
+  gene_count: 1
+- category: Replication and repair
+  gene_count: 1
 top_genes:
-- gene_name: ecfA1
-  locus_tag: PMM0125
+- gene_name: sufC
+  locus_tag: PMM0072
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
+  tcdb_evidence_score_max: 0.4
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: resolved
+  transporter_count: 1
+- gene_name: null
+  locus_tag: PMM0089
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  tcdb_evidence_score_max: 0.4
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: resolved
+  transporter_count: 1
+- gene_name: tolC
+  locus_tag: PMM0097
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  tcdb_evidence_score_max: 0.4
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: resolved
+  transporter_count: 1
+- gene_name: cgtA
+  locus_tag: PMM0218
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  tcdb_evidence_score_max: 0.0
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: resolved
   transporter_count: 1
 - gene_name: murJ
   locus_tag: PMM0261
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
+  tcdb_evidence_score_max: 0.8
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transport_substrate_resolution: resolved
   transporter_count: 1
-- gene_name: cbiQ
-  locus_tag: PMM0392
+- gene_name: minD
+  locus_tag: PMM0321
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
+  tcdb_evidence_score_max: 0.2
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: resolved
   transporter_count: 1
 - gene_name: ftsE
   locus_tag: PMM0434
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
+  tcdb_evidence_score_max: 0.8
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: family_inferred
   transporter_count: 1
 - gene_name: ccmA
   locus_tag: PMM0449
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
+  tcdb_evidence_score_max: 0.8
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: family_inferred
   transporter_count: 1
 - gene_name: ycf38
   locus_tag: PMM0450
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
+  tcdb_evidence_score_max: 0.8
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: family_inferred
   transporter_count: 1
 - gene_name: null
-  locus_tag: PMM0666
+  locus_tag: PMM0538
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
-  transporter_count: 1
-- gene_name: devC
-  locus_tag: PMM0749
-  metabolism_rows: 0
-  metabolite_count: 1
-  reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
-  transporter_count: 1
-- gene_name: devA
-  locus_tag: PMM0750
-  metabolism_rows: 0
-  metabolite_count: 1
-  reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
-  transporter_count: 1
-- gene_name: salY
-  locus_tag: PMM0913
-  metabolism_rows: 0
-  metabolite_count: 1
-  reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
+  tcdb_evidence_score_max: 0.2
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: resolved
   transporter_count: 1
 top_reactions:
 - ec_numbers:
@@ -213,24 +250,30 @@ top_reactions:
     ADP + Orthophosphate + L-Glutamine
   reaction_id: kegg.reaction:R00253
 top_tcdb_families:
-- gene_count: 12
+- gene_count: 20
   level_kind: tc_family
   metabolite_count: 1
+  substrate_depth: inherited
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
-  transport_confidence: family_inferred
+- gene_count: 4
+  level_kind: tc_family
+  metabolite_count: 1
+  substrate_depth: inherited
+  tcdb_family_id: tcdb:2.A.7
+  tcdb_family_name: The Drug/Metabolite Transporter (DMT) Superfamily
 - gene_count: 1
   level_kind: tc_subfamily
   metabolite_count: 1
+  substrate_depth: most_specific
   tcdb_family_id: tcdb:2.A.66.4
-  tcdb_family_name: 2.A.66.4
-  transport_confidence: family_inferred
-total_matching: 14
-transporter_count_total: 2
+  tcdb_family_name: The Mouse Virulence Factor (MVF) Family
+total_matching: 26
+transporter_count_total: 3
 truncated: true
 warnings:
-- 'Most transport rows are `family_inferred` (13 of 13) — annotations rolled up from
-  family-level transport potential. Workflow-dependent: use `transport_confidence=''substrate_confirmed''`
-  for conservative-cast questions (e.g. cross-organism inference); keep `family_inferred`
-  for broad-screen candidate enumeration. Both tiers are annotations, neither is ground
-  truth — see analysis-doc §g.'
+- Most transport rows are `inherited` (24 of 25) — the substrate is reached through
+  a broader family's substrate list, not the gene's most specific surviving node.
+  Use substrate_depth=['most_specific'] for conservative-cast questions (e.g. cross-organism
+  inference); keep `inherited` rows for broad-screen candidate enumeration, and rank
+  within a tier by `tcdb_evidence_score`. Per-gene trust lives in `top_genes[].transport_substrate_resolution`.

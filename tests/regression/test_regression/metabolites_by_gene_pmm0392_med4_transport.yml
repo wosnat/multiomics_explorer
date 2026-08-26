@@ -1,0 +1,448 @@
+by_element:
+- element: C
+  metabolite_count: 9
+- element: H
+  metabolite_count: 9
+- element: N
+  metabolite_count: 9
+- element: O
+  metabolite_count: 9
+- element: S
+  metabolite_count: 3
+- element: P
+  metabolite_count: 2
+- element: Co
+  metabolite_count: 1
+- element: Mg
+  metabolite_count: 1
+by_evidence_source:
+- count: 13
+  evidence_source: transport
+by_gene:
+- gene_name: cbiQ
+  locus_tag: PMM0392
+  metabolism_rows: 0
+  metabolite_count: 13
+  product: transmembrane component of ECF transporter energizing module
+  reaction_count: 0
+  rows: 13
+  tcdb_evidence_score_max: 0.8
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 13
+  transport_substrate_resolution: resolved
+  transporter_count: 5
+by_substrate_depth:
+- count: 13
+  substrate_depth: most_specific
+case_id: metabolites_by_gene_pmm0392_med4_transport
+gene_count_total: 1
+metabolite_count_total: 13
+not_found:
+  locus_tags: []
+  metabolite_elements: []
+  metabolite_ids: []
+  metabolite_pathway_ids: []
+  organism: null
+not_matched: []
+offset: 0
+reaction_count_total: 0
+results:
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: cbiQ
+  locus_tag: PMM0392
+  mass_balance: null
+  metabolite_chebi_id: '10004'
+  metabolite_id: chebi:10004
+  metabolite_name: vitamin (role)
+  product: transmembrane component of ECF transporter energizing module
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1.32
+  tcdb_family_name: The Cobalamin Precursor (B 12 -P) Family
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: cbiQ
+  locus_tag: PMM0392
+  mass_balance: null
+  metabolite_chebi_id: '30411'
+  metabolite_id: chebi:30411
+  metabolite_name: cobalamin
+  product: transmembrane component of ECF transporter energizing module
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1.32
+  tcdb_family_name: The Cobalamin Precursor (B 12 -P) Family
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: cbiQ
+  locus_tag: PMM0392
+  mass_balance: null
+  metabolite_chebi_id: '13315'
+  metabolite_formula: C27H33N9O15P2
+  metabolite_id: kegg.compound:C00016
+  metabolite_mass: 785.557
+  metabolite_name: FAD
+  product: transmembrane component of ECF transporter energizing module
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1.25
+  tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: cbiQ
+  locus_tag: PMM0392
+  mass_balance: null
+  metabolite_chebi_id: '13317'
+  metabolite_formula: C17H21N4O9P
+  metabolite_id: kegg.compound:C00061
+  metabolite_mass: 456.348
+  metabolite_name: FMN
+  product: transmembrane component of ECF transporter energizing module
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1.25
+  tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: cbiQ
+  locus_tag: PMM0392
+  mass_balance: null
+  metabolite_chebi_id: '13905'
+  metabolite_formula: C10H15N2O3S
+  metabolite_id: kegg.compound:C00120
+  metabolite_mass: 243.308
+  metabolite_name: Biotin
+  product: transmembrane component of ECF transporter energizing module
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1.25
+  tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: cbiQ
+  locus_tag: PMM0392
+  mass_balance: null
+  metabolite_chebi_id: '12055'
+  metabolite_formula: C11H15N5O3S
+  metabolite_id: kegg.compound:C00170
+  metabolite_mass: 297.34
+  metabolite_name: 5^-Methylthioadenosine
+  product: transmembrane component of ECF transporter energizing module
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1.33
+  tcdb_family_name: The Methylthioadenosine (MTA) Family
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: cbiQ
+  locus_tag: PMM0392
+  mass_balance: null
+  metabolite_chebi_id: '176615'
+  metabolite_formula: Co
+  metabolite_id: kegg.compound:C00175
+  metabolite_mass: 58.933
+  metabolite_name: Cobalt ion
+  product: transmembrane component of ECF transporter energizing module
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1.33
+  tcdb_family_name: The Methylthioadenosine (MTA) Family
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: cbiQ
+  locus_tag: PMM0392
+  mass_balance: null
+  metabolite_chebi_id: '15044'
+  metabolite_formula: C17H19N4O6
+  metabolite_id: kegg.compound:C00255
+  metabolite_mass: 375.361
+  metabolite_name: Riboflavin
+  product: transmembrane component of ECF transporter energizing module
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1.25
+  tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: cbiQ
+  locus_tag: PMM0392
+  mass_balance: null
+  metabolite_chebi_id: '13379'
+  metabolite_formula: Mg
+  metabolite_id: kegg.compound:C00305
+  metabolite_mass: 24.305
+  metabolite_name: Magnesium cation
+  product: transmembrane component of ECF transporter energizing module
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1.33
+  tcdb_family_name: The Methylthioadenosine (MTA) Family
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: cbiQ
+  locus_tag: PMM0392
+  mass_balance: null
+  metabolite_chebi_id: '15227'
+  metabolite_formula: C12H17N4OS
+  metabolite_id: kegg.compound:C00378
+  metabolite_mass: 265.362
+  metabolite_name: Thiamine
+  product: transmembrane component of ECF transporter energizing module
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1.30
+  tcdb_family_name: The Thiamin Precursor (Thi-P) Family
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: cbiQ
+  locus_tag: PMM0392
+  mass_balance: null
+  metabolite_chebi_id: '136521'
+  metabolite_formula: C18H22N5O6
+  metabolite_id: kegg.compound:C21647
+  metabolite_mass: 404.403
+  metabolite_name: Roseoflavin
+  product: transmembrane component of ECF transporter energizing module
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1.25
+  tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: cbiQ
+  locus_tag: PMM0392
+  mass_balance: null
+  metabolite_chebi_id: '64299'
+  metabolite_formula: C17H21N5O6*2
+  metabolite_id: chebi:64299
+  metabolite_name: queuosine residue
+  product: transmembrane component of ECF transporter energizing module
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.6
+  tcdb_family_id: tcdb:3.A.1.28
+  tcdb_family_name: The Queuosine (Queuosine) Family
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: cbiQ
+  locus_tag: PMM0392
+  mass_balance: null
+  metabolite_chebi_id: '24075'
+  metabolite_formula: C19H17N7O6
+  metabolite_id: kegg.compound:C00504
+  metabolite_mass: 439.388
+  metabolite_name: Folate
+  product: transmembrane component of ECF transporter energizing module
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.6
+  tcdb_family_id: tcdb:3.A.1.28
+  tcdb_family_name: The Queuosine (Queuosine) Family
+returned: 13
+row_count: 13
+top_gene_categories:
+- category: Transport
+  gene_count: 1
+top_metabolite_pathways:
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko00270
+  metabolite_pathway_name: Cysteine and methionine metabolism
+  pathway_metabolite_count: 62
+  pathway_reaction_count: 63
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko01100
+  metabolite_pathway_name: Metabolic pathways
+  pathway_metabolite_count: 1621
+  pathway_reaction_count: 1718
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko00730
+  metabolite_pathway_name: Thiamine metabolism
+  pathway_metabolite_count: 27
+  pathway_reaction_count: 20
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko01240
+  metabolite_pathway_name: Biosynthesis of cofactors
+  pathway_metabolite_count: 286
+  pathway_reaction_count: 223
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko00670
+  metabolite_pathway_name: One carbon pool by folate
+  pathway_metabolite_count: 25
+  pathway_reaction_count: 32
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko00790
+  metabolite_pathway_name: Folate biosynthesis
+  pathway_metabolite_count: 46
+  pathway_reaction_count: 42
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko00998
+  metabolite_pathway_name: Biosynthesis of various antibiotics
+  pathway_metabolite_count: 40
+  pathway_reaction_count: 5
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko01110
+  metabolite_pathway_name: Biosynthesis of secondary metabolites
+  pathway_metabolite_count: 614
+  pathway_reaction_count: 536
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko00740
+  metabolite_pathway_name: Riboflavin metabolism
+  pathway_metabolite_count: 19
+  pathway_reaction_count: 16
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko00780
+  metabolite_pathway_name: Biotin metabolism
+  pathway_metabolite_count: 23
+  pathway_reaction_count: 18
+top_metabolites:
+- formula: null
+  gene_count: 1
+  metabolism_rows: 0
+  metabolite_id: chebi:10004
+  name: vitamin (role)
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
+- formula: null
+  gene_count: 1
+  metabolism_rows: 0
+  metabolite_id: chebi:30411
+  name: cobalamin
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
+- formula: C17H21N5O6*2
+  gene_count: 1
+  metabolism_rows: 0
+  metabolite_id: chebi:64299
+  name: queuosine residue
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
+- formula: C27H33N9O15P2
+  gene_count: 1
+  metabolism_rows: 0
+  metabolite_id: kegg.compound:C00016
+  name: FAD
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
+- formula: C17H21N4O9P
+  gene_count: 1
+  metabolism_rows: 0
+  metabolite_id: kegg.compound:C00061
+  name: FMN
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
+- formula: C10H15N2O3S
+  gene_count: 1
+  metabolism_rows: 0
+  metabolite_id: kegg.compound:C00120
+  name: Biotin
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
+- formula: C11H15N5O3S
+  gene_count: 1
+  metabolism_rows: 0
+  metabolite_id: kegg.compound:C00170
+  name: 5^-Methylthioadenosine
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
+- formula: Co
+  gene_count: 1
+  metabolism_rows: 0
+  metabolite_id: kegg.compound:C00175
+  name: Cobalt ion
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
+- formula: C17H19N4O6
+  gene_count: 1
+  metabolism_rows: 0
+  metabolite_id: kegg.compound:C00255
+  name: Riboflavin
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
+- formula: Mg
+  gene_count: 1
+  metabolism_rows: 0
+  metabolite_id: kegg.compound:C00305
+  name: Magnesium cation
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
+top_reactions: []
+top_tcdb_families:
+- gene_count: 1
+  level_kind: tc_subfamily
+  metabolite_count: 5
+  substrate_depth: most_specific
+  tcdb_family_id: tcdb:3.A.1.25
+  tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
+- gene_count: 1
+  level_kind: tc_subfamily
+  metabolite_count: 2
+  substrate_depth: most_specific
+  tcdb_family_id: tcdb:3.A.1.28
+  tcdb_family_name: The Queuosine (Queuosine) Family
+- gene_count: 1
+  level_kind: tc_subfamily
+  metabolite_count: 1
+  substrate_depth: most_specific
+  tcdb_family_id: tcdb:3.A.1.30
+  tcdb_family_name: The Thiamin Precursor (Thi-P) Family
+- gene_count: 1
+  level_kind: tc_subfamily
+  metabolite_count: 2
+  substrate_depth: most_specific
+  tcdb_family_id: tcdb:3.A.1.32
+  tcdb_family_name: The Cobalamin Precursor (B 12 -P) Family
+- gene_count: 1
+  level_kind: tc_subfamily
+  metabolite_count: 3
+  substrate_depth: most_specific
+  tcdb_family_id: tcdb:3.A.1.33
+  tcdb_family_name: The Methylthioadenosine (MTA) Family
+total_matching: 13
+transporter_count_total: 5
+truncated: false
+warnings: []

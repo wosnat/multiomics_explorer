@@ -346,6 +346,18 @@ pathway_enrichment(
 )
 ```
 
+### TCDB in ORA
+
+`genes_by_ontology(ontology="tcdb", ...)` builds TERM2GENE from **edge presence** (every
+`Gene_has_tcdb_family` edge, recall semantics). Keep it that way: do **not** pre-filter term
+membership by `annotation_types`, by `tcdb_evidence_score`, or to deepest attachments only —
+the same membership rule must define the numerator (foreground hits) and the denominator
+(background term sizes), and a pre-filtered TERM2GENE breaks that consistency. Per-row
+`substrate_depth` and gene-level `transport_substrate_resolution` never enter the test; they
+belong to interpretation. Once a family is enriched, read *what it transports* through
+`genes_by_metabolite` / `metabolites_by_gene` `most_specific` rows (and rank by
+`tcdb_evidence_score`) rather than through the family's inherited rollup.
+
 The `tree` parameter is accepted by `search_ontology`, `genes_by_ontology`, `gene_ontology_terms`,
 `ontology_landscape`, and `pathway_enrichment`. Use `list_filter_values("brite_tree")` to
 discover valid tree names.

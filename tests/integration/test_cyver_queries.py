@@ -171,6 +171,11 @@ _KNOWN_MAP_KEYS = {
     # aliases not property accesses.
     "evidence_kind", "det", "flag",
     "metabolite_id", "metabolite_name", "assay_id", "assay_name",
+    # TCDB substrate_depth migration (2026-08): edge/gene-level TCDB facts
+    # carried through GBM/MBG row maps + gene_overview/list_* projections.
+    "substrate_depth", "tcdb_evidence_score", "transport_substrate_resolution",
+    "tcdb_evidence_score_max", "transported_metabolite_count",
+    "transporter_gene_count",
 }
 
 # Regex to extract property name from CyVer description:

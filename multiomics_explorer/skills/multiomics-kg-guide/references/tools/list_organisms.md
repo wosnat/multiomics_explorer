@@ -64,6 +64,7 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 | compartments | list[string] (optional) | Wet-lab compartments measured for this organism (e.g. ['whole_cell', 'vesicle']). |
 | reaction_count | int (optional) | Distinct reactions catalyzed by genes in this organism. When > 0, drill in via list_metabolites(organism_names=[organism_name]). |
 | catalyzed_metabolite_count | int (optional) | Distinct metabolites this organism's genes can catalyze reactions on (Gene → Reaction → Metabolite; catalysis arm only — transport-reach excluded). Does NOT mean measured. When > 0, drill in via list_metabolites(organism_names=[organism_name]). |
+| transported_metabolite_count | int (optional) | Distinct metabolites this organism's genes transport via their deepest TCDB attachments (precomputed OrganismTaxon.transported_metabolite_count). Pairs with catalyzed_metabolite_count; 0 when no TCDB calls. |
 | measured_metabolite_count | int (optional) | Distinct metabolites measured in this organism via any MetaboliteAssay (precomputed OrganismTaxon.measured_metabolite_count). Different from catalyzed_metabolite_count (catalysis-arm chemistry capability). When > 0, drill in via list_metabolite_assays(organism=organism_name). |
 | derived_metric_gene_count | int \| None (optional) | Total gene-level DM annotation count (verbose-only). |
 | derived_metric_types | list[string] \| None (optional) | Distinct metric_type tags observed (verbose-only). |
@@ -93,10 +94,10 @@ list_organisms()
 
 ```example-response
 {
-  "total_entries": 36,
-  "total_matching": 36,
+  "total_entries": 47,
+  "total_matching": 47,
   "by_organism_type": [
-    {"organism_type": "genome_strain", "count": 29},
+    {"organism_type": "genome_strain", "count": 40},
     {"organism_type": "treatment", "count": 5},
     {"organism_type": "reference_proteome_match", "count": 2}
   ],
@@ -105,7 +106,7 @@ list_organisms()
   "offset": 0,
   "not_found": [],
   "results": [
-    {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 16, "experiment_count": 112, "treatment_types": ["coculture", "carbon", "nitrogen", ...], "omics_types": ["RNASEQ", "PROTEOMICS"], "clustering_analysis_count": 4, "cluster_types": ["diel", "time_course"], "reaction_count": 943, "catalyzed_metabolite_count": 1039}
+    {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 17, "experiment_count": 114, "treatment_types": ["coculture", "carbon", "nitrogen", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS", ...], "clustering_analysis_count": 4, "cluster_types": ["diel", "time_course"], "reaction_count": 943, "catalyzed_metabolite_count": 1039, "transported_metabolite_count": 1069}
   ]
 }
 ```
@@ -123,7 +124,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
 ```
 
 ```example-response
-{"total_entries": 36, "total_matching": 2, "returned": 2, "truncated": false, "not_found": ["Bogus organism"], "by_organism_type": [{"organism_type": "genome_strain", "count": 2}], "by_metabolic_capability": [{"organism_name": "Prochlorococcus MED4", "reaction_count": 943, "catalyzed_metabolite_count": 1039}, {"organism_name": "Prochlorococcus MIT9301", "reaction_count": 916, "catalyzed_metabolite_count": 1018}], "results": [{"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "gene_count": 1976, "reaction_count": 943, "catalyzed_metabolite_count": 1039, ...}, {"organism_name": "Prochlorococcus MIT9301", "organism_type": "genome_strain", "gene_count": 1935, "reaction_count": 916, "catalyzed_metabolite_count": 1018, ...}]}
+{"total_entries": 47, "total_matching": 2, "returned": 2, "truncated": false, "not_found": ["Bogus organism"], "by_organism_type": [{"organism_type": "genome_strain", "count": 2}], "by_metabolic_capability": [{"organism_name": "Prochlorococcus MED4", "reaction_count": 943, "catalyzed_metabolite_count": 1039, "transported_metabolite_count": 1069}, {"organism_name": "Prochlorococcus MIT9301", "reaction_count": 945, "catalyzed_metabolite_count": 1052, "transported_metabolite_count": 1061}], "results": [{"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "gene_count": 1976, "reaction_count": 943, "catalyzed_metabolite_count": 1039, "transported_metabolite_count": 1069, ...}, {"organism_name": "Prochlorococcus MIT9301", "organism_type": "genome_strain", "gene_count": 1935, "reaction_count": 945, "catalyzed_metabolite_count": 1052, "transported_metabolite_count": 1061, ...}]}
 ```
 
 ### Example 4: Chaining to genes and publications
@@ -146,9 +147,10 @@ list_organisms(compartment="vesicle")
 ```
 
 ```example-response
-{"total_matching": 3, "by_compartment": [{"compartment": "vesicle", "count": 3}, {"compartment": "whole_cell", "count": 1}], "returned": 3, "truncated": false, "offset": 0, "not_found": [],
+{"total_matching": 9, "by_compartment": [{"compartment": "vesicle", "count": 9}, {"compartment": "whole_cell", "count": 2}], "returned": 5, "truncated": true, "offset": 0, "not_found": [],
  "results": [
-   {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "derived_metric_count": 17, "derived_metric_value_kinds": ["boolean", "categorical", "numeric"], "compartments": ["vesicle", "whole_cell"], "reaction_count": 943, "catalyzed_metabolite_count": 1039}
+   {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "derived_metric_count": 17, "derived_metric_value_kinds": ["boolean", "categorical", "numeric"], "compartments": ["vesicle", "whole_cell"], "reaction_count": 943, "catalyzed_metabolite_count": 1039, "transported_metabolite_count": 1069},
+   ...
  ]}
 ```
 
@@ -159,7 +161,7 @@ list_organisms(summary=True)
 ```
 
 ```example-response
-{"total_entries": 36, "total_matching": 36, "by_metabolic_capability": [{"organism_name": "Pseudomonas putida KT2440", "reaction_count": 1449, "catalyzed_metabolite_count": 1490}, {"organism_name": "Ruegeria pomeroyi DSS-3", "reaction_count": 1377, "catalyzed_metabolite_count": 1468}, {"organism_name": "Alteromonas macleodii EZ55", "reaction_count": 1348, "catalyzed_metabolite_count": 1428}], "returned": 0, "truncated": true, "offset": 0, "not_found": [], "results": []}
+{"total_entries": 47, "total_matching": 47, "by_metabolic_capability": [{"organism_name": "Pseudomonas putida KT2440", "reaction_count": 1449, "catalyzed_metabolite_count": 1490, "transported_metabolite_count": 1260}, {"organism_name": "Ruegeria pomeroyi DSS-3", "reaction_count": 1377, "catalyzed_metabolite_count": 1468, "transported_metabolite_count": 1213}, {"organism_name": "Alteromonas macleodii EZ55", "reaction_count": 1348, "catalyzed_metabolite_count": 1428, "transported_metabolite_count": 1266}], "returned": 0, "truncated": true, "offset": 0, "not_found": [], "results": []}
 ```
 
 ### Example 7: Survey measurement coverage across organisms
@@ -169,7 +171,7 @@ list_organisms(summary=True)
 ```
 
 ```example-response
-{"total_entries": 37, "total_matching": 37, "by_measurement_capability": {"has_metabolomics": 4, "no_metabolomics": 33}, "returned": 0, "truncated": true, "offset": 0, "not_found": [], "results": []}
+{"total_entries": 47, "total_matching": 47, "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 42}, "returned": 0, "truncated": true, "offset": 0, "not_found": [], "results": []}
 ```
 
 ## Chaining patterns
@@ -196,9 +198,9 @@ list_organisms (per-row catalyzed_metabolite_count > 0) → list_metabolites(org
 
 - organism_type values: 'genome_strain' (real genome assembly), 'treatment' (non-genomic coculture partners), 'reference_proteome_match' (identified via reference database matching).
 
-- `catalyzed_metabolite_count` counts catalysis capability only — distinct metabolites reachable through Gene → Reaction → Metabolite. Transport-reach (Gene → TcdbFamily → Metabolite) is not aggregated to the organism level; per-metabolite organism reach including transport is on `list_metabolites(organism_names=[...])`. Measurement-side coverage is the separate `measured_metabolite_count` field. catalyzed_metabolite_count=0 means no catalysis path in this organism, not that chemistry is absent from the KG.
+- `catalyzed_metabolite_count` counts catalysis capability only — distinct metabolites reachable through Gene → Reaction → Metabolite. Transport reach is the separate `transported_metabolite_count` (distinct metabolites through Gene → TcdbFamily → Metabolite over each gene's deepest TCDB attachments; breadth, not a confidence signal — inherited superfamily substrates count). Measurement-side coverage is `measured_metabolite_count`. catalyzed_metabolite_count=0 means no catalysis path in this organism, not that chemistry is absent from the KG.
 
-- by_metabolic_capability is a top-10 ranking sorted by catalyzed_metabolite_count descending; organisms with zero chemistry are excluded. Use it on summary=True calls to identify chemistry-rich organisms before drilling in via list_metabolites(organism_names=[...]).
+- by_metabolic_capability is a top-10 ranking sorted by catalyzed_metabolite_count descending (transported_metabolite_count is carried as a column, not a sort key); organisms with zero chemistry are excluded. Use it on summary=True calls to identify chemistry-rich organisms before drilling in via list_metabolites(organism_names=[...]).
 
 - by_measurement_capability is a binary rollup ({has_metabolomics, no_metabolomics}) — tool-specific shape that deviates from the list[{key,count}] frequency rollups elsewhere. See docs://guide/conventions for the standard envelope shape.
 

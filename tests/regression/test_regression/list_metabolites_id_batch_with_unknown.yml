@@ -76,6 +76,7 @@ results:
   - kegg.pathway:ko05230
   - kegg.pathway:ko05415
   transporter_count: 10
+  transporter_gene_count: 1422
 returned: 1
 row_count: 1
 score_max: null

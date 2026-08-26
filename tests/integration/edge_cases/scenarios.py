@@ -651,6 +651,30 @@ def genes_by_metabolite_scenarios():
             "offset_past_end",
             dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
                  offset=fx.OFFSET_PAST_END)),
+        # TCDB substrate_depth migration (spec 2026-08-20): the retired
+        # `transport_confidence` value strings are a DOCUMENTED raise with a
+        # rename pointer (api ValueError -> ToolError), as is any unknown value.
+        Scenario(
+            "old_transport_confidence_value_substrate_confirmed",
+            dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
+                 substrate_depth=["substrate_confirmed"]),
+            expects_error=ToolError),
+        Scenario(
+            "old_transport_confidence_value_family_inferred",
+            dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
+                 substrate_depth=["family_inferred"]),
+            expects_error=ToolError),
+        Scenario(
+            "unknown_substrate_depth_value",
+            dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
+                 substrate_depth=["bogus"]),
+            expects_error=ToolError),
+        Scenario(
+            # Valid filter narrowing the transport arm on a real slice -> must
+            # stay a well-formed (possibly empty) envelope, never a raise.
+            "substrate_depth_most_specific_filter",
+            dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
+                 substrate_depth=["most_specific"])),
     ]
 
 
@@ -672,6 +696,27 @@ def metabolites_by_gene_scenarios():
             "offset_past_end",
             dict(locus_tags=["PMM0963"], organism=fx.CONTROL_ORGANISM,
                  offset=fx.OFFSET_PAST_END)),
+        # TCDB substrate_depth migration (mirrors GBM): retired value strings
+        # + unknown values are a documented raise; the valid filter is not.
+        Scenario(
+            "old_transport_confidence_value_substrate_confirmed",
+            dict(locus_tags=["PMM0963"], organism=fx.CONTROL_ORGANISM,
+                 substrate_depth=["substrate_confirmed"]),
+            expects_error=ToolError),
+        Scenario(
+            "old_transport_confidence_value_family_inferred",
+            dict(locus_tags=["PMM0963"], organism=fx.CONTROL_ORGANISM,
+                 substrate_depth=["family_inferred"]),
+            expects_error=ToolError),
+        Scenario(
+            "unknown_substrate_depth_value",
+            dict(locus_tags=["PMM0963"], organism=fx.CONTROL_ORGANISM,
+                 substrate_depth=["bogus"]),
+            expects_error=ToolError),
+        Scenario(
+            "substrate_depth_inherited_filter",
+            dict(locus_tags=["PMM0963"], organism=fx.CONTROL_ORGANISM,
+                 substrate_depth=["inherited"])),
     ]
 
 

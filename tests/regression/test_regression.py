@@ -73,24 +73,16 @@ CASE_IDS = [c["id"] for c in CASES]
 # ---------------------------------------------------------------------------
 # Expected-failure cases (slice-2 worklist)
 # ---------------------------------------------------------------------------
-# Goldens for these cases are intentionally NOT regenerated: they pin the
-# pre-2026-08 transport_confidence semantics, and regenerating them now
-# would bake the broken interim level_kind-derived classification into the
-# baselines. Re-pin (and drop from this set) in slice 2 once the
-# substrate_depth migration lands. strict=False — they fail on value
+# Mechanism kept for future slices. The slice-2 worklist (6
+# genes_by_metabolite cases pinned on the retired transport_confidence
+# semantics) was cleared by the TCDB substrate_depth migration
+# (docs/tool-specs/2026-08-20-tcdb-substrate-depth-migration.md): those
+# cases are live acceptance again and their goldens are regenerated at
+# Stage 3 of that build. Add an id here (with a dated reason) only when a
+# golden must be held stale on purpose; strict=False — cases fail on value
 # mismatch against the stale golden, not by raising.
-_XFAIL_REASON = (
-    "slice-2: transport_confidence must migrate to substrate_depth "
-    "(KG 2026-08 TCDB upgrade)"
-)
-XFAIL_CASES = {
-    "genes_by_metabolite_urea_med4_default",
-    "genes_by_metabolite_nitrite_med4_warning",
-    "genes_by_metabolite_urea_substrate_confirmed_only",
-    "genes_by_metabolite_glutamine_ec_filter",
-    "genes_by_metabolite_mixed_unknown_ids",
-    "genes_by_metabolite_pathway_anchored_n_metabolism",
-}
+_XFAIL_REASON = "no expected-failure cases currently"
+XFAIL_CASES: set[str] = set()
 
 _CASE_PARAMS = [
     pytest.param(
@@ -208,6 +200,23 @@ def test_regression(conn, case, data_regression):
     tool = case["tool"]
     params = case.get("params", {})
 
+    if case.get("dispatch") == "api":
+        # Generic api (L2) envelope capture, opted in per case via
+        # `dispatch: api` — for tools whose TOOL_BUILDERS entry pins the
+        # builder-row shape on existing goldens (gene_overview,
+        # list_organisms, metabolites_by_gene) but whose new envelope
+        # surface (warnings, by_gene[], by_metabolic_capability) must be
+        # pinned too. Same shape as the explicit api branches below.
+        data = getattr(api, tool)(**params, conn=conn)
+        normalized_rows = _normalize(data.get("results", []))
+        envelope = {k: v for k, v in data.items() if k != "results"}
+        envelope["results"] = normalized_rows
+        envelope["row_count"] = len(normalized_rows)
+        data_regression.check(
+            {"case_id": case["id"], **envelope},
+            basename=case["id"],
+        )
+        return
     if tool == "raw_cypher":
         results = conn.execute_query(params["query"])
     elif tool == "list_filter_values":

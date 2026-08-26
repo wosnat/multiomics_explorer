@@ -14,21 +14,21 @@ Runnable companion: `docs://examples/metabolites.py` (7 scenarios).
 | `evidence_source` | Path in KG | Question it answers | Native tools | Key caveats |
 |---|---|---|---|---|
 | `metabolism` | `Gene → Reaction → Metabolite` (KEGG-derived) | "Which metabolites is this gene's reaction involved in?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['metabolism']`) | KO inference may be putative; `Reaction_has_metabolite` is undirected — upstream KEGG direction is unreliable, so the convention is permanent: use "involved in" framing, never "produces"/"consumes"; promiscuous enzymes inflate counts |
-| `transport` | `Gene → TcdbFamily → Metabolite` (TCDB-derived) | "Which metabolites does this gene transport (or could transport, family-inferred)?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['transport']`) | family_inferred ≫ substrate_confirmed (per-gene median ≈ 4 metabolites, p90 ≈ 48, max ≈ 992 via ABC superfamily); auto-warning fires when this skews; no import/export direction |
+| `transport` | `Gene → TcdbFamily → Metabolite` (TCDB-derived) | "Which metabolites does this gene transport (or could transport, via an inherited family substrate set)?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['transport']`) | `inherited` ≫ `most_specific` rows; superfamily-only genes read `transport_substrate_resolution='family_inferred'` (reachability, not capability) and trigger the auto-warning; rows are deepest-attachment projections; no import/export direction |
 | `metabolomics` | `MetaboliteAssay → Metabolite` (mass-spec) | "Which metabolites were measured under this condition?" | `list_metabolite_assays` (discovery), `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay` (per-arm drill-down), `assays_by_metabolite` (reverse lookup) — see Track B | No gene anchor; `Assay_quantifies` (concentration/intensity) ≠ `Assay_flags` (qualitative detection); compartment matters (`whole_cell` / `extracellular` / `vesicle`); ~149 of ~3.3k metabolites measured (~95% are annotation-only); 3 papers, 14 assays (12 numeric + 2 boolean), 12 experiments; replicate / normalisation conventions vary by paper |
 
-The `metabolism` and `transport` rows share tools — the `evidence_source` field on result rows is the discriminator, and `transport_confidence ∈ {substrate_confirmed, family_inferred}` further qualifies transport rows. The `metabolomics` row has dedicated tools — see Track B.
+The `metabolism` and `transport` rows share tools — the `evidence_source` field on result rows is the discriminator, and `substrate_depth ∈ {most_specific, inherited}` plus `tcdb_evidence_score` further qualify transport rows (see the trust ladder under Track A2). The `metabolomics` row has dedicated tools — see Track B.
 
 The `Metabolite.evidence_sources` list field on each Metabolite node already indicates which of the three pipelines contribute (e.g., `['metabolism', 'transport', 'metabolomics']`); read this to route quickly.
 
-**Row schema is unified across both annotation arms.** `genes_by_metabolite` and `metabolites_by_gene` rows carry the full cross-arm key set — every row has `evidence_source`, `transport_confidence`, `reaction_id`, `reaction_name`, `ec_numbers`, `mass_balance`, `tcdb_family_id`, `tcdb_family_name`, with explicit `None` on the fields belonging to the other arm. Code against `evidence_source` to discriminate (or `transport_confidence is not None` for transport-only); the cross-arm `None`s mean every row has identical keys, no `KeyError` branching.
+**Row schema is unified across both annotation arms.** `genes_by_metabolite` and `metabolites_by_gene` rows carry the full cross-arm key set — every row has `evidence_source`, `substrate_depth`, `tcdb_evidence_score`, `reaction_id`, `reaction_name`, `ec_numbers`, `mass_balance`, `tcdb_family_id`, `tcdb_family_name`, with explicit `None` on the fields belonging to the other arm. Code against `evidence_source` to discriminate (or `substrate_depth is not None` for transport-only); the cross-arm `None`s mean every row has identical keys, no `KeyError` branching.
 
 ## When to surface caveats inline
 
 Always restate the row's caveats when the answer touches it. The LLM should never claim:
 
 - "This gene produces X" — only "this gene catalyses a reaction involving X". This is the permanent convention: upstream KEGG annotation direction is unreliable, so the KG intentionally stays undirected.
-- "This gene transports X" without qualifying tier — when `transport_confidence='family_inferred'`, the gene is annotated to a non-leaf TCDB family whose curated substrate set was rolled up from descendant leaves; we don't know which specific subfamily (and thus which specific substrate set) applies. Say "this gene belongs to a TCDB family that includes leaf-level transporters of X — we can't tell from the annotation which leaf, so X is candidate-only".
+- "This gene transports X" without qualifying the evidence — when the gene reads `transport_substrate_resolution='family_inferred'`, or the row is `substrate_depth='inherited'`, X came down from a lumping family's substrate set; we don't know which specific subfamily applies. Say "this gene belongs to a TCDB family whose substrate set includes X — the annotation can't pin the subfamily, so X is candidate-only". Quote the `tcdb_evidence_score` when you rank candidates.
 - "Metabolite X was not produced under condition Y" based on metabolomics absence — say "X was not detected in the targeted panel under condition Y" (targeted ≠ comprehensive).
 
 ---
@@ -95,7 +95,7 @@ result = metabolites_by_gene(
 
 ## Track A2 — Transport (TCDB) annotation
 
-For substrates the gene's TCDB family transports. Always restate inline: family_inferred ≫ substrate_confirmed; ABC superfamily promiscuity; no direction.
+For substrates the gene's TCDB family transports. Always restate inline: the trust ladder (score → resolution → depth, section g below); ABC superfamily promiscuity; no direction.
 
 ### b2 — Transport-anchored: compound → genes
 
@@ -108,9 +108,10 @@ result = genes_by_metabolite(
     metabolite_ids=["C00719"],            # glycine betaine
     organism="MED4",
     evidence_sources=["transport"],
-    transport_confidence="substrate_confirmed",  # tighten when family_inferred dominates
+    substrate_depth=["most_specific"],    # tighten when inherited rows dominate
 )
-# Each row has evidence_source="transport" and transport_confidence ∈ {substrate_confirmed, family_inferred}.
+# Each row has evidence_source="transport", substrate_depth ∈ {most_specific, inherited}
+# and tcdb_evidence_score (rank by it; never treat 0 as "absent").
 ```
 
 ### c2 — Transport-anchored: gene → metabolites
@@ -125,22 +126,29 @@ result = metabolites_by_gene(
     organism="MED4",
     evidence_sources=["transport"],
 )
-# Detail rows are sorted by precision tier — substrate_confirmed first, then family_inferred.
+# Detail rows are sorted metabolism → most_specific → inherited, then tcdb_evidence_score desc.
+# result["by_gene"][i] carries transport_substrate_resolution + tcdb_evidence_score_max.
 ```
 
-### g — Reading the substrate_confirmed vs family_inferred split
+### g — The transport trust ladder (score → resolution → depth)
 
-Both tiers are annotations, not ground truth. `substrate_confirmed` reflects "a curator listed this compound for this family"; `family_inferred` reflects "this family is known to transport these compound classes, exact specificity unknown." Real transporter specificity is often promiscuous or under-characterized — the gap between tiers is more about curation effort than biological certainty.
+Both depths are annotations, not ground truth — transporter specificity in nature is often promiscuous or under-characterized. Read transport evidence top-down through three levels, each answering a different question:
 
-**Choose by question shape, not by reflex toward "high confidence":**
+1. **`tcdb_evidence_score`** (row) / **`tcdb_evidence_score_max`** (gene; on `gene_overview` rows, `genes_by_metabolite.top_genes[]`, `metabolites_by_gene.by_gene[]`) — *how corroborated is the gene × family call?* A composite on `[0, 1]`. **Rank by it; never filter by it** (there is deliberately no score filter param). `0` is an uncorroborated hit, not an absent call — absent is `tcdb_evidence_score_max = None`, which means the gene has no TCDB call at all. The `'tcdb' ∈ annotation_types` gate is the binary version of the same evidence; the score is the graded one.
+2. **`transport_substrate_resolution`** (gene) — *is the gene's substrate breadth meaningful?* `family_inferred` means every deepest attachment is a lumping family: `transported_metabolite_count` is reachability, not capability, and its rows can still be `most_specific` (at the superfamily) — the depth filter does not screen these genes out. `resolved` means **at least one** deepest attachment is non-lumping — not all of them. A gene attached at both a specific family and the ABC superfamily is `resolved` and still carries the superfamily's rollup inside its `transported_metabolite_count`; only the row level separates the two.
+3. **`substrate_depth`** (row) — *where does this substrate sit for this family?* `most_specific` is the most specific **surviving** transporter node for this substrate relative to the gene-pruned hierarchy — it can be a family node when no gene in the KG is annotated below it (nitrite via the formate-nitrite family `tcdb:2.A.16` in MED4), and it is not a curation level. `inherited` rows came down from an ancestor's substrate set (the ABC superfamily `tcdb:3.A.1` is the usual source).
 
-- **`transport_confidence='substrate_confirmed'`** — narrower, more conservative cast. Use when the downstream inference is fragile (cross-organism cross-feeding) or when over-claiming specific substrates would mislead.
-- **No filter / both tiers** — broader cast that includes family-level potential. Use for screening questions ("which transporters could plausibly act on N substrates?") where you'd rather over-include and let downstream evidence (e.g. DE response) anchor the functional interpretation. Real N-uptake transporters in MED4 (PMM0263 amt1, PMM0628 gltS) are family_inferred — `substrate_confirmed` would silently exclude them.
+**Rows are deepest-attachment projections.** A gene attached to a family *and* to one of its descendants contributes rows only through the descendant; the ancestor's substrate rollup is intentionally absent. So distinct metabolites across a gene's transport rows equal `gene_overview.transported_metabolite_count` (PMM0392: 13, not the ABC-superfamily plateau of 554), and distinct genes across a metabolite's transport rows, summed over organisms, equal `list_metabolites.transporter_gene_count`. Full family membership, ancestors included, is visible via `gene_ontology_terms(ontology='tcdb')`.
+
+**Choose the depth filter by question shape, not by reflex toward "high confidence":**
+
+- **`substrate_depth=['most_specific']`** — narrower, more conservative cast. Use when the downstream inference is fragile (cross-organism cross-feeding) or when over-claiming specific substrates would mislead.
+- **No filter / both depths** — broader cast that includes inherited family potential. Use for screening questions ("which transporters could plausibly act on N substrates?") where you'd rather over-include and let downstream evidence (e.g. DE response) anchor the interpretation. Real N-uptake transporters in MED4 (PMM0263 amt1, PMM0628 gltS) reach their substrates via inherited rows — `most_specific` alone would silently exclude them.
 - **Pivot** for a single transporter family: `genes_by_ontology(ontology="tcdb", term_ids=[...])`. (But for substrate-anchored questions — "which genes transport X" — prefer the metabolite-anchored route under "Track A2 — Transport (TCDB) annotation".)
 
-The family_inferred-dominance auto-warning is informational, not a defect signal: it tells you most rows came from family-level inheritance so you can pick a confidence tier deliberately.
+The auto-warning is informational, not a defect signal. `genes_by_metabolite` fires it when inherited rows dominate the transport rows (nitrite × MED4: most of the 29 deepest-attachment rows are inherited via `tcdb:3.A.1`); `metabolites_by_gene` fires it when input genes read `transport_substrate_resolution='family_inferred'` — their substrate breadth is reachability, not capability.
 
-Empirical scale: per-gene metabolite count via transport — median 4, p90 48, max **992**. In MED4 specifically, **12 genes** sit at the ABC-superfamily plateau (554 metabolites each): PMM0125, PMM0392, PMM0434, PMM0449, PMM0450, PMM0666, PMM0749, PMM0750, PMM0913, PMM0976, PMM0977, PMM0978. Expect family_inferred-dominance warnings when querying common metabolites against MED4.
+Empirical scale: the 13 MED4 genes carrying `transport_substrate_resolution='family_inferred'` (e.g. PMM0913 salY, PMM0434 ftsE) plateau at the ABC-superfamily rollup — 554 transport rows each, of which 312 are `inherited` and **242 are `most_specific` at `tcdb:3.A.1` itself** (substrates no kept child of the superfamily carries). `substrate_depth=['most_specific']` therefore does *not* remove superfamily-only genes; `most_specific` at a lumping superfamily is a superfamily-level position, not a subfamily call, and the gene-level resolution is the only guard against reading those substrates. PMM0392, by contrast, is attached to seven ABC subfamilies, so under the deepest-attachment rule it reads 13 metabolites, `resolved`, score 0.8. Expect the warning when querying common metabolites against MED4.
 
 ---
 
@@ -157,7 +165,7 @@ Workflows that cross both reaction and transport arms, or that consume the annot
 | # | Confounder | Arm | Mitigation |
 |---|---|---|---|
 | 1 | **Currency cofactors flood the rollup.** `top_metabolites` is sorted by gene_count, which is exactly the wrong sort for cross-feeding because the highest-reach metabolites are universal (H2O, ATP/ADP/AMP, Pi, PPi, NAD(P)(H), CO2). | metabolism | Pass `exclude_metabolite_ids=CURRENCY_METABOLITES_MIN8` directly on the next call (tool-side filter — pushes the mitigation into the query so envelope rollups also benefit; available on `list_metabolites`, `genes_by_metabolite`, `metabolites_by_gene`). Minimal-8 (H2O, CO2, ATP, ADP, AMP, Pi, PPi, NAD(P)(H)) is the conservative default — see `examples/metabolites.py::CURRENCY_METABOLITES_MIN8`. Extend with H+, Glu/Gln, CoA, FAD if the seed pulls them in (these are borderline and depend on whether you care about central-N flux as a signal). Set-difference semantics with `metabolite_ids` — exclude wins on overlap. |
-| 2 | **Family-level transport casts a wide net.** Broad-substrate TCDB families (especially ABC superfamily) inherit ~554 substrates per MED4 gene via family rollup. Substrate specificity is often unknown or context-dependent in nature — `family_inferred` reflects family-level potential, not measured per-substrate confirmation. For cross-feeding *inferences* (which over-claim a specific substrate flowing between organisms), the conservative `substrate_confirmed` cast is preferable. | transport | `transport_confidence='substrate_confirmed'` on the Step-2 `genes_by_metabolite` call. Empirical: in a 7-metabolite N-cross test against ALT this narrowed transport rows 1426 → 185, leaving the curated CmpA/NrtA-family nitrate transporters. **Note:** for *broad-screen* questions (e.g. "which transporters could plausibly act on N?", scenario `n_source_de`) the opposite call applies — drop the filter so family_inferred biology is included; see the broad-screen note below. |
+| 2 | **Family-level transport casts a wide net.** Superfamily-only genes (especially ABC, `tcdb:3.A.1`) inherit ~554 substrates each via the family rollup. Substrate specificity is often unknown or context-dependent in nature — `inherited` rows reflect family-level potential, not per-substrate confirmation. For cross-feeding *inferences* (which over-claim a specific substrate flowing between organisms), the conservative `most_specific` cast is preferable. | transport | `substrate_depth=['most_specific']` on the Step-2 `genes_by_metabolite` call; then rank the survivors by `tcdb_evidence_score`. **Note:** for *broad-screen* questions (e.g. "which transporters could plausibly act on N?", scenario `n_source_de`) the opposite call applies — drop the filter so inherited biology is included; see the broad-screen note below. |
 | 3 | **Transport polarity not encoded.** TCDB annotation says "transports X" without import/export direction (TCDB lacks direction upstream; permanently unmitigable). Even with clean filters, "MED4 has cynA, ALT has nrtA" tells you both touch the substrate, not who's the producer. | both | None on the annotation side — surface the limitation in the answer ("compatible with", not "confirmed"). The Track-B measurement layer can corroborate (extracellular elevation in coculture) but cannot confirm causality. |
 
 **Pattern (two-step, with all three mitigations applied):**
@@ -190,15 +198,15 @@ med4_chem = metabolites_by_gene(
 )
 metabolite_ids = [m["metabolite_id"] for m in med4_chem["top_metabolites"]]
 
-# 2. Cross to ALT — split per-arm so both have airtime and the family_inferred
-#    plateau is killed on the transport side only. Pass `exclude_metabolite_ids`
+# 2. Cross to ALT — split per-arm so both have airtime and the inherited
+#    superfamily plateau is killed on the transport side only. Pass `exclude_metabolite_ids`
 #    again as a belt-and-braces guard (cross-organism enrichment can re-introduce
 #    currency hits — exclude is harmless if the input is already clean).
 alt_transport = genes_by_metabolite(
     metabolite_ids=metabolite_ids,
     organism="Alteromonas macleodii HOT1A3",   # one strain, not the species — keeps locus tags consistent and cuts cross-strain duplicate rows
     evidence_sources=["transport"],
-    transport_confidence="substrate_confirmed",          # confounder #2
+    substrate_depth=["most_specific"],                   # confounder #2
     exclude_metabolite_ids=CURRENCY,
 )
 alt_metab = genes_by_metabolite(
@@ -235,7 +243,7 @@ de = differential_expression_by_gene(
 )
 ```
 
-**Caveat — promiscuous enzymes / family_inferred transport inflate the gene set fed to DE.** Tighten via `evidence_sources=['metabolism']` or `transport_confidence='substrate_confirmed'` if results are noisy. Symmetric primitives exist for `metabolite_elements=['P']`, `['S']`, `['Fe']`, etc.
+**Caveat — promiscuous enzymes / inherited transport substrates inflate the gene set fed to DE.** Tighten via `evidence_sources=['metabolism']` or `substrate_depth=['most_specific']` if results are noisy; `by_gene[].transport_substrate_resolution` tells you which genes contribute reachability rather than capability. Symmetric primitives exist for `metabolite_elements=['P']`, `['S']`, `['Fe']`, etc.
 
 ### f — Ontology bridges
 
@@ -431,7 +439,7 @@ Time-point alignment between metabolomics and expression assays still varies by 
 User asks about a metabolite or chemistry
 ├─ "Can / does gene X act on metabolite M?"
 │   ├─ "produce / catalyse" → Track A1 b1/c1 (metabolism arm)
-│   └─ "transport" → Track A2 b2/c2 (transport arm) + g (precision-tier)
+│   └─ "transport" → Track A2 b2/c2 (transport arm) + g (trust ladder)
 ├─ "Which genes act on M?" → genes_by_metabolite (read evidence_source split)
 ├─ "Which metabolites does gene X act on?" → metabolites_by_gene
 ├─ "Find metabolite by name → metabolite_id" → list_metabolites(search_text="...")  ← name-search hook; precedes any compound-anchored chain

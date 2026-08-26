@@ -44,16 +44,21 @@ examples:
          {"locus_tag": "MIT1002_01809", "gene_name": null, "product": "MarR family winged helix-turn-helix transcriptional regulator", "organism_name": "Alteromonas macleodii MIT1002", "derived_metric_count": 1, "derived_metric_value_kinds": ["boolean"]}
        ]}
 
-  - title: Transport-only gene — ABC transporter with zero catalysis reach
-    call: gene_overview(locus_tags=["PMM0392"])
+  - title: Transport-only gene — resolved transporter with zero catalysis reach
+    call: gene_overview(locus_tags=["PMM0392", "PMM0001"])
     response: |
       # catalyzed_metabolite_count counts the catalysis arm only
-      # (Gene → Reaction → Metabolite). This transporter reads 0 there,
-      # yet has chemistry: transporter_count=8 and 'transport' in
-      # evidence_sources mark the transport arm.
-      {"total_matching": 1, "has_expression": 1, "has_chemistry": 1, "returned": 1, "truncated": false, "offset": 0, "not_found": [],
+      # (Gene → Reaction → Metabolite). PMM0392 reads 0 there, yet has
+      # chemistry: 'transport' in evidence_sources, tcdb_evidence_score_max
+      # 0.8 (how corroborated its best TCDB call is), transported_metabolite_count
+      # 13 (substrate breadth over its deepest TCDB attachments) and
+      # transport_substrate_resolution 'resolved' (at least one non-lumping
+      # attachment, so that breadth is a real call). PMM0001 has no TCDB
+      # call at all: score null, count 0, resolution null.
+      {"total_matching": 2, "has_expression": 2, "has_chemistry": 2, "returned": 2, "truncated": false, "offset": 0, "not_found": [],
        "results": [
-         {"locus_tag": "PMM0392", "gene_name": null, "product": "ABC transporter, ATP-binding protein", "organism_name": "Prochlorococcus MED4", "reaction_count": 0, "catalyzed_metabolite_count": 0, "transporter_count": 8, "evidence_sources": ["transport", "metabolomics"]}
+         {"locus_tag": "PMM0392", "gene_name": "cbiQ", "product": "transmembrane component of ECF transporter energizing module", "organism_name": "Prochlorococcus MED4", "reaction_count": 0, "catalyzed_metabolite_count": 0, "tcdb_evidence_score_max": 0.8, "transported_metabolite_count": 13, "transport_substrate_resolution": "resolved", "evidence_sources": ["transport", "metabolomics"]},
+         {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_name": "Prochlorococcus MED4", "reaction_count": 4, "catalyzed_metabolite_count": 6, "tcdb_evidence_score_max": null, "transported_metabolite_count": 0, "transport_substrate_resolution": null, "evidence_sources": ["metabolism", "metabolomics"]}
        ]}
 
   - title: Genes named in the literature — which paper discusses them
@@ -89,6 +94,7 @@ chaining:
   - "gene_overview(locus_tags=...) → for genes with derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric; for ['numeric'] use genes_by_numeric_metric; for ['categorical'] use genes_by_categorical_metric"
   - "gene_overview(verbose=True) → see compartments_observed for vesicle/whole-cell triage"
   - "gene_overview (per-row `evidence_sources` non-empty) → metabolites_by_gene OR genes_by_metabolite for chemistry drill-down."
+  - "gene_overview (per-row `transport_substrate_resolution='resolved'`, after reading `tcdb_evidence_score_max`) → metabolites_by_gene(locus_tags=[...], organism=..., evidence_sources=['transport']) — distinct metabolites in the rows equal `transported_metabolite_count`."
   - "gene_overview (per-row `discussed_in_publication_count` > 0) → use verbose=True for the per-gene {doi, prominence, evidence} list, or discussed_by_publication(publication_dois=[...]) for the paper's full discussed set."
 
 mistakes:
@@ -96,7 +102,8 @@ mistakes:
   - "If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this gene."
   - "annotation_types lists which ontology types have data — use gene_ontology_terms to get the actual terms."
   - "When `evidence_sources` is non-empty, drill via `metabolites_by_gene` (gene-anchored) or `genes_by_metabolite` (metabolite-anchored). Values are subset of {'metabolism', 'transport', 'metabolomics'} — 'metabolomics' means at least one of the gene's reachable metabolites has measurement coverage."
-  - "`catalyzed_metabolite_count` counts the catalysis arm only (distinct metabolites via Gene → Reaction → Metabolite). It is NOT a total chemistry reach: a transport-only gene reads 0 here while `transporter_count > 0` and 'transport' appears in `evidence_sources`. Use `evidence_sources` to see which arms exist before interpreting a 0."
+  - "`catalyzed_metabolite_count` counts the catalysis arm only (distinct metabolites via Gene → Reaction → Metabolite). It is NOT a total chemistry reach: a transport-only gene reads 0 here while `transported_metabolite_count > 0` and 'transport' appears in `evidence_sources`. Use `evidence_sources` to see which arms exist before interpreting a 0."
+  - "TCDB routing rule: read the score; if resolved, drill into substrates. `tcdb_evidence_score_max` is the gene's most corroborated TCDB call (null = no TCDB call; 0 = an uncorroborated hit, not absence) — rank by it, never filter by it. `transport_substrate_resolution='family_inferred'` means `transported_metabolite_count` is reachability through a lumping family, not capability; `'resolved'` means at least one deepest attachment is non-lumping (not all of them — a superfamily rollup can still sit inside the count). Per-row `substrate_depth` in `metabolites_by_gene` separates the two."
   - "discussed_in_publication_count > 0 means at least one publication names this gene in prose (a recall-biased literature index, NOT DE-table expression). At ~1 pub/gene the answer is usually inline: verbose=True returns discussed_in_publications as {doi, prominence, evidence} per gene. Use discussed_by_publication for a paper's full discussed set."
   - wrong: "gene_overview(locus_tags=['PMM0845'], verbose=True)  # just to see the gene"
     right: "gene_overview(locus_tags=['PMM0845'])  # verbose only needed for gene_summary text"

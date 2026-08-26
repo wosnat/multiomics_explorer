@@ -9,13 +9,13 @@ by_metabolite:
   name: Urea
   reaction_count: 0
   rows: 10
-  transport_family_inferred_rows: 0
-  transport_substrate_confirmed_rows: 10
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 10
   transporter_count: 2
-by_transport_confidence:
+by_substrate_depth:
 - count: 10
-  transport_confidence: substrate_confirmed
-case_id: genes_by_metabolite_urea_substrate_confirmed_only
+  substrate_depth: most_specific
+case_id: genes_by_metabolite_urea_most_specific_only
 gene_count_total: 5
 metabolite_count_total: 1
 not_found:
@@ -39,9 +39,10 @@ results:
   product: ABC-type urea transporter, substrate binding component
   reaction_id: null
   reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.6
   tcdb_family_id: tcdb:3.A.1.4.4
-  tcdb_family_name: 3.A.1.4.4
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: The high-affinity (
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtA
@@ -55,9 +56,10 @@ results:
   product: ABC-type urea transporter, substrate binding component
   reaction_id: null
   reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.6
   tcdb_family_id: tcdb:3.A.1.4.5
-  tcdb_family_name: 3.A.1.4.5
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtB
@@ -71,9 +73,10 @@ results:
   product: ABC-type urea transporter, permease component
   reaction_id: null
   reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.4
-  tcdb_family_name: 3.A.1.4.4
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: The high-affinity (
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtB
@@ -87,9 +90,10 @@ results:
   product: ABC-type urea transporter, permease component
   reaction_id: null
   reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.5
-  tcdb_family_name: 3.A.1.4.5
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtC
@@ -103,9 +107,10 @@ results:
   product: ABC-type urea transporter, membrane component
   reaction_id: null
   reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.4
-  tcdb_family_name: 3.A.1.4.4
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: The high-affinity (
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtC
@@ -119,9 +124,10 @@ results:
   product: ABC-type urea transporter, membrane component
   reaction_id: null
   reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.5
-  tcdb_family_name: 3.A.1.4.5
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtD
@@ -135,9 +141,10 @@ results:
   product: ABC-type urea transporter, ATP-binding component UrtD
   reaction_id: null
   reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.4
-  tcdb_family_name: 3.A.1.4.4
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: The high-affinity (
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtD
@@ -151,9 +158,10 @@ results:
   product: ABC-type urea transporter, ATP-binding component UrtD
   reaction_id: null
   reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.5
-  tcdb_family_name: 3.A.1.4.5
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtE
@@ -167,9 +175,10 @@ results:
   product: ABC-type urea transporter, ATPase component UrtE
   reaction_id: null
   reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.4
-  tcdb_family_name: 3.A.1.4.4
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: The high-affinity (
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtE
@@ -183,9 +192,10 @@ results:
   product: ABC-type urea transporter, ATPase component UrtE
   reaction_id: null
   reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.5
-  tcdb_family_name: 3.A.1.4.5
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
 returned: 10
 row_count: 10
 top_gene_categories:
@@ -197,55 +207,65 @@ top_genes:
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 0
-  transport_substrate_confirmed_rows: 2
+  tcdb_evidence_score_max: 0.6
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 2
+  transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: urtB
   locus_tag: PMM0971
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 0
-  transport_substrate_confirmed_rows: 2
+  tcdb_evidence_score_max: 0.8
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 2
+  transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: urtC
   locus_tag: PMM0972
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 0
-  transport_substrate_confirmed_rows: 2
+  tcdb_evidence_score_max: 0.8
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 2
+  transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: urtD
   locus_tag: PMM0973
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 0
-  transport_substrate_confirmed_rows: 2
+  tcdb_evidence_score_max: 0.8
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 2
+  transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: urtE
   locus_tag: PMM0974
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 0
-  transport_substrate_confirmed_rows: 2
+  tcdb_evidence_score_max: 0.8
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 2
+  transport_substrate_resolution: resolved
   transporter_count: 2
 top_reactions: []
 top_tcdb_families:
 - gene_count: 5
   level_kind: tc_specificity
   metabolite_count: 1
+  substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.4.4
-  tcdb_family_name: 3.A.1.4.4
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: The high-affinity (
 - gene_count: 5
   level_kind: tc_specificity
   metabolite_count: 1
+  substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.4.5
-  tcdb_family_name: 3.A.1.4.5
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
 total_matching: 10
 transporter_count_total: 2
 truncated: false

@@ -2526,24 +2526,20 @@ class TestGenesByMetabolite:
     drift during the genes_by_metabolite Phase 2 build, 2026-05-03.)
     """
 
-    @pytest.mark.xfail(
-        reason="slice-2: transport_confidence must migrate to substrate_depth "
-               "(KG 2026-08 TCDB upgrade)",
-        strict=False,
-    )
     def test_urea_med4_both_arms_round_trip(self, conn):
-        """Urea × MED4: both arms exercised, fi > sc post-2026-05-05 rebuild.
+        """Urea × MED4: both arms exercised under the TCDB substrate_depth
+        migration (spec 2026-08-20; deepest-attachment predicate, decision 4).
 
-        XFAIL (2026-08-20): pins the substrate_confirmed / family_inferred
-        split, which the 2026-08 TCDB rebuild broke (level_kind
-        classification); re-pin in slice 2 after the substrate_depth
-        migration — do not bake interim values.
-
-        Pins live-KG snapshot (verified 2026-05-05 post-rebuild):
-        total_matching=26, gene_count_total=21, metabolism_rows=4,
-        transport_substrate_confirmed_rows=10, transport_family_inferred_rows=12.
-        Family-inferred-dominance warning fires (fi=12 > sc=10) — flipped from
-        2026-05-03 state where sc > fi.
+        Live-pinned 2026-08-26 via run_cypher with the spec's predicate
+        (`NOT EXISTS { (g)-[:Gene_has_tcdb_family]->(d) WHERE
+        (d)-[:Tcdb_family_is_a_tcdb_family*1..4]->(tf) }`):
+          metabolism rows 4 (4 genes);
+          transport rows 30 = 10 most_specific (5 genes urtABCDE on
+          3.A.1.4.4 / 3.A.1.4.5) + 20 inherited (20 genes, all via 3.A.1;
+          the 38 superseded 3.A.1 rows of the all-edges walk are gone);
+          total_matching 34; gene_count_total 29 (union across arms).
+        Inherited dominates (20 > 10) → GBM auto-warning fires naming
+        `substrate_depth=['most_specific']`.
         """
         from multiomics_explorer.mcp_server.tools import (
             GenesByMetaboliteResponse,
@@ -2552,35 +2548,106 @@ class TestGenesByMetabolite:
         result = api.genes_by_metabolite(
             metabolite_ids=["kegg.compound:C00086"],
             organism="Prochlorococcus MED4",
+            limit=50,
             conn=conn,
         )
         model = GenesByMetaboliteResponse(**result)
-        assert model.total_matching == 26
-        assert model.gene_count_total == 21
+        assert model.total_matching == 34
+        assert model.gene_count_total == 29
         urea_row = next(
             r for r in model.by_metabolite
             if r.metabolite_id == "kegg.compound:C00086"
         )
         assert urea_row.metabolism_rows == 4
-        assert urea_row.transport_substrate_confirmed_rows == 10
-        assert urea_row.transport_family_inferred_rows == 12
-        assert any("family_inferred" in w for w in model.warnings)
+        assert urea_row.transport_most_specific_rows == 10
+        assert urea_row.transport_inherited_rows == 20
+        depth_counts = {r.substrate_depth: r.count for r in model.by_substrate_depth}
+        assert depth_counts == {"most_specific": 10, "inherited": 20}
+        assert any("substrate_depth=['most_specific']" in w for w in model.warnings)
+        assert not any("family_inferred" in w for w in model.warnings)
 
-    @pytest.mark.xfail(
-        reason="slice-2: transport_confidence must migrate to substrate_depth "
-               "(KG 2026-08 TCDB upgrade)",
-        strict=False,
-    )
+        # Detail ordering: metabolism → most_specific → inherited; within a
+        # transport tier tcdb_evidence_score desc (urtBCDE 0.8 before urtA 0.6).
+        rows = model.results
+        tiers = [
+            (r.evidence_source, r.substrate_depth) for r in rows
+        ]
+        tier_rank = {("metabolism", None): 0, ("transport", "most_specific"): 1,
+                     ("transport", "inherited"): 2}
+        ranks = [tier_rank[t] for t in tiers]
+        assert ranks == sorted(ranks)
+        ms_scores = [r.tcdb_evidence_score for r in rows
+                     if r.substrate_depth == "most_specific"]
+        assert ms_scores == sorted(ms_scores, reverse=True)
+        assert set(ms_scores) == {0.8, 0.6}
+        inh_scores = [r.tcdb_evidence_score for r in rows
+                      if r.substrate_depth == "inherited"]
+        assert inh_scores == sorted(inh_scores, reverse=True)
+        for r in rows:
+            if r.evidence_source == "metabolism":
+                assert r.substrate_depth is None
+                assert r.tcdb_evidence_score is None
+            else:
+                assert r.tcdb_evidence_score is not None
+        # top_genes carry the gene-level TCDB facts
+        urt = next(g for g in model.top_genes if g.locus_tag == "PMM0974")
+        assert urt.transport_substrate_resolution == "resolved"
+        assert urt.tcdb_evidence_score_max == 0.8
+
+    def test_urea_med4_substrate_depth_filter_narrows(self, conn):
+        """Spec acceptance 2: `substrate_depth=['most_specific']` narrows the
+        transport arm live — urea × MED4 → exactly the 10 urtABCDE rows
+        (PMM0970–PMM0974 on 3.A.1.4.4 / 3.A.1.4.5); metabolism arm
+        untouched (4 rows); no inherited-dominance warning when the user
+        set the filter."""
+        result = api.genes_by_metabolite(
+            metabolite_ids=["kegg.compound:C00086"],
+            organism="Prochlorococcus MED4",
+            substrate_depth=["most_specific"],
+            limit=50,
+            conn=conn,
+        )
+        assert result["total_matching"] == 14
+        transport = [r for r in result["results"] if r["evidence_source"] == "transport"]
+        assert len(transport) == 10
+        assert {r["substrate_depth"] for r in transport} == {"most_specific"}
+        assert {r["locus_tag"] for r in transport} == {
+            "PMM0970", "PMM0971", "PMM0972", "PMM0973", "PMM0974",
+        }
+        assert {r["tcdb_family_id"] for r in transport} == {
+            "tcdb:3.A.1.4.4", "tcdb:3.A.1.4.5",
+        }
+        assert result["warnings"] == []
+
+    def test_old_transport_confidence_values_raise_with_rename_pointer(self, conn):
+        """Spec acceptance 3: the retired value strings raise with a rename
+        pointer; the retired parameter name is gone."""
+        for old, new in (("substrate_confirmed", "most_specific"),
+                         ("family_inferred", "inherited")):
+            with pytest.raises(ValueError, match=new):
+                api.genes_by_metabolite(
+                    metabolite_ids=["kegg.compound:C00086"],
+                    organism="Prochlorococcus MED4",
+                    substrate_depth=[old],
+                    conn=conn,
+                )
+        with pytest.raises(TypeError):
+            api.genes_by_metabolite(
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+                transport_confidence="substrate_confirmed",
+                conn=conn,
+            )
+
     def test_nitrite_med4_transport_only_warning_fires(self, conn):
-        """Nitrite × MED4: transport-only, fi > sc, auto-warning fires.
+        """Nitrite × MED4: transport-only; inherited dominates; auto-warning.
 
-        XFAIL (2026-08-20): the family_inferred-dominance warning derives
-        from the broken level_kind classification post-TCDB-rebuild; re-pin
-        in slice 2 after the substrate_depth migration.
-
-        Pins live-KG snapshot (verified 2026-05-05 post-rebuild):
-        total_matching=17, no metabolism rows, substrate_confirmed=5,
-        family_inferred=12, family-inferred-dominance warning present.
+        Live-pinned 2026-08-26 (spec + KG review §1, reproduced via
+        run_cypher with the deepest-attachment predicate): 29 transport
+        rows = 6 most_specific (4 genes, 2.A.16 formate-nitrite family) +
+        23 inherited (23 genes via 3.A.1); 27 distinct genes; 39 superseded
+        3.A.1 rows dropped (all-edges walk gave 68 rows / 63 genes). No
+        metabolism rows (MED4 has no nitrite-anchored reaction).
         """
         from multiomics_explorer.mcp_server.tools import (
             GenesByMetaboliteResponse,
@@ -2589,19 +2656,153 @@ class TestGenesByMetabolite:
         result = api.genes_by_metabolite(
             metabolite_ids=["kegg.compound:C00088"],
             organism="Prochlorococcus MED4",
+            limit=50,
             conn=conn,
         )
         model = GenesByMetaboliteResponse(**result)
-        assert model.total_matching == 17
+        assert model.total_matching == 29
+        assert model.gene_count_total == 27
         es_counts = {r.evidence_source: r.count for r in model.by_evidence_source}
         assert "metabolism" not in es_counts
-        assert es_counts.get("transport") == 17
-        tc_counts = {
-            r.transport_confidence: r.count
-            for r in model.by_transport_confidence
-        }
-        assert tc_counts == {"substrate_confirmed": 5, "family_inferred": 12}
-        assert any("family_inferred" in w for w in model.warnings)
+        assert es_counts.get("transport") == 29
+        depth_counts = {r.substrate_depth: r.count for r in model.by_substrate_depth}
+        assert depth_counts == {"most_specific": 6, "inherited": 23}
+        assert len({r.locus_tag for r in model.results}) == 27
+        warning = next(
+            (w for w in model.warnings if "substrate_depth=['most_specific']" in w),
+            None,
+        )
+        assert warning is not None, model.warnings
+        assert "(23 of 29)" in warning
+        assert "family_inferred" not in warning
+
+
+@pytest.mark.kg
+class TestTcdbSubstrateDepthCrossToolAgreement:
+    """Spec acceptance 4 + 5 (KG review §1): rows, envelope counts and the
+    KG's precomputed transport scalars are projections of ONE (gene,
+    metabolite) set once every transport-arm traversal applies the
+    deepest-attachment predicate. Numbers live-verified 2026-08-26.
+    """
+
+    _MED4 = "Prochlorococcus MED4"
+    _NITRITE = "kegg.compound:C00088"
+
+    def test_gene_overview_pmm0001_no_tcdb_call(self, conn):
+        """PMM0001 → tcdb_evidence_score_max None (sparse prop surfaced as
+        null, never a sentinel) / transported_metabolite_count 0 /
+        transport_substrate_resolution None; transporter_count is gone."""
+        row = api.gene_overview(["PMM0001"], conn=conn)["results"][0]
+        assert "transporter_count" not in row
+        assert row["tcdb_evidence_score_max"] is None
+        assert row["transported_metabolite_count"] == 0
+        assert row["transport_substrate_resolution"] is None
+        assert "transport" not in row["evidence_sources"]
+
+    def test_gene_overview_pmm0392_resolved(self, conn):
+        """PMM0392 (ABC transporter; deepest families 3.A.1.{25,28,29,30,31,
+        32,33}) → 0.8 / 13 / 'resolved'."""
+        row = api.gene_overview(["PMM0392"], conn=conn)["results"][0]
+        assert "transporter_count" not in row
+        assert row["tcdb_evidence_score_max"] == 0.8
+        assert row["transported_metabolite_count"] == 13
+        assert row["transport_substrate_resolution"] == "resolved"
+        assert "transport" in row["evidence_sources"]
+
+    def test_mbg_pmm0392_transport_metabolites_equal_gene_overview_count(self, conn):
+        """(i) distinct metabolites in metabolites_by_gene(['PMM0392'])
+        transport rows == gene_overview.transported_metabolite_count == 13
+        (all-edges semantics gave 554 — the superseded 3.A.1 rollup)."""
+        mbg = api.metabolites_by_gene(
+            ["PMM0392"], self._MED4, evidence_sources=["transport"],
+            limit=1000, conn=conn,
+        )
+        assert not mbg["truncated"]
+        mets = {r["metabolite_id"] for r in mbg["results"]}
+        assert len(mets) == 13
+        ov = api.gene_overview(["PMM0392"], conn=conn)["results"][0]
+        assert len(mets) == ov["transported_metabolite_count"] == 13
+        by_gene = next(g for g in mbg["by_gene"] if g["locus_tag"] == "PMM0392")
+        assert by_gene["metabolite_count"] == 13
+        assert by_gene["transport_substrate_resolution"] == "resolved"
+        assert by_gene["tcdb_evidence_score_max"] == 0.8
+        # decision 5 caveat: resolved genes do not trigger the gene-anchored
+        # warning even when inherited rows are present
+        assert not any("family_inferred" in w for w in mbg["warnings"])
+
+    def test_gbm_nitrite_med4_distinct_transport_genes(self, conn):
+        """(ii) distinct genes in genes_by_metabolite(nitrite, MED4)
+        transport rows == 27."""
+        gbm = api.genes_by_metabolite(
+            [self._NITRITE], self._MED4, evidence_sources=["transport"],
+            limit=1000, conn=conn,
+        )
+        assert not gbm["truncated"]
+        genes = {r["locus_tag"] for r in gbm["results"]}
+        assert len(genes) == 27
+        assert gbm["gene_count_total"] == 27
+
+    def test_gbm_nitrite_all_organisms_sum_equals_transporter_gene_count(self, conn):
+        """(iii) distinct transport genes for nitrite summed over ALL
+        organisms == list_metabolites transporter_gene_count (2,318).
+        Method: loop list_organisms(preferred_name) →
+        genes_by_metabolite(evidence_sources=['transport']) and union the
+        locus_tags (a gene belongs to exactly one organism, so the set-union
+        is exact even though genes_by_metabolite's `organism=` is a
+        word-CONTAINS match).
+
+        No per-organism count is pinned: the exact Cypher (deepest-attachment
+        predicate, DISTINCT g.organism_name) gives 42 organisms, but the
+        API loop reports 43–44 because some preferred_names word-match
+        other strains' genes — the genus-level organism "Alteromonas"
+        matches every Alteromonas strain (856 genes vs ≤157 per strain) and
+        "Alteromonas mediterranea AltDE" ⊂ "…AltDE1" — a fuzzy-match
+        artefact, not an invariant (diagnosed live 2026-08-26)."""
+        lm = api.list_metabolites(metabolite_ids=[self._NITRITE], conn=conn)
+        assert lm["results"][0]["transporter_gene_count"] == 2318
+
+        orgs = api.list_organisms(limit=500, conn=conn)["results"]
+        assert len(orgs) >= 47
+        genes: set[str] = set()
+        for org in orgs:
+            gbm = api.genes_by_metabolite(
+                [self._NITRITE], org["organism_name"],
+                evidence_sources=["transport"], limit=5000, conn=conn,
+            )
+            assert not gbm["truncated"], org["organism_name"]
+            genes |= {r["locus_tag"] for r in gbm["results"]}
+        assert len(genes) == 2318
+
+    def test_list_metabolites_transporter_gene_count_closes_trap_loop(self, conn):
+        """list_metabolites row `transporter_gene_count` (deepest-attachment
+        transporter genes). Spec acceptance 4 says glucose > 0; live
+        2026-08-26 (current KG build) glucose reads catalyst 277 /
+        transporter_gene_count 1422 — NOT the spec's 3051 / 0 snapshot from
+        2026-08-20, so only `> 0` is pinned for glucose. The transport-only
+        trap loop (`catalyst_gene_count == 0, transporter_gene_count > 0`)
+        is pinned on sodium cation (kegg.compound:C01330: 0 / 6655 live)."""
+        rows = api.list_metabolites(
+            metabolite_ids=["kegg.compound:C00031", "kegg.compound:C01330"],
+            limit=10, conn=conn,
+        )["results"]
+        by_id = {r["metabolite_id"]: r for r in rows}
+        glucose = by_id["kegg.compound:C00031"]
+        assert glucose["transporter_gene_count"] > 0
+        sodium = by_id["kegg.compound:C01330"]
+        assert sodium["catalyst_gene_count"] == 0
+        assert sodium["transporter_gene_count"] == 6655
+        assert sodium["evidence_sources"] == ["transport"]
+
+    def test_list_organisms_med4_transported_metabolite_count(self, conn):
+        """list_organisms: MED4 transported_metabolite_count > 0 on the row
+        and on its by_metabolic_capability entry (ranking unchanged)."""
+        res = api.list_organisms(organism_names=[self._MED4], conn=conn)
+        row = res["results"][0]
+        assert row["transported_metabolite_count"] > 0
+        cap = next(c for c in res["by_metabolic_capability"]
+                   if c["organism_name"] == self._MED4)
+        assert cap["transported_metabolite_count"] == row["transported_metabolite_count"]
+        assert cap["catalyzed_metabolite_count"] == row["catalyzed_metabolite_count"]
 
 
 # ===========================================================================

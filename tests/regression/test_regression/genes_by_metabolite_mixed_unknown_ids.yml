@@ -1,26 +1,26 @@
 by_evidence_source:
-- count: 22
+- count: 30
   evidence_source: transport
 - count: 4
   evidence_source: metabolism
 by_metabolite:
 - formula: CH4N2O
-  gene_count: 21
+  gene_count: 29
   metabolism_rows: 4
   metabolite_id: kegg.compound:C00086
   name: Urea
   reaction_count: 2
-  rows: 26
-  transport_family_inferred_rows: 12
-  transport_substrate_confirmed_rows: 10
+  rows: 34
+  transport_inherited_rows: 20
+  transport_most_specific_rows: 10
   transporter_count: 3
-by_transport_confidence:
-- count: 12
-  transport_confidence: family_inferred
+by_substrate_depth:
+- count: 20
+  substrate_depth: inherited
 - count: 10
-  transport_confidence: substrate_confirmed
+  substrate_depth: most_specific
 case_id: genes_by_metabolite_mixed_unknown_ids
-gene_count_total: 21
+gene_count_total: 29
 metabolite_count_total: 1
 not_found:
   metabolite_ids:
@@ -46,9 +46,10 @@ results:
   product: urease alpha subunit
   reaction_id: kegg.reaction:R00131
   reaction_name: urea amidohydrolase; Urea + H2O <=> CO2 + 2 Ammonia
+  substrate_depth: null
+  tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
-  transport_confidence: null
 - ec_numbers:
   - 3.5.1.5
   evidence_source: metabolism
@@ -63,9 +64,10 @@ results:
   product: urease beta subunit
   reaction_id: kegg.reaction:R00131
   reaction_name: urea amidohydrolase; Urea + H2O <=> CO2 + 2 Ammonia
+  substrate_depth: null
+  tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
-  transport_confidence: null
 - ec_numbers:
   - 3.5.1.5
   evidence_source: metabolism
@@ -80,25 +82,27 @@ results:
   product: urease gamma subunit
   reaction_id: kegg.reaction:R00131
   reaction_name: urea amidohydrolase; Urea + H2O <=> CO2 + 2 Ammonia
+  substrate_depth: null
+  tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
-  transport_confidence: null
 - ec_numbers: null
   evidence_source: transport
-  gene_name: urtA
-  locus_tag: PMM0970
+  gene_name: urtB
+  locus_tag: PMM0971
   mass_balance: null
   metabolite_chebi_id: '134711'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
-  product: ABC-type urea transporter, substrate binding component
+  product: ABC-type urea transporter, permease component
   reaction_id: null
   reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.4
-  tcdb_family_name: 3.A.1.4.4
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: The high-affinity (
 - ec_numbers:
   - 3.5.3.1
   - 3.5.3.11
@@ -114,19 +118,30 @@ results:
   product: agmatinase
   reaction_id: kegg.reaction:R01157
   reaction_name: agmatine amidinohydrolase; Agmatine + H2O <=> Putrescine + Urea
+  substrate_depth: null
+  tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
-  transport_confidence: null
 returned: 5
 row_count: 5
 top_gene_categories:
 - category: Stress response and adaptation
-  gene_count: 11
+  gene_count: 12
 - category: Transport
-  gene_count: 8
+  gene_count: 10
 - category: Carbohydrate metabolism
   gene_count: 1
+- category: Cell cycle and division
+  gene_count: 1
 - category: Cellular processes
+  gene_count: 1
+- category: Coenzyme metabolism
+  gene_count: 1
+- category: Post-translational modification
+  gene_count: 1
+- category: Replication and repair
+  gene_count: 1
+- category: Translation
   gene_count: 1
 top_genes:
 - gene_name: urtA
@@ -134,80 +149,100 @@ top_genes:
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 0
-  transport_substrate_confirmed_rows: 2
+  tcdb_evidence_score_max: 0.6
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 2
+  transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: urtB
   locus_tag: PMM0971
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 0
-  transport_substrate_confirmed_rows: 2
+  tcdb_evidence_score_max: 0.8
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 2
+  transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: urtC
   locus_tag: PMM0972
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 0
-  transport_substrate_confirmed_rows: 2
+  tcdb_evidence_score_max: 0.8
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 2
+  transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: urtD
   locus_tag: PMM0973
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 0
-  transport_substrate_confirmed_rows: 2
+  tcdb_evidence_score_max: 0.8
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 2
+  transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: urtE
   locus_tag: PMM0974
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 0
-  transport_substrate_confirmed_rows: 2
+  tcdb_evidence_score_max: 0.8
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 2
+  transport_substrate_resolution: resolved
   transporter_count: 2
-- gene_name: ecfA1
-  locus_tag: PMM0125
+- gene_name: sufC
+  locus_tag: PMM0072
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
+  tcdb_evidence_score_max: 0.4
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: resolved
   transporter_count: 1
-- gene_name: cbiQ
-  locus_tag: PMM0392
+- gene_name: null
+  locus_tag: PMM0089
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
+  tcdb_evidence_score_max: 0.4
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: resolved
   transporter_count: 1
-- gene_name: ftsE
-  locus_tag: PMM0434
+- gene_name: tolC
+  locus_tag: PMM0097
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
+  tcdb_evidence_score_max: 0.4
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: resolved
   transporter_count: 1
-- gene_name: ccmA
-  locus_tag: PMM0449
+- gene_name: cgtA
+  locus_tag: PMM0218
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
+  tcdb_evidence_score_max: 0.0
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: resolved
   transporter_count: 1
-- gene_name: ycf38
-  locus_tag: PMM0450
+- gene_name: minD
+  locus_tag: PMM0321
   metabolism_rows: 0
   metabolite_count: 1
   reaction_count: 0
-  transport_family_inferred_rows: 1
-  transport_substrate_confirmed_rows: 0
+  tcdb_evidence_score_max: 0.2
+  transport_inherited_rows: 1
+  transport_most_specific_rows: 0
+  transport_substrate_resolution: resolved
   transporter_count: 1
 top_reactions:
 - ec_numbers:
@@ -224,30 +259,30 @@ top_reactions:
   name: agmatine amidinohydrolase; Agmatine + H2O <=> Putrescine + Urea
   reaction_id: kegg.reaction:R01157
 top_tcdb_families:
-- gene_count: 12
+- gene_count: 20
   level_kind: tc_family
   metabolite_count: 1
+  substrate_depth: inherited
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
-  transport_confidence: family_inferred
 - gene_count: 5
   level_kind: tc_specificity
   metabolite_count: 1
+  substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.4.4
-  tcdb_family_name: 3.A.1.4.4
-  transport_confidence: substrate_confirmed
+  tcdb_family_name: The high-affinity (
 - gene_count: 5
   level_kind: tc_specificity
   metabolite_count: 1
+  substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.4.5
-  tcdb_family_name: 3.A.1.4.5
-  transport_confidence: substrate_confirmed
-total_matching: 26
+  tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
+total_matching: 34
 transporter_count_total: 3
 truncated: true
 warnings:
-- 'Most transport rows are `family_inferred` (12 of 22) — annotations rolled up from
-  family-level transport potential. Workflow-dependent: use `transport_confidence=''substrate_confirmed''`
-  for conservative-cast questions (e.g. cross-organism inference); keep `family_inferred`
-  for broad-screen candidate enumeration. Both tiers are annotations, neither is ground
-  truth — see analysis-doc §g.'
+- Most transport rows are `inherited` (20 of 30) — the substrate is reached through
+  a broader family's substrate list, not the gene's most specific surviving node.
+  Use substrate_depth=['most_specific'] for conservative-cast questions (e.g. cross-organism
+  inference); keep `inherited` rows for broad-screen candidate enumeration, and rank
+  within a tier by `tcdb_evidence_score`. Per-gene trust lives in `top_genes[].transport_substrate_resolution`.

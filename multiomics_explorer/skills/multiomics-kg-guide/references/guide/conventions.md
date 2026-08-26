@@ -317,36 +317,50 @@ selected assay is non-rankable, soft-exclude on mixed input.
 
 ---
 
-## Transport-confidence discriminator (chemistry)
+## Transport trust ladder (chemistry)
 
-Substrates in TCDB are curated at the **leaf** level
-(`tc_specificity`), and the rollup unions those substrates **up** the
-family hierarchy: every ancestor family is annotated with the union of
-substrates curated for any of its descendant leaves. The design rationale
-is biological: transporter substrate specificity is uncertain, so genes
-annotated to broad TCDB families (common in homology-based annotation)
-can still surface the candidate substrates curated at any descendant
-leaf. The `transport_confidence` field on transport rows discriminates
-the two cases:
+TCDB substrates are attached to transporter family nodes and inherited
+down the family hierarchy, so a gene annotated to a broad family (common
+in homology-based annotation) still surfaces candidate substrates. Read
+transport evidence as a three-level ladder, top down:
 
-- **`substrate_confirmed`** — the gene is annotated to the leaf
-  (`tc_specificity`) family that is *itself* curated for this
-  metabolite. Direct evidence.
-- **`family_inferred`** — the gene is annotated to a non-leaf ancestor
-  family. The metabolite is curated on *some* descendant leaf, but
-  we don't know which specific subfamily applies to this gene. Lower
-  precision, broader-screen evidence.
+1. **`tcdb_evidence_score`** (transport row) / **`tcdb_evidence_score_max`**
+   (gene; `gene_overview`, `top_genes`, `by_gene`) — how corroborated the
+   gene × family call is, on `[0, 1]`. Rank by it; never filter by it. `0`
+   is an uncorroborated hit, not an absent call — absent is
+   `tcdb_evidence_score_max = None` (no TCDB call on the gene at all). The
+   `'tcdb' ∈ annotation_types` gate on `gene_overview` is the binary
+   version of the same evidence; the score is the graded one.
+2. **`transport_substrate_resolution`** (gene) — is the gene's substrate
+   breadth meaningful. `family_inferred` means every deepest attachment is
+   a lumping family: the breadth is reachability, not capability, and
+   `substrate_depth=['most_specific']` does not screen such genes out
+   (substrates no kept child of the superfamily carries sit
+   `most_specific` at the superfamily itself).
+   `resolved` means **at least one** deepest attachment is non-lumping —
+   not all of them. A gene attached at both a specific family and the ABC
+   superfamily is `resolved` and still carries the superfamily rollup in
+   its `transported_metabolite_count`; only the row level separates them.
+3. **`substrate_depth`** (transport row) — `most_specific` is the most
+   specific *surviving* transporter node for this substrate relative to
+   the gene-pruned hierarchy; it can be a family node when no gene in the
+   KG is annotated below it, and it is not a curation level. `inherited`
+   rows came down from an ancestor's substrate set.
 
-`family_inferred` dominates by volume (per-gene median ≈ 6 metabolites
-of substrate evidence, p90 ≈ 90, max = 551 via the ABC superfamily).
-`metabolites_by_gene` and `genes_by_metabolite` emit an automatic
-warning when `family_inferred` overwhelms `substrate_confirmed` on
-the result set, and `metabolites_by_gene` sorts globally by precision
-tier so a single ABC-only gene cannot consume the `limit`.
+Transport rows are **deepest-attachment projections**: a gene attached to
+a family and to one of its descendants contributes rows only through the
+descendant, so distinct genes / metabolites across the rows match the KG's
+`transporter_gene_count` / `transported_metabolite_count`. Superseded
+ancestor rows are intentionally absent; full family membership (ancestors
+included) is visible via `gene_ontology_terms(ontology='tcdb')`.
 
-Filter with `transport_confidence=['substrate_confirmed']` to suppress
-the rollup-tier rows when precision matters. See `docs://analysis/metabolites`
-for the full discriminator semantics.
+`metabolites_by_gene` and `genes_by_metabolite` emit an automatic warning
+when inherited rows dominate (metabolite-anchored) or when input genes
+read `family_inferred` (gene-anchored), and sort detail rows
+metabolism → `most_specific` → `inherited`, then by score, so a single
+superfamily-only gene cannot consume the `limit`. Filter with
+`substrate_depth=['most_specific']` when precision matters. See
+`docs://analysis/metabolites` for the full ladder.
 
 ---
 
