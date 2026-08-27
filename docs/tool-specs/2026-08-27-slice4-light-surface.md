@@ -33,7 +33,7 @@ New tools; changes to the trust surface (slice 3); spec §15 follow-ups from 3b 
 
 - Row columns (compact, after `measured_metabolite_count`): `peptidase_gene_count`, `nonpeptidase_homolog_gene_count`, `interpro_gene_count`, `ncbifam_gene_count` — `coalesce(o.<prop>, 0)`, same form as the chemistry rollups. Verbose unchanged.
 - Envelope `by_annotation_capability`: top-10 organisms (within the matched set) by `peptidase_gene_count` desc, then `preferred_name`; carries all four columns; excludes rows with all four = 0. Mirrors `by_metabolic_capability` (api-side over matched rows in detail mode; summary builder in summary mode).
-- Filter: `min_peptidase_gene_count: int | None` — the only new param; Cypher `coalesce(o.peptidase_gene_count, 0) >= $min_peptidase_gene_count`. (No filters on the other three — coverage counts are for reading, not selecting.)
+- No new filter (decided 2026-08-27): `list_organisms` returns 48 rows; agents read the `by_annotation_capability` ranking instead of selecting. Coverage counts are for reading, not selecting.
 - Invariant test (`-m kg`, `test_trust_invariants.py`): per organism, `peptidase_gene_count` == `count(DISTINCT g)` over `(o)<-[:Gene_belongs_to_organism]-(g:Gene)` with `'peptidase' IN coalesce(g.merops_classes, [])`. **Join by edge, never by name** — the treatment-organism node `Meiothermus ruber` shares its `preferred_name` with the MruberA strain (KG review ORG-001).
 
 ### 3.4 Paper-batch absorption (no new params)
@@ -57,7 +57,7 @@ Unchanged on every tool. `list_organisms` stays "always small" (48 rows, `verbos
 
 | tool | new params |
 |---|---|
-| `list_organisms` | `min_peptidase_gene_count: int \| None = None` |
+| `list_organisms` | none — new columns + envelope key only |
 | `list_filter_values` | `filter_type` += `cluster_type` |
 | everything else | none — new columns / envelope keys only |
 
@@ -106,7 +106,7 @@ MATCH (e:Experiment) RETURN count(e) AS n, count(e.table_scope) AS with_scope, s
 
 ## 8. Tests, docs, build order
 
-- RED: unit for the 3 builders/api/wrappers + `EXPECTED_KG_SHAPE` bucket 6 (mock hash match / mismatch / absent → ok / warn / warn), `list_filter_values('cluster_type')` vocab + pivot paths; integration `-m kg`: 7.2 invariant, 7.5 identity (hash equality with the pin — this test IS the release-time guard), 7.6 sparsity; edge-case scenarios: `min_peptidase_gene_count` above max → 0 rows, organism with all-zero rollups (genome-only) excluded from `by_annotation_capability`.
+- RED: unit for the 3 builders/api/wrappers + `EXPECTED_KG_SHAPE` bucket 6 (mock hash match / mismatch / absent → ok / warn / warn), `list_filter_values('cluster_type')` vocab + pivot paths; integration `-m kg`: 7.2 invariant, 7.5 identity (hash equality with the pin — this test IS the release-time guard), 7.6 sparsity; edge-case scenarios: organism with all-zero rollups excluded from `by_annotation_capability`; `organism_names=` subset with zero peptidase genes → empty `by_annotation_capability`.
 - Regression: `--force-regen` — expect the §3.4 diffs and nothing else; every other diff is a concern.
 - Docs: yamls for the 5 touched tools, `analysis/metabolites.md` (§3.2 note), `guide/conventions.md` (sparse `table_scope`, open `growth_phases`, vocab-hash warn), `CLAUDE.md` rows, `examples/annotation_evidence.py` gains an organism-rollup scenario.
 - Order: KG up → `schema_baseline` refresh → §7 verified → freeze → worktree (`EnterWorktree` then `git reset --hard main`) → RED → GREEN (4 agents, explicit-path staging) → VERIFY → merge → `/release-explorer 0.1.0-alpha.5`.
@@ -115,7 +115,7 @@ MATCH (e:Experiment) RETURN count(e) AS n, count(e.table_scope) AS with_scope, s
 
 1. `kg_release_info()` on KG-SYNC-006 → `verdict: ok`, bucket 6 passed; with the pin altered → `warn` naming the hash.
 2. `genes_by_metabolite(metabolite_ids=['<urea>'], organism='MED4')` transport rows carry `transport_substrate_resolution`; metabolism rows carry `None`.
-3. `list_organisms()` → 48 rows, `by_annotation_capability[0]` = Alteromonas MarRef with `peptidase_gene_count=148`; `min_peptidase_gene_count=100` narrows the set.
+3. `list_organisms()` → 48 rows, `by_annotation_capability[0]` = Alteromonas MarRef with `peptidase_gene_count=148`; `list_organisms(organism_names=['Prochlorococcus MED4'])` → `by_annotation_capability` has exactly MED4.
 4. `list_filter_values(filter_type='cluster_type')` → 6 values, `source='vocabulary'`.
 5. Regression regen diff matches §3.4 only.
 
