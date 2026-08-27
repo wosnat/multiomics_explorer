@@ -11803,8 +11803,8 @@ class TestKGReleaseInfo:
         report = kg_release_info(conn)
 
         assert report["verdict"] == "ok"
-        # 5 + 5 + 3 + 2 + 1 = 16 asserts
-        assert len(report["asserts"]) == 16
+        # 5 + 5 + 3 + 2 + 1 + 1 = 17 asserts (bucket 6, spec slice-4 §3.1)
+        assert len(report["asserts"]) == 17
         assert all(a["passed"] for a in report["asserts"])
         assert "OK:" in report["summary"]
         assert report["kg"]["version"] == "0.1.0"
