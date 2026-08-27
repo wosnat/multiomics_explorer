@@ -48,7 +48,20 @@ VALID_OMICS_TYPES: set[str] = {
 # (api/functions.kg_release_info). Five buckets, all small. Bucket 5
 # (version compatibility) is computed in api/functions.py, not stored here.
 # See docs/superpowers/specs/2026-06-02-kg-compatibility-check-design.md §5.
-EXPECTED_KG_SHAPE: dict[str, tuple[str, ...]] = {
+#
+# Bucket 6 (vocabulary set): the `Schema_info.controlled_vocabularies_hash`
+# this explorer was built against (KG-SYNC-006 + dense-list fix, built
+# 2026-08-27T16:11Z). The recipe lives KG-side (docs/kg-changes/
+# vocabulary-contract.md). A mismatch means baked docs / Field descriptions
+# may list stale values — filters still validate live. Must equal the live
+# KG's value at release cut.
+EXPECTED_CONTROLLED_VOCABULARIES_HASH: str = (
+    "sha256:61709080e7de57d755e0e417ea782b6fc9e7611608b12f2b45aff9e715a6e0ae"
+)
+
+EXPECTED_KG_SHAPE: dict[str, tuple[str, ...] | str] = {
+    # 6. Vocabulary set (see above).
+    "controlled_vocabularies_hash": EXPECTED_CONTROLLED_VOCABULARIES_HASH,
     # 1. The contract surface — Schema_info must exist and carry these properties.
     "schema_info_required_props": (
         "version",

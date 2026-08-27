@@ -16,7 +16,7 @@ New tools; changes to the trust surface (slice 3); spec §15 follow-ups from 3b 
 
 ### 3.1 `kg_release_info` — vocabulary-set check (explorer-only)
 
-- `EXPECTED_KG_SHAPE` gains `"controlled_vocabularies_hash": "<value read from the final alpha.7 build — the 2026-08-27T15:41Z build read sha256:e81df139…43efd4; the dense-list fix adds vocab value `oxygen`, so RE-READ via §7.5 before RED>"` (recipe recipe in KG `docs/kg-changes/vocabulary-contract.md`: sorted canonical-JSON of `{id, value_type, closed, values, sparse, expected_empty, exhaustive, min_value, max_value, signal_count, signals}` per vocab entry, `\n`-joined, sha256 hex, `"sha256:"` prefix; `description` excluded ⇒ doc-only vocab edits do not trip it).
+- `EXPECTED_KG_SHAPE` gains `"controlled_vocabularies_hash": "sha256:61709080e7de57d755e0e417ea782b6fc9e7611608b12f2b45aff9e715a6e0ae" (read live from the post-fix build `built_at 2026-08-27T16:11Z`; the 15:41Z build read sha256:e81df139…43efd4 before `oxygen` was added)` (recipe in KG `docs/kg-changes/vocabulary-contract.md`: sorted canonical-JSON of `{id, value_type, closed, values, sparse, expected_empty, exhaustive, min_value, max_value, signal_count, signals}` per vocab entry, `\n`-joined, sha256 hex, `"sha256:"` prefix; `description` excluded ⇒ doc-only vocab edits do not trip it).
 - New assert bucket **6 — vocabulary set**: `{check: "controlled_vocabularies_hash", passed, expected, actual, detail}`. `passed` iff `schema_info.controlled_vocabularies_hash == expected`. Absent prop (pre-SYNC-005 KG) → `passed=False`, detail "KG predates the vocabulary contract".
 - Verdict fold-in: a failed bucket 6 yields `warn` (never worse). Summary sentence: "Vocabulary set differs from the one this explorer was built against — filters still validate live and `list_filter_values` reads live, but docs://ontologies pages and Field descriptions may list stale values."
 - `kg` envelope surfaces `controlled_vocabularies_hash` (already passed through via `s{.*}`; confirm it is not stripped by the projection at `api/functions.py:8584`).
@@ -97,7 +97,7 @@ RETURN v.values AS values, v.description AS description, v.closed AS closed
 -- 7.5 release identity
 MATCH (s:Schema_info {id: 'schema_info'})
 RETURN s.version, s.built_at, s.controlled_vocabularies_hash, s.paper_count, s.experiment_count, s.organism_count
--- expected hash sha256:e81df139…43efd4, paper_count 49, experiment_count 209, organism_count 48
+-- verified (post-fix build 16:11Z): hash sha256:61709080…a6e0ae, paper_count 49, experiment_count 209, organism_count 48; treatment_type / background_factors dense 209/209
 
 -- 7.6 table_scope sparsity + treatment-less experiments
 MATCH (e:Experiment) RETURN count(e) AS n, count(e.table_scope) AS with_scope, sum(CASE WHEN e.table_scope = '' THEN 1 ELSE 0 END) AS empty_string, sum(CASE WHEN e.treatment_type IS NULL THEN 1 ELSE 0 END) AS no_treatment
