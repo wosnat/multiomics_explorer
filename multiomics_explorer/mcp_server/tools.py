@@ -601,6 +601,12 @@ class GeneReactionMetaboliteTriplet(BaseModel):
         "KG 5-signal composite for the gene×family call, in [0,1]. Rank "
         "with it, don't filter: 0 = uncorroborated DIAMOND hit, not "
         "absent. Rows within a depth tier sort by it desc.")
+    transport_substrate_resolution: Literal["resolved", "family_inferred"] | None = Field(
+        default=None,
+        description="Transport rows only (None on metabolism rows). The gene's "
+        "KG-authoritative TCDB substrate resolution, repeated on each of its "
+        "transport rows — not a per-substrate fact ('family_inferred' = "
+        "reachability, not capability). Row fact: substrate_depth.")
 
     # metabolism-arm fields (None on transport rows)
     reaction_id: str | None = Field(
@@ -1343,7 +1349,7 @@ class KGAssert(BaseModel):
     )
     kind: Literal[
         "schema_info_prop", "node_label", "relationship_type",
-        "nonzero_count", "version_compat",
+        "nonzero_count", "version_compat", "controlled_vocabularies_hash",
     ] = Field(
         description=(
             "Assertion family. "
@@ -1351,10 +1357,20 @@ class KGAssert(BaseModel):
             "'node_label' = the named node label exists in db.labels(); "
             "'relationship_type' = the named relationship type exists in db.relationshipTypes(); "
             "'nonzero_count' = the named Schema_info count property is a positive int; "
-            "'version_compat' = installed explorer version satisfies KG.mcp_min_version under PEP 440."
+            "'version_compat' = installed explorer version satisfies KG.mcp_min_version under PEP 440; "
+            "'controlled_vocabularies_hash' = Schema_info.controlled_vocabularies_hash equals the hash this "
+            "explorer was built against (bucket 6 — a miss yields 'warn', never worse)."
         ),
     )
     passed: bool = Field(description="True if the assertion held against the live KG.")
+    expected: str | None = Field(
+        default=None,
+        description="Value this explorer expects (bucket 6: the pinned 'sha256:…' vocabulary-set hash). Null on older assert kinds.",
+    )
+    actual: str | None = Field(
+        default=None,
+        description="Value read from the live KG (bucket 6: Schema_info.controlled_vocabularies_hash; null when the KG predates the vocabulary contract). Null on older assert kinds.",
+    )
     detail: str | None = Field(
         default=None,
         description="Human-readable explanation when failed; null when passed.",
@@ -1377,6 +1393,14 @@ class KGIdentity(BaseModel):
     )
     git_sha_short: str | None = Field(default=None, description="Short git SHA of the KG build.")
     git_branch: str | None = Field(default=None, description="Git branch of the KG build.")
+    controlled_vocabularies_hash: str | None = Field(
+        default=None,
+        description=(
+            "'sha256:…' digest of the KG's ControlledVocabulary set (values, closedness, signals; "
+            "descriptions excluded). Compared against the explorer's pin in the "
+            "'controlled_vocabularies_hash' assert. Null on KGs built before the vocabulary contract."
+        ),
+    )
     deployment_role: str | None = Field(
         default=None,
         description=(
@@ -1540,6 +1564,7 @@ def register_tools(mcp: FastMCP):
         Verdict semantics:
         - `ok`     — explorer satisfies KG min-version + all schema asserts pass.
         - `warn`   — at least one assert failed; tools still serve but may emit confusing errors against the affected shapes. Filter `asserts` on `passed=False` for the failure list.
+        - A failed `controlled_vocabularies_hash` assert (bucket 6) yields `warn`: filters still validate live and `list_filter_values` reads live, but docs://ontologies pages and Field descriptions may list stale values. `kg.controlled_vocabularies_hash` carries the live digest.
         - `unknown` — could not evaluate (no `Schema_info` node in the KG — legacy build without release metadata, or wrong database).
 
         On non-`ok` verdicts, the tool emits `ctx.warning(summary)` so the surrounding MCP client surfaces it to the user. See `docs://guide/conventions` for cross-tool semantics.
@@ -1612,9 +1637,12 @@ def register_tools(mcp: FastMCP):
                     "evidence", "sources", "call_class", "interpro_type",
                     "ncbifam_family_type", "merops_catalytic_type",
                     "merops_family_class", "best_hit_kind", "pfam_support",
-                    "attachment_depth", "trust_axes", "link_kinds"],
+                    "attachment_depth", "trust_axes", "link_kinds",
+                    "cluster_type"],
             Field(description=(
-                "Which categorical filter to enumerate. `omics_type` returns "
+                "Which categorical filter to enumerate. `cluster_type` reads "
+                "the ClusteringAnalysis.cluster_type ControlledVocabulary "
+                "(pivot fallback + warning). `omics_type` returns "
                 "the full canonical enum incl. METABOLOMICS; `evidence_source` "
                 "returns Metabolite.evidence_sources values. The trust-surface "
                 "types (evidence, sources, call_class, interpro_type, "
@@ -1630,7 +1658,13 @@ def register_tools(mcp: FastMCP):
                         "one ontology key. Ignored on non-trust filter types.",
         )] = None,
     ) -> ListFilterValuesResponse:
-        """Enumerate valid values + counts for a categorical filter (gene_category, brite_tree, growth_phase, metric_type, value_kind, compartment, omics_type, evidence_source, plus the annotation-trust types).
+        """Enumerate valid values + counts for a categorical filter (gene_category, brite_tree, growth_phase, metric_type, value_kind, compartment, omics_type, evidence_source, cluster_type, plus the annotation-trust types).
+
+        `cluster_type` enumerates the closed ClusteringAnalysis.cluster_type
+        vocabulary from ControlledVocabulary (source='vocabulary'; falls back
+        to a pivot over ClusteringAnalysis nodes with a warning) — the live
+        source for the `cluster_type` filter on `list_clustering_analyses` /
+        `gene_clusters_by_gene`.
 
         [TRUST] evidence / sources / call_class / interpro_type /
         ncbifam_family_type / merops_catalytic_type / merops_family_class /
@@ -1693,6 +1727,11 @@ def register_tools(mcp: FastMCP):
         transported_metabolite_count: int = Field(default=0, description="Distinct metabolites this organism's genes transport via their deepest TCDB attachments (precomputed OrganismTaxon.transported_metabolite_count). Pairs with catalyzed_metabolite_count; 0 when no TCDB calls.")
         # Metabolomics measurement rollup
         measured_metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this organism via any MetaboliteAssay (precomputed OrganismTaxon.measured_metabolite_count). Different from catalyzed_metabolite_count (catalysis-arm chemistry capability). When > 0, drill in via list_metabolite_assays(organism=organism_name).")
+        # Annotation-capability rollups (precomputed OrganismTaxon props, coalesced to 0)
+        peptidase_gene_count: int = Field(default=0, description="Genes in this organism with a MEROPS 'peptidase' call (merops_classes). Precomputed OrganismTaxon.peptidase_gene_count; 0 when none. Drill in via genes_by_ontology(ontology='merops', call_class='peptidase').")
+        nonpeptidase_homolog_gene_count: int = Field(default=0, description="Genes with a MEROPS 'nonpeptidase_homolog' call (a gene can carry both classes). Precomputed OrganismTaxon.nonpeptidase_homolog_gene_count; 0 when none.")
+        interpro_gene_count: int = Field(default=0, description="Genes with at least one InterPro entry. Precomputed OrganismTaxon.interpro_gene_count; 0 when none. Coverage count for reading, not selecting.")
+        ncbifam_gene_count: int = Field(default=0, description="Genes with at least one NCBIfam family. Precomputed OrganismTaxon.ncbifam_gene_count; 0 when none. Coverage count for reading, not selecting.")
         # DM verbose-only fields
         derived_metric_gene_count: int | None = Field(default=None, description="Total gene-level DM annotation count (verbose-only).")
         derived_metric_types: list[str] | None = Field(default=None, description="Distinct metric_type tags observed (verbose-only).")
@@ -1726,6 +1765,14 @@ def register_tools(mcp: FastMCP):
         catalyzed_metabolite_count: int = Field(description="Distinct metabolites reachable via catalysis (Gene → Reaction → Metabolite). Same semantics as OrganismResult.catalyzed_metabolite_count.")
         transported_metabolite_count: int = Field(default=0, description="Distinct metabolites transported via deepest TCDB attachments. Same semantics as OrganismResult.transported_metabolite_count. Column only — ranking stays on catalyzed_metabolite_count.")
 
+    class OrgAnnotationCapabilityBreakdown(BaseModel):
+        preferred_name: str = Field(description="OrganismTaxon.preferred_name (tie-break sort key).")
+        organism_name: str = Field(description="Organism name as used by organism= filters elsewhere (e.g. 'Prochlorococcus MED4').")
+        peptidase_gene_count: int = Field(default=0, description="Genes with a MEROPS 'peptidase' call. Same semantics as OrganismResult.peptidase_gene_count; the ranking key.")
+        nonpeptidase_homolog_gene_count: int = Field(default=0, description="Genes with a MEROPS 'nonpeptidase_homolog' call. Same semantics as OrganismResult.nonpeptidase_homolog_gene_count.")
+        interpro_gene_count: int = Field(default=0, description="Genes with at least one InterPro entry. Same semantics as OrganismResult.interpro_gene_count.")
+        ncbifam_gene_count: int = Field(default=0, description="Genes with at least one NCBIfam family. Same semantics as OrganismResult.ncbifam_gene_count.")
+
     class OrgMeasurementCapability(BaseModel):
         has_metabolomics: int = Field(default=0, description="Number of matched organisms with measured_metabolite_count > 0.")
         no_metabolomics: int = Field(default=0, description="Number of matched organisms with measured_metabolite_count == 0.")
@@ -1739,6 +1786,7 @@ def register_tools(mcp: FastMCP):
         by_metric_type: list[OrgMetricTypeBreakdown] = Field(default_factory=list, description="DM metric_type frequency rollup across matched organisms.")
         by_compartment: list[OrgCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched organisms.")
         by_metabolic_capability: list[OrgMetabolicCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms by catalyzed_metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites.")
+        by_annotation_capability: list[OrgAnnotationCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms (within matched set) by peptidase_gene_count desc, then preferred_name. Carries all four annotation counts; excludes organisms with all four = 0. [] when none. Coverage ranking for reading, not a filter.")
         by_measurement_capability: OrgMeasurementCapability = Field(default_factory=OrgMeasurementCapability, description="Binary rollup of metabolomics measurement coverage across matched organisms: {has_metabolomics, no_metabolomics} (tool-specific deviation from list_/by_-style frequency rollups elsewhere — exactly two keys).")
         returned: int = Field(description="Number of results returned.")
         offset: int = Field(default=0, description="Offset into full result set.")
@@ -1779,7 +1827,7 @@ def register_tools(mcp: FastMCP):
     ) -> ListOrganismsResponse:
         """List organisms with taxonomy, data-availability counts, organism_type, DM rollups, chemistry-capability rollups, and metabolomics-coverage rollup.
 
-        Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `catalyzed_metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Note that `organism_names=` on this tool is exact (case-insensitive) on `preferred_name`, while the `organism=` filter on most other tools is a substring match.
+        Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `catalyzed_metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Read `by_annotation_capability` (top-10 by `peptidase_gene_count`, plus `interpro_gene_count` / `ncbifam_gene_count`) to see which organisms carry MEROPS / InterPro / NCBIfam coverage — then `genes_by_ontology(ontology='merops'|'interpro'|'ncbifam', organism=...)`. Note that `organism_names=` on this tool is exact (case-insensitive) on `preferred_name`, while the `organism=` filter on most other tools is a substring match.
         """
         await ctx.info(
             f"list_organisms organism_names={organism_names} compartment={compartment} "
@@ -1806,6 +1854,10 @@ def register_tools(mcp: FastMCP):
                 OrgMetabolicCapabilityBreakdown(**b)
                 for b in result.get("by_metabolic_capability", [])
             ]
+            by_annotation_capability = [
+                OrgAnnotationCapabilityBreakdown(**b)
+                for b in result.get("by_annotation_capability", [])
+            ]
             measurement_cap_data = result.get("by_measurement_capability") or {}
             by_measurement_capability = OrgMeasurementCapability(**measurement_cap_data)
             response = ListOrganismsResponse(
@@ -1817,6 +1869,7 @@ def register_tools(mcp: FastMCP):
                 by_metric_type=by_metric_type,
                 by_compartment=by_compartment,
                 by_metabolic_capability=by_metabolic_capability,
+                by_annotation_capability=by_annotation_capability,
                 by_measurement_capability=by_measurement_capability,
                 returned=result["returned"],
                 offset=result.get("offset", 0),
@@ -5385,7 +5438,9 @@ def register_tools(mcp: FastMCP):
             description="Filter by organism (case-insensitive partial match).",
         )] = None,
         cluster_type: Annotated[str | None, Field(
-            description="Filter: " + ", ".join(f"'{v}'" for v in sorted(VALID_CLUSTER_TYPES)) + ".",
+            description="Filter by cluster type. Live vocabulary: "
+                        "list_filter_values(filter_type='cluster_type'). Offline examples: "
+                        + ", ".join(f"'{v}'" for v in sorted(VALID_CLUSTER_TYPES)) + ".",
         )] = None,
         treatment_type: Annotated[list[str] | None, Field(
             description="Filter by treatment type(s). E.g. ['nitrogen_stress'].",
@@ -6133,7 +6188,9 @@ def register_tools(mcp: FastMCP):
             "inferred from genes if omitted. Single organism enforced.",
         )] = None,
         cluster_type: Annotated[str | None, Field(
-            description="Filter: " + ", ".join(f"'{v}'" for v in sorted(VALID_CLUSTER_TYPES)) + ".",
+            description="Filter by cluster type. Live vocabulary: "
+                        "list_filter_values(filter_type='cluster_type'). Offline examples: "
+                        + ", ".join(f"'{v}'" for v in sorted(VALID_CLUSTER_TYPES)) + ".",
         )] = None,
         treatment_type: Annotated[list[str] | None, Field(
             description="Filter by treatment type(s).",
