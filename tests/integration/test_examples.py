@@ -63,3 +63,30 @@ def test_metabolites_scenario_runs_cleanly(scenario):
     assert result.stdout.strip(), (
         f"metabolites scenario {scenario} produced no output"
     )
+
+
+# --- annotation_evidence.py ---
+
+ANNOTATION_EVIDENCE_SCRIPT = REPO_ROOT / "examples" / "annotation_evidence.py"
+
+ANNOTATION_EVIDENCE_SCENARIOS = [
+    "merops_call_class",
+    "tcdb_attachment_depth",
+    "interpro_enrichment",
+    "trust_filtered_tcdb",
+]
+
+
+@pytest.mark.parametrize("scenario", ANNOTATION_EVIDENCE_SCENARIOS)
+def test_annotation_evidence_scenario_runs_cleanly(scenario):
+    """Each annotation_evidence.py scenario exits 0 and produces some output on the live KG."""
+    cmd = [sys.executable, str(ANNOTATION_EVIDENCE_SCRIPT), "--scenario", scenario]
+    result = subprocess.run(
+        cmd, cwd=REPO_ROOT, capture_output=True, text=True, timeout=300
+    )
+    assert result.returncode == 0, (
+        f"annotation_evidence scenario {scenario} failed: stderr={result.stderr}"
+    )
+    assert result.stdout.strip(), (
+        f"annotation_evidence scenario {scenario} produced no output"
+    )
