@@ -11385,21 +11385,34 @@ class TestGeneNeighbors:
 
 
 class TestGenesByOntologyEdgePropStripping:
-    """Non-owner ontologies must have null edge-prop columns stripped from rows.
-    Uses lightweight row-dict approach since threading 4 new columns through
-    the heavy mock-conn machinery would require invasive fixture changes."""
+    """Strip-non-applicable: a row keeps only the columns its ontology OWNS
+    (`ontology_row_columns`), and owned-but-null columns stay — there `null`
+    is information. Supersedes the fixed `_EDGE_PROP_COLS` union strip.
 
-    def _run_strip(self, rows):
-        """Apply the same strip loop that genes_by_ontology uses."""
+    Uses lightweight row-dicts since threading the trust columns through the
+    heavy mock-conn machinery would require invasive fixture changes."""
+
+    @staticmethod
+    def _owned_universe():
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        return {
+            col
+            for ont in ALL_ONTOLOGIES
+            for col in ontology_row_columns(ont, verbose=True)
+        }
+
+    def _run_strip(self, rows, ontology, verbose=True):
+        """Apply the same strip rule that genes_by_ontology uses."""
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        owned = set(ontology_row_columns(ontology, verbose=verbose))
         for r in rows:
-            for col in api._EDGE_PROP_COLS:
-                if r.get(col) is None:
-                    r.pop(col, None)
+            for col in self._owned_universe() - owned:
+                r.pop(col, None)
         return rows
 
     def test_non_owner_ontology_strips_all_four_columns(self):
-        """When all 4 edge-prop cols are null (non-owner ontology), they are
-        all absent from the row after stripping."""
+        """A Pfam row owns none of the PSORTb / SignalP native scalars."""
         rows = [{
             "locus_tag": "PMM0001",
             "term_id": "pfam:PF00001",
@@ -11410,19 +11423,19 @@ class TestGenesByOntologyEdgePropStripping:
             "signal_peptide_cleavage_site": None,
             "signal_peptide_cleavage_probability": None,
         }]
-        result = self._run_strip(rows)
+        result = self._run_strip(rows, ontology="pfam")
         row = result[0]
         assert "localization_score" not in row
         assert "signal_peptide_probability" not in row
         assert "signal_peptide_cleavage_site" not in row
         assert "signal_peptide_cleavage_probability" not in row
-        # Non-edge-prop fields are preserved
+        # Non-owned-universe fields are preserved
         assert row["locus_tag"] == "PMM0001"
         assert row["term_id"] == "pfam:PF00001"
 
     def test_owner_ontology_psortb_keeps_localization_score(self):
-        """When querying subcellular_localization, rows from the owner ontology
-        keep localization_score (non-null) while the other 3 cols are stripped."""
+        """A subcellular_localization verbose row keeps localization_score
+        while the SignalP columns are stripped."""
         rows = [{
             "locus_tag": "PMM0001",
             "term_id": "psortb:cytoplasmic",
@@ -11433,16 +11446,28 @@ class TestGenesByOntologyEdgePropStripping:
             "signal_peptide_cleavage_site": None,
             "signal_peptide_cleavage_probability": None,
         }]
-        result = self._run_strip(rows)
+        result = self._run_strip(
+            rows, ontology="subcellular_localization", verbose=True)
         row = result[0]
         assert row["localization_score"] == 9.97
         assert "signal_peptide_probability" not in row
         assert "signal_peptide_cleavage_site" not in row
         assert "signal_peptide_cleavage_probability" not in row
 
+    def test_psortb_compact_row_sheds_localization_score(self):
+        """PSORTb native detail moved compact -> verbose."""
+        rows = [{
+            "locus_tag": "PMM0001",
+            "term_id": "psortb:cytoplasmic",
+            "localization_score": 9.97,
+        }]
+        result = self._run_strip(
+            rows, ontology="subcellular_localization", verbose=False)
+        assert "localization_score" not in result[0]
+
     def test_owner_ontology_signalp_keeps_three_columns(self):
-        """signal_peptide ontology rows keep all 3 SP cols; localization_score
-        is null and gets stripped."""
+        """signal_peptide verbose rows keep all 3 SP cols; localization_score
+        is not owned and gets stripped."""
         rows = [{
             "locus_tag": "PMM0002",
             "term_id": "signalp:signal_peptide",
@@ -11453,71 +11478,74 @@ class TestGenesByOntologyEdgePropStripping:
             "signal_peptide_cleavage_site": 22,
             "signal_peptide_cleavage_probability": 0.841,
         }]
-        result = self._run_strip(rows)
+        result = self._run_strip(
+            rows, ontology="signal_peptide_type", verbose=True)
         row = result[0]
         assert "localization_score" not in row
         assert row["signal_peptide_probability"] == 0.992
         assert row["signal_peptide_cleavage_site"] == 22
         assert row["signal_peptide_cleavage_probability"] == 0.841
 
-    def test_edge_prop_cols_constant_has_four_members(self):
-        """Verify _EDGE_PROP_COLS is the expected 4-tuple."""
-        assert len(api._EDGE_PROP_COLS) == 4
-        assert "localization_score" in api._EDGE_PROP_COLS
-        assert "signal_peptide_probability" in api._EDGE_PROP_COLS
-        assert "signal_peptide_cleavage_site" in api._EDGE_PROP_COLS
-        assert "signal_peptide_cleavage_probability" in api._EDGE_PROP_COLS
+    def test_owned_but_null_columns_are_kept(self):
+        """A TCDB eggNOG-only edge carries no tier — `null` is information,
+        not absence, and the envelope `trust_axes` says what to expect."""
+        rows = [{
+            "locus_tag": "PMM0392",
+            "term_id": "tcdb:3.A.1",
+            "evidence": "homology",
+            "sources": ["eggnog"],
+            "evidence_score": 0.6,
+            "tier": None,
+            "attachment_depth": "most_specific",
+        }]
+        result = self._run_strip(rows, ontology="tcdb", verbose=True)
+        row = result[0]
+        assert "tier" in row
+        assert row["tier"] is None
+        assert row["evidence"] == "homology"
 
-    def test_rows_without_edge_prop_keys_unaffected(self):
-        """Rows that never had edge-prop keys are not mutated."""
+    def test_edge_prop_cols_constant_is_deleted(self):
+        """The fixed union constant is superseded by the registry."""
+        assert not hasattr(api, "_EDGE_PROP_COLS")
+
+    def test_rows_without_owned_universe_keys_unaffected(self):
         rows = [{"locus_tag": "PMM0003", "term_id": "go:0006260", "level": 4}]
-        result = self._run_strip(rows)
-        assert result[0] == {"locus_tag": "PMM0003", "term_id": "go:0006260", "level": 4}
+        result = self._run_strip(rows, ontology="go_bp")
+        assert result[0] == {
+            "locus_tag": "PMM0003", "term_id": "go:0006260", "level": 4}
 
-    def test_mixed_batch_strips_correctly(self):
-        """Mixed batch: owner row keeps its column, non-owner row strips all."""
-        rows = [
-            {
+    def test_mixed_batch_strips_per_ontology(self):
+        """Rows from different ontologies keep their own owned columns."""
+        psortb_rows = self._run_strip(
+            [{
                 "locus_tag": "PMM0001",
                 "term_id": "psortb:cytoplasmic",
                 "localization_score": 9.97,
                 "signal_peptide_probability": None,
-                "signal_peptide_cleavage_site": None,
-                "signal_peptide_cleavage_probability": None,
-            },
-            {
+            }],
+            ontology="subcellular_localization", verbose=True)
+        pfam_rows = self._run_strip(
+            [{
                 "locus_tag": "PMM0002",
                 "term_id": "pfam:PF00001",
                 "localization_score": None,
                 "signal_peptide_probability": None,
-                "signal_peptide_cleavage_site": None,
-                "signal_peptide_cleavage_probability": None,
-            },
-        ]
-        result = self._run_strip(rows)
-        owner_row = result[0]
-        non_owner_row = result[1]
-        assert owner_row["localization_score"] == 9.97
-        assert "signal_peptide_probability" not in owner_row
-        for col in api._EDGE_PROP_COLS:
-            assert col not in non_owner_row
+            }],
+            ontology="pfam", verbose=True)
+        assert psortb_rows[0]["localization_score"] == 9.97
+        assert "signal_peptide_probability" not in psortb_rows[0]
+        assert "localization_score" not in pfam_rows[0]
+        assert "signal_peptide_probability" not in pfam_rows[0]
 
 
 class TestGeneOntologyTermsEdgePropStripping:
-    """gene_ontology_terms strips null edge-prop columns per-chunk inside the
-    detail-row loop. Same strip logic — verified with the same lightweight
-    row-dict approach."""
+    """gene_ontology_terms applies the same strip-non-applicable rule
+    per-chunk inside the detail-row loop, keyed on the chunk's ontology."""
 
-    def _run_strip(self, rows):
-        """Apply the same per-chunk strip loop that gene_ontology_terms uses."""
-        for r in rows:
-            for col in api._EDGE_PROP_COLS:
-                if r.get(col) is None:
-                    r.pop(col, None)
-        return rows
+    _run_strip = TestGenesByOntologyEdgePropStripping._run_strip
+    _owned_universe = TestGenesByOntologyEdgePropStripping._owned_universe
 
     def test_non_owner_chunk_strips_all_four(self):
-        """Chunk from non-owner ontology has all 4 null cols removed."""
         rows = [
             {
                 "locus_tag": "PMM0001",
@@ -11530,15 +11558,16 @@ class TestGeneOntologyTermsEdgePropStripping:
                 "signal_peptide_cleavage_probability": None,
             },
         ]
-        result = self._run_strip(rows)
+        result = self._run_strip(rows, ontology="go_bp", verbose=True)
         row = result[0]
-        for col in api._EDGE_PROP_COLS:
+        for col in ("localization_score", "signal_peptide_probability",
+                    "signal_peptide_cleavage_site",
+                    "signal_peptide_cleavage_probability"):
             assert col not in row
         assert row["locus_tag"] == "PMM0001"
         assert row["term_id"] == "go:0006260"
 
     def test_owner_psortb_chunk_keeps_score(self):
-        """Chunk from subcellular_localization ontology keeps localization_score."""
         rows = [
             {
                 "locus_tag": "PMM0001",
@@ -11550,7 +11579,8 @@ class TestGeneOntologyTermsEdgePropStripping:
                 "signal_peptide_cleavage_probability": None,
             },
         ]
-        result = self._run_strip(rows)
+        result = self._run_strip(
+            rows, ontology="subcellular_localization", verbose=True)
         row = result[0]
         assert row["localization_score"] == 9.97
         assert "signal_peptide_probability" not in row
@@ -11558,7 +11588,6 @@ class TestGeneOntologyTermsEdgePropStripping:
         assert "signal_peptide_cleavage_probability" not in row
 
     def test_owner_signalp_chunk_keeps_three_sp_cols(self):
-        """Chunk from signal_peptide ontology keeps 3 SP cols; strips localization_score."""
         rows = [
             {
                 "locus_tag": "PMM0002",
@@ -11570,18 +11599,36 @@ class TestGeneOntologyTermsEdgePropStripping:
                 "signal_peptide_cleavage_probability": 0.841,
             },
         ]
-        result = self._run_strip(rows)
+        result = self._run_strip(
+            rows, ontology="signal_peptide_type", verbose=True)
         row = result[0]
         assert "localization_score" not in row
         assert row["signal_peptide_probability"] == 0.992
         assert row["signal_peptide_cleavage_site"] == 22
         assert row["signal_peptide_cleavage_probability"] == 0.841
 
-    def test_chunk_without_edge_prop_keys_unaffected(self):
-        """Rows that never carried edge-prop keys are not mutated."""
+    def test_merops_chunk_keeps_call_class_in_compact(self):
+        rows = [
+            {
+                "locus_tag": "MIT1002_03660",
+                "term_id": "merops.family:S14",
+                "evidence": "signature",
+                "call_class": "peptidase",
+                "confidence_score": 1.0,
+            },
+        ]
+        result = self._run_strip(rows, ontology="merops", verbose=False)
+        row = result[0]
+        assert row["call_class"] == "peptidase"
+        assert row["evidence"] == "signature"
+        # native detail is verbose-only
+        assert "confidence_score" not in row
+
+    def test_chunk_without_owned_universe_keys_unaffected(self):
         rows = [{"locus_tag": "PMM0003", "term_id": "go:0006260", "level": 5}]
-        result = self._run_strip(rows)
-        assert result[0] == {"locus_tag": "PMM0003", "term_id": "go:0006260", "level": 5}
+        result = self._run_strip(rows, ontology="go_bp", verbose=True)
+        assert result[0] == {
+            "locus_tag": "PMM0003", "term_id": "go:0006260", "level": 5}
 
 
 # ---------------------------------------------------------------------------
@@ -12184,3 +12231,872 @@ class TestListPublicationsDiscusses:
         r = result["results"][0]
         assert r["discussed_gene_count"] == 0
         assert r["discussed_pathway_count"] == 0
+
+
+# ---------------------------------------------------------------------------
+# Annotation-trust surface (PR 3a) — api layer
+#
+# One normalized trust vocabulary across 17 ontologies: generic
+# config-validated filters, envelope rollups + auto-warnings, the
+# strip-non-applicable row rule, three newly registered ontologies, and the
+# ControlledVocabulary -> pivot -> warning ladder behind list_filter_values.
+# ---------------------------------------------------------------------------
+
+import inspect as _inspect
+
+_ORG = "Prochlorococcus MED4"
+_MIT1002 = "Alteromonas macleodii MIT1002"
+
+
+def _trust_dispatch(mock_conn, rules, default=None):
+    """Route mocked execute_query calls by a substring of their Cypher.
+
+    `rules` is an ordered list of (needle, rows). The first needle contained
+    in the Cypher wins; `default` (or []) is the fallthrough.
+    """
+    def _exec(cypher, **params):
+        for needle, rows in rules:
+            if needle in cypher:
+                return rows
+        return [] if default is None else default
+    mock_conn.execute_query.side_effect = _exec
+    return mock_conn
+
+
+def _org_rows(name=_ORG):
+    return [{"organisms": [name]}]
+
+
+def _freq_values(rollup):
+    """Values of a `by_X` rollup, whatever its value-key is named."""
+    out = []
+    for entry in rollup:
+        vals = [v for k, v in entry.items() if k != "count"]
+        out.append(vals[0] if len(vals) == 1 else tuple(vals))
+    return out
+
+
+def _freq_map(rollup):
+    return dict(zip(_freq_values(rollup), [e["count"] for e in rollup]))
+
+
+def _gbo_rules(detail_rows, per_term=None, per_gene=None, org=_ORG):
+    """Mock the genes_by_ontology query chain (org -> A -> B -> D)."""
+    per_term = per_term if per_term is not None else [{
+        "term_id": "tcdb:3.A.1", "term_name": "ABC superfamily", "level": 2,
+        "tree": None, "tree_code": None, "best_effort": False,
+        "n_genes": len(detail_rows),
+        "cat_freqs": [{"item": "Transport", "count": len(detail_rows)}],
+        "is_informative": True,
+    }]
+    per_gene = per_gene if per_gene is not None else [
+        {"locus_tag": r["locus_tag"], "gene_category": "Transport",
+         "n_terms": 1, "levels_hit": [2]}
+        for r in detail_rows
+    ]
+    return [
+        ("MATCH (o:OrganismTaxon)", _org_rows(org)),
+        ("matched_label", []),
+        ("cat_freqs", per_term),
+        ("levels_hit", per_gene),
+    ]
+
+
+class TestGenesByOntologyTrustFilterSignature:
+    """Generic trust filters, all defaulting to None — defaults never filter."""
+
+    @pytest.mark.parametrize("param", [
+        "sources", "evidence", "max_tier", "min_evidence_score",
+        "call_class", "interpro_type",
+    ])
+    def test_param_exists_and_defaults_to_none(self, param):
+        sig = _inspect.signature(api.genes_by_ontology)
+        assert param in sig.parameters, param
+        assert sig.parameters[param].default is None, param
+
+    @pytest.mark.parametrize("fn_name,param", [
+        ("gene_ontology_terms", "sources"),
+        ("gene_ontology_terms", "evidence"),
+        ("gene_ontology_terms", "max_tier"),
+        ("gene_ontology_terms", "min_evidence_score"),
+        ("gene_ontology_terms", "call_class"),
+        ("gene_ontology_terms", "interpro_type"),
+        ("pathway_enrichment", "sources"),
+        ("pathway_enrichment", "evidence"),
+        ("pathway_enrichment", "max_tier"),
+        ("pathway_enrichment", "min_evidence_score"),
+        ("pathway_enrichment", "call_class"),
+        ("pathway_enrichment", "interpro_type"),
+        ("cluster_enrichment", "sources"),
+        ("cluster_enrichment", "evidence"),
+        ("cluster_enrichment", "max_tier"),
+        ("cluster_enrichment", "min_evidence_score"),
+        ("cluster_enrichment", "call_class"),
+        ("cluster_enrichment", "interpro_type"),
+        ("ontology_landscape", "call_class"),
+        ("ontology_landscape", "interpro_type"),
+    ])
+    def test_filters_present_on_the_other_ontology_tools(self, fn_name, param):
+        sig = _inspect.signature(getattr(api, fn_name))
+        assert param in sig.parameters, f"{fn_name}.{param}"
+        assert sig.parameters[param].default is None
+
+    def test_gene_ontology_terms_gains_include_superseded(self):
+        sig = _inspect.signature(api.gene_ontology_terms)
+        assert sig.parameters["include_superseded"].default is False
+
+    def test_search_ontology_gains_interpro_type(self):
+        sig = _inspect.signature(api.search_ontology)
+        assert sig.parameters["interpro_type"].default is None
+
+    def test_list_filter_values_gains_ontology_scope(self):
+        sig = _inspect.signature(api.list_filter_values)
+        assert sig.parameters["ontology"].default is None
+
+
+class TestGenesByOntologyTrustEnvelope:
+    """Design section 5 envelope keys on the gene-set tools."""
+
+    def _run(self, mock_conn, rows, **kwargs):
+        _trust_dispatch(mock_conn, _gbo_rules(rows), default=rows)
+        return api.genes_by_ontology(
+            ontology=kwargs.pop("ontology", "tcdb"), organism=_ORG,
+            level=kwargs.pop("level", 2), conn=mock_conn, **kwargs,
+        )
+
+    def _tcdb_rows(self):
+        return [
+            {"locus_tag": "PMM0392", "gene_name": None, "product": None,
+             "gene_category": "Transport", "term_id": "tcdb:3.A.1",
+             "term_name": "ABC superfamily", "level": 2, "is_informative": True,
+             "evidence": "homology", "sources": ["eggnog"],
+             "evidence_score": 0.6, "tier": None},
+            {"locus_tag": "PMM0393", "gene_name": None, "product": None,
+             "gene_category": "Transport", "term_id": "tcdb:3.A.1",
+             "term_name": "ABC superfamily", "level": 2, "is_informative": True,
+             "evidence": "curated", "sources": ["tcdb", "eggnog"],
+             "evidence_score": 1.0, "tier": 1},
+        ]
+
+    @pytest.mark.parametrize("key", [
+        "trust_axes", "by_evidence", "by_tier", "by_sources", "by_call_class",
+        "evidence_score_stats", "filters_applied", "skipped_ontologies",
+        "warnings",
+    ])
+    def test_envelope_key_present(self, mock_conn, key):
+        result = self._run(mock_conn, self._tcdb_rows())
+        assert key in result
+
+    def test_trust_axes_reports_the_ontology_axes(self, mock_conn):
+        result = self._run(mock_conn, self._tcdb_rows())
+        assert result["trust_axes"] == {
+            "tcdb": ["sources", "evidence", "evidence_score", "tier"]}
+
+    def test_by_evidence_rolls_up_the_compact_column(self, mock_conn):
+        result = self._run(mock_conn, self._tcdb_rows())
+        assert _freq_map(result["by_evidence"]) == {"homology": 1, "curated": 1}
+
+    def test_by_tier_carries_an_explicit_null_bucket(self, mock_conn):
+        """eggNOG-only TCDB edges carry no tier; the bucket is explicit so a
+        reader never mistakes tier-null for tier-1."""
+        result = self._run(mock_conn, self._tcdb_rows())
+        values = _freq_values(result["by_tier"])
+        assert "null" in values
+        assert _freq_map(result["by_tier"])["null"] == 1
+
+    def test_by_sources_counts_membership_not_tuples(self, mock_conn):
+        result = self._run(mock_conn, self._tcdb_rows())
+        assert _freq_map(result["by_sources"]) == {"eggnog": 2, "tcdb": 1}
+
+    def test_evidence_score_stats_shape(self, mock_conn):
+        result = self._run(mock_conn, self._tcdb_rows())
+        stats = result["evidence_score_stats"]
+        assert set(stats) == {"min", "median", "max", "n_null"}
+        assert stats["min"] == 0.6
+        assert stats["max"] == 1.0
+        assert stats["n_null"] == 0
+
+    def test_evidence_score_signals_absent_without_a_cutoff(self, mock_conn):
+        """Ground rule 1: the envelope shows fired signals only when the one
+        numeric cutoff is actually applied."""
+        result = self._run(mock_conn, self._tcdb_rows())
+        assert "evidence_score_signals" not in result
+
+    def test_evidence_score_signals_present_with_a_cutoff(self, mock_conn):
+        rows = self._tcdb_rows()
+        rules = _gbo_rules(rows) + [
+            ("ControlledVocabulary", [{
+                "edge_type": "Gene_has_tcdb_family",
+                "signals": ["tier_le_2", "pfam_support", "go_support",
+                            "source_agreement", "identity"],
+                "signal_count": 5,
+            }]),
+        ]
+        _trust_dispatch(mock_conn, rules, default=rows)
+        result = api.genes_by_ontology(
+            ontology="tcdb", organism=_ORG, level=2,
+            min_evidence_score=0.6, conn=mock_conn,
+        )
+        assert "evidence_score_signals" in result
+        assert "Gene_has_tcdb_family" in result["evidence_score_signals"]
+
+    def test_filters_applied_echoes_the_active_filters(self, mock_conn):
+        result = self._run(
+            mock_conn, self._tcdb_rows(), max_tier=2, sources=["eggnog"])
+        applied = result["filters_applied"]
+        assert applied["max_tier"] == 2
+        assert applied["sources"] == ["eggnog"]
+
+    def test_filters_applied_omits_unset_filters(self, mock_conn):
+        result = self._run(mock_conn, self._tcdb_rows())
+        assert result["filters_applied"] == {}
+
+    def test_skipped_ontologies_empty_on_single_ontology_tool(self, mock_conn):
+        result = self._run(mock_conn, self._tcdb_rows())
+        assert result["skipped_ontologies"] == []
+
+
+class TestGenesByOntologyTrustWarnings:
+    """Design section 5.4 auto-warnings — rows-conditional, message-pinned."""
+
+    def _merops_rows(self, call_class="nonpeptidase_homolog"):
+        return [{
+            "locus_tag": "MIT1002_03660", "gene_name": None, "product": None,
+            "gene_category": "Unknown", "term_id": "merops.family:S14",
+            "term_name": "ClpP", "level": 1, "is_informative": True,
+            "evidence": "signature", "call_class": call_class,
+        }]
+
+    def _run_merops(self, mock_conn, rows, **kwargs):
+        rules = _gbo_rules(rows, org=_MIT1002)
+        _trust_dispatch(mock_conn, rules, default=rows)
+        return api.genes_by_ontology(
+            ontology="merops", organism=_MIT1002, level=0,
+            conn=mock_conn, **kwargs,
+        )
+
+    def test_nonpeptidase_rows_without_call_class_filter_warn(self, mock_conn):
+        result = self._run_merops(mock_conn, self._merops_rows())
+        joined = " ".join(result["warnings"])
+        assert "catalytically-dead homologs" in joined
+
+    def test_no_warning_when_call_class_filter_is_set(self, mock_conn):
+        result = self._run_merops(
+            mock_conn, self._merops_rows(call_class="peptidase"),
+            call_class=["peptidase"],
+        )
+        joined = " ".join(result["warnings"])
+        assert "catalytically-dead homologs" not in joined
+
+    def test_no_warning_when_no_nonpeptidase_rows(self, mock_conn):
+        result = self._run_merops(
+            mock_conn, self._merops_rows(call_class="peptidase"))
+        joined = " ".join(result["warnings"])
+        assert "catalytically-dead homologs" not in joined
+
+    def test_by_call_class_rollup(self, mock_conn):
+        result = self._run_merops(mock_conn, self._merops_rows())
+        assert _freq_map(result["by_call_class"]) == {"nonpeptidase_homolog": 1}
+
+    def test_max_tier_keeping_tier_null_rows_warns(self, mock_conn):
+        rows = [{
+            "locus_tag": "PMM0392", "gene_name": None, "product": None,
+            "gene_category": "Transport", "term_id": "tcdb:3.A.1",
+            "term_name": "ABC superfamily", "level": 2, "is_informative": True,
+            "evidence": "homology", "tier": None,
+        }]
+        _trust_dispatch(mock_conn, _gbo_rules(rows), default=rows)
+        result = api.genes_by_ontology(
+            ontology="tcdb", organism=_ORG, level=2, max_tier=2, conn=mock_conn,
+        )
+        joined = " ".join(result["warnings"])
+        assert "carry no tier" in joined
+
+    def test_min_evidence_score_applied_warns(self, mock_conn):
+        rows = [{
+            "locus_tag": "PMM0392", "term_id": "tcdb:3.A.1",
+            "term_name": "ABC superfamily", "level": 2, "gene_name": None,
+            "product": None, "gene_category": "Transport",
+            "is_informative": True, "evidence": "homology",
+        }]
+        rules = _gbo_rules(rows) + [("ControlledVocabulary", [])]
+        _trust_dispatch(mock_conn, rules, default=rows)
+        result = api.genes_by_ontology(
+            ontology="tcdb", organism=_ORG, level=2,
+            min_evidence_score=0.6, conn=mock_conn,
+        )
+        assert result["warnings"], "min_evidence_score must announce itself"
+
+
+class TestGenesByOntologyTrustValidation:
+    """Unsupported axis / unknown facet raise before any query runs."""
+
+    def test_max_tier_on_kegg_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="max_tier"):
+            api.genes_by_ontology(
+                ontology="kegg", organism=_ORG, level=1, max_tier=2,
+                conn=mock_conn,
+            )
+
+    def test_call_class_on_tcdb_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="call_class"):
+            api.genes_by_ontology(
+                ontology="tcdb", organism=_ORG, level=2,
+                call_class=["peptidase"], conn=mock_conn,
+            )
+
+    def test_error_message_names_the_ontology_axes(self, mock_conn):
+        with pytest.raises(ValueError) as excinfo:
+            api.genes_by_ontology(
+                ontology="kegg", organism=_ORG, level=1,
+                min_evidence_score=0.5, conn=mock_conn,
+            )
+        msg = str(excinfo.value)
+        assert "evidence" in msg
+        assert "trust_axes" in msg
+
+    def test_interpro_type_on_non_interpro_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="interpro_type"):
+            api.genes_by_ontology(
+                ontology="tcdb", organism=_ORG, level=2,
+                interpro_type="FAMILY", conn=mock_conn,
+            )
+
+    def test_the_three_new_ontologies_are_accepted(self, mock_conn):
+        for ontology in ("interpro", "ncbifam", "merops"):
+            _trust_dispatch(mock_conn, _gbo_rules([]), default=[])
+            result = api.genes_by_ontology(
+                ontology=ontology, organism=_ORG, level=0, conn=mock_conn,
+            )
+            assert result["ontology"] == ontology
+
+
+class TestGenesByOntologyStripRule:
+    """Rows omit columns their ontology does not own; owned-but-null stay."""
+
+    def _run(self, ontology, rows, **kwargs):
+        from unittest.mock import MagicMock
+        conn = MagicMock()
+        _trust_dispatch(conn, _gbo_rules(rows), default=rows)
+        return api.genes_by_ontology(
+            ontology=ontology, organism=_ORG, level=kwargs.pop("level", 2),
+            conn=conn, **kwargs,
+        )
+
+    def test_compact_tcdb_row_keeps_evidence_and_sheds_axes(self):
+        rows = [{
+            "locus_tag": "PMM0392", "gene_name": None, "product": None,
+            "gene_category": "Transport", "term_id": "tcdb:3.A.1",
+            "term_name": "ABC superfamily", "level": 2, "is_informative": True,
+            "evidence": "homology", "sources": ["eggnog"],
+            "evidence_score": 0.6, "tier": None,
+        }]
+        result = self._run("tcdb", rows)
+        row = result["results"][0]
+        assert row["evidence"] == "homology"
+        assert "sources" not in row
+        assert "evidence_score" not in row
+        assert "tier" not in row
+
+    def test_verbose_tcdb_row_keeps_owned_null_tier(self):
+        rows = [{
+            "locus_tag": "PMM0392", "gene_name": None, "product": None,
+            "gene_category": "Transport", "term_id": "tcdb:3.A.1",
+            "term_name": "ABC superfamily", "level": 2, "is_informative": True,
+            "evidence": "homology", "sources": ["eggnog"],
+            "evidence_score": 0.6, "tier": None,
+            "attachment_depth": "most_specific",
+        }]
+        result = self._run("tcdb", rows, verbose=True)
+        row = result["results"][0]
+        assert "tier" in row and row["tier"] is None
+        assert row["attachment_depth"] == "most_specific"
+
+    def test_kegg_row_never_carries_evidence_score(self):
+        rows = [{
+            "locus_tag": "PMM0001", "gene_name": None, "product": None,
+            "gene_category": "Unknown", "term_id": "kegg:ko00010",
+            "term_name": "Glycolysis", "level": 3, "is_informative": True,
+            "evidence": "signature", "sources": ["eggnog"],
+            "evidence_score": None,
+        }]
+        result = self._run("kegg", rows, level=3, verbose=True)
+        row = result["results"][0]
+        assert "evidence_score" not in row
+        assert row["evidence"] == "signature"
+
+    def test_interpro_row_keeps_interpro_type_in_compact(self):
+        rows = [{
+            "locus_tag": "PMM0001", "gene_name": None, "product": None,
+            "gene_category": "Unknown", "term_id": "interpro:IPR027417",
+            "term_name": "P-loop NTPase", "level": 0, "is_informative": True,
+            "evidence": "signature", "interpro_type": "HOMOLOGOUS_SUPERFAMILY",
+        }]
+        result = self._run("interpro", rows, level=0)
+        row = result["results"][0]
+        assert row["interpro_type"] == "HOMOLOGOUS_SUPERFAMILY"
+
+
+class TestGeneOntologyTermsMultiOntology:
+    """Design section 4.5 skip / raise matrix for `ontology: list | None`."""
+
+    def _rules(self, detail_rows=None, org=_ORG):
+        detail_rows = detail_rows or []
+        return [
+            ("MATCH (o:OrganismTaxon)", _org_rows(org)),
+            ("AS found", [{"lt": "PMM0392", "found": True}]),
+            ("gene_term_counts", []),
+        ]
+
+    def test_accepts_a_list_of_ontologies(self, mock_conn):
+        _trust_dispatch(mock_conn, self._rules(), default=[])
+        result = api.gene_ontology_terms(
+            locus_tags=["PMM0392"], organism=_ORG,
+            ontology=["tcdb", "merops"], conn=mock_conn,
+        )
+        assert result["skipped_ontologies"] == []
+
+    def test_filter_carried_by_all_applies_to_all(self, mock_conn):
+        _trust_dispatch(mock_conn, self._rules(), default=[])
+        result = api.gene_ontology_terms(
+            locus_tags=["PMM0392"], organism=_ORG,
+            ontology=["tcdb", "merops"], max_tier=2, conn=mock_conn,
+        )
+        assert result["skipped_ontologies"] == []
+        assert result["filters_applied"]["max_tier"] == 2
+
+    def test_filter_carried_by_some_skips_the_rest_with_a_warning(self, mock_conn):
+        _trust_dispatch(mock_conn, self._rules(), default=[])
+        result = api.gene_ontology_terms(
+            locus_tags=["PMM0392"], organism=_ORG,
+            ontology=["tcdb", "kegg"], max_tier=2, conn=mock_conn,
+        )
+        skipped = {e["ontology"] for e in result["skipped_ontologies"]}
+        assert skipped == {"kegg"}
+        assert all("reason" in e for e in result["skipped_ontologies"])
+        assert result["warnings"]
+
+    def test_filter_carried_by_none_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="max_tier"):
+            api.gene_ontology_terms(
+                locus_tags=["PMM0392"], organism=_ORG,
+                ontology=["kegg", "go_bp"], max_tier=2, conn=mock_conn,
+            )
+
+    def test_facet_owner_in_the_set_applies_to_owner_only(self, mock_conn):
+        _trust_dispatch(mock_conn, self._rules(), default=[])
+        result = api.gene_ontology_terms(
+            locus_tags=["PMM0392"], organism=_ORG,
+            ontology=["interpro", "kegg"], interpro_type="FAMILY",
+            conn=mock_conn,
+        )
+        assert result["skipped_ontologies"] == []
+
+    def test_facet_owner_absent_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="interpro_type"):
+            api.gene_ontology_terms(
+                locus_tags=["PMM0392"], organism=_ORG,
+                ontology=["kegg", "tcdb"], interpro_type="FAMILY",
+                conn=mock_conn,
+            )
+
+    def test_unknown_ontology_name_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="bogus"):
+            api.gene_ontology_terms(
+                locus_tags=["PMM0392"], organism=_ORG,
+                ontology=["bogus"], conn=mock_conn,
+            )
+
+    def test_single_string_ontology_still_accepted(self, mock_conn):
+        _trust_dispatch(mock_conn, self._rules(), default=[])
+        result = api.gene_ontology_terms(
+            locus_tags=["PMM0392"], organism=_ORG, ontology="tcdb",
+            conn=mock_conn,
+        )
+        assert "results" in result
+
+    def test_trust_axes_envelope_is_per_ontology(self, mock_conn):
+        _trust_dispatch(mock_conn, self._rules(), default=[])
+        result = api.gene_ontology_terms(
+            locus_tags=["PMM0392"], organism=_ORG,
+            ontology=["tcdb", "kegg"], conn=mock_conn,
+        )
+        assert result["trust_axes"]["kegg"] == ["sources", "evidence"]
+        assert "tier" in result["trust_axes"]["tcdb"]
+
+
+class TestOntologyLandscapeTrustSurface:
+    """Landscape gains `ontology: list | None`, the merops call_class filter,
+    and the InterPro (interpro_type, level) stratum."""
+
+    def _rules(self, stat_rows=None):
+        return [
+            ("MATCH (o:OrganismTaxon)", _org_rows()),
+            ("total_genes", [{"total_genes": 1000}]),
+            ("n_terms_with_genes", stat_rows or []),
+        ]
+
+    def test_accepts_a_list_of_ontologies(self, mock_conn):
+        _trust_dispatch(mock_conn, self._rules(), default=[])
+        result = api.ontology_landscape(
+            organism=_ORG, ontology=["tcdb", "merops"], conn=mock_conn)
+        assert "results" in result
+
+    def test_unknown_ontology_in_list_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="bogus"):
+            api.ontology_landscape(
+                organism=_ORG, ontology=["bogus"], conn=mock_conn)
+
+    def test_call_class_on_non_merops_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="call_class"):
+            api.ontology_landscape(
+                organism=_ORG, ontology="tcdb", call_class=["peptidase"],
+                conn=mock_conn)
+
+    def test_interpro_stratum_rows_carry_interpro_type(self, mock_conn):
+        stat_rows = [{
+            "level": 0, "tree": None, "tree_code": None,
+            "interpro_type": "HOMOLOGOUS_SUPERFAMILY",
+            "n_terms_with_genes": 74, "n_genes_at_level": 400,
+            "min_genes_per_term": 5, "q1_genes_per_term": 6.0,
+            "median_genes_per_term": 9.0, "q3_genes_per_term": 20.0,
+            "max_genes_per_term": 119, "n_best_effort": 0,
+        }]
+        _trust_dispatch(mock_conn, self._rules(stat_rows), default=[])
+        result = api.ontology_landscape(
+            organism=_ORG, ontology="interpro", conn=mock_conn)
+        assert result["results"][0]["interpro_type"] == "HOMOLOGOUS_SUPERFAMILY"
+
+    def test_by_ontology_reports_best_interpro_type(self, mock_conn):
+        stat_rows = [{
+            "level": 0, "tree": None, "tree_code": None,
+            "interpro_type": "HOMOLOGOUS_SUPERFAMILY",
+            "n_terms_with_genes": 74, "n_genes_at_level": 400,
+            "min_genes_per_term": 5, "q1_genes_per_term": 6.0,
+            "median_genes_per_term": 9.0, "q3_genes_per_term": 20.0,
+            "max_genes_per_term": 119, "n_best_effort": 0,
+        }]
+        _trust_dispatch(mock_conn, self._rules(stat_rows), default=[])
+        result = api.ontology_landscape(
+            organism=_ORG, ontology="interpro", conn=mock_conn)
+        entry = result["by_ontology"]["interpro"]
+        assert entry["best_interpro_type"] == "HOMOLOGOUS_SUPERFAMILY"
+        assert entry["best_level"] == 0
+
+    def test_non_interpro_rows_carry_no_interpro_type(self, mock_conn):
+        stat_rows = [{
+            "level": 1, "tree": None, "tree_code": None,
+            "n_terms_with_genes": 10, "n_genes_at_level": 100,
+            "min_genes_per_term": 5, "q1_genes_per_term": 6.0,
+            "median_genes_per_term": 9.0, "q3_genes_per_term": 20.0,
+            "max_genes_per_term": 40, "n_best_effort": 0,
+        }]
+        _trust_dispatch(mock_conn, self._rules(stat_rows), default=[])
+        result = api.ontology_landscape(
+            organism=_ORG, ontology="kegg", conn=mock_conn)
+        assert "interpro_type" not in result["results"][0]
+
+    def test_default_fan_out_covers_all_17_ontologies(self, mock_conn):
+        seen = []
+
+        def _exec(cypher, **params):
+            if "MATCH (o:OrganismTaxon)" in cypher:
+                return _org_rows()
+            if "total_genes" in cypher:
+                return [{"total_genes": 1000}]
+            seen.append(cypher)
+            return []
+
+        mock_conn.execute_query.side_effect = _exec
+        api.ontology_landscape(organism=_ORG, conn=mock_conn)
+        joined = "\n".join(seen)
+        for rel in ("Gene_has_interpro_entry", "Gene_has_ncbifam_family",
+                    "Gene_has_merops_family"):
+            assert rel in joined, rel
+
+
+class TestEnrichmentTrustFilters:
+    """Enrichment shapes TERM2GENE with the same filters, so tested sets and
+    background move together."""
+
+    def test_interpro_without_interpro_type_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="interpro_type"):
+            api.pathway_enrichment(
+                organism=_ORG, experiment_ids=["EXP1"], ontology="interpro",
+                level=0, conn=mock_conn,
+            )
+
+    def test_cluster_enrichment_interpro_without_type_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="interpro_type"):
+            api.cluster_enrichment(
+                analysis_id="A1", organism=_ORG, ontology="interpro",
+                level=0, conn=mock_conn,
+            )
+
+    def test_unsupported_axis_raises_on_enrichment(self, mock_conn):
+        with pytest.raises(ValueError, match="max_tier"):
+            api.pathway_enrichment(
+                organism=_ORG, experiment_ids=["EXP1"], ontology="kegg",
+                level=1, max_tier=2, conn=mock_conn,
+            )
+
+    def test_the_three_new_ontologies_are_valid_enrichment_targets(self):
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        for ontology in ("interpro", "ncbifam", "merops"):
+            assert ontology in ALL_ONTOLOGIES
+
+
+class TestEnrichmentEnvelopeTrustKeys:
+    """Design section 5: enrichment envelope adds filters_applied,
+    trust_axes, background_filtered, interpro_type."""
+
+    @pytest.mark.parametrize("key", [
+        "filters_applied", "trust_axes", "background_filtered", "interpro_type",
+    ])
+    def test_envelope_key_declared_on_the_result(self, key):
+        from multiomics_explorer.analysis.enrichment import EnrichmentResult
+        src = _inspect.getsource(EnrichmentResult.to_envelope)
+        assert key in src, f"{key} missing from the enrichment envelope"
+
+
+class TestSearchOntologyTrustSurfaceApi:
+    """PR 3a: `interpro_type` facet + compact gene_count / organism_count.
+    Browse mode and multi-ontology are PR 3b."""
+
+    def _rules(self, rows):
+        return [
+            ("total_entries", [{
+                "total_entries": 100, "total_matching": len(rows),
+                "score_max": 5.0, "score_median": 3.0}]),
+        ]
+
+    def test_rows_carry_gene_count_and_organism_count(self, mock_conn):
+        rows = [{
+            "id": "merops.family:S33", "name": "S33", "score": 5.0,
+            "level": 1, "tree": None, "tree_code": None,
+            "is_informative": True, "gene_count": 412, "organism_count": 41,
+        }]
+        _trust_dispatch(mock_conn, self._rules(rows), default=rows)
+        result = api.search_ontology(
+            "protease", "merops", conn=mock_conn)
+        assert result["results"][0]["gene_count"] == 412
+        assert result["results"][0]["organism_count"] == 41
+
+    def test_interpro_type_facet_is_forwarded(self, mock_conn):
+        seen = {}
+
+        def _exec(cypher, **params):
+            seen.update(params)
+            if "total_entries" in cypher:
+                return [{"total_entries": 10, "total_matching": 0,
+                         "score_max": None, "score_median": None}]
+            return []
+
+        mock_conn.execute_query.side_effect = _exec
+        api.search_ontology(
+            "kinase", "interpro", interpro_type="DOMAIN", conn=mock_conn)
+        assert seen.get("interpro_type") == "DOMAIN"
+
+    def test_interpro_type_on_non_interpro_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="interpro_type"):
+            api.search_ontology(
+                "transport", "kegg", interpro_type="DOMAIN", conn=mock_conn)
+
+    @pytest.mark.parametrize("ontology", ["interpro", "ncbifam", "merops"])
+    def test_new_ontologies_accepted(self, mock_conn, ontology):
+        _trust_dispatch(mock_conn, self._rules([]), default=[])
+        result = api.search_ontology("x", ontology, conn=mock_conn)
+        assert result["returned"] == 0
+
+
+class TestListFilterValuesTrustTypes:
+    """ControlledVocabulary owns the values; the pivot query is the fallback
+    and always announces itself."""
+
+    TRUST_FILTER_TYPES = [
+        "evidence", "sources", "call_class", "interpro_type",
+        "ncbifam_family_type", "merops_catalytic_type", "merops_family_class",
+        "best_hit_kind", "pfam_support", "attachment_depth",
+    ]
+
+    def _vocab_rows(self, values, applies_to="Gene_has_merops_family"):
+        return [{
+            "applies_to": applies_to,
+            "values": values,
+            "description": "MEROPS call class",
+            "sparse": "false",
+        }]
+
+    @pytest.mark.parametrize("filter_type", TRUST_FILTER_TYPES)
+    def test_filter_type_is_accepted(self, mock_conn, filter_type):
+        _trust_dispatch(
+            mock_conn,
+            [("ControlledVocabulary", self._vocab_rows(["a", "b"]))],
+            default=[],
+        )
+        result = api.list_filter_values(filter_type=filter_type, conn=mock_conn)
+        assert result["filter_type"] == filter_type
+
+    def test_vocabulary_rows_are_tagged_as_vocabulary(self, mock_conn):
+        _trust_dispatch(
+            mock_conn,
+            [("ControlledVocabulary", self._vocab_rows(
+                ["peptidase", "nonpeptidase_homolog", "unassigned"]))],
+            default=[],
+        )
+        result = api.list_filter_values(
+            filter_type="call_class", conn=mock_conn)
+        values = {r["value"] for r in result["results"]}
+        assert "peptidase" in values
+        assert all(r["source"] == "vocabulary" for r in result["results"])
+
+    def test_rows_carry_applies_to_and_description(self, mock_conn):
+        _trust_dispatch(
+            mock_conn,
+            [("ControlledVocabulary", self._vocab_rows(["peptidase"]))],
+            default=[],
+        )
+        result = api.list_filter_values(
+            filter_type="call_class", conn=mock_conn)
+        row = result["results"][0]
+        assert "applies_to" in row
+        assert "description" in row
+
+    def test_missing_vocab_node_falls_back_to_the_pivot(self, mock_conn):
+        def _exec(cypher, **params):
+            if "ControlledVocabulary" in cypher:
+                return []
+            if "DISTINCT" in cypher:
+                return [{"value": "peptidase"},
+                        {"value": "nonpeptidase_homolog"}]
+            return []
+
+        mock_conn.execute_query.side_effect = _exec
+        result = api.list_filter_values(
+            filter_type="call_class", conn=mock_conn)
+        values = {r["value"] for r in result["results"]}
+        assert values == {"peptidase", "nonpeptidase_homolog"}
+        assert all(r["source"] == "pivot" for r in result["results"])
+
+    def test_pivot_fallback_emits_the_kg_side_warning(self, mock_conn):
+        def _exec(cypher, **params):
+            if "ControlledVocabulary" in cypher:
+                return []
+            if "DISTINCT" in cypher:
+                return [{"value": "peptidase"}]
+            return []
+
+        mock_conn.execute_query.side_effect = _exec
+        result = api.list_filter_values(
+            filter_type="call_class", conn=mock_conn)
+        joined = " ".join(result["warnings"])
+        assert "No ControlledVocabulary entry for" in joined
+        assert "KG-side fix pending" in joined
+
+    def test_missing_vocab_is_never_a_hard_raise(self, mock_conn):
+        mock_conn.execute_query.side_effect = lambda cypher, **p: []
+        result = api.list_filter_values(
+            filter_type="call_class", conn=mock_conn)
+        assert result["results"] == []
+
+    def test_trust_axes_filter_type_is_config_derived(self, mock_conn):
+        result = api.list_filter_values(
+            filter_type="trust_axes", conn=mock_conn)
+        values = {r["value"] for r in result["results"]}
+        assert {"sources", "evidence", "evidence_score", "tier"} <= values
+
+    def test_link_kinds_filter_type_is_config_derived(self, mock_conn):
+        result = api.list_filter_values(
+            filter_type="link_kinds", conn=mock_conn)
+        values = {r["value"] for r in result["results"]}
+        assert values == {"composition", "membership", "router"}
+
+    def test_ontology_scope_narrows_trust_axes(self, mock_conn):
+        result = api.list_filter_values(
+            filter_type="trust_axes", ontology="kegg", conn=mock_conn)
+        values = {r["value"] for r in result["results"]}
+        assert values == {"sources", "evidence"}
+
+    def test_unknown_filter_type_still_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="Unknown filter_type"):
+            api.list_filter_values(filter_type="bogus", conn=mock_conn)
+
+
+class TestGeneOverviewMeropsNcbifam:
+    """gene_overview gains the protease / family-domain routing columns."""
+
+    def _summary_row(self, **overrides):
+        row = {
+            "total_matching": 1,
+            "by_organism": [{"item": _MIT1002, "count": 1}],
+            "by_category": [{"item": "Unknown", "count": 1}],
+            "by_annotation_type": [],
+            "by_annotation_state": [],
+            "has_expression": 0,
+            "has_significant_expression": 0,
+            "has_orthologs": 0,
+            "has_clusters": 0,
+            "has_derived_metrics": 0,
+            "has_chemistry": 0,
+            "has_discussed": 0,
+            "has_ncbifam": 1,
+            "by_merops_class": [{"item": "peptidase", "count": 1}],
+            "not_found": [],
+        }
+        row.update(overrides)
+        return [row]
+
+    def _detail_rows(self):
+        return [{
+            "locus_tag": "MIT1002_03660",
+            "gene_name": None, "product": None, "gene_category": "Unknown",
+            "annotation_quality": 3, "organism_name": _MIT1002,
+            "annotation_types": [], "expression_edge_count": 0,
+            "significant_up_count": 0, "significant_down_count": 0,
+            "closest_ortholog_group_size": 0, "closest_ortholog_genera": [],
+            "cluster_membership_count": 0, "cluster_types": [],
+            "numeric_metric_count": 0, "boolean_metric_count": 0,
+            "categorical_metric_count": 0, "reaction_count": 0,
+            "catalyzed_metabolite_count": 0, "tcdb_evidence_score_max": None,
+            "transported_metabolite_count": 0,
+            "transport_substrate_resolution": None,
+            "discussed_in_publication_count": 0, "evidence_sources": [],
+            "merops_classes": ["peptidase"],
+            "ncbifam_family_count": 2,
+            "merops_evidence_score_max": 1.0,
+        }]
+
+    def _run(self, mock_conn, summary_rows=None, detail_rows=None):
+        summary_rows = summary_rows or self._summary_row()
+        detail_rows = self._detail_rows() if detail_rows is None else detail_rows
+        _trust_dispatch(
+            mock_conn,
+            [("not_found", summary_rows)],
+            default=detail_rows,
+        )
+        return api.gene_overview(
+            locus_tags=["MIT1002_03660"], conn=mock_conn)
+
+    def test_rows_carry_merops_classes(self, mock_conn):
+        result = self._run(mock_conn)
+        assert result["results"][0]["merops_classes"] == ["peptidase"]
+
+    def test_rows_carry_ncbifam_family_count(self, mock_conn):
+        result = self._run(mock_conn)
+        assert result["results"][0]["ncbifam_family_count"] == 2
+
+    def test_merops_evidence_score_max_is_uncoalesced(self, mock_conn):
+        """Twin of tcdb_evidence_score_max: null means no MEROPS call at all,
+        0 means an uncorroborated one."""
+        rows = self._detail_rows()
+        rows[0]["merops_evidence_score_max"] = None
+        result = self._run(mock_conn, detail_rows=rows)
+        assert result["results"][0]["merops_evidence_score_max"] is None
+
+    def test_envelope_by_merops_class(self, mock_conn):
+        result = self._run(mock_conn)
+        assert _freq_map(result["by_merops_class"]) == {"peptidase": 1}
+
+    def test_envelope_has_ncbifam(self, mock_conn):
+        result = self._run(mock_conn)
+        assert result["has_ncbifam"] == 1

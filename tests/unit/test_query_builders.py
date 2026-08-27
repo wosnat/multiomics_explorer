@@ -321,8 +321,15 @@ class TestOntologyConfigSubcellularLocalization:
         assert cfg["fulltext_index"] == "subcellularLocalizationFullText"
         assert "bridge" not in cfg
         assert "parent_label" not in cfg
-        # edge_props: list of (neo4j_prop, output_column) pairs
-        assert cfg["edge_props"] == [("score", "localization_score")]
+        # Annotation-trust surface: the PSORTb-era `edge_props` key is
+        # superseded by `verbose_edge` (native detail, verbose-only).
+        # `score` keeps its `localization_score` output-column name.
+        assert "edge_props" not in cfg
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns(
+            "subcellular_localization", verbose=False) == []
+        assert ontology_row_columns(
+            "subcellular_localization", verbose=True) == ["localization_score"]
 
     def test_subcellular_localization_in_all_ontologies(self):
         from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
@@ -348,10 +355,16 @@ class TestOntologyConfigSignalPeptideType:
         assert cfg["fulltext_index"] == "signalPeptideTypeFullText"
         assert "bridge" not in cfg
         assert "parent_label" not in cfg
-        assert cfg["edge_props"] == [
-            ("probability", "signal_peptide_probability"),
-            ("cleavage_site", "signal_peptide_cleavage_site"),
-            ("cleavage_probability", "signal_peptide_cleavage_probability"),
+        # Annotation-trust surface: `edge_props` superseded by `verbose_edge`
+        # (native detail, verbose-only). The three SignalP output columns keep
+        # their existing names.
+        assert "edge_props" not in cfg
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns("signal_peptide_type", verbose=False) == []
+        assert ontology_row_columns("signal_peptide_type", verbose=True) == [
+            "signal_peptide_probability",
+            "signal_peptide_cleavage_site",
+            "signal_peptide_cleavage_probability",
         ]
 
     def test_signal_peptide_type_in_all_ontologies(self):
@@ -366,23 +379,31 @@ class TestOntologyConfigSignalPeptideType:
 
 
 class TestEdgePropsAbsentOnOtherOntologies:
-    """The `edge_props` field is optional. Existing 12 ontologies should
-    not carry it (or carry empty list) so they emit nulls for the new
-    edge-prop columns."""
+    """The PSORTb-era `edge_props` key is gone registry-wide (superseded by
+    `trust` / `compact_edge` / `verbose_edge`). Native detail is declared
+    only where the KG carries it."""
 
     @pytest.mark.parametrize("ontology", [
         "go_bp", "go_mf", "go_cc", "ec", "kegg",
         "cog_category", "cyanorak_role", "tigr_role", "pfam",
-        "brite", "tcdb", "cazy",
+        "brite", "cazy",
     ])
-    def test_no_edge_props_on_pre_existing_ontologies(self, ontology):
+    def test_no_native_detail_on_axes_only_ontologies(self, ontology):
         from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
         cfg = ONTOLOGY_CONFIG[ontology]
-        # Either absent or empty list — both signal "no edge props to surface"
-        assert cfg.get("edge_props", []) == [], (
-            f"Pre-existing ontology {ontology!r} unexpectedly has edge_props; "
-            "only psortb/signalp should carry this field"
+        assert "edge_props" not in cfg
+        assert cfg.get("verbose_edge", []) in (None, []), (
+            f"{ontology!r} declares native detail it does not carry"
         )
+
+    @pytest.mark.parametrize("ontology", ["tcdb", "merops", "interpro", "ncbifam"])
+    def test_native_detail_ontologies_use_verbose_edge_not_edge_props(
+        self, ontology
+    ):
+        from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+        cfg = ONTOLOGY_CONFIG[ontology]
+        assert "edge_props" not in cfg
+        assert cfg["verbose_edge"]
 
 
 class TestBuildResolveGene:
@@ -10256,55 +10277,38 @@ class TestBuildAssaysByMetabolite:
 
 
 class TestEdgePropColumnHelper:
-    """`_edge_prop_return_columns()` is the single source of truth for
-    the ordered set of edge-prop output columns across all ontologies.
-    Returns a list of (output_column, neo4j_prop, owner_ontology) tuples
-    so the Cypher RETURN-builder can emit `r.<prop> AS <col>` for the
-    owner and `null AS <col>` for non-owners.
+    """The uniform null-padded edge-prop row schema is superseded.
+
+    `_edge_prop_return_columns()` / `_edge_prop_return_cypher()` emitted the
+    union of every ontology's edge-prop columns on every row (`null AS <col>`
+    for non-owners). The annotation-trust surface replaces that with
+    strip-non-applicable: `ontology_row_columns(ontology, verbose)` names the
+    columns a row of that ontology OWNS, and nothing else is projected.
     """
 
-    def test_helper_returns_union_in_config_order(self):
-        from multiomics_explorer.kg.queries_lib import _edge_prop_return_columns
-        cols = _edge_prop_return_columns()
-        # Order: subcellular_localization (1 col), then signal_peptide_type (3 cols)
-        assert cols == [
-            ("localization_score", "score", "subcellular_localization"),
-            ("signal_peptide_probability", "probability", "signal_peptide_type"),
-            ("signal_peptide_cleavage_site", "cleavage_site", "signal_peptide_type"),
-            ("signal_peptide_cleavage_probability", "cleavage_probability",
-             "signal_peptide_type"),
+    def test_union_column_helper_is_gone(self):
+        import multiomics_explorer.kg.queries_lib as ql
+        assert not hasattr(ql, "_edge_prop_return_columns")
+
+    def test_union_cypher_helper_is_gone(self):
+        import multiomics_explorer.kg.queries_lib as ql
+        assert not hasattr(ql, "_edge_prop_return_cypher")
+
+    def test_owner_columns_come_from_ontology_row_columns(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns(
+            "subcellular_localization", verbose=True) == ["localization_score"]
+        assert ontology_row_columns("signal_peptide_type", verbose=True) == [
+            "signal_peptide_probability",
+            "signal_peptide_cleavage_site",
+            "signal_peptide_cleavage_probability",
         ]
 
-    def test_owner_cypher_for_psortb(self):
-        """For the owner ontology, emit `r.<neo4j_prop> AS <output_column>`."""
-        from multiomics_explorer.kg.queries_lib import _edge_prop_return_cypher
-        cypher = _edge_prop_return_cypher("subcellular_localization")
-        # Owner column: r.score AS localization_score
-        # Non-owner columns: null AS <col>
-        assert "r.score AS localization_score" in cypher
-        assert "null AS signal_peptide_probability" in cypher
-        assert "null AS signal_peptide_cleavage_site" in cypher
-        assert "null AS signal_peptide_cleavage_probability" in cypher
-
-    def test_owner_cypher_for_signalp(self):
-        from multiomics_explorer.kg.queries_lib import _edge_prop_return_cypher
-        cypher = _edge_prop_return_cypher("signal_peptide_type")
-        assert "null AS localization_score" in cypher
-        assert "r.probability AS signal_peptide_probability" in cypher
-        assert "r.cleavage_site AS signal_peptide_cleavage_site" in cypher
-        assert "r.cleavage_probability AS signal_peptide_cleavage_probability" \
-            in cypher
-
-    def test_non_owner_cypher_is_all_nulls(self):
-        from multiomics_explorer.kg.queries_lib import _edge_prop_return_cypher
-        cypher = _edge_prop_return_cypher("pfam")
-        assert "null AS localization_score" in cypher
-        assert "null AS signal_peptide_probability" in cypher
-        assert "null AS signal_peptide_cleavage_site" in cypher
-        assert "null AS signal_peptide_cleavage_probability" in cypher
-        # No r.* projections for non-owner ontologies
-        assert "r.score" not in cypher
-        assert "r.probability" not in cypher
+    def test_non_owner_ontology_owns_none_of_them(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        cols = ontology_row_columns("pfam", verbose=True)
+        assert "localization_score" not in cols
+        assert "signal_peptide_probability" not in cols
 
 
 class TestHierarchyWalkRelBinding:
@@ -10423,50 +10427,71 @@ class TestPerTermPerGeneUnwindShape:
 
 
 class TestGenesByOntologyDetailEdgeProps:
-    """build_genes_by_ontology_detail must emit edge-prop columns:
-    `r.<prop> AS <output_col>` on the owner ontology, `null AS <col>`
-    on all other ontologies. Row schema is uniform across all 14
-    ontologies."""
+    """build_genes_by_ontology_detail projects exactly the columns the row's
+    ontology owns. PSORTb / SignalP native scalars moved compact -> verbose;
+    no cross-ontology null padding is emitted any more."""
 
-    def test_subcellular_localization_emits_localization_score(self):
+    def test_subcellular_localization_emits_localization_score_in_verbose(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="subcellular_localization",
+            organism="MED4",
+            term_ids=["psortb_OuterMembrane"],
+            verbose=True,
+        )
+        assert "r.score AS localization_score" in cypher
+        # No foreign-ontology padding
+        assert "null AS signal_peptide_probability" not in cypher
+        assert "AS signal_peptide_cleavage_site" not in cypher
+
+    def test_subcellular_localization_compact_omits_localization_score(self):
         from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
         cypher, _ = build_genes_by_ontology_detail(
             ontology="subcellular_localization",
             organism="MED4",
             term_ids=["psortb_OuterMembrane"],
         )
-        assert "r.score AS localization_score" in cypher
-        # Other-ontology columns are null on this query
-        assert "null AS signal_peptide_probability" in cypher
-        assert "null AS signal_peptide_cleavage_site" in cypher
-        assert "null AS signal_peptide_cleavage_probability" in cypher
+        assert "AS localization_score" not in cypher
 
-    def test_signal_peptide_type_emits_three_signalp_cols(self):
+    def test_signal_peptide_type_emits_three_signalp_cols_in_verbose(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="signal_peptide_type",
+            organism="MED4",
+            term_ids=["signalp_LIPO"],
+            verbose=True,
+        )
+        assert "r.probability AS signal_peptide_probability" in cypher
+        assert "r.cleavage_site AS signal_peptide_cleavage_site" in cypher
+        assert "r.cleavage_probability AS signal_peptide_cleavage_probability" in cypher
+        assert "AS localization_score" not in cypher
+
+    def test_signal_peptide_type_compact_omits_signalp_cols(self):
         from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
         cypher, _ = build_genes_by_ontology_detail(
             ontology="signal_peptide_type",
             organism="MED4",
             term_ids=["signalp_LIPO"],
         )
-        assert "r.probability AS signal_peptide_probability" in cypher
-        assert "r.cleavage_site AS signal_peptide_cleavage_site" in cypher
-        assert "r.cleavage_probability AS signal_peptide_cleavage_probability" in cypher
-        assert "null AS localization_score" in cypher
+        assert "AS signal_peptide_probability" not in cypher
 
-    def test_pfam_emits_all_nulls(self):
-        """Non-owner ontology — all 4 edge-prop columns null."""
+    def test_pfam_emits_no_foreign_columns(self):
+        """Non-owner ontology — the four PSORTb / SignalP columns are simply
+        not part of a Pfam row."""
         from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
         cypher, _ = build_genes_by_ontology_detail(
             ontology="pfam",
             organism="MED4",
             term_ids=["pfam:PF00001"],
+            verbose=True,
         )
-        assert "null AS localization_score" in cypher
-        assert "null AS signal_peptide_probability" in cypher
-        assert "null AS signal_peptide_cleavage_site" in cypher
-        assert "null AS signal_peptide_cleavage_probability" in cypher
-        assert "r.score" not in cypher
-        assert "r.probability" not in cypher
+        assert "localization_score" not in cypher
+        assert "signal_peptide_probability" not in cypher
+        assert "signal_peptide_cleavage_site" not in cypher
+        assert "signal_peptide_cleavage_probability" not in cypher
+        # Pfam owns the three trust axes instead
+        assert "AS evidence" in cypher
+        assert "AS evidence_score" in cypher
 
     def test_detail_unwinds_bare_g(self):
         """Detail builder uses UNWIND term_genes AS g — re-bind r happens
@@ -10481,28 +10506,29 @@ class TestGenesByOntologyDetailEdgeProps:
         assert "UNWIND term_genes AS pair" not in cypher
 
     def test_detail_owner_ontology_optional_match_rebinds_r(self):
-        """For PSORTb (owner ontology with edge_props), the detail builder
-        inserts OPTIONAL MATCH to re-bind r for the (g, t) pair."""
+        """PSORTb is flat — the detail builder re-binds `r` for the (g, t)
+        pair with a direct OPTIONAL MATCH (no hierarchy, so no best-edge
+        list comprehension)."""
+        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="subcellular_localization",
+            organism="MED4",
+            term_ids=["psortb_OuterMembrane"],
+            verbose=True,
+        )
+        assert "OPTIONAL MATCH (g)-[r:Gene_has_subcellular_localization]->(t)" in cypher
+        assert "r.score AS localization_score" in cypher
+
+    def test_detail_ontology_with_no_owned_columns_skips_the_rebind(self):
+        """PSORTb compact owns no row columns, so `r` is never projected."""
         from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
         cypher, _ = build_genes_by_ontology_detail(
             ontology="subcellular_localization",
             organism="MED4",
             term_ids=["psortb_OuterMembrane"],
         )
-        assert "OPTIONAL MATCH (g)-[r:Gene_has_subcellular_localization]->(t)" in cypher
-        assert "r.score AS localization_score" in cypher
-
-    def test_detail_non_owner_no_optional_match(self):
-        """For pfam (no edge_props), no OPTIONAL MATCH is emitted."""
-        from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
-        cypher, _ = build_genes_by_ontology_detail(
-            ontology="pfam",
-            organism="MED4",
-            term_ids=["pfam:PF00001"],
-        )
         assert "OPTIONAL MATCH (g)-[r:" not in cypher
-        # Still emits the null columns
-        assert "null AS localization_score" in cypher
+        assert "localization_score" not in cypher
 
 
 class TestGeneOntologyTermsRelBindingAndEdgeProps:
@@ -10523,25 +10549,23 @@ class TestGeneOntologyTermsRelBindingAndEdgeProps:
         from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
         cypher, _ = build_gene_ontology_terms(
             locus_tags=["PMM0001"], ontology="signal_peptide_type",
-            organism_name="MED4", mode="leaf",
+            organism_name="MED4", mode="leaf", verbose=True,
         )
         assert "r.probability AS signal_peptide_probability" in cypher
         assert "r.cleavage_site AS signal_peptide_cleavage_site" in cypher
         assert "r.cleavage_probability AS signal_peptide_cleavage_probability" in cypher
-        assert "null AS localization_score" in cypher
+        assert "AS localization_score" not in cypher
 
-    def test_leaf_mode_non_owner_emits_all_nulls(self):
+    def test_leaf_mode_non_owner_emits_no_foreign_columns(self):
         from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
         cypher, _ = build_gene_ontology_terms(
             locus_tags=["PMM0001"], ontology="pfam",
-            organism_name="MED4", mode="leaf",
+            organism_name="MED4", mode="leaf", verbose=True,
         )
-        assert "null AS localization_score" in cypher
-        assert "null AS signal_peptide_probability" in cypher
-        assert "null AS signal_peptide_cleavage_site" in cypher
-        assert "null AS signal_peptide_cleavage_probability" in cypher
-        assert "r.score" not in cypher
-        assert "r.probability" not in cypher
+        assert "localization_score" not in cypher
+        assert "signal_peptide_probability" not in cypher
+        assert "signal_peptide_cleavage_site" not in cypher
+        assert "signal_peptide_cleavage_probability" not in cypher
 
     # --- rollup mode ---
 
@@ -10557,7 +10581,7 @@ class TestGeneOntologyTermsRelBindingAndEdgeProps:
         from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
         cypher, _ = build_gene_ontology_terms(
             locus_tags=["PMM0001"], ontology="subcellular_localization",
-            organism_name="MED4", mode="rollup", level=0,
+            organism_name="MED4", mode="rollup", level=0, verbose=True,
         )
         assert "r.score AS localization_score" in cypher
 
@@ -10567,21 +10591,21 @@ class TestGeneOntologyTermsRelBindingAndEdgeProps:
         from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
         cypher, _ = build_gene_ontology_terms(
             locus_tags=["PMM0001"], ontology="subcellular_localization",
-            organism_name="MED4", mode="rollup", level=0,
+            organism_name="MED4", mode="rollup", level=0, verbose=True,
         )
         # Must keep r through the WITH stage (otherwise RETURN r.score crashes)
         assert "WITH g, t, r" in cypher
         # Guard the legacy 2-var WITH doesn't linger
         assert "WITH g, t\nWHERE" not in cypher
 
-    def test_rollup_mode_non_owner_emits_all_nulls(self):
+    def test_rollup_mode_non_owner_emits_no_foreign_columns(self):
         from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
         cypher, _ = build_gene_ontology_terms(
             locus_tags=["PMM0001"], ontology="tcdb",
-            organism_name="MED4", mode="rollup", level=0,
+            organism_name="MED4", mode="rollup", level=0, verbose=True,
         )
-        assert "null AS localization_score" in cypher
-        assert "null AS signal_peptide_probability" in cypher
+        assert "localization_score" not in cypher
+        assert "signal_peptide_probability" not in cypher
 
 
 class TestBuildKGReleaseInfoQuery:
@@ -10923,3 +10947,924 @@ class TestBuildListPublicationsSummaryDiscusses:
         cypher, _ = build_list_publications_summary()
         assert "has_discusses" in cypher
         assert "no_discusses" in cypher
+
+
+# ===========================================================================
+# Annotation-trust surface (PR 3a)
+#
+# One normalized trust vocabulary across 17 ontologies: a compact `evidence`
+# column, verbose trust axes + native detail, generic config-validated trust
+# filters, and three newly registered ontologies (interpro / ncbifam / merops).
+# ===========================================================================
+
+
+TRUST_ONTOLOGIES = [
+    "go_bp", "go_mf", "go_cc", "ec", "kegg",
+    "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
+    "tcdb", "cazy", "interpro", "ncbifam", "merops",
+]
+
+NO_TRUST_ONTOLOGIES = ["subcellular_localization", "signal_peptide_type"]
+
+
+class TestOntologyRowColumns:
+    """`ontology_row_columns(ontology, verbose)` — the columns a gene x term
+    row of that ontology OWNS. Compact = comparable (evidence + the two
+    materially-important categoricals); verbose = remaining trust axes then
+    native detail. The api layer strips every owned-column-universe column
+    the row's ontology does not own."""
+
+    def test_compact_trust_ontology_owns_evidence_only(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns("go_bp", verbose=False) == ["evidence"]
+
+    @pytest.mark.parametrize("ontology", TRUST_ONTOLOGIES)
+    def test_every_trust_ontology_owns_evidence_in_compact(self, ontology):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert "evidence" in ontology_row_columns(ontology, verbose=False)
+
+    @pytest.mark.parametrize("ontology", NO_TRUST_ONTOLOGIES)
+    def test_psortb_signalp_own_no_compact_columns(self, ontology):
+        """PSORTb / SignalP carry no trust axes — their native scalars move
+        compact -> verbose."""
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns(ontology, verbose=False) == []
+
+    def test_go_bp_verbose_adds_sources_and_score(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns("go_bp", verbose=True) == [
+            "evidence", "sources", "evidence_score"]
+
+    def test_kegg_verbose_has_no_evidence_score(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns("kegg", verbose=True) == [
+            "evidence", "sources"]
+
+    def test_brite_inherits_kegg_edge_axes(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns("brite", verbose=True) == [
+            "evidence", "sources"]
+
+    def test_tcdb_verbose_is_axes_then_native_detail(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns("tcdb", verbose=True) == [
+            "evidence", "sources", "evidence_score", "tier",
+            "confidence_score", "source_agreement", "pfam_support", "go_support",
+            "identity", "qcov", "evalue", "consensus_n", "attachment_depth",
+        ]
+
+    def test_merops_compact_carries_call_class(self):
+        """`call_class` is materially important — absence changes the
+        biological reading, so it is compact, filterable and warned on."""
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns("merops", verbose=False) == [
+            "evidence", "call_class"]
+
+    def test_merops_verbose_is_compact_then_axes_then_native(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns("merops", verbose=True) == [
+            "evidence", "call_class", "sources", "evidence_score", "tier",
+            "confidence_score", "pfam_support", "best_hit_kind", "identity",
+            "qcov", "evalue", "consensus_n", "best_hit_id",
+        ]
+
+    def test_interpro_compact_carries_interpro_type(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns("interpro", verbose=False) == [
+            "evidence", "interpro_type"]
+
+    def test_interpro_verbose(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns("interpro", verbose=True) == [
+            "evidence", "interpro_type", "sources",
+            "libraries", "evalue_library", "evalue", "match_count",
+            "start", "end",
+        ]
+
+    def test_ncbifam_verbose(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns("ncbifam", verbose=True) == [
+            "evidence", "sources", "evalue", "bit_score", "start", "end"]
+
+    def test_psortb_verbose_keeps_localization_score_name(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns(
+            "subcellular_localization", verbose=True) == ["localization_score"]
+
+    def test_signalp_verbose_keeps_prefixed_column_names(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns("signal_peptide_type", verbose=True) == [
+            "signal_peptide_probability",
+            "signal_peptide_cleavage_site",
+            "signal_peptide_cleavage_probability",
+        ]
+
+    def test_call_class_is_merops_only(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        for ontology in ALL_ONTOLOGIES:
+            if ontology == "merops":
+                continue
+            assert "call_class" not in ontology_row_columns(
+                ontology, verbose=True), ontology
+
+    def test_interpro_type_is_interpro_only(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        for ontology in ALL_ONTOLOGIES:
+            if ontology == "interpro":
+                continue
+            assert "interpro_type" not in ontology_row_columns(
+                ontology, verbose=True), ontology
+
+    def test_verbose_is_superset_of_compact(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        for ontology in ALL_ONTOLOGIES:
+            compact = ontology_row_columns(ontology, verbose=False)
+            verbose = ontology_row_columns(ontology, verbose=True)
+            assert verbose[:len(compact)] == compact, ontology
+
+    def test_unknown_ontology_raises(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        with pytest.raises(ValueError, match="not_an_ontology"):
+            ontology_row_columns("not_an_ontology", verbose=False)
+
+
+class TestOntologyTrustAxes:
+    """`ontology_trust_axes(ontology)` — the comparable axes the ontology's
+    gene edge carries. Drives the envelope `trust_axes` key and the
+    unsupported-axis validation message."""
+
+    def test_tcdb_has_all_four_axes(self):
+        from multiomics_explorer.kg.queries_lib import ontology_trust_axes
+        assert ontology_trust_axes("tcdb") == [
+            "sources", "evidence", "evidence_score", "tier"]
+
+    def test_kegg_has_two_axes(self):
+        from multiomics_explorer.kg.queries_lib import ontology_trust_axes
+        assert ontology_trust_axes("kegg") == ["sources", "evidence"]
+
+    def test_psortb_has_no_axes(self):
+        from multiomics_explorer.kg.queries_lib import ontology_trust_axes
+        assert ontology_trust_axes("subcellular_localization") == []
+
+    def test_rank_prop_never_leaks_into_axes(self):
+        from multiomics_explorer.kg.queries_lib import ontology_trust_axes
+        for ontology in ALL_ONTOLOGIES:
+            assert "rank_prop" not in ontology_trust_axes(ontology), ontology
+
+    def test_unknown_ontology_raises(self):
+        from multiomics_explorer.kg.queries_lib import ontology_trust_axes
+        with pytest.raises(ValueError, match="not_an_ontology"):
+            ontology_trust_axes("not_an_ontology")
+
+
+class TestBuildTrustFilterClause:
+    """`build_trust_filter_clause` — WHERE fragment on rel var `r`, plus its
+    params. Generic names, config-validated per ontology. Defaults never
+    filter on trust."""
+
+    def test_no_filters_returns_empty_fragment_and_params(self):
+        from multiomics_explorer.kg.queries_lib import build_trust_filter_clause
+        frag, params = build_trust_filter_clause("tcdb")
+        assert frag == ""
+        assert params == {}
+
+    def test_evidence_clause(self):
+        from multiomics_explorer.kg.queries_lib import build_trust_filter_clause
+        frag, params = build_trust_filter_clause(
+            "go_bp", evidence=["curated", "signature"])
+        assert "r.evidence IN $evidence" in frag
+        assert params["evidence"] == ["curated", "signature"]
+
+    def test_sources_clause_uses_any_over_list_prop(self):
+        """`sources` is a list property — membership, not equality."""
+        from multiomics_explorer.kg.queries_lib import build_trust_filter_clause
+        frag, params = build_trust_filter_clause("tcdb", sources=["eggnog"])
+        assert "any(s IN $sources WHERE s IN r.sources)" in frag
+        assert params["sources"] == ["eggnog"]
+
+    def test_max_tier_keeps_tier_null_rows(self):
+        """Ground rule: eggNOG-only TCDB edges carry no tier and are kept."""
+        from multiomics_explorer.kg.queries_lib import build_trust_filter_clause
+        frag, params = build_trust_filter_clause("tcdb", max_tier=2)
+        assert "(r.tier <= $max_tier OR r.tier IS NULL)" in frag
+        assert params["max_tier"] == 2
+
+    def test_min_evidence_score_clause(self):
+        from multiomics_explorer.kg.queries_lib import build_trust_filter_clause
+        frag, params = build_trust_filter_clause("merops", min_evidence_score=0.6)
+        assert "r.evidence_score >= $min_evidence_score" in frag
+        assert params["min_evidence_score"] == 0.6
+
+    def test_call_class_clause(self):
+        from multiomics_explorer.kg.queries_lib import build_trust_filter_clause
+        frag, params = build_trust_filter_clause(
+            "merops", call_class=["peptidase"])
+        assert "r.call_class IN $call_class" in frag
+        assert params["call_class"] == ["peptidase"]
+
+    def test_fragment_is_a_bare_conjunction(self):
+        """Callers splice the fragment into an existing WHERE — it must not
+        open its own WHERE nor lead with AND."""
+        from multiomics_explorer.kg.queries_lib import build_trust_filter_clause
+        frag, _ = build_trust_filter_clause(
+            "merops", call_class=["peptidase"], evidence=["curated"])
+        assert not frag.strip().startswith("WHERE")
+        assert not frag.strip().startswith("AND")
+        assert " AND " in frag
+
+    def test_unsupported_axis_raises_naming_the_ontology_axes(self):
+        from multiomics_explorer.kg.queries_lib import build_trust_filter_clause
+        with pytest.raises(ValueError) as excinfo:
+            build_trust_filter_clause("kegg", max_tier=2)
+        msg = str(excinfo.value)
+        assert "max_tier" in msg
+        assert "kegg" in msg
+        # names the axes the ontology DOES carry, and routes to discovery
+        assert "evidence" in msg
+        assert "sources" in msg
+        assert "trust_axes" in msg
+
+    def test_call_class_on_non_merops_raises(self):
+        from multiomics_explorer.kg.queries_lib import build_trust_filter_clause
+        with pytest.raises(ValueError, match="call_class"):
+            build_trust_filter_clause("tcdb", call_class=["peptidase"])
+
+    def test_min_evidence_score_on_kegg_raises(self):
+        """KEGG edges carry no evidence_score (null on 9 of 17)."""
+        from multiomics_explorer.kg.queries_lib import build_trust_filter_clause
+        with pytest.raises(ValueError, match="min_evidence_score"):
+            build_trust_filter_clause("kegg", min_evidence_score=0.5)
+
+    def test_any_trust_filter_on_psortb_raises(self):
+        from multiomics_explorer.kg.queries_lib import build_trust_filter_clause
+        with pytest.raises(ValueError, match="evidence"):
+            build_trust_filter_clause(
+                "subcellular_localization", evidence=["curated"])
+
+    def test_max_tier_supported_on_merops(self):
+        from multiomics_explorer.kg.queries_lib import build_trust_filter_clause
+        frag, params = build_trust_filter_clause("merops", max_tier=1)
+        assert "r.tier" in frag
+        assert params["max_tier"] == 1
+
+
+class TestTrustPredicatePlacement:
+    """Spec section 7.1 — trust predicates bind at the gene -> leaf MATCH,
+    BEFORE the hierarchy walk and BEFORE the collect(DISTINCT g) size
+    collapse, so per-term gene-set sizes reflect the filtered edges."""
+
+    def _merops_match_stage(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            _genes_by_ontology_match_stage,
+        )
+        return _genes_by_ontology_match_stage(
+            ontology="merops", level=0, term_ids=None,
+            organism="Alteromonas macleodii MIT1002", **kwargs,
+        )
+
+    def test_call_class_predicate_precedes_hierarchy_walk(self):
+        cypher, _ = self._merops_match_stage(call_class=["peptidase"])
+        pred = cypher.index("r.call_class IN $call_class")
+        walk = cypher.index("Merops_family_is_a_merops_family")
+        assert pred < walk, cypher
+
+    def test_call_class_predicate_precedes_size_collapse(self):
+        cypher, _ = self._merops_match_stage(call_class=["peptidase"])
+        pred = cypher.index("r.call_class IN $call_class")
+        collapse = cypher.index("collect(DISTINCT g) AS term_genes")
+        assert pred < collapse, cypher
+
+    def test_predicate_binds_on_the_gene_leaf_rel_var(self):
+        cypher, _ = self._merops_match_stage(call_class=["peptidase"])
+        bind = cypher.index("[r:Gene_has_merops_family]")
+        pred = cypher.index("r.call_class IN $call_class")
+        assert bind < pred, cypher
+
+    def test_params_carry_the_filter_values(self):
+        _cypher, params = self._merops_match_stage(
+            call_class=["peptidase"], evidence=["curated"], max_tier=2)
+        assert params["call_class"] == ["peptidase"]
+        assert params["evidence"] == ["curated"]
+        assert params["max_tier"] == 2
+
+    def test_no_filters_emits_no_trust_predicate(self):
+        cypher, params = self._merops_match_stage()
+        assert "r.call_class" not in cypher
+        assert "r.evidence" not in cypher
+        assert "call_class" not in params
+
+    def test_walk_down_mode_also_binds_trust_predicate_before_collapse(self):
+        from multiomics_explorer.kg.queries_lib import (
+            _genes_by_ontology_match_stage,
+        )
+        cypher, _ = _genes_by_ontology_match_stage(
+            ontology="tcdb", level=None, term_ids=["tcdb:3.A.1"],
+            organism="Prochlorococcus MED4", max_tier=2,
+        )
+        pred = cypher.index("r.tier <= $max_tier")
+        collapse = cypher.index("collect(DISTINCT g) AS term_genes")
+        assert pred < collapse, cypher
+
+    @pytest.mark.parametrize("builder_name", [
+        "build_genes_by_ontology_detail",
+        "build_genes_by_ontology_per_term",
+        "build_genes_by_ontology_per_gene",
+    ])
+    def test_all_three_gbo_builders_thread_trust_filters(self, builder_name):
+        import multiomics_explorer.kg.queries_lib as ql
+        builder = getattr(ql, builder_name)
+        cypher, params = builder(
+            ontology="merops", organism="Alteromonas macleodii MIT1002",
+            level=0, call_class=["peptidase"],
+        )
+        assert "r.call_class IN $call_class" in cypher
+        assert params["call_class"] == ["peptidase"]
+
+    def test_gene_ontology_terms_threads_trust_filters(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["MIT1002_03660"], ontology="merops",
+            organism_name="Alteromonas macleodii MIT1002",
+            mode="leaf", call_class=["peptidase"],
+        )
+        assert "r.call_class IN $call_class" in cypher
+        assert params["call_class"] == ["peptidase"]
+
+    def test_gene_ontology_terms_summary_threads_trust_filters(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_gene_ontology_terms_summary,
+        )
+        cypher, params = build_gene_ontology_terms_summary(
+            locus_tags=["MIT1002_03660"], ontology="merops",
+            organism_name="Alteromonas macleodii MIT1002",
+            mode="leaf", call_class=["peptidase"],
+        )
+        assert "r.call_class IN $call_class" in cypher
+        assert params["call_class"] == ["peptidase"]
+
+    def test_ontology_landscape_threads_trust_filters(self):
+        from multiomics_explorer.kg.queries_lib import build_ontology_landscape
+        cypher, params = build_ontology_landscape(
+            ontology="merops", organism_name="Alteromonas macleodii MIT1002",
+            call_class=["peptidase"],
+        )
+        assert "r.call_class IN $call_class" in cypher
+        assert params["call_class"] == ["peptidase"]
+
+    def test_landscape_predicate_precedes_per_term_aggregation(self):
+        from multiomics_explorer.kg.queries_lib import build_ontology_landscape
+        cypher, _ = build_ontology_landscape(
+            ontology="merops", organism_name="Alteromonas macleodii MIT1002",
+            call_class=["peptidase"],
+        )
+        pred = cypher.index("r.call_class IN $call_class")
+        agg = cypher.index("count(DISTINCT g) AS n_g_per_term")
+        assert pred < agg, cypher
+
+    def test_unsupported_axis_raises_from_the_builder(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        with pytest.raises(ValueError, match="call_class"):
+            build_genes_by_ontology_detail(
+                ontology="tcdb", organism="Prochlorococcus MED4",
+                level=1, call_class=["peptidase"],
+            )
+
+
+class TestOneEdgePerGeneTermRebind:
+    """Spec section 7.2 — on hierarchical trust ontologies a rollup row's `t`
+    is an ancestor reachable by several gene edges. Trust columns come from
+    the gene's best edge under `t` (rank_prop desc), rebound via a
+    list-comprehension + apoc.coll.sortMaps, so there is exactly one row per
+    (gene, term)."""
+
+    def test_tcdb_rollup_sorts_edges_by_evidence_score(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="tcdb", organism="Prochlorococcus MED4", level=2,
+        )
+        assert "apoc.coll.sortMaps(" in cypher
+        assert "'evidence_score'" in cypher
+        assert "head(reverse(" in cypher
+
+    def test_merops_rollup_sorts_edges_by_confidence_score(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="merops", organism="Alteromonas macleodii MIT1002", level=0,
+        )
+        assert "apoc.coll.sortMaps(" in cypher
+        assert "'confidence_score'" in cypher
+
+    def test_hierarchical_trust_ontology_uses_the_rebind(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="go_bp", organism="Prochlorococcus MED4", level=3,
+        )
+        assert "apoc.coll.sortMaps(" in cypher
+
+    def test_flat_ontology_keeps_the_direct_optional_match(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="cog_category", organism="Prochlorococcus MED4", level=0,
+        )
+        assert "OPTIONAL MATCH (g)-[r:Gene_in_cog_category]->(t)" in cypher
+        assert "apoc.coll.sortMaps(" not in cypher
+
+    def test_no_duplicate_gene_term_rows_from_distinct_plus_rel(self):
+        """Guard the PSORTb-era `RETURN DISTINCT ... r.*` duplication."""
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="tcdb", organism="Prochlorococcus MED4", level=2,
+        )
+        assert "WITH DISTINCT t, g" in cypher
+
+    def test_psortb_has_no_rebind_and_no_trust_columns_in_compact(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="subcellular_localization",
+            organism="Prochlorococcus MED4",
+            term_ids=["psortb_OuterMembrane"],
+        )
+        assert "apoc.coll.sortMaps(" not in cypher
+        assert "AS localization_score" not in cypher
+
+
+class TestOntologyRowColumnsInCypher:
+    """The projected RETURN columns are exactly `ontology_row_columns`.
+    No cross-ontology null padding survives (the api layer no longer strips
+    a fixed `_EDGE_PROP_COLS` union)."""
+
+    def test_tcdb_compact_projects_evidence_only(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="tcdb", organism="Prochlorococcus MED4", level=2,
+        )
+        assert "AS evidence" in cypher
+        assert "AS tier" not in cypher
+        assert "AS sources" not in cypher
+
+    def test_tcdb_verbose_projects_axes_and_native_detail(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="tcdb", organism="Prochlorococcus MED4", level=2,
+            verbose=True,
+        )
+        for col in ("evidence", "sources", "evidence_score", "tier",
+                    "attachment_depth", "source_agreement"):
+            assert f"AS {col}" in cypher, col
+
+    def test_merops_compact_projects_call_class(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="merops", organism="Alteromonas macleodii MIT1002", level=0,
+        )
+        assert "AS call_class" in cypher
+
+    def test_interpro_compact_projects_interpro_type_from_the_term(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="interpro", organism="Prochlorococcus MED4", level=0,
+        )
+        assert "t.interpro_type AS interpro_type" in cypher
+
+    def test_no_foreign_ontology_null_padding(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="tcdb", organism="Prochlorococcus MED4", level=2,
+            verbose=True,
+        )
+        assert "null AS localization_score" not in cypher
+        assert "null AS signal_peptide_probability" not in cypher
+        assert "null AS call_class" not in cypher
+
+    def test_gene_ontology_terms_verbose_projects_native_detail(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0392"], ontology="tcdb",
+            organism_name="Prochlorococcus MED4", mode="leaf", verbose=True,
+        )
+        assert "AS attachment_depth" in cypher
+        assert "AS evidence_score" in cypher
+
+    def test_gene_ontology_terms_compact_omits_native_detail(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0392"], ontology="tcdb",
+            organism_name="Prochlorococcus MED4", mode="leaf",
+        )
+        assert "AS attachment_depth" not in cypher
+        assert "AS evidence" in cypher
+
+
+class TestLeafFilterMostSpecificAttachment:
+    """Spec section 7.3 — the leaf filter walks the whole ancestor chain
+    (`*1..`, was one hop). TCDB additionally restricts to
+    `attachment_depth = 'most_specific'` unless `include_superseded`."""
+
+    def test_tcdb_leaf_filter_uses_transitive_star_one(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0392"], ontology="tcdb",
+            organism_name="Prochlorococcus MED4", mode="leaf",
+        )
+        assert "Tcdb_family_is_a_tcdb_family*1..]->(t)" in cypher
+
+    def test_merops_leaf_filter_uses_transitive_star_one(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["MIT1002_03660"], ontology="merops",
+            organism_name="Alteromonas macleodii MIT1002", mode="leaf",
+        )
+        assert "Merops_family_is_a_merops_family*1..]->(t)" in cypher
+
+    def test_leaf_filter_is_not_single_hop_anymore(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0392"], ontology="tcdb",
+            organism_name="Prochlorococcus MED4", mode="leaf",
+        )
+        assert "-[:Tcdb_family_is_a_tcdb_family]->(t)" not in cypher
+
+    def test_tcdb_leaf_defaults_to_most_specific_attachment(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0392"], ontology="tcdb",
+            organism_name="Prochlorococcus MED4", mode="leaf",
+        )
+        assert "r.attachment_depth = 'most_specific'" in cypher
+
+    def test_include_superseded_drops_the_attachment_depth_predicate(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0392"], ontology="tcdb",
+            organism_name="Prochlorococcus MED4", mode="leaf",
+            include_superseded=True,
+        )
+        assert "r.attachment_depth = 'most_specific'" not in cypher
+
+    def test_include_superseded_defaults_to_false(self):
+        import inspect
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        sig = inspect.signature(build_gene_ontology_terms)
+        assert sig.parameters["include_superseded"].default is False
+
+    def test_attachment_depth_predicate_is_tcdb_only(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["MIT1002_03660"], ontology="merops",
+            organism_name="Alteromonas macleodii MIT1002", mode="leaf",
+        )
+        assert "attachment_depth" not in cypher
+
+    def test_summary_builder_applies_the_same_leaf_predicate(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_gene_ontology_terms_summary,
+        )
+        cypher, _ = build_gene_ontology_terms_summary(
+            locus_tags=["PMM0392"], ontology="tcdb",
+            organism_name="Prochlorococcus MED4", mode="leaf",
+        )
+        assert "r.attachment_depth = 'most_specific'" in cypher
+        assert "Tcdb_family_is_a_tcdb_family*1..]->(t)" in cypher
+
+
+class TestFacetGeneralization:
+    """`tree` keeps its name and behaviour; the facet mechanism generalizes
+    so InterPro's `interpro_type` binds on `t` after the walk."""
+
+    # Byte-identical BRITE goldens captured before the facet generalization
+    # (2026-08-27, worktree slice3a-annotation-trust). `tree` output must not
+    # move when the facet mechanism is introduced.
+    BRITE_PER_TERM_GOLDEN = (
+        "MATCH (g:Gene {organism_name: $org})-[r:Gene_has_kegg_ko]->(ko:KeggTerm)"
+        "-[:Kegg_term_in_brite_category]->(leaf:BriteCategory)\n"
+        "MATCH (leaf)-[:Brite_category_is_a_brite_category*0..]->(t:BriteCategory)\n"
+        "WHERE t.level = $level AND t.tree = $tree\n"
+        "\n"
+        "WITH t, collect(DISTINCT g) AS term_genes\n"
+        "WHERE size(term_genes) >= $min_gene_set_size\n"
+        "  AND ($max_gene_set_size IS NULL OR size(term_genes) <= $max_gene_set_size)\n"
+        "UNWIND term_genes AS g\n"
+        "WITH t, collect({lt: g.locus_tag, cat: coalesce(g.gene_category, 'Unknown')})"
+        " AS gene_rows\n"
+        "RETURN t.id AS term_id, t.name AS term_name, t.level AS level,\n"
+        "       t.tree AS tree, t.tree_code AS tree_code,\n"
+        "       t.level_is_best_effort IS NOT NULL AS best_effort,\n"
+        "       size(gene_rows) AS n_genes,\n"
+        "       apoc.coll.frequencies([r IN gene_rows | r.cat]) AS cat_freqs,\n"
+        "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative\n"
+        "ORDER BY t.id"
+    )
+
+    def test_brite_per_term_cypher_is_byte_identical(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
+        )
+        cypher, params = build_genes_by_ontology_per_term(
+            ontology="brite", organism="MED4", level=1, tree="transporters",
+        )
+        assert cypher == self.BRITE_PER_TERM_GOLDEN
+        assert params["tree"] == "transporters"
+
+    def test_brite_landscape_still_filters_on_tree(self):
+        from multiomics_explorer.kg.queries_lib import build_ontology_landscape
+        cypher, params = build_ontology_landscape(
+            ontology="brite", organism_name="MED4", tree="transporters",
+        )
+        assert "WHERE t.tree = $tree" in cypher
+        assert params["tree"] == "transporters"
+
+    def test_tree_on_non_brite_still_raises(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        with pytest.raises(ValueError, match="tree"):
+            build_genes_by_ontology_detail(
+                ontology="kegg", organism="MED4", level=1, tree="transporters",
+            )
+
+    def test_interpro_type_binds_on_the_term(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, params = build_genes_by_ontology_detail(
+            ontology="interpro", organism="Prochlorococcus MED4", level=0,
+            interpro_type="HOMOLOGOUS_SUPERFAMILY",
+        )
+        assert "t.interpro_type = $interpro_type" in cypher
+        assert params["interpro_type"] == "HOMOLOGOUS_SUPERFAMILY"
+
+    def test_interpro_type_binds_after_the_hierarchy_walk(self):
+        from multiomics_explorer.kg.queries_lib import (
+            _genes_by_ontology_match_stage,
+        )
+        cypher, _ = _genes_by_ontology_match_stage(
+            ontology="interpro", level=0, term_ids=None,
+            organism="Prochlorococcus MED4", interpro_type="FAMILY",
+        )
+        walk = cypher.index("Interpro_entry_is_a_interpro_entry")
+        facet = cypher.index("t.interpro_type = $interpro_type")
+        assert walk < facet, cypher
+
+    def test_interpro_type_on_non_interpro_raises(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        with pytest.raises(ValueError, match="interpro_type"):
+            build_genes_by_ontology_detail(
+                ontology="tcdb", organism="MED4", level=1,
+                interpro_type="FAMILY",
+            )
+
+    def test_gene_ontology_terms_accepts_interpro_type(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="interpro",
+            organism_name="Prochlorococcus MED4", mode="leaf",
+            interpro_type="DOMAIN",
+        )
+        assert "t.interpro_type = $interpro_type" in cypher
+        assert params["interpro_type"] == "DOMAIN"
+
+    def test_landscape_accepts_interpro_type(self):
+        from multiomics_explorer.kg.queries_lib import build_ontology_landscape
+        cypher, params = build_ontology_landscape(
+            ontology="interpro", organism_name="Prochlorococcus MED4",
+            interpro_type="FAMILY",
+        )
+        assert "t.interpro_type = $interpro_type" in cypher
+        assert params["interpro_type"] == "FAMILY"
+
+
+class TestLandscapeInterproStratum:
+    """Spec section 7.7 — InterPro landscape rows group by
+    (interpro_type, level), so an ORA stratum is a testable unit."""
+
+    def test_interpro_type_is_in_the_grouping_key(self):
+        from multiomics_explorer.kg.queries_lib import build_ontology_landscape
+        cypher, _ = build_ontology_landscape(
+            ontology="interpro", organism_name="Prochlorococcus MED4",
+        )
+        assert "t.interpro_type AS interpro_type" in cypher
+
+    def test_interpro_type_is_returned(self):
+        from multiomics_explorer.kg.queries_lib import build_ontology_landscape
+        cypher, _ = build_ontology_landscape(
+            ontology="interpro", organism_name="Prochlorococcus MED4",
+        )
+        assert "RETURN" in cypher
+        tail = cypher[cypher.index("RETURN"):]
+        assert "interpro_type" in tail
+
+    def test_non_interpro_landscape_has_no_interpro_type_column(self):
+        from multiomics_explorer.kg.queries_lib import build_ontology_landscape
+        cypher, _ = build_ontology_landscape(
+            ontology="kegg", organism_name="Prochlorococcus MED4",
+        )
+        assert "interpro_type" not in cypher
+
+    def test_merops_landscape_accepts_call_class(self):
+        """Landscape sizes must match the enrichment tested sets."""
+        from multiomics_explorer.kg.queries_lib import build_ontology_landscape
+        cypher, params = build_ontology_landscape(
+            ontology="merops", organism_name="Alteromonas macleodii MIT1002",
+            call_class=["peptidase"],
+        )
+        assert "r.call_class IN $call_class" in cypher
+        assert params["call_class"] == ["peptidase"]
+
+
+class TestSearchOntologyTrustSurface:
+    """PR 3a adds the `interpro_type` facet plus compact `gene_count` /
+    `organism_count` to search_ontology. Browse mode and multi-ontology are
+    PR 3b."""
+
+    def test_compact_returns_gene_count_and_organism_count(self):
+        cypher, _ = build_search_ontology(
+            ontology="merops", search_text="protease",
+        )
+        assert "t.gene_count AS gene_count" in cypher
+        assert "t.organism_count AS organism_count" in cypher
+
+    def test_interpro_type_facet_filters_the_search(self):
+        cypher, params = build_search_ontology(
+            ontology="interpro", search_text="kinase",
+            interpro_type="DOMAIN",
+        )
+        assert "t.interpro_type = $interpro_type" in cypher
+        assert params["interpro_type"] == "DOMAIN"
+
+    def test_interpro_type_on_non_interpro_raises(self):
+        with pytest.raises(ValueError, match="interpro_type"):
+            build_search_ontology(
+                ontology="kegg", search_text="transport",
+                interpro_type="DOMAIN",
+            )
+
+    def test_summary_builder_accepts_interpro_type(self):
+        cypher, params = build_search_ontology_summary(
+            ontology="interpro", search_text="kinase", interpro_type="FAMILY",
+        )
+        assert "t.interpro_type = $interpro_type" in cypher
+        assert params["interpro_type"] == "FAMILY"
+
+    def test_new_ontologies_use_their_fulltext_index(self):
+        for ontology, index in [
+            ("interpro", "interproEntryFullText"),
+            ("ncbifam", "ncbifamFamilyFullText"),
+            ("merops", "meropsFamilyFullText"),
+        ]:
+            cypher, _ = build_search_ontology(
+                ontology=ontology, search_text="x")
+            assert index in cypher, ontology
+
+
+class TestVocabularyQueryBuilders:
+    """Spec section 7.6 — `ControlledVocabulary` owns values / descriptions /
+    signals; the pivot query is the fallback when the node is missing."""
+
+    def test_build_vocab_values_reads_the_vocabulary_node(self):
+        from multiomics_explorer.kg.queries_lib import build_vocab_values
+        cypher, params = build_vocab_values(
+            applies_to="Gene_has_merops_family", prop="call_class")
+        assert "ControlledVocabulary" in cypher
+        assert "$applies_to" in cypher
+        assert "$prop" in cypher
+        assert params["applies_to"] == "Gene_has_merops_family"
+        assert params["prop"] == "call_class"
+
+    def test_build_vocab_values_returns_values_and_description(self):
+        from multiomics_explorer.kg.queries_lib import build_vocab_values
+        cypher, _ = build_vocab_values(
+            applies_to="Gene_has_merops_family", prop="call_class")
+        assert "v.values" in cypher
+        assert "v.description" in cypher
+        assert "v.sparse" in cypher
+
+    def test_pivot_over_an_edge_property(self):
+        from multiomics_explorer.kg.queries_lib import build_vocab_pivot_values
+        cypher, _ = build_vocab_pivot_values(
+            applies_to="Gene_has_merops_family", prop="call_class", kind="edge")
+        assert "[r:Gene_has_merops_family]" in cypher
+        assert "DISTINCT r.call_class AS value" in cypher
+        assert "ORDER BY value" in cypher
+
+    def test_pivot_over_a_node_property(self):
+        from multiomics_explorer.kg.queries_lib import build_vocab_pivot_values
+        cypher, _ = build_vocab_pivot_values(
+            applies_to="InterproEntry", prop="interpro_type", kind="node")
+        assert ":InterproEntry" in cypher
+        assert ".interpro_type AS value" in cypher
+        assert "ORDER BY value" in cypher
+
+    def test_pivot_rejects_unknown_kind(self):
+        from multiomics_explorer.kg.queries_lib import build_vocab_pivot_values
+        with pytest.raises(ValueError, match="kind"):
+            build_vocab_pivot_values(
+                applies_to="InterproEntry", prop="interpro_type", kind="bogus")
+
+    def test_evidence_score_signals_builder(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_evidence_score_signals,
+        )
+        cypher, params = build_evidence_score_signals(
+            edge_types=["Gene_has_tcdb_family", "Gene_has_merops_family"])
+        assert "ControlledVocabulary" in cypher
+        assert "'evidence_score'" in cypher
+        assert "signals" in cypher
+        assert params["edge_types"] == [
+            "Gene_has_tcdb_family", "Gene_has_merops_family"]
+
+
+class TestNewOntologyCypherNames:
+    """Every label / edge / index the three new ontologies use is read from
+    the registry, never inlined by hand."""
+
+    @pytest.mark.parametrize("ontology,label,rel", [
+        ("interpro", "InterproEntry", "Gene_has_interpro_entry"),
+        ("ncbifam", "NcbifamFamily", "Gene_has_ncbifam_family"),
+        ("merops", "MeropsFamily", "Gene_has_merops_family"),
+    ])
+    def test_hierarchy_walk_binds_label_and_rel(self, ontology, label, rel):
+        frag = _hierarchy_walk(ontology, direction="up")
+        assert frag["leaf_label"] == label
+        assert f"[r:{rel}]" in frag["bind_up"]
+
+    def test_interpro_walks_its_is_a_hierarchy(self):
+        frag = _hierarchy_walk("interpro", direction="up")
+        assert "Interpro_entry_is_a_interpro_entry*0.." in frag["walk_up"]
+
+    def test_merops_walks_its_is_a_hierarchy(self):
+        frag = _hierarchy_walk("merops", direction="up")
+        assert "Merops_family_is_a_merops_family*0.." in frag["walk_up"]
+
+    def test_ncbifam_is_flat(self):
+        frag = _hierarchy_walk("ncbifam", direction="up")
+        assert frag["walk_up"] == ""
+        assert "(t:NcbifamFamily)" in frag["bind_up"]
+
+    @pytest.mark.parametrize("ontology", ["interpro", "ncbifam", "merops"])
+    def test_detail_builder_works_for_the_new_ontologies(self, ontology):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, params = build_genes_by_ontology_detail(
+            ontology=ontology, organism="Prochlorococcus MED4", level=0,
+        )
+        assert ONTOLOGY_CONFIG[ontology]["gene_rel"] in cypher
+        assert params["org"] == "Prochlorococcus MED4"
+
+
+class TestGeneOverviewMeropsNcbifamColumns:
+    """Spec section 7.8 — gene_overview surfaces the protease / family-domain
+    routing signals from precomputed Gene properties."""
+
+    def test_detail_projects_merops_classes_defaulted_to_empty(self):
+        cypher, _ = build_gene_overview(locus_tags=["MIT1002_03660"])
+        assert "coalesce(g.merops_classes, []) AS merops_classes" in cypher
+
+    def test_detail_projects_ncbifam_family_count_defaulted_to_zero(self):
+        cypher, _ = build_gene_overview(locus_tags=["MIT1002_03660"])
+        assert (
+            "coalesce(g.ncbifam_family_count, 0) AS ncbifam_family_count"
+            in cypher
+        )
+
+    def test_merops_evidence_score_max_is_not_coalesced(self):
+        """Twin of tcdb_evidence_score_max — null means no MEROPS call."""
+        cypher, _ = build_gene_overview(locus_tags=["MIT1002_03660"])
+        assert (
+            "g.merops_evidence_score_max AS merops_evidence_score_max" in cypher
+        )
+        assert "coalesce(g.merops_evidence_score_max" not in cypher
+
+    def test_summary_emits_by_merops_class(self):
+        cypher, _ = build_gene_overview_summary(locus_tags=["MIT1002_03660"])
+        assert "by_merops_class" in cypher
+
+    def test_summary_emits_has_ncbifam(self):
+        cypher, _ = build_gene_overview_summary(locus_tags=["MIT1002_03660"])
+        assert "has_ncbifam" in cypher

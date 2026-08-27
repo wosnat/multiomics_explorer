@@ -9516,3 +9516,317 @@ class TestListPublicationsWrapperDiscusses:
             result = await tool_fns["list_publications"](mock_ctx)
         assert result.by_discusses_coverage.has_discusses == 1
         assert result.by_discusses_coverage.no_discusses == 0
+
+
+# ---------------------------------------------------------------------------
+# Annotation-trust surface (PR 3a) — MCP wrapper layer
+# ---------------------------------------------------------------------------
+
+
+def _hint_str(tool_fns, tool_name, param):
+    import typing
+    hints = typing.get_type_hints(tool_fns[tool_name], include_extras=True)
+    hint = hints.get(param)
+    assert hint is not None, f"{tool_name} has no {param} parameter"
+    return str(hint)
+
+
+def _field_descriptions(tool_fns, tool_name, param):
+    import typing
+    hints = typing.get_type_hints(tool_fns[tool_name], include_extras=True)
+    hint = hints.get(param)
+    assert hint is not None, f"{tool_name} has no {param} parameter"
+    return [
+        getattr(meta, "description", None)
+        for meta in getattr(hint, "__metadata__", ())
+    ]
+
+
+_TRUST_TOOLS = [
+    "genes_by_ontology", "gene_ontology_terms",
+    "pathway_enrichment", "cluster_enrichment",
+]
+
+_ONTOLOGY_LITERAL_TOOLS = [
+    "genes_by_ontology", "gene_ontology_terms", "ontology_landscape",
+    "pathway_enrichment", "cluster_enrichment",
+]
+
+
+class TestOntologyLiteralAcceptsNewThree:
+    """The closed Literal enums on the 5 ontology wrappers must accept
+    'interpro', 'ncbifam' and 'merops'."""
+
+    @pytest.mark.parametrize("tool_name", _ONTOLOGY_LITERAL_TOOLS)
+    @pytest.mark.parametrize("key", ["interpro", "ncbifam", "merops"])
+    def test_literal_includes_new_key(self, tool_fns, tool_name, key):
+        assert f"'{key}'" in _hint_str(tool_fns, tool_name, "ontology")
+
+    @pytest.mark.parametrize("tool_name", _ONTOLOGY_LITERAL_TOOLS)
+    def test_literal_still_carries_the_existing_14(self, tool_fns, tool_name):
+        hint_str = _hint_str(tool_fns, tool_name, "ontology")
+        for key in ("go_bp", "kegg", "tcdb", "cazy",
+                    "subcellular_localization", "signal_peptide_type"):
+            assert f"'{key}'" in hint_str, key
+
+    def test_search_ontology_description_mentions_new_keys(self, tool_fns):
+        joined = " ".join(
+            d for d in _field_descriptions(tool_fns, "search_ontology", "ontology")
+            if d
+        )
+        assert "interpro" in joined
+        assert "ncbifam" in joined
+        assert "merops" in joined
+
+
+class TestMultiOntologyParamShape:
+    """`gene_ontology_terms` and `ontology_landscape` accept a list."""
+
+    @pytest.mark.parametrize(
+        "tool_name", ["gene_ontology_terms", "ontology_landscape"])
+    def test_ontology_param_accepts_a_list(self, tool_fns, tool_name):
+        hint_str = _hint_str(tool_fns, tool_name, "ontology")
+        assert "list" in hint_str.lower()
+
+    @pytest.mark.parametrize(
+        "tool_name", ["genes_by_ontology", "pathway_enrichment",
+                      "cluster_enrichment"])
+    def test_single_ontology_tools_stay_single(self, tool_fns, tool_name):
+        hint_str = _hint_str(tool_fns, tool_name, "ontology")
+        assert "list[" not in hint_str
+
+
+class TestTrustFilterParamsOnWrappers:
+    """Every trust filter is exposed on the four gene-set tools; the two
+    categorical facets also on ontology_landscape."""
+
+    @pytest.mark.parametrize("tool_name", _TRUST_TOOLS)
+    @pytest.mark.parametrize("param", [
+        "sources", "evidence", "max_tier", "min_evidence_score",
+        "call_class", "interpro_type",
+    ])
+    def test_param_present(self, tool_fns, tool_name, param):
+        import inspect
+        sig = inspect.signature(tool_fns[tool_name])
+        assert param in sig.parameters, f"{tool_name}.{param}"
+
+    @pytest.mark.parametrize("tool_name", _TRUST_TOOLS)
+    @pytest.mark.parametrize("param", [
+        "sources", "evidence", "max_tier", "min_evidence_score",
+        "call_class", "interpro_type",
+    ])
+    def test_param_defaults_to_none(self, tool_fns, tool_name, param):
+        import inspect
+        sig = inspect.signature(tool_fns[tool_name])
+        assert sig.parameters[param].default is None, f"{tool_name}.{param}"
+
+    @pytest.mark.parametrize("param", ["call_class", "interpro_type"])
+    def test_landscape_carries_the_categorical_facets(self, tool_fns, param):
+        import inspect
+        sig = inspect.signature(tool_fns["ontology_landscape"])
+        assert param in sig.parameters
+
+    def test_gene_ontology_terms_has_include_superseded(self, tool_fns):
+        import inspect
+        sig = inspect.signature(tool_fns["gene_ontology_terms"])
+        assert sig.parameters["include_superseded"].default is False
+
+    def test_search_ontology_has_interpro_type(self, tool_fns):
+        import inspect
+        sig = inspect.signature(tool_fns["search_ontology"])
+        assert sig.parameters["interpro_type"].default is None
+
+    @pytest.mark.parametrize("tool_name", _TRUST_TOOLS + ["ontology_landscape"])
+    @pytest.mark.parametrize("param", ["sources", "evidence", "call_class",
+                                       "interpro_type", "max_tier",
+                                       "min_evidence_score"])
+    def test_field_description_within_250_chars(self, tool_fns, tool_name, param):
+        import inspect
+        sig = inspect.signature(tool_fns[tool_name])
+        if param not in sig.parameters:
+            pytest.skip(f"{tool_name} does not expose {param}")
+        for desc in _field_descriptions(tool_fns, tool_name, param):
+            if desc is None:
+                continue
+            assert len(desc) <= 250, (
+                f"{tool_name}.{param} Field description is {len(desc)} chars")
+
+    @pytest.mark.parametrize("tool_name", _TRUST_TOOLS + ["ontology_landscape"])
+    @pytest.mark.parametrize("param", ["sources", "evidence", "call_class",
+                                       "interpro_type", "max_tier",
+                                       "min_evidence_score"])
+    def test_field_description_is_present(self, tool_fns, tool_name, param):
+        import inspect
+        sig = inspect.signature(tool_fns[tool_name])
+        if param not in sig.parameters:
+            pytest.skip(f"{tool_name} does not expose {param}")
+        descs = [d for d in _field_descriptions(tool_fns, tool_name, param) if d]
+        assert descs, f"{tool_name}.{param} has no Field description"
+
+
+class TestInterproTypeLiteral:
+    """`interpro_type` is a closed 8-value Literal — the InterPro entry
+    types. Values come from ControlledVocabulary; the enum pins the shape."""
+
+    def test_literal_has_eight_options(self, tool_fns):
+        import re
+        hint_str = _hint_str(tool_fns, "genes_by_ontology", "interpro_type")
+        assert "Literal[" in hint_str
+        literal_part = hint_str[hint_str.index("Literal["):]
+        options = set(re.findall(r"'([A-Z_]+)'", literal_part))
+        assert len(options) == 8, sorted(options)
+
+    @pytest.mark.parametrize("value", [
+        "FAMILY", "DOMAIN", "HOMOLOGOUS_SUPERFAMILY"])
+    def test_literal_includes_the_verified_strata(self, tool_fns, value):
+        assert f"'{value}'" in _hint_str(
+            tool_fns, "genes_by_ontology", "interpro_type")
+
+
+class TestInterproEnrichmentRequiresStratum:
+    """Section 10 acceptance 5: interpro enrichment without a stratum raises."""
+
+    @pytest.mark.asyncio
+    async def test_pathway_enrichment_raises_without_interpro_type(
+        self, tool_fns, mock_ctx
+    ):
+        with pytest.raises(ToolError):
+            await tool_fns["pathway_enrichment"](
+                mock_ctx, organism="MED4", experiment_ids=["EXP1"],
+                ontology="interpro", level=0,
+            )
+
+    @pytest.mark.asyncio
+    async def test_cluster_enrichment_raises_without_interpro_type(
+        self, tool_fns, mock_ctx
+    ):
+        with pytest.raises(ToolError):
+            await tool_fns["cluster_enrichment"](
+                mock_ctx, analysis_id="A1", organism="MED4",
+                ontology="interpro", level=0,
+            )
+
+    @pytest.mark.asyncio
+    async def test_unsupported_axis_becomes_tool_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_ontology",
+            side_effect=ValueError("max_tier is not a trust axis of 'kegg'"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["genes_by_ontology"](
+                    mock_ctx, ontology="kegg", organism="MED4", level=1,
+                    max_tier=2,
+                )
+
+
+class TestTrustFieldsOnRowModels:
+    """Row models carry the compact trust column and the verbose axes /
+    native detail as optional sparse fields."""
+
+    @staticmethod
+    def _model_section(class_name, next_class_name):
+        from multiomics_explorer.mcp_server.tools import register_tools
+        import inspect
+        src = inspect.getsource(register_tools)
+        idx = src.index(f"class {class_name}(BaseModel):")
+        end_idx = src.index(f"class {next_class_name}(BaseModel):", idx)
+        return src[idx:end_idx]
+
+    @pytest.mark.parametrize("field", [
+        "evidence", "sources", "evidence_score", "tier",
+        "call_class", "interpro_type",
+    ])
+    def test_genes_by_ontology_result_has_trust_fields(self, field):
+        section = self._model_section(
+            "GenesByOntologyResult", "OntologyCategoryBreakdown")
+        assert f"{field}:" in section
+
+    @pytest.mark.parametrize("field", [
+        "evidence", "sources", "evidence_score", "tier",
+        "call_class", "interpro_type",
+    ])
+    def test_ontology_term_row_has_trust_fields(self, field):
+        section = self._model_section("OntologyTermRow", "OntologyTypeBreakdown")
+        assert f"{field}:" in section
+
+    @pytest.mark.parametrize("field", [
+        "attachment_depth", "confidence_score", "pfam_support",
+        "best_hit_kind", "libraries", "bit_score",
+    ])
+    def test_native_detail_fields_on_the_gene_term_row(self, field):
+        section = self._model_section(
+            "GenesByOntologyResult", "OntologyCategoryBreakdown")
+        assert f"{field}:" in section
+
+
+class TestTrustEnvelopeFieldsOnResponses:
+    """Envelope keys are declared on the response models, not just passed
+    through as dict keys."""
+
+    @staticmethod
+    def _response_src(class_name):
+        from multiomics_explorer.mcp_server.tools import register_tools
+        import inspect
+        src = inspect.getsource(register_tools)
+        idx = src.index(f"class {class_name}(BaseModel):")
+        return src[idx:idx + 4000]
+
+    @pytest.mark.parametrize("field", [
+        "trust_axes", "by_evidence", "by_tier", "by_sources", "by_call_class",
+        "evidence_score_stats", "filters_applied", "skipped_ontologies",
+        "warnings",
+    ])
+    def test_genes_by_ontology_response_declares_envelope_field(self, field):
+        assert f"{field}:" in self._response_src("GenesByOntologyResponse")
+
+    @pytest.mark.parametrize("field", [
+        "merops_classes", "ncbifam_family_count", "merops_evidence_score_max",
+    ])
+    def test_gene_overview_row_declares_the_new_columns(self, field):
+        from multiomics_explorer.mcp_server.tools import register_tools
+        import inspect
+        src = inspect.getsource(register_tools)
+        idx = src.index("class GeneOverviewResult(BaseModel):")
+        assert f"{field}:" in src[idx:idx + 8000]
+
+
+class TestListFilterValuesTrustTypes:
+    """`filter_type` grows the trust / facet / config-derived enumerations."""
+
+    NEW_FILTER_TYPES = [
+        "evidence", "sources", "call_class", "interpro_type",
+        "ncbifam_family_type", "merops_catalytic_type", "merops_family_class",
+        "best_hit_kind", "pfam_support", "attachment_depth",
+        "trust_axes", "link_kinds",
+    ]
+
+    @pytest.mark.parametrize("value", NEW_FILTER_TYPES)
+    def test_literal_includes_new_filter_type(self, tool_fns, value):
+        assert f"'{value}'" in _hint_str(
+            tool_fns, "list_filter_values", "filter_type")
+
+    def test_ontology_scope_param_present(self, tool_fns):
+        import inspect
+        sig = inspect.signature(tool_fns["list_filter_values"])
+        assert sig.parameters["ontology"].default is None
+
+    def test_existing_filter_types_survive(self, tool_fns):
+        hint_str = _hint_str(tool_fns, "list_filter_values", "filter_type")
+        for value in ("gene_category", "brite_tree", "omics_type",
+                      "evidence_source"):
+            assert f"'{value}'" in hint_str, value
+
+
+class TestExpectedToolsUnchangedForAnnotationTrust:
+    """PR 3a registers three ontologies and a trust surface — no new tool.
+    (`ontology_term_details` lands in PR 3b.)"""
+
+    def test_expected_tools_size_unchanged_at_41(self):
+        assert len(EXPECTED_TOOLS) == 41, (
+            f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
+            "the annotation-trust surface adds NO new tool in PR 3a"
+        )
+
+    def test_no_ontology_keys_leaked_in_as_tools(self, tool_fns):
+        for key in ("interpro", "ncbifam", "merops", "ontology_term_details"):
+            assert key not in tool_fns

@@ -35,6 +35,48 @@ def genes_by_ontology_scenarios():
             dict(ontology="go_bp", term_ids=[fx.UNKNOWN_ONTOLOGY_TERM],
                  organism=fx.CONTROL_ORGANISM),
             input_ids=[fx.UNKNOWN_ONTOLOGY_TERM]),
+        # --- annotation-trust surface (PR 3a) ---
+        Scenario(
+            # KEGG edges carry sources + evidence only — max_tier is not one
+            # of its axes, so validation must raise before any query runs.
+            "unsupported_trust_axis",
+            dict(ontology="kegg", organism=fx.CONTROL_ORGANISM, level=1,
+                 max_tier=2),
+            expects_error=ToolError),
+        Scenario(
+            "call_class_on_non_merops",
+            dict(ontology="tcdb", organism=fx.CONTROL_ORGANISM, level=2,
+                 call_class=["peptidase"]),
+            expects_error=ToolError),
+        Scenario(
+            "interpro_type_on_non_interpro",
+            dict(ontology="tcdb", organism=fx.CONTROL_ORGANISM, level=2,
+                 interpro_type="FAMILY"),
+            expects_error=ToolError),
+        Scenario(
+            # tier is null on eggNOG-only TCDB edges; max_tier keeps them and
+            # the envelope must show the explicit "null" bucket + a warning.
+            "max_tier_keeps_tier_null_rows",
+            dict(ontology="tcdb", organism=fx.CONTROL_ORGANISM, level=2,
+                 max_tier=3)),
+        Scenario(
+            # every MEROPS row in a cyanobacterium is a dead homolog at most —
+            # filtering to peptidase can legitimately empty the result.
+            "call_class_zero_rows",
+            dict(ontology="merops", organism=fx.GENOME_ONLY_ORGANISM, level=0,
+                 call_class=["peptidase"])),
+        Scenario(
+            "interpro_stratum_with_no_terms",
+            dict(ontology="interpro", organism=fx.GENOME_ONLY_ORGANISM,
+                 level=0, interpro_type="PTM")),
+        Scenario(
+            "min_evidence_score_above_every_edge",
+            dict(ontology="tcdb", organism=fx.CONTROL_ORGANISM, level=2,
+                 min_evidence_score=1.1)),
+        Scenario(
+            "ncbifam_genome_only_organism",
+            dict(ontology="ncbifam", organism=fx.GENOME_ONLY_ORGANISM,
+                 level=0)),
     ]
 
 
@@ -54,6 +96,18 @@ def gene_overview_scenarios():
             "gene_no_de",
             dict(locus_tags=[fx.GENE_NO_DE]),
             input_ids=[fx.GENE_NO_DE]),
+        # --- annotation-trust surface (PR 3a) ---
+        Scenario(
+            # Cyanobacterial gene with no MEROPS / NCBIfam signal: the new
+            # columns must default ([] / 0) and merops_evidence_score_max
+            # must stay null rather than coalescing to 0.
+            "gene_without_protease_or_family_signal",
+            dict(locus_tags=[fx.GENE_NO_DE]),
+            input_ids=[fx.GENE_NO_DE]),
+        Scenario(
+            "gene_with_merops_call",
+            dict(locus_tags=["MIT1002_03660"]),
+            input_ids=["MIT1002_03660"]),
     ]
 
 
@@ -104,6 +158,38 @@ def gene_ontology_terms_scenarios():
             "offset_past_end",
             dict(locus_tags=["PMM0001"], organism=fx.CONTROL_ORGANISM,
                  offset=fx.OFFSET_PAST_END)),
+        # --- annotation-trust surface (PR 3a) ---
+        Scenario(
+            # No ontology in the set carries max_tier -> hard raise.
+            "multi_ontology_all_skipped",
+            dict(locus_tags=["PMM0001"], organism=fx.CONTROL_ORGANISM,
+                 ontology=["kegg", "go_bp"], max_tier=2),
+            expects_error=ToolError),
+        Scenario(
+            # Some carry it -> apply where possible, skip the rest + warn.
+            "multi_ontology_partial_skip",
+            dict(locus_tags=["PMM0001"], organism=fx.CONTROL_ORGANISM,
+                 ontology=["tcdb", "kegg"], max_tier=2)),
+        Scenario(
+            "facet_owner_absent_from_set",
+            dict(locus_tags=["PMM0001"], organism=fx.CONTROL_ORGANISM,
+                 ontology=["kegg", "tcdb"], interpro_type="FAMILY"),
+            expects_error=ToolError),
+        Scenario(
+            "unknown_ontology_in_list",
+            dict(locus_tags=["PMM0001"], organism=fx.CONTROL_ORGANISM,
+                 ontology=["not_an_ontology"]),
+            expects_error=ToolError),
+        Scenario(
+            # PMM0392 has superseded TCDB attachments; the leaf rows must be
+            # most-specific-only by default and gain the labelled rows here.
+            "include_superseded_tcdb_leaf",
+            dict(locus_tags=["PMM0392"], organism=fx.CONTROL_ORGANISM,
+                 ontology=["tcdb"], mode="leaf", include_superseded=True)),
+        Scenario(
+            "merops_call_class_zero_rows",
+            dict(locus_tags=["PMM0001"], organism=fx.CONTROL_ORGANISM,
+                 ontology=["merops"], call_class=["peptidase"])),
     ]
 
 
@@ -337,6 +423,31 @@ def pathway_enrichment_scenarios():
             dict(organism=fx.CONTROL_ORGANISM,
                  experiment_ids=[_MED4_DE_EXP],
                  ontology="kegg", level=1, offset=fx.OFFSET_PAST_END)),
+        # --- annotation-trust surface (PR 3a) ---
+        Scenario(
+            # InterPro mixes 8 non-comparable strata; ORA over the union is
+            # meaningless, so the stratum is required.
+            "interpro_without_stratum",
+            dict(organism=fx.CONTROL_ORGANISM,
+                 experiment_ids=[_MED4_DE_EXP], ontology="interpro", level=0),
+            expects_error=ToolError),
+        Scenario(
+            "interpro_stratum_with_no_testable_terms",
+            dict(organism=fx.CONTROL_ORGANISM,
+                 experiment_ids=[_MED4_DE_EXP], ontology="interpro", level=0,
+                 interpro_type="PTM")),
+        Scenario(
+            "unsupported_trust_axis",
+            dict(organism=fx.CONTROL_ORGANISM,
+                 experiment_ids=[_MED4_DE_EXP], ontology="kegg", level=1,
+                 max_tier=2),
+            expects_error=ToolError),
+        Scenario(
+            # Filters shape the tested sets AND the background identically.
+            "trust_filtered_background",
+            dict(organism=fx.CONTROL_ORGANISM,
+                 experiment_ids=[_MED4_DE_EXP], ontology="tcdb", level=2,
+                 max_tier=2)),
     ]
 
 
@@ -357,6 +468,21 @@ def cluster_enrichment_scenarios():
             dict(analysis_id=_MED4_ANALYSIS,
                  organism=fx.GENOME_ONLY_ORGANISM, ontology="kegg", level=1),
             input_ids=[_MED4_ANALYSIS]),
+        # --- annotation-trust surface (PR 3a) ---
+        Scenario(
+            "interpro_without_stratum",
+            dict(analysis_id=_MED4_ANALYSIS, organism=fx.CONTROL_ORGANISM,
+                 ontology="interpro", level=0),
+            expects_error=ToolError),
+        Scenario(
+            "unsupported_trust_axis",
+            dict(analysis_id=_MED4_ANALYSIS, organism=fx.CONTROL_ORGANISM,
+                 ontology="kegg", level=1, max_tier=2),
+            expects_error=ToolError),
+        Scenario(
+            "merops_call_class_zero_rows",
+            dict(analysis_id=_MED4_ANALYSIS, organism=fx.CONTROL_ORGANISM,
+                 ontology="merops", level=0, call_class=["peptidase"])),
     ]
 
 
@@ -568,6 +694,42 @@ def search_ontology_scenarios():
             "offset_past_end",
             dict(search_text="transport", ontology="kegg",
                  offset=fx.OFFSET_PAST_END)),
+        # --- annotation-trust surface (PR 3a) ---
+        Scenario(
+            "no_hits_new_ontology",
+            dict(search_text="zzzznonexistentontologytermzzz",
+                 ontology="merops")),
+        Scenario(
+            "interpro_type_facet",
+            dict(search_text="kinase", ontology="interpro",
+                 interpro_type="DOMAIN")),
+        Scenario(
+            "interpro_type_on_non_interpro",
+            dict(search_text="transport", ontology="kegg",
+                 interpro_type="DOMAIN"),
+            expects_error=ToolError),
+        Scenario(
+            "ncbifam_search",
+            dict(search_text="protein", ontology="ncbifam")),
+    ]
+
+
+def list_filter_values_scenarios():
+    # No entity input; the degenerate axes are the vocabulary-backed filter
+    # types (ControlledVocabulary read -> pivot fallback -> warning) and the
+    # `ontology` scope. An unknown filter_type is a documented raise.
+    return [
+        Scenario("evidence", dict(filter_type="evidence")),
+        Scenario("sources", dict(filter_type="sources")),
+        Scenario("call_class", dict(filter_type="call_class")),
+        Scenario("interpro_type", dict(filter_type="interpro_type")),
+        Scenario("attachment_depth", dict(filter_type="attachment_depth")),
+        Scenario("trust_axes_scoped",
+                 dict(filter_type="trust_axes", ontology="kegg")),
+        Scenario("link_kinds", dict(filter_type="link_kinds")),
+        Scenario("unknown_filter_type",
+                 dict(filter_type="not_a_filter_type"),
+                 expects_error=ToolError),
     ]
 
 
@@ -588,6 +750,27 @@ def ontology_landscape_scenarios():
             "unknown_experiment_weighting",
             dict(organism=fx.CONTROL_ORGANISM, ontology="kegg",
                  experiment_ids=[fx.UNKNOWN_EXPERIMENT_ID])),
+        # --- annotation-trust surface (PR 3a) ---
+        Scenario(
+            "interpro_stratum_rows",
+            dict(organism=fx.CONTROL_ORGANISM, ontology="interpro")),
+        Scenario(
+            "multi_ontology_list",
+            dict(organism=fx.CONTROL_ORGANISM,
+                 ontology=["tcdb", "merops", "ncbifam"])),
+        Scenario(
+            "unknown_ontology_in_list",
+            dict(organism=fx.CONTROL_ORGANISM, ontology=["not_an_ontology"]),
+            expects_error=ToolError),
+        Scenario(
+            "call_class_on_non_merops",
+            dict(organism=fx.CONTROL_ORGANISM, ontology="tcdb",
+                 call_class=["peptidase"]),
+            expects_error=ToolError),
+        Scenario(
+            "merops_call_class_genome_only",
+            dict(organism=fx.GENOME_ONLY_ORGANISM, ontology="merops",
+                 call_class=["peptidase"])),
     ]
 
 
@@ -935,6 +1118,9 @@ SCENARIO_BUILDERS = {
     "list_metabolite_assays": list_metabolite_assays_scenarios,
     "search_ontology": search_ontology_scenarios,
     "ontology_landscape": ontology_landscape_scenarios,
+    # Annotation-trust surface (PR 3a): the vocabulary-backed filter types
+    # give list_filter_values real degenerate axes (vocab -> pivot -> warning).
+    "list_filter_values": list_filter_values_scenarios,
     # Batch D
     "genes_by_metabolite": genes_by_metabolite_scenarios,
     "metabolites_by_gene": metabolites_by_gene_scenarios,
