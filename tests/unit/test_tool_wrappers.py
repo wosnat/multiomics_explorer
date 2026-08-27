@@ -10357,3 +10357,87 @@ class TestSearchOntologyWrapper3b:
         assert row.family_class == "S"
         assert row.peptidase_gene_count == 380
         assert row.direct_gene_count == 400
+
+
+class TestSearchOntologyReviewFixes3b:
+    """PR 3b code-review fix wave: `skipped_ontologies` is `[{ontology,
+    reason}]` (matches `_resolve_multi_ontology` and the other multi-ontology
+    wrappers); every Field description on search_ontology and
+    ontology_term_details is within 250 chars (incl. `verbose`)."""
+
+    @pytest.mark.asyncio
+    async def test_skipped_ontologies_accepts_dict_entries(self, tool_fns, mock_ctx):
+        data = dict(TestSearchOntologyWrapper3b._BROWSE_RETURN)
+        data["skipped_ontologies"] = [
+            {"ontology": "tcdb", "reason": "interpro_type applies to interpro only"}]
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value=data,
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, ontology=["merops", "tcdb"], level=1,
+                interpro_type="FAMILY")
+        assert result.skipped_ontologies == [
+            {"ontology": "tcdb", "reason": "interpro_type applies to interpro only"}]
+
+    def test_skipped_ontologies_is_a_list_of_dicts(self, tool_fns):
+        ann = _response_model(tool_fns, "search_ontology").model_fields[
+            "skipped_ontologies"].annotation
+        assert ann == list[dict]
+
+    @pytest.mark.parametrize("tool_name", ["search_ontology", "ontology_term_details"])
+    def test_every_param_field_description_within_250(self, tool_fns, tool_name):
+        sig = _inspect3b.signature(tool_fns[tool_name])
+        for param in sig.parameters:
+            if param == "ctx":
+                continue
+            for d in _field_descriptions(tool_fns, tool_name, param):
+                if d is not None:
+                    assert len(d) <= 250, f"{tool_name}.{param}: {len(d)} chars"
+
+    def test_search_ontology_verbose_within_250(self, tool_fns):
+        descs = [d for d in _field_descriptions(
+            tool_fns, "search_ontology", "verbose") if d]
+        assert descs
+        assert all(len(d) <= 250 for d in descs)
+
+    @pytest.mark.parametrize("tool_name", ["search_ontology", "ontology_term_details"])
+    def test_every_response_field_description_within_250(self, tool_fns, tool_name):
+        seen = set()
+
+        def walk(model):
+            if model in seen:
+                return
+            seen.add(model)
+            for name, info in model.model_fields.items():
+                if info.description is not None:
+                    assert len(info.description) <= 250, (
+                        f"{model.__name__}.{name}: {len(info.description)} chars")
+                for sub in (info.annotation, *_typing3b.get_args(info.annotation)):
+                    if hasattr(sub, "model_fields"):
+                        walk(sub)
+
+        walk(_response_model(tool_fns, tool_name))
+        assert len(seen) >= 2
+
+    def test_organism_gene_count_semantics_are_stated(self, tool_fns):
+        so = _row_model(tool_fns, "search_ontology").model_fields[
+            "organism_gene_count"].description
+        otd = _row_model(tool_fns, "ontology_term_details").model_fields[
+            "organism_gene_count"].description
+        assert "DIRECT" in so
+        assert "ontology_term_details" in so
+        assert "SUBTREE" in otd
+        assert "search_ontology" in otd
+
+    def test_score_median_states_page_vs_full_match(self, tool_fns):
+        desc = _response_model(tool_fns, "search_ontology").model_fields[
+            "score_median"].description
+        assert "page" in desc.lower()
+        assert "full match" in desc.lower()
+
+    def test_term_details_warnings_is_reserved(self, tool_fns):
+        desc = _response_model(tool_fns, "ontology_term_details").model_fields[
+            "warnings"].description
+        assert "router_ambiguous" not in desc
+        assert "reserved" in desc.lower()

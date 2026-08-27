@@ -2521,8 +2521,9 @@ def register_tools(mcp: FastMCP):
         organism_count: int | None = Field(default=None,
             description="Distinct organisms reaching this term (precomputed Node.organism_count; sparse until every ontology's builder emits it).")
         organism_gene_count: int | None = Field(default=None,
-            description="Genes directly annotated to this term in the requested "
-                        "`organism` (only when organism is set; browse sorts by it).")
+            description="Genes of `organism` on the term's DIRECT edge (not subtree — "
+                        "differs from gene_count and from ontology_term_details."
+                        "organism_gene_count); only when organism is set; browse sorts by it.")
         # verbose-only term columns
         description: str | None = Field(default=None,
             description="Term description / definition (verbose only; sparse).")
@@ -2578,7 +2579,7 @@ def register_tools(mcp: FastMCP):
         total_entries: int = Field(description="Total terms in the selected ontologies (e.g. 847; summed over the set)")
         total_matching: int = Field(description="Terms matching the search (e.g. 31; summed over the set)")
         score_max: float | None = Field(default=None, description="Highest relevance score (null if 0 matches or browse, e.g. 5.23)")
-        score_median: float | None = Field(default=None, description="Median relevance score (null if 0 matches or browse, e.g. 2.1)")
+        score_median: float | None = Field(default=None, description="Median relevance score (null if 0 matches or browse). Single ontology: over the full match; multi-ontology: over the returned page only.")
         returned: int = Field(description="Results in this response (0 when summary=true; <= limit x n_ontologies)")
         offset: int = Field(default=0, description="Offset into each ontology's result set (lockstep paging, e.g. 0)")
         truncated: bool = Field(description="True if any selected ontology has more matches than returned")
@@ -2590,8 +2591,8 @@ def register_tools(mcp: FastMCP):
             description="Matching InterPro terms per entry type (only when 'interpro' is in the set).")
         by_family_type: list[SearchOntologyFamilyTypeBreakdown] = Field(default_factory=list,
             description="Matching NCBIfam terms per family type (only when 'ncbifam' is in the set).")
-        skipped_ontologies: list[str] = Field(default_factory=list,
-            description="Ontologies in the set skipped because a filter does not apply to them.")
+        skipped_ontologies: list[dict] = Field(default_factory=list,
+            description="[{ontology, reason}] for ontologies in the set skipped because a filter does not apply to them.")
         warnings: list[str] = Field(default_factory=list,
             description="Auto-warnings, e.g. browse truncated with no narrowing filter.")
         results: list[SearchOntologyResult] = Field(
@@ -2642,7 +2643,7 @@ def register_tools(mcp: FastMCP):
         )] = False,
         verbose: Annotated[bool, Field(
             description="Add description, level_kind, direct_gene_count, per-ontology "
-            "term columns (tcdb superfamily/metabolite_count, ncbifam family_type/"
+            "columns (tcdb superfamily/metabolite_count, ncbifam family_type/"
             "gene_symbol, merops family_class/catalytic_type/peptidase_gene_count) "
             "and KEGG discussed_in_publications. Default compact.",
         )] = False,
@@ -2656,8 +2657,9 @@ def register_tools(mcp: FastMCP):
             ge=0,
         )] = None,
         organism: Annotated[str | None, Field(
-            description="Organism preferred_name to scope counts to; rows gain "
-                        "organism_gene_count and browse sorts by it. Default: all organisms.",
+            description="Organism to scope counts to (resolved like every other tool: "
+                        "'MED4' -> 'Prochlorococcus MED4'; unknown/ambiguous raises). Rows "
+                        "gain organism_gene_count (direct edge) and browse sorts by it.",
         )] = None,
     ) -> SearchOntologyResponse:
         """Search or browse ontology terms — Lucene over term names (search) or a gene_count-sorted listing (browse); no hierarchy traversal.
@@ -2760,7 +2762,9 @@ def register_tools(mcp: FastMCP):
             description="Genes annotated directly to this term, excluding descendants "
                         "(sparse: hierarchical ontologies)")
         organism_gene_count: int | None = Field(default=None,
-            description="Subtree gene count in the requested `organism` (only when organism set)")
+            description="Genes of `organism` in this term's SUBTREE (term + descendants; "
+                        "same scope as gene_count). Only when organism set. Differs from "
+                        "search_ontology.organism_gene_count (direct edge).")
         # term_details_compact — per-ontology native columns (sparse: strip rule)
         code: str | None = Field(default=None,
             description="Category code (sparse: cog_category, cyanorak_role, tigr_role)")
@@ -2840,7 +2844,7 @@ def register_tools(mcp: FastMCP):
         by_link_kind: list[OntologyTermDetailsByLinkKind] = Field(default_factory=list,
             description="links_out entries per link_kind")
         warnings: list[str] = Field(default_factory=list,
-            description="Auto-warnings (e.g. router_ambiguous InterPro terms)")
+            description="Auto-warnings (reserved for future use; always empty)")
         results: list[OntologyTermDetailsRow] = Field(default_factory=list,
             description="One row per found term, in input order")
 
@@ -2857,8 +2861,9 @@ def register_tools(mcp: FastMCP):
                         "Rows return in input order.",
         )],
         organism: Annotated[str | None, Field(
-            description="Organism preferred_name to scope genes_by_organism to; rows "
-                        "gain organism_gene_count. Default: all organisms.",
+            description="Organism to scope genes_by_organism to (resolved like every other "
+                        "tool: 'MED4' -> 'Prochlorococcus MED4'; unknown/ambiguous raises). "
+                        "Rows gain organism_gene_count (subtree). Default: all organisms.",
         )] = None,
         link_kinds: Annotated[list[Literal["composition", "membership", "router"]] | None, Field(
             description="Keep only links_out of these kinds. 'composition' = term built "
