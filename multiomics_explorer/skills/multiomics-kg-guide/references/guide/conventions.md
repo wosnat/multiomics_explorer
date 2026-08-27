@@ -457,7 +457,13 @@ no cross-ontology threshold is safe.
 **Strip rule.** A row only carries the trust columns its ontology owns —
 `tier` never appears on a `kegg` row (KEGG has no tier axis); `interpro_type`
 never appears on a `tcdb` row. Owned-but-null columns stay (a TCDB edge with
-only eggNOG support carries `tier: null`, not an absent field).
+only eggNOG support carries `tier: null`, not an absent field). The rule
+holds on the MCP wire as well as in the Python API: `genes_by_ontology` and
+`gene_ontology_terms` rows are serialized sparsely, so a compact `tcdb`
+row is ~9 keys and a verbose one ~22 — a key that is absent means "not an
+axis of this ontology", a key that is `null` means "owned, but this edge
+has no value". (`genes_by_metabolite` / `metabolites_by_gene` keep their
+documented None-padded cross-arm fields — a different, deliberate contract.)
 
 **Filters** — `sources=`, `evidence=`, `max_tier=`, `min_evidence_score=`,
 `call_class=` (MEROPS-only), `interpro_type=` (InterPro-only) — default to

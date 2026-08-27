@@ -8997,7 +8997,7 @@ class TestEdgePropFieldsOnRowModels:
         from multiomics_explorer.mcp_server.tools import register_tools
         import inspect
         src = inspect.getsource(register_tools)
-        idx = src.index("class GenesByOntologyResult(BaseModel):")
+        idx = src.index("class GenesByOntologyResult(SparseRow):")
         end_idx = src.index("class OntologyCategoryBreakdown(BaseModel):", idx)
         section = src[idx:end_idx]
         assert "localization_score:" in section, (
@@ -9011,7 +9011,7 @@ class TestEdgePropFieldsOnRowModels:
         from multiomics_explorer.mcp_server.tools import register_tools
         import inspect
         src = inspect.getsource(register_tools)
-        idx = src.index("class OntologyTermRow(BaseModel):")
+        idx = src.index("class OntologyTermRow(SparseRow):")
         end_idx = src.index("class OntologyTypeBreakdown(BaseModel):", idx)
         section = src[idx:end_idx]
         assert "localization_score:" in section
@@ -9728,7 +9728,9 @@ class TestTrustFieldsOnRowModels:
         from multiomics_explorer.mcp_server.tools import register_tools
         import inspect
         src = inspect.getsource(register_tools)
-        idx = src.index(f"class {class_name}(BaseModel):")
+        import re
+        m = re.search(rf"class {class_name}\((BaseModel|SparseRow)\):", src)
+        idx = m.start()
         end_idx = src.index(f"class {next_class_name}(BaseModel):", idx)
         return src[idx:end_idx]
 
@@ -9830,3 +9832,34 @@ class TestExpectedToolsUnchangedForAnnotationTrust:
     def test_no_ontology_keys_leaked_in_as_tools(self, tool_fns):
         for key in ("interpro", "ncbifam", "merops", "ontology_term_details"):
             assert key not in tool_fns
+
+
+class TestSparseRowWireShape:
+    """Trust row models serialize only the fields the api layer set:
+    a non-applicable column (never provided) is omitted from the wire,
+    an owned-but-absent column (provided as None) is kept as null.
+    Mirrors the api strip rule (design §3) at the MCP boundary."""
+
+    def test_unset_fields_are_omitted_and_explicit_none_is_kept(self):
+        import json
+        from pydantic import Field
+        from pydantic_core import to_json
+        from multiomics_explorer.mcp_server.tools import SparseRow
+
+        class Row(SparseRow):
+            locus_tag: str
+            evidence: str | None = Field(default=None)
+            tier: int | None = Field(default=None)
+            bit_score: float | None = Field(default=None)
+
+        row = Row(locus_tag="PMM0392", evidence="family_inferred", tier=None)
+        dumped = row.model_dump()
+        assert dumped == {"locus_tag": "PMM0392", "evidence": "family_inferred", "tier": None}
+        assert json.loads(to_json(row)) == dumped
+
+    @pytest.mark.parametrize("class_name", ["GenesByOntologyResult", "OntologyTermRow"])
+    def test_gene_term_row_models_are_sparse(self, class_name):
+        import inspect
+        from multiomics_explorer.mcp_server.tools import register_tools
+        src = inspect.getsource(register_tools)
+        assert f"class {class_name}(SparseRow):" in src

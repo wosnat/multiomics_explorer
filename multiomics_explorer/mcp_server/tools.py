@@ -6,7 +6,25 @@ from typing import Annotated, Literal
 
 from fastmcp import Context, FastMCP
 from fastmcp.exceptions import ToolError
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_serializer
+
+
+class SparseRow(BaseModel):
+    """Row model that serializes only the fields the api layer actually set.
+
+    The api layer strips columns an ontology does not own (design §3 strip
+    rule); Pydantic would otherwise re-add every Optional field as ``null``
+    on the wire. This base keeps a field iff it was explicitly provided —
+    so an owned-but-absent value (``tier: null`` on an eggNOG-only TCDB
+    edge) survives, while a non-applicable column (``bit_score`` on a GO
+    row) is omitted. ``outputSchema`` is unchanged (all fields Optional).
+    """
+
+    @model_serializer(mode="wrap")
+    def _only_set_fields(self, handler):
+        data = handler(self)
+        keep = self.model_fields_set
+        return {k: v for k, v in data.items() if k in keep}
 
 import multiomics_explorer.api.functions as api
 from multiomics_explorer.kg.connection import GraphConnection
@@ -2592,7 +2610,7 @@ def register_tools(mcp: FastMCP):
 
     # --- genes_by_ontology ---
 
-    class GenesByOntologyResult(BaseModel):
+    class GenesByOntologyResult(SparseRow):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
         gene_name: str | None = Field(default=None,
             description="Gene name (e.g. 'dnaN')")
@@ -2914,7 +2932,7 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"genes_by_ontology unexpected error: {e}")
             raise ToolError(f"Error in genes_by_ontology: {e}")
 
-    class OntologyTermRow(BaseModel):
+    class OntologyTermRow(SparseRow):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
         term_id: str = Field(description="Ontology term ID (e.g. 'go:0006260')")
         term_name: str = Field(description="Term name (e.g. 'DNA replication')")
