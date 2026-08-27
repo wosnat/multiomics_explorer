@@ -284,6 +284,14 @@ class TestTermSide:
             "interpro_id", "interpro_type", "direct_gene_count", "member_count",
         ]
 
+    def test_kegg_term_details_compact_carries_chemistry_counts(self):
+        """Review fix #4: KEGG pathway terms expose reaction_count /
+        metabolite_count as compact term-details columns (absent on KO /
+        module rows by the strip rule)."""
+        assert ONTOLOGY_CONFIG["kegg"]["term_details_compact"] == [
+            "direct_gene_count", "reaction_count", "metabolite_count",
+        ]
+
     def test_ncbifam_term_details_compact_matches_spec(self):
         assert ONTOLOGY_CONFIG["ncbifam"]["term_details_compact"] == [
             "ncbifam_id", "family_type", "gene_symbol",

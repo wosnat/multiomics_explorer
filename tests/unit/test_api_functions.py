@@ -13274,9 +13274,23 @@ def _batch6_rows():
     ]
 
 
+def _is_resolve(cypher):
+    """The organism-resolution query every organism-taking api runs first."""
+    return "OrganismTaxon" in cypher and "organisms" in cypher
+
+
 def _otd_run(mock_conn, rows=None, term_ids=None, **kwargs):
     rows = _batch6_rows() if rows is None else rows
-    mock_conn.execute_query.return_value = rows
+
+    def _exec(cypher, **params):
+        if _is_resolve(cypher):
+            # Echo the resolver: 'MED4' and the full name both resolve.
+            org = params["organism"]
+            return [{"organisms": [
+                org if org.startswith("Prochlorococcus") else f"Prochlorococcus {org}"]}]
+        return rows
+
+    mock_conn.execute_query.side_effect = _exec
     return api.ontology_term_details(
         term_ids=list(_BATCH6) if term_ids is None else term_ids,
         conn=mock_conn, **kwargs)
@@ -13624,6 +13638,10 @@ def _so_dispatch(mock_conn, per_ontology):
 
     def _exec(cypher, **params):
         calls.append((cypher, params))
+        if _is_resolve(cypher):
+            org = params["organism"]
+            return [{"organisms": [
+                org if org.startswith("Prochlorococcus") else f"Prochlorococcus {org}"]}]
         for key, (summary, rows) in per_ontology.items():
             cfg = _CFG3B[key]
             labels = [cfg["label"]] + (
@@ -13642,7 +13660,7 @@ def _so_dispatch(mock_conn, per_ontology):
 
 
 def _is_detail(cypher):
-    return "total_entries" not in cypher
+    return "total_entries" not in cypher and not _is_resolve(cypher)
 
 
 class TestSearchOntologyBrowseApi:
@@ -14157,3 +14175,138 @@ class TestGenesByOntologyAggregateRollups:
                     "skipped_ontologies", "warnings", "results", "returned",
                     "truncated", "offset", "total_matching"):
             assert key in result, key
+
+
+# ---------------------------------------------------------------------------
+# PR 3b code-review fix wave
+# ---------------------------------------------------------------------------
+
+
+class TestOntologyOrganismResolution3b:
+    """Review #1: `organism` on search_ontology / ontology_term_details is
+    resolved through the shared organism resolver BEFORE the builder runs —
+    'MED4' reaches Cypher as 'Prochlorococcus MED4'; unknown / ambiguous
+    names raise the standard ValueError without a term query."""
+
+    def _merops(self, mock_conn):
+        return _so_dispatch(mock_conn, {"merops": (
+            _so_summary(total_matching=1, score_max=None, score_median=None,
+                        by_level=[{"level": 1, "count": 1}]),
+            [_so_row("merops.family:S33", score=None, organism_gene_count=9)])})
+
+    # --- search_ontology ---
+
+    def test_search_ontology_resolves_short_name_before_builder(self, mock_conn):
+        calls = self._merops(mock_conn)
+        api.search_ontology(ontology="merops", organism="MED4", conn=mock_conn)
+        assert _is_resolve(calls[0][0]), "resolver must run first"
+        assert calls[0][1]["organism"] == "MED4"
+        term_calls = [(c, p) for c, p in calls if not _is_resolve(c)]
+        assert term_calls
+        for _, params in term_calls:
+            assert params["organism"] == "Prochlorococcus MED4"
+            assert "MED4" not in [v for v in params.values() if v == "MED4"]
+
+    def test_search_ontology_full_name_passes_through(self, mock_conn):
+        calls = self._merops(mock_conn)
+        api.search_ontology(
+            ontology="merops", organism="Prochlorococcus MED4", conn=mock_conn)
+        for c, params in calls:
+            if not _is_resolve(c):
+                assert params["organism"] == "Prochlorococcus MED4"
+
+    def test_search_ontology_unknown_organism_raises(self, mock_conn):
+        mock_conn.execute_query.return_value = [{"organisms": []}]
+        with pytest.raises(ValueError, match="no organism matching"):
+            api.search_ontology(ontology="merops", organism="Nope", conn=mock_conn)
+        assert mock_conn.execute_query.call_count == 1
+
+    def test_search_ontology_ambiguous_organism_raises(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"organisms": ["Prochlorococcus MED4", "Prochlorococcus MIT9312"]}]
+        with pytest.raises(ValueError, match="multiple organisms"):
+            api.search_ontology(
+                ontology="merops", organism="Prochlorococcus", conn=mock_conn)
+        assert mock_conn.execute_query.call_count == 1
+
+    def test_search_ontology_no_organism_no_resolver_call(self, mock_conn):
+        calls = self._merops(mock_conn)
+        api.search_ontology(ontology="merops", conn=mock_conn)
+        assert not any(_is_resolve(c) for c, _ in calls)
+
+    # --- ontology_term_details ---
+
+    def test_term_details_resolves_short_name_before_builder(self, mock_conn):
+        _otd_run(mock_conn, organism="MED4")
+        calls = mock_conn.execute_query.call_args_list
+        assert _is_resolve(calls[0].args[0])
+        assert calls[0].kwargs["organism"] == "MED4"
+        assert calls[-1].kwargs["organism"] == "Prochlorococcus MED4"
+        assert not _is_resolve(calls[-1].args[0])
+
+    def test_term_details_unknown_organism_raises(self, mock_conn):
+        mock_conn.execute_query.return_value = [{"organisms": []}]
+        with pytest.raises(ValueError, match="no organism matching"):
+            api.ontology_term_details(
+                term_ids=["tcdb:3.A.1"], organism="Nope", conn=mock_conn)
+        assert mock_conn.execute_query.call_count == 1
+
+    def test_term_details_ambiguous_organism_raises(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"organisms": ["Prochlorococcus MED4", "Prochlorococcus MIT9312"]}]
+        with pytest.raises(ValueError, match="multiple organisms"):
+            api.ontology_term_details(
+                term_ids=["tcdb:3.A.1"], organism="Prochlorococcus",
+                conn=mock_conn)
+        assert mock_conn.execute_query.call_count == 1
+
+    def test_term_details_no_organism_no_resolver_call(self, mock_conn):
+        _otd_run(mock_conn)
+        assert mock_conn.execute_query.call_count == 1
+        assert not _is_resolve(mock_conn.execute_query.call_args.args[0])
+
+
+class TestTermDetailsStripRule3b:
+    """Review #4 / #5: `direct_gene_count` is keyed on the node VALUE (absent
+    when null, present when 0); KEGG chemistry counts are compact on pathway
+    terms and absent on KO terms."""
+
+    def test_pfam_row_without_direct_gene_count_has_no_key(self, mock_conn):
+        rows = [_otd_row("pfam:PF00005", "Pfam", name="ABC_tran", level=1,
+                         gene_count=1702, organism_count=42,
+                         extra={"short_name": "ABC_tran"})]
+        row = _otd_run(mock_conn, rows=rows, term_ids=["pfam:PF00005"])["results"][0]
+        assert row["ontology"] == "pfam"
+        assert "direct_gene_count" not in row
+        assert row["short_name"] == "ABC_tran"
+
+    def test_hierarchical_row_with_a_value_keeps_it(self, mock_conn):
+        rows = {r["term_id"]: r for r in _otd_run(mock_conn)["results"]}
+        assert rows["go:0006979"]["direct_gene_count"] == 860
+
+    def test_zero_is_a_value_not_a_strip(self, mock_conn):
+        rows = [_otd_row("kegg.pathway:ko00010", "KeggTerm", name="Glycolysis",
+                         level=2, direct_gene_count=0,
+                         extra={"reaction_count": 40, "metabolite_count": 31})]
+        row = _otd_run(mock_conn, rows=rows,
+                       term_ids=["kegg.pathway:ko00010"])["results"][0]
+        assert row["direct_gene_count"] == 0
+
+    def test_kegg_pathway_carries_chemistry_counts(self, mock_conn):
+        rows = [_otd_row("kegg.pathway:ko00010", "KeggTerm", name="Glycolysis",
+                         level=2, direct_gene_count=0,
+                         extra={"reaction_count": 40, "metabolite_count": 31})]
+        row = _otd_run(mock_conn, rows=rows,
+                       term_ids=["kegg.pathway:ko00010"])["results"][0]
+        assert row["reaction_count"] == 40
+        assert row["metabolite_count"] == 31
+
+    def test_kegg_ko_has_neither_chemistry_key(self, mock_conn):
+        rows = [_otd_row("kegg.orthology:K00001", "KeggTerm", name="adh",
+                         level=3, direct_gene_count=52,
+                         extra={"reaction_count": None, "metabolite_count": None})]
+        row = _otd_run(mock_conn, rows=rows,
+                       term_ids=["kegg.orthology:K00001"])["results"][0]
+        assert row["direct_gene_count"] == 52
+        assert "reaction_count" not in row
+        assert "metabolite_count" not in row

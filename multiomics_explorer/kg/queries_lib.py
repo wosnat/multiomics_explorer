@@ -97,7 +97,11 @@ ONTOLOGY_CONFIG = {
         "discusses_rel": "Publication_discusses_kegg_pathway",
         "trust": dict(_TRUST_SOURCES_EVIDENCE),
         "term_compact": ["gene_count", "organism_count"],
-        "term_details_compact": ["direct_gene_count"],
+        # reaction_count / metabolite_count live on pathway terms only
+        # (strip rule: absent on KO / module rows).
+        "term_details_compact": [
+            "direct_gene_count", "reaction_count", "metabolite_count",
+        ],
         "term_details_verbose": "*",
         "bridges_out": [
             ("Kegg_term_in_brite_category", "brite", "membership"),

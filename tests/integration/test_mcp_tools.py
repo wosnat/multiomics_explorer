@@ -3992,3 +3992,69 @@ class TestOntologyTermDetailsLive:
         ctx = _ctx_with_conn(conn)
         with pytest.raises(ToolError):
             await tool_fns["ontology_term_details"](ctx, term_ids=[])
+
+
+@pytest.mark.kg
+class TestOntologyOrganismResolutionLive:
+    """PR 3b review fix #1: `organism` on search_ontology /
+    ontology_term_details resolves like every other tool ('MED4' ->
+    'Prochlorococcus MED4'); unknown names raise."""
+
+    def test_search_ontology_short_name_matches_full_name(self, conn):
+        short = api.search_ontology(
+            ontology=["interpro"], interpro_type="HOMOLOGOUS_SUPERFAMILY",
+            organism="MED4", min_gene_count=5, limit=5, conn=conn)
+        first = short["results"][0]
+        assert first["id"] == "interpro:IPR027417"
+        assert first["organism_gene_count"] == 119
+        full = api.search_ontology(
+            ontology=["interpro"], interpro_type="HOMOLOGOUS_SUPERFAMILY",
+            organism="Prochlorococcus MED4", min_gene_count=5, limit=5,
+            conn=conn)
+        assert [r["id"] for r in full["results"]] == [
+            r["id"] for r in short["results"]]
+        assert full["total_matching"] == short["total_matching"]
+
+    def test_search_ontology_unknown_organism_raises(self, conn):
+        with pytest.raises(ValueError, match="no organism matching"):
+            api.search_ontology(
+                ontology=["merops"], level=1, organism="NotAnOrganism",
+                conn=conn)
+
+    def test_term_details_short_name(self, conn):
+        result = api.ontology_term_details(
+            ["tcdb:3.A.1"], organism="MED4", conn=conn)
+        row = result["results"][0]
+        assert row["organism_gene_count"] > 0
+        full = api.ontology_term_details(
+            ["tcdb:3.A.1"], organism="Prochlorococcus MED4", conn=conn)
+        assert full["results"][0]["organism_gene_count"] == row["organism_gene_count"]
+
+    def test_term_details_unknown_organism_raises(self, conn):
+        with pytest.raises(ValueError, match="no organism matching"):
+            api.ontology_term_details(
+                ["tcdb:3.A.1"], organism="NotAnOrganism", conn=conn)
+
+
+@pytest.mark.kg
+class TestOntologyTermDetailsStripRuleLive:
+    """PR 3b review fixes #4 / #5: KEGG chemistry counts on pathway terms
+    only; `direct_gene_count` absent when the node carries none."""
+
+    def test_kegg_pathway_carries_chemistry_counts(self, conn):
+        result = api.ontology_term_details(
+            ["kegg.pathway:ko00010", "kegg.orthology:K00001"], conn=conn)
+        rows = {r["term_id"]: r for r in result["results"]}
+        pathway = rows["kegg.pathway:ko00010"]
+        assert pathway["reaction_count"] == 40
+        assert pathway["metabolite_count"] == 31
+        ko = rows["kegg.orthology:K00001"]
+        assert "reaction_count" not in ko
+        assert "metabolite_count" not in ko
+
+    def test_pfam_has_no_direct_gene_count_key(self, conn):
+        result = api.ontology_term_details(
+            ["pfam:PF00005", "go:0006979"], conn=conn)
+        rows = {r["term_id"]: r for r in result["results"]}
+        assert "direct_gene_count" not in rows["pfam:PF00005"]
+        assert rows["go:0006979"]["direct_gene_count"] == 860

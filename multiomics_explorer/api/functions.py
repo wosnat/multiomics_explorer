@@ -2249,6 +2249,10 @@ def search_ontology(
         limit = 0
 
     conn = _default_conn(conn)
+    if organism is not None:
+        # Same fuzzy resolution as every other organism-taking tool
+        # ('MED4' -> 'Prochlorococcus MED4'; unknown / ambiguous raises).
+        organism = _validate_organism_inputs(organism, None, None, conn)
 
     results: list[dict] = []
     by_ontology: list[dict] = []
@@ -2570,13 +2574,23 @@ def _bridge_registry() -> dict[str, tuple[str, str]]:
     return out
 
 
+# Count props carried by only SOME nodes of their label (KEGG chemistry
+# counts live on pathway terms, not KO / module rows). Neo4j has no null
+# property, so a null here means "not carried" — stripped, like
+# `direct_gene_count`. Every other owned prop keeps a null (e.g. ncbifam
+# `gene_symbol`), which is information.
+_TERM_DETAILS_SPARSE_COUNTS: frozenset[str] = frozenset({
+    "direct_gene_count", "reaction_count", "metabolite_count",
+})
+
+
 def _term_details_row(row: dict, *, verbose: bool, organism: str | None) -> dict:
     """Project one builder row onto the compact / verbose term-details shape.
 
     Only the props the term's ontology declares under `term_details_compact`
     are carried (owned-but-null survives; a prop another ontology owns is
-    absent). `direct_gene_count` is applicable on hierarchical ontologies
-    and on any ontology that lists it explicitly.
+    absent). `direct_gene_count` is emitted only when the node carries a
+    value — flat labels, PfamClan and BriteCategory have none.
     """
     labels = _term_label_to_ontology()
     label = next((lab for lab in row.get("labels") or [] if lab in labels), None)
@@ -2602,13 +2616,19 @@ def _term_details_row(row: dict, *, verbose: bool, organism: str | None) -> dict
         "organism_count": row.get("organism_count"),
     }
     compact_props = list(cfg.get("term_details_compact") or [])
-    if cfg.get("hierarchy_rels") or "direct_gene_count" in compact_props:
-        out["direct_gene_count"] = _prop("direct_gene_count")
+    # Strip rule: emitted only when the node actually carries it (null on
+    # flat labels, PfamClan, BriteCategory -> key absent, not null).
+    direct_gene_count = _prop("direct_gene_count")
+    if direct_gene_count is not None:
+        out["direct_gene_count"] = direct_gene_count
     for prop in compact_props:
         if prop == "direct_gene_count" or prop in out:
             continue
         if prop in row or prop in props_map:
-            out[prop] = _prop(prop)
+            value = _prop(prop)
+            if value is None and prop in _TERM_DETAILS_SPARSE_COUNTS:
+                continue
+            out[prop] = value
     if organism is not None:
         out["organism_gene_count"] = row.get("organism_gene_count")
 
@@ -2728,6 +2748,8 @@ def ontology_term_details(
         link_kinds = list(link_kinds)
 
     conn = _default_conn(conn)
+    if organism is not None:
+        organism = _validate_organism_inputs(organism, None, None, conn)
     cypher, params = build_ontology_term_details(
         term_ids=list(term_ids), link_kinds=link_kinds, verbose=verbose,
         organism=organism,
