@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from multiomics_explorer.api import functions as api
+from multiomics_explorer.kg import constants as _kg_constants
 
 
 # ---------------------------------------------------------------------------
@@ -11781,6 +11782,10 @@ class TestKGReleaseInfo:
             "organism_count": 2,
             "expression_edge_count": 500,
             "release_notes_url": None,
+            # Spec 2026-08-27-slice4 §3.1: an absent hash is a `warn`, so the
+            # "everything passes" fixture must carry the pinned value.
+            "controlled_vocabularies_hash": (
+                _kg_constants.EXPECTED_KG_SHAPE["controlled_vocabularies_hash"]),
         }
         si.update(overrides)
         return si
@@ -14333,8 +14338,14 @@ class TestKGReleaseInfoVocabularyHash:
         return EXPECTED_KG_SHAPE["controlled_vocabularies_hash"]
 
     def _conn(self, **overrides):
+        """Fake conn over the ok-schema fixture. The fixture now carries the
+        pinned hash (spec §3.1); pass `absent=True` to drop the property
+        entirely (pre-SYNC-005 KG) rather than null it."""
+        absent = overrides.pop("absent", False)
         base = TestKGReleaseInfo()
         si = base._ok_schema_info(**overrides)
+        if absent:
+            si.pop("controlled_vocabularies_hash", None)
         return base._make_conn(si, base._ok_labels(), base._ok_rel_types())
 
     @staticmethod
@@ -14381,7 +14392,7 @@ class TestKGReleaseInfoVocabularyHash:
     def test_hash_absent_yields_warn_and_predates_detail(self):
         from multiomics_explorer.api.functions import kg_release_info
         # Pre-SYNC-005 KG: no such property on Schema_info at all.
-        report = kg_release_info(self._conn())
+        report = kg_release_info(self._conn(absent=True))
         assert report["verdict"] == "warn"
         b6 = self._bucket6(report)
         assert b6["passed"] is False
@@ -14420,7 +14431,7 @@ class TestKGReleaseInfoVocabularyHash:
 
     def test_kg_identity_hash_is_none_when_absent(self):
         from multiomics_explorer.api.functions import kg_release_info
-        report = kg_release_info(self._conn())
+        report = kg_release_info(self._conn(absent=True))
         assert "controlled_vocabularies_hash" in report["kg"]
         assert report["kg"]["controlled_vocabularies_hash"] is None
 
