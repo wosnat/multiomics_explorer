@@ -35,8 +35,8 @@ from multiomics_explorer.kg.constants import (
 )
 from multiomics_explorer.kg.queries_lib import (
     ONTOLOGY_CONFIG,
-    _TRUST_FILTER_AXIS,
-    _verbose_edge_pairs,
+    TRUST_FILTER_AXIS,
+    verbose_edge_pairs,
     ontology_row_columns,
     ontology_trust_axes,
     build_evidence_score_signals,
@@ -59,6 +59,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_genes_by_ontology_detail,
     build_genes_by_ontology_per_gene,
     build_genes_by_ontology_per_term,
+    build_genes_by_ontology_trust_rollups,
     build_genes_by_ontology_validate,
     build_gene_details,
     build_gene_details_summary,
@@ -145,6 +146,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_ontology_expcov,
     build_ontology_landscape,
     build_ontology_organism_gene_count,
+    build_ontology_term_details,
 )
 from multiomics_explorer.kg.schema import load_schema_from_neo4j
 
@@ -275,8 +277,8 @@ def _compact_edge_owners(param: str) -> list[str]:
 
 def _ontology_carries(ontology: str, param: str) -> bool:
     """True when `ontology` can be filtered on `param`."""
-    if param in _TRUST_FILTER_AXIS:
-        return _TRUST_FILTER_AXIS[param] in ontology_trust_axes(ontology)
+    if param in TRUST_FILTER_AXIS:
+        return TRUST_FILTER_AXIS[param] in ontology_trust_axes(ontology)
     cfg = ONTOLOGY_CONFIG.get(ontology, {})
     if param in (cfg.get("compact_edge") or {}):
         return True
@@ -479,6 +481,78 @@ def _trust_row_warnings(
     return warns
 
 
+_TRUST_ROLLUP_KEYS: tuple[str, ...] = (
+    "by_evidence", "by_tier", "by_sources", "by_call_class",
+)
+
+
+def _trust_rollups_from_aggregate(agg: dict | None) -> dict:
+    """Normalize the one-row output of the aggregate-only trust builder.
+
+    Same envelope keys and value shapes as `_trust_rollups`, read from
+    Cypher `count()` aggregations instead of a second per-row scan. A
+    missing rollup defaults to `[]`; missing stats to the all-null shape.
+    """
+    agg = agg or {}
+    out = {key: list(agg.get(key) or []) for key in _TRUST_ROLLUP_KEYS}
+    stats = dict(agg.get("evidence_score_stats") or {})
+    out["evidence_score_stats"] = {
+        "min": stats.get("min"),
+        "median": stats.get("median"),
+        "max": stats.get("max"),
+        "n_null": int(stats.get("n_null") or 0),
+    }
+    return out
+
+
+def _trust_aggregate_warnings(
+    rollups: dict, targets: list[str], filters: dict, total_rows: int,
+) -> list[str]:
+    """The `_trust_row_warnings` set, derived from full-match rollups.
+
+    Mirrors the per-row variant message for message so a reader sees the
+    same warning whether the envelope came from rows or from the aggregate.
+    """
+    warns: list[str] = []
+    for ontology in targets:
+        cfg = ONTOLOGY_CONFIG.get(ontology, {})
+        for name, spec in (cfg.get("compact_edge") or {}).items():
+            if filters.get(name) is not None:
+                continue
+            warn_values = set(spec.get("warn_values") or [])
+            rollup = rollups.get(f"by_{name}") or []
+            hits = [e for e in rollup if e.get(name) in warn_values]
+            if not hits:
+                continue
+            n_hits = sum(int(e.get("count") or 0) for e in hits)
+            observed = sorted({e[name] for e in hits})
+            warns.append(
+                f"{n_hits} of {total_rows} matching rows carry "
+                f"{name}={observed} — catalytically-dead homologs that keep "
+                f"the family fold but not a working active site. Pass "
+                f"{name}=[...] to scope the set."
+            )
+    if filters.get("max_tier") is not None:
+        n_null = sum(
+            int(e.get("count") or 0)
+            for e in (rollups.get("by_tier") or [])
+            if e.get("tier") in (None, "null")
+        )
+        if n_null:
+            warns.append(
+                f"max_tier={filters['max_tier']} kept {n_null} rows that "
+                f"carry no tier — single-source edges are never truncated, "
+                f"so a null tier is not a tier-1 call."
+            )
+    if filters.get("min_evidence_score") is not None:
+        warns.append(
+            f"min_evidence_score={filters['min_evidence_score']} applied — "
+            f"the one numeric trust cutoff. Read evidence_score_signals for "
+            f"the signals that fed each score."
+        )
+    return warns
+
+
 def _evidence_score_signals(conn, targets: list[str]) -> dict:
     """Vocabulary-declared signals behind evidence_score, per edge type."""
     edge_types = [
@@ -636,7 +710,7 @@ def _trust_value_owners(filter_type: str, ontology: str | None) -> list[str]:
         elif scope == "compact_edge":
             hit = prop in (cfg.get("compact_edge") or {})
         elif scope == "verbose_edge":
-            hit = prop in {p for p, _c in _verbose_edge_pairs(cfg)}
+            hit = prop in {p for p, _c in verbose_edge_pairs(cfg)}
         else:
             hit = key in spec.get("ontologies", [])
         if hit:
@@ -2028,9 +2102,71 @@ def list_experiments(
     return envelope
 
 
+_SEARCH_ONTOLOGY_NARROWING = ("level", "tree", "interpro_type", "min_gene_count", "organism")
+
+
+def _search_ontology_one(
+    conn, ontology: str, *, search_text: str | None, mode: str,
+    limit: int | None, offset: int, level: int | None,
+    facet: dict, informative_only: bool, verbose: bool,
+    min_gene_count: int | None, organism: str | None,
+) -> tuple[dict, list[dict]]:
+    """Run the summary (+ detail) query for ONE ontology with Lucene retry.
+
+    Returns (summary_row, detail_rows). `detail_rows` is empty when
+    `limit == 0`. Search mode retries once with the Lucene-escaped text on
+    a parse error; browse mode never touches the fulltext index.
+    """
+    effective_text = search_text
+    common = dict(
+        ontology=ontology, level=level, informative_only=informative_only,
+        min_gene_count=min_gene_count, organism=organism, **facet,
+    )
+
+    def _summary(text):
+        cypher, params = build_search_ontology_summary(
+            search_text=text, **common,
+        )
+        rows = conn.execute_query(cypher, **params)
+        return rows[0] if rows else {}
+
+    def _detail(text):
+        cypher, params = build_search_ontology(
+            search_text=text, limit=limit, offset=offset, verbose=verbose,
+            **common,
+        )
+        return conn.execute_query(cypher, **params)
+
+    try:
+        raw_summary = _summary(effective_text)
+    except Neo4jClientError:
+        if mode != "search":
+            raise
+        logger.debug(
+            "search_ontology[%s]: Lucene parse error, retrying escaped", ontology,
+        )
+        effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+        raw_summary = _summary(effective_text)
+
+    if limit == 0:
+        return raw_summary, []
+
+    try:
+        rows = _detail(effective_text)
+    except Neo4jClientError:
+        if mode != "search" or effective_text != search_text:
+            raise
+        logger.debug(
+            "search_ontology[%s] detail: Lucene parse error, retrying", ontology,
+        )
+        effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+        rows = _detail(effective_text)
+    return raw_summary, rows
+
+
 def search_ontology(
-    search_text: str,
-    ontology: str,
+    search_text: str | None = None,
+    ontology: str | list[str] | None = None,
     summary: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -2039,121 +2175,164 @@ def search_ontology(
     informative_only: bool = False,
     verbose: bool = False,
     interpro_type: str | None = None,
+    min_gene_count: int | None = None,
+    organism: str | None = None,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
-    """Browse ontology terms by text search.
+    """Search or browse ontology terms, one or many ontologies per call.
+
+    Two modes, chosen by `search_text`:
+
+    - **search** (`search_text` given): Lucene fulltext query over term
+      names, rows ranked by `score` DESC within each ontology.
+    - **browse** (`search_text` None / empty): plain label scan, rows ranked
+      by `gene_count` DESC then id, `score` is None. Narrow with `level`,
+      a facet (`tree` / `interpro_type`), `min_gene_count` or `organism`;
+      a truncated browse with none of those set adds a warning.
 
     Args:
-        search_text: Lucene fulltext query over ontology term names.
-        ontology: Ontology key (e.g. 'kegg', 'go', 'ec'); see ONTOLOGY_CONFIG.
+        search_text: Lucene fulltext query, or None/'' for browse mode.
+        ontology: One ontology key, a list of keys, or None for all 17 in
+            ONTOLOGY_CONFIG order. Duplicates collapse; unknown keys raise.
         summary: Return only summary fields (forces limit=0, empty results).
-        limit: Max detail rows.
-        offset: Skip this many detail rows (pagination).
-        level: Restrict to terms at this hierarchy level.
-        tree: BRITE-only sub-tree filter.
+        limit: Max detail rows PER ONTOLOGY (lockstep paging on multi-
+            ontology calls — `returned` is at most `limit * n_ontologies`).
+        offset: Skip this many detail rows per ontology.
+        level: Restrict to terms at this hierarchy level (0 = root).
+        tree: BRITE-only sub-tree facet; raises when brite is not in the set.
         informative_only: Drop uninformative (root / catch-all) terms.
-        verbose: Include the per-term `discussed_in_publications` DOI list
-            (KEGG only — list of {doi, prominence, evidence}).
-        interpro_type: InterPro-only stratum facet (one of the eight entry
-            types, e.g. 'FAMILY' or 'HOMOLOGOUS_SUPERFAMILY').
+        verbose: Add `description`, `level_kind`, `direct_gene_count`
+            (hierarchical ontologies), the per-ontology `term_verbose`
+            columns, and the KEGG `discussed_in_publications` list.
+        interpro_type: InterPro-only stratum facet (e.g. 'FAMILY'); raises
+            when interpro is not in the set.
+        min_gene_count: Keep terms with at least this many annotated genes
+            (`organism_gene_count` when `organism` is set).
+        organism: Scope gene counts to one organism; rows gain
+            `organism_gene_count` and browse ranks by it.
         conn: Optional graph connection (defaults to the shared connection).
 
-    Returns dict with keys: total_entries, total_matching, score_max,
-    score_median, returned, truncated, results.
-    Per result: id, name, score, level, gene_count, organism_count,
-    tree (sparse), tree_code (sparse), interpro_type (InterPro only).
-    For KEGG, each result also carries discussed_by_n_publications (count of
-    publications that discuss this pathway in prose). Verbose adds, for KEGG,
-    discussed_in_publications (list of {doi, prominence, evidence}; see
-    discussed_by_publication for a paper's full discussed set).
+    Returns dict with keys: mode ('search' | 'browse'), total_entries,
+    total_matching, score_max, score_median, returned, offset, truncated,
+    by_ontology [{ontology, total_entries, total_matching, score_max,
+    returned, truncated}], by_level [{level, count}] (browse only),
+    by_interpro_type, by_family_type, skipped_ontologies, warnings, results.
+    On multi-ontology calls the flat counts are sums (score_max the max)
+    across ontologies and rows are grouped by ontology in config order.
+    Per result: id, name, ontology_type, score, level, is_informative,
+    gene_count, organism_count, tree / tree_code (BRITE), interpro_type
+    (InterPro), organism_gene_count (when `organism` is set). KEGG rows
+    also carry discussed_by_n_publications.
+
+    Raises ValueError on an unknown ontology key, or when a facet's owning
+    ontology is not in the requested set.
     """
-    if not search_text or not search_text.strip():
-        raise ValueError("search_text must not be empty.")
-    if ontology not in ONTOLOGY_CONFIG:
-        valid = ", ".join(sorted(ONTOLOGY_CONFIG))
-        raise ValueError(
-            f"Invalid ontology '{ontology}'. Valid: {valid}"
-        )
-    if interpro_type is not None and not _ontology_carries(
-        ontology, "interpro_type",
-    ):
-        raise _unsupported_axis_error(ontology, "interpro_type")
+    from collections import Counter
+
+    mode = "search" if search_text and search_text.strip() else "browse"
+    effective_text = search_text if mode == "search" else None
+
+    requested = _normalize_ontology_arg(ontology)
+    if requested is None:
+        requested = list(ONTOLOGY_CONFIG)
+    # Config order is the row / by_ontology order, whatever the caller wrote.
+    ontologies = [key for key in ONTOLOGY_CONFIG if key in requested]
+
+    facet_filters = _active_trust_filters(tree=tree, interpro_type=interpro_type)
+    if len(ontologies) == 1:
+        _validate_trust_filters(ontologies[0], facet_filters)
+    targets, skipped, warnings, per_ontology = _resolve_multi_ontology(
+        ontologies, facet_filters,
+    )
     if summary:
         limit = 0
 
     conn = _default_conn(conn)
-    effective_text = search_text
 
-    # Summary query — always runs
-    try:
-        sum_cypher, sum_params = build_search_ontology_summary(
-            ontology=ontology, search_text=effective_text,
-            level=level, tree=tree,
-            informative_only=informative_only,
-            interpro_type=interpro_type,
-        )
-        raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
-    except Neo4jClientError:
-        logger.debug("search_ontology: Lucene parse error, retrying with escaped query")
-        effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
-        sum_cypher, sum_params = build_search_ontology_summary(
-            ontology=ontology, search_text=effective_text,
-            level=level, tree=tree,
-            informative_only=informative_only,
-            interpro_type=interpro_type,
-        )
-        raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
-
-    total_matching = raw_summary["total_matching"]
-    envelope = {
-        "total_entries": raw_summary["total_entries"],
-        "total_matching": total_matching,
-        "score_max": raw_summary["score_max"],
-        "score_median": raw_summary["score_median"],
-    }
-
-    # Detail query — skip when limit=0
-    if limit == 0:
-        envelope["returned"] = 0
-        envelope["offset"] = offset
-        envelope["truncated"] = total_matching > 0
-        envelope["results"] = []
-        return envelope
-
-    try:
-        det_cypher, det_params = build_search_ontology(
-            ontology=ontology, search_text=effective_text, limit=limit, offset=offset,
-            level=level, tree=tree,
+    results: list[dict] = []
+    by_ontology: list[dict] = []
+    level_counter: Counter = Counter()
+    single_summary: dict | None = None
+    for key in targets:
+        raw_summary, rows = _search_ontology_one(
+            conn, key, search_text=effective_text, mode=mode,
+            limit=limit, offset=offset, level=level,
+            facet=per_ontology.get(key, {}),
             informative_only=informative_only, verbose=verbose,
-            interpro_type=interpro_type,
+            min_gene_count=min_gene_count, organism=organism,
         )
-        results = conn.execute_query(det_cypher, **det_params)
-    except Neo4jClientError:
-        if effective_text == search_text:
-            logger.debug("search_ontology detail: Lucene parse error, retrying")
-            effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
-            det_cypher, det_params = build_search_ontology(
-                ontology=ontology, search_text=effective_text, limit=limit, offset=offset,
-                level=level, tree=tree,
-                informative_only=informative_only, verbose=verbose,
-                interpro_type=interpro_type,
-            )
-            results = conn.execute_query(det_cypher, **det_params)
-        else:
-            raise
+        if single_summary is None:
+            single_summary = raw_summary
+        o_total = raw_summary.get("total_matching") or 0
+        for r in rows:
+            r["ontology_type"] = key
+            # Strip sparse BRITE-only fields when absent
+            if r.get("tree") is None:
+                r.pop("tree", None)
+                r.pop("tree_code", None)
+        results.extend(rows)
+        by_ontology.append({
+            "ontology": key,
+            "total_entries": raw_summary.get("total_entries") or 0,
+            "total_matching": o_total,
+            "score_max": raw_summary.get("score_max"),
+            "returned": len(rows),
+            "truncated": (
+                o_total > 0 if limit == 0 else o_total > offset + len(rows)
+            ),
+        })
+        for entry in raw_summary.get("by_level") or []:
+            if entry and entry.get("level") is not None:
+                level_counter[entry["level"]] += entry.get("count") or 0
 
-    # Strip sparse BRITE-only fields when absent
-    for r in results:
-        if r.get("tree") is None:
-            r.pop("tree", None)
-            r.pop("tree_code", None)
+    score_values = [e["score_max"] for e in by_ontology if e["score_max"] is not None]
+    if len(by_ontology) == 1 and single_summary is not None:
+        score_median = single_summary.get("score_median")
+    else:
+        returned_scores = [
+            r["score"] for r in results if r.get("score") is not None
+        ]
+        score_median = (
+            float(statistics.median(returned_scores)) if returned_scores else None
+        )
 
-    envelope["returned"] = len(results)
-    envelope["offset"] = offset
-    envelope["truncated"] = total_matching > offset + len(results)
-    envelope["results"] = results
-    return envelope
+    truncated = any(e["truncated"] for e in by_ontology)
+    if mode == "browse" and truncated and not any(
+        v is not None for v in (level, tree, interpro_type, min_gene_count, organism)
+    ):
+        warnings = warnings + [
+            "Browse mode truncated with no narrowing filter — set level, "
+            "min_gene_count, organism or a facet (tree / interpro_type), "
+            "or raise limit / page with offset, to see the rest."
+        ]
+
+    def _facet_rollup(owner: str, column: str) -> list[dict]:
+        counter = Counter(
+            r.get(column) for r in results
+            if r.get("ontology_type") == owner and r.get(column) is not None
+        )
+        return _freq_rollup(counter, column)
+
+    return {
+        "mode": mode,
+        "total_entries": sum(e["total_entries"] for e in by_ontology),
+        "total_matching": sum(e["total_matching"] for e in by_ontology),
+        "score_max": max(score_values) if score_values else None,
+        "score_median": score_median,
+        "returned": len(results),
+        "offset": offset,
+        "truncated": truncated,
+        "by_ontology": by_ontology,
+        "by_level": [
+            {"level": lvl, "count": n} for lvl, n in sorted(level_counter.items())
+        ],
+        "by_interpro_type": _facet_rollup("interpro", "interpro_type"),
+        "by_family_type": _facet_rollup("ncbifam", "family_type"),
+        "skipped_ontologies": skipped,
+        "warnings": warnings,
+        "results": results,
+    }
 
 
 def search_homolog_groups(
@@ -2365,6 +2544,233 @@ def genes_by_homolog_group(
     envelope["truncated"] = total_matching > offset + len(results)
     envelope["results"] = results
     return envelope
+
+
+_LINK_KINDS: tuple[str, ...] = ("composition", "membership", "router")
+
+
+@lru_cache(maxsize=1)
+def _term_label_to_ontology() -> dict[str, str]:
+    """Node label -> ontology key, PfamClan folding into pfam."""
+    out: dict[str, str] = {}
+    for key, cfg in ONTOLOGY_CONFIG.items():
+        out[cfg["label"]] = key
+        if cfg.get("parent_label"):
+            out[cfg["parent_label"]] = key
+    return out
+
+
+@lru_cache(maxsize=1)
+def _bridge_registry() -> dict[str, tuple[str, str]]:
+    """Bridge rel type -> (target ontology key, link_kind), from config."""
+    out: dict[str, tuple[str, str]] = {}
+    for cfg in ONTOLOGY_CONFIG.values():
+        for rel, target, kind in cfg.get("bridges_out") or []:
+            out[rel] = (target, kind)
+    return out
+
+
+def _term_details_row(row: dict, *, verbose: bool, organism: str | None) -> dict:
+    """Project one builder row onto the compact / verbose term-details shape.
+
+    Only the props the term's ontology declares under `term_details_compact`
+    are carried (owned-but-null survives; a prop another ontology owns is
+    absent). `direct_gene_count` is applicable on hierarchical ontologies
+    and on any ontology that lists it explicitly.
+    """
+    labels = _term_label_to_ontology()
+    label = next((lab for lab in row.get("labels") or [] if lab in labels), None)
+    ontology = labels.get(label) if label else None
+    cfg = ONTOLOGY_CONFIG.get(ontology, {}) if ontology else {}
+    props_map = row.get("properties") or {}
+
+    def _prop(name):
+        if name in row:
+            return row[name]
+        return props_map.get(name)
+
+    out: dict = {
+        "term_id": row["term_id"],
+        "ontology": ontology,
+        "label": label,
+        "name": row.get("name"),
+        "description": row.get("description"),
+        "level": row.get("level"),
+        "level_kind": row.get("level_kind"),
+        "is_informative": row.get("is_informative"),
+        "gene_count": row.get("gene_count"),
+        "organism_count": row.get("organism_count"),
+    }
+    compact_props = list(cfg.get("term_details_compact") or [])
+    if cfg.get("hierarchy_rels") or "direct_gene_count" in compact_props:
+        out["direct_gene_count"] = _prop("direct_gene_count")
+    for prop in compact_props:
+        if prop == "direct_gene_count" or prop in out:
+            continue
+        if prop in row or prop in props_map:
+            out[prop] = _prop(prop)
+    if organism is not None:
+        out["organism_gene_count"] = row.get("organism_gene_count")
+
+    children = list(row.get("children") or [])
+    children_total = row.get("children_total")
+    if children_total is None:
+        children_total = len(children)
+    out["parents"] = list(row.get("parents") or [])
+    out["children"] = children
+    out["children_total"] = children_total
+    out["children_truncated"] = children_total > len(children)
+
+    bridges = _bridge_registry()
+    raw_links = list(row.get("links_out") or [])
+    n_router = sum(
+        1 for link in raw_links
+        if bridges.get(link.get("rel"), (None, None))[1] == "router"
+    )
+    interpro_type = _prop("interpro_type")
+    links_out: list[dict] = []
+    for link in raw_links:
+        target_ontology, kind = bridges.get(link.get("rel"), (None, None))
+        entry = {
+            "rel": link.get("rel"),
+            "link_kind": kind,
+            "target_id": link.get("target_id"),
+            "target_ontology": target_ontology,
+            "target_name": link.get("target_name"),
+        }
+        if verbose:
+            props = dict(link.get("props") or {})
+            if kind == "router" and ontology == "interpro":
+                props["router_ambiguous"] = bool(
+                    n_router > 1 or interpro_type != "FAMILY"
+                )
+            entry["props"] = props
+        links_out.append(entry)
+    out["links_out"] = links_out
+
+    if verbose:
+        out["properties"] = props_map
+        out["genes_by_organism"] = list(row.get("genes_by_organism") or [])
+    return out
+
+
+def ontology_term_details(
+    term_ids: list[str],
+    organism: str | None = None,
+    link_kinds: list[str] | None = None,
+    verbose: bool = False,
+    limit: int | None = 50,
+    offset: int = 0,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Describe ontology terms: hierarchy, counts, and cross-ontology links.
+
+    Batch and cross-ontology — term IDs are self-prefixed CURIEs
+    (`go:0006979`, `tcdb:3.A.1`, `merops.family:S14`, `interpro:IPR000362`,
+    `ncbifam:NF000812`, `kegg.pathway:ko00010`, `pfam:PF00005`, `ec:1.1.1.1`,
+    `cazy:GH13`). Rows come back in input order; IDs with no node land in
+    `not_found`.
+
+    Links are forward-only by construction. `composition` (tcdb / merops ->
+    pfam, tcdb -> go_*) says what a family is built from — read it forward,
+    never as "this Pfam domain implies that transporter". `membership`
+    (pfam / ncbifam -> interpro, kegg -> brite) is a grouping. `router`
+    (interpro -> ec / cazy) is recall-biased: it points at candidate
+    functions and never assigns one to a gene — verbose `router_ambiguous`
+    flags entries with more than one target or a non-FAMILY type.
+
+    Args:
+        term_ids: Term CURIEs to describe (any ontology, mixed is fine).
+        organism: Scope `genes_by_organism` (verbose) to one organism and
+            add `organism_gene_count` to every row.
+        link_kinds: Keep only these link kinds ('composition', 'membership',
+            'router'); None keeps all.
+        verbose: Add `properties` (every node prop), `links_out[].props`
+            (edge props such as `curated_tcids` / `member_id_count`, plus
+            `router_ambiguous` on router links) and `genes_by_organism`.
+        limit: Max rows returned per page (found rows only).
+        offset: Skip this many found rows.
+        conn: Optional graph connection (defaults to the shared connection).
+
+    Returns dict with keys: total_matching (found rows), returned, offset,
+    truncated, not_found, by_ontology [{ontology, count}], links_out_total,
+    by_link_kind [{link_kind, count}], warnings, results.
+    Per result: term_id, ontology, label (node label), name, description,
+    level, level_kind, is_informative, gene_count, organism_count,
+    direct_gene_count (hierarchical ontologies), the ontology's own detail
+    props (e.g. tcdb_id / tc_class_id, family_class / catalytic_type,
+    interpro_type, family_type / gene_symbol — a prop the ontology does not
+    own is absent, an owned null survives), parents [{id, name, level}],
+    children [{id, name, level}] (capped at 50), children_total,
+    children_truncated, links_out [{rel, link_kind, target_id,
+    target_ontology, target_name}]. The rollups describe the whole batch,
+    not the page.
+
+    Raises ValueError when `term_ids` is empty or `link_kinds` names an
+    unknown kind.
+
+    Routing: genes_by_ontology(term_ids=[...]) for the annotated genes;
+    search_ontology for discovery; docs://ontologies/{ontology} for the
+    per-ontology reference.
+    """
+    from collections import Counter
+
+    if not term_ids:
+        raise ValueError("term_ids must not be empty.")
+    if link_kinds is not None:
+        unknown = [k for k in link_kinds if k not in _LINK_KINDS]
+        if unknown:
+            raise ValueError(
+                f"Unknown link_kind {', '.join(repr(k) for k in unknown)}. "
+                f"Valid link_kinds: {', '.join(_LINK_KINDS)}."
+            )
+        link_kinds = list(link_kinds)
+
+    conn = _default_conn(conn)
+    cypher, params = build_ontology_term_details(
+        term_ids=list(term_ids), link_kinds=link_kinds, verbose=verbose,
+        organism=organism,
+    )
+    raw_rows = conn.execute_query(cypher, **params)
+
+    found: list[dict] = []
+    not_found: list[str] = []
+    for row in raw_rows:
+        if row.get("not_found") or not row.get("labels"):
+            not_found.append(row["term_id"])
+            continue
+        found.append(_term_details_row(row, verbose=verbose, organism=organism))
+    # The builder already applies `link_kinds`; keep the api-side guard so
+    # the envelope rollups never count a kind the caller excluded.
+    if link_kinds is not None:
+        allowed = set(link_kinds)
+        for r in found:
+            r["links_out"] = [
+                link for link in r["links_out"] if link["link_kind"] in allowed
+            ]
+
+    ontology_counter = Counter(r["ontology"] for r in found)
+    link_counter: Counter = Counter()
+    for r in found:
+        for link in r["links_out"]:
+            link_counter[link["link_kind"]] += 1
+
+    total_matching = len(found)
+    page = found[offset:] if limit is None else found[offset:offset + limit]
+
+    return {
+        "total_matching": total_matching,
+        "returned": len(page),
+        "offset": offset,
+        "truncated": total_matching > offset + len(page),
+        "not_found": not_found,
+        "by_ontology": _freq_rollup(ontology_counter, "ontology"),
+        "links_out_total": sum(link_counter.values()),
+        "by_link_kind": _freq_rollup(link_counter, "link_kind"),
+        "warnings": [],
+        "results": page,
+    }
 
 
 def genes_by_ontology(
@@ -2592,34 +2998,40 @@ def genes_by_ontology(
         "filters_applied": dict(trust_filters),
         "skipped_ontologies": [],
     }
-    # --- Query C: full-match trust projection ---
+    # --- Query C: full-match trust rollups (aggregate-only) ---
     # The `by_*` rollups and the row-conditional warnings describe the whole
     # match, not the page the caller happens to be reading, and they must be
     # there in summary mode too. The detail query below already IS the full
-    # match when it is unpaginated, so re-run it only when it is not.
-    trust_rows: list[dict] | None = None
+    # match when it is unpaginated; on a paged or summary call the rollups
+    # come from Cypher count() aggregations — never a second row scan.
+    aggregate_done = False
     if ontology_row_columns(ontology, verbose=False, force_trust_axes=True) and (
         per_term and not (limit is None and offset == 0)
     ):
-        tr_cypher, tr_params = build_genes_by_ontology_detail(
+        agg_cypher, agg_params = build_genes_by_ontology_trust_rollups(
             ontology=ontology, organism=organism,
             level=level, term_ids=effective_term_ids,
             min_gene_set_size=min_gene_set_size,
             max_gene_set_size=max_gene_set_size,
-            verbose=False, limit=None, offset=0,
             informative_only=informative_only,
             **trust_filters,
         )
-        trust_rows = conn.execute_query(tr_cypher, **tr_params)
-
-    envelope.update(_trust_rollups(trust_rows or []))
+        agg_rows = conn.execute_query(agg_cypher, **agg_params)
+        rollups = _trust_rollups_from_aggregate(agg_rows[0] if agg_rows else None)
+        envelope.update(rollups)
+        envelope["warnings"] = trust_warnings + _trust_aggregate_warnings(
+            rollups, [ontology], trust_filters, total_matching,
+        )
+        aggregate_done = True
+    else:
+        envelope.update(_trust_rollups([]))
+        envelope["warnings"] = trust_warnings + _trust_row_warnings(
+            [], [ontology], trust_filters,
+        )
     if min_evidence_score is not None:
         envelope["evidence_score_signals"] = _evidence_score_signals(
             conn, [ontology],
         )
-    envelope["warnings"] = trust_warnings + _trust_row_warnings(
-        trust_rows or [], [ontology], trust_filters,
-    )
 
     # --- Query D: detail rows (skipped when summary=True) ---
     if limit == 0:
@@ -2641,8 +3053,9 @@ def genes_by_ontology(
 
     # Rollups and warnings read the raw rows: the compact strip below hides
     # the verbose axes from the caller, but the distribution still belongs
-    # in the envelope. When Query C was skipped these rows ARE the full match.
-    if trust_rows is None:
+    # in the envelope. When the aggregate was skipped these rows ARE the
+    # full match.
+    if not aggregate_done:
         envelope.update(_trust_rollups(results))
         envelope["warnings"] = trust_warnings + _trust_row_warnings(
             results, [ontology], trust_filters,
