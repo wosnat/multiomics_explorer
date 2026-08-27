@@ -69,6 +69,42 @@ edge to have its own trust facts.
 
 ---
 
+## One edge per (gene, term)
+
+A hierarchical ontology lets one gene reach the same ancestor term through
+several annotations at once. Ask `genes_by_ontology` for TCDB at level 2 and
+a transporter annotated to three different subfamilies under the same
+superfamily reaches that superfamily three times.
+
+Every gene × term row is still exactly one row. The row's identity columns
+(`locus_tag`, `term_id`, `term_name`, `level`) describe the pair, and the
+trust columns (`evidence`, `sources`, `evidence_score`, `tier`, plus
+`call_class` and the native detail) are read off **one** of those
+annotations: the gene's best edge under that term, chosen by the ontology's
+`rank_prop` — `evidence_score` for TCDB, `confidence_score` for MEROPS, and
+the depth of the attachment itself when the ontology declares neither.
+Highest wins.
+
+Three consequences worth holding on to:
+
+- **A rollup row's trust is the gene's best case for that term, not its
+  average.** `evidence: curated` on an ancestor row means at least one of
+  the gene's annotations under that ancestor is curated; it says nothing
+  about the others.
+- **Filters win over the tiebreak.** The trust filters apply to the
+  candidate edges before the best one is picked, so a `max_tier=2` row can
+  never report `tier=3` by way of an edge the filter already removed. The
+  gene simply drops out if nothing under that term survives.
+- **Leaf mode does not need any of this.** In `gene_ontology_terms(mode=
+  'leaf')` the term IS the attachment, so the row's trust columns are that
+  edge's own facts. TCDB narrows further to the deepest surviving
+  attachment — see the leaf-mode recipe below.
+
+To see the individual annotations rather than the best one, drop to leaf
+mode (`gene_ontology_terms`), where each attachment is its own row.
+
+---
+
 ## Rank vs. filter — the one rule that matters most
 
 Every numeric trust field in this surface falls into exactly one of two
@@ -229,12 +265,13 @@ leaf_only = gene_ontology_terms(
 
 with_superseded = gene_ontology_terms(
     locus_tags=["PMM0392"], organism="MED4",
-    ontology=["tcdb"], mode="leaf", include_superseded=True,
+    ontology=["tcdb"], mode="leaf", include_superseded=True, verbose=True,
 )
 # Adds back the 73 (genome-wide) rows most_specific drops, each labelled
 # attachment_depth='superseded' — less specific, not wrong. PMM0392's
 # superseded row is the tcdb:3.A.1 ABC-superfamily ancestor of its actual
-# (deeper) subfamily attachment.
+# (deeper) subfamily attachment. `attachment_depth` is TCDB native detail,
+# so the label itself needs verbose=True; the row set widens either way.
 ```
 
 `include_superseded` is a leaf-mode-only switch; it has no effect outside

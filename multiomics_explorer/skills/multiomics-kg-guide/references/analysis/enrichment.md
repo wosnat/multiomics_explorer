@@ -68,7 +68,7 @@ Accepts any gene-set source — not just DE results: construct
 `EnrichmentInputs(gene_sets=..., background=..., organism_name=...,
 cluster_metadata=...)` directly when you have hand-curated sets
 (`cluster_metadata` can be `{cluster_key: {}}` if you have no per-cluster
-context to attach). Returns an `EnrichmentResult` object (see "EnrichmentResult accessors" below)
+context to attach). Returns an `EnrichmentResult` object (see "`EnrichmentResult` — rich return type" below)
 carrying a long DataFrame (one row per cluster × term pair) with
 compareCluster-compatible columns at `result.results`.
 
@@ -598,7 +598,7 @@ collect the per-cluster `pvalue` values and apply BH across the full table manua
 
 The column names `gene_ratio`, `bg_ratio`, `rich_factor`, `fold_enrichment`, `count`, and
 `bg_count` are deliberately clusterProfiler-compatible; `cluster` maps to clusterProfiler's
-`Cluster`; `term_id` / `term_name` map to `ID` / `Description`. See "Output schema" below for the full mapping.
+`Cluster`; `term_id` / `term_name` map to `ID` / `Description`. See "Output field reference" below for the full mapping.
 
 ---
 

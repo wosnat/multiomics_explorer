@@ -471,7 +471,18 @@ first via `list_filter_values(filter_type='trust_axes', ontology=...)`.
 **Multi-ontology filter scoping** (`gene_ontology_terms`, `ontology_landscape`):
 a trust filter carried by every requested ontology applies normally; carried
 by some but not all applies to those and drops the rest into
-`skipped_ontologies` with a warning; carried by none raises.
+`skipped_ontologies` with a warning; carried by none raises. A **facet** —
+`interpro_type` for InterPro, `tree` for BRITE — behaves differently: it
+narrows its own ontology and leaves the others untouched (nothing is
+skipped), and raises when its owner is not in the list at all.
+
+**Envelope rollups are full-match.** `by_evidence`, `by_tier`, `by_sources`,
+`by_call_class` and `evidence_score_stats` describe every matching row, not
+the page you are reading, and they are populated in compact mode — where
+`tier`, `sources` and `evidence_score` are not on the row at all, the
+envelope is the only place to read their distribution. On
+`gene_ontology_terms` they are empty under `summary=true`, which fetches no
+rows.
 
 **Vocab-vs-pivot.** Filterable trust values (`evidence`, `sources`,
 `call_class`, `interpro_type`, and the other categorical `filter_type`s on

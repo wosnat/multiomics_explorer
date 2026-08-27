@@ -103,6 +103,8 @@ def scenario_tcdb_attachment_depth() -> None:
         ontology=["tcdb"],
         mode="leaf",
         include_superseded=True,
+        # attachment_depth is TCDB native detail — verbose-only on the row.
+        verbose=True,
     )
     print("include_superseded=True (adds back less-specific ancestor rows):")
     print(f"  total_matching={with_superseded.get('total_matching')}")
@@ -162,7 +164,7 @@ def scenario_trust_filtered_tcdb() -> None:
     print()
 
     axes = list_filter_values(filter_type="trust_axes", ontology="tcdb")
-    print(f"tcdb trust axes: {[r.get('trust_axes') for r in axes.get('results', [])]}")
+    print(f"tcdb trust axes: {[r.get('value') for r in axes.get('results', [])]}")
     print()
 
     unfiltered = genes_by_ontology(ontology="tcdb", organism="MED4", level=2)
