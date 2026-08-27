@@ -56,12 +56,12 @@ VALID_OMICS_TYPES: set[str] = {
 #
 # Bucket 6 (vocabulary set): the `Schema_info.controlled_vocabularies_hash`
 # this explorer was built against (KG-SYNC-006 + dense-list fix, built
-# 2026-08-27T16:11Z). The recipe lives KG-side (docs/kg-changes/
+# 2026-08-27T17:19Z, KG contract v2). The recipe lives KG-side (docs/kg-changes/
 # vocabulary-contract.md). A mismatch means baked docs / parameter descriptions
 # may list stale values — filters still validate live. Must equal the live
 # KG's value at release cut.
 EXPECTED_CONTROLLED_VOCABULARIES_HASH: str = (
-    "sha256:61709080e7de57d755e0e417ea782b6fc9e7611608b12f2b45aff9e715a6e0ae"
+    "sha256:496c5ad45b58829df2ab580415be09e001219772bb0a36005a0f05a2da2c7429"
 )
 
 EXPECTED_KG_SHAPE: dict[str, tuple[str, ...] | str] = {
