@@ -598,7 +598,8 @@ rows:
   - Prochlorococcus MED4
   study_type: Microarray-based transcriptomics
   title: RNA half-lives in the slow-growing marine cyanobacterium Prochlorococcus
-  treatment_types: []
+  treatment_types:
+  - rna_decay
   year: 2010
 - authors:
   - Claudia Steglich

@@ -90,6 +90,8 @@ rows:
   - '{''count'': 12, ''item'': ''diel''}'
   - '{''count'': 3, ''item'': ''compartment''}'
   - '{''count'': 4, ''item'': ''growth_phase''}'
+  - '{''count'': 8, ''item'': ''rna_decay''}'
+  - '{''count'': 8, ''item'': ''tss_mapping''}'
   by_value_kind:
   - '{''count'': 25, ''item'': ''numeric''}'
   - '{''count'': 5, ''item'': ''boolean''}'

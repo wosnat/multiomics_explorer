@@ -191,7 +191,6 @@ rows:
   species: null
   strain: null
   treatment_types:
-  - coculture
   - light
   - oxygen
 - clade: null
@@ -206,7 +205,6 @@ rows:
   species: null
   strain: MruberA
   treatment_types:
-  - coculture
   - light
   - oxygen
 - clade: null
@@ -264,7 +262,9 @@ rows:
   - light
   - nitrogen
   - phosphorus
+  - rna_decay
   - salt
+  - tss_mapping
   - viral
 - clade: HLII
   experiment_count: 3
@@ -411,6 +411,7 @@ rows:
   - iron
   - nitrogen
   - phosphorus
+  - tss_mapping
   - viral
 - clade: HLI
   experiment_count: 0
@@ -675,7 +676,6 @@ rows:
   species: Thermosynechococcus vestitus
   strain: BP1
   treatment_types:
-  - coculture
   - light
   - oxygen
 - clade: null

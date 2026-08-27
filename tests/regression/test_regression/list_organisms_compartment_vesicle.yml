@@ -303,7 +303,9 @@ rows:
   - light
   - nitrogen
   - phosphorus
+  - rna_decay
   - salt
+  - tss_mapping
   - viral
 - background_factors:
   - axenic
@@ -408,4 +410,5 @@ rows:
   - iron
   - nitrogen
   - phosphorus
+  - tss_mapping
   - viral

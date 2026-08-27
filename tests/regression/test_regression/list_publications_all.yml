@@ -903,7 +903,7 @@ rows:
   - William B. Chrisler
   - Young-Mo Kim
   background_factors:
-  - light
+  - coculture
   cluster_types:
   - condition_comparison
   clustering_analysis_count: 4
@@ -929,7 +929,6 @@ rows:
   title: 'Indirect Interspecies Regulation: Transcriptional and Physiological Responses
     of a Cyanobacterium to Heterotrophic Partnership'
   treatment_types:
-  - coculture
   - light
   - oxygen
   year: 2017
@@ -1401,7 +1400,8 @@ rows:
   study_type: RNA-seq|dRNA-seq|Microarray|Transcriptomics
   title: Comparative transcriptomics of two environmentally relevant cyanobacteria
     reveals unexpected transcriptome diversity
-  treatment_types: []
+  treatment_types:
+  - tss_mapping
   year: 2014
 - authors:
   - Alexander S Beliaev
@@ -1628,7 +1628,8 @@ rows:
   - Prochlorococcus MED4
   study_type: Microarray-based transcriptomics
   title: RNA half-lives in the slow-growing marine cyanobacterium Prochlorococcus
-  treatment_types: []
+  treatment_types:
+  - rna_decay
   year: 2010
 - authors:
   - Claudia Steglich

@@ -472,7 +472,7 @@ rows:
   - carbon
   - coculture
 - background_factors:
-  - light
+  - coculture
   catalyzed_metabolite_count: 0
   clade: null
   cluster_types: []
@@ -502,11 +502,10 @@ rows:
   strain: null
   transported_metabolite_count: 0
   treatment_types:
-  - coculture
   - light
   - oxygen
 - background_factors:
-  - light
+  - coculture
   catalyzed_metabolite_count: 1215
   clade: null
   cluster_types:
@@ -537,7 +536,6 @@ rows:
   strain: MruberA
   transported_metabolite_count: 1201
   treatment_types:
-  - coculture
   - light
   - oxygen
 - background_factors:
@@ -687,7 +685,9 @@ rows:
   - light
   - nitrogen
   - phosphorus
+  - rna_decay
   - salt
+  - tss_mapping
   - viral
 - background_factors:
   - axenic
@@ -1052,6 +1052,7 @@ rows:
   - iron
   - nitrogen
   - phosphorus
+  - tss_mapping
   - viral
 - background_factors: []
   catalyzed_metabolite_count: 1018
@@ -1704,7 +1705,7 @@ rows:
   - carbon
   - coculture
 - background_factors:
-  - light
+  - coculture
   catalyzed_metabolite_count: 1003
   clade: null
   cluster_types:
@@ -1735,7 +1736,6 @@ rows:
   strain: BP1
   transported_metabolite_count: 1156
   treatment_types:
-  - coculture
   - light
   - oxygen
 - background_factors:

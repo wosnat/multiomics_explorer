@@ -792,7 +792,8 @@ rows:
   publication_doi: 10.1186/gb-2010-11-5-r54
   rankable: false
   total_gene_count: 1930
-  treatment_type: []
+  treatment_type:
+  - rna_decay
   unit: ''
   value_kind: boolean
 - allowed_categories: null
@@ -814,7 +815,8 @@ rows:
   publication_doi: 10.1038/ismej.2014.57
   rankable: false
   total_gene_count: 1629
-  treatment_type: []
+  treatment_type:
+  - tss_mapping
   unit: ''
   value_kind: boolean
 - allowed_categories: null
@@ -1079,7 +1081,8 @@ rows:
   publication_doi: 10.1186/gb-2010-11-5-r54
   rankable: true
   total_gene_count: 1930
-  treatment_type: []
+  treatment_type:
+  - rna_decay
   unit: log2
   value_kind: numeric
 - allowed_categories: null
@@ -1106,7 +1109,8 @@ rows:
   publication_doi: 10.1186/gb-2010-11-5-r54
   rankable: true
   total_gene_count: 1930
-  treatment_type: []
+  treatment_type:
+  - rna_decay
   unit: min
   value_kind: numeric
 - allowed_categories: null
@@ -1133,7 +1137,8 @@ rows:
   publication_doi: 10.1186/gb-2010-11-5-r54
   rankable: true
   total_gene_count: 1930
-  treatment_type: []
+  treatment_type:
+  - rna_decay
   unit: min
   value_kind: numeric
 - allowed_categories: null
@@ -1156,7 +1161,8 @@ rows:
   publication_doi: 10.1038/ismej.2014.57
   rankable: true
   total_gene_count: 1629
-  treatment_type: []
+  treatment_type:
+  - tss_mapping
   unit: count
   value_kind: numeric
 - allowed_categories: null
@@ -1177,7 +1183,8 @@ rows:
   publication_doi: 10.1038/ismej.2014.57
   rankable: true
   total_gene_count: 1629
-  treatment_type: []
+  treatment_type:
+  - tss_mapping
   unit: count
   value_kind: numeric
 - allowed_categories: null
@@ -1199,7 +1206,8 @@ rows:
   publication_doi: 10.1038/ismej.2014.57
   rankable: true
   total_gene_count: 824
-  treatment_type: []
+  treatment_type:
+  - tss_mapping
   unit: ''
   value_kind: numeric
 - allowed_categories: null
@@ -1222,7 +1230,8 @@ rows:
   publication_doi: 10.1038/ismej.2014.57
   rankable: true
   total_gene_count: 821
-  treatment_type: []
+  treatment_type:
+  - tss_mapping
   unit: nt
   value_kind: numeric
 - allowed_categories: null
@@ -1486,7 +1495,8 @@ rows:
   publication_doi: 10.1038/ismej.2014.57
   rankable: false
   total_gene_count: 2139
-  treatment_type: []
+  treatment_type:
+  - tss_mapping
   unit: ''
   value_kind: boolean
 - allowed_categories: null
@@ -1625,7 +1635,8 @@ rows:
   publication_doi: 10.1038/ismej.2014.57
   rankable: true
   total_gene_count: 2139
-  treatment_type: []
+  treatment_type:
+  - tss_mapping
   unit: count
   value_kind: numeric
 - allowed_categories: null
@@ -1646,7 +1657,8 @@ rows:
   publication_doi: 10.1038/ismej.2014.57
   rankable: true
   total_gene_count: 2139
-  treatment_type: []
+  treatment_type:
+  - tss_mapping
   unit: count
   value_kind: numeric
 - allowed_categories: null
@@ -1668,7 +1680,8 @@ rows:
   publication_doi: 10.1038/ismej.2014.57
   rankable: true
   total_gene_count: 1029
-  treatment_type: []
+  treatment_type:
+  - tss_mapping
   unit: ''
   value_kind: numeric
 - allowed_categories: null
@@ -1691,7 +1704,8 @@ rows:
   publication_doi: 10.1038/ismej.2014.57
   rankable: true
   total_gene_count: 976
-  treatment_type: []
+  treatment_type:
+  - tss_mapping
   unit: nt
   value_kind: numeric
 - allowed_categories: null

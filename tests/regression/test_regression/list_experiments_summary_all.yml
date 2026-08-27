@@ -2,12 +2,12 @@ case_id: list_experiments_summary_all
 row_count: 1
 rows:
 - by_background_factors:
-  - '{''count'': 128, ''item'': ''light''}'
+  - '{''count'': 127, ''item'': ''light''}'
   - '{''count'': 19, ''item'': ''diel''}'
   - '{''count'': 2, ''item'': ''chemical''}'
   - '{''count'': 2, ''item'': ''viral''}'
   - '{''count'': 37, ''item'': ''darkness''}'
-  - '{''count'': 57, ''item'': ''coculture''}'
+  - '{''count'': 58, ''item'': ''coculture''}'
   - '{''count'': 90, ''item'': ''axenic''}'
   by_cluster_type:
   - '{''count'': 1, ''item'': ''decay_pattern''}'
@@ -184,17 +184,19 @@ rows:
   - '{''count'': 7, ''item'': ''top_n''}'
   by_treatment_type:
   - '{''count'': 1, ''item'': ''oxygen''}'
+  - '{''count'': 1, ''item'': ''rna_decay''}'
   - '{''count'': 1, ''item'': ''temperature''}'
   - '{''count'': 13, ''item'': ''light''}'
   - '{''count'': 16, ''item'': ''nitrogen''}'
   - '{''count'': 17, ''item'': ''compartment''}'
   - '{''count'': 2, ''item'': ''chemical''}'
   - '{''count'': 2, ''item'': ''diel''}'
+  - '{''count'': 2, ''item'': ''tss_mapping''}'
   - '{''count'': 3, ''item'': ''salt''}'
   - '{''count'': 4, ''item'': ''plastic''}'
   - '{''count'': 5, ''item'': ''iron''}'
   - '{''count'': 6, ''item'': ''darkness''}'
-  - '{''count'': 77, ''item'': ''coculture''}'
+  - '{''count'': 76, ''item'': ''coculture''}'
   - '{''count'': 78, ''item'': ''carbon''}'
   - '{''count'': 8, ''item'': ''growth_phase''}'
   - '{''count'': 8, ''item'': ''viral''}'

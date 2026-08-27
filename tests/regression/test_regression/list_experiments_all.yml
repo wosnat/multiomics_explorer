@@ -4912,7 +4912,8 @@ rows:
   time_point_significant_down: []
   time_point_significant_up: []
   time_point_totals: []
-  treatment_type: []
+  treatment_type:
+  - tss_mapping
 - authors:
   - Anne W. Thompson
   - Florence Schubotz
@@ -5244,7 +5245,8 @@ rows:
   time_point_significant_down: []
   time_point_significant_up: []
   time_point_totals: []
-  treatment_type: []
+  treatment_type:
+  - rna_decay
 - authors:
   - Claudia Steglich
   - Debbie Lindell
@@ -7648,7 +7650,8 @@ rows:
   time_point_significant_down: []
   time_point_significant_up: []
   time_point_totals: []
-  treatment_type: []
+  treatment_type:
+  - tss_mapping
 - authors:
   - Anne W. Thompson
   - Florence Schubotz
@@ -11457,7 +11460,7 @@ rows:
   - William B. Chrisler
   - Young-Mo Kim
   background_factors:
-  - light
+  - coculture
   cluster_types:
   - condition_comparison
   clustering_analysis_count: 4
@@ -11491,6 +11494,5 @@ rows:
   time_point_significant_up: []
   time_point_totals: []
   treatment_type:
-  - coculture
   - light
   - oxygen

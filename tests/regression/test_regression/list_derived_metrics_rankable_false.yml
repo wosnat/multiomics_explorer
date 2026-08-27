@@ -378,7 +378,8 @@ rows:
   publication_doi: 10.1186/gb-2010-11-5-r54
   rankable: false
   total_gene_count: 1930
-  treatment_type: []
+  treatment_type:
+  - rna_decay
   unit: ''
   value_kind: boolean
 - allowed_categories: null
@@ -400,7 +401,8 @@ rows:
   publication_doi: 10.1038/ismej.2014.57
   rankable: false
   total_gene_count: 1629
-  treatment_type: []
+  treatment_type:
+  - tss_mapping
   unit: ''
   value_kind: boolean
 - allowed_categories: null
@@ -730,7 +732,8 @@ rows:
   publication_doi: 10.1038/ismej.2014.57
   rankable: false
   total_gene_count: 2139
-  treatment_type: []
+  treatment_type:
+  - tss_mapping
   unit: ''
   value_kind: boolean
 - allowed_categories: null

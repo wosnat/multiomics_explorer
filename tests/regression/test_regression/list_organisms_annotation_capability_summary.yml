@@ -253,7 +253,9 @@ results:
   - light
   - nitrogen
   - phosphorus
+  - rna_decay
   - salt
+  - tss_mapping
   - viral
 returned: 3
 row_count: 3

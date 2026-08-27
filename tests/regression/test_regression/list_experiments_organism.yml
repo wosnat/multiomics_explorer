@@ -1365,7 +1365,8 @@ rows:
   time_point_significant_down: []
   time_point_significant_up: []
   time_point_totals: []
-  treatment_type: []
+  treatment_type:
+  - tss_mapping
 - authors:
   - Anne W. Thompson
   - Florence Schubotz
@@ -1697,7 +1698,8 @@ rows:
   time_point_significant_down: []
   time_point_significant_up: []
   time_point_totals: []
-  treatment_type: []
+  treatment_type:
+  - rna_decay
 - authors:
   - Claudia Steglich
   - Debbie Lindell

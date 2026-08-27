@@ -378,7 +378,8 @@ rows:
   study_type: RNA-seq|dRNA-seq|Microarray|Transcriptomics
   title: Comparative transcriptomics of two environmentally relevant cyanobacteria
     reveals unexpected transcriptome diversity
-  treatment_types: []
+  treatment_types:
+  - tss_mapping
   year: 2014
 - authors:
   - Bang Wang
@@ -523,7 +524,8 @@ rows:
   - Prochlorococcus MED4
   study_type: Microarray-based transcriptomics
   title: RNA half-lives in the slow-growing marine cyanobacterium Prochlorococcus
-  treatment_types: []
+  treatment_types:
+  - rna_decay
   year: 2010
 - authors:
   - Claudia Steglich
