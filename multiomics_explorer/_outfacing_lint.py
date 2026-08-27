@@ -48,7 +48,47 @@ LINT_PATTERN = re.compile(
 # notes on affected tools.
 CARVEOUT_PATTERN = re.compile(r"\[AQ\]|\[ENR\]")
 
+# Dangling internal cross-reference: `see "Some Section" above|below` whose
+# quoted text names no heading in the same file. Deliberately narrow —
+# a `see docs://...` cross-link carries no quotes, and a quoted *value*
+# ("most_specific") is lowercase and is not followed by above/below. The
+# `\s+` spans newlines because the phrase often wraps.
+# Source violation: analysis/annotation_evidence.md's pointer at the
+# per-ontology trust table, which named a section that did not exist.
+DANGLING_REF_PATTERN = re.compile(
+    r"[Ss]ee\s+[\"“]`?([A-Z][^\"”\n]{2,80})[\"”]\s+(?:above|below)\b"
+)
+
+_HEADING_RE = re.compile(r"^#{1,6}\s+(.+?)\s*$", re.MULTILINE)
+
 Violation = tuple[Path, int, str, str]
+
+
+def _normalize_ref(text: str) -> str:
+    """Heading / reference text reduced to a comparable form."""
+    return re.sub(r"[`*_]", "", text).strip().strip(".").lower()
+
+
+def _dangling_refs(path: Path, text: str) -> list[Violation]:
+    """`see "X" above|below` matches with no `X` heading in the same file.
+
+    A reference resolves when its text appears anywhere inside a heading,
+    so section numbering (`## 12. Gotchas`) and trailing qualifiers
+    (`## Partial-failure buckets: ...`) do not have to be quoted back.
+    """
+    headings = [_normalize_ref(m.group(1)) for m in _HEADING_RE.finditer(text)]
+    lines = text.splitlines()
+    out: list[Violation] = []
+    for m in DANGLING_REF_PATTERN.finditer(text):
+        ref = _normalize_ref(m.group(1))
+        if any(ref in heading for heading in headings):
+            continue
+        line_no = text.count("\n", 0, m.start()) + 1
+        line = lines[line_no - 1] if line_no <= len(lines) else ""
+        if CARVEOUT_PATTERN.search(line):
+            continue
+        out.append((path, line_no, line, m.group(0)))
+    return out
 
 
 def lint_lines(paths: list[Path]) -> list[Violation]:
@@ -56,6 +96,10 @@ def lint_lines(paths: list[Path]) -> list[Violation]:
 
     Returns ``(path, line_no, line, matched_token)`` per violation.
     Lines containing ``[AQ]`` / ``[ENR]`` drift markers are exempt.
+
+    One rule needs the whole file rather than one line: a
+    ``see "Section" above|below`` pointer is only a violation when no
+    heading in that same file answers to it.
     """
     violations: list[Violation] = []
     for path in paths:
@@ -70,6 +114,7 @@ def lint_lines(paths: list[Path]) -> list[Violation]:
             m = LINT_PATTERN.search(line)
             if m:
                 violations.append((path, i, line, m.group(0)))
+        violations.extend(_dangling_refs(path, text))
     return violations
 
 

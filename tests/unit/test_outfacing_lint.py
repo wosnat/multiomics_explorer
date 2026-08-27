@@ -311,3 +311,78 @@ def test_python_docstrings_skips_files_without_docstrings(lint_mod, tmp_path):
     f = _write_py(tmp_path, 'def foo():\n    return 1\n')
     vs = lint_mod.lint_python_docstrings([f])
     assert vs == []
+
+
+# ---------------------------------------------------------------------------
+# Dangling internal cross-reference: `see "Section" above|below`
+# ---------------------------------------------------------------------------
+
+
+def test_dangling_ref_flags_a_missing_section(lint_mod, tmp_path):
+    """The source violation: a pointer at a section that was never written."""
+    md = tmp_path / "t.md"
+    md.write_text(
+        "# Annotation trust\n"
+        "\n"
+        "picking the one edge whose trust columns populate an ancestor row (see\n"
+        '"One edge per (gene, term)" below). Ontologies without a rank_prop are\n'
+        "either flat or carry no score at all.\n"
+    )
+    vs = lint_mod.lint_about_content([md])
+    assert len(vs) == 1
+    # The phrase wraps, so the match is anchored at the line carrying `see`.
+    assert vs[0][1] == 3
+    assert "One edge per (gene, term)" in vs[0][3]
+
+
+def test_dangling_ref_resolves_against_a_heading_in_the_same_file(
+    lint_mod, tmp_path,
+):
+    md = tmp_path / "t.md"
+    md.write_text(
+        "# Annotation trust\n"
+        "\n"
+        'The ancestor row takes the best edge (see "One edge per (gene, term)"\n'
+        "below).\n"
+        "\n"
+        "## One edge per (gene, term)\n"
+        "\n"
+        "Highest rank_prop wins.\n"
+    )
+    assert lint_mod.lint_about_content([md]) == []
+
+
+def test_dangling_ref_tolerates_numbering_and_qualifiers(lint_mod, tmp_path):
+    """`## 12. Gotchas` answers a pointer that just says "Gotchas"."""
+    md = tmp_path / "t.md"
+    md.write_text(
+        "# Enrichment\n"
+        "\n"
+        'Term size is the background-scoped size. See "Gotchas" below.\n'
+        "\n"
+        "## 12. Gotchas\n"
+    )
+    assert lint_mod.lint_about_content([md]) == []
+
+
+def test_dangling_ref_ignores_docs_cross_links(lint_mod, tmp_path):
+    """A `docs://` cross-link is the sanctioned form and carries no quotes."""
+    md = tmp_path / "t.md"
+    md.write_text(
+        "# Annotation trust\n"
+        "\n"
+        "See docs://analysis/annotation_evidence below for the full ladder.\n"
+    )
+    assert lint_mod.lint_about_content([md]) == []
+
+
+def test_dangling_ref_ignores_quoted_values(lint_mod, tmp_path):
+    """A quoted *value* is not a section pointer, even next to above/below."""
+    md = tmp_path / "t.md"
+    md.write_text(
+        "# Annotation trust\n"
+        "\n"
+        'Rows default to "most_specific" above; see "most_specific" below.\n'
+        'Tier sits at or above 2; the table above lists "curated" first.\n'
+    )
+    assert lint_mod.lint_about_content([md]) == []
