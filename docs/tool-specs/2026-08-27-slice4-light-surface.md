@@ -1,6 +1,6 @@
 # Tool spec: slice 4 — light surface + paper-batch absorption (Mode B)
 
-**Status:** DRAFT v1 (2026-08-27) — Cypher in §7 marked *unverified* until KG-SYNC-006 is reachable on `:7687`; freeze after live verification.
+**Status:** v1 — §7 live-verified 2026-08-27 against KG-SYNC-006 (`built_at 2026-08-27T15:41Z`, 127,458 genes, 48 organisms, 209 experiments, 49 papers; hash matches the pin). Awaiting freeze.
 **KG:** KG-SYNC-006 (`6c51bf3b`, `built_at 2026-08-27T14:22Z`) — asks + review in `docs/kg-specs/2026-08-27-slice4-kg-asks.md` (§6).
 **Tools touched:** `kg_release_info`, `genes_by_metabolite`, `metabolites_by_gene`, `list_organisms`, `list_filter_values`, `list_clustering_analyses` / `gene_clusters_by_gene` (description only). Mode B: one-page spec, no KG iteration.
 
@@ -68,7 +68,7 @@ Unchanged on every tool. `list_organisms` stays "always small" (48 rows, `verbos
 - `ListOrganismsResult` += the four counts; `ListOrganismsResponse` += `by_annotation_capability[]` (`{preferred_name, organism_name, peptidase_gene_count, nonpeptidase_homolog_gene_count, interpro_gene_count, ncbifam_gene_count}`).
 - `list_filter_values(filter_type='cluster_type')` rows: `{value, applies_to: ['ClusteringAnalysis'], description, source: 'vocabulary' | 'pivot'}`.
 
-## 7. Cypher (⚠ unverified — run against KG-SYNC-006 before freeze)
+## 7. Cypher (verified live 2026-08-27 — every expected value below reproduced exactly)
 
 ```cypher
 -- 7.1 list_organisms rollups (append to the existing RETURN)
@@ -76,7 +76,7 @@ Unchanged on every tool. `list_organisms` stays "always small" (48 rows, `verbos
        coalesce(o.nonpeptidase_homolog_gene_count, 0) AS nonpeptidase_homolog_gene_count,
        coalesce(o.interpro_gene_count, 0) AS interpro_gene_count,
        coalesce(o.ncbifam_gene_count, 0) AS ncbifam_gene_count
--- expected (KG review): Σ peptidase 3,439 (max 148, Alteromonas MarRef), Σ nonpeptidase 787, Σ interpro 104,764, Σ ncbifam 48,182; dense on 48/48
+-- verified: Σ peptidase 3,439 (max 148, Alteromonas MarRef), Σ nonpeptidase 787, Σ interpro 104,764, Σ ncbifam 48,182; dense on 48/48
 
 -- 7.2 invariant (0 rows expected)
 MATCH (o:OrganismTaxon)
@@ -92,7 +92,7 @@ RETURN o.preferred_name, live, o.peptidase_gene_count
 -- 7.4 vocab read for cluster_type
 MATCH (v:ControlledVocabulary {applies_to: 'ClusteringAnalysis', property: 'cluster_type'})
 RETURN v.values AS values, v.description AS description, v.closed AS closed
--- expected: 6 values incl. decay_pattern, genomic_island, expression_bin
+-- verified: ['time_course','diel','condition_comparison','expression_bin','decay_pattern','genomic_island'], closed
 
 -- 7.5 release identity
 MATCH (s:Schema_info {id: 'schema_info'})
@@ -101,7 +101,7 @@ RETURN s.version, s.built_at, s.controlled_vocabularies_hash, s.paper_count, s.e
 
 -- 7.6 table_scope sparsity + treatment-less experiments
 MATCH (e:Experiment) RETURN count(e) AS n, count(e.table_scope) AS with_scope, sum(CASE WHEN e.table_scope = '' THEN 1 ELSE 0 END) AS empty_string, sum(CASE WHEN e.treatment_type IS NULL THEN 1 ELSE 0 END) AS no_treatment
--- expected: 209 / 192 / 0 / 3
+-- verified: 209 / 192 / 0 / 3
 ```
 
 ## 8. Tests, docs, build order
@@ -118,3 +118,10 @@ MATCH (e:Experiment) RETURN count(e) AS n, count(e.table_scope) AS with_scope, s
 3. `list_organisms()` → 48 rows, `by_annotation_capability[0]` = Alteromonas MarRef with `peptidase_gene_count=148`; `min_peptidase_gene_count=100` narrows the set.
 4. `list_filter_values(filter_type='cluster_type')` → 6 values, `source='vocabulary'`.
 5. Regression regen diff matches §3.4 only.
+
+## 10. Live-verification notes (2026-08-27)
+
+- `Schema_info.version` reads `0.0.0-dev` / `git_sha_short = unknown` on this dev build — expected; the alpha.7 cut stamps them. `mcp_min_version = 0.1.0a1`.
+- Top of `by_annotation_capability` will be `Alteromonas (MarRef v6)` (148 / 31 / 3746 / 1379), then AD45 129, Shewanella W3-18-1 128, BGP6 127, ATCC27126 125.
+- Two `OrganismTaxon` nodes share `preferred_name = 'Meiothermus ruber'`: the genome strain (`insdc.gcf:GCF_000836395.1`, 2,884 genes, peptidase 99) and the treatment taxon (`ncbitaxon:1299`, 0 genes). `build_resolve_organism_for_organism` already gates on `gene_count > 0`, so `organism='ruber'` resolves to the strain; any new organism-count Cypher must join through `Gene_belongs_to_organism` (§3.3).
+- `list_organisms` will return both nodes unless it already filters treatment taxa — verify in RED (the existing golden shows the current behaviour).
