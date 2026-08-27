@@ -19,6 +19,8 @@ import pandas as pd
 import scipy.stats as _stats
 import statsmodels.stats.multitest as _multitest
 
+from multiomics_explorer.kg.queries_lib import ontology_edge_row_columns
+
 
 class EnrichmentInputs(BaseModel):
     """Inputs bundle for fisher_ora. Produced by de_enrichment_inputs.
@@ -365,9 +367,15 @@ def _fisher_ora_impl(gene_sets, background, term2gene, min_gene_set_size, max_ge
     term_name_map: dict[str, str] = dict(
         term2gene.drop_duplicates("term_id").set_index("term_id")["term_name"]
     )
+    # Passthrough carries TERM-level context onto the result row, taken from
+    # the term's first gene. Edge columns (the trust axes, `call_class`, the
+    # per-ontology native detail) are facts about that one gene's annotation,
+    # not about the term — passing them through would label the whole term
+    # `evidence: curated` because its first member happened to be.
     passthrough_cols = [
         c for c in term2gene.columns
         if c not in {"term_id", "term_name", "locus_tag"}
+        and c not in ontology_edge_row_columns()
     ]
     passthrough_by_term: dict[str, dict] = {}
     if passthrough_cols:
