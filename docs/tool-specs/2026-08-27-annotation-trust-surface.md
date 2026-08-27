@@ -194,3 +194,10 @@ Verified: TCDB 5 signals, MEROPS `[tier_le_2, pfam_support]` (2), GO/EC/Pfam/CAZ
 
 **PR 3b — term side (next build, same spec).**
 - `ontology_term_details` (§7.5, design §6), `search_ontology` browse mode + `ontology: list | None` + lockstep paging + `min_gene_count` / `organism` + `description` verbose (§7.4), per-ontology reference (`inputs/ontologies/*.yaml` + generator stage → `docs://ontologies/{key}` + index; links from concepts/enrichment/metabolites/start_here), `examples/ontology_terms.py`, remaining edge-case scenarios and goldens.
+
+## 12. Freeze notes v1.1 (2026-08-27, post-build review — no contract change)
+
+- §7.3 wording "replaced": implementation emits BOTH the generic `*1..` leaf predicate and `attachment_depth = 'most_specific'` when `include_superseded=False` (live-verified identical sets, MED4 670 → 597) and NEITHER when `True`. Behaviour identical to the spec text; RED tests pin this form.
+- §7.7: "FAMILY-L0 7 testable terms" is the `informative_only=False` figure; the tool default (`informative_only=True`) gives 5. HOMOLOGOUS_SUPERFAMILY 74 / DOMAIN 47 unchanged.
+- §9 regression diff rule is amended to what §11 already implies: existing golden rows may (i) lose the four PSORTb/SignalP compact columns, (ii) gain `evidence` (compact trust column) and the `search_ontology` term counts `gene_count` / `organism_count`, (iii) gain envelope trust keys, (iv) be re-keyed by YAML ordering as a consequence; landscape gains rows for the three appended ontologies with rank shifts. Enrichment term rows do NOT carry per-row trust columns.
+- §11: `ontology_type` on `search_ontology` compact rows moves to PR 3b (it is the multi-ontology column).
