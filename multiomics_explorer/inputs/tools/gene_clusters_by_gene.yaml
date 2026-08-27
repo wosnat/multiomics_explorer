@@ -47,4 +47,4 @@ mistakes:
   - wrong: "gene_clusters_by_gene(locus_tags='PMM0370')"
     right: "gene_clusters_by_gene(locus_tags=['PMM0370']) — always a list"
   - "Valid `cluster_type` values come from the KG vocabulary — enumerate them with list_filter_values(filter_type='cluster_type') (currently six: time_course, diel, condition_comparison, expression_bin, decay_pattern, genomic_island). The list quoted in the parameter description is documentation, not the source."
-  - "A row with `treatment_type: []` belongs to a characterization analysis (e.g. the mRNA-decay clusters), not a perturbation — it is a real, well-formed value, not a missing one. `treatment_type=[...]` filters do not match it."
+  - "`treatment_type` is never empty: a characterization analysis with no perturbation names what was measured (`rna_decay` for the mRNA-decay clusters, `genomic_analysis` for sequence-predicted genomic-island sets). Filter on those values to isolate characterization analyses; `background_factors` may be `[]` on a sequence-only analysis."

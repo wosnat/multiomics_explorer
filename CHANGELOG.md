@@ -146,11 +146,14 @@ coordinated to `0.1.0a5` ahead of the KG release.
   experiments with no differential-expression table. `list_experiments`
   loses the `""` bucket in `by_table_scope`; `table_scope=[...]` filters
   simply never match those experiments.
-- `treatment_type` is dense on `Experiment`, `ClusteringAnalysis`,
-  `DerivedMetric` and `MetaboliteAssay`; `treatment_type: []` is a real
-  value meaning a characterization experiment (no perturbation), not a
-  missing annotation. `treatment_type` gains the value `chemical`;
-  `growth_phases` stays an open vocabulary.
+- `treatment_type` is dense and non-empty on `Experiment`,
+  `ClusteringAnalysis`, `DerivedMetric` and `MetaboliteAssay`; a
+  characterization study with no perturbation carries a measurement-type
+  value such as `rna_decay` / `tss_mapping` / `genomic_analysis`.
+  `background_factors` is dense, `[]` only on sequence-only clustering
+  analyses. `treatment_type` gains the values `chemical`, `oxygen`,
+  `rna_decay`, `tss_mapping`, `genomic_analysis`; `growth_phases` stays an
+  open vocabulary.
 - KG paper batch absorbed: 48 organisms (adds *Synechococcus* WH8109),
   49 publications, 209 experiments; new `DerivedMetric` metric types
   (mRNA half-life / decay time, TSS and promoter features) are discoverable

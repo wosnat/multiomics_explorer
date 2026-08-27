@@ -150,7 +150,7 @@ response['total_matching']  # use total, not len — results may be truncated
 
 - Valid `cluster_type` values come from the KG vocabulary — enumerate them with list_filter_values(filter_type='cluster_type') (currently six: time_course, diel, condition_comparison, expression_bin, decay_pattern, genomic_island). The list quoted in the parameter description is documentation, not the source.
 
-- An analysis with `treatment_type: []` is a characterization study (e.g. decay_pattern clusters from an mRNA half-life survey) with no perturbation — a real value, not a missing annotation. `treatment_type=[...]` filters do not match it.
+- `treatment_type` is dense and never empty. A characterization study with no perturbation names what was measured — `rna_decay` (decay_pattern clusters from an mRNA half-life survey), `genomic_analysis` (sequence-predicted genomic-island sets) — so `treatment_type=[...]` filters reach it. `background_factors` is `[]` only on sequence-only analyses (no experimental context).
 
 - DataFrame conversion: `to_dataframe(result)` auto-dispatches and returns one row per analysis × cluster (compact: cluster_id / cluster_name / cluster_member_count; verbose=True adds cluster descriptions). See `docs://guide/python_api`.
 

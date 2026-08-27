@@ -248,16 +248,16 @@ and `table_scope=[...]` filters never match those experiments.
 
 Two related experiment-metadata conventions:
 
-- **`treatment_type: []` means characterization, not perturbation.** The
-  list is dense (present on every `Experiment`, `ClusteringAnalysis`,
-  `DerivedMetric` and `MetaboliteAssay`); an empty list is a real value
-  saying "no treatment was applied — this study characterizes the
-  organism as-is". `treatment_type=[...]` filters do not match it.
-  `background_factors` is likewise dense (always present). On `Experiment`
-  it is never empty — every experiment has a held-constant context. On
-  `ClusteringAnalysis` / `DerivedMetric` / `MetaboliteAssay`, `[]` means no
-  background factor was recorded (e.g. sequence-predicted genomic-island
-  gene sets).
+- **`treatment_type` is dense and never empty.** It is present on every
+  `Experiment`, `ClusteringAnalysis`, `DerivedMetric` and `MetaboliteAssay`,
+  and a non-empty list is the marker of a real experiment. A study with no
+  perturbation names *what was measured* instead: `rna_decay` (mRNA
+  half-life survey), `tss_mapping` (TSS / promoter survey),
+  `genomic_analysis` (sequence-predicted genomic islands). Filter on those
+  values to isolate characterization studies — never test for `[]`.
+  `background_factors` is likewise dense. On `Experiment` it is never empty
+  (every experiment has a held-constant context); it is `[]` only on
+  sequence-only clustering analyses, which have no experimental context.
 - **`growth_phases` is an open vocabulary.** New papers add new labels;
   enumerate live from the data rather than assuming a fixed set.
   `treatment_type`, `cluster_type` and the trust vocabularies are closed
