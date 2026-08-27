@@ -1,0 +1,120 @@
+# Human-authored content for ontology_term_details about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: A mixed batch across ontologies, including an unknown ID
+    call: ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR000362", "ncbifam:NF000812", "go:0006979", "bogus:xyz"])
+    response: |
+      # Rows come back in input order; `bogus:xyz` lands in not_found.
+      # children[] is capped (children_total / children_truncated say how much
+      # was cut); links_out[] lists the forward bridges of each term.
+      {
+        "total_matching": 5, "returned": 5, "offset": 0, "truncated": false,
+        "not_found": ["bogus:xyz"],
+        "by_ontology": [{"ontology": "tcdb", "count": 1}, {"ontology": "merops", "count": 1}, {"ontology": "interpro", "count": 1}, {"ontology": "ncbifam", "count": 1}, {"ontology": "go_bp", "count": 1}],
+        "links_out_total": 135,
+        "by_link_kind": [{"link_kind": "composition", "count": 130}, {"link_kind": "router", "count": 5}],
+        "warnings": [],
+        "results": [
+          {"term_id": "tcdb:3.A.1", "ontology": "tcdb", "label": "TcdbFamily", "name": "ATP-binding Cassette (ABC) Superfamily",
+           "level": 2, "level_kind": "tc_family", "is_informative": true, "gene_count": 4817, "organism_count": 42,
+           "direct_gene_count": 242, "tcdb_id": "3.A.1", "tc_class_id": "3", "member_count": 1400, "superfamily": "ABC", "metabolite_count": 554,
+           "parents": [{"id": "tcdb:3.A", "name": "P-P-bond-hydrolysis-driven transporters"}],
+           "children": [{"id": "tcdb:3.A.1.1", "name": "Carbohydrate Uptake Transporter-1 (CUT1) Family"}, "..."],
+           "children_total": 55, "children_truncated": true,
+           "links_out": [{"rel": "Tcdb_family_has_pfam_domain", "link_kind": "composition", "target_id": "pfam:PF00005", "target_ontology": "pfam", "target_name": "ABC transporter"}, "..."]},
+          {"term_id": "merops.family:S14", "ontology": "merops", "label": "MeropsFamily", "name": "Clp protease",
+           "level": 1, "level_kind": "merops_family", "is_informative": true, "gene_count": 125, "organism_count": 41,
+           "merops_id": "S14", "family_class": "peptidase", "catalytic_type": "serine", "peptidase_gene_count": 121,
+           "parents": [{"id": "merops.clan:SK", "name": "SK"}], "children": [], "children_total": 0, "children_truncated": false,
+           "links_out": [{"rel": "Merops_family_has_pfam_domain", "link_kind": "composition", "target_id": "pfam:PF00574", "target_ontology": "pfam", "target_name": "Clp protease"}]},
+          {"term_id": "interpro:IPR000362", "ontology": "interpro", "interpro_type": "FAMILY", "children_total": 4,
+           "links_out": [{"rel": "Interpro_entry_related_to_ec_number", "link_kind": "router", "target_id": "ec:4.3.1.1", "target_ontology": "ec", "target_name": "Aspartate ammonia-lyase"}, "..."]},
+          {"term_id": "ncbifam:NF000812", "ontology": "ncbifam", "level": 0, "family_type": "equivalog", "parents": [], "children": [], "children_total": 0, "links_out": []},
+          {"term_id": "go:0006979", "ontology": "go_bp", "name": "response to oxidative stress", "level": 3, "gene_count": 1050, "organism_count": 42, "direct_gene_count": 860,
+           "parents": [{"id": "go:0006950", "name": "response to stress"}], "children_total": 3, "links_out": []}
+        ]
+      }
+
+  - title: Only the composition bridges of a transporter family
+    call: ontology_term_details(term_ids=["tcdb:3.A.1"], link_kinds=["composition"])
+    response: |
+      # link_kinds narrows links_out (and links_out_total / by_link_kind) to the
+      # requested kinds; hierarchy and counts are unchanged.
+      {"total_matching": 1, "links_out_total": 129, "by_link_kind": [{"link_kind": "composition", "count": 129}],
+       "results": [{"term_id": "tcdb:3.A.1", "links_out": [{"rel": "Tcdb_family_has_pfam_domain", "link_kind": "composition", "target_id": "pfam:PF00005", "target_ontology": "pfam", "target_name": "ABC transporter"}, "..."]}]}
+
+  - title: Verbose — every node property, link props, per-organism counts
+    call: ontology_term_details(term_ids=["interpro:IPR000362"], verbose=True)
+    response: |
+      # verbose adds `properties` (the whole node), `links_out[].props`
+      # (curated_tcids on TCDB links, member_id_count on MEROPS → Pfam,
+      # router_ambiguous on InterPro router links) and genes_by_organism[].
+      {"results": [
+        {"term_id": "interpro:IPR000362", "ontology": "interpro", "interpro_type": "FAMILY",
+         "properties": {"id": "interpro:IPR000362", "interpro_id": "IPR000362", "interpro_type": "FAMILY", "member_count": 4, "gene_count": 51, "...": "..."},
+         "links_out": [{"rel": "Interpro_entry_related_to_ec_number", "link_kind": "router", "target_id": "ec:4.3.1.1", "target_ontology": "ec", "target_name": "Aspartate ammonia-lyase", "props": {"router_ambiguous": true}}, "..."],
+         "genes_by_organism": [{"organism": "MED4", "gene_count": 1}, {"organism": "MIT1002", "gene_count": 2}, "..."]}
+      ]}
+
+  - title: Scope the per-organism count to one organism
+    call: ontology_term_details(term_ids=["go:0006979", "tcdb:3.A.1"], organism="MED4", verbose=True)
+    response: |
+      # With organism= set, compact rows gain organism_gene_count and the
+      # verbose genes_by_organism[] holds only that organism.
+      {"results": [
+        {"term_id": "go:0006979", "gene_count": 1050, "organism_gene_count": 22, "genes_by_organism": [{"organism": "MED4", "gene_count": 22}]},
+        {"term_id": "tcdb:3.A.1", "gene_count": 4817, "organism_gene_count": 66, "genes_by_organism": [{"organism": "MED4", "gene_count": 66}]}
+      ]}
+
+  - title: From an enrichment table to term context to genes
+    steps: |
+      Step 1: pathway_enrichment(organism="MED4", experiment_ids=["EXP042"], ontology="tcdb", level=2)
+              → term_ids of the enriched families (e.g. "tcdb:3.A.1")
+
+      Step 2: ontology_term_details(term_ids=["tcdb:3.A.1", "tcdb:2.A.1"])
+              → parents / children / links_out (Pfam domains, GO terms) and
+                gene_count vs member_count to judge how broad each family is
+
+      Step 3: genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1.1"])
+              → the member genes of a child family picked from children[]
+
+  - title: Two-hop bridge walk (tcdb → pfam → interpro)
+    steps: |
+      Step 1: ontology_term_details(term_ids=["tcdb:3.A.1"], link_kinds=["composition"])
+              → collect links_out[].target_id where target_ontology == "pfam"
+
+      Step 2: ontology_term_details(term_ids=["pfam:PF00005", "pfam:PF00664"], link_kinds=["membership"])
+              → links_out[].target_id where target_ontology == "interpro"
+
+      Bridges are forward-only: each hop reads links_out on the *source* term.
+      Runnable version: docs://examples/ontology_terms.py --scenario bridge_walk
+
+verbose_fields:
+  - properties
+  - genes_by_organism
+
+chaining:
+  - "search_ontology(ontology=[...]) → ontology_term_details(term_ids=[...]) — search or browse first, then inspect the hits' hierarchy and bridges"
+  - "pathway_enrichment / cluster_enrichment → ontology_term_details(term_ids=[enriched term_ids]) — what is this enriched term, how broad, what is it built from"
+  - "ontology_term_details → genes_by_ontology(ontology=<row.ontology>, term_ids=[child.id], organism=...) — pick a child from children[] and expand it to genes"
+  - "ontology_term_details(link_kinds=['composition']) → ontology_term_details(term_ids=[links_out[].target_id]) — hop across bridges (tcdb → pfam → interpro)"
+  - "gene_ontology_terms(locus_tags=[...]) → ontology_term_details(term_ids=[row.term_id]) — from a gene's terms to the terms' context"
+  - "discussed_by_publication(publication_dois=[...]) → ontology_term_details(term_ids=[kegg.pathway ids]) — context for pathways a paper names"
+
+mistakes:
+  - "Term IDs are self-prefixed CURIEs and the ontology is inferred from the node label — pass `go:0006979`, `tcdb:3.A.1`, `merops.family:S14`, `pfam:PF00005` / `pfam.clan:CL0023`, `kegg.pathway:ko00910`, `interpro:IPR000362`, `ncbifam:NF000812`, `ec:1.1.1.1`, `cazy:GT2`. There is no `ontology=` param; a bare accession without its prefix lands in `not_found`."
+  - "`not_found` means no node with that ID exists in any registered ontology label. It is not a filter miss — `link_kinds` can empty `links_out` but never removes the row."
+  - "`links_out` is forward-only (composition / membership / router from the source term). To find which TCDB families are built from a given Pfam domain you need the reverse direction, which this tool does not carry — see docs://analysis/annotation_evidence for the run_cypher form."
+  - "`router` links (InterPro → EC / CAZy) are recall-biased cross-references. `router_ambiguous=True` (verbose) means the entry maps to several targets or is not a FAMILY-type entry. Never assign the target function to a gene from a router link — read the gene's own EC / CAZy edge."
+  - "`children` is capped at 50 per term; read `children_total` / `children_truncated` and drill with `search_ontology(ontology=[...], level=<child level>)` or `genes_by_ontology(term_ids=[...])` (hierarchy expansion DOWN) for the full set."
+  - "`gene_count` / `organism_count` are subtree-inclusive on hierarchical labels and direct on flat ones; `direct_gene_count` is node-local and absent (not null) on flat labels and on PfamClan / BriteCategory — see docs://ontologies/{ontology} for what each count means there."
+  - "`member_count` (TCDB, MEROPS, InterPro) is the upstream database's family size, not a KG gene count."
+  - "A compact column that is missing on the node is absent, not null: GO rows carry only `direct_gene_count` from their compact extras, Pfam rows `short_name`, KEGG chemistry counts only on pathway terms. Do not treat an absent key as `0`."
+  - "`limit` / `offset` page the *found* rows (input order); `total_matching` counts found terms, not input IDs. There is no `summary` mode — batches are small by design (≤ 50 IDs per call is the comfortable range)."
+  - "`organism=` scopes `genes_by_organism` (verbose) and adds `organism_gene_count` to compact rows; it does not filter rows out — a term with zero genes in that organism still returns with `organism_gene_count: 0`."
+  - wrong: "ontology_term_details(term_ids=['3.A.1'])  # bare TC number"
+    right: "ontology_term_details(term_ids=['tcdb:3.A.1'])  # self-prefixed CURIE"
+  - wrong: "ontology_term_details(term_ids=['tcdb:3.A.1'])  # expecting the member genes"
+    right: "genes_by_ontology(ontology='tcdb', term_ids=['tcdb:3.A.1'], organism='MED4')  # term → genes; ontology_term_details is term → hierarchy / bridges / counts"

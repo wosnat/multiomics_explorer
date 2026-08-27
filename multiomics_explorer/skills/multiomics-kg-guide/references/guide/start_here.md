@@ -1,6 +1,6 @@
 # Start here — picking the right tool
 
-This MCP server exposes 41 tools over a Prochlorococcus/Alteromonas multi-omics
+This MCP server exposes 42 tools over a Prochlorococcus/Alteromonas multi-omics
 knowledge graph. Tools cluster into nine families. Before calling anything,
 match your question to a family below, then read the entry-point tool's full
 doc at `docs://tools/{name}`.
@@ -26,7 +26,7 @@ worked recipes), read `docs://guide/python_api`.
 | Family | Anchor concept | Entry-point tool(s) | Drill-down |
 |---|---|---|---|
 | **Identity** | "I have a gene name / locus tag / partial label" | `resolve_gene`, `gene_overview` | family-specific tools below |
-| **Function / annotation** | "I have a function description, pathway, or ontology term" | `genes_by_function` (text), `search_ontology`, `ontology_landscape` | `genes_by_ontology`, `gene_ontology_terms` |
+| **Function / annotation** | "I have a function description, pathway, or ontology term" | `genes_by_function` (text), `search_ontology` (browse or search terms), `ontology_landscape` | `ontology_term_details` (term → parents / children / bridges), `genes_by_ontology`, `gene_ontology_terms`. Per-ontology reference: `docs://ontologies/index` |
 | **Expression** | "I have an experimental condition or want DE results" | `list_experiments`, `list_publications` | `differential_expression_by_gene`, `differential_expression_by_ortholog`, `gene_response_profile` |
 | **Orthology** | "I want to compare across organisms" | `search_homolog_groups`, `gene_homologs` | `genes_by_homolog_group`, `differential_expression_by_ortholog` |
 | **Co-expression / clustering** | "I want gene modules from a published clustering" | `list_clustering_analyses` | `genes_in_cluster`, `gene_clusters_by_gene` |
@@ -59,7 +59,8 @@ Plus three orthogonal helpers:
 
 ### "Find genes related to {keyword / function}."
 1. `genes_by_function(search_text="...")` — Lucene over functional annotations. Best when you have a free-text description.
-2. Or `search_ontology(search_text="...", ontology=...)` then `genes_by_ontology(term_ids=[...], organism=...)` when the keyword maps to a known ontology term (more precise than text search).
+2. Or `search_ontology(search_text="...", ontology=[...])` then `genes_by_ontology(term_ids=[...], organism=...)` when the keyword maps to a known ontology term (more precise than text search). `ontology=` takes a list (or omit it to search all 17); `limit` applies per ontology. Omit `search_text` to *browse* an ontology's terms ranked by `gene_count` (filter with `level=`, `min_gene_count=`, `organism=`).
+3. Holding term IDs already (from a paper, an enrichment table, a search)? `ontology_term_details(term_ids=[...])` gives parents, children, bridge links (`links_out`) and gene / organism counts for a mixed batch across ontologies. Not sure what an ontology *means*? Read `docs://ontologies/{key}` (index: `docs://ontologies/index`).
 
 ### "What pathways / functional categories are enriched in my DE set?"
 - `pathway_enrichment(experiment_ids=[...], organism=..., ontology=..., level=...)`. See `docs://analysis/enrichment` for methodology, background semantics, and the `informative_only` default.
@@ -103,6 +104,7 @@ Plus three orthogonal helpers:
 ### "Which genes belong to BRITE category / TCDB family / CAZy family / InterPro entry / MEROPS clan X?"
 - `genes_by_ontology(ontology=..., term_ids=[...], organism=...)` works for all 17 ontologies (GO, KEGG, EC, COG, Cyanorak, TIGR, Pfam, BRITE, TCDB, CAZy, InterPro, NCBIfam, MEROPS, plus the two structural ontologies below). For BRITE, scope with `tree=` (use `list_filter_values(filter_type='brite_tree')` to discover trees).
 - 14 of the 17 carry an annotation-trust surface — filter by `sources=`, `evidence=`, `max_tier=`, `min_evidence_score=`, `call_class=` (MEROPS), or facet by `interpro_type=` (InterPro). See `docs://analysis/annotation_evidence` for which ontology carries which axis.
+- Don't know the term ID yet? `search_ontology(ontology=['tcdb'], level=2)` browses families by size; `search_ontology(search_text='ABC', ontology=['tcdb','pfam'])` searches several ontologies at once. Have the ID? `ontology_term_details(term_ids=['tcdb:3.A.1'])` shows its parents, children and the Pfam / GO terms it is built from. Each ontology's semantics: `docs://ontologies/{key}`.
 
 ### "Where in the cell does gene X live? / Is gene X secreted (signal peptide)?"
 - `genes_by_ontology(ontology="subcellular_localization", term_ids=["psortb_OuterMembrane"|"psortb_CytoplasmicMembrane"|...], organism=...)` for PSORTb-predicted localization; row carries `localization_score` (∈[7.5, 10.0]).
@@ -132,7 +134,7 @@ This index is a router, NOT exhaustive and NOT expression — use `differential_
 
 ## When to call `summary=True` first
 
-**Nearly universal: 34 of 41 tools accept `summary=True`** — discovery,
+**Nearly universal: 34 of 42 tools accept `summary=True`** — discovery,
 drill-down, gene-anchored, ontology, enrichment, all of it. With
 `summary=True` the call returns only the envelope rollups
 (`by_organism`, `by_treatment_type`, `top_*`, counts) and an empty
@@ -143,11 +145,12 @@ committing to a slice.
 Pattern: `summary=True` → look at rollups → narrow with filters → drop
 `summary=True` to fetch detail rows.
 
-The 7 tools without `summary=`: `kg_schema`, `kg_release_info`,
+The 8 tools without `summary=`: `kg_schema`, `kg_release_info`,
 `list_filter_values`, `resolve_gene`, `list_publications`,
-`gene_response_profile`, `run_cypher`. These either return small fixed
-sets, are themselves
-summaries (`gene_response_profile`), or have raw / shape-specific
+`gene_response_profile`, `ontology_term_details`, `run_cypher`. These
+either return small fixed sets, are themselves
+summaries (`gene_response_profile`), take a bounded batch
+(`ontology_term_details`), or have raw / shape-specific
 output (`run_cypher`, `kg_schema`).
 
 ---
@@ -167,7 +170,7 @@ tool** (returns envelope + per-row routing fields) with one or more
 | `list_derived_metrics` | `gene_derived_metrics`, `genes_by_{numeric,boolean,categorical}_metric` |
 | `list_clustering_analyses` | `genes_in_cluster`, `cluster_enrichment` |
 | `search_homolog_groups` | `genes_by_homolog_group`, `differential_expression_by_ortholog` |
-| `search_ontology` / `ontology_landscape` | `genes_by_ontology`, `pathway_enrichment`, `cluster_enrichment` |
+| `search_ontology` / `ontology_landscape` | `ontology_term_details`, `genes_by_ontology`, `pathway_enrichment`, `cluster_enrichment` |
 | `gene_overview` | family-specific drill-downs based on per-row availability signals |
 
 Per-row routing fields on the discovery output (e.g.
@@ -188,6 +191,8 @@ expression data, and the routing field is there to prevent that.
 - `docs://analysis/metabolites` — metabolites decision-tree (3 source pipelines).
 - `docs://analysis/derived_metrics` — DerivedMetric family overview.
 - `docs://analysis/annotation_evidence` — annotation-trust surface: per-ontology trust profile, rank-vs-filter rule, MEROPS `call_class`, InterPro `interpro_type` enrichment requirement.
+- `docs://ontologies/index` — per-ontology reference (`docs://ontologies/{key}` for each of the 17): what each ontology is, how genes get annotated, identifier form, hierarchy, node properties, vocabularies, pitfalls.
 - `docs://examples/pathway_enrichment.py` — runnable enrichment example.
 - `docs://examples/metabolites.py` — runnable metabolites workflow examples (7 scenarios).
 - `docs://examples/annotation_evidence.py` — runnable annotation-trust examples (4 scenarios).
+- `docs://examples/ontology_terms.py` — runnable term-side examples: browse, multi-ontology search, term details, bridge walk (4 scenarios).

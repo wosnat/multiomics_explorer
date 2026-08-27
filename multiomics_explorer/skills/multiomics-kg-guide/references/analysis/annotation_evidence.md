@@ -215,13 +215,21 @@ members), or `router` (a computed cross-reference, ambiguous when a source
 term maps to multiple targets or isn't a `FAMILY`-type InterPro entry).
 
 Bridges are modeled **forward only** by design — family → what characterizes
-it, never the reverse (`links_in` does not exist). A term-side drill-down
-tool that walks these bridges directly (batch term IDs → parents / children /
-bridge targets in one call) is not part of this tool surface; reach bridge
-edges via `run_cypher` when you need them (e.g.
-`MATCH (t:TcdbFamily {id: $id})-[:Tcdb_family_has_pfam_domain]->(p:Pfam) RETURN p`).
+it, never the reverse (`links_in` does not exist). Walk them with
+`ontology_term_details(term_ids=[...])`: each row carries `links_out[]`
+(`{rel, link_kind, target_id, target_ontology, target_name}`; verbose adds the
+edge props — `curated_tcids` on TCDB composition links, `member_id_count` on
+MEROPS → Pfam, and the computed `router_ambiguous` on InterPro router links),
+and `link_kinds=[...]` narrows to one kind. A two-hop walk
+(`tcdb:3.A.1` → Pfam domains → InterPro entries) is scenario `bridge_walk`
+in `docs://examples/ontology_terms.py`. To reach a *source* term from its
+target (which TCDB families are built from this Pfam domain?) you still need
+`run_cypher` — e.g.
+`MATCH (t:TcdbFamily)-[:Tcdb_family_has_pfam_domain]->(p:Pfam {id: $id}) RETURN t`.
 `list_filter_values(filter_type="link_kinds")` enumerates the kind vocabulary
-and which bridge relationships carry each kind.
+and which bridge relationships carry each kind; every ontology's reference
+page (`docs://ontologies/{key}`, index `docs://ontologies/index`) lists its
+bridges out and in.
 
 ---
 

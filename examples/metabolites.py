@@ -38,11 +38,9 @@ from typing import Callable
 
 from multiomics_explorer import (
     assays_by_metabolite,
-    differential_expression_by_gene,
     gene_response_profile,
     genes_by_metabolite,
     genes_by_ontology,
-    list_experiments,
     list_metabolite_assays,
     list_metabolites,
     metabolites_by_flags_assay,
@@ -549,9 +547,9 @@ def scenario_tcdb_chain() -> None:
     a_genes = sorted({r["locus_tag"] for r in a["results"] if r.get("locus_tag")})
     print(f"  Route A — substrate-anchored, most_specific only: {len(a_genes)} genes")
     print(f"           call: genes_by_metabolite(metabolite_ids=['{BETAINE}'],")
-    print(f"                                    substrate_depth=['most_specific'])")
-    print(f"           interp: no MED4 gene is attached at a node where betaine is the")
-    print(f"                   most specific surviving substrate")
+    print("                                    substrate_depth=['most_specific'])")
+    print("           interp: no MED4 gene is attached at a node where betaine is the")
+    print("                   most specific surviving substrate")
     print()
 
     # Route B — substrate-anchored, no filter (substrate scoped via family rollup)
@@ -565,7 +563,7 @@ def scenario_tcdb_chain() -> None:
     b_families = sorted({r.get("tcdb_family_id") for r in b["results"] if r.get("tcdb_family_id")})
     print(f"  Route B — substrate-anchored, no substrate_depth filter: {len(b_genes)} genes")
     print(f"           call: genes_by_metabolite(metabolite_ids=['{BETAINE}'])")
-    print(f"           interp: MED4 genes annotated to families that include betaine via rollup")
+    print("           interp: MED4 genes annotated to families that include betaine via rollup")
     print(f"           tcdb_family_ids surfaced: {b_families}")
     print(f"           genes: {b_genes}")
     print()
@@ -583,19 +581,19 @@ def scenario_tcdb_chain() -> None:
     print(f"  Route C — family-anchored on the literal 'betaine family' ({bcct_term_id}, BCCT):")
     print(f"           {len(c_genes)} genes")
     print(f"           call: genes_by_ontology(ontology='tcdb', term_ids=['{bcct_term_id}'])")
-    print(f"           interp: MED4 has zero BCCT-family members — the family-anchored route")
-    print(f"                   would have missed the candidates that Route B surfaced")
+    print("           interp: MED4 has zero BCCT-family members — the family-anchored route")
+    print("                   would have missed the candidates that Route B surfaced")
     print()
 
     print("Reading the 3-way comparison:")
-    print(f"  - Substrate-anchored Routes A and B share the *anchor* (the metabolite),")
-    print(f"    differ only in the substrate_depth filter. A=conservative cast (most_specific);")
-    print(f"    B=broader cast that includes family-level transport potential.")
-    print(f"  - Family-anchored Route C uses a different anchor (the family taxonomy)")
-    print(f"    and answers a different question. For betaine in MED4 it returns zero —")
-    print(f"    the only candidates live in ABC superfamily (3.A.1) via inherited rollup.")
-    print(f"  - For 'which genes transport X?' — use substrate-anchored (A or B).")
-    print(f"  - For 'what does family Y transport?' or 'which genes are in family Y?' — use C.")
+    print("  - Substrate-anchored Routes A and B share the *anchor* (the metabolite),")
+    print("    differ only in the substrate_depth filter. A=conservative cast (most_specific);")
+    print("    B=broader cast that includes family-level transport potential.")
+    print("  - Family-anchored Route C uses a different anchor (the family taxonomy)")
+    print("    and answers a different question. For betaine in MED4 it returns zero —")
+    print("    the only candidates live in ABC superfamily (3.A.1) via inherited rollup.")
+    print("  - For 'which genes transport X?' — use substrate-anchored (A or B).")
+    print("  - For 'what does family Y transport?' or 'which genes are in family Y?' — use C.")
     print()
     print("Filter call (most_specific vs no filter) is question-shape-dependent.")
     print("Both depths are annotations, neither is ground truth; transporter")

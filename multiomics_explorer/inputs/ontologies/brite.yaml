@@ -1,0 +1,74 @@
+# Human-authored reference for the brite ontology (docs://ontologies/brite).
+# Structural facts are merged in from ONTOLOGY_CONFIG + schema baseline.
+
+what_it_is: |
+  KEGG BRITE functional hierarchies — twelve curated trees that classify
+  KEGG Orthology groups by protein family rather than by pathway:
+  `transporters`, `enzymes`, `peptidases`, `transcription_factors`,
+  `secretion`, `two_component`, `defense`, `chaperones`, `ribosome`,
+  `translation_factors`, `trna_biogenesis`, `dna_replication`. Where a
+  KEGG pathway asks "what process", BRITE asks "what kind of protein".
+
+method: |
+  BRITE has no gene edge of its own: genes reach a category through their
+  KO (`Gene_has_kegg_ko`) and the `Kegg_term_in_brite_category` bridge, so
+  every BRITE annotation inherits KEGG's trust profile
+  (`sources=['eggnog']`, `evidence='family_inferred'`, no score). Each
+  category node records which tree it belongs to (`tree`, `tree_code`) and
+  how many KOs it holds (`member_ko_count`).
+
+id_form: |
+  `kegg.brite:ko02000.A2` — prefix, the tree code (`ko02000` =
+  transporters), and the node path within that tree. `tree` is the
+  snake_case tree name used by the `tree=` facet; discover the names with
+  `list_filter_values(filter_type='brite_tree')`.
+
+hierarchy: |
+  Four levels within each tree, `level` 0-3 with `level_kind` `brite_class`
+  → `brite_subclass` → `brite_family` → `brite_subfamily`
+  (`Brite_category_is_a_brite_category`). Trees are independent — the
+  transporters tree and the enzymes tree share no nodes. `gene_count` /
+  `organism_count` are subtree-inclusive; there is no `direct_gene_count`
+  (genes never attach to a category directly). The `enzymes` tree is by far
+  the largest and swamps any un-faceted query.
+
+interpretation: |
+  Always pick a tree first. `tree='transporters'` at level 1-2 gives the
+  transporter-family enrichment KEGG pathways cannot (an ABC importer and a
+  MFS exporter are one "membrane transport" pathway but different BRITE
+  families); `tree='transcription_factors'` or `two_component` gives
+  regulator-family views. Because the gene edge is KEGG's, a BRITE
+  enrichment re-partitions the same KO annotations — it is a different
+  lens, not independent evidence.
+
+informativeness_rule: |
+  No BRITE category is flagged uninformative; the level-0 class nodes of the
+  `enzymes` tree (Transferases, Hydrolases, ...) are catch-alls by size.
+  Scope with `tree=` and `level>=1`, and let `max_gene_set_size` handle the
+  rest.
+
+pitfalls: |
+  - Un-faceted BRITE calls are dominated by the `enzymes` tree; `tree=` is
+    a facet (it narrows only BRITE and raises if `brite` is not in the
+    ontology list).
+  - Term IDs carry the tree code; a level-3 node in `transporters` and one
+    in `enzymes` are unrelated even when their names look similar.
+  - For substrate-level transporter questions use TCDB (`tcdb`) or the
+    chemistry layer; BRITE transporter families are KO groupings, not
+    substrate calls.
+  - Trust filters on `brite` do nothing (single rung) and `min_evidence_score`
+    raises.
+
+typical_questions:
+  - "Which transporter families (BRITE `transporters` tree) are enriched among genes up under nitrogen limitation?"
+  - "How many two-component system genes does MIT1002 carry, by BRITE subclass?"
+  - "Which BRITE categories does `kegg:K02575` belong to?"
+  - "What are the level-2 families under the `secretion` tree, with gene counts for MED4?"
+
+see_also:
+  - docs://ontologies/kegg
+  - docs://ontologies/tcdb
+  - docs://guide/conventions
+  - docs://analysis/enrichment
+  - docs://tools/list_filter_values
+  - docs://tools/ontology_term_details

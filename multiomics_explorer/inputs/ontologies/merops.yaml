@@ -1,0 +1,89 @@
+# Human-authored reference for the merops ontology (docs://ontologies/merops).
+# Structural facts are merged in from ONTOLOGY_CONFIG + schema baseline.
+
+what_it_is: |
+  MEROPS — the peptidase (protease) and peptidase-inhibitor database.
+  Families are grouped by catalytic mechanism (`catalytic_type`: serine,
+  cysteine, metallo, aspartic, threonine, glutamic, asparagine lyase,
+  mixed, unknown) into clans that share a fold (`merops.clan:SC`,
+  `merops.clan:MA`), with families (`merops.family:S33` prolyl
+  aminopeptidase, `merops.family:S14` Clp protease) and some subfamilies
+  below. `family_class` separates peptidase families from inhibitor
+  families. Term nodes also carry cleavage-specificity summaries
+  (`cleavage_summary`, `cleavage_p1_residues`, `known_cleavage_count`) from
+  MEROPS substrate data.
+
+method: |
+  Gene → family edges come from a DIAMOND search against MEROPS sequences
+  (`sources=['merops_diamond']`, `evidence='homology'`). The materially
+  important column is the compact `call_class`: `peptidase` (the best hit
+  is an active peptidase — a holotype or putative peptidase),
+  `nonpeptidase_homolog` (the best hit is a MEROPS-curated catalytically
+  dead homolog — same family, no proteolytic activity), or `inhibitor` (an
+  inhibitor-family hit). Trust axes: `evidence_score` in [0, 1], `tier`,
+  and verbose native detail (`confidence_score` — the rank prop —
+  `pfam_support`, `best_hit_kind`, `identity`, `qcov`, `evalue`,
+  `consensus_n`, `best_hit_id`). Families bridge *out* to the Pfam domains
+  that define them (`Merops_family_has_pfam_domain`, composition, with
+  `member_id_count` = how many MEROPS members carry that domain).
+
+id_form: |
+  `merops.clan:SC` (level 0), `merops.family:S33` (level 1),
+  `merops.family:S33A`-style subfamilies (level 2). The letter encodes the
+  catalytic type (S serine, C cysteine, M metallo, A aspartic, T threonine,
+  G glutamic, N asparagine lyase, P mixed, U unknown; inhibitors use `I`).
+  Node `merops_id` holds the bare identifier.
+
+hierarchy: |
+  Three levels via `Merops_family_is_a_merops_family`, `level_kind`
+  `merops_clan` (0) → `merops_family` (1) → `merops_subfamily` (2).
+  `gene_count` / `organism_count` are subtree-inclusive and count *every*
+  hit including non-peptidase homologs; `peptidase_gene_count` /
+  `peptidase_organism_count` count only `call_class='peptidase'` edges and
+  are the numbers to quote for "how many proteases". `direct_gene_count` is
+  node-local; `member_count` is MEROPS's own family size.
+
+interpretation: |
+  Always decide what the question is: a **peptidase census** wants
+  `call_class=['peptidase']` (or the term-side `peptidase_gene_count`); a
+  **sequence-family census** wants the unfiltered set. The tools warn when
+  `nonpeptidase_homolog` rows are present in an unfiltered result. Rank a
+  gene's competing family hits by `confidence_score` / `evidence_score`;
+  `pfam_support='corroborated'` means the family's defining Pfam domain is
+  also on the gene. `call_class` is orthogonal to `tier` — a confident hit
+  can be a confident non-peptidase homolog. Family level (1) is the
+  enrichment unit; clan level (0) groups by fold.
+
+informativeness_rule: |
+  No MEROPS node is flagged uninformative. Clan roots are large by
+  construction; enrich at `level=1`. `call_class` on enrichment shapes both
+  the term sets and the background, so a peptidase-only ORA is a different
+  test from an all-hits ORA.
+
+pitfalls: |
+  - `gene_count` on a MEROPS term includes catalytically dead homologs;
+    quote `peptidase_gene_count` for protease counts.
+  - `call_class` is an edge property — one gene can be `peptidase` in one
+    family and `nonpeptidase_homolog` in another (`gene_overview` exposes
+    the set as `merops_classes`).
+  - `inhibitor` families are not proteases; `family_class='inhibitor'`
+    on the term is the term-side twin.
+  - `evidence_score` is MEROPS-internal; `merops_evidence_score_max` on
+    `gene_overview` is sparse (null = no MEROPS call — rank, don't filter).
+  - Cleavage-specificity fields describe the family's known substrates in
+    MEROPS, not this organism's biology.
+
+typical_questions:
+  - "How many active peptidases, by clan, does MIT1002 carry vs MED4?"
+  - "Which MEROPS families are enriched among genes up in stationary phase, counting peptidase calls only?"
+  - "Is `PMM0001`'s S14 hit an active Clp protease or a non-peptidase homolog?"
+  - "Which Pfam domains define `merops.family:S33`, and what are its cleavage-site preferences?"
+
+see_also:
+  - docs://analysis/annotation_evidence
+  - docs://analysis/enrichment
+  - docs://ontologies/pfam
+  - docs://ontologies/brite
+  - docs://tools/gene_overview
+  - docs://tools/genes_by_ontology
+  - docs://tools/ontology_term_details

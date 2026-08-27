@@ -1,0 +1,72 @@
+# Human-authored reference for the go_cc ontology (docs://ontologies/go_cc).
+# Structural facts are merged in from ONTOLOGY_CONFIG + schema baseline.
+
+what_it_is: |
+  Gene Ontology *cellular component* — where a gene product is found
+  (e.g. `go:0005886` plasma membrane, `go:0009522` photosystem I,
+  `go:0005840` ribosome). Sister branches: `go_bp` and `go_mf`. It is a
+  functional-vocabulary view of location; the *predicted* localization of
+  each protein is a separate, flat ontology (`subcellular_localization`,
+  PSORTb).
+
+method: |
+  Same pooled GO pipeline: Cyanorak, eggNOG, InterProScan, NCBI, UniProt
+  merged into one edge per (gene, term) with `sources[]`, compact `evidence`
+  (`curated` / `family_inferred` / `domain_inferred`) and `evidence_score`.
+  Complex-level terms (photosystems, ribosome subunits, ATP synthase) are
+  mostly `curated` or `family_inferred`; membrane terms are often
+  `domain_inferred` from transmembrane-domain signatures.
+
+id_form: |
+  `go:0005886` — `go:` prefix plus the seven-digit accession; the branch is
+  the node label (`CellularComponent`). Use `ontology='go_cc'` on the
+  branch-scoped tools.
+
+hierarchy: |
+  The shallowest GO branch here (about seven levels; root `go:0005575`).
+  `part_of` matters more than in the other branches — a photosystem subunit
+  is `part_of` the photosystem, which is `part_of` the thylakoid membrane —
+  so `level` is a min-path proxy and `level_is_best_effort` is set on many
+  terms. Counts are subtree-inclusive (`gene_count`, `organism_count`) with
+  `direct_gene_count` node-local; level 1 is almost the whole proteome.
+
+interpretation: |
+  Useful for "which complexes / compartments does this gene set touch"
+  questions — photosystem, phycobilisome, ribosome, membrane complexes,
+  carboxysome (`go:0031470`). For per-protein predicted localization use
+  PSORTb (`subcellular_localization`), which is 1:1 and scored; GO CC is
+  many-to-one and evidence-graded. For enrichment, level 2-4 is where the
+  named complexes live; level 1 (`cellular anatomical structure`) is a
+  catch-all.
+
+informativeness_rule: |
+  Root `cellular_component` (`go:0005575`) is flagged uninformative. Level 1
+  (`cellular anatomical structure`, `protein-containing complex`) is
+  unflagged but covers nearly everything; pass `level>=2` or
+  `max_gene_set_size` when enriching.
+
+pitfalls: |
+  - `go:0016020` membrane and `go:0005886` plasma membrane are large and
+    mostly `domain_inferred`; treat membrane enrichment as a weak signal
+    unless corroborated by PSORTb or SignalP.
+  - Cyanobacterial compartments (thylakoid, carboxysome, phycobilisome)
+    have no counterpart in Alteromonas — cross-organism comparison at those
+    terms is structurally zero, not biologically absent.
+  - TCDB families bridge *out* to GO CC terms
+    (`Tcdb_family_located_in_cellular_component`); read those links on the
+    `tcdb` term.
+
+typical_questions:
+  - "Which MED4 genes are annotated to the carboxysome, and with what evidence?"
+  - "Are ribosome or photosystem components over-represented among down-regulated genes in darkness?"
+  - "What sits under `go:0034357` photosynthetic membrane in this KG?"
+  - "Does the GO CC annotation agree with PSORTb's predicted localization for this gene?"
+
+see_also:
+  - docs://ontologies/go_bp
+  - docs://ontologies/go_mf
+  - docs://ontologies/subcellular_localization
+  - docs://ontologies/signal_peptide_type
+  - docs://analysis/annotation_evidence
+  - docs://analysis/enrichment
+  - docs://tools/ontology_term_details

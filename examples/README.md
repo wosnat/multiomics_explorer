@@ -39,4 +39,15 @@ uv run python examples/annotation_evidence.py --scenario interpro_enrichment
 uv run python examples/annotation_evidence.py --scenario trust_filtered_tcdb
 ```
 
-All three scripts are exercised by `tests/integration/test_examples.py` under `-m kg`.
+## `ontology_terms.py`
+
+Four scenarios on the term side of the ontology surface: browse mode (no `search_text`), multi-ontology search with lockstep paging, a mixed `ontology_term_details` batch (hierarchy + bridges + `not_found`), and a two-hop bridge walk (tcdb → pfam → interpro). See `docs://ontologies/index` and `docs://analysis/annotation_evidence`.
+
+```bash
+uv run python examples/ontology_terms.py --scenario browse_merops
+uv run python examples/ontology_terms.py --scenario multi_search
+uv run python examples/ontology_terms.py --scenario term_details_batch
+uv run python examples/ontology_terms.py --scenario bridge_walk
+```
+
+All four scripts are exercised by `tests/integration/test_examples.py` under `-m kg`.

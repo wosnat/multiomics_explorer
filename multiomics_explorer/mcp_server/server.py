@@ -69,7 +69,7 @@ mcp = FastMCP(
     "multiomics-kg",
     instructions=(
         "Multi-omics knowledge graph for Prochlorococcus and Alteromonas "
-        "(41 tools across gene/sequence/expression/ortholog/ontology/cluster/"
+        "(42 tools across gene/sequence/expression/ortholog/ontology/cluster/"
         "chemistry/metabolomics/enrichment).\n\n"
         "First call: kg_release_info — verifies your KG release matches what this "
         "explorer-MCP version expects. Surfaces the KG's identity (version, "
@@ -112,6 +112,7 @@ _DOC_DIRS = {
     "docs://tools": (_SKILLS_DIR / "tools", "Usage guide for the {stem} tool"),
     "docs://analysis": (_SKILLS_DIR / "analysis", "Usage guide for the {stem} analysis utility"),
     "docs://guide": (_SKILLS_DIR / "guide", "Cross-tool guide: {stem}"),
+    "docs://ontologies": (_SKILLS_DIR / "ontologies", "Ontology reference: {stem}"),
 }
 
 for uri_prefix, (doc_dir, desc_template) in _DOC_DIRS.items():
@@ -139,6 +140,11 @@ for example_name, example_description in [
     (
         "metabolites.py",
         "Runnable metabolites workflow examples (3 source pipelines × 7 scenarios)",
+    ),
+    (
+        "ontology_terms.py",
+        "Runnable ontology term-side examples (browse, multi-ontology search, "
+        "term details, bridge walk)",
     ),
 ]:
     mcp.add_resource(

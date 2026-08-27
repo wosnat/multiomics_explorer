@@ -1,6 +1,6 @@
 # Using the Python API
 
-The `multiomics_explorer` package exposes the same 41 tools available
+The `multiomics_explorer` package exposes the same 42 tools available
 via MCP, plus a handful of analysis utilities, as ordinary Python
 functions. Use the package when you need bulk extraction, multi-step
 pipelines, custom plotting, or DataFrame workflows. Use MCP when you

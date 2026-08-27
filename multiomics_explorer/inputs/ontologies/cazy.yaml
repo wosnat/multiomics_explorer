@@ -1,0 +1,67 @@
+# Human-authored reference for the cazy ontology (docs://ontologies/cazy).
+# Structural facts are merged in from ONTOLOGY_CONFIG + schema baseline.
+
+what_it_is: |
+  CAZy — Carbohydrate-Active enZymes: sequence-based families of the
+  enzymes that build, break and modify glycosidic bonds. Six classes
+  (`cazy:GH` glycoside hydrolases, `cazy:GT` glycosyltransferases, `cazy:PL`
+  polysaccharide lyases, `cazy:CE` carbohydrate esterases, `cazy:AA`
+  auxiliary activities, `cazy:CBM` carbohydrate-binding modules) and
+  numbered families within each (`cazy:GT2`). Relevant to
+  exopolysaccharide, cell-wall and — for Alteromonas — polysaccharide
+  degradation biology.
+
+method: |
+  Gene → family edges pool InterProScan (via dbCAN-style HMMs) and eggNOG
+  transfer (`sources[]`), merged with compact `evidence` (`curated`,
+  `family_inferred`, `domain_inferred`) and an `evidence_score` in [0, 1].
+  Family edges roll up to the class node via `Cazy_family_is_a_cazy_family`.
+  InterPro entries bridge *to* CAZy families as a `router`
+  (`Interpro_entry_related_to_cazy_family`) — a computed cross-reference,
+  read from the InterPro term.
+
+id_form: |
+  `cazy:GT` (class, level 0) and `cazy:GT2` (family, level 1) — prefix plus
+  the CAZy class letters and family number; node `cazy_id` holds the bare
+  family name.
+
+hierarchy: |
+  Two levels via `Cazy_family_is_a_cazy_family`: `level_kind` `cazy_class`
+  (0) → `cazy_family` (1); the vocabulary also lists `cazy_subfamily`, but
+  no subfamily nodes are present. `gene_count` / `organism_count` are
+  subtree-inclusive on the class, direct on the family; `direct_gene_count`
+  is node-local.
+
+interpretation: |
+  Family level is the unit — `cazy:GT2` (cellulose/chitin-synthase-like
+  transferases) and `cazy:GH23` (lytic transglycosylases) mean specific
+  chemistry, the class does not. CAZy is small in these genomes (tens of
+  families), so enrichment at level 1 works only for glycan-heavy gene sets;
+  otherwise use it as a per-gene annotation via `gene_ontology_terms`. Rank
+  by `evidence_score`; `curated` edges are rare and strong.
+
+informativeness_rule: |
+  No CAZy node is flagged uninformative. The six class roots are too broad
+  to enrich — use `level=1`.
+
+pitfalls: |
+  - Family names are opaque (`GT2`, `GH13`); browse with
+    `search_ontology(ontology=['cazy'], level=1)` and read `description` in
+    verbose mode.
+  - A CAZy family says which fold/mechanism, not which sugar — substrate
+    specificity varies within a family.
+  - InterPro → CAZy routing is recall-biased; when `router_ambiguous` is
+    true on the InterPro term, look at the gene's own CAZy edge instead.
+
+typical_questions:
+  - "Which CAZy families does MIT1002 carry that MED4 lacks?"
+  - "Which glycosyltransferase families are enriched among genes up during biofilm or EPS production?"
+  - "Which InterPro entries route to `cazy:GH23`, and are those routings unambiguous?"
+
+see_also:
+  - docs://ontologies/interpro
+  - docs://ontologies/pfam
+  - docs://ontologies/ec
+  - docs://analysis/annotation_evidence
+  - docs://analysis/enrichment
+  - docs://tools/ontology_term_details

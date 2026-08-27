@@ -1,0 +1,92 @@
+# Human-authored reference for the tcdb ontology (docs://ontologies/tcdb).
+# Structural facts are merged in from ONTOLOGY_CONFIG + schema baseline.
+
+what_it_is: |
+  The Transporter Classification Database — a five-level classification of
+  membrane transport systems (`tcdb:3.A.1` ABC superfamily,
+  `tcdb:2.A.1.5.3` a sucrose:H+ symporter). TCDB families are both an
+  ontology (genes annotated to families) and a chemistry node: families
+  carry curated substrate sets (`Tcdb_family_transports_metabolite`) that
+  the metabolite tools walk. Classes 1-5 are transporter types (channels,
+  secondary carriers, primary active, group translocators, transmembrane
+  electron carriers); 8 and 9 are accessory factors and incompletely
+  characterized systems.
+
+method: |
+  Gene → family edges come from a DIAMOND search against TCDB proteins
+  (`tcdb_diamond`) and from eggNOG transfer (`sources[]`), merged with a
+  compact `evidence` of `homology` (direct sequence hit) or
+  `family_inferred` (eggNOG only) and the fullest trust surface in the KG:
+  `evidence_score` in [0, 1], `tier`, and verbose native detail
+  (`confidence_score`, `source_agreement`, `pfam_support`, `go_support`,
+  `identity`, `qcov`, `evalue`, `consensus_n`). A gene is attached at every
+  level of its lineage; `attachment_depth='most_specific'` marks the deepest
+  attachment and `'superseded'` the ancestors, which are less specific, not
+  wrong. Families also bridge *out* to the Pfam domains and GO terms that
+  characterise them (composition, with `curated_tcids` naming the curated
+  members behind each link).
+
+id_form: |
+  `tcdb:3.A.1.2.3` — prefix plus the dotted TC number; the number of fields
+  gives the level: `tcdb:3` class, `tcdb:3.A` subclass, `tcdb:3.A.1`
+  family, `tcdb:3.A.1.2` subfamily, `tcdb:3.A.1.2.3` specificity node.
+  Node `tcdb_id` holds the bare number, `tc_class_id` the class, and
+  `superfamily` the superfamily name where TCDB assigns one.
+
+hierarchy: |
+  Strict five-level tree via `Tcdb_family_is_a_tcdb_family`, `level` 0-4
+  with `level_kind` `tc_class` → `tc_subclass` → `tc_family` →
+  `tc_subfamily` → `tc_specificity`. `gene_count` / `organism_count` are
+  subtree-inclusive and, because every gene is attached along its whole
+  lineage, they also equal the attached-gene count; `direct_gene_count` is
+  node-local. `member_count` is TCDB's own family size, `metabolite_count`
+  the size of the family's substrate set. The ABC superfamily `tcdb:3.A.1`
+  has dozens of subfamilies and a very large substrate set — most
+  "transports everything" artefacts trace to it.
+
+interpretation: |
+  Read the trust ladder in order: `evidence_score` ranks how corroborated
+  the gene × family call is (rank, never threshold — `min_evidence_score`
+  exists but 0 is an uncorroborated hit, not an absent call); `tier` and
+  `source_agreement` say whether DIAMOND and eggNOG agree; `pfam_support`
+  / `go_support` say whether the family's own Pfam/GO composition is
+  present on the gene. For "what does this gene transport" go through
+  `metabolites_by_gene`; for "which genes could transport X" go through
+  `genes_by_metabolite` — the family-anchored route via `genes_by_ontology`
+  misses cross-family substrate hits. Leaf mode on `gene_ontology_terms`
+  returns only `most_specific` attachments; pass `include_superseded=True`
+  to see the ancestors.
+
+informativeness_rule: |
+  No TCDB node is flagged uninformative. The seven class roots and the ABC
+  superfamily behave as catch-alls by size; enrich at `level=2` (family) or
+  `level=3` (subfamily) and confirm with `ontology_landscape`.
+
+pitfalls: |
+  - `superseded` means the gene is also attached deeper — it is a real
+    annotation, just not the gene's most specific one. Counting genes
+    across levels without the leaf predicate multiplies them.
+  - A gene whose deepest attachment is a lumping superfamily reads
+    `transport_substrate_resolution='family_inferred'` on `gene_overview`:
+    its substrate breadth is reachability, not capability.
+  - TCDB encodes no transport direction (import vs export).
+  - `evidence_score` is TCDB-internal; do not compare it with MEROPS's or
+    GO's.
+  - Family `metabolite_count` counts the curated substrate set, not what
+    any particular gene moves.
+
+typical_questions:
+  - "Which ABC-transporter subfamilies does MED4 carry, and how corroborated is each call?"
+  - "What is the most specific TCDB family for `PMM0392`, and what does that family transport?"
+  - "Which Pfam domains and GO terms characterise `tcdb:3.A.1`, and how many children does it have?"
+  - "Which transporter families are enriched among genes up under phosphorus limitation, restricted to homology-evidenced calls?"
+
+see_also:
+  - docs://analysis/metabolites
+  - docs://analysis/annotation_evidence
+  - docs://ontologies/pfam
+  - docs://ontologies/brite
+  - docs://guide/conventions
+  - docs://tools/genes_by_metabolite
+  - docs://tools/metabolites_by_gene
+  - docs://tools/ontology_term_details

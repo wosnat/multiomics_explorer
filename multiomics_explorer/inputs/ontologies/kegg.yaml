@@ -1,0 +1,87 @@
+# Human-authored reference for the kegg ontology (docs://ontologies/kegg).
+# Structural facts are merged in from ONTOLOGY_CONFIG + schema baseline.
+
+what_it_is: |
+  KEGG orthology and pathway maps — the most common "which pathway is this
+  gene in" vocabulary. One `KeggTerm` label holds four kinds of node
+  (`level_kind`): `category` (Metabolism, Genetic Information Processing,
+  ...), `subcategory` (Carbohydrate metabolism, ...), `pathway`
+  (`kegg.pathway:ko00910` Nitrogen metabolism) and `ko` (KEGG Orthology
+  groups, `kegg:K02575` NRT nitrate/nitrite transporter). Genes attach to
+  KOs; pathways and categories are reached by rollup.
+
+method: |
+  Every gene → KO edge comes from eggNOG-mapper (`sources=['eggnog']`,
+  `evidence='family_inferred'`): the gene was placed in an orthologous group
+  whose members carry that KO. There is no curated rung and no
+  `evidence_score` — all KEGG edges sit on one rung, so trust filters on
+  `kegg` do nothing useful; use `informative_only` and term size instead.
+  Pathway membership is a rollup from KO → pathway → subcategory → category
+  (`Kegg_term_is_a_kegg_term`). Pathway nodes also carry a literature index
+  (`Publication_discusses_kegg_pathway` → `discussed_by_n_publications`) and,
+  for pathways only, chemistry counts (`reaction_count`, `metabolite_count`)
+  tying them to the reaction / metabolite layer.
+
+id_form: |
+  Four prefixes on one label — `kegg.category:09100`, `kegg.subcategory:...`,
+  `kegg.pathway:ko00910`, and bare KO `kegg:K02575`. The `ko` pathway prefix
+  (not `map`) is the KG's canonical form. `list_metabolites(pathway_ids=[...])`
+  and `genes_by_ontology(ontology='kegg', term_ids=[...])` both take the
+  `kegg.pathway:` form; `discussed_by_publication` returns it.
+
+hierarchy: |
+  Four levels, `level` 0-3 = `category` → `subcategory` → `pathway` → `ko`.
+  It is a DAG in practice: one KO belongs to many pathways (a glycolysis
+  enzyme is also in several biosynthesis maps), so `gene_count` on a pathway
+  is the union of its KOs' genes and sibling pathways overlap heavily.
+  `direct_gene_count` is present on every node; on a pathway it counts genes
+  attached to the pathway itself, which is normally 0 (genes attach to KOs).
+  BRITE hierarchies are a *separate* view over the same KOs, reached through
+  the `Kegg_term_in_brite_category` bridge.
+
+interpretation: |
+  Pathway level (`level=2`) is the interpretable enrichment unit — it maps
+  directly onto the KEGG map images and onto `list_metabolites(pathway_ids=)`.
+  KO level (`level=3`) is the gene-family unit for "does this organism have
+  a nitrate transporter" questions. Because every edge is `family_inferred`,
+  KEGG annotation coverage is uniform across organisms, which makes it the
+  best axis for cross-organism comparisons that do not need curated depth.
+  For a pathway's *metabolites* (as opposed to its genes) go through the
+  chemistry layer — the two memberships differ (see
+  `docs://analysis/metabolites`).
+
+informativeness_rule: |
+  Catch-all maps are flagged uninformative — `ko01100` Metabolic pathways,
+  `ko01110` Biosynthesis of secondary metabolites, `ko01120` Microbial
+  metabolism in diverse environments, and a set of broad KO groups — and
+  dropped by `informative_only=True` (default on enrichment, opt-in on
+  browse/search). The flag is term-side only; the genes stay in the
+  background.
+
+pitfalls: |
+  - Pathway `gene_count`s overlap — a gene in three maps is counted three
+    times across siblings. Never sum them.
+  - `kegg` and `brite` share the same gene edge (`Gene_has_kegg_ko`): a
+    BRITE enrichment is a re-partitioning of the same KOs, not independent
+    evidence.
+  - No trust ladder to filter on: `sources`/`evidence` are constant. Passing
+    `min_evidence_score` raises (KEGG carries no score axis).
+  - Pathway-anchored metabolite lists and KO-anchored gene lists for the
+    same map are different sets; name the anchor when answering.
+  - Publication counts are a prose literature index, not expression — see
+    `discussed_by_publication`.
+
+typical_questions:
+  - "Which KEGG pathways are enriched among genes down under phosphorus limitation in MED4?"
+  - "Does MIT1002 carry a KO for nitrate assimilation, and which pathway maps does it sit in?"
+  - "Which pathway maps are most discussed in the literature for this organism?"
+  - "What are the KO children of `kegg.pathway:ko00910`, and which BRITE categories does the pathway belong to?"
+
+see_also:
+  - docs://ontologies/brite
+  - docs://ontologies/ec
+  - docs://analysis/enrichment
+  - docs://analysis/metabolites
+  - docs://tools/discussed_by_publication
+  - docs://tools/list_metabolites
+  - docs://tools/ontology_term_details

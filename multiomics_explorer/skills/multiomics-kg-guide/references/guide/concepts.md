@@ -212,6 +212,15 @@ supported ontologies:
 | NCBIfam | `NcbifamFamily` | Flat. Term-side `family_type` and `gene_symbol`. Bridges to InterPro (membership). |
 | MEROPS | `MeropsFamily` | Hierarchical (`Merops_family_is_a_merops_family`); families roll up into clans. Edge-level `call_class` (`peptidase` / `inhibitor` / `nonpeptidase_homolog`) distinguishes an active peptidase call, a peptidase-inhibitor family, and a catalytically-dead homolog. Bridges to Pfam (composition). |
 
+Each ontology has its own reference page at `docs://ontologies/{key}`
+(`key` = the `ontology=` value: `go_bp`, `kegg`, `tcdb`, `merops`, ...) —
+what it is, how genes get annotated, identifier form, hierarchy, the
+registry row (labels, edges, trust axes, bridges), node properties,
+controlled vocabularies, interpretation and pitfalls. The index is
+`docs://ontologies/index`. Term-side tools: `search_ontology` (browse or
+search terms, one or many ontologies) and `ontology_term_details` (batch
+term IDs → parents, children, bridges, counts).
+
 Fourteen of the seventeen carry a gene-edge **annotation-trust surface** —
 `sources[]`, an `evidence` ladder (`curated > signature > homology >
 family_inferred > domain_inferred`), and (on a subset) `evidence_score` /

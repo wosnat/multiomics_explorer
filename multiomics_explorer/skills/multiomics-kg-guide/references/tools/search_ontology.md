@@ -2,47 +2,69 @@
 
 ## What it does
 
-Search ontology terms by text — Lucene over term names only (no hierarchy traversal).
+Search or browse ontology terms — Lucene over term names (search) or a gene_count-sorted listing (browse); no hierarchy traversal.
 
-Returns term IDs and `level` for use with `genes_by_ontology`. Supports
-fuzzy (~), wildcards (*), exact phrases ("..."), boolean (AND, OR) —
-see docs://guide/conventions for syntax + scoring.
+Returns term IDs and `level` for use with `genes_by_ontology`. With
+`search_text`, supports fuzzy (~), wildcards (*), exact phrases ("..."),
+boolean (AND, OR) — see docs://guide/conventions for syntax + scoring.
+Without `search_text` (browse), rows sort by `gene_count DESC`; narrow
+with `level`, `tree`/`interpro_type`, `min_gene_count`, `organism`.
+
+`ontology` accepts one key, a list, or None (all 17). `limit`/`offset`
+apply PER ontology (lockstep paging); rows are grouped by ontology in
+registry order, then score DESC (search) / gene_count DESC (browse).
+`by_ontology` carries per-ontology truncation.
 
 [TRUST] `interpro_type` scopes InterPro terms to one entry type. See
-docs://analysis/annotation_evidence for the full trust surface.
+docs://analysis/annotation_evidence for the full trust surface, and
+docs://ontologies/{key} for what each ontology means and how to read it.
 
-Routing: chain term_ids into `genes_by_ontology` for gene discovery.
+Routing: chain term_ids into `genes_by_ontology` for gene discovery;
+`ontology_term_details(term_ids=[...])` for a term's hierarchy, bridges
+and per-organism counts; `docs://ontologies/index` for the per-ontology
+reference.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| search_text | string | — | Lucene query over term names. E.g. 'replication', 'oxido*', 'transport AND membrane'. See docs://guide/conventions for Lucene scoring. |
-| ontology | string | — | Ontology to search: 'go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops'. |
+| search_text | string \| None | None | Lucene query over term names, e.g. 'replication', 'oxido*', 'transport AND membrane'. None/'' = browse mode: list terms sorted by gene_count DESC (score null). See docs://guide/conventions for Lucene scoring. |
+| ontology | list[string] \| None | None | Ontology key or list: go_bp, go_mf, go_cc, kegg, ec, cog_category, cyanorak_role, tigr_role, pfam, brite, tcdb, cazy, subcellular_localization, signal_peptide_type, interpro, ncbifam, merops. None = all 17. limit/offset apply per ontology. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
-| limit | int | 5 | Max results. |
-| offset | int | 0 | Number of results to skip for pagination. |
+| limit | int | 5 | Max results per ontology (returned <= limit x n_ontologies). |
+| offset | int | 0 | Number of results to skip per ontology (lockstep paging). |
 | level | int \| None | None | Hierarchy level filter (0 = broadest). See docs://guide/conventions for the level convention. |
-| tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
+| tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Applies to 'brite' only; raises if 'brite' is not in the ontology set. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' go:0008150). Term-side filter only — never restricts the gene set. Default False (opt-in). |
-| verbose | bool | False | Include the per-row discussed_in_publications {doi, prominence, evidence} list (KEGG pathways only). Default compact. |
-| interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type. Only valid when ontology='interpro'. |
+| verbose | bool | False | Add description, level_kind, direct_gene_count, per-ontology term columns (tcdb superfamily/metabolite_count, ncbifam family_type/gene_symbol, merops family_class/catalytic_type/peptidase_gene_count) and KEGG discussed_in_publications. Default compact. |
+| interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type. Applies to 'interpro' only; raises if 'interpro' is not in the set. |
+| min_gene_count | int \| None | None | Keep terms with gene_count >= this (organism_gene_count when `organism` is set). Narrows browse mode. |
+| organism | string \| None | None | Organism preferred_name to scope counts to; rows gain organism_gene_count and browse sorts by it. Default: all organisms. |
+
+**Discovery:** use `list_organisms` for valid organism names.
 
 ## Response format
 
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, score_max, score_median, returned, offset, truncated, results
+mode, total_entries, total_matching, score_max, score_median, returned, offset, truncated, by_ontology, by_level, by_interpro_type, by_family_type, skipped_ontologies, warnings, results
 ```
 
-- **total_entries** (int): Total terms in this ontology (e.g. 847)
-- **total_matching** (int): Terms matching the search (e.g. 31)
-- **score_max** (float | None): Highest relevance score (null if 0 matches, e.g. 5.23)
-- **score_median** (float | None): Median relevance score (null if 0 matches, e.g. 2.1)
-- **returned** (int): Results in this response (0 when summary=true)
-- **offset** (int): Offset into full result set (e.g. 0)
-- **truncated** (bool): True if total_matching > returned
+- **mode** (string ('search', 'browse')): 'search' (Lucene over search_text) or 'browse' (no search_text; sorted by gene_count).
+- **total_entries** (int): Total terms in the selected ontologies (e.g. 847; summed over the set)
+- **total_matching** (int): Terms matching the search (e.g. 31; summed over the set)
+- **score_max** (float | None): Highest relevance score (null if 0 matches or browse, e.g. 5.23)
+- **score_median** (float | None): Median relevance score (null if 0 matches or browse, e.g. 2.1)
+- **returned** (int): Results in this response (0 when summary=true; <= limit x n_ontologies)
+- **offset** (int): Offset into each ontology's result set (lockstep paging, e.g. 0)
+- **truncated** (bool): True if any selected ontology has more matches than returned
+- **by_ontology** (list[SearchOntologyByOntology]): Per-ontology totals + truncation flags, in ONTOLOGY_CONFIG order.
+- **by_level** (list[SearchOntologyLevelBreakdown]): Terms per hierarchy level over the full match (browse mode only).
+- **by_interpro_type** (list[SearchOntologyInterproTypeBreakdown]): Matching InterPro terms per entry type (only when 'interpro' is in the set).
+- **by_family_type** (list[SearchOntologyFamilyTypeBreakdown]): Matching NCBIfam terms per family type (only when 'ncbifam' is in the set).
+- **skipped_ontologies** (list[string]): Ontologies in the set skipped because a filter does not apply to them.
+- **warnings** (list[string]): Auto-warnings, e.g. browse truncated with no narrowing filter.
 
 ### Per-result fields
 
@@ -50,31 +72,45 @@ total_entries, total_matching, score_max, score_median, returned, offset, trunca
 |---|---|---|
 | id | string | Term ID (e.g. 'go:0006260') |
 | name | string | Term name (e.g. 'DNA replication') |
-| score | float | Fulltext relevance score (e.g. 5.23) |
+| ontology_type | string \| None (optional) | Ontology key this row came from (e.g. 'go_bp', 'tcdb'); set on every compact row, single- or multi-ontology. |
+| score | float \| None (optional) | Fulltext relevance score (e.g. 5.23); null in browse mode (no search_text). |
 | level | int | Hierarchy level of this term (0 = broadest) |
 | is_informative | bool | True iff term is not flagged is_uninformative (positive framing; coerced from sparse '<term>.is_uninformative' KG flag) |
 | tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
 | tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
+| interpro_type | string \| None (optional) | InterPro entry type (sparse: interpro only), e.g. 'DOMAIN', 'FAMILY', 'HOMOLOGOUS_SUPERFAMILY'. |
 | discussed_by_n_publications | int \| None (optional) | Publications that discuss this KEGG pathway in prose (KEGG only; None on other ontologies). Recall-biased narrative mention, NOT gene annotation. When > 0, set verbose=True for the per-paper DOI list, or call discussed_by_publication. |
 | gene_count | int \| None (optional) | Subtree gene count on this term (precomputed Node.gene_count; sparse until every ontology's builder emits it). |
 | organism_count | int \| None (optional) | Distinct organisms reaching this term (precomputed Node.organism_count; sparse until every ontology's builder emits it). |
+| organism_gene_count | int \| None (optional) | Genes directly annotated to this term in the requested `organism` (only when organism is set; browse sorts by it). |
 
 **Verbose-only fields** (included when `verbose=True`):
 
 | Field | Type | Description |
 |---|---|---|
 | discussed_in_publications | list[DiscussedPublicationRef] \| None (optional) | Per-paper {doi, prominence, evidence} for papers discussing this KEGG pathway (verbose-only; KEGG only). Call discussed_by_publication for a paper's full discussed set. |
+| description | string \| None (optional) | Term description / definition (verbose only; sparse). |
+| level_kind | string \| None (optional) | What `level` measures for this ontology, e.g. 'depth', 'tc_family' (verbose only). |
+| direct_gene_count | int \| None (optional) | Genes annotated directly to this term, excluding descendants (verbose only; hierarchical ontologies). |
+| superfamily | string \| None (optional) | TCDB superfamily label (verbose only; sparse: tcdb). |
+| metabolite_count | int \| None (optional) | Distinct substrate metabolites attached to this TCDB family (verbose only; sparse: tcdb). |
+| family_type | string \| None (optional) | NCBIfam family type, e.g. 'equivalog', 'subfamily' (verbose only; sparse: ncbifam). |
+| gene_symbol | string \| None (optional) | NCBIfam gene symbol (verbose only; sparse: ncbifam). |
+| family_class | string \| None (optional) | MEROPS family class letter, e.g. 'S' (verbose only; sparse: merops). |
+| catalytic_type | string \| None (optional) | MEROPS catalytic type, e.g. 'Serine' (verbose only; sparse: merops). |
+| peptidase_gene_count | int \| None (optional) | Genes with a 'peptidase' call_class on this MEROPS family (verbose only; sparse: merops). |
 
 ## Few-shot examples
 
 ### Example 1: Search GO biological processes
 
 ```example-call
-search_ontology(search_text="replication", ontology="go_bp")
+search_ontology(search_text="replication", ontology=["go_bp"])
 ```
 
 ```example-response
 {
+  "mode": "search",
   "total_entries": 2448,
   "total_matching": 31,
   "score_max": 2.48,
@@ -82,296 +118,350 @@ search_ontology(search_text="replication", ontology="go_bp")
   "returned": 5,
   "truncated": true,
   "offset": 0,
+  "by_ontology": [{"ontology": "go_bp", "total_entries": 2448, "total_matching": 31, "score_max": 2.48, "returned": 5, "truncated": true}],
+  "skipped_ontologies": [],
+  "warnings": [],
   "results": [
-    {"id": "go:0006260", "name": "DNA replication", "score": 2.48},
-    {"id": "go:0006261", "name": "DNA-templated DNA replication", "score": 2.41},
+    {"id": "go:0006260", "name": "DNA replication", "score": 2.48, "level": 4, "ontology_type": "go_bp", "gene_count": 1290, "organism_count": 42},
+    {"id": "go:0006261", "name": "DNA-templated DNA replication", "score": 2.41, "level": 5, "ontology_type": "go_bp", "gene_count": 640, "organism_count": 42},
     ...
   ]
 }
 ```
 
-### Example 2: Summary only (how many terms match?)
+### Example 2: Browse mode — MEROPS families ranked by size (no search_text)
 
 ```example-call
-search_ontology(search_text="transport", ontology="go_bp", summary=True)
-```
-
-### Example 3: BRITE search scoped to a specific tree
-
-```example-call
-search_ontology(search_text="transport", ontology="brite", tree="transporters")
+search_ontology(ontology=["merops"], level=1)
 ```
 
 ```example-response
+# Omit search_text to browse: every term of the ontology, sorted
+# gene_count DESC then id, score null, envelope mode='browse' with
+# by_level over the full match. level / min_gene_count / organism /
+# informative_only / facets narrow it.
 {
-  "total_entries": 84,
-  "total_matching": 12,
-  "score_max": 3.1,
-  "score_median": 2.0,
+  "mode": "browse",
+  "total_entries": 155,
+  "total_matching": 97,
+  "score_max": null,
   "returned": 5,
   "truncated": true,
   "offset": 0,
+  "by_level": [{"level": 1, "count": 97}],
+  "by_ontology": [{"ontology": "merops", "total_entries": 155, "total_matching": 97, "score_max": null, "returned": 5, "truncated": true}],
+  "warnings": [],
   "results": [
-    {"id": "brite:B99001", "name": "ABC transporters", "score": 3.1, "level": 1, "tree": "transporters", "tree_code": "ko02000"},
+    {"id": "merops.family:S33", "name": "prolyl aminopeptidase", "score": null, "level": 1, "ontology_type": "merops", "gene_count": 412, "organism_count": 42},
+    {"id": "merops.family:C44", "name": "glutamine-fructose-6-phosphate transaminase", "score": null, "level": 1, "ontology_type": "merops", "gene_count": 169, "organism_count": 42},
     ...
   ]
 }
 ```
 
-### Example 4: Filter search results by hierarchy level
+### Example 3: Browse per organism — which TCDB families are biggest in MED4
 
 ```example-call
-search_ontology(search_text="oxido*", ontology="kegg", level=2)
-```
-
-### Example 5: Find TCDB families that move sucrose
-
-```example-call
-search_ontology(search_text="sucrose", ontology="tcdb")
+search_ontology(ontology=["tcdb"], level=2, organism="MED4", min_gene_count=5)
 ```
 
 ```example-response
-{
-  "total_entries": 4844,
-  "total_matching": 6,
-  "score_max": 3.42,
-  "score_median": 2.10,
-  "returned": 5,
-  "truncated": true,
-  "offset": 0,
-  "results": [
-    {"id": "tcdb:2.A.1.5.3", "name": "Sucrose:H+ symporter", "score": 3.42, "level": 4},
-    ...
-  ]
-}
-```
-
-### Example 6: Browse CAZy glycoside hydrolase families
-
-```example-call
-search_ontology(search_text="GH13", ontology="cazy")
-```
-
-### Example 7: Search InterPro entries, scoped to one interpro_type
-
-```example-call
-search_ontology(search_text="P-loop", ontology="interpro", interpro_type="HOMOLOGOUS_SUPERFAMILY")
-```
-
-```example-response
-# Every ontology's compact row now carries `gene_count` / `organism_count`
-# (KG-wide, not organism-scoped) alongside the existing `id` / `name` /
-# `score`. `interpro_type` scopes InterPro search the way `tree` scopes
-# BRITE search — omit it and results mix all 8 InterPro types.
-{"total_entries": 6640, "total_matching": 3, "score_max": 2.9, "returned": 3, "truncated": false, "offset": 0,
- "results": [
-   {"id": "interpro:IPR027417", "name": "P-loop containing nucleoside triphosphate hydrolase", "score": 2.9, "level": 0, "ontology_type": "interpro", "interpro_type": "HOMOLOGOUS_SUPERFAMILY", "gene_count": 119, "organism_count": 1}
- ]}
-```
-
-### Example 8: Search NCBIfam families
-
-```example-call
-search_ontology(search_text="ABC transporter", ontology="ncbifam")
-```
-
-```example-response
-{"total_matching": 4, "results": [
-  {"id": "ncbifam:NF000812", "name": "ABC transporter ATP-binding protein", "score": 2.4, "level": 0, "ontology_type": "ncbifam", "gene_count": 41, "organism_count": 12}
+# organism= scopes the count: rows gain organism_gene_count, the sort
+# and min_gene_count apply to it (gene_count stays KG-wide).
+{"mode": "browse", "total_matching": 18, "results": [
+  {"id": "tcdb:3.A.1", "name": "ATP-binding Cassette (ABC) Superfamily", "score": null, "level": 2, "ontology_type": "tcdb", "gene_count": 4817, "organism_count": 42, "organism_gene_count": 66},
+  ...
 ]}
 ```
 
-### Example 9: Search MEROPS peptidase families
+### Example 4: One keyword across several ontologies (lockstep paging)
 
 ```example-call
-search_ontology(search_text="serine protease", ontology="merops")
+search_ontology(search_text="transport", ontology=["go_bp", "tcdb"], limit=5)
 ```
 
 ```example-response
-{"total_matching": 8, "results": [
+# limit / offset apply PER ontology: up to 5 go_bp rows then up to 5
+# tcdb rows (returned <= limit x n). Flat keys are sums / max across the
+# set; by_ontology carries the per-ontology truncation flags. Lucene
+# scores are per index — never rank a go_bp row against a tcdb row.
+{
+  "mode": "search",
+  "total_matching": 412,
+  "returned": 10,
+  "truncated": true,
+  "by_ontology": [
+    {"ontology": "go_bp", "total_entries": 2448, "total_matching": 260, "score_max": 3.9, "returned": 5, "truncated": true},
+    {"ontology": "tcdb", "total_entries": 1515, "total_matching": 152, "score_max": 3.1, "returned": 5, "truncated": true}
+  ],
+  "results": [
+    {"id": "go:0006810", "name": "transport", "score": 3.9, "level": 3, "ontology_type": "go_bp", "gene_count": 15838, "organism_count": 42},
+    ...,
+    {"id": "tcdb:3", "name": "Primary Active Transporters", "score": 3.1, "level": 0, "ontology_type": "tcdb", "gene_count": 12580, "organism_count": 42},
+    ...
+  ]
+}
+```
+
+### Example 5: Search every ontology at once (ontology omitted)
+
+```example-call
+search_ontology(search_text="nitrate", limit=2)
+```
+
+```example-response
+# ontology=None fans out over all 17 in registry order, 2 rows each at
+# most; ontologies with no hit contribute a by_ontology entry with
+# total_matching 0 and no rows.
+{"mode": "search", "returned": 14, "by_ontology": [{"ontology": "go_bp", "total_matching": 9, "returned": 2, "truncated": true}, "..."],
+ "results": [{"id": "go:0042128", "name": "nitrate assimilation", "ontology_type": "go_bp", "score": 3.4, "level": 5, "gene_count": 233, "organism_count": 44}, "..."]}
+```
+
+### Example 6: Summary only (how many terms match?)
+
+```example-call
+search_ontology(search_text="transport", ontology=["go_bp"], summary=True)
+```
+
+### Example 7: BRITE search scoped to a specific tree
+
+```example-call
+search_ontology(search_text="transport", ontology=["brite"], tree="transporters")
+```
+
+```example-response
+{
+  "mode": "search",
+  "total_entries": 84,
+  "total_matching": 12,
+  "score_max": 3.1,
+  "returned": 5,
+  "truncated": true,
+  "offset": 0,
+  "results": [
+    {"id": "kegg.brite:ko02000.A2", "name": "ABC transporters", "score": 3.1, "level": 1, "ontology_type": "brite", "tree": "transporters", "tree_code": "ko02000", "gene_count": 2210, "organism_count": 42},
+    ...
+  ]
+}
+```
+
+### Example 8: Filter search results by hierarchy level
+
+```example-call
+search_ontology(search_text="oxido*", ontology=["kegg"], level=2)
+```
+
+### Example 9: Find TCDB families that move sucrose
+
+```example-call
+search_ontology(search_text="sucrose", ontology=["tcdb"])
+```
+
+```example-response
+{
+  "mode": "search",
+  "total_matching": 6,
+  "score_max": 3.42,
+  "returned": 5,
+  "truncated": true,
+  "offset": 0,
+  "results": [
+    {"id": "tcdb:2.A.1.5.3", "name": "Sucrose:H+ symporter", "score": 3.42, "level": 4, "ontology_type": "tcdb", "gene_count": 3, "organism_count": 2},
+    ...
+  ]
+}
+```
+
+### Example 10: Search InterPro entries, scoped to one interpro_type
+
+```example-call
+search_ontology(search_text="P-loop", ontology=["interpro"], interpro_type="HOMOLOGOUS_SUPERFAMILY")
+```
+
+```example-response
+# interpro_type scopes InterPro the way tree scopes BRITE — omit it and
+# results mix all 8 InterPro types, which size very differently. The
+# envelope adds by_interpro_type whenever interpro is in the set.
+{"mode": "search", "total_matching": 3, "by_interpro_type": [{"interpro_type": "HOMOLOGOUS_SUPERFAMILY", "count": 3}],
+ "results": [
+   {"id": "interpro:IPR027417", "name": "P-loop containing nucleoside triphosphate hydrolase", "score": 2.9, "level": 0, "ontology_type": "interpro", "interpro_type": "HOMOLOGOUS_SUPERFAMILY", "gene_count": 6909, "organism_count": 42}
+ ]}
+```
+
+### Example 11: Browse NCBIfam families with their family_type (verbose)
+
+```example-call
+search_ontology(ontology=["ncbifam"], min_gene_count=300, verbose=True)
+```
+
+```example-response
+# verbose adds description, level_kind, direct_gene_count (hierarchical
+# labels only) and the ontology's term-level extras — ncbifam
+# family_type + gene_symbol, tcdb superfamily + metabolite_count,
+# merops family_class + catalytic_type + peptidase_gene_count.
+{"mode": "browse", "by_family_type": [{"family_type": "equivalog", "count": 4}, {"family_type": "subfamily", "count": 2}],
+ "results": [
+   {"id": "ncbifam:TIGR00254", "name": "diguanylate cyclase", "score": null, "level": 0, "ontology_type": "ncbifam", "gene_count": 696, "organism_count": 20,
+    "description": "...", "family_type": "subfamily", "gene_symbol": null}
+ ]}
+```
+
+### Example 12: Search MEROPS peptidase families
+
+```example-call
+search_ontology(search_text="serine protease", ontology=["merops"])
+```
+
+```example-response
+{"mode": "search", "total_matching": 8, "results": [
   {"id": "merops.family:S14", "name": "Clp protease", "score": 3.0, "level": 1, "ontology_type": "merops", "gene_count": 125, "organism_count": 41}
 ]}
 ```
 
-### Example 10: Find PSORTb subcellular localizations
+### Example 13: Find PSORTb subcellular localizations
 
 ```example-call
-search_ontology(search_text="outer", ontology="subcellular_localization")
+search_ontology(search_text="outer", ontology=["subcellular_localization"])
 ```
 
 ```example-response
 {
+  "mode": "search",
   "total_entries": 5,
   "total_matching": 1,
-  "score_max": 2.42,
-  "score_median": 2.42,
   "returned": 1,
   "truncated": false,
   "offset": 0,
   "results": [
-    {"id": "psortb_OuterMembrane", "name": "Outer membrane",
-     "score": 2.42, "level": 0}
+    {"id": "psortb_OuterMembrane", "name": "Outer membrane", "score": 2.42, "level": 0, "ontology_type": "subcellular_localization", "gene_count": 2087, "organism_count": 42}
   ]
 }
 ```
 
-### Example 11: Find SignalP lipoprotein signal-peptide types
+### Example 14: Filter out uninformative terms (term-side, opt-in)
 
 ```example-call
-search_ontology(search_text="lipo", ontology="signal_peptide_type")
+search_ontology(search_text="transport", ontology=["kegg"], informative_only=True)
 ```
 
 ```example-response
-{
-  "total_entries": 5,
-  "total_matching": 2,
-  "score_max": 3.1,
-  "score_median": 2.6,
-  "returned": 2,
-  "truncated": false,
-  "offset": 0,
-  "results": [
-    {"id": "signalp_LIPO", "name": "Lipoprotein signal peptide (Sec/SPII)",
-     "score": 3.1, "level": 0},
-    {"id": "signalp_TATLIPO", "name": "TAT lipoprotein signal peptide (Tat/SPII)",
-     "score": 2.6, "level": 0}
-  ]
-}
+# informative_only=True drops terms flagged is_uninformative='true'
+# (catch-all KEGG maps and KO groups, a few Cyanorak / TIGR / GO / COG
+# entries, broad InterPro superfamilies, broad NCBIfam families). Each
+# row carries is_informative. Use it when seeding term IDs into
+# genes_by_ontology for enrichment.
+{"mode": "search", "total_matching": 22, "results": [
+  {"id": "kegg:K02035", "name": "ABC.PE.S; peptide/nickel transport system substrate-binding protein", "score": 2.81, "level": 3, "ontology_type": "kegg", "is_informative": true, "gene_count": 304, "organism_count": 46}
+]}
 ```
 
-### Example 12: Filter out uninformative terms (term-side, opt-in)
+### Example 15: Which papers discuss a KEGG pathway (literature index)
 
 ```example-call
-search_ontology(search_text="transport", ontology="kegg", informative_only=True)
-```
-
-```example-response
-# `informative_only=True` drops terms flagged `is_uninformative='true'`
-# (~224 sparsely-flagged terms genome-wide, mostly KEGG catch-all
-# modules + a handful of Cyanorak / TIGR / GO / COG entries — Pfam is
-# not flagged in the current KG). Each result row carries
-# `is_informative: bool` (always populated). Use this when seeding
-# term IDs into `genes_by_ontology` for enrichment so catch-all KEGG
-# buckets don't dominate the term set.
-{
-  "total_entries": 18000,
-  "total_matching": 22,
-  "results": [
-    {"id": "kegg:K02035", "name": "ABC.PE.S; peptide/nickel transport system substrate-binding protein", "score": 2.81, "level": 3, "is_informative": true}
-  ]
-}
-```
-
-### Example 13: Which papers discuss a KEGG pathway (literature index)
-
-```example-call
-search_ontology(search_text="calvin", ontology="kegg")
+search_ontology(search_text="calvin", ontology=["kegg"])
 ```
 
 ```example-response
 # KEGG terms carry discussed_by_n_publications — how many publications
-# name the pathway in prose. This column is present ONLY for the kegg
-# ontology; other ontologies omit it (no per-row subquery is paid).
-# Pass verbose=True to expand the list of {doi, prominence, evidence}.
-{
-  "total_matching": 3,
-  "score_max": 3.2,
-  "score_median": 2.4,
-  "returned": 3,
-  "truncated": false,
-  "offset": 0,
-  "results": [
-    {"id": "kegg.pathway:ko00710", "name": "Carbon fixation by Calvin cycle", "score": 3.2, "level": 2, "discussed_by_n_publications": 19}
-  ]
-}
+# name the pathway in prose. Present ONLY for kegg; other ontologies
+# omit it. verbose=True expands the {doi, prominence, evidence} list.
+{"mode": "search", "total_matching": 3, "results": [
+  {"id": "kegg.pathway:ko00710", "name": "Carbon fixation by Calvin cycle", "score": 3.2, "level": 2, "ontology_type": "kegg", "gene_count": 1210, "organism_count": 42, "discussed_by_n_publications": 19}
+]}
 ```
 
-### Example 14: Read the discussing-paper DOIs for a KEGG term (verbose)
-
-```example-call
-search_ontology(search_text="glycolysis", ontology="kegg", verbose=True)
-```
-
-```example-response
-# verbose adds discussed_in_publications — the per-term list of
-# {doi, prominence, evidence}. Pathways fan out more than genes
-# (e.g. ko00710 → 19 papers, ko00010 → 4).
-{"total_matching": 1, "returned": 1, "truncated": false, "offset": 0,
- "results": [
-   {"id": "kegg.pathway:ko00010", "name": "Glycolysis / Gluconeogenesis", "score": 3.4, "level": 2, "discussed_by_n_publications": 4,
-    "discussed_in_publications": [{"doi": "10.1038/ismej.2016.70", "prominence": "peripheral", "evidence": "...glycolytic genes..."}]}
- ]}
-```
-
-### Example 15: From search to gene discovery
+### Example 16: From search to gene discovery
 
 ```
-Step 1: search_ontology(search_text="replication", ontology="go_bp")
+Step 1: search_ontology(search_text="replication", ontology=["go_bp"])
         → collect term IDs from results (e.g. "go:0006260")
 
-Step 2: genes_by_ontology(ontology="go_bp", organism="MED4", term_ids=["go:0006260"])
-        → find (gene × term) pairs annotated to these terms in MED4
-        (with hierarchy expansion DOWN). Single organism is required.
+Step 2: ontology_term_details(term_ids=["go:0006260"])
+        → parents / children / gene_count per organism — confirm the term
+          sits at the right granularity before expanding it
 
-Step 3: gene_overview(locus_tags=["PMM0845", ...])
-        → check data availability for discovered genes
+Step 3: genes_by_ontology(ontology="go_bp", organism="MED4", term_ids=["go:0006260"])
+        → (gene × term) pairs in MED4 (hierarchy expansion DOWN)
+
+Step 4: gene_overview(locus_tags=["PMM0845", ...])
+        → data availability for the discovered genes
+```
+
+### Example 17: Browse → pick a level → enrich
+
+```
+Step 1: search_ontology(ontology=["cyanorak_role"], level=1, organism="MED4")
+        → the level-1 roles ranked by MED4 gene count (no keyword needed)
+
+Step 2: ontology_landscape(ontology=["cyanorak_role"], organism="MED4")
+        → confirm level 1 has usable coverage / term sizes
+
+Step 3: pathway_enrichment(organism="MED4", experiment_ids=["EXP042"], ontology="cyanorak_role", level=1)
 ```
 
 ## Chaining patterns
 
 ```
+search_ontology → ontology_term_details(term_ids=[...]) — inspect the hits' parents / children / bridges before expanding
 search_ontology → genes_by_ontology
 search_ontology → genes_by_ontology → gene_overview
-list_filter_values('brite_tree') → search_ontology(ontology='brite', tree=...)
-search_ontology(ontology='kegg', verbose=True) → read per-term discussed_in_publications DOIs → list_publications(publication_dois=[...]) for paper metadata, or discussed_by_publication(publication_dois=[...]) for the paper's full discussed set
-search_ontology(ontology='interpro'|'ncbifam'|'merops', search_text=...) → genes_by_ontology(ontology=..., term_ids=[...], organism=...) — same forward chain as the other 14 ontologies
+search_ontology(ontology=[key], level=N) (browse) → ontology_landscape(ontology=[key]) → pathway_enrichment(ontology=key, level=N)
+list_filter_values('brite_tree') → search_ontology(ontology=['brite'], tree=...)
+search_ontology(ontology=['kegg'], verbose=True) → read per-term discussed_in_publications DOIs → list_publications(publication_dois=[...]) or discussed_by_publication(publication_dois=[...])
+search_ontology(ontology=['interpro'], interpro_type=...) / ['ncbifam'] / ['merops'] → genes_by_ontology(ontology=..., term_ids=[...], organism=...) — same forward chain as the other 14 ontologies
 ```
 
 ## Common mistakes
 
-- search_ontology finds term IDs — use genes_by_ontology to find (gene × term) pairs annotated to those terms (single organism required, hierarchy expanded DOWN by default)
+- search_ontology finds term IDs — use genes_by_ontology to find (gene × term) pairs annotated to those terms (single organism required, hierarchy expanded DOWN by default), and ontology_term_details for a term's parents / children / bridges. Neither search nor browse traverses the hierarchy.
 
-- This tool searches term names only — it does not traverse the ontology hierarchy
+- `ontology` is a list (a single string is accepted); omit it to fan out over all 17 in registry order. `limit` / `offset` apply PER ontology (lockstep paging — `returned <= limit x n`); read `by_ontology[].truncated` to see which ontology still has pages. See docs://guide/conventions.
 
-- For brite: term IDs look like 'brite:ko00001' (tree root) or 'brite:K00001' (leaf KO). BRITE trees mix functional and taxonomic hierarchies — confirm the tree context before using term IDs in genes_by_ontology.
+- Browse mode (no `search_text`) sorts by `gene_count DESC, id` and leaves `score` null; a browse that truncates with no `level` / facet / `min_gene_count` / `organism` filter adds a warning — you are paging through a whole ontology. Narrow first.
 
-- Use `level` to restrict results to a specific hierarchy depth (0 = broadest). Use `tree` to scope BRITE searches to a single tree (e.g. 'transporters'). Both filters are optional.
+- `organism=` (browse) changes what is sorted and filtered: rows gain `organism_gene_count`, `min_gene_count` applies to it, and `gene_count` stays KG-wide. Without `organism=`, `gene_count` / `organism_count` are counts across all organisms on the term node.
 
-- For BRITE, pass `tree=...` (e.g. `tree='transporters'`); without it, results are dominated by the largest BRITE tree (~1,776 enzyme entries at level 3) and rarely what's wanted. Discover trees via `list_filter_values('brite_tree')`.
+- Lucene scores are per index: rows of two ontologies in one call are grouped by ontology, not interleaved by score. Never rank a `go_bp` row against a `tcdb` row by `score`.
 
-- Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `kegg`, `ec`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`.
+- A facet (`tree` for BRITE, `interpro_type` for InterPro) narrows only its owner and raises when the owner is not in the ontology list. For BRITE, always pass `tree=` — without it the `enzymes` tree dominates. Discover trees via `list_filter_values('brite_tree')`.
 
-- Every row now carries `gene_count` and `organism_count` (KG-wide counts on the term node, not organism-scoped) plus `ontology_type` — use these to gauge term size before feeding an ID into `genes_by_ontology` or an enrichment call.
+- `interpro_type` scopes InterPro to one of the 8 types (`FAMILY`, `DOMAIN`, `HOMOLOGOUS_SUPERFAMILY`, `REPEAT`, `CONSERVED_SITE`, `ACTIVE_SITE`, `BINDING_SITE`, `PTM`); the envelope's `by_interpro_type` (and `by_family_type` for NCBIfam) shows the mix when you don't.
 
-- `interpro_type` scopes InterPro search results to one of the 8 types (`FAMILY`, `DOMAIN`, `HOMOLOGOUS_SUPERFAMILY`, `REPEAT`, `CONSERVED_SITE`, `ACTIVE_SITE`, `BINDING_SITE`, `PTM`), the same role `tree` plays for BRITE. Without it, InterPro results mix all 8 types, which size very differently.
+- Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `kegg`, `ec`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`. Each has a reference page at docs://ontologies/{key} (identifier form, levels, what `gene_count` means there).
 
-- This tool still requires `search_text` — a term-name Lucene search, one ontology at a time. It does not yet browse terms without a search string or fan out across multiple ontologies in one call.
+- Use `level` to restrict results to a hierarchy depth (0 = broadest). PSORTb, SignalP, COG, TIGR and NCBIfam are flat — `level=1` returns nothing for them. Pfam clans are level 0, domains level 1.
 
-- TCDB is family-level transporter classification (e.g. `tcdb:1.A.1` voltage-gated ion channels). For substrate-anchored questions ('which genes transport sucrose?'), chain via `genes_by_metabolite` instead — that tool surfaces the TCDB substrate edges directly. Use `search_ontology(ontology='tcdb')` for *family*-level browsing.
+- TCDB is family-level transporter classification. For substrate-anchored questions ('which genes transport sucrose?'), chain via `genes_by_metabolite` instead — that tool surfaces the TCDB substrate edges directly.
+
+- PSORTb / SignalP are structural ontologies (where a protein is / how it is handled), not functional — use them for localization / secretion questions.
+
+- discussed_by_n_publications (how many papers name the pathway in prose) is present only for `kegg`. It is a recall-biased literature index, NOT DE-table expression. verbose=True adds the per-term {doi, prominence, evidence} list; route DOIs into discussed_by_publication.
+
+- Use this to assemble a custom `term_ids=[...]` list for `pathway_enrichment` / `cluster_enrichment` when relevant terms live at different depths (GO is graph-shaped). See docs://analysis/enrichment.
 
 ```mistake
-search_ontology(search_text='PMM0845', ontology='go_bp')  # searching for a gene
+search_ontology(search_text='PMM0845', ontology=['go_bp'])  # searching for a gene
 ```
 
 ```correction
 resolve_gene(identifier='PMM0845')  # use resolve_gene for gene lookups
 ```
 
-- Use this to assemble a custom `term_ids=[...]` list for `pathway_enrichment` / `cluster_enrichment`. Both tools accept either `level=N` (test all terms at one hierarchy depth) or `term_ids=[...]` (test a specific set you chose). Custom term sets are useful when relevant terms live at different depths — e.g. in GO, a term at level 3 may be more specific than one at level 4 because GO is graph-shaped, not strictly tree-shaped. See `docs://analysis/enrichment`.
+```mistake
+search_ontology(search_text='*', ontology=['merops'])  # trying to list everything
+```
 
-- PSORTb and SignalP ontologies are **flat** (5 nodes each, single `level=0`). Don't pass `level=1` or higher — the search returns nothing because no terms exist at those levels.
-
-- PSORTb / SignalP are **structural** ontologies (where a gene's product is / how it's handled). Use them for localization / secretion questions, not for functional-annotation `genes_by_function`-style proxies.
-
-- discussed_by_n_publications (how many papers name the pathway in prose) is present only for ontology='kegg' — other ontologies omit it. It is a recall-biased literature index, NOT DE-table expression. Pass verbose=True for the per-term discussed_in_publications list of {doi, prominence, evidence}, then route DOIs into discussed_by_publication.
+```correction
+search_ontology(ontology=['merops'], level=1)  # browse mode: omit search_text, narrow with level
+```
 
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import search_ontology
 
-result = search_ontology(search_text=..., ontology=...)
-# returns dict with keys: total_entries, total_matching, score_max, score_median, offset, results
+result = search_ontology()
+# returns dict with keys: mode, total_entries, total_matching, score_max, score_median, offset, by_ontology, by_level, by_interpro_type, by_family_type, skipped_ontologies, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

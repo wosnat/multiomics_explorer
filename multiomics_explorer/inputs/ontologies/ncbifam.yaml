@@ -1,0 +1,76 @@
+# Human-authored reference for the ncbifam ontology
+# (docs://ontologies/ncbifam). Structural facts are merged in from
+# ONTOLOGY_CONFIG + schema baseline.
+
+what_it_is: |
+  NCBIfam — NCBI's curated protein-family HMM collection, which absorbed
+  and continues TIGRFAMs. Each family is an HMM with a curated name, a
+  `family_type` that states how much function the name implies
+  (`equivalog` = full-length, same function across members; `subfamily`,
+  `superfamily`, `domain`, `repeat`, `signature`, `paralog`,
+  `hypoth_equivalog`, `exception`, `PfamEq` / `PfamAutoEq`, ...) and, for
+  many, a `gene_symbol` (`nrtA`, `ntcA`). The best source of confident
+  *names* for bacterial proteins in the KG.
+
+method: |
+  Gene → family edges come from InterProScan's NCBIfam member library
+  (`sources=['interproscan']`, `evidence='signature'` — the HMM's trusted
+  cutoff was met). Verbose native detail carries `evalue`, `bit_score` and
+  the matched region (`start`, `end`); higher bit score is better, and it
+  is NCBIfam-internal. No `evidence_score`. Families bridge *out* to the
+  InterPro entry that integrates them (`Ncbifam_family_in_interpro_entry`,
+  membership).
+
+id_form: |
+  Two accession styles on one prefix: `ncbifam:NF000812` (NCBIfam-native)
+  and `ncbifam:TIGR00254` (legacy TIGRFAMs accessions kept by NCBIfam).
+  Node `ncbifam_id` holds the bare accession; `family_type` and
+  `gene_symbol` are term-level (verbose on `search_ontology`, compact on
+  `ontology_term_details`).
+
+hierarchy: |
+  Flat: every family is `level=0`, no hierarchy edges. `gene_count` /
+  `organism_count` are direct; no `direct_gene_count`. Family relationships
+  (a subfamily of a superfamily) exist only as `family_type` semantics, not
+  as edges — use the InterPro bridge for hierarchy.
+
+interpretation: |
+  Read `family_type` before trusting the name: `equivalog` (and
+  `equivalog_domain`) means every member shares the function, so the family
+  name can be used as the gene's function; `subfamily` / `superfamily` /
+  `domain` mean shared ancestry, not shared function; `hypoth_equivalog`
+  is a conserved hypothetical; `exception` marks a family whose name is a
+  deliberate carve-out; `retired` families are kept for provenance and
+  should not be reported. Rank competing hits on one gene by `bit_score`
+  (verbose). `gene_symbol` is the quickest way to answer "which gene is
+  ntcA in this genome".
+
+informativeness_rule: |
+  Broad `domain`, `superfamily` and `signature` families are flagged
+  uninformative and dropped by `informative_only=True`; `equivalog` families
+  are essentially never flagged. There is no `family_type` filter on the
+  tools — browse with `verbose=True` and filter client-side, or read
+  `family_type` on `ontology_term_details`.
+
+pitfalls: |
+  - The `TIGR` accessions are NCBIfam families, not TIGR *roles*
+    (`tigr_role` is a different, curated-role ontology).
+  - A `subfamily`/`superfamily` hit does not license the family name as the
+    gene's function; only `equivalog`-type families do.
+  - `bit_score` / `evalue` are verbose-only and never filterable.
+  - Flat: `level=1` returns nothing; hierarchy questions go through the
+    InterPro bridge.
+
+typical_questions:
+  - "Which equivalog-type NCBIfam families does MIT1002 carry that MED4 lacks?"
+  - "Which gene is `ntcA` in each Prochlorococcus genome, by NCBIfam gene symbol?"
+  - "Which InterPro entry integrates `ncbifam:NF000812`, and what other Pfam/NCBIfam signatures sit under it?"
+  - "Among genes up under nitrogen limitation, which named NCBIfam families recur?"
+
+see_also:
+  - docs://ontologies/interpro
+  - docs://ontologies/pfam
+  - docs://ontologies/tigr_role
+  - docs://analysis/annotation_evidence
+  - docs://tools/search_ontology
+  - docs://tools/ontology_term_details

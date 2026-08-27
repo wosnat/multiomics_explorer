@@ -1,0 +1,59 @@
+# Human-authored reference for the tigr_role ontology
+# (docs://ontologies/tigr_role). Structural facts are merged in from
+# ONTOLOGY_CONFIG + schema baseline.
+
+what_it_is: |
+  TIGR (JCVI) functional roles — the classic "main role / sub role" scheme
+  from TIGR genome annotation (`tigr.role:164` Energy metabolism /
+  Photosynthesis, `tigr.role:156` Hypothetical proteins / Conserved). In
+  this KG the roles arrive through Cyanorak's curation layer, which carries
+  a TIGR role alongside its own role for each gene cluster.
+
+method: |
+  All edges are `evidence='curated'`, `sources=['cyanorak']` — the TIGR role
+  Cyanorak curators attached to the ortholog cluster. Same coverage boundary
+  as `cyanorak_role`: only Cyanorak-covered picocyanobacteria carry TIGR
+  roles; Alteromonas genes have none. No `evidence_score`.
+
+id_form: |
+  `tigr.role:164` — prefix plus the TIGR role numeric ID; node `code` is the
+  bare number, `name` the "Main role / Sub role" string.
+
+hierarchy: |
+  Flat in the KG: every node is `level=0`, no hierarchy edges. The main-role
+  / sub-role pairing lives inside `name`, not as a parent–child edge, so
+  there is no rollup from sub role to main role. `gene_count` /
+  `organism_count` are direct.
+
+interpretation: |
+  A second curated, picocyanobacteria-scoped functional axis, at roughly the
+  granularity of a Cyanorak level-1 role but with different boundaries
+  (TIGR splits energy metabolism finely, lumps regulation). Useful as a
+  cross-check on a Cyanorak enrichment, or when a question is phrased in
+  TIGR vocabulary. Same organism-coverage caveat as Cyanorak.
+
+informativeness_rule: |
+  The hypothetical / unknown-function roles (`tigr.role:156` and sibling
+  "Unknown function" entries) are flagged uninformative and dropped by
+  `informative_only=True`.
+
+pitfalls: |
+  - Flat: `level=1` returns nothing; to group by main role, split `name` on
+    ` / ` client-side.
+  - Coverage bounded to Cyanorak-covered organisms — check
+    `genome_coverage` in `ontology_landscape` before enriching a mixed
+    organism set.
+  - Roles are broad (a hundred-odd nodes for a whole genome); use them for
+    composition and coarse enrichment, not gene-level function.
+
+typical_questions:
+  - "Which TIGR sub roles are enriched among genes down at night in the diel experiment?"
+  - "How many MED4 genes fall under each TIGR main role?"
+  - "Does the TIGR role agree with the Cyanorak role for this gene set?"
+
+see_also:
+  - docs://ontologies/cyanorak_role
+  - docs://ontologies/cog_category
+  - docs://analysis/enrichment
+  - docs://tools/ontology_landscape
+  - docs://tools/ontology_term_details

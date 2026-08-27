@@ -89,6 +89,12 @@ level with hierarchy expansion. Pass the result through `to_dataframe` and feed 
 `fisher_ora` — no manual column renaming required. Any DataFrame with `term_id`, `term_name`,
 and `locus_tag` columns also works (clusterProfiler TERM2GENE frames, hand-curated CSVs, etc.).
 
+Not sure what a given ontology's levels, identifiers or `gene_count` mean before you pick one?
+Each has a reference page at `docs://ontologies/{key}` (index: `docs://ontologies/index`) with
+its hierarchy, informativeness rule and enrichment pitfalls. To inspect a specific term that
+comes out enriched — its parents, children and what it is built from — use
+`ontology_term_details(term_ids=[...])`.
+
 ---
 
 ## 3. Code example — choosing ontology and level with `ontology_landscape`

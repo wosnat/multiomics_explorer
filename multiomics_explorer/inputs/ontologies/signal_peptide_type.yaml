@@ -1,0 +1,61 @@
+# Human-authored reference for the signal_peptide_type ontology
+# (docs://ontologies/signal_peptide_type). Structural facts are merged in
+# from ONTOLOGY_CONFIG + schema baseline.
+
+what_it_is: |
+  SignalP predicted signal-peptide type — a *structural* ontology of five
+  N-terminal signal classes: `signalp_SP` (Sec/SPI, classic secretory),
+  `signalp_LIPO` (Sec/SPII, lipoprotein), `signalp_TAT` (Tat/SPI, folded
+  export), `signalp_TATLIPO` (Tat/SPII) and `signalp_PILIN` (Sec/SPIII,
+  type IV pilin-like). It says how a protein is handled at the membrane
+  during export, not where it ends up or what it does.
+
+method: |
+  SignalP (v6-style multi-class prediction) assigns each protein the most
+  probable signal class with a `probability` on [0, 1]; proteins predicted
+  to have no signal peptide carry no edge. Where a cleavage site is
+  predicted the edge also carries `cleavage_site` (residue position) and
+  `cleavage_probability`. All three are verbose-only, under the names
+  `signal_peptide_probability`, `signal_peptide_cleavage_site`,
+  `signal_peptide_cleavage_probability`. No trust axes — trust filters
+  raise for this ontology.
+
+id_form: |
+  `signalp_SP` — the `signalp_` prefix plus the SignalP class name in upper
+  case; node `signalp_id` holds the same string.
+
+hierarchy: |
+  Flat: five nodes, all `level=0`, no hierarchy edges. `gene_count` /
+  `organism_count` are direct; one edge per gene at most.
+
+interpretation: |
+  The natural companion to PSORTb and to the exoproteome / vesicle
+  compartments: a signal peptide plus an envelope PSORTb call is strong
+  evidence of a secreted or surface protein; `LIPO` marks lipoproteins
+  (surface-anchored, vesicle-enriched); `TAT` marks proteins exported
+  folded, often cofactor-containing. Probability is SignalP-internal —
+  rank within the ontology, never threshold across ontologies.
+
+informativeness_rule: |
+  Nothing is flagged; five terms. `signalp_SP` is by far the largest class
+  and behaves as the catch-all in any enrichment.
+
+pitfalls: |
+  - Absence of an edge means "no signal peptide predicted", which is
+    itself a call — but it is not represented as a term.
+  - `level=1` returns nothing (flat).
+  - Signal-peptide type is not localization: a `SP` protein may be
+    periplasmic, outer-membrane or extracellular — read PSORTb for that.
+  - Cleavage fields are sparse (absent where SignalP reports no site).
+
+typical_questions:
+  - "Which MIT1002 genes up in coculture carry a Tat signal peptide?"
+  - "How many predicted lipoproteins does each organism have, and are they enriched in the vesicle proteome?"
+  - "Which secreted-protein candidates (SP + PSORTb extracellular) respond to nitrogen limitation?"
+
+see_also:
+  - docs://ontologies/subcellular_localization
+  - docs://ontologies/go_cc
+  - docs://guide/concepts
+  - docs://tools/gene_ontology_terms
+  - docs://tools/ontology_term_details

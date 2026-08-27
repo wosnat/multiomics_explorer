@@ -1,0 +1,61 @@
+# Human-authored reference for the cog_category ontology
+# (docs://ontologies/cog_category). Structural facts are merged in from
+# ONTOLOGY_CONFIG + schema baseline.
+
+what_it_is: |
+  COG functional categories — the 26 single-letter classes of the Clusters
+  of Orthologous Groups system (`cog.category:E` amino acid transport and
+  metabolism, `cog.category:J` translation, `cog.category:S` function
+  unknown). The coarsest functional partition in the KG: every gene lands
+  in one or a few letters, which makes it the quickest whole-genome
+  composition view and the weakest enrichment axis.
+
+method: |
+  Assigned by eggNOG-mapper from the gene's orthologous group
+  (`sources=['eggnog']`, `evidence='family_inferred'` on every edge). A gene
+  can carry several letters when its group is multi-category. No curated
+  rung, no `evidence_score` — the trust surface is uniform, so filters on
+  `sources`/`evidence` do not separate anything.
+
+id_form: |
+  `cog.category:E` — prefix plus the single capital letter; node `code`
+  holds the bare letter, `name` the category description.
+
+hierarchy: |
+  Flat: 26 nodes, all `level=0`, no hierarchy edges, nothing to expand.
+  `gene_count` / `organism_count` are direct (no `direct_gene_count` — it
+  would equal `gene_count`).
+
+interpretation: |
+  Use for genome-level composition ("what fraction of the genome is
+  informational vs metabolic") and for a first-pass enrichment when the
+  gene set is small and any finer ontology would fail `min_gene_set_size`.
+  Category `S` (function unknown) and `R` (general function prediction
+  only) are the "we don't know" bins; a gene set enriched in `S` is a set
+  of poorly annotated genes, not a biological signal.
+
+informativeness_rule: |
+  `cog.category:S` (function unknown) is flagged uninformative and dropped
+  by `informative_only=True`. `R` is not flagged but carries the same
+  caveat.
+
+pitfalls: |
+  - Only 26 terms — an enrichment run over COG gives at most 26 tests and
+    nearly every category is a large gene set; expect broad, low-resolution
+    results.
+  - `level` is always 0; passing `level=1` returns nothing.
+  - Multi-letter genes contribute to several categories, so category
+    `gene_count`s overlap.
+
+typical_questions:
+  - "What is the COG category composition of MED4 vs MIT9313?"
+  - "Which COG categories are over-represented in the darkness-responsive cluster?"
+  - "How many genes in this organism have no functional category beyond `S`?"
+
+see_also:
+  - docs://ontologies/kegg
+  - docs://ontologies/cyanorak_role
+  - docs://ontologies/tigr_role
+  - docs://analysis/enrichment
+  - docs://tools/genes_by_ontology
+  - docs://tools/ontology_term_details

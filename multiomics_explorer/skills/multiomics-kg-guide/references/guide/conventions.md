@@ -1,6 +1,6 @@
 # Cross-tool conventions
 
-Patterns that hold across most or all 41 tools. If you've read a single
+Patterns that hold across most or all 42 tools. If you've read a single
 tool's doc, these are the things you'd otherwise have to re-learn each
 time you read another.
 
@@ -44,7 +44,7 @@ most tools) and `offset`.
 
 ### `summary=True` mode
 
-**34 of 41 tools accept `summary=True`** — nearly universal across
+**34 of 42 tools accept `summary=True`** — nearly universal across
 discovery, drill-down, gene-anchored, ontology, and enrichment surfaces.
 With `summary=True` the call returns only the envelope (`results=[]`,
 `returned=0`, `truncated=true`). Use this as the **first call** for
@@ -52,7 +52,7 @@ any question that doesn't already specify exact IDs — the rollups
 characterize the full matched set before you commit to a slice.
 Pattern: `summary=True` → narrow filters → drop `summary=True` for detail.
 
-The 7 tools without `summary=`: `kg_schema`, `kg_release_info`,
+The 8 tools without `summary=`: `kg_schema`, `kg_release_info`, `ontology_term_details`,
 `list_filter_values`, `resolve_gene`, `list_publications`,
 `gene_response_profile`, `run_cypher`. These either return small fixed
 sets, are themselves
@@ -416,6 +416,45 @@ sets, batch DataFrame extraction), use the **package import**: every
 tool md has a "Package import equivalent" section. MCP is for
 reasoning and interactive exploration; the package is for bulk
 extraction.
+
+### Lockstep paging on multi-ontology calls
+
+`search_ontology` accepts `ontology=[...]` (or `None` for all 17). The
+call fans out per ontology and **`limit` / `offset` apply to each
+ontology separately** — a `limit=5` call over three ontologies returns
+up to 15 rows, ordered by ontology (registry order) then by score
+(search) or `gene_count` (browse). The flat envelope keys
+(`total_matching`, `returned`, `truncated`, `score_max`) are sums / max
+across the set; `by_ontology[]` carries the per-ontology
+`total_matching` / `returned` / `truncated` so you can see which
+ontology still has pages left. Walk pages with the same `offset` on the
+same ontology list. Lucene scores are per index, so never rank rows of
+two ontologies against each other by `score`.
+
+---
+
+## Browse vs search (`search_ontology`)
+
+`search_ontology` has two modes, chosen by whether `search_text` is
+set:
+
+- **Search** (`search_text='...'`) — Lucene over term names; rows carry
+  a `score`, sorted `score DESC`; envelope `mode: "search"`.
+- **Browse** (`search_text` omitted or empty) — every term of the
+  ontology, sorted `gene_count DESC, id`, `score` null; envelope
+  `mode: "browse"` plus `by_level[]` over the full match. Narrow with
+  `level=`, a facet (`tree=` / `interpro_type=`), `min_gene_count=`,
+  or `organism=` (rows gain `organism_gene_count` and the sort/filter
+  switch to that organism's count). A browse that truncates without any
+  narrowing filter adds a warning — it means you are paging through an
+  entire ontology.
+
+Browse answers "what terms exist here and which are big"; search
+answers "which term is called X". Neither traverses the hierarchy —
+for a term's parents, children and bridge links use
+`ontology_term_details(term_ids=[...])`. Per-ontology semantics
+(identifier form, levels, what `gene_count` means there):
+`docs://ontologies/{key}`, index at `docs://ontologies/index`.
 
 ---
 
