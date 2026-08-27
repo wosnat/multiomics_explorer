@@ -9788,7 +9788,7 @@ class TestTrustEnvelopeFieldsOnResponses:
         from multiomics_explorer.mcp_server.tools import register_tools
         import inspect
         src = inspect.getsource(register_tools)
-        idx = src.index("class GeneOverviewResult(BaseModel):")
+        idx = src.index("class GeneOverviewResult(SparseRow):")
         assert f"{field}:" in src[idx:idx + 8000]
 
 

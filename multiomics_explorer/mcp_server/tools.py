@@ -50,7 +50,7 @@ def _kg_compat_report(ctx: Context) -> dict:
 # pathway_enrichment response models (module-level for direct importability)
 # ---------------------------------------------------------------------------
 
-class PathwayEnrichmentResult(BaseModel):
+class PathwayEnrichmentResult(SparseRow):
     cluster: str = Field(
         description="Cluster key '{experiment_id}|{timepoint}|{direction}'"
     )
@@ -314,7 +314,7 @@ class PathwayEnrichmentResponse(BaseModel):
 # cluster_enrichment response models (module-level for direct importability)
 # ---------------------------------------------------------------------------
 
-class ClusterEnrichmentResult(BaseModel):
+class ClusterEnrichmentResult(SparseRow):
     cluster: str = Field(description="Cluster name from the clustering analysis")
     cluster_id: str = Field(description="Cluster ID from KG")
     term_id: str = Field(description="Ontology term ID")
@@ -449,7 +449,7 @@ class ClusterEnrichmentResponse(BaseModel):
 # list_metabolites response models (module-level for direct importability)
 # ---------------------------------------------------------------------------
 
-class MetaboliteResult(BaseModel):
+class MetaboliteResult(SparseRow):
     # compact
     metabolite_id: str = Field(description="Full prefixed ID (e.g. 'kegg.compound:C00031'). Most carry the kegg.compound: namespace; a smaller set carry chebi: (TCDB-curated transport-only substrates).")
     name: str = Field(description="Metabolite name (e.g. 'D-Glucose', 'L-Glutamate').")
@@ -1555,7 +1555,7 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"kg_release_info unexpected error: {e}")
             raise ToolError(f"Error in kg_release_info: {e}")
 
-    class FilterValueResult(BaseModel):
+    class FilterValueResult(SparseRow):
         value: str = Field(
             description="Filter value (e.g. 'Photosynthesis', 'Transport', 'Unknown')."
         )
@@ -1657,7 +1657,7 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"list_filter_values unexpected error: {e}")
             raise ToolError(f"Error in list_filter_values: {e}")
 
-    class OrganismResult(BaseModel):
+    class OrganismResult(SparseRow):
         organism_name: str = Field(description="Display name (e.g. 'Prochlorococcus MED4'). Use for organism filters in other tools.")
         organism_type: str = Field(description="Classification: 'genome_strain', 'treatment', or 'reference_proteome_match'.")
         genus: str | None = Field(default=None, description="Genus (e.g. 'Prochlorococcus', 'Alteromonas').")
@@ -1833,7 +1833,7 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"list_organisms unexpected error: {e}")
             raise ToolError(f"Error in list_organisms: {e}")
 
-    class GeneMatch(BaseModel):
+    class GeneMatch(SparseRow):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
         gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN')")
         product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III, beta subunit')")
@@ -1910,7 +1910,7 @@ def register_tools(mcp: FastMCP):
         category: str = Field(description="Gene category (e.g. 'Photosynthesis').")
         count: int = Field(description="Number of matching genes.")
 
-    class GenesByFunctionResult(BaseModel):
+    class GenesByFunctionResult(SparseRow):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001').")
         gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN').")
         product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III subunit beta').")
@@ -2017,7 +2017,7 @@ def register_tools(mcp: FastMCP):
 
     # --- gene_overview ---
 
-    class GeneOverviewResult(BaseModel):
+    class GeneOverviewResult(SparseRow):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001').")
         gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN').")
         product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III subunit beta').")
@@ -2309,7 +2309,7 @@ def register_tools(mcp: FastMCP):
 
     # --- gene_homologs ---
 
-    class GeneHomologResult(BaseModel):
+    class GeneHomologResult(SparseRow):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
         organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
         group_id: str = Field(description="Prefixed ortholog group ID for chaining to genes_by_homolog_group (e.g. 'cyanorak:CK_00000364', 'eggnog:COG0592@2')")
@@ -2494,7 +2494,7 @@ def register_tools(mcp: FastMCP):
 
     # --- search_ontology ---
 
-    class SearchOntologyResult(BaseModel):
+    class SearchOntologyResult(SparseRow):
         id: str = Field(description="Term ID (e.g. 'go:0006260')")
         name: str = Field(description="Term name (e.g. 'DNA replication')")
         score: float = Field(description="Fulltext relevance score (e.g. 5.23)")
@@ -3203,7 +3203,7 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"gene_ontology_terms unexpected error: {e}")
             raise ToolError(f"Error in gene_ontology_terms: {e}")
 
-    class PublicationResult(BaseModel):
+    class PublicationResult(SparseRow):
         doi: str = Field(description="Publication DOI (e.g. '10.1038/s41396-022-01202-1').")
         title: str = Field(description="Publication title.")
         authors: list[str] = Field(description="Author list (free-text, semicolon- or comma-delimited).")
@@ -3413,7 +3413,7 @@ def register_tools(mcp: FastMCP):
         gene_count: int = Field(description="Total genes with expression data at this time point.")
         genes_by_status: GeneStatusBreakdown = Field(description="Gene counts by expression status at this time point.")
 
-    class ExperimentResult(BaseModel):
+    class ExperimentResult(SparseRow):
         # compact fields (always returned)
         experiment_id: str = Field(description="Experiment identifier (e.g. '10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq').")
         experiment_name: str = Field(description="Experiment display name.")
@@ -3797,7 +3797,7 @@ def register_tools(mcp: FastMCP):
             description="Genes with at least one significant row (e.g. 2)",
         )
 
-    class ExpressionRow(BaseModel):
+    class ExpressionRow(SparseRow):
         # Compact (always present)
         locus_tag: str = Field(
             description="Gene locus tag (e.g. 'ACZ81_01830')",
@@ -4163,7 +4163,7 @@ def register_tools(mcp: FastMCP):
     # search_homolog_groups
     # ------------------------------------------------------------------
 
-    class SearchHomologGroupsResult(BaseModel):
+    class SearchHomologGroupsResult(SparseRow):
         group_id: str = Field(description="OG identifier (e.g. 'cyanorak:CK_00000570')")
         group_name: str = Field(description="Raw OG name (e.g. 'CK_00000570')")
         consensus_gene_name: str | None = Field(default=None,
@@ -4320,7 +4320,7 @@ def register_tools(mcp: FastMCP):
     # genes_by_homolog_group
     # -----------------------------------------------------------------
 
-    class GenesByHomologGroupResult(BaseModel):
+    class GenesByHomologGroupResult(SparseRow):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0315')")
         gene_name: str | None = Field(default=None,
             description="Gene name (e.g. 'psbB')")
@@ -4469,7 +4469,7 @@ def register_tools(mcp: FastMCP):
     # differential_expression_by_ortholog
     # -----------------------------------------------------------------
 
-    class DifferentialExpressionByOrthologResult(BaseModel):
+    class DifferentialExpressionByOrthologResult(SparseRow):
         # --- always present ---
         group_id: str = Field(
             description="Ortholog group ID"
@@ -4849,7 +4849,7 @@ def register_tools(mcp: FastMCP):
         down_median_rank: float | None = Field(default=None, description="Median rank_down across significant_down timepoints. Present only when experiments_down > 0.")
         down_max_log2fc: float | None = Field(default=None, description="Most negative log2FC across significant_down timepoints. Present only when experiments_down > 0.")
 
-    class GeneResponseProfileResult(BaseModel):
+    class GeneResponseProfileResult(SparseRow):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0370')")
         gene_name: str | None = Field(description="Gene name (e.g. 'cynA'). Null if unannotated.")
         product: str | None = Field(description="Gene product description (e.g. 'cyanate transporter')")
@@ -4972,7 +4972,7 @@ def register_tools(mcp: FastMCP):
         temporal_pattern: str | None = Field(default=None,
             description="Detailed temporal pattern description")
 
-    class ListClusteringAnalysesResult(BaseModel):
+    class ListClusteringAnalysesResult(SparseRow):
         analysis_id: str = Field(
             description="ClusteringAnalysis node ID (e.g. 'ca:msb4100087:med4:nitrogen')")
         name: str = Field(
@@ -5196,7 +5196,7 @@ def register_tools(mcp: FastMCP):
         publication_doi: str = Field(description="Parent publication DOI.")
         count: int = Field(description="Rows from this publication.")
 
-    class GeneDerivedMetricsResult(BaseModel):
+    class GeneDerivedMetricsResult(SparseRow):
         # ── compact (always populated by api/) ──────────────────────────
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM1714').")
         gene_name: str | None = Field(
@@ -5339,7 +5339,7 @@ def register_tools(mcp: FastMCP):
     # list_derived_metrics
     # -----------------------------------------------------------------
 
-    class ListDerivedMetricsResult(BaseModel):
+    class ListDerivedMetricsResult(SparseRow):
         derived_metric_id: str = Field(
             description=(
                 "Unique id for this DerivedMetric. Pass to `derived_metric_ids` "
@@ -5717,7 +5717,7 @@ def register_tools(mcp: FastMCP):
         analysis_id: str = Field(description="Clustering analysis ID")
         count: int = Field(description="Rows for this analysis")
 
-    class GeneClustersByGeneResult(BaseModel):
+    class GeneClustersByGeneResult(SparseRow):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0370')")
         gene_name: str | None = Field(default=None,
             description="Gene name (e.g. 'cynA')")
@@ -6040,7 +6040,7 @@ def register_tools(mcp: FastMCP):
 
     # ── genes_in_cluster ───────────────────────────────────────────────
 
-    class GenesInClusterResult(BaseModel):
+    class GenesInClusterResult(SparseRow):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0370')")
         gene_name: str | None = Field(default=None,
             description="Gene name (e.g. 'cynA')")
@@ -6194,7 +6194,7 @@ def register_tools(mcp: FastMCP):
         name: str = Field(description="Ontology term name")
         n_genes: int = Field(description="Genes at this term in this organism")
 
-    class OntologyLandscapeRow(BaseModel):
+    class OntologyLandscapeRow(SparseRow):
         ontology_type: str = Field(description="Ontology key (e.g. 'cyanorak_role')")
         level: int = Field(description="Hierarchy level; 0 = broadest")
         tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
@@ -6772,7 +6772,7 @@ def register_tools(mcp: FastMCP):
 
     # ── genes_by_numeric_metric per-row result ─────────────────────────
 
-    class GenesByNumericMetricResult(BaseModel):
+    class GenesByNumericMetricResult(SparseRow):
         # Identity / routing (5)
         locus_tag: str = Field(
             description="Gene locus tag (e.g. 'PMM1545').")
@@ -7217,7 +7217,7 @@ def register_tools(mcp: FastMCP):
                         "`dm.flag_false_count` — always 0 in the current KG, "
                         "positive-only DM storage).")
 
-    class GenesByBooleanMetricResult(BaseModel):
+    class GenesByBooleanMetricResult(SparseRow):
         # Identity / routing (5)
         locus_tag: str = Field(
             description="Gene locus tag (e.g. 'PMM0090').")
@@ -7587,7 +7587,7 @@ def register_tools(mcp: FastMCP):
                         "categories (may be a strict subset of "
                         "`allowed_categories`).")
 
-    class GenesByCategoricalMetricResult(BaseModel):
+    class GenesByCategoricalMetricResult(SparseRow):
         # Identity / routing (5)
         locus_tag: str = Field(
             description="Gene locus tag (e.g. 'PMM0097').")
@@ -8657,7 +8657,7 @@ def register_tools(mcp: FastMCP):
         count: int = Field(
             description="Edge count for this status on the assay")
 
-    class ListMetaboliteAssaysResult(BaseModel):
+    class ListMetaboliteAssaysResult(SparseRow):
         assay_id: str = Field(
             description="Unique id (e.g. "
             "'metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration'). "
@@ -9097,7 +9097,7 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="Input publication DOIs absent from the KG.")
 
-    class MetabolitesByQuantifiesAssayResult(BaseModel):
+    class MetabolitesByQuantifiesAssayResult(SparseRow):
         # Identity / chemistry
         metabolite_id: str = Field(
             description="Metabolite node id (e.g. 'kegg.compound:C00074' "
@@ -9490,7 +9490,7 @@ def register_tools(mcp: FastMCP):
         experiment_ids: list[str] = Field(default_factory=list)
         publication_doi: list[str] = Field(default_factory=list)
 
-    class MetabolitesByFlagsAssayResult(BaseModel):
+    class MetabolitesByFlagsAssayResult(SparseRow):
         # Identity / chemistry
         metabolite_id: str = Field(
             description="Metabolite node id.")
@@ -10035,7 +10035,7 @@ def register_tools(mcp: FastMCP):
         organism_name: str = Field(description="Organism the matched genes belong to. E.g. 'Alteromonas macleodii HOT1A3'.")
         count: int = Field(description="Number of matched genes from this organism. E.g. 2.")
 
-    class GeneAaSequenceResult(BaseModel):
+    class GeneAaSequenceResult(SparseRow):
         locus_tag: str = Field(description="Gene locus tag (globally unique). E.g. 'ACZ81_08860'.")
         organism_name: str = Field(description="Organism the gene belongs to. E.g. 'Alteromonas macleodii HOT1A3'.")
         gene_name: str | None = Field(default=None, description="Short gene name, often null. E.g. 'dnaN'.")
@@ -10110,7 +10110,7 @@ def register_tools(mcp: FastMCP):
     # -------------------------------------------------------------------
     # gene_neighbors
     # -------------------------------------------------------------------
-    class GeneNeighborsResult(BaseModel):
+    class GeneNeighborsResult(SparseRow):
         anchor_locus_tag: str = Field(description="Anchor gene the neighbor is reported relative to. E.g. 'ACZ81_08860'.")
         neighbor_locus_tag: str = Field(description="Adjacent gene on the same contig. E.g. 'ACZ81_08850'.")
         rank_offset: int = Field(description="Signed positional offset by start order; negative = upstream, positive = downstream; anchor itself excluded. E.g. -1.")

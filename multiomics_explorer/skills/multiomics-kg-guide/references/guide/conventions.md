@@ -458,12 +458,18 @@ no cross-ontology threshold is safe.
 `tier` never appears on a `kegg` row (KEGG has no tier axis); `interpro_type`
 never appears on a `tcdb` row. Owned-but-null columns stay (a TCDB edge with
 only eggNOG support carries `tier: null`, not an absent field). The rule
-holds on the MCP wire as well as in the Python API: `genes_by_ontology` and
-`gene_ontology_terms` rows are serialized sparsely, so a compact `tcdb`
-row is ~9 keys and a verbose one ~22 — a key that is absent means "not an
-axis of this ontology", a key that is `null` means "owned, but this edge
-has no value". (`genes_by_metabolite` / `metabolites_by_gene` keep their
-documented None-padded cross-arm fields — a different, deliberate contract.)
+holds on the MCP wire as well as in the Python API, and it is the general
+row convention: result rows are serialized sparsely — a key that is absent
+means "not applicable to this row" (a verbose-only column on a compact
+call, an axis this ontology does not carry), a key that is `null` means
+"applicable, but this record has no value" (a TCDB edge with only eggNOG
+support carries `tier: null`; a gene with no MEROPS call carries
+`merops_evidence_score_max: null`). A compact `tcdb` row from
+`genes_by_ontology` is ~9 keys, a verbose one ~22. Three tools keep a
+deliberately None-padded union shape instead, so their rows always carry
+every column: `genes_by_metabolite` / `metabolites_by_gene` (cross-arm
+fields) and `assays_by_metabolite` / `discussed_by_publication`
+(polymorphic rows).
 
 **Filters** — `sources=`, `evidence=`, `max_tier=`, `min_evidence_score=`,
 `call_class=` (MEROPS-only), `interpro_type=` (InterPro-only) — default to
