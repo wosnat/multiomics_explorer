@@ -2210,7 +2210,9 @@ def search_ontology(
         min_gene_count: Keep terms with at least this many annotated genes
             (`organism_gene_count` when `organism` is set).
         organism: Scope gene counts to one organism; rows gain
-            `organism_gene_count` and browse ranks by it.
+            `organism_gene_count` and browse ranks by it. Resolved by the
+            shared organism resolver (word match, e.g. 'MED4'); an unknown
+            or ambiguous name raises ValueError.
         conn: Optional graph connection (defaults to the shared connection).
 
     Returns dict with keys: mode ('search' | 'browse'), total_entries,
@@ -2588,9 +2590,11 @@ def _term_details_row(row: dict, *, verbose: bool, organism: str | None) -> dict
     """Project one builder row onto the compact / verbose term-details shape.
 
     Only the props the term's ontology declares under `term_details_compact`
-    are carried (owned-but-null survives; a prop another ontology owns is
-    absent). `direct_gene_count` is emitted only when the node carries a
-    value — flat labels, PfamClan and BriteCategory have none.
+    are carried (owned-but-null survives, except the count props in
+    `_TERM_DETAILS_SPARSE_COUNTS`, which are stripped when null; a prop
+    another ontology owns is absent). `direct_gene_count` is emitted only
+    when the node carries a value — flat labels, PfamClan and BriteCategory
+    have none.
     """
     labels = _term_label_to_ontology()
     label = next((lab for lab in row.get("labels") or [] if lab in labels), None)
@@ -2703,7 +2707,9 @@ def ontology_term_details(
     Args:
         term_ids: Term CURIEs to describe (any ontology, mixed is fine).
         organism: Scope `genes_by_organism` (verbose) to one organism and
-            add `organism_gene_count` to every row.
+            add `organism_gene_count` to every row. Resolved by the shared
+            organism resolver (word match, e.g. 'MED4'); an unknown or
+            ambiguous name raises ValueError.
         link_kinds: Keep only these link kinds ('composition', 'membership',
             'router'); None keeps all.
         verbose: Add `properties` (every node prop), `links_out[].props`
