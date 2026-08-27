@@ -12669,8 +12669,10 @@ class TestTransportSubstrateResolutionDetailColumn:
             res_at = cypher.index("AS transport_substrate_resolution")
             assert res_at > score_at
             between = cypher[score_at:res_at]
-            # exactly one projection boundary between the two aliases
-            assert between.count(" AS ") == 1, between
+            # The slice opens at the `A` of `AS tcdb_evidence_score` (no
+            # leading space) and closes before `AS transport_...`, so a
+            # directly-adjacent projection leaves NO other alias boundary.
+            assert between.count(" AS ") == 0, between
 
 
 class TestClusterTypeVocabulary:
