@@ -1293,6 +1293,7 @@ class TestOntologyConfig:
             "cog_category", "cyanorak_role", "tigr_role", "pfam",
             "brite", "tcdb", "cazy",
             "subcellular_localization", "signal_peptide_type",
+            "interpro", "ncbifam", "merops",
         }
 
     def test_required_fields_present(self):
@@ -5160,6 +5161,7 @@ def test_all_ontologies_matches_config_keys():
         "cog_category", "cyanorak_role", "tigr_role", "pfam",
         "brite", "tcdb", "cazy",
         "subcellular_localization", "signal_peptide_type",
+        "interpro", "ncbifam", "merops",
     ]
 
 
