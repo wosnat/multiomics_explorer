@@ -1,9 +1,26 @@
 """Tests for configuration settings."""
 
+import pytest
+
 from multiomics_explorer.config.settings import Settings
 
+_NEO4J_ENV_VARS = ("NEO4J_URI", "NEO4J_USERNAME", "NEO4J_USER", "NEO4J_PASSWORD", "NEO4J_DATABASE")
 
-def test_default_settings():
+
+@pytest.fixture
+def clean_neo4j_env(monkeypatch):
+    """Strip NEO4J_* from the process environment.
+
+    `_env_file=None` only skips the .env *file*; pydantic-settings still reads
+    os.environ. Runners like the VS Code Python extension load `.env` into the
+    process environment (python.envFile), which would otherwise leak a
+    developer's real NEO4J_URI into the "true defaults" tests.
+    """
+    for var in _NEO4J_ENV_VARS:
+        monkeypatch.delenv(var, raising=False)
+
+
+def test_default_settings(clean_neo4j_env):
     """Default settings should have sensible values."""
     # _env_file=None isolates from a developer's local .env (which legitimately
     # points at a real, possibly remote KG) so this tests true code defaults.
@@ -19,7 +36,7 @@ def test_neo4j_auth_when_set():
     assert s.neo4j_auth == ("neo4j", "test")
 
 
-def test_kg_repo_path_none_by_default():
+def test_kg_repo_path_none_by_default(clean_neo4j_env):
     """KG repo path should be None by default."""
     s = Settings(_env_file=None)  # isolate from local .env (see test_default_settings)
     assert s.kg_repo is None
