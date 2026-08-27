@@ -1,5 +1,5 @@
 version: 1
-captured_at: '2026-08-27T08:16:58.213484+00:00'
+captured_at: '2026-08-27T15:43:25.645152+00:00'
 schema:
   nodes:
     AnatomicalEntity:
@@ -19,10 +19,8 @@ schema:
         annotation_quality: int
         annotation_state: string
         annotation_types: list
-        bigg_reaction: list
         boolean_metric_count: int
         boolean_metric_types_observed: list
-        catalytic_activities: list
         catalyzed_metabolite_count: int
         categorical_metric_count: int
         categorical_metric_types_observed: list
@@ -46,7 +44,6 @@ schema:
         interpro_entry_count: int
         locus_tag: string
         merops_classes: list
-        merops_evidence_score_max: float
         merops_family_count: int
         ncbifam_family_count: int
         numeric_metric_count: int
@@ -54,7 +51,6 @@ schema:
         organism_name: string
         preferred_id: string
         product: string
-        protein_family: string
         protein_id: string
         reaction_count: int
         seed_ortholog: string
@@ -231,14 +227,13 @@ schema:
         preferred_id: string
     Entity:
       properties:
-        code: string
-        direct_gene_count: int
         gene_count: int
         id: string
         level: int
         name: string
         organism_count: int
         preferred_id: string
+        short_name: string
     Experiment:
       properties:
         background_factors: list
@@ -293,10 +288,8 @@ schema:
         annotation_quality: int
         annotation_state: string
         annotation_types: list
-        bigg_reaction: list
         boolean_metric_count: int
         boolean_metric_types_observed: list
-        catalytic_activities: list
         catalyzed_metabolite_count: int
         categorical_metric_count: int
         categorical_metric_types_observed: list
@@ -320,7 +313,6 @@ schema:
         interpro_entry_count: int
         locus_tag: string
         merops_classes: list
-        merops_evidence_score_max: float
         merops_family_count: int
         ncbifam_family_count: int
         numeric_metric_count: int
@@ -328,7 +320,6 @@ schema:
         organism_name: string
         preferred_id: string
         product: string
-        protein_family: string
         protein_id: string
         reaction_count: int
         seed_ortholog: string
@@ -363,43 +354,49 @@ schema:
         preferred_id: string
     GroupingClass:
       properties:
+        consensus_gene_name: string
+        consensus_product: string
+        description: string
+        functional_description: string
+        genera: list
+        has_cross_genus_members: string
         id: string
         member_count: int
         name: string
-        organism_name: string
+        organism_count: int
         preferred_id: string
+        source: string
+        specificity_rank: int
+        taxon_id: int
+        taxonomic_level: string
     InformationContentEntity:
       properties:
-        allowed_categories: list
-        applies_to_organisms: list
+        aggregation_method: string
         background_factors: list
-        category_counts: list
-        category_labels: list
         compartment: string
-        description: string
         experiment_id: string
         experimental_context: string
         field_description: string
         growth_phases: list
-        has_p_value: string
         id: string
-        info_types: list
         light_condition: string
         metric_type: string
         name: string
         omics_type: string
         organism_name: string
         preferred_id: string
-        provenance: string
         publication_doi: string
         rankable: string
-        scope: string
-        total_gene_count: int
+        total_metabolite_count: int
         treatment: string
         treatment_type: list
         unit: string
         value_kind: string
-        version: string
+        value_max: float
+        value_median: float
+        value_min: float
+        value_q1: float
+        value_q3: float
     InterproEntry:
       properties:
         description: string
@@ -557,14 +554,13 @@ schema:
         preferred_id: string
     NamedThing:
       properties:
-        code: string
-        direct_gene_count: int
         gene_count: int
         id: string
         level: int
         name: string
         organism_count: int
         preferred_id: string
+        short_name: string
     NcbifamFamily:
       properties:
         description: string
@@ -596,14 +592,18 @@ schema:
         genus: string
         growth_phases: list
         id: string
+        interpro_gene_count: int
         kingdom: string
         lineage: string
         measured_metabolite_count: int
         ncbi_taxon_id: int
+        ncbifam_gene_count: int
+        nonpeptidase_homolog_gene_count: int
         omics_types: list
         order: string
         organism_name: string
         organism_type: string
+        peptidase_gene_count: int
         phylum: string
         preferred_id: string
         preferred_name: string
@@ -663,11 +663,10 @@ schema:
       properties:
         annotation_score: float
         catalytic_activities: list
-        cofactor_names: list
-        domain_description: string
+        caution_notes: string
         ec_numbers: list
+        eggnog_ids: string
         function_description: string
-        functional_motifs: string
         gene_names: list
         gene_symbol: string
         go_biological_processes: list
@@ -677,7 +676,9 @@ schema:
         is_reviewed: string
         keyword_ids: list
         keywords: list
+        locus_tag: string
         molecular_mass: int
+        pathways: list
         pfam_ids: list
         preferred_id: string
         protein_family: string
@@ -685,17 +686,15 @@ schema:
         proteome_ids: list
         refseq_ids: list
         sequence_length: int
-        signal_peptide: string
-        string_ids: string
+        transmembrane_regions: list
     Protein:
       properties:
         annotation_score: float
         catalytic_activities: list
-        cofactor_names: list
-        domain_description: string
+        caution_notes: string
         ec_numbers: list
+        eggnog_ids: string
         function_description: string
-        functional_motifs: string
         gene_names: list
         gene_symbol: string
         go_biological_processes: list
@@ -705,7 +704,9 @@ schema:
         is_reviewed: string
         keyword_ids: list
         keywords: list
+        locus_tag: string
         molecular_mass: int
+        pathways: list
         pfam_ids: list
         preferred_id: string
         protein_family: string
@@ -713,8 +714,7 @@ schema:
         proteome_ids: list
         refseq_ids: list
         sequence_length: int
-        signal_peptide: string
-        string_ids: string
+        transmembrane_regions: list
     Publication:
       properties:
         abstract: string
@@ -1096,7 +1096,10 @@ schema:
       - NamedThing
       properties:
         id: string
+        metric_bucket: string
+        metric_percentile: float
         metric_type: string
+        rank_by_metric: int
         value: float
     Ec_number_is_a_ec_number:
       source_labels:
