@@ -1589,7 +1589,9 @@ class TestGenesByOntology:
         )
         assert result["filtered_out"] == ["go:0006412"]
 
-    def test_summary_mode_skips_detail(self, mock_conn):
+    def test_summary_mode_returns_no_rows(self, mock_conn):
+        """Summary mode returns no rows, but still rolls up the trust axes —
+        the full-match trust projection runs in place of the paged detail."""
         mock_conn.execute_query.side_effect = [
             self._org_resolve(),
             self._per_term_rows(
@@ -1597,7 +1599,7 @@ class TestGenesByOntology:
                  [{"item": "Cell cycle", "count": 7}]),
             ),
             self._per_gene_rows(("PMM0001", "Cell cycle", 1, [1])),
-            # no detail
+            self._detail_rows(n=1),  # Query C — rollups only, never returned
         ]
         result = api.genes_by_ontology(
             ontology="go_bp",
@@ -1609,7 +1611,8 @@ class TestGenesByOntology:
         assert result["results"] == []
         assert result["returned"] == 0
         assert result["truncated"] is True  # total_matching > 0 but returned=0
-        assert mock_conn.execute_query.call_count == 3  # org-resolve + A + B, no detail
+        # org-resolve + A + B + C; the paged detail query never runs.
+        assert mock_conn.execute_query.call_count == 4
 
     def test_missing_level_and_term_ids_raises(self, mock_conn):
         with pytest.raises(ValueError, match="level.*term_ids"):
@@ -12707,6 +12710,25 @@ class TestGeneOntologyTermsMultiOntology:
                 conn=mock_conn,
             )
 
+    def test_tree_applies_to_brite_only_and_skips_nothing(self, mock_conn):
+        """`tree` is a facet like any other: it narrows its owner and leaves
+        the rest of the list alone, rather than refusing the whole call."""
+        _trust_dispatch(mock_conn, self._rules(), default=[])
+        result = api.gene_ontology_terms(
+            locus_tags=["PMM0392"], organism=_ORG,
+            ontology=["brite", "kegg"], tree="transporters", conn=mock_conn,
+        )
+        assert result["skipped_ontologies"] == []
+        assert result["filters_applied"]["tree"] == "transporters"
+
+    def test_tree_owner_absent_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="tree"):
+            api.gene_ontology_terms(
+                locus_tags=["PMM0392"], organism=_ORG,
+                ontology=["kegg", "tcdb"], tree="transporters",
+                conn=mock_conn,
+            )
+
     def test_unknown_ontology_name_raises(self, mock_conn):
         with pytest.raises(ValueError, match="bogus"):
             api.gene_ontology_terms(
@@ -12864,6 +12886,26 @@ class TestEnrichmentEnvelopeTrustKeys:
         from multiomics_explorer.analysis.enrichment import EnrichmentResult
         src = _inspect.getsource(EnrichmentResult.to_envelope)
         assert key in src, f"{key} missing from the enrichment envelope"
+
+    def test_background_filtered_is_true_only_for_edge_filters(self):
+        from multiomics_explorer.api.functions import _enrichment_trust_params
+        block = _enrichment_trust_params("merops", {"max_tier": 2}, None)
+        assert block["background_filtered"] is True
+
+    def test_a_facet_alone_does_not_narrow_the_background(self):
+        """`interpro_type` and `tree` pick which terms are tested; neither
+        removes a gene from the universe."""
+        from multiomics_explorer.api.functions import _enrichment_trust_params
+        block = _enrichment_trust_params(
+            "interpro", {"interpro_type": "FAMILY"}, "FAMILY",
+        )
+        assert block["background_filtered"] is False
+        assert block["filters_applied"]["interpro_type"] == "FAMILY"
+
+    def test_no_filters_at_all_is_false(self):
+        from multiomics_explorer.api.functions import _enrichment_trust_params
+        assert _enrichment_trust_params("kegg", {}, None)[
+            "background_filtered"] is False
 
 
 class TestSearchOntologyTrustSurfaceApi:

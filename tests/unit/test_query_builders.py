@@ -11409,16 +11409,29 @@ class TestOntologyRowColumnsInCypher:
     No cross-ontology null padding survives (the api layer no longer strips
     a fixed `_EDGE_PROP_COLS` union)."""
 
-    def test_tcdb_compact_projects_evidence_only(self):
+    def test_tcdb_compact_projects_the_trust_axes_but_no_native_detail(self):
+        """The trust axes ride along in compact so the envelope rollups and
+        the tier-null warning have rows to read; the api layer strips them
+        back off the rows. Native `verbose_edge` detail stays verbose-only."""
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
         cypher, _ = build_genes_by_ontology_detail(
             ontology="tcdb", organism="Prochlorococcus MED4", level=2,
         )
-        assert "AS evidence" in cypher
-        assert "AS tier" not in cypher
-        assert "AS sources" not in cypher
+        for col in ("evidence", "sources", "evidence_score", "tier"):
+            assert f"AS {col}" in cypher, col
+        assert "AS attachment_depth" not in cypher
+        assert "AS source_agreement" not in cypher
+
+    def test_compact_row_columns_still_exclude_the_extra_axes(self):
+        """`ontology_row_columns` — what the api layer keeps — is unchanged:
+        the forced projection is a query-side concern only."""
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns("tcdb", verbose=False) == ["evidence"]
+        assert ontology_row_columns(
+            "tcdb", verbose=False, force_trust_axes=True,
+        ) == ["evidence", "sources", "evidence_score", "tier"]
 
     def test_tcdb_verbose_projects_axes_and_native_detail(self):
         from multiomics_explorer.kg.queries_lib import (
@@ -11640,6 +11653,54 @@ class TestFacetGeneralization:
                 ontology="tcdb", organism="MED4", level=1,
                 interpro_type="FAMILY",
             )
+
+    def test_interpro_type_applies_in_term_ids_mode(self):
+        """Mode 1 (walk DOWN) must honour the facet too — enrichment forces
+        the caller to name a stratum, so it cannot be a no-op there."""
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, params = build_genes_by_ontology_detail(
+            ontology="interpro", organism="Prochlorococcus MED4",
+            term_ids=["interpro:IPR027417"], interpro_type="DOMAIN",
+        )
+        assert "t.interpro_type = $interpro_type" in cypher
+        assert params["interpro_type"] == "DOMAIN"
+
+    def test_term_ids_facet_binds_on_the_input_term_before_the_walk(self):
+        from multiomics_explorer.kg.queries_lib import (
+            _genes_by_ontology_match_stage,
+        )
+        cypher, _ = _genes_by_ontology_match_stage(
+            ontology="interpro", level=None,
+            term_ids=["interpro:IPR027417"],
+            organism="Prochlorococcus MED4", interpro_type="FAMILY",
+        )
+        facet = cypher.index("t.interpro_type = $interpro_type")
+        walk = cypher.index("Interpro_entry_is_a_interpro_entry")
+        assert facet < walk, cypher
+
+    def test_tree_applies_in_term_ids_mode(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
+        )
+        cypher, params = build_genes_by_ontology_per_term(
+            ontology="brite", organism="MED4",
+            term_ids=["br:ko02000"], tree="transporters",
+        )
+        assert "t.tree = $tree" in cypher
+        assert params["tree"] == "transporters"
+
+    def test_term_ids_mode_without_a_facet_is_unchanged(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, params = build_genes_by_ontology_detail(
+            ontology="interpro", organism="Prochlorococcus MED4",
+            term_ids=["interpro:IPR027417"],
+        )
+        assert "interpro_type = $" not in cypher
+        assert "interpro_type" not in params
 
     def test_gene_ontology_terms_accepts_interpro_type(self):
         from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms

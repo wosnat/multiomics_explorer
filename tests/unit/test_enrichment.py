@@ -110,6 +110,32 @@ class TestFisherOra:
         assert "level" in df.columns
         assert "extra" in df.columns
 
+    def test_edge_columns_do_not_pass_through(self):
+        """Passthrough takes the term's FIRST gene row. An edge fact (the
+        trust axes, call_class, native detail) belongs to that one gene's
+        annotation, so labelling the whole term with it would be a lie."""
+        from multiomics_explorer import fisher_ora, EnrichmentInputs
+        t2g = self._term2gene_simple().assign(
+            gene_category="Transport", evidence="curated", tier=1,
+            sources=[["tcdb"]] * 9, evidence_score=1.0,
+            call_class="peptidase", attachment_depth="most_specific",
+            localization_score=9.9, interpro_type="DOMAIN",
+        )
+        inputs = EnrichmentInputs(
+            organism_name="test",
+            gene_sets={"c1": ["g1", "g2"]},
+            background={"c1": [f"g{i}" for i in range(1, 10)] + ["g10"]},
+            cluster_metadata={"c1": {}},
+        )
+        df = fisher_ora(inputs, t2g).results
+        for col in ("evidence", "sources", "evidence_score", "tier",
+                    "call_class", "attachment_depth", "localization_score"):
+            assert col not in df.columns, col
+        # Term-side context still flows: gene_category is the documented
+        # passthrough, and interpro_type is a property of the term itself.
+        assert "gene_category" in df.columns
+        assert "interpro_type" in df.columns
+
     def test_basic_enrichment_math(self):
         """A pathway enriched with 2/2 DE hits out of 3 members in a 10-gene background."""
         from multiomics_explorer import fisher_ora, EnrichmentInputs

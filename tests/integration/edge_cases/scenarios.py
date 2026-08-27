@@ -77,6 +77,27 @@ def genes_by_ontology_scenarios():
             "ncbifam_genome_only_organism",
             dict(ontology="ncbifam", organism=fx.GENOME_ONLY_ORGANISM,
                  level=0)),
+        Scenario(
+            # A facet must narrow term_ids mode too — enrichment forces the
+            # caller to name an InterPro stratum, so it cannot be a no-op
+            # here. A stratum that matches none of the input terms is an
+            # empty envelope, not an error.
+            "term_ids_with_a_facet_that_matches_nothing",
+            dict(ontology="interpro", organism=fx.CONTROL_ORGANISM,
+                 term_ids=["interpro:IPR027417"], interpro_type="PTM",
+                 min_gene_set_size=0)),
+        Scenario(
+            "term_ids_with_a_facet_the_ontology_does_not_own",
+            dict(ontology="interpro", organism=fx.CONTROL_ORGANISM,
+                 term_ids=["interpro:IPR027417"], tree="transporters"),
+            expects_error=ToolError),
+        Scenario(
+            # Compact (default) mode must still carry the trust envelope:
+            # by_tier's null bucket and the tier-null auto-warning are the
+            # only place a compact reader meets tier at all.
+            "tier_null_bucket_visible_in_compact",
+            dict(ontology="tcdb", organism=fx.CONTROL_ORGANISM, level=2,
+                 max_tier=3, verbose=False)),
     ]
 
 

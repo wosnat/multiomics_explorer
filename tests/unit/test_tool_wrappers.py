@@ -9769,7 +9769,7 @@ class TestTrustEnvelopeFieldsOnResponses:
         import inspect
         src = inspect.getsource(register_tools)
         idx = src.index(f"class {class_name}(BaseModel):")
-        return src[idx:idx + 4000]
+        return src[idx:idx + 6000]
 
     @pytest.mark.parametrize("field", [
         "trust_axes", "by_evidence", "by_tier", "by_sources", "by_call_class",
