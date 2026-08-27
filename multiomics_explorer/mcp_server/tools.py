@@ -271,6 +271,22 @@ class PathwayEnrichmentResponse(BaseModel):
         default=None,
         description="ORA parameters used for this call. See docs://analysis/enrichment.",
     )
+    filters_applied: dict = Field(
+        default_factory=dict,
+        description="Echo of the trust filters actually set on this call. See docs://analysis/annotation_evidence.",
+    )
+    trust_axes: dict = Field(
+        default_factory=dict,
+        description="Trust axes the chosen ontology carries, e.g. {'tcdb': ['sources','evidence','evidence_score','tier']}.",
+    )
+    background_filtered: bool | int | None = Field(
+        default=None,
+        description="Whether/how many background genes were narrowed by the same trust filters that shaped TERM2GENE.",
+    )
+    interpro_type: str | None = Field(
+        default=None,
+        description="Echo of the interpro_type stratum used (sparse: only when ontology='interpro').",
+    )
     results: list[PathwayEnrichmentResult] = Field(
         default_factory=list, description="Long-format result rows (one Fisher test per row)"
     )
@@ -389,6 +405,22 @@ class ClusterEnrichmentResponse(BaseModel):
     enrichment_params: dict | None = Field(
         default=None,
         description="ORA parameters used for this call. See docs://analysis/enrichment.",
+    )
+    filters_applied: dict = Field(
+        default_factory=dict,
+        description="Echo of the trust filters actually set on this call. See docs://analysis/annotation_evidence.",
+    )
+    trust_axes: dict = Field(
+        default_factory=dict,
+        description="Trust axes the chosen ontology carries, e.g. {'tcdb': ['sources','evidence','evidence_score','tier']}.",
+    )
+    background_filtered: bool | int | None = Field(
+        default=None,
+        description="Whether/how many background genes were narrowed by the same trust filters that shaped TERM2GENE.",
+    )
+    interpro_type: str | None = Field(
+        default=None,
+        description="Echo of the interpro_type stratum used (sparse: only when ontology='interpro').",
     )
     results: list[ClusterEnrichmentResult] = Field(
         default_factory=list, description="Long-format result rows"
@@ -1396,6 +1428,55 @@ class DiscussedPublicationRef(BaseModel):
 def register_tools(mcp: FastMCP):
     """Register all KG tools with the MCP server."""
 
+    # -------------------------------------------------------------------
+    # Annotation-trust surface (PR 3a) — shared Field descriptions.
+    # See docs://analysis/annotation_evidence for the full trust model.
+    # -------------------------------------------------------------------
+    _TRUST_SOURCES_DESC = (
+        "Keep rows whose edge sources[] contains any of these values (e.g. "
+        "['eggnog']). Valid on the 14 functional-edge ontologies (not "
+        "PSORTb / SignalP). Default None never filters. See "
+        "list_filter_values(filter_type='sources')."
+    )
+    _TRUST_EVIDENCE_DESC = (
+        "Keep rows whose compact evidence ladder value is in this list "
+        "(curated > signature > homology > family_inferred > "
+        "domain_inferred). Valid on the 14 functional-edge ontologies. "
+        "Default None never filters."
+    )
+    _TRUST_MAX_TIER_DESC = (
+        "Keep rows with edge tier <= this value OR tier IS NULL (diamond "
+        "truncation depth, 1-3; tier-null edges are always kept - see "
+        "by_tier's null bucket). Valid on tcdb, merops only."
+    )
+    _TRUST_MIN_EVIDENCE_SCORE_DESC = (
+        "Keep rows with edge evidence_score >= this cutoff (composite "
+        "trust score, 0-1; the only native-scalar cutoff allowed). Valid "
+        "on go_bp/mf/cc, ec, pfam, cazy, tcdb, merops. Envelope adds "
+        "evidence_score_signals when set."
+    )
+    _TRUST_CALL_CLASS_DESC = (
+        "MEROPS peptidase-call filter: keep rows whose call_class is in "
+        "this list. Merops only; leaving unfiltered mixes in "
+        "catalytically-dead homologs (nonpeptidase_homolog) - the "
+        "envelope warns when it does."
+    )
+    _TRUST_INTERPRO_TYPE_DESC = (
+        "Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). "
+        "InterPro only; required on interpro enrichment/landscape strata "
+        "- ranking across mixed entry types is not meaningful."
+    )
+    _TRUST_INCLUDE_SUPERSEDED_DESC = (
+        "TCDB leaf mode only: when True, also include rows whose "
+        "gene->term attachment is less specific ('superseded') rather "
+        "than the deepest ('most_specific'). Default False."
+    )
+    _INTERPRO_TYPES = Literal[
+        "FAMILY", "DOMAIN", "HOMOLOGOUS_SUPERFAMILY", "REPEAT",
+        "CONSERVED_SITE", "ACTIVE_SITE", "BINDING_SITE", "PTM",
+    ]
+    _CALL_CLASSES = Literal["peptidase", "inhibitor", "nonpeptidase_homolog"]
+
     class KgSchemaResponse(BaseModel):
         nodes: dict[str, dict] = Field(
             description="Node labels mapped to their property definitions. "
@@ -1461,11 +1542,31 @@ def register_tools(mcp: FastMCP):
             description="Filter value (e.g. 'Photosynthesis', 'Transport', 'Unknown')."
         )
         count: int = Field(
-            description="Number of items with this value."
+            default=0,
+            description="Number of items with this value (0/unset on trust "
+                        "filter types where ControlledVocabulary/pivot has no "
+                        "per-value graph count).",
         )
         tree_code: str | None = Field(
             default=None,
             description="BRITE tree code (sparse: only for brite_tree filter, e.g. 'ko01000').",
+        )
+        source: str | None = Field(
+            default=None,
+            description="Provenance of this value (sparse: trust filter types "
+                        "only): 'vocabulary' (from ControlledVocabulary) or "
+                        "'pivot' (KG-side vocab node missing; derived from the "
+                        "graph, see envelope warnings).",
+        )
+        applies_to: str | None = Field(
+            default=None,
+            description="Edge/node type this value is scoped to (sparse: "
+                        "trust filter types only), e.g. 'Gene_has_merops_family'.",
+        )
+        description: str | None = Field(
+            default=None,
+            description="Human-readable meaning of this value (sparse: trust "
+                        "filter types only, from ControlledVocabulary).",
         )
 
     class ListFilterValuesResponse(BaseModel):
@@ -1473,6 +1574,11 @@ def register_tools(mcp: FastMCP):
         total_entries: int = Field(description="Total distinct values for this filter.")
         returned: int = Field(description="Number of results returned.")
         truncated: bool = Field(description="True if total_entries > returned.")
+        warnings: list[str] = Field(
+            default_factory=list,
+            description="E.g. a KG-side ControlledVocabulary-missing notice "
+                        "when a trust filter_type fell back to the pivot query.",
+        )
         results: list[FilterValueResult] = Field(default_factory=list)
 
     @mcp.tool(
@@ -1484,23 +1590,44 @@ def register_tools(mcp: FastMCP):
         filter_type: Annotated[
             Literal["gene_category", "brite_tree", "growth_phase",
                     "metric_type", "value_kind", "compartment",
-                    "omics_type", "evidence_source"],
+                    "omics_type", "evidence_source",
+                    "evidence", "sources", "call_class", "interpro_type",
+                    "ncbifam_family_type", "merops_catalytic_type",
+                    "merops_family_class", "best_hit_kind", "pfam_support",
+                    "attachment_depth", "trust_axes", "link_kinds"],
             Field(description=(
-                "Which categorical filter to enumerate. See type column "
-                "for the 8 valid values; `omics_type` returns the full "
-                "canonical enum incl. METABOLOMICS; `evidence_source` "
-                "returns Metabolite.evidence_sources values."
+                "Which categorical filter to enumerate. `omics_type` returns "
+                "the full canonical enum incl. METABOLOMICS; `evidence_source` "
+                "returns Metabolite.evidence_sources values. The trust-surface "
+                "types (evidence, sources, call_class, interpro_type, "
+                "ncbifam_family_type, merops_catalytic_type, "
+                "merops_family_class, best_hit_kind, pfam_support, "
+                "attachment_depth, trust_axes, link_kinds) come from "
+                "ControlledVocabulary (or a pivot-query fallback) / config — "
+                "see docs://analysis/annotation_evidence."
             )),
         ] = "gene_category",
+        ontology: Annotated[str | None, Field(
+            description="Scope a trust filter_type (e.g. 'trust_axes') to "
+                        "one ontology key. Ignored on non-trust filter types.",
+        )] = None,
     ) -> ListFilterValuesResponse:
-        """Enumerate valid values + counts for a categorical filter (gene_category, brite_tree, growth_phase, metric_type, value_kind, compartment, omics_type, evidence_source).
+        """Enumerate valid values + counts for a categorical filter (gene_category, brite_tree, growth_phase, metric_type, value_kind, compartment, omics_type, evidence_source, plus the annotation-trust types).
 
-        Routing: feed the returned `value`s into the corresponding filter on the relevant tool — `gene_category` → `genes_by_function(category=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`.
+        [TRUST] evidence / sources / call_class / interpro_type /
+        ncbifam_family_type / merops_catalytic_type / merops_family_class /
+        best_hit_kind / pfam_support / attachment_depth / trust_axes /
+        link_kinds enumerate the per-edge trust vocabulary. See
+        docs://analysis/annotation_evidence.
+
+        Routing: feed the returned `value`s into the corresponding filter on the relevant tool — `gene_category` → `genes_by_function(category=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`; the trust types → `sources` / `evidence` / `call_class` / `interpro_type` on `genes_by_ontology` and friends.
         """
         await ctx.info(f"list_filter_values filter_type={filter_type}")
         try:
             conn = _conn(ctx)
-            data = api.list_filter_values(filter_type=filter_type, conn=conn)
+            data = api.list_filter_values(
+                filter_type=filter_type, ontology=ontology, conn=conn,
+            )
             results = [FilterValueResult(**r) for r in data["results"]]
             response = ListFilterValuesResponse(**{**data, "results": results})
             await ctx.info(f"Returning {response.total_entries} values for {filter_type}")
@@ -1923,6 +2050,24 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. When non-empty, drill into metabolites_by_gene(locus_tags=[...]). Per-source definitions: see docs://guide/concepts.",
         )
+        # Annotation-trust surface: protease / family-domain routing columns.
+        merops_classes: list[str] = Field(
+            default_factory=list,
+            description="Distinct MEROPS call_class values across this gene's MEROPS "
+                        "calls (e.g. ['peptidase']). Empty when no MEROPS annotation. "
+                        "Drill via gene_ontology_terms(ontology='merops').",
+        )
+        ncbifam_family_count: int = Field(
+            default=0,
+            description="Distinct NCBIfam family annotations on this gene. When > 0, "
+                        "drill via gene_ontology_terms(ontology='ncbifam').",
+        )
+        merops_evidence_score_max: float | None = Field(
+            default=None,
+            description="Max MEROPS evidence_score over this gene's calls, in [0,1]. "
+                        "Twin of tcdb_evidence_score_max — uncoalesced: None = no MEROPS "
+                        "call at all, 0 = an uncorroborated one. Rank with it, don't filter.",
+        )
         # Literature 'discusses' rollup
         discussed_in_publication_count: int = Field(
             default=0,
@@ -1966,6 +2111,10 @@ def register_tools(mcp: FastMCP):
         title: str | None = Field(default=None, description="Publication title.")
         n_genes: int = Field(description="Number of the queried genes this publication discusses (batch set-coverage — which one paper covers most of your gene set).")
 
+    class OverviewMeropsClassBreakdown(BaseModel):
+        merops_class: str = Field(description="MEROPS call_class value (e.g. 'peptidase').")
+        count: int = Field(description="Genes with this call_class.")
+
     class GeneOverviewResponse(BaseModel):
         total_matching: int = Field(description="Genes found in KG from input locus_tags.")
         by_organism: list[OverviewOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc.")
@@ -1991,6 +2140,14 @@ def register_tools(mcp: FastMCP):
         top_discussing_publications: list[OverviewDiscussingPublication] = Field(
             default_factory=list,
             description="Publications ranked by how many of the queried genes they discuss (batch set-coverage — recovers 'which one paper covers most of my gene set'). Feed a doi into discussed_by_publication for that paper's full discussed set.",
+        )
+        has_ncbifam: int = Field(
+            default=0,
+            description="Count of requested locus_tags with at least one NCBIfam family annotation (ncbifam_family_count > 0).",
+        )
+        by_merops_class: list[OverviewMeropsClassBreakdown] = Field(
+            default_factory=list,
+            description="Rollup of merops_classes over the result set, sorted desc by count.",
         )
         returned: int = Field(description="Results in this response (0 when summary=true).")
         offset: int = Field(default=0, description="Offset into full result set.")
@@ -2023,7 +2180,9 @@ def register_tools(mcp: FastMCP):
     ) -> GeneOverviewResponse:
         """Batch gene routing: identity (gene_name, product, gene_category) plus per-gene data-availability signals (annotation_types, expression counts, ortholog/cluster summaries, DM rollups, chemistry rollups).
 
-        Routing: drill into each axis when the per-gene signal is non-zero — `gene_ontology_terms` (annotation_types non-empty), `gene_homologs` (closest_ortholog_group_size > 0), `gene_clusters_by_gene` (cluster_membership_count > 0), `differential_expression_by_gene` / `gene_response_profile` (expression_edge_count > 0), `gene_derived_metrics` and `genes_by_{numeric,boolean,categorical}_metric` keyed off `derived_metric_value_kinds`, `metabolites_by_gene` / `genes_by_metabolite` (evidence_sources non-empty). Use `gene_details` for the full Gene-node property dump.
+        [TRUST] `merops_classes` / `ncbifam_family_count` / `merops_evidence_score_max` are the protease / family-domain routing columns. See docs://analysis/annotation_evidence.
+
+        Routing: drill into each axis when the per-gene signal is non-zero — `gene_ontology_terms` (annotation_types non-empty), `gene_homologs` (closest_ortholog_group_size > 0), `gene_clusters_by_gene` (cluster_membership_count > 0), `differential_expression_by_gene` / `gene_response_profile` (expression_edge_count > 0), `gene_derived_metrics` and `genes_by_{numeric,boolean,categorical}_metric` keyed off `derived_metric_value_kinds`, `metabolites_by_gene` / `genes_by_metabolite` (evidence_sources non-empty), `gene_ontology_terms(ontology='merops')` (merops_classes non-empty). Use `gene_details` for the full Gene-node property dump.
         """
         await ctx.info(f"gene_overview locus_tags={locus_tags} summary={summary}")
         try:
@@ -2044,6 +2203,10 @@ def register_tools(mcp: FastMCP):
                 OverviewDiscussingPublication(**p)
                 for p in data.get("top_discussing_publications", [])
             ]
+            by_merops_class = [
+                OverviewMeropsClassBreakdown(**b)
+                for b in data.get("by_merops_class", [])
+            ]
             return GeneOverviewResponse(
                 total_matching=data["total_matching"],
                 by_organism=by_organism,
@@ -2058,6 +2221,8 @@ def register_tools(mcp: FastMCP):
                 has_chemistry=data.get("has_chemistry", 0),
                 has_discussed=data.get("has_discussed", 0),
                 top_discussing_publications=top_discussing_publications,
+                has_ncbifam=data.get("has_ncbifam", 0),
+                by_merops_class=by_merops_class,
                 returned=data["returned"],
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],
@@ -2325,6 +2490,10 @@ def register_tools(mcp: FastMCP):
         discussed_in_publications: list[DiscussedPublicationRef] | None = Field(
             default=None,
             description="Per-paper {doi, prominence, evidence} for papers discussing this KEGG pathway (verbose-only; KEGG only). Call discussed_by_publication for a paper's full discussed set.")
+        gene_count: int | None = Field(default=None,
+            description="Subtree gene count on this term (precomputed Node.gene_count; sparse until every ontology's builder emits it).")
+        organism_count: int | None = Field(default=None,
+            description="Distinct organisms reaching this term (precomputed Node.organism_count; sparse until every ontology's builder emits it).")
 
     class SearchOntologyResponse(BaseModel):
         total_entries: int = Field(description="Total terms in this ontology (e.g. 847)")
@@ -2352,7 +2521,8 @@ def register_tools(mcp: FastMCP):
         ontology: Annotated[str, Field(
             description="Ontology to search: 'go_bp', 'go_mf', 'go_cc', "
             "'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', "
-            "'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type'.",
+            "'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', "
+            "'interpro', 'ncbifam', 'merops'.",
         )],
         summary: Annotated[bool, Field(
             description="When true, return only summary fields (results=[]).",
@@ -2383,12 +2553,21 @@ def register_tools(mcp: FastMCP):
             description="Include the per-row discussed_in_publications {doi, prominence, "
             "evidence} list (KEGG pathways only). Default compact.",
         )] = False,
+        interpro_type: Annotated[_INTERPRO_TYPES | None, Field(
+            description="Restrict to this InterPro entry type. Only valid "
+                        "when ontology='interpro'.",
+        )] = None,
     ) -> SearchOntologyResponse:
         """Search ontology terms by text — Lucene over term names only (no hierarchy traversal).
 
         Returns term IDs and `level` for use with `genes_by_ontology`. Supports
         fuzzy (~), wildcards (*), exact phrases ("..."), boolean (AND, OR) —
         see docs://guide/conventions for syntax + scoring.
+
+        [TRUST] `interpro_type` scopes InterPro terms to one entry type. See
+        docs://analysis/annotation_evidence for the full trust surface.
+
+        Routing: chain term_ids into `genes_by_ontology` for gene discovery.
         """
         await ctx.info(f"search_ontology search_text={search_text!r} ontology={ontology}")
         try:
@@ -2399,6 +2578,7 @@ def register_tools(mcp: FastMCP):
                 level=level, tree=tree,
                 informative_only=informative_only,
                 verbose=verbose,
+                interpro_type=interpro_type,
                 conn=conn,
             )
             results = [SearchOntologyResult(**r) for r in data["results"]]
@@ -2441,6 +2621,64 @@ def register_tools(mcp: FastMCP):
             description="SignalP cleavage-site probability (sparse: only set "
                         "when ontology='signal_peptide_type' and cleavage_site "
                         "present).")
+        # Trust surface — compact (sparse: strip-non-applicable, owner keeps
+        # owned-but-null). See docs://analysis/annotation_evidence.
+        evidence: str | None = Field(default=None,
+            description="Compact trust ladder: curated > signature > homology "
+                        "> family_inferred > domain_inferred. Present on the "
+                        "14 functional-edge ontologies; null on PSORTb/SignalP.")
+        call_class: str | None = Field(default=None,
+            description="MEROPS peptidase call (sparse: merops only). "
+                        "'nonpeptidase_homolog' rows are catalytically dead.")
+        interpro_type: str | None = Field(default=None,
+            description="InterPro entry type (sparse: interpro only), e.g. "
+                        "'DOMAIN', 'FAMILY', 'HOMOLOGOUS_SUPERFAMILY'.")
+        # Trust surface — verbose axes + native detail (never a cross-ontology
+        # comparison; rank within one ontology only).
+        sources: list[str] | None = Field(default=None,
+            description="Provenance tags on this edge (verbose only; sparse "
+                        "outside the 14 functional-edge ontologies), e.g. ['eggnog'].")
+        evidence_score: float | None = Field(default=None,
+            description="Composite trust score in [0,1] (verbose only; sparse: "
+                        "go_bp/mf/cc, ec, pfam, cazy, tcdb, merops).")
+        tier: int | None = Field(default=None,
+            description="Diamond truncation depth 1-3 (verbose only; sparse: "
+                        "tcdb, merops; owned-but-null when the edge carries no tier).")
+        attachment_depth: str | None = Field(default=None,
+            description="TCDB rollup attachment depth: 'most_specific' or "
+                        "'superseded' (verbose only; sparse: tcdb only).")
+        confidence_score: float | None = Field(default=None,
+            description="Native rank score (verbose only; sparse: tcdb, merops).")
+        source_agreement: str | None = Field(default=None,
+            description="TCDB two-source agreement detail (verbose only; sparse: tcdb only).")
+        pfam_support: str | None = Field(default=None,
+            description="Pfam-domain corroboration detail (verbose only; sparse: tcdb, merops).")
+        go_support: str | None = Field(default=None,
+            description="GO corroboration detail (verbose only; sparse: tcdb only).")
+        identity: float | None = Field(default=None,
+            description="Alignment percent identity (verbose only; sparse: tcdb, merops).")
+        qcov: float | None = Field(default=None,
+            description="Query coverage fraction (verbose only; sparse: tcdb, merops).")
+        evalue: float | None = Field(default=None,
+            description="Alignment e-value (verbose only; sparse: tcdb, merops, interpro, ncbifam). Never a filter cutoff.")
+        consensus_n: int | None = Field(default=None,
+            description="Number of corroborating calls in consensus (verbose only; sparse: tcdb, merops).")
+        best_hit_kind: str | None = Field(default=None,
+            description="MEROPS best-hit classification (verbose only; sparse: merops only).")
+        best_hit_id: str | None = Field(default=None,
+            description="MEROPS best-hit identifier (verbose only; sparse: merops only).")
+        libraries: list[str] | None = Field(default=None,
+            description="InterPro member-database libraries backing this match (verbose only; sparse: interpro only).")
+        evalue_library: str | None = Field(default=None,
+            description="InterPro per-library e-value detail (verbose only; sparse: interpro only).")
+        match_count: int | None = Field(default=None,
+            description="InterPro match-segment count (verbose only; sparse: interpro only).")
+        start: int | None = Field(default=None,
+            description="Match start coordinate (verbose only; sparse: interpro, ncbifam).")
+        end: int | None = Field(default=None,
+            description="Match end coordinate (verbose only; sparse: interpro, ncbifam).")
+        bit_score: float | None = Field(default=None,
+            description="NCBIfam alignment bit score (verbose only; sparse: ncbifam only).")
         # verbose only
         function_description: str | None = Field(default=None,
             description="Curated functional description (verbose only)")
@@ -2498,6 +2736,30 @@ def register_tools(mcp: FastMCP):
         returned: int = Field(description="Rows in this response")
         offset: int = Field(default=0, description="Offset into full result set")
         truncated: bool = Field(description="True when total_matching > offset + returned")
+        # Trust surface envelope. See docs://analysis/annotation_evidence.
+        trust_axes: dict[str, list[str]] = Field(
+            default_factory=dict,
+            description="Trust axes this ontology carries, e.g. {'tcdb': "
+                        "['sources','evidence','evidence_score','tier']}.")
+        warnings: list[str] = Field(default_factory=list,
+            description="Auto-warnings (e.g. nonpeptidase_homolog rows without a call_class filter).")
+        filters_applied: dict = Field(default_factory=dict,
+            description="Echo of the trust filters that were actually set on this call.")
+        skipped_ontologies: list[dict] = Field(default_factory=list,
+            description="Empty for single-ontology tools; reserved for multi-ontology callers.")
+        by_evidence: list[dict] = Field(default_factory=list,
+            description="Rollup of the compact evidence column over result rows.")
+        by_tier: list[dict] = Field(default_factory=list,
+            description="Rollup of tier over result rows; carries an explicit 'null' bucket.")
+        by_sources: list[dict] = Field(default_factory=list,
+            description="Membership counts per source value over result rows.")
+        by_call_class: list[dict] = Field(default_factory=list,
+            description="Rollup of MEROPS call_class over result rows (merops only).")
+        evidence_score_stats: dict | None = Field(default=None,
+            description="{min, median, max, n_null} over evidence_score in result rows.")
+        evidence_score_signals: dict | None = Field(default=None,
+            description="Fired ControlledVocabulary signals per edge_type; present only "
+                        "when min_evidence_score was set.")
         results: list[GenesByOntologyResult] = Field(
             default_factory=list,
             description="One row per (gene × term) pair")
@@ -2514,6 +2776,7 @@ def register_tools(mcp: FastMCP):
             "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
             "tcdb", "cazy",
             "subcellular_localization", "signal_peptide_type",
+            "interpro", "ncbifam", "merops",
         ], Field(
             description="Ontology for these term_ids / this level.",
         )],
@@ -2558,6 +2821,24 @@ def register_tools(mcp: FastMCP):
         verbose: Annotated[bool, Field(
             description="Include function_description and sparse level_is_best_effort.",
         )] = False,
+        sources: Annotated[list[str] | None, Field(
+            description=_TRUST_SOURCES_DESC,
+        )] = None,
+        evidence: Annotated[list[str] | None, Field(
+            description=_TRUST_EVIDENCE_DESC,
+        )] = None,
+        max_tier: Annotated[int | None, Field(
+            description=_TRUST_MAX_TIER_DESC, ge=1, le=3,
+        )] = None,
+        min_evidence_score: Annotated[float | None, Field(
+            description=_TRUST_MIN_EVIDENCE_SCORE_DESC, ge=0, le=1,
+        )] = None,
+        call_class: Annotated[list[_CALL_CLASSES] | None, Field(
+            description=_TRUST_CALL_CLASS_DESC,
+        )] = None,
+        interpro_type: Annotated[_INTERPRO_TYPES | None, Field(
+            description=_TRUST_INTERPRO_TYPE_DESC,
+        )] = None,
         limit: Annotated[int, Field(
             description="Max rows returned. Default 500 — this tool feeds enrichment.",
             ge=1,
@@ -2576,6 +2857,10 @@ def register_tools(mcp: FastMCP):
         Single-organism enforced. Default `limit=500` because this tool feeds
         enrichment via TERM2GENE. `min/max_gene_set_size` is organism-scoped
         (matches `ontology_landscape`).
+
+        [TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
+        `call_class` / `interpro_type` filter on the per-edge trust profile;
+        defaults never filter. See docs://analysis/annotation_evidence.
 
         Routing: pipe `results` into `pathway_enrichment` / `cluster_enrichment`
         as TERM2GENE; chain from `search_ontology` for term discovery;
@@ -2599,7 +2884,11 @@ def register_tools(mcp: FastMCP):
                 informative_only=informative_only,
                 summary=summary, verbose=verbose,
                 limit=limit, offset=offset,
-                tree=tree, conn=conn,
+                tree=tree,
+                sources=sources, evidence=evidence,
+                max_tier=max_tier, min_evidence_score=min_evidence_score,
+                call_class=call_class, interpro_type=interpro_type,
+                conn=conn,
             )
             if data["wrong_ontology"]:
                 await ctx.warning(
@@ -2643,6 +2932,56 @@ def register_tools(mcp: FastMCP):
             description="SignalP cleavage-site probability (sparse: only set "
                         "when ontology='signal_peptide_type' and cleavage_site "
                         "present).")
+        # Trust surface — compact + verbose (sparse). See docs://analysis/annotation_evidence.
+        evidence: str | None = Field(default=None,
+            description="Compact trust ladder: curated > signature > homology "
+                        "> family_inferred > domain_inferred. Present on the "
+                        "14 functional-edge ontologies; null on PSORTb/SignalP.")
+        call_class: str | None = Field(default=None,
+            description="MEROPS peptidase call (sparse: merops only).")
+        interpro_type: str | None = Field(default=None,
+            description="InterPro entry type (sparse: interpro only).")
+        sources: list[str] | None = Field(default=None,
+            description="Provenance tags on this edge (verbose only; sparse).")
+        evidence_score: float | None = Field(default=None,
+            description="Composite trust score in [0,1] (verbose only; sparse).")
+        tier: int | None = Field(default=None,
+            description="Diamond truncation depth 1-3 (verbose only; sparse: tcdb, merops).")
+        attachment_depth: str | None = Field(default=None,
+            description="TCDB attachment depth: 'most_specific' or 'superseded' "
+                        "(verbose only; sparse: tcdb only).")
+        confidence_score: float | None = Field(default=None,
+            description="Native rank score (verbose only; sparse: tcdb, merops).")
+        source_agreement: str | None = Field(default=None,
+            description="TCDB two-source agreement detail (verbose only; sparse: tcdb only).")
+        pfam_support: str | None = Field(default=None,
+            description="Pfam-domain corroboration detail (verbose only; sparse: tcdb, merops).")
+        go_support: str | None = Field(default=None,
+            description="GO corroboration detail (verbose only; sparse: tcdb only).")
+        identity: float | None = Field(default=None,
+            description="Alignment percent identity (verbose only; sparse: tcdb, merops).")
+        qcov: float | None = Field(default=None,
+            description="Query coverage fraction (verbose only; sparse: tcdb, merops).")
+        evalue: float | None = Field(default=None,
+            description="Alignment e-value (verbose only; sparse). Never a filter cutoff.")
+        consensus_n: int | None = Field(default=None,
+            description="Corroborating-calls count (verbose only; sparse: tcdb, merops).")
+        best_hit_kind: str | None = Field(default=None,
+            description="MEROPS best-hit classification (verbose only; sparse: merops only).")
+        best_hit_id: str | None = Field(default=None,
+            description="MEROPS best-hit identifier (verbose only; sparse: merops only).")
+        libraries: list[str] | None = Field(default=None,
+            description="InterPro member-database libraries (verbose only; sparse: interpro only).")
+        evalue_library: str | None = Field(default=None,
+            description="InterPro per-library e-value detail (verbose only; sparse: interpro only).")
+        match_count: int | None = Field(default=None,
+            description="InterPro match-segment count (verbose only; sparse: interpro only).")
+        start: int | None = Field(default=None,
+            description="Match start coordinate (verbose only; sparse: interpro, ncbifam).")
+        end: int | None = Field(default=None,
+            description="Match end coordinate (verbose only; sparse: interpro, ncbifam).")
+        bit_score: float | None = Field(default=None,
+            description="NCBIfam alignment bit score (verbose only; sparse: ncbifam only).")
         # verbose-only
         organism_name: str | None = Field(default=None, description="Organism (e.g. 'Prochlorococcus MED4')")
 
@@ -2674,6 +3013,29 @@ def register_tools(mcp: FastMCP):
         truncated: bool = Field(description="True if total_matching > returned")
         not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
         no_terms: list[str] = Field(default_factory=list, description="Input locus_tags in KG but with no terms for queried ontology")
+        # Trust surface envelope + multi-ontology skip/raise matrix.
+        trust_axes: dict[str, list[str]] = Field(default_factory=dict,
+            description="Trust axes carried per queried ontology.")
+        by_evidence: list[dict] = Field(default_factory=list,
+            description="Rollup of the compact evidence column over result rows.")
+        by_tier: list[dict] = Field(default_factory=list,
+            description="Rollup of tier over result rows; carries an explicit 'null' bucket.")
+        by_sources: list[dict] = Field(default_factory=list,
+            description="Membership counts per source value over result rows.")
+        by_call_class: list[dict] = Field(default_factory=list,
+            description="Rollup of MEROPS call_class over result rows (merops only).")
+        evidence_score_stats: dict | None = Field(default=None,
+            description="{min, median, max, n_null} over evidence_score in result rows.")
+        evidence_score_signals: dict | None = Field(default=None,
+            description="Fired ControlledVocabulary signals per edge_type; present only "
+                        "when min_evidence_score was set.")
+        filters_applied: dict = Field(default_factory=dict,
+            description="Echo of the trust filters that were actually set on this call.")
+        skipped_ontologies: list[dict] = Field(default_factory=list,
+            description="Multi-ontology: [{ontology, reason}] for ontologies dropped "
+                        "because a filter/facet only some of the queried ontologies own.")
+        warnings: list[str] = Field(default_factory=list,
+            description="Auto-warnings, incl. skipped-ontology and trust-cutoff notices.")
         results: list[OntologyTermRow] = Field(default_factory=list, description="One row per gene × term")
 
     @mcp.tool(
@@ -2690,11 +3052,20 @@ def register_tools(mcp: FastMCP):
             description="Organism (case-insensitive substring match, e.g. 'MED4'). Required — single-valued.",
         )],
         ontology: Annotated[
-            Literal["go_bp", "go_mf", "go_cc", "kegg", "ec",
+            list[Literal["go_bp", "go_mf", "go_cc", "kegg", "ec",
                     "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
                     "tcdb", "cazy",
-                    "subcellular_localization", "signal_peptide_type"] | None,
-            Field(description="Filter to one ontology. None returns all."),
+                    "subcellular_localization", "signal_peptide_type",
+                    "interpro", "ncbifam", "merops"]]
+            | Literal["go_bp", "go_mf", "go_cc", "kegg", "ec",
+                    "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
+                    "tcdb", "cazy",
+                    "subcellular_localization", "signal_peptide_type",
+                    "interpro", "ncbifam", "merops"]
+            | None,
+            Field(description="Filter to one ontology, or a list of ontologies "
+                              "(trust filters/facets shape all-or-skip-or-raise "
+                              "per docs://guide/conventions). None returns all."),
         ] = None,
         mode: Annotated[Literal["leaf", "rollup"], Field(
             description="'leaf' returns most-specific annotations (default). "
@@ -2722,6 +3093,27 @@ def register_tools(mcp: FastMCP):
         verbose: Annotated[bool, Field(
             description="Include organism_name per row.",
         )] = False,
+        sources: Annotated[list[str] | None, Field(
+            description=_TRUST_SOURCES_DESC,
+        )] = None,
+        evidence: Annotated[list[str] | None, Field(
+            description=_TRUST_EVIDENCE_DESC,
+        )] = None,
+        max_tier: Annotated[int | None, Field(
+            description=_TRUST_MAX_TIER_DESC, ge=1, le=3,
+        )] = None,
+        min_evidence_score: Annotated[float | None, Field(
+            description=_TRUST_MIN_EVIDENCE_SCORE_DESC, ge=0, le=1,
+        )] = None,
+        call_class: Annotated[list[_CALL_CLASSES] | None, Field(
+            description=_TRUST_CALL_CLASS_DESC,
+        )] = None,
+        interpro_type: Annotated[_INTERPRO_TYPES | None, Field(
+            description=_TRUST_INTERPRO_TYPE_DESC,
+        )] = None,
+        include_superseded: Annotated[bool, Field(
+            description=_TRUST_INCLUDE_SUPERSEDED_DESC,
+        )] = False,
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
         )] = 5,
@@ -2733,7 +3125,15 @@ def register_tools(mcp: FastMCP):
 
         `mode='leaf'` (default) returns the most specific annotations only —
         redundant ancestors are excluded. `mode='rollup'` walks UP to ancestors
-        at the given level. Single-organism enforced.
+        at the given level. Single-organism enforced. `ontology` accepts a
+        list; when a trust filter/facet is carried by only some of the
+        requested ontologies, the rest drop into `skipped_ontologies` with
+        a warning.
+
+        [TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
+        `call_class` / `interpro_type` filter on the per-edge trust profile;
+        `include_superseded` (tcdb leaf mode) also surfaces less-specific
+        attachments. Defaults never filter. See docs://analysis/annotation_evidence.
 
         Routing: for the forward direction (term → genes, with hierarchy
         expansion) use `genes_by_ontology`; for term discovery by text use
@@ -2749,7 +3149,12 @@ def register_tools(mcp: FastMCP):
                 locus_tags, organism=organism, ontology=ontology,
                 mode=mode, level=level, tree=tree,
                 informative_only=informative_only,
-                summary=summary, verbose=verbose, limit=limit, offset=offset, conn=conn,
+                summary=summary, verbose=verbose, limit=limit, offset=offset,
+                sources=sources, evidence=evidence,
+                max_tier=max_tier, min_evidence_score=min_evidence_score,
+                call_class=call_class, interpro_type=interpro_type,
+                include_superseded=include_superseded,
+                conn=conn,
             )
             results = [OntologyTermRow(**r) for r in data["results"]]
             by_ontology = [OntologyTypeBreakdown(**b) for b in data["by_ontology"]]
@@ -5760,6 +6165,8 @@ def register_tools(mcp: FastMCP):
         level: int = Field(description="Hierarchy level; 0 = broadest")
         tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
         tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
+        interpro_type: str | None = Field(default=None,
+            description="InterPro entry type this stratum covers (sparse: interpro only).")
         relevance_rank: int = Field(
             description="1-indexed rank by spec_score; stable under pagination",
         )
@@ -5797,6 +6204,8 @@ def register_tools(mcp: FastMCP):
         n_levels: int
         tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
         tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
+        best_interpro_type: str | None = Field(default=None,
+            description="InterPro entry type of the best-ranked stratum (sparse: interpro only).")
 
     class OntologyLandscapeResponse(BaseModel):
         organism_name: str
@@ -5821,11 +6230,20 @@ def register_tools(mcp: FastMCP):
             description="Organism (fuzzy match, e.g. 'MED4').",
         )],
         ontology: Annotated[
-            Literal["go_bp", "go_mf", "go_cc", "ec", "kegg",
+            list[Literal["go_bp", "go_mf", "go_cc", "ec", "kegg",
                     "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
                     "tcdb", "cazy",
-                    "subcellular_localization", "signal_peptide_type"] | None,
-            Field(description="If None, surveys all ontologies."),
+                    "subcellular_localization", "signal_peptide_type",
+                    "interpro", "ncbifam", "merops"]]
+            | Literal["go_bp", "go_mf", "go_cc", "ec", "kegg",
+                    "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
+                    "tcdb", "cazy",
+                    "subcellular_localization", "signal_peptide_type",
+                    "interpro", "ncbifam", "merops"]
+            | None,
+            Field(description="If None, surveys all 17 ontologies. Accepts a "
+                              "list; a facet carried by only some of them "
+                              "drops the rest into skipped_ontologies."),
         ] = None,
         tree: Annotated[str | None, Field(
             description="BRITE tree name filter (e.g. 'transporters'). "
@@ -5864,6 +6282,12 @@ def register_tools(mcp: FastMCP):
             "restricts the gene set. Pass False to opt out and survey the full "
             "term set (rebaselines may differ).",
         )] = True,
+        call_class: Annotated[list[_CALL_CLASSES] | None, Field(
+            description=_TRUST_CALL_CLASS_DESC,
+        )] = None,
+        interpro_type: Annotated[_INTERPRO_TYPES | None, Field(
+            description=_TRUST_INTERPRO_TYPE_DESC,
+        )] = None,
     ) -> OntologyLandscapeResponse:
         """Rank (ontology x level) combinations by enrichment suitability — pre-flight for enrichment.
 
@@ -5871,9 +6295,14 @@ def register_tools(mcp: FastMCP):
         best-effort share (GO). Ranked by coverage x size_factor(median) with
         sweet-spot [5, 50] median genes-per-term; `relevance_rank` is the
         composite score (rank 1 = best). `ontology=None` surveys every key
-        (GO BP/MF/CC + 9 others); BRITE rows break down per tree (scope with
-        `tree=`). Pass `experiment_ids=` to weight by coverage of those
-        experiments' quantified genes.
+        (GO BP/MF/CC + 14 others); BRITE rows break down per tree (scope with
+        `tree=`); InterPro rows break down per `interpro_type`. Pass
+        `experiment_ids=` to weight by coverage of those experiments'
+        quantified genes.
+
+        [TRUST] `call_class` scopes MEROPS to a peptidase call so landscape
+        sizes match `genes_by_ontology`/enrichment sets; `interpro_type`
+        scopes InterPro to one entry type. See docs://analysis/annotation_evidence.
 
         Routing: pick an `(ontology, level)` row, then call
         `pathway_enrichment(ontology=..., level=...)` or
@@ -5894,6 +6323,7 @@ def register_tools(mcp: FastMCP):
                 max_gene_set_size=max_gene_set_size,
                 tree=tree,
                 informative_only=informative_only,
+                call_class=call_class, interpro_type=interpro_type,
                 conn=conn,
             )
             return OntologyLandscapeResponse(**data)
@@ -5922,6 +6352,7 @@ def register_tools(mcp: FastMCP):
             "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
             "tcdb", "cazy",
             "subcellular_localization", "signal_peptide_type",
+            "interpro", "ncbifam", "merops",
         ], Field(
             description="Ontology for pathway definitions. Run ontology_landscape first to rank by relevance.",
         )],
@@ -5989,6 +6420,24 @@ def register_tools(mcp: FastMCP):
                 "to True in 2026-05 KG release; see docs://guide/conventions."
             ),
         )] = True,
+        sources: Annotated[list[str] | None, Field(
+            description=_TRUST_SOURCES_DESC,
+        )] = None,
+        evidence: Annotated[list[str] | None, Field(
+            description=_TRUST_EVIDENCE_DESC,
+        )] = None,
+        max_tier: Annotated[int | None, Field(
+            description=_TRUST_MAX_TIER_DESC, ge=1, le=3,
+        )] = None,
+        min_evidence_score: Annotated[float | None, Field(
+            description=_TRUST_MIN_EVIDENCE_SCORE_DESC, ge=0, le=1,
+        )] = None,
+        call_class: Annotated[list[_CALL_CLASSES] | None, Field(
+            description=_TRUST_CALL_CLASS_DESC,
+        )] = None,
+        interpro_type: Annotated[_INTERPRO_TYPES | None, Field(
+            description=_TRUST_INTERPRO_TYPE_DESC,
+        )] = None,
     ) -> PathwayEnrichmentResponse:
         """Run pathway over-representation analysis from DE results (Fisher + BH).
 
@@ -5997,6 +6446,13 @@ def register_tools(mcp: FastMCP):
         (default, per-cluster quantified set), `organism` (full genome), or an
         explicit locus_tag list — drive the Fisher denominator and matter more
         than the ontology choice.
+
+        [TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
+        `call_class` filter TERM2GENE at the same match stage as the
+        background, so tested sets and background move together;
+        `interpro_type` is required when `ontology='interpro'` (ranking
+        across mixed entry types is not meaningful). See
+        docs://analysis/annotation_evidence.
 
         Routing: pre-flight via `ontology_landscape` to pick `(ontology, level)`;
         chain `differential_expression_by_gene` for raw DE inputs; drill enriched
@@ -6010,6 +6466,11 @@ def register_tools(mcp: FastMCP):
             f"pathway_enrichment organism={organism} experiments={len(experiment_ids)} "
             f"ontology={ontology} level={level}"
         )
+        if ontology == "interpro" and interpro_type is None:
+            raise ToolError(
+                "pathway_enrichment(ontology='interpro') requires interpro_type "
+                "— ranking across mixed InterPro entry types is not meaningful."
+            )
         try:
             conn = _conn(ctx)
             result = api.pathway_enrichment(
@@ -6028,6 +6489,9 @@ def register_tools(mcp: FastMCP):
                 growth_phases=growth_phases,
                 tree=tree,
                 informative_only=informative_only,
+                sources=sources, evidence=evidence,
+                max_tier=max_tier, min_evidence_score=min_evidence_score,
+                call_class=call_class, interpro_type=interpro_type,
                 conn=conn,
             )
         except ValueError as e:
@@ -6068,6 +6532,7 @@ def register_tools(mcp: FastMCP):
             "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
             "tcdb", "cazy",
             "subcellular_localization", "signal_peptide_type",
+            "interpro", "ncbifam", "merops",
         ], Field(description="Ontology for pathway definitions. Run ontology_landscape first.")],
         tree: Annotated[str | None, Field(
             description="BRITE tree name filter. Only valid when ontology='brite'. "
@@ -6099,6 +6564,24 @@ def register_tools(mcp: FastMCP):
                 "to True in 2026-05 KG release; see docs://guide/conventions."
             ),
         )] = True,
+        sources: Annotated[list[str] | None, Field(
+            description=_TRUST_SOURCES_DESC,
+        )] = None,
+        evidence: Annotated[list[str] | None, Field(
+            description=_TRUST_EVIDENCE_DESC,
+        )] = None,
+        max_tier: Annotated[int | None, Field(
+            description=_TRUST_MAX_TIER_DESC, ge=1, le=3,
+        )] = None,
+        min_evidence_score: Annotated[float | None, Field(
+            description=_TRUST_MIN_EVIDENCE_SCORE_DESC, ge=0, le=1,
+        )] = None,
+        call_class: Annotated[list[_CALL_CLASSES] | None, Field(
+            description=_TRUST_CALL_CLASS_DESC,
+        )] = None,
+        interpro_type: Annotated[_INTERPRO_TYPES | None, Field(
+            description=_TRUST_INTERPRO_TYPE_DESC,
+        )] = None,
     ) -> ClusterEnrichmentResponse:
         """Run cluster-membership over-representation analysis (Fisher + BH) — one ORA per cluster in a clustering analysis.
 
@@ -6107,6 +6590,12 @@ def register_tools(mcp: FastMCP):
         `table_scope` default); `organism` or an explicit locus_tag list are
         also accepted. Background drives the Fisher denominator and matters
         more than the ontology choice.
+
+        [TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
+        `call_class` filter TERM2GENE at the same match stage as the
+        background, so tested sets and background move together;
+        `interpro_type` is required when `ontology='interpro'`. See
+        docs://analysis/annotation_evidence.
 
         Routing: pre-flight via `list_clustering_analyses` for `analysis_id`
         and `ontology_landscape` for `(ontology, level)`; drill enriched terms
@@ -6120,6 +6609,11 @@ def register_tools(mcp: FastMCP):
             f"cluster_enrichment analysis_id={analysis_id} "
             f"ontology={ontology} level={level}"
         )
+        if ontology == "interpro" and interpro_type is None:
+            raise ToolError(
+                "cluster_enrichment(ontology='interpro') requires interpro_type "
+                "— ranking across mixed InterPro entry types is not meaningful."
+            )
         try:
             conn = _conn(ctx)
             result = api.cluster_enrichment(
@@ -6136,6 +6630,9 @@ def register_tools(mcp: FastMCP):
                 max_cluster_size=max_cluster_size,
                 pvalue_cutoff=pvalue_cutoff,
                 informative_only=informative_only,
+                sources=sources, evidence=evidence,
+                max_tier=max_tier, min_evidence_score=min_evidence_score,
+                call_class=call_class, interpro_type=interpro_type,
                 conn=conn,
             )
         except ValueError as e:
