@@ -141,11 +141,91 @@ MATCH (o:OrganismTaxon) RETURN count(o) AS organisms, collect(o.preferred_name) 
 
 ## 6. KG review
 
-_(KG owner fills in: accept / revise / decline per ask, plus any schema change the paper batch introduced.)_
+**Reviewed 2026-08-27 against the live rebuild** (`built_at 2026-08-27T13:55Z`, KG `main` @ `d7252549`:
+GEO processed-supplements pass + WH8109 + KG-SYNC-005 + orphan-protein fix). §5 queries were run; results
+inline. Nothing below is a schema change — no new node/edge types came out of the batch.
+
+| ID | Verdict | Notes |
+|---|---|---|
+| **ORG-001** | **Accept — IMPLEMENTED & live** (KG `6c51bf3b`, build `2026-08-27T14:22Z`) | Definitions accepted as written with one substitution: organism scope is the `Gene_belongs_to_organism` edge, not `Gene.organism_name` (that is how every sibling rollup — `gene_count`, `reaction_count`, `transported_metabolite_count` — is built; same result, and the invariant query in §5 should join the same way). Dense `0`. Four `ControlledVocabulary` numeric entries + a `test_organism.py` assertion ride along. Live trial on the morning build: Σ `peptidase_gene_count` = 3,439 (max 148, Alteromonas MarRef), Σ nonpeptidase 787, Σ interpro 104,764, Σ ncbifam 48,182; 0 drift vs the edge-join recount. ⚠ **Do not join on `Gene.organism_name = o.preferred_name` for the invariant** — the *treatment* organism node `Meiothermus ruber` (`ncbitaxon:`) shares its `preferred_name` with the MruberA genome strain's `Gene.organism_name`, so a name join credits 99 peptidase genes to a node with `gene_count = 0`. Join via `Gene_belongs_to_organism`, as the KG test does. |
+| **ORG-002** | **Accept (doc)** | Recipe, from `multiomics_kg/utils/controlled_vocab.py::vocabularies_hash`: for every vocabulary entry build `json.dumps({id, value_type, closed, values: sorted, sparse, expected_empty, exhaustive, min_value, max_value, signal_count, signals: sorted}, sort_keys=True)`; **sort** those strings; join with `\n`; `sha256` hex over the UTF-8 bytes; stored as `"sha256:" + full 64-hex`. **Excluded:** `description`, `applies_to_kind` (`id` = `applies_to.property` already pins the target). **Guarantee:** no timestamp, node id, YAML ordering or emission ordering enters the hash — same vocab *set* ⇒ same string across rebuilds; description-only edits do **not** trip it. Live value now: `sha256:80413969…ecc2d`. Written into `docs/kg-changes/vocabulary-contract.md` (KG `6c51bf3b`). ⚠ The hash changes once with that commit (ORG-001's four entries + the `ClusteringAnalysis.cluster_type` registration below); pin the KG-SYNC-006 value: `sha256:e81df1394964ab8ac3fb74ac2831530b8b21296b347d13d28c4d6f039f43efd4` (live, `built_at 2026-08-27T14:22Z`). |
+| **ORG-003** | **Verified; gaps (b) and (c) closed in KG `6c51bf3b`, (a) is a naming note** | Inside vocab (live, `outside_vocab = []`): `treatment_type` (15 values, incl. new `chemical` — Hackl 2023 mitomycin C), `background_factors` (7), `omics_type`. Gaps: **(a)** there is no `Experiment.growth_phase` — the property is `growth_phases` (str[], post-import rollup, **open** vocab by contract: live values `exponential`, `acclimated_steady_state`, `acute_stress`, `darkness`, `diel`, `[]`); `list_filter_values` must enumerate it live, as the contract already says. **(b)** `table_scope` is `""` on 35 experiments that have no DE table (metabolomics / DM-only) — an adapter default that predates the batch and sits outside the 5-value closed vocab; now **sparse** — omitted, never `""` — so read `coalesce(e.table_scope, null)`. **(c)** `ClusteringAnalysis.cluster_type` has **no** vocab node; the batch adds two values — `decay_pattern` (Steglich 2010 half-life clusters) and `genomic_island` (Hackl 2023 islands as gene sets) — on top of `time_course`, `diel`, `condition_comparison`. now registered (`ClusteringAnalysis.cluster_type`, closed, 6 values incl. `expression_bin`). Discusses index: regenerated for all six GEO-pass papers with a PDF; live totals 1,298 gene / 176 pathway edges across 45 of 49 publications. The 4 without edges are **pre-existing, not batch**: Biller 2014 (extraction returned 0 mentions), Zinser 2009 (only mention is the ncRNA `rnpB` — no Gene node), Alonso 2023 + Domínguez 2017 (never extracted). `release_highlights` / `breaking_changes` are stamped by `/release-kg` at the cut, not by the rebuild. |
+| **ORG-004** | **Note** — 47 → **48** | One new `OrganismTaxon`: **`Synechococcus WH8109`** (`insdc.gcf:GCF_000161795.2`, `organism_type = genome_strain`, `genus = Synechococcus`, `species = null` — same as WH7803/CC9311, NCBI has no species rank for them; 2,707 genes; full tool coverage). Motivated by Doron 2016 (Syn9 infection, third host). `genome_strain` 40 → 41. |
+
+**Paper batch — what else moved (for the regen diff):** publications 32 → 49 with expression edges
+(`Schema_info.paper_count = 49`, `experiment_count = 209`, `expression_edge_count = 327,522`, was 244,350).
+New DE: Huang 2020 (WH7803 phage), Doron 2016 (WH7803/WH8102/WH8109), Hackl 2023 (MIT0604), Johnson
+2026b (MED4); he 2022 NATL1A arm grew 109 → 4,137 edges. New `DerivedMetric` **metric_types** (existing
+kinds, no new shape): `rna_half_life_min`, `rna_decay_time_min`, `expression_at_t0_log2` (Steglich),
+`has_primary_tss`, `antisense_tss_count`, `internal_tss_count`, `minus10_element_score`,
+`tss_distance_to_cds` (Voigt). Three characterization experiments (Steglich half-lives, Voigt TSS ×2)
+~~deliberately carry **no `treatment_type`** (`[]` → absent)~~ — **superseded by §7**: they now carry
+`rna_decay` / `tss_mapping`, and `treatment_type` is dense + non-empty on every Experiment; they
+have DM edges only. Only edge losses vs the pre-batch snapshot are 9 edges on `PMM0236` shedding
+wrongly-merged placeholder IDs (B1 fix) — intended.
+
+## 7. Post-review amendment — `treatment_type` / `background_factors` contract (KG `33772b9b` + `5d2e444c`, 2026-08-27)
+
+Triggered by the explorer edge-case gate: `gene_clusters_by_gene` raised pydantic
+`treatment_type: Input should be a valid list, input_value=None` on the Steglich decay clusters.
+
+**Root cause (KG side, not explorer).** The adapters emitted `[]`, but `neo4j-admin import`
+materializes an empty `string[]` cell as *no property*. The §6 line "`[]` → absent" described that
+import artefact, not a design. Affected on the KG-SYNC-006 build: 3 `Experiment` (Steglich, Voigt ×2),
+12 `ClusteringAnalysis` (Steglich decay clusters + Hackl 2023 islands ×11), 14 `DerivedMetric`, and
+1 `Experiment.background_factors` (Bernstein 2017 — a labelling error, see below).
+
+**Contract after the next rebuild (pin the explorer against this):**
+
+| Property | Guarantee | Notes |
+|---|---|---|
+| `Experiment.treatment_type` | **dense, `size ≥ 1`** (`ControlledVocabulary` `min_size: 1`) | A non-empty list is the "this is a real experiment" indicator. Studies with no perturbation name *what was measured*: `rna_decay` (Steglich 2010), `tss_mapping` (Voigt 2014 ×2). |
+| `Experiment.background_factors` | **dense, `size ≥ 1`** (`min_size: 1`) | An experiment always has a held-constant context. |
+| `ClusteringAnalysis.treatment_type` | dense, non-empty (validator rule) | Hackl 2023 genomic islands → `genomic_analysis`. |
+| `ClusteringAnalysis.background_factors` | dense; **`[]` allowed** | A `genomic_analysis` has no experimental context. |
+| `DerivedMetric.*`, `MetaboliteAssay.*` (both props) | dense, copied from the parent Experiment | so `size ≥ 1` in practice |
+| `Experiment.table_scope` | unchanged — **sparse** | the one property where absent = not applicable |
+
+**Vocabulary deltas** (`Experiment.treatment_type`, closed, 15 → **19** values): `+ oxygen` (Bernstein
+2017 pO₂ turbidostat steady states), `+ rna_decay`, `+ tss_mapping`, `+ genomic_analysis`. The
+convention going forward: when a new paper's design fits nothing, mint a short categorical value
+rather than leave `[]`. `Experiment.background_factors` unchanged (7). New optional
+`ControlledVocabulary` property **`min_size`** (int, string_array vocabs only) — `list_filter_values`
+/ schema baseline may surface it. `Schema_info.controlled_vocabularies_hash` changes — the ORG-002
+pinned value is superseded; the rebuilt graph (KG `16e8a8bf`, `built_at 2026-08-27T17:19Z`, KG validity
+1,195 pass) carries **`sha256:496c5ad45b58829df2ab580415be09e001219772bb0a36005a0f05a2da2c7429`**.
+
+**Data correction — Bernstein 2017 (`10.1128/mSystems.00181-16`).** Was `treatment_type:
+[coculture, light]`, `background_factors: []` on the experiment and `[coculture]` / `[]` on all four
+clustering analyses. Only binary-coculture samples are wired into the KG (3 irradiance × 3 pO₂), so
+now: experiment `[light, oxygen]` / `[coculture]`; light clusters `[light]` / `[coculture]`; oxygen
+clusters `[oxygen]` / `[coculture, light]`. `Tests_coculture_with` is unaffected (gated on
+`treatment_organism`). Any explorer test pinned to the old Bernstein labels needs updating.
+
+**Explorer actions.**
+1. Withdraw the pending slice-4 coalesce amendment (`coalesce(e.treatment_type, [])` at ~7 sites) — not needed; pydantic `list[str]` is correct as-is.
+2. Add `oxygen`, `rna_decay`, `tss_mapping`, `genomic_analysis` to any hard-coded treatment-type enum, or read `ControlledVocabulary {applies_to:'Experiment', property:'treatment_type'}`.
+3. Edge-case gate: assert `treatment_type == ['rna_decay']` on the Steglich analysis (not `[]`).
+4. Optional: a "characterization" facet in `list_experiments` can be derived as `treatment_type ⊆ {rna_decay, tss_mapping, genomic_analysis}` — no KG-side flag is planned.
+
+**Verification (after rebuild):**
+```cypher
+MATCH (e:Experiment)
+RETURN count(e) = count(e.treatment_type) AS dense_tt,
+       count(e) = count(e.background_factors) AS dense_bf,
+       sum(CASE WHEN size(e.treatment_type) = 0 OR size(e.background_factors) = 0 THEN 1 ELSE 0 END) AS empty;
+-- expect true / true / 0
+MATCH (n) WHERE n:ClusteringAnalysis OR n:DerivedMetric OR n:MetaboliteAssay
+RETURN labels(n)[0] AS l, count(n) AS total, count(n.treatment_type) AS tt, count(n.background_factors) AS bf;
+-- expect tt = bf = total per label
+```
+KG docs: `docs/kg-changes/experiment-list-props-dense.md`, CHANGELOG `### Fixed` + `### Data`.
 
 ## Status
 
-- [ ] Asks reviewed (KG side)
-- [ ] KG-SYNC-006 rebuilt (papers + ORG-001) on `:7687`
-- [ ] §5 verification queries pass
+- [x] Asks reviewed (KG side) — 2026-08-27, see §6
+- [x] KG-SYNC-006 rebuilt (papers + ORG-001) on `:7687` — KG `6c51bf3b`, `built_at 2026-08-27T14:22Z`
+- [x] §5 verification queries pass — ORG-001 dense on 48/48 (Σ peptidase 3,439), table_scope `""` count 0 (192/209 carry one), cluster_type outside-vocab `[]`, treatment_type/background_factors/omics_type outside-vocab `[]`; KG validity 1,189 pass
 - [ ] Explorer `schema_baseline.yaml` refreshed; slice-4 tool spec written against the live build
+- [x] KG `16e8a8bf` rebuilt on `:7687` (`built_at 2026-08-27T17:19Z`), §7 verification queries pass, KG validity 1,195 pass
+- [ ] §7 amendment picked up ( coalesce amendment withdrawn; 4 new treatment_type values; Steglich gate → `['rna_decay']`; re-pin vocab hash)
