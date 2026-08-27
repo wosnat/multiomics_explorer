@@ -245,6 +245,12 @@ list_experiments (per-row `metabolite_count > 0`) → list_metabolite_assays(exp
 
 - timepoints is omitted for non-time-course experiments, not an empty list.
 
+- `table_scope` is sparse: absent on an experiment means the experiment has no differential-expression table at all (a characterization or metabolomics-only experiment), never an empty string. `by_table_scope` has no '' bucket; `table_scope=[...]` filters simply never match those experiments.
+
+- `treatment_type: []` is a real value — a characterization experiment (e.g. an mRNA-decay or promoter survey) with no perturbation, not a missing annotation. `background_factors` is never `[]` (it is absent instead). `treatment_type=[...]` filters never match an empty-list experiment; to list characterization experiments, filter client-side on `treatment_type == []`.
+
+- `growth_phase` values (on `timepoints[].growth_phase` and the `growth_phases` filter) are an OPEN vocabulary — new papers add new labels. Enumerate live from the data rather than assuming a fixed set.
+
 - For time-course experiments, top-level `gene_count` is the cumulative row count across timepoints (= `sum(time_point_totals)`). A 6-TP experiment with 1697 genes/TP has `gene_count=10182`. Use `distinct_gene_count` for detection-power or pathway-background reasoning — that's the unique-genes count regardless of timepoint. Per-TP detail lives in `timepoints[].gene_count`.
 
 - `authors` is on every result row — no need to join with list_publications when you only need author attribution. list_publications is still the right call for richer publication metadata (abstract, journal, year).

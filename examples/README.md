@@ -30,13 +30,14 @@ uv run python examples/metabolites.py --scenario measurement
 
 ## `annotation_evidence.py`
 
-Four scenarios exercising the annotation-trust surface (evidence / evidence_score / tier / call_class / interpro_type) across the 17 supported ontologies. See `docs://analysis/annotation_evidence`.
+Five scenarios exercising the annotation-trust surface (evidence / evidence_score / tier / call_class / interpro_type) across the 17 supported ontologies, plus the organism-level coverage rollups on `list_organisms` (`by_annotation_capability`). See `docs://analysis/annotation_evidence`.
 
 ```bash
 uv run python examples/annotation_evidence.py --scenario merops_call_class
 uv run python examples/annotation_evidence.py --scenario tcdb_attachment_depth
 uv run python examples/annotation_evidence.py --scenario interpro_enrichment
 uv run python examples/annotation_evidence.py --scenario trust_filtered_tcdb
+uv run python examples/annotation_evidence.py --scenario organism_rollups
 ```
 
 ## `ontology_terms.py`

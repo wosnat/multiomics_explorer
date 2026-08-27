@@ -12,6 +12,7 @@ Scenarios:
   2. tcdb_attachment_depth — most-specific vs superseded leaf rows (attachment_depth)
   3. interpro_enrichment  — interpro_type required on enrichment, then supplied
   4. trust_filtered_tcdb  — sources/evidence/min_evidence_score before enrichment
+  5. organism_rollups     — per-organism protease / domain coverage (list_organisms)
 
 Notes:
 - Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`,
@@ -31,6 +32,7 @@ from multiomics_explorer import (
     gene_ontology_terms,
     genes_by_ontology,
     list_filter_values,
+    list_organisms,
     pathway_enrichment,
 )
 
@@ -195,11 +197,65 @@ def scenario_trust_filtered_tcdb() -> None:
           f"background_filtered={envelope.get('background_filtered')}")
 
 
+def scenario_organism_rollups() -> None:
+    """Use this when the user asks 'which organisms carry the most
+    protease genes?' or 'how well is this strain covered by InterPro /
+    NCBIfam?' — organism-level coverage before any gene-level drill-down.
+
+    Surface: list_organisms rows carry four zero-filled distinct-gene counts
+    (peptidase_gene_count, nonpeptidase_homolog_gene_count,
+    interpro_gene_count, ncbifam_gene_count); the envelope's
+    by_annotation_capability ranks the top 10 of the matched set by
+    peptidase_gene_count. There is no filter on these counts by design —
+    48 organisms is small enough to read, so read the ranking.
+    """
+    print("=== Scenario: organism_rollups ===")
+    print("Question class: 'which organisms are protease-rich / best covered by domain annotation?'")
+    print()
+
+    survey = list_organisms(summary=True)
+    ranking = survey.get("by_annotation_capability") or []
+    print(f"organisms matched: {survey.get('total_matching')}; "
+          f"ranked (all-zero rows excluded, top 10): {len(ranking)}")
+    print(f"  {'organism':<34} {'peptidase_gene_count':>20} "
+          f"{'nonpeptidase_homolog_gene_count':>31} {'interpro_gene_count':>19} "
+          f"{'ncbifam_gene_count':>18}")
+    for row in ranking:
+        print(f"  {row.get('preferred_name', '')[:34]:<34} "
+              f"{row.get('peptidase_gene_count'):>20} "
+              f"{row.get('nonpeptidase_homolog_gene_count'):>31} "
+              f"{row.get('interpro_gene_count'):>19} "
+              f"{row.get('ncbifam_gene_count'):>18}")
+    if ranking:
+        top = ranking[0]
+        print()
+        print(f"top organism by peptidase_gene_count: {top.get('preferred_name')} "
+              f"({top.get('peptidase_gene_count')} peptidase genes)")
+    print()
+    print("Coverage counts scale with genome size — a 4,000-gene heterotroph")
+    print("out-counts a 2,000-gene Prochlorococcus on every column. Compare")
+    print("within a clade, then drill in with")
+    print("genes_by_ontology(ontology='merops', organism=..., call_class=['peptidase']).")
+    print()
+
+    subset = list_organisms(organism_names=["Prochlorococcus MED4"])
+    rows = subset.get("results", [])
+    if rows:
+        med4 = rows[0]
+        print("Per-row counts for one organism (list_organisms(organism_names=['Prochlorococcus MED4'])):")
+        for key in ("peptidase_gene_count", "nonpeptidase_homolog_gene_count",
+                    "interpro_gene_count", "ncbifam_gene_count"):
+            print(f"  {key}={med4.get(key)}")
+    print(f"  by_annotation_capability over the subset: "
+          f"{[r.get('preferred_name') for r in subset.get('by_annotation_capability') or []]}")
+
+
 SCENARIOS: dict[str, Callable[[], None]] = {
     "merops_call_class": scenario_merops_call_class,
     "tcdb_attachment_depth": scenario_tcdb_attachment_depth,
     "interpro_enrichment": scenario_interpro_enrichment,
     "trust_filtered_tcdb": scenario_trust_filtered_tcdb,
+    "organism_rollups": scenario_organism_rollups,
 }
 
 

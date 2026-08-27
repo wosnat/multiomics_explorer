@@ -11,7 +11,10 @@ examples:
     # of its subfamilies, so rows come only from the subfamilies
     # (deepest-attachment projection): 13 distinct metabolites, matching
     # `gene_overview.transported_metabolite_count`. `by_gene[0]` reads
-    # transport_substrate_resolution='resolved', tcdb_evidence_score_max=0.8.
+    # transport_substrate_resolution='resolved', tcdb_evidence_score_max=0.8,
+    # and every one of the 13 transport rows repeats
+    # transport_substrate_resolution='resolved' — the gene's value, not a
+    # per-substrate one (substrate_depth is the per-row fact).
 
   - title: Single-gene drill-down — superfamily-only gene (reachability, not capability)
     call: metabolites_by_gene(locus_tags=["PMM0913"], organism="Prochlorococcus MED4", limit=5)
@@ -217,6 +220,16 @@ mistakes:
     hierarchy; it can be a family node and it is not a curation level.
     `inherited` rows came down from an ancestor's substrate set.
   - >-
+    Row-level `transport_substrate_resolution` is the GENE's resolution
+    (the same KG value `by_gene[]` and `gene_overview` carry), repeated on
+    every transport row of that gene — it is not a per-substrate fact and it
+    never varies across one gene's rows (PMM0913: 554 rows, all
+    `family_inferred`, including the 242 `most_specific` ones). Do not read
+    it as "this substrate is inferred"; the per-row fact is
+    `substrate_depth`. Metabolism rows read `None` (union padding), never
+    `resolved`. It exists on rows so a batch-DE scan can drop
+    `family_inferred` rows without a join back to `by_gene[]`.
+  - >-
     When the auto-warning fires (input genes read
     `transport_substrate_resolution='family_inferred'`), their substrate
     breadth is reachability, not capability — and `substrate_depth=['most_specific']`
@@ -242,7 +255,7 @@ mistakes:
   - >-
     Every result row has the same key set — cross-arm fields are explicitly
     `None` on rows from the other arm (metabolism rows have
-    `substrate_depth`/`tcdb_evidence_score`/`tcdb_family_id`/`tcdb_family_name`
+    `substrate_depth`/`tcdb_evidence_score`/`transport_substrate_resolution`/`tcdb_family_id`/`tcdb_family_name`
     = None; transport rows have `reaction_id`/`reaction_name`/`ec_numbers`/`mass_balance`
     = None). Use `row['substrate_depth']` (KeyError-free) rather than
     `row.get('substrate_depth')` if the difference matters.

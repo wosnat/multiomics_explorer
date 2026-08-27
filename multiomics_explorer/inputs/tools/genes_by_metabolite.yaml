@@ -13,8 +13,13 @@ examples:
     #   0.8, urtA 0.6.
     # — inherited rows follow: ABC-superfamily (tcdb:3.A.1) genes whose
     #   deepest TCDB attachment is the superfamily itself.
-    # top_genes entries carry transport_substrate_resolution + tcdb_evidence_score_max
-    # (gene-level facts — not repeated per row).
+    # Every transport row also carries transport_substrate_resolution — the
+    # GENE's KG-authoritative value repeated on each of that gene's transport
+    # rows ('resolved' on all ten urtABCDE rows, 'family_inferred' on the
+    # ABC-superfamily-only rows); metabolism rows read None. It is not a
+    # per-substrate fact: the per-row fact is substrate_depth. top_genes
+    # entries carry transport_substrate_resolution + tcdb_evidence_score_max
+    # once per gene.
 
   - title: Cross-feeding pair (Workflow B) — call once per organism, intersect locus_tags client-side
     steps: |
@@ -132,6 +137,16 @@ mistakes:
     node (nitrite via tcdb:2.A.16) and it is not a curation level.
     `inherited` rows came down from an ancestor's substrate set.
   - >-
+    Row-level `transport_substrate_resolution` is the GENE's resolution
+    (the same KG value `gene_overview` and `top_genes[]` carry), repeated on
+    every transport row of that gene — it is not a per-substrate fact and it
+    does not vary across a gene's rows. Do not read `family_inferred` on a
+    row as "this substrate is inferred": it says the gene's whole substrate
+    breadth is reachability through a lumping family. The per-row fact is
+    `substrate_depth`. Metabolism rows read `None` (union padding), never
+    `resolved`. Group rows by locus_tag when you want one resolution per
+    gene, or read `top_genes[]` directly.
+  - >-
     When the auto-warning fires (most transport rows are `inherited`),
     choose by question shape: `substrate_depth=['most_specific']` for
     conservative casts (cross-organism inference); no filter for
@@ -151,7 +166,7 @@ mistakes:
   - >-
     Every result row has the same key set — cross-arm fields are explicitly
     `None` on rows from the other arm (metabolism rows have
-    `substrate_depth`/`tcdb_evidence_score`/`tcdb_family_id`/`tcdb_family_name`
+    `substrate_depth`/`tcdb_evidence_score`/`transport_substrate_resolution`/`tcdb_family_id`/`tcdb_family_name`
     = None; transport rows have `reaction_id`/`reaction_name`/`ec_numbers`/`mass_balance`
     = None). Use `row['substrate_depth']` (KeyError-free) rather than
     `row.get('substrate_depth')` if the difference matters.

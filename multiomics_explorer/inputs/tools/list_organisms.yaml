@@ -7,10 +7,10 @@ examples:
     call: list_organisms()
     response: |
       {
-        "total_entries": 47,
-        "total_matching": 47,
+        "total_entries": 48,
+        "total_matching": 48,
         "by_organism_type": [
-          {"organism_type": "genome_strain", "count": 40},
+          {"organism_type": "genome_strain", "count": 41},
           {"organism_type": "treatment", "count": 5},
           {"organism_type": "reference_proteome_match", "count": 2}
         ],
@@ -19,9 +19,46 @@ examples:
         "offset": 0,
         "not_found": [],
         "results": [
-          {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 17, "experiment_count": 114, "treatment_types": ["coculture", "carbon", "nitrogen", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS", ...], "clustering_analysis_count": 4, "cluster_types": ["diel", "time_course"], "reaction_count": 943, "catalyzed_metabolite_count": 1039, "transported_metabolite_count": 1069}
+          {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 17, "experiment_count": 114, "treatment_types": ["coculture", "carbon", "nitrogen", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS", ...], "clustering_analysis_count": 4, "cluster_types": ["diel", "time_course"], "reaction_count": 943, "catalyzed_metabolite_count": 1039, "transported_metabolite_count": 1069, "peptidase_gene_count": 50, "nonpeptidase_homolog_gene_count": 8, "interpro_gene_count": 1545, "ncbifam_gene_count": 744}
         ]
       }
+
+  - title: Read the annotation-capability ranking (protease and domain coverage per organism)
+    call: list_organisms(summary=True)
+    response: |
+      # Four per-row coverage counts, each the number of DISTINCT genes in the
+      # organism with that annotation: peptidase_gene_count (a MEROPS
+      # `peptidase` call), nonpeptidase_homolog_gene_count (a MEROPS
+      # `nonpeptidase_homolog` call — sequence resembles a peptidase family
+      # but the catalytic machinery is missing), interpro_gene_count (at
+      # least one InterPro entry), ncbifam_gene_count (at least one NCBIfam
+      # family). Zero-filled, never null. by_annotation_capability ranks the
+      # top 10 of the MATCHED set by peptidase_gene_count desc, then
+      # preferred_name; organisms whose four counts are all 0 (treatment
+      # taxa, genome-less umbrella nodes) are excluded.
+      {"total_entries": 48, "total_matching": 48,
+       "by_annotation_capability": [
+         {"preferred_name": "Alteromonas (MarRef v6)", "organism_name": "Alteromonas (MarRef v6)", "peptidase_gene_count": 148, "nonpeptidase_homolog_gene_count": 31, "interpro_gene_count": 3746, "ncbifam_gene_count": 1379},
+         {"preferred_name": "Alteromonas macleodii AD45", "organism_name": "Alteromonas macleodii AD45", "peptidase_gene_count": 129, "nonpeptidase_homolog_gene_count": 32, "interpro_gene_count": 3495, "ncbifam_gene_count": 1611},
+         {"preferred_name": "Shewanella sp. W3-18-1", "organism_name": "Shewanella sp. W3-18-1", "peptidase_gene_count": 128, "...": "..."},
+         "...7 more entries..."
+       ],
+       "returned": 0, "truncated": true, "offset": 0, "not_found": [], "results": []}
+
+      # There is no filter on these counts by design — 48 rows is small enough
+      # to read. Read the ranking; do not try to select on it. The counts are
+      # coverage (how much of the genome carries the annotation), not a quality
+      # score, and they scale with genome size: a 4,000-gene heterotroph will
+      # out-count a 2,000-gene Prochlorococcus on every column.
+
+  - title: Compare a few named organisms' annotation coverage
+    call: list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MIT1002"])
+    response: |
+      # by_annotation_capability is computed over the matched rows only — here
+      # exactly the two organisms, MIT1002 first (more peptidase genes). A
+      # subset whose only members have all-zero counts yields an empty list
+      # while the rows themselves are still returned.
+      {"total_matching": 2, "by_annotation_capability": [{"preferred_name": "Alteromonas macleodii MIT1002", "organism_name": "Alteromonas macleodii MIT1002", "peptidase_gene_count": 120, "nonpeptidase_homolog_gene_count": 32, "interpro_gene_count": 3584, "ncbifam_gene_count": 1699}, {"preferred_name": "Prochlorococcus MED4", "organism_name": "Prochlorococcus MED4", "peptidase_gene_count": 50, "nonpeptidase_homolog_gene_count": 8, "interpro_gene_count": 1545, "ncbifam_gene_count": 744}], "results": ["..."]}
 
   - title: Full taxonomy
     call: list_organisms(verbose=True)
@@ -29,7 +66,7 @@ examples:
   - title: Look up specific organisms by name
     call: list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301", "Bogus organism"])
     response: |
-      {"total_entries": 47, "total_matching": 2, "returned": 2, "truncated": false, "not_found": ["Bogus organism"], "by_organism_type": [{"organism_type": "genome_strain", "count": 2}], "by_metabolic_capability": [{"organism_name": "Prochlorococcus MED4", "reaction_count": 943, "catalyzed_metabolite_count": 1039, "transported_metabolite_count": 1069}, {"organism_name": "Prochlorococcus MIT9301", "reaction_count": 945, "catalyzed_metabolite_count": 1052, "transported_metabolite_count": 1061}], "results": [{"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "gene_count": 1976, "reaction_count": 943, "catalyzed_metabolite_count": 1039, "transported_metabolite_count": 1069, ...}, {"organism_name": "Prochlorococcus MIT9301", "organism_type": "genome_strain", "gene_count": 1935, "reaction_count": 945, "catalyzed_metabolite_count": 1052, "transported_metabolite_count": 1061, ...}]}
+      {"total_entries": 48, "total_matching": 2, "returned": 2, "truncated": false, "not_found": ["Bogus organism"], "by_organism_type": [{"organism_type": "genome_strain", "count": 2}], "by_metabolic_capability": [{"organism_name": "Prochlorococcus MED4", "reaction_count": 943, "catalyzed_metabolite_count": 1039, "transported_metabolite_count": 1069}, {"organism_name": "Prochlorococcus MIT9301", "reaction_count": 945, "catalyzed_metabolite_count": 1052, "transported_metabolite_count": 1061}], "results": [{"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "gene_count": 1976, "reaction_count": 943, "catalyzed_metabolite_count": 1039, "transported_metabolite_count": 1069, ...}, {"organism_name": "Prochlorococcus MIT9301", "organism_type": "genome_strain", "gene_count": 1935, "reaction_count": 945, "catalyzed_metabolite_count": 1052, "transported_metabolite_count": 1061, ...}]}
 
   - title: Chaining to genes and publications
     steps: |
@@ -54,12 +91,12 @@ examples:
   - title: Identify chemistry-rich organisms (capability ranking)
     call: list_organisms(summary=True)
     response: |
-      {"total_entries": 47, "total_matching": 47, "by_metabolic_capability": [{"organism_name": "Pseudomonas putida KT2440", "reaction_count": 1449, "catalyzed_metabolite_count": 1490, "transported_metabolite_count": 1260}, {"organism_name": "Ruegeria pomeroyi DSS-3", "reaction_count": 1377, "catalyzed_metabolite_count": 1468, "transported_metabolite_count": 1213}, {"organism_name": "Alteromonas macleodii EZ55", "reaction_count": 1348, "catalyzed_metabolite_count": 1428, "transported_metabolite_count": 1266}], "returned": 0, "truncated": true, "offset": 0, "not_found": [], "results": []}
+      {"total_entries": 48, "total_matching": 48, "by_metabolic_capability": [{"organism_name": "Pseudomonas putida KT2440", "reaction_count": 1449, "catalyzed_metabolite_count": 1490, "transported_metabolite_count": 1260}, {"organism_name": "Ruegeria pomeroyi DSS-3", "reaction_count": 1377, "catalyzed_metabolite_count": 1468, "transported_metabolite_count": 1213}, {"organism_name": "Alteromonas macleodii EZ55", "reaction_count": 1348, "catalyzed_metabolite_count": 1428, "transported_metabolite_count": 1266}], "returned": 0, "truncated": true, "offset": 0, "not_found": [], "results": []}
 
   - title: Survey measurement coverage across organisms
     call: list_organisms(summary=True)
     response: |
-      {"total_entries": 47, "total_matching": 47, "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 42}, "returned": 0, "truncated": true, "offset": 0, "not_found": [], "results": []}
+      {"total_entries": 48, "total_matching": 48, "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 43}, "returned": 0, "truncated": true, "offset": 0, "not_found": [], "results": []}
 
 chaining:
   - "list_organisms → genes_by_function"
@@ -69,6 +106,8 @@ chaining:
   - "list_organisms → list_clustering_analyses(organism=...)"
   - "list_organisms(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric"
   - "list_organisms (per-row catalyzed_metabolite_count > 0) → list_metabolites(organism_names=[organism_name]) for chemistry drill-down"
+  - "list_organisms(summary=True) → by_annotation_capability → genes_by_ontology(ontology='merops', organism=..., call_class=['peptidase']) for the peptidase genes behind peptidase_gene_count"
+  - "list_organisms → per-row interpro_gene_count / ncbifam_gene_count → ontology_landscape(organism=..., ontology=['interpro', 'ncbifam']) before enrichment on a domain ontology"
 
 verbose_fields:
   - family
@@ -89,3 +128,6 @@ mistakes:
   - "`catalyzed_metabolite_count` counts catalysis capability only — distinct metabolites reachable through Gene → Reaction → Metabolite. Transport reach is the separate `transported_metabolite_count` (distinct metabolites through Gene → TcdbFamily → Metabolite over each gene's deepest TCDB attachments; breadth, not a confidence signal — inherited superfamily substrates count). Measurement-side coverage is `measured_metabolite_count`. catalyzed_metabolite_count=0 means no catalysis path in this organism, not that chemistry is absent from the KG."
   - "by_metabolic_capability is a top-10 ranking sorted by catalyzed_metabolite_count descending (transported_metabolite_count is carried as a column, not a sort key); organisms with zero chemistry are excluded. Use it on summary=True calls to identify chemistry-rich organisms before drilling in via list_metabolites(organism_names=[...])."
   - "by_measurement_capability is a binary rollup ({has_metabolomics, no_metabolomics}) — tool-specific shape that deviates from the list[{key,count}] frequency rollups elsewhere. See docs://guide/conventions for the standard envelope shape."
+  - "The four annotation-coverage counts (`peptidase_gene_count`, `nonpeptidase_homolog_gene_count`, `interpro_gene_count`, `ncbifam_gene_count`) are distinct-gene counts per organism, zero-filled (never null). A gene carrying both a `peptidase` and a `nonpeptidase_homolog` MEROPS call counts once in each. They measure coverage, not annotation quality, and scale with genome size — rank Prochlorococcus strains against each other, not against a 4,000-gene heterotroph."
+  - "`by_annotation_capability` is a top-10 ranking of the matched set by `peptidase_gene_count` descending, then `preferred_name`; the other three counts are carried as columns, not sort keys. All-zero rows are excluded from the ranking but still appear in `results`. There is no min-count filter — read the ranking, then drill in with genes_by_ontology(ontology='merops', call_class=['peptidase'], organism=...)."
+  - "Two OrganismTaxon nodes can share a `preferred_name` (the Meiothermus ruber genome strain and the gene-less Meiothermus ruber treatment taxon). Their rows differ in `organism_type` and `gene_count`; the treatment taxon reads 0 on every coverage count. When you need a strain, pick the `genome_strain` row."

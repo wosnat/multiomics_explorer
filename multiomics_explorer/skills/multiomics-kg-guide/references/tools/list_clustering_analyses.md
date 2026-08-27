@@ -19,7 +19,7 @@ analysis_ids=[id])` to scope a per-gene cluster lookup.
 |---|---|---|---|
 | search_text | string \| None | None | Lucene full-text query over analysis name, cluster names, functional/behavioral descriptions, experimental_context. Results ranked by score. |
 | organism | string \| None | None | Filter by organism (case-insensitive partial match). |
-| cluster_type | string \| None | None | Filter: 'condition_comparison', 'diel', 'time_course'. |
+| cluster_type | string \| None | None | Filter by cluster type. Live vocabulary: list_filter_values(filter_type='cluster_type'). Offline examples: 'condition_comparison', 'decay_pattern', 'diel', 'expression_bin', 'genomic_island', 'time_course'. |
 | treatment_type | list[string] \| None | None | Filter by treatment type(s). E.g. ['nitrogen_stress']. |
 | background_factors | list[string] \| None | None | Filter by background factors. E.g. ['axenic', 'diel_cycle']. |
 | growth_phases | list[string] \| None | None | Filter by growth phase(s) (case-insensitive). Physiological state of the culture at sampling time. E.g. ['exponential', 'nutrient_limited']. |
@@ -147,6 +147,10 @@ response['total_matching']  # use total, not len — results may be truncated
 ```
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
+
+- Valid `cluster_type` values come from the KG vocabulary — enumerate them with list_filter_values(filter_type='cluster_type') (currently six: time_course, diel, condition_comparison, expression_bin, decay_pattern, genomic_island). The list quoted in the parameter description is documentation, not the source.
+
+- An analysis with `treatment_type: []` is a characterization study (e.g. decay_pattern clusters from an mRNA half-life survey) with no perturbation — a real value, not a missing annotation. `treatment_type=[...]` filters do not match it.
 
 - DataFrame conversion: `to_dataframe(result)` auto-dispatches and returns one row per analysis × cluster (compact: cluster_id / cluster_name / cluster_member_count; verbose=True adds cluster descriptions). See `docs://guide/python_api`.
 

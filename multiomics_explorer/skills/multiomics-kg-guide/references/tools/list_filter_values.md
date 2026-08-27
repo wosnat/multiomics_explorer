@@ -2,7 +2,13 @@
 
 ## What it does
 
-Enumerate valid values + counts for a categorical filter (gene_category, brite_tree, growth_phase, metric_type, value_kind, compartment, omics_type, evidence_source, plus the annotation-trust types).
+Enumerate valid values + counts for a categorical filter (gene_category, brite_tree, growth_phase, metric_type, value_kind, compartment, omics_type, evidence_source, cluster_type, plus the annotation-trust types).
+
+`cluster_type` enumerates the closed ClusteringAnalysis.cluster_type
+vocabulary from ControlledVocabulary (source='vocabulary'; falls back
+to a pivot over ClusteringAnalysis nodes with a warning) — the live
+source for the `cluster_type` filter on `list_clustering_analyses` /
+`gene_clusters_by_gene`.
 
 [TRUST] evidence / sources / call_class / interpro_type /
 ncbifam_family_type / merops_catalytic_type / merops_family_class /
@@ -16,7 +22,7 @@ Routing: feed the returned `value`s into the corresponding filter on the relevan
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment', 'omics_type', 'evidence_source', 'evidence', 'sources', 'call_class', 'interpro_type', 'ncbifam_family_type', 'merops_catalytic_type', 'merops_family_class', 'best_hit_kind', 'pfam_support', 'attachment_depth', 'trust_axes', 'link_kinds') | gene_category | Which categorical filter to enumerate. `omics_type` returns the full canonical enum incl. METABOLOMICS; `evidence_source` returns Metabolite.evidence_sources values. The trust-surface types (evidence, sources, call_class, interpro_type, ncbifam_family_type, merops_catalytic_type, merops_family_class, best_hit_kind, pfam_support, attachment_depth, trust_axes, link_kinds) come from ControlledVocabulary (or a pivot-query fallback) / config — see docs://analysis/annotation_evidence. |
+| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment', 'omics_type', 'evidence_source', 'evidence', 'sources', 'call_class', 'interpro_type', 'ncbifam_family_type', 'merops_catalytic_type', 'merops_family_class', 'best_hit_kind', 'pfam_support', 'attachment_depth', 'trust_axes', 'link_kinds', 'cluster_type') | gene_category | Which categorical filter to enumerate. `cluster_type` reads the ClusteringAnalysis.cluster_type ControlledVocabulary (pivot fallback + warning). `omics_type` returns the full canonical enum incl. METABOLOMICS; `evidence_source` returns Metabolite.evidence_sources values. The trust-surface types (evidence, sources, call_class, interpro_type, ncbifam_family_type, merops_catalytic_type, merops_family_class, best_hit_kind, pfam_support, attachment_depth, trust_axes, link_kinds) come from ControlledVocabulary (or a pivot-query fallback) / config — see docs://analysis/annotation_evidence. |
 | ontology | string \| None | None | Scope a trust filter_type (e.g. 'trust_axes') to one ontology key. Ignored on non-trust filter types. |
 
 ## Response format
@@ -295,10 +301,35 @@ list_filter_values(filter_type="merops_catalytic_type")
  ]}
 ```
 
+### Example 15: Enumerate clustering-analysis types (for the cluster_type filter)
+
+```example-call
+list_filter_values(filter_type="cluster_type")
+```
+
+```example-response
+# cluster_type is a closed vocabulary read from the KG's
+# ControlledVocabulary node for ClusteringAnalysis.cluster_type — the
+# authoritative source; the offline constant in the explorer is only a
+# fallback. Same vocabulary-or-pivot rule as the trust types: if the
+# node is missing, a live DISTINCT pivot over ClusteringAnalysis nodes
+# supplies the values, flagged source="pivot" with a warning.
+{"filter_type": "cluster_type", "total_entries": 6, "returned": 6, "truncated": false, "warnings": [],
+ "results": [
+   {"value": "time_course", "applies_to": ["ClusteringAnalysis"], "description": "...", "source": "vocabulary"},
+   {"value": "diel", "applies_to": ["ClusteringAnalysis"], "description": "...", "source": "vocabulary"},
+   {"value": "condition_comparison", "applies_to": ["ClusteringAnalysis"], "description": "...", "source": "vocabulary"},
+   {"value": "expression_bin", "applies_to": ["ClusteringAnalysis"], "description": "...", "source": "vocabulary"},
+   {"value": "decay_pattern", "applies_to": ["ClusteringAnalysis"], "description": "...", "source": "vocabulary"},
+   {"value": "genomic_island", "applies_to": ["ClusteringAnalysis"], "description": "...", "source": "vocabulary"}
+ ]}
+```
+
 ## Chaining patterns
 
 ```
 list_filter_values → genes_by_function(category=...)
+list_filter_values(filter_type='cluster_type') → list_clustering_analyses(cluster_type=...) / gene_clusters_by_gene(cluster_type=...)
 list_filter_values('brite_tree') → ontology_landscape(tree=...) → pathway_enrichment(tree=...)
 list_filter_values(filter_type='metric_type') → list_derived_metrics(metric_types=[...]) → genes_by_{kind}_metric
 list_filter_values(filter_type='compartment') → list_experiments(compartment=...) / list_organisms(compartment=...) / list_publications(compartment=...)
@@ -328,6 +359,8 @@ list_filter_values(filter_type='gene_category')  # then pass value to genes_by_f
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
 - Trust-related filter_type values (`evidence`, `sources`, `call_class`, `interpro_type`, `ncbifam_family_type`, `merops_catalytic_type`, `merops_family_class`, `best_hit_kind`, `pfam_support`, `attachment_depth`) are read from the KG's ControlledVocabulary nodes (or a live pivot-query fallback, flagged via `source: "pivot"` and a warning, if that node is missing). They are never hard-coded — a KG rebuild that adds a new value shows up here automatically.
+
+- `cluster_type` follows the same vocabulary-or-pivot rule (ControlledVocabulary for ClusteringAnalysis.cluster_type; six values). The value lists quoted in the `cluster_type` parameter descriptions of list_clustering_analyses / gene_clusters_by_gene are documentation only — this call is the live source, and a `warn` from kg_release_info on the vocabulary hash is the cue to prefer it over any quoted list.
 
 - `trust_axes` and `link_kinds` are config-derived (not KG-vocabulary reads) — they answer 'which filter params work on this ontology', not 'what values exist'. Pass `ontology=...` to scope either to one ontology; omit it to see all.
 

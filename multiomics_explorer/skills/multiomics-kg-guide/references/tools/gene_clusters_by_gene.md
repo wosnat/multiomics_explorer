@@ -17,7 +17,7 @@ into a cluster's full membership via `genes_in_cluster`.
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags (e.g. ['PMM0370', 'PMM0920']). |
 | organism | string \| None | None | Organism name (case-insensitive partial match); inferred from genes if omitted. Single organism enforced. |
-| cluster_type | string \| None | None | Filter: 'condition_comparison', 'diel', 'time_course'. |
+| cluster_type | string \| None | None | Filter by cluster type. Live vocabulary: list_filter_values(filter_type='cluster_type'). Offline examples: 'condition_comparison', 'decay_pattern', 'diel', 'expression_bin', 'genomic_island', 'time_course'. |
 | treatment_type | list[string] \| None | None | Filter by treatment type(s). |
 | background_factors | list[string] \| None | None | Filter by background factors. |
 | publication_doi | list[string] \| None | None | Filter by publication DOI(s). |
@@ -137,6 +137,10 @@ gene_clusters_by_gene(locus_tags='PMM0370')
 ```correction
 gene_clusters_by_gene(locus_tags=['PMM0370']) — always a list
 ```
+
+- Valid `cluster_type` values come from the KG vocabulary — enumerate them with list_filter_values(filter_type='cluster_type') (currently six: time_course, diel, condition_comparison, expression_bin, decay_pattern, genomic_island). The list quoted in the parameter description is documentation, not the source.
+
+- A row with `treatment_type: []` belongs to a characterization analysis (e.g. the mRNA-decay clusters), not a perturbation — it is a real, well-formed value, not a missing one. `treatment_type=[...]` filters do not match it.
 
 ## Package import equivalent
 

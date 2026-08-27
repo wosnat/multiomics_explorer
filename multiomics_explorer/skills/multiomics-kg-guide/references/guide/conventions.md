@@ -240,6 +240,25 @@ Always check the experiment's `table_scope` (surfaced on
 missing rows. Same gene can carry both shapes simultaneously across
 different experiments.
 
+`table_scope` is **sparse**: an experiment with no DE table at all — a
+characterization study (mRNA decay, promoter mapping) or a
+metabolomics-only experiment — carries no `table_scope` property, never
+an empty string. `list_experiments.by_table_scope` has no `""` bucket
+and `table_scope=[...]` filters never match those experiments.
+
+Two related experiment-metadata conventions:
+
+- **`treatment_type: []` means characterization, not perturbation.** The
+  list is dense (present on every `Experiment`, `ClusteringAnalysis`,
+  `DerivedMetric` and `MetaboliteAssay`); an empty list is a real value
+  saying "no treatment was applied — this study characterizes the
+  organism as-is". `treatment_type=[...]` filters do not match it.
+  `background_factors` is never `[]` — it is absent when there is none.
+- **`growth_phases` is an open vocabulary.** New papers add new labels;
+  enumerate live from the data rather than assuming a fixed set.
+  `treatment_type`, `cluster_type` and the trust vocabularies are closed
+  and readable via `list_filter_values`.
+
 The DerivedMetric layer is **positive-only by storage convention** —
 `Derived_metric_flags_gene` only stores edges for `flag=True`, so
 `flag=False` returns 0 rows. Tested-absent semantics on the DM side
@@ -544,6 +563,20 @@ rows.
 never hard-coded. If a `ControlledVocabulary` node is missing for some edge
 type, a live pivot query derives the value set instead, flagged
 `source: "pivot"` plus a warning — same values, just not pre-registered.
+The same rule covers non-trust closed vocabularies such as `cluster_type`.
+
+**Vocabulary-hash warn.** The KG stamps
+`Schema_info.controlled_vocabularies_hash` (sha256 over every
+`ControlledVocabulary` entry's ids, values, closed/sparse flags and score
+signals — descriptions excluded). `kg_release_info` compares it with the
+hash the explorer was built against; a mismatch, or a KG that predates the
+vocabulary contract, yields `verdict: warn` — never worse. What it means:
+calls are unaffected (filters validate live, `list_filter_values` reads
+live), but the value lists quoted in `docs://ontologies/{key}` pages and in
+parameter descriptions were rendered from the pinned vocabulary and may be
+stale. When the warn is up, trust `list_filter_values` over any quoted
+list. The pin is re-set at explorer release time to equal the live KG's
+hash.
 
 Full per-ontology trust profile, the rank-vs-filter rule, MEROPS
 `call_class` semantics, and why InterPro enrichment requires `interpro_type`:

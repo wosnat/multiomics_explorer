@@ -21,7 +21,86 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 
 ## [Unreleased]
 
+**KG requirement:** this release targets KG `0.1.0-alpha.7` (the
+KG-side sync that adds the organism annotation rollups, the
+`ControlledVocabulary` hash, and the paper batch below). It adds a new MCP
+tool (`ontology_term_details`) and changes row shapes, so the explorer
+version becomes `0.1.0-alpha.5` and the KG's `mcp_min_version` must be
+coordinated to `0.1.0a5` ahead of the KG release.
+
 ### Added
+
+- **Annotation-trust surface** on the ontology tools. Every gene→term edge
+  across the 14 functional-edge ontologies carries a compact `evidence`
+  column (five-rung ladder `curated > signature > homology >
+  family_inferred > domain_inferred`); `sources[]`, `evidence_score`
+  (`[0, 1]` composite) and `tier` are verbose. New filters on
+  `genes_by_ontology`, `gene_ontology_terms`, `pathway_enrichment`,
+  `cluster_enrichment` and `ontology_landscape`: `sources`, `evidence`,
+  `max_tier`, `min_evidence_score` (the only numeric cutoff in the surface),
+  `call_class` (MEROPS) and `interpro_type` (InterPro; required on InterPro
+  enrichment). All default to `None` and never narrow a result unless set.
+  Full-match envelope rollups `by_evidence` / `by_tier` / `by_sources` /
+  `by_call_class` / `evidence_score_stats`, plus `evidence_score_signals`
+  whenever `min_evidence_score` is set. Rows carry only the trust columns
+  their ontology owns (strip rule). See `docs://analysis/annotation_evidence`.
+- **InterPro, NCBIfam and MEROPS** registered as ontologies 15–17 across the
+  ontology tools and both enrichment tools. `ontology_landscape` breaks
+  InterPro rows down per `interpro_type` and reports `best_interpro_type`.
+- `ontology_term_details` MCP tool — batch term lookup across all 17
+  ontologies: parents, children, bridge links (`links_out`), direct and
+  subtree gene / organism counts, per-ontology native detail; `not_found`
+  for unknown IDs.
+- `search_ontology` **browse mode**: omit `search_text` to list an
+  ontology's terms ranked by `gene_count` (`mode: 'browse'`, `by_level`
+  rollup). `ontology` now accepts a list (or `None` for all 17) with
+  lockstep paging (`limit` / `offset` apply per ontology; `by_ontology`
+  carries per-ontology truncation). New params `min_gene_count`, `organism`
+  (adds `organism_gene_count`), `interpro_type`, `verbose` (term
+  `description`). Every row carries `gene_count`, `organism_count` and
+  `ontology_type`.
+- `gene_overview` rows: `merops_classes` (list — a gene can carry both a
+  `peptidase` and a `nonpeptidase_homolog` call), `ncbifam_family_count`,
+  `merops_evidence_score_max` (sparse, uncoalesced — rank, don't filter);
+  envelope `by_merops_class`, `has_ncbifam`.
+- `list_filter_values` trust types (`evidence`, `sources`, `call_class`,
+  `interpro_type`, `ncbifam_family_type`, `merops_catalytic_type`,
+  `merops_family_class`, `best_hit_kind`, `pfam_support`,
+  `attachment_depth`) read from the KG's `ControlledVocabulary` nodes with a
+  live pivot-query fallback (`source: 'pivot'` + warning), and the
+  config-derived `trust_axes` / `link_kinds` (scoped by `ontology=`).
+- Per-ontology reference pages `docs://ontologies/{key}` (17 pages + index)
+  generated from `inputs/ontologies/*.yaml`; `docs://analysis/annotation_evidence`
+  methodology guide; runnable examples `examples/annotation_evidence.py`
+  and `examples/ontology_terms.py`.
+- `kg_release_info` **vocabulary-set assert**: a sixth assert bucket
+  (`controlled_vocabularies_hash`) compares the KG's
+  `Schema_info.controlled_vocabularies_hash` with the hash the explorer was
+  built against. A mismatch, or a KG that predates the vocabulary contract,
+  yields `warn` (never worse) with a summary sentence explaining that
+  filters still validate live and `list_filter_values` reads live, but
+  quoted value lists in `docs://ontologies` pages and parameter descriptions
+  may be stale. `kg.controlled_vocabularies_hash` is surfaced. The pin is
+  re-set at explorer release time to equal the live KG's hash.
+- `genes_by_metabolite` / `metabolites_by_gene` detail rows carry
+  `transport_substrate_resolution` on the transport arm (`resolved` |
+  `family_inferred`; `None` on metabolism rows). It is the gene's
+  KG-authoritative value repeated on each of that gene's transport rows —
+  not a per-substrate fact (`substrate_depth` is) — so a batch scan can drop
+  `family_inferred` rows without a join back to `top_genes[]` / `by_gene[]`.
+- `list_organisms` rows: annotation-coverage counts `peptidase_gene_count`,
+  `nonpeptidase_homolog_gene_count`, `interpro_gene_count`,
+  `ncbifam_gene_count` (distinct genes, zero-filled); envelope
+  `by_annotation_capability` (top 10 of the matched set by
+  `peptidase_gene_count` desc then `preferred_name`, all four columns,
+  all-zero rows excluded). No count filter by design — read the ranking.
+- `list_filter_values(filter_type='cluster_type')` — the six
+  `ClusteringAnalysis.cluster_type` values from `ControlledVocabulary`
+  (`time_course`, `diel`, `condition_comparison`, `expression_bin`,
+  `decay_pattern`, `genomic_island`), pivot fallback + warning if the node is
+  missing. The `cluster_type` parameter descriptions on
+  `list_clustering_analyses` / `gene_clusters_by_gene` now point here;
+  `VALID_CLUSTER_TYPES` is the offline fallback (updated to 6 values).
 
 - `genes_by_metabolite` / `metabolites_by_gene` transport rows carry
   `tcdb_evidence_score` (the KG's 5-signal composite on the gene × family
@@ -40,6 +119,43 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 - Spec: `docs/tool-specs/2026-08-20-tcdb-substrate-depth-migration.md`.
 
 ### Changed
+
+- **Breaking:** PSORTb / SignalP native columns `localization_score` and
+  `signal_peptide_*` on ontology rows moved from compact to verbose — they
+  are ontology-specific scalars, now under the same verbose-only rule as
+  every other native trust detail (`confidence_score`, `evalue`,
+  `bit_score`, ...). Pass `verbose=True` to read them.
+- **Breaking:** row-level result models serialize **sparsely** on the MCP
+  wire: a key that was never set is omitted, an explicit `null` is kept.
+  Absent means "not applicable to this row" (a verbose-only column on a
+  compact call, a trust axis this ontology does not carry); `null` means
+  "applicable, but this record has no value". `genes_by_metabolite` /
+  `metabolites_by_gene`, `assays_by_metabolite` and
+  `discussed_by_publication` keep their None-padded union shape. See
+  `docs://guide/conventions`.
+- `search_ontology` with an empty `search_text` no longer raises — it
+  browses (see browse mode above).
+- `gene_ontology_terms.ontology` accepts a list (or `None`); a trust filter
+  carried by only some of the requested ontologies applies to those and
+  drops the rest into `skipped_ontologies` with a warning, one carried by
+  none raises.
+- TCDB leaf rows (`gene_ontology_terms(mode='leaf')`) exclude
+  `attachment_depth='superseded'` ancestor attachments unless
+  `include_superseded=True`.
+- `Experiment.table_scope` is now sparse: absent (never `""`) on
+  experiments with no differential-expression table. `list_experiments`
+  loses the `""` bucket in `by_table_scope`; `table_scope=[...]` filters
+  simply never match those experiments.
+- `treatment_type` is dense on `Experiment`, `ClusteringAnalysis`,
+  `DerivedMetric` and `MetaboliteAssay`; `treatment_type: []` is a real
+  value meaning a characterization experiment (no perturbation), not a
+  missing annotation. `treatment_type` gains the value `chemical`;
+  `growth_phases` stays an open vocabulary.
+- KG paper batch absorbed: 48 organisms (adds *Synechococcus* WH8109),
+  49 publications, 209 experiments; new `DerivedMetric` metric types
+  (mRNA half-life / decay time, TSS and promoter features) are discoverable
+  via `list_derived_metrics`. Schema baseline and regression goldens
+  refreshed accordingly.
 
 - **Breaking:** `genes_by_metabolite` / `metabolites_by_gene` param
   `transport_confidence` renamed to `substrate_depth`
@@ -91,6 +207,20 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
   substrate-depth migration below, `transporter_gene_count > 0`.
 
 ### Fixed
+
+- One-edge-per-(gene, term) rebind on the ontology tools picked the
+  **lowest**-ranked edge: the rebind reversed the output of
+  `apoc.coll.sortMaps`, which already sorts descending, so multi-edge
+  (gene, term) pairs reported the least-supported edge's trust columns.
+  Rows now carry the best edge (highest `evidence_score` /
+  `confidence_score` / deepest attachment). Row counts are unchanged; only
+  the trust columns of multi-edge rollup rows move.
+- `genes_by_ontology` full-match trust rollups no longer re-scan the detail
+  rows on every paged call (aggregate-only projection).
+- `search_ontology` / `ontology_term_details` resolve organism shorthand
+  (`'MED4'`) the way the other single-organism tools do, and strip a null
+  `direct_gene_count` instead of returning it as an applicable-but-empty
+  key.
 
 ## [0.1.0-alpha.4] - 2026-06-17
 ### Fixed
