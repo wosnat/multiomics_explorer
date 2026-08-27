@@ -1412,8 +1412,21 @@ class EnrichmentResult:
         limit: int | None = None,
         offset: int = 0,
     ) -> dict:
-        """MCP-compatible envelope: summary fields + paginated scalar results rows."""
+        """MCP-compatible envelope: summary fields + paginated scalar results rows.
+
+        The annotation-trust block echoes how the gene-to-term mapping was
+        shaped: ``filters_applied`` (the trust filters that were set),
+        ``trust_axes`` (what this ontology can be filtered on),
+        ``background_filtered`` (True when the filters moved the background
+        as well as the tested sets) and ``interpro_type`` (the stratum an
+        InterPro run was scoped to).
+        """
         env = self.generate_summary()
+        params = getattr(self, "params", None) or {}
+        env["filters_applied"] = dict(params.get("filters_applied") or {})
+        env["trust_axes"] = dict(params.get("trust_axes") or {})
+        env["background_filtered"] = bool(params.get("background_filtered"))
+        env["interpro_type"] = params.get("interpro_type")
         total = int(len(self.results))
 
         if summary:

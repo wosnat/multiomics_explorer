@@ -12,6 +12,7 @@ import logging
 import os
 import re
 import statistics
+from functools import lru_cache
 from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as _pkg_version
 from typing import Literal
@@ -34,6 +35,11 @@ from multiomics_explorer.kg.constants import (
 )
 from multiomics_explorer.kg.queries_lib import (
     ONTOLOGY_CONFIG,
+    ontology_row_columns,
+    ontology_trust_axes,
+    build_evidence_score_signals,
+    build_vocab_pivot_values,
+    build_vocab_values,
     build_discussed_by_publication,
     build_discussed_by_publication_summary,
     build_gene_aa_sequence,
@@ -207,18 +213,586 @@ _WRITE_KEYWORDS = re.compile(
 # Regex for escaping Lucene special characters on retry.
 _LUCENE_SPECIAL = re.compile(r'[+\-!(){}\[\]^"~*?:\\/]')
 
-# Sparse-null strip list for ontology-row edge properties. Owner ontology
-# (PSORTb / SignalP today) populates its column(s); non-owner ontologies emit
-# NULL. The api/ layer strips the nulls so non-owner rows carry no extra keys.
-# MUST stay in sync with the `edge_props` field on ONTOLOGY_CONFIG entries in
-# kg/queries_lib.py — if a future ontology adds new edge-prop columns, append
-# them here.
-_EDGE_PROP_COLS: tuple[str, ...] = (
-    "localization_score",
-    "signal_peptide_probability",
-    "signal_peptide_cleavage_site",
-    "signal_peptide_cleavage_probability",
+# ---------------------------------------------------------------------------
+# Annotation-trust surface: shared helpers
+#
+# One vocabulary of trust axes across every gene->term edge. ONTOLOGY_CONFIG
+# owns the shape (which axes an ontology carries, which native scalars are
+# verbose-only, which facet it exposes); ControlledVocabulary nodes in the
+# graph own the allowed values. Nothing here hard-codes a value set.
+# ---------------------------------------------------------------------------
+
+# Filter parameter -> normalized trust axis name in ONTOLOGY_CONFIG["trust"].
+_TRUST_PARAM_AXIS: dict[str, str] = {
+    "sources": "sources",
+    "evidence": "evidence",
+    "max_tier": "tier",
+    "min_evidence_score": "evidence_score",
+}
+
+# Every generic trust / facet filter, in the order envelopes echo them.
+_TRUST_PARAMS: tuple[str, ...] = (
+    "sources", "evidence", "max_tier", "min_evidence_score",
+    "call_class", "interpro_type",
 )
+
+_TRUST_AXIS_HINT = "list_filter_values(filter_type='trust_axes')"
+
+_TRUST_AXIS_DESCRIPTIONS: dict[str, str] = {
+    "sources": "Which pipelines asserted the annotation (membership list).",
+    "evidence": "Strength ladder: curated > signature > homology > "
+                "family_inferred > domain_inferred.",
+    "evidence_score": "Composite trust score in 0..1 — the only numeric "
+                      "cutoff (min_evidence_score) and the within-ontology "
+                      "sort key.",
+    "tier": "Diamond-truncation depth 1..3; null means the edge came from a "
+            "single source and was never truncated.",
+}
+
+# Cached ControlledVocabulary reads, keyed by (applies_to, property). The
+# graph is read once per process; a missing node degrades to a pivot query
+# plus a warning, never a raise.
+_VOCAB_CACHE: dict[tuple[str, str], dict] = {}
+
+
+def _reset_vocab_cache() -> None:
+    """Drop the cached ControlledVocabulary reads."""
+    _VOCAB_CACHE.clear()
+
+
+def _verbose_edge_props(cfg: dict) -> list[str]:
+    """Edge property names in an entry's ``verbose_edge`` list.
+
+    Entries are either a bare property name or a (property, column) pair
+    when the output column is renamed.
+    """
+    props: list[str] = []
+    for entry in cfg.get("verbose_edge") or []:
+        if isinstance(entry, str):
+            props.append(entry)
+        elif isinstance(entry, (tuple, list)) and entry:
+            props.append(entry[0])
+        elif isinstance(entry, dict):
+            prop = entry.get("prop")
+            if prop:
+                props.append(prop)
+    return props
+
+
+def _facet_owner(param: str) -> str | None:
+    """Ontology key whose facet is driven by `param`, if any."""
+    for key, cfg in ONTOLOGY_CONFIG.items():
+        facet = cfg.get("facet")
+        if isinstance(facet, dict) and facet.get("param") == param:
+            return key
+    return None
+
+
+def _compact_edge_owners(param: str) -> list[str]:
+    """Ontology keys carrying `param` as a compact edge column."""
+    return [
+        key for key, cfg in ONTOLOGY_CONFIG.items()
+        if param in (cfg.get("compact_edge") or {})
+    ]
+
+
+def _ontology_carries(ontology: str, param: str) -> bool:
+    """True when `ontology` can be filtered on `param`."""
+    if param in _TRUST_PARAM_AXIS:
+        return _TRUST_PARAM_AXIS[param] in ontology_trust_axes(ontology)
+    cfg = ONTOLOGY_CONFIG.get(ontology, {})
+    if param in (cfg.get("compact_edge") or {}):
+        return True
+    facet = cfg.get("facet")
+    return isinstance(facet, dict) and facet.get("param") == param
+
+
+def _active_trust_filters(**filters) -> dict:
+    """The subset of trust filters the caller actually set."""
+    return {p: filters[p] for p in _TRUST_PARAMS if filters.get(p) is not None}
+
+
+def _axes_phrase(ontology: str) -> str:
+    axes = ontology_trust_axes(ontology)
+    return ", ".join(axes) if axes else "none"
+
+
+def _unsupported_axis_error(ontology: str, param: str) -> ValueError:
+    """ValueError naming the ontology's axes and where to look them up."""
+    owner = _facet_owner(param)
+    owners = [owner] if owner else _compact_edge_owners(param)
+    if owners:
+        head = (
+            f"{param} is only carried by ontology "
+            f"{' / '.join(repr(o) for o in owners)}, not '{ontology}'."
+        )
+    else:
+        head = f"Ontology '{ontology}' does not carry the {param} filter."
+    return ValueError(
+        f"{head} Trust axes on '{ontology}': {_axes_phrase(ontology)}. "
+        f"Call {_TRUST_AXIS_HINT} for the per-ontology axis map."
+    )
+
+
+def _validate_trust_filters(ontology: str, filters: dict) -> None:
+    """Raise when a single-ontology call sets a filter it cannot carry."""
+    for param in filters:
+        if not _ontology_carries(ontology, param):
+            raise _unsupported_axis_error(ontology, param)
+
+
+def _normalize_ontology_arg(ontology) -> list[str] | None:
+    """Accept a key, a list of keys, or None; validate every name."""
+    if ontology is None:
+        return None
+    names = [ontology] if isinstance(ontology, str) else list(ontology)
+    if not names:
+        return None
+    unknown = [n for n in names if n not in ONTOLOGY_CONFIG]
+    if unknown:
+        raise ValueError(
+            f"Invalid ontology {', '.join(repr(n) for n in unknown)}. "
+            f"Valid: {sorted(ONTOLOGY_CONFIG)}"
+        )
+    seen: list[str] = []
+    for n in names:
+        if n not in seen:
+            seen.append(n)
+    return seen
+
+
+def _resolve_multi_ontology(
+    ontologies: list[str], filters: dict,
+) -> tuple[list[str], list[dict], list[str], dict[str, dict]]:
+    """Apply the multi-ontology skip / raise rules to a filter set.
+
+    Carried by all -> applied everywhere. Carried by some -> applied to the
+    carriers, the rest are dropped into `skipped` with a reason plus a
+    warning. Carried by none -> raise. A facet applies to its owner only and
+    never skips the others; a facet whose owner is absent raises.
+
+    Returns (targets, skipped, warnings, per_ontology_filters).
+    """
+    skipped: dict[str, str] = {}
+    warns: list[str] = []
+    per_ontology: dict[str, dict] = {o: {} for o in ontologies}
+
+    for param, value in filters.items():
+        carriers = [o for o in ontologies if _ontology_carries(o, param)]
+        if not carriers:
+            raise ValueError(
+                f"None of the requested ontologies "
+                f"({', '.join(ontologies)}) carries the {param} filter. "
+                f"Axes: "
+                + "; ".join(f"{o}=[{_axes_phrase(o)}]" for o in ontologies)
+                + f". Call {_TRUST_AXIS_HINT} for the per-ontology axis map."
+            )
+        for o in carriers:
+            per_ontology[o][param] = value
+        if _facet_owner(param) is not None:
+            continue
+        dropped = [o for o in ontologies if o not in carriers]
+        if dropped:
+            for o in dropped:
+                skipped.setdefault(o, f"does not carry the {param} filter")
+            warns.append(
+                f"Dropped {len(dropped)} ontologies that do not carry "
+                f"{param}: {', '.join(dropped)}. Re-run without {param} to "
+                f"see them."
+            )
+
+    targets = [o for o in ontologies if o not in skipped]
+    skipped_rows = [
+        {"ontology": o, "reason": skipped[o]} for o in ontologies if o in skipped
+    ]
+    return targets, skipped_rows, warns, per_ontology
+
+
+def _freq_rollup(counter, key: str) -> list[dict]:
+    """Counter -> the codebase's [{<key>, count}] rollup shape."""
+    return [{key: value, "count": n} for value, n in counter.most_common()]
+
+
+def _trust_rollups(rows: list[dict]) -> dict:
+    """Row-derived envelope rollups for the trust axes present in `rows`.
+
+    An axis no ontology in the batch carries yields an empty rollup rather
+    than a missing key, so a reader can tell "no rows" from "not carried"
+    by reading `trust_axes`.
+    """
+    from collections import Counter
+
+    evidence_counter: Counter = Counter()
+    tier_counter: Counter = Counter()
+    sources_counter: Counter = Counter()
+    call_class_counter: Counter = Counter()
+    scores: list[float] = []
+    n_null_score = 0
+
+    for r in rows:
+        if "evidence" in r and r["evidence"] is not None:
+            evidence_counter[r["evidence"]] += 1
+        if "tier" in r:
+            tier_counter["null" if r["tier"] is None else r["tier"]] += 1
+        if "sources" in r:
+            for s in r["sources"] or []:
+                sources_counter[s] += 1
+        if "call_class" in r and r["call_class"] is not None:
+            call_class_counter[r["call_class"]] += 1
+        if "evidence_score" in r:
+            if r["evidence_score"] is None:
+                n_null_score += 1
+            else:
+                scores.append(float(r["evidence_score"]))
+
+    stats = {
+        "min": min(scores) if scores else None,
+        "median": float(statistics.median(scores)) if scores else None,
+        "max": max(scores) if scores else None,
+        "n_null": n_null_score,
+    }
+    return {
+        "by_evidence": _freq_rollup(evidence_counter, "evidence"),
+        "by_tier": _freq_rollup(tier_counter, "tier"),
+        "by_sources": _freq_rollup(sources_counter, "source"),
+        "by_call_class": _freq_rollup(call_class_counter, "call_class"),
+        "evidence_score_stats": stats,
+    }
+
+
+def _trust_row_warnings(
+    rows: list[dict], targets: list[str], filters: dict,
+) -> list[str]:
+    """Rows-conditional auto-warnings for a finished detail slice."""
+    warns: list[str] = []
+    for ontology in targets:
+        cfg = ONTOLOGY_CONFIG.get(ontology, {})
+        for name, spec in (cfg.get("compact_edge") or {}).items():
+            if filters.get(name) is not None:
+                continue
+            warn_values = set(spec.get("warn_values") or [])
+            hits = [r for r in rows if r.get(name) in warn_values]
+            if not hits:
+                continue
+            observed = sorted({r[name] for r in hits})
+            warns.append(
+                f"{len(hits)} of {len(rows)} returned rows carry "
+                f"{name}={observed} — catalytically-dead homologs that keep "
+                f"the family fold but not a working active site. Pass "
+                f"{name}=[...] to scope the set."
+            )
+    if filters.get("max_tier") is not None:
+        n_null = sum(1 for r in rows if "tier" in r and r["tier"] is None)
+        if n_null:
+            warns.append(
+                f"max_tier={filters['max_tier']} kept {n_null} rows that "
+                f"carry no tier — single-source edges are never truncated, "
+                f"so a null tier is not a tier-1 call."
+            )
+    if filters.get("min_evidence_score") is not None:
+        warns.append(
+            f"min_evidence_score={filters['min_evidence_score']} applied — "
+            f"the one numeric trust cutoff. Read evidence_score_signals for "
+            f"the signals that fed each score."
+        )
+    return warns
+
+
+def _evidence_score_signals(conn, targets: list[str]) -> dict:
+    """Vocabulary-declared signals behind evidence_score, per edge type."""
+    edge_types = [
+        ONTOLOGY_CONFIG[o]["gene_rel"]
+        for o in targets
+        if "evidence_score" in ontology_trust_axes(o)
+        and ONTOLOGY_CONFIG.get(o, {}).get("gene_rel")
+    ]
+    if not edge_types:
+        return {}
+    cypher, params = build_evidence_score_signals(edge_types=edge_types)
+    rows = conn.execute_query(cypher, **params)
+    out: dict[str, list] = {}
+    for r in rows:
+        edge_type = r.get("edge_type") or r.get("applies_to")
+        if edge_type:
+            out[edge_type] = list(r.get("signals") or [])
+    return out
+
+
+def _read_vocab_values(
+    conn, applies_to: str, prop: str, kind: str, *, cache: bool = True,
+) -> dict:
+    """Allowed values for one (applies_to, property) pair.
+
+    Reads the ControlledVocabulary node first. When the node is missing the
+    values are derived from the graph with a pivot query and the result
+    carries a warning — never a raise.
+
+    Returns a dict with keys: values, description, source, warning.
+    """
+    key = (applies_to, prop)
+    if cache and key in _VOCAB_CACHE:
+        return _VOCAB_CACHE[key]
+
+    values: list = []
+    description = None
+    v_cypher, v_params = build_vocab_values(applies_to=applies_to, prop=prop)
+    for r in conn.execute_query(v_cypher, **v_params) or []:
+        for v in r.get("values") or []:
+            if v not in values:
+                values.append(v)
+        description = description or r.get("description")
+
+    if values:
+        out = {
+            "values": values, "description": description,
+            "source": "vocabulary", "warning": None,
+        }
+    else:
+        p_cypher, p_params = build_vocab_pivot_values(
+            applies_to=applies_to, prop=prop, kind=kind,
+        )
+        pivoted: list = []
+        for r in conn.execute_query(p_cypher, **p_params) or []:
+            v = r.get("value")
+            if v is None:
+                continue
+            if isinstance(v, list):
+                pivoted.extend(x for x in v if x not in pivoted)
+            elif v not in pivoted:
+                pivoted.append(v)
+        out = {
+            "values": pivoted, "description": description, "source": "pivot",
+            "warning": (
+                f"No ControlledVocabulary entry for {applies_to}.{prop}; "
+                f"allowed values derived from the graph "
+                f"(KG-side fix pending)"
+            ),
+        }
+    if cache:
+        _VOCAB_CACHE[key] = out
+    return out
+
+
+# Categorical filter params -> where their allowed values live.
+_CATEGORICAL_VALUE_SOURCE: dict[str, tuple[str, str]] = {
+    "evidence": ("edge", "evidence"),
+    "sources": ("edge", "sources"),
+    "call_class": ("edge", "call_class"),
+    "interpro_type": ("node", "interpro_type"),
+}
+
+
+def _validate_categorical_values(
+    conn, ontology: str, filters: dict,
+) -> list[str]:
+    """Check categorical filter values against the graph's vocabulary.
+
+    Silent when the vocabulary yields nothing — an unknown value is only
+    ever rejected against a known allowed set.
+    """
+    warns: list[str] = []
+    cfg = ONTOLOGY_CONFIG.get(ontology, {})
+    for param, value in filters.items():
+        if param not in _CATEGORICAL_VALUE_SOURCE:
+            continue
+        kind, prop = _CATEGORICAL_VALUE_SOURCE[param]
+        applies_to = cfg.get("gene_rel") if kind == "edge" else cfg.get("label")
+        if not applies_to:
+            continue
+        read = _read_vocab_values(conn, applies_to, prop, kind)
+        if read["warning"]:
+            warns.append(read["warning"])
+        allowed = read["values"]
+        if not allowed:
+            continue
+        wanted = value if isinstance(value, list) else [value]
+        unknown = [v for v in wanted if v not in allowed]
+        if unknown:
+            raise ValueError(
+                f"Unknown {param} value(s) {', '.join(map(repr, unknown))} "
+                f"for ontology '{ontology}'. Allowed: "
+                f"{', '.join(map(str, allowed))}. Call "
+                f"list_filter_values(filter_type='{param}') for the full set."
+            )
+    return warns
+
+
+# Annotation-trust `filter_type` values -> where their allowed values live.
+# `scope` says how the owning ontologies are found in ONTOLOGY_CONFIG:
+# "trust_axis" (the axis is declared), "compact_edge", "verbose_edge", or an
+# explicit ontology list for the node-side term-character values.
+_TRUST_FILTER_VALUE_SPECS: dict[str, dict] = {
+    "evidence": {"kind": "edge", "prop": "evidence", "scope": "trust_axis"},
+    "sources": {"kind": "edge", "prop": "sources", "scope": "trust_axis"},
+    "call_class": {"kind": "edge", "prop": "call_class",
+                   "scope": "compact_edge"},
+    "best_hit_kind": {"kind": "edge", "prop": "best_hit_kind",
+                      "scope": "verbose_edge"},
+    "pfam_support": {"kind": "edge", "prop": "pfam_support",
+                     "scope": "verbose_edge"},
+    "attachment_depth": {"kind": "edge", "prop": "attachment_depth",
+                         "scope": "verbose_edge"},
+    "interpro_type": {"kind": "node", "prop": "interpro_type",
+                      "ontologies": ["interpro"]},
+    "ncbifam_family_type": {"kind": "node", "prop": "family_type",
+                            "ontologies": ["ncbifam"]},
+    "merops_catalytic_type": {"kind": "node", "prop": "catalytic_type",
+                              "ontologies": ["merops"]},
+    "merops_family_class": {"kind": "node", "prop": "family_class",
+                            "ontologies": ["merops"]},
+}
+
+
+def _trust_value_owners(filter_type: str, ontology: str | None) -> list[str]:
+    """Ontology keys whose config declares this filter_type's property."""
+    spec = _TRUST_FILTER_VALUE_SPECS[filter_type]
+    prop = spec["prop"]
+    scope = spec.get("scope")
+    owners: list[str] = []
+    for key, cfg in ONTOLOGY_CONFIG.items():
+        if scope == "trust_axis":
+            hit = prop in ontology_trust_axes(key)
+        elif scope == "compact_edge":
+            hit = prop in (cfg.get("compact_edge") or {})
+        elif scope == "verbose_edge":
+            hit = prop in _verbose_edge_props(cfg)
+        else:
+            hit = key in spec.get("ontologies", [])
+        if hit:
+            owners.append(key)
+    if ontology is not None:
+        owners = [o for o in owners if o == ontology]
+    return owners
+
+
+def _trust_filter_values(
+    conn, filter_type: str, ontology: str | None,
+) -> tuple[list[dict], list[str]]:
+    """Allowed values for one annotation-trust filter_type.
+
+    One row per distinct value, carrying every edge type or label it applies
+    to, so a reader can see that `evidence` means the same thing everywhere.
+    """
+    spec = _TRUST_FILTER_VALUE_SPECS[filter_type]
+    kind, prop = spec["kind"], spec["prop"]
+    applies_to_keys = []
+    for key in _trust_value_owners(filter_type, ontology):
+        cfg = ONTOLOGY_CONFIG[key]
+        target = cfg.get("gene_rel") if kind == "edge" else cfg.get("label")
+        if target and target not in applies_to_keys:
+            applies_to_keys.append(target)
+
+    aggregated: dict[str, dict] = {}
+    warns: list[str] = []
+    for applies_to in applies_to_keys:
+        read = _read_vocab_values(conn, applies_to, prop, kind, cache=False)
+        if read["warning"]:
+            warns.append(read["warning"])
+        for value in read["values"]:
+            row = aggregated.setdefault(value, {
+                "value": value,
+                "applies_to": [],
+                "description": read["description"],
+                "source": read["source"],
+            })
+            if applies_to not in row["applies_to"]:
+                row["applies_to"].append(applies_to)
+            if row["description"] is None:
+                row["description"] = read["description"]
+    return list(aggregated.values()), warns
+
+
+def _trust_axes_filter_values(ontology: str | None) -> list[dict]:
+    """Which trust axes each ontology carries, read from the registry."""
+    aggregated: dict[str, dict] = {}
+    for key in ONTOLOGY_CONFIG:
+        if ontology is not None and key != ontology:
+            continue
+        for axis in ontology_trust_axes(key):
+            row = aggregated.setdefault(axis, {
+                "value": axis,
+                "applies_to": [],
+                "description": _TRUST_AXIS_DESCRIPTIONS.get(axis),
+                "source": "config",
+            })
+            row["applies_to"].append(key)
+    return list(aggregated.values())
+
+
+def _link_kind_filter_values(ontology: str | None) -> list[dict]:
+    """The bridge kinds terms link out on, read from the registry."""
+    aggregated: dict[str, dict] = {}
+    for key, cfg in ONTOLOGY_CONFIG.items():
+        if ontology is not None and key != ontology:
+            continue
+        for bridge in cfg.get("bridges_out") or []:
+            if len(bridge) < 3:
+                continue
+            link_kind = bridge[2]
+            row = aggregated.setdefault(link_kind, {
+                "value": link_kind,
+                "applies_to": [],
+                "description": None,
+                "source": "config",
+            })
+            if key not in row["applies_to"]:
+                row["applies_to"].append(key)
+    return list(aggregated.values())
+
+
+def _require_interpro_stratum(ontology: str, interpro_type: str | None) -> None:
+    """InterPro enrichment must name one stratum.
+
+    InterPro entry types are separate strata, not levels of one hierarchy.
+    Pooling them puts families, domains and homologous superfamilies in the
+    same test and the result reads as significance where it is only overlap.
+    """
+    if ontology == "interpro" and interpro_type is None:
+        raise ValueError(
+            "interpro_type is required when ontology='interpro'. InterPro "
+            "entry types are separate strata, not levels of one hierarchy — "
+            "pick one (e.g. 'FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY'). "
+            "Call list_filter_values(filter_type='interpro_type') for the "
+            "full set."
+        )
+
+
+def _enrichment_trust_params(
+    ontology: str, trust_filters: dict, interpro_type: str | None,
+) -> dict:
+    """The trust block enrichment envelopes echo back."""
+    return {
+        "filters_applied": dict(trust_filters),
+        "trust_axes": {ontology: ontology_trust_axes(ontology)},
+        "background_filtered": bool(trust_filters),
+        "interpro_type": interpro_type,
+    }
+
+
+@lru_cache(maxsize=1)
+def _owned_row_columns() -> frozenset[str]:
+    """Union of every column any registered ontology owns on a gene x term row."""
+    return frozenset({
+        col
+        for ont in ALL_ONTOLOGIES
+        for col in ontology_row_columns(ont, verbose=True)
+    })
+
+
+def _strip_unowned_columns(rows: list[dict], ontology: str, verbose: bool) -> None:
+    """Drop columns the ontology does not own; keep owned-but-null ones.
+
+    A null in an owned column is information (a single-source edge has no
+    tier, a PROSITE-only match has no e-value); a null in a column the
+    ontology never carries is noise.
+    """
+    owned = set(ontology_row_columns(ontology, verbose=verbose))
+    drop = _owned_row_columns() - owned
+    if not drop:
+        return
+    for r in rows:
+        for col in drop:
+            r.pop(col, None)
 
 
 def kg_schema(
@@ -400,6 +974,12 @@ def gene_overview(
     transport_substrate_resolution ('resolved' | 'family_inferred' | None;
     'resolved' means at least one non-lumping attachment, 'family_inferred'
     means breadth is reachability, not capability).
+    Rows also carry the protease / family-domain routing trio:
+    merops_classes (list — 'peptidase' vs 'nonpeptidase_homolog', the
+    catalytically-dead homologs), ncbifam_family_count (int, 0 default) and
+    merops_evidence_score_max (float | None — None means no MEROPS call at
+    all, 0 means an uncorroborated one; rank with it, don't filter).
+    Envelope adds by_merops_class and has_ncbifam.
     Verbose adds: gene_summary, function_description, all_identifiers,
     discussed_in_publications (list of {doi, prominence, evidence}; see
     discussed_by_publication for a paper's full discussed set).
@@ -450,6 +1030,13 @@ def gene_overview(
         # Literature "discusses" arm (spec Extension 1): count of input genes
         # with >=1 discussing publication. Mirrors has_expression / has_chemistry.
         "has_discussed": raw_summary.get("has_discussed", 0),
+        # Protease / family-domain routing. by_merops_class splits real
+        # peptidases from catalytically-dead homologs across the batch;
+        # has_ncbifam counts input genes with at least one NCBIfam family.
+        "by_merops_class": _rename_freq(
+            raw_summary.get("by_merops_class", []), "merops_class",
+        ),
+        "has_ncbifam": raw_summary.get("has_ncbifam", 0),
         "not_found": raw_summary["not_found"],
     }
 
@@ -779,13 +1366,16 @@ def gene_homologs(
 
 def list_filter_values(
     filter_type: str = "gene_category",
+    ontology: str | None = None,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
     """List valid values for a categorical filter.
 
-    Returns dict with keys: filter_type, total_entries, returned, truncated, results.
-    Per result: value, count.
+    Returns dict with keys: filter_type, total_entries, returned, truncated,
+    warnings, results.
+    Per result: value, count (graph-derived types) or value, applies_to,
+    description, source (annotation-trust types).
 
     filter_type options:
       - ``gene_category``: gene functional categories.
@@ -799,9 +1389,36 @@ def list_filter_values(
         count=0 even when no experiments of that type exist.
       - ``evidence_source``: Metabolite.evidence_sources buckets
         (metabolism / transport / metabolomics).
+      - ``evidence``, ``sources``, ``call_class``, ``best_hit_kind``,
+        ``pfam_support``, ``attachment_depth``: gene-to-term edge trust
+        values, one row per value with the edge types it applies to.
+      - ``interpro_type``, ``ncbifam_family_type``, ``merops_catalytic_type``,
+        ``merops_family_class``: term-side character values.
+      - ``trust_axes``: which trust axes each ontology carries.
+      - ``link_kinds``: the bridge kinds a term can link out on.
+
+    ``ontology`` scopes any of the annotation-trust types to one ontology.
+    Values come from the graph's ControlledVocabulary nodes; when a node is
+    missing they are derived from the graph instead, ``source`` reads
+    "pivot" and a warning says so.
+
+    Raises ValueError on an unknown filter_type or ontology.
     """
     conn = _default_conn(conn)
-    if filter_type == "gene_category":
+    warnings_out: list[str] = []
+    if ontology is not None and ontology not in ONTOLOGY_CONFIG:
+        raise ValueError(
+            f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
+        )
+    if filter_type in _TRUST_FILTER_VALUE_SPECS:
+        results, warnings_out = _trust_filter_values(
+            conn, filter_type, ontology,
+        )
+    elif filter_type == "trust_axes":
+        results = _trust_axes_filter_values(ontology)
+    elif filter_type == "link_kinds":
+        results = _link_kind_filter_values(ontology)
+    elif filter_type == "gene_category":
         cypher, params = build_list_gene_categories()
         rows = conn.execute_query(cypher, **params)
         results = [{"value": r["category"], "count": r["gene_count"]} for r in rows]
@@ -844,10 +1461,14 @@ def list_filter_values(
         rows = conn.execute_query(cypher, **params)
         results = [{"value": r["value"], "count": r["count"]} for r in rows]
     else:
+        valid = [
+            "gene_category", "brite_tree", "growth_phase", "metric_type",
+            "value_kind", "compartment", "omics_type", "evidence_source",
+            *sorted(_TRUST_FILTER_VALUE_SPECS), "trust_axes", "link_kinds",
+        ]
         raise ValueError(
             f"Unknown filter_type: {filter_type!r}. Valid options: "
-            "'gene_category', 'brite_tree', 'growth_phase', 'metric_type', "
-            "'value_kind', 'compartment', 'omics_type', 'evidence_source'."
+            + ", ".join(repr(v) for v in valid) + "."
         )
     total = len(results)
     return {
@@ -855,6 +1476,7 @@ def list_filter_values(
         "total_entries": total,
         "returned": total,
         "truncated": False,
+        "warnings": warnings_out,
         "results": results,
     }
 
@@ -1428,6 +2050,7 @@ def search_ontology(
     tree: str | None = None,
     informative_only: bool = False,
     verbose: bool = False,
+    interpro_type: str | None = None,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -1444,11 +2067,14 @@ def search_ontology(
         informative_only: Drop uninformative (root / catch-all) terms.
         verbose: Include the per-term `discussed_in_publications` DOI list
             (KEGG only — list of {doi, prominence, evidence}).
+        interpro_type: InterPro-only stratum facet (one of the eight entry
+            types, e.g. 'FAMILY' or 'HOMOLOGOUS_SUPERFAMILY').
         conn: Optional graph connection (defaults to the shared connection).
 
     Returns dict with keys: total_entries, total_matching, score_max,
     score_median, returned, truncated, results.
-    Per result: id, name, score, level, tree (sparse), tree_code (sparse).
+    Per result: id, name, score, level, gene_count, organism_count,
+    tree (sparse), tree_code (sparse), interpro_type (InterPro only).
     For KEGG, each result also carries discussed_by_n_publications (count of
     publications that discuss this pathway in prose). Verbose adds, for KEGG,
     discussed_in_publications (list of {doi, prominence, evidence}; see
@@ -1461,6 +2087,10 @@ def search_ontology(
         raise ValueError(
             f"Invalid ontology '{ontology}'. Valid: {valid}"
         )
+    if interpro_type is not None and not _ontology_carries(
+        ontology, "interpro_type",
+    ):
+        raise _unsupported_axis_error(ontology, "interpro_type")
     if summary:
         limit = 0
 
@@ -1473,6 +2103,7 @@ def search_ontology(
             ontology=ontology, search_text=effective_text,
             level=level, tree=tree,
             informative_only=informative_only,
+            interpro_type=interpro_type,
         )
         raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
     except Neo4jClientError:
@@ -1482,6 +2113,7 @@ def search_ontology(
             ontology=ontology, search_text=effective_text,
             level=level, tree=tree,
             informative_only=informative_only,
+            interpro_type=interpro_type,
         )
         raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
 
@@ -1506,6 +2138,7 @@ def search_ontology(
             ontology=ontology, search_text=effective_text, limit=limit, offset=offset,
             level=level, tree=tree,
             informative_only=informative_only, verbose=verbose,
+            interpro_type=interpro_type,
         )
         results = conn.execute_query(det_cypher, **det_params)
     except Neo4jClientError:
@@ -1516,6 +2149,7 @@ def search_ontology(
                 ontology=ontology, search_text=effective_text, limit=limit, offset=offset,
                 level=level, tree=tree,
                 informative_only=informative_only, verbose=verbose,
+                interpro_type=interpro_type,
             )
             results = conn.execute_query(det_cypher, **det_params)
         else:
@@ -1758,6 +2392,12 @@ def genes_by_ontology(
     offset: int = 0,
     tree: str | None = None,
     informative_only: bool = False,
+    sources: list[str] | None = None,
+    evidence: list[str] | None = None,
+    max_tier: int | None = None,
+    min_evidence_score: float | None = None,
+    call_class: list[str] | None = None,
+    interpro_type: str | None = None,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -1767,7 +2407,27 @@ def genes_by_ontology(
     Mode 2 (level only): roll UP, row term_id = level-N ancestor.
     Mode 3 (level + term_ids): Mode 2 scoped to provided level-N terms.
 
-    Returns dict with full envelope -- see spec for shape.
+    Trust filters bind on the gene->term edge before the hierarchy walk, so
+    they shape the gene set itself and not just the rows you read. They all
+    default to None and none of them filters by default:
+
+    - ``sources``: keep edges asserted by any of the named pipelines.
+    - ``evidence``: keep edges on the named rungs of the strength ladder
+      (curated > signature > homology > family_inferred > domain_inferred).
+    - ``max_tier``: keep edges at or above this truncation depth. Edges with
+      no tier are kept and counted in the ``by_tier`` null bucket.
+    - ``min_evidence_score``: the one numeric cutoff. Sets
+      ``evidence_score_signals`` in the envelope.
+    - ``call_class``: MEROPS only — separate real peptidases from
+      catalytically-dead homologs.
+    - ``interpro_type``: InterPro only — the term-side stratum facet.
+
+    Returns dict with the standard envelope plus ``trust_axes``,
+    ``by_evidence``, ``by_tier``, ``by_sources``, ``by_call_class``,
+    ``evidence_score_stats``, ``filters_applied``, ``skipped_ontologies``
+    and ``warnings``.
+
+    Raises ValueError when the ontology does not carry a filter you set.
     """
     from collections import Counter
 
@@ -1776,6 +2436,12 @@ def genes_by_ontology(
         raise ValueError(
             f"Invalid ontology '{ontology}'. Valid: {ALL_ONTOLOGIES}"
         )
+    trust_filters = _active_trust_filters(
+        sources=sources, evidence=evidence, max_tier=max_tier,
+        min_evidence_score=min_evidence_score, call_class=call_class,
+        interpro_type=interpro_type,
+    )
+    _validate_trust_filters(ontology, trust_filters)
     if level is None and not term_ids:
         raise ValueError(
             "At least one of `level` or `term_ids` must be provided."
@@ -1790,6 +2456,10 @@ def genes_by_ontology(
         limit = 0
 
     conn = _default_conn(conn)
+
+    # Categorical filter values are owned by the graph's ControlledVocabulary
+    # nodes, never by this file. A missing node degrades to a pivot read.
+    trust_warnings = _validate_categorical_values(conn, ontology, trust_filters)
 
     # Resolve organism to canonical name (fuzzy → exact)
     organism = _validate_organism_inputs(
@@ -1832,6 +2502,7 @@ def genes_by_ontology(
             max_gene_set_size=max_gene_set_size,
             tree=tree,
             informative_only=informative_only,
+            **trust_filters,
         )
         per_term = conn.execute_query(pt_cypher, **pt_params)
 
@@ -1843,6 +2514,7 @@ def genes_by_ontology(
             max_gene_set_size=max_gene_set_size,
             tree=tree,
             informative_only=informative_only,
+            **trust_filters,
         )
         per_gene = conn.execute_query(pg_cypher, **pg_params)
 
@@ -1932,7 +2604,18 @@ def genes_by_ontology(
         "wrong_level": wrong_level,
         "filtered_out": filtered_out,
         "offset": offset,
+        "trust_axes": {ontology: ontology_trust_axes(ontology)},
+        "filters_applied": dict(trust_filters),
+        "skipped_ontologies": [],
     }
+    envelope.update(_trust_rollups([]))
+    if min_evidence_score is not None:
+        envelope["evidence_score_signals"] = _evidence_score_signals(
+            conn, [ontology],
+        )
+    envelope["warnings"] = trust_warnings + _trust_row_warnings(
+        [], [ontology], trust_filters,
+    )
 
     # --- Query D: detail rows (skipped when summary=True) ---
     if limit == 0:
@@ -1949,8 +2632,17 @@ def genes_by_ontology(
         verbose=verbose, limit=limit, offset=offset,
         tree=tree,
         informative_only=informative_only,
+        **trust_filters,
     )
     results = conn.execute_query(det_cypher, **det_params)
+
+    # Rollups and warnings read the raw rows: the compact strip below hides
+    # the verbose axes from the caller, but the distribution still belongs
+    # in the envelope.
+    envelope.update(_trust_rollups(results))
+    envelope["warnings"] = trust_warnings + _trust_row_warnings(
+        results, [ontology], trust_filters,
+    )
 
     # Strip sparse level_is_best_effort=False from rows (verbose only)
     if verbose:
@@ -1964,12 +2656,8 @@ def genes_by_ontology(
             r.pop("tree", None)
             r.pop("tree_code", None)
 
-    # Strip sparse edge-prop columns when their value is null. Owner ontology
-    # keeps its non-null column; non-owner rows shed all of them.
-    for r in results:
-        for col in _EDGE_PROP_COLS:
-            if r.get(col) is None:
-                r.pop(col, None)
+    # Strip-non-applicable: drop the columns this ontology does not own.
+    _strip_unowned_columns(results, ontology, verbose)
 
     envelope["returned"] = len(results)
     envelope["truncated"] = total_matching > offset + len(results)
@@ -1980,7 +2668,7 @@ def genes_by_ontology(
 def gene_ontology_terms(
     locus_tags: list[str],
     organism: str,
-    ontology: str | None = None,
+    ontology: str | list[str] | None = None,
     mode: str = "leaf",
     level: int | None = None,
     tree: str | None = None,
@@ -1989,39 +2677,81 @@ def gene_ontology_terms(
     limit: int | None = None,
     offset: int = 0,
     informative_only: bool = False,
+    sources: list[str] | None = None,
+    evidence: list[str] | None = None,
+    max_tier: int | None = None,
+    min_evidence_score: float | None = None,
+    call_class: list[str] | None = None,
+    interpro_type: str | None = None,
+    include_superseded: bool = False,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
     """Get ontology annotations for genes. One row per gene × term.
 
+    ``ontology`` takes one key, a list of keys, or None for every registered
+    ontology. With several ontologies in play a trust filter that all of
+    them carry is applied everywhere; one only some of them carry is applied
+    to the carriers and the rest are reported in ``skipped_ontologies``; one
+    none of them carries raises. A facet applies to its owner alone and
+    raises when that owner is absent from the list.
+
+    ``include_superseded`` widens leaf mode to the less specific TCDB
+    attachments a gene also carries. Superseded means less specific, not
+    wrong.
+
     Returns dict with keys: total_matching, total_genes, total_terms,
     by_ontology, by_term, terms_per_gene_min, terms_per_gene_max,
     terms_per_gene_median, returned, truncated, not_found, no_terms,
-    results.
+    results, plus trust_axes, by_evidence, by_tier, by_sources,
+    by_call_class, evidence_score_stats, filters_applied,
+    skipped_ontologies and warnings.
     Per result: locus_tag, term_id, term_name, level.
     Verbose adds: organism_name.
     All-ontology queries add: ontology_type.
     BRITE results include sparse tree/tree_code fields.
 
-    Raises ValueError if ontology is invalid or locus_tags is empty.
+    Raises ValueError if an ontology name is unknown, if an ontology cannot
+    carry a filter you set, or if locus_tags is empty.
     """
     if not locus_tags:
         raise ValueError("locus_tags must not be empty.")
-    if ontology is not None and ontology not in ONTOLOGY_CONFIG:
-        raise ValueError(
-            f"Invalid ontology '{ontology}'. "
-            f"Valid: {sorted(ONTOLOGY_CONFIG)}"
-        )
+    ontology_arg = ontology
+    requested = _normalize_ontology_arg(ontology)
+    single_ontology = isinstance(ontology_arg, str)
+    if tree is not None and requested != ["brite"]:
+        raise ValueError("tree filter is only valid for ontology='brite'")
     if mode not in ("leaf", "rollup"):
         raise ValueError(f"mode must be 'leaf' or 'rollup', got '{mode}'")
     if mode == "rollup" and level is None:
         raise ValueError("level is required when mode='rollup'")
-    if tree is not None and ontology != "brite":
-        raise ValueError("tree filter is only valid for ontology='brite'")
     if summary:
         limit = 0
 
+    trust_filters = _active_trust_filters(
+        sources=sources, evidence=evidence, max_tier=max_tier,
+        min_evidence_score=min_evidence_score, call_class=call_class,
+        interpro_type=interpro_type,
+    )
+    requested_all = requested if requested is not None else sorted(ONTOLOGY_CONFIG)
+    if single_ontology:
+        _validate_trust_filters(requested_all[0], trust_filters)
+        targets = list(requested_all)
+        skipped_ontologies: list[dict] = []
+        trust_warnings: list[str] = []
+        per_ontology_filters = {requested_all[0]: dict(trust_filters)}
+    else:
+        (targets, skipped_ontologies, trust_warnings,
+         per_ontology_filters) = _resolve_multi_ontology(
+            requested_all, trust_filters,
+        )
+
     conn = _default_conn(conn)
+
+    for ont in targets:
+        trust_warnings += _validate_categorical_values(
+            conn, ont, per_ontology_filters.get(ont, {}),
+        )
 
     # Resolve organism
     organism_name = _validate_organism_inputs(
@@ -2034,8 +2764,8 @@ def gene_ontology_terms(
     not_found = [r["lt"] for r in exist_rows if not r["found"]]
     found_tags = [r["lt"] for r in exist_rows if r["found"]]
 
-    # Determine which ontologies to query
-    ontologies = [ontology] if ontology else sorted(ONTOLOGY_CONFIG)
+    # Determine which ontologies to query (skipped ones already dropped)
+    ontologies = list(targets)
 
     # Step 2: summary queries — chunked to avoid 1.4 GiB Neo4j transaction cap
     by_ontology: list[dict] = []
@@ -2053,6 +2783,7 @@ def gene_ontology_terms(
                     organism_name=organism_name,
                     mode=mode, level=level, tree=tree,
                     informative_only=informative_only,
+                    **per_ontology_filters.get(ont, {}),
                 )
                 rows = conn.execute_query(sum_cypher, **sum_params)
                 if not rows or rows[0]["gene_count"] == 0:
@@ -2093,6 +2824,9 @@ def gene_ontology_terms(
     total_matching = sum(o["term_count"] for o in by_ontology)
 
     # Step 3: detail queries — skip when limit=0 (summary only)
+    # Rollups read the pre-strip rows so the envelope carries the trust
+    # distribution even in compact mode.
+    raw_trust_rows: list[dict] = []
     if limit == 0:
         results: list[dict] = []
     else:
@@ -2106,6 +2840,8 @@ def gene_ontology_terms(
                         mode=mode, level=level, tree=tree,
                         verbose=verbose, limit=None,
                         informative_only=informative_only,
+                        include_superseded=include_superseded,
+                        **per_ontology_filters.get(ont, {}),
                     )
                     rows = conn.execute_query(det_cypher, **det_params)
                     # Strip sparse tree/tree_code when None
@@ -2114,12 +2850,10 @@ def gene_ontology_terms(
                             r.pop("tree", None)
                         if r.get("tree_code") is None:
                             r.pop("tree_code", None)
-                    # Strip sparse edge-prop columns when their value is null.
-                    for r in rows:
-                        for col in _EDGE_PROP_COLS:
-                            if r.get(col) is None:
-                                r.pop(col, None)
-                    if ontology is None:
+                    raw_trust_rows.extend({**r} for r in rows)
+                    # Strip-non-applicable, keyed on the chunk's ontology.
+                    _strip_unowned_columns(rows, ont, verbose)
+                    if not single_ontology:
                         for r in rows:
                             r["ontology_type"] = ont
                     all_detail_rows.extend(rows)
@@ -2154,7 +2888,7 @@ def gene_ontology_terms(
         terms_per_gene_max = 0
         terms_per_gene_median = 0.0
 
-    return {
+    envelope = {
         "total_matching": total_matching,
         "total_genes": total_genes,
         "total_terms": total_terms,
@@ -2169,7 +2903,19 @@ def gene_ontology_terms(
         "not_found": not_found,
         "no_terms": no_terms,
         "results": results,
+        "trust_axes": {o: ontology_trust_axes(o) for o in targets},
+        "filters_applied": dict(trust_filters),
+        "skipped_ontologies": skipped_ontologies,
     }
+    envelope.update(_trust_rollups(raw_trust_rows))
+    if min_evidence_score is not None:
+        envelope["evidence_score_signals"] = _evidence_score_signals(
+            conn, targets,
+        )
+    envelope["warnings"] = trust_warnings + _trust_row_warnings(
+        raw_trust_rows, targets, trust_filters,
+    )
+    return envelope
 
 
 def run_cypher(
@@ -4404,7 +5150,7 @@ def _ontology_exp_coverage_stats(
 
 def ontology_landscape(
     organism: str,
-    ontology: str | None = None,
+    ontology: str | list[str] | None = None,
     experiment_ids: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
@@ -4414,6 +5160,8 @@ def ontology_landscape(
     max_gene_set_size: int = 500,
     tree: str | None = None,
     informative_only: bool = True,
+    call_class: list[str] | None = None,
+    interpro_type: str | None = None,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -4425,21 +5173,40 @@ def ontology_landscape(
     min_gene_set_size <= gene_count <= max_gene_set_size contribute to
     per-level stats -- same filter as pathway_enrichment.
 
+    ``ontology`` takes one key, a list of keys, or None to survey every
+    registered ontology. InterPro is stratified by (interpro_type, level)
+    because its types are not comparable strata; ``by_ontology`` reports
+    ``best_interpro_type`` alongside ``best_level``.
+
     Returns dict with keys: organism_name, organism_gene_count,
     n_ontologies, by_ontology, not_found, not_matched, results,
-    returned, total_matching, truncated, offset.
+    returned, total_matching, truncated, offset, filters_applied,
+    trust_axes, skipped_ontologies, warnings.
 
-    Raises ValueError on unknown/ambiguous organism or invalid ontology.
+    Raises ValueError on unknown/ambiguous organism, an unknown ontology
+    name, or a filter the ontology cannot carry.
     """
-    if ontology is not None and ontology not in ONTOLOGY_CONFIG:
-        raise ValueError(
-            f"Invalid ontology '{ontology}'. "
-            f"Valid: {sorted(ONTOLOGY_CONFIG)}"
-        )
-    if tree is not None and ontology != "brite":
+    requested = _normalize_ontology_arg(ontology)
+    if tree is not None and requested != ["brite"]:
         raise ValueError("tree filter is only valid for ontology='brite'")
     if summary:
         limit = 0
+
+    trust_filters = _active_trust_filters(
+        call_class=call_class, interpro_type=interpro_type,
+    )
+    requested_all = requested if requested is not None else list(ALL_ONTOLOGIES)
+    if isinstance(ontology, str):
+        _validate_trust_filters(requested_all[0], trust_filters)
+        target_keys = list(requested_all)
+        skipped_ontologies: list[dict] = []
+        trust_warnings: list[str] = []
+        per_ontology_filters = {requested_all[0]: dict(trust_filters)}
+    else:
+        (target_keys, skipped_ontologies, trust_warnings,
+         per_ontology_filters) = _resolve_multi_ontology(
+            requested_all, trust_filters,
+        )
 
     conn = _default_conn(conn)
 
@@ -4472,7 +5239,7 @@ def ontology_landscape(
                 valid_eids.append(r["eid"])
 
     # Step 4: Per-ontology landscape queries
-    targets = [ontology] if ontology else ALL_ONTOLOGIES
+    targets = list(target_keys)
     all_rows: list[dict] = []
     for ont in targets:
         ls_cypher, ls_params = build_ontology_landscape(
@@ -4481,6 +5248,7 @@ def ontology_landscape(
             max_gene_set_size=max_gene_set_size,
             tree=tree if ont == "brite" else None,
             informative_only=informative_only,
+            **per_ontology_filters.get(ont, {}),
         )
         stat_rows = conn.execute_query(ls_cypher, **ls_params)
         n_levels = len(stat_rows)
@@ -4529,6 +5297,9 @@ def ontology_landscape(
             if tree_val is not None:
                 row["tree"] = tree_val
                 row["tree_code"] = r.get("tree_code")
+            # Sparse facet column: only the ontology that owns it carries it.
+            if r.get("interpro_type") is not None:
+                row["interpro_type"] = r["interpro_type"]
             if verbose:
                 row["example_terms"] = r["example_terms"]
             if valid_eids:
@@ -4571,6 +5342,8 @@ def ontology_landscape(
             if tree_val:
                 by_ontology[key]["tree"] = tree_val
                 by_ontology[key]["tree_code"] = r.get("tree_code")
+            if r.get("interpro_type") is not None:
+                by_ontology[key]["best_interpro_type"] = r["interpro_type"]
         by_ontology[key]["n_levels"] += 1
 
     # Step 6: Paginate + envelope
@@ -4593,6 +5366,10 @@ def ontology_landscape(
         "total_matching": total_matching,
         "truncated": total_matching > offset + len(results),
         "offset": offset,
+        "filters_applied": dict(trust_filters),
+        "trust_axes": {o: ontology_trust_axes(o) for o in targets},
+        "skipped_ontologies": skipped_ontologies,
+        "warnings": trust_warnings,
     }
 
 
@@ -4622,18 +5399,43 @@ def pathway_enrichment(
     growth_phases: list[str] | None = None,
     tree: str | None = None,
     informative_only: bool = True,
+    sources: list[str] | None = None,
+    evidence: list[str] | None = None,
+    max_tier: int | None = None,
+    min_evidence_score: float | None = None,
+    call_class: list[str] | None = None,
+    interpro_type: str | None = None,
     *,
     conn: GraphConnection | None = None,
 ):
     """Pathway over-representation analysis from DE results.
 
+    The trust filters (``sources``, ``evidence``, ``max_tier``,
+    ``min_evidence_score``, ``call_class``, ``interpro_type``) shape the
+    gene-to-term mapping itself, so tested sets and background move
+    together; the envelope echoes that as ``background_filtered``.
+
+    ``interpro_type`` is required when ``ontology='interpro'``: InterPro
+    types are separate strata, not levels of one hierarchy, and pooling
+    them mixes families with domains and superfamilies.
+
     Returns an EnrichmentResult. Callers who need the MCP-dict envelope
     should call result.to_envelope(...).
+
+    Raises ValueError when the ontology cannot carry a filter you set, or
+    when an InterPro run omits interpro_type.
     """
     if ontology not in ALL_ONTOLOGIES:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {ALL_ONTOLOGIES}")
     if tree is not None and ontology != "brite":
         raise ValueError("tree filter is only valid for ontology='brite'")
+    trust_filters = _active_trust_filters(
+        sources=sources, evidence=evidence, max_tier=max_tier,
+        min_evidence_score=min_evidence_score, call_class=call_class,
+        interpro_type=interpro_type,
+    )
+    _require_interpro_stratum(ontology, interpro_type)
+    _validate_trust_filters(ontology, trust_filters)
     if level is None and not term_ids:
         raise ValueError("At least one of `level` or `term_ids` must be provided.")
     if direction not in {"up", "down", "both"}:
@@ -4708,6 +5510,7 @@ def pathway_enrichment(
         limit=None, offset=0, tree=tree,
         informative_only=informative_only,
         conn=conn,
+        **trust_filters,
     )
     from multiomics_explorer.analysis.frames import to_dataframe
     term2gene = to_dataframe(gbo_result)
@@ -4780,6 +5583,9 @@ def pathway_enrichment(
         "n_unique_terms": int(term2gene["term_id"].nunique()) if not term2gene.empty else 0,
         "multitest_method": "fdr_bh",
     }
+    result.params.update(
+        _enrichment_trust_params(ontology, trust_filters, interpro_type)
+    )
 
     return result
 
@@ -4808,14 +5614,35 @@ def cluster_enrichment(
     pvalue_cutoff: float = 0.05,
     tree: str | None = None,
     informative_only: bool = True,
+    sources: list[str] | None = None,
+    evidence: list[str] | None = None,
+    max_tier: int | None = None,
+    min_evidence_score: float | None = None,
+    call_class: list[str] | None = None,
+    interpro_type: str | None = None,
     *,
     conn: GraphConnection | None = None,
 ):
-    """Cluster-based over-representation analysis — returns EnrichmentResult."""
+    """Cluster-based over-representation analysis — returns EnrichmentResult.
+
+    Takes the same trust filters as pathway_enrichment; they shape the
+    gene-to-term mapping, so tested sets and background move together.
+    ``interpro_type`` is required when ``ontology='interpro'``.
+
+    Raises ValueError when the ontology cannot carry a filter you set, or
+    when an InterPro run omits interpro_type.
+    """
     if ontology not in ALL_ONTOLOGIES:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {ALL_ONTOLOGIES}")
     if tree is not None and ontology != "brite":
         raise ValueError("tree filter is only valid for ontology='brite'")
+    trust_filters = _active_trust_filters(
+        sources=sources, evidence=evidence, max_tier=max_tier,
+        min_evidence_score=min_evidence_score, call_class=call_class,
+        interpro_type=interpro_type,
+    )
+    _require_interpro_stratum(ontology, interpro_type)
+    _validate_trust_filters(ontology, trust_filters)
     if level is None and not term_ids:
         raise ValueError("At least one of `level` or `term_ids` must be provided.")
     if isinstance(background, str):
@@ -4898,6 +5725,9 @@ def cluster_enrichment(
             pvalue_cutoff=pvalue_cutoff,
             inputs=inputs, produced=set(), term2gene=pd.DataFrame(),
         )
+        result.params.update(
+            _enrichment_trust_params(ontology, trust_filters, interpro_type)
+        )
         return result
 
     gbo_result = genes_by_ontology(
@@ -4908,6 +5738,7 @@ def cluster_enrichment(
         limit=None, offset=0, tree=tree,
         informative_only=informative_only,
         conn=conn,
+        **trust_filters,
     )
     from multiomics_explorer.analysis.frames import to_dataframe
     term2gene = to_dataframe(gbo_result)
@@ -4977,6 +5808,9 @@ def cluster_enrichment(
         min_cluster_size=min_cluster_size, max_cluster_size=max_cluster_size,
         pvalue_cutoff=pvalue_cutoff,
         inputs=inputs, produced=produced, term2gene=term2gene,
+    )
+    result.params.update(
+        _enrichment_trust_params(ontology, trust_filters, interpro_type)
     )
     return result
 
