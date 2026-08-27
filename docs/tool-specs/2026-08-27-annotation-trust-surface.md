@@ -91,7 +91,7 @@ MATCH (leaf)-[:Tcdb_family_is_a_tcdb_family*0..]->(t:TcdbFamily) WHERE t.level =
 WITH DISTINCT t, g
 WITH t, g, [(g)-[r2:Gene_has_tcdb_family]->(l2:TcdbFamily)-[:Tcdb_family_is_a_tcdb_family*0..]->(t)
             | {es: r2.evidence_score, ad: r2.attachment_depth, ev: r2.evidence, tier: r2.tier, sources: r2.sources, leaf: l2.id}] AS edges
-WITH t, g, edges, head(reverse(apoc.coll.sortMaps(edges, 'es'))) AS best      -- rank_prop desc (confidence_score for merops)
+WITH t, g, edges, head(apoc.coll.sortMaps(edges, 'es')) AS best      -- rank_prop desc (confidence_score for merops)
 RETURN t.id AS term_id, g.locus_tag AS locus_tag, best.es AS evidence_score, best.ev AS evidence, best.tier AS tier,
        best.sources AS sources, best.ad AS attachment_depth, size(edges) AS n_edges
 ```
@@ -209,3 +209,7 @@ Verified: TCDB 5 signals, MEROPS `[tier_le_2, pfam_support]` (2), GO/EC/Pfam/CAZ
 - `MeropsFamily` (and other flat/new labels) carry no `is_uninformative` prop; the browse predicate `coalesce(t.is_uninformative,'') <> 'true'` is null-safe and stays (CyVer warning only).
 - 3b also carries the three 3a-deferred minors: (i) `genes_by_ontology` full-match rollups use an aggregate-only projection (no second detail scan per paged call); (ii) `_TRUST_FILTER_AXIS` / `_verbose_edge_pairs` get public names (old names kept as aliases for one release); (iii) this re-check.
 - `search_ontology` browse-mode envelope: `mode` ∈ {`search`, `browse`}; `by_ontology` keyed by ontology with `{total_entries, total_matching, score_max, returned, truncated}`; `by_level` populated in browse mode; single-ontology calls keep the flat top-level keys (`total_entries`, `total_matching`, `score_max`, `score_median`, `returned`, `offset`, `truncated`) so existing goldens only GAIN keys. `ontology_type` is on every compact row (single-ontology included).
+
+## 14. Freeze notes v1.3 (2026-08-27, PR 3b build — one-edge rebind pick direction)
+
+- §7.2 as frozen (and PR 3a as shipped) rebound the edge with `head(reverse(apoc.coll.sortMaps(edges, key)))`. `apoc.coll.sortMaps` already sorts DESCENDING by the key (nulls last; live-verified on `{0.9, 0.5, null}` → `high, mid, nullk`), so the `reverse` selected the LOWEST-ranked edge — the opposite of the "best edge" contract. Every rank key is higher-is-better (`evidence_score`, `confidence_score`, attachment level). Fixed in 3b by dropping `reverse`; §7.2 text corrected above. Row counts are unchanged (one row per (gene, term) either way); only the verbose trust columns of multi-edge pairs change — expect those rows to move in the regression regen.

@@ -11350,7 +11350,8 @@ class TestOneEdgePerGeneTermRebind:
         )
         assert "apoc.coll.sortMaps(" in cypher
         assert "'evidence_score'" in cypher
-        assert "head(reverse(" in cypher
+        assert "head(apoc.coll.sortMaps(" in cypher
+        assert "reverse(" not in cypher  # sortMaps is already DESC (spec §14)
 
     def test_merops_rollup_sorts_edges_by_confidence_score(self):
         from multiomics_explorer.kg.queries_lib import (

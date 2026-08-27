@@ -706,7 +706,7 @@ def _best_edge_rebind_cypher(
         f"WITH t, g, [{edge_pattern}{walk_pattern}\n"
         f"{trust_where}"
         f"            | {edge_map}] AS edges\n"
-        f"WITH t, g, head(reverse(apoc.coll.sortMaps(edges, '{rank_key}'))) AS r\n"
+        f"WITH t, g, head(apoc.coll.sortMaps(edges, '{rank_key}')) AS r\n"
     )
 
 
