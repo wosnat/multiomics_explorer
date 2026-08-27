@@ -4,9 +4,41 @@ Each builder returns a (cypher, params) tuple. The caller is responsible
 for executing the query via GraphConnection.execute_query(cypher, **params).
 """
 
+import re
 from typing import Literal
 
-# Ontology type configuration — drives all three ontology query builders.
+# Ontology type configuration — the single registry driving every ontology
+# builder: labels, edges, indexes, hierarchy walks, trust axes, row columns,
+# term-side projections, facets and forward bridges.
+#
+# Per-entry keys (annotation-trust surface, 2026-08):
+#   label / gene_rel / hierarchy_rels / fulltext_index  — graph names.
+#   trust        — comparable trust axes: normalized axis name -> edge prop.
+#                  Absent key = axis not carried. `rank_prop` is NOT an axis:
+#                  it is the sort key for the one-edge-per-(gene, term) rebind.
+#   compact_edge — materially-important edge categoricals: compact column,
+#                  filterable, rolled up, auto-warned on `warn_values`.
+#   verbose_edge — native trust detail, verbose only, never a filter. Entries
+#                  are either a bare prop name (column == prop) or a
+#                  (edge_prop, output_column) pair.
+#   facet        — term-side facet ({prop, param}) bound on `t` after the walk.
+#   term_compact / term_verbose         — search_ontology term columns.
+#   term_details_compact / _verbose     — ontology_term_details (PR 3b).
+#   leaf_attachment — leaf-mode most-specific-attachment predicate (TCDB).
+#   bridges_out  — forward-only (rel, target_ontology, link_kind) triples.
+#
+# The registry declares SHAPE only. Values / descriptions / ranges / signals
+# come from `ControlledVocabulary` at runtime (see build_vocab_values).
+_TRUST_AXES_ORDER: tuple[str, ...] = ("sources", "evidence", "evidence_score", "tier")
+
+# Trust-axis sets shared by several ontologies (Layer-B `sources` + `evidence`
+# landed on all 14 functional gene-edge types in KG-SYNC-005).
+_TRUST_SOURCES_EVIDENCE = {"sources": "sources", "evidence": "evidence"}
+_TRUST_SOURCES_EVIDENCE_SCORE = {
+    "sources": "sources", "evidence": "evidence",
+    "evidence_score": "evidence_score",
+}
+
 ONTOLOGY_CONFIG = {
     "go_bp": {
         "label": "BiologicalProcess",
@@ -16,6 +48,10 @@ ONTOLOGY_CONFIG = {
             "Biological_process_part_of_biological_process",
         ],
         "fulltext_index": "biologicalProcessFullText",
+        "trust": dict(_TRUST_SOURCES_EVIDENCE_SCORE),
+        "term_compact": ["gene_count", "organism_count"],
+        "term_details_compact": ["direct_gene_count"],
+        "term_details_verbose": "*",
     },
     "go_mf": {
         "label": "MolecularFunction",
@@ -25,6 +61,10 @@ ONTOLOGY_CONFIG = {
             "Molecular_function_part_of_molecular_function",
         ],
         "fulltext_index": "molecularFunctionFullText",
+        "trust": dict(_TRUST_SOURCES_EVIDENCE_SCORE),
+        "term_compact": ["gene_count", "organism_count"],
+        "term_details_compact": ["direct_gene_count"],
+        "term_details_verbose": "*",
     },
     "go_cc": {
         "label": "CellularComponent",
@@ -34,12 +74,20 @@ ONTOLOGY_CONFIG = {
             "Cellular_component_part_of_cellular_component",
         ],
         "fulltext_index": "cellularComponentFullText",
+        "trust": dict(_TRUST_SOURCES_EVIDENCE_SCORE),
+        "term_compact": ["gene_count", "organism_count"],
+        "term_details_compact": ["direct_gene_count"],
+        "term_details_verbose": "*",
     },
     "ec": {
         "label": "EcNumber",
         "gene_rel": "Gene_catalyzes_ec_number",
         "hierarchy_rels": ["Ec_number_is_a_ec_number"],
         "fulltext_index": "ecNumberFullText",
+        "trust": dict(_TRUST_SOURCES_EVIDENCE_SCORE),
+        "term_compact": ["gene_count", "organism_count"],
+        "term_details_compact": ["direct_gene_count"],
+        "term_details_verbose": "*",
     },
     "kegg": {
         "label": "KeggTerm",
@@ -47,24 +95,43 @@ ONTOLOGY_CONFIG = {
         "hierarchy_rels": ["Kegg_term_is_a_kegg_term"],
         "fulltext_index": "keggFullText",
         "discusses_rel": "Publication_discusses_kegg_pathway",
+        "trust": dict(_TRUST_SOURCES_EVIDENCE),
+        "term_compact": ["gene_count", "organism_count"],
+        "term_details_compact": ["direct_gene_count"],
+        "term_details_verbose": "*",
+        "bridges_out": [
+            ("Kegg_term_in_brite_category", "brite", "membership"),
+        ],
     },
     "cog_category": {
         "label": "CogFunctionalCategory",
         "gene_rel": "Gene_in_cog_category",
         "hierarchy_rels": [],
         "fulltext_index": "cogCategoryFullText",
+        "trust": dict(_TRUST_SOURCES_EVIDENCE),
+        "term_compact": ["gene_count", "organism_count"],
+        "term_details_compact": ["code"],
+        "term_details_verbose": "*",
     },
     "cyanorak_role": {
         "label": "CyanorakRole",
         "gene_rel": "Gene_has_cyanorak_role",
         "hierarchy_rels": ["Cyanorak_role_is_a_cyanorak_role"],
         "fulltext_index": "cyanorakRoleFullText",
+        "trust": dict(_TRUST_SOURCES_EVIDENCE),
+        "term_compact": ["gene_count", "organism_count"],
+        "term_details_compact": ["code", "direct_gene_count"],
+        "term_details_verbose": "*",
     },
     "tigr_role": {
         "label": "TigrRole",
         "gene_rel": "Gene_has_tigr_role",
         "hierarchy_rels": [],
         "fulltext_index": "tigrRoleFullText",
+        "trust": dict(_TRUST_SOURCES_EVIDENCE),
+        "term_compact": ["gene_count", "organism_count"],
+        "term_details_compact": ["code"],
+        "term_details_verbose": "*",
     },
     "pfam": {
         "label": "Pfam",
@@ -73,6 +140,15 @@ ONTOLOGY_CONFIG = {
         "fulltext_index": "pfamFullText",
         "parent_label": "PfamClan",
         "parent_fulltext_index": "pfamClanFullText",
+        "trust": dict(_TRUST_SOURCES_EVIDENCE_SCORE),
+        "term_compact": ["gene_count", "organism_count"],
+        # `pfam_id` (spec §4) is not a Pfam node property in the KG-SYNC-005
+        # baseline; `short_name` is the accession-side prop that exists.
+        "term_details_compact": ["short_name"],
+        "term_details_verbose": "*",
+        "bridges_out": [
+            ("Pfam_in_interpro_entry", "interpro", "membership"),
+        ],
     },
     "brite": {
         "label": "BriteCategory",
@@ -83,77 +159,580 @@ ONTOLOGY_CONFIG = {
             "node_label": "KeggTerm",
             "edge": "Kegg_term_in_brite_category",
         },
+        # BRITE binds `r` on the Gene_has_kegg_ko edge, so it carries KEGG's
+        # axes (spec §4: "(kegg's)").
+        "trust": dict(_TRUST_SOURCES_EVIDENCE),
+        "facet": {"prop": "tree", "param": "tree"},
+        "term_compact": ["gene_count", "organism_count"],
+        "term_details_compact": ["tree", "tree_code"],
+        "term_details_verbose": "*",
     },
     "tcdb": {
         "label": "TcdbFamily",
         "gene_rel": "Gene_has_tcdb_family",
         "hierarchy_rels": ["Tcdb_family_is_a_tcdb_family"],
         "fulltext_index": "tcdbFamilyFullText",
+        "trust": {
+            "sources": "sources", "evidence": "evidence",
+            "evidence_score": "evidence_score", "tier": "tier",
+            "rank_prop": "evidence_score",
+        },
+        "verbose_edge": [
+            "confidence_score", "source_agreement", "pfam_support", "go_support",
+            "identity", "qcov", "evalue", "consensus_n", "attachment_depth",
+        ],
+        # Leaf mode: the deepest surviving attachment. `include_superseded`
+        # drops the predicate (spec §7.3).
+        "leaf_attachment": {
+            "prop": "attachment_depth",
+            "value": "most_specific",
+            "override_param": "include_superseded",
+        },
+        "term_compact": ["gene_count", "organism_count"],
+        "term_verbose": ["superfamily", "metabolite_count"],
+        "term_details_compact": [
+            "tcdb_id", "tc_class_id", "direct_gene_count", "member_count",
+            "superfamily", "metabolite_count",
+        ],
+        "term_details_verbose": "*",
+        "bridges_out": [
+            ("Tcdb_family_has_pfam_domain", "pfam", "composition"),
+            ("Tcdb_family_involved_in_biological_process", "go_bp", "composition"),
+            ("Tcdb_family_enables_molecular_function", "go_mf", "composition"),
+            ("Tcdb_family_located_in_cellular_component", "go_cc", "composition"),
+        ],
     },
     "cazy": {
         "label": "CazyFamily",
         "gene_rel": "Gene_has_cazy_family",
         "hierarchy_rels": ["Cazy_family_is_a_cazy_family"],
         "fulltext_index": "cazyFamilyFullText",
+        "trust": dict(_TRUST_SOURCES_EVIDENCE_SCORE),
+        "term_compact": ["gene_count", "organism_count"],
+        "term_details_compact": ["cazy_id", "direct_gene_count"],
+        "term_details_verbose": "*",
     },
     "subcellular_localization": {
         "label": "SubcellularLocalization",
         "gene_rel": "Gene_has_subcellular_localization",
         "hierarchy_rels": [],
         "fulltext_index": "subcellularLocalizationFullText",
-        "edge_props": [("score", "localization_score")],
+        # No trust axes — PSORTb carries a native scalar only.
+        "verbose_edge": [("score", "localization_score")],
+        "term_compact": ["gene_count", "organism_count"],
+        "term_details_compact": ["psortb_id"],
+        "term_details_verbose": "*",
     },
     "signal_peptide_type": {
         "label": "SignalPeptideType",
         "gene_rel": "Gene_has_signal_peptide_type",
         "hierarchy_rels": [],
         "fulltext_index": "signalPeptideTypeFullText",
-        "edge_props": [
+        "verbose_edge": [
             ("probability", "signal_peptide_probability"),
             ("cleavage_site", "signal_peptide_cleavage_site"),
             ("cleavage_probability", "signal_peptide_cleavage_probability"),
         ],
+        "term_compact": ["gene_count", "organism_count"],
+        "term_details_compact": ["signalp_id"],
+        "term_details_verbose": "*",
+    },
+    "interpro": {
+        "label": "InterproEntry",
+        "gene_rel": "Gene_has_interpro_entry",
+        "hierarchy_rels": ["Interpro_entry_is_a_interpro_entry"],
+        "fulltext_index": "interproEntryFullText",
+        "trust": dict(_TRUST_SOURCES_EVIDENCE),
+        "verbose_edge": [
+            "libraries", "evalue_library", "evalue", "match_count",
+            "start", "end",
+        ],
+        "facet": {"prop": "interpro_type", "param": "interpro_type"},
+        "term_compact": ["gene_count", "organism_count"],
+        "term_details_compact": [
+            "interpro_id", "interpro_type", "direct_gene_count", "member_count",
+        ],
+        "term_details_verbose": "*",
+        "bridges_out": [
+            ("Interpro_entry_related_to_ec_number", "ec", "router"),
+            ("Interpro_entry_related_to_cazy_family", "cazy", "router"),
+        ],
+    },
+    "ncbifam": {
+        "label": "NcbifamFamily",
+        "gene_rel": "Gene_has_ncbifam_family",
+        "hierarchy_rels": [],
+        "fulltext_index": "ncbifamFamilyFullText",
+        "trust": dict(_TRUST_SOURCES_EVIDENCE),
+        "verbose_edge": ["evalue", "bit_score", "start", "end"],
+        "term_compact": ["gene_count", "organism_count"],
+        "term_verbose": ["family_type", "gene_symbol"],
+        "term_details_compact": ["ncbifam_id", "family_type", "gene_symbol"],
+        "term_details_verbose": "*",
+        "bridges_out": [
+            ("Ncbifam_family_in_interpro_entry", "interpro", "membership"),
+        ],
+    },
+    "merops": {
+        "label": "MeropsFamily",
+        "gene_rel": "Gene_has_merops_family",
+        "hierarchy_rels": ["Merops_family_is_a_merops_family"],
+        "fulltext_index": "meropsFamilyFullText",
+        "trust": {
+            "sources": "sources", "evidence": "evidence",
+            "evidence_score": "evidence_score", "tier": "tier",
+            "rank_prop": "confidence_score",
+        },
+        "compact_edge": {
+            "call_class": {
+                "prop": "call_class",
+                "warn_values": ["nonpeptidase_homolog"],
+            },
+        },
+        "verbose_edge": [
+            "confidence_score", "pfam_support", "best_hit_kind", "identity",
+            "qcov", "evalue", "consensus_n", "best_hit_id",
+        ],
+        "term_compact": ["gene_count", "organism_count"],
+        "term_verbose": ["family_class", "catalytic_type", "peptidase_gene_count"],
+        "term_details_compact": [
+            "merops_id", "family_class", "catalytic_type", "peptidase_gene_count",
+            "peptidase_organism_count", "direct_gene_count", "member_count",
+            "cleavage_summary", "cleavage_p1_residues", "known_cleavage_count",
+        ],
+        "term_details_verbose": "*",
+        "bridges_out": [
+            ("Merops_family_has_pfam_domain", "pfam", "composition"),
+        ],
     },
 }
 
+# Term-side columns every ontology row already projects from `t`. A facet whose
+# prop is one of these does not become an extra owned row column (BRITE's
+# `tree` is already a first-class row column; InterPro's `interpro_type` is not).
+_STANDARD_TERM_ROW_COLUMNS: frozenset[str] = frozenset({"tree", "tree_code"})
 
-def _edge_prop_return_columns() -> list[tuple[str, str, str]]:
-    """Union of edge-prop columns across ONTOLOGY_CONFIG, in config order.
+# param name -> (owning ontology key, node prop). Generated from the registry so
+# a new facet is one config entry (spec §7, design §7).
+_FACET_PARAMS: dict[str, tuple[str, str]] = {
+    cfg["facet"]["param"]: (key, cfg["facet"]["prop"])
+    for key, cfg in ONTOLOGY_CONFIG.items()
+    if cfg.get("facet")
+}
 
-    Returns ordered list of (output_column, neo4j_prop, owner_ontology)
-    triples. The list is the source of truth for column count, ordering,
-    and column names — every ontology row must include each of these
-    columns (with `r.<prop>` for the owner, `null` for non-owners) so
-    the row schema is uniform across all ontologies.
+# Trust filter params -> the config axis they need. `call_class` is not an
+# axis: it is declared per-ontology under `compact_edge`.
+_TRUST_FILTER_AXIS: dict[str, str] = {
+    "sources": "sources",
+    "evidence": "evidence",
+    "max_tier": "tier",
+    "min_evidence_score": "evidence_score",
+}
+
+_IDENTIFIER_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+
+def _safe_identifier(value: str, what: str) -> str:
+    """Guard a graph identifier that cannot be passed as a `$param`.
+
+    Labels, relationship types and property names are structural in Cypher.
+    Every caller sources them from ONTOLOGY_CONFIG or ControlledVocabulary,
+    but the guard keeps an unexpected value from reaching the query text.
     """
-    cols: list[tuple[str, str, str]] = []
-    for ont_key, cfg in ONTOLOGY_CONFIG.items():
-        for neo4j_prop, output_col in cfg.get("edge_props", []):
-            cols.append((output_col, neo4j_prop, ont_key))
-    return cols
+    if not _IDENTIFIER_RE.match(value or ""):
+        raise ValueError(f"Invalid {what} '{value}'.")
+    return value
 
 
-def _edge_prop_return_cypher(ontology: str) -> str:
-    """Return a comma-prefixed Cypher fragment projecting edge-prop columns.
+def _verbose_edge_pairs(cfg: dict) -> list[tuple[str, str]]:
+    """Normalize `verbose_edge` entries to (edge_prop, output_column) pairs.
 
-    For the owner ontology of each column, emits `r.<neo4j_prop> AS <col>`.
-    For non-owner ontologies, emits `null AS <col>`. The relationship
-    variable is assumed to be named `r` in the surrounding Cypher.
-
-    Returned string starts with `,\n       ` so it can be appended directly
-    after another RETURN-block column. Empty string if no edge_props are
-    defined anywhere (defensive).
+    A bare string means column == prop; a 2-tuple means (prop, column) —
+    needed for PSORTb `score -> localization_score` and the three SignalP
+    columns, which keep their existing prefixed names (design §1).
     """
-    cols = _edge_prop_return_columns()
-    if not cols:
-        return ""
-    parts: list[str] = []
-    for output_col, neo4j_prop, owner in cols:
-        if owner == ontology:
-            parts.append(f"r.{neo4j_prop} AS {output_col}")
+    pairs: list[tuple[str, str]] = []
+    for entry in cfg.get("verbose_edge") or []:
+        if isinstance(entry, str):
+            pairs.append((entry, entry))
         else:
-            parts.append(f"null AS {output_col}")
+            prop, column = entry
+            pairs.append((prop, column))
+    return pairs
+
+
+def _ontology_cfg(ontology: str) -> dict:
+    """Look up an ONTOLOGY_CONFIG entry, raising the standard ValueError."""
+    if ontology not in ONTOLOGY_CONFIG:
+        raise ValueError(
+            f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
+        )
+    return ONTOLOGY_CONFIG[ontology]
+
+
+def ontology_trust_axes(ontology: str) -> list[str]:
+    """Comparable trust axes the ontology's gene edge carries.
+
+    Returns a subset of ('sources', 'evidence', 'evidence_score', 'tier') in
+    that canonical order — never `rank_prop`, which is a sort key, not an axis.
+    Drives the envelope `trust_axes` key and the unsupported-axis message.
+    """
+    cfg = _ontology_cfg(ontology)
+    trust = cfg.get("trust") or {}
+    return [axis for axis in _TRUST_AXES_ORDER if axis in trust]
+
+
+def ontology_row_columns(ontology: str, verbose: bool) -> list[str]:
+    """Row columns a gene × term row of `ontology` OWNS.
+
+    Compact = comparable + materially-important: `evidence` (the single
+    compact trust column, spec §0), the ontology's facet column when it is not
+    already a standard term column (InterPro `interpro_type`), and every
+    `compact_edge` categorical (MEROPS `call_class`).
+
+    Verbose appends the remaining trust axes (`sources`, `evidence_score`,
+    `tier` — whichever the edge carries) and then the native detail from
+    `verbose_edge`, under its output-column names.
+
+    The api layer strips every column an ontology does not own; owned-but-null
+    columns stay (there `null` is information — design §3).
+    """
+    cfg = _ontology_cfg(ontology)
+    trust = cfg.get("trust") or {}
+
+    columns: list[str] = []
+    if "evidence" in trust:
+        columns.append("evidence")
+    facet = cfg.get("facet")
+    if facet and facet["prop"] not in _STANDARD_TERM_ROW_COLUMNS:
+        columns.append(facet["prop"])
+    columns.extend(cfg.get("compact_edge") or {})
+    if not verbose:
+        return columns
+
+    for axis in ("sources", "evidence_score", "tier"):
+        if axis in trust:
+            columns.append(axis)
+    columns.extend(column for _prop, column in _verbose_edge_pairs(cfg))
+    return columns
+
+
+def build_trust_filter_clause(
+    ontology: str,
+    *,
+    sources: list[str] | None = None,
+    evidence: list[str] | None = None,
+    max_tier: int | None = None,
+    min_evidence_score: float | None = None,
+    call_class: list[str] | None = None,
+    rel_var: str = "r",
+) -> tuple[str, dict]:
+    """Build the trust WHERE fragment bound on the gene→leaf rel var.
+
+    Returns a bare conjunction (no leading `WHERE` / `AND`) plus its params, so
+    callers splice it into whichever WHERE the gene→leaf MATCH already has.
+    Empty string + empty params when nothing is filtered — defaults never
+    filter on trust (design §1 ground rule 1).
+
+    Clause forms (spec §7.1):
+      sources            any(s IN $sources WHERE s IN r.sources)
+      evidence           r.evidence IN $evidence
+      max_tier           (r.tier <= $max_tier OR r.tier IS NULL)   — keeps the
+                         tier-null bucket (TCDB eggNOG-only edges)
+      min_evidence_score r.evidence_score >= $min_evidence_score
+      call_class         r.call_class IN $call_class
+
+    Raises ValueError naming the ontology's axes when an axis the ontology does
+    not carry is filtered on.
+    """
+    cfg = _ontology_cfg(ontology)
+    trust = cfg.get("trust") or {}
+    compact_edge = cfg.get("compact_edge") or {}
+    axes = ontology_trust_axes(ontology)
+
+    def _unsupported(param: str) -> ValueError:
+        carried = ", ".join(axes + sorted(compact_edge)) or "none"
+        return ValueError(
+            f"Filter '{param}' is not supported for ontology '{ontology}'. "
+            f"{ontology} carries: {carried}. "
+            f"Discover the per-ontology axes with "
+            f"list_filter_values(filter_type='trust_axes')."
+        )
+
+    parts: list[str] = []
+    params: dict = {}
+
+    requested = {
+        "sources": sources, "evidence": evidence, "max_tier": max_tier,
+        "min_evidence_score": min_evidence_score,
+    }
+    for param, value in requested.items():
+        if value is None:
+            continue
+        axis = _TRUST_FILTER_AXIS[param]
+        if axis not in trust:
+            raise _unsupported(param)
+        prop = _safe_identifier(trust[axis], "trust property")
+        if param == "sources":
+            parts.append(f"any(s IN $sources WHERE s IN {rel_var}.{prop})")
+        elif param == "evidence":
+            parts.append(f"{rel_var}.{prop} IN $evidence")
+        elif param == "max_tier":
+            parts.append(
+                f"({rel_var}.{prop} <= $max_tier OR {rel_var}.{prop} IS NULL)"
+            )
+        else:
+            parts.append(f"{rel_var}.{prop} >= $min_evidence_score")
+        params[param] = value
+
+    if call_class is not None:
+        if "call_class" not in compact_edge:
+            raise _unsupported("call_class")
+        prop = _safe_identifier(
+            compact_edge["call_class"]["prop"], "compact_edge property"
+        )
+        parts.append(f"{rel_var}.{prop} IN $call_class")
+        params["call_class"] = call_class
+
+    return " AND ".join(parts), params
+
+
+def _resolve_facet(
+    ontology: str,
+    *,
+    tree: str | None = None,
+    interpro_type: str | None = None,
+) -> tuple[str, str, str] | None:
+    """Validate the facet params and return (prop, param, value) or None.
+
+    Facets are term-side node properties declared per ontology under `facet`
+    and bound on `t` AFTER the hierarchy walk. Passing a facet param to an
+    ontology that does not own it raises ValueError.
+    """
+    requested = {"tree": tree, "interpro_type": interpro_type}
+    resolved: tuple[str, str, str] | None = None
+    for param, value in requested.items():
+        if value is None:
+            continue
+        owner, prop = _FACET_PARAMS[param]
+        if ontology != owner:
+            raise ValueError(
+                f"{param} filter is only valid for ontology='{owner}'"
+            )
+        resolved = (prop, param, value)
+    return resolved
+
+
+def _ontology_row_return_cypher(
+    ontology: str, verbose: bool, *, rel_var: str = "r"
+) -> str:
+    """Comma-prefixed RETURN fragment projecting `ontology_row_columns`.
+
+    Trust axes / compact_edge / verbose_edge columns come from the gene→leaf
+    relationship (or, on the one-edge rebind, from the best-edge map — the
+    `r.<prop>` access syntax is identical for both). The facet column comes
+    from the term (`t.interpro_type`). Empty string when the ontology owns no
+    row columns in this mode.
+    """
+    cfg = _ontology_cfg(ontology)
+    trust = cfg.get("trust") or {}
+    columns = ontology_row_columns(ontology, verbose)
+    if not columns:
+        return ""
+
+    facet = cfg.get("facet")
+    facet_prop = facet["prop"] if facet else None
+    compact_edge = cfg.get("compact_edge") or {}
+    verbose_props = {column: prop for prop, column in _verbose_edge_pairs(cfg)}
+
+    parts: list[str] = []
+    for column in columns:
+        if column == facet_prop:
+            parts.append(f"t.{column} AS {column}")
+        elif column in trust:
+            parts.append(f"{rel_var}.{trust[column]} AS {column}")
+        elif column in compact_edge:
+            parts.append(f"{rel_var}.{compact_edge[column]['prop']} AS {column}")
+        else:
+            parts.append(f"{rel_var}.{verbose_props[column]} AS {column}")
     return ",\n       " + ",\n       ".join(parts)
+
+
+def _ontology_row_edge_props(ontology: str, verbose: bool) -> list[str]:
+    """Edge props the row columns need, for the best-edge rebind map."""
+    cfg = _ontology_cfg(ontology)
+    trust = cfg.get("trust") or {}
+    compact_edge = cfg.get("compact_edge") or {}
+    verbose_props = {column: prop for prop, column in _verbose_edge_pairs(cfg)}
+    facet = cfg.get("facet")
+    facet_prop = facet["prop"] if facet else None
+
+    props: list[str] = []
+    for column in ontology_row_columns(ontology, verbose):
+        if column == facet_prop:
+            continue
+        if column in trust:
+            props.append(trust[column])
+        elif column in compact_edge:
+            props.append(compact_edge[column]["prop"])
+        else:
+            props.append(verbose_props[column])
+    return props
+
+
+def _best_edge_rank_key(cfg: dict) -> str:
+    """Sort key for the one-edge-per-(gene, term) rebind.
+
+    `rank_prop` when the ontology declares one (TCDB `evidence_score`, MEROPS
+    `confidence_score`); else `evidence_score` when the edge carries it; else
+    the attachment's own level, i.e. spec §3.1's "most specific attachment"
+    tiebreak. Never an e-value or bit score — those are native scalars whose
+    direction differs (design §1).
+    """
+    trust = cfg.get("trust") or {}
+    if trust.get("rank_prop"):
+        return trust["rank_prop"]
+    if "evidence_score" in trust:
+        return trust["evidence_score"]
+    return "attachment_level"
+
+
+def _uses_best_edge_rebind(ontology: str, verbose: bool) -> bool:
+    """True when a rollup row needs the one-edge-per-(gene, term) rebind.
+
+    Hierarchical ontologies only: a rollup row's `t` is an ancestor reachable
+    through several gene edges, so `RETURN DISTINCT ... r.*` would emit one row
+    per edge (the latent PSORTb-era duplication). Flat ontologies have exactly
+    one (gene, term) edge and keep the direct OPTIONAL MATCH.
+    """
+    cfg = _ontology_cfg(ontology)
+    return bool(cfg["hierarchy_rels"]) and bool(
+        ontology_row_columns(ontology, verbose)
+    )
+
+
+def _best_edge_rebind_cypher(
+    ontology: str,
+    verbose: bool,
+    *,
+    trust_frag: str = "",
+    distinct_head: str = "WITH DISTINCT t, g",
+) -> str:
+    """Cypher for the one-edge-per-(gene, term) rebind (spec §7.2).
+
+    Collects every gene edge that reaches `t` (leaf or ancestor), keeps the
+    best one by the ontology's rank key, and rebinds it as `r` — a map whose
+    `r.<prop>` accesses read exactly like the relationship's.
+
+    `trust_frag` is the same trust conjunction the gene→leaf MATCH carries,
+    rebuilt on `r2`: an edge the filter removed must not come back as the
+    row's "best" one (a `max_tier=2` row may never report `tier=3`).
+    """
+    cfg = _ontology_cfg(ontology)
+    label = cfg["label"]
+    gene_rel = cfg["gene_rel"]
+    rank_key = _best_edge_rank_key(cfg)
+
+    bridge = cfg.get("bridge")
+    if bridge:
+        edge_pattern = (
+            f"(g)-[r2:{gene_rel}]->(:{bridge['node_label']})"
+            f"-[:{bridge['edge']}]->(l2:{label})"
+        )
+    else:
+        edge_pattern = f"(g)-[r2:{gene_rel}]->(l2:{label})"
+
+    rel_union = "|".join(cfg["hierarchy_rels"])
+    depth = "*0..1" if cfg.get("parent_label") else "*0.."
+    walk_pattern = f"-[:{rel_union}{depth}]->(t)"
+
+    entries = [
+        f"{prop}: r2.{prop}" for prop in _ontology_row_edge_props(ontology, verbose)
+    ]
+    if rank_key == "attachment_level":
+        entries.append("attachment_level: l2.level")
+    elif rank_key not in _ontology_row_edge_props(ontology, verbose):
+        entries.append(f"{rank_key}: r2.{rank_key}")
+    edge_map = "{" + ", ".join(entries) + "}"
+    trust_where = f"            WHERE {trust_frag}\n" if trust_frag else ""
+
+    return (
+        f"{distinct_head}\n"
+        f"WITH t, g, [{edge_pattern}{walk_pattern}\n"
+        f"{trust_where}"
+        f"            | {edge_map}] AS edges\n"
+        f"WITH t, g, head(reverse(apoc.coll.sortMaps(edges, '{rank_key}'))) AS r\n"
+    )
+
+
+def build_vocab_values(*, applies_to: str, prop: str) -> tuple[str, dict]:
+    """Read one `ControlledVocabulary` node (spec §7.6).
+
+    `ControlledVocabulary` owns values / descriptions / ranges; the registry
+    owns shape. Callers cache per process and fall back to
+    `build_vocab_pivot_values` (plus a warning) when the node is missing.
+
+    RETURN keys: values, description, value_type, sparse, min_value, max_value.
+    """
+    cypher = (
+        "MATCH (v:ControlledVocabulary "
+        "{applies_to: $applies_to, property: $prop})\n"
+        "RETURN v.values AS values, v.description AS description,\n"
+        "       v.value_type AS value_type, v.sparse AS sparse,\n"
+        "       v.min_value AS min_value, v.max_value AS max_value"
+    )
+    return cypher, {"applies_to": applies_to, "prop": prop}
+
+
+def build_vocab_pivot_values(
+    *, applies_to: str, prop: str, kind: Literal["edge", "node"],
+) -> tuple[str, dict]:
+    """Derive a value set from the graph when the vocabulary node is missing.
+
+    `applies_to` is a relationship type (`kind='edge'`) or a node label
+    (`kind='node'`); both are structural in Cypher and cannot be `$param`s, so
+    they are identifier-guarded instead.
+
+    RETURN keys: value.
+    """
+    prop = _safe_identifier(prop, "property name")
+    if kind == "edge":
+        rel_type = _safe_identifier(applies_to, "relationship type")
+        cypher = (
+            f"MATCH ()-[r:{rel_type}]->()\n"
+            f"RETURN DISTINCT r.{prop} AS value\n"
+            "ORDER BY value"
+        )
+    elif kind == "node":
+        label = _safe_identifier(applies_to, "node label")
+        cypher = (
+            f"MATCH (n:{label})\n"
+            f"RETURN DISTINCT n.{prop} AS value\n"
+            "ORDER BY value"
+        )
+    else:
+        raise ValueError(f"kind must be 'edge' or 'node', got {kind!r}")
+    return cypher, {}
+
+
+def build_evidence_score_signals(
+    *, edge_types: list[str],
+) -> tuple[str, dict]:
+    """Read the `evidence_score` signal list per edge type (spec §7.6).
+
+    Surfaced as the envelope `evidence_score_signals` whenever
+    `min_evidence_score` is applied, so a cutoff says which signals it fired on.
+
+    RETURN keys: edge_type, signals, signal_count.
+    """
+    cypher = (
+        "MATCH (v:ControlledVocabulary)\n"
+        "WHERE v.applies_to IN $edge_types AND v.property = 'evidence_score'\n"
+        "RETURN v.applies_to AS edge_type, v.signals AS signals,\n"
+        "       v.signal_count AS signal_count\n"
+        "ORDER BY edge_type"
+    )
+    return cypher, {"edge_types": edge_types}
 
 
 def _hierarchy_walk(
@@ -464,7 +1043,7 @@ def build_gene_overview_summary(
     RETURN keys: total_matching, by_organism, by_category,
     by_annotation_type, has_expression, has_significant_expression,
     has_orthologs, has_clusters, has_derived_metrics, has_chemistry,
-    has_discussed, not_found.
+    has_discussed, by_merops_class, has_ncbifam, not_found.
     """
     cypher = (
         "UNWIND $locus_tags AS lt\n"
@@ -508,6 +1087,12 @@ def build_gene_overview_summary(
         # envelope rollup gate in the api layer.
         "       size([g IN found WHERE\n"
         "           coalesce(g.discussed_in_publication_count, 0) > 0]) AS has_discussed,\n"
+        # Annotation-trust rollups (design §8): protease-call classes across the
+        # batch, and how many input genes carry any NCBIfam family call.
+        "       apoc.coll.frequencies(apoc.coll.flatten(\n"
+        "         [g IN found | coalesce(g.merops_classes, [])])) AS by_merops_class,\n"
+        "       size([g IN found WHERE\n"
+        "           coalesce(g.ncbifam_family_count, 0) > 0]) AS has_ncbifam,\n"
         "       not_found"
     )
     return cypher, {"locus_tags": locus_tags}
@@ -534,6 +1119,10 @@ def build_gene_overview(
     null = no TCDB call), transported_metabolite_count (deepest-attachment
     substrate breadth), transport_substrate_resolution ('resolved' |
     'family_inferred' | null), discussed_in_publication_count,
+    merops_classes (list, [] default — the protease call classes this gene
+    carries), ncbifam_family_count (int, 0 default),
+    merops_evidence_score_max (float | null — sparse KG prop, NOT coalesced:
+    null = no MEROPS call, the twin of tcdb_evidence_score_max),
     evidence_sources.
     RETURN keys (verbose): adds gene_summary, function_description,
     all_identifiers, numeric_metric_types_observed,
@@ -625,6 +1214,13 @@ def build_gene_overview(
         "       coalesce(g.transported_metabolite_count, 0) AS transported_metabolite_count,\n"
         "       g.transport_substrate_resolution AS transport_substrate_resolution,\n"
         "       coalesce(g.discussed_in_publication_count, 0) AS discussed_in_publication_count,\n"
+        # Annotation-trust routing signals (spec §7.8). merops_classes and
+        # ncbifam_family_count are safe to default; merops_evidence_score_max
+        # is surfaced uncoalesced (twin of tcdb_evidence_score_max) — null
+        # means "no MEROPS call", which is not the same as a weak one.
+        "       coalesce(g.merops_classes, []) AS merops_classes,\n"
+        "       coalesce(g.ncbifam_family_count, 0) AS ncbifam_family_count,\n"
+        "       g.merops_evidence_score_max AS merops_evidence_score_max,\n"
         f"       evidence_sources{verbose_cols}\n"
         f"ORDER BY g.locus_tag{skip_clause}{limit_clause}"
     )
@@ -2343,15 +2939,18 @@ def build_search_ontology_summary(
     level: int | None = None,
     tree: str | None = None,
     informative_only: bool = False,
+    interpro_type: str | None = None,
 ) -> tuple[str, dict]:
     """Build summary Cypher for search_ontology.
+
+    `interpro_type` is the InterPro term facet (spec §7.4) — the same
+    `facet` config entry BRITE's `tree` uses.
 
     RETURN keys: total_entries, total_matching, score_max, score_median.
     """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
-    if tree is not None and ontology != "brite":
-        raise ValueError("tree filter is only valid for ontology='brite'")
+    facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
     cfg = ONTOLOGY_CONFIG[ontology]
     index_name = cfg["fulltext_index"]
     parent_index = cfg.get("parent_fulltext_index")
@@ -2363,9 +2962,10 @@ def build_search_ontology_summary(
     if level is not None:
         where_parts.append("t.level = $level")
         params["level"] = level
-    if tree is not None:
-        where_parts.append("t.tree = $tree")
-        params["tree"] = tree
+    if facet is not None:
+        facet_prop, facet_param, facet_value = facet
+        where_parts.append(f"t.{facet_prop} = ${facet_param}")
+        params[facet_param] = facet_value
     if informative_only:
         where_parts.append("coalesce(t.is_uninformative, '') <> 'true'")
     where_clause = "  WHERE " + " AND ".join(where_parts) + "\n" if where_parts else ""
@@ -2414,10 +3014,18 @@ def build_search_ontology(
     tree: str | None = None,
     informative_only: bool = False,
     verbose: bool = False,
+    interpro_type: str | None = None,
 ) -> tuple[str, dict]:
     """Build Cypher for search_ontology.
 
-    RETURN keys: id, name, score, level, tree, tree_code, is_informative.
+    RETURN keys: id, name, score, level, tree, tree_code, is_informative,
+    gene_count, organism_count (the two term-side counts every ontology label
+    carries — `term_compact` in the registry). InterPro rows also carry the
+    `interpro_type` facet column.
+
+    `interpro_type` filters the search to one InterPro stratum, the same
+    `facet` mechanism BRITE's `tree` uses.
+
     When the selected ontology's ONTOLOGY_CONFIG entry declares `discusses_rel`
     (KEGG only today), an extra per-row `discussed_by_n_publications`
     pattern-count column is emitted, and verbose adds the
@@ -2426,11 +3034,21 @@ def build_search_ontology(
     """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
-    if tree is not None and ontology != "brite":
-        raise ValueError("tree filter is only valid for ontology='brite'")
+    facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
     cfg = ONTOLOGY_CONFIG[ontology]
     index_name = cfg["fulltext_index"]
     parent_index = cfg.get("parent_fulltext_index")
+
+    # Term-side compact counts (registry `term_compact`) plus the facet column
+    # where the ontology owns one that is not already a first-class column.
+    term_props = list(cfg["term_compact"])
+    cfg_facet = cfg.get("facet")
+    if cfg_facet and cfg_facet["prop"] not in _STANDARD_TERM_ROW_COLUMNS:
+        term_props.append(cfg_facet["prop"])
+    # Inner projection is indented one level deeper inside the UNION subquery.
+    term_cols = "".join(f",\n         t.{prop} AS {prop}" for prop in term_props)
+    term_cols_flat = "".join(f",\n       t.{prop} AS {prop}" for prop in term_props)
+    term_outer = "".join(f",\n       {prop}" for prop in term_props)
 
     # Publication "discusses" columns — config-gated (only ontologies whose
     # config declares `discusses_rel`, i.e. KEGG). Rel-type read from config,
@@ -2470,9 +3088,10 @@ def build_search_ontology(
     if level is not None:
         where_parts.append("t.level = $level")
         params["level"] = level
-    if tree is not None:
-        where_parts.append("t.tree = $tree")
-        params["tree"] = tree
+    if facet is not None:
+        facet_prop, facet_param, facet_value = facet
+        where_parts.append(f"t.{facet_prop} = ${facet_param}")
+        params[facet_param] = facet_value
     if informative_only:
         where_parts.append("coalesce(t.is_uninformative, '') <> 'true'")
     where_clause = "  WHERE " + " AND ".join(where_parts) + "\n" if where_parts else ""
@@ -2489,7 +3108,7 @@ def build_search_ontology(
             + "  RETURN t.id AS id, t.name AS name, score,\n"
             "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
             "         coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
-            + inner_discusses + "\n"
+            + term_cols + inner_discusses + "\n"
             "  UNION ALL\n"
             f"  CALL db.index.fulltext.queryNodes('{parent_index}', $search_text)\n"
             "  YIELD node AS t, score\n"
@@ -2497,10 +3116,10 @@ def build_search_ontology(
             + "  RETURN t.id AS id, t.name AS name, score,\n"
             "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
             "         coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
-            + inner_discusses + "\n"
+            + term_cols + inner_discusses + "\n"
             "}\n"
             "RETURN id, name, score, level, tree, tree_code, is_informative"
-            + discusses_outer + "\n"
+            + term_outer + discusses_outer + "\n"
             "ORDER BY score DESC, id" + skip_clause + limit_clause
         )
     else:
@@ -2511,6 +3130,7 @@ def build_search_ontology(
             + "RETURN t.id AS id, t.name AS name, score,\n"
             "       t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
             "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
+            + term_cols_flat
             + inner_discusses + "\n"
             "ORDER BY score DESC, id" + skip_clause + limit_clause
         )
@@ -2587,6 +3207,12 @@ def _genes_by_ontology_match_stage(
     organism: str,
     tree: str | None = None,
     informative_only: bool = False,
+    sources: list[str] | None = None,
+    evidence: list[str] | None = None,
+    max_tier: int | None = None,
+    min_evidence_score: float | None = None,
+    call_class: list[str] | None = None,
+    interpro_type: str | None = None,
 ) -> tuple[str, dict]:
     """Shared MATCH + size-filter-WITH for detail/per_term/per_gene builders.
 
@@ -2598,13 +3224,23 @@ def _genes_by_ontology_match_stage(
     `AND coalesce(t.is_uninformative, '') <> 'true'` is applied BEFORE the
     size collapse so per-term gene counts reflect informative terms only.
 
+    Trust filters (`sources` / `evidence` / `max_tier` / `min_evidence_score` /
+    `call_class`) bind on the gene→leaf relationship `r`, BEFORE the hierarchy
+    walk and BEFORE `collect(DISTINCT g)`, so per-term gene-set sizes reflect
+    the filtered edges (spec §7.1). Facets (`tree`, `interpro_type`) bind on
+    `t` AFTER the walk. Enrichment reaches the same filters through this stage.
+
     Consumers are responsible for adding $min_gene_set_size / $max_gene_set_size
     into params, and for appending their own UNWIND/RETURN tail.
     """
-    if tree is not None and ontology != "brite":
-        raise ValueError("tree filter is only valid for ontology='brite'")
+    facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
+    trust_frag, trust_params = build_trust_filter_clause(
+        ontology, sources=sources, evidence=evidence, max_tier=max_tier,
+        min_evidence_score=min_evidence_score, call_class=call_class,
+    )
 
     params: dict = {"org": organism}
+    params.update(trust_params)
 
     if level is None:
         # Mode 1 — walk DOWN from each input term.
@@ -2621,7 +3257,9 @@ def _genes_by_ontology_match_stage(
                 "OPTIONAL MATCH (t)<-[:Pfam_in_pfam_clan*0..1]-(leaf:Pfam)\n"
                 "WITH t, coalesce(leaf, t) AS leaf\n"
                 "MATCH (g:Gene {organism_name: $org})-[r:Gene_has_pfam]->(leaf)\n"
-                "WHERE t:Pfam OR t:PfamClan\n"
+                "WHERE t:Pfam OR t:PfamClan"
+                + (f" AND {trust_frag}" if trust_frag else "")
+                + "\n"
             )
         else:
             frag = _hierarchy_walk(ontology, direction="down")
@@ -2629,6 +3267,7 @@ def _genes_by_ontology_match_stage(
             walk = frag["walk_down"]
             # Single-label: walk DOWN from root to leaf to gene.
             # Flat ontologies: no walk, leaf = t.
+            trust_where = f"WHERE {trust_frag}\n" if trust_frag else ""
             if walk:
                 cypher_head = (
                     "UNWIND $term_ids AS input_tid\n"
@@ -2636,6 +3275,7 @@ def _genes_by_ontology_match_stage(
                     f"{walk}\n"
                     f"MATCH (g:Gene {{organism_name: $org}})"
                     f"-[r:{frag['gene_rel']}]->(leaf)\n"
+                    f"{trust_where}"
                 )
             else:
                 # Flat: t = leaf; still the "input term's genes"
@@ -2644,6 +3284,7 @@ def _genes_by_ontology_match_stage(
                     f"MATCH (t:{leaf} {{id: input_tid}})\n"
                     f"MATCH (g:Gene {{organism_name: $org}})"
                     f"-[r:{frag['gene_rel']}]->(t)\n"
+                    f"{trust_where}"
                 )
     else:
         # Mode 2/3 — walk UP, filter on level (and optionally term_ids).
@@ -2659,13 +3300,21 @@ def _genes_by_ontology_match_stage(
         if term_ids is not None:
             level_clause += " AND t.id IN $term_ids"
             params["term_ids"] = term_ids
-        if tree is not None:
-            level_clause += " AND t.tree = $tree"
-            params["tree"] = tree
+        if facet is not None:
+            facet_prop, facet_param, facet_value = facet
+            level_clause += f" AND t.{facet_prop} = ${facet_param}"
+            params[facet_param] = facet_value
         if walk:
-            cypher_head = f"{bind}\n{walk}\n{level_clause}\n"
+            # Trust predicate rides the gene→leaf MATCH, ahead of the walk.
+            bind_block = bind + (f"\nWHERE {trust_frag}" if trust_frag else "")
+            cypher_head = f"{bind_block}\n{walk}\n{level_clause}\n"
         else:
-            # Flat ontology: t = leaf; no walk; level filter on t directly.
+            # Flat ontology: t = leaf; no walk; one WHERE carries both the
+            # trust predicate and the level filter.
+            if trust_frag:
+                level_clause = (
+                    f"WHERE {trust_frag} AND " + level_clause[len("WHERE "):]
+                )
             cypher_head = f"{bind}\n{level_clause}\n"
 
     # Term-level informative filter: must apply BEFORE size collapse so
@@ -2702,6 +3351,12 @@ def build_genes_by_ontology_detail(
     offset: int = 0,
     tree: str | None = None,
     informative_only: bool = False,
+    sources: list[str] | None = None,
+    evidence: list[str] | None = None,
+    max_tier: int | None = None,
+    min_evidence_score: float | None = None,
+    call_class: list[str] | None = None,
+    interpro_type: str | None = None,
 ) -> tuple[str, dict]:
     """Build (gene × term) detail query. Dispatches on (level, term_ids).
 
@@ -2711,9 +3366,21 @@ def build_genes_by_ontology_detail(
     Mode 2: level only — walk UP, filter on level.
     Mode 3: level + term_ids — walk UP, filter on level AND input_tids.
 
+    Trust filters (`sources` / `evidence` / `max_tier` / `min_evidence_score` /
+    `call_class`) bind on the gene→leaf relationship `r` BEFORE the walk and
+    the size collapse, so per-term gene-set sizes reflect the filtered edges
+    (spec §7.1). Facets (`tree`, `interpro_type`) bind on `t` after the walk.
+    On a hierarchical ontology the trust columns come from the gene's best
+    edge under `t` via the one-edge-per-(gene, term) rebind (spec §7.2).
+
     RETURN keys (compact): locus_tag, gene_name, product, gene_category,
-    term_id, term_name, level, is_informative.
-    RETURN keys (verbose): adds function_description, level_is_best_effort.
+    term_id, term_name, level, tree, tree_code, is_informative, plus the
+    ontology's compact trust columns — `evidence`, and `interpro_type` /
+    `call_class` where owned.
+    RETURN keys (verbose): adds function_description, level_is_best_effort,
+    the remaining trust axes (`sources`, `evidence_score`, `tier`) and the
+    ontology's native detail. See `ontology_row_columns(ontology, verbose)`
+    for the exact owned set; the api layer strips everything else.
     """
     # Validation stays in the builder (helper would also need it, but the
     # detail-builder tests expect `match="level.*term_ids"`).
@@ -2729,6 +3396,9 @@ def build_genes_by_ontology_detail(
     head, params = _genes_by_ontology_match_stage(
         ontology=ontology, level=level, term_ids=term_ids, organism=organism,
         tree=tree, informative_only=informative_only,
+        sources=sources, evidence=evidence, max_tier=max_tier,
+        min_evidence_score=min_evidence_score, call_class=call_class,
+        interpro_type=interpro_type,
     )
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
@@ -2739,7 +3409,7 @@ def build_genes_by_ontology_detail(
         "       t.level_is_best_effort IS NOT NULL AS level_is_best_effort"
         if verbose else ""
     )
-    edge_prop_cols = _edge_prop_return_cypher(ontology)
+    edge_prop_cols = _ontology_row_return_cypher(ontology, verbose)
     return_block = (
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.gene_category AS gene_category,\n"
@@ -2760,15 +3430,25 @@ def build_genes_by_ontology_detail(
         limit_clause = "\nLIMIT $limit"
         params["limit"] = limit
 
-    # Re-bind r for edge-prop projection. Only emitted when ontology has
-    # edge_props — for other ontologies the RETURN block emits nulls so the
-    # rel is unused. Skipping the OPTIONAL MATCH avoids multi-edge fan-out
-    # on ontologies where a gene has multiple annotation edges.
+    # Re-bind `r` for the (gene, term) pair. Emitted only when the ontology
+    # owns row columns in this mode — skipping it avoids multi-edge fan-out.
+    #
+    # Hierarchical ontologies take the one-edge-per-(gene, term) rebind
+    # (spec §7.2): `t` is an ancestor reachable through several gene edges, so
+    # the best one by the ontology's rank key wins and exactly one row per
+    # (gene, term) survives. Flat ontologies keep the direct OPTIONAL MATCH.
     cfg = ONTOLOGY_CONFIG[ontology]
-    if cfg.get("edge_props"):
-        edge_rebind = (
-            f"OPTIONAL MATCH (g)-[r:{cfg['gene_rel']}]->(t)\n"
+    if _uses_best_edge_rebind(ontology, verbose):
+        rebind_trust, _ = build_trust_filter_clause(
+            ontology, sources=sources, evidence=evidence, max_tier=max_tier,
+            min_evidence_score=min_evidence_score, call_class=call_class,
+            rel_var="r2",
         )
+        edge_rebind = _best_edge_rebind_cypher(
+            ontology, verbose, trust_frag=rebind_trust,
+        )
+    elif ontology_row_columns(ontology, verbose):
+        edge_rebind = f"OPTIONAL MATCH (g)-[r:{cfg['gene_rel']}]->(t)\n"
     else:
         edge_rebind = ""
 
@@ -2791,6 +3471,12 @@ def build_genes_by_ontology_per_term(
     max_gene_set_size: int | None = 500,
     tree: str | None = None,
     informative_only: bool = False,
+    sources: list[str] | None = None,
+    evidence: list[str] | None = None,
+    max_tier: int | None = None,
+    min_evidence_score: float | None = None,
+    call_class: list[str] | None = None,
+    interpro_type: str | None = None,
 ) -> tuple[str, dict]:
     """Per-term aggregate. One row per surviving term.
 
@@ -2802,12 +3488,18 @@ def build_genes_by_ontology_per_term(
     Mode 2: level only — walk UP, filter on level.
     Mode 3: level + term_ids — walk UP, filter on level AND input_tids.
 
-    RETURN keys: term_id, term_name, level, best_effort, n_genes, cat_freqs,
-    is_informative.
+    Trust filters and facets thread through `_genes_by_ontology_match_stage`,
+    so the per-term sizes here match the detail rows for the same filters.
+
+    RETURN keys: term_id, term_name, level, tree, tree_code, best_effort,
+    n_genes, cat_freqs, is_informative.
     """
     head, params = _genes_by_ontology_match_stage(
         ontology=ontology, level=level, term_ids=term_ids, organism=organism,
         tree=tree, informative_only=informative_only,
+        sources=sources, evidence=evidence, max_tier=max_tier,
+        min_evidence_score=min_evidence_score, call_class=call_class,
+        interpro_type=interpro_type,
     )
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
@@ -2838,6 +3530,12 @@ def build_genes_by_ontology_per_gene(
     max_gene_set_size: int | None = 500,
     tree: str | None = None,
     informative_only: bool = False,
+    sources: list[str] | None = None,
+    evidence: list[str] | None = None,
+    max_tier: int | None = None,
+    min_evidence_score: float | None = None,
+    call_class: list[str] | None = None,
+    interpro_type: str | None = None,
 ) -> tuple[str, dict]:
     """Per-gene aggregate. One row per surviving gene.
 
@@ -2847,11 +3545,16 @@ def build_genes_by_ontology_per_gene(
 
     Per-gene rows do not carry per-term flags; `informative_only` threads
     through the helper so only informative terms count toward each gene's
-    aggregate, but `is_informative` is NOT a row column here.
+    aggregate, but `is_informative` is NOT a row column here. Trust filters
+    and facets thread through the same helper — a gene only counts through
+    edges that survive them.
     """
     head, params = _genes_by_ontology_match_stage(
         ontology=ontology, level=level, term_ids=term_ids, organism=organism,
         tree=tree, informative_only=informative_only,
+        sources=sources, evidence=evidence, max_tier=max_tier,
+        min_evidence_score=min_evidence_score, call_class=call_class,
+        interpro_type=interpro_type,
     )
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
@@ -2868,34 +3571,62 @@ def build_genes_by_ontology_per_gene(
     return f"{head}\n{tail}", params
 
 
-def _gene_ontology_terms_leaf_filter(cfg: dict) -> str:
-    """Return a WHERE NOT EXISTS clause for leaf filtering, or empty string.
+def _gene_ontology_terms_leaf_filter(
+    cfg: dict, *, include_superseded: bool = False,
+) -> str:
+    """Return a WHERE clause pinning leaf mode to most-specific rows, or "".
 
-    Leaf filtering is meaningful only when genes can be annotated to both
-    a child and its ancestor within the same label. Skipped for:
-    - Flat ontologies (no hierarchy_rels): cog_category, tigr_role
-    - Cross-label hierarchies (parent_label present): pfam (Pfam→PfamClan)
+    Two predicates, both spec §7.3:
+
+    1. The *transitive* leaf filter — `NOT EXISTS { (g)-[:gene_rel]->(child)
+       -[:is_a*1..]->(t) }`. `*1..` (was a single hop) so an annotation two or
+       more levels below `t` also supersedes it. Meaningful only when genes can
+       be annotated to both a child and its ancestor within the same label, so
+       skipped for flat ontologies (cog_category, tigr_role, ncbifam),
+       cross-label hierarchies (pfam: Pfam→PfamClan) and bridges (brite).
+
+    2. `leaf_attachment` — TCDB stamps the deepest surviving attachment on the
+       edge itself (`attachment_depth='most_specific'`), which selects exactly
+       the same rows as (1) and is cheaper (spec §7.3: verified identical on
+       MED4, 670 → 597 either way).
+
+    Because the two are equivalent, `include_superseded=True` must drop BOTH on
+    an ontology that declares `leaf_attachment` — dropping only the
+    `attachment_depth` predicate would leave the flag a no-op. The superseded
+    rows then come back labelled by the `attachment_depth` verbose column.
 
     For KEGG, gene→KeggTerm edges only terminate at ko leaves (enforced by
     graph structure), so the NOT EXISTS clause is a no-op but still emitted
     — the query optimizer handles it cheaply.
     """
+    parts: list[str] = []
+
+    attachment = cfg.get("leaf_attachment")
+    superseded_opt_out = bool(attachment) and include_superseded
+
     hierarchy_rels = cfg["hierarchy_rels"]
-    if not hierarchy_rels:
+    if (
+        hierarchy_rels
+        and not cfg.get("parent_label")
+        and not cfg.get("bridge")
+        and not superseded_opt_out
+    ):
+        gene_rel = cfg["gene_rel"]
+        label = cfg["label"]
+        hierarchy = "|".join(hierarchy_rels)
+        parts.append(
+            "NOT EXISTS {\n"
+            f"  MATCH (g)-[:{gene_rel}]->(child:{label})\n"
+            f"        -[:{hierarchy}*1..]->(t)\n"
+            "}"
+        )
+
+    if attachment and not include_superseded:
+        parts.append(f"r.{attachment['prop']} = '{attachment['value']}'")
+
+    if not parts:
         return ""
-    if cfg.get("parent_label"):
-        return ""
-    if cfg.get("bridge"):
-        return ""
-    gene_rel = cfg["gene_rel"]
-    label = cfg["label"]
-    hierarchy = "|".join(hierarchy_rels)
-    return (
-        "WHERE NOT EXISTS {\n"
-        f"  MATCH (g)-[:{gene_rel}]->(child:{label})\n"
-        f"        -[:{hierarchy}]->(t)\n"
-        "}\n"
-    )
+    return "WHERE " + "\n  AND ".join(parts) + "\n"
 
 
 def build_gene_ontology_terms_summary(
@@ -2907,11 +3638,23 @@ def build_gene_ontology_terms_summary(
     level: int | None = None,
     tree: str | None = None,
     informative_only: bool = False,
+    sources: list[str] | None = None,
+    evidence: list[str] | None = None,
+    max_tier: int | None = None,
+    min_evidence_score: float | None = None,
+    call_class: list[str] | None = None,
+    interpro_type: str | None = None,
+    include_superseded: bool = False,
 ) -> tuple[str, dict]:
     """Build summary for gene_ontology_terms for ONE ontology.
 
     Called once per ontology by api/ layer (which merges results
     and adds not_found, no_terms, totals).
+
+    Trust filters bind on the gene→leaf relationship `r` before the hierarchy
+    walk, so the summary counts and the detail rows describe the same filtered
+    edge set (spec §7.1). Leaf mode honours the most-specific-attachment
+    predicate unless `include_superseded` (spec §7.3).
 
     RETURN keys: gene_count, term_count, by_term, gene_term_counts.
     gene_term_counts is [{locus_tag, term_count}] — has per-gene identity
@@ -2921,13 +3664,18 @@ def build_gene_ontology_terms_summary(
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
     if mode == "rollup" and level is None:
         raise ValueError("level is required when mode='rollup'")
-    if tree is not None and ontology != "brite":
-        raise ValueError("tree filter is only valid for ontology='brite'")
+    facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
+    trust_frag, trust_params = build_trust_filter_clause(
+        ontology, sources=sources, evidence=evidence, max_tier=max_tier,
+        min_evidence_score=min_evidence_score, call_class=call_class,
+    )
     cfg = ONTOLOGY_CONFIG[ontology]
     gene_rel = cfg["gene_rel"]
     label = cfg["label"]
 
     params: dict = {"locus_tags": locus_tags, "org": organism_name}
+    params.update(trust_params)
+    trust_and = f" AND {trust_frag}" if trust_frag else ""
 
     bridge = cfg.get("bridge")
 
@@ -2938,9 +3686,9 @@ def build_gene_ontology_terms_summary(
             bridge_node = bridge["node_label"]
             bind = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
-                f"-[:{gene_rel}]->(ko:{bridge_node})"
+                f"-[r:{gene_rel}]->(ko:{bridge_node})"
                 f"-[:{bridge_edge}]->(leaf:{label})\n"
-                "WHERE g.locus_tag IN $locus_tags\n"
+                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
             )
             rel_union = "|".join(cfg["hierarchy_rels"])
             walk = (
@@ -2951,15 +3699,15 @@ def build_gene_ontology_terms_summary(
             # flat: leaf = term, walk is identity
             bind = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
-                f"-[:{gene_rel}]->(t:{label})\n"
-                "WHERE g.locus_tag IN $locus_tags\n"
+                f"-[r:{gene_rel}]->(t:{label})\n"
+                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
             )
             walk = "WITH g, t\nWHERE t.level = $level\n"
         elif ontology == "pfam":
             bind = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
-                f"-[:{gene_rel}]->(leaf:Pfam)\n"
-                "WHERE g.locus_tag IN $locus_tags\n"
+                f"-[r:{gene_rel}]->(leaf:Pfam)\n"
+                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
             )
             walk = (
                 "MATCH (leaf)-[:Pfam_in_pfam_clan*0..1]->(t)\n"
@@ -2969,18 +3717,19 @@ def build_gene_ontology_terms_summary(
             rel_union = "|".join(cfg["hierarchy_rels"])
             bind = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
-                f"-[:{gene_rel}]->(leaf:{label})\n"
-                "WHERE g.locus_tag IN $locus_tags\n"
+                f"-[r:{gene_rel}]->(leaf:{label})\n"
+                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
             )
             walk = (
                 f"MATCH (leaf)-[:{rel_union}*0..]->(t:{label})\n"
                 "WHERE t.level = $level\n"
             )
         params["level"] = level
-        tree_filter = ""
-        if tree is not None:
-            tree_filter = "AND t.tree = $tree\n"
-            params["tree"] = tree
+        facet_filter = ""
+        if facet is not None:
+            facet_prop, facet_param, facet_value = facet
+            facet_filter = f"AND t.{facet_prop} = ${facet_param}\n"
+            params[facet_param] = facet_value
         informative_filter = (
             "AND coalesce(t.is_uninformative, '') <> 'true'\n"
             if informative_only else ""
@@ -2988,7 +3737,7 @@ def build_gene_ontology_terms_summary(
         cypher = (
             f"{bind}"
             f"{walk}"
-            f"{tree_filter}"
+            f"{facet_filter}"
             f"{informative_filter}"
             "WITH g.locus_tag AS lt, collect(DISTINCT {id: t.id, name: t.name, level: t.level, tree: t.tree, tree_code: t.tree_code}) AS terms\n"
             "WITH collect({lt: lt, cnt: size(terms), terms: terms}) AS genes\n"
@@ -3006,19 +3755,21 @@ def build_gene_ontology_terms_summary(
         )
     else:
         # --- leaf mode ---
-        leaf_filter = _gene_ontology_terms_leaf_filter(cfg)
+        leaf_filter = _gene_ontology_terms_leaf_filter(
+            cfg, include_superseded=include_superseded,
+        )
 
         if bridge:
             match_line = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
-                f"-[:{gene_rel}]->(:{bridge['node_label']})"
+                f"-[r:{gene_rel}]->(:{bridge['node_label']})"
                 f"-[:{bridge['edge']}]->(t:{label})\n"
-                "WHERE g.locus_tag IN $locus_tags\n"
+                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
             )
         else:
             match_line = (
-                f"MATCH (g:Gene {{organism_name: $org}})-[:{gene_rel}]->(t:{label})\n"
-                "WHERE g.locus_tag IN $locus_tags\n"
+                f"MATCH (g:Gene {{organism_name: $org}})-[r:{gene_rel}]->(t:{label})\n"
+                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
             )
 
         # Convert leaf_filter "WHERE NOT EXISTS ..." to "AND NOT EXISTS ..."
@@ -3029,10 +3780,11 @@ def build_gene_ontology_terms_summary(
         if level is not None:
             level_filter = "AND t.level = $level\n"
             params["level"] = level
-        tree_filter = ""
-        if tree is not None:
-            tree_filter = "AND t.tree = $tree\n"
-            params["tree"] = tree
+        facet_filter = ""
+        if facet is not None:
+            facet_prop, facet_param, facet_value = facet
+            facet_filter = f"AND t.{facet_prop} = ${facet_param}\n"
+            params[facet_param] = facet_value
         informative_filter = (
             "AND coalesce(t.is_uninformative, '') <> 'true'\n"
             if informative_only else ""
@@ -3042,7 +3794,7 @@ def build_gene_ontology_terms_summary(
             f"{match_line}"
             f"{leaf_filter}"
             f"{level_filter}"
-            f"{tree_filter}"
+            f"{facet_filter}"
             f"{informative_filter}"
             "WITH g.locus_tag AS lt, collect({id: t.id, name: t.name, level: t.level, tree: t.tree, tree_code: t.tree_code}) AS terms\n"
             "WITH collect({lt: lt, cnt: size(terms), terms: terms}) AS genes\n"
@@ -3073,33 +3825,56 @@ def build_gene_ontology_terms(
     limit: int | None = None,
     offset: int = 0,
     informative_only: bool = False,
+    sources: list[str] | None = None,
+    evidence: list[str] | None = None,
+    max_tier: int | None = None,
+    min_evidence_score: float | None = None,
+    call_class: list[str] | None = None,
+    interpro_type: str | None = None,
+    include_superseded: bool = False,
 ) -> tuple[str, dict]:
     """Build detail Cypher for gene_ontology_terms for ONE ontology.
 
-    RETURN keys (compact): locus_tag, term_id, term_name, level, tree,
-    tree_code, is_informative.
-    RETURN keys (verbose): adds organism_name.
+    Trust filters (`sources` / `evidence` / `max_tier` / `min_evidence_score` /
+    `call_class`) bind on the gene→leaf relationship `r`; facets (`tree`,
+    `interpro_type`) bind on `t`. In rollup mode a hierarchical ontology takes
+    the one-edge-per-(gene, term) rebind (spec §7.2) so the trust columns come
+    from the gene's best edge under `t` and no (gene, term) pair repeats. Leaf
+    mode pins rows to the most specific attachment unless `include_superseded`
+    (spec §7.3) — the superseded rows then carry `attachment_depth` in verbose.
 
-    Called by api/ — which adds ontology_type column and merges
-    across ontologies when ontology=None.
+    RETURN keys (compact): locus_tag, term_id, term_name, level, tree,
+    tree_code, is_informative, plus the ontology's compact trust columns —
+    `evidence`, and `interpro_type` / `call_class` where owned.
+    RETURN keys (verbose): adds organism_name, the remaining trust axes
+    (`sources`, `evidence_score`, `tier`) and the ontology's native detail.
+    See `ontology_row_columns(ontology, verbose)` for the exact owned set.
+
+    Called by api/ — which adds ontology_type column, strips the columns this
+    ontology does not own, and merges across ontologies when ontology=None.
     """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
     if mode == "rollup" and level is None:
         raise ValueError("level is required when mode='rollup'")
-    if tree is not None and ontology != "brite":
-        raise ValueError("tree filter is only valid for ontology='brite'")
+    facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
+    trust_frag, trust_params = build_trust_filter_clause(
+        ontology, sources=sources, evidence=evidence, max_tier=max_tier,
+        min_evidence_score=min_evidence_score, call_class=call_class,
+    )
     cfg = ONTOLOGY_CONFIG[ontology]
     gene_rel = cfg["gene_rel"]
     label = cfg["label"]
 
     params: dict = {"locus_tags": locus_tags, "org": organism_name}
+    params.update(trust_params)
+    trust_and = f" AND {trust_frag}" if trust_frag else ""
 
     verbose_cols = (
         ",\n       g.organism_name AS organism_name"
         if verbose else ""
     )
-    edge_prop_cols = _edge_prop_return_cypher(ontology)
+    edge_prop_cols = _ontology_row_return_cypher(ontology, verbose)
 
     if offset:
         skip_clause = "\nSKIP $offset"
@@ -3124,7 +3899,7 @@ def build_gene_ontology_terms(
                 f"MATCH (g:Gene {{organism_name: $org}})"
                 f"-[r:{gene_rel}]->(ko:{bridge_node})"
                 f"-[:{bridge_edge}]->(leaf:{label})\n"
-                "WHERE g.locus_tag IN $locus_tags\n"
+                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
             )
             rel_union = "|".join(cfg["hierarchy_rels"])
             walk = (
@@ -3136,14 +3911,14 @@ def build_gene_ontology_terms(
             bind = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
                 f"-[r:{gene_rel}]->(t:{label})\n"
-                "WHERE g.locus_tag IN $locus_tags\n"
+                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
             )
             walk = "WITH g, t, r\nWHERE t.level = $level\n"
         elif ontology == "pfam":
             bind = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
                 f"-[r:{gene_rel}]->(leaf:Pfam)\n"
-                "WHERE g.locus_tag IN $locus_tags\n"
+                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
             )
             walk = (
                 "MATCH (leaf)-[:Pfam_in_pfam_clan*0..1]->(t)\n"
@@ -3154,45 +3929,67 @@ def build_gene_ontology_terms(
             bind = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
                 f"-[r:{gene_rel}]->(leaf:{label})\n"
-                "WHERE g.locus_tag IN $locus_tags\n"
+                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
             )
             walk = (
                 f"MATCH (leaf)-[:{rel_union}*0..]->(t:{label})\n"
                 "WHERE t.level = $level\n"
             )
-        tree_filter = ""
-        if tree is not None:
-            tree_filter = "AND t.tree = $tree\n"
-            params["tree"] = tree
+        facet_filter = ""
+        if facet is not None:
+            facet_prop, facet_param, facet_value = facet
+            facet_filter = f"AND t.{facet_prop} = ${facet_param}\n"
+            params[facet_param] = facet_value
         informative_filter = (
             "AND coalesce(t.is_uninformative, '') <> 'true'\n"
             if informative_only else ""
         )
+        # One edge per (gene, term): on a hierarchical rollup `t` is an
+        # ancestor several gene edges can reach, so keep the best one
+        # (spec section 7.2) instead of emitting one row per edge.
+        if _uses_best_edge_rebind(ontology, verbose):
+            rebind_trust, _ = build_trust_filter_clause(
+                ontology, sources=sources, evidence=evidence,
+                max_tier=max_tier, min_evidence_score=min_evidence_score,
+                call_class=call_class, rel_var="r2",
+            )
+            rebind = _best_edge_rebind_cypher(
+                ontology, verbose, trust_frag=rebind_trust,
+            )
+            row_head = "RETURN g.locus_tag AS locus_tag, t.id AS term_id,\n"
+        else:
+            rebind = ""
+            row_head = (
+                "RETURN DISTINCT g.locus_tag AS locus_tag, t.id AS term_id,\n"
+            )
         cypher = (
             f"{bind}"
             f"{walk}"
-            f"{tree_filter}"
+            f"{facet_filter}"
             f"{informative_filter}"
-            "RETURN DISTINCT g.locus_tag AS locus_tag, t.id AS term_id,\n"
+            f"{rebind}"
+            f"{row_head}"
             f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
             f"       coalesce(t.is_uninformative, '') <> 'true' AS is_informative{verbose_cols}{edge_prop_cols}\n"
             f"ORDER BY g.locus_tag, t.id{skip_clause}{limit_clause}"
         )
     else:
         # --- leaf mode ---
-        leaf_filter = _gene_ontology_terms_leaf_filter(cfg)
+        leaf_filter = _gene_ontology_terms_leaf_filter(
+            cfg, include_superseded=include_superseded,
+        )
 
         if bridge:
             match_line = (
                 f"MATCH (g:Gene {{organism_name: $org}})"
                 f"-[r:{gene_rel}]->(:{bridge['node_label']})"
                 f"-[:{bridge['edge']}]->(t:{label})\n"
-                "WHERE g.locus_tag IN $locus_tags\n"
+                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
             )
         else:
             match_line = (
                 f"MATCH (g:Gene {{organism_name: $org}})-[r:{gene_rel}]->(t:{label})\n"
-                "WHERE g.locus_tag IN $locus_tags\n"
+                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
             )
 
         # Convert leaf_filter "WHERE NOT EXISTS ..." to "AND NOT EXISTS ..."
@@ -3203,10 +4000,11 @@ def build_gene_ontology_terms(
         if level is not None:
             level_filter = "AND t.level = $level\n"
             params["level"] = level
-        tree_filter = ""
-        if tree is not None:
-            tree_filter = "AND t.tree = $tree\n"
-            params["tree"] = tree
+        facet_filter = ""
+        if facet is not None:
+            facet_prop, facet_param, facet_value = facet
+            facet_filter = f"AND t.{facet_prop} = ${facet_param}\n"
+            params[facet_param] = facet_value
         informative_filter = (
             "AND coalesce(t.is_uninformative, '') <> 'true'\n"
             if informative_only else ""
@@ -3216,7 +4014,7 @@ def build_gene_ontology_terms(
             f"{match_line}"
             f"{leaf_filter}"
             f"{level_filter}"
-            f"{tree_filter}"
+            f"{facet_filter}"
             f"{informative_filter}"
             "RETURN g.locus_tag AS locus_tag, t.id AS term_id,\n"
             f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
@@ -5470,8 +6268,14 @@ def build_ontology_landscape(
     max_gene_set_size: int = 500,
     tree: str | None = None,
     informative_only: bool = True,
+    sources: list[str] | None = None,
+    evidence: list[str] | None = None,
+    max_tier: int | None = None,
+    min_evidence_score: float | None = None,
+    call_class: list[str] | None = None,
+    interpro_type: str | None = None,
 ) -> tuple[str, dict]:
-    """Per-(ontology, level) aggregated landscape stats for one ontology.
+    """Per-(ontology, level[, facet]) aggregated landscape stats for one ontology.
 
     Returns one row per level reached by the organism's genes. Aggregates
     happen server-side — percentiles via percentileCont, distinct-gene
@@ -5481,17 +6285,27 @@ def build_ontology_landscape(
     terms that would be valid for pathway enrichment. Verbose adds top-3
     example terms in the same scan via pre-aggregation ORDER BY + collect[0..3].
 
-    RETURN keys: level, n_terms_with_genes, n_genes_at_level,
+    Trust filters bind on the gene→leaf relationship `r` ahead of the per-term
+    aggregation, so landscape sizes match the enrichment tested sets for the
+    same filters (spec §7.1). InterPro rows carry `interpro_type` in the
+    grouping key — an ORA stratum is `(interpro_type, level)`, not `level`
+    alone (spec §7.7).
+
+    RETURN keys: level, tree, tree_code, n_terms_with_genes, n_genes_at_level,
     min_genes_per_term, q1_genes_per_term, median_genes_per_term,
     q3_genes_per_term, max_genes_per_term, n_best_effort.
+    InterPro adds: interpro_type.
     Verbose adds: example_terms (list of {term_id, name, n_genes}).
     """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(
             f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
         )
-    if tree is not None and ontology != "brite":
-        raise ValueError("tree filter is only valid for ontology='brite'")
+    facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
+    trust_frag, trust_params = build_trust_filter_clause(
+        ontology, sources=sources, evidence=evidence, max_tier=max_tier,
+        min_evidence_score=min_evidence_score, call_class=call_class,
+    )
 
     # Unified hierarchy walk via _hierarchy_walk helper.
     # This corrects the previous flat-Pfam treatment: Pfam is actually 2-level
@@ -5499,11 +6313,28 @@ def build_ontology_landscape(
     frag = _hierarchy_walk(ontology, direction="up")
     walk = frag["walk_up"] + "\n" if frag["walk_up"] else ""
 
-    # Tree filter (BRITE only): applied after the hierarchy walk, before
+    # Trust predicate: rides the gene→leaf MATCH, ahead of the walk and of the
     # per-term aggregation.
-    tree_filter = ""
-    if tree is not None:
-        tree_filter = "WHERE t.tree = $tree\n"
+    bind_up = frag["bind_up"] + (f"\nWHERE {trust_frag}" if trust_frag else "")
+
+    # Facet filter (BRITE `tree`, InterPro `interpro_type`): applied after the
+    # hierarchy walk, before per-term aggregation. Flat ontologies own no
+    # facet, so this never collides with the trust WHERE on the same MATCH.
+    facet_filter = ""
+    if facet is not None:
+        facet_prop, facet_param, _facet_value = facet
+        facet_filter = f"WHERE t.{facet_prop} = ${facet_param}\n"
+
+    # Facet column in the level-rollup grouping key. Only for facets that are
+    # not already first-class row columns (BRITE's `tree` / `tree_code` are).
+    cfg_facet = ONTOLOGY_CONFIG[ontology].get("facet")
+    if cfg_facet and cfg_facet["prop"] not in _STANDARD_TERM_ROW_COLUMNS:
+        facet_col = cfg_facet["prop"]
+        facet_group = f"t.{facet_col} AS {facet_col}, "
+        facet_ret = f"{facet_col}, "
+        facet_order = f"{facet_col}, "
+    else:
+        facet_group = facet_ret = facet_order = ""
 
     # Informative-only filter (default-on per spec § decision 3 for
     # ontology_landscape). Filters terms by per-term flag in the level-rollup.
@@ -5529,16 +6360,17 @@ def build_ontology_landscape(
     verbose_ret = ",\n       example_terms" if verbose else ""
 
     cypher = (
-        f"{frag['bind_up']}\n"
+        f"{bind_up}\n"
         f"{walk}"
-        f"{tree_filter}"
+        f"{facet_filter}"
         f"{informative_filter}"
         "WITH t, count(DISTINCT g) AS n_g_per_term, "
         "collect(DISTINCT g) AS term_genes\n"
         "WHERE n_g_per_term >= $min_gene_set_size "
         "AND n_g_per_term <= $max_gene_set_size\n"
         f"{pre_sort}"
-        "WITH t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
+        f"WITH {facet_group}t.level AS level, t.tree AS tree, "
+        "t.tree_code AS tree_code,\n"
         "     count(t) AS n_terms_with_genes,\n"
         "     min(n_g_per_term) AS min_genes_per_term,\n"
         "     percentileCont(toFloat(n_g_per_term), 0.25) AS q1_genes_per_term,\n"
@@ -5549,20 +6381,21 @@ def build_ontology_landscape(
         "     sum(CASE WHEN t.level_is_best_effort IS NOT NULL "
         "THEN 1 ELSE 0 END) AS n_best_effort"
         f"{verbose_agg}\n"
-        "RETURN level, tree, tree_code, n_terms_with_genes,\n"
+        f"RETURN {facet_ret}level, tree, tree_code, n_terms_with_genes,\n"
         "       size(all_genes) AS n_genes_at_level,\n"
         "       min_genes_per_term, q1_genes_per_term, median_genes_per_term,\n"
         "       q3_genes_per_term, max_genes_per_term,\n"
         f"       n_best_effort{verbose_ret}\n"
-        "ORDER BY level"
+        f"ORDER BY {facet_order}level"
     )
     params = {
         "org": organism_name,
         "min_gene_set_size": min_gene_set_size,
         "max_gene_set_size": max_gene_set_size,
     }
-    if tree is not None:
-        params["tree"] = tree
+    params.update(trust_params)
+    if facet is not None:
+        params[facet[1]] = facet[2]
     return cypher, params
 
 
