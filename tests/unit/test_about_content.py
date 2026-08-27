@@ -384,7 +384,15 @@ class TestAboutContentConsistency:
                 )
 
     def test_expected_keys_match_response_envelope(self, tool_schemas):
-        """expected-keys include the response envelope fields."""
+        """expected-keys include the always-present response envelope fields.
+
+        Conditional envelope keys (e.g. `evidence_score_signals`, emitted only
+        when `min_evidence_score` is set) are excluded from the generated
+        expected-keys block, so the gate skips exactly the same set. Imported
+        from the generator rather than duplicated — single source of truth.
+        """
+        from scripts.build_about_content import CONDITIONAL_ENVELOPE_KEYS
+
         for path in _get_about_files():
             tool_name = path.stem
             schema = tool_schemas.get(tool_name)
@@ -399,6 +407,8 @@ class TestAboutContentConsistency:
             # Check envelope fields are in expected-keys
             output_props = schema["output_schema"].get("properties", {})
             for prop_name in output_props:
+                if prop_name in CONDITIONAL_ENVELOPE_KEYS:
+                    continue
                 assert prop_name in expected_keys, (
                     f"About file '{path.name}': response field '{prop_name}' "
                     f"missing from expected-keys"
