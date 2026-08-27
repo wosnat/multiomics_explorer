@@ -1,6 +1,6 @@
 # Tool spec: annotation-trust surface (slice 3 — interpro / ncbifam / merops + trust normalization + `ontology_term_details`)
 
-**Status:** DRAFT v1 for freeze · **Design:** `docs/superpowers/specs/2026-08-27-annotation-trust-surface-design.md` (sections 1–10 approved) · **KG:** KG-SYNC-005 landed 2026-08-27 (`multiomics_biocypher_kg/docs/kg-changes/annotation-trust-surface.md`); explorer schema baseline refreshed 2026-08-27 · **Asks:** `docs/kg-specs/2026-08-27-annotation-trust-kg-asks.md` (ONT-001…015 all landed)
+**Status:** FROZEN 2026-08-27 (v1; §0 = `evidence`; split 3a/3b per §11) · **Design:** `docs/superpowers/specs/2026-08-27-annotation-trust-surface-design.md` (sections 1–10 approved) · **KG:** KG-SYNC-005 landed 2026-08-27 (`multiomics_biocypher_kg/docs/kg-changes/annotation-trust-surface.md`); explorer schema baseline refreshed 2026-08-27 · **Asks:** `docs/kg-specs/2026-08-27-annotation-trust-kg-asks.md` (ONT-001…015 all landed)
 **Mode:** B (8 existing tools, config-driven) + one Mode-A tool (`ontology_term_details`).
 
 Every Cypher block below is **verified against the live KG-SYNC-005 build (2026-08-27)** unless marked otherwise.
@@ -23,7 +23,7 @@ Give every gene→term annotation a readable, filterable trust profile with one 
 - [x] Schema baseline refreshed (`config/schema_baseline.yaml`)
 - [x] Design approved section-by-section
 - [x] §0 decided — `evidence`
-- [ ] Spec frozen
+- [x] Spec frozen 2026-08-27
 
 ## 4. `ONTOLOGY_CONFIG` registry (design §2) — authoritative table
 
@@ -178,3 +178,19 @@ Verified: TCDB 5 signals, MEROPS `[tier_le_2, pfam_support]` (2), GO/EC/Pfam/CAZ
 5. `pathway_enrichment(ontology='interpro', level=0)` without `interpro_type` raises; with `interpro_type='HOMOLOGOUS_SUPERFAMILY'` returns a well-formed envelope.
 6. Trust-vocab coverage test green on this build; `list_filter_values(filter_type='evidence')` lists 5 values with per-edge `applies_to`.
 7. `gene_overview(['MIT1002_03660'])` shows `merops_classes=['peptidase']`, `merops_evidence_score_max=1.0`.
+
+## 11. Build split (decided 2026-08-27)
+
+**PR 3a — registry + trust surface + 3 ontologies (this build).**
+- `ONTOLOGY_CONFIG` registry (§4) incl. `interpro`, `ncbifam`, `merops` rows; `ALL_ONTOLOGIES` += 3; `_EDGE_PROP_COLS` removed; `tree` generalized under `facet`.
+- Gene×term rows (§6): compact `evidence` + `interpro_type` + `call_class`; verbose `sources`, `evidence_score`, `tier` + `verbose_edge`; strip-non-applicable; PSORTb/SignalP columns compact → verbose; one-edge-per-(g,t) rebind (§7.2); leaf filter `*1..` + tcdb `attachment_depth` / `include_superseded` (§7.3).
+- Filters + validation (§5) on `genes_by_ontology`, `gene_ontology_terms`, `pathway_enrichment`, `cluster_enrichment`, `ontology_landscape`; `ontology: list | None` + skip/raise matrix on `gene_ontology_terms` and `ontology_landscape`; `interpro_type` required on interpro enrichment; landscape `(interpro_type, level)` rows + `best_interpro_type`.
+- Envelopes + warnings (design §5) on those tools; `evidence_score_signals` from vocab.
+- `list_filter_values` trust/facet types from `ControlledVocabulary` + pivot fallback + `trust_axes` / `link_kinds`.
+- `gene_overview`: `merops_classes`, `ncbifam_family_count`, `merops_evidence_score_max`.
+- `search_ontology`: **only** accepts the 3 new ontology keys (open `str` param already) and gains `interpro_type` facet + compact `gene_count` / `organism_count` / `ontology_type`; browse mode, multi-ontology, lockstep paging, `description` verbose are 3b.
+- Tests: design §10 minus `ontology_term_details` / browse / lockstep; `test_config_registry.py`, `test_trust_vocab_coverage.py`, `test_trust_invariants.py`, edge-case scenarios for every new filter/warning.
+- Docs: `docs://analysis/annotation_evidence`, `conventions` + `concepts` updates, yamls for the 7 touched tools, `examples/annotation_evidence.py`, `CLAUDE.md` rows + `[TRUST]` marker.
+
+**PR 3b — term side (next build, same spec).**
+- `ontology_term_details` (§7.5, design §6), `search_ontology` browse mode + `ontology: list | None` + lockstep paging + `min_gene_count` / `organism` + `description` verbose (§7.4), per-ontology reference (`inputs/ontologies/*.yaml` + generator stage → `docs://ontologies/{key}` + index; links from concepts/enrichment/metabolites/start_here), `examples/ontology_terms.py`, remaining edge-case scenarios and goldens.
