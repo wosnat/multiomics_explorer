@@ -1,0 +1,77 @@
+by_family_type: []
+by_interpro_type:
+- count: 5
+  interpro_type: HOMOLOGOUS_SUPERFAMILY
+by_level:
+- count: 74
+  level: 0
+by_ontology:
+- ontology: interpro
+  returned: 5
+  score_max: null
+  total_entries: 12999
+  total_matching: 74
+  truncated: true
+case_id: search_ontology_browse_interpro_med4_scoped
+mode: browse
+offset: 0
+results:
+- gene_count: 1846
+  id: interpro:IPR013785
+  interpro_type: HOMOLOGOUS_SUPERFAMILY
+  is_informative: true
+  level: 0
+  name: Aldolase-type TIM barrel
+  ontology_type: interpro
+  organism_count: 42
+  organism_gene_count: 32
+  score: null
+- gene_count: 1188
+  id: interpro:IPR015421
+  interpro_type: HOMOLOGOUS_SUPERFAMILY
+  is_informative: true
+  level: 0
+  name: Pyridoxal phosphate-dependent transferase, major domain
+  ontology_type: interpro
+  organism_count: 42
+  organism_gene_count: 26
+  score: null
+- gene_count: 6909
+  id: interpro:IPR027417
+  interpro_type: HOMOLOGOUS_SUPERFAMILY
+  is_informative: true
+  level: 0
+  name: P-loop containing nucleoside triphosphate hydrolase
+  ontology_type: interpro
+  organism_count: 42
+  organism_gene_count: 119
+  score: null
+- gene_count: 1738
+  id: interpro:IPR029063
+  interpro_type: HOMOLOGOUS_SUPERFAMILY
+  is_informative: true
+  level: 0
+  name: S-adenosyl-L-methionine-dependent methyltransferase superfamily
+  ontology_type: interpro
+  organism_count: 42
+  organism_gene_count: 32
+  score: null
+- gene_count: 3163
+  id: interpro:IPR036291
+  interpro_type: HOMOLOGOUS_SUPERFAMILY
+  is_informative: true
+  level: 0
+  name: NAD(P)-binding domain superfamily
+  ontology_type: interpro
+  organism_count: 42
+  organism_gene_count: 54
+  score: null
+returned: 5
+row_count: 5
+score_max: null
+score_median: null
+skipped_ontologies: []
+total_entries: 12999
+total_matching: 74
+truncated: true
+warnings: []

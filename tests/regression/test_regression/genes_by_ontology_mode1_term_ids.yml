@@ -21,15 +21,15 @@ by_level:
   n_terms: 1
   row_count: 30
 by_sources:
-- count: 19
-  source: uniprot
-- count: 10
+- count: 21
   source: cyanorak
-- count: 7
-  source: ncbi
-- count: 5
+- count: 10
   source: interproscan
-- count: 3
+- count: 9
+  source: ncbi
+- count: 9
+  source: uniprot
+- count: 5
   source: eggnog
 by_tier: []
 case_id: genes_by_ontology_mode1_term_ids

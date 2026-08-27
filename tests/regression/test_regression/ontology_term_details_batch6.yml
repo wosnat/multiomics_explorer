@@ -1,0 +1,650 @@
+by_link_kind:
+- count: 130
+  link_kind: composition
+- count: 5
+  link_kind: router
+by_ontology:
+- count: 1
+  ontology: tcdb
+- count: 1
+  ontology: merops
+- count: 1
+  ontology: interpro
+- count: 1
+  ontology: ncbifam
+- count: 1
+  ontology: go_bp
+case_id: ontology_term_details_batch6
+links_out_total: 135
+not_found:
+- bogus:xyz
+offset: 0
+results:
+- children:
+  - '{''id'': ''tcdb:3.A.1.1'', ''level'': 3, ''name'': ''The Carbohydrate Uptake
+    Transporter-1 (CUT1) Family''}'
+  - '{''id'': ''tcdb:3.A.1.10'', ''level'': 3, ''name'': ''The Ferric Iron Uptake
+    Transporter (FeT) Family''}'
+  - '{''id'': ''tcdb:3.A.1.101'', ''level'': 3, ''name'': ''The Capsular Polysaccharide
+    Exporter (CPSE) Family''}'
+  - '{''id'': ''tcdb:3.A.1.103'', ''level'': 3, ''name'': ''The Lipopolysaccharide
+    Exporter (LPSE) Family''}'
+  - '{''id'': ''tcdb:3.A.1.105'', ''level'': 3, ''name'': ''The Drug Exporter-1 (DrugE1)
+    Family''}'
+  - '{''id'': ''tcdb:3.A.1.106'', ''level'': 3, ''name'': ''The Lipid Exporter (LipidE)
+    Family''}'
+  - '{''id'': ''tcdb:3.A.1.107'', ''level'': 3, ''name'': ''The Putative Heme Exporter
+    (HemeE) Family''}'
+  - '{''id'': ''tcdb:3.A.1.109'', ''level'': 3, ''name'': ''The Protein-1 Exporter
+    (Prot1E) Family''}'
+  - '{''id'': ''tcdb:3.A.1.11'', ''level'': 3, ''name'': ''The Polyamine/Opine/Phosphonate
+    Uptake Transporter (POPT) Family''}'
+  - '{''id'': ''tcdb:3.A.1.110'', ''level'': 3, ''name'': ''The Protein-2 Exporter
+    (Prot2E) Family''}'
+  - '{''id'': ''tcdb:3.A.1.112'', ''level'': 3, ''name'': ''The Peptide-2 Exporter
+    (Pep2E) Family''}'
+  - '{''id'': ''tcdb:3.A.1.113'', ''level'': 3, ''name'': ''The Peptide-3 Exporter
+    (Pep3E) Family''}'
+  - '{''id'': ''tcdb:3.A.1.114'', ''level'': 3, ''name'': ''The Probable Glycolipid
+    Exporter (DevE) Family''}'
+  - '{''id'': ''tcdb:3.A.1.115'', ''level'': 3, ''name'': ''The Na + Exporter (NatE)
+    Family''}'
+  - '{''id'': ''tcdb:3.A.1.117'', ''level'': 3, ''name'': ''The Drug Exporter-2 (DrugE2)
+    Family''}'
+  - '{''id'': ''tcdb:3.A.1.12'', ''level'': 3, ''name'': ''The Quaternary Amine Uptake
+    Transporter (QAT) Family (Similar to 3.A.1.16 and 3.A.1.17)''}'
+  - '{''id'': ''tcdb:3.A.1.120'', ''level'': 3, ''name'': ''The (Putative) Drug Resistance
+    ATPase-1 (Drug RA1) Family''}'
+  - '{''id'': ''tcdb:3.A.1.122'', ''level'': 3, ''name'': ''The Macrolide Exporter
+    (MacB) Family''}'
+  - '{''id'': ''tcdb:3.A.1.123'', ''level'': 3, ''name'': ''The Peptide-4 Exporter
+    (Pep4E) Family''}'
+  - '{''id'': ''tcdb:3.A.1.125'', ''level'': 3, ''name'': ''The Lipoprotein Translocase
+    (LPT) Family (This TC subfamily overlaps with TC# 3.A.1.122)''}'
+  - '{''id'': ''tcdb:3.A.1.129'', ''level'': 3, ''name'': ''3.A.1.129''}'
+  - '{''id'': ''tcdb:3.A.1.13'', ''level'': 3, ''name'': ''The Vitamin B 12 Uptake
+    Transporter (B 12 T) Family (Similar to 3.A.1.14)''}'
+  - '{''id'': ''tcdb:3.A.1.132'', ''level'': 3, ''name'': ''The Gliding Motility ABC
+    Transporter (Gld) Family''}'
+  - '{''id'': ''tcdb:3.A.1.136'', ''level'': 3, ''name'': ''The Uncharacterized ABC-3-type
+    (U-ABC3-1) Family''}'
+  - '{''id'': ''tcdb:3.A.1.14'', ''level'': 3, ''name'': ''The Iron Chelate Uptake
+    Transporter (FeCT) Family (Similar to 3.A.1.13 and 3.A.1.15)''}'
+  - '{''id'': ''tcdb:3.A.1.140'', ''level'': 3, ''name'': ''The FtsX/FtsE Septation
+    (FtsX/FtsE) Family''}'
+  - '{''id'': ''tcdb:3.A.1.141'', ''level'': 3, ''name'': ''The Ethyl Viologen Exporter
+    (EVE) Family (DUF990 Family)''}'
+  - '{''id'': ''tcdb:3.A.1.15'', ''level'': 3, ''name'': ''The Manganese/Zinc/Iron
+    Chelate Uptake Transporter (MZT) Family (Similar to 3.A.1.12, 3.A.1.14 and 3.A.1.16)''}'
+  - '{''id'': ''tcdb:3.A.1.152'', ''level'': 3, ''name'': ''The lipopolysaccharide
+    export (LptBFG) Family''}'
+  - '{''id'': ''tcdb:3.A.1.16'', ''level'': 3, ''name'': ''The Nitrate/Nitrite/Cyanate
+    Uptake Transporter (NitT) Family (Similar to 3.A.1.12 and 3.A.1.17)''}'
+  - '{''id'': ''tcdb:3.A.1.17'', ''level'': 3, ''name'': ''The Taurine Uptake Transporter
+    (TauT) Family (Similar to 3.A.1.12 and 3.A.1.16)''}'
+  - '{''id'': ''tcdb:3.A.1.18'', ''level'': 3, ''name'': ''The Cobalamin Precursor/Cobalt
+    (CPC) Family''}'
+  - '{''id'': ''tcdb:3.A.1.19'', ''level'': 3, ''name'': ''The Thiamin Uptake Transporter
+    (ThiT) Family (Most similar to 3.A.1.10, 3.A.1.6 and 3.A.1.8 in that order)''}'
+  - '{''id'': ''tcdb:3.A.1.2'', ''level'': 3, ''name'': ''The Carbohydrate Uptake
+    Transporter-2 (CUT2) Family''}'
+  - '{''id'': ''tcdb:3.A.1.20'', ''level'': 3, ''name'': ''The Brachyspira Iron Transporter
+    (BIT) Family (Most similar to 3.A.1.6, 3.A.1.8 and 3.A.1.11)''}'
+  - '{''id'': ''tcdb:3.A.1.203'', ''level'': 3, ''name'': ''The Peroxysomal Fatty
+    Acyl CoA Transporter (P-FAT) Family (ABCD)''}'
+  - '{''id'': ''tcdb:3.A.1.21'', ''level'': 3, ''name'': ''The Siderophore-Fe 3+ Uptake
+    Transporter (SIUT) Family''}'
+  - '{''id'': ''tcdb:3.A.1.22'', ''level'': 3, ''name'': ''The Nickel Uptake Transporter
+    (NiT) Family''}'
+  - '{''id'': ''tcdb:3.A.1.23'', ''level'': 3, ''name'': ''The Nickel/Cobalt Uptake
+    Transporter (NiCoT) Family''}'
+  - '{''id'': ''tcdb:3.A.1.24'', ''level'': 3, ''name'': ''The Methionine Uptake Transporter
+    (MUT) Family (Similar to 3.A.1.3 and 3.A.1.12)''}'
+  - '{''id'': ''tcdb:3.A.1.25'', ''level'': 3, ''name'': ''The Biotin Uptake Transporter
+    (BioMNY) Family''}'
+  - '{''id'': ''tcdb:3.A.1.27'', ''level'': 3, ''name'': ''The γ-Hexachlorocyclohexane
+    (HCH) Family (Similar to 3.A.1.12 and 3.A.1.24)''}'
+  - '{''id'': ''tcdb:3.A.1.28'', ''level'': 3, ''name'': ''The Queuosine (Queuosine)
+    Family''}'
+  - '{''id'': ''tcdb:3.A.1.29'', ''level'': 3, ''name'': ''The Methionine Precursor
+    (Met-P) Family''}'
+  - '{''id'': ''tcdb:3.A.1.3'', ''level'': 3, ''name'': ''The Polar Amino Acid Uptake
+    Transporter (PAAT) Family''}'
+  - '{''id'': ''tcdb:3.A.1.30'', ''level'': 3, ''name'': ''The Thiamin Precursor (Thi-P)
+    Family''}'
+  - '{''id'': ''tcdb:3.A.1.31'', ''level'': 3, ''name'': ''The Unknown-ABC1 (U-ABC1)
+    Family''}'
+  - '{''id'': ''tcdb:3.A.1.32'', ''level'': 3, ''name'': ''The Cobalamin Precursor
+    (B 12 -P) Family''}'
+  - '{''id'': ''tcdb:3.A.1.33'', ''level'': 3, ''name'': ''The Methylthioadenosine
+    (MTA) Family''}'
+  - '{''id'': ''tcdb:3.A.1.4'', ''level'': 3, ''name'': ''The Hydrophobic Amino Acid
+    Uptake Transporter (HAAT) Family''}'
+  children_total: 55
+  children_truncated: true
+  description: null
+  direct_gene_count: 3845
+  gene_count: 4817
+  is_informative: true
+  label: TcdbFamily
+  level: 2
+  level_kind: tc_family
+  links_out:
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0004888'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''transmembrane signaling receptor activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005215'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''transporter activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005254'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''chloride channel activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005315'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''phosphate transmembrane transporter activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005515'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''protein binding''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005516'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''calmodulin binding''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005524'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''ATP binding''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005543'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''phospholipid binding''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005548'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''phospholipid transporter activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0008233'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''peptidase activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0008234'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''cysteine-type peptidase activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0008509'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''monoatomic anion transmembrane transporter activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0008554'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''P-type sodium transporter activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0008559'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''ABC-type xenobiotic transporter activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0015079'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''potassium ion transmembrane transporter activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0015086'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''cadmium ion transmembrane transporter activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0015087'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''cobalt ion transmembrane transporter activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0015125'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''bile acid transmembrane transporter activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0015232'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''heme transmembrane transporter activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0015419'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''ABC-type sulfate transporter activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0015421'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''ABC-type oligopeptide transporter activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0015562'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''efflux transmembrane transporter activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0016887'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''ATP hydrolysis activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0019534'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''toxin transmembrane transporter activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0019899'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''enzyme binding''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0031409'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''pigment binding''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0042626'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''ATPase-coupled transmembrane transporter activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0042802'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''identical protein binding''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0042803'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''protein homodimerization activity''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0043531'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''ADP binding''}'
+  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0046982'', ''target_ontology'': ''go_mf'', ''target_name'':
+    ''protein heterodimerization activity''}'
+  - '{''rel'': ''Tcdb_family_has_pfam_domain'', ''link_kind'': ''composition'', ''target_id'':
+    ''pfam:PF00005'', ''target_ontology'': ''pfam'', ''target_name'': ''ABC transporter''}'
+  - '{''rel'': ''Tcdb_family_has_pfam_domain'', ''link_kind'': ''composition'', ''target_id'':
+    ''pfam:PF00664'', ''target_ontology'': ''pfam'', ''target_name'': ''ABC transporter
+    transmembrane region''}'
+  - '{''rel'': ''Tcdb_family_has_pfam_domain'', ''link_kind'': ''composition'', ''target_id'':
+    ''pfam:PF01061'', ''target_ontology'': ''pfam'', ''target_name'': ''ABC-2 type
+    transporter''}'
+  - '{''rel'': ''Tcdb_family_has_pfam_domain'', ''link_kind'': ''composition'', ''target_id'':
+    ''pfam:PF02361'', ''target_ontology'': ''pfam'', ''target_name'': ''Cobalt transport
+    protein''}'
+  - '{''rel'': ''Tcdb_family_has_pfam_domain'', ''link_kind'': ''composition'', ''target_id'':
+    ''pfam:PF02367'', ''target_ontology'': ''pfam'', ''target_name'': ''Threonylcarbamoyl
+    adenosine biosynthesis protein TsaE''}'
+  - '{''rel'': ''Tcdb_family_has_pfam_domain'', ''link_kind'': ''composition'', ''target_id'':
+    ''pfam:PF02632'', ''target_ontology'': ''pfam'', ''target_name'': ''BioY family''}'
+  - '{''rel'': ''Tcdb_family_has_pfam_domain'', ''link_kind'': ''composition'', ''target_id'':
+    ''pfam:PF02653'', ''target_ontology'': ''pfam'', ''target_name'': ''Branched-chain
+    amino acid transport system / permease component''}'
+  - '{''rel'': ''Tcdb_family_has_pfam_domain'', ''link_kind'': ''composition'', ''target_id'':
+    ''pfam:PF02687'', ''target_ontology'': ''pfam'', ''target_name'': ''FtsX-like
+    permease C-terminal''}'
+  - '{''rel'': ''Tcdb_family_has_pfam_domain'', ''link_kind'': ''composition'', ''target_id'':
+    ''pfam:PF03412'', ''target_ontology'': ''pfam'', ''target_name'': ''Peptidase
+    C39 family''}'
+  - '{''rel'': ''Tcdb_family_has_pfam_domain'', ''link_kind'': ''composition'', ''target_id'':
+    ''pfam:PF03649'', ''target_ontology'': ''pfam'', ''target_name'': ''Uncharacterised
+    protein family (UPF0014)''}'
+  - '{''rel'': ''Tcdb_family_has_pfam_domain'', ''link_kind'': ''composition'', ''target_id'':
+    ''pfam:PF04392'', ''target_ontology'': ''pfam'', ''target_name'': ''ABC transporter
+    substrate binding protein''}'
+  - '{''rel'': ''Tcdb_family_has_pfam_domain'', ''link_kind'': ''composition'', ''target_id'':
+    ''pfam:PF09991'', ''target_ontology'': ''pfam'', ''target_name'': ''Predicted
+    membrane protein (DUF2232)''}'
+  - '{''rel'': ''Tcdb_family_has_pfam_domain'', ''link_kind'': ''composition'', ''target_id'':
+    ''pfam:PF12787'', ''target_ontology'': ''pfam'', ''target_name'': ''EcsC protein
+    family''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0002790'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''peptide secretion''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005975'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''carbohydrate metabolic process''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0006355'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''regulation of DNA-templated transcription''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0006357'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''regulation of transcription by RNA polymerase II''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0006497'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''protein lipidation''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0006508'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''proteolysis''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0006629'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''lipid metabolic process''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0006810'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0006811'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''monoatomic ion transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0006813'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''potassium ion transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0006817'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''phosphate ion transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0006824'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''cobalt ion transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0006826'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''iron ion transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0006855'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''xenobiotic transmembrane transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0006857'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''oligopeptide transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0006869'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''lipid transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0006879'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''intracellular iron ion homeostasis''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0006952'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''defense response''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0006955'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''immune response''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0007034'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''vacuolar transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0007165'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''signal transduction''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0008203'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''cholesterol metabolic process''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0008219'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''cell death''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0008361'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''regulation of cell size''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0008643'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''carbohydrate transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0009236'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''cobalamin biosynthetic process''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0009555'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''pollen development''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0009607'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''response to biotic stimulus''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0009636'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''response to toxic substance''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0009637'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''response to blue light''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0009651'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''response to salt stress''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0009658'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''chloroplast organization''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0010288'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''response to lead ion''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0010380'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''regulation of chlorophyll biosynthetic process''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0015031'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''protein transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0015691'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''cadmium ion transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0015721'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''bile acid and bile salt transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0015833'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''peptide transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0015849'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''organic acid transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0019541'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''propionate metabolic process''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0030007'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''intracellular potassium ion homeostasis''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0030153'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''bacteriocin immunity''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0030420'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''establishment of competence for transformation''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0030435'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''sporulation resulting in formation of a cellular spore''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0031348'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''negative regulation of defense response''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0033554'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''cellular response to stress''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0033993'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''response to lipid''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0042157'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''lipoprotein metabolic process''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0042391'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''regulation of membrane potential''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0042401'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''biogenic amine biosynthetic process''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0042742'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''defense response to bacterium''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0043213'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''bacteriocin transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0046677'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''response to antibiotic''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0046686'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''response to cadmium ion''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0048364'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''root development''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0050790'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''regulation of catalytic activity''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0051607'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''defense response to virus''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0055085'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''transmembrane transport''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0055091'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''phospholipid homeostasis''}'
+  - '{''rel'': ''Tcdb_family_involved_in_biological_process'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0070574'', ''target_ontology'': ''go_bp'', ''target_name'':
+    ''cadmium ion transmembrane transport''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0000139'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''Golgi membrane''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0000324'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''fungal-type vacuole''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0000329'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''fungal-type vacuole membrane''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005634'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''nucleus''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005739'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''mitochondrion''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005741'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''mitochondrial outer membrane''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005743'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''mitochondrial inner membrane''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005764'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''lysosome''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005765'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''lysosomal membrane''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005770'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''late endosome''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005774'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''vacuolar membrane''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005789'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''endoplasmic reticulum membrane''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005794'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''Golgi apparatus''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005815'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''microtubule organizing center''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005829'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''cytosol''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0005886'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''plasma membrane''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0009897'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''external side of plasma membrane''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0009941'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''chloroplast envelope''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0009986'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''cell surface''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0016020'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''membrane''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0019866'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''organelle inner membrane''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0031410'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''cytoplasmic vesicle''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0034707'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''chloride channel complex''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0043190'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''ATP-binding cassette (ABC) transporter complex''}'
+  - '{''rel'': ''Tcdb_family_located_in_cellular_component'', ''link_kind'': ''composition'',
+    ''target_id'': ''go:0048046'', ''target_ontology'': ''go_cc'', ''target_name'':
+    ''apoplast''}'
+  member_count: 55
+  metabolite_count: 554
+  name: The ATP-binding Cassette (ABC) Superfamily
+  ontology: tcdb
+  organism_count: 42
+  parents:
+  - '{''id'': ''tcdb:3.A'', ''level'': 1, ''name'': ''P-P-bond-hydrolysis-driven transporters''}'
+  superfamily: ArsA ATPase (ArsA) Superfamily
+  tc_class_id: tcdb:3
+  tcdb_id: 3.A.1
+  term_id: tcdb:3.A.1
+- catalytic_type: serine
+  children: []
+  children_total: 0
+  children_truncated: false
+  cleavage_p1_residues:
+  - Gly
+  - Leu
+  - Met
+  cleavage_summary: cleaves after Met (44%) / Leu (22%) / Gly (11%) - 27 known cleavages
+    (0% physiological)
+  description: null
+  direct_gene_count: 125
+  family_class: peptidase
+  gene_count: 125
+  is_informative: true
+  known_cleavage_count: 27
+  label: MeropsFamily
+  level: 1
+  level_kind: merops_family
+  links_out:
+  - '{''rel'': ''Merops_family_has_pfam_domain'', ''link_kind'': ''composition'',
+    ''target_id'': ''pfam:PF00574'', ''target_ontology'': ''pfam'', ''target_name'':
+    ''Clp protease''}'
+  member_count: 0
+  merops_id: S14
+  name: ClpP endopeptidase
+  ontology: merops
+  organism_count: 41
+  parents:
+  - '{''id'': ''merops.clan:SK'', ''level'': 0, ''name'': ''SK''}'
+  peptidase_gene_count: 125
+  peptidase_organism_count: 41
+  term_id: merops.family:S14
+- children:
+  - '{''id'': ''interpro:IPR004708'', ''level'': 1, ''name'': ''Aspartate ammonia-lyase''}'
+  - '{''id'': ''interpro:IPR005677'', ''level'': 1, ''name'': ''Fumarate hydratase,
+    class II''}'
+  - '{''id'': ''interpro:IPR009049'', ''level'': 1, ''name'': ''Argininosuccinate
+    lyase''}'
+  - '{''id'': ''interpro:IPR012789'', ''level'': 1, ''name'': ''3-carboxy-cis,cis-muconate
+    cycloisomerase-like''}'
+  children_total: 4
+  children_truncated: false
+  description: 'A number of enzymes, belonging to the lyase class, for which fumarate
+    is a substrate, have been shown to share a short conserved sequence around a methionine
+    which is probably involved in the catalytic activity of this type of enzymes.
+    The following are examples of members of this family:'
+  direct_gene_count: 132
+  gene_count: 132
+  interpro_id: IPR000362
+  interpro_type: FAMILY
+  is_informative: true
+  label: InterproEntry
+  level: 0
+  level_kind: null
+  links_out:
+  - '{''rel'': ''Interpro_entry_related_to_ec_number'', ''link_kind'': ''router'',
+    ''target_id'': ''ec:4.2.1.2'', ''target_ontology'': ''ec'', ''target_name'': ''fumarate
+    hydratase''}'
+  - '{''rel'': ''Interpro_entry_related_to_ec_number'', ''link_kind'': ''router'',
+    ''target_id'': ''ec:4.3.1.1'', ''target_ontology'': ''ec'', ''target_name'': ''aspartate
+    ammonia-lyase''}'
+  - '{''rel'': ''Interpro_entry_related_to_ec_number'', ''link_kind'': ''router'',
+    ''target_id'': ''ec:4.3.2.1'', ''target_ontology'': ''ec'', ''target_name'': ''argininosuccinate
+    lyase''}'
+  - '{''rel'': ''Interpro_entry_related_to_ec_number'', ''link_kind'': ''router'',
+    ''target_id'': ''ec:4.3.2.2'', ''target_ontology'': ''ec'', ''target_name'': ''adenylosuccinate
+    lyase''}'
+  - '{''rel'': ''Interpro_entry_related_to_ec_number'', ''link_kind'': ''router'',
+    ''target_id'': ''ec:5.5.1.2'', ''target_ontology'': ''ec'', ''target_name'': ''3-carboxy-cis,cis-muconate
+    cycloisomerase''}'
+  member_count: 4
+  name: Fumarate lyase family
+  ontology: interpro
+  organism_count: 42
+  parents: []
+  term_id: interpro:IPR000362
+- children: []
+  children_total: 0
+  children_truncated: false
+  description: null
+  family_type: retired
+  gene_count: 13
+  gene_symbol: null
+  is_informative: true
+  label: NcbifamFamily
+  level: 0
+  level_kind: null
+  links_out: []
+  name: 6,7-dimethyl-8-ribityllumazine synthase
+  ncbifam_id: NF000812
+  ontology: ncbifam
+  organism_count: 13
+  parents: []
+  term_id: ncbifam:NF000812
+- children:
+  - '{''id'': ''go:0000302'', ''level'': 4, ''name'': ''response to reactive oxygen
+    species''}'
+  - '{''id'': ''go:0033194'', ''level'': 4, ''name'': ''response to hydroperoxide''}'
+  - '{''id'': ''go:0034599'', ''level'': 4, ''name'': ''cellular response to oxidative
+    stress''}'
+  children_total: 3
+  children_truncated: false
+  description: null
+  direct_gene_count: 860
+  gene_count: 1050
+  is_informative: true
+  label: BiologicalProcess
+  level: 3
+  level_kind: null
+  links_out: []
+  name: response to oxidative stress
+  ontology: go_bp
+  organism_count: 42
+  parents:
+  - '{''id'': ''go:0006950'', ''level'': 2, ''name'': ''response to stress''}'
+  term_id: go:0006979
+returned: 5
+row_count: 5
+total_matching: 5
+truncated: false
+warnings: []

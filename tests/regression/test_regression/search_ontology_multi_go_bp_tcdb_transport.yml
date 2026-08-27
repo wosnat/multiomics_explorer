@@ -1,0 +1,110 @@
+by_family_type: []
+by_interpro_type: []
+by_level: []
+by_ontology:
+- ontology: go_bp
+  returned: 5
+  score_max: 1.5473122596740723
+  total_entries: 3433
+  total_matching: 324
+  truncated: true
+- ontology: tcdb
+  returned: 5
+  score_max: 3.75053071975708
+  total_entries: 1515
+  total_matching: 42
+  truncated: true
+case_id: search_ontology_multi_go_bp_tcdb_transport
+mode: search
+offset: 0
+results:
+- gene_count: 10831
+  id: go:0006810
+  is_informative: true
+  level: 3
+  name: transport
+  ontology_type: go_bp
+  organism_count: 42
+  score: 1.5473
+- gene_count: 55
+  id: go:0006821
+  is_informative: true
+  level: 5
+  name: chloride transport
+  ontology_type: go_bp
+  organism_count: 42
+  score: 1.3486
+- gene_count: 4
+  id: go:0006833
+  is_informative: true
+  level: 5
+  name: water transport
+  ontology_type: go_bp
+  organism_count: 4
+  score: 1.3486
+- gene_count: 5
+  id: go:0006836
+  is_informative: true
+  level: 4
+  name: neurotransmitter transport
+  ontology_type: go_bp
+  organism_count: 3
+  score: 1.3486
+- gene_count: 154
+  id: go:0015990
+  is_informative: true
+  level: 7
+  name: electron transport coupled proton transport
+  ontology_type: go_bp
+  organism_count: 42
+  score: 1.3782
+- gene_count: 23
+  id: tcdb:2.A.1.2.65
+  is_informative: true
+  level: 4
+  name: Inner membrane transport protein YdhP
+  ontology_type: tcdb
+  organism_count: 13
+  score: 3.7505
+- gene_count: 5
+  id: tcdb:2.A.1.4.6
+  is_informative: true
+  level: 4
+  name: Glucose-6-P:P i antiporter, Hpt (may also transport other organophosphates
+    including C 3 organophosphates).
+  ontology_type: tcdb
+  organism_count: 5
+  score: 2.5783
+- gene_count: 6
+  id: tcdb:3.A.1.17.3
+  is_informative: true
+  level: 4
+  name: Putative hydroxymethylpyrimidine transport system, ThiXYZ.
+  ontology_type: tcdb
+  organism_count: 4
+  score: 3.3182
+- gene_count: 6
+  id: tcdb:3.A.1.17.6
+  is_informative: true
+  level: 4
+  name: Putative hydroxymethylpyrimidine transport system, ThiXYZ.
+  ontology_type: tcdb
+  organism_count: 4
+  score: 3.0931
+- gene_count: 1
+  id: tcdb:4.A.1.1.5
+  is_informative: true
+  level: 4
+  name: N-Acetylglucosamine (NAG) porter (PtsBC1C2)(also may facilitate xylose transport).
+  ontology_type: tcdb
+  organism_count: 1
+  score: 2.9301
+returned: 10
+row_count: 10
+score_max: 3.75053071975708
+score_median: 2.0627857446670532
+skipped_ontologies: []
+total_entries: 4948
+total_matching: 366
+truncated: true
+warnings: []

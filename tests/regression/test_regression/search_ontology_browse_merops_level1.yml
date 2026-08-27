@@ -1,0 +1,105 @@
+by_family_type: []
+by_interpro_type: []
+by_level:
+- count: 97
+  level: 1
+by_ontology:
+- ontology: merops
+  returned: 10
+  score_max: null
+  total_entries: 155
+  total_matching: 97
+  truncated: true
+case_id: search_ontology_browse_merops_level1
+mode: browse
+offset: 0
+results:
+- gene_count: 272
+  id: merops.family:C26
+  is_informative: true
+  level: 1
+  name: gamma-glutamyl hydrolase
+  ontology_type: merops
+  organism_count: 42
+  score: null
+- gene_count: 169
+  id: merops.family:C44
+  is_informative: true
+  level: 1
+  name: amidophosphoribosyltransferase precursor
+  ontology_type: merops
+  organism_count: 42
+  score: null
+- gene_count: 120
+  id: merops.family:M23
+  is_informative: true
+  level: 1
+  name: beta-lytic metallopeptidase
+  ontology_type: merops
+  organism_count: 26
+  score: null
+- gene_count: 129
+  id: merops.family:M24
+  is_informative: true
+  level: 1
+  name: methionyl aminopeptidase 1 ({Escherichia}-type)
+  ontology_type: merops
+  organism_count: 42
+  score: null
+- gene_count: 175
+  id: merops.family:M38
+  is_informative: true
+  level: 1
+  name: beta-aspartyl dipeptidase
+  ontology_type: merops
+  organism_count: 42
+  score: null
+- gene_count: 127
+  id: merops.family:M41
+  is_informative: true
+  level: 1
+  name: FtsH endopeptidase
+  ontology_type: merops
+  organism_count: 42
+  score: null
+- gene_count: 130
+  id: merops.family:S01
+  is_informative: true
+  level: 1
+  name: chymotrypsin
+  ontology_type: merops
+  organism_count: 42
+  score: null
+- gene_count: 298
+  id: merops.family:S09
+  is_informative: true
+  level: 1
+  name: prolyl oligopeptidase
+  ontology_type: merops
+  organism_count: 42
+  score: null
+- gene_count: 125
+  id: merops.family:S14
+  is_informative: true
+  level: 1
+  name: ClpP endopeptidase
+  ontology_type: merops
+  organism_count: 41
+  score: null
+- gene_count: 412
+  id: merops.family:S33
+  is_informative: true
+  level: 1
+  name: prolyl aminopeptidase
+  ontology_type: merops
+  organism_count: 42
+  score: null
+returned: 10
+row_count: 10
+score_max: null
+score_median: null
+skipped_ontologies: []
+total_entries: 155
+total_matching: 97
+truncated: true
+warnings: []

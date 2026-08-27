@@ -49,9 +49,9 @@ by_category:
 - category: Cell motility
   count: 1
 by_evidence:
-- count: 1044
+- count: 1062
   evidence: curated
-- count: 37
+- count: 19
   evidence: signature
 by_level:
 - level: 0
@@ -59,13 +59,13 @@ by_level:
   n_terms: 78
   row_count: 1081
 by_sources:
-- count: 968
+- count: 998
   source: eggnog
-- count: 899
+- count: 956
   source: interproscan
-- count: 881
+- count: 951
   source: cyanorak
-- count: 593
+- count: 653
   source: uniprot
 by_tier: []
 case_id: genes_by_ontology_pfam_clans
@@ -599,7 +599,7 @@ results:
   product: L-aspartate oxidase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
-- evidence: signature
+- evidence: curated
   gene_category: Translation
   gene_name: rimO
   is_informative: true
@@ -761,7 +761,7 @@ results:
   product: copper-translocating P-type ATPase
   term_id: pfam.clan:CL0137
   term_name: HAD
-- evidence: signature
+- evidence: curated
   gene_category: Photosynthesis
   gene_name: ycf3
   is_informative: true
@@ -1941,7 +1941,7 @@ results:
   product: plastoquinol terminal oxidase
   term_id: pfam.clan:CL0044
   term_name: Ferritin
-- evidence: signature
+- evidence: curated
   gene_category: Coenzyme metabolism
   gene_name: T8L23.23
   is_informative: true
@@ -2224,7 +2224,7 @@ results:
   product: light repressed protein A
   term_id: pfam.clan:CL0219
   term_name: RNase_H
-- evidence: signature
+- evidence: curated
   gene_category: Coenzyme metabolism
   gene_name: lipB
   is_informative: true
@@ -3235,7 +3235,7 @@ results:
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
-- evidence: signature
+- evidence: curated
   gene_category: Stress response and adaptation
   gene_name: clpB1
   is_informative: true
@@ -3804,7 +3804,7 @@ results:
   product: photosystem II D1 protein carboxyl-terminal processing peptidase
   term_id: pfam.clan:CL0127
   term_name: ClpP_crotonase
-- evidence: signature
+- evidence: curated
   gene_category: Post-translational modification
   gene_name: ctpA
   is_informative: true
@@ -3921,7 +3921,7 @@ results:
   product: two-component system sensor histidine kinase, phosphate sensing PhoR
   term_id: pfam.clan:CL0025
   term_name: His_Kinase_A
-- evidence: signature
+- evidence: curated
   gene_category: Secondary metabolites
   gene_name: null
   is_informative: true
@@ -4155,7 +4155,7 @@ results:
   product: DEVA-like ABC transporter, ATP-binding subunit
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
-- evidence: signature
+- evidence: curated
   gene_category: Cell wall and membrane
   gene_name: wcaA
   is_informative: true
@@ -4390,7 +4390,7 @@ results:
   product: UDP-3-O-[3-hydroxymyristoyl] glucosamine N-acyltransferase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
-- evidence: signature
+- evidence: curated
   gene_category: Cell wall and membrane
   gene_name: lpxD
   is_informative: true
@@ -4877,7 +4877,7 @@ results:
   product: excinuclease UvrABC complex, endonuclease subunit
   term_id: pfam.clan:CL0198
   term_name: HHH
-- evidence: signature
+- evidence: curated
   gene_category: Replication and repair
   gene_name: uvrC
   is_informative: true
@@ -4922,7 +4922,7 @@ results:
   product: cysteine desulfurase
   term_id: pfam.clan:CL0061
   term_name: PLP_aminotran
-- evidence: signature
+- evidence: curated
   gene_category: Translation
   gene_name: leuS
   is_informative: true
@@ -4949,7 +4949,7 @@ results:
   product: N-acetyl-gamma-glutamyl-phosphate reductase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
-- evidence: signature
+- evidence: curated
   gene_category: Amino acid metabolism
   gene_name: argC
   is_informative: true
@@ -6057,7 +6057,7 @@ results:
   product: lipoyl synthase
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
-- evidence: signature
+- evidence: curated
   gene_category: Replication and repair
   gene_name: recR
   is_informative: true
@@ -6888,7 +6888,7 @@ results:
   product: possible alpha-glycosyltransferase, family 4
   term_id: pfam.clan:CL0113
   term_name: GT-B
-- evidence: signature
+- evidence: curated
   gene_category: Cell wall and membrane
   gene_name: kpsD3
   is_informative: true
@@ -7780,7 +7780,7 @@ results:
   product: tRNA pseudouridine(55) synthase
   term_id: pfam.clan:CL0178
   term_name: PUA
-- evidence: signature
+- evidence: curated
   gene_category: Transcription
   gene_name: rnz
   is_informative: true
@@ -8401,7 +8401,7 @@ results:
   product: translation initiation factor IF-2
   term_id: pfam.clan:CL0123
   term_name: HTH
-- evidence: signature
+- evidence: curated
   gene_category: Translation
   gene_name: infB
   is_informative: true
@@ -8689,7 +8689,7 @@ results:
   product: 30S ribosomal protein S5
   term_id: pfam.clan:CL0329
   term_name: S5
-- evidence: signature
+- evidence: curated
   gene_category: Translation
   gene_name: rplX
   is_informative: true
@@ -9229,7 +9229,7 @@ results:
   product: serine O-acetyltransferase
   term_id: pfam.clan:CL0536
   term_name: HEXAPEP
-- evidence: signature
+- evidence: curated
   gene_category: Post-translational modification
   gene_name: secA
   is_informative: true
