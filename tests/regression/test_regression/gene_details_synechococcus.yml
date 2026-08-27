@@ -112,6 +112,7 @@ rows:
   locus_tag: SYNW0305
   merops_classes:
   - peptidase
+  merops_evidence_score_max: 0.5
   merops_family_count: 1
   ncbifam_family_count: 1
   numeric_metric_count: 0

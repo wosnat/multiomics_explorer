@@ -1,13 +1,12 @@
 case_id: gene_ontology_terms_cyanorak_role
 row_count: 1
 rows:
-- is_informative: true
+- evidence: curated
+  is_informative: true
   level: 1
-  localization_score: null
   locus_tag: PMM0001
-  signal_peptide_cleavage_probability: null
-  signal_peptide_cleavage_site: null
-  signal_peptide_probability: null
+  sources:
+  - cyanorak
   term_id: cyanorak.role:F.1
   term_name: DNA metabolism > DNA replication, recombination, and repair
   tree: null

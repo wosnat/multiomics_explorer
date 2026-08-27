@@ -1,13 +1,12 @@
 case_id: gene_ontology_terms_cog_category
 row_count: 1
 rows:
-- is_informative: true
+- evidence: family_inferred
+  is_informative: true
   level: 0
-  localization_score: null
   locus_tag: PMM0001
-  signal_peptide_cleavage_probability: null
-  signal_peptide_cleavage_site: null
-  signal_peptide_probability: null
+  sources:
+  - eggnog
   term_id: cog.category:L
   term_name: Replication, recombination and repair
   tree: null

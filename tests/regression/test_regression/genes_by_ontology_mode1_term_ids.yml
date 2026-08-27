@@ -1,3 +1,4 @@
+by_call_class: []
 by_category:
 - category: Replication and repair
   count: 24
@@ -11,13 +12,34 @@ by_category:
   count: 1
 - category: Regulatory functions
   count: 1
+by_evidence:
+- count: 30
+  evidence: curated
 by_level:
 - level: 6
   n_genes: 30
   n_terms: 1
   row_count: 30
+by_sources:
+- count: 19
+  source: uniprot
+- count: 10
+  source: cyanorak
+- count: 7
+  source: ncbi
+- count: 5
+  source: interproscan
+- count: 3
+  source: eggnog
+by_tier: []
 case_id: genes_by_ontology_mode1_term_ids
+evidence_score_stats:
+  max: 1.0
+  median: 0.667
+  min: 0.667
+  n_null: 0
 filtered_out: []
+filters_applied: {}
 genes_per_term_max: 30
 genes_per_term_median: 30.0
 genes_per_term_min: 30
@@ -27,7 +49,8 @@ offset: 0
 ontology: go_bp
 organism_name: Prochlorococcus MED4
 results:
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: dnaN
   is_informative: true
   level: 6
@@ -35,7 +58,8 @@ results:
   product: DNA polymerase III, beta subunit
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: rarA
   is_informative: true
   level: 6
@@ -43,7 +67,8 @@ results:
   product: recombination factor
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: holB
   is_informative: true
   level: 6
@@ -51,7 +76,8 @@ results:
   product: DNA polymerase III, delta^ subunit
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Transcription
+- evidence: curated
+  gene_category: Transcription
   gene_name: rnhA
   is_informative: true
   level: 6
@@ -59,7 +85,8 @@ results:
   product: ribonuclease HI
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: topA
   is_informative: true
   level: 6
@@ -67,7 +94,8 @@ results:
   product: DNA topoisomerase I, omega subunit
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: priA
   is_informative: true
   level: 6
@@ -75,7 +103,8 @@ results:
   product: primosomal protein N^
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Transport
+- evidence: curated
+  gene_category: Transport
   gene_name: ycf41
   is_informative: true
   level: 6
@@ -83,7 +112,8 @@ results:
   product: possible single-stranded DNA-binding protein
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: dnaA
   is_informative: true
   level: 6
@@ -91,7 +121,8 @@ results:
   product: chromosomal replication initiator protein
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: dnaQ
   is_informative: true
   level: 6
@@ -99,7 +130,8 @@ results:
   product: exonuclease family protein
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Coenzyme metabolism
+- evidence: curated
+  gene_category: Coenzyme metabolism
   gene_name: nrdJ
   is_informative: true
   level: 6
@@ -107,7 +139,8 @@ results:
   product: ribonucleoside-diphosphate reductase
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: lig
   is_informative: true
   level: 6
@@ -115,7 +148,8 @@ results:
   product: ATP-dependent DNA ligase
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Post-translational modification
+- evidence: curated
+  gene_category: Post-translational modification
   gene_name: dnaK2
   is_informative: true
   level: 6
@@ -123,7 +157,8 @@ results:
   product: chaperone protein DnaK
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: umuD
   is_informative: true
   level: 6
@@ -131,7 +166,8 @@ results:
   product: DNA polymerase V, subunit D
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: umuC
   is_informative: true
   level: 6
@@ -139,7 +175,8 @@ results:
   product: DNA polymerase V, subunit C
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: dnaG
   is_informative: true
   level: 6
@@ -147,7 +184,8 @@ results:
   product: DNA primase
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: ruvA
   is_informative: true
   level: 6
@@ -155,7 +193,8 @@ results:
   product: holliday junction ATP-dependent DNA helicase RuvA
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: dnaE
   is_informative: true
   level: 6
@@ -163,7 +202,8 @@ results:
   product: DNA polymerase III, alpha subunit
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: ruvC
   is_informative: true
   level: 6
@@ -171,7 +211,8 @@ results:
   product: crossover junction endodeoxyribonuclease RuvC
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: gyrA
   is_informative: true
   level: 6
@@ -179,7 +220,8 @@ results:
   product: DNA gyrase, A subunit
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: polA
   is_informative: true
   level: 6
@@ -187,7 +229,8 @@ results:
   product: DNA polymerase I
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Regulatory functions
+- evidence: curated
+  gene_category: Regulatory functions
   gene_name: lexA
   is_informative: true
   level: 6
@@ -195,7 +238,8 @@ results:
   product: SOS-response transcriptional repressor
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Post-translational modification
+- evidence: curated
+  gene_category: Post-translational modification
   gene_name: dnaK1
   is_informative: true
   level: 6
@@ -203,7 +247,8 @@ results:
   product: chaperone protein DnaK
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: recF
   is_informative: true
   level: 6
@@ -211,7 +256,8 @@ results:
   product: DNA replication and repair protein recF
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: ruvB
   is_informative: true
   level: 6
@@ -219,7 +265,8 @@ results:
   product: holliday junction ATP-dependent DNA helicase RuvB
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: ssb
   is_informative: true
   level: 6
@@ -227,7 +274,8 @@ results:
   product: single-stranded DNA-binding protein
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: gyrB
   is_informative: true
   level: 6
@@ -235,7 +283,8 @@ results:
   product: DNA gyrase, B subunit
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: holA
   is_informative: true
   level: 6
@@ -243,7 +292,8 @@ results:
   product: DNA polymerase III, delta subunit
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: dnaX
   is_informative: true
   level: 6
@@ -251,7 +301,8 @@ results:
   product: DNA polymerase III, gamma and tau subunits
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: dnaB
   is_informative: true
   level: 6
@@ -259,7 +310,8 @@ results:
   product: replicative DNA helicase
   term_id: go:0006260
   term_name: DNA replication
-- gene_category: Replication and repair
+- evidence: curated
+  gene_category: Replication and repair
   gene_name: ligA
   is_informative: true
   level: 6
@@ -269,6 +321,7 @@ results:
   term_name: DNA replication
 returned: 30
 row_count: 30
+skipped_ontologies: []
 terms_per_gene_max: 1
 terms_per_gene_median: 1.0
 terms_per_gene_min: 1
@@ -282,5 +335,11 @@ total_genes: 30
 total_matching: 30
 total_terms: 1
 truncated: false
+trust_axes:
+  go_bp:
+  - sources
+  - evidence
+  - evidence_score
+warnings: []
 wrong_level: []
 wrong_ontology: []

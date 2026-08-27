@@ -33,6 +33,7 @@ by_category:
   count: 1
 - category: Transport
   count: 1
+by_merops_class: []
 by_organism:
 - count: 2
   organism_name: Prochlorococcus MED4
@@ -42,6 +43,7 @@ has_clusters: 2
 has_derived_metrics: 2
 has_discussed: 0
 has_expression: 2
+has_ncbifam: 1
 has_orthologs: 2
 has_significant_expression: 2
 not_found: []
@@ -94,6 +96,9 @@ results:
   - reaction
   - tigr_role
   locus_tag: PMM0001
+  merops_classes: []
+  merops_evidence_score_max: null
+  ncbifam_family_count: 1
   organism_name: Prochlorococcus MED4
   product: DNA polymerase III, beta subunit
   reaction_count: 4
@@ -144,6 +149,9 @@ results:
   - tigr_role
   - transporter
   locus_tag: PMM0392
+  merops_classes: []
+  merops_evidence_score_max: null
+  ncbifam_family_count: 0
   organism_name: Prochlorococcus MED4
   product: transmembrane component of ECF transporter energizing module
   reaction_count: 0

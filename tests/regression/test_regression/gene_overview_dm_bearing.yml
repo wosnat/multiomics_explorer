@@ -28,6 +28,9 @@ rows:
   - go_mf
   - pfam
   locus_tag: MIT1002_01809
+  merops_classes: []
+  merops_evidence_score_max: null
+  ncbifam_family_count: 0
   numeric_metric_count: 0
   organism_name: Alteromonas macleodii MIT1002
   product: MarR family winged helix-turn-helix transcriptional regulator

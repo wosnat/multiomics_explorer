@@ -1,451 +1,579 @@
 case_id: search_ontology_go_cc
 row_count: 64
 rows:
-- id: go:0000139
+- gene_count: 3
+  id: go:0000139
   is_informative: true
   level: 4
   name: Golgi membrane
+  organism_count: 3
   score: 1.056
   tree: null
   tree_code: null
-- id: go:0000329
+- gene_count: 1
+  id: go:0000329
   is_informative: true
   level: 6
   name: fungal-type vacuole membrane
+  organism_count: 1
   score: 0.8155
   tree: null
   tree_code: null
-- id: go:0005741
+- gene_count: 1
+  id: go:0005741
   is_informative: true
   level: 4
   name: mitochondrial outer membrane
+  organism_count: 1
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0005743
+- gene_count: 32
+  id: go:0005743
   is_informative: true
   level: 4
   name: mitochondrial inner membrane
+  organism_count: 25
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0005765
+- gene_count: 2
+  id: go:0005765
   is_informative: true
   level: 6
   name: lysosomal membrane
+  organism_count: 2
   score: 1.056
   tree: null
   tree_code: null
-- id: go:0005774
+- gene_count: 3
+  id: go:0005774
   is_informative: true
   level: 4
   name: vacuolar membrane
+  organism_count: 3
   score: 1.056
   tree: null
   tree_code: null
-- id: go:0005789
+- gene_count: 3
+  id: go:0005789
   is_informative: true
   level: 4
   name: endoplasmic reticulum membrane
+  organism_count: 3
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0005886
+- gene_count: 10692
+  id: go:0005886
   is_informative: true
   level: 3
   name: plasma membrane
+  organism_count: 42
   score: 1.056
   tree: null
   tree_code: null
-- id: go:0009279
+- gene_count: 1159
+  id: go:0009279
   is_informative: true
   level: 3
   name: cell outer membrane
+  organism_count: 38
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0009528
+- gene_count: 10
+  id: go:0009528
   is_informative: true
   level: 4
   name: plastid inner membrane
+  organism_count: 10
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0009535
+- gene_count: 94
+  id: go:0009535
   is_informative: true
   level: 4
   name: chloroplast thylakoid membrane
+  organism_count: 26
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0009706
+- gene_count: 10
+  id: go:0009706
   is_informative: true
   level: 5
   name: chloroplast inner membrane
+  organism_count: 10
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0009897
+- gene_count: 159
+  id: go:0009897
   is_informative: true
   level: 3
   name: external side of plasma membrane
+  organism_count: 14
   score: 0.7321
   tree: null
   tree_code: null
-- id: go:0009898
+- gene_count: 364
+  id: go:0009898
   is_informative: true
   level: 4
   name: cytoplasmic side of plasma membrane
+  organism_count: 41
   score: 0.7321
   tree: null
   tree_code: null
-- id: go:0016020
+- gene_count: 21641
+  id: go:0016020
   is_informative: true
   level: 2
   name: membrane
+  organism_count: 42
   score: 1.2387
   tree: null
   tree_code: null
-- id: go:0019866
+- gene_count: 43
+  id: go:0019866
   is_informative: true
   level: 3
   name: organelle inner membrane
+  organism_count: 26
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0019867
+- gene_count: 1540
+  id: go:0019867
   is_informative: true
   level: 3
   name: outer membrane
+  organism_count: 42
   score: 1.056
   tree: null
   tree_code: null
-- id: go:0019897
+- gene_count: 166
+  id: go:0019897
   is_informative: true
   level: 3
   name: extrinsic component of plasma membrane
+  organism_count: 16
   score: 0.7321
   tree: null
   tree_code: null
-- id: go:0019898
+- gene_count: 247
+  id: go:0019898
   is_informative: true
   level: 2
   name: extrinsic component of membrane
+  organism_count: 41
   score: 0.8155
   tree: null
   tree_code: null
-- id: go:0030077
+- gene_count: 2
+  id: go:0030077
   is_informative: true
   level: 3
   name: plasma membrane light-harvesting complex
+  organism_count: 2
   score: 0.7321
   tree: null
   tree_code: null
-- id: go:0030094
+- gene_count: 181
+  id: go:0030094
   is_informative: true
   level: 3
   name: plasma membrane-derived photosystem I
+  organism_count: 27
   score: 0.7321
   tree: null
   tree_code: null
-- id: go:0030096
+- gene_count: 334
+  id: go:0030096
   is_informative: true
   level: 3
   name: plasma membrane-derived thylakoid photosystem II
+  organism_count: 27
   score: 0.6642
   tree: null
   tree_code: null
-- id: go:0030288
+- gene_count: 999
+  id: go:0030288
   is_informative: true
   level: 3
   name: outer membrane-bounded periplasmic space
+  organism_count: 42
   score: 0.7321
   tree: null
   tree_code: null
-- id: go:0031090
+- gene_count: 137
+  id: go:0031090
   is_informative: true
   level: 3
   name: organelle membrane
+  organism_count: 32
   score: 1.056
   tree: null
   tree_code: null
-- id: go:0031232
+- gene_count: 2
+  id: go:0031232
   is_informative: true
   level: 4
   name: extrinsic component of external side of plasma membrane
+  organism_count: 1
   score: 0.5603
   tree: null
   tree_code: null
-- id: go:0031234
+- gene_count: 99
+  id: go:0031234
   is_informative: true
   level: 4
   name: extrinsic component of cytoplasmic side of plasma membrane
+  organism_count: 15
   score: 0.5603
   tree: null
   tree_code: null
-- id: go:0031236
+- gene_count: 2
+  id: go:0031236
   is_informative: true
   level: 5
   name: extrinsic component of periplasmic side of plasma membrane
+  organism_count: 1
   score: 0.5603
   tree: null
   tree_code: null
-- id: go:0031240
+- gene_count: 15
+  id: go:0031240
   is_informative: true
   level: 3
   name: external side of cell outer membrane
+  organism_count: 9
   score: 0.6642
   tree: null
   tree_code: null
-- id: go:0031241
+- gene_count: 112
+  id: go:0031241
   is_informative: true
   level: 3
   name: periplasmic side of cell outer membrane
+  organism_count: 13
   score: 0.6642
   tree: null
   tree_code: null
-- id: go:0031676
+- gene_count: 377
+  id: go:0031676
   is_informative: true
   level: 4
   name: plasma membrane-derived thylakoid membrane
+  organism_count: 17
   score: 1.0641
   tree: null
   tree_code: null
-- id: go:0031966
+- gene_count: 34
+  id: go:0031966
   is_informative: true
   level: 4
   name: mitochondrial membrane
+  organism_count: 26
   score: 1.056
   tree: null
   tree_code: null
-- id: go:0031968
+- gene_count: 95
+  id: go:0031968
   is_informative: true
   level: 3
   name: organelle outer membrane
+  organism_count: 27
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0031969
+- gene_count: 10
+  id: go:0031969
   is_informative: true
   level: 5
   name: chloroplast membrane
+  organism_count: 10
   score: 1.056
   tree: null
   tree_code: null
-- id: go:0031974
+- gene_count: 80
+  id: go:0031974
   is_informative: true
   level: 2
   name: membrane-enclosed lumen
+  organism_count: 39
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0031979
+- gene_count: 15
+  id: go:0031979
   is_informative: true
   level: 3
   name: plasma membrane-derived thylakoid lumen
+  organism_count: 12
   score: 0.7321
   tree: null
   tree_code: null
-- id: go:0032588
+- gene_count: 2
+  id: go:0032588
   is_informative: true
   level: 4
   name: trans-Golgi network membrane
+  organism_count: 2
   score: 0.8155
   tree: null
   tree_code: null
-- id: go:0033644
+- gene_count: 1
+  id: go:0033644
   is_informative: true
   level: 5
   name: host cell membrane
+  organism_count: 1
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0034357
+- gene_count: 2163
+  id: go:0034357
   is_informative: true
   level: 3
   name: photosynthetic membrane
+  organism_count: 30
   score: 1.056
   tree: null
   tree_code: null
-- id: go:0042170
+- gene_count: 94
+  id: go:0042170
   is_informative: true
   level: 4
   name: plastid membrane
+  organism_count: 26
   score: 1.056
   tree: null
   tree_code: null
-- id: go:0042175
+- gene_count: 3
+  id: go:0042175
   is_informative: true
   level: 3
   name: nuclear outer membrane-endoplasmic reticulum membrane network
+  organism_count: 3
   score: 0.9265
   tree: null
   tree_code: null
-- id: go:0042651
+- gene_count: 1446
+  id: go:0042651
   is_informative: true
   level: 4
   name: thylakoid membrane
+  organism_count: 27
   score: 1.056
   tree: null
   tree_code: null
-- id: go:0042716
+- gene_count: 379
+  id: go:0042716
   is_informative: true
   level: 2
   name: plasma membrane-derived chromatophore
+  organism_count: 19
   score: 0.8155
   tree: null
   tree_code: null
-- id: go:0042717
+- gene_count: 377
+  id: go:0042717
   is_informative: true
   level: 3
   name: plasma membrane-derived chromatophore membrane
+  organism_count: 17
   score: 1.0641
   tree: null
   tree_code: null
-- id: go:0042720
+- gene_count: 2
+  id: go:0042720
   is_informative: true
   level: 4
   name: mitochondrial inner membrane peptidase complex
+  organism_count: 2
   score: 0.7321
   tree: null
   tree_code: null
-- id: go:0043227
+- gene_count: 554
+  id: go:0043227
   is_informative: true
   level: 3
   name: membrane-bounded organelle
+  organism_count: 42
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0043231
+- gene_count: 553
+  id: go:0043231
   is_informative: true
   level: 4
   name: intracellular membrane-bounded organelle
+  organism_count: 42
   score: 0.8155
   tree: null
   tree_code: null
-- id: go:0044384
+- gene_count: 1
+  id: go:0044384
   is_informative: true
   level: 6
   name: host outer membrane
+  organism_count: 1
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0044853
+- gene_count: 12
+  id: go:0044853
   is_informative: true
   level: 4
   name: plasma membrane raft
+  organism_count: 10
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0045121
+- gene_count: 17
+  id: go:0045121
   is_informative: true
   level: 4
   name: membrane raft
+  organism_count: 12
   score: 1.056
   tree: null
   tree_code: null
-- id: go:0048501
+- gene_count: 40
+  id: go:0048501
   is_informative: true
   level: 4
   name: signal recognition particle, plasma membrane targeting
+  organism_count: 40
   score: 0.6642
   tree: null
   tree_code: null
-- id: go:0055035
+- gene_count: 94
+  id: go:0055035
   is_informative: true
   level: 5
   name: plastid thylakoid membrane
+  organism_count: 26
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0098552
+- gene_count: 659
+  id: go:0098552
   is_informative: true
   level: 2
   name: side of membrane
+  organism_count: 41
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0098562
+- gene_count: 364
+  id: go:0098562
   is_informative: true
   level: 3
   name: cytoplasmic side of membrane
+  organism_count: 41
   score: 0.8155
   tree: null
   tree_code: null
-- id: go:0098567
+- gene_count: 66
+  id: go:0098567
   is_informative: true
   level: 4
   name: periplasmic side of plasma membrane
+  organism_count: 14
   score: 0.7321
   tree: null
   tree_code: null
-- id: go:0098588
+- gene_count: 101
+  id: go:0098588
   is_informative: true
   level: 4
   name: bounding membrane of organelle
+  organism_count: 31
   score: 0.8155
   tree: null
   tree_code: null
-- id: go:0098590
+- gene_count: 389
+  id: go:0098590
   is_informative: true
   level: 3
   name: plasma membrane region
+  organism_count: 26
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0098796
+- gene_count: 4677
+  id: go:0098796
   is_informative: true
   level: 2
   name: membrane protein complex
+  organism_count: 42
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0098797
+- gene_count: 2771
+  id: go:0098797
   is_informative: true
   level: 3
   name: plasma membrane protein complex
+  organism_count: 42
   score: 0.8155
   tree: null
   tree_code: null
-- id: go:0098800
+- gene_count: 30
+  id: go:0098800
   is_informative: true
   level: 3
   name: inner mitochondrial membrane protein complex
+  organism_count: 25
   score: 0.7321
   tree: null
   tree_code: null
-- id: go:0098802
+- gene_count: 2
+  id: go:0098802
   is_informative: true
   level: 3
   name: plasma membrane signaling receptor complex
+  organism_count: 2
   score: 0.7321
   tree: null
   tree_code: null
-- id: go:0098807
+- gene_count: 68
+  id: go:0098807
   is_informative: true
   level: 3
   name: chloroplast thylakoid membrane protein complex
+  organism_count: 26
   score: 0.7321
   tree: null
   tree_code: null
-- id: go:0098852
+- gene_count: 3
+  id: go:0098852
   is_informative: true
   level: 5
   name: lytic vacuole membrane
+  organism_count: 3
   score: 0.9203
   tree: null
   tree_code: null
-- id: go:0098857
+- gene_count: 17
+  id: go:0098857
   is_informative: true
   level: 3
   name: membrane microdomain
+  organism_count: 12
   score: 1.056
   tree: null
   tree_code: null
-- id: go:0120025
+- gene_count: 3
+  id: go:0120025
   is_informative: true
   level: 3
   name: plasma membrane bounded cell projection
+  organism_count: 3
   score: 0.7321
   tree: null
   tree_code: null

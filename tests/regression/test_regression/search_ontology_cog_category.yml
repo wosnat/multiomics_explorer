@@ -1,10 +1,12 @@
 case_id: search_ontology_cog_category
 row_count: 1
 rows:
-- id: cog.category:C
+- gene_count: 7424
+  id: cog.category:C
   is_informative: true
   level: 0
   name: Energy production and conversion
+  organism_count: 42
   score: 1.2872
   tree: null
   tree_code: null

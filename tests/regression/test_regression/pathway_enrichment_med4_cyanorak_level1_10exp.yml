@@ -1,3 +1,4 @@
+background_filtered: false
 by_direction:
 - direction: down
   n_significant: 16
@@ -117,6 +118,7 @@ clusters_skipped:
 - cluster: 10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics|stationary|up
   reason: empty_gene_set
 enrichment_params:
+  background_filtered: false
   background_mode: table_scope
   direction: both
   experiment_ids:
@@ -130,8 +132,10 @@ enrichment_params:
   - 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
   - 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   - 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
+  filters_applied: {}
   growth_phases: null
   informative_only: true
+  interpro_type: null
   level: 1
   max_gene_set_size: 500
   min_gene_set_size: 5
@@ -148,6 +152,12 @@ enrichment_params:
   term_ids: null
   timepoint_filter: null
   tree: null
+  trust_axes:
+    cyanorak_role:
+    - sources
+    - evidence
+filters_applied: {}
+interpro_type: null
 level: 1
 n_significant: 42
 no_expression: []
@@ -80205,3 +80215,7 @@ top_pathways_by_padj:
   term_name: Transport and binding proteins > Amino acids, peptides and amines
 total_matching: 2342
 truncated: false
+trust_axes:
+  cyanorak_role:
+  - sources
+  - evidence

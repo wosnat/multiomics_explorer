@@ -1,24 +1,13 @@
 case_id: gene_ontology_terms_cc
-row_count: 2
+row_count: 1
 rows:
-- is_informative: false
-  level: 0
-  localization_score: null
-  locus_tag: MIT1002_03493
-  signal_peptide_cleavage_probability: null
-  signal_peptide_cleavage_site: null
-  signal_peptide_probability: null
-  term_id: go:0005575
-  term_name: cellular_component
-  tree: null
-  tree_code: null
-- is_informative: true
+- evidence: curated
+  evidence_score: 0.667
+  is_informative: true
   level: 2
-  localization_score: null
   locus_tag: MIT1002_03493
-  signal_peptide_cleavage_probability: null
-  signal_peptide_cleavage_site: null
-  signal_peptide_probability: null
+  sources:
+  - eggnog
   term_id: go:0005737
   term_name: cytoplasm
   tree: null

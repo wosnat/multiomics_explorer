@@ -19,6 +19,9 @@ rows:
   gene_name: null
   informative_annotation_types: []
   locus_tag: EZ55_00275
+  merops_classes: []
+  merops_evidence_score_max: null
+  ncbifam_family_count: 0
   numeric_metric_count: 0
   organism_name: Alteromonas macleodii EZ55
   product: hypothetical protein
@@ -56,6 +59,9 @@ rows:
   - go_mf
   - pfam
   locus_tag: PMM1428
+  merops_classes: []
+  merops_evidence_score_max: null
+  ncbifam_family_count: 0
   numeric_metric_count: 0
   organism_name: Prochlorococcus MED4
   product: EVE domain protein

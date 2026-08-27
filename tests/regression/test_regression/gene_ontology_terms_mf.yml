@@ -1,57 +1,58 @@
 case_id: gene_ontology_terms_mf
 row_count: 5
 rows:
-- is_informative: true
+- evidence: curated
+  evidence_score: 0.667
+  is_informative: true
   level: 5
-  localization_score: null
   locus_tag: MIT1002_03493
-  signal_peptide_cleavage_probability: null
-  signal_peptide_cleavage_site: null
-  signal_peptide_probability: null
+  sources:
+  - eggnog
   term_id: go:0000987
   term_name: cis-regulatory region sequence-specific DNA binding
   tree: null
   tree_code: null
-- is_informative: true
+- evidence: family_inferred
+  evidence_score: 0.333
+  is_informative: true
   level: 2
-  localization_score: null
   locus_tag: MIT1002_03493
-  signal_peptide_cleavage_probability: null
-  signal_peptide_cleavage_site: null
-  signal_peptide_probability: null
+  sources:
+  - interproscan
   term_id: go:0003700
   term_name: DNA-binding transcription factor activity
   tree: null
   tree_code: null
-- is_informative: true
+- evidence: curated
+  evidence_score: 1.0
+  is_informative: true
   level: 3
-  localization_score: null
   locus_tag: MIT1002_03493
-  signal_peptide_cleavage_probability: null
-  signal_peptide_cleavage_site: null
-  signal_peptide_probability: null
+  sources:
+  - eggnog
+  - interproscan
   term_id: go:0034618
   term_name: arginine binding
   tree: null
   tree_code: null
-- is_informative: true
+- evidence: curated
+  evidence_score: 0.667
+  is_informative: true
   level: 3
-  localization_score: null
   locus_tag: MIT1002_03493
-  signal_peptide_cleavage_probability: null
-  signal_peptide_cleavage_site: null
-  signal_peptide_probability: null
+  sources:
+  - eggnog
   term_id: go:0042802
   term_name: identical protein binding
   tree: null
   tree_code: null
-- is_informative: true
+- evidence: curated
+  evidence_score: 0.667
+  is_informative: true
   level: 3
-  localization_score: null
   locus_tag: MIT1002_03493
-  signal_peptide_cleavage_probability: null
-  signal_peptide_cleavage_site: null
-  signal_peptide_probability: null
+  sources:
+  - eggnog
   term_id: go:1901363
   term_name: heterocyclic compound binding
   tree: null
