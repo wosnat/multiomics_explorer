@@ -69,6 +69,72 @@ examples:
         ]
       }
 
+  - title: InterPro homologous-superfamily census (interpro_type facet)
+    call: genes_by_ontology(ontology="interpro", organism="MED4", term_ids=["interpro:IPR027417"])
+    response: |
+      {"ontology": "interpro", "organism_name": "Prochlorococcus MED4",
+       "total_genes": 119, "total_terms": 1,
+       "top_terms": [{"term_id": "interpro:IPR027417", "term_name": "P-loop containing nucleoside triphosphate hydrolase", "count": 119}],
+       "results": [{"locus_tag": "PMM0001", "term_id": "interpro:IPR027417", "term_name": "P-loop containing nucleoside triphosphate hydrolase", "level": 2, "interpro_type": "HOMOLOGOUS_SUPERFAMILY", "evidence": "signature"}]}
+
+  - title: MEROPS peptidase-only clan census (call_class filter)
+    call: genes_by_ontology(ontology="merops", organism="MIT1002", level=0, call_class=["peptidase"])
+    response: |
+      # call_class=['peptidase'] restricts the clan census to genes whose best
+      # MEROPS edge calls them an actual peptidase, dropping nonpeptidase_homolog
+      # rows (catalytically-dead homologs that still resemble a peptidase family
+      # by sequence). MIT1002 level=0: 7 clans pass the default gene-set-size
+      # filter — SC 22, MA 18, MH 8, PB 8, SB 6, MG 5, SK 5. No warning fires
+      # because the filter already excludes the ambiguous rows.
+      {"ontology": "merops", "organism_name": "Alteromonas macleodii MIT1002",
+       "by_call_class": [{"call_class": "peptidase", "count": 67}],
+       "top_terms": [
+         {"term_id": "merops.clan:SC", "term_name": "...", "count": 22},
+         {"term_id": "merops.clan:MA", "term_name": "...", "count": 18},
+         {"term_id": "merops.clan:MH", "term_name": "...", "count": 8}
+       ],
+       "warnings": [],
+       "results": [{"locus_tag": "MIT1002_03660", "term_id": "merops.clan:SC", "term_name": "...", "level": 0, "evidence": "curated", "call_class": "peptidase"}]}
+
+  - title: MEROPS clan census without call_class (warns)
+    call: genes_by_ontology(ontology="merops", organism="MIT1002", level=0)
+    response: |
+      # Omitting call_class folds nonpeptidase_homolog rows into the census —
+      # MIT1002 level=0 returns 10 clans (vs 7 with call_class=['peptidase'])
+      # and fires a warning naming the catalytically-dead-homolog rows.
+      {"ontology": "merops", "organism_name": "Alteromonas macleodii MIT1002",
+       "warnings": ["12 rows call_class='nonpeptidase_homolog' (catalytically-dead homologs) are included in this clan census"],
+       "results": [{"locus_tag": "MIT1002_04012", "term_id": "merops.clan:C26", "term_name": "...", "level": 0, "evidence": "homology", "call_class": "nonpeptidase_homolog"}]}
+
+  - title: TCDB trust detail — sources / evidence_score / tier (verbose)
+    call: genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], verbose=True)
+    response: |
+      # Compact rows carry only `evidence` (the ladder). verbose=True adds
+      # `sources`, `evidence_score`, `tier` plus TCDB's native detail
+      # (confidence_score, source_agreement, pfam_support, go_support,
+      # identity, qcov, evalue, consensus_n, attachment_depth). On a
+      # hierarchical rollup like tcdb:3.A.1, trust columns come from the
+      # gene's single best edge under the term (ranked by evidence_score) —
+      # never a duplicated per-edge row.
+      {"ontology": "tcdb", "organism_name": "Prochlorococcus MED4",
+       "results": [{"locus_tag": "PMM0392", "term_id": "tcdb:3.A.1", "term_name": "ATP-binding Cassette (ABC) Superfamily",
+                    "level": 2, "evidence": "homology", "sources": ["eggnog"], "evidence_score": 0.6, "tier": 2,
+                    "confidence_score": 0.6, "attachment_depth": "most_specific"}]}
+
+  - title: Cutoff on evidence_score (the only numeric trust filter)
+    call: genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], min_evidence_score=0.6, evidence=["homology"])
+    response: |
+      # min_evidence_score is the only numeric cutoff anywhere in the trust
+      # surface — no filter exists on native scalars (evalue, bit_score,
+      # confidence_score, ...). Setting it adds `evidence_score_signals` to
+      # the envelope, naming which ControlledVocabulary signals fired
+      # (composite inputs behind the score). MED4 tcdb: evidence=['homology']
+      # AND evidence_score>=0.6 narrows 670 rows to 98.
+      {"ontology": "tcdb", "organism_name": "Prochlorococcus MED4",
+       "filters_applied": {"evidence": ["homology"], "min_evidence_score": 0.6},
+       "evidence_score_signals": {"Gene_has_tcdb_family": ["source_agreement", "pfam_support", "go_support", "identity", "qcov"]},
+       "results": [{"locus_tag": "PMM0392", "term_id": "tcdb:3.A.1", "evidence": "homology", "evidence_score": 0.6}]}
+
   - title: Filter out uninformative terms (term-side filter, opt-in)
     call: genes_by_ontology(ontology="kegg", organism="MED4", level=3, informative_only=True)
     response: |
@@ -101,6 +167,26 @@ examples:
 verbose_fields:
   - function_description
   - level_is_best_effort
+  - sources
+  - evidence_score
+  - tier
+  - confidence_score
+  - source_agreement
+  - pfam_support
+  - go_support
+  - identity
+  - qcov
+  - evalue
+  - consensus_n
+  - attachment_depth
+  - best_hit_kind
+  - best_hit_id
+  - libraries
+  - evalue_library
+  - match_count
+  - start
+  - end
+  - bit_score
 
 chaining:
   - "ontology_landscape → genes_by_ontology(level=N)"
@@ -110,6 +196,8 @@ chaining:
   - "genes_by_ontology(ontology='tcdb' | 'ec', term_ids=[...]) → genes_by_metabolite (substrate-anchored pivot — see docs://analysis/metabolites)"
   - "From PSORTb-filtered genes → differential_expression_by_gene to ask: are
      outer-membrane proteins enriched in the up-regulated set?"
+  - "list_filter_values(filter_type='trust_axes') → check which trust params an ontology supports before filtering — see docs://analysis/annotation_evidence"
+  - "genes_by_ontology(ontology='merops', call_class=['peptidase']) → pathway_enrichment(ontology='merops', call_class=['peptidase']) to keep the TERM2GENE definitions and the enrichment test on the same trust-filtered gene set"
 
 mistakes:
   - "At least one of `level` or `term_ids` must be set — calling without either is an error."
@@ -122,7 +210,13 @@ mistakes:
   - "KEGG: gene edges only hit the KO leaf (`level=3`). Passing `level=0/1/2` rolls up to category/subcategory/pathway via `is_a`."
   - "BRITE: gene edges hit the KO leaf (`level=3`, same as KEGG). Passing `level=0/1/2` rolls up through BRITE tree hierarchy. Each BRITE tree is a separate functional classification — use `tree` to scope to a specific tree (e.g. `tree='transporters'`). Without `tree`, results mix all BRITE trees. Use `list_filter_values('brite_tree')` to discover available trees."
   - "Flat ontologies (`cog_category`, `tigr_role`) have only `level=0`. Passing `level >= 1` in Mode 2 returns empty results; in Mode 3 the ids route to `wrong_level`."
-  - "Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`."
+  - "Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`."
+  - "Trust surface: compact rows on the 14 functional-edge ontologies (everything except PSORTb/SignalP) carry `evidence` — a categorical ladder `curated > signature > homology > family_inferred > domain_inferred`. `sources`, `evidence_score`, and `tier` (TCDB + MEROPS only) move to verbose. Filters `sources`, `evidence`, `max_tier`, `min_evidence_score` default to `None` and never narrow the result unless set; `min_evidence_score` is the only numeric cutoff anywhere in the surface. `call_class` (`peptidase` / `inhibitor` / `nonpeptidase_homolog`) is MEROPS-only and compact always (not verbose-gated) because it changes the biological reading. `interpro_type` is InterPro-only and compact always. Passing an axis an ontology doesn't carry raises `ValueError` naming that ontology's axes. See `docs://analysis/annotation_evidence` for the full per-ontology profile."
+  - "`max_tier` keeps tier-null rows (`r.tier <= max_tier OR r.tier IS NULL`) — an eggNOG-only TCDB edge with no `tier` passes any `max_tier` filter. Check the envelope's `by_tier` `\"null\"` bucket to see how many rows that affects."
+  - "`sources` is set-membership ANY (`any(s IN $sources WHERE s IN r.sources)`), not exact match — an edge with `sources=['eggnog', 'blast']` matches `sources=['eggnog']`."
+  - "Row strip rule: a row only carries the columns its ontology owns. `tier` never appears on a `kegg` row (KEGG carries no `tier` axis); `interpro_type` never appears on a `tcdb` row. Owned-but-null stays — e.g. `tier` is present and `null` on a TCDB edge with only eggNOG support (no tier assigned)."
+  - wrong: "genes_by_ontology(ontology='go_bp', organism='MED4', level=3, call_class=['peptidase'])  # call_class is MEROPS-only"
+    right: "list_filter_values(filter_type='trust_axes', ontology='go_bp')  # check axes first — go_bp supports sources/evidence/evidence_score only, raises ValueError otherwise"
   - "TCDB is hierarchical (5 levels: `tc_class` → `tc_subclass` → `tc_family` → `tc_subfamily` → `tc_specificity`). `term_ids=['tcdb:1.A.1']` expands DOWN through ~31 descendant subfamilies before binding to genes via `Gene_has_tcdb_family`."
   - "CAZy is a small ontology (~64 terms, 6 classes / 58 families). `level=0` gives ~6 class-level rows (GH, GT, PL, CE, AA, CBM); `level=1` gives families. With default `min_gene_set_size=5`, many CAZy terms are filtered out — pass `min_gene_set_size=1` to see all."
   - "Substrate-anchored TCDB questions ('which genes transport sucrose?') chain via `genes_by_metabolite`, NOT `genes_by_ontology`. Use `genes_by_ontology(ontology='tcdb', term_ids=[...])` for *family*-level questions ('which genes are in voltage-gated ion channels?'). The metabolite-anchored route includes all TCDB families curating the substrate; the family-anchored route here is anchored on a single family ID and misses cross-family substrate hits."

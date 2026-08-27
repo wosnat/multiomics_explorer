@@ -13,6 +13,10 @@ Single-organism enforced. Default `limit=500` because this tool feeds
 enrichment via TERM2GENE. `min/max_gene_set_size` is organism-scoped
 (matches `ontology_landscape`).
 
+[TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
+`call_class` / `interpro_type` filter on the per-edge trust profile;
+defaults never filter. See docs://analysis/annotation_evidence.
+
 Routing: pipe `results` into `pathway_enrichment` / `cluster_enrichment`
 as TERM2GENE; chain from `search_ontology` for term discovery;
 `gene_ontology_terms` for per-gene reverse lookup. For
@@ -25,7 +29,7 @@ conventions; docs://analysis/enrichment for the enrichment workflow.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type') | — | Ontology for these term_ids / this level. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') | — | Ontology for these term_ids / this level. |
 | organism | string | — | Organism (case-insensitive substring match, e.g. 'MED4'). Required — single-valued. Use list_organisms for valid values. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | level | int \| None | None | Hierarchy level to roll UP to (0 = broadest). At least one of `level` or `term_ids` must be provided. See docs://guide/conventions. |
@@ -35,6 +39,12 @@ conventions; docs://analysis/enrichment for the enrichment workflow.
 | informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' go:0008150). Term-side filter only — never restricts the gene set. Default False (opt-in). |
 | summary | bool | False | If true, omit `results` (envelope only). |
 | verbose | bool | False | Include function_description and sparse level_is_best_effort. |
+| sources | list[string] \| None | None | Keep rows whose edge sources[] contains any of these values (e.g. ['eggnog']). Valid on the 14 functional-edge ontologies (not PSORTb / SignalP). Default None never filters. See list_filter_values(filter_type='sources'). |
+| evidence | list[string] \| None | None | Keep rows whose compact evidence ladder value is in this list (curated > signature > homology > family_inferred > domain_inferred). Valid on the 14 functional-edge ontologies. Default None never filters. |
+| max_tier | int \| None | None | Keep rows with edge tier <= this value OR tier IS NULL (diamond truncation depth, 1-3; tier-null edges are always kept - see by_tier's null bucket). Valid on tcdb, merops only. |
+| min_evidence_score | float \| None | None | Keep rows with edge evidence_score >= this cutoff (composite trust score, 0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, tcdb, merops. Envelope adds evidence_score_signals when set. |
+| call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; leaving unfiltered mixes in catalytically-dead homologs (nonpeptidase_homolog) - the envelope warns when it does. |
+| interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
 | limit | int | 500 | Max rows returned. Default 500 — this tool feeds enrichment. |
 | offset | int | 0 | Skip N rows before limit |
 
@@ -45,7 +55,7 @@ conventions; docs://analysis/enrichment for the enrichment workflow.
 ### Envelope
 
 ```expected-keys
-ontology, organism_name, total_matching, total_genes, total_terms, total_categories, genes_per_term_min, genes_per_term_median, genes_per_term_max, terms_per_gene_min, terms_per_gene_median, terms_per_gene_max, by_category, by_level, top_terms, n_best_effort_terms, not_found, wrong_ontology, wrong_level, filtered_out, returned, offset, truncated, results
+ontology, organism_name, total_matching, total_genes, total_terms, total_categories, genes_per_term_min, genes_per_term_median, genes_per_term_max, terms_per_gene_min, terms_per_gene_median, terms_per_gene_max, by_category, by_level, top_terms, n_best_effort_terms, not_found, wrong_ontology, wrong_level, filtered_out, returned, offset, truncated, trust_axes, warnings, filters_applied, skipped_ontologies, by_evidence, by_tier, by_sources, by_call_class, evidence_score_stats, results
 ```
 
 - **ontology** (string): Echo of input ontology (e.g. 'go_bp')
@@ -71,6 +81,16 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 - **returned** (int): Rows in this response
 - **offset** (int): Offset into full result set
 - **truncated** (bool): True when total_matching > offset + returned
+- **trust_axes** (object): Trust axes this ontology carries, e.g. {'tcdb': ['sources','evidence','evidence_score','tier']}.
+- **warnings** (list[string]): Auto-warnings (e.g. nonpeptidase_homolog rows without a call_class filter).
+- **filters_applied** (object): Echo of the trust filters that were actually set on this call.
+- **skipped_ontologies** (list[object]): Empty for single-ontology tools; reserved for multi-ontology callers.
+- **by_evidence** (list[object]): Rollup of the compact evidence column over result rows.
+- **by_tier** (list[object]): Rollup of tier over result rows; carries an explicit 'null' bucket.
+- **by_sources** (list[object]): Membership counts per source value over result rows.
+- **by_call_class** (list[object]): Rollup of MEROPS call_class over result rows (merops only).
+- **evidence_score_stats** (object | None): {min, median, max, n_null} over evidence_score in result rows.
+- **evidence_score_signals** (object | None): Fired ControlledVocabulary signals per edge_type; present only when min_evidence_score was set.
 
 ### Per-result fields
 
@@ -90,11 +110,34 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 | signal_peptide_probability | float \| None (optional) | SignalP winning-class probability (sparse: only set when ontology='signal_peptide_type'). Range 0–1. |
 | signal_peptide_cleavage_site | int \| None (optional) | SignalP-predicted cleavage residue position (sparse: only set when ontology='signal_peptide_type'; absent when SignalP reports no cleavage site). |
 | signal_peptide_cleavage_probability | float \| None (optional) | SignalP cleavage-site probability (sparse: only set when ontology='signal_peptide_type' and cleavage_site present). |
+| evidence | string \| None (optional) | Compact trust ladder: curated > signature > homology > family_inferred > domain_inferred. Present on the 14 functional-edge ontologies; null on PSORTb/SignalP. |
+| call_class | string \| None (optional) | MEROPS peptidase call (sparse: merops only). 'nonpeptidase_homolog' rows are catalytically dead. |
+| interpro_type | string \| None (optional) | InterPro entry type (sparse: interpro only), e.g. 'DOMAIN', 'FAMILY', 'HOMOLOGOUS_SUPERFAMILY'. |
 
 **Verbose-only fields** (included when `verbose=True`):
 
 | Field | Type | Description |
 |---|---|---|
+| sources | list[string] \| None (optional) | Provenance tags on this edge (verbose only; sparse outside the 14 functional-edge ontologies), e.g. ['eggnog']. |
+| evidence_score | float \| None (optional) | Composite trust score in [0,1] (verbose only; sparse: go_bp/mf/cc, ec, pfam, cazy, tcdb, merops). |
+| tier | int \| None (optional) | Diamond truncation depth 1-3 (verbose only; sparse: tcdb, merops; owned-but-null when the edge carries no tier). |
+| attachment_depth | string \| None (optional) | TCDB rollup attachment depth: 'most_specific' or 'superseded' (verbose only; sparse: tcdb only). |
+| confidence_score | float \| None (optional) | Native rank score (verbose only; sparse: tcdb, merops). |
+| source_agreement | string \| None (optional) | TCDB two-source agreement detail (verbose only; sparse: tcdb only). |
+| pfam_support | string \| None (optional) | Pfam-domain corroboration detail (verbose only; sparse: tcdb, merops). |
+| go_support | string \| None (optional) | GO corroboration detail (verbose only; sparse: tcdb only). |
+| identity | float \| None (optional) | Alignment percent identity (verbose only; sparse: tcdb, merops). |
+| qcov | float \| None (optional) | Query coverage fraction (verbose only; sparse: tcdb, merops). |
+| evalue | float \| None (optional) | Alignment e-value (verbose only; sparse: tcdb, merops, interpro, ncbifam). Never a filter cutoff. |
+| consensus_n | int \| None (optional) | Number of corroborating calls in consensus (verbose only; sparse: tcdb, merops). |
+| best_hit_kind | string \| None (optional) | MEROPS best-hit classification (verbose only; sparse: merops only). |
+| best_hit_id | string \| None (optional) | MEROPS best-hit identifier (verbose only; sparse: merops only). |
+| libraries | list[string] \| None (optional) | InterPro member-database libraries backing this match (verbose only; sparse: interpro only). |
+| evalue_library | string \| None (optional) | InterPro per-library e-value detail (verbose only; sparse: interpro only). |
+| match_count | int \| None (optional) | InterPro match-segment count (verbose only; sparse: interpro only). |
+| start | int \| None (optional) | Match start coordinate (verbose only; sparse: interpro, ncbifam). |
+| end | int \| None (optional) | Match end coordinate (verbose only; sparse: interpro, ncbifam). |
+| bit_score | float \| None (optional) | NCBIfam alignment bit score (verbose only; sparse: ncbifam only). |
 | function_description | string \| None (optional) | Curated functional description (verbose only) |
 | level_is_best_effort | bool \| None (optional) | True when GO term's level is best-effort min-path (sparse: absent for non-GO or non-best-effort; verbose only) |
 
@@ -206,7 +249,98 @@ genes_by_ontology(ontology="signal_peptide_type", term_ids=["signalp_LIPO"], org
 }
 ```
 
-### Example 11: Filter out uninformative terms (term-side filter, opt-in)
+### Example 11: InterPro homologous-superfamily census (interpro_type facet)
+
+```example-call
+genes_by_ontology(ontology="interpro", organism="MED4", term_ids=["interpro:IPR027417"])
+```
+
+```example-response
+{"ontology": "interpro", "organism_name": "Prochlorococcus MED4",
+ "total_genes": 119, "total_terms": 1,
+ "top_terms": [{"term_id": "interpro:IPR027417", "term_name": "P-loop containing nucleoside triphosphate hydrolase", "count": 119}],
+ "results": [{"locus_tag": "PMM0001", "term_id": "interpro:IPR027417", "term_name": "P-loop containing nucleoside triphosphate hydrolase", "level": 2, "interpro_type": "HOMOLOGOUS_SUPERFAMILY", "evidence": "signature"}]}
+```
+
+### Example 12: MEROPS peptidase-only clan census (call_class filter)
+
+```example-call
+genes_by_ontology(ontology="merops", organism="MIT1002", level=0, call_class=["peptidase"])
+```
+
+```example-response
+# call_class=['peptidase'] restricts the clan census to genes whose best
+# MEROPS edge calls them an actual peptidase, dropping nonpeptidase_homolog
+# rows (catalytically-dead homologs that still resemble a peptidase family
+# by sequence). MIT1002 level=0: 7 clans pass the default gene-set-size
+# filter — SC 22, MA 18, MH 8, PB 8, SB 6, MG 5, SK 5. No warning fires
+# because the filter already excludes the ambiguous rows.
+{"ontology": "merops", "organism_name": "Alteromonas macleodii MIT1002",
+ "by_call_class": [{"call_class": "peptidase", "count": 67}],
+ "top_terms": [
+   {"term_id": "merops.clan:SC", "term_name": "...", "count": 22},
+   {"term_id": "merops.clan:MA", "term_name": "...", "count": 18},
+   {"term_id": "merops.clan:MH", "term_name": "...", "count": 8}
+ ],
+ "warnings": [],
+ "results": [{"locus_tag": "MIT1002_03660", "term_id": "merops.clan:SC", "term_name": "...", "level": 0, "evidence": "curated", "call_class": "peptidase"}]}
+```
+
+### Example 13: MEROPS clan census without call_class (warns)
+
+```example-call
+genes_by_ontology(ontology="merops", organism="MIT1002", level=0)
+```
+
+```example-response
+# Omitting call_class folds nonpeptidase_homolog rows into the census —
+# MIT1002 level=0 returns 10 clans (vs 7 with call_class=['peptidase'])
+# and fires a warning naming the catalytically-dead-homolog rows.
+{"ontology": "merops", "organism_name": "Alteromonas macleodii MIT1002",
+ "warnings": ["12 rows call_class='nonpeptidase_homolog' (catalytically-dead homologs) are included in this clan census"],
+ "results": [{"locus_tag": "MIT1002_04012", "term_id": "merops.clan:C26", "term_name": "...", "level": 0, "evidence": "homology", "call_class": "nonpeptidase_homolog"}]}
+```
+
+### Example 14: TCDB trust detail — sources / evidence_score / tier (verbose)
+
+```example-call
+genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], verbose=True)
+```
+
+```example-response
+# Compact rows carry only `evidence` (the ladder). verbose=True adds
+# `sources`, `evidence_score`, `tier` plus TCDB's native detail
+# (confidence_score, source_agreement, pfam_support, go_support,
+# identity, qcov, evalue, consensus_n, attachment_depth). On a
+# hierarchical rollup like tcdb:3.A.1, trust columns come from the
+# gene's single best edge under the term (ranked by evidence_score) —
+# never a duplicated per-edge row.
+{"ontology": "tcdb", "organism_name": "Prochlorococcus MED4",
+ "results": [{"locus_tag": "PMM0392", "term_id": "tcdb:3.A.1", "term_name": "ATP-binding Cassette (ABC) Superfamily",
+              "level": 2, "evidence": "homology", "sources": ["eggnog"], "evidence_score": 0.6, "tier": 2,
+              "confidence_score": 0.6, "attachment_depth": "most_specific"}]}
+```
+
+### Example 15: Cutoff on evidence_score (the only numeric trust filter)
+
+```example-call
+genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], min_evidence_score=0.6, evidence=["homology"])
+```
+
+```example-response
+# min_evidence_score is the only numeric cutoff anywhere in the trust
+# surface — no filter exists on native scalars (evalue, bit_score,
+# confidence_score, ...). Setting it adds `evidence_score_signals` to
+# the envelope, naming which ControlledVocabulary signals fired
+# (composite inputs behind the score). MED4 tcdb: evidence=['homology']
+# AND evidence_score>=0.6 narrows 670 rows to 98.
+{"ontology": "tcdb", "organism_name": "Prochlorococcus MED4",
+ "filters_applied": {"evidence": ["homology"], "min_evidence_score": 0.6},
+ "evidence_score_signals": {"Gene_has_tcdb_family": ["source_agreement", "pfam_support", "go_support", "identity", "qcov"]},
+ "results": [{"locus_tag": "PMM0392", "term_id": "tcdb:3.A.1", "evidence": "homology", "evidence_score": 0.6}]}
+```
+
+### Example 16: Filter out uninformative terms (term-side filter, opt-in)
 
 ```example-call
 genes_by_ontology(ontology="kegg", organism="MED4", level=3, informative_only=True)
@@ -229,7 +363,7 @@ genes_by_ontology(ontology="kegg", organism="MED4", level=3, informative_only=Tr
 }
 ```
 
-### Example 12: From level-survey to pathway defs
+### Example 17: From level-survey to pathway defs
 
 ```
 Step 1: ontology_landscape(organism="MED4")
@@ -251,6 +385,8 @@ genes_by_ontology → pathway_enrichment
 genes_by_ontology → gene_overview
 genes_by_ontology(ontology='tcdb' | 'ec', term_ids=[...]) → genes_by_metabolite (substrate-anchored pivot — see docs://analysis/metabolites)
 From PSORTb-filtered genes → differential_expression_by_gene to ask: are outer-membrane proteins enriched in the up-regulated set?
+list_filter_values(filter_type='trust_axes') → check which trust params an ontology supports before filtering — see docs://analysis/annotation_evidence
+genes_by_ontology(ontology='merops', call_class=['peptidase']) → pathway_enrichment(ontology='merops', call_class=['peptidase']) to keep the TERM2GENE definitions and the enrichment test on the same trust-filtered gene set
 ```
 
 ## Common mistakes
@@ -275,7 +411,23 @@ From PSORTb-filtered genes → differential_expression_by_gene to ask: are outer
 
 - Flat ontologies (`cog_category`, `tigr_role`) have only `level=0`. Passing `level >= 1` in Mode 2 returns empty results; in Mode 3 the ids route to `wrong_level`.
 
-- Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`.
+- Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`.
+
+- Trust surface: compact rows on the 14 functional-edge ontologies (everything except PSORTb/SignalP) carry `evidence` — a categorical ladder `curated > signature > homology > family_inferred > domain_inferred`. `sources`, `evidence_score`, and `tier` (TCDB + MEROPS only) move to verbose. Filters `sources`, `evidence`, `max_tier`, `min_evidence_score` default to `None` and never narrow the result unless set; `min_evidence_score` is the only numeric cutoff anywhere in the surface. `call_class` (`peptidase` / `inhibitor` / `nonpeptidase_homolog`) is MEROPS-only and compact always (not verbose-gated) because it changes the biological reading. `interpro_type` is InterPro-only and compact always. Passing an axis an ontology doesn't carry raises `ValueError` naming that ontology's axes. See `docs://analysis/annotation_evidence` for the full per-ontology profile.
+
+- `max_tier` keeps tier-null rows (`r.tier <= max_tier OR r.tier IS NULL`) — an eggNOG-only TCDB edge with no `tier` passes any `max_tier` filter. Check the envelope's `by_tier` `"null"` bucket to see how many rows that affects.
+
+- `sources` is set-membership ANY (`any(s IN $sources WHERE s IN r.sources)`), not exact match — an edge with `sources=['eggnog', 'blast']` matches `sources=['eggnog']`.
+
+- Row strip rule: a row only carries the columns its ontology owns. `tier` never appears on a `kegg` row (KEGG carries no `tier` axis); `interpro_type` never appears on a `tcdb` row. Owned-but-null stays — e.g. `tier` is present and `null` on a TCDB edge with only eggNOG support (no tier assigned).
+
+```mistake
+genes_by_ontology(ontology='go_bp', organism='MED4', level=3, call_class=['peptidase'])  # call_class is MEROPS-only
+```
+
+```correction
+list_filter_values(filter_type='trust_axes', ontology='go_bp')  # check axes first — go_bp supports sources/evidence/evidence_score only, raises ValueError otherwise
+```
 
 - TCDB is hierarchical (5 levels: `tc_class` → `tc_subclass` → `tc_family` → `tc_subfamily` → `tc_specificity`). `term_ids=['tcdb:1.A.1']` expands DOWN through ~31 descendant subfamilies before binding to genes via `Gene_has_tcdb_family`.
 
@@ -313,7 +465,7 @@ response.total_genes  # distinct genes across all matches
 from multiomics_explorer import genes_by_ontology
 
 result = genes_by_ontology(ontology=..., organism=...)
-# returns dict with keys: ontology, organism_name, total_matching, total_genes, total_terms, total_categories, genes_per_term_min, genes_per_term_median, genes_per_term_max, terms_per_gene_min, terms_per_gene_median, terms_per_gene_max, by_category, by_level, top_terms, n_best_effort_terms, not_found, wrong_ontology, wrong_level, filtered_out, offset, results
+# returns dict with keys: ontology, organism_name, total_matching, total_genes, total_terms, total_categories, genes_per_term_min, genes_per_term_median, genes_per_term_max, terms_per_gene_min, terms_per_gene_median, terms_per_gene_max, by_category, by_level, top_terms, n_best_effort_terms, not_found, wrong_ontology, wrong_level, filtered_out, offset, trust_axes, warnings, filters_applied, skipped_ontologies, by_evidence, by_tier, by_sources, by_call_class, evidence_score_stats, evidence_score_signals, results
 ```
 
 Use package import for bulk data extraction in scripts.

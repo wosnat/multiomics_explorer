@@ -54,6 +54,19 @@ OUTPUT_DIR = (
     / "multiomics_explorer" / "skills" / "multiomics-kg-guide" / "references" / "tools"
 )
 
+# Envelope fields that are declared on the Pydantic response model but are
+# NOT unconditionally present in every response dict — they appear only
+# under a specific caller-set condition (e.g. a filter param being passed).
+# The ```expected-keys block documents keys a caller can rely on seeing on
+# every call; conditional keys are still documented via their bullet
+# description in the "Envelope" section, just excluded from that block, so
+# the integration smoke test (tests/integration/test_about_examples.py)
+# doesn't demand them on examples that don't trigger the condition.
+#
+# evidence_score_signals: present only when `min_evidence_score` is set —
+# pinned by tests/unit/test_api_functions.py::TestGenesByOntologyTrustEnvelope.
+CONDITIONAL_ENVELOPE_KEYS = {"evidence_score_signals"}
+
 
 def get_tool_schemas() -> dict:
     """Extract tool schemas from registered FastMCP tools.
@@ -225,7 +238,8 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
         lines.append("")
         lines.append("```expected-keys")
         suffix = ", results" if has_results else ""
-        lines.append(", ".join(f["name"] for f in envelope) + suffix)
+        always_present = [f["name"] for f in envelope if f["name"] not in CONDITIONAL_ENVELOPE_KEYS]
+        lines.append(", ".join(always_present) + suffix)
         lines.append("```")
         lines.append("")
         for f in envelope:

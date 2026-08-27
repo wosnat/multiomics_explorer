@@ -100,8 +100,9 @@ Plus three orthogonal helpers:
 3. Boolean arm: `metabolites_by_flags_assay(assay_ids=[...])` for presence/absence flags.
 4. Reverse: `assays_by_metabolite(metabolite_ids=[...])` collects all measurement evidence (numeric + boolean) for given metabolites.
 
-### "Which genes belong to BRITE category / TCDB family / CAZy family X?"
-- `genes_by_ontology(ontology=..., term_ids=[...], organism=...)` works for all 14 ontologies (GO, KEGG, EC, COG, Cyanorak, TIGR, Pfam, BRITE, TCDB, CAZy, plus the two structural ontologies below). For BRITE, scope with `tree=` (use `list_filter_values(filter_type='brite_tree')` to discover trees).
+### "Which genes belong to BRITE category / TCDB family / CAZy family / InterPro entry / MEROPS clan X?"
+- `genes_by_ontology(ontology=..., term_ids=[...], organism=...)` works for all 17 ontologies (GO, KEGG, EC, COG, Cyanorak, TIGR, Pfam, BRITE, TCDB, CAZy, InterPro, NCBIfam, MEROPS, plus the two structural ontologies below). For BRITE, scope with `tree=` (use `list_filter_values(filter_type='brite_tree')` to discover trees).
+- 14 of the 17 carry an annotation-trust surface — filter by `sources=`, `evidence=`, `max_tier=`, `min_evidence_score=`, `call_class=` (MEROPS), or facet by `interpro_type=` (InterPro). See `docs://analysis/annotation_evidence` for which ontology carries which axis.
 
 ### "Where in the cell does gene X live? / Is gene X secreted (signal peptide)?"
 - `genes_by_ontology(ontology="subcellular_localization", term_ids=["psortb_OuterMembrane"|"psortb_CytoplasmicMembrane"|...], organism=...)` for PSORTb-predicted localization; row carries `localization_score` (∈[7.5, 10.0]).
@@ -186,5 +187,7 @@ expression data, and the routing field is there to prevent that.
 - `docs://analysis/enrichment` — pathway enrichment methodology + background semantics.
 - `docs://analysis/metabolites` — metabolites decision-tree (3 source pipelines).
 - `docs://analysis/derived_metrics` — DerivedMetric family overview.
+- `docs://analysis/annotation_evidence` — annotation-trust surface: per-ontology trust profile, rank-vs-filter rule, MEROPS `call_class`, InterPro `interpro_type` enrichment requirement.
 - `docs://examples/pathway_enrichment.py` — runnable enrichment example.
 - `docs://examples/metabolites.py` — runnable metabolites workflow examples (7 scenarios).
+- `docs://examples/annotation_evidence.py` — runnable annotation-trust examples (4 scenarios).

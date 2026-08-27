@@ -16,6 +16,16 @@ examples:
   - title: Organism background instead of cluster union
     call: cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="cyanorak_role", level=1, background="organism")
 
+  - title: "InterPro enrichment requires interpro_type"
+    call: cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="interpro", interpro_type="HOMOLOGOUS_SUPERFAMILY", level=0)
+    response: |
+      # Same requirement as pathway_enrichment: ontology='interpro' without
+      # interpro_type raises (InterPro types size too differently to pool).
+      {"trust_axes": {"interpro": ["sources", "evidence"]}, "interpro_type": "HOMOLOGOUS_SUPERFAMILY", "...": "..."}
+
+  - title: "MEROPS enrichment restricted to peptidase calls (call_class)"
+    call: cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="merops", call_class=["peptidase"], level=0)
+
   - title: From landscape to cluster enrichment
     steps: |
       Step 1: list_clustering_analyses(organism="MED4")
@@ -52,6 +62,7 @@ chaining:
   - "cluster_enrichment → genes_in_cluster"
   - "cluster_enrichment(ontology='kegg', ...) → list_metabolites(pathway_ids=[<enriched_pathway_id>]) — inspect the chemistry of an enriched KEGG pathway (compound-anchored membership, distinct from the gene-KO membership the enrichment used). See docs://analysis/metabolites for the pathway-anchor disambiguation."
   - "See `docs://analysis/enrichment` for the full methodology and the `informative_only` filter semantics."
+  - "See `docs://analysis/annotation_evidence` for the trust-axis registry and rank-vs-filter guidance for evidence_score."
 
 mistakes:
   - "[ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions."
@@ -63,5 +74,6 @@ mistakes:
   - "`min/max_gene_set_size` is the pathway M filter (per-cluster, clusterProfiler semantics). `min/max_cluster_size` is the cluster membership filter."
   - "For BRITE, scope to a specific tree with `tree=`. Use `list_filter_values('brite_tree')` to discover trees."
   - "When a KEGG pathway is significantly enriched in a cluster, drill into its chemistry via `list_metabolites(pathway_ids=[<term_id>])`. The cluster's gene-KO membership and the pathway's compound-membership reach the same KEGG map via different relations — name the anchor when answering. See docs://analysis/metabolites."
+  - "`ontology='interpro'` requires `interpro_type` (one of the 8 InterPro types) — omitting it raises. Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`) shape the per-cluster TERM2GENE mapping identically to `pathway_enrichment`; defaults never filter. See `docs://analysis/annotation_evidence`."
   - wrong: "cluster_enrichment(..., background='table_scope')  # not valid"
     right: "cluster_enrichment(..., background='cluster_union')  # or 'organism', or a locus_tag list"

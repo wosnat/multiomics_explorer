@@ -8,9 +8,14 @@ Per-(ontology x level) stats: term-size distribution, genome coverage,
 best-effort share (GO). Ranked by coverage x size_factor(median) with
 sweet-spot [5, 50] median genes-per-term; `relevance_rank` is the
 composite score (rank 1 = best). `ontology=None` surveys every key
-(GO BP/MF/CC + 9 others); BRITE rows break down per tree (scope with
-`tree=`). Pass `experiment_ids=` to weight by coverage of those
-experiments' quantified genes.
+(GO BP/MF/CC + 14 others); BRITE rows break down per tree (scope with
+`tree=`); InterPro rows break down per `interpro_type`. Pass
+`experiment_ids=` to weight by coverage of those experiments'
+quantified genes.
+
+[TRUST] `call_class` scopes MEROPS to a peptidase call so landscape
+sizes match `genes_by_ontology`/enrichment sets; `interpro_type`
+scopes InterPro to one entry type. See docs://analysis/annotation_evidence.
 
 Routing: pick an `(ontology, level)` row, then call
 `pathway_enrichment(ontology=..., level=...)` or
@@ -24,7 +29,7 @@ and BRITE-tree scoping conventions.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | organism | string | — | Organism (fuzzy match, e.g. 'MED4'). |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type') \| None | None | If None, surveys all ontologies. |
+| ontology | list[string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops')] \| None | None | If None, surveys all 17 ontologies. Accepts a list; a facet carried by only some of them drops the rest into skipped_ontologies. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | experiment_ids | list[string] \| None | None | Restrict coverage computation to genes quantified in these experiments. |
 | summary | bool | False | If true, omit per-row results (by_ontology only). |
@@ -34,6 +39,8 @@ and BRITE-tree scoping conventions.
 | min_gene_set_size | int | 5 | Exclude terms with fewer genes than this (default 5). |
 | max_gene_set_size | int | 500 | Exclude terms with more genes than this (default 500). |
 | informative_only | bool | True | When True (default), exclude terms flagged uninformative in KG (e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' go:0008150). Term-side filter only — never restricts the gene set. Pass False to opt out and survey the full term set (rebaselines may differ). |
+| call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; leaving unfiltered mixes in catalytically-dead homologs (nonpeptidase_homolog) - the envelope warns when it does. |
+| interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -64,6 +71,7 @@ organism_name, organism_gene_count, n_ontologies, by_ontology, not_found, not_ma
 | level | int | Hierarchy level; 0 = broadest |
 | tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
 | tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
+| interpro_type | string \| None (optional) | InterPro entry type this stratum covers (sparse: interpro only). |
 | relevance_rank | int | 1-indexed rank by spec_score; stable under pagination |
 | n_terms_with_genes | int |  |
 | n_genes_at_level | int |  |
@@ -134,7 +142,73 @@ ontology_landscape(organism="MED4")
  ]}
 ```
 
-### Example 5: Opt out of informative-only filtering (browse all terms, including catch-alls)
+### Example 5: Default survey now spans 17 ontologies (InterPro / NCBIfam / MEROPS added)
+
+```example-call
+ontology_landscape(organism="MED4")
+```
+
+```example-response
+{"organism_name": "Prochlorococcus MED4", "n_ontologies": 17,
+ "by_ontology": {
+   "interpro": {"best_level": 0, "best_genome_coverage": 0.71, "best_relevance_rank": 4, "n_levels": 3},
+   "ncbifam":  {"best_level": 0, "best_genome_coverage": 0.22, "best_relevance_rank": 14, "n_levels": 1},
+   "merops":   {"best_level": 0, "best_genome_coverage": 0.06, "best_relevance_rank": 15, "n_levels": 2}
+ },
+ "results": [{"ontology_type": "interpro", "level": 0, "best_interpro_type": "HOMOLOGOUS_SUPERFAMILY", "n_terms_with_genes": 74, "min_genes_per_term": 5, "max_genes_per_term": 119}]}
+```
+
+### Example 6: Restrict the fan-out to specific ontologies
+
+```example-call
+ontology_landscape(organism="MED4", ontology=["interpro", "merops"])
+```
+
+```example-response
+# `ontology` now accepts a str, a list, or None (all 17). Passing a
+# list restricts the fan-out to just those ontologies — useful when
+# you already know the trust-registered ontology you care about and
+# don't need the full 17-ontology scan.
+{"organism_name": "Prochlorococcus MED4", "n_ontologies": 2, "results": [
+  {"ontology_type": "interpro", "level": 0, "best_interpro_type": "HOMOLOGOUS_SUPERFAMILY", "n_terms_with_genes": 74},
+  {"ontology_type": "merops", "level": 0, "n_terms_with_genes": 10}
+]}
+```
+
+### Example 7: InterPro rows are broken down per interpro_type
+
+```example-call
+ontology_landscape(organism="MED4", ontology="interpro", verbose=True)
+```
+
+```example-response
+# Like BRITE's `tree`, InterPro rows carry a `best_interpro_type` /
+# per-type breakdown instead of one pooled row — HOMOLOGOUS_SUPERFAMILY,
+# DOMAIN, FAMILY, REPEAT, CONSERVED_SITE, ACTIVE_SITE, BINDING_SITE, PTM
+# size very differently (MED4 level 0: HOMOLOGOUS_SUPERFAMILY 74 testable
+# terms, DOMAIN 47, FAMILY 7, the rest ≤4).
+{"organism_name": "Prochlorococcus MED4", "results": [
+  {"ontology_type": "interpro", "level": 0, "interpro_type": "HOMOLOGOUS_SUPERFAMILY", "n_terms_with_genes": 74},
+  {"ontology_type": "interpro", "level": 0, "interpro_type": "DOMAIN", "n_terms_with_genes": 47},
+  {"ontology_type": "interpro", "level": 0, "interpro_type": "FAMILY", "n_terms_with_genes": 7}
+]}
+```
+
+### Example 8: MEROPS landscape scoped to peptidase calls (call_class filter)
+
+```example-call
+ontology_landscape(organism="MED4", ontology="merops", call_class=["peptidase"])
+```
+
+```example-response
+# call_class narrows landscape term-size stats to match the gene set
+# pathway_enrichment(ontology='merops', call_class=['peptidase']) would
+# actually test — without it, landscape term sizes include
+# nonpeptidase_homolog rows and overstate what enrichment will see.
+{"organism_name": "Prochlorococcus MED4", "results": [{"ontology_type": "merops", "level": 0, "n_terms_with_genes": 6}]}
+```
+
+### Example 9: Opt out of informative-only filtering (browse all terms, including catch-alls)
 
 ```example-call
 ontology_landscape(organism="MED4", informative_only=False)
@@ -155,7 +229,7 @@ ontology_landscape(organism="MED4", informative_only=False)
  ]}
 ```
 
-### Example 6: PSORTb + SignalP appear at level=0
+### Example 10: PSORTb + SignalP appear at level=0
 
 ```example-call
 ontology_landscape(organism="MED4")
@@ -173,7 +247,7 @@ ontology_landscape(organism="MED4")
 }
 ```
 
-### Example 7: Weight by experiments (coverage of quantified genes)
+### Example 11: Weight by experiments (coverage of quantified genes)
 
 ```
 Step 1: list_experiments(organism="MED4", table_scope=["all_detected_genes"])
@@ -192,6 +266,8 @@ Step 2: ontology_landscape(
 ```
 ontology_landscape -> genes_by_ontology(level=N) -> pathway_enrichment
 list_experiments -> ontology_landscape(experiment_ids=...)
+ontology_landscape(ontology='interpro', ...) -> pathway_enrichment(ontology='interpro', interpro_type=..., level=...) (interpro_type is required on interpro enrichment)
+ontology_landscape(ontology='merops', call_class=['peptidase']) -> genes_by_ontology(ontology='merops', call_class=['peptidase'], level=...) -> pathway_enrichment(ontology='merops', call_class=['peptidase'], ...)
 ```
 
 ## Common mistakes
@@ -216,7 +292,11 @@ results[0]['relevance_rank']
 
 - BRITE stats at each level mix all trees together by default. Use `tree` to scope to a single BRITE tree (e.g. `tree='transporters'`). BRITE rows are broken down per tree when `tree` is specified. Use `list_filter_values('brite_tree')` to discover available trees.
 
-- Default surveys all 12 ontologies (`go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`).
+- Default surveys all 17 ontologies (`go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`). Pass `ontology=[...]` (str or list) to restrict the fan-out.
+
+- `call_class` (merops-only) and `interpro_type` (interpro-only; scopes to one InterPro type instead of the per-type breakdown) narrow landscape term-size stats the same way they narrow `genes_by_ontology` / enrichment gene sets — pass them here first to check what a trust-filtered enrichment run will actually test.
+
+- InterPro rows break down by `interpro_type` the same way BRITE rows break down by `tree` — without a specific `interpro_type`, `results` mixes all 8 InterPro types (HOMOLOGOUS_SUPERFAMILY, DOMAIN, FAMILY, REPEAT, CONSERVED_SITE, ACTIVE_SITE, BINDING_SITE, PTM), each carrying `best_interpro_type` per row.
 
 - CAZy is a small ontology (64 nodes — 6 classes + 58 families). With default `min_gene_set_size=5`, only a handful of CAZy terms ever pass the filter — typically 1–2 rows per organism. This is expected, not a bug. Pass `min_gene_set_size=1` to see all CAZy classes/families.
 

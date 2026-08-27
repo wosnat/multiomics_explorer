@@ -51,6 +51,59 @@ examples:
   - title: TCDB family annotations for a gene
     call: gene_ontology_terms(locus_tags=["PMM1129"], organism="MED4", ontology="tcdb")
 
+  - title: Multiple ontologies in one call (ontology now accepts a list)
+    call: gene_ontology_terms(locus_tags=["PMM0392"], organism="MED4", ontology=["tcdb", "merops"])
+    response: |
+      # `ontology` accepts a single str, a list, or None (all ontologies).
+      # PMM0392 has tcdb edges but no merops edges — merops contributes
+      # nothing to `results` and nothing to `by_ontology`; no error, no
+      # skipped_ontologies entry (skip/raise only applies to *filters*
+      # unsupported on one of the requested ontologies, not to empty hits).
+      {"total_matching": 8, "by_ontology": [{"ontology_type": "tcdb", "term_count": 8, "gene_count": 1}],
+       "results": [{"locus_tag": "PMM0392", "term_id": "tcdb:3.A.1.28", "term_name": "...", "evidence": "homology"}]}
+
+  - title: TCDB leaf mode — most-specific attachment only (default)
+    call: gene_ontology_terms(locus_tags=["PMM0392"], organism="MED4", ontology=["tcdb"], mode="leaf")
+    response: |
+      # Default mode='leaf' on tcdb applies `attachment_depth='most_specific'`
+      # under the hood — PMM0392's 8 raw edges collapse to the gene's deepest
+      # attachment(s) only. Genome-wide MED4: 670 raw tcdb edges → 597 rows
+      # under this predicate (73 rows are superseded — a less-specific
+      # ancestor attachment made redundant by a deeper one on the same gene).
+      {"total_matching": 1, "results": [{"locus_tag": "PMM0392", "term_id": "tcdb:3.A.1.28", "term_name": "...", "attachment_depth": "most_specific", "evidence": "homology"}]}
+
+  - title: TCDB leaf mode with include_superseded — see the collapsed rows too
+    call: gene_ontology_terms(locus_tags=["PMM0392"], organism="MED4", ontology=["tcdb"], mode="leaf", include_superseded=True)
+    response: |
+      # include_superseded=True adds back the rows most_specific mode drops —
+      # each labelled attachment_depth='superseded'. 'Superseded' means less
+      # specific, not wrong: it is a real annotation, just not the gene's
+      # deepest call for that lineage.
+      {"total_matching": 2, "results": [
+        {"locus_tag": "PMM0392", "term_id": "tcdb:3.A.1.28", "term_name": "...", "attachment_depth": "most_specific", "evidence": "homology"},
+        {"locus_tag": "PMM0392", "term_id": "tcdb:3.A.1", "term_name": "ATP-binding Cassette (ABC) Superfamily", "attachment_depth": "superseded", "evidence": "homology"}
+      ]}
+
+  - title: MEROPS leaf annotations with call_class and confidence
+    call: gene_ontology_terms(locus_tags=["MIT1002_03660"], organism="MIT1002", ontology=["merops"], verbose=True)
+    response: |
+      {"total_matching": 1, "results": [
+        {"locus_tag": "MIT1002_03660", "term_id": "merops.family:S14", "term_name": "...", "evidence": "curated", "call_class": "peptidase",
+         "sources": ["merops"], "evidence_score": 1.0, "tier": 1, "confidence_score": 1.0}
+      ]}
+
+  - title: Filter by evidence + max_tier (skip/raise matrix — multi-ontology)
+    call: gene_ontology_terms(locus_tags=["PMM0392"], organism="MED4", ontology=["tcdb", "kegg"], max_tier=2)
+    response: |
+      # max_tier is a tcdb/merops-only axis. Carried by some of the
+      # requested ontologies (tcdb) but not all (kegg has no tier axis) →
+      # apply to tcdb, drop kegg into `skipped_ontologies` with a warning.
+      # Requesting max_tier with ontology=['kegg'] alone (no ontology in the
+      # set supports it) raises ValueError instead.
+      {"skipped_ontologies": [{"ontology": "kegg", "reason": "max_tier is not a trust axis of ontology='kegg'"}],
+       "warnings": ["ontology 'kegg' dropped from this call: max_tier does not apply to it"],
+       "results": [{"locus_tag": "PMM0392", "term_id": "tcdb:3.A.1.28", "term_name": "...", "tier": 2}]}
+
   - title: Filter out uninformative terms (e.g. catch-all KEGG modules)
     call: gene_ontology_terms(locus_tags=["PMM0001"], organism="Prochlorococcus MED4", ontology="kegg", informative_only=True)
     response: |
@@ -99,11 +152,32 @@ examples:
 
 verbose_fields:
   - organism_name
+  - sources
+  - evidence_score
+  - tier
+  - confidence_score
+  - source_agreement
+  - pfam_support
+  - go_support
+  - identity
+  - qcov
+  - evalue
+  - consensus_n
+  - best_hit_kind
+  - best_hit_id
+  - libraries
+  - evalue_library
+  - match_count
+  - start
+  - end
+  - bit_score
 
 chaining:
   - "gene_overview → gene_ontology_terms (check annotation_types first)"
   - "gene_ontology_terms → genes_by_ontology (reverse: term → other genes)"
   - "resolve_gene → gene_ontology_terms"
+  - "gene_ontology_terms(ontology=['merops'], call_class=['peptidase']) → gene_overview to cross-check merops_classes / merops_evidence_score_max"
+  - "See docs://analysis/annotation_evidence for the full trust-axis reference and rank-vs-filter guidance."
 
 mistakes:
   - "organism is required — single-valued. Locus tags must belong to the specified organism."
@@ -113,7 +187,11 @@ mistakes:
   - "to check if a gene is connected to a broad term (e.g. 'DNA repair'), use genes_by_ontology(term_ids=[...], ontology=..., organism=...) which expands down the hierarchy — gene_ontology_terms only returns the leaf annotations"
   - "For brite: leaf annotations are KO-level terms (same leaf as kegg). Use ontology='brite' to filter; the returned term_ids are KO IDs shared with the kegg ontology."
   - "Use `tree` to scope BRITE rollup to a single tree (e.g. 'transporters'). Without it, rollup mixes all BRITE trees."
-  - "Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `kegg`, `ec`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`."
+  - "Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `kegg`, `ec`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`."
+  - "`ontology` is now `str | list[str] | None` (was single-value only). With a list: a filter carried by all requested ontologies applies normally; carried by some but not all applies to those and drops the rest into `skipped_ontologies` with a warning; carried by none raises `ValueError`. An unknown ontology name always raises."
+  - "`include_superseded=False` (default) applies TCDB's `attachment_depth='most_specific'` predicate in leaf mode — ancestor rows made redundant by a deeper attachment on the same gene are dropped. `include_superseded=True` adds them back labelled `attachment_depth='superseded'`; superseded means less specific, not incorrect."
+  - "Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`) mirror `genes_by_ontology` exactly — same defaults (`None`, never filter), same per-ontology axis gating, same `ValueError` on an unsupported axis. See `docs://analysis/annotation_evidence` for the per-ontology axis table."
+  - "Compact rows carry `evidence` on the 14 functional-edge ontologies (null on PSORTb/SignalP); `interpro_type` (interpro rows) and `call_class` (merops rows) are compact always. `sources`, `evidence_score`, `tier`, and native detail (`confidence_score`, `libraries`, `evalue`, ...) are verbose-only."
   - "CAZy rollup at `level=0` returns the 6 top-level classes (GH, GT, PL, CE, AA, CBM). Genes commonly belong to multiple top-level classes (e.g. a CBM-domain-containing GH); duplicates per `(gene × class)` are de-duped automatically."
   - "TCDB substrate-level questions ('which genes does this metabolite bind to?') chain via `genes_by_metabolite`, NOT this tool. Use `gene_ontology_terms(ontology='tcdb')` for *family*-level annotations (e.g. 'what TCDB family does PMM1129 belong to?')."
   - "Reverse-lookup of `genes_by_ontology` — same ontology surface, gene-anchored. For enrichment workflows the forward direction (`genes_by_ontology` → TERM2GENE → `pathway_enrichment` / `cluster_enrichment`) is canonical; see `docs://analysis/enrichment`."

@@ -4,7 +4,9 @@
 
 Batch gene routing: identity (gene_name, product, gene_category) plus per-gene data-availability signals (annotation_types, expression counts, ortholog/cluster summaries, DM rollups, chemistry rollups).
 
-Routing: drill into each axis when the per-gene signal is non-zero — `gene_ontology_terms` (annotation_types non-empty), `gene_homologs` (closest_ortholog_group_size > 0), `gene_clusters_by_gene` (cluster_membership_count > 0), `differential_expression_by_gene` / `gene_response_profile` (expression_edge_count > 0), `gene_derived_metrics` and `genes_by_{numeric,boolean,categorical}_metric` keyed off `derived_metric_value_kinds`, `metabolites_by_gene` / `genes_by_metabolite` (evidence_sources non-empty). Use `gene_details` for the full Gene-node property dump.
+[TRUST] `merops_classes` / `ncbifam_family_count` / `merops_evidence_score_max` are the protease / family-domain routing columns. See docs://analysis/annotation_evidence.
+
+Routing: drill into each axis when the per-gene signal is non-zero — `gene_ontology_terms` (annotation_types non-empty), `gene_homologs` (closest_ortholog_group_size > 0), `gene_clusters_by_gene` (cluster_membership_count > 0), `differential_expression_by_gene` / `gene_response_profile` (expression_edge_count > 0), `gene_derived_metrics` and `genes_by_{numeric,boolean,categorical}_metric` keyed off `derived_metric_value_kinds`, `metabolites_by_gene` / `genes_by_metabolite` (evidence_sources non-empty), `gene_ontology_terms(ontology='merops')` (merops_classes non-empty). Use `gene_details` for the full Gene-node property dump.
 
 ## Parameters
 
@@ -21,7 +23,7 @@ Routing: drill into each axis when the per-gene signal is non-zero — `gene_ont
 ### Envelope
 
 ```expected-keys
-total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, has_chemistry, has_discussed, top_discussing_publications, returned, offset, truncated, not_found, results
+total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, has_chemistry, has_discussed, top_discussing_publications, has_ncbifam, by_merops_class, returned, offset, truncated, not_found, results
 ```
 
 - **total_matching** (int): Genes found in KG from input locus_tags.
@@ -37,6 +39,8 @@ total_matching, by_organism, by_category, by_annotation_type, by_annotation_stat
 - **has_chemistry** (int): Count of requested locus_tags with non-empty evidence_sources (participate in at least one reaction-to-metabolite or transport path).
 - **has_discussed** (int): Count of requested locus_tags discussed in prose by at least one publication (discussed_in_publication_count > 0).
 - **top_discussing_publications** (list[OverviewDiscussingPublication]): Publications ranked by how many of the queried genes they discuss (batch set-coverage — recovers 'which one paper covers most of my gene set'). Feed a doi into discussed_by_publication for that paper's full discussed set.
+- **has_ncbifam** (int): Count of requested locus_tags with at least one NCBIfam family annotation (ncbifam_family_count > 0).
+- **by_merops_class** (list[OverviewMeropsClassBreakdown]): Rollup of merops_classes over the result set, sorted desc by count.
 - **returned** (int): Results in this response (0 when summary=true).
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if total_matching > returned.
@@ -70,6 +74,9 @@ total_matching, by_organism, by_category, by_annotation_type, by_annotation_stat
 | transported_metabolite_count | int (optional) | Distinct metabolites this gene transports via its deepest TCDB attachments (precomputed Gene.transported_metabolite_count). Pairs with catalyzed_metabolite_count. When > 0, drill via metabolites_by_gene(locus_tags=[...]). |
 | transport_substrate_resolution | string \| None (optional) | 'resolved' = at least one non-lumping deepest TCDB attachment (not all); 'family_inferred' = transported_metabolite_count is reachability, not capability. None = no TCDB call. Read the score; if resolved, drill into substrates. |
 | evidence_sources | list[string] (optional) | Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. When non-empty, drill into metabolites_by_gene(locus_tags=[...]). Per-source definitions: see docs://guide/concepts. |
+| merops_classes | list[string] (optional) | Distinct MEROPS call_class values across this gene's MEROPS calls (e.g. ['peptidase']). Empty when no MEROPS annotation. Drill via gene_ontology_terms(ontology='merops'). |
+| ncbifam_family_count | int (optional) | Distinct NCBIfam family annotations on this gene. When > 0, drill via gene_ontology_terms(ontology='ncbifam'). |
+| merops_evidence_score_max | float \| None (optional) | Max MEROPS evidence_score over this gene's calls, in [0,1]. Twin of tcdb_evidence_score_max — uncoalesced: None = no MEROPS call at all, 0 = an uncorroborated one. Rank with it, don't filter. |
 | discussed_in_publication_count | int (optional) | Distinct publications that discuss this gene in prose (precomputed Gene.discussed_in_publication_count). Recall-biased narrative mention, NOT DE-table expression. When > 0, set verbose=True for the per-paper DOI list, or call discussed_by_publication for a paper's full discussed set. |
 | numeric_metric_count | int \| None (optional) | Numeric DM count (verbose-only). |
 | boolean_metric_count | int \| None (optional) | Boolean DM count (verbose-only). |
@@ -171,7 +178,27 @@ gene_overview(locus_tags=["PMM0392", "PMM0001"])
  ]}
 ```
 
-### Example 7: Genes named in the literature — which paper discusses them
+### Example 7: MEROPS peptidase + NCBIfam rollups on a gene
+
+```example-call
+gene_overview(locus_tags=["MIT1002_03660"])
+```
+
+```example-response
+# merops_classes defaults to [] (list, not a single value — a gene can
+# have both a peptidase call and a nonpeptidase_homolog call on
+# different MEROPS families). ncbifam_family_count defaults to 0.
+# merops_evidence_score_max is sparse and uncoalesced (null = no
+# MEROPS call at all) — same rank-don't-filter contract as
+# tcdb_evidence_score_max: read it to rank candidate genes, never as
+# a pass/fail cutoff.
+{"total_matching": 1, "by_merops_class": [{"merops_class": "peptidase", "count": 1}], "has_ncbifam": 0, "returned": 1, "truncated": false, "offset": 0, "not_found": [],
+ "results": [
+   {"locus_tag": "MIT1002_03660", "gene_name": null, "product": "Clp protease", "organism_name": "Alteromonas macleodii MIT1002", "merops_classes": ["peptidase"], "ncbifam_family_count": 0, "merops_evidence_score_max": 1.0}
+ ]}
+```
+
+### Example 8: Genes named in the literature — which paper discusses them
 
 ```example-call
 gene_overview(locus_tags=["PMT2118", "PMT_1030"])
@@ -207,6 +234,8 @@ gene_overview(verbose=True) → see compartments_observed for vesicle/whole-cell
 gene_overview (per-row `evidence_sources` non-empty) → metabolites_by_gene OR genes_by_metabolite for chemistry drill-down.
 gene_overview (per-row `transport_substrate_resolution='resolved'`, after reading `tcdb_evidence_score_max`) → metabolites_by_gene(locus_tags=[...], organism=..., evidence_sources=['transport']) — distinct metabolites in the rows equal `transported_metabolite_count`.
 gene_overview (per-row `discussed_in_publication_count` > 0) → use verbose=True for the per-gene {doi, prominence, evidence} list, or discussed_by_publication(publication_dois=[...]) for the paper's full discussed set.
+gene_overview (per-row `merops_classes` non-empty) → gene_ontology_terms(locus_tags=[...], ontology=['merops'], verbose=True) for the confidence_score / pfam_support detail behind the call, or genes_by_ontology(ontology='merops', call_class=['peptidase']) to find peers.
+`merops_classes` is a list (`[]` default) because a gene can carry both a `peptidase` and a `nonpeptidase_homolog` MEROPS call on different families — don't assume at most one value. `merops_evidence_score_max` is sparse and uncoalesced (null = no MEROPS call at all, the twin contract of `tcdb_evidence_score_max`) — rank by it, never filter by it.
 ```
 
 ## Common mistakes
@@ -239,7 +268,7 @@ gene_overview(locus_tags=['PMM0845'])  # verbose only needed for gene_summary te
 from multiomics_explorer import gene_overview
 
 result = gene_overview(locus_tags=...)
-# returns dict with keys: total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, has_chemistry, has_discussed, top_discussing_publications, offset, not_found, results
+# returns dict with keys: total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, has_chemistry, has_discussed, top_discussing_publications, has_ncbifam, by_merops_class, offset, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

@@ -32,6 +32,32 @@ examples:
   - title: "Hand-curated DAG-ontology panel via search_ontology + term_ids"
     call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="go_bp", term_ids=["go:0071941", "go:0071705"])
 
+  - title: "InterPro enrichment scoped to one type"
+    call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="interpro", interpro_type="HOMOLOGOUS_SUPERFAMILY", level=0)
+
+  - title: "MEROPS enrichment restricted to peptidase calls (call_class)"
+    call: pathway_enrichment(organism="MIT1002", experiment_ids=["10.1128/msystems.01261-22_phosphorus_stress_mit9301_metabolomics"], ontology="merops", call_class=["peptidase"], level=0)
+    response: |
+      # call_class shapes the TERM2GENE mapping and the background identically
+      # (both go through the same gene->leaf MATCH), so foreground and
+      # background stay apples-to-apples. Omitting call_class tests
+      # nonpeptidase_homolog rows alongside real peptidases, inflating clan
+      # term sizes with catalytically-dead hits.
+      {"trust_axes": {"merops": ["sources", "evidence", "evidence_score", "tier", "call_class"]}, "filters_applied": {"call_class": ["peptidase"]}, "...": "..."}
+
+  - title: "Trust-filtered TCDB enrichment (sources + evidence + min_evidence_score)"
+    call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="tcdb", level=2, evidence=["homology"], min_evidence_score=0.6)
+    response: |
+      # Trust filters bind at the gene->leaf match, before the hierarchy
+      # rollup and before the Fisher test — foreground and background are
+      # filtered identically (background_filtered echoes this). MED4 tcdb:
+      # evidence=['homology'] AND evidence_score>=0.6 narrows the raw 670
+      # gene x term edges to 98 before rollup. Unlike genes_by_ontology,
+      # this envelope does NOT carry evidence_score_signals — read that
+      # from a genes_by_ontology call with the same filters if you need
+      # the signal breakdown behind the 0.6 threshold.
+      {"background_filtered": true, "trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]}, "...": "..."}
+
 verbose_fields:
   - foreground_gene_ids
   - background_gene_ids
@@ -75,6 +101,8 @@ chaining:
   - "differential_expression_by_gene → pathway_enrichment"
   - "pathway_enrichment(ontology='kegg', ...) → list_metabolites(pathway_ids=[<enriched_pathway_id>]) — inspect the chemistry of an enriched KEGG pathway (compound-anchored membership, distinct from the gene-KO membership the enrichment used). See docs://analysis/metabolites for the pathway-anchor disambiguation."
   - "See `docs://analysis/enrichment` for the full methodology and the `informative_only` filter semantics."
+  - "ontology_landscape(ontology='interpro') → pathway_enrichment(ontology='interpro', interpro_type=..., level=...) — pick the InterPro type before enrichment; the param is required."
+  - "See `docs://analysis/annotation_evidence` for the trust-axis registry (which filters apply to which ontology) and rank-vs-filter guidance for evidence_score."
 
 mistakes:
   - "[ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions."
@@ -88,6 +116,11 @@ mistakes:
   - "For brite enrichment, use `tree` to scope to a single BRITE tree (e.g. `tree='transporters'`). Without `tree`, all-BRITE enrichment is dominated by enzymes (~1,776 terms at level 3). Pick a specific level: `level=1` (BRITE category) or `level=2` (BRITE sub-category) are the most useful. Use `list_filter_values('brite_tree')` to discover trees → `ontology_landscape(ontology='brite', tree=...)` to pick level → `pathway_enrichment(ontology='brite', tree=..., level=...)` for enrichment."
   - wrong: "pathway_enrichment(..., background='genome')  # not a valid string"
     right: "pathway_enrichment(..., background='organism')  # or 'table_scope' (default), or a locus_tag list"
+  - wrong: "pathway_enrichment(..., ontology='interpro', level=0)  # missing interpro_type — raises"
+    right: "pathway_enrichment(..., ontology='interpro', interpro_type='HOMOLOGOUS_SUPERFAMILY', level=0)"
   - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"
   - "For DAG ontologies (`go_*`), `level=N`-only enrichment silently drops biologically-meaningful terms at heterogeneous depths. For narrow research questions, hand-curate a `term_ids` panel via `search_ontology(ontology='go_bp', search_text=...)` and pass it directly. Use `level` only when surveying a whole branch."
+  - "`ontology='interpro'` requires `interpro_type` — one of `FAMILY`, `DOMAIN`, `HOMOLOGOUS_SUPERFAMILY`, `REPEAT`, `CONSERVED_SITE`, `ACTIVE_SITE`, `BINDING_SITE`, `PTM`. Omitting it raises. Check sizing per type via `ontology_landscape(organism=..., ontology='interpro')` first."
+  - "Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`) shape the TERM2GENE mapping fed to Fisher, not the row output — they change which (gene × term) pairs are tested, applied identically to foreground and background. Defaults are `None` and never filter. `min_evidence_score` is the only numeric cutoff; there is no filter on native scalars (`evalue`, `bit_score`, `confidence_score`, ...). See `docs://analysis/annotation_evidence`."
+  - "MEROPS `call_class=['peptidase']` excludes `nonpeptidase_homolog` rows (catalytically-dead homologs) from both the tested gene set and the pathway definitions — run it whenever the enrichment question is about peptidase activity, not sequence homology to a peptidase family."
   - "When a KEGG pathway is significantly enriched, drill into its chemistry via `list_metabolites(pathway_ids=[<term_id>])`. This answers 'what compounds does the enriched pathway involve?' — a different anchor than the gene-KO membership the enrichment is built on. The same KEGG pathway map (e.g. `kegg.pathway:ko00910` Nitrogen metabolism) reaches the same map from compound-membership vs gene-KO-membership; a gene whose KO is in pathway X may not catalyse any reaction whose metabolites are in pathway X (and vice versa). See docs://analysis/metabolites."

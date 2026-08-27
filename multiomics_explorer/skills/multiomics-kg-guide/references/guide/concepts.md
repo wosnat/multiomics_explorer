@@ -185,13 +185,13 @@ and `list_organisms`. Discover valid values with
   dominate by volume — see the trust ladder in
   `docs://analysis/metabolites`.
 
-### Ontology nodes (14 ontologies)
+### Ontology nodes (17 ontologies)
 
 All ontology nodes share a `level: int` property
 (0 = root / broadest, higher = more specific) and most carry
 `level_kind` and a sparse `level_is_best_effort` flag for DAG-shaped
 ontologies. The two structural ontologies at the bottom (PSORTb,
-SignalP) are flat — `level=0` only, no `level_kind`. The fourteen
+SignalP) are flat — `level=0` only, no `level_kind`. The seventeen
 supported ontologies:
 
 | Ontology | Node label | Notes |
@@ -208,11 +208,25 @@ supported ontologies:
 | CAZy | `CazyFamily` | Carbohydrate-active enzymes |
 | PSORTb subcellular localization | `SubcellularLocalization` | Flat, 5 nodes (Cytoplasmic, CytoplasmicMembrane, OuterMembrane, Periplasmic, Extracellular). Scored edge: `localization_score: float` ∈[7.5, 10.0]. 1:1 (≤1 edge per gene). **Structural** — where the protein lives, not what it does. |
 | SignalP signal-peptide type | `SignalPeptideType` | Flat, 5 nodes (SP, LIPO, TAT, TATLIPO, PILIN). Scored edge: `probability: float` ∈[0, 1], plus optional `cleavage_site: int` / `cleavage_probability: float`. 1:1. **Structural** — how the protein is handled at the membrane. |
+| InterPro | `InterproEntry` | Hierarchical (`Interpro_entry_is_a_interpro_entry`); each term carries `interpro_type` — one of `FAMILY`, `DOMAIN`, `HOMOLOGOUS_SUPERFAMILY`, `REPEAT`, `CONSERVED_SITE`, `ACTIVE_SITE`, `BINDING_SITE`, `PTM`. Forward-only bridges to EC and CAZy (a recall-biased function router, not a functional call). |
+| NCBIfam | `NcbifamFamily` | Flat. Term-side `family_type` and `gene_symbol`. Bridges to InterPro (membership). |
+| MEROPS | `MeropsFamily` | Hierarchical (`Merops_family_is_a_merops_family`); families roll up into clans. Edge-level `call_class` (`peptidase` / `inhibitor` / `nonpeptidase_homolog`) distinguishes an active peptidase call, a peptidase-inhibitor family, and a catalytically-dead homolog. Bridges to Pfam (composition). |
+
+Fourteen of the seventeen carry a gene-edge **annotation-trust surface** —
+`sources[]`, an `evidence` ladder (`curated > signature > homology >
+family_inferred > domain_inferred`), and (on a subset) `evidence_score` /
+`tier` — plus ontology-specific native detail (TCDB's `confidence_score` /
+`attachment_depth`, MEROPS's `call_class`, InterPro's `libraries`, and so
+on). PSORTb and SignalP carry no trust axes (their `localization_score` /
+`signal_peptide_probability` are native detail only). See
+`docs://analysis/annotation_evidence` for the per-ontology trust profile and
+`docs://guide/conventions` for the compact/verbose placement rule.
 
 Two reverse-mode ontology tools — `genes_by_ontology` (term → genes) and
-`gene_ontology_terms` (genes → terms) — operate on all 14 uniformly
-(with hierarchy expansion where applicable; PSORTb / SignalP are flat
-so there's nothing to expand). For methodology see `docs://analysis/enrichment`.
+`gene_ontology_terms` (genes → terms) — operate on all 17 uniformly
+(with hierarchy expansion where applicable; PSORTb / SignalP / NCBIfam are
+flat so there's nothing to expand). For methodology see
+`docs://analysis/enrichment`.
 
 PSORTb and SignalP are deliberately **NOT** folded into
 `Gene.annotation_types` / `informative_annotation_types` /

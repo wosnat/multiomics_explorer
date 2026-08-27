@@ -10,6 +10,12 @@ of all clustered genes — differs from `pathway_enrichment`'s
 also accepted. Background drives the Fisher denominator and matters
 more than the ontology choice.
 
+[TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
+`call_class` filter TERM2GENE at the same match stage as the
+background, so tested sets and background move together;
+`interpro_type` is required when `ontology='interpro'`. See
+docs://analysis/annotation_evidence.
+
 Routing: pre-flight via `list_clustering_analyses` for `analysis_id`
 and `ontology_landscape` for `(ontology, level)`; drill enriched terms
 via `gene_overview`, `genes_in_cluster`, or for KEGG
@@ -24,7 +30,7 @@ runnable code (custom term2gene path covers cluster-membership ORA).
 |---|---|---|---|
 | analysis_id | string | — | Clustering analysis ID. Get from list_clustering_analyses. |
 | organism | string | — | Organism (case-insensitive fuzzy match). Single-organism enforced. |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type') | — | Ontology for pathway definitions. Run ontology_landscape first. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') | — | Ontology for pathway definitions. Run ontology_landscape first. |
 | tree | string \| None | None | BRITE tree name filter. Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | level | int \| None | None | Hierarchy level (0 = root). At least one of `level` or `term_ids` required. See docs://guide/conventions. |
 | term_ids | list[string] \| None | None | Specific term IDs to test. |
@@ -38,6 +44,12 @@ runnable code (custom term2gene path covers cluster-membership ORA).
 | limit | int | 5 | Max rows returned. |
 | offset | int | 0 | Skip N rows before limit. |
 | informative_only | bool | True | When True (default), exclude ontology terms flagged uninformative in the KG (e.g. KEGG map00001 'metabolic pathways', GO root go:0008150). Term-side filter — never restricts the gene set, background, or DE inputs. Pass False to include uninformative terms; per-row is_informative still surfaces in either mode. [ENR] Default flipped to True in 2026-05 KG release; see docs://guide/conventions. |
+| sources | list[string] \| None | None | Keep rows whose edge sources[] contains any of these values (e.g. ['eggnog']). Valid on the 14 functional-edge ontologies (not PSORTb / SignalP). Default None never filters. See list_filter_values(filter_type='sources'). |
+| evidence | list[string] \| None | None | Keep rows whose compact evidence ladder value is in this list (curated > signature > homology > family_inferred > domain_inferred). Valid on the 14 functional-edge ontologies. Default None never filters. |
+| max_tier | int \| None | None | Keep rows with edge tier <= this value OR tier IS NULL (diamond truncation depth, 1-3; tier-null edges are always kept - see by_tier's null bucket). Valid on tcdb, merops only. |
+| min_evidence_score | float \| None | None | Keep rows with edge evidence_score >= this cutoff (composite trust score, 0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, tcdb, merops. Envelope adds evidence_score_signals when set. |
+| call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; leaving unfiltered mixes in catalytically-dead homologs (nonpeptidase_homolog) - the envelope warns when it does. |
+| interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -46,7 +58,7 @@ runnable code (custom term2gene path covers cluster-membership ORA).
 ### Envelope
 
 ```expected-keys
-analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_type, treatment_type, background_factors, growth_phases, experiment_ids, ontology, level, tree, total_matching, returned, truncated, offset, n_significant, by_cluster, by_term, clusters_tested, not_found, not_matched, clusters_skipped, term_validation, enrichment_params, results
+analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_type, treatment_type, background_factors, growth_phases, experiment_ids, ontology, level, tree, total_matching, returned, truncated, offset, n_significant, by_cluster, by_term, clusters_tested, not_found, not_matched, clusters_skipped, term_validation, enrichment_params, filters_applied, trust_axes, background_filtered, interpro_type, results
 ```
 
 - **analysis_id** (string | None): Clustering analysis ID
@@ -75,6 +87,10 @@ analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_t
 - **clusters_skipped** (list[ClusterEnrichmentClusterSkipped]): Clusters filtered out or producing no rows
 - **term_validation** (PathwayEnrichmentTermValidation): Namespaced passthrough of term_id validation from genes_by_ontology
 - **enrichment_params** (object | None): ORA parameters used for this call. See docs://analysis/enrichment.
+- **filters_applied** (object): Echo of the trust filters actually set on this call. See docs://analysis/annotation_evidence.
+- **trust_axes** (object): Trust axes the chosen ontology carries, e.g. {'tcdb': ['sources','evidence','evidence_score','tier']}.
+- **background_filtered** (bool | None): Whether/how many background genes were narrowed by the same trust filters that shaped TERM2GENE.
+- **interpro_type** (string | None): Echo of the interpro_type stratum used (sparse: only when ontology='interpro').
 
 ### Per-result fields
 
@@ -146,7 +162,25 @@ cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_di
 cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="cyanorak_role", level=1, background="organism")
 ```
 
-### Example 5: From landscape to cluster enrichment
+### Example 5: InterPro enrichment requires interpro_type
+
+```example-call
+cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="interpro", interpro_type="HOMOLOGOUS_SUPERFAMILY", level=0)
+```
+
+```example-response
+# Same requirement as pathway_enrichment: ontology='interpro' without
+# interpro_type raises (InterPro types size too differently to pool).
+{"trust_axes": {"interpro": ["sources", "evidence"]}, "interpro_type": "HOMOLOGOUS_SUPERFAMILY", "...": "..."}
+```
+
+### Example 6: MEROPS enrichment restricted to peptidase calls (call_class)
+
+```example-call
+cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="merops", call_class=["peptidase"], level=0)
+```
+
+### Example 7: From landscape to cluster enrichment
 
 ```
 Step 1: list_clustering_analyses(organism="MED4")
@@ -168,6 +202,7 @@ cluster_enrichment → gene_overview
 cluster_enrichment → genes_in_cluster
 cluster_enrichment(ontology='kegg', ...) → list_metabolites(pathway_ids=[<enriched_pathway_id>]) — inspect the chemistry of an enriched KEGG pathway (compound-anchored membership, distinct from the gene-KO membership the enrichment used). See docs://analysis/metabolites for the pathway-anchor disambiguation.
 See `docs://analysis/enrichment` for the full methodology and the `informative_only` filter semantics.
+See `docs://analysis/annotation_evidence` for the trust-axis registry and rank-vs-filter guidance for evidence_score.
 ```
 
 ## Common mistakes
@@ -189,6 +224,8 @@ See `docs://analysis/enrichment` for the full methodology and the `informative_o
 - For BRITE, scope to a specific tree with `tree=`. Use `list_filter_values('brite_tree')` to discover trees.
 
 - When a KEGG pathway is significantly enriched in a cluster, drill into its chemistry via `list_metabolites(pathway_ids=[<term_id>])`. The cluster's gene-KO membership and the pathway's compound-membership reach the same KEGG map via different relations — name the anchor when answering. See docs://analysis/metabolites.
+
+- `ontology='interpro'` requires `interpro_type` (one of the 8 InterPro types) — omitting it raises. Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`) shape the per-cluster TERM2GENE mapping identically to `pathway_enrichment`; defaults never filter. See `docs://analysis/annotation_evidence`.
 
 ```mistake
 cluster_enrichment(..., background='table_scope')  # not valid

@@ -440,9 +440,55 @@ The choice of background matters more than the choice of ontology.
 
 ---
 
+## Annotation-trust surface (ontology tools)
+
+Every gene→term edge across the 14 functional-edge ontologies (all but
+PSORTb / SignalP) carries a **compact trust column**: `evidence`, a
+five-rung ladder `curated > signature > homology > family_inferred >
+domain_inferred`. `sources[]`, `evidence_score` (a `[0, 1]` composite, only
+on TCDB / MEROPS / GO×3 / EC / Pfam / CAZy), and `tier` (TCDB / MEROPS only)
+are verbose. Ontology-specific native scalars — TCDB's `confidence_score` /
+`attachment_depth`, MEROPS's `pfam_support` / `best_hit_kind`, InterPro's
+`libraries` / `evalue`, NCBIfam's `bit_score` — are verbose-only, under
+their own names, and **never filterable**: their scale and direction differ
+across ontologies (lower e-value is better, higher bit score is better), so
+no cross-ontology threshold is safe.
+
+**Strip rule.** A row only carries the trust columns its ontology owns —
+`tier` never appears on a `kegg` row (KEGG has no tier axis); `interpro_type`
+never appears on a `tcdb` row. Owned-but-null columns stay (a TCDB edge with
+only eggNOG support carries `tier: null`, not an absent field).
+
+**Filters** — `sources=`, `evidence=`, `max_tier=`, `min_evidence_score=`,
+`call_class=` (MEROPS-only), `interpro_type=` (InterPro-only) — default to
+`None` and never narrow a result unless set. `min_evidence_score` is the
+only numeric cutoff anywhere in the surface; setting it adds
+`evidence_score_signals` to the envelope (the `ControlledVocabulary`-backed
+composite inputs behind the score). Passing an axis an ontology doesn't
+carry raises `ValueError` naming that ontology's supported axes — check
+first via `list_filter_values(filter_type='trust_axes', ontology=...)`.
+
+**Multi-ontology filter scoping** (`gene_ontology_terms`, `ontology_landscape`):
+a trust filter carried by every requested ontology applies normally; carried
+by some but not all applies to those and drops the rest into
+`skipped_ontologies` with a warning; carried by none raises.
+
+**Vocab-vs-pivot.** Filterable trust values (`evidence`, `sources`,
+`call_class`, `interpro_type`, and the other categorical `filter_type`s on
+`list_filter_values`) are read from the KG's `ControlledVocabulary` nodes,
+never hard-coded. If a `ControlledVocabulary` node is missing for some edge
+type, a live pivot query derives the value set instead, flagged
+`source: "pivot"` plus a warning — same values, just not pre-registered.
+
+Full per-ontology trust profile, the rank-vs-filter rule, MEROPS
+`call_class` semantics, and why InterPro enrichment requires `interpro_type`:
+`docs://analysis/annotation_evidence`.
+
+---
+
 ## Hierarchy `level` convention (ontology tools)
 
-For all 14 supported ontologies, `level: int` follows the same convention:
+For all 17 supported ontologies, `level: int` follows the same convention:
 
 - **`level=0`** = root (broadest term).
 - Higher integers = more specific.
@@ -451,8 +497,13 @@ For all 14 supported ontologies, `level: int` follows the same convention:
 - DAG-shaped ontologies (GO, sometimes KEGG) use min-path-from-root
   with a sparse `level_is_best_effort='true'` flag on affected terms.
 - Flat ontologies (PSORTb `subcellular_localization`, SignalP
-  `signal_peptide_type`) have **`level=0` only** — no hierarchy, 5 terms each.
-  Passing `level=1` or higher returns no rows.
+  `signal_peptide_type`, NCBIfam) have **`level=0` only** — no hierarchy
+  (PSORTb / SignalP: 5 terms each). Passing `level=1` or higher returns no
+  rows.
+- InterPro and MEROPS are hierarchical, like TCDB — InterPro rolls up
+  through `Interpro_entry_is_a_interpro_entry` (and additionally facets by
+  `interpro_type`, independent of `level`); MEROPS families roll up into
+  clans through `Merops_family_is_a_merops_family`.
 
 `ontology_landscape` ranks (ontology × level) combinations by
 `relevance_rank` baking in genome coverage and median term size; use it

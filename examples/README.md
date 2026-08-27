@@ -28,4 +28,15 @@ uv run python examples/metabolites.py --scenario tcdb_chain
 uv run python examples/metabolites.py --scenario measurement
 ```
 
-Both scripts are exercised by `tests/integration/test_examples.py` under `-m kg`.
+## `annotation_evidence.py`
+
+Four scenarios exercising the annotation-trust surface (evidence / evidence_score / tier / call_class / interpro_type) across the 17 supported ontologies. See `docs://analysis/annotation_evidence`.
+
+```bash
+uv run python examples/annotation_evidence.py --scenario merops_call_class
+uv run python examples/annotation_evidence.py --scenario tcdb_attachment_depth
+uv run python examples/annotation_evidence.py --scenario interpro_enrichment
+uv run python examples/annotation_evidence.py --scenario trust_filtered_tcdb
+```
+
+All three scripts are exercised by `tests/integration/test_examples.py` under `-m kg`.

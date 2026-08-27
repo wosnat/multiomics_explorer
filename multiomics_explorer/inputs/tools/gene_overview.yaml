@@ -61,6 +61,21 @@ examples:
          {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_name": "Prochlorococcus MED4", "reaction_count": 4, "catalyzed_metabolite_count": 6, "tcdb_evidence_score_max": null, "transported_metabolite_count": 0, "transport_substrate_resolution": null, "evidence_sources": ["metabolism", "metabolomics"]}
        ]}
 
+  - title: MEROPS peptidase + NCBIfam rollups on a gene
+    call: gene_overview(locus_tags=["MIT1002_03660"])
+    response: |
+      # merops_classes defaults to [] (list, not a single value — a gene can
+      # have both a peptidase call and a nonpeptidase_homolog call on
+      # different MEROPS families). ncbifam_family_count defaults to 0.
+      # merops_evidence_score_max is sparse and uncoalesced (null = no
+      # MEROPS call at all) — same rank-don't-filter contract as
+      # tcdb_evidence_score_max: read it to rank candidate genes, never as
+      # a pass/fail cutoff.
+      {"total_matching": 1, "by_merops_class": [{"merops_class": "peptidase", "count": 1}], "has_ncbifam": 0, "returned": 1, "truncated": false, "offset": 0, "not_found": [],
+       "results": [
+         {"locus_tag": "MIT1002_03660", "gene_name": null, "product": "Clp protease", "organism_name": "Alteromonas macleodii MIT1002", "merops_classes": ["peptidase"], "ncbifam_family_count": 0, "merops_evidence_score_max": 1.0}
+       ]}
+
   - title: Genes named in the literature — which paper discusses them
     call: gene_overview(locus_tags=["PMT2118", "PMT_1030"])
     response: |
@@ -96,6 +111,8 @@ chaining:
   - "gene_overview (per-row `evidence_sources` non-empty) → metabolites_by_gene OR genes_by_metabolite for chemistry drill-down."
   - "gene_overview (per-row `transport_substrate_resolution='resolved'`, after reading `tcdb_evidence_score_max`) → metabolites_by_gene(locus_tags=[...], organism=..., evidence_sources=['transport']) — distinct metabolites in the rows equal `transported_metabolite_count`."
   - "gene_overview (per-row `discussed_in_publication_count` > 0) → use verbose=True for the per-gene {doi, prominence, evidence} list, or discussed_by_publication(publication_dois=[...]) for the paper's full discussed set."
+  - "gene_overview (per-row `merops_classes` non-empty) → gene_ontology_terms(locus_tags=[...], ontology=['merops'], verbose=True) for the confidence_score / pfam_support detail behind the call, or genes_by_ontology(ontology='merops', call_class=['peptidase']) to find peers."
+  - "`merops_classes` is a list (`[]` default) because a gene can carry both a `peptidase` and a `nonpeptidase_homolog` MEROPS call on different families — don't assume at most one value. `merops_evidence_score_max` is sparse and uncoalesced (null = no MEROPS call at all, the twin contract of `tcdb_evidence_score_max`) — rank by it, never filter by it."
 
 mistakes:
   - "annotation_quality / min_quality semantics shifted in 2026-05 KG release. Existing notebooks using min_quality may select a different gene set than before. See docs://guide/conventions."

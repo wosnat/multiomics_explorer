@@ -31,6 +31,52 @@ examples:
          {"ontology_type": "cazy", "level": 0, "level_kind": "cazy_class",  "n_terms_with_genes": 2, "min_genes_per_term": 6, "max_genes_per_term": 17}
        ]}
 
+  - title: Default survey now spans 17 ontologies (InterPro / NCBIfam / MEROPS added)
+    call: ontology_landscape(organism="MED4")
+    response: |
+      {"organism_name": "Prochlorococcus MED4", "n_ontologies": 17,
+       "by_ontology": {
+         "interpro": {"best_level": 0, "best_genome_coverage": 0.71, "best_relevance_rank": 4, "n_levels": 3},
+         "ncbifam":  {"best_level": 0, "best_genome_coverage": 0.22, "best_relevance_rank": 14, "n_levels": 1},
+         "merops":   {"best_level": 0, "best_genome_coverage": 0.06, "best_relevance_rank": 15, "n_levels": 2}
+       },
+       "results": [{"ontology_type": "interpro", "level": 0, "best_interpro_type": "HOMOLOGOUS_SUPERFAMILY", "n_terms_with_genes": 74, "min_genes_per_term": 5, "max_genes_per_term": 119}]}
+
+  - title: Restrict the fan-out to specific ontologies
+    call: ontology_landscape(organism="MED4", ontology=["interpro", "merops"])
+    response: |
+      # `ontology` now accepts a str, a list, or None (all 17). Passing a
+      # list restricts the fan-out to just those ontologies — useful when
+      # you already know the trust-registered ontology you care about and
+      # don't need the full 17-ontology scan.
+      {"organism_name": "Prochlorococcus MED4", "n_ontologies": 2, "results": [
+        {"ontology_type": "interpro", "level": 0, "best_interpro_type": "HOMOLOGOUS_SUPERFAMILY", "n_terms_with_genes": 74},
+        {"ontology_type": "merops", "level": 0, "n_terms_with_genes": 10}
+      ]}
+
+  - title: InterPro rows are broken down per interpro_type
+    call: ontology_landscape(organism="MED4", ontology="interpro", verbose=True)
+    response: |
+      # Like BRITE's `tree`, InterPro rows carry a `best_interpro_type` /
+      # per-type breakdown instead of one pooled row — HOMOLOGOUS_SUPERFAMILY,
+      # DOMAIN, FAMILY, REPEAT, CONSERVED_SITE, ACTIVE_SITE, BINDING_SITE, PTM
+      # size very differently (MED4 level 0: HOMOLOGOUS_SUPERFAMILY 74 testable
+      # terms, DOMAIN 47, FAMILY 7, the rest ≤4).
+      {"organism_name": "Prochlorococcus MED4", "results": [
+        {"ontology_type": "interpro", "level": 0, "interpro_type": "HOMOLOGOUS_SUPERFAMILY", "n_terms_with_genes": 74},
+        {"ontology_type": "interpro", "level": 0, "interpro_type": "DOMAIN", "n_terms_with_genes": 47},
+        {"ontology_type": "interpro", "level": 0, "interpro_type": "FAMILY", "n_terms_with_genes": 7}
+      ]}
+
+  - title: MEROPS landscape scoped to peptidase calls (call_class filter)
+    call: ontology_landscape(organism="MED4", ontology="merops", call_class=["peptidase"])
+    response: |
+      # call_class narrows landscape term-size stats to match the gene set
+      # pathway_enrichment(ontology='merops', call_class=['peptidase']) would
+      # actually test — without it, landscape term sizes include
+      # nonpeptidase_homolog rows and overstate what enrichment will see.
+      {"organism_name": "Prochlorococcus MED4", "results": [{"ontology_type": "merops", "level": 0, "n_terms_with_genes": 6}]}
+
   - title: Opt out of informative-only filtering (browse all terms, including catch-alls)
     call: ontology_landscape(organism="MED4", informative_only=False)
     response: |
@@ -78,6 +124,8 @@ verbose_fields:
 chaining:
   - "ontology_landscape -> genes_by_ontology(level=N) -> pathway_enrichment"
   - "list_experiments -> ontology_landscape(experiment_ids=...)"
+  - "ontology_landscape(ontology='interpro', ...) -> pathway_enrichment(ontology='interpro', interpro_type=..., level=...) (interpro_type is required on interpro enrichment)"
+  - "ontology_landscape(ontology='merops', call_class=['peptidase']) -> genes_by_ontology(ontology='merops', call_class=['peptidase'], level=...) -> pathway_enrichment(ontology='merops', call_class=['peptidase'], ...)"
 
 mistakes:
   - "Don't pick a level by term-size stats alone -- always check genome_coverage. An ontology may have appealing median term size at a level that covers only 18% of the genome."
@@ -88,7 +136,9 @@ mistakes:
   - wrong: "results[0]['rank']  # AttributeError"
     right: "results[0]['relevance_rank']"
   - "BRITE stats at each level mix all trees together by default. Use `tree` to scope to a single BRITE tree (e.g. `tree='transporters'`). BRITE rows are broken down per tree when `tree` is specified. Use `list_filter_values('brite_tree')` to discover available trees."
-  - "Default surveys all 12 ontologies (`go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`)."
+  - "Default surveys all 17 ontologies (`go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`). Pass `ontology=[...]` (str or list) to restrict the fan-out."
+  - "`call_class` (merops-only) and `interpro_type` (interpro-only; scopes to one InterPro type instead of the per-type breakdown) narrow landscape term-size stats the same way they narrow `genes_by_ontology` / enrichment gene sets — pass them here first to check what a trust-filtered enrichment run will actually test."
+  - "InterPro rows break down by `interpro_type` the same way BRITE rows break down by `tree` — without a specific `interpro_type`, `results` mixes all 8 InterPro types (HOMOLOGOUS_SUPERFAMILY, DOMAIN, FAMILY, REPEAT, CONSERVED_SITE, ACTIVE_SITE, BINDING_SITE, PTM), each carrying `best_interpro_type` per row."
   - "CAZy is a small ontology (64 nodes — 6 classes + 58 families). With default `min_gene_set_size=5`, only a handful of CAZy terms ever pass the filter — typically 1–2 rows per organism. This is expected, not a bug. Pass `min_gene_set_size=1` to see all CAZy classes/families."
   - "TCDB and CAZy use organism-scoped term-size stats just like the other ontologies. TCDB has 5 levels (`tc_class`...`tc_specificity`); CAZy has 2 (`cazy_class`, `cazy_family`)."
   - wrong: "result['total_rows']  # KeyError"
