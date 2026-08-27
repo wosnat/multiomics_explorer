@@ -3444,10 +3444,13 @@ class TestOntologyToolsPsortbSignalpLive:
         assert "signalp_LIPO" in result_ids or "signalp_TATLIPO" in result_ids
 
     def test_genes_by_ontology_psortb_surfaces_score(self, conn):
+        # Annotation-trust surface (design section 1): PSORTb / SignalP native
+        # scalars are verbose-only now — compact = comparable, verbose = native.
         result = api.genes_by_ontology(
             ontology="subcellular_localization",
             term_ids=["psortb_OuterMembrane"],
             organism=self.ORGANISM,
+            verbose=True,
             conn=conn,
         )
         assert result["total_matching"] > 0
@@ -3457,16 +3460,30 @@ class TestOntologyToolsPsortbSignalpLive:
             # Owner column populated, range [7.5, 10.0]
             assert "localization_score" in row, row
             assert 7.5 <= row["localization_score"] <= 10.0
-            # Non-owner columns absent (stripped sparse-null)
+            # Non-owner columns absent (strip-non-applicable)
             assert "signal_peptide_probability" not in row
             assert "signal_peptide_cleavage_site" not in row
             assert "signal_peptide_cleavage_probability" not in row
+
+    def test_genes_by_ontology_psortb_compact_omits_score(self, conn):
+        """localization_score moved compact -> verbose."""
+        result = api.genes_by_ontology(
+            ontology="subcellular_localization",
+            term_ids=["psortb_OuterMembrane"],
+            organism=self.ORGANISM,
+            conn=conn,
+        )
+        rows = result["results"]
+        assert rows, "Expected at least one PMM* gene with OuterMembrane call"
+        for row in rows:
+            assert "localization_score" not in row, row
 
     def test_genes_by_ontology_signalp_surfaces_probability(self, conn):
         result = api.genes_by_ontology(
             ontology="signal_peptide_type",
             term_ids=["signalp_LIPO"],
             organism=self.ORGANISM,
+            verbose=True,
             conn=conn,
         )
         rows = result["results"]
@@ -3477,6 +3494,19 @@ class TestOntologyToolsPsortbSignalpLive:
                 # cleavage_site may or may not be present (depends on the gene);
                 # both states must not crash
                 assert "localization_score" not in row
+
+    def test_genes_by_ontology_signalp_compact_omits_probability(self, conn):
+        """signal_peptide_* moved compact -> verbose."""
+        result = api.genes_by_ontology(
+            ontology="signal_peptide_type",
+            term_ids=["signalp_LIPO"],
+            organism=self.ORGANISM,
+            conn=conn,
+        )
+        for row in result["results"]:
+            assert "signal_peptide_probability" not in row, row
+            assert "signal_peptide_cleavage_site" not in row
+            assert "signal_peptide_cleavage_probability" not in row
 
 
     def test_genes_by_ontology_pfam_strips_edge_prop_columns(self, conn):

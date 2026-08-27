@@ -124,6 +124,10 @@ class TestGeneOverviewContract:
             "transport_substrate_resolution",
             # Literature "discusses" arm (Extension 1): always-present compact count.
             "discussed_in_publication_count",
+            # Annotation-trust surface (spec section 3.6 / 6): protease +
+            # family-domain routing signals. merops_evidence_score_max is
+            # sparse and uncoalesced (null = no MEROPS call at all).
+            "merops_classes", "ncbifam_family_count", "merops_evidence_score_max",
         }
         assert set(result["results"][0].keys()) == expected_keys
 
@@ -259,7 +263,13 @@ class TestSearchOntologyContract:
 
     def test_result_keys(self, conn):
         result = api.search_ontology("DNA replication", "go_bp", conn=conn)
-        expected_keys = {"id", "name", "score", "level", "is_informative"}
+        # Annotation-trust surface (spec section 6): compact gains gene_count
+        # and organism_count. `ontology_type` is a multi-ontology column and is
+        # not emitted for a single-ontology call.
+        expected_keys = {
+            "id", "name", "score", "level", "is_informative",
+            "gene_count", "organism_count",
+        }
         assert len(result["results"]) >= 1
         assert set(result["results"][0].keys()) == expected_keys
 
@@ -298,6 +308,10 @@ class TestGenesByOntologyContract:
         expected_keys = {
             "locus_tag", "gene_name", "product", "gene_category",
             "term_id", "term_name", "level", "is_informative",
+            # Annotation-trust surface (spec section 0 / 6): `evidence` is the
+            # one compact trust column. go_bp owns no other row column, so the
+            # strip rule keeps interpro_type / call_class off this row.
+            "evidence",
         }
         assert set(result["results"][0].keys()) == expected_keys
 
