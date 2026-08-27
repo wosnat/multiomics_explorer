@@ -1368,11 +1368,16 @@ class TestSearchOntology:
         with pytest.raises(ValueError, match="Invalid ontology"):
             api.search_ontology("test", "invalid", conn=mock_conn)
 
-    def test_empty_search_text_raises(self, mock_conn):
-        with pytest.raises(ValueError, match="search_text must not be empty"):
-            api.search_ontology("", "go_bp", conn=mock_conn)
-        with pytest.raises(ValueError, match="search_text must not be empty"):
-            api.search_ontology("   ", "go_bp", conn=mock_conn)
+    def test_empty_search_text_is_browse_mode(self, mock_conn):
+        # Retired "search_text must not be empty" (spec §11/§13): empty or
+        # whitespace-only search_text now selects browse mode.
+        mock_conn.execute_query.return_value = []
+        for text in ("", "   "):
+            mock_conn.execute_query.reset_mock()
+            result = api.search_ontology(text, "go_bp", conn=mock_conn)
+            assert result["mode"] == "browse"
+            cyphers = [c.args[0] for c in mock_conn.execute_query.call_args_list]
+            assert cyphers and all("db.index.fulltext" not in c for c in cyphers)
 
     def test_lucene_retry(self, mock_conn):
         from neo4j.exceptions import ClientError as Neo4jClientError
