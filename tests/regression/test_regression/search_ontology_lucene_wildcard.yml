@@ -1,12 +1,12 @@
 case_id: search_ontology_lucene_wildcard
 row_count: 37
 rows:
-- gene_count: 9238
+- gene_count: 9412
   id: ec:1.-.-.-
   is_informative: true
   level: 0
   name: Oxidoreductases
-  organism_count: 42
+  organism_count: 43
   score: 1.0
   tree: null
   tree_code: null
@@ -91,21 +91,21 @@ rows:
   score: 1.0
   tree: null
   tree_code: null
-- gene_count: 23
+- gene_count: 24
   id: ec:1.3.7.2
   is_informative: true
   level: 3
   name: 15,16-dihydrobiliverdin:ferredoxin oxidoreductase
-  organism_count: 23
+  organism_count: 24
   score: 1.0
   tree: null
   tree_code: null
-- gene_count: 23
+- gene_count: 24
   id: ec:1.3.7.3
   is_informative: true
   level: 3
   name: phycoerythrobilin:ferredoxin oxidoreductase
-  organism_count: 23
+  organism_count: 24
   score: 1.0
   tree: null
   tree_code: null
@@ -118,12 +118,12 @@ rows:
   score: 1.0
   tree: null
   tree_code: null
-- gene_count: 27
+- gene_count: 28
   id: ec:1.3.7.5
   is_informative: true
   level: 3
   name: phycocyanobilin:ferredoxin oxidoreductase
-  organism_count: 27
+  organism_count: 28
   score: 1.0
   tree: null
   tree_code: null
@@ -235,21 +235,21 @@ rows:
   score: 1.0
   tree: null
   tree_code: null
-- gene_count: 122
+- gene_count: 126
   id: ec:1.97.-.-
   is_informative: true
   level: 1
   name: Other oxidoreductases
-  organism_count: 31
+  organism_count: 32
   score: 1.0
   tree: null
   tree_code: null
-- gene_count: 122
+- gene_count: 126
   id: ec:1.97.1.-
   is_informative: true
   level: 2
   name: Other oxidoreductases
-  organism_count: 31
+  organism_count: 32
   score: 1.0
   tree: null
   tree_code: null
@@ -271,12 +271,12 @@ rows:
   score: 1.0
   tree: null
   tree_code: null
-- gene_count: 586
+- gene_count: 595
   id: ec:5.3.-.-
   is_informative: true
   level: 1
   name: Intramolecular oxidoreductases
-  organism_count: 42
+  organism_count: 43
   score: 1.0
   tree: null
   tree_code: null
@@ -289,12 +289,12 @@ rows:
   score: 1.0
   tree: null
   tree_code: null
-- gene_count: 1119
+- gene_count: 1149
   id: ec:7.1.1.-
   is_informative: true
   level: 2
   name: Hydron translocation or charge separation linked to oxidoreductase reactions
-  organism_count: 42
+  organism_count: 43
   score: 1.0
   tree: null
   tree_code: null

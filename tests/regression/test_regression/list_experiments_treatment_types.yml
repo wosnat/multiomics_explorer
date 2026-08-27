@@ -3881,11 +3881,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 526
+  distinct_gene_count: 523
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_selongatus_axenic_proteomics
   experiment_name: S. elongatus cscB coculture with P. putida cscRABY vs axenic S.
     elongatus cscB (proteomics)
-  gene_count: 526
+  gene_count: 523
   growth_phases:
   - exponential
   is_time_course: 'false'
@@ -3896,7 +3896,7 @@ rows:
   organism_name: Synechococcus elongatus PCC 7942
   publication_doi: 10.1038/s42003-024-06098-5
   significant_down_count: 81
-  significant_up_count: 71
+  significant_up_count: 69
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -3911,9 +3911,9 @@ rows:
   time_point_significant_down:
   - '81'
   time_point_significant_up:
-  - '71'
+  - '69'
   time_point_totals:
-  - '526'
+  - '523'
   treatment_type:
   - coculture
 - authors:
@@ -4038,7 +4038,8 @@ rows:
   - Vera Thiel
   - William B. Chrisler
   - Young-Mo Kim
-  background_factors: []
+  background_factors:
+  - light
   cluster_types:
   - condition_comparison
   clustering_analysis_count: 4
@@ -4061,7 +4062,7 @@ rows:
   publication_doi: 10.1128/mSystems.00181-16
   significant_down_count: 0
   significant_up_count: 0
-  table_scope: ''
+  table_scope: null
   table_scope_detail: ''
   time_point_count: 0
   time_point_growth_phases: []
@@ -4074,3 +4075,4 @@ rows:
   treatment_type:
   - coculture
   - light
+  - oxygen

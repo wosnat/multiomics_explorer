@@ -1,5 +1,5 @@
 case_id: differential_expression_by_ortholog_organism_filter
-row_count: 43
+row_count: 48
 rows:
 - background_factors:
   - axenic
@@ -625,6 +625,101 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- background_factors:
+  - axenic
+  - light
+  coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: acclimated_steady_state
+  not_significant: 1
+  organism_name: Prochlorococcus MED4
+  significant_down: 0
+  significant_up: 0
+  timepoint: acclimated
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type:
+  - salt
+- background_factors:
+  - axenic
+  - diel
+  coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: diel
+  not_significant: 1
+  organism_name: Prochlorococcus MED4
+  significant_down: 0
+  significant_up: 0
+  timepoint: 2h
+  timepoint_hours: 2.0
+  timepoint_order: 1
+  treatment_type:
+  - darkness
+- background_factors:
+  - axenic
+  - diel
+  coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: diel
+  not_significant: 1
+  organism_name: Prochlorococcus MED4
+  significant_down: 0
+  significant_up: 0
+  timepoint: 4h
+  timepoint_hours: 4.0
+  timepoint_order: 2
+  treatment_type:
+  - darkness
+- background_factors:
+  - axenic
+  - diel
+  coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.64898/2026.04.15.718746_extended_light_med4
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: diel
+  not_significant: 1
+  organism_name: Prochlorococcus MED4
+  significant_down: 0
+  significant_up: 0
+  timepoint: 14h
+  timepoint_hours: 14.0
+  timepoint_order: 1
+  treatment_type:
+  - light
+- background_factors:
+  - axenic
+  - diel
+  coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.64898/2026.04.15.718746_extended_light_med4
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: diel
+  not_significant: 1
+  organism_name: Prochlorococcus MED4
+  significant_down: 0
+  significant_up: 0
+  timepoint: 16h
+  timepoint_hours: 16.0
+  timepoint_order: 2
+  treatment_type:
+  - light
 - background_factors:
   - light
   coculture_partner: Alteromonas macleodii HOT1A3

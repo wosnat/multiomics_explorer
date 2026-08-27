@@ -47,6 +47,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:2.A.66.4
   tcdb_family_name: The Mouse Virulence Factor (MVF) Family
+  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: ftsE
@@ -64,6 +65,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
 - ec_numbers: null
   evidence_source: transport
   gene_name: ccmA
@@ -81,6 +83,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
 - ec_numbers: null
   evidence_source: transport
   gene_name: ycf38
@@ -98,6 +101,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
 - ec_numbers:
   - 6.3.1.2
   evidence_source: metabolism
@@ -117,6 +121,7 @@ results:
   tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
+  transport_substrate_resolution: null
 returned: 5
 row_count: 5
 top_gene_categories:

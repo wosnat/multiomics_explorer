@@ -73,6 +73,7 @@ results:
   tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
+  transport_substrate_resolution: null
 - ec_numbers:
   - 6.3.1.2
   evidence_source: metabolism
@@ -92,6 +93,7 @@ results:
   tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
+  transport_substrate_resolution: null
 - ec_numbers:
   - 1.4.1.13
   - 1.4.1.14
@@ -124,6 +126,7 @@ results:
   tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
+  transport_substrate_resolution: null
 - ec_numbers:
   - 6.3.5.1
   evidence_source: metabolism
@@ -143,6 +146,7 @@ results:
   tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
+  transport_substrate_resolution: null
 - ec_numbers:
   - 1.4.7.1
   evidence_source: metabolism
@@ -163,6 +167,7 @@ results:
   tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
+  transport_substrate_resolution: null
 returned: 5
 row_count: 5
 top_gene_categories:

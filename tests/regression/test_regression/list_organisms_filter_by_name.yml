@@ -12,18 +12,20 @@ rows:
   catalyzed_metabolite_count: 1039
   clade: HLI
   cluster_types:
+  - decay_pattern
   - diel
+  - genomic_island
   - time_course
-  clustering_analysis_count: 4
+  clustering_analysis_count: 6
   compartments:
   - vesicle
   - whole_cell
-  derived_metric_count: 17
+  derived_metric_count: 26
   derived_metric_value_kinds:
   - boolean
   - categorical
   - numeric
-  experiment_count: 114
+  experiment_count: 119
   gene_count: 1976
   genus: Prochlorococcus
   growth_phases:
@@ -31,13 +33,17 @@ rows:
   - acute_stress
   - darkness
   - death
+  - diel
   - exponential
   - infected
   - nutrient_limited
   - recovery
   - stationary
+  interpro_gene_count: 1545
   measured_metabolite_count: 0
   ncbi_taxon_id: 59919
+  ncbifam_gene_count: 744
+  nonpeptidase_homolog_gene_count: 8
   omics_types:
   - MICROARRAY
   - PAIRED_RNASEQ_PROTEOME
@@ -47,7 +53,8 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MED4
   organism_type: genome_strain
-  publication_count: 17
+  peptidase_gene_count: 50
+  publication_count: 20
   reaction_count: 943
   reference_database: null
   reference_proteome: null
@@ -58,6 +65,7 @@ rows:
   - carbon
   - coculture
   - compartment
+  - darkness
   - diel
   - growth_phase
   - iron
@@ -74,7 +82,8 @@ rows:
   clade: HLII
   cluster_types:
   - condition_comparison
-  clustering_analysis_count: 1
+  - genomic_island
+  clustering_analysis_count: 2
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -83,13 +92,17 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - exponential
+  interpro_gene_count: 1537
   measured_metabolite_count: 99
   ncbi_taxon_id: 167546
+  ncbifam_gene_count: 774
+  nonpeptidase_homolog_gene_count: 10
   omics_types:
   - METABOLOMICS
   - RNASEQ
   organism_name: Prochlorococcus MIT9301
   organism_type: genome_strain
+  peptidase_gene_count: 49
   publication_count: 3
   reaction_count: 945
   reference_database: null

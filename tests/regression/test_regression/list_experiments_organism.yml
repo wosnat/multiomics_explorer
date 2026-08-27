@@ -1,6 +1,130 @@
 case_id: list_experiments_organism
-row_count: 41
+row_count: 45
 rows:
+- authors:
+  - Jordan Rozum
+  - Lindsey Anderson
+  - Marci R. Garcia
+  - Margaret S. Cheung
+  - Natalie C. Sadler
+  - Pavlo Bohutskyi
+  - Song Feng
+  - Tong Zhang
+  - Wei-Jun Qian
+  - Xiaolu Li
+  - Zachary Johnson
+  background_factors:
+  - axenic
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 1876
+  experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
+  experiment_name: MED4 extended darkness past dawn vs normal light period (RNA-seq)
+  gene_count: 3752
+  growth_phases:
+  - diel
+  is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.64898/2026.04.15.718746
+  significant_down_count: 469
+  significant_up_count: 557
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 2
+  time_point_growth_phases:
+  - diel
+  - diel
+  time_point_hours:
+  - '2.0'
+  - '4.0'
+  time_point_labels:
+  - 2h
+  - 4h
+  time_point_orders:
+  - '1'
+  - '2'
+  time_point_significant_down:
+  - '203'
+  - '266'
+  time_point_significant_up:
+  - '248'
+  - '309'
+  time_point_totals:
+  - '1876'
+  - '1876'
+  treatment_type:
+  - darkness
+- authors:
+  - Jordan Rozum
+  - Lindsey Anderson
+  - Marci R. Garcia
+  - Margaret S. Cheung
+  - Natalie C. Sadler
+  - Pavlo Bohutskyi
+  - Song Feng
+  - Tong Zhang
+  - Wei-Jun Qian
+  - Xiaolu Li
+  - Zachary Johnson
+  background_factors:
+  - axenic
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 1876
+  experiment_id: 10.64898/2026.04.15.718746_extended_light_med4
+  experiment_name: MED4 extended light past dusk vs normal dark period (RNA-seq)
+  gene_count: 3751
+  growth_phases:
+  - diel
+  is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.64898/2026.04.15.718746
+  significant_down_count: 333
+  significant_up_count: 439
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 2
+  time_point_growth_phases:
+  - diel
+  - diel
+  time_point_hours:
+  - '14.0'
+  - '16.0'
+  time_point_labels:
+  - 14h
+  - 16h
+  time_point_orders:
+  - '1'
+  - '2'
+  time_point_significant_down:
+  - '270'
+  - '63'
+  time_point_significant_up:
+  - '367'
+  - '72'
+  time_point_totals:
+  - '1875'
+  - '1876'
+  treatment_type:
+  - light
 - authors:
   - Daniel Sher
   - Dikla Aharonovich
@@ -532,11 +656,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 28
+  distinct_gene_count: 1947
   experiment_id: 10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq
   experiment_name: MED4 Low salinity acclimation (28 psu) vs Normal seawater salinity
     (34 psu) (RNASEQ)
-  gene_count: 28
+  gene_count: 1947
   growth_phases:
   - acclimated_steady_state
   is_time_course: 'false'
@@ -546,10 +670,10 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.3389/fmicb.2022.1038136
-  significant_down_count: 15
+  significant_down_count: 14
   significant_up_count: 13
-  table_scope: significant_only
-  table_scope_detail: p < 0.05 and ,logFC, > 1
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
   - acclimated_steady_state
@@ -560,11 +684,11 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '15'
+  - '14'
   time_point_significant_up:
   - '13'
   time_point_totals:
-  - '28'
+  - '1947'
   treatment_type:
   - salt
 - authors:
@@ -758,10 +882,10 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 39
+  distinct_gene_count: 38
   experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_infected
   experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) (RNASEQ)
-  gene_count: 52
+  gene_count: 51
   growth_phases:
   - infected
   is_time_course: 'true'
@@ -771,7 +895,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
-  significant_down_count: 43
+  significant_down_count: 42
   significant_up_count: 9
   table_scope: significant_only
   table_scope_detail: ''
@@ -803,7 +927,7 @@ rows:
   time_point_significant_down:
   - '0'
   - '2'
-  - '26'
+  - '25'
   - '7'
   - '8'
   time_point_significant_up:
@@ -815,8 +939,8 @@ rows:
   time_point_totals:
   - '1'
   - '10'
+  - '29'
   - '3'
-  - '30'
   - '8'
   treatment_type:
   - light
@@ -832,11 +956,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 25
+  distinct_gene_count: 24
   experiment_id: 10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_dark
   experiment_name: MED4 Phage (P-HM2) lysate vs Spent medium (uninfected) in dark
     (RNASEQ)
-  gene_count: 33
+  gene_count: 30
   growth_phases:
   - infected
   is_time_course: 'true'
@@ -846,8 +970,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
-  significant_down_count: 22
-  significant_up_count: 11
+  significant_down_count: 21
+  significant_up_count: 9
   table_scope: significant_only
   table_scope_detail: ''
   time_point_count: 3
@@ -870,15 +994,15 @@ rows:
   time_point_significant_down:
   - '13'
   - '2'
-  - '7'
+  - '6'
   time_point_significant_up:
   - '1'
-  - '4'
-  - '6'
+  - '3'
+  - '5'
   time_point_totals:
-  - '17'
-  - '8'
-  - '8'
+  - '16'
+  - '7'
+  - '7'
   treatment_type:
   - viral
 - authors:
@@ -893,11 +1017,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 30
+  distinct_gene_count: 29
   experiment_id: 10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_light
   experiment_name: MED4 Phage (P-HM2) lysate vs Spent medium (uninfected) in light
     (RNASEQ)
-  gene_count: 34
+  gene_count: 32
   growth_phases:
   - infected
   is_time_course: 'true'
@@ -907,8 +1031,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
-  significant_down_count: 21
-  significant_up_count: 13
+  significant_down_count: 20
+  significant_up_count: 12
   table_scope: significant_only
   table_scope_detail: ''
   time_point_count: 5
@@ -941,18 +1065,18 @@ rows:
   - '11'
   - '2'
   - '2'
-  - '5'
+  - '4'
   time_point_significant_up:
   - '1'
   - '1'
   - '1'
-  - '3'
+  - '2'
   - '7'
   time_point_totals:
-  - '14'
+  - '13'
   - '3'
   - '3'
-  - '6'
+  - '5'
   - '8'
   treatment_type:
   - viral
@@ -1183,7 +1307,7 @@ rows:
   publication_doi: 10.1186/1471-2180-14-11
   significant_down_count: 0
   significant_up_count: 0
-  table_scope: ''
+  table_scope: null
   table_scope_detail: ''
   time_point_count: 0
   time_point_growth_phases: []
@@ -1195,6 +1319,53 @@ rows:
   time_point_totals: []
   treatment_type:
   - growth_phase
+- authors:
+  - Björn Voß
+  - Claudia Steglich
+  - Cynthia M Sharma
+  - Jan Mitschke
+  - Karsten Voigt
+  - S Joke Lambrecht
+  - Wolfgang R Hess
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 5
+  derived_metric_value_kinds:
+  - boolean
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1038/ismej.2014.57_tss_mapping_med4
+  experiment_name: MED4 transcriptome architecture mapping (TSS map, 454 + Solexa
+    dRNA-seq + tiling array)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2014.57
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: filtered_subset
+  table_scope_detail: Only genes with at least one mapped gene-linked TSS (gTSS/aTSS/aArray/iTSS)
+    appear; orphan nTSS rows are dropped. Genes without any mapped TSS are absent,
+    not zero.
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type: []
 - authors:
   - Anne W. Thompson
   - Florence Schubotz
@@ -1314,7 +1485,7 @@ rows:
   publication_doi: 10.1371/journal.pone.0043432
   significant_down_count: 0
   significant_up_count: 0
-  table_scope: ''
+  table_scope: null
   table_scope_detail: ''
   time_point_count: 0
   time_point_growth_phases: []
@@ -1483,6 +1654,53 @@ rows:
 - authors:
   - Claudia Steglich
   - Debbie Lindell
+  - Matthias Futschik
+  - Robert Steen
+  - Sallie W Chisholm
+  - Trent Rector
+  background_factors:
+  - axenic
+  - chemical
+  - light
+  cluster_types:
+  - decay_pattern
+  clustering_analysis_count: 1
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 4
+  derived_metric_value_kinds:
+  - boolean
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1186/gb-2010-11-5-r54_rifampicin_rna_decay_med4
+  experiment_name: MED4 genome-wide mRNA half-life measurement (rifampicin transcription
+    arrest)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1186/gb-2010-11-5-r54
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: Whole-transcriptome half-life table (2,043 features incl. pseudogene/ncRNA/operon
+    features absent from the gene layer).
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type: []
+- authors:
+  - Claudia Steglich
+  - Debbie Lindell
   - Erik R. Zinser
   - Luke R. Thompson
   - Matthew A. Wright
@@ -1517,7 +1735,7 @@ rows:
   publication_doi: 10.1371/journal.pone.0005135
   significant_down_count: 0
   significant_up_count: 0
-  table_scope: ''
+  table_scope: null
   table_scope_detail: ''
   time_point_count: 0
   time_point_growth_phases: []

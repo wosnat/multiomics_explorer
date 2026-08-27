@@ -1,5 +1,5 @@
 case_id: differential_expression_by_ortholog_significant
-row_count: 33
+row_count: 49
 rows:
 - background_factors:
   - axenic
@@ -590,6 +590,114 @@ rows:
   treatment_type:
   - carbon
 - background_factors:
+  - diel
+  coculture_partner: Phage
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh7803
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: infected
+  not_significant: 0
+  organism_name: Synechococcus WH7803
+  significant_down: 1
+  significant_up: 0
+  timepoint: 30 min
+  timepoint_hours: 0.5
+  timepoint_order: 2
+  treatment_type:
+  - viral
+- background_factors:
+  - diel
+  coculture_partner: Phage
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh7803
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: infected
+  not_significant: 0
+  organism_name: Synechococcus WH7803
+  significant_down: 1
+  significant_up: 0
+  timepoint: 60 min
+  timepoint_hours: 1.0
+  timepoint_order: 3
+  treatment_type:
+  - viral
+- background_factors:
+  - diel
+  coculture_partner: Phage
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh7803
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: infected
+  not_significant: 0
+  organism_name: Synechococcus WH7803
+  significant_down: 1
+  significant_up: 0
+  timepoint: 90 min
+  timepoint_hours: 1.5
+  timepoint_order: 4
+  treatment_type:
+  - viral
+- background_factors:
+  - diel
+  coculture_partner: Phage
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh7803
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: infected
+  not_significant: 0
+  organism_name: Synechococcus WH7803
+  significant_down: 1
+  significant_up: 0
+  timepoint: 120 min
+  timepoint_hours: 2.0
+  timepoint_order: 5
+  treatment_type:
+  - viral
+- background_factors:
+  - diel
+  coculture_partner: Phage
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh7803
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: infected
+  not_significant: 0
+  organism_name: Synechococcus WH7803
+  significant_down: 1
+  significant_up: 0
+  timepoint: 180 min
+  timepoint_hours: 3.0
+  timepoint_order: 6
+  treatment_type:
+  - viral
+- background_factors:
+  - diel
+  coculture_partner: Phage
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh7803
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: infected
+  not_significant: 0
+  organism_name: Synechococcus WH7803
+  significant_down: 1
+  significant_up: 0
+  timepoint: 240 min
+  timepoint_hours: 4.0
+  timepoint_order: 7
+  treatment_type:
+  - viral
+- background_factors:
   - light
   coculture_partner: Ruegeria pomeroyi DSS-3
   consensus_gene_name: psbB
@@ -608,6 +716,96 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
+  - diel
+  coculture_partner: Phage
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8102
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: infected
+  not_significant: 0
+  organism_name: Synechococcus WH8102
+  significant_down: 1
+  significant_up: 0
+  timepoint: 1 h
+  timepoint_hours: 1.0
+  timepoint_order: 3
+  treatment_type:
+  - viral
+- background_factors:
+  - diel
+  coculture_partner: Phage
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8102
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: infected
+  not_significant: 0
+  organism_name: Synechococcus WH8102
+  significant_down: 1
+  significant_up: 0
+  timepoint: 1.5 h
+  timepoint_hours: 1.5
+  timepoint_order: 4
+  treatment_type:
+  - viral
+- background_factors:
+  - diel
+  coculture_partner: Phage
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8102
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: infected
+  not_significant: 0
+  organism_name: Synechococcus WH8102
+  significant_down: 1
+  significant_up: 0
+  timepoint: 2 h
+  timepoint_hours: 2.0
+  timepoint_order: 5
+  treatment_type:
+  - viral
+- background_factors:
+  - diel
+  coculture_partner: Phage
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8102
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: infected
+  not_significant: 0
+  organism_name: Synechococcus WH8102
+  significant_down: 1
+  significant_up: 0
+  timepoint: 3 h
+  timepoint_hours: 3.0
+  timepoint_order: 6
+  treatment_type:
+  - viral
+- background_factors:
+  - diel
+  coculture_partner: Phage
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8102
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: infected
+  not_significant: 0
+  organism_name: Synechococcus WH8102
+  significant_down: 1
+  significant_up: 0
+  timepoint: 4 h
+  timepoint_hours: 4.0
+  timepoint_order: 7
+  treatment_type:
+  - viral
+- background_factors:
   - light
   coculture_partner: Vibrio parahaemolyticus
   consensus_gene_name: psbB
@@ -625,3 +823,93 @@ rows:
   timepoint_order: 1
   treatment_type:
   - coculture
+- background_factors:
+  - diel
+  coculture_partner: Phage
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8109
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: infected
+  not_significant: 0
+  organism_name: Synechococcus WH8109
+  significant_down: 1
+  significant_up: 0
+  timepoint: 1 h
+  timepoint_hours: 1.0
+  timepoint_order: 3
+  treatment_type:
+  - viral
+- background_factors:
+  - diel
+  coculture_partner: Phage
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8109
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: infected
+  not_significant: 0
+  organism_name: Synechococcus WH8109
+  significant_down: 1
+  significant_up: 0
+  timepoint: 1.5 h
+  timepoint_hours: 1.5
+  timepoint_order: 4
+  treatment_type:
+  - viral
+- background_factors:
+  - diel
+  coculture_partner: Phage
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8109
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: infected
+  not_significant: 0
+  organism_name: Synechococcus WH8109
+  significant_down: 1
+  significant_up: 0
+  timepoint: 2 h
+  timepoint_hours: 2.0
+  timepoint_order: 5
+  treatment_type:
+  - viral
+- background_factors:
+  - diel
+  coculture_partner: Phage
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8109
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: infected
+  not_significant: 0
+  organism_name: Synechococcus WH8109
+  significant_down: 1
+  significant_up: 0
+  timepoint: 3 h
+  timepoint_hours: 3.0
+  timepoint_order: 6
+  treatment_type:
+  - viral
+- background_factors:
+  - diel
+  coculture_partner: Phage
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8109
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: infected
+  not_significant: 0
+  organism_name: Synechococcus WH8109
+  significant_down: 1
+  significant_up: 0
+  timepoint: 4 h
+  timepoint_hours: 4.0
+  timepoint_order: 7
+  treatment_type:
+  - viral

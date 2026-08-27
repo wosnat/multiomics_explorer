@@ -1,5 +1,5 @@
 case_id: list_experiments_time_course
-row_count: 35
+row_count: 41
 rows:
 - authors:
   - Daniel Sher
@@ -488,6 +488,130 @@ rows:
   treatment_type:
   - darkness
 - authors:
+  - Jordan Rozum
+  - Lindsey Anderson
+  - Marci R. Garcia
+  - Margaret S. Cheung
+  - Natalie C. Sadler
+  - Pavlo Bohutskyi
+  - Song Feng
+  - Tong Zhang
+  - Wei-Jun Qian
+  - Xiaolu Li
+  - Zachary Johnson
+  background_factors:
+  - axenic
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 1876
+  experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
+  experiment_name: MED4 extended darkness past dawn vs normal light period (RNA-seq)
+  gene_count: 3752
+  growth_phases:
+  - diel
+  is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.64898/2026.04.15.718746
+  significant_down_count: 469
+  significant_up_count: 557
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 2
+  time_point_growth_phases:
+  - diel
+  - diel
+  time_point_hours:
+  - '2.0'
+  - '4.0'
+  time_point_labels:
+  - 2h
+  - 4h
+  time_point_orders:
+  - '1'
+  - '2'
+  time_point_significant_down:
+  - '203'
+  - '266'
+  time_point_significant_up:
+  - '248'
+  - '309'
+  time_point_totals:
+  - '1876'
+  - '1876'
+  treatment_type:
+  - darkness
+- authors:
+  - Jordan Rozum
+  - Lindsey Anderson
+  - Marci R. Garcia
+  - Margaret S. Cheung
+  - Natalie C. Sadler
+  - Pavlo Bohutskyi
+  - Song Feng
+  - Tong Zhang
+  - Wei-Jun Qian
+  - Xiaolu Li
+  - Zachary Johnson
+  background_factors:
+  - axenic
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 1876
+  experiment_id: 10.64898/2026.04.15.718746_extended_light_med4
+  experiment_name: MED4 extended light past dusk vs normal dark period (RNA-seq)
+  gene_count: 3751
+  growth_phases:
+  - diel
+  is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.64898/2026.04.15.718746
+  significant_down_count: 333
+  significant_up_count: 439
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 2
+  time_point_growth_phases:
+  - diel
+  - diel
+  time_point_hours:
+  - '14.0'
+  - '16.0'
+  time_point_labels:
+  - 14h
+  - 16h
+  time_point_orders:
+  - '1'
+  - '2'
+  time_point_significant_down:
+  - '270'
+  - '63'
+  time_point_significant_up:
+  - '367'
+  - '72'
+  time_point_totals:
+  - '1875'
+  - '1876'
+  treatment_type:
+  - light
+- authors:
   - Daniel Sher
   - Dikla Aharonovich
   - Osnat Weissberg
@@ -889,10 +1013,10 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 39
+  distinct_gene_count: 38
   experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_infected
   experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) (RNASEQ)
-  gene_count: 52
+  gene_count: 51
   growth_phases:
   - infected
   is_time_course: 'true'
@@ -902,7 +1026,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
-  significant_down_count: 43
+  significant_down_count: 42
   significant_up_count: 9
   table_scope: significant_only
   table_scope_detail: ''
@@ -934,7 +1058,7 @@ rows:
   time_point_significant_down:
   - '0'
   - '2'
-  - '26'
+  - '25'
   - '7'
   - '8'
   time_point_significant_up:
@@ -946,8 +1070,8 @@ rows:
   time_point_totals:
   - '1'
   - '10'
+  - '29'
   - '3'
-  - '30'
   - '8'
   treatment_type:
   - light
@@ -1030,11 +1154,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 25
+  distinct_gene_count: 24
   experiment_id: 10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_dark
   experiment_name: MED4 Phage (P-HM2) lysate vs Spent medium (uninfected) in dark
     (RNASEQ)
-  gene_count: 33
+  gene_count: 30
   growth_phases:
   - infected
   is_time_course: 'true'
@@ -1044,8 +1168,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
-  significant_down_count: 22
-  significant_up_count: 11
+  significant_down_count: 21
+  significant_up_count: 9
   table_scope: significant_only
   table_scope_detail: ''
   time_point_count: 3
@@ -1068,15 +1192,15 @@ rows:
   time_point_significant_down:
   - '13'
   - '2'
-  - '7'
+  - '6'
   time_point_significant_up:
   - '1'
-  - '4'
-  - '6'
+  - '3'
+  - '5'
   time_point_totals:
-  - '17'
-  - '8'
-  - '8'
+  - '16'
+  - '7'
+  - '7'
   treatment_type:
   - viral
 - authors:
@@ -1091,11 +1215,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 30
+  distinct_gene_count: 29
   experiment_id: 10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_light
   experiment_name: MED4 Phage (P-HM2) lysate vs Spent medium (uninfected) in light
     (RNASEQ)
-  gene_count: 34
+  gene_count: 32
   growth_phases:
   - infected
   is_time_course: 'true'
@@ -1105,8 +1229,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
-  significant_down_count: 21
-  significant_up_count: 13
+  significant_down_count: 20
+  significant_up_count: 12
   table_scope: significant_only
   table_scope_detail: ''
   time_point_count: 5
@@ -1139,18 +1263,18 @@ rows:
   - '11'
   - '2'
   - '2'
-  - '5'
+  - '4'
   time_point_significant_up:
   - '1'
   - '1'
   - '1'
-  - '3'
+  - '2'
   - '7'
   time_point_totals:
-  - '14'
+  - '13'
   - '3'
   - '3'
-  - '6'
+  - '5'
   - '8'
   treatment_type:
   - viral
@@ -2498,6 +2622,83 @@ rows:
   treatment_type:
   - coculture
 - authors:
+  - Lijuan Long
+  - Si Zhang
+  - Sijun Huang
+  - Yingting Sun
+  background_factors:
+  - light
+  cluster_types:
+  - time_course
+  clustering_analysis_count: 1
+  coculture_partner: Phage
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 2456
+  experiment_id: 10.1002/mbo3.1150_viral_s_sbp1_infection_wh7803_rnaseq
+  experiment_name: WH7803 Cyanopodovirus S-SBP1 infection vs Uninfected control (RNASEQ)
+  gene_count: 12280
+  growth_phases:
+  - infected
+  is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Synechococcus WH7803
+  publication_doi: 10.1002/mbo3.1150
+  significant_down_count: 204
+  significant_up_count: 70
+  table_scope: all_detected_genes
+  table_scope_detail: All 2528 detected host genes reported at every timepoint; not
+    pre-filtered for significance
+  time_point_count: 5
+  time_point_growth_phases:
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
+  time_point_hours:
+  - '0.25'
+  - '1.0'
+  - '3.0'
+  - '5.0'
+  - '7.0'
+  time_point_labels:
+  - 15 min
+  - 1h
+  - 3h
+  - 5h
+  - 7h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  time_point_significant_down:
+  - '22'
+  - '24'
+  - '62'
+  - '7'
+  - '89'
+  time_point_significant_up:
+  - '10'
+  - '13'
+  - '2'
+  - '22'
+  - '23'
+  time_point_totals:
+  - '2456'
+  - '2456'
+  - '2456'
+  - '2456'
+  - '2456'
+  treatment_type:
+  - viral
+- authors:
   - Amandeep Kaur
   - Elizabeth M. Wellington
   - Joseph A. Christie-Oleza
@@ -2681,3 +2882,306 @@ rows:
   - '187'
   treatment_type:
   - coculture
+- authors:
+  - Ayalla Fedida
+  - Claudia Steglich
+  - Damir Stazic
+  - Debbie Lindell
+  - Gazalah Sabehi
+  - Iris Karunker
+  - Matthias Futschik
+  - Miguel A Hernández-Prieto
+  - Roi Feingersch
+  - Rotem Sorek
+  - Shany Doron
+  background_factors:
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Phage
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 2525
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh7803
+  experiment_name: WH7803 cyanophage Syn9 infection time course (microarray)
+  gene_count: 17675
+  growth_phases:
+  - infected
+  is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: MICROARRAY
+  organism_name: Synechococcus WH7803
+  publication_doi: 10.1038/ismej.2015.210
+  significant_down_count: 11038
+  significant_up_count: 14
+  table_scope: all_detected_genes
+  table_scope_detail: All host probes on the array (WH7803); 232 BSV9_* Syn9 phage
+    probes filtered out at CSV-generation time (no Gene nodes). adjusted_p_value is
+    wired ONLY on the terminal 4 h timepoint and is limma^s omnibus series-level FDR
+    (^this gene changed at some point in the series^), not a timepoint-specific test;
+    the other six timepoints carry log-ratios with null adjusted_p_value (decision
+    D7(a)).
+  time_point_count: 7
+  time_point_growth_phases:
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
+  time_point_hours:
+  - '0.083'
+  - '0.5'
+  - '1.0'
+  - '1.5'
+  - '2.0'
+  - '3.0'
+  - '4.0'
+  time_point_labels:
+  - 120 min
+  - 180 min
+  - 2-5 min
+  - 240 min
+  - 30 min
+  - 60 min
+  - 90 min
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  time_point_significant_down:
+  - '0'
+  - '1766'
+  - '2005'
+  - '2087'
+  - '2115'
+  - '2148'
+  - '917'
+  time_point_significant_up:
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '1'
+  - '13'
+  time_point_totals:
+  - '2525'
+  - '2525'
+  - '2525'
+  - '2525'
+  - '2525'
+  - '2525'
+  - '2525'
+  treatment_type:
+  - viral
+- authors:
+  - Ayalla Fedida
+  - Claudia Steglich
+  - Damir Stazic
+  - Debbie Lindell
+  - Gazalah Sabehi
+  - Iris Karunker
+  - Matthias Futschik
+  - Miguel A Hernández-Prieto
+  - Roi Feingersch
+  - Rotem Sorek
+  - Shany Doron
+  background_factors:
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Phage
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 2509
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8102
+  experiment_name: WH8102 cyanophage Syn9 infection time course (microarray)
+  gene_count: 17563
+  growth_phases:
+  - infected
+  is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: MICROARRAY
+  organism_name: Synechococcus WH8102
+  publication_doi: 10.1038/ismej.2015.210
+  significant_down_count: 10030
+  significant_up_count: 12
+  table_scope: all_detected_genes
+  table_scope_detail: All host probes on the array (WH8102); 232 BSV9_* Syn9 phage
+    probes filtered out at CSV-generation time (no Gene nodes). adjusted_p_value is
+    wired ONLY on the terminal 4 h timepoint and is limma^s omnibus series-level FDR
+    (^this gene changed at some point in the series^), not a timepoint-specific test;
+    the other six timepoints carry log-ratios with null adjusted_p_value (decision
+    D7(a)).
+  time_point_count: 7
+  time_point_growth_phases:
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
+  time_point_hours:
+  - '0.083'
+  - '0.5'
+  - '1.0'
+  - '1.5'
+  - '2.0'
+  - '3.0'
+  - '4.0'
+  time_point_labels:
+  - 0.5 h
+  - 1 h
+  - 1.5 h
+  - 2 h
+  - 2-5 min
+  - 3 h
+  - 4 h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  time_point_significant_down:
+  - '1751'
+  - '1829'
+  - '1865'
+  - '2001'
+  - '2108'
+  - '37'
+  - '439'
+  time_point_significant_up:
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '1'
+  - '11'
+  time_point_totals:
+  - '2509'
+  - '2509'
+  - '2509'
+  - '2509'
+  - '2509'
+  - '2509'
+  - '2509'
+  treatment_type:
+  - viral
+- authors:
+  - Ayalla Fedida
+  - Claudia Steglich
+  - Damir Stazic
+  - Debbie Lindell
+  - Gazalah Sabehi
+  - Iris Karunker
+  - Matthias Futschik
+  - Miguel A Hernández-Prieto
+  - Roi Feingersch
+  - Rotem Sorek
+  - Shany Doron
+  background_factors:
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Phage
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 2589
+  experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8109
+  experiment_name: WH8109 cyanophage Syn9 infection time course (microarray)
+  gene_count: 18123
+  growth_phases:
+  - infected
+  is_time_course: 'true'
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: MICROARRAY
+  organism_name: Synechococcus WH8109
+  publication_doi: 10.1038/ismej.2015.210
+  significant_down_count: 10968
+  significant_up_count: 13
+  table_scope: all_detected_genes
+  table_scope_detail: All host probes on the array (WH8109); 232 BSV9_* Syn9 phage
+    probes filtered out at CSV-generation time (no Gene nodes). adjusted_p_value is
+    wired ONLY on the terminal 4 h timepoint and is limma^s omnibus series-level FDR
+    (^this gene changed at some point in the series^), not a timepoint-specific test;
+    the other six timepoints carry log-ratios with null adjusted_p_value (decision
+    D7(a)).
+  time_point_count: 7
+  time_point_growth_phases:
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
+  time_point_hours:
+  - '0.083'
+  - '0.5'
+  - '1.0'
+  - '1.5'
+  - '2.0'
+  - '3.0'
+  - '4.0'
+  time_point_labels:
+  - 0.5 h
+  - 1 h
+  - 1.5 h
+  - 2 h
+  - 2-5 min
+  - 3 h
+  - 4 h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  time_point_significant_down:
+  - '1745'
+  - '18'
+  - '2183'
+  - '2277'
+  - '2325'
+  - '2390'
+  - '30'
+  time_point_significant_up:
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '1'
+  - '12'
+  time_point_totals:
+  - '2589'
+  - '2589'
+  - '2589'
+  - '2589'
+  - '2589'
+  - '2589'
+  - '2589'
+  treatment_type:
+  - viral

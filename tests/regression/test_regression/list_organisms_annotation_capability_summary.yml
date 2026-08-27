@@ -1,0 +1,262 @@
+by_annotation_capability:
+- interpro_gene_count: 3746
+  ncbifam_gene_count: 1379
+  nonpeptidase_homolog_gene_count: 31
+  organism_name: Alteromonas (MarRef v6)
+  peptidase_gene_count: 148
+  preferred_name: Alteromonas (MarRef v6)
+- interpro_gene_count: 1545
+  ncbifam_gene_count: 744
+  nonpeptidase_homolog_gene_count: 8
+  organism_name: Prochlorococcus MED4
+  peptidase_gene_count: 50
+  preferred_name: Prochlorococcus MED4
+by_cluster_type:
+- cluster_type: genomic_island
+  count: 1
+- cluster_type: decay_pattern
+  count: 1
+- cluster_type: diel
+  count: 1
+- cluster_type: time_course
+  count: 1
+by_compartment:
+- compartment: vesicle
+  count: 1
+- compartment: whole_cell
+  count: 1
+by_measurement_capability:
+  has_metabolomics: 0
+  no_metabolomics: 3
+by_metabolic_capability:
+- catalyzed_metabolite_count: 1359
+  organism_name: Alteromonas (MarRef v6)
+  reaction_count: 1263
+  transported_metabolite_count: 1265
+- catalyzed_metabolite_count: 1039
+  organism_name: Prochlorococcus MED4
+  reaction_count: 943
+  transported_metabolite_count: 1069
+by_metric_type:
+- count: 1
+  metric_type: antisense_tss_count
+- count: 1
+  metric_type: damping_ratio
+- count: 1
+  metric_type: diel_amplitude_protein_log2
+- count: 1
+  metric_type: diel_amplitude_transcript_log2
+- count: 1
+  metric_type: expressed_above_background
+- count: 1
+  metric_type: expression_at_t0_log2
+- count: 1
+  metric_type: expression_change_high_light_shock
+- count: 1
+  metric_type: expression_change_low_co2_no_o2_shock
+- count: 1
+  metric_type: expression_change_low_co2_shock
+- count: 1
+  metric_type: expression_level_class
+- count: 1
+  metric_type: has_primary_tss
+- count: 1
+  metric_type: internal_tss_count
+- count: 1
+  metric_type: mascot_identification_probability
+- count: 1
+  metric_type: minus10_element_score
+- count: 1
+  metric_type: pangenome_membership
+- count: 1
+  metric_type: peak_time_protein_h
+- count: 1
+  metric_type: peak_time_transcript_h
+- count: 1
+  metric_type: predicted_subcellular_localization
+- count: 1
+  metric_type: protein_transcript_lag_h
+- count: 1
+  metric_type: rapid_recovery_low_co2_no_o2_shock
+- count: 1
+  metric_type: rapid_recovery_low_co2_shock
+- count: 1
+  metric_type: rna_decay_time_min
+- count: 1
+  metric_type: rna_half_life_min
+- count: 1
+  metric_type: tss_distance_to_cds
+- count: 1
+  metric_type: vesicle_dna_avg_read_coverage
+- count: 1
+  metric_type: vesicle_proteome_member
+by_organism_type:
+- count: 1
+  organism_type: genome_strain
+- count: 1
+  organism_type: reference_proteome_match
+- count: 1
+  organism_type: treatment
+by_value_kind:
+- count: 1
+  value_kind: boolean
+- count: 1
+  value_kind: categorical
+- count: 1
+  value_kind: numeric
+case_id: list_organisms_annotation_capability_summary
+not_found: []
+offset: 0
+results:
+- background_factors:
+  - coculture
+  - darkness
+  - light
+  catalyzed_metabolite_count: 1359
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  experiment_count: 60
+  gene_count: 4305
+  genus: Alteromonas
+  growth_phases:
+  - darkness
+  - stationary
+  interpro_gene_count: 3746
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 232
+  ncbifam_gene_count: 1379
+  nonpeptidase_homolog_gene_count: 31
+  omics_types:
+  - PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  organism_type: reference_proteome_match
+  peptidase_gene_count: 148
+  publication_count: 1
+  reaction_count: 1263
+  reference_database: MarRef v6
+  reference_proteome: UP000262181
+  species: null
+  strain: Alt_MarRef
+  transported_metabolite_count: 1265
+  treatment_types:
+  - carbon
+  - coculture
+- background_factors:
+  - axenic
+  - darkness
+  - diel
+  - light
+  - viral
+  catalyzed_metabolite_count: 0
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  experiment_count: 10
+  gene_count: 0
+  genus: null
+  growth_phases:
+  - acute_stress
+  - exponential
+  - infected
+  interpro_gene_count: 0
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 10239
+  ncbifam_gene_count: 0
+  nonpeptidase_homolog_gene_count: 0
+  omics_types:
+  - MICROARRAY
+  - RNASEQ
+  organism_name: Phage
+  organism_type: treatment
+  peptidase_gene_count: 0
+  publication_count: 5
+  reaction_count: 0
+  species: null
+  strain: null
+  transported_metabolite_count: 0
+  treatment_types:
+  - light
+  - viral
+- background_factors:
+  - axenic
+  - chemical
+  - coculture
+  - darkness
+  - diel
+  - light
+  - viral
+  catalyzed_metabolite_count: 1039
+  clade: HLI
+  cluster_types:
+  - decay_pattern
+  - diel
+  - genomic_island
+  - time_course
+  clustering_analysis_count: 6
+  compartments:
+  - vesicle
+  - whole_cell
+  derived_metric_count: 26
+  derived_metric_value_kinds:
+  - boolean
+  - categorical
+  - numeric
+  experiment_count: 119
+  gene_count: 1976
+  genus: Prochlorococcus
+  growth_phases:
+  - acclimated_steady_state
+  - acute_stress
+  - darkness
+  - death
+  - diel
+  - exponential
+  - infected
+  - nutrient_limited
+  - recovery
+  - stationary
+  interpro_gene_count: 1545
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 59919
+  ncbifam_gene_count: 744
+  nonpeptidase_homolog_gene_count: 8
+  omics_types:
+  - MICROARRAY
+  - PAIRED_RNASEQ_PROTEOME
+  - PROTEOMICS
+  - RNASEQ
+  - VESICLE_DNASEQ
+  - VESICLE_PROTEOMICS
+  organism_name: Prochlorococcus MED4
+  organism_type: genome_strain
+  peptidase_gene_count: 50
+  publication_count: 20
+  reaction_count: 943
+  species: Prochlorococcus marinus
+  strain: MED4
+  transported_metabolite_count: 1069
+  treatment_types:
+  - carbon
+  - coculture
+  - compartment
+  - darkness
+  - diel
+  - growth_phase
+  - iron
+  - light
+  - nitrogen
+  - phosphorus
+  - salt
+  - viral
+returned: 3
+row_count: 3
+total_entries: 48
+total_matching: 3
+truncated: false

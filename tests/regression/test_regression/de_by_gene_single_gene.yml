@@ -1,5 +1,5 @@
 case_id: de_by_gene_single_gene
-row_count: 33
+row_count: 38
 rows:
 - experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   expression_status: not_significant
@@ -91,6 +91,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - carbon
+- experiment_id: 10.64898/2026.04.15.718746_extended_light_med4
+  expression_status: significant_up
+  gene_name: dnaN
+  growth_phase: diel
+  locus_tag: PMM0001
+  log2fc: 1.1294
+  padj: 0.0
+  rank: 545
+  rank_down: null
+  rank_up: 313
+  timepoint: 16h
+  timepoint_hours: 16.0
+  timepoint_order: 2
+  treatment_type:
+  - light
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   expression_status: significant_up
   gene_name: dnaN
@@ -106,6 +121,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
+  expression_status: significant_up
+  gene_name: dnaN
+  growth_phase: diel
+  locus_tag: PMM0001
+  log2fc: 1.0312
+  padj: 0.0
+  rank: 563
+  rank_down: null
+  rank_up: 297
+  timepoint: 4h
+  timepoint_hours: 4.0
+  timepoint_order: 2
+  treatment_type:
+  - darkness
 - experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
@@ -166,6 +196,21 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
+  expression_status: not_significant
+  gene_name: dnaN
+  growth_phase: diel
+  locus_tag: PMM0001
+  log2fc: 0.8456
+  padj: 0.0002
+  rank: 606
+  rank_down: null
+  rank_up: null
+  timepoint: 2h
+  timepoint_hours: 2.0
+  timepoint_order: 1
+  treatment_type:
+  - darkness
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   expression_status: not_significant
   gene_name: dnaN
@@ -301,6 +346,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.64898/2026.04.15.718746_extended_light_med4
+  expression_status: not_significant
+  gene_name: dnaN
+  growth_phase: diel
+  locus_tag: PMM0001
+  log2fc: 0.3637
+  padj: 0.7829
+  rank: 1190
+  rank_down: null
+  rank_up: null
+  timepoint: 14h
+  timepoint_hours: 14.0
+  timepoint_order: 1
+  treatment_type:
+  - light
 - experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
@@ -451,6 +511,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq
+  expression_status: not_significant
+  gene_name: dnaN
+  growth_phase: acclimated_steady_state
+  locus_tag: PMM0001
+  log2fc: 0.0821
+  padj: 1.0
+  rank: 1617
+  rank_down: null
+  rank_up: null
+  timepoint: acclimated
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type:
+  - salt
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   expression_status: not_significant
   gene_name: dnaN

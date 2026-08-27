@@ -33,7 +33,7 @@ not_found:
   pathway_ids: []
 offset: 0
 results:
-- catalyst_gene_count: 10052
+- catalyst_gene_count: 10249
   chebi_id: '10743'
   elements:
   - H
@@ -49,7 +49,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00001
   name: H2O
-  organism_count: 42
+  organism_count: 43
   pathway_count: 17
   pathway_ids:
   - kegg.pathway:ko00190
@@ -70,8 +70,8 @@ results:
   - kegg.pathway:ko05208
   - kegg.pathway:ko05415
   transporter_count: 14
-  transporter_gene_count: 1822
-- catalyst_gene_count: 5906
+  transporter_gene_count: 1844
+- catalyst_gene_count: 6041
   chebi_id: '10789'
   elements:
   - C
@@ -90,7 +90,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00002
   name: ATP
-  organism_count: 42
+  organism_count: 43
   pathway_count: 33
   pathway_ids:
   - kegg.pathway:ko00190
@@ -127,8 +127,8 @@ results:
   - kegg.pathway:ko05410
   - kegg.pathway:ko05415
   transporter_count: 15
-  transporter_gene_count: 2177
-- catalyst_gene_count: 5666
+  transporter_gene_count: 2195
+- catalyst_gene_count: 5776
   chebi_id: '10744'
   elements:
   - H
@@ -143,7 +143,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00080
   name: H+
-  organism_count: 42
+  organism_count: 43
   pathway_count: 27
   pathway_ids:
   - kegg.pathway:ko00190
@@ -174,8 +174,8 @@ results:
   - kegg.pathway:ko05164
   - kegg.pathway:ko05323
   transporter_count: 123
-  transporter_gene_count: 7889
-- catalyst_gene_count: 4228
+  transporter_gene_count: 8017
+- catalyst_gene_count: 4325
   chebi_id: '13420'
   elements:
   - H
@@ -192,15 +192,15 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00013
   name: Diphosphate
-  organism_count: 42
+  organism_count: 43
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00190
   - kegg.pathway:ko05012
   - kegg.pathway:ko05022
   transporter_count: 3
-  transporter_gene_count: 98
-- catalyst_gene_count: 3983
+  transporter_gene_count: 99
+- catalyst_gene_count: 4069
   chebi_id: '14791'
   elements:
   - H
@@ -217,7 +217,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00009
   name: Orthophosphate
-  organism_count: 42
+  organism_count: 43
   pathway_count: 10
   pathway_ids:
   - kegg.pathway:ko00190
@@ -231,7 +231,7 @@ results:
   - kegg.pathway:ko05012
   - kegg.pathway:ko05022
   transporter_count: 15
-  transporter_gene_count: 2826
+  transporter_gene_count: 2867
 returned: 5
 row_count: 5
 score_max: null

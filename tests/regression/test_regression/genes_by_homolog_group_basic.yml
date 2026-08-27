@@ -1,5 +1,5 @@
 case_id: genes_by_homolog_group_basic
-row_count: 21
+row_count: 22
 rows:
 - gene_category: Photosynthesis
   gene_name: psbB
@@ -120,6 +120,12 @@ rows:
   group_id: cyanorak:CK_00000570
   locus_tag: SynWH7803_0518
   organism_name: Synechococcus WH7803
+  product: photosystem II chlorophyll-binding protein CP47
+- gene_category: Photosynthesis
+  gene_name: psbB
+  group_id: cyanorak:CK_00000570
+  locus_tag: Syncc8109_0504
+  organism_name: Synechococcus WH8109
   product: photosystem II chlorophyll-binding protein CP47
 - gene_category: Photosynthesis
   gene_name: psbB

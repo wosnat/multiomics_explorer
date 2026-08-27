@@ -45,6 +45,7 @@ results:
   tcdb_evidence_score: 0.6
   tcdb_family_id: tcdb:3.A.1.16.1
   tcdb_family_name: Four component nitrate/nitrite porter.
+  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: cynA
@@ -62,6 +63,7 @@ results:
   tcdb_evidence_score: 0.6
   tcdb_family_id: tcdb:3.A.1.16.2
   tcdb_family_name: Bispecific cyanate/nitrite transporter.
+  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: cynB
@@ -79,6 +81,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.16.1
   tcdb_family_name: Four component nitrate/nitrite porter.
+  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: cynB
@@ -96,6 +99,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.16.2
   tcdb_family_name: Bispecific cyanate/nitrite transporter.
+  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: cynD
@@ -113,6 +117,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.16.1
   tcdb_family_name: Four component nitrate/nitrite porter.
+  transport_substrate_resolution: resolved
 returned: 5
 row_count: 5
 top_gene_categories:

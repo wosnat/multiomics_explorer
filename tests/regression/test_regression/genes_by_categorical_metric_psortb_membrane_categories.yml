@@ -58,15 +58,15 @@ by_metric:
   dm_by_category:
   - category: Unknown
     count: 15
+  - category: Cytoplasmic
+    count: 3
   - category: Extracellular
     count: 3
   - category: Outer Membrane
     count: 3
   - category: Periplasmic
     count: 3
-  - category: Cytoplasmic
-    count: 2
-  dm_total_gene_count: 26
+  dm_total_gene_count: 27
   metric_type: predicted_subcellular_localization
   name: MIT9313 vesicle protein PSORTb predicted localization (Biller 2014 Table S3)
   value_kind: categorical

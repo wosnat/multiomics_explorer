@@ -1,5 +1,5 @@
 case_id: list_organisms
-row_count: 47
+row_count: 48
 rows:
 - background_factors: []
   catalyzed_metabolite_count: 0
@@ -13,11 +13,15 @@ rows:
   gene_count: 0
   genus: Alteromonas
   growth_phases: []
+  interpro_gene_count: 0
   measured_metabolite_count: 0
   ncbi_taxon_id: 28108
+  ncbifam_gene_count: 0
+  nonpeptidase_homolog_gene_count: 0
   omics_types: []
   organism_name: Alteromonas
   organism_type: treatment
+  peptidase_gene_count: 0
   publication_count: 0
   reaction_count: 0
   reference_database: null
@@ -43,12 +47,16 @@ rows:
   growth_phases:
   - darkness
   - stationary
+  interpro_gene_count: 3746
   measured_metabolite_count: 0
   ncbi_taxon_id: 232
+  ncbifam_gene_count: 1379
+  nonpeptidase_homolog_gene_count: 31
   omics_types:
   - PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   organism_type: reference_proteome_match
+  peptidase_gene_count: 148
   publication_count: 1
   reaction_count: 1263
   reference_database: MarRef v6
@@ -75,12 +83,16 @@ rows:
   gene_count: 3929
   genus: Alteromonas
   growth_phases: []
+  interpro_gene_count: 3495
   measured_metabolite_count: 0
   ncbi_taxon_id: 1004787
+  ncbifam_gene_count: 1611
+  nonpeptidase_homolog_gene_count: 32
   omics_types:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii AD45
   organism_type: genome_strain
+  peptidase_gene_count: 129
   publication_count: 1
   reaction_count: 1259
   reference_database: null
@@ -106,12 +118,16 @@ rows:
   gene_count: 3834
   genus: Alteromonas
   growth_phases: []
+  interpro_gene_count: 3456
   measured_metabolite_count: 0
   ncbi_taxon_id: 529120
+  ncbifam_gene_count: 1598
+  nonpeptidase_homolog_gene_count: 37
   omics_types:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii ATCC27126
   organism_type: genome_strain
+  peptidase_gene_count: 125
   publication_count: 1
   reaction_count: 1251
   reference_database: null
@@ -137,12 +153,16 @@ rows:
   gene_count: 4063
   genus: Alteromonas
   growth_phases: []
+  interpro_gene_count: 3608
   measured_metabolite_count: 0
   ncbi_taxon_id: 28108
+  ncbifam_gene_count: 1656
+  nonpeptidase_homolog_gene_count: 33
   omics_types:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii BGP6
   organism_type: genome_strain
+  peptidase_gene_count: 127
   publication_count: 1
   reaction_count: 1275
   reference_database: null
@@ -168,12 +188,16 @@ rows:
   gene_count: 3741
   genus: Alteromonas
   growth_phases: []
+  interpro_gene_count: 3349
   measured_metabolite_count: 0
   ncbi_taxon_id: 1004785
+  ncbifam_gene_count: 1577
+  nonpeptidase_homolog_gene_count: 29
   omics_types:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii BS11
   organism_type: genome_strain
+  peptidase_gene_count: 123
   publication_count: 1
   reaction_count: 1228
   reference_database: null
@@ -204,14 +228,18 @@ rows:
   growth_phases:
   - acclimated_steady_state
   - exponential
+  interpro_gene_count: 3659
   measured_metabolite_count: 0
   ncbi_taxon_id: 28108
+  ncbifam_gene_count: 1701
+  nonpeptidase_homolog_gene_count: 34
   omics_types:
   - EXOPROTEOMICS
   - PROTEOMICS
   - RNASEQ
   organism_name: Alteromonas macleodii EZ55
   organism_type: genome_strain
+  peptidase_gene_count: 124
   publication_count: 3
   reaction_count: 1348
   reference_database: null
@@ -244,14 +272,18 @@ rows:
   - death
   - exponential
   - nutrient_limited
+  interpro_gene_count: 3563
   measured_metabolite_count: 0
   ncbi_taxon_id: 28108
+  ncbifam_gene_count: 1678
+  nonpeptidase_homolog_gene_count: 33
   omics_types:
   - PROTEOMICS
   - RNASEQ
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii HOT1A3
   organism_type: genome_strain
+  peptidase_gene_count: 118
   publication_count: 3
   reaction_count: 1266
   reference_database: null
@@ -287,13 +319,17 @@ rows:
   - darkness
   - diel
   - exponential
+  interpro_gene_count: 3584
   measured_metabolite_count: 0
   ncbi_taxon_id: 28108
+  ncbifam_gene_count: 1699
+  nonpeptidase_homolog_gene_count: 32
   omics_types:
   - RNASEQ
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii MIT1002
   organism_type: genome_strain
+  peptidase_gene_count: 120
   publication_count: 4
   reaction_count: 1288
   reference_database: null
@@ -318,11 +354,15 @@ rows:
   gene_count: 3817
   genus: Alteromonas
   growth_phases: []
+  interpro_gene_count: 3363
   measured_metabolite_count: 0
   ncbi_taxon_id: 1774373
+  ncbifam_gene_count: 1591
+  nonpeptidase_homolog_gene_count: 31
   omics_types: []
   organism_name: Alteromonas mediterranea AltDE
   organism_type: genome_strain
+  peptidase_gene_count: 104
   publication_count: 0
   reaction_count: 1206
   reference_database: null
@@ -343,11 +383,15 @@ rows:
   gene_count: 4238
   genus: Alteromonas
   growth_phases: []
+  interpro_gene_count: 3621
   measured_metabolite_count: 0
   ncbi_taxon_id: 1004786
+  ncbifam_gene_count: 1686
+  nonpeptidase_homolog_gene_count: 31
   omics_types: []
   organism_name: Alteromonas mediterranea AltDE1
   organism_type: genome_strain
+  peptidase_gene_count: 116
   publication_count: 0
   reaction_count: 1249
   reference_database: null
@@ -370,13 +414,17 @@ rows:
   genus: Escherichia
   growth_phases:
   - acclimated_steady_state
+  interpro_gene_count: 0
   measured_metabolite_count: 0
   ncbi_taxon_id: 562
+  ncbifam_gene_count: 0
+  nonpeptidase_homolog_gene_count: 0
   omics_types:
   - PROTEOMICS
   - RNASEQ
   organism_name: Escherichia coli
   organism_type: treatment
+  peptidase_gene_count: 0
   publication_count: 1
   reaction_count: 0
   reference_database: null
@@ -403,12 +451,16 @@ rows:
   growth_phases:
   - darkness
   - stationary
+  interpro_gene_count: 3780
   measured_metabolite_count: 0
   ncbi_taxon_id: 225937
+  ncbifam_gene_count: 1712
+  nonpeptidase_homolog_gene_count: 31
   omics_types:
   - PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   organism_type: reference_proteome_match
+  peptidase_gene_count: 94
   publication_count: 1
   reaction_count: 1278
   reference_database: MarRef v6
@@ -419,7 +471,8 @@ rows:
   treatment_types:
   - carbon
   - coculture
-- background_factors: []
+- background_factors:
+  - light
   catalyzed_metabolite_count: 0
   clade: null
   cluster_types: []
@@ -431,12 +484,16 @@ rows:
   gene_count: 0
   genus: Deinococcus
   growth_phases: []
+  interpro_gene_count: 0
   measured_metabolite_count: 0
   ncbi_taxon_id: 1299
+  ncbifam_gene_count: 0
+  nonpeptidase_homolog_gene_count: 0
   omics_types:
   - RNASEQ
   organism_name: Meiothermus ruber
   organism_type: treatment
+  peptidase_gene_count: 0
   publication_count: 1
   reaction_count: 0
   reference_database: null
@@ -447,7 +504,9 @@ rows:
   treatment_types:
   - coculture
   - light
-- background_factors: []
+  - oxygen
+- background_factors:
+  - light
   catalyzed_metabolite_count: 1215
   clade: null
   cluster_types:
@@ -460,12 +519,16 @@ rows:
   gene_count: 2884
   genus: Meiothermus
   growth_phases: []
+  interpro_gene_count: 2492
   measured_metabolite_count: 0
   ncbi_taxon_id: 172827
+  ncbifam_gene_count: 951
+  nonpeptidase_homolog_gene_count: 26
   omics_types:
   - RNASEQ
   organism_name: Meiothermus ruber
   organism_type: genome_strain
+  peptidase_gene_count: 99
   publication_count: 1
   reaction_count: 1138
   reference_database: null
@@ -476,9 +539,11 @@ rows:
   treatment_types:
   - coculture
   - light
+  - oxygen
 - background_factors:
   - axenic
   - darkness
+  - diel
   - light
   - viral
   catalyzed_metabolite_count: 0
@@ -488,21 +553,25 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 6
+  experiment_count: 10
   gene_count: 0
   genus: null
   growth_phases:
   - acute_stress
   - exponential
   - infected
+  interpro_gene_count: 0
   measured_metabolite_count: 0
   ncbi_taxon_id: 10239
+  ncbifam_gene_count: 0
+  nonpeptidase_homolog_gene_count: 0
   omics_types:
   - MICROARRAY
   - RNASEQ
   organism_name: Phage
   organism_type: treatment
-  publication_count: 3
+  peptidase_gene_count: 0
+  publication_count: 5
   reaction_count: 0
   reference_database: null
   reference_proteome: null
@@ -517,8 +586,9 @@ rows:
   - light
   catalyzed_metabolite_count: 1017
   clade: HLII
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - genomic_island
+  clustering_analysis_count: 1
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -527,12 +597,16 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - acclimated_steady_state
+  interpro_gene_count: 1547
   measured_metabolite_count: 0
   ncbi_taxon_id: 146891
+  ncbifam_gene_count: 758
+  nonpeptidase_homolog_gene_count: 8
   omics_types:
   - RNASEQ
   organism_name: Prochlorococcus AS9601
   organism_type: genome_strain
+  peptidase_gene_count: 49
   publication_count: 1
   reaction_count: 924
   reference_database: null
@@ -553,18 +627,20 @@ rows:
   catalyzed_metabolite_count: 1039
   clade: HLI
   cluster_types:
+  - decay_pattern
   - diel
+  - genomic_island
   - time_course
-  clustering_analysis_count: 4
+  clustering_analysis_count: 6
   compartments:
   - vesicle
   - whole_cell
-  derived_metric_count: 17
+  derived_metric_count: 26
   derived_metric_value_kinds:
   - boolean
   - categorical
   - numeric
-  experiment_count: 114
+  experiment_count: 119
   gene_count: 1976
   genus: Prochlorococcus
   growth_phases:
@@ -572,13 +648,17 @@ rows:
   - acute_stress
   - darkness
   - death
+  - diel
   - exponential
   - infected
   - nutrient_limited
   - recovery
   - stationary
+  interpro_gene_count: 1545
   measured_metabolite_count: 0
   ncbi_taxon_id: 59919
+  ncbifam_gene_count: 744
+  nonpeptidase_homolog_gene_count: 8
   omics_types:
   - MICROARRAY
   - PAIRED_RNASEQ_PROTEOME
@@ -588,7 +668,8 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MED4
   organism_type: genome_strain
-  publication_count: 17
+  peptidase_gene_count: 50
+  publication_count: 20
   reaction_count: 943
   reference_database: null
   reference_proteome: null
@@ -599,6 +680,7 @@ rows:
   - carbon
   - coculture
   - compartment
+  - darkness
   - diel
   - growth_phase
   - iron
@@ -607,7 +689,8 @@ rows:
   - phosphorus
   - salt
   - viral
-- background_factors: []
+- background_factors:
+  - axenic
   catalyzed_metabolite_count: 1022
   clade: HLII
   cluster_types: []
@@ -615,23 +698,31 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 0
+  experiment_count: 3
   gene_count: 2137
   genus: Prochlorococcus
-  growth_phases: []
+  growth_phases:
+  - acute_stress
+  interpro_gene_count: 1600
   measured_metabolite_count: 0
   ncbi_taxon_id: 1501268
-  omics_types: []
+  ncbifam_gene_count: 770
+  nonpeptidase_homolog_gene_count: 8
+  omics_types:
+  - RNASEQ
   organism_name: Prochlorococcus MIT0604
   organism_type: genome_strain
-  publication_count: 0
+  peptidase_gene_count: 50
+  publication_count: 1
   reaction_count: 930
   reference_database: null
   reference_proteome: null
   species: null
   strain: MIT0604
   transported_metabolite_count: 1057
-  treatment_types: []
+  treatment_types:
+  - chemical
+  - light
 - background_factors:
   - axenic
   catalyzed_metabolite_count: 1036
@@ -645,12 +736,16 @@ rows:
   gene_count: 2358
   genus: Prochlorococcus
   growth_phases: []
+  interpro_gene_count: 1616
   measured_metabolite_count: 92
   ncbi_taxon_id: 1501269
+  ncbifam_gene_count: 793
+  nonpeptidase_homolog_gene_count: 11
   omics_types:
   - METABOLOMICS
   organism_name: Prochlorococcus MIT0801
   organism_type: genome_strain
+  peptidase_gene_count: 52
   publication_count: 1
   reaction_count: 934
   reference_database: null
@@ -664,8 +759,9 @@ rows:
 - background_factors: []
   catalyzed_metabolite_count: 1027
   clade: HLII
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - genomic_island
+  clustering_analysis_count: 1
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -673,11 +769,15 @@ rows:
   gene_count: 1883
   genus: Prochlorococcus
   growth_phases: []
+  interpro_gene_count: 1541
   measured_metabolite_count: 0
   ncbi_taxon_id: 3096220
+  ncbifam_gene_count: 753
+  nonpeptidase_homolog_gene_count: 12
   omics_types: []
   organism_name: Prochlorococcus MIT1314
   organism_type: genome_strain
+  peptidase_gene_count: 46
   publication_count: 0
   reaction_count: 928
   reference_database: null
@@ -698,11 +798,15 @@ rows:
   gene_count: 2452
   genus: Prochlorococcus
   growth_phases: []
+  interpro_gene_count: 1923
   measured_metabolite_count: 0
   ncbi_taxon_id: 1801626
+  ncbifam_gene_count: 883
+  nonpeptidase_homolog_gene_count: 10
   omics_types: []
   organism_name: Prochlorococcus MIT1327
   organism_type: genome_strain
+  peptidase_gene_count: 70
   publication_count: 0
   reaction_count: 956
   reference_database: null
@@ -723,11 +827,15 @@ rows:
   gene_count: 2027
   genus: Prochlorococcus
   growth_phases: []
+  interpro_gene_count: 1529
   measured_metabolite_count: 0
   ncbi_taxon_id: 93058
+  ncbifam_gene_count: 756
+  nonpeptidase_homolog_gene_count: 11
   omics_types: []
   organism_name: Prochlorococcus MIT9202
   organism_type: genome_strain
+  peptidase_gene_count: 48
   publication_count: 0
   reaction_count: 921
   reference_database: null
@@ -748,11 +856,15 @@ rows:
   gene_count: 2030
   genus: Prochlorococcus
   growth_phases: []
+  interpro_gene_count: 1580
   measured_metabolite_count: 0
   ncbi_taxon_id: 93060
+  ncbifam_gene_count: 770
+  nonpeptidase_homolog_gene_count: 10
   omics_types: []
   organism_name: Prochlorococcus MIT9215
   organism_type: genome_strain
+  peptidase_gene_count: 50
   publication_count: 0
   reaction_count: 950
   reference_database: null
@@ -769,7 +881,8 @@ rows:
   clade: HLII
   cluster_types:
   - condition_comparison
-  clustering_analysis_count: 1
+  - genomic_island
+  clustering_analysis_count: 2
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -778,13 +891,17 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - exponential
+  interpro_gene_count: 1537
   measured_metabolite_count: 99
   ncbi_taxon_id: 167546
+  ncbifam_gene_count: 774
+  nonpeptidase_homolog_gene_count: 10
   omics_types:
   - METABOLOMICS
   - RNASEQ
   organism_name: Prochlorococcus MIT9301
   organism_type: genome_strain
+  peptidase_gene_count: 49
   publication_count: 3
   reaction_count: 945
   reference_database: null
@@ -801,8 +918,9 @@ rows:
   - light
   catalyzed_metabolite_count: 1135
   clade: LLIV
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - genomic_island
+  clustering_analysis_count: 1
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -811,13 +929,17 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - exponential
+  interpro_gene_count: 2015
   measured_metabolite_count: 16
   ncbi_taxon_id: 59922
+  ncbifam_gene_count: 895
+  nonpeptidase_homolog_gene_count: 13
   omics_types:
   - METABOLOMICS
   - RNASEQ
   organism_name: Prochlorococcus MIT9303
   organism_type: genome_strain
+  peptidase_gene_count: 72
   publication_count: 1
   reaction_count: 993
   reference_database: null
@@ -834,8 +956,9 @@ rows:
   - light
   catalyzed_metabolite_count: 1047
   clade: HLII
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - genomic_island
+  clustering_analysis_count: 1
   compartments:
   - vesicle
   derived_metric_count: 3
@@ -849,8 +972,11 @@ rows:
   - acute_stress
   - exponential
   - stationary
+  interpro_gene_count: 1557
   measured_metabolite_count: 69
   ncbi_taxon_id: 74546
+  ncbifam_gene_count: 759
+  nonpeptidase_homolog_gene_count: 9
   omics_types:
   - METABOLOMICS
   - PROTEOMICS
@@ -858,6 +984,7 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MIT9312
   organism_type: genome_strain
+  peptidase_gene_count: 50
   publication_count: 5
   reaction_count: 943
   reference_database: null
@@ -877,16 +1004,18 @@ rows:
   catalyzed_metabolite_count: 1081
   clade: LLIV
   cluster_types:
+  - genomic_island
   - time_course
-  clustering_analysis_count: 2
+  clustering_analysis_count: 3
   compartments:
   - vesicle
-  derived_metric_count: 6
+  - whole_cell
+  derived_metric_count: 11
   derived_metric_value_kinds:
   - boolean
   - categorical
   - numeric
-  experiment_count: 38
+  experiment_count: 40
   gene_count: 2948
   genus: Prochlorococcus
   growth_phases:
@@ -894,8 +1023,11 @@ rows:
   - exponential
   - nutrient_limited
   - recovery
+  interpro_gene_count: 1888
   measured_metabolite_count: 145
   ncbi_taxon_id: 74547
+  ncbifam_gene_count: 905
+  nonpeptidase_homolog_gene_count: 11
   omics_types:
   - METABOLOMICS
   - MICROARRAY
@@ -904,7 +1036,8 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MIT9313
   organism_type: genome_strain
-  publication_count: 9
+  peptidase_gene_count: 60
+  publication_count: 10
   reaction_count: 953
   reference_database: null
   reference_proteome: null
@@ -932,11 +1065,15 @@ rows:
   gene_count: 1949
   genus: Prochlorococcus
   growth_phases: []
+  interpro_gene_count: 1538
   measured_metabolite_count: 0
   ncbi_taxon_id: 167542
+  ncbifam_gene_count: 744
+  nonpeptidase_homolog_gene_count: 8
   omics_types: []
   organism_name: Prochlorococcus MIT9515
   organism_type: genome_strain
+  peptidase_gene_count: 50
   publication_count: 0
   reaction_count: 926
   reference_database: null
@@ -950,8 +1087,9 @@ rows:
   - light
   catalyzed_metabolite_count: 1039
   clade: LLI
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - genomic_island
+  clustering_analysis_count: 1
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -960,12 +1098,16 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - acclimated_steady_state
+  interpro_gene_count: 1573
   measured_metabolite_count: 0
   ncbi_taxon_id: 167555
+  ncbifam_gene_count: 777
+  nonpeptidase_homolog_gene_count: 12
   omics_types:
   - RNASEQ
   organism_name: Prochlorococcus NATL1A
   organism_type: genome_strain
+  peptidase_gene_count: 49
   publication_count: 1
   reaction_count: 935
   reference_database: null
@@ -985,7 +1127,8 @@ rows:
   clade: LLI
   cluster_types:
   - diel
-  clustering_analysis_count: 2
+  - genomic_island
+  clustering_analysis_count: 3
   compartments:
   - whole_cell
   derived_metric_count: 5
@@ -1003,13 +1146,17 @@ rows:
   - nutrient_limited
   - recovery
   - stationary
+  interpro_gene_count: 1567
   measured_metabolite_count: 0
   ncbi_taxon_id: 59920
+  ncbifam_gene_count: 775
+  nonpeptidase_homolog_gene_count: 10
   omics_types:
   - PROTEOMICS
   - RNASEQ
   organism_name: Prochlorococcus NATL2A
   organism_type: genome_strain
+  peptidase_gene_count: 50
   publication_count: 6
   reaction_count: 927
   reference_database: null
@@ -1035,11 +1182,15 @@ rows:
   gene_count: 2370
   genus: Prochlorococcus
   growth_phases: []
+  interpro_gene_count: 1563
   measured_metabolite_count: 0
   ncbi_taxon_id: 59924
+  ncbifam_gene_count: 771
+  nonpeptidase_homolog_gene_count: 10
   omics_types: []
   organism_name: Prochlorococcus PAC1
   organism_type: genome_strain
+  peptidase_gene_count: 50
   publication_count: 0
   reaction_count: 959
   reference_database: null
@@ -1051,8 +1202,9 @@ rows:
 - background_factors: []
   catalyzed_metabolite_count: 1043
   clade: HLI
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - genomic_island
+  clustering_analysis_count: 1
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1060,11 +1212,15 @@ rows:
   gene_count: 1870
   genus: Prochlorococcus
   growth_phases: []
+  interpro_gene_count: 1550
   measured_metabolite_count: 0
   ncbi_taxon_id: 1924285
+  ncbifam_gene_count: 760
+  nonpeptidase_homolog_gene_count: 10
   omics_types: []
   organism_name: Prochlorococcus RSP50
   organism_type: genome_strain
+  peptidase_gene_count: 49
   publication_count: 0
   reaction_count: 948
   reference_database: null
@@ -1085,11 +1241,15 @@ rows:
   gene_count: 1977
   genus: Prochlorococcus
   growth_phases: []
+  interpro_gene_count: 1525
   measured_metabolite_count: 0
   ncbi_taxon_id: 59926
+  ncbifam_gene_count: 760
+  nonpeptidase_homolog_gene_count: 8
   omics_types: []
   organism_name: Prochlorococcus SB
   organism_type: genome_strain
+  peptidase_gene_count: 51
   publication_count: 0
   reaction_count: 931
   reference_database: null
@@ -1105,8 +1265,9 @@ rows:
   - light
   catalyzed_metabolite_count: 1046
   clade: LLII
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - genomic_island
+  clustering_analysis_count: 1
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1118,12 +1279,16 @@ rows:
   - darkness
   - exponential
   - stationary
+  interpro_gene_count: 1527
   measured_metabolite_count: 0
   ncbi_taxon_id: 167539
+  ncbifam_gene_count: 778
+  nonpeptidase_homolog_gene_count: 9
   omics_types:
   - PROTEOMICS
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   organism_type: genome_strain
+  peptidase_gene_count: 49
   publication_count: 3
   reaction_count: 919
   reference_database: null
@@ -1150,13 +1315,17 @@ rows:
   genus: Pseudomonas
   growth_phases:
   - exponential
+  interpro_gene_count: 4961
   measured_metabolite_count: 0
   ncbi_taxon_id: 160488
+  ncbifam_gene_count: 2264
+  nonpeptidase_homolog_gene_count: 43
   omics_types:
   - PROTEOMICS
   - RNASEQ
   organism_name: Pseudomonas putida KT2440
   organism_type: genome_strain
+  peptidase_gene_count: 125
   publication_count: 1
   reaction_count: 1449
   reference_database: null
@@ -1183,12 +1352,16 @@ rows:
   genus: Ruegeria
   growth_phases:
   - acclimated_steady_state
+  interpro_gene_count: 3953
   measured_metabolite_count: 0
   ncbi_taxon_id: 89184
+  ncbifam_gene_count: 1453
+  nonpeptidase_homolog_gene_count: 33
   omics_types:
   - EXOPROTEOMICS
   organism_name: Ruegeria pomeroyi DSS-3
   organism_type: genome_strain
+  peptidase_gene_count: 111
   publication_count: 3
   reaction_count: 1377
   reference_database: null
@@ -1212,12 +1385,16 @@ rows:
   genus: Shewanella
   growth_phases:
   - acclimated_steady_state
+  interpro_gene_count: 3636
   measured_metabolite_count: 0
   ncbi_taxon_id: 351745
+  ncbifam_gene_count: 1853
+  nonpeptidase_homolog_gene_count: 23
   omics_types:
   - RNASEQ
   organism_name: Shewanella sp. W3-18-1
   organism_type: genome_strain
+  peptidase_gene_count: 128
   publication_count: 1
   reaction_count: 1260
   reference_database: null
@@ -1244,12 +1421,16 @@ rows:
   genus: Synechococcus
   growth_phases:
   - exponential
+  interpro_gene_count: 2152
   measured_metabolite_count: 0
   ncbi_taxon_id: 64471
+  ncbifam_gene_count: 909
+  nonpeptidase_homolog_gene_count: 17
   omics_types:
   - RNASEQ
   organism_name: Synechococcus CC9311
   organism_type: genome_strain
+  peptidase_gene_count: 70
   publication_count: 1
   reaction_count: 1039
   reference_database: null
@@ -1274,12 +1455,16 @@ rows:
   genus: Picosynechococcus
   growth_phases:
   - acclimated_steady_state
+  interpro_gene_count: 2721
   measured_metabolite_count: 0
   ncbi_taxon_id: 32049
+  ncbifam_gene_count: 1161
+  nonpeptidase_homolog_gene_count: 15
   omics_types:
   - RNASEQ
   organism_name: Synechococcus PCC 7002
   organism_type: genome_strain
+  peptidase_gene_count: 94
   publication_count: 1
   reaction_count: 977
   reference_database: null
@@ -1293,29 +1478,38 @@ rows:
 - background_factors:
   - coculture
   - darkness
+  - diel
   - light
   catalyzed_metabolite_count: 1145
   clade: V
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - time_course
+  clustering_analysis_count: 1
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 69
+  experiment_count: 73
   gene_count: 2621
   genus: Synechococcus
   growth_phases:
   - acclimated_steady_state
   - darkness
+  - infected
   - stationary
+  interpro_gene_count: 2079
   measured_metabolite_count: 0
   ncbi_taxon_id: 32051
+  ncbifam_gene_count: 884
+  nonpeptidase_homolog_gene_count: 9
   omics_types:
   - EXOPROTEOMICS
+  - MICROARRAY
   - PROTEOMICS
+  - RNASEQ
   organism_name: Synechococcus WH7803
   organism_type: genome_strain
-  publication_count: 4
+  peptidase_gene_count: 68
+  publication_count: 6
   reaction_count: 1045
   reference_database: null
   reference_proteome: null
@@ -1325,10 +1519,12 @@ rows:
   treatment_types:
   - carbon
   - coculture
+  - viral
 - background_factors:
   - axenic
   - coculture
   - darkness
+  - diel
   - light
   catalyzed_metabolite_count: 1120
   clade: III
@@ -1337,15 +1533,19 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 74
+  experiment_count: 77
   gene_count: 2881
   genus: Parasynechococcus
   growth_phases:
   - darkness
   - exponential
+  - infected
   - stationary
+  interpro_gene_count: 2105
   measured_metabolite_count: 0
   ncbi_taxon_id: 84588
+  ncbifam_gene_count: 908
+  nonpeptidase_homolog_gene_count: 13
   omics_types:
   - EXOPROTEOMICS
   - MICROARRAY
@@ -1353,7 +1553,8 @@ rows:
   - RNASEQ
   organism_name: Synechococcus WH8102
   organism_type: genome_strain
-  publication_count: 4
+  peptidase_gene_count: 61
+  publication_count: 5
   reaction_count: 1027
   reference_database: null
   reference_proteome: null
@@ -1363,6 +1564,40 @@ rows:
   treatment_types:
   - carbon
   - coculture
+  - viral
+- background_factors:
+  - diel
+  catalyzed_metabolite_count: 1059
+  clade: II
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  experiment_count: 3
+  gene_count: 2707
+  genus: Synechococcus
+  growth_phases:
+  - infected
+  interpro_gene_count: 1869
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 166314
+  ncbifam_gene_count: 858
+  nonpeptidase_homolog_gene_count: 12
+  omics_types:
+  - MICROARRAY
+  organism_name: Synechococcus WH8109
+  organism_type: genome_strain
+  peptidase_gene_count: 60
+  publication_count: 1
+  reaction_count: 983
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: WH8109
+  transported_metabolite_count: 1151
+  treatment_types:
+  - viral
 - background_factors:
   - light
   catalyzed_metabolite_count: 1170
@@ -1377,13 +1612,17 @@ rows:
   genus: Synechococcus
   growth_phases:
   - exponential
+  interpro_gene_count: 2339
   measured_metabolite_count: 0
   ncbi_taxon_id: 1140
+  ncbifam_gene_count: 1081
+  nonpeptidase_homolog_gene_count: 14
   omics_types:
   - PROTEOMICS
   - RNASEQ
   organism_name: Synechococcus elongatus PCC 7942
   organism_type: genome_strain
+  peptidase_gene_count: 81
   publication_count: 1
   reaction_count: 1033
   reference_database: null
@@ -1407,13 +1646,17 @@ rows:
   genus: Synechococcus
   growth_phases:
   - acclimated_steady_state
+  interpro_gene_count: 2336
   measured_metabolite_count: 0
   ncbi_taxon_id: 1350461
+  ncbifam_gene_count: 1085
+  nonpeptidase_homolog_gene_count: 14
   omics_types:
   - PROTEOMICS
   - RNASEQ
   organism_name: Synechococcus elongatus UTEX 2973
   organism_type: genome_strain
+  peptidase_gene_count: 82
   publication_count: 1
   reaction_count: 1058
   reference_database: null
@@ -1440,12 +1683,16 @@ rows:
   growth_phases:
   - darkness
   - stationary
+  interpro_gene_count: 1998
   measured_metabolite_count: 0
   ncbi_taxon_id: 313625
+  ncbifam_gene_count: 884
+  nonpeptidase_homolog_gene_count: 10
   omics_types:
   - PROTEOMICS
   organism_name: Synechococcus sp. BL107
   organism_type: genome_strain
+  peptidase_gene_count: 61
   publication_count: 1
   reaction_count: 989
   reference_database: null
@@ -1456,7 +1703,8 @@ rows:
   treatment_types:
   - carbon
   - coculture
-- background_factors: []
+- background_factors:
+  - light
   catalyzed_metabolite_count: 1003
   clade: null
   cluster_types:
@@ -1469,12 +1717,16 @@ rows:
   gene_count: 2449
   genus: Thermosynechococcus
   growth_phases: []
+  interpro_gene_count: 2178
   measured_metabolite_count: 0
   ncbi_taxon_id: 197221
+  ncbifam_gene_count: 1078
+  nonpeptidase_homolog_gene_count: 16
   omics_types:
   - RNASEQ
   organism_name: Thermosynechococcus vestitus BP-1
   organism_type: genome_strain
+  peptidase_gene_count: 77
   publication_count: 1
   reaction_count: 894
   reference_database: null
@@ -1485,6 +1737,7 @@ rows:
   treatment_types:
   - coculture
   - light
+  - oxygen
 - background_factors:
   - light
   catalyzed_metabolite_count: 0
@@ -1499,12 +1752,16 @@ rows:
   genus: Vibrio
   growth_phases:
   - exponential
+  interpro_gene_count: 0
   measured_metabolite_count: 0
   ncbi_taxon_id: 670
+  ncbifam_gene_count: 0
+  nonpeptidase_homolog_gene_count: 0
   omics_types:
   - MICROARRAY
   organism_name: Vibrio parahaemolyticus
   organism_type: treatment
+  peptidase_gene_count: 0
   publication_count: 1
   reaction_count: 0
   reference_database: null

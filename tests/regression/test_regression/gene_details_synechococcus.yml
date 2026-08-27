@@ -64,7 +64,7 @@ rows:
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
-  closest_ortholog_group_size: 21
+  closest_ortholog_group_size: 22
   cluster_membership_count: 0
   cluster_types: []
   compartments_observed: []
@@ -81,7 +81,7 @@ rows:
   - uniprot
   discussed_in_publication_count: 0
   end: 304589
-  expression_edge_count: 5
+  expression_edge_count: 12
   function_description: Acts as a processive, ATP-dependent zinc metallopeptidase
     for both cytoplasmic and membrane proteins. Plays a role in the quality control
     of integral membrane proteins
@@ -126,7 +126,7 @@ rows:
   seed_ortholog: 84588.SYNW0305
   seed_ortholog_evalue: 0.0
   sequence: MNKRWRNIGLTALLVLAIVVIAPAFLGGGNTQQEARTMRYSDFVEAVEDNQISRVLISPDRGTAQVVENDGRRAQVNLAPDKELLGLLTQHDVDIAVQPTRQAPAWQQAAGSLIFPLLLLGGLFFLFRRAQGGGGGNPAMQFGKSKARVQMEPSTQVTFTDVAGIEGAKLELTEVVDFLKNPDRFTAVGAKIPKGVLLVGPPGTGKTLLAKAVAGEAGVPFFSISGSEFVEMFVGVGASRVRDLFEQAKKNAPCIVFIDEIDAVGRQRGAGLGGGNDEREQTLNQLLTEMDGFEGNTGIIIVAATNRPDVLDAALMRPGRFDRQVTVDRPDYAGRLQILNVHARGKTLSKDVDLDKVARRTPGYTGADLANLLNEAAILAARRELTEVSNDEISDAIERVMAGPEKKDRVMSERRKRLVAYHEAGHALVGALMPDYDPVQKISIIPRGNAGGLTFFTPSEERMESGLYSRAYLQNQMAVALGGRVAEEIVYGEDEVTTGASNDLQQVASTARQMITRFGMSDTLGPVALGRAQGGMFLGRDIAAERDFSEDTAATIDQEVSELVDVAYKRATKVLVDNRAVLDELADMLVEQETVDAEELQELLITRDVRVAEYI
-  significant_down_count: 1
+  significant_down_count: 7
   significant_up_count: 0
   start: 302742
   strand: +

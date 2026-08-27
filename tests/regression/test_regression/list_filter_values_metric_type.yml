@@ -1,5 +1,5 @@
 case_id: list_filter_values_metric_type
-row_count: 44
+row_count: 53
 rows:
 - count: 6
   value: log2_mv_cell_enrichment
@@ -8,21 +8,31 @@ rows:
 - count: 6
   value: prop_abund_mvs_percent
 - count: 2
+  value: antisense_tss_count
+- count: 2
   value: cell_abundance_biovolume_normalized
 - count: 2
   value: exoproteome_avg_pct_nsaf
 - count: 2
   value: exoproteome_detection_status
 - count: 2
+  value: has_primary_tss
+- count: 2
+  value: internal_tss_count
+- count: 2
   value: log2_vesicle_cell_enrichment
 - count: 2
   value: mascot_identification_probability
+- count: 2
+  value: minus10_element_score
 - count: 2
   value: periodic_in_coculture_LD
 - count: 2
   value: periodic_in_coculture_extended_darkness
 - count: 2
   value: predicted_subcellular_localization
+- count: 2
+  value: tss_distance_to_cds
 - count: 2
   value: vesicle_abundance_biovolume_normalized
 - count: 2
@@ -58,6 +68,10 @@ rows:
 - count: 1
   value: exoproteome_detected_evolved_800ppm
 - count: 1
+  value: expressed_above_background
+- count: 1
+  value: expression_at_t0_log2
+- count: 1
   value: expression_change_high_light_shock
 - count: 1
   value: expression_change_low_co2_no_o2_shock
@@ -81,6 +95,10 @@ rows:
   value: rapid_recovery_low_co2_no_o2_shock
 - count: 1
   value: rapid_recovery_low_co2_shock
+- count: 1
+  value: rna_decay_time_min
+- count: 1
+  value: rna_half_life_min
 - count: 1
   value: vesicle_dna_avg_read_coverage
 - count: 1

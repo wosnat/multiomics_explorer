@@ -33,7 +33,7 @@ not_found:
   pathway_ids: []
 offset: 0
 results:
-- catalyst_gene_count: 5906
+- catalyst_gene_count: 6041
   chebi_id: '10789'
   elements:
   - C
@@ -52,7 +52,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00002
   name: ATP
-  organism_count: 42
+  organism_count: 43
   pathway_count: 33
   pathway_ids:
   - kegg.pathway:ko00190
@@ -89,8 +89,8 @@ results:
   - kegg.pathway:ko05410
   - kegg.pathway:ko05415
   transporter_count: 15
-  transporter_gene_count: 2177
-- catalyst_gene_count: 3486
+  transporter_gene_count: 2195
+- catalyst_gene_count: 3564
   chebi_id: '13222'
   elements:
   - C
@@ -114,7 +114,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00008
   name: ADP
-  organism_count: 42
+  organism_count: 43
   pathway_count: 20
   pathway_ids:
   - kegg.pathway:ko00190
@@ -138,8 +138,8 @@ results:
   - kegg.pathway:ko05014
   - kegg.pathway:ko05022
   transporter_count: 5
-  transporter_gene_count: 852
-- catalyst_gene_count: 3242
+  transporter_gene_count: 862
+- catalyst_gene_count: 3302
   chebi_id: '13393'
   elements:
   - C
@@ -163,7 +163,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00003
   name: NAD+
-  organism_count: 42
+  organism_count: 43
   pathway_count: 14
   pathway_ids:
   - kegg.pathway:ko00190
@@ -181,8 +181,8 @@ results:
   - kegg.pathway:ko04977
   - kegg.pathway:ko05208
   transporter_count: 4
-  transporter_gene_count: 619
-- catalyst_gene_count: 2963
+  transporter_gene_count: 625
+- catalyst_gene_count: 3017
   chebi_id: '13395'
   elements:
   - C
@@ -207,7 +207,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00004
   name: NADH
-  organism_count: 42
+  organism_count: 43
   pathway_count: 5
   pathway_ids:
   - kegg.pathway:ko00190
@@ -216,8 +216,8 @@ results:
   - kegg.pathway:ko04714
   - kegg.pathway:ko04925
   transporter_count: 2
-  transporter_gene_count: 125
-- catalyst_gene_count: 2411
+  transporter_gene_count: 129
+- catalyst_gene_count: 2464
   chebi_id: '12056'
   elements:
   - C
@@ -244,7 +244,7 @@ results:
   measured_paper_count: 2
   metabolite_id: kegg.compound:C00020
   name: AMP
-  organism_count: 42
+  organism_count: 43
   pathway_count: 25
   pathway_ids:
   - kegg.pathway:ko00230

@@ -39,20 +39,20 @@ rows:
   - interpro
   - pfam
   - tigr_role
-  boolean_metric_count: 0
+  boolean_metric_count: 2
   catalyzed_metabolite_count: 0
   categorical_metric_count: 2
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
-  closest_ortholog_group_size: 21
+  closest_ortholog_group_size: 22
   cluster_membership_count: 2
   cluster_types:
   - diel
   - time_course
   discussed_in_publication_count: 0
   evidence_sources: []
-  expression_edge_count: 37
+  expression_edge_count: 42
   gene_category: Unknown
   gene_name: null
   informative_annotation_types:
@@ -62,7 +62,7 @@ rows:
   merops_classes: []
   merops_evidence_score_max: null
   ncbifam_family_count: 0
-  numeric_metric_count: 0
+  numeric_metric_count: 5
   organism_name: Prochlorococcus MED4
   product: EVE domain protein
   reaction_count: 0

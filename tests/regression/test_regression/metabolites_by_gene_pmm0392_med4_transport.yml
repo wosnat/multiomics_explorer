@@ -62,6 +62,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.32
   tcdb_family_name: The Cobalamin Precursor (B 12 -P) Family
+  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
@@ -77,6 +78,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.32
   tcdb_family_name: The Cobalamin Precursor (B 12 -P) Family
+  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
@@ -94,6 +96,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.25
   tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
+  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
@@ -111,6 +114,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.25
   tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
+  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
@@ -128,6 +132,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.25
   tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
+  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
@@ -145,6 +150,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.33
   tcdb_family_name: The Methylthioadenosine (MTA) Family
+  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
@@ -162,6 +168,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.33
   tcdb_family_name: The Methylthioadenosine (MTA) Family
+  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
@@ -179,6 +186,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.25
   tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
+  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
@@ -196,6 +204,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.33
   tcdb_family_name: The Methylthioadenosine (MTA) Family
+  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
@@ -213,6 +222,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.30
   tcdb_family_name: The Thiamin Precursor (Thi-P) Family
+  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
@@ -230,6 +240,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.25
   tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
+  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
@@ -246,6 +257,7 @@ results:
   tcdb_evidence_score: 0.6
   tcdb_family_id: tcdb:3.A.1.28
   tcdb_family_name: The Queuosine (Queuosine) Family
+  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
@@ -263,6 +275,7 @@ results:
   tcdb_evidence_score: 0.6
   tcdb_family_id: tcdb:3.A.1.28
   tcdb_family_name: The Queuosine (Queuosine) Family
+  transport_substrate_resolution: resolved
 returned: 13
 row_count: 13
 top_gene_categories:

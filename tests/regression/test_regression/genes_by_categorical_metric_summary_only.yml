@@ -2,7 +2,7 @@ by_category:
 - category: Unknown
   count: 22
 - category: Cytoplasmic
-  count: 13
+  count: 14
 - category: Outer Membrane
   count: 8
 - category: Cytoplasmic Membrane
@@ -13,11 +13,11 @@ by_category:
   count: 3
 by_compartment:
 - compartment: vesicle
-  count: 58
+  count: 59
 by_experiment:
 - count: 32
   experiment_id: 10.1126/science.1243457_vesicle_proteomics_med4
-- count: 26
+- count: 27
   experiment_id: 10.1126/science.1243457_vesicle_proteomics_mit9313
 by_metric:
 - allowed_categories:
@@ -69,34 +69,34 @@ by_metric:
     count: 3
   - category: Periplasmic
     count: 3
+  - category: Cytoplasmic
+    count: 3
   - category: Outer Membrane
     count: 3
-  - category: Cytoplasmic
-    count: 2
-  count: 26
+  count: 27
   derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:predicted_subcellular_localization
   dm_by_category:
   - category: Unknown
     count: 15
+  - category: Cytoplasmic
+    count: 3
   - category: Extracellular
     count: 3
   - category: Outer Membrane
     count: 3
   - category: Periplasmic
     count: 3
-  - category: Cytoplasmic
-    count: 2
-  dm_total_gene_count: 26
+  dm_total_gene_count: 27
   metric_type: predicted_subcellular_localization
   name: MIT9313 vesicle protein PSORTb predicted localization (Biller 2014 Table S3)
   value_kind: categorical
 by_organism:
 - count: 32
   organism_name: Prochlorococcus MED4
-- count: 26
+- count: 27
   organism_name: Prochlorococcus MIT9313
 by_publication:
-- count: 58
+- count: 59
   publication_doi: 10.1126/science.1243457
 case_id: genes_by_categorical_metric_summary_only
 excluded_derived_metrics: []
@@ -123,7 +123,7 @@ top_categories:
 - count: 4
   gene_category: Post-translational modification
 total_derived_metrics: 2
-total_genes: 58
-total_matching: 58
+total_genes: 59
+total_matching: 59
 truncated: true
 warnings: []

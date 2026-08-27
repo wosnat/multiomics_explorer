@@ -1,5 +1,5 @@
 case_id: list_derived_metrics_rankable_false
-row_count: 38
+row_count: 41
 rows:
 - allowed_categories: null
   background_factors:
@@ -360,6 +360,52 @@ rows:
 - allowed_categories: null
   background_factors:
   - axenic
+  - chemical
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:expressed_above_background
+  experiment_id: 10.1186/gb-2010-11-5-r54_rifampicin_rna_decay_med4
+  field_description: The paper^s expression-threshold call at t0. false = below background
+    — the paper excluded these genes from its global half-life statistics and clustering,
+    and their decay fits are unreliable. Use as a reliability filter on rna_half_life_min
+    / rna_decay_time_min.
+  growth_phases: []
+  has_p_value: false
+  metric_type: expressed_above_background
+  name: Expressed above background at t0
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1186/gb-2010-11-5-r54
+  rankable: false
+  total_gene_count: 1930
+  treatment_type: []
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:has_primary_tss
+  experiment_id: 10.1038/ismej.2014.57_tss_mapping_med4
+  field_description: At least one primary/genic TSS (gTSS) mapped for this gene. false
+    = gene appears in the TSS map only via antisense/internal sites. Routing signal
+    reduced from the Voigt 2014 TSS map — NOT a complete promoter annotation.
+  growth_phases: []
+  has_p_value: false
+  metric_type: has_primary_tss
+  name: Has mapped primary TSS (gTSS)
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2014.57
+  rankable: false
+  total_gene_count: 1629
+  treatment_type: []
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - axenic
   - light
   compartment: whole_cell
   derived_metric_id: derived_metric:ismej.2015.36:s2_concordance_low_co2:rapid_recovery_low_co2_shock
@@ -669,6 +715,28 @@ rows:
   background_factors:
   - axenic
   - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:has_primary_tss
+  experiment_id: 10.1038/ismej.2014.57_tss_mapping_mit9313
+  field_description: At least one primary/genic TSS (gTSS) mapped for this gene. false
+    = gene appears in the TSS map only via antisense/internal sites. Routing signal
+    reduced from the Voigt 2014 TSS map — NOT a complete promoter annotation.
+  growth_phases: []
+  has_p_value: false
+  metric_type: has_primary_tss
+  name: Has mapped primary TSS (gTSS)
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1038/ismej.2014.57
+  rankable: false
+  total_gene_count: 2139
+  treatment_type: []
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
   compartment: vesicle
   derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
   experiment_id: 10.1126/science.1243457_vesicle_proteomics_mit9313
@@ -682,7 +750,7 @@ rows:
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1126/science.1243457
   rankable: false
-  total_gene_count: 26
+  total_gene_count: 27
   treatment_type:
   - compartment
   unit: ''
@@ -710,7 +778,7 @@ rows:
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1126/science.1243457
   rankable: false
-  total_gene_count: 26
+  total_gene_count: 27
   treatment_type:
   - compartment
   unit: ''
@@ -733,7 +801,7 @@ rows:
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1126/science.1243457
   rankable: false
-  total_gene_count: 26
+  total_gene_count: 27
   treatment_type:
   - compartment
   unit: percent

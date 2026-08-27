@@ -27,7 +27,7 @@ not_found:
   pathway_ids: []
 offset: 0
 results:
-- catalyst_gene_count: 2337
+- catalyst_gene_count: 2386
   chebi_id: '13282'
   elements:
   - C
@@ -43,7 +43,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00011
   name: CO2
-  organism_count: 42
+  organism_count: 43
   pathway_count: 25
   pathway_ids:
   - kegg.pathway:ko00220
@@ -72,8 +72,8 @@ results:
   - kegg.pathway:ko04974
   - kegg.pathway:ko04976
   transporter_count: 8
-  transporter_gene_count: 221
-- catalyst_gene_count: 2063
+  transporter_gene_count: 228
+- catalyst_gene_count: 2106
   chebi_id: '13405'
   elements:
   - H
@@ -89,7 +89,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00014
   name: Ammonia
-  organism_count: 42
+  organism_count: 43
   pathway_count: 19
   pathway_ids:
   - kegg.pathway:ko00220
@@ -112,8 +112,8 @@ results:
   - kegg.pathway:ko05110
   - kegg.pathway:ko05120
   transporter_count: 9
-  transporter_gene_count: 434
-- catalyst_gene_count: 1866
+  transporter_gene_count: 442
+- catalyst_gene_count: 1905
   chebi_id: '13107'
   elements:
   - C
@@ -137,7 +137,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00025
   name: L-Glutamate
-  organism_count: 42
+  organism_count: 43
   pathway_count: 52
   pathway_ids:
   - kegg.pathway:ko00220
@@ -193,8 +193,8 @@ results:
   - kegg.pathway:ko05215
   - kegg.pathway:ko05230
   transporter_count: 5
-  transporter_gene_count: 778
-- catalyst_gene_count: 1351
+  transporter_gene_count: 786
+- catalyst_gene_count: 1374
   chebi_id: '10745'
   elements:
   - O
@@ -209,7 +209,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00007
   name: Oxygen
-  organism_count: 42
+  organism_count: 43
   pathway_count: 13
   pathway_ids:
   - kegg.pathway:ko00190
@@ -226,8 +226,8 @@ results:
   - kegg.pathway:ko05208
   - kegg.pathway:ko05211
   transporter_count: 4
-  transporter_gene_count: 2208
-- catalyst_gene_count: 1072
+  transporter_gene_count: 2248
+- catalyst_gene_count: 1096
   chebi_id: '13110'
   elements:
   - C
@@ -251,7 +251,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00064
   name: L-Glutamine
-  organism_count: 42
+  organism_count: 43
   pathway_count: 24
   pathway_ids:
   - kegg.pathway:ko00220
@@ -279,8 +279,8 @@ results:
   - kegg.pathway:ko04978
   - kegg.pathway:ko05230
   transporter_count: 12
-  transporter_gene_count: 2325
-- catalyst_gene_count: 453
+  transporter_gene_count: 2365
+- catalyst_gene_count: 463
   chebi_id: '13351'
   elements:
   - C
@@ -297,7 +297,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00288
   name: HCO3-
-  organism_count: 42
+  organism_count: 43
   pathway_count: 17
   pathway_ids:
   - kegg.pathway:ko00220
@@ -318,8 +318,8 @@ results:
   - kegg.pathway:ko04976
   - kegg.pathway:ko04978
   transporter_count: 13
-  transporter_gene_count: 1952
-- catalyst_gene_count: 366
+  transporter_gene_count: 1989
+- catalyst_gene_count: 373
   chebi_id: '14276'
   elements:
   - C
@@ -336,7 +336,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00058
   name: Formate
-  organism_count: 42
+  organism_count: 43
   pathway_count: 11
   pathway_ids:
   - kegg.pathway:ko00440
@@ -351,8 +351,8 @@ results:
   - kegg.pathway:ko01200
   - kegg.pathway:ko01220
   transporter_count: 5
-  transporter_gene_count: 659
-- catalyst_gene_count: 178
+  transporter_gene_count: 667
+- catalyst_gene_count: 183
   chebi_id: '13942'
   elements:
   - C
@@ -371,7 +371,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00169
   name: Carbamoyl phosphate
-  organism_count: 42
+  organism_count: 43
   pathway_count: 11
   pathway_ids:
   - kegg.pathway:ko00220
@@ -387,7 +387,7 @@ results:
   - kegg.pathway:ko01240
   transporter_count: 1
   transporter_gene_count: 0
-- catalyst_gene_count: 126
+- catalyst_gene_count: 129
   chebi_id: '13941'
   elements:
   - C
@@ -404,7 +404,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C01563
   name: Carbamate
-  organism_count: 42
+  organism_count: 43
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00240
@@ -412,7 +412,7 @@ results:
   - kegg.pathway:ko01100
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 96
+- catalyst_gene_count: 98
   chebi_id: '14658'
   elements:
   - N
@@ -428,7 +428,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00088
   name: Nitrite
-  organism_count: 42
+  organism_count: 43
   pathway_count: 8
   pathway_ids:
   - kegg.pathway:ko00910
@@ -440,8 +440,8 @@ results:
   - kegg.pathway:ko02010
   - kegg.pathway:ko02020
   transporter_count: 8
-  transporter_gene_count: 2318
-- catalyst_gene_count: 32
+  transporter_gene_count: 2347
+- catalyst_gene_count: 33
   chebi_id: '25545'
   elements:
   - H
@@ -458,7 +458,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00244
   name: Nitrate
-  organism_count: 42
+  organism_count: 43
   pathway_count: 6
   pathway_ids:
   - kegg.pathway:ko00910
@@ -468,8 +468,8 @@ results:
   - kegg.pathway:ko02010
   - kegg.pathway:ko02020
   transporter_count: 8
-  transporter_gene_count: 1717
-- catalyst_gene_count: 25
+  transporter_gene_count: 1737
+- catalyst_gene_count: 26
   chebi_id: '14037'
   elements:
   - C
@@ -486,14 +486,14 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C01417
   name: Cyanate
-  organism_count: 42
+  organism_count: 43
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00910
   - kegg.pathway:ko01100
   - kegg.pathway:ko02010
   transporter_count: 3
-  transporter_gene_count: 2142
+  transporter_gene_count: 2169
 - catalyst_gene_count: 7
   chebi_id: '14661'
   elements:
@@ -510,7 +510,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00887
   name: Nitrous oxide
-  organism_count: 42
+  organism_count: 43
   pathway_count: 4
   pathway_ids:
   - kegg.pathway:ko00910
@@ -518,7 +518,7 @@ results:
   - kegg.pathway:ko01120
   - kegg.pathway:ko01310
   transporter_count: 2
-  transporter_gene_count: 189
+  transporter_gene_count: 192
 - catalyst_gene_count: 20
   elements:
   - C

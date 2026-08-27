@@ -123,8 +123,8 @@ results:
   children_total: 55
   children_truncated: true
   description: null
-  direct_gene_count: 3845
-  gene_count: 4817
+  direct_gene_count: 3910
+  gene_count: 4900
   genes_by_organism:
   - '{''gene_count'': 107, ''organism'': ''Alteromonas macleodii BS11''}'
   - '{''gene_count'': 107, ''organism'': ''Synechococcus WH8102''}'
@@ -163,6 +163,7 @@ results:
   - '{''gene_count'': 70, ''organism'': ''Prochlorococcus MIT0801''}'
   - '{''gene_count'': 70, ''organism'': ''Prochlorococcus PAC1''}'
   - '{''gene_count'': 72, ''organism'': ''Prochlorococcus RSP50''}'
+  - '{''gene_count'': 83, ''organism'': ''Synechococcus WH8109''}'
   - '{''gene_count'': 84, ''organism'': ''Synechococcus sp. BL107''}'
   - '{''gene_count'': 89, ''organism'': ''Synechococcus CC9311''}'
   - '{''gene_count'': 95, ''organism'': ''Prochlorococcus MIT1327''}'
@@ -830,19 +831,19 @@ results:
   metabolite_count: 554
   name: The ATP-binding Cassette (ABC) Superfamily
   ontology: tcdb
-  organism_count: 42
+  organism_count: 43
   parents:
   - '{''id'': ''tcdb:3.A'', ''level'': 1, ''name'': ''P-P-bond-hydrolysis-driven transporters''}'
   properties:
-    direct_gene_count: 3845
-    gene_count: 4817
+    direct_gene_count: 3910
+    gene_count: 4900
     id: tcdb:3.A.1
     level: 2
     level_kind: tc_family
     member_count: 55
     metabolite_count: 554
     name: The ATP-binding Cassette (ABC) Superfamily
-    organism_count: 42
+    organism_count: 43
     preferred_id: tcdb
     superfamily: ArsA ATPase (ArsA) Superfamily
     tc_class_id: tcdb:3
@@ -862,9 +863,9 @@ results:
   cleavage_summary: cleaves after Met (44%) / Leu (22%) / Gly (11%) - 27 known cleavages
     (0% physiological)
   description: null
-  direct_gene_count: 125
+  direct_gene_count: 129
   family_class: peptidase
-  gene_count: 125
+  gene_count: 129
   genes_by_organism:
   - '{''gene_count'': 1, ''organism'': ''Alteromonas macleodii AD45''}'
   - '{''gene_count'': 1, ''organism'': ''Alteromonas macleodii ATCC27126''}'
@@ -905,6 +906,7 @@ results:
   - '{''gene_count'': 4, ''organism'': ''Synechococcus PCC 7002''}'
   - '{''gene_count'': 4, ''organism'': ''Synechococcus WH7803''}'
   - '{''gene_count'': 4, ''organism'': ''Synechococcus WH8102''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus WH8109''}'
   - '{''gene_count'': 4, ''organism'': ''Synechococcus elongatus PCC 7942''}'
   - '{''gene_count'': 4, ''organism'': ''Synechococcus elongatus UTEX 2973''}'
   - '{''gene_count'': 4, ''organism'': ''Synechococcus sp. BL107''}'
@@ -922,11 +924,11 @@ results:
   merops_id: S14
   name: ClpP endopeptidase
   ontology: merops
-  organism_count: 41
+  organism_count: 42
   parents:
   - '{''id'': ''merops.clan:SK'', ''level'': 0, ''name'': ''SK''}'
-  peptidase_gene_count: 125
-  peptidase_organism_count: 41
+  peptidase_gene_count: 129
+  peptidase_organism_count: 42
   properties:
     catalytic_type: serine
     cleavage_p1_residues:
@@ -935,9 +937,9 @@ results:
     - Gly
     cleavage_summary: cleaves after Met (44%) / Leu (22%) / Gly (11%) - 27 known cleavages
       (0% physiological)
-    direct_gene_count: 125
+    direct_gene_count: 129
     family_class: peptidase
-    gene_count: 125
+    gene_count: 129
     id: merops.family:S14
     known_cleavage_count: 27
     level: 1
@@ -945,9 +947,9 @@ results:
     member_count: 0
     merops_id: S14
     name: ClpP endopeptidase
-    organism_count: 41
-    peptidase_gene_count: 125
-    peptidase_organism_count: 41
+    organism_count: 42
+    peptidase_gene_count: 129
+    peptidase_organism_count: 42
     preferred_id: merops.family
   term_id: merops.family:S14
 - children:
@@ -964,8 +966,8 @@ results:
     is a substrate, have been shown to share a short conserved sequence around a methionine
     which is probably involved in the catalytic activity of this type of enzymes.
     The following are examples of members of this family:'
-  direct_gene_count: 132
-  gene_count: 132
+  direct_gene_count: 135
+  gene_count: 135
   genes_by_organism:
   - '{''gene_count'': 2, ''organism'': ''Alteromonas (MarRef v6)''}'
   - '{''gene_count'': 3, ''organism'': ''Alteromonas macleodii AD45''}'
@@ -1003,6 +1005,7 @@ results:
   - '{''gene_count'': 3, ''organism'': ''Synechococcus PCC 7002''}'
   - '{''gene_count'': 3, ''organism'': ''Synechococcus WH7803''}'
   - '{''gene_count'': 3, ''organism'': ''Synechococcus WH8102''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus WH8109''}'
   - '{''gene_count'': 3, ''organism'': ''Synechococcus elongatus PCC 7942''}'
   - '{''gene_count'': 3, ''organism'': ''Synechococcus elongatus UTEX 2973''}'
   - '{''gene_count'': 3, ''organism'': ''Synechococcus sp. BL107''}'
@@ -1040,22 +1043,22 @@ results:
   member_count: 4
   name: Fumarate lyase family
   ontology: interpro
-  organism_count: 42
+  organism_count: 43
   parents: []
   properties:
     description: 'A number of enzymes, belonging to the lyase class, for which fumarate
       is a substrate, have been shown to share a short conserved sequence around a
       methionine which is probably involved in the catalytic activity of this type
       of enzymes. The following are examples of members of this family:'
-    direct_gene_count: 132
-    gene_count: 132
+    direct_gene_count: 135
+    gene_count: 135
     id: interpro:IPR000362
     interpro_id: IPR000362
     interpro_type: FAMILY
     level: 0
     member_count: 4
     name: Fumarate lyase family
-    organism_count: 42
+    organism_count: 43
     preferred_id: interpro
   term_id: interpro:IPR000362
 - children: []
@@ -1108,8 +1111,8 @@ results:
   children_total: 3
   children_truncated: false
   description: null
-  direct_gene_count: 860
-  gene_count: 1050
+  direct_gene_count: 875
+  gene_count: 1068
   genes_by_organism:
   - '{''gene_count'': 10, ''organism'': ''Prochlorococcus MIT1314''}'
   - '{''gene_count'': 11, ''organism'': ''Prochlorococcus RSP50''}'
@@ -1129,6 +1132,7 @@ results:
   - '{''gene_count'': 18, ''organism'': ''Prochlorococcus MED4''}'
   - '{''gene_count'': 18, ''organism'': ''Prochlorococcus MIT1327''}'
   - '{''gene_count'': 18, ''organism'': ''Prochlorococcus SB''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus WH8109''}'
   - '{''gene_count'': 19, ''organism'': ''Prochlorococcus MIT9301''}'
   - '{''gene_count'': 19, ''organism'': ''Prochlorococcus NATL1A''}'
   - '{''gene_count'': 19, ''organism'': ''Prochlorococcus NATL2A''}'
@@ -1161,16 +1165,16 @@ results:
   links_out: []
   name: response to oxidative stress
   ontology: go_bp
-  organism_count: 42
+  organism_count: 43
   parents:
   - '{''id'': ''go:0006950'', ''level'': 2, ''name'': ''response to stress''}'
   properties:
-    direct_gene_count: 860
-    gene_count: 1050
+    direct_gene_count: 875
+    gene_count: 1068
     id: go:0006979
     level: 3
     name: response to oxidative stress
-    organism_count: 42
+    organism_count: 43
     preferred_id: go
   term_id: go:0006979
 returned: 5

@@ -41,7 +41,7 @@ case_id: gene_overview_tcdb_pair
 has_chemistry: 2
 has_clusters: 2
 has_derived_metrics: 2
-has_discussed: 0
+has_discussed: 1
 has_expression: 2
 has_ncbifam: 1
 has_orthologs: 2
@@ -68,18 +68,20 @@ results:
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
-  closest_ortholog_group_size: 21
-  cluster_membership_count: 1
+  closest_ortholog_group_size: 22
+  cluster_membership_count: 2
   cluster_types:
+  - decay_pattern
   - diel
-  derived_metric_count: 8
+  derived_metric_count: 17
   derived_metric_value_kinds:
+  - boolean
   - categorical
   - numeric
-  discussed_in_publication_count: 0
+  discussed_in_publication_count: 1
   evidence_sources:
   - metabolism
-  expression_edge_count: 33
+  expression_edge_count: 38
   gene_category: Replication and repair
   gene_name: dnaN
   informative_annotation_types:
@@ -103,7 +105,7 @@ results:
   product: DNA polymerase III, beta subunit
   reaction_count: 4
   significant_down_count: 1
-  significant_up_count: 3
+  significant_up_count: 5
   tcdb_evidence_score_max: null
   transport_substrate_resolution: null
   transported_metabolite_count: 0
@@ -124,18 +126,20 @@ results:
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
-  closest_ortholog_group_size: 21
+  closest_ortholog_group_size: 22
   cluster_membership_count: 1
   cluster_types:
   - diel
-  derived_metric_count: 2
+  derived_metric_count: 9
   derived_metric_value_kinds:
+  - boolean
   - categorical
+  - numeric
   discussed_in_publication_count: 0
   evidence_sources:
   - metabolomics
   - transport
-  expression_edge_count: 26
+  expression_edge_count: 31
   gene_category: Transport
   gene_name: cbiQ
   informative_annotation_types:
@@ -162,6 +166,9 @@ results:
   transported_metabolite_count: 13
 returned: 2
 row_count: 2
-top_discussing_publications: []
+top_discussing_publications:
+- doi: 10.1186/gb-2010-11-5-r54
+  n_genes: 1
+  title: RNA half-lives in the slow-growing marine cyanobacterium Prochlorococcus
 total_matching: 2
 truncated: false

@@ -1,5 +1,5 @@
 case_id: genes_by_function_lucene_fuzzy
-row_count: 225
+row_count: 234
 rows:
 - annotation_quality: 3
   gene_category: Replication and repair
@@ -7,7 +7,7 @@ rows:
   locus_tag: A9601_00001
   organism_name: Prochlorococcus AS9601
   product: DNA polymerase III, beta subunit
-  score: 0.7012
+  score: 0.7017
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -21,14 +21,14 @@ rows:
   locus_tag: A9601_09151
   organism_name: Prochlorococcus AS9601
   product: DNA polymerase III, alpha subunit
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
   locus_tag: A9601_09231
   organism_name: Prochlorococcus AS9601
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -42,84 +42,84 @@ rows:
   locus_tag: A9601_12081
   organism_name: Prochlorococcus AS9601
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.6823
+  score: 1.6814
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: A9601_13151
   organism_name: Prochlorococcus AS9601
   product: DNA polymerase I
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
   locus_tag: A9601_18561
   organism_name: Prochlorococcus AS9601
   product: DNA polymerase III, delta subunit
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: A9601_18671
   organism_name: Prochlorococcus AS9601
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8637
+  score: 0.8641
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: seqA
   locus_tag: ACZ81_07415
   organism_name: Alteromonas macleodii HOT1A3
   product: replication initiation negative regulator SeqA
-  score: 3.7577
+  score: 3.7711
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: ACZ81_11500
   organism_name: Alteromonas macleodii HOT1A3
   product: exodeoxyribonuclease V subunit alpha
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: seqA
   locus_tag: ALTBGP6_01546
   organism_name: Alteromonas macleodii BGP6
   product: replication initiation negative regulator SeqA
-  score: 3.7577
+  score: 3.7711
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: ALTBGP6_02349
   organism_name: Alteromonas macleodii BGP6
   product: exodeoxyribonuclease V subunit alpha
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: seqA
   locus_tag: AMBAS45_07300
   organism_name: Alteromonas macleodii AD45
   product: replication initiation negative regulator SeqA
-  score: 3.7577
+  score: 3.7711
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: AMBAS45_11565
   organism_name: Alteromonas macleodii AD45
   product: exodeoxyribonuclease V subunit alpha
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: seqA
   locus_tag: AMBLS11_06990
   organism_name: Alteromonas macleodii BS11
   product: replication initiation negative regulator SeqA
-  score: 3.7577
+  score: 3.7711
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: AMBLS11_10795
   organism_name: Alteromonas macleodii BS11
   product: exodeoxyribonuclease V subunit alpha
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -140,21 +140,21 @@ rows:
   locus_tag: BL107_06324
   organism_name: Synechococcus sp. BL107
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
   locus_tag: BL107_06649
   organism_name: Synechococcus sp. BL107
   product: DNA polymerase III, beta subunit
-  score: 0.8637
+  score: 0.8641
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: BL107_11686
   organism_name: Synechococcus sp. BL107
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.4817
+  score: 1.4812
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
@@ -168,7 +168,7 @@ rows:
   locus_tag: BL107_12390
   organism_name: Synechococcus sp. BL107
   product: DNA polymerase III, alpha subunit
-  score: 1.0032
+  score: 1.0035
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -182,42 +182,42 @@ rows:
   locus_tag: BL107_13875
   organism_name: Synechococcus sp. BL107
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: BL107_15355
   organism_name: Synechococcus sp. BL107
   product: UvrD-like P-loop containing nucleoside triphosphate hydrolase
-  score: 1.6823
+  score: 1.6814
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: BL107_15605
   organism_name: Synechococcus sp. BL107
   product: DNA polymerase I
-  score: 1.0602
+  score: 1.0605
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: BSR22_08920
   organism_name: Prochlorococcus RSP50
   product: AAA family ATPase
-  score: 2.8064
+  score: 2.8009
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
   locus_tag: EV02_0206
   organism_name: Prochlorococcus SB
   product: DNA polymerase III, alpha subunit
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
   locus_tag: EV02_0214
   organism_name: Prochlorococcus SB
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -231,7 +231,7 @@ rows:
   locus_tag: EV02_0509
   organism_name: Prochlorococcus SB
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.543
+  score: 1.5424
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -245,28 +245,28 @@ rows:
   locus_tag: EV02_1236
   organism_name: Prochlorococcus SB
   product: DNA polymerase III, beta subunit
-  score: 0.7012
+  score: 0.7017
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: EV02_1295
   organism_name: Prochlorococcus SB
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8637
+  score: 0.8641
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
   locus_tag: EV02_1306
   organism_name: Prochlorococcus SB
   product: DNA polymerase III, delta subunit
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: EV02_1812
   organism_name: Prochlorococcus SB
   product: DNA polymerase I
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -280,56 +280,56 @@ rows:
   locus_tag: EV03_0597
   organism_name: Prochlorococcus PAC1
   product: DNA polymerase I
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
   locus_tag: EV03_1035
   organism_name: Prochlorococcus PAC1
   product: DNA polymerase III, delta subunit
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: EV03_1046
   organism_name: Prochlorococcus PAC1
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8254
+  score: 0.8259
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
   locus_tag: EV03_1138
   organism_name: Prochlorococcus PAC1
   product: DNA polymerase III, beta subunit
-  score: 0.7012
+  score: 0.7017
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: EV03_1482
   organism_name: Prochlorococcus PAC1
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.6097
+  score: 1.6089
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: EV03_1518
   organism_name: Prochlorococcus PAC1
   product: UvrD-like P-loop containing nucleoside triphosphate hydrolase
-  score: 1.7618
+  score: 1.7607
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
   locus_tag: EV03_2074
   organism_name: Prochlorococcus PAC1
   product: DNA polymerase III, alpha subunit
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
   locus_tag: EV03_2083
   organism_name: Prochlorococcus PAC1
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -343,7 +343,7 @@ rows:
   locus_tag: EW14_0001
   organism_name: Prochlorococcus MIT0604
   product: DNA polymerase III, beta subunit
-  score: 0.8637
+  score: 0.8641
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -357,14 +357,14 @@ rows:
   locus_tag: EW14_0945
   organism_name: Prochlorococcus MIT0604
   product: DNA polymerase III, alpha subunit
-  score: 1.0032
+  score: 1.0035
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
   locus_tag: EW14_0953
   organism_name: Prochlorococcus MIT0604
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -378,14 +378,14 @@ rows:
   locus_tag: EW14_1242
   organism_name: Prochlorococcus MIT0604
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.6823
+  score: 1.6814
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: EW14_1372
   organism_name: Prochlorococcus MIT0604
   product: DNA polymerase I
-  score: 1.0602
+  score: 1.0605
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -399,14 +399,14 @@ rows:
   locus_tag: EW14_2026
   organism_name: Prochlorococcus MIT0604
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
   locus_tag: EW15_0002
   organism_name: Prochlorococcus MIT0801
   product: DNA polymerase III, beta subunit
-  score: 0.8637
+  score: 0.8641
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -420,14 +420,14 @@ rows:
   locus_tag: EW15_0953
   organism_name: Prochlorococcus MIT0801
   product: DNA polymerase III, alpha subunit
-  score: 1.0032
+  score: 1.0035
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
   locus_tag: EW15_0962
   organism_name: Prochlorococcus MIT0801
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -441,21 +441,21 @@ rows:
   locus_tag: EW15_1538
   organism_name: Prochlorococcus MIT0801
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.6097
+  score: 1.6089
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: EW15_1573
   organism_name: Prochlorococcus MIT0801
   product: UvrD-like P-loop containing nucleoside triphosphate hydrolase
-  score: 1.7618
+  score: 1.7607
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: EW15_1648
   organism_name: Prochlorococcus MIT0801
   product: DNA polymerase I
-  score: 1.0602
+  score: 1.0605
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -469,91 +469,91 @@ rows:
   locus_tag: EW15_2212
   organism_name: Prochlorococcus MIT0801
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.9057
+  score: 0.9061
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: seqA
   locus_tag: EZ55_01557
   organism_name: Alteromonas macleodii EZ55
   product: replication initiation negative regulator SeqA
-  score: 3.7577
+  score: 3.7711
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: EZ55_02361
   organism_name: Alteromonas macleodii EZ55
   product: exodeoxyribonuclease V subunit alpha
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: HP15_1200
   organism_name: Marinobacter (MarRef v6)
   product: DEAD/DEAH box helicase
-  score: 2.4193
+  score: 2.4158
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: HP15_3712
   organism_name: Marinobacter (MarRef v6)
   product: exodeoxyribonuclease V subunit alpha
-  score: 0.7583
+  score: 0.7587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: M8001_24510
   organism_name: Pseudomonas putida KT2440
   product: exodeoxyribonuclease V subunit alpha
-  score: 0.7583
+  score: 0.7587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: seqA
   locus_tag: MADE_1007740
   organism_name: Alteromonas mediterranea AltDE
   product: hypothetical protein
-  score: 3.939
+  score: 3.9528
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: MADE_1013625
   organism_name: Alteromonas mediterranea AltDE
   product: exodeoxyribonuclease V subunit alpha
-  score: 0.7583
+  score: 0.7587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: seqA
   locus_tag: MASE_06970
   organism_name: Alteromonas macleodii ATCC27126
   product: replication initiation negative regulator SeqA
-  score: 3.7577
+  score: 3.7711
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: MASE_10935
   organism_name: Alteromonas macleodii ATCC27126
   product: exodeoxyribonuclease V subunit alpha
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: seqA
   locus_tag: MIT1002_01533
   organism_name: Alteromonas macleodii MIT1002
   product: hypothetical protein
-  score: 3.939
+  score: 3.9528
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: MIT1002_02359
   organism_name: Alteromonas macleodii MIT1002
   product: exodeoxyribonuclease V subunit alpha
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
   locus_tag: NATL1_00001
   organism_name: Prochlorococcus NATL1A
   product: DNA polymerase III, beta subunit
-  score: 0.7012
+  score: 0.7017
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -567,14 +567,14 @@ rows:
   locus_tag: NATL1_09341
   organism_name: Prochlorococcus NATL1A
   product: DNA polymerase III, alpha subunit
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
   locus_tag: NATL1_09431
   organism_name: Prochlorococcus NATL1A
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -588,42 +588,42 @@ rows:
   locus_tag: NATL1_14781
   organism_name: Prochlorococcus NATL1A
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.6097
+  score: 1.6089
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: NATL1_15131
   organism_name: Prochlorococcus NATL1A
   product: UvrD-like P-loop containing nucleoside triphosphate hydrolase
-  score: 1.7618
+  score: 1.7607
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: NATL1_15881
   organism_name: Prochlorococcus NATL1A
   product: DNA polymerase I
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
   locus_tag: NATL1_21151
   organism_name: Prochlorococcus NATL1A
   product: DNA polymerase III, delta subunit
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: NATL1_21271
   organism_name: Prochlorococcus NATL1A
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8254
+  score: 0.8259
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: P9202_1541
   organism_name: Prochlorococcus MIT9202
   product: DNA polymerase I
-  score: 1.0602
+  score: 1.0605
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -637,14 +637,14 @@ rows:
   locus_tag: P9202_543
   organism_name: Prochlorococcus MIT9202
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
   locus_tag: P9202_547
   organism_name: Prochlorococcus MIT9202
   product: DNA polymerase III, alpha subunit
-  score: 1.0032
+  score: 1.0035
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -658,14 +658,14 @@ rows:
   locus_tag: P9202_694
   organism_name: Prochlorococcus MIT9202
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.6823
+  score: 1.6814
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
   locus_tag: P9202_735
   organism_name: Prochlorococcus MIT9202
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -679,14 +679,14 @@ rows:
   locus_tag: P9202_979
   organism_name: Prochlorococcus MIT9202
   product: DNA polymerase III, beta subunit
-  score: 0.8637
+  score: 0.8641
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
   locus_tag: P9215_00001
   organism_name: Prochlorococcus MIT9215
   product: DNA polymerase III, beta subunit
-  score: 0.7012
+  score: 0.7017
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -707,14 +707,14 @@ rows:
   locus_tag: P9215_09451
   organism_name: Prochlorococcus MIT9215
   product: DNA polymerase III, alpha subunit
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
   locus_tag: P9215_09531
   organism_name: Prochlorococcus MIT9215
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -728,35 +728,35 @@ rows:
   locus_tag: P9215_12381
   organism_name: Prochlorococcus MIT9215
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.543
+  score: 1.5424
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: P9215_13441
   organism_name: Prochlorococcus MIT9215
   product: DNA polymerase I
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
   locus_tag: P9215_19201
   organism_name: Prochlorococcus MIT9215
   product: DNA polymerase III, delta subunit
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: P9215_19311
   organism_name: Prochlorococcus MIT9215
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8637
+  score: 0.8641
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
   locus_tag: P9301_00001
   organism_name: Prochlorococcus MIT9301
   product: DNA polymerase III, beta subunit
-  score: 0.7012
+  score: 0.7017
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -770,14 +770,14 @@ rows:
   locus_tag: P9301_09131
   organism_name: Prochlorococcus MIT9301
   product: DNA polymerase III, alpha subunit
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
   locus_tag: P9301_09211
   organism_name: Prochlorococcus MIT9301
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -791,84 +791,84 @@ rows:
   locus_tag: P9301_12091
   organism_name: Prochlorococcus MIT9301
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.6823
+  score: 1.6814
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: P9301_13291
   organism_name: Prochlorococcus MIT9301
   product: DNA polymerase I
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
   locus_tag: P9301_18371
   organism_name: Prochlorococcus MIT9301
   product: DNA polymerase III, delta subunit
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: P9301_18481
   organism_name: Prochlorococcus MIT9301
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8637
+  score: 0.8641
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
   locus_tag: P9303_00001
   organism_name: Prochlorococcus MIT9303
   product: DNA polymerase III, beta subunit
-  score: 0.7012
+  score: 0.7017
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: P9303_00641
   organism_name: Prochlorococcus MIT9303
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8637
+  score: 0.8641
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
   locus_tag: P9303_00831
   organism_name: Prochlorococcus MIT9303
   product: DNA polymerase III, delta subunit
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: P9303_08691
   organism_name: Prochlorococcus MIT9303
   product: DNA polymerase I
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: P9303_09351
   organism_name: Prochlorococcus MIT9303
   product: UvrD-like P-loop containing nucleoside triphosphate hydrolase
-  score: 1.7618
+  score: 1.7607
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: P9303_09631
   organism_name: Prochlorococcus MIT9303
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.543
+  score: 1.5424
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
   locus_tag: P9303_15831
   organism_name: Prochlorococcus MIT9303
   product: DNA polymerase III, alpha subunit
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
   locus_tag: P9303_15961
   organism_name: Prochlorococcus MIT9303
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -889,7 +889,7 @@ rows:
   locus_tag: P9515_00001
   organism_name: Prochlorococcus MIT9515
   product: DNA polymerase III, beta subunit
-  score: 0.7012
+  score: 0.7017
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -910,63 +910,63 @@ rows:
   locus_tag: P9515_10201
   organism_name: Prochlorococcus MIT9515
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
   locus_tag: P9515_10281
   organism_name: Prochlorococcus MIT9515
   product: DNA polymerase III, alpha subunit
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: P9515_11931
   organism_name: Prochlorococcus MIT9515
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.6823
+  score: 1.6814
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: P9515_13041
   organism_name: Prochlorococcus MIT9515
   product: DNA polymerase I
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
   locus_tag: P9515_18371
   organism_name: Prochlorococcus MIT9515
   product: DNA polymerase III, delta subunit
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: P9515_18481
   organism_name: Prochlorococcus MIT9515
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8637
+  score: 0.8641
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD2
   locus_tag: PMIT1327_01474
   organism_name: Prochlorococcus MIT1327
   product: UvrD-like P-loop containing nucleoside triphosphate hydrolase
-  score: 1.8492
+  score: 1.8478
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: PMIT1327_01504
   organism_name: Prochlorococcus MIT1327
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.8963
+  score: 1.8947
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
   locus_tag: PMM0001
   organism_name: Prochlorococcus MED4
   product: DNA polymerase III, beta subunit
-  score: 0.7012
+  score: 0.7017
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -987,56 +987,56 @@ rows:
   locus_tag: PMM0937
   organism_name: Prochlorococcus MED4
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
   locus_tag: PMM0945
   organism_name: Prochlorococcus MED4
   product: DNA polymerase III, alpha subunit
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: PMM1102
   organism_name: Prochlorococcus MED4
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.6823
+  score: 1.6814
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: PMM1140
   organism_name: Prochlorococcus MED4
   product: DNA polymerase I
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
   locus_tag: PMM1647
   organism_name: Prochlorococcus MED4
   product: DNA polymerase III, delta subunit
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: PMM1658
   organism_name: Prochlorococcus MED4
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8254
+  score: 0.8259
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
   locus_tag: PMN2A_0265
   organism_name: Prochlorococcus NATL2A
   product: DNA polymerase III, alpha subunit
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
   locus_tag: PMN2A_0274
   organism_name: Prochlorococcus NATL2A
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -1050,42 +1050,42 @@ rows:
   locus_tag: PMN2A_0646
   organism_name: Prochlorococcus NATL2A
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.6097
+  score: 1.6089
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: PMN2A_RS06565
   locus_tag: PMN2A_0679
   organism_name: Prochlorococcus NATL2A
   product: UvrD-like P-loop containing nucleoside triphosphate hydrolase
-  score: 1.7618
+  score: 1.7607
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: PMN2A_0748
   organism_name: Prochlorococcus NATL2A
   product: DNA polymerase I
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
   locus_tag: PMN2A_1245
   organism_name: Prochlorococcus NATL2A
   product: DNA polymerase III, delta subunit
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: PMN2A_1256
   organism_name: Prochlorococcus NATL2A
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8254
+  score: 0.8259
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
   locus_tag: PMN2A_1328
   organism_name: Prochlorococcus NATL2A
   product: DNA polymerase III, beta subunit
-  score: 0.7012
+  score: 0.7017
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -1099,28 +1099,28 @@ rows:
   locus_tag: PMT0001
   organism_name: Prochlorococcus MIT9313
   product: DNA polymerase III, beta subunit
-  score: 0.7012
+  score: 0.7017
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: PMT0059
   organism_name: Prochlorococcus MIT9313
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8637
+  score: 0.8641
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
   locus_tag: PMT0074
   organism_name: Prochlorococcus MIT9313
   product: DNA polymerase III, delta subunit
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMT0302
   organism_name: Prochlorococcus MIT9313
   product: type III restriction enzyme, res subunit
-  score: 1.4817
+  score: 1.4812
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -1134,35 +1134,35 @@ rows:
   locus_tag: PMT0638
   organism_name: Prochlorococcus MIT9313
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
   locus_tag: PMT0647
   organism_name: Prochlorococcus MIT9313
   product: DNA polymerase III, alpha subunit
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: PMT1085
   organism_name: Prochlorococcus MIT9313
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.543
+  score: 1.5424
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: PMT1107
   organism_name: Prochlorococcus MIT9313
   product: UvrD-like P-loop containing nucleoside triphosphate hydrolase
-  score: 1.7618
+  score: 1.7607
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: PMT1157
   organism_name: Prochlorococcus MIT9313
   product: DNA polymerase I
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -1176,7 +1176,7 @@ rows:
   locus_tag: PMT9312_0001
   organism_name: Prochlorococcus MIT9312
   product: DNA polymerase III, beta subunit
-  score: 0.7012
+  score: 0.7017
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -1190,14 +1190,14 @@ rows:
   locus_tag: PMT9312_0854
   organism_name: Prochlorococcus MIT9312
   product: DNA polymerase III, alpha subunit
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
   locus_tag: PMT9312_0862
   organism_name: Prochlorococcus MIT9312
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -1211,35 +1211,35 @@ rows:
   locus_tag: PMT9312_1113
   organism_name: Prochlorococcus MIT9312
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.6823
+  score: 1.6814
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: PMT9312_1236
   organism_name: Prochlorococcus MIT9312
   product: DNA polymerase I
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
   locus_tag: PMT9312_1739
   organism_name: Prochlorococcus MIT9312
   product: DNA polymerase III, delta subunit
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: PMT9312_1750
   organism_name: Prochlorococcus MIT9312
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8637
+  score: 0.8641
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
   locus_tag: Pro0001
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: DNA polymerase III, beta subunit
-  score: 0.7012
+  score: 0.7017
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -1253,21 +1253,21 @@ rows:
   locus_tag: Pro0607
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: ATP-dependent DNA/RNA helicase, superfamily II
-  score: 1.3238
+  score: 1.3237
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
   locus_tag: Pro0751
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: DNA polymerase III, alpha subunit
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
   locus_tag: Pro0759
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -1281,112 +1281,112 @@ rows:
   locus_tag: Pro1093
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.6097
+  score: 1.6089
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: Pro1127
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: UvrD-like P-loop containing nucleoside triphosphate hydrolase
-  score: 1.7618
+  score: 1.7607
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: Pro1234
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: DNA polymerase I
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
   locus_tag: Pro1807
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: DNA polymerase III, delta subunit
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: Pro1818
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8254
+  score: 0.8259
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: SOI86_RS02910
   organism_name: Prochlorococcus MIT1314
   product: ATP-dependent DNA helicase
-  score: 2.7803
+  score: 2.7749
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: SOI86_RS08710
   organism_name: Prochlorococcus MIT1314
   product: TM0106 family RecB-like putative nuclease
-  score: 2.0529
+  score: 2.0508
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD2
   locus_tag: SPO0373
   organism_name: Ruegeria pomeroyi DSS-3
   product: ATP-dependent DNA helicase
-  score: 2.4593
+  score: 2.4555
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
   locus_tag: SYNW0001
   organism_name: Synechococcus WH8102
   product: DNA polymerase III, beta subunit
-  score: 0.7012
+  score: 0.7017
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: SYNW0061
   organism_name: Synechococcus WH8102
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8637
+  score: 0.8641
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
   locus_tag: SYNW0073
   organism_name: Synechococcus WH8102
   product: DNA polymerase III, delta subunit
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: SYNW0702
   organism_name: Synechococcus WH8102
   product: DNA polymerase I
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: SYNW0744
   organism_name: Synechococcus WH8102
   product: UvrD-like P-loop containing nucleoside triphosphate hydrolase
-  score: 1.6823
+  score: 1.6814
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: SYNW0918
   organism_name: Synechococcus WH8102
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.4817
+  score: 1.4812
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
   locus_tag: SYNW1032
   organism_name: Synechococcus WH8102
   product: DNA polymerase III, alpha subunit
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
   locus_tag: SYNW1043
   organism_name: Synechococcus WH8102
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -1407,35 +1407,35 @@ rows:
   locus_tag: Sputw3181_0682
   organism_name: Shewanella sp. W3-18-1
   product: DEAD/DEAH box helicase
-  score: 2.307
+  score: 2.3039
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: Sputw3181_1900
   organism_name: Shewanella sp. W3-18-1
   product: exodeoxyribonuclease V subunit alpha
-  score: 1.0602
+  score: 1.0605
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: seqA
   locus_tag: Sputw3181_2127
   organism_name: Shewanella sp. W3-18-1
   product: replication initiation negative regulator SeqA
-  score: 3.5522
+  score: 3.5651
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
   locus_tag: SynWH7803_0001
   organism_name: Synechococcus WH7803
   product: DNA polymerase III, beta subunit
-  score: 0.8637
+  score: 0.8641
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: SynWH7803_0062
   organism_name: Synechococcus WH7803
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -1449,14 +1449,14 @@ rows:
   locus_tag: SynWH7803_1067
   organism_name: Synechococcus WH7803
   product: DNA polymerase III, alpha subunit
-  score: 1.0032
+  score: 1.0035
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
   locus_tag: SynWH7803_1080
   organism_name: Synechococcus WH7803
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -1470,21 +1470,21 @@ rows:
   locus_tag: SynWH7803_1509
   organism_name: Synechococcus WH7803
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.425
+  score: 1.4247
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: SynWH7803_1567
   organism_name: Synechococcus WH7803
   product: UvrD-like P-loop containing nucleoside triphosphate hydrolase
-  score: 1.6823
+  score: 1.6814
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA
   locus_tag: SynWH7803_1617
   organism_name: Synechococcus WH7803
   product: DNA polymerase I
-  score: 1.0602
+  score: 1.0605
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -1494,32 +1494,95 @@ rows:
   score: 1.2784
 - annotation_quality: 3
   gene_category: Replication and repair
+  gene_name: dnaX
+  locus_tag: Syncc8109_0066
+  organism_name: Synechococcus WH8109
+  product: DNA polymerase III, gamma and tau subunits
+  score: 0.9523
+- annotation_quality: 3
+  gene_category: Replication and repair
+  gene_name: holA
+  locus_tag: Syncc8109_0079
+  organism_name: Synechococcus WH8109
+  product: DNA polymerase III, delta subunit
+  score: 1.1964
+- annotation_quality: 3
+  gene_category: Replication and repair
+  gene_name: recD
+  locus_tag: Syncc8109_0977
+  organism_name: Synechococcus WH8109
+  product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
+  score: 1.4812
+- annotation_quality: 3
+  gene_category: Replication and repair
+  gene_name: umuD
+  locus_tag: Syncc8109_1516
+  organism_name: Synechococcus WH8109
+  product: DNA polymerase V, subunit D
+  score: 1.2784
+- annotation_quality: 3
+  gene_category: Replication and repair
+  gene_name: umuC
+  locus_tag: Syncc8109_1517
+  organism_name: Synechococcus WH8109
+  product: DNA polymerase V, subunit C
+  score: 1.1244
+- annotation_quality: 3
+  gene_category: Replication and repair
+  gene_name: dnaE
+  locus_tag: Syncc8109_1526
+  organism_name: Synechococcus WH8109
+  product: DNA polymerase III, alpha subunit
+  score: 1.0035
+- annotation_quality: 3
+  gene_category: Replication and repair
+  gene_name: null
+  locus_tag: Syncc8109_2019
+  organism_name: Synechococcus WH8109
+  product: UvrD-like P-loop containing nucleoside triphosphate hydrolase
+  score: 1.6814
+- annotation_quality: 3
+  gene_category: Replication and repair
+  gene_name: polA
+  locus_tag: Syncc8109_2065
+  organism_name: Synechococcus WH8109
+  product: DNA polymerase I
+  score: 1.0605
+- annotation_quality: 3
+  gene_category: Replication and repair
+  gene_name: holB
+  locus_tag: Syncc8109_2488
+  organism_name: Synechococcus WH8109
+  product: DNA polymerase III, delta^ subunit
+  score: 1.2784
+- annotation_quality: 3
+  gene_category: Replication and repair
   gene_name: seqA
   locus_tag: amad1_07825
   organism_name: Alteromonas mediterranea AltDE1
   product: replication initiation regulator SeqA
-  score: 3.8217
+  score: 3.8352
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: amad1_11915
   organism_name: Alteromonas mediterranea AltDE1
   product: exodeoxyribonuclease V subunit alpha
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
   locus_tag: sync_0001
   organism_name: Synechococcus CC9311
   product: DNA polymerase III, beta subunit
-  score: 0.8637
+  score: 0.8641
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: sync_0062
   organism_name: Synechococcus CC9311
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.9519
+  score: 0.9523
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -1533,21 +1596,21 @@ rows:
   locus_tag: sync_0928
   organism_name: Synechococcus CC9311
   product: DNA polymerase I
-  score: 1.0602
+  score: 1.0605
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: sync_0993
   organism_name: Synechococcus CC9311
   product: UvrD-like P-loop containing nucleoside triphosphate hydrolase
-  score: 1.6823
+  score: 1.6814
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recD
   locus_tag: sync_1053
   organism_name: Synechococcus CC9311
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-  score: 1.4817
+  score: 1.4812
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -1561,14 +1624,14 @@ rows:
   locus_tag: sync_1607
   organism_name: Synechococcus CC9311
   product: DNA polymerase V, subunit C
-  score: 1.1242
+  score: 1.1244
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
   locus_tag: sync_1630
   organism_name: Synechococcus CC9311
   product: DNA polymerase III, alpha subunit
-  score: 1.0032
+  score: 1.0035
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB

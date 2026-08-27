@@ -20,7 +20,7 @@ not_found:
   pathway_ids: []
 offset: 0
 results:
-- catalyst_gene_count: 277
+- catalyst_gene_count: 284
   chebi_id: '4167'
   elements:
   - C
@@ -37,7 +37,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00031
   name: D-Glucose
-  organism_count: 42
+  organism_count: 43
   pathway_count: 35
   pathway_ids:
   - kegg.pathway:ko00010
@@ -76,7 +76,7 @@ results:
   - kegg.pathway:ko05230
   - kegg.pathway:ko05415
   transporter_count: 10
-  transporter_gene_count: 1422
+  transporter_gene_count: 1436
 returned: 1
 row_count: 1
 score_max: null

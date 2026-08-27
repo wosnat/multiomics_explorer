@@ -15,7 +15,7 @@ by_metabolite:
 by_substrate_depth:
 - count: 10
   substrate_depth: most_specific
-case_id: genes_by_metabolite_urea_most_specific_only
+case_id: genes_by_metabolite_urea_med4_resolution
 gene_count_total: 5
 metabolite_count_total: 1
 not_found:

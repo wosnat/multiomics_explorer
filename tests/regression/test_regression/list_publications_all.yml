@@ -1,6 +1,49 @@
 case_id: list_publications_all
-row_count: 43
+row_count: 49
 rows:
+- authors:
+  - Jordan Rozum
+  - Lindsey Anderson
+  - Marci R. Garcia
+  - Margaret S. Cheung
+  - Natalie C. Sadler
+  - Pavlo Bohutskyi
+  - Song Feng
+  - Tong Zhang
+  - Wei-Jun Qian
+  - Xiaolu Li
+  - Zachary Johnson
+  background_factors:
+  - axenic
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  discussed_gene_count: 78
+  discussed_pathway_count: 11
+  doi: 10.64898/2026.04.15.718746
+  experiment_count: 2
+  growth_phases:
+  - diel
+  journal: bioRxiv
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Prochlorococcus MED4
+  study_type: RNA-seq, Transcriptomics
+  title: 'Extreme genome reduction selectively retains modular regulatory architecture
+    in Prochlorococcus MED4: conserved transcriptional modules reveal core physiological
+    regulatory programs'
+  treatment_types:
+  - darkness
+  - light
+  year: 2026
 - authors:
   - J. Jeffrey Morris
   - James Kizziah
@@ -374,6 +417,57 @@ rows:
   - phosphorus
   year: 2023
 - authors:
+  - Ahmed A. Zayed
+  - Aldo A. Arellano
+  - Christina Bliem
+  - Edward F. DeLong
+  - Elaina Thomas
+  - Elaine Luo
+  - Gabriel E. Leventhal
+  - John Beaulaurier
+  - John M. Eppley
+  - Keven D. Dooley
+  - Markus J. Ankenbrand
+  - Matthew B. Sullivan
+  - Paul Berube
+  - Ramunas Stepanauskas
+  - Raphaël Laurenceau
+  - Sallie W. Chisholm
+  - Shane L. Hogle
+  - Steven J. Biller
+  - Thomas Hackl
+  - Zev Cariani
+  background_factors:
+  - axenic
+  cluster_types:
+  - genomic_island
+  clustering_analysis_count: 11
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  discussed_gene_count: 0
+  discussed_pathway_count: 1
+  doi: 10.1016/j.cell.2022.12.006
+  experiment_count: 3
+  growth_phases:
+  - acute_stress
+  journal: Cell
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Prochlorococcus MIT0604
+  study_type: Comparative genomics / Genomic analysis of mobile genetic elements in
+    Prochlorococcus
+  title: Novel integrative elements and genomic plasticity in ocean ecosystems
+  treatment_types:
+  - chemical
+  - light
+  year: 2023
+- authors:
   - ' Ana M. Cabello'
   - ' Antonio S. Palacio'
   - ' José M. González'
@@ -567,6 +661,41 @@ rows:
   treatment_types:
   - compartment
   year: 2022
+- authors:
+  - Lijuan Long
+  - Si Zhang
+  - Sijun Huang
+  - Yingting Sun
+  background_factors:
+  - light
+  cluster_types:
+  - time_course
+  clustering_analysis_count: 1
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  discussed_gene_count: 14
+  discussed_pathway_count: 5
+  doi: 10.1002/mbo3.1150
+  experiment_count: 1
+  growth_phases:
+  - infected
+  journal: MicrobiologyOpen
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Phage
+  - Synechococcus WH7803
+  study_type: RNA-seq, Transcriptomics
+  title: Temporal transcriptomes of a marine cyanopodovirus and its Synechococcus
+    host during infection
+  treatment_types:
+  - viral
+  year: 2021
 - authors:
   - Ian T. Paulsen
   - Indrani Sarker
@@ -773,7 +902,8 @@ rows:
   - Vera Thiel
   - William B. Chrisler
   - Young-Mo Kim
-  background_factors: []
+  background_factors:
+  - light
   cluster_types:
   - condition_comparison
   clustering_analysis_count: 4
@@ -801,6 +931,7 @@ rows:
   treatment_types:
   - coculture
   - light
+  - oxygen
   year: 2017
 - authors:
   - Andres Cubillos-Ruiz
@@ -1018,6 +1149,48 @@ rows:
   - coculture
   year: 2016
 - authors:
+  - Ayalla Fedida
+  - Claudia Steglich
+  - Damir Stazic
+  - Debbie Lindell
+  - Gazalah Sabehi
+  - Iris Karunker
+  - Matthias Futschik
+  - Miguel A Hernández-Prieto
+  - Roi Feingersch
+  - Rotem Sorek
+  - Shany Doron
+  background_factors:
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  discussed_gene_count: 16
+  discussed_pathway_count: 9
+  doi: 10.1038/ismej.2015.210
+  experiment_count: 3
+  growth_phases:
+  - infected
+  journal: The ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Phage
+  - Synechococcus WH7803
+  - Synechococcus WH8102
+  - Synechococcus WH8109
+  study_type: Transcriptomics (RNA-seq and Microarray)
+  title: Transcriptome dynamics of a broad host-range cyanophage and its hosts
+  treatment_types:
+  - viral
+  year: 2016
+- authors:
   - Andreas Henschel
   - Lina F. Yousef
   - Mai M. Oudah
@@ -1064,7 +1237,7 @@ rows:
   derived_metric_value_kinds:
   - boolean
   - categorical
-  discussed_gene_count: 66
+  discussed_gene_count: 65
   discussed_pathway_count: 4
   doi: 10.1038/ismej.2015.36
   experiment_count: 4
@@ -1191,6 +1364,44 @@ rows:
   title: Bacterial Vesicles in Marine Ecosystems
   treatment_types:
   - compartment
+  year: 2014
+- authors:
+  - Björn Voß
+  - Claudia Steglich
+  - Cynthia M Sharma
+  - Jan Mitschke
+  - Karsten Voigt
+  - S Joke Lambrecht
+  - Wolfgang R Hess
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 10
+  derived_metric_value_kinds:
+  - boolean
+  - numeric
+  discussed_gene_count: 62
+  discussed_pathway_count: 6
+  doi: 10.1038/ismej.2014.57
+  experiment_count: 2
+  growth_phases: []
+  journal: The ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT9313
+  study_type: RNA-seq|dRNA-seq|Microarray|Transcriptomics
+  title: Comparative transcriptomics of two environmentally relevant cyanobacteria
+    reveals unexpected transcriptome diversity
+  treatment_types: []
   year: 2014
 - authors:
   - Alexander S Beliaev
@@ -1359,7 +1570,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 36
+  discussed_gene_count: 35
   discussed_pathway_count: 0
   doi: 10.1038/ismej.2011.49
   experiment_count: 5
@@ -1385,6 +1596,43 @@ rows:
 - authors:
   - Claudia Steglich
   - Debbie Lindell
+  - Matthias Futschik
+  - Robert Steen
+  - Sallie W Chisholm
+  - Trent Rector
+  background_factors:
+  - axenic
+  - chemical
+  - light
+  cluster_types:
+  - decay_pattern
+  clustering_analysis_count: 1
+  compartments:
+  - whole_cell
+  derived_metric_count: 4
+  derived_metric_value_kinds:
+  - boolean
+  - numeric
+  discussed_gene_count: 31
+  discussed_pathway_count: 3
+  doi: 10.1186/gb-2010-11-5-r54
+  experiment_count: 1
+  growth_phases: []
+  journal: Genome Biology
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Prochlorococcus MED4
+  study_type: Microarray-based transcriptomics
+  title: RNA half-lives in the slow-growing marine cyanobacterium Prochlorococcus
+  treatment_types: []
+  year: 2010
+- authors:
+  - Claudia Steglich
+  - Debbie Lindell
   - Erik R. Zinser
   - Luke R. Thompson
   - Matthew A. Wright
@@ -1405,7 +1653,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 1
+  discussed_gene_count: 0
   discussed_pathway_count: 0
   doi: 10.1371/journal.pone.0005135
   experiment_count: 1
@@ -1587,7 +1835,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 83
+  discussed_gene_count: 84
   discussed_pathway_count: 3
   doi: 10.1038/msb4100087
   experiment_count: 6

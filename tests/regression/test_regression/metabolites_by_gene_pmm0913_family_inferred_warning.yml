@@ -106,6 +106,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
@@ -123,6 +124,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
@@ -139,6 +141,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
@@ -156,6 +159,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
@@ -173,6 +177,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
@@ -189,6 +194,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
@@ -204,6 +210,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
@@ -221,6 +228,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
@@ -236,6 +244,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
@@ -252,6 +261,7 @@ results:
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
 returned: 10
 row_count: 10
 top_gene_categories:

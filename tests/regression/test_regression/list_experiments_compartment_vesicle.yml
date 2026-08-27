@@ -398,7 +398,7 @@ rows:
   publication_doi: 10.1111/1462-2920.15834
   significant_down_count: 0
   significant_up_count: 0
-  table_scope: ''
+  table_scope: null
   table_scope_detail: ''
   time_point_count: 0
   time_point_growth_phases: []
@@ -494,7 +494,7 @@ rows:
   publication_doi: 10.1111/1462-2920.15834
   significant_down_count: 0
   significant_up_count: 0
-  table_scope: ''
+  table_scope: null
   table_scope_detail: ''
   time_point_count: 0
   time_point_growth_phases: []

@@ -247,7 +247,8 @@ rows:
   - Vera Thiel
   - William B. Chrisler
   - Young-Mo Kim
-  background_factors: []
+  background_factors:
+  - light
   cluster_types:
   - condition_comparison
   clustering_analysis_count: 4
@@ -275,6 +276,7 @@ rows:
   treatment_types:
   - coculture
   - light
+  - oxygen
   year: 2017
 - authors:
   - David J. Scanlan

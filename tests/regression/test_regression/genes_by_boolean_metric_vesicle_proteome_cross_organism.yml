@@ -1,10 +1,10 @@
 by_compartment:
 - compartment: vesicle
-  count: 58
+  count: 59
 by_experiment:
 - count: 32
   experiment_id: 10.1126/science.1243457_vesicle_proteomics_med4
-- count: 26
+- count: 27
   experiment_id: 10.1126/science.1243457_vesicle_proteomics_mit9313
 by_metric:
 - count: 32
@@ -17,26 +17,26 @@ by_metric:
   name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
   true_count: 32
   value_kind: boolean
-- count: 26
+- count: 27
   derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
   dm_false_count: 0
-  dm_total_gene_count: 26
-  dm_true_count: 26
+  dm_total_gene_count: 27
+  dm_true_count: 27
   false_count: 0
   metric_type: vesicle_proteome_member
   name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
-  true_count: 26
+  true_count: 27
   value_kind: boolean
 by_organism:
 - count: 32
   organism_name: Prochlorococcus MED4
-- count: 26
+- count: 27
   organism_name: Prochlorococcus MIT9313
 by_publication:
-- count: 58
+- count: 59
   publication_doi: 10.1126/science.1243457
 by_value:
-- count: 58
+- count: 59
   value: 'true'
 case_id: genes_by_boolean_metric_vesicle_proteome_cross_organism
 excluded_derived_metrics: []
@@ -578,6 +578,17 @@ results:
   value: 'true'
   value_kind: boolean
 - derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Regulatory functions
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1599
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: putative ATP-dependent protease
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
   gene_category: Energy production
   gene_name: null
   has_p_value: false
@@ -687,8 +698,8 @@ results:
   rankable: false
   value: 'true'
   value_kind: boolean
-returned: 58
-row_count: 58
+returned: 59
+row_count: 59
 top_categories:
 - count: 12
   gene_category: Unknown
@@ -701,7 +712,7 @@ top_categories:
 - count: 4
   gene_category: Post-translational modification
 total_derived_metrics: 2
-total_genes: 58
-total_matching: 58
+total_genes: 59
+total_matching: 59
 truncated: false
 warnings: []

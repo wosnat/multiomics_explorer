@@ -1,5 +1,5 @@
 case_id: list_publications_author
-row_count: 18
+row_count: 20
 rows:
 - authors:
   - James I. Mullet
@@ -173,6 +173,57 @@ rows:
   treatment_types:
   - growth_phase
   - phosphorus
+  year: 2023
+- authors:
+  - Ahmed A. Zayed
+  - Aldo A. Arellano
+  - Christina Bliem
+  - Edward F. DeLong
+  - Elaina Thomas
+  - Elaine Luo
+  - Gabriel E. Leventhal
+  - John Beaulaurier
+  - John M. Eppley
+  - Keven D. Dooley
+  - Markus J. Ankenbrand
+  - Matthew B. Sullivan
+  - Paul Berube
+  - Ramunas Stepanauskas
+  - Raphaël Laurenceau
+  - Sallie W. Chisholm
+  - Shane L. Hogle
+  - Steven J. Biller
+  - Thomas Hackl
+  - Zev Cariani
+  background_factors:
+  - axenic
+  cluster_types:
+  - genomic_island
+  clustering_analysis_count: 11
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  discussed_gene_count: 0
+  discussed_pathway_count: 1
+  doi: 10.1016/j.cell.2022.12.006
+  experiment_count: 3
+  growth_phases:
+  - acute_stress
+  journal: Cell
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Prochlorococcus MIT0604
+  study_type: Comparative genomics / Genomic analysis of mobile genetic elements in
+    Prochlorococcus
+  title: Novel integrative elements and genomic plasticity in ocean ecosystems
+  treatment_types:
+  - chemical
+  - light
   year: 2023
 - authors:
   - Aldo A. Arellano
@@ -383,7 +434,7 @@ rows:
   derived_metric_value_kinds:
   - boolean
   - categorical
-  discussed_gene_count: 66
+  discussed_gene_count: 65
   discussed_pathway_count: 4
   doi: 10.1038/ismej.2015.36
   experiment_count: 4
@@ -489,7 +540,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 36
+  discussed_gene_count: 35
   discussed_pathway_count: 0
   doi: 10.1038/ismej.2011.49
   experiment_count: 5
@@ -515,6 +566,43 @@ rows:
 - authors:
   - Claudia Steglich
   - Debbie Lindell
+  - Matthias Futschik
+  - Robert Steen
+  - Sallie W Chisholm
+  - Trent Rector
+  background_factors:
+  - axenic
+  - chemical
+  - light
+  cluster_types:
+  - decay_pattern
+  clustering_analysis_count: 1
+  compartments:
+  - whole_cell
+  derived_metric_count: 4
+  derived_metric_value_kinds:
+  - boolean
+  - numeric
+  discussed_gene_count: 31
+  discussed_pathway_count: 3
+  doi: 10.1186/gb-2010-11-5-r54
+  experiment_count: 1
+  growth_phases: []
+  journal: Genome Biology
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Prochlorococcus MED4
+  study_type: Microarray-based transcriptomics
+  title: RNA half-lives in the slow-growing marine cyanobacterium Prochlorococcus
+  treatment_types: []
+  year: 2010
+- authors:
+  - Claudia Steglich
+  - Debbie Lindell
   - Erik R. Zinser
   - Luke R. Thompson
   - Matthew A. Wright
@@ -535,7 +623,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 1
+  discussed_gene_count: 0
   discussed_pathway_count: 0
   doi: 10.1371/journal.pone.0005135
   experiment_count: 1
@@ -650,7 +738,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 83
+  discussed_gene_count: 84
   discussed_pathway_count: 3
   doi: 10.1038/msb4100087
   experiment_count: 6

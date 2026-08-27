@@ -1,6 +1,28 @@
 case_id: gene_derived_metrics_pmm1714_all_kinds
-row_count: 11
+row_count: 18
 rows:
+- derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:expressed_above_background
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  name: Expressed above background at t0
+  rank_by_metric: null
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:has_primary_tss
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  name: Has mapped primary TSS (gTSS)
+  rank_by_metric: null
+  rankable: false
+  value: 'false'
+  value_kind: boolean
 - derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
   gene_name: null
   has_p_value: false
@@ -45,6 +67,61 @@ rows:
   rankable: false
   value: Cytoplasmic Membrane
   value_kind: categorical
+- derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:expression_at_t0_log2
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: mid
+  metric_percentile: 58.8906
+  name: Expression at t0 (log2)
+  rank_by_metric: 794
+  rankable: true
+  value: 6.1576
+  value_kind: numeric
+- derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:rna_decay_time_min
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: mid
+  metric_percentile: 56.2986
+  name: mRNA decay time (min per twofold decrease)
+  rank_by_metric: 844
+  rankable: true
+  value: 3.8237
+  value_kind: numeric
+- derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:rna_half_life_min
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: mid
+  metric_percentile: 69.3105
+  name: mRNA half-life (min)
+  rank_by_metric: 593
+  rankable: true
+  value: 4.9606
+  value_kind: numeric
+- derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:antisense_tss_count
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: top_decile
+  metric_percentile: 94.7789
+  name: Antisense TSS count
+  rank_by_metric: 86
+  rankable: true
+  value: 4.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:internal_tss_count
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: low
+  metric_percentile: 6.1425
+  name: Internal TSS count
+  rank_by_metric: 1529
+  rankable: true
+  value: 0.0
+  value_kind: numeric
 - derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
   gene_name: null
   has_p_value: false

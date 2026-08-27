@@ -1,20 +1,85 @@
+by_annotation_capability:
+- interpro_gene_count: 3746
+  ncbifam_gene_count: 1379
+  nonpeptidase_homolog_gene_count: 31
+  organism_name: Alteromonas (MarRef v6)
+  peptidase_gene_count: 148
+  preferred_name: Alteromonas (MarRef v6)
+- interpro_gene_count: 3495
+  ncbifam_gene_count: 1611
+  nonpeptidase_homolog_gene_count: 32
+  organism_name: Alteromonas macleodii AD45
+  peptidase_gene_count: 129
+  preferred_name: Alteromonas macleodii AD45
+- interpro_gene_count: 3636
+  ncbifam_gene_count: 1853
+  nonpeptidase_homolog_gene_count: 23
+  organism_name: Shewanella sp. W3-18-1
+  peptidase_gene_count: 128
+  preferred_name: Shewanella sp. W3-18-1
+- interpro_gene_count: 3608
+  ncbifam_gene_count: 1656
+  nonpeptidase_homolog_gene_count: 33
+  organism_name: Alteromonas macleodii BGP6
+  peptidase_gene_count: 127
+  preferred_name: Alteromonas macleodii BGP6
+- interpro_gene_count: 3456
+  ncbifam_gene_count: 1598
+  nonpeptidase_homolog_gene_count: 37
+  organism_name: Alteromonas macleodii ATCC27126
+  peptidase_gene_count: 125
+  preferred_name: Alteromonas macleodii ATCC27126
+- interpro_gene_count: 4961
+  ncbifam_gene_count: 2264
+  nonpeptidase_homolog_gene_count: 43
+  organism_name: Pseudomonas putida KT2440
+  peptidase_gene_count: 125
+  preferred_name: Pseudomonas putida KT2440
+- interpro_gene_count: 3659
+  ncbifam_gene_count: 1701
+  nonpeptidase_homolog_gene_count: 34
+  organism_name: Alteromonas macleodii EZ55
+  peptidase_gene_count: 124
+  preferred_name: Alteromonas macleodii EZ55
+- interpro_gene_count: 3349
+  ncbifam_gene_count: 1577
+  nonpeptidase_homolog_gene_count: 29
+  organism_name: Alteromonas macleodii BS11
+  peptidase_gene_count: 123
+  preferred_name: Alteromonas macleodii BS11
+- interpro_gene_count: 3584
+  ncbifam_gene_count: 1699
+  nonpeptidase_homolog_gene_count: 32
+  organism_name: Alteromonas macleodii MIT1002
+  peptidase_gene_count: 120
+  preferred_name: Alteromonas macleodii MIT1002
+- interpro_gene_count: 3563
+  ncbifam_gene_count: 1678
+  nonpeptidase_homolog_gene_count: 33
+  organism_name: Alteromonas macleodii HOT1A3
+  peptidase_gene_count: 118
+  preferred_name: Alteromonas macleodii HOT1A3
 by_cluster_type:
+- cluster_type: genomic_island
+  count: 11
+- cluster_type: time_course
+  count: 3
 - cluster_type: condition_comparison
   count: 3
 - cluster_type: diel
   count: 2
-- cluster_type: time_course
-  count: 2
+- cluster_type: decay_pattern
+  count: 1
 by_compartment:
 - compartment: vesicle
   count: 9
 - compartment: whole_cell
-  count: 4
+  count: 5
 - compartment: exoproteome
   count: 2
 by_measurement_capability:
   has_metabolomics: 5
-  no_metabolomics: 42
+  no_metabolomics: 43
 by_metabolic_capability:
 - catalyzed_metabolite_count: 1490
   organism_name: Pseudomonas putida KT2440
@@ -64,9 +129,19 @@ by_metric_type:
 - count: 6
   metric_type: prop_abund_mvs_percent
 - count: 2
+  metric_type: antisense_tss_count
+- count: 2
+  metric_type: has_primary_tss
+- count: 2
+  metric_type: internal_tss_count
+- count: 2
   metric_type: mascot_identification_probability
 - count: 2
+  metric_type: minus10_element_score
+- count: 2
   metric_type: predicted_subcellular_localization
+- count: 2
+  metric_type: tss_distance_to_cds
 - count: 2
   metric_type: vesicle_proteome_member
 - count: 2
@@ -85,6 +160,10 @@ by_metric_type:
   metric_type: diel_amplitude_protein_log2
 - count: 1
   metric_type: diel_amplitude_transcript_log2
+- count: 1
+  metric_type: expressed_above_background
+- count: 1
+  metric_type: expression_at_t0_log2
 - count: 1
   metric_type: expression_change_high_light_shock
 - count: 1
@@ -105,6 +184,10 @@ by_metric_type:
   metric_type: rapid_recovery_low_co2_no_o2_shock
 - count: 1
   metric_type: rapid_recovery_low_co2_shock
+- count: 1
+  metric_type: rna_decay_time_min
+- count: 1
+  metric_type: rna_half_life_min
 - count: 1
   metric_type: vesicle_dna_avg_read_coverage
 - count: 1
@@ -146,7 +229,7 @@ by_metric_type:
 - count: 1
   metric_type: exoproteome_detection_status
 by_organism_type:
-- count: 40
+- count: 41
   organism_type: genome_strain
 - count: 5
   organism_type: treatment
@@ -165,6 +248,6 @@ offset: 0
 results: []
 returned: 0
 row_count: 0
-total_entries: 47
-total_matching: 47
+total_entries: 48
+total_matching: 48
 truncated: true

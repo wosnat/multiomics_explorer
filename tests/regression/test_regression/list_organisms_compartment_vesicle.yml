@@ -17,12 +17,16 @@ rows:
   gene_count: 3929
   genus: Alteromonas
   growth_phases: []
+  interpro_gene_count: 3495
   measured_metabolite_count: 0
   ncbi_taxon_id: 1004787
+  ncbifam_gene_count: 1611
+  nonpeptidase_homolog_gene_count: 32
   omics_types:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii AD45
   organism_type: genome_strain
+  peptidase_gene_count: 129
   publication_count: 1
   reaction_count: 1259
   reference_database: null
@@ -48,12 +52,16 @@ rows:
   gene_count: 3834
   genus: Alteromonas
   growth_phases: []
+  interpro_gene_count: 3456
   measured_metabolite_count: 0
   ncbi_taxon_id: 529120
+  ncbifam_gene_count: 1598
+  nonpeptidase_homolog_gene_count: 37
   omics_types:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii ATCC27126
   organism_type: genome_strain
+  peptidase_gene_count: 125
   publication_count: 1
   reaction_count: 1251
   reference_database: null
@@ -79,12 +87,16 @@ rows:
   gene_count: 4063
   genus: Alteromonas
   growth_phases: []
+  interpro_gene_count: 3608
   measured_metabolite_count: 0
   ncbi_taxon_id: 28108
+  ncbifam_gene_count: 1656
+  nonpeptidase_homolog_gene_count: 33
   omics_types:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii BGP6
   organism_type: genome_strain
+  peptidase_gene_count: 127
   publication_count: 1
   reaction_count: 1275
   reference_database: null
@@ -110,12 +122,16 @@ rows:
   gene_count: 3741
   genus: Alteromonas
   growth_phases: []
+  interpro_gene_count: 3349
   measured_metabolite_count: 0
   ncbi_taxon_id: 1004785
+  ncbifam_gene_count: 1577
+  nonpeptidase_homolog_gene_count: 29
   omics_types:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii BS11
   organism_type: genome_strain
+  peptidase_gene_count: 123
   publication_count: 1
   reaction_count: 1228
   reference_database: null
@@ -146,14 +162,18 @@ rows:
   - death
   - exponential
   - nutrient_limited
+  interpro_gene_count: 3563
   measured_metabolite_count: 0
   ncbi_taxon_id: 28108
+  ncbifam_gene_count: 1678
+  nonpeptidase_homolog_gene_count: 33
   omics_types:
   - PROTEOMICS
   - RNASEQ
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii HOT1A3
   organism_type: genome_strain
+  peptidase_gene_count: 118
   publication_count: 3
   reaction_count: 1266
   reference_database: null
@@ -189,13 +209,17 @@ rows:
   - darkness
   - diel
   - exponential
+  interpro_gene_count: 3584
   measured_metabolite_count: 0
   ncbi_taxon_id: 28108
+  ncbifam_gene_count: 1699
+  nonpeptidase_homolog_gene_count: 32
   omics_types:
   - RNASEQ
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii MIT1002
   organism_type: genome_strain
+  peptidase_gene_count: 120
   publication_count: 4
   reaction_count: 1288
   reference_database: null
@@ -219,18 +243,20 @@ rows:
   catalyzed_metabolite_count: 1039
   clade: HLI
   cluster_types:
+  - decay_pattern
   - diel
+  - genomic_island
   - time_course
-  clustering_analysis_count: 4
+  clustering_analysis_count: 6
   compartments:
   - vesicle
   - whole_cell
-  derived_metric_count: 17
+  derived_metric_count: 26
   derived_metric_value_kinds:
   - boolean
   - categorical
   - numeric
-  experiment_count: 114
+  experiment_count: 119
   gene_count: 1976
   genus: Prochlorococcus
   growth_phases:
@@ -238,13 +264,17 @@ rows:
   - acute_stress
   - darkness
   - death
+  - diel
   - exponential
   - infected
   - nutrient_limited
   - recovery
   - stationary
+  interpro_gene_count: 1545
   measured_metabolite_count: 0
   ncbi_taxon_id: 59919
+  ncbifam_gene_count: 744
+  nonpeptidase_homolog_gene_count: 8
   omics_types:
   - MICROARRAY
   - PAIRED_RNASEQ_PROTEOME
@@ -254,7 +284,8 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MED4
   organism_type: genome_strain
-  publication_count: 17
+  peptidase_gene_count: 50
+  publication_count: 20
   reaction_count: 943
   reference_database: null
   reference_proteome: null
@@ -265,6 +296,7 @@ rows:
   - carbon
   - coculture
   - compartment
+  - darkness
   - diel
   - growth_phase
   - iron
@@ -280,8 +312,9 @@ rows:
   - light
   catalyzed_metabolite_count: 1047
   clade: HLII
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - genomic_island
+  clustering_analysis_count: 1
   compartments:
   - vesicle
   derived_metric_count: 3
@@ -295,8 +328,11 @@ rows:
   - acute_stress
   - exponential
   - stationary
+  interpro_gene_count: 1557
   measured_metabolite_count: 69
   ncbi_taxon_id: 74546
+  ncbifam_gene_count: 759
+  nonpeptidase_homolog_gene_count: 9
   omics_types:
   - METABOLOMICS
   - PROTEOMICS
@@ -304,6 +340,7 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MIT9312
   organism_type: genome_strain
+  peptidase_gene_count: 50
   publication_count: 5
   reaction_count: 943
   reference_database: null
@@ -323,16 +360,18 @@ rows:
   catalyzed_metabolite_count: 1081
   clade: LLIV
   cluster_types:
+  - genomic_island
   - time_course
-  clustering_analysis_count: 2
+  clustering_analysis_count: 3
   compartments:
   - vesicle
-  derived_metric_count: 6
+  - whole_cell
+  derived_metric_count: 11
   derived_metric_value_kinds:
   - boolean
   - categorical
   - numeric
-  experiment_count: 38
+  experiment_count: 40
   gene_count: 2948
   genus: Prochlorococcus
   growth_phases:
@@ -340,8 +379,11 @@ rows:
   - exponential
   - nutrient_limited
   - recovery
+  interpro_gene_count: 1888
   measured_metabolite_count: 145
   ncbi_taxon_id: 74547
+  ncbifam_gene_count: 905
+  nonpeptidase_homolog_gene_count: 11
   omics_types:
   - METABOLOMICS
   - MICROARRAY
@@ -350,7 +392,8 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MIT9313
   organism_type: genome_strain
-  publication_count: 9
+  peptidase_gene_count: 60
+  publication_count: 10
   reaction_count: 953
   reference_database: null
   reference_proteome: null

@@ -1,5 +1,5 @@
 case_id: list_derived_metrics_rankable_true
-row_count: 31
+row_count: 42
 rows:
 - allowed_categories: null
   background_factors:
@@ -418,6 +418,171 @@ rows:
 - allowed_categories: null
   background_factors:
   - axenic
+  - chemical
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:expression_at_t0_log2
+  experiment_id: 10.1186/gb-2010-11-5-r54_rifampicin_rna_decay_med4
+  field_description: log2 microarray expression level at 0 min (before rifampicin
+    addition) — the steady-state abundance baseline the decay fit starts from.
+  growth_phases: []
+  has_p_value: false
+  metric_type: expression_at_t0_log2
+  name: Expression at t0 (log2)
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1186/gb-2010-11-5-r54
+  rankable: true
+  total_gene_count: 1930
+  treatment_type: []
+  unit: log2
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - chemical
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:rna_decay_time_min
+  experiment_id: 10.1186/gb-2010-11-5-r54_rifampicin_rna_decay_med4
+  field_description: Two-phase-fit mRNA decay time in minutes per twofold decrease,
+    measured relative to the timepoint of maximal expression (the paper idiosyncratically
+    calls this ^decay rate^; it is a TIME, not a rate constant). Higher = MORE stable
+    — same direction as rna_half_life_min, which it complements (different fitting
+    approach; median 2.6 min for expressed genes). Standard error and error-interval
+    bounds per gene in source columns decay_time_se_min / decay_time_lower / decay_time_upper
+    (kept in the CSV, not wired as metrics).
+  growth_phases: []
+  has_p_value: false
+  metric_type: rna_decay_time_min
+  name: mRNA decay time (min per twofold decrease)
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1186/gb-2010-11-5-r54
+  rankable: true
+  total_gene_count: 1930
+  treatment_type: []
+  unit: min
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - chemical
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:rna_half_life_min
+  experiment_id: 10.1186/gb-2010-11-5-r54_rifampicin_rna_decay_med4
+  field_description: 'Fitted mRNA half-life in minutes after rifampicin transcription
+    arrest (median 2.4 min for expressed genes; 3.4 min over the whole table). Higher
+    = more stable transcript. Caveat: fits for genes below the expression threshold
+    (expressed_above_background = false) are unreliable, and half-lives of very highly
+    expressed genes are saturation-inflated (paper: psbA 40 min by array vs 18 min
+    by qPCR). Standard error per gene in source column half_life_se_min (kept in the
+    CSV, not wired as a metric).'
+  growth_phases: []
+  has_p_value: false
+  metric_type: rna_half_life_min
+  name: mRNA half-life (min)
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1186/gb-2010-11-5-r54
+  rankable: true
+  total_gene_count: 1930
+  treatment_type: []
+  unit: min
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:antisense_tss_count
+  experiment_id: 10.1038/ismej.2014.57_tss_mapping_med4
+  field_description: Number of mapped antisense TSS rows (aTSS + array-only aArray)
+    at this gene^s locus. 0 = gene is in the TSS map but with no antisense site. Routing
+    signal (^does this gene have mapped antisense transcription?^) — NOT a complete
+    antisense-transcript annotation (the paper^s asRNA/ncRNA catalogue is not wired).
+  growth_phases: []
+  has_p_value: false
+  metric_type: antisense_tss_count
+  name: Antisense TSS count
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2014.57
+  rankable: true
+  total_gene_count: 1629
+  treatment_type: []
+  unit: count
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:internal_tss_count
+  experiment_id: 10.1038/ismej.2014.57_tss_mapping_med4
+  field_description: Number of mapped internal TSS (iTSS) rows inside this gene^s
+    CDS. Routing signal reduced from the Voigt 2014 TSS map.
+  growth_phases: []
+  has_p_value: false
+  metric_type: internal_tss_count
+  name: Internal TSS count
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2014.57
+  rankable: true
+  total_gene_count: 1629
+  treatment_type: []
+  unit: count
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:minus10_element_score
+  experiment_id: 10.1038/ismej.2014.57_tss_mapping_med4
+  field_description: Maximum -10 promoter element motif score across the gene^s primary
+    (gTSS) sites. Present only for genes with a gTSS. Higher = stronger canonical
+    -10 box.
+  growth_phases: []
+  has_p_value: false
+  metric_type: minus10_element_score
+  name: -10 element score (best gTSS)
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2014.57
+  rankable: true
+  total_gene_count: 824
+  treatment_type: []
+  unit: ''
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:tss_distance_to_cds
+  experiment_id: 10.1038/ismej.2014.57_tss_mapping_med4
+  field_description: Distance from the gene^s dominant primary TSS (strongest gTSS
+    by normalized Solexa read value; fallback raw Solexa / 454 reads) to the CDS start
+    = 5^UTR length in nt. 0 = leaderless. Present only for genes with a gTSS carrying
+    a mapped distance.
+  growth_phases: []
+  has_p_value: false
+  metric_type: tss_distance_to_cds
+  name: TSS distance to CDS (5^UTR length)
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2014.57
+  rankable: true
+  total_gene_count: 821
+  treatment_type: []
+  unit: nt
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
   compartment: whole_cell
   derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
   experiment_id: 10.1371/journal.pone.0043432_waldbauer_2012_med4_paired_diel
@@ -609,7 +774,7 @@ rows:
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 1039
+  total_gene_count: 1044
   treatment_type:
   - compartment
   unit: spectral counts / cell biovolume
@@ -631,7 +796,7 @@ rows:
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 350
+  total_gene_count: 353
   treatment_type:
   - compartment
   unit: spectral counts / vesicle biovolume
@@ -654,10 +819,98 @@ rows:
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 310
+  total_gene_count: 312
   treatment_type:
   - compartment
   unit: log2 ratio
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:antisense_tss_count
+  experiment_id: 10.1038/ismej.2014.57_tss_mapping_mit9313
+  field_description: Number of mapped antisense TSS rows (aTSS + array-only aArray)
+    at this gene^s locus. 0 = gene is in the TSS map but with no antisense site. Routing
+    signal — NOT a complete antisense-transcript annotation.
+  growth_phases: []
+  has_p_value: false
+  metric_type: antisense_tss_count
+  name: Antisense TSS count
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1038/ismej.2014.57
+  rankable: true
+  total_gene_count: 2139
+  treatment_type: []
+  unit: count
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:internal_tss_count
+  experiment_id: 10.1038/ismej.2014.57_tss_mapping_mit9313
+  field_description: Number of mapped internal TSS (iTSS) rows inside this gene^s
+    CDS. Routing signal reduced from the Voigt 2014 TSS map.
+  growth_phases: []
+  has_p_value: false
+  metric_type: internal_tss_count
+  name: Internal TSS count
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1038/ismej.2014.57
+  rankable: true
+  total_gene_count: 2139
+  treatment_type: []
+  unit: count
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:minus10_element_score
+  experiment_id: 10.1038/ismej.2014.57_tss_mapping_mit9313
+  field_description: Maximum -10 promoter element motif score across the gene^s primary
+    (gTSS) sites. Present only for genes with a gTSS. Higher = stronger canonical
+    -10 box.
+  growth_phases: []
+  has_p_value: false
+  metric_type: minus10_element_score
+  name: -10 element score (best gTSS)
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1038/ismej.2014.57
+  rankable: true
+  total_gene_count: 1029
+  treatment_type: []
+  unit: ''
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:tss_distance_to_cds
+  experiment_id: 10.1038/ismej.2014.57_tss_mapping_mit9313
+  field_description: Distance from the gene^s dominant primary TSS (strongest gTSS
+    by normalized Solexa read value; fallback raw Solexa / 454 reads) to the CDS start
+    = 5^UTR length in nt. 0 = leaderless. Present only for genes with a gTSS carrying
+    a mapped distance.
+  growth_phases: []
+  has_p_value: false
+  metric_type: tss_distance_to_cds
+  name: TSS distance to CDS (5^UTR length)
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1038/ismej.2014.57
+  rankable: true
+  total_gene_count: 976
+  treatment_type: []
+  unit: nt
   value_kind: numeric
 - allowed_categories: null
   background_factors:

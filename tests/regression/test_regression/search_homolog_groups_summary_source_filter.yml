@@ -2,13 +2,13 @@ case_id: search_homolog_groups_summary_source_filter
 row_count: 1
 rows:
 - by_level:
-  - '{''count'': 425, ''item'': ''curated''}'
+  - '{''count'': 430, ''item'': ''curated''}'
   by_source:
-  - '{''count'': 425, ''item'': ''cyanorak''}'
-  score_max: 3.9123
-  score_median: 1.0816
+  - '{''count'': 430, ''item'': ''cyanorak''}'
+  score_max: 3.8651
+  score_median: 1.0681
   top_cog_categories:
-  - '{''id'': ''cog.category:C'', ''count'': 153, ''name'': ''Energy production and
+  - '{''id'': ''cog.category:C'', ''count'': 157, ''name'': ''Energy production and
     conversion''}'
   - '{''id'': ''cog.category:G'', ''count'': 26, ''name'': ''Carbohydrate transport
     and metabolism''}'
@@ -20,12 +20,12 @@ rows:
   top_cyanorak_roles:
   - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 41, ''name'': ''Cellular processes
     > Adaptation/acclimation to atypical conditions and detoxification > Light''}'
-  - '{''id'': ''cyanorak.role:G.2'', ''count'': 52, ''name'': ''Energy metabolism
+  - '{''id'': ''cyanorak.role:G.2'', ''count'': 53, ''name'': ''Energy metabolism
     > Electron transport''}'
   - '{''id'': ''cyanorak.role:J'', ''count'': 35, ''name'': ''Photosynthesis and respiration''}'
   - '{''id'': ''cyanorak.role:J.2'', ''count'': 41, ''name'': ''Photosynthesis and
     respiration > CO2 fixation''}'
   - '{''id'': ''cyanorak.role:J.8'', ''count'': 41, ''name'': ''Photosynthesis and
     respiration > Photosystem II''}'
-  total_entries: 48388
-  total_matching: 241
+  total_entries: 48972
+  total_matching: 244

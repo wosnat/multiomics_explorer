@@ -1,5 +1,5 @@
 case_id: de_by_gene_verbose
-row_count: 33
+row_count: 38
 rows:
 - background_factors:
   - light
@@ -159,6 +159,33 @@ rows:
   treatment_type:
   - carbon
 - background_factors:
+  - axenic
+  - diel
+  coculture_partner: null
+  experiment_id: 10.64898/2026.04.15.718746_extended_light_med4
+  experiment_name: MED4 extended light past dusk vs normal dark period (RNA-seq)
+  expression_status: significant_up
+  gene_category: Replication and repair
+  gene_name: dnaN
+  growth_phase: diel
+  locus_tag: PMM0001
+  log2fc: 1.1294
+  omics_type: RNASEQ
+  padj: 0.0
+  product: DNA polymerase III, beta subunit
+  rank: 545
+  rank_down: null
+  rank_up: 313
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  timepoint: 16h
+  timepoint_hours: 16.0
+  timepoint_order: 2
+  treatment: 'Extended light across dusk: lights NOT turned off at ZT 12, light continued
+    into the subjective circadian night'
+  treatment_type:
+  - light
+- background_factors:
   - coculture
   - light
   coculture_partner: null
@@ -185,6 +212,33 @@ rows:
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
   - nitrogen
+- background_factors:
+  - axenic
+  - diel
+  coculture_partner: null
+  experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
+  experiment_name: MED4 extended darkness past dawn vs normal light period (RNA-seq)
+  expression_status: significant_up
+  gene_category: Replication and repair
+  gene_name: dnaN
+  growth_phase: diel
+  locus_tag: PMM0001
+  log2fc: 1.0312
+  omics_type: RNASEQ
+  padj: 0.0
+  product: DNA polymerase III, beta subunit
+  rank: 563
+  rank_down: null
+  rank_up: 297
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  timepoint: 4h
+  timepoint_hours: 4.0
+  timepoint_order: 2
+  treatment: 'Extended darkness across dawn: lights NOT turned on at ZT 0, darkness
+    continued into the subjective circadian day'
+  treatment_type:
+  - darkness
 - background_factors:
   - axenic
   - light
@@ -291,6 +345,33 @@ rows:
   treatment: Nitrogen deprivation (MED4)
   treatment_type:
   - nitrogen
+- background_factors:
+  - axenic
+  - diel
+  coculture_partner: null
+  experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
+  experiment_name: MED4 extended darkness past dawn vs normal light period (RNA-seq)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  growth_phase: diel
+  locus_tag: PMM0001
+  log2fc: 0.8456
+  omics_type: RNASEQ
+  padj: 0.0002
+  product: DNA polymerase III, beta subunit
+  rank: 606
+  rank_down: null
+  rank_up: null
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  timepoint: 2h
+  timepoint_hours: 2.0
+  timepoint_order: 1
+  treatment: 'Extended darkness across dawn: lights NOT turned on at ZT 0, darkness
+    continued into the subjective circadian day'
+  treatment_type:
+  - darkness
 - background_factors:
   - coculture
   - light
@@ -531,6 +612,33 @@ rows:
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
   - nitrogen
+- background_factors:
+  - axenic
+  - diel
+  coculture_partner: null
+  experiment_id: 10.64898/2026.04.15.718746_extended_light_med4
+  experiment_name: MED4 extended light past dusk vs normal dark period (RNA-seq)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  growth_phase: diel
+  locus_tag: PMM0001
+  log2fc: 0.3637
+  omics_type: RNASEQ
+  padj: 0.7829
+  product: DNA polymerase III, beta subunit
+  rank: 1190
+  rank_down: null
+  rank_up: null
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  timepoint: 14h
+  timepoint_hours: 14.0
+  timepoint_order: 1
+  treatment: 'Extended light across dusk: lights NOT turned off at ZT 12, light continued
+    into the subjective circadian night'
+  treatment_type:
+  - light
 - background_factors:
   - axenic
   - light
@@ -799,6 +907,33 @@ rows:
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
   - nitrogen
+- background_factors:
+  - axenic
+  - light
+  coculture_partner: null
+  experiment_id: 10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq
+  experiment_name: MED4 Low salinity acclimation (28 psu) vs Normal seawater salinity
+    (34 psu) (RNASEQ)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  growth_phase: acclimated_steady_state
+  locus_tag: PMM0001
+  log2fc: 0.0821
+  omics_type: RNASEQ
+  padj: 1.0
+  product: DNA polymerase III, beta subunit
+  rank: 1617
+  rank_down: null
+  rank_up: null
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  timepoint: acclimated
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment: Low salinity acclimation (28 psu)
+  treatment_type:
+  - salt
 - background_factors:
   - coculture
   - light
