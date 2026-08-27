@@ -59,10 +59,10 @@ examples:
       # Per-row discussed_gene_count / discussed_pathway_count expose the
       # paper's prose literature index — the genes + KEGG pathways it names
       # in text. The envelope by_discusses_coverage splits the corpus into
-      # has_discusses (40) vs no_discusses (3). Drill into a paper's named
+      # has_discusses (45) vs no_discusses (4). Drill into a paper's named
       # entities via discussed_by_publication.
       {"total_matching": 21,
-       "by_discusses_coverage": {"has_discusses": 40, "no_discusses": 3},
+       "by_discusses_coverage": {"has_discusses": 45, "no_discusses": 4},
        "returned": 5, "truncated": true, "offset": 0,
        "results": [
          {"doi": "10.1038/ismej.2016.70", "title": "Transcriptional response of Prochlorococcus...", "year": 2016, "discussed_gene_count": 29, "discussed_pathway_count": 8}

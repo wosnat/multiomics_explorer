@@ -247,7 +247,7 @@ list_experiments (per-row `metabolite_count > 0`) → list_metabolite_assays(exp
 
 - `table_scope` is sparse: absent on an experiment means the experiment has no differential-expression table at all (a characterization or metabolomics-only experiment), never an empty string. `by_table_scope` has no '' bucket; `table_scope=[...]` filters simply never match those experiments.
 
-- `treatment_type: []` is a real value — a characterization experiment (e.g. an mRNA-decay or promoter survey) with no perturbation, not a missing annotation. `background_factors` is never `[]` (it is absent instead). `treatment_type=[...]` filters never match an empty-list experiment; to list characterization experiments, filter client-side on `treatment_type == []`.
+- `treatment_type: []` is a real value — a characterization experiment (e.g. an mRNA-decay or promoter survey) with no perturbation, not a missing annotation. `background_factors` is dense too (always present) and on Experiment never empty — every experiment has a held-constant context; on ClusteringAnalysis / DerivedMetric / MetaboliteAssay `[]` means no background factor recorded (e.g. sequence-predicted genomic-island gene sets). `treatment_type=[...]` filters never match an empty-list experiment; to list characterization experiments, filter client-side on `treatment_type == []`.
 
 - `growth_phase` values (on `timepoints[].growth_phase` and the `growth_phases` filter) are an OPEN vocabulary — new papers add new labels. Enumerate live from the data rather than assuming a fixed set.
 

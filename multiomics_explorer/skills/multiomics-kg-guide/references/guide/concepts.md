@@ -82,7 +82,7 @@ and `list_organisms`. Discover valid values with
 
 ### Organisms and genes
 
-- **`OrganismTaxon`** (37 nodes) — strain-level organism with full
+- **`OrganismTaxon`** (48 nodes) — strain-level organism with full
   taxonomy hierarchy. `preferred_name` is the canonical identifier (e.g.
   `"Prochlorococcus MED4"`); use exact case-insensitive matching.
 - **`Gene`** (~100k nodes across all organisms) — anchored by
@@ -120,7 +120,7 @@ and `list_organisms`. Discover valid values with
   Both edges carry `prominence` (`central` | `peripheral`) and an
   extraction `evidence` quote. This is a **router, not exhaustive
   coverage** — 935 distinct genes named across the whole corpus (out of
-  ~100k), spread over 40 of the 43 publications. Precomputed counts live
+  ~100k), spread over 45 of the 49 publications. Precomputed counts live
   on the nodes (`Publication.discussed_gene_count` /
   `.discussed_pathway_count`, `Gene.discussed_in_publication_count`).
   Forward lookup: `discussed_by_publication` (paper → named genes +

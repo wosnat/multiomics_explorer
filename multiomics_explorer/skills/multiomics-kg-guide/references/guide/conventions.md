@@ -253,7 +253,11 @@ Two related experiment-metadata conventions:
   `DerivedMetric` and `MetaboliteAssay`); an empty list is a real value
   saying "no treatment was applied — this study characterizes the
   organism as-is". `treatment_type=[...]` filters do not match it.
-  `background_factors` is never `[]` — it is absent when there is none.
+  `background_factors` is likewise dense (always present). On `Experiment`
+  it is never empty — every experiment has a held-constant context. On
+  `ClusteringAnalysis` / `DerivedMetric` / `MetaboliteAssay`, `[]` means no
+  background factor was recorded (e.g. sequence-predicted genomic-island
+  gene sets).
 - **`growth_phases` is an open vocabulary.** New papers add new labels;
   enumerate live from the data rather than assuming a fixed set.
   `treatment_type`, `cluster_type` and the trust vocabularies are closed
