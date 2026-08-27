@@ -382,7 +382,9 @@ def ontology_trust_axes(ontology: str) -> list[str]:
     return [axis for axis in _TRUST_AXES_ORDER if axis in trust]
 
 
-def ontology_row_columns(ontology: str, verbose: bool) -> list[str]:
+def ontology_row_columns(
+    ontology: str, verbose: bool, *, force_trust_axes: bool = False,
+) -> list[str]:
     """Row columns a gene × term row of `ontology` OWNS.
 
     Compact = comparable + materially-important: `evidence` (the single
@@ -393,6 +395,13 @@ def ontology_row_columns(ontology: str, verbose: bool) -> list[str]:
     Verbose appends the remaining trust axes (`sources`, `evidence_score`,
     `tier` — whichever the edge carries) and then the native detail from
     `verbose_edge`, under its output-column names.
+
+    `force_trust_axes` adds the remaining trust axes to a *compact* column
+    set without the native detail. The gene×term detail builders project
+    that set unconditionally so the envelope rollups (`by_tier`,
+    `by_sources`, `evidence_score_stats`) and the tier-null auto-warning
+    have something to read; the api layer then strips the extra axes off
+    compact rows, which stay byte-identical.
 
     The api layer strips every column an ontology does not own; owned-but-null
     columns stay (there `null` is information — design §3).
@@ -407,14 +416,33 @@ def ontology_row_columns(ontology: str, verbose: bool) -> list[str]:
     if facet and facet["prop"] not in _STANDARD_TERM_ROW_COLUMNS:
         columns.append(facet["prop"])
     columns.extend(cfg.get("compact_edge") or {})
-    if not verbose:
+    if not verbose and not force_trust_axes:
         return columns
 
     for axis in ("sources", "evidence_score", "tier"):
         if axis in trust:
             columns.append(axis)
+    if not verbose:
+        return columns
     columns.extend(column for _prop, column in _verbose_edge_pairs(cfg))
     return columns
+
+
+def ontology_edge_row_columns() -> frozenset[str]:
+    """Every gene×term row column sourced from the gene→term *edge*.
+
+    Trust axes, `compact_edge` categoricals and `verbose_edge` native
+    detail — but never a facet, which is a term-node property. Consumers
+    that treat a row as a *term* fact (enrichment's TERM2GENE passthrough)
+    must drop these: the first gene's edge is not a property of the term.
+    """
+    columns: set[str] = set()
+    for cfg in ONTOLOGY_CONFIG.values():
+        columns.update(cfg.get("trust") or {})
+        columns.update(cfg.get("compact_edge") or {})
+        columns.update(column for _prop, column in _verbose_edge_pairs(cfg))
+    columns.discard("rank_prop")
+    return frozenset(columns)
 
 
 def build_trust_filter_clause(
@@ -524,7 +552,8 @@ def _resolve_facet(
 
 
 def _ontology_row_return_cypher(
-    ontology: str, verbose: bool, *, rel_var: str = "r"
+    ontology: str, verbose: bool, *, rel_var: str = "r",
+    force_trust_axes: bool = False,
 ) -> str:
     """Comma-prefixed RETURN fragment projecting `ontology_row_columns`.
 
@@ -536,7 +565,9 @@ def _ontology_row_return_cypher(
     """
     cfg = _ontology_cfg(ontology)
     trust = cfg.get("trust") or {}
-    columns = ontology_row_columns(ontology, verbose)
+    columns = ontology_row_columns(
+        ontology, verbose, force_trust_axes=force_trust_axes,
+    )
     if not columns:
         return ""
 
@@ -558,7 +589,9 @@ def _ontology_row_return_cypher(
     return ",\n       " + ",\n       ".join(parts)
 
 
-def _ontology_row_edge_props(ontology: str, verbose: bool) -> list[str]:
+def _ontology_row_edge_props(
+    ontology: str, verbose: bool, *, force_trust_axes: bool = False,
+) -> list[str]:
     """Edge props the row columns need, for the best-edge rebind map."""
     cfg = _ontology_cfg(ontology)
     trust = cfg.get("trust") or {}
@@ -568,7 +601,9 @@ def _ontology_row_edge_props(ontology: str, verbose: bool) -> list[str]:
     facet_prop = facet["prop"] if facet else None
 
     props: list[str] = []
-    for column in ontology_row_columns(ontology, verbose):
+    for column in ontology_row_columns(
+        ontology, verbose, force_trust_axes=force_trust_axes,
+    ):
         if column == facet_prop:
             continue
         if column in trust:
@@ -597,7 +632,9 @@ def _best_edge_rank_key(cfg: dict) -> str:
     return "attachment_level"
 
 
-def _uses_best_edge_rebind(ontology: str, verbose: bool) -> bool:
+def _uses_best_edge_rebind(
+    ontology: str, verbose: bool, *, force_trust_axes: bool = False,
+) -> bool:
     """True when a rollup row needs the one-edge-per-(gene, term) rebind.
 
     Hierarchical ontologies only: a rollup row's `t` is an ancestor reachable
@@ -607,7 +644,7 @@ def _uses_best_edge_rebind(ontology: str, verbose: bool) -> bool:
     """
     cfg = _ontology_cfg(ontology)
     return bool(cfg["hierarchy_rels"]) and bool(
-        ontology_row_columns(ontology, verbose)
+        ontology_row_columns(ontology, verbose, force_trust_axes=force_trust_axes)
     )
 
 
@@ -617,6 +654,7 @@ def _best_edge_rebind_cypher(
     *,
     trust_frag: str = "",
     distinct_head: str = "WITH DISTINCT t, g",
+    force_trust_axes: bool = False,
 ) -> str:
     """Cypher for the one-edge-per-(gene, term) rebind (spec §7.2).
 
@@ -646,12 +684,13 @@ def _best_edge_rebind_cypher(
     depth = "*0..1" if cfg.get("parent_label") else "*0.."
     walk_pattern = f"-[:{rel_union}{depth}]->(t)"
 
-    entries = [
-        f"{prop}: r2.{prop}" for prop in _ontology_row_edge_props(ontology, verbose)
-    ]
+    row_props = _ontology_row_edge_props(
+        ontology, verbose, force_trust_axes=force_trust_axes,
+    )
+    entries = [f"{prop}: r2.{prop}" for prop in row_props]
     if rank_key == "attachment_level":
         entries.append("attachment_level: l2.level")
-    elif rank_key not in _ontology_row_edge_props(ontology, verbose):
+    elif rank_key not in row_props:
         entries.append(f"{rank_key}: r2.{rank_key}")
     edge_map = "{" + ", ".join(entries) + "}"
     trust_where = f"            WHERE {trust_frag}\n" if trust_frag else ""
@@ -3228,7 +3267,9 @@ def _genes_by_ontology_match_stage(
     `call_class`) bind on the gene→leaf relationship `r`, BEFORE the hierarchy
     walk and BEFORE `collect(DISTINCT g)`, so per-term gene-set sizes reflect
     the filtered edges (spec §7.1). Facets (`tree`, `interpro_type`) bind on
-    `t` AFTER the walk. Enrichment reaches the same filters through this stage.
+    `t`: after the walk UP in level mode, and on the input term itself in
+    term_ids mode (where the facet narrows the caller's own list rather than
+    the walk). Enrichment reaches the same filters through this stage.
 
     Consumers are responsible for adding $min_gene_set_size / $max_gene_set_size
     into params, and for appending their own UNWIND/RETURN tail.
@@ -3245,6 +3286,17 @@ def _genes_by_ontology_match_stage(
     if level is None:
         # Mode 1 — walk DOWN from each input term.
         params["term_ids"] = term_ids
+        # The facet narrows the caller's own term list here: it binds on `t`
+        # right after the input MATCH and before the walk down, so a mixed
+        # `term_ids` batch cannot pool two InterPro strata (or two BRITE
+        # trees) into one gene set (spec §7.7).
+        facet_where = ""
+        facet_and = ""
+        if facet is not None:
+            facet_prop, facet_param, facet_value = facet
+            facet_where = f"WHERE t.{facet_prop} = ${facet_param}\n"
+            facet_and = f" AND t.{facet_prop} = ${facet_param}"
+            params[facet_param] = facet_value
         # Pfam needs special handling because input may be Pfam OR PfamClan;
         # caller-side validation (Query V) tells the apex label, but the
         # builder must work without that. Use coalesce over both label MATCHes.
@@ -3258,6 +3310,7 @@ def _genes_by_ontology_match_stage(
                 "WITH t, coalesce(leaf, t) AS leaf\n"
                 "MATCH (g:Gene {organism_name: $org})-[r:Gene_has_pfam]->(leaf)\n"
                 "WHERE t:Pfam OR t:PfamClan"
+                + facet_and
                 + (f" AND {trust_frag}" if trust_frag else "")
                 + "\n"
             )
@@ -3272,6 +3325,7 @@ def _genes_by_ontology_match_stage(
                 cypher_head = (
                     "UNWIND $term_ids AS input_tid\n"
                     f"MATCH (t:{leaf} {{id: input_tid}})\n"
+                    f"{facet_where}"
                     f"{walk}\n"
                     f"MATCH (g:Gene {{organism_name: $org}})"
                     f"-[r:{frag['gene_rel']}]->(leaf)\n"
@@ -3282,6 +3336,7 @@ def _genes_by_ontology_match_stage(
                 cypher_head = (
                     "UNWIND $term_ids AS input_tid\n"
                     f"MATCH (t:{leaf} {{id: input_tid}})\n"
+                    f"{facet_where}"
                     f"MATCH (g:Gene {{organism_name: $org}})"
                     f"-[r:{frag['gene_rel']}]->(t)\n"
                     f"{trust_where}"
@@ -3377,10 +3432,15 @@ def build_genes_by_ontology_detail(
     term_id, term_name, level, tree, tree_code, is_informative, plus the
     ontology's compact trust columns — `evidence`, and `interpro_type` /
     `call_class` where owned.
-    RETURN keys (verbose): adds function_description, level_is_best_effort,
-    the remaining trust axes (`sources`, `evidence_score`, `tier`) and the
-    ontology's native detail. See `ontology_row_columns(ontology, verbose)`
-    for the exact owned set; the api layer strips everything else.
+    RETURN keys (verbose): adds function_description, level_is_best_effort
+    and the ontology's native detail. See
+    `ontology_row_columns(ontology, verbose)` for the exact owned set; the
+    api layer strips everything else.
+
+    The remaining trust axes (`sources`, `evidence_score`, `tier`) are
+    projected in BOTH modes (`force_trust_axes`) so the envelope rollups and
+    the tier-null warning have rows to read; the api layer strips them back
+    off compact rows.
     """
     # Validation stays in the builder (helper would also need it, but the
     # detail-builder tests expect `match="level.*term_ids"`).
@@ -3409,7 +3469,9 @@ def build_genes_by_ontology_detail(
         "       t.level_is_best_effort IS NOT NULL AS level_is_best_effort"
         if verbose else ""
     )
-    edge_prop_cols = _ontology_row_return_cypher(ontology, verbose)
+    edge_prop_cols = _ontology_row_return_cypher(
+        ontology, verbose, force_trust_axes=True,
+    )
     return_block = (
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.gene_category AS gene_category,\n"
@@ -3438,16 +3500,16 @@ def build_genes_by_ontology_detail(
     # the best one by the ontology's rank key wins and exactly one row per
     # (gene, term) survives. Flat ontologies keep the direct OPTIONAL MATCH.
     cfg = ONTOLOGY_CONFIG[ontology]
-    if _uses_best_edge_rebind(ontology, verbose):
+    if _uses_best_edge_rebind(ontology, verbose, force_trust_axes=True):
         rebind_trust, _ = build_trust_filter_clause(
             ontology, sources=sources, evidence=evidence, max_tier=max_tier,
             min_evidence_score=min_evidence_score, call_class=call_class,
             rel_var="r2",
         )
         edge_rebind = _best_edge_rebind_cypher(
-            ontology, verbose, trust_frag=rebind_trust,
+            ontology, verbose, trust_frag=rebind_trust, force_trust_axes=True,
         )
-    elif ontology_row_columns(ontology, verbose):
+    elif ontology_row_columns(ontology, verbose, force_trust_axes=True):
         edge_rebind = f"OPTIONAL MATCH (g)-[r:{cfg['gene_rel']}]->(t)\n"
     else:
         edge_rebind = ""
@@ -3846,9 +3908,12 @@ def build_gene_ontology_terms(
     RETURN keys (compact): locus_tag, term_id, term_name, level, tree,
     tree_code, is_informative, plus the ontology's compact trust columns —
     `evidence`, and `interpro_type` / `call_class` where owned.
-    RETURN keys (verbose): adds organism_name, the remaining trust axes
-    (`sources`, `evidence_score`, `tier`) and the ontology's native detail.
-    See `ontology_row_columns(ontology, verbose)` for the exact owned set.
+    RETURN keys (verbose): adds organism_name and the ontology's native
+    detail. See `ontology_row_columns(ontology, verbose)` for the exact
+    owned set. The remaining trust axes (`sources`, `evidence_score`,
+    `tier`) are projected in BOTH modes (`force_trust_axes`) so the
+    envelope rollups and the tier-null warning have rows to read; the api
+    layer strips them back off compact rows.
 
     Called by api/ — which adds ontology_type column, strips the columns this
     ontology does not own, and merges across ontologies when ontology=None.
@@ -3874,7 +3939,9 @@ def build_gene_ontology_terms(
         ",\n       g.organism_name AS organism_name"
         if verbose else ""
     )
-    edge_prop_cols = _ontology_row_return_cypher(ontology, verbose)
+    edge_prop_cols = _ontology_row_return_cypher(
+        ontology, verbose, force_trust_axes=True,
+    )
 
     if offset:
         skip_clause = "\nSKIP $offset"
@@ -3947,7 +4014,7 @@ def build_gene_ontology_terms(
         # One edge per (gene, term): on a hierarchical rollup `t` is an
         # ancestor several gene edges can reach, so keep the best one
         # (spec section 7.2) instead of emitting one row per edge.
-        if _uses_best_edge_rebind(ontology, verbose):
+        if _uses_best_edge_rebind(ontology, verbose, force_trust_axes=True):
             rebind_trust, _ = build_trust_filter_clause(
                 ontology, sources=sources, evidence=evidence,
                 max_tier=max_tier, min_evidence_score=min_evidence_score,
@@ -3955,6 +4022,7 @@ def build_gene_ontology_terms(
             )
             rebind = _best_edge_rebind_cypher(
                 ontology, verbose, trust_frag=rebind_trust,
+                force_trust_axes=True,
             )
             row_head = "RETURN g.locus_tag AS locus_tag, t.id AS term_id,\n"
         else:
@@ -6413,9 +6481,16 @@ def build_ontology_expcov(
     in that experiment AND (b) reach any term at each level. The same
     min_gene_set_size/max_gene_set_size filter as Q_landscape is applied
     so coverage is computed over the same term population. Returns one row
-    per (eid, level). L2 applies zero-fill + min/median/max aggregation.
+    per (eid, level, facet_value). L2 applies zero-fill + min/median/max
+    aggregation.
 
-    RETURN keys: eid, n_total, level, n_at_level.
+    `facet_value` carries the ontology's facet property (BRITE `tree`,
+    InterPro `interpro_type`) and is null on the ontologies that own no
+    facet. It is part of the key because a facet marks a separate stratum:
+    without it every InterPro type at one level would report the same
+    experiment coverage.
+
+    RETURN keys: eid, n_total, level, facet_value, n_at_level.
     """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(
@@ -6434,6 +6509,14 @@ def build_ontology_expcov(
     bind_tail = frag["bind_up"][len(prefix):]
     walk = frag["walk_up"] + "\n" if frag["walk_up"] else ""
 
+    # Facet column in the stratum key — see docstring. `null` keeps the
+    # RETURN shape uniform for the ontologies that own no facet.
+    cfg_facet = ONTOLOGY_CONFIG[ontology].get("facet")
+    if cfg_facet:
+        facet_expr = f"t.{cfg_facet['prop']} AS facet_value"
+    else:
+        facet_expr = "null AS facet_value"
+
     cypher = (
         "UNWIND $experiment_ids AS eid\n"
         "MATCH (e:Experiment {id:eid})-[:Changes_expression_of]->"
@@ -6447,11 +6530,12 @@ def build_ontology_expcov(
         "collect(DISTINCT g) AS term_genes_exp\n"
         "WHERE n_g_per_term_exp >= $min_gene_set_size "
         "AND n_g_per_term_exp <= $max_gene_set_size\n"
-        "WITH eid, n_total, t.level AS level,\n"
+        f"WITH eid, n_total, t.level AS level, {facet_expr},\n"
         "     apoc.coll.toSet(apoc.coll.flatten("
         "collect(term_genes_exp))) AS level_genes\n"
-        "RETURN eid, n_total, level, size(level_genes) AS n_at_level\n"
-        "ORDER BY eid, level"
+        "RETURN eid, n_total, level, facet_value, "
+        "size(level_genes) AS n_at_level\n"
+        "ORDER BY eid, level, facet_value"
     )
     return cypher, {
         "org": organism_name,
