@@ -1,6 +1,6 @@
 # Tool spec: slice 4 — light surface + paper-batch absorption (Mode B)
 
-**Status:** v1 — §7 live-verified 2026-08-27 against KG-SYNC-006 (`built_at 2026-08-27T15:41Z`, 127,458 genes, 48 organisms, 209 experiments, 49 papers; hash matches the pin). Awaiting freeze.
+**Status:** v1 — §7 live-verified 2026-08-27 against KG-SYNC-006 (`built_at 2026-08-27T15:41Z`, 127,458 genes, 48 organisms, 209 experiments, 49 papers; hash matches the pin). **FROZEN 2026-08-27** (user approval via /add-or-update-tool; `min_peptidase_gene_count` dropped before freeze).
 **KG:** KG-SYNC-006 (`6c51bf3b`, `built_at 2026-08-27T14:22Z`) — asks + review in `docs/kg-specs/2026-08-27-slice4-kg-asks.md` (§6).
 **Tools touched:** `kg_release_info`, `genes_by_metabolite`, `metabolites_by_gene`, `list_organisms`, `list_filter_values`, `list_clustering_analyses` / `gene_clusters_by_gene` (description only). Mode B: one-page spec, no KG iteration.
 
