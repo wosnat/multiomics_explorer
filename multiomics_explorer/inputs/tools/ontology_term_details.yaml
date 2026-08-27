@@ -19,7 +19,7 @@ examples:
         "results": [
           {"term_id": "tcdb:3.A.1", "ontology": "tcdb", "label": "TcdbFamily", "name": "ATP-binding Cassette (ABC) Superfamily",
            "level": 2, "level_kind": "tc_family", "is_informative": true, "gene_count": 4817, "organism_count": 42,
-           "direct_gene_count": 242, "tcdb_id": "3.A.1", "tc_class_id": "3", "member_count": 1400, "superfamily": "ABC", "metabolite_count": 554,
+           "direct_gene_count": 3845, "tcdb_id": "3.A.1", "tc_class_id": "3", "member_count": 55, "superfamily": "ABC", "metabolite_count": 554,
            "parents": [{"id": "tcdb:3.A", "name": "P-P-bond-hydrolysis-driven transporters"}],
            "children": [{"id": "tcdb:3.A.1.1", "name": "Carbohydrate Uptake Transporter-1 (CUT1) Family"}, "..."],
            "children_total": 55, "children_truncated": true,
@@ -61,11 +61,13 @@ examples:
   - title: Scope the per-organism count to one organism
     call: ontology_term_details(term_ids=["go:0006979", "tcdb:3.A.1"], organism="MED4", verbose=True)
     response: |
-      # With organism= set, compact rows gain organism_gene_count and the
+      # With organism= set ('MED4' resolves to 'Prochlorococcus MED4'), compact
+      # rows gain organism_gene_count (SUBTREE count — search_ontology's
+      # organism_gene_count is the direct edge: 57 for tcdb:3.A.1) and the
       # verbose genes_by_organism[] holds only that organism.
       {"results": [
-        {"term_id": "go:0006979", "gene_count": 1050, "organism_gene_count": 22, "genes_by_organism": [{"organism": "MED4", "gene_count": 22}]},
-        {"term_id": "tcdb:3.A.1", "gene_count": 4817, "organism_gene_count": 66, "genes_by_organism": [{"organism": "MED4", "gene_count": 66}]}
+        {"term_id": "go:0006979", "gene_count": 1050, "organism_gene_count": 18, "genes_by_organism": [{"organism": "Prochlorococcus MED4", "gene_count": 18}]},
+        {"term_id": "tcdb:3.A.1", "gene_count": 4817, "organism_gene_count": 65, "genes_by_organism": [{"organism": "Prochlorococcus MED4", "gene_count": 65}]}
       ]}
 
   - title: From an enrichment table to term context to genes
@@ -111,9 +113,10 @@ mistakes:
   - "`children` is capped at 50 per term; read `children_total` / `children_truncated` and drill with `search_ontology(ontology=[...], level=<child level>)` or `genes_by_ontology(term_ids=[...])` (hierarchy expansion DOWN) for the full set."
   - "`gene_count` / `organism_count` are subtree-inclusive on hierarchical labels and direct on flat ones; `direct_gene_count` is node-local and absent (not null) on flat labels and on PfamClan / BriteCategory — see docs://ontologies/{ontology} for what each count means there."
   - "`member_count` (TCDB, MEROPS, InterPro) is the upstream database's family size, not a KG gene count."
-  - "A compact column that is missing on the node is absent, not null: GO rows carry only `direct_gene_count` from their compact extras, Pfam rows `short_name`, KEGG chemistry counts only on pathway terms. Do not treat an absent key as `0`."
+  - "A compact column that is missing on the node is absent, not null: GO rows carry only `direct_gene_count` from their compact extras, Pfam rows `short_name`, KEGG `reaction_count` / `metabolite_count` only on pathway terms (absent on KO / module rows). Do not treat an absent key as `0`."
   - "`limit` / `offset` page the *found* rows (input order); `total_matching` counts found terms, not input IDs. There is no `summary` mode — batches are small by design (≤ 50 IDs per call is the comfortable range)."
-  - "`organism=` scopes `genes_by_organism` (verbose) and adds `organism_gene_count` to compact rows; it does not filter rows out — a term with zero genes in that organism still returns with `organism_gene_count: 0`."
+  - "`organism=` scopes `genes_by_organism` (verbose) and adds `organism_gene_count` to compact rows; it does not filter rows out — a term with zero genes in that organism still returns with `organism_gene_count: 0`. The name resolves like every other tool (`'MED4'` → `'Prochlorococcus MED4'`; unknown or ambiguous raises)."
+  - "`organism_gene_count` here is the SUBTREE count (term + descendants, same scope as `gene_count`). `search_ontology.organism_gene_count` is the term's DIRECT gene edge only — the two differ on hierarchical ontologies (`tcdb:3.A.1` in MED4: 65 here vs 57 in search_ontology). Do not compare them across tools."
   - wrong: "ontology_term_details(term_ids=['3.A.1'])  # bare TC number"
     right: "ontology_term_details(term_ids=['tcdb:3.A.1'])  # self-prefixed CURIE"
   - wrong: "ontology_term_details(term_ids=['tcdb:3.A.1'])  # expecting the member genes"

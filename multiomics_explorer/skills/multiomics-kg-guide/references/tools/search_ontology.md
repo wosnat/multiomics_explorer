@@ -36,10 +36,10 @@ reference.
 | level | int \| None | None | Hierarchy level filter (0 = broadest). See docs://guide/conventions for the level convention. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Applies to 'brite' only; raises if 'brite' is not in the ontology set. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' go:0008150). Term-side filter only — never restricts the gene set. Default False (opt-in). |
-| verbose | bool | False | Add description, level_kind, direct_gene_count, per-ontology term columns (tcdb superfamily/metabolite_count, ncbifam family_type/gene_symbol, merops family_class/catalytic_type/peptidase_gene_count) and KEGG discussed_in_publications. Default compact. |
+| verbose | bool | False | Add description, level_kind, direct_gene_count, per-ontology columns (tcdb superfamily/metabolite_count, ncbifam family_type/gene_symbol, merops family_class/catalytic_type/peptidase_gene_count) and KEGG discussed_in_publications. Default compact. |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type. Applies to 'interpro' only; raises if 'interpro' is not in the set. |
 | min_gene_count | int \| None | None | Keep terms with gene_count >= this (organism_gene_count when `organism` is set). Narrows browse mode. |
-| organism | string \| None | None | Organism preferred_name to scope counts to; rows gain organism_gene_count and browse sorts by it. Default: all organisms. |
+| organism | string \| None | None | Organism to scope counts to (resolved like every other tool: 'MED4' -> 'Prochlorococcus MED4'; unknown/ambiguous raises). Rows gain organism_gene_count (direct edge) and browse sorts by it. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -55,7 +55,7 @@ mode, total_entries, total_matching, score_max, score_median, returned, offset, 
 - **total_entries** (int): Total terms in the selected ontologies (e.g. 847; summed over the set)
 - **total_matching** (int): Terms matching the search (e.g. 31; summed over the set)
 - **score_max** (float | None): Highest relevance score (null if 0 matches or browse, e.g. 5.23)
-- **score_median** (float | None): Median relevance score (null if 0 matches or browse, e.g. 2.1)
+- **score_median** (float | None): Median relevance score (null if 0 matches or browse). Single ontology: over the full match; multi-ontology: over the returned page only.
 - **returned** (int): Results in this response (0 when summary=true; <= limit x n_ontologies)
 - **offset** (int): Offset into each ontology's result set (lockstep paging, e.g. 0)
 - **truncated** (bool): True if any selected ontology has more matches than returned
@@ -63,7 +63,7 @@ mode, total_entries, total_matching, score_max, score_median, returned, offset, 
 - **by_level** (list[SearchOntologyLevelBreakdown]): Terms per hierarchy level over the full match (browse mode only).
 - **by_interpro_type** (list[SearchOntologyInterproTypeBreakdown]): Matching InterPro terms per entry type (only when 'interpro' is in the set).
 - **by_family_type** (list[SearchOntologyFamilyTypeBreakdown]): Matching NCBIfam terms per family type (only when 'ncbifam' is in the set).
-- **skipped_ontologies** (list[string]): Ontologies in the set skipped because a filter does not apply to them.
+- **skipped_ontologies** (list[object]): [{ontology, reason}] for ontologies in the set skipped because a filter does not apply to them.
 - **warnings** (list[string]): Auto-warnings, e.g. browse truncated with no narrowing filter.
 
 ### Per-result fields
@@ -82,7 +82,7 @@ mode, total_entries, total_matching, score_max, score_median, returned, offset, 
 | discussed_by_n_publications | int \| None (optional) | Publications that discuss this KEGG pathway in prose (KEGG only; None on other ontologies). Recall-biased narrative mention, NOT gene annotation. When > 0, set verbose=True for the per-paper DOI list, or call discussed_by_publication. |
 | gene_count | int \| None (optional) | Subtree gene count on this term (precomputed Node.gene_count; sparse until every ontology's builder emits it). |
 | organism_count | int \| None (optional) | Distinct organisms reaching this term (precomputed Node.organism_count; sparse until every ontology's builder emits it). |
-| organism_gene_count | int \| None (optional) | Genes directly annotated to this term in the requested `organism` (only when organism is set; browse sorts by it). |
+| organism_gene_count | int \| None (optional) | Genes of `organism` on the term's DIRECT edge (not subtree — differs from gene_count and from ontology_term_details.organism_gene_count); only when organism is set; browse sorts by it. |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -167,9 +167,11 @@ search_ontology(ontology=["tcdb"], level=2, organism="MED4", min_gene_count=5)
 
 ```example-response
 # organism= scopes the count: rows gain organism_gene_count, the sort
-# and min_gene_count apply to it (gene_count stays KG-wide).
-{"mode": "browse", "total_matching": 18, "results": [
-  {"id": "tcdb:3.A.1", "name": "ATP-binding Cassette (ABC) Superfamily", "score": null, "level": 2, "ontology_type": "tcdb", "gene_count": 4817, "organism_count": 42, "organism_gene_count": 66},
+# and min_gene_count apply to it (gene_count stays KG-wide). 'MED4'
+# resolves to 'Prochlorococcus MED4'. organism_gene_count is the DIRECT
+# gene edge (57 here); ontology_term_details gives the subtree count (65).
+{"mode": "browse", "total_matching": 16, "results": [
+  {"id": "tcdb:3.A.1", "name": "ATP-binding Cassette (ABC) Superfamily", "score": null, "level": 2, "ontology_type": "tcdb", "gene_count": 4817, "organism_count": 42, "organism_gene_count": 57},
   ...
 ]}
 ```
@@ -419,7 +421,11 @@ search_ontology(ontology=['interpro'], interpro_type=...) / ['ncbifam'] / ['mero
 
 - Browse mode (no `search_text`) sorts by `gene_count DESC, id` and leaves `score` null; a browse that truncates with no `level` / facet / `min_gene_count` / `organism` filter adds a warning — you are paging through a whole ontology. Narrow first.
 
-- `organism=` (browse) changes what is sorted and filtered: rows gain `organism_gene_count`, `min_gene_count` applies to it, and `gene_count` stays KG-wide. Without `organism=`, `gene_count` / `organism_count` are counts across all organisms on the term node.
+- `organism=` (browse) changes what is sorted and filtered: rows gain `organism_gene_count`, `min_gene_count` applies to it, and `gene_count` stays KG-wide. Without `organism=`, `gene_count` / `organism_count` are counts across all organisms on the term node. The name resolves like every other tool (`'MED4'` → `'Prochlorococcus MED4'`; unknown or ambiguous raises).
+
+- `organism_gene_count` is the term's DIRECT gene edge in that organism (BRITE via its KEGG bridge) — NOT the subtree. It differs from `gene_count` (subtree, all organisms) and from `ontology_term_details.organism_gene_count` (subtree, one organism). On hierarchical ontologies a parent term can show a smaller `organism_gene_count` than its child; use `ontology_term_details(organism=...)` for subtree-scoped per-organism counts.
+
+- `score_median` is over the full match on a single-ontology search, but over the RETURNED PAGE on multi-ontology calls (the per-ontology summaries carry no pooled median). `score_max` is exact in both cases.
 
 - Lucene scores are per index: rows of two ontologies in one call are grouped by ontology, not interleaved by score. Never rank a `go_bp` row against a `tcdb` row by `score`.
 

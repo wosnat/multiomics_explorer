@@ -53,7 +53,7 @@ the `Kegg_term_in_brite_category` bridge.
 | Hierarchy edges (child → parent) | `Kegg_term_is_a_kegg_term` |
 | Fulltext index | `keggFullText` |
 | Trust axes on the gene edge | `sources`, `evidence` |
-| Extra compact columns, `ontology_term_details` | `direct_gene_count` |
+| Extra compact columns, `ontology_term_details` | `direct_gene_count`, `reaction_count`, `metabolite_count` |
 | Literature index | `Publication_discusses_kegg_pathway` (`discussed_by_n_publications`) |
 | Bridges out (`links_out`) | `Kegg_term_in_brite_category` → `brite` (*membership*) |
 

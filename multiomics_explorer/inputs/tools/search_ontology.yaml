@@ -54,9 +54,11 @@ examples:
     call: search_ontology(ontology=["tcdb"], level=2, organism="MED4", min_gene_count=5)
     response: |
       # organism= scopes the count: rows gain organism_gene_count, the sort
-      # and min_gene_count apply to it (gene_count stays KG-wide).
-      {"mode": "browse", "total_matching": 18, "results": [
-        {"id": "tcdb:3.A.1", "name": "ATP-binding Cassette (ABC) Superfamily", "score": null, "level": 2, "ontology_type": "tcdb", "gene_count": 4817, "organism_count": 42, "organism_gene_count": 66},
+      # and min_gene_count apply to it (gene_count stays KG-wide). 'MED4'
+      # resolves to 'Prochlorococcus MED4'. organism_gene_count is the DIRECT
+      # gene edge (57 here); ontology_term_details gives the subtree count (65).
+      {"mode": "browse", "total_matching": 16, "results": [
+        {"id": "tcdb:3.A.1", "name": "ATP-binding Cassette (ABC) Superfamily", "score": null, "level": 2, "ontology_type": "tcdb", "gene_count": 4817, "organism_count": 42, "organism_gene_count": 57},
         ...
       ]}
 
@@ -251,7 +253,9 @@ mistakes:
   - "search_ontology finds term IDs — use genes_by_ontology to find (gene × term) pairs annotated to those terms (single organism required, hierarchy expanded DOWN by default), and ontology_term_details for a term's parents / children / bridges. Neither search nor browse traverses the hierarchy."
   - "`ontology` is a list (a single string is accepted); omit it to fan out over all 17 in registry order. `limit` / `offset` apply PER ontology (lockstep paging — `returned <= limit x n`); read `by_ontology[].truncated` to see which ontology still has pages. See docs://guide/conventions."
   - "Browse mode (no `search_text`) sorts by `gene_count DESC, id` and leaves `score` null; a browse that truncates with no `level` / facet / `min_gene_count` / `organism` filter adds a warning — you are paging through a whole ontology. Narrow first."
-  - "`organism=` (browse) changes what is sorted and filtered: rows gain `organism_gene_count`, `min_gene_count` applies to it, and `gene_count` stays KG-wide. Without `organism=`, `gene_count` / `organism_count` are counts across all organisms on the term node."
+  - "`organism=` (browse) changes what is sorted and filtered: rows gain `organism_gene_count`, `min_gene_count` applies to it, and `gene_count` stays KG-wide. Without `organism=`, `gene_count` / `organism_count` are counts across all organisms on the term node. The name resolves like every other tool (`'MED4'` → `'Prochlorococcus MED4'`; unknown or ambiguous raises)."
+  - "`organism_gene_count` is the term's DIRECT gene edge in that organism (BRITE via its KEGG bridge) — NOT the subtree. It differs from `gene_count` (subtree, all organisms) and from `ontology_term_details.organism_gene_count` (subtree, one organism). On hierarchical ontologies a parent term can show a smaller `organism_gene_count` than its child; use `ontology_term_details(organism=...)` for subtree-scoped per-organism counts."
+  - "`score_median` is over the full match on a single-ontology search, but over the RETURNED PAGE on multi-ontology calls (the per-ontology summaries carry no pooled median). `score_max` is exact in both cases."
   - "Lucene scores are per index: rows of two ontologies in one call are grouped by ontology, not interleaved by score. Never rank a `go_bp` row against a `tcdb` row by `score`."
   - "A facet (`tree` for BRITE, `interpro_type` for InterPro) narrows only its owner and raises when the owner is not in the ontology list. For BRITE, always pass `tree=` — without it the `enzymes` tree dominates. Discover trees via `list_filter_values('brite_tree')`."
   - "`interpro_type` scopes InterPro to one of the 8 types (`FAMILY`, `DOMAIN`, `HOMOLOGOUS_SUPERFAMILY`, `REPEAT`, `CONSERVED_SITE`, `ACTIVE_SITE`, `BINDING_SITE`, `PTM`); the envelope's `by_interpro_type` (and `by_family_type` for NCBIfam) shows the mix when you don't."

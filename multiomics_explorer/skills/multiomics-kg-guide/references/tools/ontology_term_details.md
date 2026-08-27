@@ -35,7 +35,7 @@ docs://ontologies/{key} for how each ontology is built and read.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | term_ids | list[string] | — | Self-prefixed term IDs, any ontology mix (e.g. 'go:0006979', 'tcdb:3.A.1', 'merops.family:S14', 'interpro:IPR000362', 'ncbifam:NF000812', 'pfam:PF00005', 'kegg.pathway:ko00010'). Rows return in input order. |
-| organism | string \| None | None | Organism preferred_name to scope genes_by_organism to; rows gain organism_gene_count. Default: all organisms. |
+| organism | string \| None | None | Organism to scope genes_by_organism to (resolved like every other tool: 'MED4' -> 'Prochlorococcus MED4'; unknown/ambiguous raises). Rows gain organism_gene_count (subtree). Default: all organisms. |
 | link_kinds | list[string ('composition', 'membership', 'router')] \| None | None | Keep only links_out of these kinds. 'composition' = term built from target (tcdb/merops -> pfam); 'membership' = term belongs to target (pfam -> interpro, kegg -> brite); 'router' = recall-biased cross-ref (interpro -> ec/cazy). Default: all. |
 | verbose | bool | False | Add `properties` (every node prop), `links_out[].props` (curated_tcids, member_id_count, router_ambiguous) and `genes_by_organism`. Default compact. |
 | limit | int | 50 | Max rows (found terms) to return. |
@@ -59,7 +59,7 @@ total_matching, returned, offset, truncated, not_found, by_ontology, links_out_t
 - **by_ontology** (list[OntologyTermDetailsByOntology]): Found terms per ontology
 - **links_out_total** (int): Total links_out entries across returned rows
 - **by_link_kind** (list[OntologyTermDetailsByLinkKind]): links_out entries per link_kind
-- **warnings** (list[string]): Auto-warnings (e.g. router_ambiguous InterPro terms)
+- **warnings** (list[string]): Auto-warnings (reserved for future use; always empty)
 
 ### Per-result fields
 
@@ -76,7 +76,7 @@ total_matching, returned, offset, truncated, not_found, by_ontology, links_out_t
 | gene_count | int \| None (optional) | Subtree gene count across all organisms (precomputed) |
 | organism_count | int \| None (optional) | Distinct organisms reaching this term (precomputed) |
 | direct_gene_count | int \| None (optional) | Genes annotated directly to this term, excluding descendants (sparse: hierarchical ontologies) |
-| organism_gene_count | int \| None (optional) | Subtree gene count in the requested `organism` (only when organism set) |
+| organism_gene_count | int \| None (optional) | Genes of `organism` in this term's SUBTREE (term + descendants; same scope as gene_count). Only when organism set. Differs from search_ontology.organism_gene_count (direct edge). |
 | code | string \| None (optional) | Category code (sparse: cog_category, cyanorak_role, tigr_role) |
 | short_name | string \| None (optional) | Pfam short name, e.g. 'ABC_tran' (sparse: pfam) |
 | tree | string \| None (optional) | BRITE tree name (sparse: brite) |
@@ -138,7 +138,7 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
   "results": [
     {"term_id": "tcdb:3.A.1", "ontology": "tcdb", "label": "TcdbFamily", "name": "ATP-binding Cassette (ABC) Superfamily",
      "level": 2, "level_kind": "tc_family", "is_informative": true, "gene_count": 4817, "organism_count": 42,
-     "direct_gene_count": 242, "tcdb_id": "3.A.1", "tc_class_id": "3", "member_count": 1400, "superfamily": "ABC", "metabolite_count": 554,
+     "direct_gene_count": 3845, "tcdb_id": "3.A.1", "tc_class_id": "3", "member_count": 55, "superfamily": "ABC", "metabolite_count": 554,
      "parents": [{"id": "tcdb:3.A", "name": "P-P-bond-hydrolysis-driven transporters"}],
      "children": [{"id": "tcdb:3.A.1.1", "name": "Carbohydrate Uptake Transporter-1 (CUT1) Family"}, "..."],
      "children_total": 55, "children_truncated": true,
@@ -195,11 +195,13 @@ ontology_term_details(term_ids=["go:0006979", "tcdb:3.A.1"], organism="MED4", ve
 ```
 
 ```example-response
-# With organism= set, compact rows gain organism_gene_count and the
+# With organism= set ('MED4' resolves to 'Prochlorococcus MED4'), compact
+# rows gain organism_gene_count (SUBTREE count — search_ontology's
+# organism_gene_count is the direct edge: 57 for tcdb:3.A.1) and the
 # verbose genes_by_organism[] holds only that organism.
 {"results": [
-  {"term_id": "go:0006979", "gene_count": 1050, "organism_gene_count": 22, "genes_by_organism": [{"organism": "MED4", "gene_count": 22}]},
-  {"term_id": "tcdb:3.A.1", "gene_count": 4817, "organism_gene_count": 66, "genes_by_organism": [{"organism": "MED4", "gene_count": 66}]}
+  {"term_id": "go:0006979", "gene_count": 1050, "organism_gene_count": 18, "genes_by_organism": [{"organism": "Prochlorococcus MED4", "gene_count": 18}]},
+  {"term_id": "tcdb:3.A.1", "gene_count": 4817, "organism_gene_count": 65, "genes_by_organism": [{"organism": "Prochlorococcus MED4", "gene_count": 65}]}
 ]}
 ```
 
@@ -257,11 +259,13 @@ discussed_by_publication(publication_dois=[...]) → ontology_term_details(term_
 
 - `member_count` (TCDB, MEROPS, InterPro) is the upstream database's family size, not a KG gene count.
 
-- A compact column that is missing on the node is absent, not null: GO rows carry only `direct_gene_count` from their compact extras, Pfam rows `short_name`, KEGG chemistry counts only on pathway terms. Do not treat an absent key as `0`.
+- A compact column that is missing on the node is absent, not null: GO rows carry only `direct_gene_count` from their compact extras, Pfam rows `short_name`, KEGG `reaction_count` / `metabolite_count` only on pathway terms (absent on KO / module rows). Do not treat an absent key as `0`.
 
 - `limit` / `offset` page the *found* rows (input order); `total_matching` counts found terms, not input IDs. There is no `summary` mode — batches are small by design (≤ 50 IDs per call is the comfortable range).
 
-- `organism=` scopes `genes_by_organism` (verbose) and adds `organism_gene_count` to compact rows; it does not filter rows out — a term with zero genes in that organism still returns with `organism_gene_count: 0`.
+- `organism=` scopes `genes_by_organism` (verbose) and adds `organism_gene_count` to compact rows; it does not filter rows out — a term with zero genes in that organism still returns with `organism_gene_count: 0`. The name resolves like every other tool (`'MED4'` → `'Prochlorococcus MED4'`; unknown or ambiguous raises).
+
+- `organism_gene_count` here is the SUBTREE count (term + descendants, same scope as `gene_count`). `search_ontology.organism_gene_count` is the term's DIRECT gene edge only — the two differ on hierarchical ontologies (`tcdb:3.A.1` in MED4: 65 here vs 57 in search_ontology). Do not compare them across tools.
 
 ```mistake
 ontology_term_details(term_ids=['3.A.1'])  # bare TC number

@@ -447,7 +447,10 @@ set:
   or `organism=` (rows gain `organism_gene_count` and the sort/filter
   switch to that organism's count). A browse that truncates without any
   narrowing filter adds a warning — it means you are paging through an
-  entire ontology.
+  entire ontology. Note that `search_ontology.organism_gene_count` is the
+  term's DIRECT gene edge in that organism, whereas
+  `ontology_term_details.organism_gene_count` walks the subtree — the two
+  differ on hierarchical ontologies.
 
 Browse answers "what terms exist here and which are big"; search
 answers "which term is called X". Neither traverses the hierarchy —

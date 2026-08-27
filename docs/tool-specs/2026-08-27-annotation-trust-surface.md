@@ -213,3 +213,7 @@ Verified: TCDB 5 signals, MEROPS `[tier_le_2, pfam_support]` (2), GO/EC/Pfam/CAZ
 ## 14. Freeze notes v1.3 (2026-08-27, PR 3b build — one-edge rebind pick direction)
 
 - §7.2 as frozen (and PR 3a as shipped) rebound the edge with `head(reverse(apoc.coll.sortMaps(edges, key)))`. `apoc.coll.sortMaps` already sorts DESCENDING by the key (nulls last; live-verified on `{0.9, 0.5, null}` → `high, mid, nullk`), so the `reverse` selected the LOWEST-ranked edge — the opposite of the "best edge" contract. Every rank key is higher-is-better (`evidence_score`, `confidence_score`, attachment level). Fixed in 3b by dropping `reverse`; §7.2 text corrected above. Row counts are unchanged (one row per (gene, term) either way); only the verbose trust columns of multi-edge pairs change — expect those rows to move in the regression regen.
+
+## 15. Follow-ups (post-3b, not in scope)
+
+- Follow-up (not 3b): align `search_ontology` `organism_gene_count` / `min_gene_count` to subtree semantics (today: the term's DIRECT gene edge, BRITE via its KEGG bridge — §7.4; `ontology_term_details.organism_gene_count` walks the subtree); would move §7.4's pinned per-organism numbers.
