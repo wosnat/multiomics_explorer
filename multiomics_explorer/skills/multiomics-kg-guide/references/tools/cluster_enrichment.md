@@ -89,7 +89,7 @@ analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_t
 - **enrichment_params** (object | None): ORA parameters used for this call. See docs://analysis/enrichment.
 - **filters_applied** (object): Echo of the trust filters actually set on this call. See docs://analysis/annotation_evidence.
 - **trust_axes** (object): Trust axes the chosen ontology carries, e.g. {'tcdb': ['sources','evidence','evidence_score','tier']}.
-- **background_filtered** (bool | None): Whether/how many background genes were narrowed by the same trust filters that shaped TERM2GENE.
+- **background_filtered** (bool): True when a trust filter narrowed the background.
 - **interpro_type** (string | None): Echo of the interpro_type stratum used (sparse: only when ontology='interpro').
 
 ### Per-result fields

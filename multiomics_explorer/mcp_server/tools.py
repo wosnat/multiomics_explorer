@@ -279,9 +279,9 @@ class PathwayEnrichmentResponse(BaseModel):
         default_factory=dict,
         description="Trust axes the chosen ontology carries, e.g. {'tcdb': ['sources','evidence','evidence_score','tier']}.",
     )
-    background_filtered: bool | int | None = Field(
-        default=None,
-        description="Whether/how many background genes were narrowed by the same trust filters that shaped TERM2GENE.",
+    background_filtered: bool = Field(
+        default=False,
+        description="True when a trust filter narrowed the background.",
     )
     interpro_type: str | None = Field(
         default=None,
@@ -414,9 +414,9 @@ class ClusterEnrichmentResponse(BaseModel):
         default_factory=dict,
         description="Trust axes the chosen ontology carries, e.g. {'tcdb': ['sources','evidence','evidence_score','tier']}.",
     )
-    background_filtered: bool | int | None = Field(
-        default=None,
-        description="Whether/how many background genes were narrowed by the same trust filters that shaped TERM2GENE.",
+    background_filtered: bool = Field(
+        default=False,
+        description="True when a trust filter narrowed the background.",
     )
     interpro_type: str | None = Field(
         default=None,
@@ -2748,15 +2748,21 @@ def register_tools(mcp: FastMCP):
         skipped_ontologies: list[dict] = Field(default_factory=list,
             description="Empty for single-ontology tools; reserved for multi-ontology callers.")
         by_evidence: list[dict] = Field(default_factory=list,
-            description="Rollup of the compact evidence column over result rows.")
+            description="Rollup of the compact evidence column over every "
+                        "matching row, not just the page you are reading.")
         by_tier: list[dict] = Field(default_factory=list,
-            description="Rollup of tier over result rows; carries an explicit 'null' bucket.")
+            description="Rollup of tier over every matching row; carries an "
+                        "explicit 'null' bucket. Present in compact mode too, "
+                        "where tier itself is not on the row.")
         by_sources: list[dict] = Field(default_factory=list,
-            description="Membership counts per source value over result rows.")
+            description="Membership counts per source value over every "
+                        "matching row.")
         by_call_class: list[dict] = Field(default_factory=list,
-            description="Rollup of MEROPS call_class over result rows (merops only).")
+            description="Rollup of MEROPS call_class over every matching row "
+                        "(merops only).")
         evidence_score_stats: dict | None = Field(default=None,
-            description="{min, median, max, n_null} over evidence_score in result rows.")
+            description="{min, median, max, n_null} over evidence_score across "
+                        "every matching row.")
         evidence_score_signals: dict | None = Field(default=None,
             description="Fired ControlledVocabulary signals per edge_type; present only "
                         "when min_evidence_score was set.")
@@ -3017,15 +3023,23 @@ def register_tools(mcp: FastMCP):
         trust_axes: dict[str, list[str]] = Field(default_factory=dict,
             description="Trust axes carried per queried ontology.")
         by_evidence: list[dict] = Field(default_factory=list,
-            description="Rollup of the compact evidence column over result rows.")
+            description="Rollup of the compact evidence column over every "
+                        "matching row, not just the page you are reading. "
+                        "Empty with summary=true, which fetches no rows.")
         by_tier: list[dict] = Field(default_factory=list,
-            description="Rollup of tier over result rows; carries an explicit 'null' bucket.")
+            description="Rollup of tier over every matching row; carries an "
+                        "explicit 'null' bucket. Present in compact mode too, "
+                        "where tier itself is not on the row. Empty with "
+                        "summary=true.")
         by_sources: list[dict] = Field(default_factory=list,
-            description="Membership counts per source value over result rows.")
+            description="Membership counts per source value over every "
+                        "matching row. Empty with summary=true.")
         by_call_class: list[dict] = Field(default_factory=list,
-            description="Rollup of MEROPS call_class over result rows (merops only).")
+            description="Rollup of MEROPS call_class over every matching row "
+                        "(merops only). Empty with summary=true.")
         evidence_score_stats: dict | None = Field(default=None,
-            description="{min, median, max, n_null} over evidence_score in result rows.")
+            description="{min, median, max, n_null} over evidence_score across "
+                        "every matching row. All-null with summary=true.")
         evidence_score_signals: dict | None = Field(default=None,
             description="Fired ControlledVocabulary signals per edge_type; present only "
                         "when min_evidence_score was set.")
@@ -3078,8 +3092,10 @@ def register_tools(mcp: FastMCP):
             ge=0,
         )] = None,
         tree: Annotated[str | None, Field(
-            description="BRITE tree name filter. Only valid when ontology='brite'. "
-                        "See docs://guide/conventions for the BRITE-tree scoping rule.",
+            description="BRITE tree name filter. Narrows brite and leaves any "
+                        "other ontology in the list untouched; raises when "
+                        "brite is not among them. See docs://guide/conventions "
+                        "for the BRITE-tree scoping rule.",
         )] = None,
         informative_only: Annotated[bool, Field(
             description="When True, exclude terms flagged uninformative in KG "
@@ -6246,8 +6262,9 @@ def register_tools(mcp: FastMCP):
                               "drops the rest into skipped_ontologies."),
         ] = None,
         tree: Annotated[str | None, Field(
-            description="BRITE tree name filter (e.g. 'transporters'). "
-            "Only valid when ontology='brite'. See docs://guide/conventions for "
+            description="BRITE tree name filter (e.g. 'transporters'). Narrows "
+            "brite and leaves any other ontology in the list untouched; raises "
+            "when brite is not among them. See docs://guide/conventions for "
             "the BRITE-tree scoping rule.",
         )] = None,
         experiment_ids: Annotated[

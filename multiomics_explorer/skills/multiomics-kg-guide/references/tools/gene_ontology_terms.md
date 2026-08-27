@@ -29,7 +29,7 @@ expansion) use `genes_by_ontology`; for term discovery by text use
 | ontology | list[string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops')] \| None | None | Filter to one ontology, or a list of ontologies (trust filters/facets shape all-or-skip-or-raise per docs://guide/conventions). None returns all. |
 | mode | string ('leaf', 'rollup') | leaf | 'leaf' returns most-specific annotations (default). 'rollup' walks up to ancestors at the given level. |
 | level | int \| None | None | Hierarchy level (0 = broadest). In leaf mode: filter to leaves at this level. In rollup mode: required — target ancestor level. See docs://guide/conventions. |
-| tree | string \| None | None | BRITE tree name filter. Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
+| tree | string \| None | None | BRITE tree name filter. Narrows brite and leaves any other ontology in the list untouched; raises when brite is not among them. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' go:0008150). Term-side filter only — never restricts the gene set. Default False (opt-in). |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include organism_name per row. |
@@ -67,11 +67,11 @@ total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_m
 - **not_found** (list[string]): Input locus_tags not in KG
 - **no_terms** (list[string]): Input locus_tags in KG but with no terms for queried ontology
 - **trust_axes** (object): Trust axes carried per queried ontology.
-- **by_evidence** (list[object]): Rollup of the compact evidence column over result rows.
-- **by_tier** (list[object]): Rollup of tier over result rows; carries an explicit 'null' bucket.
-- **by_sources** (list[object]): Membership counts per source value over result rows.
-- **by_call_class** (list[object]): Rollup of MEROPS call_class over result rows (merops only).
-- **evidence_score_stats** (object | None): {min, median, max, n_null} over evidence_score in result rows.
+- **by_evidence** (list[object]): Rollup of the compact evidence column over every matching row, not just the page you are reading. Empty with summary=true, which fetches no rows.
+- **by_tier** (list[object]): Rollup of tier over every matching row; carries an explicit 'null' bucket. Present in compact mode too, where tier itself is not on the row. Empty with summary=true.
+- **by_sources** (list[object]): Membership counts per source value over every matching row. Empty with summary=true.
+- **by_call_class** (list[object]): Rollup of MEROPS call_class over every matching row (merops only). Empty with summary=true.
+- **evidence_score_stats** (object | None): {min, median, max, n_null} over evidence_score across every matching row. All-null with summary=true.
 - **evidence_score_signals** (object | None): Fired ControlledVocabulary signals per edge_type; present only when min_evidence_score was set.
 - **filters_applied** (object): Echo of the trust filters that were actually set on this call.
 - **skipped_ontologies** (list[object]): Multi-ontology: [{ontology, reason}] for ontologies dropped because a filter/facet only some of the queried ontologies own.

@@ -85,11 +85,11 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 - **warnings** (list[string]): Auto-warnings (e.g. nonpeptidase_homolog rows without a call_class filter).
 - **filters_applied** (object): Echo of the trust filters that were actually set on this call.
 - **skipped_ontologies** (list[object]): Empty for single-ontology tools; reserved for multi-ontology callers.
-- **by_evidence** (list[object]): Rollup of the compact evidence column over result rows.
-- **by_tier** (list[object]): Rollup of tier over result rows; carries an explicit 'null' bucket.
-- **by_sources** (list[object]): Membership counts per source value over result rows.
-- **by_call_class** (list[object]): Rollup of MEROPS call_class over result rows (merops only).
-- **evidence_score_stats** (object | None): {min, median, max, n_null} over evidence_score in result rows.
+- **by_evidence** (list[object]): Rollup of the compact evidence column over every matching row, not just the page you are reading.
+- **by_tier** (list[object]): Rollup of tier over every matching row; carries an explicit 'null' bucket. Present in compact mode too, where tier itself is not on the row.
+- **by_sources** (list[object]): Membership counts per source value over every matching row.
+- **by_call_class** (list[object]): Rollup of MEROPS call_class over every matching row (merops only).
+- **evidence_score_stats** (object | None): {min, median, max, n_null} over evidence_score across every matching row.
 - **evidence_score_signals** (object | None): Fired ControlledVocabulary signals per edge_type; present only when min_evidence_score was set.
 
 ### Per-result fields
