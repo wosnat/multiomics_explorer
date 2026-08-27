@@ -5,9 +5,9 @@
 
 Every Cypher block below is **verified against the live KG-SYNC-005 build (2026-08-27)** unless marked otherwise.
 
-## 0. One open decision for freeze
+## 0. Decided (2026-08-27): single compact trust column = `evidence`
 
-**Single compact trust column** on gene×term rows (design §1). Options: (a) `evidence_score` — numeric rank key, present on 8 of 17 ontologies (GO×3, EC, Pfam, CAZy, TCDB, MEROPS; null on KO, COG, roles, InterPro, NCBIfam, PSORTb, SignalP); (b) `evidence` — categorical ladder, present on all 14 functional-edge ontologies (null only on PSORTb/SignalP). Owner's lean: (a). **Spec is written for (a); switching to (b) changes only the compact/verbose placement of the two columns — no Cypher change.**
+The compact trust column on gene×term rows is **`evidence`** (categorical ladder `curated > signature > homology > family_inferred > domain_inferred`; present on all 14 functional-edge ontologies, null only on PSORTb/SignalP). `evidence_score` moves to verbose alongside `sources` and `tier`; it remains the sort key within an ontology and the only cutoff (`min_evidence_score`). Rationale: after ONT-008 `evidence` is the one axis an agent can read on every functional ontology row; `evidence_score` is null on 9 of 17.
 
 ## 1. Purpose
 
@@ -22,7 +22,7 @@ Give every gene→term annotation a readable, filterable trust profile with one 
 - [x] KG-SYNC-005 landed and live-verified (all 14 functional edge types carry `sources`+`evidence`; TCDB `attachment_depth` 46,593/7,170; MEROPS `evidence_score` 151/3,768/338; `gene_count`+`organism_count` on all 18 labels; `direct_gene_count` on BP/MF/CC/EC/KEGG/CyanorakRole/InterPro/TCDB/CAZy/MEROPS; `bit_score`; `family_class`; 10 `retired`; 110 vocab nodes)
 - [x] Schema baseline refreshed (`config/schema_baseline.yaml`)
 - [x] Design approved section-by-section
-- [ ] §0 decided
+- [x] §0 decided — `evidence`
 - [ ] Spec frozen
 
 ## 4. `ONTOLOGY_CONFIG` registry (design §2) — authoritative table
@@ -63,7 +63,7 @@ Validation: unsupported axis → `ValueError` naming the ontology's axes; unknow
 
 ## 6. Row / envelope contracts — see design §3 and §5 (verbatim contract). Column-placement summary:
 
-- gene×term compact: existing + `evidence_score` (§0) + `interpro_type` + `call_class`; verbose: `sources`, `evidence`, `tier` + config `verbose_edge` (strip non-applicable).
+- gene×term compact: existing + `evidence` (§0) + `interpro_type` + `call_class`; verbose: `sources`, `evidence_score`, `tier` + config `verbose_edge` (strip non-applicable).
 - `search_ontology` compact: existing + `ontology_type`, `gene_count`, `organism_count`, `interpro_type`, `score` null in browse; verbose: + `description`, `level_kind`, `direct_gene_count`, config `term_verbose`.
 - `ontology_term_details` compact: `term_id, ontology, label, name, description, level, level_kind, is_informative, gene_count, organism_count, direct_gene_count, <term_details_compact>, parents[], children[] (+children_total, children_truncated), links_out[]`; verbose: + `properties` (`t{.*}`), `links_out[].props`, `genes_by_organism[]`.
 - `gene_overview` compact: + `merops_classes`, `ncbifam_family_count`, `merops_evidence_score_max` (sparse, uncoalesced).

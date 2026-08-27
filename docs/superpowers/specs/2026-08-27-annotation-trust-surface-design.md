@@ -38,7 +38,7 @@ Plus a **term-character layer** (node side): `description`, `interpro_type`, NCB
 `is_uninformative`, forward bridges.
 
 **Decisions taken in review:**
-- **One compact trust column, not four.** Rollups carry the distribution; verbose carries the axes per row. Candidate columns: `evidence_score` (owner's lean) or `evidence` (universal on all 14 functional edge types after KG-SYNC-005; absent on PSORTb/SignalP). **Decided at spec freeze.**
+- **One compact trust column, not four.** Rollups carry the distribution; verbose carries the axes per row. **Decided 2026-08-27: `evidence`** (universal on all 14 functional edge types after KG-SYNC-005; absent on PSORTb/SignalP). `evidence_score` is verbose, remains the within-ontology sort key and the only cutoff.
 - **`score` + `score_kind` rejected.** Native scalars differ in scale *and direction* (e-value lower-is-better, bit score / confidence / probability higher-is-better); a kind tag does not stop cross-ontology sorting. Rule: *compact = comparable, verbose = native.*
 - PSORTb/SignalP columns keep their names and move compact → verbose.
 - Term side has four layers: `search_ontology` compact / verbose (anything you would filter or compare wide on) and `ontology_term_details` compact / verbose (dig-in; verbose = every node property).
@@ -110,9 +110,9 @@ Invariants (import-time, `tests/unit/test_config_registry.py`): `term_details_co
 | mode | columns |
 |---|---|
 | compact (existing) | `locus_tag`, `gene_name`, `product`, `gene_category` (GbO), `term_id`, `term_name`, `level`, `tree`, `tree_code`, `is_informative`, `ontology_type` (GOT multi) |
-| compact (new) | *single trust column* (§1), `interpro_type`, `call_class` |
+| compact (new) | `evidence` (§1), `interpro_type`, `call_class` |
 | verbose (existing) | `function_description`, `level_is_best_effort`, `organism_name` |
-| verbose (new) | `sources`, `evidence`, `tier` (+ the compact-column's siblings), then native detail per config |
+| verbose (new) | `sources`, `evidence_score`, `tier`, then native detail per config |
 
 **One edge per (gene, term).** On hierarchical ontologies a rollup row's `t` is an ancestor; trust columns come from the gene's best edge under `t` (`rank_prop` desc, then most specific attachment). Fixes the latent PSORTb-era `RETURN DISTINCT` + `r.*` duplication on rollups.
 
@@ -214,7 +214,7 @@ Optional seam if split: **3a** registry + trust surface + 3 ontologies; **3b** `
 
 ## Self-review (2026-08-27)
 
-- Placeholders: none. Open item explicitly deferred to freeze: single compact trust column (`evidence_score` vs `evidence`).
+- Placeholders: none. Single compact trust column decided: `evidence`.
 - Consistency: `score`/`score_kind` removed everywhere; `attachment_depth` values match KG (`most_specific | superseded`); `family_class` / `bit_score` renames applied; `direct_gene_count` exceptions (PfamClan, BriteCategory) recorded.
 - Scope: large; seam 3a/3b documented.
 - Ambiguity resolved: `max_tier` keeps tier-null; lockstep paging bound stated; multi-ontology skip/raise matrix explicit.
