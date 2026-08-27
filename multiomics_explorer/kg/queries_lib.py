@@ -2494,8 +2494,9 @@ def build_list_organisms(
     clustering_analysis_count, cluster_types, derived_metric_count,
     derived_metric_value_kinds, compartments, reaction_count,
     catalyzed_metabolite_count, transported_metabolite_count,
-    measured_metabolite_count, reference_database, reference_proteome,
-    growth_phases.
+    measured_metabolite_count, peptidase_gene_count,
+    nonpeptidase_homolog_gene_count, interpro_gene_count, ncbifam_gene_count,
+    reference_database, reference_proteome, growth_phases.
     RETURN keys (verbose): adds family, order, tax_class, phylum, kingdom,
     superkingdom, lineage, cluster_count, derived_metric_gene_count,
     derived_metric_types.
@@ -2550,6 +2551,10 @@ def build_list_organisms(
         "       coalesce(o.catalyzed_metabolite_count, 0) AS catalyzed_metabolite_count,\n"
         "       coalesce(o.transported_metabolite_count, 0) AS transported_metabolite_count,\n"
         "       coalesce(o.measured_metabolite_count, 0) AS measured_metabolite_count,\n"
+        "       coalesce(o.peptidase_gene_count, 0) AS peptidase_gene_count,\n"
+        "       coalesce(o.nonpeptidase_homolog_gene_count, 0) AS nonpeptidase_homolog_gene_count,\n"
+        "       coalesce(o.interpro_gene_count, 0) AS interpro_gene_count,\n"
+        "       coalesce(o.ncbifam_gene_count, 0) AS ncbifam_gene_count,\n"
         "       o.reference_database AS reference_database,\n"
         "       o.reference_proteome AS reference_proteome,\n"
         "       coalesce(o.growth_phases, []) AS growth_phases"
@@ -2567,7 +2572,11 @@ def build_list_organisms_summary(
     """Summary count + DM/compartment/cluster/organism-type rollups across matched organisms.
 
     RETURN keys: total_entries, total_matching, by_value_kind,
-    by_metric_type, by_compartment, by_cluster_type, by_organism_type.
+    by_metric_type, by_compartment, by_cluster_type, by_organism_type,
+    by_measurement_capability, by_annotation_capability (top-10 by
+    peptidase_gene_count desc then preferred_name; entries carry
+    preferred_name, organism_name + the four ORG-001 counts; all-four-zero
+    organisms excluded).
     """
     conditions = [
         "($organism_names_lc IS NULL"
@@ -2595,7 +2604,16 @@ def build_list_organisms_summary(
         "     apoc.coll.flatten(\n"
         "       collect(coalesce(o.cluster_types, []))) AS ctypes,\n"
         "     collect(o.organism_type) AS otypes,\n"
-        "     collect(coalesce(o.measured_metabolite_count, 0)) AS mmc\n"
+        "     collect(coalesce(o.measured_metabolite_count, 0)) AS mmc,\n"
+        "     collect({\n"
+        "       preferred_name: o.preferred_name,\n"
+        "       organism_name: o.preferred_name,\n"
+        "       peptidase_gene_count: coalesce(o.peptidase_gene_count, 0),\n"
+        "       nonpeptidase_homolog_gene_count:\n"
+        "         coalesce(o.nonpeptidase_homolog_gene_count, 0),\n"
+        "       interpro_gene_count: coalesce(o.interpro_gene_count, 0),\n"
+        "       ncbifam_gene_count: coalesce(o.ncbifam_gene_count, 0)\n"
+        "     }) AS ann\n"
         "RETURN total_entries, total_matching,\n"
         "       apoc.coll.frequencies(vks) AS by_value_kind,\n"
         "       apoc.coll.frequencies(mtypes) AS by_metric_type,\n"
@@ -2605,7 +2623,14 @@ def build_list_organisms_summary(
         "       {\n"
         "         has_metabolomics: size([c IN mmc WHERE c > 0]),\n"
         "         no_metabolomics: size([c IN mmc WHERE c = 0])\n"
-        "       } AS by_measurement_capability"
+        "       } AS by_measurement_capability,\n"
+        "       apoc.coll.sortMulti(\n"
+        "         [a IN ann WHERE a.peptidase_gene_count > 0\n"
+        "            OR a.nonpeptidase_homolog_gene_count > 0\n"
+        "            OR a.interpro_gene_count > 0\n"
+        "            OR a.ncbifam_gene_count > 0],\n"
+        "         ['peptidase_gene_count', '^preferred_name'])[0..10]\n"
+        "       AS by_annotation_capability"
     )
     return cypher, params
 
@@ -2629,7 +2654,9 @@ def build_list_organisms_capability(
     so the matched set is identical.
 
     RETURN keys: organism_name, reaction_count, catalyzed_metabolite_count,
-    transported_metabolite_count, measured_metabolite_count.
+    transported_metabolite_count, measured_metabolite_count,
+    peptidase_gene_count, nonpeptidase_homolog_gene_count, interpro_gene_count,
+    ncbifam_gene_count (slice 4 — feeds by_annotation_capability api-side).
     """
     conditions = [
         "($organism_names_lc IS NULL"
@@ -2649,7 +2676,11 @@ def build_list_organisms_capability(
         "       coalesce(o.reaction_count, 0) AS reaction_count,\n"
         "       coalesce(o.catalyzed_metabolite_count, 0) AS catalyzed_metabolite_count,\n"
         "       coalesce(o.transported_metabolite_count, 0) AS transported_metabolite_count,\n"
-        "       coalesce(o.measured_metabolite_count, 0) AS measured_metabolite_count\n"
+        "       coalesce(o.measured_metabolite_count, 0) AS measured_metabolite_count,\n"
+        "       coalesce(o.peptidase_gene_count, 0) AS peptidase_gene_count,\n"
+        "       coalesce(o.nonpeptidase_homolog_gene_count, 0) AS nonpeptidase_homolog_gene_count,\n"
+        "       coalesce(o.interpro_gene_count, 0) AS interpro_gene_count,\n"
+        "       coalesce(o.ncbifam_gene_count, 0) AS ncbifam_gene_count\n"
         "ORDER BY o.genus, o.preferred_name"
     )
     return cypher, params
@@ -6809,7 +6840,7 @@ def build_genes_in_cluster_summary(
         "       {cluster_id: cid,\n"
         "        cluster_name: head([r IN rows WHERE r.cid = cid | r.cname]),\n"
         "        count: size([r IN rows WHERE r.cid = cid])}] AS by_cluster"
-        + (f",\n     analysis_name\n" if analysis_id is not None else "\n")
+        + (",\n     analysis_name\n" if analysis_id is not None else "\n")
         + "RETURN total_matching, by_organism, by_cluster, by_category_raw,\n"
         f"       not_found_clusters, not_matched_clusters{return_suffix}"
     )
@@ -8565,6 +8596,7 @@ def build_genes_by_metabolite_metabolism(
         "       'metabolism' AS evidence_source,\n"
         "       null AS substrate_depth,\n"
         "       null AS tcdb_evidence_score,\n"
+        "       null AS transport_substrate_resolution,\n"
         "       r.id AS reaction_id,\n"
         "       r.name AS reaction_name,\n"
         "       coalesce(r.ec_numbers, []) AS ec_numbers,\n"
@@ -8662,6 +8694,7 @@ def build_genes_by_metabolite_transport(
         "       'transport' AS evidence_source,\n"
         "       r.substrate_depth AS substrate_depth,\n"
         "       gt.evidence_score AS tcdb_evidence_score,\n"
+        "       g.transport_substrate_resolution AS transport_substrate_resolution,\n"
         "       null AS reaction_id,\n"
         "       null AS reaction_name,\n"
         "       null AS ec_numbers,\n"
@@ -9148,6 +9181,7 @@ def build_metabolites_by_gene_metabolism(
         "       'metabolism' AS evidence_source,\n"
         "       null AS substrate_depth,\n"
         "       null AS tcdb_evidence_score,\n"
+        "       null AS transport_substrate_resolution,\n"
         "       r.id AS reaction_id,\n"
         "       r.name AS reaction_name,\n"
         "       coalesce(r.ec_numbers, []) AS ec_numbers,\n"
@@ -9255,6 +9289,7 @@ def build_metabolites_by_gene_transport(
         "       'transport' AS evidence_source,\n"
         "       r.substrate_depth AS substrate_depth,\n"
         "       gt.evidence_score AS tcdb_evidence_score,\n"
+        "       g.transport_substrate_resolution AS transport_substrate_resolution,\n"
         "       null AS reaction_id,\n"
         "       null AS reaction_name,\n"
         "       null AS ec_numbers,\n"

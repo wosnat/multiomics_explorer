@@ -30,6 +30,9 @@ VALID_CLUSTER_TYPES: set[str] = {
     "condition_comparison",
     "diel",
     "time_course",
+    "expression_bin",
+    "decay_pattern",
+    "genomic_island",
 }
 
 VALID_OMICS_TYPES: set[str] = {
