@@ -1458,6 +1458,11 @@ def list_filter_values(
         ``merops_family_class``: term-side character values.
       - ``trust_axes``: which trust axes each ontology carries.
       - ``link_kinds``: the bridge kinds a term can link out on.
+      - ``cluster_type``: ClusteringAnalysis.cluster_type values (closed
+        vocabulary; the ``cluster_type`` filter on
+        ``list_clustering_analyses`` / ``gene_clusters_by_gene``). Rows carry
+        value, applies_to (``['ClusteringAnalysis']``), description, source.
+        ``ontology`` does not apply and is ignored.
 
     ``ontology`` scopes any of the annotation-trust types to one ontology.
     Values come from the graph's ControlledVocabulary nodes; when a node is
@@ -1480,6 +1485,24 @@ def list_filter_values(
         results = _trust_axes_filter_values(ontology)
     elif filter_type == "link_kinds":
         results = _link_kind_filter_values(ontology)
+    elif filter_type == "cluster_type":
+        # Slice 4 (§3.4): closed vocab on ClusteringAnalysis.cluster_type.
+        # Same read-then-pivot rule as the annotation-trust types; the
+        # vocabulary node is not ontology-scoped, so `ontology` is ignored.
+        read = _read_vocab_values(
+            conn, "ClusteringAnalysis", "cluster_type", "node", cache=False,
+        )
+        if read["warning"]:
+            warnings_out.append(read["warning"])
+        results = [
+            {
+                "value": v,
+                "applies_to": ["ClusteringAnalysis"],
+                "description": read["description"],
+                "source": read["source"],
+            }
+            for v in read["values"]
+        ]
     elif filter_type == "gene_category":
         cypher, params = build_list_gene_categories()
         rows = conn.execute_query(cypher, **params)
@@ -1527,6 +1550,7 @@ def list_filter_values(
             "gene_category", "brite_tree", "growth_phase", "metric_type",
             "value_kind", "compartment", "omics_type", "evidence_source",
             *sorted(_TRUST_FILTER_VALUE_SPECS), "trust_axes", "link_kinds",
+            "cluster_type",
         ]
         raise ValueError(
             f"Unknown filter_type: {filter_type!r}. Valid options: "
@@ -1565,14 +1589,18 @@ def list_organisms(
     Returns dict with keys: total_entries, total_matching, returned, offset,
     truncated, by_cluster_type, by_organism_type, by_value_kind, by_metric_type,
     by_compartment, by_metabolic_capability, by_measurement_capability,
-    not_found, results.
+    by_annotation_capability, not_found, results.
     Per result (compact): organism_name, organism_type, genus, species,
     strain, clade, ncbi_taxon_id, gene_count, publication_count,
     experiment_count, treatment_types, omics_types, clustering_analysis_count,
     cluster_types, derived_metric_count, derived_metric_value_kinds, compartments,
     reaction_count, catalyzed_metabolite_count, transported_metabolite_count
     (distinct substrates reached via the organism's genes' deepest TCDB
-    attachments), measured_metabolite_count.
+    attachments), measured_metabolite_count, peptidase_gene_count,
+    nonpeptidase_homolog_gene_count, interpro_gene_count, ncbifam_gene_count
+    (annotation-coverage counts of genes carrying a MEROPS peptidase call,
+    a MEROPS non-peptidase-homolog call, at least one InterPro term, at
+    least one NCBIfam family; 0 when the organism has none).
     Sparse fields (omitted when null): reference_database, reference_proteome.
     When verbose=True, also includes: family, order, tax_class, phylum, kingdom,
     superkingdom, lineage, cluster_count, derived_metric_gene_count,
@@ -1587,6 +1615,12 @@ def list_organisms(
     by_measurement_capability: binary 2-bucket count
     {has_metabolomics: N, no_metabolomics: M} where has_metabolomics counts
     organisms with measured_metabolite_count > 0. Sums to total_matching.
+    by_annotation_capability: top 10 organisms (within matched set) by
+    peptidase_gene_count desc, then preferred_name; each entry carries
+    preferred_name, organism_name and all four annotation counts. Organisms
+    with all four counts at 0 are excluded. A reading aid for choosing an
+    organism for MEROPS / InterPro / NCBIfam questions — there is no filter
+    on these counts.
     """
     conn = _default_conn(conn)
     if summary:
@@ -1607,6 +1641,7 @@ def list_organisms(
         "by_measurement_capability": {
             "has_metabolomics": 0, "no_metabolomics": 0,
         },
+        "by_annotation_capability": [],
     }
     total_entries = summary_row["total_entries"]
     total_matching = summary_row["total_matching"]
@@ -1631,6 +1666,9 @@ def list_organisms(
         )
         matched = conn.execute_query(detail_cypher, **detail_params)
         capability_rows = matched
+        # The detail projection is unpaged (slicing happens below), so the
+        # matched-row count is the authoritative total for the same filters.
+        total_matching = len(matched)
 
         sliced = matched
         if offset:
@@ -1672,6 +1710,16 @@ def list_organisms(
     )
     by_metabolic_capability = chemistry_capable[:10]
 
+    # by_annotation_capability (slice 4 §3.3): top 10 organisms by
+    # peptidase_gene_count desc then preferred_name; all-four-zero rows
+    # excluded. Detail mode ranks the matched rows api-side (page-
+    # independent); summary mode reads the summary builder's rollup and
+    # only falls back to the capability rows when that key is absent.
+    if limit == 0 and summary_row.get("by_annotation_capability") is not None:
+        by_annotation_capability = list(summary_row["by_annotation_capability"])
+    else:
+        by_annotation_capability = _rank_annotation_capability(capability_rows)
+
     # not_found: input names that didn't match any OrganismTaxon
     # (case-insensitive). Original casing preserved in the returned list.
     if organism_names:
@@ -1707,12 +1755,40 @@ def list_organisms(
             "by_measurement_capability",
             {"has_metabolomics": 0, "no_metabolomics": 0},
         ),
+        "by_annotation_capability": by_annotation_capability,
         "returned": len(results),
         "offset": offset,
         "truncated": total_matching > offset + len(results),
         "not_found": not_found,
         "results": results,
     }
+
+
+_ANNOTATION_CAPABILITY_COLS = (
+    "peptidase_gene_count", "nonpeptidase_homolog_gene_count",
+    "interpro_gene_count", "ncbifam_gene_count",
+)
+
+
+def _rank_annotation_capability(rows: list[dict]) -> list[dict]:
+    """Top-10 `by_annotation_capability` entries over organism rows.
+
+    Sort key: peptidase_gene_count desc, then preferred_name (== organism_name
+    on the row projection). Rows with all four counts at 0 are dropped.
+    """
+    entries = []
+    for r in rows:
+        counts = {c: r.get(c) or 0 for c in _ANNOTATION_CAPABILITY_COLS}
+        if not any(counts.values()):
+            continue
+        name = r.get("preferred_name") or r.get("organism_name")
+        entries.append({
+            "preferred_name": name,
+            "organism_name": r.get("organism_name") or name,
+            **counts,
+        })
+    entries.sort(key=lambda e: (-e["peptidase_gene_count"], e["preferred_name"]))
+    return entries[:10]
 
 
 def list_publications(
@@ -6671,6 +6747,10 @@ def genes_by_metabolite(
       - `tcdb_evidence_score` (float, 0..1): the KG's composite evidence for
         the gene × family call. Rank with it, don't filter on it — 0 means
         an uncorroborated DIAMOND hit, not "absent".
+      - `transport_substrate_resolution` (`resolved` | `family_inferred` |
+        None): the GENE's KG-authoritative resolution, repeated on every
+        transport row of that gene — not a per-substrate fact (use
+        `substrate_depth` for the row). Explicit None on metabolism rows.
 
     substrate_depth: Transport-arm filter, list of `most_specific` /
         `inherited`. Unknown values raise ValueError; the retired
@@ -7077,6 +7157,10 @@ def metabolites_by_gene(
       - `tcdb_evidence_score` (float, 0..1): the KG's composite evidence for
         the gene × family call. Rank with it, don't filter on it — 0 means
         an uncorroborated DIAMOND hit, not "absent".
+      - `transport_substrate_resolution` (`resolved` | `family_inferred` |
+        None): the GENE's KG-authoritative resolution, repeated on every
+        transport row of that gene — not a per-substrate fact (use
+        `substrate_depth` for the row). Explicit None on metabolism rows.
 
     substrate_depth: Transport-arm filter, list of `most_specific` /
         `inherited`. Unknown values raise ValueError; the retired
@@ -8582,7 +8666,47 @@ _KG_IDENTITY_FIELDS = (
     "gene_count", "experiment_count", "paper_count", "organism_count",
     "expression_edge_count", "release_notes_url",
     "release_highlights", "breaking_changes", "deployment_role",
+    "controlled_vocabularies_hash",
 )
+
+_VOCAB_HASH_KEY = "controlled_vocabularies_hash"
+_VOCAB_MISMATCH_SENTENCE = (
+    "Vocabulary set differs from the one this explorer was built against — "
+    "filters still validate live and `list_filter_values` reads live, but "
+    "docs://ontologies pages and Field descriptions may list stale values"
+)
+
+
+def _evaluate_vocabulary_hash(schema_info: dict) -> dict:
+    """Build assert bucket 6 — the vocabulary-set check.
+
+    Compares `Schema_info.controlled_vocabularies_hash` with the pin in
+    `EXPECTED_KG_SHAPE` (read at call time). A KG that predates the
+    vocabulary contract has no such property and fails the bucket.
+    """
+    expected = EXPECTED_KG_SHAPE[_VOCAB_HASH_KEY]
+    actual = schema_info.get(_VOCAB_HASH_KEY)
+    base = {
+        "name": _VOCAB_HASH_KEY, "kind": _VOCAB_HASH_KEY,
+        "expected": expected, "actual": actual,
+    }
+    if actual is None:
+        return {
+            **base, "passed": False,
+            "detail": (
+                "KG predates the vocabulary contract "
+                "(no Schema_info.controlled_vocabularies_hash)."
+            ),
+        }
+    if actual == expected:
+        return {**base, "passed": True, "detail": None}
+    return {
+        **base, "passed": False,
+        "detail": (
+            f"Schema_info.controlled_vocabularies_hash is {actual}, "
+            f"explorer was built against {expected}."
+        ),
+    }
 
 
 def _get_explorer_version() -> str:
@@ -8640,6 +8764,14 @@ def kg_release_info(conn: GraphConnection) -> dict:
     (verdict, explorer_version, kg, asserts, summary). Cached by the
     MCP server at lifespan startup; the kg_release_info MCP tool reads
     from cache.
+
+    Six assert buckets: Schema_info props, node labels, relationship
+    types, non-zero counts, version compatibility, and the vocabulary set
+    (`controlled_vocabularies_hash` vs the pin this explorer was built
+    against; that assert also carries `expected` / `actual`). A vocabulary
+    mismatch — or a KG that predates the contract — yields `warn`, never
+    worse: filters still validate live and `list_filter_values` reads live,
+    but baked docs may list stale values. `kg` carries the live hash.
     """
     cypher, params = build_kg_release_info()
     rows = conn.execute_query(cypher, **params)
@@ -8706,6 +8838,10 @@ def kg_release_info(conn: GraphConnection) -> dict:
     kg_min = schema_info.get("mcp_min_version")
     asserts.append(_evaluate_version_compat(explorer_version, kg_min))
 
+    # Bucket 6 — vocabulary set (slice 4 §3.1). A failure folds into `warn`,
+    # never worse: filters still validate live against the KG's vocab nodes.
+    asserts.append(_evaluate_vocabulary_hash(schema_info))
+
     failed = [a for a in asserts if not a["passed"]]
     verdict = "ok" if not failed else "warn"
 
@@ -8716,7 +8852,9 @@ def kg_release_info(conn: GraphConnection) -> dict:
         )
     else:
         version_fail = next((a for a in failed if a["kind"] == "version_compat"), None)
-        shape_fails = [a for a in failed if a["kind"] != "version_compat"]
+        vocab_fail = next((a for a in failed if a["kind"] == _VOCAB_HASH_KEY), None)
+        shape_fails = [a for a in failed
+                       if a["kind"] not in ("version_compat", _VOCAB_HASH_KEY)]
         parts: list[str] = []
         if version_fail:
             parts.append(version_fail["detail"].rstrip("."))
@@ -8725,6 +8863,8 @@ def kg_release_info(conn: GraphConnection) -> dict:
             parts.append(
                 f"{len(shape_fails)} schema assert(s) failed ({', '.join(kinds)})"
             )
+        if vocab_fail:
+            parts.append(_VOCAB_MISMATCH_SENTENCE)
         summary = "WARN: " + "; ".join(parts) + "."
 
     # Preflight change-list pointers (nullable, absent on dev builds). Keep the
