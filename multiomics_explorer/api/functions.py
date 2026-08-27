@@ -8673,7 +8673,7 @@ _VOCAB_HASH_KEY = "controlled_vocabularies_hash"
 _VOCAB_MISMATCH_SENTENCE = (
     "Vocabulary set differs from the one this explorer was built against — "
     "filters still validate live and `list_filter_values` reads live, but "
-    "docs://ontologies pages and Field descriptions may list stale values"
+    "docs://ontologies pages and parameter descriptions may list stale values"
 )
 
 

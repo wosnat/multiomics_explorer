@@ -2,7 +2,7 @@
 
 ## What it does
 
-List organisms with taxonomy, data-availability counts, organism_type, DM rollups, chemistry-capability rollups, and metabolomics-coverage rollup.
+List organisms with taxonomy, data-availability counts, organism_type, DM rollups, chemistry-capability rollups, annotation-coverage rollups, and metabolomics-coverage rollup.
 
 Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `catalyzed_metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Read `by_annotation_capability` (top-10 by `peptidase_gene_count`, plus `interpro_gene_count` / `ncbifam_gene_count`) to see which organisms carry MEROPS / InterPro / NCBIfam coverage — then `genes_by_ontology(ontology='merops'|'interpro'|'ncbifam', organism=...)`. Note that `organism_names=` on this tool is exact (case-insensitive) on `preferred_name`, while the `organism=` filter on most other tools is a substring match.
 
@@ -111,7 +111,7 @@ list_organisms()
   "offset": 0,
   "not_found": [],
   "results": [
-    {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 17, "experiment_count": 114, "treatment_types": ["coculture", "carbon", "nitrogen", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS", ...], "clustering_analysis_count": 4, "cluster_types": ["diel", "time_course"], "reaction_count": 943, "catalyzed_metabolite_count": 1039, "transported_metabolite_count": 1069, "measured_metabolite_count": 41, "peptidase_gene_count": 52, "nonpeptidase_homolog_gene_count": 9, "interpro_gene_count": 1610, "ncbifam_gene_count": 690}
+    {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 17, "experiment_count": 114, "treatment_types": ["coculture", "carbon", "nitrogen", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS", ...], "clustering_analysis_count": 4, "cluster_types": ["diel", "time_course"], "reaction_count": 943, "catalyzed_metabolite_count": 1039, "transported_metabolite_count": 1069, "peptidase_gene_count": 50, "nonpeptidase_homolog_gene_count": 8, "interpro_gene_count": 1545, "ncbifam_gene_count": 744}
   ]
 }
 ```
@@ -136,7 +136,7 @@ list_organisms(summary=True)
 {"total_entries": 48, "total_matching": 48,
  "by_annotation_capability": [
    {"preferred_name": "Alteromonas (MarRef v6)", "organism_name": "Alteromonas (MarRef v6)", "peptidase_gene_count": 148, "nonpeptidase_homolog_gene_count": 31, "interpro_gene_count": 3746, "ncbifam_gene_count": 1379},
-   {"preferred_name": "Alteromonas macleodii AD45", "organism_name": "Alteromonas macleodii AD45", "peptidase_gene_count": 129, "nonpeptidase_homolog_gene_count": 27, "interpro_gene_count": 3612, "ncbifam_gene_count": 1320},
+   {"preferred_name": "Alteromonas macleodii AD45", "organism_name": "Alteromonas macleodii AD45", "peptidase_gene_count": 129, "nonpeptidase_homolog_gene_count": 32, "interpro_gene_count": 3495, "ncbifam_gene_count": 1611},
    {"preferred_name": "Shewanella sp. W3-18-1", "organism_name": "Shewanella sp. W3-18-1", "peptidase_gene_count": 128, "...": "..."},
    "...7 more entries..."
  ],
@@ -160,7 +160,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
 # exactly the two organisms, MIT1002 first (more peptidase genes). A
 # subset whose only members have all-zero counts yields an empty list
 # while the rows themselves are still returned.
-{"total_matching": 2, "by_annotation_capability": [{"preferred_name": "Alteromonas macleodii MIT1002", "organism_name": "Alteromonas macleodii MIT1002", "peptidase_gene_count": 121, "nonpeptidase_homolog_gene_count": 26, "interpro_gene_count": 3480, "ncbifam_gene_count": 1290}, {"preferred_name": "Prochlorococcus MED4", "organism_name": "Prochlorococcus MED4", "peptidase_gene_count": 52, "nonpeptidase_homolog_gene_count": 9, "interpro_gene_count": 1610, "ncbifam_gene_count": 690}], "results": ["..."]}
+{"total_matching": 2, "by_annotation_capability": [{"preferred_name": "Alteromonas macleodii MIT1002", "organism_name": "Alteromonas macleodii MIT1002", "peptidase_gene_count": 120, "nonpeptidase_homolog_gene_count": 32, "interpro_gene_count": 3584, "ncbifam_gene_count": 1699}, {"preferred_name": "Prochlorococcus MED4", "organism_name": "Prochlorococcus MED4", "peptidase_gene_count": 50, "nonpeptidase_homolog_gene_count": 8, "interpro_gene_count": 1545, "ncbifam_gene_count": 744}], "results": ["..."]}
 ```
 
 ### Example 4: Full taxonomy

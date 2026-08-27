@@ -41,6 +41,10 @@ LINT_PATTERN = re.compile(
     # "g (precision-tier)"; the pre-migration warning concept.
     r"|precision[ -]tier"
     r"|family[ _-]inferred[ _-]dominance"
+    # Pydantic-internal vocabulary leaking into agent-facing text: agents see
+    # parameter descriptions, not "Field descriptions" (kg_release_info
+    # vocabulary-mismatch sentence).
+    r"|\bField descriptions?\b"
 )
 
 # Drift-marker carveout. The [AQ] (annotation_quality redefinition) and

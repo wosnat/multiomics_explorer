@@ -9,7 +9,7 @@ Return the KG's release identity (`Schema_info` properties) and a compatibility 
 Verdict semantics:
 - `ok`     — explorer satisfies KG min-version + all schema asserts pass.
 - `warn`   — at least one assert failed; tools still serve but may emit confusing errors against the affected shapes. Filter `asserts` on `passed=False` for the failure list.
-- A failed `controlled_vocabularies_hash` assert (bucket 6) yields `warn`: filters still validate live and `list_filter_values` reads live, but docs://ontologies pages and Field descriptions may list stale values. `kg.controlled_vocabularies_hash` carries the live digest.
+- A failed `controlled_vocabularies_hash` assert (bucket 6) yields `warn`: filters still validate live and `list_filter_values` reads live, but docs://ontologies pages and parameter descriptions may list stale values. `kg.controlled_vocabularies_hash` carries the live digest.
 - `unknown` — could not evaluate (no `Schema_info` node in the KG — legacy build without release metadata, or wrong database).
 
 On non-`ok` verdicts, the tool emits `ctx.warning(summary)` so the surrounding MCP client surfaces it to the user. See `docs://guide/conventions` for cross-tool semantics.
@@ -32,6 +32,20 @@ verdict, explorer_version, kg, asserts, summary
 - **kg** (KGIdentity): The KG's self-declared release identity.
 - **asserts** (list[KGAssert]): Every assertion evaluated, pass + fail. Filter `passed=False` for the failure list.
 - **summary** (string): One-line human-readable verdict.
+
+### Assert kinds
+
+Each `asserts[]` entry belongs to one of six families (`kind`):
+`schema_info_prop` — the named `Schema_info` property is present and
+non-null on the live KG; `node_label` — the named node label exists
+in `db.labels()`; `relationship_type` — the named relationship type
+exists in `db.relationshipTypes()`; `nonzero_count` — the named
+`Schema_info` count property is a positive int; `version_compat` —
+the installed explorer version satisfies `KG.mcp_min_version` under
+PEP 440; `controlled_vocabularies_hash` — the live
+`Schema_info.controlled_vocabularies_hash` equals the hash this
+explorer was built against (a miss yields `warn`, never worse).
+
 
 ## Few-shot examples
 
@@ -63,7 +77,7 @@ kg_release_info()
 # signal_count, signals}. `description` is excluded, so doc-only
 # vocabulary edits do not change it. The explorer pins the hash of the
 # KG it was built against; the sixth assert bucket compares the two.
-{"verdict": "warn", "kg": {"controlled_vocabularies_hash": "sha256:e81d...efd4", "...": "..."}, "asserts": ["...16 schema asserts, all passed...", {"name": "controlled_vocabularies_hash", "kind": "controlled_vocabularies_hash", "passed": false, "expected": "sha256:6170...e0ae", "actual": "sha256:e81d...efd4", "detail": "KG vocabulary hash sha256:e81d...efd4 differs from the pinned sha256:6170...e0ae"}], "summary": "WARN: ... Vocabulary set differs from the one this explorer was built against — filters still validate live and list_filter_values reads live, but docs://ontologies pages and Field descriptions may list stale values."}
+{"verdict": "warn", "kg": {"controlled_vocabularies_hash": "sha256:e81d...efd4", "...": "..."}, "asserts": ["...16 schema asserts, all passed...", {"name": "controlled_vocabularies_hash", "kind": "controlled_vocabularies_hash", "passed": false, "expected": "sha256:6170...e0ae", "actual": "sha256:e81d...efd4", "detail": "Schema_info.controlled_vocabularies_hash is sha256:e81d...efd4, explorer was built against sha256:6170...e0ae."}], "summary": "WARN: ... Vocabulary set differs from the one this explorer was built against — filters still validate live and list_filter_values reads live, but docs://ontologies pages and parameter descriptions may list stale values."}
 
 # What this warn means in practice: nothing is broken. Every filter
 # value is validated against the live KG at call time and

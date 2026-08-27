@@ -1352,14 +1352,10 @@ class KGAssert(BaseModel):
         "nonzero_count", "version_compat", "controlled_vocabularies_hash",
     ] = Field(
         description=(
-            "Assertion family. "
-            "'schema_info_prop' = the named Schema_info property is present and non-null on the live KG; "
-            "'node_label' = the named node label exists in db.labels(); "
-            "'relationship_type' = the named relationship type exists in db.relationshipTypes(); "
-            "'nonzero_count' = the named Schema_info count property is a positive int; "
-            "'version_compat' = installed explorer version satisfies KG.mcp_min_version under PEP 440; "
-            "'controlled_vocabularies_hash' = Schema_info.controlled_vocabularies_hash equals the hash this "
-            "explorer was built against (bucket 6 — a miss yields 'warn', never worse)."
+            "Assertion family: schema_info_prop (property present), node_label, "
+            "relationship_type, nonzero_count (positive count), version_compat "
+            "(PEP 440 vs mcp_min_version), controlled_vocabularies_hash "
+            "(pinned hash match; a miss is only 'warn')."
         ),
     )
     passed: bool = Field(description="True if the assertion held against the live KG.")
@@ -1564,7 +1560,7 @@ def register_tools(mcp: FastMCP):
         Verdict semantics:
         - `ok`     — explorer satisfies KG min-version + all schema asserts pass.
         - `warn`   — at least one assert failed; tools still serve but may emit confusing errors against the affected shapes. Filter `asserts` on `passed=False` for the failure list.
-        - A failed `controlled_vocabularies_hash` assert (bucket 6) yields `warn`: filters still validate live and `list_filter_values` reads live, but docs://ontologies pages and Field descriptions may list stale values. `kg.controlled_vocabularies_hash` carries the live digest.
+        - A failed `controlled_vocabularies_hash` assert (bucket 6) yields `warn`: filters still validate live and `list_filter_values` reads live, but docs://ontologies pages and parameter descriptions may list stale values. `kg.controlled_vocabularies_hash` carries the live digest.
         - `unknown` — could not evaluate (no `Schema_info` node in the KG — legacy build without release metadata, or wrong database).
 
         On non-`ok` verdicts, the tool emits `ctx.warning(summary)` so the surrounding MCP client surfaces it to the user. See `docs://guide/conventions` for cross-tool semantics.
@@ -1825,7 +1821,7 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> ListOrganismsResponse:
-        """List organisms with taxonomy, data-availability counts, organism_type, DM rollups, chemistry-capability rollups, and metabolomics-coverage rollup.
+        """List organisms with taxonomy, data-availability counts, organism_type, DM rollups, chemistry-capability rollups, annotation-coverage rollups, and metabolomics-coverage rollup.
 
         Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `catalyzed_metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Read `by_annotation_capability` (top-10 by `peptidase_gene_count`, plus `interpro_gene_count` / `ncbifam_gene_count`) to see which organisms carry MEROPS / InterPro / NCBIfam coverage — then `genes_by_ontology(ontology='merops'|'interpro'|'ncbifam', organism=...)`. Note that `organism_names=` on this tool is exact (case-insensitive) on `preferred_name`, while the `organism=` filter on most other tools is a substring match.
         """

@@ -386,3 +386,16 @@ def test_dangling_ref_ignores_quoted_values(lint_mod, tmp_path):
         'Tier sits at or above 2; the table above lists "curated" first.\n'
     )
     assert lint_mod.lint_about_content([md]) == []
+
+
+def test_lint_catches_field_descriptions(lint_mod, tmp_path):
+    md = tmp_path / "t.md"
+    md.write_text(
+        "Docs and Field descriptions may list stale values.\n"
+        "One Field description per parameter.\n"
+        "Parameter descriptions may list stale values.\n"
+    )
+    vs = lint_mod.lint_about_content([md])
+    assert [v[1] for v in vs] == [1, 2]
+    assert vs[0][3] == "Field descriptions"
+    assert vs[1][3] == "Field description"
