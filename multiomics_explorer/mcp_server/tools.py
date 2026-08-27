@@ -2497,11 +2497,19 @@ def register_tools(mcp: FastMCP):
     class SearchOntologyResult(SparseRow):
         id: str = Field(description="Term ID (e.g. 'go:0006260')")
         name: str = Field(description="Term name (e.g. 'DNA replication')")
-        score: float = Field(description="Fulltext relevance score (e.g. 5.23)")
+        ontology_type: str | None = Field(default=None,
+            description="Ontology key this row came from (e.g. 'go_bp', 'tcdb'); "
+                        "set on every compact row, single- or multi-ontology.")
+        score: float | None = Field(default=None,
+            description="Fulltext relevance score (e.g. 5.23); null in browse mode "
+                        "(no search_text).")
         level: int = Field(description="Hierarchy level of this term (0 = broadest)")
         is_informative: bool = Field(description="True iff term is not flagged is_uninformative (positive framing; coerced from sparse '<term>.is_uninformative' KG flag)")
         tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
         tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
+        interpro_type: str | None = Field(default=None,
+            description="InterPro entry type (sparse: interpro only), e.g. "
+                        "'DOMAIN', 'FAMILY', 'HOMOLOGOUS_SUPERFAMILY'.")
         discussed_by_n_publications: int | None = Field(
             default=None,
             description="Publications that discuss this KEGG pathway in prose (KEGG only; None on other ontologies). Recall-biased narrative mention, NOT gene annotation. When > 0, set verbose=True for the per-paper DOI list, or call discussed_by_publication.")
@@ -2512,15 +2520,80 @@ def register_tools(mcp: FastMCP):
             description="Subtree gene count on this term (precomputed Node.gene_count; sparse until every ontology's builder emits it).")
         organism_count: int | None = Field(default=None,
             description="Distinct organisms reaching this term (precomputed Node.organism_count; sparse until every ontology's builder emits it).")
+        organism_gene_count: int | None = Field(default=None,
+            description="Genes directly annotated to this term in the requested "
+                        "`organism` (only when organism is set; browse sorts by it).")
+        # verbose-only term columns
+        description: str | None = Field(default=None,
+            description="Term description / definition (verbose only; sparse).")
+        level_kind: str | None = Field(default=None,
+            description="What `level` measures for this ontology, e.g. 'depth', "
+                        "'tc_family' (verbose only).")
+        direct_gene_count: int | None = Field(default=None,
+            description="Genes annotated directly to this term, excluding "
+                        "descendants (verbose only; hierarchical ontologies).")
+        superfamily: str | None = Field(default=None,
+            description="TCDB superfamily label (verbose only; sparse: tcdb).")
+        metabolite_count: int | None = Field(default=None,
+            description="Distinct substrate metabolites attached to this TCDB "
+                        "family (verbose only; sparse: tcdb).")
+        family_type: str | None = Field(default=None,
+            description="NCBIfam family type, e.g. 'equivalog', 'subfamily' "
+                        "(verbose only; sparse: ncbifam).")
+        gene_symbol: str | None = Field(default=None,
+            description="NCBIfam gene symbol (verbose only; sparse: ncbifam).")
+        family_class: str | None = Field(default=None,
+            description="MEROPS family class letter, e.g. 'S' (verbose only; sparse: merops).")
+        catalytic_type: str | None = Field(default=None,
+            description="MEROPS catalytic type, e.g. 'Serine' (verbose only; sparse: merops).")
+        peptidase_gene_count: int | None = Field(default=None,
+            description="Genes with a 'peptidase' call_class on this MEROPS "
+                        "family (verbose only; sparse: merops).")
+
+    class SearchOntologyByOntology(BaseModel):
+        ontology: str = Field(description="Ontology key (e.g. 'go_bp')")
+        total_entries: int = Field(description="Total terms in this ontology")
+        total_matching: int = Field(description="Terms matching in this ontology")
+        score_max: float | None = Field(default=None,
+            description="Highest relevance score in this ontology (null in browse / 0 matches)")
+        returned: int = Field(description="Rows returned for this ontology (per-ontology limit)")
+        truncated: bool = Field(description="True if this ontology has more matches than returned")
+
+    class SearchOntologyLevelBreakdown(BaseModel):
+        level: int = Field(description="Hierarchy level (0 = broadest)")
+        count: int = Field(description="Matching terms at this level (full match, not the page)")
+
+    class SearchOntologyInterproTypeBreakdown(BaseModel):
+        interpro_type: str = Field(description="InterPro entry type (e.g. 'DOMAIN')")
+        count: int = Field(description="Matching InterPro terms of this type")
+
+    class SearchOntologyFamilyTypeBreakdown(BaseModel):
+        family_type: str = Field(description="NCBIfam family type (e.g. 'equivalog')")
+        count: int = Field(description="Matching NCBIfam terms of this type")
 
     class SearchOntologyResponse(BaseModel):
-        total_entries: int = Field(description="Total terms in this ontology (e.g. 847)")
-        total_matching: int = Field(description="Terms matching the search (e.g. 31)")
-        score_max: float | None = Field(default=None, description="Highest relevance score (null if 0 matches, e.g. 5.23)")
-        score_median: float | None = Field(default=None, description="Median relevance score (null if 0 matches, e.g. 2.1)")
-        returned: int = Field(description="Results in this response (0 when summary=true)")
-        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-        truncated: bool = Field(description="True if total_matching > returned")
+        mode: Literal["search", "browse"] = Field(default="search",
+            description="'search' (Lucene over search_text) or 'browse' (no search_text; "
+                        "sorted by gene_count).")
+        total_entries: int = Field(description="Total terms in the selected ontologies (e.g. 847; summed over the set)")
+        total_matching: int = Field(description="Terms matching the search (e.g. 31; summed over the set)")
+        score_max: float | None = Field(default=None, description="Highest relevance score (null if 0 matches or browse, e.g. 5.23)")
+        score_median: float | None = Field(default=None, description="Median relevance score (null if 0 matches or browse, e.g. 2.1)")
+        returned: int = Field(description="Results in this response (0 when summary=true; <= limit x n_ontologies)")
+        offset: int = Field(default=0, description="Offset into each ontology's result set (lockstep paging, e.g. 0)")
+        truncated: bool = Field(description="True if any selected ontology has more matches than returned")
+        by_ontology: list[SearchOntologyByOntology] = Field(default_factory=list,
+            description="Per-ontology totals + truncation flags, in ONTOLOGY_CONFIG order.")
+        by_level: list[SearchOntologyLevelBreakdown] = Field(default_factory=list,
+            description="Terms per hierarchy level over the full match (browse mode only).")
+        by_interpro_type: list[SearchOntologyInterproTypeBreakdown] = Field(default_factory=list,
+            description="Matching InterPro terms per entry type (only when 'interpro' is in the set).")
+        by_family_type: list[SearchOntologyFamilyTypeBreakdown] = Field(default_factory=list,
+            description="Matching NCBIfam terms per family type (only when 'ncbifam' is in the set).")
+        skipped_ontologies: list[str] = Field(default_factory=list,
+            description="Ontologies in the set skipped because a filter does not apply to them.")
+        warnings: list[str] = Field(default_factory=list,
+            description="Auto-warnings, e.g. browse truncated with no narrowing filter.")
         results: list[SearchOntologyResult] = Field(
             default_factory=list, description="One row per matching term",
         )
@@ -2531,25 +2604,25 @@ def register_tools(mcp: FastMCP):
     )
     async def search_ontology(
         ctx: Context,
-        search_text: Annotated[str, Field(
-            description="Lucene query over term names. "
-            "E.g. 'replication', 'oxido*', 'transport AND membrane'. "
-            "See docs://guide/conventions for Lucene scoring.",
-        )],
-        ontology: Annotated[str, Field(
-            description="Ontology to search: 'go_bp', 'go_mf', 'go_cc', "
-            "'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', "
-            "'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', "
-            "'interpro', 'ncbifam', 'merops'.",
-        )],
+        search_text: Annotated[str | None, Field(
+            description="Lucene query over term names, e.g. 'replication', 'oxido*', "
+            "'transport AND membrane'. None/'' = browse mode: list terms sorted by "
+            "gene_count DESC (score null). See docs://guide/conventions for Lucene scoring.",
+        )] = None,
+        ontology: Annotated[list[str] | str | None, Field(
+            description="Ontology key(s): 'go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', "
+            "'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', "
+            "'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', "
+            "'ncbifam', 'merops'. None = all 17. limit/offset apply per ontology.",
+        )] = None,
         summary: Annotated[bool, Field(
             description="When true, return only summary fields (results=[]).",
         )] = False,
         limit: Annotated[int, Field(
-            description="Max results.", ge=1,
+            description="Max results per ontology (returned <= limit x n_ontologies).", ge=1,
         )] = 5,
         offset: Annotated[int, Field(
-            description="Number of results to skip for pagination.", ge=0,
+            description="Number of results to skip per ontology (lockstep paging).", ge=0,
         )] = 0,
         level: Annotated[int | None, Field(
             description="Hierarchy level filter (0 = broadest). "
@@ -2557,9 +2630,9 @@ def register_tools(mcp: FastMCP):
             ge=0,
         )] = None,
         tree: Annotated[str | None, Field(
-            description="BRITE tree name filter (e.g. 'transporters'). "
-            "Only valid when ontology='brite'. See docs://guide/conventions for "
-            "the BRITE-tree scoping rule.",
+            description="BRITE tree name filter (e.g. 'transporters'). Applies to "
+            "'brite' only; raises if 'brite' is not in the ontology set. See "
+            "docs://guide/conventions for the BRITE-tree scoping rule.",
         )] = None,
         informative_only: Annotated[bool, Field(
             description="When True, exclude terms flagged uninformative in KG "
@@ -2568,24 +2641,46 @@ def register_tools(mcp: FastMCP):
             "Default False (opt-in).",
         )] = False,
         verbose: Annotated[bool, Field(
-            description="Include the per-row discussed_in_publications {doi, prominence, "
-            "evidence} list (KEGG pathways only). Default compact.",
+            description="Add description, level_kind, direct_gene_count, per-ontology "
+            "term columns (tcdb superfamily/metabolite_count, ncbifam family_type/"
+            "gene_symbol, merops family_class/catalytic_type/peptidase_gene_count) "
+            "and KEGG discussed_in_publications. Default compact.",
         )] = False,
         interpro_type: Annotated[_INTERPRO_TYPES | None, Field(
-            description="Restrict to this InterPro entry type. Only valid "
-                        "when ontology='interpro'.",
+            description="Restrict to this InterPro entry type. Applies to "
+                        "'interpro' only; raises if 'interpro' is not in the set.",
+        )] = None,
+        min_gene_count: Annotated[int | None, Field(
+            description="Keep terms with gene_count >= this (organism_gene_count "
+                        "when `organism` is set). Narrows browse mode.",
+            ge=0,
+        )] = None,
+        organism: Annotated[str | None, Field(
+            description="Organism preferred_name to scope counts to; rows gain "
+                        "organism_gene_count and browse sorts by it. Default: all organisms.",
         )] = None,
     ) -> SearchOntologyResponse:
-        """Search ontology terms by text — Lucene over term names only (no hierarchy traversal).
+        """Search or browse ontology terms — Lucene over term names (search) or a gene_count-sorted listing (browse); no hierarchy traversal.
 
-        Returns term IDs and `level` for use with `genes_by_ontology`. Supports
-        fuzzy (~), wildcards (*), exact phrases ("..."), boolean (AND, OR) —
-        see docs://guide/conventions for syntax + scoring.
+        Returns term IDs and `level` for use with `genes_by_ontology`. With
+        `search_text`, supports fuzzy (~), wildcards (*), exact phrases ("..."),
+        boolean (AND, OR) — see docs://guide/conventions for syntax + scoring.
+        Without `search_text` (browse), rows sort by `gene_count DESC`; narrow
+        with `level`, `tree`/`interpro_type`, `min_gene_count`, `organism`.
+
+        `ontology` accepts one key, a list, or None (all 17). `limit`/`offset`
+        apply PER ontology (lockstep paging); rows are grouped by ontology in
+        registry order, then score DESC (search) / gene_count DESC (browse).
+        `by_ontology` carries per-ontology truncation.
 
         [TRUST] `interpro_type` scopes InterPro terms to one entry type. See
-        docs://analysis/annotation_evidence for the full trust surface.
+        docs://analysis/annotation_evidence for the full trust surface, and
+        docs://ontologies/{key} for what each ontology means and how to read it.
 
-        Routing: chain term_ids into `genes_by_ontology` for gene discovery.
+        Routing: chain term_ids into `genes_by_ontology` for gene discovery;
+        `ontology_term_details(term_ids=[...])` for a term's hierarchy, bridges
+        and per-organism counts; `docs://ontologies/index` for the per-ontology
+        reference.
         """
         await ctx.info(f"search_ontology search_text={search_text!r} ontology={ontology}")
         try:
@@ -2597,16 +2692,249 @@ def register_tools(mcp: FastMCP):
                 informative_only=informative_only,
                 verbose=verbose,
                 interpro_type=interpro_type,
+                min_gene_count=min_gene_count,
+                organism=organism,
                 conn=conn,
             )
             results = [SearchOntologyResult(**r) for r in data["results"]]
-            return SearchOntologyResponse(**{**data, "results": results})
+            response = SearchOntologyResponse(**{**data, "results": results})
+            for w in response.warnings:
+                await ctx.warning(w)
+            if response.skipped_ontologies:
+                await ctx.warning(
+                    f"skipped_ontologies: {response.skipped_ontologies}")
+            return response
         except ValueError as e:
             await ctx.warning(f"search_ontology error: {e}")
             raise ToolError(str(e))
         except Exception as e:
             await ctx.error(f"search_ontology unexpected error: {e}")
             raise ToolError(f"Error in search_ontology: {e}")
+
+    # --- ontology_term_details ---
+
+    class OntologyTermRef(BaseModel):
+        id: str = Field(description="Term ID (e.g. 'tcdb:3.A')")
+        name: str | None = Field(default=None, description="Term name")
+        level: int | None = Field(default=None,
+            description="Hierarchy level of this term (0 = broadest)")
+
+    class OntologyTermLink(BaseModel):
+        rel: str = Field(description="Bridge edge type (e.g. 'Tcdb_family_has_pfam_domain')")
+        link_kind: Literal["composition", "membership", "router"] = Field(
+            description="'composition' (source term is built from target), "
+                        "'membership' (source belongs to target), 'router' "
+                        "(recall-biased cross-reference — never a function assignment).")
+        target_id: str = Field(description="Target term ID (e.g. 'pfam:PF00005')")
+        target_ontology: str = Field(description="Target ontology key (e.g. 'pfam')")
+        target_name: str | None = Field(default=None, description="Target term name")
+        props: dict | None = Field(default=None,
+            description="Edge properties (verbose only): curated_tcids, member_id_count, "
+                        "router_ambiguous (InterPro router links).")
+
+    class OntologyTermGenesByOrganism(BaseModel):
+        organism: str = Field(description="Organism preferred_name")
+        gene_count: int = Field(description="Genes reaching this term (subtree) in this organism")
+
+    class OntologyTermDetailsRow(SparseRow):
+        term_id: str = Field(description="Term ID as given (e.g. 'tcdb:3.A.1')")
+        ontology: str = Field(
+            description="Ontology key derived from the node label (e.g. 'tcdb'; "
+                        "PfamClan -> 'pfam'). See docs://ontologies/{key} for how to "
+                        "read this ontology.")
+        label: str = Field(description="Neo4j node label (e.g. 'TcdbFamily')")
+        name: str | None = Field(default=None, description="Term name")
+        description: str | None = Field(default=None,
+            description="Term description / definition (null when the ontology has none)")
+        level: int | None = Field(default=None,
+            description="Hierarchy level (0 = broadest); null on flat ontologies")
+        level_kind: str | None = Field(default=None,
+            description="What `level` measures, e.g. 'depth', 'tc_family'")
+        is_informative: bool | None = Field(default=None,
+            description="True iff term is not flagged is_uninformative")
+        gene_count: int | None = Field(default=None,
+            description="Subtree gene count across all organisms (precomputed)")
+        organism_count: int | None = Field(default=None,
+            description="Distinct organisms reaching this term (precomputed)")
+        direct_gene_count: int | None = Field(default=None,
+            description="Genes annotated directly to this term, excluding descendants "
+                        "(sparse: hierarchical ontologies)")
+        organism_gene_count: int | None = Field(default=None,
+            description="Subtree gene count in the requested `organism` (only when organism set)")
+        # term_details_compact — per-ontology native columns (sparse: strip rule)
+        code: str | None = Field(default=None,
+            description="Category code (sparse: cog_category, cyanorak_role, tigr_role)")
+        short_name: str | None = Field(default=None,
+            description="Pfam short name, e.g. 'ABC_tran' (sparse: pfam)")
+        tree: str | None = Field(default=None, description="BRITE tree name (sparse: brite)")
+        tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: brite)")
+        tcdb_id: str | None = Field(default=None, description="Bare TC number, e.g. '3.A.1' (sparse: tcdb)")
+        tc_class_id: str | None = Field(default=None, description="Parent TC class, e.g. '3.A' (sparse: tcdb)")
+        member_count: int | None = Field(default=None,
+            description="Child/member term count (sparse: tcdb, interpro, merops)")
+        superfamily: str | None = Field(default=None, description="TCDB superfamily label (sparse: tcdb)")
+        metabolite_count: int | None = Field(default=None,
+            description="Distinct metabolites attached (sparse: tcdb substrates; KEGG pathway chemistry)")
+        reaction_count: int | None = Field(default=None,
+            description="Reactions mapped to this KEGG pathway (sparse: kegg pathway terms)")
+        cazy_id: str | None = Field(default=None, description="CAZy family ID (sparse: cazy)")
+        psortb_id: str | None = Field(default=None, description="PSORTb localization ID (sparse: subcellular_localization)")
+        signalp_id: str | None = Field(default=None, description="SignalP type ID (sparse: signal_peptide_type)")
+        interpro_id: str | None = Field(default=None, description="Bare InterPro accession (sparse: interpro)")
+        interpro_type: str | None = Field(default=None,
+            description="InterPro entry type, e.g. 'FAMILY', 'DOMAIN' (sparse: interpro)")
+        ncbifam_id: str | None = Field(default=None, description="Bare NCBIfam accession (sparse: ncbifam)")
+        family_type: str | None = Field(default=None,
+            description="NCBIfam family type, e.g. 'equivalog' (sparse: ncbifam)")
+        gene_symbol: str | None = Field(default=None, description="NCBIfam gene symbol (sparse: ncbifam)")
+        merops_id: str | None = Field(default=None, description="Bare MEROPS family ID, e.g. 'S14' (sparse: merops)")
+        family_class: str | None = Field(default=None, description="MEROPS family class letter (sparse: merops)")
+        catalytic_type: str | None = Field(default=None, description="MEROPS catalytic type, e.g. 'Serine' (sparse: merops)")
+        peptidase_gene_count: int | None = Field(default=None,
+            description="Genes with a 'peptidase' call on this family (sparse: merops)")
+        peptidase_organism_count: int | None = Field(default=None,
+            description="Organisms with a 'peptidase' call on this family (sparse: merops)")
+        cleavage_summary: str | None = Field(default=None,
+            description="MEROPS cleavage-specificity summary (sparse: merops)")
+        cleavage_p1_residues: list[str] | str | None = Field(default=None,
+            description="MEROPS preferred P1 residues (sparse: merops)")
+        known_cleavage_count: int | None = Field(default=None,
+            description="Known cleavage sites recorded for this family (sparse: merops)")
+        # hierarchy + bridges
+        parents: list[OntologyTermRef] = Field(default_factory=list,
+            description="Direct parent terms ({id, name, level}); [] on roots / flat ontologies")
+        children: list[OntologyTermRef] = Field(default_factory=list,
+            description="Direct child terms ({id, name, level}), capped at 50 — see children_total")
+        children_total: int = Field(default=0, description="Total direct children (uncapped)")
+        children_truncated: bool = Field(default=False,
+            description="True when children_total > len(children)")
+        links_out: list[OntologyTermLink] = Field(default_factory=list,
+            description="Forward-only cross-ontology bridges "
+                        "({rel, link_kind, target_id, target_ontology, target_name}); "
+                        "filtered by link_kinds")
+        # verbose only
+        properties: dict | None = Field(default=None,
+            description="Every node property (verbose only)")
+        genes_by_organism: list[OntologyTermGenesByOrganism] | None = Field(default=None,
+            description="Subtree gene count per organism (verbose only; scoped to `organism` when set)")
+
+    class OntologyTermDetailsByOntology(BaseModel):
+        ontology: str = Field(description="Ontology key (e.g. 'tcdb')")
+        count: int = Field(description="Found terms from this ontology")
+
+    class OntologyTermDetailsByLinkKind(BaseModel):
+        link_kind: str = Field(description="'composition' / 'membership' / 'router'")
+        count: int = Field(description="links_out entries of this kind (across returned rows)")
+
+    class OntologyTermDetailsResponse(BaseModel):
+        total_matching: int = Field(description="Term IDs found in the KG (e.g. 5)")
+        returned: int = Field(description="Rows in this response (after limit/offset)")
+        offset: int = Field(default=0, description="Offset into the found rows")
+        truncated: bool = Field(description="True if total_matching > offset + returned")
+        not_found: list[str] = Field(default_factory=list,
+            description="Input term IDs with no node in the KG")
+        by_ontology: list[OntologyTermDetailsByOntology] = Field(default_factory=list,
+            description="Found terms per ontology")
+        links_out_total: int = Field(default=0,
+            description="Total links_out entries across returned rows")
+        by_link_kind: list[OntologyTermDetailsByLinkKind] = Field(default_factory=list,
+            description="links_out entries per link_kind")
+        warnings: list[str] = Field(default_factory=list,
+            description="Auto-warnings (e.g. router_ambiguous InterPro terms)")
+        results: list[OntologyTermDetailsRow] = Field(default_factory=list,
+            description="One row per found term, in input order")
+
+    @mcp.tool(
+        tags={"ontology"},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
+    )
+    async def ontology_term_details(
+        ctx: Context,
+        term_ids: Annotated[list[str], Field(
+            description="Self-prefixed term IDs, any ontology mix (e.g. 'go:0006979', "
+                        "'tcdb:3.A.1', 'merops.family:S14', 'interpro:IPR000362', "
+                        "'ncbifam:NF000812', 'pfam:PF00005', 'kegg.pathway:ko00010'). "
+                        "Rows return in input order.",
+        )],
+        organism: Annotated[str | None, Field(
+            description="Organism preferred_name to scope genes_by_organism to; rows "
+                        "gain organism_gene_count. Default: all organisms.",
+        )] = None,
+        link_kinds: Annotated[list[Literal["composition", "membership", "router"]] | None, Field(
+            description="Keep only links_out of these kinds. 'composition' = term built "
+                        "from target (tcdb/merops -> pfam); 'membership' = term belongs to "
+                        "target (pfam -> interpro, kegg -> brite); 'router' = recall-biased "
+                        "cross-ref (interpro -> ec/cazy). Default: all.",
+        )] = None,
+        verbose: Annotated[bool, Field(
+            description="Add `properties` (every node prop), `links_out[].props` "
+                        "(curated_tcids, member_id_count, router_ambiguous) and "
+                        "`genes_by_organism`. Default compact.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max rows (found terms) to return.", ge=1,
+        )] = 50,
+        offset: Annotated[int, Field(
+            description="Number of found rows to skip for pagination.", ge=0,
+        )] = 0,
+    ) -> OntologyTermDetailsResponse:
+        """Describe ontology terms in batch — identity, hierarchy (parents / children), gene reach and forward-only cross-ontology bridges, for any mix of the 17 ontologies.
+
+        Each row carries the term's name/description, `level` + `level_kind`,
+        `is_informative`, precomputed `gene_count` / `organism_count` /
+        `direct_gene_count`, the ontology's native columns (e.g. tcdb
+        `superfamily`, merops `catalytic_type`, interpro `interpro_type`;
+        absent props are stripped, not nulled), `parents[]`, `children[]`
+        (capped at 50, see `children_total`), and `links_out[]`.
+
+        Bridge-direction contract: `links_out` is forward-only. A
+        `composition` link means the source term is BUILT FROM the target
+        (TCDB family / MEROPS family -> Pfam domain, TCDB -> GO process);
+        a `membership` link means the source BELONGS TO the target (Pfam ->
+        InterPro entry, KEGG term -> BRITE category). A `router` link
+        (InterPro -> EC / CAZy) is a recall-biased cross-reference for
+        finding candidate terms — never use it to assign a gene a function;
+        verbose `router_ambiguous` flags InterPro entries whose router links
+        fan out or whose type is not FAMILY. Walk bridges only in the stored
+        direction.
+
+        IDs absent from the KG land in `not_found`. `organism` scopes
+        `genes_by_organism` and adds `organism_gene_count` per row.
+
+        Routing: `genes_by_ontology(term_ids=[...])` for the annotated genes;
+        `search_ontology` to find term IDs (browse or Lucene); target IDs in
+        `links_out` feed back into this tool for a bridge walk;
+        docs://ontologies/{key} for how each ontology is built and read.
+        """
+        await ctx.info(
+            f"ontology_term_details term_ids={len(term_ids)} organism={organism} "
+            f"link_kinds={link_kinds} verbose={verbose}")
+        if not term_ids:
+            raise ToolError("term_ids must not be empty.")
+        try:
+            conn = _conn(ctx)
+            data = api.ontology_term_details(
+                term_ids=term_ids, organism=organism, link_kinds=link_kinds,
+                verbose=verbose, limit=limit, offset=offset, conn=conn,
+            )
+            results = [OntologyTermDetailsRow(**r) for r in data["results"]]
+            response = OntologyTermDetailsResponse(**{**data, "results": results})
+            for w in response.warnings:
+                await ctx.warning(w)
+            if response.not_found:
+                await ctx.warning(
+                    f"{len(response.not_found)} term_ids not_found: "
+                    f"{response.not_found[:5]}")
+            await ctx.info(
+                f"Returning {response.returned}/{response.total_matching} terms, "
+                f"{response.links_out_total} links_out")
+            return response
+        except ValueError as e:
+            await ctx.warning(f"ontology_term_details error: {e}")
+            raise ToolError(str(e))
+        except Exception as e:
+            await ctx.error(f"ontology_term_details unexpected error: {e}")
+            raise ToolError(f"Error in ontology_term_details: {e}")
 
     # --- genes_by_ontology ---
 
