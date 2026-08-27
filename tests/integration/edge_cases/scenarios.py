@@ -753,8 +753,11 @@ def search_ontology_scenarios():
             "browse_empty_string_search_text",
             dict(search_text="", ontology="merops", level=1)),
         Scenario(
-            "browse_all_ontologies_summary",
-            dict(summary=True)),
+            # ontology=None fans out to all 17 registry keys in browse mode;
+            # limit=1 keeps one row per ontology (lockstep paging) so the
+            # envelope is populated, not a summary=True empty results list.
+            "browse_all_ontologies_fanout",
+            dict(ontology=None, limit=1)),
         Scenario(
             "multi_no_hits",
             dict(search_text="zzzznonexistentontologytermzzz",
