@@ -134,12 +134,19 @@ _EXPECTED_GUIDE_RESOURCES = {
 _EXPECTED_EXAMPLE_RESOURCES = {
     "docs://examples/pathway_enrichment.py",
     "docs://examples/metabolites.py",
+    # PR 3b: ontology_terms.py joins the served examples.
+    "docs://examples/ontology_terms.py",
+}
+# PR 3b: per-ontology reference (generated) served at docs://ontologies/{key}
+_EXPECTED_ONTOLOGY_RESOURCES = {
+    f"docs://ontologies/{p.stem}" for p in (_SKILLS_DIR / "ontologies").glob("*.md")
 }
 _EXPECTED_RESOURCES = (
     _EXPECTED_TOOL_RESOURCES
     | _EXPECTED_ANALYSIS_RESOURCES
     | _EXPECTED_GUIDE_RESOURCES
     | _EXPECTED_EXAMPLE_RESOURCES
+    | _EXPECTED_ONTOLOGY_RESOURCES
 )
 
 
@@ -192,3 +199,35 @@ class TestDocResources:
             resource = await mcp._local_provider.get_resource(uri)
             content = await resource.read()
             assert content, f"Empty content for {uri}"
+
+
+class TestOntologyDocResources:
+    """PR 3b: `_DOC_DIRS` gains docs://ontologies (design §9)."""
+
+    def test_doc_dirs_registers_ontologies(self):
+        from multiomics_explorer.mcp_server.server import _DOC_DIRS
+        assert "docs://ontologies" in _DOC_DIRS
+        doc_dir, desc = _DOC_DIRS["docs://ontologies"]
+        assert doc_dir == _SKILLS_DIR / "ontologies"
+        assert "{stem}" in desc
+
+    @pytest.mark.asyncio
+    async def test_index_and_all_17_keys_registered(self):
+        from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+        resources = await mcp._local_provider._list_resources()
+        uris = {str(r.uri) for r in resources}
+        assert "docs://ontologies/index" in uris
+        missing = {f"docs://ontologies/{k}" for k in ONTOLOGY_CONFIG} - uris
+        assert not missing, missing
+
+    @pytest.mark.asyncio
+    async def test_ontology_terms_example_registered(self):
+        resources = await mcp._local_provider._list_resources()
+        uris = {str(r.uri) for r in resources}
+        assert "docs://examples/ontology_terms.py" in uris
+
+    @pytest.mark.asyncio
+    async def test_ontology_resources_return_content(self):
+        resource = await mcp._local_provider.get_resource("docs://ontologies/merops")
+        content = await resource.read()
+        assert "MeropsFamily" in content

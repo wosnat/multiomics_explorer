@@ -264,11 +264,11 @@ class TestSearchOntologyContract:
     def test_result_keys(self, conn):
         result = api.search_ontology("DNA replication", "go_bp", conn=conn)
         # Annotation-trust surface (spec section 6): compact gains gene_count
-        # and organism_count. `ontology_type` is a multi-ontology column and is
-        # not emitted for a single-ontology call.
+        # and organism_count. `ontology_type` is on every compact row —
+        # single-ontology calls included (spec freeze notes v1.2).
         expected_keys = {
             "id", "name", "score", "level", "is_informative",
-            "gene_count", "organism_count",
+            "gene_count", "organism_count", "ontology_type",
         }
         assert len(result["results"]) >= 1
         assert set(result["results"][0].keys()) == expected_keys
@@ -1725,3 +1725,89 @@ class TestKGReleaseInfoLive:
         report = kg_release_info(conn)
         assert "deployment_role" in report["kg"]
         assert report["kg"]["deployment_role"] == "local-dev"
+
+
+
+# ---------------------------------------------------------------------------
+# PR 3b — term side: ontology_term_details + search_ontology browse / multi
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestOntologyTermDetailsContract:
+    _IDS = ["tcdb:3.A.1", "go:0006979", "bogus:xyz"]
+
+    def test_returns_dict_envelope(self, conn):
+        result = api.ontology_term_details(term_ids=self._IDS, conn=conn)
+        assert isinstance(result, dict)
+        for key in ("total_matching", "returned", "offset", "truncated",
+                    "not_found", "by_ontology", "links_out_total",
+                    "by_link_kind", "warnings", "results"):
+            assert key in result, key
+        assert result["not_found"] == ["bogus:xyz"]
+        assert result["total_matching"] == 2
+
+    def test_compact_row_keys(self, conn):
+        result = api.ontology_term_details(term_ids=self._IDS, conn=conn)
+        row = result["results"][0]
+        base = {
+            "term_id", "ontology", "label", "name", "description", "level",
+            "level_kind", "is_informative", "gene_count", "organism_count",
+            "direct_gene_count", "parents", "children", "children_total",
+            "children_truncated", "links_out",
+        }
+        assert base <= set(row)
+        assert "properties" not in row
+        assert "genes_by_organism" not in row
+        assert set(row["links_out"][0]) == {
+            "rel", "link_kind", "target_id", "target_ontology", "target_name"}
+
+    def test_verbose_row_keys(self, conn):
+        result = api.ontology_term_details(
+            term_ids=self._IDS, verbose=True, conn=conn)
+        row = result["results"][0]
+        assert isinstance(row["properties"], dict)
+        assert isinstance(row["genes_by_organism"], list)
+        assert set(row["genes_by_organism"][0]) == {"organism", "gene_count"}
+        assert "props" in row["links_out"][0]
+
+    def test_all_missing_returns_empty(self, conn):
+        result = api.ontology_term_details(term_ids=["nope:1"], conn=conn)
+        assert result["results"] == []
+        assert result["not_found"] == ["nope:1"]
+        assert result["total_matching"] == 0
+        assert result["by_ontology"] == []
+
+
+@pytest.mark.kg
+class TestSearchOntologyBrowseContract:
+    def test_browse_envelope_keys(self, conn):
+        result = api.search_ontology(ontology="merops", level=1, conn=conn)
+        for key in ("total_entries", "total_matching", "score_max",
+                    "score_median", "returned", "offset", "truncated",
+                    "mode", "by_ontology", "by_level", "skipped_ontologies",
+                    "warnings", "results"):
+            assert key in result, key
+        assert result["mode"] == "browse"
+
+    def test_browse_row_keys(self, conn):
+        result = api.search_ontology(ontology="merops", level=1, conn=conn)
+        expected_keys = {
+            "id", "name", "ontology_type", "score", "level", "is_informative",
+            "gene_count", "organism_count",
+        }
+        assert set(result["results"][0].keys()) == expected_keys
+        assert result["results"][0]["score"] is None
+
+    def test_organism_scope_row_keys(self, conn):
+        result = api.search_ontology(
+            ontology="merops", organism="Prochlorococcus MED4",
+            min_gene_count=1, conn=conn)
+        assert "organism_gene_count" in result["results"][0]
+
+    def test_multi_by_ontology_entry_keys(self, conn):
+        result = api.search_ontology(
+            "transport", ["go_bp", "tcdb"], limit=2, conn=conn)
+        assert result["mode"] == "search"
+        for entry in result["by_ontology"]:
+            assert set(entry) == {
+                "ontology", "total_entries", "total_matching", "score_max",
+                "returned", "truncated"}

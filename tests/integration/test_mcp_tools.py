@@ -3689,3 +3689,306 @@ class TestKGReleaseInfoMCPSmoke:
             "Dev KG should self-declare deployment_role='local-dev'; got "
             f"{response.kg.deployment_role!r}"
         )
+
+
+
+# ---------------------------------------------------------------------------
+# PR 3b — annotation-trust surface, term side: browse / multi-ontology
+# search and the `ontology_term_details` batch, live (spec §7.4, §7.5, §10.3,
+# §10.4; freeze notes v1.2).
+# ---------------------------------------------------------------------------
+
+_BATCH6_LIVE = [
+    "tcdb:3.A.1", "merops.family:S14", "interpro:IPR000362",
+    "ncbifam:NF000812", "go:0006979", "bogus:xyz",
+]
+
+
+@pytest.mark.kg
+class TestSearchOntologyBrowseLive:
+    """Spec §10.3: `search_ontology(ontology=['merops'], level=1)` returns
+    S33 first with gene_count=412."""
+
+    def test_merops_level1_browse(self, conn):
+        result = api.search_ontology(
+            ontology=["merops"], level=1, limit=5, conn=conn)
+        assert result["mode"] == "browse"
+        first = result["results"][0]
+        assert first["id"] == "merops.family:S33"
+        assert first["gene_count"] == 412
+        assert first["score"] is None
+        assert first["ontology_type"] == "merops"
+        assert result["score_max"] is None
+        assert result["by_level"]
+
+    def test_merops_level1_verified_top5(self, conn):
+        result = api.search_ontology(
+            ontology="merops", level=1, limit=5, conn=conn)
+        ids = [r["id"] for r in result["results"]]
+        assert ids == [
+            "merops.family:S33", "merops.family:S09", "merops.family:C26",
+            "merops.family:M38", "merops.family:C44",
+        ]
+        assert [r["gene_count"] for r in result["results"]] == [
+            412, 298, 272, 175, 169]
+
+    def test_browse_sorts_gene_count_desc(self, conn):
+        result = api.search_ontology(ontology="tcdb", limit=20, conn=conn)
+        counts = [r["gene_count"] for r in result["results"]]
+        assert counts == sorted(counts, reverse=True)
+
+    def test_browse_verbose_merops_carries_term_verbose(self, conn):
+        result = api.search_ontology(
+            ontology="merops", level=1, limit=3, verbose=True, conn=conn)
+        row = result["results"][0]
+        for col in ("description", "level_kind", "family_class",
+                    "catalytic_type", "peptidase_gene_count"):
+            assert col in row, col
+
+    def test_c26_dead_homolog_family(self, conn):
+        """C26 has 272 genes but only 41 peptidase calls (spec §7.4)."""
+        result = api.search_ontology(
+            ontology="merops", level=1, limit=5, verbose=True, conn=conn)
+        c26 = [r for r in result["results"] if r["id"] == "merops.family:C26"][0]
+        assert c26["peptidase_gene_count"] == 41
+
+    def test_browse_interpro_med4_scoped(self, conn):
+        """Spec §7.4 per-organism scope: MED4 HOMOLOGOUS_SUPERFAMILY >= 5
+        genes -> IPR027417 P-loop NTPase first with 119."""
+        result = api.search_ontology(
+            ontology="interpro", interpro_type="HOMOLOGOUS_SUPERFAMILY",
+            organism="Prochlorococcus MED4", min_gene_count=5, limit=5,
+            conn=conn)
+        first = result["results"][0]
+        assert first["id"] == "interpro:IPR027417"
+        assert first["organism_gene_count"] == 119
+        assert all(r["organism_gene_count"] >= 5 for r in result["results"])
+
+    def test_pfam_browse_reaches_both_labels(self, conn):
+        result = api.search_ontology(ontology="pfam", level=0, limit=5, conn=conn)
+        assert result["returned"] > 0
+        assert all(r["level"] == 0 for r in result["results"])
+
+    def test_browse_truncated_without_narrowing_warns(self, conn):
+        result = api.search_ontology(ontology="tcdb", limit=2, conn=conn)
+        assert result["truncated"] is True
+        assert any("browse" in w.lower() for w in result["warnings"])
+
+    def test_browse_with_level_does_not_warn(self, conn):
+        result = api.search_ontology(ontology="tcdb", level=2, limit=2, conn=conn)
+        assert not [w for w in result["warnings"] if "browse" in w.lower()]
+
+    def test_min_gene_count_bounds_rows(self, conn):
+        result = api.search_ontology(
+            ontology="merops", min_gene_count=100, limit=50, conn=conn)
+        assert result["returned"] > 0
+        assert all(r["gene_count"] >= 100 for r in result["results"])
+
+    @pytest.mark.asyncio
+    async def test_wrapper_browse(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        result = await tool_fns["search_ontology"](
+            ctx, ontology=["merops"], level=1, limit=5)
+        assert result.mode == "browse"
+        assert result.results[0].id == "merops.family:S33"
+        assert result.results[0].gene_count == 412
+
+
+@pytest.mark.kg
+class TestSearchOntologyMultiLive:
+    """Spec §10.3: `ontology=['go_bp','tcdb'], search_text='transport',
+    limit=5` returns <= 10 rows ordered by ontology then score with
+    `by_ontology` truncation flags."""
+
+    def test_go_bp_tcdb_transport(self, conn):
+        result = api.search_ontology(
+            "transport", ["go_bp", "tcdb"], limit=5, conn=conn)
+        assert result["mode"] == "search"
+        assert result["returned"] <= 10
+        types = [r["ontology_type"] for r in result["results"]]
+        assert types == sorted(types, key=["go_bp", "tcdb"].index)
+        by = {e["ontology"]: e for e in result["by_ontology"]}
+        assert set(by) == {"go_bp", "tcdb"}
+        for entry in by.values():
+            assert isinstance(entry["truncated"], bool)
+            assert entry["returned"] <= 5
+            assert entry["truncated"] == (entry["total_matching"] > 5)
+        assert result["total_matching"] == sum(
+            e["total_matching"] for e in result["by_ontology"])
+
+    def test_scores_desc_within_each_ontology(self, conn):
+        result = api.search_ontology(
+            "transport", ["go_bp", "tcdb"], limit=5, conn=conn)
+        for key in ("go_bp", "tcdb"):
+            scores = [r["score"] for r in result["results"]
+                      if r["ontology_type"] == key]
+            assert scores == sorted(scores, reverse=True)
+
+    def test_lockstep_paging_second_page(self, conn):
+        page1 = api.search_ontology(
+            "transport", ["go_bp", "tcdb"], limit=3, conn=conn)
+        page2 = api.search_ontology(
+            "transport", ["go_bp", "tcdb"], limit=3, offset=3, conn=conn)
+        ids1 = {r["id"] for r in page1["results"]}
+        ids2 = {r["id"] for r in page2["results"]}
+        assert not (ids1 & ids2)
+        assert page2["offset"] == 3
+
+    def test_none_fans_out_to_all_17(self, conn):
+        result = api.search_ontology("transport", None, limit=1, conn=conn)
+        assert len(result["by_ontology"]) == 17
+        assert result["returned"] <= 17
+
+    def test_facet_applies_to_owner_only(self, conn):
+        result = api.search_ontology(
+            "kinase", ["interpro", "kegg"], interpro_type="DOMAIN",
+            limit=5, conn=conn)
+        for row in result["results"]:
+            if row["ontology_type"] == "interpro":
+                assert row["interpro_type"] == "DOMAIN"
+        assert result["skipped_ontologies"] == []
+        assert isinstance(result["by_interpro_type"], list)
+
+    def test_facet_owner_absent_raises(self, conn):
+        with pytest.raises(ValueError, match="interpro_type"):
+            api.search_ontology(
+                "kinase", ["kegg", "tcdb"], interpro_type="DOMAIN", conn=conn)
+
+
+@pytest.mark.kg
+class TestOntologyTermDetailsLive:
+    """Spec §7.5 / §10.4 verified batch counts (freeze notes v1.2)."""
+
+    def _rows(self, conn, **kw):
+        result = api.ontology_term_details(
+            term_ids=list(_BATCH6_LIVE), conn=conn, **kw)
+        return result, {r["term_id"]: r for r in result["results"]}
+
+    def test_not_found(self, conn):
+        result, _ = self._rows(conn)
+        assert result["not_found"] == ["bogus:xyz"]
+        assert result["total_matching"] == 5
+        assert [r["term_id"] for r in result["results"]] == _BATCH6_LIVE[:5]
+
+    def test_tcdb_3_a_1(self, conn):
+        result, rows = self._rows(conn)
+        row = rows["tcdb:3.A.1"]
+        assert row["ontology"] == "tcdb"
+        assert len(row["parents"]) == 1
+        assert row["children_total"] == 55
+        assert len(row["children"]) == 50
+        assert row["children_truncated"] is True
+        assert len(row["links_out"]) == 129
+        assert {l["target_ontology"] for l in row["links_out"]} >= {"pfam"}
+        assert all(l["link_kind"] == "composition" for l in row["links_out"])
+
+    def test_merops_s14(self, conn):
+        _, rows = self._rows(conn)
+        row = rows["merops.family:S14"]
+        assert row["ontology"] == "merops"
+        assert len(row["parents"]) == 1
+        assert row["children_total"] == 0
+        assert len(row["links_out"]) == 1
+        assert row["links_out"][0]["target_id"] == "pfam:PF00574"
+        assert row["links_out"][0]["link_kind"] == "composition"
+
+    def test_interpro_ipr000362(self, conn):
+        _, rows = self._rows(conn, verbose=True)
+        row = rows["interpro:IPR000362"]
+        assert row["ontology"] == "interpro"
+        assert row["parents"] == []
+        assert row["children_total"] == 4
+        assert len(row["links_out"]) == 5
+        assert all(l["link_kind"] == "router" for l in row["links_out"])
+        assert all(l["target_ontology"] == "ec" for l in row["links_out"])
+        assert all(l["props"]["router_ambiguous"] is True
+                   for l in row["links_out"])
+
+    def test_ncbifam_nf000812(self, conn):
+        _, rows = self._rows(conn)
+        row = rows["ncbifam:NF000812"]
+        assert row["ontology"] == "ncbifam"
+        assert row["parents"] == [] and row["children_total"] == 0
+        assert row["links_out"] == []
+        assert "direct_gene_count" not in row
+
+    def test_go_0006979(self, conn):
+        _, rows = self._rows(conn)
+        row = rows["go:0006979"]
+        assert row["ontology"] == "go_bp"
+        assert row["level"] == 3
+        assert row["gene_count"] == 1050
+        assert row["organism_count"] == 42
+        assert row["direct_gene_count"] == 860
+        assert len(row["parents"]) == 1
+        assert row["children_total"] == 3
+        assert row["links_out"] == []
+        assert "member_count" not in row
+        assert "go_id" not in row
+
+    def test_envelope_rollups(self, conn):
+        result, _ = self._rows(conn)
+        assert result["links_out_total"] == 129 + 1 + 5
+        by_kind = {e["link_kind"]: e["count"] for e in result["by_link_kind"]}
+        assert by_kind == {"composition": 130, "router": 5}
+        by_ont = {e["ontology"]: e["count"] for e in result["by_ontology"]}
+        assert by_ont == {"tcdb": 1, "merops": 1, "interpro": 1,
+                          "ncbifam": 1, "go_bp": 1}
+
+    def test_link_kinds_filter(self, conn):
+        result, rows = self._rows(conn, link_kinds=["router"])
+        assert rows["tcdb:3.A.1"]["links_out"] == []
+        assert len(rows["interpro:IPR000362"]["links_out"]) == 5
+        assert result["links_out_total"] == 5
+
+    def test_organism_scope(self, conn):
+        _, rows = self._rows(conn, organism="Prochlorococcus MED4", verbose=True)
+        row = rows["tcdb:3.A.1"]
+        assert row["organism_gene_count"] > 0
+        assert row["genes_by_organism"] == [
+            {"organism": "Prochlorococcus MED4",
+             "gene_count": row["organism_gene_count"]}]
+
+    def test_verbose_genes_by_organism_covers_organism_count(self, conn):
+        _, rows = self._rows(conn, verbose=True)
+        row = rows["go:0006979"]
+        assert len(row["genes_by_organism"]) == row["organism_count"]
+        assert row["properties"]["id"] == "go:0006979"
+
+    def test_pagination(self, conn):
+        result = api.ontology_term_details(
+            term_ids=list(_BATCH6_LIVE), limit=2, offset=1, conn=conn)
+        assert [r["term_id"] for r in result["results"]] == [
+            "merops.family:S14", "interpro:IPR000362"]
+        assert result["truncated"] is True
+        assert result["not_found"] == ["bogus:xyz"]
+
+    def test_pfam_clan_is_pfam(self, conn):
+        result = api.ontology_term_details(
+            term_ids=["pfam:PF00005"], verbose=True, conn=conn)
+        row = result["results"][0]
+        assert row["ontology"] == "pfam"
+        assert "short_name" in row
+        parent = row["parents"][0]["id"] if row["parents"] else None
+        if parent:
+            clan = api.ontology_term_details(term_ids=[parent], conn=conn)
+            assert clan["results"][0]["ontology"] == "pfam"
+            assert clan["results"][0]["label"] == "PfamClan"
+
+    @pytest.mark.asyncio
+    async def test_wrapper_batch(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        result = await tool_fns["ontology_term_details"](
+            ctx, term_ids=list(_BATCH6_LIVE))
+        assert result.not_found == ["bogus:xyz"]
+        assert result.returned == 5
+        assert result.results[0].children_truncated is True
+        dumped = result.results[4].model_dump()
+        assert "tcdb_id" not in dumped
+
+    @pytest.mark.asyncio
+    async def test_wrapper_empty_term_ids_is_a_toolerror(self, tool_fns, conn):
+        from fastmcp.exceptions import ToolError
+        ctx = _ctx_with_conn(conn)
+        with pytest.raises(ToolError):
+            await tool_fns["ontology_term_details"](ctx, term_ids=[])

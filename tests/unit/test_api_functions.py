@@ -13149,3 +13149,997 @@ class TestGeneOverviewMeropsNcbifam:
     def test_envelope_has_ncbifam(self, mock_conn):
         result = self._run(mock_conn)
         assert result["has_ncbifam"] == 1
+
+
+# ===========================================================================
+# PR 3b — annotation-trust surface, term side (RED)
+#
+# `ontology_term_details` (design §6, spec §7.5), `search_ontology` browse
+# mode + multi-ontology lockstep paging (design §4 / §7, spec §7.4 / §13),
+# and the aggregate-only trust rollups on `genes_by_ontology` (spec §13 (i)).
+# ===========================================================================
+
+from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG as _CFG3B
+
+_BATCH6 = [
+    "tcdb:3.A.1", "merops.family:S14", "interpro:IPR000362",
+    "ncbifam:NF000812", "go:0006979", "bogus:xyz",
+]
+
+
+def _otd_link(rel, target_id, target_name="x", **props):
+    return {"rel": rel, "target_id": target_id, "target_name": target_name,
+            "props": props}
+
+
+def _otd_row(term_id, label=None, *, not_found=False, name=None, level=None,
+             level_kind=None, gene_count=10, organism_count=3,
+             direct_gene_count=None, parents=(), children=(),
+             children_total=None, links=(), extra=None, is_informative=True,
+             genes_by_organism=None, organism_gene_count=None):
+    """A builder row in the spec §7.5 shape (+ `labels`, flat compact props,
+    and the verbose `properties` map so either projection strategy works)."""
+    extra = dict(extra or {})
+    row = {
+        "term_id": term_id,
+        "not_found": not_found,
+        "labels": [label] if label else [],
+        "name": name, "description": None,
+        "level": level, "level_kind": level_kind,
+        "is_informative": is_informative,
+        "gene_count": gene_count, "organism_count": organism_count,
+        "direct_gene_count": direct_gene_count,
+        "parents": list(parents), "children": list(children),
+        "children_total": (
+            children_total if children_total is not None else len(children)),
+        "links_total": len(links), "links_out": list(links),
+    }
+    if not_found:
+        for k in ("name", "level", "gene_count", "organism_count"):
+            row[k] = None
+    row.update(extra)
+    props = {k: v for k, v in extra.items() if v is not None}
+    props.update({"id": term_id, "name": name, "level": level,
+                  "gene_count": gene_count, "organism_count": organism_count})
+    if direct_gene_count is not None:
+        props["direct_gene_count"] = direct_gene_count
+    row["properties"] = None if not_found else props
+    if genes_by_organism is not None:
+        row["genes_by_organism"] = genes_by_organism
+    if organism_gene_count is not None:
+        row["organism_gene_count"] = organism_gene_count
+    return row
+
+
+def _batch6_rows():
+    """The verified §7.5 batch, shrunk to a handful of links per term."""
+    tcdb_children = [{"id": f"tcdb:3.A.1.{i}", "name": f"fam {i}", "level": 3}
+                     for i in range(50)]
+    return [
+        _otd_row("tcdb:3.A.1", "TcdbFamily", name="ABC superfamily", level=2,
+                 level_kind="tc_family", gene_count=900, organism_count=45,
+                 direct_gene_count=120,
+                 parents=[{"id": "tcdb:3.A", "name": "P-P-bond", "level": 1}],
+                 children=tcdb_children, children_total=55,
+                 links=[
+                     _otd_link("Tcdb_family_has_pfam_domain", "pfam:PF00005",
+                               "ABC_tran", curated_tcids=["3.A.1.1.1"]),
+                     _otd_link("Tcdb_family_has_pfam_domain", "pfam:PF00664",
+                               "ABC_membrane", curated_tcids=["3.A.1.2.1"]),
+                     _otd_link("Tcdb_family_involved_in_biological_process",
+                               "go:0055085", "transmembrane transport",
+                               curated_tcids=["3.A.1.1.1"]),
+                 ],
+                 extra={"tcdb_id": "3.A.1", "tc_class_id": "3.A",
+                        "member_count": 55, "superfamily": "ABC",
+                        "metabolite_count": 40}),
+        _otd_row("merops.family:S14", "MeropsFamily", name="S14", level=1,
+                 gene_count=100, organism_count=44, direct_gene_count=100,
+                 parents=[{"id": "merops.clan:SK", "name": "SK", "level": 0}],
+                 links=[_otd_link("Merops_family_has_pfam_domain",
+                                  "pfam:PF00574", "CLP_protease",
+                                  member_id_count=5)],
+                 extra={"merops_id": "S14", "family_class": "S",
+                        "catalytic_type": "Serine",
+                        "peptidase_gene_count": 90}),
+        _otd_row("interpro:IPR000362", "InterproEntry",
+                 name="Fumarate lyase family", level=0, gene_count=60,
+                 organism_count=40, direct_gene_count=10,
+                 children=[{"id": f"interpro:IPR00{i}", "name": f"c{i}",
+                            "level": 1} for i in range(4)],
+                 links=[_otd_link("Interpro_entry_related_to_ec_number",
+                                  f"ec:4.3.2.{i}", f"EC {i}")
+                        for i in range(5)],
+                 extra={"interpro_id": "IPR000362",
+                        "interpro_type": "FAMILY", "member_count": 4}),
+        _otd_row("ncbifam:NF000812", "NcbifamFamily", name="NF000812",
+                 level=0, gene_count=5, organism_count=5,
+                 extra={"ncbifam_id": "NF000812", "family_type": "equivalog",
+                        "gene_symbol": None}),
+        _otd_row("go:0006979", "BiologicalProcess",
+                 name="response to oxidative stress", level=3,
+                 level_kind="depth", gene_count=1050, organism_count=42,
+                 direct_gene_count=860,
+                 parents=[{"id": "go:0006950", "name": "response to stress",
+                           "level": 2}],
+                 children=[{"id": f"go:000{i}", "name": f"c{i}", "level": 4}
+                           for i in range(3)],
+                 extra={"member_count": None, "go_id": None}),
+        _otd_row("bogus:xyz", None, not_found=True),
+    ]
+
+
+def _otd_run(mock_conn, rows=None, term_ids=None, **kwargs):
+    rows = _batch6_rows() if rows is None else rows
+    mock_conn.execute_query.return_value = rows
+    return api.ontology_term_details(
+        term_ids=list(_BATCH6) if term_ids is None else term_ids,
+        conn=mock_conn, **kwargs)
+
+
+def _by(rollup, key):
+    return {e[key]: e["count"] for e in rollup}
+
+
+class TestOntologyTermDetailsApi:
+    """Batch, cross-ontology, rows in input order, `not_found[]`."""
+
+    def test_importable_from_package(self):
+        from multiomics_explorer import ontology_term_details as fn
+        assert fn is api.ontology_term_details
+
+    def test_returns_dict(self, mock_conn):
+        assert isinstance(_otd_run(mock_conn), dict)
+
+    def test_empty_term_ids_raises_before_any_query(self, mock_conn):
+        with pytest.raises(ValueError, match="term_ids"):
+            api.ontology_term_details(term_ids=[], conn=mock_conn)
+        assert mock_conn.execute_query.call_count == 0
+
+    def test_unknown_link_kind_raises_before_any_query(self, mock_conn):
+        with pytest.raises(ValueError, match="link_kind"):
+            api.ontology_term_details(
+                term_ids=["tcdb:3.A.1"], link_kinds=["sideways"],
+                conn=mock_conn)
+        assert mock_conn.execute_query.call_count == 0
+
+    def test_term_ids_forwarded_as_param(self, mock_conn):
+        _otd_run(mock_conn)
+        assert mock_conn.execute_query.call_args.kwargs["term_ids"] == _BATCH6
+
+    def test_rows_in_input_order(self, mock_conn):
+        result = _otd_run(mock_conn)
+        assert [r["term_id"] for r in result["results"]] == _BATCH6[:5]
+
+    def test_not_found_lists_missing_ids(self, mock_conn):
+        result = _otd_run(mock_conn)
+        assert result["not_found"] == ["bogus:xyz"]
+        assert "bogus:xyz" not in {r["term_id"] for r in result["results"]}
+
+    def test_counts(self, mock_conn):
+        result = _otd_run(mock_conn)
+        assert result["total_matching"] == 5
+        assert result["returned"] == 5
+        assert result["offset"] == 0
+        assert result["truncated"] is False
+
+    @pytest.mark.parametrize("key", [
+        "total_matching", "returned", "offset", "truncated", "not_found",
+        "by_ontology", "links_out_total", "by_link_kind", "warnings",
+        "results",
+    ])
+    def test_envelope_key_present(self, mock_conn, key):
+        assert key in _otd_run(mock_conn)
+
+    def test_warnings_is_a_list(self, mock_conn):
+        assert isinstance(_otd_run(mock_conn)["warnings"], list)
+
+    # --- ontology / label derivation ---
+
+    def test_ontology_derived_from_node_label(self, mock_conn):
+        result = _otd_run(mock_conn)
+        got = {r["term_id"]: r["ontology"] for r in result["results"]}
+        assert got == {
+            "tcdb:3.A.1": "tcdb", "merops.family:S14": "merops",
+            "interpro:IPR000362": "interpro", "ncbifam:NF000812": "ncbifam",
+            "go:0006979": "go_bp",
+        }
+
+    def test_label_column_is_the_node_label(self, mock_conn):
+        result = _otd_run(mock_conn)
+        assert result["results"][0]["label"] == "TcdbFamily"
+
+    def test_pfam_clan_maps_to_pfam(self, mock_conn):
+        rows = [_otd_row("pfam.clan:CL0023", "PfamClan", name="P-loop_NTPase",
+                         level=0, extra={"short_name": "P-loop_NTPase"})]
+        result = _otd_run(mock_conn, rows=rows, term_ids=["pfam.clan:CL0023"])
+        assert result["results"][0]["ontology"] == "pfam"
+        assert result["results"][0]["label"] == "PfamClan"
+
+    def test_by_ontology_rollup(self, mock_conn):
+        result = _otd_run(mock_conn)
+        assert _by(result["by_ontology"], "ontology") == {
+            "tcdb": 1, "merops": 1, "interpro": 1, "ncbifam": 1, "go_bp": 1}
+
+    # --- compact columns ---
+
+    @pytest.mark.parametrize("col", [
+        "term_id", "ontology", "label", "name", "description", "level",
+        "level_kind", "is_informative", "gene_count", "organism_count",
+        "parents", "children", "children_total", "children_truncated",
+        "links_out",
+    ])
+    def test_compact_column_present(self, mock_conn, col):
+        row = _otd_run(mock_conn)["results"][0]
+        assert col in row
+
+    def test_go_row_matches_the_verified_batch(self, mock_conn):
+        row = [r for r in _otd_run(mock_conn)["results"]
+               if r["term_id"] == "go:0006979"][0]
+        assert row["level"] == 3
+        assert row["gene_count"] == 1050
+        assert row["organism_count"] == 42
+        assert len(row["parents"]) == 1
+        assert len(row["children"]) == 3
+        assert row["links_out"] == []
+
+    def test_term_details_compact_props_projected(self, mock_conn):
+        rows = {r["term_id"]: r for r in _otd_run(mock_conn)["results"]}
+        assert rows["tcdb:3.A.1"]["tcdb_id"] == "3.A.1"
+        assert rows["tcdb:3.A.1"]["tc_class_id"] == "3.A"
+        assert rows["merops.family:S14"]["family_class"] == "S"
+        assert rows["merops.family:S14"]["catalytic_type"] == "Serine"
+        assert rows["interpro:IPR000362"]["interpro_type"] == "FAMILY"
+        assert rows["ncbifam:NF000812"]["family_type"] == "equivalog"
+
+    def test_strip_rule_missing_prop_is_absent_not_null(self, mock_conn):
+        """Spec §13: GO nodes carry direct_gene_count only — no member_count,
+        no go_id. A missing term_details_compact prop is absent."""
+        rows = {r["term_id"]: r for r in _otd_run(mock_conn)["results"]}
+        go = rows["go:0006979"]
+        assert go["direct_gene_count"] == 860
+        assert "member_count" not in go
+        assert "go_id" not in go
+
+    def test_strip_rule_direct_gene_count_absent_on_flat_label(self, mock_conn):
+        rows = {r["term_id"]: r for r in _otd_run(mock_conn)["results"]}
+        assert "direct_gene_count" not in rows["ncbifam:NF000812"]
+
+    def test_strip_rule_does_not_leak_other_ontologies_props(self, mock_conn):
+        rows = {r["term_id"]: r for r in _otd_run(mock_conn)["results"]}
+        assert "tcdb_id" not in rows["merops.family:S14"]
+        assert "family_class" not in rows["tcdb:3.A.1"]
+
+    def test_owned_but_null_prop_survives(self, mock_conn):
+        """ncbifam owns gene_symbol; null there is information."""
+        rows = {r["term_id"]: r for r in _otd_run(mock_conn)["results"]}
+        assert "gene_symbol" in rows["ncbifam:NF000812"]
+        assert rows["ncbifam:NF000812"]["gene_symbol"] is None
+
+    # --- children cap ---
+
+    def test_children_truncated_flag(self, mock_conn):
+        rows = {r["term_id"]: r for r in _otd_run(mock_conn)["results"]}
+        assert rows["tcdb:3.A.1"]["children_total"] == 55
+        assert len(rows["tcdb:3.A.1"]["children"]) == 50
+        assert rows["tcdb:3.A.1"]["children_truncated"] is True
+        assert rows["interpro:IPR000362"]["children_truncated"] is False
+
+    def test_parent_child_entries_carry_id_name_level(self, mock_conn):
+        rows = {r["term_id"]: r for r in _otd_run(mock_conn)["results"]}
+        assert set(rows["tcdb:3.A.1"]["parents"][0]) == {"id", "name", "level"}
+        assert set(rows["tcdb:3.A.1"]["children"][0]) == {"id", "name", "level"}
+
+    # --- links_out ---
+
+    def test_compact_link_keys(self, mock_conn):
+        rows = {r["term_id"]: r for r in _otd_run(mock_conn)["results"]}
+        link = rows["tcdb:3.A.1"]["links_out"][0]
+        assert set(link) == {
+            "rel", "link_kind", "target_id", "target_ontology", "target_name"}
+
+    def test_link_kind_and_target_ontology_derived_from_registry(self, mock_conn):
+        rows = {r["term_id"]: r for r in _otd_run(mock_conn)["results"]}
+        tcdb_links = {(l["rel"], l["link_kind"], l["target_ontology"])
+                      for l in rows["tcdb:3.A.1"]["links_out"]}
+        assert ("Tcdb_family_has_pfam_domain", "composition", "pfam") in tcdb_links
+        assert ("Tcdb_family_involved_in_biological_process", "composition",
+                "go_bp") in tcdb_links
+        s14 = rows["merops.family:S14"]["links_out"][0]
+        assert (s14["link_kind"], s14["target_ontology"]) == ("composition", "pfam")
+        ipr = rows["interpro:IPR000362"]["links_out"][0]
+        assert (ipr["link_kind"], ipr["target_ontology"]) == ("router", "ec")
+
+    def test_links_out_total_and_by_link_kind(self, mock_conn):
+        result = _otd_run(mock_conn)
+        assert result["links_out_total"] == 9
+        assert _by(result["by_link_kind"], "link_kind") == {
+            "composition": 4, "router": 5}
+
+    def test_link_kinds_filter_is_applied_in_the_query(self, mock_conn):
+        _otd_run(mock_conn, link_kinds=["router"])
+        cypher = mock_conn.execute_query.call_args.args[0]
+        assert "Interpro_entry_related_to_ec_number" in cypher
+        assert "Tcdb_family_has_pfam_domain" not in cypher
+
+    def test_link_kinds_none_keeps_every_bridge_in_the_query(self, mock_conn):
+        _otd_run(mock_conn)
+        cypher = mock_conn.execute_query.call_args.args[0]
+        assert "Tcdb_family_has_pfam_domain" in cypher
+        assert "Kegg_term_in_brite_category" in cypher
+
+    # --- verbose ---
+
+    def test_compact_has_no_properties_or_genes_by_organism(self, mock_conn):
+        row = _otd_run(mock_conn)["results"][0]
+        assert "properties" not in row
+        assert "genes_by_organism" not in row
+
+    def test_verbose_adds_properties_map(self, mock_conn):
+        row = _otd_run(mock_conn, verbose=True)["results"][0]
+        assert row["properties"]["id"] == "tcdb:3.A.1"
+
+    def test_verbose_adds_genes_by_organism(self, mock_conn):
+        rows = _batch6_rows()
+        for r in rows:
+            r["genes_by_organism"] = [
+                {"organism": "Prochlorococcus MED4", "gene_count": 3}]
+        row = _otd_run(mock_conn, rows=rows, verbose=True)["results"][0]
+        assert row["genes_by_organism"] == [
+            {"organism": "Prochlorococcus MED4", "gene_count": 3}]
+
+    def test_verbose_link_props(self, mock_conn):
+        rows = {r["term_id"]: r
+                for r in _otd_run(mock_conn, verbose=True)["results"]}
+        assert rows["tcdb:3.A.1"]["links_out"][0]["props"]["curated_tcids"] == [
+            "3.A.1.1.1"]
+        assert rows["merops.family:S14"]["links_out"][0]["props"][
+            "member_id_count"] == 5
+
+    def test_router_ambiguous_true_when_out_degree_above_one(self, mock_conn):
+        rows = {r["term_id"]: r
+                for r in _otd_run(mock_conn, verbose=True)["results"]}
+        for link in rows["interpro:IPR000362"]["links_out"]:
+            assert link["props"]["router_ambiguous"] is True
+
+    def test_router_ambiguous_false_for_single_family_router(self, mock_conn):
+        rows = [_otd_row(
+            "interpro:IPR999999", "InterproEntry", name="x", level=0,
+            links=[_otd_link("Interpro_entry_related_to_ec_number",
+                             "ec:1.1.1.1")],
+            extra={"interpro_id": "IPR999999", "interpro_type": "FAMILY"})]
+        result = _otd_run(mock_conn, rows=rows,
+                          term_ids=["interpro:IPR999999"], verbose=True)
+        assert result["results"][0]["links_out"][0]["props"][
+            "router_ambiguous"] is False
+
+    def test_router_ambiguous_true_when_type_is_not_family(self, mock_conn):
+        rows = [_otd_row(
+            "interpro:IPR999998", "InterproEntry", name="x", level=0,
+            links=[_otd_link("Interpro_entry_related_to_ec_number",
+                             "ec:1.1.1.1")],
+            extra={"interpro_id": "IPR999998", "interpro_type": "DOMAIN"})]
+        result = _otd_run(mock_conn, rows=rows,
+                          term_ids=["interpro:IPR999998"], verbose=True)
+        assert result["results"][0]["links_out"][0]["props"][
+            "router_ambiguous"] is True
+
+    def test_router_ambiguous_not_on_composition_links(self, mock_conn):
+        rows = {r["term_id"]: r
+                for r in _otd_run(mock_conn, verbose=True)["results"]}
+        for link in rows["tcdb:3.A.1"]["links_out"]:
+            assert "router_ambiguous" not in link["props"]
+
+    def test_verbose_flag_forwarded_to_builder(self, mock_conn):
+        _otd_run(mock_conn, verbose=True)
+        cypher = mock_conn.execute_query.call_args.args[0]
+        assert "genes_by_organism" in cypher
+
+    # --- organism scope ---
+
+    def test_organism_forwarded_to_query(self, mock_conn):
+        _otd_run(mock_conn, organism="Prochlorococcus MED4")
+        params = mock_conn.execute_query.call_args.kwargs
+        assert "Prochlorococcus MED4" in params.values()
+
+    def test_organism_scope_adds_organism_gene_count(self, mock_conn):
+        rows = _batch6_rows()
+        for r in rows:
+            if not r["not_found"]:
+                r["organism_gene_count"] = 7
+        result = _otd_run(mock_conn, rows=rows,
+                          organism="Prochlorococcus MED4")
+        assert result["results"][0]["organism_gene_count"] == 7
+
+    def test_no_organism_no_organism_gene_count(self, mock_conn):
+        row = _otd_run(mock_conn)["results"][0]
+        assert "organism_gene_count" not in row
+
+    # --- pagination over the row list ---
+
+    def test_limit_and_offset_paginate_found_rows(self, mock_conn):
+        result = _otd_run(mock_conn, limit=2, offset=1)
+        assert [r["term_id"] for r in result["results"]] == [
+            "merops.family:S14", "interpro:IPR000362"]
+        assert result["returned"] == 2
+        assert result["offset"] == 1
+        assert result["truncated"] is True
+        assert result["total_matching"] == 5
+        assert result["not_found"] == ["bogus:xyz"]
+
+    def test_offset_beyond_found_rows(self, mock_conn):
+        result = _otd_run(mock_conn, offset=50)
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["truncated"] is False
+        assert result["total_matching"] == 5
+
+    def test_rollups_describe_the_full_batch_not_the_page(self, mock_conn):
+        result = _otd_run(mock_conn, limit=1)
+        assert result["links_out_total"] == 9
+        assert sum(_by(result["by_ontology"], "ontology").values()) == 5
+
+    def test_all_missing(self, mock_conn):
+        rows = [_otd_row("a:1", None, not_found=True),
+                _otd_row("b:2", None, not_found=True)]
+        result = _otd_run(mock_conn, rows=rows, term_ids=["a:1", "b:2"])
+        assert result["not_found"] == ["a:1", "b:2"]
+        assert result["results"] == []
+        assert result["total_matching"] == 0
+        assert result["by_ontology"] == []
+        assert result["links_out_total"] == 0
+
+
+# ---------------------------------------------------------------------------
+# search_ontology — browse mode + multi-ontology (PR 3b)
+# ---------------------------------------------------------------------------
+
+def _so_summary(total_entries=100, total_matching=1, score_max=5.0,
+                score_median=3.0, by_level=None):
+    return {
+        "total_entries": total_entries, "total_matching": total_matching,
+        "score_max": score_max, "score_median": score_median,
+        "by_level": by_level if by_level is not None else [],
+    }
+
+
+def _so_row(id_, name="x", score=5.0, level=1, **extra):
+    row = {"id": id_, "name": name, "score": score, "level": level,
+           "tree": None, "tree_code": None, "is_informative": True,
+           "gene_count": 10, "organism_count": 4}
+    row.update(extra)
+    return row
+
+
+def _so_dispatch(mock_conn, per_ontology):
+    """Route by ontology: the fulltext index name (search) or the label
+    (browse) identifies the ontology; `total_entries` marks the summary.
+    Returns the list of (cypher, params) calls for assertions."""
+    calls = []
+
+    def _exec(cypher, **params):
+        calls.append((cypher, params))
+        for key, (summary, rows) in per_ontology.items():
+            cfg = _CFG3B[key]
+            labels = [cfg["label"]] + (
+                [cfg["parent_label"]] if "parent_label" in cfg else [])
+            hit = cfg["fulltext_index"] in cypher or any(
+                f"t:{lab}" in cypher for lab in labels)
+            if hit:
+                return [summary] if "total_entries" in cypher else rows
+        if "total_entries" in cypher:
+            return [_so_summary(total_entries=0, total_matching=0,
+                                score_max=None, score_median=None)]
+        return []
+
+    mock_conn.execute_query.side_effect = _exec
+    return calls
+
+
+def _is_detail(cypher):
+    return "total_entries" not in cypher
+
+
+class TestSearchOntologyBrowseApi:
+    """Spec §7.4 / §13: `search_text` None / '' -> browse."""
+
+    def _merops(self, mock_conn, total=60, rows=None, by_level=None):
+        rows = rows if rows is not None else [
+            _so_row("merops.family:S33", "S33", score=None, gene_count=412),
+            _so_row("merops.family:S09", "S09", score=None, gene_count=298),
+        ]
+        return _so_dispatch(mock_conn, {"merops": (
+            _so_summary(total_entries=300, total_matching=total,
+                        score_max=None, score_median=None,
+                        by_level=by_level if by_level is not None else [
+                            {"level": 1, "count": total}]),
+            rows)})
+
+    def test_no_search_text_is_browse(self, mock_conn):
+        calls = self._merops(mock_conn)
+        result = api.search_ontology(ontology="merops", level=1, conn=mock_conn)
+        assert result["mode"] == "browse"
+        assert all("db.index.fulltext" not in c for c, _ in calls)
+
+    def test_empty_search_text_is_browse_not_a_raise(self, mock_conn):
+        self._merops(mock_conn)
+        result = api.search_ontology("", "merops", level=1, conn=mock_conn)
+        assert result["mode"] == "browse"
+
+    def test_whitespace_search_text_is_browse(self, mock_conn):
+        self._merops(mock_conn)
+        result = api.search_ontology("   ", "merops", level=1, conn=mock_conn)
+        assert result["mode"] == "browse"
+
+    def test_search_mode_when_text_given(self, mock_conn):
+        calls = _so_dispatch(mock_conn, {"merops": (
+            _so_summary(), [_so_row("merops.family:S33")])})
+        result = api.search_ontology("protease", "merops", conn=mock_conn)
+        assert result["mode"] == "search"
+        assert any("db.index.fulltext" in c for c, _ in calls)
+
+    def test_browse_rows_carry_null_score(self, mock_conn):
+        self._merops(mock_conn)
+        result = api.search_ontology(ontology="merops", level=1, conn=mock_conn)
+        assert result["results"][0]["score"] is None
+        assert result["score_max"] is None
+        assert result["score_median"] is None
+
+    def test_browse_rows_keep_builder_order(self, mock_conn):
+        self._merops(mock_conn)
+        result = api.search_ontology(ontology="merops", level=1, conn=mock_conn)
+        assert result["results"][0]["id"] == "merops.family:S33"
+        assert result["results"][0]["gene_count"] == 412
+
+    def test_browse_rows_carry_ontology_type(self, mock_conn):
+        self._merops(mock_conn)
+        result = api.search_ontology(ontology="merops", level=1, conn=mock_conn)
+        assert all(r["ontology_type"] == "merops" for r in result["results"])
+
+    def test_browse_by_level_over_full_match(self, mock_conn):
+        self._merops(mock_conn, by_level=[{"level": 1, "count": 60}])
+        result = api.search_ontology(ontology="merops", level=1, conn=mock_conn)
+        assert result["by_level"] == [{"level": 1, "count": 60}]
+
+    def test_search_mode_by_level_is_empty(self, mock_conn):
+        _so_dispatch(mock_conn, {"merops": (
+            _so_summary(), [_so_row("merops.family:S33")])})
+        result = api.search_ontology("protease", "merops", conn=mock_conn)
+        assert result["by_level"] == []
+
+    def test_level_forwarded(self, mock_conn):
+        calls = self._merops(mock_conn)
+        api.search_ontology(ontology="merops", level=1, conn=mock_conn)
+        assert all(p.get("level") == 1 for _, p in calls)
+
+    def test_min_gene_count_forwarded(self, mock_conn):
+        calls = self._merops(mock_conn)
+        api.search_ontology(ontology="merops", min_gene_count=5, conn=mock_conn)
+        assert all(p.get("min_gene_count") == 5 for _, p in calls)
+
+    def test_organism_forwarded(self, mock_conn):
+        calls = self._merops(mock_conn)
+        api.search_ontology(
+            ontology="merops", organism="Prochlorococcus MED4", conn=mock_conn)
+        assert all("Prochlorococcus MED4" in p.values() for _, p in calls)
+        assert all("org_gene_count" in c for c, _ in calls if _is_detail(c))
+
+    def test_organism_scope_rows_carry_organism_gene_count(self, mock_conn):
+        self._merops(mock_conn, rows=[
+            _so_row("merops.family:S33", score=None, organism_gene_count=9)])
+        result = api.search_ontology(
+            ontology="merops", organism="Prochlorococcus MED4", conn=mock_conn)
+        assert result["results"][0]["organism_gene_count"] == 9
+
+    def test_no_organism_no_organism_gene_count(self, mock_conn):
+        self._merops(mock_conn)
+        result = api.search_ontology(ontology="merops", conn=mock_conn)
+        assert "organism_gene_count" not in result["results"][0]
+
+    def test_flat_envelope_keys_survive(self, mock_conn):
+        self._merops(mock_conn)
+        result = api.search_ontology(ontology="merops", level=1, conn=mock_conn)
+        for key in ("total_entries", "total_matching", "score_max",
+                    "score_median", "returned", "offset", "truncated"):
+            assert key in result, key
+        assert result["total_entries"] == 300
+        assert result["total_matching"] == 60
+        assert result["returned"] == 2
+        assert result["truncated"] is True
+
+    @pytest.mark.parametrize("key", [
+        "mode", "by_ontology", "by_level", "skipped_ontologies", "warnings",
+    ])
+    def test_new_envelope_key_on_single_ontology_call(self, mock_conn, key):
+        self._merops(mock_conn)
+        assert key in api.search_ontology(ontology="merops", conn=mock_conn)
+
+    # --- auto-warning: browse truncated without narrowing ---
+
+    def test_browse_truncated_without_narrowing_warns(self, mock_conn):
+        self._merops(mock_conn, total=60)
+        result = api.search_ontology(ontology="merops", limit=2, conn=mock_conn)
+        assert result["truncated"] is True
+        assert result["warnings"], "expected a browse-truncation warning"
+        assert "browse" in " ".join(result["warnings"]).lower()
+
+    @pytest.mark.parametrize("narrowing", [
+        {"level": 1}, {"min_gene_count": 5},
+        {"organism": "Prochlorococcus MED4"},
+    ])
+    def test_browse_truncated_with_narrowing_does_not_warn(
+            self, mock_conn, narrowing):
+        self._merops(mock_conn, total=60)
+        result = api.search_ontology(
+            ontology="merops", limit=2, conn=mock_conn, **narrowing)
+        assert result["truncated"] is True
+        assert not [w for w in result["warnings"] if "browse" in w.lower()]
+
+    def test_interpro_facet_is_narrowing(self, mock_conn):
+        _so_dispatch(mock_conn, {"interpro": (
+            _so_summary(total_matching=60, score_max=None, score_median=None),
+            [_so_row("interpro:IPR027417", score=None,
+                     interpro_type="HOMOLOGOUS_SUPERFAMILY")])})
+        result = api.search_ontology(
+            ontology="interpro", interpro_type="HOMOLOGOUS_SUPERFAMILY",
+            limit=1, conn=mock_conn)
+        assert result["truncated"] is True
+        assert not [w for w in result["warnings"] if "browse" in w.lower()]
+
+    def test_browse_not_truncated_does_not_warn(self, mock_conn):
+        self._merops(mock_conn, total=2)
+        result = api.search_ontology(ontology="merops", limit=10, conn=mock_conn)
+        assert result["truncated"] is False
+        assert result["warnings"] == []
+
+    def test_search_mode_never_emits_browse_warning(self, mock_conn):
+        _so_dispatch(mock_conn, {"merops": (
+            _so_summary(total_matching=60), [_so_row("merops.family:S33")])})
+        result = api.search_ontology(
+            "protease", "merops", limit=1, conn=mock_conn)
+        assert result["truncated"] is True
+        assert not [w for w in result["warnings"] if "browse" in w.lower()]
+
+    def test_summary_browse_runs_no_detail_query(self, mock_conn):
+        calls = self._merops(mock_conn)
+        result = api.search_ontology(
+            ontology="merops", level=1, summary=True, conn=mock_conn)
+        assert result["results"] == []
+        assert result["mode"] == "browse"
+        assert all(not _is_detail(c) for c, _ in calls)
+
+    def test_pfam_browse_hits_both_labels(self, mock_conn):
+        calls = _so_dispatch(mock_conn, {"pfam": (
+            _so_summary(score_max=None, score_median=None),
+            [_so_row("pfam.clan:CL0023", score=None, level=0)])})
+        result = api.search_ontology(ontology="pfam", conn=mock_conn)
+        assert result["mode"] == "browse"
+        assert any("t:PfamClan" in c for c, _ in calls)
+
+
+class TestSearchOntologyMultiApi:
+    """Design §4 / §7: `ontology: str | list[str] | None`, api-layer fan-out,
+    config-order rows, lockstep per-ontology paging."""
+
+    def _go_tcdb(self, mock_conn, go_total=40, tcdb_total=3):
+        return _so_dispatch(mock_conn, {
+            "go_bp": (
+                _so_summary(total_entries=1000, total_matching=go_total,
+                            score_max=9.0, score_median=4.0),
+                [_so_row(f"go:00{i}", score=9.0 - i, level=3)
+                 for i in range(5)]),
+            "tcdb": (
+                _so_summary(total_entries=500, total_matching=tcdb_total,
+                            score_max=6.0, score_median=5.0),
+                [_so_row(f"tcdb:3.A.{i}", score=6.0 - i, level=2)
+                 for i in range(3)]),
+        })
+
+    def test_list_is_accepted(self, mock_conn):
+        self._go_tcdb(mock_conn)
+        result = api.search_ontology(
+            "transport", ["go_bp", "tcdb"], limit=5, conn=mock_conn)
+        assert isinstance(result, dict)
+
+    def test_rows_ordered_by_ontology_config_order_then_score(self, mock_conn):
+        self._go_tcdb(mock_conn)
+        result = api.search_ontology(
+            "transport", ["tcdb", "go_bp"], limit=5, conn=mock_conn)
+        types = [r["ontology_type"] for r in result["results"]]
+        assert types == ["go_bp"] * 5 + ["tcdb"] * 3
+        go_scores = [r["score"] for r in result["results"] if r["ontology_type"] == "go_bp"]
+        assert go_scores == sorted(go_scores, reverse=True)
+
+    def test_returned_is_bounded_by_limit_times_n(self, mock_conn):
+        self._go_tcdb(mock_conn)
+        result = api.search_ontology(
+            "transport", ["go_bp", "tcdb"], limit=5, conn=mock_conn)
+        assert result["returned"] == 8
+        assert result["returned"] <= 5 * 2
+
+    def test_limit_and_offset_apply_per_ontology(self, mock_conn):
+        """Lockstep paging: every ontology's detail query gets the same
+        LIMIT / SKIP — never a global slice."""
+        calls = self._go_tcdb(mock_conn)
+        api.search_ontology(
+            "transport", ["go_bp", "tcdb"], limit=5, offset=5, conn=mock_conn)
+        detail = [p for c, p in calls if _is_detail(c)]
+        assert len(detail) == 2
+        assert all(p["limit"] == 5 for p in detail)
+        assert all(p["offset"] == 5 for p in detail)
+
+    def test_one_summary_and_one_detail_per_ontology(self, mock_conn):
+        calls = self._go_tcdb(mock_conn)
+        api.search_ontology("transport", ["go_bp", "tcdb"], limit=5, conn=mock_conn)
+        assert len(calls) == 4
+
+    def test_by_ontology_shape_and_order(self, mock_conn):
+        self._go_tcdb(mock_conn)
+        result = api.search_ontology(
+            "transport", ["tcdb", "go_bp"], limit=5, conn=mock_conn)
+        assert [e["ontology"] for e in result["by_ontology"]] == ["go_bp", "tcdb"]
+        for entry in result["by_ontology"]:
+            assert set(entry) == {
+                "ontology", "total_entries", "total_matching", "score_max",
+                "returned", "truncated"}
+
+    def test_by_ontology_truncation_flags(self, mock_conn):
+        self._go_tcdb(mock_conn, go_total=40, tcdb_total=3)
+        result = api.search_ontology(
+            "transport", ["go_bp", "tcdb"], limit=5, conn=mock_conn)
+        by = {e["ontology"]: e for e in result["by_ontology"]}
+        assert by["go_bp"]["truncated"] is True
+        assert by["go_bp"]["returned"] == 5
+        assert by["go_bp"]["total_matching"] == 40
+        assert by["tcdb"]["truncated"] is False
+        assert by["tcdb"]["returned"] == 3
+
+    def test_flat_keys_are_sums_and_max_across_ontologies(self, mock_conn):
+        self._go_tcdb(mock_conn)
+        result = api.search_ontology(
+            "transport", ["go_bp", "tcdb"], limit=5, conn=mock_conn)
+        assert result["total_entries"] == 1500
+        assert result["total_matching"] == 43
+        assert result["score_max"] == 9.0
+        assert result["returned"] == 8
+        assert result["truncated"] is True
+        assert result["offset"] == 0
+
+    def test_mode_is_search_with_text(self, mock_conn):
+        self._go_tcdb(mock_conn)
+        result = api.search_ontology(
+            "transport", ["go_bp", "tcdb"], limit=5, conn=mock_conn)
+        assert result["mode"] == "search"
+        assert result["skipped_ontologies"] == []
+        assert result["warnings"] == []
+
+    def test_multi_browse(self, mock_conn):
+        calls = _so_dispatch(mock_conn, {
+            "merops": (_so_summary(score_max=None, score_median=None,
+                                   by_level=[{"level": 1, "count": 1}]),
+                       [_so_row("merops.family:S33", score=None)]),
+            "tcdb": (_so_summary(score_max=None, score_median=None,
+                                 by_level=[{"level": 2, "count": 1}]),
+                     [_so_row("tcdb:3.A.1", score=None, level=2)]),
+        })
+        result = api.search_ontology(
+            ontology=["tcdb", "merops"], conn=mock_conn)
+        assert result["mode"] == "browse"
+        assert all("db.index.fulltext" not in c for c, _ in calls)
+        assert [r["ontology_type"] for r in result["results"]] == ["tcdb", "merops"]
+        assert result["score_max"] is None
+        levels = {e["level"] for e in result["by_level"]}
+        assert levels == {1, 2}
+
+    def test_none_means_all_17_in_config_order(self, mock_conn):
+        calls = _so_dispatch(mock_conn, {})
+        result = api.search_ontology("transport", None, limit=5, conn=mock_conn)
+        summaries = [c for c, _ in calls if not _is_detail(c)]
+        assert len(summaries) == 17
+        assert [e["ontology"] for e in result["by_ontology"]] == list(_CFG3B)
+
+    def test_ontology_kwarg_defaults_to_all(self, mock_conn):
+        calls = _so_dispatch(mock_conn, {})
+        api.search_ontology("transport", limit=5, conn=mock_conn)
+        assert len([c for c, _ in calls if not _is_detail(c)]) == 17
+
+    def test_single_str_still_works_and_carries_ontology_type(self, mock_conn):
+        self._go_tcdb(mock_conn)
+        result = api.search_ontology("transport", "tcdb", limit=5, conn=mock_conn)
+        assert result["returned"] == 3
+        assert all(r["ontology_type"] == "tcdb" for r in result["results"])
+        assert [e["ontology"] for e in result["by_ontology"]] == ["tcdb"]
+        assert result["total_entries"] == 500
+
+    def test_single_ontology_summary_still_one_query(self, mock_conn):
+        calls = self._go_tcdb(mock_conn)
+        result = api.search_ontology(
+            "transport", "tcdb", summary=True, conn=mock_conn)
+        assert result["results"] == []
+        assert len(calls) == 1
+
+    def test_duplicates_in_list_are_collapsed(self, mock_conn):
+        calls = self._go_tcdb(mock_conn)
+        result = api.search_ontology(
+            "transport", ["tcdb", "tcdb"], limit=5, conn=mock_conn)
+        assert [e["ontology"] for e in result["by_ontology"]] == ["tcdb"]
+        assert len(calls) == 2
+
+    def test_unknown_name_in_list_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="Invalid ontology"):
+            api.search_ontology(
+                "transport", ["go_bp", "nope"], conn=mock_conn)
+        assert mock_conn.execute_query.call_count == 0
+
+    def test_empty_list_means_all(self, mock_conn):
+        calls = _so_dispatch(mock_conn, {})
+        api.search_ontology("transport", [], limit=5, conn=mock_conn)
+        assert len([c for c, _ in calls if not _is_detail(c)]) == 17
+
+    # --- facet skip/raise matrix ---
+
+    def test_facet_owner_absent_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="interpro_type"):
+            api.search_ontology(
+                "kinase", ["kegg", "tcdb"], interpro_type="DOMAIN",
+                conn=mock_conn)
+        assert mock_conn.execute_query.call_count == 0
+
+    def test_tree_owner_absent_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="tree"):
+            api.search_ontology(
+                "transport", ["kegg", "tcdb"], tree="transporters",
+                conn=mock_conn)
+
+    def test_facet_applies_to_owner_only(self, mock_conn):
+        calls = _so_dispatch(mock_conn, {
+            "interpro": (_so_summary(), [_so_row("interpro:IPR1", interpro_type="DOMAIN")]),
+            "kegg": (_so_summary(), [_so_row("kegg.pathway:ko00010")]),
+        })
+        result = api.search_ontology(
+            "kinase", ["interpro", "kegg"], interpro_type="DOMAIN",
+            limit=5, conn=mock_conn)
+        for cypher, params in calls:
+            if "interproEntryFullText" in cypher:
+                assert params.get("interpro_type") == "DOMAIN"
+            else:
+                assert "interpro_type" not in params
+        assert result["skipped_ontologies"] == []
+
+    def test_tree_applies_to_brite_only(self, mock_conn):
+        calls = _so_dispatch(mock_conn, {
+            "brite": (_so_summary(), [_so_row("brite:br01601", tree="transporters",
+                                                tree_code="br01601")]),
+            "kegg": (_so_summary(), [_so_row("kegg.pathway:ko00010")]),
+        })
+        api.search_ontology(
+            "transport", ["brite", "kegg"], tree="transporters",
+            limit=5, conn=mock_conn)
+        for cypher, params in calls:
+            if "briteCategoryFullText" in cypher:
+                assert params.get("tree") == "transporters"
+            else:
+                assert "tree" not in params
+
+    def test_by_interpro_type_present_when_interpro_in_set(self, mock_conn):
+        _so_dispatch(mock_conn, {
+            "interpro": (_so_summary(), [_so_row("interpro:IPR1", interpro_type="DOMAIN")]),
+        })
+        result = api.search_ontology(
+            "kinase", ["interpro", "kegg"], limit=5, conn=mock_conn)
+        assert isinstance(result["by_interpro_type"], list)
+
+    def test_by_family_type_present_when_ncbifam_in_set(self, mock_conn):
+        _so_dispatch(mock_conn, {
+            "ncbifam": (_so_summary(), [_so_row("ncbifam:NF000812", family_type="equivalog")]),
+        })
+        result = api.search_ontology(
+            "protein", ["ncbifam", "kegg"], limit=5, conn=mock_conn)
+        assert isinstance(result["by_family_type"], list)
+
+    def test_lucene_retry_is_per_ontology(self, mock_conn):
+        """A Lucene parse error on one ontology retries that ontology with
+        the escaped query and leaves the others untouched."""
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        state = {"failed": False}
+
+        def _exec(cypher, **params):
+            if "tcdbFamilyFullText" in cypher and not state["failed"]:
+                state["failed"] = True
+                raise Neo4jClientError("bad")
+            if "total_entries" in cypher:
+                return [_so_summary(total_matching=1)]
+            return [_so_row("x:1")]
+
+        mock_conn.execute_query.side_effect = _exec
+        result = api.search_ontology(
+            "bad+query", ["go_bp", "tcdb"], limit=5, conn=mock_conn)
+        assert result["returned"] == 2
+
+
+class TestGenesByOntologyAggregateRollups:
+    """Spec §13 (i): the full-match trust rollups on a paged call come from
+    the aggregate-only builder — the detail scan runs exactly once."""
+
+    _AGG = {
+        "by_evidence": [{"evidence": "curated", "count": 5},
+                        {"evidence": "homology", "count": 2}],
+        "by_tier": [{"tier": 1, "count": 5}, {"tier": "null", "count": 2}],
+        "by_sources": [{"source": "eggnog", "count": 7},
+                       {"source": "tcdb", "count": 5}],
+        "by_call_class": [],
+        "evidence_score_stats": {"min": 0.2, "median": 0.7, "max": 1.0,
+                                 "n_null": 2},
+    }
+
+    def _rows(self):
+        return [
+            {"locus_tag": "PMM0392", "gene_name": None, "product": None,
+             "gene_category": "Transport", "term_id": "tcdb:3.A.1",
+             "term_name": "ABC superfamily", "level": 2, "is_informative": True,
+             "evidence": "homology", "sources": ["eggnog"],
+             "evidence_score": 0.6, "tier": None},
+        ]
+
+    def _run(self, mock_conn, calls=None, **kwargs):
+        rows = self._rows()
+        rules = [("by_evidence", [dict(self._AGG)])] + _gbo_rules(rows)
+        seen = calls if calls is not None else []
+
+        def _exec(cypher, **params):
+            seen.append((cypher, params))
+            for needle, out in rules:
+                if needle in cypher:
+                    return out
+            return rows
+
+        mock_conn.execute_query.side_effect = _exec
+        return api.genes_by_ontology(
+            ontology="tcdb", organism=_ORG, level=2, conn=mock_conn, **kwargs)
+
+    def test_paged_call_runs_the_detail_scan_exactly_once(self, mock_conn):
+        calls = []
+        self._run(mock_conn, calls, limit=5)
+        detail = [c for c, _ in calls if "AS locus_tag" in c]
+        assert len(detail) == 1
+
+    def test_paged_call_runs_the_aggregate_projection(self, mock_conn):
+        calls = []
+        self._run(mock_conn, calls, limit=5)
+        agg = [c for c, _ in calls if "by_evidence" in c]
+        assert len(agg) == 1
+        assert "AS locus_tag" not in agg[0]
+        assert "LIMIT" not in agg[0]
+
+    def test_envelope_reads_the_aggregate_row(self, mock_conn):
+        result = self._run(mock_conn, limit=5)
+        assert _freq_map(result["by_evidence"]) == {"curated": 5, "homology": 2}
+        assert _freq_map(result["by_tier"]) == {1: 5, "null": 2}
+        assert _freq_map(result["by_sources"]) == {"eggnog": 7, "tcdb": 5}
+        assert result["evidence_score_stats"] == {
+            "min": 0.2, "median": 0.7, "max": 1.0, "n_null": 2}
+
+    def test_summary_mode_uses_the_aggregate_and_no_detail_scan(self, mock_conn):
+        calls = []
+        result = self._run(mock_conn, calls, summary=True)
+        assert result["results"] == []
+        assert not [c for c, _ in calls if "AS locus_tag" in c]
+        assert _freq_map(result["by_evidence"]) == {"curated": 5, "homology": 2}
+
+    def test_aggregate_carries_the_trust_filters(self, mock_conn):
+        calls = []
+        self._run(mock_conn, calls, limit=5, sources=["eggnog"])
+        agg = [(c, p) for c, p in calls if "by_evidence" in c]
+        assert agg[0][1]["sources"] == ["eggnog"]
+
+    def test_tier_null_warning_from_the_aggregate(self, mock_conn):
+        result = self._run(mock_conn, limit=5, max_tier=2)
+        assert any("tier" in w for w in result["warnings"])
+
+    def test_envelope_keys_unchanged(self, mock_conn):
+        result = self._run(mock_conn, limit=5)
+        for key in ("trust_axes", "by_evidence", "by_tier", "by_sources",
+                    "by_call_class", "evidence_score_stats", "filters_applied",
+                    "skipped_ontologies", "warnings", "results", "returned",
+                    "truncated", "offset", "total_matching"):
+            assert key in result, key

@@ -732,6 +732,51 @@ def search_ontology_scenarios():
         Scenario(
             "ncbifam_search",
             dict(search_text="protein", ontology="ncbifam")),
+        # --- PR 3b: browse mode + multi-ontology ---
+        Scenario(
+            # No search_text = browse; a level no MEROPS term reaches gives
+            # the empty-layer shape (total_entries>0, total_matching=0).
+            "browse_level_with_no_terms",
+            dict(ontology="merops", level=99)),
+        Scenario(
+            "browse_offset_past_end",
+            dict(ontology="merops", level=1, offset=fx.OFFSET_PAST_END)),
+        Scenario(
+            "browse_min_gene_count_above_max",
+            dict(ontology="tcdb", min_gene_count=10_000_000)),
+        Scenario(
+            # Genome-only organism scope: every org_gene_count is 0.
+            "browse_genome_only_organism_scope",
+            dict(ontology="merops", organism=fx.GENOME_ONLY_ORGANISM,
+                 min_gene_count=1)),
+        Scenario(
+            "browse_empty_string_search_text",
+            dict(search_text="", ontology="merops", level=1)),
+        Scenario(
+            "browse_all_ontologies_summary",
+            dict(summary=True)),
+        Scenario(
+            "multi_no_hits",
+            dict(search_text="zzzznonexistentontologytermzzz",
+                 ontology=["go_bp", "tcdb", "merops"])),
+        Scenario(
+            "multi_unknown_ontology_name",
+            dict(search_text="transport", ontology=["go_bp", "nope"]),
+            expects_error=ToolError),
+        Scenario(
+            "multi_facet_owner_absent",
+            dict(search_text="kinase", ontology=["kegg", "tcdb"],
+                 interpro_type="DOMAIN"),
+            expects_error=ToolError),
+        Scenario(
+            "multi_tree_owner_absent",
+            dict(search_text="transport", ontology=["kegg", "tcdb"],
+                 tree="transporters"),
+            expects_error=ToolError),
+        Scenario(
+            "multi_offset_past_end",
+            dict(search_text="transport", ontology=["go_bp", "tcdb"],
+                 offset=fx.OFFSET_PAST_END)),
     ]
 
 
@@ -1107,6 +1152,54 @@ def genes_by_categorical_metric_scenarios():
 
 
 # Registry: tool name -> builder. Phase 4 fills the rest.
+
+def ontology_term_details_scenarios():
+    # Batch, cross-ontology term drill-down. Degenerate axes: missing / mixed
+    # batch (flat not_found), empty input (documented ToolError), a
+    # link_kinds filter that removes every bridge, offset beyond the found
+    # rows, and verbose on a flat-ontology term (no hierarchy, no bridges).
+    return [
+        Scenario(
+            "unknown_term",
+            dict(term_ids=[fx.UNKNOWN_ONTOLOGY_TERM]),
+            input_ids=[fx.UNKNOWN_ONTOLOGY_TERM]),
+        Scenario(
+            "mixed_batch",
+            dict(term_ids=["tcdb:3.A.1", fx.UNKNOWN_ONTOLOGY_TERM]),
+            input_ids=["tcdb:3.A.1", fx.UNKNOWN_ONTOLOGY_TERM]),
+        Scenario(
+            "empty_term_ids",
+            dict(term_ids=[]),
+            expects_error=ToolError),
+        Scenario(
+            # go:0006979 has no bridges; a router-only filter on a TCDB family
+            # strips its composition links -> links_out=[] on every row.
+            "link_kinds_filters_everything_out",
+            dict(term_ids=["go:0006979", "tcdb:3.A.1"], link_kinds=["router"]),
+            input_ids=["go:0006979", "tcdb:3.A.1"]),
+        Scenario(
+            "offset_past_end",
+            dict(term_ids=["tcdb:3.A.1", "go:0006979"],
+                 offset=fx.OFFSET_PAST_END),
+            input_ids=["tcdb:3.A.1", "go:0006979"]),
+        Scenario(
+            "verbose_flat_ontology_term",
+            dict(term_ids=["ncbifam:NF000812"], verbose=True),
+            input_ids=["ncbifam:NF000812"]),
+        Scenario(
+            # Genome-only organism: every term has 0 genes there; the scoped
+            # count is 0, never a crash.
+            "genome_only_organism_scope",
+            dict(term_ids=["tcdb:3.A.1"], organism=fx.GENOME_ONLY_ORGANISM,
+                 verbose=True),
+            input_ids=["tcdb:3.A.1"]),
+        Scenario(
+            "unknown_link_kind",
+            dict(term_ids=["tcdb:3.A.1"], link_kinds=["sideways"]),
+            expects_error=ToolError),
+    ]
+
+
 SCENARIO_BUILDERS = {
     "genes_by_ontology": genes_by_ontology_scenarios,
     "gene_overview": gene_overview_scenarios,
@@ -1153,4 +1246,6 @@ SCENARIO_BUILDERS = {
     "genes_by_numeric_metric": genes_by_numeric_metric_scenarios,
     "genes_by_boolean_metric": genes_by_boolean_metric_scenarios,
     "genes_by_categorical_metric": genes_by_categorical_metric_scenarios,
+    # Annotation-trust surface (PR 3b): term-side drill-down.
+    "ontology_term_details": ontology_term_details_scenarios,
 }

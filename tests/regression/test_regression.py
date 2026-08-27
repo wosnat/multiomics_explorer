@@ -105,6 +105,10 @@ TOOL_BUILDERS = {
     "search_ontology": build_search_ontology,
     # genes_by_ontology: dispatched via api (L2) — returns envelope, not flat rows
     "genes_by_ontology": None,
+    # ontology_term_details (PR 3b): every case uses `dispatch: api` — the
+    # envelope (not_found, by_ontology, links_out_total, by_link_kind) is
+    # the contract; the builder rows alone would hide it.
+    "ontology_term_details": None,
     "gene_ontology_terms": build_gene_ontology_terms,
     "list_publications": build_list_publications,
     "discussed_by_publication": build_discussed_by_publication,

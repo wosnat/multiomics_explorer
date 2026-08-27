@@ -467,3 +467,211 @@ def test_about_content_lint_clean(about_path):
             "See docs/superpowers/specs/"
             "2026-05-07-mcp-docs-readability-pass-design.md"
         )
+
+
+
+# ---------------------------------------------------------------------------
+# PR 3b: per-ontology reference docs — the `ontologies` generator stage
+# (design §9). 17 hand-authored yaml inputs -> references/ontologies/{key}.md
+# + index.md, served at docs://ontologies/{key}. No Neo4j required to build.
+# ---------------------------------------------------------------------------
+
+import yaml as _yaml3b
+
+from multiomics_explorer._outfacing_lint import lint_lines as _lint_lines3b
+from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG as _CFG3B
+
+_ONTOLOGY_INPUTS_DIR = _ROOT / "multiomics_explorer" / "inputs" / "ontologies"
+_ONTOLOGY_DOCS_DIR = (
+    _ROOT / "multiomics_explorer" / "skills" / "multiomics-kg-guide"
+    / "references" / "ontologies"
+)
+_ONTOLOGY_KEYS = list(_CFG3B)
+_ONTOLOGY_YAML_KEYS = [
+    "what_it_is", "method", "id_form", "hierarchy", "interpretation",
+    "informativeness_rule", "pitfalls", "typical_questions", "see_also",
+]
+_BASELINE_PATH3B = _ROOT / "multiomics_explorer" / "config" / "schema_baseline.yaml"
+
+
+def _ontology_yaml(key):
+    path = _ONTOLOGY_INPUTS_DIR / f"{key}.yaml"
+    assert path.exists(), f"missing {path}"
+    return _yaml3b.safe_load(path.read_text()) or {}
+
+
+def _ontology_md(key):
+    path = _ONTOLOGY_DOCS_DIR / f"{key}.md"
+    assert path.exists(), f"missing {path}"
+    return path.read_text()
+
+
+class TestOntologyReferenceInputs:
+    @pytest.mark.parametrize("key", _ONTOLOGY_KEYS)
+    def test_yaml_exists(self, key):
+        assert (_ONTOLOGY_INPUTS_DIR / f"{key}.yaml").exists()
+
+    @pytest.mark.parametrize("key", _ONTOLOGY_KEYS)
+    @pytest.mark.parametrize("field", _ONTOLOGY_YAML_KEYS)
+    def test_yaml_required_field(self, key, field):
+        data = _ontology_yaml(key)
+        assert field in data, f"{key}.yaml lacks {field}"
+        assert data[field], f"{key}.yaml: {field} is empty"
+
+    @pytest.mark.parametrize("key", _ONTOLOGY_KEYS)
+    def test_typical_questions_is_a_list(self, key):
+        assert isinstance(_ontology_yaml(key)["typical_questions"], list)
+
+    @pytest.mark.parametrize("key", _ONTOLOGY_KEYS)
+    def test_see_also_is_a_list_of_docs_links(self, key):
+        see_also = _ontology_yaml(key)["see_also"]
+        assert isinstance(see_also, list) and see_also
+        for link in see_also:
+            assert str(link).startswith("docs://"), link
+
+    def test_no_stray_inputs(self):
+        stems = {p.stem for p in _ONTOLOGY_INPUTS_DIR.glob("*.yaml")}
+        assert stems == set(_ONTOLOGY_KEYS)
+
+
+class TestOntologyReferenceDocs:
+    def test_docs_dir_exists(self):
+        assert _ONTOLOGY_DOCS_DIR.is_dir()
+
+    @pytest.mark.parametrize("key", _ONTOLOGY_KEYS)
+    def test_md_exists(self, key):
+        assert (_ONTOLOGY_DOCS_DIR / f"{key}.md").exists()
+
+    def test_index_exists_and_links_every_key(self):
+        index = (_ONTOLOGY_DOCS_DIR / "index.md").read_text()
+        for key in _ONTOLOGY_KEYS:
+            assert key in index, f"index.md does not mention {key}"
+
+    def test_no_stray_docs(self):
+        stems = {p.stem for p in _ONTOLOGY_DOCS_DIR.glob("*.md")}
+        assert stems == set(_ONTOLOGY_KEYS) | {"index"}
+
+    @pytest.mark.parametrize("key", _ONTOLOGY_KEYS)
+    def test_md_merges_the_registry_row(self, key):
+        """Label, gene_rel, hierarchy rels and bridges come from
+        ONTOLOGY_CONFIG at build time — never hand-typed."""
+        md = _ontology_md(key)
+        cfg = _CFG3B[key]
+        assert cfg["label"] in md
+        assert cfg["gene_rel"] in md
+        for rel in cfg["hierarchy_rels"]:
+            assert rel in md, rel
+        for rel, target, kind in cfg.get("bridges_out") or []:
+            assert rel in md, rel
+            assert kind in md, kind
+
+    @pytest.mark.parametrize("key", [
+        k for k in _ONTOLOGY_KEYS if (_CFG3B[k].get("trust") or {})
+    ])
+    def test_md_lists_the_trust_axes(self, key):
+        md = _ontology_md(key)
+        for axis in ("sources", "evidence", "evidence_score", "tier"):
+            if axis in (_CFG3B[key].get("trust") or {}):
+                assert axis in md, axis
+
+    @pytest.mark.parametrize("key", ["brite", "interpro"])
+    def test_md_names_the_facet(self, key):
+        assert _CFG3B[key]["facet"]["param"] in _ontology_md(key)
+
+    @pytest.mark.parametrize("key", _ONTOLOGY_KEYS)
+    def test_md_carries_the_human_sections(self, key):
+        md = _ontology_md(key)
+        data = _ontology_yaml(key)
+        for question in data["typical_questions"]:
+            assert str(question).strip()[:30] in md, question
+        for link in data["see_also"]:
+            assert str(link) in md, link
+
+    @pytest.mark.parametrize("key", _ONTOLOGY_KEYS)
+    def test_md_names_baseline_node_props(self, key):
+        """Schema-baseline node props for the label are rendered."""
+        baseline = _yaml3b.safe_load(_BASELINE_PATH3B.read_text())["schema"]
+        props = set(baseline["nodes"].get(_CFG3B[key]["label"], {})
+                    .get("properties", {}))
+        md = _ontology_md(key)
+        missing = [p for p in props if p not in md]
+        assert not missing, f"{key}.md lacks node props {missing}"
+
+    @pytest.mark.parametrize("key", _ONTOLOGY_KEYS)
+    def test_md_points_at_the_term_tools(self, key):
+        md = _ontology_md(key)
+        assert "ontology_term_details" in md
+        assert "search_ontology" in md
+
+    @pytest.mark.parametrize(
+        "md_path",
+        sorted(_ONTOLOGY_DOCS_DIR.glob("*.md")) if _ONTOLOGY_DOCS_DIR.exists() else [],
+        ids=lambda p: p.stem,
+    )
+    def test_md_lint_clean(self, md_path):
+        violations = _lint_lines3b([md_path])
+        assert not violations, [
+            f"{p.name}:{n}: {tok!r} in: {line.strip()}"
+            for p, n, line, tok in violations]
+
+    def test_lint_matrix_is_not_vacuous(self):
+        assert len(list(_ONTOLOGY_DOCS_DIR.glob("*.md"))) == 18
+
+
+class TestOntologiesGeneratorStage:
+    """`scripts/build_about_content.py` grows an `ontologies` stage that
+    renders without a live KG (vocabulary values fall back to a pointer at
+    `list_filter_values`)."""
+
+    def test_module_exposes_the_stage_dirs(self):
+        from scripts import build_about_content as gen
+        assert gen.ONTOLOGY_INPUTS_DIR == _ONTOLOGY_INPUTS_DIR
+        assert gen.ONTOLOGY_OUTPUT_DIR == _ONTOLOGY_DOCS_DIR
+
+    def test_render_ontology_without_kg(self):
+        from scripts.build_about_content import render_ontology
+        data = {
+            "what_it_is": "Transporter classification.",
+            "method": "HMM + curated.",
+            "id_form": "tcdb:3.A.1",
+            "hierarchy": "5 levels.",
+            "interpretation": "Rank by evidence_score.",
+            "informativeness_rule": "Roots are uninformative.",
+            "pitfalls": "Superseded attachments.",
+            "typical_questions": ["Which ABC transporters does MED4 carry?"],
+            "see_also": ["docs://analysis/metabolites"],
+        }
+        out = render_ontology("tcdb", data, vocab_values=None)
+        assert "TcdbFamily" in out
+        assert "Gene_has_tcdb_family" in out
+        assert "Tcdb_family_is_a_tcdb_family" in out
+        assert "Tcdb_family_has_pfam_domain" in out
+        assert "composition" in out
+        assert "Which ABC transporters does MED4 carry?" in out
+        assert "docs://analysis/metabolites" in out
+        assert "list_filter_values" in out
+
+    def test_render_ontology_with_vocab_values(self):
+        from scripts.build_about_content import render_ontology
+        data = {k: "x" for k in _ONTOLOGY_YAML_KEYS}
+        data["typical_questions"] = ["q"]
+        data["see_also"] = ["docs://guide/concepts"]
+        out = render_ontology(
+            "merops", data,
+            vocab_values={"call_class": ["peptidase", "nonpeptidase_homolog"]})
+        assert "nonpeptidase_homolog" in out
+
+    def test_render_ontology_index_lists_every_key(self):
+        from scripts.build_about_content import render_ontology_index
+        inputs = {k: {"what_it_is": f"about {k}"} for k in _ONTOLOGY_KEYS}
+        out = render_ontology_index(inputs)
+        for key in _ONTOLOGY_KEYS:
+            assert key in out
+
+    def test_lint_covers_the_ontologies_dir(self):
+        src = (_ROOT / "scripts" / "build_about_content.py").read_text()
+        assert 'skills_refs / "ontologies"' in src
+
+    def test_cli_accepts_the_ontologies_stage(self):
+        src = (_ROOT / "scripts" / "build_about_content.py").read_text()
+        assert "--ontologies" in src or '"ontologies"' in src

@@ -101,3 +101,42 @@ def test_annotation_evidence_scenario_runs_cleanly(scenario, expected):
         f"annotation_evidence scenario {scenario} printed no {expected!r}:\n"
         f"{result.stdout}"
     )
+
+
+
+# --- ontology_terms.py ---
+
+ONTOLOGY_TERMS_SCRIPT = REPO_ROOT / "examples" / "ontology_terms.py"
+
+# Scenario -> a substring its output must contain (same rule as
+# annotation_evidence.py: exit 0 + non-empty stdout is not enough).
+ONTOLOGY_TERMS_SCENARIOS = [
+    ("browse_merops", "merops.family:S33"),
+    ("multi_search", "tcdb"),
+    ("term_details_batch", "bogus:xyz"),
+    ("bridge_walk", "interpro"),
+]
+
+
+@pytest.mark.parametrize(
+    "scenario,expected", ONTOLOGY_TERMS_SCENARIOS,
+    ids=[s for s, _ in ONTOLOGY_TERMS_SCENARIOS],
+)
+def test_ontology_terms_scenario_runs_cleanly(scenario, expected):
+    """Each ontology_terms.py scenario exits 0 and prints the fact it exists
+    to demonstrate, on the live KG."""
+    assert ONTOLOGY_TERMS_SCRIPT.exists(), ONTOLOGY_TERMS_SCRIPT
+    cmd = [sys.executable, str(ONTOLOGY_TERMS_SCRIPT), "--scenario", scenario]
+    result = subprocess.run(
+        cmd, cwd=REPO_ROOT, capture_output=True, text=True, timeout=300
+    )
+    assert result.returncode == 0, (
+        f"ontology_terms scenario {scenario} failed: stderr={result.stderr}"
+    )
+    assert result.stdout.strip(), (
+        f"ontology_terms scenario {scenario} produced no output"
+    )
+    assert expected in result.stdout, (
+        f"ontology_terms scenario {scenario} printed no {expected!r}:\n"
+        f"{result.stdout}"
+    )

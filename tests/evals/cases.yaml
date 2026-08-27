@@ -1975,3 +1975,118 @@
   expect:
     min_rows: 1
     columns: [doi, entity_kind, entity_id, entity_name, prominence]
+
+# ── Annotation-trust surface, term side (PR 3b) ─────────────────────────
+# `dispatch: api` throughout: browse / multi-ontology envelopes (mode,
+# by_ontology, by_level, warnings) and the ontology_term_details envelope
+# (not_found, by_ontology, links_out_total, by_link_kind) are the contract.
+
+- id: ontology_term_details_batch6
+  tool: ontology_term_details
+  dispatch: api
+  desc: |
+    The verified §7.5 batch: tcdb 3.A.1 (1 parent / 55 children capped at 50 /
+    129 composition links), merops S14 (1 link), interpro IPR000362 (4 children /
+    5 router links), ncbifam NF000812 (0/0/0), go:0006979 (L3, 1050/42),
+    bogus:xyz -> not_found. Rows in input order.
+  params:
+    term_ids:
+      - "tcdb:3.A.1"
+      - "merops.family:S14"
+      - "interpro:IPR000362"
+      - "ncbifam:NF000812"
+      - "go:0006979"
+      - "bogus:xyz"
+  expect:
+    min_rows: 5
+    max_rows: 5
+    columns: [term_id, ontology, label, name, level, gene_count, organism_count,
+              parents, children, children_total, children_truncated, links_out]
+
+- id: ontology_term_details_batch6_verbose
+  tool: ontology_term_details
+  dispatch: api
+  desc: |
+    Same batch, verbose: properties (t{.*}), links_out[].props
+    (curated_tcids / member_id_count / router_ambiguous on interpro) and
+    genes_by_organism per row.
+  params:
+    term_ids:
+      - "tcdb:3.A.1"
+      - "merops.family:S14"
+      - "interpro:IPR000362"
+      - "ncbifam:NF000812"
+      - "go:0006979"
+      - "bogus:xyz"
+    verbose: true
+  expect:
+    min_rows: 5
+    max_rows: 5
+    columns: [term_id, ontology, properties, genes_by_organism, links_out]
+
+- id: ontology_term_details_router_only_med4
+  tool: ontology_term_details
+  dispatch: api
+  desc: |
+    link_kinds=['router'] strips every composition / membership bridge
+    (3.A.1 -> 0 links; IPR000362 keeps its 5 EC routers); organism scope adds
+    organism_gene_count per row.
+  params:
+    term_ids: ["tcdb:3.A.1", "interpro:IPR000362"]
+    link_kinds: [router]
+    organism: Prochlorococcus MED4
+  expect:
+    min_rows: 2
+    max_rows: 2
+    columns: [term_id, organism_gene_count, links_out]
+
+- id: search_ontology_browse_merops_level1
+  tool: search_ontology
+  dispatch: api
+  desc: |
+    Browse mode (no search_text): MEROPS level-1 families sorted gene_count
+    DESC, id — S33 412 / S09 298 / C26 272 / M38 175 / C44 169. score null,
+    mode=browse, by_level over the full match.
+  params:
+    ontology: [merops]
+    level: 1
+    limit: 10
+  expect:
+    min_rows: 10
+    max_rows: 10
+    columns: [id, name, ontology_type, score, level, gene_count, organism_count]
+
+- id: search_ontology_multi_go_bp_tcdb_transport
+  tool: search_ontology
+  dispatch: api
+  desc: |
+    Multi-ontology search with lockstep paging: limit=5 per ontology,
+    rows ordered go_bp then tcdb, by_ontology carries per-ontology totals and
+    truncation flags; flat keys are the sums / max.
+  params:
+    search_text: transport
+    ontology: [go_bp, tcdb]
+    limit: 5
+  expect:
+    min_rows: 1
+    max_rows: 10
+    columns: [id, name, ontology_type, score, level, gene_count, organism_count]
+
+- id: search_ontology_browse_interpro_med4_scoped
+  tool: search_ontology
+  dispatch: api
+  desc: |
+    Browse with organism scope: MED4 HOMOLOGOUS_SUPERFAMILY entries with
+    >= 5 MED4 genes, sorted org_gene_count DESC — IPR027417 P-loop NTPase 119
+    first; rows gain organism_gene_count.
+  params:
+    ontology: interpro
+    interpro_type: HOMOLOGOUS_SUPERFAMILY
+    organism: Prochlorococcus MED4
+    min_gene_count: 5
+    limit: 5
+  expect:
+    min_rows: 5
+    max_rows: 5
+    columns: [id, name, ontology_type, interpro_type, gene_count,
+              organism_gene_count]

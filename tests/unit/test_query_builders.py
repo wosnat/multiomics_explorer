@@ -11931,3 +11931,599 @@ class TestGeneOverviewMeropsNcbifamColumns:
     def test_summary_emits_has_ncbifam(self):
         cypher, _ = build_gene_overview_summary(locus_tags=["MIT1002_03660"])
         assert "has_ncbifam" in cypher
+
+
+# ===========================================================================
+# PR 3b — annotation-trust surface, term side (RED)
+#
+# `ontology_term_details` (spec §7.5, design §6), `search_ontology` browse
+# mode (spec §7.4, design §7), the aggregate-only trust-rollup projection for
+# `genes_by_ontology` (spec §13) and the public `TRUST_FILTER_AXIS` /
+# `verbose_edge_pairs` names.
+# ===========================================================================
+
+import re as _re3b
+
+from multiomics_explorer.kg import queries_lib as _ql3b
+from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG as _CFG3B
+
+_ORG3B = "Prochlorococcus MED4"
+
+# Every term-node label the registry knows: 17 `label`s + PfamClan (18).
+_ALL_TERM_LABELS_3B = sorted(
+    {cfg["label"] for cfg in _CFG3B.values()}
+    | {cfg["parent_label"] for cfg in _CFG3B.values() if "parent_label" in cfg}
+)
+_ALL_HIERARCHY_RELS_3B = sorted(
+    {rel for cfg in _CFG3B.values() for rel in cfg["hierarchy_rels"]}
+)
+_ALL_BRIDGES_3B = [
+    (rel, target, kind)
+    for cfg in _CFG3B.values()
+    for (rel, target, kind) in (cfg.get("bridges_out") or [])
+]
+_ALL_GENE_RELS_3B = sorted({cfg["gene_rel"] for cfg in _CFG3B.values()})
+
+_BATCH6_3B = [
+    "tcdb:3.A.1", "merops.family:S14", "interpro:IPR000362",
+    "ncbifam:NF000812", "go:0006979", "bogus:xyz",
+]
+
+
+def _otd3b(**kwargs):
+    kwargs.setdefault("term_ids", list(_BATCH6_3B))
+    return _ql3b.build_ontology_term_details(**kwargs)
+
+
+class TestTrustPublicNames:
+    """Spec §13 (ii): `_TRUST_FILTER_AXIS` / `_verbose_edge_pairs` get public
+    names; the old names stay as aliases for one release."""
+
+    def test_trust_filter_axis_is_public(self):
+        assert _ql3b.TRUST_FILTER_AXIS is _ql3b._TRUST_FILTER_AXIS
+
+    def test_trust_filter_axis_shape(self):
+        assert _ql3b.TRUST_FILTER_AXIS == {
+            "sources": "sources", "evidence": "evidence",
+            "max_tier": "tier", "min_evidence_score": "evidence_score",
+        }
+
+    def test_verbose_edge_pairs_is_public(self):
+        assert _ql3b.verbose_edge_pairs is _ql3b._verbose_edge_pairs
+
+    def test_verbose_edge_pairs_normalizes_entries(self):
+        pairs = _ql3b.verbose_edge_pairs(
+            {"verbose_edge": ["evalue", ("score", "localization_score")]})
+        assert pairs == [("evalue", "evalue"), ("score", "localization_score")]
+
+    def test_api_layer_imports_the_public_names(self):
+        from multiomics_explorer.api import functions as api
+        assert api.TRUST_FILTER_AXIS is _ql3b.TRUST_FILTER_AXIS
+        assert api.verbose_edge_pairs is _ql3b.verbose_edge_pairs
+
+
+class TestBuildOntologyTermDetails:
+    """Spec §7.5: one UNWIND batch, label guard over all 18 labels, null-safe
+    collects, is-a union + bridge union generated from config."""
+
+    def test_returns_tuple(self):
+        cypher, params = _otd3b()
+        assert isinstance(cypher, str)
+        assert isinstance(params, dict)
+
+    def test_unwinds_term_ids_param(self):
+        cypher, params = _otd3b()
+        assert "UNWIND $term_ids AS tid" in cypher
+        assert params["term_ids"] == _BATCH6_3B
+        assert "tcdb:3.A.1" not in cypher
+
+    def test_empty_term_ids_raises(self):
+        with pytest.raises(ValueError, match="term_ids"):
+            _otd3b(term_ids=[])
+
+    @pytest.mark.parametrize("label", _ALL_TERM_LABELS_3B)
+    def test_label_guard_names_every_registry_label(self, label):
+        cypher, _ = _otd3b()
+        assert f"t:{label}" in cypher
+
+    def test_label_guard_covers_exactly_18_labels(self):
+        cypher, _ = _otd3b()
+        guarded = set(_re3b.findall(r"\bt:([A-Za-z]+)", cypher))
+        assert set(_ALL_TERM_LABELS_3B) <= guarded
+        assert len(_ALL_TERM_LABELS_3B) == 18
+
+    def test_lookup_is_optional_so_missing_ids_survive(self):
+        cypher, _ = _otd3b()
+        assert "OPTIONAL MATCH (t {id: tid})" in cypher
+
+    def test_not_found_is_t_is_null(self):
+        cypher, _ = _otd3b()
+        assert "t IS NULL AS not_found" in cypher
+
+    @pytest.mark.parametrize("rel", _ALL_HIERARCHY_RELS_3B)
+    def test_hierarchy_union_covers_every_config_rel(self, rel):
+        cypher, _ = _otd3b()
+        assert rel in cypher
+
+    def test_parents_walk_outgoing_children_walk_incoming(self):
+        """(t)-[:is_a]->(p) = parent; (t)<-[:is_a]-(c) = child."""
+        cypher, _ = _otd3b()
+        assert _re3b.search(r"\(t\)-\[:[A-Za-z_|]+\]->\(p\)", cypher), (
+            "parents must be the outgoing is-a hop")
+        assert _re3b.search(r"\(t\)<-\[:[A-Za-z_|]+\]-\(c\)", cypher), (
+            "children must be the incoming is-a hop")
+
+    def test_children_capped_at_50_with_total(self):
+        cypher, _ = _otd3b()
+        assert "[0..50]" in cypher
+        assert "count(DISTINCT c) AS children_total" in cypher
+
+    def test_collects_are_null_safe(self):
+        cypher, _ = _otd3b()
+        assert "CASE WHEN p IS NULL THEN null" in cypher
+        assert "CASE WHEN c IS NULL THEN null" in cypher
+        assert "CASE WHEN b IS NULL THEN null" in cypher
+        assert "WHERE x IS NOT NULL" in cypher
+
+    @pytest.mark.parametrize("rel,target,kind", _ALL_BRIDGES_3B,
+                             ids=[b[0] for b in _ALL_BRIDGES_3B])
+    def test_bridge_union_covers_every_config_bridge(self, rel, target, kind):
+        cypher, _ = _otd3b()
+        assert rel in cypher
+
+    def test_bridge_rows_carry_rel_type_and_props(self):
+        cypher, _ = _otd3b()
+        assert "type(b)" in cypher
+        assert "properties(b)" in cypher
+        assert "count(b) AS links_total" in cypher
+
+    @pytest.mark.parametrize("col", [
+        "term_id", "not_found", "name", "description", "level", "level_kind",
+        "is_informative", "gene_count", "organism_count", "direct_gene_count",
+        "parents", "children_total", "children", "links_total", "links_out",
+    ])
+    def test_return_column(self, col):
+        cypher, _ = _otd3b()
+        assert _re3b.search(rf"(AS|,|\s){col}\b", cypher.split("RETURN")[-1])
+
+    def test_row_carries_node_labels_for_ontology_derivation(self):
+        """`ontology` per row is derived from labels(t) via the registry."""
+        cypher, _ = _otd3b()
+        assert "labels(t)" in cypher
+
+    @pytest.mark.parametrize("prop", [
+        "tcdb_id", "family_class", "interpro_type", "short_name", "tree_code",
+        "ncbifam_id", "cazy_id",
+    ])
+    def test_term_details_compact_props_are_reachable(self, prop):
+        """Each registry `term_details_compact` prop is either projected
+        flat or reachable through a `t{.*}` map."""
+        cypher, _ = _otd3b()
+        assert f"t.{prop}" in cypher or "t{.*}" in cypher
+
+    # --- link_kinds filter (applies on the bridge block) ---
+
+    def test_link_kinds_none_keeps_every_bridge(self):
+        cypher, _ = _otd3b(link_kinds=None)
+        for rel, _t, _k in _ALL_BRIDGES_3B:
+            assert rel in cypher
+
+    def test_link_kinds_router_drops_composition_and_membership(self):
+        cypher, _ = _otd3b(link_kinds=["router"])
+        for rel, _t, kind in _ALL_BRIDGES_3B:
+            if kind == "router":
+                assert rel in cypher, rel
+            else:
+                assert rel not in cypher, rel
+
+    def test_link_kinds_composition_and_membership_keep_both(self):
+        cypher, _ = _otd3b(link_kinds=["composition", "membership"])
+        for rel, _t, kind in _ALL_BRIDGES_3B:
+            assert (rel in cypher) == (kind in ("composition", "membership")), rel
+
+    def test_unknown_link_kind_raises(self):
+        with pytest.raises(ValueError, match="link_kind"):
+            _otd3b(link_kinds=["sideways"])
+
+    # --- verbose: properties + genes_by_organism ---
+
+    def test_compact_has_no_genes_by_organism(self):
+        cypher, _ = _otd3b(verbose=False)
+        assert "genes_by_organism" not in cypher
+
+    def test_verbose_projects_full_property_map(self):
+        cypher, _ = _otd3b(verbose=True)
+        assert "t{.*} AS properties" in cypher
+
+    def test_verbose_genes_by_organism_walks_subtree_then_gene_rel(self):
+        cypher, _ = _otd3b(verbose=True)
+        assert "genes_by_organism" in cypher
+        assert "*0.." in cypher
+        assert "organism_name" in cypher
+        assert "count(DISTINCT g)" in cypher
+
+    @pytest.mark.parametrize("gene_rel", _ALL_GENE_RELS_3B)
+    def test_verbose_genes_by_organism_union_covers_every_gene_rel(self, gene_rel):
+        cypher, _ = _otd3b(verbose=True)
+        assert gene_rel in cypher
+
+    # --- organism scope ---
+
+    def test_no_organism_no_organism_gene_count(self):
+        cypher, params = _otd3b()
+        assert "organism_gene_count" not in cypher
+        assert _ORG3B not in params.values()
+
+    def test_organism_is_a_parameter(self):
+        cypher, params = _otd3b(organism=_ORG3B)
+        assert _ORG3B in params.values()
+        assert _ORG3B not in cypher
+
+    def test_organism_adds_compact_organism_gene_count(self):
+        cypher, _ = _otd3b(organism=_ORG3B)
+        assert "AS organism_gene_count" in cypher
+
+    def test_organism_scopes_verbose_genes_by_organism(self):
+        cypher, params = _otd3b(organism=_ORG3B, verbose=True)
+        assert "genes_by_organism" in cypher
+        assert "AS organism_gene_count" in cypher
+        assert _ORG3B in params.values()
+
+    def test_regression_harness_can_reach_the_builder(self):
+        """`TOOL_BUILDERS` pins the builder by import; keep it importable."""
+        from multiomics_explorer.kg.queries_lib import build_ontology_term_details
+        assert callable(build_ontology_term_details)
+
+
+class TestBuildSearchOntologyBrowse:
+    """Spec §7.4: `search_text` None / '' -> browse (plain label MATCH, sort
+    gene_count DESC, id; score null)."""
+
+    def _browse(self, ontology="merops", **kw):
+        kw.setdefault("search_text", None)
+        return build_search_ontology(ontology=ontology, **kw)
+
+    def test_none_search_text_has_no_fulltext_call(self):
+        cypher, params = self._browse()
+        assert "db.index.fulltext" not in cypher
+        assert "search_text" not in params
+
+    def test_empty_string_is_browse_too(self):
+        cypher, params = self._browse(search_text="")
+        assert "db.index.fulltext" not in cypher
+        assert "search_text" not in params
+
+    def test_matches_the_config_label(self):
+        cypher, _ = self._browse()
+        assert "MATCH (t:MeropsFamily)" in cypher
+
+    @pytest.mark.parametrize("ontology", [k for k in _CFG3B if k != "pfam"])
+    def test_every_single_label_ontology_browses_its_label(self, ontology):
+        cypher, _ = self._browse(ontology=ontology)
+        assert f"(t:{_CFG3B[ontology]['label']})" in cypher
+        assert "db.index.fulltext" not in cypher
+
+    def test_pfam_browse_is_dual_label(self):
+        cypher, _ = self._browse(ontology="pfam")
+        assert "t:Pfam" in cypher
+        assert "t:PfamClan" in cypher
+        assert "db.index.fulltext" not in cypher
+
+    def test_sort_is_gene_count_desc_then_id(self):
+        cypher, _ = self._browse()
+        assert _re3b.search(
+            r"ORDER BY\s+(t\.)?gene_count DESC,\s*(t\.)?id\b", cypher), cypher
+
+    def test_score_is_null(self):
+        cypher, _ = self._browse()
+        assert _re3b.search(r"\bnull AS score\b", cypher, _re3b.IGNORECASE)
+
+    def test_no_score_desc_sort_in_browse(self):
+        cypher, _ = self._browse()
+        assert "ORDER BY score DESC" not in cypher
+
+    def test_level_filter(self):
+        cypher, params = self._browse(level=1)
+        assert "t.level = $level" in cypher
+        assert params["level"] == 1
+
+    def test_informative_only_predicate_is_null_safe(self):
+        cypher, _ = self._browse(informative_only=True)
+        assert "coalesce(t.is_uninformative, '') <> 'true'" in cypher
+
+    def test_min_gene_count_filter(self):
+        cypher, params = self._browse(min_gene_count=5)
+        assert "gene_count >= $min_gene_count" in cypher
+        assert params["min_gene_count"] == 5
+
+    def test_min_gene_count_absent_by_default(self):
+        cypher, params = self._browse()
+        assert "$min_gene_count" not in cypher
+        assert "min_gene_count" not in params
+
+    def test_interpro_facet_in_browse(self):
+        cypher, params = self._browse(
+            ontology="interpro", interpro_type="HOMOLOGOUS_SUPERFAMILY")
+        assert "t.interpro_type = $interpro_type" in cypher
+        assert params["interpro_type"] == "HOMOLOGOUS_SUPERFAMILY"
+
+    def test_brite_tree_facet_in_browse(self):
+        cypher, params = self._browse(ontology="brite", tree="transporters")
+        assert "t.tree = $tree" in cypher
+        assert params["tree"] == "transporters"
+
+    def test_pagination_in_browse(self):
+        cypher, params = self._browse(limit=10, offset=20)
+        assert "SKIP $offset" in cypher
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 10
+        assert params["offset"] == 20
+        assert cypher.index("SKIP") < cypher.index("LIMIT")
+
+    @pytest.mark.parametrize("col", [
+        "id", "name", "level", "gene_count", "organism_count",
+        "is_informative", "tree", "tree_code",
+    ])
+    def test_browse_keeps_the_compact_columns(self, col):
+        cypher, _ = self._browse()
+        assert f"AS {col}" in cypher
+
+    def test_browse_facet_column_on_interpro(self):
+        cypher, _ = self._browse(ontology="interpro")
+        assert "t.interpro_type AS interpro_type" in cypher
+
+    def test_kegg_browse_keeps_discusses_count(self):
+        cypher, _ = self._browse(ontology="kegg")
+        assert "discussed_by_n_publications" in cypher
+
+    # --- organism scope ---
+
+    def test_organism_scope_counts_per_organism_genes(self):
+        cypher, params = self._browse(
+            ontology="interpro", organism=_ORG3B, min_gene_count=5,
+            interpro_type="HOMOLOGOUS_SUPERFAMILY")
+        assert "Gene_has_interpro_entry" in cypher
+        assert "organism_name" in cypher
+        assert "count(DISTINCT g) AS org_gene_count" in cypher
+        assert "org_gene_count >= $min_gene_count" in cypher
+        assert _ORG3B in params.values()
+        assert _ORG3B not in cypher
+
+    def test_organism_scope_sorts_by_org_gene_count(self):
+        cypher, _ = self._browse(organism=_ORG3B)
+        assert _re3b.search(r"ORDER BY\s+org_gene_count DESC,\s*(t\.)?id\b", cypher)
+
+    def test_organism_scope_emits_organism_gene_count_column(self):
+        cypher, _ = self._browse(organism=_ORG3B)
+        assert "AS organism_gene_count" in cypher
+
+    def test_no_organism_no_organism_gene_count(self):
+        cypher, _ = self._browse()
+        assert "organism_gene_count" not in cypher
+
+    def test_organism_scope_uses_the_ontology_gene_rel(self):
+        cypher, _ = self._browse(ontology="merops", organism=_ORG3B)
+        assert "Gene_has_merops_family" in cypher
+
+    # --- search mode is unchanged ---
+
+    def test_search_mode_still_uses_fulltext(self):
+        cypher, params = build_search_ontology(
+            ontology="merops", search_text="protease")
+        assert "db.index.fulltext.queryNodes('meropsFamilyFullText'" in cypher
+        assert "ORDER BY score DESC" in cypher
+        assert params["search_text"] == "protease"
+
+    def test_search_mode_accepts_min_gene_count(self):
+        cypher, params = build_search_ontology(
+            ontology="merops", search_text="protease", min_gene_count=3)
+        assert "gene_count >= $min_gene_count" in cypher
+        assert params["min_gene_count"] == 3
+
+    def test_search_mode_accepts_organism_scope(self):
+        cypher, params = build_search_ontology(
+            ontology="merops", search_text="protease", organism=_ORG3B)
+        assert "org_gene_count" in cypher
+        assert _ORG3B in params.values()
+
+
+class TestBuildSearchOntologySummaryBrowse:
+    def _summary(self, ontology="merops", **kw):
+        kw.setdefault("search_text", None)
+        return build_search_ontology_summary(ontology=ontology, **kw)
+
+    def test_browse_summary_has_no_fulltext_call(self):
+        cypher, params = self._summary()
+        assert "db.index.fulltext" not in cypher
+        assert "search_text" not in params
+
+    def test_empty_string_is_browse(self):
+        cypher, _ = self._summary(search_text="")
+        assert "db.index.fulltext" not in cypher
+
+    @pytest.mark.parametrize("col", [
+        "total_entries", "total_matching", "score_max", "score_median",
+    ])
+    def test_browse_summary_keeps_flat_keys(self, col):
+        cypher, _ = self._summary()
+        assert col in cypher
+
+    def test_browse_summary_rolls_up_by_level_over_the_full_match(self):
+        cypher, _ = self._summary()
+        assert "by_level" in cypher
+
+    def test_browse_summary_level_filter(self):
+        cypher, params = self._summary(level=1)
+        assert "t.level = $level" in cypher
+        assert params["level"] == 1
+
+    def test_browse_summary_min_gene_count(self):
+        cypher, params = self._summary(min_gene_count=5)
+        assert "$min_gene_count" in cypher
+        assert params["min_gene_count"] == 5
+
+    def test_browse_summary_organism_scope(self):
+        cypher, params = self._summary(organism=_ORG3B, min_gene_count=5)
+        assert "org_gene_count" in cypher
+        assert _ORG3B in params.values()
+
+    def test_pfam_browse_summary_dual_label(self):
+        cypher, _ = self._summary(ontology="pfam")
+        assert "t:Pfam" in cypher
+        assert "t:PfamClan" in cypher
+        assert "db.index.fulltext" not in cypher
+
+    def test_search_summary_unchanged(self):
+        cypher, params = build_search_ontology_summary(
+            ontology="merops", search_text="protease")
+        assert "db.index.fulltext.queryNodes('meropsFamilyFullText'" in cypher
+        assert params["search_text"] == "protease"
+
+
+class TestBuildSearchOntologyVerboseColumns:
+    """Design §3.4 verbose: description, level_kind, direct_gene_count
+    (hierarchical labels only), config `term_verbose` union."""
+
+    def test_compact_has_no_description(self):
+        cypher, _ = build_search_ontology(
+            ontology="tcdb", search_text="transport", verbose=False)
+        assert "AS description" not in cypher
+        assert "AS level_kind" not in cypher
+
+    def test_verbose_adds_description_and_level_kind(self):
+        cypher, _ = build_search_ontology(
+            ontology="tcdb", search_text="transport", verbose=True)
+        assert "t.description AS description" in cypher
+        assert "t.level_kind AS level_kind" in cypher
+
+    def test_verbose_direct_gene_count_on_hierarchical_label(self):
+        cypher, _ = build_search_ontology(
+            ontology="tcdb", search_text="transport", verbose=True)
+        assert "t.direct_gene_count AS direct_gene_count" in cypher
+
+    @pytest.mark.parametrize("ontology", ["ncbifam", "cog_category", "tigr_role"])
+    def test_verbose_no_direct_gene_count_on_flat_label(self, ontology):
+        cypher, _ = build_search_ontology(
+            ontology=ontology, search_text="x", verbose=True)
+        assert "direct_gene_count" not in cypher
+
+    @pytest.mark.parametrize("ontology,props", [
+        ("tcdb", ["superfamily", "metabolite_count"]),
+        ("ncbifam", ["family_type", "gene_symbol"]),
+        ("merops", ["family_class", "catalytic_type", "peptidase_gene_count"]),
+    ])
+    def test_verbose_term_verbose_union(self, ontology, props):
+        cypher, _ = build_search_ontology(
+            ontology=ontology, search_text="x", verbose=True)
+        for prop in props:
+            assert f"t.{prop} AS {prop}" in cypher, prop
+
+    @pytest.mark.parametrize("ontology,props", [
+        ("tcdb", ["superfamily", "metabolite_count"]),
+        ("merops", ["family_class", "catalytic_type", "peptidase_gene_count"]),
+    ])
+    def test_compact_never_projects_term_verbose(self, ontology, props):
+        cypher, _ = build_search_ontology(
+            ontology=ontology, search_text="x", verbose=False)
+        for prop in props:
+            assert f"AS {prop}" not in cypher, prop
+
+    def test_verbose_columns_in_browse_mode(self):
+        cypher, _ = build_search_ontology(
+            ontology="merops", search_text=None, verbose=True)
+        assert "t.description AS description" in cypher
+        assert "t.family_class AS family_class" in cypher
+
+    def test_kegg_verbose_keeps_discussed_list(self):
+        cypher, _ = build_search_ontology(
+            ontology="kegg", search_text="x", verbose=True)
+        assert "discussed_in_publications" in cypher
+        assert "t.description AS description" in cypher
+
+    def test_pfam_verbose_projects_in_both_union_arms(self):
+        cypher, _ = build_search_ontology(
+            ontology="pfam", search_text="x", verbose=True)
+        assert cypher.count("t.description AS description") == 2
+
+
+class TestBuildGenesByOntologyTrustRollups:
+    """Spec §13 (i): the full-match trust rollups come from Cypher
+    aggregations — never a second per-row scan."""
+
+    def _build(self, **kw):
+        kw.setdefault("ontology", "tcdb")
+        kw.setdefault("organism", _ORG3B)
+        if "term_ids" not in kw:
+            kw.setdefault("level", 2)
+        return _ql3b.build_genes_by_ontology_trust_rollups(**kw)
+
+    def test_returns_tuple(self):
+        cypher, params = self._build()
+        assert isinstance(cypher, str) and isinstance(params, dict)
+
+    @pytest.mark.parametrize("fragment", [
+        "AS locus_tag", "AS term_id", "AS gene_name", "AS product",
+        "AS term_name",
+    ])
+    def test_no_per_row_projection(self, fragment):
+        cypher, _ = self._build()
+        assert fragment not in cypher
+
+    def test_no_pagination(self):
+        cypher, params = self._build()
+        assert "LIMIT" not in cypher
+        assert "SKIP" not in cypher
+        assert "limit" not in params and "offset" not in params
+
+    def test_is_an_aggregation(self):
+        cypher, _ = self._build()
+        assert "count(" in cypher or "apoc.coll.frequencies" in cypher
+
+    @pytest.mark.parametrize("key", [
+        "by_evidence", "by_tier", "by_sources", "evidence_score_stats",
+    ])
+    def test_returns_the_envelope_rollup(self, key):
+        cypher, _ = self._build()
+        assert key in cypher
+
+    def test_merops_returns_by_call_class(self):
+        cypher, _ = self._build(ontology="merops", level=1)
+        assert "by_call_class" in cypher
+        assert "call_class" in cypher
+
+    def test_tier_null_bucket_is_explicit(self):
+        cypher, _ = self._build()
+        assert "'null'" in cypher
+
+    def test_trust_filters_bind_before_the_rollup(self):
+        cypher, params = self._build(sources=["eggnog"], max_tier=2)
+        assert "$sources" in cypher
+        assert params["sources"] == ["eggnog"]
+        assert "$max_tier" in cypher
+        assert params["max_tier"] == 2
+        assert "r.tier IS NULL" in cypher
+
+    def test_size_filters_are_parameters(self):
+        _, params = self._build(min_gene_set_size=5, max_gene_set_size=500)
+        assert params["min_gene_set_size"] == 5
+        assert params["max_gene_set_size"] == 500
+
+    def test_organism_is_a_parameter(self):
+        cypher, params = self._build()
+        assert _ORG3B in params.values()
+        assert _ORG3B not in cypher
+
+    def test_term_ids_mode(self):
+        _, params = self._build(term_ids=["tcdb:3.A.1"])
+        assert ["tcdb:3.A.1"] in params.values()
+
+    def test_facet_binds_on_the_term(self):
+        cypher, params = self._build(
+            ontology="interpro", level=0, interpro_type="FAMILY")
+        assert "t.interpro_type = $interpro_type" in cypher
+        assert params["interpro_type"] == "FAMILY"
+
+    def test_missing_level_and_term_ids_raises(self):
+        with pytest.raises(ValueError, match="level.*term_ids"):
+            _ql3b.build_genes_by_ontology_trust_rollups(
+                ontology="tcdb", organism=_ORG3B)

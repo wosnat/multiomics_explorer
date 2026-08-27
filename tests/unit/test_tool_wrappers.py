@@ -78,6 +78,7 @@ EXPECTED_TOOLS = [
     "gene_aa_sequence",
     "gene_neighbors",
     "discussed_by_publication",
+    "ontology_term_details",
 ]
 
 
@@ -6737,7 +6738,9 @@ class TestExpectedToolsUnchangedForTcdbCazy:
         # Bumped 39 → 40 by kg_release_info (KG compatibility check tool).
         # Bumped 40 → 41 by discussed_by_publication (literature-index forward
         # tool; the 3 sibling extensions add fields only, no new tool).
-        assert len(EXPECTED_TOOLS) == 41, (
+        # Bumped 41 → 42 by ontology_term_details (annotation-trust surface
+        # PR 3b — term-side drill-down, legitimate new MCP tool).
+        assert len(EXPECTED_TOOLS) == 42, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
             "tcdb/cazy adds NO new tools (it's a Mode-B ontology surface "
             "refresh); MBG legitimately adds one; "
@@ -7373,7 +7376,9 @@ class TestExpectedToolsUnchangedForPhase1Plumbing:
         # Bumped 39 → 40 by kg_release_info (KG compatibility check tool).
         # Bumped 40 → 41 by discussed_by_publication (literature-index forward
         # tool; its 3 sibling extensions add fields only, no new tool).
-        assert len(EXPECTED_TOOLS) == 41, (
+        # Bumped 41 → 42 by ontology_term_details (annotation-trust surface
+        # PR 3b — term-side drill-down, legitimate new MCP tool).
+        assert len(EXPECTED_TOOLS) == 42, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
             "Phase 1 plumbing adds no new tools — only field additions; "
             "Phase 5 list_metabolite_assays legitimately adds one; "
@@ -9035,7 +9040,9 @@ class TestExpectedToolsUnchangedForPsortbSignalp:
         # Bumped 39 → 40 by kg_release_info (KG compatibility check tool).
         # Bumped 40 → 41 by discussed_by_publication (literature-index forward
         # tool; its 3 sibling extensions add fields only, no new tool).
-        assert len(EXPECTED_TOOLS) == 41, (
+        # Bumped 41 → 42 by ontology_term_details (annotation-trust surface
+        # PR 3b — term-side drill-down, legitimate new MCP tool).
+        assert len(EXPECTED_TOOLS) == 42, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
             "psortb/signalp adds NO new tools (Mode-B ontology surface refresh); "
             "kg_release_info legitimately adds one."
@@ -9821,16 +9828,17 @@ class TestListFilterValuesTrustTypes:
 
 class TestExpectedToolsUnchangedForAnnotationTrust:
     """PR 3a registers three ontologies and a trust surface — no new tool.
-    (`ontology_term_details` lands in PR 3b.)"""
+    PR 3b adds exactly one: `ontology_term_details` (41 → 42)."""
 
-    def test_expected_tools_size_unchanged_at_41(self):
-        assert len(EXPECTED_TOOLS) == 41, (
+    def test_expected_tools_size_is_42(self):
+        assert len(EXPECTED_TOOLS) == 42, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
-            "the annotation-trust surface adds NO new tool in PR 3a"
+            "the annotation-trust surface adds exactly one tool "
+            "(ontology_term_details, PR 3b)"
         )
 
     def test_no_ontology_keys_leaked_in_as_tools(self, tool_fns):
-        for key in ("interpro", "ncbifam", "merops", "ontology_term_details"):
+        for key in ("interpro", "ncbifam", "merops"):
             assert key not in tool_fns
 
 
@@ -9863,3 +9871,489 @@ class TestSparseRowWireShape:
         from multiomics_explorer.mcp_server.tools import register_tools
         src = inspect.getsource(register_tools)
         assert f"class {class_name}(SparseRow):" in src
+
+
+# ===========================================================================
+# PR 3b — annotation-trust surface, term side (RED)
+#
+# New `ontology_term_details` tool (Mode A) + `search_ontology` browse /
+# multi-ontology signature and envelope changes (design §3.4, §3.5, §6;
+# spec §13).
+# ===========================================================================
+
+import inspect as _inspect3b
+import typing as _typing3b
+
+from multiomics_explorer.mcp_server.tools import SparseRow as _SparseRow3b
+
+
+def _response_model(tool_fns, tool_name):
+    hints = _typing3b.get_type_hints(tool_fns[tool_name])
+    return hints["return"]
+
+
+def _row_model(tool_fns, tool_name):
+    resp = _response_model(tool_fns, tool_name)
+    ann = resp.model_fields["results"].annotation
+    return _typing3b.get_args(ann)[0]
+
+
+_OTD_API_RETURN = {
+    "total_matching": 2,
+    "returned": 2,
+    "offset": 0,
+    "truncated": False,
+    "not_found": ["bogus:xyz"],
+    "by_ontology": [{"ontology": "tcdb", "count": 1},
+                    {"ontology": "go_bp", "count": 1}],
+    "links_out_total": 2,
+    "by_link_kind": [{"link_kind": "composition", "count": 2}],
+    "warnings": [],
+    "results": [
+        {
+            "term_id": "tcdb:3.A.1", "ontology": "tcdb", "label": "TcdbFamily",
+            "name": "ABC superfamily", "description": None, "level": 2,
+            "level_kind": "tc_family", "is_informative": True,
+            "gene_count": 900, "organism_count": 45, "direct_gene_count": 120,
+            "tcdb_id": "3.A.1", "tc_class_id": "3.A", "member_count": 55,
+            "superfamily": "ABC", "metabolite_count": 40,
+            "parents": [{"id": "tcdb:3.A", "name": "P-P-bond", "level": 1}],
+            "children": [{"id": "tcdb:3.A.1.1", "name": "fam", "level": 3}],
+            "children_total": 55, "children_truncated": True,
+            "links_out": [
+                {"rel": "Tcdb_family_has_pfam_domain", "link_kind": "composition",
+                 "target_id": "pfam:PF00005", "target_ontology": "pfam",
+                 "target_name": "ABC_tran"},
+                {"rel": "Tcdb_family_involved_in_biological_process",
+                 "link_kind": "composition", "target_id": "go:0055085",
+                 "target_ontology": "go_bp", "target_name": "transmembrane transport"},
+            ],
+        },
+        {
+            "term_id": "go:0006979", "ontology": "go_bp",
+            "label": "BiologicalProcess", "name": "response to oxidative stress",
+            "description": None, "level": 3, "level_kind": "depth",
+            "is_informative": True, "gene_count": 1050, "organism_count": 42,
+            "direct_gene_count": 860,
+            "parents": [{"id": "go:0006950", "name": "response to stress", "level": 2}],
+            "children": [], "children_total": 0, "children_truncated": False,
+            "links_out": [],
+        },
+    ],
+}
+
+
+class TestOntologyTermDetailsWrapper:
+    def test_registered(self, tool_fns):
+        assert "ontology_term_details" in tool_fns
+
+    def test_in_expected_tools(self):
+        assert "ontology_term_details" in EXPECTED_TOOLS
+
+    @pytest.mark.parametrize("param,default", [
+        ("organism", None), ("link_kinds", None), ("verbose", False),
+        ("limit", 50), ("offset", 0),
+    ])
+    def test_signature_defaults(self, tool_fns, param, default):
+        sig = _inspect3b.signature(tool_fns["ontology_term_details"])
+        assert sig.parameters[param].default == default
+
+    def test_term_ids_is_required(self, tool_fns):
+        sig = _inspect3b.signature(tool_fns["ontology_term_details"])
+        assert sig.parameters["term_ids"].default is _inspect3b.Parameter.empty
+
+    def test_no_summary_param(self, tool_fns):
+        sig = _inspect3b.signature(tool_fns["ontology_term_details"])
+        assert "summary" not in sig.parameters
+
+    def test_link_kinds_is_a_closed_literal(self, tool_fns):
+        hint = _hint_str(tool_fns, "ontology_term_details", "link_kinds")
+        for kind in ("composition", "membership", "router"):
+            assert f"'{kind}'" in hint
+
+    @pytest.mark.parametrize("param", [
+        "term_ids", "organism", "link_kinds", "verbose", "limit", "offset",
+    ])
+    def test_field_description_present_and_within_250(self, tool_fns, param):
+        descs = [d for d in _field_descriptions(
+            tool_fns, "ontology_term_details", param) if d]
+        assert descs, f"{param} has no Field description"
+        for d in descs:
+            assert len(d) <= 250, f"{param}: {len(d)} chars"
+
+    def test_docstring_opens_with_a_verb_and_ends_with_routing(self, tool_fns):
+        doc = _inspect3b.getdoc(tool_fns["ontology_term_details"]) or ""
+        first = doc.strip().split()[0]
+        assert first[0].isupper()
+        assert first not in ("This", "The", "A", "An", "Tool")
+        assert "Routing:" in doc
+        assert doc.strip().rfind("Routing:") > doc.strip().rfind("\n\n")
+
+    @pytest.mark.parametrize("needle", [
+        "genes_by_ontology", "search_ontology", "docs://ontologies",
+    ])
+    def test_docstring_routes(self, tool_fns, needle):
+        doc = _inspect3b.getdoc(tool_fns["ontology_term_details"]) or ""
+        assert needle in doc
+
+    @pytest.mark.parametrize("needle", ["composition", "router", "recall"])
+    def test_docstring_carries_the_bridge_direction_contract(self, tool_fns, needle):
+        doc = _inspect3b.getdoc(tool_fns["ontology_term_details"]) or ""
+        assert needle in doc.lower()
+
+    def test_row_model_is_sparse(self, tool_fns):
+        row_model = _row_model(tool_fns, "ontology_term_details")
+        assert issubclass(row_model, _SparseRow3b)
+
+    @pytest.mark.parametrize("field", [
+        "term_id", "ontology", "label", "name", "description", "level",
+        "level_kind", "is_informative", "gene_count", "organism_count",
+        "direct_gene_count", "parents", "children", "children_total",
+        "children_truncated", "links_out", "properties", "genes_by_organism",
+        "organism_gene_count",
+    ])
+    def test_row_model_field(self, tool_fns, field):
+        assert field in _row_model(tool_fns, "ontology_term_details").model_fields
+
+    def test_ontology_field_routes_to_the_reference(self, tool_fns):
+        row_model = _row_model(tool_fns, "ontology_term_details")
+        assert "docs://ontologies" in (
+            row_model.model_fields["ontology"].description or "")
+
+    @pytest.mark.parametrize("field", [
+        "total_matching", "returned", "offset", "truncated", "not_found",
+        "by_ontology", "links_out_total", "by_link_kind", "warnings", "results",
+    ])
+    def test_response_model_field(self, tool_fns, field):
+        assert field in _response_model(
+            tool_fns, "ontology_term_details").model_fields
+
+    def test_row_field_descriptions_within_250(self, tool_fns):
+        row_model = _row_model(tool_fns, "ontology_term_details")
+        for name, field in row_model.model_fields.items():
+            assert field.description, name
+            assert len(field.description) <= 250, name
+
+    @pytest.mark.asyncio
+    async def test_returns_envelope(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.ontology_term_details",
+            return_value=_OTD_API_RETURN,
+        ):
+            result = await tool_fns["ontology_term_details"](
+                mock_ctx, term_ids=["tcdb:3.A.1", "go:0006979", "bogus:xyz"])
+        assert result.total_matching == 2
+        assert result.returned == 2
+        assert result.not_found == ["bogus:xyz"]
+        assert result.links_out_total == 2
+        assert [b.ontology for b in result.by_ontology] == ["tcdb", "go_bp"]
+        assert result.by_link_kind[0].link_kind == "composition"
+        assert result.results[0].term_id == "tcdb:3.A.1"
+        assert result.results[0].children_truncated is True
+        assert result.results[0].links_out[0].target_ontology == "pfam"
+
+    @pytest.mark.asyncio
+    async def test_rows_serialize_sparse(self, tool_fns, mock_ctx):
+        """A GO row never carries tcdb_id; a TCDB row does."""
+        with patch(
+            "multiomics_explorer.api.functions.ontology_term_details",
+            return_value=_OTD_API_RETURN,
+        ):
+            result = await tool_fns["ontology_term_details"](
+                mock_ctx, term_ids=["tcdb:3.A.1", "go:0006979"])
+        go = result.results[1].model_dump()
+        tcdb = result.results[0].model_dump()
+        assert "tcdb_id" not in go
+        assert "properties" not in go
+        assert "genes_by_organism" not in go
+        assert tcdb["tcdb_id"] == "3.A.1"
+
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.ontology_term_details",
+            return_value={**_OTD_API_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["ontology_term_details"](
+                mock_ctx, term_ids=["tcdb:3.A.1"],
+                organism="Prochlorococcus MED4", link_kinds=["router"],
+                verbose=True, limit=10, offset=5)
+        kwargs = mock_api.call_args.kwargs
+        args = mock_api.call_args.args
+        assert kwargs.get("term_ids", args[0] if args else None) == ["tcdb:3.A.1"]
+        assert kwargs["organism"] == "Prochlorococcus MED4"
+        assert kwargs["link_kinds"] == ["router"]
+        assert kwargs["verbose"] is True
+        assert kwargs["limit"] == 10
+        assert kwargs["offset"] == 5
+
+    @pytest.mark.asyncio
+    async def test_empty_term_ids_raises_toolerror(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.ontology_term_details",
+            side_effect=ValueError("term_ids must not be empty"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["ontology_term_details"](mock_ctx, term_ids=[])
+
+    @pytest.mark.asyncio
+    async def test_value_error_becomes_toolerror(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.ontology_term_details",
+            side_effect=ValueError("Unknown link_kind"),
+        ):
+            with pytest.raises(ToolError, match="link_kind"):
+                await tool_fns["ontology_term_details"](
+                    mock_ctx, term_ids=["tcdb:3.A.1"], link_kinds=["router"])
+
+    @pytest.mark.asyncio
+    async def test_verbose_rows_carry_properties_and_genes_by_organism(
+            self, tool_fns, mock_ctx):
+        rows = [dict(_OTD_API_RETURN["results"][0])]
+        rows[0]["properties"] = {"id": "tcdb:3.A.1", "name": "ABC superfamily"}
+        rows[0]["genes_by_organism"] = [
+            {"organism": "Prochlorococcus MED4", "gene_count": 3}]
+        rows[0]["links_out"] = [dict(rows[0]["links_out"][0],
+                                     props={"curated_tcids": ["3.A.1.1.1"]})]
+        with patch(
+            "multiomics_explorer.api.functions.ontology_term_details",
+            return_value={**_OTD_API_RETURN, "results": rows, "returned": 1},
+        ):
+            result = await tool_fns["ontology_term_details"](
+                mock_ctx, term_ids=["tcdb:3.A.1"], verbose=True)
+        row = result.results[0]
+        assert row.properties["id"] == "tcdb:3.A.1"
+        assert row.genes_by_organism[0].organism == "Prochlorococcus MED4"
+        assert row.links_out[0].props["curated_tcids"] == ["3.A.1.1.1"]
+
+    @pytest.mark.asyncio
+    async def test_all_not_found_is_an_empty_envelope(self, tool_fns, mock_ctx):
+        empty = {**_OTD_API_RETURN, "total_matching": 0, "returned": 0,
+                 "truncated": False, "not_found": ["a:1"], "by_ontology": [],
+                 "links_out_total": 0, "by_link_kind": [], "results": []}
+        with patch(
+            "multiomics_explorer.api.functions.ontology_term_details",
+            return_value=empty,
+        ):
+            result = await tool_fns["ontology_term_details"](
+                mock_ctx, term_ids=["a:1"])
+        assert result.results == []
+        assert result.not_found == ["a:1"]
+
+
+class TestSearchOntologyWrapper3b:
+    """`search_text` optional (browse), `ontology: list | str | None`,
+    `min_gene_count`, `organism`; rows gain `ontology_type`; envelope gains
+    `mode` / `by_ontology` / `by_level` / `skipped_ontologies` / `warnings`."""
+
+    _BROWSE_RETURN = {
+        "total_entries": 300, "total_matching": 60,
+        "score_max": None, "score_median": None,
+        "returned": 2, "offset": 0, "truncated": True,
+        "mode": "browse",
+        "by_ontology": [{"ontology": "merops", "total_entries": 300,
+                         "total_matching": 60, "score_max": None,
+                         "returned": 2, "truncated": True}],
+        "by_level": [{"level": 1, "count": 60}],
+        "skipped_ontologies": [],
+        "warnings": ["browse mode truncated; narrow with level / min_gene_count"],
+        "results": [
+            {"id": "merops.family:S33", "name": "S33", "ontology_type": "merops",
+             "score": None, "level": 1, "is_informative": True,
+             "gene_count": 412, "organism_count": 41},
+            {"id": "merops.family:S09", "name": "S09", "ontology_type": "merops",
+             "score": None, "level": 1, "is_informative": True,
+             "gene_count": 298, "organism_count": 40},
+        ],
+    }
+
+    @pytest.mark.parametrize("param,default", [
+        ("search_text", None), ("ontology", None),
+        ("min_gene_count", None), ("organism", None),
+    ])
+    def test_signature_defaults(self, tool_fns, param, default):
+        sig = _inspect3b.signature(tool_fns["search_ontology"])
+        assert sig.parameters[param].default == default
+
+    def test_ontology_accepts_a_list(self, tool_fns):
+        assert "list" in _hint_str(tool_fns, "search_ontology", "ontology").lower()
+
+    @pytest.mark.parametrize("param", [
+        "search_text", "ontology", "min_gene_count", "organism",
+    ])
+    def test_field_description_present_and_within_250(self, tool_fns, param):
+        descs = [d for d in _field_descriptions(
+            tool_fns, "search_ontology", param) if d]
+        assert descs, f"{param} has no Field description"
+        for d in descs:
+            assert len(d) <= 250, f"{param}: {len(d)} chars"
+
+    def test_search_text_description_mentions_browse(self, tool_fns):
+        joined = " ".join(
+            d for d in _field_descriptions(tool_fns, "search_ontology", "search_text") if d)
+        assert "browse" in joined.lower()
+
+    def test_docstring_routes_to_the_reference(self, tool_fns):
+        doc = _inspect3b.getdoc(tool_fns["search_ontology"]) or ""
+        assert "docs://ontologies" in doc
+        assert "ontology_term_details" in doc
+
+    @pytest.mark.parametrize("field", [
+        "ontology_type", "description", "level_kind", "direct_gene_count",
+        "superfamily", "metabolite_count", "family_type", "gene_symbol",
+        "family_class", "catalytic_type", "peptidase_gene_count",
+        "interpro_type", "organism_gene_count",
+    ])
+    def test_row_model_field(self, tool_fns, field):
+        assert field in _row_model(tool_fns, "search_ontology").model_fields
+
+    def test_row_score_is_optional(self, tool_fns):
+        row_model = _row_model(tool_fns, "search_ontology")
+        assert row_model.model_fields["score"].is_required() is False
+
+    @pytest.mark.parametrize("field", [
+        "mode", "by_ontology", "by_level", "by_interpro_type",
+        "by_family_type", "skipped_ontologies", "warnings",
+    ])
+    def test_response_model_field(self, tool_fns, field):
+        assert field in _response_model(tool_fns, "search_ontology").model_fields
+
+    @pytest.mark.asyncio
+    async def test_browse_call_without_search_text(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value=self._BROWSE_RETURN,
+        ) as mock_api:
+            result = await tool_fns["search_ontology"](
+                mock_ctx, ontology="merops", level=1)
+        assert result.mode == "browse"
+        assert result.results[0].id == "merops.family:S33"
+        assert result.results[0].gene_count == 412
+        assert result.results[0].score is None
+        assert result.results[0].ontology_type == "merops"
+        assert result.by_level[0].level == 1
+        assert result.by_ontology[0].ontology == "merops"
+        assert result.by_ontology[0].truncated is True
+        assert result.warnings
+        call = mock_api.call_args
+        text = call.kwargs.get("search_text", call.args[0] if call.args else "MISSING")
+        assert text is None
+
+    @pytest.mark.asyncio
+    async def test_list_ontology_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value={**self._BROWSE_RETURN, "results": [], "returned": 0,
+                          "mode": "search"},
+        ) as mock_api:
+            await tool_fns["search_ontology"](
+                mock_ctx, search_text="transport", ontology=["go_bp", "tcdb"],
+                limit=5)
+        call = mock_api.call_args
+        ont = call.kwargs.get(
+            "ontology", call.args[1] if len(call.args) > 1 else None)
+        assert ont == ["go_bp", "tcdb"]
+
+    @pytest.mark.asyncio
+    async def test_new_params_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value={**self._BROWSE_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["search_ontology"](
+                mock_ctx, ontology="interpro",
+                interpro_type="HOMOLOGOUS_SUPERFAMILY",
+                organism="Prochlorococcus MED4", min_gene_count=5)
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs["organism"] == "Prochlorococcus MED4"
+        assert kwargs["min_gene_count"] == 5
+        assert kwargs["interpro_type"] == "HOMOLOGOUS_SUPERFAMILY"
+
+    @pytest.mark.asyncio
+    async def test_rows_with_organism_gene_count(self, tool_fns, mock_ctx):
+        rows = [dict(self._BROWSE_RETURN["results"][0], organism_gene_count=9)]
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value={**self._BROWSE_RETURN, "results": rows, "returned": 1},
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, ontology="merops", organism="Prochlorococcus MED4")
+        assert result.results[0].organism_gene_count == 9
+
+    @pytest.mark.asyncio
+    async def test_compact_rows_serialize_sparse(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value=self._BROWSE_RETURN,
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, ontology="merops", level=1)
+        dumped = result.results[0].model_dump()
+        assert "description" not in dumped
+        assert "family_class" not in dumped
+        assert "organism_gene_count" not in dumped
+        assert dumped["score"] is None
+
+    @pytest.mark.asyncio
+    async def test_multi_response_carries_skipped_and_by_ontology(
+            self, tool_fns, mock_ctx):
+        multi = {
+            **self._BROWSE_RETURN, "mode": "search", "score_max": 9.0,
+            "score_median": 4.0, "warnings": [],
+            "by_ontology": [
+                {"ontology": "go_bp", "total_entries": 1000, "total_matching": 40,
+                 "score_max": 9.0, "returned": 5, "truncated": True},
+                {"ontology": "tcdb", "total_entries": 500, "total_matching": 3,
+                 "score_max": 6.0, "returned": 3, "truncated": False},
+            ],
+            "by_level": [],
+            "results": [
+                {"id": "go:0055085", "name": "transmembrane transport",
+                 "ontology_type": "go_bp", "score": 9.0, "level": 3,
+                 "is_informative": True, "gene_count": 10, "organism_count": 4},
+                {"id": "tcdb:3.A.1", "name": "ABC", "ontology_type": "tcdb",
+                 "score": 6.0, "level": 2, "is_informative": True,
+                 "gene_count": 10, "organism_count": 4},
+            ],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value=multi,
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, search_text="transport", ontology=["go_bp", "tcdb"],
+                limit=5)
+        assert [b.ontology for b in result.by_ontology] == ["go_bp", "tcdb"]
+        assert result.by_ontology[0].truncated is True
+        assert result.by_ontology[1].truncated is False
+        assert result.skipped_ontologies == []
+        assert [r.ontology_type for r in result.results] == ["go_bp", "tcdb"]
+
+    @pytest.mark.asyncio
+    async def test_facet_owner_absent_becomes_toolerror(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            side_effect=ValueError("interpro_type is only carried by 'interpro'"),
+        ):
+            with pytest.raises(ToolError, match="interpro_type"):
+                await tool_fns["search_ontology"](
+                    mock_ctx, search_text="kinase", ontology=["kegg", "tcdb"],
+                    interpro_type="DOMAIN")
+
+    @pytest.mark.asyncio
+    async def test_verbose_rows_carry_term_verbose_columns(self, tool_fns, mock_ctx):
+        rows = [dict(self._BROWSE_RETURN["results"][0],
+                     description="serine peptidase", level_kind="family",
+                     direct_gene_count=400, family_class="S",
+                     catalytic_type="Serine", peptidase_gene_count=380)]
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value={**self._BROWSE_RETURN, "results": rows, "returned": 1},
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, ontology="merops", verbose=True)
+        row = result.results[0]
+        assert row.description == "serine peptidase"
+        assert row.family_class == "S"
+        assert row.peptidase_gene_count == 380
+        assert row.direct_gene_count == 400

@@ -38,25 +38,23 @@ def _rel_props(baseline, rel_type):
     return set(baseline["relationships"].get(rel_type, {}).get("properties", {}))
 
 
-def _verbose_edge_pairs(cfg):
-    """Normalize `verbose_edge` entries to (neo4j_prop, output_column).
+# PR 3b: the normalizer is public in queries_lib (`verbose_edge_pairs`);
+# the old `_verbose_edge_pairs` name stays as an alias for one release.
+try:
+    from multiomics_explorer.kg.queries_lib import (
+        verbose_edge_pairs as _verbose_edge_pairs,
+    )
+except ImportError:  # RED until PR 3b lands the public name; drop in Stage 3
+    from multiomics_explorer.kg.queries_lib import _verbose_edge_pairs
 
-    A bare string means column == prop; a 2-tuple/list means (prop, column).
-    PSORTb / SignalP are the only renaming entries today
-    (`score` -> `localization_score`, `probability` ->
-    `signal_peptide_probability`).
-    """
-    pairs = []
-    for entry in cfg.get("verbose_edge", []) or []:
-        if isinstance(entry, str):
-            pairs.append((entry, entry))
-        elif isinstance(entry, (tuple, list)) and len(entry) == 2:
-            pairs.append((entry[0], entry[1]))
-        elif isinstance(entry, dict):
-            pairs.append((entry["prop"], entry.get("column", entry["prop"])))
-        else:  # pragma: no cover - guard
-            raise AssertionError(f"unrecognised verbose_edge entry: {entry!r}")
-    return pairs
+
+class TestVerboseEdgePairsIsPublic:
+    """PR 3b: the normalizer this module leans on is public API."""
+
+    def test_public_name_exists(self):
+        from multiomics_explorer.kg import queries_lib
+        assert hasattr(queries_lib, "verbose_edge_pairs")
+        assert queries_lib.verbose_edge_pairs is queries_lib._verbose_edge_pairs
 
 
 # --- registry membership ----------------------------------------------------

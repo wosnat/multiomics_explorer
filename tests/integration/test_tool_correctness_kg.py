@@ -929,3 +929,98 @@ class TestRunCypherCorrectness:
         )
         assert result["returned"] == 1
         assert result["truncated"] is False
+
+
+
+# ---------------------------------------------------------------------------
+# PR 3b — builder-level checks for browse mode and ontology_term_details
+# (spec §7.4 / §7.5 verified figures, freeze notes v1.2).
+# ---------------------------------------------------------------------------
+
+@pytest.mark.kg
+class TestSearchOntologyBrowseCorrectnessKG:
+    def test_merops_level1_browse_top5(self, conn):
+        cypher, params = build_search_ontology(
+            ontology="merops", search_text=None, level=1, limit=5)
+        rows = conn.execute_query(cypher, **params)
+        assert [r["id"] for r in rows] == [
+            "merops.family:S33", "merops.family:S09", "merops.family:C26",
+            "merops.family:M38", "merops.family:C44",
+        ]
+        assert [r["gene_count"] for r in rows] == [412, 298, 272, 175, 169]
+        assert all(r["score"] is None for r in rows)
+
+    def test_merops_browse_summary_by_level(self, conn):
+        cypher, params = build_search_ontology_summary(
+            ontology="merops", search_text=None)
+        row = conn.execute_query(cypher, **params)[0]
+        assert row["total_matching"] == row["total_entries"]
+        assert row["score_max"] is None
+        assert {e["level"] for e in row["by_level"]} >= {0, 1}
+
+    def test_pfam_browse_dual_label(self, conn):
+        cypher, params = build_search_ontology(
+            ontology="pfam", search_text=None, level=0, limit=5)
+        rows = conn.execute_query(cypher, **params)
+        assert rows and all(r["level"] == 0 for r in rows)
+
+    def test_interpro_med4_scoped_browse(self, conn):
+        cypher, params = build_search_ontology(
+            ontology="interpro", search_text=None,
+            interpro_type="HOMOLOGOUS_SUPERFAMILY",
+            organism="Prochlorococcus MED4", min_gene_count=5, limit=5,
+            informative_only=True)
+        rows = conn.execute_query(cypher, **params)
+        assert rows[0]["id"] == "interpro:IPR027417"
+        assert rows[0]["organism_gene_count"] == 119
+        assert [r["organism_gene_count"] for r in rows] == sorted(
+            [r["organism_gene_count"] for r in rows], reverse=True)
+
+
+@pytest.mark.kg
+class TestOntologyTermDetailsCorrectnessKG:
+    _IDS = ["tcdb:3.A.1", "merops.family:S14", "interpro:IPR000362",
+            "ncbifam:NF000812", "go:0006979", "bogus:xyz"]
+
+    def _rows(self, conn, **kw):
+        from multiomics_explorer.kg.queries_lib import build_ontology_term_details
+        cypher, params = build_ontology_term_details(term_ids=self._IDS, **kw)
+        rows = conn.execute_query(cypher, **params)
+        return {r["term_id"]: r for r in rows}
+
+    def test_one_row_per_input_in_order(self, conn):
+        from multiomics_explorer.kg.queries_lib import build_ontology_term_details
+        cypher, params = build_ontology_term_details(term_ids=self._IDS)
+        rows = conn.execute_query(cypher, **params)
+        assert [r["term_id"] for r in rows] == self._IDS
+
+    def test_verified_counts(self, conn):
+        rows = self._rows(conn)
+        t = rows["tcdb:3.A.1"]
+        assert (len(t["parents"]), t["children_total"], t["links_total"]) == (1, 55, 129)
+        assert len(t["children"]) == 50
+        s = rows["merops.family:S14"]
+        assert (len(s["parents"]), s["children_total"], s["links_total"]) == (1, 0, 1)
+        i = rows["interpro:IPR000362"]
+        assert (len(i["parents"]), i["children_total"], i["links_total"]) == (0, 4, 5)
+        n = rows["ncbifam:NF000812"]
+        assert (len(n["parents"]), n["children_total"], n["links_total"]) == (0, 0, 0)
+        g = rows["go:0006979"]
+        assert (g["level"], g["gene_count"], g["organism_count"]) == (3, 1050, 42)
+        assert (len(g["parents"]), g["children_total"], g["links_total"]) == (1, 3, 0)
+
+    def test_not_found_flag(self, conn):
+        rows = self._rows(conn)
+        assert rows["bogus:xyz"]["not_found"] is True
+        assert rows["tcdb:3.A.1"]["not_found"] is False
+
+    def test_link_kinds_router_only(self, conn):
+        rows = self._rows(conn, link_kinds=["router"])
+        assert rows["tcdb:3.A.1"]["links_total"] == 0
+        assert rows["interpro:IPR000362"]["links_total"] == 5
+
+    def test_verbose_shape(self, conn):
+        rows = self._rows(conn, verbose=True)
+        g = rows["go:0006979"]
+        assert g["properties"]["id"] == "go:0006979"
+        assert len(g["genes_by_organism"]) == 42
