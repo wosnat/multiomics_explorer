@@ -1541,11 +1541,11 @@ def register_tools(mcp: FastMCP):
         value: str = Field(
             description="Filter value (e.g. 'Photosynthesis', 'Transport', 'Unknown')."
         )
-        count: int = Field(
-            default=0,
-            description="Number of items with this value (0/unset on trust "
-                        "filter types where ControlledVocabulary/pivot has no "
-                        "per-value graph count).",
+        count: int | None = Field(
+            default=None,
+            description="Number of items with this value. None on trust "
+                        "filter types (ControlledVocabulary/pivot rows carry "
+                        "no per-value graph count).",
         )
         tree_code: str | None = Field(
             default=None,
@@ -1558,10 +1558,10 @@ def register_tools(mcp: FastMCP):
                         "'pivot' (KG-side vocab node missing; derived from the "
                         "graph, see envelope warnings).",
         )
-        applies_to: str | None = Field(
+        applies_to: list[str] | None = Field(
             default=None,
-            description="Edge/node type this value is scoped to (sparse: "
-                        "trust filter types only), e.g. 'Gene_has_merops_family'.",
+            description="Edge/node type(s) this value is scoped to (sparse: "
+                        "trust filter types only), e.g. ['Gene_has_merops_family'].",
         )
         description: str | None = Field(
             default=None,

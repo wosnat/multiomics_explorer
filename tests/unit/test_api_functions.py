@@ -1707,6 +1707,12 @@ class TestGeneOntologyTerms:
             "by_ontology", "by_term",
             "terms_per_gene_min", "terms_per_gene_max", "terms_per_gene_median",
             "returned", "offset", "truncated", "not_found", "no_terms", "results",
+            # Annotation-trust surface (design section 5.1). `evidence_score_signals`
+            # is deliberately absent: it appears only when `min_evidence_score`
+            # is set, and this call applies no cutoff.
+            "trust_axes", "by_evidence", "by_tier", "by_sources", "by_call_class",
+            "evidence_score_stats", "filters_applied", "skipped_ontologies",
+            "warnings",
         }
         assert set(result.keys()) == expected_keys
 
@@ -11543,7 +11549,8 @@ class TestGeneOntologyTermsEdgePropStripping:
     per-chunk inside the detail-row loop, keyed on the chunk's ontology."""
 
     _run_strip = TestGenesByOntologyEdgePropStripping._run_strip
-    _owned_universe = TestGenesByOntologyEdgePropStripping._owned_universe
+    _owned_universe = staticmethod(
+        TestGenesByOntologyEdgePropStripping._owned_universe)
 
     def test_non_owner_chunk_strips_all_four(self):
         rows = [
