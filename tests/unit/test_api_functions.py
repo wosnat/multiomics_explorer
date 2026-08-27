@@ -14097,11 +14097,19 @@ class TestGenesByOntologyAggregateRollups:
         return api.genes_by_ontology(
             ontology="tcdb", organism=_ORG, level=2, conn=mock_conn, **kwargs)
 
+    @staticmethod
+    def _is_detail_scan(cypher):
+        """The paged detail query is the only one projecting term_name; the
+        per-gene rollup (Query B) also emits `AS locus_tag`, so that alone
+        cannot identify it."""
+        return "AS term_name" in cypher and "AS locus_tag" in cypher
+
     def test_paged_call_runs_the_detail_scan_exactly_once(self, mock_conn):
         calls = []
         self._run(mock_conn, calls, limit=5)
-        detail = [c for c, _ in calls if "AS locus_tag" in c]
+        detail = [c for c, _ in calls if self._is_detail_scan(c)]
         assert len(detail) == 1
+        assert "LIMIT $limit" in detail[0]
 
     def test_paged_call_runs_the_aggregate_projection(self, mock_conn):
         calls = []
@@ -14109,6 +14117,7 @@ class TestGenesByOntologyAggregateRollups:
         agg = [c for c, _ in calls if "by_evidence" in c]
         assert len(agg) == 1
         assert "AS locus_tag" not in agg[0]
+        assert "AS term_name" not in agg[0]
         assert "LIMIT" not in agg[0]
 
     def test_envelope_reads_the_aggregate_row(self, mock_conn):
@@ -14123,7 +14132,7 @@ class TestGenesByOntologyAggregateRollups:
         calls = []
         result = self._run(mock_conn, calls, summary=True)
         assert result["results"] == []
-        assert not [c for c, _ in calls if "AS locus_tag" in c]
+        assert not [c for c, _ in calls if self._is_detail_scan(c)]
         assert _freq_map(result["by_evidence"]) == {"curated": 5, "homology": 2}
 
     def test_aggregate_carries_the_trust_filters(self, mock_conn):

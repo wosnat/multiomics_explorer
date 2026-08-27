@@ -322,12 +322,14 @@ _FACET_PARAMS: dict[str, tuple[str, str]] = {
 
 # Trust filter params -> the config axis they need. `call_class` is not an
 # axis: it is declared per-ontology under `compact_edge`.
-_TRUST_FILTER_AXIS: dict[str, str] = {
+TRUST_FILTER_AXIS: dict[str, str] = {
     "sources": "sources",
     "evidence": "evidence",
     "max_tier": "tier",
     "min_evidence_score": "evidence_score",
 }
+# Pre-3b private name — kept as an alias for one release (spec §13 ii).
+_TRUST_FILTER_AXIS = TRUST_FILTER_AXIS
 
 _IDENTIFIER_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 
@@ -344,7 +346,7 @@ def _safe_identifier(value: str, what: str) -> str:
     return value
 
 
-def _verbose_edge_pairs(cfg: dict) -> list[tuple[str, str]]:
+def verbose_edge_pairs(cfg: dict) -> list[tuple[str, str]]:
     """Normalize `verbose_edge` entries to (edge_prop, output_column) pairs.
 
     A bare string means column == prop; a 2-tuple means (prop, column) —
@@ -359,6 +361,10 @@ def _verbose_edge_pairs(cfg: dict) -> list[tuple[str, str]]:
             prop, column = entry
             pairs.append((prop, column))
     return pairs
+
+
+# Pre-3b private name — kept as an alias for one release (spec §13 ii).
+_verbose_edge_pairs = verbose_edge_pairs
 
 
 def _ontology_cfg(ontology: str) -> dict:
@@ -2973,30 +2979,56 @@ def build_list_experiments_summary(
     return cypher, params
 
 
-def build_search_ontology_summary(
-    *, ontology: str, search_text: str,
-    level: int | None = None,
-    tree: str | None = None,
-    informative_only: bool = False,
-    interpro_type: str | None = None,
-) -> tuple[str, dict]:
-    """Build summary Cypher for search_ontology.
+def _is_browse(search_text: str | None) -> bool:
+    """`search_text` None / '' / whitespace selects browse mode (spec §7.4)."""
+    return search_text is None or not search_text.strip()
 
-    `interpro_type` is the InterPro term facet (spec §7.4) — the same
-    `facet` config entry BRITE's `tree` uses.
 
-    RETURN keys: total_entries, total_matching, score_max, score_median.
+def _search_ontology_term_verbose_props(cfg: dict) -> list[str]:
+    """Term-side verbose columns for search_ontology (design §3.4).
+
+    `description`, `level_kind`, `direct_gene_count` (hierarchical labels
+    only — flat ontologies have no rollup so the prop does not exist), then
+    the registry `term_verbose` union.
     """
-    if ontology not in ONTOLOGY_CONFIG:
-        raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
-    facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
-    cfg = ONTOLOGY_CONFIG[ontology]
-    index_name = cfg["fulltext_index"]
-    parent_index = cfg.get("parent_fulltext_index")
+    props = ["description", "level_kind"]
+    if cfg["hierarchy_rels"]:
+        props.append("direct_gene_count")
+    for prop in cfg.get("term_verbose") or []:
+        if prop not in props:
+            props.append(prop)
+    return props
 
-    params: dict = {"search_text": search_text}
 
-    # Build optional WHERE predicates
+def _search_ontology_org_scope(cfg: dict, *, indent: str) -> str:
+    """OPTIONAL MATCH counting one organism's genes on `t` (spec §7.4).
+
+    Direct gene edge from the registry `gene_rel`. BRITE reaches genes
+    through its `bridge` (KEGG term); Pfam walks `*0..1` so a clan row counts
+    its member domains' genes rather than reading 0.
+    """
+    gene_rel = cfg["gene_rel"]
+    bridge = cfg.get("bridge")
+    if bridge:
+        pattern = (
+            f"(t)<-[:{bridge['edge']}]-(:{bridge['node_label']})"
+            f"<-[:{gene_rel}]-(g:Gene {{organism_name: $organism}})"
+        )
+    elif cfg.get("parent_label"):
+        rel_union = "|".join(cfg["hierarchy_rels"])
+        pattern = (
+            f"(t)<-[:{rel_union}*0..1]-(:{cfg['label']})"
+            f"<-[:{gene_rel}]-(g:Gene {{organism_name: $organism}})"
+        )
+    else:
+        pattern = f"(t)<-[:{gene_rel}]-(g:Gene {{organism_name: $organism}})"
+    return f"{indent}OPTIONAL MATCH {pattern}\n"
+
+
+def _search_ontology_predicates(
+    *, level, facet, informative_only, min_gene_count, organism, params,
+) -> tuple[list[str], str]:
+    """Shared term-side WHERE parts + the organism-scope post-filter."""
     where_parts: list[str] = []
     if level is not None:
         where_parts.append("t.level = $level")
@@ -3007,7 +3039,111 @@ def build_search_ontology_summary(
         params[facet_param] = facet_value
     if informative_only:
         where_parts.append("coalesce(t.is_uninformative, '') <> 'true'")
+    org_where = ""
+    if min_gene_count is not None:
+        params["min_gene_count"] = min_gene_count
+        if organism is None:
+            where_parts.append("t.gene_count >= $min_gene_count")
+        else:
+            org_where = "WHERE org_gene_count >= $min_gene_count\n"
+    if organism is not None:
+        params["organism"] = organism
+    return where_parts, org_where
+
+
+def build_search_ontology_summary(
+    *, ontology: str, search_text: str | None = None,
+    level: int | None = None,
+    tree: str | None = None,
+    informative_only: bool = False,
+    interpro_type: str | None = None,
+    min_gene_count: int | None = None,
+    organism: str | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for search_ontology.
+
+    `search_text` None / empty selects browse mode (spec §7.4): a plain
+    label MATCH with no fulltext CALL; `score_max` / `score_median` are null
+    and `by_level` ([{level, count}]) rolls up the FULL match. Search mode
+    keeps its existing Cypher.
+
+    `interpro_type` is the InterPro term facet (spec §7.4) — the same
+    `facet` config entry BRITE's `tree` uses. `min_gene_count` filters on the
+    node `gene_count` (or, with `organism`, on the per-organism count).
+
+    RETURN keys: total_entries, total_matching, score_max, score_median;
+    browse adds by_level.
+    """
+    if ontology not in ONTOLOGY_CONFIG:
+        raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
+    facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
+    cfg = ONTOLOGY_CONFIG[ontology]
+    index_name = cfg["fulltext_index"]
+    parent_index = cfg.get("parent_fulltext_index")
+    browse = _is_browse(search_text)
+
+    params: dict = {} if browse else {"search_text": search_text}
+    where_parts, org_where = _search_ontology_predicates(
+        level=level, facet=facet, informative_only=informative_only,
+        min_gene_count=min_gene_count, organism=organism, params=params,
+    )
+    label = cfg["label"]
+
+    if browse:
+        if parent_index:
+            where_parts.insert(0, f"(t:{label} OR t:{cfg['parent_label']})")
+            match = "MATCH (t)\n"
+            total_entries = (
+                f"CALL {{ MATCH (all_t:{label}) RETURN count(all_t) AS pfam_count }}\n"
+                f"CALL {{ MATCH (all_c:{cfg['parent_label']}) "
+                "RETURN count(all_c) AS clan_count }\n"
+                "RETURN pfam_count + clan_count AS total_entries,\n"
+            )
+        else:
+            match = f"MATCH (t:{label})\n"
+            total_entries = (
+                f"CALL {{ MATCH (all_t:{label}) RETURN count(all_t) AS total_entries }}\n"
+                "RETURN total_entries,\n"
+            )
+        where_clause = (
+            "WHERE " + " AND ".join(where_parts) + "\n" if where_parts else ""
+        )
+        org_block = ""
+        if organism is not None:
+            org_block = (
+                _search_ontology_org_scope(cfg, indent="")
+                + "WITH t, count(DISTINCT g) AS org_gene_count\n"
+                + org_where
+            )
+        cypher = (
+            match
+            + where_clause
+            + org_block
+            + "WITH count(t) AS total_matching,\n"
+            "     [x IN apoc.coll.frequencies(collect(t.level))"
+            " | {level: x.item, count: x.count}] AS by_level\n"
+            + total_entries
+            + "       total_matching, null AS score_max, null AS score_median,\n"
+            "       by_level"
+        )
+        return cypher, params
+
     where_clause = "  WHERE " + " AND ".join(where_parts) + "\n" if where_parts else ""
+    # Organism scope in search mode: count the organism's genes per term and
+    # apply the per-organism floor after the fulltext YIELD.
+    org_inner = ""
+    org_flat = ""
+    if organism is not None:
+        org_inner = (
+            _search_ontology_org_scope(cfg, indent="  ")
+            + "  WITH t, score, count(DISTINCT g) AS org_gene_count\n"
+            + ("  " + org_where if org_where else "")
+        )
+        org_flat = (
+            _search_ontology_org_scope(cfg, indent="")
+            + "WITH t, score, count(DISTINCT g) AS org_gene_count\n"
+            + org_where
+        )
 
     if parent_index:
         cypher = (
@@ -3015,11 +3151,13 @@ def build_search_ontology_summary(
             f"  CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
             "  YIELD node AS t, score\n"
             + where_clause
+            + org_inner
             + "  RETURN score\n"
             "  UNION ALL\n"
             f"  CALL db.index.fulltext.queryNodes('{parent_index}', $search_text)\n"
             "  YIELD node AS t, score\n"
             + where_clause
+            + org_inner
             + "  RETURN score\n"
             "}\n"
             "WITH count(score) AS total_matching,\n"
@@ -3031,11 +3169,11 @@ def build_search_ontology_summary(
             "       total_matching, score_max, score_median"
         )
     else:
-        label = cfg["label"]
         cypher = (
             f"CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
             "YIELD node AS t, score\n"
             + where_clause
+            + org_flat
             + "WITH count(t) AS total_matching,\n"
             "     max(score) AS score_max,\n"
             "     percentileDisc(score, 0.5) AS score_median\n"
@@ -3046,7 +3184,7 @@ def build_search_ontology_summary(
 
 
 def build_search_ontology(
-    *, ontology: str, search_text: str,
+    *, ontology: str, search_text: str | None = None,
     limit: int | None = None,
     offset: int = 0,
     level: int | None = None,
@@ -3054,16 +3192,30 @@ def build_search_ontology(
     informative_only: bool = False,
     verbose: bool = False,
     interpro_type: str | None = None,
+    min_gene_count: int | None = None,
+    organism: str | None = None,
 ) -> tuple[str, dict]:
     """Build Cypher for search_ontology.
 
-    RETURN keys: id, name, score, level, tree, tree_code, is_informative,
-    gene_count, organism_count (the two term-side counts every ontology label
-    carries — `term_compact` in the registry). InterPro rows also carry the
-    `interpro_type` facet column.
+    Two modes (spec §7.4):
 
-    `interpro_type` filters the search to one InterPro stratum, the same
-    `facet` mechanism BRITE's `tree` uses.
+    * search — `search_text` given: fulltext CALL, `ORDER BY score DESC, id`
+      (existing Cypher, unchanged).
+    * browse — `search_text` None / empty / whitespace: plain label MATCH
+      (`MATCH (t:<label>)`; Pfam `MATCH (t) WHERE t:Pfam OR t:PfamClan`),
+      no fulltext CALL, `null AS score`, `ORDER BY gene_count DESC, id`.
+
+    `min_gene_count` filters on the node `gene_count`. With `organism`, the
+    per-organism gene count is computed (`org_gene_count`, projected as
+    `organism_gene_count`), the floor applies to it, and browse rows sort by
+    `org_gene_count DESC, id` (search mode keeps `score DESC`).
+
+    RETURN keys (compact): id, name, score, level, tree, tree_code,
+    is_informative, gene_count, organism_count (`term_compact`), the facet
+    column where owned (InterPro `interpro_type`), `organism_gene_count`
+    when `organism` is set.
+    Verbose adds description, level_kind, direct_gene_count (hierarchical
+    labels only) and the registry `term_verbose` union.
 
     When the selected ontology's ONTOLOGY_CONFIG entry declares `discusses_rel`
     (KEGG only today), an extra per-row `discussed_by_n_publications`
@@ -3077,6 +3229,7 @@ def build_search_ontology(
     cfg = ONTOLOGY_CONFIG[ontology]
     index_name = cfg["fulltext_index"]
     parent_index = cfg.get("parent_fulltext_index")
+    browse = _is_browse(search_text)
 
     # Term-side compact counts (registry `term_compact`) plus the facet column
     # where the ontology owns one that is not already a first-class column.
@@ -3084,10 +3237,19 @@ def build_search_ontology(
     cfg_facet = cfg.get("facet")
     if cfg_facet and cfg_facet["prop"] not in _STANDARD_TERM_ROW_COLUMNS:
         term_props.append(cfg_facet["prop"])
+    if verbose:
+        term_props.extend(
+            p for p in _search_ontology_term_verbose_props(cfg)
+            if p not in term_props
+        )
     # Inner projection is indented one level deeper inside the UNION subquery.
     term_cols = "".join(f",\n         t.{prop} AS {prop}" for prop in term_props)
     term_cols_flat = "".join(f",\n       t.{prop} AS {prop}" for prop in term_props)
     term_outer = "".join(f",\n       {prop}" for prop in term_props)
+    if organism is not None:
+        term_cols += ",\n         org_gene_count AS organism_gene_count"
+        term_cols_flat += ",\n       org_gene_count AS organism_gene_count"
+        term_outer += ",\n       organism_gene_count"
 
     # Publication "discusses" columns — config-gated (only ontologies whose
     # config declares `discusses_rel`, i.e. KEGG). Rel-type read from config,
@@ -3112,7 +3274,7 @@ def build_search_ontology(
         discusses_verbose_col = ""
         discusses_outer = ""
 
-    params: dict = {"search_text": search_text}
+    params: dict = {} if browse else {"search_text": search_text}
     if offset:
         skip_clause = "\nSKIP $offset"
         params["offset"] = offset
@@ -3122,20 +3284,59 @@ def build_search_ontology(
     if limit is not None:
         params["limit"] = limit
 
-    # Build optional WHERE predicates
-    where_parts: list[str] = []
-    if level is not None:
-        where_parts.append("t.level = $level")
-        params["level"] = level
-    if facet is not None:
-        facet_prop, facet_param, facet_value = facet
-        where_parts.append(f"t.{facet_prop} = ${facet_param}")
-        params[facet_param] = facet_value
-    if informative_only:
-        where_parts.append("coalesce(t.is_uninformative, '') <> 'true'")
-    where_clause = "  WHERE " + " AND ".join(where_parts) + "\n" if where_parts else ""
-
+    where_parts, org_where = _search_ontology_predicates(
+        level=level, facet=facet, informative_only=informative_only,
+        min_gene_count=min_gene_count, organism=organism, params=params,
+    )
     inner_discusses = discusses_count_col + discusses_verbose_col
+
+    if browse:
+        label = cfg["label"]
+        if parent_index:
+            where_parts.insert(0, f"(t:{label} OR t:{cfg['parent_label']})")
+            match = "MATCH (t)\n"
+        else:
+            match = f"MATCH (t:{label})\n"
+        where_clause = (
+            "WHERE " + " AND ".join(where_parts) + "\n" if where_parts else ""
+        )
+        if organism is not None:
+            org_block = (
+                _search_ontology_org_scope(cfg, indent="")
+                + "WITH t, count(DISTINCT g) AS org_gene_count\n"
+                + org_where
+                + "WITH t, org_gene_count\n"
+                "ORDER BY org_gene_count DESC, t.id"
+            )
+        else:
+            org_block = "WITH t\nORDER BY t.gene_count DESC, t.id"
+        cypher = (
+            match
+            + where_clause
+            + org_block
+            + skip_clause + limit_clause + "\n"
+            "RETURN t.id AS id, t.name AS name, null AS score,\n"
+            "       t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
+            "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
+            + term_cols_flat
+            + inner_discusses
+        )
+        return cypher, params
+
+    where_clause = "  WHERE " + " AND ".join(where_parts) + "\n" if where_parts else ""
+    org_inner = ""
+    org_flat = ""
+    if organism is not None:
+        org_inner = (
+            _search_ontology_org_scope(cfg, indent="  ")
+            + "  WITH t, score, count(DISTINCT g) AS org_gene_count\n"
+            + ("  " + org_where if org_where else "")
+        )
+        org_flat = (
+            _search_ontology_org_scope(cfg, indent="")
+            + "WITH t, score, count(DISTINCT g) AS org_gene_count\n"
+            + org_where
+        )
 
     if parent_index:
         # UNION search across both indexes (e.g. Pfam domain + clan)
@@ -3144,6 +3345,7 @@ def build_search_ontology(
             f"  CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
             "  YIELD node AS t, score\n"
             + where_clause
+            + org_inner
             + "  RETURN t.id AS id, t.name AS name, score,\n"
             "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
             "         coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
@@ -3152,6 +3354,7 @@ def build_search_ontology(
             f"  CALL db.index.fulltext.queryNodes('{parent_index}', $search_text)\n"
             "  YIELD node AS t, score\n"
             + where_clause
+            + org_inner
             + "  RETURN t.id AS id, t.name AS name, score,\n"
             "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
             "         coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
@@ -3166,6 +3369,7 @@ def build_search_ontology(
             f"CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
             "YIELD node AS t, score\n"
             + where_clause
+            + org_flat
             + "RETURN t.id AS id, t.name AS name, score,\n"
             "       t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
             "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
@@ -3519,6 +3723,374 @@ def build_genes_by_ontology_detail(
         f"UNWIND term_genes AS g\n"
         f"{edge_rebind}"
         f"{return_block}{skip_clause}{limit_clause}"
+    )
+    return cypher, params
+
+
+
+
+# --- ontology_term_details (spec §7.5, design §6) -----------------------------
+
+LINK_KINDS: tuple[str, ...] = ("composition", "membership", "router")
+
+# Every (rel, target_ontology, link_kind) bridge the registry declares, in
+# config order. `ontology_term_details` derives `link_kind` / `target_ontology`
+# per row from `rel` through this table.
+BRIDGES_OUT: list[tuple[str, str, str, str]] = [
+    (rel, key, target, kind)
+    for key, cfg in ONTOLOGY_CONFIG.items()
+    for (rel, target, kind) in (cfg.get("bridges_out") or [])
+]
+
+_ALL_HIERARCHY_RELS: list[str] = sorted({
+    rel for cfg in ONTOLOGY_CONFIG.values() for rel in cfg["hierarchy_rels"]
+})
+_ALL_GENE_RELS: list[str] = sorted({
+    cfg["gene_rel"] for cfg in ONTOLOGY_CONFIG.values()
+})
+# Membership edges a term reaches genes through indirectly (BRITE → KEGG
+# term → gene). Joined into the subtree walk so a bridged ontology's
+# per-organism gene count is not 0 by construction.
+_ALL_BRIDGE_WALK_RELS: list[str] = sorted({
+    cfg["bridge"]["edge"] for cfg in ONTOLOGY_CONFIG.values() if cfg.get("bridge")
+})
+
+# Columns every term-details row already projects from `t`; a
+# `term_details_compact` prop with one of these names is not re-projected.
+_TERM_DETAILS_STANDARD_COLUMNS: frozenset[str] = frozenset({
+    "id", "name", "description", "level", "level_kind", "gene_count",
+    "organism_count", "direct_gene_count",
+})
+
+
+def _term_details_compact_props() -> list[str]:
+    """Union of the registry `term_details_compact` props, config order."""
+    props: list[str] = []
+    for cfg in ONTOLOGY_CONFIG.values():
+        for prop in cfg.get("term_details_compact") or []:
+            if prop not in props and prop not in _TERM_DETAILS_STANDARD_COLUMNS:
+                props.append(prop)
+    return props
+
+
+def build_ontology_term_details(
+    *,
+    term_ids: list[str],
+    link_kinds: list[str] | None = None,
+    verbose: bool = False,
+    organism: str | None = None,
+) -> tuple[str, dict]:
+    """Build the batch term-details query (spec §7.5).
+
+    One `UNWIND $term_ids` over a cross-ontology batch; the lookup is an
+    OPTIONAL MATCH guarded by an OR over every registry label (17 `label`s +
+    `PfamClan`) so an unknown id survives as `not_found = true`. Rows come
+    back in input order.
+
+    Hierarchy: parents = `(t)-[:<is-a union>]->(p)`, children =
+    `(t)<-[:<is-a union>]-(c)` over the union of ALL `hierarchy_rels`;
+    children are capped at 50 (`children_total` carries the full count).
+    Bridges: `(t)-[b:<bridges_out union>]->(tgt)` generated from the registry
+    `bridges_out` triples; `link_kinds` narrows the union IN CYPHER (a
+    de-selected rel type is absent from the query text). Every collect is
+    null-safe (`CASE WHEN x IS NULL THEN null ... WHERE x IS NOT NULL`).
+
+    Term-side props: the flat `t.<prop> AS <prop>` union of every
+    `term_details_compact` entry — a prop the node lacks comes back null and
+    the api layer strips it (docs://guide/conventions). `labels(t)` is
+    projected so the api derives `ontology` from the registry (`PfamClan` →
+    `pfam`), and `links_out[].rel` so it derives `link_kind` /
+    `target_ontology` via `BRIDGES_OUT`.
+
+    `router_ambiguous` (InterPro rows, router links): router out-degree > 1
+    OR `t.interpro_type <> 'FAMILY'`; null on every other row.
+
+    `organism` scopes the gene walk to `$organism` and adds
+    `organism_gene_count`. Verbose adds `t{.*} AS properties` and
+    `genes_by_organism` ([{organism, gene_count}], gene_count DESC) via
+    `(t)<-[:<is-a union>*0..]-(d)<-[:<gene_rel union>]-(g:Gene)`.
+
+    RETURN keys: term_id, not_found, labels, name, description, level,
+    level_kind, is_informative, gene_count, organism_count,
+    direct_gene_count, <term_details_compact union>, parents,
+    children_total, children, links_total, links_out, router_ambiguous;
+    + organism_gene_count (organism); + properties, genes_by_organism
+    (verbose).
+    """
+    if not term_ids:
+        raise ValueError("term_ids must be a non-empty list.")
+    if link_kinds is not None:
+        unknown = sorted(set(link_kinds) - set(LINK_KINDS))
+        if unknown:
+            raise ValueError(
+                f"Unknown link_kind value(s) {unknown}. "
+                f"Valid link_kinds: {list(LINK_KINDS)}."
+            )
+    selected_kinds = set(link_kinds) if link_kinds is not None else set(LINK_KINDS)
+    bridges = [b for b in BRIDGES_OUT if b[3] in selected_kinds]
+    bridge_rels = "|".join(rel for rel, _o, _t, _k in bridges)
+    router_rels = [rel for rel, _o, _t, kind in bridges if kind == "router"]
+
+    params: dict = {"term_ids": list(term_ids)}
+    label_guard = _ONTOLOGY_LABEL_GUARD
+    hier_union = "|".join(_ALL_HIERARCHY_RELS)
+
+    # --- bridges (union generated from config; empty when link_kinds
+    # de-selects every kind that exists) ---
+    if bridges:
+        bridge_block = (
+            f"OPTIONAL MATCH (t)-[b:{bridge_rels}]->(tgt)\n"
+            "WITH tid, t, parents, children_total, children, b, tgt\n"
+            "ORDER BY tgt.id\n"
+            "WITH tid, t, parents, children_total, children,\n"
+            "     count(b) AS links_total,\n"
+            "     [x IN collect(CASE WHEN b IS NULL THEN null ELSE {\n"
+            "         rel: type(b), target_id: tgt.id, target_name: tgt.name,\n"
+            "         target_labels: labels(tgt), props: properties(b)}\n"
+            "     END) WHERE x IS NOT NULL] AS links_out\n"
+        )
+    else:
+        bridge_block = (
+            "WITH tid, t, parents, children_total, children,\n"
+            "     0 AS links_total, [] AS links_out\n"
+        )
+
+    # --- router_ambiguous: only ontologies that own router bridges ---
+    router_owner_labels = sorted({
+        ONTOLOGY_CONFIG[owner]["label"]
+        for _rel, owner, _t, kind in bridges if kind == "router"
+    })
+    if router_rels:
+        router_list = ", ".join(f"'{r}'" for r in router_rels)
+        router_guard = " OR ".join(f"t:{L}" for L in router_owner_labels)
+        router_col = (
+            ",\n       CASE WHEN t IS NULL OR NOT (" + router_guard + ") THEN null\n"
+            "            ELSE size([l IN links_out WHERE l.rel IN [" + router_list + "]]) > 1\n"
+            "                 OR coalesce(t.interpro_type, '') <> 'FAMILY'\n"
+            "       END AS router_ambiguous"
+        )
+    else:
+        router_col = ",\n       null AS router_ambiguous"
+
+    # --- gene walk: organism scope and/or verbose genes_by_organism ---
+    gene_block = ""
+    gene_cols = ""
+    if organism is not None or verbose:
+        walk_union = "|".join(_ALL_HIERARCHY_RELS + _ALL_BRIDGE_WALK_RELS)
+        gene_union = "|".join(_ALL_GENE_RELS)
+        if organism is not None:
+            params["organism"] = organism
+            gene_node = "(g:Gene {organism_name: $organism})"
+        else:
+            gene_node = "(g:Gene)"
+        gene_block = (
+            f"OPTIONAL MATCH (t)<-[:{walk_union}*0..]-(d)"
+            f"<-[:{gene_union}]-{gene_node}\n"
+            "WITH tid, t, parents, children_total, children, links_total, links_out,\n"
+            "     g.organism_name AS organism_name, count(DISTINCT g) AS n_genes\n"
+            "ORDER BY n_genes DESC, organism_name\n"
+            "WITH tid, t, parents, children_total, children, links_total, links_out,\n"
+            "     [x IN collect(CASE WHEN organism_name IS NULL THEN null\n"
+            "         ELSE {organism: organism_name, gene_count: n_genes} END)\n"
+            "      WHERE x IS NOT NULL] AS genes_by_organism\n"
+        )
+        if organism is not None:
+            gene_cols += (
+                ",\n       reduce(acc = 0, x IN genes_by_organism | acc + x.gene_count)"
+                " AS organism_gene_count"
+            )
+        if verbose:
+            gene_cols += ",\n       genes_by_organism"
+
+    compact_cols = "".join(
+        f",\n       t.{prop} AS {prop}" for prop in _term_details_compact_props()
+    )
+    verbose_cols = ",\n       t{.*} AS properties" if verbose else ""
+
+    cypher = (
+        "UNWIND $term_ids AS tid\n"
+        f"OPTIONAL MATCH (t {{id: tid}}) WHERE {label_guard}\n"
+        "WITH tid, t\n"
+        f"OPTIONAL MATCH (t)-[:{hier_union}]->(p)\n"
+        "WITH tid, t, p ORDER BY p.id\n"
+        "WITH tid, t,\n"
+        "     [x IN collect(DISTINCT CASE WHEN p IS NULL THEN null\n"
+        "         ELSE {id: p.id, name: p.name, level: p.level} END)\n"
+        "      WHERE x IS NOT NULL] AS parents\n"
+        f"OPTIONAL MATCH (t)<-[:{hier_union}]-(c)\n"
+        "WITH tid, t, parents, c ORDER BY c.id\n"
+        "WITH tid, t, parents, count(DISTINCT c) AS children_total,\n"
+        "     [x IN collect(DISTINCT CASE WHEN c IS NULL THEN null\n"
+        "         ELSE {id: c.id, name: c.name, level: c.level} END)\n"
+        "      WHERE x IS NOT NULL][0..50] AS children\n"
+        + bridge_block
+        + gene_block
+        + "RETURN tid AS term_id, t IS NULL AS not_found, labels(t) AS labels,\n"
+        "       t.name AS name, t.description AS description,\n"
+        "       t.level AS level, t.level_kind AS level_kind,\n"
+        "       CASE WHEN t IS NULL THEN null\n"
+        "            ELSE coalesce(t.is_uninformative, '') <> 'true' END AS is_informative,\n"
+        "       t.gene_count AS gene_count, t.organism_count AS organism_count,\n"
+        "       t.direct_gene_count AS direct_gene_count"
+        + compact_cols
+        + ",\n       parents, children_total, children, links_total, links_out"
+        + router_col
+        + gene_cols
+        + verbose_cols
+        + "\nORDER BY apoc.coll.indexOf($term_ids, tid)"
+    )
+    return cypher, params
+
+
+# --- genes_by_ontology aggregate trust rollups (spec §13 i) ------------------
+
+def build_genes_by_ontology_trust_rollups(
+    *,
+    ontology: str,
+    organism: str,
+    level: int | None = None,
+    term_ids: list[str] | None = None,
+    min_gene_set_size: int = 5,
+    max_gene_set_size: int | None = 500,
+    tree: str | None = None,
+    informative_only: bool = False,
+    sources: list[str] | None = None,
+    evidence: list[str] | None = None,
+    max_tier: int | None = None,
+    min_evidence_score: float | None = None,
+    call_class: list[str] | None = None,
+    interpro_type: str | None = None,
+) -> tuple[str, dict]:
+    """Aggregate-only full-match trust projection for genes_by_ontology.
+
+    Same MATCH stage, filters and one-edge-per-(gene, term) rebind as
+    `build_genes_by_ontology_detail`, but the tail is a single aggregation
+    over the (gene, term) edges — no per-row id / locus_tag, no pagination —
+    so the envelope rollups describe the whole match without a second row
+    scan (spec §13 i).
+
+    Rollups follow the api's row-derived shapes: `by_evidence`
+    [{evidence, count}], `by_tier` [{tier, count}] with a string `'null'`
+    bucket for tier-less edges, `by_sources` [{source, count}] (one count per
+    source membership), `by_call_class` [{call_class, count}] (MEROPS),
+    `evidence_score_stats` {min, median, max, n_null}. An axis the ontology
+    does not carry yields `[]` / null stats with `n_null = 0`. Rollup lists
+    are sorted count DESC in Cypher (`apoc.coll.sortMulti`); `total_rows` is
+    the full (gene, term) row count the per-row warnings are phrased against.
+
+    RETURN keys: total_rows, by_evidence, by_tier, by_sources,
+    by_call_class, evidence_score_stats.
+    """
+    if level is None and not term_ids:
+        raise ValueError(
+            "At least one of `level` or `term_ids` must be provided."
+        )
+    if max_gene_set_size is not None and max_gene_set_size < min_gene_set_size:
+        raise ValueError(
+            "max_gene_set_size must be >= min_gene_set_size."
+        )
+
+    head, params = _genes_by_ontology_match_stage(
+        ontology=ontology, level=level, term_ids=term_ids, organism=organism,
+        tree=tree, informative_only=informative_only,
+        sources=sources, evidence=evidence, max_tier=max_tier,
+        min_evidence_score=min_evidence_score, call_class=call_class,
+        interpro_type=interpro_type,
+    )
+    params["min_gene_set_size"] = min_gene_set_size
+    params["max_gene_set_size"] = max_gene_set_size
+
+    cfg = ONTOLOGY_CONFIG[ontology]
+    trust = cfg.get("trust") or {}
+    compact_edge = cfg.get("compact_edge") or {}
+    has_edge_cols = bool(
+        ontology_row_columns(ontology, False, force_trust_axes=True)
+    )
+
+    if _uses_best_edge_rebind(ontology, False, force_trust_axes=True):
+        rebind_trust, _ = build_trust_filter_clause(
+            ontology, sources=sources, evidence=evidence, max_tier=max_tier,
+            min_evidence_score=min_evidence_score, call_class=call_class,
+            rel_var="r2",
+        )
+        edge_rebind = _best_edge_rebind_cypher(
+            ontology, False, trust_frag=rebind_trust, force_trust_axes=True,
+        )
+    elif has_edge_cols:
+        edge_rebind = f"OPTIONAL MATCH (g)-[r:{cfg['gene_rel']}]->(t)\n"
+    else:
+        edge_rebind = ""
+
+    def _freq(values: str, key: str) -> str:
+        return (
+            f"[x IN apoc.coll.sortMulti(apoc.coll.frequencies({values}), "
+            f"['count']) | {{{key}: x.item, count: x.count}}]"
+        )
+
+    agg_parts = ["count(*) AS total_rows"]
+    ret_parts = ["total_rows"]
+
+    if "evidence" in trust:
+        prop = _safe_identifier(trust["evidence"], "trust property")
+        agg_parts.append(f"collect(r.{prop}) AS evidence_values")
+        ret_parts.append(_freq("evidence_values", "evidence") + " AS by_evidence")
+    else:
+        ret_parts.append("[] AS by_evidence")
+
+    if "tier" in trust:
+        prop = _safe_identifier(trust["tier"], "trust property")
+        agg_parts.append(
+            f"collect(CASE WHEN r.{prop} IS NULL THEN 'null' ELSE r.{prop} END)"
+            " AS tier_values"
+        )
+        ret_parts.append(_freq("tier_values", "tier") + " AS by_tier")
+    else:
+        ret_parts.append("[] AS by_tier")
+
+    if "sources" in trust:
+        prop = _safe_identifier(trust["sources"], "trust property")
+        agg_parts.append(
+            f"apoc.coll.flatten(collect(coalesce(r.{prop}, []))) AS source_values"
+        )
+        ret_parts.append(_freq("source_values", "source") + " AS by_sources")
+    else:
+        ret_parts.append("[] AS by_sources")
+
+    if "call_class" in compact_edge:
+        prop = _safe_identifier(
+            compact_edge["call_class"]["prop"], "compact_edge property"
+        )
+        agg_parts.append(f"collect(r.{prop}) AS call_class_values")
+        ret_parts.append(
+            _freq("call_class_values", "call_class") + " AS by_call_class"
+        )
+    else:
+        ret_parts.append("[] AS by_call_class")
+
+    if "evidence_score" in trust:
+        prop = _safe_identifier(trust["evidence_score"], "trust property")
+        agg_parts.extend([
+            f"min(r.{prop}) AS score_min",
+            f"percentileCont(r.{prop}, 0.5) AS score_median",
+            f"max(r.{prop}) AS score_max",
+            f"sum(CASE WHEN r.{prop} IS NULL THEN 1 ELSE 0 END) AS score_n_null",
+        ])
+        ret_parts.append(
+            "{min: score_min, median: score_median, max: score_max,"
+            " n_null: score_n_null} AS evidence_score_stats"
+        )
+    else:
+        ret_parts.append(
+            "{min: null, median: null, max: null, n_null: 0}"
+            " AS evidence_score_stats"
+        )
+
+    cypher = (
+        f"{head}\n"
+        "UNWIND term_genes AS g\n"
+        f"{edge_rebind}"
+        "WITH " + ",\n     ".join(agg_parts) + "\n"
+        "RETURN " + ",\n       ".join(ret_parts)
     )
     return cypher, params
 
