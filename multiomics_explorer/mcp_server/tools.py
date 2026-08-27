@@ -2610,10 +2610,10 @@ def register_tools(mcp: FastMCP):
             "gene_count DESC (score null). See docs://guide/conventions for Lucene scoring.",
         )] = None,
         ontology: Annotated[list[str] | str | None, Field(
-            description="Ontology key(s): 'go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', "
-            "'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', "
-            "'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', "
-            "'ncbifam', 'merops'. None = all 17. limit/offset apply per ontology.",
+            description="Ontology key or list: go_bp, go_mf, go_cc, kegg, ec, "
+            "cog_category, cyanorak_role, tigr_role, pfam, brite, tcdb, cazy, "
+            "subcellular_localization, signal_peptide_type, interpro, ncbifam, "
+            "merops. None = all 17. limit/offset apply per ontology.",
         )] = None,
         summary: Annotated[bool, Field(
             description="When true, return only summary fields (results=[]).",
