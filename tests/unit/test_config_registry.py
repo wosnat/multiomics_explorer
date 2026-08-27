@@ -40,12 +40,9 @@ def _rel_props(baseline, rel_type):
 
 # PR 3b: the normalizer is public in queries_lib (`verbose_edge_pairs`);
 # the old `_verbose_edge_pairs` name stays as an alias for one release.
-try:
-    from multiomics_explorer.kg.queries_lib import (
-        verbose_edge_pairs as _verbose_edge_pairs,
-    )
-except ImportError:  # RED until PR 3b lands the public name; drop in Stage 3
-    from multiomics_explorer.kg.queries_lib import _verbose_edge_pairs
+from multiomics_explorer.kg.queries_lib import (
+    verbose_edge_pairs as _verbose_edge_pairs,
+)
 
 
 class TestVerboseEdgePairsIsPublic:
