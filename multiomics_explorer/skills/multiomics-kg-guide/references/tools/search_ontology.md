@@ -96,8 +96,8 @@ mode, total_entries, total_matching, score_max, score_median, returned, offset, 
 | metabolite_count | int \| None (optional) | Distinct substrate metabolites attached to this TCDB family (verbose only; sparse: tcdb). |
 | family_type | string \| None (optional) | NCBIfam family type, e.g. 'equivalog', 'subfamily' (verbose only; sparse: ncbifam). |
 | gene_symbol | string \| None (optional) | NCBIfam gene symbol (verbose only; sparse: ncbifam). |
-| family_class | string \| None (optional) | MEROPS family class letter, e.g. 'S' (verbose only; sparse: merops). |
-| catalytic_type | string \| None (optional) | MEROPS catalytic type, e.g. 'Serine' (verbose only; sparse: merops). |
+| family_class | string \| None (optional) | MEROPS family class ('peptidase' or 'inhibitor'; verbose only; sparse: merops). |
+| catalytic_type | string \| None (optional) | MEROPS catalytic type, e.g. 'serine', 'metallo' (verbose only; sparse: merops). |
 | peptidase_gene_count | int \| None (optional) | Genes with a 'peptidase' call_class on this MEROPS family (verbose only; sparse: merops). |
 
 ## Few-shot examples

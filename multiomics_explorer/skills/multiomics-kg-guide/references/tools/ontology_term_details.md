@@ -96,8 +96,8 @@ total_matching, returned, offset, truncated, not_found, by_ontology, links_out_t
 | family_type | string \| None (optional) | NCBIfam family type, e.g. 'equivalog' (sparse: ncbifam) |
 | gene_symbol | string \| None (optional) | NCBIfam gene symbol (sparse: ncbifam) |
 | merops_id | string \| None (optional) | Bare MEROPS family ID, e.g. 'S14' (sparse: merops) |
-| family_class | string \| None (optional) | MEROPS family class letter (sparse: merops) |
-| catalytic_type | string \| None (optional) | MEROPS catalytic type, e.g. 'Serine' (sparse: merops) |
+| family_class | string \| None (optional) | MEROPS family class ('peptidase' or 'inhibitor'; sparse: merops) |
+| catalytic_type | string \| None (optional) | MEROPS catalytic type, e.g. 'serine', 'metallo' (sparse: merops) |
 | peptidase_gene_count | int \| None (optional) | Genes with a 'peptidase' call on this family (sparse: merops) |
 | peptidase_organism_count | int \| None (optional) | Organisms with a 'peptidase' call on this family (sparse: merops) |
 | cleavage_summary | string \| None (optional) | MEROPS cleavage-specificity summary (sparse: merops) |

@@ -2543,9 +2543,9 @@ def register_tools(mcp: FastMCP):
         gene_symbol: str | None = Field(default=None,
             description="NCBIfam gene symbol (verbose only; sparse: ncbifam).")
         family_class: str | None = Field(default=None,
-            description="MEROPS family class letter, e.g. 'S' (verbose only; sparse: merops).")
+            description="MEROPS family class ('peptidase' or 'inhibitor'; verbose only; sparse: merops).")
         catalytic_type: str | None = Field(default=None,
-            description="MEROPS catalytic type, e.g. 'Serine' (verbose only; sparse: merops).")
+            description="MEROPS catalytic type, e.g. 'serine', 'metallo' (verbose only; sparse: merops).")
         peptidase_gene_count: int | None = Field(default=None,
             description="Genes with a 'peptidase' call_class on this MEROPS "
                         "family (verbose only; sparse: merops).")
@@ -2788,8 +2788,8 @@ def register_tools(mcp: FastMCP):
             description="NCBIfam family type, e.g. 'equivalog' (sparse: ncbifam)")
         gene_symbol: str | None = Field(default=None, description="NCBIfam gene symbol (sparse: ncbifam)")
         merops_id: str | None = Field(default=None, description="Bare MEROPS family ID, e.g. 'S14' (sparse: merops)")
-        family_class: str | None = Field(default=None, description="MEROPS family class letter (sparse: merops)")
-        catalytic_type: str | None = Field(default=None, description="MEROPS catalytic type, e.g. 'Serine' (sparse: merops)")
+        family_class: str | None = Field(default=None, description="MEROPS family class ('peptidase' or 'inhibitor'; sparse: merops)")
+        catalytic_type: str | None = Field(default=None, description="MEROPS catalytic type, e.g. 'serine', 'metallo' (sparse: merops)")
         peptidase_gene_count: int | None = Field(default=None,
             description="Genes with a 'peptidase' call on this family (sparse: merops)")
         peptidase_organism_count: int | None = Field(default=None,
