@@ -150,12 +150,35 @@ def differential_expression_by_gene_scenarios():
     ]
 
 
+# --- Slice 4 (2026-08-27) fixtures ------------------------------------------
+# OrganismTaxon whose four annotation rollups are all 0 (treatment taxon,
+# 0 genes) -> must be EXCLUDED from list_organisms.by_annotation_capability.
+# MATCH (o:OrganismTaxon) WHERE coalesce(o.peptidase_gene_count,0)=0
+#   AND coalesce(o.nonpeptidase_homolog_gene_count,0)=0
+#   AND coalesce(o.interpro_gene_count,0)=0 AND coalesce(o.ncbifam_gene_count,0)=0
+#   RETURN o.preferred_name
+_ALL_ZERO_ROLLUP_ORGANISM = "Phage"
+# The Steglich 2010 mRNA-decay analysis: a characterization experiment with
+# `treatment_type == []` (dense-list KG fix, spec v1.2) — must be a
+# well-formed row on both cluster tools, never a ToolError.
+# MATCH (ca:ClusteringAnalysis) WHERE ca.cluster_type = 'decay_pattern' RETURN ca.id
+_DECAY_ANALYSIS_ID = "clustering_analysis:gb-2010-11-5-r54:decay_clusters"
+_DECAY_ANALYSIS_GENE = "PMM2072"    # MED4 gene inside one of its clusters
+
+
 def list_organisms_scenarios():
     return [
         Scenario(
             "unknown_organism_name",
             dict(organism_names=["Nonexistus fakeii"]),
             input_ids=["Nonexistus fakeii"]),
+        # Slice 4 (spec §8): a subset whose only member has all-zero
+        # annotation rollups -> by_annotation_capability == [] but the row
+        # itself is still returned (coverage counts are for reading).
+        Scenario(
+            "all_zero_annotation_rollups_subset",
+            dict(organism_names=[_ALL_ZERO_ROLLUP_ORGANISM]),
+            input_ids=[_ALL_ZERO_ROLLUP_ORGANISM]),
     ]
 
 
@@ -331,6 +354,14 @@ def gene_clusters_by_gene_scenarios():
             "offset_past_end",
             dict(locus_tags=["PMM0001"], organism=fx.CONTROL_ORGANISM,
                  offset=fx.OFFSET_PAST_END)),
+        # Slice 4 (spec §3.4 v1.2): the treatment-less characterization
+        # analysis (treatment_type == []) — was a ToolError on the
+        # pre-dense-list KG; now a well-formed row.
+        Scenario(
+            "characterization_analysis_no_treatment",
+            dict(locus_tags=[_DECAY_ANALYSIS_GENE], organism=fx.CONTROL_ORGANISM,
+                 analysis_ids=[_DECAY_ANALYSIS_ID]),
+            input_ids=[_DECAY_ANALYSIS_GENE]),
     ]
 
 
@@ -645,6 +676,11 @@ def list_clustering_analyses_scenarios():
         Scenario(
             "offset_past_end",
             dict(offset=fx.OFFSET_PAST_END)),
+        # Slice 4 (spec §3.4 v1.2): characterization analysis with
+        # treatment_type == [] -> well-formed row, never a raise.
+        Scenario(
+            "characterization_analysis_no_treatment",
+            dict(analysis_ids=[_DECAY_ANALYSIS_ID])),
     ]
 
 

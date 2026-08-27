@@ -1394,16 +1394,18 @@ class TestListDerivedMetrics:
         # 2 numeric DMs with 6 boolean per-strain detection metrics (net +4).
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(conn=conn, limit=None)
-        assert out["total_entries"] == 69
-        assert out["total_matching"] == 69
-        assert len(out["results"]) == 69
+        # 69 -> 83: KG-SYNC-006 paper batch (verified live 2026-08-27) added the Steglich 2010 decay + TSS metrics.
+        assert out["total_entries"] == 83
+        assert out["total_matching"] == 83
+        assert len(out["results"]) == 83
 
     def test_value_kind_numeric_6(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(value_kind="numeric", conn=conn, limit=None)
         # 37 → 35 (verified live 2026-08-20): Lu 2026 DM rewiring removed
         # 2 numeric DMs (replaced by boolean per-strain detection metrics).
-        assert out["total_matching"] == 35
+        # 35 -> 46: KG-SYNC-006 paper batch (verified live 2026-08-27).
+        assert out["total_matching"] == 46
         assert all(r["value_kind"] == "numeric" for r in out["results"])
         compartments = {r["compartment"] for r in out["results"]}
         assert compartments == {"whole_cell", "vesicle", "exoproteome"}
@@ -1413,7 +1415,8 @@ class TestListDerivedMetrics:
         out = list_derived_metrics(value_kind="boolean", conn=conn, limit=None)
         # 18 → 24 (verified live 2026-08-20): Lu 2026 DM rewiring added
         # 6 boolean per-strain detection metrics.
-        assert out["total_matching"] == 24
+        # 24 -> 27: KG-SYNC-006 paper batch (verified live 2026-08-27).
+        assert out["total_matching"] == 27
         organisms = {r["organism_name"] for r in out["results"]}
         assert "Prochlorococcus NATL2A" in organisms
         assert "Alteromonas macleodii MIT1002" in organisms
@@ -1429,7 +1432,8 @@ class TestListDerivedMetrics:
     def test_rankable_true_4(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(rankable=True, conn=conn, limit=None)
-        assert out["total_matching"] == 31
+        # 31 -> 42: KG-SYNC-006 paper batch (verified live 2026-08-27).
+        assert out["total_matching"] == 42
         assert all(r["rankable"] is True for r in out["results"])
 
     def test_rankable_false_9(self, conn):
@@ -1439,7 +1443,8 @@ class TestListDerivedMetrics:
         # 34 → 38 (verified live 2026-08-20): Lu 2026 DM rewiring — the 6 new
         # boolean per-strain detection metrics are non-rankable, the 2 removed
         # numeric DMs were also non-rankable (net +4; rankable=True stays 31).
-        assert out["total_matching"] == 38
+        # 38 -> 41: KG-SYNC-006 paper batch (verified live 2026-08-27).
+        assert out["total_matching"] == 41
         metric_types = {r["metric_type"] for r in out["results"]}
         # The two non-rankable numeric DMs are always in this set
         assert "peak_time_protein_h" in metric_types
@@ -1456,7 +1461,8 @@ class TestListDerivedMetrics:
     def test_organism_short_code(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(organism="MED4", conn=conn, limit=None)
-        assert out["total_matching"] == 17
+        # 17 -> 26: KG-SYNC-006 paper batch (verified live 2026-08-27) (MED4 decay / TSS metrics).
+        assert out["total_matching"] == 26
         assert all(r["organism_name"] == "Prochlorococcus MED4" for r in out["results"])
 
     def test_organism_full_name(self, conn):
@@ -1796,10 +1802,11 @@ class TestGeneDerivedMetrics:
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["gene_derived_metrics"](
             ctx, locus_tags=["PMM1714"], limit=20)
-        assert response.total_matching == 11
-        assert response.total_derived_metrics == 11
+        # 11 -> 18: KG-SYNC-006 paper batch (verified live 2026-08-27).
+        assert response.total_matching == 18
+        assert response.total_derived_metrics == 18
         assert response.genes_with_metrics == 1
-        assert response.returned == 11
+        assert response.returned == 18
         kinds = {r.value_kind for r in response.results}
         assert kinds == {"numeric", "boolean", "categorical"}
         # Polymorphic value typing
@@ -1818,12 +1825,14 @@ class TestGeneDerivedMetrics:
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["gene_derived_metrics"](
             ctx, locus_tags=["PMM0001"], value_kind="numeric", limit=20)
-        assert response.total_matching == 6
+        # 6 -> 13 rows, 4 -> 11 rankable: KG-SYNC-006 paper batch (verified live 2026-08-27)
+        # (Steglich 2010 half-life / decay + Voigt 2014 TSS numeric DMs).
+        assert response.total_matching == 13
         assert all(r.value_kind == "numeric" for r in response.results)
-        # 4 rankable (damping_ratio, diel_amp_*, protein_transcript_lag),
-        # 2 non-rankable (peak_time_*)
+        # 11 rankable (damping_ratio, diel_amp_*, protein_transcript_lag,
+        # + the paper-batch rankable numerics), 2 non-rankable (peak_time_*)
         rankable_count = sum(1 for r in response.results if r.rankable)
-        assert rankable_count == 4
+        assert rankable_count == 11
         # Sparse extras null on non-rankable rows
         for r in response.results:
             if not r.rankable:
@@ -1836,12 +1845,14 @@ class TestGeneDerivedMetrics:
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["gene_derived_metrics"](
             ctx, locus_tags=["PMM1714"], value_kind="boolean")
-        assert response.total_matching == 1
+        # 1 -> 3 boolean DMs: KG-SYNC-006 paper batch (verified live 2026-08-27) added
+        # expressed_above_background + has_primary_tss for MED4 genes.
+        assert response.total_matching == 3
         # metric_type is verbose-only; assert against compact fields instead
-        assert response.results[0].derived_metric_id.endswith(
-            "vesicle_proteome_member")
-        assert response.results[0].value == "true"
-        assert response.results[0].value_kind == "boolean"
+        vesicle = next(r for r in response.results
+                       if r.derived_metric_id.endswith("vesicle_proteome_member"))
+        assert vesicle.value == "true"
+        assert all(r.value_kind == "boolean" for r in response.results)
 
     @pytest.mark.asyncio
     async def test_kind_mismatch_not_matched(self, tool_fns, conn):
@@ -1873,16 +1884,18 @@ class TestGeneDerivedMetrics:
         """All 3 diagnostic buckets within single-organism scope."""
         ctx = _ctx_with_conn(conn)
         # NOTE: PMN2A_2128 (NATL2A) cannot be combined with MED4 locus_tags —
-        # single-organism enforcement is by design. Use PMM0002 (MED4 gene
-        # with no DM signal) for the not_matched bucket instead.
+        # single-organism enforcement is by design. Use a MED4 gene with no
+        # DM signal for the not_matched bucket. PMM0002 gained decay / TSS
+        # DMs in the KG-SYNC-006 paper batch (verified live 2026-08-27), so the
+        # DM-less probe is now PMM1720 (also the edge-case GENE_NO_DE fixture).
         response = await tool_fns["gene_derived_metrics"](
-            ctx, locus_tags=["PMM1714", "PMM_FAKE", "PMM0002"],
+            ctx, locus_tags=["PMM1714", "PMM_FAKE", "PMM1720"],
             value_kind="numeric", limit=20)
-        assert response.total_matching == 7  # PMM1714 numeric only
+        assert response.total_matching == 12  # PMM1714 numeric only (7 -> 12)
         assert response.genes_with_metrics == 1
-        assert response.genes_without_metrics == 1  # PMM0002
+        assert response.genes_without_metrics == 1  # PMM1720
         assert response.not_found == ["PMM_FAKE"]
-        assert response.not_matched == ["PMM0002"]
+        assert response.not_matched == ["PMM1720"]
 
     @pytest.mark.asyncio
     async def test_compartment_filter(self, tool_fns, conn):
@@ -1919,7 +1932,8 @@ class TestGeneDerivedMetrics:
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["gene_derived_metrics"](
             ctx, locus_tags=["PMM1714"], summary=True)
-        assert len(response.by_metric) == 11  # one per DM touching the gene
+        # 11 -> 18: KG-SYNC-006 paper batch (verified live 2026-08-27).
+        assert len(response.by_metric) == 18  # one per DM touching the gene
         for entry in response.by_metric:
             assert entry.derived_metric_id  # non-empty
             assert entry.name
@@ -1955,7 +1969,7 @@ class TestGeneDerivedMetrics:
             ctx, locus_tags=["PMM1714"], limit=2)
         assert response.returned == 2
         assert response.truncated is True
-        assert response.total_matching == 11
+        assert response.total_matching == 18  # 11 -> 18: KG-SYNC-006 paper batch (verified live 2026-08-27)
 
 
 @pytest.mark.kg
@@ -2186,18 +2200,19 @@ class TestGenesByBooleanMetric:
 
     @pytest.mark.asyncio
     async def test_vesicle_proteome_cross_organism(self, tool_fns, conn):
-        """Happy path: 32 MED4 + 26 MIT9313 = 58 vesicle-proteome members."""
+        """Happy path: 32 MED4 + 27 MIT9313 = 59 vesicle-proteome members
+        (26 -> 27 / 58 -> 59: KG-SYNC-006 paper batch (verified live 2026-08-27))."""
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["genes_by_boolean_metric"](
             ctx, metric_types=["vesicle_proteome_member"], limit=200)
-        assert response.total_matching == 58
-        assert response.total_genes == 58
+        assert response.total_matching == 59
+        assert response.total_genes == 59
         # Cross-organism: by_organism shows both strains
         org_counts = {o.organism_name: o.count for o in response.by_organism}
         med4_hits = [c for n, c in org_counts.items() if "MED4" in n]
         mit9313_hits = [c for n, c in org_counts.items() if "MIT9313" in n]
         assert med4_hits == [32]
-        assert mit9313_hits == [26]
+        assert mit9313_hits == [27]
         # by_metric: filtered counts == full-DM precomputed counts (positive-only)
         assert len(response.by_metric) == 2
         for bm in response.by_metric:
@@ -2744,7 +2759,8 @@ class TestTcdbSubstrateDepthCrossToolAgreement:
 
     def test_gbm_nitrite_all_organisms_sum_equals_transporter_gene_count(self, conn):
         """(iii) distinct transport genes for nitrite summed over ALL
-        organisms == list_metabolites transporter_gene_count (2,318).
+        organisms == list_metabolites transporter_gene_count (2,347;
+        2,318 -> 2,347: KG-SYNC-006 paper batch (verified live 2026-08-27)).
         Method: loop list_organisms(preferred_name) →
         genes_by_metabolite(evidence_sources=['transport']) and union the
         locus_tags (a gene belongs to exactly one organism, so the set-union
@@ -2759,7 +2775,7 @@ class TestTcdbSubstrateDepthCrossToolAgreement:
         "Alteromonas mediterranea AltDE" ⊂ "…AltDE1" — a fuzzy-match
         artefact, not an invariant (diagnosed live 2026-08-26)."""
         lm = api.list_metabolites(metabolite_ids=[self._NITRITE], conn=conn)
-        assert lm["results"][0]["transporter_gene_count"] == 2318
+        assert lm["results"][0]["transporter_gene_count"] == 2347
 
         orgs = api.list_organisms(limit=500, conn=conn)["results"]
         assert len(orgs) >= 47
@@ -2771,7 +2787,7 @@ class TestTcdbSubstrateDepthCrossToolAgreement:
             )
             assert not gbm["truncated"], org["organism_name"]
             genes |= {r["locus_tag"] for r in gbm["results"]}
-        assert len(genes) == 2318
+        assert len(genes) == 2347
 
     def test_list_metabolites_transporter_gene_count_closes_trap_loop(self, conn):
         """list_metabolites row `transporter_gene_count` (deepest-attachment
@@ -2780,7 +2796,8 @@ class TestTcdbSubstrateDepthCrossToolAgreement:
         transporter_gene_count 1422 — NOT the spec's 3051 / 0 snapshot from
         2026-08-20, so only `> 0` is pinned for glucose. The transport-only
         trap loop (`catalyst_gene_count == 0, transporter_gene_count > 0`)
-        is pinned on sodium cation (kegg.compound:C01330: 0 / 6655 live)."""
+        is pinned on sodium cation (kegg.compound:C01330: 0 / 6742 live;
+        6655 -> 6742: KG-SYNC-006 paper batch (verified live 2026-08-27))."""
         rows = api.list_metabolites(
             metabolite_ids=["kegg.compound:C00031", "kegg.compound:C01330"],
             limit=10, conn=conn,
@@ -2790,7 +2807,7 @@ class TestTcdbSubstrateDepthCrossToolAgreement:
         assert glucose["transporter_gene_count"] > 0
         sodium = by_id["kegg.compound:C01330"]
         assert sodium["catalyst_gene_count"] == 0
-        assert sodium["transporter_gene_count"] == 6655
+        assert sodium["transporter_gene_count"] == 6742
         assert sodium["evidence_sources"] == ["transport"]
 
     def test_list_organisms_med4_transported_metabolite_count(self, conn):
@@ -3707,7 +3724,7 @@ _BATCH6_LIVE = [
 @pytest.mark.kg
 class TestSearchOntologyBrowseLive:
     """Spec §10.3: `search_ontology(ontology=['merops'], level=1)` returns
-    S33 first with gene_count=412."""
+    S33 first with gene_count=417 (412 -> 417: KG-SYNC-006 paper batch (verified live 2026-08-27))."""
 
     def test_merops_level1_browse(self, conn):
         result = api.search_ontology(
@@ -3715,7 +3732,7 @@ class TestSearchOntologyBrowseLive:
         assert result["mode"] == "browse"
         first = result["results"][0]
         assert first["id"] == "merops.family:S33"
-        assert first["gene_count"] == 412
+        assert first["gene_count"] == 417
         assert first["score"] is None
         assert first["ontology_type"] == "merops"
         assert result["score_max"] is None
@@ -3730,7 +3747,7 @@ class TestSearchOntologyBrowseLive:
             "merops.family:M38", "merops.family:C44",
         ]
         assert [r["gene_count"] for r in result["results"]] == [
-            412, 298, 272, 175, 169]
+            417, 300, 278, 178, 173]
 
     def test_browse_sorts_gene_count_desc(self, conn):
         result = api.search_ontology(ontology="tcdb", limit=20, conn=conn)
@@ -3791,7 +3808,7 @@ class TestSearchOntologyBrowseLive:
             ctx, ontology=["merops"], level=1, limit=5)
         assert result.mode == "browse"
         assert result.results[0].id == "merops.family:S33"
-        assert result.results[0].gene_count == 412
+        assert result.results[0].gene_count == 417
 
 
 @pytest.mark.kg
@@ -3916,10 +3933,11 @@ class TestOntologyTermDetailsLive:
         _, rows = self._rows(conn)
         row = rows["go:0006979"]
         assert row["ontology"] == "go_bp"
+        # 1050 / 42 / 860 -> 1068 / 43 / 875: KG-SYNC-006 paper batch (verified live 2026-08-27).
         assert row["level"] == 3
-        assert row["gene_count"] == 1050
-        assert row["organism_count"] == 42
-        assert row["direct_gene_count"] == 860
+        assert row["gene_count"] == 1068
+        assert row["organism_count"] == 43
+        assert row["direct_gene_count"] == 875
         assert len(row["parents"]) == 1
         assert row["children_total"] == 3
         assert row["links_out"] == []
@@ -4057,4 +4075,285 @@ class TestOntologyTermDetailsStripRuleLive:
             ["pfam:PF00005", "go:0006979"], conn=conn)
         rows = {r["term_id"]: r for r in result["results"]}
         assert "direct_gene_count" not in rows["pfam:PF00005"]
-        assert rows["go:0006979"]["direct_gene_count"] == 860
+        # 860 -> 875: KG-SYNC-006 paper batch (verified live 2026-08-27) (a count, not a strip-rule regression).
+        assert rows["go:0006979"]["direct_gene_count"] == 875
+
+
+
+# ---------------------------------------------------------------------------
+# Slice 4 — light surface + paper-batch absorption, live (spec
+# docs/tool-specs/2026-08-27-slice4-light-surface.md §7, §9, §10).
+# Numbers verified live 2026-08-27 against the post-fix KG-SYNC-006 build
+# (built_at 2026-08-27T16:11Z; 48 organisms, 209 experiments, 49 papers).
+# ---------------------------------------------------------------------------
+
+_SLICE4_MED4 = "Prochlorococcus MED4"
+_SLICE4_UREA = "kegg.compound:C00086"
+_SLICE4_MARREF = "Alteromonas (MarRef v6)"
+# MATCH (ca:ClusteringAnalysis) WHERE ca.cluster_type = 'decay_pattern' RETURN ca.id
+_SLICE4_DECAY_ANALYSIS = "clustering_analysis:gb-2010-11-5-r54:decay_clusters"
+# A MED4 gene inside that analysis' clusters (verified live 2026-08-27).
+_SLICE4_DECAY_GENE = "PMM2072"
+# OrganismTaxon with all four annotation rollups = 0 (treatment taxon, 0 genes).
+_SLICE4_ALL_ZERO_ORGANISM = "Phage"
+_SLICE4_ANNOT_COLS = (
+    "peptidase_gene_count", "nonpeptidase_homolog_gene_count",
+    "interpro_gene_count", "ncbifam_gene_count",
+)
+
+
+@pytest.mark.kg
+class TestKGReleaseInfoVocabularyHashLive:
+    """Spec §9.1: on KG-SYNC-006 the verdict is `ok` and bucket 6 passes;
+    the KG's hash is surfaced in the identity block."""
+
+    def test_verdict_ok_and_bucket_six_passed(self, conn):
+        report = api.kg_release_info(conn)
+        b6 = [a for a in report["asserts"]
+              if a["kind"] == "controlled_vocabularies_hash"]
+        assert len(b6) == 1
+        assert b6[0]["passed"] is True, b6[0]
+        assert b6[0]["expected"] == b6[0]["actual"]
+        assert report["verdict"] == "ok", report["summary"]
+
+    def test_identity_surfaces_the_live_hash(self, conn):
+        report = api.kg_release_info(conn)
+        live = conn.execute_query(
+            "MATCH (s:Schema_info {id: 'schema_info'}) "
+            "RETURN s.controlled_vocabularies_hash AS h")[0]["h"]
+        assert report["kg"]["controlled_vocabularies_hash"] == live
+
+    def test_altered_pin_warns_naming_the_vocabulary(self, conn, monkeypatch):
+        """Spec §9.1 second half: with the pin altered → `warn` naming the
+        hash / vocabulary set."""
+        from multiomics_explorer.kg import constants
+        monkeypatch.setitem(
+            constants.EXPECTED_KG_SHAPE, "controlled_vocabularies_hash",
+            "sha256:" + "0" * 64)
+        report = api.kg_release_info(conn)
+        assert report["verdict"] == "warn"
+        b6 = next(a for a in report["asserts"]
+                  if a["kind"] == "controlled_vocabularies_hash")
+        assert b6["passed"] is False
+        assert "vocabulary" in report["summary"].lower()
+
+    @pytest.mark.asyncio
+    async def test_wrapper_validates_bucket_six(self, tool_fns, conn):
+        ctx = _ctx_with_kg_report(conn)
+        response = await tool_fns["kg_release_info"](ctx)
+        kinds = {a.kind for a in response.asserts}
+        assert "controlled_vocabularies_hash" in kinds
+        assert response.kg.controlled_vocabularies_hash
+        assert response.kg.controlled_vocabularies_hash.startswith("sha256:")
+
+
+@pytest.mark.kg
+class TestListOrganismsAnnotationCapabilityLive:
+    """Spec §9.3 / §10: 48 rows; MarRef v6 tops `by_annotation_capability`
+    with 148 peptidase genes; a single-organism subset ranks exactly that
+    organism; an all-zero treatment taxon is excluded."""
+
+    def test_48_rows_each_carrying_the_four_counts(self, conn):
+        res = api.list_organisms(limit=500, conn=conn)
+        assert res["total_entries"] == 48
+        assert res["total_matching"] == 48
+        assert len(res["results"]) == 48
+        for row in res["results"]:
+            for col in _SLICE4_ANNOT_COLS:
+                assert isinstance(row[col], int) and row[col] >= 0, (
+                    row["organism_name"], col)
+
+    def test_marref_tops_with_148(self, conn):
+        res = api.list_organisms(limit=500, conn=conn)
+        cap = res["by_annotation_capability"]
+        assert len(cap) == 10
+        assert cap[0]["organism_name"] == _SLICE4_MARREF
+        assert cap[0]["preferred_name"] == _SLICE4_MARREF
+        assert cap[0]["peptidase_gene_count"] == 148
+        assert cap[0]["nonpeptidase_homolog_gene_count"] == 31
+        assert cap[0]["interpro_gene_count"] == 3746
+        assert cap[0]["ncbifam_gene_count"] == 1379
+        # then AD45 129, Shewanella W3-18-1 128, BGP6 127 (spec §10)
+        assert [c["peptidase_gene_count"] for c in cap[:4]] == [148, 129, 128, 127]
+        peps = [c["peptidase_gene_count"] for c in cap]
+        assert peps == sorted(peps, reverse=True)
+
+    def test_summary_mode_matches_detail_mode(self, conn):
+        detail = api.list_organisms(limit=500, conn=conn)["by_annotation_capability"]
+        summary = api.list_organisms(summary=True, conn=conn)["by_annotation_capability"]
+        assert summary == detail
+
+    def test_med4_subset_ranks_exactly_med4(self, conn):
+        res = api.list_organisms(organism_names=[_SLICE4_MED4], conn=conn)
+        cap = res["by_annotation_capability"]
+        assert [c["organism_name"] for c in cap] == [_SLICE4_MED4]
+        row = res["results"][0]
+        for col in _SLICE4_ANNOT_COLS:
+            assert cap[0][col] == row[col], col
+        assert row["peptidase_gene_count"] == 50
+
+    def test_all_zero_organism_excluded(self, conn):
+        res = api.list_organisms(
+            organism_names=[_SLICE4_ALL_ZERO_ORGANISM, _SLICE4_MED4], conn=conn)
+        assert res["not_found"] == []
+        names = [c["organism_name"] for c in res["by_annotation_capability"]]
+        assert names == [_SLICE4_MED4]
+        zero = api.list_organisms(
+            organism_names=[_SLICE4_ALL_ZERO_ORGANISM], conn=conn)
+        assert zero["total_matching"] >= 1
+        assert zero["by_annotation_capability"] == []
+
+    def test_sum_of_peptidase_counts(self, conn):
+        """Spec §7.1: Σ peptidase 3,439 over the 48 organisms."""
+        res = api.list_organisms(limit=500, conn=conn)
+        assert sum(r["peptidase_gene_count"] for r in res["results"]) == 3439
+
+    @pytest.mark.asyncio
+    async def test_wrapper_round_trip(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["list_organisms"](ctx, summary=True)
+        assert response.by_annotation_capability[0].organism_name == _SLICE4_MARREF
+        assert response.by_annotation_capability[0].peptidase_gene_count == 148
+
+
+@pytest.mark.kg
+class TestListFilterValuesClusterTypeLive:
+    """Spec §9.4: 6 values from the ControlledVocabulary node,
+    `source='vocabulary'`, no pivot warning."""
+
+    _SIX = {"time_course", "diel", "condition_comparison",
+            "expression_bin", "decay_pattern", "genomic_island"}
+
+    def test_six_values_from_vocabulary(self, conn):
+        result = api.list_filter_values(filter_type="cluster_type", conn=conn)
+        assert result["total_entries"] == 6
+        assert {r["value"] for r in result["results"]} == self._SIX
+        assert all(r["source"] == "vocabulary" for r in result["results"])
+        assert all(r["applies_to"] == ["ClusteringAnalysis"]
+                   for r in result["results"])
+        assert result["warnings"] == []
+
+    def test_matches_the_offline_constant(self, conn):
+        from multiomics_explorer.kg.constants import VALID_CLUSTER_TYPES
+        result = api.list_filter_values(filter_type="cluster_type", conn=conn)
+        assert {r["value"] for r in result["results"]} == VALID_CLUSTER_TYPES
+
+    @pytest.mark.asyncio
+    async def test_wrapper_round_trip(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["list_filter_values"](
+            ctx, filter_type="cluster_type")
+        assert {r.value for r in response.results} == self._SIX
+
+
+@pytest.mark.kg
+class TestTransportSubstrateResolutionRowsLive:
+    """Spec §9.2 / §7.3: urea × MED4 transport rows carry the gene's
+    `transport_substrate_resolution`; metabolism rows carry None; PMM0392
+    reads 'resolved' on every one of its transport rows."""
+
+    def test_urea_med4_rows(self, conn):
+        res = api.genes_by_metabolite(
+            [_SLICE4_UREA], _SLICE4_MED4, limit=1000, conn=conn)
+        assert not res["truncated"]
+        rows = res["results"]
+        assert rows
+        for row in rows:
+            assert "transport_substrate_resolution" in row, row["locus_tag"]
+            if row["evidence_source"] == "metabolism":
+                assert row["transport_substrate_resolution"] is None
+            else:
+                assert row["transport_substrate_resolution"] in (
+                    "resolved", "family_inferred"), row
+        assert any(r["evidence_source"] == "metabolism" for r in rows)
+        assert any(r["evidence_source"] == "transport" for r in rows)
+
+    def test_row_value_is_the_genes_value(self, conn):
+        """Row-level = the GENE's KG-authoritative resolution, repeated on
+        every transport row of that gene (never a per-substrate fact)."""
+        res = api.genes_by_metabolite(
+            [_SLICE4_UREA], _SLICE4_MED4, evidence_sources=["transport"],
+            limit=1000, conn=conn)
+        per_gene: dict[str, set] = {}
+        for row in res["results"]:
+            per_gene.setdefault(row["locus_tag"], set()).add(
+                row["transport_substrate_resolution"])
+        assert per_gene
+        for locus, values in per_gene.items():
+            assert len(values) == 1, (locus, values)
+        top = {g["locus_tag"]: g["transport_substrate_resolution"]
+               for g in res["top_genes"]}
+        for locus, values in per_gene.items():
+            if locus in top:
+                assert values == {top[locus]}, locus
+
+    def test_pmm0392_transport_rows_all_resolved(self, conn):
+        mbg = api.metabolites_by_gene(
+            ["PMM0392"], _SLICE4_MED4, evidence_sources=["transport"],
+            limit=1000, conn=conn)
+        assert mbg["results"]
+        assert {r["transport_substrate_resolution"] for r in mbg["results"]} == {
+            "resolved"}
+
+    def test_family_inferred_gene_rows(self, conn):
+        """An ABC-superfamily-only MED4 gene reads 'family_inferred' on its
+        transport rows (spec §7.3 check)."""
+        locus = conn.execute_query(
+            "MATCH (g:Gene {organism_name: $org}) "
+            "WHERE g.transport_substrate_resolution = 'family_inferred' "
+            "RETURN g.locus_tag AS l ORDER BY l LIMIT 1",
+            org=_SLICE4_MED4)[0]["l"]
+        mbg = api.metabolites_by_gene(
+            [locus], _SLICE4_MED4, evidence_sources=["transport"],
+            limit=50, conn=conn)
+        assert mbg["results"], locus
+        assert {r["transport_substrate_resolution"] for r in mbg["results"]} == {
+            "family_inferred"}
+
+    def test_wrapper_round_trip(self, conn):
+        from multiomics_explorer.mcp_server.tools import GenesByMetaboliteResponse
+        res = api.genes_by_metabolite(
+            [_SLICE4_UREA], _SLICE4_MED4, limit=50, conn=conn)
+        model = GenesByMetaboliteResponse(**res)
+        by_src = {}
+        for r in model.results:
+            by_src.setdefault(r.evidence_source, r)
+        assert by_src["metabolism"].transport_substrate_resolution is None
+        assert by_src["transport"].transport_substrate_resolution in (
+            "resolved", "family_inferred")
+
+
+@pytest.mark.kg
+class TestCharacterizationExperimentsLive:
+    """Spec §3.4 (v1.2): the Steglich 2010 decay analysis has
+    `treatment_type == []` (characterization, not perturbation) and both
+    cluster tools return it as a well-formed row rather than a ToolError."""
+
+    def test_list_clustering_analyses_decay_analysis(self, conn):
+        res = api.list_clustering_analyses(
+            analysis_ids=[_SLICE4_DECAY_ANALYSIS], conn=conn)
+        assert res["total_matching"] == 1
+        row = res["results"][0]
+        assert row["cluster_type"] == "decay_pattern"
+        assert row["treatment_type"] == []
+
+    def test_gene_clusters_by_gene_decay_analysis(self, conn):
+        res = api.gene_clusters_by_gene(
+            [_SLICE4_DECAY_GENE], organism=_SLICE4_MED4,
+            analysis_ids=[_SLICE4_DECAY_ANALYSIS], conn=conn)
+        assert res["not_found"] == []
+        assert res["results"], res
+        for row in res["results"]:
+            assert row["analysis_id"] == _SLICE4_DECAY_ANALYSIS
+            assert row["treatment_type"] == []
+
+    @pytest.mark.asyncio
+    async def test_wrappers_do_not_raise(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        lca = await tool_fns["list_clustering_analyses"](
+            ctx, analysis_ids=[_SLICE4_DECAY_ANALYSIS])
+        assert lca.results[0].treatment_type == []
+        gcg = await tool_fns["gene_clusters_by_gene"](
+            ctx, locus_tags=[_SLICE4_DECAY_GENE], organism=_SLICE4_MED4,
+            analysis_ids=[_SLICE4_DECAY_ANALYSIS])
+        assert gcg.results and gcg.results[0].treatment_type == []

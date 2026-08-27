@@ -310,3 +310,86 @@ class TestFacetAppliesInTermIdsMode:
             "enrichment insists on would be a no-op."
         )
         assert domains["total_terms"] > 0
+
+
+
+# ---------------------------------------------------------------------------
+# Slice 4 (ORG-001): the organism-level annotation rollups are counts over
+# `Gene_belongs_to_organism` — joined by EDGE, never by name (two
+# `OrganismTaxon` nodes share preferred_name 'Meiothermus ruber').
+# Spec docs/tool-specs/2026-08-27-slice4-light-surface.md §3.3 / §7.2.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.kg
+class TestOrganismAnnotationRollups:
+    """`OrganismTaxon.peptidase_gene_count` == distinct genes attached by
+    `Gene_belongs_to_organism` carrying 'peptidase' in `merops_classes`
+    (spec §7.2 — 0 offending rows expected)."""
+
+    _DRIFT = (
+        "MATCH (o:OrganismTaxon)\n"
+        "OPTIONAL MATCH (o)<-[:Gene_belongs_to_organism]-(g:Gene)\n"
+        "WHERE 'peptidase' IN coalesce(g.merops_classes, [])\n"
+        "WITH o, count(DISTINCT g) AS live\n"
+        "WHERE live <> coalesce(o.peptidase_gene_count, 0)\n"
+        "RETURN o.preferred_name AS organism, live,\n"
+        "       o.peptidase_gene_count AS declared"
+    )
+
+    def test_peptidase_gene_count_matches_edge_walk(self, conn):
+        rows = conn.execute_query(self._DRIFT)
+        assert rows == [], (
+            "OrganismTaxon.peptidase_gene_count drifted from the "
+            f"Gene_belongs_to_organism walk on: {rows}"
+        )
+
+    def test_nonpeptidase_homolog_gene_count_matches_edge_walk(self, conn):
+        rows = conn.execute_query(
+            self._DRIFT.replace("'peptidase' IN", "'nonpeptidase_homolog' IN")
+            .replace("o.peptidase_gene_count",
+                     "o.nonpeptidase_homolog_gene_count"))
+        assert rows == [], rows
+
+    def test_rollups_are_dense_on_every_organism(self, conn):
+        """Spec §7.1: dense on 48/48 (a missing prop coalesces to 0 in the
+        builder, but the KG stamps every node)."""
+        row = conn.execute_query(
+            "MATCH (o:OrganismTaxon)\n"
+            "RETURN count(o) AS n,\n"
+            "       count(o.peptidase_gene_count) AS pep,\n"
+            "       count(o.nonpeptidase_homolog_gene_count) AS nonpep,\n"
+            "       count(o.interpro_gene_count) AS ipr,\n"
+            "       count(o.ncbifam_gene_count) AS ncbi,\n"
+            "       sum(o.peptidase_gene_count) AS pep_sum,\n"
+            "       max(o.peptidase_gene_count) AS pep_max")[0]
+        assert row["n"] == 48
+        assert row["pep"] == row["nonpep"] == row["ipr"] == row["ncbi"] == 48
+        assert row["pep_sum"] == 3439
+        assert row["pep_max"] == 148
+
+    def test_meiothermus_ruber_name_collision_is_real(self, conn):
+        """Guards the 'join by edge' rule: the strain and the treatment
+        taxon share a preferred_name but only one has genes."""
+        rows = conn.execute_query(
+            "MATCH (o:OrganismTaxon {preferred_name: 'Meiothermus ruber'})\n"
+            "RETURN o.organism_type AS t, coalesce(o.gene_count, 0) AS g,\n"
+            "       coalesce(o.peptidase_gene_count, 0) AS p ORDER BY g")
+        assert len(rows) == 2
+        assert rows[0]["g"] == 0 and rows[0]["p"] == 0
+        assert rows[1]["g"] > 0 and rows[1]["p"] > 0
+
+    def test_list_organisms_row_equals_node_property(self, conn):
+        """The api surfaces the node value verbatim (no re-count)."""
+        res = api.list_organisms(organism_names=[MED4], conn=conn)
+        row = res["results"][0]
+        node = conn.execute_query(
+            "MATCH (o:OrganismTaxon {preferred_name: $n})\n"
+            "RETURN o.peptidase_gene_count AS p,\n"
+            "       o.nonpeptidase_homolog_gene_count AS np,\n"
+            "       o.interpro_gene_count AS i, o.ncbifam_gene_count AS nc",
+            n=MED4)[0]
+        assert row["peptidase_gene_count"] == node["p"]
+        assert row["nonpeptidase_homolog_gene_count"] == node["np"]
+        assert row["interpro_gene_count"] == node["i"]
+        assert row["ncbifam_gene_count"] == node["nc"]

@@ -140,3 +140,40 @@ def test_ontology_terms_scenario_runs_cleanly(scenario, expected):
         f"ontology_terms scenario {scenario} printed no {expected!r}:\n"
         f"{result.stdout}"
     )
+
+
+
+# --- annotation_evidence.py: slice-4 organism-rollup scenario ---
+
+# Spec 2026-08-27-slice4-light-surface §8: `examples/annotation_evidence.py`
+# gains an organism-rollup scenario reading list_organisms'
+# `by_annotation_capability` (peptidase / nonpeptidase-homolog / interpro /
+# ncbifam gene counts per organism). Same output-substring rule as above.
+ANNOTATION_EVIDENCE_SLICE4_SCENARIOS = [
+    ("organism_rollups", "peptidase_gene_count"),
+]
+
+
+@pytest.mark.parametrize(
+    "scenario,expected", ANNOTATION_EVIDENCE_SLICE4_SCENARIOS,
+    ids=[s for s, _ in ANNOTATION_EVIDENCE_SLICE4_SCENARIOS],
+)
+def test_annotation_evidence_slice4_scenario_runs_cleanly(scenario, expected):
+    """The organism-rollup scenario exits 0 and prints the rollup column it
+    exists to demonstrate, on the live KG."""
+    cmd = [sys.executable, str(ANNOTATION_EVIDENCE_SCRIPT), "--scenario", scenario]
+    result = subprocess.run(
+        cmd, cwd=REPO_ROOT, capture_output=True, text=True, timeout=300
+    )
+    assert result.returncode == 0, (
+        f"annotation_evidence scenario {scenario} failed: stderr={result.stderr}"
+    )
+    assert result.stdout.strip(), (
+        f"annotation_evidence scenario {scenario} produced no output"
+    )
+    assert expected in result.stdout, (
+        f"annotation_evidence scenario {scenario} printed no {expected!r}:\n"
+        f"{result.stdout}"
+    )
+    # The ranking it prints must lead with the live top organism.
+    assert "Alteromonas (MarRef v6)" in result.stdout

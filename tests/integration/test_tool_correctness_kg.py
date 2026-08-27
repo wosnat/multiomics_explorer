@@ -235,12 +235,14 @@ class TestGeneOverviewCorrectnessKG:
         assert set(r["annotation_types"]) >= {"go_mf", "pfam", "cog_category", "tigr_role"}
         # 35 → 37 edges, 5 → 6 significant (verified live 2026-08-20):
         # Weissberg 2025 added new contrasts touching this gene (up=4, down=2).
-        assert r["expression_edge_count"] == 37
+        # 37 → 42 edges: KG-SYNC-006 paper batch (verified live 2026-08-27).
+        assert r["expression_edge_count"] == 42
         assert r["significant_up_count"] + r["significant_down_count"] == 6
         # 14 → 20 after the 2026-05 KG rebuild added 6 Prochlorococcus strains,
         # all of which joined this gene's cyanorak ortholog group; 20 → 21 after
-        # the 2026-06-13 rebuild added 2 more organisms.
-        assert r["closest_ortholog_group_size"] == 21
+        # the 2026-06-13 rebuild added 2 more organisms; 21 → 22 after the
+        # KG-SYNC-006 paper batch (verified live 2026-08-27) added Synechococcus WH8109.
+        assert r["closest_ortholog_group_size"] == 22
         assert set(r["closest_ortholog_genera"]) == {"Prochlorococcus", "Synechococcus"}
 
     def test_single_gene_alt(self, conn):
@@ -947,7 +949,8 @@ class TestSearchOntologyBrowseCorrectnessKG:
             "merops.family:S33", "merops.family:S09", "merops.family:C26",
             "merops.family:M38", "merops.family:C44",
         ]
-        assert [r["gene_count"] for r in rows] == [412, 298, 272, 175, 169]
+        # KG-SYNC-006 paper batch (verified live 2026-08-27).
+        assert [r["gene_count"] for r in rows] == [417, 300, 278, 178, 173]
         assert all(r["score"] is None for r in rows)
 
     def test_merops_browse_summary_by_level(self, conn):
@@ -1006,7 +1009,8 @@ class TestOntologyTermDetailsCorrectnessKG:
         n = rows["ncbifam:NF000812"]
         assert (len(n["parents"]), n["children_total"], n["links_total"]) == (0, 0, 0)
         g = rows["go:0006979"]
-        assert (g["level"], g["gene_count"], g["organism_count"]) == (3, 1050, 42)
+        # (3, 1050, 42) -> (3, 1068, 43): KG-SYNC-006 paper batch (verified live 2026-08-27).
+        assert (g["level"], g["gene_count"], g["organism_count"]) == (3, 1068, 43)
         assert (len(g["parents"]), g["children_total"], g["links_total"]) == (1, 3, 0)
 
     def test_not_found_flag(self, conn):
@@ -1023,4 +1027,4 @@ class TestOntologyTermDetailsCorrectnessKG:
         rows = self._rows(conn, verbose=True)
         g = rows["go:0006979"]
         assert g["properties"]["id"] == "go:0006979"
-        assert len(g["genes_by_organism"]) == 42
+        assert len(g["genes_by_organism"]) == 43  # 42 -> 43: KG-SYNC-006 paper batch (verified live 2026-08-27)

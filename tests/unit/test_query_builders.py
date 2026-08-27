@@ -12528,3 +12528,178 @@ class TestBuildGenesByOntologyTrustRollups:
         with pytest.raises(ValueError, match="level.*term_ids"):
             _ql3b.build_genes_by_ontology_trust_rollups(
                 ontology="tcdb", organism=_ORG3B)
+
+
+# ===========================================================================
+# Slice 4 — light surface + paper-batch absorption (spec
+# docs/tool-specs/2026-08-27-slice4-light-surface.md). Stage 1 RED.
+# ===========================================================================
+
+
+class TestBuildListOrganismsAnnotationRollups:
+    """Spec §3.3 / §7.1: the four ORG-001 organism-level annotation counts are
+    `coalesce(o.<prop>, 0)` compact columns on the detail builder, and the
+    summary builder emits the `by_annotation_capability` rollup."""
+
+    _COLS = (
+        "peptidase_gene_count",
+        "nonpeptidase_homolog_gene_count",
+        "interpro_gene_count",
+        "ncbifam_gene_count",
+    )
+
+    @pytest.mark.parametrize("col", _COLS)
+    def test_detail_builder_projects_coalesced_count(self, col):
+        from multiomics_explorer.kg.queries_lib import build_list_organisms
+        cypher, _ = build_list_organisms()
+        assert f"coalesce(o.{col}, 0) AS {col}" in cypher
+
+    def test_detail_columns_sit_after_measured_metabolite_count(self):
+        """Spec §3.3: compact, after `measured_metabolite_count`."""
+        from multiomics_explorer.kg.queries_lib import build_list_organisms
+        cypher, _ = build_list_organisms()
+        anchor = cypher.index("AS measured_metabolite_count")
+        for col in self._COLS:
+            assert cypher.index(f"AS {col}") > anchor, col
+
+    def test_verbose_keeps_the_four_columns(self):
+        from multiomics_explorer.kg.queries_lib import build_list_organisms
+        cypher, _ = build_list_organisms(verbose=True)
+        for col in self._COLS:
+            assert f"coalesce(o.{col}, 0) AS {col}" in cypher
+
+    def test_summary_builder_emits_by_annotation_capability(self):
+        from multiomics_explorer.kg.queries_lib import build_list_organisms_summary
+        cypher, _ = build_list_organisms_summary()
+        assert "by_annotation_capability" in cypher
+        for col in self._COLS:
+            assert col in cypher, col
+
+    def test_summary_builder_keeps_existing_rollups(self):
+        from multiomics_explorer.kg.queries_lib import build_list_organisms_summary
+        cypher, _ = build_list_organisms_summary()
+        for key in ("by_value_kind", "by_metric_type", "by_compartment",
+                    "by_cluster_type", "by_organism_type",
+                    "by_measurement_capability"):
+            assert key in cypher, key
+
+    def test_no_new_filter_param(self):
+        """Decided 2026-08-27: no `min_peptidase_gene_count` — counts are for
+        reading, not selecting."""
+        import inspect
+        from multiomics_explorer.kg.queries_lib import (
+            build_list_organisms, build_list_organisms_summary,
+        )
+        for fn in (build_list_organisms, build_list_organisms_summary):
+            assert "min_peptidase_gene_count" not in inspect.signature(fn).parameters
+
+
+class TestTransportSubstrateResolutionDetailColumn:
+    """Spec §3.2 / §7.3: the gene-level `transport_substrate_resolution` is
+    projected on every transport-arm detail row and null-padded on the
+    metabolism arm, for both triplet tools."""
+
+    _TRANSPORT = "g.transport_substrate_resolution AS transport_substrate_resolution"
+    _PADDING = "null AS transport_substrate_resolution"
+
+    def test_gbm_transport_arm_projects_gene_resolution(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_transport,
+        )
+        cypher, _ = build_genes_by_metabolite_transport(
+            metabolite_ids=["kegg.compound:C00086"],
+            organism="Prochlorococcus MED4")
+        assert self._TRANSPORT in cypher
+        assert self._PADDING not in cypher
+
+    def test_gbm_metabolism_arm_pads_null(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_metabolism,
+        )
+        cypher, _ = build_genes_by_metabolite_metabolism(
+            metabolite_ids=["kegg.compound:C00086"],
+            organism="Prochlorococcus MED4")
+        assert self._PADDING in cypher
+        assert self._TRANSPORT not in cypher
+
+    def test_mbg_transport_arm_projects_gene_resolution(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolites_by_gene_transport,
+        )
+        cypher, _ = build_metabolites_by_gene_transport(
+            locus_tags=["PMM0392"], organism="Prochlorococcus MED4")
+        assert self._TRANSPORT in cypher
+        assert self._PADDING not in cypher
+
+    def test_mbg_metabolism_arm_pads_null(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolites_by_gene_metabolism,
+        )
+        cypher, _ = build_metabolites_by_gene_metabolism(
+            locus_tags=["PMM0963"], organism="Prochlorococcus MED4")
+        assert self._PADDING in cypher
+        assert self._TRANSPORT not in cypher
+
+    @pytest.mark.parametrize("verbose", [False, True])
+    def test_column_sits_right_after_tcdb_evidence_score_on_both_arms(self, verbose):
+        """Spec §3.2: compact, right after `tcdb_evidence_score` — same
+        RETURN order on both arms so the UNION-shaped rows stay aligned."""
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_metabolism,
+            build_genes_by_metabolite_transport,
+            build_metabolites_by_gene_metabolism,
+            build_metabolites_by_gene_transport,
+        )
+        builders = [
+            build_genes_by_metabolite_metabolism(
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4", verbose=verbose)[0],
+            build_genes_by_metabolite_transport(
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4", verbose=verbose)[0],
+            build_metabolites_by_gene_metabolism(
+                locus_tags=["PMM0963"], organism="Prochlorococcus MED4",
+                verbose=verbose)[0],
+            build_metabolites_by_gene_transport(
+                locus_tags=["PMM0392"], organism="Prochlorococcus MED4",
+                verbose=verbose)[0],
+        ]
+        for cypher in builders:
+            score_at = cypher.index("AS tcdb_evidence_score")
+            res_at = cypher.index("AS transport_substrate_resolution")
+            assert res_at > score_at
+            between = cypher[score_at:res_at]
+            # exactly one projection boundary between the two aliases
+            assert between.count(" AS ") == 1, between
+
+
+class TestClusterTypeVocabulary:
+    """Spec §3.4 / §7.4: `cluster_type` values come from the
+    `ControlledVocabulary {applies_to:'ClusteringAnalysis',
+    property:'cluster_type'}` node; the constant is the offline fallback."""
+
+    _SIX = {
+        "condition_comparison", "diel", "time_course",
+        "expression_bin", "decay_pattern", "genomic_island",
+    }
+
+    def test_vocab_read_targets_the_clustering_analysis_node(self):
+        from multiomics_explorer.kg.queries_lib import build_vocab_values
+        cypher, params = build_vocab_values(
+            applies_to="ClusteringAnalysis", prop="cluster_type")
+        assert "ControlledVocabulary" in cypher
+        assert params == {"applies_to": "ClusteringAnalysis",
+                          "prop": "cluster_type"}
+        assert "v.values AS values" in cypher
+        assert "v.description AS description" in cypher
+
+    def test_pivot_fallback_is_a_node_pivot(self):
+        from multiomics_explorer.kg.queries_lib import build_vocab_pivot_values
+        cypher, _ = build_vocab_pivot_values(
+            applies_to="ClusteringAnalysis", prop="cluster_type", kind="node")
+        assert "MATCH (n:ClusteringAnalysis)" in cypher
+        assert "DISTINCT n.cluster_type AS value" in cypher
+
+    def test_valid_cluster_types_is_the_six_value_set(self):
+        from multiomics_explorer.kg.constants import VALID_CLUSTER_TYPES
+        assert VALID_CLUSTER_TYPES == self._SIX

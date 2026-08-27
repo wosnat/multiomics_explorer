@@ -14310,3 +14310,464 @@ class TestTermDetailsStripRule3b:
         assert row["direct_gene_count"] == 52
         assert "reaction_count" not in row
         assert "metabolite_count" not in row
+
+
+# ===========================================================================
+# Slice 4 — light surface + paper-batch absorption (spec
+# docs/tool-specs/2026-08-27-slice4-light-surface.md). Stage 1 RED.
+# ===========================================================================
+
+
+class TestKGReleaseInfoVocabularyHash:
+    """Spec §3.1: assert bucket 6 — the KG's `controlled_vocabularies_hash`
+    must equal the pin the explorer was built against. Match → ok; mismatch
+    or absent → warn (never worse), with a summary sentence naming the
+    vocabulary set. The pin is read from
+    `EXPECTED_KG_SHAPE["controlled_vocabularies_hash"]` — never hard-coded."""
+
+    _BUCKET = "controlled_vocabularies_hash"
+
+    @staticmethod
+    def _pin():
+        from multiomics_explorer.kg.constants import EXPECTED_KG_SHAPE
+        return EXPECTED_KG_SHAPE["controlled_vocabularies_hash"]
+
+    def _conn(self, **overrides):
+        base = TestKGReleaseInfo()
+        si = base._ok_schema_info(**overrides)
+        return base._make_conn(si, base._ok_labels(), base._ok_rel_types())
+
+    @staticmethod
+    def _bucket6(report):
+        hits = [a for a in report["asserts"]
+                if a.get("kind") == "controlled_vocabularies_hash"]
+        assert len(hits) == 1, report["asserts"]
+        return hits[0]
+
+    def test_pin_is_declared_in_expected_kg_shape(self):
+        pin = self._pin()
+        assert isinstance(pin, str)
+        assert pin.startswith("sha256:")
+        assert len(pin) == len("sha256:") + 64
+
+    def test_hash_match_yields_ok_and_a_passed_bucket(self):
+        from multiomics_explorer.api.functions import kg_release_info
+        report = kg_release_info(self._conn(
+            controlled_vocabularies_hash=self._pin()))
+        assert report["verdict"] == "ok"
+        b6 = self._bucket6(report)
+        assert b6["passed"] is True
+        assert b6["name"] == self._BUCKET
+        assert b6["expected"] == self._pin()
+        assert b6["actual"] == self._pin()
+        assert b6["detail"] is None
+        # 5 + 5 + 3 + 2 + 1 + 1 = 17 asserts
+        assert len(report["asserts"]) == 17
+        assert "17/17" in report["summary"]
+
+    def test_hash_mismatch_yields_warn_with_the_vocabulary_sentence(self):
+        from multiomics_explorer.api.functions import kg_release_info
+        report = kg_release_info(self._conn(
+            controlled_vocabularies_hash="sha256:" + "0" * 64))
+        assert report["verdict"] == "warn"
+        b6 = self._bucket6(report)
+        assert b6["passed"] is False
+        assert b6["expected"] == self._pin()
+        assert b6["actual"] == "sha256:" + "0" * 64
+        assert b6["detail"]
+        assert "vocabulary" in report["summary"].lower()
+        assert "list_filter_values" in report["summary"]
+
+    def test_hash_absent_yields_warn_and_predates_detail(self):
+        from multiomics_explorer.api.functions import kg_release_info
+        # Pre-SYNC-005 KG: no such property on Schema_info at all.
+        report = kg_release_info(self._conn())
+        assert report["verdict"] == "warn"
+        b6 = self._bucket6(report)
+        assert b6["passed"] is False
+        assert b6["actual"] is None
+        assert b6["expected"] == self._pin()
+        assert "predates" in b6["detail"]
+        assert "vocabulary" in report["summary"].lower()
+
+    def test_failed_bucket_never_worse_than_warn(self):
+        from multiomics_explorer.api.functions import kg_release_info
+        report = kg_release_info(self._conn(
+            controlled_vocabularies_hash="sha256:" + "f" * 64))
+        assert report["verdict"] in ("ok", "warn")
+        assert report["verdict"] != "unknown"
+
+    def test_expected_is_read_from_expected_kg_shape(self, monkeypatch):
+        """Patch the pin — the bucket must follow it, proving the api reads
+        EXPECTED_KG_SHAPE rather than a private copy."""
+        from multiomics_explorer.api.functions import kg_release_info
+        from multiomics_explorer.kg import constants
+        sentinel = "sha256:" + "a" * 64
+        monkeypatch.setitem(
+            constants.EXPECTED_KG_SHAPE, "controlled_vocabularies_hash", sentinel)
+        report = kg_release_info(self._conn(
+            controlled_vocabularies_hash=sentinel))
+        b6 = self._bucket6(report)
+        assert b6["expected"] == sentinel
+        assert b6["passed"] is True
+        assert report["verdict"] == "ok"
+
+    def test_kg_identity_surfaces_the_hash(self):
+        from multiomics_explorer.api.functions import kg_release_info
+        report = kg_release_info(self._conn(
+            controlled_vocabularies_hash=self._pin()))
+        assert report["kg"]["controlled_vocabularies_hash"] == self._pin()
+
+    def test_kg_identity_hash_is_none_when_absent(self):
+        from multiomics_explorer.api.functions import kg_release_info
+        report = kg_release_info(self._conn())
+        assert "controlled_vocabularies_hash" in report["kg"]
+        assert report["kg"]["controlled_vocabularies_hash"] is None
+
+    def test_other_shape_failures_still_reported_alongside(self):
+        from multiomics_explorer.api.functions import kg_release_info
+        base = TestKGReleaseInfo()
+        si = base._ok_schema_info(mcp_min_version="99.99.99",
+                                  controlled_vocabularies_hash="sha256:" + "1" * 64)
+        report = kg_release_info(base._make_conn(
+            si, base._ok_labels(), base._ok_rel_types()))
+        assert report["verdict"] == "warn"
+        failed_kinds = {a["kind"] for a in report["asserts"] if not a["passed"]}
+        assert failed_kinds == {"version_compat", "controlled_vocabularies_hash"}
+        assert "99.99.99" in report["summary"]
+        assert "vocabulary" in report["summary"].lower()
+
+
+class TestListOrganismsAnnotationCapability:
+    """Spec §3.3: four compact annotation counts per row and the
+    `by_annotation_capability` envelope — top-10 by peptidase_gene_count
+    desc then preferred_name, all four columns, all-zero rows excluded.
+    Detail mode computes it api-side over the matched rows; summary mode
+    reads the summary builder (mirror of by_metabolic_capability)."""
+
+    _COLS = (
+        "peptidase_gene_count", "nonpeptidase_homolog_gene_count",
+        "interpro_gene_count", "ncbifam_gene_count",
+    )
+
+    @staticmethod
+    def _row(name, pep, nonpep, ipr, ncbi, genus="Alteromonas"):
+        return {
+            "organism_name": name, "organism_type": "genome_strain",
+            "genus": genus, "species": None, "strain": None, "clade": None,
+            "ncbi_taxon_id": None, "gene_count": 4000,
+            "publication_count": 0, "experiment_count": 0,
+            "treatment_types": [], "background_factors": [],
+            "omics_types": [], "clustering_analysis_count": 0,
+            "cluster_types": [], "derived_metric_count": 0,
+            "derived_metric_value_kinds": [], "compartments": [],
+            "reaction_count": 0, "catalyzed_metabolite_count": 0,
+            "transported_metabolite_count": 0,
+            "measured_metabolite_count": 0,
+            "peptidase_gene_count": pep,
+            "nonpeptidase_homolog_gene_count": nonpep,
+            "interpro_gene_count": ipr,
+            "ncbifam_gene_count": ncbi,
+            "growth_phases": [],
+        }
+
+    # Live-shaped fixtures (spec §10): MarRef tops, two ties on 125 broken by
+    # name, one all-zero treatment taxon, one zero-peptidase-but-annotated.
+    _ROWS = [
+        _row.__func__("Alteromonas (MarRef v6)", 148, 31, 3746, 1379),
+        _row.__func__("Pseudomonas putida KT2440", 125, 43, 4961, 2264,
+                      genus="Pseudomonas"),
+        _row.__func__("Alteromonas macleodii ATCC27126", 125, 37, 3456, 1598),
+        _row.__func__("Alteromonas macleodii AD45", 129, 32, 3495, 1611),
+        _row.__func__("Prochlorococcus MED4", 50, 8, 1545, 744,
+                      genus="Prochlorococcus"),
+        _row.__func__("Phage", 0, 0, 0, 0, genus=None),
+        _row.__func__("Prochlorococcus MIT1314", 0, 0, 12, 3,
+                      genus="Prochlorococcus"),
+    ]
+
+    @staticmethod
+    def _expected_entries(rows):
+        keep = [r for r in rows if any(r[c] for c in (
+            "peptidase_gene_count", "nonpeptidase_homolog_gene_count",
+            "interpro_gene_count", "ncbifam_gene_count"))]
+        keep.sort(key=lambda r: (-r["peptidase_gene_count"], r["organism_name"]))
+        return [
+            {
+                "preferred_name": r["organism_name"],
+                "organism_name": r["organism_name"],
+                "peptidase_gene_count": r["peptidase_gene_count"],
+                "nonpeptidase_homolog_gene_count": r["nonpeptidase_homolog_gene_count"],
+                "interpro_gene_count": r["interpro_gene_count"],
+                "ncbifam_gene_count": r["ncbifam_gene_count"],
+            }
+            for r in keep[:10]
+        ]
+
+    def _summary_row(self, rows):
+        return {
+            "total_entries": 48, "total_matching": len(rows),
+            "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
+            "by_cluster_type": [], "by_organism_type": [],
+            "by_measurement_capability": {
+                "has_metabolomics": 0, "no_metabolomics": len(rows)},
+            "by_annotation_capability": self._expected_entries(rows),
+        }
+
+    def _wire(self, mock_conn, rows):
+        """Route by Cypher shape: the summary builder returns one rollup row;
+        every other (detail / capability / not_found probe) query returns
+        the organism rows, which carry the four counts."""
+        summary_row = self._summary_row(rows)
+
+        def _exec(cypher, **params):
+            if "total_entries" in cypher:
+                return [summary_row]
+            if "collect(toLower(o.preferred_name)) AS found" in cypher:
+                return [{"found": [r["organism_name"].lower() for r in rows]}]
+            names_lc = params.get("organism_names_lc")
+            if names_lc:
+                return [r for r in rows if r["organism_name"].lower() in names_lc]
+            return list(rows)
+
+        mock_conn.execute_query.side_effect = _exec
+        return mock_conn
+
+    def test_rows_carry_the_four_counts(self, mock_conn):
+        self._wire(mock_conn, self._ROWS)
+        result = api.list_organisms(limit=50, conn=mock_conn)
+        by_name = {r["organism_name"]: r for r in result["results"]}
+        marref = by_name["Alteromonas (MarRef v6)"]
+        assert marref["peptidase_gene_count"] == 148
+        assert marref["nonpeptidase_homolog_gene_count"] == 31
+        assert marref["interpro_gene_count"] == 3746
+        assert marref["ncbifam_gene_count"] == 1379
+        phage = by_name["Phage"]
+        assert all(phage[c] == 0 for c in self._COLS)
+
+    def test_envelope_has_by_annotation_capability(self, mock_conn):
+        self._wire(mock_conn, self._ROWS)
+        result = api.list_organisms(limit=50, conn=mock_conn)
+        assert "by_annotation_capability" in result
+        assert isinstance(result["by_annotation_capability"], list)
+
+    def test_entry_shape(self, mock_conn):
+        self._wire(mock_conn, self._ROWS)
+        result = api.list_organisms(limit=50, conn=mock_conn)
+        entry = result["by_annotation_capability"][0]
+        assert set(entry) == {
+            "preferred_name", "organism_name", *self._COLS,
+        }
+        assert entry["preferred_name"] == entry["organism_name"]
+
+    def test_sorted_by_peptidase_desc_then_preferred_name(self, mock_conn):
+        self._wire(mock_conn, self._ROWS)
+        result = api.list_organisms(limit=50, conn=mock_conn)
+        names = [e["organism_name"] for e in result["by_annotation_capability"]]
+        assert names[:4] == [
+            "Alteromonas (MarRef v6)",            # 148
+            "Alteromonas macleodii AD45",          # 129
+            "Alteromonas macleodii ATCC27126",     # 125, name-tie-break
+            "Pseudomonas putida KT2440",           # 125
+        ]
+        assert result["by_annotation_capability"][0]["peptidase_gene_count"] == 148
+
+    def test_all_zero_rows_excluded_but_zero_peptidase_kept(self, mock_conn):
+        self._wire(mock_conn, self._ROWS)
+        result = api.list_organisms(limit=50, conn=mock_conn)
+        names = {e["organism_name"] for e in result["by_annotation_capability"]}
+        assert "Phage" not in names
+        # zero peptidases but non-zero interpro/ncbifam → still listed
+        assert "Prochlorococcus MIT1314" in names
+
+    def test_top_ten_cap(self, mock_conn):
+        rows = [self._row(f"Org {i:02d}", 200 - i, 1, 1, 1) for i in range(15)]
+        self._wire(mock_conn, rows)
+        result = api.list_organisms(limit=50, conn=mock_conn)
+        cap = result["by_annotation_capability"]
+        assert len(cap) == 10
+        assert [e["peptidase_gene_count"] for e in cap] == list(range(200, 190, -1))
+
+    def test_computed_over_matched_set_not_page(self, mock_conn):
+        """Detail mode with limit=1: the rollup still ranks every matched
+        organism (page-independent, like by_metabolic_capability)."""
+        self._wire(mock_conn, self._ROWS)
+        result = api.list_organisms(limit=1, conn=mock_conn)
+        assert result["returned"] == 1
+        assert len(result["by_annotation_capability"]) == 6
+
+    def test_subset_via_organism_names(self, mock_conn):
+        self._wire(mock_conn, self._ROWS)
+        result = api.list_organisms(
+            organism_names=["Prochlorococcus MED4"], limit=50, conn=mock_conn)
+        cap = result["by_annotation_capability"]
+        assert [e["organism_name"] for e in cap] == ["Prochlorococcus MED4"]
+        assert cap[0]["peptidase_gene_count"] == 50
+
+    def test_subset_of_all_zero_organism_is_empty(self, mock_conn):
+        self._wire(mock_conn, self._ROWS)
+        result = api.list_organisms(
+            organism_names=["Phage"], limit=50, conn=mock_conn)
+        assert result["total_matching"] == 1
+        assert result["by_annotation_capability"] == []
+
+    def test_summary_mode_surfaces_rollup(self, mock_conn):
+        self._wire(mock_conn, self._ROWS)
+        result = api.list_organisms(summary=True, conn=mock_conn)
+        assert result["results"] == []
+        cap = result["by_annotation_capability"]
+        assert cap == self._expected_entries(self._ROWS)
+
+    def test_empty_match_yields_empty_rollup(self, mock_conn):
+        self._wire(mock_conn, [])
+        result = api.list_organisms(
+            organism_names=["Nonexistus fakeii"], conn=mock_conn)
+        assert result["by_annotation_capability"] == []
+
+    def test_no_new_filter_param(self):
+        import inspect
+        assert "min_peptidase_gene_count" not in inspect.signature(
+            api.list_organisms).parameters
+
+
+class TestListFilterValuesClusterType:
+    """Spec §3.4 / §7.4: `filter_type='cluster_type'` reads the
+    ControlledVocabulary node for ClusteringAnalysis.cluster_type (closed,
+    6 values), falling back to a node pivot + warning (slice-3 rule)."""
+
+    _SIX = ["time_course", "diel", "condition_comparison",
+            "expression_bin", "decay_pattern", "genomic_island"]
+
+    def _vocab_rows(self):
+        return [{
+            "values": list(self._SIX),
+            "description": "How the analysis grouped genes",
+            "value_type": "string", "sparse": "false",
+            "min_value": None, "max_value": None,
+        }]
+
+    def test_filter_type_is_accepted(self, mock_conn):
+        _trust_dispatch(mock_conn,
+                        [("ControlledVocabulary", self._vocab_rows())])
+        result = api.list_filter_values(filter_type="cluster_type", conn=mock_conn)
+        assert result["filter_type"] == "cluster_type"
+        assert result["total_entries"] == 6
+        assert result["returned"] == 6
+        assert result["truncated"] is False
+
+    def test_vocabulary_path_rows(self, mock_conn):
+        _trust_dispatch(mock_conn,
+                        [("ControlledVocabulary", self._vocab_rows())])
+        result = api.list_filter_values(filter_type="cluster_type", conn=mock_conn)
+        values = [r["value"] for r in result["results"]]
+        assert set(values) == set(self._SIX)
+        for row in result["results"]:
+            assert row["source"] == "vocabulary"
+            assert row["applies_to"] == ["ClusteringAnalysis"]
+            assert row["description"] == "How the analysis grouped genes"
+        assert result["warnings"] == []
+
+    def test_vocab_read_targets_clustering_analysis_cluster_type(self, mock_conn):
+        _trust_dispatch(mock_conn,
+                        [("ControlledVocabulary", self._vocab_rows())])
+        api.list_filter_values(filter_type="cluster_type", conn=mock_conn)
+        vocab_calls = [
+            c for c in mock_conn.execute_query.call_args_list
+            if "ControlledVocabulary" in c.args[0]
+        ]
+        assert vocab_calls, "no ControlledVocabulary read issued"
+        kwargs = vocab_calls[0].kwargs
+        assert kwargs["applies_to"] == "ClusteringAnalysis"
+        assert kwargs["prop"] == "cluster_type"
+
+    def test_missing_vocab_node_falls_back_to_the_node_pivot(self, mock_conn):
+        def _exec(cypher, **params):
+            if "ControlledVocabulary" in cypher:
+                return []
+            if "MATCH (n:ClusteringAnalysis)" in cypher and "DISTINCT" in cypher:
+                return [{"value": "diel"}, {"value": "decay_pattern"}]
+            return []
+
+        mock_conn.execute_query.side_effect = _exec
+        result = api.list_filter_values(filter_type="cluster_type", conn=mock_conn)
+        assert {r["value"] for r in result["results"]} == {"diel", "decay_pattern"}
+        assert all(r["source"] == "pivot" for r in result["results"])
+        assert all(r["applies_to"] == ["ClusteringAnalysis"]
+                   for r in result["results"])
+
+    def test_pivot_fallback_emits_the_kg_side_warning(self, mock_conn):
+        def _exec(cypher, **params):
+            if "ControlledVocabulary" in cypher:
+                return []
+            if "DISTINCT" in cypher:
+                return [{"value": "diel"}]
+            return []
+
+        mock_conn.execute_query.side_effect = _exec
+        result = api.list_filter_values(filter_type="cluster_type", conn=mock_conn)
+        joined = " ".join(result["warnings"])
+        assert "No ControlledVocabulary entry for ClusteringAnalysis.cluster_type" in joined
+        assert "KG-side fix pending" in joined
+
+    def test_missing_vocab_is_never_a_hard_raise(self, mock_conn):
+        mock_conn.execute_query.side_effect = lambda cypher, **p: []
+        result = api.list_filter_values(filter_type="cluster_type", conn=mock_conn)
+        assert result["results"] == []
+
+    def test_unknown_filter_type_error_lists_cluster_type(self, mock_conn):
+        with pytest.raises(ValueError, match="cluster_type"):
+            api.list_filter_values(filter_type="bogus", conn=mock_conn)
+
+
+class TestTripletRowsCarryTransportSubstrateResolution:
+    """Spec §3.2: the api passes the new detail column through unchanged —
+    a real value on transport rows, an explicit `None` (union padding, NOT
+    sparse-stripped) on metabolism rows — for both triplet tools."""
+
+    _MET_ROW = {**TestGenesByMetabolite._METAB_ROW,
+                "transport_substrate_resolution": None}
+    _TR_ROW = {**TestGenesByMetabolite._TRANS_ROW_MS,
+               "transport_substrate_resolution": "resolved"}
+    _TR_ROW_FI = {**TestGenesByMetabolite._TRANS_ROW_INH,
+                  "transport_substrate_resolution": "family_inferred"}
+
+    def test_gbm_rows_keep_the_column_on_both_arms(self):
+        gbm = TestGenesByMetabolite()
+        conn = gbm._mock_conn(
+            [gbm._SUMMARY_ROW_BOTH_ARMS],
+            [self._MET_ROW],
+            [self._TR_ROW, self._TR_ROW_FI],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm._api()(gbm._METS, gbm._ORG, conn=conn)
+        by_src = {}
+        for r in out["results"]:
+            by_src.setdefault(r["evidence_source"], []).append(r)
+        met = by_src["metabolism"][0]
+        assert "transport_substrate_resolution" in met
+        assert met["transport_substrate_resolution"] is None
+        trans = {r["locus_tag"]: r["transport_substrate_resolution"]
+                 for r in by_src["transport"]}
+        assert trans == {"PMM0974": "resolved", "PMM0234": "family_inferred"}
+
+    def test_gbm_column_is_not_sparse_stripped(self):
+        from multiomics_explorer.api.functions import _GBM_SPARSE_FIELDS
+        assert "transport_substrate_resolution" not in _GBM_SPARSE_FIELDS
+
+    def test_mbg_rows_keep_the_column_on_both_arms(self):
+        mbg = TestMetabolitesByGene()
+        conn = mbg._mock_conn(
+            [mbg._SUMMARY_ROW_BOTH_ARMS],
+            [self._MET_ROW],
+            [self._TR_ROW],
+            [{"found": ["PMM0944", "PMM0974"]}],
+        )
+        out = mbg._api()(["PMM0944", "PMM0974"], mbg._ORG, conn=conn)
+        rows = {r["evidence_source"]: r for r in out["results"]}
+        assert rows["metabolism"]["transport_substrate_resolution"] is None
+        assert "transport_substrate_resolution" in rows["metabolism"]
+        assert rows["transport"]["transport_substrate_resolution"] == "resolved"
+
+    def test_mbg_column_is_not_sparse_stripped(self):
+        from multiomics_explorer.api.functions import _MBG_SPARSE_FIELDS
+        assert "transport_substrate_resolution" not in _MBG_SPARSE_FIELDS

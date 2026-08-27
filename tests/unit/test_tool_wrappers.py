@@ -10441,3 +10441,401 @@ class TestSearchOntologyReviewFixes3b:
             "warnings"].description
         assert "router_ambiguous" not in desc
         assert "reserved" in desc.lower()
+
+
+# ===========================================================================
+# Slice 4 — light surface + paper-batch absorption (spec
+# docs/tool-specs/2026-08-27-slice4-light-surface.md). Stage 1 RED.
+# ===========================================================================
+
+
+def _param_description(tool_fns, tool_name, param):
+    """Joined Field(description=...) text of one wrapper parameter."""
+    import typing
+    fn = tool_fns[tool_name]
+    hints = typing.get_type_hints(fn, include_extras=True)
+    hint = hints[param]
+    descriptions = [
+        getattr(meta, "description", None)
+        for meta in getattr(hint, "__metadata__", ())
+    ]
+    return " ".join(d for d in descriptions if d)
+
+
+def _param_literal_values(tool_fns, tool_name, param):
+    import typing
+    fn = tool_fns[tool_name]
+    hints = typing.get_type_hints(fn, include_extras=True)
+    hint = hints[param]
+    inner = typing.get_args(hint)[0] if hasattr(hint, "__metadata__") else hint
+    assert typing.get_origin(inner) is typing.Literal, inner
+    return set(typing.get_args(inner))
+
+
+class TestGeneReactionMetaboliteTripletSubstrateResolution:
+    """Spec §3.2 / §6: `GeneReactionMetaboliteTriplet` gains
+    `transport_substrate_resolution: Literal['resolved','family_inferred']
+    | None`, compact, right after `tcdb_evidence_score`, explicit None on
+    metabolism rows (union padding — the model is NOT a SparseRow)."""
+
+    _BASE = {
+        "locus_tag": "PMM0974", "gene_name": "urtE",
+        "product": "ABC-type urea transporter, ATPase component",
+        "evidence_source": "transport", "substrate_depth": "most_specific",
+        "tcdb_evidence_score": 0.8,
+        "tcdb_family_id": "tcdb:3.A.1.4.5", "tcdb_family_name": "tcdb:3.A.1.4.5",
+        "metabolite_id": "kegg.compound:C00086", "metabolite_name": "Urea",
+    }
+
+    def test_field_exists_and_is_optional_literal(self):
+        import types
+        import typing
+        from multiomics_explorer.mcp_server.tools import GeneReactionMetaboliteTriplet
+        fields = GeneReactionMetaboliteTriplet.model_fields
+        assert "transport_substrate_resolution" in fields
+        ann = fields["transport_substrate_resolution"].annotation
+        assert typing.get_origin(ann) in {types.UnionType, typing.Union}
+        args = typing.get_args(ann)
+        assert type(None) in args
+        literal = next(a for a in args if typing.get_origin(a) is typing.Literal)
+        assert set(typing.get_args(literal)) == {"resolved", "family_inferred"}
+
+    def test_field_description_present_and_bounded(self):
+        from multiomics_explorer.mcp_server.tools import GeneReactionMetaboliteTriplet
+        field = GeneReactionMetaboliteTriplet.model_fields["transport_substrate_resolution"]
+        assert field.description
+        assert len(field.description) <= 250
+        # It is the GENE's resolution, repeated on the row — say so.
+        assert "gene" in field.description.lower()
+
+    def test_position_right_after_tcdb_evidence_score(self):
+        from multiomics_explorer.mcp_server.tools import GeneReactionMetaboliteTriplet
+        names = list(GeneReactionMetaboliteTriplet.model_fields)
+        assert names.index("transport_substrate_resolution") == (
+            names.index("tcdb_evidence_score") + 1)
+
+    def test_transport_row_accepts_both_values(self):
+        from multiomics_explorer.mcp_server.tools import GeneReactionMetaboliteTriplet
+        for v in ("resolved", "family_inferred"):
+            row = GeneReactionMetaboliteTriplet(
+                **self._BASE, transport_substrate_resolution=v)
+            assert row.transport_substrate_resolution == v
+
+    def test_rejects_retired_or_unknown_value(self):
+        from pydantic import ValidationError
+        from multiomics_explorer.mcp_server.tools import GeneReactionMetaboliteTriplet
+        for bad in ("substrate_confirmed", "most_specific", "bogus"):
+            with pytest.raises(ValidationError):
+                GeneReactionMetaboliteTriplet(
+                    **self._BASE, transport_substrate_resolution=bad)
+
+    def test_metabolism_row_explicit_none_is_kept_on_the_wire(self):
+        """Union padding: an explicit None must survive serialization
+        (the model is not a SparseRow — every row carries identical keys)."""
+        from multiomics_explorer.mcp_server.tools import GeneReactionMetaboliteTriplet
+        row = GeneReactionMetaboliteTriplet(
+            locus_tag="PMM0944", gene_name="ureC", product="urease",
+            evidence_source="metabolism", substrate_depth=None,
+            tcdb_evidence_score=None, transport_substrate_resolution=None,
+            reaction_id="kegg.reaction:R00131",
+            metabolite_id="kegg.compound:C00086", metabolite_name="Urea",
+        )
+        dumped = row.model_dump()
+        assert "transport_substrate_resolution" in dumped
+        assert dumped["transport_substrate_resolution"] is None
+
+    @pytest.mark.asyncio
+    async def test_gbm_wrapper_surfaces_the_column(self, tool_fns, mock_ctx):
+        payload = {
+            **_GBM_SAMPLE_API_RETURN,
+            "results": [
+                {**self._BASE, "transport_substrate_resolution": "resolved"},
+                {
+                    "locus_tag": "PMM0944", "gene_name": "ureC",
+                    "product": "urease", "evidence_source": "metabolism",
+                    "substrate_depth": None, "tcdb_evidence_score": None,
+                    "transport_substrate_resolution": None,
+                    "reaction_id": "kegg.reaction:R00131",
+                    "metabolite_id": "kegg.compound:C00086",
+                    "metabolite_name": "Urea",
+                },
+            ],
+        }
+        with patch("multiomics_explorer.api.functions.genes_by_metabolite",
+                   return_value=payload):
+            result = await tool_fns["genes_by_metabolite"](
+                mock_ctx, metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4")
+        by_src = {r.evidence_source: r for r in result.results}
+        assert by_src["transport"].transport_substrate_resolution == "resolved"
+        assert by_src["metabolism"].transport_substrate_resolution is None
+
+    @pytest.mark.asyncio
+    async def test_mbg_wrapper_surfaces_the_column(self, tool_fns, mock_ctx):
+        payload = {
+            **_MBG_SAMPLE_API_RETURN,
+            "results": [
+                {**self._BASE, "locus_tag": "PMM0234",
+                 "substrate_depth": "inherited", "tcdb_evidence_score": 0.4,
+                 "transport_substrate_resolution": "family_inferred"},
+            ],
+        }
+        with patch("multiomics_explorer.api.functions.metabolites_by_gene",
+                   return_value=payload):
+            result = await tool_fns["metabolites_by_gene"](
+                mock_ctx, locus_tags=["PMM0234"],
+                organism="Prochlorococcus MED4")
+        assert result.results[0].transport_substrate_resolution == "family_inferred"
+
+
+class TestListOrganismsAnnotationCapabilityWrapper:
+    """Spec §3.3 / §6: `ListOrganismsResult` carries the four ints (default 0)
+    and `ListOrganismsResponse.by_annotation_capability` is a typed list of
+    `{preferred_name, organism_name, <four counts>}` entries."""
+
+    _COLS = (
+        "peptidase_gene_count", "nonpeptidase_homolog_gene_count",
+        "interpro_gene_count", "ncbifam_gene_count",
+    )
+
+    _ORG = {
+        "organism_name": "Alteromonas (MarRef v6)",
+        "organism_type": "reference_proteome_match",
+        "genus": "Alteromonas", "species": None, "strain": None, "clade": None,
+        "ncbi_taxon_id": None, "gene_count": 4200, "publication_count": 1,
+        "experiment_count": 2, "treatment_types": [], "omics_types": [],
+        "peptidase_gene_count": 148,
+        "nonpeptidase_homolog_gene_count": 31,
+        "interpro_gene_count": 3746,
+        "ncbifam_gene_count": 1379,
+    }
+
+    _CAP = [
+        {"preferred_name": "Alteromonas (MarRef v6)",
+         "organism_name": "Alteromonas (MarRef v6)",
+         "peptidase_gene_count": 148, "nonpeptidase_homolog_gene_count": 31,
+         "interpro_gene_count": 3746, "ncbifam_gene_count": 1379},
+        {"preferred_name": "Prochlorococcus MED4",
+         "organism_name": "Prochlorococcus MED4",
+         "peptidase_gene_count": 50, "nonpeptidase_homolog_gene_count": 8,
+         "interpro_gene_count": 1545, "ncbifam_gene_count": 744},
+    ]
+
+    def _envelope(self, **extra):
+        return {
+            "total_entries": 48, "total_matching": 48,
+            "returned": 1, "truncated": True, "not_found": [],
+            "results": [self._ORG],
+            "by_annotation_capability": self._CAP,
+            **extra,
+        }
+
+    @pytest.mark.asyncio
+    async def test_rows_carry_the_four_counts(self, tool_fns, mock_ctx):
+        with patch("multiomics_explorer.api.functions.list_organisms",
+                   return_value=self._envelope()):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        org = result.results[0]
+        assert org.peptidase_gene_count == 148
+        assert org.nonpeptidase_homolog_gene_count == 31
+        assert org.interpro_gene_count == 3746
+        assert org.ncbifam_gene_count == 1379
+
+    @pytest.mark.asyncio
+    async def test_row_counts_default_to_zero(self, tool_fns, mock_ctx):
+        bare = {k: v for k, v in self._ORG.items() if k not in self._COLS}
+        with patch("multiomics_explorer.api.functions.list_organisms",
+                   return_value=self._envelope(results=[bare])):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        org = result.results[0]
+        for col in self._COLS:
+            assert getattr(org, col) == 0, col
+
+    @pytest.mark.asyncio
+    async def test_row_field_descriptions_present(self, tool_fns, mock_ctx):
+        with patch("multiomics_explorer.api.functions.list_organisms",
+                   return_value=self._envelope()):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        row_model = type(result.results[0])
+        names = list(row_model.model_fields)
+        for col in self._COLS:
+            field = row_model.model_fields[col]
+            assert field.description, col
+            assert field.annotation is int, col
+            # compact, after measured_metabolite_count (spec §3.3)
+            assert names.index(col) > names.index("measured_metabolite_count"), col
+
+    @pytest.mark.asyncio
+    async def test_envelope_by_annotation_capability_is_typed(self, tool_fns, mock_ctx):
+        with patch("multiomics_explorer.api.functions.list_organisms",
+                   return_value=self._envelope()):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        cap = result.by_annotation_capability
+        assert len(cap) == 2
+        first = cap[0]
+        assert not isinstance(first, dict), "entries must be a Pydantic sub-model"
+        assert first.preferred_name == "Alteromonas (MarRef v6)"
+        assert first.organism_name == "Alteromonas (MarRef v6)"
+        assert first.peptidase_gene_count == 148
+        assert first.nonpeptidase_homolog_gene_count == 31
+        assert first.interpro_gene_count == 3746
+        assert first.ncbifam_gene_count == 1379
+        entry_model = type(first)
+        assert set(entry_model.model_fields) == {
+            "preferred_name", "organism_name", *self._COLS}
+        for name, field in entry_model.model_fields.items():
+            assert field.description, name
+
+    @pytest.mark.asyncio
+    async def test_envelope_field_description_names_the_ranking(self, tool_fns, mock_ctx):
+        with patch("multiomics_explorer.api.functions.list_organisms",
+                   return_value=self._envelope()):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        field = type(result).model_fields["by_annotation_capability"]
+        assert field.description
+        assert "peptidase_gene_count" in field.description
+        assert "10" in field.description
+
+    @pytest.mark.asyncio
+    async def test_envelope_defaults_to_empty_list(self, tool_fns, mock_ctx):
+        env = self._envelope()
+        env.pop("by_annotation_capability")
+        with patch("multiomics_explorer.api.functions.list_organisms",
+                   return_value=env):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        assert result.by_annotation_capability == []
+
+    def test_no_new_filter_param(self, tool_fns):
+        import inspect
+        params = inspect.signature(tool_fns["list_organisms"]).parameters
+        assert "min_peptidase_gene_count" not in params
+
+
+class TestKGAssertVocabularyBucket:
+    """Spec §3.1 / §6: bucket 6 entry shape on the KGAssert model —
+    `{name/kind: 'controlled_vocabularies_hash', passed, expected, actual,
+    detail}`; older kinds validate without expected/actual."""
+
+    def _bucket(self, passed=True):
+        pin = "sha256:" + "6" * 64
+        return {
+            "name": "controlled_vocabularies_hash",
+            "kind": "controlled_vocabularies_hash",
+            "passed": passed,
+            "expected": pin,
+            "actual": pin if passed else "sha256:" + "0" * 64,
+            "detail": None if passed else "Vocabulary set differs.",
+        }
+
+    def test_kind_literal_accepts_the_new_bucket(self):
+        from multiomics_explorer.mcp_server.tools import KGAssert
+        a = KGAssert(**self._bucket())
+        assert a.kind == "controlled_vocabularies_hash"
+        assert a.passed is True
+        assert a.expected.startswith("sha256:")
+        assert a.actual == a.expected
+
+    def test_failed_bucket_carries_both_hashes(self):
+        from multiomics_explorer.mcp_server.tools import KGAssert
+        a = KGAssert(**self._bucket(passed=False))
+        assert a.passed is False
+        assert a.expected != a.actual
+        assert a.detail
+
+    def test_absent_hash_is_null_actual(self):
+        from multiomics_explorer.mcp_server.tools import KGAssert
+        b = self._bucket(passed=False)
+        b["actual"] = None
+        b["detail"] = "KG predates the vocabulary contract."
+        a = KGAssert(**b)
+        assert a.actual is None
+
+    def test_expected_actual_optional_on_older_kinds(self):
+        from multiomics_explorer.mcp_server.tools import KGAssert
+        a = KGAssert(name="node_label:Gene", kind="node_label",
+                     passed=True, detail=None)
+        assert a.expected is None and a.actual is None
+
+    def test_expected_actual_fields_documented(self):
+        from multiomics_explorer.mcp_server.tools import KGAssert
+        for name in ("expected", "actual"):
+            assert KGAssert.model_fields[name].description, name
+        assert "controlled_vocabularies_hash" in KGAssert.model_fields["kind"].description
+
+    def test_kg_identity_surfaces_controlled_vocabularies_hash(self):
+        from multiomics_explorer.mcp_server.tools import KGIdentity
+        pin = "sha256:" + "6" * 64
+        assert "controlled_vocabularies_hash" in KGIdentity.model_fields
+        assert KGIdentity.model_fields["controlled_vocabularies_hash"].description
+        assert KGIdentity(controlled_vocabularies_hash=pin).controlled_vocabularies_hash == pin
+        assert KGIdentity().controlled_vocabularies_hash is None
+
+    def test_full_response_with_bucket_six(self):
+        from multiomics_explorer.mcp_server.tools import KGReleaseInfoResponse
+        report = TestKGReleaseInfoTool()._ok_report()
+        report["kg"]["controlled_vocabularies_hash"] = "sha256:" + "6" * 64
+        report["asserts"].append(self._bucket())
+        resp = KGReleaseInfoResponse(**report)
+        assert resp.asserts[-1].kind == "controlled_vocabularies_hash"
+        assert resp.kg.controlled_vocabularies_hash == "sha256:" + "6" * 64
+
+
+class TestClusterTypeDescriptionsAndFilterType:
+    """Spec §3.4: `VALID_CLUSTER_TYPES` is description-only — the two
+    `cluster_type` Field descriptions point at `list_filter_values`, and
+    `list_filter_values` accepts `filter_type='cluster_type'`."""
+
+    @pytest.mark.parametrize("tool", ["list_clustering_analyses", "gene_clusters_by_gene"])
+    def test_cluster_type_description_points_at_list_filter_values(self, tool_fns, tool):
+        desc = _param_description(tool_fns, tool, "cluster_type")
+        assert "list_filter_values" in desc, desc
+        assert "cluster_type" in desc, desc
+
+    @pytest.mark.parametrize("tool", ["list_clustering_analyses", "gene_clusters_by_gene"])
+    def test_cluster_type_description_lists_the_six_offline_values(self, tool_fns, tool):
+        desc = _param_description(tool_fns, tool, "cluster_type")
+        for v in ("condition_comparison", "diel", "time_course",
+                  "expression_bin", "decay_pattern", "genomic_island"):
+            assert v in desc, (tool, v)
+
+    def test_filter_type_literal_accepts_cluster_type(self, tool_fns):
+        values = _param_literal_values(tool_fns, "list_filter_values", "filter_type")
+        assert "cluster_type" in values
+
+    def test_filter_type_description_mentions_cluster_type(self, tool_fns):
+        desc = _param_description(tool_fns, "list_filter_values", "filter_type")
+        assert "cluster_type" in desc
+
+    @pytest.mark.asyncio
+    async def test_wrapper_forwards_cluster_type_rows(self, tool_fns, mock_ctx):
+        payload = {
+            "filter_type": "cluster_type", "total_entries": 6, "returned": 6,
+            "truncated": False, "warnings": [],
+            "results": [
+                {"value": v, "applies_to": ["ClusteringAnalysis"],
+                 "description": "How the analysis grouped genes",
+                 "source": "vocabulary"}
+                for v in ("time_course", "diel", "condition_comparison",
+                          "expression_bin", "decay_pattern", "genomic_island")
+            ],
+        }
+        with patch("multiomics_explorer.api.functions.list_filter_values",
+                   return_value=payload) as mock_api:
+            result = await tool_fns["list_filter_values"](
+                mock_ctx, filter_type="cluster_type")
+        assert mock_api.call_args.kwargs["filter_type"] == "cluster_type"
+        assert result.filter_type == "cluster_type"
+        assert result.returned == 6
+        assert {r.value for r in result.results} == {
+            "time_course", "diel", "condition_comparison",
+            "expression_bin", "decay_pattern", "genomic_island"}
+        assert all(r.source == "vocabulary" for r in result.results)
+        assert all(r.applies_to == ["ClusteringAnalysis"] for r in result.results)
+
+
+class TestSlice4NoNewTool:
+    """Slice 4 is Mode B — no new tool; EXPECTED_TOOLS stays at 42."""
+
+    def test_expected_tools_unchanged(self, tool_fns):
+        assert len(EXPECTED_TOOLS) == 42
+        assert sorted(tool_fns) == sorted(EXPECTED_TOOLS)
