@@ -83,16 +83,30 @@ class TestExperimentConstants:
     """VALID_CLUSTER_TYPES, VALID_OMICS_TYPES."""
 
     def test_valid_cluster_types_match_kg(self, run_query):
+        # KG-SYNC-006: `ClusteringAnalysis.cluster_type` has a closed
+        # ControlledVocabulary node — the authority for the constant. The
+        # values in USE may be a strict subset (`expression_bin` is declared
+        # but no analysis carries it yet), so the pivot is checked as ⊆ only.
+        vocab = run_query(
+            "MATCH (v:ControlledVocabulary "
+            "{applies_to: 'ClusteringAnalysis', property: 'cluster_type'}) "
+            "RETURN v.values AS vals"
+        )
+        assert vocab, "ControlledVocabulary node for ClusteringAnalysis.cluster_type is missing"
+        declared = set(vocab[0]["vals"])
+        assert declared == VALID_CLUSTER_TYPES, _drift_msg(
+            "VALID_CLUSTER_TYPES",
+            "kg/constants.py",
+            VALID_CLUSTER_TYPES,
+            declared,
+        )
         results = run_query(
             "MATCH (ca:ClusteringAnalysis) "
             "RETURN DISTINCT ca.cluster_type AS val"
         )
-        actual = {r["val"] for r in results}
-        assert actual == VALID_CLUSTER_TYPES, _drift_msg(
-            "VALID_CLUSTER_TYPES",
-            "kg/constants.py",
-            VALID_CLUSTER_TYPES,
-            actual,
+        in_use = {r["val"] for r in results}
+        assert in_use <= declared, (
+            f"cluster_type values in use outside the closed vocabulary: {in_use - declared}"
         )
 
     def test_valid_omics_types_match_kg(self, run_query):
