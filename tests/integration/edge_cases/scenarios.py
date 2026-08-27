@@ -159,7 +159,7 @@ def differential_expression_by_gene_scenarios():
 #   RETURN o.preferred_name
 _ALL_ZERO_ROLLUP_ORGANISM = "Phage"
 # The Steglich 2010 mRNA-decay analysis: a characterization experiment with
-# `treatment_type == []` (dense-list KG fix, spec v1.2) — must be a
+# `treatment_type == ['rna_decay']` (KG contract v2: dense, non-empty) — must be a
 # well-formed row on both cluster tools, never a ToolError.
 # MATCH (ca:ClusteringAnalysis) WHERE ca.cluster_type = 'decay_pattern' RETURN ca.id
 _DECAY_ANALYSIS_ID = "clustering_analysis:gb-2010-11-5-r54:decay_clusters"
@@ -355,8 +355,8 @@ def gene_clusters_by_gene_scenarios():
             dict(locus_tags=["PMM0001"], organism=fx.CONTROL_ORGANISM,
                  offset=fx.OFFSET_PAST_END)),
         # Slice 4 (spec §3.4 v1.2): the treatment-less characterization
-        # analysis (treatment_type == []) — was a ToolError on the
-        # pre-dense-list KG; now a well-formed row.
+        # analysis (treatment_type == ['rna_decay']) — was a ToolError on the
+        # first KG-SYNC-006 build (null list); now a well-formed row.
         Scenario(
             "characterization_analysis_no_treatment",
             dict(locus_tags=[_DECAY_ANALYSIS_GENE], organism=fx.CONTROL_ORGANISM,
@@ -677,7 +677,7 @@ def list_clustering_analyses_scenarios():
             "offset_past_end",
             dict(offset=fx.OFFSET_PAST_END)),
         # Slice 4 (spec §3.4 v1.2): characterization analysis with
-        # treatment_type == [] -> well-formed row, never a raise.
+        # treatment_type == ['rna_decay'] -> well-formed row, never a raise.
         Scenario(
             "characterization_analysis_no_treatment",
             dict(analysis_ids=[_DECAY_ANALYSIS_ID])),

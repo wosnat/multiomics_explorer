@@ -4325,9 +4325,11 @@ class TestTransportSubstrateResolutionRowsLive:
 
 @pytest.mark.kg
 class TestCharacterizationExperimentsLive:
-    """Spec §3.4 (v1.2): the Steglich 2010 decay analysis has
-    `treatment_type == []` (characterization, not perturbation) and both
-    cluster tools return it as a well-formed row rather than a ToolError."""
+    """Spec §3.4 (KG contract v2): `treatment_type` is dense and non-empty;
+    the Steglich 2010 decay analysis names what was measured
+    (`['rna_decay']`) and both cluster tools return it as a well-formed row
+    rather than a ToolError (it was `None` → ValidationError on the first
+    KG-SYNC-006 build)."""
 
     def test_list_clustering_analyses_decay_analysis(self, conn):
         res = api.list_clustering_analyses(
@@ -4335,7 +4337,7 @@ class TestCharacterizationExperimentsLive:
         assert res["total_matching"] == 1
         row = res["results"][0]
         assert row["cluster_type"] == "decay_pattern"
-        assert row["treatment_type"] == []
+        assert row["treatment_type"] == ["rna_decay"]
 
     def test_gene_clusters_by_gene_decay_analysis(self, conn):
         res = api.gene_clusters_by_gene(
@@ -4345,15 +4347,15 @@ class TestCharacterizationExperimentsLive:
         assert res["results"], res
         for row in res["results"]:
             assert row["analysis_id"] == _SLICE4_DECAY_ANALYSIS
-            assert row["treatment_type"] == []
+            assert row["treatment_type"] == ["rna_decay"]
 
     @pytest.mark.asyncio
     async def test_wrappers_do_not_raise(self, tool_fns, conn):
         ctx = _ctx_with_conn(conn)
         lca = await tool_fns["list_clustering_analyses"](
             ctx, analysis_ids=[_SLICE4_DECAY_ANALYSIS])
-        assert lca.results[0].treatment_type == []
+        assert lca.results[0].treatment_type == ["rna_decay"]
         gcg = await tool_fns["gene_clusters_by_gene"](
             ctx, locus_tags=[_SLICE4_DECAY_GENE], organism=_SLICE4_MED4,
             analysis_ids=[_SLICE4_DECAY_ANALYSIS])
-        assert gcg.results and gcg.results[0].treatment_type == []
+        assert gcg.results and gcg.results[0].treatment_type == ["rna_decay"]

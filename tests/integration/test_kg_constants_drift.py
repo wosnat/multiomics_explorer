@@ -358,7 +358,7 @@ class TestControlledVocabulariesHashPin:
 
 class TestExperimentListPropsDense:
     """§7.6 (v1.2) — `treatment_type` / `background_factors` are dense on
-    every Experiment (`[]` = characterization experiment, never null), and
+    every Experiment (dense and non-empty — KG contract v2), and
     `table_scope` is sparse (absent, never '') on the no-DE experiments."""
 
     def test_treatment_type_dense(self, run_query):
@@ -380,13 +380,20 @@ class TestExperimentListPropsDense:
         )[0]
         assert row["bf"] == row["n"]
 
-    def test_characterization_experiments_carry_empty_list(self, run_query):
-        """The 3 characterization experiments read `[]`, not null."""
+    def test_characterization_experiments_carry_named_values(self, run_query):
+        """KG contract v2: `treatment_type` is never empty — characterization
+        experiments name what was measured (`rna_decay`, `tss_mapping`)."""
         row = run_query(
             "MATCH (e:Experiment) WHERE size(e.treatment_type) = 0 "
             "RETURN count(e) AS n"
         )[0]
-        assert row["n"] == 3
+        assert row["n"] == 0
+        rows = run_query(
+            "MATCH (e:Experiment) WHERE ANY(t IN e.treatment_type "
+            "WHERE t IN ['rna_decay', 'tss_mapping']) "
+            "RETURN e.treatment_type AS tt"
+        )
+        assert len(rows) == 3, rows
 
     def test_table_scope_sparse_never_empty_string(self, run_query):
         row = run_query(
@@ -397,8 +404,8 @@ class TestExperimentListPropsDense:
         assert (row["n"], row["with_scope"], row["empty_string"]) == (209, 192, 0)
 
     def test_clustering_analysis_treatment_type_dense(self, run_query):
-        """Same fix on ClusteringAnalysis — the Steglich decay analysis
-        reads `[]`."""
+        """Same contract on ClusteringAnalysis — the Steglich decay analysis
+        reads `['rna_decay']`."""
         row = run_query(
             "MATCH (ca:ClusteringAnalysis) RETURN count(ca) AS n, "
             "count(ca.treatment_type) AS tt"
@@ -408,4 +415,4 @@ class TestExperimentListPropsDense:
             "MATCH (ca:ClusteringAnalysis {cluster_type: 'decay_pattern'}) "
             "RETURN ca.treatment_type AS tt"
         )
-        assert decay and all(r["tt"] == [] for r in decay)
+        assert decay and all(r["tt"] == ["rna_decay"] for r in decay)
