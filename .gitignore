@@ -136,3 +136,6 @@ dmypy.json
 # Git worktrees
 .worktrees/
 .claude/worktrees/
+
+# superpowers SDD scratch
+.superpowers/
