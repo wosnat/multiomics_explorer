@@ -120,6 +120,13 @@ coordinated to `0.1.0a5` ahead of the KG release.
 
 ### Changed
 
+- `list_filter_values(filter_type='cluster_type')` carries the vocabulary
+  description once, on the new envelope `description` key; per-row
+  `description` is absent (trust filter types keep the per-row text and
+  also populate the envelope key when every row agrees).
+- `ontology_term_details` compact `links_out[]` rows omit `props` entirely
+  (verbose-only) instead of emitting `props: null`.
+
 - **Breaking:** PSORTb / SignalP native columns `localization_score` and
   `signal_peptide_*` on ontology rows moved from compact to verbose — they
   are ontology-specific scalars, now under the same verbose-only rule as
@@ -210,6 +217,10 @@ coordinated to `0.1.0a5` ahead of the KG release.
   substrate-depth migration below, `transporter_gene_count > 0`.
 
 ### Fixed
+
+- `docs://ontologies/index` summary column no longer truncates at the
+  YAML line wrap: summaries end at the first sentence (or a word boundary
+  with `…`).
 
 - One-edge-per-(gene, term) rebind on the ontology tools picked the
   **lowest**-ranked edge: the rebind reversed the output of
