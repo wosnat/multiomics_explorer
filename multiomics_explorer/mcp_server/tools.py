@@ -2572,8 +2572,8 @@ def register_tools(mcp: FastMCP):
         organism_count: int | None = Field(default=None,
             description="Distinct organisms reaching this term (precomputed Node.organism_count; sparse until every ontology's builder emits it).")
         organism_gene_count: int | None = Field(default=None,
-            description="Genes of `organism` on the term's DIRECT edge (not subtree — "
-                        "differs from gene_count and from ontology_term_details."
+            description="Genes of `organism` in the term's SUBTREE (term + descendants; "
+                        "same scope as gene_count and as ontology_term_details."
                         "organism_gene_count); only when organism is set; browse sorts by it.")
         # verbose-only term columns
         description: str | None = Field(default=None,
@@ -2703,7 +2703,7 @@ def register_tools(mcp: FastMCP):
                         "'interpro' only; raises if 'interpro' is not in the set.",
         )] = None,
         min_gene_count: Annotated[int | None, Field(
-            description="Keep terms with gene_count >= this (organism_gene_count "
+            description="Keep terms with gene_count >= this (subtree organism_gene_count "
                         "when `organism` is set). Narrows browse mode.",
             ge=0,
         )] = None,
@@ -2815,8 +2815,8 @@ def register_tools(mcp: FastMCP):
                         "(sparse: hierarchical ontologies)")
         organism_gene_count: int | None = Field(default=None,
             description="Genes of `organism` in this term's SUBTREE (term + descendants; "
-                        "same scope as gene_count). Only when organism set. Differs from "
-                        "search_ontology.organism_gene_count (direct edge).")
+                        "same scope as gene_count and as search_ontology."
+                        "organism_gene_count). Only when organism set.")
         # term_details_compact — per-ontology native columns (sparse: strip rule)
         code: str | None = Field(default=None,
             description="Category code (sparse: cog_category, cyanorak_role, tigr_role)")

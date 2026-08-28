@@ -10437,7 +10437,9 @@ class TestSearchOntologyReviewFixes3b:
             "organism_gene_count"].description
         otd = _row_model(tool_fns, "ontology_term_details").model_fields[
             "organism_gene_count"].description
-        assert "DIRECT" in so
+        # Both are subtree-scoped since backlog 2.2 and say so, cross-referencing
+        # each other.
+        assert "SUBTREE" in so and "DIRECT" not in so
         assert "ontology_term_details" in so
         assert "SUBTREE" in otd
         assert "search_ontology" in otd

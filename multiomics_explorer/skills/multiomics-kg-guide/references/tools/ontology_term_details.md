@@ -76,7 +76,7 @@ total_matching, returned, offset, truncated, not_found, by_ontology, links_out_t
 | gene_count | int \| None (optional) | Subtree gene count across all organisms (precomputed) |
 | organism_count | int \| None (optional) | Distinct organisms reaching this term (precomputed) |
 | direct_gene_count | int \| None (optional) | Genes annotated directly to this term, excluding descendants (sparse: hierarchical ontologies) |
-| organism_gene_count | int \| None (optional) | Genes of `organism` in this term's SUBTREE (term + descendants; same scope as gene_count). Only when organism set. Differs from search_ontology.organism_gene_count (direct edge). |
+| organism_gene_count | int \| None (optional) | Genes of `organism` in this term's SUBTREE (term + descendants; same scope as gene_count and as search_ontology.organism_gene_count). Only when organism set. |
 | code | string \| None (optional) | Category code (sparse: cog_category, cyanorak_role, tigr_role) |
 | short_name | string \| None (optional) | Pfam short name, e.g. 'ABC_tran' (sparse: pfam) |
 | tree | string \| None (optional) | BRITE tree name (sparse: brite) |

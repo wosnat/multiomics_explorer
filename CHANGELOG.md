@@ -120,6 +120,11 @@ coordinated to `0.1.0a5` ahead of the KG release.
 
 ### Changed
 
+- `search_ontology.organism_gene_count` (and the `min_gene_count` floor when
+  `organism` is set) is now SUBTREE-scoped — term + descendants, the same
+  scope as `gene_count` and as `ontology_term_details.organism_gene_count`.
+  Was: the term's direct edge only. Leaf terms are unchanged; ancestor rows
+  gain the descendants' genes (GO `go:0008150` MED4: 1134).
 - `docs://ontologies/{key}` pages no longer embed a build-time snapshot of
   `ControlledVocabulary` values (the build output depended on whether a KG
   was reachable); they point at `list_filter_values(..., ontology=key)`,

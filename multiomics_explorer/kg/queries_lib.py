@@ -3046,27 +3046,38 @@ def _search_ontology_term_verbose_props(cfg: dict) -> list[str]:
 
 
 def _search_ontology_org_scope(cfg: dict, *, indent: str) -> str:
-    """OPTIONAL MATCH counting one organism's genes on `t` (spec §7.4).
+    """OPTIONAL MATCH counting one organism's genes in `t`'s SUBTREE.
 
-    Direct gene edge from the registry `gene_rel`. BRITE reaches genes
-    through its `bridge` (KEGG term); Pfam walks `*0..1` so a clan row counts
-    its member domains' genes rather than reading 0.
+    Same scope as the term's `gene_count` and as
+    `ontology_term_details.organism_gene_count` (backlog 2.2 — was the
+    direct edge only): hierarchical ontologies walk `hierarchy_rels*0..`
+    down to descendants before the registry `gene_rel`; BRITE additionally
+    crosses its `bridge` (KEGG term); Pfam walks `*0..1` so a clan row
+    counts its member domains' genes; flat ontologies read the direct edge.
     """
     gene_rel = cfg["gene_rel"]
     bridge = cfg.get("bridge")
+    org_gene = f"(g:Gene {{organism_name: $organism}})"
+    hier = cfg.get("hierarchy_rels") or []
     if bridge:
+        walk = f"<-[:{'|'.join(hier)}*0..]-(:{cfg['label']})" if hier else ""
         pattern = (
-            f"(t)<-[:{bridge['edge']}]-(:{bridge['node_label']})"
-            f"<-[:{gene_rel}]-(g:Gene {{organism_name: $organism}})"
+            f"(t){walk}<-[:{bridge['edge']}]-(:{bridge['node_label']})"
+            f"<-[:{gene_rel}]-{org_gene}"
         )
     elif cfg.get("parent_label"):
-        rel_union = "|".join(cfg["hierarchy_rels"])
+        rel_union = "|".join(hier)
         pattern = (
             f"(t)<-[:{rel_union}*0..1]-(:{cfg['label']})"
-            f"<-[:{gene_rel}]-(g:Gene {{organism_name: $organism}})"
+            f"<-[:{gene_rel}]-{org_gene}"
+        )
+    elif hier:
+        pattern = (
+            f"(t)<-[:{'|'.join(hier)}*0..]-(:{cfg['label']})"
+            f"<-[:{gene_rel}]-{org_gene}"
         )
     else:
-        pattern = f"(t)<-[:{gene_rel}]-(g:Gene {{organism_name: $organism}})"
+        pattern = f"(t)<-[:{gene_rel}]-{org_gene}"
     return f"{indent}OPTIONAL MATCH {pattern}\n"
 
 

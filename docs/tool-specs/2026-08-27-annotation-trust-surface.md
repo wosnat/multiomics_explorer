@@ -216,4 +216,4 @@ Verified: TCDB 5 signals, MEROPS `[tier_le_2, pfam_support]` (2), GO/EC/Pfam/CAZ
 
 ## 15. Follow-ups (post-3b, not in scope)
 
-- Follow-up (not 3b): align `search_ontology` `organism_gene_count` / `min_gene_count` to subtree semantics (today: the term's DIRECT gene edge, BRITE via its KEGG bridge — §7.4; `ontology_term_details.organism_gene_count` walks the subtree); would move §7.4's pinned per-organism numbers.
+- Follow-up (not 3b): align `search_ontology` `organism_gene_count` / `min_gene_count` to subtree semantics (today: the term's DIRECT gene edge, BRITE via its KEGG bridge — §7.4; `ontology_term_details.organism_gene_count` walks the subtree); would move §7.4's pinned per-organism numbers. — **DONE 2026-08-28**: `_search_ontology_org_scope` walks `hierarchy_rels*0..` (bridge/Pfam-clan cases keep their extra hop), so `organism_gene_count` / `min_gene_count` are subtree-scoped like `gene_count` and `ontology_term_details.organism_gene_count` (GO roots MED4 1134/1055/934 identical across both tools).

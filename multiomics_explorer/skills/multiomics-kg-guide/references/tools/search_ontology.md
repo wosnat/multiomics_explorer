@@ -38,7 +38,7 @@ reference.
 | informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' go:0008150). Term-side filter only — never restricts the gene set. Default False (opt-in). |
 | verbose | bool | False | Add description, level_kind, direct_gene_count, per-ontology columns (tcdb superfamily/metabolite_count, ncbifam family_type/gene_symbol, merops family_class/catalytic_type/peptidase_gene_count) and KEGG discussed_in_publications. Default compact. |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type. Applies to 'interpro' only; raises if 'interpro' is not in the set. |
-| min_gene_count | int \| None | None | Keep terms with gene_count >= this (organism_gene_count when `organism` is set). Narrows browse mode. |
+| min_gene_count | int \| None | None | Keep terms with gene_count >= this (subtree organism_gene_count when `organism` is set). Narrows browse mode. |
 | organism | string \| None | None | Organism to scope counts to (resolved like every other tool: 'MED4' -> 'Prochlorococcus MED4'; unknown/ambiguous raises). Rows gain organism_gene_count (direct edge) and browse sorts by it. |
 
 **Discovery:** use `list_organisms` for valid organism names.
@@ -82,7 +82,7 @@ mode, total_entries, total_matching, score_max, score_median, returned, offset, 
 | discussed_by_n_publications | int \| None (optional) | Publications that discuss this KEGG pathway in prose (KEGG only; None on other ontologies). Recall-biased narrative mention, NOT gene annotation. When > 0, set verbose=True for the per-paper DOI list, or call discussed_by_publication. |
 | gene_count | int \| None (optional) | Subtree gene count on this term (precomputed Node.gene_count; sparse until every ontology's builder emits it). |
 | organism_count | int \| None (optional) | Distinct organisms reaching this term (precomputed Node.organism_count; sparse until every ontology's builder emits it). |
-| organism_gene_count | int \| None (optional) | Genes of `organism` on the term's DIRECT edge (not subtree — differs from gene_count and from ontology_term_details.organism_gene_count); only when organism is set; browse sorts by it. |
+| organism_gene_count | int \| None (optional) | Genes of `organism` in the term's SUBTREE (term + descendants; same scope as gene_count and as ontology_term_details.organism_gene_count); only when organism is set; browse sorts by it. |
 
 **Verbose-only fields** (included when `verbose=True`):
 
