@@ -129,6 +129,7 @@ Already in `.claude/settings.json`. Update the `--directory` path if needed:
 | `multiomics_explorer/inputs/tools/{tool}.yaml` | Human-authored about-content (examples, mistakes, chaining, verbose_fields) — generated md is downstream |
 | `multiomics_explorer/inputs/ontologies/{key}.yaml` | Human-authored per-ontology reference (17, keys = `ONTOLOGY_CONFIG`) — generated `references/ontologies/{key}.md` is downstream (`docs://ontologies/{key}`) |
 | `scripts/build_about_content.py` | Generator — writes `skills/multiomics-kg-guide/references/tools/*.md` directly (no separate sync step) |
+| `docs/backlog.md` | The only open-work list — one line per item with size + origin; delete items when they ship (CHANGELOG keeps the record) |
 
 ## Skill / about-content workflow
 
