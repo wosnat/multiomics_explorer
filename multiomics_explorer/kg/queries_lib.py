@@ -671,7 +671,8 @@ def _best_edge_rebind_cypher(
     """Cypher for the one-edge-per-(gene, term) rebind (spec §7.2).
 
     Collects every gene edge that reaches `t` (leaf or ancestor), keeps the
-    best one by the ontology's rank key, and rebinds it as `r` — a map whose
+    best one by the ontology's rank key (ties → deepest attachment), and
+    rebinds it as `r` — a map whose
     `r.<prop>` accesses read exactly like the relationship's.
 
     `trust_frag` is the same trust conjunction the gene→leaf MATCH carries,
@@ -700,19 +701,26 @@ def _best_edge_rebind_cypher(
         ontology, verbose, force_trust_axes=force_trust_axes,
     )
     entries = [f"{prop}: r2.{prop}" for prop in row_props]
-    if rank_key == "attachment_level":
-        entries.append("attachment_level: l2.level")
-    elif rank_key not in row_props:
+    if rank_key != "attachment_level" and rank_key not in row_props:
         entries.append(f"{rank_key}: r2.{rank_key}")
+    # Secondary key (backlog 2.1): equal primary scores pick the deepest
+    # attachment (higher `level` = more specific), so a rollup row never
+    # reports a `superseded` ancestor edge over a most-specific descendant
+    # with the same score. Levels are always in the map.
+    entries.append("attachment_level: l2.level")
     edge_map = "{" + ", ".join(entries) + "}"
     trust_where = f"            WHERE {trust_frag}\n" if trust_frag else ""
+    sort_keys = (
+        "['attachment_level']" if rank_key == "attachment_level"
+        else f"['{rank_key}', 'attachment_level']"
+    )
 
     return (
         f"{distinct_head}\n"
         f"WITH t, g, [{edge_pattern}{walk_pattern}\n"
         f"{trust_where}"
         f"            | {edge_map}] AS edges\n"
-        f"WITH t, g, head(apoc.coll.sortMaps(edges, '{rank_key}')) AS r\n"
+        f"WITH t, g, head(apoc.coll.sortMulti(edges, {sort_keys})) AS r\n"
     )
 
 

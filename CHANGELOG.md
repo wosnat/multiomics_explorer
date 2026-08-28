@@ -120,6 +120,13 @@ coordinated to `0.1.0a5` ahead of the KG release.
 
 ### Changed
 
+- One-edge-per-(gene, term) rebind tie-break: when two edges reaching a
+  rollup term share the primary rank key (`evidence_score` /
+  `confidence_score`), the deepest attachment (highest `level`) wins
+  (`apoc.coll.sortMulti([rank_key, 'attachment_level'])`). A rollup row
+  no longer reports a `superseded` ancestor edge over an equal-scored
+  most-specific descendant (PMM0392 @ `tcdb:3.A.1`). Trust columns move
+  on a few multi-edge rollup rows.
 - **Breaking envelope keys:** `list_organisms.by_metabolic_capability` →
   `top_metabolic_capability` and `by_annotation_capability` →
   `top_annotation_capability` (project rule: `top_*` = hard-coded top-N,

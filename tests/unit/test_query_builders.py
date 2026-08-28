@@ -11346,7 +11346,7 @@ class TestOneEdgePerGeneTermRebind:
     """Spec section 7.2 — on hierarchical trust ontologies a rollup row's `t`
     is an ancestor reachable by several gene edges. Trust columns come from
     the gene's best edge under `t` (rank_prop desc), rebound via a
-    list-comprehension + apoc.coll.sortMaps, so there is exactly one row per
+    list-comprehension + apoc.coll.sortMulti, so there is exactly one row per
     (gene, term)."""
 
     def test_tcdb_rollup_sorts_edges_by_evidence_score(self):
@@ -11356,10 +11356,11 @@ class TestOneEdgePerGeneTermRebind:
         cypher, _ = build_genes_by_ontology_detail(
             ontology="tcdb", organism="Prochlorococcus MED4", level=2,
         )
-        assert "apoc.coll.sortMaps(" in cypher
-        assert "'evidence_score'" in cypher
-        assert "head(apoc.coll.sortMaps(" in cypher
-        assert "reverse(" not in cypher  # sortMaps is already DESC (spec §14)
+        assert "apoc.coll.sortMulti(" in cypher
+        assert "['evidence_score', 'attachment_level']" in cypher  # 2.1 tie-break
+        assert "attachment_level: l2.level" in cypher
+        assert "head(apoc.coll.sortMulti(" in cypher
+        assert "reverse(" not in cypher  # sortMulti is DESC per key (spec §14)
 
     def test_merops_rollup_sorts_edges_by_confidence_score(self):
         from multiomics_explorer.kg.queries_lib import (
@@ -11368,7 +11369,7 @@ class TestOneEdgePerGeneTermRebind:
         cypher, _ = build_genes_by_ontology_detail(
             ontology="merops", organism="Alteromonas macleodii MIT1002", level=0,
         )
-        assert "apoc.coll.sortMaps(" in cypher
+        assert "apoc.coll.sortMulti(" in cypher
         assert "'confidence_score'" in cypher
 
     def test_hierarchical_trust_ontology_uses_the_rebind(self):
@@ -11378,7 +11379,7 @@ class TestOneEdgePerGeneTermRebind:
         cypher, _ = build_genes_by_ontology_detail(
             ontology="go_bp", organism="Prochlorococcus MED4", level=3,
         )
-        assert "apoc.coll.sortMaps(" in cypher
+        assert "apoc.coll.sortMulti(" in cypher
 
     def test_flat_ontology_keeps_the_direct_optional_match(self):
         from multiomics_explorer.kg.queries_lib import (
@@ -11388,7 +11389,7 @@ class TestOneEdgePerGeneTermRebind:
             ontology="cog_category", organism="Prochlorococcus MED4", level=0,
         )
         assert "OPTIONAL MATCH (g)-[r:Gene_in_cog_category]->(t)" in cypher
-        assert "apoc.coll.sortMaps(" not in cypher
+        assert "apoc.coll.sortMulti(" not in cypher
 
     def test_no_duplicate_gene_term_rows_from_distinct_plus_rel(self):
         """Guard the PSORTb-era `RETURN DISTINCT ... r.*` duplication."""
@@ -11409,7 +11410,7 @@ class TestOneEdgePerGeneTermRebind:
             organism="Prochlorococcus MED4",
             term_ids=["psortb_OuterMembrane"],
         )
-        assert "apoc.coll.sortMaps(" not in cypher
+        assert "apoc.coll.sortMulti(" not in cypher
         assert "AS localization_score" not in cypher
 
 

@@ -21,14 +21,14 @@ by_level:
   n_terms: 1
   row_count: 30
 by_sources:
-- count: 21
+- count: 18
   source: cyanorak
+- count: 13
+  source: uniprot
+- count: 11
+  source: ncbi
 - count: 10
   source: interproscan
-- count: 9
-  source: ncbi
-- count: 9
-  source: uniprot
 - count: 5
   source: eggnog
 by_tier: []
