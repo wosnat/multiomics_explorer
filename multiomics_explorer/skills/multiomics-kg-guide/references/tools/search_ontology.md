@@ -60,7 +60,7 @@ mode, total_entries, total_matching, score_max, score_median, returned, offset, 
 - **offset** (int): Offset into each ontology's result set (lockstep paging, e.g. 0)
 - **truncated** (bool): True if any selected ontology has more matches than returned
 - **by_ontology** (list[SearchOntologyByOntology]): Per-ontology totals + truncation flags, in ONTOLOGY_CONFIG order.
-- **by_level** (list[SearchOntologyLevelBreakdown]): Terms per hierarchy level over the full match (browse mode only).
+- **by_level** (list[SearchOntologyLevelBreakdown]): Terms per hierarchy level over the full match (browse mode, single ontology only — [] on multi-ontology browse because level scales differ).
 - **by_interpro_type** (list[SearchOntologyInterproTypeBreakdown]): Matching InterPro terms per entry type (only when 'interpro' is in the set).
 - **by_family_type** (list[SearchOntologyFamilyTypeBreakdown]): Matching NCBIfam terms per family type (only when 'ncbifam' is in the set).
 - **skipped_ontologies** (list[object]): [{ontology, reason}] for ontologies in the set skipped because a filter does not apply to them.

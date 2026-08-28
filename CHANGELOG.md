@@ -120,6 +120,11 @@ coordinated to `0.1.0a5` ahead of the KG release.
 
 ### Changed
 
+- `search_ontology.by_level` is emitted only for a single-ontology browse
+  (`[]` when `ontology` spans several) — level scales differ per ontology,
+  so summing them was meaningless.
+- `ontology_term_details`: dropped a redundant api-side `link_kinds`
+  re-filter (the query already narrows the bridge union). No behaviour change.
 - One-edge-per-(gene, term) rebind tie-break: when two edges reaching a
   rollup term share the primary rank key (`evidence_score` /
   `confidence_score`), the deepest attachment (highest `level`) wins

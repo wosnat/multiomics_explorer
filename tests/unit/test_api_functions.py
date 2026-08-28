@@ -13962,8 +13962,9 @@ class TestSearchOntologyMultiApi:
         assert all("db.index.fulltext" not in c for c, _ in calls)
         assert [r["ontology_type"] for r in result["results"]] == ["tcdb", "merops"]
         assert result["score_max"] is None
-        levels = {e["level"] for e in result["by_level"]}
-        assert levels == {1, 2}
+        # by_level is single-ontology only (level scales differ across
+        # ontologies): multi-ontology browse emits [] (backlog 2.5).
+        assert result["by_level"] == []
 
     def test_none_means_all_17_in_config_order(self, mock_conn):
         calls = _so_dispatch(mock_conn, {})

@@ -2635,7 +2635,7 @@ def register_tools(mcp: FastMCP):
         by_ontology: list[SearchOntologyByOntology] = Field(default_factory=list,
             description="Per-ontology totals + truncation flags, in ONTOLOGY_CONFIG order.")
         by_level: list[SearchOntologyLevelBreakdown] = Field(default_factory=list,
-            description="Terms per hierarchy level over the full match (browse mode only).")
+            description="Terms per hierarchy level over the full match (browse mode, single ontology only — [] on multi-ontology browse because level scales differ).")
         by_interpro_type: list[SearchOntologyInterproTypeBreakdown] = Field(default_factory=list,
             description="Matching InterPro terms per entry type (only when 'interpro' is in the set).")
         by_family_type: list[SearchOntologyFamilyTypeBreakdown] = Field(default_factory=list,

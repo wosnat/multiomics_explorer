@@ -2305,7 +2305,8 @@ def search_ontology(
     Returns dict with keys: mode ('search' | 'browse'), total_entries,
     total_matching, score_max, score_median, returned, offset, truncated,
     by_ontology [{ontology, total_entries, total_matching, score_max,
-    returned, truncated}], by_level [{level, count}] (browse only),
+    returned, truncated}], by_level [{level, count}] (browse, single ontology only —
+    `[]` on multi-ontology browse because level scales differ),
     by_interpro_type, by_family_type, skipped_ontologies, warnings, results.
     On multi-ontology calls the flat counts are sums (score_max the max)
     across ontologies and rows are grouped by ontology in config order.
@@ -2417,9 +2418,12 @@ def search_ontology(
         "offset": offset,
         "truncated": truncated,
         "by_ontology": by_ontology,
-        "by_level": [
-            {"level": lvl, "count": n} for lvl, n in sorted(level_counter.items())
-        ],
+        # Levels are ontology-scoped scales (GO depth != KEGG != TCDB), so
+        # the rollup is only meaningful for a single-ontology browse.
+        "by_level": (
+            [{"level": lvl, "count": n} for lvl, n in sorted(level_counter.items())]
+            if len(by_ontology) == 1 else []
+        ),
         "by_interpro_type": _facet_rollup("interpro", "interpro_type"),
         "by_family_type": _facet_rollup("ncbifam", "family_type"),
         "skipped_ontologies": skipped,
@@ -2856,15 +2860,6 @@ def ontology_term_details(
             not_found.append(row["term_id"])
             continue
         found.append(_term_details_row(row, verbose=verbose, organism=organism))
-    # The builder already applies `link_kinds`; keep the api-side guard so
-    # the envelope rollups never count a kind the caller excluded.
-    if link_kinds is not None:
-        allowed = set(link_kinds)
-        for r in found:
-            r["links_out"] = [
-                link for link in r["links_out"] if link["link_kind"] in allowed
-            ]
-
     ontology_counter = Counter(r["ontology"] for r in found)
     link_counter: Counter = Counter()
     for r in found:
