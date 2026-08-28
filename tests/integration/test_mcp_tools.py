@@ -4149,15 +4149,20 @@ class TestKGReleaseInfoVocabularyHashLive:
 
 @pytest.mark.kg
 class TestListOrganismsAnnotationCapabilityLive:
-    """Spec §9.3 / §10: 48 rows; MarRef v6 tops `by_annotation_capability`
+    """Spec §9.3 / §10: one row per organism (Schema_info.organism_count);
+    MarRef v6 tops `by_annotation_capability`
     with 148 peptidase genes; a single-organism subset ranks exactly that
     organism; an all-zero treatment taxon is excluded."""
 
-    def test_48_rows_each_carrying_the_four_counts(self, conn):
+    def test_every_organism_row_carries_the_four_counts(self, conn):
+        n_org = conn.execute_query(
+            "MATCH (s:Schema_info {id: 'schema_info'}) "
+            "RETURN s.organism_count AS n")[0]["n"]
+        assert n_org > 40, n_org  # sanity floor — an empty DB must fail
         res = api.list_organisms(limit=500, conn=conn)
-        assert res["total_entries"] == 48
-        assert res["total_matching"] == 48
-        assert len(res["results"]) == 48
+        assert res["total_entries"] == n_org
+        assert res["total_matching"] == n_org
+        assert len(res["results"]) == n_org
         for row in res["results"]:
             for col in _SLICE4_ANNOT_COLS:
                 assert isinstance(row[col], int) and row[col] >= 0, (

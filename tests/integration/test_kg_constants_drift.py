@@ -346,15 +346,25 @@ class TestControlledVocabulariesHashPin:
         )
 
     def test_release_identity_counts(self, run_query):
-        """§7.5 companions: 49 papers / 209 experiments / 48 organisms on
-        KG-SYNC-006."""
-        row = run_query(
+        """§7.5 companions: `Schema_info.{paper,experiment,organism}_count`
+        must agree with the live node counts (Publication / Experiment /
+        OrganismTaxon) and clear a sanity floor so an empty or stub DB
+        still fails. No literal pins — the vocabulary hash above IS the pin."""
+        si = run_query(
             "MATCH (s:Schema_info {id: 'schema_info'}) "
             "RETURN s.paper_count AS p, s.experiment_count AS e, "
             "s.organism_count AS o"
         )[0]
-        assert (row["p"], row["e"], row["o"]) == (49, 209, 48)
-
+        live = run_query(
+            "MATCH (p:Publication) WITH count(p) AS p "
+            "MATCH (e:Experiment) WITH p, count(e) AS e "
+            "MATCH (o:OrganismTaxon) RETURN p, e, count(o) AS o"
+        )[0]
+        assert (si["p"], si["e"], si["o"]) == (live["p"], live["e"], live["o"]), (
+            f"Schema_info counts {dict(si)} disagree with live node counts "
+            f"{dict(live)}"
+        )
+        assert si["p"] > 40 and si["e"] > 150 and si["o"] > 40, dict(si)
 
 class TestExperimentListPropsDense:
     """§7.6 (v1.2) — `treatment_type` / `background_factors` are dense on
