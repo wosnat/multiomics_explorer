@@ -37,7 +37,7 @@ by_publication:
   publication_doi: 10.1126/science.1243457
 by_value:
 - count: 59
-  value: 'true'
+  value: flagged
 case_id: genes_by_boolean_metric_summary_only
 excluded_derived_metrics: []
 genes_per_metric_max: 32

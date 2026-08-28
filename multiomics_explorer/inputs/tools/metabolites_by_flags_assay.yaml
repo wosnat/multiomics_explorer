@@ -20,8 +20,8 @@ examples:
     call: metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular"], flag_value=True)
     # 35 rows — the metabolites flagged as detected on the msystems
     # intracellular assay (matches by_value.true=35 in the canonical example).
-    # Unlike `genes_by_boolean_metric` (positive-only KG storage),
-    # `Assay_flags_metabolite` stores both true and false, so flag_value=True
+    # `Assay_flags_metabolite` always stores both states ('detected' /
+    # 'not_detected' in the KG, bool on the surface), so flag_value=True
     # is presence-only (35 of 93 rows), not "all rows".
 
   - title: Tested-absent slice — flag_value=False
@@ -89,11 +89,11 @@ mistakes:
 
   - wrong: "flag_value=False returns 0 rows like genes_by_boolean_metric does."
     right: |
-      `genes_by_boolean_metric` returns 0 rows for `flag=False` because the
-      DM layer stores positive-only edges (`dm_false_count=0` on every current
-      DM). `Assay_flags_metabolite` stores BOTH true and false flags — about
-      62% of boolean rows are `flag_value=false`. flag_value=False returns
-      real rows here. Distinct KG-storage convention.
+      `Assay_flags_metabolite` ALWAYS stores both states (KG literals
+      'detected' / 'not_detected', bool on the surface) — about 62% of
+      boolean rows are `flag_value=false`, and flag_value=False returns real
+      rows. On the DM side only 11 of 27 boolean DMs store `not_flagged`
+      edges, so `genes_by_boolean_metric(flag=False)` is DM-dependent.
 
   - wrong: "excluded_assays / warnings will surface gating diagnostics."
     right: |

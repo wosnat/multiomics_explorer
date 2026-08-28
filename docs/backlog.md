@@ -11,7 +11,7 @@ Sizes: **S** ≤ half a day, no spec · **M** a day, one-page spec (Mode B) · *
 
 | # | Item | Size | Notes |
 |---|---|---|---|
-| 1.1 | `/release-explorer 0.1.0-alpha.5` — cuts `[Unreleased]`, tags, builds, publishes; pushes `main` (~87 commits ahead of origin). | S | Preflight: pinned `EXPECTED_CONTROLLED_VOCABULARIES_HASH` (`sha256:496c5ad4…`) must equal the live KG's; `kg_release_info` reads `ok` today. |
+| 1.1 | `/release-explorer 0.1.0-alpha.5` — cuts `[Unreleased]`, tags, builds, publishes; pushes `main` (~87 commits ahead of origin). | S | Preflight: pinned `EXPECTED_CONTROLLED_VOCABULARIES_HASH` (`sha256:d7191e2a…`, 2026-08-28 dev build) must equal the live KG's at the cut; KG must first fix `flag_true_count` / `flag_false_count` (ask R6). |
 | 1.2 | KG cut pairing: `Schema_info.version = 0.1.0-alpha.7`, `mcp_min_version = 0.1.0a5` (new tool ⇒ a4 clients rejected), `release_highlights` / `breaking_changes` stamped. | KG | Highlights + breaking list drafted in §4 A1 below. |
 | 1.3 | Eval pass on the annotation-trust surface in `multiomics_research` (protease vs dead-homolog, urea transporter ranking, InterPro superfamily ORA on a dark-survival cluster). | M | The contract gates are green; only agent-driven runs show whether routing / warnings / `docs://` pages lead to the right tool. Roadmap "stress test" step. |
 
@@ -28,6 +28,14 @@ Sizes: **S** ≤ half a day, no spec · **M** a day, one-page spec (Mode B) · *
 | 2.7 | Lint pattern for internal shorthand leaking into docstrings: `(?:PR|slice)\s?\d[ab]?\b`. Only code comments use it today. | S | 3b review recommendation |
 | 2.8 | `organism=` word-match backlog: genus node `Alteromonas` matches all strains; `AltDE` matches `AltDE1`. Resolver gates on `gene_count > 0` so treatment taxa are safe (KG B4 removes the last name collision). | M | slice-2 ledger |
 | 2.9 | Literal KG counts still pinned in some `-m kg` tests (browse S33 417, `go:0006979` 875, DM counts, nitrite sums) — each paper batch flips them. Consider `Schema_info`-relative or tolerance assertions for the ones that are not release guards. | S | slice-4 RED |
+
+### 2b. From the KG hand-off 2026-08-28 (`multiomics_biocypher_kg/docs/kg-changes/2026-08-28-explorer-handoff.md`)
+
+Shipped 2026-08-28 against the 11:58Z dev build: HO-001 two-state strings (`two_state()` helper, hash re-pinned), HO-002 taxid + `name_synonyms` resolver, `genes_by_boolean_metric` flag=False doc correction. Still open:
+
+| # | Item | Size | Origin |
+|---|---|---|---|
+| 2.13 | 2.9 follow-through: use `Schema_info.organism_count` / `experiment_count` / `gene_count` / `paper_count` for tolerance assertions (R4: already stamped). | S | R4 |
 
 ## 3. Older backlog — verified 2026-08-28
 
@@ -63,7 +71,7 @@ Filed in chat 2026-08-28; copy into `docs/kg-specs/` when the KG picks them up.
 - B1. Per-value descriptions on closed vocabularies (`value_descriptions` map) — unblocks 2.3.
 - B2. Vocab descriptions are user-facing (served by `list_filter_values`, `docs://ontologies`): drop script/paperconfig provenance from `ClusteringAnalysis.cluster_type`'s text.
 - B3. Stamp `min_size` on the vocab node (yaml-only today).
-- B4. Two `OrganismTaxon` nodes share `preferred_name = 'Meiothermus ruber'` (genome strain + 0-gene treatment taxon) — disambiguate the treatment taxon's name or add a uniqueness validity test.
+- ~~B4~~ closed 2026-08-28 (HO-002: synonyms + `taxonomy_note`, name kept). Was: two `OrganismTaxon` nodes share `preferred_name = 'Meiothermus ruber'` (genome strain + 0-gene treatment taxon) — disambiguate the treatment taxon's name or add a uniqueness validity test.
 
 **C — notes, no action**: `expression_bin` declared but unused (drift test checks in-use ⊆ declared); `direct_gene_count` absent on PfamClan / BriteCategory (documented); 4 publications without `discusses` edges (pre-existing extraction gaps).
 

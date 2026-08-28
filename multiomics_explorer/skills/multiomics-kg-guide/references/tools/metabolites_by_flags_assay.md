@@ -5,9 +5,9 @@
 Drill into boolean MetaboliteAssay edges — one row per
 (metabolite × flag-edge). `flag_value=False` rows are
 *tested-absent* (assayed and not found, real biology, kept by
-default — about 62% of boolean rows). Unlike
-`genes_by_boolean_metric` which returns 0 rows for `False` (DM
-positive-only storage), this tool stores both true and false.
+default — about 62% of boolean rows). Both states are always
+stored on this edge (KG `'detected'` / `'not_detected'`), unlike
+the DM layer where only some DMs store `not_flagged`.
 Cross-organism by design. No `by_detection_status` envelope — on
 the boolean arm, `flag_value` IS the qualitative-detection
 signal; `by_value` is its envelope rollup.
@@ -197,11 +197,11 @@ flag_value=False returns 0 rows like genes_by_boolean_metric does.
 ```
 
 ```correction
-`genes_by_boolean_metric` returns 0 rows for `flag=False` because the
-DM layer stores positive-only edges (`dm_false_count=0` on every current
-DM). `Assay_flags_metabolite` stores BOTH true and false flags — about
-62% of boolean rows are `flag_value=false`. flag_value=False returns
-real rows here. Distinct KG-storage convention.
+`Assay_flags_metabolite` ALWAYS stores both states (KG literals
+'detected' / 'not_detected', bool on the surface) — about 62% of
+boolean rows are `flag_value=false`, and flag_value=False returns real
+rows. On the DM side only 11 of 27 boolean DMs store `not_flagged`
+edges, so `genes_by_boolean_metric(flag=False)` is DM-dependent.
 
 ```
 

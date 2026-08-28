@@ -2123,7 +2123,7 @@ def list_experiments(
     for row in results:
         r = dict(row)
         # Cast is_time_course string to bool
-        r["is_time_course"] = r["is_time_course"] == "true"
+        r["is_time_course"] = r["is_time_course"] == "time_course"
 
         # Consolidate gene status counts into dict
         sig_up = r.pop("significant_up_count")
@@ -3736,7 +3736,7 @@ def differential_expression_by_gene(
             e["rows_by_status"] = _apoc_freq_to_dict(e["rows_by_status"])
 
             # Handle timepoints
-            if e.get("is_time_course") == "false":
+            if e.get("is_time_course") == "single_time_point":
                 e["timepoints"] = None
             elif e.get("timepoints"):
                 tps = []
@@ -8111,8 +8111,8 @@ def metabolites_by_flags_assay(
       1. summary — envelope rollups.
       2. detail — top-N rows; skipped when `summary=True`.
 
-    The API coerces `flag_value: bool | None` to string `'true'` /
-    `'false'` for Cypher (KG stores boolean as string).
+    The API coerces `flag_value: bool | None` to string `'detected'` /
+    `'not_detected'` for Cypher (KG two-state string, HO-001).
     `flag_value=False` returns rows in this slice (KG stores both true
     and false flags; differs from DM `genes_by_boolean_metric`).
 
@@ -8133,9 +8133,9 @@ def metabolites_by_flags_assay(
     # D4: bool → string coercion at API boundary (parent §11 Conv K).
     flag_value_str: str | None
     if flag_value is True:
-        flag_value_str = "true"
+        flag_value_str = "detected"
     elif flag_value is False:
-        flag_value_str = "false"
+        flag_value_str = "not_detected"
     else:
         flag_value_str = None
 

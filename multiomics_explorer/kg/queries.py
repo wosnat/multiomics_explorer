@@ -226,7 +226,7 @@ FEW_SHOT_EXAMPLES = [
         ),
         "explanation": (
             "Time series: filter by gene and order by time_point_hours (numeric hours). "
-            "Experiment nodes have is_time_course='true' for multi-timepoint experiments."
+            "Experiment nodes have is_time_course='time_course' for multi-timepoint experiments (else 'single_time_point')."
         ),
     },
     {

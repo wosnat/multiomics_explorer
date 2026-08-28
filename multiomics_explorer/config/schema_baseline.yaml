@@ -575,6 +575,8 @@ schema:
         preferred_id: string
     OrganismTaxon:
       properties:
+        name_synonyms: list
+        taxonomy_note: string
         background_factors: list
         catalyzed_metabolite_count: int
         clade: string

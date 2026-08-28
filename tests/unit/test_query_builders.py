@@ -3051,9 +3051,9 @@ class TestBuildListExperiments:
         assert "score" not in cypher
 
     def test_time_course_only(self):
-        """time_course_only adds WHERE is_time_course = 'true'."""
+        """time_course_only adds WHERE is_time_course = 'time_course'."""
         cypher, _ = build_list_experiments(time_course_only=True)
-        assert "e.is_time_course = 'true'" in cypher
+        assert "e.is_time_course = 'time_course'" in cypher
 
     def test_combined_filters(self):
         """Multiple filters produce AND-joined WHERE."""
@@ -3452,6 +3452,14 @@ class TestBuildResolveOrganismForOrganism:
         assert "Experiment" not in cypher
         assert "gene_count" in cypher
         assert "> 0" in cypher
+
+    def test_matches_name_synonyms(self):
+        # HO-002: sparse OrganismTaxon.name_synonyms participates in the
+        # word scan so 'Meiothermus taiwanensis' resolves the ruber strain.
+        cypher, _ = build_resolve_organism_for_organism(
+            organism="Meiothermus taiwanensis")
+        assert "coalesce(o.name_synonyms, [])" in cypher
+        assert "toLower(syn) CONTAINS word" in cypher
 
     def test_fuzzy_match(self):
         cypher, _ = build_resolve_organism_for_organism(organism="MED4")
@@ -5570,20 +5578,20 @@ class TestListDerivedMetricsWhere:
         from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
         conditions, params = _list_derived_metrics_where(rankable=True)
         assert conditions == ["dm.rankable = $rankable_str"]
-        assert params == {"rankable_str": "true"}
+        assert params == {"rankable_str": "rankable"}
 
     def test_rankable_false_coerces_to_string(self):
         from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
         conditions, params = _list_derived_metrics_where(rankable=False)
         assert conditions == ["dm.rankable = $rankable_str"]
-        assert params == {"rankable_str": "false"}
+        assert params == {"rankable_str": "not_rankable"}
 
     def test_has_p_value_coerces_to_string(self):
         from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
         _, params_true = _list_derived_metrics_where(has_p_value=True)
         _, params_false = _list_derived_metrics_where(has_p_value=False)
-        assert params_true == {"has_p_value_str": "true"}
-        assert params_false == {"has_p_value_str": "false"}
+        assert params_true == {"has_p_value_str": "p_value"}
+        assert params_false == {"has_p_value_str": "no_p_value"}
 
     def test_combined_filters(self):
         from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
@@ -5647,7 +5655,7 @@ class TestBuildListDerivedMetricsSummary:
         assert params == {
             "organism": "MED4",
             "value_kind": "numeric",
-            "rankable_str": "true",
+            "rankable_str": "rankable",
         }
 
     def test_null_safe_flatten(self):
@@ -5826,15 +5834,15 @@ class TestBuildGeneDerivedMetrics:
             "dm.value_kind AS value_kind",
             "dm.name AS name",
             "r.value AS value",
-            "dm.rankable = 'true' AS rankable",
-            "dm.has_p_value = 'true' AS has_p_value",
+            "dm.rankable = 'rankable' AS rankable",
+            "dm.has_p_value = 'p_value' AS has_p_value",
         ]:
             assert col in cypher, f"missing compact column: {col}"
 
     def test_rankable_case_gates(self):
         cypher, _ = build_gene_derived_metrics(locus_tags=["X"])
         for col in ["rank_by_metric", "metric_percentile", "metric_bucket"]:
-            assert (f"CASE WHEN dm.rankable = 'true' THEN r.{col} "
+            assert (f"CASE WHEN dm.rankable = 'rankable' THEN r.{col} "
                     f"ELSE null END AS {col}") in cypher
 
     def test_has_p_value_columns_deferred(self):
@@ -5958,8 +5966,8 @@ class TestBuildListDerivedMetrics:
         assert "dm.name AS name" in cypher
         assert "dm.metric_type AS metric_type" in cypher
         assert "dm.value_kind AS value_kind" in cypher
-        assert "dm.rankable = 'true' AS rankable" in cypher
-        assert "dm.has_p_value = 'true' AS has_p_value" in cypher
+        assert "dm.rankable = 'rankable' AS rankable" in cypher
+        assert "dm.has_p_value = 'p_value' AS has_p_value" in cypher
         assert "dm.unit AS unit" in cypher
         assert "CASE WHEN dm.value_kind = 'categorical'" in cypher
         assert "THEN dm.allowed_categories ELSE null END AS allowed_categories" in cypher
@@ -6039,7 +6047,7 @@ class TestBuildListDerivedMetrics:
         assert params == {
             "organism": "NATL2A",
             "value_kind": "boolean",
-            "rankable_str": "false",
+            "rankable_str": "not_rankable",
             "limit": 10,
         }
 
@@ -6092,8 +6100,8 @@ class TestBuildGenesByNumericMetricDiagnostics:
             "dm.metric_type AS metric_type",
             "dm.value_kind AS value_kind",
             "dm.name AS name",
-            "dm.rankable = 'true' AS rankable",
-            "dm.has_p_value = 'true' AS has_p_value",
+            "dm.rankable = 'rankable' AS rankable",
+            "dm.has_p_value = 'p_value' AS has_p_value",
             "dm.total_gene_count AS total_gene_count",
             "dm.organism_name AS organism_name",
         ]:
@@ -6290,8 +6298,8 @@ class TestBuildGenesByNumericMetric:
             "dm.id AS derived_metric_id",
             "dm.name AS name",
             "dm.value_kind AS value_kind",
-            "dm.rankable = 'true' AS rankable",
-            "dm.has_p_value = 'true' AS has_p_value",
+            "dm.rankable = 'rankable' AS rankable",
+            "dm.has_p_value = 'p_value' AS has_p_value",
             "r.value AS value",
             "AS rank_by_metric",
             "AS metric_percentile",
@@ -6327,7 +6335,7 @@ class TestBuildGenesByNumericMetric:
         cypher, _ = build_genes_by_numeric_metric(
             derived_metric_ids=["dm:abc"])
         for col in ["rank_by_metric", "metric_percentile", "metric_bucket"]:
-            assert (f"CASE WHEN dm.rankable = 'true' THEN r.{col}"
+            assert (f"CASE WHEN dm.rankable = 'rankable' THEN r.{col}"
                     f" ELSE null END AS {col}") in cypher
 
     def test_has_p_value_columns_deferred(self):
@@ -6345,8 +6353,8 @@ class TestBuildGenesByNumericMetric:
     def test_rankable_has_p_value_coerced(self):
         cypher, _ = build_genes_by_numeric_metric(
             derived_metric_ids=["dm:abc"])
-        assert "dm.rankable = 'true' AS rankable" in cypher
-        assert "dm.has_p_value = 'true' AS has_p_value" in cypher
+        assert "dm.rankable = 'rankable' AS rankable" in cypher
+        assert "dm.has_p_value = 'p_value' AS has_p_value" in cypher
 
     def test_locus_tags_filter(self):
         cypher, params = build_genes_by_numeric_metric(
@@ -6529,13 +6537,13 @@ class TestBuildGenesByBooleanMetricSummary:
         cypher, params = build_genes_by_boolean_metric_summary(
             derived_metric_ids=["dm:abc"], flag=True)
         assert "r.value = $flag_str" in cypher
-        assert params["flag_str"] == "true"
+        assert params["flag_str"] == "flagged"
 
     def test_flag_false_filter(self):
         cypher, params = build_genes_by_boolean_metric_summary(
             derived_metric_ids=["dm:abc"], flag=False)
         assert "r.value = $flag_str" in cypher
-        assert params["flag_str"] == "false"
+        assert params["flag_str"] == "not_flagged"
 
     def test_returns_expected_columns(self):
         cypher, _ = build_genes_by_boolean_metric_summary(
@@ -6566,8 +6574,8 @@ class TestBuildGenesByBooleanMetricSummary:
             "metric_type: head([x IN rows WHERE x.dm_id = dm_id | x.mt])",
             "value_kind:  head([x IN rows WHERE x.dm_id = dm_id | x.vk])",
             "count:       size([x IN rows WHERE x.dm_id = dm_id])",
-            "true_count:  size([x IN rows WHERE x.dm_id = dm_id AND x.value = 'true'])",
-            "false_count: size([x IN rows WHERE x.dm_id = dm_id AND x.value = 'false'])",
+            "true_count:  size([x IN rows WHERE x.dm_id = dm_id AND x.value = 'flagged'])",
+            "false_count: size([x IN rows WHERE x.dm_id = dm_id AND x.value = 'not_flagged'])",
             "dm_total_gene_count: head([x IN rows WHERE x.dm_id = dm_id | x.dm_total])",
             "dm_true_count:  head([x IN rows WHERE x.dm_id = dm_id | x.dm_true])",
             "dm_false_count: head([x IN rows WHERE x.dm_id = dm_id | x.dm_false])",
@@ -6600,10 +6608,10 @@ class TestBuildGenesByBooleanMetric:
         cypher, params = build_genes_by_boolean_metric(
             derived_metric_ids=["dm:abc"], flag=True)
         assert "r.value = $flag_str" in cypher
-        assert params["flag_str"] == "true"
+        assert params["flag_str"] == "flagged"
         cypher, params = build_genes_by_boolean_metric(
             derived_metric_ids=["dm:abc"], flag=False)
-        assert params["flag_str"] == "false"
+        assert params["flag_str"] == "not_flagged"
 
     def test_returns_expected_columns_compact(self):
         cypher, _ = build_genes_by_boolean_metric(
@@ -6617,8 +6625,8 @@ class TestBuildGenesByBooleanMetric:
             "dm.id AS derived_metric_id",
             "dm.name AS name",
             "dm.value_kind AS value_kind",
-            "dm.rankable = 'true' AS rankable",
-            "dm.has_p_value = 'true' AS has_p_value",
+            "dm.rankable = 'rankable' AS rankable",
+            "dm.has_p_value = 'p_value' AS has_p_value",
             "r.value AS value",
         ]:
             assert col in cypher, f"missing compact column: {col}"
@@ -6863,8 +6871,8 @@ class TestBuildGenesByCategoricalMetric:
             "dm.id AS derived_metric_id",
             "dm.name AS name",
             "dm.value_kind AS value_kind",
-            "dm.rankable = 'true' AS rankable",
-            "dm.has_p_value = 'true' AS has_p_value",
+            "dm.rankable = 'rankable' AS rankable",
+            "dm.has_p_value = 'p_value' AS has_p_value",
             "r.value AS value",
         ]:
             assert col in cypher, f"missing compact column: {col}"
@@ -9752,13 +9760,13 @@ class TestListMetaboliteAssaysWhere:
         from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
         conditions, params = _list_metabolite_assays_where(rankable=True)
         assert conditions == ["a.rankable = $rankable_str"]
-        assert params == {"rankable_str": "true"}
+        assert params == {"rankable_str": "rankable"}
 
     def test_rankable_false_coerces_to_string(self):
         from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
         conditions, params = _list_metabolite_assays_where(rankable=False)
         assert conditions == ["a.rankable = $rankable_str"]
-        assert params == {"rankable_str": "false"}
+        assert params == {"rankable_str": "not_rankable"}
 
     def test_combined_filters(self):
         from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
@@ -9856,7 +9864,7 @@ class TestBuildListMetaboliteAssays:
         assert "a.name AS name" in cypher
         assert "a.metric_type AS metric_type" in cypher
         assert "a.value_kind AS value_kind" in cypher
-        assert "(a.rankable = \"true\") AS rankable" in cypher  # bool coercion
+        assert "(a.rankable = \"rankable\") AS rankable" in cypher  # bool coercion
         assert "a.unit AS unit" in cypher
         assert "a.field_description AS field_description" in cypher
         assert "a.organism_name AS organism_name" in cypher
@@ -9930,14 +9938,14 @@ class TestBuildListMetaboliteAssays:
         assert "a.value_kind = $value_kind" in cypher
         assert "a.rankable = $rankable_str" in cypher
         assert params["value_kind"] == "numeric"
-        assert params["rankable_str"] == "true"
+        assert params["rankable_str"] == "rankable"
         assert params["organism"] == "MIT9313"
 
     def test_rankable_returned_as_bool_via_string_compare(self):
         """Per Phase 5 D4: per-row rankable is bool, derived from string compare."""
         from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays
         cypher, _ = build_list_metabolite_assays()
-        assert "(a.rankable = \"true\") AS rankable" in cypher
+        assert "(a.rankable = \"rankable\") AS rankable" in cypher
 
     def test_metabolite_ids_filter_appears(self):
         from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays
@@ -10061,7 +10069,7 @@ class TestBuildMetabolitesByQuantifiesAssayDiagnostics:
         assert "MATCH (a:MetaboliteAssay)" in cypher
         assert "a.id IN $assay_ids" in cypher
         assert "a.value_kind = 'numeric'" in cypher
-        assert "(a.rankable = 'true') AS rankable" in cypher       # D4 string→bool
+        assert "(a.rankable = 'rankable') AS rankable" in cypher       # D4 string→bool
         assert "a.value_min" in cypher and "a.value_max" in cypher  # so api/ can echo full-DM range
         assert params["assay_ids"] == [
             "metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration"]
@@ -10172,9 +10180,9 @@ class TestBuildMetabolitesByFlagsAssaySummary:
     def test_flag_value_filter_string_form(self):
         # D4: API coerces bool → string before passing to Cypher.
         from multiomics_explorer.kg.queries_lib import build_metabolites_by_flags_assay_summary
-        cypher, params = build_metabolites_by_flags_assay_summary(assay_ids=["a1"], flag_value="true")
+        cypher, params = build_metabolites_by_flags_assay_summary(assay_ids=["a1"], flag_value="detected")
         assert "r.flag_value = $flag_value" in cypher
-        assert params["flag_value"] == "true"
+        assert params["flag_value"] == "detected"
 
 
 class TestBuildMetabolitesByFlagsAssay:
@@ -10183,12 +10191,12 @@ class TestBuildMetabolitesByFlagsAssay:
     def test_string_to_bool_coercion_in_return(self):
         from multiomics_explorer.kg.queries_lib import build_metabolites_by_flags_assay
         cypher, _ = build_metabolites_by_flags_assay(assay_ids=["a1"])
-        assert "(r.flag_value = 'true') AS flag_value" in cypher
+        assert "(r.flag_value = 'detected') AS flag_value" in cypher
 
     def test_order_by_flag_desc(self):
         from multiomics_explorer.kg.queries_lib import build_metabolites_by_flags_assay
         cypher, _ = build_metabolites_by_flags_assay(assay_ids=["a1"])
-        assert "ORDER BY r.flag_value DESC" in cypher
+        assert "ORDER BY flag_value DESC" in cypher
         assert "m.id ASC" in cypher
 
     def test_verbose_adds_minimal(self):

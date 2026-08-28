@@ -2379,7 +2379,7 @@ class TestListExperiments:
             "treatment_type": "coculture",
             "coculture_partner": "Alteromonas macleodii HOT1A3",
             "omics_type": "RNASEQ",
-            "is_time_course": "false",
+            "is_time_course": "single_time_point",
             "table_scope": "gene_level",
             "table_scope_detail": "gene_level_all",
             "gene_count": 1696,
@@ -2403,7 +2403,7 @@ class TestListExperiments:
         """Helper: mock time-course detail row."""
         return self._detail_row(
             experiment_id="test_tc_1",
-            is_time_course="true",
+            is_time_course="time_course",
             time_point_count=3,
             time_point_labels=["2h", "12h", "24h"],
             time_point_orders=[1, 2, 3],
@@ -2473,8 +2473,8 @@ class TestListExperiments:
         mock_conn.execute_query.side_effect = [
             self._summary_result(),
             self._summary_result(),
-            [self._detail_row(is_time_course="true"),
-             self._detail_row(is_time_course="false")],
+            [self._detail_row(is_time_course="time_course"),
+             self._detail_row(is_time_course="single_time_point")],
         ]
         result = api.list_experiments(conn=mock_conn)
         assert result["results"][0]["is_time_course"] is True
@@ -2522,7 +2522,7 @@ class TestListExperiments:
         mock_conn.execute_query.side_effect = [
             self._summary_result(),
             self._summary_result(),
-            [self._detail_row(is_time_course="false")],
+            [self._detail_row(is_time_course="single_time_point")],
         ]
         result = api.list_experiments(conn=mock_conn)
         assert "timepoints" not in result["results"][0]
@@ -2530,7 +2530,7 @@ class TestListExperiments:
     def test_sentinel_conversion(self, mock_conn):
         """Sentinel values converted: '' timepoint -> None, -1.0 hours -> None."""
         tc_row = self._detail_row(
-            is_time_course="true",
+            is_time_course="time_course",
             time_point_count=1,
             time_point_labels=[""],
             time_point_orders=[1],
@@ -2707,7 +2707,7 @@ class TestListExperiments:
             self._summary_result(),
             [self._detail_row(
                 experiment_id="time_course_med4",
-                is_time_course="true",
+                is_time_course="time_course",
                 gene_count=10182,
                 distinct_gene_count=1697,
                 time_point_count=6,
@@ -2977,7 +2977,7 @@ class TestDifferentialExpressionByGene:
                     "treatment_type": "nitrogen_stress",
                     "omics_type": "RNASEQ",
                     "coculture_partner": None,
-                    "is_time_course": "true",
+                    "is_time_course": "time_course",
                     "table_scope": "all_detected_genes",
                     "table_scope_detail": None,
                     "matching_genes": 5,
@@ -3155,7 +3155,7 @@ class TestDifferentialExpressionByGene:
                     "treatment_type": "x",
                     "omics_type": "RNASEQ",
                     "coculture_partner": None,
-                    "is_time_course": "false",
+                    "is_time_course": "single_time_point",
                     "table_scope": "all_detected_genes",
                     "table_scope_detail": None,
                     "matching_genes": 1,
@@ -3170,7 +3170,7 @@ class TestDifferentialExpressionByGene:
                     "treatment_type": "y",
                     "omics_type": "RNASEQ",
                     "coculture_partner": None,
-                    "is_time_course": "false",
+                    "is_time_course": "single_time_point",
                     "table_scope": "significant_only",
                     "table_scope_detail": None,
                     "matching_genes": 1,
@@ -3207,7 +3207,7 @@ class TestDifferentialExpressionByGene:
                     "treatment_type": "x",
                     "omics_type": "RNASEQ",
                     "coculture_partner": None,
-                    "is_time_course": "false",
+                    "is_time_course": "single_time_point",
                     "table_scope": "all_detected_genes",
                     "table_scope_detail": None,
                     "matching_genes": 1,
@@ -4989,13 +4989,13 @@ class TestGenesByBooleanMetric:
             metric_types=["vesicle_proteome_member"],
             flag=True, conn=mock_conn,
         )
-        # 3 calls: diag, summary, detail. flag → flag_str='true' on
+        # 3 calls: diag, summary, detail. flag → flag_str='flagged' on
         # summary + detail.
         assert mock_conn.execute_query.call_count == 3
         sum_kwargs = mock_conn.execute_query.call_args_list[1].kwargs
         det_kwargs = mock_conn.execute_query.call_args_list[2].kwargs
-        assert sum_kwargs.get("flag_str") == "true"
-        assert det_kwargs.get("flag_str") == "true"
+        assert sum_kwargs.get("flag_str") == "flagged"
+        assert det_kwargs.get("flag_str") == "flagged"
 
     def test_creates_conn_when_none(self, monkeypatch):
         # Patch GraphConnection so no real Neo4j call happens.
@@ -6699,8 +6699,8 @@ class TestListDerivedMetrics:
         "name": "Transcript:protein amplitude ratio",
         "metric_type": "damping_ratio",
         "value_kind": "numeric",
-        "rankable": "true",
-        "has_p_value": "false",
+        "rankable": "rankable",
+        "has_p_value": "no_p_value",
         "unit": "",
         "allowed_categories": None,
         "field_description": "...",
@@ -9808,7 +9808,7 @@ class TestListExperimentsPhase1Plumbing:
             "publication_doi": "10.1234/a",
             "organism_name": "MED4", "treatment_type": ["control"],
             "coculture_partner": None, "omics_type": "METABOLOMICS",
-            "is_time_course": "false",
+            "is_time_course": "single_time_point",
             "table_scope": "all_detected_genes",
             "table_scope_detail": None,
             "gene_count": 0, "distinct_gene_count": 0,
@@ -10783,7 +10783,7 @@ class TestMetabolitesByFlagsAssay:
             metabolites_by_flags_assay(assay_ids=[], conn=MagicMock())
 
     def test_flag_value_bool_to_string_coercion(self):
-        # D4: bool flag_value → string 'true'/'false' for Cypher param.
+        # D4: bool flag_value → string 'detected'/'not_detected' for Cypher param.
         captured: list[dict] = []
 
         class StubConn:
@@ -10802,10 +10802,10 @@ class TestMetabolitesByFlagsAssay:
         metabolites_by_flags_assay(
             assay_ids=["a1"], flag_value=True, summary=True, conn=StubConn(),
         )
-        # At least one query carried flag_value="true"
-        coerced_seen = [p for p in captured if p.get("flag_value") == "true"]
+        # At least one query carried flag_value="detected"
+        coerced_seen = [p for p in captured if p.get("flag_value") == "detected"]
         assert coerced_seen, (
-            f"Expected flag_value='true' string param, got: {captured}"
+            f"Expected flag_value='detected' string param, got: {captured}"
         )
 
     def test_no_rankable_diagnostics(self):

@@ -20,7 +20,7 @@ rows:
   growth_phases:
   - exponential
   - nutrient_limited
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -82,7 +82,7 @@ rows:
   gene_count: 4450
   growth_phases:
   - nutrient_limited
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -137,7 +137,7 @@ rows:
   gene_count: 11125
   growth_phases:
   - nutrient_limited
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -213,7 +213,7 @@ rows:
   gene_count: 11841
   growth_phases:
   - nutrient_limited
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -275,7 +275,7 @@ rows:
   gene_count: 19735
   growth_phases:
   - nutrient_limited
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -360,7 +360,7 @@ rows:
   gene_count: 26992
   growth_phases:
   - diel
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -452,7 +452,7 @@ rows:
   gene_count: 350
   growth_phases:
   - darkness
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -514,7 +514,7 @@ rows:
   gene_count: 3752
   growth_phases:
   - diel
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -576,7 +576,7 @@ rows:
   gene_count: 3751
   growth_phases:
   - diel
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -630,7 +630,7 @@ rows:
   growth_phases:
   - exponential
   - nutrient_limited
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -686,7 +686,7 @@ rows:
   growth_phases:
   - death
   - nutrient_limited
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -748,7 +748,7 @@ rows:
   gene_count: 7120
   growth_phases:
   - nutrient_limited
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -824,7 +824,7 @@ rows:
   gene_count: 3698
   growth_phases:
   - nutrient_limited
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -879,7 +879,7 @@ rows:
   gene_count: 9245
   growth_phases:
   - nutrient_limited
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -959,7 +959,7 @@ rows:
   growth_phases:
   - acute_stress
   - nutrient_limited
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -1019,7 +1019,7 @@ rows:
   gene_count: 51
   growth_phases:
   - infected
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -1093,7 +1093,7 @@ rows:
   gene_count: 49
   growth_phases:
   - acute_stress
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -1161,7 +1161,7 @@ rows:
   gene_count: 30
   growth_phases:
   - infected
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -1222,7 +1222,7 @@ rows:
   gene_count: 32
   growth_phases:
   - infected
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -1299,7 +1299,7 @@ rows:
   gene_count: 224
   growth_phases:
   - acute_stress
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -1362,7 +1362,7 @@ rows:
   gene_count: 360
   growth_phases:
   - infected
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -1465,7 +1465,7 @@ rows:
   gene_count: 10182
   growth_phases:
   - acute_stress
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -1549,7 +1549,7 @@ rows:
   - acute_stress
   - exponential
   - nutrient_limited
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -1632,7 +1632,7 @@ rows:
   gene_count: 3852
   growth_phases:
   - exponential
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -1739,7 +1739,7 @@ rows:
   growth_phases:
   - acute_stress
   - nutrient_limited
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -1807,7 +1807,7 @@ rows:
   gene_count: 13446
   growth_phases:
   - acute_stress
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -1890,7 +1890,7 @@ rows:
   growth_phases:
   - acute_stress
   - exponential
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -1969,7 +1969,7 @@ rows:
   gene_count: 14105
   growth_phases:
   - diel
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -2062,7 +2062,7 @@ rows:
   gene_count: 5862
   growth_phases:
   - darkness
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -2126,7 +2126,7 @@ rows:
   gene_count: 5862
   growth_phases:
   - darkness
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -2187,7 +2187,7 @@ rows:
   gene_count: 2471
   growth_phases:
   - exponential
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -2277,7 +2277,7 @@ rows:
   growth_phases:
   - nutrient_limited
   - recovery
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -2360,7 +2360,7 @@ rows:
   growth_phases:
   - nutrient_limited
   - recovery
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -2458,7 +2458,7 @@ rows:
   gene_count: 1554
   growth_phases:
   - acclimated_steady_state
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -2550,7 +2550,7 @@ rows:
   gene_count: 1288
   growth_phases:
   - acclimated_steady_state
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -2641,7 +2641,7 @@ rows:
   gene_count: 12280
   growth_phases:
   - infected
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -2719,7 +2719,7 @@ rows:
   gene_count: 1547
   growth_phases:
   - acclimated_steady_state
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -2811,7 +2811,7 @@ rows:
   gene_count: 1309
   growth_phases:
   - acclimated_steady_state
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -2908,7 +2908,7 @@ rows:
   gene_count: 17675
   growth_phases:
   - infected
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -3009,7 +3009,7 @@ rows:
   gene_count: 17563
   growth_phases:
   - infected
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -3110,7 +3110,7 @@ rows:
   gene_count: 18123
   growth_phases:
   - infected
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0

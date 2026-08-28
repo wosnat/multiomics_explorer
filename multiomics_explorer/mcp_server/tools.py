@@ -4144,7 +4144,7 @@ def register_tools(mcp: FastMCP):
             description="Coculture partner organism, if applicable",
         )
         is_time_course: str = Field(
-            description="'true' or 'false'",
+            description="KG two-state literal: 'time_course' or 'single_time_point'.",
         )
         table_scope: str = Field(
             description="What genes the source DE table contains."
@@ -5602,7 +5602,7 @@ def register_tools(mcp: FastMCP):
                         "list_derived_metrics for opaque metric_type codes.")
         value: float | str = Field(
             description="Polymorphic measurement: float on numeric rows, "
-                        "'true'/'false' string on boolean rows, category "
+                        "'flagged'/'not_flagged' string on boolean rows, category "
                         "string on categorical rows. Branch on `value_kind`.")
         rankable: bool = Field(
             description="Echoed from parent DM. True iff this row's `value` "
@@ -6302,7 +6302,7 @@ def register_tools(mcp: FastMCP):
             Literal["numeric", "boolean", "categorical"] | None, Field(
                 description="Restrict to one DM kind. Each kind has a "
                             "different `value` column type — 'numeric' → "
-                            "float, 'boolean' → 'true'/'false', "
+                            "float, 'boolean' → 'flagged'/'not_flagged', "
                             "'categorical' → category string.",
             )] = None,
         compartment: Annotated[str | None, Field(
@@ -6347,7 +6347,7 @@ def register_tools(mcp: FastMCP):
         )] = 0,
     ) -> GeneDerivedMetricsResponse:
         """Look up DerivedMetric annotations for a gene batch — one row per
-        (gene × DM), polymorphic `value` (float on numeric / `'true'`/`'false'`
+        (gene × DM), polymorphic `value` (float on numeric / `'flagged'`/`'not_flagged'`
         on boolean / category string on categorical). Numeric extras
         (`rank_by_metric`, `metric_percentile`, `metric_bucket`) populate only
         on rankable parent DMs; `adjusted_p_value` / `significant` only on
@@ -7409,7 +7409,7 @@ def register_tools(mcp: FastMCP):
         )] = None,
         # ── Edge-level filters: HAS_P_VALUE-GATED ───────────────────────
         significant_only: Annotated[bool, Field(
-            description="Filter to `r.significant=true`. **has_p_value-gated** "
+            description="Filter to `r.significant='significant'`. **has_p_value-gated** "
                         "— raises in the current KG (no DM has p-values yet). "
                         "Forward-compat surface; check "
                         "`list_derived_metrics(has_p_value=True)` before using.",
@@ -7573,7 +7573,7 @@ def register_tools(mcp: FastMCP):
 
     class GenesByBooleanMetricValueBreakdown(BaseModel):
         value: str = Field(
-            description="Edge value: 'true' or 'false' (string-typed bool).")
+            description="Edge value: KG literal 'flagged' or 'not_flagged'.")
         count: int = Field(description="Rows with this value.")
 
     class GenesByBooleanMetricBreakdown(BaseModel):
@@ -7587,11 +7587,11 @@ def register_tools(mcp: FastMCP):
             description="Rows contributed by this DM after filters.")
         # Filtered slice (query-time)
         true_count: int = Field(
-            description="Rows in filtered slice with r.value='true'.")
+            description="Rows in filtered slice with r.value='flagged'.")
         false_count: int = Field(
-            description="Rows in filtered slice with r.value='false' "
-                        "(always 0 in the current KG — positive-only "
-                        "DM storage).")
+            description="Rows in filtered slice with r.value='not_flagged' "
+                        "(tested-absent; populated on 11 of 27 boolean "
+                        "DMs, 0 on positive-only DMs).")
         # Full DM (precomputed)
         dm_total_gene_count: int = Field(
             description="Full-DM total gene count (precomputed "
@@ -7631,7 +7631,7 @@ def register_tools(mcp: FastMCP):
                         "DMs in the current KG).")
         # Edge value (1)
         value: str = Field(
-            description="'true' or 'false' (string-typed bool — see KG-spec "
+            description="'flagged' or 'not_flagged' (KG two-state literal — see KG-spec "
                         "BioCypher constraint).")
         # ── Verbose adds (default None) ─────────────────────────────────
         metric_type: str | None = Field(
@@ -7689,8 +7689,8 @@ def register_tools(mcp: FastMCP):
         by_value: list[GenesByBooleanMetricValueBreakdown] = Field(
             default_factory=list,
             description="Frequency rollup of `r.value` across surviving rows. "
-                        "Every row is 'true' in the current KG (positive-only "
-                        "DM storage).")
+                        "Values are 'flagged' / 'not_flagged'; not_flagged "
+                        "rows exist on 11 of 27 boolean DMs.")
         top_categories: list[GenesByNumericMetricCategoryBreakdown] = Field(
             default_factory=list, description="Top 5 gene categories by count.")
         by_metric: list[GenesByBooleanMetricBreakdown] = Field(
@@ -7798,12 +7798,12 @@ def register_tools(mcp: FastMCP):
         )] = None,
         # ── Edge-level filter (kind-specific) ───────────────────────────
         flag: Annotated[bool | None, Field(
-            description="Filter on `r.value`: True keeps `'true'` edges, "
-                        "False keeps `'false'` edges. **flag=False returns "
-                        "zero rows in the current KG** — DM layer stores only "
-                        "positive (true) edges; inspect "
-                        "`by_metric[*].dm_false_count` (always 0) before "
-                        "assuming a gene is 'not flagged'.",
+            description="Filter on `r.value`: True keeps `'flagged'` edges, "
+                        "False keeps `'not_flagged'` edges (tested-absent — "
+                        "real biology, stored on 11 of 27 boolean DMs; the "
+                        "rest are positive-only and return 0 rows for False). "
+                        "Check `by_metric[*].false_count` before reading an "
+                        "absent gene as 'not flagged' vs 'not assessed'.",
         )] = None,
         # ── Result-size controls ────────────────────────────────────────
         summary: Annotated[bool, Field(
@@ -7830,7 +7830,7 @@ def register_tools(mcp: FastMCP):
         )] = 0,
     ) -> GenesByBooleanMetricResponse:
         """Drill into boolean DerivedMetric edges — one row per (gene × DM ×
-        edge value). `value` is the string-typed bool (`'true'` / `'false'`).
+        edge value). `value` is the KG two-state literal (`'flagged'` / `'not_flagged'`).
         Cross-organism by design.
 
         Selection is `derived_metric_ids` XOR `metric_types` (exactly one
@@ -7840,12 +7840,13 @@ def register_tools(mcp: FastMCP):
         DMs. See `docs://guide/conventions` for the full DM family gating
         contract.
 
-        **Positive-only storage gotcha:** the DM layer stores only
-        `flag=True` edges, so `flag=False` returns 0 rows; every current
-        boolean DM has `dm.flag_false_count=0`. The `by_metric[*]` rollup
-        echoes that count so absence is self-evident without a follow-up.
-        Tested-absent semantics are not currently representable on the DM
-        side (distinct from the metabolomics layer, which does store both).
+        **Two storage conventions coexist:** 11 of 27 boolean DMs store
+        both `flagged` and `not_flagged` edges (tested-absent is real
+        biology — `flag=False` returns rows), the rest are positive-only
+        (`flag=False` → 0 rows). Read `by_metric[*].false_count` to tell
+        'not flagged' from 'not assessed'. The precomputed `dm_false_count`
+        column is unreliable on current KG builds (reads 0 everywhere);
+        use the filtered-slice counts.
         See `docs://guide/conventions`.
 
         The `by_metric` envelope rollup pairs filtered-slice true/false
@@ -10026,9 +10027,9 @@ def register_tools(mcp: FastMCP):
         """Drill into boolean MetaboliteAssay edges — one row per
         (metabolite × flag-edge). `flag_value=False` rows are
         *tested-absent* (assayed and not found, real biology, kept by
-        default — about 62% of boolean rows). Unlike
-        `genes_by_boolean_metric` which returns 0 rows for `False` (DM
-        positive-only storage), this tool stores both true and false.
+        default — about 62% of boolean rows). Both states are always
+        stored on this edge (KG `'detected'` / `'not_detected'`), unlike
+        the DM layer where only some DMs store `not_flagged`.
         Cross-organism by design. No `by_detection_status` envelope — on
         the boolean arm, `flag_value` IS the qualitative-detection
         signal; `by_value` is its envelope rollup.

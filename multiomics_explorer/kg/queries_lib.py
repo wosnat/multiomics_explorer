@@ -7,6 +7,8 @@ for executing the query via GraphConnection.execute_query(cypher, **params).
 import re
 from typing import Literal
 
+from multiomics_explorer.kg.constants import two_state
+
 # Ontology type configuration — the single registry driving every ontology
 # builder: labels, edges, indexes, hierarchy walks, trust axes, row columns,
 # term-side projections, facets and forward bridges.
@@ -2756,7 +2758,7 @@ def _list_experiments_where(
         params["partner"] = coculture_partner
 
     if time_course_only:
-        conditions.append("e.is_time_course = 'true'")
+        conditions.append("e.is_time_course = 'time_course'")
 
     if table_scope:
         conditions.append("e.table_scope IN $table_scopes")
@@ -2975,7 +2977,7 @@ def build_list_experiments_summary(
 
     return_cols = (
         "size(orgs) AS total_matching,\n"
-        "       size([x IN tc WHERE x = 'true']) AS time_course_count,\n"
+        "       size([x IN tc WHERE x = 'time_course']) AS time_course_count,\n"
         "       apoc.coll.frequencies(orgs) AS by_organism,\n"
         "       apoc.coll.frequencies(tts) AS by_treatment_type,\n"
         "       apoc.coll.frequencies(bfs) AS by_background_factors,\n"
@@ -4936,12 +4938,18 @@ def build_resolve_organism_for_organism(
     must still resolve, whereas gene-less higher-rank taxonomy nodes
     (genus / phage / non-target species) should not resolve (they would only
     yield empty downstream results with a confusing success).
+
+    Each word must match ``preferred_name`` or one of the sparse
+    ``name_synonyms`` (HO-002: 'Meiothermus taiwanensis' resolves the
+    'Meiothermus ruber' genome strain).
     """
     cypher = (
         "MATCH (o:OrganismTaxon)\n"
         "WHERE coalesce(o.gene_count, 0) > 0\n"
         "  AND ALL(word IN split(toLower($organism), ' ')"
-        " WHERE toLower(o.preferred_name) CONTAINS word)\n"
+        " WHERE toLower(o.preferred_name) CONTAINS word"
+        "    OR ANY(syn IN coalesce(o.name_synonyms, [])"
+        " WHERE toLower(syn) CONTAINS word))\n"
         "RETURN collect(DISTINCT o.preferred_name) AS organisms"
     )
     return cypher, {"organism": organism}
@@ -7186,7 +7194,7 @@ def _list_derived_metrics_where(
 
     Returns (conditions, params). All filters are AND-joined at the caller.
     Organism uses space-split CONTAINS (mirrors _list_experiments_where).
-    rankable / has_p_value bool params are coerced to string "true"/"false"
+    rankable / has_p_value bool params are coerced to the KG two-state literals
     for comparison against KG-stored strings.
     omics_type is scalar on DerivedMetric (unlike list-valued on Experiment);
     filter is exact-match after toUpper normalization.
@@ -7256,11 +7264,11 @@ def _list_derived_metrics_where(
 
     if rankable is not None:
         conditions.append("dm.rankable = $rankable_str")
-        params["rankable_str"] = "true" if rankable else "false"
+        params["rankable_str"] = two_state("rankable", rankable)
 
     if has_p_value is not None:
         conditions.append("dm.has_p_value = $has_p_value_str")
-        params["has_p_value_str"] = "true" if has_p_value else "false"
+        params["has_p_value_str"] = two_state("has_p_value", has_p_value)
 
     return conditions, params
 
@@ -7375,7 +7383,7 @@ def build_list_derived_metrics(
     NOTE: p_value_threshold is intentionally absent from the RETURN — the
     property does not exist on any DerivedMetric in the current KG. See
     docs/tool-specs/list_derived_metrics.md §Verbose adds for the
-    reinstatement rule (CASE-gated on dm.has_p_value='true').
+    reinstatement rule (CASE-gated on dm.has_p_value='p_value').
     """
     conditions, params = _list_derived_metrics_where(
         organism=organism, metric_types=metric_types, value_kind=value_kind,
@@ -7427,8 +7435,8 @@ def build_list_derived_metrics(
         "       dm.name AS name,\n"
         "       dm.metric_type AS metric_type,\n"
         "       dm.value_kind AS value_kind,\n"
-        "       dm.rankable = 'true' AS rankable,\n"
-        "       dm.has_p_value = 'true' AS has_p_value,\n"
+        "       dm.rankable = 'rankable' AS rankable,\n"
+        "       dm.has_p_value = 'p_value' AS has_p_value,\n"
         "       dm.unit AS unit,\n"
         "       CASE WHEN dm.value_kind = 'categorical'\n"
         "            THEN dm.allowed_categories ELSE null END AS allowed_categories,\n"
@@ -7571,7 +7579,7 @@ def build_gene_derived_metrics(
     """Build detail Cypher for gene_derived_metrics.
 
     One row per gene × DM. `r.value` is polymorphic across edge types
-    (float / 'true'/'false' string / category string) — branch on
+    (float / 'flagged'/'not_flagged' string / category string) — branch on
     value_kind in the consumer.
 
     RETURN keys (compact, 11 columns today): locus_tag, gene_name,
@@ -7581,11 +7589,11 @@ def build_gene_derived_metrics(
     NOTE: adjusted_p_value, significant are declared in the Pydantic
     Result model with default=None but NOT in the current Cypher RETURN
     — no edge in today's KG carries those props (no DM has
-    has_p_value='true') and including them produces CyVer schema
+    has_p_value='p_value') and including them produces CyVer schema
     warnings. Mirrors p_value_threshold deferral in
     build_list_derived_metrics. Re-add CASE-gated RETURN columns
-    (`CASE WHEN dm.has_p_value = 'true' THEN r.<col> ELSE null END`)
-    when a has_p_value='true' DM lands.
+    (`CASE WHEN dm.has_p_value = 'p_value' THEN r.<col> ELSE null END`)
+    when a has_p_value='p_value' DM lands.
 
     RETURN keys (verbose, 11 added today): metric_type,
     field_description, unit, allowed_categories, compartment,
@@ -7670,11 +7678,11 @@ def build_gene_derived_metrics(
         "       dm.value_kind AS value_kind,\n"
         "       dm.name AS name,\n"
         "       r.value AS value,\n"
-        "       dm.rankable = 'true' AS rankable,\n"
-        "       dm.has_p_value = 'true' AS has_p_value,\n"
-        "       CASE WHEN dm.rankable = 'true' THEN r.rank_by_metric ELSE null END AS rank_by_metric,\n"
-        "       CASE WHEN dm.rankable = 'true' THEN r.metric_percentile ELSE null END AS metric_percentile,\n"
-        "       CASE WHEN dm.rankable = 'true' THEN r.metric_bucket ELSE null END AS metric_bucket"
+        "       dm.rankable = 'rankable' AS rankable,\n"
+        "       dm.has_p_value = 'p_value' AS has_p_value,\n"
+        "       CASE WHEN dm.rankable = 'rankable' THEN r.rank_by_metric ELSE null END AS rank_by_metric,\n"
+        "       CASE WHEN dm.rankable = 'rankable' THEN r.metric_percentile ELSE null END AS metric_percentile,\n"
+        "       CASE WHEN dm.rankable = 'rankable' THEN r.metric_bucket ELSE null END AS metric_bucket"
         f"{verbose_cols}\n"
         "ORDER BY g.locus_tag ASC, dm.value_kind ASC, dm.id ASC"
         f"{skip_clause}{limit_clause}"
@@ -7734,8 +7742,8 @@ def build_genes_by_numeric_metric_diagnostics(
         "       dm.metric_type AS metric_type,\n"
         "       dm.value_kind AS value_kind,\n"
         "       dm.name AS name,\n"
-        "       dm.rankable = 'true' AS rankable,\n"
-        "       dm.has_p_value = 'true' AS has_p_value,\n"
+        "       dm.rankable = 'rankable' AS rankable,\n"
+        "       dm.has_p_value = 'p_value' AS has_p_value,\n"
         "       dm.total_gene_count AS total_gene_count,\n"
         "       dm.organism_name AS organism_name\n"
         "ORDER BY dm.id ASC"
@@ -7876,11 +7884,11 @@ def build_genes_by_numeric_metric(
 
     NOTE: adjusted_p_value, significant declared in Pydantic Result with
     default=None, NOT in current Cypher RETURN — no edge in today's KG
-    carries those props (no DM has has_p_value='true') and including them
+    carries those props (no DM has has_p_value='p_value') and including them
     produces CyVer schema warnings. p_value (raw, edge-side) is also
     deferred for the same reason. Re-add CASE-gated RETURN columns
-    (`CASE WHEN dm.has_p_value = 'true' THEN r.<col> ELSE null END`)
-    when a has_p_value='true' DM lands.
+    (`CASE WHEN dm.has_p_value = 'p_value' THEN r.<col> ELSE null END`)
+    when a has_p_value='p_value' DM lands.
 
     RETURN keys (compact, 14 columns): locus_tag, gene_name, product,
     gene_category, organism_name, derived_metric_id, name, value_kind,
@@ -7959,12 +7967,12 @@ def build_genes_by_numeric_metric(
         "       dm.id AS derived_metric_id,\n"
         "       dm.name AS name,\n"
         "       dm.value_kind AS value_kind,\n"
-        "       dm.rankable = 'true' AS rankable,\n"
-        "       dm.has_p_value = 'true' AS has_p_value,\n"
+        "       dm.rankable = 'rankable' AS rankable,\n"
+        "       dm.has_p_value = 'p_value' AS has_p_value,\n"
         "       r.value AS value,\n"
-        "       CASE WHEN dm.rankable = 'true' THEN r.rank_by_metric ELSE null END AS rank_by_metric,\n"
-        "       CASE WHEN dm.rankable = 'true' THEN r.metric_percentile ELSE null END AS metric_percentile,\n"
-        "       CASE WHEN dm.rankable = 'true' THEN r.metric_bucket ELSE null END AS metric_bucket"
+        "       CASE WHEN dm.rankable = 'rankable' THEN r.rank_by_metric ELSE null END AS rank_by_metric,\n"
+        "       CASE WHEN dm.rankable = 'rankable' THEN r.metric_percentile ELSE null END AS metric_percentile,\n"
+        "       CASE WHEN dm.rankable = 'rankable' THEN r.metric_bucket ELSE null END AS metric_bucket"
         f"{verbose_cols}\n"
         "ORDER BY r.rank_by_metric ASC, r.value DESC, dm.id ASC, g.locus_tag ASC"
         f"{skip_clause}{limit_clause}"
@@ -8048,9 +8056,9 @@ def build_genes_by_boolean_metric_summary(
         conditions.append("g.locus_tag IN $locus_tags")
         params["locus_tags"] = locus_tags
     if flag is not None:
-        # Edge property `value` is BioCypher string-typed bool ("true"/"false").
+        # Edge property `value` is a two-state string ('flagged' / 'not_flagged').
         conditions.append("r.value = $flag_str")
-        params["flag_str"] = "true" if flag else "false"
+        params["flag_str"] = two_state("value", flag)
 
     where_block = "WHERE " + " AND ".join(conditions) + "\n"
 
@@ -8083,8 +8091,8 @@ def build_genes_by_boolean_metric_summary(
         "     metric_type: head([x IN rows WHERE x.dm_id = dm_id | x.mt]),\n"
         "     value_kind:  head([x IN rows WHERE x.dm_id = dm_id | x.vk]),\n"
         "     count:       size([x IN rows WHERE x.dm_id = dm_id]),\n"
-        "     true_count:  size([x IN rows WHERE x.dm_id = dm_id AND x.value = 'true']),\n"
-        "     false_count: size([x IN rows WHERE x.dm_id = dm_id AND x.value = 'false']),\n"
+        "     true_count:  size([x IN rows WHERE x.dm_id = dm_id AND x.value = 'flagged']),\n"
+        "     false_count: size([x IN rows WHERE x.dm_id = dm_id AND x.value = 'not_flagged']),\n"
         "     dm_total_gene_count: head([x IN rows WHERE x.dm_id = dm_id | x.dm_total]),\n"
         "     dm_true_count:  head([x IN rows WHERE x.dm_id = dm_id | x.dm_true]),\n"
         "     dm_false_count: head([x IN rows WHERE x.dm_id = dm_id | x.dm_false])\n"
@@ -8130,9 +8138,9 @@ def build_genes_by_boolean_metric(
         conditions.append("g.locus_tag IN $locus_tags")
         params["locus_tags"] = locus_tags
     if flag is not None:
-        # Edge property `value` is BioCypher string-typed bool ("true"/"false").
+        # Edge property `value` is a two-state string ('flagged' / 'not_flagged').
         conditions.append("r.value = $flag_str")
-        params["flag_str"] = "true" if flag else "false"
+        params["flag_str"] = two_state("value", flag)
 
     where_block = "WHERE " + " AND ".join(conditions) + "\n"
 
@@ -8176,8 +8184,8 @@ def build_genes_by_boolean_metric(
         "       dm.id AS derived_metric_id,\n"
         "       dm.name AS name,\n"
         "       dm.value_kind AS value_kind,\n"
-        "       dm.rankable = 'true' AS rankable,\n"
-        "       dm.has_p_value = 'true' AS has_p_value,\n"
+        "       dm.rankable = 'rankable' AS rankable,\n"
+        "       dm.has_p_value = 'p_value' AS has_p_value,\n"
         "       r.value AS value"
         f"{verbose_cols}\n"
         "ORDER BY dm.id ASC, g.locus_tag ASC"
@@ -8395,8 +8403,8 @@ def build_genes_by_categorical_metric(
         "       dm.id AS derived_metric_id,\n"
         "       dm.name AS name,\n"
         "       dm.value_kind AS value_kind,\n"
-        "       dm.rankable = 'true' AS rankable,\n"
-        "       dm.has_p_value = 'true' AS has_p_value,\n"
+        "       dm.rankable = 'rankable' AS rankable,\n"
+        "       dm.has_p_value = 'p_value' AS has_p_value,\n"
         "       r.value AS value"
         f"{verbose_cols}\n"
         "ORDER BY r.value ASC, dm.id ASC, g.locus_tag ASC"
@@ -9686,7 +9694,7 @@ def _list_metabolite_assays_where(
         params["exclude_metabolite_ids"] = exclude_metabolite_ids
     if rankable is not None:
         conditions.append("a.rankable = $rankable_str")
-        params["rankable_str"] = "true" if rankable else "false"
+        params["rankable_str"] = two_state("rankable", rankable)
 
     return conditions, params
 
@@ -9877,7 +9885,7 @@ def build_list_metabolite_assays(
         "       a.name AS name,\n"
         "       a.metric_type AS metric_type,\n"
         "       a.value_kind AS value_kind,\n"
-        "       (a.rankable = \"true\") AS rankable,\n"
+        "       (a.rankable = \"rankable\") AS rankable,\n"
         "       a.unit AS unit,\n"
         "       a.field_description AS field_description,\n"
         "       a.organism_name AS organism_name,\n"
@@ -10086,7 +10094,7 @@ def build_metabolites_by_quantifies_assay_diagnostics(
         "RETURN a.id AS assay_id,\n"
         "       a.name AS name,\n"
         "       a.value_kind AS value_kind,\n"
-        "       (a.rankable = 'true') AS rankable,\n"
+        "       (a.rankable = 'rankable') AS rankable,\n"
         "       a.organism_name AS organism_name,\n"
         "       a.compartment AS compartment,\n"
         "       a.value_min AS value_min,\n"
@@ -10312,7 +10320,7 @@ def _metabolites_by_flags_assay_where(
 
     Same scoping params as the quantifies helper — only the edge-level
     filter differs (`flag_value` string-form per parent §11 Conv K / D4;
-    api/ coerces bool → 'true'/'false' before passing here).
+    api/ coerces bool → 'detected'/'not_detected' before passing here).
     """
     conditions: list[str] = []
     params: dict = {}
@@ -10354,7 +10362,7 @@ def _metabolites_by_flags_assay_where(
         )
         params["growth_phases_lower"] = [gp.lower() for gp in growth_phases]
     if flag_value is not None:
-        # D4: API coerces bool → 'true'/'false' string before this layer.
+        # D4: API coerces bool → 'detected'/'not_detected' string before this layer.
         conditions.append("r.flag_value = $flag_value")
         params["flag_value"] = flag_value
 
@@ -10401,7 +10409,7 @@ def build_metabolites_by_flags_assay_summary(
     cypher = (
         "MATCH (a:MetaboliteAssay)-[r:Assay_flags_metabolite]->(m:Metabolite)\n"
         f"{where_block}"
-        "WITH [f IN collect(r.flag_value) WHERE f IS NOT NULL] AS flags,\n"
+        "WITH [f IN collect(r.flag_value = 'detected') WHERE f IS NOT NULL] AS flags,\n"
         "     collect(a.id) AS assay_ids_collected,\n"
         "     collect(a.compartment) AS comps,\n"
         "     collect(a.organism_name) AS orgs,\n"
@@ -10441,9 +10449,9 @@ def build_metabolites_by_flags_assay(
 
     Verbose adds: assay_name, field_description.
 
-    D4: `r.flag_value = 'true'` boolean coercion at Cypher boundary.
+    D4: `r.flag_value = 'detected'` boolean coercion at Cypher boundary.
 
-    Sort key (slice spec §5.4): r.flag_value DESC, m.id ASC, a.id ASC.
+    Sort key (slice spec §5.4): flag_value DESC (coerced bool, detected first), m.id ASC, a.id ASC.
     """
     conditions, params = _metabolites_by_flags_assay_where(
         organism=organism,
@@ -10480,7 +10488,7 @@ def build_metabolites_by_flags_assay(
         "RETURN m.id AS metabolite_id,\n"
         "       m.name AS name,\n"
         "       m.kegg_compound_id AS kegg_compound_id,\n"
-        "       (r.flag_value = 'true') AS flag_value,\n"
+        "       (r.flag_value = 'detected') AS flag_value,\n"
         "       r.n_positive AS n_positive,\n"
         "       r.n_replicates AS n_replicates,\n"
         "       r.metric_type AS metric_type,\n"
@@ -10489,7 +10497,7 @@ def build_metabolites_by_flags_assay(
         "       a.organism_name AS organism_name,\n"
         "       a.compartment AS compartment"
         f"{verbose_cols}\n"
-        "ORDER BY r.flag_value DESC, m.id ASC, a.id ASC"
+        "ORDER BY flag_value DESC, m.id ASC, a.id ASC"
         f"{pagination}"
     )
     return cypher, params
@@ -10592,7 +10600,7 @@ def build_assays_by_metabolite_summary(
             "         a.organism_name AS organism_name,\n"
             "         a.compartment AS compartment,\n"
             "         'flags' AS evidence_kind,\n"
-            "         null AS det, rf.flag_value AS flag"
+            "         null AS det, (rf.flag_value = 'detected') AS flag"
         )
 
     # Always emit both rel-aliases in cypher text so anti-pattern guards
@@ -10609,7 +10617,7 @@ def build_assays_by_metabolite_summary(
             "         a.organism_name AS organism_name,\n"
             "         a.compartment AS compartment,\n"
             "         'flags' AS evidence_kind,\n"
-            "         null AS det, rf.flag_value AS flag"
+            "         null AS det, (rf.flag_value = 'detected') AS flag"
         )
     elif evidence_kind == "flags":
         union_body = (
@@ -10737,7 +10745,7 @@ def build_assays_by_metabolite(
         "    a.id AS assay_id, a.name AS assay_name,\n"
         "    'flags' AS evidence_kind,\n"
         "    null AS value, null AS value_sd,\n"
-        "    (rf.flag_value = 'true') AS flag_value,\n"
+        "    (rf.flag_value = 'detected') AS flag_value,\n"
         "    rf.n_positive AS n_positive,\n"
         "    rf.n_replicates AS n_replicates, rf.metric_type AS metric_type,\n"
         "    null AS metric_bucket, null AS metric_percentile, null AS detection_status,\n"

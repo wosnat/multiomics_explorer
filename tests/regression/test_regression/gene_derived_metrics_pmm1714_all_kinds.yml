@@ -10,7 +10,7 @@ rows:
   name: Expressed above background at t0
   rank_by_metric: null
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:has_primary_tss
   gene_name: null
@@ -21,7 +21,7 @@ rows:
   name: Has mapped primary TSS (gTSS)
   rank_by_metric: null
   rankable: false
-  value: 'false'
+  value: not_flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
   gene_name: null
@@ -32,7 +32,7 @@ rows:
   name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
   rank_by_metric: null
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:1471-2180-14-11:med4_expression_level:expression_level_class
   gene_name: null

@@ -150,9 +150,14 @@ result = api.genes_by_numeric_metric(
 
 ## Notes on current KG constraints
 
-- `genes_by_boolean_metric(flag=False)` returns 0 rows in the current KG —
-  the KG stores only positive (True) flag edges. `dm_false_count=0` on every
-  current DM.
+- `genes_by_boolean_metric(flag=False)` returns rows only on DMs that store
+  `not_flagged` edges (11 of 27 boolean DMs — Biller 2022, Voigt 2014,
+  Hennon 2015, Steglich 2010); the rest are positive-only. Read the
+  filtered-slice `by_metric[*].false_count`; the precomputed `dm_false_count`
+  reads 0 on current KG builds.
+- Boolean-like KG properties are two-state strings (`rankable` /
+  `not_rankable`, `p_value` / `no_p_value`, `flagged` / `not_flagged`);
+  the explorer surface stays `bool`, and `by_value` reports the KG literal.
 - `genes_by_numeric_metric` with `has_p_value=True` gate raises in the current
   KG — no numeric DM currently has p-values. Check `has_p_value` on
   `list_derived_metrics` output before using the p-value filter.

@@ -55,13 +55,13 @@ VALID_OMICS_TYPES: set[str] = {
 # See docs/superpowers/specs/2026-06-02-kg-compatibility-check-design.md §5.
 #
 # Bucket 6 (vocabulary set): the `Schema_info.controlled_vocabularies_hash`
-# this explorer was built against (KG-SYNC-006 + dense-list fix, built
-# 2026-08-27T17:19Z, KG contract v2). The recipe lives KG-side (docs/kg-changes/
+# this explorer was built against (KG-SYNC-006 + two-state strings HO-001 +
+# Meiothermus HO-002, built 2026-08-28T11:58Z, KG contract v2). The recipe lives KG-side (docs/kg-changes/
 # vocabulary-contract.md). A mismatch means baked docs / parameter descriptions
 # may list stale values — filters still validate live. Must equal the live
 # KG's value at release cut.
 EXPECTED_CONTROLLED_VOCABULARIES_HASH: str = (
-    "sha256:496c5ad45b58829df2ab580415be09e001219772bb0a36005a0f05a2da2c7429"
+    "sha256:d7191e2a63eac2c56c36391397108ca8c5b5d3d50f12388de7709fda964b3338"
 )
 
 EXPECTED_KG_SHAPE: dict[str, tuple[str, ...] | str] = {
@@ -95,3 +95,23 @@ EXPECTED_KG_SHAPE: dict[str, tuple[str, ...] | str] = {
         "experiment_count",
     ),
 }
+
+
+# Two-state string properties (KG hand-off 2026-08-28, HO-001). The KG stores
+# these as named string pairs, never "true"/"false"; the explorer keeps a
+# boolean surface and coerces at the Cypher boundary. Positive literal first.
+TWO_STATE: dict[str, tuple[str, str]] = {
+    "is_time_course": ("time_course", "single_time_point"),
+    "reports_fold_change": ("fold_change", "no_fold_change"),
+    "rankable": ("rankable", "not_rankable"),
+    "has_p_value": ("p_value", "no_p_value"),
+    "significant": ("significant", "not_significant"),
+    "value": ("flagged", "not_flagged"),  # Derived_metric_flags_gene.value
+    "flag_value": ("detected", "not_detected"),  # Assay_flags_metabolite.flag_value
+}
+
+
+def two_state(prop: str, flag: bool) -> str:
+    """Map a boolean filter value to the KG's two-state literal for `prop`."""
+    pos, neg = TWO_STATE[prop]
+    return pos if flag else neg

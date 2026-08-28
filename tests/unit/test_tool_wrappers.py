@@ -2849,7 +2849,7 @@ class TestDifferentialExpressionByGeneWrapper:
                 "background_factors": [],
                 "omics_type": "RNASEQ",
                 "coculture_partner": None,
-                "is_time_course": "true",
+                "is_time_course": "time_course",
                 "table_scope": "all_detected_genes",
                 "table_scope_detail": None,
                 "matching_genes": 5,
@@ -2942,7 +2942,7 @@ class TestDifferentialExpressionByGeneWrapper:
             )
         exp = result.experiments[0]
         assert exp.experiment_id == "exp1"
-        assert exp.is_time_course == "true"
+        assert exp.is_time_course == "time_course"
         assert exp.timepoints is not None
         assert len(exp.timepoints) == 1
         assert exp.timepoints[0].timepoint == "day 18"
@@ -2956,7 +2956,7 @@ class TestDifferentialExpressionByGeneWrapper:
             "experiments": [
                 {
                     **self._SAMPLE_API_RETURN["experiments"][0],
-                    "is_time_course": "false",
+                    "is_time_course": "single_time_point",
                     "timepoints": None,
                 },
             ],

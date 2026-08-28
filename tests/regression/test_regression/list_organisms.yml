@@ -473,39 +473,6 @@ rows:
   - coculture
 - background_factors:
   - coculture
-  catalyzed_metabolite_count: 0
-  clade: null
-  cluster_types: []
-  clustering_analysis_count: 0
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 1
-  gene_count: 0
-  genus: Deinococcus
-  growth_phases: []
-  interpro_gene_count: 0
-  measured_metabolite_count: 0
-  ncbi_taxon_id: 1299
-  ncbifam_gene_count: 0
-  nonpeptidase_homolog_gene_count: 0
-  omics_types:
-  - RNASEQ
-  organism_name: Meiothermus ruber
-  organism_type: treatment
-  peptidase_gene_count: 0
-  publication_count: 1
-  reaction_count: 0
-  reference_database: null
-  reference_proteome: null
-  species: null
-  strain: null
-  transported_metabolite_count: 0
-  treatment_types:
-  - light
-  - oxygen
-- background_factors:
-  - coculture
   catalyzed_metabolite_count: 1215
   clade: null
   cluster_types:
@@ -535,6 +502,39 @@ rows:
   species: null
   strain: MruberA
   transported_metabolite_count: 1201
+  treatment_types:
+  - light
+  - oxygen
+- background_factors:
+  - coculture
+  catalyzed_metabolite_count: 0
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  experiment_count: 1
+  gene_count: 0
+  genus: Meiothermus
+  growth_phases: []
+  interpro_gene_count: 0
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 277
+  ncbifam_gene_count: 0
+  nonpeptidase_homolog_gene_count: 0
+  omics_types:
+  - RNASEQ
+  organism_name: Meiothermus ruber
+  organism_type: treatment
+  peptidase_gene_count: 0
+  publication_count: 1
+  reaction_count: 0
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: null
+  transported_metabolite_count: 0
   treatment_types:
   - light
   - oxygen

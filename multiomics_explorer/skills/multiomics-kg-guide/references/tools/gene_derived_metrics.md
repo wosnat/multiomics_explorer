@@ -3,7 +3,7 @@
 ## What it does
 
 Look up DerivedMetric annotations for a gene batch — one row per
-(gene × DM), polymorphic `value` (float on numeric / `'true'`/`'false'`
+(gene × DM), polymorphic `value` (float on numeric / `'flagged'`/`'not_flagged'`
 on boolean / category string on categorical). Numeric extras
 (`rank_by_metric`, `metric_percentile`, `metric_bucket`) populate only
 on rankable parent DMs; `adjusted_p_value` / `significant` only on
@@ -29,7 +29,7 @@ thresholds) live on `genes_by_numeric_metric`; flag-level filters on
 | locus_tags | list[string] | — | Gene locus tags to look up (e.g. ['PMM1714', 'PMM0001']). Required, non-empty. Single organism enforced — locus_tags must all resolve to the same organism (or pair with `organism` to disambiguate). |
 | organism | string \| None | None | Organism to scope to. Accepts short strain code ('MED4', 'NATL2A', 'MIT1002') or full name. Case-insensitive substring match. Inferred from locus_tags when omitted. |
 | metric_types | list[string] \| None | None | Filter by metric_type tags (e.g. 'diel_amplitude_protein_log2'). Same metric_type may appear across publications — pair with publication_doi or use derived_metric_ids to pin one specific DM. |
-| value_kind | string ('numeric', 'boolean', 'categorical') \| None | None | Restrict to one DM kind. Each kind has a different `value` column type — 'numeric' → float, 'boolean' → 'true'/'false', 'categorical' → category string. |
+| value_kind | string ('numeric', 'boolean', 'categorical') \| None | None | Restrict to one DM kind. Each kind has a different `value` column type — 'numeric' → float, 'boolean' → 'flagged'/'not_flagged', 'categorical' → category string. |
 | compartment | string \| None | None | Filter to DMs from one sample compartment ('whole_cell', 'vesicle', 'exoproteome', 'spent_medium', 'lysate'). Exact match. |
 | treatment_type | list[string] \| None | None | Treatment type(s) to match. Returns DMs whose treatment_type list overlaps ANY of the given values. Case-insensitive. |
 | background_factors | list[string] \| None | None | Background experimental factor(s) to match. ANY-overlap. Case-insensitive. |
@@ -76,7 +76,7 @@ total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics
 | derived_metric_id | string | Unique parent-DM id. Pass to `derived_metric_ids` on genes_by_*_metric drill-downs to pin this exact DM. metric_type, compartment, publication_doi etc. are available in verbose mode or via list_derived_metrics(derived_metric_ids=[...]). |
 | value_kind | string ('numeric', 'boolean', 'categorical') | Determines how to interpret `value`. Routes to the matching genes_by_*_metric drill-down. |
 | name | string | Human-readable DM name (e.g. 'Transcript:protein amplitude ratio'). Saves a round-trip to list_derived_metrics for opaque metric_type codes. |
-| value | float | Polymorphic measurement: float on numeric rows, 'true'/'false' string on boolean rows, category string on categorical rows. Branch on `value_kind`. |
+| value | float | Polymorphic measurement: float on numeric rows, 'flagged'/'not_flagged' string on boolean rows, category string on categorical rows. Branch on `value_kind`. |
 | rankable | bool | Echoed from parent DM. True iff this row's `value` carries rank/percentile/bucket extras. |
 | has_p_value | bool | Echoed from parent DM. True iff adjusted_p_value/significant carry data. No DM in current KG has p-values. |
 | rank_by_metric | int \| None (optional) | Rank by metric value (1 = highest). Populated only when parent DM rankable=True. |
@@ -153,7 +153,7 @@ resolve_gene → gene_derived_metrics(locus_tags)
 
 ## Common mistakes
 
-- The `value` column is polymorphic — branch on each row's `value_kind` (`'numeric'` → float, `'boolean'` → `'true'`/`'false'` string, `'categorical'` → category string). Numeric rows additionally have `rank_by_metric`, `metric_percentile`, `metric_bucket` populated when their parent DM is rankable; null otherwise (e.g. `peak_time_protein_h`).
+- The `value` column is polymorphic — branch on each row's `value_kind` (`'numeric'` → float, `'boolean'` → `'flagged'`/`'not_flagged'` string, `'categorical'` → category string). Numeric rows additionally have `rank_by_metric`, `metric_percentile`, `metric_bucket` populated when their parent DM is rankable; null otherwise (e.g. `peak_time_protein_h`).
 
 - For numeric edge filtering (bucket / percentile / rank / value thresholds), pivot to `genes_by_numeric_metric`. This tool intentionally has no edge-level numeric filters — it is the gene-anchor surface only.
 

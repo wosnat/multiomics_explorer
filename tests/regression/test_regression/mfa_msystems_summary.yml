@@ -8,6 +8,6 @@ rows:
   by_organism:
   - '{''count'': 93, ''item'': ''Prochlorococcus MIT9301''}'
   by_value:
-  - '{''count'': 35, ''item'': ''true''}'
-  - '{''count'': 58, ''item'': ''false''}'
+  - '{''count'': 35, ''item'': True}'
+  - '{''count'': 58, ''item'': False}'
   total_matching: 93

@@ -50,7 +50,7 @@ chaining:
 mistakes:
   - >-
     The `value` column is polymorphic — branch on each row's `value_kind`
-    (`'numeric'` → float, `'boolean'` → `'true'`/`'false'` string,
+    (`'numeric'` → float, `'boolean'` → `'flagged'`/`'not_flagged'` string,
     `'categorical'` → category string). Numeric rows additionally have
     `rank_by_metric`, `metric_percentile`, `metric_bucket` populated when
     their parent DM is rankable; null otherwise (e.g. `peak_time_protein_h`).

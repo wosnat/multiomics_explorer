@@ -24,7 +24,7 @@ rows:
   experiment_name: AD45 vesicle vs whole-cell proteome (label-free LC-MS/MS)
   gene_count: 0
   growth_phases: []
-  is_time_course: 'false'
+  is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -69,7 +69,7 @@ rows:
   experiment_name: ATCC27126 vesicle vs whole-cell proteome (label-free LC-MS/MS)
   gene_count: 0
   growth_phases: []
-  is_time_course: 'false'
+  is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -114,7 +114,7 @@ rows:
   experiment_name: BGP6 vesicle vs whole-cell proteome (label-free LC-MS/MS)
   gene_count: 0
   growth_phases: []
-  is_time_course: 'false'
+  is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -159,7 +159,7 @@ rows:
   experiment_name: BS11 vesicle vs whole-cell proteome (label-free LC-MS/MS)
   gene_count: 0
   growth_phases: []
-  is_time_course: 'false'
+  is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -204,7 +204,7 @@ rows:
   experiment_name: HOT1A3 vesicle vs whole-cell proteome (label-free LC-MS/MS)
   gene_count: 0
   growth_phases: []
-  is_time_course: 'false'
+  is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -249,7 +249,7 @@ rows:
   experiment_name: MIT1002 vesicle vs whole-cell proteome (label-free LC-MS/MS)
   gene_count: 0
   growth_phases: []
-  is_time_course: 'false'
+  is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -296,7 +296,7 @@ rows:
     + PSORTb localization)
   gene_count: 0
   growth_phases: []
-  is_time_course: 'false'
+  is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -340,7 +340,7 @@ rows:
   experiment_name: MED4 vesicle-encapsulated DNA-seq (top-50 ORFs by avg read coverage)
   gene_count: 0
   growth_phases: []
-  is_time_course: 'false'
+  is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -388,7 +388,7 @@ rows:
   experiment_name: MIT9312 extracellular vesicle targeted metabolome (Table S7)
   gene_count: 0
   growth_phases: []
-  is_time_course: 'false'
+  is_time_course: single_time_point
   metabolite_assay_count: 1
   metabolite_compartments:
   - vesicle
@@ -437,7 +437,7 @@ rows:
   experiment_name: MIT9312 vesicle vs whole-cell proteome (label-free LC-MS/MS)
   gene_count: 0
   growth_phases: []
-  is_time_course: 'false'
+  is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -484,7 +484,7 @@ rows:
   experiment_name: MIT9313 extracellular vesicle targeted metabolome (Table S7)
   gene_count: 0
   growth_phases: []
-  is_time_course: 'false'
+  is_time_course: single_time_point
   metabolite_assay_count: 1
   metabolite_compartments:
   - vesicle
@@ -533,7 +533,7 @@ rows:
   experiment_name: MIT9313 vesicle vs whole-cell proteome (label-free LC-MS/MS)
   gene_count: 0
   growth_phases: []
-  is_time_course: 'false'
+  is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -579,7 +579,7 @@ rows:
     + PSORTb localization)
   gene_count: 0
   growth_phases: []
-  is_time_course: 'false'
+  is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0

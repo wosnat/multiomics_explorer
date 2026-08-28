@@ -1265,7 +1265,7 @@ class TestDiffExprByGeneCorrectness:
                 "experiments": [
                     {"experiment_id": "exp1", "experiment_name": "Coculture",
                      "treatment_type": ["coculture"], "background_factors": [], "omics_type": "RNASEQ",
-                     "coculture_partner": None, "is_time_course": "true",
+                     "coculture_partner": None, "is_time_course": "time_course",
                      "table_scope": "all_detected_genes",
                      "matching_genes": 1,
                      "rows_by_status": {"significant_up": 1, "significant_down": 1, "not_significant": 0},
@@ -1343,7 +1343,7 @@ class TestDiffExprByGeneCorrectness:
                 "experiments": [
                     {"experiment_id": "exp1", "experiment_name": "Test",
                      "treatment_type": ["coculture"], "background_factors": [], "omics_type": "RNASEQ",
-                     "coculture_partner": None, "is_time_course": "false",
+                     "coculture_partner": None, "is_time_course": "single_time_point",
                      "table_scope": "all_detected_genes",
                      "matching_genes": 1,
                      "rows_by_status": {"significant_up": 1, "significant_down": 0, "not_significant": 0},

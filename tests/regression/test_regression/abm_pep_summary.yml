@@ -23,7 +23,7 @@ rows:
   - '{''count'': 18, ''item'': ''quantifies''}'
   - '{''count'': 2, ''item'': ''flags''}'
   by_flag_value:
-  - '{''count'': 2, ''item'': ''false''}'
+  - '{''count'': 2, ''item'': False}'
   by_organism:
   - '{''count'': 2, ''item'': ''Prochlorococcus MIT0801''}'
   - '{''count'': 2, ''item'': ''Prochlorococcus MIT9303''}'

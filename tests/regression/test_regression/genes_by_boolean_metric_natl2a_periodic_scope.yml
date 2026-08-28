@@ -23,7 +23,7 @@ by_publication:
   publication_doi: 10.1128/mSystems.00040-18
 by_value:
 - count: 1651
-  value: 'true'
+  value: flagged
 case_id: genes_by_boolean_metric_natl2a_periodic_scope
 excluded_derived_metrics: []
 genes_per_metric_max: 1651
@@ -44,7 +44,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: chromosomal replication initiator protein
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Coenzyme metabolism
@@ -55,7 +55,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: glutathione S-transferase
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Coenzyme metabolism
@@ -66,7 +66,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: glutathione reductase
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Transport
@@ -77,7 +77,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: cation:H+ antiporter
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Nucleotide metabolism
@@ -88,7 +88,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: dihydroorotase, homodimeric type
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Carbohydrate metabolism
@@ -99,7 +99,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: NADH dehydrogenase I subunit NdhL
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Unknown
@@ -110,7 +110,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: conserved hypothetical protein
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Amino acid metabolism
@@ -121,7 +121,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: tryptophan synthase, alpha subunit
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Unknown
@@ -132,7 +132,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: YCII-like domain-containing protein
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Carbohydrate metabolism
@@ -143,7 +143,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: cytochrome c553 (cytochrome c6)
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Unknown
@@ -154,7 +154,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: conserved hypothetical protein
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Unknown
@@ -165,7 +165,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: conserved hypothetical protein (DUF1232)
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Transcription
@@ -176,7 +176,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: RNA polymerase sigma factor, type II
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Amino acid metabolism
@@ -188,7 +188,7 @@ results:
   product: bifunctional phosphoribosyl-ATP pyrophosphohydrolase / phosphoribosyl-AMP
     cyclohydrolase
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Cellular processes
@@ -199,7 +199,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: putative 6-pyruvoyl tetrahydropterin synthase
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Stress response and adaptation
@@ -210,7 +210,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Stress response and adaptation
@@ -221,7 +221,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: plastocyanin
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Carbohydrate metabolism
@@ -232,7 +232,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: short chain dehydrogenase family protein
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Coenzyme metabolism
@@ -243,7 +243,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: uroporphyrinogen decarboxylase
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Carbohydrate metabolism
@@ -254,7 +254,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: 1,4-alpha-glucan branching enzyme
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Post-translational modification
@@ -265,7 +265,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: X-Pro dipeptidyl-peptidase, S15 family
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Unknown
@@ -276,7 +276,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: uncharacterized conserved secreted protein
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Unknown
@@ -287,7 +287,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: conserved hypothetical protein
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Transport
@@ -298,7 +298,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: translocation and assembly module TamB-like protein
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
   gene_category: Amino acid metabolism
@@ -309,7 +309,7 @@ results:
   organism_name: Prochlorococcus NATL2A
   product: glutamate-5-semialdehyde dehydrogenase
   rankable: false
-  value: 'true'
+  value: flagged
   value_kind: boolean
 returned: 25
 row_count: 25

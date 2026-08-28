@@ -120,6 +120,34 @@ coordinated to `0.1.0a5` ahead of the KG release.
 
 ### Changed
 
+- **Two-state strings (KG hand-off 2026-08-28, HO-001).** The eight
+  boolean-like KG properties are now named string pairs instead of
+  `'true'` / `'false'` (`is_time_course`: `time_course` /
+  `single_time_point`; `reports_fold_change`: `fold_change` /
+  `no_fold_change`; `rankable`: `rankable` / `not_rankable`; `has_p_value`:
+  `p_value` / `no_p_value`; `Derived_metric_quantifies_gene.significant`;
+  `Derived_metric_flags_gene.value`: `flagged` / `not_flagged`;
+  `Assay_flags_metabolite.flag_value`: `detected` / `not_detected`). Tool
+  parameters and `bool` output columns are unchanged (one `two_state()`
+  coercion helper in `kg/constants.py`); the surfaces that echo the KG
+  literal change value: `differential_expression_by_ortholog`
+  `experiments[*].is_time_course` (`list_experiments` coerces to bool) and
+  `genes_by_boolean_metric.by_value[*].value`. `metabolites_by_flags_assay`
+  / `assays_by_metabolite` `by_value` / `by_flag_value` rollups are now
+  coerced to `bool` in Cypher (previously relied on pydantic parsing
+  `'true'`). Pinned `EXPECTED_CONTROLLED_VOCABULARIES_HASH` re-pinned to
+  the 2026-08-28 build (`sha256:d7191e2a…`); 8 new closed vocabularies.
+- **Meiothermus taxid correction (HO-002).** The Bernstein 2017 treatment
+  taxon is `ncbitaxon:277` (was `ncbitaxon:1299`, which is *Deinococcus
+  radiodurans*). `OrganismTaxon` gains sparse `name_synonyms` /
+  `taxonomy_note`; the shared organism resolver now also matches words
+  against `name_synonyms` (`'Meiothermus taiwanensis'` resolves).
+- `genes_by_boolean_metric` docs corrected: `flag=False` returns
+  tested-absent rows on the 11 of 27 boolean DMs that store `not_flagged`
+  edges (Biller 2022, Voigt 2014, Hennon 2015, Steglich 2010); only the
+  rest are positive-only. Read the filtered-slice `by_metric[*].false_count`
+  — the precomputed `dm_false_count` reads 0 on current KG builds (KG ask
+  R6). The earlier "returns 0 rows on every DM" statement was wrong.
 - `list_filter_values(filter_type='cluster_type')` carries the vocabulary
   description once, on the new envelope `description` key; per-row
   `description` is absent (trust filter types keep the per-row text and

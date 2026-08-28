@@ -263,10 +263,18 @@ Two related experiment-metadata conventions:
   `treatment_type`, `cluster_type` and the trust vocabularies are closed
   and readable via `list_filter_values`.
 
-The DerivedMetric layer is **positive-only by storage convention** —
-`Derived_metric_flags_gene` only stores edges for `flag=True`, so
-`flag=False` returns 0 rows. Tested-absent semantics on the DM side
-are not currently representable.
+Boolean-like properties are stored as **two-state strings** in the KG
+(`Experiment.is_time_course`: `time_course` / `single_time_point`;
+`rankable` / `not_rankable`; `p_value` / `no_p_value`;
+`Derived_metric_flags_gene.value`: `flagged` / `not_flagged`;
+`Assay_flags_metabolite.flag_value`: `detected` / `not_detected`). Tool
+parameters and most output columns stay `bool`;
+`differential_expression_by_ortholog.experiments[*].is_time_course` and the
+`genes_by_boolean_metric.by_value` rollup surface the KG literal. On the DM side, tested-absent
+(`not_flagged`) edges exist on 11 of 27 boolean DMs — the rest are
+positive-only, so `genes_by_boolean_metric(flag=False)` is DM-dependent
+(read `by_metric[*].false_count`). `Assay_flags_metabolite` always stores
+both states.
 
 ---
 

@@ -16,7 +16,7 @@ examples:
         ],
         "by_compartment": [{"compartment": "vesicle", "count": 58}],
         "by_publication": [{"publication_doi": "10.1126/science.1243457", "count": 58}],
-        "by_value": [{"value": "true", "count": 58}],
+        "by_value": [{"value": "flagged", "count": 58}],
         "by_metric": [
           {"derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "metric_type": "vesicle_proteome_member", "name": "MED4 vesicle proteome member", "value_kind": "boolean", "count": 32, "true_count": 32, "false_count": 0, "dm_total_gene_count": 32, "dm_true_count": 32, "dm_false_count": 0},
           {"derived_metric_id": "derived_metric:pnas.1402782111:s2_mit9313_vesicle_proteome:vesicle_proteome_member", "metric_type": "vesicle_proteome_member", "name": "MIT9313 vesicle proteome member", "value_kind": "boolean", "count": 26, "true_count": 26, "false_count": 0, "dm_total_gene_count": 26, "dm_true_count": 26, "dm_false_count": 0}
@@ -38,8 +38,8 @@ examples:
         "offset": 0,
         "truncated": true,
         "results": [
-          {"locus_tag": "PMM0090", "gene_name": null, "product": null, "gene_category": null, "organism_name": "Prochlorococcus MED4", "derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "name": "MED4 vesicle proteome member", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "true"},
-          {"locus_tag": "PMM0097", "gene_name": null, "product": null, "gene_category": null, "organism_name": "Prochlorococcus MED4", "derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "name": "MED4 vesicle proteome member", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "true"}
+          {"locus_tag": "PMM0090", "gene_name": null, "product": null, "gene_category": null, "organism_name": "Prochlorococcus MED4", "derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "name": "MED4 vesicle proteome member", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "flagged"},
+          {"locus_tag": "PMM0097", "gene_name": null, "product": null, "gene_category": null, "organism_name": "Prochlorococcus MED4", "derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "name": "MED4 vesicle proteome member", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "flagged"}
         ]
       }
 
@@ -52,7 +52,7 @@ examples:
         "total_genes": 5,
         "by_organism": [{"organism_name": "Prochlorococcus NATL2A", "count": 5}],
         "by_compartment": [{"compartment": "whole_cell", "count": 5}],
-        "by_value": [{"value": "true", "count": 5}],
+        "by_value": [{"value": "flagged", "count": 5}],
         "by_metric": [
           {"derived_metric_id": "derived_metric:1462-2920.14179:s2_natl2a_periodic_LD:periodic_in_coculture_LD", "metric_type": "periodic_in_coculture_LD", "name": "NATL2A periodic in coculture L:D", "value_kind": "boolean", "count": 5, "true_count": 5, "false_count": 0, "dm_total_gene_count": 1377, "dm_true_count": 5, "dm_false_count": 0}
         ],
@@ -65,7 +65,7 @@ examples:
         "offset": 0,
         "truncated": false,
         "results": [
-          {"locus_tag": "PMN2A_0123", "organism_name": "Prochlorococcus NATL2A", "derived_metric_id": "derived_metric:1462-2920.14179:s2_natl2a_periodic_LD:periodic_in_coculture_LD", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "true"}
+          {"locus_tag": "PMN2A_0123", "organism_name": "Prochlorococcus NATL2A", "derived_metric_id": "derived_metric:1462-2920.14179:s2_natl2a_periodic_LD:periodic_in_coculture_LD", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "flagged"}
         ]
       }
 
@@ -81,7 +81,7 @@ examples:
           {"organism_name": "Prochlorococcus MIT9313", "count": 26}
         ],
         "by_compartment": [{"compartment": "vesicle", "count": 58}],
-        "by_value": [{"value": "true", "count": 58}],
+        "by_value": [{"value": "flagged", "count": 58}],
         "by_metric": [
           {"derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "metric_type": "vesicle_proteome_member", "value_kind": "boolean", "count": 32, "true_count": 32, "false_count": 0, "dm_total_gene_count": 32, "dm_true_count": 32, "dm_false_count": 0},
           {"derived_metric_id": "derived_metric:pnas.1402782111:s2_mit9313_vesicle_proteome:vesicle_proteome_member", "metric_type": "vesicle_proteome_member", "value_kind": "boolean", "count": 26, "true_count": 26, "false_count": 0, "dm_total_gene_count": 26, "dm_true_count": 26, "dm_false_count": 0}
@@ -105,7 +105,7 @@ examples:
                 metric_types=["vesicle_proteome_member"],
                 locus_tags=[<those 20 locus_tags>])
               → which DE hits are also vesicle-proteome members?
-                Per-row `value="true"` confirms the flag; envelope
+                Per-row `value="flagged"` confirms the flag; envelope
                 `total_matching` shows the intersection size.
 
       Step 3 (drill-down): gene_overview(locus_tags=[<intersected genes>])
@@ -134,12 +134,13 @@ chaining:
 
 mistakes:
   - >-
-    Positive-only DM storage. `flag=False` returns zero rows because every
-    materialized boolean edge is `r.value="true"`
-    (`dm.flag_false_count=0` on every current DM). Inspect
-    `by_metric[*].dm_false_count` before assuming a gene is "not flagged
-    false". Mirrors the numeric tool's "p-value filter" gotcha — surface
-    exists for future DMs. Contrast with metabolomics
+    Two storage conventions coexist. 11 of 27 boolean DMs (Biller 2022,
+    Voigt 2014, Hennon 2015, Steglich 2010) store `r.value="not_flagged"`
+    edges, so `flag=False` returns tested-absent rows there; the rest
+    (Biller 2014 / 2018, Coe 2016) are positive-only and return 0 rows for
+    `flag=False`. Read `by_metric[*].false_count` before reading an absent
+    gene as "not flagged" rather than "not assessed". The precomputed
+    `dm_false_count` reads 0 on current KG builds — do not rely on it.
     `metabolites_by_flags_assay`, which stores both true and false.
   - >-
     Sparse `rankable` / `has_p_value` echoes. Both are always `False` on
@@ -149,4 +150,4 @@ mistakes:
     them.
   - wrong: genes_by_boolean_metric(derived_metric_ids=['derived_metric:...:damping_ratio'])  # numeric DM
     right: genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])  # discover IDs via list_derived_metrics(value_kind='boolean') first
-  - "See `docs://analysis/derived_metrics` for the DM family overview. Note: `flag=False` returns 0 rows on every current DM (positive-only DM storage); contrast with metabolomics `metabolites_by_flags_assay`, which stores both true and false."
+  - "See `docs://analysis/derived_metrics` for the DM family overview. Note: `flag=False` returns rows only on DMs that store `not_flagged` edges (11 of 27); metabolomics `metabolites_by_flags_assay` always stores both states."

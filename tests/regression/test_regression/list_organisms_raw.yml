@@ -181,20 +181,6 @@ rows:
   - coculture
 - clade: null
   experiment_count: 1
-  gene_count: 0
-  genus: Deinococcus
-  ncbi_taxon_id: 1299
-  omics_types:
-  - RNASEQ
-  organism_name: Meiothermus ruber
-  publication_count: 1
-  species: null
-  strain: null
-  treatment_types:
-  - light
-  - oxygen
-- clade: null
-  experiment_count: 1
   gene_count: 2884
   genus: Meiothermus
   ncbi_taxon_id: 172827
@@ -204,6 +190,20 @@ rows:
   publication_count: 1
   species: null
   strain: MruberA
+  treatment_types:
+  - light
+  - oxygen
+- clade: null
+  experiment_count: 1
+  gene_count: 0
+  genus: Meiothermus
+  ncbi_taxon_id: 277
+  omics_types:
+  - RNASEQ
+  organism_name: Meiothermus ruber
+  publication_count: 1
+  species: null
+  strain: null
   treatment_types:
   - light
   - oxygen

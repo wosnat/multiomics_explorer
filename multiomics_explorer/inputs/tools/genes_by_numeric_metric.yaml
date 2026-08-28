@@ -165,7 +165,7 @@ mistakes:
   - >-
     P-value filter on current KG. `significant_only=True` or
     `max_adjusted_p_value=0.05` raises in the current KG because no DM has
-    `has_p_value='true'`. The surface exists for future DMs; check
+    `has_p_value='p_value'`. The surface exists for future DMs; check
     `list_derived_metrics(has_p_value=True)` first.
   - >-
     Sparse columns in results. `rank_by_metric` / `metric_percentile` /

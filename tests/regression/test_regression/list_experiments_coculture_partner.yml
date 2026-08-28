@@ -20,7 +20,7 @@ rows:
   growth_phases:
   - exponential
   - nutrient_limited
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -73,7 +73,7 @@ rows:
   gene_count: 1714
   growth_phases:
   - exponential
-  is_time_course: 'false'
+  is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -119,7 +119,7 @@ rows:
   gene_count: 2267
   growth_phases:
   - exponential
-  is_time_course: 'false'
+  is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -165,7 +165,7 @@ rows:
   gene_count: 2268
   growth_phases:
   - exponential
-  is_time_course: 'false'
+  is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -212,7 +212,7 @@ rows:
   gene_count: 2471
   growth_phases:
   - exponential
-  is_time_course: 'true'
+  is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0

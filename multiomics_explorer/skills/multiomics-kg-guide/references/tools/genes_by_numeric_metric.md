@@ -42,7 +42,7 @@ primary diagnostic when a real DM produces zero rows.
 | max_percentile | float \| None | None | Upper bound on `r.metric_percentile`. **Rankable-gated.** |
 | bucket | list[string] \| None | None | Bucket label(s) — subset of {'top_decile','top_quartile','mid','low'}. **Rankable-gated.** Buckets are decile / quartile splits computed at import time per DM. |
 | max_rank | int \| None | None | Cap on `r.rank_by_metric` (1 = highest). Use for top-N drill-down. **Rankable-gated.** |
-| significant_only | bool | False | Filter to `r.significant=true`. **has_p_value-gated** — raises in the current KG (no DM has p-values yet). Forward-compat surface; check `list_derived_metrics(has_p_value=True)` before using. |
+| significant_only | bool | False | Filter to `r.significant='significant'`. **has_p_value-gated** — raises in the current KG (no DM has p-values yet). Forward-compat surface; check `list_derived_metrics(has_p_value=True)` before using. |
 | max_adjusted_p_value | float \| None | None | Upper bound on `r.adjusted_p_value`. **has_p_value-gated**. |
 | summary | bool | False | Return summary fields only (counts, breakdowns, by_metric, diagnostics). Sugar for limit=0; results=[]. |
 | verbose | bool | False | Include heavy text fields per row: gene_function_description, gene_summary, plus DM context (metric_type, field_description, unit, compartment, experiment_id, publication_doi, treatment_type, background_factors, treatment, light_condition, experimental_context). p_value (raw) is reserved for future has_p_value DMs. |
@@ -285,7 +285,7 @@ genes_by_numeric_metric → gene_overview(locus_tags=results)
 
 - Non-rankable DM + rankable-gated filter. Calling with `metric_types=['peak_time_transcript_h']` + `bucket=['top_decile']` raises — `peak_time_transcript_h` is non-rankable. Inspect `list_derived_metrics(value_kind='numeric', rankable=True)` to see which DMs support `bucket` / `min_percentile` / `max_percentile` / `max_rank`. Mixed rankable/non-rankable DM sets don't raise — instead the envelope's `excluded_derived_metrics` + `warnings` pinpoint the excluded ones.
 
-- P-value filter on current KG. `significant_only=True` or `max_adjusted_p_value=0.05` raises in the current KG because no DM has `has_p_value='true'`. The surface exists for future DMs; check `list_derived_metrics(has_p_value=True)` first.
+- P-value filter on current KG. `significant_only=True` or `max_adjusted_p_value=0.05` raises in the current KG because no DM has `has_p_value='p_value'`. The surface exists for future DMs; check `list_derived_metrics(has_p_value=True)` first.
 
 - Sparse columns in results. `rank_by_metric` / `metric_percentile` / `metric_bucket` are null in rows from non-rankable DMs (e.g. `peak_time_*_h`); don't treat null as missing data — it's gate-driven. Per-row `rankable` (echoed from the parent DM) tells you which to expect.
 

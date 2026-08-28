@@ -1805,7 +1805,7 @@ class TestGeneDerivedMetrics:
             if r.value_kind == "numeric":
                 assert isinstance(r.value, float)
             elif r.value_kind == "boolean":
-                assert r.value in ("true", "false")
+                assert r.value in ("flagged", "not_flagged")
             elif r.value_kind == "categorical":
                 assert isinstance(r.value, str)
 
@@ -1842,7 +1842,7 @@ class TestGeneDerivedMetrics:
         # metric_type is verbose-only; assert against compact fields instead
         vesicle = next(r for r in response.results
                        if r.derived_metric_id.endswith("vesicle_proteome_member"))
-        assert vesicle.value == "true"
+        assert vesicle.value == "flagged"
         assert all(r.value_kind == "boolean" for r in response.results)
 
     @pytest.mark.asyncio
@@ -2214,8 +2214,8 @@ class TestGenesByBooleanMetric:
             assert bm.dm_false_count == 0
         # by_value: every surviving row is 'true'
         assert response.by_value == [
-            type(response.by_value[0])(value="true", count=58)
-        ] or all(bv.value == "true" for bv in response.by_value)
+            type(response.by_value[0])(value="flagged", count=58)
+        ] or all(bv.value == "flagged" for bv in response.by_value)
 
     @pytest.mark.asyncio
     async def test_flag_false_zero_rows(self, tool_fns, conn):
@@ -3270,7 +3270,7 @@ class TestMetabolitesByFlagsAssayKG:
             assay_ids=[_MSYSTEMS_PRESENCE_FLAGS_ASSAY],
             summary=True, conn=conn)
         assert result["total_matching"] == 93
-        # API surfaces flag_value as string ('true'/'false') from KG.
+        # API surfaces flag_value as bool (coerced from KG 'detected'/'not_detected').
         # Pydantic coerces to bool downstream (verified in contract test).
         by_val = {b["flag_value"]: b["count"] for b in result["by_value"]}
         # Accept either string or bool key per Pydantic-coercion-tolerance.

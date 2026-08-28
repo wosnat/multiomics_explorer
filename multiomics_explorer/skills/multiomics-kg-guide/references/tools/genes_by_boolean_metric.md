@@ -3,7 +3,7 @@
 ## What it does
 
 Drill into boolean DerivedMetric edges — one row per (gene × DM ×
-edge value). `value` is the string-typed bool (`'true'` / `'false'`).
+edge value). `value` is the KG two-state literal (`'flagged'` / `'not_flagged'`).
 Cross-organism by design.
 
 Selection is `derived_metric_ids` XOR `metric_types` (exactly one
@@ -13,12 +13,13 @@ in `not_found_ids`. Pre-flight via
 DMs. See `docs://guide/conventions` for the full DM family gating
 contract.
 
-**Positive-only storage gotcha:** the DM layer stores only
-`flag=True` edges, so `flag=False` returns 0 rows; every current
-boolean DM has `dm.flag_false_count=0`. The `by_metric[*]` rollup
-echoes that count so absence is self-evident without a follow-up.
-Tested-absent semantics are not currently representable on the DM
-side (distinct from the metabolomics layer, which does store both).
+**Two storage conventions coexist:** 11 of 27 boolean DMs store
+both `flagged` and `not_flagged` edges (tested-absent is real
+biology — `flag=False` returns rows), the rest are positive-only
+(`flag=False` → 0 rows). Read `by_metric[*].false_count` to tell
+'not flagged' from 'not assessed'. The precomputed `dm_false_count`
+column is unreliable on current KG builds (reads 0 everywhere);
+use the filtered-slice counts.
 See `docs://guide/conventions`.
 
 The `by_metric` envelope rollup pairs filtered-slice true/false
@@ -41,7 +42,7 @@ gates apply); kept for envelope-shape consistency.
 | treatment_type | list[string] \| None | None | Treatment type(s) (e.g. ['diel']). ANY-overlap. Case-insensitive. |
 | background_factors | list[string] \| None | None | Background factor(s) (e.g. ['axenic', 'light']). ANY-overlap. Case-insensitive. |
 | growth_phases | list[string] \| None | None | Growth phase(s). ANY-overlap. Case-insensitive. |
-| flag | bool \| None | None | Filter on `r.value`: True keeps `'true'` edges, False keeps `'false'` edges. **flag=False returns zero rows in the current KG** — DM layer stores only positive (true) edges; inspect `by_metric[*].dm_false_count` (always 0) before assuming a gene is 'not flagged'. |
+| flag | bool \| None | None | Filter on `r.value`: True keeps `'flagged'` edges, False keeps `'not_flagged'` edges (tested-absent — real biology, stored on 11 of 27 boolean DMs; the rest are positive-only and return 0 rows for False). Check `by_metric[*].false_count` before reading an absent gene as 'not flagged' vs 'not assessed'. |
 | summary | bool | False | Return summary fields only (counts, breakdowns, by_metric, diagnostics). Sugar for limit=0; results=[]. |
 | verbose | bool | False | Include heavy text fields per row: gene_function_description, gene_summary, plus DM context (metric_type, field_description, unit, compartment, experiment_id, publication_doi, treatment_type, background_factors, treatment, light_condition, experimental_context). |
 | limit | int | 5 | Max rows to return. Paginate with `offset`. Use `summary=True` for summary-only (sets limit=0). |
@@ -64,7 +65,7 @@ total_matching, total_derived_metrics, total_genes, by_organism, by_compartment,
 - **by_compartment** (list[GenesByNumericMetricCompartmentBreakdown]): Rows per compartment.
 - **by_publication** (list[GenesByNumericMetricPublicationBreakdown]): Rows per publication.
 - **by_experiment** (list[GenesByNumericMetricExperimentBreakdown]): Rows per experiment.
-- **by_value** (list[GenesByBooleanMetricValueBreakdown]): Frequency rollup of `r.value` across surviving rows. Every row is 'true' in the current KG (positive-only DM storage).
+- **by_value** (list[GenesByBooleanMetricValueBreakdown]): Frequency rollup of `r.value` across surviving rows. Values are 'flagged' / 'not_flagged'; not_flagged rows exist on 11 of 27 boolean DMs.
 - **top_categories** (list[GenesByNumericMetricCategoryBreakdown]): Top 5 gene categories by count.
 - **by_metric** (list[GenesByBooleanMetricBreakdown]): Per-DM rollup: filtered-slice true/false counts + full-DM precomputed tallies. Sorted by count desc.
 - **genes_per_metric_max** (int): Largest per-DM gene count.
@@ -94,7 +95,7 @@ total_matching, total_derived_metrics, total_genes, by_organism, by_compartment,
 | value_kind | string | Always 'boolean' for this tool; kept for cross-tool row-shape consistency with `genes_by_numeric_metric`. |
 | rankable | bool | DM-level rankable flag (always False for boolean DMs in the current KG). |
 | has_p_value | bool | DM-level p-value flag (always False for boolean DMs in the current KG). |
-| value | string | 'true' or 'false' (string-typed bool — see KG-spec BioCypher constraint). |
+| value | string | 'flagged' or 'not_flagged' (KG two-state literal — see KG-spec BioCypher constraint). |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -133,7 +134,7 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
   ],
   "by_compartment": [{"compartment": "vesicle", "count": 58}],
   "by_publication": [{"publication_doi": "10.1126/science.1243457", "count": 58}],
-  "by_value": [{"value": "true", "count": 58}],
+  "by_value": [{"value": "flagged", "count": 58}],
   "by_metric": [
     {"derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "metric_type": "vesicle_proteome_member", "name": "MED4 vesicle proteome member", "value_kind": "boolean", "count": 32, "true_count": 32, "false_count": 0, "dm_total_gene_count": 32, "dm_true_count": 32, "dm_false_count": 0},
     {"derived_metric_id": "derived_metric:pnas.1402782111:s2_mit9313_vesicle_proteome:vesicle_proteome_member", "metric_type": "vesicle_proteome_member", "name": "MIT9313 vesicle proteome member", "value_kind": "boolean", "count": 26, "true_count": 26, "false_count": 0, "dm_total_gene_count": 26, "dm_true_count": 26, "dm_false_count": 0}
@@ -155,8 +156,8 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
   "offset": 0,
   "truncated": true,
   "results": [
-    {"locus_tag": "PMM0090", "gene_name": null, "product": null, "gene_category": null, "organism_name": "Prochlorococcus MED4", "derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "name": "MED4 vesicle proteome member", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "true"},
-    {"locus_tag": "PMM0097", "gene_name": null, "product": null, "gene_category": null, "organism_name": "Prochlorococcus MED4", "derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "name": "MED4 vesicle proteome member", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "true"}
+    {"locus_tag": "PMM0090", "gene_name": null, "product": null, "gene_category": null, "organism_name": "Prochlorococcus MED4", "derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "name": "MED4 vesicle proteome member", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "flagged"},
+    {"locus_tag": "PMM0097", "gene_name": null, "product": null, "gene_category": null, "organism_name": "Prochlorococcus MED4", "derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "name": "MED4 vesicle proteome member", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "flagged"}
   ]
 }
 ```
@@ -174,7 +175,7 @@ genes_by_boolean_metric(metric_types=['periodic_in_coculture_LD'], organism='NAT
   "total_genes": 5,
   "by_organism": [{"organism_name": "Prochlorococcus NATL2A", "count": 5}],
   "by_compartment": [{"compartment": "whole_cell", "count": 5}],
-  "by_value": [{"value": "true", "count": 5}],
+  "by_value": [{"value": "flagged", "count": 5}],
   "by_metric": [
     {"derived_metric_id": "derived_metric:1462-2920.14179:s2_natl2a_periodic_LD:periodic_in_coculture_LD", "metric_type": "periodic_in_coculture_LD", "name": "NATL2A periodic in coculture L:D", "value_kind": "boolean", "count": 5, "true_count": 5, "false_count": 0, "dm_total_gene_count": 1377, "dm_true_count": 5, "dm_false_count": 0}
   ],
@@ -187,7 +188,7 @@ genes_by_boolean_metric(metric_types=['periodic_in_coculture_LD'], organism='NAT
   "offset": 0,
   "truncated": false,
   "results": [
-    {"locus_tag": "PMN2A_0123", "organism_name": "Prochlorococcus NATL2A", "derived_metric_id": "derived_metric:1462-2920.14179:s2_natl2a_periodic_LD:periodic_in_coculture_LD", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "true"}
+    {"locus_tag": "PMN2A_0123", "organism_name": "Prochlorococcus NATL2A", "derived_metric_id": "derived_metric:1462-2920.14179:s2_natl2a_periodic_LD:periodic_in_coculture_LD", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "flagged"}
   ]
 }
 ```
@@ -208,7 +209,7 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'], summary=True)
     {"organism_name": "Prochlorococcus MIT9313", "count": 26}
   ],
   "by_compartment": [{"compartment": "vesicle", "count": 58}],
-  "by_value": [{"value": "true", "count": 58}],
+  "by_value": [{"value": "flagged", "count": 58}],
   "by_metric": [
     {"derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "metric_type": "vesicle_proteome_member", "value_kind": "boolean", "count": 32, "true_count": 32, "false_count": 0, "dm_total_gene_count": 32, "dm_true_count": 32, "dm_false_count": 0},
     {"derived_metric_id": "derived_metric:pnas.1402782111:s2_mit9313_vesicle_proteome:vesicle_proteome_member", "metric_type": "vesicle_proteome_member", "value_kind": "boolean", "count": 26, "true_count": 26, "false_count": 0, "dm_total_gene_count": 26, "dm_true_count": 26, "dm_false_count": 0}
@@ -234,7 +235,7 @@ Step 2: genes_by_boolean_metric(
           metric_types=["vesicle_proteome_member"],
           locus_tags=[<those 20 locus_tags>])
         → which DE hits are also vesicle-proteome members?
-          Per-row `value="true"` confirms the flag; envelope
+          Per-row `value="flagged"` confirms the flag; envelope
           `total_matching` shows the intersection size.
 
 Step 3 (drill-down): gene_overview(locus_tags=[<intersected genes>])
@@ -252,7 +253,7 @@ genes_by_boolean_metric (no organism filter) → split via envelope by_organism 
 
 ## Common mistakes
 
-- Positive-only DM storage. `flag=False` returns zero rows because every materialized boolean edge is `r.value="true"` (`dm.flag_false_count=0` on every current DM). Inspect `by_metric[*].dm_false_count` before assuming a gene is "not flagged false". Mirrors the numeric tool's "p-value filter" gotcha — surface exists for future DMs. Contrast with metabolomics `metabolites_by_flags_assay`, which stores both true and false.
+- Two storage conventions coexist. 11 of 27 boolean DMs (Biller 2022, Voigt 2014, Hennon 2015, Steglich 2010) store `r.value="not_flagged"` edges, so `flag=False` returns tested-absent rows there; the rest (Biller 2014 / 2018, Coe 2016) are positive-only and return 0 rows for `flag=False`. Read `by_metric[*].false_count` before reading an absent gene as "not flagged" rather than "not assessed". The precomputed `dm_false_count` reads 0 on current KG builds — do not rely on it. `metabolites_by_flags_assay`, which stores both true and false.
 
 - Sparse `rankable` / `has_p_value` echoes. Both are always `False` on every row from boolean DMs in the current KG — kept for cross-tool row-shape consistency with `genes_by_numeric_metric`, not because this tool reads them as a meaningful signal. Don't gate downstream logic on them.
 
@@ -264,7 +265,7 @@ genes_by_boolean_metric(derived_metric_ids=['derived_metric:...:damping_ratio'])
 genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
 ```
 
-- See `docs://analysis/derived_metrics` for the DM family overview. Note: `flag=False` returns 0 rows on every current DM (positive-only DM storage); contrast with metabolomics `metabolites_by_flags_assay`, which stores both true and false.
+- See `docs://analysis/derived_metrics` for the DM family overview. Note: `flag=False` returns rows only on DMs that store `not_flagged` edges (11 of 27); metabolomics `metabolites_by_flags_assay` always stores both states.
 
 ## Package import equivalent
 
