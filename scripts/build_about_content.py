@@ -884,6 +884,47 @@ def render_ontology(key: str, data: dict, vocab_values: dict | None = None) -> s
     return "\n".join(L)
 
 
+_SUMMARY_ABBREVIATIONS = {"e.g", "i.e", "cf", "vs", "etc", "et al", "approx"}
+
+
+def _summary_sentence(text: str, max_len: int = 110) -> str:
+    """First sentence of the first paragraph of `text`, whole words only.
+
+    YAML `|` blocks hard-wrap prose, so the paragraph is re-joined before
+    the cut. The sentence ends at the first `. ` outside parentheses that
+    is not an abbreviation (`e.g.`, `i.e.`, ...). If that sentence exceeds
+    `max_len`, cut at the last word boundary before `max_len` and append
+    `…`. The result always ends with `.` or `…` (or is empty).
+    """
+    paragraph = text.strip().split("\n\n")[0]
+    joined = " ".join(line.strip() for line in paragraph.split("\n") if line.strip())
+    if not joined:
+        return ""
+    depth = 0
+    end = None
+    for i, ch in enumerate(joined):
+        if ch in "([":
+            depth += 1
+        elif ch in ")]":
+            depth = max(0, depth - 1)
+        elif ch == "." and depth == 0 and (i + 1 == len(joined) or joined[i + 1] == " "):
+            head = joined[:i]
+            last_word = head.rsplit(" ", 1)[-1].lower().lstrip("(`*\"")
+            if last_word in _SUMMARY_ABBREVIATIONS or len(last_word) == 1:
+                continue
+            end = i + 1
+            break
+    sentence = joined[:end] if end is not None else joined.rstrip()
+    if not sentence.endswith("."):
+        sentence += "."
+    if len(sentence) <= max_len:
+        return sentence
+    cut = sentence[:max_len].rsplit(" ", 1)[0]
+    if cut.count("(") > cut.count(")"):  # never end on an open parenthetical
+        cut = cut[:cut.rfind("(")]
+    return cut.rstrip(" ,;:—-") + "…"
+
+
 def render_ontology_index(inputs: dict) -> str:
     """Render ``docs://ontologies/index`` from ``{key: yaml_data}``."""
     from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG, ontology_trust_axes
@@ -914,8 +955,7 @@ def render_ontology_index(inputs: dict) -> str:
         bridges = ", ".join(
             f"{target} ({kind})" for _rel, target, kind in (cfg.get("bridges_out") or [])
         ) or "—"
-        summary = str(data.get("what_it_is", "")).strip().split("\n")[0]
-        summary = summary.split(". ")[0].rstrip(".")
+        summary = _summary_sentence(str(data.get("what_it_is", "")))
         summary = summary.replace("|", "\\|")
         L.append(
             f"| `{key}` | {ONTOLOGY_DISPLAY_NAMES.get(key, key)} | `{cfg['label']}` | "

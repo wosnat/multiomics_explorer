@@ -668,6 +668,27 @@ class TestOntologiesGeneratorStage:
         for key in _ONTOLOGY_KEYS:
             assert key in out
 
+    def test_index_summary_ends_at_a_sentence_or_word_boundary(self):
+        """Summaries never cut mid-word or mid-line: each ends with `.`
+        (first sentence) or `…` (cut at a word boundary before ~110 chars),
+        and hard-wrapped YAML lines are re-joined before the cut."""
+        from scripts.build_about_content import _summary_sentence, render_ontology_index
+        short = "Pfam protein domain families and clans.\nSecond sentence here."
+        assert _summary_sentence(short) == "Pfam protein domain families and clans."
+        wrapped = ("Gene Ontology biological process — the branch of GO (e.g.\n"
+                   "`go:0006979` response to oxidative stress) that describes\n"
+                   "what larger program a gene is part of. Second sentence.")
+        out = _summary_sentence(wrapped)
+        assert out.endswith("…") and len(out) <= 111
+        assert "\n" not in out and not out.endswith("(e.g.…")
+        assert out.split("…")[0].rsplit(" ", 1)[-1] in wrapped.replace("\n", " ")
+        assert _summary_sentence("Short (e.g. this). More.") == "Short (e.g. this)."
+        inputs = {k: {"what_it_is": "x " * 80 + "y. tail"} for k in _ONTOLOGY_KEYS}
+        for line in render_ontology_index(inputs).splitlines():
+            if line.startswith("| `"):
+                summary = line.rsplit("|", 2)[-2].strip()
+                assert summary.endswith(".") or summary.endswith("…"), summary
+
     def test_lint_covers_the_ontologies_dir(self):
         src = (_ROOT / "scripts" / "build_about_content.py").read_text()
         assert 'skills_refs / "ontologies"' in src
