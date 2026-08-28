@@ -7846,9 +7846,8 @@ def register_tools(mcp: FastMCP):
         both `flagged` and `not_flagged` edges (tested-absent is real
         biology — `flag=False` returns rows), the rest are positive-only
         (`flag=False` → 0 rows). Read `by_metric[*].false_count` to tell
-        'not flagged' from 'not assessed'. The precomputed `dm_false_count`
-        column is unreliable on current KG builds (reads 0 everywhere);
-        use the filtered-slice counts.
+        'not flagged' from 'not assessed'; `by_metric[*].dm_false_count`
+        is the full-DM precomputed twin (0 on positive-only DMs).
         See `docs://guide/conventions`.
 
         The `by_metric` envelope rollup pairs filtered-slice true/false

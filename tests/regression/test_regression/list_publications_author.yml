@@ -109,7 +109,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 9
+  discussed_gene_count: 8
   discussed_pathway_count: 2
   doi: 10.1073/pnas.2213271120
   experiment_count: 4
@@ -248,7 +248,7 @@ rows:
   derived_metric_count: 6
   derived_metric_value_kinds:
   - numeric
-  discussed_gene_count: 13
+  discussed_gene_count: 12
   discussed_pathway_count: 0
   doi: 10.1111/1462-2920.15834
   experiment_count: 6
@@ -362,7 +362,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 18
+  discussed_gene_count: 16
   discussed_pathway_count: 3
   doi: 10.1371/journal.pone.0165375
   experiment_count: 4
@@ -398,7 +398,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 39
+  discussed_gene_count: 37
   discussed_pathway_count: 1
   doi: 10.1038/ismej.2016.82
   experiment_count: 3
@@ -434,7 +434,7 @@ rows:
   derived_metric_value_kinds:
   - boolean
   - categorical
-  discussed_gene_count: 65
+  discussed_gene_count: 60
   discussed_pathway_count: 4
   doi: 10.1038/ismej.2015.36
   experiment_count: 4
@@ -540,7 +540,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 35
+  discussed_gene_count: 34
   discussed_pathway_count: 0
   doi: 10.1038/ismej.2011.49
   experiment_count: 5
@@ -583,7 +583,7 @@ rows:
   derived_metric_value_kinds:
   - boolean
   - numeric
-  discussed_gene_count: 31
+  discussed_gene_count: 30
   discussed_pathway_count: 3
   doi: 10.1186/gb-2010-11-5-r54
   experiment_count: 1
@@ -701,7 +701,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 51
+  discussed_gene_count: 43
   discussed_pathway_count: 3
   doi: 10.1128/JB.01097-06
   experiment_count: 6
@@ -739,7 +739,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 84
+  discussed_gene_count: 76
   discussed_pathway_count: 3
   doi: 10.1038/msb4100087
   experiment_count: 6

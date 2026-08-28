@@ -173,7 +173,7 @@ rows:
   omics_type: RNASEQ
   padj: 0.0
   product: DNA polymerase III, beta subunit
-  rank: 545
+  rank: 544
   rank_down: null
   rank_up: 313
   table_scope: all_detected_genes
@@ -227,9 +227,9 @@ rows:
   omics_type: RNASEQ
   padj: 0.0
   product: DNA polymerase III, beta subunit
-  rank: 563
+  rank: 562
   rank_down: null
-  rank_up: 297
+  rank_up: 296
   table_scope: all_detected_genes
   table_scope_detail: ''
   timepoint: 4h
@@ -360,7 +360,7 @@ rows:
   omics_type: RNASEQ
   padj: 0.0002
   product: DNA polymerase III, beta subunit
-  rank: 606
+  rank: 605
   rank_down: null
   rank_up: null
   table_scope: all_detected_genes
@@ -923,7 +923,7 @@ rows:
   omics_type: RNASEQ
   padj: 1.0
   product: DNA polymerase III, beta subunit
-  rank: 1617
+  rank: 1624
   rank_down: null
   rank_up: null
   table_scope: all_detected_genes

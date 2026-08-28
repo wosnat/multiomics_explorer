@@ -413,17 +413,6 @@ results:
   value: flagged
   value_kind: boolean
 - derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
-  gene_category: Stress response and adaptation
-  gene_name: som
-  has_p_value: false
-  locus_tag: PMT0284
-  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
-  organism_name: Prochlorococcus MIT9313
-  product: outer membrane porin
-  rankable: false
-  value: flagged
-  value_kind: boolean
-- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
   gene_category: Cell wall and membrane
   gene_name: amiC
   has_p_value: false
@@ -640,6 +629,17 @@ results:
   name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
   organism_name: Prochlorococcus MIT9313
   product: uncharacterized conserved secreted protein (DUF541)
+  rankable: false
+  value: flagged
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Stress response and adaptation
+  gene_name: som
+  has_p_value: false
+  locus_tag: PMT1979
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: outer membrane porin
   rankable: false
   value: flagged
   value_kind: boolean

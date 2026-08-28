@@ -2514,11 +2514,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 85
+  distinct_gene_count: 82
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: darkness +100 nM glucose vs darkness
     (control)'
-  gene_count: 85
+  gene_count: 82
   growth_phases:
   - darkness
   is_time_course: single_time_point
@@ -2546,7 +2546,7 @@ rows:
   time_point_significant_up:
   - '3'
   time_point_totals:
-  - '85'
+  - '82'
   treatment_type:
   - carbon
   - coculture
@@ -2564,11 +2564,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 85
+  distinct_gene_count: 82
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: darkness +5 mM glucose vs darkness
     (control)'
-  gene_count: 85
+  gene_count: 82
   growth_phases:
   - darkness
   is_time_course: single_time_point
@@ -2596,7 +2596,7 @@ rows:
   time_point_significant_up:
   - '1'
   time_point_totals:
-  - '85'
+  - '82'
   treatment_type:
   - carbon
   - coculture
@@ -2614,11 +2614,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 85
+  distinct_gene_count: 82
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: light +100 nM glucose vs light
     (control)'
-  gene_count: 85
+  gene_count: 82
   growth_phases:
   - stationary
   is_time_course: single_time_point
@@ -2646,7 +2646,7 @@ rows:
   time_point_significant_up:
   - '2'
   time_point_totals:
-  - '85'
+  - '82'
   treatment_type:
   - carbon
   - coculture
@@ -2664,11 +2664,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 85
+  distinct_gene_count: 82
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: light +5 mM glucose vs light
     (control)'
-  gene_count: 85
+  gene_count: 82
   growth_phases:
   - stationary
   is_time_course: single_time_point
@@ -2696,7 +2696,7 @@ rows:
   time_point_significant_up:
   - '1'
   time_point_totals:
-  - '85'
+  - '82'
   treatment_type:
   - carbon
   - coculture
@@ -2714,11 +2714,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 343
+  distinct_gene_count: 342
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: darkness +100 nM glucose vs darkness
     (control)'
-  gene_count: 343
+  gene_count: 342
   growth_phases:
   - darkness
   is_time_course: single_time_point
@@ -2746,7 +2746,7 @@ rows:
   time_point_significant_up:
   - '0'
   time_point_totals:
-  - '343'
+  - '342'
   treatment_type:
   - carbon
   - coculture
@@ -2764,11 +2764,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 343
+  distinct_gene_count: 342
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: darkness +5 mM glucose vs darkness
     (control)'
-  gene_count: 343
+  gene_count: 342
   growth_phases:
   - darkness
   is_time_course: single_time_point
@@ -2779,7 +2779,7 @@ rows:
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 17
-  significant_up_count: 44
+  significant_up_count: 43
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2794,9 +2794,9 @@ rows:
   time_point_significant_down:
   - '17'
   time_point_significant_up:
-  - '44'
+  - '43'
   time_point_totals:
-  - '343'
+  - '342'
   treatment_type:
   - carbon
   - coculture
@@ -2814,11 +2814,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 343
+  distinct_gene_count: 342
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: light +100 nM glucose vs light
     (control)'
-  gene_count: 343
+  gene_count: 342
   growth_phases:
   - stationary
   is_time_course: single_time_point
@@ -2846,7 +2846,7 @@ rows:
   time_point_significant_up:
   - '3'
   time_point_totals:
-  - '343'
+  - '342'
   treatment_type:
   - carbon
   - coculture
@@ -2864,10 +2864,10 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 343
+  distinct_gene_count: 342
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: light +5 mM glucose vs light (control)'
-  gene_count: 343
+  gene_count: 342
   growth_phases:
   - stationary
   is_time_course: single_time_point
@@ -2895,7 +2895,7 @@ rows:
   time_point_significant_up:
   - '34'
   time_point_totals:
-  - '343'
+  - '342'
   treatment_type:
   - carbon
   - coculture
@@ -2913,11 +2913,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 198
+  distinct_gene_count: 195
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: darkness +100 nM glucose vs darkness
     (control)'
-  gene_count: 198
+  gene_count: 195
   growth_phases:
   - darkness
   is_time_course: single_time_point
@@ -2945,7 +2945,7 @@ rows:
   time_point_significant_up:
   - '1'
   time_point_totals:
-  - '198'
+  - '195'
   treatment_type:
   - carbon
   - coculture
@@ -2963,11 +2963,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 198
+  distinct_gene_count: 195
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: darkness +5 mM glucose vs darkness
     (control)'
-  gene_count: 198
+  gene_count: 195
   growth_phases:
   - darkness
   is_time_course: single_time_point
@@ -2978,7 +2978,7 @@ rows:
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 12
-  significant_up_count: 76
+  significant_up_count: 74
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2993,9 +2993,9 @@ rows:
   time_point_significant_down:
   - '12'
   time_point_significant_up:
-  - '76'
+  - '74'
   time_point_totals:
-  - '198'
+  - '195'
   treatment_type:
   - carbon
   - coculture
@@ -3013,11 +3013,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 198
+  distinct_gene_count: 195
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: light +100 nM glucose vs light
     (control)'
-  gene_count: 198
+  gene_count: 195
   growth_phases:
   - stationary
   is_time_course: single_time_point
@@ -3045,7 +3045,7 @@ rows:
   time_point_significant_up:
   - '2'
   time_point_totals:
-  - '198'
+  - '195'
   treatment_type:
   - carbon
   - coculture
@@ -3063,11 +3063,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 198
+  distinct_gene_count: 195
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: light +5 mM glucose vs light
     (control)'
-  gene_count: 198
+  gene_count: 195
   growth_phases:
   - stationary
   is_time_course: single_time_point
@@ -3078,7 +3078,7 @@ rows:
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 19
-  significant_up_count: 46
+  significant_up_count: 44
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -3093,9 +3093,9 @@ rows:
   time_point_significant_down:
   - '19'
   time_point_significant_up:
-  - '46'
+  - '44'
   time_point_totals:
-  - '198'
+  - '195'
   treatment_type:
   - carbon
   - coculture
@@ -3113,11 +3113,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 148
+  distinct_gene_count: 146
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: darkness +100 nM glucose vs
     darkness (control)'
-  gene_count: 148
+  gene_count: 146
   growth_phases:
   - darkness
   is_time_course: single_time_point
@@ -3145,7 +3145,7 @@ rows:
   time_point_significant_up:
   - '1'
   time_point_totals:
-  - '148'
+  - '146'
   treatment_type:
   - carbon
   - coculture
@@ -3163,11 +3163,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 147
+  distinct_gene_count: 145
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: darkness +5 mM glucose vs darkness
     (control)'
-  gene_count: 147
+  gene_count: 145
   growth_phases:
   - darkness
   is_time_course: single_time_point
@@ -3178,7 +3178,7 @@ rows:
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 2
-  significant_up_count: 17
+  significant_up_count: 16
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -3193,9 +3193,9 @@ rows:
   time_point_significant_down:
   - '2'
   time_point_significant_up:
-  - '17'
+  - '16'
   time_point_totals:
-  - '147'
+  - '145'
   treatment_type:
   - carbon
   - coculture
@@ -3213,11 +3213,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 147
+  distinct_gene_count: 145
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: light +100 nM glucose vs light
     (control)'
-  gene_count: 147
+  gene_count: 145
   growth_phases:
   - stationary
   is_time_course: single_time_point
@@ -3245,7 +3245,7 @@ rows:
   time_point_significant_up:
   - '0'
   time_point_totals:
-  - '147'
+  - '145'
   treatment_type:
   - carbon
   - coculture
@@ -3263,11 +3263,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 148
+  distinct_gene_count: 146
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: light +5 mM glucose vs light
     (control)'
-  gene_count: 148
+  gene_count: 146
   growth_phases:
   - stationary
   is_time_course: single_time_point
@@ -3295,7 +3295,7 @@ rows:
   time_point_significant_up:
   - '9'
   time_point_totals:
-  - '148'
+  - '146'
   treatment_type:
   - carbon
   - coculture
@@ -3313,11 +3313,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 487
+  distinct_gene_count: 483
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: darkness +100 nM glucose vs
     darkness (control)'
-  gene_count: 487
+  gene_count: 483
   growth_phases:
   - darkness
   is_time_course: single_time_point
@@ -3327,7 +3327,7 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 25
+  significant_down_count: 24
   significant_up_count: 5
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -3341,11 +3341,11 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '25'
+  - '24'
   time_point_significant_up:
   - '5'
   time_point_totals:
-  - '487'
+  - '483'
   treatment_type:
   - carbon
   - coculture
@@ -3363,11 +3363,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 488
+  distinct_gene_count: 484
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: darkness +5 mM glucose vs darkness
     (control)'
-  gene_count: 488
+  gene_count: 484
   growth_phases:
   - darkness
   is_time_course: single_time_point
@@ -3395,7 +3395,7 @@ rows:
   time_point_significant_up:
   - '24'
   time_point_totals:
-  - '488'
+  - '484'
   treatment_type:
   - carbon
   - coculture
@@ -3413,11 +3413,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 488
+  distinct_gene_count: 484
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: light +100 nM glucose vs light
     (control)'
-  gene_count: 488
+  gene_count: 484
   growth_phases:
   - stationary
   is_time_course: single_time_point
@@ -3445,7 +3445,7 @@ rows:
   time_point_significant_up:
   - '6'
   time_point_totals:
-  - '488'
+  - '484'
   treatment_type:
   - carbon
   - coculture
@@ -3463,11 +3463,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 488
+  distinct_gene_count: 484
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: light +5 mM glucose vs light
     (control)'
-  gene_count: 488
+  gene_count: 484
   growth_phases:
   - stationary
   is_time_course: single_time_point
@@ -3477,8 +3477,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 33
-  significant_up_count: 55
+  significant_down_count: 32
+  significant_up_count: 54
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -3491,11 +3491,11 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '33'
+  - '32'
   time_point_significant_up:
-  - '55'
+  - '54'
   time_point_totals:
-  - '488'
+  - '484'
   treatment_type:
   - carbon
   - coculture
@@ -3513,11 +3513,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 1887
+  distinct_gene_count: 1879
   experiment_id: 10.1016/j.micres.2015.04.006_salt_saltacclimated_5_salt_as9601_rnaseq
   experiment_name: AS9601 Salt-acclimated (5% salt) vs Normal seawater control (3.8%
     salt) (RNASEQ)
-  gene_count: 1887
+  gene_count: 1879
   growth_phases:
   - acclimated_steady_state
   is_time_course: single_time_point
@@ -3527,8 +3527,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus AS9601
   publication_doi: 10.1016/j.micres.2015.04.006
-  significant_down_count: 937
-  significant_up_count: 950
+  significant_down_count: 933
+  significant_up_count: 946
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -3541,11 +3541,11 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '937'
+  - '933'
   time_point_significant_up:
-  - '950'
+  - '946'
   time_point_totals:
-  - '1887'
+  - '1879'
   treatment_type:
   - salt
 - authors:
@@ -3583,7 +3583,7 @@ rows:
   organism_name: Prochlorococcus MED4
   publication_doi: 10.64898/2026.04.15.718746
   significant_down_count: 469
-  significant_up_count: 557
+  significant_up_count: 556
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 2
@@ -3604,7 +3604,7 @@ rows:
   - '266'
   time_point_significant_up:
   - '248'
-  - '309'
+  - '308'
   time_point_totals:
   - '1876'
   - '1876'
@@ -3644,7 +3644,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.64898/2026.04.15.718746
-  significant_down_count: 333
+  significant_down_count: 331
   significant_up_count: 439
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -3662,8 +3662,8 @@ rows:
   - '1'
   - '2'
   time_point_significant_down:
-  - '270'
-  - '63'
+  - '269'
+  - '62'
   time_point_significant_up:
   - '367'
   - '72'
@@ -4203,11 +4203,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 1947
+  distinct_gene_count: 1953
   experiment_id: 10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq
   experiment_name: MED4 Low salinity acclimation (28 psu) vs Normal seawater salinity
     (34 psu) (RNASEQ)
-  gene_count: 1947
+  gene_count: 1953
   growth_phases:
   - acclimated_steady_state
   is_time_course: single_time_point
@@ -4235,7 +4235,7 @@ rows:
   time_point_significant_up:
   - '13'
   time_point_totals:
-  - '1947'
+  - '1953'
   treatment_type:
   - salt
 - authors:
@@ -4503,11 +4503,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 24
+  distinct_gene_count: 23
   experiment_id: 10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_dark
   experiment_name: MED4 Phage (P-HM2) lysate vs Spent medium (uninfected) in dark
     (RNASEQ)
-  gene_count: 30
+  gene_count: 29
   growth_phases:
   - infected
   is_time_course: time_course
@@ -4518,7 +4518,7 @@ rows:
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
   significant_down_count: 21
-  significant_up_count: 9
+  significant_up_count: 8
   table_scope: significant_only
   table_scope_detail: ''
   time_point_count: 3
@@ -4545,10 +4545,10 @@ rows:
   time_point_significant_up:
   - '1'
   - '3'
-  - '5'
+  - '4'
   time_point_totals:
   - '16'
-  - '7'
+  - '6'
   - '7'
   treatment_type:
   - viral
@@ -6967,10 +6967,10 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 103
+  distinct_gene_count: 102
   experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_mit9312_rnaseq
   experiment_name: MIT9312 Elevated CO2 (800 ppm) vs Ambient CO2 (400 ppm) (RNASEQ)
-  gene_count: 103
+  gene_count: 102
   growth_phases:
   - acclimated_steady_state
   is_time_course: single_time_point
@@ -6980,7 +6980,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MIT9312
   publication_doi: 10.1038/ismej.2017.189
-  significant_down_count: 51
+  significant_down_count: 50
   significant_up_count: 52
   table_scope: significant_only
   table_scope_detail: ''
@@ -6994,11 +6994,11 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '51'
+  - '50'
   time_point_significant_up:
   - '52'
   time_point_totals:
-  - '103'
+  - '102'
   treatment_type:
   - carbon
 - authors:
@@ -7714,11 +7714,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 98
+  distinct_gene_count: 97
   experiment_id: 10.1038/ismej.2011.49_iron_iron_starvation_mit9313_mit9313_microarray
   experiment_name: MIT9313 Iron starvation (MIT9313) vs Iron-replete control (MIT9313)
     (MICROARRAY)
-  gene_count: 294
+  gene_count: 291
   growth_phases:
   - acute_stress
   - nutrient_limited
@@ -7729,7 +7729,7 @@ rows:
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1038/ismej.2011.49
-  significant_down_count: 48
+  significant_down_count: 46
   significant_up_count: 68
   table_scope: significant_any_timepoint
   table_scope_detail: ''
@@ -7752,16 +7752,16 @@ rows:
   - '3'
   time_point_significant_down:
   - '3'
-  - '36'
-  - '9'
+  - '35'
+  - '8'
   time_point_significant_up:
   - '14'
   - '45'
   - '9'
   time_point_totals:
-  - '98'
-  - '98'
-  - '98'
+  - '97'
+  - '97'
+  - '97'
   treatment_type:
   - iron
 - authors:
@@ -7779,11 +7779,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 98
+  distinct_gene_count: 97
   experiment_id: 10.1038/ismej.2011.49_growth_medium_ironreplete_control_mit9313_mit9313_microarray
   experiment_name: MIT9313 Iron-replete control (MIT9313) vs Iron starvation (MIT9313)
     (MICROARRAY)
-  gene_count: 98
+  gene_count: 97
   growth_phases:
   - recovery
   is_time_course: single_time_point
@@ -7794,7 +7794,7 @@ rows:
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1038/ismej.2011.49
   significant_down_count: 35
-  significant_up_count: 11
+  significant_up_count: 10
   table_scope: significant_any_timepoint
   table_scope_detail: ''
   time_point_count: 1
@@ -7809,9 +7809,9 @@ rows:
   time_point_significant_down:
   - '35'
   time_point_significant_up:
-  - '11'
+  - '10'
   time_point_totals:
-  - '98'
+  - '97'
   treatment_type:
   - iron
 - authors:
@@ -8986,10 +8986,10 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 389
+  distinct_gene_count: 362
   experiment_id: 10.1128/mSystems.00008-17_azaserine_ss120_proteomics
   experiment_name: 'SS120 proteomics: control vs azaserine (N-limitation proxy)'
-  gene_count: 389
+  gene_count: 362
   growth_phases:
   - acute_stress
   is_time_course: single_time_point
@@ -8999,8 +8999,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   publication_doi: 10.1128/mSystems.00008-17
-  significant_down_count: 135
-  significant_up_count: 15
+  significant_down_count: 126
+  significant_up_count: 12
   table_scope: significant_only
   table_scope_detail: Only significantly-changing proteins reported in S3 (up + down).
   time_point_count: 1
@@ -9013,11 +9013,11 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '135'
+  - '126'
   time_point_significant_up:
-  - '15'
+  - '12'
   time_point_totals:
-  - '389'
+  - '362'
   treatment_type:
   - nitrogen
 - authors:
@@ -9514,10 +9514,10 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 1287
+  distinct_gene_count: 1295
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_axenic_shew_w3181_rnaseq
   experiment_name: Shewanella W3-18-1 coculture (HCO3-) vs axenic (SOLiD RNA-seq)
-  gene_count: 1287
+  gene_count: 1295
   growth_phases:
   - acclimated_steady_state
   is_time_course: single_time_point
@@ -9528,7 +9528,7 @@ rows:
   organism_name: Shewanella sp. W3-18-1
   publication_doi: 10.1038/ismej.2014.69
   significant_down_count: 0
-  significant_up_count: 486
+  significant_up_count: 490
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in HCO3- co-culture vs axenic control
   time_point_count: 1
@@ -9543,9 +9543,9 @@ rows:
   time_point_significant_down:
   - '0'
   time_point_significant_up:
-  - '486'
+  - '490'
   time_point_totals:
-  - '1287'
+  - '1295'
   treatment_type:
   - coculture
 - authors:
@@ -9572,10 +9572,10 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 454
+  distinct_gene_count: 455
   experiment_id: 10.1038/ismej.2014.69_coculture_lactate_vs_axenic_shew_w3181_rnaseq
   experiment_name: Shewanella W3-18-1 coculture (lactate) vs axenic (SOLiD RNA-seq)
-  gene_count: 454
+  gene_count: 455
   growth_phases:
   - acclimated_steady_state
   is_time_course: single_time_point
@@ -9603,7 +9603,7 @@ rows:
   time_point_significant_up:
   - '206'
   time_point_totals:
-  - '454'
+  - '455'
   treatment_type:
   - coculture
 - authors:
@@ -9630,11 +9630,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 1219
+  distinct_gene_count: 1226
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_lactate_shew_w3181_rnaseq
   experiment_name: Shewanella W3-18-1 coculture HCO3- vs coculture lactate (SOLiD
     RNA-seq)
-  gene_count: 1219
+  gene_count: 1226
   growth_phases:
   - acclimated_steady_state
   is_time_course: single_time_point
@@ -9645,7 +9645,7 @@ rows:
   organism_name: Shewanella sp. W3-18-1
   publication_doi: 10.1038/ismej.2014.69
   significant_down_count: 0
-  significant_up_count: 474
+  significant_up_count: 475
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in HCO3- co-culture vs lactate co-culture
   time_point_count: 1
@@ -9660,9 +9660,9 @@ rows:
   time_point_significant_down:
   - '0'
   time_point_significant_up:
-  - '474'
+  - '475'
   time_point_totals:
-  - '1219'
+  - '1226'
   treatment_type:
   - carbon
   - coculture
@@ -10096,10 +10096,10 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 2456
+  distinct_gene_count: 2455
   experiment_id: 10.1002/mbo3.1150_viral_s_sbp1_infection_wh7803_rnaseq
   experiment_name: WH7803 Cyanopodovirus S-SBP1 infection vs Uninfected control (RNASEQ)
-  gene_count: 12280
+  gene_count: 12275
   growth_phases:
   - infected
   is_time_course: time_course
@@ -10152,11 +10152,11 @@ rows:
   - '22'
   - '23'
   time_point_totals:
-  - '2456'
-  - '2456'
-  - '2456'
-  - '2456'
-  - '2456'
+  - '2455'
+  - '2455'
+  - '2455'
+  - '2455'
+  - '2455'
   treatment_type:
   - viral
 - authors:
@@ -11110,11 +11110,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 523
+  distinct_gene_count: 521
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_selongatus_axenic_proteomics
   experiment_name: S. elongatus cscB coculture with P. putida cscRABY vs axenic S.
     elongatus cscB (proteomics)
-  gene_count: 523
+  gene_count: 521
   growth_phases:
   - exponential
   is_time_course: single_time_point
@@ -11125,7 +11125,7 @@ rows:
   organism_name: Synechococcus elongatus PCC 7942
   publication_doi: 10.1038/s42003-024-06098-5
   significant_down_count: 81
-  significant_up_count: 69
+  significant_up_count: 68
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -11140,9 +11140,9 @@ rows:
   time_point_significant_down:
   - '81'
   time_point_significant_up:
-  - '69'
+  - '68'
   time_point_totals:
-  - '523'
+  - '521'
   treatment_type:
   - coculture
 - authors:
@@ -11268,10 +11268,10 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 167
+  distinct_gene_count: 163
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: darkness +100 nM glucose vs darkness (control)'
-  gene_count: 167
+  gene_count: 163
   growth_phases:
   - darkness
   is_time_course: single_time_point
@@ -11282,7 +11282,7 @@ rows:
   organism_name: Synechococcus sp. BL107
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 3
-  significant_up_count: 5
+  significant_up_count: 4
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -11297,9 +11297,9 @@ rows:
   time_point_significant_down:
   - '3'
   time_point_significant_up:
-  - '5'
+  - '4'
   time_point_totals:
-  - '167'
+  - '163'
   treatment_type:
   - carbon
 - authors:
@@ -11316,10 +11316,10 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 167
+  distinct_gene_count: 163
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: darkness +5 mM glucose vs darkness (control)'
-  gene_count: 167
+  gene_count: 163
   growth_phases:
   - darkness
   is_time_course: single_time_point
@@ -11329,8 +11329,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Synechococcus sp. BL107
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 1
-  significant_up_count: 30
+  significant_down_count: 0
+  significant_up_count: 29
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -11343,11 +11343,11 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '1'
+  - '0'
   time_point_significant_up:
-  - '30'
+  - '29'
   time_point_totals:
-  - '167'
+  - '163'
   treatment_type:
   - carbon
 - authors:
@@ -11364,10 +11364,10 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 167
+  distinct_gene_count: 163
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: light +100 nM glucose vs light (control)'
-  gene_count: 167
+  gene_count: 163
   growth_phases:
   - stationary
   is_time_course: single_time_point
@@ -11395,7 +11395,7 @@ rows:
   time_point_significant_up:
   - '6'
   time_point_totals:
-  - '167'
+  - '163'
   treatment_type:
   - carbon
 - authors:
@@ -11412,10 +11412,10 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 166
+  distinct_gene_count: 162
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: light +5 mM glucose vs light (control)'
-  gene_count: 166
+  gene_count: 162
   growth_phases:
   - stationary
   is_time_course: single_time_point
@@ -11426,7 +11426,7 @@ rows:
   organism_name: Synechococcus sp. BL107
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 1
-  significant_up_count: 27
+  significant_up_count: 26
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -11441,9 +11441,9 @@ rows:
   time_point_significant_down:
   - '1'
   time_point_significant_up:
-  - '27'
+  - '26'
   time_point_totals:
-  - '166'
+  - '162'
   treatment_type:
   - carbon
 - authors:

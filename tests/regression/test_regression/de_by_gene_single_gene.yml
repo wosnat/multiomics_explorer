@@ -98,7 +98,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 1.1294
   padj: 0.0
-  rank: 545
+  rank: 544
   rank_down: null
   rank_up: 313
   timepoint: 16h
@@ -128,9 +128,9 @@ rows:
   locus_tag: PMM0001
   log2fc: 1.0312
   padj: 0.0
-  rank: 563
+  rank: 562
   rank_down: null
-  rank_up: 297
+  rank_up: 296
   timepoint: 4h
   timepoint_hours: 4.0
   timepoint_order: 2
@@ -203,7 +203,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.8456
   padj: 0.0002
-  rank: 606
+  rank: 605
   rank_down: null
   rank_up: null
   timepoint: 2h
@@ -518,7 +518,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.0821
   padj: 1.0
-  rank: 1617
+  rank: 1624
   rank_down: null
   rank_up: null
   timepoint: acclimated

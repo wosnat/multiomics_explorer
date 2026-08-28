@@ -19,7 +19,7 @@ rows:
   organism_name: Alteromonas macleodii AD45
   publication_doi: 10.1093/femsml/uqac025
   rankable: true
-  total_gene_count: 15
+  total_gene_count: 14
   treatment_type:
   - compartment
   unit: log2 ratio
@@ -42,7 +42,7 @@ rows:
   organism_name: Alteromonas macleodii AD45
   publication_doi: 10.1093/femsml/uqac025
   rankable: true
-  total_gene_count: 59
+  total_gene_count: 58
   treatment_type:
   - compartment
   unit: percent of summed PSM intensity in whole-cell fraction
@@ -65,7 +65,7 @@ rows:
   organism_name: Alteromonas macleodii AD45
   publication_doi: 10.1093/femsml/uqac025
   rankable: true
-  total_gene_count: 29
+  total_gene_count: 28
   treatment_type:
   - compartment
   unit: percent of summed PSM intensity in vesicle fraction
@@ -157,7 +157,7 @@ rows:
   organism_name: Alteromonas macleodii BGP6
   publication_doi: 10.1093/femsml/uqac025
   rankable: true
-  total_gene_count: 30
+  total_gene_count: 29
   treatment_type:
   - compartment
   unit: log2 ratio
@@ -180,7 +180,7 @@ rows:
   organism_name: Alteromonas macleodii BGP6
   publication_doi: 10.1093/femsml/uqac025
   rankable: true
-  total_gene_count: 61
+  total_gene_count: 60
   treatment_type:
   - compartment
   unit: percent of summed PSM intensity in whole-cell fraction
@@ -203,7 +203,7 @@ rows:
   organism_name: Alteromonas macleodii BGP6
   publication_doi: 10.1093/femsml/uqac025
   rankable: true
-  total_gene_count: 45
+  total_gene_count: 44
   treatment_type:
   - compartment
   unit: percent of summed PSM intensity in vesicle fraction
@@ -318,7 +318,7 @@ rows:
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1093/femsml/uqac025
   rankable: true
-  total_gene_count: 53
+  total_gene_count: 52
   treatment_type:
   - compartment
   unit: percent of summed PSM intensity in whole-cell fraction
@@ -364,7 +364,7 @@ rows:
   organism_name: Alteromonas macleodii MIT1002
   publication_doi: 10.1093/femsml/uqac025
   rankable: true
-  total_gene_count: 31
+  total_gene_count: 30
   treatment_type:
   - compartment
   unit: log2 ratio
@@ -387,7 +387,7 @@ rows:
   organism_name: Alteromonas macleodii MIT1002
   publication_doi: 10.1093/femsml/uqac025
   rankable: true
-  total_gene_count: 71
+  total_gene_count: 70
   treatment_type:
   - compartment
   unit: percent of summed PSM intensity in whole-cell fraction
@@ -410,7 +410,7 @@ rows:
   organism_name: Alteromonas macleodii MIT1002
   publication_doi: 10.1093/femsml/uqac025
   rankable: true
-  total_gene_count: 52
+  total_gene_count: 51
   treatment_type:
   - compartment
   unit: percent of summed PSM intensity in vesicle fraction
@@ -714,7 +714,7 @@ rows:
   organism_name: Prochlorococcus MIT9312
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 1014
+  total_gene_count: 1000
   treatment_type:
   - compartment
   unit: spectral counts / cell biovolume
@@ -736,7 +736,7 @@ rows:
   organism_name: Prochlorococcus MIT9312
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 221
+  total_gene_count: 217
   treatment_type:
   - compartment
   unit: spectral counts / vesicle biovolume
@@ -759,7 +759,7 @@ rows:
   organism_name: Prochlorococcus MIT9312
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 204
+  total_gene_count: 200
   treatment_type:
   - compartment
   unit: log2 ratio
@@ -781,7 +781,7 @@ rows:
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 1044
+  total_gene_count: 1048
   treatment_type:
   - compartment
   unit: spectral counts / cell biovolume
@@ -803,7 +803,7 @@ rows:
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 353
+  total_gene_count: 354
   treatment_type:
   - compartment
   unit: spectral counts / vesicle biovolume
@@ -826,7 +826,7 @@ rows:
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 312
+  total_gene_count: 313
   treatment_type:
   - compartment
   unit: log2 ratio

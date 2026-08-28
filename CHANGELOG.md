@@ -178,9 +178,10 @@ coordinated to `0.1.0a5` ahead of the KG release.
 - `genes_by_boolean_metric` docs corrected: `flag=False` returns
   tested-absent rows on the 11 of 27 boolean DMs that store `not_flagged`
   edges (Biller 2022, Voigt 2014, Hennon 2015, Steglich 2010); only the
-  rest are positive-only. Read the filtered-slice `by_metric[*].false_count`
-  — the precomputed `dm_false_count` reads 0 on current KG builds (KG ask
-  R6). The earlier "returns 0 rows on every DM" statement was wrong.
+  rest are positive-only. Read `by_metric[*].false_count` (filtered slice)
+  or `dm_false_count` (full DM; the KG precompute was 0 until the
+  2026-08-28 rebuild — KG ask R6, fixed). The earlier "returns 0 rows on
+  every DM" statement was wrong.
 - `list_filter_values(filter_type='cluster_type')` carries the vocabulary
   description once, on the new envelope `description` key; per-row
   `description` is absent (trust filter types keep the per-row text and
