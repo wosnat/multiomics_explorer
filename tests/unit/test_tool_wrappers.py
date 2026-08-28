@@ -10121,6 +10121,20 @@ class TestOntologyTermDetailsWrapper:
         assert row.genes_by_organism[0].organism == "Prochlorococcus MED4"
         assert row.links_out[0].props["curated_tcids"] == ["3.A.1.1.1"]
 
+    def test_compact_link_rows_omit_props_key_on_the_wire(self, tool_fns):
+        """Compact `links_out[]` rows carry no `props` key at all (sparse) —
+        the wrapper must not re-add `props: null`."""
+        row_model = _response_model(tool_fns, "ontology_term_details").model_fields[
+            "results"].annotation.__args__[0]
+        link_model = row_model.model_fields["links_out"].annotation.__args__[0]
+        compact = link_model(rel="Tcdb_family_has_pfam_domain", link_kind="composition",
+                             target_id="pfam:PF00005", target_ontology="pfam")
+        assert "props" not in compact.model_dump()
+        verbose = link_model(rel="Tcdb_family_has_pfam_domain", link_kind="composition",
+                             target_id="pfam:PF00005", target_ontology="pfam",
+                             props={"curated_tcids": ["3.A.1.1.1"]})
+        assert verbose.model_dump()["props"] == {"curated_tcids": ["3.A.1.1.1"]}
+
     @pytest.mark.asyncio
     async def test_all_not_found_is_an_empty_envelope(self, tool_fns, mock_ctx):
         empty = {**_OTD_API_RETURN, "total_matching": 0, "returned": 0,

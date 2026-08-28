@@ -2764,7 +2764,7 @@ def register_tools(mcp: FastMCP):
         level: int | None = Field(default=None,
             description="Hierarchy level of this term (0 = broadest)")
 
-    class OntologyTermLink(BaseModel):
+    class OntologyTermLink(SparseRow):
         rel: str = Field(description="Bridge edge type (e.g. 'Tcdb_family_has_pfam_domain')")
         link_kind: Literal["composition", "membership", "router"] = Field(
             description="'composition' (source term is built from target), "
@@ -2774,8 +2774,9 @@ def register_tools(mcp: FastMCP):
         target_ontology: str = Field(description="Target ontology key (e.g. 'pfam')")
         target_name: str | None = Field(default=None, description="Target term name")
         props: dict | None = Field(default=None,
-            description="Edge properties (verbose only): curated_tcids, member_id_count, "
-                        "router_ambiguous (InterPro router links).")
+            description="Edge properties (verbose only; key absent in compact rows): "
+                        "curated_tcids, member_id_count, router_ambiguous (InterPro "
+                        "router links).")
 
     class OntologyTermGenesByOrganism(BaseModel):
         organism: str = Field(description="Organism preferred_name")
