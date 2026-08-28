@@ -2666,7 +2666,7 @@ def build_list_organisms_capability(
     RETURN keys: organism_name, reaction_count, catalyzed_metabolite_count,
     transported_metabolite_count, measured_metabolite_count,
     peptidase_gene_count, nonpeptidase_homolog_gene_count, interpro_gene_count,
-    ncbifam_gene_count (slice 4 — feeds top_annotation_capability api-side).
+    ncbifam_gene_count (feeds top_annotation_capability api-side).
     """
     conditions = [
         "($organism_names_lc IS NULL"

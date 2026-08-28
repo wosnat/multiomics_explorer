@@ -10,7 +10,7 @@ Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, 
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| organism_names | list[string] \| None | None | Filter by exact organism preferred_name (case-insensitive). Pass values from a prior list_organisms call or another tool's organism_name field. Unknown names are reported in not_found rather than raising. |
+| organism_names | list[string] \| None | None | Filter by organism: case-insensitive word match on preferred_name and name_synonyms, like every other tool's organism param ('MED4', 'Prochlorococcus MED4', 'Meiothermus taiwanensis'); a genus word like 'Alteromonas' matches every strain. Unknown names are reported in not_found rather than raising. |
 | compartment | string \| None | None | Filter to organisms with at least one experiment in this wet-lab compartment (e.g. 'vesicle', 'whole_cell'). Use list_filter_values(filter_type='compartment') to enumerate valid values. |
 | summary | bool | False | Return summary fields only (results=[]). |
 | verbose | bool | False | Include full taxonomy hierarchy (family, order, class, phylum, kingdom, superkingdom, lineage). |

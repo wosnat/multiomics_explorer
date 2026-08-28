@@ -120,6 +120,14 @@ coordinated to `0.1.0a5` ahead of the KG release.
 
 ### Changed
 
+- `list_organisms(organism_names=)` now resolves through the shared organism
+  resolver (case-insensitive word match on `preferred_name` + `name_synonyms`,
+  gene-bearing taxa) — `'MED4'` works here like in every other tool. An exact
+  `preferred_name` still matches gene-less treatment taxa. Was: exact
+  `preferred_name` only.
+- Unit lint: user-facing text (tool docstrings, field descriptions, about
+  yaml, skill docs) may not contain internal build shorthand (`PR 3b`,
+  `slice 4`) — `tests/unit/test_no_internal_shorthand_in_docs.py`.
 - `search_ontology.by_level` is emitted only for a single-ontology browse
   (`[]` when `ontology` spans several) — level scales differ per ontology,
   so summing them was meaningless.

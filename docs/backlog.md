@@ -22,7 +22,6 @@ Sizes: **S** ≤ half a day, no spec · **M** a day, one-page spec (Mode B) · *
 | 2.2 | `search_ontology.organism_gene_count` / `min_gene_count` are DIRECT-edge (spec 3 §7.4) while `ontology_term_details.organism_gene_count` walks the subtree. Align to subtree; moves the pinned per-organism InterPro numbers (IPR027417 MED4 119). Needs one spec line. | M | 3b review #2; spec 3 §15 |
 | 2.3 | `list_filter_values` description parity: `cluster_type` rows are sparse with the vocab text once on the envelope; trust types (`evidence`, `sources`, …) still repeat it per row. Make all vocab-backed types envelope-once. Depends on KG B1 (per-value descriptions) for the rows to carry anything useful. | S | polish item 6 |
 | 2.4 | Generated `docs://ontologies/{key}` pages embed live `ControlledVocabulary` values when a KG is reachable at build time, else a `list_filter_values` pointer — build output depends on the environment. Decide: always pointer, or a cached snapshot in `config/schema_baseline.yaml`. | S | 3b review #11 |
-| 2.7 | Lint pattern for internal shorthand leaking into docstrings: `(?:PR|slice)\s?\d[ab]?\b`. Only code comments use it today. | S | 3b review recommendation |
 | 2.8 | `organism=` word-match backlog: genus node `Alteromonas` matches all strains; `AltDE` matches `AltDE1`. Resolver gates on `gene_count > 0` so treatment taxa are safe (KG B4 removes the last name collision). | M | slice-2 ledger |
 | 2.9 | Literal KG counts still pinned in some `-m kg` tests (browse S33 417, `go:0006979` 875, DM counts, nitrite sums) — each paper batch flips them. Consider `Schema_info`-relative or tolerance assertions for the ones that are not release guards. | S | slice-4 RED |
 
@@ -45,7 +44,6 @@ pathway rollups; `mcp_min_version` mismatch (live reads `0.1.0a1`, verdict `ok`)
 | # | Item | Size | Notes |
 |---|---|---|---|
 | 3.2 | Bare metabolite IDs (`C00064`) → prefixed canonical form via `m.kegg_compound_id` in compound-anchored tools; extend to CHEBI / HMDB / MNXM. Partially present (`kegg_compound_id` used in 2 sites) — verify scope. | M | KG-MET-014 |
-| 3.3 | Organism-name resolution policy: chemistry tools accept `'MED4'`, `list_organisms(organism_names=)` requires the full `preferred_name`. Standardise (slice 4 made `search_ontology` / `ontology_term_details` use the shared resolver — `list_organisms` is the last exact-match holdout). | S | KG-MET-015 |
 | 3.4 | `gene_overview`: `tcdb_family_count` / `cazy_family_count` routing signals (parallel to chemistry counts). `transporter_count` was removed in slice 2 for counting superseded ancestors — any replacement must count `attachment_depth = 'most_specific'` only. | S | TCDB/CAZy follow-up |
 | 3.5 | `kg_schema` property-description enrichment + analysis-doc `field_description` callout. | M | metabolites roadmap Track B |
 | 3.6 | Static MCP resources: resource templates don't list; `docs://` is registered per file now (guide/analysis/tools/ontologies/examples) — verify nothing is still template-only, then close. | S | project_static_resources |

@@ -1798,9 +1798,11 @@ def register_tools(mcp: FastMCP):
         ctx: Context,
         organism_names: Annotated[list[str] | None, Field(
             description=(
-                "Filter by exact organism preferred_name (case-insensitive). "
-                "Pass values from a prior list_organisms call or another "
-                "tool's organism_name field. Unknown names are reported in "
+                "Filter by organism: case-insensitive word match on "
+                "preferred_name and name_synonyms, like every other tool's "
+                "organism param ('MED4', 'Prochlorococcus MED4', "
+                "'Meiothermus taiwanensis'); a genus word like 'Alteromonas' "
+                "matches every strain. Unknown names are reported in "
                 "not_found rather than raising."
             ),
         )] = None,

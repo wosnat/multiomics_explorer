@@ -1590,8 +1590,11 @@ def list_organisms(
 ) -> dict:
     """List organisms in the knowledge graph, optionally filtered by name or compartment.
 
-    organism_names: when provided, restricts to organisms whose preferred_name
-        matches (case-insensitive). Unknown names returned in `not_found`.
+    organism_names: when provided, each name goes through the shared organism
+        resolver (case-insensitive word match on `preferred_name` and
+        `name_synonyms`, so 'MED4' works as everywhere else); an exact
+        `preferred_name` also matches gene-less treatment taxa. Names that
+        resolve to nothing are returned in `not_found`.
     compartment: when provided, restricts to organisms with at least one
         experiment in that wet-lab compartment ('whole_cell', 'vesicle',
         'exoproteome', 'spent_medium', 'lysate').
@@ -1637,7 +1640,24 @@ def list_organisms(
     if summary:
         limit = 0
 
-    names_lc = [n.lower() for n in organism_names] if organism_names else None
+    # Resolve each input through the shared organism resolver (word match on
+    # preferred_name + name_synonyms, gene_count > 0) so 'MED4' works here
+    # like everywhere else; exact preferred_name stays a fallback so gene-less
+    # treatment taxa remain addressable (backlog 3.3).
+    names_lc: list[str] | None = None
+    unresolved: list[str] = []
+    if organism_names:
+        resolved: set[str] = set()
+        for name in organism_names:
+            cypher, params = build_resolve_organism_for_organism(organism=name)
+            rows = conn.execute_query(cypher, **params)
+            hits = rows[0]["organisms"] if rows else []
+            if hits:
+                resolved.update(h.lower() for h in hits)
+            else:
+                unresolved.append(name)
+            resolved.add(name.lower())
+        names_lc = sorted(resolved)
 
     # Always run summary first — provides total_entries, total_matching,
     # and the 3 new rollup envelope keys.
@@ -1733,15 +1753,16 @@ def list_organisms(
 
     # not_found: input names that didn't match any OrganismTaxon
     # (case-insensitive). Original casing preserved in the returned list.
-    if organism_names:
+    if unresolved:
         not_found_cypher = (
             "MATCH (o:OrganismTaxon) "
             "WHERE toLower(o.preferred_name) IN $names_lc "
             "RETURN collect(toLower(o.preferred_name)) AS found"
         )
-        nf_rows = conn.execute_query(not_found_cypher, names_lc=names_lc)
+        nf_rows = conn.execute_query(
+            not_found_cypher, names_lc=[n.lower() for n in unresolved])
         found = set(nf_rows[0]["found"]) if nf_rows else set()
-        not_found = [n for n in organism_names if n.lower() not in found]
+        not_found = [n for n in unresolved if n.lower() not in found]
     else:
         not_found = []
 

@@ -1021,24 +1021,26 @@ class TestListOrganisms:
         """api lowercases input list before forwarding to both builders."""
         filtered_summary = {**self._SUMMARY_ROW, "total_entries": 32, "total_matching": 1}
         mock_conn.execute_query.side_effect = [
+            [{"organisms": ["Prochlorococcus MED4"]}],    # resolver
             [filtered_summary],                          # summary
             self._ROWS[:1],                              # detail
-            [{"found": ["prochlorococcus med4"]}],       # not_found lookup
         ]
         api.list_organisms(
             organism_names=["Prochlorococcus MED4"], conn=mock_conn,
         )
-        # Second call is the detail query — params include lowercased list.
-        detail_call_kwargs = mock_conn.execute_query.call_args_list[1][1]
+        # Third call is the detail query — params include lowercased list.
+        detail_call_kwargs = mock_conn.execute_query.call_args_list[2][1]
         assert detail_call_kwargs["organism_names_lc"] == ["prochlorococcus med4"]
 
     def test_filter_with_unknown_populates_not_found(self, mock_conn):
         """Unknown names appear in not_found, original casing preserved."""
         filtered_summary = {**self._SUMMARY_ROW, "total_entries": 32, "total_matching": 1}
         mock_conn.execute_query.side_effect = [
+            [{"organisms": ["Prochlorococcus MED4"]}],    # resolver
+            [{"organisms": []}],                         # resolver miss
             [filtered_summary],                          # summary
             self._ROWS[:1],                              # detail
-            [{"found": ["prochlorococcus med4"]}],       # not_found lookup
+            [{"found": []}],                             # exact-name fallback
         ]
         result = api.list_organisms(
             organism_names=["Prochlorococcus MED4", "Bogus Org"],
@@ -1051,12 +1053,10 @@ class TestListOrganisms:
     def test_filter_all_match_empty_not_found(self, mock_conn):
         filtered_summary = {**self._SUMMARY_ROW, "total_entries": 32, "total_matching": 2}
         mock_conn.execute_query.side_effect = [
+            [{"organisms": ["Prochlorococcus MED4"]}],    # resolver
+            [{"organisms": ["Alteromonas macleodii EZ55"]}],
             [filtered_summary],                          # summary
             self._ROWS,                                  # detail
-            [{"found": [
-                "prochlorococcus med4",
-                "alteromonas macleodii ez55",
-            ]}],                                          # not_found lookup
         ]
         result = api.list_organisms(
             organism_names=["Prochlorococcus MED4", "Alteromonas macleodii EZ55"],
@@ -1231,9 +1231,9 @@ class TestListOrganisms:
         """When filter applied, breakdowns reflect only matched rows."""
         filtered_summary = {**self._SUMMARY_ROW, "total_entries": 32, "total_matching": 1}
         mock_conn.execute_query.side_effect = [
+            [{"organisms": ["Prochlorococcus MED4"]}],    # resolver
             [filtered_summary],                          # summary
             self._ROWS[:1],                              # detail (MED4 only)
-            [{"found": ["prochlorococcus med4"]}],
         ]
         result = api.list_organisms(
             organism_names=["Prochlorococcus MED4"], conn=mock_conn,
@@ -14543,6 +14543,13 @@ class TestListOrganismsAnnotationCapability:
                 return [summary_row]
             if "collect(toLower(o.preferred_name)) AS found" in cypher:
                 return [{"found": [r["organism_name"].lower() for r in rows]}]
+            if "collect(DISTINCT o.preferred_name) AS organisms" in cypher:
+                # shared resolver: word match on the wired rows
+                words = params["organism"].lower().split()
+                return [{"organisms": [
+                    r["organism_name"] for r in rows
+                    if all(w in r["organism_name"].lower() for w in words)
+                ]}]
             names_lc = params.get("organism_names_lc")
             if names_lc:
                 return [r for r in rows if r["organism_name"].lower() in names_lc]
