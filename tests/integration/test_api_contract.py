@@ -7,7 +7,6 @@ Marked with @pytest.mark.kg — auto-skips if Neo4j is unavailable.
 import pytest
 
 from multiomics_explorer.api import functions as api
-from tests.fixtures.gene_data import GENES
 
 
 # Use a well-annotated gene for most tests.

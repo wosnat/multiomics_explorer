@@ -15,7 +15,6 @@ from pathlib import Path
 import pytest
 import yaml
 
-from functools import partial
 
 from multiomics_explorer.api import functions as api
 from multiomics_explorer.kg.queries_lib import (
@@ -26,7 +25,6 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_neighbors,
     build_gene_ontology_terms,
     build_gene_overview,
-    build_gene_stub,
     build_genes_by_function,
     build_genes_by_homolog_group,
     build_genes_by_homolog_group_summary,
@@ -34,7 +32,6 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_details,
     build_gene_homologs,
     build_list_derived_metrics,
-    build_list_gene_categories,
     build_list_experiments,
     build_list_experiments_summary,
     build_genes_by_metabolite_metabolism,

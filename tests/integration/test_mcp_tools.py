@@ -5,32 +5,23 @@ without the MCP transport layer. They use the shared `conn` fixture from conftes
 """
 
 import asyncio
-import json
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
 import pytest
 from fastmcp import FastMCP
 
 from multiomics_explorer.mcp_server.tools import register_tools
 from multiomics_explorer.kg.queries_lib import (
-    build_gene_stub,
     build_gene_details,
     build_gene_homologs,
     build_gene_homologs_summary,
-    build_genes_by_homolog_group,
-    build_genes_by_homolog_group_summary,
-    build_list_experiments,
-    build_list_experiments_summary,
     build_list_organisms,
     build_list_publications,
     build_list_publications_summary,
     build_resolve_gene,
     build_genes_by_function,
-    build_search_homolog_groups,
-    build_search_homolog_groups_summary,
 )
 from multiomics_explorer.api import functions as api
-from multiomics_explorer.api.functions import _WRITE_KEYWORDS
 
 
 @pytest.mark.kg
@@ -3896,8 +3887,8 @@ class TestOntologyTermDetailsLive:
         assert len(row["children"]) == 50
         assert row["children_truncated"] is True
         assert len(row["links_out"]) == 129
-        assert {l["target_ontology"] for l in row["links_out"]} >= {"pfam"}
-        assert all(l["link_kind"] == "composition" for l in row["links_out"])
+        assert {lk["target_ontology"] for lk in row["links_out"]} >= {"pfam"}
+        assert all(lk["link_kind"] == "composition" for lk in row["links_out"])
 
     def test_merops_s14(self, conn):
         _, rows = self._rows(conn)
@@ -3916,10 +3907,10 @@ class TestOntologyTermDetailsLive:
         assert row["parents"] == []
         assert row["children_total"] == 4
         assert len(row["links_out"]) == 5
-        assert all(l["link_kind"] == "router" for l in row["links_out"])
-        assert all(l["target_ontology"] == "ec" for l in row["links_out"])
-        assert all(l["props"]["router_ambiguous"] is True
-                   for l in row["links_out"])
+        assert all(lk["link_kind"] == "router" for lk in row["links_out"])
+        assert all(lk["target_ontology"] == "ec" for lk in row["links_out"])
+        assert all(lk["props"]["router_ambiguous"] is True
+                   for lk in row["links_out"])
 
     def test_ncbifam_nf000812(self, conn):
         _, rows = self._rows(conn)

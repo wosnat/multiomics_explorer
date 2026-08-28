@@ -10,7 +10,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
-from neo4j.exceptions import ClientError as Neo4jClientError
 
 from multiomics_explorer.mcp_server.tools import register_tools
 
@@ -253,7 +252,6 @@ class TestListFilterValuesWrapper:
         Instead we introspect the type hint — FastMCP uses it to build the JSON
         schema that enforces the constraint at the MCP protocol boundary.
         """
-        import inspect
         import typing
         fn = tool_fns["list_filter_values"]
         hints = typing.get_type_hints(fn, include_extras=True)
@@ -716,7 +714,7 @@ class TestResolveGeneWrapper:
                 "truncated": True, "offset": 5, "results": [],
             },
         ) as mock_api:
-            result = await tool_fns["resolve_gene"](mock_ctx, identifier="x", offset=5)
+            await tool_fns["resolve_gene"](mock_ctx, identifier="x", offset=5)
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5 or (len(mock_api.call_args.args) > 3 and mock_api.call_args.args[3] == 5)
@@ -869,7 +867,7 @@ class TestGenesByFunctionWrapper:
             "multiomics_explorer.api.functions.genes_by_function",
             return_value={**self._SAMPLE_API_RETURN, "offset": 5},
         ) as mock_api:
-            result = await tool_fns["genes_by_function"](mock_ctx, search_text="dna", offset=5)
+            await tool_fns["genes_by_function"](mock_ctx, search_text="dna", offset=5)
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
@@ -1024,7 +1022,7 @@ class TestGeneOverviewWrapper:
             "multiomics_explorer.api.functions.gene_overview",
             return_value={**self._SAMPLE_API_RETURN, "offset": 5},
         ) as mock_api:
-            result = await tool_fns["gene_overview"](mock_ctx, locus_tags=["PMM1428"], offset=5)
+            await tool_fns["gene_overview"](mock_ctx, locus_tags=["PMM1428"], offset=5)
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
@@ -1069,7 +1067,7 @@ class TestGeneDetailsWrapper:
                 "offset": 5, "not_found": [], "results": [],
             },
         ) as mock_api:
-            result = await tool_fns["gene_details"](mock_ctx, locus_tags=["PMM0001"], offset=5)
+            await tool_fns["gene_details"](mock_ctx, locus_tags=["PMM0001"], offset=5)
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
@@ -1233,7 +1231,7 @@ class TestGeneHomologsWrapper:
             "multiomics_explorer.api.functions.gene_homologs",
             return_value={**self._SAMPLE_API_RETURN, "offset": 5},
         ) as mock_api:
-            result = await tool_fns["gene_homologs"](mock_ctx, locus_tags=["PMM0001"], offset=5)
+            await tool_fns["gene_homologs"](mock_ctx, locus_tags=["PMM0001"], offset=5)
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
@@ -1495,7 +1493,7 @@ class TestSearchOntologyWrapper:
             "multiomics_explorer.api.functions.search_ontology",
             return_value={**self._SAMPLE_API_RETURN, "offset": 5},
         ) as mock_api:
-            result = await tool_fns["search_ontology"](
+            await tool_fns["search_ontology"](
                 mock_ctx, search_text="replication", ontology="go_bp", offset=5,
             )
         mock_api.assert_called_once()
@@ -1927,7 +1925,7 @@ class TestGeneOntologyTermsWrapper:
             "multiomics_explorer.api.functions.gene_ontology_terms",
             return_value={**self._SAMPLE_API_RETURN, "offset": 5},
         ) as mock_api:
-            result = await tool_fns["gene_ontology_terms"](mock_ctx, locus_tags=["PMM0001"], organism="MED4", offset=5)
+            await tool_fns["gene_ontology_terms"](mock_ctx, locus_tags=["PMM0001"], organism="MED4", offset=5)
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
@@ -2202,7 +2200,7 @@ class TestListPublicationsWrapper:
                 "returned": 2, "truncated": True, "offset": 5, "results": [],
             },
         ) as mock_api:
-            result = await tool_fns["list_publications"](mock_ctx, offset=5)
+            await tool_fns["list_publications"](mock_ctx, offset=5)
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
@@ -2638,7 +2636,7 @@ class TestListExperimentsWrapper:
             "multiomics_explorer.api.functions.list_experiments",
             return_value={**self._SAMPLE_SUMMARY, "offset": 5},
         ) as mock_api:
-            result = await tool_fns["list_experiments"](mock_ctx, offset=5)
+            await tool_fns["list_experiments"](mock_ctx, offset=5)
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
@@ -3055,7 +3053,7 @@ class TestDifferentialExpressionByGeneWrapper:
             "multiomics_explorer.api.functions.differential_expression_by_gene",
             return_value={**self._SAMPLE_API_RETURN, "offset": 5},
         ) as mock_api:
-            result = await tool_fns["differential_expression_by_gene"](
+            await tool_fns["differential_expression_by_gene"](
                 mock_ctx, organism="MED4", offset=5,
             )
         mock_api.assert_called_once()
@@ -3193,7 +3191,7 @@ class TestSearchHomologGroupsWrapper:
             "multiomics_explorer.api.functions.search_homolog_groups",
             return_value={**self._SAMPLE_API_RETURN, "offset": 5},
         ) as mock_api:
-            result = await tool_fns["search_homolog_groups"](
+            await tool_fns["search_homolog_groups"](
                 mock_ctx, search_text="photosynthesis", offset=5,
             )
         mock_api.assert_called_once()
@@ -3384,7 +3382,7 @@ class TestGenesByHomologGroupWrapper:
             "multiomics_explorer.api.functions.genes_by_homolog_group",
             return_value={**self._SAMPLE_API_RETURN, "offset": 5},
         ) as mock_api:
-            result = await tool_fns["genes_by_homolog_group"](
+            await tool_fns["genes_by_homolog_group"](
                 mock_ctx, group_ids=["cyanorak:CK_00000570"], offset=5,
             )
         mock_api.assert_called_once()
@@ -3521,7 +3519,7 @@ class TestDifferentialExpressionByOrthologWrapper:
             "multiomics_explorer.api.functions.differential_expression_by_ortholog",
             return_value={**self._SAMPLE_API_RETURN, "offset": 5},
         ) as mock_api:
-            result = await tool_fns["differential_expression_by_ortholog"](
+            await tool_fns["differential_expression_by_ortholog"](
                 mock_ctx, group_ids=["g1"], offset=5,
             )
         mock_api.assert_called_once()
@@ -4072,7 +4070,6 @@ class TestListDerivedMetricsWrapper:
         Instead we introspect the type hint — FastMCP uses it to build the JSON
         schema that enforces the constraint at the MCP protocol boundary.
         """
-        import inspect
         import typing
         fn = tool_fns["list_derived_metrics"]
         hints = typing.get_type_hints(fn, include_extras=True)
@@ -8219,7 +8216,6 @@ class TestDifferentialExpressionByGeneWrapperPhase2:
         assert direction_hint is not None
         # Walk the Annotated wrapper to extract the Literal args.
         # `direction_hint` looks like Annotated[Literal[...] | None, Field(...)].
-        origin = typing.get_origin(direction_hint)
         # Strip Annotated/Union; collect Literal arg sets.
         def _literal_values(tp):
             o = typing.get_origin(tp)
@@ -9849,7 +9845,6 @@ class TestSparseRowWireShape:
     Mirrors the api strip rule (design §3) at the MCP boundary."""
 
     def test_unset_fields_are_omitted_and_explicit_none_is_kept(self):
-        import json
         from pydantic import Field
         from pydantic_core import to_json
         from multiomics_explorer.mcp_server.tools import SparseRow

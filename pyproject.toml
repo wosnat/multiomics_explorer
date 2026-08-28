@@ -76,3 +76,9 @@ exclude = [
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+# Historical scoping / profiling scratch scripts — not package code.
+extend-exclude = ["docs/superpowers/specs/scoping"]
+
+[tool.ruff.lint.per-file-ignores]
+# Test modules are appended in PR waves with section-local imports.
+"tests/**" = ["E402"]

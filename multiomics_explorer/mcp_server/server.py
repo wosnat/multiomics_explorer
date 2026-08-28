@@ -99,9 +99,10 @@ register_tools(mcp)
 
 
 # --- Documentation resources: per-tool and per-analysis guides ---
-from pathlib import Path
+# Order-dependent: resource registration below needs `mcp` already built.
+from pathlib import Path  # noqa: E402
 
-from fastmcp.resources.function_resource import FunctionResource
+from fastmcp.resources.function_resource import FunctionResource  # noqa: E402
 
 _SKILLS_DIR = (
     Path(__file__).resolve().parent.parent

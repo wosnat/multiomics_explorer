@@ -16,7 +16,6 @@ from multiomics_explorer.api import functions as api
 from multiomics_explorer.kg.queries_lib import (
     build_gene_ontology_terms,
     build_gene_overview,
-    build_gene_stub,
     build_gene_details,
     build_gene_homologs,
     build_gene_homologs_summary,
@@ -31,7 +30,6 @@ from tests.fixtures.gene_data import (
     GENES,
     GENES_BY_LOCUS,
     GENES_WITH_GENE_NAME,
-    GENES_WITHOUT_GENE_NAME,
 )
 
 

@@ -127,7 +127,7 @@ def main() -> None:
 
         # Hierarchical subset
         hier_rows = [r for r in all_rows if r["hierarchical"]]
-        print(f"\n--- Hierarchical ontologies (n_levels > 1) ---")
+        print("\n--- Hierarchical ontologies (n_levels > 1) ---")
         for r in hier_rows[:10]:
             print(f"  hier_rank {hier_rows.index(r)+1:>2}.  "
                   f"{r['ont']} L{r['level']}  "

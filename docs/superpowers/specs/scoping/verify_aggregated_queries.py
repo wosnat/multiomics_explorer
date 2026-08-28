@@ -17,9 +17,7 @@ example-term names when verbose=False.
 from __future__ import annotations
 
 import json
-import sys
 import time
-from pathlib import Path
 
 from multiomics_explorer.kg.connection import GraphConnection
 

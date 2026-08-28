@@ -1,6 +1,5 @@
 """P3: Tests for MCP server lifespan, KGContext, and doc resources — no Neo4j needed."""
 
-import asyncio
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 

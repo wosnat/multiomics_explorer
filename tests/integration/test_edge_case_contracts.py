@@ -36,7 +36,8 @@ _CASES = [
     _CASES,
     ids=[f"{t}-{sc.label}" for t, sc in _CASES],
 )
-async def test_tool_edge_case_contract(tool_name, scenario, tool_fns, conn):
+async def test_tool_edge_case_contract(
+        tool_name, scenario, tool_fns, conn):  # noqa: F811 — fixture re-exported from test_mcp_tools
     ctx = _ctx_with_conn(conn)
     fn = tool_fns[tool_name]
 

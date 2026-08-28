@@ -1,6 +1,5 @@
 """P0: Tests for write-blocking in run_cypher."""
 
-import re
 
 import pytest
 

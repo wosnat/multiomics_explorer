@@ -202,7 +202,7 @@ def _build_simple_result():
     gene_stats populated for c1 only (pathway-kind demo).
     """
     from multiomics_explorer import (
-        EnrichmentInputs, EnrichmentResult, fisher_ora, DEStats,
+        EnrichmentInputs, fisher_ora, DEStats,
     )
 
     term2gene = pd.DataFrame([
@@ -401,7 +401,7 @@ class TestNiceAccessors:
 
     def test_why_skipped_returns_reason_for_skipped(self):
         from multiomics_explorer import (
-            EnrichmentInputs, EnrichmentResult, fisher_ora,
+            EnrichmentInputs, fisher_ora,
         )
         t2g = pd.DataFrame([
             {"term_id": "P", "term_name": "P", "locus_tag": "g1"},

@@ -6,7 +6,6 @@ wrapper logic (validation, error messages, LIMIT injection) with minimal mocks.
 """
 
 import asyncio
-import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -19,12 +18,8 @@ from tests.fixtures.gene_data import (
     GENES_BY_LOCUS,
     GENES_HYPOTHETICAL,
     GENES_WITH_EC,
-    GENES_WITH_GENE_NAME,
-    GENES_WITHOUT_GENE_NAME,
     as_search_genes_result,
     as_resolve_gene_result,
-    genes_by_organism,
-    genes_with_property,
 )
 
 

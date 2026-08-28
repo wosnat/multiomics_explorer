@@ -20,19 +20,9 @@ class TestTopLevelImports:
         """from multiomics_explorer import <fn> works for every api function."""
         from multiomics_explorer import (
             gene_homologs,
-            gene_ontology_terms,
-            gene_overview,
-            gene_response_profile,
             genes_by_function,
-            genes_by_ontology,
-            gene_details,
-            kg_schema,
-            list_filter_values,
             list_clustering_analyses,
-            list_organisms,
             resolve_gene,
-            run_cypher,
-            search_ontology,
             gene_clusters_by_gene,
             genes_in_cluster,
         )
@@ -1821,7 +1811,7 @@ class TestGeneOntologyTerms:
             self._exist_found("PMM0001"),
         ] + [[] for _ in range(n)] + [[] for _ in range(n)]
 
-        result = api.gene_ontology_terms(["PMM0001"], organism="MED4", conn=mock_conn)
+        api.gene_ontology_terms(["PMM0001"], organism="MED4", conn=mock_conn)
         # 1 existence + n summary + n detail = 1 + 2n
         assert mock_conn.execute_query.call_count == 1 + 2 * n
 
@@ -2109,7 +2099,7 @@ class TestListPublications:
             [{"total_entries": 21, "total_matching": 5}],
             [{"doi": "10.1234/test"}],
         ]
-        result = api.list_publications(
+        api.list_publications(
             organism="MED4", treatment_type="coculture",
             search_text="nitrogen", author="Sher",
             verbose=True, limit=10, conn=mock_conn,
@@ -5397,7 +5387,7 @@ class TestGeneOntologyTermsChunking:
 # ontology_landscape
 # ---------------------------------------------------------------------------
 
-from multiomics_explorer.kg.constants import ALL_ONTOLOGIES, GO_ONTOLOGIES
+from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
 from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
 
 
@@ -13464,8 +13454,8 @@ class TestOntologyTermDetailsApi:
 
     def test_link_kind_and_target_ontology_derived_from_registry(self, mock_conn):
         rows = {r["term_id"]: r for r in _otd_run(mock_conn)["results"]}
-        tcdb_links = {(l["rel"], l["link_kind"], l["target_ontology"])
-                      for l in rows["tcdb:3.A.1"]["links_out"]}
+        tcdb_links = {(lk["rel"], lk["link_kind"], lk["target_ontology"])
+                      for lk in rows["tcdb:3.A.1"]["links_out"]}
         assert ("Tcdb_family_has_pfam_domain", "composition", "pfam") in tcdb_links
         assert ("Tcdb_family_involved_in_biological_process", "composition",
                 "go_bp") in tcdb_links

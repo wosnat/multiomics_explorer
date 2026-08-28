@@ -1,15 +1,11 @@
 """P1: Tests for schema diffing, baseline round-trip, and prompt formatting."""
 
-import tempfile
-from pathlib import Path
 
-import pytest
 
 from multiomics_explorer.kg.schema import (
     GraphSchema,
     NodeSchema,
     RelationshipSchema,
-    SchemaDiff,
     diff_schemas,
     load_baseline,
     save_baseline,

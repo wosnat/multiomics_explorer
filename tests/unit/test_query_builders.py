@@ -5122,7 +5122,7 @@ class TestGrowthPhases:
 
     def test_list_clustering_analyses_growth_phases_filter_cypher(self):
         """growth_phases filter uses ANY on coalesce(ca.growth_phases, []) with lowercased list."""
-        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses, _clustering_analysis_where
+        from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
         conditions, params = _clustering_analysis_where(growth_phases=["Diel", "Exponential"])
         assert any("growth_phases" in c for c in conditions)
         assert params["growth_phases"] == ["diel", "exponential"]

@@ -6,7 +6,6 @@ group_map re-aggregation, and metadata columns.
 
 from unittest.mock import patch
 
-import pytest
 
 from multiomics_explorer.analysis import response_matrix, gene_set_compare
 

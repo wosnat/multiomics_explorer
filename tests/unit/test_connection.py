@@ -1,8 +1,7 @@
 """P3: Tests for GraphConnection error handling and lifecycle — no Neo4j needed."""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-import pytest
 
 from multiomics_explorer.config.settings import Settings
 from multiomics_explorer.kg.connection import GraphConnection

@@ -10,8 +10,10 @@ See docs://analysis/enrichment for methodology.
 """
 from __future__ import annotations
 
+import math as _math
 import statistics
-from typing import Literal
+from dataclasses import dataclass, field
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -451,9 +453,6 @@ def _fisher_ora_impl(gene_sets, background, term2gene, min_gene_set_size, max_ge
     ).reset_index(drop=True)
 
 
-import math as _math
-
-
 def signed_enrichment_score(
     df: pd.DataFrame,
     direction_col: str = "direction",
@@ -516,9 +515,6 @@ def signed_enrichment_score(
         lambda p: -_math.log10(p) if p > 0 else float("inf")
     )
     return winners.reset_index(drop=True)
-
-
-from typing import Any
 
 _METADATA_FIELDS = (
     "experiment_id", "experiment_name",
@@ -686,8 +682,8 @@ def de_enrichment_inputs(
             background[cluster] = list(bg_list)
             gene_sets.setdefault(cluster, [])
             md: dict = {}
-            for field in _METADATA_FIELDS:
-                md[field] = sample_row.get(field)
+            for md_field in _METADATA_FIELDS:
+                md[md_field] = sample_row.get(md_field)
             md["direction"] = d
             md["name"] = sample_row.get("experiment_name") or sample_row.get("name")
             md["timepoint"] = tp
@@ -914,9 +910,6 @@ def cluster_enrichment_inputs(
         clusters_skipped=clusters_skipped,
         analysis_metadata=analysis_md,
     )
-
-
-from dataclasses import dataclass, field
 
 
 def _gene_ref_from_row(

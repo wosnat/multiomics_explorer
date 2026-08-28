@@ -239,10 +239,10 @@ def phase_2_changelog_cut(args, ctx: dict) -> None:
     if not args.resume:
         print()
         print("=" * 60)
-        print(f"PAUSE: CHANGELOG cut done.")
+        print("PAUSE: CHANGELOG cut done.")
         print("=" * 60)
         print(f"Review and polish {CHANGELOG.relative_to(REPO_ROOT)} as needed,")
-        print(f"then re-run with --resume to continue.")
+        print("then re-run with --resume to continue.")
         sys.exit(0)
 
 
@@ -313,7 +313,7 @@ def phase_4_build_verify(args, ctx: dict) -> None:
         log("would run: uv build", "dry")
         ctx["wheel"] = f"multiomics_explorer-{ctx['pep440_version']}-py3-none-any.whl"
         ctx["sdist"] = f"multiomics_explorer-{ctx['pep440_version']}.tar.gz"
-        log(f"would verify wheel + sdist + venv install", "dry")
+        log("would verify wheel + sdist + venv install", "dry")
         return
 
     run(["uv", "build"], cwd=REPO_ROOT)
@@ -479,7 +479,7 @@ def phase_5_publish(args, ctx: dict) -> None:
     print(f"  Install:  uv add git+https://github.com/wosnat/multiomics_explorer.git@{ctx['tag']}")
     print()
     print("  Cross-repo coordination reminder:")
-    print(f"    The KG declares a min-compatible explorer via Schema_info.mcp_min_version.")
+    print("    The KG declares a min-compatible explorer via Schema_info.mcp_min_version.")
     print(f"    Confirm the paired KG release accepts {ctx['version']} (KG plan §2.3).")
 
 

@@ -249,7 +249,6 @@ class TestFisherOra:
         assert math.isclose(p_row["fold_enrichment"], (2 / 2) / (3 / 20), rel_tol=1e-9)
 
 
-import numpy as np
 
 
 class TestSignedEnrichmentScore:
@@ -299,7 +298,6 @@ class TestSignedEnrichmentScore:
         assert set(out["cluster_stem"]) == {"exp1|T0", "exp2|T0"}
 
 
-from unittest.mock import MagicMock
 
 
 class TestDeEnrichmentInputs:

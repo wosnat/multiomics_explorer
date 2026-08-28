@@ -1,7 +1,6 @@
 """MCP tool implementations for the Multiomics Knowledge Graph."""
 
 import logging
-import re
 from typing import Annotated, Literal
 
 from fastmcp import Context, FastMCP
@@ -26,9 +25,11 @@ class SparseRow(BaseModel):
         keep = self.model_fields_set
         return {k: v for k, v in data.items() if k in keep}
 
-import multiomics_explorer.api.functions as api
-from multiomics_explorer.kg.connection import GraphConnection
-from multiomics_explorer.kg.constants import VALID_CLUSTER_TYPES, VALID_OMICS_TYPES
+# SparseRow is defined above the package imports on purpose (base class for
+# every row model below; keeps the wire-format rule next to the models).
+import multiomics_explorer.api.functions as api  # noqa: E402
+from multiomics_explorer.kg.connection import GraphConnection  # noqa: E402
+from multiomics_explorer.kg.constants import VALID_CLUSTER_TYPES, VALID_OMICS_TYPES  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
