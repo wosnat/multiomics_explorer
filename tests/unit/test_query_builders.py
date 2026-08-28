@@ -12102,6 +12102,13 @@ class TestBuildOntologyTermDetails:
         cypher, _ = _otd3b()
         assert f"t.{prop}" in cypher or "t{.*}" in cypher
 
+    def test_router_ambiguous_not_projected_by_builder(self):
+        """`router_ambiguous` is derived api-side (out-degree + interpro_type);
+        the builder never projects it (polish-alpha5: dead column removed)."""
+        for kwargs in ({}, {"verbose": True}, {"link_kinds": ["router"]}):
+            cypher, _ = _otd3b(**kwargs)
+            assert "router_ambiguous" not in cypher
+
     # --- link_kinds filter (applies on the bridge block) ---
 
     def test_link_kinds_none_keeps_every_bridge(self):

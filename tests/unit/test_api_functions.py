@@ -13548,6 +13548,22 @@ class TestOntologyTermDetailsApi:
         assert result["results"][0]["links_out"][0]["props"][
             "router_ambiguous"] is True
 
+    def test_router_ambiguous_computed_api_side_ignores_builder_column(
+            self, mock_conn):
+        """The api derives `router_ambiguous` from router out-degree +
+        `interpro_type`; a stray builder column must never leak through."""
+        rows = [_otd_row(
+            "interpro:IPR999997", "InterproEntry", name="x", level=0,
+            links=[_otd_link("Interpro_entry_related_to_ec_number",
+                             "ec:1.1.1.1")],
+            extra={"interpro_id": "IPR999997", "interpro_type": "FAMILY"})]
+        rows[0]["router_ambiguous"] = True  # contradicts the api computation
+        result = _otd_run(mock_conn, rows=rows,
+                          term_ids=["interpro:IPR999997"], verbose=True)
+        row = result["results"][0]
+        assert row["links_out"][0]["props"]["router_ambiguous"] is False
+        assert "router_ambiguous" not in row
+
     def test_router_ambiguous_not_on_composition_links(self, mock_conn):
         rows = {r["term_id"]: r
                 for r in _otd_run(mock_conn, verbose=True)["results"]}

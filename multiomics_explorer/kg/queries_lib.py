@@ -3837,8 +3837,8 @@ def build_ontology_term_details(
     `pfam`), and `links_out[].rel` so it derives `link_kind` /
     `target_ontology` via `BRIDGES_OUT`.
 
-    `router_ambiguous` (InterPro rows, router links): router out-degree > 1
-    OR `t.interpro_type <> 'FAMILY'`; null on every other row.
+    `router_ambiguous` is NOT projected — the api layer derives it per
+    router link from the row's router out-degree and `interpro_type`.
 
     `organism` scopes the gene walk to `$organism` and adds
     `organism_gene_count`. Verbose adds `t{.*} AS properties` and
@@ -3848,7 +3848,7 @@ def build_ontology_term_details(
     RETURN keys: term_id, not_found, labels, name, description, level,
     level_kind, is_informative, gene_count, organism_count,
     direct_gene_count, <term_details_compact union>, parents,
-    children_total, children, links_total, links_out, router_ambiguous;
+    children_total, children, links_total, links_out;
     + organism_gene_count (organism); + properties, genes_by_organism
     (verbose).
     """
@@ -3864,7 +3864,6 @@ def build_ontology_term_details(
     selected_kinds = set(link_kinds) if link_kinds is not None else set(LINK_KINDS)
     bridges = [b for b in BRIDGES_OUT if b[3] in selected_kinds]
     bridge_rels = "|".join(rel for rel, _o, _t, _k in bridges)
-    router_rels = [rel for rel, _o, _t, kind in bridges if kind == "router"]
 
     params: dict = {"term_ids": list(term_ids)}
     label_guard = _ONTOLOGY_LABEL_GUARD
@@ -3889,23 +3888,6 @@ def build_ontology_term_details(
             "WITH tid, t, parents, children_total, children,\n"
             "     0 AS links_total, [] AS links_out\n"
         )
-
-    # --- router_ambiguous: only ontologies that own router bridges ---
-    router_owner_labels = sorted({
-        ONTOLOGY_CONFIG[owner]["label"]
-        for _rel, owner, _t, kind in bridges if kind == "router"
-    })
-    if router_rels:
-        router_list = ", ".join(f"'{r}'" for r in router_rels)
-        router_guard = " OR ".join(f"t:{L}" for L in router_owner_labels)
-        router_col = (
-            ",\n       CASE WHEN t IS NULL OR NOT (" + router_guard + ") THEN null\n"
-            "            ELSE size([l IN links_out WHERE l.rel IN [" + router_list + "]]) > 1\n"
-            "                 OR coalesce(t.interpro_type, '') <> 'FAMILY'\n"
-            "       END AS router_ambiguous"
-        )
-    else:
-        router_col = ",\n       null AS router_ambiguous"
 
     # --- gene walk: organism scope and/or verbose genes_by_organism ---
     gene_block = ""
@@ -3969,7 +3951,6 @@ def build_ontology_term_details(
         "       t.direct_gene_count AS direct_gene_count"
         + compact_cols
         + ",\n       parents, children_total, children, links_total, links_out"
-        + router_col
         + gene_cols
         + verbose_cols
         + "\nORDER BY apoc.coll.indexOf($term_ids, tid)"
