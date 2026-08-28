@@ -120,6 +120,10 @@ coordinated to `0.1.0a5` ahead of the KG release.
 
 ### Changed
 
+- `docs://ontologies/{key}` pages no longer embed a build-time snapshot of
+  `ControlledVocabulary` values (the build output depended on whether a KG
+  was reachable); they point at `list_filter_values(..., ontology=key)`,
+  which reads live. `scripts/build_about_content.py --live-vocab` opts back in.
 - `list_organisms(organism_names=)` now resolves through the shared organism
   resolver (case-insensitive word match on `preferred_name` + `name_synonyms`,
   gene-bearing taxa) — `'MED4'` works here like in every other tool. An exact

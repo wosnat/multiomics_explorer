@@ -21,7 +21,6 @@ Sizes: **S** ≤ half a day, no spec · **M** a day, one-page spec (Mode B) · *
 |---|---|---|---|
 | 2.2 | `search_ontology.organism_gene_count` / `min_gene_count` are DIRECT-edge (spec 3 §7.4) while `ontology_term_details.organism_gene_count` walks the subtree. Align to subtree; moves the pinned per-organism InterPro numbers (IPR027417 MED4 119). Needs one spec line. | M | 3b review #2; spec 3 §15 |
 | 2.3 | `list_filter_values` description parity: `cluster_type` rows are sparse with the vocab text once on the envelope; trust types (`evidence`, `sources`, …) still repeat it per row. Make all vocab-backed types envelope-once. Depends on KG B1 (per-value descriptions) for the rows to carry anything useful. | S | polish item 6 |
-| 2.4 | Generated `docs://ontologies/{key}` pages embed live `ControlledVocabulary` values when a KG is reachable at build time, else a `list_filter_values` pointer — build output depends on the environment. Decide: always pointer, or a cached snapshot in `config/schema_baseline.yaml`. | S | 3b review #11 |
 | 2.8 | `organism=` word-match backlog: genus node `Alteromonas` matches all strains; `AltDE` matches `AltDE1`. Resolver gates on `gene_count > 0` so treatment taxa are safe (KG B4 removes the last name collision). | M | slice-2 ledger |
 | 2.9 | Literal KG counts still pinned in some `-m kg` tests (browse S33 417, `go:0006979` 875, DM counts, nitrite sums) — each paper batch flips them. Consider `Schema_info`-relative or tolerance assertions for the ones that are not release guards. | S | slice-4 RED |
 

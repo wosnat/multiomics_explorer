@@ -75,10 +75,7 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 ## Controlled vocabularies
 
-- `Gene_catalyzes_ec_number.evidence`: `curated`, `family_inferred`
-- `Gene_catalyzes_ec_number.sources`: `cyanorak`, `eggnog`, `interproscan`, `uniprot`
-
-Values are read from the KG's `ControlledVocabulary` nodes at build time; confirm live via `list_filter_values(filter_type=..., ontology='ec')`.
+Values: see `list_filter_values(filter_type=..., ontology='ec')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
 
 ## Interpretation
 

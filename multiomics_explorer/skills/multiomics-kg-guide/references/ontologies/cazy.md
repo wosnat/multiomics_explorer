@@ -70,11 +70,7 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 ## Controlled vocabularies
 
-- `CazyFamily.level_kind`: `cazy_class`, `cazy_family`, `cazy_subfamily`
-- `Gene_has_cazy_family.evidence`: `curated`, `family_inferred`, `domain_inferred`
-- `Gene_has_cazy_family.sources`: `eggnog`, `interproscan`
-
-Values are read from the KG's `ControlledVocabulary` nodes at build time; confirm live via `list_filter_values(filter_type=..., ontology='cazy')`.
+Values: see `list_filter_values(filter_type=..., ontology='cazy')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
 
 ## Interpretation
 

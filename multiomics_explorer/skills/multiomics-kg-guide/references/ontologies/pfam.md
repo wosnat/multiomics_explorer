@@ -71,10 +71,7 @@ Parent label `PfamClan`: `gene_count`, `id`, `level`, `name`, `organism_count`, 
 
 ## Controlled vocabularies
 
-- `Gene_has_pfam.evidence`: `curated`, `signature`
-- `Gene_has_pfam.sources`: `cyanorak`, `eggnog`, `interproscan`, `uniprot`
-
-Values are read from the KG's `ControlledVocabulary` nodes at build time; confirm live via `list_filter_values(filter_type=..., ontology='pfam')`.
+Values: see `list_filter_values(filter_type=..., ontology='pfam')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
 
 ## Interpretation
 

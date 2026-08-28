@@ -73,12 +73,7 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 ## Controlled vocabularies
 
-- `BriteCategory.level_kind`: `brite_class`, `brite_subclass`, `brite_family`, `brite_subfamily`
-- `BriteCategory.tree`: `enzymes`, `transporters`, `peptidases`, `transcription_factors`, `secretion`, `two_component`, `defense`, `chaperones`, `ribosome`, `translation_factors`, `trna_biogenesis`, `dna_replication`
-- `Gene_has_kegg_ko.evidence`: `family_inferred`
-- `Gene_has_kegg_ko.sources`: `eggnog`
-
-Values are read from the KG's `ControlledVocabulary` nodes at build time; confirm live via `list_filter_values(filter_type=..., ontology='brite')`.
+Values: see `list_filter_values(filter_type=..., ontology='brite')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
 
 ## Interpretation
 

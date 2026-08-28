@@ -93,17 +93,7 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 ## Controlled vocabularies
 
-- `Gene_has_merops_family.best_hit_kind`: `holotype`, `putative`, `nonpeptidase_homolog`
-- `Gene_has_merops_family.call_class`: `peptidase`, `inhibitor`, `nonpeptidase_homolog`
-- `Gene_has_merops_family.evidence`: `homology`
-- `Gene_has_merops_family.pfam_support`: `corroborated`, `uncorroborated`
-- `Gene_has_merops_family.sources`: `merops_diamond`
-- `MeropsFamily.catalytic_type`: `serine`, `cysteine`, `metallo`, `aspartic`, `threonine`, `glutamic`, `asparagine_lyase`, `mixed`, `unknown`
-- `MeropsFamily.cleavage_p1_residues`: `Ala`, `Arg`, `Asn`, `Asp`, `Cys`, `Gln`, `Glu`, `Gly`, `His`, `Ile`, `Leu`, `Lys`, `Met`, `Phe`, `Pro`, `Ser`, `Thr`, `Trp`, `Tyr`, `Val`
-- `MeropsFamily.family_class`: `peptidase`, `inhibitor`
-- `MeropsFamily.level_kind`: `merops_clan`, `merops_family`, `merops_subfamily`
-
-Values are read from the KG's `ControlledVocabulary` nodes at build time; confirm live via `list_filter_values(filter_type=..., ontology='merops')`.
+Values: see `list_filter_values(filter_type=..., ontology='merops')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
 
 ## Interpretation
 

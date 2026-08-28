@@ -59,10 +59,7 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 ## Controlled vocabularies
 
-- `Gene_has_tigr_role.evidence`: `curated`
-- `Gene_has_tigr_role.sources`: `cyanorak`
-
-Values are read from the KG's `ControlledVocabulary` nodes at build time; confirm live via `list_filter_values(filter_type=..., ontology='tigr_role')`.
+Values: see `list_filter_values(filter_type=..., ontology='tigr_role')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
 
 ## Interpretation
 

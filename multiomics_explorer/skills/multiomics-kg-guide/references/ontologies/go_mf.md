@@ -67,10 +67,7 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 ## Controlled vocabularies
 
-- `Gene_enables_molecular_function.evidence`: `curated`, `family_inferred`, `domain_inferred`
-- `Gene_enables_molecular_function.sources`: `cyanorak`, `eggnog`, `interproscan`, `ncbi`, `uniprot`
-
-Values are read from the KG's `ControlledVocabulary` nodes at build time; confirm live via `list_filter_values(filter_type=..., ontology='go_mf')`.
+Values: see `list_filter_values(filter_type=..., ontology='go_mf')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
 
 ## Interpretation
 

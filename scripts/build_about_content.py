@@ -971,7 +971,7 @@ def render_ontology_index(inputs: dict) -> str:
     return "\n".join(L)
 
 
-def build_ontologies() -> int:
+def build_ontologies(*, live_vocab: bool = False) -> int:
     """Render every ``inputs/ontologies/*.yaml`` into ``references/ontologies/``.
 
     Returns the number of pages written (17 + index on a complete input set).
@@ -992,9 +992,14 @@ def build_ontologies() -> int:
     if not inputs:
         return 0
 
-    vocab = load_vocab_values({k: ONTOLOGY_CONFIG[k] for k in inputs})
-    if vocab is None:
-        print("  (no KG reachable — vocabulary values point at list_filter_values)")
+    # Deterministic by default: pages point at `list_filter_values` (values
+    # are live there and the explorer's vocabulary-hash pin already flags
+    # stale baked lists). `--live-vocab` opts in to embedding a snapshot.
+    vocab = None
+    if live_vocab:
+        vocab = load_vocab_values({k: ONTOLOGY_CONFIG[k] for k in inputs})
+        if vocab is None:
+            print("  (no KG reachable — vocabulary values point at list_filter_values)")
 
     ONTOLOGY_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     written = 0
@@ -1019,6 +1024,12 @@ def main():
         "--ontologies",
         action="store_true",
         help="Build only the per-ontology reference (references/ontologies/*.md)",
+    )
+    parser.add_argument(
+        "--live-vocab",
+        action="store_true",
+        help="Embed a ControlledVocabulary snapshot from a reachable KG into the "
+             "ontology pages (default: pages point at list_filter_values)",
     )
     parser.add_argument(
         "--lint",
@@ -1090,7 +1101,7 @@ def main():
 
     if args.ontologies:
         print("Building per-ontology reference:")
-        n = build_ontologies()
+        n = build_ontologies(live_vocab=args.live_vocab)
         print(f"\nDone: {n} ontology pages built")
         return
 
@@ -1122,7 +1133,7 @@ def main():
 
     if args.all or not args.tools:
         print("\nBuilding per-ontology reference:")
-        n = build_ontologies()
+        n = build_ontologies(live_vocab=args.live_vocab)
         print(f"Done: {n} ontology pages built")
 
 

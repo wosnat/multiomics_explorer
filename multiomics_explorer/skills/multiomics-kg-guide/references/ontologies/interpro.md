@@ -78,13 +78,7 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 ## Controlled vocabularies
 
-- `Gene_has_interpro_entry.evalue_library`: `CDD`, `GENE3D`, `HAMAP`, `NCBIFAM`, `PANTHER`, `PFAM`, `PIRSF`, `PRINTS`, `PROSITE_PATTERNS`, `PROSITE_PROFILES`, `SFLD`, `SMART`, `SUPERFAMILY`
-- `Gene_has_interpro_entry.evidence`: `signature`
-- `Gene_has_interpro_entry.libraries`: `CDD`, `GENE3D`, `HAMAP`, `NCBIFAM`, `PANTHER`, `PFAM`, `PIRSF`, `PRINTS`, `PROSITE_PATTERNS`, `PROSITE_PROFILES`, `SFLD`, `SMART`, `SUPERFAMILY`
-- `Gene_has_interpro_entry.sources`: `interproscan`
-- `InterproEntry.interpro_type`: `FAMILY`, `DOMAIN`, `HOMOLOGOUS_SUPERFAMILY`, `REPEAT`, `CONSERVED_SITE`, `ACTIVE_SITE`, `BINDING_SITE`, `PTM`
-
-Values are read from the KG's `ControlledVocabulary` nodes at build time; confirm live via `list_filter_values(filter_type=..., ontology='interpro')`.
+Values: see `list_filter_values(filter_type=..., ontology='interpro')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
 
 ## Interpretation
 

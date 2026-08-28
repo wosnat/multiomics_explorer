@@ -73,11 +73,7 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 ## Controlled vocabularies
 
-- `Gene_has_ncbifam_family.evidence`: `signature`
-- `Gene_has_ncbifam_family.sources`: `interproscan`
-- `NcbifamFamily.family_type`: `PfamAutoEq`, `PfamEq`, `domain`, `equivalog`, `equivalog_domain`, `exception`, `hypoth_equivalog`, `hypoth_equivalog_domain`, `paralog`, `paralog_domain`, `repeat`, `retired`, `signature`, `subfamily`, `subfamily_domain`, `superfamily`
-
-Values are read from the KG's `ControlledVocabulary` nodes at build time; confirm live via `list_filter_values(filter_type=..., ontology='ncbifam')`.
+Values: see `list_filter_values(filter_type=..., ontology='ncbifam')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
 
 ## Interpretation
 

@@ -89,15 +89,7 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 ## Controlled vocabularies
 
-- `Gene_has_tcdb_family.attachment_depth`: `most_specific`, `superseded`
-- `Gene_has_tcdb_family.evidence`: `family_inferred`, `homology`
-- `Gene_has_tcdb_family.go_support`: `corroborated`, `uncorroborated`
-- `Gene_has_tcdb_family.pfam_support`: `corroborated`, `uncorroborated`
-- `Gene_has_tcdb_family.source_agreement`: `both_sources`, `single_source`
-- `Gene_has_tcdb_family.sources`: `eggnog`, `tcdb_diamond`
-- `TcdbFamily.level_kind`: `tc_class`, `tc_subclass`, `tc_family`, `tc_subfamily`, `tc_specificity`
-
-Values are read from the KG's `ControlledVocabulary` nodes at build time; confirm live via `list_filter_values(filter_type=..., ontology='tcdb')`.
+Values: see `list_filter_values(filter_type=..., ontology='tcdb')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
 
 ## Interpretation
 
