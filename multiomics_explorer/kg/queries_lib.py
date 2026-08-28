@@ -3057,7 +3057,7 @@ def _search_ontology_org_scope(cfg: dict, *, indent: str) -> str:
     """
     gene_rel = cfg["gene_rel"]
     bridge = cfg.get("bridge")
-    org_gene = f"(g:Gene {{organism_name: $organism}})"
+    org_gene = "(g:Gene {organism_name: $organism})"
     hier = cfg.get("hierarchy_rels") or []
     if bridge:
         walk = f"<-[:{'|'.join(hier)}*0..]-(:{cfg['label']})" if hier else ""
