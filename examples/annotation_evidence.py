@@ -205,7 +205,7 @@ def scenario_organism_rollups() -> None:
     Surface: list_organisms rows carry four zero-filled distinct-gene counts
     (peptidase_gene_count, nonpeptidase_homolog_gene_count,
     interpro_gene_count, ncbifam_gene_count); the envelope's
-    by_annotation_capability ranks the top 10 of the matched set by
+    top_annotation_capability ranks the top 10 of the matched set by
     peptidase_gene_count. There is no filter on these counts by design —
     48 organisms is small enough to read, so read the ranking.
     """
@@ -214,7 +214,7 @@ def scenario_organism_rollups() -> None:
     print()
 
     survey = list_organisms(summary=True)
-    ranking = survey.get("by_annotation_capability") or []
+    ranking = survey.get("top_annotation_capability") or []
     print(f"organisms matched: {survey.get('total_matching')}; "
           f"ranked (all-zero rows excluded, top 10): {len(ranking)}")
     print(f"  {'organism':<34} {'peptidase_gene_count':>20} "
@@ -246,8 +246,8 @@ def scenario_organism_rollups() -> None:
         for key in ("peptidase_gene_count", "nonpeptidase_homolog_gene_count",
                     "interpro_gene_count", "ncbifam_gene_count"):
             print(f"  {key}={med4.get(key)}")
-    print(f"  by_annotation_capability over the subset: "
-          f"{[r.get('preferred_name') for r in subset.get('by_annotation_capability') or []]}")
+    print(f"  top_annotation_capability over the subset: "
+          f"{[r.get('preferred_name') for r in subset.get('top_annotation_capability') or []]}")
 
 
 SCENARIOS: dict[str, Callable[[], None]] = {

@@ -349,7 +349,7 @@ Check each tool below against measurement-side data (MetaboliteAssay, omics_type
 - `list_metabolites` — does it have `measured_in_experiments` or per-row `assay_count` / `quantified_in` / `flagged_in`? (Likely no — the gap is rich.)
 - `list_publications` — does it surface MetaboliteAssay counts per row when omics_type includes METABOLOMICS?
 - `list_experiments` — same.
-- `list_organisms` — does the `by_metabolic_capability` rollup include measurement coverage?
+- `list_organisms` — does the `top_metabolic_capability` rollup include measurement coverage?
 - `kg_schema` — does the new node/edge inventory appear?
 - `list_filter_values` — does the compartment filter include `extracellular`?
 

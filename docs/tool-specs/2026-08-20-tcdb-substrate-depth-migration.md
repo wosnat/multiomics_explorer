@@ -66,7 +66,7 @@ Gene-level `transport_substrate_resolution` is **not** repeated per row; it live
 | `gene_overview` | add `transported_metabolite_count` (int, coalesce 0) | `g.transported_metabolite_count` |
 | `gene_overview` | add `transport_substrate_resolution` (str \| null) | `g.transport_substrate_resolution` |
 | `list_metabolites` | add row `transporter_gene_count` (int, coalesce 0) | `m.transporter_gene_count` — closes the trap loop: `catalyst_gene_count=0, transporter_gene_count>0` = transport-only |
-| `list_organisms` | add row `transported_metabolite_count` (int, coalesce 0); `by_metabolic_capability[]` entries gain it as a column (ranking stays `catalyzed_metabolite_count`) | `o.transported_metabolite_count` |
+| `list_organisms` | add row `transported_metabolite_count` (int, coalesce 0); `top_metabolic_capability[]` entries gain it as a column (ranking stays `catalyzed_metabolite_count`) | `o.transported_metabolite_count` |
 
 `has_chemistry` / `evidence_sources` (traversal-computed) unchanged. No new params on the discovery tools; no result-size-control changes; `EXPECTED_TOOLS`/`TOOL_BUILDERS` unchanged.
 

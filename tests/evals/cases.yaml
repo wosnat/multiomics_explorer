@@ -1677,7 +1677,7 @@
 
 # ── TCDB substrate_depth migration (spec 2026-08-20) — golden-diff coverage ──
 # `dispatch: api` captures the full api envelope (warnings, by_gene[],
-# by_metabolic_capability) instead of builder rows.
+# top_metabolic_capability) instead of builder rows.
 - id: metabolites_by_gene_pmm0392_med4_transport
   tool: metabolites_by_gene
   dispatch: api
@@ -1757,7 +1757,7 @@
   tool: list_organisms
   dispatch: api
   desc: |
-    list_organisms(summary=True) — pins by_metabolic_capability entries
+    list_organisms(summary=True) — pins top_metabolic_capability entries
     (top 10 by catalyzed_metabolite_count, ranking unchanged) now carrying
     transported_metabolite_count, plus by_measurement_capability.
   params:
@@ -2104,7 +2104,7 @@
     list_organisms over a 3-organism subset (MarRef v6 148 peptidase genes,
     MED4 50, the all-zero treatment taxon 'Phage') — pins the four per-row
     annotation rollups (peptidase / nonpeptidase_homolog / interpro / ncbifam
-    gene counts, spec §3.3) and the by_annotation_capability envelope
+    gene counts, spec §3.3) and the top_annotation_capability envelope
     (sorted by peptidase_gene_count desc then preferred_name; the all-zero
     row is excluded, so exactly 2 entries).
   params:

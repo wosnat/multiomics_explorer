@@ -120,6 +120,10 @@ coordinated to `0.1.0a5` ahead of the KG release.
 
 ### Changed
 
+- **Breaking envelope keys:** `list_organisms.by_metabolic_capability` →
+  `top_metabolic_capability` and `by_annotation_capability` →
+  `top_annotation_capability` (project rule: `top_*` = hard-coded top-N,
+  `by_*` = full frequency; both are top-10 rankings).
 - **Two-state strings (KG hand-off 2026-08-28, HO-001).** The eight
   boolean-like KG properties are now named string pairs instead of
   `'true'` / `'false'` (`is_time_course`: `time_course` /

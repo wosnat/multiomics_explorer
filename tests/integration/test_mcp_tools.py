@@ -394,12 +394,12 @@ class TestListOrganisms:
             assert row["reaction_count"] > 0
             assert row["catalyzed_metabolite_count"] > 0
 
-    def test_by_metabolic_capability_top_organisms(self, conn):
-        """by_metabolic_capability is populated with top organisms in summary mode,
+    def test_top_metabolic_capability_top_organisms(self, conn):
+        """top_metabolic_capability is populated with top organisms in summary mode,
         sorted desc by catalyzed_metabolite_count, excluding zero-chemistry
         organisms (catalysis-arm rename, KG-SYNC-001)."""
         result = api.list_organisms(summary=True, conn=conn)
-        cap = result["by_metabolic_capability"]
+        cap = result["top_metabolic_capability"]
         assert len(cap) > 0 and len(cap) <= 10
         # Sorted descending by catalyzed_metabolite_count
         catalyzed_counts = [r["catalyzed_metabolite_count"] for r in cap]
@@ -2803,11 +2803,11 @@ class TestTcdbSubstrateDepthCrossToolAgreement:
 
     def test_list_organisms_med4_transported_metabolite_count(self, conn):
         """list_organisms: MED4 transported_metabolite_count > 0 on the row
-        and on its by_metabolic_capability entry (ranking unchanged)."""
+        and on its top_metabolic_capability entry (ranking unchanged)."""
         res = api.list_organisms(organism_names=[self._MED4], conn=conn)
         row = res["results"][0]
         assert row["transported_metabolite_count"] > 0
-        cap = next(c for c in res["by_metabolic_capability"]
+        cap = next(c for c in res["top_metabolic_capability"]
                    if c["organism_name"] == self._MED4)
         assert cap["transported_metabolite_count"] == row["transported_metabolite_count"]
         assert cap["catalyzed_metabolite_count"] == row["catalyzed_metabolite_count"]
@@ -4141,7 +4141,7 @@ class TestKGReleaseInfoVocabularyHashLive:
 @pytest.mark.kg
 class TestListOrganismsAnnotationCapabilityLive:
     """Spec §9.3 / §10: one row per organism (Schema_info.organism_count);
-    MarRef v6 tops `by_annotation_capability`
+    MarRef v6 tops `top_annotation_capability`
     with 148 peptidase genes; a single-organism subset ranks exactly that
     organism; an all-zero treatment taxon is excluded."""
 
@@ -4161,7 +4161,7 @@ class TestListOrganismsAnnotationCapabilityLive:
 
     def test_marref_tops_with_148(self, conn):
         res = api.list_organisms(limit=500, conn=conn)
-        cap = res["by_annotation_capability"]
+        cap = res["top_annotation_capability"]
         assert len(cap) == 10
         assert cap[0]["organism_name"] == _SLICE4_MARREF
         assert cap[0]["preferred_name"] == _SLICE4_MARREF
@@ -4175,13 +4175,13 @@ class TestListOrganismsAnnotationCapabilityLive:
         assert peps == sorted(peps, reverse=True)
 
     def test_summary_mode_matches_detail_mode(self, conn):
-        detail = api.list_organisms(limit=500, conn=conn)["by_annotation_capability"]
-        summary = api.list_organisms(summary=True, conn=conn)["by_annotation_capability"]
+        detail = api.list_organisms(limit=500, conn=conn)["top_annotation_capability"]
+        summary = api.list_organisms(summary=True, conn=conn)["top_annotation_capability"]
         assert summary == detail
 
     def test_med4_subset_ranks_exactly_med4(self, conn):
         res = api.list_organisms(organism_names=[_SLICE4_MED4], conn=conn)
-        cap = res["by_annotation_capability"]
+        cap = res["top_annotation_capability"]
         assert [c["organism_name"] for c in cap] == [_SLICE4_MED4]
         row = res["results"][0]
         for col in _SLICE4_ANNOT_COLS:
@@ -4192,12 +4192,12 @@ class TestListOrganismsAnnotationCapabilityLive:
         res = api.list_organisms(
             organism_names=[_SLICE4_ALL_ZERO_ORGANISM, _SLICE4_MED4], conn=conn)
         assert res["not_found"] == []
-        names = [c["organism_name"] for c in res["by_annotation_capability"]]
+        names = [c["organism_name"] for c in res["top_annotation_capability"]]
         assert names == [_SLICE4_MED4]
         zero = api.list_organisms(
             organism_names=[_SLICE4_ALL_ZERO_ORGANISM], conn=conn)
         assert zero["total_matching"] >= 1
-        assert zero["by_annotation_capability"] == []
+        assert zero["top_annotation_capability"] == []
 
     def test_sum_of_peptidase_counts(self, conn):
         """Spec §7.1: Σ peptidase 3,439 over the 48 organisms."""
@@ -4208,8 +4208,8 @@ class TestListOrganismsAnnotationCapabilityLive:
     async def test_wrapper_round_trip(self, tool_fns, conn):
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["list_organisms"](ctx, summary=True)
-        assert response.by_annotation_capability[0].organism_name == _SLICE4_MARREF
-        assert response.by_annotation_capability[0].peptidase_gene_count == 148
+        assert response.top_annotation_capability[0].organism_name == _SLICE4_MARREF
+        assert response.top_annotation_capability[0].peptidase_gene_count == 148
 
 
 @pytest.mark.kg

@@ -379,7 +379,7 @@ Surface KG-rollup props that already exist on `OrganismTaxon`:
 - `OrganismResult.metabolite_count: int` — same.
 
 Envelope additions:
-- `by_metabolic_capability: list[{organism_name, reaction_count, metabolite_count}]` — top N organisms by `metabolite_count`.
+- `top_metabolic_capability: list[{organism_name, reaction_count, metabolite_count}]` — top N organisms by `metabolite_count`.
 
 ### Tool 5: `gene_overview` extension (4-layer pass, gated on KG-1 + KG-2)
 

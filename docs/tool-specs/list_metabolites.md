@@ -331,7 +331,7 @@ class ListMetabolitesResponse(BaseModel):
 list does NOT exhaust the matched set); `by_*` for full frequency
 rollups (every distinct value present in the matched set, sorted desc by
 count). The convention is project-new — see "Open questions" for the
-retroactive question about `list_organisms.by_metabolic_capability`.
+retroactive question about `list_organisms.top_metabolic_capability`.
 
 **Per-result `MetaboliteResult` (compact):**
 
@@ -1181,10 +1181,10 @@ uv run python scripts/build_about_content.py list_metabolites
 
 ## Open questions / risks
 
-- **Retroactive `top_*` rename for `list_organisms.by_metabolic_capability`?**
+- **Retroactive `top_*` rename for `list_organisms.top_metabolic_capability`?**
   This spec introduces the project convention: `top_*` for hardcoded top-N
   rollups, `by_*` for full frequency rollups. The already-shipped
-  `list_organisms.by_metabolic_capability` is a top-10 rollup — rename
+  `list_organisms.top_metabolic_capability` is a top-10 rollup — rename
   it to `top_metabolically_capable_organisms` (or similar) for
   consistency? Not blocking slice-1 build; can ship as a one-line
   follow-up renamer (with regression baseline regen + a single about-content

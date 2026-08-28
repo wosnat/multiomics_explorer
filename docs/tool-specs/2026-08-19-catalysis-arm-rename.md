@@ -8,7 +8,7 @@
 | Tool | Row/envelope field (old → new) | KG property read (old → new) |
 |---|---|---|
 | `gene_overview` | row `metabolite_count` → `catalyzed_metabolite_count` | `g.metabolite_count` → `g.catalyzed_metabolite_count` |
-| `list_organisms` | row `metabolite_count` → `catalyzed_metabolite_count`; `by_metabolic_capability[].metabolite_count` → `catalyzed_metabolite_count` | `o.metabolite_count` → `o.catalyzed_metabolite_count` (2 query sites) |
+| `list_organisms` | row `metabolite_count` → `catalyzed_metabolite_count`; `top_metabolic_capability[].metabolite_count` → `catalyzed_metabolite_count` | `o.metabolite_count` → `o.catalyzed_metabolite_count` (2 query sites) |
 | `list_metabolites` | row `gene_count` → `catalyst_gene_count` | `m.gene_count` → `m.catalyst_gene_count` (2 query sites + `ORDER BY` tiebreaker) |
 
 No parameter changes. No new fields (transport-arm row fields `transported_metabolite_count` / `transporter_gene_count` are slice-2 scope). No result-size-control changes.
@@ -16,7 +16,7 @@ No parameter changes. No new fields (transport-arm row fields `transported_metab
 ## Per-layer touch points (verified by grep 2026-08-19)
 
 - **`kg/queries_lib.py`**: `gene_overview` detail (L593); `list_organisms` detail (L1866) + capability query (L1964) + docstrings (L1813/1936/1945); `list_metabolites` detail (L1485/1509) + `ORDER BY m.gene_count` tiebreaker (L1520).
-- **`api/functions.py`**: `list_organisms` `by_metabolic_capability` assembly (L955–966: dict key, zero-chemistry filter, sort key) + docstring (L886).
+- **`api/functions.py`**: `list_organisms` `top_metabolic_capability` assembly (L955–966: dict key, zero-chemistry filter, sort key) + docstring (L886).
 - **`mcp_server/tools.py`**: `GeneOverviewRow.metabolite_count` (L1875, description rewritten — the "reaction OR transport (UNION)" claim is dead); `OrganismResult` row + `OrgMetabolicCapabilityBreakdown` fields (~L1486–1565, envelope description updated); `MetaboliteResult.gene_count` (L409, description rewritten — see semantic trap below).
 - **`inputs/tools/*.yaml`**: `gene_overview.yaml` example L52 (shows retired union value 554 — regenerate from live: PMM0392 now `catalyzed_metabolite_count: 0`); `list_organisms.yaml` examples L22/32/50/56 + chaining L70 + note L89; `list_metabolites.yaml` chaining L64 + mistakes L72/78–79 (rewrite, see trap).
 

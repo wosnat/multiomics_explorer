@@ -1065,9 +1065,9 @@ class TestListOrganisms:
         assert result["not_found"] == []
         assert result["total_matching"] == 2
 
-    # Chemistry rollup propagation + by_metabolic_capability envelope (slice 1)
+    # Chemistry rollup propagation + top_metabolic_capability envelope (slice 1)
     # Catalysis-arm rename (KG-SYNC-001): metabolite_count →
-    # catalyzed_metabolite_count on rows AND by_metabolic_capability entries.
+    # catalyzed_metabolite_count on rows AND top_metabolic_capability entries.
 
     _CHEMISTRY_ROWS = [
         {**dict(_ROWS[0]),
@@ -1104,14 +1104,14 @@ class TestListOrganisms:
         assert result["results"][0]["catalyzed_metabolite_count"] == 1039
         assert result["results"][1]["catalyzed_metabolite_count"] == 1428
 
-    def test_by_metabolic_capability_sorted_desc_by_catalyzed_metabolite_count(
+    def test_top_metabolic_capability_sorted_desc_by_catalyzed_metabolite_count(
         self, mock_conn,
     ):
         mock_conn.execute_query.side_effect = [
             [self._SUMMARY_ROW], self._CHEMISTRY_ROWS,
         ]
         result = api.list_organisms(conn=mock_conn)
-        cap = result["by_metabolic_capability"]
+        cap = result["top_metabolic_capability"]
         assert len(cap) == 2
         # EZ55 has higher catalyzed_metabolite_count (1428 > 1039) — first
         assert cap[0]["organism_name"] == "Alteromonas macleodii EZ55"
@@ -1119,10 +1119,10 @@ class TestListOrganisms:
         assert cap[0]["reaction_count"] == 1348
         assert cap[1]["organism_name"] == "Prochlorococcus MED4"
 
-    def test_by_metabolic_capability_entries_carry_transported_metabolite_count(
+    def test_top_metabolic_capability_entries_carry_transported_metabolite_count(
         self, mock_conn,
     ):
-        """substrate_depth migration: by_metabolic_capability[] entries gain
+        """substrate_depth migration: top_metabolic_capability[] entries gain
         transported_metabolite_count as a column; ranking stays
         catalyzed_metabolite_count desc (EZ55 first despite lower transport
         breadth)."""
@@ -1130,7 +1130,7 @@ class TestListOrganisms:
             [self._SUMMARY_ROW], self._CHEMISTRY_ROWS,
         ]
         result = api.list_organisms(conn=mock_conn)
-        cap = result["by_metabolic_capability"]
+        cap = result["top_metabolic_capability"]
         assert cap[0]["organism_name"] == "Alteromonas macleodii EZ55"
         assert cap[0]["transported_metabolite_count"] == 95
         assert cap[1]["transported_metabolite_count"] == 120
@@ -1139,7 +1139,7 @@ class TestListOrganisms:
             "transported_metabolite_count",
         }
 
-    def test_by_metabolic_capability_excludes_zero_chemistry(self, mock_conn):
+    def test_top_metabolic_capability_excludes_zero_chemistry(self, mock_conn):
         rows = [
             {**dict(self._ROWS[0]),
              "reaction_count": 943, "catalyzed_metabolite_count": 1039},
@@ -1148,18 +1148,18 @@ class TestListOrganisms:
         ]
         mock_conn.execute_query.side_effect = [[self._SUMMARY_ROW], rows]
         result = api.list_organisms(conn=mock_conn)
-        cap = result["by_metabolic_capability"]
+        cap = result["top_metabolic_capability"]
         assert len(cap) == 1
         assert cap[0]["organism_name"] == "Prochlorococcus MED4"
 
-    def test_by_metabolic_capability_empty_when_no_matches(self, mock_conn):
+    def test_top_metabolic_capability_empty_when_no_matches(self, mock_conn):
         empty_summary = {**self._SUMMARY_ROW, "total_entries": 0, "total_matching": 0}
         mock_conn.execute_query.side_effect = [[empty_summary], []]
         result = api.list_organisms(conn=mock_conn)
-        assert result["by_metabolic_capability"] == []
+        assert result["top_metabolic_capability"] == []
 
-    def test_by_metabolic_capability_summary_mode(self, mock_conn):
-        """summary=True populates by_metabolic_capability via the dedicated
+    def test_top_metabolic_capability_summary_mode(self, mock_conn):
+        """summary=True populates top_metabolic_capability via the dedicated
         capability builder, NOT the detail builder. Asserts call count = 2
         (summary + capability) so the summary fast path stays cheap."""
         capability_rows = [
@@ -1174,10 +1174,10 @@ class TestListOrganisms:
         ]
         result = api.list_organisms(summary=True, conn=mock_conn)
         assert result["results"] == []
-        assert len(result["by_metabolic_capability"]) == 2
-        assert (result["by_metabolic_capability"][0]
+        assert len(result["top_metabolic_capability"]) == 2
+        assert (result["top_metabolic_capability"][0]
                 ["catalyzed_metabolite_count"]) == 1428
-        assert (result["by_metabolic_capability"][0]
+        assert (result["top_metabolic_capability"][0]
                 ["transported_metabolite_count"]) == 95
         # Exactly 2 Cypher calls: summary + capability. No detail builder.
         assert mock_conn.execute_query.call_count == 2
@@ -1188,7 +1188,7 @@ class TestListOrganisms:
         assert "lineage" not in second_cypher
         assert "derived_metric_count" not in second_cypher
 
-    def test_by_metabolic_capability_top_10_cap(self, mock_conn):
+    def test_top_metabolic_capability_top_10_cap(self, mock_conn):
         """When matched set has > 10 chemistry-capable organisms, only top 10 returned."""
         rows = [
             {
@@ -1206,7 +1206,7 @@ class TestListOrganisms:
         summary = {**self._SUMMARY_ROW, "total_entries": 15, "total_matching": 15}
         mock_conn.execute_query.side_effect = [[summary], rows]
         result = api.list_organisms(conn=mock_conn)
-        cap = result["by_metabolic_capability"]
+        cap = result["top_metabolic_capability"]
         assert len(cap) == 10  # capped
         # Top entry should be Org14 (highest catalyzed_metabolite_count = 140)
         assert cap[0]["organism_name"] == "Org14"
@@ -14457,10 +14457,10 @@ class TestKGReleaseInfoVocabularyHash:
 
 class TestListOrganismsAnnotationCapability:
     """Spec §3.3: four compact annotation counts per row and the
-    `by_annotation_capability` envelope — top-10 by peptidase_gene_count
+    `top_annotation_capability` envelope — top-10 by peptidase_gene_count
     desc then preferred_name, all four columns, all-zero rows excluded.
     Detail mode computes it api-side over the matched rows; summary mode
-    reads the summary builder (mirror of by_metabolic_capability)."""
+    reads the summary builder (mirror of top_metabolic_capability)."""
 
     _COLS = (
         "peptidase_gene_count", "nonpeptidase_homolog_gene_count",
@@ -14528,7 +14528,7 @@ class TestListOrganismsAnnotationCapability:
             "by_cluster_type": [], "by_organism_type": [],
             "by_measurement_capability": {
                 "has_metabolomics": 0, "no_metabolomics": len(rows)},
-            "by_annotation_capability": self._expected_entries(rows),
+            "top_annotation_capability": self._expected_entries(rows),
         }
 
     def _wire(self, mock_conn, rows):
@@ -14562,16 +14562,16 @@ class TestListOrganismsAnnotationCapability:
         phage = by_name["Phage"]
         assert all(phage[c] == 0 for c in self._COLS)
 
-    def test_envelope_has_by_annotation_capability(self, mock_conn):
+    def test_envelope_has_top_annotation_capability(self, mock_conn):
         self._wire(mock_conn, self._ROWS)
         result = api.list_organisms(limit=50, conn=mock_conn)
-        assert "by_annotation_capability" in result
-        assert isinstance(result["by_annotation_capability"], list)
+        assert "top_annotation_capability" in result
+        assert isinstance(result["top_annotation_capability"], list)
 
     def test_entry_shape(self, mock_conn):
         self._wire(mock_conn, self._ROWS)
         result = api.list_organisms(limit=50, conn=mock_conn)
-        entry = result["by_annotation_capability"][0]
+        entry = result["top_annotation_capability"][0]
         assert set(entry) == {
             "preferred_name", "organism_name", *self._COLS,
         }
@@ -14580,19 +14580,19 @@ class TestListOrganismsAnnotationCapability:
     def test_sorted_by_peptidase_desc_then_preferred_name(self, mock_conn):
         self._wire(mock_conn, self._ROWS)
         result = api.list_organisms(limit=50, conn=mock_conn)
-        names = [e["organism_name"] for e in result["by_annotation_capability"]]
+        names = [e["organism_name"] for e in result["top_annotation_capability"]]
         assert names[:4] == [
             "Alteromonas (MarRef v6)",            # 148
             "Alteromonas macleodii AD45",          # 129
             "Alteromonas macleodii ATCC27126",     # 125, name-tie-break
             "Pseudomonas putida KT2440",           # 125
         ]
-        assert result["by_annotation_capability"][0]["peptidase_gene_count"] == 148
+        assert result["top_annotation_capability"][0]["peptidase_gene_count"] == 148
 
     def test_all_zero_rows_excluded_but_zero_peptidase_kept(self, mock_conn):
         self._wire(mock_conn, self._ROWS)
         result = api.list_organisms(limit=50, conn=mock_conn)
-        names = {e["organism_name"] for e in result["by_annotation_capability"]}
+        names = {e["organism_name"] for e in result["top_annotation_capability"]}
         assert "Phage" not in names
         # zero peptidases but non-zero interpro/ncbifam → still listed
         assert "Prochlorococcus MIT1314" in names
@@ -14601,23 +14601,23 @@ class TestListOrganismsAnnotationCapability:
         rows = [self._row(f"Org {i:02d}", 200 - i, 1, 1, 1) for i in range(15)]
         self._wire(mock_conn, rows)
         result = api.list_organisms(limit=50, conn=mock_conn)
-        cap = result["by_annotation_capability"]
+        cap = result["top_annotation_capability"]
         assert len(cap) == 10
         assert [e["peptidase_gene_count"] for e in cap] == list(range(200, 190, -1))
 
     def test_computed_over_matched_set_not_page(self, mock_conn):
         """Detail mode with limit=1: the rollup still ranks every matched
-        organism (page-independent, like by_metabolic_capability)."""
+        organism (page-independent, like top_metabolic_capability)."""
         self._wire(mock_conn, self._ROWS)
         result = api.list_organisms(limit=1, conn=mock_conn)
         assert result["returned"] == 1
-        assert len(result["by_annotation_capability"]) == 6
+        assert len(result["top_annotation_capability"]) == 6
 
     def test_subset_via_organism_names(self, mock_conn):
         self._wire(mock_conn, self._ROWS)
         result = api.list_organisms(
             organism_names=["Prochlorococcus MED4"], limit=50, conn=mock_conn)
-        cap = result["by_annotation_capability"]
+        cap = result["top_annotation_capability"]
         assert [e["organism_name"] for e in cap] == ["Prochlorococcus MED4"]
         assert cap[0]["peptidase_gene_count"] == 50
 
@@ -14626,20 +14626,20 @@ class TestListOrganismsAnnotationCapability:
         result = api.list_organisms(
             organism_names=["Phage"], limit=50, conn=mock_conn)
         assert result["total_matching"] == 1
-        assert result["by_annotation_capability"] == []
+        assert result["top_annotation_capability"] == []
 
     def test_summary_mode_surfaces_rollup(self, mock_conn):
         self._wire(mock_conn, self._ROWS)
         result = api.list_organisms(summary=True, conn=mock_conn)
         assert result["results"] == []
-        cap = result["by_annotation_capability"]
+        cap = result["top_annotation_capability"]
         assert cap == self._expected_entries(self._ROWS)
 
     def test_empty_match_yields_empty_rollup(self, mock_conn):
         self._wire(mock_conn, [])
         result = api.list_organisms(
             organism_names=["Nonexistus fakeii"], conn=mock_conn)
-        assert result["by_annotation_capability"] == []
+        assert result["top_annotation_capability"] == []
 
     def test_no_new_filter_param(self):
         import inspect

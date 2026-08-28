@@ -2575,7 +2575,7 @@ def build_list_organisms_summary(
 
     RETURN keys: total_entries, total_matching, by_value_kind,
     by_metric_type, by_compartment, by_cluster_type, by_organism_type,
-    by_measurement_capability, by_annotation_capability (top-10 by
+    by_measurement_capability, top_annotation_capability (top-10 by
     peptidase_gene_count desc then preferred_name; entries carry
     preferred_name, organism_name + the four ORG-001 counts; all-four-zero
     organisms excluded).
@@ -2632,7 +2632,7 @@ def build_list_organisms_summary(
         "            OR a.interpro_gene_count > 0\n"
         "            OR a.ncbifam_gene_count > 0],\n"
         "         ['peptidase_gene_count', '^preferred_name'])[0..10]\n"
-        "       AS by_annotation_capability"
+        "       AS top_annotation_capability"
     )
     return cypher, params
 
@@ -2643,7 +2643,7 @@ def build_list_organisms_capability(
     compartment: str | None = None,
 ) -> tuple[str, dict]:
     """Build Cypher for the small chemistry-capability projection used by
-    list_organisms's by_metabolic_capability envelope rollup in summary mode.
+    list_organisms's top_metabolic_capability envelope rollup in summary mode.
 
     Returns only (organism_name, reaction_count, catalyzed_metabolite_count,
     transported_metabolite_count, measured_metabolite_count) per matched
@@ -2658,7 +2658,7 @@ def build_list_organisms_capability(
     RETURN keys: organism_name, reaction_count, catalyzed_metabolite_count,
     transported_metabolite_count, measured_metabolite_count,
     peptidase_gene_count, nonpeptidase_homolog_gene_count, interpro_gene_count,
-    ncbifam_gene_count (slice 4 — feeds by_annotation_capability api-side).
+    ncbifam_gene_count (slice 4 — feeds top_annotation_capability api-side).
     """
     conditions = [
         "($organism_names_lc IS NULL"

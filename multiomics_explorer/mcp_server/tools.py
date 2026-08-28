@@ -1781,8 +1781,8 @@ def register_tools(mcp: FastMCP):
         by_value_kind: list[OrgValueKindBreakdown] = Field(default_factory=list, description="DM value_kind frequency rollup across matched organisms.")
         by_metric_type: list[OrgMetricTypeBreakdown] = Field(default_factory=list, description="DM metric_type frequency rollup across matched organisms.")
         by_compartment: list[OrgCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched organisms.")
-        by_metabolic_capability: list[OrgMetabolicCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms by catalyzed_metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites.")
-        by_annotation_capability: list[OrgAnnotationCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms (within matched set) by peptidase_gene_count desc, then preferred_name. Carries all four annotation counts; excludes organisms with all four = 0. [] when none. Coverage ranking for reading, not a filter.")
+        top_metabolic_capability: list[OrgMetabolicCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms by catalyzed_metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites.")
+        top_annotation_capability: list[OrgAnnotationCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms (within matched set) by peptidase_gene_count desc, then preferred_name. Carries all four annotation counts; excludes organisms with all four = 0. [] when none. Coverage ranking for reading, not a filter.")
         by_measurement_capability: OrgMeasurementCapability = Field(default_factory=OrgMeasurementCapability, description="Binary rollup of metabolomics measurement coverage across matched organisms: {has_metabolomics, no_metabolomics} (tool-specific deviation from list_/by_-style frequency rollups elsewhere — exactly two keys).")
         returned: int = Field(description="Number of results returned.")
         offset: int = Field(default=0, description="Offset into full result set.")
@@ -1823,7 +1823,7 @@ def register_tools(mcp: FastMCP):
     ) -> ListOrganismsResponse:
         """List organisms with taxonomy, data-availability counts, organism_type, DM rollups, chemistry-capability rollups, annotation-coverage rollups, and metabolomics-coverage rollup.
 
-        Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `catalyzed_metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Read `by_annotation_capability` (top-10 by `peptidase_gene_count`, plus `interpro_gene_count` / `ncbifam_gene_count`) to see which organisms carry MEROPS / InterPro / NCBIfam coverage — then `genes_by_ontology(ontology='merops'|'interpro'|'ncbifam', organism=...)`. Note that `organism_names=` on this tool is exact (case-insensitive) on `preferred_name`, while the `organism=` filter on most other tools is a substring match.
+        Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `catalyzed_metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Read `top_annotation_capability` (top-10 by `peptidase_gene_count`, plus `interpro_gene_count` / `ncbifam_gene_count`) to see which organisms carry MEROPS / InterPro / NCBIfam coverage — then `genes_by_ontology(ontology='merops'|'interpro'|'ncbifam', organism=...)`. Note that `organism_names=` on this tool is exact (case-insensitive) on `preferred_name`, while the `organism=` filter on most other tools is a substring match.
         """
         await ctx.info(
             f"list_organisms organism_names={organism_names} compartment={compartment} "
@@ -1846,13 +1846,13 @@ def register_tools(mcp: FastMCP):
             by_value_kind = [OrgValueKindBreakdown(**b) for b in result.get("by_value_kind", [])]
             by_metric_type = [OrgMetricTypeBreakdown(**b) for b in result.get("by_metric_type", [])]
             by_compartment = [OrgCompartmentBreakdown(**b) for b in result.get("by_compartment", [])]
-            by_metabolic_capability = [
+            top_metabolic_capability = [
                 OrgMetabolicCapabilityBreakdown(**b)
-                for b in result.get("by_metabolic_capability", [])
+                for b in result.get("top_metabolic_capability", [])
             ]
-            by_annotation_capability = [
+            top_annotation_capability = [
                 OrgAnnotationCapabilityBreakdown(**b)
-                for b in result.get("by_annotation_capability", [])
+                for b in result.get("top_annotation_capability", [])
             ]
             measurement_cap_data = result.get("by_measurement_capability") or {}
             by_measurement_capability = OrgMeasurementCapability(**measurement_cap_data)
@@ -1864,8 +1864,8 @@ def register_tools(mcp: FastMCP):
                 by_value_kind=by_value_kind,
                 by_metric_type=by_metric_type,
                 by_compartment=by_compartment,
-                by_metabolic_capability=by_metabolic_capability,
-                by_annotation_capability=by_annotation_capability,
+                top_metabolic_capability=top_metabolic_capability,
+                top_annotation_capability=top_annotation_capability,
                 by_measurement_capability=by_measurement_capability,
                 returned=result["returned"],
                 offset=result.get("offset", 0),

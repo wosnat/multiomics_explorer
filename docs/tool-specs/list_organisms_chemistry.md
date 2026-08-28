@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-Surface the two `OrganismTaxon` chemistry rollups landed by the chemistry-slice-1 KG asks (KG-A2 / KG-A4-adjacent — they were already on `OrganismTaxon` from Phase 1.2 chemistry layer; verified live 2026-05-02): `reaction_count` and `metabolite_count`. Adds a small envelope rollup `by_metabolic_capability` listing top-N organisms by metabolite breadth.
+Surface the two `OrganismTaxon` chemistry rollups landed by the chemistry-slice-1 KG asks (KG-A2 / KG-A4-adjacent — they were already on `OrganismTaxon` from Phase 1.2 chemistry layer; verified live 2026-05-02): `reaction_count` and `metabolite_count`. Adds a small envelope rollup `top_metabolic_capability` listing top-N organisms by metabolite breadth.
 
 This is the **smallest 4-layer pass in chemistry slice 1** — KG props are already populated, no new builder logic, two new fields plus one envelope key.
 
@@ -11,7 +11,7 @@ Purpose: gives the LLM a per-organism chemistry-coverage signal at the discovery
 ## Out of Scope
 
 - **Filter on `reaction_count` / `metabolite_count`** (e.g. `min_reaction_count: int`). Defer until a real workflow demands it; LLM can sort client-side from returned rows.
-- **Top-N tunable.** `by_metabolic_capability` returns top 10 fixed. Add `top_n` param later if needed.
+- **Top-N tunable.** `top_metabolic_capability` returns top 10 fixed. Add `top_n` param later if needed.
 - **Pathway-level rollups** (`KeggTerm.reaction_count` / `metabolite_count`, also landed via KG-A4). Those surface in a Tier-2 follow-up extension to `list_metabolites.by_pathway`, not this PR.
 - **Transport path additions** (TCDB-CAZy `transporter_count`, `evidence_sources`). On `Metabolite`, not `OrganismTaxon`. Not relevant here.
 
@@ -27,7 +27,7 @@ Purpose: gives the LLM a per-organism chemistry-coverage signal at the discovery
 
 - **Discovery routing:** `list_organisms()` returns `metabolite_count` per row; LLM uses it to identify chemistry-rich organisms before drilling in via `list_metabolites(organism_names=[...])` (slice-1 sibling tool).
 - **Comparison:** `list_organisms(organism_names=[...])` for two organisms shows side-by-side metabolic capability counts. Useful for cross-feeding hypothesis framing.
-- **Survey:** `summary=True` returns `by_metabolic_capability` showing which organisms have richest chemistry coverage, without paging through detail rows.
+- **Survey:** `summary=True` returns `top_metabolic_capability` showing which organisms have richest chemistry coverage, without paging through detail rows.
 
 ## KG dependencies
 
@@ -55,7 +55,7 @@ class ListOrganismsResponse(BaseModel):
     by_value_kind: list[OrgValueKindBreakdown]
     by_metric_type: list[OrgMetricTypeBreakdown]
     by_compartment: list[OrgCompartmentBreakdown]
-    by_metabolic_capability: list[OrgMetabolicCapabilityBreakdown]    # NEW
+    top_metabolic_capability: list[OrgMetabolicCapabilityBreakdown]    # NEW
     returned: int
     offset: int
     truncated: bool
@@ -78,7 +78,7 @@ class OrganismResult(BaseModel):
 |---|---|---|
 | `OrganismResult.reaction_count` | absent | int (default 0); compact |
 | `OrganismResult.metabolite_count` | absent | int (default 0); compact |
-| `by_metabolic_capability` | absent | list of top-10 organisms by metabolite_count, with reaction_count alongside |
+| `top_metabolic_capability` | absent | list of top-10 organisms by metabolite_count, with reaction_count alongside |
 
 ## Result-size controls
 
@@ -87,9 +87,9 @@ Unchanged. KG still has only ~36 organisms; result fits in one response easily. 
 ## Special handling
 
 - **`coalesce(o.reaction_count, 0)` / `coalesce(o.metabolite_count, 0)`** in the builder. Even though all current organisms have the props populated, the coalesce keeps the explorer code timing-resilient — works against any KG that hasn't yet shipped chemistry rollups.
-- **`by_metabolic_capability` computed in api/, not Cypher.** The detail builder already returns per-row `reaction_count` / `metabolite_count` (after this change), so api/ can sort + slice for the top-N rollup without re-querying. Avoids inflating the Cypher summary builder. Filter to non-zero rows so organisms without chemistry don't pollute the rollup.
-- **When `summary=True`**: detail rows aren't fetched, so api/ runs a small standalone query (the same Cypher as the detail builder, projecting only the 3 fields) to populate `by_metabolic_capability`. Adds one query when `summary=True` AND chemistry coverage is requested. Cheap (≤36 row scan).
-- **When `total_matching == 0`**: `by_metabolic_capability == []`. No special-case needed.
+- **`top_metabolic_capability` computed in api/, not Cypher.** The detail builder already returns per-row `reaction_count` / `metabolite_count` (after this change), so api/ can sort + slice for the top-N rollup without re-querying. Avoids inflating the Cypher summary builder. Filter to non-zero rows so organisms without chemistry don't pollute the rollup.
+- **When `summary=True`**: detail rows aren't fetched, so api/ runs a small standalone query (the same Cypher as the detail builder, projecting only the 3 fields) to populate `top_metabolic_capability`. Adds one query when `summary=True` AND chemistry coverage is requested. Cheap (≤36 row scan).
+- **When `total_matching == 0`**: `top_metabolic_capability == []`. No special-case needed.
 
 ---
 
@@ -98,15 +98,15 @@ Unchanged. KG still has only ~36 organisms; result fits in one response easily. 
 | Step | Layer | File | What |
 |------|-------|------|------|
 | 1 | Query builder | `kg/queries_lib.py` | Append `coalesce(o.reaction_count, 0)` and `coalesce(o.metabolite_count, 0)` to `build_list_organisms` compact RETURN. |
-| 2 | API function | `api/functions.py` | Compute `by_metabolic_capability` from matched rows (or run small extra query when `limit=0`); add to envelope. |
-| 3 | MCP wrapper | `mcp_server/tools.py` | Add `reaction_count` and `metabolite_count` to `OrganismResult`. Add `OrgMetabolicCapabilityBreakdown` model and `by_metabolic_capability` to `ListOrganismsResponse`. Wire pass-through in wrapper. |
+| 2 | API function | `api/functions.py` | Compute `top_metabolic_capability` from matched rows (or run small extra query when `limit=0`); add to envelope. |
+| 3 | MCP wrapper | `mcp_server/tools.py` | Add `reaction_count` and `metabolite_count` to `OrganismResult`. Add `OrgMetabolicCapabilityBreakdown` model and `top_metabolic_capability` to `ListOrganismsResponse`. Wire pass-through in wrapper. |
 | 4 | Unit tests | `tests/unit/test_query_builders.py` | Extend `TestBuildListOrganisms`: assert new RETURN columns present. |
-| 5 | Unit tests | `tests/unit/test_api_functions.py` | Extend `TestListOrganisms`: `reaction_count`/`metabolite_count` propagate to results; `by_metabolic_capability` computed correctly (sorted desc by metabolite_count, top 10, non-zero filter); summary=True path hits the small-query branch. |
+| 5 | Unit tests | `tests/unit/test_api_functions.py` | Extend `TestListOrganisms`: `reaction_count`/`metabolite_count` propagate to results; `top_metabolic_capability` computed correctly (sorted desc by metabolite_count, top 10, non-zero filter); summary=True path hits the small-query branch. |
 | 6 | Unit tests | `tests/unit/test_tool_wrappers.py` | Extend `TestListOrganismsWrapper`: assert new envelope key + new row fields surface. |
-| 7 | Integration | `tests/integration/test_mcp_tools.py` | Live-KG case: `list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii EZ55"])` → both rows have `metabolite_count > 0`, `by_metabolic_capability` includes both ordered by metabolite_count desc. |
+| 7 | Integration | `tests/integration/test_mcp_tools.py` | Live-KG case: `list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii EZ55"])` → both rows have `metabolite_count > 0`, `top_metabolic_capability` includes both ordered by metabolite_count desc. |
 | 8 | Regression | `tests/regression/test_regression.py` | Regenerate baselines with `--force-regen -m kg` (new RETURN columns will fail existing baselines). |
 | 9 | About content | `inputs/tools/list_organisms.yaml` | Add example with `metabolite_count`/`reaction_count`. Add chaining note: "list_organisms → list_metabolites(organism_names=[...]) when metabolite_count > 0". Run `build_about_content.py`. |
-| 10 | Docs | `CLAUDE.md` | Update `list_organisms` row to mention chemistry-coverage rollups + `by_metabolic_capability` envelope. |
+| 10 | Docs | `CLAUDE.md` | Update `list_organisms` row to mention chemistry-coverage rollups + `top_metabolic_capability` envelope. |
 
 ---
 
@@ -150,7 +150,7 @@ RETURN o.preferred_name AS organism_name,
 ORDER BY o.genus, o.preferred_name
 ```
 
-`build_list_organisms_summary` is **not modified.** `by_metabolic_capability` is computed in api/ from the matched detail rows (or via a small extra Cypher when `summary=True`).
+`build_list_organisms_summary` is **not modified.** `top_metabolic_capability` is computed in api/ from the matched detail rows (or via a small extra Cypher when `summary=True`).
 
 ### KG verification (verified 2026-05-02)
 
@@ -168,11 +168,11 @@ ORDER BY o.genus, o.preferred_name
 
 **File:** `api/functions.py` (line 609 `list_organisms`)
 
-Add `by_metabolic_capability` computation. Two paths:
+Add `top_metabolic_capability` computation. Two paths:
 
 1. **`limit > 0`:** detail query returns matched rows with `reaction_count`/`metabolite_count` columns. Sort by `metabolite_count` desc, filter to non-zero, slice to top 10.
 
-2. **`limit == 0` (summary mode):** detail query is skipped today. Run a small extra query (same WHERE as detail builder, projecting only the 3 fields) just to populate `by_metabolic_capability`.
+2. **`limit == 0` (summary mode):** detail query is skipped today. Run a small extra query (same WHERE as detail builder, projecting only the 3 fields) just to populate `top_metabolic_capability`.
 
 ```python
 # After existing detail-fetch block:
@@ -187,9 +187,9 @@ if matched:
         if r.get("metabolite_count", 0) > 0 or r.get("reaction_count", 0) > 0
     ]
     chemistry_capable.sort(key=lambda r: r["metabolite_count"], reverse=True)
-    by_metabolic_capability = chemistry_capable[:10]
+    top_metabolic_capability = chemistry_capable[:10]
 else:
-    by_metabolic_capability = []
+    top_metabolic_capability = []
 
 # When limit == 0 and chemistry-capable rows still wanted:
 if limit == 0 and total_matching > 0:
@@ -207,12 +207,12 @@ if limit == 0 and total_matching > 0:
         if r.get("metabolite_count", 0) > 0 or r.get("reaction_count", 0) > 0
     ]
     chemistry_capable.sort(key=lambda r: r["metabolite_count"], reverse=True)
-    by_metabolic_capability = chemistry_capable[:10]
+    top_metabolic_capability = chemistry_capable[:10]
 ```
 
 (The duplication in the two branches is acceptable — small block, clearer than refactoring. If it grows, extract a helper.)
 
-Add `by_metabolic_capability` to the returned dict. Update docstring to document the new envelope key + per-row fields.
+Add `top_metabolic_capability` to the returned dict. Update docstring to document the new envelope key + per-row fields.
 
 ---
 
@@ -253,7 +253,7 @@ class OrgMetabolicCapabilityBreakdown(BaseModel):
 Insert after `by_compartment`:
 
 ```python
-by_metabolic_capability: list[OrgMetabolicCapabilityBreakdown] = Field(
+top_metabolic_capability: list[OrgMetabolicCapabilityBreakdown] = Field(
     default_factory=list,
     description="Top 10 organisms by metabolite_count (within matched set), sorted desc. "
     "Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry.",
@@ -265,12 +265,12 @@ by_metabolic_capability: list[OrgMetabolicCapabilityBreakdown] = Field(
 Pass-through in the wrapper body — one new line in the response construction:
 
 ```python
-by_metabolic_capability = [
+top_metabolic_capability = [
     OrgMetabolicCapabilityBreakdown(**b)
-    for b in result.get("by_metabolic_capability", [])
+    for b in result.get("top_metabolic_capability", [])
 ]
 # ... in ListOrganismsResponse(...):
-by_metabolic_capability=by_metabolic_capability,
+top_metabolic_capability=top_metabolic_capability,
 ```
 
 Docstring: append a brief note about the new chemistry-coverage signal and drill-down to `list_metabolites`.
@@ -291,19 +291,19 @@ test_returns_metabolite_count_column    — RETURN includes "coalesce(o.metaboli
 ```
 test_reaction_count_propagates_to_results
 test_metabolite_count_propagates_to_results
-test_by_metabolic_capability_sorted_desc_by_metabolite_count
-test_by_metabolic_capability_excludes_zero_chemistry
-test_by_metabolic_capability_top_10_cap
-test_by_metabolic_capability_summary_mode_runs_extra_query  — limit=0 path computes via small Cypher
-test_by_metabolic_capability_empty_when_no_matches
+test_top_metabolic_capability_sorted_desc_by_metabolite_count
+test_top_metabolic_capability_excludes_zero_chemistry
+test_top_metabolic_capability_top_10_cap
+test_top_metabolic_capability_summary_mode_runs_extra_query  — limit=0 path computes via small Cypher
+test_top_metabolic_capability_empty_when_no_matches
 ```
 
 ### Unit: MCP wrapper (extend `TestListOrganismsWrapper`)
 
 ```
-test_response_has_by_metabolic_capability
+test_response_has_top_metabolic_capability
 test_organism_result_has_reaction_count_and_metabolite_count
-test_by_metabolic_capability_passes_through
+test_top_metabolic_capability_passes_through
 ```
 
 `EXPECTED_TOOLS` already lists `list_organisms` — no change needed.
@@ -313,7 +313,7 @@ test_by_metabolic_capability_passes_through
 Live-KG case (re-uses 2026-05-02 verified data):
 - `list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii EZ55"])`
   → both rows have `metabolite_count` and `reaction_count` > 0
-  → `by_metabolic_capability` includes both, sorted with EZ55 (1428) first, MED4 (1039) second.
+  → `top_metabolic_capability` includes both, sorted with EZ55 (1428) first, MED4 (1039) second.
 
 ### Regression (`test_regression.py`)
 
@@ -327,7 +327,7 @@ pytest tests/regression/ --force-regen -m kg
 
 ### Eval cases (`tests/evals/cases.yaml`)
 
-Add a small case: query MED4 + assert `metabolite_count > 0` and `by_metabolic_capability[0].metabolite_count >= [...]`.
+Add a small case: query MED4 + assert `metabolite_count > 0` and `top_metabolic_capability[0].metabolite_count >= [...]`.
 
 ---
 
@@ -341,7 +341,7 @@ Add example:
 - title: Identify chemistry-rich organisms (capability ranking)
   call: list_organisms(summary=True)
   response: |
-    {"total_entries": 36, "total_matching": 36, "by_metabolic_capability": [
+    {"total_entries": 36, "total_matching": 36, "top_metabolic_capability": [
        {"organism_name": "Pseudomonas putida KT2440", "reaction_count": 1449, "metabolite_count": 1490},
        {"organism_name": "Ruegeria pomeroyi DSS-3", "reaction_count": 1377, "metabolite_count": 1468},
        {"organism_name": "Alteromonas macleodii EZ55", "reaction_count": 1348, "metabolite_count": 1428}
@@ -372,7 +372,7 @@ uv run python scripts/build_about_content.py list_organisms
 
 | File | What to update |
 |------|----------------|
-| `CLAUDE.md` | Update `list_organisms` row: mention `reaction_count` / `metabolite_count` per row + `by_metabolic_capability` envelope rollup. |
+| `CLAUDE.md` | Update `list_organisms` row: mention `reaction_count` / `metabolite_count` per row + `top_metabolic_capability` envelope rollup. |
 
 ---
 
@@ -380,7 +380,7 @@ uv run python scripts/build_about_content.py list_organisms
 
 When the TCDB-CAZy spec lands and extends `Metabolite.gene_count` / `Organism_has_metabolite` to UNION the transport path, `OrganismTaxon.metabolite_count` will grow to include transport substrates. **No explorer change needed** — the value just gets bigger. The Pydantic field description already states this.
 
-When the metabolomics-DM spec lands, it does NOT change `OrganismTaxon.metabolite_count` (metabolomics-only metabolites have no gene path). `by_metabolic_capability` continues to reflect catalysis + transport coverage; metabolomics adds a separate axis surfaced through `list_metabolites` rather than `list_organisms`.
+When the metabolomics-DM spec lands, it does NOT change `OrganismTaxon.metabolite_count` (metabolomics-only metabolites have no gene path). `top_metabolic_capability` continues to reflect catalysis + transport coverage; metabolomics adds a separate axis surfaced through `list_metabolites` rather than `list_organisms`.
 
 ## References
 

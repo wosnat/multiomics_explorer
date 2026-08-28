@@ -1219,7 +1219,7 @@ class TestBuildListOrganisms:
 
 class TestBuildListOrganismsCapability:
     """Small-projection builder used by api/list_organisms in summary mode
-    so the by_metabolic_capability rollup doesn't drag the full detail
+    so the top_metabolic_capability rollup doesn't drag the full detail
     builder along."""
 
     def test_returns_only_three_columns(self):
@@ -1229,7 +1229,7 @@ class TestBuildListOrganismsCapability:
         assert "coalesce(o.reaction_count, 0) AS reaction_count" in cypher
         assert ("coalesce(o.catalyzed_metabolite_count, 0) "
                 "AS catalyzed_metabolite_count") in cypher
-        # substrate_depth migration: by_metabolic_capability[] entries carry
+        # substrate_depth migration: top_metabolic_capability[] entries carry
         # transported_metabolite_count (ranking unchanged)
         assert ("coalesce(o.transported_metabolite_count, 0) "
                 "AS transported_metabolite_count") in cypher
@@ -12554,7 +12554,7 @@ class TestBuildGenesByOntologyTrustRollups:
 class TestBuildListOrganismsAnnotationRollups:
     """Spec §3.3 / §7.1: the four ORG-001 organism-level annotation counts are
     `coalesce(o.<prop>, 0)` compact columns on the detail builder, and the
-    summary builder emits the `by_annotation_capability` rollup."""
+    summary builder emits the `top_annotation_capability` rollup."""
 
     _COLS = (
         "peptidase_gene_count",
@@ -12583,10 +12583,10 @@ class TestBuildListOrganismsAnnotationRollups:
         for col in self._COLS:
             assert f"coalesce(o.{col}, 0) AS {col}" in cypher
 
-    def test_summary_builder_emits_by_annotation_capability(self):
+    def test_summary_builder_emits_top_annotation_capability(self):
         from multiomics_explorer.kg.queries_lib import build_list_organisms_summary
         cypher, _ = build_list_organisms_summary()
-        assert "by_annotation_capability" in cypher
+        assert "top_annotation_capability" in cypher
         for col in self._COLS:
             assert col in cypher, col
 

@@ -209,7 +209,7 @@ def test_regression(conn, case, data_regression):
         # `dispatch: api` — for tools whose TOOL_BUILDERS entry pins the
         # builder-row shape on existing goldens (gene_overview,
         # list_organisms, metabolites_by_gene) but whose new envelope
-        # surface (warnings, by_gene[], by_metabolic_capability) must be
+        # surface (warnings, by_gene[], top_metabolic_capability) must be
         # pinned too. Same shape as the explicit api branches below.
         data = getattr(api, tool)(**params, conn=conn)
         normalized_rows = _normalize(data.get("results", []))

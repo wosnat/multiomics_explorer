@@ -47,7 +47,6 @@ pathway rollups; `mcp_min_version` mismatch (live reads `0.1.0a1`, verdict `ok`)
 
 | # | Item | Size | Notes |
 |---|---|---|---|
-| 3.1 | Rename `list_organisms.by_metabolic_capability` → `top_metabolic_capability` (project rule: `top_*` = hard-coded top-N, `by_*` = full frequency). `by_annotation_capability` (slice 4) inherited the same misnomer — rename both together. **Breaking** envelope key. | S | naming convention 2026-05-02 |
 | 3.2 | Bare metabolite IDs (`C00064`) → prefixed canonical form via `m.kegg_compound_id` in compound-anchored tools; extend to CHEBI / HMDB / MNXM. Partially present (`kegg_compound_id` used in 2 sites) — verify scope. | M | KG-MET-014 |
 | 3.3 | Organism-name resolution policy: chemistry tools accept `'MED4'`, `list_organisms(organism_names=)` requires the full `preferred_name`. Standardise (slice 4 made `search_ontology` / `ontology_term_details` use the shared resolver — `list_organisms` is the last exact-match holdout). | S | KG-MET-015 |
 | 3.4 | `gene_overview`: `tcdb_family_count` / `cazy_family_count` routing signals (parallel to chemistry counts). `transporter_count` was removed in slice 2 for counting superseded ancestors — any replacement must count `attachment_depth = 'most_specific'` only. | S | TCDB/CAZy follow-up |

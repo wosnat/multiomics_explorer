@@ -147,7 +147,7 @@ def test_ontology_terms_scenario_runs_cleanly(scenario, expected):
 
 # Spec 2026-08-27-slice4-light-surface §8: `examples/annotation_evidence.py`
 # gains an organism-rollup scenario reading list_organisms'
-# `by_annotation_capability` (peptidase / nonpeptidase-homolog / interpro /
+# `top_annotation_capability` (peptidase / nonpeptidase-homolog / interpro /
 # ncbifam gene counts per organism). Same output-substring rule as above.
 ANNOTATION_EVIDENCE_SLICE4_SCENARIOS = [
     ("organism_rollups", "peptidase_gene_count"),

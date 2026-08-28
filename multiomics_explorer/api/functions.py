@@ -1599,8 +1599,8 @@ def list_organisms(
 
     Returns dict with keys: total_entries, total_matching, returned, offset,
     truncated, by_cluster_type, by_organism_type, by_value_kind, by_metric_type,
-    by_compartment, by_metabolic_capability, by_measurement_capability,
-    by_annotation_capability, not_found, results.
+    by_compartment, top_metabolic_capability, by_measurement_capability,
+    top_annotation_capability, not_found, results.
     Per result (compact): organism_name, organism_type, genus, species,
     strain, clade, ncbi_taxon_id, gene_count, publication_count,
     experiment_count, treatment_types, omics_types, clustering_analysis_count,
@@ -1616,7 +1616,7 @@ def list_organisms(
     When verbose=True, also includes: family, order, tax_class, phylum, kingdom,
     superkingdom, lineage, cluster_count, derived_metric_gene_count,
     derived_metric_types.
-    by_metabolic_capability: top 10 organisms (within matched set) by
+    top_metabolic_capability: top 10 organisms (within matched set) by
     catalyzed_metabolite_count, sorted desc; excludes zero-chemistry
     organisms. Ranks on the catalysis arm only (metabolites reached via
     Gene -> Reaction); each entry also carries transported_metabolite_count
@@ -1626,7 +1626,7 @@ def list_organisms(
     by_measurement_capability: binary 2-bucket count
     {has_metabolomics: N, no_metabolomics: M} where has_metabolomics counts
     organisms with measured_metabolite_count > 0. Sums to total_matching.
-    by_annotation_capability: top 10 organisms (within matched set) by
+    top_annotation_capability: top 10 organisms (within matched set) by
     peptidase_gene_count desc, then preferred_name; each entry carries
     preferred_name, organism_name and all four annotation counts. Organisms
     with all four counts at 0 are excluded. A reading aid for choosing an
@@ -1652,12 +1652,12 @@ def list_organisms(
         "by_measurement_capability": {
             "has_metabolomics": 0, "no_metabolomics": 0,
         },
-        "by_annotation_capability": [],
+        "top_annotation_capability": [],
     }
     total_entries = summary_row["total_entries"]
     total_matching = summary_row["total_matching"]
 
-    # by_metabolic_capability source: detail-mode callers reuse matched rows
+    # top_metabolic_capability source: detail-mode callers reuse matched rows
     # (avoids a second round-trip); summary-mode callers run a small dedicated
     # capability projection so the summary fast path stays cheap and doesn't
     # pull verbose detail columns just to throw them away.
@@ -1701,7 +1701,7 @@ def list_organisms(
                                      "derived_metric_types")}
                        for r in results]
 
-    # by_metabolic_capability: top 10 organisms by catalyzed_metabolite_count
+    # top_metabolic_capability: top 10 organisms by catalyzed_metabolite_count
     # in the matched set; excludes zero-chemistry rows. transported_metabolite_count
     # rides along as a column (ranking unchanged — catalysis arm).
     chemistry_capable = [
@@ -1719,17 +1719,17 @@ def list_organisms(
     chemistry_capable.sort(
         key=lambda r: r["catalyzed_metabolite_count"], reverse=True,
     )
-    by_metabolic_capability = chemistry_capable[:10]
+    top_metabolic_capability = chemistry_capable[:10]
 
-    # by_annotation_capability (slice 4 §3.3): top 10 organisms by
+    # top_annotation_capability (slice 4 §3.3): top 10 organisms by
     # peptidase_gene_count desc then preferred_name; all-four-zero rows
     # excluded. Detail mode ranks the matched rows api-side (page-
     # independent); summary mode reads the summary builder's rollup and
     # only falls back to the capability rows when that key is absent.
-    if limit == 0 and summary_row.get("by_annotation_capability") is not None:
-        by_annotation_capability = list(summary_row["by_annotation_capability"])
+    if limit == 0 and summary_row.get("top_annotation_capability") is not None:
+        top_annotation_capability = list(summary_row["top_annotation_capability"])
     else:
-        by_annotation_capability = _rank_annotation_capability(capability_rows)
+        top_annotation_capability = _rank_annotation_capability(capability_rows)
 
     # not_found: input names that didn't match any OrganismTaxon
     # (case-insensitive). Original casing preserved in the returned list.
@@ -1758,7 +1758,7 @@ def list_organisms(
                                        "metric_type"),
         "by_compartment": _rename_freq(summary_row.get("by_compartment", []),
                                        "compartment"),
-        "by_metabolic_capability": by_metabolic_capability,
+        "top_metabolic_capability": top_metabolic_capability,
         # Phase 1 plumbing (spec §6.4): pass-through binary 2-bucket dict
         # surfaced by build_list_organisms_summary. Default to zero-bucket
         # dict on no-summary fall-through.
@@ -1766,7 +1766,7 @@ def list_organisms(
             "by_measurement_capability",
             {"has_metabolomics": 0, "no_metabolomics": 0},
         ),
-        "by_annotation_capability": by_annotation_capability,
+        "top_annotation_capability": top_annotation_capability,
         "returned": len(results),
         "offset": offset,
         "truncated": total_matching > offset + len(results),
@@ -1782,7 +1782,7 @@ _ANNOTATION_CAPABILITY_COLS = (
 
 
 def _rank_annotation_capability(rows: list[dict]) -> list[dict]:
-    """Top-10 `by_annotation_capability` entries over organism rows.
+    """Top-10 `top_annotation_capability` entries over organism rows.
 
     Sort key: peptidase_gene_count desc, then preferred_name (== organism_name
     on the row projection). Rows with all four counts at 0 are dropped.

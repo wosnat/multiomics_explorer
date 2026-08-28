@@ -152,7 +152,7 @@ def differential_expression_by_gene_scenarios():
 
 # --- Slice 4 (2026-08-27) fixtures ------------------------------------------
 # OrganismTaxon whose four annotation rollups are all 0 (treatment taxon,
-# 0 genes) -> must be EXCLUDED from list_organisms.by_annotation_capability.
+# 0 genes) -> must be EXCLUDED from list_organisms.top_annotation_capability.
 # MATCH (o:OrganismTaxon) WHERE coalesce(o.peptidase_gene_count,0)=0
 #   AND coalesce(o.nonpeptidase_homolog_gene_count,0)=0
 #   AND coalesce(o.interpro_gene_count,0)=0 AND coalesce(o.ncbifam_gene_count,0)=0
@@ -173,7 +173,7 @@ def list_organisms_scenarios():
             dict(organism_names=["Nonexistus fakeii"]),
             input_ids=["Nonexistus fakeii"]),
         # Slice 4 (spec §8): a subset whose only member has all-zero
-        # annotation rollups -> by_annotation_capability == [] but the row
+        # annotation rollups -> top_annotation_capability == [] but the row
         # itself is still returned (coverage counts are for reading).
         Scenario(
             "all_zero_annotation_rollups_subset",

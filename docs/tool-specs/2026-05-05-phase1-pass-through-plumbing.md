@@ -213,7 +213,7 @@ ORDER BY g.locus_tag
 ...
 ```
 
-Summary query — append envelope rollup CTE. Pattern parallels existing `by_metabolic_capability` rollup, but simpler shape (no top-N logic):
+Summary query — append envelope rollup CTE. Pattern parallels existing `top_metabolic_capability` rollup, but simpler shape (no top-N logic):
 
 ```cypher
 ... existing summary CTE ...

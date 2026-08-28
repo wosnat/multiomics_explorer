@@ -1,16 +1,3 @@
-by_annotation_capability:
-- interpro_gene_count: 3746
-  ncbifam_gene_count: 1379
-  nonpeptidase_homolog_gene_count: 31
-  organism_name: Alteromonas (MarRef v6)
-  peptidase_gene_count: 148
-  preferred_name: Alteromonas (MarRef v6)
-- interpro_gene_count: 1545
-  ncbifam_gene_count: 744
-  nonpeptidase_homolog_gene_count: 8
-  organism_name: Prochlorococcus MED4
-  peptidase_gene_count: 50
-  preferred_name: Prochlorococcus MED4
 by_cluster_type:
 - cluster_type: genomic_island
   count: 1
@@ -28,15 +15,6 @@ by_compartment:
 by_measurement_capability:
   has_metabolomics: 0
   no_metabolomics: 3
-by_metabolic_capability:
-- catalyzed_metabolite_count: 1359
-  organism_name: Alteromonas (MarRef v6)
-  reaction_count: 1263
-  transported_metabolite_count: 1265
-- catalyzed_metabolite_count: 1039
-  organism_name: Prochlorococcus MED4
-  reaction_count: 943
-  transported_metabolite_count: 1069
 by_metric_type:
 - count: 1
   metric_type: antisense_tss_count
@@ -259,6 +237,28 @@ results:
   - viral
 returned: 3
 row_count: 3
+top_annotation_capability:
+- interpro_gene_count: 3746
+  ncbifam_gene_count: 1379
+  nonpeptidase_homolog_gene_count: 31
+  organism_name: Alteromonas (MarRef v6)
+  peptidase_gene_count: 148
+  preferred_name: Alteromonas (MarRef v6)
+- interpro_gene_count: 1545
+  ncbifam_gene_count: 744
+  nonpeptidase_homolog_gene_count: 8
+  organism_name: Prochlorococcus MED4
+  peptidase_gene_count: 50
+  preferred_name: Prochlorococcus MED4
+top_metabolic_capability:
+- catalyzed_metabolite_count: 1359
+  organism_name: Alteromonas (MarRef v6)
+  reaction_count: 1263
+  transported_metabolite_count: 1265
+- catalyzed_metabolite_count: 1039
+  organism_name: Prochlorococcus MED4
+  reaction_count: 943
+  transported_metabolite_count: 1069
 total_entries: 48
 total_matching: 3
 truncated: false

@@ -36,7 +36,7 @@ transport-arm rows (reads the existing `Gene.transport_substrate_resolution`).
 ### ORG-001 — organism-level protease / domain-coverage rollups
 
 **Surface it unblocks.** `list_organisms` rows gain `peptidase_gene_count`, `nonpeptidase_homolog_gene_count`,
-`interpro_gene_count`, `ncbifam_gene_count`; envelope gains `by_annotation_capability` (top-10 organisms by
+`interpro_gene_count`, `ncbifam_gene_count`; envelope gains `top_annotation_capability` (top-10 organisms by
 `peptidase_gene_count`, carries the other three as columns, excludes zero rows) — the routing question is
 "which organisms are protease-rich / which have thin domain coverage" before drilling into
 `genes_by_ontology(ontology='merops', organism=…, call_class=['peptidase'])`.

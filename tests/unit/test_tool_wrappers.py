@@ -511,7 +511,7 @@ class TestListOrganismsWrapper:
                 "total_entries": 1, "total_matching": 1, "returned": 1,
                 "truncated": False, "not_found": [], "results": [sample_org_with_chem],
                 "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
-                "by_metabolic_capability": [],
+                "top_metabolic_capability": [],
             },
         ):
             result = await tool_fns["list_organisms"](mock_ctx)
@@ -520,15 +520,15 @@ class TestListOrganismsWrapper:
         assert org.catalyzed_metabolite_count == 1039
 
     @pytest.mark.asyncio
-    async def test_by_metabolic_capability_envelope(self, tool_fns, mock_ctx):
-        """Response includes by_metabolic_capability rollup with typed entries."""
+    async def test_top_metabolic_capability_envelope(self, tool_fns, mock_ctx):
+        """Response includes top_metabolic_capability rollup with typed entries."""
         with patch(
             "multiomics_explorer.api.functions.list_organisms",
             return_value={
                 "total_entries": 2, "total_matching": 2, "returned": 0,
                 "truncated": True, "not_found": [], "results": [],
                 "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
-                "by_metabolic_capability": [
+                "top_metabolic_capability": [
                     {"organism_name": "Alteromonas macleodii EZ55",
                      "reaction_count": 1348,
                      "catalyzed_metabolite_count": 1428,
@@ -541,15 +541,15 @@ class TestListOrganismsWrapper:
             },
         ):
             result = await tool_fns["list_organisms"](mock_ctx, summary=True)
-        assert len(result.by_metabolic_capability) == 2
-        top = result.by_metabolic_capability[0]
+        assert len(result.top_metabolic_capability) == 2
+        top = result.top_metabolic_capability[0]
         assert top.organism_name == "Alteromonas macleodii EZ55"
         assert top.reaction_count == 1348
         assert top.catalyzed_metabolite_count == 1428
         # substrate_depth migration: entries carry transported_metabolite_count
         # (ranking unchanged — EZ55 leads on catalyzed_metabolite_count)
         assert top.transported_metabolite_count == 95
-        assert result.by_metabolic_capability[1].transported_metabolite_count == 120
+        assert result.top_metabolic_capability[1].transported_metabolite_count == 120
 
     @pytest.mark.asyncio
     async def test_row_transported_metabolite_count(self, tool_fns, mock_ctx):
@@ -567,7 +567,7 @@ class TestListOrganismsWrapper:
                 "total_entries": 1, "total_matching": 1, "returned": 1,
                 "truncated": False, "not_found": [], "results": [sample],
                 "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
-                "by_metabolic_capability": [],
+                "top_metabolic_capability": [],
             },
         ):
             result = await tool_fns["list_organisms"](mock_ctx)
@@ -10602,7 +10602,7 @@ class TestGeneReactionMetaboliteTripletSubstrateResolution:
 
 class TestListOrganismsAnnotationCapabilityWrapper:
     """Spec §3.3 / §6: `ListOrganismsResult` carries the four ints (default 0)
-    and `ListOrganismsResponse.by_annotation_capability` is a typed list of
+    and `ListOrganismsResponse.top_annotation_capability` is a typed list of
     `{preferred_name, organism_name, <four counts>}` entries."""
 
     _COLS = (
@@ -10638,7 +10638,7 @@ class TestListOrganismsAnnotationCapabilityWrapper:
             "total_entries": 48, "total_matching": 48,
             "returned": 1, "truncated": True, "not_found": [],
             "results": [self._ORG],
-            "by_annotation_capability": self._CAP,
+            "top_annotation_capability": self._CAP,
             **extra,
         }
 
@@ -10678,11 +10678,11 @@ class TestListOrganismsAnnotationCapabilityWrapper:
             assert names.index(col) > names.index("measured_metabolite_count"), col
 
     @pytest.mark.asyncio
-    async def test_envelope_by_annotation_capability_is_typed(self, tool_fns, mock_ctx):
+    async def test_envelope_top_annotation_capability_is_typed(self, tool_fns, mock_ctx):
         with patch("multiomics_explorer.api.functions.list_organisms",
                    return_value=self._envelope()):
             result = await tool_fns["list_organisms"](mock_ctx)
-        cap = result.by_annotation_capability
+        cap = result.top_annotation_capability
         assert len(cap) == 2
         first = cap[0]
         assert not isinstance(first, dict), "entries must be a Pydantic sub-model"
@@ -10703,7 +10703,7 @@ class TestListOrganismsAnnotationCapabilityWrapper:
         with patch("multiomics_explorer.api.functions.list_organisms",
                    return_value=self._envelope()):
             result = await tool_fns["list_organisms"](mock_ctx)
-        field = type(result).model_fields["by_annotation_capability"]
+        field = type(result).model_fields["top_annotation_capability"]
         assert field.description
         assert "peptidase_gene_count" in field.description
         assert "10" in field.description
@@ -10711,11 +10711,11 @@ class TestListOrganismsAnnotationCapabilityWrapper:
     @pytest.mark.asyncio
     async def test_envelope_defaults_to_empty_list(self, tool_fns, mock_ctx):
         env = self._envelope()
-        env.pop("by_annotation_capability")
+        env.pop("top_annotation_capability")
         with patch("multiomics_explorer.api.functions.list_organisms",
                    return_value=env):
             result = await tool_fns["list_organisms"](mock_ctx)
-        assert result.by_annotation_capability == []
+        assert result.top_annotation_capability == []
 
     def test_no_new_filter_param(self, tool_fns):
         import inspect
