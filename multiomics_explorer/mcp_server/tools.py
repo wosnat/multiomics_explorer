@@ -1636,17 +1636,10 @@ def register_tools(mcp: FastMCP):
                     "attachment_depth", "trust_axes", "link_kinds",
                     "cluster_type"],
             Field(description=(
-                "Which categorical filter to enumerate. `cluster_type` reads "
-                "the ClusteringAnalysis.cluster_type ControlledVocabulary "
-                "(pivot fallback + warning). `omics_type` returns "
-                "the full canonical enum incl. METABOLOMICS; `evidence_source` "
-                "returns Metabolite.evidence_sources values. The trust-surface "
-                "types (evidence, sources, call_class, interpro_type, "
-                "ncbifam_family_type, merops_catalytic_type, "
-                "merops_family_class, best_hit_kind, pfam_support, "
-                "attachment_depth, trust_axes, link_kinds) come from "
-                "ControlledVocabulary (or a pivot-query fallback) / config — "
-                "see docs://analysis/annotation_evidence."
+                "Which filter to enumerate: gene/expression (gene_category, "
+                "brite_tree, growth_phase, omics_type, cluster_type), "
+                "DerivedMetric (metric_type, value_kind, compartment), "
+                "chemistry (evidence_source), or an annotation-trust vocabulary."
             )),
         ] = "gene_category",
         ontology: Annotated[str | None, Field(

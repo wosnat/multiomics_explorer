@@ -10385,7 +10385,10 @@ class TestSearchOntologyReviewFixes3b:
             "skipped_ontologies"].annotation
         assert ann == list[dict]
 
-    @pytest.mark.parametrize("tool_name", ["search_ontology", "ontology_term_details"])
+    @pytest.mark.parametrize("tool_name", [
+        "search_ontology", "ontology_term_details",
+        "list_filter_values", "kg_release_info",
+    ])
     def test_every_param_field_description_within_250(self, tool_fns, tool_name):
         sig = _inspect3b.signature(tool_fns[tool_name])
         for param in sig.parameters:

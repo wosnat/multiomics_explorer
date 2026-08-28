@@ -207,6 +207,26 @@ examples:
          {"value": "genomic_island", "applies_to": ["ClusteringAnalysis"], "description": "...", "source": "vocabulary"}
        ]}
 
+response_notes:
+  - title: "Filter-type families"
+    body: |
+      `filter_type` values fall into four families. Gene / expression:
+      `gene_category` (Gene.category, counts summed across organisms),
+      `brite_tree` (BRITE tree names + `tree_code`; count = terms, not
+      genes), `growth_phase` (timepoint-level culture state), `omics_type`
+      (the full canonical enum incl. METABOLOMICS), `cluster_type`
+      (ClusteringAnalysis.cluster_type from ControlledVocabulary, pivot
+      fallback + warning). DerivedMetric: `metric_type`, `value_kind`
+      (`numeric` / `boolean` / `categorical`), `compartment` (wet-lab
+      fraction). Chemistry: `evidence_source` (Metabolite.evidence_sources
+      values). Annotation-trust: `evidence`, `sources`, `call_class`,
+      `interpro_type`, `ncbifam_family_type`, `merops_catalytic_type`,
+      `merops_family_class`, `best_hit_kind`, `pfam_support`,
+      `attachment_depth` read ControlledVocabulary (pivot fallback + warning
+      when the node is missing); `trust_axes` / `link_kinds` are
+      config-derived and accept `ontology=` to scope. See
+      docs://analysis/annotation_evidence.
+
 chaining:
   - "list_filter_values → genes_by_function(category=...)"
   - "list_filter_values(filter_type='cluster_type') → list_clustering_analyses(cluster_type=...) / gene_clusters_by_gene(cluster_type=...)"

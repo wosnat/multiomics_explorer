@@ -22,7 +22,7 @@ Routing: feed the returned `value`s into the corresponding filter on the relevan
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment', 'omics_type', 'evidence_source', 'evidence', 'sources', 'call_class', 'interpro_type', 'ncbifam_family_type', 'merops_catalytic_type', 'merops_family_class', 'best_hit_kind', 'pfam_support', 'attachment_depth', 'trust_axes', 'link_kinds', 'cluster_type') | gene_category | Which categorical filter to enumerate. `cluster_type` reads the ClusteringAnalysis.cluster_type ControlledVocabulary (pivot fallback + warning). `omics_type` returns the full canonical enum incl. METABOLOMICS; `evidence_source` returns Metabolite.evidence_sources values. The trust-surface types (evidence, sources, call_class, interpro_type, ncbifam_family_type, merops_catalytic_type, merops_family_class, best_hit_kind, pfam_support, attachment_depth, trust_axes, link_kinds) come from ControlledVocabulary (or a pivot-query fallback) / config — see docs://analysis/annotation_evidence. |
+| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment', 'omics_type', 'evidence_source', 'evidence', 'sources', 'call_class', 'interpro_type', 'ncbifam_family_type', 'merops_catalytic_type', 'merops_family_class', 'best_hit_kind', 'pfam_support', 'attachment_depth', 'trust_axes', 'link_kinds', 'cluster_type') | gene_category | Which filter to enumerate: gene/expression (gene_category, brite_tree, growth_phase, omics_type, cluster_type), DerivedMetric (metric_type, value_kind, compartment), chemistry (evidence_source), or an annotation-trust vocabulary. |
 | ontology | string \| None | None | Scope a trust filter_type (e.g. 'trust_axes') to one ontology key. Ignored on non-trust filter types. |
 
 ## Response format
@@ -49,6 +49,26 @@ filter_type, total_entries, returned, truncated, warnings, results
 | source | string \| None (optional) | Provenance of this value (sparse: trust filter types only): 'vocabulary' (from ControlledVocabulary) or 'pivot' (KG-side vocab node missing; derived from the graph, see envelope warnings). |
 | applies_to | list[string] \| None (optional) | Edge/node type(s) this value is scoped to (sparse: trust filter types only), e.g. ['Gene_has_merops_family']. |
 | description | string \| None (optional) | Human-readable meaning of this value (sparse: trust filter types only, from ControlledVocabulary). |
+
+### Filter-type families
+
+`filter_type` values fall into four families. Gene / expression:
+`gene_category` (Gene.category, counts summed across organisms),
+`brite_tree` (BRITE tree names + `tree_code`; count = terms, not
+genes), `growth_phase` (timepoint-level culture state), `omics_type`
+(the full canonical enum incl. METABOLOMICS), `cluster_type`
+(ClusteringAnalysis.cluster_type from ControlledVocabulary, pivot
+fallback + warning). DerivedMetric: `metric_type`, `value_kind`
+(`numeric` / `boolean` / `categorical`), `compartment` (wet-lab
+fraction). Chemistry: `evidence_source` (Metabolite.evidence_sources
+values). Annotation-trust: `evidence`, `sources`, `call_class`,
+`interpro_type`, `ncbifam_family_type`, `merops_catalytic_type`,
+`merops_family_class`, `best_hit_kind`, `pfam_support`,
+`attachment_depth` read ControlledVocabulary (pivot fallback + warning
+when the node is missing); `trust_axes` / `link_kinds` are
+config-derived and accept `ontology=` to scope. See
+docs://analysis/annotation_evidence.
+
 
 ## Few-shot examples
 
