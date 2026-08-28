@@ -30,10 +30,11 @@ Routing: feed the returned `value`s into the corresponding filter on the relevan
 ### Envelope
 
 ```expected-keys
-filter_type, total_entries, returned, truncated, warnings, results
+filter_type, description, total_entries, returned, truncated, warnings, results
 ```
 
 - **filter_type** (string): The filter type returned (e.g. 'gene_category').
+- **description** (string | None): Vocabulary-level description of the property behind this filter (ControlledVocabulary text; cluster_type and the trust types). Emitted once here, not per row. None elsewhere.
 - **total_entries** (int): Total distinct values for this filter.
 - **returned** (int): Number of results returned.
 - **truncated** (bool): True if total_entries > returned.
@@ -398,7 +399,7 @@ list_filter_values(filter_type='trust_axes', ontology='go_bp')  # check axes fir
 from multiomics_explorer import list_filter_values
 
 result = list_filter_values()
-# returns dict with keys: filter_type, total_entries, warnings, results
+# returns dict with keys: filter_type, description, total_entries, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

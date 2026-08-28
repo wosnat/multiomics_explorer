@@ -1,58 +1,33 @@
 case_id: list_filter_values_cluster_type
+description: What kind of gene grouping a clustering analysis is (paperconfig `gene_clusters.cluster_type`,
+  validated by scripts/validate_paperconfig.py VALID_CLUSTER_TYPES). Registered 2026-08-27
+  (KG-SYNC-006) when the GEO pass added `decay_pattern` (Steglich 2010 mRNA-decay
+  profile clusters) and `genomic_island` (Hackl 2023 predicted genomic islands as
+  gene sets).
 filter_type: cluster_type
 results:
 - applies_to:
   - ClusteringAnalysis
-  description: What kind of gene grouping a clustering analysis is (paperconfig `gene_clusters.cluster_type`,
-    validated by scripts/validate_paperconfig.py VALID_CLUSTER_TYPES). Registered
-    2026-08-27 (KG-SYNC-006) when the GEO pass added `decay_pattern` (Steglich 2010
-    mRNA-decay profile clusters) and `genomic_island` (Hackl 2023 predicted genomic
-    islands as gene sets).
   source: vocabulary
   value: time_course
 - applies_to:
   - ClusteringAnalysis
-  description: What kind of gene grouping a clustering analysis is (paperconfig `gene_clusters.cluster_type`,
-    validated by scripts/validate_paperconfig.py VALID_CLUSTER_TYPES). Registered
-    2026-08-27 (KG-SYNC-006) when the GEO pass added `decay_pattern` (Steglich 2010
-    mRNA-decay profile clusters) and `genomic_island` (Hackl 2023 predicted genomic
-    islands as gene sets).
   source: vocabulary
   value: diel
 - applies_to:
   - ClusteringAnalysis
-  description: What kind of gene grouping a clustering analysis is (paperconfig `gene_clusters.cluster_type`,
-    validated by scripts/validate_paperconfig.py VALID_CLUSTER_TYPES). Registered
-    2026-08-27 (KG-SYNC-006) when the GEO pass added `decay_pattern` (Steglich 2010
-    mRNA-decay profile clusters) and `genomic_island` (Hackl 2023 predicted genomic
-    islands as gene sets).
   source: vocabulary
   value: condition_comparison
 - applies_to:
   - ClusteringAnalysis
-  description: What kind of gene grouping a clustering analysis is (paperconfig `gene_clusters.cluster_type`,
-    validated by scripts/validate_paperconfig.py VALID_CLUSTER_TYPES). Registered
-    2026-08-27 (KG-SYNC-006) when the GEO pass added `decay_pattern` (Steglich 2010
-    mRNA-decay profile clusters) and `genomic_island` (Hackl 2023 predicted genomic
-    islands as gene sets).
   source: vocabulary
   value: expression_bin
 - applies_to:
   - ClusteringAnalysis
-  description: What kind of gene grouping a clustering analysis is (paperconfig `gene_clusters.cluster_type`,
-    validated by scripts/validate_paperconfig.py VALID_CLUSTER_TYPES). Registered
-    2026-08-27 (KG-SYNC-006) when the GEO pass added `decay_pattern` (Steglich 2010
-    mRNA-decay profile clusters) and `genomic_island` (Hackl 2023 predicted genomic
-    islands as gene sets).
   source: vocabulary
   value: decay_pattern
 - applies_to:
   - ClusteringAnalysis
-  description: What kind of gene grouping a clustering analysis is (paperconfig `gene_clusters.cluster_type`,
-    validated by scripts/validate_paperconfig.py VALID_CLUSTER_TYPES). Registered
-    2026-08-27 (KG-SYNC-006) when the GEO pass added `decay_pattern` (Steglich 2010
-    mRNA-decay profile clusters) and `genomic_island` (Hackl 2023 predicted genomic
-    islands as gene sets).
   source: vocabulary
   value: genomic_island
 returned: 6

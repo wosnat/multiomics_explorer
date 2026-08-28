@@ -1473,6 +1473,7 @@ def list_filter_values(
     """
     conn = _default_conn(conn)
     warnings_out: list[str] = []
+    envelope_description: str | None = None
     if ontology is not None and ontology not in ONTOLOGY_CONFIG:
         raise ValueError(
             f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
@@ -1494,11 +1495,13 @@ def list_filter_values(
         )
         if read["warning"]:
             warnings_out.append(read["warning"])
+        # The vocabulary description is per-property, not per-value: emit it
+        # once on the envelope and leave the per-row key absent (sparse row).
+        envelope_description = read["description"]
         results = [
             {
                 "value": v,
                 "applies_to": ["ClusteringAnalysis"],
-                "description": read["description"],
                 "source": read["source"],
             }
             for v in read["values"]
@@ -1557,8 +1560,16 @@ def list_filter_values(
             + ", ".join(repr(v) for v in valid) + "."
         )
     total = len(results)
+    if envelope_description is None:
+        # Trust types keep the per-row description (one vocab read per
+        # applies_to may differ); the envelope carries it only when every
+        # row agrees on a single non-null text.
+        descs = {r.get("description") for r in results} - {None}
+        if len(descs) == 1 and all(r.get("description") for r in results):
+            envelope_description = descs.pop()
     return {
         "filter_type": filter_type,
+        "description": envelope_description,
         "total_entries": total,
         "returned": total,
         "truncated": False,

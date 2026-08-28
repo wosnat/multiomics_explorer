@@ -14681,8 +14681,30 @@ class TestListFilterValuesClusterType:
         for row in result["results"]:
             assert row["source"] == "vocabulary"
             assert row["applies_to"] == ["ClusteringAnalysis"]
-            assert row["description"] == "How the analysis grouped genes"
+            # Vocab description is per-property: once on the envelope, and
+            # the per-row key is absent (no per-value text in the vocab).
+            assert "description" not in row
+        assert result["description"] == "How the analysis grouped genes"
         assert result["warnings"] == []
+
+    def test_pivot_fallback_has_no_envelope_description(self, mock_conn):
+        def _exec(cypher, **params):
+            if "ControlledVocabulary" in cypher:
+                return []
+            if "DISTINCT" in cypher:
+                return [{"value": "diel"}]
+            return []
+
+        mock_conn.execute_query.side_effect = _exec
+        result = api.list_filter_values(filter_type="cluster_type", conn=mock_conn)
+        assert result["description"] is None
+        assert "description" not in result["results"][0]
+
+    def test_non_vocab_filter_types_have_null_envelope_description(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"category": "Photosynthesis", "gene_count": 3}]
+        result = api.list_filter_values(filter_type="gene_category", conn=mock_conn)
+        assert result["description"] is None
 
     def test_vocab_read_targets_clustering_analysis_cluster_type(self, mock_conn):
         _trust_dispatch(mock_conn,

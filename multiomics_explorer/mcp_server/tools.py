@@ -1611,6 +1611,12 @@ def register_tools(mcp: FastMCP):
 
     class ListFilterValuesResponse(BaseModel):
         filter_type: str = Field(description="The filter type returned (e.g. 'gene_category').")
+        description: str | None = Field(
+            default=None,
+            description="Vocabulary-level description of the property behind this "
+                        "filter (ControlledVocabulary text; cluster_type and the trust "
+                        "types). Emitted once here, not per row. None elsewhere.",
+        )
         total_entries: int = Field(description="Total distinct values for this filter.")
         returned: int = Field(description="Number of results returned.")
         truncated: bool = Field(description="True if total_entries > returned.")
