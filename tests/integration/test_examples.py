@@ -15,24 +15,37 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 PATHWAY_SCRIPT = REPO_ROOT / "examples" / "pathway_enrichment.py"
 
-PATHWAY_SCENARIOS = ["landscape", "de", "cluster", "custom"]
-# "ortholog" is a placeholder in the script and is skipped until real
-# group-id plumbing lands.
+# Scenario -> a substring its output must contain (exit 0 + non-empty stdout
+# is not enough: a scenario that silently skips its KG call still exits 0).
+PATHWAY_SCENARIOS = [
+    ("landscape", "relevance_rank"),
+    ("de", "to_compare_cluster_frame"),
+    ("cluster", "cluster_enrichment rows="),
+    ("ortholog", "vs organism universe"),
+    ("custom", "hand-built term2gene"),
+]
 
 
-@pytest.mark.parametrize("scenario", PATHWAY_SCENARIOS)
-def test_scenario_runs_cleanly(scenario):
-    """Each pathway_enrichment scenario exits 0 and produces some output on the live KG."""
+@pytest.mark.parametrize(
+    "scenario,expected", PATHWAY_SCENARIOS,
+    ids=[s for s, _ in PATHWAY_SCENARIOS],
+)
+def test_scenario_runs_cleanly(scenario, expected):
+    """Each pathway_enrichment scenario exits 0 and prints the fact it exists
+    to demonstrate, on the live KG."""
     cmd = [sys.executable, str(PATHWAY_SCRIPT), "--scenario", scenario]
     if scenario == "custom":
         cmd += ["--locus-tags", "PMM0001,PMM0002,PMM0003"]
     result = subprocess.run(
-        cmd, cwd=REPO_ROOT, capture_output=True, text=True, timeout=120
+        cmd, cwd=REPO_ROOT, capture_output=True, text=True, timeout=300
     )
     assert result.returncode == 0, (
         f"scenario {scenario} failed: stderr={result.stderr}"
     )
     assert result.stdout.strip(), f"scenario {scenario} produced no output"
+    assert expected in result.stdout, (
+        f"scenario {scenario} printed no {expected!r}:\n{result.stdout}"
+    )
 
 
 # --- metabolites.py ---

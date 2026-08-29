@@ -4,7 +4,7 @@ Runnable companions to `docs://analysis/*` guides.
 
 ## `pathway_enrichment.py`
 
-Five scenarios exercising the enrichment package end-to-end. See `docs://analysis/enrichment`.
+Five scenarios, one per gene-set source, all against the live KG (real MED4 experiment / analysis IDs discovered at run time). `de` exercises `pathway_enrichment`, the `EnrichmentResult` accessors, `to_compare_cluster_frame`, `to_envelope` and an `informative_only` side-by-side; `cluster` runs `cluster_enrichment` and reproduces it from `cluster_enrichment_inputs` + `fisher_ora`; `ortholog` and `custom` build `EnrichmentInputs` by hand against the organism gene universe. See `docs://analysis/enrichment`.
 
 ```bash
 uv run python examples/pathway_enrichment.py --scenario landscape

@@ -7,7 +7,9 @@ facts below; this page tells you which ontology carries which fact, where it
 lives (compact row / verbose row / filter param), and how to use it without
 misreading a categorical for a curation grade.
 
-Runnable companion: `docs://examples/annotation_evidence.py` (4 recipes).
+Runnable companion: `docs://examples/annotation_evidence.py` (5 scenarios:
+`merops_call_class`, `tcdb_attachment_depth`, `interpro_enrichment`,
+`trust_filtered_tcdb`, `organism_rollups`).
 
 > **Counts in this doc are an illustrative snapshot** and drift with each KG
 > rebuild. Use them for rough scale only; call `list_filter_values`,
@@ -22,11 +24,54 @@ fact lives (compact column, verbose column, filter param) follows from which
 layer it's in — this is the single decision that resolves almost every
 question about the trust surface.
 
-| Layer | What it is | Where it lives |
-|---|---|---|
-| **Comparable trust axes** | Facts with the *same meaning* wherever they occur: `sources[]` (which pipeline made the call), `evidence` (a five-rung ladder: `curated > signature > homology > family_inferred > domain_inferred`), `evidence_score` (a `[0, 1]` composite, TCDB/MEROPS only), `tier` (1–3, diamond-truncation depth, TCDB/MEROPS only) | `evidence` is compact on every row of the 14 functional-edge ontologies (null on PSORTb/SignalP, which carry no trust axes at all). `sources`, `evidence_score`, `tier` are verbose. All four are filterable (`sources=`, `evidence=`, `max_tier=`, `min_evidence_score=`), defaulting to `None` — a call with no trust filters returns exactly what it always did. |
-| **Native trust detail** | Ontology-specific scalars that must **never** be compared across ontologies because their scale and direction differ (e-value lower-is-better, bit score / confidence / probability higher-is-better): TCDB's `confidence_score`, `source_agreement`, `pfam_support`, `go_support`, `identity`, `qcov`, `evalue`, `consensus_n`, `attachment_depth`; MEROPS's `confidence_score`, `pfam_support`, `best_hit_kind`, `identity`, `qcov`, `evalue`, `consensus_n`, `best_hit_id`; InterPro's `libraries`, `evalue_library`, `evalue`, `match_count`, `start`, `end`; NCBIfam's `evalue`, `bit_score`, `start`, `end`; PSORTb's `localization_score`; SignalP's `signal_peptide_probability` / `signal_peptide_cleavage_site` / `signal_peptide_cleavage_probability` | Verbose-only, under their own native names. **Never a filter** — there is no cutoff anywhere on a native scalar (InterPro's e-value included; no ontology's native detail is calibrated enough to threshold safely). |
-| **Materially-important facts** | Categoricals whose *absence changes the biological reading*, not just its confidence: MEROPS `call_class` (`peptidase` / `inhibitor` / `nonpeptidase_homolog` — a real peptidase call, a peptidase-inhibitor family, or a catalytically-dead homolog that still resembles a peptidase family by sequence) | Compact **always** (not verbose-gated, unlike the comparable axes), filterable (`call_class=`), rolled up (`by_call_class`), and auto-warned on when `nonpeptidase_homolog` rows are silently included in a census. InterPro's `interpro_type` (the 8-way FAMILY/DOMAIN/... split) gets the same "compact always" treatment, though it is a term-character fact rather than an edge fact. |
+### Comparable trust axes
+
+Facts with the *same meaning* wherever they occur:
+
+- `sources[]` — which pipeline made the call (`eggnog`, `interproscan`,
+  `uniprot`, `cyanorak`, ...).
+- `evidence` — the five-rung ladder, see "The evidence ladder" below.
+- `evidence_score` — a `[0, 1]` composite; TCDB, MEROPS, GO×3, EC, Pfam, CAZy.
+- `tier` — 1–3, diamond-truncation depth of the ortholog call; TCDB / MEROPS.
+
+Where they live: `evidence` is compact on every row of the 14 functional-edge
+ontologies (null on PSORTb / SignalP, which carry no trust axes). `sources`,
+`evidence_score`, `tier` are verbose. All four are filterable (`sources=`,
+`evidence=`, `max_tier=`, `min_evidence_score=`), default `None` — a call with
+no trust filters returns exactly what it always did.
+
+### Native trust detail
+
+Ontology-specific scalars that must **never** be compared across ontologies —
+scale and direction differ (e-value lower-is-better; bit score, confidence,
+probability higher-is-better):
+
+- TCDB: `confidence_score`, `source_agreement`, `pfam_support`, `go_support`,
+  `identity`, `qcov`, `evalue`, `consensus_n`, `attachment_depth`.
+- MEROPS: `confidence_score`, `pfam_support`, `best_hit_kind`, `identity`,
+  `qcov`, `evalue`, `consensus_n`, `best_hit_id`.
+- InterPro: `libraries`, `evalue_library`, `evalue`, `match_count`, `start`, `end`.
+- NCBIfam: `evalue`, `bit_score`, `start`, `end`.
+- PSORTb: `localization_score`. SignalP: `signal_peptide_probability`,
+  `signal_peptide_cleavage_site`, `signal_peptide_cleavage_probability`.
+
+Where they live: verbose-only, under their native names. **Never a filter** —
+no cutoff exists on any native scalar (InterPro's e-value included); none is
+calibrated well enough to threshold safely.
+
+### Materially-important facts
+
+Categoricals whose *absence changes the biological reading*, not just its
+confidence:
+
+- MEROPS `call_class` — `peptidase` (a real peptidase call), `inhibitor` (a
+  peptidase-inhibitor family), `nonpeptidase_homolog` (catalytically dead but
+  sequence-similar). Compact **always**, filterable (`call_class=`), rolled up
+  (`by_call_class`), auto-warned when `nonpeptidase_homolog` rows are silently
+  included in a census.
+- InterPro `interpro_type` — the 8-way FAMILY / DOMAIN / ... split. Same
+  "compact always" treatment, though it is a term-character fact rather than an
+  edge fact.
 
 Why one compact column and not four: rollups already carry the distribution
 (`by_evidence`, `by_tier`, `by_sources`), so the per-row payload only needs
@@ -35,6 +80,38 @@ the one axis an agent can read on **every** functional-edge row —
 GO×3, EC, Pfam, CAZy carry it), so it moved to verbose and kept its role as
 the within-ontology sort key and the *only* numeric cutoff in the whole
 surface (`min_evidence_score`).
+
+---
+
+## The evidence ladder — one canonical paragraph
+
+`evidence` is one of five rungs, strongest first:
+
+| Rung | Intended meaning |
+|---|---|
+| `curated` | Asserted by a reference annotation (UniProt / NCBI / Cyanorak curation). |
+| `signature` | A profile-HMM / signature hit from InterProScan on a family-level model (Pfam). |
+| `homology` | A sequence-similarity call with an explicit hit (TCDB / MEROPS diamond). |
+| `family_inferred` | Transferred from an ortholog family (eggNOG KO / COG / TCDB transfer, NCBIfam equivalog → TIGR role). |
+| `domain_inferred` | Inferred from a domain-level match only (InterPro router to EC / CAZy / GO). |
+
+Multi-source edges take the strongest rung. Rank by rung within one ontology;
+across ontologies compare only with the live caveat below in mind.
+
+**Live state (current build).** The ladder is applied uniformly on the
+post-2026 edge types — on KEGG KO, COG, TCDB and TIGR roles an eggNOG-only edge
+reads `family_inferred`, an InterProScan-only role reads `family_inferred`, and
+a Cyanorak role reads `curated`. On the four older edge types — GO (×3), EC,
+Pfam, CAZy — an **eggNOG-only edge currently reads `curated`** (GO-BP ~434k
+edges, EC 11.7k, Pfam 24.7k, CAZy 744), and `['eggnog','interproscan']` reads
+`signature` on Pfam but `curated` on CAZy. So `evidence=['curated']` means
+"curated or eggNOG-transferred" on GO / EC / Pfam / CAZy and "curated" on the
+roles. This is KG ask DOC-001 (open; explorer prefers re-mapping eggNOG-only to
+`family_inferred`) in the docs-review KG-asks doc under `docs/kg-specs/`; until
+it lands, treat `sources` as the authoritative provenance on those four and
+`evidence` as the comparable axis only among the newer ontologies. The
+per-ontology pages (`docs://ontologies/{key}`) link here rather than restating
+the rungs.
 
 ---
 
@@ -115,8 +192,8 @@ buckets, and mixing them up is the most common mistake:
   are meant to be sorted on, not thresholded — except through the one
   sanctioned cutoff below. `0` is a real, uncorroborated hit, not an absence
   signal; absence is `null` (no call at all on that gene/edge). This mirrors
-  the transport trust ladder in `docs://guide/conventions` — the phrase "rank
-  by it, never filter by it" describes the *gene-level max* rollups
+  substrate resolution / depth in `docs://analysis/metabolites` — the phrase
+  "rank by it, never filter by it" describes the *gene-level max* rollups
   specifically.
 - **Filter by it — but only through `min_evidence_score`.** The edge-level
   `evidence_score` *does* have exactly one sanctioned cutoff:
@@ -124,9 +201,12 @@ buckets, and mixing them up is the most common mistake:
   `pathway_enrichment`, `cluster_enrichment`. On `genes_by_ontology` and
   `gene_ontology_terms`, setting it adds `evidence_score_signals` to the
   envelope — the `ControlledVocabulary`-backed list of composite inputs that
-  feed the score for that edge type (e.g. TCDB: `source_agreement`,
-  `pfam_support`, `go_support`, `identity`, `qcov`), so you can see what the
-  number is actually made of before trusting a threshold. `pathway_enrichment`
+  feed the score for that edge type, keyed by edge type (live: TCDB
+  `Gene_has_tcdb_family` → `eggnog_called`, `source_agreement`, `tier_le_2`,
+  `pfam_support`, `go_support`; GO-BP → `multi_source`,
+  `high_trust_assertion`, `not_domain_inferred`), so you can see what the
+  number is actually made of before trusting a threshold. `identity` / `qcov`
+  are native detail, not signals. `pathway_enrichment`
   / `cluster_enrichment` apply the same cutoff to shape the TERM2GENE mapping
   and background but don't carry `evidence_score_signals` themselves — read
   it from a `genes_by_ontology` call with the same filters first if you need
@@ -180,7 +260,8 @@ InterPro registers 8 structurally distinct entry types —
 `FAMILY`, `DOMAIN`, `HOMOLOGOUS_SUPERFAMILY`, `REPEAT`, `CONSERVED_SITE`,
 `ACTIVE_SITE`, `BINDING_SITE`, `PTM` — and they size very differently at the
 same hierarchy level (a MED4-scale snapshot at level 0: HOMOLOGOUS_SUPERFAMILY
-~74 testable terms, DOMAIN ~47, FAMILY ~7, the remaining five ≤4 each).
+74 testable terms, DOMAIN 47, FAMILY 5, CONSERVED_SITE 4, REPEAT 1, the
+other three none).
 Pooling them for enrichment would let the largest type dominate the Fisher
 background the way an unscoped BRITE run is dominated by the enzyme tree.
 
@@ -208,7 +289,13 @@ families to InterPro entries, InterPro entries to EC numbers and CAZy
 families (a **router** — InterPro's function-inference relation is
 recall-biased and should never be read as "this gene has this EC/CAZy
 function," only "this InterPro entry family clusters with this
-EC/CAZy family"), and KEGG terms to BRITE categories. Each bridge carries a
+EC/CAZy family"), NCBIfam families to TIGR roles
+(`Ncbifam_family_has_tigr_role`, 1,847 edges, all from `TIGR*`-prefixed
+families — also a router: only the `equivalog` subset licenses a gene-level
+`Gene_has_tigr_role` edge (`evidence='family_inferred'`); the other family
+types reach a role through the bridge only), and KEGG terms to BRITE
+categories. TIGR roles themselves are a two-level hierarchy (21 main roles at
+level 0, 115 sub-roles at level 1; `docs://ontologies/tigr_role`). Each bridge carries a
 `link_kind` — `composition` (this family is built from these Pfam domains /
 GO functions), `membership` (this family is one of that ontology's known
 members), or `router` (a computed cross-reference, ambiguous when a source
@@ -219,7 +306,10 @@ it, never the reverse (`links_in` does not exist). Walk them with
 `ontology_term_details(term_ids=[...])`: each row carries `links_out[]`
 (`{rel, link_kind, target_id, target_ontology, target_name}`; verbose adds the
 edge props — `curated_tcids` on TCDB composition links, `member_id_count` on
-MEROPS → Pfam, and the computed `router_ambiguous` on InterPro router links),
+MEROPS → Pfam, and `router_ambiguous` on InterPro router links — not a KG
+property but computed by `ontology_term_details` at verbose time as
+`links_total(router) > 1 OR interpro_type <> 'FAMILY'`, on InterPro links
+only),
 and `link_kinds=[...]` narrows to one kind. A two-hop walk
 (`tcdb:3.A.1` → Pfam domains → InterPro entries) is scenario `bridge_walk`
 in `docs://examples/ontology_terms.py`. To reach a *source* term from its
@@ -233,7 +323,7 @@ bridges out and in.
 
 ---
 
-## Recipe 1 — MEROPS peptidase-only clan census
+## Scenario `merops_call_class` — MEROPS peptidase-only clan census
 
 **When:** "how many genes in this organism actually encode peptidases, by
 clan?" — not "how many genes resemble a peptidase family by sequence."
@@ -258,7 +348,7 @@ Read `by_call_class` on either call to see the split without a second query.
 
 ---
 
-## Recipe 2 — TCDB leaf mode: most-specific vs superseded
+## Scenario `tcdb_attachment_depth` — TCDB leaf mode: most-specific vs superseded
 
 **When:** "what's this gene's actual TCDB call, not every ancestor it also
 technically belongs to?"
@@ -268,15 +358,17 @@ leaf_only = gene_ontology_terms(
     locus_tags=["PMM0392"], organism="MED4",
     ontology=["tcdb"], mode="leaf",
 )
-# Default: attachment_depth='most_specific' only. Genome-wide MED4: 670 raw
-# tcdb edges collapse to 597 rows under this predicate.
+# Default: attachment_depth='most_specific' only — PMM0392: 7 rows.
+# Genome-wide MED4: 670 raw tcdb edges collapse to 597 rows under this
+# predicate.
 
 with_superseded = gene_ontology_terms(
     locus_tags=["PMM0392"], organism="MED4",
     ontology=["tcdb"], mode="leaf", include_superseded=True, verbose=True,
 )
 # Adds back the 73 (genome-wide) rows most_specific drops, each labelled
-# attachment_depth='superseded' — less specific, not wrong. PMM0392's
+# attachment_depth='superseded' — less specific, not wrong. PMM0392: 8 rows
+# (7 most_specific + 1 superseded). PMM0392's
 # superseded row is the tcdb:3.A.1 ABC-superfamily ancestor of its actual
 # (deeper) subfamily attachment. `attachment_depth` is TCDB native detail,
 # so the label itself needs verbose=True; the row set widens either way.
@@ -287,7 +379,7 @@ with_superseded = gene_ontology_terms(
 
 ---
 
-## Recipe 3 — InterPro-scoped enrichment
+## Scenario `interpro_enrichment` — InterPro-scoped enrichment
 
 **When:** "which InterPro homologous superfamilies are enriched in my DE
 set?" — a question that only makes sense scoped to one `interpro_type`.
@@ -315,12 +407,12 @@ that stratum.
 
 ---
 
-## Recipe 4 — Trust-filtered TCDB gene set before enrichment
+## Scenario `trust_filtered_tcdb` — Trust-filtered TCDB gene set before enrichment
 
 **When:** "restrict a TCDB-based gene set to homology calls with a
 corroborated score before testing it" — tightening a noisy hierarchical
 ontology the same way `substrate_depth=['most_specific']` tightens transport
-chemistry rows (see `docs://guide/conventions`).
+chemistry rows (see `docs://analysis/metabolites`).
 
 ```python
 # Discover the axis set first (skip if already known).
@@ -331,8 +423,9 @@ filtered = genes_by_ontology(
     ontology="tcdb", organism="MED4", level=2,
     evidence=["homology"], min_evidence_score=0.6,
 )
-# MED4 tcdb, genome-wide: 670 raw gene x term edges narrow to 98 under
-# evidence=['homology'] AND evidence_score>=0.6. Read
+# MED4 tcdb, genome-wide: 670 raw gene x family edges narrow to 98 under
+# evidence=['homology'] AND evidence_score>=0.6; rolled up to level 2 those
+# 98 edges collapse to 44 (gene x term) rows (total_matching). Read
 # filtered["evidence_score_signals"] to see which composite inputs back
 # the 0.6 threshold for this edge type.
 
@@ -343,8 +436,24 @@ enrichment = pathway_enrichment(
 )
 # The same filters shape the enrichment TERM2GENE mapping AND the
 # background identically (both traverse the same gene->leaf match stage),
-# so foreground and background stay apples-to-apples —
+# so gene set and background stay apples-to-apples —
 # envelope["background_filtered"] confirms this.
+```
+
+---
+
+## Scenario `organism_rollups` — coverage per organism
+
+**When:** "which organisms carry the most peptidase / InterPro / NCBIfam
+annotation?" — before choosing an organism for a trust-filtered census.
+
+```python
+orgs = list_organisms(limit=None)
+orgs["top_annotation_capability"][:3]
+# top 10 organisms by peptidase_gene_count (then name); columns
+# peptidase_gene_count / nonpeptidase_homolog_gene_count / interpro_gene_count /
+# ncbifam_gene_count; Alteromonas (MarRef v6) leads. The same four counts sit
+# on every list_organisms row (zero-filled).
 ```
 
 ---
@@ -362,5 +471,5 @@ annotation
 ├─ "Which InterPro structural type" → interpro_type (compact always; REQUIRED on interpro enrichment)
 ├─ "Native e-value / bit score / identity / confidence_score" → verbose-only, per-ontology name, never a filter
 ├─ "Most-specific vs redundant ancestor attachment" → attachment_depth (TCDB; mode='leaf' + include_superseded)
-└─ "What does term X compose from / belong to / route to" → bridges_out (forward-only; reach via run_cypher)
+└─ "What does term X compose from / belong to / route to" → ontology_term_details links_out (forward-only; reverse via run_cypher)
 ```
