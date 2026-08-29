@@ -348,6 +348,61 @@ coordinated to `0.1.0a5` ahead of the KG release.
   `direct_gene_count` instead of returning it as an applicable-but-empty
   key.
 
+- `list_filter_values` now serves `treatment_type`, `background_factors`,
+  `table_scope`, `detection_status` and `expression_status` (previously
+  raised `Unknown filter_type` for all five); rows correctly union
+  `applies_to` across the labels/edges each vocabulary spans, and
+  per-value `source` (`vocabulary` vs pivot fallback) is tracked per value
+  instead of one flag shared across every row.
+- `genes_by_metabolite` / `metabolites_by_gene` now resolve `organism`
+  once and enforce single-organism: an ambiguous genus word (e.g.
+  `'Prochlorococcus'`) raises instead of silently blending rows from every
+  matching strain, and `metabolites_by_gene`'s existence probe uses the
+  resolved canonical organism name instead of the raw input, fixing a
+  false-positive `not_found.locus_tags` for genes that actually exist.
+- `pathway_enrichment` rows carry real experiment metadata again —
+  `omics_type`, `table_scope`, `background_factors`, `is_time_course` and
+  `name` (from `experiment_name`) were always null and `by_omics_type` was
+  always empty, because the metadata was copied from compact-verbosity DE
+  rows that never carry those columns; now merged in from `list_experiments`.
+- `pathway_enrichment` raises on all-unknown `experiment_ids` and on an
+  out-of-range `level` for the chosen ontology instead of returning a
+  vacuous empty envelope; a partial batch of ids surfaces the unknown ones
+  in the new `not_found_experiments` envelope key. `cluster_enrichment`
+  raises the same way on an unknown `analysis_id` and an out-of-range
+  `level`.
+- Tested-absent (`detection_status='not_detected'`) rows on
+  `metabolites_by_quantifies_assay` and `assays_by_metabolite` no longer
+  carry a `metric_bucket` / `metric_percentile` / `rank_by_metric` — those
+  were statistical artifacts of ranking over raw values including zeros,
+  not a real signal on an untested/absent measurement; rank-gated filters
+  now also exclude tested-absent rows so filtering and display agree.
+  `assays_by_metabolite(summary=True)` computed `not_matched` /
+  `metabolites_with_evidence` / `metabolites_without_evidence` from the
+  (empty, in summary mode) `results` list, so metabolites with real
+  evidence were wrongly reported as unmatched; the summary buckets now
+  derive from the full filtered match set.
+- `differential_expression_by_gene` and `gene_response_profile` used to
+  fold a typo'd or unknown `growth_phases` / `treatment_types` value into
+  `no_expression`, which is documented to mean "no expression edges at
+  all" — misleading a caller into thinking a gene has no data instead of
+  telling them their filter value doesn't exist. Both tools now
+  distinguish the two cases (`filtered_out` for "has expression, just not
+  matching this filter" vs `no_expression` for "no edges at all") and add
+  a `warnings` entry naming the unrecognized value and pointing at
+  `list_filter_values`.
+- `genes_by_homolog_group`'s `by_organism` breakdown reordered between KG
+  rebuilds whenever two organisms tied on count (no defined tie order from
+  the underlying aggregation); now sorted count DESC, then
+  `organism_name` ASC for a stable order across rebuilds.
+- Documentation corrections: DM rankable-filter param names on the row
+  fields they populate, real (not fabricated) experiment IDs in the
+  Python-API worked example, `genes_by_function`'s `category` param name
+  (was documented as `gene_categories`), the `table_scope` collapse
+  sentence on the DE tools, and PSORTb/SignalP referred to by their actual
+  ontology keys (`subcellular_localization` / `signal_peptide_type`)
+  instead of implying they're informal names only.
+
 ## [0.1.0-alpha.4] - 2026-06-17
 ### Fixed
 - `to_dataframe()` no longer drops the polymorphic `value` column from
