@@ -696,3 +696,176 @@ class TestOntologiesGeneratorStage:
     def test_cli_accepts_the_ontologies_stage(self):
         src = (_ROOT / "scripts" / "build_about_content.py").read_text()
         assert "--ontologies" in src or '"ontologies"' in src
+
+
+# ---------------------------------------------------------------------------
+# Docs-review generator fixes: package-import key list, union type rendering,
+# one "Common mistakes" heading, illustrative examples, ontology prop notes,
+# applicable filter types + index columns, example-response envelope lint.
+# ---------------------------------------------------------------------------
+
+
+def test_package_import_lists_returned_and_truncated():
+    """The Python API returns the full MCP envelope (`returned` / `truncated`
+    included) — the package-import block must not strip them."""
+    from scripts.build_about_content import _build_package_import_section
+
+    section = "\n".join(_build_package_import_section(
+        tool_name="resolve_gene",
+        params=[{"name": "identifier", "default": "—"}],
+        envelope=[{"name": "total_matching"}, {"name": "returned"},
+                  {"name": "truncated"}, {"name": "offset"}],
+        has_results=True,
+    ))
+    assert "returns dict with keys: total_matching, returned, truncated, offset, results" in section
+    assert "subset" not in section
+
+
+def test_type_string_renders_every_union_arm():
+    from scripts.build_about_content import _type_string
+
+    prop = {"anyOf": [{"type": "string"},
+                      {"type": "array", "items": {"type": "string"}},
+                      {"type": "null"}]}
+    assert _type_string(prop) == "string | list[string] | None"
+    assert _type_string({"anyOf": [{"type": "integer"}, {"type": "number"}]}) == "int | float"
+    assert _type_string({"anyOf": [{"type": "integer"}, {"type": "null"}]}) == "int | None"
+    assert _type_string({"anyOf": [{"type": "null"}]}) == "any | None"
+
+
+def test_generated_union_param_shows_scalar_arm(tool_schemas):
+    from scripts.build_about_content import extract_params_table
+
+    rows = {r["name"]: r for r in extract_params_table(tool_schemas["search_ontology"])}
+    assert rows["ontology"]["type"] == "string | list[string] | None"
+
+
+def test_mistakes_heading_is_always_common_mistakes():
+    from scripts.build_about_content import render_about
+
+    schema = {"description": "d", "parameters": {"properties": {}}, "output_schema": None}
+    plain = render_about("t", schema, {"mistakes": ["only a note"]})
+    assert "## Common mistakes" in plain
+    assert "Good to know" not in plain
+    assert "- only a note" in plain
+    pairs = render_about("t", schema, {"mistakes": [{"wrong": "w", "right": "r"}]})
+    assert "## Common mistakes" in pairs
+    assert "```mistake\nw\n```" in pairs
+
+
+def test_example_illustrative_marker_and_note():
+    from scripts.build_about_content import render_about
+
+    schema = {"description": "d", "parameters": {"properties": {}}, "output_schema": None}
+    md = render_about("t", schema, {"examples": [
+        {"title": "Hand-written", "call": "t()", "illustrative": True,
+         "note": "Shape only; IDs are made up.", "response": "{}"},
+        {"title": "Live", "call": "t()", "response": "{}"},
+    ]})
+    assert "### Example 1: Hand-written (illustrative — not a live response)" in md
+    assert "*Shape only; IDs are made up.*" in md
+    assert "### Example 2: Live\n" in md
+    # The note sits under the call, before the response block.
+    assert md.index("```example-call") < md.index("*Shape only") < md.index("```example-response")
+
+
+def test_example_keys_lint_accepts_illustrative_and_note():
+    from scripts.build_about_content import EXAMPLE_KEYS, lint_example_keys
+
+    assert {"title", "call", "response", "steps", "illustrative", "note"} <= EXAMPLE_KEYS
+    ok = {"examples": [{"title": "x", "call": "t()", "illustrative": True, "note": "n"}]}
+    assert lint_example_keys("t", ok) == []
+    bad = {"examples": [{"title": "x", "call": "t()", "ilustrative": True}]}
+    assert any("ilustrative" in v for v in lint_example_keys("t", bad))
+
+
+def test_yaml_example_keys_are_known():
+    """Every example entry across inputs/tools/*.yaml uses only known keys."""
+    from scripts.build_about_content import lint_example_keys
+
+    failures = []
+    for yf in sorted(_INPUTS_DIR.glob("*.yaml")):
+        failures += lint_example_keys(yf.stem, _yaml3b.safe_load(yf.read_text()) or {})
+    assert not failures, "\n".join(failures)
+
+
+def test_node_prop_notes_cover_every_ontology_label_prop():
+    """Every baseline prop on an ontology (or parent) label has a one-liner."""
+    from scripts.build_about_content import _NODE_PROP_NOTES
+
+    baseline = _yaml3b.safe_load(_BASELINE_PATH3B.read_text())["schema"]["nodes"]
+    missing = []
+    for key, cfg in _CFG3B.items():
+        for label in [cfg["label"]] + ([cfg["parent_label"]] if cfg.get("parent_label") else []):
+            for prop in (baseline.get(label) or {}).get("properties") or {}:
+                if not _NODE_PROP_NOTES.get(prop):
+                    missing.append(f"{key}/{label}.{prop}")
+    assert not missing, "blank Meaning cells: " + ", ".join(missing)
+
+
+def test_ontology_page_lists_applicable_filter_types():
+    from scripts.build_about_content import applicable_filter_types, render_ontology
+
+    assert applicable_filter_types("merops") == [
+        "evidence", "sources", "call_class", "link_kinds"]
+    assert applicable_filter_types("interpro") == [
+        "evidence", "sources", "interpro_type", "link_kinds"]
+    assert applicable_filter_types("ncbifam") == [
+        "evidence", "sources", "ncbifam_family_type", "link_kinds"]
+    assert applicable_filter_types("tcdb") == [
+        "evidence", "sources", "attachment_depth", "link_kinds"]
+    assert applicable_filter_types("brite") == ["evidence", "sources", "brite_tree"]
+    assert applicable_filter_types("subcellular_localization") == []
+
+    data = {k: "x" for k in _ONTOLOGY_YAML_KEYS}
+    data["typical_questions"] = ["q"]
+    data["see_also"] = ["docs://guide/concepts"]
+    md = render_ontology("merops", data)
+    assert "## Applicable filter types" in md
+    assert "## Controlled vocabularies" not in md
+    assert "`list_filter_values(filter_type=\"call_class\", ontology=\"merops\")`" in md
+    assert "`list_filter_values(filter_type=\"link_kinds\")`" in md
+    assert "read live" in md
+    flat = render_ontology("subcellular_localization", data)
+    assert "## Applicable filter types" in flat
+    assert "none" in flat.split("## Applicable filter types")[1].split("##")[0]
+
+
+def test_ontology_index_has_levels_hierarchy_trust_columns():
+    from scripts.build_about_content import render_ontology_index
+
+    inputs = {k: {"what_it_is": f"about {k}."} for k in _ONTOLOGY_KEYS}
+    out = render_ontology_index(inputs)
+    assert "controlled vocabularies" not in out.split("\n")[2]
+    header = next(line for line in out.splitlines() if line.startswith("| key |"))
+    assert "| Levels |" in header and "| Hierarchy |" in header and "| Trust |" in header
+    rows = {line.split("|")[1].strip("` "): line for line in out.splitlines() if line.startswith("| `")}
+    assert "| 0–11 | DAG | yes |" in rows["go_bp"]
+    assert "| 0–4 | tree | yes |" in rows["tcdb"]
+    assert "| 0 | flat | no |" in rows["subcellular_localization"]
+    assert "| 0–1 | tree | yes |" in rows["pfam"]
+
+
+def test_lint_example_response_requires_envelope_key():
+    from scripts.build_about_content import lint_example_responses
+
+    schema = {"output_schema": {"properties": {"total_matching": {}, "results": {}}}}
+    good = {"examples": [{"title": "a", "call": "t()", "response": '{"total_matching": 1}'}]}
+    assert lint_example_responses("t", good, schema) == []
+    bad = {"examples": [{"title": "b", "call": "t()", "response": '{"gene_count": 1973}'}]}
+    v = lint_example_responses("t", bad, schema)
+    assert len(v) == 1 and "b" in v[0]
+    # No response block, no output schema -> nothing to check.
+    assert lint_example_responses("t", {"examples": [{"title": "c", "call": "t()"}]}, schema) == []
+    assert lint_example_responses("t", bad, {"output_schema": None}) == []
+
+
+def test_yaml_example_responses_carry_an_envelope_key(tool_schemas):
+    from scripts.build_about_content import lint_example_responses
+
+    failures = []
+    for yf in sorted(_INPUTS_DIR.glob("*.yaml")):
+        if yf.stem in tool_schemas:
+            failures += lint_example_responses(
+                yf.stem, _yaml3b.safe_load(yf.read_text()) or {}, tool_schemas[yf.stem])
+    assert not failures, "\n".join(failures)

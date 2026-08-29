@@ -26,10 +26,10 @@ Supported YAML keys (in ``multiomics_explorer/inputs/tools/{tool}.yaml``):
 
 | Key                       | Type                          | Renders as                                              |
 |---------------------------|-------------------------------|---------------------------------------------------------|
-| ``examples``              | list[{title, call, response, steps}] | "Few-shot examples" section                       |
+| ``examples``              | list[{title, call, response, steps, illustrative, note}] | "Few-shot examples" section; ``illustrative: true`` marks the title "(illustrative — not a live response)", ``note`` renders italic under the call |
 | ``verbose_fields``        | list[str]                     | Splits per-result table into compact + verbose          |
 | ``chaining``              | list[str]                     | "Chaining patterns" section                             |
-| ``mistakes``              | list (str or {wrong, right})  | "Good to know" / "Common mistakes" sections             |
+| ``mistakes``              | list (str or {wrong, right})  | "Common mistakes" section (bullets and/or wrong/right pairs) |
 | ``response_notes``        | list[{title, body}]           | Subsections under "Response format"                     |
 | ``python_returns``        | str (class name)              | Replaces "returns dict with keys" with object-shape hint|
 | ``python_returns_example``| str (URI)                     | Appends a `See <uri>` line (only when python_returns set)|
@@ -40,6 +40,7 @@ extracted from Pydantic models in ``mcp_server/tools.py``.
 
 import argparse
 import asyncio
+import re
 import sys
 from pathlib import Path
 
@@ -140,9 +141,20 @@ def extract_params_table(schema: dict) -> list[dict]:
 def _type_string(prop: dict) -> str:
     """Convert JSON Schema property to readable type string."""
     if "anyOf" in prop:
-        types = [_type_string(t) for t in prop["anyOf"] if t.get("type") != "null"]
+        # Render every non-null arm (`str | list[str] | None` must not
+        # collapse to `list[string] | None`); `None` always goes last.
+        arms: list[str] = []
+        for arm in prop["anyOf"]:
+            if arm.get("type") == "null":
+                continue
+            rendered = _type_string(arm)
+            if rendered not in arms:
+                arms.append(rendered)
         nullable = any(t.get("type") == "null" for t in prop["anyOf"])
-        base = types[0] if types else "any"
+        # Scalar arms before container arms: `string | list[string]` reads
+        # as "pass one or many", whichever order the annotation declares.
+        arms.sort(key=lambda a: a.startswith("list["))
+        base = " | ".join(arms) if arms else "any"
         return f"{base} | None" if nullable else base
     # Handle $ref to named model (e.g. {"$ref": "#/$defs/OrganismBreakdown"})
     if "$ref" in prop:
@@ -247,7 +259,9 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
 
     # Response format (auto-generated)
     envelope, result_fields = extract_response_fields(schema)
-    has_results = bool(result_fields) or "results" in schema.get("output_schema", {}).get("properties", {})
+    has_results = bool(result_fields) or "results" in (
+        (schema.get("output_schema") or {}).get("properties") or {}
+    )
     lines.append("## Response format")
     lines.append("")
 
@@ -305,12 +319,18 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
         lines.append("## Few-shot examples")
         lines.append("")
         for i, ex in enumerate(input_data["examples"], 1):
-            lines.append(f"### Example {i}: {ex['title']}")
+            title = ex["title"]
+            if ex.get("illustrative"):
+                title += ILLUSTRATIVE_MARKER
+            lines.append(f"### Example {i}: {title}")
             lines.append("")
             if "call" in ex:
                 lines.append("```example-call")
                 lines.append(ex["call"])
                 lines.append("```")
+                lines.append("")
+            if ex.get("note"):
+                lines.append(f"*{str(ex['note']).strip()}*")
                 lines.append("")
             if "response" in ex:
                 lines.append("```example-response")
@@ -344,15 +364,11 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
         lines.append("")
 
     # Common mistakes (from input YAML)
-    # Supports two formats:
-    #   - plain string: rendered as a note/gotcha
+    # Supports two formats, under one fixed heading (readers grep for it):
+    #   - plain string: rendered as a note/gotcha bullet
     #   - dict with wrong/right: rendered as mistake/correction pair
     if input_data and input_data.get("mistakes"):
-        # Use "Good to know" if all entries are plain strings (notes/gotchas),
-        # "Common mistakes" if any are wrong/right pairs
-        has_pairs = any(isinstance(m, dict) for m in input_data["mistakes"])
-        heading = "Common mistakes" if has_pairs else "Good to know"
-        lines.append(f"## {heading}")
+        lines.append("## Common mistakes")
         lines.append("")
         for m in input_data["mistakes"]:
             if isinstance(m, str):
@@ -439,11 +455,9 @@ def _build_package_import_section(
         if python_returns_example:
             lines.append(f'# See {python_returns_example} for runnable code.')
     else:
-        # API returns a subset of the MCP envelope (no returned/truncated wrapper)
-        api_keys = [
-            f["name"] for f in envelope
-            if f["name"] not in ("returned", "truncated")
-        ]
+        # The API returns the same envelope dict the MCP tool serializes
+        # (`returned` / `truncated` included).
+        api_keys = [f["name"] for f in envelope]
         if has_results:
             api_keys.append("results")
         envelope_keys = ", ".join(api_keys)
@@ -455,6 +469,68 @@ def _build_package_import_section(
     lines.append("Use MCP for reasoning and interactive exploration.")
     lines.append("")
     return lines
+
+
+ILLUSTRATIVE_MARKER = " (illustrative — not a live response)"
+
+# Keys an `examples[]` entry may carry. `illustrative: true` = hand-written
+# response (title gets ILLUSTRATIVE_MARKER; live-refresh tooling skips it);
+# `note` = one italic line rendered under the call.
+EXAMPLE_KEYS = frozenset({"title", "call", "response", "steps", "illustrative", "note"})
+
+
+def lint_example_keys(tool_name: str, input_data: dict) -> list[str]:
+    """Unknown keys on `examples[]` entries (typos silently render nothing)."""
+    out: list[str] = []
+    for i, ex in enumerate(input_data.get("examples") or [], 1):
+        if not isinstance(ex, dict):
+            out.append(f"{tool_name}.yaml: examples[{i}] is not a mapping")
+            continue
+        unknown = sorted(set(ex) - EXAMPLE_KEYS)
+        if unknown:
+            out.append(
+                f"{tool_name}.yaml: examples[{i}] ({ex.get('title', '?')}) "
+                f"has unknown keys {unknown}; allowed: {sorted(EXAMPLE_KEYS)}"
+            )
+    return out
+
+
+_RESPONSE_KEY_RE = re.compile(r'(?:"|\b)([A-Za-z_][A-Za-z0-9_]*)"?\s*:')
+
+
+def lint_example_responses(tool_name: str, input_data: dict, schema: dict) -> list[str]:
+    """A YAML example `response` block must name at least one top-level
+    envelope key of the tool's response model (`results` counts).
+
+    Cheap sanity only — it catches pasted genome-wide stats or a response
+    copied from another tool, not shape drift inside `results`.
+    """
+    output = (schema or {}).get("output_schema") or {}
+    envelope_keys = set((output.get("properties") or {}))
+    if not envelope_keys:
+        return []
+    out: list[str] = []
+    for i, ex in enumerate(input_data.get("examples") or [], 1):
+        if not isinstance(ex, dict) or not ex.get("response"):
+            continue
+        keys_in_block = set(_RESPONSE_KEY_RE.findall(str(ex["response"])))
+        if not keys_in_block & envelope_keys:
+            out.append(
+                f"{tool_name}.yaml: examples[{i}] ({ex.get('title', '?')}) response "
+                f"names none of the envelope keys {sorted(envelope_keys)}"
+            )
+    return out
+
+
+def lint_example_yaml(schemas: dict) -> list[str]:
+    """Run the example-entry lints over every `inputs/tools/*.yaml`."""
+    out: list[str] = []
+    for path in sorted(INPUTS_DIR.glob("*.yaml")):
+        data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        out += lint_example_keys(path.stem, data)
+        if path.stem in schemas:
+            out += lint_example_responses(path.stem, data, schemas[path.stem])
+    return out
 
 
 def generate_skeleton(tool_name: str, schema: dict) -> str:
@@ -473,6 +549,8 @@ def generate_skeleton(tool_name: str, schema: dict) -> str:
         "examples:",
         "  - title: Basic usage",
         f"    call: {tool_name}()",
+        "    # illustrative: true   # hand-written response, not captured live",
+        "    # note: one italic line rendered under the call",
         "    # response: |",
         "    #   {{ ... }}",
         "",
@@ -499,8 +577,8 @@ def generate_skeleton(tool_name: str, schema: dict) -> str:
         "chaining:",
         f'  # - "{tool_name} → next_tool"',
         "",
-        "# Plain strings → 'Good to know' section.",
-        "# Dicts with wrong/right → 'Common mistakes' section.",
+        "# All entries render under 'Common mistakes':",
+        "# plain strings → bullets; dicts with wrong/right → mistake/correction pair.",
         "mistakes: []",
         "  # - \"plain note about this tool\"",
         "  # - wrong: \"common mistake\"",
@@ -586,14 +664,129 @@ _NODE_PROP_NOTES = {
     "name": "term name (what `search_ontology` indexes)",
     "description": "longer free text (verbose on `search_ontology`; compact on `ontology_term_details`)",
     "level": "hierarchy depth, 0 = root / broadest",
-    "level_kind": "what a level means in this ontology (see the vocabulary below)",
+    "level_kind": "what a level means in this ontology (e.g. `tc_family`, `pathway`) — read values via `list_filter_values`",
     "level_is_best_effort": "sparse `'true'` flag — DAG term whose depth is a min-path proxy",
     "gene_count": "genes annotated to the term — subtree-inclusive on hierarchical labels, direct on flat ones",
     "direct_gene_count": "genes attached to this exact node (not descendants); absent where it would be vacuous",
     "organism_count": "organisms with at least one gene annotated to the term (subtree-inclusive where `gene_count` is)",
     "member_count": "upstream family size (source-database members), not KG genes",
     "ncbifam_family_count": "NCBIfam families bridged to this role via `Ncbifam_family_has_tigr_role`; subtree sum on mainroles",
+    # --- per-ontology props (baseline labels) ---
+    "code": "source-database short code (COG one-letter category, Cyanorak / TIGR numeric role code) — the un-prefixed tail of `id`",
+    "alternate_name": "EC alternate enzyme name(s) from the source record",
+    "catalytic_activity": "EC reaction text (substrates → products) from the source record",
+    "comments": "EC free-text notes from the source record (transferred / deleted entries, caveats)",
+    "short_name": "Pfam short name (e.g. `ABC_tran`); `name` holds the long description",
+    "tree": "BRITE tree this category belongs to (snake_case, e.g. `transporters`) — the `tree=` facet value",
+    "tree_code": "KEGG BRITE tree accession (e.g. `ko02000`) — the tree segment of `id`",
+    "member_ko_count": "KOs listed under this BRITE category upstream (source membership, not KG genes)",
+    "tcdb_id": "bare TC number (e.g. `3.A.1.14`); `id` is the `tcdb:` CURIE",
+    "tc_class_id": "CURIE of the level-0 TC class this node sits under (e.g. `tcdb:3`) — for grouping without walking the hierarchy",
+    "superfamily": "TCDB superfamily name the family belongs to, where TCDB assigns one (sparse)",
+    "metabolite_count": "distinct substrates reachable via `Tcdb_family_transports_metabolite` (rolled up over the subtree, so it grows toward the root) — on KEGG, metabolites in the pathway",
+    "cazy_id": "bare CAZy family code (e.g. `GH13`); `id` is the `cazy:` CURIE",
+    "psortb_id": "PSORTb localization label as emitted by the tool (e.g. `CytoplasmicMembrane`)",
+    "signalp_id": "SignalP signal-peptide type code as emitted by the tool (e.g. `SP`, `LIPO`, `TAT`)",
+    "interpro_id": "bare InterPro accession (e.g. `IPR000001`); `id` is the `interpro:` CURIE",
+    "interpro_type": "InterPro entry type (`FAMILY` / `DOMAIN` / `HOMOLOGOUS_SUPERFAMILY` / ...) — the `interpro_type=` facet value",
+    "ncbifam_id": "bare NCBIfam / TIGRFAM accession (e.g. `TIGR00001`, `NF000001`); `id` is the `ncbifam:` CURIE",
+    "family_type": "NCBIfam model type (equivalog, subfamily, domain, ...) — the `ncbifam_family_type` filter value",
+    "gene_symbol": "gene symbol NCBIfam assigns to the family's members (sparse)",
+    "merops_id": "bare MEROPS identifier (clan e.g. `SC`, family `S8`, subfamily `S8A`); `id` is the `merops.*:` CURIE",
+    "family_class": "MEROPS grouping of the family (peptidase vs inhibitor family) — the `merops_family_class` filter value",
+    "catalytic_type": "MEROPS catalytic type (serine, cysteine, metallo, ...) — the `merops_catalytic_type` filter value",
+    "peptidase_gene_count": "genes attached with `call_class = 'peptidase'` (excludes nonpeptidase homologs); compare with `gene_count`",
+    "peptidase_organism_count": "organisms with at least one `call_class = 'peptidase'` gene on the term",
+    "cleavage_summary": "MEROPS cleavage-site specificity summary text (sparse; family level)",
+    "cleavage_p1_residues": "residues MEROPS reports at the P1 cleavage position (sparse; family level)",
+    "known_cleavage_count": "number of MEROPS-recorded cleavage sites behind the specificity summary (sparse)",
 }
+
+
+# Observed `level` range per ontology key (min, max), from the live KG.
+# Static so the index renders without Neo4j; `--live-vocab` re-checks it
+# against the reachable KG and warns on drift.
+ONTOLOGY_LEVEL_RANGES: dict[str, tuple[int, int]] = {
+    "go_bp": (0, 11), "go_mf": (0, 9), "go_cc": (0, 6),
+    "ec": (0, 3), "kegg": (0, 3), "cog_category": (0, 0),
+    "cyanorak_role": (0, 2), "tigr_role": (0, 1), "pfam": (0, 1),
+    "brite": (0, 3), "tcdb": (0, 4), "cazy": (0, 1),
+    "subcellular_localization": (0, 0), "signal_peptide_type": (0, 0),
+    "interpro": (0, 2), "ncbifam": (0, 0), "merops": (0, 2),
+}
+
+# `list_filter_values` filter types owned by one ontology (rendered with
+# `ontology=` scoping). Trust axes (`evidence` / `sources`) come from the
+# registry's trust row; `link_kinds` applies wherever `bridges_out` is set.
+_ONTOLOGY_OWNED_FILTER_TYPES: dict[str, list[str]] = {
+    "merops": ["call_class"],
+    "interpro": ["interpro_type"],
+    "ncbifam": ["ncbifam_family_type"],
+    "tcdb": ["attachment_depth"],
+    "brite": ["brite_tree"],
+}
+_UNSCOPED_FILTER_TYPES = frozenset({"link_kinds", "brite_tree"})
+
+
+def applicable_filter_types(key: str) -> list[str]:
+    """`list_filter_values` filter types that apply to this ontology, in
+    render order: trust axes, the ontology-owned categorical, `link_kinds`."""
+    from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG, ontology_trust_axes
+
+    cfg = ONTOLOGY_CONFIG[key]
+    out: list[str] = []
+    axes = set(ontology_trust_axes(key))
+    if "evidence" in axes:
+        out.append("evidence")
+    if "sources" in axes:
+        out.append("sources")
+    out += _ONTOLOGY_OWNED_FILTER_TYPES.get(key, [])
+    if cfg.get("bridges_out"):
+        out.append("link_kinds")
+    return out
+
+
+def _hierarchy_kind(key: str, cfg: dict, baseline: dict | None = None) -> str:
+    """`flat` (no hierarchy rels), `DAG` (baseline carries the
+    `level_is_best_effort` min-path marker) or `tree`."""
+    if not cfg.get("hierarchy_rels"):
+        return "flat"
+    props = _label_props(cfg["label"], baseline)
+    return "DAG" if "level_is_best_effort" in props else "tree"
+
+
+def _level_range_cell(key: str) -> str:
+    lo, hi = ONTOLOGY_LEVEL_RANGES.get(key, (0, 0))
+    return str(lo) if lo == hi else f"{lo}–{hi}"
+
+
+def check_level_ranges_live() -> list[str]:
+    """Compare ONTOLOGY_LEVEL_RANGES with a reachable KG; [] when unreachable."""
+    from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+
+    try:
+        from multiomics_explorer.kg.connection import GraphConnection
+
+        conn = GraphConnection()
+        try:
+            drift: list[str] = []
+            for key, cfg in ONTOLOGY_CONFIG.items():
+                labels = [cfg["label"]] + ([cfg["parent_label"]] if cfg.get("parent_label") else [])
+                match = " UNION ALL ".join(
+                    f"MATCH (t:{lab}) RETURN t.level AS level" for lab in labels
+                )
+                rows = conn.execute_query(
+                    f"CALL {{ {match} }} RETURN min(level) AS mn, max(level) AS mx",
+                    timeout=10,
+                )
+                live = (rows[0]["mn"], rows[0]["mx"])
+                if live != ONTOLOGY_LEVEL_RANGES.get(key):
+                    drift.append(f"{key}: static {ONTOLOGY_LEVEL_RANGES.get(key)} vs live {live}")
+            return drift
+        finally:
+            conn.close()
+    except Exception:
+        return []
 
 
 def _label_props(label: str, baseline: dict | None = None) -> dict[str, str]:
@@ -816,25 +1009,35 @@ def render_ontology(key: str, data: dict, vocab_values: dict | None = None) -> s
     )
     L.append("")
 
-    # --- vocab -----------------------------------------------------------
-    L.append("## Controlled vocabularies")
+    # --- applicable filter types ------------------------------------------
+    L.append("## Applicable filter types")
     L.append("")
-    if vocab_values:
-        for name in sorted(vocab_values):
-            values = vocab_values[name]
-            L.append(f"- `{name}`: " + ", ".join(f"`{v}`" for v in values))
+    filter_types = applicable_filter_types(key)
+    if filter_types:
+        for ft in filter_types:
+            scope = "" if ft in _UNSCOPED_FILTER_TYPES else f', ontology="{key}"'
+            L.append(f'- `{ft}` — `list_filter_values(filter_type="{ft}"{scope})`')
         L.append("")
         L.append(
-            "Values are read from the KG's `ControlledVocabulary` nodes at build "
-            f"time; confirm live via `list_filter_values(filter_type=..., ontology='{key}')`."
+            "Values are read live from the KG's `ControlledVocabulary` nodes at "
+            "call time; this page never quotes them. `trust_axes` "
+            f"(`list_filter_values(filter_type=\"trust_axes\", ontology=\"{key}\")`) "
+            "lists which comparable axes the gene edge carries."
         )
     else:
         L.append(
-            "Values: see `list_filter_values(filter_type=..., ontology="
-            f"'{key}')` — `trust_axes`, `evidence`, `sources`, and the "
-            "ontology-specific categorical filter types are read from the "
-            "KG's `ControlledVocabulary` nodes at call time."
+            "none — the gene edge carries native scalars only (no trust axes, "
+            "no ontology-owned categorical, no bridges), so no "
+            "`list_filter_values` type is scoped to this ontology. Values on "
+            "other tools' filters are still read live from the KG's "
+            "`ControlledVocabulary` nodes at call time."
         )
+    if vocab_values:
+        L.append("")
+        L.append("Snapshot of vocabulary values at build time (`--live-vocab`):")
+        L.append("")
+        for name in sorted(vocab_values):
+            L.append(f"- `{name}`: " + ", ".join(f"`{v}`" for v in vocab_values[name]))
     L.append("")
 
     # --- human sections ----------------------------------------------------
@@ -936,8 +1139,8 @@ def render_ontology_index(inputs: dict) -> str:
     L.append(
         "One page per supported ontology — what it is, how genes get "
         "annotated, identifier form, hierarchy, the registry row (labels, "
-        "edges, trust axes, bridges), node properties, controlled "
-        "vocabularies, interpretation and pitfalls. Open "
+        "edges, trust axes, bridges), node properties, the applicable "
+        "`list_filter_values` filter types, interpretation and pitfalls. Open "
         "`docs://ontologies/{key}` for the detail; `key` is the value you "
         "pass as `ontology=` to `search_ontology`, `genes_by_ontology`, "
         "`gene_ontology_terms`, `ontology_landscape` and the enrichment tools. "
@@ -945,14 +1148,22 @@ def render_ontology_index(inputs: dict) -> str:
         "term IDs instead."
     )
     L.append("")
-    L.append("| key | Ontology | Node label | Shape | Trust axes | Bridges out | Summary |")
-    L.append("|---|---|---|---|---|---|---|")
+    baseline = None
+    if SCHEMA_BASELINE_PATH.exists():
+        baseline = yaml.safe_load(SCHEMA_BASELINE_PATH.read_text(encoding="utf-8"))
+    L.append(
+        "| key | Ontology | Node label | Levels | Hierarchy | Trust | "
+        "Trust axes | Bridges out | Summary |"
+    )
+    L.append("|---|---|---|---|---|---|---|---|---|")
     for key, cfg in ONTOLOGY_CONFIG.items():
         data = inputs.get(key) or {}
-        shape = "hierarchical" if cfg.get("hierarchy_rels") else "flat"
+        hierarchy = _hierarchy_kind(key, cfg, baseline)
         if cfg.get("facet"):
-            shape += f", facet `{cfg['facet']['param']}`"
-        axes = ", ".join(ontology_trust_axes(key)) or "—"
+            hierarchy += f", facet `{cfg['facet']['param']}`"
+        trust_axes = ontology_trust_axes(key)
+        axes = ", ".join(trust_axes) or "—"
+        trust = "yes" if trust_axes else "no"
         bridges = ", ".join(
             f"{target} ({kind})" for _rel, target, kind in (cfg.get("bridges_out") or [])
         ) or "—"
@@ -960,8 +1171,15 @@ def render_ontology_index(inputs: dict) -> str:
         summary = summary.replace("|", "\\|")
         L.append(
             f"| `{key}` | {ONTOLOGY_DISPLAY_NAMES.get(key, key)} | `{cfg['label']}` | "
-            f"{shape} | {axes} | {bridges} | {summary} |"
+            f"{_level_range_cell(key)} | {hierarchy} | {trust} | {axes} | {bridges} | {summary} |"
         )
+    L.append("")
+    L.append(
+        "`Levels` is the observed `level` range (0 = root / broadest); "
+        "`Hierarchy` is tree, DAG (GO — `level` is a min-path proxy) or flat; "
+        "`Trust` says whether the gene edge carries comparable trust axes "
+        "(`evidence` / `sources`, filterable on `genes_by_ontology` and friends)."
+    )
     L.append("")
     L.append(
         "Cross-cutting semantics live in `docs://analysis/annotation_evidence` "
@@ -1001,6 +1219,8 @@ def build_ontologies(*, live_vocab: bool = False) -> int:
         vocab = load_vocab_values({k: ONTOLOGY_CONFIG[k] for k in inputs})
         if vocab is None:
             print("  (no KG reachable — vocabulary values point at list_filter_values)")
+        for line in check_level_ranges_live():
+            print(f"  WARN level range drift — update ONTOLOGY_LEVEL_RANGES: {line}")
 
     ONTOLOGY_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     written = 0
@@ -1036,7 +1256,9 @@ def main():
         "--lint",
         action="store_true",
         help=(
-            "Scan rendered md for outfacing-doc style-rule violations. "
+            "Scan rendered md for outfacing-doc style-rule violations, plus "
+            "the inputs/tools/*.yaml example-entry checks (unknown keys, "
+            "response block naming no envelope key). "
             "With positional tool names, scopes to those tools' md. "
             "Exit 1 if any violation, 0 if clean."
         ),
@@ -1082,7 +1304,16 @@ def main():
             if not paths:
                 print("Error: no scannable files found", file=sys.stderr)
                 sys.exit(2)
-        sys.exit(run_lint(paths))
+        rc = run_lint(paths)
+        if not args.tools:
+            # Example-entry lints over inputs/tools/*.yaml: unknown keys and
+            # response blocks that name no envelope key of the tool's model.
+            yaml_violations = lint_example_yaml(get_tool_schemas())
+            for v in yaml_violations:
+                print(v, file=sys.stderr)
+            if yaml_violations:
+                rc = rc or 1
+        sys.exit(rc)
 
     if args.skeleton:
         schemas = get_tool_schemas()
