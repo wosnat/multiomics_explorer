@@ -7039,10 +7039,23 @@ class TestGenesByMetabolite:
     that care about ordering use .call_args_list inspection. Tests that
     only care about the envelope use simpler probes via .return_value or
     side_effect.
+
+    Organism resolution (`_validate_organism_inputs`) is monkeypatched to
+    an identity function by an autouse fixture below, so it consumes no
+    `conn.execute_query` call and the mocked sequences above stay
+    unshifted. Tests that specifically exercise organism resolution
+    (ambiguous / zero-match) override the patch locally.
     """
 
     _METS = ["kegg.compound:C00086"]  # urea
     _ORG = "Prochlorococcus MED4"
+
+    @pytest.fixture(autouse=True)
+    def _mock_validate_organism_inputs(self, monkeypatch):
+        monkeypatch.setattr(
+            api, "_validate_organism_inputs",
+            lambda organism, locus_tags, experiment_ids, conn: organism,
+        )
 
     # ---- Canned summary row (envelope payload from build_*_summary) ----
     _SUMMARY_ROW_BOTH_ARMS = {
@@ -7489,26 +7502,41 @@ class TestGenesByMetabolite:
         assert "kegg.compound:C00001" in out["not_matched"]
         assert "kegg.compound:C00001" not in out["not_found"]["metabolite_ids"]
 
-    def test_not_found_organism_when_zero_genes(self):
-        """When the fuzzy organism match produces 0 genes (i.e. summary's
-        gene_count_total == 0), not_found.organism is set to the input."""
+    def test_not_found_organism_when_zero_genes(self, monkeypatch):
+        """A word matching zero organisms short-circuits to an empty
+        envelope with `not_found.organism` set — no arm queries run, but
+        the metabolite-side existence probe still does."""
         gbm = self._api()
-        empty_summary = {
-            **self._SUMMARY_ROW_BOTH_ARMS,
-            "total_matching": 0,
-            "gene_count_total": 0,
-            "rows_by_evidence_source": [],
-            "rows_by_substrate_depth": [],
-            "by_metabolite": [],
-        }
+
+        def boom(organism, locus_tags, experiment_ids, conn):
+            raise ValueError(
+                f"no organism matching '{organism}' found. "
+                "Use list_organisms to see valid organism names."
+            )
+        monkeypatch.setattr(api, "_validate_organism_inputs", boom)
         conn = self._mock_conn(
-            [empty_summary],
-            [],  # metab detail (empty)
-            [],  # transport detail (empty)
-            [{"found": ["kegg.compound:C00086"]}],
+            [{"found": ["kegg.compound:C00086"]}],  # metabolite_id probe
         )
         out = gbm(self._METS, "Bogus organism", conn=conn)
         assert out["not_found"]["organism"] == "Bogus organism"
+        assert out["total_matching"] == 0
+        assert out["gene_count_total"] == 0
+        assert out["results"] == []
+
+    def test_genes_by_metabolite_ambiguous_organism_raises(self, monkeypatch):
+        """An organism word matching multiple organisms propagates the
+        ValueError rather than silently returning cross-organism rows."""
+        gbm = self._api()
+
+        def boom(organism, locus_tags, experiment_ids, conn):
+            raise ValueError(
+                f"organism '{organism}' matches multiple organisms: "
+                "Prochlorococcus MED4, Prochlorococcus MIT9313 — be more "
+                "specific"
+            )
+        monkeypatch.setattr(api, "_validate_organism_inputs", boom)
+        with pytest.raises(ValueError, match="multiple organisms"):
+            gbm(self._METS, "Prochlorococcus", conn=MagicMock())
 
     def test_not_found_organism_none_on_success(self):
         """gene_count_total > 0 → not_found.organism is None."""
@@ -8201,10 +8229,23 @@ class TestMetabolitesByGene:
       2. metabolism-arm detail (when summary=False AND metabolism arm fires)
       3. transport-arm detail   (when summary=False AND transport arm fires)
       4. existence probes (one per filter that has unknown-input diagnostics)
+
+    Organism resolution (`_validate_organism_inputs`) is monkeypatched to
+    an identity function by an autouse fixture below, so it consumes no
+    `conn.execute_query` call and the mocked sequences above stay
+    unshifted. Tests that specifically exercise organism resolution
+    (ambiguous / zero-match) override the patch locally.
     """
 
     _LOCUS = ["PMM0963", "PMM0964", "PMM0965"]   # urease α/β/γ subunits
     _ORG = "Prochlorococcus MED4"
+
+    @pytest.fixture(autouse=True)
+    def _mock_validate_organism_inputs(self, monkeypatch):
+        monkeypatch.setattr(
+            api, "_validate_organism_inputs",
+            lambda organism, locus_tags, experiment_ids, conn: organism,
+        )
 
     # ---- Canned summary row (envelope payload from build_*_summary) ----
     _SUMMARY_ROW_BOTH_ARMS = {
@@ -8676,25 +8717,52 @@ class TestMetabolitesByGene:
         assert "PMM0005" in out["not_matched"]
         assert "PMM9999" not in out["not_matched"]
 
-    def test_not_found_organism_when_zero_genes(self):
-        """fuzzy organism match yields zero genes → not_found.organism set."""
+    def test_not_found_organism_when_zero_genes(self, monkeypatch):
+        """A word matching zero organisms short-circuits to an empty
+        envelope with `not_found.organism` set — no arm queries or
+        existence probes run when no metabolite-side filters are given
+        (locus_tags can't exist under a nonexistent organism, so
+        `not_found.locus_tags` is the full input, no query needed)."""
         mbg = self._api()
-        empty_summary = {
-            **self._SUMMARY_ROW_BOTH_ARMS,
-            "total_matching": 0,
-            "gene_count_total": 0,
-            "rows_by_evidence_source": [],
-            "rows_by_substrate_depth": [],
-            "by_gene": [],
-        }
-        conn = self._mock_conn(
-            [empty_summary],
-            [],
-            [],
-            [{"found": []}],
-        )
+
+        def boom(organism, locus_tags, experiment_ids, conn):
+            raise ValueError(
+                f"no organism matching '{organism}' found. "
+                "Use list_organisms to see valid organism names."
+            )
+        monkeypatch.setattr(api, "_validate_organism_inputs", boom)
+        conn = self._mock_conn()
         out = mbg(self._LOCUS, "Bogus organism", conn=conn)
         assert out["not_found"]["organism"] == "Bogus organism"
+        assert out["not_found"]["locus_tags"] == self._LOCUS
+        assert out["total_matching"] == 0
+        assert out["results"] == []
+        conn.execute_query.assert_not_called()
+
+    def test_metabolites_by_gene_probe_uses_resolved_organism(self, monkeypatch):
+        """The existence probe (exact match on `g.organism_name`) must use
+        the canonical name — passing the raw fuzzy word ('MED4') would
+        never match, listing every found gene as not_found (the bug this
+        task fixes)."""
+        monkeypatch.setattr(
+            api, "_validate_organism_inputs",
+            lambda o, lt, ex, conn: "Prochlorococcus MED4",
+        )
+        conn = MagicMock()
+        seen = []
+
+        def exec_q(cypher, **params):
+            seen.append(params)
+            if "collect(DISTINCT g.locus_tag) AS found" in cypher:
+                return [{"found": ["PMM0920"]}]
+            return []  # every other builder: no rows (mock)
+        conn.execute_query.side_effect = exec_q
+        out = api.metabolites_by_gene(
+            locus_tags=["PMM0920"], organism="MED4", conn=conn,
+        )
+        probe = [p for p in seen if "locus_tags" in p and "organism" in p][-1]
+        assert probe["organism"] == "Prochlorococcus MED4"
+        assert out["not_found"]["locus_tags"] == []
 
     def test_not_found_organism_none_on_success(self):
         """gene_count_total > 0 → not_found.organism is None."""
@@ -10228,6 +10296,13 @@ class TestGenesByMetabolitePhase2:
     _METS = ["kegg.compound:C00086"]
     _ORG = "Prochlorococcus MED4"
 
+    @pytest.fixture(autouse=True)
+    def _mock_validate_organism_inputs(self, monkeypatch):
+        monkeypatch.setattr(
+            api, "_validate_organism_inputs",
+            lambda organism, locus_tags, experiment_ids, conn: organism,
+        )
+
     _SUMMARY_ROW = {
         "total_matching": 0,
         "gene_count_total": 0,
@@ -10280,6 +10355,13 @@ class TestMetabolitesByGenePhase2:
 
     _LOCUS = ["PMM0963", "PMM0964", "PMM0965"]
     _ORG = "Prochlorococcus MED4"
+
+    @pytest.fixture(autouse=True)
+    def _mock_validate_organism_inputs(self, monkeypatch):
+        monkeypatch.setattr(
+            api, "_validate_organism_inputs",
+            lambda organism, locus_tags, experiment_ids, conn: organism,
+        )
 
     _SUMMARY_ROW = {
         "total_matching": 0,
@@ -15015,7 +15097,14 @@ class TestTripletRowsCarryTransportSubstrateResolution:
     _TR_ROW_FI = {**TestGenesByMetabolite._TRANS_ROW_INH,
                   "transport_substrate_resolution": "family_inferred"}
 
-    def test_gbm_rows_keep_the_column_on_both_arms(self):
+    def test_gbm_rows_keep_the_column_on_both_arms(self, monkeypatch):
+        # Manually-instantiated helper object (not run through pytest's own
+        # collection) — TestGenesByMetabolite's autouse fixture doesn't
+        # apply here, so patch _validate_organism_inputs directly.
+        monkeypatch.setattr(
+            api, "_validate_organism_inputs",
+            lambda organism, locus_tags, experiment_ids, conn: organism,
+        )
         gbm = TestGenesByMetabolite()
         conn = gbm._mock_conn(
             [gbm._SUMMARY_ROW_BOTH_ARMS],
@@ -15038,7 +15127,12 @@ class TestTripletRowsCarryTransportSubstrateResolution:
         from multiomics_explorer.api.functions import _GBM_SPARSE_FIELDS
         assert "transport_substrate_resolution" not in _GBM_SPARSE_FIELDS
 
-    def test_mbg_rows_keep_the_column_on_both_arms(self):
+    def test_mbg_rows_keep_the_column_on_both_arms(self, monkeypatch):
+        # See test_gbm_rows_keep_the_column_on_both_arms — same reason.
+        monkeypatch.setattr(
+            api, "_validate_organism_inputs",
+            lambda organism, locus_tags, experiment_ids, conn: organism,
+        )
         mbg = TestMetabolitesByGene()
         conn = mbg._mock_conn(
             [mbg._SUMMARY_ROW_BOTH_ARMS],
@@ -15084,6 +15178,13 @@ class _AliasConn:
                 {"raw": r, "canonical": list(self.alias_map.get(r, []))}
                 for r in params["raw"]
             ]
+        if "AS organisms" in cypher:
+            # genes_by_metabolite / metabolites_by_gene call
+            # _validate_organism_inputs before any builder; every per-tool
+            # call here already passes the canonical `_ORG`, so echo it
+            # back as the sole resolved organism (doesn't consume the
+            # `responses` FIFO reserved for the builder calls).
+            return [{"organisms": [params["organism"]]}]
         if self.responses:
             return self.responses.pop(0)
         return []

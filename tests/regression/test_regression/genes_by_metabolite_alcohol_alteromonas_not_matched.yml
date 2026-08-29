@@ -7,7 +7,7 @@ metabolite_count_total: 0
 not_found:
   metabolite_ids: []
   metabolite_pathway_ids: []
-  organism: Alteromonas macleodii ATCC27126
+  organism: null
 not_matched:
 - kegg.compound:C00069
 offset: 0

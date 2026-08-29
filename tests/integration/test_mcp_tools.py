@@ -20,6 +20,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_publications_summary,
     build_resolve_gene,
     build_genes_by_function,
+    TCDB_DEEPEST_ATTACHMENT_PREDICATE,
 )
 from multiomics_explorer.api import functions as api
 
@@ -2795,16 +2796,23 @@ class TestTcdbSubstrateDepthCrossToolAgreement:
         Method: loop list_organisms(preferred_name) →
         genes_by_metabolite(evidence_sources=['transport']) and union the
         locus_tags (a gene belongs to exactly one organism, so the set-union
-        is exact even though genes_by_metabolite's `organism=` is a
-        word-CONTAINS match).
+        is exact).
 
-        No per-organism count is pinned: the exact Cypher (deepest-attachment
-        predicate, DISTINCT g.organism_name) gives 42 organisms, but the
-        API loop reports 43–44 because some preferred_names word-match
-        other strains' genes — the genus-level organism "Alteromonas"
-        matches every Alteromonas strain (856 genes vs ≤157 per strain) and
-        "Alteromonas mediterranea AltDE" ⊂ "…AltDE1" — a fuzzy-match
-        artefact, not an invariant (diagnosed live 2026-08-26)."""
+        llm-review 2b.1: genes_by_metabolite now enforces single-organism
+        matching via `_validate_organism_inputs` (raises on an ambiguous
+        `organism=` word instead of silently blending rows from every
+        organism sharing a token — the bug that fixed). Two of the KG's own
+        `preferred_name` values are themselves ambiguous under word-CONTAINS
+        against ANOTHER organism's name: the genus-level "Alteromonas" word-
+        matches every "Alteromonas ..." strain, and "Alteromonas
+        mediterranea AltDE" is a strict substring of "...AltDE1" (real,
+        distinct strains — 3817 vs 4238 genes; no disambiguating synonym).
+        For those two, `genes_by_metabolite` correctly raises (there is no
+        fuzzy string that reaches AltDE without AltDE1 too), so the loop
+        falls back to an exact-match Cypher using the same deepest-
+        attachment predicate the transport-arm builder applies — this keeps
+        the union exact without relying on the old cross-organism-bleed
+        bug (diagnosed live 2026-08-26; fallback verified live 2026-08-30)."""
         live = kg_count(
             "MATCH (m:Metabolite {id: $id}) RETURN m.transporter_gene_count", id=self._NITRITE)
         assert live > 1000
@@ -2815,10 +2823,28 @@ class TestTcdbSubstrateDepthCrossToolAgreement:
         assert len(orgs) >= 47
         genes: set[str] = set()
         for org in orgs:
-            gbm = api.genes_by_metabolite(
-                [self._NITRITE], org["organism_name"],
-                evidence_sources=["transport"], limit=5000, conn=conn,
-            )
+            try:
+                gbm = api.genes_by_metabolite(
+                    [self._NITRITE], org["organism_name"],
+                    evidence_sources=["transport"], limit=5000, conn=conn,
+                )
+            except ValueError:
+                # Ambiguous preferred_name (see docstring) — no fuzzy
+                # `organism=` string isolates this organism alone. Recover
+                # its exact gene set directly, bypassing the word-CONTAINS
+                # match but keeping the identical deepest-attachment
+                # predicate the transport-arm builder uses.
+                rows = conn.execute_query(
+                    "MATCH (g:Gene {organism_name: $organism})"
+                    "-[gt:Gene_has_tcdb_family]->(tf:TcdbFamily)"
+                    "-[:Tcdb_family_transports_metabolite]->"
+                    "(m:Metabolite {id: $metabolite_id})\n"
+                    f"WHERE {TCDB_DEEPEST_ATTACHMENT_PREDICATE}\n"
+                    "RETURN collect(DISTINCT g.locus_tag) AS locus_tags",
+                    organism=org["organism_name"], metabolite_id=self._NITRITE,
+                )
+                genes |= set(rows[0]["locus_tags"])
+                continue
             assert not gbm["truncated"], org["organism_name"]
             genes |= {r["locus_tag"] for r in gbm["results"]}
         assert len(genes) == live

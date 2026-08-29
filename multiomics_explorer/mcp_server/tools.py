@@ -871,7 +871,9 @@ class GbmNotFound(BaseModel):
     organism: str | None = Field(
         default=None,
         description="Set to the input string when the organism word-match resolves "
-        "to zero genes (typo, unsupported strain). None on success.")
+        "to zero organisms (typo, unsupported strain). None on success — "
+        "including a valid organism with zero matching rows (see "
+        "`not_matched` for that case).")
     metabolite_pathway_ids: list[str] = Field(
         default_factory=list,
         description="Input metabolite_pathway_ids that don't exist as a "
@@ -1232,7 +1234,9 @@ class MbgNotFound(BaseModel):
     organism: str | None = Field(
         default=None,
         description="Set to the input string when the organism word-match "
-        "resolves to zero genes for the input locus_tags. None on success.")
+        "resolves to zero organisms. None on success — including a valid "
+        "organism where none of the input locus_tags resolve (see "
+        "`locus_tags` above for that case).")
     metabolite_ids: list[str] = Field(
         default_factory=list,
         description="Input metabolite_ids that don't exist as a "
@@ -8558,7 +8562,7 @@ def register_tools(mcp: FastMCP):
             description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises) — "
             "mirrors `differential_expression_by_gene`). Single-organism enforced. "
             "E.g. 'Prochlorococcus MED4'. `not_found.organism` is set when the "
-            "name resolves to zero matching genes.",
+            "name resolves to zero organisms.",
             min_length=1,
         )],
         exclude_metabolite_ids: Annotated[
@@ -8779,8 +8783,7 @@ def register_tools(mcp: FastMCP):
             "— mirrors `differential_expression_by_gene` "
             "and `genes_by_metabolite`). Single-organism enforced. "
             "E.g. 'Prochlorococcus MED4'. `not_found.organism` is set "
-            "when the name resolves to zero matching genes for the "
-            "input locus_tags.",
+            "when the name resolves to zero organisms.",
             min_length=1,
         )],
         metabolite_elements: Annotated[list[str] | None, Field(

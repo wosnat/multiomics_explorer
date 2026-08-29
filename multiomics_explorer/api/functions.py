@@ -7049,6 +7049,9 @@ def genes_by_metabolite(
             ``("metabolism", "transport")``. Note this diverges from
             `list_metabolites` — gene-anchored tools reject
             ``"metabolomics"``. Also on unknown `substrate_depth` values.
+            Also if `organism` fuzzy-matches multiple organisms (be more
+            specific); a word matching zero organisms does not raise — it
+            returns an empty envelope with `not_found.organism` set.
     """
     # 1. Defense-in-depth validators (before any Cypher executes).
     if evidence_sources is not None:
@@ -7071,6 +7074,73 @@ def genes_by_metabolite(
         _canonicalize_metabolite_id_params(
             conn, metabolite_ids, exclude_metabolite_ids)
     )
+
+    # 1c. Pre-validate & resolve organism to its canonical preferred_name.
+    # Both the builders' organism filter and the existence probe (step 6
+    # below) need the canonical form — the raw word the caller passed can
+    # fuzzy word-match every organism sharing a token (e.g. 'Prochlorococcus'
+    # matching every strain) instead of the single organism intended.
+    # Ambiguous words propagate the ValueError (mirrors
+    # `differential_expression_by_gene`); a word matching zero organisms
+    # short-circuits to an empty envelope with `not_found.organism` set —
+    # the metabolite-side probes still run since they don't depend on
+    # organism.
+    try:
+        organism_resolved = _validate_organism_inputs(organism, None, None, conn)
+    except ValueError as e:
+        if "no organism matching" not in str(e):
+            raise
+        if metabolite_ids:
+            rows = conn.execute_query(
+                "MATCH (m:Metabolite) WHERE m.id IN $ids "
+                "RETURN collect(m.id) AS found",
+                ids=metabolite_ids,
+            )
+            found_metab = set(rows[0]["found"]) if rows else set()
+            not_found_metab = [
+                x for x in metabolite_ids if x not in found_metab
+            ]
+        else:
+            not_found_metab = []
+        if metabolite_pathway_ids:
+            rows = conn.execute_query(
+                "MATCH (p:KeggTerm) WHERE p.id IN $ids "
+                "RETURN collect(p.id) AS found",
+                ids=metabolite_pathway_ids,
+            )
+            found_paths = set(rows[0]["found"]) if rows else set()
+            not_found_paths = [
+                x for x in metabolite_pathway_ids if x not in found_paths
+            ]
+        else:
+            not_found_paths = []
+        return {
+            "total_matching": 0,
+            "returned": 0,
+            "offset": offset,
+            "truncated": False,
+            "warnings": list(alias_warnings),
+            "resolved_aliases": resolved_aliases,
+            "not_found": {
+                "metabolite_ids": not_found_metab,
+                "organism": organism,
+                "metabolite_pathway_ids": not_found_paths,
+            },
+            "not_matched": [],
+            "by_metabolite": [],
+            "by_evidence_source": [],
+            "by_substrate_depth": [],
+            "top_reactions": [],
+            "top_tcdb_families": [],
+            "top_gene_categories": [],
+            "top_genes": [],
+            "gene_count_total": 0,
+            "reaction_count_total": 0,
+            "transporter_count_total": 0,
+            "metabolite_count_total": 0,
+            "results": [],
+        }
+    organism = organism_resolved
 
     # 2. Arm selection driven solely by evidence_sources.
     if evidence_sources is None:
@@ -7210,9 +7280,12 @@ def genes_by_metabolite(
     else:
         not_found_paths = []
 
-    # 8. not_found.organism — set when the fuzzy match resolved to zero
-    # genes (i.e. nothing showed up in the summary aggregate).
-    not_found_org = organism if gene_count_total == 0 else None
+    # 8. not_found.organism — organism existence was already validated in
+    # step 1c (_validate_organism_inputs); reaching here means it resolved,
+    # so this is always None. A zero-row slice (gene_count_total == 0) is a
+    # legitimate empty result, not an invalid organism — the short-circuit
+    # in step 1c is the only path that sets this field.
+    not_found_org = None
 
     # 9. not_matched: input metabolite_ids that exist as Metabolite nodes
     # but produced 0 rows in this organism slice. Computed as
@@ -7484,7 +7557,10 @@ def metabolites_by_gene(
         ValueError: if `evidence_sources` contains values outside
             ``("metabolism", "transport")``. Mirrors `genes_by_metabolite`
             — gene-anchored tools reject ``"metabolomics"``. Also on
-            unknown `substrate_depth` values.
+            unknown `substrate_depth` values. Also if `organism`
+            fuzzy-matches multiple organisms (be more specific); a word
+            matching zero organisms does not raise — it returns an empty
+            envelope with `not_found.organism` set.
     """
     # 1. Defense-in-depth validators (before any Cypher executes).
     if evidence_sources is not None:
@@ -7507,6 +7583,91 @@ def metabolites_by_gene(
         _canonicalize_metabolite_id_params(
             conn, metabolite_ids, exclude_metabolite_ids)
     )
+
+    # 1c. Pre-validate & resolve organism to its canonical preferred_name.
+    # The existence probe below (step 6) requires an EXACT match on
+    # `Gene.organism_name` — passing the raw fuzzy word through (e.g.
+    # 'MED4') would never match, listing every found gene as not_found.
+    # Ambiguous words propagate the ValueError (mirrors
+    # `differential_expression_by_gene` / `genes_by_metabolite`); a word
+    # matching zero organisms short-circuits to an empty envelope with
+    # `not_found.organism` set — the metabolite-side probes still run
+    # since they don't depend on organism.
+    try:
+        organism_resolved = _validate_organism_inputs(organism, None, None, conn)
+    except ValueError as e:
+        if "no organism matching" not in str(e):
+            raise
+        not_found_locus = list(locus_tags) if locus_tags else []
+        if metabolite_ids:
+            rows = conn.execute_query(
+                "MATCH (m:Metabolite) WHERE m.id IN $ids "
+                "RETURN collect(m.id) AS found",
+                ids=metabolite_ids,
+            )
+            found_metab = set(rows[0]["found"]) if rows else set()
+            not_found_metab = [
+                x for x in metabolite_ids if x not in found_metab
+            ]
+        else:
+            not_found_metab = []
+        if metabolite_pathway_ids:
+            rows = conn.execute_query(
+                "MATCH (p:KeggTerm) WHERE p.id IN $ids "
+                "RETURN collect(p.id) AS found",
+                ids=metabolite_pathway_ids,
+            )
+            found_paths = set(rows[0]["found"]) if rows else set()
+            not_found_paths = [
+                x for x in metabolite_pathway_ids if x not in found_paths
+            ]
+        else:
+            not_found_paths = []
+        if metabolite_elements:
+            rows = conn.execute_query(
+                "MATCH (m:Metabolite) "
+                "WHERE size(m.elements) > 0 "
+                "WITH apoc.coll.toSet(apoc.coll.flatten(collect(m.elements))) AS all_elements "
+                "RETURN [e IN $elements WHERE e IN all_elements] AS found",
+                elements=metabolite_elements,
+            )
+            found_elems = set(rows[0]["found"]) if rows else set()
+            not_found_elements = [
+                e for e in metabolite_elements if e not in found_elems
+            ]
+        else:
+            not_found_elements = []
+        return {
+            "total_matching": 0,
+            "returned": 0,
+            "offset": offset,
+            "truncated": False,
+            "warnings": list(alias_warnings),
+            "resolved_aliases": resolved_aliases,
+            "not_found": {
+                "locus_tags": not_found_locus,
+                "organism": organism,
+                "metabolite_ids": not_found_metab,
+                "metabolite_pathway_ids": not_found_paths,
+                "metabolite_elements": not_found_elements,
+            },
+            "not_matched": [],
+            "by_gene": [],
+            "by_evidence_source": [],
+            "by_substrate_depth": [],
+            "by_element": [],
+            "top_metabolites": [],
+            "top_reactions": [],
+            "top_tcdb_families": [],
+            "top_gene_categories": [],
+            "top_metabolite_pathways": [],
+            "gene_count_total": 0,
+            "reaction_count_total": 0,
+            "transporter_count_total": 0,
+            "metabolite_count_total": 0,
+            "results": [],
+        }
+    organism = organism_resolved
 
     # 2. Arm selection driven solely by evidence_sources.
     if evidence_sources is None:
@@ -7690,9 +7851,11 @@ def metabolites_by_gene(
     else:
         not_found_metab = []
 
-    # 10. not_found.organism — set when fuzzy-resolution yielded zero genes
-    # in the slice (mirror GBM).
-    not_found_org = organism if gene_count_total == 0 else None
+    # 10. not_found.organism — organism existence was already validated in
+    # step 1c (_validate_organism_inputs); reaching here means it resolved,
+    # so this is always None (mirrors GBM — a zero-row slice is a
+    # legitimate empty result, not an invalid organism).
+    not_found_org = None
 
     # 11. not_matched: locus_tags that resolve to a Gene in the requested
     # organism (i.e. exist in `found_locus`) but produced 0 rows in the
