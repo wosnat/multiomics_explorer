@@ -3570,6 +3570,32 @@ class TestGenesByHomologGroup:
         cypher = first_call[0][0]
         assert "$organisms" in cypher
 
+    def test_by_organism_tie_break_is_deterministic(self, mock_conn):
+        """Equal-count organisms sort by count DESC then organism_name ASC.
+
+        apoc.coll.frequencies (the Cypher source of by_organism) has no
+        defined tie order, so ties can reorder between KG builds unless
+        the api layer applies a deterministic secondary sort key.
+        """
+        mock_conn.execute_query.side_effect = [
+            [{"total_matching": 6, "total_genes": 6, "total_categories": 1,
+              "by_organism": [
+                  {"item": "Zeta organism", "count": 2},
+                  {"item": "Alpha organism", "count": 2},
+                  {"item": "Middle organism", "count": 3},
+              ],
+              "by_category_raw": [],
+              "by_group_raw": [{"item": "cyanorak:CK_00000570", "count": 6}],
+              "not_found_groups": [], "not_matched_groups": []}],
+        ]
+        result = api.genes_by_homolog_group(
+            ["cyanorak:CK_00000570"], summary=True, conn=mock_conn)
+        assert result["by_organism"] == [
+            {"organism_name": "Middle organism", "count": 3},
+            {"organism_name": "Alpha organism", "count": 2},
+            {"organism_name": "Zeta organism", "count": 2},
+        ]
+
     def test_importable_from_package(self):
         from multiomics_explorer import genes_by_homolog_group
         assert genes_by_homolog_group is api.genes_by_homolog_group

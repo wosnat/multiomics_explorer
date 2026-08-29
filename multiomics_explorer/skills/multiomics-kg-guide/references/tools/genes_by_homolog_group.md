@@ -83,11 +83,11 @@ genes_by_homolog_group(group_ids=["cyanorak:CK_00000570"])
   "genes_per_group_max": 22,
   "genes_per_group_median": 22.0,
   "by_organism": [
-    {"organism_name": "Prochlorococcus SB", "count": 1},
+    {"organism_name": "Prochlorococcus AS9601", "count": 1},
+    {"organism_name": "Prochlorococcus MED4", "count": 1},
     {"organism_name": "Prochlorococcus MIT0604", "count": 1},
-    {"organism_name": "Synechococcus sp. BL107", "count": 1},
-    {"organism_name": "Prochlorococcus MIT9215", "count": 1},
-    {"organism_name": "Prochlorococcus MIT9202", "count": 1},
+    {"organism_name": "Prochlorococcus MIT0801", "count": 1},
+    {"organism_name": "Prochlorococcus MIT1327", "count": 1},
     ...
   ],
   "top_categories": [{"category": "Photosynthesis", "count": 22}],
@@ -149,11 +149,11 @@ genes_by_homolog_group(group_ids=["cyanorak:CK_00000570", "eggnog:COG0592@2"], s
   "genes_per_group_max": 43,
   "genes_per_group_median": 32.5,
   "by_organism": [
-    {"organism_name": "Prochlorococcus SB", "count": 2},
+    {"organism_name": "Prochlorococcus AS9601", "count": 2},
+    {"organism_name": "Prochlorococcus MED4", "count": 2},
     {"organism_name": "Prochlorococcus MIT0604", "count": 2},
-    {"organism_name": "Synechococcus sp. BL107", "count": 2},
-    {"organism_name": "Prochlorococcus MIT9215", "count": 2},
-    {"organism_name": "Prochlorococcus MIT9202", "count": 2},
+    {"organism_name": "Prochlorococcus MIT0801", "count": 2},
+    {"organism_name": "Prochlorococcus MIT1327", "count": 2},
     ...
   ],
   "top_categories": [{"category": "Replication and repair", "count": 43}, {"category": "Photosynthesis", "count": 22}],

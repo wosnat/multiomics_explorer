@@ -2738,6 +2738,11 @@ def genes_by_homolog_group(
     group_counts = [g["count"] for g in by_group_all]
 
     total_matching = raw_summary["total_matching"]
+    # count DESC, then organism_name ASC — apoc.coll.frequencies has no
+    # defined tie order, so ties (equal counts) would otherwise reorder
+    # between KG builds; _rename_freq's sort is by count only.
+    by_organism = _rename_freq(raw_summary["by_organism"], "organism_name")
+    by_organism.sort(key=lambda row: (-row["count"], row["organism_name"]))
     envelope = {
         "total_matching": total_matching,
         "total_genes": raw_summary["total_genes"],
@@ -2746,7 +2751,7 @@ def genes_by_homolog_group(
         "genes_per_group_median": (
             statistics.median(group_counts) if group_counts else 0
         ),
-        "by_organism": _rename_freq(raw_summary["by_organism"], "organism_name"),
+        "by_organism": by_organism,
         "top_categories": _rename_freq(raw_summary["by_category_raw"], "category")[:5],
         "top_groups": by_group_all[:5],
         "not_found_groups": raw_summary["not_found_groups"],
