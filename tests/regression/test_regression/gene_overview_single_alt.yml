@@ -7,6 +7,7 @@ rows:
   boolean_metric_count: 0
   catalyzed_metabolite_count: 0
   categorical_metric_count: 0
+  cazy_family_count: 0
   closest_ortholog_genera:
   - Alteromonas
   closest_ortholog_group_size: 2
@@ -29,5 +30,6 @@ rows:
   significant_down_count: 0
   significant_up_count: 0
   tcdb_evidence_score_max: null
+  tcdb_family_count: 0
   transport_substrate_resolution: null
   transported_metabolite_count: 0

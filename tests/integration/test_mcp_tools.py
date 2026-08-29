@@ -2733,6 +2733,20 @@ class TestTcdbSubstrateDepthCrossToolAgreement:
         assert row["transport_substrate_resolution"] == "resolved"
         assert "transport" in row["evidence_sources"]
 
+    def test_gene_overview_family_counts_pmm0392_pmm0001(self, conn):
+        """tcdb_family_count counts deepest attachments only: PMM0392 has 7
+        most_specific 3.A.1.x families (its superseded 3.A.1 ancestor is not
+        counted; the KG precompute reads 8), PMM0001 has no TCDB call. Neither
+        carries a CAZy family. Envelope has_tcdb / has_cazy follow."""
+        res = api.gene_overview(["PMM0392", "PMM0001"], conn=conn)
+        rows = {r["locus_tag"]: r for r in res["results"]}
+        assert rows["PMM0392"]["tcdb_family_count"] == 7
+        assert rows["PMM0392"]["cazy_family_count"] == 0
+        assert rows["PMM0001"]["tcdb_family_count"] == 0
+        assert rows["PMM0001"]["cazy_family_count"] == 0
+        assert res["has_tcdb"] == 1
+        assert res["has_cazy"] == 0
+
     def test_mbg_pmm0392_transport_metabolites_equal_gene_overview_count(self, conn):
         """(i) distinct metabolites in metabolites_by_gene(['PMM0392'])
         transport rows == gene_overview.transported_metabolite_count == 13

@@ -393,3 +393,60 @@ class TestOrganismAnnotationRollups:
         assert row["nonpeptidase_homolog_gene_count"] == node["np"]
         assert row["interpro_gene_count"] == node["i"]
         assert row["ncbifam_gene_count"] == node["nc"]
+
+
+# ---------------------------------------------------------------------------
+# gene_overview family counts (backlog 3.4): tcdb_family_count counts
+# attachment_depth='most_specific' edges only (the KG precompute
+# Gene.tcdb_family_count counts superseded ancestors too — PMM0392 8 vs 7);
+# cazy_family_count is the precompute verbatim.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.kg
+class TestGeneOverviewFamilyCounts:
+    BATCH = ["PMM0392", "PMM0001", "HP15_1897", "Sputw3181_2456"]
+
+    @pytest.fixture(scope="class")
+    def result(self, conn):
+        return api.gene_overview(locus_tags=self.BATCH, conn=conn)
+
+    @staticmethod
+    def _rows(result):
+        return {r["locus_tag"]: r for r in result["results"]}
+
+    def test_tcdb_family_count_is_the_most_specific_edge_count(self, conn, result):
+        live = {
+            r["lt"]: r["n"] for r in conn.execute_query(
+                "UNWIND $lts AS lt\n"
+                "MATCH (g:Gene {locus_tag: lt})\n"
+                "OPTIONAL MATCH (g)-[r:Gene_has_tcdb_family]->(:TcdbFamily)\n"
+                "WHERE r.attachment_depth = 'most_specific'\n"
+                "RETURN lt, count(r) AS n",
+                lts=self.BATCH)
+        }
+        rows = self._rows(result)
+        assert set(rows) == set(self.BATCH)
+        for lt, row in rows.items():
+            assert row["tcdb_family_count"] == live[lt], (
+                f"{lt}: api tcdb_family_count={row['tcdb_family_count']} "
+                f"but live most_specific edge count={live[lt]}")
+
+    def test_pmm0392_reads_seven_not_eight(self, result):
+        row = self._rows(result)["PMM0392"]
+        assert row["tcdb_family_count"] == 7
+        assert row["cazy_family_count"] == 0
+
+    def test_hp15_1897_reads_four_cazy_families(self, result):
+        row = self._rows(result)["HP15_1897"]
+        assert row["cazy_family_count"] == 4
+        assert row["tcdb_family_count"] == 0
+
+    def test_tcdb_family_count_iff_transport_substrate_resolution(self, result):
+        for lt, row in self._rows(result).items():
+            assert (row["tcdb_family_count"] > 0) == (
+                row["transport_substrate_resolution"] is not None), lt
+
+    def test_envelope_has_tcdb_has_cazy(self, result):
+        assert result["has_tcdb"] == 2
+        assert result["has_cazy"] == 2

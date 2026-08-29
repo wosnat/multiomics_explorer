@@ -4,9 +4,9 @@
 
 Batch gene routing: identity (gene_name, product, gene_category) plus per-gene data-availability signals (annotation_types, expression counts, ortholog/cluster summaries, DM rollups, chemistry rollups).
 
-[TRUST] `merops_classes` / `ncbifam_family_count` / `merops_evidence_score_max` are the protease / family-domain routing columns. See docs://analysis/annotation_evidence.
+[TRUST] `merops_classes` / `ncbifam_family_count` / `tcdb_family_count` / `cazy_family_count` / `merops_evidence_score_max` are the protease / family-domain / transporter / CAZyme routing columns; `tcdb_family_count` counts deepest attachments only (superseded ancestors excluded), so it equals the default TCDB row count from `gene_ontology_terms`. See docs://analysis/annotation_evidence.
 
-Routing: drill into each axis when the per-gene signal is non-zero — `gene_ontology_terms` (annotation_types non-empty), `gene_homologs` (closest_ortholog_group_size > 0), `gene_clusters_by_gene` (cluster_membership_count > 0), `differential_expression_by_gene` / `gene_response_profile` (expression_edge_count > 0), `gene_derived_metrics` and `genes_by_{numeric,boolean,categorical}_metric` keyed off `derived_metric_value_kinds`, `metabolites_by_gene` / `genes_by_metabolite` (evidence_sources non-empty), `gene_ontology_terms(ontology='merops')` (merops_classes non-empty). Use `gene_details` for the full Gene-node property dump.
+Routing: drill into each axis when the per-gene signal is non-zero — `gene_ontology_terms` (annotation_types non-empty), `gene_homologs` (closest_ortholog_group_size > 0), `gene_clusters_by_gene` (cluster_membership_count > 0), `differential_expression_by_gene` / `gene_response_profile` (expression_edge_count > 0), `gene_derived_metrics` and `genes_by_{numeric,boolean,categorical}_metric` keyed off `derived_metric_value_kinds`, `metabolites_by_gene` / `genes_by_metabolite` (evidence_sources non-empty), `gene_ontology_terms(ontology='merops')` (merops_classes non-empty), `gene_ontology_terms(ontology=['tcdb'])` (tcdb_family_count > 0), `gene_ontology_terms(ontology=['cazy'])` (cazy_family_count > 0). Use `gene_details` for the full Gene-node property dump.
 
 ## Parameters
 
@@ -23,7 +23,7 @@ Routing: drill into each axis when the per-gene signal is non-zero — `gene_ont
 ### Envelope
 
 ```expected-keys
-total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, has_chemistry, has_discussed, top_discussing_publications, has_ncbifam, by_merops_class, returned, offset, truncated, not_found, results
+total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, has_chemistry, has_discussed, top_discussing_publications, has_ncbifam, has_tcdb, has_cazy, by_merops_class, returned, offset, truncated, not_found, results
 ```
 
 - **total_matching** (int): Genes found in KG from input locus_tags.
@@ -40,6 +40,8 @@ total_matching, by_organism, by_category, by_annotation_type, by_annotation_stat
 - **has_discussed** (int): Count of requested locus_tags discussed in prose by at least one publication (discussed_in_publication_count > 0).
 - **top_discussing_publications** (list[OverviewDiscussingPublication]): Publications ranked by how many of the queried genes they discuss (batch set-coverage — recovers 'which one paper covers most of my gene set'). Feed a doi into discussed_by_publication for that paper's full discussed set.
 - **has_ncbifam** (int): Count of requested locus_tags with at least one NCBIfam family annotation (ncbifam_family_count > 0).
+- **has_tcdb** (int): Count of requested locus_tags with at least one deepest-attachment TCDB family (tcdb_family_count > 0).
+- **has_cazy** (int): Count of requested locus_tags with at least one CAZy family annotation (cazy_family_count > 0).
 - **by_merops_class** (list[OverviewMeropsClassBreakdown]): Rollup of merops_classes over the result set, sorted desc by count.
 - **returned** (int): Results in this response (0 when summary=true).
 - **offset** (int): Offset into full result set.
@@ -76,6 +78,8 @@ total_matching, by_organism, by_category, by_annotation_type, by_annotation_stat
 | evidence_sources | list[string] (optional) | Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. When non-empty, drill into metabolites_by_gene(locus_tags=[...]). Per-source definitions: see docs://guide/concepts. |
 | merops_classes | list[string] (optional) | Distinct MEROPS call_class values across this gene's MEROPS calls (e.g. ['peptidase']). Empty when no MEROPS annotation. Drill via gene_ontology_terms(ontology='merops'). |
 | ncbifam_family_count | int (optional) | Distinct NCBIfam family annotations on this gene. When > 0, drill via gene_ontology_terms(ontology='ncbifam'). |
+| tcdb_family_count | int (optional) | Distinct TCDB families at the deepest attachment only (superseded ancestors excluded); equals the default TCDB row count from gene_ontology_terms. 0 = no TCDB call (score and resolution null). Drill via gene_ontology_terms(ontology=['tcdb']). |
+| cazy_family_count | int (optional) | Distinct CAZy families on this gene (precomputed Gene.cazy_family_count; flat ontology). When > 0, drill via gene_ontology_terms(ontology=['cazy']) or find peers with genes_by_ontology(ontology='cazy'). |
 | merops_evidence_score_max | float \| None (optional) | Max MEROPS evidence_score over this gene's calls, in [0,1]. Twin of tcdb_evidence_score_max — uncoalesced: None = no MEROPS call at all, 0 = an uncorroborated one. Rank with it, don't filter. |
 | discussed_in_publication_count | int (optional) | Distinct publications that discuss this gene in prose (precomputed Gene.discussed_in_publication_count). Recall-biased narrative mention, NOT DE-table expression. When > 0, set verbose=True for the per-paper DOI list, or call discussed_by_publication for a paper's full discussed set. |
 | numeric_metric_count | int \| None (optional) | Numeric DM count (verbose-only). |
@@ -171,14 +175,37 @@ gene_overview(locus_tags=["PMM0392", "PMM0001"])
 # transport_substrate_resolution 'resolved' (at least one non-lumping
 # attachment, so that breadth is a real call). PMM0001 has no TCDB
 # call at all: score null, count 0, resolution null.
-{"total_matching": 2, "has_expression": 2, "has_chemistry": 2, "returned": 2, "truncated": false, "offset": 0, "not_found": [],
+# tcdb_family_count counts deepest attachments only: PMM0392 has 7
+# most-specific 3.A.1.x families; its superseded 3.A.1 ancestor is not
+# counted, so the value equals the default TCDB row count from
+# gene_ontology_terms(ontology=['tcdb']).
+# cazy_family_count is 0 on both (no carbohydrate-active-enzyme call);
+# envelope has_tcdb / has_cazy count input genes with a non-zero value.
+{"total_matching": 2, "has_expression": 2, "has_chemistry": 2, "has_tcdb": 1, "has_cazy": 0, "returned": 2, "truncated": false, "offset": 0, "not_found": [],
  "results": [
-   {"locus_tag": "PMM0392", "gene_name": "cbiQ", "product": "transmembrane component of ECF transporter energizing module", "organism_name": "Prochlorococcus MED4", "reaction_count": 0, "catalyzed_metabolite_count": 0, "tcdb_evidence_score_max": 0.8, "transported_metabolite_count": 13, "transport_substrate_resolution": "resolved", "evidence_sources": ["transport", "metabolomics"]},
-   {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_name": "Prochlorococcus MED4", "reaction_count": 4, "catalyzed_metabolite_count": 6, "tcdb_evidence_score_max": null, "transported_metabolite_count": 0, "transport_substrate_resolution": null, "evidence_sources": ["metabolism", "metabolomics"]}
+   {"locus_tag": "PMM0392", "gene_name": "cbiQ", "product": "transmembrane component of ECF transporter energizing module", "organism_name": "Prochlorococcus MED4", "reaction_count": 0, "catalyzed_metabolite_count": 0, "tcdb_evidence_score_max": 0.8, "transported_metabolite_count": 13, "transport_substrate_resolution": "resolved", "tcdb_family_count": 7, "cazy_family_count": 0, "evidence_sources": ["transport", "metabolomics"]},
+   {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_name": "Prochlorococcus MED4", "reaction_count": 4, "catalyzed_metabolite_count": 6, "tcdb_evidence_score_max": null, "transported_metabolite_count": 0, "transport_substrate_resolution": null, "tcdb_family_count": 0, "cazy_family_count": 0, "evidence_sources": ["metabolism", "metabolomics"]}
  ]}
 ```
 
-### Example 7: MEROPS peptidase + NCBIfam rollups on a gene
+### Example 7: CAZy-only gene — carbohydrate-active enzyme with no transporter call
+
+```example-call
+gene_overview(locus_tags=["HP15_1897"])
+```
+
+```example-response
+# cazy_family_count is the flat Gene_has_cazy_family edge count (no
+# depth rule). tcdb_family_count 0 pairs with a null
+# tcdb_evidence_score_max and null transport_substrate_resolution —
+# the three are non-zero / non-null together or not at all.
+{"total_matching": 1, "has_tcdb": 0, "has_cazy": 1, "returned": 1, "truncated": false, "offset": 0, "not_found": [],
+ "results": [
+   {"locus_tag": "HP15_1897", "gene_name": null, "product": "FG-GAP repeat domain-containing protein", "organism_name": "Marinobacter (MarRef v6)", "tcdb_family_count": 0, "cazy_family_count": 4, "tcdb_evidence_score_max": null, "transport_substrate_resolution": null}
+ ]}
+```
+
+### Example 8: MEROPS peptidase + NCBIfam rollups on a gene
 
 ```example-call
 gene_overview(locus_tags=["MIT1002_03660"])
@@ -198,7 +225,7 @@ gene_overview(locus_tags=["MIT1002_03660"])
  ]}
 ```
 
-### Example 8: Genes named in the literature — which paper discusses them
+### Example 9: Genes named in the literature — which paper discusses them
 
 ```example-call
 gene_overview(locus_tags=["PMT2118", "PMT_1030"])
@@ -234,6 +261,8 @@ gene_overview(verbose=True) → see compartments_observed for vesicle/whole-cell
 gene_overview (per-row `evidence_sources` non-empty) → metabolites_by_gene OR genes_by_metabolite for chemistry drill-down.
 gene_overview (per-row `transport_substrate_resolution='resolved'`, after reading `tcdb_evidence_score_max`) → metabolites_by_gene(locus_tags=[...], organism=..., evidence_sources=['transport']) — distinct metabolites in the rows equal `transported_metabolite_count`.
 gene_overview (per-row `discussed_in_publication_count` > 0) → use verbose=True for the per-gene {doi, prominence, evidence} list, or discussed_by_publication(publication_dois=[...]) for the paper's full discussed set.
+gene_overview (per-row `tcdb_family_count` > 0) → gene_ontology_terms(locus_tags=[...], ontology=['tcdb']) for the family IDs and evidence; `cazy_family_count` > 0 → gene_ontology_terms(locus_tags=[...], ontology=['cazy']), or genes_by_ontology(ontology='cazy', organism=...) for peers.
+gene_overview envelope `has_tcdb` / `has_cazy` = batch triage (how many input genes carry a transporter-family / carbohydrate-active-enzyme call) before deciding whether a pathway_enrichment(ontology='tcdb'|'cazy') run is worth it.
 gene_overview (per-row `merops_classes` non-empty) → gene_ontology_terms(locus_tags=[...], ontology=['merops'], verbose=True) for the confidence_score / pfam_support detail behind the call, or genes_by_ontology(ontology='merops', call_class=['peptidase']) to find peers.
 `merops_classes` is a list (`[]` default) because a gene can carry both a `peptidase` and a `nonpeptidase_homolog` MEROPS call on different families — don't assume at most one value. `merops_evidence_score_max` is sparse and uncoalesced (null = no MEROPS call at all, the twin contract of `tcdb_evidence_score_max`) — rank by it, never filter by it.
 ```
@@ -252,6 +281,8 @@ gene_overview (per-row `merops_classes` non-empty) → gene_ontology_terms(locus
 
 - TCDB routing rule: read the score; if resolved, drill into substrates. `tcdb_evidence_score_max` is the gene's most corroborated TCDB call (null = no TCDB call; 0 = an uncorroborated hit, not absence) — rank by it, never filter by it. `transport_substrate_resolution='family_inferred'` means `transported_metabolite_count` is reachability through a lumping family, not capability; `'resolved'` means at least one deepest attachment is non-lumping (not all of them — a superfamily rollup can still sit inside the count). Per-row `substrate_depth` in `metabolites_by_gene` separates the two.
 
+- `tcdb_family_count` counts TCDB families at the deepest attachment only (superseded ancestor families excluded) — it equals the TCDB row count of `gene_ontology_terms(ontology=['tcdb'])` in default leaf mode. Ancestor membership is still visible with `include_superseded=True`. `tcdb_family_count > 0` exactly when `tcdb_evidence_score_max` / `transport_substrate_resolution` are non-null.
+
 - discussed_in_publication_count > 0 means at least one publication names this gene in prose (a recall-biased literature index, NOT DE-table expression). At ~1 pub/gene the answer is usually inline: verbose=True returns discussed_in_publications as {doi, prominence, evidence} per gene. Use discussed_by_publication for a paper's full discussed set.
 
 ```mistake
@@ -268,7 +299,7 @@ gene_overview(locus_tags=['PMM0845'])  # verbose only needed for gene_summary te
 from multiomics_explorer import gene_overview
 
 result = gene_overview(locus_tags=...)
-# returns dict with keys: total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, has_chemistry, has_discussed, top_discussing_publications, has_ncbifam, by_merops_class, offset, not_found, results
+# returns dict with keys: total_matching, by_organism, by_category, by_annotation_type, by_annotation_state, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, has_chemistry, has_discussed, top_discussing_publications, has_ncbifam, has_tcdb, has_cazy, by_merops_class, offset, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

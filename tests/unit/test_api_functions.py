@@ -13151,6 +13151,44 @@ class TestGeneOverviewMeropsNcbifam:
         assert result["has_ncbifam"] == 1
 
 
+class TestGeneOverviewFamilyCounts(TestGeneOverviewMeropsNcbifam):
+    """Backlog 3.4 — gene_overview rows carry tcdb_family_count /
+    cazy_family_count; envelope carries has_tcdb / has_cazy (0 default)."""
+
+    def _summary_row(self, **overrides):
+        return super()._summary_row(has_tcdb=1, has_cazy=1, **overrides)
+
+    def _detail_rows(self):
+        rows = super()._detail_rows()
+        rows[0]["tcdb_family_count"] = 7
+        rows[0]["cazy_family_count"] = 4
+        return rows
+
+    def test_rows_carry_tcdb_family_count(self, mock_conn):
+        result = self._run(mock_conn)
+        assert result["results"][0]["tcdb_family_count"] == 7
+
+    def test_rows_carry_cazy_family_count(self, mock_conn):
+        result = self._run(mock_conn)
+        assert result["results"][0]["cazy_family_count"] == 4
+
+    def test_envelope_has_tcdb(self, mock_conn):
+        result = self._run(mock_conn)
+        assert result["has_tcdb"] == 1
+
+    def test_envelope_has_cazy(self, mock_conn):
+        result = self._run(mock_conn)
+        assert result["has_cazy"] == 1
+
+    def test_envelope_defaults_to_zero_when_summary_lacks_keys(self, mock_conn):
+        rows = self._summary_row()
+        del rows[0]["has_tcdb"]
+        del rows[0]["has_cazy"]
+        result = self._run(mock_conn, summary_rows=rows)
+        assert result["has_tcdb"] == 0
+        assert result["has_cazy"] == 0
+
+
 # ===========================================================================
 # PR 3b — annotation-trust surface, term side (RED)
 #

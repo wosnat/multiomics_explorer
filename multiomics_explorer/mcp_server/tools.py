@@ -2131,6 +2131,20 @@ def register_tools(mcp: FastMCP):
             description="Distinct NCBIfam family annotations on this gene. When > 0, "
                         "drill via gene_ontology_terms(ontology='ncbifam').",
         )
+        tcdb_family_count: int = Field(
+            0,
+            description="Distinct TCDB families at the deepest attachment only "
+                        "(superseded ancestors excluded); equals the default TCDB row "
+                        "count from gene_ontology_terms. 0 = no TCDB call (score and "
+                        "resolution null). Drill via gene_ontology_terms(ontology=['tcdb']).",
+        )
+        cazy_family_count: int = Field(
+            0,
+            description="Distinct CAZy families on this gene (precomputed "
+                        "Gene.cazy_family_count; flat ontology). When > 0, drill via "
+                        "gene_ontology_terms(ontology=['cazy']) or find peers with "
+                        "genes_by_ontology(ontology='cazy').",
+        )
         merops_evidence_score_max: float | None = Field(
             default=None,
             description="Max MEROPS evidence_score over this gene's calls, in [0,1]. "
@@ -2214,6 +2228,14 @@ def register_tools(mcp: FastMCP):
             default=0,
             description="Count of requested locus_tags with at least one NCBIfam family annotation (ncbifam_family_count > 0).",
         )
+        has_tcdb: int = Field(
+            default=0,
+            description="Count of requested locus_tags with at least one deepest-attachment TCDB family (tcdb_family_count > 0).",
+        )
+        has_cazy: int = Field(
+            default=0,
+            description="Count of requested locus_tags with at least one CAZy family annotation (cazy_family_count > 0).",
+        )
         by_merops_class: list[OverviewMeropsClassBreakdown] = Field(
             default_factory=list,
             description="Rollup of merops_classes over the result set, sorted desc by count.",
@@ -2249,9 +2271,9 @@ def register_tools(mcp: FastMCP):
     ) -> GeneOverviewResponse:
         """Batch gene routing: identity (gene_name, product, gene_category) plus per-gene data-availability signals (annotation_types, expression counts, ortholog/cluster summaries, DM rollups, chemistry rollups).
 
-        [TRUST] `merops_classes` / `ncbifam_family_count` / `merops_evidence_score_max` are the protease / family-domain routing columns. See docs://analysis/annotation_evidence.
+        [TRUST] `merops_classes` / `ncbifam_family_count` / `tcdb_family_count` / `cazy_family_count` / `merops_evidence_score_max` are the protease / family-domain / transporter / CAZyme routing columns; `tcdb_family_count` counts deepest attachments only (superseded ancestors excluded), so it equals the default TCDB row count from `gene_ontology_terms`. See docs://analysis/annotation_evidence.
 
-        Routing: drill into each axis when the per-gene signal is non-zero — `gene_ontology_terms` (annotation_types non-empty), `gene_homologs` (closest_ortholog_group_size > 0), `gene_clusters_by_gene` (cluster_membership_count > 0), `differential_expression_by_gene` / `gene_response_profile` (expression_edge_count > 0), `gene_derived_metrics` and `genes_by_{numeric,boolean,categorical}_metric` keyed off `derived_metric_value_kinds`, `metabolites_by_gene` / `genes_by_metabolite` (evidence_sources non-empty), `gene_ontology_terms(ontology='merops')` (merops_classes non-empty). Use `gene_details` for the full Gene-node property dump.
+        Routing: drill into each axis when the per-gene signal is non-zero — `gene_ontology_terms` (annotation_types non-empty), `gene_homologs` (closest_ortholog_group_size > 0), `gene_clusters_by_gene` (cluster_membership_count > 0), `differential_expression_by_gene` / `gene_response_profile` (expression_edge_count > 0), `gene_derived_metrics` and `genes_by_{numeric,boolean,categorical}_metric` keyed off `derived_metric_value_kinds`, `metabolites_by_gene` / `genes_by_metabolite` (evidence_sources non-empty), `gene_ontology_terms(ontology='merops')` (merops_classes non-empty), `gene_ontology_terms(ontology=['tcdb'])` (tcdb_family_count > 0), `gene_ontology_terms(ontology=['cazy'])` (cazy_family_count > 0). Use `gene_details` for the full Gene-node property dump.
         """
         await ctx.info(f"gene_overview locus_tags={locus_tags} summary={summary}")
         try:
@@ -2291,6 +2313,8 @@ def register_tools(mcp: FastMCP):
                 has_discussed=data.get("has_discussed", 0),
                 top_discussing_publications=top_discussing_publications,
                 has_ncbifam=data.get("has_ncbifam", 0),
+                has_tcdb=data.get("has_tcdb", 0),
+                has_cazy=data.get("has_cazy", 0),
                 by_merops_class=by_merops_class,
                 returned=data["returned"],
                 offset=data.get("offset", 0),

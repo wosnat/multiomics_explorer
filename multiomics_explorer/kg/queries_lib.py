@@ -1102,7 +1102,8 @@ def build_gene_overview_summary(
     RETURN keys: total_matching, by_organism, by_category,
     by_annotation_type, has_expression, has_significant_expression,
     has_orthologs, has_clusters, has_derived_metrics, has_chemistry,
-    has_discussed, by_merops_class, has_ncbifam, not_found.
+    has_discussed, by_merops_class, has_ncbifam, has_tcdb, has_cazy,
+    not_found.
     """
     cypher = (
         "UNWIND $locus_tags AS lt\n"
@@ -1152,6 +1153,15 @@ def build_gene_overview_summary(
         "         [g IN found | coalesce(g.merops_classes, [])])) AS by_merops_class,\n"
         "       size([g IN found WHERE\n"
         "           coalesce(g.ncbifam_family_count, 0) > 0]) AS has_ncbifam,\n"
+        # Family-count rollups (backlog 3.4): has_tcdb counts genes with >=1
+        # deepest-attachment TCDB edge (live edge predicate, not the KG's
+        # Gene.tcdb_family_count precompute which counts superseded ancestors);
+        # has_cazy reads the flat-ontology precompute.
+        "       size([g IN found WHERE EXISTS {\n"
+        "         MATCH (g)-[r:Gene_has_tcdb_family]->(:TcdbFamily)\n"
+        "         WHERE r.attachment_depth = 'most_specific'\n"
+        "       }]) AS has_tcdb,\n"
+        "       size([g IN found WHERE coalesce(g.cazy_family_count, 0) > 0]) AS has_cazy,\n"
         "       not_found"
     )
     return cypher, {"locus_tags": locus_tags}
@@ -1180,6 +1190,9 @@ def build_gene_overview(
     'family_inferred' | null), discussed_in_publication_count,
     merops_classes (list, [] default — the protease call classes this gene
     carries), ncbifam_family_count (int, 0 default),
+    tcdb_family_count (int, live count of attachment_depth='most_specific'
+    Gene_has_tcdb_family edges — NOT the KG precompute, which counts
+    superseded ancestors), cazy_family_count (int, 0 default),
     merops_evidence_score_max (float | null — sparse KG prop, NOT coalesced:
     null = no MEROPS call, the twin of tcdb_evidence_score_max),
     evidence_sources.
@@ -1279,6 +1292,15 @@ def build_gene_overview(
         # means "no MEROPS call", which is not the same as a weak one.
         "       coalesce(g.merops_classes, []) AS merops_classes,\n"
         "       coalesce(g.ncbifam_family_count, 0) AS ncbifam_family_count,\n"
+        # TCDB family count at the deepest attachment only (backlog 3.4). The
+        # KG's Gene.tcdb_family_count precompute counts every edge incl.
+        # superseded ancestors — the transporter_count defect — so count live
+        # on the edge prop (exactly equivalent to
+        # TCDB_DEEPEST_ATTACHMENT_PREDICATE). CAZy is flat, so its precompute
+        # is safe to read.
+        "       size([(g)-[r:Gene_has_tcdb_family]->(:TcdbFamily)\n"
+        "             WHERE r.attachment_depth = 'most_specific' | r]) AS tcdb_family_count,\n"
+        "       coalesce(g.cazy_family_count, 0) AS cazy_family_count,\n"
         "       g.merops_evidence_score_max AS merops_evidence_score_max,\n"
         f"       evidence_sources{verbose_cols}\n"
         f"ORDER BY g.locus_tag{skip_clause}{limit_clause}"

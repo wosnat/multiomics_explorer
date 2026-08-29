@@ -41,7 +41,6 @@ pathway rollups; `mcp_min_version` mismatch (live reads `0.1.0a1`, verdict `ok`)
 | # | Item | Size | Notes |
 |---|---|---|---|
 | 3.2 | Bare metabolite IDs (`C00064`) → prefixed canonical form via `m.kegg_compound_id` in compound-anchored tools; extend to CHEBI / HMDB / MNXM. Partially present (`kegg_compound_id` referenced at 18 sites across queries_lib / functions / tools) — verify which compound-anchored entry points still lack the coercion. | M | KG-MET-014 |
-| 3.4 | `gene_overview`: `tcdb_family_count` / `cazy_family_count` routing signals (parallel to chemistry counts). `transporter_count` was removed in slice 2 for counting superseded ancestors — any replacement must count `attachment_depth = 'most_specific'` only. | S | TCDB/CAZy follow-up |
 | 3.5 | `kg_schema` property-description enrichment + analysis-doc `field_description` callout. | M | metabolites roadmap Track B |
 | 3.7 | MCP usability audit passes B/C/D + KG-1..KG-7. Pass A shipped 2026-04-30. Re-scope against the current surface before starting — much of it landed via the readability passes and the trust surface. | L | audit |
 | 3.8 | Chemistry slice 2+: `metabolites_by_pathway`, `list_reactions` / `genes_by_reaction`, `organism_metabolite_overlap`, Tier-3 `pathway_chemistry`. Defer until a workflow needs them. | L | chemistry design |
@@ -61,6 +60,7 @@ Filed in chat 2026-08-28; the non-release set (B1–B3, new B5 rebuild-#3 ping, 
 - ~~B2~~ done in rebuild #3 (42 vocab descriptions rewritten researcher-facing; provenance → yaml comments; hash-neutral).
 - ~~B3~~ done in rebuild #3 (`min_size: int` sparse on the vocab node — was dropped by BioCypher for lack of a schema slot; hash-neutral, no re-pin).
 - ~~B5~~ rebuild #3 verified 2026-08-29 (07:22Z): `kg_release_info` ok, hash unchanged, 17/17 asserts; `min_size = 1` on the 7 promised vocab nodes; 4 goldens moved (3 Biller 2022 DM + `cluster_type` text), 2,904 `-m kg` passed after 4 stale pin fixes.
+- B6. `Gene.tcdb_family_count` → deepest-attachment-only (explorer computes live meanwhile) — `docs/kg-specs/2026-08-29-gene-overview-family-counts-asks.md`.
 - ~~B4~~ closed 2026-08-28 (HO-002: synonyms + `taxonomy_note`, name kept). Was: two `OrganismTaxon` nodes share `preferred_name = 'Meiothermus ruber'` (genome strain + 0-gene treatment taxon) — disambiguate the treatment taxon's name or add a uniqueness validity test.
 
 **C — notes, no action**: `expression_bin` declared but unused (drift test checks in-use ⊆ declared); `direct_gene_count` absent on PfamClan / BriteCategory (documented); 4 publications without `discusses` edges (pre-existing extraction gaps).

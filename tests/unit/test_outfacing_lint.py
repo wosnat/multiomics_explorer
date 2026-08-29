@@ -137,6 +137,19 @@ def test_lint_catches_retired_tcdb_trust_vocabulary(lint_mod, tmp_path):
     assert len(vs) == 2
 
 
+def test_lint_catches_retired_name_lineage(lint_mod, tmp_path):
+    """'successor of the removed X' is CHANGELOG lineage, not usage guidance
+    (gene_overview tcdb_family_count description)."""
+    md = tmp_path / "t.md"
+    md.write_text(
+        "The corrected successor of the removed transporter_count.\n"
+        "A replacement for the retired metabolite_count column.\n"
+        "The successor family sits one level below its parent.\n"
+    )
+    vs = lint_mod.lint_about_content([md])
+    assert [v[1] for v in vs] == [1, 2]
+
+
 def test_lint_ignores_legitimate_count_names(lint_mod, tmp_path):
     """Bare gene_count / measured metabolite_count remain valid elsewhere."""
     md = tmp_path / "t.md"

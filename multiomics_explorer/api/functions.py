@@ -1041,7 +1041,13 @@ def gene_overview(
     catalytically-dead homologs), ncbifam_family_count (int, 0 default) and
     merops_evidence_score_max (float | None — None means no MEROPS call at
     all, 0 means an uncorroborated one; rank with it, don't filter).
-    Envelope adds by_merops_class and has_ncbifam.
+    Rows also carry tcdb_family_count (int, 0 default — distinct TCDB
+    families at the deepest attachment only, superseded ancestors excluded;
+    0 means no TCDB call) and cazy_family_count (int, 0 default — distinct
+    CAZy families, precomputed on the gene). Drill in with
+    gene_ontology_terms(ontology=['tcdb'] or ['cazy']).
+    Envelope adds by_merops_class, has_ncbifam, has_tcdb and has_cazy
+    (ints — input genes with at least one family of that kind).
     Verbose adds: gene_summary, function_description, all_identifiers,
     discussed_in_publications (list of {doi, prominence, evidence}; see
     discussed_by_publication for a paper's full discussed set).
@@ -1099,6 +1105,10 @@ def gene_overview(
             raw_summary.get("by_merops_class", []), "merops_class",
         ),
         "has_ncbifam": raw_summary.get("has_ncbifam", 0),
+        # Transporter / CAZyme routing: input genes with >=1 TCDB family at
+        # the deepest attachment / >=1 CAZy family.
+        "has_tcdb": raw_summary.get("has_tcdb", 0),
+        "has_cazy": raw_summary.get("has_cazy", 0),
         "not_found": raw_summary["not_found"],
     }
 

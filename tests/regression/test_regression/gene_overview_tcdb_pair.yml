@@ -38,6 +38,7 @@ by_organism:
 - count: 2
   organism_name: Prochlorococcus MED4
 case_id: gene_overview_tcdb_pair
+has_cazy: 0
 has_chemistry: 2
 has_clusters: 2
 has_derived_metrics: 2
@@ -46,6 +47,7 @@ has_expression: 2
 has_ncbifam: 1
 has_orthologs: 2
 has_significant_expression: 2
+has_tcdb: 1
 not_found: []
 offset: 0
 results:
@@ -65,6 +67,7 @@ results:
   - pfam
   - tigr_role
   catalyzed_metabolite_count: 6
+  cazy_family_count: 0
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
@@ -107,6 +110,7 @@ results:
   significant_down_count: 1
   significant_up_count: 5
   tcdb_evidence_score_max: null
+  tcdb_family_count: 0
   transport_substrate_resolution: null
   transported_metabolite_count: 0
 - annotation_quality: 3
@@ -123,6 +127,7 @@ results:
   - tcdb
   - tigr_role
   catalyzed_metabolite_count: 0
+  cazy_family_count: 0
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
@@ -162,6 +167,7 @@ results:
   significant_down_count: 1
   significant_up_count: 0
   tcdb_evidence_score_max: 0.8
+  tcdb_family_count: 7
   transport_substrate_resolution: resolved
   transported_metabolite_count: 13
 returned: 2

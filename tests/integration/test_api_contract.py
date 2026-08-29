@@ -127,6 +127,8 @@ class TestGeneOverviewContract:
             # family-domain routing signals. merops_evidence_score_max is
             # sparse and uncoalesced (null = no MEROPS call at all).
             "merops_classes", "ncbifam_family_count", "merops_evidence_score_max",
+            # Backlog 3.4: TCDB (most-specific depth only) / CAZy family counts.
+            "tcdb_family_count", "cazy_family_count",
         }
         assert set(result["results"][0].keys()) == expected_keys
 

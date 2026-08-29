@@ -111,6 +111,13 @@ coordinated to `0.1.0a5` ahead of the KG release.
 - `gene_overview` rows: `tcdb_evidence_score_max` (float | null; null = no
   TCDB call, never coalesced), `transported_metabolite_count` (int) and
   `transport_substrate_resolution` (`resolved` | `family_inferred` | null).
+- `gene_overview` rows: `tcdb_family_count` (TCDB families at the deepest
+  attachment only — the corrected successor of the removed
+  `transporter_count`, which counted superseded ancestors) and
+  `cazy_family_count`; envelope `has_tcdb` / `has_cazy`. Spec
+  `docs/tool-specs/2026-08-29-gene-overview-family-counts.md`; KG ask filed
+  to align `Gene.tcdb_family_count`
+  (`docs/kg-specs/2026-08-29-gene-overview-family-counts-asks.md`).
 - `list_metabolites` rows: `transporter_gene_count` (distinct genes over
   deepest TCDB attachments, all organisms) — pairs with `catalyst_gene_count`
   so transport-only reads `0 / >0`.

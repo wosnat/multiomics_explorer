@@ -45,6 +45,11 @@ LINT_PATTERN = re.compile(
     # parameter descriptions, not "Field descriptions" (kg_release_info
     # vocabulary-mismatch sentence).
     r"|\bField descriptions?\b"
+    # Retired-name lineage ("the corrected successor of the removed
+    # transporter_count"): what a column replaced is CHANGELOG material,
+    # not usage guidance. Source violation: the gene_overview
+    # tcdb_family_count parameter description and example comment.
+    r"|\b(?:successor|replacement)s? (?:of|for|to) the (?:removed|retired|old)\b"
 )
 
 # Drift-marker carveout. The [AQ] (annotation_quality redefinition) and

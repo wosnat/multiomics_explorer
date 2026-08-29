@@ -129,6 +129,13 @@ def gene_overview_scenarios():
             "gene_with_merops_call",
             dict(locus_tags=["MIT1002_03660"]),
             input_ids=["MIT1002_03660"]),
+        # --- backlog 3.4: TCDB / CAZy family counts ---
+        Scenario(
+            # Alteromonas gene with CAZy calls but no TCDB call:
+            # cazy_family_count=4, tcdb_family_count=0.
+            "gene_with_cazy_only",
+            dict(locus_tags=["HP15_1897"]),
+            input_ids=["HP15_1897"]),
     ]
 
 

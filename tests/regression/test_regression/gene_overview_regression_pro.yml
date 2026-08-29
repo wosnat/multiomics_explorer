@@ -12,6 +12,7 @@ rows:
   boolean_metric_count: 2
   catalyzed_metabolite_count: 0
   categorical_metric_count: 2
+  cazy_family_count: 0
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
@@ -39,5 +40,6 @@ rows:
   significant_down_count: 2
   significant_up_count: 4
   tcdb_evidence_score_max: null
+  tcdb_family_count: 0
   transport_substrate_resolution: null
   transported_metabolite_count: 0

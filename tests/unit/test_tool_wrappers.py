@@ -9795,6 +9795,96 @@ class TestTrustEnvelopeFieldsOnResponses:
         assert f"{field}:" in src[idx:idx + 8000]
 
 
+class TestGeneOverviewWrapperFamilyCounts:
+    """Backlog 3.4: GeneOverviewResult declares tcdb_family_count /
+    cazy_family_count (int, default 0); GeneOverviewResponse declares
+    has_tcdb / has_cazy; the wrapper forwards the api values verbatim."""
+
+    @staticmethod
+    def _src(class_name):
+        from multiomics_explorer.mcp_server.tools import register_tools
+        import inspect
+        src = inspect.getsource(register_tools)
+        idx = src.index(f"class {class_name}(")
+        return src[idx:idx + 8000]
+
+    @pytest.mark.parametrize("field", ["tcdb_family_count", "cazy_family_count"])
+    def test_row_declares_family_count_with_zero_default(self, field):
+        import re as _re
+        src = self._src("GeneOverviewResult")
+        assert (
+            _re.search(rf"{field}:\s*int\s*=\s*Field\(\s*0\b", src)
+            or _re.search(rf"{field}:\s*int\s*=\s*0\b", src)
+        ), field
+
+    @pytest.mark.parametrize("field", ["has_tcdb", "has_cazy"])
+    def test_response_declares_envelope_field(self, field):
+        assert f"{field}:" in self._src("GeneOverviewResponse")
+
+    def _api_return(self):
+        row = {
+            "locus_tag": "PMM0392", "gene_name": None, "product": "ABC transporter",
+            "gene_category": "Transport", "annotation_quality": 3,
+            "organism_name": "Prochlorococcus MED4",
+            "annotation_types": [], "annotation_state": "informative_multi",
+            "informative_annotation_types": [],
+            "expression_edge_count": 0,
+            "significant_up_count": 0, "significant_down_count": 0,
+            "closest_ortholog_group_size": 1, "closest_ortholog_genera": [],
+            "cluster_membership_count": 0, "cluster_types": [],
+            "derived_metric_count": 0, "derived_metric_value_kinds": [],
+            "discussed_in_publication_count": 0,
+            "ncbifam_family_count": 0, "merops_classes": [],
+            "tcdb_family_count": 7, "cazy_family_count": 4,
+        }
+        return {
+            "total_matching": 1,
+            "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
+            "by_category": [], "by_annotation_type": [], "by_annotation_state": [],
+            "has_expression": 0, "has_significant_expression": 0,
+            "has_orthologs": 0, "has_clusters": 0, "has_derived_metrics": 0,
+            "has_chemistry": 0, "has_discussed": 0,
+            "top_discussing_publications": [],
+            "has_ncbifam": 0, "by_merops_class": [],
+            "has_tcdb": 1, "has_cazy": 1,
+            "returned": 1, "offset": 0, "truncated": False,
+            "not_found": [], "results": [row],
+        }
+
+    @pytest.mark.asyncio
+    async def test_wrapper_forwards_family_counts(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=self._api_return(),
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["PMM0392"],
+            )
+        assert result.results[0].tcdb_family_count == 7
+        assert result.results[0].cazy_family_count == 4
+        assert result.has_tcdb == 1
+        assert result.has_cazy == 1
+
+    @pytest.mark.asyncio
+    async def test_wrapper_defaults_family_counts_to_zero(self, tool_fns, mock_ctx):
+        ret = self._api_return()
+        for k in ("tcdb_family_count", "cazy_family_count"):
+            del ret["results"][0][k]
+        for k in ("has_tcdb", "has_cazy"):
+            del ret[k]
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=ret,
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["PMM0392"],
+            )
+        assert result.results[0].tcdb_family_count == 0
+        assert result.results[0].cazy_family_count == 0
+        assert result.has_tcdb == 0
+        assert result.has_cazy == 0
+
+
 class TestListFilterValuesTrustTypes:
     """`filter_type` grows the trust / facet / config-derived enumerations."""
 
