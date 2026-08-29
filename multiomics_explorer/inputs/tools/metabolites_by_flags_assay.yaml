@@ -97,9 +97,12 @@ mistakes:
 
   - wrong: "excluded_assays / warnings will surface gating diagnostics."
     right: |
-      Always `[]` here (no gates) — kept for cross-tool envelope-shape
-      consistency with `metabolites_by_quantifies_assay`. Boolean assays
-      have no `rankable` gate to probe. Mirrors `genes_by_boolean_metric`
+      `excluded_assays` is always `[]` here (no gates) — kept for cross-tool
+      envelope-shape consistency with `metabolites_by_quantifies_assay`.
+      Boolean assays have no `rankable` gate to probe. `warnings` is `[]`
+      unless a bare / xref `metabolite_ids` input was ambiguous (CHEBI /
+      HMDB / MNXM collision expanded to several metabolites — see
+      `resolved_aliases`). Mirrors `genes_by_boolean_metric`
       vs `genes_by_numeric_metric`.
 
   - wrong: "growth_phase populated on every row."
@@ -111,3 +114,16 @@ mistakes:
       change when the upstream backfill lands.
 
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (62% of boolean rows are flag_value=False, kept by default — unlike DM boolean which is positive-only)."
+
+  - wrong: "metabolites_by_flags_assay(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'"
+    right: |
+      Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
+      the node's cross-references before the query runs: `C00064` →
+      `kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
+      `HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
+      (`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
+      inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
+      CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
+      ALL matching metabolites and appends a `warnings` entry; pass the canonical
+      id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
+      in the form you passed.

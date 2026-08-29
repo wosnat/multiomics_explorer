@@ -93,3 +93,16 @@ mistakes:
   - wrong: "list_metabolites(organism_names=['MED4'])  # short name doesn't match"
     right: "list_metabolites(organism_names=['Prochlorococcus MED4'])  # full preferred_name"
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/concepts` for the chemistry layer overview."
+
+  - wrong: "list_metabolites(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'"
+    right: |
+      Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
+      the node's cross-references before the query runs: `C00064` →
+      `kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
+      `HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
+      (`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
+      inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
+      CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
+      ALL matching metabolites and appends a `warnings` entry; pass the canonical
+      id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
+      in the form you passed. The dedicated exact-xref filters (`kegg_compound_ids`, `chebi_ids`, `hmdb_ids`, `mnxm_ids`) are a separate, uncoerced mechanism — they match the xref property directly.

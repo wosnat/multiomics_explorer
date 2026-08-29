@@ -78,7 +78,9 @@ mistakes:
       Pre-flight via list_metabolite_assays(rankable=True, value_kind='numeric').
       Tool soft-excludes non-rankable assays from mixed input (surfaces in
       envelope `excluded_assays` + `warnings`) and raises ValueError if every
-      selected assay is non-rankable.
+      selected assay is non-rankable. `warnings` also carries metabolite-ID
+      collision notes when an ambiguous CHEBI / HMDB / MNXM input expanded to
+      several metabolites (see `resolved_aliases`).
 
   - wrong: "Expect not_found to be a flat list[str]."
     right: |
@@ -112,3 +114,16 @@ mistakes:
       change when the upstream backfill lands.
 
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (75% of numeric edges are not_detected, kept by default)."
+
+  - wrong: "metabolites_by_quantifies_assay(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'"
+    right: |
+      Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
+      the node's cross-references before the query runs: `C00064` →
+      `kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
+      `HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
+      (`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
+      inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
+      CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
+      ALL matching metabolites and appends a `warnings` entry; pass the canonical
+      id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
+      in the form you passed.

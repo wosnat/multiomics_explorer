@@ -417,6 +417,35 @@ Always restate the caveat when you answer with metabolite chemistry —
 produces X". This is the permanent convention; see
 `docs://analysis/metabolites`.
 
+## Metabolite ID forms (chemistry + metabolomics tools)
+
+Canonical `Metabolite.id` carries a namespace prefix: `kegg.compound:C00064`,
+`chebi:10004`, `mnx:MNXM…`. Every `metabolite_ids` / `exclude_metabolite_ids`
+parameter on the seven chemistry / metabolomics tools (`list_metabolites`,
+`genes_by_metabolite`, `metabolites_by_gene`, `list_metabolite_assays`,
+`metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`,
+`assays_by_metabolite`) also accepts the un-prefixed / xref aliases and
+resolves them to canonical IDs before the query runs: bare KEGG `C00064`,
+`CHEBI:17234` or bare numeric `17234`, `HMDB0000122`, `MNXM1095050`.
+Canonical forms pass through untouched; any other prefixed form is passed
+through verbatim and lands in `not_found`.
+
+- **Collision policy.** KEGG xrefs are unique; CHEBI / HMDB / MNXM are not
+  (two KEGG nodes can share one `chebi_id`). An ambiguous alias expands to
+  **all** matching metabolites and appends a `warnings` entry
+  (`'<input>' resolved to N metabolites: [...] — pass the canonical id to
+  narrow`). Nothing is silently picked. The same rule applies to
+  `exclude_metabolite_ids` — an ambiguous exclude removes every match.
+- **Envelope.** Coerced inputs are reported in `resolved_aliases`
+  (`{input: [canonical, ...]}`, empty when none). Unresolved inputs stay
+  verbatim and appear in `not_found` in the form you passed. Exclude-wins-on-
+  overlap is evaluated on the canonical IDs, so mixed forms across
+  `metabolite_ids` and `exclude_metabolite_ids` still overlap correctly.
+- **Not coercion:** `list_metabolites`' exact-xref filters
+  (`kegg_compound_ids`, `chebi_ids`, `hmdb_ids`, `mnxm_ids`) match the xref
+  property directly, never rewrite the input, and report nothing in
+  `resolved_aliases`.
+
 ---
 
 ## Pagination

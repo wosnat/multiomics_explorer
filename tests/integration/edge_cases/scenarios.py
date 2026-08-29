@@ -724,6 +724,11 @@ def list_metabolites_scenarios():
         Scenario(
             "no_hits_search",
             dict(search_text="zzzznonexistentmetabolitezzz")),
+        Scenario(
+            # backlog 3.2: bare KEGG C-number coerced to kegg.compound:C00064
+            # via xrefs before the builder runs; must not land in not_found.
+            "bare_metabolite_id",
+            dict(metabolite_ids=[_BARE_KEGG_ID])),
     ]
 
 
@@ -743,6 +748,10 @@ def list_metabolite_assays_scenarios():
         Scenario(
             "offset_past_end",
             dict(offset=fx.OFFSET_PAST_END)),
+        Scenario(
+            # backlog 3.2: bare metabolite id coerced before the builder runs.
+            "bare_metabolite_id",
+            dict(metabolite_ids=[_BARE_PEP_ID])),
     ]
 
 
@@ -924,6 +933,10 @@ _BOOLEAN_ASSAY = (
 _DISCUSSES_DOI = "10.1038/ismej.2016.70"          # discusses genes + pathways
 _NO_DISCUSSES_DOI = "10.1126/science.1243457"     # present, no discusses edge
 _UNKNOWN_ASSAY_ID = "metabolite_assay:does_not_exist"
+# backlog 3.2 (bare metabolite-ID coercion): un-prefixed forms of ids above.
+_BARE_UREA_ID = "C00086"   # -> _UREA_ID
+_BARE_PEP_ID = "C00074"    # -> _PEP_ID
+_BARE_KEGG_ID = "C00064"   # L-glutamate, kegg.compound:C00064
 
 
 def genes_by_metabolite_scenarios():
@@ -970,6 +983,10 @@ def genes_by_metabolite_scenarios():
             "substrate_depth_most_specific_filter",
             dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
                  substrate_depth=["most_specific"])),
+        Scenario(
+            # backlog 3.2: bare urea C-number resolves to _UREA_ID (same rows).
+            "bare_metabolite_id",
+            dict(metabolite_ids=[_BARE_UREA_ID], organism=fx.CONTROL_ORGANISM)),
     ]
 
 
@@ -1012,6 +1029,11 @@ def metabolites_by_gene_scenarios():
             "substrate_depth_inherited_filter",
             dict(locus_tags=["PMM0963"], organism=fx.CONTROL_ORGANISM,
                  substrate_depth=["inherited"])),
+        Scenario(
+            # backlog 3.2: bare metabolite id as a filter is coerced first.
+            "bare_metabolite_id_filter",
+            dict(locus_tags=["PMM0963"], organism=fx.CONTROL_ORGANISM,
+                 metabolite_ids=[_BARE_UREA_ID])),
     ]
 
 
@@ -1033,6 +1055,10 @@ def metabolites_by_quantifies_assay_scenarios():
         Scenario(
             "offset_past_end",
             dict(assay_ids=[_NUMERIC_ASSAY], offset=fx.OFFSET_PAST_END)),
+        Scenario(
+            # backlog 3.2: bare PEP C-number coerced before the edge filter.
+            "bare_metabolite_id_filter",
+            dict(assay_ids=[_NUMERIC_ASSAY], metabolite_ids=[_BARE_PEP_ID])),
     ]
 
 
@@ -1053,6 +1079,10 @@ def metabolites_by_flags_assay_scenarios():
         Scenario(
             "offset_past_end",
             dict(assay_ids=[_BOOLEAN_ASSAY], offset=fx.OFFSET_PAST_END)),
+        Scenario(
+            # backlog 3.2: bare PEP C-number coerced before the edge filter.
+            "bare_metabolite_id_filter",
+            dict(assay_ids=[_BOOLEAN_ASSAY], metabolite_ids=[_BARE_PEP_ID])),
     ]
 
 
@@ -1073,6 +1103,11 @@ def assays_by_metabolite_scenarios():
         Scenario(
             "offset_past_end",
             dict(metabolite_ids=[_PEP_ID], offset=fx.OFFSET_PAST_END)),
+        Scenario(
+            # backlog 3.2: bare PEP C-number coerced to _PEP_ID; resolved input
+            # never appears in the flat not_found, so input_ids is omitted.
+            "bare_metabolite_id",
+            dict(metabolite_ids=[_BARE_PEP_ID])),
     ]
 
 

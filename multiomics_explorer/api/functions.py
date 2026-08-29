@@ -121,6 +121,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_assays_by_metabolite_summary,
     build_list_metabolites,
     build_list_metabolites_summary,
+    build_resolve_metabolite_aliases,
     build_genes_by_metabolite_metabolism,
     build_genes_by_metabolite_transport,
     build_genes_by_metabolite_summary,
@@ -6439,6 +6440,111 @@ def _cluster_enrichment_params_dict(
 _VALID_EVIDENCE_SOURCES = ("metabolism", "transport", "metabolomics")
 
 
+# ---------------------------------------------------------------------------
+# Bare / xref metabolite-ID coercion (shared by the 7 metabolite_ids tools).
+# Spec: docs/tool-specs/bare-metabolite-id-coercion.md
+# ---------------------------------------------------------------------------
+
+_CANONICAL_METABOLITE_PREFIXES = ("kegg.compound", "chebi", "mnx")
+_METABOLITE_ALIAS_PATTERNS = (
+    re.compile(r"^C\d{5}$"),          # KEGG compound → kegg_compound_id
+    re.compile(r"^CHEBI:\d+$", re.I),  # prefixed CHEBI → chebi_id
+    re.compile(r"^\d+$"),             # bare numeric → chebi_id
+    re.compile(r"^HMDB\d+$"),         # HMDB → hmdb_id
+    re.compile(r"^MNXM\d+$"),         # MetaNetX → mnxm_id
+)
+
+
+def _is_metabolite_alias(raw: str) -> bool:
+    """True when `raw` is a bare / xref form that the resolver should map.
+
+    Rule 1 of the spec: anything carrying a `prefix:` is passed through
+    verbatim — canonical prefixes are already `Metabolite.id`, unknown
+    prefixes land in `not_found` unchanged. The single exception is the
+    upper-case `CHEBI:NNN` xref form (rule 3), which is an alias.
+    """
+    if ":" in raw:
+        return bool(_METABOLITE_ALIAS_PATTERNS[1].match(raw)) and not raw.startswith("chebi:")
+    return any(p.match(raw) for p in _METABOLITE_ALIAS_PATTERNS)
+
+
+def _canonicalize_metabolite_ids(
+    conn: GraphConnection, ids: list[str] | None,
+) -> tuple[list[str] | None, dict[str, list[str]], list[str]]:
+    """Resolve bare / xref metabolite identifiers to canonical `Metabolite.id`.
+
+    Returns `(canonical_ids, resolved_aliases, warnings)`:
+      - `canonical_ids`: input order preserved, aliases replaced by their
+        canonical id(s), duplicates removed (first-seen order). Unresolved
+        aliases are kept verbatim so the existing existence probes report
+        them in `not_found` in the caller's own input form. `None` / `[]`
+        are returned unchanged.
+      - `resolved_aliases`: `{input: [canonical, ...]}` — only entries that
+        were actually coerced.
+      - `warnings`: one entry per collision (an xref shared by several
+        nodes) — every match is kept, never silently narrowed to one.
+
+    Zero round-trips when nothing needs resolving; exactly one otherwise.
+    """
+    if not ids:
+        return ids, {}, []
+
+    to_resolve = [x for x in ids if _is_metabolite_alias(x)]
+    if not to_resolve:
+        return list(ids), {}, []
+
+    cypher, params = build_resolve_metabolite_aliases(
+        list(dict.fromkeys(to_resolve)))
+    rows = conn.execute_query(cypher, **params)
+    lookup = {r["raw"]: list(r.get("canonical") or []) for r in rows}
+
+    canonical: list[str] = []
+    seen: set[str] = set()
+    resolved: dict[str, list[str]] = {}
+    warnings: list[str] = []
+    warned: set[str] = set()
+
+    def _push(x: str) -> None:
+        if x not in seen:
+            seen.add(x)
+            canonical.append(x)
+
+    for raw in ids:
+        matches = lookup.get(raw)
+        if not matches:
+            _push(raw)
+            continue
+        resolved[raw] = matches
+        if len(matches) > 1 and raw not in warned:
+            warned.add(raw)
+            warnings.append(
+                f"'{raw}' resolved to {len(matches)} metabolites: "
+                f"{matches} — pass the canonical id to narrow."
+            )
+        for m in matches:
+            _push(m)
+
+    return canonical, resolved, warnings
+
+
+def _canonicalize_metabolite_id_params(
+    conn: GraphConnection,
+    metabolite_ids: list[str] | None,
+    exclude_metabolite_ids: list[str] | None,
+) -> tuple[list[str] | None, list[str] | None, dict[str, list[str]], list[str]]:
+    """Canonicalize `metabolite_ids` then `exclude_metabolite_ids`, merging
+    the alias maps and collision warnings into one of each."""
+    mids, aliases, warnings = _canonicalize_metabolite_ids(conn, metabolite_ids)
+    xids, x_aliases, x_warnings = _canonicalize_metabolite_ids(
+        conn, exclude_metabolite_ids)
+    merged = {**aliases, **x_aliases}
+    merged_warnings = list(warnings)
+    for w in x_warnings:
+        if w not in merged_warnings:
+            merged_warnings.append(w)
+    return mids, xids, merged, merged_warnings
+
+
 def list_metabolites(
     search_text: str | None = None,
     metabolite_ids: list[str] | None = None,
@@ -6465,7 +6571,7 @@ def list_metabolites(
     Returns dict with keys: total_entries, total_matching, returned, offset,
     truncated, top_organisms, top_metabolite_pathways, by_evidence_source,
     xref_coverage, mass_stats, by_measurement_coverage, score_max,
-    score_median, not_found, results.
+    score_median, not_found, resolved_aliases, warnings, results.
     Per result (compact): metabolite_id, name, formula, elements, mass,
     catalyst_gene_count (genes reaching this metabolite via Reaction —
     catalysis arm only; a transport-only metabolite reads 0 here, so use
@@ -6487,8 +6593,26 @@ def list_metabolites(
     score_max, score_median (envelope, otherwise None).
 
     exclude_metabolite_ids: Exclude metabolites with these IDs. Set-difference
-        semantics with metabolite_ids — exclude wins on overlap. Empty list
-        is no-op.
+        semantics with metabolite_ids — exclude wins on overlap (computed on
+        the canonical ids, so `metabolite_ids=['C00064']` with
+        `exclude_metabolite_ids=['kegg.compound:C00064']` excludes). Empty
+        list is no-op.
+    metabolite_ids / exclude_metabolite_ids: Accept the canonical
+        `Metabolite.id` (`kegg.compound:C00064`, `chebi:17234`,
+        `mnx:MNXM…`) or a bare / cross-reference form — `C00064`,
+        `CHEBI:17234`, `17234`, `HMDB0000122`, `MNXM1095050` — which is
+        resolved to the canonical id before the query runs. An xref shared
+        by several metabolites expands to all of them and adds a warning
+        (never narrowed silently); an unresolved input is forwarded
+        verbatim so it surfaces in `not_found` in the form you passed.
+        `resolved_aliases` in the envelope maps each coerced input to the
+        canonical id(s) it became.
+        The dedicated exact-match xref filters `kegg_compound_ids` /
+        `chebi_ids` / `hmdb_ids` / `mnxm_ids` are unchanged by this.
+
+    Envelope also carries `resolved_aliases` (dict, `{input: [canonical,
+    ...]}`, only coerced inputs; `{}` when none) and `warnings` (list of
+    str; ambiguous-xref expansions).
 
     Raises:
         ValueError: if search_text is empty/whitespace, or evidence_sources
@@ -6513,6 +6637,13 @@ def list_metabolites(
         limit = 0
 
     conn = _default_conn(conn)
+
+    # 1b. Coerce bare / xref metabolite IDs to canonical Metabolite.id
+    # before any other query and before the exclude-overlap set-difference.
+    metabolite_ids, exclude_metabolite_ids, resolved_aliases, warnings = (
+        _canonicalize_metabolite_id_params(
+            conn, metabolite_ids, exclude_metabolite_ids)
+    )
 
     # 2. Lowercase organism_names for WHERE
     organism_names_lc = (
@@ -6652,6 +6783,8 @@ def list_metabolites(
         "offset": offset,
         "truncated": total_matching > offset + len(results),
         "not_found": not_found,
+        "resolved_aliases": resolved_aliases,
+        "warnings": warnings,
         "results": results,
     }
 
@@ -6838,8 +6971,22 @@ def genes_by_metabolite(
     transport arm and `substrate_depth` was not set explicitly.
 
     exclude_metabolite_ids: Exclude metabolites with these IDs. Set-difference
-        semantics with metabolite_ids — exclude wins on overlap. Empty list
-        is no-op.
+        semantics with metabolite_ids — exclude wins on overlap (computed on
+        the canonical ids). Empty list is no-op.
+    metabolite_ids / exclude_metabolite_ids: Accept the canonical
+        `Metabolite.id` (`kegg.compound:C00064`, `chebi:17234`,
+        `mnx:MNXM…`) or a bare / cross-reference form — `C00064`,
+        `CHEBI:17234`, `17234`, `HMDB0000122`, `MNXM1095050` — which is
+        resolved to the canonical id before the query runs. An xref shared
+        by several metabolites expands to all of them and adds a warning
+        (never narrowed silently); an unresolved input is forwarded
+        verbatim so it surfaces in `not_found` in the form you passed.
+        `resolved_aliases` in the envelope maps each coerced input to the
+        canonical id(s) it became.
+
+    Envelope also carries `resolved_aliases` (dict, `{input: [canonical,
+    ...]}`, only coerced inputs; `{}` when none); ambiguous-xref
+    expansions are appended to `warnings`.
 
     Raises:
         ValueError: if `evidence_sources` contains values outside
@@ -6861,6 +7008,13 @@ def genes_by_metabolite(
     _validate_substrate_depth(substrate_depth)
 
     conn = _default_conn(conn)
+
+    # 1b. Coerce bare / xref metabolite IDs to canonical Metabolite.id
+    # before any other query and before the exclude-overlap set-difference.
+    metabolite_ids, exclude_metabolite_ids, resolved_aliases, alias_warnings = (
+        _canonicalize_metabolite_id_params(
+            conn, metabolite_ids, exclude_metabolite_ids)
+    )
 
     # 2. Arm selection driven solely by evidence_sources.
     if evidence_sources is None:
@@ -7079,7 +7233,7 @@ def genes_by_metabolite(
     # 11. Auto-warning: `inherited` dominance over deepest-attachment
     # transport rows. Strict majority threshold; metabolism rows do not
     # factor in; suppressed when the caller set substrate_depth explicitly.
-    warnings: list[str] = []
+    warnings: list[str] = list(alias_warnings)
     transport_ms_total = sum(
         (entry.get("transport_most_specific_rows") or 0)
         for entry in by_metabolite
@@ -7121,6 +7275,7 @@ def genes_by_metabolite(
         # truncated iff (offset + limit) < total_matching.
         "truncated": (offset + limit) < total_matching,
         "warnings": warnings,
+        "resolved_aliases": resolved_aliases,
         "not_found": not_found,
         "not_matched": not_matched,
         "by_metabolite": by_metabolite,
@@ -7252,8 +7407,22 @@ def metabolites_by_gene(
     `substrate_depth` was set explicitly.
 
     exclude_metabolite_ids: Exclude metabolites with these IDs. Set-difference
-        semantics with metabolite_ids — exclude wins on overlap. Empty list
-        is no-op.
+        semantics with metabolite_ids — exclude wins on overlap (computed on
+        the canonical ids). Empty list is no-op.
+    metabolite_ids / exclude_metabolite_ids: Accept the canonical
+        `Metabolite.id` (`kegg.compound:C00064`, `chebi:17234`,
+        `mnx:MNXM…`) or a bare / cross-reference form — `C00064`,
+        `CHEBI:17234`, `17234`, `HMDB0000122`, `MNXM1095050` — which is
+        resolved to the canonical id before the query runs. An xref shared
+        by several metabolites expands to all of them and adds a warning
+        (never narrowed silently); an unresolved input is forwarded
+        verbatim so it surfaces in `not_found` in the form you passed.
+        `resolved_aliases` in the envelope maps each coerced input to the
+        canonical id(s) it became.
+
+    Envelope also carries `resolved_aliases` (dict, `{input: [canonical,
+    ...]}`, only coerced inputs; `{}` when none); ambiguous-xref
+    expansions are appended to `warnings`.
 
     Raises:
         ValueError: if `evidence_sources` contains values outside
@@ -7275,6 +7444,13 @@ def metabolites_by_gene(
     _validate_substrate_depth(substrate_depth)
 
     conn = _default_conn(conn)
+
+    # 1b. Coerce bare / xref metabolite IDs to canonical Metabolite.id
+    # before any other query and before the exclude-overlap set-difference.
+    metabolite_ids, exclude_metabolite_ids, resolved_aliases, alias_warnings = (
+        _canonicalize_metabolite_id_params(
+            conn, metabolite_ids, exclude_metabolite_ids)
+    )
 
     # 2. Arm selection driven solely by evidence_sources.
     if evidence_sources is None:
@@ -7553,7 +7729,7 @@ def metabolites_by_gene(
     # `transport_substrate_resolution = 'family_inferred'` (every deepest
     # attachment is a lumping family), NOT on a row-share threshold.
     # Suppressed when the caller set substrate_depth explicitly.
-    warnings: list[str] = []
+    warnings: list[str] = list(alias_warnings)
     family_inferred_genes = [
         entry["locus_tag"] for entry in by_gene
         if entry.get("transport_substrate_resolution") == "family_inferred"
@@ -7593,6 +7769,7 @@ def metabolites_by_gene(
         # truncated iff (offset + limit) < total_matching (mirrors GBM).
         "truncated": (offset + limit) < total_matching,
         "warnings": warnings,
+        "resolved_aliases": resolved_aliases,
         "not_found": not_found,
         "not_matched": not_matched,
         "by_gene": by_gene,
@@ -7649,7 +7826,8 @@ def list_metabolite_assays(
       by_organism, by_value_kind, by_compartment, top_metric_types,
       by_treatment_type, by_background_factors, by_growth_phase,
       by_detection_status, score_max (opt), score_median (opt),
-      returned, offset, truncated, not_found, results.
+      returned, offset, truncated, not_found, resolved_aliases, warnings,
+      results.
 
     Per-result compact:
       assay_id, name, metric_type, value_kind, rankable, unit,
@@ -7666,6 +7844,23 @@ def list_metabolite_assays(
       when all matched.
 
     summary=True forces limit=0 and skips the detail query.
+
+    metabolite_ids / exclude_metabolite_ids: Accept the canonical
+        `Metabolite.id` (`kegg.compound:C00064`, `chebi:17234`,
+        `mnx:MNXM…`) or a bare / cross-reference form — `C00064`,
+        `CHEBI:17234`, `17234`, `HMDB0000122`, `MNXM1095050` — which is
+        resolved to the canonical id before the query runs. An xref shared
+        by several metabolites expands to all of them and adds a warning
+        (never narrowed silently); an unresolved input is forwarded
+        verbatim so it surfaces in `not_found` in the form you passed.
+        `resolved_aliases` in the envelope maps each coerced input to the
+        canonical id(s) it became.
+    exclude_metabolite_ids: Set-difference semantics with metabolite_ids —
+        exclude wins on overlap (computed on the canonical ids).
+
+    Envelope `resolved_aliases` (dict, `{input: [canonical, ...]}`, only
+    coerced inputs; `{}` when none) and `warnings` (list of str;
+    ambiguous-xref expansions).
     """
     if search_text is not None and not search_text.strip():
         raise ValueError("search_text must not be empty if provided.")
@@ -7673,6 +7868,13 @@ def list_metabolite_assays(
     conn = _default_conn(conn)
     if summary:
         limit = 0
+
+    # Coerce bare / xref metabolite IDs to canonical Metabolite.id before
+    # any other query and before the exclude-overlap set-difference.
+    metabolite_ids, exclude_metabolite_ids, resolved_aliases, warnings = (
+        _canonicalize_metabolite_id_params(
+            conn, metabolite_ids, exclude_metabolite_ids)
+    )
 
     builder_kwargs = dict(
         search_text=search_text, organism=organism, metric_types=metric_types,
@@ -7819,6 +8021,8 @@ def list_metabolite_assays(
         "offset": offset,
         "truncated": total_matching > offset + len(results),
         "not_found": not_found,
+        "resolved_aliases": resolved_aliases,
+        "warnings": warnings,
         "results": results,
     }
 
@@ -7942,6 +8146,23 @@ def metabolites_by_quantifies_assay(
     `not_found` is a structured dict, one bucket per batch input
     (`assay_ids`, `metabolite_ids`, `experiment_ids`, `publication_doi`).
 
+    metabolite_ids / exclude_metabolite_ids: Accept the canonical
+        `Metabolite.id` (`kegg.compound:C00064`, `chebi:17234`,
+        `mnx:MNXM…`) or a bare / cross-reference form — `C00064`,
+        `CHEBI:17234`, `17234`, `HMDB0000122`, `MNXM1095050` — which is
+        resolved to the canonical id before the query runs. An xref shared
+        by several metabolites expands to all of them and adds a warning
+        (never narrowed silently); an unresolved input is forwarded
+        verbatim so it surfaces in `not_found` in the form you passed.
+        `resolved_aliases` in the envelope maps each coerced input to the
+        canonical id(s) it became.
+    exclude_metabolite_ids: Set-difference semantics with metabolite_ids —
+        exclude wins on overlap (computed on the canonical ids).
+
+    Envelope `resolved_aliases` (dict, `{input: [canonical, ...]}`, only
+    coerced inputs; `{}` when none); ambiguous-xref expansions are
+    appended to `warnings` alongside the rankable-gate messages.
+
     Raises:
         ValueError: empty `assay_ids`; `metric_bucket` / `detection_status`
         contains invalid values; rankable-gated filter set with all
@@ -7966,6 +8187,13 @@ def metabolites_by_quantifies_assay(
                 f"Invalid detection_status value(s): {sorted(bad)}. "
                 f"Allowed: {sorted(_VALID_DETECTION_STATUS)}."
             )
+
+    # ---- Q0: bare / xref metabolite-ID coercion ---------------------------
+    # Before any other query and before the exclude-overlap set-difference.
+    metabolite_ids, exclude_metabolite_ids, resolved_aliases, alias_warnings = (
+        _canonicalize_metabolite_id_params(
+            conn, metabolite_ids, exclude_metabolite_ids)
+    )
 
     # ---- Q1: diagnostics probe ------------------------------------------
     diag_cypher, diag_params = build_metabolites_by_quantifies_assay_diagnostics(
@@ -7994,7 +8222,7 @@ def metabolites_by_quantifies_assay(
         rank_by_metric_max is not None,
     ])
     excluded_assays: list[str] = []
-    warnings: list[str] = []
+    warnings: list[str] = list(alias_warnings)
     if rankable_filter_set and diag_rows:
         rankable_ids = {r["assay_id"] for r in diag_rows if r["rankable"]}
         if not rankable_ids:
@@ -8026,6 +8254,7 @@ def metabolites_by_quantifies_assay(
             "by_metric": [],
             "excluded_assays": excluded_assays,
             "warnings": warnings,
+            "resolved_aliases": resolved_aliases,
             "not_found": {
                 "assay_ids": not_found_assay_ids,
                 "metabolite_ids": _probe_existence(
@@ -8123,6 +8352,7 @@ def metabolites_by_quantifies_assay(
         "by_metric": by_metric,
         "excluded_assays": excluded_assays,
         "warnings": warnings,
+        "resolved_aliases": resolved_aliases,
         "not_found": {
             "assay_ids": not_found_assay_ids,
             "metabolite_ids": _probe_existence(
@@ -8172,8 +8402,25 @@ def metabolites_by_flags_assay(
     Tested-absent rows (`flag_value=False`) are real biology — 62% of
     boolean rows in the live KG. Don't default-filter.
 
-    `excluded_assays` and `warnings` always `[]` here (no gates) — kept
-    for cross-tool envelope-shape consistency.
+    `excluded_assays` is always `[]` here (no gates) — kept for
+    cross-tool envelope-shape consistency. `warnings` carries only
+    ambiguous-xref expansions from metabolite-ID coercion.
+
+    metabolite_ids / exclude_metabolite_ids: Accept the canonical
+        `Metabolite.id` (`kegg.compound:C00064`, `chebi:17234`,
+        `mnx:MNXM…`) or a bare / cross-reference form — `C00064`,
+        `CHEBI:17234`, `17234`, `HMDB0000122`, `MNXM1095050` — which is
+        resolved to the canonical id before the query runs. An xref shared
+        by several metabolites expands to all of them and adds a warning
+        (never narrowed silently); an unresolved input is forwarded
+        verbatim so it surfaces in `not_found` in the form you passed.
+        `resolved_aliases` in the envelope maps each coerced input to the
+        canonical id(s) it became.
+    exclude_metabolite_ids: Set-difference semantics with metabolite_ids —
+        exclude wins on overlap (computed on the canonical ids).
+
+    Envelope `resolved_aliases` (dict, `{input: [canonical, ...]}`, only
+    coerced inputs; `{}` when none).
 
     Raises:
         ValueError: empty `assay_ids`.
@@ -8182,6 +8429,13 @@ def metabolites_by_flags_assay(
 
     if not assay_ids:
         raise ValueError("assay_ids must not be empty")
+
+    # Bare / xref metabolite-ID coercion — before any other query and
+    # before the exclude-overlap set-difference.
+    metabolite_ids, exclude_metabolite_ids, resolved_aliases, alias_warnings = (
+        _canonicalize_metabolite_id_params(
+            conn, metabolite_ids, exclude_metabolite_ids)
+    )
 
     # D4: bool → string coercion at API boundary (parent §11 Conv K).
     flag_value_str: str | None
@@ -8272,7 +8526,8 @@ def metabolites_by_flags_assay(
         "by_organism": by_organism,
         "by_metric": by_metric,
         "excluded_assays": [],
-        "warnings": [],
+        "warnings": list(alias_warnings),
+        "resolved_aliases": resolved_aliases,
         "not_found": {
             "assay_ids": not_found_assay_ids,
             "metabolite_ids": _probe_existence(
@@ -8325,6 +8580,23 @@ def assays_by_metabolite(
     `not_found` is a flat `list[str]` (single batch input —
     `metabolite_ids` only). `not_matched` likewise flat.
 
+    metabolite_ids / exclude_metabolite_ids: Accept the canonical
+        `Metabolite.id` (`kegg.compound:C00064`, `chebi:17234`,
+        `mnx:MNXM…`) or a bare / cross-reference form — `C00064`,
+        `CHEBI:17234`, `17234`, `HMDB0000122`, `MNXM1095050` — which is
+        resolved to the canonical id before the query runs. An xref shared
+        by several metabolites expands to all of them and adds a warning
+        (never narrowed silently); an unresolved input is forwarded
+        verbatim so it surfaces in `not_found` in the form you passed.
+        `resolved_aliases` in the envelope maps each coerced input to the
+        canonical id(s) it became.
+    exclude_metabolite_ids: Set-difference semantics with metabolite_ids —
+        exclude wins on overlap (computed on the canonical ids).
+
+    Envelope `resolved_aliases` (dict, `{input: [canonical, ...]}`, only
+    coerced inputs; `{}` when none) and `warnings` (list of str;
+    ambiguous-xref expansions).
+
     Raises:
         ValueError: empty `metabolite_ids`; `evidence_kind` not in
         {None, 'quantifies', 'flags'}.
@@ -8338,6 +8610,13 @@ def assays_by_metabolite(
             f"Invalid evidence_kind: {evidence_kind!r}. "
             f"Allowed: 'quantifies', 'flags', or None (both)."
         )
+
+    # ---- Q0: bare / xref metabolite-ID coercion ---------------------------
+    # Before any other query and before the exclude-overlap set-difference.
+    metabolite_ids, exclude_metabolite_ids, resolved_aliases, warnings = (
+        _canonicalize_metabolite_id_params(
+            conn, metabolite_ids, exclude_metabolite_ids)
+    )
 
     # ---- Q1: existence-probe (populate flat not_found per §13.6) --------
     probe_rows = conn.execute_query(
@@ -8431,6 +8710,8 @@ def assays_by_metabolite(
         "metabolites_without_evidence": metabolites_without_evidence,
         "not_found": not_found,
         "not_matched": not_matched,
+        "resolved_aliases": resolved_aliases,
+        "warnings": warnings,
         "returned": len(results),
         "truncated": total_matching > offset + len(results),
         "offset": offset,

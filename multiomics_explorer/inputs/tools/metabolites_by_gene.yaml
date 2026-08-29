@@ -349,3 +349,16 @@ mistakes:
   - wrong: "metabolites_by_gene(locus_tags=[...], organism=..., substrate_depth=['family_inferred'])  # retired value — raises with a rename pointer"
     right: "metabolites_by_gene(locus_tags=[...], organism=..., substrate_depth=['inherited'])  # valid values: most_specific, inherited"
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and the transport trust ladder, and `docs://guide/concepts` for the chemistry layer overview."
+
+  - wrong: "metabolites_by_gene(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'"
+    right: |
+      Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
+      the node's cross-references before the query runs: `C00064` →
+      `kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
+      `HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
+      (`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
+      inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
+      CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
+      ALL matching metabolites and appends a `warnings` entry; pass the canonical
+      id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
+      in the form you passed. Exclude-wins-on-overlap is computed on the canonical IDs, so currency-cofactor exclude lists in either form behave identically.

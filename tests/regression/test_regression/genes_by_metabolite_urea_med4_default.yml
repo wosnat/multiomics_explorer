@@ -29,6 +29,7 @@ not_found:
 not_matched: []
 offset: 0
 reaction_count_total: 2
+resolved_aliases: {}
 results:
 - ec_numbers:
   - 3.5.1.5

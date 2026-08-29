@@ -12760,3 +12760,65 @@ class TestClusterTypeVocabulary:
     def test_valid_cluster_types_is_the_six_value_set(self):
         from multiomics_explorer.kg.constants import VALID_CLUSTER_TYPES
         assert VALID_CLUSTER_TYPES == self._SIX
+
+
+# ---------------------------------------------------------------------------
+# Bare metabolite-ID coercion (backlog 3.2, Mode B) — alias-resolver builder
+# ---------------------------------------------------------------------------
+
+
+class TestBuildResolveMetaboliteAliases:
+    """`build_resolve_metabolite_aliases(raw_ids)` — one UNWIND round-trip
+    mapping bare / xref forms to canonical `Metabolite.id`.
+
+    Imports happen inside each test so pre-impl collection still passes.
+    """
+
+    def _build(self, raw_ids):
+        from multiomics_explorer.kg.queries_lib import (
+            build_resolve_metabolite_aliases,
+        )
+        return build_resolve_metabolite_aliases(raw_ids)
+
+    def test_returns_cypher_and_params(self):
+        out = self._build(["C00064"])
+        assert isinstance(out, tuple) and len(out) == 2
+        cypher, params = out
+        assert isinstance(cypher, str)
+        assert isinstance(params, dict)
+
+    def test_params_is_exactly_raw(self):
+        raw = ["C00064", "CHEBI:17234", "HMDB0000122"]
+        _, params = self._build(raw)
+        assert params == {"raw": raw}
+
+    def test_unwinds_raw(self):
+        cypher, _ = self._build(["C00064"])
+        assert "UNWIND $raw" in cypher
+
+    def test_matches_all_four_xref_properties(self):
+        cypher, _ = self._build(["C00064"])
+        for prop in ("m.kegg_compound_id", "m.chebi_id", "m.hmdb_id", "m.mnxm_id"):
+            assert prop in cypher, f"missing xref match on {prop}"
+
+    def test_matches_metabolite_label(self):
+        cypher, _ = self._build(["C00064"])
+        assert "(m:Metabolite)" in cypher
+
+    def test_chebi_prefix_is_stripped_case_insensitively(self):
+        """`CHEBI:NNN` → key `NNN` before matching `m.chebi_id`."""
+        cypher, _ = self._build(["CHEBI:17234"])
+        assert "toUpper(raw) STARTS WITH 'CHEBI:'" in cypher
+
+    def test_returns_raw_and_canonical(self):
+        cypher, _ = self._build(["C00064"])
+        return_clause = cypher[cypher.rfind("RETURN"):]
+        assert "raw" in return_clause
+        assert "AS canonical" in return_clause
+        # Multiple matches are collected, never picked one-of.
+        assert "collect(m.id)" in return_clause
+
+    def test_no_match_is_optional(self):
+        """Unresolved inputs must still produce a row (empty canonical)."""
+        cypher, _ = self._build(["bogus"])
+        assert "OPTIONAL MATCH" in cypher

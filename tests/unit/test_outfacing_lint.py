@@ -412,3 +412,26 @@ def test_lint_catches_field_descriptions(lint_mod, tmp_path):
     assert [v[1] for v in vs] == [1, 2]
     assert vs[0][3] == "Field descriptions"
     assert vs[1][3] == "Field description"
+
+
+def test_lint_catches_release_note_previously(lint_mod, tmp_path):
+    """'previously 0 rows' in a served mistakes entry: the reader has no 'previously'."""
+    md = tmp_path / "t.md"
+    md.write_text("bare KEGG id — previously 0 rows, `C00064` in not_found\n")
+    vs = lint_mod.lint_about_content([md])
+    assert len(vs) >= 1
+
+
+def test_lint_catches_release_note_are_now_resolved(lint_mod, tmp_path):
+    md = tmp_path / "t.md"
+    md.write_text("Bare metabolite IDs are now resolved via cross-references.\n")
+    vs = lint_mod.lint_about_content([md])
+    assert len(vs) >= 1
+
+
+def test_lint_ignores_present_tense_type_note(lint_mod, tmp_path):
+    """'`ontology` is now `str | list[str]`' is a type description, not release framing."""
+    md = tmp_path / "t.md"
+    md.write_text("`ontology` is now `str | list[str] | None`.\n")
+    vs = lint_mod.lint_about_content([md])
+    assert vs == []

@@ -19,7 +19,8 @@ The `metabolite_elements` filter is the N-source workflow
 primitive (presence-only AND-of, e.g. `['N']`). The `by_element`
 envelope is presence-only — not stoichiometric, not
 mass-balanced. Use `summary=True` on batch DE inputs (50+
-locus_tags).
+locus_tags). Bare / xref metabolite IDs are coerced to canonical
+(`resolved_aliases`; collisions expand + warn).
 
 Routing: narrow with `substrate_depth=['most_specific']` to mute
 inherited long tails; from `top_metabolites` drill into
@@ -44,8 +45,8 @@ for the chemistry-layer decision tree.
 | locus_tags | list[string] | — | Gene locus tags to drill into (case-sensitive). E.g. ['PMM0963', 'PMM0964', 'PMM0965'] for urease α/β/γ subunits. `not_found.locus_tags` lists tags that don't resolve to any Gene in the requested organism; `not_matched` lists tags that DO resolve but have no chemistry edges (no Gene_catalyzes_reaction AND no Gene_has_tcdb_family). |
 | organism | string | — | Organism name (case-insensitive, fuzzy word-based match — mirrors `differential_expression_by_gene` and `genes_by_metabolite`). Single-organism enforced. E.g. 'Prochlorococcus MED4'. `not_found.organism` is set when the name resolves to zero matching genes for the input locus_tags. |
 | metabolite_elements | list[string] \| None | None | Filter to rows where the metabolite contains ALL of the given element symbols (AND-of-presence). E.g. `['N']` keeps only N-bearing metabolites — the headline N-source workflow primitive. `['N', 'P']` requires both. Anchored on `Metabolite.elements` (KG-A3 Hill-parsed presence list); applies uniformly to both arms. Never substring-match on `formula` (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). `not_found.metabolite_elements` lists symbols that don't exist on any KG metabolite. |
-| metabolite_ids | list[string] \| None | None | Restrict rows to specific metabolite IDs (full prefixed, e.g. ['kegg.compound:C00086', 'kegg.compound:C00064']). Useful for the cross-feeding workflow: after MBG returns top_metabolites, re-query a partner organism via `genes_by_metabolite` with these IDs. Applies uniformly to both arms. |
-| exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites with these IDs. Set-difference semantics with `metabolite_ids` — exclude wins on overlap. Empty list is no-op. |
+| metabolite_ids | list[string] \| None | None | Restrict rows to these metabolites (both arms). Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). Cross-feeding: feed `top_metabolites` to `genes_by_metabolite` on a partner. |
+| exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
 | ec_numbers | list[string] \| None | None | Narrow metabolism rows to those whose Reaction carries any of these EC numbers. **Metabolism arm only — does not affect transport rows**, which are returned unchanged. To restrict to metabolism rows alone, combine with `evidence_sources=['metabolism']`. E.g. ['3.5.1.5'] for urease. |
 | metabolite_pathway_ids | list[string] \| None | None | Filter to rows where the **metabolite** is in any of these KEGG pathways (`KeggTerm.id`, e.g. ['kegg.pathway:ko00910'] for nitrogen metabolism). Anchored on `Metabolite.pathway_ids` (transport-extended), so applies uniformly to both arms. **Not gene-anchored** — for filtering by genes' KEGG-pathway annotations, route through `genes_by_ontology(ontology="kegg", term_ids=[pathway_id], organism=...)` first to obtain locus_tags. `not_found.metabolite_pathway_ids` lists IDs that don't exist as a KeggTerm. |
 | mass_balance | string ('balanced', 'unbalanced') \| None | None | Narrow metabolism rows to those whose Reaction has this mass balance status. **Metabolism arm only — does not affect transport rows**. Combine with `evidence_sources=['metabolism']` to restrict to metabolism rows alone. |
@@ -64,14 +65,15 @@ for the chemistry-layer decision tree.
 ### Envelope
 
 ```expected-keys
-total_matching, returned, offset, truncated, warnings, not_found, not_matched, by_gene, by_evidence_source, by_substrate_depth, by_element, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
+total_matching, returned, offset, truncated, warnings, resolved_aliases, not_found, not_matched, by_gene, by_evidence_source, by_substrate_depth, by_element, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 
 - **total_matching** (int): Total row count after all filters, across both arms.
 - **returned** (int): Number of rows in `results` (≤ `limit`).
 - **offset** (int): Echo of the requested offset.
 - **truncated** (bool): True when `offset + limit < total_matching`.
-- **warnings** (list[string]): Diagnostic strings. Currently emitted: gene-anchored auto-warning naming input genes whose `transport_substrate_resolution='family_inferred'` — their substrate breadth is reachability, not capability.
+- **warnings** (list[string]): Diagnostic strings. Currently emitted: gene-anchored auto-warning naming input genes whose `transport_substrate_resolution='family_inferred'` — their substrate breadth is reachability, not capability; bare-ID collision notes (one input → several metabolites, expanded to all).
+- **resolved_aliases** (object): Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).
 - **not_found** (MbgNotFound): Inputs that did not resolve to a KG node — see model.
 - **not_matched** (list[string]): Input locus_tags that resolve to a Gene in the requested organism but produced zero chemistry rows (no Gene_catalyzes_reaction AND no Gene_has_tcdb_family). Distinct from `not_found.locus_tags` (those don't resolve at all).
 - **by_gene** (list[MbgByGene]): Per-gene rollup. One entry per input locus_tag that produced ≥1 row.
@@ -309,13 +311,31 @@ metabolites_by_gene(locus_tags=[...], organism=..., substrate_depth=['inherited'
 
 - See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and the transport trust ladder, and `docs://guide/concepts` for the chemistry layer overview.
 
+```mistake
+metabolites_by_gene(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'
+```
+
+```correction
+Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
+the node's cross-references before the query runs: `C00064` →
+`kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
+`HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
+(`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
+inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
+CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
+ALL matching metabolites and appends a `warnings` entry; pass the canonical
+id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
+in the form you passed. Exclude-wins-on-overlap is computed on the canonical IDs, so currency-cofactor exclude lists in either form behave identically.
+
+```
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import metabolites_by_gene
 
 result = metabolites_by_gene(locus_tags=..., organism=...)
-# returns dict with keys: total_matching, offset, warnings, not_found, not_matched, by_gene, by_evidence_source, by_substrate_depth, by_element, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
+# returns dict with keys: total_matching, offset, warnings, resolved_aliases, not_found, not_matched, by_gene, by_evidence_source, by_substrate_depth, by_element, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 
 Use package import for bulk data extraction in scripts.

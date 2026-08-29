@@ -15,7 +15,9 @@ and tested-absent rows surfaced in `results` (`value=0` /
 `flag_value=false` / `detection_status='not_detected'` — real
 biology, kept by default). Use `metabolites_matched` for distinct-
 metabolite count (NOT `total_matching` — that's row count). Use
-`summary=True` on batch routing for 50+ metabolite_ids.
+`summary=True` on batch routing for 50+ metabolite_ids. Bare / xref
+metabolite IDs are coerced to canonical (`resolved_aliases`;
+collisions expand + warn).
 
 Routing: drill back via
 `metabolites_by_quantifies_assay(assay_ids=[...], metabolite_ids=[...])`
@@ -30,10 +32,10 @@ decision tree.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| metabolite_ids | list[string] | — | Metabolite IDs to look up (full prefixed, case-sensitive). E.g. ['kegg.compound:C00074']. `not_found` lists IDs absent from the KG; `not_matched` lists IDs in KG but with no assay edge after filters (unmeasured for this scope). Required, non-empty. |
+| metabolite_ids | list[string] | — | Metabolite IDs to look up (required). Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). `not_found` = absent from KG; `not_matched` = in KG but no assay edge after filters. |
 | organism | string \| None | None | Optional organism filter (case-insensitive CONTAINS). Default `None` = cross-organism — metabolite IDs are organism-agnostic (one Metabolite node shared across organisms). |
 | evidence_kind | string ('quantifies', 'flags') \| None | None | Filter by edge type. `'quantifies'` = numeric arm only (rows carry value, detection_status, timepoint*). `'flags'` = boolean arm only (rows carry flag_value, n_positive). Default `None` = both arms merged (polymorphic rows; cross-arm fields explicit `None`). |
-| exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites with these IDs (set-difference). |
+| exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
 | metric_types | list[string] \| None | None | Filter by metric_type tag(s) on the parent assay. E.g. ['cellular_concentration', 'extracellular_concentration', 'presence_flag_intracellular', 'presence_flag_extracellular']. |
 | compartment | string \| None | None | Sample compartment ('whole_cell' or 'extracellular'). Exact match on the parent assay. |
 | summary | bool | False | Return summary fields only (results=[]). |
@@ -48,7 +50,7 @@ decision tree.
 ### Envelope
 
 ```expected-keys
-total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_detection_status, by_flag_value, metabolites_with_evidence, metabolites_without_evidence, metabolites_matched, not_found, not_matched, returned, truncated, offset, results
+total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_detection_status, by_flag_value, metabolites_with_evidence, metabolites_without_evidence, metabolites_matched, not_found, not_matched, resolved_aliases, warnings, returned, truncated, offset, results
 ```
 
 - **total_matching** (int): Row count merged across arms (one row per metabolite × assay-edge). Use `metabolites_matched` for distinct-metabolite count.
@@ -63,6 +65,8 @@ total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_dete
 - **metabolites_matched** (int): Distinct-metabolite count — use this for unique tallies (NOT `total_matching`, which is row-count).
 - **not_found** (list[string]): Flat `list[str]` — single-batch reverse-lookup. Input metabolite IDs absent from the KG.
 - **not_matched** (list[string]): Flat `list[str]` — IDs in KG with no edge after filters (unmeasured for this scope). Distinct from `not_found`.
+- **resolved_aliases** (object): Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).
+- **warnings** (list[string]): Diagnostic strings, e.g. a bare metabolite ID that resolved to more than one metabolite (expanded to all — pass the canonical id to narrow).
 - **returned** (int): Length of `results`.
 - **truncated** (bool): True when total_matching > offset + returned.
 - **offset** (int): Pagination offset used.
@@ -259,13 +263,31 @@ layer. See `docs://guide/conventions`.
 
 - See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for the not_found vs not_matched convention across batch tools.
 
+```mistake
+assays_by_metabolite(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'
+```
+
+```correction
+Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
+the node's cross-references before the query runs: `C00064` →
+`kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
+`HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
+(`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
+inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
+CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
+ALL matching metabolites and appends a `warnings` entry; pass the canonical
+id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
+in the form you passed.
+
+```
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import assays_by_metabolite
 
 result = assays_by_metabolite(metabolite_ids=...)
-# returns dict with keys: total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_detection_status, by_flag_value, metabolites_with_evidence, metabolites_without_evidence, metabolites_matched, not_found, not_matched, offset, results
+# returns dict with keys: total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_detection_status, by_flag_value, metabolites_with_evidence, metabolites_without_evidence, metabolites_matched, not_found, not_matched, resolved_aliases, warnings, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

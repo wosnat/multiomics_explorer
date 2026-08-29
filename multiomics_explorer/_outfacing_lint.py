@@ -28,6 +28,11 @@ LINT_PATTERN = re.compile(
     r"|Mode-[A-Z]\b"          # Mode-A / Mode-B template tag
     r"|Cluster [A-Z]\b"       # Cluster A / Cluster B internal tag
     r"|parent §"              # cross-ref shorthand
+    # Release-note framing in served docs: the reader has no "previously".
+    # Source violation: inputs/tools/list_metabolites.yaml mistakes entry
+    # ("previously 0 rows", "are now resolved via").
+    r"|\bpreviously\b"
+    r"|\b(?:is|are) now (?:resolved|accepted|coerced|supported)\b"
     # Retired catalysis-arm names (2026-08 KG rename). Context-anchored on
     # purpose: bare gene_count / metabolite_count stay legitimate elsewhere
     # (ontology-node gene_count, Experiment/Publication measured counts).

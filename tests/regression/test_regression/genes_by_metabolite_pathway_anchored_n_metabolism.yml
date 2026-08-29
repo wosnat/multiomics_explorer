@@ -40,6 +40,7 @@ not_matched:
 - kegg.compound:C00086
 offset: 0
 reaction_count_total: 19
+resolved_aliases: {}
 results:
 - ec_numbers:
   - 1.4.1.13

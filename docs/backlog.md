@@ -39,7 +39,6 @@ pathway rollups; `mcp_min_version` mismatch (live reads `0.1.0a1`, verdict `ok`)
 
 | # | Item | Size | Notes |
 |---|---|---|---|
-| 3.2 | Bare metabolite IDs (`C00064`) → prefixed canonical form via `m.kegg_compound_id` in compound-anchored tools; extend to CHEBI / HMDB / MNXM. Partially present (`kegg_compound_id` referenced at 18 sites across queries_lib / functions / tools) — verify which compound-anchored entry points still lack the coercion. | M | KG-MET-014 |
 | 3.5 | `kg_schema` property-description enrichment + analysis-doc `field_description` callout. | M | metabolites roadmap Track B |
 | 3.7 | MCP usability audit passes B/C/D + KG-1..KG-7. Pass A shipped 2026-04-30. Re-scope against the current surface before starting — much of it landed via the readability passes and the trust surface. | L | audit |
 | 3.8 | Chemistry slice 2+: `metabolites_by_pathway`, `list_reactions` / `genes_by_reaction`, `organism_metabolite_overlap`, Tier-3 `pathway_chemistry`. Defer until a workflow needs them. | L | chemistry design |

@@ -10,7 +10,8 @@ stored on this edge (KG `'detected'` / `'not_detected'`), unlike
 the DM layer where only some DMs store `not_flagged`.
 Cross-organism by design. No `by_detection_status` envelope — on
 the boolean arm, `flag_value` IS the qualitative-detection
-signal; `by_value` is its envelope rollup.
+signal; `by_value` is its envelope rollup. Bare / xref metabolite
+IDs are coerced to canonical (`resolved_aliases`).
 
 Routing: drill across to `assays_by_metabolite(metabolite_ids=[...])`
 for the quantifies-arm complement, or
@@ -25,8 +26,8 @@ the metabolomics decision tree.
 |---|---|---|---|
 | assay_ids | list[string] | — | MetaboliteAssay IDs to drill into. Discover via `list_metabolite_assays(value_kind='boolean')`. E.g. ['metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular']. `not_found.assay_ids` lists IDs absent from the KG. |
 | organism | string \| None | None | Filter to assays from this organism (case-insensitive CONTAINS). Cross-organism is the default. |
-| metabolite_ids | list[string] \| None | None | Restrict to specific metabolites (full prefixed IDs, e.g. ['kegg.compound:C00019']). `not_found.metabolite_ids` lists IDs absent from the KG. |
-| exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites with these IDs (set-difference). |
+| metabolite_ids | list[string] \| None | None | Restrict to specific metabolites. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). Absent from KG → `not_found.metabolite_ids`. |
+| exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
 | experiment_ids | list[string] \| None | None | Filter to assays from these experiments. |
 | publication_doi | list[string] \| None | None | Filter by publication DOI(s). E.g. ['10.1128/msystems.01261-22']. |
 | compartment | string \| None | None | Sample compartment ('whole_cell' or 'extracellular'). |
@@ -46,7 +47,7 @@ the metabolomics decision tree.
 ### Envelope
 
 ```expected-keys
-total_matching, by_value, by_assay, by_compartment, by_organism, by_metric, excluded_assays, warnings, not_found, returned, truncated, offset, results
+total_matching, by_value, by_assay, by_compartment, by_organism, by_metric, excluded_assays, warnings, resolved_aliases, not_found, returned, truncated, offset, results
 ```
 
 - **total_matching** (int): Row count in the filtered slice.
@@ -56,7 +57,8 @@ total_matching, by_value, by_assay, by_compartment, by_organism, by_metric, excl
 - **by_organism** (list[MfaByOrganism]): Counts per organism (cross-organism by default).
 - **by_metric** (list[MfaByMetric]): Per-assay filtered-slice rollup.
 - **excluded_assays** (list[string]): Always `[]` here (no gates apply). Kept for envelope-shape consistency with the numeric drill-down.
-- **warnings** (list[string]): Always `[]` here (no gates apply). Kept for envelope-shape consistency with the numeric drill-down.
+- **warnings** (list[string]): No gate diagnostics here (no gates apply); only bare-ID collision notes (one input → several metabolites, expanded to all). Otherwise `[]`.
+- **resolved_aliases** (object): Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).
 - **not_found** (MfaNotFound): Per-batch-input unknown IDs (4 buckets: assay_ids, metabolite_ids, experiment_ids, publication_doi).
 - **returned** (int): Length of `results`.
 - **truncated** (bool): True when total_matching > offset + returned.
@@ -210,9 +212,12 @@ excluded_assays / warnings will surface gating diagnostics.
 ```
 
 ```correction
-Always `[]` here (no gates) — kept for cross-tool envelope-shape
-consistency with `metabolites_by_quantifies_assay`. Boolean assays
-have no `rankable` gate to probe. Mirrors `genes_by_boolean_metric`
+`excluded_assays` is always `[]` here (no gates) — kept for cross-tool
+envelope-shape consistency with `metabolites_by_quantifies_assay`.
+Boolean assays have no `rankable` gate to probe. `warnings` is `[]`
+unless a bare / xref `metabolite_ids` input was ambiguous (CHEBI /
+HMDB / MNXM collision expanded to several metabolites — see
+`resolved_aliases`). Mirrors `genes_by_boolean_metric`
 vs `genes_by_numeric_metric`.
 
 ```
@@ -232,13 +237,31 @@ change when the upstream backfill lands.
 
 - See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (62% of boolean rows are flag_value=False, kept by default — unlike DM boolean which is positive-only).
 
+```mistake
+metabolites_by_flags_assay(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'
+```
+
+```correction
+Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
+the node's cross-references before the query runs: `C00064` →
+`kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
+`HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
+(`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
+inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
+CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
+ALL matching metabolites and appends a `warnings` entry; pass the canonical
+id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
+in the form you passed.
+
+```
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import metabolites_by_flags_assay
 
 result = metabolites_by_flags_assay(assay_ids=...)
-# returns dict with keys: total_matching, by_value, by_assay, by_compartment, by_organism, by_metric, excluded_assays, warnings, not_found, offset, results
+# returns dict with keys: total_matching, by_value, by_assay, by_compartment, by_organism, by_metric, excluded_assays, warnings, resolved_aliases, not_found, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

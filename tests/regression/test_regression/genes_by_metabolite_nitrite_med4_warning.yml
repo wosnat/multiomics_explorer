@@ -27,6 +27,7 @@ not_found:
 not_matched: []
 offset: 0
 reaction_count_total: 0
+resolved_aliases: {}
 results:
 - ec_numbers: null
   evidence_source: transport

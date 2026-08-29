@@ -14938,3 +14938,452 @@ class TestTripletRowsCarryTransportSubstrateResolution:
     def test_mbg_column_is_not_sparse_stripped(self):
         from multiomics_explorer.api.functions import _MBG_SPARSE_FIELDS
         assert "transport_substrate_resolution" not in _MBG_SPARSE_FIELDS
+
+
+# ---------------------------------------------------------------------------
+# Bare metabolite-ID coercion (backlog 3.2, Mode B) — api helper + 7 tools
+# ---------------------------------------------------------------------------
+
+_ALIAS_MARK = "UNWIND $raw"
+
+
+class _AliasConn:
+    """Stub GraphConnection that answers the alias-resolver query from a
+    `{raw: [canonical, ...]}` map and every other query from a FIFO of canned
+    responses (last-exhausted → `[]`).
+
+    Records every call so tests can inspect the params each builder received.
+    """
+
+    def __init__(self, alias_map: dict | None = None, responses=None):
+        self.alias_map = alias_map or {}
+        self.responses = list(responses or [])
+        self.calls: list[tuple[str, dict]] = []
+
+    def execute_query(self, cypher, **params):
+        self.calls.append((cypher, dict(params)))
+        if _ALIAS_MARK in cypher:
+            return [
+                {"raw": r, "canonical": list(self.alias_map.get(r, []))}
+                for r in params["raw"]
+            ]
+        if self.responses:
+            return self.responses.pop(0)
+        return []
+
+    # -- helpers -----------------------------------------------------------
+    @property
+    def alias_calls(self):
+        return [(c, p) for c, p in self.calls if _ALIAS_MARK in c]
+
+    def first_params_with(self, key):
+        for c, p in self.calls:
+            if _ALIAS_MARK in c:
+                continue
+            if key in p:
+                return p
+        raise AssertionError(f"no non-alias query carried param {key!r}: "
+                             f"{[sorted(p) for _, p in self.calls]}")
+
+
+class TestCanonicalizeMetaboliteIds:
+    """`_canonicalize_metabolite_ids(conn, ids)` →
+    `(canonical_ids, resolved_aliases, warnings)`."""
+
+    def _fn(self):
+        from multiomics_explorer.api.functions import (
+            _canonicalize_metabolite_ids,
+        )
+        return _canonicalize_metabolite_ids
+
+    # -- short-circuits ----------------------------------------------------
+    def test_none_passthrough_no_query(self):
+        conn = _AliasConn()
+        ids, aliases, warnings = self._fn()(conn, None)
+        assert ids is None
+        assert aliases == {}
+        assert warnings == []
+        assert conn.calls == []
+
+    def test_empty_list_passthrough_no_query(self):
+        conn = _AliasConn()
+        ids, aliases, warnings = self._fn()(conn, [])
+        assert ids == []
+        assert aliases == {}
+        assert warnings == []
+        assert conn.calls == []
+
+    @pytest.mark.parametrize("canon", [
+        "kegg.compound:C00064", "chebi:17234", "mnx:MNXM1095050",
+    ])
+    def test_canonical_prefix_passthrough_no_query(self, canon):
+        conn = _AliasConn()
+        ids, aliases, warnings = self._fn()(conn, [canon])
+        assert ids == [canon]
+        assert aliases == {}
+        assert warnings == []
+        assert conn.calls == []
+
+    def test_all_canonical_batch_zero_queries(self):
+        conn = _AliasConn()
+        batch = ["kegg.compound:C00064", "chebi:17234", "mnx:MNXM1095050"]
+        ids, _, _ = self._fn()(conn, batch)
+        assert ids == batch
+        assert conn.calls == []
+
+    def test_unknown_prefix_passthrough_verbatim_no_query(self):
+        """Any other `prefix:` form (except CHEBI:) is not an alias —
+        forwarded untouched so it lands in `not_found` as today."""
+        conn = _AliasConn()
+        ids, aliases, _ = self._fn()(conn, ["pubchem:5793", "kegg.pathway:ko00010"])
+        assert ids == ["pubchem:5793", "kegg.pathway:ko00010"]
+        assert aliases == {}
+        assert conn.calls == []
+
+    def test_prefixed_ids_not_sent_to_resolver(self):
+        """Canonical inputs are filtered out in Python before the UNWIND."""
+        conn = _AliasConn({"C00064": ["kegg.compound:C00064"]})
+        self._fn()(conn, ["kegg.compound:C00001", "C00064", "pubchem:1"])
+        assert len(conn.alias_calls) == 1
+        _, params = conn.alias_calls[0]
+        assert params["raw"] == ["C00064"]
+
+    # -- classification rules ---------------------------------------------
+    def test_bare_kegg(self):
+        conn = _AliasConn({"C00064": ["kegg.compound:C00064"]})
+        ids, aliases, warnings = self._fn()(conn, ["C00064"])
+        assert ids == ["kegg.compound:C00064"]
+        assert aliases == {"C00064": ["kegg.compound:C00064"]}
+        assert warnings == []
+
+    def test_uppercase_chebi_prefix_is_alias(self):
+        conn = _AliasConn({"CHEBI:17234": ["kegg.compound:C00064"]})
+        ids, aliases, _ = self._fn()(conn, ["CHEBI:17234"])
+        assert ids == ["kegg.compound:C00064"]
+        assert aliases == {"CHEBI:17234": ["kegg.compound:C00064"]}
+        _, params = conn.alias_calls[0]
+        assert params["raw"] == ["CHEBI:17234"]
+
+    def test_lowercase_chebi_prefix_is_canonical(self):
+        """`chebi:NNN` is a KG-canonical `Metabolite.id` — never resolved."""
+        conn = _AliasConn({"chebi:10004": ["SHOULD_NOT_BE_USED"]})
+        ids, aliases, _ = self._fn()(conn, ["chebi:10004"])
+        assert ids == ["chebi:10004"]
+        assert aliases == {}
+        assert conn.calls == []
+
+    def test_bare_numeric_is_chebi(self):
+        conn = _AliasConn({"17234": ["kegg.compound:C00064"]})
+        ids, aliases, _ = self._fn()(conn, ["17234"])
+        assert ids == ["kegg.compound:C00064"]
+        assert aliases == {"17234": ["kegg.compound:C00064"]}
+
+    def test_bare_hmdb(self):
+        conn = _AliasConn({"HMDB0000122": ["kegg.compound:C00221"]})
+        ids, aliases, _ = self._fn()(conn, ["HMDB0000122"])
+        assert ids == ["kegg.compound:C00221"]
+        assert aliases == {"HMDB0000122": ["kegg.compound:C00221"]}
+
+    def test_bare_mnxm(self):
+        conn = _AliasConn({"MNXM1095050": ["chebi:10004"]})
+        ids, aliases, _ = self._fn()(conn, ["MNXM1095050"])
+        assert ids == ["chebi:10004"]
+        assert aliases == {"MNXM1095050": ["chebi:10004"]}
+
+    def test_exactly_one_round_trip(self):
+        conn = _AliasConn({
+            "C00064": ["kegg.compound:C00064"],
+            "HMDB0000122": ["kegg.compound:C00221"],
+            "MNXM1095050": ["chebi:10004"],
+        })
+        self._fn()(conn, ["C00064", "HMDB0000122", "MNXM1095050", "chebi:1"])
+        assert len(conn.calls) == 1
+        assert len(conn.alias_calls) == 1
+
+    # -- collisions / unresolved / ordering -------------------------------
+    def test_collision_expands_to_all_and_warns(self):
+        both = ["kegg.compound:C00354", "kegg.compound:C05378"]
+        conn = _AliasConn({"CHEBI:16905": both})
+        ids, aliases, warnings = self._fn()(conn, ["CHEBI:16905"])
+        assert ids == both
+        assert aliases == {"CHEBI:16905": both}
+        assert len(warnings) == 1
+        w = warnings[0]
+        assert "CHEBI:16905" in w
+        assert "kegg.compound:C00354" in w
+        assert "kegg.compound:C05378" in w
+        assert "2 metabolites" in w
+
+    def test_unique_match_no_warning(self):
+        conn = _AliasConn({"C00064": ["kegg.compound:C00064"]})
+        _, _, warnings = self._fn()(conn, ["C00064"])
+        assert warnings == []
+
+    def test_unresolved_stays_verbatim(self):
+        """No node matched → keep the user's input form so the existing
+        `not_found` probes report it unchanged; no alias, no warning."""
+        conn = _AliasConn({})  # C99999 → []
+        ids, aliases, warnings = self._fn()(conn, ["C99999"])
+        assert ids == ["C99999"]
+        assert aliases == {}
+        assert warnings == []
+
+    def test_input_order_preserved(self):
+        conn = _AliasConn({
+            "C00064": ["kegg.compound:C00064"],
+            "HMDB0000122": ["kegg.compound:C00221"],
+        })
+        ids, _, _ = self._fn()(conn, [
+            "HMDB0000122", "chebi:10004", "C00064", "bogus99",
+        ])
+        assert ids == [
+            "kegg.compound:C00221", "chebi:10004", "kegg.compound:C00064",
+            "bogus99",
+        ]
+
+    def test_dedup_after_expansion_first_seen_order(self):
+        conn = _AliasConn({
+            "C00064": ["kegg.compound:C00064"],
+            "CHEBI:17234": ["kegg.compound:C00064"],
+        })
+        ids, aliases, _ = self._fn()(conn, [
+            "C00064", "kegg.compound:C00064", "CHEBI:17234", "kegg.compound:C00001",
+        ])
+        assert ids == ["kegg.compound:C00064", "kegg.compound:C00001"]
+        assert aliases == {
+            "C00064": ["kegg.compound:C00064"],
+            "CHEBI:17234": ["kegg.compound:C00064"],
+        }
+
+    def test_resolved_aliases_only_holds_coerced_entries(self):
+        conn = _AliasConn({"C00064": ["kegg.compound:C00064"]})
+        _, aliases, _ = self._fn()(conn, [
+            "kegg.compound:C00001", "C00064", "C99999", "pubchem:1",
+        ])
+        assert set(aliases) == {"C00064"}
+
+
+# ---- per-tool plumbing ------------------------------------------------------
+
+_BARE = "C00064"
+_CANON = "kegg.compound:C00064"
+_BARE_X = "C00002"
+_CANON_X = "kegg.compound:C00002"
+_ALIAS_MAP = {_BARE: [_CANON], _BARE_X: [_CANON_X]}
+_ORG = "Prochlorococcus MED4"
+
+_LM_SUMMARY = {
+    "total_entries": 3025, "total_matching": 0, "top_organisms": [],
+    "top_metabolite_pathways": [], "by_evidence_source": [],
+    "with_chebi": 0, "with_hmdb": 0, "with_mnxm": 0,
+    "mass_min": None, "mass_median": None, "mass_max": None,
+}
+_GBM_SUMMARY = {
+    "total_matching": 0, "gene_count_total": 0, "reaction_count_total": 0,
+    "transporter_count_total": 0, "metabolite_count_total": 0,
+    "rows_by_evidence_source": [], "rows_by_substrate_depth": [],
+    "by_metabolite": [], "top_reactions": [], "top_tcdb_families": [],
+    "top_gene_categories": [], "top_genes": [],
+}
+_MBG_SUMMARY = {
+    **_GBM_SUMMARY, "by_gene": [], "top_metabolites": [],
+    "top_metabolite_pathways": [], "by_element": [],
+}
+_LMA_SUMMARY = {
+    "total_entries": 10, "total_matching": 0, "metabolite_count_total": 0,
+    "by_organism": [], "by_value_kind": [], "by_compartment": [],
+    "top_metric_types": [], "by_treatment_type": [],
+    "by_background_factors": [], "by_growth_phase": [],
+    "by_detection_status": [],
+}
+_MQA_DIAG = [{
+    "assay_id": "a1", "name": "Assay a1", "value_kind": "numeric",
+    "rankable": True, "organism_name": "Prochlorococcus MIT9313",
+    "compartment": "whole_cell", "value_min": 0.0, "value_q1": 0.001,
+    "value_median": 0.005, "value_q3": 0.05, "value_max": 0.5,
+}]
+_MQA_SUMMARY = {
+    "total_matching": 0, "by_detection_status": [], "by_metric_bucket": [],
+    "by_assay": [], "by_compartment": [], "by_organism": [],
+    "filtered_value_min": None, "filtered_value_max": None,
+}
+_MFA_SUMMARY = {
+    "total_matching": 0, "by_value": [], "by_assay": [],
+    "by_compartment": [], "by_organism": [],
+}
+_ABM_SUMMARY = {
+    "total_matching": 0, "by_evidence_kind": [], "by_organism": [],
+    "by_compartment": [], "by_assay": [], "by_detection_status": [],
+    "by_flag_value": [], "metabolites_matched": 0,
+}
+
+
+def _tool_calls():
+    """(name, call(conn, metabolite_ids, exclude_metabolite_ids), responses)."""
+    from multiomics_explorer.api import functions as f
+    return [
+        ("list_metabolites",
+         lambda c, m, x: f.list_metabolites(
+             metabolite_ids=m, exclude_metabolite_ids=x, summary=True, conn=c),
+         lambda: [[_LM_SUMMARY]]),
+        ("genes_by_metabolite",
+         lambda c, m, x: f.genes_by_metabolite(
+             metabolite_ids=m or [_CANON], organism=_ORG,
+             exclude_metabolite_ids=x, summary=True, conn=c),
+         lambda: [[_GBM_SUMMARY]]),
+        ("metabolites_by_gene",
+         lambda c, m, x: f.metabolites_by_gene(
+             ["PMM0963"], _ORG, metabolite_ids=m, exclude_metabolite_ids=x,
+             summary=True, conn=c),
+         lambda: [[_MBG_SUMMARY]]),
+        ("list_metabolite_assays",
+         lambda c, m, x: f.list_metabolite_assays(
+             metabolite_ids=m, exclude_metabolite_ids=x, summary=True, conn=c),
+         lambda: [[_LMA_SUMMARY]]),
+        ("metabolites_by_quantifies_assay",
+         lambda c, m, x: f.metabolites_by_quantifies_assay(
+             assay_ids=["a1"], metabolite_ids=m, exclude_metabolite_ids=x,
+             summary=True, conn=c),
+         lambda: [list(_MQA_DIAG), [_MQA_SUMMARY]]),
+        ("metabolites_by_flags_assay",
+         lambda c, m, x: f.metabolites_by_flags_assay(
+             assay_ids=["a1"], metabolite_ids=m, exclude_metabolite_ids=x,
+             summary=True, conn=c),
+         lambda: [[_MFA_SUMMARY]]),
+        ("assays_by_metabolite",
+         lambda c, m, x: f.assays_by_metabolite(
+             metabolite_ids=m or [_CANON], exclude_metabolite_ids=x,
+             summary=True, conn=c),
+         # existence probe (canonical id present) then summary
+         lambda: [[{"metabolite_id": _CANON}], [_ABM_SUMMARY]]),
+    ]
+
+
+_TOOL_NAMES = [
+    "list_metabolites", "genes_by_metabolite", "metabolites_by_gene",
+    "list_metabolite_assays", "metabolites_by_quantifies_assay",
+    "metabolites_by_flags_assay", "assays_by_metabolite",
+]
+
+
+def _tool(name):
+    for n, call, responses in _tool_calls():
+        if n == name:
+            return call, responses
+    raise KeyError(name)
+
+
+class TestMetaboliteIdCoercionPerTool:
+    """Every one of the 7 tools canonicalizes both `metabolite_ids` and
+    `exclude_metabolite_ids` before the builders run, and carries
+    `resolved_aliases` + `warnings` on its envelope."""
+
+    @pytest.mark.parametrize("name", _TOOL_NAMES)
+    def test_bare_metabolite_id_reaches_builder_canonical(self, name):
+        call, responses = _tool(name)
+        conn = _AliasConn(_ALIAS_MAP, responses())
+        out = call(conn, [_BARE], None)
+        params = conn.first_params_with("metabolite_ids")
+        assert params["metabolite_ids"] == [_CANON]
+        assert _BARE not in params["metabolite_ids"]
+        assert out["resolved_aliases"] == {_BARE: [_CANON]}
+
+    @pytest.mark.parametrize("name", _TOOL_NAMES)
+    def test_bare_exclude_metabolite_id_reaches_builder_canonical(self, name):
+        call, responses = _tool(name)
+        conn = _AliasConn(_ALIAS_MAP, responses())
+        out = call(conn, None, [_BARE_X])
+        params = conn.first_params_with("exclude_metabolite_ids")
+        assert params["exclude_metabolite_ids"] == [_CANON_X]
+        assert out["resolved_aliases"] == {_BARE_X: [_CANON_X]}
+
+    @pytest.mark.parametrize("name", _TOOL_NAMES)
+    def test_envelope_carries_resolved_aliases_and_warnings(self, name):
+        """Keys present (typed) even when nothing was coerced."""
+        call, responses = _tool(name)
+        conn = _AliasConn(_ALIAS_MAP, responses())
+        out = call(conn, None, None)
+        assert isinstance(out["resolved_aliases"], dict)
+        assert out["resolved_aliases"] == {}
+        assert isinstance(out["warnings"], list)
+        # No bare input → no resolver round-trip.
+        assert conn.alias_calls == []
+
+    @pytest.mark.parametrize("name", _TOOL_NAMES)
+    def test_both_params_share_one_resolved_aliases_map(self, name):
+        call, responses = _tool(name)
+        conn = _AliasConn(_ALIAS_MAP, responses())
+        out = call(conn, [_BARE], [_BARE_X])
+        assert out["resolved_aliases"] == {
+            _BARE: [_CANON], _BARE_X: [_CANON_X],
+        }
+
+    @pytest.mark.parametrize("name", _TOOL_NAMES)
+    def test_collision_warning_appended_to_envelope(self, name):
+        both = ["kegg.compound:C00354", "kegg.compound:C05378"]
+        call, responses = _tool(name)
+        conn = _AliasConn({"CHEBI:16905": both}, responses())
+        out = call(conn, ["CHEBI:16905"], None)
+        params = conn.first_params_with("metabolite_ids")
+        assert params["metabolite_ids"] == both
+        assert any("CHEBI:16905" in w for w in out["warnings"])
+
+    @pytest.mark.parametrize("name", _TOOL_NAMES)
+    def test_unresolved_bare_id_forwarded_verbatim(self, name):
+        """Unresolved input keeps the user's form so `not_found` reports it."""
+        call, responses = _tool(name)
+        conn = _AliasConn({}, responses())
+        out = call(conn, ["C99999"], None)
+        params = conn.first_params_with("metabolite_ids")
+        assert "C99999" in params["metabolite_ids"]
+        assert out["resolved_aliases"] == {}
+
+
+class TestCoercionWarningsAppendNotReplace:
+    """Alias-collision warnings seed the envelope `warnings` list and a
+    tool's own auto-warning is appended after them — never overwritten."""
+
+    def test_genes_by_metabolite_keeps_both_warnings(self):
+        import copy
+        from multiomics_explorer.api import functions as f
+        both = ["kegg.compound:C00354", "kegg.compound:C05378"]
+        summary = copy.deepcopy(_GBM_SUMMARY)
+        # Inherited strictly dominates most_specific → native auto-warning.
+        summary["by_metabolite"] = [{
+            "metabolite_id": both[0], "name": "x",
+            "transport_most_specific_rows": 1, "transport_inherited_rows": 3,
+        }]
+        conn = _AliasConn({"CHEBI:16905": both}, [[summary]])
+        out = f.genes_by_metabolite(
+            metabolite_ids=["CHEBI:16905"], organism=_ORG,
+            summary=True, conn=conn,
+        )
+        assert len(out["warnings"]) == 2
+        assert "CHEBI:16905" in out["warnings"][0]
+        assert "inherited" in out["warnings"][1]
+
+
+class TestListMetabolitesCoercionOverlap:
+    def test_exclude_wins_when_overlap_only_visible_post_coercion(self):
+        """`metabolite_ids=['C00064'], exclude_metabolite_ids=['kegg.compound:C00064']`
+        — both reach the builder canonical so the Cypher set-difference sees
+        the overlap (exclude wins)."""
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = _AliasConn(_ALIAS_MAP, [[_LM_SUMMARY]])
+        out = list_metabolites(
+            metabolite_ids=[_BARE], exclude_metabolite_ids=[_CANON],
+            summary=True, conn=conn,
+        )
+        params = conn.first_params_with("exclude_metabolite_ids")
+        assert params["metabolite_ids"] == [_CANON]
+        assert params["exclude_metabolite_ids"] == [_CANON]
+        assert out["resolved_aliases"] == {_BARE: [_CANON]}
+        # The coerced id exists → never reported as not_found.
+        assert _BARE not in out["not_found"]["metabolite_ids"]
+
+    def test_unresolved_bare_id_lands_in_not_found_verbatim(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        # summary, then the existence probe returns nothing found
+        conn = _AliasConn({}, [[_LM_SUMMARY], [{"found": []}]])
+        out = list_metabolites(metabolite_ids=["C99999"], summary=True, conn=conn)
+        assert out["not_found"]["metabolite_ids"] == ["C99999"]

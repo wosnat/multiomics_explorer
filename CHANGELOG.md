@@ -30,6 +30,23 @@ coordinated to `0.1.0a5` ahead of the KG release.
 
 ### Added
 
+- **Bare / xref metabolite-ID coercion** (backlog 3.2, closes KG-MET-014
+  explorer-side). Every `metabolite_ids` / `exclude_metabolite_ids`
+  parameter on the 7 chemistry + metabolomics tools (`list_metabolites`,
+  `genes_by_metabolite`, `metabolites_by_gene`, `list_metabolite_assays`,
+  `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`,
+  `assays_by_metabolite`) now accepts bare `C00064`, `CHEBI:17234` / `17234`,
+  `HMDB…` and `MNXM…` and resolves them to the canonical `Metabolite.id`
+  via the node xrefs before the query runs (previously a silent
+  `not_found`). Canonical `kegg.compound:` / `chebi:` / `mnx:` inputs pass
+  through with zero extra round-trips. Ambiguous CHEBI / HMDB / MNXM aliases
+  expand to every matching node and append a `warnings` entry; unresolved
+  inputs stay verbatim in `not_found`. New envelope key `resolved_aliases`
+  (`{input: [canonical, ...]}`) on all 7; `warnings` added to
+  `list_metabolites`, `list_metabolite_assays`, `assays_by_metabolite`.
+  Exclude-wins-on-overlap is evaluated on canonical IDs. Outfacing lint
+  gained release-note framing patterns (`previously`, `are now resolved`).
+
 - `list_filter_values` description parity (backlog 2.3): every
   vocabulary-backed filter type now puts the property-level
   `ControlledVocabulary` text once on the envelope `description`, and rows

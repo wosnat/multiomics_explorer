@@ -7,7 +7,8 @@ layer. Mirrors `list_derived_metrics`. Inspect `value_kind` (routes
 drill-down), `rankable` (gates rankable filters on the numeric
 drill-down), `compartment` (whole_cell vs extracellular), and
 per-row `detection_status_counts` (signals how much of the assay
-is detected / sporadic / not_detected).
+is detected / sporadic / not_detected). Bare / xref metabolite IDs
+are coerced to canonical (`resolved_aliases`; collisions expand + warn).
 
 Routing: drill into `metabolites_by_quantifies_assay(assay_ids=[...])`
 for numeric details, `metabolites_by_flags_assay(assay_ids=[...])`
@@ -32,8 +33,8 @@ for reverse lookup across both arms, and
 | publication_doi | list[string] \| None | None | DOI(s). Exact match. E.g. ['10.1073/pnas.2213271120', '10.1128/msystems.01261-22']. |
 | experiment_ids | list[string] \| None | None | Experiment node id(s). |
 | assay_ids | list[string] \| None | None | MetaboliteAssay id(s). `not_found.assay_ids` lists unknowns. |
-| metabolite_ids | list[string] \| None | None | Restrict to assays measuring at least one of these metabolites (1-hop via Assay_quantifies_metabolite | Assay_flags_metabolite). Full prefixed IDs, e.g. ['kegg.compound:C00074']. |
-| exclude_metabolite_ids | list[string] \| None | None | Exclude assays measuring any of these metabolites (set-difference cross-tool convention). |
+| metabolite_ids | list[string] \| None | None | Restrict to assays measuring at least one of these metabolites (1-hop via either assay edge). Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
+| exclude_metabolite_ids | list[string] \| None | None | Exclude assays measuring any of these metabolites (set-difference; exclude wins on overlap). Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
 | rankable | bool \| None | None | True → assays supporting rank/percentile/bucket on metabolites_by_quantifies_assay's rankable-gated filters. |
 | summary | bool | False | Return summary fields only (results=[]). |
 | verbose | bool | False | Include heavy-text fields per row: treatment, light_condition, experimental_context. |
@@ -47,7 +48,7 @@ for reverse lookup across both arms, and
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, metabolite_count_total, by_organism, by_value_kind, by_compartment, top_metric_types, by_treatment_type, by_background_factors, by_growth_phase, by_detection_status, score_max, score_median, returned, offset, truncated, not_found, results
+total_entries, total_matching, metabolite_count_total, by_organism, by_value_kind, by_compartment, top_metric_types, by_treatment_type, by_background_factors, by_growth_phase, by_detection_status, score_max, score_median, returned, offset, truncated, not_found, resolved_aliases, warnings, results
 ```
 
 - **total_entries** (int): Total MetaboliteAssay nodes in KG.
@@ -67,6 +68,8 @@ total_entries, total_matching, metabolite_count_total, by_organism, by_value_kin
 - **offset** (int): Pagination offset used
 - **truncated** (bool): True when total_matching > returned
 - **not_found** (LmaNotFound): Per-batch-input unknown IDs (4 buckets: assay_ids, metabolite_ids, experiment_ids, publication_doi).
+- **resolved_aliases** (object): Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).
+- **warnings** (list[string]): Diagnostic strings, e.g. a bare metabolite ID that resolved to more than one metabolite (expanded to all — pass the canonical id to narrow).
 
 ### Per-result fields
 
@@ -202,13 +205,31 @@ Call list_metabolite_assays(value_kind='numeric', rankable=True) first. Drill-do
 
 - See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/conventions` for tested-absent semantics across the metabolomics layer.
 
+```mistake
+list_metabolite_assays(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'
+```
+
+```correction
+Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
+the node's cross-references before the query runs: `C00064` →
+`kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
+`HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
+(`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
+inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
+CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
+ALL matching metabolites and appends a `warnings` entry; pass the canonical
+id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
+in the form you passed.
+
+```
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import list_metabolite_assays
 
 result = list_metabolite_assays()
-# returns dict with keys: total_entries, total_matching, metabolite_count_total, by_organism, by_value_kind, by_compartment, top_metric_types, by_treatment_type, by_background_factors, by_growth_phase, by_detection_status, score_max, score_median, offset, not_found, results
+# returns dict with keys: total_entries, total_matching, metabolite_count_total, by_organism, by_value_kind, by_compartment, top_metric_types, by_treatment_type, by_background_factors, by_growth_phase, by_detection_status, score_max, score_median, offset, not_found, resolved_aliases, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

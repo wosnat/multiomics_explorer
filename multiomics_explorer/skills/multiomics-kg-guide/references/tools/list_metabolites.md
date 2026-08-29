@@ -3,6 +3,7 @@
 ## What it does
 
 Browse and filter metabolites in the chemistry layer (KEGG-curated metabolism + TCDB-curated transport substrates + measured by MetaboliteAssay).
+Bare / xref metabolite IDs (`C00064`, `CHEBI:17234`, `HMDB…`, `MNXM…`) on `metabolite_ids` / `exclude_metabolite_ids` are coerced to canonical IDs (`resolved_aliases`; collisions expand + warn) — the exact-xref filters `kegg_compound_ids` / `chebi_ids` / `hmdb_ids` / `mnxm_ids` are unchanged.
 
 Routing: drill into `genes_by_metabolite(metabolite_ids=[...])` for catalysts/transporters per organism, `assays_by_metabolite(metabolite_ids=[...])` for measurement evidence, `genes_by_ontology(ontology='kegg', term_ids=[pathway_id])` for pathway → genes. See `docs://guide/conventions` for direction-agnosticism (KEGG equation order is unreliable upstream — joins through Reaction_has_metabolite and Tcdb_family_transports_metabolite return both produced and consumed metabolites identically). See `docs://analysis/metabolites` for the 3 source pipelines decision tree.
 
@@ -11,8 +12,8 @@ Routing: drill into `genes_by_metabolite(metabolite_ids=[...])` for catalysts/tr
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string \| None | None | Free-text search on metabolite name (Lucene syntax). Index covers Metabolite.name only — element/formula composition is filtered through `elements` (presence list), not search. E.g. 'glucose', 'phosphate AND amino'. |
-| metabolite_ids | list[string] \| None | None | Restrict to specific metabolites by full prefixed ID (case-sensitive). E.g. ['kegg.compound:C00031', 'kegg.compound:C00002']. Combines with other filters via AND. `not_found.metabolite_ids` lists any IDs that don't exist in the KG. |
-| exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites with these IDs. Set-difference semantics with `metabolite_ids` — exclude wins on overlap. Empty list is no-op. |
+| metabolite_ids | list[string] \| None | None | Restrict to specific metabolites (ANDs with other filters). Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). Unknown IDs land in `not_found.metabolite_ids`. |
+| exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
 | kegg_compound_ids | list[string] \| None | None | Filter by raw KEGG C-numbers (e.g. ['C00031']). Convenience over `metabolite_ids` when working with KEGG-anchored data; the prefixed equivalent is `kegg.compound:C*`. |
 | chebi_ids | list[string] \| None | None | Filter by raw ChEBI numeric IDs (e.g. ['4167', '15422']). 90% of Metabolite nodes carry a `chebi_id`. |
 | hmdb_ids | list[string] \| None | None | Filter by raw HMDB IDs (e.g. ['HMDB0000122']). 47% coverage. |
@@ -33,7 +34,7 @@ Routing: drill into `genes_by_metabolite(metabolite_ids=[...])` for catalysts/tr
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, score_max, score_median, returned, offset, truncated, not_found, results
+total_entries, total_matching, top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, score_max, score_median, returned, offset, truncated, not_found, resolved_aliases, warnings, results
 ```
 
 - **total_entries** (int): Total Metabolite nodes in KG (unfiltered).
@@ -50,6 +51,8 @@ total_entries, total_matching, top_organisms, top_metabolite_pathways, by_eviden
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if total_matching > returned.
 - **not_found** (MetNotFound): Per-filter buckets for unknown input IDs.
+- **resolved_aliases** (object): Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).
+- **warnings** (list[string]): Diagnostic strings, e.g. a bare ID that resolved to more than one metabolite (expanded to all — pass the canonical id to narrow).
 
 ### Per-result fields
 
@@ -220,13 +223,31 @@ list_metabolites(organism_names=['Prochlorococcus MED4'])  # full preferred_name
 
 - See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/concepts` for the chemistry layer overview.
 
+```mistake
+list_metabolites(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'
+```
+
+```correction
+Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
+the node's cross-references before the query runs: `C00064` →
+`kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
+`HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
+(`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
+inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
+CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
+ALL matching metabolites and appends a `warnings` entry; pass the canonical
+id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
+in the form you passed. The dedicated exact-xref filters (`kegg_compound_ids`, `chebi_ids`, `hmdb_ids`, `mnxm_ids`) are a separate, uncoerced mechanism — they match the xref property directly.
+
+```
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import list_metabolites
 
 result = list_metabolites()
-# returns dict with keys: total_entries, total_matching, top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, score_max, score_median, offset, not_found, results
+# returns dict with keys: total_entries, total_matching, top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, score_max, score_median, offset, not_found, resolved_aliases, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

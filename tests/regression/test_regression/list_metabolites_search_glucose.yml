@@ -30,6 +30,7 @@ not_found:
   organism_names: []
   pathway_ids: []
 offset: 0
+resolved_aliases: {}
 results:
 - catalyst_gene_count: 0
   chebi_id: '14313'
@@ -822,6 +823,7 @@ top_organisms:
 total_entries: 3356
 total_matching: 23
 truncated: false
+warnings: []
 xref_coverage:
   with_chebi: 23
   with_hmdb: 12

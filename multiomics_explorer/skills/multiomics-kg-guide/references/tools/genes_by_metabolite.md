@@ -17,7 +17,8 @@ the transport arm. Direction-agnostic (KEGG equation order is
 unreliable upstream — joins through Reaction_has_metabolite and
 Tcdb_family_transports_metabolite return both produced and consumed
 metabolites identically). Per-row union shape: cross-arm fields are
-explicitly None on rows from the other arm.
+explicitly None on rows from the other arm. Bare / xref metabolite
+IDs are coerced to canonical (`resolved_aliases`; collisions expand + warn).
 
 Routing: narrow with `substrate_depth=['most_specific']` when
 inherited rows dominate; from `top_genes` (read
@@ -35,9 +36,9 @@ substrate-depth and direction-agnostic semantics, and
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| metabolite_ids | list[string] | — | Metabolite IDs to drill into (full prefixed, case-sensitive). E.g. ['kegg.compound:C00086', 'kegg.compound:C00064']. `not_found.metabolite_ids` lists IDs that don't exist as a Metabolite node; `not_matched` lists IDs that exist but have no gene reach in the requested organism via either arm. |
+| metabolite_ids | list[string] | — | Metabolite IDs to drill into. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). `not_found.metabolite_ids` = absent from KG; `not_matched` = no gene reach in this organism. |
 | organism | string | — | Organism name (case-insensitive, fuzzy word-based match — mirrors `differential_expression_by_gene`). Single-organism enforced. E.g. 'Prochlorococcus MED4'. `not_found.organism` is set when the name resolves to zero matching genes. |
-| exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites with these IDs. Set-difference semantics with `metabolite_ids` — exclude wins on overlap. Empty list is no-op. |
+| exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
 | ec_numbers | list[string] \| None | None | Narrow metabolism rows to those whose Reaction carries any of these EC numbers. **Metabolism arm only — does not affect transport rows**, which are returned unchanged. To restrict to metabolism rows alone, combine with `evidence_sources=['metabolism']`. E.g. ['6.3.1.2'] for glutamine synthetase. |
 | metabolite_pathway_ids | list[string] \| None | None | Filter to rows where the **metabolite** is in any of these KEGG pathways (`KeggTerm.id`, e.g. ['kegg.pathway:ko00910'] for nitrogen metabolism). Anchored on `Metabolite.pathway_ids` (transport-extended), so applies uniformly to both arms. **Not gene-anchored** — for filtering by genes' KEGG-pathway annotations, route through `genes_by_ontology(ontology="kegg", term_ids=[pathway_id], organism=...)` first to obtain locus_tags. `not_found.metabolite_pathway_ids` lists IDs that don't exist as a KeggTerm. |
 | mass_balance | string ('balanced', 'unbalanced') \| None | None | Narrow metabolism rows to those whose Reaction has this mass balance status. **Metabolism arm only — does not affect transport rows**. Combine with `evidence_sources=['metabolism']` to restrict to metabolism rows alone. |
@@ -56,14 +57,15 @@ substrate-depth and direction-agnostic semantics, and
 ### Envelope
 
 ```expected-keys
-total_matching, returned, offset, truncated, warnings, not_found, not_matched, by_metabolite, by_evidence_source, by_substrate_depth, top_reactions, top_tcdb_families, top_gene_categories, top_genes, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
+total_matching, returned, offset, truncated, warnings, resolved_aliases, not_found, not_matched, by_metabolite, by_evidence_source, by_substrate_depth, top_reactions, top_tcdb_families, top_gene_categories, top_genes, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 
 - **total_matching** (int): Total row count after all filters, across both arms.
 - **returned** (int): Number of rows in `results` (≤ `limit`).
 - **offset** (int): Echo of the requested offset.
 - **truncated** (bool): True when `offset + limit < total_matching`.
-- **warnings** (list[string]): Diagnostic strings. Currently emitted: inherited-dominance auto-warning when `substrate_depth='inherited'` rows are the transport-arm majority and `substrate_depth` was not set explicitly.
+- **warnings** (list[string]): Diagnostic strings. Currently emitted: inherited-dominance auto-warning when `substrate_depth='inherited'` rows are the transport-arm majority and `substrate_depth` was not set explicitly; bare-ID collision notes (one input → several metabolites, expanded to all).
+- **resolved_aliases** (object): Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).
 - **not_found** (GbmNotFound): Inputs that did not resolve to a KG node — see model.
 - **not_matched** (list[string]): Input metabolite_ids that exist as Metabolite nodes but produced zero rows in this organism slice (under the active filters). Distinct from `not_found.metabolite_ids` (those don't exist at all).
 - **by_metabolite** (list[GbmByMetabolite]): Per-metabolite rollup. One entry per input metabolite_id that produced ≥1 row.
@@ -236,13 +238,31 @@ genes_by_metabolite(metabolite_ids=[...], organism=..., substrate_depth=['most_s
 
 - See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and the transport trust ladder, and `docs://guide/concepts` for the chemistry layer overview.
 
+```mistake
+genes_by_metabolite(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'
+```
+
+```correction
+Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
+the node's cross-references before the query runs: `C00064` →
+`kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
+`HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
+(`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
+inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
+CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
+ALL matching metabolites and appends a `warnings` entry; pass the canonical
+id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
+in the form you passed. Exclude-wins-on-overlap is computed on the canonical IDs, so `metabolite_ids=['C00064'], exclude_metabolite_ids=['kegg.compound:C00064']` excludes.
+
+```
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import genes_by_metabolite
 
 result = genes_by_metabolite(metabolite_ids=..., organism=...)
-# returns dict with keys: total_matching, offset, warnings, not_found, not_matched, by_metabolite, by_evidence_source, by_substrate_depth, top_reactions, top_tcdb_families, top_gene_categories, top_genes, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
+# returns dict with keys: total_matching, offset, warnings, resolved_aliases, not_found, not_matched, by_metabolite, by_evidence_source, by_substrate_depth, top_reactions, top_tcdb_families, top_gene_categories, top_genes, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 
 Use package import for bulk data extraction in scripts.

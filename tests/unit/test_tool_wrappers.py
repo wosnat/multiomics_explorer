@@ -10943,3 +10943,62 @@ class TestSlice4NoNewTool:
     def test_expected_tools_unchanged(self, tool_fns):
         assert len(EXPECTED_TOOLS) == 42
         assert sorted(tool_fns) == sorted(EXPECTED_TOOLS)
+
+
+# ---------------------------------------------------------------------------
+# Bare metabolite-ID coercion (backlog 3.2, Mode B) — envelope keys + docs
+# ---------------------------------------------------------------------------
+
+_METABOLITE_ID_TOOLS = [
+    "list_metabolites", "genes_by_metabolite", "metabolites_by_gene",
+    "list_metabolite_assays", "metabolites_by_quantifies_assay",
+    "metabolites_by_flags_assay", "assays_by_metabolite",
+]
+
+
+def _response_model(tool_fns, name):
+    import inspect
+    return inspect.signature(tool_fns[name]).return_annotation
+
+
+def _param_description(tool_fns, name, param):
+    import typing
+    hints = typing.get_type_hints(tool_fns[name], include_extras=True)
+    ann = hints[param]
+    for meta in getattr(ann, "__metadata__", ()):
+        if getattr(meta, "description", None):
+            return meta.description
+    raise AssertionError(f"{name}.{param} has no Field(description=...)")
+
+
+class TestMetaboliteIdCoercionWrappers:
+    """Mode B — no new tool; every metabolite-ID tool's response model gains
+    `resolved_aliases` + `warnings` and its two ID params document bare IDs."""
+
+    def test_expected_tools_unchanged(self, tool_fns):
+        assert len(EXPECTED_TOOLS) == 42
+        assert sorted(tool_fns) == sorted(EXPECTED_TOOLS)
+
+    @pytest.mark.parametrize("name", _METABOLITE_ID_TOOLS)
+    def test_resolved_aliases_field(self, tool_fns, name):
+        model = _response_model(tool_fns, name)
+        field = model.model_fields["resolved_aliases"]
+        assert field.annotation == dict[str, list[str]]
+        assert field.get_default(call_default_factory=True) == {}
+        assert field.description, f"{name}: resolved_aliases needs a description"
+
+    @pytest.mark.parametrize("name", _METABOLITE_ID_TOOLS)
+    def test_warnings_field(self, tool_fns, name):
+        model = _response_model(tool_fns, name)
+        field = model.model_fields["warnings"]
+        assert field.annotation == list[str]
+        assert field.get_default(call_default_factory=True) == []
+        assert field.description, f"{name}: warnings needs a description"
+
+    @pytest.mark.parametrize("name", _METABOLITE_ID_TOOLS)
+    @pytest.mark.parametrize("param", ["metabolite_ids", "exclude_metabolite_ids"])
+    def test_param_description_mentions_bare_ids(self, tool_fns, name, param):
+        desc = _param_description(tool_fns, name, param)
+        assert "bare" in desc.lower(), f"{name}.{param}: {desc!r}"
+        assert "resolved_aliases" in desc, f"{name}.{param}: {desc!r}"
+        assert len(desc) <= 250, f"{name}.{param} is {len(desc)} chars"

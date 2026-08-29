@@ -544,6 +544,8 @@ class ListMetabolitesResponse(BaseModel):
     offset: int = Field(default=0, description="Offset into full result set.")
     truncated: bool = Field(description="True if total_matching > returned.")
     not_found: MetNotFound = Field(default_factory=MetNotFound, description="Per-filter buckets for unknown input IDs.")
+    resolved_aliases: dict[str, list[str]] = Field(default_factory=dict, description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
+    warnings: list[str] = Field(default_factory=list, description="Diagnostic strings, e.g. a bare ID that resolved to more than one metabolite (expanded to all — pass the canonical id to narrow).")
     results: list[MetaboliteResult] = Field(default_factory=list)
 
 
@@ -891,7 +893,11 @@ class GenesByMetaboliteResponse(BaseModel):
         description="Diagnostic strings. Currently emitted: inherited-"
         "dominance auto-warning when `substrate_depth='inherited'` rows "
         "are the transport-arm majority and `substrate_depth` was not set "
-        "explicitly.")
+        "explicitly; bare-ID collision notes (one input → several "
+        "metabolites, expanded to all).")
+    resolved_aliases: dict[str, list[str]] = Field(
+        default_factory=dict,
+        description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
     not_found: GbmNotFound = Field(
         default_factory=GbmNotFound,
         description="Inputs that did not resolve to a KG node — see model.")
@@ -1257,7 +1263,11 @@ class MetabolitesByGeneResponse(BaseModel):
         description="Diagnostic strings. Currently emitted: gene-anchored "
         "auto-warning naming input genes whose "
         "`transport_substrate_resolution='family_inferred'` — their "
-        "substrate breadth is reachability, not capability.")
+        "substrate breadth is reachability, not capability; bare-ID "
+        "collision notes (one input → several metabolites, expanded to all).")
+    resolved_aliases: dict[str, list[str]] = Field(
+        default_factory=dict,
+        description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
     not_found: MbgNotFound = Field(
         default_factory=MbgNotFound,
         description="Inputs that did not resolve to a KG node — see model.")
@@ -8352,17 +8362,14 @@ def register_tools(mcp: FastMCP):
             "E.g. 'glucose', 'phosphate AND amino'.",
         )] = None,
         metabolite_ids: Annotated[list[str] | None, Field(
-            description="Restrict to specific metabolites by full prefixed ID "
-            "(case-sensitive). E.g. ['kegg.compound:C00031', 'kegg.compound:C00002']. "
-            "Combines with other filters via AND. `not_found.metabolite_ids` "
-            "lists any IDs that don't exist in the KG.",
+            description="Restrict to specific metabolites (ANDs with other "
+            "filters). Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). Unknown IDs land in "
+            "`not_found.metabolite_ids`.",
         )] = None,
         exclude_metabolite_ids: Annotated[
             list[str] | None,
             Field(
-                description="Exclude metabolites with these IDs. Set-difference "
-                "semantics with `metabolite_ids` — exclude wins on overlap. "
-                "Empty list is no-op.",
+                description="Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`).",
             ),
         ] = None,
         kegg_compound_ids: Annotated[list[str] | None, Field(
@@ -8434,6 +8441,7 @@ def register_tools(mcp: FastMCP):
         )] = 0,
     ) -> ListMetabolitesResponse:
         """Browse and filter metabolites in the chemistry layer (KEGG-curated metabolism + TCDB-curated transport substrates + measured by MetaboliteAssay).
+        Bare / xref metabolite IDs (`C00064`, `CHEBI:17234`, `HMDB…`, `MNXM…`) on `metabolite_ids` / `exclude_metabolite_ids` are coerced to canonical IDs (`resolved_aliases`; collisions expand + warn) — the exact-xref filters `kegg_compound_ids` / `chebi_ids` / `hmdb_ids` / `mnxm_ids` are unchanged.
 
         Routing: drill into `genes_by_metabolite(metabolite_ids=[...])` for catalysts/transporters per organism, `assays_by_metabolite(metabolite_ids=[...])` for measurement evidence, `genes_by_ontology(ontology='kegg', term_ids=[pathway_id])` for pathway → genes. See `docs://guide/conventions` for direction-agnosticism (KEGG equation order is unreliable upstream — joins through Reaction_has_metabolite and Tcdb_family_transports_metabolite return both produced and consumed metabolites identically). See `docs://analysis/metabolites` for the 3 source pipelines decision tree.
         """
@@ -8505,6 +8513,8 @@ def register_tools(mcp: FastMCP):
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],
                 not_found=not_found,
+                resolved_aliases=result.get("resolved_aliases", {}),
+                warnings=result.get("warnings", []),
                 results=results,
             )
             await ctx.info(
@@ -8529,11 +8539,9 @@ def register_tools(mcp: FastMCP):
     async def genes_by_metabolite(
         ctx: Context,
         metabolite_ids: Annotated[list[str], Field(
-            description="Metabolite IDs to drill into (full prefixed, "
-            "case-sensitive). E.g. ['kegg.compound:C00086', 'kegg.compound:C00064']. "
-            "`not_found.metabolite_ids` lists IDs that don't exist as a Metabolite "
-            "node; `not_matched` lists IDs that exist but have no gene reach in "
-            "the requested organism via either arm.",
+            description="Metabolite IDs to drill into. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). "
+            "`not_found.metabolite_ids` = absent from KG; `not_matched` = "
+            "no gene reach in this organism.",
             min_length=1,
         )],
         organism: Annotated[str, Field(
@@ -8546,9 +8554,7 @@ def register_tools(mcp: FastMCP):
         exclude_metabolite_ids: Annotated[
             list[str] | None,
             Field(
-                description="Exclude metabolites with these IDs. Set-difference "
-                "semantics with `metabolite_ids` — exclude wins on overlap. "
-                "Empty list is no-op.",
+                description="Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`).",
             ),
         ] = None,
         ec_numbers: Annotated[list[str] | None, Field(
@@ -8634,7 +8640,8 @@ def register_tools(mcp: FastMCP):
         unreliable upstream — joins through Reaction_has_metabolite and
         Tcdb_family_transports_metabolite return both produced and consumed
         metabolites identically). Per-row union shape: cross-arm fields are
-        explicitly None on rows from the other arm.
+        explicitly None on rows from the other arm. Bare / xref metabolite
+        IDs are coerced to canonical (`resolved_aliases`; collisions expand + warn).
 
         Routing: narrow with `substrate_depth=['most_specific']` when
         inherited rows dominate; from `top_genes` (read
@@ -8705,6 +8712,7 @@ def register_tools(mcp: FastMCP):
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],
                 warnings=result.get("warnings", []),
+                resolved_aliases=result.get("resolved_aliases", {}),
                 not_found=not_found,
                 not_matched=result.get("not_matched", []),
                 by_metabolite=by_metabolite,
@@ -8773,19 +8781,14 @@ def register_tools(mcp: FastMCP):
             "exist on any KG metabolite.",
         )] = None,
         metabolite_ids: Annotated[list[str] | None, Field(
-            description="Restrict rows to specific metabolite IDs (full "
-            "prefixed, e.g. ['kegg.compound:C00086', "
-            "'kegg.compound:C00064']). Useful for the cross-feeding "
-            "workflow: after MBG returns top_metabolites, re-query a "
-            "partner organism via `genes_by_metabolite` with these IDs. "
-            "Applies uniformly to both arms.",
+            description="Restrict rows to these metabolites (both arms). "
+            "Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). Cross-feeding: feed `top_metabolites` "
+            "to `genes_by_metabolite` on a partner.",
         )] = None,
         exclude_metabolite_ids: Annotated[
             list[str] | None,
             Field(
-                description="Exclude metabolites with these IDs. Set-difference "
-                "semantics with `metabolite_ids` — exclude wins on overlap. "
-                "Empty list is no-op.",
+                description="Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`).",
             ),
         ] = None,
         ec_numbers: Annotated[list[str] | None, Field(
@@ -8890,7 +8893,8 @@ def register_tools(mcp: FastMCP):
         primitive (presence-only AND-of, e.g. `['N']`). The `by_element`
         envelope is presence-only — not stoichiometric, not
         mass-balanced. Use `summary=True` on batch DE inputs (50+
-        locus_tags).
+        locus_tags). Bare / xref metabolite IDs are coerced to canonical
+        (`resolved_aliases`; collisions expand + warn).
 
         Routing: narrow with `substrate_depth=['most_specific']` to mute
         inherited long tails; from `top_metabolites` drill into
@@ -8977,6 +8981,7 @@ def register_tools(mcp: FastMCP):
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],
                 warnings=result.get("warnings", []),
+                resolved_aliases=result.get("resolved_aliases", {}),
                 not_found=not_found,
                 not_matched=result.get("not_matched", []),
                 by_gene=by_gene,
@@ -9230,6 +9235,14 @@ def register_tools(mcp: FastMCP):
             default_factory=LmaNotFound,
             description="Per-batch-input unknown IDs (4 buckets: "
             "assay_ids, metabolite_ids, experiment_ids, publication_doi).")
+        resolved_aliases: dict[str, list[str]] = Field(
+            default_factory=dict,
+            description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
+        warnings: list[str] = Field(
+            default_factory=list,
+            description="Diagnostic strings, e.g. a bare metabolite ID "
+            "that resolved to more than one metabolite (expanded to all — "
+            "pass the canonical id to narrow).")
         results: list[ListMetaboliteAssaysResult] = Field(default_factory=list)
 
     @mcp.tool(
@@ -9289,15 +9302,13 @@ def register_tools(mcp: FastMCP):
         )] = None,
         metabolite_ids: Annotated[list[str] | None, Field(
             description="Restrict to assays measuring at least one of "
-                        "these metabolites (1-hop via "
-                        "Assay_quantifies_metabolite | "
-                        "Assay_flags_metabolite). Full prefixed IDs, "
-                        "e.g. ['kegg.compound:C00074'].",
+                        "these metabolites (1-hop via either assay edge). "
+                        "Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`).",
         )] = None,
         exclude_metabolite_ids: Annotated[list[str] | None, Field(
             description="Exclude assays measuring any of these "
-                        "metabolites (set-difference cross-tool "
-                        "convention).",
+                        "metabolites (set-difference; exclude wins on "
+                        "overlap). Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`).",
         )] = None,
         rankable: Annotated[bool | None, Field(
             description="True → assays supporting rank/percentile/bucket "
@@ -9324,7 +9335,8 @@ def register_tools(mcp: FastMCP):
         drill-down), `rankable` (gates rankable filters on the numeric
         drill-down), `compartment` (whole_cell vs extracellular), and
         per-row `detection_status_counts` (signals how much of the assay
-        is detected / sporadic / not_detected).
+        is detected / sporadic / not_detected). Bare / xref metabolite IDs
+        are coerced to canonical (`resolved_aliases`; collisions expand + warn).
 
         Routing: drill into `metabolites_by_quantifies_assay(assay_ids=[...])`
         for numeric details, `metabolites_by_flags_assay(assay_ids=[...])`
@@ -9409,6 +9421,8 @@ def register_tools(mcp: FastMCP):
                 score_median=data.get("score_median"),
                 returned=data["returned"], offset=data["offset"],
                 truncated=data["truncated"], not_found=not_found,
+                resolved_aliases=data.get("resolved_aliases", {}),
+                warnings=data.get("warnings", []),
                 results=results,
             )
         except ValueError as e:
@@ -9645,7 +9659,12 @@ def register_tools(mcp: FastMCP):
             "(non-rankable assays dropped when a rankable filter is set).")
         warnings: list[str] = Field(
             default_factory=list,
-            description="Human-readable rankable-gating diagnostics.")
+            description="Human-readable rankable-gating diagnostics, plus "
+            "bare-ID collision notes (one input → several metabolites, "
+            "expanded to all).")
+        resolved_aliases: dict[str, list[str]] = Field(
+            default_factory=dict,
+            description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
         not_found: MqaNotFound = Field(
             default_factory=MqaNotFound,
             description="Per-batch-input unknown IDs (4 buckets: "
@@ -9674,15 +9693,12 @@ def register_tools(mcp: FastMCP):
                         "CONTAINS). Cross-organism is the default; pass to narrow.",
         )] = None,
         metabolite_ids: Annotated[list[str] | None, Field(
-            description="Restrict to specific metabolites (full prefixed IDs, "
-                        "e.g. ['kegg.compound:C00074']). `not_found.metabolite_ids` "
-                        "lists IDs absent from the KG; metabolites in the KG "
-                        "but not measured by any selected assay surface as "
-                        "zero rows (unmeasured — distinct from tested-absent).",
+            description="Restrict to specific metabolites. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). "
+                        "Absent from KG → `not_found.metabolite_ids`; "
+                        "unmeasured by selected assays → zero rows.",
         )] = None,
         exclude_metabolite_ids: Annotated[list[str] | None, Field(
-            description="Exclude metabolites with these IDs (set-difference; "
-                        "exclude wins on overlap with `metabolite_ids`).",
+            description="Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`).",
         )] = None,
         experiment_ids: Annotated[list[str] | None, Field(
             description="Filter to assays from these experiments.",
@@ -9775,7 +9791,8 @@ def register_tools(mcp: FastMCP):
         absent rows (`value=0` / `detection_status='not_detected'`) are
         real biology and kept by default. Cross-organism by design.
         Pre-flight via
-        `list_metabolite_assays(value_kind='numeric', rankable=True)`.
+        `list_metabolite_assays(value_kind='numeric', rankable=True)`. Bare /
+        xref metabolite IDs are coerced to canonical (`resolved_aliases`).
 
         Routing: drill across to `assays_by_metabolite(metabolite_ids=[...])`
         for the boolean-arm complement and the cross-organism reverse view,
@@ -9857,6 +9874,7 @@ def register_tools(mcp: FastMCP):
             by_metric=by_metric,
             excluded_assays=data["excluded_assays"],
             warnings=data["warnings"],
+            resolved_aliases=data.get("resolved_aliases", {}),
             not_found=not_found,
             returned=data["returned"],
             truncated=data["truncated"],
@@ -9974,8 +9992,12 @@ def register_tools(mcp: FastMCP):
             "envelope-shape consistency with the numeric drill-down.")
         warnings: list[str] = Field(
             default_factory=list,
-            description="Always `[]` here (no gates apply). Kept for "
-            "envelope-shape consistency with the numeric drill-down.")
+            description="No gate diagnostics here (no gates apply); only "
+            "bare-ID collision notes (one input → several metabolites, "
+            "expanded to all). Otherwise `[]`.")
+        resolved_aliases: dict[str, list[str]] = Field(
+            default_factory=dict,
+            description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
         not_found: MfaNotFound = Field(
             default_factory=MfaNotFound,
             description="Per-batch-input unknown IDs (4 buckets: "
@@ -10004,12 +10026,11 @@ def register_tools(mcp: FastMCP):
                         "CONTAINS). Cross-organism is the default.",
         )] = None,
         metabolite_ids: Annotated[list[str] | None, Field(
-            description="Restrict to specific metabolites (full prefixed IDs, "
-                        "e.g. ['kegg.compound:C00019']). `not_found.metabolite_ids` "
-                        "lists IDs absent from the KG.",
+            description="Restrict to specific metabolites. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). "
+                        "Absent from KG → `not_found.metabolite_ids`.",
         )] = None,
         exclude_metabolite_ids: Annotated[list[str] | None, Field(
-            description="Exclude metabolites with these IDs (set-difference).",
+            description="Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`).",
         )] = None,
         experiment_ids: Annotated[list[str] | None, Field(
             description="Filter to assays from these experiments.",
@@ -10061,7 +10082,8 @@ def register_tools(mcp: FastMCP):
         the DM layer where only some DMs store `not_flagged`.
         Cross-organism by design. No `by_detection_status` envelope — on
         the boolean arm, `flag_value` IS the qualitative-detection
-        signal; `by_value` is its envelope rollup.
+        signal; `by_value` is its envelope rollup. Bare / xref metabolite
+        IDs are coerced to canonical (`resolved_aliases`).
 
         Routing: drill across to `assays_by_metabolite(metabolite_ids=[...])`
         for the quantifies-arm complement, or
@@ -10123,6 +10145,7 @@ def register_tools(mcp: FastMCP):
             by_metric=by_metric,
             excluded_assays=data["excluded_assays"],
             warnings=data["warnings"],
+            resolved_aliases=data.get("resolved_aliases", {}),
             not_found=not_found,
             returned=data["returned"],
             truncated=data["truncated"],
@@ -10288,6 +10311,14 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="Flat `list[str]` — IDs in KG with no edge after "
             "filters (unmeasured for this scope). Distinct from `not_found`.")
+        resolved_aliases: dict[str, list[str]] = Field(
+            default_factory=dict,
+            description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
+        warnings: list[str] = Field(
+            default_factory=list,
+            description="Diagnostic strings, e.g. a bare metabolite ID "
+            "that resolved to more than one metabolite (expanded to all — "
+            "pass the canonical id to narrow).")
         returned: int = Field(description="Length of `results`.")
         truncated: bool = Field(
             description="True when total_matching > offset + returned.")
@@ -10301,12 +10332,9 @@ def register_tools(mcp: FastMCP):
     async def assays_by_metabolite(
         ctx: Context,
         metabolite_ids: Annotated[list[str], Field(
-            description="Metabolite IDs to look up (full prefixed, "
-                        "case-sensitive). E.g. ['kegg.compound:C00074']. "
-                        "`not_found` lists IDs absent from the KG; "
-                        "`not_matched` lists IDs in KG but with no assay "
-                        "edge after filters (unmeasured for this scope). "
-                        "Required, non-empty.",
+            description="Metabolite IDs to look up (required). "
+                        "Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). `not_found` = absent from KG; "
+                        "`not_matched` = in KG but no assay edge after filters.",
             min_length=1,
         )],
         organism: Annotated[str | None, Field(
@@ -10323,7 +10351,7 @@ def register_tools(mcp: FastMCP):
                         "(polymorphic rows; cross-arm fields explicit `None`).",
         )] = None,
         exclude_metabolite_ids: Annotated[list[str] | None, Field(
-            description="Exclude metabolites with these IDs (set-difference).",
+            description="Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`).",
         )] = None,
         metric_types: Annotated[list[str] | None, Field(
             description="Filter by metric_type tag(s) on the parent assay. "
@@ -10364,7 +10392,9 @@ def register_tools(mcp: FastMCP):
         `flag_value=false` / `detection_status='not_detected'` — real
         biology, kept by default). Use `metabolites_matched` for distinct-
         metabolite count (NOT `total_matching` — that's row count). Use
-        `summary=True` on batch routing for 50+ metabolite_ids.
+        `summary=True` on batch routing for 50+ metabolite_ids. Bare / xref
+        metabolite IDs are coerced to canonical (`resolved_aliases`;
+        collisions expand + warn).
 
         Routing: drill back via
         `metabolites_by_quantifies_assay(assay_ids=[...], metabolite_ids=[...])`
@@ -10431,6 +10461,8 @@ def register_tools(mcp: FastMCP):
             metabolites_matched=data["metabolites_matched"],
             not_found=data["not_found"],
             not_matched=data["not_matched"],
+            resolved_aliases=data.get("resolved_aliases", {}),
+            warnings=data.get("warnings", []),
             returned=data["returned"],
             truncated=data["truncated"],
             offset=data["offset"],

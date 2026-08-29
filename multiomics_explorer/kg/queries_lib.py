@@ -2117,6 +2117,43 @@ def _list_metabolites_where(
     return where_block, params
 
 
+def build_resolve_metabolite_aliases(raw_ids: list[str]) -> tuple[str, dict]:
+    """Map bare / xref metabolite identifiers to canonical ``Metabolite.id``.
+
+    One ``UNWIND $raw`` round-trip (spec
+    ``docs/tool-specs/bare-metabolite-id-coercion.md``). Each input string is
+    matched against exactly one xref property by shape: ``C\\d{5}`` →
+    ``kegg_compound_id``; ``CHEBI:\\d+`` (prefix stripped case-insensitively)
+    or ``\\d+`` → ``chebi_id``; ``HMDB\\d+`` → ``hmdb_id``; ``MNXM\\d+`` →
+    ``mnxm_id``. Already-canonical / prefixed inputs are filtered out by the
+    api layer before the call — this builder does not pass them through.
+
+    Returns one row per input (``OPTIONAL MATCH``) with ``raw`` and
+    ``canonical`` (``collect(m.id)`` — empty when unresolved, >1 on CHEBI /
+    HMDB / MNXM collisions; the api layer expands all and warns, never picks
+    one). Row order follows ``$raw``.
+
+    Args:
+        raw_ids: Bare / xref identifiers to resolve (``["C00064", "CHEBI:17234"]``).
+
+    Returns:
+        ``(cypher, {"raw": raw_ids})``.
+    """
+    cypher = (
+        "UNWIND $raw AS raw\n"
+        "WITH raw,\n"
+        "     CASE WHEN toUpper(raw) STARTS WITH 'CHEBI:' "
+        "THEN substring(raw, 6) ELSE raw END AS key\n"
+        "OPTIONAL MATCH (m:Metabolite)\n"
+        "WHERE (raw =~ 'C[0-9]{5}'  AND m.kegg_compound_id = raw)\n"
+        "   OR (key =~ '[0-9]+'     AND m.chebi_id = key)\n"
+        "   OR (raw =~ 'HMDB[0-9]+' AND m.hmdb_id = raw)\n"
+        "   OR (raw =~ 'MNXM[0-9]+' AND m.mnxm_id = raw)\n"
+        "RETURN raw, collect(m.id) AS canonical"
+    )
+    return cypher, {"raw": raw_ids}
+
+
 def build_list_metabolites(
     *,
     search_text: str | None = None,

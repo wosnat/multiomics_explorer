@@ -12,6 +12,7 @@ not_matched:
 - kegg.compound:C00069
 offset: 0
 reaction_count_total: 0
+resolved_aliases: {}
 results: []
 returned: 0
 row_count: 0

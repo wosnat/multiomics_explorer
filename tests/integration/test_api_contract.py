@@ -1530,8 +1530,8 @@ class TestMetabolitesByQuantifiesAssayContract:
         "by_detection_status", "by_metric_bucket", "by_assay",
         "by_compartment", "by_organism", "by_metric",
         "excluded_assays", "warnings", "not_found",
-        "returned", "offset", "truncated",
-    }  # 14 keys
+        "returned", "offset", "truncated", "resolved_aliases",
+    }  # 15 keys
 
     def test_envelope_keys(self, conn):
         result = api.metabolites_by_quantifies_assay(
@@ -1571,8 +1571,8 @@ class TestMetabolitesByFlagsAssayContract:
         "results", "total_matching",
         "by_value", "by_assay", "by_compartment", "by_organism", "by_metric",
         "excluded_assays", "warnings", "not_found",
-        "returned", "offset", "truncated",
-    }  # 13 keys — note: NO `by_detection_status` (boolean arm has no
+        "returned", "offset", "truncated", "resolved_aliases",
+    }  # 14 keys — note: NO `by_detection_status` (boolean arm has no
     #              `detection_status` field per slice spec §5.3)
 
     def test_envelope_keys(self, conn):
@@ -1624,8 +1624,8 @@ class TestAssaysByMetaboliteContract:
         "metabolites_matched",
         "metabolites_with_evidence", "metabolites_without_evidence",
         "not_found", "not_matched",
-        "returned", "offset", "truncated",
-    }  # 16 keys
+        "returned", "offset", "truncated", "resolved_aliases", "warnings",
+    }  # 18 keys
 
     def test_envelope_keys(self, conn):
         result = api.assays_by_metabolite(
