@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 
 import multiomics_explorer.api.functions as api
+from scripts import refresh_examples as rx
 
 ABOUT_DIR = (
     Path(__file__).resolve().parent.parent.parent
@@ -79,14 +80,21 @@ def _parse_examples(content: str) -> list[dict]:
         # Look for example-response after this call
         remainder = part[call_end + 3:]
         response_keys = None
+        null_keys: set[str] = set()
         resp_match = re.search(r"```example-response\n(.+?)\n```", remainder, re.DOTALL)
         if resp_match:
             response_keys = _extract_top_level_keys(resp_match.group(1))
+            # Keys the MCP envelope always carries but the API dict sets only
+            # conditionally show up as `null` in a live-refreshed example.
+            parsed = rx.parse_shown_response(resp_match.group(1))
+            if isinstance(parsed, dict):
+                null_keys = {k for k, v in parsed.items() if v is None}
 
         examples.append({
             "call": call,
             "tool_expected_keys": tool_keys,
             "response_keys": response_keys,
+            "null_keys": null_keys,
         })
     return examples
 
@@ -113,7 +121,7 @@ def _execute_call(call_str: str, conn) -> object:
     if args_str:
         # Use a safe eval approach — only allow simple literals
         # Build a dict from "key=value, key=value" pairs
-        for part in _split_kwargs(args_str):
+        for part in rx.split_kwargs(args_str):
             key, _, value = part.partition("=")
             key = key.strip()
             value = value.strip()
@@ -132,40 +140,6 @@ def _execute_call(call_str: str, conn) -> object:
     if hasattr(result, "to_envelope"):
         result = result.to_envelope(**envelope_kwargs)
     return result
-
-
-def _split_kwargs(args_str: str) -> list[str]:
-    """Split 'key=val, key=val' respecting strings and nested structures."""
-    parts = []
-    depth = 0
-    current = []
-    in_string = False
-    string_char = None
-
-    for char in args_str:
-        if in_string:
-            current.append(char)
-            if char == string_char:
-                in_string = False
-        elif char in ('"', "'"):
-            in_string = True
-            string_char = char
-            current.append(char)
-        elif char in ("(", "[", "{"):
-            depth += 1
-            current.append(char)
-        elif char in (")", "]", "}"):
-            depth -= 1
-            current.append(char)
-        elif char == "," and depth == 0:
-            parts.append("".join(current))
-            current = []
-        else:
-            current.append(char)
-
-    if current:
-        parts.append("".join(current))
-    return parts
 
 
 def _collect_test_cases() -> list[tuple[str, dict]]:
@@ -233,7 +207,7 @@ def test_example_response_keys_match(conn, tool_name, example):
         actual_keys = set()
 
     # 'returned' and 'truncated' are added by MCP wrapper, not API
-    mcp_only_keys = {"returned", "truncated"}
+    mcp_only_keys = {"returned", "truncated"} | example.get("null_keys", set())
     for key in example["response_keys"]:
         if key in mcp_only_keys:
             continue
@@ -241,3 +215,46 @@ def test_example_response_keys_match(conn, tool_name, example):
             f"example-response shows key '{key}' but actual response "
             f"doesn't have it. Got: {sorted(actual_keys)}"
         )
+
+
+# ---------------------------------------------------------------------------
+# Value-level drift: YAML `response:` blocks vs the live KG
+# (scripts/refresh_examples.py --check, one test per example)
+# ---------------------------------------------------------------------------
+
+_YAML_EXAMPLES = [
+    ex
+    for path in rx.iter_tool_yamls()
+    for ex in rx.load_examples(path)
+    if ex.skip_reason is None
+]
+_YAML_IDS = [f"{ex.tool}[{ex.index}]:{ex.title[:40]}" for ex in _YAML_EXAMPLES]
+
+
+@pytest.fixture(scope="module")
+def live_runner(neo4j_driver):
+    """In-memory FastMCP client against the real server (one lifespan per module).
+
+    `neo4j_driver` is requested only so the module skips cleanly when Neo4j
+    is unreachable; the runner opens its own connection via the server lifespan.
+    """
+    try:
+        with rx.LiveRunner() as runner:
+            yield runner
+    except RuntimeError as e:  # lifespan could not connect
+        pytest.skip(f"MCP server lifespan failed: {e}")
+
+
+@pytest.mark.kg
+@pytest.mark.parametrize("example", _YAML_EXAMPLES, ids=_YAML_IDS)
+def test_example_response_values_match_live(live_runner, example):
+    """Every scalar shown in the YAML `response:` block equals the live value
+    at the same path (envelope scalars, nested rollups, the rows shown).
+
+    Fails on `drift` (with the path-level diff), `error` (call raised),
+    `empty` (live result empty — fabricated inputs) and `unparseable`.
+    Fix by regenerating the block: `scripts/refresh_examples.py --write <tool>`
+    (or correct the inputs by hand when the status is `empty` / `error`).
+    """
+    result = rx.check_example(example, live_runner)
+    assert result.status == rx.STATUS_OK, result.describe()
