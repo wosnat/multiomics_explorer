@@ -21,7 +21,6 @@ Sizes: **S** ≤ half a day, no spec · **M** a day, one-page spec (Mode B) · *
 |---|---|---|---|
 | 2.3 | `list_filter_values` description parity: `cluster_type` rows are sparse with the vocab text once on the envelope; trust types (`evidence`, `sources`, …) still repeat it per row. Make all vocab-backed types envelope-once. Depends on KG B1 (per-value descriptions) for the rows to carry anything useful. | S | polish item 6 |
 | 2.8 | `organism=` word-match backlog: genus node `Alteromonas` matches all strains; `AltDE` matches `AltDE1`. Resolver gates on `gene_count > 0` so treatment taxa are safe (KG B4 removes the last name collision). | M | slice-2 ledger |
-| 2.9 | Literal KG counts still pinned in some `-m kg` tests (browse S33 417, `go:0006979` 875, DM counts incl. `cases.yaml` rankable 42/41, numeric-metric 310, nitrite sums) — each paper batch flips them. Consider `Schema_info`-relative or tolerance assertions for the ones that are not release guards. | S | slice-4 RED |
 
 ### 2b. From the KG hand-off 2026-08-28 (`multiomics_biocypher_kg/docs/kg-changes/2026-08-28-explorer-handoff.md`)
 
@@ -29,7 +28,7 @@ Shipped 2026-08-28 against the 11:58Z dev build: HO-001 two-state strings (`two_
 
 | # | Item | Size | Origin |
 |---|---|---|---|
-| 2.13 | 2.9 follow-through: use `Schema_info.organism_count` / `experiment_count` / `gene_count` / `paper_count` for tolerance assertions (R4: already stamped). | S | R4 |
+| 2.13 | ~~2.9~~ shipped 2026-08-29 (`kg_count` fixture; ~30 paper-batch-fragile pins now assert against live Cypher / node precomputes). Left as deliberate guards: chemistry counts (`list_metabolites` N / N+P / MED4+N), Phase-5 metabolomics §7 fixtures, `cases.yaml` eval snapshots (rankable 42/41). `Schema_info.*_count` not needed after all — per-count live queries were more precise. | — | R4 |
 
 ## 3. Older backlog — verified 2026-08-28
 

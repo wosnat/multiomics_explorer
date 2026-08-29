@@ -1376,66 +1376,73 @@ class TestClusterEnrichmentIntegration:
         assert org_max >= union_max
 
 
+
+# --- Live-count Cypher used instead of literal pins (backlog 2.9) ---
+_DM_EDGES_TO_GENE = (
+    "MATCH (d:DerivedMetric)-[:Derived_metric_quantifies_gene|"
+    "Derived_metric_flags_gene|Derived_metric_classifies_gene]->"
+    "(g:Gene {locus_tag: $lt}) RETURN count(DISTINCT d)"
+)
+_TOP_QUARTILE_CELL_ABUNDANCE = (
+    "MATCH (d:DerivedMetric {metric_type: 'cell_abundance_biovolume_normalized'})"
+    "-[r:Derived_metric_quantifies_gene {metric_bucket: 'top_quartile'}]->(g:Gene)"
+    "-[:Gene_belongs_to_organism]->(o:OrganismTaxon {preferred_name: $org}) RETURN count(r)"
+)
+_TERM_PROP = "MATCH (t {id: $id}) RETURN t[$prop]"
+
 @pytest.mark.kg
 class TestListDerivedMetrics:
     """Live-KG integration tests for list_derived_metrics."""
 
-    def test_no_filters_13_dms(self, conn):
-        # 65 → 69 (verified live 2026-08-20): Lu 2026 DM rewiring replaced
-        # 2 numeric DMs with 6 boolean per-strain detection metrics (net +4).
+    def test_no_filters_all_dms(self, conn, kg_count):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(conn=conn, limit=None)
-        # 69 -> 83: KG-SYNC-006 paper batch (verified live 2026-08-27) added the Steglich 2010 decay + TSS metrics.
-        assert out["total_entries"] == 83
-        assert out["total_matching"] == 83
-        assert len(out["results"]) == 83
+        n = kg_count("MATCH (d:DerivedMetric) RETURN count(d)")
+        assert n > 0
+        assert out["total_entries"] == n
+        assert out["total_matching"] == n
+        assert len(out["results"]) == n
 
-    def test_value_kind_numeric_6(self, conn):
+    def test_value_kind_numeric(self, conn, kg_count):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(value_kind="numeric", conn=conn, limit=None)
-        # 37 → 35 (verified live 2026-08-20): Lu 2026 DM rewiring removed
-        # 2 numeric DMs (replaced by boolean per-strain detection metrics).
-        # 35 -> 46: KG-SYNC-006 paper batch (verified live 2026-08-27).
-        assert out["total_matching"] == 46
+        assert out["total_matching"] == kg_count(
+            "MATCH (d:DerivedMetric {value_kind: 'numeric'}) RETURN count(d)")
         assert all(r["value_kind"] == "numeric" for r in out["results"])
         compartments = {r["compartment"] for r in out["results"]}
         assert compartments == {"whole_cell", "vesicle", "exoproteome"}
 
-    def test_value_kind_boolean_6(self, conn):
+    def test_value_kind_boolean(self, conn, kg_count):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(value_kind="boolean", conn=conn, limit=None)
-        # 18 → 24 (verified live 2026-08-20): Lu 2026 DM rewiring added
-        # 6 boolean per-strain detection metrics.
-        # 24 -> 27: KG-SYNC-006 paper batch (verified live 2026-08-27).
-        assert out["total_matching"] == 27
+        assert out["total_matching"] == kg_count(
+            "MATCH (d:DerivedMetric {value_kind: 'boolean'}) RETURN count(d)")
         organisms = {r["organism_name"] for r in out["results"]}
         assert "Prochlorococcus NATL2A" in organisms
         assert "Alteromonas macleodii MIT1002" in organisms
 
-    def test_value_kind_categorical_1(self, conn):
+    def test_value_kind_categorical(self, conn, kg_count):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(value_kind="categorical", conn=conn, limit=None)
-        assert out["total_matching"] == 10
+        assert out["total_matching"] == kg_count(
+            "MATCH (d:DerivedMetric {value_kind: 'categorical'}) RETURN count(d)")
         metric_types = {r["metric_type"] for r in out["results"]}
         assert "darkness_survival_class" in metric_types
         assert all(r["allowed_categories"] is not None for r in out["results"])
 
-    def test_rankable_true_4(self, conn):
+    def test_rankable_true(self, conn, kg_count):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(rankable=True, conn=conn, limit=None)
-        # 31 -> 42: KG-SYNC-006 paper batch (verified live 2026-08-27).
-        assert out["total_matching"] == 42
+        assert out["total_matching"] == kg_count(
+            "MATCH (d:DerivedMetric {rankable: 'rankable'}) RETURN count(d)")
         assert all(r["rankable"] is True for r in out["results"])
 
-    def test_rankable_false_9(self, conn):
-        """Sanity-checks bool→'false' string coercion path."""
+    def test_rankable_false(self, conn, kg_count):
+        """Sanity-checks bool→two-state string coercion path."""
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(rankable=False, conn=conn, limit=None)
-        # 34 → 38 (verified live 2026-08-20): Lu 2026 DM rewiring — the 6 new
-        # boolean per-strain detection metrics are non-rankable, the 2 removed
-        # numeric DMs were also non-rankable (net +4; rankable=True stays 31).
-        # 38 -> 41: KG-SYNC-006 paper batch (verified live 2026-08-27).
-        assert out["total_matching"] == 41
+        assert out["total_matching"] == kg_count(
+            "MATCH (d:DerivedMetric {rankable: 'not_rankable'}) RETURN count(d)")
         metric_types = {r["metric_type"] for r in out["results"]}
         # The two non-rankable numeric DMs are always in this set
         assert "peak_time_protein_h" in metric_types
@@ -1449,11 +1456,12 @@ class TestListDerivedMetrics:
         assert out["total_matching"] == 0
         assert out["results"] == []
 
-    def test_organism_short_code(self, conn):
+    def test_organism_short_code(self, conn, kg_count):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(organism="MED4", conn=conn, limit=None)
-        # 17 -> 26: KG-SYNC-006 paper batch (verified live 2026-08-27) (MED4 decay / TSS metrics).
-        assert out["total_matching"] == 26
+        assert out["total_matching"] == kg_count(
+            "MATCH (d:DerivedMetric)-[:DerivedMetricBelongsToOrganism]->"
+            "(o:OrganismTaxon {preferred_name: 'Prochlorococcus MED4'}) RETURN count(d)")
         assert all(r["organism_name"] == "Prochlorococcus MED4" for r in out["results"])
 
     def test_organism_full_name(self, conn):
@@ -1789,15 +1797,16 @@ class TestGeneDerivedMetrics:
     """Integration tests against live KG. Baselines pinned 2026-04-26."""
 
     @pytest.mark.asyncio
-    async def test_pmm1714_all_three_kinds(self, tool_fns, conn):
+    async def test_pmm1714_all_three_kinds(self, tool_fns, conn, kg_count):
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["gene_derived_metrics"](
-            ctx, locus_tags=["PMM1714"], limit=20)
-        # 11 -> 18: KG-SYNC-006 paper batch (verified live 2026-08-27).
-        assert response.total_matching == 18
-        assert response.total_derived_metrics == 18
+            ctx, locus_tags=["PMM1714"], limit=100)
+        n = kg_count(_DM_EDGES_TO_GENE, lt="PMM1714")
+        assert n >= 3
+        assert response.total_matching == n
+        assert response.total_derived_metrics == n
         assert response.genes_with_metrics == 1
-        assert response.returned == 18
+        assert response.returned == n
         kinds = {r.value_kind for r in response.results}
         assert kinds == {"numeric", "boolean", "categorical"}
         # Polymorphic value typing
@@ -1810,20 +1819,24 @@ class TestGeneDerivedMetrics:
                 assert isinstance(r.value, str)
 
     @pytest.mark.asyncio
-    async def test_pmm0001_diel_only(self, tool_fns, conn):
+    async def test_pmm0001_diel_only(self, tool_fns, conn, kg_count):
         # value_kind='numeric' filters out the gene-level categorical DMs
         # (expression_level_class, pangenome_membership) that aren't diel-related.
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["gene_derived_metrics"](
-            ctx, locus_tags=["PMM0001"], value_kind="numeric", limit=20)
-        # 6 -> 13 rows, 4 -> 11 rankable: KG-SYNC-006 paper batch (verified live 2026-08-27)
-        # (Steglich 2010 half-life / decay + Voigt 2014 TSS numeric DMs).
-        assert response.total_matching == 13
+            ctx, locus_tags=["PMM0001"], value_kind="numeric", limit=100)
+        n_numeric = kg_count(
+            "MATCH (d:DerivedMetric)-[:Derived_metric_quantifies_gene]->"
+            "(g:Gene {locus_tag: $lt}) RETURN count(d)", lt="PMM0001")
+        assert n_numeric > 0
+        assert response.total_matching == n_numeric
         assert all(r.value_kind == "numeric" for r in response.results)
-        # 11 rankable (damping_ratio, diel_amp_*, protein_transcript_lag,
-        # + the paper-batch rankable numerics), 2 non-rankable (peak_time_*)
-        rankable_count = sum(1 for r in response.results if r.rankable)
-        assert rankable_count == 11
+        # The two non-rankable numeric DMs (peak_time_*) always sit in this set
+        n_rankable = kg_count(
+            "MATCH (d:DerivedMetric {rankable: 'rankable'})-[:Derived_metric_quantifies_gene]->"
+            "(g:Gene {locus_tag: $lt}) RETURN count(d)", lt="PMM0001")
+        assert 0 < n_rankable < n_numeric
+        assert sum(1 for r in response.results if r.rankable) == n_rankable
         # Sparse extras null on non-rankable rows
         for r in response.results:
             if not r.rankable:
@@ -1832,13 +1845,13 @@ class TestGeneDerivedMetrics:
                 assert r.metric_bucket is None
 
     @pytest.mark.asyncio
-    async def test_value_kind_filter_routes(self, tool_fns, conn):
+    async def test_value_kind_filter_routes(self, tool_fns, conn, kg_count):
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["gene_derived_metrics"](
             ctx, locus_tags=["PMM1714"], value_kind="boolean")
-        # 1 -> 3 boolean DMs: KG-SYNC-006 paper batch (verified live 2026-08-27) added
-        # expressed_above_background + has_primary_tss for MED4 genes.
-        assert response.total_matching == 3
+        assert response.total_matching == kg_count(
+            "MATCH (d:DerivedMetric)-[:Derived_metric_flags_gene]->"
+            "(g:Gene {locus_tag: $lt}) RETURN count(d)", lt="PMM1714")
         # metric_type is verbose-only; assert against compact fields instead
         vesicle = next(r for r in response.results
                        if r.derived_metric_id.endswith("vesicle_proteome_member"))
@@ -1871,7 +1884,7 @@ class TestGeneDerivedMetrics:
         assert response.genes_without_metrics == 0
 
     @pytest.mark.asyncio
-    async def test_mixed_input_with_filter(self, tool_fns, conn):
+    async def test_mixed_input_with_filter(self, tool_fns, conn, kg_count):
         """All 3 diagnostic buckets within single-organism scope."""
         ctx = _ctx_with_conn(conn)
         # NOTE: PMN2A_2128 (NATL2A) cannot be combined with MED4 locus_tags —
@@ -1882,7 +1895,9 @@ class TestGeneDerivedMetrics:
         response = await tool_fns["gene_derived_metrics"](
             ctx, locus_tags=["PMM1714", "PMM_FAKE", "PMM1720"],
             value_kind="numeric", limit=20)
-        assert response.total_matching == 12  # PMM1714 numeric only (7 -> 12)
+        assert response.total_matching == kg_count(  # PMM1714 numeric only
+            "MATCH (d:DerivedMetric)-[:Derived_metric_quantifies_gene]->"
+            "(g:Gene {locus_tag: $lt}) RETURN count(d)", lt="PMM1714")
         assert response.genes_with_metrics == 1
         assert response.genes_without_metrics == 1  # PMM1720
         assert response.not_found == ["PMM_FAKE"]
@@ -1919,12 +1934,12 @@ class TestGeneDerivedMetrics:
             assert hasattr(response, breakdown_attr)
 
     @pytest.mark.asyncio
-    async def test_by_metric_disambiguates(self, tool_fns, conn):
+    async def test_by_metric_disambiguates(self, tool_fns, conn, kg_count):
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["gene_derived_metrics"](
             ctx, locus_tags=["PMM1714"], summary=True)
-        # 11 -> 18: KG-SYNC-006 paper batch (verified live 2026-08-27).
-        assert len(response.by_metric) == 18  # one per DM touching the gene
+        # one entry per DM touching the gene
+        assert len(response.by_metric) == kg_count(_DM_EDGES_TO_GENE, lt="PMM1714")
         for entry in response.by_metric:
             assert entry.derived_metric_id  # non-empty
             assert entry.name
@@ -1954,13 +1969,13 @@ class TestGeneDerivedMetrics:
                 ctx, locus_tags=["PMM1714", "PMN2A_2128"])  # MED4 + NATL2A
 
     @pytest.mark.asyncio
-    async def test_truncation(self, tool_fns, conn):
+    async def test_truncation(self, tool_fns, conn, kg_count):
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["gene_derived_metrics"](
             ctx, locus_tags=["PMM1714"], limit=2)
         assert response.returned == 2
         assert response.truncated is True
-        assert response.total_matching == 18  # 11 -> 18: KG-SYNC-006 paper batch (verified live 2026-08-27)
+        assert response.total_matching == kg_count(_DM_EDGES_TO_GENE, lt="PMM1714")
 
 
 @pytest.mark.kg
@@ -2068,30 +2083,31 @@ class TestGenesByNumericMetric:
         assert response.excluded_derived_metrics == []
 
     @pytest.mark.asyncio
-    async def test_cross_organism_no_scope(self, tool_fns, conn):
+    async def test_cross_organism_no_scope(self, tool_fns, conn, kg_count):
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["genes_by_numeric_metric"](
             ctx, metric_types=["cell_abundance_biovolume_normalized"],
             bucket=["top_quartile"], limit=10)
-        assert response.total_matching == 310  # 2026-08-29 rebuild #3: Biller 2022 accession re-homing
+        live = {
+            org: kg_count(_TOP_QUARTILE_CELL_ABUNDANCE, org=org)
+            for org in ("Prochlorococcus MIT9312", "Prochlorococcus MIT9313")
+        }
+        assert all(v > 0 for v in live.values())
+        assert response.total_matching == sum(live.values())
         assert len(response.by_organism) == 2
-        # 153 MIT9312 + 157 MIT9313 = 310
         org_counts = {o.organism_name: o.count for o in response.by_organism}
-        # match by substring (organism_name is full e.g. "Prochlorococcus MIT9312")
-        mit9312_hits = [c for n, c in org_counts.items() if "MIT9312" in n]
-        mit9313_hits = [c for n, c in org_counts.items() if "MIT9313" in n]
-        assert mit9312_hits == [153]  # 2026-08-29 rebuild #3
-        assert mit9313_hits == [157]  # 2026-08-29 rebuild
+        assert org_counts == live
         assert len(response.by_metric) == 2
         assert response.not_matched_organism is None
 
     @pytest.mark.asyncio
-    async def test_cross_organism_with_scope(self, tool_fns, conn):
+    async def test_cross_organism_with_scope(self, tool_fns, conn, kg_count):
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["genes_by_numeric_metric"](
             ctx, metric_types=["cell_abundance_biovolume_normalized"],
             bucket=["top_quartile"], organism="MIT9313", limit=10)
-        assert response.total_matching == 157  # 2026-08-29 rebuild
+        assert response.total_matching == kg_count(
+            _TOP_QUARTILE_CELL_ABUNDANCE, org="Prochlorococcus MIT9313")
         assert len(response.by_organism) == 1
         assert "MIT9313" in response.by_organism[0].organism_name
         assert response.not_matched_organism is None
@@ -2190,20 +2206,22 @@ class TestGenesByBooleanMetric:
     """
 
     @pytest.mark.asyncio
-    async def test_vesicle_proteome_cross_organism(self, tool_fns, conn):
-        """Happy path: 32 MED4 + 27 MIT9313 = 59 vesicle-proteome members
-        (26 -> 27 / 58 -> 59: KG-SYNC-006 paper batch (verified live 2026-08-27))."""
+    async def test_vesicle_proteome_cross_organism(self, tool_fns, conn, run_query):
+        """Happy path: MED4 + MIT9313 vesicle-proteome members, one row per
+        flag edge (positive-only DMs today, so rows == flagged edges)."""
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["genes_by_boolean_metric"](
             ctx, metric_types=["vesicle_proteome_member"], limit=200)
-        assert response.total_matching == 59
-        assert response.total_genes == 59
+        live = {x["org"]: x["n"] for x in run_query(
+            "MATCH (d:DerivedMetric {metric_type: 'vesicle_proteome_member'})"
+            "-[r:Derived_metric_flags_gene]->(g:Gene)-[:Gene_belongs_to_organism]->(o) "
+            "RETURN o.preferred_name AS org, count(r) AS n")}
+        assert set(live) == {"Prochlorococcus MED4", "Prochlorococcus MIT9313"}
+        assert response.total_matching == sum(live.values())
+        assert response.total_genes == sum(live.values())
         # Cross-organism: by_organism shows both strains
         org_counts = {o.organism_name: o.count for o in response.by_organism}
-        med4_hits = [c for n, c in org_counts.items() if "MED4" in n]
-        mit9313_hits = [c for n, c in org_counts.items() if "MIT9313" in n]
-        assert med4_hits == [32]
-        assert mit9313_hits == [27]
+        assert org_counts == live
         # by_metric: filtered counts == full-DM precomputed counts (positive-only)
         assert len(response.by_metric) == 2
         for bm in response.by_metric:
@@ -2420,10 +2438,10 @@ class TestSliceTwoSearchTextReach:
 class TestListMetabolites:
     """Live-KG smoke tests for the list_metabolites api function."""
 
-    def test_no_filters_returns_all(self, conn):
+    def test_no_filters_returns_all(self, conn, kg_count):
         """Unfiltered query reports total Metabolite node count."""
         result = api.list_metabolites(conn=conn)
-        assert result["total_matching"] == 3356
+        assert result["total_matching"] == kg_count("MATCH (m:Metabolite) RETURN count(m)")
 
     def test_elements_n_filter(self, conn):
         """N-bearing metabolites total."""
@@ -2492,12 +2510,12 @@ class TestListMetabolites:
         )
         assert result["total_matching"] == 1462
 
-    def test_summary_mode_empty_results_envelope_populated(self, conn):
+    def test_summary_mode_empty_results_envelope_populated(self, conn, kg_count):
         """summary=True returns no result rows but envelope is populated."""
         result = api.list_metabolites(summary=True, conn=conn)
         assert result["results"] == []
         assert result["returned"] == 0
-        assert result["total_matching"] == 3356
+        assert result["total_matching"] == kg_count("MATCH (m:Metabolite) RETURN count(m)")
         # Envelope rollups present (lists, possibly empty but typed)
         assert isinstance(result["top_organisms"], list)
         assert isinstance(result["top_metabolite_pathways"], list)
@@ -2748,10 +2766,10 @@ class TestTcdbSubstrateDepthCrossToolAgreement:
         assert len(genes) == 27
         assert gbm["gene_count_total"] == 27
 
-    def test_gbm_nitrite_all_organisms_sum_equals_transporter_gene_count(self, conn):
+    def test_gbm_nitrite_all_organisms_sum_equals_transporter_gene_count(self, conn, kg_count):
         """(iii) distinct transport genes for nitrite summed over ALL
-        organisms == list_metabolites transporter_gene_count (2,347;
-        2,318 -> 2,347: KG-SYNC-006 paper batch (verified live 2026-08-27)).
+        organisms == list_metabolites transporter_gene_count == the
+        precomputed Metabolite.transporter_gene_count (not pinned).
         Method: loop list_organisms(preferred_name) →
         genes_by_metabolite(evidence_sources=['transport']) and union the
         locus_tags (a gene belongs to exactly one organism, so the set-union
@@ -2765,8 +2783,11 @@ class TestTcdbSubstrateDepthCrossToolAgreement:
         matches every Alteromonas strain (856 genes vs ≤157 per strain) and
         "Alteromonas mediterranea AltDE" ⊂ "…AltDE1" — a fuzzy-match
         artefact, not an invariant (diagnosed live 2026-08-26)."""
+        live = kg_count(
+            "MATCH (m:Metabolite {id: $id}) RETURN m.transporter_gene_count", id=self._NITRITE)
+        assert live > 1000
         lm = api.list_metabolites(metabolite_ids=[self._NITRITE], conn=conn)
-        assert lm["results"][0]["transporter_gene_count"] == 2347
+        assert lm["results"][0]["transporter_gene_count"] == live
 
         orgs = api.list_organisms(limit=500, conn=conn)["results"]
         assert len(orgs) >= 47
@@ -2778,17 +2799,17 @@ class TestTcdbSubstrateDepthCrossToolAgreement:
             )
             assert not gbm["truncated"], org["organism_name"]
             genes |= {r["locus_tag"] for r in gbm["results"]}
-        assert len(genes) == 2347
+        assert len(genes) == live
 
-    def test_list_metabolites_transporter_gene_count_closes_trap_loop(self, conn):
+    def test_list_metabolites_transporter_gene_count_closes_trap_loop(self, conn, kg_count):
         """list_metabolites row `transporter_gene_count` (deepest-attachment
         transporter genes). Spec acceptance 4 says glucose > 0; live
         2026-08-26 (current KG build) glucose reads catalyst 277 /
         transporter_gene_count 1422 — NOT the spec's 3051 / 0 snapshot from
         2026-08-20, so only `> 0` is pinned for glucose. The transport-only
         trap loop (`catalyst_gene_count == 0, transporter_gene_count > 0`)
-        is pinned on sodium cation (kegg.compound:C01330: 0 / 6742 live;
-        6655 -> 6742: KG-SYNC-006 paper batch (verified live 2026-08-27))."""
+        is pinned on sodium cation (kegg.compound:C01330: catalyst 0, and
+        transporter_gene_count == the precomputed node property)."""
         rows = api.list_metabolites(
             metabolite_ids=["kegg.compound:C00031", "kegg.compound:C01330"],
             limit=10, conn=conn,
@@ -2798,7 +2819,9 @@ class TestTcdbSubstrateDepthCrossToolAgreement:
         assert glucose["transporter_gene_count"] > 0
         sodium = by_id["kegg.compound:C01330"]
         assert sodium["catalyst_gene_count"] == 0
-        assert sodium["transporter_gene_count"] == 6742
+        assert sodium["transporter_gene_count"] == kg_count(
+            "MATCH (m:Metabolite {id: 'kegg.compound:C01330'}) RETURN m.transporter_gene_count")
+        assert sodium["transporter_gene_count"] > 1000
         assert sodium["evidence_sources"] == ["transport"]
 
     def test_list_organisms_med4_transported_metabolite_count(self, conn):
@@ -3715,15 +3738,15 @@ _BATCH6_LIVE = [
 @pytest.mark.kg
 class TestSearchOntologyBrowseLive:
     """Spec §10.3: `search_ontology(ontology=['merops'], level=1)` returns
-    S33 first with gene_count=417 (412 -> 417: KG-SYNC-006 paper batch (verified live 2026-08-27))."""
+    S33 first, carrying the term's precomputed gene_count."""
 
-    def test_merops_level1_browse(self, conn):
+    def test_merops_level1_browse(self, conn, kg_count):
         result = api.search_ontology(
             ontology=["merops"], level=1, limit=5, conn=conn)
         assert result["mode"] == "browse"
         first = result["results"][0]
         assert first["id"] == "merops.family:S33"
-        assert first["gene_count"] == 417
+        assert first["gene_count"] == kg_count(_TERM_PROP, id="merops.family:S33", prop="gene_count")
         assert first["score"] is None
         assert first["ontology_type"] == "merops"
         assert result["score_max"] is None
@@ -3793,13 +3816,14 @@ class TestSearchOntologyBrowseLive:
         assert all(r["gene_count"] >= 100 for r in result["results"])
 
     @pytest.mark.asyncio
-    async def test_wrapper_browse(self, tool_fns, conn):
+    async def test_wrapper_browse(self, tool_fns, conn, kg_count):
         ctx = _ctx_with_conn(conn)
         result = await tool_fns["search_ontology"](
             ctx, ontology=["merops"], level=1, limit=5)
         assert result.mode == "browse"
         assert result.results[0].id == "merops.family:S33"
-        assert result.results[0].gene_count == 417
+        assert result.results[0].gene_count == kg_count(
+            _TERM_PROP, id="merops.family:S33", prop="gene_count")
 
 
 @pytest.mark.kg
@@ -3920,15 +3944,14 @@ class TestOntologyTermDetailsLive:
         assert row["links_out"] == []
         assert "direct_gene_count" not in row
 
-    def test_go_0006979(self, conn):
+    def test_go_0006979(self, conn, kg_count):
         _, rows = self._rows(conn)
         row = rows["go:0006979"]
         assert row["ontology"] == "go_bp"
-        # 1050 / 42 / 860 -> 1068 / 43 / 875: KG-SYNC-006 paper batch (verified live 2026-08-27).
         assert row["level"] == 3
-        assert row["gene_count"] == 1068
-        assert row["organism_count"] == 43
-        assert row["direct_gene_count"] == 875
+        for prop in ("gene_count", "organism_count", "direct_gene_count"):
+            assert row[prop] == kg_count(_TERM_PROP, id="go:0006979", prop=prop)
+        assert row["direct_gene_count"] < row["gene_count"]
         assert len(row["parents"]) == 1
         assert row["children_total"] == 3
         assert row["links_out"] == []
@@ -4061,13 +4084,13 @@ class TestOntologyTermDetailsStripRuleLive:
         assert "reaction_count" not in ko
         assert "metabolite_count" not in ko
 
-    def test_pfam_has_no_direct_gene_count_key(self, conn):
+    def test_pfam_has_no_direct_gene_count_key(self, conn, kg_count):
         result = api.ontology_term_details(
             ["pfam:PF00005", "go:0006979"], conn=conn)
         rows = {r["term_id"]: r for r in result["results"]}
         assert "direct_gene_count" not in rows["pfam:PF00005"]
-        # 860 -> 875: KG-SYNC-006 paper batch (verified live 2026-08-27) (a count, not a strip-rule regression).
-        assert rows["go:0006979"]["direct_gene_count"] == 875
+        assert rows["go:0006979"]["direct_gene_count"] == kg_count(
+            _TERM_PROP, id="go:0006979", prop="direct_gene_count")
 
 
 

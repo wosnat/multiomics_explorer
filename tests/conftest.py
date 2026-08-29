@@ -41,6 +41,18 @@ def run_query(neo4j_driver):
 
 
 @pytest.fixture(scope="session")
+def kg_count(run_query):
+    """Live scalar from the KG, for count assertions that must never be
+    pinned to a literal (paper batches flip them). The query must RETURN
+    exactly one row with one column."""
+    def _count(cypher, **params):
+        rows = run_query(cypher, **params)
+        assert len(rows) == 1, f"kg_count expects one row, got {len(rows)}"
+        return next(iter(rows[0].values()))
+    return _count
+
+
+@pytest.fixture(scope="session")
 def conn(neo4j_driver):
     """GraphConnection wrapping the session-scoped neo4j_driver."""
     from multiomics_explorer.config.settings import Settings

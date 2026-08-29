@@ -223,24 +223,35 @@ class TestGeneDetailsCorrectnessKG:
 class TestGeneOverviewCorrectnessKG:
     """Validate gene_overview queries return routing signals from pre-computed properties."""
 
-    def test_single_gene_pro(self, conn):
-        """PMM1428: verify annotation_types, expression counts, ortholog signals."""
+    def test_single_gene_pro(self, conn, kg_count):
+        """PMM1428: verify annotation_types, expression counts, ortholog signals.
+
+        Counts are checked against live edge counts rather than literals
+        (paper batches flip them) — this also validates the Gene-level
+        precomputes the query reads."""
         cypher, params = build_gene_overview(locus_tags=["PMM1428"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         r = results[0]
         assert r["locus_tag"] == "PMM1428"
         assert set(r["annotation_types"]) >= {"go_mf", "pfam", "cog_category", "tigr_role"}
-        # 35 → 37 edges, 5 → 6 significant (verified live 2026-08-20):
-        # Weissberg 2025 added new contrasts touching this gene (up=4, down=2).
-        # 37 → 42 edges: KG-SYNC-006 paper batch (verified live 2026-08-27).
-        assert r["expression_edge_count"] == 42
-        assert r["significant_up_count"] + r["significant_down_count"] == 6
-        # 14 → 20 after the 2026-05 KG rebuild added 6 Prochlorococcus strains,
-        # all of which joined this gene's cyanorak ortholog group; 20 → 21 after
-        # the 2026-06-13 rebuild added 2 more organisms; 21 → 22 after the
-        # KG-SYNC-006 paper batch (verified live 2026-08-27) added Synechococcus WH8109.
-        assert r["closest_ortholog_group_size"] == 22
+        n_edges = kg_count(
+            "MATCH (:Gene {locus_tag: $lt})<-[e:Changes_expression_of]-() RETURN count(e)",
+            lt="PMM1428")
+        n_sig = kg_count(
+            "MATCH (:Gene {locus_tag: $lt})<-[e:Changes_expression_of]-() "
+            "WHERE e.significant = 'significant' RETURN count(e)", lt="PMM1428")
+        assert n_edges > n_sig > 0
+        assert r["expression_edge_count"] == n_edges
+        assert r["significant_up_count"] + r["significant_down_count"] == n_sig
+        # closest group = lowest specificity_rank (the curated cyanorak group);
+        # every organism added so far has joined it, so it only grows.
+        closest_size = kg_count(
+            "MATCH (:Gene {locus_tag: $lt})-[:Gene_in_ortholog_group]->(og:OrthologGroup) "
+            "WITH og ORDER BY og.specificity_rank LIMIT 1 "
+            "MATCH (og)<-[:Gene_in_ortholog_group]-(m:Gene) RETURN count(m)", lt="PMM1428")
+        assert closest_size >= 14
+        assert r["closest_ortholog_group_size"] == closest_size
         assert set(r["closest_ortholog_genera"]) == {"Prochlorococcus", "Synechococcus"}
 
     def test_single_gene_alt(self, conn):
@@ -668,14 +679,13 @@ class TestGenesByOntologyCorrectnessKG:
             min_gene_set_size=5,
             max_gene_set_size=2000,
         )
-        # 1068 → 1085 (verified live 2026-08-20): InterPro Layer-B GO
-        # enrichment grew L1 (cellular process) 1038 → 1055 (+17, matching
-        # the mode-2 gene delta); L6 (DNA replication) unchanged at 30.
-        assert r["total_matching"] == 1085  # 1055 + 30
         levels_in_result = {e["level"] for e in r["by_level"]}
         assert levels_in_result == {1, 6}
         by_level = {e["level"]: e for e in r["by_level"]}
-        assert by_level[1]["n_genes"] == 1055
+        # total = sum over the two scoped terms; L1 (cellular process) dwarfs
+        # L6 (DNA replication). Not pinned — GO gene counts drift per rebuild.
+        assert r["total_matching"] == by_level[1]["n_genes"] + by_level[6]["n_genes"]
+        assert by_level[1]["n_genes"] > 1000 > by_level[6]["n_genes"] >= 20
         assert by_level[6]["n_genes"] == 30
 
     def test_mode3_wrong_level_bucket(self):
@@ -939,7 +949,7 @@ class TestRunCypherCorrectness:
 
 @pytest.mark.kg
 class TestSearchOntologyBrowseCorrectnessKG:
-    def test_merops_level1_browse_top5(self, conn):
+    def test_merops_level1_browse_top5(self, conn, run_query):
         cypher, params = build_search_ontology(
             ontology="merops", search_text=None, level=1, limit=5)
         rows = conn.execute_query(cypher, **params)
@@ -947,8 +957,12 @@ class TestSearchOntologyBrowseCorrectnessKG:
             "merops.family:S33", "merops.family:S09", "merops.family:C26",
             "merops.family:M38", "merops.family:C44",
         ]
-        # KG-SYNC-006 paper batch (verified live 2026-08-27).
-        assert [r["gene_count"] for r in rows] == [417, 300, 278, 178, 173]
+        live = {x["id"]: x["gc"] for x in run_query(
+            "MATCH (t:MeropsFamily) WHERE t.id IN $ids RETURN t.id AS id, t.gene_count AS gc",
+            ids=[r["id"] for r in rows])}
+        counts = [r["gene_count"] for r in rows]
+        assert counts == [live[r["id"]] for r in rows]
+        assert counts == sorted(counts, reverse=True)
         assert all(r["score"] is None for r in rows)
 
     def test_merops_browse_summary_by_level(self, conn):
@@ -995,7 +1009,7 @@ class TestOntologyTermDetailsCorrectnessKG:
         rows = conn.execute_query(cypher, **params)
         assert [r["term_id"] for r in rows] == self._IDS
 
-    def test_verified_counts(self, conn):
+    def test_verified_counts(self, conn, run_query):
         rows = self._rows(conn)
         t = rows["tcdb:3.A.1"]
         assert (len(t["parents"]), t["children_total"], t["links_total"]) == (1, 55, 129)
@@ -1007,8 +1021,9 @@ class TestOntologyTermDetailsCorrectnessKG:
         n = rows["ncbifam:NF000812"]
         assert (len(n["parents"]), n["children_total"], n["links_total"]) == (0, 0, 0)
         g = rows["go:0006979"]
-        # (3, 1050, 42) -> (3, 1068, 43): KG-SYNC-006 paper batch (verified live 2026-08-27).
-        assert (g["level"], g["gene_count"], g["organism_count"]) == (3, 1068, 43)
+        live = run_query(
+            "MATCH (t {id: 'go:0006979'}) RETURN t.gene_count AS gc, t.organism_count AS oc")[0]
+        assert (g["level"], g["gene_count"], g["organism_count"]) == (3, live["gc"], live["oc"])
         assert (len(g["parents"]), g["children_total"], g["links_total"]) == (1, 3, 0)
 
     def test_not_found_flag(self, conn):
@@ -1021,8 +1036,9 @@ class TestOntologyTermDetailsCorrectnessKG:
         assert rows["tcdb:3.A.1"]["links_total"] == 0
         assert rows["interpro:IPR000362"]["links_total"] == 5
 
-    def test_verbose_shape(self, conn):
+    def test_verbose_shape(self, conn, kg_count):
         rows = self._rows(conn, verbose=True)
         g = rows["go:0006979"]
         assert g["properties"]["id"] == "go:0006979"
-        assert len(g["genes_by_organism"]) == 43  # 42 -> 43: KG-SYNC-006 paper batch (verified live 2026-08-27)
+        assert len(g["genes_by_organism"]) == kg_count(
+            "MATCH (t {id: 'go:0006979'}) RETURN t.organism_count")
