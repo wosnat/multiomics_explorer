@@ -19,11 +19,14 @@ and [regression guide](references/regression-guide.md) for golden-file tests.
 | `tests/unit/test_tool_correctness.py` | Fixture-based correctness (mocked) | No |
 | `tests/unit/test_write_blocking.py` | Write keyword regex | No |
 | `tests/unit/test_about_content.py` | About-file consistency with Pydantic schemas (expected-keys, param names) | No |
+| `tests/unit/test_docs_lint.py` | Docs hygiene: `docs://` links resolve, stale identifiers (`inputs/lint/stale_identifiers.yaml`), quoted vocab values vs `inputs/lint/vocab_snapshot.yaml`, CLAUDE.md table shape, tool inventory | No |
+| `tests/unit/test_refresh_examples.py` | Parser / comparator / formatter of `scripts/refresh_examples.py` | No |
 | `tests/integration/test_cyver_queries.py` | CyVer schema/property validation of all builders | Yes |
 | `tests/integration/test_tool_correctness_kg.py` | Fixture-based correctness (live KG) | Yes |
 | `tests/integration/test_mcp_tools.py` | MCP smoke tests | Yes |
 | `tests/integration/test_api_contract.py` | API return-type contracts (shape + keys) | Yes |
-| `tests/integration/test_about_examples.py` | About-content examples execute against KG | Yes |
+| `tests/integration/test_about_examples.py` | About-content examples execute against KG; `test_example_response_values_match_live` = shown response vs live (`scripts/refresh_examples.py --write` to refresh) | Yes |
+| `tests/integration/test_docs_kg_claims.py` | Every KG number the docs quote (`inputs/lint/kg_claims.yaml`) evaluated live; vocab snapshot == live (`scripts/snapshot_vocab.py` after a rebuild) | Yes |
 | `tests/integration/test_edge_case_contracts.py` | Corner-case matrix: every tool × degenerate inputs vs. structural invariants + coverage gate | Yes |
 | `tests/integration/edge_cases/test_fixture_guards.py` | Degenerate-fixture self-validation (re-pin after KG rebuild) | Yes |
 | `tests/regression/test_regression.py` | Golden-file comparison | Yes |

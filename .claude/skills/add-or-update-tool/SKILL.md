@@ -135,7 +135,7 @@ Once all 4 agents report green:
 
    See the [readability-pass spec](../../../docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md) for the full 9 outfacing-doc style rules + the lint extension contract.
 
-3. **Foreground**: `pytest tests/unit/ -q`
+3. **Foreground**: `pytest tests/unit/ -q` — includes `tests/unit/test_docs_lint.py` (dangling `docs://` links, stale identifiers from `inputs/lint/stale_identifiers.yaml`, quoted vocabulary values, CLAUDE.md row shape, 42-tool inventory incl. `start_here` routing). A rename that fails it is fixed by sweeping the prose, not by loosening the rule. **Also**: `uv run python scripts/refresh_examples.py --check --tool {name}` — every example response must match the live KG (`--write` to refresh; `illustrative: true` only for unreproducible points).
 4. **Foreground**: `pytest tests/integration/ -m kg -q` — includes the corner-case matrix (`test_edge_case_contracts.py`) + the `test_every_tool_has_edge_scenarios` coverage gate. A tool with no edge-case scenarios, or one that crashes / malforms its envelope on a degenerate input, fails here.
 5. **Foreground**: `pytest tests/regression/ -m kg -q`
    If the spec declared new or renamed columns, run `pytest tests/regression/ --force-regen -m kg -q` first, then verify.

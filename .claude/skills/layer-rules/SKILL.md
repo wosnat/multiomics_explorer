@@ -56,6 +56,28 @@ tree. **Never hand-edit rendered md.** YAML examples / mistakes /
 chaining follow the same 9 outfacing-doc rules as Layer 3. After regen,
 run `uv run python scripts/build_about_content.py --lint {tool_name}`.
 
+**Example responses are not hand-typed.** Write the `call:` (real IDs —
+verify live), then `uv run python scripts/refresh_examples.py --write {tool}`
+fills the `response:` block from the live KG; `--check` reports drift
+(`tests/integration/test_about_examples.py::test_example_response_values_match_live`
+fails on it). Mark an example `illustrative: true` (+ `note:`) only when its
+point cannot be reproduced live (a `warn` verdict, a tool bug).
+
+**Prose may not restate machine-known facts.** Vocabulary values
+(`treatment_type`, `background_factors`, `compartment`, …) are quoted at most
+once and pointed at `list_filter_values`; `tests/unit/test_docs_lint.py`
+checks every quoted value against `inputs/lint/vocab_snapshot.yaml`. A KG
+number quoted in prose (a percentage, a count) needs an entry in
+`inputs/lint/kg_claims.yaml` with the file in `used_in` (evaluated live by
+`tests/integration/test_docs_kg_claims.py`). Every `docs://` link must resolve.
+
+**Rename cascade.** When a field / param / envelope key / tool is removed or
+renamed, add the old identifier to `inputs/lint/stale_identifiers.yaml` in the
+same PR (pattern + reason + replacement, `allow_in` for rename pointers) — the
+lint scans docs, YAML, `tools.py`, CLAUDE.md and examples so the prose sweep
+can't be skipped. CLAUDE.md tool-table rows stay routing one-liners (≤ 700
+chars, no `§` refs, no config internals, no changelog phrasing).
+
 ## Cross-layer: empty-data-layer safety
 
 The KG holds entities that exist genomically but lack a data layer —

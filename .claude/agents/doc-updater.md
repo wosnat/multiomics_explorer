@@ -21,15 +21,22 @@ from the YAML + Pydantic models. Never edit the generated `tools/{name}.md` dire
 1. Read the spec referenced in your brief (typically `docs/tool-specs/{name}.md`).
 2. Update or create the input YAML in `multiomics_explorer/inputs/tools/{name}.yaml`. New tool? Generate skeleton first:
    `uv run python scripts/build_about_content.py --skeleton {name}`
-3. Regenerate the about markdown:
+3. Example `call:`s use real inputs (verify against the live KG). Do NOT hand-type `response:` blocks —
+   fill them from the live KG: `uv run python scripts/refresh_examples.py --write {name}`, then
+   `--check --tool {name}` must report no `drift` / `empty` / `error`. Mark an example
+   `illustrative: true` (+ `note:`) only when its point cannot be reproduced live.
+   Quote vocabulary values at most once and point at `list_filter_values`; a KG number quoted in
+   prose needs an `inputs/lint/kg_claims.yaml` entry. Renamed/removed identifiers go into
+   `inputs/lint/stale_identifiers.yaml`.
+4. Regenerate the about markdown:
    `uv run python scripts/build_about_content.py {name}`
-4. If the spec touches analysis utilities, hand-edit the matching `references/analysis/*.md` and the corresponding `examples/*.py`.
-5. Update the CLAUDE.md tool-table row for the tool (purpose, key params, summary fields).
-6. Before reporting back, run scoped pytest and confirm green:
-   - `pytest tests/unit/test_about_content.py -q`
-   - `pytest tests/integration/test_about_examples.py -m kg -q`
+5. If the spec touches analysis utilities, hand-edit the matching `references/analysis/*.md` and the corresponding `examples/*.py` — every Python snippet you leave in an analysis md must have been executed against the live KG.
+6. Update the CLAUDE.md tool-table row for the tool: one routing sentence (what + when vs siblings) + the 3-5 load-bearing field names; ≤ 700 chars, no `§` refs, no config internals, no changelog phrasing. Detail lives on the page.
+7. Before reporting back, run scoped pytest and confirm green:
+   - `pytest tests/unit/test_about_content.py tests/unit/test_docs_lint.py -q`
+   - `pytest tests/integration/test_about_examples.py -m kg -q -k {name}`
    - If analysis md changed: `pytest tests/unit/test_analysis_about_content.py -q` and `pytest tests/integration/test_examples.py -m kg -q`
-7. Report `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` per `superpowers:subagent-driven-development`.
+8. Report `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` per `superpowers:subagent-driven-development`.
 
 ## Out of scope
 
