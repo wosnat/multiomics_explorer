@@ -114,10 +114,17 @@ coordinated to `0.1.0a5` ahead of the KG release.
 - `gene_overview` rows: `tcdb_family_count` (TCDB families at the deepest
   attachment only — the corrected successor of the removed
   `transporter_count`, which counted superseded ancestors) and
-  `cazy_family_count`; envelope `has_tcdb` / `has_cazy`. Spec
-  `docs/tool-specs/2026-08-29-gene-overview-family-counts.md`; KG ask filed
-  to align `Gene.tcdb_family_count`
-  (`docs/kg-specs/2026-08-29-gene-overview-family-counts-asks.md`).
+  `cazy_family_count`; envelope `has_tcdb` / `has_cazy`. Both read KG
+  precomputes: the KG redefined `Gene.tcdb_family_count` to the
+  deepest-attachment count in the 2026-08-29 rebuild
+  (`docs/kg-specs/2026-08-29-gene-overview-family-counts-asks.md`), and a
+  `-m kg` invariant test keeps it equal to the live edge count. Spec
+  `docs/tool-specs/2026-08-29-gene-overview-family-counts.md`.
+- Regression goldens regenerated for the 2026-08-29 gene-mapping rebuild
+  (KG `fix(gene-mapping)`: NCBI↔Cyanorak position fallback by stop codon +
+  frame; 423 shadow gene ids vanished, 359 paper rows re-homed; 127,458 →
+  127,035 genes). 41 goldens moved: tied-score reordering, gene counts a
+  few lower, shadow locus_tags gone.
 - `list_metabolites` rows: `transporter_gene_count` (distinct genes over
   deepest TCDB attachments, all organisms) — pairs with `catalyst_gene_count`
   so transport-only reads `0 / >0`.

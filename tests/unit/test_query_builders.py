@@ -8882,10 +8882,8 @@ class TestBuildGeneOverviewPhase1Plumbing:
         under the deepest-attachment rule and is removed."""
         cypher, _ = build_gene_overview(locus_tags=["PMM0001"], verbose=True)
         assert "transporter_count" not in cypher
-        # The successor column `tcdb_family_count` is computed live from the
-        # most_specific edges; the KG precompute (all edges incl. superseded
-        # ancestors) must never be read.
-        assert "g.tcdb_family_count" not in cypher
+        # `tcdb_family_count` (deepest-attachment precompute) is the
+        # replacement column; only the old name must stay gone.
 
     def test_compact_returns_tcdb_evidence_score_max_uncoalesced(self):
         """null = no TCDB call — sparse KG property surfaced as null, never
@@ -11947,37 +11945,27 @@ class TestGeneOverviewMeropsNcbifamColumns:
 
 
 class TestGeneOverviewFamilyCountColumns:
-    """Backlog 3.4 — gene_overview surfaces tcdb_family_count (live count of
-    attachment_depth='most_specific' edges; the KG precompute counts superseded
-    ancestors) and cazy_family_count (precomputed, flat ontology), plus the
-    has_tcdb / has_cazy envelope counts."""
+    """Backlog 3.4 — gene_overview surfaces tcdb_family_count and
+    cazy_family_count (both KG precomputes: tcdb = attachment_depth=
+    'most_specific' edges only since the 2026-08-29 rebuild; cazy is flat),
+    plus the has_tcdb / has_cazy envelope counts."""
 
-    _MS = "attachment_depth = 'most_specific'"
-
-    def test_detail_projects_tcdb_family_count_at_most_specific_depth(self):
+    def test_detail_projects_tcdb_family_count_from_the_precompute(self):
+        """Gene.tcdb_family_count counts attachment_depth='most_specific'
+        edges only (KG rebuild 2026-08-29; PMM0392 reads 7, not the 8 of the
+        earlier all-edges definition). Read it zero-filled; the -m kg
+        invariant test compares it with the live edge count."""
         cypher, _ = build_gene_overview(locus_tags=["PMM0392"])
-        assert "AS tcdb_family_count" in cypher
-        head = cypher[: cypher.index("AS tcdb_family_count")]
-        comprehension = head[head.rfind("size(") :]
-        assert "Gene_has_tcdb_family" in comprehension
-        assert self._MS in comprehension
-
-    def test_detail_does_not_read_the_kg_tcdb_precompute(self):
-        """Gene.tcdb_family_count counts every edge incl. superseded ancestors
-        (PMM0392: 8 vs 7) — the transporter_count defect. Never read it."""
-        cypher, _ = build_gene_overview(locus_tags=["PMM0392"])
-        assert "g.tcdb_family_count" not in cypher
+        assert "coalesce(g.tcdb_family_count, 0) AS tcdb_family_count" in cypher
+        assert "Gene_has_tcdb_family" not in cypher.split("AS tcdb_family_count")[0].split("ncbifam_family_count,")[-1]
 
     def test_detail_projects_cazy_family_count_defaulted_to_zero(self):
         cypher, _ = build_gene_overview(locus_tags=["PMM0392"])
         assert "coalesce(g.cazy_family_count, 0) AS cazy_family_count" in cypher
 
-    def test_summary_emits_has_tcdb_with_most_specific_predicate(self):
+    def test_summary_emits_has_tcdb_from_the_precompute(self):
         cypher, _ = build_gene_overview_summary(locus_tags=["PMM0392"])
-        assert "AS has_tcdb" in cypher
-        head = cypher[: cypher.index("AS has_tcdb")]
-        assert "Gene_has_tcdb_family" in head
-        assert self._MS in head
+        assert "coalesce(g.tcdb_family_count, 0) > 0]) AS has_tcdb" in cypher
 
     def test_summary_emits_has_cazy(self):
         cypher, _ = build_gene_overview_summary(locus_tags=["PMM0392"])

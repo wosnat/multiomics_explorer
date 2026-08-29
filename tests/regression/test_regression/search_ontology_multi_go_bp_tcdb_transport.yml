@@ -18,7 +18,7 @@ case_id: search_ontology_multi_go_bp_tcdb_transport
 mode: search
 offset: 0
 results:
-- gene_count: 10987
+- gene_count: 10984
   id: go:0006810
   is_informative: true
   level: 3

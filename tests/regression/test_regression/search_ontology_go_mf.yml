@@ -28,7 +28,7 @@ rows:
   score: 1.0871
   tree: null
   tree_code: null
-- gene_count: 17146
+- gene_count: 17144
   id: go:0000166
   is_informative: true
   level: 3
@@ -298,7 +298,7 @@ rows:
   score: 1.3378
   tree: null
   tree_code: null
-- gene_count: 13791
+- gene_count: 13783
   id: go:0003676
   is_informative: true
   level: 2
@@ -307,7 +307,7 @@ rows:
   score: 1.1994
   tree: null
   tree_code: null
-- gene_count: 8099
+- gene_count: 8095
   id: go:0003677
   is_informative: true
   level: 3
@@ -388,7 +388,7 @@ rows:
   score: 0.9939
   tree: null
   tree_code: null
-- gene_count: 4913
+- gene_count: 4912
   id: go:0003723
   is_informative: true
   level: 3
@@ -469,7 +469,7 @@ rows:
   score: 1.0871
   tree: null
   tree_code: null
-- gene_count: 46306
+- gene_count: 46282
   id: go:0005488
   is_informative: true
   level: 1
@@ -514,7 +514,7 @@ rows:
   score: 1.1994
   tree: null
   tree_code: null
-- gene_count: 335
+- gene_count: 334
   id: go:0005509
   is_informative: true
   level: 6
@@ -523,7 +523,7 @@ rows:
   score: 1.1994
   tree: null
   tree_code: null
-- gene_count: 7519
+- gene_count: 7513
   id: go:0005515
   is_informative: true
   level: 2
@@ -541,7 +541,7 @@ rows:
   score: 1.3378
   tree: null
   tree_code: null
-- gene_count: 10306
+- gene_count: 10305
   id: go:0005524
   is_informative: true
   level: 4
@@ -550,7 +550,7 @@ rows:
   score: 1.3378
   tree: null
   tree_code: null
-- gene_count: 1518
+- gene_count: 1517
   id: go:0005525
   is_informative: true
   level: 4
@@ -856,7 +856,7 @@ rows:
   score: 1.1994
   tree: null
   tree_code: null
-- gene_count: 14141
+- gene_count: 14139
   id: go:0017076
   is_informative: true
   level: 4
@@ -874,7 +874,7 @@ rows:
   score: 0.9155
   tree: null
   tree_code: null
-- gene_count: 1649
+- gene_count: 1648
   id: go:0019001
   is_informative: true
   level: 5
@@ -937,7 +937,7 @@ rows:
   score: 1.3378
   tree: null
   tree_code: null
-- gene_count: 1988
+- gene_count: 1987
   id: go:0019842
   is_informative: true
   level: 3
@@ -1009,7 +1009,7 @@ rows:
   score: 1.3378
   tree: null
   tree_code: null
-- gene_count: 1058
+- gene_count: 1056
   id: go:0020037
   is_informative: true
   level: 3
@@ -1018,7 +1018,7 @@ rows:
   score: 1.3378
   tree: null
   tree_code: null
-- gene_count: 538
+- gene_count: 536
   id: go:0030145
   is_informative: true
   level: 7
@@ -1036,7 +1036,7 @@ rows:
   score: 1.1994
   tree: null
   tree_code: null
-- gene_count: 1428
+- gene_count: 1427
   id: go:0030170
   is_informative: true
   level: 5
@@ -1099,7 +1099,7 @@ rows:
   score: 1.3378
   tree: null
   tree_code: null
-- gene_count: 12627
+- gene_count: 12626
   id: go:0030554
   is_informative: true
   level: 5
@@ -1378,7 +1378,7 @@ rows:
   score: 1.3378
   tree: null
   tree_code: null
-- gene_count: 12840
+- gene_count: 12838
   id: go:0032553
   is_informative: true
   level: 3
@@ -1396,7 +1396,7 @@ rows:
   score: 1.1994
   tree: null
   tree_code: null
-- gene_count: 12010
+- gene_count: 12008
   id: go:0032555
   is_informative: true
   level: 4
@@ -1432,7 +1432,7 @@ rows:
   score: 1.1994
   tree: null
   tree_code: null
-- gene_count: 10496
+- gene_count: 10495
   id: go:0032559
   is_informative: true
   level: 5
@@ -1450,7 +1450,7 @@ rows:
   score: 1.1994
   tree: null
   tree_code: null
-- gene_count: 1648
+- gene_count: 1647
   id: go:0032561
   is_informative: true
   level: 5
@@ -1639,7 +1639,7 @@ rows:
   score: 1.0871
   tree: null
   tree_code: null
-- gene_count: 11695
+- gene_count: 11693
   id: go:0035639
   is_informative: true
   level: 3
@@ -1657,7 +1657,7 @@ rows:
   score: 0.8485
   tree: null
   tree_code: null
-- gene_count: 33270
+- gene_count: 33263
   id: go:0036094
   is_informative: true
   level: 2
@@ -1747,7 +1747,7 @@ rows:
   score: 1.0871
   tree: null
   tree_code: null
-- gene_count: 28168
+- gene_count: 28161
   id: go:0043167
   is_informative: true
   level: 3
@@ -1756,7 +1756,7 @@ rows:
   score: 1.3378
   tree: null
   tree_code: null
-- gene_count: 17395
+- gene_count: 17392
   id: go:0043168
   is_informative: true
   level: 4
@@ -1765,7 +1765,7 @@ rows:
   score: 1.3378
   tree: null
   tree_code: null
-- gene_count: 14393
+- gene_count: 14389
   id: go:0043169
   is_informative: true
   level: 4
@@ -1963,7 +1963,7 @@ rows:
   score: 1.1994
   tree: null
   tree_code: null
-- gene_count: 13359
+- gene_count: 13355
   id: go:0046872
   is_informative: true
   level: 5
@@ -1972,7 +1972,7 @@ rows:
   score: 1.1994
   tree: null
   tree_code: null
-- gene_count: 1621
+- gene_count: 1619
   id: go:0046906
   is_informative: true
   level: 2
@@ -1981,7 +1981,7 @@ rows:
   score: 1.3378
   tree: null
   tree_code: null
-- gene_count: 4785
+- gene_count: 4783
   id: go:0046914
   is_informative: true
   level: 6
@@ -2314,7 +2314,7 @@ rows:
   score: 1.0871
   tree: null
   tree_code: null
-- gene_count: 1428
+- gene_count: 1427
   id: go:0070279
   is_informative: true
   level: 4
@@ -2485,7 +2485,7 @@ rows:
   score: 1.1994
   tree: null
   tree_code: null
-- gene_count: 13280
+- gene_count: 13278
   id: go:0097367
   is_informative: true
   level: 2
@@ -2557,7 +2557,7 @@ rows:
   score: 1.3378
   tree: null
   tree_code: null
-- gene_count: 17186
+- gene_count: 17184
   id: go:1901265
   is_informative: true
   level: 2
@@ -2575,7 +2575,7 @@ rows:
   score: 1.3378
   tree: null
   tree_code: null
-- gene_count: 21642
+- gene_count: 21639
   id: go:1901363
   is_informative: true
   level: 3

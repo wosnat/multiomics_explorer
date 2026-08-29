@@ -1,9 +1,9 @@
 by_call_class: []
 by_category:
 - category: Coenzyme metabolism
-  count: 118
+  count: 117
 - category: Stress response and adaptation
-  count: 94
+  count: 91
 - category: Translation
   count: 86
 - category: Unknown
@@ -29,7 +29,7 @@ by_category:
 - category: Central intermediary metabolism
   count: 18
 - category: Lipid metabolism
-  count: 17
+  count: 16
 - category: Regulatory functions
   count: 13
 - category: Cell cycle and division
@@ -49,23 +49,23 @@ by_category:
 - category: Cell motility
   count: 1
 by_evidence:
-- count: 1062
+- count: 1058
   evidence: curated
-- count: 19
+- count: 18
   evidence: signature
 by_level:
 - level: 0
-  n_genes: 868
-  n_terms: 78
-  row_count: 1081
+  n_genes: 863
+  n_terms: 77
+  row_count: 1076
 by_sources:
-- count: 998
+- count: 994
   source: eggnog
-- count: 956
+- count: 952
   source: interproscan
-- count: 951
+- count: 947
   source: cyanorak
-- count: 653
+- count: 651
   source: uniprot
 by_tier: []
 case_id: genes_by_ontology_pfam_clans
@@ -1437,15 +1437,6 @@ results:
   product: aspartate carbamoyltransferase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
-- evidence: signature
-  gene_category: Lipid metabolism
-  gene_name: crtR
-  is_informative: true
-  level: 0
-  locus_tag: PMM0236
-  product: fatty acid desaturase
-  term_id: pfam.clan:CL0713
-  term_name: Acyl-CoA_desat
 - evidence: curated
   gene_category: Translation
   gene_name: ileS
@@ -7961,15 +7952,6 @@ results:
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
 - evidence: curated
-  gene_category: Stress response and adaptation
-  gene_name: desA3
-  is_informative: true
-  level: 0
-  locus_tag: PMM1378
-  product: delta-12 fatty acid desaturase DesA3
-  term_id: pfam.clan:CL0713
-  term_name: Acyl-CoA_desat
-- evidence: curated
   gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -7978,15 +7960,6 @@ results:
   product: HAD hydrolase, IA, variant 3 family protein
   term_id: pfam.clan:CL0137
   term_name: HAD
-- evidence: curated
-  gene_category: Stress response and adaptation
-  gene_name: desA2
-  is_informative: true
-  level: 0
-  locus_tag: PMM1382
-  product: delta-12 fatty acid desaturase DesA2
-  term_id: pfam.clan:CL0713
-  term_name: Acyl-CoA_desat
 - evidence: curated
   gene_category: Translation
   gene_name: null
@@ -9482,15 +9455,6 @@ results:
   term_id: pfam.clan:CL0061
   term_name: PLP_aminotran
 - evidence: curated
-  gene_category: Stress response and adaptation
-  gene_name: desC4
-  is_informative: true
-  level: 0
-  locus_tag: PMM1672
-  product: delta-9 fatty-acid desaturase DesC4
-  term_id: pfam.clan:CL0713
-  term_name: Acyl-CoA_desat
-- evidence: curated
   gene_category: Replication and repair
   gene_name: dnaB
   is_informative: true
@@ -9788,15 +9752,6 @@ results:
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
 - evidence: curated
-  gene_category: Coenzyme metabolism
-  gene_name: crtR
-  is_informative: true
-  level: 0
-  locus_tag: PMM1723
-  product: beta-carotene hydroxylase
-  term_id: pfam.clan:CL0713
-  term_name: Acyl-CoA_desat
-- evidence: curated
   gene_category: Replication and repair
   gene_name: null
   is_informative: true
@@ -9832,8 +9787,8 @@ results:
   product: putative sxtK
   term_id: pfam.clan:CL0184
   term_name: DMT
-returned: 1081
-row_count: 1081
+returned: 1076
+row_count: 1076
 skipped_ontologies: []
 terms_per_gene_max: 4
 terms_per_gene_median: 1.0
@@ -9860,9 +9815,9 @@ top_terms:
   term_id: pfam.clan:CL0021
   term_name: OB
 total_categories: 24
-total_genes: 868
-total_matching: 1081
-total_terms: 78
+total_genes: 863
+total_matching: 1076
+total_terms: 77
 truncated: false
 trust_axes:
   pfam:

@@ -1112,7 +1112,7 @@ results:
   children_truncated: false
   description: null
   direct_gene_count: 875
-  gene_count: 1068
+  gene_count: 1067
   genes_by_organism:
   - '{''gene_count'': 10, ''organism'': ''Prochlorococcus MIT1314''}'
   - '{''gene_count'': 11, ''organism'': ''Prochlorococcus RSP50''}'
@@ -1120,8 +1120,8 @@ results:
   - '{''gene_count'': 13, ''organism'': ''Synechococcus elongatus UTEX 2973''}'
   - '{''gene_count'': 13, ''organism'': ''Thermosynechococcus vestitus BP-1''}'
   - '{''gene_count'': 15, ''organism'': ''Prochlorococcus MIT0604''}'
+  - '{''gene_count'': 15, ''organism'': ''Prochlorococcus MIT9202''}'
   - '{''gene_count'': 16, ''organism'': ''Prochlorococcus MIT0801''}'
-  - '{''gene_count'': 16, ''organism'': ''Prochlorococcus MIT9202''}'
   - '{''gene_count'': 17, ''organism'': ''Prochlorococcus MIT9215''}'
   - '{''gene_count'': 17, ''organism'': ''Prochlorococcus MIT9312''}'
   - '{''gene_count'': 17, ''organism'': ''Prochlorococcus MIT9515''}'
@@ -1170,7 +1170,7 @@ results:
   - '{''id'': ''go:0006950'', ''level'': 2, ''name'': ''response to stress''}'
   properties:
     direct_gene_count: 875
-    gene_count: 1068
+    gene_count: 1067
     id: go:0006979
     level: 3
     name: response to oxidative stress

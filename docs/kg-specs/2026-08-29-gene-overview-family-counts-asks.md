@@ -100,8 +100,8 @@ is verified by the existing gate. No re-pin, no golden movement.
 
 ## Status
 
-- [ ] Reviewed with KG owner
-- [ ] Implemented in KG repo (aggregation + validity test)
-- [ ] KG rebuilt
-- [ ] Verification queries pass
+- [x] Reviewed with KG owner (2026-08-29)
+- [x] Implemented in KG repo (aggregation + validity test) — `scripts/post-import.{sh,cypher}` transport-arm statement sets `tcdb_family_count = n_deepest`; `tests/kg_validity/test_tcdb_cazy.py::test_tcdb_family_count_is_deepest_attachment_only` + `_not_tier_gated` + `_matches_substrate_resolution_presence`
+- [x] KG rebuilt (2026-08-29, dev build)
+- [x] Verification queries pass — 0 mismatches, PMM0392 → 7, invariant 0 violations; `pytest -m kg` 1200 passed
 - [ ] Explorer swapped to the precomputed prop

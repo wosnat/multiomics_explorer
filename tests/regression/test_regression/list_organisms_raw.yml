@@ -224,7 +224,7 @@ rows:
   - viral
 - clade: HLII
   experiment_count: 1
-  gene_count: 1951
+  gene_count: 1945
   genus: Prochlorococcus
   ncbi_taxon_id: 146891
   omics_types:
@@ -237,7 +237,7 @@ rows:
   - salt
 - clade: HLI
   experiment_count: 119
-  gene_count: 1976
+  gene_count: 1973
   genus: Prochlorococcus
   ncbi_taxon_id: 59919
   omics_types:
@@ -268,7 +268,7 @@ rows:
   - viral
 - clade: HLII
   experiment_count: 3
-  gene_count: 2137
+  gene_count: 2111
   genus: Prochlorococcus
   ncbi_taxon_id: 1501268
   omics_types:
@@ -282,7 +282,7 @@ rows:
   - light
 - clade: LLI
   experiment_count: 6
-  gene_count: 2358
+  gene_count: 2330
   genus: Prochlorococcus
   ncbi_taxon_id: 1501269
   omics_types:
@@ -318,7 +318,7 @@ rows:
   treatment_types: []
 - clade: HLII
   experiment_count: 0
-  gene_count: 2027
+  gene_count: 2005
   genus: Prochlorococcus
   ncbi_taxon_id: 93058
   omics_types: []
@@ -329,7 +329,7 @@ rows:
   treatment_types: []
 - clade: HLII
   experiment_count: 0
-  gene_count: 2030
+  gene_count: 2022
   genus: Prochlorococcus
   ncbi_taxon_id: 93060
   omics_types: []
@@ -340,7 +340,7 @@ rows:
   treatment_types: []
 - clade: HLII
   experiment_count: 8
-  gene_count: 1935
+  gene_count: 1926
   genus: Prochlorococcus
   ncbi_taxon_id: 167546
   omics_types:
@@ -356,7 +356,7 @@ rows:
   - temperature
 - clade: LLIV
   experiment_count: 4
-  gene_count: 3114
+  gene_count: 3091
   genus: Prochlorococcus
   ncbi_taxon_id: 59922
   omics_types:
@@ -370,7 +370,7 @@ rows:
   - carbon
 - clade: HLII
   experiment_count: 27
-  gene_count: 1978
+  gene_count: 1970
   genus: Prochlorococcus
   ncbi_taxon_id: 74546
   omics_types:
@@ -390,7 +390,7 @@ rows:
   - plastic
 - clade: LLIV
   experiment_count: 40
-  gene_count: 2948
+  gene_count: 2906
   genus: Prochlorococcus
   ncbi_taxon_id: 74547
   omics_types:
@@ -415,7 +415,7 @@ rows:
   - viral
 - clade: HLI
   experiment_count: 0
-  gene_count: 1949
+  gene_count: 1945
   genus: Prochlorococcus
   ncbi_taxon_id: 167542
   omics_types: []
@@ -426,7 +426,7 @@ rows:
   treatment_types: []
 - clade: LLI
   experiment_count: 2
-  gene_count: 2226
+  gene_count: 2221
   genus: Prochlorococcus
   ncbi_taxon_id: 167555
   omics_types:
@@ -439,7 +439,7 @@ rows:
   - salt
 - clade: LLI
   experiment_count: 17
-  gene_count: 2214
+  gene_count: 2210
   genus: Prochlorococcus
   ncbi_taxon_id: 59920
   omics_types:
@@ -457,7 +457,7 @@ rows:
   - plastic
 - clade: LLI
   experiment_count: 0
-  gene_count: 2370
+  gene_count: 2317
   genus: Prochlorococcus
   ncbi_taxon_id: 59924
   omics_types: []
@@ -479,7 +479,7 @@ rows:
   treatment_types: []
 - clade: HLII
   experiment_count: 0
-  gene_count: 1977
+  gene_count: 1950
   genus: Prochlorococcus
   ncbi_taxon_id: 59926
   omics_types: []
@@ -490,7 +490,7 @@ rows:
   treatment_types: []
 - clade: LLII
   experiment_count: 64
-  gene_count: 1964
+  gene_count: 1959
   genus: Prochlorococcus
   ncbi_taxon_id: 167539
   omics_types:
@@ -547,7 +547,7 @@ rows:
   - coculture
 - clade: I
   experiment_count: 11
-  gene_count: 3052
+  gene_count: 3038
   genus: Synechococcus
   ncbi_taxon_id: 64471
   omics_types:
@@ -575,7 +575,7 @@ rows:
   - coculture
 - clade: V
   experiment_count: 73
-  gene_count: 2621
+  gene_count: 2590
   genus: Synechococcus
   ncbi_taxon_id: 32051
   omics_types:
@@ -593,7 +593,7 @@ rows:
   - viral
 - clade: III
   experiment_count: 77
-  gene_count: 2881
+  gene_count: 2830
   genus: Parasynechococcus
   ncbi_taxon_id: 84588
   omics_types:
@@ -611,7 +611,7 @@ rows:
   - viral
 - clade: II
   experiment_count: 3
-  gene_count: 2707
+  gene_count: 2681
   genus: Synechococcus
   ncbi_taxon_id: 166314
   omics_types:
@@ -652,7 +652,7 @@ rows:
   - coculture
 - clade: IV
   experiment_count: 60
-  gene_count: 2595
+  gene_count: 2567
   genus: Synechococcus
   ncbi_taxon_id: 313625
   omics_types:

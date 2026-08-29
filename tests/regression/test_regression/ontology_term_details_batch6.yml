@@ -631,7 +631,7 @@ results:
   children_truncated: false
   description: null
   direct_gene_count: 875
-  gene_count: 1068
+  gene_count: 1067
   is_informative: true
   label: BiologicalProcess
   level: 3

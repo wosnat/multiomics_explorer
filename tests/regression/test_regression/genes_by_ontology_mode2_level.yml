@@ -2270,6 +2270,15 @@ results:
   term_id: cyanorak.role:K.1
   term_name: Protein synthesis > tRNA aminoacylation
 - evidence: curated
+  gene_category: Coenzyme metabolism
+  gene_name: crtR
+  is_informative: true
+  level: 1
+  locus_tag: PMM0236
+  product: beta-carotene hydroxylase
+  term_id: cyanorak.role:B.5
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
+- evidence: curated
   gene_category: Translation
   gene_name: ileS
   is_informative: true
@@ -15302,15 +15311,6 @@ results:
   term_id: cyanorak.role:J.6
   term_name: Photosynthesis and respiration > NADH dehydrogenase
 - evidence: curated
-  gene_category: Coenzyme metabolism
-  gene_name: crtR
-  is_informative: true
-  level: 1
-  locus_tag: PMM1723
-  product: beta-carotene hydroxylase
-  term_id: cyanorak.role:B.5
-  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
-- evidence: curated
   gene_category: Unknown
   gene_name: null
   is_informative: false
@@ -15614,15 +15614,6 @@ results:
   level: 1
   locus_tag: PMM1877
   product: possible uncharacterized conserved secreted protein
-  term_id: cyanorak.role:R.2
-  term_name: Other > Conserved hypothetical proteins
-- evidence: curated
-  gene_category: Unknown
-  gene_name: null
-  is_informative: false
-  level: 1
-  locus_tag: PMM1878
-  product: uncharacterized conserved lipoprotein
   term_id: cyanorak.role:R.2
   term_name: Other > Conserved hypothetical proteins
 - evidence: curated
@@ -16262,6 +16253,15 @@ results:
   level: 1
   locus_tag: PMM_50048
   product: uncharacterized conserved membrane protein
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+- evidence: curated
+  gene_category: Unknown
+  gene_name: null
+  is_informative: false
+  level: 1
+  locus_tag: TX50_RS03815
+  product: uncharacterized conserved lipoprotein
   term_id: cyanorak.role:R.2
   term_name: Other > Conserved hypothetical proteins
 - evidence: curated

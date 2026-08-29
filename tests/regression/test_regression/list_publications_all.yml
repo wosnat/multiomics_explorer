@@ -1836,7 +1836,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 75
+  discussed_gene_count: 76
   discussed_pathway_count: 3
   doi: 10.1038/msb4100087
   experiment_count: 6

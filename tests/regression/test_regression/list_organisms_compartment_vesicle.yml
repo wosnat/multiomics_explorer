@@ -257,7 +257,7 @@ rows:
   - categorical
   - numeric
   experiment_count: 119
-  gene_count: 1976
+  gene_count: 1973
   genus: Prochlorococcus
   growth_phases:
   - acclimated_steady_state
@@ -323,7 +323,7 @@ rows:
   derived_metric_value_kinds:
   - numeric
   experiment_count: 27
-  gene_count: 1978
+  gene_count: 1970
   genus: Prochlorococcus
   growth_phases:
   - acclimated_steady_state
@@ -374,7 +374,7 @@ rows:
   - categorical
   - numeric
   experiment_count: 40
-  gene_count: 2948
+  gene_count: 2906
   genus: Prochlorococcus
   growth_phases:
   - acute_stress

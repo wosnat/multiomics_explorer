@@ -1153,14 +1153,9 @@ def build_gene_overview_summary(
         "         [g IN found | coalesce(g.merops_classes, [])])) AS by_merops_class,\n"
         "       size([g IN found WHERE\n"
         "           coalesce(g.ncbifam_family_count, 0) > 0]) AS has_ncbifam,\n"
-        # Family-count rollups (backlog 3.4): has_tcdb counts genes with >=1
-        # deepest-attachment TCDB edge (live edge predicate, not the KG's
-        # Gene.tcdb_family_count precompute which counts superseded ancestors);
-        # has_cazy reads the flat-ontology precompute.
-        "       size([g IN found WHERE EXISTS {\n"
-        "         MATCH (g)-[r:Gene_has_tcdb_family]->(:TcdbFamily)\n"
-        "         WHERE r.attachment_depth = 'most_specific'\n"
-        "       }]) AS has_tcdb,\n"
+        # Family-count rollups (backlog 3.4): both read the KG precomputes
+        # (tcdb_family_count = deepest-attachment edges only; cazy is flat).
+        "       size([g IN found WHERE coalesce(g.tcdb_family_count, 0) > 0]) AS has_tcdb,\n"
         "       size([g IN found WHERE coalesce(g.cazy_family_count, 0) > 0]) AS has_cazy,\n"
         "       not_found"
     )
@@ -1292,14 +1287,12 @@ def build_gene_overview(
         # means "no MEROPS call", which is not the same as a weak one.
         "       coalesce(g.merops_classes, []) AS merops_classes,\n"
         "       coalesce(g.ncbifam_family_count, 0) AS ncbifam_family_count,\n"
-        # TCDB family count at the deepest attachment only (backlog 3.4). The
-        # KG's Gene.tcdb_family_count precompute counts every edge incl.
-        # superseded ancestors — the transporter_count defect — so count live
-        # on the edge prop (exactly equivalent to
-        # TCDB_DEEPEST_ATTACHMENT_PREDICATE). CAZy is flat, so its precompute
-        # is safe to read.
-        "       size([(g)-[r:Gene_has_tcdb_family]->(:TcdbFamily)\n"
-        "             WHERE r.attachment_depth = 'most_specific' | r]) AS tcdb_family_count,\n"
+        # TCDB family count at the deepest attachment only (backlog 3.4).
+        # Gene.tcdb_family_count is a KG precompute over the
+        # attachment_depth='most_specific' edges (aligned in the 2026-08-29
+        # rebuild; test_trust_invariants guards it against the live edge
+        # count). CAZy is flat, so its precompute is exact by construction.
+        "       coalesce(g.tcdb_family_count, 0) AS tcdb_family_count,\n"
         "       coalesce(g.cazy_family_count, 0) AS cazy_family_count,\n"
         "       g.merops_evidence_score_max AS merops_evidence_score_max,\n"
         f"       evidence_sources{verbose_cols}\n"

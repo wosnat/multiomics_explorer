@@ -29,8 +29,8 @@ families `metabolites_by_gene`'s transport arm walks.
       multiplicity (see §KG dependencies) → explorer computes live; KG ask filed
       (`docs/kg-specs/2026-08-29-gene-overview-family-counts-asks.md`, P3, non-blocking).
 - [x] Cypher verified against live KG.
-- [ ] Spec frozen (user approval).
-- [ ] Ready for Phase 2.
+- [x] Spec frozen (user approval, 2026-08-29).
+- [x] Shipped to main 2026-08-29; KG ask landed the same day and the explorer now reads `coalesce(g.tcdb_family_count, 0)` (see Follow-up).
 
 ## Use cases / chains
 

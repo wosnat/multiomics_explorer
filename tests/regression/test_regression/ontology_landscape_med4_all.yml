@@ -2,7 +2,7 @@ case_id: ontology_landscape_med4_all
 row_count: 80
 rows:
 - best_effort_share: null
-  genome_coverage: 0.6144
+  genome_coverage: 0.6153
   level: 0
   max_genes_per_term: 118
   median_genes_per_term: 13.0
@@ -15,7 +15,7 @@ rows:
   q3_genes_per_term: 21.0
   relevance_rank: 1
 - best_effort_share: 0.2
-  genome_coverage: 0.5815
+  genome_coverage: 0.5824
   level: 2
   max_genes_per_term: 318
   median_genes_per_term: 26.0
@@ -28,7 +28,7 @@ rows:
   q3_genes_per_term: 98.5
   relevance_rank: 2
 - best_effort_share: null
-  genome_coverage: 0.5607
+  genome_coverage: 0.5616
   level: 1
   max_genes_per_term: 213
   median_genes_per_term: 14.0
@@ -41,7 +41,7 @@ rows:
   q3_genes_per_term: 23.0
   relevance_rank: 3
 - best_effort_share: 0.1944
-  genome_coverage: 0.5602
+  genome_coverage: 0.5611
   level: 3
   max_genes_per_term: 489
   median_genes_per_term: 19.5
@@ -54,7 +54,7 @@ rows:
   q3_genes_per_term: 42.25
   relevance_rank: 4
 - best_effort_share: 0.2029
-  genome_coverage: 0.545
+  genome_coverage: 0.5459
   level: 3
   max_genes_per_term: 403
   median_genes_per_term: 13.0
@@ -67,12 +67,12 @@ rows:
   q3_genes_per_term: 38.0
   relevance_rank: 5
 - best_effort_share: 0.406
-  genome_coverage: 0.5025
+  genome_coverage: 0.5028
   level: 4
   max_genes_per_term: 292
   median_genes_per_term: 13.0
   min_genes_per_term: 5
-  n_genes_at_level: 993
+  n_genes_at_level: 992
   n_levels_in_ontology: 9
   n_terms_with_genes: 133
   ontology_type: go_bp
@@ -80,7 +80,7 @@ rows:
   q3_genes_per_term: 38.0
   relevance_rank: 6
 - best_effort_share: 0.2
-  genome_coverage: 0.4843
+  genome_coverage: 0.485
   level: 4
   max_genes_per_term: 308
   median_genes_per_term: 16.0
@@ -93,7 +93,7 @@ rows:
   q3_genes_per_term: 25.0
   relevance_rank: 7
 - best_effort_share: 0.6294
-  genome_coverage: 0.4464
+  genome_coverage: 0.447
   level: 5
   max_genes_per_term: 219
   median_genes_per_term: 11.0
@@ -106,20 +106,20 @@ rows:
   q3_genes_per_term: 24.5
   relevance_rank: 8
 - best_effort_share: null
-  genome_coverage: 0.4393
+  genome_coverage: 0.4374
   level: 0
   max_genes_per_term: 148
   median_genes_per_term: 7.0
   min_genes_per_term: 5
-  n_genes_at_level: 868
+  n_genes_at_level: 863
   n_levels_in_ontology: 2
-  n_terms_with_genes: 78
+  n_terms_with_genes: 77
   ontology_type: pfam
   q1_genes_per_term: 6.0
-  q3_genes_per_term: 11.75
+  q3_genes_per_term: 12.0
   relevance_rank: 9
 - best_effort_share: null
-  genome_coverage: 0.5633
+  genome_coverage: 0.5641
   level: 0
   max_genes_per_term: 150
   median_genes_per_term: 65.0
@@ -131,21 +131,8 @@ rows:
   q1_genes_per_term: 32.0
   q3_genes_per_term: 102.0
   relevance_rank: 10
-- best_effort_share: null
-  genome_coverage: 0.4028
-  level: 1
-  max_genes_per_term: 91
-  median_genes_per_term: 17.0
-  min_genes_per_term: 5
-  n_genes_at_level: 796
-  n_levels_in_ontology: 4
-  n_terms_with_genes: 36
-  ontology_type: ec
-  q1_genes_per_term: 9.75
-  q3_genes_per_term: 36.75
-  relevance_rank: 11
 - best_effort_share: 0.3889
-  genome_coverage: 0.4028
+  genome_coverage: 0.4034
   level: 2
   max_genes_per_term: 434
   median_genes_per_term: 39.0
@@ -156,9 +143,22 @@ rows:
   ontology_type: go_cc
   q1_genes_per_term: 13.5
   q3_genes_per_term: 149.75
+  relevance_rank: 11
+- best_effort_share: null
+  genome_coverage: 0.4029
+  level: 1
+  max_genes_per_term: 91
+  median_genes_per_term: 17.0
+  min_genes_per_term: 5
+  n_genes_at_level: 795
+  n_levels_in_ontology: 4
+  n_terms_with_genes: 36
+  ontology_type: ec
+  q1_genes_per_term: 9.0
+  q3_genes_per_term: 36.75
   relevance_rank: 12
 - best_effort_share: null
-  genome_coverage: 0.3861
+  genome_coverage: 0.3867
   level: 1
   max_genes_per_term: 164
   median_genes_per_term: 28.0
@@ -171,7 +171,7 @@ rows:
   q3_genes_per_term: 45.25
   relevance_rank: 13
 - best_effort_share: null
-  genome_coverage: 0.5663
+  genome_coverage: 0.5672
   level: 0
   max_genes_per_term: 242
   median_genes_per_term: 73.5
@@ -184,7 +184,7 @@ rows:
   q3_genes_per_term: 117.25
   relevance_rank: 14
 - best_effort_share: null
-  genome_coverage: 0.3765
+  genome_coverage: 0.3771
   level: 2
   max_genes_per_term: 254
   median_genes_per_term: 12.0
@@ -197,7 +197,7 @@ rows:
   q3_genes_per_term: 18.0
   relevance_rank: 15
 - best_effort_share: null
-  genome_coverage: 0.3446
+  genome_coverage: 0.3452
   level: 2
   max_genes_per_term: 48
   median_genes_per_term: 9.0
@@ -210,7 +210,7 @@ rows:
   q3_genes_per_term: 17.0
   relevance_rank: 16
 - best_effort_share: null
-  genome_coverage: 0.33
+  genome_coverage: 0.3305
   interpro_type: HOMOLOGOUS_SUPERFAMILY
   level: 0
   max_genes_per_term: 119
@@ -224,7 +224,7 @@ rows:
   q3_genes_per_term: 11.75
   relevance_rank: 17
 - best_effort_share: 0.2955
-  genome_coverage: 0.3239
+  genome_coverage: 0.3244
   level: 5
   max_genes_per_term: 233
   median_genes_per_term: 10.0
@@ -237,7 +237,7 @@ rows:
   q3_genes_per_term: 20.25
   relevance_rank: 18
 - best_effort_share: null
-  genome_coverage: 0.3173
+  genome_coverage: 0.3178
   level: 1
   max_genes_per_term: 77
   median_genes_per_term: 14.0
@@ -252,7 +252,7 @@ rows:
   tree: enzymes
   tree_code: ko01000
 - best_effort_share: 0.7429
-  genome_coverage: 0.3168
+  genome_coverage: 0.3173
   level: 6
   max_genes_per_term: 168
   median_genes_per_term: 9.0
@@ -265,20 +265,20 @@ rows:
   q3_genes_per_term: 23.0
   relevance_rank: 20
 - best_effort_share: null
-  genome_coverage: 0.4327
+  genome_coverage: 0.4328
   level: 0
   max_genes_per_term: 304
   median_genes_per_term: 80.0
   min_genes_per_term: 60
-  n_genes_at_level: 855
+  n_genes_at_level: 854
   n_levels_in_ontology: 4
   n_terms_with_genes: 7
   ontology_type: ec
   q1_genes_per_term: 70.5
-  q3_genes_per_term: 176.0
+  q3_genes_per_term: 175.5
   relevance_rank: 21
 - best_effort_share: null
-  genome_coverage: 0.2561
+  genome_coverage: 0.2565
   level: 2
   max_genes_per_term: 33
   median_genes_per_term: 9.0
@@ -293,7 +293,7 @@ rows:
   tree: enzymes
   tree_code: ko01000
 - best_effort_share: 0.25
-  genome_coverage: 0.2227
+  genome_coverage: 0.223
   level: 2
   max_genes_per_term: 122
   median_genes_per_term: 19.5
@@ -306,7 +306,7 @@ rows:
   q3_genes_per_term: 38.5
   relevance_rank: 23
 - best_effort_share: null
-  genome_coverage: 0.3381
+  genome_coverage: 0.3386
   level: 0
   max_genes_per_term: 237
   median_genes_per_term: 77.0
@@ -321,7 +321,7 @@ rows:
   tree: enzymes
   tree_code: ko01000
 - best_effort_share: null
-  genome_coverage: 0.1872
+  genome_coverage: 0.1875
   level: 0
   max_genes_per_term: 343
   median_genes_per_term: 10.5
@@ -334,7 +334,7 @@ rows:
   q3_genes_per_term: 94.0
   relevance_rank: 25
 - best_effort_share: null
-  genome_coverage: 0.1802
+  genome_coverage: 0.1804
   level: 0
   max_genes_per_term: 188
   median_genes_per_term: 43.0
@@ -347,7 +347,7 @@ rows:
   q3_genes_per_term: 71.0
   relevance_rank: 26
 - best_effort_share: 0.6471
-  genome_coverage: 0.1802
+  genome_coverage: 0.1804
   level: 3
   max_genes_per_term: 171
   median_genes_per_term: 12.5
@@ -360,7 +360,7 @@ rows:
   q3_genes_per_term: 36.75
   relevance_rank: 27
 - best_effort_share: 0.125
-  genome_coverage: 0.1766
+  genome_coverage: 0.1769
   level: 1
   max_genes_per_term: 155
   median_genes_per_term: 15.0
@@ -373,7 +373,7 @@ rows:
   q3_genes_per_term: 108.0
   relevance_rank: 28
 - best_effort_share: 0.0
-  genome_coverage: 0.1751
+  genome_coverage: 0.1754
   level: 1
   max_genes_per_term: 124
   median_genes_per_term: 19.0
@@ -386,20 +386,7 @@ rows:
   q3_genes_per_term: 52.0
   relevance_rank: 29
 - best_effort_share: null
-  genome_coverage: 0.1741
-  level: 1
-  max_genes_per_term: 27
-  median_genes_per_term: 6.0
-  min_genes_per_term: 5
-  n_genes_at_level: 344
-  n_levels_in_ontology: 2
-  n_terms_with_genes: 64
-  ontology_type: pfam
-  q1_genes_per_term: 5.0
-  q3_genes_per_term: 7.0
-  relevance_rank: 30
-- best_effort_share: null
-  genome_coverage: 0.1731
+  genome_coverage: 0.1733
   level: 1
   max_genes_per_term: 133
   median_genes_per_term: 26.0
@@ -410,9 +397,22 @@ rows:
   ontology_type: tcdb
   q1_genes_per_term: 15.0
   q3_genes_per_term: 49.0
+  relevance_rank: 30
+- best_effort_share: null
+  genome_coverage: 0.1718
+  level: 1
+  max_genes_per_term: 27
+  median_genes_per_term: 6.0
+  min_genes_per_term: 5
+  n_genes_at_level: 339
+  n_levels_in_ontology: 2
+  n_terms_with_genes: 63
+  ontology_type: pfam
+  q1_genes_per_term: 5.0
+  q3_genes_per_term: 7.0
   relevance_rank: 31
 - best_effort_share: null
-  genome_coverage: 0.1695
+  genome_coverage: 0.1698
   level: 2
   max_genes_per_term: 51
   median_genes_per_term: 13.0
@@ -425,7 +425,7 @@ rows:
   q3_genes_per_term: 26.0
   relevance_rank: 32
 - best_effort_share: 0.7872
-  genome_coverage: 0.1483
+  genome_coverage: 0.1485
   level: 7
   max_genes_per_term: 53
   median_genes_per_term: 9.0
@@ -438,7 +438,7 @@ rows:
   q3_genes_per_term: 18.0
   relevance_rank: 33
 - best_effort_share: null
-  genome_coverage: 0.1493
+  genome_coverage: 0.1495
   level: 0
   max_genes_per_term: 161
   median_genes_per_term: 52.0
@@ -451,7 +451,7 @@ rows:
   q3_genes_per_term: 81.0
   relevance_rank: 34
 - best_effort_share: null
-  genome_coverage: 0.1432
+  genome_coverage: 0.1434
   interpro_type: DOMAIN
   level: 0
   max_genes_per_term: 49
@@ -465,7 +465,7 @@ rows:
   q3_genes_per_term: 7.0
   relevance_rank: 35
 - best_effort_share: 0.4
-  genome_coverage: 0.1225
+  genome_coverage: 0.1227
   level: 6
   max_genes_per_term: 86
   median_genes_per_term: 14.5
@@ -478,7 +478,7 @@ rows:
   q3_genes_per_term: 33.5
   relevance_rank: 36
 - best_effort_share: 0.8
-  genome_coverage: 0.1154
+  genome_coverage: 0.1156
   level: 4
   max_genes_per_term: 157
   median_genes_per_term: 15.5
@@ -491,7 +491,7 @@ rows:
   q3_genes_per_term: 31.0
   relevance_rank: 37
 - best_effort_share: null
-  genome_coverage: 0.0997
+  genome_coverage: 0.0998
   level: 2
   max_genes_per_term: 65
   median_genes_per_term: 8.0
@@ -504,7 +504,7 @@ rows:
   q3_genes_per_term: 10.75
   relevance_rank: 38
 - best_effort_share: 0.3333
-  genome_coverage: 0.0926
+  genome_coverage: 0.0928
   level: 5
   max_genes_per_term: 77
   median_genes_per_term: 15.5
@@ -517,7 +517,7 @@ rows:
   q3_genes_per_term: 47.25
   relevance_rank: 39
 - best_effort_share: 0.75
-  genome_coverage: 0.0709
+  genome_coverage: 0.071
   level: 8
   max_genes_per_term: 40
   median_genes_per_term: 8.0
@@ -530,7 +530,7 @@ rows:
   q3_genes_per_term: 13.5
   relevance_rank: 40
 - best_effort_share: null
-  genome_coverage: 0.0541
+  genome_coverage: 0.0542
   level: 0
   max_genes_per_term: 92
   median_genes_per_term: 53.5
@@ -556,7 +556,7 @@ rows:
   q3_genes_per_term: 16.0
   relevance_rank: 42
 - best_effort_share: null
-  genome_coverage: 0.043
+  genome_coverage: 0.0431
   level: 0
   max_genes_per_term: 49
   median_genes_per_term: 30.0
@@ -642,7 +642,7 @@ rows:
   tree: trna_biogenesis
   tree_code: ko03016
 - best_effort_share: null
-  genome_coverage: 0.0273
+  genome_coverage: 0.0274
   level: 2
   max_genes_per_term: 31
   median_genes_per_term: 23.0
@@ -656,38 +656,8 @@ rows:
   relevance_rank: 49
   tree: ribosome
   tree_code: ko03011
-- best_effort_share: null
-  genome_coverage: 0.0273
-  level: 0
-  max_genes_per_term: 54
-  median_genes_per_term: 54.0
-  min_genes_per_term: 54
-  n_genes_at_level: 54
-  n_levels_in_ontology: 4
-  n_terms_with_genes: 1
-  ontology_type: brite
-  q1_genes_per_term: 54.0
-  q3_genes_per_term: 54.0
-  relevance_rank: 50
-  tree: ribosome
-  tree_code: ko03011
-- best_effort_share: null
-  genome_coverage: 0.0273
-  level: 1
-  max_genes_per_term: 54
-  median_genes_per_term: 54.0
-  min_genes_per_term: 30
-  n_genes_at_level: 54
-  n_levels_in_ontology: 4
-  n_terms_with_genes: 3
-  ontology_type: brite
-  q1_genes_per_term: 42.0
-  q3_genes_per_term: 54.0
-  relevance_rank: 51
-  tree: ribosome
-  tree_code: ko03011
 - best_effort_share: 0.0
-  genome_coverage: 0.1311
+  genome_coverage: 0.1313
   level: 1
   max_genes_per_term: 259
   median_genes_per_term: 259.0
@@ -698,7 +668,37 @@ rows:
   ontology_type: go_cc
   q1_genes_per_term: 259.0
   q3_genes_per_term: 259.0
+  relevance_rank: 50
+- best_effort_share: null
+  genome_coverage: 0.0274
+  level: 0
+  max_genes_per_term: 54
+  median_genes_per_term: 54.0
+  min_genes_per_term: 54
+  n_genes_at_level: 54
+  n_levels_in_ontology: 4
+  n_terms_with_genes: 1
+  ontology_type: brite
+  q1_genes_per_term: 54.0
+  q3_genes_per_term: 54.0
+  relevance_rank: 51
+  tree: ribosome
+  tree_code: ko03011
+- best_effort_share: null
+  genome_coverage: 0.0274
+  level: 1
+  max_genes_per_term: 54
+  median_genes_per_term: 54.0
+  min_genes_per_term: 30
+  n_genes_at_level: 54
+  n_levels_in_ontology: 4
+  n_terms_with_genes: 3
+  ontology_type: brite
+  q1_genes_per_term: 42.0
+  q3_genes_per_term: 54.0
   relevance_rank: 52
+  tree: ribosome
+  tree_code: ko03011
 - best_effort_share: null
   genome_coverage: 0.0233
   interpro_type: DOMAIN
@@ -742,7 +742,7 @@ rows:
   q3_genes_per_term: 26.5
   relevance_rank: 55
 - best_effort_share: null
-  genome_coverage: 0.0192
+  genome_coverage: 0.0193
   level: 0
   max_genes_per_term: 17
   median_genes_per_term: 16.0
@@ -826,7 +826,7 @@ rows:
   q3_genes_per_term: 6.0
   relevance_rank: 61
 - best_effort_share: null
-  genome_coverage: 0.0121
+  genome_coverage: 0.0122
   level: 0
   max_genes_per_term: 13
   median_genes_per_term: 6.0
@@ -841,7 +841,7 @@ rows:
   tree: chaperones
   tree_code: ko03110
 - best_effort_share: null
-  genome_coverage: 0.0111
+  genome_coverage: 0.0112
   level: 0
   max_genes_per_term: 22
   median_genes_per_term: 22.0
@@ -1000,7 +1000,7 @@ rows:
   tree: secretion
   tree_code: ko02044
 - best_effort_share: 1.0
-  genome_coverage: 0.004
+  genome_coverage: 0.0041
   level: 9
   max_genes_per_term: 8
   median_genes_per_term: 8.0

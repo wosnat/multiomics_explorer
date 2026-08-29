@@ -4,7 +4,7 @@ by_direction:
   n_significant: 16
   n_tests: 1171
 - direction: up
-  n_significant: 26
+  n_significant: 25
   n_tests: 1171
 by_experiment:
 - background_factors: null
@@ -33,7 +33,7 @@ by_experiment:
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   is_time_course: null
   n_clusters: 4
-  n_significant: 7
+  n_significant: 6
   n_tests: 268
   name: null
   omics_type: null
@@ -99,7 +99,7 @@ by_omics_type: []
 case_id: pathway_enrichment_med4_cyanorak_level1_10exp
 cluster_summary:
   n_clusters: 38
-  n_significant_max: 6
+  n_significant_max: 5
   n_significant_median: 0.5
   n_significant_min: 0
   n_tests_max: 67
@@ -159,7 +159,7 @@ enrichment_params:
 filters_applied: {}
 interpro_type: null
 level: 1
-n_significant: 42
+n_significant: 41
 no_expression: []
 not_found: []
 not_matched: []
@@ -1396,40 +1396,6 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 44
-  bg_ratio: 44/1424
-  bg_ratio_numeric: 0.0309
-  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
-    89|down
-  count: 14
-  direction: down
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
-  experiment_name: null
-  fold_enrichment: 2.221
-  gene_category: Coenzyme metabolism
-  gene_name: cbb3
-  gene_ratio: 14/204
-  gene_ratio_numeric: 0.0686
-  growth_phase: death
-  is_informative: true
-  is_time_course: null
-  level: 1
-  name: null
-  omics_type: null
-  p_adjust: 0.034
-  product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.0021
-  rich_factor: 0.3182
-  signed_score: -1.4681
-  table_scope: null
-  term_id: cyanorak.role:B.5
-  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
-  timepoint: day 89
-  timepoint_hours: 2136.0
-  timepoint_order: 3
-  treatment_type:
-  - nitrogen
-- background_factors: null
   bg_count: 22
   bg_ratio: 22/1424
   bg_ratio_numeric: 0.0154
@@ -1464,39 +1430,39 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1849
-  bg_ratio_numeric: 0.026
-  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
-    18|up
-  count: 19
-  direction: up
-  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  bg_count: 45
+  bg_ratio: 45/1424
+  bg_ratio_numeric: 0.0316
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|down
+  count: 14
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: null
-  fold_enrichment: 1.8027
+  fold_enrichment: 2.1717
   gene_category: Coenzyme metabolism
   gene_name: cbb3
-  gene_ratio: 19/406
-  gene_ratio_numeric: 0.0468
-  growth_phase: nutrient_limited
+  gene_ratio: 14/204
+  gene_ratio_numeric: 0.0686
+  growth_phase: death
   is_informative: true
   is_time_course: null
   level: 1
   name: null
   omics_type: null
-  p_adjust: 0.044
+  p_adjust: 0.0432
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.0039
-  rich_factor: 0.3958
-  signed_score: 1.357
+  pvalue: 0.0027
+  rich_factor: 0.3111
+  signed_score: -1.3642
   table_scope: null
   term_id: cyanorak.role:B.5
   term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
-  timepoint: day 18
-  timepoint_hours: 432.0
-  timepoint_order: 2
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
   treatment_type:
-  - coculture
+  - nitrogen
 - background_factors: null
   bg_count: 11
   bg_ratio: 11/1424
@@ -1670,6 +1636,40 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
+  bg_count: 49
+  bg_ratio: 49/1849
+  bg_ratio_numeric: 0.0265
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    18|up
+  count: 19
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.7659
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 19/406
+  gene_ratio_numeric: 0.0468
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.0575
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 0.0052
+  rich_factor: 0.3878
+  signed_score: 1.2401
+  table_scope: null
+  term_id: cyanorak.role:B.5
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 2
+  treatment_type:
+  - coculture
+- background_factors: null
   bg_count: 21
   bg_ratio: 21/1849
   bg_ratio_numeric: 0.0114
@@ -1738,16 +1738,16 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 44
-  bg_ratio: 44/1424
-  bg_ratio_numeric: 0.0309
+  bg_count: 45
+  bg_ratio: 45/1424
+  bg_ratio_numeric: 0.0316
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
     89|down
   count: 9
   direction: down
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: null
-  fold_enrichment: 3.166
+  fold_enrichment: 3.0957
   gene_category: Coenzyme metabolism
   gene_name: cbb3
   gene_ratio: 9/92
@@ -1760,8 +1760,8 @@ results:
   omics_type: null
   p_adjust: 0.0635
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.0014
-  rich_factor: 0.2045
+  pvalue: 0.0017
+  rich_factor: 0.2
   signed_score: -1.1973
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -2556,40 +2556,6 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 44
-  bg_ratio: 44/1424
-  bg_ratio_numeric: 0.0309
-  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
-    60|down
-  count: 7
-  direction: down
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  experiment_name: null
-  fold_enrichment: 3.0614
-  gene_category: Coenzyme metabolism
-  gene_name: cbb3
-  gene_ratio: 7/74
-  gene_ratio_numeric: 0.0946
-  growth_phase: nutrient_limited
-  is_informative: true
-  is_time_course: null
-  level: 1
-  name: null
-  omics_type: null
-  p_adjust: 0.1999
-  product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.0062
-  rich_factor: 0.1591
-  signed_score: -0.6991
-  table_scope: null
-  term_id: cyanorak.role:B.5
-  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
-  timepoint: day 60
-  timepoint_hours: 1440.0
-  timepoint_order: 3
-  treatment_type:
-  - nitrogen
-- background_factors: null
   bg_count: 10
   bg_ratio: 10/1424
   bg_ratio_numeric: 0.007
@@ -2624,37 +2590,37 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 44
-  bg_ratio: 44/1424
-  bg_ratio_numeric: 0.0309
-  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
-    31|down
-  count: 14
+  bg_count: 45
+  bg_ratio: 45/1424
+  bg_ratio_numeric: 0.0316
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    60|down
+  count: 7
   direction: down
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: null
-  fold_enrichment: 1.763
+  fold_enrichment: 2.9934
   gene_category: Coenzyme metabolism
   gene_name: cbb3
-  gene_ratio: 14/257
-  gene_ratio_numeric: 0.0545
-  growth_phase: death
+  gene_ratio: 7/74
+  gene_ratio_numeric: 0.0946
+  growth_phase: nutrient_limited
   is_informative: true
   is_time_course: null
   level: 1
   name: null
   omics_type: null
-  p_adjust: 0.229
+  p_adjust: 0.227
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.0179
-  rich_factor: 0.3182
-  signed_score: -0.6401
+  pvalue: 0.0071
+  rich_factor: 0.1556
+  signed_score: -0.6439
   table_scope: null
   term_id: cyanorak.role:B.5
   term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
-  timepoint: day 31
-  timepoint_hours: 744.0
-  timepoint_order: 2
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
   treatment_type:
   - nitrogen
 - background_factors: null
@@ -2723,6 +2689,74 @@ results:
   timepoint: steady state
   timepoint_hours: .nan
   timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 45
+  bg_ratio: 45/1424
+  bg_ratio_numeric: 0.0316
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 14
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.7238
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 14/257
+  gene_ratio_numeric: 0.0545
+  growth_phase: death
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.2799
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 0.0219
+  rich_factor: 0.3111
+  signed_score: -0.5529
+  table_scope: null
+  term_id: cyanorak.role:B.5
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 45
+  bg_ratio: 45/1424
+  bg_ratio_numeric: 0.0316
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    31|down
+  count: 9
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 2.0788
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 9/137
+  gene_ratio_numeric: 0.0657
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.3028
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 0.0237
+  rich_factor: 0.2
+  signed_score: -0.5188
+  table_scope: null
+  term_id: cyanorak.role:B.5
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
   treatment_type:
   - nitrogen
 - background_factors: null
@@ -4022,40 +4056,6 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 44
-  bg_ratio: 44/1424
-  bg_ratio_numeric: 0.0309
-  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|days
-    60+89|down
-  count: 6
-  direction: down
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  experiment_name: null
-  fold_enrichment: 2.5218
-  gene_category: Coenzyme metabolism
-  gene_name: cbb3
-  gene_ratio: 6/77
-  gene_ratio_numeric: 0.0779
-  growth_phase: nutrient_limited
-  is_informative: true
-  is_time_course: null
-  level: 1
-  name: null
-  omics_type: null
-  p_adjust: 0.5969
-  product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.028
-  rich_factor: 0.1364
-  signed_score: -0.2241
-  table_scope: null
-  term_id: cyanorak.role:B.5
-  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
-  timepoint: days 60+89
-  timepoint_hours: .nan
-  timepoint_order: 5
-  treatment_type:
-  - nitrogen
-- background_factors: null
   bg_count: 12
   bg_ratio: 12/1424
   bg_ratio_numeric: 0.0084
@@ -4703,6 +4703,40 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
+  bg_count: 45
+  bg_ratio: 45/1424
+  bg_ratio_numeric: 0.0316
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|days
+    60+89|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 2.4658
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 6/77
+  gene_ratio_numeric: 0.0779
+  growth_phase: nutrient_limited
+  is_informative: true
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 0.6597
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 0.0309
+  rich_factor: 0.1333
+  signed_score: -0.1806
+  table_scope: null
+  term_id: cyanorak.role:B.5
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
   bg_count: 8
   bg_ratio: 8/1424
   bg_ratio_numeric: 0.0056
@@ -4768,40 +4802,6 @@ results:
   timepoint: day 60
   timepoint_hours: 1440.0
   timepoint_order: 3
-  treatment_type:
-  - nitrogen
-- background_factors: null
-  bg_count: 44
-  bg_ratio: 44/1424
-  bg_ratio_numeric: 0.0309
-  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
-    31|down
-  count: 8
-  direction: down
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  experiment_name: null
-  fold_enrichment: 1.8898
-  gene_category: Coenzyme metabolism
-  gene_name: cbb3
-  gene_ratio: 8/137
-  gene_ratio_numeric: 0.0584
-  growth_phase: nutrient_limited
-  is_informative: true
-  is_time_course: null
-  level: 1
-  name: null
-  omics_type: null
-  p_adjust: 0.6863
-  product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.0536
-  rich_factor: 0.1818
-  signed_score: -0.1635
-  table_scope: null
-  term_id: cyanorak.role:B.5
-  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
-  timepoint: day 31
-  timepoint_hours: 744.0
-  timepoint_order: 2
   treatment_type:
   - nitrogen
 - background_factors: null
@@ -6093,16 +6093,16 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 44
-  bg_ratio: 44/1424
-  bg_ratio_numeric: 0.0309
+  bg_count: 45
+  bg_ratio: 45/1424
+  bg_ratio_numeric: 0.0316
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
     14|down
   count: 5
   direction: down
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: null
-  fold_enrichment: 1.7033
+  fold_enrichment: 1.6655
   gene_category: Coenzyme metabolism
   gene_name: cbb3
   gene_ratio: 5/95
@@ -6115,8 +6115,8 @@ results:
   omics_type: null
   p_adjust: 0.8608
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.1648
-  rich_factor: 0.1136
+  pvalue: 0.1762
+  rich_factor: 0.1111
   signed_score: -0.0651
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -8704,9 +8704,9 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1697
-  bg_ratio_numeric: 0.0283
+  bg_count: 49
+  bg_ratio: 49/1697
+  bg_ratio_numeric: 0.0289
   cluster: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray|steady
     state|down
   count: 0
@@ -10857,9 +10857,9 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1697
-  bg_ratio_numeric: 0.0283
+  bg_count: 49
+  bg_ratio: 49/1697
+  bg_ratio_numeric: 0.0289
   cluster: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray|steady
     state|up
   count: 0
@@ -13043,9 +13043,9 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1697
-  bg_ratio_numeric: 0.0283
+  bg_count: 49
+  bg_ratio: 49/1697
+  bg_ratio_numeric: 0.0289
   cluster: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray|steady
     state|down
   count: 0
@@ -15264,9 +15264,9 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1697
-  bg_ratio_numeric: 0.0283
+  bg_count: 49
+  bg_ratio: 49/1697
+  bg_ratio_numeric: 0.0289
   cluster: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray|steady
     state|up
   count: 0
@@ -17518,9 +17518,9 @@ results:
   treatment_type:
   - coculture
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1849
-  bg_ratio_numeric: 0.026
+  bg_count: 49
+  bg_ratio: 49/1849
+  bg_ratio_numeric: 0.0265
   cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
     11|down
   count: 0
@@ -19807,9 +19807,9 @@ results:
   treatment_type:
   - coculture
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1849
-  bg_ratio_numeric: 0.026
+  bg_count: 49
+  bg_ratio: 49/1849
+  bg_ratio_numeric: 0.0265
   cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
     11|up
   count: 0
@@ -22028,20 +22028,20 @@ results:
   treatment_type:
   - coculture
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1849
-  bg_ratio_numeric: 0.026
+  bg_count: 49
+  bg_ratio: 49/1849
+  bg_ratio_numeric: 0.0265
   cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
     18|down
-  count: 5
+  count: 6
   direction: down
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: null
-  fold_enrichment: 0.6057
+  fold_enrichment: 0.712
   gene_category: Coenzyme metabolism
   gene_name: cbb3
-  gene_ratio: 5/318
-  gene_ratio_numeric: 0.0157
+  gene_ratio: 6/318
+  gene_ratio_numeric: 0.0189
   growth_phase: nutrient_limited
   is_informative: true
   is_time_course: null
@@ -22050,8 +22050,8 @@ results:
   omics_type: null
   p_adjust: 1.0
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.9354
-  rich_factor: 0.1042
+  pvalue: 0.8724
+  rich_factor: 0.1224
   signed_score: 0.0
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -27599,9 +27599,9 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 44
-  bg_ratio: 44/1424
-  bg_ratio_numeric: 0.0309
+  bg_count: 45
+  bg_ratio: 45/1424
+  bg_ratio_numeric: 0.0316
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
     14|up
   count: 0
@@ -31357,20 +31357,20 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 44
-  bg_ratio: 44/1424
-  bg_ratio_numeric: 0.0309
+  bg_count: 45
+  bg_ratio: 45/1424
+  bg_ratio_numeric: 0.0316
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
     31|up
-  count: 2
+  count: 3
   direction: up
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: null
-  fold_enrichment: 0.2452
+  fold_enrichment: 0.3596
   gene_category: Coenzyme metabolism
   gene_name: cbb3
-  gene_ratio: 2/264
-  gene_ratio_numeric: 0.0076
+  gene_ratio: 3/264
+  gene_ratio_numeric: 0.0114
   growth_phase: death
   is_informative: true
   is_time_course: null
@@ -31379,8 +31379,8 @@ results:
   omics_type: null
   p_adjust: 1.0
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.9988
-  rich_factor: 0.0455
+  pvalue: 0.9944
+  rich_factor: 0.0667
   signed_score: -0.0
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -34636,16 +34636,16 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 44
-  bg_ratio: 44/1424
-  bg_ratio_numeric: 0.0309
+  bg_count: 45
+  bg_ratio: 45/1424
+  bg_ratio_numeric: 0.0316
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
     89|up
   count: 2
   direction: up
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: null
-  fold_enrichment: 0.2194
+  fold_enrichment: 0.2145
   gene_category: Coenzyme metabolism
   gene_name: cbb3
   gene_ratio: 2/295
@@ -34658,8 +34658,8 @@ results:
   omics_type: null
   p_adjust: 1.0
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.9996
-  rich_factor: 0.0455
+  pvalue: 0.9997
+  rich_factor: 0.0444
   signed_score: -0.0
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -36446,9 +36446,9 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 44
-  bg_ratio: 44/1424
-  bg_ratio_numeric: 0.0309
+  bg_count: 45
+  bg_ratio: 45/1424
+  bg_ratio_numeric: 0.0316
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
     18|down
   count: 0
@@ -38564,16 +38564,16 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 44
-  bg_ratio: 44/1424
-  bg_ratio_numeric: 0.0309
+  bg_count: 45
+  bg_ratio: 45/1424
+  bg_ratio_numeric: 0.0316
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
     18|up
   count: 1
   direction: up
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: null
-  fold_enrichment: 0.9247
+  fold_enrichment: 0.9041
   gene_category: Coenzyme metabolism
   gene_name: cbb3
   gene_ratio: 1/35
@@ -38586,8 +38586,8 @@ results:
   omics_type: null
   p_adjust: 1.0
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.6711
-  rich_factor: 0.0227
+  pvalue: 0.6795
+  rich_factor: 0.0222
   signed_score: -0.0
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -42663,16 +42663,16 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 44
-  bg_ratio: 44/1424
-  bg_ratio_numeric: 0.0309
+  bg_count: 45
+  bg_ratio: 45/1424
+  bg_ratio_numeric: 0.0316
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
     31|up
   count: 1
   direction: up
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: null
-  fold_enrichment: 0.2916
+  fold_enrichment: 0.2851
   gene_category: Coenzyme metabolism
   gene_name: cbb3
   gene_ratio: 1/111
@@ -42685,8 +42685,8 @@ results:
   omics_type: null
   p_adjust: 1.0
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.9734
-  rich_factor: 0.0227
+  pvalue: 0.9756
+  rich_factor: 0.0222
   signed_score: -0.0
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -46694,16 +46694,16 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 44
-  bg_ratio: 44/1424
-  bg_ratio_numeric: 0.0309
+  bg_count: 45
+  bg_ratio: 45/1424
+  bg_ratio_numeric: 0.0316
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
     60|up
   count: 1
   direction: up
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: null
-  fold_enrichment: 0.2232
+  fold_enrichment: 0.2182
   gene_category: Coenzyme metabolism
   gene_name: cbb3
   gene_ratio: 1/145
@@ -46716,8 +46716,8 @@ results:
   omics_type: null
   p_adjust: 1.0
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.9918
-  rich_factor: 0.0227
+  pvalue: 0.9927
+  rich_factor: 0.0222
   signed_score: -0.0
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -50452,16 +50452,16 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 44
-  bg_ratio: 44/1424
-  bg_ratio_numeric: 0.0309
+  bg_count: 45
+  bg_ratio: 45/1424
+  bg_ratio_numeric: 0.0316
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
     89|up
   count: 2
   direction: up
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: null
-  fold_enrichment: 0.402
+  fold_enrichment: 0.3931
   gene_category: Coenzyme metabolism
   gene_name: cbb3
   gene_ratio: 2/161
@@ -50474,8 +50474,8 @@ results:
   omics_type: null
   p_adjust: 1.0
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.9682
-  rich_factor: 0.0455
+  pvalue: 0.9713
+  rich_factor: 0.0444
   signed_score: -0.0
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -54379,16 +54379,16 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 44
-  bg_ratio: 44/1424
-  bg_ratio_numeric: 0.0309
+  bg_count: 45
+  bg_ratio: 45/1424
+  bg_ratio_numeric: 0.0316
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|days
     60+89|up
   count: 2
   direction: up
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: null
-  fold_enrichment: 0.4123
+  fold_enrichment: 0.4031
   gene_category: Coenzyme metabolism
   gene_name: cbb3
   gene_ratio: 2/157
@@ -54401,8 +54401,8 @@ results:
   omics_type: null
   p_adjust: 1.0
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.9642
-  rich_factor: 0.0455
+  pvalue: 0.9677
+  rich_factor: 0.0444
   signed_score: -0.0
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -56394,9 +56394,9 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1849
-  bg_ratio_numeric: 0.026
+  bg_count: 49
+  bg_ratio: 49/1849
+  bg_ratio_numeric: 0.0265
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
     18|down
   count: 0
@@ -58683,9 +58683,9 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1849
-  bg_ratio_numeric: 0.026
+  bg_count: 49
+  bg_ratio: 49/1849
+  bg_ratio_numeric: 0.0265
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
     18|up
   count: 0
@@ -60904,16 +60904,16 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1849
-  bg_ratio_numeric: 0.026
+  bg_count: 49
+  bg_ratio: 49/1849
+  bg_ratio_numeric: 0.0265
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
     31|down
   count: 7
   direction: down
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: null
-  fold_enrichment: 1.1474
+  fold_enrichment: 1.124
   gene_category: Coenzyme metabolism
   gene_name: cbb3
   gene_ratio: 7/235
@@ -60926,8 +60926,8 @@ results:
   omics_type: null
   p_adjust: 1.0
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.4107
-  rich_factor: 0.1458
+  pvalue: 0.4328
+  rich_factor: 0.1429
   signed_score: 0.0
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -62885,20 +62885,20 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1849
-  bg_ratio_numeric: 0.026
+  bg_count: 49
+  bg_ratio: 49/1849
+  bg_ratio_numeric: 0.0265
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
     31|up
-  count: 4
+  count: 5
   direction: up
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: null
-  fold_enrichment: 0.9877
+  fold_enrichment: 1.2094
   gene_category: Coenzyme metabolism
   gene_name: cbb3
-  gene_ratio: 4/156
-  gene_ratio_numeric: 0.0256
+  gene_ratio: 5/156
+  gene_ratio_numeric: 0.0321
   growth_phase: nutrient_limited
   is_informative: true
   is_time_course: null
@@ -62907,8 +62907,8 @@ results:
   omics_type: null
   p_adjust: 1.0
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.5877
-  rich_factor: 0.0833
+  pvalue: 0.3985
+  rich_factor: 0.102
   signed_score: -0.0
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -64969,16 +64969,16 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1849
-  bg_ratio_numeric: 0.026
+  bg_count: 49
+  bg_ratio: 49/1849
+  bg_ratio_numeric: 0.0265
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
     60|down
   count: 6
   direction: down
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: null
-  fold_enrichment: 1.0227
+  fold_enrichment: 1.0018
   gene_category: Coenzyme metabolism
   gene_name: cbb3
   gene_ratio: 6/226
@@ -64991,8 +64991,8 @@ results:
   omics_type: null
   p_adjust: 1.0
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.5438
-  rich_factor: 0.125
+  pvalue: 0.565
+  rich_factor: 0.1224
   signed_score: 0.0
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -66712,16 +66712,16 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1849
-  bg_ratio_numeric: 0.026
+  bg_count: 49
+  bg_ratio: 49/1849
+  bg_ratio_numeric: 0.0265
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
     60|up
   count: 4
   direction: up
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: null
-  fold_enrichment: 1.1499
+  fold_enrichment: 1.1264
   gene_category: Coenzyme metabolism
   gene_name: cbb3
   gene_ratio: 4/134
@@ -66734,8 +66734,8 @@ results:
   omics_type: null
   p_adjust: 1.0
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.4638
-  rich_factor: 0.0833
+  pvalue: 0.4802
+  rich_factor: 0.0816
   signed_score: -0.0
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -68966,16 +68966,16 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1849
-  bg_ratio_numeric: 0.026
+  bg_count: 49
+  bg_ratio: 49/1849
+  bg_ratio_numeric: 0.0265
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
     89|down
   count: 4
   direction: down
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: null
-  fold_enrichment: 0.9691
+  fold_enrichment: 0.9493
   gene_category: Coenzyme metabolism
   gene_name: cbb3
   gene_ratio: 4/159
@@ -68988,8 +68988,8 @@ results:
   omics_type: null
   p_adjust: 1.0
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.6034
-  rich_factor: 0.0833
+  pvalue: 0.6201
+  rich_factor: 0.0816
   signed_score: 0.0
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -71255,20 +71255,20 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1849
-  bg_ratio_numeric: 0.026
+  bg_count: 49
+  bg_ratio: 49/1849
+  bg_ratio_numeric: 0.0265
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
     89|up
-  count: 4
+  count: 5
   direction: up
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: null
-  fold_enrichment: 1.4267
+  fold_enrichment: 1.747
   gene_category: Coenzyme metabolism
   gene_name: cbb3
-  gene_ratio: 4/108
-  gene_ratio_numeric: 0.037
+  gene_ratio: 5/108
+  gene_ratio_numeric: 0.0463
   growth_phase: nutrient_limited
   is_informative: true
   is_time_course: null
@@ -71277,8 +71277,8 @@ results:
   omics_type: null
   p_adjust: 1.0
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.3067
-  rich_factor: 0.0833
+  pvalue: 0.1539
+  rich_factor: 0.102
   signed_score: -0.0
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -73442,16 +73442,16 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1849
-  bg_ratio_numeric: 0.026
+  bg_count: 49
+  bg_ratio: 49/1849
+  bg_ratio_numeric: 0.0265
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|days
     60+89|down
   count: 3
   direction: down
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: null
-  fold_enrichment: 0.6838
+  fold_enrichment: 0.6698
   gene_category: Coenzyme metabolism
   gene_name: cbb3
   gene_ratio: 3/169
@@ -73464,8 +73464,8 @@ results:
   omics_type: null
   p_adjust: 1.0
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.8305
-  rich_factor: 0.0625
+  pvalue: 0.841
+  rich_factor: 0.0612
   signed_score: 0.0
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -75629,20 +75629,20 @@ results:
   treatment_type:
   - nitrogen
 - background_factors: null
-  bg_count: 48
-  bg_ratio: 48/1849
-  bg_ratio_numeric: 0.026
+  bg_count: 49
+  bg_ratio: 49/1849
+  bg_ratio_numeric: 0.0265
   cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|days
     60+89|up
-  count: 4
+  count: 5
   direction: up
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: null
-  fold_enrichment: 1.3283
+  fold_enrichment: 1.6265
   gene_category: Coenzyme metabolism
   gene_name: cbb3
-  gene_ratio: 4/116
-  gene_ratio_numeric: 0.0345
+  gene_ratio: 5/116
+  gene_ratio_numeric: 0.0431
   growth_phase: nutrient_limited
   is_informative: true
   is_time_course: null
@@ -75651,8 +75651,8 @@ results:
   omics_type: null
   p_adjust: 1.0
   product: cofactor assembly of complex C subunit CBB3
-  pvalue: 0.3551
-  rich_factor: 0.0833
+  pvalue: 0.1897
+  rich_factor: 0.102
   signed_score: -0.0
   table_scope: null
   term_id: cyanorak.role:B.5
@@ -80086,7 +80086,7 @@ top_clusters_by_min_padj:
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   is_time_course: null
   min_padj: 1.3872803221176627e-15
-  n_significant: 6
+  n_significant: 5
   n_tests: 67
   name: null
   omics_type: null

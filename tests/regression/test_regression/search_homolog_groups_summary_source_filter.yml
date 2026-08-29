@@ -5,18 +5,18 @@ rows:
   - '{''count'': 430, ''item'': ''curated''}'
   by_source:
   - '{''count'': 430, ''item'': ''cyanorak''}'
-  score_max: 3.8651
-  score_median: 1.0681
+  score_max: 3.8659
+  score_median: 1.0683
   top_cog_categories:
   - '{''id'': ''cog.category:C'', ''count'': 157, ''name'': ''Energy production and
     conversion''}'
   - '{''id'': ''cog.category:G'', ''count'': 26, ''name'': ''Carbohydrate transport
     and metabolism''}'
-  - '{''id'': ''cog.category:H'', ''count'': 20, ''name'': ''Coenzyme transport and
+  - '{''id'': ''cog.category:H'', ''count'': 21, ''name'': ''Coenzyme transport and
     metabolism''}'
   - '{''id'': ''cog.category:P'', ''count'': 19, ''name'': ''Inorganic ion transport
     and metabolism''}'
-  - '{''id'': ''cog.category:S'', ''count'': 136, ''name'': ''Function unknown''}'
+  - '{''id'': ''cog.category:S'', ''count'': 138, ''name'': ''Function unknown''}'
   top_cyanorak_roles:
   - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 41, ''name'': ''Cellular processes
     > Adaptation/acclimation to atypical conditions and detoxification > Light''}'

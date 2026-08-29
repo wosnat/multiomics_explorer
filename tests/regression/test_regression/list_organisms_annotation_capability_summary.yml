@@ -187,7 +187,7 @@ results:
   - categorical
   - numeric
   experiment_count: 119
-  gene_count: 1976
+  gene_count: 1973
   genus: Prochlorococcus
   growth_phases:
   - acclimated_steady_state

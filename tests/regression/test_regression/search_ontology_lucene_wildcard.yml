@@ -1,7 +1,7 @@
 case_id: search_ontology_lucene_wildcard
 row_count: 37
 rows:
-- gene_count: 9412
+- gene_count: 9409
   id: ec:1.-.-.-
   is_informative: true
   level: 0

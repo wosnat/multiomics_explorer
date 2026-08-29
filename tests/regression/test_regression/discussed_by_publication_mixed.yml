@@ -28,21 +28,21 @@ results:
   organism: Prochlorococcus MIT9313
   prominence: central
 - doi: 10.1038/ismej.2016.70
-  entity_id: PMT0923
-  entity_kind: gene
-  entity_name: bacteriocin-type signal sequence
-  organism: Prochlorococcus MIT9313
-  prominence: central
-- doi: 10.1038/ismej.2016.70
   entity_id: PMT0925
   entity_kind: gene
   entity_name: conserved hypothetical protein
   organism: Prochlorococcus MIT9313
   prominence: central
 - doi: 10.1038/ismej.2016.70
-  entity_id: PMT0928
+  entity_id: PMT0943
   entity_kind: gene
-  entity_name: bacteriocin-type signal sequence
+  entity_name: hypothetical protein
+  organism: Prochlorococcus MIT9313
+  prominence: central
+- doi: 10.1038/ismej.2016.70
+  entity_id: PMT0956
+  entity_kind: gene
+  entity_name: possible kinesin motor domain
   organism: Prochlorococcus MIT9313
   prominence: central
 returned: 5
