@@ -2,7 +2,7 @@
 # Live ControlledVocabulary values for the properties the docs quote.
 # tests/unit/test_docs_lint.py reads this offline; the -m kg test in
 # tests/integration/test_docs_kg_claims.py asserts it matches the live KG.
-kg_built_at: '2026-08-29T18:29:37.625Z'
+kg_built_at: '2026-08-29T20:27:48.162Z'
 vocabularies:
   attachment_depth:
     Gene_has_tcdb_family:
