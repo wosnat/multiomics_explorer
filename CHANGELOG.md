@@ -29,6 +29,11 @@ version becomes `0.1.0-alpha.5` and the KG's `mcp_min_version` must be
 coordinated to `0.1.0a5` ahead of the KG release.
 
 ### Added
+- Docs lint suite `tests/unit/test_docs_lint.py` (link integrity, stale identifiers from `inputs/lint/stale_identifiers.yaml`, quoted vocabulary values vs `inputs/lint/vocab_snapshot.yaml`, CLAUDE.md table shape, tool-inventory coherence incl. `start_here` routing) + `tests/integration/test_docs_kg_claims.py` (`-m kg`: every KG number the docs quote, from `inputs/lint/kg_claims.yaml`; vocab snapshot == live).
+- `scripts/refresh_examples.py` — executes every YAML example `call` through an in-memory MCP client and rewrites (`--write`) or checks (`--check`) the `response:` block against the live KG; `tests/integration/test_about_examples.py::test_example_response_values_match_live` fails on drift. Example entries accept `illustrative: true` + `note:`.
+- `scripts/snapshot_vocab.py` — regenerates the offline vocabulary snapshot after a KG rebuild.
+- `docs://examples/annotation_evidence.py` registered (was referenced but not served); `examples/pathway_enrichment.py` rebuilt with the `--scenario landscape|de|cluster|ortholog|custom` interface.
+- KG handoff `docs/kg-specs/2026-08-29-docs-review-kg-asks.md` (DOC-001..008).
 
 - **Bare / xref metabolite-ID coercion** (backlog 3.2, closes KG-MET-014
   explorer-side). Every `metabolite_ids` / `exclude_metabolite_ids`
@@ -159,6 +164,8 @@ coordinated to `0.1.0a5` ahead of the KG release.
 - Spec: `docs/tool-specs/2026-08-20-tcdb-substrate-depth-migration.md`.
 
 ### Changed
+- **Docs review sweep (2026-08-29):** every served doc surface re-verified against code and the live KG. Highlights: treatment / background vocabulary values quoted in ~40 sites replaced with live values; organism-matching described uniformly (word-based on `preferred_name` + `name_synonyms`); `not_found` shapes documented as the three real forms; `organism_gene_count` subtree scope on both tools; `informative_only` defaults and KEGG informativeness described as live (KO-level only — `ko01100` is not flagged; `map00001` never existed); evidence-rung glosses replaced by one canonical section in `docs://analysis/annotation_evidence` (eggNOG-only GO/EC/Pfam/CAZy edges read `curated` today — KG ask DOC-001); TIGR two-level hierarchy + NCBIfam→TigrRole router surfaced in concepts / `ontology_term_details` / annotation_evidence; `enrichment.md` rewritten with runnable recipes (773 → 532 lines); `concepts.md` inline node counts dropped; CLAUDE.md tool table trimmed to routing one-liners (≤ ~620 chars/row) and the removed CLI struck from CLAUDE.md / README; every YAML example response regenerated from the live KG (`scripts/refresh_examples.py --write`) and fabricated example inputs replaced with real IDs.
+- Generator: `## Common mistakes` heading always; union param types render every arm (`string | list[string] | None`); package-import key list no longer drops `returned` / `truncated`; ontology pages carry an "Applicable filter types" section instead of empty vocabulary boilerplate; `index.md` gains Levels / Hierarchy / Trust columns; `_NODE_PROP_NOTES` filled for every ontology label prop.
 
 - `search_ontology.organism_gene_count` (and the `min_gene_count` floor when
   `organism` is set) is now SUBTREE-scoped — term + descendants, the same
@@ -319,6 +326,8 @@ coordinated to `0.1.0a5` ahead of the KG release.
   substrate-depth migration below, `transporter_gene_count > 0`.
 
 ### Fixed
+- `cluster_enrichment` / `pathway_enrichment` envelope rows emitted NaN for clusters with no description text (pandas str-column hole), which the MCP layer rejected; rows now carry `None`.
+- Outfacing-doc lint no longer scans inside ```example-response fences (live KG payloads are data, not prose).
 
 - `docs://ontologies/index` summary column no longer truncates at the
   YAML line wrap: summaries end at the first sentence (or a word boundary

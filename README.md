@@ -1,13 +1,12 @@
 # Multiomics Explorer
 
-Tools for exploring a Prochlorococcus/Alteromonas multi-omics knowledge graph. Provides an MCP server for Claude Code integration, a CLI, and a LangChain agent for natural language queries against Neo4j.
+Tools for exploring a Prochlorococcus/Alteromonas multi-omics knowledge graph. Provides an MCP server for Claude Code and a Python package for scripting against the same Neo4j graph.
 
 ## Prerequisites
 
 - Python 3.11+
 - [uv](https://docs.astral.sh/uv/) package manager
 - Running Neo4j instance with the multi-omics KG (built by [multiomics_biocypher_kg](https://github.com/wosnat/multiomics_biocypher_kg))
-- API key for your LLM provider (Anthropic, OpenAI, etc.)
 
 ## Quick Start
 
@@ -16,16 +15,19 @@ Tools for exploring a Prochlorococcus/Alteromonas multi-omics knowledge graph. P
 git clone <repo-url>
 cd multiomics_explorer
 cp .env.example .env
-# Edit .env with your API key and Neo4j settings
+# Edit .env with your Neo4j settings
 
 uv sync
+
+# Verify the Neo4j connection
+uv run python scripts/validate_connection.py
 ```
 
 ### MCP Server (Claude Code integration)
 
-The MCP server exposes the KG to Claude Code with specialized tools. See tool tracker below for the full list.
+The MCP server exposes the KG to Claude Code through 42 typed tools (gene identity, expression, orthology, ontologies, clustering, derived metrics, chemistry, metabolomics, enrichment, literature index, plus a read-only Cypher escape hatch). The full table is in [CLAUDE.md](CLAUDE.md); per-tool docs are served as `docs://tools/{name}` and a routing guide as `docs://guide/start_here`.
 
-To use with Claude Code, add to your `.claude/settings.json` (already configured in this repo):
+To use with Claude Code, add to your `.claude/settings.json`:
 
 ```json
 {
@@ -40,78 +42,42 @@ To use with Claude Code, add to your `.claude/settings.json` (already configured
 
 Then start Claude Code in any project directory — the KG tools will be available automatically.
 
-## Tool Tracker
+### Python package
 
-### Done
+Every MCP tool is also an ordinary function under the `multiomics_explorer` namespace, unpaginated by default:
 
-| Tool | Domain | Purpose |
-|---|---|---|
-| `kg_schema` | Schema | Graph schema: node labels, relationship types, properties |
-| `run_cypher` | Schema | Raw Cypher escape hatch (read-only, validated) |
-| `resolve_gene` | Gene | Resolve gene identifier to graph nodes (case-insensitive) |
-| `gene_details` | Gene | All Gene node properties |
-| `gene_overview` | Gene | Batch gene routing: identity + data availability signals |
-| `genes_by_function` | Gene | Free-text search across functional annotations (Lucene) |
-| `list_filter_values` | Gene | Valid values for categorical filters |
-| `list_organisms` | Organism | All organisms with taxonomy and counts |
-| `list_publications` | Publication | Publications with experiment summaries, filterable |
-| `list_experiments` | Experiment | Experiments with gene count stats, summary mode |
-| `search_ontology` | Ontology | Browse ontology terms by text (GO, KEGG, EC, COG, etc.) |
-| `genes_by_ontology` | Ontology | Term IDs → genes, with hierarchy expansion |
-| `gene_ontology_terms` | Ontology | Genes → ontology annotations (reverse lookup, batch) |
-| `gene_homologs` | Ortholog | Gene locus_tags → ortholog group memberships |
-| `search_homolog_groups` | Ortholog | Search ortholog groups by text (Lucene) |
-| `genes_by_homolog_group` | Ortholog | Group IDs → member genes per organism |
-| `differential_expression_by_gene` | Expression | Gene-centric DE: gene × experiment × timepoint |
-| `differential_expression_by_ortholog` | Expression | Cross-organism DE framed by ortholog groups |
+```python
+from multiomics_explorer import gene_overview, differential_expression_by_gene, to_dataframe
 
-### Todo
-
-| Tool | Domain | Purpose | Notes |
-|---|---|---|---|
-| `homologs_by_ontology` | Ortholog × Ontology | Ortholog groups annotated to ontology terms — functional enrichment view for gene sets | Bridges OG↔ontology; enrichment-style analysis |
-| `ontology_subgraph` | Ontology | Navigate ontology hierarchies: expand to roots, list children, sub-categories | Uses is_a / part_of / regulates edges |
-
-### Needs Exploration
-
-| Idea | Domain | Notes |
-|---|---|---|
-| Genomic neighbors | Gene | Genes near gene X (operon/synteny). Needs: are start/end/strand populated consistently? |
-| Coculture exposure | Experiment | `Tests_coculture_with` edges. Could be a filter on `list_experiments` rather than a new tool |
-
-### CLI
-
-```bash
-# Verify Neo4j connection
-uv run python scripts/validate_connection.py
-
-# Explore the graph
-uv run multiomics-explorer stats
-uv run multiomics-explorer schema
-
-# Run a direct Cypher query
-uv run multiomics-explorer cypher "MATCH (g:Gene)-[:Gene_belongs_to_organism]->(o:OrganismTaxon) WHERE o.strain_name = 'MED4' RETURN count(g)"
-
-# Ask a natural language question
-uv run multiomics-explorer query "What genes are upregulated in MED4 during coculture with Alteromonas?"
-
-# Interactive mode
-uv run multiomics-explorer interactive
+overview = gene_overview(locus_tags=["PMM0370"])
+df = to_dataframe(differential_expression_by_gene(organism="MED4", locus_tags=["PMM0370"]))
 ```
+
+For ad-hoc Cypher from a script, use the shared connection wrapper (read-only by convention — this repo never writes to the graph):
+
+```python
+from multiomics_explorer.kg.connection import GraphConnection
+GraphConnection().execute_query("MATCH (g:Gene) RETURN count(g) AS n")
+```
+
+See `docs://guide/python_api` (served by the MCP server; source at `multiomics_explorer/skills/multiomics-kg-guide/references/guide/python_api.md`) for import topology, return shapes, DataFrame conversion and worked recipes.
 
 ## Knowledge Graph
 
-The agent queries a Neo4j knowledge graph containing:
-- **16,000+ genes** across 13 organisms (Prochlorococcus, Synechococcus, Alteromonas)
-- **110,000+ expression edges** from 19 differential expression studies
-- Protein annotations, GO terms, pathways, homology relationships
-- Expression data from coculture experiments and environmental stress studies
+The Neo4j knowledge graph integrates, for Prochlorococcus, Synechococcus, Alteromonas and their co-culture partners:
+
+- Genomes (protein-coding genes with sequences and coordinates), ortholog groups, and 17 functional / structural ontologies with an annotation-trust surface
+- Differential expression from RNAseq, microarray and proteomics studies, plus published co-expression clusterings and derived per-gene metrics
+- A chemistry layer (KEGG reactions, TCDB transport substrates) and a metabolomics measurement layer
+- A recall-biased literature index of the genes and pathways each paper discusses
+
+Call `kg_release_info` for the live counts and release identity.
 
 ## Architecture
 
 - **MCP Server** — Primary interface. Tools for Claude Code to query the KG.
-- **CLI** — Typer-based terminal interface for direct exploration.
-- **kg/** — Shared core: Neo4j connection, schema introspection, curated Cypher queries.
+- **api/** — Public Python functions (same names as the tools) wrapping the query builders.
+- **kg/** — Shared core: Neo4j connection, schema introspection, parameterized Cypher builders.
 
 See [docs/architecture.md](docs/architecture.md) for the full technology stack, package structure, and data flow.
 

@@ -22,13 +22,21 @@ code beyond what this guide covers):
   custom term2gene, `informative_only` side-by-side comparison.
 - `docs://examples/metabolites.py` — 7 worked scenarios spanning the 3
   metabolite source pipelines.
+- `docs://examples/annotation_evidence.py` — annotation-trust filters,
+  rank-vs-filter, MEROPS `call_class`, InterPro enrichment (4 scenarios).
+- `docs://examples/ontology_terms.py` — browse, multi-ontology search, term
+  details, bridge walk (4 scenarios).
 
 **Other guides:**
 
 - `docs://guide/start_here` — tool-selection map (which tool for which question).
 - `docs://guide/concepts` — node and edge meanings, evidence layers, cross-cutting axes.
 - `docs://guide/conventions` — `not_found`, tested-absent rows, filter
-  semantics, pagination, transport-confidence, AQ / informative_only defaults.
+  semantics, pagination, the transport trust ladder (`substrate_depth`),
+  AQ / informative_only defaults.
+- `docs://analysis/annotation_evidence` — annotation-trust surface
+  (per-ontology trust profile, rank-vs-filter rule).
+- `docs://ontologies/index` — per-ontology reference pages.
 
 ---
 
@@ -58,7 +66,7 @@ level.
 
 ```python
 from multiomics_explorer import (
-    # 37 API functions — same names as the MCP tools.
+    # 42 API functions — same names as the MCP tools.
     list_metabolites, gene_overview,
     differential_expression_by_gene, pathway_enrichment,
     discussed_by_publication,  # paper → discussed genes + KEGG pathways
@@ -78,7 +86,7 @@ from multiomics_explorer import (
 ```
 
 That's the contract. `multiomics_explorer.__all__` lists every public
-name (50 total: 37 API + 9 enrichment + 3 analysis utilities + `GraphConnection`).
+name (55 total: 42 API + 9 enrichment + 3 analysis utilities + `GraphConnection`).
 
 Deeper paths (`multiomics_explorer.api`, `multiomics_explorer.analysis`,
 `multiomics_explorer.analysis.frames`,
@@ -93,10 +101,10 @@ contract is what's stable.
 
 ## Three return shapes
 
-The 37 API functions plus the analysis utilities cluster into three
+The 42 API functions plus the analysis utilities cluster into three
 return types:
 
-### 1. `dict` (default — 32 of 37 API functions)
+### 1. `dict` (default — 40 of 42 API functions)
 
 ```python
 result = list_metabolites(organism_names=["Prochlorococcus MED4"], elements=["N"])
@@ -110,12 +118,13 @@ result = list_metabolites(organism_names=["Prochlorococcus MED4"], elements=["N"
 # }
 ```
 
-The dict shape mirrors the MCP envelope but is **unpaginated** — the
-`results` list contains every matching row. `total_matching ==
-len(result["results"])` always. The `returned` and `truncated` fields
-are present but reflect the full set (no pagination occurred).
+The dict shape mirrors the MCP envelope but is **unpaginated** by
+default — with `limit=None` (the package default) the `results` list
+contains every matching row and `total_matching == len(result["results"])`.
+`returned` and `truncated` are present in the dict; they only diverge from
+the full set when you pass an explicit `limit=`.
 
-### 2. `EnrichmentResult` (3 functions: `pathway_enrichment`, `cluster_enrichment`, `fisher_ora`)
+### 2. `EnrichmentResult` (2 API functions — `pathway_enrichment`, `cluster_enrichment` — plus the building block `fisher_ora`)
 
 ```python
 result = pathway_enrichment(
@@ -148,8 +157,9 @@ full accessor reference.
 
 Both wrap `gene_response_profile` and reshape its result. They are the
 right entry points when you need a matrix view across treatments
-rather than per-gene response stats. Detailed reference is the
-"Cross-experiment summarization" section below.
+rather than per-gene response stats. Reference: the
+"Cross-experiment summarization" section below — the only place these
+two utilities are documented (no analysis page covers expression yet).
 
 ---
 
@@ -228,8 +238,9 @@ df = response_matrix(
     genes=["PMM0370", "PMM0920", "PMM0965"],
     organism="MED4",
 )
-# Columns: "nitrogen_stress", "light_stress", ..., "gene_name", "product", "gene_category"
-print(df[["nitrogen_stress", "light_stress"]])
+# Columns: one per treatment_type value (e.g. "nitrogen", "light", ...),
+# then "gene_name", "product", "gene_category"
+print(df[["nitrogen", "light"]])
 ```
 
 **Custom grouping with `group_map`:**
@@ -321,9 +332,9 @@ result = gene_set_compare(
 print(result["overlap"])              # PMM0965
 print(result["summary_per_group"])
 #                      early_responders  late_responders  overlap  shared
-# nitrogen_stress                    3                2        1    True
-# light_stress                       0                1        0   False
-print(result["shared_groups"])        # ["nitrogen_stress"]
+# nitrogen                           3                2        1    True
+# light                              0                1        0   False
+print(result["shared_groups"])        # ["nitrogen"]
 ```
 
 **Common mistakes**
@@ -383,9 +394,9 @@ rarely need it.
 ## Connection management
 
 Every API function accepts `conn: GraphConnection | None = None` as a
-keyword-only argument (positional or keyword — kwarg is conventional).
-When `conn=None` (the default), the function creates a fresh
-`GraphConnection` per call:
+**keyword-only** argument (`conn=conn`; passing it positionally raises
+`TypeError`). When `conn=None` (the default), the function creates a
+fresh `GraphConnection` per call:
 
 ```python
 def _default_conn(conn: GraphConnection | None) -> GraphConnection:
@@ -515,12 +526,19 @@ scenarios) see `docs://examples/metabolites.py`.
 
 ## Where to go next
 
+- `docs://guide/start_here` — tool-selection map (which tool for which question).
+- `docs://guide/concepts` — node types, edge types, what each measurement layer means.
+- `docs://guide/conventions` — filter semantics, response shapes, gotchas that apply across tools.
 - `docs://analysis/enrichment` — `EnrichmentResult` accessors, custom
   TERM2GENE, background semantics, `informative_only` rationale.
-- `docs://analysis/derived_metrics` — DerivedMetric family in Python.
 - `docs://analysis/metabolites` — chemistry layer (3 source pipelines).
+- `docs://analysis/derived_metrics` — DerivedMetric family in Python.
+- `docs://analysis/annotation_evidence` — annotation-trust surface.
+- `docs://ontologies/index` — per-ontology reference (`docs://ontologies/{key}`).
 - `docs://examples/pathway_enrichment.py` — runnable enrichment example.
-- `docs://examples/metabolites.py` — runnable metabolites workflow examples.
+- `docs://examples/metabolites.py` — runnable metabolites workflow examples (7 scenarios).
+- `docs://examples/annotation_evidence.py` — runnable annotation-trust examples (4 scenarios).
+- `docs://examples/ontology_terms.py` — runnable term-side examples (4 scenarios).
 - Per-tool docs (`docs://tools/{name}`) — every tool md has a
   "Package import equivalent" section showing the matching Python
   signature, the import statement, and the dict shape returned.
