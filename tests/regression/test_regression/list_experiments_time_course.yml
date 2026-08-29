@@ -1625,11 +1625,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 428
+  distinct_gene_count: 427
   experiment_id: 10.1111/1462-2920.14513_viral_viral_dom_vdom_addition_mit9313_rnaseq
   experiment_name: MIT9313 Viral DOM (vDOM) addition vs Pro99 growth medium control
     (RNASEQ)
-  gene_count: 3852
+  gene_count: 3843
   growth_phases:
   - exponential
   is_time_course: time_course
@@ -1639,7 +1639,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1111/1462-2920.14513
-  significant_down_count: 373
+  significant_down_count: 372
   significant_up_count: 461
   table_scope: significant_any_timepoint
   table_scope_detail: ''
@@ -1686,7 +1686,7 @@ rows:
   - '9'
   time_point_significant_down:
   - '1'
-  - '106'
+  - '105'
   - '106'
   - '17'
   - '25'
@@ -1705,15 +1705,15 @@ rows:
   - '74'
   - '8'
   time_point_totals:
-  - '428'
-  - '428'
-  - '428'
-  - '428'
-  - '428'
-  - '428'
-  - '428'
-  - '428'
-  - '428'
+  - '427'
+  - '427'
+  - '427'
+  - '427'
+  - '427'
+  - '427'
+  - '427'
+  - '427'
+  - '427'
   treatment_type:
   - viral
 - authors:

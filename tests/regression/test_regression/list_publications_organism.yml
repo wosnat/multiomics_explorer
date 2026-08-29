@@ -361,7 +361,7 @@ rows:
   derived_metric_value_kinds:
   - boolean
   - numeric
-  discussed_gene_count: 61
+  discussed_gene_count: 60
   discussed_pathway_count: 6
   doi: 10.1038/ismej.2014.57
   experiment_count: 2
@@ -466,7 +466,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 34
+  discussed_gene_count: 32
   discussed_pathway_count: 0
   doi: 10.1038/ismej.2011.49
   experiment_count: 5
@@ -698,7 +698,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 76
+  discussed_gene_count: 75
   discussed_pathway_count: 3
   doi: 10.1038/msb4100087
   experiment_count: 6

@@ -18,7 +18,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 6
+  discussed_gene_count: 5
   discussed_pathway_count: 2
   doi: 10.1101/2025.08.05.668435
   experiment_count: 1
@@ -109,7 +109,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 8
+  discussed_gene_count: 7
   discussed_pathway_count: 2
   doi: 10.1073/pnas.2213271120
   experiment_count: 4
@@ -248,7 +248,7 @@ rows:
   derived_metric_count: 6
   derived_metric_value_kinds:
   - numeric
-  discussed_gene_count: 12
+  discussed_gene_count: 11
   discussed_pathway_count: 0
   doi: 10.1111/1462-2920.15834
   experiment_count: 6
@@ -540,7 +540,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 34
+  discussed_gene_count: 32
   discussed_pathway_count: 0
   doi: 10.1038/ismej.2011.49
   experiment_count: 5
@@ -739,7 +739,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 76
+  discussed_gene_count: 75
   discussed_pathway_count: 3
   doi: 10.1038/msb4100087
   experiment_count: 6

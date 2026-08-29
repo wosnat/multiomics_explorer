@@ -1426,7 +1426,7 @@ rows:
   organism_name: Prochlorococcus MIT9312
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 1000
+  total_gene_count: 1016
   treatment_type:
   - compartment
   unit: spectral counts / cell biovolume
@@ -1448,7 +1448,7 @@ rows:
   organism_name: Prochlorococcus MIT9312
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 217
+  total_gene_count: 221
   treatment_type:
   - compartment
   unit: spectral counts / vesicle biovolume
@@ -1471,7 +1471,7 @@ rows:
   organism_name: Prochlorococcus MIT9312
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 200
+  total_gene_count: 204
   treatment_type:
   - compartment
   unit: log2 ratio
@@ -1566,7 +1566,7 @@ rows:
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 1048
+  total_gene_count: 1052
   treatment_type:
   - compartment
   unit: spectral counts / cell biovolume
@@ -1588,7 +1588,7 @@ rows:
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 354
+  total_gene_count: 355
   treatment_type:
   - compartment
   unit: spectral counts / vesicle biovolume
@@ -1611,7 +1611,7 @@ rows:
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 313
+  total_gene_count: 314
   treatment_type:
   - compartment
   unit: log2 ratio

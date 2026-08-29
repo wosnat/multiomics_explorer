@@ -2073,7 +2073,7 @@ class TestGenesByNumericMetric:
         response = await tool_fns["genes_by_numeric_metric"](
             ctx, metric_types=["cell_abundance_biovolume_normalized"],
             bucket=["top_quartile"], limit=10)
-        assert response.total_matching == 308
+        assert response.total_matching == 309  # 2026-08-29 rebuild: +4 quantifies edges
         assert len(response.by_organism) == 2
         # 152 MIT9312 + 156 MIT9313 = 308
         org_counts = {o.organism_name: o.count for o in response.by_organism}
@@ -2081,7 +2081,7 @@ class TestGenesByNumericMetric:
         mit9312_hits = [c for n, c in org_counts.items() if "MIT9312" in n]
         mit9313_hits = [c for n, c in org_counts.items() if "MIT9313" in n]
         assert mit9312_hits == [152]
-        assert mit9313_hits == [156]
+        assert mit9313_hits == [157]  # 2026-08-29 rebuild
         assert len(response.by_metric) == 2
         assert response.not_matched_organism is None
 
@@ -2091,7 +2091,7 @@ class TestGenesByNumericMetric:
         response = await tool_fns["genes_by_numeric_metric"](
             ctx, metric_types=["cell_abundance_biovolume_normalized"],
             bucket=["top_quartile"], organism="MIT9313", limit=10)
-        assert response.total_matching == 156
+        assert response.total_matching == 157  # 2026-08-29 rebuild
         assert len(response.by_organism) == 1
         assert "MIT9313" in response.by_organism[0].organism_name
         assert response.not_matched_organism is None

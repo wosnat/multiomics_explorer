@@ -3416,11 +3416,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 521
+  distinct_gene_count: 522
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_selongatus_axenic_proteomics
   experiment_name: S. elongatus cscB coculture with P. putida cscRABY vs axenic S.
     elongatus cscB (proteomics)
-  gene_count: 521
+  gene_count: 522
   growth_phases:
   - exponential
   is_time_course: single_time_point
@@ -3430,7 +3430,7 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Synechococcus elongatus PCC 7942
   publication_doi: 10.1038/s42003-024-06098-5
-  significant_down_count: 81
+  significant_down_count: 82
   significant_up_count: 68
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -3444,11 +3444,11 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '81'
+  - '82'
   time_point_significant_up:
   - '68'
   time_point_totals:
-  - '521'
+  - '522'
   treatment_type:
   - coculture
 - authors:
