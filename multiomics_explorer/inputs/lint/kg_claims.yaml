@@ -243,3 +243,45 @@
     Gene.ec_numbers / ko_terms / kegg_ids / cog_categories are null on every gene —
     docs must not advertise them as gene_details payload. If any becomes non-null
     the KG repopulated them; revisit gene_details docs.
+
+# --- behavioural claims (DOC-001 / DOC-002, expected after the 2026-08-29 rebuild) ---
+
+- id: kegg_global_maps_flagged_uninformative
+  cypher: >
+    MATCH (p:KeggTerm {level_kind: 'pathway'}) WHERE NOT (p)-[:Kegg_term_is_a_kegg_term]->()
+    RETURN count(p) AS parentless,
+           sum(CASE WHEN p.is_uninformative = 'true' THEN 1 ELSE 0 END) AS flagged
+  expect: {parentless: 13, flagged: 13}
+  used_in:
+    - CLAUDE.md
+    - multiomics_explorer/mcp_server/tools.py
+    - multiomics_explorer/inputs/ontologies/kegg.yaml
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
+    - multiomics_explorer/inputs/tools/pathway_enrichment.yaml
+    - multiomics_explorer/inputs/tools/list_metabolites.yaml
+  note: >
+    Behavioural claim: the 13 parentless KEGG global / overview maps (ko01100, ko01110, …)
+    carry is_uninformative, so informative_only=True drops them (KG DOC-002).
+    Fails ⇒ the docs' description of informative_only / KEGG informativeness is wrong.
+
+- id: eggnog_only_edges_not_curated
+  cypher: >
+    MATCH ()-[r]->()
+    WHERE type(r) IN ['Gene_involved_in_biological_process', 'Gene_enables_molecular_function',
+                      'Gene_located_in_cellular_component', 'Gene_catalyzes_ec_number',
+                      'Gene_has_pfam', 'Gene_has_cazy_family']
+      AND r.sources = ['eggnog']
+    RETURN count(r) AS eggnog_only,
+           sum(CASE WHEN r.evidence = 'curated' THEN 1 ELSE 0 END) AS read_curated,
+           sum(CASE WHEN r.evidence = 'family_inferred' THEN 1 ELSE 0 END) AS read_family_inferred
+  expect: {read_curated: 0}
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/annotation_evidence.md
+    - multiomics_explorer/inputs/ontologies/go_bp.yaml
+    - multiomics_explorer/inputs/ontologies/ec.yaml
+    - multiomics_explorer/inputs/ontologies/pfam.yaml
+    - multiomics_explorer/inputs/ontologies/cazy.yaml
+  note: >
+    Behavioural claim: eggNOG-only GO / EC / Pfam / CAZy edges read evidence='family_inferred',
+    never 'curated' (KG DOC-001). Fails ⇒ annotation_evidence.md's ladder description and
+    the per-ontology evidence notes are wrong for this build.

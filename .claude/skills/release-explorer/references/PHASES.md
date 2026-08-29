@@ -33,10 +33,22 @@ Fail-fast read-only checks, no mutation.
 | `git status --porcelain` is empty | exit 1 | `--allow-dirty` |
 | `HEAD..origin/<branch>` count is 0 | exit 1 | `--allow-dirty`, or pull first |
 | `pytest tests/unit/` green (skipped under `--dry-run`) | exit 1 | fix the failing test |
+| `pytest tests/integration -m kg -p no:cacheprovider` green (skipped under `--dry-run`) | exit 1 | `--skip-kg` (unverified docs), or absorb the KG first (`absorb-kg-rebuild`) |
+| `pytest tests/regression -m kg` green (skipped under `--dry-run`) | exit 1 | same |
 
 On success, captures `git_sha`, `git_sha_short`, `git_branch`, `git_dirty`,
 `branch` into the run context — these flow into the publish manifest in
 Phase 5.
+
+## Phase 1b: Docs review (manual)
+
+Not part of `release_explorer.py`. After preflight is green, Claude runs the
+reviewer pass described in `DOCS_REVIEW.md` (same directory): agents read
+each served doc surface against code + live KG and report conceptual
+findings the lints cannot see. Mechanical fixes land as commits before
+Phase 2; open items go to `docs/backlog.md`; KG-side items go to a
+`docs/kg-specs/YYYY-MM-DD-*-asks.md`. One line in the CHANGELOG
+`[Unreleased]` records "docs review: N findings, M fixed".
 
 ## Phase 2: CHANGELOG cut
 

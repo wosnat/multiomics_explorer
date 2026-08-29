@@ -177,6 +177,23 @@ def phase_1_preflight(args, ctx: dict) -> None:
         run(["uv", "run", "pytest", "tests/unit/", "-q"], cwd=REPO_ROOT)
         log("unit tests green", "ok")
 
+    # Live-KG gate — the docs / examples / goldens are only known to be true
+    # against a KG; a release must not ship prose the current build contradicts.
+    if args.dry_run:
+        log("live-KG suites skipped (--dry-run)", "dry")
+    elif args.skip_kg:
+        log("live-KG suites skipped (--skip-kg) — docs/examples NOT verified", "warn")
+    else:
+        for label, cmd in (
+            ("integration -m kg (docs claims, example responses, tool correctness)",
+             ["uv", "run", "pytest", "tests/integration/", "-m", "kg", "-q", "-p", "no:cacheprovider"]),
+            ("regression -m kg (goldens)",
+             ["uv", "run", "pytest", "tests/regression/", "-m", "kg", "-q"]),
+        ):
+            log(f"running {label} ...", "info")
+            run(cmd, cwd=REPO_ROOT)
+            log(f"{label} green", "ok")
+
     ctx.update(
         {
             "branch": branch,
@@ -502,6 +519,7 @@ def main() -> None:
                         help="Skip the post-CHANGELOG-cut pause.")
     parser.add_argument("--allow-dirty", action="store_true",
                         help="Skip working-tree-clean and behind-origin checks.")
+    parser.add_argument("--skip-kg", action="store_true", help="Skip the live-KG suites in preflight (docs/examples/goldens then go unverified).")
     args = parser.parse_args()
 
     if args.dry_run:

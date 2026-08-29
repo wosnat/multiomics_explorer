@@ -38,6 +38,7 @@ Do **not** use for:
 | `--dry-run` | off | Every phase logs `[dry-run] would <action>`; mutates nothing (no commits, tags, push, build, gh). Use to exercise the pipeline. |
 | `--resume` | off | Skip the post-CHANGELOG-cut pause (use on the second invocation after polishing). |
 | `--allow-dirty` | off | Skip the working-tree-clean and behind-origin checks. |
+| `--skip-kg` | off | Skip the live-KG suites in preflight. Docs / examples / goldens then go unverified — only for a hotfix release when no KG is reachable. |
 
 ## Flow
 
@@ -49,7 +50,15 @@ onward.
 1. **Preflight** — version regex; `pyproject.toml` version matches arg;
    tooling (`uv` / `git` / `gh`) on PATH; `gh auth status` OK; git on a
    branch, working tree clean, in sync with origin; `pytest tests/unit/`
-   green. Captures git SHA / branch / dirty into context.
+   green; then the live-KG gate — `pytest tests/integration -m kg` (docs
+   claims register, vocab snapshot, YAML example responses vs live,
+   examples/*.py scenarios, tool correctness) and `pytest tests/regression
+   -m kg` (goldens). `--skip-kg` bypasses the gate and says so loudly.
+   Captures git SHA / branch / dirty into context.
+   **1b. Docs review (Claude-driven, not scripted)** — before Phase 2, run
+   the reviewer pass in `references/DOCS_REVIEW.md` and either fix or
+   record the findings; the CHANGELOG pause in Phase 2 is where the
+   review summary goes.
 2. **CHANGELOG cut** — rename `## [Unreleased]` → `## [<version>] - YYYY-MM-DD`,
    open a fresh empty `## [Unreleased]` above. Idempotent: if
    `## [<version>]` already exists, no-op. **Pauses for polish** unless
