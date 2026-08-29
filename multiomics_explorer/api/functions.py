@@ -573,6 +573,15 @@ def _evidence_score_signals(conn, targets: list[str]) -> dict:
     return out
 
 
+def _strip_value_prefix(value: str, text: str) -> str:
+    """KG `value_descriptions` entries read ``"<value>: <text>"``; the value
+    is already on the row, so keep only the text."""
+    prefix = f"{value}:"
+    if text.startswith(prefix):
+        return text[len(prefix):].strip()
+    return text
+
+
 def _read_vocab_values(
     conn, applies_to: str, prop: str, kind: str, *, cache: bool = True,
 ) -> dict:
@@ -582,24 +591,33 @@ def _read_vocab_values(
     values are derived from the graph with a pivot query and the result
     carries a warning — never a raise.
 
-    Returns a dict with keys: values, description, source, warning.
+    Returns a dict with keys: values, value_descriptions (``{value: text}``
+    from the node's parallel ``value_descriptions`` list, with a leading
+    ``"<value>: "`` prefix stripped; empty when the node carries none),
+    description, source, warning.
     """
     key = (applies_to, prop)
     if cache and key in _VOCAB_CACHE:
         return _VOCAB_CACHE[key]
 
     values: list = []
+    value_descriptions: dict = {}
     description = None
     v_cypher, v_params = build_vocab_values(applies_to=applies_to, prop=prop)
     for r in conn.execute_query(v_cypher, **v_params) or []:
-        for v in r.get("values") or []:
+        node_values = r.get("values") or []
+        node_texts = r.get("value_descriptions") or []
+        for i, v in enumerate(node_values):
             if v not in values:
                 values.append(v)
+            if i < len(node_texts) and node_texts[i] and v not in value_descriptions:
+                value_descriptions[v] = _strip_value_prefix(v, node_texts[i])
         description = description or r.get("description")
 
     if values:
         out = {
-            "values": values, "description": description,
+            "values": values, "value_descriptions": value_descriptions,
+            "description": description,
             "source": "vocabulary", "warning": None,
         }
     else:
@@ -616,7 +634,8 @@ def _read_vocab_values(
             elif v not in pivoted:
                 pivoted.append(v)
         out = {
-            "values": pivoted, "description": description, "source": "pivot",
+            "values": pivoted, "value_descriptions": {},
+            "description": description, "source": "pivot",
             "warning": (
                 f"No ControlledVocabulary entry for {applies_to}.{prop}; "
                 f"allowed values derived from the graph "
@@ -722,11 +741,17 @@ def _trust_value_owners(filter_type: str, ontology: str | None) -> list[str]:
 
 def _trust_filter_values(
     conn, filter_type: str, ontology: str | None,
-) -> tuple[list[dict], list[str]]:
+) -> tuple[list[dict], list[str], str | None]:
     """Allowed values for one annotation-trust filter_type.
 
     One row per distinct value, carrying every edge type or label it applies
     to, so a reader can see that `evidence` means the same thing everywhere.
+
+    Description parity with `cluster_type` (backlog 2.3): the property-level
+    vocabulary text is returned once (third element, for the envelope — the
+    first owner's when several edge types carry the property); rows carry
+    only the per-value text from `value_descriptions`, and the row key is
+    absent when no owner has any (sparse row).
     """
     spec = _TRUST_FILTER_VALUE_SPECS[filter_type]
     kind, prop = spec["kind"], spec["prop"]
@@ -739,22 +764,24 @@ def _trust_filter_values(
 
     aggregated: dict[str, dict] = {}
     warns: list[str] = []
+    property_description: str | None = None
     for applies_to in applies_to_keys:
         read = _read_vocab_values(conn, applies_to, prop, kind, cache=False)
         if read["warning"]:
             warns.append(read["warning"])
+        property_description = property_description or read["description"]
         for value in read["values"]:
             row = aggregated.setdefault(value, {
                 "value": value,
                 "applies_to": [],
-                "description": read["description"],
                 "source": read["source"],
             })
             if applies_to not in row["applies_to"]:
                 row["applies_to"].append(applies_to)
-            if row["description"] is None:
-                row["description"] = read["description"]
-    return list(aggregated.values()), warns
+            text = read["value_descriptions"].get(value)
+            if text and "description" not in row:
+                row["description"] = text
+    return list(aggregated.values()), warns, property_description
 
 
 def _trust_axes_filter_values(ontology: str | None) -> list[dict]:
@@ -1489,7 +1516,7 @@ def list_filter_values(
             f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
         )
     if filter_type in _TRUST_FILTER_VALUE_SPECS:
-        results, warnings_out = _trust_filter_values(
+        results, warnings_out, envelope_description = _trust_filter_values(
             conn, filter_type, ontology,
         )
     elif filter_type == "trust_axes":

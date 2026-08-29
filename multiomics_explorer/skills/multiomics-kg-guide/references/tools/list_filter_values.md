@@ -34,7 +34,7 @@ filter_type, description, total_entries, returned, truncated, warnings, results
 ```
 
 - **filter_type** (string): The filter type returned (e.g. 'gene_category').
-- **description** (string | None): Vocabulary-level description of the property behind this filter (ControlledVocabulary text; cluster_type and the trust types). Emitted once here, not per row. None elsewhere.
+- **description** (string | None): Vocabulary-level description of the property behind this filter (ControlledVocabulary text; cluster_type and the trust types — first owner's text when a value spans several edge types). Emitted once here, not per row. None elsewhere.
 - **total_entries** (int): Total distinct values for this filter.
 - **returned** (int): Number of results returned.
 - **truncated** (bool): True if total_entries > returned.
@@ -49,7 +49,7 @@ filter_type, description, total_entries, returned, truncated, warnings, results
 | tree_code | string \| None (optional) | BRITE tree code (sparse: only for brite_tree filter, e.g. 'ko01000'). |
 | source | string \| None (optional) | Provenance of this value (sparse: trust filter types only): 'vocabulary' (from ControlledVocabulary) or 'pivot' (KG-side vocab node missing; derived from the graph, see envelope warnings). |
 | applies_to | list[string] \| None (optional) | Edge/node type(s) this value is scoped to (sparse: trust filter types only), e.g. ['Gene_has_merops_family']. |
-| description | string \| None (optional) | Human-readable meaning of this value (sparse: trust filter types only, from ControlledVocabulary). |
+| description | string \| None (optional) | Meaning of THIS value (sparse: vocabulary-backed filter types only, from ControlledVocabulary.value_descriptions). Absent when the KG carries no per-value text (e.g. cluster_type, interpro_type). The property-level text is on the envelope `description`, never repeated per row. |
 
 ### Filter-type families
 
@@ -235,13 +235,17 @@ list_filter_values(filter_type="evidence")
 # Trust-vocabulary rows carry no `count` (unlike gene_category /
 # evidence_source) — there is no single precomputed cardinality for a
 # value that spans several edge types at once.
-{"filter_type": "evidence", "total_entries": 5, "returned": 5, "truncated": false,
+# Envelope `description` = the property's vocabulary text, once; each
+# row's `description` = the meaning of THAT value (absent when the KG
+# carries no per-value text, e.g. interpro_type / cluster_type).
+{"filter_type": "evidence", "description": "Inference strength on the shared ladder curated > signature > ...",
+ "total_entries": 5, "returned": 5, "truncated": false,
  "results": [
-   {"value": "curated", "applies_to": ["Gene_has_merops_family"], "description": "...", "source": "vocabulary"},
-   {"value": "signature", "applies_to": ["Gene_has_interpro_entry", "Gene_has_ncbifam_family"], "description": "...", "source": "vocabulary"},
+   {"value": "curated", "applies_to": ["Gene_has_merops_family"], "description": "assigned by a human curator or a curated reference annotation (Cyanorak, UniProt, NCBI); strongest rung", "source": "vocabulary"},
+   {"value": "signature", "applies_to": ["Gene_has_interpro_entry", "Gene_has_ncbifam_family"], "description": "direct HMM / profile hit against a member database that pre-applies its own curated threshold (InterProScan, Pfam)", "source": "vocabulary"},
    {"value": "homology", "applies_to": ["Gene_has_tcdb_family", "Gene_has_merops_family", "Gene_has_pfam"], "description": "...", "source": "vocabulary"},
    {"value": "family_inferred", "applies_to": ["Gene_has_tcdb_family"], "description": "...", "source": "vocabulary"},
-   {"value": "domain_inferred", "applies_to": ["Gene_involved_in_biological_process"], "description": "...", "source": "vocabulary"}
+   {"value": "domain_inferred", "applies_to": ["Gene_involved_in_biological_process"], "description": "transferred from a shared domain (InterPro DOMAIN entry); weakest rung", "source": "vocabulary"}
  ]}
 ```
 
@@ -382,6 +386,8 @@ list_filter_values(filter_type='gene_category')  # then pass value to genes_by_f
 - Trust-related filter_type values (`evidence`, `sources`, `call_class`, `interpro_type`, `ncbifam_family_type`, `merops_catalytic_type`, `merops_family_class`, `best_hit_kind`, `pfam_support`, `attachment_depth`) are read from the KG's ControlledVocabulary nodes (or a live pivot-query fallback, flagged via `source: "pivot"` and a warning, if that node is missing). They are never hard-coded — a KG rebuild that adds a new value shows up here automatically.
 
 - `cluster_type` follows the same vocabulary-or-pivot rule (ControlledVocabulary for ClusteringAnalysis.cluster_type; six values). The value lists quoted in the `cluster_type` parameter descriptions of list_clustering_analyses / gene_clusters_by_gene are documentation only — this call is the live source, and a `warn` from kg_release_info on the vocabulary hash is the cue to prefer it over any quoted list.
+
+- Two `description` fields, two scopes: the envelope `description` is the property's vocabulary text (what `evidence` / `call_class` / `cluster_type` means as a whole), emitted once; a row's `description` is the meaning of that one value. Rows without per-value text simply omit the key — read the envelope, don't treat the absence as a missing vocabulary.
 
 - `trust_axes` and `link_kinds` are config-derived (not KG-vocabulary reads) — they answer 'which filter params work on this ontology', not 'what values exist'. Pass `ontology=...` to scope either to one ontology; omit it to see all.
 

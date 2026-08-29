@@ -30,6 +30,15 @@ coordinated to `0.1.0a5` ahead of the KG release.
 
 ### Added
 
+- `list_filter_values` description parity (backlog 2.3): every
+  vocabulary-backed filter type now puts the property-level
+  `ControlledVocabulary` text once on the envelope `description`, and rows
+  carry the per-value meaning from the KG's new `value_descriptions` (B1,
+  2026-08-29 rebuild — 39 nodes, the whole trust surface) with the
+  redundant `"<value>: "` prefix stripped. Rows without per-value text
+  (`cluster_type`, `interpro_type`, …) omit the key. Before, the trust
+  types repeated the property paragraph on every row and left the
+  envelope null.
 - **Annotation-trust surface** on the ontology tools. Every gene→term edge
   across the 14 functional-edge ontologies carries a compact `evidence`
   column (five-rung ladder `curated > signature > homology >

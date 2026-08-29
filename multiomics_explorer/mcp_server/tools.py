@@ -1605,8 +1605,11 @@ def register_tools(mcp: FastMCP):
         )
         description: str | None = Field(
             default=None,
-            description="Human-readable meaning of this value (sparse: trust "
-                        "filter types only, from ControlledVocabulary).",
+            description="Meaning of THIS value (sparse: vocabulary-backed filter "
+                        "types only, from ControlledVocabulary.value_descriptions). "
+                        "Absent when the KG carries no per-value text (e.g. "
+                        "cluster_type, interpro_type). The property-level text "
+                        "is on the envelope `description`, never repeated per row.",
         )
 
     class ListFilterValuesResponse(BaseModel):
@@ -1615,6 +1618,7 @@ def register_tools(mcp: FastMCP):
             default=None,
             description="Vocabulary-level description of the property behind this "
                         "filter (ControlledVocabulary text; cluster_type and the trust "
+                        "types — first owner's text when a value spans several edge "
                         "types). Emitted once here, not per row. None elsewhere.",
         )
         total_entries: int = Field(description="Total distinct values for this filter.")

@@ -19,7 +19,6 @@ Sizes: **S** ≤ half a day, no spec · **M** a day, one-page spec (Mode B) · *
 
 | # | Item | Size | Origin |
 |---|---|---|---|
-| 2.3 | `list_filter_values` description parity: `cluster_type` rows are sparse with the vocab text once on the envelope; trust types (`evidence`, `sources`, …) still repeat it per row. Make all vocab-backed types envelope-once. KG B1 (`value_descriptions`, 39 vocab nodes) landed 2026-08-29 — the rows can now carry the per-value text. | S | polish item 6 |
 | 2.8 | `organism=` word-match backlog: genus node `Alteromonas` matches all strains; `AltDE` matches `AltDE1`. Resolver gates on `gene_count > 0` so treatment taxa are safe (KG B4 removes the last name collision). | M | slice-2 ledger |
 
 ### 2b. From the KG hand-off 2026-08-28 (`multiomics_biocypher_kg/docs/kg-changes/2026-08-28-explorer-handoff.md`)

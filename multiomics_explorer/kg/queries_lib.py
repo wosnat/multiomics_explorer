@@ -731,12 +731,18 @@ def build_vocab_values(*, applies_to: str, prop: str) -> tuple[str, dict]:
     owns shape. Callers cache per process and fall back to
     `build_vocab_pivot_values` (plus a warning) when the node is missing.
 
-    RETURN keys: values, description, value_type, sparse, min_value, max_value.
+    `value_descriptions` (KG B1, 2026-08-29) is a list parallel to `values`
+    carrying per-value text; absent on nodes that predate it.
+
+    RETURN keys: values, value_descriptions, description, value_type, sparse,
+    min_value, max_value.
     """
     cypher = (
         "MATCH (v:ControlledVocabulary "
         "{applies_to: $applies_to, property: $prop})\n"
-        "RETURN v.values AS values, v.description AS description,\n"
+        "RETURN v.values AS values,\n"
+        "       v.value_descriptions AS value_descriptions,\n"
+        "       v.description AS description,\n"
         "       v.value_type AS value_type, v.sparse AS sparse,\n"
         "       v.min_value AS min_value, v.max_value AS max_value"
     )

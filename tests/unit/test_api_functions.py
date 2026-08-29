@@ -12999,7 +12999,7 @@ class TestListFilterValuesTrustTypes:
         assert "peptidase" in values
         assert all(r["source"] == "vocabulary" for r in result["results"])
 
-    def test_rows_carry_applies_to_and_description(self, mock_conn):
+    def test_rows_carry_applies_to(self, mock_conn):
         _trust_dispatch(
             mock_conn,
             [("ControlledVocabulary", self._vocab_rows(["peptidase"]))],
@@ -13008,8 +13008,90 @@ class TestListFilterValuesTrustTypes:
         result = api.list_filter_values(
             filter_type="call_class", conn=mock_conn)
         row = result["results"][0]
-        assert "applies_to" in row
-        assert "description" in row
+        assert row["applies_to"] == ["Gene_has_merops_family"]
+
+    # --- backlog 2.3: description parity with cluster_type -----------------
+    # Property-level vocab text goes once on the envelope; rows carry the
+    # per-value text from `value_descriptions` (KG B1) or nothing at all.
+
+    def _vocab_rows_with_value_text(self):
+        return [{
+            "applies_to": "Gene_has_merops_family",
+            "values": ["peptidase", "inhibitor"],
+            "value_descriptions": [
+                "peptidase: best hit is a catalytically live entry",
+                "inhibitor: the family is an I-family",
+            ],
+            "description": "MEROPS call class",
+            "sparse": "false",
+        }]
+
+    def test_property_description_is_on_the_envelope_once(self, mock_conn):
+        _trust_dispatch(
+            mock_conn,
+            [("ControlledVocabulary", self._vocab_rows_with_value_text())],
+            default=[],
+        )
+        result = api.list_filter_values(
+            filter_type="call_class", conn=mock_conn)
+        assert result["description"] == "MEROPS call class"
+        assert all(r.get("description") != "MEROPS call class"
+                   for r in result["results"])
+
+    def test_rows_carry_the_per_value_text_without_the_value_prefix(
+            self, mock_conn):
+        _trust_dispatch(
+            mock_conn,
+            [("ControlledVocabulary", self._vocab_rows_with_value_text())],
+            default=[],
+        )
+        result = api.list_filter_values(
+            filter_type="call_class", conn=mock_conn)
+        by_value = {r["value"]: r for r in result["results"]}
+        assert by_value["peptidase"]["description"] == (
+            "best hit is a catalytically live entry")
+        assert by_value["inhibitor"]["description"] == (
+            "the family is an I-family")
+
+    def test_rows_without_per_value_text_have_no_description_key(
+            self, mock_conn):
+        """Vocab nodes that predate B1 (no `value_descriptions`) — the row
+        key is absent, the same sparse rule cluster_type already follows."""
+        _trust_dispatch(
+            mock_conn,
+            [("ControlledVocabulary", self._vocab_rows(["peptidase"]))],
+            default=[],
+        )
+        result = api.list_filter_values(
+            filter_type="call_class", conn=mock_conn)
+        assert result["description"] == "MEROPS call class"
+        assert "description" not in result["results"][0]
+
+    def test_per_value_text_survives_multi_owner_aggregation(self, mock_conn):
+        """`evidence` spans many edges; the first owner that carries text
+        for a value wins, and a later owner without text never blanks it."""
+        rows = [
+            {"applies_to": "Gene_has_pfam", "values": ["curated"],
+             "value_descriptions": None,
+             "description": "pfam ladder", "sparse": "false"},
+        ]
+        calls = {"n": 0}
+
+        def _exec(cypher, **params):
+            if "ControlledVocabulary" not in cypher:
+                return []
+            calls["n"] += 1
+            if params.get("applies_to") == "Gene_has_pfam":
+                return rows
+            return [{"applies_to": params["applies_to"], "values": ["curated"],
+                     "value_descriptions": ["curated: a human said so"],
+                     "description": "some ladder", "sparse": "false"}]
+
+        mock_conn.execute_query.side_effect = _exec
+        result = api.list_filter_values(filter_type="evidence", conn=mock_conn)
+        row = next(r for r in result["results"] if r["value"] == "curated")
+        assert row["description"] == "a human said so"
+        assert calls["n"] > 1
 
     def test_missing_vocab_node_falls_back_to_the_pivot(self, mock_conn):
         def _exec(cypher, **params):

@@ -11838,6 +11838,14 @@ class TestVocabularyQueryBuilders:
         assert "v.description" in cypher
         assert "v.sparse" in cypher
 
+    def test_build_vocab_values_returns_value_descriptions(self):
+        """Backlog 2.3: KG B1 added `value_descriptions` (list parallel to
+        `values`) — the per-value text `list_filter_values` puts on rows."""
+        from multiomics_explorer.kg.queries_lib import build_vocab_values
+        cypher, _ = build_vocab_values(
+            applies_to="Gene_has_merops_family", prop="call_class")
+        assert "v.value_descriptions AS value_descriptions" in cypher
+
     def test_pivot_over_an_edge_property(self):
         from multiomics_explorer.kg.queries_lib import build_vocab_pivot_values
         cypher, _ = build_vocab_pivot_values(
