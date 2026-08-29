@@ -46,7 +46,7 @@ surface (`min_evidence_score`).
 | `ec` | sources, evidence, evidence_score | — | — | — | — |
 | `kegg` | sources, evidence | — | — | — | — |
 | `cog_category` | sources, evidence | — | — | — | — |
-| `tigr_role` | sources, evidence | — | — | — | — |
+| `tigr_role` | sources (⊆ `[cyanorak, interproscan]`; an agreeing edge carries both — filter by membership, which the `sources=` filter already does), evidence (`curated` / `family_inferred`) | — | — | — | — |
 | `cyanorak_role` | sources, evidence | — | — | — | — |
 | `pfam` | sources, evidence, evidence_score | — | — | — | — |
 | `brite` | (inherits kegg's — the gene edge is `Gene_has_kegg_ko`) | — | — | — | `tree` |

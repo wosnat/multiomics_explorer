@@ -36,6 +36,7 @@ rows:
   - '[pfam] Peptidase_M41: Peptidase family M41'
   - '[protein_family] AAA ATPase family; Peptidase M41 family; AAA ATPase family'
   - '[tigr_role] Cellular processes / Cell division'
+  - '[tigr_role_inferred] Protein fate / Degradation of proteins, peptides, and glycopeptides'
   - '[uniprot] Acts as a processive, ATP-dependent zinc metallopeptidase for both
     cytoplasmic and membrane proteins. Plays a role in the quality control of integral
     membrane proteins'

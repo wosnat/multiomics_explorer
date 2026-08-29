@@ -592,6 +592,7 @@ _NODE_PROP_NOTES = {
     "direct_gene_count": "genes attached to this exact node (not descendants); absent where it would be vacuous",
     "organism_count": "organisms with at least one gene annotated to the term (subtree-inclusive where `gene_count` is)",
     "member_count": "upstream family size (source-database members), not KG genes",
+    "ncbifam_family_count": "NCBIfam families bridged to this role via `Ncbifam_family_has_tigr_role`; subtree sum on mainroles",
 }
 
 

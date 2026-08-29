@@ -150,7 +150,7 @@ _KNOWN_MAP_KEYS = {
     # ontology_landscape verbose example_terms map projection keys
     "term_id", "n_genes",
     # Sparse ontology property — present on GO nodes with best-effort levels,
-    # absent on flat ontology nodes (CyanorakRole, TigrRole, etc.)
+    # absent on tree ontology nodes (CyanorakRole, TigrRole, etc.)
     "level_is_best_effort",
     # BRITE-only properties — present on BriteCategory nodes,
     # absent on all other ontology labels (returns null)

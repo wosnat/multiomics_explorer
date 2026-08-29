@@ -56,12 +56,13 @@ VALID_OMICS_TYPES: set[str] = {
 #
 # Bucket 6 (vocabulary set): the `Schema_info.controlled_vocabularies_hash`
 # this explorer was built against (KG-SYNC-006 + two-state strings HO-001 +
-# Meiothermus HO-002, built 2026-08-28T11:58Z, KG contract v2). The recipe lives KG-side (docs/kg-changes/
+# Meiothermus HO-002 + TigrRole hierarchy / NCBIfam→TigrRole bridge, built
+# 2026-08-29T10:11Z, KG contract v2). The recipe lives KG-side (docs/kg-changes/
 # vocabulary-contract.md). A mismatch means baked docs / parameter descriptions
 # may list stale values — filters still validate live. Must equal the live
 # KG's value at release cut.
 EXPECTED_CONTROLLED_VOCABULARIES_HASH: str = (
-    "sha256:d7191e2a63eac2c56c36391397108ca8c5b5d3d50f12388de7709fda964b3338"
+    "sha256:a7c97e007fb5d7978ce84ffafaa30852b7e04fc8a242817f8e94c8215f407aca"
 )
 
 EXPECTED_KG_SHAPE: dict[str, tuple[str, ...] | str] = {

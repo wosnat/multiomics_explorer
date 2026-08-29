@@ -3,10 +3,11 @@ row_count: 1
 rows:
 - evidence: curated
   is_informative: true
-  level: 0
+  level: 1
   locus_tag: PMM0001
   sources:
   - cyanorak
+  - interproscan
   term_id: tigr.role:132
   term_name: DNA metabolism / DNA replication, recombination, and repair
   tree: null

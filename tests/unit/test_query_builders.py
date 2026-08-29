@@ -102,10 +102,18 @@ class TestHierarchyWalk:
         assert frag["walk_up"] == ""
         assert "(g:Gene {organism_name: $org})-[r:Gene_in_cog_category]->(t:CogFunctionalCategory)" in frag["bind_up"]
 
-    def test_tigr_role_flat(self):
+    def test_tigr_role_two_level(self):
+        """TigrRole is a two-level ontology (subrole -> mainrole) since the
+        2026-08-29 KG rebuild: the up walk must traverse Tigr_role_is_a_tigr_role."""
         frag = _hierarchy_walk("tigr_role", direction="up")
-        assert frag["walk_up"] == ""
         assert frag["leaf_label"] == "TigrRole"
+        assert "Tigr_role_is_a_tigr_role" in frag["rel_union"]
+        assert "Tigr_role_is_a_tigr_role" in frag["walk_up"]
+        assert "(t:TigrRole)" in frag["walk_up"]
+
+    def test_tigr_role_down(self):
+        frag = _hierarchy_walk("tigr_role", direction="down")
+        assert "(t:TigrRole)<-[:Tigr_role_is_a_tigr_role*0..]-(leaf:TigrRole)" in frag["walk_down"]
 
     def test_pfam_up_crosses_to_clan(self):
         frag = _hierarchy_walk("pfam", direction="up")
@@ -1830,7 +1838,7 @@ class TestBuildGenesByOntologyPerTerm:
             build_genes_by_ontology_per_term,
         )
         cypher, _ = build_genes_by_ontology_per_term(
-            ontology="tigr_role",
+            ontology="cog_category",
             organism="Prochlorococcus MED4",
             level=0,
             term_ids=None,
@@ -1838,7 +1846,7 @@ class TestBuildGenesByOntologyPerTerm:
             max_gene_set_size=500,
         )
         # Flat ontology: t = leaf, no walk
-        assert "(g:Gene {organism_name: $org})-[r:Gene_has_tigr_role]->(t:TigrRole)" in cypher
+        assert "(g:Gene {organism_name: $org})-[r:Gene_in_cog_category]->(t:CogFunctionalCategory)" in cypher
         assert "(leaf)-[:" not in cypher
 
 
@@ -5219,9 +5227,9 @@ class TestBuildOntologyLandscape:
         assert "Biological_process_part_of_biological_process" in cypher
 
     def test_flat_ontology_omits_hierarchy_walk(self):
-        """tigr_role has empty hierarchy_rels — only one MATCH."""
+        """cog_category has empty hierarchy_rels — only one MATCH."""
         cypher, _ = build_ontology_landscape(
-            ontology="tigr_role", organism_name="Prochlorococcus MED4",
+            ontology="cog_category", organism_name="Prochlorococcus MED4",
         )
         # No hierarchy-walk MATCH (the second MATCH line is absent)
         assert cypher.count("MATCH") == 1
@@ -5360,7 +5368,7 @@ class TestBuildOntologyExpcov:
 
     def test_flat_ontology_omits_hierarchy_walk(self):
         cypher, _ = build_ontology_expcov(
-            ontology="tigr_role",
+            ontology="cog_category",
             organism_name="Prochlorococcus MED4",
             experiment_ids=["e1"],
         )
@@ -12452,12 +12460,13 @@ class TestBuildSearchOntologyVerboseColumns:
         assert "t.description AS description" in cypher
         assert "t.level_kind AS level_kind" in cypher
 
-    def test_verbose_direct_gene_count_on_hierarchical_label(self):
+    @pytest.mark.parametrize("ontology", ["tcdb", "tigr_role"])
+    def test_verbose_direct_gene_count_on_hierarchical_label(self, ontology):
         cypher, _ = build_search_ontology(
-            ontology="tcdb", search_text="transport", verbose=True)
+            ontology=ontology, search_text="transport", verbose=True)
         assert "t.direct_gene_count AS direct_gene_count" in cypher
 
-    @pytest.mark.parametrize("ontology", ["ncbifam", "cog_category", "tigr_role"])
+    @pytest.mark.parametrize("ontology", ["ncbifam", "cog_category"])
     def test_verbose_no_direct_gene_count_on_flat_label(self, ontology):
         cypher, _ = build_search_ontology(
             ontology=ontology, search_text="x", verbose=True)

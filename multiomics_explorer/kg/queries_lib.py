@@ -130,13 +130,15 @@ ONTOLOGY_CONFIG = {
         "term_details_verbose": "*",
     },
     "tigr_role": {
+        # Two-level since the 2026-08-29 KG (subrole -> mainrole); mainroles
+        # are slug ids (`tigr.role:energy_metabolism`), subroles numeric.
         "label": "TigrRole",
         "gene_rel": "Gene_has_tigr_role",
-        "hierarchy_rels": [],
+        "hierarchy_rels": ["Tigr_role_is_a_tigr_role"],
         "fulltext_index": "tigrRoleFullText",
         "trust": dict(_TRUST_SOURCES_EVIDENCE),
         "term_compact": ["gene_count", "organism_count"],
-        "term_details_compact": ["code"],
+        "term_details_compact": ["code", "direct_gene_count", "ncbifam_family_count"],
         "term_details_verbose": "*",
     },
     "pfam": {
@@ -277,6 +279,10 @@ ONTOLOGY_CONFIG = {
         "term_details_verbose": "*",
         "bridges_out": [
             ("Ncbifam_family_in_interpro_entry", "interpro", "membership"),
+            # JCVI TIGRFAMs 15.0 role archive, family -> role; read outward
+            # only -- the KG asserts a gene role from it solely for
+            # equivalog families.
+            ("Ncbifam_family_has_tigr_role", "tigr_role", "router"),
         ],
     },
     "merops": {
@@ -4311,7 +4317,7 @@ def _gene_ontology_terms_leaf_filter(
        -[:is_a*1..]->(t) }`. `*1..` (was a single hop) so an annotation two or
        more levels below `t` also supersedes it. Meaningful only when genes can
        be annotated to both a child and its ancestor within the same label, so
-       skipped for flat ontologies (cog_category, tigr_role, ncbifam),
+       skipped for flat ontologies (cog_category, ncbifam, psortb),
        cross-label hierarchies (pfam: Pfam→PfamClan) and bridges (brite).
 
     2. `leaf_attachment` — TCDB stamps the deepest surviving attachment on the

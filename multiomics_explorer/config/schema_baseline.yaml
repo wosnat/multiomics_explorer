@@ -113,6 +113,7 @@ schema:
         preferred_id: string
         property: string
         sparse: string
+        value_descriptions: list
         value_type: string
         values: list
     CyanorakRole:
@@ -808,10 +809,13 @@ schema:
     TigrRole:
       properties:
         code: string
+        direct_gene_count: int
         gene_count: int
         id: string
         level: int
+        level_kind: string
         name: string
+        ncbifam_family_count: int
         organism_count: int
         preferred_id: string
   relationships:
@@ -1623,6 +1627,18 @@ schema:
       - NamedThing
       properties:
         id: string
+    Ncbifam_family_has_tigr_role:
+      source_labels:
+      - BiologicalEntity
+      - Entity
+      - NamedThing
+      - NcbifamFamily
+      target_labels:
+      - Entity
+      - NamedThing
+      - TigrRole
+      properties:
+        id: string
     Og_has_cyanorak_role:
       source_labels:
       - GroupingClass
@@ -1862,6 +1878,17 @@ schema:
       properties:
         id: string
         substrate_depth: string
+    Tigr_role_is_a_tigr_role:
+      source_labels:
+      - Entity
+      - NamedThing
+      - TigrRole
+      target_labels:
+      - Entity
+      - NamedThing
+      - TigrRole
+      properties:
+        id: string
     Tests_coculture_with:
       source_labels:
       - Experiment

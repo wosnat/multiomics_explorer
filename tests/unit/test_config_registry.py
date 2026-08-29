@@ -297,6 +297,19 @@ class TestTermSide:
             "ncbifam_id", "family_type", "gene_symbol",
         ]
 
+    def test_tigr_role_term_details_compact(self):
+        """tigr-role-hierarchy-bridge spec §1: two-level TigrRole exposes
+        direct_gene_count + the NCBIfam bridge fan-in count on term details."""
+        assert ONTOLOGY_CONFIG["tigr_role"]["term_details_compact"] == [
+            "code", "direct_gene_count", "ncbifam_family_count",
+        ]
+
+    def test_tigr_role_hierarchy_rels(self):
+        """tigr-role-hierarchy-bridge spec §1: subrole -> mainrole is_a edge."""
+        assert ONTOLOGY_CONFIG["tigr_role"]["hierarchy_rels"] == [
+            "Tigr_role_is_a_tigr_role",
+        ]
+
 
 # --- bridges ----------------------------------------------------------------
 
@@ -316,7 +329,10 @@ EXPECTED_BRIDGES = {
         ("Interpro_entry_related_to_ec_number", "ec", "router"),
         ("Interpro_entry_related_to_cazy_family", "cazy", "router"),
     ],
-    "ncbifam": [("Ncbifam_family_in_interpro_entry", "interpro", "membership")],
+    "ncbifam": [
+        ("Ncbifam_family_in_interpro_entry", "interpro", "membership"),
+        ("Ncbifam_family_has_tigr_role", "tigr_role", "router"),
+    ],
 }
 
 

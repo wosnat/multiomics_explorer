@@ -103,7 +103,8 @@ ontology_landscape(organism="MED4")
 ```
 
 ```example-response
-{"organism_name": "Prochlorococcus MED4", "organism_gene_count": 1976, "n_ontologies": 9, "by_ontology": {"tigr_role": {"best_level": 0, "best_genome_coverage": 0.893, "best_relevance_rank": 1, "n_levels": 1}, "cyanorak_role": {"best_level": 1, "best_genome_coverage": 0.755, "best_relevance_rank": 2, "n_levels": 3}}, "results": [{"ontology_type": "tigr_role", "level": 0, "relevance_rank": 1, "genome_coverage": 0.893, "median_genes_per_term": 9.0, "n_levels_in_ontology": 1}]}
+{"organism_name": "Prochlorococcus MED4", "organism_gene_count": 1976, "n_ontologies": 9, "by_ontology": {"tigr_role": {"best_level": 1, "best_genome_coverage": 0.62, "best_relevance_rank": 1, "n_levels": 2}, "cyanorak_role": {"best_level": 1, "best_genome_coverage": 0.755, "best_relevance_rank": 2, "n_levels": 3}}, "results": [{"ontology_type": "tigr_role", "level": 1, "relevance_rank": 1, "genome_coverage": 0.62, "median_genes_per_term": 12.5, "n_levels_in_ontology": 2}]}
+# Illustrative — ranks and coverages shift with each KG build; read the live response.
 ```
 
 ### Example 2: Drill into a specific ontology
@@ -131,7 +132,7 @@ ontology_landscape(organism="MED4")
 ```example-response
 {"organism_name": "Prochlorococcus MED4", "n_ontologies": 12,
  "by_ontology": {
-   "tigr_role": {"best_level": 0, "best_genome_coverage": 0.893, "best_relevance_rank": 1, "n_levels": 1},
+   "tigr_role": {"best_level": 1, "best_genome_coverage": 0.62, "best_relevance_rank": 1, "n_levels": 2},
    "tcdb":      {"best_level": 0, "best_genome_coverage": 0.04,  "best_relevance_rank": 11, "n_levels": 5},
    "cazy":      {"best_level": 0, "best_genome_coverage": 0.012, "best_relevance_rank": 12, "n_levels": 2}
  },
@@ -274,7 +275,7 @@ ontology_landscape(ontology='merops', call_class=['peptidase']) -> genes_by_onto
 
 - Don't pick a level by term-size stats alone -- always check genome_coverage. An ontology may have appealing median term size at a level that covers only 18% of the genome.
 
-- Top-ranked flat ontologies (tigr_role, cog_category, pfam) are valid enrichment surfaces but offer no level choice. For hierarchical drill-down, filter results to rows where n_levels_in_ontology > 1.
+- Top-ranked flat ontologies (cog_category, ncbifam) are valid enrichment surfaces but offer no level choice. For hierarchical drill-down, filter results to rows where n_levels_in_ontology > 1.
 
 - KEGG has ~40% orphan KOs lacking pathway membership. If L3 coverage is substantially higher than L0-L2 coverage, the gap is structural -- those genes have KO-level annotations only.
 

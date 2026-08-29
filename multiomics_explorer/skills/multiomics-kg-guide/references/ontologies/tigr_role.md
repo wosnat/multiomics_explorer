@@ -6,28 +6,68 @@ Generated from `inputs/ontologies/tigr_role.yaml`, the `ONTOLOGY_CONFIG` registr
 
 TIGR (JCVI) functional roles — the classic "main role / sub role" scheme
 from TIGR genome annotation (`tigr.role:164` Energy metabolism /
-Photosynthesis, `tigr.role:156` Hypothetical proteins / Conserved). In
-this KG the roles arrive through Cyanorak's curation layer, which carries
-a TIGR role alongside its own role for each gene cluster.
+Photosynthesis, `tigr.role:156` Hypothetical proteins / Conserved). The
+role vocabulary and the family-to-role assignments come from JCVI's
+frozen TIGRFAMs 15.0 role archive; in this KG the gene-level roles arrive
+from two sources (see `method`).
 
 ## How genes get annotated
 
-All edges are `evidence='curated'`, `sources=['cyanorak']` — the TIGR role
-Cyanorak curators attached to the ortholog cluster. Same coverage boundary
-as `cyanorak_role`: only Cyanorak-covered picocyanobacteria carry TIGR
-roles; Alteromonas genes have none. No `evidence_score`.
+Two sources feed `Gene_has_tigr_role`:
+
+- **Cyanorak curation** — the TIGR role Cyanorak curators attached to the
+  ortholog cluster. `sources=['cyanorak']`, `evidence='curated'`. Covers
+  only the 22 Cyanorak-annotated picocyanobacteria.
+- **NCBIfam family inference** — for each gene's NCBIfam hit whose family
+  is `family_type='equivalog'` (same function in every member) and carries
+  an archived TIGR role, the KG asserts that role on the gene.
+  `sources=['interproscan']`, `evidence='family_inferred'`. Covers all 43
+  organisms, heterotrophs included. Non-equivalog families (`subfamily`,
+  `domain`, `hypoth_equivalog`, …) never produce a gene edge — they reach
+  a role only through the `Ncbifam_family_has_tigr_role` bridge (see
+  `docs://ontologies/ncbifam`), which is a router, not an annotation.
+
+When both sources name the same role for a gene they are merged into ONE
+edge with `sources=['cyanorak','interproscan']` and `evidence='curated'`
+(curated wins the ladder). When they disagree the gene carries two
+separate edges, distinguishable by `evidence`. Filter `sources` by
+membership, never by list equality: `'cyanorak' IN r.sources` keeps the
+agreeing edges, `r.sources = ['cyanorak']` silently drops them (the
+explorer's `sources=` filter already uses membership). No
+`evidence_score`.
 
 ## Identifier form
 
-`tigr.role:164` — prefix plus the TIGR role numeric ID; node `code` is the
-bare number, `name` the "Main role / Sub role" string.
+Subroles: `tigr.role:164` — prefix plus the TIGR role numeric ID; node
+`code` is the bare number, `name` the compound "Main role / Sub role"
+string. Mainroles: `tigr.role:energy_metabolism` — prefix plus a slug of
+the main-role text; node `code` is the slug, `name` the main-role text.
+Two Cyanorak-only roots keep numeric ids (`tigr.role:856` "Not Found",
+`tigr.role:270`), so `level_kind` — not the id shape — is the reliable
+level discriminator.
 
 ## Hierarchy
 
-Flat in the KG: every node is `level=0`, no hierarchy edges. The main-role
-/ sub-role pairing lives inside `name`, not as a parent–child edge, so
-there is no rollup from sub role to main role. `gene_count` /
-`organism_count` are direct.
+Two-level tree via `Tigr_role_is_a_tigr_role` (subrole → mainrole, one
+parent per subrole).
+
+- `level=0`, `level_kind='tigr_mainrole'`: 21 roots — 19 slug-id mainroles
+  plus the two Cyanorak-only numeric roots `tigr.role:856` / `tigr.role:270`
+  (no parent, no children).
+- `level=1`, `level_kind='tigr_subrole'`: 115 subroles, numeric ids,
+  compound "Main / Sub" name.
+
+Genes attach to subroles, except for the two numeric roots `tigr.role:856`
+/ `tigr.role:270`, which carry a few hundred genes directly (no subrole
+below them) — so a `level=1` selection misses those genes while a
+`level=0` rollup includes them (MED4: 1,758 genes at level 1 vs 1,766
+at level 0). `gene_count` / `organism_count` are
+subtree-inclusive, so a mainrole's `gene_count` is the union over its
+children and its `direct_gene_count` is 0; use `direct_gene_count` when
+you need the non-recursive number, and do not mix levels in one ORA
+without collapsing them first. `ncbifam_family_count` is the number of
+NCBIfam families bridged to the role via `Ncbifam_family_has_tigr_role`,
+subtree-summed on mainroles with the same caveat.
 
 ## Graph shape (from the registry)
 
@@ -35,11 +75,12 @@ there is no rollup from sub role to main role. `gene_count` /
 |---|---|
 | Node label | `TigrRole` |
 | Gene → term edge | `Gene_has_tigr_role` |
-| Hierarchy edges | none — flat ontology (`level=0` only, nothing to expand) |
+| Hierarchy edges (child → parent) | `Tigr_role_is_a_tigr_role` |
 | Fulltext index | `tigrRoleFullText` |
 | Trust axes on the gene edge | `sources`, `evidence` |
-| Extra compact columns, `ontology_term_details` | `code` |
+| Extra compact columns, `ontology_term_details` | `code`, `direct_gene_count`, `ncbifam_family_count` |
 | Bridges out (`links_out`) | none |
+| Bridges in (read from the source term) | `Ncbifam_family_has_tigr_role` from `ncbifam` (*router*) |
 
 Bridges are forward-only: `ontology_term_details` lists `links_out` on the source term; there is no `links_in`. `composition` = built from these parts; `membership` = one of that ontology's known members; `router` = a computed cross-reference, recall-biased, never a gene-function call.
 
@@ -48,10 +89,13 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 | Property | Type | Meaning |
 |---|---|---|
 | `code` | string |  |
+| `direct_gene_count` | int | genes attached to this exact node (not descendants); absent where it would be vacuous |
 | `gene_count` | int | genes annotated to the term — subtree-inclusive on hierarchical labels, direct on flat ones |
 | `id` | string | term ID as used in `term_ids=[...]` (self-prefixed CURIE) |
 | `level` | int | hierarchy depth, 0 = root / broadest |
+| `level_kind` | string | what a level means in this ontology (see the vocabulary below) |
 | `name` | string | term name (what `search_ontology` indexes) |
+| `ncbifam_family_count` | int | NCBIfam families bridged to this role via `Ncbifam_family_has_tigr_role`; subtree sum on mainroles |
 | `organism_count` | int | organisms with at least one gene annotated to the term (subtree-inclusive where `gene_count` is) |
 | `preferred_id` | string | same value as `id` |
 
@@ -63,32 +107,58 @@ Values: see `list_filter_values(filter_type=..., ontology='tigr_role')` — `tru
 
 ## Interpretation
 
-A second curated, picocyanobacteria-scoped functional axis, at roughly the
-granularity of a Cyanorak level-1 role but with different boundaries
-(TIGR splits energy metabolism finely, lumps regulation). Useful as a
-cross-check on a Cyanorak enrichment, or when a question is phrased in
-TIGR vocabulary. Same organism-coverage caveat as Cyanorak.
+A functional axis at roughly the granularity of a Cyanorak level-1 role
+but with different boundaries (TIGR splits energy metabolism finely,
+lumps regulation), and — unlike `cyanorak_role` — comparable across
+genera: every organism carries roles, so "which roles dominate the
+Alteromonas response" is a first-class question. Coverage is uneven,
+though: inferred coverage is bounded by NCBIfam hits and by the equivalog
+gate, so roughly a fifth of a heterotroph genome carries a role, versus
+~90% of MED4 where curated Cyanorak roles dominate. Level 1 (subroles)
+is the usual enrichment unit; level 0 (mainroles) is genome-composition
+scale.
 
 ## Informativeness rule
 
-The hypothetical / unknown-function roles (`tigr.role:156` and sibling
-"Unknown function" entries) are flagged uninformative and dropped by
-`informative_only=True`.
+Nine roles are flagged uninformative and dropped by
+`informative_only=True`: five level-0 roots — the numeric Cyanorak-only
+roots `tigr.role:270` and `tigr.role:856` ("Not Found") plus the mainroles
+`tigr.role:hypothetical_proteins`, `tigr.role:unclassified`,
+`tigr.role:unknown_function` — and four subroles `tigr.role:156`, `157`,
+`185`, `704` (hypothetical / unknown-function entries). A level-0
+composition with `informative_only=True` therefore sees 16 roots, not
+21. Inferred edges to
+these roles are still stored — a family *being* "hypothetical" is a fact
+worth keeping — they are simply excluded from enrichment by default.
 
 ## Pitfalls
 
-- Flat: `level=1` returns nothing; to group by main role, split `name` on
-  ` / ` client-side.
-- Coverage bounded to Cyanorak-covered organisms — check
-  `genome_coverage` in `ontology_landscape` before enriching a mixed
-  organism set.
-- Roles are broad (a hundred-odd nodes for a whole genome); use them for
-  composition and coarse enrichment, not gene-level function.
+- `level=0` returns the 21 mainroles, not every role. To work at subrole
+  granularity pass `level=1`, or select on `level_kind='tigr_subrole'` —
+  two roots have numeric ids, so the id shape alone does not tell levels
+  apart.
+- Mainrole `code` is a slug (`energy_metabolism`), subrole `code` a
+  number — do not parse `code` as an integer across levels.
+- Coverage bias in ORA: a heterotroph carries roles on only a fraction of
+  its genes, so an enrichment whose background is "all genes of the
+  organism" reports role enrichment that is really an annotation-density
+  artifact. Pass an explicit `background=` list of the organism's genes
+  with at least one TIGR edge — build it from
+  `genes_by_ontology(ontology='tigr_role', level=0, organism=...)` and
+  collect the distinct `locus_tag` values.
+- Curated-vs-inferred disagreements (about 5% of genes carrying both) are
+  facet choices, not errors (FtsH1: Cyanorak *Cell division* vs TIGR
+  *Protein degradation*). Both views are kept as two edges; scope with the
+  `evidence` filter when one view is wanted.
+- Roles are broad (a hundred-odd subroles for a whole genome); use them
+  for composition and coarse enrichment, not gene-level function.
 
 ## Typical questions
 
 - Which TIGR sub roles are enriched among genes down at night in the diel experiment?
 - How many MED4 genes fall under each TIGR main role?
+- Which TIGR roles are most common among Alteromonas HOT1A3 genes?
+- Roll this gene set up to TIGR main roles and compare the composition across organisms.
 - Does the TIGR role agree with the Cyanorak role for this gene set?
 
 ## Tools
@@ -100,8 +170,10 @@ The hypothetical / unknown-function roles (`tigr.role:156` and sibling
 
 ## See also
 
+- `docs://ontologies/ncbifam`
 - `docs://ontologies/cyanorak_role`
 - `docs://ontologies/cog_category`
 - `docs://analysis/enrichment`
+- `docs://analysis/annotation_evidence`
 - `docs://tools/ontology_landscape`
 - `docs://tools/ontology_term_details`

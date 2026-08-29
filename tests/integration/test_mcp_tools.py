@@ -1189,11 +1189,14 @@ class TestGeneOverview:
 
 @pytest.mark.kg
 class TestOntologyLandscapeIntegration:
-    def test_med4_all_ontologies_cyanorak_l1_rank1_among_hierarchical(self, conn):
+    def test_med4_all_ontologies_tigr_l1_rank1_among_hierarchical(self, conn):
         from multiomics_explorer.api.functions import ontology_landscape
         # informative_only=False preserves the pre-F1-surface rank ordering
         # (cyanorak_role L1 has 5 uninformative-flagged terms / ~16.5% of
         # gene-pairs that the default-on filter would drop).
+        # Since the 2026-08-29 KG TigrRole is two-level, so tigr_role L1
+        # (MED4 coverage ~0.62) is the top hierarchical row, ahead of
+        # cyanorak_role L1 (~0.56); both must appear as hierarchical rows.
         result = ontology_landscape(
             organism="MED4", limit=None, informative_only=False, conn=conn,
         )
@@ -1203,10 +1206,15 @@ class TestOntologyLandscapeIntegration:
         ]
         assert hierarchical, "expected at least one hierarchical row"
         top_hier = min(hierarchical, key=lambda r: r["relevance_rank"])
-        assert top_hier["ontology_type"] == "cyanorak_role"
+        assert top_hier["ontology_type"] == "tigr_role"
         assert top_hier["level"] == 1, (
-            f"expected cyanorak_role L1, got L{top_hier['level']}"
+            f"expected tigr_role L1, got L{top_hier['level']}"
         )
+        cyanorak_l1 = [
+            r for r in hierarchical
+            if r["ontology_type"] == "cyanorak_role" and r["level"] == 1
+        ]
+        assert cyanorak_l1, "cyanorak_role L1 must still be a hierarchical row"
 
     def test_med4_experiment_branch_coverage_fields(self, conn):
         from multiomics_explorer.api.functions import ontology_landscape

@@ -43,6 +43,8 @@ pathway rollups; `mcp_min_version` mismatch (live reads `0.1.0a1`, verdict `ok`)
 | 3.7 | MCP usability audit passes B/C/D + KG-1..KG-7. Pass A shipped 2026-04-30. Re-scope against the current surface before starting — much of it landed via the readability passes and the trust surface. | L | audit |
 | 3.8 | Chemistry slice 2+: `metabolites_by_pathway`, `list_reactions` / `genes_by_reaction`, `organism_metabolite_overlap`, Tier-3 `pathway_chemistry`. Defer until a workflow needs them. | L | chemistry design |
 | 3.11 | PyPI publication (out of scope for `/release-explorer` v1; install path is the git tag). | M | release |
+| 3.12 | Annotated-genes ORA background mode for `pathway_enrichment` / `cluster_enrichment` (per-organism genes with ≥1 edge in the chosen ontology; TIGR coverage bias — workaround is an explicit `background=` list from `genes_by_ontology(ontology='tigr_role', level=0)`). | S | tigr-role-bridge 2026-08-29 |
+| 3.13 | Registry-driven outfacing lint: for every `ONTOLOGY_CONFIG` key with non-empty `hierarchy_rels`, flag md/yaml prose calling it "flat" or saying `level=1` returns nothing for it (the fixed `LINT_PATTERN` regex missed `search_ontology.yaml`, `genes_by_ontology.yaml`, `ontology_landscape.yaml` and two test comments during the TIGR absorb). | S | tigr-role-bridge code review 2026-08-29 |
 
 ## 4. KG asks pending (explorer → KG)
 

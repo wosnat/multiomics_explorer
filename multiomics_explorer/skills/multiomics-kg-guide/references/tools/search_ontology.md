@@ -435,7 +435,7 @@ search_ontology(ontology=['interpro'], interpro_type=...) / ['ncbifam'] / ['mero
 
 - Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `kegg`, `ec`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`. Each has a reference page at docs://ontologies/{key} (identifier form, levels, what `gene_count` means there).
 
-- Use `level` to restrict results to a hierarchy depth (0 = broadest). PSORTb, SignalP, COG, TIGR and NCBIfam are flat — `level=1` returns nothing for them. Pfam clans are level 0, domains level 1.
+- Use `level` to restrict results to a hierarchy depth (0 = broadest). PSORTb, SignalP, COG and NCBIfam are flat — `level=1` returns nothing for them. Pfam clans are level 0, domains level 1. TIGR is two-level: level 0 = the 21 main roles (`level_kind='tigr_mainrole'`), level 1 = sub roles (`level_kind='tigr_subrole'`).
 
 - TCDB is family-level transporter classification. For substrate-anchored questions ('which genes transport sucrose?'), chain via `genes_by_metabolite` instead — that tool surfaces the TCDB substrate edges directly.
 

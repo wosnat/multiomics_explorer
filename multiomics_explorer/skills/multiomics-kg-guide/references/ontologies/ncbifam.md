@@ -50,7 +50,7 @@ as edges — use the InterPro bridge for hierarchy.
 | Verbose edge detail | `evalue`, `bit_score`, `start`, `end` |
 | Term columns, verbose `search_ontology` | `family_type`, `gene_symbol` |
 | Extra compact columns, `ontology_term_details` | `ncbifam_id`, `family_type`, `gene_symbol` |
-| Bridges out (`links_out`) | `Ncbifam_family_in_interpro_entry` → `interpro` (*membership*) |
+| Bridges out (`links_out`) | `Ncbifam_family_in_interpro_entry` → `interpro` (*membership*); `Ncbifam_family_has_tigr_role` → `tigr_role` (*router*) |
 
 Bridges are forward-only: `ontology_term_details` lists `links_out` on the source term; there is no `links_in`. `composition` = built from these parts; `membership` = one of that ontology's known members; `router` = a computed cross-reference, recall-biased, never a gene-function call.
 
