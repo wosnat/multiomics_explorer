@@ -987,8 +987,10 @@
   params:
     rankable: true
   expect:
-    min_rows: 31
-    max_rows: 31
+    # 31 -> 42 (verified live 2026-08-29): KG-SYNC-006 paper batch added
+    # 11 rankable numeric DMs.
+    min_rows: 42
+    max_rows: 42
 
 - id: list_derived_metrics_rankable_false
   tool: list_derived_metrics
@@ -998,9 +1000,10 @@
   expect:
     # 34 -> 38 (verified live 2026-08-20): Lu 2026 DM rewiring replaced
     # 2 non-rankable numeric DMs with 6 non-rankable boolean per-strain
-    # detection metrics (net +4).
-    min_rows: 38
-    max_rows: 38
+    # detection metrics (net +4). 38 -> 41 (verified live 2026-08-29):
+    # KG-SYNC-006 paper batch, +3 non-rankable DMs.
+    min_rows: 41
+    max_rows: 41
 
 - id: list_derived_metrics_has_p_value_empty
   tool: list_derived_metrics
@@ -2128,12 +2131,13 @@
     ControlledVocabulary {applies_to:'ClusteringAnalysis',
     property:'cluster_type'} node (closed), source='vocabulary',
     applies_to=['ClusteringAnalysis'], no pivot warning (spec §3.4 / §7.4).
+    Rows are sparse — the vocab description sits once on the envelope.
   params:
     filter_type: cluster_type
   expect:
     min_rows: 6
     max_rows: 6
-    columns: [value, applies_to, description, source]
+    columns: [value, applies_to, source]
     contains:
       value: decay_pattern
       source: vocabulary

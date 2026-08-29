@@ -714,7 +714,7 @@ rows:
   organism_name: Prochlorococcus MIT9312
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 1016
+  total_gene_count: 1017
   treatment_type:
   - compartment
   unit: spectral counts / cell biovolume
@@ -736,7 +736,7 @@ rows:
   organism_name: Prochlorococcus MIT9312
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 221
+  total_gene_count: 222
   treatment_type:
   - compartment
   unit: spectral counts / vesicle biovolume
@@ -759,7 +759,7 @@ rows:
   organism_name: Prochlorococcus MIT9312
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
-  total_gene_count: 204
+  total_gene_count: 205
   treatment_type:
   - compartment
   unit: log2 ratio

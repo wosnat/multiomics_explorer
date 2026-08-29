@@ -1,9 +1,7 @@
 case_id: list_filter_values_cluster_type
-description: What kind of gene grouping a clustering analysis is (paperconfig `gene_clusters.cluster_type`,
-  validated by scripts/validate_paperconfig.py VALID_CLUSTER_TYPES). Registered 2026-08-27
-  (KG-SYNC-006) when the GEO pass added `decay_pattern` (Steglich 2010 mRNA-decay
-  profile clusters) and `genomic_island` (Hackl 2023 predicted genomic islands as
-  gene sets).
+description: 'What kind of gene grouping the analysis is: time_course, diel, condition_comparison,
+  expression_bin, decay_pattern (mRNA-decay profiles, Steglich 2010) or genomic_island
+  (predicted islands as gene sets, Hackl 2023).'
 filter_type: cluster_type
 results:
 - applies_to:
