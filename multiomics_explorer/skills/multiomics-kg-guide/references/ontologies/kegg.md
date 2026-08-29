@@ -91,13 +91,6 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="kegg")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
-
-- `Gene_has_kegg_ko.evidence`: `family_inferred`
-- `Gene_has_kegg_ko.sources`: `eggnog`
-- `KeggTerm.is_uninformative`: `true`
-- `KeggTerm.level_kind`: `category`, `subcategory`, `pathway`, `ko`
-
 ## Interpretation
 
 Pathway level (`level=2`) is the interpretable enrichment unit — it maps
@@ -134,8 +127,8 @@ in the background.
   evidence.
 - No trust ladder to filter on: `sources`/`evidence` are constant. Passing
   `min_evidence_score` raises (KEGG carries no score axis).
-- `informative_only` does not remove the global maps — see the
-  informativeness rule; `max_gene_set_size` is the working guard.
+- `informative_only` removes the global / overview maps but not
+  category or subcategory nodes — gate those with `level`.
 - Pathway-anchored metabolite lists and KO-anchored gene lists for the
   same map are different sets; name the anchor when answering.
 - Publication counts are a prose literature index, not expression — see

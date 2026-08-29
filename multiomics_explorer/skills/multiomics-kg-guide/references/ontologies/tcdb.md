@@ -101,16 +101,6 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="tcdb")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
-
-- `Gene_has_tcdb_family.attachment_depth`: `most_specific`, `superseded`
-- `Gene_has_tcdb_family.evidence`: `family_inferred`, `homology`
-- `Gene_has_tcdb_family.go_support`: `corroborated`, `uncorroborated`
-- `Gene_has_tcdb_family.pfam_support`: `corroborated`, `uncorroborated`
-- `Gene_has_tcdb_family.source_agreement`: `both_sources`, `single_source`
-- `Gene_has_tcdb_family.sources`: `eggnog`, `tcdb_diamond`
-- `TcdbFamily.level_kind`: `tc_class`, `tc_subclass`, `tc_family`, `tc_subfamily`, `tc_specificity`
-
 ## Interpretation
 
 Read the trust ladder in order: `evidence_score` ranks how corroborated

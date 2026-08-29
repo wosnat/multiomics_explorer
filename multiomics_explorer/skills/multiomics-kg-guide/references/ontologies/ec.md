@@ -84,11 +84,6 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="ec")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
-
-- `Gene_catalyzes_ec_number.evidence`: `curated`, `family_inferred`
-- `Gene_catalyzes_ec_number.sources`: `cyanorak`, `eggnog`, `interproscan`, `uniprot`
-
 ## Interpretation
 
 Level 3 (full EC) is the interpretable unit for "which enzymes does this

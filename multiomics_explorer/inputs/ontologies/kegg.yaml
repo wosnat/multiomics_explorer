@@ -81,8 +81,8 @@ pitfalls: |
     evidence.
   - No trust ladder to filter on: `sources`/`evidence` are constant. Passing
     `min_evidence_score` raises (KEGG carries no score axis).
-  - `informative_only` does not remove the global maps — see the
-    informativeness rule; `max_gene_set_size` is the working guard.
+  - `informative_only` removes the global / overview maps but not
+    category or subcategory nodes — gate those with `level`.
   - Pathway-anchored metabolite lists and KO-anchored gene lists for the
     same map are different sets; name the anchor when answering.
   - Publication counts are a prose literature index, not expression — see
