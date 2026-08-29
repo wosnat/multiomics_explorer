@@ -16,9 +16,13 @@ Same pooled pipeline as the other GO branches: Cyanorak curation, eggNOG
 transfer, InterProScan signature-to-GO mapping, NCBI and UniProt records,
 merged into one edge per (gene, term) with `sources[]`, a compact
 `evidence` rung (`curated` / `family_inferred` / `domain_inferred`) and an
-`evidence_score` in [0, 1]. Molecular-function terms are the branch most
-often filled by `domain_inferred` edges, because a Pfam/InterPro domain
-maps naturally onto an activity (a kinase domain implies kinase activity).
+`evidence_score` in [0, 1] — rung semantics in
+`docs://analysis/annotation_evidence`. Live on this edge type: eggNOG-only
+edges read `curated` (most of the branch; an open KG-side ask),
+InterProScan-only edges read `domain_inferred` or `family_inferred`.
+Molecular function is the branch where `domain_inferred` is most common,
+because a Pfam/InterPro domain maps naturally onto an activity (a kinase
+domain implies kinase activity).
 
 ## Identifier form
 
@@ -65,9 +69,12 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 `ontology_term_details(verbose=True)` returns every property as `properties`; a compact column that is missing on the node is absent, not null (`docs://guide/conventions`).
 
-## Controlled vocabularies
+## Applicable filter types
 
-Values: see `list_filter_values(filter_type=..., ontology='go_mf')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
+- `evidence` — `list_filter_values(filter_type="evidence", ontology="go_mf")`
+- `sources` — `list_filter_values(filter_type="sources", ontology="go_mf")`
+
+Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="go_mf")`) lists which comparable axes the gene edge carries.
 
 ## Interpretation
 
@@ -75,8 +82,9 @@ Molecular-function terms are precise about *what* an enzyme does but say
 nothing about pathway context — pair them with `go_bp`, KEGG or EC when the
 question is "which pathway". `domain_inferred` edges are common and often
 correct but broad (`ATP binding` on every P-loop protein); rank by
-`evidence_score` and prefer `curated` where a curator has been through the
-genome (Cyanorak-covered cyanobacteria). For enrichment, level 3-5 is the
+`evidence_score`, and check `sources` before reading `curated` as a
+curator's call — `['cyanorak']`, `['uniprot']` or `['ncbi']` are;
+`['eggnog']` alone is an orthology transfer. For enrichment, level 3-5 is the
 usual working range — check `ontology_landscape` first.
 
 ## Informativeness rule
@@ -92,16 +100,17 @@ instead of trusting them.
   unfiltered enrichment — expect them and look past them.
 - For transporter activity questions, TCDB families bridge *out* to GO
   molecular-function terms (`Tcdb_family_enables_molecular_function`);
-  the link is visible on the `tcdb` term, not on the GO term.
+  the bridge is forward-only — visible on the `tcdb` term, never on the
+  GO term. For the reverse direction use `run_cypher`.
 - Do not compare `evidence_score` to TCDB or MEROPS scores — each is a
   within-ontology composite.
 
 ## Typical questions
 
-- Which genes in MIT9313 have a curated (not domain-inferred) oxidoreductase activity annotation?
-- Which molecular functions are enriched in a co-expression cluster?
-- What is the sub-hierarchy under `go:0016491` oxidoreductase activity, and how many genes sit at each child?
-- Which TCDB families link to `go:0015399` primary active transmembrane transporter activity?
+- Which genes in MIT9313 have a non-domain-inferred oxidoreductase activity annotation? — `genes_by_ontology(ontology='go_mf', organism='MIT9313', term_ids=['go:0016491'], evidence=['curated','family_inferred'])`
+- Which molecular functions are enriched in a co-expression cluster? — `cluster_enrichment(organism='MED4', analysis_id=..., ontology='go_mf', level=3)`
+- What is the sub-hierarchy under `go:0016491` oxidoreductase activity, and how many genes sit at each child? — `ontology_term_details(term_ids=['go:0016491'])` and read `children[]`
+- Which TCDB families are characterised by `go:0005215` transporter activity? — the bridge runs from `tcdb` to GO only, so `run_cypher` over `Tcdb_family_enables_molecular_function`, or start from a `tcdb` term with `ontology_term_details`
 
 ## Tools
 

@@ -24,12 +24,12 @@ kind-specific drill-downs.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string \| None | None | Full-text search over DM name and field_description. Examples: 'diel amplitude', 'darkness survival', 'peak time'. |
-| organism | string \| None | None | Organism to filter by. Accepts short strain code ('MED4', 'NATL2A', 'MIT1002') or full name ('Prochlorococcus MED4'). Case-insensitive substring match. |
+| organism | string \| None | None | Organism to filter by. Accepts short strain code ('MED4', 'NATL2A', 'MIT1002') or full name ('Prochlorococcus MED4'). Word-based, case-insensitive match on preferred_name + name_synonyms; a genus word matches every strain. |
 | metric_types | list[string] \| None | None | Filter by metric_type tags (e.g. 'diel_amplitude_protein_log2', 'periodic_in_coculture_LD'). The same metric_type may appear across organisms / publications — use derived_metric_ids to pin one specific DM when that matters. |
 | value_kind | string ('numeric', 'boolean', 'categorical') \| None | None | Filter by value kind. Determines which drill-down tool applies: 'numeric' → genes_by_numeric_metric, 'boolean' → genes_by_boolean_metric, 'categorical' → genes_by_categorical_metric. |
 | compartment | string \| None | None | Sample compartment / scope. Current values: 'whole_cell', 'vesicle', 'exoproteome', 'spent_medium', 'lysate'. |
 | omics_type | string \| None | None | Omics assay type. Examples: 'RNASEQ', 'PROTEOME', 'PAIRED_RNASEQ_PROTEOME'. Case-insensitive. |
-| treatment_type | list[string] \| None | None | Treatment type(s) to match. Returns DMs whose treatment_type list overlaps ANY of the given values (e.g. 'diel', 'darkness', 'nitrogen_starvation'). Case-insensitive. |
+| treatment_type | list[string] \| None | None | Treatment type(s) to match. Returns DMs whose treatment_type list overlaps ANY of the given values (e.g. 'diel', 'darkness', 'nitrogen'). Case-insensitive. Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True). |
 | background_factors | list[string] \| None | None | Background experimental factor(s) to match (e.g. 'axenic', 'coculture', 'diel'). Returns DMs overlapping ANY given value. Case-insensitive. |
 | growth_phases | list[string] \| None | None | Growth phase(s) to match (e.g. 'darkness', 'exponential'). Case-insensitive. |
 | publication_doi | list[string] \| None | None | Filter by one or more publication DOIs (e.g. '10.1128/mSystems.00040-18'). Exact match. |
@@ -189,7 +189,7 @@ list_derived_metrics(organism="MED4")
 from multiomics_explorer import list_derived_metrics
 
 result = list_derived_metrics()
-# returns dict with keys: total_entries, total_matching, by_organism, by_value_kind, by_metric_type, by_compartment, by_omics_type, by_treatment_type, by_background_factors, by_growth_phase, score_max, score_median, offset, results
+# returns dict with keys: total_entries, total_matching, by_organism, by_value_kind, by_metric_type, by_compartment, by_omics_type, by_treatment_type, by_background_factors, by_growth_phase, score_max, score_median, returned, offset, truncated, results
 ```
 
 Use package import for bulk data extraction in scripts.

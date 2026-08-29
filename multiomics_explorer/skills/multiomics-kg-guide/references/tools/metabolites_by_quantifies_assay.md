@@ -13,7 +13,8 @@ absent rows (`value=0` / `detection_status='not_detected'`) are
 real biology and kept by default. Cross-organism by design.
 Pre-flight via
 `list_metabolite_assays(value_kind='numeric', rankable=True)`. Bare /
-xref metabolite IDs are coerced to canonical (`resolved_aliases`).
+xref metabolite IDs are coerced to canonical (`resolved_aliases`;
+collisions expand + warn).
 
 Routing: drill across to `assays_by_metabolite(metabolite_ids=[...])`
 for the boolean-arm complement and the cross-organism reverse view,
@@ -60,7 +61,7 @@ total_matching, by_detection_status, by_metric_bucket, by_assay, by_compartment,
 ```
 
 - **total_matching** (int): Row count in the filtered slice.
-- **by_detection_status** (list[MqaByDetectionStatus]): Counts per detection_status — primary qualitative headline. 'not_detected' rows are tested-absent (real biology, kept by default — about 75% of numeric edges).
+- **by_detection_status** (list[MqaByDetectionStatus]): Counts per detection_status — primary qualitative headline. 'not_detected' rows are tested-absent (real biology, kept by default — about 70% of numeric edges).
 - **by_metric_bucket** (list[MqaByMetricBucket]): Counts per rank-bucket on rankable rows.
 - **by_assay** (list[MqaByAssay]): Counts per assay_id. Pass these `assay_id`s to `metabolites_by_flags_assay(assay_ids=[...])` for the boolean complement.
 - **by_compartment** (list[MqaByCompartment]): Counts per compartment.
@@ -118,16 +119,120 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:met
 ```
 
 ```example-response
-total_matching: 64
-by_detection_status: [{detected: 27}, {sporadic: 30}, {not_detected: 7}]
-by_metric_bucket: [{mid: 32}, {low: 16}, {top_quartile: 9}, {top_decile: 7}]
-by_assay: [{assay_id: "metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration", count: 64}]
-by_compartment: [{whole_cell: 64}]
-by_organism: [{Prochlorococcus MIT9313: 64}]
-excluded_assays: []
-warnings: []
-not_found: {assay_ids: [], metabolite_ids: [], experiment_ids: [], publication_doi: []}
-results: [F6P top_decile rank 1-3, Citrate top_decile rank 4-5, ...]  # default limit=5
+{
+  "results": [
+    {
+      "metabolite_id": "kegg.compound:C00085",
+      "name": "D-Fructose 6-phosphate",
+      "kegg_compound_id": "C00085",
+      "value": 0.4465,
+      "value_sd": 0.0643467170879758,
+      "n_replicates": 2,
+      "n_non_zero": 2,
+      "metric_type": "cellular_concentration",
+      "metric_bucket": "top_decile",
+      "metric_percentile": 100.0,
+      "rank_by_metric": 1,
+      "detection_status": "detected",
+      "timepoint": "6 days",
+      "timepoint_hours": 144.0,
+      "timepoint_order": 2,
+      "growth_phase": null,
+      "condition_label": "control",
+      "assay_id": "metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration",
+      "organism_name": "Prochlorococcus MIT9313",
+      "compartment": "whole_cell"
+    },
+    {
+      "metabolite_id": "kegg.compound:C00085",
+      "name": "D-Fructose 6-phosphate",
+      "kegg_compound_id": "C00085",
+      "value": 0.289,
+      "value_sd": 0.26416093579482947,
+      "n_replicates": 3,
+      "n_non_zero": 2,
+      "metric_type": "cellular_concentration",
+      "metric_bucket": "top_decile",
+      "metric_percentile": 98.41269841269842,
+      "rank_by_metric": 2,
+      "detection_status": "sporadic",
+      "timepoint": "4 days",
+      "timepoint_hours": 96.0,
+      "timepoint_order": 1,
+      "growth_phase": null,
+      "condition_label": "control",
+      "assay_id": "metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration",
+      "organism_name": "Prochlorococcus MIT9313",
+      "compartment": "whole_cell"
+    },
+    {
+      "metabolite_id": "kegg.compound:C00085",
+      "name": "D-Fructose 6-phosphate",
+      "kegg_compound_id": "C00085",
+      "value": 0.2385,
+      "value_sd": 0.03747665940288703,
+      "n_replicates": 2,
+      "n_non_zero": 2,
+      "metric_type": "cellular_concentration",
+      "metric_bucket": "top_decile",
+      "metric_percentile": 96.82539682539682,
+      "rank_by_metric": 3,
+      "detection_status": "detected",
+      "timepoint": "6 days",
+      "timepoint_hours": 144.0,
+      "timepoint_order": 2,
+      "growth_phase": null,
+      "condition_label": "chitosan",
+      "assay_id": "metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration",
+      "organism_name": "Prochlorococcus MIT9313",
+      "compartment": "whole_cell"
+    },
+    ...
+  ],
+  "total_matching": 64,
+  "by_detection_status": [
+    {"detection_status": "sporadic", "count": 30},
+    {"detection_status": "detected", "count": 27},
+    {"detection_status": "not_detected", "count": 7}
+  ],
+  "by_metric_bucket": [
+    {"bucket": "mid", "count": 32},
+    {"bucket": "low", "count": 16},
+    {"bucket": "top_quartile", "count": 9},
+    {"bucket": "top_decile", "count": 7}
+  ],
+  "by_assay": [
+    {
+      "assay_id": "metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration",
+      "count": 64
+    }
+  ],
+  "by_compartment": [{"compartment": "whole_cell", "count": 64}],
+  "by_organism": [{"organism_name": "Prochlorococcus MIT9313", "count": 64}],
+  "by_metric": [
+    {
+      "assay_id": "metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration",
+      "name": "MIT9313 cellular metabolite concentration (fg/cell)",
+      "metric_type": "",
+      "count": 64,
+      "filtered_value_min": 0.0,
+      "filtered_value_max": 0.4465,
+      "assay_value_min": 0.0,
+      "assay_value_q1": 0.0010333333333333334,
+      "assay_value_median": 0.0046,
+      "assay_value_q3": 0.010866666666666665,
+      "assay_value_max": 0.4465,
+      "rankable": true
+    }
+  ],
+  "excluded_assays": [],
+  "warnings": [],
+  "resolved_aliases": {},
+  "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
+  "returned": 5,
+  "truncated": true,
+  "offset": 0
+}
 ```
 
 ### Example 2: Top-decile only (rankable filter applies)
@@ -170,6 +275,8 @@ metabolites_by_quantifies_assay → metabolites_by_gene(locus_tags=[...], organi
 ```
 
 ## Common mistakes
+
+- Numeric arm only (`Assay_quantifies_metabolite`). Siblings: `metabolites_by_flags_assay` is the boolean-arm twin (presence flags, no values); `assays_by_metabolite` is the metabolite-anchored reverse lookup over both arms.
 
 ```mistake
 Filter out value=0 / flag_value=false rows assuming they are noise.
@@ -225,7 +332,7 @@ Apply value_min=0.001 by default to 'clean' the data.
 
 ```correction
 `value_min > 0` strips tested-absent rows (`value=0` /
-`detection_status='not_detected'`). About 75% of numeric edges are
+`detection_status='not_detected'`). About 70% of numeric edges are
 not_detected — value_min would discard the majority of measured
 biology. Surface as caller choice, never default-on. See
 `docs://guide/conventions`.
@@ -257,8 +364,6 @@ change when the upstream backfill lands.
 
 ```
 
-- See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (75% of numeric edges are not_detected, kept by default).
-
 ```mistake
 metabolites_by_quantifies_assay(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'
 ```
@@ -277,13 +382,15 @@ in the form you passed.
 
 ```
 
+- See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (about 70% of numeric edges are not_detected, kept by default).
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import metabolites_by_quantifies_assay
 
 result = metabolites_by_quantifies_assay(assay_ids=...)
-# returns dict with keys: total_matching, by_detection_status, by_metric_bucket, by_assay, by_compartment, by_organism, by_metric, excluded_assays, warnings, resolved_aliases, not_found, offset, results
+# returns dict with keys: total_matching, by_detection_status, by_metric_bucket, by_assay, by_compartment, by_organism, by_metric, excluded_assays, warnings, resolved_aliases, not_found, returned, truncated, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

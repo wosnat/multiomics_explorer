@@ -3,22 +3,27 @@
 ## What it does
 
 Find metabolites the input gene set's chemistry reaches in one
-organism. Symmetric counterpart to `genes_by_metabolite` — same
-two arms (metabolism and transport over each gene's deepest TCDB
+organism.
+
+What: symmetric counterpart to `genes_by_metabolite` — same two
+arms (metabolism and transport over each gene's deepest TCDB
 attachments only, so distinct transport metabolites equal
 `gene_overview.transported_metabolite_count`), same per-row union
 shape with `substrate_depth` + `tcdb_evidence_score`, same
-direction-agnostic semantics. Genes with only lumping attachments
-(notably ABC-only) emit many `inherited` rows; the global sort
-(metabolism → most_specific → inherited, score desc within a tier)
-prevents one gene from consuming `limit`, and the auto-warning
-names input genes whose `transport_substrate_resolution` is
-'family_inferred' (breadth is reachability, not capability;
-'resolved' means at least one non-lumping attachment, not all).
-The `metabolite_elements` filter is the N-source workflow
-primitive (presence-only AND-of, e.g. `['N']`). The `by_element`
-envelope is presence-only — not stoichiometric, not
-mass-balanced. Use `summary=True` on batch DE inputs (50+
+direction-agnostic semantics. The `metabolite_elements` filter is
+the N-source workflow primitive (presence-only AND-of, e.g.
+`['N']`). The `by_element` envelope is presence-only — not
+stoichiometric, not mass-balanced.
+
+Transport semantics: genes with only lumping attachments (notably
+ABC-only) emit many `inherited` rows; the global sort (metabolism →
+most_specific → inherited, score desc within a tier) prevents one
+gene from consuming `limit`, and the auto-warning names input genes
+whose `transport_substrate_resolution` is 'family_inferred'
+(breadth is reachability, not capability; 'resolved' means at
+least one non-lumping attachment, not all).
+
+Batch advice: use `summary=True` on batch DE inputs (50+
 locus_tags). Bare / xref metabolite IDs are coerced to canonical
 (`resolved_aliases`; collisions expand + warn).
 
@@ -43,7 +48,7 @@ for the chemistry-layer decision tree.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags to drill into (case-sensitive). E.g. ['PMM0963', 'PMM0964', 'PMM0965'] for urease α/β/γ subunits. `not_found.locus_tags` lists tags that don't resolve to any Gene in the requested organism; `not_matched` lists tags that DO resolve but have no chemistry edges (no Gene_catalyzes_reaction AND no Gene_has_tcdb_family). |
-| organism | string | — | Organism name (case-insensitive, fuzzy word-based match — mirrors `differential_expression_by_gene` and `genes_by_metabolite`). Single-organism enforced. E.g. 'Prochlorococcus MED4'. `not_found.organism` is set when the name resolves to zero matching genes for the input locus_tags. |
+| organism | string | — | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises) — mirrors `differential_expression_by_gene` and `genes_by_metabolite`). Single-organism enforced. E.g. 'Prochlorococcus MED4'. `not_found.organism` is set when the name resolves to zero matching genes for the input locus_tags. |
 | metabolite_elements | list[string] \| None | None | Filter to rows where the metabolite contains ALL of the given element symbols (AND-of-presence). E.g. `['N']` keeps only N-bearing metabolites — the headline N-source workflow primitive. `['N', 'P']` requires both. Anchored on `Metabolite.elements` (KG-A3 Hill-parsed presence list); applies uniformly to both arms. Never substring-match on `formula` (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). `not_found.metabolite_elements` lists symbols that don't exist on any KG metabolite. |
 | metabolite_ids | list[string] \| None | None | Restrict rows to these metabolites (both arms). Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). Cross-feeding: feed `top_metabolites` to `genes_by_metabolite` on a partner. |
 | exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
@@ -265,15 +270,13 @@ metabolites_by_gene → not_matched (locus_tags with no chemistry edges) → gen
 
 ## Common mistakes
 
+- Gene-anchored (locus_tags → metabolites). The metabolite-anchored mirror is `genes_by_metabolite` (metabolite → genes); both share the same row class, discriminators and per-arm filter scope.
+
 - Single-organism enforced (mirrors `differential_expression_by_gene` and `genes_by_metabolite`). There is no `organisms` list. For cross-organism / cross-feeding work: call MBG once on the focal organism, take `top_metabolites`, then route to `genes_by_metabolite(metabolite_ids=[...], organism=partner)` (or `list_metabolites(metabolite_ids=[...], organism_names=[partner])` for presence-only).
 
 - `'metabolomics'` is NOT accepted in `evidence_sources` here — the Pydantic Literal allows only `('metabolism', 'transport')`. The metabolomics path (`MetaboliteAssay → Metabolite`) has no Gene anchor, so a metabolomics-only metabolite contributes no rows from this tool. For measurement evidence, use `list_metabolite_assays` / `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay`. Same divergence as `genes_by_metabolite`.
 
-- Read transport evidence as a three-level trust ladder, top down. (1) `tcdb_evidence_score` (row) / `tcdb_evidence_score_max` (gene, in `by_gene`) — how corroborated the gene × family call is. Rank by it, never filter by it; 0 means an uncorroborated hit, not an absent call (absent is `tcdb_evidence_score_max = None`). (2) Gene-level `transport_substrate_resolution` in `by_gene` — `family_inferred` means the gene's substrate breadth is reachability through a lumping family, not capability; `resolved` means AT LEAST ONE of the gene's deepest attachments is non-lumping, not all of them — a gene attached at both a specific family and the ABC superfamily is `resolved` and still carries the superfamily rollup in its rows. (3) Per-row `substrate_depth` — `most_specific` is the most specific SURVIVING transporter node for this substrate relative to the gene-pruned hierarchy; it can be a family node and it is not a curation level. `inherited` rows came down from an ancestor's substrate set.
-
-- Row-level `transport_substrate_resolution` is the GENE's resolution (the same KG value `by_gene[]` and `gene_overview` carry), repeated on every transport row of that gene — it is not a per-substrate fact and it never varies across one gene's rows (PMM0913: 554 rows, all `family_inferred`, including the 242 `most_specific` ones). Do not read it as "this substrate is inferred"; the per-row fact is `substrate_depth`. Metabolism rows read `None` (union padding), never `resolved`. It exists on rows so a batch-DE scan can drop `family_inferred` rows without a join back to `by_gene[]`.
-
-- When the auto-warning fires (input genes read `transport_substrate_resolution='family_inferred'`), their substrate breadth is reachability, not capability — and `substrate_depth=['most_specific']` does NOT remove them (substrates no kept child of the superfamily carries are most_specific AT the superfamily; PMM0913 keeps 242 such rows). Only the gene-level resolution guards against reading their substrates. Choose the depth filter by question shape: `substrate_depth=['most_specific']` for conservative casts (cross-organism inference); no filter for broad-screen candidate enumeration (N-source DE), where inherited rows on real uptake genes are the biology you want. Both depths are annotations, neither is ground truth — see `docs://guide/conventions`.
+- Transport trust reads top down, exactly as on `genes_by_metabolite`: (1) `tcdb_evidence_score` (row) / `tcdb_evidence_score_max` (in `by_gene`) — rank by it, never filter; (2) gene-level `transport_substrate_resolution` in `by_gene` and repeated on every transport row of that gene (`family_inferred` = reachability through a lumping family, not capability; `resolved` = at least one non-lumping deepest attachment; metabolism rows read `None`); (3) per-row `substrate_depth` (`most_specific` = most specific SURVIVING node in the gene-pruned hierarchy, which can be a family node; `inherited` = came down from an ancestor's substrate set). When the auto-warning fires, `substrate_depth=['most_specific']` does NOT remove `family_inferred` genes (PMM0913 keeps 242 such rows) — only the gene-level resolution guards against reading their substrates. Full ladder and the depth-filter decision (conservative cast vs broad screen): `docs://analysis/metabolites`.
 
 - Transport rows are deepest-attachment projections. A gene attached to a TCDB family AND to one of that family's descendants contributes rows only through the descendant; the ancestor's substrate rollup is intentionally absent. Consequently distinct metabolites across a gene's transport rows equal `gene_overview.transported_metabolite_count` (PMM0392: 13, not the ABC-superfamily plateau), and metabolite-side distinct genes equal `list_metabolites.transporter_gene_count`. To see a gene's full family membership including superseded ancestors, use `gene_ontology_terms(ontology='tcdb')`.
 
@@ -295,7 +298,7 @@ metabolites_by_gene → not_matched (locus_tags with no chemistry edges) → gen
 
 - Use `summary=True` for batch DE inputs (50+ locus_tags). Detail rows can exceed 1,000 quickly even after the depth-tier sort; the envelope rollups (top_metabolites, top_metabolite_pathways, top_reactions, top_tcdb_families, by_element, by_gene, top_gene_categories) are the actually-useful artifact at that scale.
 
-- `not_found.locus_tags` vs `not_matched`. `not_found.locus_tags` = locus_tags that don't resolve to any Gene in the requested organism (typo, wrong organism, gene removed in KG rebuild). `not_matched` = locus_tags that DO resolve to a Gene but have zero chemistry edges (no `Gene_catalyzes_reaction` AND no `Gene_has_tcdb_family`). The majority of MED4 genes fall into the `not_matched` bucket — most are richly-annotated non-chemistry genes (DNA gyrase, queG, signaling modules), not annotation gaps. Pivot via `gene_overview(locus_tags=not_matched)` for annotation context.
+- `not_found.locus_tags` vs `not_matched`. `not_found.locus_tags` = locus_tags that don't resolve to any Gene in the requested organism (typo, wrong organism, gene removed in KG rebuild). `not_matched` = locus_tags that DO resolve to a Gene but have zero chemistry edges (no `Gene_catalyzes_reaction` AND no `Gene_has_tcdb_family`). Most MED4 genes fall into the `not_matched` bucket (roughly 1,170 of MED4's ~1,970 genes carry no chemistry edge) — most are richly-annotated non-chemistry genes (DNA gyrase, queG, signaling modules), not annotation gaps. Pivot via `gene_overview(locus_tags=not_matched)` for annotation context.
 
 - When `top_metabolites` is dominated by ATP / ADP / NADH / NADPH / H2O, pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip the currency-cofactor noise. Set-difference semantics with `metabolite_ids` — exclude wins on overlap (silent). Per-arm scope: exclude applies on BOTH metabolism + transport arms (mirrors `metabolite_ids`). KG namespace is `kegg.compound:` (not `chebi:`).
 
@@ -308,8 +311,6 @@ metabolites_by_gene(locus_tags=[...], organism=..., substrate_depth=['family_inf
 ```correction
 metabolites_by_gene(locus_tags=[...], organism=..., substrate_depth=['inherited'])  # valid values: most_specific, inherited
 ```
-
-- See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and the transport trust ladder, and `docs://guide/concepts` for the chemistry layer overview.
 
 ```mistake
 metabolites_by_gene(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'
@@ -329,13 +330,15 @@ in the form you passed. Exclude-wins-on-overlap is computed on the canonical IDs
 
 ```
 
+- See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and the transport trust ladder, and `docs://guide/concepts` for the chemistry layer overview.
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import metabolites_by_gene
 
 result = metabolites_by_gene(locus_tags=..., organism=...)
-# returns dict with keys: total_matching, offset, warnings, resolved_aliases, not_found, not_matched, by_gene, by_evidence_source, by_substrate_depth, by_element, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
+# returns dict with keys: total_matching, returned, offset, truncated, warnings, resolved_aliases, not_found, not_matched, by_gene, by_evidence_source, by_substrate_depth, by_element, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 
 Use package import for bulk data extraction in scripts.

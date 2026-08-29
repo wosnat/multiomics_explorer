@@ -2,7 +2,7 @@
 
 ## What it does
 
-All Gene node properties (deep-dive). Use `gene_overview` for the common routing case; this tool dumps every property including sparse fields (catalytic_activities, ec_numbers, ko_terms, etc.). TCDB/CAZy memberships are graph edges, not properties.
+All Gene node properties (deep-dive). Use `gene_overview` for the common routing case; this tool adds what overview omits — `sequence`, `gene_summary`, `function_description`, `alternate_functional_descriptions`, `catalytic_activities` (sparse: ~8k genes), `contributing_sources`, `seed_ortholog` / `seed_ortholog_evalue`, `protein_family`, coordinates (`contig`, `start`, `end`, `strand`). The Gene node carries NO `ec_numbers` / `ko_terms` / `kegg_ids` / `cog_categories` properties — chemistry and ontology annotations are graph edges: use `gene_ontology_terms(ontology=['ec','kegg'])` or `metabolites_by_gene`. TCDB/CAZy memberships are edges too.
 
 Routing: prefer `gene_overview` for triage; chain into `metabolites_by_gene` for chemistry, `gene_homologs` for orthologs, `gene_ontology_terms` for annotations, `list_organisms` for taxonomy.
 
@@ -40,9 +40,77 @@ gene_details(locus_tags=["PMM0001"])
 ```example-response
 {
   "total_matching": 1,
-  "returned": 1, "truncated": false, "offset": 0, "not_found": [],
+  "returned": 1,
+  "offset": 0,
+  "truncated": false,
+  "not_found": [],
   "results": [
-    {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_name": "Prochlorococcus MED4", "gene_category": "DNA replication", "annotation_quality": 3, "ec_numbers": ["2.7.7.7"], "cog_categories": ["L"], "kegg_ids": ["K02338"], ...}
+    {
+      "merops_family_count": 0,
+      "categorical_metric_count": 2,
+      "strand": "+",
+      "significant_down_count": 1,
+      "compartments_observed": ["whole_cell"],
+      "closest_ortholog_group_size": 22,
+      "gene_summary": "dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering and processivity to DNA polymerases and other prote...",
+      "categorical_metric_types_observed": ["expression_level_class", "pangenome_membership"],
+      "informative_annotation_types": ["go_bp", "go_mf", "go_cc", "pfam", "cog_category", ...],
+      "annotation_quality": 3,
+      "gene_name": "dnaN",
+      "ncbifam_family_count": 1,
+      "numeric_metric_count": 13,
+      "catalyzed_metabolite_count": 6,
+      "contig": "NC_005072.1",
+      "significant_up_count": 5,
+      "merops_classes": [],
+      "numeric_metric_types_observed": [
+        "antisense_tss_count",
+        "damping_ratio",
+        "diel_amplitude_protein_log2",
+        "diel_amplitude_transcript_log2",
+        "expression_at_t0_log2",
+        ...
+      ],
+      "gene_category": "Replication and repair",
+      "start": 174,
+      "cluster_membership_count": 2,
+      "all_identifiers": ["CK_Pro_MED4_00001", "Q7V3R7", "TX50_RS00020", "WP_011131639.1"],
+      "boolean_metric_count": 2,
+      "transported_metabolite_count": 0,
+      "organism_name": "Prochlorococcus MED4",
+      "tcdb_family_count": 0,
+      "reaction_count": 4,
+      "function_description": "Confers DNA tethering and processivity to DNA polymerases and other proteins. Acts as a clamp, forming a ring around ...",
+      "subcellular_localization": "Cytoplasmic",
+      "annotation_state": "informative_multi",
+      "protein_id": "WP_011131639.1",
+      "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
+      "id": "ncbigene:PMM0001",
+      "annotation_types": ["go_bp", "go_mf", "go_cc", "pfam", "cog_category", ...],
+      "expression_edge_count": 38,
+      "seed_ortholog_evalue": 1.12e-267,
+      "cluster_types": ["decay_pattern", "diel"],
+      "end": 1331,
+      "locus_tag": "PMM0001",
+      "alternate_functional_descriptions": [
+        "[cyanorak] DNA polymerase III, beta subunit",
+        "[ncbi] DNA polymerase III subunit beta",
+        "[eggnog] Confers DNA tethering and processivity to DNA polymerases and other proteins. Acts as a clamp, forming a rin...",
+        "[uniprot] Confers DNA tethering and processivity to DNA polymerases and other proteins. Acts as a clamp, forming a ri...",
+        "[protein_family] Beta sliding clamp family",
+        ...
+      ],
+      "contributing_sources": ["cyanorak", "eggnog", "interproscan", "ncbi", "psortb", ...],
+      "interpro_entry_count": 5,
+      "preferred_id": "ncbigene",
+      "product": "DNA polymerase III, beta subunit",
+      "cazy_family_count": 0,
+      "boolean_metric_types_observed": ["expressed_above_background", "has_primary_tss"],
+      "protein_family": "Beta sliding clamp family",
+      "sequence": "MEIVCNQNEFNYAIQLVSKAVASRPTHPILANLLLTADQGTNKISLTGFDLNLGIQTSFDATVNKSGAITIPSKLLSEIVNKLPSETPVSLDVDESSDNILIKSDRGSFNIKGIPSD...",
+      "seed_ortholog": "59919.PMM0001",
+      "discussed_in_publication_count": 1
+    }
   ]
 }
 ```
@@ -62,7 +130,10 @@ gene_details(locus_tags=["PMM0001", "FAKE_GENE"], summary=True)
 ```example-response
 {
   "total_matching": 1,
-  "returned": 0, "truncated": true, "offset": 0, "not_found": ["FAKE_GENE"],
+  "returned": 0,
+  "offset": 0,
+  "truncated": true,
+  "not_found": ["FAKE_GENE"],
   "results": []
 }
 ```
@@ -74,10 +145,12 @@ Step 1: gene_overview(locus_tags=["PMM0001", "PMM0845"])
         → see annotation_types, expression counts, ortholog summary
 
 Step 2: gene_details(locus_tags=["PMM0001"])
-        → inspect all properties including sparse fields
-        (catalytic_activities, ec_numbers, etc.). TCDB and CAZy
-        memberships traverse Gene_has_tcdb_family / Gene_has_cazy_family
-        edges, not Gene properties.
+        → inspect the raw node: sequence + coordinates (contig / start /
+        end / strand / protein_id), gene_summary, function_description,
+        sparse catalytic_activities, contributing_sources, seed_ortholog
+        (+ evalue), all_identifiers, and every precomputed count.
+        Ontology memberships (GO / KEGG / EC / TCDB / CAZy / ...) are
+        graph edges, not Gene properties — use gene_ontology_terms.
 ```
 
 ## Chaining patterns
@@ -86,7 +159,8 @@ Step 2: gene_details(locus_tags=["PMM0001"])
 gene_overview → gene_details
 resolve_gene → gene_details
 genes_by_function → gene_details
-gene_details → metabolites_by_gene — drill from this gene's chemistry properties (ec_numbers, ko_terms) into the metabolites its reactions involve / its TCDB family transports. Single-gene chemistry deep-dive. See docs://analysis/metabolites.
+gene_details → gene_ontology_terms(locus_tags=[...], ontology=['ec', 'kegg']) — the EC numbers / KO terms behind a gene live on edges, not on the node.
+gene_details → metabolites_by_gene — when reaction_count / transported_metabolite_count are non-zero, list the metabolites this gene's reactions involve / its TCDB families transport. Single-gene chemistry deep-dive. See docs://analysis/metabolites.
 ```
 
 ## Common mistakes
@@ -95,9 +169,11 @@ gene_details → metabolites_by_gene — drill from this gene's chemistry proper
 
 - This returns ALL Gene node properties via g{.*} — for the common case, use gene_overview which returns curated fields with routing signals.
 
-- Sparse fields (ec_numbers, catalytic_activities, ko_terms) are only present when the gene has them — check with gene_overview first. TCDB / CAZy memberships are graph edges, not properties — use gene_overview's annotation_types or traverse Gene_has_tcdb_family / Gene_has_cazy_family.
+- What this adds over gene_overview: the amino-acid `sequence`, genome coordinates (`contig`, `start`, `end`, `strand`, `protein_id`), the free-text `gene_summary` / `function_description` / `alternate_functional_descriptions`, sparse `catalytic_activities` (present on a minority of genes), `contributing_sources`, `seed_ortholog` + `seed_ortholog_evalue`, `all_identifiers`, `subcellular_localization`, and the full set of precomputed per-kind DM counts.
 
-- Chemistry context lives in three places: (1) ec_numbers / catalytic_activities / ko_terms on the Gene properties returned here (annotation-side); (2) `gene_overview` per-row `reaction_count` / `catalyzed_metabolite_count` / `transporter_count` + `evidence_sources` rollup (routing surface — when non-zero, drill); (3) `metabolites_by_gene` for the actual metabolite list (per-arm: reaction-anchored via Gene → Reaction → Metabolite, transport-anchored via Gene → TcdbFamily → Metabolite). For 'what compounds does this gene's chemistry touch?', chain `gene_details → metabolites_by_gene` (or pre-filter with `gene_overview` first to skip genes with no chemistry).
+- The Gene node carries NO `ec_numbers`, `ko_terms`, `kegg_ids` or `cog_categories` properties — those are null on every gene. Ontology memberships (GO, KEGG KO / pathway, EC, COG, TCDB, CAZy, Pfam, ...) are graph edges: use gene_ontology_terms(locus_tags=[...], ontology=['ec', 'kegg']) (or any ontology list) to read them, gene_overview's `annotation_types` to see which exist.
+
+- Chemistry context lives in three places: (1) edge-side EC / KO terms via `gene_ontology_terms(ontology=['ec', 'kegg'])` plus the sparse `catalytic_activities` text returned here; (2) `gene_overview` per-row `reaction_count` / `catalyzed_metabolite_count` / `tcdb_family_count` / `transported_metabolite_count` + `evidence_sources` rollup (routing surface — when non-zero, drill; the same counts are on the raw node here); (3) `metabolites_by_gene` for the actual metabolite list (per-arm: reaction-anchored via Gene → Reaction → Metabolite, transport-anchored via Gene → TcdbFamily → Metabolite). For 'what compounds does this gene's chemistry touch?', chain `gene_details → metabolites_by_gene` (or pre-filter with `gene_overview` first to skip genes with no chemistry).
 
 ```mistake
 gene_details(locus_tags='PMM0001')
@@ -113,7 +189,7 @@ gene_details(locus_tags=['PMM0001']) — always a list
 from multiomics_explorer import gene_details
 
 result = gene_details(locus_tags=...)
-# returns dict with keys: total_matching, offset, not_found, results
+# returns dict with keys: total_matching, returned, offset, truncated, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

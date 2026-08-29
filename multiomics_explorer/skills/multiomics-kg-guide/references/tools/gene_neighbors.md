@@ -57,22 +57,62 @@ gene_neighbors(locus_tags=["ACZ81_08860"], window=2)
 ```
 
 ```example-response
-# rank_offset is signed: negative = upstream by start, positive = downstream.
-# The anchor itself is excluded from results (it is in `anchors`).
-# bp_gap is the unsigned intergenic distance (0 when intervals overlap).
-# same_strand is null only if a gene's strand is null — rare: genes with coordinates carry a strand.
 {
-  "total_matching": 4, "returned": 4, "truncated": false,
+  "total_matching": 4,
+  "returned": 4,
+  "truncated": false,
   "anchors": [
-    {"locus_tag": "ACZ81_08860", "organism_name": "Alteromonas macleodii HOT1A3", "contig": "NZ_CP012202.1", "start": 2042340, "end": 2043803, "strand": "+", "product": "PepSY-associated TM helix domain-containing protein", "neighbors_returned": 4, "dropped_null_strand": 0}
+    {
+      "locus_tag": "ACZ81_08860",
+      "organism_name": "Alteromonas macleodii HOT1A3",
+      "contig": "NZ_CP012202.1",
+      "start": 2042340,
+      "end": 2043803,
+      "strand": "+",
+      "product": "PepSY-associated TM helix domain-containing protein",
+      "neighbors_returned": 4,
+      "dropped_null_strand": 0
+    }
   ],
   "by_organism": [{"organism_name": "Alteromonas macleodii HOT1A3", "count": 4}],
-  "not_found": [], "not_matched": [], "warnings": [],
+  "not_found": [],
+  "not_matched": [],
+  "warnings": [],
   "results": [
-    {"anchor_locus_tag": "ACZ81_08860", "neighbor_locus_tag": "ACZ81_08850", "rank_offset": -2, "bp_gap": 556, "strand": "+", "same_strand": true, "product": "TonB-dependent siderophore receptor", "gene_name": null, "gene_category": null},
-    {"anchor_locus_tag": "ACZ81_08860", "neighbor_locus_tag": "ACZ81_08855", "rank_offset": -1, "bp_gap": 10, "strand": "+", "same_strand": true, "product": "hypothetical protein", "gene_name": null, "gene_category": null},
-    {"anchor_locus_tag": "ACZ81_08860", "neighbor_locus_tag": "ACZ81_08865", "rank_offset": 1, "bp_gap": 335, "strand": "-", "same_strand": false, "product": "demethoxyubiquinone hydroxylase family protein", "gene_name": null, "gene_category": null},
-    {"anchor_locus_tag": "ACZ81_08860", "neighbor_locus_tag": "ACZ81_08870", "rank_offset": 2, "bp_gap": 1119, "strand": "+", "same_strand": true, "product": "strictosidine synthase family protein", "gene_name": null, "gene_category": null}
+    {
+      "anchor_locus_tag": "ACZ81_08860",
+      "neighbor_locus_tag": "ACZ81_08850",
+      "rank_offset": -2,
+      "bp_gap": 556,
+      "strand": "+",
+      "same_strand": true,
+      "product": "TonB-dependent siderophore receptor",
+      "gene_name": null,
+      "gene_category": "Inorganic ion transport"
+    },
+    {
+      "anchor_locus_tag": "ACZ81_08860",
+      "neighbor_locus_tag": "ACZ81_08855",
+      "rank_offset": -1,
+      "bp_gap": 10,
+      "strand": "+",
+      "same_strand": true,
+      "product": "hypothetical protein",
+      "gene_name": null,
+      "gene_category": "Unknown"
+    },
+    {
+      "anchor_locus_tag": "ACZ81_08860",
+      "neighbor_locus_tag": "ACZ81_08865",
+      "rank_offset": 1,
+      "bp_gap": 335,
+      "strand": "-",
+      "same_strand": false,
+      "product": "demethoxyubiquinone hydroxylase family protein",
+      "gene_name": null,
+      "gene_category": "Coenzyme metabolism"
+    },
+    ...
   ]
 }
 ```
@@ -84,13 +124,50 @@ gene_neighbors(locus_tags=["ACZ81_08860"], window=2, max_bp_distance=400)
 ```
 
 ```example-response
-# Same anchor as above: the ±2 window finds 4 neighbors, but only the two
-# within 400 bp survive (bp_gap 10 and 335 kept; 556 and 1119 dropped).
 {
-  "total_matching": 2, "returned": 2,
+  "total_matching": 2,
+  "returned": 2,
+  "truncated": false,
+  "anchors": [
+    {
+      "locus_tag": "ACZ81_08860",
+      "organism_name": "Alteromonas macleodii HOT1A3",
+      "contig": "NZ_CP012202.1",
+      "start": 2042340,
+      "end": 2043803,
+      "strand": "+",
+      "product": "PepSY-associated TM helix domain-containing protein",
+      "neighbors_returned": 2,
+      "dropped_null_strand": 0
+    }
+  ],
+  "by_organism": [{"organism_name": "Alteromonas macleodii HOT1A3", "count": 2}],
+  "not_found": [],
+  "not_matched": [],
+  "warnings": [],
   "results": [
-    {"anchor_locus_tag": "ACZ81_08860", "neighbor_locus_tag": "ACZ81_08855", "rank_offset": -1, "bp_gap": 10},
-    {"anchor_locus_tag": "ACZ81_08860", "neighbor_locus_tag": "ACZ81_08865", "rank_offset": 1, "bp_gap": 335}
+    {
+      "anchor_locus_tag": "ACZ81_08860",
+      "neighbor_locus_tag": "ACZ81_08855",
+      "rank_offset": -1,
+      "bp_gap": 10,
+      "strand": "+",
+      "same_strand": true,
+      "product": "hypothetical protein",
+      "gene_name": null,
+      "gene_category": "Unknown"
+    },
+    {
+      "anchor_locus_tag": "ACZ81_08860",
+      "neighbor_locus_tag": "ACZ81_08865",
+      "rank_offset": 1,
+      "bp_gap": 335,
+      "strand": "-",
+      "same_strand": false,
+      "product": "demethoxyubiquinone hydroxylase family protein",
+      "gene_name": null,
+      "gene_category": "Coenzyme metabolism"
+    }
   ]
 }
 ```
@@ -102,20 +179,61 @@ gene_neighbors(locus_tags=["ACZ81_08860"], window=2, same_strand=True)
 ```
 
 ```example-response
-# Keeps only neighbors on the anchor's own strand ('+'); opposite-strand
-# neighbors are dropped (here ACZ81_08865, '-'). dropped_null_strand counts
-# only NULL-strand drops (0 here). Defensive: in the current build every gene
-# with coordinates has a strand, so the filter is always appliable — if an
-# anchor's own strand were null, its neighbors would be returned unfiltered
-# with a `warnings` entry.
 {
-  "total_matching": 3, "returned": 3,
-  "anchors": [{"locus_tag": "ACZ81_08860", "strand": "+", "neighbors_returned": 3, "dropped_null_strand": 0}],
+  "total_matching": 3,
+  "returned": 3,
+  "truncated": false,
+  "anchors": [
+    {
+      "locus_tag": "ACZ81_08860",
+      "organism_name": "Alteromonas macleodii HOT1A3",
+      "contig": "NZ_CP012202.1",
+      "start": 2042340,
+      "end": 2043803,
+      "strand": "+",
+      "product": "PepSY-associated TM helix domain-containing protein",
+      "neighbors_returned": 3,
+      "dropped_null_strand": 0
+    }
+  ],
+  "by_organism": [{"organism_name": "Alteromonas macleodii HOT1A3", "count": 3}],
+  "not_found": [],
+  "not_matched": [],
   "warnings": [],
   "results": [
-    {"anchor_locus_tag": "ACZ81_08860", "neighbor_locus_tag": "ACZ81_08850", "rank_offset": -2, "same_strand": true},
-    {"anchor_locus_tag": "ACZ81_08860", "neighbor_locus_tag": "ACZ81_08855", "rank_offset": -1, "same_strand": true},
-    {"anchor_locus_tag": "ACZ81_08860", "neighbor_locus_tag": "ACZ81_08870", "rank_offset": 2, "same_strand": true}
+    {
+      "anchor_locus_tag": "ACZ81_08860",
+      "neighbor_locus_tag": "ACZ81_08850",
+      "rank_offset": -2,
+      "bp_gap": 556,
+      "strand": "+",
+      "same_strand": true,
+      "product": "TonB-dependent siderophore receptor",
+      "gene_name": null,
+      "gene_category": "Inorganic ion transport"
+    },
+    {
+      "anchor_locus_tag": "ACZ81_08860",
+      "neighbor_locus_tag": "ACZ81_08855",
+      "rank_offset": -1,
+      "bp_gap": 10,
+      "strand": "+",
+      "same_strand": true,
+      "product": "hypothetical protein",
+      "gene_name": null,
+      "gene_category": "Unknown"
+    },
+    {
+      "anchor_locus_tag": "ACZ81_08860",
+      "neighbor_locus_tag": "ACZ81_08870",
+      "rank_offset": 2,
+      "bp_gap": 1119,
+      "strand": "+",
+      "same_strand": true,
+      "product": "strictosidine synthase family protein",
+      "gene_name": null,
+      "gene_category": "Carbohydrate metabolism"
+    }
   ]
 }
 ```
@@ -127,12 +245,63 @@ gene_neighbors(locus_tags=["ACZ81_08860", "A9601_09441", "NOTAREAL"])
 ```
 
 ```example-response
-# A9601_09441 exists but has no contig/start coordinates -> not_matched (no
-# neighborhood). NOTAREAL is absent from the KG -> not_found.
 {
+  "total_matching": 10,
+  "returned": 10,
+  "truncated": false,
+  "anchors": [
+    {
+      "locus_tag": "ACZ81_08860",
+      "organism_name": "Alteromonas macleodii HOT1A3",
+      "contig": "NZ_CP012202.1",
+      "start": 2042340,
+      "end": 2043803,
+      "strand": "+",
+      "product": "PepSY-associated TM helix domain-containing protein",
+      "neighbors_returned": 10,
+      "dropped_null_strand": 0
+    }
+  ],
+  "by_organism": [{"organism_name": "Alteromonas macleodii HOT1A3", "count": 10}],
   "not_found": ["NOTAREAL"],
   "not_matched": ["A9601_09441"],
-  "anchors": [{"locus_tag": "ACZ81_08860", "contig": "NZ_CP012202.1", "neighbors_returned": 6}]
+  "warnings": [],
+  "results": [
+    {
+      "anchor_locus_tag": "ACZ81_08860",
+      "neighbor_locus_tag": "ACZ81_08835",
+      "rank_offset": -5,
+      "bp_gap": 5614,
+      "strand": "-",
+      "same_strand": false,
+      "product": "DUF2252 family protein",
+      "gene_name": null,
+      "gene_category": "Unknown"
+    },
+    {
+      "anchor_locus_tag": "ACZ81_08860",
+      "neighbor_locus_tag": "ACZ81_08840",
+      "rank_offset": -4,
+      "bp_gap": 4757,
+      "strand": "+",
+      "same_strand": true,
+      "product": "alkyl hydroperoxide reductase subunit C",
+      "gene_name": "ahpC",
+      "gene_category": "Cellular processes"
+    },
+    {
+      "anchor_locus_tag": "ACZ81_08860",
+      "neighbor_locus_tag": "ACZ81_08845",
+      "rank_offset": -3,
+      "bp_gap": 2986,
+      "strand": "+",
+      "same_strand": true,
+      "product": "alkyl hydroperoxide reductase subunit F",
+      "gene_name": "ahpF",
+      "gene_category": "Post-translational modification"
+    },
+    ...
+  ]
 }
 ```
 
@@ -181,7 +350,7 @@ It reports positional adjacency only — genes next to the anchor on the same co
 from multiomics_explorer import gene_neighbors
 
 result = gene_neighbors(locus_tags=...)
-# returns dict with keys: total_matching, anchors, by_organism, not_found, not_matched, warnings, results
+# returns dict with keys: total_matching, returned, truncated, anchors, by_organism, not_found, not_matched, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

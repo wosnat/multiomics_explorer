@@ -29,9 +29,12 @@ snake_case tree name used by the `tree=` facet; discover the names with
 
 ## Hierarchy
 
-Four levels within each tree, `level` 0-3 with `level_kind` `brite_class`
-→ `brite_subclass` → `brite_family` → `brite_subfamily`
-(`Brite_category_is_a_brite_category`). Trees are independent — the
+Up to four levels within a tree, `level` 0-3 with `level_kind`
+`brite_class` → `brite_subclass` → `brite_family` → `brite_subfamily`
+(`Brite_category_is_a_brite_category`); most trees stop at level 1 or
+2 — only `enzymes` and `dna_replication` reach level 3, and
+`peptidases`, `secretion` and `two_component` end at level 1. Trees
+are independent — the
 transporters tree and the enzymes tree share no nodes. `gene_count` /
 `organism_count` are subtree-inclusive; there is no `direct_gene_count`
 (genes never attach to a category directly). The `enzymes` tree is by far
@@ -61,19 +64,23 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 | `gene_count` | int | genes annotated to the term — subtree-inclusive on hierarchical labels, direct on flat ones |
 | `id` | string | term ID as used in `term_ids=[...]` (self-prefixed CURIE) |
 | `level` | int | hierarchy depth, 0 = root / broadest |
-| `level_kind` | string | what a level means in this ontology (see the vocabulary below) |
-| `member_ko_count` | int |  |
+| `level_kind` | string | what a level means in this ontology (e.g. `tc_family`, `pathway`) — read values via `list_filter_values` |
+| `member_ko_count` | int | KOs listed under this BRITE category upstream (source membership, not KG genes) |
 | `name` | string | term name (what `search_ontology` indexes) |
 | `organism_count` | int | organisms with at least one gene annotated to the term (subtree-inclusive where `gene_count` is) |
 | `preferred_id` | string | same value as `id` |
-| `tree` | string |  |
-| `tree_code` | string |  |
+| `tree` | string | BRITE tree this category belongs to (snake_case, e.g. `transporters`) — the `tree=` facet value |
+| `tree_code` | string | KEGG BRITE tree accession (e.g. `ko02000`) — the tree segment of `id` |
 
 `ontology_term_details(verbose=True)` returns every property as `properties`; a compact column that is missing on the node is absent, not null (`docs://guide/conventions`).
 
-## Controlled vocabularies
+## Applicable filter types
 
-Values: see `list_filter_values(filter_type=..., ontology='brite')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
+- `evidence` — `list_filter_values(filter_type="evidence", ontology="brite")`
+- `sources` — `list_filter_values(filter_type="sources", ontology="brite")`
+- `brite_tree` — `list_filter_values(filter_type="brite_tree")`
+
+Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="brite")`) lists which comparable axes the gene edge carries.
 
 ## Interpretation
 
@@ -109,7 +116,8 @@ rest.
 
 - Which transporter families (BRITE `transporters` tree) are enriched among genes up under nitrogen limitation?
 - How many two-component system genes does MIT1002 carry, by BRITE subclass?
-- Which BRITE categories does `kegg:K02575` belong to?
+- Which BRITE categories does `kegg.orthology:K02575` belong to? — `ontology_term_details(term_ids=['kegg.orthology:K02575'])` and read `links_out[]`
+- Which two-component-system genes does MIT1002 carry? — `genes_by_ontology(ontology='brite', organism='MIT1002', tree='two_component', level=1)`
 - What are the level-2 families under the `secretion` tree, with gene counts for MED4?
 
 ## Tools

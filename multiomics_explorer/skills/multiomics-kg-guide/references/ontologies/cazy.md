@@ -15,9 +15,14 @@ degradation biology.
 
 ## How genes get annotated
 
-Gene → family edges pool InterProScan (via dbCAN-style HMMs) and eggNOG
-transfer (`sources[]`), merged with compact `evidence` (`curated`,
-`family_inferred`, `domain_inferred`) and an `evidence_score` in [0, 1].
+Gene → family edges pool InterProScan signatures and eggNOG transfer
+(`sources[]`), merged with compact `evidence` (`curated`,
+`family_inferred`, `domain_inferred`) and an `evidence_score` in [0, 1];
+rung semantics in `docs://analysis/annotation_evidence`. Live on this
+edge type: every edge with an `eggnog` source reads `curated` — about
+70% of all CAZy edges — and InterProScan-only edges read
+`domain_inferred` or `family_inferred`. Re-labelling the eggNOG-only
+case is an open KG-side ask.
 Family edges roll up to the class node via `Cazy_family_is_a_cazy_family`.
 InterPro entries bridge *to* CAZy families as a `router`
 (`Interpro_entry_related_to_cazy_family`) — a computed cross-reference,
@@ -56,21 +61,24 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 | Property | Type | Meaning |
 |---|---|---|
-| `cazy_id` | string |  |
+| `cazy_id` | string | bare CAZy family code (e.g. `GH13`); `id` is the `cazy:` CURIE |
 | `direct_gene_count` | int | genes attached to this exact node (not descendants); absent where it would be vacuous |
 | `gene_count` | int | genes annotated to the term — subtree-inclusive on hierarchical labels, direct on flat ones |
 | `id` | string | term ID as used in `term_ids=[...]` (self-prefixed CURIE) |
 | `level` | int | hierarchy depth, 0 = root / broadest |
-| `level_kind` | string | what a level means in this ontology (see the vocabulary below) |
+| `level_kind` | string | what a level means in this ontology (e.g. `tc_family`, `pathway`) — read values via `list_filter_values` |
 | `name` | string | term name (what `search_ontology` indexes) |
 | `organism_count` | int | organisms with at least one gene annotated to the term (subtree-inclusive where `gene_count` is) |
 | `preferred_id` | string | same value as `id` |
 
 `ontology_term_details(verbose=True)` returns every property as `properties`; a compact column that is missing on the node is absent, not null (`docs://guide/conventions`).
 
-## Controlled vocabularies
+## Applicable filter types
 
-Values: see `list_filter_values(filter_type=..., ontology='cazy')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
+- `evidence` — `list_filter_values(filter_type="evidence", ontology="cazy")`
+- `sources` — `list_filter_values(filter_type="sources", ontology="cazy")`
+
+Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="cazy")`) lists which comparable axes the gene edge carries.
 
 ## Interpretation
 
@@ -79,7 +87,8 @@ transferases) and `cazy:GH23` (lytic transglycosylases) mean specific
 chemistry, the class does not. CAZy is small in these genomes (tens of
 families), so enrichment at level 1 works only for glycan-heavy gene sets;
 otherwise use it as a per-gene annotation via `gene_ontology_terms`. Rank
-by `evidence_score`; `curated` edges are rare and strong.
+by `evidence_score`; `curated` is the majority rung here, not a rare
+one, so it does not by itself single out strong calls.
 
 ## Informativeness rule
 
@@ -93,14 +102,16 @@ to enrich — use `level=1`.
   verbose mode.
 - A CAZy family says which fold/mechanism, not which sugar — substrate
   specificity varies within a family.
-- InterPro → CAZy routing is recall-biased; when `router_ambiguous` is
-  true on the InterPro term, look at the gene's own CAZy edge instead.
+- InterPro → CAZy routing is recall-biased. `router_ambiguous` is
+  computed per link by `ontology_term_details(verbose=True)` on the
+  InterPro term (not a KG property); when it is true, look at the
+  gene's own CAZy edge instead.
 
 ## Typical questions
 
-- Which CAZy families does MIT1002 carry that MED4 lacks?
-- Which glycosyltransferase families are enriched among genes up during biofilm or EPS production?
-- Which InterPro entries route to `cazy:GH23`, and are those routings unambiguous?
+- Which CAZy families does MIT1002 carry that MED4 lacks? — `genes_by_ontology(ontology='cazy', organism='MIT1002', level=1, summary=True)` vs the same call with `organism='MED4'`
+- Which glycosyltransferase families are enriched among genes up during biofilm or EPS production? — `pathway_enrichment(..., ontology='cazy', level=1, direction='up')`
+- Which genes carry `cazy:GT2`, and which InterPro entries route to it? — `genes_by_ontology(ontology='cazy', organism='MIT1002', term_ids=['cazy:GT2'])`; the router links are read from the InterPro side (`ontology_term_details(term_ids=[...], link_kinds=['router'], verbose=True)`)
 
 ## Tools
 

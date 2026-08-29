@@ -28,7 +28,7 @@ here (no gates apply); kept for envelope-shape consistency.
 |---|---|---|---|
 | derived_metric_ids | list[string] \| None | None | Categorical DerivedMetric node IDs. Use when the same `metric_type` appears across organisms / publications and you need to pin one. Discover IDs via `list_derived_metrics(value_kind='categorical')`. Mutually exclusive with `metric_types`. Wrong-kind IDs (numeric / boolean) surface silently in `not_found_ids`. |
 | metric_types | list[string] \| None | None | Categorical metric-type tags (e.g. ['predicted_subcellular_localization', 'darkness_survival_class']). Unions every DM carrying that tag, then narrows by scoping filters. Same tag can span organisms / publications — pin one specific DM via `derived_metric_ids` instead. Mutually exclusive with `derived_metric_ids`. |
-| organism | string \| None | None | Organism to scope the DM set to. Accepts short strain code ('MED4', 'NATL2A', 'MIT9313') or full name. Case-insensitive substring match. Single-organism is **not** enforced — omit to drill across all organisms a metric_type spans. |
+| organism | string \| None | None | Organism to scope the DM set to. Accepts short strain code ('MED4', 'NATL2A', 'MIT9313') or full name; word-based, case-insensitive match. Single-organism is **not** enforced — omit to drill across all organisms a metric_type spans. |
 | locus_tags | list[string] \| None | None | Restrict drill-down to a specific gene set (e.g. DE hits from `differential_expression_by_gene`). Filter on `g.locus_tag IN $locus_tags` post-MATCH. Genes with no edge for the selected DM produce no row. |
 | experiment_ids | list[string] \| None | None | Scope to DMs from one or more experiments. |
 | publication_doi | list[string] \| None | None | Scope to DMs from one or more publications. |
@@ -129,20 +129,56 @@ genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'],
   ],
   "by_compartment": [{"compartment": "vesicle", "count": 14}],
   "by_publication": [{"publication_doi": "10.1126/science.1243457", "count": 14}],
-  "by_category": [
-    {"category": "Outer Membrane", "count": 8},
-    {"category": "Periplasmic", "count": 6}
+  "by_experiment": [
+    {"experiment_id": "10.1126/science.1243457_vesicle_proteomics_med4", "count": 8},
+    {"experiment_id": "10.1126/science.1243457_vesicle_proteomics_mit9313", "count": 6}
+  ],
+  "by_category": [{"category": "Outer Membrane", "count": 8}, {"category": "Periplasmic", "count": 6}],
+  "top_categories": [
+    {"gene_category": "Cell wall and membrane", "count": 5},
+    {"gene_category": "Post-translational modification", "count": 3},
+    {"gene_category": "Stress response and adaptation", "count": 3},
+    {"gene_category": "Cell motility", "count": 1},
+    {"gene_category": "Signal transduction", "count": 1}
   ],
   "by_metric": [
-    {"derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:predicted_subcellular_localization", "metric_type": "predicted_subcellular_localization", "name": "MED4 PSORTb localization", "value_kind": "categorical", "count": 8, "by_category": [{"category": "Outer Membrane", "count": 5}, {"category": "Periplasmic", "count": 3}], "allowed_categories": ["Cytoplasmic", "Cytoplasmic Membrane", "Periplasmic", "Outer Membrane", "Extracellular", "Unknown"], "dm_total_gene_count": 32, "dm_by_category": [{"category": "Cytoplasmic", "count": 11}, {"category": "Cytoplasmic Membrane", "count": 6}, {"category": "Outer Membrane", "count": 5}, {"category": "Periplasmic", "count": 3}, {"category": "Unknown", "count": 7}]},
-    {"derived_metric_id": "derived_metric:pnas.1402782111:s2_mit9313_vesicle_proteome:predicted_subcellular_localization", "metric_type": "predicted_subcellular_localization", "name": "MIT9313 PSORTb localization", "value_kind": "categorical", "count": 6, "by_category": [{"category": "Outer Membrane", "count": 3}, {"category": "Periplasmic", "count": 3}], "allowed_categories": ["Cytoplasmic", "Cytoplasmic Membrane", "Periplasmic", "Outer Membrane", "Extracellular", "Unknown"], "dm_total_gene_count": 26, "dm_by_category": [{"category": "Cytoplasmic", "count": 9}, {"category": "Cytoplasmic Membrane", "count": 5}, {"category": "Outer Membrane", "count": 3}, {"category": "Periplasmic", "count": 3}, {"category": "Unknown", "count": 6}]}
-  ],
-  "top_categories": [
-    {"gene_category": "Translation", "count": 4},
-    {"gene_category": "Unknown", "count": 3}
+    {
+      "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization",
+      "name": "MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)",
+      "metric_type": "predicted_subcellular_localization",
+      "value_kind": "categorical",
+      "count": 8,
+      "by_category": [{"category": "Outer Membrane", "count": 5}, {"category": "Periplasmic", "count": 3}],
+      "allowed_categories": ["Cytoplasmic", "Cytoplasmic Membrane", "Periplasmic", "Outer Membrane", "Extracellular", ...],
+      "dm_total_gene_count": 32,
+      "dm_by_category": [
+        {"category": "Cytoplasmic", "count": 11},
+        {"category": "Unknown", "count": 7},
+        {"category": "Cytoplasmic Membrane", "count": 6},
+        {"category": "Outer Membrane", "count": 5},
+        {"category": "Periplasmic", "count": 3}
+      ]
+    },
+    {
+      "derived_metric_id": "derived_metric:science.1243457:s3_mit9313_vesicle_proteome:predicted_subcellular_localization",
+      "name": "MIT9313 vesicle protein PSORTb predicted localization (Biller 2014 Table S3)",
+      "metric_type": "predicted_subcellular_localization",
+      "value_kind": "categorical",
+      "count": 6,
+      "by_category": [{"category": "Periplasmic", "count": 3}, {"category": "Outer Membrane", "count": 3}],
+      "allowed_categories": ["Cytoplasmic", "Cytoplasmic Membrane", "Periplasmic", "Outer Membrane", "Extracellular", ...],
+      "dm_total_gene_count": 27,
+      "dm_by_category": [
+        {"category": "Unknown", "count": 15},
+        {"category": "Cytoplasmic", "count": 3},
+        {"category": "Extracellular", "count": 3},
+        {"category": "Outer Membrane", "count": 3},
+        {"category": "Periplasmic", "count": 3}
+      ]
+    }
   ],
   "genes_per_metric_max": 8,
-  "genes_per_metric_median": 7.0,
+  "genes_per_metric_median": 8.0,
   "not_found_ids": [],
   "not_matched_ids": [],
   "not_found_metric_types": [],
@@ -154,8 +190,46 @@ genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'],
   "offset": 0,
   "truncated": true,
   "results": [
-    {"locus_tag": "PMM0097", "organism_name": "Prochlorococcus MED4", "derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:predicted_subcellular_localization", "name": "MED4 PSORTb localization", "value_kind": "categorical", "rankable": false, "has_p_value": false, "value": "Outer Membrane"},
-    {"locus_tag": "PMM0254", "organism_name": "Prochlorococcus MED4", "derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:predicted_subcellular_localization", "name": "MED4 PSORTb localization", "value_kind": "categorical", "rankable": false, "has_p_value": false, "value": "Outer Membrane"}
+    {
+      "locus_tag": "PMM0097",
+      "gene_name": "tolC",
+      "product": "TolC-like outer membrane efflux protein, RND family",
+      "gene_category": "Stress response and adaptation",
+      "organism_name": "Prochlorococcus MED4",
+      "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization",
+      "name": "MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)",
+      "value_kind": "categorical",
+      "rankable": false,
+      "has_p_value": false,
+      "value": "Outer Membrane"
+    },
+    {
+      "locus_tag": "PMM0254",
+      "gene_name": null,
+      "product": "protein of unknown function DUF3769",
+      "gene_category": "Cell wall and membrane",
+      "organism_name": "Prochlorococcus MED4",
+      "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization",
+      "name": "MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)",
+      "value_kind": "categorical",
+      "rankable": false,
+      "has_p_value": false,
+      "value": "Outer Membrane"
+    },
+    {
+      "locus_tag": "PMM1124",
+      "gene_name": null,
+      "product": "autotransporter beta-domain containing protein",
+      "gene_category": "Signal transduction",
+      "organism_name": "Prochlorococcus MED4",
+      "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization",
+      "name": "MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)",
+      "value_kind": "categorical",
+      "rankable": false,
+      "has_p_value": false,
+      "value": "Outer Membrane"
+    },
+    ...
   ]
 }
 ```
@@ -168,15 +242,53 @@ genes_by_categorical_metric(metric_types=['darkness_survival_class'], categories
 
 ```example-response
 {
-  "total_matching": 24,
+  "total_matching": 95,
   "total_derived_metrics": 1,
-  "total_genes": 24,
-  "by_organism": [{"organism_name": "Prochlorococcus NATL2A", "count": 24}],
-  "by_compartment": [{"compartment": "whole_cell", "count": 24}],
-  "by_category": [{"category": "darkness_axenic+darkness_coculture", "count": 24}],
-  "by_metric": [
-    {"derived_metric_id": "derived_metric:1462-2920.14179:darkness_survival:darkness_survival_class", "metric_type": "darkness_survival_class", "value_kind": "categorical", "count": 24, "by_category": [{"category": "darkness_axenic+darkness_coculture", "count": 24}], "allowed_categories": ["darkness_axenic", "darkness_coculture", "darkness_axenic+darkness_coculture", "neither"], "dm_total_gene_count": 1377, "dm_by_category": [{"category": "darkness_axenic", "count": 102}, {"category": "darkness_coculture", "count": 187}, {"category": "darkness_axenic+darkness_coculture", "count": 24}, {"category": "neither", "count": 1064}]}
+  "total_genes": 95,
+  "by_organism": [{"organism_name": "Prochlorococcus NATL2A", "count": 95}],
+  "by_compartment": [{"compartment": "whole_cell", "count": 95}],
+  "by_publication": [{"publication_doi": "10.1128/mSystems.00040-18", "count": 95}],
+  "by_experiment": [
+    {
+      "experiment_id": "10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic",
+      "count": 95
+    }
   ],
+  "by_category": [{"category": "darkness_axenic+darkness_coculture", "count": 95}],
+  "top_categories": [
+    {"gene_category": "Stress response and adaptation", "count": 25},
+    {"gene_category": "Photosynthesis", "count": 13},
+    {"gene_category": "Translation", "count": 10},
+    {"gene_category": "Unknown", "count": 10},
+    {"gene_category": "Coenzyme metabolism", "count": 5}
+  ],
+  "by_metric": [
+    {
+      "derived_metric_id": "derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class",
+      "name": "NATL2A darkness survival class (Table S5)",
+      "metric_type": "darkness_survival_class",
+      "value_kind": "categorical",
+      "count": 95,
+      "by_category": [{"category": "darkness_axenic+darkness_coculture", "count": 95}],
+      "allowed_categories": [
+        "darkness_axenic+darkness_coculture",
+        "darkness_coculture+unique_coculture",
+        "darkness_axenic+unique_axenic"
+      ],
+      "dm_total_gene_count": 258,
+      "dm_by_category": [
+        {"category": "darkness_axenic+darkness_coculture", "count": 95},
+        {"category": "darkness_coculture+unique_coculture", "count": 87},
+        {"category": "darkness_axenic+unique_axenic", "count": 76}
+      ]
+    }
+  ],
+  "genes_per_metric_max": 95,
+  "genes_per_metric_median": 95.0,
+  "not_found_ids": [],
+  "not_matched_ids": [],
+  "not_found_metric_types": [],
+  "not_matched_metric_types": [],
   "not_matched_organism": null,
   "excluded_derived_metrics": [],
   "warnings": [],
@@ -184,7 +296,46 @@ genes_by_categorical_metric(metric_types=['darkness_survival_class'], categories
   "offset": 0,
   "truncated": true,
   "results": [
-    {"locus_tag": "PMN2A_0042", "organism_name": "Prochlorococcus NATL2A", "derived_metric_id": "derived_metric:1462-2920.14179:darkness_survival:darkness_survival_class", "value_kind": "categorical", "rankable": false, "has_p_value": false, "value": "darkness_axenic+darkness_coculture"}
+    {
+      "locus_tag": "PMN2A_0016",
+      "gene_name": "clpB1",
+      "product": "ATP-dependent Clp protease ATP-binding subunit ClpB",
+      "gene_category": "Stress response and adaptation",
+      "organism_name": "Prochlorococcus NATL2A",
+      "derived_metric_id": "derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class",
+      "name": "NATL2A darkness survival class (Table S5)",
+      "value_kind": "categorical",
+      "rankable": false,
+      "has_p_value": false,
+      "value": "darkness_axenic+darkness_coculture"
+    },
+    {
+      "locus_tag": "PMN2A_0017",
+      "gene_name": "petE",
+      "product": "plastocyanin",
+      "gene_category": "Stress response and adaptation",
+      "organism_name": "Prochlorococcus NATL2A",
+      "derived_metric_id": "derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class",
+      "name": "NATL2A darkness survival class (Table S5)",
+      "value_kind": "categorical",
+      "rankable": false,
+      "has_p_value": false,
+      "value": "darkness_axenic+darkness_coculture"
+    },
+    {
+      "locus_tag": "PMN2A_0020",
+      "gene_name": "glgB",
+      "product": "1,4-alpha-glucan branching enzyme",
+      "gene_category": "Carbohydrate metabolism",
+      "organism_name": "Prochlorococcus NATL2A",
+      "derived_metric_id": "derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class",
+      "name": "NATL2A darkness survival class (Table S5)",
+      "value_kind": "categorical",
+      "rankable": false,
+      "has_p_value": false,
+      "value": "darkness_axenic+darkness_coculture"
+    },
+    ...
   ]
 }
 ```
@@ -197,27 +348,89 @@ genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'],
 
 ```example-response
 {
-  "total_matching": 58,
+  "total_matching": 59,
   "total_derived_metrics": 2,
-  "total_genes": 58,
+  "total_genes": 59,
   "by_organism": [
     {"organism_name": "Prochlorococcus MED4", "count": 32},
-    {"organism_name": "Prochlorococcus MIT9313", "count": 26}
+    {"organism_name": "Prochlorococcus MIT9313", "count": 27}
   ],
-  "by_compartment": [{"compartment": "vesicle", "count": 58}],
+  "by_compartment": [{"compartment": "vesicle", "count": 59}],
+  "by_publication": [{"publication_doi": "10.1126/science.1243457", "count": 59}],
+  "by_experiment": [
+    {"experiment_id": "10.1126/science.1243457_vesicle_proteomics_med4", "count": 32},
+    {"experiment_id": "10.1126/science.1243457_vesicle_proteomics_mit9313", "count": 27}
+  ],
   "by_category": [
-    {"category": "Cytoplasmic", "count": 20},
-    {"category": "Unknown", "count": 13},
-    {"category": "Cytoplasmic Membrane", "count": 11},
+    {"category": "Unknown", "count": 22},
+    {"category": "Cytoplasmic", "count": 14},
     {"category": "Outer Membrane", "count": 8},
-    {"category": "Periplasmic", "count": 6}
+    {"category": "Cytoplasmic Membrane", "count": 6},
+    {"category": "Periplasmic", "count": 6},
+    ...
+  ],
+  "top_categories": [
+    {"gene_category": "Unknown", "count": 12},
+    {"gene_category": "Stress response and adaptation", "count": 9},
+    {"gene_category": "Cell wall and membrane", "count": 9},
+    {"gene_category": "Translation", "count": 6},
+    {"gene_category": "Post-translational modification", "count": 4}
   ],
   "by_metric": [
-    {"derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:predicted_subcellular_localization", "metric_type": "predicted_subcellular_localization", "value_kind": "categorical", "count": 32, "allowed_categories": ["Cytoplasmic", "Cytoplasmic Membrane", "Periplasmic", "Outer Membrane", "Extracellular", "Unknown"], "dm_total_gene_count": 32, "dm_by_category": [{"category": "Cytoplasmic", "count": 11}, {"category": "Cytoplasmic Membrane", "count": 6}, {"category": "Outer Membrane", "count": 5}, {"category": "Periplasmic", "count": 3}, {"category": "Unknown", "count": 7}]},
-    {"derived_metric_id": "derived_metric:pnas.1402782111:s2_mit9313_vesicle_proteome:predicted_subcellular_localization", "metric_type": "predicted_subcellular_localization", "value_kind": "categorical", "count": 26, "allowed_categories": ["Cytoplasmic", "Cytoplasmic Membrane", "Periplasmic", "Outer Membrane", "Extracellular", "Unknown"], "dm_total_gene_count": 26, "dm_by_category": [{"category": "Cytoplasmic", "count": 9}, {"category": "Cytoplasmic Membrane", "count": 5}, {"category": "Outer Membrane", "count": 3}, {"category": "Periplasmic", "count": 3}, {"category": "Unknown", "count": 6}]}
+    {
+      "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization",
+      "name": "MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)",
+      "metric_type": "predicted_subcellular_localization",
+      "value_kind": "categorical",
+      "count": 32,
+      "by_category": [
+        {"category": "Cytoplasmic", "count": 11},
+        {"category": "Unknown", "count": 7},
+        {"category": "Cytoplasmic Membrane", "count": 6},
+        {"category": "Outer Membrane", "count": 5},
+        {"category": "Periplasmic", "count": 3}
+      ],
+      "allowed_categories": ["Cytoplasmic", "Cytoplasmic Membrane", "Periplasmic", "Outer Membrane", "Extracellular", ...],
+      "dm_total_gene_count": 32,
+      "dm_by_category": [
+        {"category": "Cytoplasmic", "count": 11},
+        {"category": "Unknown", "count": 7},
+        {"category": "Cytoplasmic Membrane", "count": 6},
+        {"category": "Outer Membrane", "count": 5},
+        {"category": "Periplasmic", "count": 3}
+      ]
+    },
+    {
+      "derived_metric_id": "derived_metric:science.1243457:s3_mit9313_vesicle_proteome:predicted_subcellular_localization",
+      "name": "MIT9313 vesicle protein PSORTb predicted localization (Biller 2014 Table S3)",
+      "metric_type": "predicted_subcellular_localization",
+      "value_kind": "categorical",
+      "count": 27,
+      "by_category": [
+        {"category": "Unknown", "count": 15},
+        {"category": "Extracellular", "count": 3},
+        {"category": "Periplasmic", "count": 3},
+        {"category": "Cytoplasmic", "count": 3},
+        {"category": "Outer Membrane", "count": 3}
+      ],
+      "allowed_categories": ["Cytoplasmic", "Cytoplasmic Membrane", "Periplasmic", "Outer Membrane", "Extracellular", ...],
+      "dm_total_gene_count": 27,
+      "dm_by_category": [
+        {"category": "Unknown", "count": 15},
+        {"category": "Cytoplasmic", "count": 3},
+        {"category": "Extracellular", "count": 3},
+        {"category": "Outer Membrane", "count": 3},
+        {"category": "Periplasmic", "count": 3}
+      ]
+    }
   ],
   "genes_per_metric_max": 32,
-  "genes_per_metric_median": 29.0,
+  "genes_per_metric_median": 32.0,
+  "not_found_ids": [],
+  "not_matched_ids": [],
+  "not_found_metric_types": [],
+  "not_matched_metric_types": [],
+  "not_matched_organism": null,
   "excluded_derived_metrics": [],
   "warnings": [],
   "returned": 0,
@@ -277,7 +490,7 @@ genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'])
 from multiomics_explorer import genes_by_categorical_metric
 
 result = genes_by_categorical_metric()
-# returns dict with keys: total_matching, total_derived_metrics, total_genes, by_organism, by_compartment, by_publication, by_experiment, by_category, top_categories, by_metric, genes_per_metric_max, genes_per_metric_median, not_found_ids, not_matched_ids, not_found_metric_types, not_matched_metric_types, not_matched_organism, excluded_derived_metrics, warnings, offset, results
+# returns dict with keys: total_matching, total_derived_metrics, total_genes, by_organism, by_compartment, by_publication, by_experiment, by_category, top_categories, by_metric, genes_per_metric_max, genes_per_metric_median, not_found_ids, not_matched_ids, not_found_metric_types, not_matched_metric_types, not_matched_organism, excluded_derived_metrics, warnings, returned, offset, truncated, results
 ```
 
 Use package import for bulk data extraction in scripts.

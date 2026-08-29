@@ -33,7 +33,7 @@ gates apply); kept for envelope-shape consistency.
 |---|---|---|---|
 | derived_metric_ids | list[string] \| None | None | Boolean DerivedMetric node IDs. Use when the same `metric_type` appears across organisms / publications and you need to pin one. Discover IDs via `list_derived_metrics(value_kind='boolean')`. Mutually exclusive with `metric_types`. Wrong-kind IDs (numeric / categorical) surface silently in `not_found_ids`. |
 | metric_types | list[string] \| None | None | Boolean metric-type tags (e.g. ['vesicle_proteome_member', 'periodic_in_coculture_LD']). Unions every DM carrying that tag, then narrows by scoping filters. Same tag can span organisms / publications — pin one specific DM via `derived_metric_ids` instead. Mutually exclusive with `derived_metric_ids`. |
-| organism | string \| None | None | Organism to scope the DM set to. Accepts short strain code ('MED4', 'NATL2A', 'MIT9313') or full name. Case-insensitive substring match. Single-organism is **not** enforced — omit to drill across all organisms a metric_type spans. |
+| organism | string \| None | None | Organism to scope the DM set to. Accepts short strain code ('MED4', 'NATL2A', 'MIT9313') or full name; word-based, case-insensitive match. Single-organism is **not** enforced — omit to drill across all organisms a metric_type spans. |
 | locus_tags | list[string] \| None | None | Restrict drill-down to a specific gene set (e.g. DE hits from `differential_expression_by_gene`). Filter on `g.locus_tag IN $locus_tags` post-MATCH. Genes with no edge for the selected DM produce no row. |
 | experiment_ids | list[string] \| None | None | Scope to DMs from one or more experiments. |
 | publication_doi | list[string] \| None | None | Scope to DMs from one or more publications. |
@@ -124,26 +124,55 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
 
 ```example-response
 {
-  "total_matching": 58,
+  "total_matching": 59,
   "total_derived_metrics": 2,
-  "total_genes": 58,
+  "total_genes": 59,
   "by_organism": [
     {"organism_name": "Prochlorococcus MED4", "count": 32},
-    {"organism_name": "Prochlorococcus MIT9313", "count": 26}
+    {"organism_name": "Prochlorococcus MIT9313", "count": 27}
   ],
-  "by_compartment": [{"compartment": "vesicle", "count": 58}],
-  "by_publication": [{"publication_doi": "10.1126/science.1243457", "count": 58}],
-  "by_value": [{"value": "flagged", "count": 58}],
-  "by_metric": [
-    {"derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "metric_type": "vesicle_proteome_member", "name": "MED4 vesicle proteome member", "value_kind": "boolean", "count": 32, "true_count": 32, "false_count": 0, "dm_total_gene_count": 32, "dm_true_count": 32, "dm_false_count": 0},
-    {"derived_metric_id": "derived_metric:pnas.1402782111:s2_mit9313_vesicle_proteome:vesicle_proteome_member", "metric_type": "vesicle_proteome_member", "name": "MIT9313 vesicle proteome member", "value_kind": "boolean", "count": 26, "true_count": 26, "false_count": 0, "dm_total_gene_count": 26, "dm_true_count": 26, "dm_false_count": 0}
+  "by_compartment": [{"compartment": "vesicle", "count": 59}],
+  "by_publication": [{"publication_doi": "10.1126/science.1243457", "count": 59}],
+  "by_experiment": [
+    {"experiment_id": "10.1126/science.1243457_vesicle_proteomics_med4", "count": 32},
+    {"experiment_id": "10.1126/science.1243457_vesicle_proteomics_mit9313", "count": 27}
   ],
+  "by_value": [{"value": "flagged", "count": 59}],
   "top_categories": [
-    {"gene_category": "Translation", "count": 12},
-    {"gene_category": "Unknown", "count": 9}
+    {"gene_category": "Unknown", "count": 12},
+    {"gene_category": "Stress response and adaptation", "count": 9},
+    {"gene_category": "Cell wall and membrane", "count": 9},
+    {"gene_category": "Translation", "count": 6},
+    {"gene_category": "Post-translational modification", "count": 4}
+  ],
+  "by_metric": [
+    {
+      "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member",
+      "name": "MED4 protein detected in vesicle proteome (Biller 2014 Table S2)",
+      "metric_type": "vesicle_proteome_member",
+      "value_kind": "boolean",
+      "count": 32,
+      "true_count": 32,
+      "false_count": 0,
+      "dm_total_gene_count": 32,
+      "dm_true_count": 32,
+      "dm_false_count": 0
+    },
+    {
+      "derived_metric_id": "derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member",
+      "name": "MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)",
+      "metric_type": "vesicle_proteome_member",
+      "value_kind": "boolean",
+      "count": 27,
+      "true_count": 27,
+      "false_count": 0,
+      "dm_total_gene_count": 27,
+      "dm_true_count": 27,
+      "dm_false_count": 0
+    }
   ],
   "genes_per_metric_max": 32,
-  "genes_per_metric_median": 29.0,
+  "genes_per_metric_median": 32.0,
   "not_found_ids": [],
   "not_matched_ids": [],
   "not_found_metric_types": [],
@@ -155,8 +184,46 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
   "offset": 0,
   "truncated": true,
   "results": [
-    {"locus_tag": "PMM0090", "gene_name": null, "product": null, "gene_category": null, "organism_name": "Prochlorococcus MED4", "derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "name": "MED4 vesicle proteome member", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "flagged"},
-    {"locus_tag": "PMM0097", "gene_name": null, "product": null, "gene_category": null, "organism_name": "Prochlorococcus MED4", "derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "name": "MED4 vesicle proteome member", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "flagged"}
+    {
+      "locus_tag": "PMM0090",
+      "gene_name": "degQ",
+      "product": "serine endoprotease, periplasmic",
+      "gene_category": "Post-translational modification",
+      "organism_name": "Prochlorococcus MED4",
+      "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member",
+      "name": "MED4 protein detected in vesicle proteome (Biller 2014 Table S2)",
+      "value_kind": "boolean",
+      "rankable": false,
+      "has_p_value": false,
+      "value": "flagged"
+    },
+    {
+      "locus_tag": "PMM0097",
+      "gene_name": "tolC",
+      "product": "TolC-like outer membrane efflux protein, RND family",
+      "gene_category": "Stress response and adaptation",
+      "organism_name": "Prochlorococcus MED4",
+      "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member",
+      "name": "MED4 protein detected in vesicle proteome (Biller 2014 Table S2)",
+      "value_kind": "boolean",
+      "rankable": false,
+      "has_p_value": false,
+      "value": "flagged"
+    },
+    {
+      "locus_tag": "PMM0107",
+      "gene_name": "aroK",
+      "product": "shikimate kinase",
+      "gene_category": "Amino acid metabolism",
+      "organism_name": "Prochlorococcus MED4",
+      "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member",
+      "name": "MED4 protein detected in vesicle proteome (Biller 2014 Table S2)",
+      "value_kind": "boolean",
+      "rankable": false,
+      "has_p_value": false,
+      "value": "flagged"
+    },
+    ...
   ]
 }
 ```
@@ -169,15 +236,44 @@ genes_by_boolean_metric(metric_types=['periodic_in_coculture_LD'], organism='NAT
 
 ```example-response
 {
-  "total_matching": 5,
+  "total_matching": 1651,
   "total_derived_metrics": 1,
-  "total_genes": 5,
-  "by_organism": [{"organism_name": "Prochlorococcus NATL2A", "count": 5}],
-  "by_compartment": [{"compartment": "whole_cell", "count": 5}],
-  "by_value": [{"value": "flagged", "count": 5}],
-  "by_metric": [
-    {"derived_metric_id": "derived_metric:1462-2920.14179:s2_natl2a_periodic_LD:periodic_in_coculture_LD", "metric_type": "periodic_in_coculture_LD", "name": "NATL2A periodic in coculture L:D", "value_kind": "boolean", "count": 5, "true_count": 5, "false_count": 0, "dm_total_gene_count": 1377, "dm_true_count": 5, "dm_false_count": 0}
+  "total_genes": 1651,
+  "by_organism": [{"organism_name": "Prochlorococcus NATL2A", "count": 1651}],
+  "by_compartment": [{"compartment": "whole_cell", "count": 1651}],
+  "by_publication": [{"publication_doi": "10.1128/mSystems.00040-18", "count": 1651}],
+  "by_experiment": [
+    {
+      "experiment_id": "10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture",
+      "count": 1651
+    }
   ],
+  "by_value": [{"value": "flagged", "count": 1651}],
+  "top_categories": [
+    {"gene_category": "Unknown", "count": 479},
+    {"gene_category": "Stress response and adaptation", "count": 196},
+    {"gene_category": "Coenzyme metabolism", "count": 152},
+    {"gene_category": "Translation", "count": 119},
+    {"gene_category": "Amino acid metabolism", "count": 93}
+  ],
+  "by_metric": [
+    {
+      "derived_metric_id": "derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD",
+      "name": "Periodic in NATL2A coculture L:D (Table S4A)",
+      "metric_type": "periodic_in_coculture_LD",
+      "value_kind": "boolean",
+      "count": 1651,
+      "true_count": 1651,
+      "false_count": 0,
+      "dm_total_gene_count": 1651,
+      "dm_true_count": 1651,
+      "dm_false_count": 0
+    }
+  ],
+  "genes_per_metric_max": 1651,
+  "genes_per_metric_median": 1651.0,
+  "not_found_ids": [],
+  "not_matched_ids": [],
   "not_found_metric_types": [],
   "not_matched_metric_types": [],
   "not_matched_organism": null,
@@ -185,9 +281,48 @@ genes_by_boolean_metric(metric_types=['periodic_in_coculture_LD'], organism='NAT
   "warnings": [],
   "returned": 5,
   "offset": 0,
-  "truncated": false,
+  "truncated": true,
   "results": [
-    {"locus_tag": "PMN2A_0123", "organism_name": "Prochlorococcus NATL2A", "derived_metric_id": "derived_metric:1462-2920.14179:s2_natl2a_periodic_LD:periodic_in_coculture_LD", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "flagged"}
+    {
+      "locus_tag": "PMN2A_0001",
+      "gene_name": "dnaA",
+      "product": "chromosomal replication initiator protein",
+      "gene_category": "Replication and repair",
+      "organism_name": "Prochlorococcus NATL2A",
+      "derived_metric_id": "derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD",
+      "name": "Periodic in NATL2A coculture L:D (Table S4A)",
+      "value_kind": "boolean",
+      "rankable": false,
+      "has_p_value": false,
+      "value": "flagged"
+    },
+    {
+      "locus_tag": "PMN2A_0002",
+      "gene_name": "gst",
+      "product": "glutathione S-transferase",
+      "gene_category": "Coenzyme metabolism",
+      "organism_name": "Prochlorococcus NATL2A",
+      "derived_metric_id": "derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD",
+      "name": "Periodic in NATL2A coculture L:D (Table S4A)",
+      "value_kind": "boolean",
+      "rankable": false,
+      "has_p_value": false,
+      "value": "flagged"
+    },
+    {
+      "locus_tag": "PMN2A_0003",
+      "gene_name": "gor",
+      "product": "glutathione reductase",
+      "gene_category": "Coenzyme metabolism",
+      "organism_name": "Prochlorococcus NATL2A",
+      "derived_metric_id": "derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD",
+      "name": "Periodic in NATL2A coculture L:D (Table S4A)",
+      "value_kind": "boolean",
+      "rankable": false,
+      "has_p_value": false,
+      "value": "flagged"
+    },
+    ...
   ]
 }
 ```
@@ -200,21 +335,60 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'], summary=True)
 
 ```example-response
 {
-  "total_matching": 58,
+  "total_matching": 59,
   "total_derived_metrics": 2,
-  "total_genes": 58,
+  "total_genes": 59,
   "by_organism": [
     {"organism_name": "Prochlorococcus MED4", "count": 32},
-    {"organism_name": "Prochlorococcus MIT9313", "count": 26}
+    {"organism_name": "Prochlorococcus MIT9313", "count": 27}
   ],
-  "by_compartment": [{"compartment": "vesicle", "count": 58}],
-  "by_value": [{"value": "flagged", "count": 58}],
+  "by_compartment": [{"compartment": "vesicle", "count": 59}],
+  "by_publication": [{"publication_doi": "10.1126/science.1243457", "count": 59}],
+  "by_experiment": [
+    {"experiment_id": "10.1126/science.1243457_vesicle_proteomics_med4", "count": 32},
+    {"experiment_id": "10.1126/science.1243457_vesicle_proteomics_mit9313", "count": 27}
+  ],
+  "by_value": [{"value": "flagged", "count": 59}],
+  "top_categories": [
+    {"gene_category": "Unknown", "count": 12},
+    {"gene_category": "Stress response and adaptation", "count": 9},
+    {"gene_category": "Cell wall and membrane", "count": 9},
+    {"gene_category": "Translation", "count": 6},
+    {"gene_category": "Post-translational modification", "count": 4}
+  ],
   "by_metric": [
-    {"derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "metric_type": "vesicle_proteome_member", "value_kind": "boolean", "count": 32, "true_count": 32, "false_count": 0, "dm_total_gene_count": 32, "dm_true_count": 32, "dm_false_count": 0},
-    {"derived_metric_id": "derived_metric:pnas.1402782111:s2_mit9313_vesicle_proteome:vesicle_proteome_member", "metric_type": "vesicle_proteome_member", "value_kind": "boolean", "count": 26, "true_count": 26, "false_count": 0, "dm_total_gene_count": 26, "dm_true_count": 26, "dm_false_count": 0}
+    {
+      "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member",
+      "name": "MED4 protein detected in vesicle proteome (Biller 2014 Table S2)",
+      "metric_type": "vesicle_proteome_member",
+      "value_kind": "boolean",
+      "count": 32,
+      "true_count": 32,
+      "false_count": 0,
+      "dm_total_gene_count": 32,
+      "dm_true_count": 32,
+      "dm_false_count": 0
+    },
+    {
+      "derived_metric_id": "derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member",
+      "name": "MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)",
+      "metric_type": "vesicle_proteome_member",
+      "value_kind": "boolean",
+      "count": 27,
+      "true_count": 27,
+      "false_count": 0,
+      "dm_total_gene_count": 27,
+      "dm_true_count": 27,
+      "dm_false_count": 0
+    }
   ],
   "genes_per_metric_max": 32,
-  "genes_per_metric_median": 29.0,
+  "genes_per_metric_median": 32.0,
+  "not_found_ids": [],
+  "not_matched_ids": [],
+  "not_found_metric_types": [],
+  "not_matched_metric_types": [],
+  "not_matched_organism": null,
   "excluded_derived_metrics": [],
   "warnings": [],
   "returned": 0,
@@ -224,7 +398,103 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'], summary=True)
 }
 ```
 
-### Example 4: DE → top hits → boolean flag intersection
+### Example 4: Tested-absent rows — flag=False on a DM that stores not_flagged edges
+
+```example-call
+genes_by_boolean_metric(metric_types=['rapid_recovery_low_co2_shock'], flag=False)
+```
+
+*This Biller low-CO2 DM stores `not_flagged` edges, so `flag=False` returns real tested-absent rows (`value: 'not_flagged'`) and `by_metric[0].dm_false_count > 0`. On a positive-only DM (e.g. `vesicle_proteome_member`) the same call returns 0 rows and `dm_false_count: 0` — absent there means not assessed, not negative.*
+
+```example-response
+{
+  "total_matching": 38,
+  "total_derived_metrics": 1,
+  "total_genes": 38,
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 38}],
+  "by_compartment": [{"compartment": "whole_cell", "count": 38}],
+  "by_publication": [{"publication_doi": "10.1038/ismej.2015.36", "count": 38}],
+  "by_experiment": [{"experiment_id": "10.1038/ismej.2015.36_carbon_low_co2_0004_co2_med4_microarray", "count": 38}],
+  "by_value": [{"value": "not_flagged", "count": 38}],
+  "top_categories": [
+    {"gene_category": "Stress response and adaptation", "count": 17},
+    {"gene_category": "Unknown", "count": 6},
+    {"gene_category": "Coenzyme metabolism", "count": 5},
+    {"gene_category": "Photosynthesis", "count": 2},
+    {"gene_category": "Transcription", "count": 2}
+  ],
+  "by_metric": [
+    {
+      "derived_metric_id": "derived_metric:ismej.2015.36:s2_concordance_low_co2:rapid_recovery_low_co2_shock",
+      "name": "MED4 rapid recovery under -CO2 shock (Bagby 2015 Table S2)",
+      "metric_type": "rapid_recovery_low_co2_shock",
+      "value_kind": "boolean",
+      "count": 38,
+      "true_count": 0,
+      "false_count": 38,
+      "dm_total_gene_count": 51,
+      "dm_true_count": 13,
+      "dm_false_count": 38
+    }
+  ],
+  "genes_per_metric_max": 38,
+  "genes_per_metric_median": 38.0,
+  "not_found_ids": [],
+  "not_matched_ids": [],
+  "not_found_metric_types": [],
+  "not_matched_metric_types": [],
+  "not_matched_organism": null,
+  "excluded_derived_metrics": [],
+  "warnings": [],
+  "returned": 5,
+  "offset": 0,
+  "truncated": true,
+  "results": [
+    {
+      "locus_tag": "PMM0051",
+      "gene_name": null,
+      "product": "cobQ/CobB/MinD/ParA nucleotide binding domain protein",
+      "gene_category": "Cell cycle and division",
+      "organism_name": "Prochlorococcus MED4",
+      "derived_metric_id": "derived_metric:ismej.2015.36:s2_concordance_low_co2:rapid_recovery_low_co2_shock",
+      "name": "MED4 rapid recovery under -CO2 shock (Bagby 2015 Table S2)",
+      "value_kind": "boolean",
+      "rankable": false,
+      "has_p_value": false,
+      "value": "not_flagged"
+    },
+    {
+      "locus_tag": "PMM0075",
+      "gene_name": null,
+      "product": "conserved hypothetical protein",
+      "gene_category": "Transcription",
+      "organism_name": "Prochlorococcus MED4",
+      "derived_metric_id": "derived_metric:ismej.2015.36:s2_concordance_low_co2:rapid_recovery_low_co2_shock",
+      "name": "MED4 rapid recovery under -CO2 shock (Bagby 2015 Table S2)",
+      "value_kind": "boolean",
+      "rankable": false,
+      "has_p_value": false,
+      "value": "not_flagged"
+    },
+    {
+      "locus_tag": "PMM0087",
+      "gene_name": null,
+      "product": "conserved hypothetical protein",
+      "gene_category": "Unknown",
+      "organism_name": "Prochlorococcus MED4",
+      "derived_metric_id": "derived_metric:ismej.2015.36:s2_concordance_low_co2:rapid_recovery_low_co2_shock",
+      "name": "MED4 rapid recovery under -CO2 shock (Bagby 2015 Table S2)",
+      "value_kind": "boolean",
+      "rankable": false,
+      "has_p_value": false,
+      "value": "not_flagged"
+    },
+    ...
+  ]
+}
+```
+
+### Example 5: DE → top hits → boolean flag intersection
 
 ```
 Step 1: differential_expression_by_gene(organism="MED4", significant_only=True, limit=20)
@@ -252,7 +522,7 @@ genes_by_boolean_metric (no organism filter) → split via envelope by_organism 
 
 ## Common mistakes
 
-- Two storage conventions coexist. 11 of 27 boolean DMs (Biller 2022, Voigt 2014, Hennon 2015, Steglich 2010) store `r.value="not_flagged"` edges, so `flag=False` returns tested-absent rows there; the rest (Biller 2014 / 2018, Coe 2016) are positive-only and return 0 rows for `flag=False`. Read `by_metric[*].false_count` before reading an absent gene as "not flagged" rather than "not assessed"; `dm_false_count` is the full-DM precomputed twin (0 on positive-only DMs). `metabolites_by_flags_assay`, which stores both true and false.
+- Two storage conventions coexist. 11 of 27 boolean DMs (Biller 2022, Voigt 2014, Hennon 2015, Steglich 2010) store `r.value="not_flagged"` edges, so `flag=False` returns tested-absent rows there; the rest (Biller 2014 / 2018, Coe 2016) are positive-only and return 0 rows for `flag=False`. Read `by_metric[*].false_count` before reading an absent gene as "not flagged" rather than "not assessed"; `dm_false_count` is the full-DM precomputed twin (0 on positive-only DMs). Contrast `metabolites_by_flags_assay`, whose edges always store both states.
 
 - Sparse `rankable` / `has_p_value` echoes. Both are always `False` on every row from boolean DMs in the current KG — kept for cross-tool row-shape consistency with `genes_by_numeric_metric`, not because this tool reads them as a meaningful signal. Don't gate downstream logic on them.
 
@@ -272,7 +542,7 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
 from multiomics_explorer import genes_by_boolean_metric
 
 result = genes_by_boolean_metric()
-# returns dict with keys: total_matching, total_derived_metrics, total_genes, by_organism, by_compartment, by_publication, by_experiment, by_value, top_categories, by_metric, genes_per_metric_max, genes_per_metric_median, not_found_ids, not_matched_ids, not_found_metric_types, not_matched_metric_types, not_matched_organism, excluded_derived_metrics, warnings, offset, results
+# returns dict with keys: total_matching, total_derived_metrics, total_genes, by_organism, by_compartment, by_publication, by_experiment, by_value, top_categories, by_metric, genes_per_metric_max, genes_per_metric_median, not_found_ids, not_matched_ids, not_found_metric_types, not_matched_metric_types, not_matched_organism, excluded_derived_metrics, warnings, returned, offset, truncated, results
 ```
 
 Use package import for bulk data extraction in scripts.

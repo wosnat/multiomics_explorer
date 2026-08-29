@@ -11,7 +11,7 @@ Routing: feed `locus_tag`s into `gene_overview` (data-availability triage), `gen
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string | — | Free-text query (Lucene syntax: quoted phrases, AND/OR, wildcards `*`, fuzzy `~`). E.g. 'photosystem', 'nitrogen AND transport', 'dnaN~'. See docs://guide/conventions for Lucene scoring details. |
-| organism | string \| None | None | Filter by organism (case-insensitive substring). E.g. 'MED4', 'Prochlorococcus MED4'. Use list_organisms to see valid values. |
+| organism | string \| None | None | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word like 'Alteromonas' matches every strain). E.g. 'MED4', 'Prochlorococcus MED4'. Use list_organisms to see valid values. |
 | category | string \| None | None | Filter by gene_category. E.g. 'Photosynthesis', 'Transport'. Use list_filter_values to see valid values. |
 | min_quality | int | 0 | Minimum annotation_quality (0..3 numeric encoding of `Gene.annotation_state`): 0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. Use 2 to skip hypothetical proteins; 3 for high-confidence. [AQ] Definition shifted in 2026-05 KG release; see docs://guide/conventions. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
@@ -67,7 +67,61 @@ genes_by_function(search_text="photosystem")
 ```
 
 ```example-response
-{"total_search_hits": 312, "total_matching": 312, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 42}, ...], "by_category": [{"category": "Photosynthesis", "count": 280}, ...], "score_max": 8.4, "score_median": 5.1, "returned": 5, "truncated": true, "offset": 0, "results": [{"locus_tag": "PMM0001", "gene_name": "psbA", "product": "Photosystem II D1 protein", "organism_name": "Prochlorococcus MED4", "gene_category": "Photosynthesis", "annotation_quality": 3, "score": 8.4}]}
+{
+  "total_search_hits": 2039,
+  "total_matching": 2039,
+  "by_organism": [
+    {"organism_name": "Prochlorococcus MIT9303", "count": 87},
+    {"organism_name": "Synechococcus CC9311", "count": 82},
+    {"organism_name": "Synechococcus sp. BL107", "count": 79},
+    {"organism_name": "Synechococcus WH7803", "count": 78},
+    {"organism_name": "Prochlorococcus MIT9313", "count": 78},
+    ...
+  ],
+  "by_category": [
+    {"category": "Photosynthesis", "count": 1001},
+    {"category": "Stress response and adaptation", "count": 274},
+    {"category": "Unknown", "count": 247},
+    {"category": "Energy production", "count": 234},
+    {"category": "Post-translational modification", "count": 87},
+    ...
+  ],
+  "score_max": 6.588601112365723,
+  "score_median": 4.331913948059082,
+  "returned": 5,
+  "offset": 0,
+  "truncated": true,
+  "results": [
+    {
+      "locus_tag": "H6G84_06320",
+      "gene_name": "psbO",
+      "product": "photosystem II manganese-stabilizing polypeptide",
+      "organism_name": "Synechococcus elongatus PCC 7942",
+      "gene_category": "Unknown",
+      "annotation_quality": 3,
+      "score": 6.588601112365723
+    },
+    {
+      "locus_tag": "M744_01545",
+      "gene_name": "psbO",
+      "product": "photosystem II manganese-stabilizing polypeptide",
+      "organism_name": "Synechococcus elongatus UTEX 2973",
+      "gene_category": "Unknown",
+      "annotation_quality": 3,
+      "score": 6.588601112365723
+    },
+    {
+      "locus_tag": "SYNPCC7002_A0269",
+      "gene_name": "psbO",
+      "product": "photosystem II manganese-stabilizing polypeptide",
+      "organism_name": "Synechococcus PCC 7002",
+      "gene_category": "Unknown",
+      "annotation_quality": 3,
+      "score": 6.588601112365723
+    },
+    ...
+  ]
+}
 ```
 
 ### Example 2: Search with organism filter and verbose output
@@ -83,7 +137,32 @@ genes_by_function(search_text="chaperone", summary=True)
 ```
 
 ```example-response
-{"total_search_hits": 87, "total_matching": 87, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 18}, ...], "by_category": [{"category": "Protein folding and degradation", "count": 54}, ...], "score_max": 7.2, "score_median": 4.3, "returned": 0, "truncated": true, "offset": 0, "results": []}
+{
+  "total_search_hits": 1428,
+  "total_matching": 1428,
+  "by_organism": [
+    {"organism_name": "Pseudomonas putida KT2440", "count": 62},
+    {"organism_name": "Shewanella sp. W3-18-1", "count": 54},
+    {"organism_name": "Marinobacter (MarRef v6)", "count": 54},
+    {"organism_name": "Alteromonas (MarRef v6)", "count": 48},
+    {"organism_name": "Alteromonas macleodii HOT1A3", "count": 42},
+    ...
+  ],
+  "by_category": [
+    {"category": "Post-translational modification", "count": 641},
+    {"category": "Stress response and adaptation", "count": 199},
+    {"category": "Unknown", "count": 167},
+    {"category": "Coenzyme metabolism", "count": 119},
+    {"category": "Cell motility", "count": 72},
+    ...
+  ],
+  "score_max": 7.583498001098633,
+  "score_median": 4.1626152992248535,
+  "returned": 0,
+  "offset": 0,
+  "truncated": true,
+  "results": []
+}
 ```
 
 ### Example 4: Chaining — find genes then inspect details
@@ -132,13 +211,15 @@ result['total_matching']  # results may be truncated
 
 - Use min_quality=2 to skip hypothetical proteins and get better-annotated results.
 
+- The organism filter is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works. A genus word alone ('Prochlorococcus') matches every strain of that genus. 'Meiothermus ruber' names two OrganismTaxon nodes (genome strain + gene-less treatment taxon) — only the genome strain has genes, so gene hits are unaffected.
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import genes_by_function
 
 result = genes_by_function(search_text=...)
-# returns dict with keys: total_search_hits, total_matching, by_organism, by_category, score_max, score_median, offset, results
+# returns dict with keys: total_search_hits, total_matching, by_organism, by_category, score_max, score_median, returned, offset, truncated, results
 ```
 
 Use package import for bulk data extraction in scripts.

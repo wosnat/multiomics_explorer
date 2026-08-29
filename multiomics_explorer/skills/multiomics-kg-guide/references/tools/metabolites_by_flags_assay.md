@@ -5,13 +5,14 @@
 Drill into boolean MetaboliteAssay edges — one row per
 (metabolite × flag-edge). `flag_value=False` rows are
 *tested-absent* (assayed and not found, real biology, kept by
-default — about 62% of boolean rows). Both states are always
+default — about 69% of boolean rows). Both states are always
 stored on this edge (KG `'detected'` / `'not_detected'`), unlike
 the DM layer where only some DMs store `not_flagged`.
 Cross-organism by design. No `by_detection_status` envelope — on
 the boolean arm, `flag_value` IS the qualitative-detection
 signal; `by_value` is its envelope rollup. Bare / xref metabolite
-IDs are coerced to canonical (`resolved_aliases`).
+IDs are coerced to canonical (`resolved_aliases`; collisions
+expand + warn).
 
 Routing: drill across to `assays_by_metabolite(metabolite_ids=[...])`
 for the quantifies-arm complement, or
@@ -34,7 +35,7 @@ the metabolomics decision tree.
 | treatment_type | list[string] \| None | None | Treatment type(s) (ANY-overlap). |
 | background_factors | list[string] \| None | None | Background factor(s) (ANY-overlap). |
 | growth_phases | list[string] \| None | None | Growth phase(s) (ANY-overlap). Currently unpopulated — KG-side backfill pending. |
-| flag_value | bool \| None | None | Filter by flag presence — `True` (presence flagged), `False` (absence flagged — *tested-absent*, real biology), `None` (both). Unlike `genes_by_boolean_metric` (positive-only KG storage), `Assay_flags_metabolite` stores both true and false flags, so `flag_value=False` returns real rows (about 62% of boolean rows). |
+| flag_value | bool \| None | None | Filter by flag presence — `True` (presence flagged), `False` (absence flagged — *tested-absent*, real biology), `None` (both). `Assay_flags_metabolite` always stores both states (unlike the DM layer, where only 11 of 27 boolean DMs store `not_flagged`), so `flag_value=False` returns real rows (about 69% of boolean rows). |
 | summary | bool | False | Return summary fields only (results=[]). |
 | verbose | bool | False | Include heavy-text fields per row: assay_name, field_description. |
 | limit | int | 5 | Max rows. Paginate with `offset`. |
@@ -96,15 +97,73 @@ metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presen
 ```
 
 ```example-response
-total_matching: 93
-by_value: [{flag_value: false, count: 58}, {flag_value: true, count: 35}]
-by_assay: [{assay_id: "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular", count: 93}]
-by_compartment: [{whole_cell: 93}]
-by_organism: [{Prochlorococcus MIT9301: 93}]
-excluded_assays: []
-warnings: []
-not_found: {assay_ids: [], metabolite_ids: [], experiment_ids: [], publication_doi: []}
-results: [S-adenosyl-L-methionine flag=true, tyrosine flag=true, NADH flag=true, AMP flag=true, S-Adenosyl-L-homocysteine flag=true]  # default limit=5
+{
+  "results": [
+    {
+      "metabolite_id": "chebi:142094",
+      "name": "S-adenosyl-L-methionine",
+      "kegg_compound_id": null,
+      "flag_value": true,
+      "n_positive": 1,
+      "n_replicates": 1,
+      "metric_type": "presence_flag_intracellular",
+      "condition_label": "",
+      "assay_id": "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular",
+      "organism_name": "Prochlorococcus MIT9301",
+      "compartment": "whole_cell"
+    },
+    {
+      "metabolite_id": "chebi:173245",
+      "name": "Tyrosine",
+      "kegg_compound_id": null,
+      "flag_value": true,
+      "n_positive": 1,
+      "n_replicates": 1,
+      "metric_type": "presence_flag_intracellular",
+      "condition_label": "",
+      "assay_id": "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular",
+      "organism_name": "Prochlorococcus MIT9301",
+      "compartment": "whole_cell"
+    },
+    {
+      "metabolite_id": "kegg.compound:C00004",
+      "name": "NADH",
+      "kegg_compound_id": "C00004",
+      "flag_value": true,
+      "n_positive": 1,
+      "n_replicates": 1,
+      "metric_type": "presence_flag_intracellular",
+      "condition_label": "",
+      "assay_id": "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular",
+      "organism_name": "Prochlorococcus MIT9301",
+      "compartment": "whole_cell"
+    },
+    ...
+  ],
+  "total_matching": 93,
+  "by_value": [{"flag_value": false, "count": 58}, {"flag_value": true, "count": 35}],
+  "by_assay": [
+    {
+      "assay_id": "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular",
+      "count": 93
+    }
+  ],
+  "by_compartment": [{"compartment": "whole_cell", "count": 93}],
+  "by_organism": [{"organism_name": "Prochlorococcus MIT9301", "count": 93}],
+  "by_metric": [
+    {
+      "assay_id": "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular",
+      "count": 93
+    }
+  ],
+  "excluded_assays": [],
+  "warnings": [],
+  "resolved_aliases": {},
+  "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
+  "returned": 5,
+  "truncated": true,
+  "offset": 0
+}
 ```
 
 ### Example 2: Presence-only — flag_value=True
@@ -147,6 +206,8 @@ metabolites_by_flags_assay → metabolites_by_gene(locus_tags=[...], organism=..
 ```
 
 ## Common mistakes
+
+- Boolean arm only (`Assay_flags_metabolite`). Siblings: `metabolites_by_quantifies_assay` is the numeric-arm twin (values, detection_status, rankable buckets); `assays_by_metabolite` is the metabolite-anchored reverse lookup over both arms.
 
 ```mistake
 Filter out value=0 / flag_value=false rows assuming they are noise.
@@ -200,10 +261,11 @@ flag_value=False returns 0 rows like genes_by_boolean_metric does.
 
 ```correction
 `Assay_flags_metabolite` ALWAYS stores both states (KG literals
-'detected' / 'not_detected', bool on the surface) — about 62% of
+'detected' / 'not_detected', bool on the surface) — about 69% of
 boolean rows are `flag_value=false`, and flag_value=False returns real
 rows. On the DM side only 11 of 27 boolean DMs store `not_flagged`
-edges, so `genes_by_boolean_metric(flag=False)` is DM-dependent.
+edges (the rest are positive-only), so `genes_by_boolean_metric(flag=False)`
+is DM-dependent — read its `by_metric[*].dm_false_count` first.
 
 ```
 
@@ -235,8 +297,6 @@ change when the upstream backfill lands.
 
 ```
 
-- See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (62% of boolean rows are flag_value=False, kept by default — unlike DM boolean which is positive-only).
-
 ```mistake
 metabolites_by_flags_assay(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'
 ```
@@ -255,13 +315,15 @@ in the form you passed.
 
 ```
 
+- See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (about 69% of boolean rows are flag_value=False, kept by default; on the DM side only 11 of 27 boolean DMs store `not_flagged` edges).
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import metabolites_by_flags_assay
 
 result = metabolites_by_flags_assay(assay_ids=...)
-# returns dict with keys: total_matching, by_value, by_assay, by_compartment, by_organism, by_metric, excluded_assays, warnings, resolved_aliases, not_found, offset, results
+# returns dict with keys: total_matching, by_value, by_assay, by_compartment, by_organism, by_metric, excluded_assays, warnings, resolved_aliases, not_found, returned, truncated, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

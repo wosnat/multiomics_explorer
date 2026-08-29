@@ -9,8 +9,8 @@ gene in" vocabulary. One `KeggTerm` label holds four kinds of node
 (`level_kind`): `category` (Metabolism, Genetic Information Processing,
 ...), `subcategory` (Carbohydrate metabolism, ...), `pathway`
 (`kegg.pathway:ko00910` Nitrogen metabolism) and `ko` (KEGG Orthology
-groups, `kegg:K02575` NRT nitrate/nitrite transporter). Genes attach to
-KOs; pathways and categories are reached by rollup.
+groups, `kegg.orthology:K02575` NRT nitrate/nitrite transporter). Genes
+attach to KOs; pathways and categories are reached by rollup.
 
 ## How genes get annotated
 
@@ -20,29 +20,38 @@ whose members carry that KO. There is no curated rung and no
 `evidence_score` — all KEGG edges sit on one rung, so trust filters on
 `kegg` do nothing useful; use `informative_only` and term size instead.
 Pathway membership is a rollup from KO → pathway → subcategory → category
-(`Kegg_term_is_a_kegg_term`). Pathway nodes also carry a literature index
-(`Publication_discusses_kegg_pathway` → `discussed_by_n_publications`) and,
-for pathways only, chemistry counts (`reaction_count`, `metabolite_count`)
-tying them to the reaction / metabolite layer.
+(`Kegg_term_is_a_kegg_term`). Pathway nodes also carry chemistry counts
+(`reaction_count`, `metabolite_count`) tying them to the reaction /
+metabolite layer, and a literature index: `search_ontology` computes
+`discussed_by_n_publications` per pathway row from the
+`Publication_discusses_kegg_pathway` edges (it is a tool-side count, not
+a node property).
 
 ## Identifier form
 
-Four prefixes on one label — `kegg.category:09100`, `kegg.subcategory:...`,
-`kegg.pathway:ko00910`, and bare KO `kegg:K02575`. The `ko` pathway prefix
-(not `map`) is the KG's canonical form. `list_metabolites(pathway_ids=[...])`
-and `genes_by_ontology(ontology='kegg', term_ids=[...])` both take the
-`kegg.pathway:` form; `discussed_by_publication` returns it.
+Four prefixes on one label — `kegg.category:09100`,
+`kegg.subcategory:09102`, `kegg.pathway:ko00910`, and
+`kegg.orthology:K02575` for KOs. The `ko` pathway prefix (not `map`) is
+the KG's canonical form. `list_metabolites(pathway_ids=[...])` and
+`genes_by_ontology(ontology='kegg', term_ids=[...])` both take the
+`kegg.pathway:` form; `discussed_by_publication` returns it. KO ids on
+`Gene_has_kegg_ko` are the `kegg.orthology:` form — pass that form to
+`term_ids` when anchoring on a KO.
 
 ## Hierarchy
 
-Four levels, `level` 0-3 = `category` → `subcategory` → `pathway` → `ko`.
-It is a DAG in practice: one KO belongs to many pathways (a glycolysis
-enzyme is also in several biosynthesis maps), so `gene_count` on a pathway
-is the union of its KOs' genes and sibling pathways overlap heavily.
-`direct_gene_count` is present on every node; on a pathway it counts genes
-attached to the pathway itself, which is normally 0 (genes attach to KOs).
-BRITE hierarchies are a *separate* view over the same KOs, reached through
-the `Kegg_term_in_brite_category` bridge.
+Four levels, `level` 0-3 = `category` (6) → `subcategory` (46) →
+`pathway` (447) → `ko` (4,644). It is a DAG in practice: one KO belongs
+to many pathways (a glycolysis enzyme is also in several biosynthesis
+maps), so `gene_count` on a pathway is the union of its KOs' genes and
+sibling pathways overlap heavily. `direct_gene_count` is present on every
+node; on a pathway it is always 0 by construction (genes attach to KOs
+only), so read `gene_count` there. The thirteen global / overview maps
+(`kegg.pathway:ko01100` Metabolic pathways, `ko01110`, `ko01120`, the
+`ko012xx` block, `ko01310`, `ko01320`) have no parent subcategory in
+this KG — they are level-2 nodes with no `parents[]`. BRITE hierarchies
+are a *separate* view over the same KOs, reached through the
+`Kegg_term_in_brite_category` bridge.
 
 ## Graph shape (from the registry)
 
@@ -67,16 +76,20 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 | `gene_count` | int | genes annotated to the term — subtree-inclusive on hierarchical labels, direct on flat ones |
 | `id` | string | term ID as used in `term_ids=[...]` (self-prefixed CURIE) |
 | `level` | int | hierarchy depth, 0 = root / broadest |
-| `level_kind` | string | what a level means in this ontology (see the vocabulary below) |
+| `level_kind` | string | what a level means in this ontology (e.g. `tc_family`, `pathway`) — read values via `list_filter_values` |
 | `name` | string | term name (what `search_ontology` indexes) |
 | `organism_count` | int | organisms with at least one gene annotated to the term (subtree-inclusive where `gene_count` is) |
 | `preferred_id` | string | same value as `id` |
 
 `ontology_term_details(verbose=True)` returns every property as `properties`; a compact column that is missing on the node is absent, not null (`docs://guide/conventions`).
 
-## Controlled vocabularies
+## Applicable filter types
 
-Values: see `list_filter_values(filter_type=..., ontology='kegg')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
+- `evidence` — `list_filter_values(filter_type="evidence", ontology="kegg")`
+- `sources` — `list_filter_values(filter_type="sources", ontology="kegg")`
+- `link_kinds` — `list_filter_values(filter_type="link_kinds")`
+
+Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="kegg")`) lists which comparable axes the gene edge carries.
 
 ## Interpretation
 
@@ -92,12 +105,17 @@ chemistry layer — the two memberships differ (see
 
 ## Informativeness rule
 
-Catch-all maps are flagged uninformative — `ko01100` Metabolic pathways,
-`ko01110` Biosynthesis of secondary metabolites, `ko01120` Microbial
-metabolism in diverse environments, and a set of broad KO groups — and
-dropped by `informative_only=True` (default on enrichment, opt-in on
-browse/search). The flag is term-side only; the genes stay in the
-background.
+Only KO-level terms are flagged: the 212 KOs named "uncharacterized
+protein" (`K00243; uncharacterized protein` and kin). No pathway,
+subcategory or category node is flagged — `informative_only=True` does
+NOT drop the global maps. `kegg.pathway:ko01100` Metabolic pathways
+(27,192 genes across the KG; about a quarter of the MED4 genome) and its
+siblings `ko01110` / `ko01120` / `ko01230` / `ko01240` pass through an
+enrichment untouched. Flagging the global-map block is an open KG-side
+ask; until it lands, cap term size with `max_gene_set_size` (a few
+hundred genes for a single organism) or drop the `ko011xx` / `ko012xx`
+rows from the result by id. The flag is term-side only; the genes stay
+in the background.
 
 ## Pitfalls
 
@@ -108,6 +126,8 @@ background.
   evidence.
 - No trust ladder to filter on: `sources`/`evidence` are constant. Passing
   `min_evidence_score` raises (KEGG carries no score axis).
+- `informative_only` does not remove the global maps — see the
+  informativeness rule; `max_gene_set_size` is the working guard.
 - Pathway-anchored metabolite lists and KO-anchored gene lists for the
   same map are different sets; name the anchor when answering.
 - Publication counts are a prose literature index, not expression — see
@@ -115,10 +135,10 @@ background.
 
 ## Typical questions
 
-- Which KEGG pathways are enriched among genes down under phosphorus limitation in MED4?
-- Does MIT1002 carry a KO for nitrate assimilation, and which pathway maps does it sit in?
-- Which pathway maps are most discussed in the literature for this organism?
-- What are the KO children of `kegg.pathway:ko00910`, and which BRITE categories does the pathway belong to?
+- Which KEGG pathways are enriched among genes down under phosphorus limitation in MED4? — `pathway_enrichment(organism='MED4', experiment_ids=[...], ontology='kegg', level=2, direction='down', max_gene_set_size=300)`
+- Does MIT1002 carry the nitrate/nitrite transporter KO, and which genes? — `genes_by_ontology(ontology='kegg', organism='MIT1002', term_ids=['kegg.orthology:K02575'])`
+- Which pathway maps are most discussed in the literature? — `search_ontology(ontology=['kegg'], level=2)` and read `discussed_by_n_publications`
+- What are the KO children of `kegg.pathway:ko00910`, and which BRITE categories does the pathway reach? — `ontology_term_details(term_ids=['kegg.pathway:ko00910'])`
 
 ## Tools
 

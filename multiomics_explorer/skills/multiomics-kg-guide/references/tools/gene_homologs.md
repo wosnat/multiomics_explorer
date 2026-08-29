@@ -77,13 +77,53 @@ gene_homologs(locus_tags=["PMM0001"])
 
 ```example-response
 {
-  "total_matching": 3,
-  "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 3}],
-  "by_source": [{"source": "eggnog", "count": 2}, {"source": "cyanorak", "count": 1}],
-  "returned": 3, "truncated": false, "offset": 0, "not_found": [], "no_groups": [],
+  "total_matching": 4,
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
+  "by_source": [{"source": "eggnog", "count": 3}, {"source": "cyanorak", "count": 1}],
+  "returned": 4,
+  "offset": 0,
+  "truncated": false,
+  "not_found": [],
+  "no_groups": [],
+  "top_cyanorak_roles": [
+    {
+      "id": "cyanorak.role:F.1",
+      "name": "DNA metabolism > DNA replication, recombination, and repair",
+      "count": 1
+    }
+  ],
+  "top_cog_categories": [{"id": "cog.category:L", "name": "Replication, recombination and repair", "count": 1}],
   "results": [
-    {"locus_tag": "PMM0001", "organism_name": "Prochlorococcus MED4", "group_id": "cyanorak:CK_00000364", "consensus_gene_name": "dnaN", "consensus_product": "DNA polymerase III, beta subunit", "taxonomic_level": "curated", "source": "cyanorak", "specificity_rank": 0},
-    {"locus_tag": "PMM0001", "organism_name": "Prochlorococcus MED4", "group_id": "eggnog:1MKTR@1212", ...},
+    {
+      "locus_tag": "PMM0001",
+      "organism_name": "Prochlorococcus MED4",
+      "group_id": "cyanorak:CK_00000364",
+      "consensus_gene_name": "dnaN",
+      "consensus_product": "DNA polymerase III, beta subunit",
+      "taxonomic_level": "curated",
+      "source": "cyanorak",
+      "specificity_rank": 0
+    },
+    {
+      "locus_tag": "PMM0001",
+      "organism_name": "Prochlorococcus MED4",
+      "group_id": "eggnog:1MKTR@1212",
+      "consensus_gene_name": "dnaN",
+      "consensus_product": "DNA polymerase III, beta subunit",
+      "taxonomic_level": "Prochloraceae",
+      "source": "eggnog",
+      "specificity_rank": 1
+    },
+    {
+      "locus_tag": "PMM0001",
+      "organism_name": "Prochlorococcus MED4",
+      "group_id": "eggnog:1FZV5@1117",
+      "consensus_gene_name": "dnaN",
+      "consensus_product": "DNA polymerase III, beta subunit",
+      "taxonomic_level": "Cyanobacteria",
+      "source": "eggnog",
+      "specificity_rank": 2
+    },
     ...
   ]
 }
@@ -129,9 +169,9 @@ search_homolog_groups → genes_by_homolog_group → gene_homologs
 
 ## Common mistakes
 
-- A gene typically belongs to 1-3 groups: cyanorak curated (Pro/Syn only), eggNOG family, eggNOG Bacteria-level COG
+- A gene typically belongs to 1-4 groups: one cyanorak curated group (Pro/Syn only) plus up to three eggNOG groups at nested taxonomic levels (e.g. Bacteria-level COG, Cyanobacteria, Prochloraceae). Rows are gene × group — use source / taxonomic_level / max_specificity_rank to pick one level.
 
-- not_found means the gene doesn't exist in the KG; no_groups means the gene exists but has no ortholog group membership
+- not_found means the gene doesn't exist in the KG; no_groups means the gene exists but has no ortholog group membership. `no_groups` is this tool's name for the not_matched bucket — see docs://guide/conventions for the shared not_found / not_matched semantics.
 
 - For member genes within a group, use genes_by_homolog_group (not this tool)
 
@@ -149,7 +189,7 @@ gene_homologs(locus_tags=['PMM0001']) — always a list
 from multiomics_explorer import gene_homologs
 
 result = gene_homologs(locus_tags=...)
-# returns dict with keys: total_matching, by_organism, by_source, offset, not_found, no_groups, top_cyanorak_roles, top_cog_categories, results
+# returns dict with keys: total_matching, by_organism, by_source, returned, offset, truncated, not_found, no_groups, top_cyanorak_roles, top_cog_categories, results
 ```
 
 Use package import for bulk data extraction in scripts.

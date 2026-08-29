@@ -2,21 +2,16 @@
 
 ## What it does
 
-Enumerate valid values + counts for a categorical filter (gene_category, brite_tree, growth_phase, metric_type, value_kind, compartment, omics_type, evidence_source, cluster_type, plus the annotation-trust types).
+Enumerate valid values (+ counts where the KG pivots them) for a categorical filter; the `filter_type` enum is the authoritative list of types.
 
-`cluster_type` enumerates the closed ClusteringAnalysis.cluster_type
-vocabulary from ControlledVocabulary (source='vocabulary'; falls back
-to a pivot over ClusteringAnalysis nodes with a warning) — the live
-source for the `cluster_type` filter on `list_clustering_analyses` /
-`gene_clusters_by_gene`.
+Value sources: data types (gene_category, brite_tree, growth_phase,
+metric_type, value_kind, compartment, omics_type, evidence_source)
+pivot live nodes and carry `count`; `cluster_type` and the
+annotation-trust types read `ControlledVocabulary` (pivot fallback +
+warning when missing) and return `count=None`. Trust types are
+documented in docs://analysis/annotation_evidence.
 
-[TRUST] evidence / sources / call_class / interpro_type /
-ncbifam_family_type / merops_catalytic_type / merops_family_class /
-best_hit_kind / pfam_support / attachment_depth / trust_axes /
-link_kinds enumerate the per-edge trust vocabulary. See
-docs://analysis/annotation_evidence.
-
-Routing: feed the returned `value`s into the corresponding filter on the relevant tool — `gene_category` → `genes_by_function(category=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`; the trust types → `sources` / `evidence` / `call_class` / `interpro_type` on `genes_by_ontology` and friends.
+Routing: feed the returned `value`s into the corresponding filter — `gene_category` → `genes_by_function(category=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `growth_phase` → `list_experiments(growth_phases=[...])` / `list_derived_metrics(growth_phases=[...])`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`; `cluster_type` → `list_clustering_analyses` / `gene_clusters_by_gene`; the trust types → `sources` / `evidence` / `call_class` / `interpro_type` on `genes_by_ontology` and friends.
 
 ## Parameters
 
@@ -82,13 +77,16 @@ list_filter_values(filter_type="gene_category")
 ```example-response
 {
   "filter_type": "gene_category",
+  "description": null,
   "total_entries": 26,
   "returned": 26,
   "truncated": false,
+  "warnings": [],
   "results": [
-    {"value": "Unknown", "count": 12183},
-    {"value": "Coenzyme metabolism", "count": 2146},
-    {"value": "Stress response and adaptation", "count": 2073}
+    {"value": "Unknown", "count": 41682},
+    {"value": "Amino acid metabolism", "count": 7709},
+    {"value": "Translation", "count": 7180},
+    ...
   ]
 }
 ```
@@ -102,13 +100,16 @@ list_filter_values(filter_type="brite_tree")
 ```example-response
 {
   "filter_type": "brite_tree",
+  "description": null,
   "total_entries": 12,
   "returned": 12,
   "truncated": false,
+  "warnings": [],
   "results": [
-    {"value": "enzymes", "tree_code": "ko01000", "count": 1776},
-    {"value": "transporters", "tree_code": "ko02000", "count": 84},
-    {"value": "protein families: signaling and cellular processes", "tree_code": "ko04131", "count": 150}
+    {"value": "chaperones", "count": 27, "tree_code": "ko03110"},
+    {"value": "defense", "count": 43, "tree_code": "ko02048"},
+    {"value": "dna_replication", "count": 23, "tree_code": "ko03032"},
+    ...
   ]
 }
 ```
@@ -143,12 +144,20 @@ list_filter_values(filter_type="metric_type")
 ```
 
 ```example-response
-{"filter_type": "metric_type", "total_entries": 26, "returned": 26, "truncated": false,
- "results": [
-   {"value": "cell_abundance_biovolume_normalized", "count": 2},
-   {"value": "log2_vesicle_cell_enrichment", "count": 2},
-   {"value": "mascot_identification_probability", "count": 2}
- ]}
+{
+  "filter_type": "metric_type",
+  "description": null,
+  "total_entries": 53,
+  "returned": 53,
+  "truncated": false,
+  "warnings": [],
+  "results": [
+    {"value": "log2_mv_cell_enrichment", "count": 6},
+    {"value": "prop_abund_cells_percent", "count": 6},
+    {"value": "prop_abund_mvs_percent", "count": 6},
+    ...
+  ]
+}
 ```
 
 ### Example 6: Enumerate DerivedMetric value kinds
@@ -158,12 +167,19 @@ list_filter_values(filter_type="value_kind")
 ```
 
 ```example-response
-{"filter_type": "value_kind", "total_entries": 3, "returned": 3, "truncated": false,
- "results": [
-   {"value": "boolean", "count": 16},
-   {"value": "numeric", "count": 15},
-   {"value": "categorical", "count": 3}
- ]}
+{
+  "filter_type": "value_kind",
+  "description": null,
+  "total_entries": 3,
+  "returned": 3,
+  "truncated": false,
+  "warnings": [],
+  "results": [
+    {"value": "numeric", "count": 46},
+    {"value": "boolean", "count": 27},
+    {"value": "categorical", "count": 10}
+  ]
+}
 ```
 
 ### Example 7: List wet-lab compartments (for compartment filter)
@@ -173,12 +189,20 @@ list_filter_values(filter_type="compartment")
 ```
 
 ```example-response
-{"filter_type": "compartment", "total_entries": 3, "returned": 3, "truncated": false,
- "results": [
-   {"value": "whole_cell", "count": 160},
-   {"value": "exoproteome", "count": 7},
-   {"value": "vesicle", "count": 5}
- ]}
+{
+  "filter_type": "compartment",
+  "description": null,
+  "total_entries": 4,
+  "returned": 4,
+  "truncated": false,
+  "warnings": [],
+  "results": [
+    {"value": "whole_cell", "count": 183},
+    {"value": "vesicle", "count": 13},
+    {"value": "exoproteome", "count": 10},
+    ...
+  ]
+}
 ```
 
 ### Example 8: Enumerate omics types (for experiment / publication filtering)
@@ -188,166 +212,266 @@ list_filter_values(filter_type="omics_type")
 ```
 
 ```example-response
-{"filter_type": "omics_type", "total_entries": 8, "returned": 8, "truncated": false,
- "results": [
-   {"value": "EXOPROTEOMICS", "count": 8},
-   {"value": "METABOLOMICS", "count": 8},
-   {"value": "MICROARRAY", "count": 26},
-   {"value": "PAIRED_RNASEQ_PROTEOME", "count": 1},
-   {"value": "PROTEOMICS", "count": 72},
-   {"value": "RNASEQ", "count": 63},
-   {"value": "VESICLE_DNASEQ", "count": 1},
-   {"value": "VESICLE_PROTEOMICS", "count": 10}
- ]}
-# Returns the full canonical OMICS_TYPE enum (8 values) in alphabetical
-# order. Values absent from current KG data still appear with count=0.
+{
+  "filter_type": "omics_type",
+  "description": null,
+  "total_entries": 8,
+  "returned": 8,
+  "truncated": false,
+  "warnings": [],
+  "results": [
+    {"value": "EXOPROTEOMICS", "count": 10},
+    {"value": "METABOLOMICS", "count": 12},
+    {"value": "MICROARRAY", "count": 30},
+    ...
+  ]
+}
 ```
 
-### Example 9: Enumerate metabolite evidence sources
+### Example 9: Enumerate growth phases (timepoint-level culture state, for growth_phases filters)
+
+```example-call
+list_filter_values(filter_type="growth_phase")
+```
+
+```example-response
+{
+  "filter_type": "growth_phase",
+  "description": null,
+  "total_entries": 10,
+  "returned": 10,
+  "truncated": false,
+  "warnings": [],
+  "results": [
+    {"value": "exponential", "count": 37},
+    {"value": "darkness", "count": 33},
+    {"value": "stationary", "count": 32},
+    ...
+  ]
+}
+```
+
+### Example 10: Enumerate metabolite evidence sources
 
 ```example-call
 list_filter_values(filter_type="evidence_source")
 ```
 
 ```example-response
-{"filter_type": "evidence_source", "total_entries": 3, "returned": 3, "truncated": false,
- "results": [
-   {"value": "metabolism", "count": 2188},
-   {"value": "transport", "count": 1355},
-   {"value": "metabolomics", "count": 107}
- ]}
+{
+  "filter_type": "evidence_source",
+  "description": null,
+  "total_entries": 3,
+  "returned": 3,
+  "truncated": false,
+  "warnings": [],
+  "results": [
+    {"value": "metabolism", "count": 2225},
+    {"value": "transport", "count": 1462},
+    {"value": "metabolomics", "count": 149}
+  ]
+}
 ```
 
-### Example 10: Enumerate the trust ladder (annotation-trust `evidence` axis)
+### Example 11: Enumerate the trust ladder (annotation-trust `evidence` axis)
 
 ```example-call
 list_filter_values(filter_type="evidence")
 ```
 
 ```example-response
-# `evidence` values, ordered by trust: curated > signature > homology >
-# family_inferred > domain_inferred. Each row's `applies_to` names the
-# gene-edge relationship types that carry the value (14 of the 17
-# ontologies carry this axis — PSORTb/SignalP don't). `source` is
-# "vocabulary" when read from the KG's ControlledVocabulary node,
-# "pivot" when that node is missing and the value set was derived
-# live via a fallback query (rare; a warning accompanies pivot rows).
-# Trust-vocabulary rows carry no `count` (unlike gene_category /
-# evidence_source) — there is no single precomputed cardinality for a
-# value that spans several edge types at once.
-# Envelope `description` = the property's vocabulary text, once; each
-# row's `description` = the meaning of THAT value (absent when the KG
-# carries no per-value text, e.g. interpro_type / cluster_type).
-{"filter_type": "evidence", "description": "Inference strength on the shared ladder curated > signature > ...",
- "total_entries": 5, "returned": 5, "truncated": false,
- "results": [
-   {"value": "curated", "applies_to": ["Gene_has_merops_family"], "description": "assigned by a human curator or a curated reference annotation (Cyanorak, UniProt, NCBI); strongest rung", "source": "vocabulary"},
-   {"value": "signature", "applies_to": ["Gene_has_interpro_entry", "Gene_has_ncbifam_family"], "description": "direct HMM / profile hit against a member database that pre-applies its own curated threshold (InterProScan, Pfam)", "source": "vocabulary"},
-   {"value": "homology", "applies_to": ["Gene_has_tcdb_family", "Gene_has_merops_family", "Gene_has_pfam"], "description": "...", "source": "vocabulary"},
-   {"value": "family_inferred", "applies_to": ["Gene_has_tcdb_family"], "description": "...", "source": "vocabulary"},
-   {"value": "domain_inferred", "applies_to": ["Gene_involved_in_biological_process"], "description": "transferred from a shared domain (InterPro DOMAIN entry); weakest rung", "source": "vocabulary"}
- ]}
+{
+  "filter_type": "evidence",
+  "description": "Inference strength on the shared ladder curated > signature > homology > family_inferred > domain_inferred (homology ...",
+  "total_entries": 5,
+  "returned": 5,
+  "truncated": false,
+  "warnings": [],
+  "results": [
+    {
+      "value": "curated",
+      "source": "vocabulary",
+      "applies_to": [
+        "Gene_involved_in_biological_process",
+        "Gene_enables_molecular_function",
+        "Gene_located_in_cellular_component",
+        "Gene_catalyzes_ec_number",
+        "Gene_has_cyanorak_role",
+        ...
+      ],
+      "description": "assigned by a human curator or a curated reference annotation (Cyanorak, UniProt, NCBI); strongest rung"
+    },
+    {
+      "value": "family_inferred",
+      "source": "vocabulary",
+      "applies_to": [
+        "Gene_involved_in_biological_process",
+        "Gene_enables_molecular_function",
+        "Gene_located_in_cellular_component",
+        "Gene_catalyzes_ec_number",
+        "Gene_has_kegg_ko",
+        ...
+      ],
+      "description": "transferred from an ortholog family or a single-function protein family (eggNOG orthology transfer, InterPro FAMILY e..."
+    },
+    {
+      "value": "domain_inferred",
+      "source": "vocabulary",
+      "applies_to": [
+        "Gene_involved_in_biological_process",
+        "Gene_enables_molecular_function",
+        "Gene_located_in_cellular_component",
+        "Gene_has_cazy_family"
+      ],
+      "description": "transferred from a shared domain (InterPro DOMAIN entry); weakest rung, since a domain can occur outside the annotate..."
+    },
+    ...
+  ]
+}
 ```
 
-### Example 11: Discover which trust axes an ontology supports
+### Example 12: Discover which trust axes an ontology supports
 
 ```example-call
 list_filter_values(filter_type="trust_axes", ontology="tcdb")
 ```
 
 ```example-response
-# trust_axes and link_kinds are config-derived, not KG-vocabulary reads
-# — they answer "what filter params work on this ontology" before you
-# call genes_by_ontology / pathway_enrichment with a trust filter.
-# One row per axis (not one row per ontology) — `applies_to` narrows to
-# the ontology you passed.
-{"filter_type": "trust_axes", "total_entries": 4, "returned": 4, "truncated": false,
- "results": [
-   {"value": "sources", "applies_to": ["tcdb"], "description": "...", "source": "config"},
-   {"value": "evidence", "applies_to": ["tcdb"], "description": "...", "source": "config"},
-   {"value": "evidence_score", "applies_to": ["tcdb"], "description": "...", "source": "config"},
-   {"value": "tier", "applies_to": ["tcdb"], "description": "...", "source": "config"}
- ]}
+{
+  "filter_type": "trust_axes",
+  "description": null,
+  "total_entries": 4,
+  "returned": 4,
+  "truncated": false,
+  "warnings": [],
+  "results": [
+    {
+      "value": "sources",
+      "source": "config",
+      "applies_to": ["tcdb"],
+      "description": "Which pipelines asserted the annotation (membership list)."
+    },
+    {
+      "value": "evidence",
+      "source": "config",
+      "applies_to": ["tcdb"],
+      "description": "Strength ladder: curated > signature > homology > family_inferred > domain_inferred."
+    },
+    {
+      "value": "evidence_score",
+      "source": "config",
+      "applies_to": ["tcdb"],
+      "description": "Composite trust score in 0..1 — the only numeric cutoff (min_evidence_score) and the within-ontology sort key."
+    },
+    ...
+  ]
+}
 ```
 
-### Example 12: Enumerate MEROPS call_class values
+### Example 13: Enumerate MEROPS call_class values
 
 ```example-call
 list_filter_values(filter_type="call_class")
 ```
 
 ```example-response
-# call_class has 3 values, not 2 — inhibitor is a real third state
-# (the family itself is a MEROPS inhibitor family, distinct from a
-# peptidase call or a catalytically-dead nonpeptidase_homolog call).
-{"filter_type": "call_class", "total_entries": 3, "returned": 3, "truncated": false,
- "results": [
-   {"value": "peptidase", "applies_to": ["Gene_has_merops_family"], "description": "...", "source": "vocabulary"},
-   {"value": "inhibitor", "applies_to": ["Gene_has_merops_family"], "description": "...", "source": "vocabulary"},
-   {"value": "nonpeptidase_homolog", "applies_to": ["Gene_has_merops_family"], "description": "...", "source": "vocabulary"}
- ]}
+{
+  "filter_type": "call_class",
+  "description": "KG-minted read-first verdict for one Gene_has_merops_family candidate. Harvested from the three return statements of ...",
+  "total_entries": 3,
+  "returned": 3,
+  "truncated": false,
+  "warnings": [],
+  "results": [
+    {
+      "value": "peptidase",
+      "source": "vocabulary",
+      "applies_to": ["Gene_has_merops_family"],
+      "description": "best hit is a characterized or putative active peptidase; protease evidence"
+    },
+    {
+      "value": "inhibitor",
+      "source": "vocabulary",
+      "applies_to": ["Gene_has_merops_family"],
+      "description": "family is a MEROPS I-family; the product is a peptidase inhibitor, not a protease"
+    },
+    {
+      "value": "nonpeptidase_homolog",
+      "source": "vocabulary",
+      "applies_to": ["Gene_has_merops_family"],
+      "description": "best hit is a catalytically dead .9xx relative; fold evidence only, NOT protease evidence"
+    }
+  ]
+}
 ```
 
-### Example 13: Enumerate InterPro types (for the interpro_type facet/filter)
+### Example 14: Enumerate InterPro types (for the interpro_type facet/filter)
 
 ```example-call
 list_filter_values(filter_type="interpro_type")
 ```
 
 ```example-response
-{"filter_type": "interpro_type", "total_entries": 8, "returned": 8, "truncated": false,
- "results": [
-   {"value": "FAMILY", "applies_to": ["InterproEntry"], "description": "...", "source": "vocabulary"},
-   {"value": "DOMAIN", "applies_to": ["InterproEntry"], "description": "...", "source": "vocabulary"},
-   {"value": "HOMOLOGOUS_SUPERFAMILY", "applies_to": ["InterproEntry"], "description": "...", "source": "vocabulary"}
- ]}
+{
+  "filter_type": "interpro_type",
+  "description": "InterPro entry class (FAMILY, DOMAIN, HOMOLOGOUS_SUPERFAMILY, CONSERVED_SITE, ACTIVE_SITE, REPEAT, BINDING_SITE, PTM)...",
+  "total_entries": 8,
+  "returned": 8,
+  "truncated": false,
+  "warnings": [],
+  "results": [
+    {"value": "FAMILY", "source": "vocabulary", "applies_to": ["InterproEntry"]},
+    {"value": "DOMAIN", "source": "vocabulary", "applies_to": ["InterproEntry"]},
+    {"value": "HOMOLOGOUS_SUPERFAMILY", "source": "vocabulary", "applies_to": ["InterproEntry"]},
+    ...
+  ]
+}
 ```
 
-### Example 14: Enumerate MEROPS / NCBIfam term-side categoricals
+### Example 15: Enumerate MEROPS / NCBIfam term-side categoricals
 
 ```example-call
 list_filter_values(filter_type="merops_catalytic_type")
 ```
 
 ```example-response
-# merops_catalytic_type (serine / cysteine / metallo / ...) is the
-# spelled-out MEROPS catalytic-type code, sparse — null for inhibitor
-# families. Distinct from merops_family_class (peptidase / inhibitor,
-# a 2-state family-level label — not the same axis as the edge-level
-# call_class above, though the value names overlap). Same read
-# pattern for filter_type='ncbifam_family_type', 'best_hit_kind',
-# 'pfam_support', 'attachment_depth' — all read from
-# ControlledVocabulary (or a pivot fallback with a warning if that
-# node is absent). None of these are ever hard-coded in this tool.
-{"filter_type": "merops_catalytic_type", "total_entries": 9, "returned": 9, "truncated": false,
- "results": [
-   {"value": "serine", "applies_to": ["MeropsFamily"], "description": "...", "source": "vocabulary"},
-   {"value": "cysteine", "applies_to": ["MeropsFamily"], "description": "...", "source": "vocabulary"}
- ]}
+{
+  "filter_type": "merops_catalytic_type",
+  "description": "KG-minted full-word spelling of MEROPS^s single-letter catalytic-type code — MEROPS ships \"S\"/\"C\"/\"M\"/etc, the KG spe...",
+  "total_entries": 9,
+  "returned": 9,
+  "truncated": false,
+  "warnings": [],
+  "results": [
+    {"value": "serine", "source": "vocabulary", "applies_to": ["MeropsFamily"]},
+    {"value": "cysteine", "source": "vocabulary", "applies_to": ["MeropsFamily"]},
+    {"value": "metallo", "source": "vocabulary", "applies_to": ["MeropsFamily"]},
+    ...
+  ]
+}
 ```
 
-### Example 15: Enumerate clustering-analysis types (for the cluster_type filter)
+### Example 16: Enumerate clustering-analysis types (for the cluster_type filter)
 
 ```example-call
 list_filter_values(filter_type="cluster_type")
 ```
 
 ```example-response
-# cluster_type is a closed vocabulary read from the KG's
-# ControlledVocabulary node for ClusteringAnalysis.cluster_type — the
-# authoritative source; the offline constant in the explorer is only a
-# fallback. Same vocabulary-or-pivot rule as the trust types: if the
-# node is missing, a live DISTINCT pivot over ClusteringAnalysis nodes
-# supplies the values, flagged source="pivot" with a warning.
-{"filter_type": "cluster_type", "total_entries": 6, "returned": 6, "truncated": false, "warnings": [],
- "results": [
-   {"value": "time_course", "applies_to": ["ClusteringAnalysis"], "description": "...", "source": "vocabulary"},
-   {"value": "diel", "applies_to": ["ClusteringAnalysis"], "description": "...", "source": "vocabulary"},
-   {"value": "condition_comparison", "applies_to": ["ClusteringAnalysis"], "description": "...", "source": "vocabulary"},
-   {"value": "expression_bin", "applies_to": ["ClusteringAnalysis"], "description": "...", "source": "vocabulary"},
-   {"value": "decay_pattern", "applies_to": ["ClusteringAnalysis"], "description": "...", "source": "vocabulary"},
-   {"value": "genomic_island", "applies_to": ["ClusteringAnalysis"], "description": "...", "source": "vocabulary"}
- ]}
+{
+  "filter_type": "cluster_type",
+  "description": "What kind of gene grouping the analysis is: time_course, diel, condition_comparison, expression_bin, decay_pattern (m...",
+  "total_entries": 6,
+  "returned": 6,
+  "truncated": false,
+  "warnings": [],
+  "results": [
+    {"value": "time_course", "source": "vocabulary", "applies_to": ["ClusteringAnalysis"]},
+    {"value": "diel", "source": "vocabulary", "applies_to": ["ClusteringAnalysis"]},
+    {"value": "condition_comparison", "source": "vocabulary", "applies_to": ["ClusteringAnalysis"]},
+    ...
+  ]
+}
 ```
 
 ## Chaining patterns
@@ -370,6 +494,10 @@ list_filter_values(filter_type='call_class') → genes_by_ontology(ontology='mer
 - Use filter_type='metric_type' to discover DerivedMetric tags before passing them to genes_by_{kind}_metric or list_derived_metrics. filter_type='value_kind' enumerates {numeric, boolean, categorical}. filter_type='compartment' enumerates wet-lab fractions (whole_cell, vesicle, exoproteome, ...).
 
 - count is summed across all organisms — a category with count=770 may cover genes in 10+ organisms
+
+- `count` is None on every vocabulary-sourced row: all the trust filter types (`evidence`, `sources`, `call_class`, `interpro_type`, ...) AND `cluster_type`. Only the pivoted / precomputed types (`gene_category`, `brite_tree`, `growth_phase`, `metric_type`, `value_kind`, `compartment`, `omics_type`, `evidence_source`) carry a count. Read `applies_to` / `description` on the count-less rows instead.
+
+- treatment_type and background_factors have no filter_type here — enumerate them from the by_treatment_type / by_background_factors rollups of list_experiments(summary=True) or list_publications(). They are live vocabularies: an unknown value passed to a filter returns 0 rows, not an error.
 
 - For brite_tree: count is the number of ontology terms in the tree, not genes. Use ontology_landscape to check gene coverage.
 
@@ -405,7 +533,7 @@ list_filter_values(filter_type='trust_axes', ontology='go_bp')  # check axes fir
 from multiomics_explorer import list_filter_values
 
 result = list_filter_values()
-# returns dict with keys: filter_type, description, total_entries, warnings, results
+# returns dict with keys: filter_type, description, total_entries, returned, truncated, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

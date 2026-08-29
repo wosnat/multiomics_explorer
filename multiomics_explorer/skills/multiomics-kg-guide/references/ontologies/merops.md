@@ -6,8 +6,9 @@ Generated from `inputs/ontologies/merops.yaml`, the `ONTOLOGY_CONFIG` registry a
 
 MEROPS — the peptidase (protease) and peptidase-inhibitor database.
 Families are grouped by catalytic mechanism (`catalytic_type`: serine,
-cysteine, metallo, aspartic, threonine, glutamic, asparagine lyase,
-mixed, unknown) into clans that share a fold (`merops.clan:SC`,
+cysteine, metallo, aspartic, threonine, asparagine lyase, mixed,
+unknown; `glutamic` is in the vocabulary but on no node here) into clans
+that share a fold (`merops.clan:SC`,
 `merops.clan:MA`), with families (`merops.family:S33` prolyl
 aminopeptidase, `merops.family:S14` Clp protease) and some subfamilies
 below. `family_class` separates peptidase families from inhibitor
@@ -70,30 +71,35 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 | Property | Type | Meaning |
 |---|---|---|
-| `catalytic_type` | string |  |
-| `cleavage_p1_residues` | list |  |
-| `cleavage_summary` | string |  |
+| `catalytic_type` | string | MEROPS catalytic type (serine, cysteine, metallo, ...) — the `merops_catalytic_type` filter value |
+| `cleavage_p1_residues` | list | residues MEROPS reports at the P1 cleavage position (sparse; family level) |
+| `cleavage_summary` | string | MEROPS cleavage-site specificity summary text (sparse; family level) |
 | `description` | string | longer free text (verbose on `search_ontology`; compact on `ontology_term_details`) |
 | `direct_gene_count` | int | genes attached to this exact node (not descendants); absent where it would be vacuous |
-| `family_class` | string |  |
+| `family_class` | string | MEROPS grouping of the family (peptidase vs inhibitor family) — the `merops_family_class` filter value |
 | `gene_count` | int | genes annotated to the term — subtree-inclusive on hierarchical labels, direct on flat ones |
 | `id` | string | term ID as used in `term_ids=[...]` (self-prefixed CURIE) |
-| `known_cleavage_count` | int |  |
+| `known_cleavage_count` | int | number of MEROPS-recorded cleavage sites behind the specificity summary (sparse) |
 | `level` | int | hierarchy depth, 0 = root / broadest |
-| `level_kind` | string | what a level means in this ontology (see the vocabulary below) |
+| `level_kind` | string | what a level means in this ontology (e.g. `tc_family`, `pathway`) — read values via `list_filter_values` |
 | `member_count` | int | upstream family size (source-database members), not KG genes |
-| `merops_id` | string |  |
+| `merops_id` | string | bare MEROPS identifier (clan e.g. `SC`, family `S8`, subfamily `S8A`); `id` is the `merops.*:` CURIE |
 | `name` | string | term name (what `search_ontology` indexes) |
 | `organism_count` | int | organisms with at least one gene annotated to the term (subtree-inclusive where `gene_count` is) |
-| `peptidase_gene_count` | int |  |
-| `peptidase_organism_count` | int |  |
+| `peptidase_gene_count` | int | genes attached with `call_class = 'peptidase'` (excludes nonpeptidase homologs); compare with `gene_count` |
+| `peptidase_organism_count` | int | organisms with at least one `call_class = 'peptidase'` gene on the term |
 | `preferred_id` | string | same value as `id` |
 
 `ontology_term_details(verbose=True)` returns every property as `properties`; a compact column that is missing on the node is absent, not null (`docs://guide/conventions`).
 
-## Controlled vocabularies
+## Applicable filter types
 
-Values: see `list_filter_values(filter_type=..., ontology='merops')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
+- `evidence` — `list_filter_values(filter_type="evidence", ontology="merops")`
+- `sources` — `list_filter_values(filter_type="sources", ontology="merops")`
+- `call_class` — `list_filter_values(filter_type="call_class", ontology="merops")`
+- `link_kinds` — `list_filter_values(filter_type="link_kinds")`
+
+Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="merops")`) lists which comparable axes the gene edge carries.
 
 ## Interpretation
 
@@ -122,7 +128,8 @@ test from an all-hits ORA.
   family and `nonpeptidase_homolog` in another (`gene_overview` exposes
   the set as `merops_classes`).
 - `inhibitor` families are not proteases; `family_class='inhibitor'`
-  on the term is the term-side twin.
+  on the term is the term-side twin, and `catalytic_type` is null on
+  most of them (the letter `I` encodes no mechanism).
 - `evidence_score` is MEROPS-internal; `merops_evidence_score_max` on
   `gene_overview` is sparse (null = no MEROPS call — rank, don't filter).
 - Cleavage-specificity fields describe the family's known substrates in
@@ -130,10 +137,10 @@ test from an all-hits ORA.
 
 ## Typical questions
 
-- How many active peptidases, by clan, does MIT1002 carry vs MED4?
-- Which MEROPS families are enriched among genes up in stationary phase, counting peptidase calls only?
-- Is `PMM0001`'s S14 hit an active Clp protease or a non-peptidase homolog?
-- Which Pfam domains define `merops.family:S33`, and what are its cleavage-site preferences?
+- How many active peptidases, by clan, does MIT1002 carry vs MED4? — `genes_by_ontology(ontology='merops', organism='MIT1002', level=0, call_class=['peptidase'], summary=True)`
+- Which MEROPS families are enriched among genes up in stationary phase, counting peptidase calls only? — `pathway_enrichment(..., ontology='merops', level=1, direction='up', call_class=['peptidase'])`
+- Is the `merops.family:S14` hit on `PMM0742` (clpP1) an active Clp protease or a non-peptidase homolog? — `gene_ontology_terms(locus_tags=['PMM0742'], organism='MED4', ontology=['merops'])` and read `call_class` (`peptidase`)
+- Which Pfam domains define `merops.family:S33`, and what are its cleavage-site preferences? — `ontology_term_details(term_ids=['merops.family:S33'], verbose=True)`
 
 ## Tools
 

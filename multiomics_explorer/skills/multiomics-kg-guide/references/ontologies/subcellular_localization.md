@@ -55,13 +55,13 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 | `name` | string | term name (what `search_ontology` indexes) |
 | `organism_count` | int | organisms with at least one gene annotated to the term (subtree-inclusive where `gene_count` is) |
 | `preferred_id` | string | same value as `id` |
-| `psortb_id` | string |  |
+| `psortb_id` | string | PSORTb localization label as emitted by the tool (e.g. `CytoplasmicMembrane`) |
 
 `ontology_term_details(verbose=True)` returns every property as `properties`; a compact column that is missing on the node is absent, not null (`docs://guide/conventions`).
 
-## Controlled vocabularies
+## Applicable filter types
 
-Values: see `list_filter_values(filter_type=..., ontology='subcellular_localization')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
+none — the gene edge carries native scalars only (no trust axes, no ontology-owned categorical, no bridges), so no `list_filter_values` type is scoped to this ontology. Values on other tools' filters are still read live from the KG's `ControlledVocabulary` nodes at call time.
 
 ## Interpretation
 
@@ -92,7 +92,7 @@ question to the envelope compartments.
 
 ## Typical questions
 
-- Which MED4 genes up in coculture are predicted outer-membrane or extracellular?
+- Which MED4 genes are predicted outer-membrane or extracellular? — `genes_by_ontology(ontology='subcellular_localization', organism='MED4', term_ids=['psortb_OuterMembrane','psortb_Extracellular'])`, then intersect with `differential_expression_by_gene`
 - How many predicted periplasmic proteins does each organism carry?
 - Is this gene's PSORTb call consistent with its SignalP signal peptide and its GO cellular-component annotation?
 

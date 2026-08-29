@@ -23,7 +23,7 @@ for reverse lookup across both arms, and
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string \| None | None | Full-text search over MetaboliteAssay name, field_description, treatment, experimental_context. E.g. 'chitosan', 'cellular concentration', 'KEGG export'. |
-| organism | string \| None | None | Organism (case-insensitive substring CONTAINS). E.g. 'MIT9301', 'Prochlorococcus MIT9313'. |
+| organism | string \| None | None | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word like 'Alteromonas' matches every strain). E.g. 'MIT9301', 'Prochlorococcus MIT9313'. |
 | metric_types | list[string] \| None | None | Filter by metric_type tags. Live values: 'cellular_concentration', 'extracellular_concentration', 'presence_flag_intracellular', 'presence_flag_extracellular'. |
 | value_kind | string ('numeric', 'boolean') \| None | None | 'numeric' → metabolites_by_quantifies_assay drill-down; 'boolean' → metabolites_by_flags_assay. |
 | compartment | string \| None | None | 'whole_cell' or 'extracellular'. Exact match. |
@@ -61,7 +61,7 @@ total_entries, total_matching, metabolite_count_total, by_organism, by_value_kin
 - **by_treatment_type** (list[LmaTreatmentTypeBreakdown])
 - **by_background_factors** (list[LmaBackgroundFactorBreakdown])
 - **by_growth_phase** (list[LmaGrowthPhaseBreakdown]): Currently unpopulated — KG-side backfill pending.
-- **by_detection_status** (list[LmaDetectionStatusBreakdown]): Envelope-level rollup of detection_status across all numeric edges of matching assays. Primary qualitative headline — about 75% of numeric edges are not_detected (tested-absent: assayed and not found, real biology). See `docs://guide/conventions`.
+- **by_detection_status** (list[LmaDetectionStatusBreakdown]): Envelope-level rollup of detection_status across all numeric edges of matching assays. Primary qualitative headline — about 70% of numeric edges are not_detected (tested-absent: assayed and not found, real biology). See `docs://guide/conventions`.
 - **score_max** (float | None): Max Lucene score (only with search_text)
 - **score_median** (float | None): Median Lucene score (only with search_text)
 - **returned** (int): Rows in this response
@@ -119,13 +119,53 @@ list_metabolite_assays(summary=True)
 ```
 
 ```example-response
-total_entries: 14
-total_matching: 14
-by_value_kind: [{value_kind: numeric, count: 12}, {value_kind: boolean, count: 2}]
-by_compartment: [{compartment: whole_cell, count: 9}, {compartment: extracellular, count: 3}, {compartment: vesicle, count: 2}]
-by_organism: [5 organisms across 3 papers — MIT9313, MIT9301, MIT9312, MIT0801, MIT9303]
-by_detection_status: [{not_detected: 1046}, {detected: 360}, {sporadic: 74}]
-results: []  # summary=True
+{
+  "total_entries": 14,
+  "total_matching": 14,
+  "metabolite_count_total": 1044,
+  "by_organism": [
+    {"organism_name": "Prochlorococcus MIT9313", "count": 5},
+    {"organism_name": "Prochlorococcus MIT9301", "count": 4},
+    {"organism_name": "Prochlorococcus MIT9312", "count": 2},
+    {"organism_name": "Prochlorococcus MIT0801", "count": 2},
+    {"organism_name": "Prochlorococcus MIT9303", "count": 1}
+  ],
+  "by_value_kind": [{"value_kind": "numeric", "count": 12}, {"value_kind": "boolean", "count": 2}],
+  "by_compartment": [
+    {"compartment": "whole_cell", "count": 9},
+    {"compartment": "extracellular", "count": 3},
+    {"compartment": "vesicle", "count": 2}
+  ],
+  "top_metric_types": [
+    {"metric_type": "cellular_concentration", "count": 5},
+    {"metric_type": "relative_peak_area_biovolume_normalized", "count": 4},
+    {"metric_type": "extracellular_concentration", "count": 3},
+    {"metric_type": "presence_flag_intracellular", "count": 1},
+    {"metric_type": "presence_flag_extracellular", "count": 1}
+  ],
+  "by_treatment_type": [
+    {"treatment_type": "compartment", "count": 4},
+    {"treatment_type": "phosphorus", "count": 4},
+    {"treatment_type": "growth_phase", "count": 4},
+    {"treatment_type": "carbon", "count": 2}
+  ],
+  "by_background_factors": [{"background_factor": "axenic", "count": 14}, {"background_factor": "light", "count": 6}],
+  "by_growth_phase": [],
+  "by_detection_status": [
+    {"detection_status": "not_detected", "count": 1046},
+    {"detection_status": "detected", "count": 360},
+    {"detection_status": "sporadic", "count": 74}
+  ],
+  "score_max": null,
+  "score_median": null,
+  "returned": 0,
+  "offset": 0,
+  "truncated": true,
+  "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
+  "resolved_aliases": {},
+  "warnings": [],
+  "results": []
+}
 ```
 
 ### Example 2: Discovery via fulltext (Capovilla chitosan paper)
@@ -203,8 +243,6 @@ Calling metabolites_by_quantifies_assay with bucket / metric_percentile filters 
 Call list_metabolite_assays(value_kind='numeric', rankable=True) first. Drill-down's rankable-gated filters raise if every selected assay has rankable=False, soft-exclude on mixed input.
 ```
 
-- See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/conventions` for tested-absent semantics across the metabolomics layer.
-
 ```mistake
 list_metabolite_assays(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'
 ```
@@ -223,13 +261,15 @@ in the form you passed.
 
 ```
 
+- See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/conventions` for tested-absent semantics across the metabolomics layer.
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import list_metabolite_assays
 
 result = list_metabolite_assays()
-# returns dict with keys: total_entries, total_matching, metabolite_count_total, by_organism, by_value_kind, by_compartment, top_metric_types, by_treatment_type, by_background_factors, by_growth_phase, by_detection_status, score_max, score_median, offset, not_found, resolved_aliases, warnings, results
+# returns dict with keys: total_entries, total_matching, metabolite_count_total, by_organism, by_value_kind, by_compartment, top_metric_types, by_treatment_type, by_background_factors, by_growth_phase, by_detection_status, score_max, score_median, returned, offset, truncated, not_found, resolved_aliases, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

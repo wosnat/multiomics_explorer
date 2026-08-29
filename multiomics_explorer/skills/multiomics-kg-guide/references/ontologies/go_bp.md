@@ -16,12 +16,15 @@ comparing Prochlorococcus, Synechococcus and Alteromonas on one axis.
 Gene → term edges are pooled from several annotation sources (`sources[]`
 on the edge: Cyanorak curation, eggNOG orthology transfer, InterProScan
 signature-to-GO mapping, NCBI and UniProt records). Each edge carries a
-compact `evidence` rung — `curated` (a curator asserted it),
-`family_inferred` (transferred through an ortholog family), or
-`domain_inferred` (implied by a protein domain) — plus an `evidence_score`
-composite in [0, 1] that rewards agreement between sources. Annotation is
-propagated: a gene annotated to a specific term counts toward every
-ancestor through `is_a` and `part_of`.
+compact `evidence` rung (`curated` / `family_inferred` /
+`domain_inferred`) and an `evidence_score` composite in [0, 1] that
+rewards agreement between sources; the rung semantics are defined once
+in `docs://analysis/annotation_evidence`. On this edge type the live
+mapping is: eggNOG-only edges read `curated` (the bulk of the edges —
+re-labelling them `family_inferred` is an open KG-side ask), while
+InterProScan-only edges read `family_inferred` or `domain_inferred`.
+Annotation is propagated: a gene annotated to a specific term counts
+toward every ancestor through `is_a` and `part_of`.
 
 ## Identifier form
 
@@ -71,14 +74,18 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 `ontology_term_details(verbose=True)` returns every property as `properties`; a compact column that is missing on the node is absent, not null (`docs://guide/conventions`).
 
-## Controlled vocabularies
+## Applicable filter types
 
-Values: see `list_filter_values(filter_type=..., ontology='go_bp')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
+- `evidence` — `list_filter_values(filter_type="evidence", ontology="go_bp")`
+- `sources` — `list_filter_values(filter_type="sources", ontology="go_bp")`
+
+Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="go_bp")`) lists which comparable axes the gene edge carries.
 
 ## Interpretation
 
-Read `evidence` first: `curated` edges are the strongest, `domain_inferred`
-the weakest. Use `evidence_score` to *rank* competing annotations of one
+Read `sources` alongside `evidence`: a `curated` edge backed only by
+`eggnog` is an orthology transfer, not a curator's assertion, so rank by
+`evidence_score` rather than trusting the rung alone. Use `evidence_score` to *rank* competing annotations of one
 gene within GO, never as a cross-ontology threshold; `min_evidence_score`
 exists as the single numeric cutoff if a stricter set is needed. Two
 organisms annotated to the same process at level 3 are comparable; a
@@ -102,15 +109,18 @@ organism's genes as a catch-all.
 - `domain_inferred` GO terms come from InterPro signatures and can be very
   broad (a single ATP-binding domain implies `go:0005524` for every
   ATPase); rank rather than trust them equally with `curated`.
-- TCDB families link *out* to GO terms (composition); reach those bridges
-  from the `tcdb` term, not from the GO term.
+- TCDB families link *out* to GO terms (composition); the bridge is
+  forward-only, so `ontology_term_details` on a GO term shows no TCDB
+  links — walk it from the `tcdb` term, or use `run_cypher` over
+  `Tcdb_family_involved_in_biological_process` for the reverse
+  direction.
 
 ## Typical questions
 
-- Which MED4 genes are annotated to a stress-response process, and how strong is each annotation?
-- Which GO biological processes are enriched among genes up under nitrogen starvation?
-- How many organisms carry at least one gene annotated to photosynthesis-related processes?
-- What are the parents and children of `go:0006979`, and which TCDB families are built from it?
+- Which MED4 genes are annotated to response to oxidative stress, and how strong is each annotation? — `genes_by_ontology(ontology='go_bp', organism='MED4', term_ids=['go:0006979'], verbose=True)`
+- Which GO biological processes are enriched among genes up under nitrogen starvation? — `pathway_enrichment(organism='MED4', experiment_ids=[...], ontology='go_bp', level=4, direction='up')`
+- How many organisms carry at least one gene annotated to photosynthesis? — `ontology_term_details(term_ids=['go:0015979'])` and read `organism_count`
+- What are the parents and children of `go:0006979`? — `ontology_term_details(term_ids=['go:0006979'])`; for the TCDB families built from a process, start from the `tcdb` term (the bridge is forward-only)
 
 ## Tools
 

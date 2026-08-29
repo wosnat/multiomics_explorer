@@ -16,7 +16,7 @@ direction via `gene_homologs`; cross-organism expression view via
 | Name | Type | Default | Description |
 |---|---|---|---|
 | group_ids | list[string] | — | Ortholog group IDs (from search_homolog_groups or gene_homologs). E.g. ['cyanorak:CK_00000570']. |
-| organisms | list[string] \| None | None | Filter by organisms (case-insensitive substring, each entry matched independently). E.g. ['MED4', 'AS9601']. Use list_organisms to see valid values. |
+| organisms | list[string] \| None | None | Filter by organisms — each entry a word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word matches every strain). E.g. ['MED4', 'AS9601']. Use list_organisms to see valid values. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include gene_summary, function_description, consensus_product, source in results. |
 | limit | int | 5 | Max results. |
@@ -75,7 +75,57 @@ genes_by_homolog_group(group_ids=["cyanorak:CK_00000570"])
 ```
 
 ```example-response
-{"total_matching": 9, "total_genes": 9, "total_categories": 1, "genes_per_group_max": 9, "genes_per_group_median": 9.0, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}], "top_categories": [{"category": "Photosynthesis", "count": 9}], "top_groups": [{"group_id": "cyanorak:CK_00000570", "count": 9}], "not_found_groups": [], "not_matched_groups": [], "not_found_organisms": [], "not_matched_organisms": [], "returned": 5, "truncated": true, "offset": 0, "results": [{"locus_tag": "A9601_03391", "gene_name": "psbB", "product": "photosystem II chlorophyll-binding protein CP47", "organism_name": "Prochlorococcus AS9601", "gene_category": "Photosynthesis", "group_id": "cyanorak:CK_00000570"}]}
+{
+  "total_matching": 22,
+  "total_genes": 22,
+  "total_categories": 1,
+  "offset": 0,
+  "genes_per_group_max": 22,
+  "genes_per_group_median": 22.0,
+  "by_organism": [
+    {"organism_name": "Prochlorococcus SB", "count": 1},
+    {"organism_name": "Synechococcus sp. BL107", "count": 1},
+    {"organism_name": "Prochlorococcus NATL1A", "count": 1},
+    {"organism_name": "Synechococcus WH7803", "count": 1},
+    {"organism_name": "Prochlorococcus MIT0604", "count": 1},
+    ...
+  ],
+  "top_categories": [{"category": "Photosynthesis", "count": 22}],
+  "top_groups": [{"group_id": "cyanorak:CK_00000570", "count": 22}],
+  "not_found_groups": [],
+  "not_matched_groups": [],
+  "not_found_organisms": [],
+  "not_matched_organisms": [],
+  "returned": 5,
+  "truncated": true,
+  "results": [
+    {
+      "locus_tag": "A9601_03391",
+      "gene_name": "psbB",
+      "product": "photosystem II chlorophyll-binding protein CP47",
+      "organism_name": "Prochlorococcus AS9601",
+      "gene_category": "Photosynthesis",
+      "group_id": "cyanorak:CK_00000570"
+    },
+    {
+      "locus_tag": "PMM0315",
+      "gene_name": "psbB",
+      "product": "photosystem II chlorophyll-binding protein CP47",
+      "organism_name": "Prochlorococcus MED4",
+      "gene_category": "Photosynthesis",
+      "group_id": "cyanorak:CK_00000570"
+    },
+    {
+      "locus_tag": "EW14_0359",
+      "gene_name": "psbB",
+      "product": "photosystem II chlorophyll-binding protein CP47",
+      "organism_name": "Prochlorococcus MIT0604",
+      "gene_category": "Photosynthesis",
+      "group_id": "cyanorak:CK_00000570"
+    },
+    ...
+  ]
+}
 ```
 
 ### Example 2: Filter to specific organisms
@@ -91,7 +141,31 @@ genes_by_homolog_group(group_ids=["cyanorak:CK_00000570", "eggnog:COG0592@2"], s
 ```
 
 ```example-response
-{"total_matching": 22, "total_genes": 22, "total_categories": 2, "genes_per_group_max": 13, "genes_per_group_median": 11.0, "top_groups": [{"group_id": "eggnog:COG0592@2", "count": 13}, {"group_id": "cyanorak:CK_00000570", "count": 9}], "returned": 0, "truncated": true, "offset": 0, "results": []}
+{
+  "total_matching": 65,
+  "total_genes": 65,
+  "total_categories": 2,
+  "offset": 0,
+  "genes_per_group_max": 43,
+  "genes_per_group_median": 32.5,
+  "by_organism": [
+    {"organism_name": "Prochlorococcus SB", "count": 2},
+    {"organism_name": "Synechococcus sp. BL107", "count": 2},
+    {"organism_name": "Prochlorococcus NATL1A", "count": 2},
+    {"organism_name": "Synechococcus WH7803", "count": 2},
+    {"organism_name": "Prochlorococcus MIT0604", "count": 2},
+    ...
+  ],
+  "top_categories": [{"category": "Replication and repair", "count": 43}, {"category": "Photosynthesis", "count": 22}],
+  "top_groups": [{"group_id": "eggnog:COG0592@2", "count": 43}, {"group_id": "cyanorak:CK_00000570", "count": 22}],
+  "not_found_groups": [],
+  "not_matched_groups": [],
+  "not_found_organisms": [],
+  "not_matched_organisms": [],
+  "returned": 0,
+  "truncated": true,
+  "results": []
+}
 ```
 
 ### Example 4: From text search to member genes
@@ -124,6 +198,8 @@ gene_homologs → genes_by_homolog_group
 
 - organisms is a list, not a string — use ['MED4'] not 'MED4'
 
+- Four diagnostic buckets, all flat lists: `not_found_groups` (group id absent from the KG) / `not_matched_groups` (group exists, no member passes the organisms filter) and `not_found_organisms` / `not_matched_organisms` (organism name unknown / known but has no member in these groups). The `_groups` / `_organisms` suffixes are this tool's spelling of the not_found / not_matched pair — See docs://guide/conventions for the shared not_found / not_matched semantics.
+
 ```mistake
 genes_by_homolog_group(group_ids=['photosystem'])  # passing text, not IDs
 ```
@@ -146,7 +222,7 @@ response['total_matching']  # use total, not len
 from multiomics_explorer import genes_by_homolog_group
 
 result = genes_by_homolog_group(group_ids=...)
-# returns dict with keys: total_matching, total_genes, total_categories, offset, genes_per_group_max, genes_per_group_median, by_organism, top_categories, top_groups, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, results
+# returns dict with keys: total_matching, total_genes, total_categories, offset, genes_per_group_max, genes_per_group_median, by_organism, top_categories, top_groups, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, returned, truncated, results
 ```
 
 Use package import for bulk data extraction in scripts.

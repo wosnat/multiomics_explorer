@@ -29,12 +29,12 @@ runnable code (custom term2gene path covers cluster-membership ORA).
 | Name | Type | Default | Description |
 |---|---|---|---|
 | analysis_id | string | — | Clustering analysis ID. Get from list_clustering_analyses. |
-| organism | string | — | Organism (case-insensitive fuzzy match). Single-organism enforced. |
+| organism | string | — | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises). Single-organism enforced. |
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') | — | Ontology for pathway definitions. Run ontology_landscape first. |
 | tree | string \| None | None | BRITE tree name filter. Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | level | int \| None | None | Hierarchy level (0 = root). At least one of `level` or `term_ids` required. See docs://guide/conventions. |
 | term_ids | list[string] \| None | None | Specific term IDs to test. |
-| background | string | cluster_union | 'cluster_union' (default — union of all clustered genes; differs from `pathway_enrichment`'s 'table_scope' default), 'organism', or explicit locus_tag list. See docs://analysis/enrichment for the full background semantics. |
+| background | string \| list[string] | cluster_union | 'cluster_union' (default — union of all clustered genes; differs from `pathway_enrichment`'s 'table_scope' default), 'organism', or explicit locus_tag list. See docs://analysis/enrichment for the full background semantics. |
 | min_gene_set_size | int | 5 | Per-cluster M filter: drop pathways with fewer members. |
 | max_gene_set_size | int \| None | 500 | Per-cluster M filter upper bound. None disables. |
 | min_cluster_size | int | 3 | Skip clusters with fewer members than this. |
@@ -43,9 +43,9 @@ runnable code (custom term2gene path covers cluster-membership ORA).
 | summary | bool | False | If true, omit results (envelope only). |
 | limit | int | 5 | Max rows returned. |
 | offset | int | 0 | Skip N rows before limit. |
-| informative_only | bool | True | When True (default), exclude ontology terms flagged uninformative in the KG (e.g. KEGG map00001 'metabolic pathways', GO root go:0008150). Term-side filter — never restricts the gene set, background, or DE inputs. Pass False to include uninformative terms; per-row is_informative still surfaces in either mode. [ENR] Default flipped to True in 2026-05 KG release; see docs://guide/conventions. |
+| informative_only | bool | True | When True (default), exclude ontology terms flagged uninformative in the KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). Term-side filter — never restricts the gene set, background, or DE inputs. Pass False to include uninformative terms; per-row is_informative still surfaces in either mode. [ENR] Default flipped to True in 2026-05 KG release; see docs://guide/conventions. |
 | sources | list[string] \| None | None | Keep rows whose edge sources[] contains any of these values (e.g. ['eggnog']). Valid on the 14 functional-edge ontologies (not PSORTb / SignalP). Default None never filters. See list_filter_values(filter_type='sources'). |
-| evidence | list[string] \| None | None | Keep rows whose compact evidence ladder value is in this list (curated > signature > homology > family_inferred > domain_inferred). Valid on the 14 functional-edge ontologies. Default None never filters. |
+| evidence | list[string] \| None | None | Keep rows whose compact evidence ladder value is in this list (read the value; rung assignment is per ontology — see docs://analysis/annotation_evidence). Valid on the 14 functional-edge ontologies. Default None never filters. |
 | max_tier | int \| None | None | Keep rows with edge tier <= this value OR tier IS NULL (diamond truncation depth, 1-3; tier-null edges are always kept - see by_tier's null bucket). Valid on tcdb, merops only. |
 | min_evidence_score | float \| None | None | Keep rows with edge evidence_score >= this cutoff (composite trust score, 0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, tcdb, merops. Envelope adds evidence_score_signals when set. |
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; leaving unfiltered mixes in catalytically-dead homologs (nonpeptidase_homolog) - the envelope warns when it does. |
@@ -127,10 +127,14 @@ analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_t
 ### `informative_only` filter
 
 When True (default), exclude ontology terms flagged uninformative
-in the KG (e.g. KEGG map00001 'metabolic pathways', GO root
-go:0008150). Term-side filter — never restricts the gene set,
-background, or DE inputs. Pass False to include uninformative terms;
-per-row `is_informative` still surfaces in either mode.
+in the KG (e.g. GO root go:0008150, catch-all Cyanorak / TIGR roles,
+KEGG KOs named "uncharacterized protein"). Term-side filter — never
+restricts the gene set, background, or cluster membership. Pass
+False to include uninformative terms; per-row `is_informative` still
+surfaces in either mode. KEGG is flagged at the KO level only:
+pathway maps — including the global map `kegg.pathway:ko01100` — are
+not flagged, so use `max_gene_set_size` to keep global maps out of a
+pathway-level test.
 
 See `docs://analysis/enrichment` (section "Informative-only filtering")
 for rationale, Fisher denominator behavior, and opt-out guidance.
@@ -162,15 +166,15 @@ cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_di
 cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="cyanorak_role", level=1, background="organism")
 ```
 
-### Example 5: InterPro enrichment requires interpro_type
+### Example 5: InterPro enrichment requires interpro_type (illustrative — not a live response)
 
 ```example-call
 cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="interpro", interpro_type="HOMOLOGOUS_SUPERFAMILY", level=0)
 ```
 
+*Same requirement as pathway_enrichment: ontology='interpro' without interpro_type raises (InterPro types size too differently to pool). Hand-written response — this call currently fails on the MCP surface (non-finite floats in the analysis's cluster description properties; a tool fix is pending).*
+
 ```example-response
-# Same requirement as pathway_enrichment: ontology='interpro' without
-# interpro_type raises (InterPro types size too differently to pool).
 {"trust_axes": {"interpro": ["sources", "evidence"]}, "interpro_type": "HOMOLOGOUS_SUPERFAMILY", "...": "..."}
 ```
 
@@ -196,6 +200,7 @@ Step 3: cluster_enrichment(analysis_id=<picked>, organism="MED4", ontology=<pick
 ## Chaining patterns
 
 ```
+Cluster-anchored ORA: cluster_enrichment tests each cluster of one clustering analysis; the sibling pathway_enrichment runs the same Fisher + BH test over DE gene sets (experiment × timepoint × direction). Same row/envelope shape.
 list_clustering_analyses → cluster_enrichment
 ontology_landscape → cluster_enrichment
 cluster_enrichment → gene_overview
@@ -206,6 +211,8 @@ See `docs://analysis/annotation_evidence` for the trust-axis registry and rank-v
 ```
 
 ## Common mistakes
+
+- cluster_enrichment is cluster-anchored (needs `analysis_id`); for DE gene sets use `pathway_enrichment(experiment_ids=...)`. `enrichment_params` (incl. `term2gene_row_count`) echoes what was tested, same as pathway_enrichment.
 
 - [ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions.
 

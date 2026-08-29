@@ -66,26 +66,60 @@ discussed_by_publication(publication_dois=["10.1038/ismej.2016.70"])
 ```
 
 ```example-response
-# Recall-biased narrative index — the genes and KEGG pathways this
-# paper names in prose (regulators, model genes, pathways discussed
-# in text), NOT the supplementary DE-table expression data. Use
-# differential_expression_by_gene for expression.
 {
   "total_entries": 37,
   "total_matching": 37,
-  "by_entity_kind": {"gene": 29, "kegg_pathway": 8},
-  "by_prominence": {"central": 14, "peripheral": 23},
+  "returned": 37,
+  "offset": 0,
+  "truncated": false,
+  "by_entity_kind": [{"entity_kind": "gene", "count": 29}, {"entity_kind": "kegg_pathway", "count": 8}],
+  "by_prominence": [{"prominence": "peripheral", "count": 20}, {"prominence": "central", "count": 17}],
   "top_kegg_pathways": [
-    {"id": "kegg.pathway:ko00195", "name": "Photosynthesis", "n": 1}, ...
+    {"id": "kegg.pathway:ko00010", "name": "Glycolysis / Gluconeogenesis", "n": 1},
+    {"id": "kegg.pathway:ko00710", "name": "Carbon fixation by Calvin cycle", "n": 1},
+    {"id": "kegg.pathway:ko00030", "name": "Pentose phosphate pathway", "n": 1},
+    {"id": "kegg.pathway:ko00061", "name": "Fatty acid biosynthesis", "n": 1},
+    {"id": "kegg.pathway:ko00860", "name": "Porphyrin metabolism", "n": 1},
+    ...
   ],
   "top_publications": [
-    {"doi": "10.1038/ismej.2016.70", "title": "Transcriptional response of Prochlorococcus to co-culture...", "n": 37}
+    {
+      "doi": "10.1038/ismej.2016.70",
+      "title": "Transcriptional response of Prochlorococcus to co-culture with a marine Alteromonas: differences between strains and ...",
+      "n": 37
+    }
   ],
-  "returned": 5, "truncated": true, "offset": 0,
-  "not_found": [], "not_matched": [],
+  "not_found": [],
+  "not_matched": [],
   "results": [
-    {"doi": "10.1038/ismej.2016.70", "entity_kind": "gene", "entity_id": "PMT2118", "entity_name": "Hypothetical protein", "organism": "Prochlorococcus MIT9313", "prominence": "central"},
-    {"doi": "10.1038/ismej.2016.70", "entity_kind": "kegg_pathway", "entity_id": "kegg.pathway:ko00195", "entity_name": "Photosynthesis", "organism": null, "prominence": "central"}
+    {
+      "doi": "10.1038/ismej.2016.70",
+      "entity_kind": "gene",
+      "entity_id": "PMT0238",
+      "entity_name": "bacteriocin-type signal sequence",
+      "organism": "Prochlorococcus MIT9313",
+      "prominence": "central",
+      "evidence": null
+    },
+    {
+      "doi": "10.1038/ismej.2016.70",
+      "entity_kind": "gene",
+      "entity_id": "PMT0246",
+      "entity_name": "possible Profilin",
+      "organism": "Prochlorococcus MIT9313",
+      "prominence": "central",
+      "evidence": null
+    },
+    {
+      "doi": "10.1038/ismej.2016.70",
+      "entity_kind": "gene",
+      "entity_id": "PMT0925",
+      "entity_name": "conserved hypothetical protein",
+      "organism": "Prochlorococcus MIT9313",
+      "prominence": "central",
+      "evidence": null
+    },
+    ...
   ]
 }
 ```
@@ -97,13 +131,62 @@ discussed_by_publication(publication_dois=["10.1038/ismej.2016.70"], entity_kind
 ```
 
 ```example-response
-{"total_entries": 37, "total_matching": 8,
- "by_entity_kind": {"gene": 0, "kegg_pathway": 8},
- "by_prominence": {"central": 2, "peripheral": 6},
- "returned": 5, "truncated": true, "offset": 0, "not_found": [], "not_matched": [],
- "results": [
-   {"doi": "10.1038/ismej.2016.70", "entity_kind": "kegg_pathway", "entity_id": "kegg.pathway:ko00710", "entity_name": "Carbon fixation by Calvin cycle", "organism": null, "prominence": "peripheral"}
- ]}
+{
+  "total_entries": 37,
+  "total_matching": 8,
+  "returned": 8,
+  "offset": 0,
+  "truncated": false,
+  "by_entity_kind": [{"entity_kind": "kegg_pathway", "count": 8}],
+  "by_prominence": [{"prominence": "peripheral", "count": 6}, {"prominence": "central", "count": 2}],
+  "top_kegg_pathways": [
+    {"id": "kegg.pathway:ko00010", "name": "Glycolysis / Gluconeogenesis", "n": 1},
+    {"id": "kegg.pathway:ko00710", "name": "Carbon fixation by Calvin cycle", "n": 1},
+    {"id": "kegg.pathway:ko00030", "name": "Pentose phosphate pathway", "n": 1},
+    {"id": "kegg.pathway:ko00061", "name": "Fatty acid biosynthesis", "n": 1},
+    {"id": "kegg.pathway:ko00860", "name": "Porphyrin metabolism", "n": 1},
+    ...
+  ],
+  "top_publications": [
+    {
+      "doi": "10.1038/ismej.2016.70",
+      "title": "Transcriptional response of Prochlorococcus to co-culture with a marine Alteromonas: differences between strains and ...",
+      "n": 8
+    }
+  ],
+  "not_found": [],
+  "not_matched": [],
+  "results": [
+    {
+      "doi": "10.1038/ismej.2016.70",
+      "entity_kind": "kegg_pathway",
+      "entity_id": "kegg.pathway:ko00195",
+      "entity_name": "Photosynthesis",
+      "organism": null,
+      "prominence": "central",
+      "evidence": null
+    },
+    {
+      "doi": "10.1038/ismej.2016.70",
+      "entity_kind": "kegg_pathway",
+      "entity_id": "kegg.pathway:ko01230",
+      "entity_name": "Biosynthesis of amino acids",
+      "organism": null,
+      "prominence": "central",
+      "evidence": null
+    },
+    {
+      "doi": "10.1038/ismej.2016.70",
+      "entity_kind": "kegg_pathway",
+      "entity_id": "kegg.pathway:ko00010",
+      "entity_name": "Glycolysis / Gluconeogenesis",
+      "organism": null,
+      "prominence": "peripheral",
+      "evidence": null
+    },
+    ...
+  ]
+}
 ```
 
 ### Example 3: Only the prominently-discussed (central) entities
@@ -125,12 +208,62 @@ discussed_by_publication(publication_dois=["10.1038/ismej.2016.70"], entity_kind
 ```
 
 ```example-response
-# verbose adds the extraction `evidence` quote — the sentence in the
-# paper that names the entity.
-{"total_matching": 8, "returned": 5, "truncated": true, "offset": 0,
- "results": [
-   {"doi": "10.1038/ismej.2016.70", "entity_kind": "kegg_pathway", "entity_id": "kegg.pathway:ko00195", "entity_name": "Photosynthesis", "organism": null, "prominence": "central", "evidence": "...photosynthesis genes were downregulated in co-culture..."}
- ]}
+{
+  "total_entries": 37,
+  "total_matching": 8,
+  "returned": 8,
+  "offset": 0,
+  "truncated": false,
+  "by_entity_kind": [{"entity_kind": "kegg_pathway", "count": 8}],
+  "by_prominence": [{"prominence": "peripheral", "count": 6}, {"prominence": "central", "count": 2}],
+  "top_kegg_pathways": [
+    {"id": "kegg.pathway:ko00010", "name": "Glycolysis / Gluconeogenesis", "n": 1},
+    {"id": "kegg.pathway:ko00710", "name": "Carbon fixation by Calvin cycle", "n": 1},
+    {"id": "kegg.pathway:ko00030", "name": "Pentose phosphate pathway", "n": 1},
+    {"id": "kegg.pathway:ko00061", "name": "Fatty acid biosynthesis", "n": 1},
+    {"id": "kegg.pathway:ko00860", "name": "Porphyrin metabolism", "n": 1},
+    ...
+  ],
+  "top_publications": [
+    {
+      "doi": "10.1038/ismej.2016.70",
+      "title": "Transcriptional response of Prochlorococcus to co-culture with a marine Alteromonas: differences between strains and ...",
+      "n": 8
+    }
+  ],
+  "not_found": [],
+  "not_matched": [],
+  "results": [
+    {
+      "doi": "10.1038/ismej.2016.70",
+      "entity_kind": "kegg_pathway",
+      "entity_id": "kegg.pathway:ko00195",
+      "entity_name": "Photosynthesis",
+      "organism": null,
+      "prominence": "central",
+      "evidence": "expression of genes involved in photosynthesis ... decreased in MED4 and increased in MIT9313 (Abstract, p1; Results,..."
+    },
+    {
+      "doi": "10.1038/ismej.2016.70",
+      "entity_kind": "kegg_pathway",
+      "entity_id": "kegg.pathway:ko01230",
+      "entity_name": "Biosynthesis of amino acids",
+      "organism": null,
+      "prominence": "central",
+      "evidence": "genes involved in the biosynthesis of amino acids ... less abundantly expressed in MED4+1A3 (p6, Results)"
+    },
+    {
+      "doi": "10.1038/ismej.2016.70",
+      "entity_kind": "kegg_pathway",
+      "entity_id": "kegg.pathway:ko00010",
+      "entity_name": "Glycolysis / Gluconeogenesis",
+      "organism": null,
+      "prominence": "peripheral",
+      "evidence": "Glycolysis (0596, 0185*) (Table 2, p7)"
+    },
+    ...
+  ]
+}
 ```
 
 ### Example 6: From paper to discussed entities to drill-down
@@ -162,7 +295,7 @@ discussed_by_publication(entity_kind='kegg_pathway') → genes_by_ontology(ontol
 
 ## Common mistakes
 
-- This is a recall-biased narrative literature index — the genes and pathways a paper names in prose, NOT exhaustive coverage and NOT the supplementary DE-table expression data. Only 935 distinct genes are named across the whole corpus (out of ~100k). For expression, use differential_expression_by_gene.
+- This is a recall-biased narrative literature index — the genes and pathways a paper names in prose, NOT exhaustive coverage and NOT the supplementary DE-table expression data. Only about 1,000 distinct genes are named across the whole corpus (out of ~127k). For expression, use differential_expression_by_gene.
 
 - It returns the KEGG pathway terms the paper discusses verbatim — it does NOT expand a pathway to its member genes. To get genes in a discussed pathway, chain into genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...).
 
@@ -172,7 +305,7 @@ discussed_by_publication(entity_kind='kegg_pathway') → genes_by_ontology(ontol
 
 - total_entries counts all discusses edges from the matched DOIs before any entity_kind / prominence filter; total_matching reflects the filtered set. A small total_matching with a large total_entries means your filter is narrow, not that the paper is sparse.
 
-- not_found means the DOI is absent from the KG; not_matched means the DOI exists but has no discusses edge (3 such publications exist). DOI matching is case-insensitive.
+- not_found means the DOI is absent from the KG; not_matched means the DOI exists but has no discusses edge (4 such publications exist — the `no_discusses` bucket of list_publications). Both buckets are flat lists of DOIs — see docs://guide/conventions for the not_found / not_matched semantics. DOI matching is case-insensitive.
 
 ```mistake
 discussed_by_publication(publication_dois=['10.1038/ismej.2016.70'])  # to get DE results for the paper
@@ -188,7 +321,7 @@ list_experiments(publication_doi=['10.1038/ismej.2016.70']) then differential_ex
 from multiomics_explorer import discussed_by_publication
 
 result = discussed_by_publication(publication_dois=...)
-# returns dict with keys: total_entries, total_matching, offset, by_entity_kind, by_prominence, top_kegg_pathways, top_publications, not_found, not_matched, results
+# returns dict with keys: total_entries, total_matching, returned, offset, truncated, by_entity_kind, by_prominence, top_kegg_pathways, top_publications, not_found, not_matched, results
 ```
 
 Use package import for bulk data extraction in scripts.

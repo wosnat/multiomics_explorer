@@ -45,8 +45,8 @@ total_entries, total_matching, top_organisms, top_metabolite_pathways, by_eviden
 - **xref_coverage** (MetXrefCoverage): Cross-ref ID coverage within matched set.
 - **mass_stats** (MetMassStats): Mass distribution within matched set.
 - **by_measurement_coverage** (MetMeasurementCoverage): Metabolomics measurement coverage rollup across matched metabolites. Two sub-rollups: by_paper_count (frequency by measured_paper_count value) + by_compartment (frequency by measured_compartments value).
-- **score_max** (float | None): Max Lucene score (only with search).
-- **score_median** (float | None): Median Lucene score (only with search).
+- **score_max** (float | None): Max Lucene score (only with `search_text`).
+- **score_median** (float | None): Median Lucene score (only with `search_text`).
 - **returned** (int): Metabolites in this response.
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if total_matching > returned.
@@ -75,7 +75,7 @@ total_entries, total_matching, top_organisms, top_metabolite_pathways, by_eviden
 | measured_paper_count | int (optional) | Distinct papers measuring this metabolite (precomputed). Non-zero on metabolites with metabolomics evidence. |
 | measured_organisms | list[string] (optional) | Organism preferred_names with at least one MetaboliteAssay anchored to this metabolite. Populated when measured_assay_count > 0; [] otherwise. |
 | measured_compartments | list[string] (optional) | Wet-lab compartments observed for this metabolite (subset of {'whole_cell', 'extracellular', 'vesicle'}). Empty on unmeasured metabolites — use len(measured_compartments) >= 1 to filter for measurement-anchored rows. |
-| score | float \| None (optional) | Lucene relevance score (only with `search`). |
+| score | float \| None (optional) | Lucene relevance score (only with `search_text`). |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -126,14 +126,52 @@ list_metabolites(metabolite_ids=["chebi:14313"])
 ```
 
 ```example-response
-# glucose (ChEBI) is reached only through TCDB substrate edges:
-# catalyst_gene_count 0 (no Gene → Reaction → Metabolite path) with
-# transporter_gene_count 3051 (distinct genes over their deepest TCDB
-# attachments, all organisms) and evidence_sources ['transport'].
-{"total_matching": 1, "returned": 1, "truncated": false, "offset": 0,
- "results": [
-   {"metabolite_id": "chebi:14313", "name": "glucose", "catalyst_gene_count": 0, "transporter_gene_count": 3051, "evidence_sources": ["transport"]}
- ]}
+{
+  "total_entries": 3356,
+  "total_matching": 1,
+  "top_organisms": [
+    {"organism_name": "Alteromonas macleodii AD45", "count": 1},
+    {"organism_name": "Alteromonas macleodii ATCC27126", "count": 1},
+    {"organism_name": "Alteromonas macleodii BGP6", "count": 1},
+    {"organism_name": "Alteromonas macleodii BS11", "count": 1},
+    {"organism_name": "Alteromonas macleodii EZ55", "count": 1},
+    ...
+  ],
+  "top_metabolite_pathways": [],
+  "by_evidence_source": [{"evidence_source": "transport", "count": 1}],
+  "xref_coverage": {"with_chebi": 1, "with_hmdb": 0, "with_mnxm": 1},
+  "mass_stats": {"mass_min": 180.156, "mass_median": 180.156, "mass_max": 180.156},
+  "by_measurement_coverage": {"by_paper_count": [{"paper_count": 0, "count": 1}], "by_compartment": []},
+  "score_max": null,
+  "score_median": null,
+  "returned": 1,
+  "offset": 0,
+  "truncated": false,
+  "not_found": {"metabolite_ids": [], "organism_names": [], "pathway_ids": []},
+  "resolved_aliases": {},
+  "warnings": [],
+  "results": [
+    {
+      "metabolite_id": "chebi:14313",
+      "name": "glucose",
+      "formula": "C6H12O6",
+      "elements": ["C", "H", "O"],
+      "mass": 180.156,
+      "catalyst_gene_count": 0,
+      "organism_count": 43,
+      "transporter_count": 18,
+      "transporter_gene_count": 3091,
+      "evidence_sources": ["transport"],
+      "chebi_id": "14313",
+      "pathway_ids": [],
+      "pathway_count": 0,
+      "measured_assay_count": 0,
+      "measured_paper_count": 0,
+      "measured_organisms": [],
+      "measured_compartments": []
+    }
+  ]
+}
 ```
 
 ### Example 7: Measured metabolites — measurement coverage envelope
@@ -143,12 +181,70 @@ list_metabolites(evidence_sources=["metabolomics"], summary=True)
 ```
 
 ```example-response
-{"total_entries": 3218, "total_matching": 107,
- "by_measurement_coverage": {
-   "by_paper_count": [{"paper_count": 1, "n": 99}, {"paper_count": 2, "n": 8}],
-   "by_compartment": [{"compartment": "whole_cell", "n": 99}, {"compartment": "extracellular", "n": 92}]
- },
- "returned": 0, "truncated": true, "offset": 0, "results": []}
+{
+  "total_entries": 3356,
+  "total_matching": 149,
+  "top_organisms": [
+    {"organism_name": "Prochlorococcus MIT9313", "count": 146},
+    {"organism_name": "Prochlorococcus MIT9301", "count": 132},
+    {"organism_name": "Prochlorococcus MIT9312", "count": 132},
+    {"organism_name": "Prochlorococcus MIT0801", "count": 128},
+    {"organism_name": "Pseudomonas putida KT2440", "count": 123},
+    ...
+  ],
+  "top_metabolite_pathways": [
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko01100",
+      "metabolite_pathway_name": "Metabolic pathways",
+      "count": 119
+    },
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko01110",
+      "metabolite_pathway_name": "Biosynthesis of secondary metabolites",
+      "count": 64
+    },
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko01240",
+      "metabolite_pathway_name": "Biosynthesis of cofactors",
+      "count": 47
+    },
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko01120",
+      "metabolite_pathway_name": "Microbial metabolism in diverse environments",
+      "count": 38
+    },
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko02010",
+      "metabolite_pathway_name": "ABC transporters",
+      "count": 38
+    },
+    ...
+  ],
+  "by_evidence_source": [
+    {"evidence_source": "metabolomics", "count": 149},
+    {"evidence_source": "metabolism", "count": 117},
+    {"evidence_source": "transport", "count": 103}
+  ],
+  "xref_coverage": {"with_chebi": 143, "with_hmdb": 128, "with_mnxm": 140},
+  "mass_stats": {"mass_min": 89.094, "mass_median": 175.188, "mass_max": 1347.385},
+  "by_measurement_coverage": {
+    "by_paper_count": [{"paper_count": 1, "count": 119}, {"paper_count": 2, "count": 25}, {"paper_count": 3, "count": 5}],
+    "by_compartment": [
+      {"compartment": "extracellular", "count": 92},
+      {"compartment": "vesicle", "count": 69},
+      {"compartment": "whole_cell", "count": 149}
+    ]
+  },
+  "score_max": null,
+  "score_median": null,
+  "returned": 0,
+  "offset": 0,
+  "truncated": true,
+  "not_found": {"metabolite_ids": [], "organism_names": [], "pathway_ids": []},
+  "resolved_aliases": {},
+  "warnings": [],
+  "results": []
+}
 ```
 
 ### Example 8: Multi-step — find N-metabolites then drill into catalysts
@@ -195,15 +291,15 @@ list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(m
 
 - catalyst_gene_count counts the catalysis arm only (genes reaching the metabolite via Gene → Reaction → Metabolite). catalyst_gene_count = 0 does NOT mean metabolomics-only: transport-only metabolites (TCDB substrates with no local catalysis) also read 0. Discriminate via the paired counts: catalyst_gene_count = 0 with `transporter_gene_count > 0` is transport-only; both 0 with `evidence_sources == ['metabolomics']` is measurement-only (no gene path). `transporter_gene_count` counts distinct genes over their deepest TCDB attachments, all organisms — it equals the distinct genes `genes_by_metabolite` returns in transport rows, summed over organisms.
 
-- organism_names with multiple values is UNION, not intersection. To find metabolites BOTH organisms reach, run two single-org calls and intersect by metabolite_id (or filter per-row by organism_count and inspect `m.organism_names` for the full UNION list).
+- organism_names with multiple values is UNION, not intersection. To find metabolites BOTH organisms reach, run two single-org calls and intersect by `metabolite_id` (per-row `organism_count` tells you how many organisms reach a metabolite, but not which — the envelope `top_organisms` rollup is the only per-organism breakdown).
 
-- metaboliteFullText covers Metabolite.name only — NOT formula. For element/composition queries, use `elements` (presence list).
+- `search_text` is a Lucene search over the metabolite name only — NOT the formula. For element/composition queries, use `elements` (presence list).
 
 - evidence_sources='metabolomics' selects metabolites measured by a MetaboliteAssay. Drill in via list_metabolite_assays(metabolite_ids=[...]) or assays_by_metabolite to inspect the measurement evidence.
 
 - Same metabolite measured in both whole_cell and extracellular returns one row with `measured_compartments=['extracellular','whole_cell']` (sorted), not two rows — Metabolite is compartment-agnostic.
 
-- When the `top_metabolites` rollup is dominated by ATP / ADP / NADH / NADPH / H2O, pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip cofactor noise. KG namespace is `kegg.compound:` (not `chebi:`).
+- When a roster is dominated by ATP / ADP / NADH / NADPH / H2O (currency cofactors that every organism reaches), pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip them — the same list works on the gene-anchored `metabolites_by_gene`, whose `top_metabolites` rollup is where the noise usually shows first. KG namespace is `kegg.compound:` (not `chebi:`).
 
 ```mistake
 list_metabolites(elements=['N'], catalyst_gene_count_min=1)  # catalyst_gene_count_min isn't a param
@@ -220,8 +316,6 @@ list_metabolites(organism_names=['MED4'])  # short name doesn't match
 ```correction
 list_metabolites(organism_names=['Prochlorococcus MED4'])  # full preferred_name
 ```
-
-- See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/concepts` for the chemistry layer overview.
 
 ```mistake
 list_metabolites(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'
@@ -241,13 +335,15 @@ in the form you passed. The dedicated exact-xref filters (`kegg_compound_ids`, `
 
 ```
 
+- See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/concepts` for the chemistry layer overview.
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import list_metabolites
 
 result = list_metabolites()
-# returns dict with keys: total_entries, total_matching, top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, score_max, score_median, offset, not_found, resolved_aliases, warnings, results
+# returns dict with keys: total_entries, total_matching, top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, score_max, score_median, returned, offset, truncated, not_found, resolved_aliases, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

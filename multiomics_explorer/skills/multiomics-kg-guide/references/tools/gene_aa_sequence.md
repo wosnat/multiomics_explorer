@@ -55,13 +55,33 @@ gene_aa_sequence(locus_tags=["ACZ81_08860", "ACZ81_08855"])
 
 ```example-response
 {
-  "total_matching": 2, "returned": 2, "truncated": false,
+  "total_matching": 2,
+  "returned": 2,
+  "truncated": false,
   "by_organism": [{"organism_name": "Alteromonas macleodii HOT1A3", "count": 2}],
-  "sequence_length_stats": {"count": 2, "min": 178, "q1": 178, "median": 178, "q3": 487, "max": 487, "mean": 332.5},
-  "not_found": [], "not_matched": [], "fasta": "",
+  "sequence_length_stats": {"count": 2, "min": 178, "q1": 178.0, "median": 178.0, "q3": 487.0, "max": 487, "mean": 332.5},
+  "not_found": [],
+  "not_matched": [],
+  "fasta": "",
   "results": [
-    {"locus_tag": "ACZ81_08855", "organism_name": "Alteromonas macleodii HOT1A3", "gene_name": null, "product": "hypothetical protein", "protein_id": "WP_049586664.1", "sequence_length": 178, "sequence": "MLSV...CIP"},
-    {"locus_tag": "ACZ81_08860", "organism_name": "Alteromonas macleodii HOT1A3", "gene_name": null, "product": "PepSY-associated TM helix domain-containing protein", "protein_id": "WP_061485747.1", "sequence_length": 487, "sequence": "MDKI...VVE"}
+    {
+      "locus_tag": "ACZ81_08855",
+      "organism_name": "Alteromonas macleodii HOT1A3",
+      "gene_name": null,
+      "product": "hypothetical protein",
+      "protein_id": "WP_049586664.1",
+      "sequence_length": 178,
+      "sequence": "MLSVAAGGLTLAALGVIYKSWRAQASTYLYLGLVVWLVAAVCWSYAQGWEFGVLYALCIPSILVWPFIAFNQTHLPQPKNVPQPRSFDFSRRTVLGNIANYIVVLVVLLVVSVLLTL..."
+    },
+    {
+      "locus_tag": "ACZ81_08860",
+      "organism_name": "Alteromonas macleodii HOT1A3",
+      "gene_name": null,
+      "product": "PepSY-associated TM helix domain-containing protein",
+      "protein_id": "WP_061485747.1",
+      "sequence_length": 487,
+      "sequence": "MDKITKQNALNAHTWVGVFLSVLLFLVCLSGTVAVFHLEFERWEQPHIEEMKNVSPDVVEKAMDTFLAQNTQESHHLYVVFPTSDIPRLVVENDHAAYFADSEGNLLEQESVSFTEM..."
+    }
   ]
 }
 ```
@@ -73,15 +93,34 @@ gene_aa_sequence(locus_tags=["ACZ81_08860", "ACZ81_08855"], fasta=True)
 ```
 
 ```example-response
-# With fasta=True the per-row `sequence` is null and the envelope `fasta`
-# field carries one multi-FASTA blob for the page (no duplication).
-# Header shape: >{locus_tag} {organism_name}|{protein_id}|{product}
 {
-  "total_matching": 2, "returned": 2, "truncated": false,
-  "fasta": ">ACZ81_08855 Alteromonas macleodii HOT1A3|WP_012345678.1|hypothetical protein\nMSEQ...VKL\n>ACZ81_08860 Alteromonas macleodii HOT1A3|WP_012345679.1|ABC transporter permease\nMNRT...GEY\n",
+  "total_matching": 2,
+  "returned": 2,
+  "truncated": false,
+  "by_organism": [{"organism_name": "Alteromonas macleodii HOT1A3", "count": 2}],
+  "sequence_length_stats": {"count": 2, "min": 178, "q1": 178.0, "median": 178.0, "q3": 487.0, "max": 487, "mean": 332.5},
+  "not_found": [],
+  "not_matched": [],
+  "fasta": ">ACZ81_08855 Alteromonas macleodii HOT1A3|WP_049586664.1|hypothetical protein\nMLSVAAGGLTLAALGVIYKSWRAQASTYLYLGLVVWLVA...",
   "results": [
-    {"locus_tag": "ACZ81_08855", "sequence": null, "sequence_length": 178},
-    {"locus_tag": "ACZ81_08860", "sequence": null, "sequence_length": 487}
+    {
+      "locus_tag": "ACZ81_08855",
+      "organism_name": "Alteromonas macleodii HOT1A3",
+      "gene_name": null,
+      "product": "hypothetical protein",
+      "protein_id": "WP_049586664.1",
+      "sequence_length": 178,
+      "sequence": null
+    },
+    {
+      "locus_tag": "ACZ81_08860",
+      "organism_name": "Alteromonas macleodii HOT1A3",
+      "gene_name": null,
+      "product": "PepSY-associated TM helix domain-containing protein",
+      "protein_id": "WP_061485747.1",
+      "sequence_length": 487,
+      "sequence": null
+    }
   ]
 }
 ```
@@ -93,14 +132,25 @@ gene_aa_sequence(locus_tags=["ACZ81_08860", "A9601_09441", "NOTAREAL"])
 ```
 
 ```example-response
-# A9601_09441 exists but has no stored sequence (expression-only gene, no
-# genome match) -> not_matched. NOTAREAL is absent from the KG -> not_found.
 {
   "total_matching": 1,
+  "returned": 1,
+  "truncated": false,
+  "by_organism": [{"organism_name": "Alteromonas macleodii HOT1A3", "count": 1}],
+  "sequence_length_stats": {"count": 1, "min": 487, "q1": 487.0, "median": 487.0, "q3": 487.0, "max": 487, "mean": 487.0},
   "not_found": ["NOTAREAL"],
   "not_matched": ["A9601_09441"],
+  "fasta": "",
   "results": [
-    {"locus_tag": "ACZ81_08860", "organism_name": "Alteromonas macleodii HOT1A3", "sequence_length": 487, "sequence": "MDKI...VVE"}
+    {
+      "locus_tag": "ACZ81_08860",
+      "organism_name": "Alteromonas macleodii HOT1A3",
+      "gene_name": null,
+      "product": "PepSY-associated TM helix domain-containing protein",
+      "protein_id": "WP_061485747.1",
+      "sequence_length": 487,
+      "sequence": "MDKITKQNALNAHTWVGVFLSVLLFLVCLSGTVAVFHLEFERWEQPHIEEMKNVSPDVVEKAMDTFLAQNTQESHHLYVVFPTSDIPRLVVENDHAAYFADSEGNLLEQESVSFTEM..."
+    }
   ]
 }
 ```
@@ -129,7 +179,7 @@ genes_by_function → gene_aa_sequence (text hit list → AA sequences for exter
 gene_overview → gene_aa_sequence (confirm identity, then pull the sequence)
 ```
 
-## Good to know
+## Common mistakes
 
 - Sequences are amino-acid only — the KG stores no nucleotide sequence. There is no DNA/CDS export here.
 
@@ -145,7 +195,7 @@ gene_overview → gene_aa_sequence (confirm identity, then pull the sequence)
 from multiomics_explorer import gene_aa_sequence
 
 result = gene_aa_sequence(locus_tags=...)
-# returns dict with keys: total_matching, by_organism, sequence_length_stats, not_found, not_matched, fasta, results
+# returns dict with keys: total_matching, returned, truncated, by_organism, sequence_length_stats, not_found, not_matched, fasta, results
 ```
 
 Use package import for bulk data extraction in scripts.

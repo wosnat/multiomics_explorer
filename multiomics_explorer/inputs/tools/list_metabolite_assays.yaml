@@ -6,13 +6,53 @@ examples:
   - title: Orient — what assays exist
     call: list_metabolite_assays(summary=True)
     response: |
-      total_entries: 14
-      total_matching: 14
-      by_value_kind: [{value_kind: numeric, count: 12}, {value_kind: boolean, count: 2}]
-      by_compartment: [{compartment: whole_cell, count: 9}, {compartment: extracellular, count: 3}, {compartment: vesicle, count: 2}]
-      by_organism: [5 organisms across 3 papers — MIT9313, MIT9301, MIT9312, MIT0801, MIT9303]
-      by_detection_status: [{not_detected: 1046}, {detected: 360}, {sporadic: 74}]
-      results: []  # summary=True
+      {
+        "total_entries": 14,
+        "total_matching": 14,
+        "metabolite_count_total": 1044,
+        "by_organism": [
+          {"organism_name": "Prochlorococcus MIT9313", "count": 5},
+          {"organism_name": "Prochlorococcus MIT9301", "count": 4},
+          {"organism_name": "Prochlorococcus MIT9312", "count": 2},
+          {"organism_name": "Prochlorococcus MIT0801", "count": 2},
+          {"organism_name": "Prochlorococcus MIT9303", "count": 1}
+        ],
+        "by_value_kind": [{"value_kind": "numeric", "count": 12}, {"value_kind": "boolean", "count": 2}],
+        "by_compartment": [
+          {"compartment": "whole_cell", "count": 9},
+          {"compartment": "extracellular", "count": 3},
+          {"compartment": "vesicle", "count": 2}
+        ],
+        "top_metric_types": [
+          {"metric_type": "cellular_concentration", "count": 5},
+          {"metric_type": "relative_peak_area_biovolume_normalized", "count": 4},
+          {"metric_type": "extracellular_concentration", "count": 3},
+          {"metric_type": "presence_flag_intracellular", "count": 1},
+          {"metric_type": "presence_flag_extracellular", "count": 1}
+        ],
+        "by_treatment_type": [
+          {"treatment_type": "compartment", "count": 4},
+          {"treatment_type": "phosphorus", "count": 4},
+          {"treatment_type": "growth_phase", "count": 4},
+          {"treatment_type": "carbon", "count": 2}
+        ],
+        "by_background_factors": [{"background_factor": "axenic", "count": 14}, {"background_factor": "light", "count": 6}],
+        "by_growth_phase": [],
+        "by_detection_status": [
+          {"detection_status": "not_detected", "count": 1046},
+          {"detection_status": "detected", "count": 360},
+          {"detection_status": "sporadic", "count": 74}
+        ],
+        "score_max": null,
+        "score_median": null,
+        "returned": 0,
+        "offset": 0,
+        "truncated": true,
+        "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
+        "resolved_aliases": {},
+        "warnings": [],
+        "results": []
+      }
 
   - title: Discovery via fulltext (Capovilla chitosan paper)
     call: list_metabolite_assays(search_text="chitosan")
@@ -53,8 +93,6 @@ mistakes:
   - wrong: "Calling metabolites_by_quantifies_assay with bucket / metric_percentile filters before checking assay rankable."
     right: "Call list_metabolite_assays(value_kind='numeric', rankable=True) first. Drill-down's rankable-gated filters raise if every selected assay has rankable=False, soft-exclude on mixed input."
 
-  - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/conventions` for tested-absent semantics across the metabolomics layer."
-
   - wrong: "list_metabolite_assays(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'"
     right: |
       Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
@@ -67,3 +105,4 @@ mistakes:
       ALL matching metabolites and appends a `warnings` entry; pass the canonical
       id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
       in the form you passed.
+  - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/conventions` for tested-absent semantics across the metabolomics layer."

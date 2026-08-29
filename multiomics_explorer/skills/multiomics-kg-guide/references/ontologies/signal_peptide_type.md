@@ -57,13 +57,13 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 | `name` | string | term name (what `search_ontology` indexes) |
 | `organism_count` | int | organisms with at least one gene annotated to the term (subtree-inclusive where `gene_count` is) |
 | `preferred_id` | string | same value as `id` |
-| `signalp_id` | string |  |
+| `signalp_id` | string | SignalP signal-peptide type code as emitted by the tool (e.g. `SP`, `LIPO`, `TAT`) |
 
 `ontology_term_details(verbose=True)` returns every property as `properties`; a compact column that is missing on the node is absent, not null (`docs://guide/conventions`).
 
-## Controlled vocabularies
+## Applicable filter types
 
-Values: see `list_filter_values(filter_type=..., ontology='signal_peptide_type')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
+none — the gene edge carries native scalars only (no trust axes, no ontology-owned categorical, no bridges), so no `list_filter_values` type is scoped to this ontology. Values on other tools' filters are still read live from the KG's `ControlledVocabulary` nodes at call time.
 
 ## Interpretation
 
@@ -90,7 +90,7 @@ and behaves as the catch-all in any enrichment.
 
 ## Typical questions
 
-- Which MIT1002 genes up in coculture carry a Tat signal peptide?
+- Which MIT1002 genes carry a Tat signal peptide? — `genes_by_ontology(ontology='signal_peptide_type', organism='MIT1002', term_ids=['signalp_TAT'])`, then intersect with `differential_expression_by_gene`
 - How many predicted lipoproteins does each organism have, and are they enriched in the vesicle proteome?
 - Which secreted-protein candidates (SP + PSORTb extracellular) respond to nitrogen limitation?
 

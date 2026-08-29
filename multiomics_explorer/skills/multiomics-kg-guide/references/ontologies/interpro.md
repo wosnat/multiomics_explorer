@@ -22,8 +22,10 @@ matched). Verbose native detail records which member libraries hit
 `evidence_score` — InterProScan is a single source. Entries bridge *out*
 to EC numbers and CAZy families (`Interpro_entry_related_to_ec_number`,
 `_cazy_family`) as a `router`: a computed cross-reference that is
-recall-biased and flagged `router_ambiguous` when an entry maps to more
-than one target or is not a `FAMILY`-type entry.
+recall-biased. `ontology_term_details(verbose=True)` derives
+`router_ambiguous` on each router link (true when the entry routes to
+more than one target or is not a `FAMILY`-type entry); it is not stored
+on the node.
 
 ## Identifier form
 
@@ -35,8 +37,8 @@ than one target or is not a `FAMILY`-type entry.
 
 InterPro's parent/child relationships (`Interpro_entry_is_a_interpro_entry`)
 give up to three levels, `level` 0-2; `level_kind` has no natural names
-and is left empty. Most entries are level-0 roots — the hierarchy is
-sparse. `gene_count` / `organism_count` are subtree-inclusive;
+and is left empty. The hierarchy is sparse and top-heavy: 11,431
+entries at level 0, 1,490 at level 1, 79 at level 2. `gene_count` / `organism_count` are subtree-inclusive;
 `direct_gene_count` is node-local. Entries of different `interpro_type`
 can sit in one parent–child chain, so the hierarchy is not a type
 hierarchy.
@@ -66,8 +68,8 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 | `direct_gene_count` | int | genes attached to this exact node (not descendants); absent where it would be vacuous |
 | `gene_count` | int | genes annotated to the term — subtree-inclusive on hierarchical labels, direct on flat ones |
 | `id` | string | term ID as used in `term_ids=[...]` (self-prefixed CURIE) |
-| `interpro_id` | string |  |
-| `interpro_type` | string |  |
+| `interpro_id` | string | bare InterPro accession (e.g. `IPR000001`); `id` is the `interpro:` CURIE |
+| `interpro_type` | string | InterPro entry type (`FAMILY` / `DOMAIN` / `HOMOLOGOUS_SUPERFAMILY` / ...) — the `interpro_type=` facet value |
 | `level` | int | hierarchy depth, 0 = root / broadest |
 | `member_count` | int | upstream family size (source-database members), not KG genes |
 | `name` | string | term name (what `search_ontology` indexes) |
@@ -76,9 +78,14 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 `ontology_term_details(verbose=True)` returns every property as `properties`; a compact column that is missing on the node is absent, not null (`docs://guide/conventions`).
 
-## Controlled vocabularies
+## Applicable filter types
 
-Values: see `list_filter_values(filter_type=..., ontology='interpro')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
+- `evidence` — `list_filter_values(filter_type="evidence", ontology="interpro")`
+- `sources` — `list_filter_values(filter_type="sources", ontology="interpro")`
+- `interpro_type` — `list_filter_values(filter_type="interpro_type", ontology="interpro")`
+- `link_kinds` — `list_filter_values(filter_type="link_kinds")`
+
+Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="interpro")`) lists which comparable axes the gene edge carries.
 
 ## Interpretation
 
@@ -95,19 +102,22 @@ entry's family clusters with that EC / CAZy family".
 
 ## Informativeness rule
 
-Many level-0 entries — mostly `HOMOLOGOUS_SUPERFAMILY` and broad `DOMAIN`
-entries such as P-loop NTPase or Rossmann-fold superfamilies — are
-flagged uninformative and dropped by `informative_only=True`. Always keep
-the default on for enrichment; combine with `interpro_type='FAMILY'` for
-the most interpretable term set.
+About a thousand entries are flagged uninformative and dropped by
+`informative_only=True` — mostly `FAMILY` (644) and `DOMAIN` (372)
+entries with generic names, plus a handful of sites, repeats and
+`HOMOLOGOUS_SUPERFAMILY` entries. The flag is name-based, so broad
+superfamilies are mostly *not* flagged; manage them with
+`max_gene_set_size`. Keep the default on for enrichment and combine with
+`interpro_type='FAMILY'` for the most interpretable term set.
 
 ## Pitfalls
 
 - Omitting `interpro_type` on search or landscape mixes types that size
   by orders of magnitude; on enrichment it raises.
-- Router links are not annotations: `router_ambiguous=True` means the
-  entry points at several EC numbers / CAZy families or is not a FAMILY
-  entry; never assign the target function to the gene from the bridge.
+- Router links are not annotations: `router_ambiguous=True` (computed
+  in verbose `ontology_term_details`) means the entry points at several
+  EC numbers / CAZy families or is not a FAMILY entry; never assign the
+  target function to the gene from the bridge.
 - `evalue` is InterProScan-internal (best member library); it is
   verbose-only and never filterable.
 - Pfam and NCBIfam entries bridge *into* InterPro (membership); read
@@ -115,10 +125,10 @@ the most interpretable term set.
 
 ## Typical questions
 
-- Which InterPro FAMILY entries are enriched among genes up under iron limitation in MED4?
-- What is the parent entry of `interpro:IPR000362`, which EC numbers does it route to, and is the routing ambiguous?
-- Which member libraries support this gene's InterPro hits?
-- Walk from a TCDB family to its Pfam domains and on to the InterPro entries that integrate them.
+- Which InterPro FAMILY entries are enriched among genes up under iron limitation in MED4? — `pathway_enrichment(organism='MED4', experiment_ids=[...], ontology='interpro', interpro_type='FAMILY', direction='up')`
+- What is the parent entry of `interpro:IPR001907` (Clp protease proteolytic subunit), which EC number does it route to, and is the routing ambiguous? — `ontology_term_details(term_ids=['interpro:IPR001907'], verbose=True)`
+- Which member libraries support this gene's InterPro hits? — `gene_ontology_terms(locus_tags=[...], organism='MED4', ontology=['interpro'], verbose=True)` and read `libraries`
+- Walk from a TCDB family to its Pfam domains and on to the InterPro entries that integrate them — `ontology_term_details(term_ids=['tcdb:3.A.1'], link_kinds=['composition'])`, then `ontology_term_details(term_ids=[...pfam ids...], link_kinds=['membership'])`
 
 ## Tools
 

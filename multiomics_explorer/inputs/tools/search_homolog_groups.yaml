@@ -6,7 +6,85 @@ examples:
   - title: Search by function
     call: search_homolog_groups(search_text="photosynthesis")
     response: |
-      {"total_entries": 21122, "total_matching": 884, "by_source": [{"source": "eggnog", "count": 647}, {"source": "cyanorak", "count": 237}], "by_level": [{"taxonomic_level": "Bacteria", "count": 218}, {"taxonomic_level": "curated", "count": 237}], "score_max": 6.13, "score_median": 1.06, "returned": 5, "truncated": true, "offset": 0, "results": [{"group_id": "eggnog:30SSF@2", "group_name": "30SSF@2", "consensus_gene_name": "psbJ", "consensus_product": "photosystem II reaction center protein PsbJ", "source": "eggnog", "taxonomic_level": "Bacteria", "specificity_rank": 3, "member_count": 13, "organism_count": 13, "score": 6.13}]}
+      {
+        "total_entries": 48972,
+        "total_matching": 1212,
+        "by_source": [{"source": "eggnog", "count": 1684}, {"source": "cyanorak", "count": 430}],
+        "by_level": [
+          {"taxonomic_level": "Cyanobacteria", "count": 559},
+          {"taxonomic_level": "curated", "count": 430},
+          {"taxonomic_level": "Prochloraceae", "count": 400},
+          {"taxonomic_level": "Synechococcus", "count": 370},
+          {"taxonomic_level": "Bacteria", "count": 352},
+          ...
+        ],
+        "score_max": 6.6423540115356445,
+        "score_median": 1.0682822465896606,
+        "top_cyanorak_roles": [
+          {"id": "cyanorak.role:J.8", "name": "Photosynthesis and respiration > Photosystem II", "count": 247},
+          {
+            "id": "cyanorak.role:D.1.2",
+            "name": "Cellular processes > Adaptation/acclimation to atypical conditions and detoxification > Light",
+            "count": 242
+          },
+          {"id": "cyanorak.role:G.2", "name": "Energy metabolism > Electron transport", "count": 241},
+          {"id": "cyanorak.role:J.2", "name": "Photosynthesis and respiration > CO2 fixation", "count": 180},
+          {"id": "cyanorak.role:J", "name": "Photosynthesis and respiration", "count": 170}
+        ],
+        "top_cog_categories": [
+          {"id": "cog.category:S", "name": "Function unknown", "count": 796},
+          {"id": "cog.category:C", "name": "Energy production and conversion", "count": 681},
+          {"id": "cog.category:G", "name": "Carbohydrate transport and metabolism", "count": 100},
+          {"id": "cog.category:H", "name": "Coenzyme transport and metabolism", "count": 92},
+          {
+            "id": "cog.category:U",
+            "name": "Intracellular trafficking, secretion, and vesicular transport",
+            "count": 69
+          }
+        ],
+        "returned": 5,
+        "offset": 0,
+        "truncated": true,
+        "results": [
+          {
+            "group_id": "eggnog:30SSF@2",
+            "group_name": "30SSF@2",
+            "consensus_gene_name": "psbJ",
+            "consensus_product": "photosystem II reaction center protein PsbJ",
+            "source": "eggnog",
+            "taxonomic_level": "Bacteria",
+            "specificity_rank": 3,
+            "member_count": 19,
+            "organism_count": 19,
+            "score": 6.6423540115356445
+          },
+          {
+            "group_id": "eggnog:31GDS@2",
+            "group_name": "31GDS@2",
+            "consensus_gene_name": "psb28",
+            "consensus_product": "photosystem II reaction centre Psb28 protein",
+            "source": "eggnog",
+            "taxonomic_level": "Bacteria",
+            "specificity_rank": 3,
+            "member_count": 27,
+            "organism_count": 27,
+            "score": 6.6423540115356445
+          },
+          {
+            "group_id": "eggnog:32YIH@2",
+            "group_name": "32YIH@2",
+            "consensus_gene_name": "psaK",
+            "consensus_product": "photosystem I reaction center subunit X",
+            "source": "eggnog",
+            "taxonomic_level": "Bacteria",
+            "specificity_rank": 3,
+            "member_count": 28,
+            "organism_count": 27,
+            "score": 6.6423540115356445
+          },
+          ...
+        ]
+      }
 
   - title: Filter to curated Cyanorak groups
     call: search_homolog_groups(search_text="kinase", source="cyanorak", max_specificity_rank=0)

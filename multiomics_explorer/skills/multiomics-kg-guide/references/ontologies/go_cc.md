@@ -15,10 +15,12 @@ PSORTb).
 
 Same pooled GO pipeline: Cyanorak, eggNOG, InterProScan, NCBI, UniProt
 merged into one edge per (gene, term) with `sources[]`, compact `evidence`
-(`curated` / `family_inferred` / `domain_inferred`) and `evidence_score`.
-Complex-level terms (photosystems, ribosome subunits, ATP synthase) are
-mostly `curated` or `family_inferred`; membrane terms are often
-`domain_inferred` from transmembrane-domain signatures.
+(`curated` / `family_inferred` / `domain_inferred`) and `evidence_score`;
+rung semantics in `docs://analysis/annotation_evidence`. Live on this
+edge type: eggNOG-only edges read `curated` (the majority; an open
+KG-side ask), InterProScan-only edges read `family_inferred` or
+`domain_inferred` — so check `sources` before treating `curated` as a
+curator's assertion.
 
 ## Identifier form
 
@@ -65,9 +67,12 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 `ontology_term_details(verbose=True)` returns every property as `properties`; a compact column that is missing on the node is absent, not null (`docs://guide/conventions`).
 
-## Controlled vocabularies
+## Applicable filter types
 
-Values: see `list_filter_values(filter_type=..., ontology='go_cc')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
+- `evidence` — `list_filter_values(filter_type="evidence", ontology="go_cc")`
+- `sources` — `list_filter_values(filter_type="sources", ontology="go_cc")`
+
+Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="go_cc")`) lists which comparable axes the gene edge carries.
 
 ## Interpretation
 
@@ -95,14 +100,14 @@ unflagged but covers nearly everything; pass `level>=2` or
   have no counterpart in Alteromonas — cross-organism comparison at those
   terms is structurally zero, not biologically absent.
 - TCDB families bridge *out* to GO CC terms
-  (`Tcdb_family_located_in_cellular_component`); read those links on the
-  `tcdb` term.
+  (`Tcdb_family_located_in_cellular_component`); the bridge is
+  forward-only — read it on the `tcdb` term.
 
 ## Typical questions
 
-- Which MED4 genes are annotated to the carboxysome, and with what evidence?
+- Which MED4 genes are annotated to the carboxysome, and with what evidence? — `genes_by_ontology(ontology='go_cc', organism='MED4', term_ids=['go:0031470'], verbose=True)`
 - Are ribosome or photosystem components over-represented among down-regulated genes in darkness?
-- What sits under `go:0034357` photosynthetic membrane in this KG?
+- What sits under `go:0034357` photosynthetic membrane in this KG? — `ontology_term_details(term_ids=['go:0034357'])`
 - Does the GO CC annotation agree with PSORTb's predicted localization for this gene?
 
 ## Tools

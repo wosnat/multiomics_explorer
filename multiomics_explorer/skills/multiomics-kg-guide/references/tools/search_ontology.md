@@ -2,7 +2,7 @@
 
 ## What it does
 
-Search or browse ontology terms — Lucene over term names (search) or a gene_count-sorted listing (browse); no hierarchy traversal.
+Search or browse ontology terms — Lucene over term names (search) or a gene_count-sorted listing (browse). Counts (`gene_count`, `organism_gene_count`, `min_gene_count`) are subtree-scoped; only the text match ignores hierarchy.
 
 Returns term IDs and `level` for use with `genes_by_ontology`. With
 `search_text`, supports fuzzy (~), wildcards (*), exact phrases ("..."),
@@ -29,17 +29,17 @@ reference.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string \| None | None | Lucene query over term names, e.g. 'replication', 'oxido*', 'transport AND membrane'. None/'' = browse mode: list terms sorted by gene_count DESC (score null). See docs://guide/conventions for Lucene scoring. |
-| ontology | list[string] \| None | None | Ontology key or list: go_bp, go_mf, go_cc, kegg, ec, cog_category, cyanorak_role, tigr_role, pfam, brite, tcdb, cazy, subcellular_localization, signal_peptide_type, interpro, ncbifam, merops. None = all 17. limit/offset apply per ontology. |
+| ontology | string \| list[string] \| None | None | Ontology key or list: go_bp, go_mf, go_cc, kegg, ec, cog_category, cyanorak_role, tigr_role, pfam, brite, tcdb, cazy, subcellular_localization, signal_peptide_type, interpro, ncbifam, merops. None = all 17. limit/offset apply per ontology. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | limit | int | 5 | Max results per ontology (returned <= limit x n_ontologies). |
 | offset | int | 0 | Number of results to skip per ontology (lockstep paging). |
 | level | int \| None | None | Hierarchy level filter (0 = broadest). See docs://guide/conventions for the level convention. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Applies to 'brite' only; raises if 'brite' is not in the ontology set. See docs://guide/conventions for the BRITE-tree scoping rule. |
-| informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' go:0008150). Term-side filter only — never restricts the gene set. Default False (opt-in). |
+| informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). Term-side filter only — never restricts the gene set. Default False (opt-in). |
 | verbose | bool | False | Add description, level_kind, direct_gene_count, per-ontology columns (tcdb superfamily/metabolite_count, ncbifam family_type/gene_symbol, merops family_class/catalytic_type/peptidase_gene_count) and KEGG discussed_in_publications. Default compact. |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type. Applies to 'interpro' only; raises if 'interpro' is not in the set. |
 | min_gene_count | int \| None | None | Keep terms with gene_count >= this (subtree organism_gene_count when `organism` is set). Narrows browse mode. |
-| organism | string \| None | None | Organism to scope counts to (resolved like every other tool: 'MED4' -> 'Prochlorococcus MED4'; unknown/ambiguous raises). Rows gain organism_gene_count (direct edge) and browse sorts by it. |
+| organism | string \| None | None | Organism to scope counts to (resolved like every other tool: 'MED4' -> 'Prochlorococcus MED4'; unknown/ambiguous raises). Rows gain organism_gene_count (subtree-scoped, like ontology_term_details) and browse sorts by it. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -111,19 +111,59 @@ search_ontology(search_text="replication", ontology=["go_bp"])
 ```example-response
 {
   "mode": "search",
-  "total_entries": 2448,
+  "total_entries": 3433,
   "total_matching": 31,
-  "score_max": 2.48,
-  "score_median": 1.78,
+  "score_max": 2.681756019592285,
+  "score_median": 1.93581223487854,
   "returned": 5,
-  "truncated": true,
   "offset": 0,
-  "by_ontology": [{"ontology": "go_bp", "total_entries": 2448, "total_matching": 31, "score_max": 2.48, "returned": 5, "truncated": true}],
+  "truncated": true,
+  "by_ontology": [
+    {
+      "ontology": "go_bp",
+      "total_entries": 3433,
+      "total_matching": 31,
+      "score_max": 2.681756019592285,
+      "returned": 5,
+      "truncated": true
+    }
+  ],
+  "by_level": [],
+  "by_interpro_type": [],
+  "by_family_type": [],
   "skipped_ontologies": [],
   "warnings": [],
   "results": [
-    {"id": "go:0006260", "name": "DNA replication", "score": 2.48, "level": 4, "ontology_type": "go_bp", "gene_count": 1290, "organism_count": 42},
-    {"id": "go:0006261", "name": "DNA-templated DNA replication", "score": 2.41, "level": 5, "ontology_type": "go_bp", "gene_count": 640, "organism_count": 42},
+    {
+      "id": "go:0006260",
+      "name": "DNA replication",
+      "ontology_type": "go_bp",
+      "score": 2.681756019592285,
+      "level": 6,
+      "is_informative": true,
+      "gene_count": 1340,
+      "organism_count": 43
+    },
+    {
+      "id": "go:0006270",
+      "name": "DNA replication initiation",
+      "ontology_type": "go_bp",
+      "score": 2.3765029907226562,
+      "level": 6,
+      "is_informative": true,
+      "gene_count": 124,
+      "organism_count": 43
+    },
+    {
+      "id": "go:0006274",
+      "name": "DNA replication termination",
+      "ontology_type": "go_bp",
+      "score": 2.3765029907226562,
+      "level": 6,
+      "is_informative": true,
+      "gene_count": 7,
+      "organism_count": 6
+    },
     ...
   ]
 }
@@ -136,24 +176,61 @@ search_ontology(ontology=["merops"], level=1)
 ```
 
 ```example-response
-# Omit search_text to browse: every term of the ontology, sorted
-# gene_count DESC then id, score null, envelope mode='browse' with
-# by_level over the full match. level / min_gene_count / organism /
-# informative_only / facets narrow it.
 {
   "mode": "browse",
   "total_entries": 155,
   "total_matching": 97,
   "score_max": null,
+  "score_median": null,
   "returned": 5,
-  "truncated": true,
   "offset": 0,
+  "truncated": true,
+  "by_ontology": [
+    {
+      "ontology": "merops",
+      "total_entries": 155,
+      "total_matching": 97,
+      "score_max": null,
+      "returned": 5,
+      "truncated": true
+    }
+  ],
   "by_level": [{"level": 1, "count": 97}],
-  "by_ontology": [{"ontology": "merops", "total_entries": 155, "total_matching": 97, "score_max": null, "returned": 5, "truncated": true}],
+  "by_interpro_type": [],
+  "by_family_type": [],
+  "skipped_ontologies": [],
   "warnings": [],
   "results": [
-    {"id": "merops.family:S33", "name": "prolyl aminopeptidase", "score": null, "level": 1, "ontology_type": "merops", "gene_count": 412, "organism_count": 42},
-    {"id": "merops.family:C44", "name": "glutamine-fructose-6-phosphate transaminase", "score": null, "level": 1, "ontology_type": "merops", "gene_count": 169, "organism_count": 42},
+    {
+      "id": "merops.family:S33",
+      "name": "prolyl aminopeptidase",
+      "ontology_type": "merops",
+      "score": null,
+      "level": 1,
+      "is_informative": true,
+      "gene_count": 417,
+      "organism_count": 43
+    },
+    {
+      "id": "merops.family:S09",
+      "name": "prolyl oligopeptidase",
+      "ontology_type": "merops",
+      "score": null,
+      "level": 1,
+      "is_informative": true,
+      "gene_count": 300,
+      "organism_count": 43
+    },
+    {
+      "id": "merops.family:C26",
+      "name": "gamma-glutamyl hydrolase",
+      "ontology_type": "merops",
+      "score": null,
+      "level": 1,
+      "is_informative": true,
+      "gene_count": 278,
+      "organism_count": 43
+    },
     ...
   ]
 }
@@ -165,67 +242,408 @@ search_ontology(ontology=["merops"], level=1)
 search_ontology(ontology=["tcdb"], level=2, organism="MED4", min_gene_count=5)
 ```
 
+*organism= scopes the count: rows gain organism_gene_count, and the sort and min_gene_count apply to it (gene_count stays KG-wide). 'MED4' resolves to 'Prochlorococcus MED4'. organism_gene_count is subtree-scoped (term + descendants), the same number ontology_term_details(organism=...) reports — tcdb:3.A.1 in MED4 reads 65 on both tools.*
+
 ```example-response
-# organism= scopes the count: rows gain organism_gene_count, the sort
-# and min_gene_count apply to it (gene_count stays KG-wide). 'MED4'
-# resolves to 'Prochlorococcus MED4'. organism_gene_count is the DIRECT
-# gene edge (57 here); ontology_term_details gives the subtree count (65).
-{"mode": "browse", "total_matching": 16, "results": [
-  {"id": "tcdb:3.A.1", "name": "ATP-binding Cassette (ABC) Superfamily", "score": null, "level": 2, "ontology_type": "tcdb", "gene_count": 4817, "organism_count": 42, "organism_gene_count": 57},
-  ...
-]}
+{
+  "mode": "browse",
+  "total_entries": 1515,
+  "total_matching": 22,
+  "score_max": null,
+  "score_median": null,
+  "returned": 5,
+  "offset": 0,
+  "truncated": true,
+  "by_ontology": [
+    {
+      "ontology": "tcdb",
+      "total_entries": 1515,
+      "total_matching": 22,
+      "score_max": null,
+      "returned": 5,
+      "truncated": true
+    }
+  ],
+  "by_level": [{"level": 2, "count": 22}],
+  "by_interpro_type": [],
+  "by_family_type": [],
+  "skipped_ontologies": [],
+  "warnings": [],
+  "results": [
+    {
+      "id": "tcdb:3.A.1",
+      "name": "The ATP-binding Cassette (ABC) Superfamily",
+      "ontology_type": "tcdb",
+      "score": null,
+      "level": 2,
+      "is_informative": true,
+      "gene_count": 4900,
+      "organism_count": 43,
+      "organism_gene_count": 65
+    },
+    {
+      "id": "tcdb:3.D.1",
+      "name": "The H+ or Na+-translocating NADH Dehydrogenase (NDH) Family",
+      "ontology_type": "tcdb",
+      "score": null,
+      "level": 2,
+      "is_informative": true,
+      "gene_count": 894,
+      "organism_count": 43,
+      "organism_gene_count": 20
+    },
+    {
+      "id": "tcdb:3.A.9",
+      "name": "The Chloroplast Envelope Protein Translocase (CEPT or Tic-Toc) Family",
+      "ontology_type": "tcdb",
+      "score": null,
+      "level": 2,
+      "is_informative": true,
+      "gene_count": 663,
+      "organism_count": 43,
+      "organism_gene_count": 17
+    },
+    ...
+  ]
+}
 ```
 
-### Example 4: One keyword across several ontologies (lockstep paging)
+### Example 4: Browse with no narrowing filter — the truncation auto-warning
+
+```example-call
+search_ontology(ontology=["go_bp"], limit=3)
+```
+
+*A browse that truncates with no `level` / facet / `min_gene_count` / `organism` filter is paging through a whole ontology; the envelope says so in `warnings`. `by_level` (browse only) is computed over the full match, so it tells you which level to narrow to.*
+
+```example-response
+{
+  "mode": "browse",
+  "total_entries": 3433,
+  "total_matching": 3433,
+  "score_max": null,
+  "score_median": null,
+  "returned": 3,
+  "offset": 0,
+  "truncated": true,
+  "by_ontology": [
+    {
+      "ontology": "go_bp",
+      "total_entries": 3433,
+      "total_matching": 3433,
+      "score_max": null,
+      "returned": 3,
+      "truncated": true
+    }
+  ],
+  "by_level": [
+    {"level": 0, "count": 1},
+    {"level": 1, "count": 16},
+    {"level": 2, "count": 111},
+    {"level": 3, "count": 324},
+    {"level": 4, "count": 670},
+    ...
+  ],
+  "by_interpro_type": [],
+  "by_family_type": [],
+  "skipped_ontologies": [],
+  "warnings": [
+    "Browse mode truncated with no narrowing filter — set level, min_gene_count, organism or a facet (tree / interpro_type..."
+  ],
+  "results": [
+    {
+      "id": "go:0008150",
+      "name": "biological_process",
+      "ontology_type": "go_bp",
+      "score": null,
+      "level": 0,
+      "is_informative": false,
+      "gene_count": 67696,
+      "organism_count": 43
+    },
+    {
+      "id": "go:0009987",
+      "name": "cellular process",
+      "ontology_type": "go_bp",
+      "score": null,
+      "level": 1,
+      "is_informative": true,
+      "gene_count": 61414,
+      "organism_count": 43
+    },
+    {
+      "id": "go:0008152",
+      "name": "metabolic process",
+      "ontology_type": "go_bp",
+      "score": null,
+      "level": 2,
+      "is_informative": true,
+      "gene_count": 48832,
+      "organism_count": 43
+    }
+  ]
+}
+```
+
+### Example 5: Browse several ontologies at once — by_level is empty on multi-ontology calls
+
+```example-call
+search_ontology(ontology=["merops", "ncbifam"], level=0, limit=3)
+```
+
+*Multi-ontology browse pages in lockstep (up to `limit` rows per ontology, rows grouped by ontology). `by_level` is only filled on a single-ontology browse — with two or more ontologies it comes back `[]` because levels mean different things per ontology; read `by_ontology[]` instead.*
+
+```example-response
+{
+  "mode": "browse",
+  "total_entries": 5112,
+  "total_matching": 4998,
+  "score_max": null,
+  "score_median": null,
+  "returned": 6,
+  "offset": 0,
+  "truncated": true,
+  "by_ontology": [
+    {
+      "ontology": "ncbifam",
+      "total_entries": 4957,
+      "total_matching": 4957,
+      "score_max": null,
+      "returned": 3,
+      "truncated": true
+    },
+    {
+      "ontology": "merops",
+      "total_entries": 155,
+      "total_matching": 41,
+      "score_max": null,
+      "returned": 3,
+      "truncated": true
+    }
+  ],
+  "by_level": [],
+  "by_interpro_type": [],
+  "by_family_type": [],
+  "skipped_ontologies": [],
+  "warnings": [],
+  "results": [
+    {
+      "id": "ncbifam:TIGR00254",
+      "name": "diguanylate cyclase",
+      "ontology_type": "ncbifam",
+      "score": null,
+      "level": 0,
+      "is_informative": true,
+      "gene_count": 696,
+      "organism_count": 20
+    },
+    {
+      "id": "ncbifam:TIGR00231",
+      "name": "GTP-binding protein",
+      "ontology_type": "ncbifam",
+      "score": null,
+      "level": 0,
+      "is_informative": true,
+      "gene_count": 475,
+      "organism_count": 43
+    },
+    {
+      "id": "ncbifam:TIGR00229",
+      "name": "PAS domain S-box protein",
+      "ontology_type": "ncbifam",
+      "score": null,
+      "level": 0,
+      "is_informative": true,
+      "gene_count": 403,
+      "organism_count": 32
+    },
+    ...
+  ]
+}
+```
+
+### Example 6: One keyword across several ontologies (lockstep paging)
 
 ```example-call
 search_ontology(search_text="transport", ontology=["go_bp", "tcdb"], limit=5)
 ```
 
 ```example-response
-# limit / offset apply PER ontology: up to 5 go_bp rows then up to 5
-# tcdb rows (returned <= limit x n). Flat keys are sums / max across the
-# set; by_ontology carries the per-ontology truncation flags. Lucene
-# scores are per index — never rank a go_bp row against a tcdb row.
 {
   "mode": "search",
-  "total_matching": 412,
+  "total_entries": 4948,
+  "total_matching": 366,
+  "score_max": 3.75053071975708,
+  "score_median": 2.0627857446670532,
   "returned": 10,
+  "offset": 0,
   "truncated": true,
   "by_ontology": [
-    {"ontology": "go_bp", "total_entries": 2448, "total_matching": 260, "score_max": 3.9, "returned": 5, "truncated": true},
-    {"ontology": "tcdb", "total_entries": 1515, "total_matching": 152, "score_max": 3.1, "returned": 5, "truncated": true}
+    {
+      "ontology": "go_bp",
+      "total_entries": 3433,
+      "total_matching": 324,
+      "score_max": 1.5473122596740723,
+      "returned": 5,
+      "truncated": true
+    },
+    {
+      "ontology": "tcdb",
+      "total_entries": 1515,
+      "total_matching": 42,
+      "score_max": 3.75053071975708,
+      "returned": 5,
+      "truncated": true
+    }
   ],
+  "by_level": [],
+  "by_interpro_type": [],
+  "by_family_type": [],
+  "skipped_ontologies": [],
+  "warnings": [],
   "results": [
-    {"id": "go:0006810", "name": "transport", "score": 3.9, "level": 3, "ontology_type": "go_bp", "gene_count": 15838, "organism_count": 42},
-    ...,
-    {"id": "tcdb:3", "name": "Primary Active Transporters", "score": 3.1, "level": 0, "ontology_type": "tcdb", "gene_count": 12580, "organism_count": 42},
+    {
+      "id": "go:0006810",
+      "name": "transport",
+      "ontology_type": "go_bp",
+      "score": 1.5473122596740723,
+      "level": 3,
+      "is_informative": true,
+      "gene_count": 10984,
+      "organism_count": 43
+    },
+    {
+      "id": "go:0015990",
+      "name": "electron transport coupled proton transport",
+      "ontology_type": "go_bp",
+      "score": 1.3782250881195068,
+      "level": 7,
+      "is_informative": true,
+      "gene_count": 155,
+      "organism_count": 43
+    },
+    {
+      "id": "go:0006821",
+      "name": "chloride transport",
+      "ontology_type": "go_bp",
+      "score": 1.3485655784606934,
+      "level": 5,
+      "is_informative": true,
+      "gene_count": 57,
+      "organism_count": 43
+    },
     ...
   ]
 }
 ```
 
-### Example 5: Search every ontology at once (ontology omitted)
+### Example 7: Search every ontology at once (ontology omitted)
 
 ```example-call
 search_ontology(search_text="nitrate", limit=2)
 ```
 
 ```example-response
-# ontology=None fans out over all 17 in registry order, 2 rows each at
-# most; ontologies with no hit contribute a by_ontology entry with
-# total_matching 0 and no rows.
-{"mode": "search", "returned": 14, "by_ontology": [{"ontology": "go_bp", "total_matching": 9, "returned": 2, "truncated": true}, "..."],
- "results": [{"id": "go:0042128", "name": "nitrate assimilation", "ontology_type": "go_bp", "score": 3.4, "level": 5, "gene_count": 233, "organism_count": 44}, "..."]}
+{
+  "mode": "search",
+  "total_entries": 49144,
+  "total_matching": 155,
+  "score_max": 7.6005682945251465,
+  "score_median": 3.41845965385437,
+  "returned": 19,
+  "offset": 0,
+  "truncated": true,
+  "by_ontology": [
+    {
+      "ontology": "go_bp",
+      "total_entries": 3433,
+      "total_matching": 6,
+      "score_max": 3.5838801860809326,
+      "returned": 2,
+      "truncated": true
+    },
+    {
+      "ontology": "go_mf",
+      "total_entries": 2899,
+      "total_matching": 6,
+      "score_max": 3.2372517585754395,
+      "returned": 2,
+      "truncated": true
+    },
+    {
+      "ontology": "go_cc",
+      "total_entries": 451,
+      "total_matching": 1,
+      "score_max": 2.6981472969055176,
+      "returned": 1,
+      "truncated": false
+    },
+    {
+      "ontology": "ec",
+      "total_entries": 7337,
+      "total_matching": 7,
+      "score_max": 3.41845965385437,
+      "returned": 2,
+      "truncated": true
+    },
+    {
+      "ontology": "kegg",
+      "total_entries": 5143,
+      "total_matching": 20,
+      "score_max": 2.7984232902526855,
+      "returned": 2,
+      "truncated": true
+    },
+    ...
+  ],
+  "by_level": [],
+  "by_interpro_type": [{"interpro_type": "FAMILY", "count": 2}],
+  "by_family_type": [],
+  "skipped_ontologies": [],
+  "warnings": [],
+  "results": [
+    {
+      "id": "go:0042128",
+      "name": "nitrate assimilation",
+      "ontology_type": "go_bp",
+      "score": 3.5838801860809326,
+      "level": 4,
+      "is_informative": true,
+      "gene_count": 88,
+      "organism_count": 32
+    },
+    {
+      "id": "go:1902025",
+      "name": "nitrate import",
+      "ontology_type": "go_bp",
+      "score": 3.5838801860809326,
+      "level": 5,
+      "is_informative": true,
+      "gene_count": 54,
+      "organism_count": 25
+    },
+    {
+      "id": "go:0008940",
+      "name": "nitrate reductase activity",
+      "ontology_type": "go_mf",
+      "score": 3.2372517585754395,
+      "level": 4,
+      "is_informative": true,
+      "gene_count": 23,
+      "organism_count": 10
+    },
+    ...
+  ]
+}
 ```
 
-### Example 6: Summary only (how many terms match?)
+### Example 8: Summary only (how many terms match?)
 
 ```example-call
 search_ontology(search_text="transport", ontology=["go_bp"], summary=True)
 ```
 
-### Example 7: BRITE search scoped to a specific tree
+### Example 9: BRITE search scoped to a specific tree
 
 ```example-call
 search_ontology(search_text="transport", ontology=["brite"], tree="transporters")
@@ -234,26 +652,64 @@ search_ontology(search_text="transport", ontology=["brite"], tree="transporters"
 ```example-response
 {
   "mode": "search",
-  "total_entries": 84,
-  "total_matching": 12,
-  "score_max": 3.1,
-  "returned": 5,
-  "truncated": true,
+  "total_entries": 2681,
+  "total_matching": 2,
+  "score_max": 2.494616985321045,
+  "score_median": 2.1319267749786377,
+  "returned": 2,
   "offset": 0,
+  "truncated": false,
+  "by_ontology": [
+    {
+      "ontology": "brite",
+      "total_entries": 2681,
+      "total_matching": 2,
+      "score_max": 2.494616985321045,
+      "returned": 2,
+      "truncated": false
+    }
+  ],
+  "by_level": [],
+  "by_interpro_type": [],
+  "by_family_type": [],
+  "skipped_ontologies": [],
+  "warnings": [],
   "results": [
-    {"id": "kegg.brite:ko02000.A2", "name": "ABC transporters", "score": 3.1, "level": 1, "ontology_type": "brite", "tree": "transporters", "tree_code": "ko02000", "gene_count": 2210, "organism_count": 42},
-    ...
+    {
+      "id": "kegg.brite:ko02000.A2.B2.C3",
+      "name": "Arabinogalactan oligomer/maltooligosaccharide transport system",
+      "ontology_type": "brite",
+      "score": 2.494616985321045,
+      "level": 2,
+      "is_informative": true,
+      "tree": "transporters",
+      "tree_code": "ko02000",
+      "gene_count": 37,
+      "organism_count": 17
+    },
+    {
+      "id": "kegg.brite:ko02000.A6.B6",
+      "name": "Accessory factors involved in transport [TC:8]",
+      "ontology_type": "brite",
+      "score": 2.1319267749786377,
+      "level": 1,
+      "is_informative": true,
+      "tree": "transporters",
+      "tree_code": "ko02000",
+      "gene_count": 215,
+      "organism_count": 23
+    }
   ]
 }
 ```
 
-### Example 8: Filter search results by hierarchy level
+### Example 10: Filter search results by hierarchy level
 
 ```example-call
 search_ontology(search_text="oxido*", ontology=["kegg"], level=2)
 ```
 
-### Example 9: Find TCDB families that move sucrose
+### Example 11: Find TCDB families that move sucrose
 
 ```example-call
 search_ontology(search_text="sucrose", ontology=["tcdb"])
@@ -262,65 +718,281 @@ search_ontology(search_text="sucrose", ontology=["tcdb"])
 ```example-response
 {
   "mode": "search",
+  "total_entries": 1515,
   "total_matching": 6,
-  "score_max": 3.42,
+  "score_max": 6.737510681152344,
+  "score_median": 3.3274388313293457,
   "returned": 5,
-  "truncated": true,
   "offset": 0,
+  "truncated": true,
+  "by_ontology": [
+    {
+      "ontology": "tcdb",
+      "total_entries": 1515,
+      "total_matching": 6,
+      "score_max": 6.737510681152344,
+      "returned": 5,
+      "truncated": true
+    }
+  ],
+  "by_level": [],
+  "by_interpro_type": [],
+  "by_family_type": [],
+  "skipped_ontologies": [],
+  "warnings": [],
   "results": [
-    {"id": "tcdb:2.A.1.5.3", "name": "Sucrose:H+ symporter", "score": 3.42, "level": 4, "ontology_type": "tcdb", "gene_count": 3, "organism_count": 2},
+    {
+      "id": "tcdb:3.A.1.1.8",
+      "name": "Sucrose/maltose/trehalose porter (sucrose-inducible)",
+      "ontology_type": "tcdb",
+      "score": 6.737510681152344,
+      "level": 4,
+      "is_informative": true,
+      "gene_count": 3,
+      "organism_count": 1
+    },
+    {
+      "id": "tcdb:3.A.1.1.17",
+      "name": "Trehalose/maltose/sucrose porter (trehalose inducible)",
+      "ontology_type": "tcdb",
+      "score": 5.250369548797607,
+      "level": 4,
+      "is_informative": true,
+      "gene_count": 3,
+      "organism_count": 1
+    },
+    {
+      "id": "tcdb:1.B.3.1.2",
+      "name": "Oligosaccharide porin, ScrY (transports sucrose, raffinose and maltooligo-saccharides).",
+      "ontology_type": "tcdb",
+      "score": 4.501997947692871,
+      "level": 4,
+      "is_informative": true,
+      "gene_count": 1,
+      "organism_count": 1
+    },
     ...
   ]
 }
 ```
 
-### Example 10: Search InterPro entries, scoped to one interpro_type
+### Example 12: Search InterPro entries, scoped to one interpro_type
 
 ```example-call
 search_ontology(search_text="P-loop", ontology=["interpro"], interpro_type="HOMOLOGOUS_SUPERFAMILY")
 ```
 
 ```example-response
-# interpro_type scopes InterPro the way tree scopes BRITE — omit it and
-# results mix all 8 InterPro types, which size very differently. The
-# envelope adds by_interpro_type whenever interpro is in the set.
-{"mode": "search", "total_matching": 3, "by_interpro_type": [{"interpro_type": "HOMOLOGOUS_SUPERFAMILY", "count": 3}],
- "results": [
-   {"id": "interpro:IPR027417", "name": "P-loop containing nucleoside triphosphate hydrolase", "score": 2.9, "level": 0, "ontology_type": "interpro", "interpro_type": "HOMOLOGOUS_SUPERFAMILY", "gene_count": 6909, "organism_count": 42}
- ]}
+{
+  "mode": "search",
+  "total_entries": 13000,
+  "total_matching": 49,
+  "score_max": 9.800861358642578,
+  "score_median": 1.573620319366455,
+  "returned": 5,
+  "offset": 0,
+  "truncated": true,
+  "by_ontology": [
+    {
+      "ontology": "interpro",
+      "total_entries": 13000,
+      "total_matching": 49,
+      "score_max": 9.800861358642578,
+      "returned": 5,
+      "truncated": true
+    }
+  ],
+  "by_level": [],
+  "by_interpro_type": [{"interpro_type": "HOMOLOGOUS_SUPERFAMILY", "count": 5}],
+  "by_family_type": [],
+  "skipped_ontologies": [],
+  "warnings": [],
+  "results": [
+    {
+      "id": "interpro:IPR027417",
+      "name": "P-loop containing nucleoside triphosphate hydrolase",
+      "ontology_type": "interpro",
+      "score": 9.800861358642578,
+      "level": 0,
+      "is_informative": true,
+      "interpro_type": "HOMOLOGOUS_SUPERFAMILY",
+      "gene_count": 7045,
+      "organism_count": 43
+    },
+    {
+      "id": "interpro:IPR008250",
+      "name": "P-type ATPase, A domain superfamily",
+      "ontology_type": "interpro",
+      "score": 5.831203460693359,
+      "level": 0,
+      "is_informative": true,
+      "interpro_type": "HOMOLOGOUS_SUPERFAMILY",
+      "gene_count": 94,
+      "organism_count": 42
+    },
+    {
+      "id": "interpro:IPR023534",
+      "name": "Rof/RNase P-like",
+      "ontology_type": "interpro",
+      "score": 4.432365417480469,
+      "level": 0,
+      "is_informative": true,
+      "interpro_type": "HOMOLOGOUS_SUPERFAMILY",
+      "gene_count": 7,
+      "organism_count": 7
+    },
+    ...
+  ]
+}
 ```
 
-### Example 11: Browse NCBIfam families with their family_type (verbose)
+### Example 13: Browse NCBIfam families with their family_type (verbose)
 
 ```example-call
 search_ontology(ontology=["ncbifam"], min_gene_count=300, verbose=True)
 ```
 
 ```example-response
-# verbose adds description, level_kind, direct_gene_count (hierarchical
-# labels only) and the ontology's term-level extras — ncbifam
-# family_type + gene_symbol, tcdb superfamily + metabolite_count,
-# merops family_class + catalytic_type + peptidase_gene_count.
-{"mode": "browse", "by_family_type": [{"family_type": "equivalog", "count": 4}, {"family_type": "subfamily", "count": 2}],
- "results": [
-   {"id": "ncbifam:TIGR00254", "name": "diguanylate cyclase", "score": null, "level": 0, "ontology_type": "ncbifam", "gene_count": 696, "organism_count": 20,
-    "description": "...", "family_type": "subfamily", "gene_symbol": null}
- ]}
+{
+  "mode": "browse",
+  "total_entries": 4957,
+  "total_matching": 4,
+  "score_max": null,
+  "score_median": null,
+  "returned": 4,
+  "offset": 0,
+  "truncated": false,
+  "by_ontology": [
+    {
+      "ontology": "ncbifam",
+      "total_entries": 4957,
+      "total_matching": 4,
+      "score_max": null,
+      "returned": 4,
+      "truncated": false
+    }
+  ],
+  "by_level": [{"level": 0, "count": 4}],
+  "by_interpro_type": [],
+  "by_family_type": [{"family_type": "domain", "count": 3}, {"family_type": "superfamily", "count": 1}],
+  "skipped_ontologies": [],
+  "warnings": [],
+  "results": [
+    {
+      "id": "ncbifam:TIGR00254",
+      "name": "diguanylate cyclase",
+      "ontology_type": "ncbifam",
+      "score": null,
+      "level": 0,
+      "is_informative": true,
+      "gene_count": 696,
+      "organism_count": 20,
+      "description": "The GGDEF domain is named for the motif GG[DE]EF shared by many proteins carrying the domain. There is evidence that ...",
+      "level_kind": null,
+      "family_type": "domain",
+      "gene_symbol": null
+    },
+    {
+      "id": "ncbifam:TIGR00231",
+      "name": "GTP-binding protein",
+      "ontology_type": "ncbifam",
+      "score": null,
+      "level": 0,
+      "is_informative": true,
+      "gene_count": 475,
+      "organism_count": 43,
+      "description": "Proteins with a small GTP-binding domain recognized by this model include Ras, RhoA, Rab11, translation elongation fa...",
+      "level_kind": null,
+      "family_type": "domain",
+      "gene_symbol": null
+    },
+    {
+      "id": "ncbifam:TIGR00229",
+      "name": "PAS domain S-box protein",
+      "ontology_type": "ncbifam",
+      "score": null,
+      "level": 0,
+      "is_informative": true,
+      "gene_count": 403,
+      "organism_count": 32,
+      "description": "The PAS domain was previously described. This sensory box, or S-box domain occupies the central portion of the PAS do...",
+      "level_kind": null,
+      "family_type": "domain",
+      "gene_symbol": null
+    },
+    ...
+  ]
+}
 ```
 
-### Example 12: Search MEROPS peptidase families
+### Example 14: Search MEROPS peptidase families
 
 ```example-call
 search_ontology(search_text="serine protease", ontology=["merops"])
 ```
 
 ```example-response
-{"mode": "search", "total_matching": 8, "results": [
-  {"id": "merops.family:S14", "name": "Clp protease", "score": 3.0, "level": 1, "ontology_type": "merops", "gene_count": 125, "organism_count": 41}
-]}
+{
+  "mode": "search",
+  "total_entries": 155,
+  "total_matching": 19,
+  "score_max": 1.636549949645996,
+  "score_median": 0.5249618291854858,
+  "returned": 5,
+  "offset": 0,
+  "truncated": true,
+  "by_ontology": [
+    {
+      "ontology": "merops",
+      "total_entries": 155,
+      "total_matching": 19,
+      "score_max": 1.636549949645996,
+      "returned": 5,
+      "truncated": true
+    }
+  ],
+  "by_level": [],
+  "by_interpro_type": [],
+  "by_family_type": [],
+  "skipped_ontologies": [],
+  "warnings": [],
+  "results": [
+    {
+      "id": "merops.family:M50",
+      "name": "S2P protease",
+      "ontology_type": "merops",
+      "score": 1.636549949645996,
+      "level": 1,
+      "is_informative": true,
+      "gene_count": 87,
+      "organism_count": 43
+    },
+    {
+      "id": "merops.family:S16",
+      "name": "lon protease",
+      "ontology_type": "merops",
+      "score": 1.636549949645996,
+      "level": 1,
+      "is_informative": true,
+      "gene_count": 82,
+      "organism_count": 43
+    },
+    {
+      "id": "merops.family:S49",
+      "name": "protease IV",
+      "ontology_type": "merops",
+      "score": 1.636549949645996,
+      "level": 1,
+      "is_informative": true,
+      "gene_count": 89,
+      "organism_count": 43
+    },
+    ...
+  ]
+}
 ```
 
-### Example 13: Find PSORTb subcellular localizations
+### Example 15: Find PSORTb subcellular localizations
 
 ```example-call
 search_ontology(search_text="outer", ontology=["subcellular_localization"])
@@ -331,48 +1003,161 @@ search_ontology(search_text="outer", ontology=["subcellular_localization"])
   "mode": "search",
   "total_entries": 5,
   "total_matching": 1,
+  "score_max": 0.5361359119415283,
+  "score_median": 0.5361359119415283,
   "returned": 1,
-  "truncated": false,
   "offset": 0,
+  "truncated": false,
+  "by_ontology": [
+    {
+      "ontology": "subcellular_localization",
+      "total_entries": 5,
+      "total_matching": 1,
+      "score_max": 0.5361359119415283,
+      "returned": 1,
+      "truncated": false
+    }
+  ],
+  "by_level": [],
+  "by_interpro_type": [],
+  "by_family_type": [],
+  "skipped_ontologies": [],
+  "warnings": [],
   "results": [
-    {"id": "psortb_OuterMembrane", "name": "Outer membrane", "score": 2.42, "level": 0, "ontology_type": "subcellular_localization", "gene_count": 2087, "organism_count": 42}
+    {
+      "id": "psortb_OuterMembrane",
+      "name": "Outer membrane",
+      "ontology_type": "subcellular_localization",
+      "score": 0.5361359119415283,
+      "level": 0,
+      "is_informative": true,
+      "gene_count": 2097,
+      "organism_count": 43
+    }
   ]
 }
 ```
 
-### Example 14: Filter out uninformative terms (term-side, opt-in)
+### Example 16: Filter out uninformative terms (term-side, opt-in)
 
 ```example-call
 search_ontology(search_text="transport", ontology=["kegg"], informative_only=True)
 ```
 
+*informative_only=True drops terms flagged is_uninformative='true' (KEGG KOs named 'uncharacterized protein' — KO level only, pathway maps are never flagged; a few Cyanorak / TIGR / GO / COG roots; broad InterPro superfamilies and NCBIfam families). Each row carries is_informative. Use it when seeding term IDs into genes_by_ontology for enrichment. KO ids are `kegg.orthology:K…`.*
+
 ```example-response
-# informative_only=True drops terms flagged is_uninformative='true'
-# (catch-all KEGG maps and KO groups, a few Cyanorak / TIGR / GO / COG
-# entries, broad InterPro superfamilies, broad NCBIfam families). Each
-# row carries is_informative. Use it when seeding term IDs into
-# genes_by_ontology for enrichment.
-{"mode": "search", "total_matching": 22, "results": [
-  {"id": "kegg:K02035", "name": "ABC.PE.S; peptide/nickel transport system substrate-binding protein", "score": 2.81, "level": 3, "ontology_type": "kegg", "is_informative": true, "gene_count": 304, "organism_count": 46}
-]}
+{
+  "mode": "search",
+  "total_entries": 5143,
+  "total_matching": 329,
+  "score_max": 1.7505996227264404,
+  "score_median": 1.155104637145996,
+  "returned": 5,
+  "offset": 0,
+  "truncated": true,
+  "by_ontology": [
+    {
+      "ontology": "kegg",
+      "total_entries": 5143,
+      "total_matching": 329,
+      "score_max": 1.7505996227264404,
+      "returned": 5,
+      "truncated": true
+    }
+  ],
+  "by_level": [],
+  "by_interpro_type": [],
+  "by_family_type": [],
+  "skipped_ontologies": [],
+  "warnings": [],
+  "results": [
+    {
+      "id": "kegg.subcategory:09131",
+      "name": "Membrane transport",
+      "ontology_type": "kegg",
+      "score": 1.7505996227264404,
+      "level": 1,
+      "is_informative": true,
+      "discussed_by_n_publications": 0,
+      "gene_count": 3358,
+      "organism_count": 43
+    },
+    {
+      "id": "kegg.subcategory:09141",
+      "name": "Transport and catabolism",
+      "ontology_type": "kegg",
+      "score": 1.6120857000350952,
+      "level": 1,
+      "is_informative": true,
+      "discussed_by_n_publications": 0,
+      "gene_count": 399,
+      "organism_count": 43
+    },
+    {
+      "id": "kegg.orthology:K06197",
+      "name": "chaB; cation transport regulator",
+      "ontology_type": "kegg",
+      "score": 1.4938839673995972,
+      "level": 3,
+      "is_informative": true,
+      "discussed_by_n_publications": 0,
+      "gene_count": 1,
+      "organism_count": 1
+    },
+    ...
+  ]
+}
 ```
 
-### Example 15: Which papers discuss a KEGG pathway (literature index)
+### Example 17: Which papers discuss a KEGG pathway (literature index)
 
 ```example-call
 search_ontology(search_text="calvin", ontology=["kegg"])
 ```
 
 ```example-response
-# KEGG terms carry discussed_by_n_publications — how many publications
-# name the pathway in prose. Present ONLY for kegg; other ontologies
-# omit it. verbose=True expands the {doi, prominence, evidence} list.
-{"mode": "search", "total_matching": 3, "results": [
-  {"id": "kegg.pathway:ko00710", "name": "Carbon fixation by Calvin cycle", "score": 3.2, "level": 2, "ontology_type": "kegg", "gene_count": 1210, "organism_count": 42, "discussed_by_n_publications": 19}
-]}
+{
+  "mode": "search",
+  "total_entries": 5143,
+  "total_matching": 1,
+  "score_max": 4.122867107391357,
+  "score_median": 4.122867107391357,
+  "returned": 1,
+  "offset": 0,
+  "truncated": false,
+  "by_ontology": [
+    {
+      "ontology": "kegg",
+      "total_entries": 5143,
+      "total_matching": 1,
+      "score_max": 4.122867107391357,
+      "returned": 1,
+      "truncated": false
+    }
+  ],
+  "by_level": [],
+  "by_interpro_type": [],
+  "by_family_type": [],
+  "skipped_ontologies": [],
+  "warnings": [],
+  "results": [
+    {
+      "id": "kegg.pathway:ko00710",
+      "name": "Carbon fixation by Calvin cycle",
+      "ontology_type": "kegg",
+      "score": 4.122867107391357,
+      "level": 2,
+      "is_informative": true,
+      "discussed_by_n_publications": 23,
+      "gene_count": 714,
+      "organism_count": 43
+    }
+  ]
+}
 ```
 
-### Example 16: From search to gene discovery
+### Example 18: From search to gene discovery
 
 ```
 Step 1: search_ontology(search_text="replication", ontology=["go_bp"])
@@ -389,7 +1174,7 @@ Step 4: gene_overview(locus_tags=["PMM0845", ...])
         → data availability for the discovered genes
 ```
 
-### Example 17: Browse → pick a level → enrich
+### Example 19: Browse → pick a level → enrich
 
 ```
 Step 1: search_ontology(ontology=["cyanorak_role"], level=1, organism="MED4")
@@ -398,7 +1183,7 @@ Step 1: search_ontology(ontology=["cyanorak_role"], level=1, organism="MED4")
 Step 2: ontology_landscape(ontology=["cyanorak_role"], organism="MED4")
         → confirm level 1 has usable coverage / term sizes
 
-Step 3: pathway_enrichment(organism="MED4", experiment_ids=["EXP042"], ontology="cyanorak_role", level=1)
+Step 3: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1)
 ```
 
 ## Chaining patterns
@@ -410,12 +1195,12 @@ search_ontology → genes_by_ontology → gene_overview
 search_ontology(ontology=[key], level=N) (browse) → ontology_landscape(ontology=[key]) → pathway_enrichment(ontology=key, level=N)
 list_filter_values('brite_tree') → search_ontology(ontology=['brite'], tree=...)
 search_ontology(ontology=['kegg'], verbose=True) → read per-term discussed_in_publications DOIs → list_publications(publication_dois=[...]) or discussed_by_publication(publication_dois=[...])
-search_ontology(ontology=['interpro'], interpro_type=...) / ['ncbifam'] / ['merops'] → genes_by_ontology(ontology=..., term_ids=[...], organism=...) — same forward chain as the other 14 ontologies
+search_ontology(ontology=['interpro'], interpro_type=...) / ['ncbifam'] / ['merops'] → genes_by_ontology(ontology=..., term_ids=[...], organism=...) — same forward chain as every other ontology
 ```
 
 ## Common mistakes
 
-- search_ontology finds term IDs — use genes_by_ontology to find (gene × term) pairs annotated to those terms (single organism required, hierarchy expanded DOWN by default), and ontology_term_details for a term's parents / children / bridges. Neither search nor browse traverses the hierarchy.
+- search_ontology finds term IDs — use genes_by_ontology to find (gene × term) pairs annotated to those terms (single organism required, hierarchy expanded DOWN by default), and ontology_term_details for a term's parents / children / bridges. Neither search nor browse walks the hierarchy for you — but the counts they show (`gene_count`, `organism_gene_count`) are subtree-scoped on hierarchical ontologies.
 
 - `ontology` is a list (a single string is accepted); omit it to fan out over all 17 in registry order. `limit` / `offset` apply PER ontology (lockstep paging — `returned <= limit x n`); read `by_ontology[].truncated` to see which ontology still has pages. See docs://guide/conventions.
 
@@ -423,7 +1208,7 @@ search_ontology(ontology=['interpro'], interpro_type=...) / ['ncbifam'] / ['mero
 
 - `organism=` (browse) changes what is sorted and filtered: rows gain `organism_gene_count`, `min_gene_count` applies to it, and `gene_count` stays KG-wide. Without `organism=`, `gene_count` / `organism_count` are counts across all organisms on the term node. The name resolves like every other tool (`'MED4'` → `'Prochlorococcus MED4'`; unknown or ambiguous raises).
 
-- `organism_gene_count` is the term's DIRECT gene edge in that organism (BRITE via its KEGG bridge) — NOT the subtree. It differs from `gene_count` (subtree, all organisms) and from `ontology_term_details.organism_gene_count` (subtree, one organism). On hierarchical ontologies a parent term can show a smaller `organism_gene_count` than its child; use `ontology_term_details(organism=...)` for subtree-scoped per-organism counts.
+- `organism_gene_count` is subtree-scoped (term + descendants, one organism; BRITE via its KEGG bridge) — the same scope as `gene_count` (all organisms) and the same number `ontology_term_details(organism=...)` reports (`tcdb:3.A.1` in MED4: 65 on both). A parent therefore never shows fewer genes than its child. For node-local counts read `direct_gene_count` (verbose, hierarchical labels only).
 
 - `score_median` is over the full match on a single-ontology search, but over the RETURNED PAGE on multi-ontology calls (the per-ontology summaries carry no pooled median). `score_max` is exact in both cases.
 
@@ -467,7 +1252,7 @@ search_ontology(ontology=['merops'], level=1)  # browse mode: omit search_text, 
 from multiomics_explorer import search_ontology
 
 result = search_ontology()
-# returns dict with keys: mode, total_entries, total_matching, score_max, score_median, offset, by_ontology, by_level, by_interpro_type, by_family_type, skipped_ontologies, warnings, results
+# returns dict with keys: mode, total_entries, total_matching, score_max, score_median, returned, offset, truncated, by_ontology, by_level, by_interpro_type, by_family_type, skipped_ontologies, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

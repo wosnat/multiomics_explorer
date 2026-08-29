@@ -16,7 +16,11 @@ proteins.
 Gene → Pfam edges pool InterProScan HMM hits with Cyanorak, eggNOG and
 UniProt records (`sources[]`); compact `evidence` is `signature` (an HMM
 match — the native Pfam rung) or `curated`, with an `evidence_score` in
-[0, 1] reflecting source agreement. Clan membership is a term-side edge
+[0, 1] reflecting source agreement; rung semantics in
+`docs://analysis/annotation_evidence`. Live on this edge type:
+InterProScan-only and eggNOG+InterProScan edges read `signature`;
+eggNOG-only edges read `curated` (an open KG-side ask), as do all edges
+with a `cyanorak` or `uniprot` source. Clan membership is a term-side edge
 (`Pfam_in_pfam_clan`), so a gene's clan count is a rollup of its
 domain hits. Pfam entries also bridge *out* to InterPro
 (`Pfam_in_interpro_entry`, membership) — the InterPro entry that
@@ -63,15 +67,19 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 | `name` | string | term name (what `search_ontology` indexes) |
 | `organism_count` | int | organisms with at least one gene annotated to the term (subtree-inclusive where `gene_count` is) |
 | `preferred_id` | string | same value as `id` |
-| `short_name` | string |  |
+| `short_name` | string | Pfam short name (e.g. `ABC_tran`); `name` holds the long description |
 
 Parent label `PfamClan`: `gene_count`, `id`, `level`, `name`, `organism_count`, `preferred_id`.
 
 `ontology_term_details(verbose=True)` returns every property as `properties`; a compact column that is missing on the node is absent, not null (`docs://guide/conventions`).
 
-## Controlled vocabularies
+## Applicable filter types
 
-Values: see `list_filter_values(filter_type=..., ontology='pfam')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
+- `evidence` — `list_filter_values(filter_type="evidence", ontology="pfam")`
+- `sources` — `list_filter_values(filter_type="sources", ontology="pfam")`
+- `link_kinds` — `list_filter_values(filter_type="link_kinds")`
+
+Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="pfam")`) lists which comparable axes the gene edge carries.
 
 ## Interpretation
 
@@ -79,9 +87,10 @@ The right axis for "what is this protein built from" and for
 architecture-level comparisons across distant organisms — domains are far
 more conserved than whole-protein orthology. Level 1 (domains) is the
 enrichment unit; clan level (0) is coarse but robust when domain sets are
-sparse. Rank a gene's competing domain hits by `evidence_score`; a
-`curated` Pfam edge means a curator confirmed the domain, `signature`
-means an HMM threshold was passed. For the *integrated* view of a domain
+sparse. Rank a gene's competing domain hits by `evidence_score`;
+`signature` means an HMM threshold was passed, and `curated` should be
+read together with `sources` (a `cyanorak` / `uniprot` source is a
+confirmed domain, `['eggnog']` alone is a transfer). For the *integrated* view of a domain
 (which InterPro entry, which GO terms it implies) follow `links_out` to
 `interpro`.
 
@@ -108,8 +117,8 @@ enrichment; use `max_gene_set_size` or `min_gene_count` to manage them.
 ## Typical questions
 
 - Which Pfam domains are enriched among genes up in the vesicle proteome?
-- Which MED4 genes carry `pfam:PF00005`, and which TCDB families are built from that domain?
-- What are the member domains of clan `pfam.clan:CL0023`, and which InterPro entry does each map to?
+- Which MED4 genes carry `pfam:PF00005`? — `genes_by_ontology(ontology='pfam', organism='MED4', term_ids=['pfam:PF00005'])`; the TCDB families built from that domain are read from the `tcdb` side (`ontology_term_details(term_ids=['tcdb:3.A.1'], link_kinds=['composition'])`)
+- What are the member domains of clan `pfam.clan:CL0023`, and which InterPro entry does each map to? — `ontology_term_details(term_ids=['pfam.clan:CL0023'])` for the children, then `ontology_term_details(term_ids=[...children...], link_kinds=['membership'])`
 - Does this gene's domain architecture match its MEROPS or TCDB family call?
 
 ## Tools

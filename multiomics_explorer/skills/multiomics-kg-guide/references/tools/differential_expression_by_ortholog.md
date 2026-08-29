@@ -23,7 +23,7 @@ via `differential_expression_by_gene`.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | group_ids | list[string] | — | Ortholog group IDs (from search_homolog_groups or gene_homologs). E.g. ['cyanorak:CK_00000570']. |
-| organisms | list[string] \| None | None | Filter by organisms (case-insensitive substring, OR semantics). E.g. ['MED4', 'MIT9313']. Use list_organisms to see valid values. |
+| organisms | list[string] \| None | None | Filter by organisms — each entry a word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word matches every strain); OR semantics. E.g. ['MED4', 'MIT9313']. Use list_organisms to see valid values. |
 | experiment_ids | list[string] \| None | None | Filter to these experiments. Get IDs from list_experiments. |
 | direction | string ('up', 'down') \| None | None | Filter by expression direction. |
 | significant_only | bool | False | If true, return only statistically significant rows. |
@@ -73,7 +73,7 @@ total_matching, matching_genes, matching_groups, experiment_count, median_abs_lo
 | consensus_gene_name | string \| None | Short gene name (e.g. 'psbB'). Null for hypotheticals. |
 | consensus_product | string | Group product description (e.g. 'photosystem II chlorophyll-binding protein CP47') |
 | experiment_id | string | Experiment ID |
-| treatment_type | list[string] | Treatment categories (e.g. ['nitrogen_limitation']) |
+| treatment_type | list[string] | Treatment categories (e.g. ['nitrogen']) |
 | background_factors | list[string] (optional) | Background experimental factors |
 | organism_name | string | Organism (e.g. 'Prochlorococcus MED4') |
 | coculture_partner | string \| None (optional) | Coculture partner organism, if applicable |
@@ -121,7 +121,11 @@ Step 2: differential_expression_by_ortholog(group_ids=[...],
           organisms=["MED4", "MIT9313"])
         → triage: which groups have expression?
 
-Step 3 (if detail needed): use expression_by_ortholog script
+Step 3 (if detail needed): genes_by_homolog_group(group_ids=[...], organisms=["MED4"])
+        → member locus_tags per organism, then
+        differential_expression_by_gene(locus_tags=[...], experiment_ids=[...])
+        once per organism for the per-gene rows (or script it — see
+        docs://guide/python_api)
 ```
 
 ## Chaining patterns
@@ -130,10 +134,10 @@ Step 3 (if detail needed): use expression_by_ortholog script
 search_homolog_groups → differential_expression_by_ortholog
 gene_homologs → differential_expression_by_ortholog
 genes_by_homolog_group (triage) → differential_expression_by_ortholog
-differential_expression_by_ortholog → scripts/expression_by_ortholog.py (detail)
+differential_expression_by_ortholog → genes_by_homolog_group(organisms=[...]) → differential_expression_by_gene per organism (per-gene detail behind a group × experiment row; loop it in Python per docs://guide/python_api)
 ```
 
-## Good to know
+## Common mistakes
 
 - group_ids must be full IDs with prefix (e.g. 'cyanorak:CK_00000570')
 
@@ -141,7 +145,11 @@ differential_expression_by_ortholog → scripts/expression_by_ortholog.py (detai
 
 - This tool does NOT enforce single organism — that is the point
 
-- Results are group × experiment × timepoint (gene counts), not individual genes. Use the script for per-gene detail.
+- Results are group × experiment × timepoint (gene counts), not individual genes. For per-gene detail take the group's members from genes_by_homolog_group and call differential_expression_by_gene once per organism (docs://guide/python_api shows the loop).
+
+- Diagnostics are suffixed flat lists: `not_found_groups` / `not_matched_groups`, `not_found_organisms` / `not_matched_organisms`, `not_found_experiments` / `not_matched_experiments`. See docs://guide/conventions for the shared not_found / not_matched semantics.
+
+- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (e.g. 'nitrogen_stress' instead of 'nitrogen') returns 0 rows, never an error. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical.
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
@@ -153,7 +161,7 @@ differential_expression_by_ortholog → scripts/expression_by_ortholog.py (detai
 from multiomics_explorer import differential_expression_by_ortholog
 
 result = differential_expression_by_ortholog(group_ids=...)
-# returns dict with keys: total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, offset, by_organism, rows_by_status, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
+# returns dict with keys: total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, returned, offset, truncated, by_organism, rows_by_status, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
 ```
 
 Use package import for bulk data extraction in scripts.

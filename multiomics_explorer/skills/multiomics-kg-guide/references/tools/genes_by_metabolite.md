@@ -3,22 +3,27 @@
 ## What it does
 
 Find genes connected to specified metabolites in one organism.
-Two arms — metabolism (`Gene → Reaction → Metabolite`) and transport
-(`Gene → TcdbFamily → Metabolite` over each gene's deepest TCDB
-attachments only, so rows agree with the KG's precomputed transport
-counts). Transport rows carry `substrate_depth` ('most_specific' =
-most specific surviving transporter node for the substrate in the
-gene-pruned hierarchy, not a curation level; 'inherited' = rolled
-up from a descendant) and `tcdb_evidence_score` (5-signal composite
-[0,1]; rank by it, don't filter — 0 = uncorroborated, not absent).
-Detail sort: metabolism → most_specific → inherited, score desc
-within a tier. The auto-warning fires when `inherited` dominates
-the transport arm. Direction-agnostic (KEGG equation order is
+
+What: two arms — metabolism (`Gene → Reaction → Metabolite`) and
+transport (`Gene → TcdbFamily → Metabolite` over each gene's deepest
+TCDB attachments only, so rows agree with the KG's precomputed
+transport counts). Direction-agnostic (KEGG equation order is
 unreliable upstream — joins through Reaction_has_metabolite and
 Tcdb_family_transports_metabolite return both produced and consumed
 metabolites identically). Per-row union shape: cross-arm fields are
-explicitly None on rows from the other arm. Bare / xref metabolite
-IDs are coerced to canonical (`resolved_aliases`; collisions expand + warn).
+explicitly None on rows from the other arm.
+
+Transport semantics: transport rows carry `substrate_depth`
+('most_specific' = most specific surviving transporter node for the
+substrate in the gene-pruned hierarchy, not a curation level;
+'inherited' = rolled up from a descendant) and `tcdb_evidence_score`
+(5-signal composite [0,1]; rank by it, don't filter — 0 =
+uncorroborated, not absent). Detail sort: metabolism →
+most_specific → inherited, score desc within a tier. The
+auto-warning fires when `inherited` dominates the transport arm.
+
+Batch advice: bare / xref metabolite IDs are coerced to canonical
+(`resolved_aliases`; collisions expand + warn).
 
 Routing: narrow with `substrate_depth=['most_specific']` when
 inherited rows dominate; from `top_genes` (read
@@ -37,7 +42,7 @@ substrate-depth and direction-agnostic semantics, and
 | Name | Type | Default | Description |
 |---|---|---|---|
 | metabolite_ids | list[string] | — | Metabolite IDs to drill into. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). `not_found.metabolite_ids` = absent from KG; `not_matched` = no gene reach in this organism. |
-| organism | string | — | Organism name (case-insensitive, fuzzy word-based match — mirrors `differential_expression_by_gene`). Single-organism enforced. E.g. 'Prochlorococcus MED4'. `not_found.organism` is set when the name resolves to zero matching genes. |
+| organism | string | — | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises) — mirrors `differential_expression_by_gene`). Single-organism enforced. E.g. 'Prochlorococcus MED4'. `not_found.organism` is set when the name resolves to zero matching genes. |
 | exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
 | ec_numbers | list[string] \| None | None | Narrow metabolism rows to those whose Reaction carries any of these EC numbers. **Metabolism arm only — does not affect transport rows**, which are returned unchanged. To restrict to metabolism rows alone, combine with `evidence_sources=['metabolism']`. E.g. ['6.3.1.2'] for glutamine synthetase. |
 | metabolite_pathway_ids | list[string] \| None | None | Filter to rows where the **metabolite** is in any of these KEGG pathways (`KeggTerm.id`, e.g. ['kegg.pathway:ko00910'] for nitrogen metabolism). Anchored on `Metabolite.pathway_ids` (transport-extended), so applies uniformly to both arms. **Not gene-anchored** — for filtering by genes' KEGG-pathway annotations, route through `genes_by_ontology(ontology="kegg", term_ids=[pathway_id], organism=...)` first to obtain locus_tags. `not_found.metabolite_pathway_ids` lists IDs that don't exist as a KeggTerm. |
@@ -142,16 +147,464 @@ Step 3: intersect / diff the two locus_tag sets client-side. Pair with
         catalysts go up while the other's transporters do too.
 ```
 
-### Example 3: Narrow to the most specific surviving transporter nodes
+### Example 3: Narrow to the most specific surviving transporter nodes (substrate_depth filter)
 
 ```example-call
 genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochlorococcus MED4", substrate_depth=["most_specific"], evidence_sources=["transport"])
 ```
 
-### Example 4: Family-level most_specific — nitrite in MED4
+*The urtABCDE rows only: no metabolism rows (evidence_sources excludes them) and no inherited rows (substrate_depth drops the superfamily-level attachments), so `by_substrate_depth` has a single bucket and no auto-warning fires. Read tcdb_evidence_score per row to rank within the slice — never as a cut-off.*
+
+```example-response
+{
+  "total_matching": 10,
+  "returned": 10,
+  "offset": 0,
+  "truncated": false,
+  "warnings": [],
+  "resolved_aliases": {},
+  "not_found": {"metabolite_ids": [], "organism": null, "metabolite_pathway_ids": []},
+  "not_matched": [],
+  "by_metabolite": [
+    {
+      "metabolite_id": "kegg.compound:C00086",
+      "name": "Urea",
+      "formula": "CH4N2O",
+      "rows": 10,
+      "gene_count": 5,
+      "reaction_count": 0,
+      "transporter_count": 2,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 10,
+      "transport_inherited_rows": 0
+    }
+  ],
+  "by_evidence_source": [{"evidence_source": "transport", "count": 10}],
+  "by_substrate_depth": [{"substrate_depth": "most_specific", "count": 10}],
+  "top_reactions": [],
+  "top_tcdb_families": [
+    {
+      "tcdb_family_id": "tcdb:3.A.1.4.4",
+      "tcdb_family_name": "The high-affinity (",
+      "level_kind": "tc_specificity",
+      "substrate_depth": "most_specific",
+      "gene_count": 5,
+      "metabolite_count": 1
+    },
+    {
+      "tcdb_family_id": "tcdb:3.A.1.4.5",
+      "tcdb_family_name": "The high affinity urea/thiourea/hydroxyurea porter",
+      "level_kind": "tc_specificity",
+      "substrate_depth": "most_specific",
+      "gene_count": 5,
+      "metabolite_count": 1
+    }
+  ],
+  "top_gene_categories": [{"category": "Stress response and adaptation", "gene_count": 5}],
+  "top_genes": [
+    {
+      "locus_tag": "PMM0970",
+      "gene_name": "urtA",
+      "reaction_count": 0,
+      "transporter_count": 2,
+      "metabolite_count": 1,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 2,
+      "transport_inherited_rows": 0,
+      "transport_substrate_resolution": "resolved",
+      "tcdb_evidence_score_max": 0.6
+    },
+    {
+      "locus_tag": "PMM0971",
+      "gene_name": "urtB",
+      "reaction_count": 0,
+      "transporter_count": 2,
+      "metabolite_count": 1,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 2,
+      "transport_inherited_rows": 0,
+      "transport_substrate_resolution": "resolved",
+      "tcdb_evidence_score_max": 0.8
+    },
+    {
+      "locus_tag": "PMM0972",
+      "gene_name": "urtC",
+      "reaction_count": 0,
+      "transporter_count": 2,
+      "metabolite_count": 1,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 2,
+      "transport_inherited_rows": 0,
+      "transport_substrate_resolution": "resolved",
+      "tcdb_evidence_score_max": 0.8
+    },
+    {
+      "locus_tag": "PMM0973",
+      "gene_name": "urtD",
+      "reaction_count": 0,
+      "transporter_count": 2,
+      "metabolite_count": 1,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 2,
+      "transport_inherited_rows": 0,
+      "transport_substrate_resolution": "resolved",
+      "tcdb_evidence_score_max": 0.8
+    },
+    {
+      "locus_tag": "PMM0974",
+      "gene_name": "urtE",
+      "reaction_count": 0,
+      "transporter_count": 2,
+      "metabolite_count": 1,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 2,
+      "transport_inherited_rows": 0,
+      "transport_substrate_resolution": "resolved",
+      "tcdb_evidence_score_max": 0.8
+    }
+  ],
+  "gene_count_total": 5,
+  "reaction_count_total": 0,
+  "transporter_count_total": 2,
+  "metabolite_count_total": 1,
+  "results": [
+    {
+      "locus_tag": "PMM0971",
+      "gene_name": "urtB",
+      "product": "ABC-type urea transporter, permease component",
+      "evidence_source": "transport",
+      "substrate_depth": "most_specific",
+      "tcdb_evidence_score": 0.8,
+      "transport_substrate_resolution": "resolved",
+      "reaction_id": null,
+      "reaction_name": null,
+      "ec_numbers": null,
+      "mass_balance": null,
+      "tcdb_family_id": "tcdb:3.A.1.4.4",
+      "tcdb_family_name": "The high-affinity (",
+      "metabolite_id": "kegg.compound:C00086",
+      "metabolite_name": "Urea",
+      "metabolite_formula": "CH4N2O",
+      "metabolite_mass": 60.056,
+      "metabolite_chebi_id": "134711",
+      "gene_category": null,
+      "metabolite_inchikey": null,
+      "metabolite_smiles": null,
+      "metabolite_mnxm_id": null,
+      "metabolite_hmdb_id": null,
+      "reaction_mnxr_id": null,
+      "reaction_rhea_ids": null,
+      "tcdb_level_kind": null,
+      "tc_class_id": null
+    },
+    {
+      "locus_tag": "PMM0972",
+      "gene_name": "urtC",
+      "product": "ABC-type urea transporter, membrane component",
+      "evidence_source": "transport",
+      "substrate_depth": "most_specific",
+      "tcdb_evidence_score": 0.8,
+      "transport_substrate_resolution": "resolved",
+      "reaction_id": null,
+      "reaction_name": null,
+      "ec_numbers": null,
+      "mass_balance": null,
+      "tcdb_family_id": "tcdb:3.A.1.4.4",
+      "tcdb_family_name": "The high-affinity (",
+      "metabolite_id": "kegg.compound:C00086",
+      "metabolite_name": "Urea",
+      "metabolite_formula": "CH4N2O",
+      "metabolite_mass": 60.056,
+      "metabolite_chebi_id": "134711",
+      "gene_category": null,
+      "metabolite_inchikey": null,
+      "metabolite_smiles": null,
+      "metabolite_mnxm_id": null,
+      "metabolite_hmdb_id": null,
+      "reaction_mnxr_id": null,
+      "reaction_rhea_ids": null,
+      "tcdb_level_kind": null,
+      "tc_class_id": null
+    },
+    {
+      "locus_tag": "PMM0973",
+      "gene_name": "urtD",
+      "product": "ABC-type urea transporter, ATP-binding component UrtD",
+      "evidence_source": "transport",
+      "substrate_depth": "most_specific",
+      "tcdb_evidence_score": 0.8,
+      "transport_substrate_resolution": "resolved",
+      "reaction_id": null,
+      "reaction_name": null,
+      "ec_numbers": null,
+      "mass_balance": null,
+      "tcdb_family_id": "tcdb:3.A.1.4.4",
+      "tcdb_family_name": "The high-affinity (",
+      "metabolite_id": "kegg.compound:C00086",
+      "metabolite_name": "Urea",
+      "metabolite_formula": "CH4N2O",
+      "metabolite_mass": 60.056,
+      "metabolite_chebi_id": "134711",
+      "gene_category": null,
+      "metabolite_inchikey": null,
+      "metabolite_smiles": null,
+      "metabolite_mnxm_id": null,
+      "metabolite_hmdb_id": null,
+      "reaction_mnxr_id": null,
+      "reaction_rhea_ids": null,
+      "tcdb_level_kind": null,
+      "tc_class_id": null
+    },
+    ...
+  ]
+}
+```
+
+### Example 4: Family-level most_specific — nitrite in MED4 (auto-warning fires)
 
 ```example-call
 genes_by_metabolite(metabolite_ids=["kegg.compound:C00088"], organism="Prochlorococcus MED4", evidence_sources=["transport"])
+```
+
+*Nitrite surfaces as substrate_depth='most_specific' at a FAMILY node (tcdb:2.A.16, formate-nitrite transporter family): no gene in the KG is annotated below it for this substrate, so the family is the most specific surviving node — 'most_specific' is a position in the gene-pruned hierarchy, not a curation level. The remaining rows are inherited via the ABC superfamily, and the auto-warning fires because inherited rows dominate. Rows are deepest-attachment projections: genes also attached to a descendant of tcdb:3.A.1 contribute only their deepest attachment.*
+
+```example-response
+{
+  "total_matching": 29,
+  "returned": 10,
+  "offset": 0,
+  "truncated": true,
+  "warnings": [
+    "Most transport rows are `inherited` (23 of 29) — the substrate is reached through a broader family's substrate list, ..."
+  ],
+  "resolved_aliases": {},
+  "not_found": {"metabolite_ids": [], "organism": null, "metabolite_pathway_ids": []},
+  "not_matched": [],
+  "by_metabolite": [
+    {
+      "metabolite_id": "kegg.compound:C00088",
+      "name": "Nitrite",
+      "formula": "NO2",
+      "rows": 29,
+      "gene_count": 27,
+      "reaction_count": 0,
+      "transporter_count": 5,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 6,
+      "transport_inherited_rows": 23
+    }
+  ],
+  "by_evidence_source": [{"evidence_source": "transport", "count": 29}],
+  "by_substrate_depth": [{"substrate_depth": "inherited", "count": 23}, {"substrate_depth": "most_specific", "count": 6}],
+  "top_reactions": [],
+  "top_tcdb_families": [
+    {
+      "tcdb_family_id": "tcdb:3.A.1",
+      "tcdb_family_name": "The ATP-binding Cassette (ABC) Superfamily",
+      "level_kind": "tc_family",
+      "substrate_depth": "inherited",
+      "gene_count": 20,
+      "metabolite_count": 1
+    },
+    {
+      "tcdb_family_id": "tcdb:2.A.1",
+      "tcdb_family_name": "The Major Facilitator Superfamily (MFS)",
+      "level_kind": "tc_family",
+      "substrate_depth": "inherited",
+      "gene_count": 3,
+      "metabolite_count": 1
+    },
+    {
+      "tcdb_family_id": "tcdb:3.A.1.16.1",
+      "tcdb_family_name": "Four component nitrate/nitrite porter.",
+      "level_kind": "tc_specificity",
+      "substrate_depth": "most_specific",
+      "gene_count": 3,
+      "metabolite_count": 1
+    },
+    {
+      "tcdb_family_id": "tcdb:3.A.1.16.2",
+      "tcdb_family_name": "Bispecific cyanate/nitrite transporter.",
+      "level_kind": "tc_specificity",
+      "substrate_depth": "most_specific",
+      "gene_count": 2,
+      "metabolite_count": 1
+    },
+    {
+      "tcdb_family_id": "tcdb:2.A.16",
+      "tcdb_family_name": "The Telurite-resistance/Dicarboxylate Transporter (TDT) Family",
+      "level_kind": "tc_family",
+      "substrate_depth": "most_specific",
+      "gene_count": 1,
+      "metabolite_count": 1
+    }
+  ],
+  "top_gene_categories": [
+    {"category": "Transport", "gene_count": 10},
+    {"category": "Stress response and adaptation", "gene_count": 5},
+    {"category": "Central intermediary metabolism", "gene_count": 3},
+    {"category": "Amino acid metabolism", "gene_count": 1},
+    {"category": "Carbohydrate metabolism", "gene_count": 1},
+    ...
+  ],
+  "top_genes": [
+    {
+      "locus_tag": "PMM0370",
+      "gene_name": "cynA",
+      "reaction_count": 0,
+      "transporter_count": 2,
+      "metabolite_count": 1,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 2,
+      "transport_inherited_rows": 0,
+      "transport_substrate_resolution": "resolved",
+      "tcdb_evidence_score_max": 0.6
+    },
+    {
+      "locus_tag": "PMM0371",
+      "gene_name": "cynB",
+      "reaction_count": 0,
+      "transporter_count": 2,
+      "metabolite_count": 1,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 2,
+      "transport_inherited_rows": 0,
+      "transport_substrate_resolution": "resolved",
+      "tcdb_evidence_score_max": 0.8
+    },
+    {
+      "locus_tag": "PMM0072",
+      "gene_name": "sufC",
+      "reaction_count": 0,
+      "transporter_count": 1,
+      "metabolite_count": 1,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 0,
+      "transport_inherited_rows": 1,
+      "transport_substrate_resolution": "resolved",
+      "tcdb_evidence_score_max": 0.4
+    },
+    {
+      "locus_tag": "PMM0089",
+      "gene_name": null,
+      "reaction_count": 0,
+      "transporter_count": 1,
+      "metabolite_count": 1,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 0,
+      "transport_inherited_rows": 1,
+      "transport_substrate_resolution": "resolved",
+      "tcdb_evidence_score_max": 0.4
+    },
+    {
+      "locus_tag": "PMM0097",
+      "gene_name": "tolC",
+      "reaction_count": 0,
+      "transporter_count": 1,
+      "metabolite_count": 1,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 0,
+      "transport_inherited_rows": 1,
+      "transport_substrate_resolution": "resolved",
+      "tcdb_evidence_score_max": 0.4
+    },
+    ...
+  ],
+  "gene_count_total": 27,
+  "reaction_count_total": 0,
+  "transporter_count_total": 5,
+  "metabolite_count_total": 1,
+  "results": [
+    {
+      "locus_tag": "PMM0371",
+      "gene_name": "cynB",
+      "product": "cyanate ABC transporter, permease protein",
+      "evidence_source": "transport",
+      "substrate_depth": "most_specific",
+      "tcdb_evidence_score": 0.8,
+      "transport_substrate_resolution": "resolved",
+      "reaction_id": null,
+      "reaction_name": null,
+      "ec_numbers": null,
+      "mass_balance": null,
+      "tcdb_family_id": "tcdb:3.A.1.16.1",
+      "tcdb_family_name": "Four component nitrate/nitrite porter.",
+      "metabolite_id": "kegg.compound:C00088",
+      "metabolite_name": "Nitrite",
+      "metabolite_formula": "NO2",
+      "metabolite_mass": 46.005,
+      "metabolite_chebi_id": "14658",
+      "gene_category": null,
+      "metabolite_inchikey": null,
+      "metabolite_smiles": null,
+      "metabolite_mnxm_id": null,
+      "metabolite_hmdb_id": null,
+      "reaction_mnxr_id": null,
+      "reaction_rhea_ids": null,
+      "tcdb_level_kind": null,
+      "tc_class_id": null
+    },
+    {
+      "locus_tag": "PMM0372",
+      "gene_name": "cynD",
+      "product": "cyanate ABC transporter ATP-binding protein",
+      "evidence_source": "transport",
+      "substrate_depth": "most_specific",
+      "tcdb_evidence_score": 0.8,
+      "transport_substrate_resolution": "resolved",
+      "reaction_id": null,
+      "reaction_name": null,
+      "ec_numbers": null,
+      "mass_balance": null,
+      "tcdb_family_id": "tcdb:3.A.1.16.1",
+      "tcdb_family_name": "Four component nitrate/nitrite porter.",
+      "metabolite_id": "kegg.compound:C00088",
+      "metabolite_name": "Nitrite",
+      "metabolite_formula": "NO2",
+      "metabolite_mass": 46.005,
+      "metabolite_chebi_id": "14658",
+      "gene_category": null,
+      "metabolite_inchikey": null,
+      "metabolite_smiles": null,
+      "metabolite_mnxm_id": null,
+      "metabolite_hmdb_id": null,
+      "reaction_mnxr_id": null,
+      "reaction_rhea_ids": null,
+      "tcdb_level_kind": null,
+      "tc_class_id": null
+    },
+    {
+      "locus_tag": "PMM0371",
+      "gene_name": "cynB",
+      "product": "cyanate ABC transporter, permease protein",
+      "evidence_source": "transport",
+      "substrate_depth": "most_specific",
+      "tcdb_evidence_score": 0.8,
+      "transport_substrate_resolution": "resolved",
+      "reaction_id": null,
+      "reaction_name": null,
+      "ec_numbers": null,
+      "mass_balance": null,
+      "tcdb_family_id": "tcdb:3.A.1.16.2",
+      "tcdb_family_name": "Bispecific cyanate/nitrite transporter.",
+      "metabolite_id": "kegg.compound:C00088",
+      "metabolite_name": "Nitrite",
+      "metabolite_formula": "NO2",
+      "metabolite_mass": 46.005,
+      "metabolite_chebi_id": "14658",
+      "gene_category": null,
+      "metabolite_inchikey": null,
+      "metabolite_smiles": null,
+      "metabolite_mnxm_id": null,
+      "metabolite_hmdb_id": null,
+      "reaction_mnxr_id": null,
+      "reaction_rhea_ids": null,
+      "tcdb_level_kind": null,
+      "tc_class_id": null
+    },
+    ...
+  ]
+}
 ```
 
 ### Example 5: Pathway-anchored — N-metabolism only
@@ -202,6 +655,8 @@ genes_by_metabolite → top_reactions / top_genes → pathway_enrichment for KEG
 
 ## Common mistakes
 
+- Metabolite-anchored (metabolite → genes). The gene-anchored mirror is `metabolites_by_gene` (locus_tags → metabolites); both share the same row class, discriminators and per-arm filter scope, so read whichever matches your anchor rather than post-filtering the other.
+
 - Read transport evidence as a three-level trust ladder, top down. (1) `tcdb_evidence_score` (row) / `tcdb_evidence_score_max` (gene, in `top_genes`) — how corroborated the gene × family call is. Rank by it, never filter by it; 0 means an uncorroborated hit, not an absent call (absent is `tcdb_evidence_score_max = None`). (2) Gene-level `transport_substrate_resolution` in `top_genes` — `family_inferred` means the gene's substrate breadth is reachability through a lumping family, not capability; `resolved` means AT LEAST ONE of the gene's deepest attachments is non-lumping, not all of them — a gene attached at both a specific family and the ABC superfamily is `resolved` and still carries the superfamily rollup. (3) Per-row `substrate_depth` — `most_specific` is the most specific SURVIVING transporter node for this substrate relative to the gene-pruned hierarchy; it can be a family node (nitrite via tcdb:2.A.16) and it is not a curation level. `inherited` rows came down from an ancestor's substrate set.
 
 - Row-level `transport_substrate_resolution` is the GENE's resolution (the same KG value `gene_overview` and `top_genes[]` carry), repeated on every transport row of that gene — it is not a per-substrate fact and it does not vary across a gene's rows. Do not read `family_inferred` on a row as "this substrate is inferred": it says the gene's whole substrate breadth is reachability through a lumping family. The per-row fact is `substrate_depth`. Metabolism rows read `None` (union padding), never `resolved`. Group rows by locus_tag when you want one resolution per gene, or read `top_genes[]` directly.
@@ -236,8 +691,6 @@ genes_by_metabolite(metabolite_ids=[...], organism=..., substrate_depth=['substr
 genes_by_metabolite(metabolite_ids=[...], organism=..., substrate_depth=['most_specific'])  # valid values: most_specific, inherited
 ```
 
-- See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and the transport trust ladder, and `docs://guide/concepts` for the chemistry layer overview.
-
 ```mistake
 genes_by_metabolite(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'
 ```
@@ -256,13 +709,15 @@ in the form you passed. Exclude-wins-on-overlap is computed on the canonical IDs
 
 ```
 
+- See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and the transport trust ladder, and `docs://guide/concepts` for the chemistry layer overview.
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import genes_by_metabolite
 
 result = genes_by_metabolite(metabolite_ids=..., organism=...)
-# returns dict with keys: total_matching, offset, warnings, resolved_aliases, not_found, not_matched, by_metabolite, by_evidence_source, by_substrate_depth, top_reactions, top_tcdb_families, top_gene_categories, top_genes, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
+# returns dict with keys: total_matching, returned, offset, truncated, warnings, resolved_aliases, not_found, not_matched, by_metabolite, by_evidence_source, by_substrate_depth, top_reactions, top_tcdb_families, top_gene_categories, top_genes, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 
 Use package import for bulk data extraction in scripts.

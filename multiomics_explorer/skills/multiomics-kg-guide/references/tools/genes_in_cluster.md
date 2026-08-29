@@ -16,7 +16,7 @@ cluster direction via `gene_clusters_by_gene`.
 |---|---|---|---|
 | cluster_ids | list[string] \| None | None | GeneCluster node IDs (from list_clustering_analyses or gene_clusters_by_gene). Provide this OR analysis_id. |
 | analysis_id | string \| None | None | ClusteringAnalysis node ID — returns all genes in all clusters of this analysis. Provide this OR cluster_ids. |
-| organism | string \| None | None | Filter by organism (case-insensitive partial match). Single organism enforced. |
+| organism | string \| None | None | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises). Single organism enforced. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include gene_function_description, gene_summary (gene-level), p_value (edge-level), cluster_functional_description, cluster_expression_dynamics, cluster_temporal_pattern (cluster-level). |
 | limit | int | 5 | Max results. |
@@ -117,7 +117,7 @@ gene_clusters_by_gene → genes_in_cluster → differential_expression_by_gene
 
 - Use analysis_id to get ALL genes across ALL clusters in an analysis; use cluster_ids for specific clusters
 
-- not_found_clusters means the ID doesn't exist in the KG; not_matched_clusters means the cluster exists but has no members matching your organism filter
+- not_found_clusters means the ID doesn't exist in the KG; not_matched_clusters means the cluster exists but has no members matching your organism filter. The `_clusters` suffix is this tool's spelling of the not_found / not_matched pair — See docs://guide/conventions for the shared not_found / not_matched semantics.
 
 - Results are gene × cluster rows — when querying multiple clusters, a gene in both appears twice. Use by_cluster to see per-cluster counts.
 
@@ -143,7 +143,7 @@ genes_in_cluster(cluster_ids=['cluster:msb4100087:med4_kmeans_nstarvation:8']) �
 from multiomics_explorer import genes_in_cluster
 
 result = genes_in_cluster()
-# returns dict with keys: total_matching, analysis_name, by_organism, by_cluster, top_categories, genes_per_cluster_max, genes_per_cluster_median, not_found_clusters, not_matched_clusters, not_matched_organism, offset, results
+# returns dict with keys: total_matching, analysis_name, by_organism, by_cluster, top_categories, genes_per_cluster_max, genes_per_cluster_median, not_found_clusters, not_matched_clusters, not_matched_organism, returned, offset, truncated, results
 ```
 
 Use package import for bulk data extraction in scripts.

@@ -27,7 +27,7 @@ thresholds) live on `genes_by_numeric_metric`; flag-level filters on
 | Name | Type | Default | Description |
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags to look up (e.g. ['PMM1714', 'PMM0001']). Required, non-empty. Single organism enforced — locus_tags must all resolve to the same organism (or pair with `organism` to disambiguate). |
-| organism | string \| None | None | Organism to scope to. Accepts short strain code ('MED4', 'NATL2A', 'MIT1002') or full name. Case-insensitive substring match. Inferred from locus_tags when omitted. |
+| organism | string \| None | None | Organism to scope to. Accepts short strain code ('MED4', 'NATL2A', 'MIT1002') or full name; word-based, case-insensitive match, ambiguous match raises. Inferred from locus_tags when omitted. |
 | metric_types | list[string] \| None | None | Filter by metric_type tags (e.g. 'diel_amplitude_protein_log2'). Same metric_type may appear across publications — pair with publication_doi or use derived_metric_ids to pin one specific DM. |
 | value_kind | string ('numeric', 'boolean', 'categorical') \| None | None | Restrict to one DM kind. Each kind has a different `value` column type — 'numeric' → float, 'boolean' → 'flagged'/'not_flagged', 'categorical' → category string. |
 | compartment | string \| None | None | Filter to DMs from one sample compartment ('whole_cell', 'vesicle', 'exoproteome', 'spent_medium', 'lysate'). Exact match. |
@@ -76,7 +76,7 @@ total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics
 | derived_metric_id | string | Unique parent-DM id. Pass to `derived_metric_ids` on genes_by_*_metric drill-downs to pin this exact DM. metric_type, compartment, publication_doi etc. are available in verbose mode or via list_derived_metrics(derived_metric_ids=[...]). |
 | value_kind | string ('numeric', 'boolean', 'categorical') | Determines how to interpret `value`. Routes to the matching genes_by_*_metric drill-down. |
 | name | string | Human-readable DM name (e.g. 'Transcript:protein amplitude ratio'). Saves a round-trip to list_derived_metrics for opaque metric_type codes. |
-| value | float | Polymorphic measurement: float on numeric rows, 'flagged'/'not_flagged' string on boolean rows, category string on categorical rows. Branch on `value_kind`. |
+| value | float \| string | Polymorphic measurement: float on numeric rows, 'flagged'/'not_flagged' string on boolean rows, category string on categorical rows. Branch on `value_kind`. |
 | rankable | bool | Echoed from parent DM. True iff this row's `value` carries rank/percentile/bucket extras. |
 | has_p_value | bool | Echoed from parent DM. True iff adjusted_p_value/significant carry data. No DM in current KG has p-values. |
 | rank_by_metric | int \| None (optional) | Rank by metric value (1 = highest). Populated only when parent DM rankable=True. |
@@ -157,7 +157,7 @@ resolve_gene → gene_derived_metrics(locus_tags)
 
 - For numeric edge filtering (bucket / percentile / rank / value thresholds), pivot to `genes_by_numeric_metric`. This tool intentionally has no edge-level numeric filters — it is the gene-anchor surface only.
 
-- `not_matched` ≠ no DM signal at all. `not_matched` lists genes that exist in the KG but have zero DM rows AFTER the applied filters. A gene with only boolean DM signal called with `value_kind='numeric'` lands in `not_matched`. Inspect rollup props (`g.numeric_metric_count` etc. via `gene_overview`) for unfiltered availability.
+- `not_matched` ≠ no DM signal at all. `not_matched` lists genes that exist in the KG but have zero DM rows AFTER the applied filters. A gene with only boolean DM signal called with `value_kind='numeric'` lands in `not_matched`. Inspect `gene_overview`'s per-row `derived_metric_count` / `derived_metric_value_kinds` (verbose adds per-kind counts) for unfiltered availability.
 
 - Single organism enforced. Mixing locus_tags from MED4 and NATL2A raises `ValueError`. Call once per organism.
 
@@ -185,7 +185,7 @@ locus_tags must be non-empty (raises ValueError).
 from multiomics_explorer import gene_derived_metrics
 
 result = gene_derived_metrics(locus_tags=...)
-# returns dict with keys: total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics, not_found, not_matched, by_value_kind, by_metric_type, by_metric, by_compartment, by_treatment_type, by_background_factors, by_publication, offset, results
+# returns dict with keys: total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics, not_found, not_matched, by_value_kind, by_metric_type, by_metric, by_compartment, by_treatment_type, by_background_factors, by_publication, returned, offset, truncated, results
 ```
 
 Use package import for bulk data extraction in scripts.

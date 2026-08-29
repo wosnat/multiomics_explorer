@@ -16,7 +16,7 @@ into a cluster's full membership via `genes_in_cluster`.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags (e.g. ['PMM0370', 'PMM0920']). |
-| organism | string \| None | None | Organism name (case-insensitive partial match); inferred from genes if omitted. Single organism enforced. |
+| organism | string \| None | None | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises); inferred from genes if omitted. Single organism enforced. |
 | cluster_type | string \| None | None | Filter by cluster type. Live vocabulary: list_filter_values(filter_type='cluster_type'). Offline examples: 'condition_comparison', 'decay_pattern', 'diel', 'expression_bin', 'genomic_island', 'time_course'. |
 | treatment_type | list[string] \| None | None | Filter by treatment type(s). |
 | background_factors | list[string] \| None | None | Filter by background factors. |
@@ -57,7 +57,7 @@ total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not
 |---|---|---|
 | locus_tag | string | Gene locus tag (e.g. 'PMM0370') |
 | gene_name | string \| None (optional) | Gene name (e.g. 'cynA') |
-| cluster_id | string | Cluster node ID (e.g. 'cluster:msb4100087:med4:up_n_transport') |
+| cluster_id | string | Cluster node ID (e.g. 'cluster:msb4100087:med4_kmeans_nstarvation:8') |
 | cluster_name | string | Cluster name (e.g. 'MED4 cluster 1 (up, N transport)') |
 | cluster_type | string | Cluster category (e.g. 'condition_comparison') |
 | membership_score | float \| None (optional) | Fuzzy membership score (null for K-means) |
@@ -126,7 +126,7 @@ gene_clusters_by_gene → differential_expression_by_gene (check expression for 
 
 - Single organism enforced — don't mix PMM (MED4) and PMT (MIT9313) locus tags in one call
 
-- not_matched means the gene exists but has no cluster membership — it is NOT the same as not_found (gene doesn't exist in KG)
+- not_matched means the gene exists but has no cluster membership (after the cluster_type / treatment_type / analysis filters) — it is NOT the same as not_found (gene doesn't exist in KG). Both are flat locus_tag lists; genes_with_clusters / genes_without_clusters are the counts. See docs://guide/conventions for the shared not_found / not_matched semantics.
 
 - Results are gene × cluster rows — a gene in 2 clusters appears twice. Use genes_with_clusters for the deduplicated count.
 
@@ -140,7 +140,9 @@ gene_clusters_by_gene(locus_tags=['PMM0370']) — always a list
 
 - Valid `cluster_type` values come from the KG vocabulary — enumerate them with list_filter_values(filter_type='cluster_type') (currently six: time_course, diel, condition_comparison, expression_bin, decay_pattern, genomic_island). The list quoted in the parameter description is documentation, not the source.
 
-- `treatment_type` is never empty: a characterization analysis with no perturbation names what was measured (`rna_decay` for the mRNA-decay clusters, `genomic_analysis` for sequence-predicted genomic-island sets). Filter on those values to isolate characterization analyses; `background_factors` may be `[]` on a sequence-only analysis.
+- `treatment_type` is never empty: a characterization analysis with no perturbation names what was measured (`rna_decay` for the mRNA-decay clusters, `genomic_analysis` for sequence-predicted genomic-island sets). Filter on those values to isolate characterization analyses; `background_factors` is `[]` only on the genomic_island analyses.
+
+- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (a made-up suffix on a real value, say) returns 0 rows, never an error. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. A filter with a misspelled value here silently drops every membership row.
 
 ## Package import equivalent
 
@@ -148,7 +150,7 @@ gene_clusters_by_gene(locus_tags=['PMM0370']) — always a list
 from multiomics_explorer import gene_clusters_by_gene
 
 result = gene_clusters_by_gene(locus_tags=...)
-# returns dict with keys: total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not_found, not_matched, by_cluster_type, by_treatment_type, by_background_factors, by_analysis, offset, results
+# returns dict with keys: total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not_found, not_matched, by_cluster_type, by_treatment_type, by_background_factors, by_analysis, returned, offset, truncated, results
 ```
 
 Use package import for bulk data extraction in scripts.

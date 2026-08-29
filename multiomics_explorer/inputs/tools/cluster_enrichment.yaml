@@ -18,9 +18,9 @@ examples:
 
   - title: "InterPro enrichment requires interpro_type"
     call: cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="interpro", interpro_type="HOMOLOGOUS_SUPERFAMILY", level=0)
+    illustrative: true
+    note: "Same requirement as pathway_enrichment: ontology='interpro' without interpro_type raises (InterPro types size too differently to pool). Hand-written response — this call currently fails on the MCP surface (non-finite floats in the analysis's cluster description properties; a tool fix is pending)."
     response: |
-      # Same requirement as pathway_enrichment: ontology='interpro' without
-      # interpro_type raises (InterPro types size too differently to pool).
       {"trust_axes": {"interpro": ["sources", "evidence"]}, "interpro_type": "HOMOLOGOUS_SUPERFAMILY", "...": "..."}
 
   - title: "MEROPS enrichment restricted to peptidase calls (call_class)"
@@ -47,15 +47,20 @@ response_notes:
   - title: "`informative_only` filter"
     body: |
       When True (default), exclude ontology terms flagged uninformative
-      in the KG (e.g. KEGG map00001 'metabolic pathways', GO root
-      go:0008150). Term-side filter — never restricts the gene set,
-      background, or DE inputs. Pass False to include uninformative terms;
-      per-row `is_informative` still surfaces in either mode.
+      in the KG (e.g. GO root go:0008150, catch-all Cyanorak / TIGR roles,
+      KEGG KOs named "uncharacterized protein"). Term-side filter — never
+      restricts the gene set, background, or cluster membership. Pass
+      False to include uninformative terms; per-row `is_informative` still
+      surfaces in either mode. KEGG is flagged at the KO level only:
+      pathway maps — including the global map `kegg.pathway:ko01100` — are
+      not flagged, so use `max_gene_set_size` to keep global maps out of a
+      pathway-level test.
 
       See `docs://analysis/enrichment` (section "Informative-only filtering")
       for rationale, Fisher denominator behavior, and opt-out guidance.
 
 chaining:
+  - "Cluster-anchored ORA: cluster_enrichment tests each cluster of one clustering analysis; the sibling pathway_enrichment runs the same Fisher + BH test over DE gene sets (experiment × timepoint × direction). Same row/envelope shape."
   - "list_clustering_analyses → cluster_enrichment"
   - "ontology_landscape → cluster_enrichment"
   - "cluster_enrichment → gene_overview"
@@ -65,6 +70,7 @@ chaining:
   - "See `docs://analysis/annotation_evidence` for the trust-axis registry and rank-vs-filter guidance for evidence_score."
 
 mistakes:
+  - "cluster_enrichment is cluster-anchored (needs `analysis_id`); for DE gene sets use `pathway_enrichment(experiment_ids=...)`. `enrichment_params` (incl. `term2gene_row_count`) echoes what was tested, same as pathway_enrichment."
   - "[ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions."
   - "Default background is `cluster_union` (union of all clustered genes, including size-filtered). Use `'organism'` only when clustering covers the full genome."
   - "BH correction is per-cluster, NOT across clusters."

@@ -117,19 +117,146 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
 ```
 
 ```example-response
-total_matching: 20  # 18 quantifies + 2 flags
-by_evidence_kind: [{quantifies: 18}, {flags: 2}]
-by_detection_status: [{not_detected: 12}, {detected: 3}, {sporadic: 3}]  # numeric subset
-by_flag_value: [{false: 2}]  # boolean subset — 70% of all PEP measurements are tested-absent
-by_organism: [4 organisms — MED4, MIT9301, MIT9303, NATL2A]
-by_compartment: [{whole_cell: 12}, {extracellular: 8}]
-by_assay: [14 assays — every numeric and boolean assay on the metabolomics layer covers PEP]
-metabolites_with_evidence: ["kegg.compound:C00074"]
-metabolites_without_evidence: []
-metabolites_matched: 1
-not_found: []
-not_matched: []
-results: [polymorphic — numeric rows carry value/detection_status/timepoint*; boolean rows carry flag_value/n_positive]  # default limit=5
+{
+  "results": [
+    {
+      "metabolite_id": "kegg.compound:C00074",
+      "metabolite_name": "Phosphoenolpyruvate",
+      "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_0801_extracellular:extracellular_concentration",
+      "assay_name": "MIT0801 extracellular metabolite concentration (mol/cell)",
+      "evidence_kind": "quantifies",
+      "n_replicates": 1,
+      "metric_type": "extracellular_concentration",
+      "condition_label": "replete_light_10",
+      "organism_name": "Prochlorococcus MIT0801",
+      "compartment": "extracellular",
+      "experiment_id": "10.1128/msystems.01261-22_kujawinski_metabolomics_0801_extracellular",
+      "publication_doi": "10.1128/msystems.01261-22",
+      "value": 0.0,
+      "value_sd": 0.0,
+      "metric_bucket": "mid",
+      "metric_percentile": 68.13186813186813,
+      "rank_by_metric": null,
+      "detection_status": "not_detected",
+      "timepoint": null,
+      "timepoint_hours": null,
+      "timepoint_order": null,
+      "growth_phase": null,
+      "flag_value": null,
+      "n_positive": null,
+      "assay_field_description": null,
+      "replicate_values": null,
+      "experimental_context": null
+    },
+    {
+      "metabolite_id": "kegg.compound:C00074",
+      "metabolite_name": "Phosphoenolpyruvate",
+      "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_0801_intracellular:cellular_concentration",
+      "assay_name": "MIT0801 intracellular metabolite concentration (mol/cell)",
+      "evidence_kind": "quantifies",
+      "n_replicates": 1,
+      "metric_type": "cellular_concentration",
+      "condition_label": "replete_light_10",
+      "organism_name": "Prochlorococcus MIT0801",
+      "compartment": "whole_cell",
+      "experiment_id": "10.1128/msystems.01261-22_kujawinski_metabolomics_0801_whole_cell",
+      "publication_doi": "10.1128/msystems.01261-22",
+      "value": 0.0,
+      "value_sd": 0.0,
+      "metric_bucket": "mid",
+      "metric_percentile": 67.03296703296704,
+      "rank_by_metric": null,
+      "detection_status": "not_detected",
+      "timepoint": null,
+      "timepoint_hours": null,
+      "timepoint_order": null,
+      "growth_phase": null,
+      "flag_value": null,
+      "n_positive": null,
+      "assay_field_description": null,
+      "replicate_values": null,
+      "experimental_context": null
+    },
+    {
+      "metabolite_id": "kegg.compound:C00074",
+      "metabolite_name": "Phosphoenolpyruvate",
+      "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_extracellular:extracellular_concentration",
+      "assay_name": "MIT9301 extracellular metabolite concentration (mol/cell)",
+      "evidence_kind": "quantifies",
+      "n_replicates": 1,
+      "metric_type": "extracellular_concentration",
+      "condition_label": "P_limited_light_50",
+      "organism_name": "Prochlorococcus MIT9301",
+      "compartment": "extracellular",
+      "experiment_id": "10.1128/msystems.01261-22_kujawinski_metabolomics_9301_extracellular",
+      "publication_doi": "10.1128/msystems.01261-22",
+      "value": 0.0,
+      "value_sd": 0.0,
+      "metric_bucket": "mid",
+      "metric_percentile": 71.27272727272727,
+      "rank_by_metric": null,
+      "detection_status": "not_detected",
+      "timepoint": null,
+      "timepoint_hours": null,
+      "timepoint_order": null,
+      "growth_phase": null,
+      "flag_value": null,
+      "n_positive": null,
+      "assay_field_description": null,
+      "replicate_values": null,
+      "experimental_context": null
+    },
+    ...
+  ],
+  "total_matching": 20,
+  "by_evidence_kind": [{"evidence_kind": "quantifies", "count": 18}, {"evidence_kind": "flags", "count": 2}],
+  "by_organism": [
+    {"organism_name": "Prochlorococcus MIT9313", "count": 8},
+    {"organism_name": "Prochlorococcus MIT9301", "count": 8},
+    {"organism_name": "Prochlorococcus MIT0801", "count": 2},
+    {"organism_name": "Prochlorococcus MIT9303", "count": 2}
+  ],
+  "by_compartment": [{"compartment": "whole_cell", "count": 14}, {"compartment": "extracellular", "count": 6}],
+  "by_assay": [
+    {
+      "assay_id": "metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration",
+      "count": 4
+    },
+    {
+      "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_extracellular:extracellular_concentration",
+      "count": 3
+    },
+    {
+      "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration",
+      "count": 3
+    },
+    {
+      "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9313_extracellular:extracellular_concentration",
+      "count": 2
+    },
+    {
+      "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9313_intracellular:cellular_concentration",
+      "count": 2
+    },
+    ...
+  ],
+  "by_detection_status": [
+    {"detection_status": "not_detected", "count": 12},
+    {"detection_status": "detected", "count": 3},
+    {"detection_status": "sporadic", "count": 3}
+  ],
+  "by_flag_value": [{"flag_value": false, "count": 2}],
+  "metabolites_with_evidence": ["kegg.compound:C00074"],
+  "metabolites_without_evidence": [],
+  "metabolites_matched": 1,
+  "not_found": [],
+  "not_matched": [],
+  "resolved_aliases": {},
+  "warnings": [],
+  "returned": 5,
+  "truncated": true,
+  "offset": 0
+}
 ```
 
 ### Example 2: Numeric arm only — quantifies edges
@@ -172,6 +299,8 @@ assays_by_metabolite → metabolites_by_flags_assay(assay_ids=[...], metabolite_
 ```
 
 ## Common mistakes
+
+- Metabolite-anchored reverse lookup over BOTH arms. Siblings: `metabolites_by_quantifies_assay` (assay-anchored, numeric arm, rankable filters) and `metabolites_by_flags_assay` (assay-anchored, boolean arm) — drill back to them with the `assay_id`s found here.
 
 ```mistake
 Filter out value=0 / flag_value=false rows assuming they are noise.
@@ -261,8 +390,6 @@ layer. See `docs://guide/conventions`.
 
 ```
 
-- See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for the not_found vs not_matched convention across batch tools.
-
 ```mistake
 assays_by_metabolite(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'
 ```
@@ -281,13 +408,15 @@ in the form you passed.
 
 ```
 
+- See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for the not_found vs not_matched convention across batch tools.
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import assays_by_metabolite
 
 result = assays_by_metabolite(metabolite_ids=...)
-# returns dict with keys: total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_detection_status, by_flag_value, metabolites_with_evidence, metabolites_without_evidence, metabolites_matched, not_found, not_matched, resolved_aliases, warnings, offset, results
+# returns dict with keys: total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_detection_status, by_flag_value, metabolites_with_evidence, metabolites_without_evidence, metabolites_matched, not_found, not_matched, resolved_aliases, warnings, returned, truncated, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

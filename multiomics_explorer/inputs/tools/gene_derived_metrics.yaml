@@ -62,9 +62,9 @@ mistakes:
     `not_matched` ≠ no DM signal at all. `not_matched` lists genes that
     exist in the KG but have zero DM rows AFTER the applied filters. A
     gene with only boolean DM signal called with `value_kind='numeric'`
-    lands in `not_matched`. Inspect rollup props
-    (`g.numeric_metric_count` etc. via `gene_overview`) for unfiltered
-    availability.
+    lands in `not_matched`. Inspect `gene_overview`'s per-row
+    `derived_metric_count` / `derived_metric_value_kinds` (verbose adds
+    per-kind counts) for unfiltered availability.
   - >-
     Single organism enforced. Mixing locus_tags from MED4 and NATL2A
     raises `ValueError`. Call once per organism.

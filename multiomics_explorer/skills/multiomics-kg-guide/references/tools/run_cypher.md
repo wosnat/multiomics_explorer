@@ -38,12 +38,14 @@ run_cypher(query="MATCH (g:Gene) RETURN g.organism_name AS strain, count(g) AS g
 
 ```example-response
 {
-  "returned": 12,
-  "truncated": false,
+  "returned": 25,
+  "truncated": true,
   "warnings": [],
   "results": [
-    {"strain": "Alteromonas macleodii EZ55", "gene_count": 4136},
-    {"strain": "Alteromonas macleodii HOT1A3", "gene_count": 4031}
+    {"strain": "Pseudomonas putida KT2440", "gene_count": 5487},
+    {"strain": "Ruegeria pomeroyi DSS-3", "gene_count": 4368},
+    {"strain": "Alteromonas (MarRef v6)", "gene_count": 4305},
+    ...
   ]
 }
 ```
@@ -65,7 +67,8 @@ run_cypher(query="MATCH (g:Gene)-[:HAS_FUNCTION]->(f:Function) RETURN g.locus_ta
   "returned": 0,
   "truncated": false,
   "warnings": [
-    "One of the relationship types in your query is not available in the database (the missing relationship type is: HAS_FUNCTION)"
+    "One of the labels in your query is not available in the database, make sure you didn't misspell it or that the label ...",
+    "One of the relationship types in your query is not available in the database, make sure you didn't misspell it or tha..."
   ],
   "results": []
 }
@@ -92,7 +95,11 @@ run_cypher(query="MATCH (g:Gene) WHERE g.locus_tag = 'PMM0001' RETURN g")
 
 - No LIMIT in query? One is added automatically at the MCP default (25). Pass limit= to increase or add LIMIT directly in your query.
 
-- Package import returns all four keys: returned, truncated, warnings, results. The build-script comment only shows a subset.
+- Package import returns all four keys: returned, truncated, warnings, results.
+
+- Reserved characters were replaced at KG build time, so string literals must match the stored form: an apostrophe is stored as a caret (`^`) and a pipe as a comma. `WHERE g.product CONTAINS "5'-nucleotidase"` matches nothing — write `CONTAINS '5^-nucleotidase'`. The same applies to search_text on the fulltext tools — search on the surrounding words instead (see docs://guide/conventions).
+
+- Organism names in Cypher must be the exact `preferred_name` / `Gene.organism_name` string ('Prochlorococcus MED4', not 'MED4') — the word-based matching that the MCP tools do on `organism=` is not applied to raw queries. Note that 'Meiothermus ruber' names two OrganismTaxon nodes; join organisms through Gene_belongs_to_organism, never by name.
 
 ## Package import equivalent
 
@@ -100,7 +107,7 @@ run_cypher(query="MATCH (g:Gene) WHERE g.locus_tag = 'PMM0001' RETURN g")
 from multiomics_explorer import run_cypher
 
 result = run_cypher(query=...)
-# returns dict with keys: warnings, results
+# returns dict with keys: returned, truncated, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

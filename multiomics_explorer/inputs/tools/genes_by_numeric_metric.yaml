@@ -13,14 +13,34 @@ examples:
         "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 32}],
         "by_compartment": [{"compartment": "whole_cell", "count": 32}],
         "by_publication": [{"publication_doi": "10.1371/journal.pone.0043432", "count": 32}],
-        "by_experiment": [{"experiment_id": "10.1371/journal.pone.0043432_med4_diel", "count": 32}],
+        "by_experiment": [{"experiment_id": "10.1371/journal.pone.0043432_waldbauer_2012_med4_paired_diel", "count": 32}],
         "by_metric": [
-          {"derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio", "metric_type": "damping_ratio", "name": "Transcript:protein amplitude ratio", "value_kind": "numeric", "count": 32, "rank_min": 1, "rank_max": 32, "value_min": 12.2, "value_q1": 13.7, "value_median": 15.9, "value_q3": 20.5, "value_max": 25.3, "dm_value_min": 0.2, "dm_value_q1": 2.8, "dm_value_median": 4.9, "dm_value_q3": 7.8, "dm_value_max": 25.3}
+          {
+            "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+            "name": "Transcript:protein amplitude ratio",
+            "metric_type": "damping_ratio",
+            "value_kind": "numeric",
+            "count": 32,
+            "value_min": 12.2,
+            "value_q1": 13.7,
+            "value_median": 15.9,
+            "value_q3": 20.5,
+            "value_max": 25.3,
+            "dm_value_min": 0.2,
+            "dm_value_q1": 2.8,
+            "dm_value_median": 4.9,
+            "dm_value_q3": 7.8,
+            "dm_value_max": 25.3,
+            "rank_min": 1,
+            "rank_max": 32
+          }
         ],
         "top_categories": [
           {"gene_category": "Translation", "count": 6},
           {"gene_category": "Carbohydrate metabolism", "count": 5},
-          {"gene_category": "Photosynthesis", "count": 5}
+          {"gene_category": "Photosynthesis", "count": 5},
+          {"gene_category": "Unknown", "count": 3},
+          {"gene_category": "Stress response and adaptation", "count": 2}
         ],
         "genes_per_metric_max": 32,
         "genes_per_metric_median": 32.0,
@@ -31,12 +51,59 @@ examples:
         "not_matched_organism": null,
         "excluded_derived_metrics": [],
         "warnings": [],
-        "returned": 32,
+        "returned": 5,
         "offset": 0,
-        "truncated": false,
+        "truncated": true,
         "results": [
-          {"locus_tag": "PMM1545", "gene_name": "rpsH", "product": "30S ribosomal protein S8", "gene_category": "Translation", "organism_name": "Prochlorococcus MED4", "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio", "name": "Transcript:protein amplitude ratio", "value_kind": "numeric", "rankable": true, "has_p_value": false, "value": 25.3, "rank_by_metric": 1, "metric_percentile": 100.0, "metric_bucket": "top_decile"},
-          {"locus_tag": "PMM0930", "gene_name": "phdB", "product": "pyruvate dehydrogenase E1 component beta subunit", "gene_category": "Carbohydrate metabolism", "organism_name": "Prochlorococcus MED4", "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio", "name": "Transcript:protein amplitude ratio", "value_kind": "numeric", "rankable": true, "has_p_value": false, "value": 23.0, "rank_by_metric": 2, "metric_percentile": 99.68, "metric_bucket": "top_decile"}
+          {
+            "locus_tag": "PMM1545",
+            "gene_name": "rpsH",
+            "product": "30S ribosomal protein S8",
+            "gene_category": "Translation",
+            "organism_name": "Prochlorococcus MED4",
+            "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+            "name": "Transcript:protein amplitude ratio",
+            "value_kind": "numeric",
+            "rankable": true,
+            "has_p_value": false,
+            "value": 25.3,
+            "rank_by_metric": 1,
+            "metric_percentile": 100.0,
+            "metric_bucket": "top_decile"
+          },
+          {
+            "locus_tag": "PMM0930",
+            "gene_name": "phdB",
+            "product": "pyruvate dehydrogenase E1 component beta subunit",
+            "gene_category": "Carbohydrate metabolism",
+            "organism_name": "Prochlorococcus MED4",
+            "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+            "name": "Transcript:protein amplitude ratio",
+            "value_kind": "numeric",
+            "rankable": true,
+            "has_p_value": false,
+            "value": 23.0,
+            "rank_by_metric": 2,
+            "metric_percentile": 99.67845659163987,
+            "metric_bucket": "top_decile"
+          },
+          {
+            "locus_tag": "PMM0161",
+            "gene_name": "gltA",
+            "product": "citrate synthase",
+            "gene_category": "Carbohydrate metabolism",
+            "organism_name": "Prochlorococcus MED4",
+            "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+            "name": "Transcript:protein amplitude ratio",
+            "value_kind": "numeric",
+            "rankable": true,
+            "has_p_value": false,
+            "value": 21.4,
+            "rank_by_metric": 3,
+            "metric_percentile": 99.35691318327974,
+            "metric_bucket": "top_decile"
+          },
+          ...
         ]
       }
 
@@ -48,19 +115,107 @@ examples:
         "total_derived_metrics": 1,
         "total_genes": 32,
         "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 32}],
+        "by_compartment": [{"compartment": "whole_cell", "count": 32}],
+        "by_publication": [{"publication_doi": "10.1371/journal.pone.0043432", "count": 32}],
+        "by_experiment": [{"experiment_id": "10.1371/journal.pone.0043432_waldbauer_2012_med4_paired_diel", "count": 32}],
         "by_metric": [
-          {"derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio", "metric_type": "damping_ratio", "value_kind": "numeric", "count": 32, "value_min": 12.2, "value_max": 25.3, "dm_value_min": 0.2, "dm_value_max": 25.3}
+          {
+            "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+            "name": "Transcript:protein amplitude ratio",
+            "metric_type": "damping_ratio",
+            "value_kind": "numeric",
+            "count": 32,
+            "value_min": 12.2,
+            "value_q1": 13.7,
+            "value_median": 15.9,
+            "value_q3": 20.5,
+            "value_max": 25.3,
+            "dm_value_min": 0.2,
+            "dm_value_q1": 2.8,
+            "dm_value_median": 4.9,
+            "dm_value_q3": 7.8,
+            "dm_value_max": 25.3,
+            "rank_min": 1,
+            "rank_max": 32
+          }
         ],
+        "top_categories": [
+          {"gene_category": "Translation", "count": 6},
+          {"gene_category": "Carbohydrate metabolism", "count": 5},
+          {"gene_category": "Photosynthesis", "count": 5},
+          {"gene_category": "Unknown", "count": 3},
+          {"gene_category": "Stress response and adaptation", "count": 2}
+        ],
+        "genes_per_metric_max": 32,
+        "genes_per_metric_median": 32.0,
+        "not_found_ids": [],
+        "not_matched_ids": [],
+        "not_found_metric_types": [],
         "not_matched_metric_types": ["peak_time_protein_h"],
+        "not_matched_organism": null,
         "excluded_derived_metrics": [
-          {"derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:peak_time_protein_h", "metric_type": "peak_time_protein_h", "rankable": false, "has_p_value": false, "reason": "non-rankable; `bucket` filter does not apply"}
+          {
+            "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:peak_time_protein_h",
+            "metric_type": "peak_time_protein_h",
+            "rankable": false,
+            "has_p_value": false,
+            "reason": "non-rankable; `bucket` filter does not apply"
+          }
         ],
         "warnings": ["1 non-rankable DM(s) excluded by `bucket` filter (peak_time_protein_h)"],
-        "returned": 32,
+        "returned": 5,
         "offset": 0,
-        "truncated": false,
+        "truncated": true,
         "results": [
-          {"locus_tag": "PMM1545", "gene_name": "rpsH", "value": 25.3, "rank_by_metric": 1, "metric_bucket": "top_decile"}
+          {
+            "locus_tag": "PMM1545",
+            "gene_name": "rpsH",
+            "product": "30S ribosomal protein S8",
+            "gene_category": "Translation",
+            "organism_name": "Prochlorococcus MED4",
+            "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+            "name": "Transcript:protein amplitude ratio",
+            "value_kind": "numeric",
+            "rankable": true,
+            "has_p_value": false,
+            "value": 25.3,
+            "rank_by_metric": 1,
+            "metric_percentile": 100.0,
+            "metric_bucket": "top_decile"
+          },
+          {
+            "locus_tag": "PMM0930",
+            "gene_name": "phdB",
+            "product": "pyruvate dehydrogenase E1 component beta subunit",
+            "gene_category": "Carbohydrate metabolism",
+            "organism_name": "Prochlorococcus MED4",
+            "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+            "name": "Transcript:protein amplitude ratio",
+            "value_kind": "numeric",
+            "rankable": true,
+            "has_p_value": false,
+            "value": 23.0,
+            "rank_by_metric": 2,
+            "metric_percentile": 99.67845659163987,
+            "metric_bucket": "top_decile"
+          },
+          {
+            "locus_tag": "PMM0161",
+            "gene_name": "gltA",
+            "product": "citrate synthase",
+            "gene_category": "Carbohydrate metabolism",
+            "organism_name": "Prochlorococcus MED4",
+            "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+            "name": "Transcript:protein amplitude ratio",
+            "value_kind": "numeric",
+            "rankable": true,
+            "has_p_value": false,
+            "value": 21.4,
+            "rank_by_metric": 3,
+            "metric_percentile": 99.35691318327974,
+            "metric_bucket": "top_decile"
+          },
+          ...
         ]
       }
 
@@ -68,29 +223,128 @@ examples:
     call: genes_by_numeric_metric(metric_types=['cell_abundance_biovolume_normalized'], bucket=['top_quartile'])
     response: |
       {
-        "total_matching": 308,
+        "total_matching": 310,
         "total_derived_metrics": 2,
-        "total_genes": 308,
+        "total_genes": 310,
         "by_organism": [
-          {"organism_name": "Prochlorococcus MIT9313", "count": 156},
-          {"organism_name": "Prochlorococcus MIT9312", "count": 152}
+          {"organism_name": "Prochlorococcus MIT9313", "count": 157},
+          {"organism_name": "Prochlorococcus MIT9312", "count": 153}
         ],
-        "by_compartment": [{"compartment": "vesicle", "count": 308}],
+        "by_compartment": [{"compartment": "vesicle", "count": 310}],
+        "by_publication": [{"publication_doi": "10.1111/1462-2920.15834", "count": 310}],
+        "by_experiment": [
+          {"experiment_id": "10.1111/1462-2920.15834_vesicle_proteomics_mit9313", "count": 157},
+          {"experiment_id": "10.1111/1462-2920.15834_vesicle_proteomics_mit9312", "count": 153}
+        ],
         "by_metric": [
-          {"derived_metric_id": "derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized", "metric_type": "cell_abundance_biovolume_normalized", "name": "MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)", "count": 156, "value_kind": "numeric"},
-          {"derived_metric_id": "derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized", "metric_type": "cell_abundance_biovolume_normalized", "name": "MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)", "count": 152, "value_kind": "numeric"}
+          {
+            "derived_metric_id": "derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized",
+            "name": "MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)",
+            "metric_type": "cell_abundance_biovolume_normalized",
+            "value_kind": "numeric",
+            "count": 157,
+            "value_min": 5.09e-08,
+            "value_q1": 5.91e-08,
+            "value_median": 7.03e-08,
+            "value_q3": 8.83e-08,
+            "value_max": 1.15e-07,
+            "dm_value_min": 2.24e-09,
+            "dm_value_q1": 7.48e-09,
+            "dm_value_median": 1.87e-08,
+            "dm_value_q3": 5.09e-08,
+            "dm_value_max": 2.98e-06,
+            "rank_min": 107,
+            "rank_max": 263
+          },
+          {
+            "derived_metric_id": "derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized",
+            "name": "MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)",
+            "metric_type": "cell_abundance_biovolume_normalized",
+            "value_kind": "numeric",
+            "count": 153,
+            "value_min": 2.01e-08,
+            "value_q1": 2.39e-08,
+            "value_median": 2.92e-08,
+            "value_q3": 3.51e-08,
+            "value_max": 4.66e-08,
+            "dm_value_min": 8.85e-10,
+            "dm_value_q1": 3.25e-09,
+            "dm_value_median": 7.67e-09,
+            "dm_value_q3": 2.01e-08,
+            "dm_value_max": 8.02e-07,
+            "rank_min": 103,
+            "rank_max": 255
+          }
         ],
         "top_categories": [
-          {"gene_category": "Translation", "count": 51},
-          {"gene_category": "Unknown", "count": 39},
-          {"gene_category": "Stress response and adaptation", "count": 35}
+          {"gene_category": "Translation", "count": 52},
+          {"gene_category": "Unknown", "count": 41},
+          {"gene_category": "Stress response and adaptation", "count": 34},
+          {"gene_category": "Carbohydrate metabolism", "count": 34},
+          {"gene_category": "Coenzyme metabolism", "count": 24}
         ],
+        "genes_per_metric_max": 157,
+        "genes_per_metric_median": 157.0,
+        "not_found_ids": [],
+        "not_matched_ids": [],
+        "not_found_metric_types": [],
+        "not_matched_metric_types": [],
         "not_matched_organism": null,
+        "excluded_derived_metrics": [],
         "warnings": [],
-        "returned": 308,
-        "truncated": false,
+        "returned": 5,
+        "offset": 0,
+        "truncated": true,
         "results": [
-          {"locus_tag": "PMT9312_1674", "gene_name": "hemF", "organism_name": "Prochlorococcus MIT9312", "value": 4.6e-08, "rank_by_metric": 103, "metric_bucket": "top_quartile"}
+          {
+            "locus_tag": "PMT9312_0062",
+            "gene_name": "accC",
+            "product": "acetyl-CoA carboxylase, biotin carboxylase subunit",
+            "gene_category": "Lipid metabolism",
+            "organism_name": "Prochlorococcus MIT9312",
+            "derived_metric_id": "derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized",
+            "name": "MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)",
+            "value_kind": "numeric",
+            "rankable": true,
+            "has_p_value": false,
+            "value": 4.66e-08,
+            "rank_by_metric": 103,
+            "metric_percentile": 89.96062992125984,
+            "metric_bucket": "top_quartile"
+          },
+          {
+            "locus_tag": "PMT9312_1235",
+            "gene_name": "acrA",
+            "product": "RND efflux pump, MFP subunit, HlyD family",
+            "gene_category": "Transport",
+            "organism_name": "Prochlorococcus MIT9312",
+            "derived_metric_id": "derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized",
+            "name": "MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)",
+            "value_kind": "numeric",
+            "rankable": true,
+            "has_p_value": false,
+            "value": 4.63e-08,
+            "rank_by_metric": 104,
+            "metric_percentile": 89.86220472440945,
+            "metric_bucket": "top_quartile"
+          },
+          {
+            "locus_tag": "PMT9312_1674",
+            "gene_name": "hemF",
+            "product": "coproporphyrinogen-III oxidase",
+            "gene_category": "Coenzyme metabolism",
+            "organism_name": "Prochlorococcus MIT9312",
+            "derived_metric_id": "derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized",
+            "name": "MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)",
+            "value_kind": "numeric",
+            "rankable": true,
+            "has_p_value": false,
+            "value": 4.6e-08,
+            "rank_by_metric": 105,
+            "metric_percentile": 89.76377952755905,
+            "metric_bucket": "top_quartile"
+          },
+          ...
         ]
       }
 
@@ -103,11 +357,44 @@ examples:
         "total_genes": 312,
         "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 312}],
         "by_compartment": [{"compartment": "whole_cell", "count": 312}],
+        "by_publication": [{"publication_doi": "10.1371/journal.pone.0043432", "count": 312}],
+        "by_experiment": [{"experiment_id": "10.1371/journal.pone.0043432_waldbauer_2012_med4_paired_diel", "count": 312}],
         "by_metric": [
-          {"derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio", "metric_type": "damping_ratio", "name": "Transcript:protein amplitude ratio", "count": 312, "value_kind": "numeric", "value_min": 0.2, "value_q1": 2.8, "value_median": 4.9, "value_q3": 7.8, "value_max": 25.3, "dm_value_min": 0.2, "dm_value_max": 25.3}
+          {
+            "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+            "name": "Transcript:protein amplitude ratio",
+            "metric_type": "damping_ratio",
+            "value_kind": "numeric",
+            "count": 312,
+            "value_min": 0.2,
+            "value_q1": 2.8,
+            "value_median": 4.9,
+            "value_q3": 7.8,
+            "value_max": 25.3,
+            "dm_value_min": 0.2,
+            "dm_value_q1": 2.8,
+            "dm_value_median": 4.9,
+            "dm_value_q3": 7.8,
+            "dm_value_max": 25.3,
+            "rank_min": 1,
+            "rank_max": 312
+          }
+        ],
+        "top_categories": [
+          {"gene_category": "Translation", "count": 47},
+          {"gene_category": "Amino acid metabolism", "count": 30},
+          {"gene_category": "Unknown", "count": 30},
+          {"gene_category": "Photosynthesis", "count": 29},
+          {"gene_category": "Carbohydrate metabolism", "count": 28}
         ],
         "genes_per_metric_max": 312,
         "genes_per_metric_median": 312.0,
+        "not_found_ids": [],
+        "not_matched_ids": [],
+        "not_found_metric_types": [],
+        "not_matched_metric_types": [],
+        "not_matched_organism": null,
+        "excluded_derived_metrics": [],
         "warnings": [],
         "returned": 0,
         "offset": 0,

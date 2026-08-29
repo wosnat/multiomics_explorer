@@ -48,7 +48,7 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 | Property | Type | Meaning |
 |---|---|---|
-| `code` | string |  |
+| `code` | string | source-database short code (COG one-letter category, Cyanorak / TIGR numeric role code) — the un-prefixed tail of `id` |
 | `gene_count` | int | genes annotated to the term — subtree-inclusive on hierarchical labels, direct on flat ones |
 | `id` | string | term ID as used in `term_ids=[...]` (self-prefixed CURIE) |
 | `level` | int | hierarchy depth, 0 = root / broadest |
@@ -58,9 +58,12 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 `ontology_term_details(verbose=True)` returns every property as `properties`; a compact column that is missing on the node is absent, not null (`docs://guide/conventions`).
 
-## Controlled vocabularies
+## Applicable filter types
 
-Values: see `list_filter_values(filter_type=..., ontology='cog_category')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
+- `evidence` — `list_filter_values(filter_type="evidence", ontology="cog_category")`
+- `sources` — `list_filter_values(filter_type="sources", ontology="cog_category")`
+
+Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="cog_category")`) lists which comparable axes the gene edge carries.
 
 ## Interpretation
 
@@ -88,7 +91,7 @@ caveat.
 
 ## Typical questions
 
-- What is the COG category composition of MED4 vs MIT9313?
+- What is the COG category composition of MED4 vs MIT9313? — `genes_by_ontology(ontology='cog_category', organism='MED4', level=0, summary=True)`
 - Which COG categories are over-represented in the darkness-responsive cluster?
 - How many genes in this organism have no functional category beyond `S`?
 

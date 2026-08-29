@@ -22,12 +22,15 @@ compact `evidence` of `homology` (direct sequence hit) or
 `family_inferred` (eggNOG only) and the fullest trust surface in the KG:
 `evidence_score` in [0, 1], `tier`, and verbose native detail
 (`confidence_score`, `source_agreement`, `pfam_support`, `go_support`,
-`identity`, `qcov`, `evalue`, `consensus_n`). A gene is attached at every
-level of its lineage; `attachment_depth='most_specific'` marks the deepest
-attachment and `'superseded'` the ancestors, which are less specific, not
-wrong. Families also bridge *out* to the Pfam domains and GO terms that
-characterise them (composition, with `curated_tcids` naming the curated
-members behind each link).
+`identity`, `qcov`, `evalue`, `consensus_n`). A gene is attached only
+where a source placed it — at family, subfamily or specificity level
+(levels 2-4; a handful at subclass level 1; never at a class root). Each
+attachment carries `attachment_depth`: `superseded` means the same gene
+also has a deeper attachment below this node (the ancestor is less
+specific, not wrong); `most_specific` marks every attachment with no
+deeper one. Families also bridge *out* to the Pfam domains and GO terms
+that characterise them (composition, with `curated_tcids` naming the
+curated members behind each link).
 
 ## Identifier form
 
@@ -41,13 +44,15 @@ Node `tcdb_id` holds the bare number, `tc_class_id` the class, and
 
 Strict five-level tree via `Tcdb_family_is_a_tcdb_family`, `level` 0-4
 with `level_kind` `tc_class` → `tc_subclass` → `tc_family` →
-`tc_subfamily` → `tc_specificity`. `gene_count` / `organism_count` are
-subtree-inclusive and, because every gene is attached along its whole
-lineage, they also equal the attached-gene count; `direct_gene_count` is
-node-local. `member_count` is TCDB's own family size, `metabolite_count`
-the size of the family's substrate set. The ABC superfamily `tcdb:3.A.1`
-has dozens of subfamilies and a very large substrate set — most
-"transports everything" artefacts trace to it.
+`tc_subfamily` → `tc_specificity`. Attachments sit at levels 1-4 only
+(three at level 1, ~35k at family level 2, ~16k at subfamily level 3,
+~4k at specificity level 4). `gene_count` / `organism_count` are
+subtree-inclusive rollups, so a class or subclass reports thousands of
+genes while its `direct_gene_count` is 0 — the seven class roots have no
+attachments at all. `member_count` is TCDB's own family size,
+`metabolite_count` the size of the family's substrate set. The ABC
+superfamily `tcdb:3.A.1` has 55 direct children and a very large
+substrate set — most "transports everything" artefacts trace to it.
 
 ## Graph shape (from the registry)
 
@@ -75,21 +80,26 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 | `gene_count` | int | genes annotated to the term — subtree-inclusive on hierarchical labels, direct on flat ones |
 | `id` | string | term ID as used in `term_ids=[...]` (self-prefixed CURIE) |
 | `level` | int | hierarchy depth, 0 = root / broadest |
-| `level_kind` | string | what a level means in this ontology (see the vocabulary below) |
+| `level_kind` | string | what a level means in this ontology (e.g. `tc_family`, `pathway`) — read values via `list_filter_values` |
 | `member_count` | int | upstream family size (source-database members), not KG genes |
-| `metabolite_count` | int |  |
+| `metabolite_count` | int | distinct substrates reachable via `Tcdb_family_transports_metabolite` (rolled up over the subtree, so it grows toward the root) — on KEGG, metabolites in the pathway |
 | `name` | string | term name (what `search_ontology` indexes) |
 | `organism_count` | int | organisms with at least one gene annotated to the term (subtree-inclusive where `gene_count` is) |
 | `preferred_id` | string | same value as `id` |
-| `superfamily` | string |  |
-| `tc_class_id` | string |  |
-| `tcdb_id` | string |  |
+| `superfamily` | string | TCDB superfamily name the family belongs to, where TCDB assigns one (sparse) |
+| `tc_class_id` | string | CURIE of the level-0 TC class this node sits under (e.g. `tcdb:3`) — for grouping without walking the hierarchy |
+| `tcdb_id` | string | bare TC number (e.g. `3.A.1.14`); `id` is the `tcdb:` CURIE |
 
 `ontology_term_details(verbose=True)` returns every property as `properties`; a compact column that is missing on the node is absent, not null (`docs://guide/conventions`).
 
-## Controlled vocabularies
+## Applicable filter types
 
-Values: see `list_filter_values(filter_type=..., ontology='tcdb')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
+- `evidence` — `list_filter_values(filter_type="evidence", ontology="tcdb")`
+- `sources` — `list_filter_values(filter_type="sources", ontology="tcdb")`
+- `attachment_depth` — `list_filter_values(filter_type="attachment_depth", ontology="tcdb")`
+- `link_kinds` — `list_filter_values(filter_type="link_kinds")`
+
+Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="tcdb")`) lists which comparable axes the gene edge carries.
 
 ## Interpretation
 
@@ -98,12 +108,19 @@ the gene × family call is (rank, never threshold — `min_evidence_score`
 exists but 0 is an uncorroborated hit, not an absent call); `tier` and
 `source_agreement` say whether DIAMOND and eggNOG agree; `pfam_support`
 / `go_support` say whether the family's own Pfam/GO composition is
-present on the gene. For "what does this gene transport" go through
+present on the gene. `most_specific` is per attachment, not per gene: a
+gene with hits in several sibling subfamilies keeps them all
+(`PMM0392` has seven `most_specific` subfamilies under `tcdb:3.A.1`
+plus the superfamily itself as `superseded`; 9,045 of 30,547 TCDB genes
+carry more than one). For "what does this gene transport" go through
 `metabolites_by_gene`; for "which genes could transport X" go through
 `genes_by_metabolite` — the family-anchored route via `genes_by_ontology`
 misses cross-family substrate hits. Leaf mode on `gene_ontology_terms`
 returns only `most_specific` attachments; pass `include_superseded=True`
-to see the ancestors.
+to see the ancestors. When `genes_by_ontology` rolls attachments up to a
+target level and two edges tie on the rank key, the deeper attachment
+wins, so a rollup row never reports a `superseded` ancestor edge over an
+equally scored `most_specific` descendant.
 
 ## Informativeness rule
 
@@ -116,6 +133,8 @@ superfamily behave as catch-alls by size; enrich at `level=2` (family) or
 - `superseded` means the gene is also attached deeper — it is a real
   annotation, just not the gene's most specific one. Counting genes
   across levels without the leaf predicate multiplies them.
+- "The most specific family" is usually "families" — expect several
+  `most_specific` rows per gene and report them as a set.
 - A gene whose deepest attachment is a lumping superfamily reads
   `transport_substrate_resolution='family_inferred'` on `gene_overview`:
   its substrate breadth is reachability, not capability.
@@ -127,10 +146,10 @@ superfamily behave as catch-alls by size; enrich at `level=2` (family) or
 
 ## Typical questions
 
-- Which ABC-transporter subfamilies does MED4 carry, and how corroborated is each call?
-- What is the most specific TCDB family for `PMM0392`, and what does that family transport?
-- Which Pfam domains and GO terms characterise `tcdb:3.A.1`, and how many children does it have?
-- Which transporter families are enriched among genes up under phosphorus limitation, restricted to homology-evidenced calls?
+- Which ABC-transporter subfamilies does MED4 carry, and how corroborated is each call? — `genes_by_ontology(ontology='tcdb', organism='MED4', term_ids=['tcdb:3.A.1'], level=3, verbose=True)`
+- What are the most specific TCDB families for `PMM0392`, and what do they transport? — `gene_ontology_terms(locus_tags=['PMM0392'], organism='MED4', ontology=['tcdb'])` then `metabolites_by_gene(locus_tags=['PMM0392'], organism='MED4')`
+- Which Pfam domains and GO terms characterise `tcdb:3.A.1`, and how many children does it have? — `ontology_term_details(term_ids=['tcdb:3.A.1'])`
+- Which transporter families are enriched among genes up under phosphorus limitation, restricted to homology-evidenced calls? — `pathway_enrichment(..., ontology='tcdb', level=2, direction='up', evidence=['homology'])`
 
 ## Tools
 

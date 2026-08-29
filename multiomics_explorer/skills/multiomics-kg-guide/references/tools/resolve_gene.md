@@ -4,14 +4,14 @@
 
 Resolve a gene identifier (locus_tag, gene name, old locus_tag, or RefSeq protein ID) to matching Gene nodes. Matching is case-insensitive.
 
-Routing: feed returned `locus_tag`s into `gene_overview` (data-availability triage), `gene_details` (full properties), `gene_homologs`, or `gene_ontology_terms`. The optional `organism` filter is a case-insensitive substring on `organism_name`.
+Routing: feed returned `locus_tag`s into `gene_overview` (data-availability triage), `gene_details` (full properties), `gene_homologs`, or `gene_ontology_terms`. The optional `organism` filter is a word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word matches every strain).
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | identifier | string | — | Gene identifier (case-insensitive) — locus_tag (e.g. 'PMM0001'), gene name (e.g. 'dnaN'), old locus tag, or RefSeq protein ID. |
-| organism | string \| None | None | Filter by organism (case-insensitive partial match). E.g. 'MED4', 'Prochlorococcus MED4'. |
+| organism | string \| None | None | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word like 'Alteromonas' matches every strain). E.g. 'MED4', 'Prochlorococcus MED4'. |
 | limit | int | 5 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
 
@@ -53,10 +53,15 @@ resolve_gene(identifier="PMM0001")
   "total_matching": 1,
   "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
   "returned": 1,
-  "truncated": false,
   "offset": 0,
+  "truncated": false,
   "results": [
-    {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_name": "Prochlorococcus MED4"}
+    {
+      "locus_tag": "PMM0001",
+      "gene_name": "dnaN",
+      "product": "DNA polymerase III, beta subunit",
+      "organism_name": "Prochlorococcus MED4"
+    }
   ]
 }
 ```
@@ -69,14 +74,37 @@ resolve_gene(identifier="dnaN")
 
 ```example-response
 {
-  "total_matching": 15,
-  "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}, {"organism_name": "Prochlorococcus MIT9312", "count": 1}, ...],
+  "total_matching": 43,
+  "by_organism": [
+    {"organism_name": "Alteromonas (MarRef v6)", "count": 1},
+    {"organism_name": "Alteromonas macleodii AD45", "count": 1},
+    {"organism_name": "Alteromonas macleodii ATCC27126", "count": 1},
+    {"organism_name": "Alteromonas macleodii BGP6", "count": 1},
+    {"organism_name": "Alteromonas macleodii BS11", "count": 1},
+    ...
+  ],
   "returned": 5,
-  "truncated": true,
   "offset": 0,
+  "truncated": true,
   "results": [
-    {"locus_tag": "PMM0001", "gene_name": "dnaN", ...},
-    {"locus_tag": "PMT9312_0001", "gene_name": "dnaN", ...},
+    {
+      "locus_tag": "DEH24_01275",
+      "gene_name": "dnaN",
+      "product": "DNA polymerase III subunit beta",
+      "organism_name": "Alteromonas (MarRef v6)"
+    },
+    {
+      "locus_tag": "AMBAS45_00010",
+      "gene_name": "dnaN",
+      "product": "DNA polymerase III subunit beta",
+      "organism_name": "Alteromonas macleodii AD45"
+    },
+    {
+      "locus_tag": "MASE_00010",
+      "gene_name": "dnaN",
+      "product": "DNA polymerase III subunit beta",
+      "organism_name": "Alteromonas macleodii ATCC27126"
+    },
     ...
   ]
 }
@@ -94,8 +122,10 @@ resolve_gene(identifier="dnaN", organism="MED4")
 Step 1: resolve_gene(identifier="psbA")
         → collect locus_tags from results
 
-Step 2: gene_overview(locus_tags=["PMM1070", "PMT9312_1073", ...])
+Step 2: gene_overview(locus_tags=["PMM0223", "PMT9312_0225", ...])
         → compare function and data availability across organisms
+        (PMM0223 / PMT9312_0225 are the MED4 / MIT9312 psbA copies;
+        psbA is multi-copy in many strains, so expect several rows per organism)
 ```
 
 ## Chaining patterns
@@ -108,9 +138,15 @@ resolve_gene → gene_ontology_terms
 
 ## Common mistakes
 
+- Sibling tools: resolve_gene answers 'which node is this identifier?' (locus_tag / gene_name / alias → gene rows, no annotation payload). For 'what do I know about this gene' use gene_overview(locus_tags=[...]); for 'which genes do X' use genes_by_function(search_text=...).
+
 - Case-insensitive matching: 'pmm0001', 'PMM0001', and 'Pmm0001' all work
 
-- The organism filter uses partial matching — 'MED4' and 'Prochlorococcus MED4' both work
+- The organism filter is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works, as does 'Prochlorococcus MED4'. A genus word alone ('Prochlorococcus') matches every strain of that genus — here that just widens the result set (this tool never raises on ambiguity; the single-organism expression tools do).
+
+- Two OrganismTaxon nodes share the name 'Meiothermus ruber' (a genome strain and a gene-less treatment taxon). organism='Meiothermus ruber' only ever returns genes of the genome strain — the treatment taxon has none — so the duplicate is harmless here, but do not use the name as a join key across list_organisms rows.
+
+- not_found is not reported — an identifier with no match simply yields total_matching=0 and results=[]. See docs://guide/conventions for the not_found / not_matched shapes on batch tools.
 
 ```mistake
 genes_by_function(search_text='PMM0001')  # wrong tool for ID lookup
@@ -126,7 +162,7 @@ resolve_gene(identifier='PMM0001')  # exact identity resolution
 from multiomics_explorer import resolve_gene
 
 result = resolve_gene(identifier=...)
-# returns dict with keys: total_matching, by_organism, offset, results
+# returns dict with keys: total_matching, by_organism, returned, offset, truncated, results
 ```
 
 Use package import for bulk data extraction in scripts.

@@ -6,16 +6,120 @@ examples:
   - title: Canonical drill-down — MIT9313 chitosan rankable assay
     call: metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration"])
     response: |
-      total_matching: 64
-      by_detection_status: [{detected: 27}, {sporadic: 30}, {not_detected: 7}]
-      by_metric_bucket: [{mid: 32}, {low: 16}, {top_quartile: 9}, {top_decile: 7}]
-      by_assay: [{assay_id: "metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration", count: 64}]
-      by_compartment: [{whole_cell: 64}]
-      by_organism: [{Prochlorococcus MIT9313: 64}]
-      excluded_assays: []
-      warnings: []
-      not_found: {assay_ids: [], metabolite_ids: [], experiment_ids: [], publication_doi: []}
-      results: [F6P top_decile rank 1-3, Citrate top_decile rank 4-5, ...]  # default limit=5
+      {
+        "results": [
+          {
+            "metabolite_id": "kegg.compound:C00085",
+            "name": "D-Fructose 6-phosphate",
+            "kegg_compound_id": "C00085",
+            "value": 0.4465,
+            "value_sd": 0.0643467170879758,
+            "n_replicates": 2,
+            "n_non_zero": 2,
+            "metric_type": "cellular_concentration",
+            "metric_bucket": "top_decile",
+            "metric_percentile": 100.0,
+            "rank_by_metric": 1,
+            "detection_status": "detected",
+            "timepoint": "6 days",
+            "timepoint_hours": 144.0,
+            "timepoint_order": 2,
+            "growth_phase": null,
+            "condition_label": "control",
+            "assay_id": "metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration",
+            "organism_name": "Prochlorococcus MIT9313",
+            "compartment": "whole_cell"
+          },
+          {
+            "metabolite_id": "kegg.compound:C00085",
+            "name": "D-Fructose 6-phosphate",
+            "kegg_compound_id": "C00085",
+            "value": 0.289,
+            "value_sd": 0.26416093579482947,
+            "n_replicates": 3,
+            "n_non_zero": 2,
+            "metric_type": "cellular_concentration",
+            "metric_bucket": "top_decile",
+            "metric_percentile": 98.41269841269842,
+            "rank_by_metric": 2,
+            "detection_status": "sporadic",
+            "timepoint": "4 days",
+            "timepoint_hours": 96.0,
+            "timepoint_order": 1,
+            "growth_phase": null,
+            "condition_label": "control",
+            "assay_id": "metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration",
+            "organism_name": "Prochlorococcus MIT9313",
+            "compartment": "whole_cell"
+          },
+          {
+            "metabolite_id": "kegg.compound:C00085",
+            "name": "D-Fructose 6-phosphate",
+            "kegg_compound_id": "C00085",
+            "value": 0.2385,
+            "value_sd": 0.03747665940288703,
+            "n_replicates": 2,
+            "n_non_zero": 2,
+            "metric_type": "cellular_concentration",
+            "metric_bucket": "top_decile",
+            "metric_percentile": 96.82539682539682,
+            "rank_by_metric": 3,
+            "detection_status": "detected",
+            "timepoint": "6 days",
+            "timepoint_hours": 144.0,
+            "timepoint_order": 2,
+            "growth_phase": null,
+            "condition_label": "chitosan",
+            "assay_id": "metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration",
+            "organism_name": "Prochlorococcus MIT9313",
+            "compartment": "whole_cell"
+          },
+          ...
+        ],
+        "total_matching": 64,
+        "by_detection_status": [
+          {"detection_status": "sporadic", "count": 30},
+          {"detection_status": "detected", "count": 27},
+          {"detection_status": "not_detected", "count": 7}
+        ],
+        "by_metric_bucket": [
+          {"bucket": "mid", "count": 32},
+          {"bucket": "low", "count": 16},
+          {"bucket": "top_quartile", "count": 9},
+          {"bucket": "top_decile", "count": 7}
+        ],
+        "by_assay": [
+          {
+            "assay_id": "metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration",
+            "count": 64
+          }
+        ],
+        "by_compartment": [{"compartment": "whole_cell", "count": 64}],
+        "by_organism": [{"organism_name": "Prochlorococcus MIT9313", "count": 64}],
+        "by_metric": [
+          {
+            "assay_id": "metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration",
+            "name": "MIT9313 cellular metabolite concentration (fg/cell)",
+            "metric_type": "",
+            "count": 64,
+            "filtered_value_min": 0.0,
+            "filtered_value_max": 0.4465,
+            "assay_value_min": 0.0,
+            "assay_value_q1": 0.0010333333333333334,
+            "assay_value_median": 0.0046,
+            "assay_value_q3": 0.010866666666666665,
+            "assay_value_max": 0.4465,
+            "rankable": true
+          }
+        ],
+        "excluded_assays": [],
+        "warnings": [],
+        "resolved_aliases": {},
+        "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
+        "returned": 5,
+        "truncated": true,
+        "offset": 0
+      }
 
   - title: Top-decile only (rankable filter applies)
     call: metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration"], metric_bucket=["top_decile"])
@@ -62,6 +166,7 @@ chaining:
   - "metabolites_by_quantifies_assay → metabolites_by_gene(locus_tags=[...], organism=...)  # gene-anchored chemistry context"
 
 mistakes:
+  - "Numeric arm only (`Assay_quantifies_metabolite`). Siblings: `metabolites_by_flags_assay` is the boolean-arm twin (presence flags, no values); `assays_by_metabolite` is the metabolite-anchored reverse lookup over both arms."
   - wrong: "Filter out value=0 / flag_value=false rows assuming they are noise."
     right: |
       These rows are tested-absent — the metabolite was assayed and not found.
@@ -93,7 +198,7 @@ mistakes:
   - wrong: "Apply value_min=0.001 by default to 'clean' the data."
     right: |
       `value_min > 0` strips tested-absent rows (`value=0` /
-      `detection_status='not_detected'`). About 75% of numeric edges are
+      `detection_status='not_detected'`). About 70% of numeric edges are
       not_detected — value_min would discard the majority of measured
       biology. Surface as caller choice, never default-on. See
       `docs://guide/conventions`.
@@ -113,8 +218,6 @@ mistakes:
       Forward-compat surface; values populate without explorer-side code
       change when the upstream backfill lands.
 
-  - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (75% of numeric edges are not_detected, kept by default)."
-
   - wrong: "metabolites_by_quantifies_assay(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'"
     right: |
       Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
@@ -127,3 +230,4 @@ mistakes:
       ALL matching metabolites and appends a `warnings` entry; pass the canonical
       id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
       in the form you passed.
+  - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (about 70% of numeric edges are not_detected, kept by default)."

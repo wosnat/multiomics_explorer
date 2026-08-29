@@ -25,18 +25,24 @@ examples:
                 organisms=["MED4", "MIT9313"])
               → triage: which groups have expression?
 
-      Step 3 (if detail needed): use expression_by_ortholog script
+      Step 3 (if detail needed): genes_by_homolog_group(group_ids=[...], organisms=["MED4"])
+              → member locus_tags per organism, then
+              differential_expression_by_gene(locus_tags=[...], experiment_ids=[...])
+              once per organism for the per-gene rows (or script it — see
+              docs://guide/python_api)
 
 chaining:
   - "search_homolog_groups → differential_expression_by_ortholog"
   - "gene_homologs → differential_expression_by_ortholog"
   - "genes_by_homolog_group (triage) → differential_expression_by_ortholog"
-  - "differential_expression_by_ortholog → scripts/expression_by_ortholog.py (detail)"
+  - "differential_expression_by_ortholog → genes_by_homolog_group(organisms=[...]) → differential_expression_by_gene per organism (per-gene detail behind a group × experiment row; loop it in Python per docs://guide/python_api)"
 
 mistakes:
   - "group_ids must be full IDs with prefix (e.g. 'cyanorak:CK_00000570')"
   - "organisms is a list, not a string — use ['MED4'] not 'MED4'"
   - "This tool does NOT enforce single organism — that is the point"
-  - "Results are group × experiment × timepoint (gene counts), not individual genes. Use the script for per-gene detail."
+  - "Results are group × experiment × timepoint (gene counts), not individual genes. For per-gene detail take the group's members from genes_by_homolog_group and call differential_expression_by_gene once per organism (docs://guide/python_api shows the loop)."
+  - "Diagnostics are suffixed flat lists: `not_found_groups` / `not_matched_groups`, `not_found_organisms` / `not_matched_organisms`, `not_found_experiments` / `not_matched_experiments`. See docs://guide/conventions for the shared not_found / not_matched semantics."
+  - "treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (e.g. 'nitrogen_stress' instead of 'nitrogen') returns 0 rows, never an error. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical."
   - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"
   - "For cross-experiment summarization patterns see `docs://guide/python_api` (Cross-experiment summarization — covers `response_matrix` for gene × treatment-group pivots and `gene_set_compare` for two-set comparisons)."

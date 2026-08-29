@@ -16,7 +16,11 @@ the upstream enzyme record.
 Gene → EC edges are pooled from Cyanorak curation, eggNOG orthology
 transfer, InterProScan and UniProt (`sources[]`), merged into one edge
 per (gene, term) with compact `evidence` — `curated` or `family_inferred`
-— and an `evidence_score` in [0, 1]. Edges are propagated up the
+— and an `evidence_score` in [0, 1]; rung semantics in
+`docs://analysis/annotation_evidence`. Live on this edge type: UniProt-
+and eggNOG-only edges both read `curated` (the eggNOG case is an open
+KG-side ask), InterProScan-only edges read `family_inferred`. Edges are
+propagated up the
 hierarchy: a gene with `ec:1.1.1.1` counts toward `ec:1.1.1.-`,
 `ec:1.1.-.-` and `ec:1.-.-.-`. EC is also the entry point to the
 reaction layer: the KEGG `Reaction` nodes a gene catalyses carry EC
@@ -60,9 +64,9 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 | Property | Type | Meaning |
 |---|---|---|
-| `alternate_name` | list |  |
-| `catalytic_activity` | list |  |
-| `comments` | list |  |
+| `alternate_name` | list | EC alternate enzyme name(s) from the source record |
+| `catalytic_activity` | list | EC reaction text (substrates → products) from the source record |
+| `comments` | list | EC free-text notes from the source record (transferred / deleted entries, caveats) |
 | `direct_gene_count` | int | genes attached to this exact node (not descendants); absent where it would be vacuous |
 | `gene_count` | int | genes annotated to the term — subtree-inclusive on hierarchical labels, direct on flat ones |
 | `id` | string | term ID as used in `term_ids=[...]` (self-prefixed CURIE) |
@@ -73,17 +77,21 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 `ontology_term_details(verbose=True)` returns every property as `properties`; a compact column that is missing on the node is absent, not null (`docs://guide/conventions`).
 
-## Controlled vocabularies
+## Applicable filter types
 
-Values: see `list_filter_values(filter_type=..., ontology='ec')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
+- `evidence` — `list_filter_values(filter_type="evidence", ontology="ec")`
+- `sources` — `list_filter_values(filter_type="sources", ontology="ec")`
+
+Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="ec")`) lists which comparable axes the gene edge carries.
 
 ## Interpretation
 
 Level 3 (full EC) is the interpretable unit for "which enzymes does this
 organism carry"; levels 0-2 are useful for enrichment when full numbers
-are too sparse. `evidence='curated'` edges (Cyanorak / UniProt) beat
-`family_inferred` (eggNOG) — rank by `evidence_score` when two sources
-disagree on the fourth field. An EC number without a KEGG `Reaction` in
+are too sparse. Read `sources` with `evidence`: `curated` backed by
+`uniprot` / `cyanorak` is a reference assertion, `curated` backed by
+`eggnog` alone is an orthology transfer — rank by `evidence_score` when
+two sources disagree on the fourth field. An EC number without a KEGG `Reaction` in
 the chemistry layer is still a valid annotation; the reaction layer is a
 subset of EC space.
 
@@ -103,18 +111,21 @@ No EC node is flagged uninformative — the seven class roots
   attached there because no source resolved the fourth field, not because
   it is "incomplete".
 - InterPro entries link *out* to EC numbers as a `router` bridge
-  (`Interpro_entry_related_to_ec_number`): recall-biased, often ambiguous
-  (`router_ambiguous=True` on the InterPro term). It is a hint to look up
-  the gene's own EC edge, never a function call.
+  (`Interpro_entry_related_to_ec_number`): recall-biased and often
+  ambiguous. `ontology_term_details(verbose=True)` on the InterPro term
+  computes `router_ambiguous` per link (true when the entry routes to
+  more than one target or is not a `FAMILY` entry) — it is not a KG
+  property. A router link is a hint to look up the gene's own EC edge,
+  never a function call.
 - Genes with a `Gene_catalyzes_reaction` edge are a stricter set than
   genes with any EC edge — see `docs://analysis/metabolites`.
 
 ## Typical questions
 
-- Which MED4 genes are annotated to nitrite reductase (`ec:1.7.1.4` / `ec:1.7.2.1`) and with what evidence?
+- Which MED4 genes are annotated to nitrite reductase (`ec:1.7.1.4` / `ec:1.7.2.1`) and with what evidence? — `genes_by_ontology(ontology='ec', organism='MED4', term_ids=['ec:1.7.1.4','ec:1.7.2.1'], verbose=True)`
 - Which enzyme sub-subclasses are enriched among genes up in coculture?
-- What full EC numbers sit under `ec:2.7.7.-` in this KG, and how many organisms carry each?
-- Which InterPro entries route to this EC number, and is the routing ambiguous?
+- What full EC numbers sit under `ec:2.7.7.-` in this KG, and how many organisms carry each? — `ontology_term_details(term_ids=['ec:2.7.7.-'])`
+- Which EC numbers does an InterPro entry route to, and is the routing ambiguous? — `ontology_term_details(term_ids=['interpro:IPR000362'], link_kinds=['router'], verbose=True)`
 
 ## Tools
 

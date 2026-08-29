@@ -6,12 +6,203 @@ examples:
   - title: Mode 1 — gene discovery by pathway (term_ids only)
     call: genes_by_ontology(ontology="go_bp", organism="MED4", term_ids=["go:0006260"])
     response: |
-      {"ontology": "go_bp", "organism_name": "Prochlorococcus MED4", "total_matching": 30, "total_genes": 30, "total_terms": 1, "total_categories": 1, "by_level": [{"level": 6, "n_terms": 1, "n_genes": 30, "row_count": 30}], "top_terms": [{"term_id": "go:0006260", "term_name": "DNA replication", "count": 30}], "n_best_effort_terms": 0, "not_found": [], "wrong_ontology": [], "wrong_level": [], "filtered_out": [], "returned": 5, "truncated": true, "offset": 0, "results": [{"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III", "gene_category": "Replication", "term_id": "go:0006260", "term_name": "DNA replication", "level": 6}]}
+      {
+        "ontology": "go_bp",
+        "organism_name": "Prochlorococcus MED4",
+        "total_matching": 30,
+        "total_genes": 30,
+        "total_terms": 1,
+        "total_categories": 6,
+        "genes_per_term_min": 30,
+        "genes_per_term_median": 30.0,
+        "genes_per_term_max": 30,
+        "terms_per_gene_min": 1,
+        "terms_per_gene_median": 1.0,
+        "terms_per_gene_max": 1,
+        "by_category": [
+          {"category": "Replication and repair", "count": 24},
+          {"category": "Post-translational modification", "count": 2},
+          {"category": "Transcription", "count": 1},
+          {"category": "Transport", "count": 1},
+          {"category": "Coenzyme metabolism", "count": 1},
+          ...
+        ],
+        "by_level": [{"level": 6, "n_terms": 1, "n_genes": 30, "row_count": 30}],
+        "top_terms": [{"term_id": "go:0006260", "term_name": "DNA replication", "count": 30, "is_informative": true}],
+        "n_best_effort_terms": 1,
+        "not_found": [],
+        "wrong_ontology": [],
+        "wrong_level": [],
+        "filtered_out": [],
+        "returned": 30,
+        "offset": 0,
+        "truncated": false,
+        "trust_axes": {"go_bp": ["sources", "evidence", "evidence_score"]},
+        "warnings": [],
+        "filters_applied": {},
+        "skipped_ontologies": [],
+        "by_evidence": [{"count": 30, "evidence": "curated"}],
+        "by_tier": [],
+        "by_sources": [
+          {"count": 18, "source": "cyanorak"},
+          {"count": 13, "source": "uniprot"},
+          {"count": 11, "source": "ncbi"},
+          {"count": 10, "source": "interproscan"},
+          {"count": 5, "source": "eggnog"}
+        ],
+        "by_call_class": [],
+        "evidence_score_stats": {"min": 0.667, "median": 0.667, "max": 1.0, "n_null": 0},
+        "evidence_score_signals": null,
+        "results": [
+          {
+            "locus_tag": "PMM0001",
+            "gene_name": "dnaN",
+            "product": "DNA polymerase III, beta subunit",
+            "gene_category": "Replication and repair",
+            "term_id": "go:0006260",
+            "term_name": "DNA replication",
+            "level": 6,
+            "is_informative": true,
+            "evidence": "curated"
+          },
+          {
+            "locus_tag": "PMM0077",
+            "gene_name": "rarA",
+            "product": "recombination factor",
+            "gene_category": "Replication and repair",
+            "term_id": "go:0006260",
+            "term_name": "DNA replication",
+            "level": 6,
+            "is_informative": true,
+            "evidence": "curated"
+          },
+          {
+            "locus_tag": "PMM0129",
+            "gene_name": "holB",
+            "product": "DNA polymerase III, delta^ subunit",
+            "gene_category": "Replication and repair",
+            "term_id": "go:0006260",
+            "term_name": "DNA replication",
+            "level": 6,
+            "is_informative": true,
+            "evidence": "curated"
+          },
+          ...
+        ]
+      }
 
   - title: Mode 2 — pathway definitions at level N (level only)
     call: genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
     response: |
-      {"ontology": "cyanorak_role", "organism_name": "Prochlorococcus MED4", "total_matching": 1740, "total_genes": 1100, "total_terms": 69, "by_level": [{"level": 1, "n_terms": 69, "n_genes": 1100, "row_count": 1740}], "top_terms": [{"term_id": "cyanorak.role:A.1", "term_name": "...", "count": 120}], "returned": 500, "truncated": true, "results": [...]}
+      {
+        "ontology": "cyanorak_role",
+        "organism_name": "Prochlorococcus MED4",
+        "total_matching": 1761,
+        "total_genes": 1438,
+        "total_terms": 69,
+        "total_categories": 22,
+        "genes_per_term_min": 5,
+        "genes_per_term_median": 14.0,
+        "genes_per_term_max": 340,
+        "terms_per_gene_min": 1,
+        "terms_per_gene_median": 1.0,
+        "terms_per_gene_max": 3,
+        "by_category": [
+          {"category": "Unknown", "count": 333},
+          {"category": "Stress response and adaptation", "count": 197},
+          {"category": "Coenzyme metabolism", "count": 163},
+          {"category": "Translation", "count": 119},
+          {"category": "Amino acid metabolism", "count": 87},
+          ...
+        ],
+        "by_level": [{"level": 1, "n_terms": 69, "n_genes": 1438, "row_count": 1761}],
+        "top_terms": [
+          {
+            "term_id": "cyanorak.role:R.2",
+            "term_name": "Other > Conserved hypothetical proteins",
+            "count": 340,
+            "is_informative": false
+          },
+          {
+            "term_id": "cyanorak.role:D.1",
+            "term_name": "Cellular processes > Adaptation/acclimation to atypical conditions and detoxification",
+            "count": 213,
+            "is_informative": true
+          },
+          {
+            "term_id": "cyanorak.role:B.10",
+            "term_name": "Biosynthesis of cofactors, prosthetic groups, and carriers > Vitamins",
+            "count": 63,
+            "is_informative": true
+          },
+          {
+            "term_id": "cyanorak.role:K.2",
+            "term_name": "Protein synthesis > Ribosomal proteins: synthesis and modification",
+            "count": 61,
+            "is_informative": true
+          },
+          {
+            "term_id": "cyanorak.role:F.1",
+            "term_name": "DNA metabolism > DNA replication, recombination, and repair",
+            "count": 60,
+            "is_informative": true
+          }
+        ],
+        "n_best_effort_terms": 0,
+        "not_found": [],
+        "wrong_ontology": [],
+        "wrong_level": [],
+        "filtered_out": [],
+        "returned": 500,
+        "offset": 0,
+        "truncated": true,
+        "trust_axes": {"cyanorak_role": ["sources", "evidence"]},
+        "warnings": [],
+        "filters_applied": {},
+        "skipped_ontologies": [],
+        "by_evidence": [{"count": 1761, "evidence": "curated"}],
+        "by_tier": [],
+        "by_sources": [{"count": 1761, "source": "cyanorak"}],
+        "by_call_class": [],
+        "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
+        "evidence_score_signals": null,
+        "results": [
+          {
+            "locus_tag": "PMM0107",
+            "gene_name": "aroK",
+            "product": "shikimate kinase",
+            "gene_category": "Amino acid metabolism",
+            "term_id": "cyanorak.role:A.1",
+            "term_name": "Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)",
+            "level": 1,
+            "is_informative": true,
+            "evidence": "curated"
+          },
+          {
+            "locus_tag": "PMM0164",
+            "gene_name": "trpB",
+            "product": "tryptophan synthase, beta subunit",
+            "gene_category": "Amino acid metabolism",
+            "term_id": "cyanorak.role:A.1",
+            "term_name": "Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)",
+            "level": 1,
+            "is_informative": true,
+            "evidence": "curated"
+          },
+          {
+            "locus_tag": "PMM0224",
+            "gene_name": "aroC",
+            "product": "chorismate synthase",
+            "gene_category": "Amino acid metabolism",
+            "term_id": "cyanorak.role:A.1",
+            "term_name": "Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)",
+            "level": 1,
+            "is_informative": true,
+            "evidence": "curated"
+          },
+          ...
+        ]
+      }
 
   - title: Mode 3 — scope rollup to specific pathways (level + term_ids)
     call: genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1, term_ids=["cyanorak.role:A.1", "cyanorak.role:A.2"])
@@ -26,13 +217,92 @@ examples:
     call: genes_by_ontology(ontology="go_bp", organism="MED4", level=1, min_gene_set_size=0, max_gene_set_size=100000)
 
   - title: TCDB family → gene drill-down (with descendant expansion)
-    call: genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:1.A.1"])
+    call: genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:2.A.1"])
+    note: "The family expands DOWN through its subfamilies before binding to genes, and the default size filter applies to the expanded set: a family with fewer than `min_gene_set_size=5` MED4 genes (e.g. `tcdb:1.A.1`, 2 genes) lands in `filtered_out` with 0 rows — pass `min_gene_set_size=1` to see it."
     response: |
-      {"ontology": "tcdb", "organism_name": "Prochlorococcus MED4",
-       "total_matching": 1, "total_genes": 1, "total_terms": 1,
-       "by_level": [{"level": 0, "n_terms": 1, "n_genes": 1, "row_count": 1}],
-       "top_terms": [{"term_id": "tcdb:1.A.1", "term_name": "Voltage-gated Ion Channel (VIC) Superfamily", "count": 1}],
-       "results": [{"locus_tag": "PMM1129", "term_id": "tcdb:1.A.1", "term_name": "Voltage-gated Ion Channel (VIC) Superfamily", "level": 0}]}
+      {
+        "ontology": "tcdb",
+        "organism_name": "Prochlorococcus MED4",
+        "total_matching": 5,
+        "total_genes": 5,
+        "total_terms": 1,
+        "total_categories": 4,
+        "genes_per_term_min": 5,
+        "genes_per_term_median": 5.0,
+        "genes_per_term_max": 5,
+        "terms_per_gene_min": 1,
+        "terms_per_gene_median": 1.0,
+        "terms_per_gene_max": 1,
+        "by_category": [
+          {"category": "Stress response and adaptation", "count": 2},
+          {"category": "Lipid metabolism", "count": 1},
+          {"category": "Carbohydrate metabolism", "count": 1},
+          {"category": "Amino acid metabolism", "count": 1}
+        ],
+        "by_level": [{"level": 2, "n_terms": 1, "n_genes": 5, "row_count": 5}],
+        "top_terms": [
+          {
+            "term_id": "tcdb:2.A.1",
+            "term_name": "The Major Facilitator Superfamily (MFS)",
+            "count": 5,
+            "is_informative": true
+          }
+        ],
+        "n_best_effort_terms": 0,
+        "not_found": [],
+        "wrong_ontology": [],
+        "wrong_level": [],
+        "filtered_out": [],
+        "returned": 5,
+        "offset": 0,
+        "truncated": false,
+        "trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]},
+        "warnings": [],
+        "filters_applied": {},
+        "skipped_ontologies": [],
+        "by_evidence": [{"count": 4, "evidence": "homology"}, {"count": 1, "evidence": "family_inferred"}],
+        "by_tier": [{"count": 3, "tier": 3}, {"count": 1, "tier": "null"}, {"count": 1, "tier": 2}],
+        "by_sources": [{"count": 4, "source": "tcdb_diamond"}, {"count": 1, "source": "eggnog"}],
+        "by_call_class": [],
+        "evidence_score_stats": {"min": 0.0, "median": 0.2, "max": 0.8, "n_null": 0},
+        "evidence_score_signals": null,
+        "results": [
+          {
+            "locus_tag": "PMM0402",
+            "gene_name": "fadD",
+            "product": "long-chain acyl-CoA synthetase",
+            "gene_category": "Lipid metabolism",
+            "term_id": "tcdb:2.A.1",
+            "term_name": "The Major Facilitator Superfamily (MFS)",
+            "level": 2,
+            "is_informative": true,
+            "evidence": "homology"
+          },
+          {
+            "locus_tag": "PMM0619",
+            "gene_name": "acs",
+            "product": "acetate--CoA ligase",
+            "gene_category": "Carbohydrate metabolism",
+            "term_id": "tcdb:2.A.1",
+            "term_name": "The Major Facilitator Superfamily (MFS)",
+            "level": 2,
+            "is_informative": true,
+            "evidence": "homology"
+          },
+          {
+            "locus_tag": "PMM0712",
+            "gene_name": "arsJ",
+            "product": "multidrug efflux transporter, MFS family",
+            "gene_category": "Stress response and adaptation",
+            "term_id": "tcdb:2.A.1",
+            "term_name": "The Major Facilitator Superfamily (MFS)",
+            "level": 2,
+            "is_informative": true,
+            "evidence": "homology"
+          },
+          ...
+        ]
+      }
 
   - title: CAZy class roll-up — genes by glycoside hydrolase / glycosyltransferase class
     call: genes_by_ontology(ontology="cazy", organism="MED4", level=0)
@@ -42,15 +312,77 @@ examples:
     response: |
       {
         "ontology": "subcellular_localization",
-        "organism_name": "MED4",
-        "total_matching": 45,
-        "...": "...",
+        "organism_name": "Prochlorococcus MED4",
+        "total_matching": 11,
+        "total_genes": 11,
+        "total_terms": 1,
+        "total_categories": 9,
+        "genes_per_term_min": 11,
+        "genes_per_term_median": 11.0,
+        "genes_per_term_max": 11,
+        "terms_per_gene_min": 1,
+        "terms_per_gene_median": 1.0,
+        "terms_per_gene_max": 1,
+        "by_category": [
+          {"category": "Stress response and adaptation", "count": 2},
+          {"category": "Cell wall and membrane", "count": 2},
+          {"category": "Transcription", "count": 1},
+          {"category": "Cellular processes", "count": 1},
+          {"category": "Coenzyme metabolism", "count": 1},
+          ...
+        ],
+        "by_level": [{"level": 0, "n_terms": 1, "n_genes": 11, "row_count": 11}],
+        "top_terms": [{"term_id": "psortb_OuterMembrane", "term_name": "Outer membrane", "count": 11, "is_informative": true}],
+        "n_best_effort_terms": 0,
+        "not_found": [],
+        "wrong_ontology": [],
+        "wrong_level": [],
+        "filtered_out": [],
+        "returned": 11,
+        "offset": 0,
+        "truncated": false,
+        "trust_axes": {"subcellular_localization": []},
+        "warnings": [],
+        "filters_applied": {},
+        "skipped_ontologies": [],
+        "by_evidence": [],
+        "by_tier": [],
+        "by_sources": [],
+        "by_call_class": [],
+        "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
+        "evidence_score_signals": null,
         "results": [
-          {"locus_tag": "PMM0001", "gene_name": "...",
-           "term_id": "psortb_OuterMembrane",
-           "term_name": "Outer membrane", "level": 0,
-           "is_informative": true,
-           "localization_score": 9.93}
+          {
+            "locus_tag": "PMM0063",
+            "gene_name": "ycf66",
+            "product": "uncharacterized conserved hypothetical protein Ycf66",
+            "gene_category": "Transcription",
+            "term_id": "psortb_OuterMembrane",
+            "term_name": "Outer membrane",
+            "level": 0,
+            "is_informative": true
+          },
+          {
+            "locus_tag": "PMM0097",
+            "gene_name": "tolC",
+            "product": "TolC-like outer membrane efflux protein, RND family",
+            "gene_category": "Stress response and adaptation",
+            "term_id": "psortb_OuterMembrane",
+            "term_name": "Outer membrane",
+            "level": 0,
+            "is_informative": true
+          },
+          {
+            "locus_tag": "PMM0151",
+            "gene_name": "scpA",
+            "product": "scpA/B family protein",
+            "gene_category": "Cellular processes",
+            "term_id": "psortb_OuterMembrane",
+            "term_name": "Outer membrane",
+            "level": 0,
+            "is_informative": true
+          },
+          ...
         ]
       }
 
@@ -58,98 +390,693 @@ examples:
     call: genes_by_ontology(ontology="signal_peptide_type", term_ids=["signalp_LIPO"], organism="MED4")
     response: |
       {
-        "...": "...",
+        "ontology": "signal_peptide_type",
+        "organism_name": "Prochlorococcus MED4",
+        "total_matching": 15,
+        "total_genes": 15,
+        "total_terms": 1,
+        "total_categories": 6,
+        "genes_per_term_min": 15,
+        "genes_per_term_median": 15.0,
+        "genes_per_term_max": 15,
+        "terms_per_gene_min": 1,
+        "terms_per_gene_median": 1.0,
+        "terms_per_gene_max": 1,
+        "by_category": [
+          {"category": "Unknown", "count": 7},
+          {"category": "Photosynthesis", "count": 2},
+          {"category": "Stress response and adaptation", "count": 2},
+          {"category": "Transport", "count": 2},
+          {"category": "Post-translational modification", "count": 1},
+          ...
+        ],
+        "by_level": [{"level": 0, "n_terms": 1, "n_genes": 15, "row_count": 15}],
+        "top_terms": [
+          {
+            "term_id": "signalp_LIPO",
+            "term_name": "Lipoprotein signal peptide (Sec/SPII)",
+            "count": 15,
+            "is_informative": true
+          }
+        ],
+        "n_best_effort_terms": 0,
+        "not_found": [],
+        "wrong_ontology": [],
+        "wrong_level": [],
+        "filtered_out": [],
+        "returned": 15,
+        "offset": 0,
+        "truncated": false,
+        "trust_axes": {"signal_peptide_type": []},
+        "warnings": [],
+        "filters_applied": {},
+        "skipped_ontologies": [],
+        "by_evidence": [],
+        "by_tier": [],
+        "by_sources": [],
+        "by_call_class": [],
+        "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
+        "evidence_score_signals": null,
         "results": [
-          {"locus_tag": "PMM0123",
-           "term_id": "signalp_LIPO", "term_name": "Lipoprotein signal peptide (Sec/SPII)",
-           "level": 0, "is_informative": true,
-           "signal_peptide_probability": 0.97,
-           "signal_peptide_cleavage_site": 22,
-           "signal_peptide_cleavage_probability": 0.91}
+          {
+            "locus_tag": "PMM0296",
+            "gene_name": "ycf48",
+            "product": "photosystem II stability/assembly factor",
+            "gene_category": "Photosynthesis",
+            "term_id": "signalp_LIPO",
+            "term_name": "Lipoprotein signal peptide (Sec/SPII)",
+            "level": 0,
+            "is_informative": true
+          },
+          {
+            "locus_tag": "PMM0437",
+            "gene_name": null,
+            "product": "conserved hypothetical protein",
+            "gene_category": "Unknown",
+            "term_id": "signalp_LIPO",
+            "term_name": "Lipoprotein signal peptide (Sec/SPII)",
+            "level": 0,
+            "is_informative": true
+          },
+          {
+            "locus_tag": "PMM0513",
+            "gene_name": "lepB",
+            "product": "signal peptidase I",
+            "gene_category": "Post-translational modification",
+            "term_id": "signalp_LIPO",
+            "term_name": "Lipoprotein signal peptide (Sec/SPII)",
+            "level": 0,
+            "is_informative": true
+          },
+          ...
         ]
       }
 
   - title: InterPro homologous-superfamily census (interpro_type facet)
     call: genes_by_ontology(ontology="interpro", organism="MED4", term_ids=["interpro:IPR027417"])
     response: |
-      {"ontology": "interpro", "organism_name": "Prochlorococcus MED4",
-       "total_genes": 119, "total_terms": 1,
-       "top_terms": [{"term_id": "interpro:IPR027417", "term_name": "P-loop containing nucleoside triphosphate hydrolase", "count": 119}],
-       "results": [{"locus_tag": "PMM0001", "term_id": "interpro:IPR027417", "term_name": "P-loop containing nucleoside triphosphate hydrolase", "level": 2, "interpro_type": "HOMOLOGOUS_SUPERFAMILY", "evidence": "signature"}]}
+      {
+        "ontology": "interpro",
+        "organism_name": "Prochlorococcus MED4",
+        "total_matching": 119,
+        "total_genes": 119,
+        "total_terms": 1,
+        "total_categories": 17,
+        "genes_per_term_min": 119,
+        "genes_per_term_median": 119.0,
+        "genes_per_term_max": 119,
+        "terms_per_gene_min": 1,
+        "terms_per_gene_median": 1.0,
+        "terms_per_gene_max": 1,
+        "by_category": [
+          {"category": "Replication and repair", "count": 24},
+          {"category": "Transport", "count": 17},
+          {"category": "Coenzyme metabolism", "count": 16},
+          {"category": "Stress response and adaptation", "count": 16},
+          {"category": "Translation", "count": 12},
+          ...
+        ],
+        "by_level": [{"level": 0, "n_terms": 1, "n_genes": 119, "row_count": 119}],
+        "top_terms": [
+          {
+            "term_id": "interpro:IPR027417",
+            "term_name": "P-loop containing nucleoside triphosphate hydrolase",
+            "count": 119,
+            "is_informative": true
+          }
+        ],
+        "n_best_effort_terms": 0,
+        "not_found": [],
+        "wrong_ontology": [],
+        "wrong_level": [],
+        "filtered_out": [],
+        "returned": 119,
+        "offset": 0,
+        "truncated": false,
+        "trust_axes": {"interpro": ["sources", "evidence"]},
+        "warnings": [],
+        "filters_applied": {},
+        "skipped_ontologies": [],
+        "by_evidence": [{"count": 119, "evidence": "signature"}],
+        "by_tier": [],
+        "by_sources": [{"count": 119, "source": "interproscan"}],
+        "by_call_class": [],
+        "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
+        "evidence_score_signals": null,
+        "results": [
+          {
+            "locus_tag": "PMM0010",
+            "gene_name": "ftsY",
+            "product": "signal recognition particle-docking protein FtsY",
+            "gene_category": "Post-translational modification",
+            "term_id": "interpro:IPR027417",
+            "term_name": "P-loop containing nucleoside triphosphate hydrolase",
+            "level": 0,
+            "is_informative": true,
+            "evidence": "signature",
+            "interpro_type": "HOMOLOGOUS_SUPERFAMILY"
+          },
+          {
+            "locus_tag": "PMM0019",
+            "gene_name": "rsgA",
+            "product": "ribosome biogenesis GTPase / thiamine phosphate phosphatase",
+            "gene_category": "Coenzyme metabolism",
+            "term_id": "interpro:IPR027417",
+            "term_name": "P-loop containing nucleoside triphosphate hydrolase",
+            "level": 0,
+            "is_informative": true,
+            "evidence": "signature",
+            "interpro_type": "HOMOLOGOUS_SUPERFAMILY"
+          },
+          {
+            "locus_tag": "PMM0049",
+            "gene_name": "coaE",
+            "product": "dephospho-CoA kinase",
+            "gene_category": "Coenzyme metabolism",
+            "term_id": "interpro:IPR027417",
+            "term_name": "P-loop containing nucleoside triphosphate hydrolase",
+            "level": 0,
+            "is_informative": true,
+            "evidence": "signature",
+            "interpro_type": "HOMOLOGOUS_SUPERFAMILY"
+          },
+          ...
+        ]
+      }
 
   - title: MEROPS peptidase-only clan census (call_class filter)
     call: genes_by_ontology(ontology="merops", organism="MIT1002", level=0, call_class=["peptidase"])
     response: |
-      # call_class=['peptidase'] restricts the clan census to genes whose best
-      # MEROPS edge calls them an actual peptidase, dropping nonpeptidase_homolog
-      # rows (catalytically-dead homologs that still resemble a peptidase family
-      # by sequence). MIT1002 level=0: 7 clans pass the default gene-set-size
-      # filter — SC 22, MA 18, MH 8, PB 8, SB 6, MG 5, SK 5. No warning fires
-      # because the filter already excludes the ambiguous rows.
-      {"ontology": "merops", "organism_name": "Alteromonas macleodii MIT1002",
-       "by_call_class": [{"call_class": "peptidase", "count": 67}],
-       "top_terms": [
-         {"term_id": "merops.clan:SC", "term_name": "...", "count": 22},
-         {"term_id": "merops.clan:MA", "term_name": "...", "count": 18},
-         {"term_id": "merops.clan:MH", "term_name": "...", "count": 8}
-       ],
-       "warnings": [],
-       "results": [{"locus_tag": "MIT1002_03660", "term_id": "merops.clan:SC", "term_name": "...", "level": 0, "evidence": "curated", "call_class": "peptidase"}]}
+      {
+        "ontology": "merops",
+        "organism_name": "Alteromonas macleodii MIT1002",
+        "total_matching": 72,
+        "total_genes": 72,
+        "total_terms": 7,
+        "total_categories": 10,
+        "genes_per_term_min": 5,
+        "genes_per_term_median": 8.0,
+        "genes_per_term_max": 22,
+        "terms_per_gene_min": 1,
+        "terms_per_gene_median": 1.0,
+        "terms_per_gene_max": 1,
+        "by_category": [
+          {"category": "Amino acid metabolism", "count": 28},
+          {"category": "Unknown", "count": 17},
+          {"category": "Post-translational modification", "count": 13},
+          {"category": "Cell wall and membrane", "count": 6},
+          {"category": "Lipid metabolism", "count": 3},
+          ...
+        ],
+        "by_level": [{"level": 0, "n_terms": 7, "n_genes": 72, "row_count": 72}],
+        "top_terms": [
+          {"term_id": "merops.clan:SC", "term_name": "SC", "count": 22, "is_informative": true},
+          {"term_id": "merops.clan:MA", "term_name": "MA", "count": 18, "is_informative": true},
+          {"term_id": "merops.clan:MH", "term_name": "MH", "count": 8, "is_informative": true},
+          {"term_id": "merops.clan:PB", "term_name": "PB", "count": 8, "is_informative": true},
+          {"term_id": "merops.clan:SB", "term_name": "SB", "count": 6, "is_informative": true}
+        ],
+        "n_best_effort_terms": 0,
+        "not_found": [],
+        "wrong_ontology": [],
+        "wrong_level": [],
+        "filtered_out": [],
+        "returned": 72,
+        "offset": 0,
+        "truncated": false,
+        "trust_axes": {"merops": ["sources", "evidence", "evidence_score", "tier"]},
+        "warnings": [],
+        "filters_applied": {"call_class": ["peptidase"]},
+        "skipped_ontologies": [],
+        "by_evidence": [{"count": 72, "evidence": "homology"}],
+        "by_tier": [{"count": 68, "tier": 3}, {"count": 4, "tier": 2}],
+        "by_sources": [{"count": 72, "source": "merops_diamond"}],
+        "by_call_class": [{"call_class": "peptidase", "count": 72}],
+        "evidence_score_stats": {"min": 0.0, "median": 0.5, "max": 1.0, "n_null": 0},
+        "evidence_score_signals": null,
+        "results": [
+          {
+            "locus_tag": "MIT1002_00401",
+            "gene_name": "dcp",
+            "product": "M3 family metallopeptidase",
+            "gene_category": "Amino acid metabolism",
+            "term_id": "merops.clan:MA",
+            "term_name": "MA",
+            "level": 0,
+            "is_informative": true,
+            "evidence": "homology",
+            "call_class": "peptidase"
+          },
+          {
+            "locus_tag": "MIT1002_00745",
+            "gene_name": null,
+            "product": "dipeptidyl-peptidase 3 family protein",
+            "gene_category": "Unknown",
+            "term_id": "merops.clan:MA",
+            "term_name": "MA",
+            "level": 0,
+            "is_informative": true,
+            "evidence": "homology",
+            "call_class": "peptidase"
+          },
+          {
+            "locus_tag": "MIT1002_00890",
+            "gene_name": "pepN",
+            "product": "M1 family metallopeptidase",
+            "gene_category": "Amino acid metabolism",
+            "term_id": "merops.clan:MA",
+            "term_name": "MA",
+            "level": 0,
+            "is_informative": true,
+            "evidence": "homology",
+            "call_class": "peptidase"
+          },
+          ...
+        ]
+      }
 
   - title: MEROPS clan census without call_class (warns)
     call: genes_by_ontology(ontology="merops", organism="MIT1002", level=0)
     response: |
-      # Omitting call_class folds nonpeptidase_homolog rows into the census —
-      # MIT1002 level=0 returns 10 clans (vs 7 with call_class=['peptidase'])
-      # and fires a warning naming the catalytically-dead-homolog rows.
-      {"ontology": "merops", "organism_name": "Alteromonas macleodii MIT1002",
-       "warnings": ["12 rows call_class='nonpeptidase_homolog' (catalytically-dead homologs) are included in this clan census"],
-       "results": [{"locus_tag": "MIT1002_04012", "term_id": "merops.clan:C26", "term_name": "...", "level": 0, "evidence": "homology", "call_class": "nonpeptidase_homolog"}]}
+      {
+        "ontology": "merops",
+        "organism_name": "Alteromonas macleodii MIT1002",
+        "total_matching": 112,
+        "total_genes": 112,
+        "total_terms": 10,
+        "total_categories": 12,
+        "genes_per_term_min": 5,
+        "genes_per_term_median": 8.0,
+        "genes_per_term_max": 31,
+        "terms_per_gene_min": 1,
+        "terms_per_gene_median": 1.0,
+        "terms_per_gene_max": 1,
+        "by_category": [
+          {"category": "Amino acid metabolism", "count": 38},
+          {"category": "Unknown", "count": 22},
+          {"category": "Post-translational modification", "count": 13},
+          {"category": "Cell wall and membrane", "count": 11},
+          {"category": "Lipid metabolism", "count": 9},
+          ...
+        ],
+        "by_level": [{"level": 0, "n_terms": 10, "n_genes": 112, "row_count": 112}],
+        "top_terms": [
+          {"term_id": "merops.clan:SC", "term_name": "SC", "count": 31, "is_informative": true},
+          {"term_id": "merops.clan:MA", "term_name": "MA", "count": 18, "is_informative": true},
+          {"term_id": "merops.clan:PC", "term_name": "PC", "count": 13, "is_informative": true},
+          {"term_id": "merops.clan:PB", "term_name": "PB", "count": 12, "is_informative": true},
+          {"term_id": "merops.clan:MH", "term_name": "MH", "count": 9, "is_informative": true}
+        ],
+        "n_best_effort_terms": 0,
+        "not_found": [],
+        "wrong_ontology": [],
+        "wrong_level": [],
+        "filtered_out": [],
+        "returned": 112,
+        "offset": 0,
+        "truncated": false,
+        "trust_axes": {"merops": ["sources", "evidence", "evidence_score", "tier"]},
+        "warnings": [
+          "29 of 112 matching rows carry call_class=['nonpeptidase_homolog'] — catalytically-dead homologs that keep the family ..."
+        ],
+        "filters_applied": {},
+        "skipped_ontologies": [],
+        "by_evidence": [{"count": 112, "evidence": "homology"}],
+        "by_tier": [{"count": 107, "tier": 3}, {"count": 5, "tier": 2}],
+        "by_sources": [{"count": 112, "source": "merops_diamond"}],
+        "by_call_class": [{"call_class": "peptidase", "count": 83}, {"call_class": "nonpeptidase_homolog", "count": 29}],
+        "evidence_score_stats": {"min": 0.0, "median": 0.5, "max": 1.0, "n_null": 0},
+        "evidence_score_signals": null,
+        "results": [
+          {
+            "locus_tag": "MIT1002_00401",
+            "gene_name": "dcp",
+            "product": "M3 family metallopeptidase",
+            "gene_category": "Amino acid metabolism",
+            "term_id": "merops.clan:MA",
+            "term_name": "MA",
+            "level": 0,
+            "is_informative": true,
+            "evidence": "homology",
+            "call_class": "peptidase"
+          },
+          {
+            "locus_tag": "MIT1002_00745",
+            "gene_name": null,
+            "product": "dipeptidyl-peptidase 3 family protein",
+            "gene_category": "Unknown",
+            "term_id": "merops.clan:MA",
+            "term_name": "MA",
+            "level": 0,
+            "is_informative": true,
+            "evidence": "homology",
+            "call_class": "peptidase"
+          },
+          {
+            "locus_tag": "MIT1002_00890",
+            "gene_name": "pepN",
+            "product": "M1 family metallopeptidase",
+            "gene_category": "Amino acid metabolism",
+            "term_id": "merops.clan:MA",
+            "term_name": "MA",
+            "level": 0,
+            "is_informative": true,
+            "evidence": "homology",
+            "call_class": "peptidase"
+          },
+          ...
+        ]
+      }
 
   - title: TCDB trust detail — sources / evidence_score / tier (verbose)
     call: genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], verbose=True)
     response: |
-      # Compact rows carry only `evidence` (the ladder). verbose=True adds
-      # `sources`, `evidence_score`, `tier` plus TCDB's native detail
-      # (confidence_score, source_agreement, pfam_support, go_support,
-      # identity, qcov, evalue, consensus_n, attachment_depth). On a
-      # hierarchical rollup like tcdb:3.A.1, trust columns come from the
-      # gene's single best edge under the term (ranked by evidence_score) —
-      # never a duplicated per-edge row.
-      {"ontology": "tcdb", "organism_name": "Prochlorococcus MED4",
-       "results": [{"locus_tag": "PMM0392", "term_id": "tcdb:3.A.1", "term_name": "ATP-binding Cassette (ABC) Superfamily",
-                    "level": 2, "evidence": "homology", "sources": ["eggnog"], "evidence_score": 0.6, "tier": 2,
-                    "confidence_score": 0.6, "attachment_depth": "most_specific"}]}
+      {
+        "ontology": "tcdb",
+        "organism_name": "Prochlorococcus MED4",
+        "total_matching": 65,
+        "total_genes": 65,
+        "total_terms": 1,
+        "total_categories": 11,
+        "genes_per_term_min": 65,
+        "genes_per_term_median": 65.0,
+        "genes_per_term_max": 65,
+        "terms_per_gene_min": 1,
+        "terms_per_gene_median": 1.0,
+        "terms_per_gene_max": 1,
+        "by_category": [
+          {"category": "Transport", "count": 30},
+          {"category": "Stress response and adaptation", "count": 23},
+          {"category": "Central intermediary metabolism", "count": 3},
+          {"category": "Secondary metabolites", "count": 2},
+          {"category": "Translation", "count": 1},
+          ...
+        ],
+        "by_level": [{"level": 2, "n_terms": 1, "n_genes": 65, "row_count": 65}],
+        "top_terms": [
+          {
+            "term_id": "tcdb:3.A.1",
+            "term_name": "The ATP-binding Cassette (ABC) Superfamily",
+            "count": 65,
+            "is_informative": true
+          }
+        ],
+        "n_best_effort_terms": 0,
+        "not_found": [],
+        "wrong_ontology": [],
+        "wrong_level": [],
+        "filtered_out": [],
+        "returned": 65,
+        "offset": 0,
+        "truncated": false,
+        "trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]},
+        "warnings": [],
+        "filters_applied": {},
+        "skipped_ontologies": [],
+        "by_evidence": [{"count": 40, "evidence": "family_inferred"}, {"count": 25, "evidence": "homology"}],
+        "by_tier": [{"count": 40, "tier": "null"}, {"count": 20, "tier": 3}, {"count": 5, "tier": 2}],
+        "by_sources": [{"count": 50, "source": "eggnog"}, {"count": 25, "source": "tcdb_diamond"}],
+        "by_call_class": [],
+        "evidence_score_stats": {"min": 0.0, "median": 0.8, "max": 1.0, "n_null": 0},
+        "evidence_score_signals": null,
+        "results": [
+          {
+            "locus_tag": "PMM0065",
+            "gene_name": "mcyH",
+            "product": "ABC transporter, ATPase component",
+            "gene_category": "Transport",
+            "term_id": "tcdb:3.A.1",
+            "term_name": "The ATP-binding Cassette (ABC) Superfamily",
+            "level": 2,
+            "is_informative": true,
+            "evidence": "family_inferred",
+            "sources": ["eggnog"],
+            "evidence_score": 0.8,
+            "tier": null,
+            "attachment_depth": "most_specific",
+            "confidence_score": null,
+            "source_agreement": "both_sources",
+            "pfam_support": "corroborated",
+            "go_support": "corroborated",
+            "identity": null,
+            "qcov": null,
+            "evalue": null,
+            "consensus_n": null,
+            "function_description": null
+          },
+          {
+            "locus_tag": "PMM0072",
+            "gene_name": "sufC",
+            "product": "ABC transporter involved in Fe-S cluster assembly, ATPase component",
+            "gene_category": "Stress response and adaptation",
+            "term_id": "tcdb:3.A.1",
+            "term_name": "The ATP-binding Cassette (ABC) Superfamily",
+            "level": 2,
+            "is_informative": true,
+            "evidence": "homology",
+            "sources": ["tcdb_diamond"],
+            "evidence_score": 0.4,
+            "tier": 3,
+            "attachment_depth": "most_specific",
+            "confidence_score": 0.1756,
+            "source_agreement": "single_source",
+            "pfam_support": "corroborated",
+            "go_support": "corroborated",
+            "identity": 30.9,
+            "qcov": 81.2,
+            "evalue": 4.45e-17,
+            "consensus_n": 24,
+            "function_description": "cluster assembly ATPase"
+          },
+          {
+            "locus_tag": "PMM0089",
+            "gene_name": null,
+            "product": "ABC transport system ATP-binding/permease protein, Uup family",
+            "gene_category": "Transport",
+            "term_id": "tcdb:3.A.1",
+            "term_name": "The ATP-binding Cassette (ABC) Superfamily",
+            "level": 2,
+            "is_informative": true,
+            "evidence": "homology",
+            "sources": ["tcdb_diamond"],
+            "evidence_score": 0.4,
+            "tier": 3,
+            "attachment_depth": "most_specific",
+            "confidence_score": 0.2655,
+            "source_agreement": "single_source",
+            "pfam_support": "corroborated",
+            "go_support": "corroborated",
+            "identity": 38.5,
+            "qcov": 98.5,
+            "evalue": 1.4e-109,
+            "consensus_n": 24,
+            "function_description": null
+          },
+          ...
+        ]
+      }
 
   - title: Cutoff on evidence_score (the only numeric trust filter)
     call: genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], min_evidence_score=0.6, evidence=["homology"])
     response: |
-      # min_evidence_score is the only numeric cutoff anywhere in the trust
-      # surface — no filter exists on native scalars (evalue, bit_score,
-      # confidence_score, ...). Setting it adds `evidence_score_signals` to
-      # the envelope, naming which ControlledVocabulary signals fired
-      # (composite inputs behind the score). MED4 tcdb: evidence=['homology']
-      # AND evidence_score>=0.6 narrows 670 rows to 98.
-      {"ontology": "tcdb", "organism_name": "Prochlorococcus MED4",
-       "filters_applied": {"evidence": ["homology"], "min_evidence_score": 0.6},
-       "evidence_score_signals": {"Gene_has_tcdb_family": ["source_agreement", "pfam_support", "go_support", "identity", "qcov"]},
-       "results": [{"locus_tag": "PMM0392", "term_id": "tcdb:3.A.1", "evidence": "homology", "evidence_score": 0.6}]}
+      {
+        "ontology": "tcdb",
+        "organism_name": "Prochlorococcus MED4",
+        "total_matching": 37,
+        "total_genes": 37,
+        "total_terms": 1,
+        "total_categories": 5,
+        "genes_per_term_min": 37,
+        "genes_per_term_median": 37.0,
+        "genes_per_term_max": 37,
+        "terms_per_gene_min": 1,
+        "terms_per_gene_median": 1.0,
+        "terms_per_gene_max": 1,
+        "by_category": [
+          {"category": "Transport", "count": 20},
+          {"category": "Stress response and adaptation", "count": 13},
+          {"category": "Central intermediary metabolism", "count": 2},
+          {"category": "Cellular processes", "count": 1},
+          {"category": "Inorganic ion transport", "count": 1}
+        ],
+        "by_level": [{"level": 2, "n_terms": 1, "n_genes": 37, "row_count": 37}],
+        "top_terms": [
+          {
+            "term_id": "tcdb:3.A.1",
+            "term_name": "The ATP-binding Cassette (ABC) Superfamily",
+            "count": 37,
+            "is_informative": true
+          }
+        ],
+        "n_best_effort_terms": 0,
+        "not_found": [],
+        "wrong_ontology": [],
+        "wrong_level": [],
+        "filtered_out": [],
+        "returned": 37,
+        "offset": 0,
+        "truncated": false,
+        "trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]},
+        "warnings": [
+          "min_evidence_score=0.6 applied — the one numeric trust cutoff. Read evidence_score_signals for the signals that fed e..."
+        ],
+        "filters_applied": {"evidence": ["homology"], "min_evidence_score": 0.6},
+        "skipped_ontologies": [],
+        "by_evidence": [{"count": 37, "evidence": "homology"}],
+        "by_tier": [{"count": 29, "tier": 3}, {"count": 8, "tier": 2}],
+        "by_sources": [{"count": 37, "source": "tcdb_diamond"}, {"count": 13, "source": "eggnog"}],
+        "by_call_class": [],
+        "evidence_score_stats": {"min": 0.6, "median": 0.6, "max": 1.0, "n_null": 0},
+        "evidence_score_signals": {"Gene_has_tcdb_family": ["eggnog_called", "source_agreement", "tier_le_2", "pfam_support", "go_support"]},
+        "results": [
+          {
+            "locus_tag": "PMM0065",
+            "gene_name": "mcyH",
+            "product": "ABC transporter, ATPase component",
+            "gene_category": "Transport",
+            "term_id": "tcdb:3.A.1",
+            "term_name": "The ATP-binding Cassette (ABC) Superfamily",
+            "level": 2,
+            "is_informative": true,
+            "evidence": "homology"
+          },
+          {
+            "locus_tag": "PMM0125",
+            "gene_name": "ecfA1",
+            "product": "energy-coupling factor transport system ATP-binding protein",
+            "gene_category": "Transport",
+            "term_id": "tcdb:3.A.1",
+            "term_name": "The ATP-binding Cassette (ABC) Superfamily",
+            "level": 2,
+            "is_informative": true,
+            "evidence": "homology"
+          },
+          {
+            "locus_tag": "PMM0192",
+            "gene_name": "ddpD",
+            "product": "peptide/nickel ABC transport system, ATP-binding component",
+            "gene_category": "Transport",
+            "term_id": "tcdb:3.A.1",
+            "term_name": "The ATP-binding Cassette (ABC) Superfamily",
+            "level": 2,
+            "is_informative": true,
+            "evidence": "homology"
+          },
+          ...
+        ]
+      }
 
   - title: Filter out uninformative terms (term-side filter, opt-in)
-    call: genes_by_ontology(ontology="kegg", organism="MED4", level=3, informative_only=True)
+    call: genes_by_ontology(ontology="kegg", organism="MED4", level=3, informative_only=True, min_gene_set_size=1)
+    note: "`informative_only=True` excludes terms flagged `is_uninformative='true'` (GO roots, catch-all Cyanorak / TIGR / COG roles, KEGG KOs named 'uncharacterized protein' — for KEGG the flag is KO-level only; pathway maps such as the global `kegg.pathway:ko01100` are not flagged). Term-side only — never narrows the gene set. Every detail row carries `is_informative: bool`. MED4 KEGG level 3: 1124 → 1094 rows. `min_gene_set_size=1` is needed here because most KOs carry a single MED4 gene and the default size filter (5) would drop them all."
     response: |
-      # `informative_only=True` excludes terms flagged `is_uninformative='true'`
-      # (~224 terms genome-wide, concentrated in KEGG / Cyanorak / TIGR /
-      # CogFunctionalCategory / GO-CC / GO-MF / GO-BP). The filter is term-side
-      # only — never narrows the gene set.
-      #
-      # Detail rows (and `per_term` mode) carry `is_informative: bool`. The
-      # `per_gene` aggregate mode does NOT include `is_informative` because the
-      # row is per-gene, not per-term.
       {
-        "ontology": "kegg", "organism_name": "Prochlorococcus MED4",
+        "ontology": "kegg",
+        "organism_name": "Prochlorococcus MED4",
+        "total_matching": 1094,
+        "total_genes": 1037,
+        "total_terms": 990,
+        "total_categories": 22,
+        "genes_per_term_min": 1,
+        "genes_per_term_median": 1.0,
+        "genes_per_term_max": 4,
+        "terms_per_gene_min": 1,
+        "terms_per_gene_median": 1.0,
+        "terms_per_gene_max": 3,
+        "by_category": [
+          {"category": "Coenzyme metabolism", "count": 156},
+          {"category": "Translation", "count": 135},
+          {"category": "Stress response and adaptation", "count": 126},
+          {"category": "Amino acid metabolism", "count": 94},
+          {"category": "Carbohydrate metabolism", "count": 72},
+          ...
+        ],
+        "by_level": [{"level": 3, "n_terms": 990, "n_genes": 1037, "row_count": 1094}],
+        "top_terms": [
+          {
+            "term_id": "kegg.orthology:K01358",
+            "term_name": "clpP, CLPP; ATP-dependent Clp protease, protease subunit [EC:3.4.21.92]",
+            "count": 4,
+            "is_informative": true
+          },
+          {
+            "term_id": "kegg.orthology:K03798",
+            "term_name": "ftsH, hflB; cell division protease FtsH [EC:3.4.24.-]",
+            "count": 4,
+            "is_informative": true
+          },
+          {
+            "term_id": "kegg.orthology:K06147",
+            "term_name": "ABCB-BAC; ATP-binding cassette, subfamily B, bacterial",
+            "count": 4,
+            "is_informative": true
+          },
+          {
+            "term_id": "kegg.orthology:K00218",
+            "term_name": "por; protochlorophyllide reductase [EC:1.3.1.33]",
+            "count": 3,
+            "is_informative": true
+          },
+          {
+            "term_id": "kegg.orthology:K00612",
+            "term_name": "nodU; carbamoyltransferase [EC:2.1.3.-]",
+            "count": 3,
+            "is_informative": true
+          }
+        ],
+        "n_best_effort_terms": 0,
+        "not_found": [],
+        "wrong_ontology": [],
+        "wrong_level": [],
+        "filtered_out": [],
+        "returned": 500,
+        "offset": 0,
+        "truncated": true,
+        "trust_axes": {"kegg": ["sources", "evidence"]},
+        "warnings": [],
+        "filters_applied": {},
+        "skipped_ontologies": [],
+        "by_evidence": [{"count": 1094, "evidence": "family_inferred"}],
+        "by_tier": [],
+        "by_sources": [{"count": 1094, "source": "eggnog"}],
+        "by_call_class": [],
+        "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
+        "evidence_score_signals": null,
         "results": [
-          {"locus_tag": "PMM0001", "term_id": "kegg:K02338", "term_name": "DNA polymerase III subunit beta", "level": 3, "is_informative": true}
+          {
+            "locus_tag": "PMM1087",
+            "gene_name": "gldA",
+            "product": "glycerol dehydrogenase",
+            "gene_category": "Lipid metabolism",
+            "term_id": "kegg.orthology:K00001",
+            "term_name": "E1.1.1.1, adh; alcohol dehydrogenase [EC:1.1.1.1]",
+            "level": 3,
+            "is_informative": true,
+            "evidence": "family_inferred"
+          },
+          {
+            "locus_tag": "PMM1051",
+            "gene_name": "thrA",
+            "product": "homoserine dehydrogenase",
+            "gene_category": "Amino acid metabolism",
+            "term_id": "kegg.orthology:K00003",
+            "term_name": "hom; homoserine dehydrogenase [EC:1.1.1.3]",
+            "level": 3,
+            "is_informative": true,
+            "evidence": "family_inferred"
+          },
+          {
+            "locus_tag": "PMM1087",
+            "gene_name": "gldA",
+            "product": "glycerol dehydrogenase",
+            "gene_category": "Lipid metabolism",
+            "term_id": "kegg.orthology:K00005",
+            "term_name": "gldA; glycerol dehydrogenase [EC:1.1.1.6]",
+            "level": 3,
+            "is_informative": true,
+            "evidence": "family_inferred"
+          },
+          ...
         ]
       }
 
@@ -189,6 +1116,7 @@ verbose_fields:
   - bit_score
 
 chaining:
+  - "Term-anchored: term / level → (gene × term) pairs, hierarchy expanded DOWN. The gene-anchored reverse (locus_tags → their terms, leaf or rollup) is `gene_ontology_terms`."
   - "ontology_landscape → genes_by_ontology(level=N)"
   - "search_ontology → genes_by_ontology(term_ids=[...])"
   - "genes_by_ontology → pathway_enrichment"
@@ -200,6 +1128,7 @@ chaining:
   - "genes_by_ontology(ontology='merops', call_class=['peptidase']) → pathway_enrichment(ontology='merops', call_class=['peptidase']) to keep the TERM2GENE definitions and the enrichment test on the same trust-filtered gene set"
 
 mistakes:
+  - "Term-anchored (term → genes). For 'which terms does this gene carry?' use `gene_ontology_terms(locus_tags=[...])` — same ontology surface, opposite anchor."
   - "At least one of `level` or `term_ids` must be set — calling without either is an error."
   - "Results are `(gene × term)` pairs, not distinct genes — use `total_genes` for the gene count. `total_matching` is the row count."
   - "Gene-set-size filter is organism-scoped via descendants — count of distinct genes annotated to the term or any descendant for `$organism`. Matches `ontology_landscape`'s convention."

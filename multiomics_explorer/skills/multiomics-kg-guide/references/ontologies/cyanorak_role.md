@@ -9,7 +9,8 @@ hierarchy of the Cyanorak information system for marine picocyanobacteria
 (Prochlorococcus and Synechococcus). Roles are named for the biology these
 genomes actually contain (photosynthesis, phycobilisome, nutrient
 acquisition, DNA metabolism, ...) with a three-level tree
-(`cyanorak.role:D` Cellular processes → `cyanorak.role:D.1` ...).
+(`cyanorak.role:D` Cellular processes → `cyanorak.role:D.2` Cell
+division → ...).
 
 ## How genes get annotated
 
@@ -21,16 +22,20 @@ Cyanorak roles at all. No `evidence_score` (single source, single rung).
 
 ## Identifier form
 
-`cyanorak.role:D` (level 0, a letter), `cyanorak.role:D.1` (level 1),
-`cyanorak.role:D.1.2` (level 2). Node `code` holds the bare dotted code;
-`name` is the full breadcrumb (`Cellular processes > Cell division`).
+`cyanorak.role:D` (level 0, a letter), `cyanorak.role:D.2` (level 1),
+`cyanorak.role:D.2.1`-style codes (level 2). One root is not a letter:
+`cyanorak.role:0` Non-coding gene (RNA), with four children. Node `code`
+holds the bare dotted code; `name` is the full breadcrumb
+(`Cellular processes > Cell division`).
 
 ## Hierarchy
 
 Strict three-level tree via `Cyanorak_role_is_a_cyanorak_role`, `level`
-0-2. `gene_count` / `organism_count` are subtree-inclusive;
-`direct_gene_count` is node-local (level-0 letters have genes attached
-directly as well as through children). Level exact — no DAG ambiguity.
+0-2: 19 roots (18 letters plus `cyanorak.role:0`), 124 level-1 roles,
+30 level-2 roles. `gene_count` / `organism_count` are
+subtree-inclusive; `direct_gene_count` is node-local (most roots have
+genes attached directly as well as through children). Level exact — no
+DAG ambiguity.
 
 ## Graph shape (from the registry)
 
@@ -50,7 +55,7 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 | Property | Type | Meaning |
 |---|---|---|
-| `code` | string |  |
+| `code` | string | source-database short code (COG one-letter category, Cyanorak / TIGR numeric role code) — the un-prefixed tail of `id` |
 | `direct_gene_count` | int | genes attached to this exact node (not descendants); absent where it would be vacuous |
 | `gene_count` | int | genes annotated to the term — subtree-inclusive on hierarchical labels, direct on flat ones |
 | `id` | string | term ID as used in `term_ids=[...]` (self-prefixed CURIE) |
@@ -61,9 +66,12 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 `ontology_term_details(verbose=True)` returns every property as `properties`; a compact column that is missing on the node is absent, not null (`docs://guide/conventions`).
 
-## Controlled vocabularies
+## Applicable filter types
 
-Values: see `list_filter_values(filter_type=..., ontology='cyanorak_role')` — `trust_axes`, `evidence`, `sources`, and the ontology-specific categorical filter types are read from the KG's `ControlledVocabulary` nodes at call time.
+- `evidence` — `list_filter_values(filter_type="evidence", ontology="cyanorak_role")`
+- `sources` — `list_filter_values(filter_type="sources", ontology="cyanorak_role")`
+
+Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="cyanorak_role")`) lists which comparable axes the gene edge carries.
 
 ## Interpretation
 
@@ -76,9 +84,11 @@ Alteromonas means "not covered", never "absent".
 
 ## Informativeness rule
 
-`cyanorak.role:R` Other, `R.2` Conserved hypothetical proteins and a few
-sibling "unknown" roles are flagged uninformative and dropped by
-`informative_only=True`; they are the largest roles in every genome.
+Five roles are flagged uninformative and dropped by
+`informative_only=True`: the root `cyanorak.role:R` Other and its
+children `R.1` Conserved hypothetical domains, `R.2` Conserved
+hypothetical proteins, `R.4` Hypothetical proteins and `R.5` Other >
+Other. They are the largest roles in every genome.
 
 ## Pitfalls
 
@@ -94,10 +104,10 @@ sibling "unknown" roles are flagged uninformative and dropped by
 
 ## Typical questions
 
-- Which Cyanorak roles are enriched among MED4 genes up under iron limitation?
-- How many genes per level-1 role does MIT9313 carry vs MED4?
-- Which MED4 genes are curated as phycobilisome or photosystem components?
-- Which organisms in the KG have Cyanorak coverage at all?
+- Which Cyanorak roles are enriched among MED4 genes up under iron limitation? — `pathway_enrichment(organism='MED4', experiment_ids=[...], ontology='cyanorak_role', level=1, direction='up')`
+- How many genes per level-1 role does MIT9313 carry vs MED4? — `genes_by_ontology(ontology='cyanorak_role', organism='MIT9313', level=1, summary=True)`
+- Which MED4 genes are curated under Photosynthesis and respiration? — `genes_by_ontology(ontology='cyanorak_role', organism='MED4', term_ids=['cyanorak.role:J'])`
+- Which organisms in the KG have Cyanorak coverage at all? — `ontology_term_details(term_ids=['cyanorak.role:J'], verbose=True)` and read `genes_by_organism[]`
 
 ## Tools
 

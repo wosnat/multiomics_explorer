@@ -42,9 +42,10 @@ chaining:
 
 mistakes:
   - "Single organism enforced — don't mix PMM (MED4) and PMT (MIT9313) locus tags in one call"
-  - "not_matched means the gene exists but has no cluster membership — it is NOT the same as not_found (gene doesn't exist in KG)"
+  - "not_matched means the gene exists but has no cluster membership (after the cluster_type / treatment_type / analysis filters) — it is NOT the same as not_found (gene doesn't exist in KG). Both are flat locus_tag lists; genes_with_clusters / genes_without_clusters are the counts. See docs://guide/conventions for the shared not_found / not_matched semantics."
   - "Results are gene × cluster rows — a gene in 2 clusters appears twice. Use genes_with_clusters for the deduplicated count."
   - wrong: "gene_clusters_by_gene(locus_tags='PMM0370')"
     right: "gene_clusters_by_gene(locus_tags=['PMM0370']) — always a list"
   - "Valid `cluster_type` values come from the KG vocabulary — enumerate them with list_filter_values(filter_type='cluster_type') (currently six: time_course, diel, condition_comparison, expression_bin, decay_pattern, genomic_island). The list quoted in the parameter description is documentation, not the source."
-  - "`treatment_type` is never empty: a characterization analysis with no perturbation names what was measured (`rna_decay` for the mRNA-decay clusters, `genomic_analysis` for sequence-predicted genomic-island sets). Filter on those values to isolate characterization analyses; `background_factors` may be `[]` on a sequence-only analysis."
+  - "`treatment_type` is never empty: a characterization analysis with no perturbation names what was measured (`rna_decay` for the mRNA-decay clusters, `genomic_analysis` for sequence-predicted genomic-island sets). Filter on those values to isolate characterization analyses; `background_factors` is `[]` only on the genomic_island analyses."
+  - "treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (a made-up suffix on a real value, say) returns 0 rows, never an error. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. A filter with a misspelled value here silently drops every membership row."
