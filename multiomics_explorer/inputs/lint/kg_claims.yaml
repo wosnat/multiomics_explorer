@@ -1,0 +1,245 @@
+# Register of KG-describing numbers quoted in docs. Each entry pairs the
+# Cypher that computes the fact with the value the docs quote and the files
+# that quote it. tests/integration/test_docs_kg_claims.py (-m kg) evaluates
+# every entry against the live KG; a failure names the `used_in` files to fix.
+# tests/unit/test_docs_lint.py checks every `used_in` path exists.
+#
+# Entry fields:
+#   id          unique slug
+#   cypher      RETURN exactly one row; column names == `expect` keys
+#   expect      {column: value} — numbers, strings or booleans
+#   tolerance   optional {abs: x} or {rel: fraction} applied to numeric columns
+#   used_in     list of repo-relative paths that quote the number
+#   note        free text (what the number means / how the docs phrase it)
+#   source      optional "ontology_config" — value computed from the explorer
+#               registry rather than Cypher (cypher omitted)
+
+- id: numeric_assay_not_detected_share
+  cypher: >
+    MATCH ()-[e:Assay_quantifies_metabolite]->()
+    WITH count(e) AS total,
+         sum(CASE WHEN e.detection_status = 'not_detected' THEN 1 ELSE 0 END) AS nd
+    RETURN total, nd, round(100.0 * nd / total, 1) AS not_detected_pct
+  expect: {total: 1480, nd: 1046, not_detected_pct: 70.7}
+  tolerance: {rel: 0.02}
+  used_in:
+    - CLAUDE.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
+    - multiomics_explorer/inputs/tools/metabolites_by_quantifies_assay.yaml
+    - multiomics_explorer/mcp_server/tools.py
+  note: "share of numeric Assay_quantifies_metabolite edges that are tested-absent (docs: '~71%')"
+
+- id: boolean_assay_false_share
+  cypher: >
+    MATCH ()-[e:Assay_flags_metabolite]->()
+    WITH count(e) AS total,
+         sum(CASE WHEN e.flag_value = 'not_detected' THEN 1 ELSE 0 END) AS f
+    RETURN total, f AS false_n, round(100.0 * f / total, 1) AS false_pct
+  expect: {total: 186, false_n: 128, false_pct: 68.8}
+  tolerance: {rel: 0.02}
+  used_in:
+    - CLAUDE.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
+    - multiomics_explorer/inputs/tools/metabolites_by_flags_assay.yaml
+    - multiomics_explorer/mcp_server/tools.py
+  note: "share of boolean Assay_flags_metabolite edges with flag_value=false (docs: '~69%')"
+
+- id: boolean_dms_storing_not_flagged
+  cypher: >
+    MATCH (d:DerivedMetric {value_kind: 'boolean'})
+    OPTIONAL MATCH (d)-[e:Derived_metric_flags_gene]->()
+    WITH d, sum(CASE WHEN e.value = 'not_flagged' THEN 1 ELSE 0 END) AS nf
+    RETURN count(d) AS boolean_dms, sum(CASE WHEN nf > 0 THEN 1 ELSE 0 END) AS storing_not_flagged
+  expect: {boolean_dms: 27, storing_not_flagged: 11}
+  used_in:
+    - CLAUDE.md
+    - multiomics_explorer/inputs/tools/genes_by_boolean_metric.yaml
+    - multiomics_explorer/mcp_server/tools.py
+  note: "genes_by_boolean_metric flag=False returns rows on 11 of 27 boolean DMs"
+
+- id: publications_discusses_split
+  cypher: >
+    MATCH (p:Publication)
+    OPTIONAL MATCH (p)-[d:Publication_discusses_gene|Publication_discusses_kegg_pathway]->()
+    WITH p, count(d) AS n
+    RETURN count(p) AS publications,
+           sum(CASE WHEN n > 0 THEN 1 ELSE 0 END) AS has_discusses,
+           sum(CASE WHEN n = 0 THEN 1 ELSE 0 END) AS no_discusses
+  expect: {publications: 49, has_discusses: 45, no_discusses: 4}
+  used_in:
+    - CLAUDE.md
+    - multiomics_explorer/inputs/tools/list_publications.yaml
+    - multiomics_explorer/inputs/tools/discussed_by_publication.yaml
+    - multiomics_explorer/mcp_server/tools.py
+  note: "by_discusses_coverage split 45 vs 4 of 49; 'not_matched' pubs = 4"
+
+- id: metabolomics_layer_counts
+  cypher: >
+    MATCH (a:MetaboliteAssay)
+    OPTIONAL MATCH (p:Publication)-[:PublicationHasMetaboliteAssay]->(a)
+    OPTIONAL MATCH (e:Experiment)-[:ExperimentHasMetaboliteAssay]->(a)
+    OPTIONAL MATCH (a)-[:MetaboliteAssayBelongsToOrganism]->(o:OrganismTaxon)
+    OPTIONAL MATCH (a)-[:Assay_quantifies_metabolite|Assay_flags_metabolite]->(m:Metabolite)
+    RETURN count(DISTINCT p) AS publications, count(DISTINCT e) AS experiments,
+           count(DISTINCT a) AS assays, count(DISTINCT o) AS organisms,
+           count(DISTINCT m) AS metabolites
+  expect: {publications: 3, experiments: 12, assays: 14, organisms: 5, metabolites: 149}
+  tolerance: {abs: 0}
+  used_in:
+    - CLAUDE.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
+    - multiomics_explorer/inputs/tools/list_publications.yaml
+    - multiomics_explorer/inputs/tools/list_experiments.yaml
+    - multiomics_explorer/inputs/tools/list_metabolite_assays.yaml
+  note: "'the 3 metabolomics publications' / '12 metabolomics experiments' / 14 assays / 5 organisms / ~149 measured metabolites"
+
+- id: organism_taxon_counts
+  cypher: >
+    MATCH (o:OrganismTaxon)
+    OPTIONAL MATCH (g:Gene)-[:Gene_belongs_to_organism]->(o)
+    WITH o, count(g) AS n
+    RETURN count(o) AS nodes, count(DISTINCT o.preferred_name) AS distinct_names,
+           sum(CASE WHEN n > 0 THEN 1 ELSE 0 END) AS with_genes
+  expect: {nodes: 48, distinct_names: 47, with_genes: 43}
+  used_in:
+    - CLAUDE.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/concepts.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
+    - multiomics_explorer/inputs/tools/list_organisms.yaml
+  note: "48 OrganismTaxon rows / 47 distinct preferred_name (Meiothermus ruber duplicate) / 43 carry genes"
+
+- id: ontology_count
+  source: ontology_config
+  expect: {ontologies: 17}
+  used_in:
+    - CLAUDE.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/start_here.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/concepts.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/annotation_evidence.md
+    - examples/README.md
+  note: "len(ONTOLOGY_CONFIG) — '17 ontologies'"
+
+- id: tool_count
+  source: tool_registry
+  expect: {tools: 42}
+  used_in:
+    - multiomics_explorer/mcp_server/server.py
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/start_here.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/python_api.md
+  note: "registered @mcp.tool count — '42 tools'"
+
+- id: pmm0392_transported_metabolite_count
+  cypher: "MATCH (g:Gene {locus_tag: 'PMM0392'}) RETURN g.transported_metabolite_count AS n"
+  expect: {n: 13}
+  used_in:
+    - CLAUDE.md
+    - multiomics_explorer/inputs/tools/metabolites_by_gene.yaml
+    - multiomics_explorer/inputs/tools/gene_ontology_terms.yaml
+  note: "worked example: PMM0392 transported_metabolite_count == distinct metabolites in its transport rows"
+
+- id: alteromonas_marref_peptidase_count
+  cypher: >
+    MATCH (o:OrganismTaxon {preferred_name: 'Alteromonas (MarRef v6)'})<-[:Gene_belongs_to_organism]-(g:Gene)
+    MATCH (g)-[e:Gene_has_merops_family]->()
+    WHERE e.call_class = 'peptidase'
+    RETURN count(DISTINCT g) AS peptidase_gene_count
+  expect: {peptidase_gene_count: 148}
+  used_in:
+    - CLAUDE.md
+    - multiomics_explorer/inputs/tools/list_organisms.yaml
+  note: "top_annotation_capability leader: 'Alteromonas (MarRef v6) leads at 148'"
+
+- id: med4_tcdb_edges
+  cypher: >
+    MATCH (g:Gene)-[e:Gene_has_tcdb_family]->()
+    WHERE g.locus_tag STARTS WITH 'PMM'
+    RETURN count(e) AS edges,
+           sum(CASE WHEN e.attachment_depth = 'most_specific' THEN 1 ELSE 0 END) AS most_specific
+  expect: {edges: 670, most_specific: 597}
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/annotation_evidence.md
+    - multiomics_explorer/inputs/tools/gene_ontology_terms.yaml
+    - multiomics_explorer/inputs/tools/genes_by_ontology.yaml
+    - multiomics_explorer/inputs/tools/pathway_enrichment.yaml
+  note: "MED4 Gene_has_tcdb_family: 670 edges, 597 most_specific"
+
+- id: ipr027417_med4_gene_count
+  cypher: >
+    MATCH (g:Gene)-[:Gene_has_interpro_entry]->(t:InterproEntry {id: 'interpro:IPR027417'})
+    WHERE g.locus_tag STARTS WITH 'PMM'
+    RETURN count(DISTINCT g) AS med4_genes
+  expect: {med4_genes: 119}
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/annotation_evidence.md
+    - multiomics_explorer/inputs/tools/genes_by_ontology.yaml
+    - multiomics_explorer/inputs/tools/ontology_landscape.yaml
+  note: "IPR027417 (P-loop NTPase) MED4 organism_gene_count 119"
+
+- id: kegg_ko_prefix
+  cypher: >
+    MATCH (k:KeggTerm {level_kind: 'ko'})
+    RETURN count(k) AS ko_terms,
+           sum(CASE WHEN k.id STARTS WITH 'kegg.orthology:' THEN 1 ELSE 0 END) AS prefixed,
+           sum(CASE WHEN k.id =~ 'kegg:K\\d+' THEN 1 ELSE 0 END) AS retired_prefix
+  expect: {retired_prefix: 0}
+  used_in:
+    - multiomics_explorer/inputs/ontologies/kegg.yaml
+    - multiomics_explorer/inputs/ontologies/brite.yaml
+    - multiomics_explorer/inputs/tools/genes_by_ontology.yaml
+  note: "all KO ids use the kegg.orthology: prefix; kegg:K… is retired (prefixed == ko_terms is asserted separately)"
+
+- id: kegg_uninformative_by_level_kind
+  cypher: >
+    MATCH (k:KeggTerm)
+    WHERE k.is_uninformative = 'true'
+    RETURN sum(CASE WHEN k.level_kind = 'ko' THEN 1 ELSE 0 END) AS ko_flagged,
+           sum(CASE WHEN k.level_kind = 'pathway' THEN 1 ELSE 0 END) AS pathway_flagged
+  expect: {ko_flagged: 212, pathway_flagged: 0}
+  tolerance: {rel: 0.05}
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/enrichment.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
+    - multiomics_explorer/inputs/ontologies/kegg.yaml
+    - examples/pathway_enrichment.py
+  note: >
+    Only KO-level KEGG terms carry is_uninformative today; NO pathway term (ko01100 etc.)
+    is flagged. If pathway_flagged becomes > 0 the KG side added pathway flags —
+    update the informative_only prose in the used_in files.
+
+- id: tigr_role_levels
+  cypher: >
+    MATCH (t:TigrRole)
+    RETURN sum(CASE WHEN t.level = 0 THEN 1 ELSE 0 END) AS level0,
+           sum(CASE WHEN t.level = 1 THEN 1 ELSE 0 END) AS level1
+  expect: {level0: 21, level1: 115}
+  used_in:
+    - multiomics_explorer/inputs/ontologies/tigr_role.yaml
+    - multiomics_explorer/inputs/tools/search_ontology.yaml
+    - multiomics_explorer/inputs/tools/genes_by_ontology.yaml
+  note: "TIGR role hierarchy: 21 main roles (level 0) / 115 sub-roles (level 1)"
+
+- id: ncbifam_to_interpro_links
+  cypher: "MATCH (:NcbifamFamily)-[r:Ncbifam_family_in_interpro_entry]->(:InterproEntry) RETURN count(r) AS links"
+  expect: {links: 2630}
+  tolerance: {rel: 0.05}
+  used_in:
+    - multiomics_explorer/inputs/ontologies/ncbifam.yaml
+  note: "NcbifamFamily → InterproEntry membership links (~2.6k; the ncbifam page's 'about half of families link to InterPro' claim)"
+
+- id: gene_retired_props_null
+  cypher: >
+    MATCH (g:Gene)
+    RETURN count(g.ec_numbers) AS ec_numbers, count(g.ko_terms) AS ko_terms,
+           count(g.kegg_ids) AS kegg_ids, count(g.cog_categories) AS cog_categories
+  expect: {ec_numbers: 0, ko_terms: 0, kegg_ids: 0, cog_categories: 0}
+  used_in:
+    - multiomics_explorer/inputs/tools/gene_details.yaml
+    - multiomics_explorer/inputs/tools/gene_homologs.yaml
+    - multiomics_explorer/inputs/tools/search_homolog_groups.yaml
+    - multiomics_explorer/mcp_server/tools.py
+  note: >
+    Gene.ec_numbers / ko_terms / kegg_ids / cog_categories are null on every gene —
+    docs must not advertise them as gene_details payload. If any becomes non-null
+    the KG repopulated them; revisit gene_details docs.

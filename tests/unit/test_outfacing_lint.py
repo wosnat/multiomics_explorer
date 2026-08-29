@@ -435,3 +435,15 @@ def test_lint_ignores_present_tense_type_note(lint_mod, tmp_path):
     md.write_text("`ontology` is now `str | list[str] | None`.\n")
     vs = lint_mod.lint_about_content([md])
     assert vs == []
+
+
+def test_lint_skips_example_response_fences(lint_mod, tmp_path):
+    """Live payloads inside ```example-response fences are data, not prose."""
+    md = tmp_path / "t.md"
+    md.write_text(
+        "Prose line.\n```example-response\n"
+        '{"description": "previously described"}\n```\n'
+        "Released on 2026-05-06.\n"
+    )
+    vs = lint_mod.lint_about_content([md])
+    assert [v[1] for v in vs] == [5]

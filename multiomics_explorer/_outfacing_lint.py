@@ -122,7 +122,18 @@ def lint_lines(paths: list[Path]) -> list[Violation]:
         except OSError as e:
             print(f"  SKIP {path}: {e}", file=sys.stderr)
             continue
+        in_example_block = False
         for i, line in enumerate(text.splitlines(), 1):
+            # ```example-response fences hold live KG payloads (term
+            # descriptions, product names) — data, not prose; skip them.
+            stripped = line.strip()
+            if stripped.startswith("```"):
+                in_example_block = (
+                    not in_example_block and stripped.startswith("```example-response")
+                )
+                continue
+            if in_example_block:
+                continue
             if CARVEOUT_PATTERN.search(line):
                 continue
             m = LINT_PATTERN.search(line)

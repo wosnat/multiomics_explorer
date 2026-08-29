@@ -1,0 +1,83 @@
+# Retired / never-existed identifiers that must not appear in user-facing text.
+# Read by tests/unit/test_docs_lint.py::test_no_stale_identifiers, which scans
+# the served docs tree, inputs/**/*.yaml, mcp_server/tools.py + server.py,
+# CLAUDE.md and examples/. Post-refactor sweeps miss prose — when you remove
+# or rename an identifier, add it here in the same PR.
+#
+# Entry fields:
+#   pattern      regex (Python), searched per line
+#   reason       why it is stale
+#   replacement  what to write instead (free text)
+#   allow_in     optional regex — a matching LINE is exempt (rename pointers,
+#                raise messages, ...)
+#   allow_files  optional list of path globs (relative to repo root) where the
+#                identifier is legitimately live
+#   near         optional regex — only flag when this appears within `near_lines`
+#                lines (default 3) of the match; scopes an identifier that is
+#                stale in one tool's context but live in another's
+#   near_lines   optional int window for `near`
+
+- pattern: '\btransporter_count\b'
+  near: 'gene_overview'
+  near_lines: 3
+  reason: "gene_overview.transporter_count was removed (counted superseded ancestor attachments)"
+  replacement: "tcdb_family_count (deepest-attachment families) or transported_metabolite_count"
+  allow_files:
+    - "multiomics_explorer/inputs/tools/list_metabolites.yaml"
+    - "multiomics_explorer/inputs/tools/genes_by_metabolite.yaml"
+    - "multiomics_explorer/inputs/tools/metabolites_by_gene.yaml"
+    - "multiomics_explorer/skills/multiomics-kg-guide/references/tools/list_metabolites.md"
+    - "multiomics_explorer/skills/multiomics-kg-guide/references/tools/genes_by_metabolite.md"
+    - "multiomics_explorer/skills/multiomics-kg-guide/references/tools/metabolites_by_gene.md"
+
+- pattern: '\btransport_confidence\b'
+  reason: "renamed to substrate_depth (values most_specific / inherited)"
+  replacement: "substrate_depth"
+  allow_in: '(?i)rename|raise'
+
+- pattern: '\bkegg:K\d+'
+  reason: "retired KO id prefix"
+  replacement: "kegg.orthology:K…"
+
+- pattern: '\bmap00001\b'
+  reason: "not a KG id (KEGG pathway ids are kegg.pathway:koXXXXX)"
+  replacement: "a live kegg.pathway:ko… id, or drop the example"
+  allow_in: '(?i)\b(?:no|not|never)\b'   # didactic "there is no map00001" mentions
+
+- pattern: '\b(?:nitrogen_stress|light_stress|nutrient_starvation|nitrogen_limitation|diel_cycle|continuous_light)\b'
+  reason: "not a live treatment_type / background_factors value — silently returns 0 rows"
+  replacement: "live values: nitrogen, light, diel, darkness, … (list_filter_values)"
+  allow_in: "(?i)\\bnot\\b|unknown value"   # didactic "'nitrogen', not 'nitrogen_stress'" mentions
+
+- pattern: '\bby_(?:metabolic|annotation)_capability\b'
+  reason: "list_organisms envelope keys renamed"
+  replacement: "top_metabolic_capability / top_annotation_capability"
+
+- pattern: 'scripts/expression_by_ortholog'
+  reason: "script never existed"
+  replacement: "differential_expression_by_ortholog tool / docs://analysis/expression"
+
+- pattern: '\buv run multiomics-explorer\b'
+  reason: "the Typer CLI was removed; pyproject ships only multiomics-kg-mcp"
+  replacement: "uv run multiomics-kg-mcp / the Python API"
+
+- pattern: 'cli/main\.py'
+  reason: "the CLI module was removed"
+  replacement: "drop the reference"
+
+- pattern: '\b(?:37|45|47) organisms\b'
+  reason: "organism count from an earlier KG (live: 48 OrganismTaxon / 43 with genes)"
+  replacement: "read list_organisms; if a number is needed, 48 nodes / 43 with genes"
+
+- pattern: '\b(?:14|15|16) ontologies\b'
+  reason: "ontology count predates InterPro / NCBIfam / MEROPS registration"
+  replacement: "17 ontologies (ONTOLOGY_CONFIG)"
+
+- pattern: '\b41 tools\b'
+  reason: "tool count from before the 42nd tool"
+  replacement: "42 tools (server.py instructions / registry)"
+
+- pattern: 'docs://ontologies(?![/\w])'
+  reason: "bare docs://ontologies is not a served resource"
+  replacement: "docs://ontologies/index or docs://ontologies/{key}"
+  allow_in: '_SKILLS_DIR'   # the _DOC_DIRS registration key in server.py is the prefix itself
