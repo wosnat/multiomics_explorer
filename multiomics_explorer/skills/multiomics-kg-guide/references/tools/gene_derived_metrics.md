@@ -30,7 +30,7 @@ thresholds) live on `genes_by_numeric_metric`; flag-level filters on
 | organism | string \| None | None | Organism to scope to. Accepts short strain code ('MED4', 'NATL2A', 'MIT1002') or full name; word-based, case-insensitive match, ambiguous match raises. Inferred from locus_tags when omitted. |
 | metric_types | list[string] \| None | None | Filter by metric_type tags (e.g. 'diel_amplitude_protein_log2'). Same metric_type may appear across publications — pair with publication_doi or use derived_metric_ids to pin one specific DM. |
 | value_kind | string ('numeric', 'boolean', 'categorical') \| None | None | Restrict to one DM kind. Each kind has a different `value` column type — 'numeric' → float, 'boolean' → 'flagged'/'not_flagged', 'categorical' → category string. |
-| compartment | string \| None | None | Filter to DMs from one sample compartment ('whole_cell', 'vesicle', 'exoproteome', 'spent_medium', 'lysate'). Exact match. |
+| compartment | string \| None | None | Filter to DMs from one sample compartment ('whole_cell', 'vesicle', 'exoproteome', 'extracellular'). Exact match. |
 | treatment_type | list[string] \| None | None | Treatment type(s) to match. Returns DMs whose treatment_type list overlaps ANY of the given values. Case-insensitive. |
 | background_factors | list[string] \| None | None | Background experimental factor(s) to match. ANY-overlap. Case-insensitive. |
 | publication_doi | list[string] \| None | None | Filter by one or more publication DOIs. Exact match. |

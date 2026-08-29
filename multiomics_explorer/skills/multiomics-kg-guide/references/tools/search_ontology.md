@@ -35,7 +35,7 @@ reference.
 | offset | int | 0 | Number of results to skip per ontology (lockstep paging). |
 | level | int \| None | None | Hierarchy level filter (0 = broadest). See docs://guide/conventions for the level convention. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Applies to 'brite' only; raises if 'brite' is not in the ontology set. See docs://guide/conventions for the BRITE-tree scoping rule. |
-| informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). Term-side filter only — never restricts the gene set. Default False (opt-in). |
+| informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; the global / overview KEGG maps such as ko01100). Term-side filter only — never restricts the gene set. Default False (opt-in). |
 | verbose | bool | False | Add description, level_kind, direct_gene_count, per-ontology columns (tcdb superfamily/metabolite_count, ncbifam family_type/gene_symbol, merops family_class/catalytic_type/peptidase_gene_count) and KEGG discussed_in_publications. Default compact. |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type. Applies to 'interpro' only; raises if 'interpro' is not in the set. |
 | min_gene_count | int \| None | None | Keep terms with gene_count >= this (subtree organism_gene_count when `organism` is set). Narrows browse mode. |

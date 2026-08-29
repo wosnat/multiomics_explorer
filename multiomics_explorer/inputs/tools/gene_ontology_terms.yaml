@@ -92,11 +92,11 @@ examples:
         "not_found": [],
         "no_terms": [],
         "trust_axes": {"cazy": ["sources", "evidence", "evidence_score"]},
-        "by_evidence": [{"evidence": "curated", "count": 4}],
+        "by_evidence": [{"evidence": "family_inferred", "count": 4}],
         "by_tier": [],
         "by_sources": [{"source": "eggnog", "count": 4}, {"source": "interproscan", "count": 2}],
         "by_call_class": [],
-        "evidence_score_stats": {"min": 0.667, "median": 0.8335, "max": 1.0, "n_null": 0},
+        "evidence_score_stats": {"min": 0.333, "median": 0.5, "max": 0.667, "n_null": 0},
         "evidence_score_signals": null,
         "filters_applied": {},
         "skipped_ontologies": [],
@@ -108,7 +108,7 @@ examples:
             "term_name": "Carbohydrate-Binding Modules",
             "level": 0,
             "is_informative": true,
-            "evidence": "curated"
+            "evidence": "family_inferred"
           },
           {
             "locus_tag": "PMM0584",
@@ -116,7 +116,7 @@ examples:
             "term_name": "Glycoside Hydrolases",
             "level": 0,
             "is_informative": true,
-            "evidence": "curated"
+            "evidence": "family_inferred"
           },
           {
             "locus_tag": "PMM1322",
@@ -124,7 +124,7 @@ examples:
             "term_name": "Carbohydrate-Binding Modules",
             "level": 0,
             "is_informative": true,
-            "evidence": "curated"
+            "evidence": "family_inferred"
           },
           ...
         ]

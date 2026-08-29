@@ -27,7 +27,7 @@ kind-specific drill-downs.
 | organism | string \| None | None | Organism to filter by. Accepts short strain code ('MED4', 'NATL2A', 'MIT1002') or full name ('Prochlorococcus MED4'). Word-based, case-insensitive match on preferred_name + name_synonyms; a genus word matches every strain. |
 | metric_types | list[string] \| None | None | Filter by metric_type tags (e.g. 'diel_amplitude_protein_log2', 'periodic_in_coculture_LD'). The same metric_type may appear across organisms / publications — use derived_metric_ids to pin one specific DM when that matters. |
 | value_kind | string ('numeric', 'boolean', 'categorical') \| None | None | Filter by value kind. Determines which drill-down tool applies: 'numeric' → genes_by_numeric_metric, 'boolean' → genes_by_boolean_metric, 'categorical' → genes_by_categorical_metric. |
-| compartment | string \| None | None | Sample compartment / scope. Current values: 'whole_cell', 'vesicle', 'exoproteome', 'spent_medium', 'lysate'. |
+| compartment | string \| None | None | Sample compartment / scope. Current values: 'whole_cell', 'vesicle', 'exoproteome', 'extracellular'. |
 | omics_type | string \| None | None | Omics assay type. Examples: 'RNASEQ', 'PROTEOME', 'PAIRED_RNASEQ_PROTEOME'. Case-insensitive. |
 | treatment_type | list[string] \| None | None | Treatment type(s) to match. Returns DMs whose treatment_type list overlaps ANY of the given values (e.g. 'diel', 'darkness', 'nitrogen'). Case-insensitive. Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True). |
 | background_factors | list[string] \| None | None | Background experimental factor(s) to match (e.g. 'axenic', 'coculture', 'diel'). Returns DMs overlapping ANY given value. Case-insensitive. |
@@ -84,7 +84,7 @@ total_entries, total_matching, by_organism, by_value_kind, by_metric_type, by_co
 | organism_name | string | Full organism name (e.g. 'Prochlorococcus MED4', 'Alteromonas macleodii MIT1002'). |
 | experiment_id | string | Parent Experiment node id. Look up context via list_experiments. |
 | publication_doi | string | Parent publication DOI (e.g. '10.1128/mSystems.00040-18'). |
-| compartment | string | Sample compartment or scope (e.g. 'whole_cell', 'vesicle', 'exoproteome', 'spent_medium', 'lysate'). |
+| compartment | string | Sample compartment or scope (e.g. 'whole_cell', 'vesicle', 'exoproteome', 'extracellular'). |
 | omics_type | string | Omics assay type (e.g. 'RNASEQ', 'PROTEOME', 'PAIRED_RNASEQ_PROTEOME'). |
 | treatment_type | list[string] | Treatment type(s) (e.g. ['diel'], ['darkness']). |
 | background_factors | list[string] | Background experimental factors (e.g. ['axenic'], ['coculture', 'diel']). May be empty. |

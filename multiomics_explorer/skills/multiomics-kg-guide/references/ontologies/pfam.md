@@ -15,12 +15,13 @@ proteins.
 
 Gene → Pfam edges pool InterProScan HMM hits with Cyanorak, eggNOG and
 UniProt records (`sources[]`); compact `evidence` is `signature` (an HMM
-match — the native Pfam rung) or `curated`, with an `evidence_score` in
+match — the native Pfam rung), `curated` or `family_inferred`, with an `evidence_score` in
 [0, 1] reflecting source agreement; rung semantics in
 `docs://analysis/annotation_evidence`. Live on this edge type:
-InterProScan-only and eggNOG+InterProScan edges read `signature`;
-eggNOG-only edges read `curated` (an open KG-side ask), as do all edges
-with a `cyanorak` or `uniprot` source. Clan membership is a term-side edge
+InterProScan-only and eggNOG+InterProScan edges read `signature` (the
+HMM hit is kept even when eggNOG agrees); eggNOG-only edges read
+`family_inferred` (~25k); any edge with a `cyanorak` or `uniprot` source
+reads `curated`. Clan membership is a term-side edge
 (`Pfam_in_pfam_clan`), so a gene's clan count is a rollup of its
 domain hits. Pfam entries also bridge *out* to InterPro
 (`Pfam_in_interpro_entry`, membership) — the InterPro entry that
@@ -81,6 +82,11 @@ Parent label `PfamClan`: `gene_count`, `id`, `level`, `name`, `organism_count`, 
 
 Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="pfam")`) lists which comparable axes the gene edge carries.
 
+Snapshot of vocabulary values at build time (`--live-vocab`):
+
+- `Gene_has_pfam.evidence`: `curated`, `signature`, `family_inferred`
+- `Gene_has_pfam.sources`: `cyanorak`, `eggnog`, `interproscan`, `uniprot`
+
 ## Interpretation
 
 The right axis for "what is this protein built from" and for
@@ -88,9 +94,9 @@ architecture-level comparisons across distant organisms — domains are far
 more conserved than whole-protein orthology. Level 1 (domains) is the
 enrichment unit; clan level (0) is coarse but robust when domain sets are
 sparse. Rank a gene's competing domain hits by `evidence_score`;
-`signature` means an HMM threshold was passed, and `curated` should be
-read together with `sources` (a `cyanorak` / `uniprot` source is a
-confirmed domain, `['eggnog']` alone is a transfer). For the *integrated* view of a domain
+`signature` means an HMM threshold was passed, `curated` a
+`cyanorak` / `uniprot` confirmation, and `family_inferred` an eggNOG-only
+transfer with no HMM hit of its own. For the *integrated* view of a domain
 (which InterPro entry, which GO terms it implies) follow `links_out` to
 `interpro`.
 

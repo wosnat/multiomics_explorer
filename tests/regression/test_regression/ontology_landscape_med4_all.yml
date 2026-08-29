@@ -197,17 +197,17 @@ rows:
   q3_genes_per_term: 117.25
   relevance_rank: 15
 - best_effort_share: null
-  genome_coverage: 0.3771
+  genome_coverage: 0.3725
   level: 2
-  max_genes_per_term: 254
+  max_genes_per_term: 54
   median_genes_per_term: 12.0
   min_genes_per_term: 5
-  n_genes_at_level: 744
+  n_genes_at_level: 735
   n_levels_in_ontology: 3
-  n_terms_with_genes: 97
+  n_terms_with_genes: 88
   ontology_type: kegg
   q1_genes_per_term: 7.0
-  q3_genes_per_term: 18.0
+  q3_genes_per_term: 17.0
   relevance_rank: 16
 - best_effort_share: null
   genome_coverage: 0.3452

@@ -1,8 +1,8 @@
 case_id: gene_ontology_terms_mf
 row_count: 5
 rows:
-- evidence: curated
-  evidence_score: 0.667
+- evidence: family_inferred
+  evidence_score: 0.333
   is_informative: true
   level: 5
   locus_tag: MIT1002_03493
@@ -23,8 +23,8 @@ rows:
   term_name: DNA-binding transcription factor activity
   tree: null
   tree_code: null
-- evidence: curated
-  evidence_score: 1.0
+- evidence: family_inferred
+  evidence_score: 0.667
   is_informative: true
   level: 3
   locus_tag: MIT1002_03493
@@ -35,8 +35,8 @@ rows:
   term_name: arginine binding
   tree: null
   tree_code: null
-- evidence: curated
-  evidence_score: 0.667
+- evidence: family_inferred
+  evidence_score: 0.333
   is_informative: true
   level: 3
   locus_tag: MIT1002_03493
@@ -46,8 +46,8 @@ rows:
   term_name: identical protein binding
   tree: null
   tree_code: null
-- evidence: curated
-  evidence_score: 0.667
+- evidence: family_inferred
+  evidence_score: 0.333
   is_informative: true
   level: 3
   locus_tag: MIT1002_03493

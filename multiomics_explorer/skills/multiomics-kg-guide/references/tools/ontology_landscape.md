@@ -38,7 +38,7 @@ and BRITE-tree scoping conventions.
 | offset | int | 0 | Skip N rows before limit |
 | min_gene_set_size | int | 5 | Exclude terms with fewer genes than this (default 5). |
 | max_gene_set_size | int | 500 | Exclude terms with more genes than this (default 500). |
-| informative_only | bool | True | When True (default), exclude terms flagged uninformative in KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). Term-side filter only — never restricts the gene set. Pass False to opt out and survey the full term set (rebaselines may differ). |
+| informative_only | bool | True | When True (default), exclude terms flagged uninformative in KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; the global / overview KEGG maps such as ko01100). Term-side filter only — never restricts the gene set. Pass False to opt out and survey the full term set (rebaselines may differ). |
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; leaving unfiltered mixes in catalytically-dead homologs (nonpeptidase_homolog) - the envelope warns when it does. |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
 
@@ -868,7 +868,7 @@ ontology_landscape(organism="MED4", ontology="merops", call_class=["peptidase"])
 ontology_landscape(organism="MED4", informative_only=False)
 ```
 
-*`ontology_landscape` defaults to `informative_only=True` (the only ontology tool that does) — the ranking surface for enrichment should reflect informative terms only. Pass `informative_only=False` for an unfiltered census, e.g. when triaging coverage gaps or comparing unfiltered vs filtered genome_coverage. Term counts and genome_coverage rise slightly (MED4 KEGG level 3: 30 KO terms; KEGG pathway maps are never flagged, including the global map ko01100 — bound those with `max_gene_set_size`).*
+*`ontology_landscape` defaults to `informative_only=True` (the only ontology tool that does) — the ranking surface for enrichment should reflect informative terms only. Pass `informative_only=False` for an unfiltered census, e.g. when triaging coverage gaps or comparing unfiltered vs filtered genome_coverage. Term counts and genome_coverage rise slightly (MED4 KEGG level 3: 30 KO terms; at KEGG level 2 the global / overview maps such as ko01100 are flagged and drop out under the default).*
 
 ```example-response
 {

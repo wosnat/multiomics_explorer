@@ -18,8 +18,9 @@ merged into one edge per (gene, term) with `sources[]`, a compact
 `evidence` rung (`curated` / `family_inferred` / `domain_inferred`) and an
 `evidence_score` in [0, 1] — rung semantics in
 `docs://analysis/annotation_evidence`. Live on this edge type: eggNOG-only
-edges read `curated` (most of the branch; an open KG-side ask),
-InterProScan-only edges read `domain_inferred` or `family_inferred`.
+edges read `family_inferred` (most of the branch, ~180k), curated sources
+read `curated`, InterProScan-only edges read `domain_inferred` or
+`family_inferred`.
 Molecular function is the branch where `domain_inferred` is most common,
 because a Pfam/InterPro domain maps naturally onto an activity (a kinase
 domain implies kinase activity).
@@ -76,15 +77,22 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="go_mf")`) lists which comparable axes the gene edge carries.
 
+Snapshot of vocabulary values at build time (`--live-vocab`):
+
+- `Gene_enables_molecular_function.evidence`: `curated`, `family_inferred`, `domain_inferred`
+- `Gene_enables_molecular_function.sources`: `cyanorak`, `eggnog`, `interproscan`, `ncbi`, `uniprot`
+- `MolecularFunction.is_uninformative`: `true`
+- `MolecularFunction.level_is_best_effort`: `true`
+
 ## Interpretation
 
 Molecular-function terms are precise about *what* an enzyme does but say
 nothing about pathway context — pair them with `go_bp`, KEGG or EC when the
 question is "which pathway". `domain_inferred` edges are common and often
 correct but broad (`ATP binding` on every P-loop protein); rank by
-`evidence_score`, and check `sources` before reading `curated` as a
-curator's call — `['cyanorak']`, `['uniprot']` or `['ncbi']` are;
-`['eggnog']` alone is an orthology transfer. For enrichment, level 3-5 is the
+`evidence_score`; `curated` is backed by a reference source
+(`cyanorak` / `uniprot` / `ncbi`), an eggNOG-only transfer reads
+`family_inferred`. For enrichment, level 3-5 is the
 usual working range — check `ontology_landscape` first.
 
 ## Informativeness rule

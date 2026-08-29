@@ -44,9 +44,9 @@ Four levels, `level` 0-3 = `category` (6) → `subcategory` (46) →
 `pathway` (447) → `ko` (4,644). It is a DAG in practice: one KO belongs
 to many pathways (a glycolysis enzyme is also in several biosynthesis
 maps), so `gene_count` on a pathway is the union of its KOs' genes and
-sibling pathways overlap heavily. `direct_gene_count` is present on every
-node; on a pathway it is always 0 by construction (genes attach to KOs
-only), so read `gene_count` there. The thirteen global / overview maps
+sibling pathways overlap heavily. `direct_gene_count` is present on KO
+nodes only (genes attach to KOs); on a pathway, subcategory or category
+node it is absent, so read `gene_count` there. The thirteen global / overview maps
 (`kegg.pathway:ko01100` Metabolic pathways, `ko01110`, `ko01120`, the
 `ko012xx` block, `ko01310`, `ko01320`) have no parent subcategory in
 this KG — they are level-2 nodes with no `parents[]`. BRITE hierarchies
@@ -91,6 +91,13 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="kegg")`) lists which comparable axes the gene edge carries.
 
+Snapshot of vocabulary values at build time (`--live-vocab`):
+
+- `Gene_has_kegg_ko.evidence`: `family_inferred`
+- `Gene_has_kegg_ko.sources`: `eggnog`
+- `KeggTerm.is_uninformative`: `true`
+- `KeggTerm.level_kind`: `category`, `subcategory`, `pathway`, `ko`
+
 ## Interpretation
 
 Pathway level (`level=2`) is the interpretable enrichment unit — it maps
@@ -105,16 +112,17 @@ chemistry layer — the two memberships differ (see
 
 ## Informativeness rule
 
-Only KO-level terms are flagged: the 212 KOs named "uncharacterized
-protein" (`K00243; uncharacterized protein` and kin). No pathway,
-subcategory or category node is flagged — `informative_only=True` does
-NOT drop the global maps. `kegg.pathway:ko01100` Metabolic pathways
-(27,192 genes across the KG; about a quarter of the MED4 genome) and its
-siblings `ko01110` / `ko01120` / `ko01230` / `ko01240` pass through an
-enrichment untouched. Flagging the global-map block is an open KG-side
-ask; until it lands, cap term size with `max_gene_set_size` (a few
-hundred genes for a single organism) or drop the `ko011xx` / `ko012xx`
-rows from the result by id. The flag is term-side only; the genes stay
+Two kinds of term are flagged. At KO level, the 212 KOs named
+"uncharacterized protein" (`K00243; uncharacterized protein` and kin).
+At pathway level, 11 of the 13 parentless global / overview maps —
+`kegg.pathway:ko01100` Metabolic pathways (27,192 genes across the KG;
+about a quarter of the MED4 genome), `ko01110`, `ko01120` and the
+`ko012xx` block — so `informative_only=True` drops them from an
+enrichment. `ko01310` Nitrogen cycle and `ko01320` Sulfur cycle are
+parentless too but stay informative: they are narrow, class-bearing
+subsets (16 and 22 KOs), not unions. Category and subcategory nodes are
+never flagged ("Carbohydrate metabolism" carries a class signal); gate
+those with `level` — they are not `level=2` ORA targets. The flag is term-side only; the genes stay
 in the background.
 
 ## Pitfalls

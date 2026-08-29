@@ -172,11 +172,12 @@ def scenario_de() -> None:
     global_maps = full_run.results[
         full_run.results["term_id"].str.contains("ko011", regex=False)
     ]
-    print("KEGG global/overview maps (ko011xx) are NOT flagged uninformative "
-          "in the live KG — they survive both runs:")
+    kept = default_run.results["term_id"].str.contains("ko011", regex=False).sum()
+    print("KEGG global/overview maps (ko011xx) are flagged uninformative in "
+          f"the live KG — {len(global_maps)} rows with informative_only=False, "
+          f"{kept} with the default:")
     print(global_maps[["cluster", "term_id", "term_name", "bg_count",
                        "p_adjust"]].head(4).to_string(index=False))
-    print("Drop them with max_gene_set_size or by post-filtering term_id.")
 
 
 def scenario_cluster() -> None:

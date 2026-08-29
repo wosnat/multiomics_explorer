@@ -377,7 +377,7 @@ list_filter_values(filter_type="call_class")
 ```example-response
 {
   "filter_type": "call_class",
-  "description": "KG-minted read-first verdict for one Gene_has_merops_family candidate. Harvested from the three return statements of ...",
+  "description": "Read-first verdict for one MEROPS candidate: inhibitor when the family is an I-family, nonpeptidase_homolog when the ...",
   "total_entries": 3,
   "returned": 3,
   "truncated": false,
@@ -437,7 +437,7 @@ list_filter_values(filter_type="merops_catalytic_type")
 ```example-response
 {
   "filter_type": "merops_catalytic_type",
-  "description": "KG-minted full-word spelling of MEROPS^s single-letter catalytic-type code — MEROPS ships \"S\"/\"C\"/\"M\"/etc, the KG spe...",
+  "description": "Catalytic mechanism of a peptidase family, MEROPS^s single-letter code spelled out (S = serine, C = cysteine, M = met...",
   "total_entries": 9,
   "returned": 9,
   "truncated": false,

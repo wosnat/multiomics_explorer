@@ -49,9 +49,11 @@ by_category:
 - category: Cell motility
   count: 1
 by_evidence:
-- count: 1058
+- count: 1007
   evidence: curated
-- count: 18
+- count: 48
+  evidence: family_inferred
+- count: 21
   evidence: signature
 by_level:
 - level: 0
@@ -59,11 +61,11 @@ by_level:
   n_terms: 77
   row_count: 1076
 by_sources:
-- count: 994
+- count: 989
   source: eggnog
-- count: 952
+- count: 955
   source: interproscan
-- count: 947
+- count: 950
   source: cyanorak
 - count: 651
   source: uniprot
@@ -72,7 +74,7 @@ case_id: genes_by_ontology_pfam_clans
 evidence_score_stats:
   max: 1.0
   median: 1.0
-  min: 0.667
+  min: 0.333
   n_null: 0
 filtered_out: []
 filters_applied: {}
@@ -437,7 +439,7 @@ results:
   product: prolyl oligopeptidase/peptidase S9-like domain containing protein
   term_id: pfam.clan:CL0028
   term_name: AB_hydrolase
-- evidence: curated
+- evidence: family_inferred
   gene_category: Post-translational modification
   gene_name: dap2
   is_informative: true
@@ -563,7 +565,7 @@ results:
   product: serine endoprotease, periplasmic
   term_id: pfam.clan:CL0466
   term_name: PDZ-like
-- evidence: curated
+- evidence: family_inferred
   gene_category: Stress response and adaptation
   gene_name: null
   is_informative: true
@@ -599,7 +601,7 @@ results:
   product: L-aspartate oxidase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
-- evidence: curated
+- evidence: signature
   gene_category: Translation
   gene_name: rimO
   is_informative: true
@@ -824,7 +826,7 @@ results:
   product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
   term_id: pfam.clan:CL0108
   term_name: Actin_ATPase
-- evidence: curated
+- evidence: family_inferred
   gene_category: Transcription
   gene_name: pcnB
   is_informative: true
@@ -932,7 +934,7 @@ results:
   product: redox-responsive LuxR-type transcriptional regulator PedR
   term_id: pfam.clan:CL0123
   term_name: HTH
-- evidence: curated
+- evidence: signature
   gene_category: Carbohydrate metabolism
   gene_name: ndhI
   is_informative: true
@@ -1635,7 +1637,7 @@ results:
   product: recB nuclease, TM0106 family domain protein
   term_id: pfam.clan:CL0219
   term_name: RNase_H
-- evidence: curated
+- evidence: family_inferred
   gene_category: Replication and repair
   gene_name: null
   is_informative: true
@@ -1770,7 +1772,7 @@ results:
   product: bifunctional selenide, water dikinase / oxidoreductase fusion protein
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
-- evidence: curated
+- evidence: family_inferred
   gene_category: Transcription
   gene_name: pcnB
   is_informative: true
@@ -2105,7 +2107,7 @@ results:
     and N6-adenine DNA methyltransferase activity
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
-- evidence: curated
+- evidence: family_inferred
   gene_category: Replication and repair
   gene_name: spnII1interrupted1C
   is_informative: true
@@ -2115,7 +2117,7 @@ results:
     and N6-adenine DNA methyltransferase activity
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
-- evidence: curated
+- evidence: family_inferred
   gene_category: Replication and repair
   gene_name: spnII1interrupted1C
   is_informative: true
@@ -2441,7 +2443,7 @@ results:
     methyltransferase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
-- evidence: curated
+- evidence: family_inferred
   gene_category: Coenzyme metabolism
   gene_name: birA
   is_informative: true
@@ -2477,7 +2479,7 @@ results:
   product: NADH dehydrogenase I subunit NdhB (chain 2 or N)
   term_id: pfam.clan:CL0425
   term_name: ComplexI-N
-- evidence: curated
+- evidence: family_inferred
   gene_category: Amino acid metabolism
   gene_name: null
   is_informative: true
@@ -2630,7 +2632,7 @@ results:
   product: N6-L-threonylcarbamoyladenine synthase
   term_id: pfam.clan:CL0108
   term_name: Actin_ATPase
-- evidence: curated
+- evidence: family_inferred
   gene_category: Transport
   gene_name: nhaS
   is_informative: true
@@ -2657,7 +2659,7 @@ results:
   product: glutamyl-tRNA synthetase
   term_id: pfam.clan:CL0039
   term_name: HUP
-- evidence: curated
+- evidence: family_inferred
   gene_category: Photosynthesis
   gene_name: null
   is_informative: true
@@ -2829,7 +2831,7 @@ results:
   product: signal peptidase I
   term_id: pfam.clan:CL0299
   term_name: Peptidase_SF
-- evidence: curated
+- evidence: family_inferred
   gene_category: Nucleotide metabolism
   gene_name: pyrC
   is_informative: true
@@ -3397,7 +3399,7 @@ results:
   product: signal peptidase I
   term_id: pfam.clan:CL0299
   term_name: Peptidase_SF
-- evidence: curated
+- evidence: family_inferred
   gene_category: Coenzyme metabolism
   gene_name: menD
   is_informative: true
@@ -3597,7 +3599,7 @@ results:
   product: radical SAM/Cys-rich domain protein
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
-- evidence: curated
+- evidence: family_inferred
   gene_category: Stress response and adaptation
   gene_name: arsS
   is_informative: true
@@ -3651,7 +3653,7 @@ results:
   product: FAD binding domain protein
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
-- evidence: curated
+- evidence: family_inferred
   gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -3975,7 +3977,7 @@ results:
   product: arsenate efflux pump
   term_id: pfam.clan:CL0064
   term_name: CPA_AT
-- evidence: curated
+- evidence: family_inferred
   gene_category: Inorganic ion transport
   gene_name: null
   is_informative: true
@@ -3984,7 +3986,7 @@ results:
   product: conserved hypothetical protein
   term_id: pfam.clan:CL0404
   term_name: BPD_transp_1
-- evidence: curated
+- evidence: family_inferred
   gene_category: Regulatory functions
   gene_name: null
   is_informative: true
@@ -4173,7 +4175,7 @@ results:
   product: ATP-dependent DNA helicase
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
-- evidence: curated
+- evidence: family_inferred
   gene_category: Translation
   gene_name: glyS
   is_informative: true
@@ -4408,7 +4410,7 @@ results:
   product: haloacid dehalogenase (HAD) family phosphatase
   term_id: pfam.clan:CL0137
   term_name: HAD
-- evidence: curated
+- evidence: family_inferred
   gene_category: Transcription
   gene_name: ycf55
   is_informative: true
@@ -4463,7 +4465,7 @@ results:
   product: endonuclease III
   term_id: pfam.clan:CL0198
   term_name: HHH
-- evidence: curated
+- evidence: family_inferred
   gene_category: Stress response and adaptation
   gene_name: futC
   is_informative: true
@@ -4823,7 +4825,7 @@ results:
   product: phenylalanine--tRNA ligase, beta subunit
   term_id: pfam.clan:CL0123
   term_name: HTH
-- evidence: curated
+- evidence: family_inferred
   gene_category: Post-translational modification
   gene_name: null
   is_informative: true
@@ -5057,7 +5059,7 @@ results:
   product: pyruvate kinase
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
-- evidence: curated
+- evidence: family_inferred
   gene_category: Carbohydrate metabolism
   gene_name: pyk
   is_informative: true
@@ -5120,7 +5122,7 @@ results:
   product: anti-sigma regulatory factor
   term_id: pfam.clan:CL0025
   term_name: His_Kinase_A
-- evidence: curated
+- evidence: family_inferred
   gene_category: Coenzyme metabolism
   gene_name: ycf53
   is_informative: true
@@ -6048,7 +6050,7 @@ results:
   product: lipoyl synthase
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
-- evidence: curated
+- evidence: signature
   gene_category: Replication and repair
   gene_name: recR
   is_informative: true
@@ -6183,7 +6185,7 @@ results:
   product: methylenetetrahydrofolate--tRNA-(uracil(54)-C(5))-methyltransferase (FADH(2)-oxidizing)
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
-- evidence: curated
+- evidence: family_inferred
   gene_category: Stress response and adaptation
   gene_name: som
   is_informative: true
@@ -6237,7 +6239,7 @@ results:
   product: autotransporter beta-domain containing protein
   term_id: pfam.clan:CL0193
   term_name: MBB
-- evidence: curated
+- evidence: family_inferred
   gene_category: Transport
   gene_name: null
   is_informative: true
@@ -6618,7 +6620,7 @@ results:
   product: mannose-1-phosphate guanylyltransferase
   term_id: pfam.clan:CL0110
   term_name: GT-A
-- evidence: curated
+- evidence: family_inferred
   gene_category: Cell wall and membrane
   gene_name: null
   is_informative: true
@@ -6699,7 +6701,7 @@ results:
   product: possible NDP-hexose 3,4-dehydratase
   term_id: pfam.clan:CL0061
   term_name: PLP_aminotran
-- evidence: curated
+- evidence: family_inferred
   gene_category: Cell wall and membrane
   gene_name: null
   is_informative: true
@@ -6762,7 +6764,7 @@ results:
   product: polysaccharide biosynthesis/export family protein
   term_id: pfam.clan:CL0072
   term_name: Ubiquitin
-- evidence: curated
+- evidence: family_inferred
   gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -6780,7 +6782,7 @@ results:
   product: hypothetical protein distantly related to alpha-glycosyltransferases
   term_id: pfam.clan:CL0113
   term_name: GT-B
-- evidence: curated
+- evidence: family_inferred
   gene_category: Cell wall and membrane
   gene_name: gmhB
   is_informative: true
@@ -6924,7 +6926,7 @@ results:
   product: dehydrogenase E1 component beta subunit
   term_id: pfam.clan:CL0254
   term_name: THDP-binding
-- evidence: curated
+- evidence: family_inferred
   gene_category: Energy production
   gene_name: bfmBA
   is_informative: true
@@ -7059,7 +7061,7 @@ results:
   product: putative methyltransferase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
-- evidence: curated
+- evidence: family_inferred
   gene_category: Secondary metabolites
   gene_name: null
   is_informative: true
@@ -7086,7 +7088,7 @@ results:
   product: carbamoyltransferase family protein
   term_id: pfam.clan:CL0108
   term_name: Actin_ATPase
-- evidence: curated
+- evidence: family_inferred
   gene_category: Cell wall and membrane
   gene_name: null
   is_informative: true
@@ -7375,7 +7377,7 @@ results:
   product: cell division protein ZipN
   term_id: pfam.clan:CL0020
   term_name: TPR
-- evidence: curated
+- evidence: family_inferred
   gene_category: Cell cycle and division
   gene_name: zipN
   is_informative: true
@@ -7492,7 +7494,7 @@ results:
   product: bifunctional dihydrofolate synthase / folylpolyglutamate synthase
   term_id: pfam.clan:CL0794
   term_name: Mur_ligase_C_sf
-- evidence: curated
+- evidence: family_inferred
   gene_category: Amino acid metabolism
   gene_name: codA
   is_informative: true
@@ -7573,7 +7575,7 @@ results:
   product: oxygen-independent coproporphyrinogen III oxidase
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
-- evidence: curated
+- evidence: family_inferred
   gene_category: Coenzyme metabolism
   gene_name: hemN
   is_informative: true
@@ -7825,7 +7827,7 @@ results:
   product: photosystem II S4 domain protein
   term_id: pfam.clan:CL0492
   term_name: S4
-- evidence: curated
+- evidence: family_inferred
   gene_category: Lipid metabolism
   gene_name: null
   is_informative: true
@@ -7879,7 +7881,7 @@ results:
   product: pirin-like protein
   term_id: pfam.clan:CL0029
   term_name: Cupin
-- evidence: curated
+- evidence: family_inferred
   gene_category: Signal transduction
   gene_name: null
   is_informative: true
@@ -7888,7 +7890,7 @@ results:
   product: GAF domain-containing protein
   term_id: pfam.clan:CL0025
   term_name: His_Kinase_A
-- evidence: curated
+- evidence: family_inferred
   gene_category: Signal transduction
   gene_name: null
   is_informative: true
@@ -8320,7 +8322,7 @@ results:
   product: 23S rRNA (adenine2503-C2)-methyltransferase
   term_id: pfam.clan:CL0198
   term_name: HHH
-- evidence: curated
+- evidence: family_inferred
   gene_category: Translation
   gene_name: rlmN
   is_informative: true
@@ -8572,7 +8574,7 @@ results:
   product: beta-lactamase enzyme family protein
   term_id: pfam.clan:CL0013
   term_name: Beta-lactamase
-- evidence: curated
+- evidence: family_inferred
   gene_category: Cell wall and membrane
   gene_name: spr
   is_informative: true
@@ -8860,7 +8862,7 @@ results:
   product: phosphoenol pyruvate carboxylase
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
-- evidence: curated
+- evidence: family_inferred
   gene_category: Signal transduction
   gene_name: null
   is_informative: true
@@ -9400,7 +9402,7 @@ results:
   product: thiazole synthase
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
-- evidence: curated
+- evidence: family_inferred
   gene_category: Coenzyme metabolism
   gene_name: thiG
   is_informative: true
@@ -9481,7 +9483,7 @@ results:
   product: SprT-like, zinc ribbon domain-containing protein
   term_id: pfam.clan:CL0126
   term_name: Peptidase_MA
-- evidence: curated
+- evidence: family_inferred
   gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -9535,7 +9537,7 @@ results:
   product: spermidine synthase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
-- evidence: curated
+- evidence: family_inferred
   gene_category: Amino acid metabolism
   gene_name: speE
   is_informative: true
@@ -9634,7 +9636,7 @@ results:
   product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
   term_id: pfam.clan:CL0364
   term_name: Leu-IlvD
-- evidence: curated
+- evidence: family_inferred
   gene_category: Transport
   gene_name: clc2
   is_informative: true
@@ -9697,7 +9699,7 @@ results:
   product: sucrose phosphate synthase
   term_id: pfam.clan:CL0113
   term_name: GT-B
-- evidence: curated
+- evidence: family_inferred
   gene_category: Carbohydrate metabolism
   gene_name: sps
   is_informative: true
@@ -9706,7 +9708,7 @@ results:
   product: sucrose phosphate synthase
   term_id: pfam.clan:CL0137
   term_name: HAD
-- evidence: curated
+- evidence: family_inferred
   gene_category: Replication and repair
   gene_name: uvrA
   is_informative: true
@@ -9751,7 +9753,7 @@ results:
   product: threonine synthase
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
-- evidence: curated
+- evidence: family_inferred
   gene_category: Replication and repair
   gene_name: null
   is_informative: true

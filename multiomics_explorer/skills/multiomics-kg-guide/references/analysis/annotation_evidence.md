@@ -98,20 +98,20 @@ surface (`min_evidence_score`).
 Multi-source edges take the strongest rung. Rank by rung within one ontology;
 across ontologies compare only with the live caveat below in mind.
 
-**Live state (current build).** The ladder is applied uniformly on the
-post-2026 edge types — on KEGG KO, COG, TCDB and TIGR roles an eggNOG-only edge
-reads `family_inferred`, an InterProScan-only role reads `family_inferred`, and
-a Cyanorak role reads `curated`. On the four older edge types — GO (×3), EC,
-Pfam, CAZy — an **eggNOG-only edge currently reads `curated`** (GO-BP ~434k
-edges, EC 11.7k, Pfam 24.7k, CAZy 744), and `['eggnog','interproscan']` reads
-`signature` on Pfam but `curated` on CAZy. So `evidence=['curated']` means
-"curated or eggNOG-transferred" on GO / EC / Pfam / CAZy and "curated" on the
-roles. This is KG ask DOC-001 (open; explorer prefers re-mapping eggNOG-only to
-`family_inferred`) in the docs-review KG-asks doc under `docs/kg-specs/`; until
-it lands, treat `sources` as the authoritative provenance on those four and
-`evidence` as the comparable axis only among the newer ontologies. The
-per-ontology pages (`docs://ontologies/{key}`) link here rather than restating
-the rungs.
+**Live state (current build).** The rung is derived from `sources` at KG
+build time, uniformly across every edge type: any curated source (`cyanorak`,
+`uniprot`, `ncbi`) ⇒ `curated`; an `eggnog` source with no curated source ⇒
+`family_inferred` (an orthology transfer — GO-BP ~434k edges, GO-MF ~180k,
+GO-CC ~100k, EC 11.7k, Pfam 24.7k, CAZy 744 are eggNOG-only); InterProScan-only
+⇒ the recorded signature strength (`signature` on Pfam, `family_inferred` /
+`domain_inferred` elsewhere). The one asymmetry is deliberate: an
+`['eggnog','interproscan']` pair reads `signature` on Pfam (the HMM hit is the
+native rung) but `family_inferred` on GO / EC / CAZy. So `evidence=['curated']`
+selects reference assertions everywhere, and `evidence_score` on an eggNOG-only
+edge is 0.333 (single source, transferred). Older builds read eggNOG-only
+GO / EC / Pfam / CAZy edges as `curated`; `kg_release_info` says which build
+you are on. The per-ontology pages
+(`docs://ontologies/{key}`) link here rather than restating the rungs.
 
 ---
 

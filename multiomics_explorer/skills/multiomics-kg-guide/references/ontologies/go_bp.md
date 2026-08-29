@@ -20,9 +20,10 @@ compact `evidence` rung (`curated` / `family_inferred` /
 `domain_inferred`) and an `evidence_score` composite in [0, 1] that
 rewards agreement between sources; the rung semantics are defined once
 in `docs://analysis/annotation_evidence`. On this edge type the live
-mapping is: eggNOG-only edges read `curated` (the bulk of the edges —
-re-labelling them `family_inferred` is an open KG-side ask), while
-InterProScan-only edges read `family_inferred` or `domain_inferred`.
+mapping is: eggNOG-only edges read `family_inferred` (the bulk of the
+edges, ~434k), curated sources (`cyanorak` / `ncbi` / `uniprot`) read
+`curated`, and InterProScan-only edges read `family_inferred` or
+`domain_inferred`.
 Annotation is propagated: a gene annotated to a specific term counts
 toward every ancestor through `is_a` and `part_of`.
 
@@ -81,11 +82,19 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="go_bp")`) lists which comparable axes the gene edge carries.
 
+Snapshot of vocabulary values at build time (`--live-vocab`):
+
+- `BiologicalProcess.is_uninformative`: `true`
+- `BiologicalProcess.level_is_best_effort`: `true`
+- `Gene_involved_in_biological_process.evidence`: `curated`, `family_inferred`, `domain_inferred`
+- `Gene_involved_in_biological_process.sources`: `cyanorak`, `eggnog`, `interproscan`, `ncbi`, `uniprot`
+
 ## Interpretation
 
-Read `sources` alongside `evidence`: a `curated` edge backed only by
-`eggnog` is an orthology transfer, not a curator's assertion, so rank by
-`evidence_score` rather than trusting the rung alone. Use `evidence_score` to *rank* competing annotations of one
+`curated` now means a reference source (`cyanorak` / `ncbi` / `uniprot`);
+an eggNOG orthology transfer reads `family_inferred` with
+`evidence_score` 0.333, so rank by `evidence_score` when two annotations
+of one gene compete. Use `evidence_score` to *rank* competing annotations of one
 gene within GO, never as a cross-ontology threshold; `min_evidence_score`
 exists as the single numeric cutoff if a stricter set is needed. Two
 organisms annotated to the same process at level 3 are comparable; a

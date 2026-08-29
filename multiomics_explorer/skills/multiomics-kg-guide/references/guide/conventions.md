@@ -369,12 +369,12 @@ to those when you want the enrichment-eligible subset only.
 
 **What is flagged.** The flag is set per ontology by the KG build. GO
 roots (`go:0008150` "biological_process" and its siblings) are flagged.
-In KEGG only KO-level terms are flagged; the global maps
-(`kegg.pathway:ko01100` "Metabolic pathways", `ko01110`, `ko01120`) are
-**not** flagged even though `ko01100` covers roughly a quarter of an
-annotated genome — a KG-side fix is filed. Until it lands, drop those
-maps from KEGG pathway enrichment yourself (`min_gene_set_size` /
-`max_gene_set_size`, or post-filter on `term_id`). KEGG pathway IDs are
+In KEGG, KO-level catch-alls ("uncharacterized protein") and the
+global / overview maps (`kegg.pathway:ko01100` "Metabolic pathways",
+`ko01110`, `ko01120`, the `ko012xx` block — 11 of the 13 parentless
+pathway nodes) are flagged; `ko01310` Nitrogen cycle and `ko01320`
+Sulfur cycle are kept informative, and category / subcategory nodes are
+never flagged (gate those with `level`). KEGG pathway IDs are
 always the `kegg.pathway:ko…` form — there are no `map…` IDs in the KG.
 Which terms an ontology flags and why: `docs://ontologies/{key}`
 "Informativeness rule".

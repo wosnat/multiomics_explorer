@@ -2727,7 +2727,7 @@ def register_tools(mcp: FastMCP):
         )] = None,
         informative_only: Annotated[bool, Field(
             description="When True, exclude terms flagged uninformative in KG "
-            "(e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). Term-side filter only — never restricts the gene set. "
+            "(e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; the global / overview KEGG maps such as ko01100). Term-side filter only — never restricts the gene set. "
             "Default False (opt-in).",
         )] = False,
         verbose: Annotated[bool, Field(
@@ -3262,7 +3262,7 @@ def register_tools(mcp: FastMCP):
         )] = 500,
         informative_only: Annotated[bool, Field(
             description="When True, exclude terms flagged uninformative in KG "
-            "(e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). Term-side filter only — never restricts the gene set. "
+            "(e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; the global / overview KEGG maps such as ko01100). Term-side filter only — never restricts the gene set. "
             "Default False (opt-in).",
         )] = False,
         summary: Annotated[bool, Field(
@@ -3544,7 +3544,7 @@ def register_tools(mcp: FastMCP):
         )] = None,
         informative_only: Annotated[bool, Field(
             description="When True, exclude terms flagged uninformative in KG "
-            "(e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). Term-side filter only — never restricts the gene set. "
+            "(e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; the global / overview KEGG maps such as ko01100). Term-side filter only — never restricts the gene set. "
             "Default False (opt-in).",
         )] = False,
         summary: Annotated[bool, Field(
@@ -5850,7 +5850,7 @@ def register_tools(mcp: FastMCP):
         compartment: str = Field(
             description=(
                 "Sample compartment or scope (e.g. 'whole_cell', 'vesicle', "
-                "'exoproteome', 'spent_medium', 'lysate')."
+                "'exoproteome', 'extracellular')."
             ),
         )
         omics_type: str = Field(
@@ -6014,7 +6014,7 @@ def register_tools(mcp: FastMCP):
         compartment: Annotated[str | None, Field(
             description=(
                 "Sample compartment / scope. Current values: 'whole_cell', "
-                "'vesicle', 'exoproteome', 'spent_medium', 'lysate'."
+                "'vesicle', 'exoproteome', 'extracellular'."
             ),
         )] = None,
         omics_type: Annotated[str | None, Field(
@@ -6355,7 +6355,7 @@ def register_tools(mcp: FastMCP):
         compartment: Annotated[str | None, Field(
             description="Filter to DMs from one sample compartment "
                         "('whole_cell', 'vesicle', 'exoproteome', "
-                        "'spent_medium', 'lysate'). Exact match.",
+                        "'extracellular'). Exact match.",
         )] = None,
         treatment_type: Annotated[list[str] | None, Field(
             description="Treatment type(s) to match. Returns DMs whose "
@@ -6746,7 +6746,7 @@ def register_tools(mcp: FastMCP):
         )] = 500,
         informative_only: Annotated[bool, Field(
             description="When True (default), exclude terms flagged uninformative "
-            "in KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). Term-side filter only — never "
+            "in KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; the global / overview KEGG maps such as ko01100). Term-side filter only — never "
             "restricts the gene set. Pass False to opt out and survey the full "
             "term set (rebaselines may differ).",
         )] = True,
@@ -6881,7 +6881,7 @@ def register_tools(mcp: FastMCP):
         informative_only: Annotated[bool, Field(
             description=(
                 "When True (default), exclude ontology terms flagged uninformative in "
-                "the KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). "
+                "the KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; the global / overview KEGG maps such as ko01100). "
                 "Term-side filter — never restricts the gene set, background, or DE "
                 "inputs. Pass False to include uninformative terms; per-row "
                 "is_informative still surfaces in either mode. [ENR] Default flipped "
@@ -7025,7 +7025,7 @@ def register_tools(mcp: FastMCP):
         informative_only: Annotated[bool, Field(
             description=(
                 "When True (default), exclude ontology terms flagged uninformative in "
-                "the KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). "
+                "the KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; the global / overview KEGG maps such as ko01100). "
                 "Term-side filter — never restricts the gene set, background, or DE "
                 "inputs. Pass False to include uninformative terms; per-row "
                 "is_informative still surfaces in either mode. [ENR] Default flipped "
@@ -7407,7 +7407,7 @@ def register_tools(mcp: FastMCP):
         )] = None,
         compartment: Annotated[str | None, Field(
             description="Sample compartment ('whole_cell', 'vesicle', "
-                        "'exoproteome', 'spent_medium', 'lysate'). Exact match.",
+                        "'exoproteome', 'extracellular'). Exact match.",
         )] = None,
         treatment_type: Annotated[list[str] | None, Field(
             description="Treatment type(s) (e.g. ['diel', 'compartment']). "
@@ -7828,7 +7828,7 @@ def register_tools(mcp: FastMCP):
         )] = None,
         compartment: Annotated[str | None, Field(
             description="Sample compartment ('whole_cell', 'vesicle', "
-                        "'exoproteome', 'spent_medium', 'lysate'). Exact "
+                        "'exoproteome', 'extracellular'). Exact "
                         "match.",
         )] = None,
         treatment_type: Annotated[list[str] | None, Field(
@@ -8201,7 +8201,7 @@ def register_tools(mcp: FastMCP):
         )] = None,
         compartment: Annotated[str | None, Field(
             description="Sample compartment ('whole_cell', 'vesicle', "
-                        "'exoproteome', 'spent_medium', 'lysate'). Exact "
+                        "'exoproteome', 'extracellular'). Exact "
                         "match.",
         )] = None,
         treatment_type: Annotated[list[str] | None, Field(

@@ -37,7 +37,7 @@ gates apply); kept for envelope-shape consistency.
 | locus_tags | list[string] \| None | None | Restrict drill-down to a specific gene set (e.g. DE hits from `differential_expression_by_gene`). Filter on `g.locus_tag IN $locus_tags` post-MATCH. Genes with no edge for the selected DM produce no row. |
 | experiment_ids | list[string] \| None | None | Scope to DMs from one or more experiments. |
 | publication_doi | list[string] \| None | None | Scope to DMs from one or more publications. |
-| compartment | string \| None | None | Sample compartment ('whole_cell', 'vesicle', 'exoproteome', 'spent_medium', 'lysate'). Exact match. |
+| compartment | string \| None | None | Sample compartment ('whole_cell', 'vesicle', 'exoproteome', 'extracellular'). Exact match. |
 | treatment_type | list[string] \| None | None | Treatment type(s) (e.g. ['diel']). ANY-overlap. Case-insensitive. |
 | background_factors | list[string] \| None | None | Background factor(s) (e.g. ['axenic', 'light']). ANY-overlap. Case-insensitive. |
 | growth_phases | list[string] \| None | None | Growth phase(s). ANY-overlap. Case-insensitive. |

@@ -196,7 +196,7 @@
     WHERE k.is_uninformative = 'true'
     RETURN sum(CASE WHEN k.level_kind = 'ko' THEN 1 ELSE 0 END) AS ko_flagged,
            sum(CASE WHEN k.level_kind = 'pathway' THEN 1 ELSE 0 END) AS pathway_flagged
-  expect: {ko_flagged: 212, pathway_flagged: 0}
+  expect: {ko_flagged: 212, pathway_flagged: 11}
   tolerance: {rel: 0.05}
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/enrichment.md
@@ -204,9 +204,8 @@
     - multiomics_explorer/inputs/ontologies/kegg.yaml
     - examples/pathway_enrichment.py
   note: >
-    Only KO-level KEGG terms carry is_uninformative today; NO pathway term (ko01100 etc.)
-    is flagged. If pathway_flagged becomes > 0 the KG side added pathway flags —
-    update the informative_only prose in the used_in files.
+    KO-level catch-alls (212) plus 11 of the 13 parentless global / overview pathway maps
+    (ko01100 …; ko01310 / ko01320 kept informative) carry is_uninformative (KG DOC-002, 2026-08-29).
 
 - id: tigr_role_levels
   cypher: >
@@ -251,7 +250,7 @@
     MATCH (p:KeggTerm {level_kind: 'pathway'}) WHERE NOT (p)-[:Kegg_term_is_a_kegg_term]->()
     RETURN count(p) AS parentless,
            sum(CASE WHEN p.is_uninformative = 'true' THEN 1 ELSE 0 END) AS flagged
-  expect: {parentless: 13, flagged: 13}
+  expect: {parentless: 13, flagged: 11}
   used_in:
     - CLAUDE.md
     - multiomics_explorer/mcp_server/tools.py
@@ -260,8 +259,9 @@
     - multiomics_explorer/inputs/tools/pathway_enrichment.yaml
     - multiomics_explorer/inputs/tools/list_metabolites.yaml
   note: >
-    Behavioural claim: the 13 parentless KEGG global / overview maps (ko01100, ko01110, …)
-    carry is_uninformative, so informative_only=True drops them (KG DOC-002).
+    Behavioural claim: 11 of the 13 parentless KEGG global / overview maps (ko01100, ko01110, …)
+    carry is_uninformative, so informative_only=True drops them (KG DOC-002); ko01310 Nitrogen
+    cycle and ko01320 Sulfur cycle are narrow class-bearing subsets and stay informative.
     Fails ⇒ the docs' description of informative_only / KEGG informativeness is wrong.
 
 - id: eggnog_only_edges_not_curated

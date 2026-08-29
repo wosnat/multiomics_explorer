@@ -315,15 +315,15 @@ comparable between runs with the same setting; raw `pvalue` is unaffected.
 
 **What the flag actually covers (live KG).** GO roots (`go:0008150`,
 `go:0003674`, `go:0005575`) and other root / catch-all terms are flagged. KEGG
-is flagged at KO level only (`K…; uncharacterized protein`, 212 of 4,644 KOs);
-**no KEGG pathway is flagged**. `kegg.pathway:ko01100` "Metabolic pathways"
-(519 of 1,973 MED4 genes, 26%), `ko01110`, `ko01120` and the rest of KEGG's
-global/overview maps therefore survive `informative_only=True` — on the
-nitrogen DE run above both settings give 1,752 rows. The `map…`-style id
-quoted in older docs never existed in the KG. KG ask DOC-002 is open
-(the docs-review KG-asks doc under `docs/kg-specs/`); until it lands, drop the
-global maps with `max_gene_set_size` (they are the largest pathway terms) or
-by post-filtering `term_id` on the `ko011` prefix.
+is flagged at two levels: KO catch-alls (`K…; uncharacterized protein`, 212 of
+4,644 KOs) and the global / overview pathway maps — `kegg.pathway:ko01100`
+"Metabolic pathways" (519 of 1,973 MED4 genes, 26%), `ko01110`, `ko01120` and
+the `ko012xx` block, 11 of the 13 parentless pathway nodes — so a `level=2`
+KEGG run under `informative_only=True` has those rows removed. `ko01310`
+Nitrogen cycle and `ko01320` Sulfur cycle are deliberately kept (narrow,
+class-bearing subsets). Category / subcategory nodes are never flagged; they
+are not `level=2` targets. The `map…`-style id quoted in older docs never
+existed in the KG.
 
 `is_informative` is on every result row in either mode, so one
 `informative_only=False` run gives both views. `result.params["informative_only"]`

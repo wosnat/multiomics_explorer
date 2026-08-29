@@ -17,9 +17,9 @@ Gene → EC edges are pooled from Cyanorak curation, eggNOG orthology
 transfer, InterProScan and UniProt (`sources[]`), merged into one edge
 per (gene, term) with compact `evidence` — `curated` or `family_inferred`
 — and an `evidence_score` in [0, 1]; rung semantics in
-`docs://analysis/annotation_evidence`. Live on this edge type: UniProt-
-and eggNOG-only edges both read `curated` (the eggNOG case is an open
-KG-side ask), InterProScan-only edges read `family_inferred`. Edges are
+`docs://analysis/annotation_evidence`. Live on this edge type: any edge
+with a UniProt or Cyanorak source reads `curated`; eggNOG-only and
+InterProScan-only edges read `family_inferred`. Edges are
 propagated up the
 hierarchy: a gene with `ec:1.1.1.1` counts toward `ec:1.1.1.-`,
 `ec:1.1.-.-` and `ec:1.-.-.-`. EC is also the entry point to the
@@ -84,14 +84,18 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="ec")`) lists which comparable axes the gene edge carries.
 
+Snapshot of vocabulary values at build time (`--live-vocab`):
+
+- `Gene_catalyzes_ec_number.evidence`: `curated`, `family_inferred`
+- `Gene_catalyzes_ec_number.sources`: `cyanorak`, `eggnog`, `interproscan`, `uniprot`
+
 ## Interpretation
 
 Level 3 (full EC) is the interpretable unit for "which enzymes does this
 organism carry"; levels 0-2 are useful for enrichment when full numbers
-are too sparse. Read `sources` with `evidence`: `curated` backed by
-`uniprot` / `cyanorak` is a reference assertion, `curated` backed by
-`eggnog` alone is an orthology transfer — rank by `evidence_score` when
-two sources disagree on the fourth field. An EC number without a KEGG `Reaction` in
+are too sparse. `curated` is a reference assertion (`uniprot` /
+`cyanorak`); an eggNOG-only transfer reads `family_inferred` — rank by
+`evidence_score` when two sources disagree on the fourth field. An EC number without a KEGG `Reaction` in
 the chemistry layer is still a valid annotation; the reaction layer is a
 subset of EC space.
 

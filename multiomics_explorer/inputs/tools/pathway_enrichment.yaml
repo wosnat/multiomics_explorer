@@ -830,10 +830,9 @@ response_notes:
       KEGG KOs named "uncharacterized protein"). Term-side filter — never
       restricts the gene set, background, or DE inputs. Pass False to
       include uninformative terms; per-row `is_informative` still surfaces
-      in either mode. KEGG is flagged at the KO level only: pathway maps —
-      including the global map `kegg.pathway:ko01100` — are not flagged,
-      so use `max_gene_set_size` to keep global maps out of a pathway-level
-      test.
+      in either mode. KEGG is flagged at KO level (catch-all KOs) and at
+      pathway level (the global / overview maps, `ko01100` and kin), so a
+      `level=2` KEGG run loses those rows under the default.
 
       See `docs://analysis/enrichment` (section "Informative-only filtering")
       for rationale, Fisher denominator behavior, and opt-out guidance.
@@ -872,7 +871,7 @@ chaining:
 mistakes:
   - "pathway_enrichment is DE-anchored (needs `experiment_ids`); for a clustering analysis use `cluster_enrichment(analysis_id=...)`, for ortholog groups / custom lists use the Python `fisher_ora` primitive."
   - "[ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions."
-  - "`informative_only=True` shrinks the TERM2GENE mapping, and `enrichment_params.term2gene_row_count` shows by how much — MED4 KEGG at `level=3`: 1124 rows with `informative_only=False`, 1094 with the default. Compare `enrichment_params` across runs before comparing p-values. For KEGG the flag is KO-level only: `level=2` pathway maps are unchanged by it (the global map `kegg.pathway:ko01100` is not flagged) — bound them with `max_gene_set_size` instead."
+  - "`informative_only=True` shrinks the TERM2GENE mapping, and `enrichment_params.term2gene_row_count` shows by how much — MED4 KEGG at `level=3`: 1124 rows with `informative_only=False`, 1094 with the default. Compare `enrichment_params` across runs before comparing p-values. For KEGG the flag also covers the global / overview maps (`kegg.pathway:ko01100` and kin), so a `level=2` run drops those rows too."
   - "Default background is `table_scope` (per-experiment quantified set). `'organism'` inflates the denominator and underestimates enrichment. See `docs://analysis/enrichment` for the full methodology note."
   - "BH correction is per-cluster (experiment × timepoint × direction), NOT across clusters. Cross-experiment FDR is biological replication, not statistical."
   - "Single-organism enforced. Run separate calls per organism."

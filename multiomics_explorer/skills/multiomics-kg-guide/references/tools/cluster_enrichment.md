@@ -43,7 +43,7 @@ runnable code (custom term2gene path covers cluster-membership ORA).
 | summary | bool | False | If true, omit results (envelope only). |
 | limit | int | 5 | Max rows returned. |
 | offset | int | 0 | Skip N rows before limit. |
-| informative_only | bool | True | When True (default), exclude ontology terms flagged uninformative in the KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). Term-side filter — never restricts the gene set, background, or DE inputs. Pass False to include uninformative terms; per-row is_informative still surfaces in either mode. [ENR] Default flipped to True in 2026-05 KG release; see docs://guide/conventions. |
+| informative_only | bool | True | When True (default), exclude ontology terms flagged uninformative in the KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; the global / overview KEGG maps such as ko01100). Term-side filter — never restricts the gene set, background, or DE inputs. Pass False to include uninformative terms; per-row is_informative still surfaces in either mode. [ENR] Default flipped to True in 2026-05 KG release; see docs://guide/conventions. |
 | sources | list[string] \| None | None | Keep rows whose edge sources[] contains any of these values (e.g. ['eggnog']). Valid on the 14 functional-edge ontologies (not PSORTb / SignalP). Default None never filters. See list_filter_values(filter_type='sources'). |
 | evidence | list[string] \| None | None | Keep rows whose compact evidence ladder value is in this list (read the value; rung assignment is per ontology — see docs://analysis/annotation_evidence). Valid on the 14 functional-edge ontologies. Default None never filters. |
 | max_tier | int \| None | None | Keep rows with edge tier <= this value OR tier IS NULL (diamond truncation depth, 1-3; tier-null edges are always kept - see by_tier's null bucket). Valid on tcdb, merops only. |
@@ -131,10 +131,9 @@ in the KG (e.g. GO root go:0008150, catch-all Cyanorak / TIGR roles,
 KEGG KOs named "uncharacterized protein"). Term-side filter — never
 restricts the gene set, background, or cluster membership. Pass
 False to include uninformative terms; per-row `is_informative` still
-surfaces in either mode. KEGG is flagged at the KO level only:
-pathway maps — including the global map `kegg.pathway:ko01100` — are
-not flagged, so use `max_gene_set_size` to keep global maps out of a
-pathway-level test.
+surfaces in either mode. KEGG is flagged at KO level (catch-all
+KOs) and at pathway level (the global / overview maps, `ko01100` and
+kin), so a `level=2` KEGG run loses those rows under the default.
 
 See `docs://analysis/enrichment` (section "Informative-only filtering")
 for rationale, Fisher denominator behavior, and opt-out guidance.

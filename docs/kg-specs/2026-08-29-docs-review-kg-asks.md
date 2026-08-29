@@ -205,3 +205,10 @@ rebuild; nothing needs a `prepare_data` rerun.
 All accepted as explorer-side. One addition to "most_specific is non-unique per gene": that is by
 design — `attachment_depth` is a per-edge fact (is *this* attachment superseded by a descendant
 attachment of the same gene), so a gene with 7 unrelated families has 7 `most_specific` edges.
+
+### 4.3 Explorer absorption (2026-08-29, build `18:29:37Z`)
+
+Absorbed on branch `docs-review-2026-08-29` via `absorb-kg-rebuild`: hash re-pinned, 10 goldens + 27
+example responses regenerated, every "not flagged yet" / "reads `curated`" / `spent_medium` / "`direct_gene_count`
+on every node" sentence rewritten, backlog 3.16 closed. Two `kg_claims` (`kegg_global_maps_flagged_uninformative`,
+`eggnog_only_edges_not_curated`) now pin the new behaviour. DOC-001..008 closed.

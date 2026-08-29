@@ -19,10 +19,10 @@ Gene → family edges pool InterProScan signatures and eggNOG transfer
 (`sources[]`), merged with compact `evidence` (`curated`,
 `family_inferred`, `domain_inferred`) and an `evidence_score` in [0, 1];
 rung semantics in `docs://analysis/annotation_evidence`. Live on this
-edge type: every edge with an `eggnog` source reads `curated` — about
-70% of all CAZy edges — and InterProScan-only edges read
-`domain_inferred` or `family_inferred`. Re-labelling the eggNOG-only
-case is an open KG-side ask.
+edge type there is no `curated` rung at all: every edge with an `eggnog`
+source reads `family_inferred` (about 70% of CAZy edges, including the
+eggNOG+InterProScan pairs), and InterProScan-only edges read
+`domain_inferred` or `family_inferred`.
 Family edges roll up to the class node via `Cazy_family_is_a_cazy_family`.
 InterPro entries bridge *to* CAZy families as a `router`
 (`Interpro_entry_related_to_cazy_family`) — a computed cross-reference,
@@ -80,6 +80,12 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="cazy")`) lists which comparable axes the gene edge carries.
 
+Snapshot of vocabulary values at build time (`--live-vocab`):
+
+- `CazyFamily.level_kind`: `cazy_class`, `cazy_family`, `cazy_subfamily`
+- `Gene_has_cazy_family.evidence`: `curated`, `family_inferred`, `domain_inferred`
+- `Gene_has_cazy_family.sources`: `eggnog`, `interproscan`
+
 ## Interpretation
 
 Family level is the unit — `cazy:GT2` (cellulose/chitin-synthase-like
@@ -87,8 +93,8 @@ transferases) and `cazy:GH23` (lytic transglycosylases) mean specific
 chemistry, the class does not. CAZy is small in these genomes (tens of
 families), so enrichment at level 1 works only for glycan-heavy gene sets;
 otherwise use it as a per-gene annotation via `gene_ontology_terms`. Rank
-by `evidence_score`; `curated` is the majority rung here, not a rare
-one, so it does not by itself single out strong calls.
+by `evidence_score`; `family_inferred` is the majority rung here, so
+`evidence` alone does not single out strong calls.
 
 ## Informativeness rule
 

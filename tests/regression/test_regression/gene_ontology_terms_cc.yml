@@ -1,8 +1,8 @@
 case_id: gene_ontology_terms_cc
 row_count: 1
 rows:
-- evidence: curated
-  evidence_score: 0.667
+- evidence: family_inferred
+  evidence_score: 0.333
   is_informative: true
   level: 2
   locus_tag: MIT1002_03493

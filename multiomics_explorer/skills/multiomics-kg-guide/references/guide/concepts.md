@@ -64,9 +64,8 @@ compartment-specific and paired variants (`VESICLE_PROTEOMICS`,
 **Compartment.** Where in the cell the measurement was sampled.
 Carried on `Experiment.compartment` (proteomics + metabolomics),
 `DerivedMetric.compartment`, and `MetaboliteAssay.compartment`.
-The vocabulary declares six values (`whole_cell`, `vesicle`,
-`exoproteome`, `extracellular`, `spent_medium`, `lysate`); the data
-currently uses the first four — `list_filter_values('compartment')`
+The vocabulary declares four values (`whole_cell`, `vesicle`,
+`exoproteome`, `extracellular`) — `list_filter_values('compartment')`
 returns the declared set with per-value counts, so read it before
 filtering. RNAseq experiments are uniformly `whole_cell` (no
 fractionation). The same gene may have proteomics DE in `whole_cell`

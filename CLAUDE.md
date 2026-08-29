@@ -87,7 +87,7 @@ The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for 
 
 `[AQ]` `annotation_quality` is a 0..3 numeric encoding of `Gene.annotation_state` (informative-evidence count); earlier KG releases encoded product-name quality in the same field, so old `min_quality` filters silently select a different set.
 
-`[ENR]` `informative_only=True` by default on the enrichment tools and `ontology_landscape` — terms the KG flags uninformative (GO roots such as go:0008150, KO-level catch-alls) are excluded. The KEGG global maps (`kegg.pathway:ko01100` etc.) are NOT flagged yet (KG ask open). `search_ontology` / `genes_by_ontology` / `gene_ontology_terms` default to `False`. Per-row `is_informative` surfaced for diagnosis.
+`[ENR]` `informative_only=True` by default on the enrichment tools and `ontology_landscape` — terms the KG flags uninformative (GO roots such as go:0008150, KO-level catch-alls) are excluded. The KEGG global / overview maps (`kegg.pathway:ko01100` etc.) are flagged too; KEGG category / subcategory nodes are not — gate those with `level`. `search_ontology` / `genes_by_ontology` / `gene_ontology_terms` default to `False`. Per-row `is_informative` surfaced for diagnosis.
 
 `[TRUST]` Annotation-trust surface: 15 of the 17 ontologies (all but PSORTb / SignalP) carry a compact `evidence` ladder on gene→term rows (`sources` / `evidence_score` / `tier` verbose); PSORTb / SignalP's `localization_score` / `signal_peptide_*` are verbose-only native detail. Filters `sources`, `evidence`, `max_tier`, `min_evidence_score` (the only numeric cutoff), `call_class` (MEROPS), `interpro_type` (InterPro, required on interpro enrichment). See `docs://analysis/annotation_evidence`.
 

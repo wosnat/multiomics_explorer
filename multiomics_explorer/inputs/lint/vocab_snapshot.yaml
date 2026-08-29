@@ -2,7 +2,7 @@
 # Live ControlledVocabulary values for the properties the docs quote.
 # tests/unit/test_docs_lint.py reads this offline; the -m kg test in
 # tests/integration/test_docs_kg_claims.py asserts it matches the live KG.
-kg_built_at: '2026-08-29T10:11:27.377Z'
+kg_built_at: '2026-08-29T18:29:37.625Z'
 vocabularies:
   attachment_depth:
     Gene_has_tcdb_family:
@@ -67,8 +67,6 @@ vocabularies:
       values:
       - exoproteome
       - extracellular
-      - lysate
-      - spent_medium
       - vesicle
       - whole_cell
   detection_status:
@@ -120,6 +118,7 @@ vocabularies:
       closed: true
       values:
       - curated
+      - family_inferred
       - signature
     Gene_has_tcdb_family:
       closed: true

@@ -30,7 +30,7 @@ expansion) use `genes_by_ontology`; for term discovery by text use
 | mode | string ('leaf', 'rollup') | leaf | 'leaf' returns most-specific annotations (default). 'rollup' walks up to ancestors at the given level. |
 | level | int \| None | None | Hierarchy level (0 = broadest). In leaf mode: filter to leaves at this level. In rollup mode: required — target ancestor level. See docs://guide/conventions. |
 | tree | string \| None | None | BRITE tree name filter. Narrows brite and leaves any other ontology in the list untouched; raises when brite is not among them. See docs://guide/conventions for the BRITE-tree scoping rule. |
-| informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). Term-side filter only — never restricts the gene set. Default False (opt-in). |
+| informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; the global / overview KEGG maps such as ko01100). Term-side filter only — never restricts the gene set. Default False (opt-in). |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include organism_name per row. |
 | sources | list[string] \| None | None | Keep rows whose edge sources[] contains any of these values (e.g. ['eggnog']). Valid on the 14 functional-edge ontologies (not PSORTb / SignalP). Default None never filters. See list_filter_values(filter_type='sources'). |
@@ -232,11 +232,11 @@ gene_ontology_terms(locus_tags=["PMM0584", "PMM1322"], organism="MED4", ontology
   "not_found": [],
   "no_terms": [],
   "trust_axes": {"cazy": ["sources", "evidence", "evidence_score"]},
-  "by_evidence": [{"evidence": "curated", "count": 4}],
+  "by_evidence": [{"evidence": "family_inferred", "count": 4}],
   "by_tier": [],
   "by_sources": [{"source": "eggnog", "count": 4}, {"source": "interproscan", "count": 2}],
   "by_call_class": [],
-  "evidence_score_stats": {"min": 0.667, "median": 0.8335, "max": 1.0, "n_null": 0},
+  "evidence_score_stats": {"min": 0.333, "median": 0.5, "max": 0.667, "n_null": 0},
   "evidence_score_signals": null,
   "filters_applied": {},
   "skipped_ontologies": [],
@@ -248,7 +248,7 @@ gene_ontology_terms(locus_tags=["PMM0584", "PMM1322"], organism="MED4", ontology
       "term_name": "Carbohydrate-Binding Modules",
       "level": 0,
       "is_informative": true,
-      "evidence": "curated"
+      "evidence": "family_inferred"
     },
     {
       "locus_tag": "PMM0584",
@@ -256,7 +256,7 @@ gene_ontology_terms(locus_tags=["PMM0584", "PMM1322"], organism="MED4", ontology
       "term_name": "Glycoside Hydrolases",
       "level": 0,
       "is_informative": true,
-      "evidence": "curated"
+      "evidence": "family_inferred"
     },
     {
       "locus_tag": "PMM1322",
@@ -264,7 +264,7 @@ gene_ontology_terms(locus_tags=["PMM0584", "PMM1322"], organism="MED4", ontology
       "term_name": "Carbohydrate-Binding Modules",
       "level": 0,
       "is_informative": true,
-      "evidence": "curated"
+      "evidence": "family_inferred"
     },
     ...
   ]

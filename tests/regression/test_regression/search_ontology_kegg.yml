@@ -534,7 +534,7 @@ rows:
 - discussed_by_n_publications: 0
   gene_count: 6559
   id: kegg.pathway:ko01120
-  is_informative: true
+  is_informative: false
   level: 2
   name: Microbial metabolism in diverse environments
   organism_count: 43
@@ -544,7 +544,7 @@ rows:
 - discussed_by_n_publications: 4
   gene_count: 3391
   id: kegg.pathway:ko01200
-  is_informative: true
+  is_informative: false
   level: 2
   name: Carbon metabolism
   organism_count: 43
@@ -554,7 +554,7 @@ rows:
 - discussed_by_n_publications: 0
   gene_count: 1344
   id: kegg.pathway:ko01210
-  is_informative: true
+  is_informative: false
   level: 2
   name: 2-Oxocarboxylic acid metabolism
   organism_count: 43
@@ -564,7 +564,7 @@ rows:
 - discussed_by_n_publications: 0
   gene_count: 894
   id: kegg.pathway:ko01212
-  is_informative: true
+  is_informative: false
   level: 2
   name: Fatty acid metabolism
   organism_count: 43
@@ -574,7 +574,7 @@ rows:
 - discussed_by_n_publications: 1
   gene_count: 1363
   id: kegg.pathway:ko01232
-  is_informative: true
+  is_informative: false
   level: 2
   name: Nucleotide metabolism
   organism_count: 43

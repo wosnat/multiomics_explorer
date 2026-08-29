@@ -1,8 +1,8 @@
 case_id: gene_ontology_terms_bp_all
 row_count: 12
 rows:
-- evidence: curated
-  evidence_score: 1.0
+- evidence: family_inferred
+  evidence_score: 0.667
   is_informative: true
   level: 6
   locus_tag: MIT1002_03493
@@ -14,8 +14,8 @@ rows:
   term_name: arginine metabolic process
   tree: null
   tree_code: null
-- evidence: curated
-  evidence_score: 0.667
+- evidence: family_inferred
+  evidence_score: 0.333
   is_informative: true
   level: 5
   locus_tag: MIT1002_03493
@@ -26,8 +26,8 @@ rows:
   term_name: regulation of ketone metabolic process
   tree: null
   tree_code: null
-- evidence: curated
-  evidence_score: 0.667
+- evidence: family_inferred
+  evidence_score: 0.333
   is_informative: true
   level: 8
   locus_tag: MIT1002_03493
@@ -38,8 +38,8 @@ rows:
   term_name: positive regulation of gene expression
   tree: null
   tree_code: null
-- evidence: curated
-  evidence_score: 0.667
+- evidence: family_inferred
+  evidence_score: 0.333
   is_informative: true
   level: 8
   locus_tag: MIT1002_03493
@@ -50,8 +50,8 @@ rows:
   term_name: negative regulation of gene expression
   tree: null
   tree_code: null
-- evidence: curated
-  evidence_score: 0.667
+- evidence: family_inferred
+  evidence_score: 0.333
   is_informative: true
   level: 6
   locus_tag: MIT1002_03493
@@ -62,8 +62,8 @@ rows:
   term_name: negative regulation of protein-containing complex assembly
   tree: null
   tree_code: null
-- evidence: curated
-  evidence_score: 0.667
+- evidence: family_inferred
+  evidence_score: 0.333
   is_informative: true
   level: 6
   locus_tag: MIT1002_03493
@@ -74,8 +74,8 @@ rows:
   term_name: positive regulation of protein-containing complex assembly
   tree: null
   tree_code: null
-- evidence: curated
-  evidence_score: 0.667
+- evidence: family_inferred
+  evidence_score: 0.333
   is_informative: true
   level: 7
   locus_tag: MIT1002_03493
@@ -86,8 +86,8 @@ rows:
   term_name: protein hexamerization
   tree: null
   tree_code: null
-- evidence: curated
-  evidence_score: 0.667
+- evidence: family_inferred
+  evidence_score: 0.333
   is_informative: true
   level: 7
   locus_tag: MIT1002_03493
@@ -98,8 +98,8 @@ rows:
   term_name: plasmid recombination
   tree: null
   tree_code: null
-- evidence: curated
-  evidence_score: 0.667
+- evidence: family_inferred
+  evidence_score: 0.333
   is_informative: true
   level: 6
   locus_tag: MIT1002_03493
@@ -110,8 +110,8 @@ rows:
   term_name: regulation of arginine biosynthetic process
   tree: null
   tree_code: null
-- evidence: curated
-  evidence_score: 0.667
+- evidence: family_inferred
+  evidence_score: 0.333
   is_informative: true
   level: 6
   locus_tag: MIT1002_03493
@@ -122,8 +122,8 @@ rows:
   term_name: regulation of arginine catabolic process
   tree: null
   tree_code: null
-- evidence: curated
-  evidence_score: 0.667
+- evidence: family_inferred
+  evidence_score: 0.333
   is_informative: true
   level: 10
   locus_tag: MIT1002_03493
@@ -134,8 +134,8 @@ rows:
   term_name: negative regulation of DNA-templated transcription initiation
   tree: null
   tree_code: null
-- evidence: curated
-  evidence_score: 0.667
+- evidence: family_inferred
+  evidence_score: 0.333
   is_informative: true
   level: 10
   locus_tag: MIT1002_03493
