@@ -70,7 +70,7 @@ mcp = FastMCP(
     instructions=(
         "Multi-omics knowledge graph for Prochlorococcus and Alteromonas "
         "(42 tools across gene/sequence/expression/ortholog/ontology/cluster/"
-        "chemistry/metabolomics/enrichment).\n\n"
+        "derived-metric/chemistry/metabolomics/literature/enrichment).\n\n"
         "First call: kg_release_info — verifies your KG release matches what this "
         "explorer-MCP version expects. Surfaces the KG's identity (version, "
         "built_at, counts) and a verdict (ok / warn / unknown).\n\n"
@@ -86,11 +86,16 @@ mcp = FastMCP(
         "worked recipes\n\n"
         "Per-tool: docs://tools/{tool_name}     "
         "(e.g. docs://tools/differential_expression_by_gene)\n"
+        "Ontology: docs://ontologies/{key}      "
+        "(index: docs://ontologies/index — one page per ontology: what it is, "
+        "id form, hierarchy, how to read it)\n"
         "Analysis: docs://analysis/{name}       "
-        "(e.g. docs://analysis/enrichment, docs://analysis/metabolites)\n"
+        "(e.g. docs://analysis/enrichment, docs://analysis/metabolites, "
+        "docs://analysis/annotation_evidence for the annotation-trust surface)\n"
         "Examples: docs://examples/{file}       "
         "(e.g. docs://examples/pathway_enrichment.py, "
-        "docs://examples/metabolites.py)"
+        "docs://examples/metabolites.py, docs://examples/ontology_terms.py, "
+        "docs://examples/annotation_evidence.py)"
     ),
     lifespan=lifespan,
 )
@@ -146,6 +151,11 @@ for example_name, example_description in [
         "ontology_terms.py",
         "Runnable ontology term-side examples (browse, multi-ontology search, "
         "term details, bridge walk)",
+    ),
+    (
+        "annotation_evidence.py",
+        "Runnable annotation-trust examples (evidence ladder, trust filters, "
+        "InterPro-typed enrichment)",
     ),
 ]:
     mcp.add_resource(

@@ -470,7 +470,7 @@ class MetaboliteResult(SparseRow):
     measured_paper_count: int = Field(default=0, description="Distinct papers measuring this metabolite (precomputed). Non-zero on metabolites with metabolomics evidence.")
     measured_organisms: list[str] = Field(default_factory=list, description="Organism preferred_names with at least one MetaboliteAssay anchored to this metabolite. Populated when measured_assay_count > 0; [] otherwise.")
     measured_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments observed for this metabolite (subset of {'whole_cell', 'extracellular', 'vesicle'}). Empty on unmeasured metabolites — use len(measured_compartments) >= 1 to filter for measurement-anchored rows.")
-    score: float | None = Field(default=None, description="Lucene relevance score (only with `search`).")
+    score: float | None = Field(default=None, description="Lucene relevance score (only with `search_text`).")
 
     # verbose
     inchikey: str | None = Field(default=None, description="InChIKey structural fingerprint (e.g. 'WQZGKKKJIJFFOK-GASJEMHNSA-N'). Verbose only.")
@@ -538,8 +538,8 @@ class ListMetabolitesResponse(BaseModel):
     xref_coverage: MetXrefCoverage = Field(description="Cross-ref ID coverage within matched set.")
     mass_stats: MetMassStats = Field(description="Mass distribution within matched set.")
     by_measurement_coverage: MetMeasurementCoverage = Field(default_factory=MetMeasurementCoverage, description="Metabolomics measurement coverage rollup across matched metabolites. Two sub-rollups: by_paper_count (frequency by measured_paper_count value) + by_compartment (frequency by measured_compartments value).")
-    score_max: float | None = Field(default=None, description="Max Lucene score (only with search).")
-    score_median: float | None = Field(default=None, description="Median Lucene score (only with search).")
+    score_max: float | None = Field(default=None, description="Max Lucene score (only with `search_text`).")
+    score_median: float | None = Field(default=None, description="Median Lucene score (only with `search_text`).")
     returned: int = Field(description="Metabolites in this response.")
     offset: int = Field(default=0, description="Offset into full result set.")
     truncated: bool = Field(description="True if total_matching > returned.")
@@ -870,7 +870,7 @@ class GbmNotFound(BaseModel):
         "node (e.g. typo, wrong prefix, ChEBI ID not in our KG).")
     organism: str | None = Field(
         default=None,
-        description="Set to the input string when the fuzzy-match resolves "
+        description="Set to the input string when the organism word-match resolves "
         "to zero genes (typo, unsupported strain). None on success.")
     metabolite_pathway_ids: list[str] = Field(
         default_factory=list,
@@ -1231,7 +1231,7 @@ class MbgNotFound(BaseModel):
         "KG rebuild). E.g. ['PMM9999'].")
     organism: str | None = Field(
         default=None,
-        description="Set to the input string when the fuzzy-match "
+        description="Set to the input string when the organism word-match "
         "resolves to zero genes for the input locus_tags. None on success.")
     metabolite_ids: list[str] = Field(
         default_factory=list,
@@ -1489,8 +1489,9 @@ def register_tools(mcp: FastMCP):
     )
     _TRUST_EVIDENCE_DESC = (
         "Keep rows whose compact evidence ladder value is in this list "
-        "(curated > signature > homology > family_inferred > "
-        "domain_inferred). Valid on the 14 functional-edge ontologies. "
+        "(read the value; rung assignment is per ontology — see "
+        "docs://analysis/annotation_evidence). Valid on the 14 "
+        "functional-edge ontologies. "
         "Default None never filters."
     )
     _TRUST_MAX_TIER_DESC = (
@@ -1571,7 +1572,7 @@ def register_tools(mcp: FastMCP):
         Verdict semantics:
         - `ok`     — explorer satisfies KG min-version + all schema asserts pass.
         - `warn`   — at least one assert failed; tools still serve but may emit confusing errors against the affected shapes. Filter `asserts` on `passed=False` for the failure list.
-        - A failed `controlled_vocabularies_hash` assert (bucket 6) yields `warn`: filters still validate live and `list_filter_values` reads live, but docs://ontologies pages and parameter descriptions may list stale values. `kg.controlled_vocabularies_hash` carries the live digest.
+        - A failed `controlled_vocabularies_hash` assert (bucket 6) yields `warn`: filters still validate live and `list_filter_values` reads live, but docs://ontologies/{key} pages (index: docs://ontologies/index) and parameter descriptions may list stale values. `kg.controlled_vocabularies_hash` carries the live digest.
         - `unknown` — could not evaluate (no `Schema_info` node in the KG — legacy build without release metadata, or wrong database).
 
         On non-`ok` verdicts, the tool emits `ctx.warning(summary)` so the surrounding MCP client surfaces it to the user. See `docs://guide/conventions` for cross-tool semantics.
@@ -1668,21 +1669,16 @@ def register_tools(mcp: FastMCP):
                         "one ontology key. Ignored on non-trust filter types.",
         )] = None,
     ) -> ListFilterValuesResponse:
-        """Enumerate valid values + counts for a categorical filter (gene_category, brite_tree, growth_phase, metric_type, value_kind, compartment, omics_type, evidence_source, cluster_type, plus the annotation-trust types).
+        """Enumerate valid values (+ counts where the KG pivots them) for a categorical filter; the `filter_type` enum is the authoritative list of types.
 
-        `cluster_type` enumerates the closed ClusteringAnalysis.cluster_type
-        vocabulary from ControlledVocabulary (source='vocabulary'; falls back
-        to a pivot over ClusteringAnalysis nodes with a warning) — the live
-        source for the `cluster_type` filter on `list_clustering_analyses` /
-        `gene_clusters_by_gene`.
+        Value sources: data types (gene_category, brite_tree, growth_phase,
+        metric_type, value_kind, compartment, omics_type, evidence_source)
+        pivot live nodes and carry `count`; `cluster_type` and the
+        annotation-trust types read `ControlledVocabulary` (pivot fallback +
+        warning when missing) and return `count=None`. Trust types are
+        documented in docs://analysis/annotation_evidence.
 
-        [TRUST] evidence / sources / call_class / interpro_type /
-        ncbifam_family_type / merops_catalytic_type / merops_family_class /
-        best_hit_kind / pfam_support / attachment_depth / trust_axes /
-        link_kinds enumerate the per-edge trust vocabulary. See
-        docs://analysis/annotation_evidence.
-
-        Routing: feed the returned `value`s into the corresponding filter on the relevant tool — `gene_category` → `genes_by_function(category=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`; the trust types → `sources` / `evidence` / `call_class` / `interpro_type` on `genes_by_ontology` and friends.
+        Routing: feed the returned `value`s into the corresponding filter — `gene_category` → `genes_by_function(category=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `growth_phase` → `list_experiments(growth_phases=[...])` / `list_derived_metrics(growth_phases=[...])`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`; `cluster_type` → `list_clustering_analyses` / `gene_clusters_by_gene`; the trust types → `sources` / `evidence` / `call_class` / `interpro_type` on `genes_by_ontology` and friends.
         """
         await ctx.info(f"list_filter_values filter_type={filter_type}")
         try:
@@ -1712,8 +1708,8 @@ def register_tools(mcp: FastMCP):
         gene_count: int = Field(description="Number of genes in the KG for this organism.")
         publication_count: int = Field(description="Number of publications studying this organism.")
         experiment_count: int = Field(description="Total experiments across all publications.")
-        treatment_types: list[str] = Field(default_factory=list, description="Distinct treatment types studied (e.g. ['coculture', 'light_stress', 'nitrogen_stress']).")
-        background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'continuous_light', 'diel_cycle']).")
+        treatment_types: list[str] = Field(default_factory=list, description="Distinct treatment types studied (e.g. ['coculture', 'nitrogen', 'light']). Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True).")
+        background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'light', 'diel']). Live vocabulary: list_experiments(summary=True).")
         omics_types: list[str] = Field(default_factory=list, description="Distinct omics types available (e.g. ['RNASEQ', 'PROTEOMICS']).")
         clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses for this organism.")
         cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison', 'diel']).")
@@ -1814,10 +1810,13 @@ def register_tools(mcp: FastMCP):
             description=(
                 "Filter by organism: case-insensitive word match on "
                 "preferred_name and name_synonyms, like every other tool's "
-                "organism param ('MED4', 'Prochlorococcus MED4', "
-                "'Meiothermus taiwanensis'); a genus word like 'Alteromonas' "
-                "matches every strain. Unknown names are reported in "
-                "not_found rather than raising."
+                "organism param ('MED4', 'Prochlorococcus MED4'; the synonym "
+                "'Meiothermus taiwanensis' resolves to 'Meiothermus ruber'); a "
+                "genus word like 'Alteromonas' matches every strain. Unknown "
+                "names are reported in not_found rather than raising. Note: two "
+                "OrganismTaxon nodes share preferred_name 'Meiothermus ruber' "
+                "(the genome strain + a gene-less treatment taxon) — join counts "
+                "by Gene_belongs_to_organism, never by name."
             ),
         )] = None,
         compartment: Annotated[str | None, Field(
@@ -1839,7 +1838,7 @@ def register_tools(mcp: FastMCP):
     ) -> ListOrganismsResponse:
         """List organisms with taxonomy, data-availability counts, organism_type, DM rollups, chemistry-capability rollups, annotation-coverage rollups, and metabolomics-coverage rollup.
 
-        Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `catalyzed_metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Read `top_annotation_capability` (top-10 by `peptidase_gene_count`, plus `interpro_gene_count` / `ncbifam_gene_count`) to see which organisms carry MEROPS / InterPro / NCBIfam coverage — then `genes_by_ontology(ontology='merops'|'interpro'|'ncbifam', organism=...)`. Note that `organism_names=` on this tool is exact (case-insensitive) on `preferred_name`, while the `organism=` filter on most other tools is a substring match.
+        Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `catalyzed_metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Read `top_annotation_capability` (top-10 by `peptidase_gene_count`, plus `interpro_gene_count` / `ncbifam_gene_count`) to see which organisms carry MEROPS / InterPro / NCBIfam coverage — then `genes_by_ontology(ontology='merops'|'interpro'|'ncbifam', organism=...)`. `organism_names=` uses the same word-based, case-insensitive match on preferred_name + name_synonyms as every other tool's organism param ('MED4' works); unknown names land in `not_found`. Two OrganismTaxon nodes share preferred_name 'Meiothermus ruber' (genome strain + gene-less treatment taxon) — both list here.
         """
         await ctx.info(
             f"list_organisms organism_names={organism_names} compartment={compartment} "
@@ -1928,7 +1927,7 @@ def register_tools(mcp: FastMCP):
             "or RefSeq protein ID.",
         )],
         organism: Annotated[str | None, Field(
-            description="Filter by organism (case-insensitive partial match). "
+            description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word like 'Alteromonas' matches every strain). "
             "E.g. 'MED4', 'Prochlorococcus MED4'.",
         )] = None,
         limit: Annotated[int, Field(
@@ -1940,7 +1939,7 @@ def register_tools(mcp: FastMCP):
     ) -> ResolveGeneResponse:
         """Resolve a gene identifier (locus_tag, gene name, old locus_tag, or RefSeq protein ID) to matching Gene nodes. Matching is case-insensitive.
 
-        Routing: feed returned `locus_tag`s into `gene_overview` (data-availability triage), `gene_details` (full properties), `gene_homologs`, or `gene_ontology_terms`. The optional `organism` filter is a case-insensitive substring on `organism_name`.
+        Routing: feed returned `locus_tag`s into `gene_overview` (data-availability triage), `gene_details` (full properties), `gene_homologs`, or `gene_ontology_terms`. The optional `organism` filter is a word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word matches every strain).
         """
         await ctx.info(f"resolve_gene identifier={identifier} organism={organism} offset={offset}")
         try:
@@ -2012,7 +2011,7 @@ def register_tools(mcp: FastMCP):
             "for Lucene scoring details.",
         )],
         organism: Annotated[str | None, Field(
-            description="Filter by organism (case-insensitive substring). "
+            description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word like 'Alteromonas' matches every strain). "
             "E.g. 'MED4', 'Prochlorococcus MED4'. "
             "Use list_organisms to see valid values.",
         )] = None,
@@ -2274,7 +2273,9 @@ def register_tools(mcp: FastMCP):
             description="When true, return only summary fields (results=[]).",
         )] = False,
         verbose: Annotated[bool, Field(
-            description="Include gene_summary, function_description, all_identifiers.",
+            description="Include gene_summary, function_description, all_identifiers, "
+            "discussed_in_publications ({doi, prominence, evidence}), per-kind "
+            "derived-metric counts and compartments_observed.",
         )] = False,
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
@@ -2371,7 +2372,7 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> GeneDetailResponse:
-        """All Gene node properties (deep-dive). Use `gene_overview` for the common routing case; this tool dumps every property including sparse fields (catalytic_activities, ec_numbers, ko_terms, etc.). TCDB/CAZy memberships are graph edges, not properties.
+        """All Gene node properties (deep-dive). Use `gene_overview` for the common routing case; this tool adds what overview omits — `sequence`, `gene_summary`, `function_description`, `alternate_functional_descriptions`, `catalytic_activities` (sparse: ~8k genes), `contributing_sources`, `seed_ortholog` / `seed_ortholog_evalue`, `protein_family`, coordinates (`contig`, `start`, `end`, `strand`). The Gene node carries NO `ec_numbers` / `ko_terms` / `kegg_ids` / `cog_categories` properties — chemistry and ontology annotations are graph edges: use `gene_ontology_terms(ontology=['ec','kegg'])` or `metabolites_by_gene`. TCDB/CAZy memberships are edges too.
 
         Routing: prefer `gene_overview` for triage; chain into `metabolites_by_gene` for chemistry, `gene_homologs` for orthologs, `gene_ontology_terms` for annotations, `list_organisms` for taxonomy.
         """
@@ -2726,8 +2727,7 @@ def register_tools(mcp: FastMCP):
         )] = None,
         informative_only: Annotated[bool, Field(
             description="When True, exclude terms flagged uninformative in KG "
-            "(e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' "
-            "go:0008150). Term-side filter only — never restricts the gene set. "
+            "(e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). Term-side filter only — never restricts the gene set. "
             "Default False (opt-in).",
         )] = False,
         verbose: Annotated[bool, Field(
@@ -2748,10 +2748,10 @@ def register_tools(mcp: FastMCP):
         organism: Annotated[str | None, Field(
             description="Organism to scope counts to (resolved like every other tool: "
                         "'MED4' -> 'Prochlorococcus MED4'; unknown/ambiguous raises). Rows "
-                        "gain organism_gene_count (direct edge) and browse sorts by it.",
+                        "gain organism_gene_count (subtree-scoped, like ontology_term_details) and browse sorts by it.",
         )] = None,
     ) -> SearchOntologyResponse:
-        """Search or browse ontology terms — Lucene over term names (search) or a gene_count-sorted listing (browse); no hierarchy traversal.
+        """Search or browse ontology terms — Lucene over term names (search) or a gene_count-sorted listing (browse). Counts (`gene_count`, `organism_gene_count`, `min_gene_count`) are subtree-scoped; only the text match ignores hierarchy.
 
         Returns term IDs and `level` for use with `genes_by_ontology`. With
         `search_text`, supports fuzzy (~), wildcards (*), exact phrases ("..."),
@@ -2947,8 +2947,8 @@ def register_tools(mcp: FastMCP):
         term_ids: Annotated[list[str], Field(
             description="Self-prefixed term IDs, any ontology mix (e.g. 'go:0006979', "
                         "'tcdb:3.A.1', 'merops.family:S14', 'interpro:IPR000362', "
-                        "'ncbifam:NF000812', 'pfam:PF00005', 'kegg.pathway:ko00010'). "
-                        "Rows return in input order.",
+                        "'ncbifam:NF006762', 'tigr.role:100', 'pfam:PF00005', "
+                        "'kegg.pathway:ko00010'). Rows return in input order.",
         )],
         organism: Annotated[str | None, Field(
             description="Organism to scope genes_by_organism to (resolved like every other "
@@ -2956,10 +2956,10 @@ def register_tools(mcp: FastMCP):
                         "Rows gain organism_gene_count (subtree). Default: all organisms.",
         )] = None,
         link_kinds: Annotated[list[Literal["composition", "membership", "router"]] | None, Field(
-            description="Keep only links_out of these kinds. 'composition' = term built "
-                        "from target (tcdb/merops -> pfam); 'membership' = term belongs to "
-                        "target (pfam -> interpro, kegg -> brite); 'router' = recall-biased "
-                        "cross-ref (interpro -> ec/cazy). Default: all.",
+            description="Keep links_out of these kinds: 'composition' = built from "
+                        "target (tcdb/merops -> pfam); 'membership' = belongs to "
+                        "(pfam/ncbifam -> interpro, kegg -> brite); 'router' = recall-biased "
+                        "(interpro -> ec/cazy, ncbifam TIGR* -> tigr.role). Default all.",
         )] = None,
         verbose: Annotated[bool, Field(
             description="Add `properties` (every node prop), `links_out[].props` "
@@ -2986,12 +2986,15 @@ def register_tools(mcp: FastMCP):
         `composition` link means the source term is BUILT FROM the target
         (TCDB family / MEROPS family -> Pfam domain, TCDB -> GO process);
         a `membership` link means the source BELONGS TO the target (Pfam ->
-        InterPro entry, KEGG term -> BRITE category). A `router` link
-        (InterPro -> EC / CAZy) is a recall-biased cross-reference for
-        finding candidate terms — never use it to assign a gene a function;
-        verbose `router_ambiguous` flags InterPro entries whose router links
-        fan out or whose type is not FAMILY. Walk bridges only in the stored
-        direction.
+        InterPro entry, NCBIfam family -> InterPro entry, KEGG term -> BRITE
+        category). A `router` link (InterPro -> EC / CAZy; NCBIfam TIGR*
+        family -> TIGR role) is a recall-biased cross-reference for finding
+        candidate terms — never use it to assign a gene a function; verbose
+        `router_ambiguous` flags InterPro entries whose router links fan out
+        or whose type is not FAMILY. Walk bridges only in the stored
+        direction. TIGR roles (`tigr.role:`) are a 2-level hierarchy —
+        main roles at level 0 (slug ids), sub-roles at level 1 (numeric
+        ids) — so `parents[]` / `children[]` apply to them.
 
         IDs absent from the KG land in `not_found`. `organism` scopes
         `genes_by_organism` and adds `organism_gene_count` per row.
@@ -3065,8 +3068,9 @@ def register_tools(mcp: FastMCP):
         # Trust surface — compact (sparse: strip-non-applicable, owner keeps
         # owned-but-null). See docs://analysis/annotation_evidence.
         evidence: str | None = Field(default=None,
-            description="Compact trust ladder: curated > signature > homology "
-                        "> family_inferred > domain_inferred. Present on the "
+            description="Compact trust ladder value (read it as-is; rung "
+                        "assignment is per ontology — see "
+                        "docs://analysis/annotation_evidence). Present on the "
                         "14 functional-edge ontologies; null on PSORTb/SignalP.")
         call_class: str | None = Field(default=None,
             description="MEROPS peptidase call (sparse: merops only). "
@@ -3228,7 +3232,7 @@ def register_tools(mcp: FastMCP):
             description="Ontology for these term_ids / this level.",
         )],
         organism: Annotated[str, Field(
-            description="Organism (case-insensitive substring match, e.g. 'MED4'). "
+            description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises). "
                         "Required — single-valued. Use list_organisms for valid values.",
         )],
         tree: Annotated[str | None, Field(
@@ -3258,8 +3262,7 @@ def register_tools(mcp: FastMCP):
         )] = 500,
         informative_only: Annotated[bool, Field(
             description="When True, exclude terms flagged uninformative in KG "
-            "(e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' "
-            "go:0008150). Term-side filter only — never restricts the gene set. "
+            "(e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). Term-side filter only — never restricts the gene set. "
             "Default False (opt-in).",
         )] = False,
         summary: Annotated[bool, Field(
@@ -3294,7 +3297,7 @@ def register_tools(mcp: FastMCP):
             description="Skip N rows before limit", ge=0,
         )] = 0,
     ) -> GenesByOntologyResponse:
-        """Find (gene × term) pairs for an ontology, scoped by terms and/or level.
+        """Find (gene × term) pairs for an ontology, scoped by terms and/or level — term-anchored (start from terms, get genes); use `gene_ontology_terms` for the gene-anchored direction (start from locus_tags, get their terms).
 
         Three modes:
         - `term_ids` only — gene discovery by pathway (walk DOWN from each term).
@@ -3381,8 +3384,9 @@ def register_tools(mcp: FastMCP):
                         "present).")
         # Trust surface — compact + verbose (sparse). See docs://analysis/annotation_evidence.
         evidence: str | None = Field(default=None,
-            description="Compact trust ladder: curated > signature > homology "
-                        "> family_inferred > domain_inferred. Present on the "
+            description="Compact trust ladder value (read it as-is; rung "
+                        "assignment is per ontology — see "
+                        "docs://analysis/annotation_evidence). Present on the "
                         "14 functional-edge ontologies; null on PSORTb/SignalP.")
         call_class: str | None = Field(default=None,
             description="MEROPS peptidase call (sparse: merops only).")
@@ -3504,7 +3508,7 @@ def register_tools(mcp: FastMCP):
             "E.g. ['PMM0001', 'PMM0845'].",
         )],
         organism: Annotated[str, Field(
-            description="Organism (case-insensitive substring match, e.g. 'MED4'). Required — single-valued.",
+            description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises). Required — single-valued.",
         )],
         ontology: Annotated[
             list[Literal["go_bp", "go_mf", "go_cc", "kegg", "ec",
@@ -3540,8 +3544,7 @@ def register_tools(mcp: FastMCP):
         )] = None,
         informative_only: Annotated[bool, Field(
             description="When True, exclude terms flagged uninformative in KG "
-            "(e.g. KEGG 'metabolic pathways' map00001, GO root 'biological_process' "
-            "go:0008150). Term-side filter only — never restricts the gene set. "
+            "(e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). Term-side filter only — never restricts the gene set. "
             "Default False (opt-in).",
         )] = False,
         summary: Annotated[bool, Field(
@@ -3631,12 +3634,12 @@ def register_tools(mcp: FastMCP):
         title: str = Field(description="Publication title.")
         authors: list[str] = Field(description="Author list (free-text, semicolon- or comma-delimited).")
         year: int = Field(description="Publication year (e.g. 2022).")
-        journal: str | None = Field(default=None, description="Journal name (e.g. 'ISME').")
+        journal: str | None = Field(default=None, description="Journal name (e.g. 'The ISME Journal').")
         study_type: str | None = Field(default=None, description="Study type tag (e.g. 'metabolomics', 'transcriptomics').")
         organisms: list[str] = Field(default=[], description="Organisms studied in this publication.")
         experiment_count: int = Field(default=0, description="Number of experiments in KG from this publication.")
-        treatment_types: list[str] = Field(default=[], description="Experiment treatment types (e.g. coculture, nitrogen_stress).")
-        background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'diel_cycle']).")
+        treatment_types: list[str] = Field(default=[], description="Experiment treatment types (e.g. coculture, nitrogen). Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True).")
+        background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'diel']).")
         omics_types: list[str] = Field(default=[], description="Omics data types (e.g. RNASEQ, PROTEOMICS).")
         clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses from this publication.")
         cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison']).")
@@ -3672,7 +3675,7 @@ def register_tools(mcp: FastMCP):
         count: int = Field(description="Number of publications.")
 
     class PubBackgroundFactorBreakdown(BaseModel):
-        background_factor: str = Field(description="Background factor (e.g. 'axenic', 'diel_cycle').")
+        background_factor: str = Field(description="Background factor (e.g. 'axenic', 'diel').")
         count: int = Field(description="Number of publications.")
 
     class PubClusterTypeBreakdown(BaseModel):
@@ -3706,7 +3709,7 @@ def register_tools(mcp: FastMCP):
         by_value_kind: list[PubValueKindBreakdown] = Field(default_factory=list, description="DerivedMetric value kind frequency rollup across matched publications.")
         by_metric_type: list[PubMetricTypeBreakdown] = Field(default_factory=list, description="DerivedMetric type frequency rollup across matched publications.")
         by_compartment: list[PubCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched publications.")
-        by_discusses_coverage: PubDiscussesCoverageBreakdown = Field(default_factory=PubDiscussesCoverageBreakdown, description="Binary split {has_discusses, no_discusses} of matched publications by whether they carry a narrative 'discusses' literature index (40 vs 3 in the current KG).")
+        by_discusses_coverage: PubDiscussesCoverageBreakdown = Field(default_factory=PubDiscussesCoverageBreakdown, description="Binary split {has_discusses, no_discusses} of matched publications by whether they carry a narrative 'discusses' literature index (45 vs 4 in the current KG).")
         returned: int = Field(description="Publications in this response.")
         offset: int = Field(default=0, description="Offset into full result set.")
         truncated: bool = Field(description="True if total_matching > returned.")
@@ -3843,8 +3846,8 @@ def register_tools(mcp: FastMCP):
         publication_doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70').")
         authors: list[str] = Field(default_factory=list, description="Publication authors. Sourced from Publication.authors via the Has_experiment edge — no need to join with list_publications for author attribution.")
         organism_name: str = Field(description="Profiled organism (e.g. 'Prochlorococcus MED4').")
-        treatment_type: list[str] = Field(description="Treatment categories (e.g. ['coculture'], ['nitrogen_stress', 'coculture']).")
-        background_factors: list[str] = Field(default_factory=list, description="Background experimental factors (e.g. ['axenic', 'continuous_light']). Empty list when none specified.")
+        treatment_type: list[str] = Field(description="Treatment categories (e.g. ['coculture'], ['nitrogen', 'coculture']). Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True).")
+        background_factors: list[str] = Field(default_factory=list, description="Background experimental factors (e.g. ['axenic', 'light']). Empty list when none specified. Live vocabulary: list_experiments(summary=True).")
         coculture_partner: str | None = Field(default=None, description="Interacting organism — coculture partner or phage. Null when no interacting organism.")
         omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ', 'MICROARRAY', 'PROTEOMICS').")
         is_time_course: bool = Field(description="Whether experiment has multiple time points.")
@@ -3889,7 +3892,7 @@ def register_tools(mcp: FastMCP):
         count: int = Field(description="Number of experiments.")
 
     class BackgroundFactorBreakdown(BaseModel):
-        background_factor: str = Field(description="Background factor (e.g. 'axenic', 'diel_cycle').")
+        background_factor: str = Field(description="Background factor (e.g. 'axenic', 'diel').")
         count: int = Field(description="Number of experiments.")
 
     class OmicsTypeBreakdown(BaseModel):
@@ -3956,20 +3959,21 @@ def register_tools(mcp: FastMCP):
         organism: Annotated[str | None, Field(
             description=(
                 "Filter to experiments where this organism is the profiled "
-                "organism (case-insensitive substring on organism_name). "
+                "organism (word-based, case-insensitive match; 'MED4' works). "
                 "For partner-side filtering, use coculture_partner=; the two "
                 "filters AND-compose."
             ),
         )] = None,
         treatment_type: Annotated[list[str] | None, Field(
             description="Filter by treatment type(s) (case-insensitive exact match). "
-            "E.g. ['coculture', 'nitrogen_stress']. "
-            "Use list_filter_values to see valid values.",
+            "E.g. ['coculture', 'nitrogen']. "
+            "Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True).",
         )] = None,
         background_factors: Annotated[list[str] | None, Field(
             description="Filter by background experimental factors (case-insensitive exact match). "
-            "E.g. ['axenic', 'diel_cycle']. "
-            "Background factors describe experimental context beyond the primary treatment.",
+            "E.g. ['axenic', 'diel']. "
+            "Background factors describe experimental context beyond the primary treatment. "
+            "Live vocabulary: list_experiments(summary=True).",
         )] = None,
         growth_phases: Annotated[list[str] | None, Field(
             description="Filter by growth phase(s) (case-insensitive). "
@@ -3986,8 +3990,8 @@ def register_tools(mcp: FastMCP):
             "E.g. ['10.1038/ismej.2016.70'].",
         )] = None,
         coculture_partner: Annotated[str | None, Field(
-            description="Filter by coculture partner organism (case-insensitive "
-            "partial match). Narrows coculture experiments. "
+            description="Filter by coculture partner organism (word-based, "
+            "case-insensitive match). Narrows coculture experiments. "
             "E.g. 'Alteromonas', 'HOT1A3'.",
         )] = None,
         search_text: Annotated[str | None, Field(
@@ -4170,7 +4174,7 @@ def register_tools(mcp: FastMCP):
         )
         treatment_type: list[str] = Field(
             description="Treatment categories"
-            " (e.g. ['nitrogen_stress'], ['nitrogen_stress', 'coculture'])",
+            " (e.g. ['nitrogen'], ['nitrogen', 'coculture'])",
         )
         background_factors: list[str] = Field(
             default_factory=list,
@@ -4233,7 +4237,7 @@ def register_tools(mcp: FastMCP):
         )
         treatment_type: list[str] = Field(
             description="Treatment types from experiment"
-            " (e.g. ['nitrogen_stress'])",
+            " (e.g. ['nitrogen'])",
         )
         timepoint: str | None = Field(
             description="Timepoint label (e.g. 'days 60+89')."
@@ -4353,11 +4357,11 @@ def register_tools(mcp: FastMCP):
         )
         rows_by_treatment_type: dict[str, int] = Field(
             description="Row counts by treatment type"
-            " (e.g. {'nitrogen_stress': 15})",
+            " (e.g. {'nitrogen': 15})",
         )
         rows_by_background_factors: dict[str, int] = Field(
             description="Row counts by background factor"
-            " (e.g. {'axenic': 10, 'diel_cycle': 5})",
+            " (e.g. {'axenic': 10, 'diel': 5})",
         )
         rows_by_growth_phase: dict[str, int] = Field(
             default_factory=dict,
@@ -4418,9 +4422,8 @@ def register_tools(mcp: FastMCP):
     async def differential_expression_by_gene(
         ctx: Context,
         organism: Annotated[str | None, Field(
-            description="Organism name or partial match (e.g. 'MED4', "
-                        "'Prochlorococcus MED4'). Fuzzy word-based matching "
-                        "(same as list_experiments). "
+            description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word like 'Alteromonas' matches every strain). "
+                        "E.g. 'MED4', 'Prochlorococcus MED4'. "
                         "Get valid names from list_organisms.",
         )] = None,
         locus_tags: Annotated[list[str] | None, Field(
@@ -4622,7 +4625,7 @@ def register_tools(mcp: FastMCP):
         count: int = Field(description="Groups at this level (e.g. 237)")
 
     class SearchHomologGroupsResponse(BaseModel):
-        total_entries: int = Field(description="Total OrthologGroup nodes in KG (e.g. 21122)")
+        total_entries: int = Field(description="Total OrthologGroup nodes in KG")
         total_matching: int = Field(description="Groups matching search + filters (e.g. 884)")
         by_source: list[SearchHomologGroupsSourceBreakdown] = Field(
             description="Groups per source, sorted by count desc")
@@ -4823,8 +4826,9 @@ def register_tools(mcp: FastMCP):
             "gene_homologs). E.g. ['cyanorak:CK_00000570'].",
         )],
         organisms: Annotated[list[str] | None, Field(
-            description="Filter by organisms (case-insensitive substring, each entry "
-            "matched independently). E.g. ['MED4', 'AS9601']. "
+            description="Filter by organisms — each entry a word-based, case-insensitive "
+            "match on preferred_name + name_synonyms ('MED4' works; a genus "
+            "word matches every strain). E.g. ['MED4', 'AS9601']. "
             "Use list_organisms to see valid values.",
         )] = None,
         summary: Annotated[bool, Field(
@@ -4911,7 +4915,7 @@ def register_tools(mcp: FastMCP):
         )
         treatment_type: list[str] = Field(
             description="Treatment categories"
-            " (e.g. ['nitrogen_limitation'])",
+            " (e.g. ['nitrogen'])",
         )
         background_factors: list[str] = Field(
             default_factory=list,
@@ -5125,8 +5129,9 @@ def register_tools(mcp: FastMCP):
             "gene_homologs). E.g. ['cyanorak:CK_00000570'].",
         )],
         organisms: Annotated[list[str] | None, Field(
-            description="Filter by organisms (case-insensitive substring, "
-            "OR semantics). E.g. ['MED4', 'MIT9313']. "
+            description="Filter by organisms — each entry a word-based, case-insensitive "
+            "match on preferred_name + name_synonyms ('MED4' works; a genus "
+            "word matches every strain); OR semantics. E.g. ['MED4', 'MIT9313']. "
             "Use list_organisms to see valid values.",
         )] = None,
         experiment_ids: Annotated[list[str] | None, Field(
@@ -5302,11 +5307,11 @@ def register_tools(mcp: FastMCP):
         ctx: Context,
         locus_tags: Annotated[list[str], Field(description="Gene locus tags. E.g. ['PMM0370', 'PMM0920']. Get these from resolve_gene / gene_overview.")],
         organism: Annotated[str | None, Field(description="Organism name for validation (optional). Inferred from genes. Fuzzy word-based matching.")] = None,
-        treatment_types: Annotated[list[str] | None, Field(description="Filter to specific treatment types.")] = None,
+        treatment_types: Annotated[list[str] | None, Field(description="Filter to specific treatment types (e.g. ['nitrogen', 'coculture']). Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True).")] = None,
         background_factors: Annotated[list[str] | None, Field(
             description="Filter by background experimental factors "
             "(case-insensitive exact match). "
-            "E.g. ['axenic', 'diel_cycle'].",
+            "E.g. ['axenic', 'diel'].",
         )] = None,
         experiment_ids: Annotated[list[str] | None, Field(description="Restrict to specific experiments. Get these from list_experiments.")] = None,
         group_by: Annotated[Literal["treatment_type", "experiment"], Field(description="Group response summary by treatment_type (aggregates across experiments) or experiment (one entry per experiment).")] = "treatment_type",
@@ -5382,7 +5387,7 @@ def register_tools(mcp: FastMCP):
 
     class InlineCluster(BaseModel):
         cluster_id: str = Field(
-            description="GeneCluster node ID (e.g. 'cluster:msb4100087:med4:up_n_transport')")
+            description="GeneCluster node ID (e.g. 'cluster:msb4100087:med4_kmeans_nstarvation:8')")
         name: str = Field(
             description="Cluster name (e.g. 'MED4 cluster 1 (up, N transport)')")
         member_count: int = Field(
@@ -5397,13 +5402,13 @@ def register_tools(mcp: FastMCP):
 
     class ListClusteringAnalysesResult(SparseRow):
         analysis_id: str = Field(
-            description="ClusteringAnalysis node ID (e.g. 'ca:msb4100087:med4:nitrogen')")
+            description="ClusteringAnalysis node ID (e.g. 'clustering_analysis:msb4100087:med4_kmeans_nstarvation')")
         name: str = Field(
             description="Analysis name (e.g. 'MED4 nitrogen stress response clustering')")
         organism_name: str = Field(
             description="Organism (e.g. 'Prochlorococcus MED4')")
         cluster_method: str | None = Field(default=None,
-            description="Clustering method (e.g. 'K-means', 'fuzzy c-means')")
+            description="Clustering method, free text (e.g. 'K-means (K=9)', 'Fuzzy c-means (K=5)')")
         cluster_type: str = Field(
             description="Cluster category (e.g. 'condition_comparison')")
         cluster_count: int = Field(
@@ -5411,10 +5416,10 @@ def register_tools(mcp: FastMCP):
         total_gene_count: int = Field(
             description="Total genes across all clusters")
         treatment_type: list[str] = Field(
-            description="Treatment types (e.g. ['nitrogen_stress'])")
+            description="Treatment types (e.g. ['nitrogen', 'coculture'])")
         growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases. Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
         background_factors: list[str] = Field(default_factory=list,
-            description="Background experimental factors (e.g. ['axenic', 'continuous_light'])")
+            description="Background experimental factors (e.g. ['axenic', 'light'])")
         omics_type: str | None = Field(default=None,
             description="Omics data type (e.g. 'MICROARRAY')")
         experiment_ids: list[str] = Field(default_factory=list,
@@ -5427,7 +5432,7 @@ def register_tools(mcp: FastMCP):
         treatment: str | None = Field(default=None,
             description="Free-text condition description")
         light_condition: str | None = Field(default=None,
-            description="Light regime (e.g. 'diel_cycle')")
+            description="Light regime, free text (e.g. 'continuous light', '14:10 light:dark cycle')")
         experimental_context: str | None = Field(default=None,
             description="Full experimental context description")
 
@@ -5472,7 +5477,7 @@ def register_tools(mcp: FastMCP):
             "Results ranked by score.",
         )] = None,
         organism: Annotated[str | None, Field(
-            description="Filter by organism (case-insensitive partial match).",
+            description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word like 'Alteromonas' matches every strain).",
         )] = None,
         cluster_type: Annotated[str | None, Field(
             description="Filter by cluster type. Live vocabulary: "
@@ -5480,11 +5485,11 @@ def register_tools(mcp: FastMCP):
                         + ", ".join(f"'{v}'" for v in sorted(VALID_CLUSTER_TYPES)) + ".",
         )] = None,
         treatment_type: Annotated[list[str] | None, Field(
-            description="Filter by treatment type(s). E.g. ['nitrogen_stress'].",
+            description="Filter by treatment type(s). E.g. ['nitrogen']. " + "Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True).",
         )] = None,
         background_factors: Annotated[list[str] | None, Field(
             description="Filter by background factors. "
-            "E.g. ['axenic', 'diel_cycle'].",
+            "E.g. ['axenic', 'diel'].",
         )] = None,
         growth_phases: Annotated[list[str] | None, Field(
             description="Filter by growth phase(s) (case-insensitive). "
@@ -5986,7 +5991,8 @@ def register_tools(mcp: FastMCP):
             description=(
                 "Organism to filter by. Accepts short strain code "
                 "('MED4', 'NATL2A', 'MIT1002') or full name "
-                "('Prochlorococcus MED4'). Case-insensitive substring match."
+                "('Prochlorococcus MED4'). Word-based, case-insensitive match on "
+                "preferred_name + name_synonyms; a genus word matches every strain."
             ),
         )] = None,
         metric_types: Annotated[list[str] | None, Field(
@@ -6021,7 +6027,8 @@ def register_tools(mcp: FastMCP):
             description=(
                 "Treatment type(s) to match. Returns DMs whose treatment_type "
                 "list overlaps ANY of the given values (e.g. 'diel', "
-                "'darkness', 'nitrogen_starvation'). Case-insensitive."
+                "'darkness', 'nitrogen'). Case-insensitive. "
+                "Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True)."
             ),
         )] = None,
         background_factors: Annotated[list[str] | None, Field(
@@ -6147,7 +6154,7 @@ def register_tools(mcp: FastMCP):
         gene_name: str | None = Field(default=None,
             description="Gene name (e.g. 'cynA')")
         cluster_id: str = Field(
-            description="Cluster node ID (e.g. 'cluster:msb4100087:med4:up_n_transport')")
+            description="Cluster node ID (e.g. 'cluster:msb4100087:med4_kmeans_nstarvation:8')")
         cluster_name: str = Field(
             description="Cluster name (e.g. 'MED4 cluster 1 (up, N transport)')")
         cluster_type: str = Field(
@@ -6221,7 +6228,7 @@ def register_tools(mcp: FastMCP):
             description="Gene locus tags (e.g. ['PMM0370', 'PMM0920']).",
         )],
         organism: Annotated[str | None, Field(
-            description="Organism name (case-insensitive partial match); "
+            description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises); "
             "inferred from genes if omitted. Single organism enforced.",
         )] = None,
         cluster_type: Annotated[str | None, Field(
@@ -6328,8 +6335,8 @@ def register_tools(mcp: FastMCP):
         )],
         organism: Annotated[str | None, Field(
             description="Organism to scope to. Accepts short strain code "
-                        "('MED4', 'NATL2A', 'MIT1002') or full name. "
-                        "Case-insensitive substring match. Inferred from "
+                        "('MED4', 'NATL2A', 'MIT1002') or full name; word-based, "
+                        "case-insensitive match, ambiguous match raises. Inferred from "
                         "locus_tags when omitted.",
         )] = None,
         metric_types: Annotated[list[str] | None, Field(
@@ -6550,7 +6557,7 @@ def register_tools(mcp: FastMCP):
             "all clusters of this analysis. Provide this OR cluster_ids.",
         )] = None,
         organism: Annotated[str | None, Field(
-            description="Filter by organism (case-insensitive partial match). "
+            description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises). "
             "Single organism enforced.",
         )] = None,
         summary: Annotated[bool, Field(
@@ -6688,7 +6695,7 @@ def register_tools(mcp: FastMCP):
     async def ontology_landscape(
         ctx: Context,
         organism: Annotated[str, Field(
-            description="Organism (fuzzy match, e.g. 'MED4').",
+            description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises).",
         )],
         ontology: Annotated[
             list[Literal["go_bp", "go_mf", "go_cc", "ec", "kegg",
@@ -6739,8 +6746,7 @@ def register_tools(mcp: FastMCP):
         )] = 500,
         informative_only: Annotated[bool, Field(
             description="When True (default), exclude terms flagged uninformative "
-            "in KG (e.g. KEGG 'metabolic pathways' map00001, GO root "
-            "'biological_process' go:0008150). Term-side filter only — never "
+            "in KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). Term-side filter only — never "
             "restricts the gene set. Pass False to opt out and survey the full "
             "term set (rebaselines may differ).",
         )] = True,
@@ -6804,7 +6810,7 @@ def register_tools(mcp: FastMCP):
     async def pathway_enrichment(
         ctx: Context,
         organism: Annotated[str, Field(
-            description="Organism (case-insensitive fuzzy match, e.g. 'MED4'). Single-organism enforced.",
+            description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises). Single-organism enforced.",
         )],
         experiment_ids: Annotated[list[str], Field(
             description="Experiments to pull DE from. Get IDs from list_experiments.",
@@ -6875,7 +6881,7 @@ def register_tools(mcp: FastMCP):
         informative_only: Annotated[bool, Field(
             description=(
                 "When True (default), exclude ontology terms flagged uninformative in "
-                "the KG (e.g. KEGG map00001 'metabolic pathways', GO root go:0008150). "
+                "the KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). "
                 "Term-side filter — never restricts the gene set, background, or DE "
                 "inputs. Pass False to include uninformative terms; per-row "
                 "is_informative still surfaces in either mode. [ENR] Default flipped "
@@ -6988,7 +6994,7 @@ def register_tools(mcp: FastMCP):
     async def cluster_enrichment(
         ctx: Context,
         analysis_id: Annotated[str, Field(description="Clustering analysis ID. Get from list_clustering_analyses.")],
-        organism: Annotated[str, Field(description="Organism (case-insensitive fuzzy match). Single-organism enforced.")],
+        organism: Annotated[str, Field(description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises). Single-organism enforced.")],
         ontology: Annotated[Literal[
             "go_bp", "go_mf", "go_cc", "ec", "kegg",
             "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
@@ -7019,7 +7025,7 @@ def register_tools(mcp: FastMCP):
         informative_only: Annotated[bool, Field(
             description=(
                 "When True (default), exclude ontology terms flagged uninformative in "
-                "the KG (e.g. KEGG map00001 'metabolic pathways', GO root go:0008150). "
+                "the KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; global KEGG maps like ko01100 are not flagged yet). "
                 "Term-side filter — never restricts the gene set, background, or DE "
                 "inputs. Pass False to include uninformative terms; per-row "
                 "is_informative still surfaces in either mode. [ENR] Default flipped "
@@ -7381,8 +7387,8 @@ def register_tools(mcp: FastMCP):
         # ── DM-scoping filters (intersected with selection) ─────────────
         organism: Annotated[str | None, Field(
             description="Organism to scope the DM set to. Accepts short strain "
-                        "code ('MED4', 'NATL2A', 'MIT9312') or full name. "
-                        "Case-insensitive substring match. Single-organism is "
+                        "code ('MED4', 'NATL2A', 'MIT9312') or full name; word-based, "
+                        "case-insensitive match. Single-organism is "
                         "**not** enforced — omit to drill across all "
                         "organisms a metric_type spans.",
         )] = None,
@@ -7804,7 +7810,7 @@ def register_tools(mcp: FastMCP):
         organism: Annotated[str | None, Field(
             description="Organism to scope the DM set to. Accepts short "
                         "strain code ('MED4', 'NATL2A', 'MIT9313') or full "
-                        "name. Case-insensitive substring match. "
+                        "name; word-based, case-insensitive match. "
                         "Single-organism is **not** enforced — omit to drill "
                         "across all organisms a metric_type spans.",
         )] = None,
@@ -8177,7 +8183,7 @@ def register_tools(mcp: FastMCP):
         organism: Annotated[str | None, Field(
             description="Organism to scope the DM set to. Accepts short "
                         "strain code ('MED4', 'NATL2A', 'MIT9313') or full "
-                        "name. Case-insensitive substring match. "
+                        "name; word-based, case-insensitive match. "
                         "Single-organism is **not** enforced — omit to drill "
                         "across all organisms a metric_type spans.",
         )] = None,
@@ -8545,7 +8551,7 @@ def register_tools(mcp: FastMCP):
             min_length=1,
         )],
         organism: Annotated[str, Field(
-            description="Organism name (case-insensitive, fuzzy word-based match — "
+            description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises) — "
             "mirrors `differential_expression_by_gene`). Single-organism enforced. "
             "E.g. 'Prochlorococcus MED4'. `not_found.organism` is set when the "
             "name resolves to zero matching genes.",
@@ -8626,22 +8632,27 @@ def register_tools(mcp: FastMCP):
         )] = 0,
     ) -> GenesByMetaboliteResponse:
         """Find genes connected to specified metabolites in one organism.
-        Two arms — metabolism (`Gene → Reaction → Metabolite`) and transport
-        (`Gene → TcdbFamily → Metabolite` over each gene's deepest TCDB
-        attachments only, so rows agree with the KG's precomputed transport
-        counts). Transport rows carry `substrate_depth` ('most_specific' =
-        most specific surviving transporter node for the substrate in the
-        gene-pruned hierarchy, not a curation level; 'inherited' = rolled
-        up from a descendant) and `tcdb_evidence_score` (5-signal composite
-        [0,1]; rank by it, don't filter — 0 = uncorroborated, not absent).
-        Detail sort: metabolism → most_specific → inherited, score desc
-        within a tier. The auto-warning fires when `inherited` dominates
-        the transport arm. Direction-agnostic (KEGG equation order is
+
+        What: two arms — metabolism (`Gene → Reaction → Metabolite`) and
+        transport (`Gene → TcdbFamily → Metabolite` over each gene's deepest
+        TCDB attachments only, so rows agree with the KG's precomputed
+        transport counts). Direction-agnostic (KEGG equation order is
         unreliable upstream — joins through Reaction_has_metabolite and
         Tcdb_family_transports_metabolite return both produced and consumed
         metabolites identically). Per-row union shape: cross-arm fields are
-        explicitly None on rows from the other arm. Bare / xref metabolite
-        IDs are coerced to canonical (`resolved_aliases`; collisions expand + warn).
+        explicitly None on rows from the other arm.
+
+        Transport semantics: transport rows carry `substrate_depth`
+        ('most_specific' = most specific surviving transporter node for the
+        substrate in the gene-pruned hierarchy, not a curation level;
+        'inherited' = rolled up from a descendant) and `tcdb_evidence_score`
+        (5-signal composite [0,1]; rank by it, don't filter — 0 =
+        uncorroborated, not absent). Detail sort: metabolism →
+        most_specific → inherited, score desc within a tier. The
+        auto-warning fires when `inherited` dominates the transport arm.
+
+        Batch advice: bare / xref metabolite IDs are coerced to canonical
+        (`resolved_aliases`; collisions expand + warn).
 
         Routing: narrow with `substrate_depth=['most_specific']` when
         inherited rows dominate; from `top_genes` (read
@@ -8760,8 +8771,8 @@ def register_tools(mcp: FastMCP):
             min_length=1,
         )],
         organism: Annotated[str, Field(
-            description="Organism name (case-insensitive, fuzzy "
-            "word-based match — mirrors `differential_expression_by_gene` "
+            description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises) "
+            "— mirrors `differential_expression_by_gene` "
             "and `genes_by_metabolite`). Single-organism enforced. "
             "E.g. 'Prochlorococcus MED4'. `not_found.organism` is set "
             "when the name resolves to zero matching genes for the "
@@ -8877,22 +8888,27 @@ def register_tools(mcp: FastMCP):
         )] = 0,
     ) -> MetabolitesByGeneResponse:
         """Find metabolites the input gene set's chemistry reaches in one
-        organism. Symmetric counterpart to `genes_by_metabolite` — same
-        two arms (metabolism and transport over each gene's deepest TCDB
+        organism.
+
+        What: symmetric counterpart to `genes_by_metabolite` — same two
+        arms (metabolism and transport over each gene's deepest TCDB
         attachments only, so distinct transport metabolites equal
         `gene_overview.transported_metabolite_count`), same per-row union
         shape with `substrate_depth` + `tcdb_evidence_score`, same
-        direction-agnostic semantics. Genes with only lumping attachments
-        (notably ABC-only) emit many `inherited` rows; the global sort
-        (metabolism → most_specific → inherited, score desc within a tier)
-        prevents one gene from consuming `limit`, and the auto-warning
-        names input genes whose `transport_substrate_resolution` is
-        'family_inferred' (breadth is reachability, not capability;
-        'resolved' means at least one non-lumping attachment, not all).
-        The `metabolite_elements` filter is the N-source workflow
-        primitive (presence-only AND-of, e.g. `['N']`). The `by_element`
-        envelope is presence-only — not stoichiometric, not
-        mass-balanced. Use `summary=True` on batch DE inputs (50+
+        direction-agnostic semantics. The `metabolite_elements` filter is
+        the N-source workflow primitive (presence-only AND-of, e.g.
+        `['N']`). The `by_element` envelope is presence-only — not
+        stoichiometric, not mass-balanced.
+
+        Transport semantics: genes with only lumping attachments (notably
+        ABC-only) emit many `inherited` rows; the global sort (metabolism →
+        most_specific → inherited, score desc within a tier) prevents one
+        gene from consuming `limit`, and the auto-warning names input genes
+        whose `transport_substrate_resolution` is 'family_inferred'
+        (breadth is reachability, not capability; 'resolved' means at
+        least one non-lumping attachment, not all).
+
+        Batch advice: use `summary=True` on batch DE inputs (50+
         locus_tags). Bare / xref metabolite IDs are coerced to canonical
         (`resolved_aliases`; collisions expand + warn).
 
@@ -9218,7 +9234,7 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="Envelope-level rollup of detection_status across "
             "all numeric edges of matching assays. Primary qualitative "
-            "headline — about 75% of numeric edges are not_detected "
+            "headline — about 70% of numeric edges are not_detected "
             "(tested-absent: assayed and not found, real biology). See "
             "`docs://guide/conventions`.")
         score_max: float | None = Field(
@@ -9259,7 +9275,7 @@ def register_tools(mcp: FastMCP):
                         "'cellular concentration', 'KEGG export'.",
         )] = None,
         organism: Annotated[str | None, Field(
-            description="Organism (case-insensitive substring CONTAINS). "
+            description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word like 'Alteromonas' matches every strain). "
                         "E.g. 'MIT9301', 'Prochlorococcus MIT9313'.",
         )] = None,
         metric_types: Annotated[list[str] | None, Field(
@@ -9633,7 +9649,7 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="Counts per detection_status — primary qualitative "
             "headline. 'not_detected' rows are tested-absent (real "
-            "biology, kept by default — about 75% of numeric edges).")
+            "biology, kept by default — about 70% of numeric edges).")
         by_metric_bucket: list[MqaByMetricBucket] = Field(
             default_factory=list,
             description="Counts per rank-bucket on rankable rows.")
@@ -9792,7 +9808,8 @@ def register_tools(mcp: FastMCP):
         real biology and kept by default. Cross-organism by design.
         Pre-flight via
         `list_metabolite_assays(value_kind='numeric', rankable=True)`. Bare /
-        xref metabolite IDs are coerced to canonical (`resolved_aliases`).
+        xref metabolite IDs are coerced to canonical (`resolved_aliases`;
+        collisions expand + warn).
 
         Routing: drill across to `assays_by_metabolite(metabolite_ids=[...])`
         for the boolean-arm complement and the cross-organism reverse view,
@@ -9888,7 +9905,7 @@ def register_tools(mcp: FastMCP):
         """One bucket of the by_value rollup (true / false counts)."""
         flag_value: bool = Field(
             description="The flag's boolean value. `false` rows are "
-            "tested-absent (real biology — about 62% of boolean rows).")
+            "tested-absent (real biology — about 69% of boolean rows).")
         count: int = Field(
             description="Row count for this flag value (e.g. 58 false / "
             "35 true on the msystems presence_flag_intracellular assay).")
@@ -10055,10 +10072,10 @@ def register_tools(mcp: FastMCP):
         flag_value: Annotated[bool | None, Field(
             description="Filter by flag presence — `True` (presence flagged), "
                         "`False` (absence flagged — *tested-absent*, real biology), "
-                        "`None` (both). Unlike `genes_by_boolean_metric` "
-                        "(positive-only KG storage), `Assay_flags_metabolite` "
-                        "stores both true and false flags, so `flag_value=False` "
-                        "returns real rows (about 62% of boolean rows).",
+                        "`None` (both). `Assay_flags_metabolite` always stores "
+                        "both states (unlike the DM layer, where only 11 of 27 "
+                        "boolean DMs store `not_flagged`), so `flag_value=False` "
+                        "returns real rows (about 69% of boolean rows).",
         )] = None,
         summary: Annotated[bool, Field(
             description="Return summary fields only (results=[]).",
@@ -10077,13 +10094,14 @@ def register_tools(mcp: FastMCP):
         """Drill into boolean MetaboliteAssay edges — one row per
         (metabolite × flag-edge). `flag_value=False` rows are
         *tested-absent* (assayed and not found, real biology, kept by
-        default — about 62% of boolean rows). Both states are always
+        default — about 69% of boolean rows). Both states are always
         stored on this edge (KG `'detected'` / `'not_detected'`), unlike
         the DM layer where only some DMs store `not_flagged`.
         Cross-organism by design. No `by_detection_status` envelope — on
         the boolean arm, `flag_value` IS the qualitative-detection
         signal; `by_value` is its envelope rollup. Bare / xref metabolite
-        IDs are coerced to canonical (`resolved_aliases`).
+        IDs are coerced to canonical (`resolved_aliases`; collisions
+        expand + warn).
 
         Routing: drill across to `assays_by_metabolite(metabolite_ids=[...])`
         for the quantifies-arm complement, or

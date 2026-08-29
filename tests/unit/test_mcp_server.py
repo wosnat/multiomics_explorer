@@ -135,6 +135,7 @@ _EXPECTED_EXAMPLE_RESOURCES = {
     "docs://examples/metabolites.py",
     # PR 3b: ontology_terms.py joins the served examples.
     "docs://examples/ontology_terms.py",
+    "docs://examples/annotation_evidence.py",
 }
 # PR 3b: per-ontology reference (generated) served at docs://ontologies/{key}
 _EXPECTED_ONTOLOGY_RESOURCES = {
