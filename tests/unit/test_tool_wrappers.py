@@ -2875,6 +2875,8 @@ class TestDifferentialExpressionByGeneWrapper:
         ],
         "not_found": [],
         "no_expression": [],
+        "filtered_out": [],
+        "warnings": [],
         "not_found_experiments": [],
         "not_matched_experiments": [],
         "returned": 1,
@@ -2914,6 +2916,8 @@ class TestDifferentialExpressionByGeneWrapper:
         assert len(result.results) == 1
         assert result.results[0].locus_tag == "PMM0001"
         assert result.results[0].expression_status == "significant_up"
+        assert result.filtered_out == []
+        assert result.warnings == []
 
     @pytest.mark.asyncio
     async def test_rows_by_status_model(self, tool_fns, mock_ctx):
@@ -3539,6 +3543,7 @@ class TestGeneResponseProfileWrapper:
                 "found_genes": ["PMM0370"],
                 "has_expression": ["PMM0370"],
                 "has_significant": ["PMM0370"],
+                "has_any_edge": ["PMM0370"],
                 "group_totals": [
                     {"group_key": "nitrogen_stress", "experiments": 4, "timepoints": 14},
                 ],
@@ -3564,7 +3569,7 @@ class TestGeneResponseProfileWrapper:
     async def test_empty_results(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.side_effect = [
             [{"organisms": ["Prochlorococcus MED4"]}],
-            [{"found_genes": [], "has_expression": [], "has_significant": [], "group_totals": []}],
+            [{"found_genes": [], "has_expression": [], "has_significant": [], "has_any_edge": [], "group_totals": []}],
             [],
         ]
         result = await tool_fns["gene_response_profile"](mock_ctx, locus_tags=["FAKE999"])
@@ -8244,6 +8249,8 @@ class TestDifferentialExpressionByGeneWrapperPhase2:
         "experiments": [],
         "not_found": [],
         "no_expression": [],
+        "filtered_out": [],
+        "warnings": [],
         "not_found_experiments": [],
         "not_matched_experiments": [],
         "returned": 0,

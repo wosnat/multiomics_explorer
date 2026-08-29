@@ -3010,6 +3010,7 @@ class TestDifferentialExpressionByGene:
             ],
             "not_found": [],
             "no_expression": [],
+            "filtered_out": [],
         }]
 
     def _detail_rows(self):
@@ -3251,6 +3252,7 @@ class TestDifferentialExpressionByGene:
                 "top_categories": [],
                 "not_found": ["FAKE_GENE"],
                 "no_expression": ["PMM9999"],
+                "filtered_out": [],
             }],
             self._detail_rows(),
         ]
@@ -3259,6 +3261,48 @@ class TestDifferentialExpressionByGene:
         )
         assert result["not_found"] == ["FAKE_GENE"]
         assert result["no_expression"] == ["PMM9999"]
+
+    def test_vocabulary_typo_lands_in_filtered_out_not_no_expression(self, mock_conn):
+        """A gene with expression edges that don't survive growth_phases
+        must land in filtered_out, never no_expression (llm-review 2b.1)."""
+        mock_conn.execute_query.side_effect = [
+            self._organism_result(),           # locus_tags pre-query
+            self._global_summary(),
+            self._experiment_summary(),
+            [{
+                "top_categories": [],
+                "not_found": [],
+                "no_expression": [],
+                "filtered_out": ["PMM1171"],
+            }],
+            [],
+        ]
+        with patch(
+            "multiomics_explorer.api.functions._read_vocab_values",
+            return_value={
+                "values": ["exponential", "stationary"],
+                "value_descriptions": {}, "description": None,
+                "source": "vocabulary", "warning": None,
+            },
+        ):
+            result = api.differential_expression_by_gene(
+                locus_tags=["PMM1171"], growth_phases=["log"], conn=mock_conn,
+            )
+        assert result["filtered_out"] == ["PMM1171"]
+        assert result["no_expression"] == []
+        assert len(result["warnings"]) == 1
+        assert result["warnings"][0].startswith(
+            "growth_phases value 'log' is not in the vocabulary"
+        )
+
+    def test_no_growth_phases_no_warnings(self, mock_conn):
+        """warnings is always present and empty when growth_phases is unset."""
+        mock_conn.execute_query.side_effect = self._mock_side_effect_organism_only()
+        result = api.differential_expression_by_gene(
+            organism="MED4", conn=mock_conn
+        )
+        assert result["warnings"] == []
+        assert result["filtered_out"] == []
 
     def test_experiment_count(self, mock_conn):
         """experiment_count = len(experiments)."""
@@ -3820,11 +3864,15 @@ class TestRunCypherLimitEdgeCases:
 class TestGeneResponseProfile:
     _ORGANISM = "Prochlorococcus marinus subsp. pastoris str. CCMP1986"
 
-    def _make_envelope_result(self, found=None, has_expression=None, has_significant=None, group_totals=None):
+    def _make_envelope_result(self, found=None, has_expression=None, has_significant=None, group_totals=None, has_any_edge=None):
+        he = has_expression or ["PMM0370"]
         return [{
             "found_genes": found or ["PMM0370"],
-            "has_expression": has_expression or ["PMM0370"],
+            "has_expression": he,
             "has_significant": has_significant or ["PMM0370"],
+            # Defaults to has_expression — matches pre-fix behavior for every
+            # test that doesn't explicitly exercise the filtered_out split.
+            "has_any_edge": he if has_any_edge is None else has_any_edge,
             "group_totals": group_totals or [
                 {"group_key": "nitrogen_stress", "experiments": 4, "timepoints": 14, "table_scopes": ["all_detected_genes"]},
                 {"group_key": "coculture", "experiments": 2, "timepoints": 6, "table_scopes": ["significant_only"]},
@@ -3882,6 +3930,47 @@ class TestGeneResponseProfile:
         ]
         result = api.gene_response_profile(locus_tags=["PMM0370", "PMM1234"], conn=mock_conn)
         assert "PMM1234" in result["no_expression"]
+
+    def test_vocabulary_typo_lands_in_filtered_out_not_no_expression(self, mock_conn):
+        """A gene with edges that don't survive treatment_types must land in
+        filtered_out, never no_expression (llm-review 2b.1)."""
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
+            self._make_envelope_result(
+                found=["PMM0370", "PMM1234"], has_expression=["PMM0370"],
+                has_any_edge=["PMM0370", "PMM1234"],
+            ),
+            self._make_agg_rows(),
+        ]
+        with patch(
+            "multiomics_explorer.api.functions._read_vocab_values",
+            return_value={
+                "values": ["nitrogen", "coculture"],
+                "value_descriptions": {}, "description": None,
+                "source": "vocabulary", "warning": None,
+            },
+        ):
+            result = api.gene_response_profile(
+                locus_tags=["PMM0370", "PMM1234"], treatment_types=["Fe"],
+                conn=mock_conn,
+            )
+        assert result["filtered_out"] == ["PMM1234"]
+        assert result["no_expression"] == []
+        assert len(result["warnings"]) == 1
+        assert result["warnings"][0].startswith(
+            "treatment_types value 'Fe' is not in the vocabulary"
+        )
+
+    def test_no_treatment_types_no_warnings(self, mock_conn):
+        """warnings is always present and empty when treatment_types is unset."""
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
+            self._make_envelope_result(),
+            self._make_agg_rows(),
+        ]
+        result = api.gene_response_profile(locus_tags=["PMM0370"], conn=mock_conn)
+        assert result["warnings"] == []
+        assert result["filtered_out"] == []
 
     def test_response_summary_structure(self, mock_conn):
         mock_conn.execute_query.side_effect = [
@@ -10612,6 +10701,7 @@ class TestDifferentialExpressionByGenePhase2:
             "top_categories": [],
             "not_found": [],
             "no_expression": [],
+            "filtered_out": [],
         }]
 
     def _detail_rows(self):

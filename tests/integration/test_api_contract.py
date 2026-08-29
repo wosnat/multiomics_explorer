@@ -431,6 +431,7 @@ class TestDifferentialExpressionByGeneContract:
             "rows_by_background_factors", "rows_by_growth_phase",
             "by_table_scope",
             "top_categories", "experiments", "not_found", "no_expression",
+            "filtered_out", "warnings",
             "not_found_experiments", "not_matched_experiments",
             "returned", "truncated", "offset", "results",
         }
@@ -807,7 +808,7 @@ class TestGeneResponseProfileContract:
         assert isinstance(result, dict)
         expected_keys = {
             "organism_name", "genes_queried", "genes_with_response",
-            "not_found", "no_expression",
+            "not_found", "no_expression", "filtered_out", "warnings",
             "returned", "offset", "truncated", "results",
         }
         assert set(result.keys()) == expected_keys

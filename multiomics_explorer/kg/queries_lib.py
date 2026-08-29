@@ -5189,9 +5189,19 @@ def build_differential_expression_by_gene_summary_diagnostics(
 ) -> tuple[str, dict]:
     """Top categories + batch diagnostics for differential_expression_by_gene.
 
-    RETURN keys: top_categories, not_found, no_expression.
-    not_found and no_expression are empty lists when locus_tags is None.
-    Constructs different Cypher depending on whether locus_tags is provided.
+    RETURN keys: top_categories, not_found, no_expression, filtered_out.
+    not_found, no_expression, filtered_out are empty lists when locus_tags
+    is None. Constructs different Cypher depending on whether locus_tags is
+    provided.
+
+    `no_expression` keeps its exact meaning — a gene has NO
+    `Changes_expression_of` edge at all in the organism. `filtered_out`
+    covers a gene that DOES have edges but none survive the active
+    `direction` / `significant_only` / `growth_phases` filters (e.g. a
+    growth_phases vocabulary typo) — those genes must never land in
+    `no_expression`. The edge-existence check (`edge_count_any`) therefore
+    applies only organism / experiment_ids (structural scope); the
+    edge_count check keeps the full filter set.
     """
     if locus_tags is None:
         # Simple: no batch diagnostics needed
@@ -5220,11 +5230,12 @@ def build_differential_expression_by_gene_summary_diagnostics(
             "                    significant_genes: significant_genes})\n"
             "      WHERE c.category IS NOT NULL][0..5]"
             " AS top_categories\n"
-            "RETURN [] AS not_found, [] AS no_expression, top_categories"
+            "RETURN [] AS not_found, [] AS no_expression,"
+            " [] AS filtered_out, top_categories"
         )
         return cypher, params
 
-    # Batch diagnostics: UNWIND locus_tags for not_found/no_expression
+    # Batch diagnostics: UNWIND locus_tags for not_found/no_expression/filtered_out
     # Use where_block WITHOUT locus_tags condition (already applied via UNWIND)
     conditions_no_lt, params = _differential_expression_where(
         organism=organism, locus_tags=None,
@@ -5237,16 +5248,35 @@ def build_differential_expression_by_gene_summary_diagnostics(
         if conditions_no_lt else ""
     )
 
+    # Unfiltered edge-existence check: organism/experiment_ids only, so a
+    # direction / significant_only / growth_phases mismatch never masquerades
+    # as "no expression data at all" (see docstring).
+    conditions_any, params_any = _differential_expression_where(
+        organism=organism, locus_tags=None,
+        experiment_ids=experiment_ids, direction=None,
+        significant_only=False, growth_phases=None,
+    )
+    params.update(params_any)
+    where_block_any = (
+        "\nWHERE " + " AND ".join(conditions_any)
+        if conditions_any else ""
+    )
+
     cypher = (
         "UNWIND $locus_tags AS lt\n"
         "OPTIONAL MATCH (g:Gene {locus_tag: lt})\n"
         "OPTIONAL MATCH (e:Experiment)-[r:Changes_expression_of]->(g)"
         f"{where_block_no_lt}\n"
         "WITH lt, g, count(r) AS edge_count\n"
-        "WITH collect(CASE WHEN g IS NULL           THEN lt END)"
+        "OPTIONAL MATCH (e:Experiment)-[r:Changes_expression_of]->(g)"
+        f"{where_block_any}\n"
+        "WITH lt, g, edge_count, count(r) AS edge_count_any\n"
+        "WITH collect(CASE WHEN g IS NULL THEN lt END)"
         " AS not_found_raw,\n"
-        "     collect(CASE WHEN g IS NOT NULL AND edge_count = 0"
+        "     collect(CASE WHEN g IS NOT NULL AND edge_count_any = 0"
         " THEN lt END) AS no_expr_raw,\n"
+        "     collect(CASE WHEN g IS NOT NULL AND edge_count_any > 0"
+        " AND edge_count = 0 THEN lt END) AS filtered_out_raw,\n"
         "     collect(CASE WHEN g IS NOT NULL AND edge_count > 0"
         " THEN g  END) AS matched_genes\n"
         "UNWIND CASE WHEN size(matched_genes) > 0"
@@ -5255,12 +5285,13 @@ def build_differential_expression_by_gene_summary_diagnostics(
         f"{where_block_no_lt}\n"
         "WITH [x IN not_found_raw WHERE x IS NOT NULL] AS not_found,\n"
         "     [x IN no_expr_raw  WHERE x IS NOT NULL] AS no_expression,\n"
+        "     [x IN filtered_out_raw WHERE x IS NOT NULL] AS filtered_out,\n"
         "     g.gene_category AS category,\n"
         "     count(DISTINCT g.locus_tag) AS total_genes,\n"
         "     count(DISTINCT CASE WHEN r.expression_status <> 'not_significant'\n"
         "                         THEN g.locus_tag END) AS significant_genes\n"
         "ORDER BY significant_genes DESC\n"
-        "RETURN not_found, no_expression,\n"
+        "RETURN not_found, no_expression, filtered_out,\n"
         "       [c IN collect({category: category, total_genes: total_genes,\n"
         "                      significant_genes: significant_genes})\n"
         "        WHERE c.category IS NOT NULL][0..5]"
@@ -6218,7 +6249,15 @@ def build_gene_response_profile_envelope(
     organism_name is required (resolved by API before calling).
 
     RETURN keys: found_genes (list), has_expression (list), has_significant (list),
-    group_totals (list of {group_key, experiments, timepoints, table_scopes}).
+    has_any_edge (list), group_totals (list of {group_key, experiments, timepoints,
+    table_scopes}).
+
+    `has_any_edge` reports Changes_expression_of edge existence scoped only to
+    organism_name / experiment_ids (structural scope) — NOT treatment_types /
+    background_factors. This keeps a treatment_types/background_factors
+    vocabulary typo from masquerading as "no expression data at all": a gene
+    with edges that a typo'd filter excludes is `filtered_out`, never
+    `no_expression`.
     """
     _, gk = _group_key_expr(group_by)
     unwind2, gk2 = _group_key_expr(group_by, alias="e2")
@@ -6230,6 +6269,14 @@ def build_gene_response_profile_envelope(
     )
     params["locus_tags"] = locus_tags
     where_e = " AND " + " AND ".join(conditions_e) if conditions_e else ""
+
+    conditions_any, params_any = _gene_response_profile_where(
+        organism_name=organism_name, treatment_types=None,
+        background_factors=None,
+        experiment_ids=experiment_ids, experiment_alias="e3",
+    )
+    params.update(params_any)
+    where_any = " AND " + " AND ".join(conditions_any) if conditions_any else ""
 
     conditions_e2, _ = _gene_response_profile_where(
         organism_name=organism_name, treatment_types=treatment_types,
@@ -6251,13 +6298,18 @@ def build_gene_response_profile_envelope(
         " ['significant_up', 'significant_down']"
         " THEN g2.locus_tag END) AS has_significant\n"
         "\n"
+        "OPTIONAL MATCH (e3:Experiment)-[:Changes_expression_of]->(g4:Gene)\n"
+        f"WHERE g4.locus_tag IN found_genes{where_any}\n"
+        "WITH found_genes, has_expression, has_significant,\n"
+        "     collect(DISTINCT g4.locus_tag) AS has_any_edge\n"
+        "\n"
         "OPTIONAL MATCH (e2:Experiment)-[:Changes_expression_of]->(:Gene)\n"
         f"{where_e2}\n"
         f"{unwind2}"
-        f"WITH found_genes, has_expression, has_significant,\n"
+        f"WITH found_genes, has_expression, has_significant, has_any_edge,\n"
         f"     {gk2} AS group_key,\n"
         "     collect(DISTINCT e2) AS group_experiments\n"
-        "WITH found_genes, has_expression, has_significant,\n"
+        "WITH found_genes, has_expression, has_significant, has_any_edge,\n"
         "     collect({group_key: group_key,"
         " experiments: size(group_experiments),"
         " timepoints: reduce(s = 0, exp IN group_experiments |"
@@ -6265,7 +6317,7 @@ def build_gene_response_profile_envelope(
         " table_scopes: apoc.coll.toSet([exp IN group_experiments |"
         " exp.table_scope])}) AS group_totals\n"
         "RETURN found_genes,"
-        " has_expression, has_significant, group_totals"
+        " has_expression, has_significant, has_any_edge, group_totals"
     )
     return cypher, params
 

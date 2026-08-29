@@ -649,6 +649,33 @@ def _read_vocab_values(
     return out
 
 
+def _vocab_warnings(
+    conn, param: str, values: list[str] | None,
+    applies_to: str, prop: str, filter_type: str,
+) -> list[str]:
+    """Warn on filter values not in the live vocabulary.
+
+    Never raises and never filters — the caller decides what to do with
+    unmatched values (typically: land the affected genes in
+    ``filtered_out`` rather than a false ``no_expression`` / silent empty
+    result). Module-level helper; a later pass (2b.3) may generalize the
+    signature further.
+    """
+    if not values:
+        return []
+    read = _read_vocab_values(conn, applies_to, prop, "node")
+    valid = set(read["values"])
+    bad = [v for v in values if v not in valid]
+    if not bad:
+        return []
+    shown = ", ".join(sorted(valid)[:8]) + (", …" if len(valid) > 8 else "")
+    return [
+        f"{param} value '{v}' is not in the vocabulary (valid: {shown})"
+        f" — see list_filter_values(filter_type='{filter_type}')"
+        for v in bad
+    ]
+
+
 # Categorical filter params -> where their allowed values live.
 _CATEGORICAL_VALUE_SOURCE: dict[str, tuple[str, str]] = {
     "evidence": ("edge", "evidence"),
@@ -3768,15 +3795,26 @@ def differential_expression_by_gene(
         rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count,
         rows_by_treatment_type, rows_by_background_factors, by_table_scope,
         rows_by_growth_phase, top_categories, experiments,
-        returned, truncated, not_found, no_expression,
-        not_found_experiments, not_matched_experiments, results.
+        returned, truncated, not_found, no_expression, filtered_out,
+        warnings, not_found_experiments, not_matched_experiments, results.
         not_found_experiments/not_matched_experiments are populated only
         when experiment_ids is provided (empty lists otherwise).
+        no_expression: gene has NO Changes_expression_of edge at all in the
+        organism. filtered_out: gene has edges but none survive the active
+        direction / significant_only / growth_phases filters (e.g. a
+        growth_phases vocabulary typo) — never confuse this with
+        no_expression. warnings: one entry per growth_phases value not in
+        the live vocabulary.
 
     growth_phases: if provided, restricts DE rows to those whose edge-level
     growth_phase property matches any of the specified values (case-insensitive).
     """
     conn = _default_conn(conn)
+
+    warnings = _vocab_warnings(
+        conn, "growth_phases", growth_phases,
+        "Experiment", "growth_phases", "growth_phase",
+    )
 
     # Validate direction
     if direction is not None and direction not in _VALID_DIRECTIONS_BY_GENE:
@@ -3883,6 +3921,7 @@ def differential_expression_by_gene(
     top_categories = diag_raw["top_categories"]
     not_found = diag_raw["not_found"]
     no_expression = diag_raw["no_expression"]
+    filtered_out = diag_raw["filtered_out"]
 
     # --- Experiment diagnostics (only when experiment_ids provided) ---
     if experiment_ids:
@@ -3931,6 +3970,8 @@ def differential_expression_by_gene(
         "experiments": experiments,
         "not_found": not_found,
         "no_expression": no_expression,
+        "filtered_out": filtered_out,
+        "warnings": warnings,
         "not_found_experiments": not_found_experiments,
         "not_matched_experiments": not_matched_experiments,
         "returned": returned,
@@ -4188,7 +4229,8 @@ def gene_response_profile(
 
     Returns:
         dict with keys: organism_name, genes_queried, genes_with_response,
-        not_found, no_expression, returned, offset, truncated, results.
+        not_found, no_expression, filtered_out, warnings, returned, offset,
+        truncated, results.
         Each result has: locus_tag, gene_name, product, gene_category,
         groups_responded, groups_not_responded, groups_tested_not_responded,
         groups_not_known, response_summary.
@@ -4196,6 +4238,11 @@ def gene_response_profile(
         edges but all experiments in the group have full-coverage scopes
         (significant_only or significant_any_timepoint), implying the gene
         was measured but did not respond significantly.
+        no_expression: gene has NO Changes_expression_of edge at all in the
+        organism. filtered_out: gene has edges but none survive the active
+        treatment_types / background_factors filters (e.g. a treatment_types
+        vocabulary typo) — never confuse this with no_expression. warnings:
+        one entry per treatment_types value not in the live vocabulary.
     """
     if not locus_tags:
         raise ValueError(
@@ -4208,6 +4255,11 @@ def gene_response_profile(
         )
 
     conn = _default_conn(conn)
+
+    warnings = _vocab_warnings(
+        conn, "treatment_types", treatment_types,
+        "Experiment", "treatment_type", "treatment_type",
+    )
 
     # Resolve organism upfront — validates single-organism constraint
     organism_name = _validate_organism_inputs(
@@ -4231,6 +4283,7 @@ def gene_response_profile(
     found_genes = env_row["found_genes"]
     has_expression = set(env_row["has_expression"])
     has_significant = set(env_row["has_significant"])
+    has_any_edge = set(env_row["has_any_edge"])
     group_totals = {
         gt["group_key"]: {
             "experiments": gt["experiments"],
@@ -4242,7 +4295,11 @@ def gene_response_profile(
     }
 
     not_found = [lt for lt in locus_tags if lt not in found_genes]
-    no_expression = [lt for lt in found_genes if lt not in has_expression]
+    filtered_out = [
+        lt for lt in found_genes
+        if lt in has_any_edge and lt not in has_expression
+    ]
+    no_expression = [lt for lt in found_genes if lt not in has_any_edge]
     genes_with_response = len(has_significant)
 
     # Q2: Aggregation — per gene x group detail (paginated)
@@ -4339,6 +4396,8 @@ def gene_response_profile(
         "genes_with_response": genes_with_response,
         "not_found": not_found,
         "no_expression": no_expression,
+        "filtered_out": filtered_out,
+        "warnings": warnings,
         "returned": len(results),
         "offset": offset,
         "truncated": truncated,

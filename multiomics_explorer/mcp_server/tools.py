@@ -4402,8 +4402,21 @@ def register_tools(mcp: FastMCP):
         )
         no_expression: list[str] = Field(
             default_factory=list,
-            description="Locus tags in KG but with no expression data"
-            " matching filters",
+            description="Locus tags in KG with NO Changes_expression_of"
+            " edge at all in the organism",
+        )
+        filtered_out: list[str] = Field(
+            default_factory=list,
+            description="Locus tags that DO have expression edges but none"
+            " survive the active direction / significant_only /"
+            " growth_phases filters — e.g. a growth_phases vocabulary typo."
+            " Never confuse with no_expression.",
+        )
+        warnings: list[str] = Field(
+            default_factory=list,
+            description="One entry per growth_phases value not found in the"
+            " live vocabulary (see list_filter_values(filter_type="
+            "'growth_phase')). Empty when clean.",
         )
         not_found_experiments: list[str] = Field(
             default_factory=list,
@@ -4461,7 +4474,11 @@ def register_tools(mcp: FastMCP):
         growth_phases: Annotated[list[str] | None, Field(
             description="Filter by growth phase(s) at sampling time (case-insensitive, edge-level). "
             "Isolates specific-phase rows from multi-phase experiments. "
-            "E.g. ['exponential'].",
+            "E.g. ['exponential']. Live vocabulary: "
+            "list_filter_values(filter_type='growth_phase'). An unknown value "
+            "reports in the envelope `warnings`, and any gene with edges "
+            "outside the requested phase(s) lands in `filtered_out`, not "
+            "`no_expression`.",
         )] = None,
         summary: Annotated[bool, Field(
             description="When true, return only summary fields"
@@ -4574,6 +4591,8 @@ def register_tools(mcp: FastMCP):
                 experiments=exp_models,
                 not_found=data["not_found"],
                 no_expression=data["no_expression"],
+                filtered_out=data["filtered_out"],
+                warnings=data["warnings"],
                 not_found_experiments=data["not_found_experiments"],
                 not_matched_experiments=data["not_matched_experiments"],
                 returned=data["returned"],
@@ -5306,7 +5325,9 @@ def register_tools(mcp: FastMCP):
         genes_queried: int = Field(description="Count of input locus_tags (e.g. 17)")
         genes_with_response: int = Field(description="Genes with at least one significant expression edge (e.g. 15)")
         not_found: list[str] = Field(default_factory=list, description="Input locus_tags not found in KG")
-        no_expression: list[str] = Field(default_factory=list, description="Gene exists but has zero expression edges")
+        no_expression: list[str] = Field(default_factory=list, description="Gene exists but has NO Changes_expression_of edge at all in the organism")
+        filtered_out: list[str] = Field(default_factory=list, description="Gene has expression edges but none survive the active treatment_types / background_factors filters — e.g. a treatment_types vocabulary typo. Never confuse with no_expression.")
+        warnings: list[str] = Field(default_factory=list, description="One entry per treatment_types value not found in the live vocabulary (see list_filter_values(filter_type='treatment_type')). Empty when clean.")
         returned: int = Field(description="Genes in results after pagination (e.g. 15)")
         offset: int = Field(description="Offset into paginated gene list (e.g. 0)")
         truncated: bool = Field(description="True if more genes available beyond returned + offset")

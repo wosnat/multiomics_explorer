@@ -33,14 +33,16 @@ See `docs://guide/conventions` for tested-absent semantics
 ### Envelope
 
 ```expected-keys
-organism_name, genes_queried, genes_with_response, not_found, no_expression, returned, offset, truncated, results
+organism_name, genes_queried, genes_with_response, not_found, no_expression, filtered_out, warnings, returned, offset, truncated, results
 ```
 
 - **organism_name** (string | None): Resolved organism name
 - **genes_queried** (int): Count of input locus_tags (e.g. 17)
 - **genes_with_response** (int): Genes with at least one significant expression edge (e.g. 15)
 - **not_found** (list[string]): Input locus_tags not found in KG
-- **no_expression** (list[string]): Gene exists but has zero expression edges
+- **no_expression** (list[string]): Gene exists but has NO Changes_expression_of edge at all in the organism
+- **filtered_out** (list[string]): Gene has expression edges but none survive the active treatment_types / background_factors filters — e.g. a treatment_types vocabulary typo. Never confuse with no_expression.
+- **warnings** (list[string]): One entry per treatment_types value not found in the live vocabulary (see list_filter_values(filter_type='treatment_type')). Empty when clean.
 - **returned** (int): Genes in results after pagination (e.g. 15)
 - **offset** (int): Offset into paginated gene list (e.g. 0)
 - **truncated** (bool): True if more genes available beyond returned + offset
@@ -74,6 +76,8 @@ gene_response_profile(locus_tags=["PMM0370", "PMM0920"])
   "genes_with_response": 2,
   "not_found": [],
   "no_expression": [],
+  "filtered_out": [],
+  "warnings": [],
   "returned": 2,
   "offset": 0,
   "truncated": false,
@@ -320,7 +324,7 @@ gene_response_profile(locus_tags=["PMM0370", "PMM0920"])
 gene_response_profile(locus_tags=["PMM0370"], treatment_types=["nitrogen", "coculture"])
 ```
 
-*treatment_types values come from the live treatment_type vocabulary ('nitrogen', 'light', 'coculture', ...) — an unknown value silently yields no group, not an error.*
+*treatment_types values come from the live treatment_type vocabulary ('nitrogen', 'light', 'coculture', ...). An unknown value (e.g. 'Fe' instead of 'iron') now reports in the envelope `warnings`, and any gene whose edges exist but don't match the requested treatment_types lands in `filtered_out` — never in `no_expression` (reserved for a gene with no expression edges at all).*
 
 ### Example 3: Read the four group buckets (incl. groups_tested_not_responded)
 
@@ -335,6 +339,8 @@ gene_response_profile(locus_tags=["PMM0370"])
   "genes_with_response": 1,
   "not_found": [],
   "no_expression": [],
+  "filtered_out": [],
+  "warnings": [],
   "returned": 1,
   "offset": 0,
   "truncated": false,
@@ -507,9 +513,17 @@ Assuming groups_not_known means 'gene does not respond to this treatment'
 groups_not_known means no expression data exists — the gene was not profiled or not reported for that treatment. Check experiments_total in the response_summary for coverage. groups_tested_not_responded is the stronger 'absent but inferred-tested' bucket (all experiments in the group report a full-coverage scope).
 ```
 
-- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (e.g. 'nitrogen_stress' instead of 'nitrogen') returns 0 rows, never an error. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. Here the group keys of response_summary and the treatment_types filter use those values.
+- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums. An unknown treatment_types value (e.g. 'Fe' instead of 'iron') now reports in the envelope `warnings` (e.g. "treatment_types value 'Fe' is not in the vocabulary (valid: ...) — see list_filter_values(filter_type='treatment_type')") — check `warnings` before trusting an empty or reduced result. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. Here the group keys of response_summary and the treatment_types filter use those values.
 
-- `no_expression` is this tool's name for the not_matched bucket (gene exists, no expression edges at all); `not_found` = locus_tag absent. See docs://guide/conventions for the shared not_found / not_matched semantics.
+```mistake
+Assuming a treatment_types typo silently returns 0 rows with no signal
+```
+
+```correction
+A treatment_types value not in the live vocabulary lands in the envelope `warnings` (one entry per bad value), and any gene whose expression edges exist but fail to match treatment_types / background_factors lands in `filtered_out` — never in `no_expression`, which is reserved for a gene with NO Changes_expression_of edge at all in the organism.
+```
+
+- `no_expression` is this tool's name for the not_matched bucket — a gene exists but has NO Changes_expression_of edge at all in the organism; `filtered_out` is the DIFFERENT bucket for a gene that DOES have edges but none survive treatment_types / background_factors (including a vocabulary typo); `not_found` = locus_tag absent. See docs://guide/conventions for the shared not_found / not_matched semantics.
 
 ```mistake
 Comparing up_max_log2fc across different organisms or platforms
@@ -541,7 +555,7 @@ This tool aggregates across timepoints. Use differential_expression_by_gene with
 from multiomics_explorer import gene_response_profile
 
 result = gene_response_profile(locus_tags=...)
-# returns dict with keys: organism_name, genes_queried, genes_with_response, not_found, no_expression, returned, offset, truncated, results
+# returns dict with keys: organism_name, genes_queried, genes_with_response, not_found, no_expression, filtered_out, warnings, returned, offset, truncated, results
 ```
 
 Use package import for bulk data extraction in scripts.
