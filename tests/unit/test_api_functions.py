@@ -14886,6 +14886,92 @@ class TestListFilterValuesClusterType:
             api.list_filter_values(filter_type="bogus", conn=mock_conn)
 
 
+class TestListFilterValuesMultiLabelVocabs:
+    """llm-review 2b.1: `list_filter_values` serves the remaining closed
+    vocabularies — treatment_type / background_factors (union across four
+    node labels), table_scope (single node label), detection_status and
+    expression_status (edge-scoped)."""
+
+    def test_list_filter_values_treatment_type_unions_four_labels(self, monkeypatch):
+        calls = []
+        def fake_read(conn, applies_to, prop, kind, *, cache=True):
+            calls.append((applies_to, prop, kind))
+            vals = {"Experiment": ["nitrogen", "iron"], "DerivedMetric": ["diel"],
+                    "MetaboliteAssay": ["nitrogen"], "ClusteringAnalysis": ["diel"]}[applies_to]
+            return {"values": vals, "value_descriptions": {}, "description": "d", "source": "vocabulary", "warning": None}
+        monkeypatch.setattr(api, "_read_vocab_values", fake_read)
+        out = api.list_filter_values(filter_type="treatment_type", conn=MagicMock())
+        by_value = {r["value"]: r for r in out["results"]}
+        assert set(by_value) == {"nitrogen", "iron", "diel"}
+        assert by_value["nitrogen"]["applies_to"] == ["Experiment", "MetaboliteAssay"]
+        assert {c[0] for c in calls} == {"Experiment", "DerivedMetric", "MetaboliteAssay", "ClusteringAnalysis"}
+
+    def test_list_filter_values_background_factors_unions_four_labels(self, monkeypatch):
+        calls = []
+        def fake_read(conn, applies_to, prop, kind, *, cache=True):
+            calls.append((applies_to, prop, kind))
+            vals = {"Experiment": ["axenic", "diel"], "DerivedMetric": ["diel"],
+                    "MetaboliteAssay": ["axenic"], "ClusteringAnalysis": ["viral"]}[applies_to]
+            return {"values": vals, "value_descriptions": {}, "description": "d", "source": "vocabulary", "warning": None}
+        monkeypatch.setattr(api, "_read_vocab_values", fake_read)
+        out = api.list_filter_values(filter_type="background_factors", conn=MagicMock())
+        by_value = {r["value"]: r for r in out["results"]}
+        assert set(by_value) == {"axenic", "diel", "viral"}
+        assert by_value["axenic"]["applies_to"] == ["Experiment", "MetaboliteAssay"]
+        assert by_value["viral"]["applies_to"] == ["ClusteringAnalysis"]
+        assert {c[0] for c in calls} == {"Experiment", "DerivedMetric", "MetaboliteAssay", "ClusteringAnalysis"}
+
+    def test_list_filter_values_table_scope_single_label(self, monkeypatch):
+        calls = []
+        def fake_read(conn, applies_to, prop, kind, *, cache=True):
+            calls.append((applies_to, prop, kind))
+            return {"values": ["all_detected_genes", "top_n"], "value_descriptions": {},
+                    "description": "d", "source": "vocabulary", "warning": None}
+        monkeypatch.setattr(api, "_read_vocab_values", fake_read)
+        out = api.list_filter_values(filter_type="table_scope", conn=MagicMock())
+        by_value = {r["value"]: r for r in out["results"]}
+        assert set(by_value) == {"all_detected_genes", "top_n"}
+        for row in out["results"]:
+            assert row["applies_to"] == ["Experiment"]
+        assert calls == [("Experiment", "table_scope", "node")]
+
+    def test_list_filter_values_detection_status_is_edge_scoped(self, monkeypatch):
+        calls = []
+        def fake_read(conn, applies_to, prop, kind, *, cache=True):
+            calls.append((applies_to, prop, kind))
+            return {"values": ["detected", "not_detected", "sporadic"], "value_descriptions": {},
+                    "description": "d", "source": "vocabulary", "warning": None}
+        monkeypatch.setattr(api, "_read_vocab_values", fake_read)
+        out = api.list_filter_values(filter_type="detection_status", conn=MagicMock())
+        by_value = {r["value"]: r for r in out["results"]}
+        assert set(by_value) == {"detected", "not_detected", "sporadic"}
+        for row in out["results"]:
+            assert row["applies_to"] == ["Assay_quantifies_metabolite"]
+        assert calls == [("Assay_quantifies_metabolite", "detection_status", "edge")]
+
+    def test_list_filter_values_expression_status_is_edge_scoped(self, monkeypatch):
+        calls = []
+        def fake_read(conn, applies_to, prop, kind, *, cache=True):
+            calls.append((applies_to, prop, kind))
+            return {"values": ["up", "down"], "value_descriptions": {},
+                    "description": "d", "source": "vocabulary", "warning": None}
+        monkeypatch.setattr(api, "_read_vocab_values", fake_read)
+        out = api.list_filter_values(filter_type="expression_status", conn=MagicMock())
+        by_value = {r["value"]: r for r in out["results"]}
+        assert set(by_value) == {"up", "down"}
+        for row in out["results"]:
+            assert row["applies_to"] == ["Changes_expression_of"]
+        assert calls == [("Changes_expression_of", "expression_status", "edge")]
+
+    def test_unknown_filter_type_error_lists_new_types(self, mock_conn):
+        with pytest.raises(ValueError) as exc_info:
+            api.list_filter_values(filter_type="bogus", conn=mock_conn)
+        msg = str(exc_info.value)
+        for name in ("treatment_type", "background_factors", "table_scope",
+                     "detection_status", "expression_status"):
+            assert name in msg
+
+
 class TestTripletRowsCarryTransportSubstrateResolution:
     """Spec §3.2: the api passes the new detail column through unchanged —
     a real value on transport rows, an explicit `None` (union padding, NOT

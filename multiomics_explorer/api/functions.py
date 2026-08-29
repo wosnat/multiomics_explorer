@@ -1464,6 +1464,25 @@ def gene_homologs(
     return envelope
 
 
+# filter_type -> (property, applies_to labels/rel types, kind) for the
+# closed vocabularies that live on more than one node label, or on an edge
+# type rather than a node. Same read-then-pivot rule as cluster_type; rows
+# union the values across labels and record which labels carry each one.
+_MULTI_LABEL_VOCABS: dict[str, tuple[str, tuple[str, ...], str]] = {
+    "treatment_type": ("treatment_type",
+                        ("Experiment", "DerivedMetric", "MetaboliteAssay",
+                         "ClusteringAnalysis"), "node"),
+    "background_factors": ("background_factors",
+                           ("Experiment", "DerivedMetric", "MetaboliteAssay",
+                            "ClusteringAnalysis"), "node"),
+    "table_scope": ("table_scope", ("Experiment",), "node"),
+    "detection_status": ("detection_status",
+                         ("Assay_quantifies_metabolite",), "edge"),
+    "expression_status": ("expression_status",
+                         ("Changes_expression_of",), "edge"),
+}
+
+
 def list_filter_values(
     filter_type: str = "gene_category",
     ontology: str | None = None,
@@ -1501,6 +1520,15 @@ def list_filter_values(
         ``list_clustering_analyses`` / ``gene_clusters_by_gene``). Rows carry
         value, applies_to (``['ClusteringAnalysis']``), description, source.
         ``ontology`` does not apply and is ignored.
+      - ``treatment_type``, ``background_factors``: closed vocabularies that
+        live on four node labels (Experiment, DerivedMetric, MetaboliteAssay,
+        ClusteringAnalysis); values are unioned across labels and each row's
+        ``applies_to`` lists only the labels that carry it.
+      - ``table_scope``: Experiment.table_scope values (single label).
+      - ``detection_status``: values on the ``Assay_quantifies_metabolite``
+        edge (``applies_to`` names the relationship type).
+      - ``expression_status``: values on the ``Changes_expression_of`` edge
+        (``applies_to`` names the relationship type).
 
     ``ontology`` scopes any of the annotation-trust types to one ontology.
     Values come from the graph's ControlledVocabulary nodes; when a node is
@@ -1543,6 +1571,28 @@ def list_filter_values(
                 "source": read["source"],
             }
             for v in read["values"]
+        ]
+    elif filter_type in _MULTI_LABEL_VOCABS:
+        prop, labels, kind = _MULTI_LABEL_VOCABS[filter_type]
+        carriers: dict[str, list[str]] = {}
+        descs: dict[str, str] = {}
+        source = "vocabulary"
+        for label in labels:
+            read = _read_vocab_values(conn, label, prop, kind, cache=False)
+            if read["warning"]:
+                warnings_out.append(read["warning"])
+            if read["source"] != "vocabulary":
+                source = read["source"]
+            if envelope_description is None:
+                envelope_description = read["description"]
+            for v in read["values"]:
+                carriers.setdefault(v, []).append(label)
+                if v in read["value_descriptions"]:
+                    descs.setdefault(v, read["value_descriptions"][v])
+        results = [
+            {"value": v, "applies_to": sorted(ls), "source": source,
+             **({"description": descs[v]} if v in descs else {})}
+            for v, ls in sorted(carriers.items())
         ]
     elif filter_type == "gene_category":
         cypher, params = build_list_gene_categories()
@@ -1591,7 +1641,7 @@ def list_filter_values(
             "gene_category", "brite_tree", "growth_phase", "metric_type",
             "value_kind", "compartment", "omics_type", "evidence_source",
             *sorted(_TRUST_FILTER_VALUE_SPECS), "trust_axes", "link_kinds",
-            "cluster_type",
+            "cluster_type", *sorted(_MULTI_LABEL_VOCABS),
         ]
         raise ValueError(
             f"Unknown filter_type: {filter_type!r}. Valid options: "

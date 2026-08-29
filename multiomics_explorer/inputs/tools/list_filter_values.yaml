@@ -335,6 +335,36 @@ examples:
         ]
       }
 
+  - title: Enumerate treatment types (spans Experiment, DerivedMetric, MetaboliteAssay, ClusteringAnalysis)
+    call: list_filter_values(filter_type="treatment_type")
+    response: |
+      {
+        "filter_type": "treatment_type",
+        "description": "The manipulated variable(s) of the experiment — nitrogen, phosphorus, iron, carbon, salt, light, temperature, plastic...",
+        "total_entries": 19,
+        "returned": 19,
+        "truncated": false,
+        "warnings": [],
+        "results": [
+          {
+            "value": "carbon",
+            "source": "vocabulary",
+            "applies_to": ["ClusteringAnalysis", "DerivedMetric", "Experiment", "MetaboliteAssay"]
+          },
+          {
+            "value": "chemical",
+            "source": "vocabulary",
+            "applies_to": ["ClusteringAnalysis", "DerivedMetric", "Experiment", "MetaboliteAssay"]
+          },
+          {
+            "value": "coculture",
+            "source": "vocabulary",
+            "applies_to": ["ClusteringAnalysis", "DerivedMetric", "Experiment", "MetaboliteAssay"]
+          },
+          ...
+        ]
+      }
+
 response_notes:
   - title: "Filter-type families"
     body: |
@@ -344,15 +374,21 @@ response_notes:
       genes), `growth_phase` (timepoint-level culture state), `omics_type`
       (the full canonical enum incl. METABOLOMICS), `cluster_type`
       (ClusteringAnalysis.cluster_type from ControlledVocabulary, pivot
-      fallback + warning). DerivedMetric: `metric_type`, `value_kind`
+      fallback + warning), `expression_status` (the `Changes_expression_of`
+      edge). DerivedMetric: `metric_type`, `value_kind`
       (`numeric` / `boolean` / `categorical`), `compartment` (wet-lab
-      fraction). Chemistry: `evidence_source` (Metabolite.evidence_sources
-      values). Annotation-trust: `evidence`, `sources`, `call_class`,
+      fraction), `table_scope` (Experiment.table_scope). Chemistry:
+      `evidence_source` (Metabolite.evidence_sources values),
+      `detection_status` (the `Assay_quantifies_metabolite` edge).
+      Annotation-trust: `evidence`, `sources`, `call_class`,
       `interpro_type`, `ncbifam_family_type`, `merops_catalytic_type`,
       `merops_family_class`, `best_hit_kind`, `pfam_support`,
       `attachment_depth` read ControlledVocabulary (pivot fallback + warning
       when the node is missing); `trust_axes` / `link_kinds` are
-      config-derived and accept `ontology=` to scope. See
+      config-derived and accept `ontology=` to scope. `treatment_type` and
+      `background_factors` span four labels (Experiment, DerivedMetric,
+      MetaboliteAssay, ClusteringAnalysis) — each row's `applies_to` lists
+      only the labels that carry that value. See
       docs://analysis/annotation_evidence.
 
 chaining:
@@ -366,12 +402,13 @@ chaining:
   - "list_filter_values(filter_type='trust_axes', ontology=...) → genes_by_ontology / gene_ontology_terms / pathway_enrichment / cluster_enrichment(sources=..., evidence=..., max_tier=..., min_evidence_score=..., call_class=...) — see docs://analysis/annotation_evidence for the full per-ontology profile."
   - "list_filter_values(filter_type='interpro_type') → genes_by_ontology(ontology='interpro', ...) / search_ontology(ontology='interpro', interpro_type=...) / pathway_enrichment(ontology='interpro', interpro_type=...)."
   - "list_filter_values(filter_type='call_class') → genes_by_ontology(ontology='merops', call_class=[...])."
+  - "list_filter_values(filter_type='treatment_type') → list_experiments(treatment_type=[...]) / list_derived_metrics(treatment_type=[...]) / list_metabolite_assays(treatment_type=[...]) / list_clustering_analyses(treatment_type=[...]); same routing for filter_type='background_factors'."
 
 mistakes:
   - "Use filter_type='metric_type' to discover DerivedMetric tags before passing them to genes_by_{kind}_metric or list_derived_metrics. filter_type='value_kind' enumerates {numeric, boolean, categorical}. filter_type='compartment' enumerates wet-lab fractions (whole_cell, vesicle, exoproteome, ...)."
   - "count is summed across all organisms — a category with count=770 may cover genes in 10+ organisms"
   - "`count` is None on every vocabulary-sourced row: all the trust filter types (`evidence`, `sources`, `call_class`, `interpro_type`, ...) AND `cluster_type`. Only the pivoted / precomputed types (`gene_category`, `brite_tree`, `growth_phase`, `metric_type`, `value_kind`, `compartment`, `omics_type`, `evidence_source`) carry a count. Read `applies_to` / `description` on the count-less rows instead."
-  - "treatment_type and background_factors have no filter_type here — enumerate them from the by_treatment_type / by_background_factors rollups of list_experiments(summary=True) or list_publications(). They are live vocabularies: an unknown value passed to a filter returns 0 rows, not an error."
+  - "treatment_type and background_factors are closed vocabularies on four labels (Experiment, DerivedMetric, MetaboliteAssay, ClusteringAnalysis) — read them here rather than from the by_treatment_type / by_background_factors rollups of list_experiments(summary=True); an unknown value passed to a filter returns 0 rows, not an error."
   - "For brite_tree: count is the number of ontology terms in the tree, not genes. Use ontology_landscape to check gene coverage."
   - wrong: "list_filter_values(category='Photosynthesis')  # no such param"
     right: "list_filter_values(filter_type='gene_category')  # then pass value to genes_by_function"

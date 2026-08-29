@@ -1656,12 +1656,14 @@ def register_tools(mcp: FastMCP):
                     "ncbifam_family_type", "merops_catalytic_type",
                     "merops_family_class", "best_hit_kind", "pfam_support",
                     "attachment_depth", "trust_axes", "link_kinds",
-                    "cluster_type"],
+                    "cluster_type", "treatment_type", "background_factors",
+                    "table_scope", "detection_status", "expression_status"],
             Field(description=(
-                "Which filter to enumerate: gene/expression (gene_category, "
-                "brite_tree, growth_phase, omics_type, cluster_type), "
-                "DerivedMetric (metric_type, value_kind, compartment), "
-                "chemistry (evidence_source), or an annotation-trust vocabulary."
+                "Which filter to enumerate — gene/expression (incl. "
+                "cluster_type, expression_status), DerivedMetric (incl. "
+                "table_scope), chemistry (incl. detection_status), "
+                "experiment (treatment_type, background_factors), or a "
+                "trust vocabulary."
             )),
         ] = "gene_category",
         ontology: Annotated[str | None, Field(
@@ -1673,12 +1675,14 @@ def register_tools(mcp: FastMCP):
 
         Value sources: data types (gene_category, brite_tree, growth_phase,
         metric_type, value_kind, compartment, omics_type, evidence_source)
-        pivot live nodes and carry `count`; `cluster_type` and the
-        annotation-trust types read `ControlledVocabulary` (pivot fallback +
-        warning when missing) and return `count=None`. Trust types are
-        documented in docs://analysis/annotation_evidence.
+        pivot live nodes and carry `count`; `cluster_type`, `treatment_type`,
+        `background_factors`, `table_scope`, `detection_status`,
+        `expression_status`, and the annotation-trust types read
+        `ControlledVocabulary` (pivot fallback + warning when missing) and
+        return `count=None`. Trust types are documented in
+        docs://analysis/annotation_evidence.
 
-        Routing: feed the returned `value`s into the corresponding filter — `gene_category` → `genes_by_function(category=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `growth_phase` → `list_experiments(growth_phases=[...])` / `list_derived_metrics(growth_phases=[...])`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`; `cluster_type` → `list_clustering_analyses` / `gene_clusters_by_gene`; the trust types → `sources` / `evidence` / `call_class` / `interpro_type` on `genes_by_ontology` and friends.
+        Routing: feed the returned `value`s into the corresponding filter — `gene_category` → `genes_by_function(category=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `growth_phase` → `list_experiments(growth_phases=[...])` / `list_derived_metrics(growth_phases=[...])`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`; `cluster_type` → `list_clustering_analyses` / `gene_clusters_by_gene`; `treatment_type` / `background_factors` → `list_experiments` / `list_derived_metrics` / `list_metabolite_assays` / `list_clustering_analyses`; `table_scope` → `list_experiments(table_scope=[...])`; the trust types → `sources` / `evidence` / `call_class` / `interpro_type` on `genes_by_ontology` and friends.
         """
         await ctx.info(f"list_filter_values filter_type={filter_type}")
         try:

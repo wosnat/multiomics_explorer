@@ -7810,6 +7810,73 @@ class TestListFilterValuesPhase1PlumbingWrapper:
         )
 
 
+class TestListFilterValuesMultiLabelVocabsWrapper:
+    """llm-review 2b.1: list_filter_values gains 5 new filter_type values —
+    treatment_type, background_factors, table_scope, detection_status,
+    expression_status — closed vocabularies read via _read_vocab_values."""
+
+    @pytest.mark.asyncio
+    async def test_treatment_type_branch_passes_through_applies_to(self, tool_fns, mock_ctx):
+        api_return = {
+            "filter_type": "treatment_type",
+            "description": None, "total_entries": 3, "returned": 3, "truncated": False,
+            "warnings": [],
+            "results": [
+                {"value": "diel", "applies_to": ["ClusteringAnalysis", "DerivedMetric"], "source": "vocabulary"},
+                {"value": "iron", "applies_to": ["Experiment"], "source": "vocabulary"},
+                {"value": "nitrogen", "applies_to": ["Experiment", "MetaboliteAssay"], "source": "vocabulary"},
+            ],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            return_value=api_return,
+        ):
+            result = await tool_fns["list_filter_values"](
+                mock_ctx, filter_type="treatment_type",
+            )
+        assert result.filter_type == "treatment_type"
+        by_value = {r.value: r for r in result.results}
+        assert by_value["nitrogen"].applies_to == ["Experiment", "MetaboliteAssay"]
+
+    @pytest.mark.asyncio
+    async def test_detection_status_branch_is_edge_scoped(self, tool_fns, mock_ctx):
+        api_return = {
+            "filter_type": "detection_status",
+            "description": None, "total_entries": 3, "returned": 3, "truncated": False,
+            "warnings": [],
+            "results": [
+                {"value": "detected", "applies_to": ["Assay_quantifies_metabolite"], "source": "vocabulary"},
+                {"value": "not_detected", "applies_to": ["Assay_quantifies_metabolite"], "source": "vocabulary"},
+                {"value": "sporadic", "applies_to": ["Assay_quantifies_metabolite"], "source": "vocabulary"},
+            ],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            return_value=api_return,
+        ):
+            result = await tool_fns["list_filter_values"](
+                mock_ctx, filter_type="detection_status",
+            )
+        assert result.filter_type == "detection_status"
+        assert all(r.applies_to == ["Assay_quantifies_metabolite"] for r in result.results)
+
+    def test_filter_type_literal_includes_the_five_new_values(self, tool_fns):
+        """The Literal annotation on filter_type must enumerate the 5 new
+        values so the JSON schema gates them at the MCP boundary."""
+        import typing
+        fn = tool_fns["list_filter_values"]
+        hints = typing.get_type_hints(fn, include_extras=True)
+        ft_hint = hints.get("filter_type")
+        assert ft_hint is not None
+        hint_str = str(ft_hint)
+        for name in ("treatment_type", "background_factors", "table_scope",
+                     "detection_status", "expression_status"):
+            assert name in hint_str, (
+                f"llm-review 2b.1 must add {name!r} to filter_type Literal; "
+                f"got: {hint_str}"
+            )
+
+
 class TestListMetabolitesPhase1PlumbingWrapper:
     """MetaboliteResult adds 4 measurement pass-through fields per row;
     list_metabolites response gains by_measurement_coverage envelope (spec §6.6)."""

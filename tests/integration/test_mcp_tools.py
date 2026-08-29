@@ -4288,6 +4288,61 @@ class TestListFilterValuesClusterTypeLive:
 
 
 @pytest.mark.kg
+class TestListFilterValuesMultiLabelVocabsLive:
+    """llm-review 2b.1: list_filter_values serves the remaining closed
+    vocabularies — treatment_type / background_factors (union across
+    Experiment, DerivedMetric, MetaboliteAssay, ClusteringAnalysis),
+    table_scope (Experiment only), detection_status
+    (Assay_quantifies_metabolite edge), expression_status
+    (Changes_expression_of edge)."""
+
+    def test_treatment_type_unions_at_least_15_values(self, conn):
+        result = api.list_filter_values(filter_type="treatment_type", conn=conn)
+        assert result["total_entries"] >= 15
+        for row in result["results"]:
+            assert row["applies_to"], row
+            assert set(row["applies_to"]) <= {
+                "Experiment", "DerivedMetric", "MetaboliteAssay",
+                "ClusteringAnalysis",
+            }
+
+    def test_background_factors_unions_labels(self, conn):
+        result = api.list_filter_values(filter_type="background_factors", conn=conn)
+        assert result["total_entries"] >= 5
+        for row in result["results"]:
+            assert row["applies_to"], row
+
+    def test_table_scope_is_experiment_only(self, conn):
+        result = api.list_filter_values(filter_type="table_scope", conn=conn)
+        assert result["total_entries"] >= 1
+        assert all(r["applies_to"] == ["Experiment"] for r in result["results"])
+
+    def test_detection_status_is_edge_scoped(self, conn):
+        result = api.list_filter_values(filter_type="detection_status", conn=conn)
+        assert result["total_entries"] >= 1
+        assert all(
+            r["applies_to"] == ["Assay_quantifies_metabolite"]
+            for r in result["results"]
+        )
+
+    def test_expression_status_is_edge_scoped(self, conn):
+        result = api.list_filter_values(filter_type="expression_status", conn=conn)
+        assert result["total_entries"] >= 1
+        assert all(
+            r["applies_to"] == ["Changes_expression_of"]
+            for r in result["results"]
+        )
+
+    @pytest.mark.asyncio
+    async def test_wrapper_round_trip_treatment_type(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["list_filter_values"](
+            ctx, filter_type="treatment_type")
+        assert len(response.results) >= 15
+        assert all(r.applies_to for r in response.results)
+
+
+@pytest.mark.kg
 class TestTransportSubstrateResolutionRowsLive:
     """Spec §9.2 / §7.3: urea × MED4 transport rows carry the gene's
     `transport_substrate_resolution`; metabolism rows carry None; PMM0392
