@@ -10,8 +10,9 @@ specific threshold (not a uniform padj<0.05 cutoff).
 
 Tested-absent semantics depend on the parent experiment's
 `table_scope`: `all_detected_genes` keeps `not_significant` rows
-(real biology — gene tested but did not respond); `significant_only`
-and `top_n` collapse tested-absent with not-detected. Always check
+(real biology — gene tested but did not respond); any other scope
+(`significant_only`, `significant_any_timepoint`, `filtered_subset`,
+`top_n`) collapses tested-absent with not-detected. Always check
 `by_table_scope` (envelope) and the per-experiment `table_scope`
 before reading missing rows. See `docs://guide/conventions` for the
 full tested-absent framing.
@@ -25,7 +26,7 @@ to `gene_response_profile`; cross-organism via
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| organism | string \| None | None | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word like 'Alteromonas' matches every strain). E.g. 'MED4', 'Prochlorococcus MED4'. Get valid names from list_organisms. |
+| organism | string \| None | None | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word that matches several strains raises — name the strain). E.g. 'MED4', 'Prochlorococcus MED4'. Get valid names from list_organisms. |
 | locus_tags | list[string] \| None | None | Gene locus tags. E.g. ['PMM0001', 'PMM0845']. Get these from resolve_gene / gene_overview. |
 | experiment_ids | list[string] \| None | None | Experiment IDs to restrict to. Get these from list_experiments. |
 | direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` is unchanged. |
@@ -56,7 +57,7 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 - **rows_by_treatment_type** (object): Row counts by treatment type (e.g. {'nitrogen': 15})
 - **rows_by_background_factors** (object): Row counts by background factor (e.g. {'axenic': 10, 'diel': 5})
 - **rows_by_growth_phase** (object): Row counts by growth phase. Growth phase is a timepoint-level condition, not gene-specific.
-- **by_table_scope** (object): Row counts by experiment table_scope (e.g. {'all_detected_genes': 100, 'significant_only': 50}). `all_detected_genes` keeps tested-absent (`not_significant`) rows; `significant_only` / `top_n` collapse them with not-detected. Check before reading missing rows. See `docs://guide/conventions`.
+- **by_table_scope** (object): Row counts by experiment table_scope (e.g. {'all_detected_genes': 100, 'significant_only': 50}). `all_detected_genes` keeps tested-absent (`not_significant`) rows; any other scope (`significant_only`, `significant_any_timepoint`, `filtered_subset`, `top_n`) collapses tested-absent with not-detected. Check before reading missing rows. See `docs://guide/conventions`.
 - **top_categories** (list[ExpressionTopCategory]): Top gene categories by significant gene count, max 5
 - **experiments** (list[ExpressionByExperiment]): Per-experiment summary with nested timepoint breakdown, sorted by significant row count desc
 - **not_found** (list[string]): Input locus_tags not found in KG

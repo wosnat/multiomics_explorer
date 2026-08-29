@@ -247,7 +247,7 @@ on). PSORTb and SignalP carry no trust axes (their `localization_score` /
 
 Two reverse-mode ontology tools — `genes_by_ontology` (term → genes) and
 `gene_ontology_terms` (genes → terms) — operate on all 17 uniformly
-(with hierarchy expansion where applicable; COG / PSORTb / SignalP /
+(with hierarchy expansion where applicable; COG / `subcellular_localization` (PSORTb) / `signal_peptide_type` (SignalP) /
 NCBIfam are flat so there's nothing to expand). For methodology see
 `docs://analysis/enrichment`.
 

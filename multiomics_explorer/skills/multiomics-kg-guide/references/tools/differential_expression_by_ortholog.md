@@ -11,8 +11,9 @@ Each list input (`group_ids`, `organisms`, `experiment_ids`) reports
 both `not_found` (input absent from KG) and `not_matched` (in KG but
 no expression after filters). Tested-absent semantics depend on the
 parent experiment's `table_scope` — `all_detected_genes` keeps
-`not_significant` rows; `significant_only` / `top_n` collapse them
-with not-detected. See `docs://guide/conventions`.
+`not_significant` rows; any other scope (`significant_only`,
+`significant_any_timepoint`, `filtered_subset`, `top_n`) collapses
+tested-absent with not-detected. See `docs://guide/conventions`.
 
 Routing: discover groups via `search_homolog_groups`; group membership
 without expression via `genes_by_homolog_group`; per-gene drill-down
@@ -55,7 +56,7 @@ total_matching, matching_genes, matching_groups, experiment_count, median_abs_lo
 - **rows_by_treatment_type** (object): Row counts by treatment type
 - **rows_by_background_factors** (object): Row counts by background factor
 - **rows_by_growth_phase** (object): Row counts by growth phase. Growth phase is a timepoint-level condition, not gene-specific.
-- **by_table_scope** (object): Row counts by experiment table_scope. `all_detected_genes` keeps tested-absent (`not_significant`) rows; `significant_only` / `top_n` collapse them with not-detected. See `docs://guide/conventions`.
+- **by_table_scope** (object): Row counts by experiment table_scope. `all_detected_genes` keeps tested-absent (`not_significant`) rows; any other scope (`significant_only`, `significant_any_timepoint`, `filtered_subset`, `top_n`) collapses tested-absent with not-detected. See `docs://guide/conventions`.
 - **top_groups** (list[DifferentialExpressionByOrthologTopGroup]): Top 5 groups by significant gene count
 - **top_experiments** (list[DifferentialExpressionByOrthologTopExperiment]): Top 5 experiments by significant gene count
 - **not_found_groups** (list[string]): Input group_ids not found in KG

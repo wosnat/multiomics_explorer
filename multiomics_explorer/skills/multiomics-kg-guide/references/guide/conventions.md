@@ -210,6 +210,7 @@ The **key shape** depends on how many ID batches the tool accepts:
 | Flat `not_found: list[str]` (+ flat `not_matched` where the tool distinguishes it) — one input batch | `gene_overview`, `gene_details`, `gene_homologs`, `gene_aa_sequence`, `gene_neighbors`, `gene_clusters_by_gene`, `gene_derived_metrics`, `gene_ontology_terms`, `genes_by_ontology`, `ontology_term_details`, `ontology_landscape`, `pathway_enrichment`, `cluster_enrichment`, `list_organisms`, `list_publications`, `list_experiments`, `gene_response_profile`, `assays_by_metabolite`, `discussed_by_publication` | `gene_overview(locus_tags=["PMM0001","NOPE"])` → `not_found: ["NOPE"]` |
 | Dict keyed by input bucket — `not_found.metabolite_ids`, `.assay_ids`, `.experiment_ids`, `.publication_doi`, `.organism_names`, `.pathway_ids`, ... (only the buckets that tool accepts) | the six multi-batch chemistry / metabolomics tools: `list_metabolites`, `genes_by_metabolite`, `metabolites_by_gene`, `list_metabolite_assays`, `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay` | `list_metabolite_assays(assay_ids=["x"], experiment_ids=["y"])` → `not_found: {assay_ids: ["x"], experiment_ids: ["y"], ...}` |
 | Suffixed flat lists — `not_found_<bucket>` / `not_matched_<bucket>` per input batch | `genes_by_homolog_group` (`_groups`, `_organisms`), `differential_expression_by_ortholog` (`_groups`, `_organisms`, `_experiments`), `differential_expression_by_gene` (flat `not_found` for genes + `_experiments`), `genes_in_cluster` (`_clusters`, `not_matched_organism`), `genes_by_{numeric,boolean,categorical}_metric` (`_ids`, `_metric_types`, `not_matched_organism`) | `genes_by_homolog_group(group_ids=["cyanorak:CK_1"], organisms=["MED4","Mars"])` → `not_found_organisms: ["Mars"]` |
+| tool-specific diagnostic buckets — `wrong_ontology`, `wrong_level`, `filtered_out` (`genes_by_ontology`); `no_expression`, `filtered_out`, `not_found_experiments` (DE tools); `no_groups` (`gene_homologs`) | | |
 
 Tools that take no ID batch (`genes_by_function`, `search_ontology`,
 `search_homolog_groups`, `list_clustering_analyses`, `list_derived_metrics`,
@@ -396,7 +397,7 @@ filters that only apply to specific DM subsets. The contract is
 consistent across all three:
 
 - **Always-available filters** (raw value, flag, category) — work on every selected DM.
-- **Rankable-gated filters** (`metric_bucket`, `metric_percentile_*`, `rank_by_metric_max`) — only meaningful on DMs with `rankable=True`.
+- **Rankable-gated filters** (`bucket`, `min_percentile` / `max_percentile`, `max_rank` — they populate the row fields `metric_bucket`, `metric_percentile`, `rank_by_metric`; the assay twins spell the same filters `metric_bucket`, `metric_percentile_min` / `_max`, `rank_by_metric_max`) — only meaningful on DMs with `rankable=True`.
   - Mixed-rankability input → soft-exclude non-rankable DMs, surface them in the envelope's `excluded_derived_metrics` + `warnings`.
   - All-non-rankable input + a rankable-gated filter → raises.
 - **`has_p_value`-gated filters** (`significant_only`, `max_adjusted_p_value`) — analogous; raise when no selected DM carries p-values.
@@ -604,7 +605,7 @@ The choice of background matters more than the choice of ontology.
 ## Annotation-trust surface (ontology tools)
 
 **15 of the 17 ontologies carry the trust surface** — every one except
-PSORTb / SignalP. Fourteen of them own a Gene→term edge type; BRITE
+`subcellular_localization` (PSORTb) / `signal_peptide_type` (SignalP). Fourteen of them own a Gene→term edge type; BRITE
 inherits its trust columns from the `Gene_has_kegg_ko` edge it is reached
 through. Every such gene→term row carries a **compact trust column**:
 `evidence`, a five-rung ladder `curated > signature > homology >

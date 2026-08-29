@@ -249,9 +249,8 @@ print(df[["nitrogen", "light"]])
 from multiomics_explorer import response_matrix
 
 group_map = {
-    "GSE37441_MED4_Nlimit_1": "early_N",
-    "GSE37441_MED4_Nlimit_2": "early_N",
-    "GSE59000_MED4_Nrecovery": "late_N",
+    "10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray": "early_N",
+    "10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray": "late_N",
 }
 df = response_matrix(
     genes=["PMM0370", "PMM0920"],

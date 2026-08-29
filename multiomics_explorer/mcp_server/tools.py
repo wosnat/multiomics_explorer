@@ -4384,9 +4384,10 @@ def register_tools(mcp: FastMCP):
             description="Row counts by experiment table_scope"
             " (e.g. {'all_detected_genes': 100, 'significant_only': 50})."
             " `all_detected_genes` keeps tested-absent (`not_significant`)"
-            " rows; `significant_only` / `top_n` collapse them with"
-            " not-detected. Check before reading missing rows."
-            " See `docs://guide/conventions`.",
+            " rows; any other scope (`significant_only`,"
+            " `significant_any_timepoint`, `filtered_subset`, `top_n`)"
+            " collapses tested-absent with not-detected. Check before"
+            " reading missing rows. See `docs://guide/conventions`.",
         )
         top_categories: list[ExpressionTopCategory] = Field(
             description="Top gene categories by significant gene count,"
@@ -4448,7 +4449,7 @@ def register_tools(mcp: FastMCP):
     async def differential_expression_by_gene(
         ctx: Context,
         organism: Annotated[str | None, Field(
-            description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word like 'Alteromonas' matches every strain). "
+            description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word that matches several strains raises — name the strain). "
                         "E.g. 'MED4', 'Prochlorococcus MED4'. "
                         "Get valid names from list_organisms.",
         )] = None,
@@ -4504,8 +4505,9 @@ def register_tools(mcp: FastMCP):
 
         Tested-absent semantics depend on the parent experiment's
         `table_scope`: `all_detected_genes` keeps `not_significant` rows
-        (real biology — gene tested but did not respond); `significant_only`
-        and `top_n` collapse tested-absent with not-detected. Always check
+        (real biology — gene tested but did not respond); any other scope
+        (`significant_only`, `significant_any_timepoint`, `filtered_subset`,
+        `top_n`) collapses tested-absent with not-detected. Always check
         `by_table_scope` (envelope) and the per-experiment `table_scope`
         before reading missing rows. See `docs://guide/conventions` for the
         full tested-absent framing.
@@ -5111,8 +5113,10 @@ def register_tools(mcp: FastMCP):
         by_table_scope: dict[str, int] = Field(
             description="Row counts by experiment table_scope."
             " `all_detected_genes` keeps tested-absent (`not_significant`)"
-            " rows; `significant_only` / `top_n` collapse them with"
-            " not-detected. See `docs://guide/conventions`.",
+            " rows; any other scope (`significant_only`,"
+            " `significant_any_timepoint`, `filtered_subset`, `top_n`)"
+            " collapses tested-absent with not-detected."
+            " See `docs://guide/conventions`.",
         )
         top_groups: list[DifferentialExpressionByOrthologTopGroup] = Field(
             default_factory=list,
@@ -5206,8 +5210,9 @@ def register_tools(mcp: FastMCP):
         both `not_found` (input absent from KG) and `not_matched` (in KG but
         no expression after filters). Tested-absent semantics depend on the
         parent experiment's `table_scope` — `all_detected_genes` keeps
-        `not_significant` rows; `significant_only` / `top_n` collapse them
-        with not-detected. See `docs://guide/conventions`.
+        `not_significant` rows; any other scope (`significant_only`,
+        `significant_any_timepoint`, `filtered_subset`, `top_n`) collapses
+        tested-absent with not-detected. See `docs://guide/conventions`.
 
         Routing: discover groups via `search_homolog_groups`; group membership
         without expression via `genes_by_homolog_group`; per-gene drill-down
