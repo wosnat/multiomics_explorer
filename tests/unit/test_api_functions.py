@@ -14971,6 +14971,37 @@ class TestListFilterValuesMultiLabelVocabs:
                      "detection_status", "expression_status"):
             assert name in msg
 
+    def test_source_is_tracked_per_value_not_a_single_flag(self, monkeypatch):
+        """Review fix: a mixed read (one label vocabulary, one label pivot)
+        must not stamp the same `source` on every row. A value carried by
+        at least one vocabulary-sourced label reads "vocabulary" even if
+        another label carrying it (or a later label carrying nothing in
+        common) fell back to pivot; a value carried ONLY by pivot-sourced
+        label(s) reads "pivot"."""
+        reads = {
+            "Experiment": {"values": ["nitrogen"], "value_descriptions": {},
+                           "description": "d", "source": "vocabulary", "warning": None},
+            "DerivedMetric": {"values": ["nitrogen", "diel"], "value_descriptions": {},
+                              "description": "d", "source": "pivot",
+                              "warning": "No ControlledVocabulary entry for DerivedMetric.treatment_type"},
+            "MetaboliteAssay": {"values": [], "value_descriptions": {},
+                                "description": "d", "source": "vocabulary", "warning": None},
+            "ClusteringAnalysis": {"values": ["iron"], "value_descriptions": {},
+                                   "description": "d", "source": "vocabulary", "warning": None},
+        }
+        def fake_read(conn, applies_to, prop, kind, *, cache=True):
+            return reads[applies_to]
+        monkeypatch.setattr(api, "_read_vocab_values", fake_read)
+        out = api.list_filter_values(filter_type="treatment_type", conn=MagicMock())
+        by_value = {r["value"]: r for r in out["results"]}
+        # Carried by Experiment (vocabulary) AND DerivedMetric (pivot) -> vocabulary wins.
+        assert by_value["nitrogen"]["source"] == "vocabulary"
+        # Carried ONLY by DerivedMetric (pivot).
+        assert by_value["diel"]["source"] == "pivot"
+        # Carried ONLY by ClusteringAnalysis (vocabulary).
+        assert by_value["iron"]["source"] == "vocabulary"
+        assert "No ControlledVocabulary entry" in " ".join(out["warnings"])
+
 
 class TestTripletRowsCarryTransportSubstrateResolution:
     """Spec §3.2: the api passes the new detail column through unchanged —

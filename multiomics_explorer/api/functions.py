@@ -1576,21 +1576,27 @@ def list_filter_values(
         prop, labels, kind = _MULTI_LABEL_VOCABS[filter_type]
         carriers: dict[str, list[str]] = {}
         descs: dict[str, str] = {}
-        source = "vocabulary"
+        # Per-value provenance: a value's source is "vocabulary" if ANY
+        # label that carries it read from the vocabulary node, else
+        # "pivot" — never a single flag stamped from the last label read,
+        # which would mislabel values carried only by a vocabulary-sourced
+        # label whenever a later, unrelated label fell back to pivot.
+        sources_by_value: dict[str, set[str]] = {}
         for label in labels:
             read = _read_vocab_values(conn, label, prop, kind, cache=False)
             if read["warning"]:
                 warnings_out.append(read["warning"])
-            if read["source"] != "vocabulary":
-                source = read["source"]
             if envelope_description is None:
                 envelope_description = read["description"]
             for v in read["values"]:
                 carriers.setdefault(v, []).append(label)
+                sources_by_value.setdefault(v, set()).add(read["source"])
                 if v in read["value_descriptions"]:
                     descs.setdefault(v, read["value_descriptions"][v])
         results = [
-            {"value": v, "applies_to": sorted(ls), "source": source,
+            {"value": v, "applies_to": sorted(ls),
+             "source": ("vocabulary" if "vocabulary" in sources_by_value[v]
+                        else "pivot"),
              **({"description": descs[v]} if v in descs else {})}
             for v, ls in sorted(carriers.items())
         ]
