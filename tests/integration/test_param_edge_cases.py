@@ -521,3 +521,89 @@ class TestDiffExprByGeneEdgeCases:
             organism="MED4", summary=True, conn=conn,
         )
         assert len(result["by_table_scope"]) >= 1
+
+
+# ---------------------------------------------------------------------------
+# pathway_enrichment / cluster_enrichment: raise on all-unknown ids and
+# out-of-range level (Task 4, llm-review 2b.1)
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestEnrichmentRaisesEdgeCases:
+    """An unknown experiment_id / analysis_id, or an out-of-range level,
+    must raise a ValueError instead of returning a vacuous empty envelope."""
+
+    @staticmethod
+    def _a_real_experiment_id(conn):
+        de = api.differential_expression_by_gene(
+            organism="MED4", limit=1, conn=conn,
+        )
+        if not de["results"]:
+            pytest.skip("No DE rows for MED4")
+        return de["results"][0]["experiment_id"]
+
+    def test_pathway_enrichment_all_unknown_experiment_ids_raises(self, conn):
+        with pytest.raises(ValueError, match=r"experiment_ids not found: \['does-not-exist'\]"):
+            api.pathway_enrichment(
+                organism="MED4", experiment_ids=["does-not-exist"],
+                ontology="cyanorak_role", level=1, conn=conn,
+            )
+
+    def test_pathway_enrichment_partial_unknown_keeps_running(self, conn):
+        real_exp = self._a_real_experiment_id(conn)
+        result = api.pathway_enrichment(
+            organism="MED4", experiment_ids=[real_exp, "does-not-exist"],
+            ontology="cyanorak_role", level=1, conn=conn,
+        )
+        envelope = result.to_envelope()
+        assert envelope["not_found_experiments"] == ["does-not-exist"]
+
+    def test_pathway_enrichment_level_out_of_range_raises(self, conn):
+        real_exp = self._a_real_experiment_id(conn)
+        with pytest.raises(
+            ValueError,
+            match=r"level 99 is out of range for ontology 'kegg' \(levels 0–\d+; 0 = root\)",
+        ):
+            api.pathway_enrichment(
+                organism="MED4", experiment_ids=[real_exp],
+                ontology="kegg", level=99, conn=conn,
+            )
+
+    def test_pathway_enrichment_flat_ontology_level_zero_still_works(self, conn):
+        """cog_category is flat (max level 0) — level=0 must not raise."""
+        real_exp = self._a_real_experiment_id(conn)
+        result = api.pathway_enrichment(
+            organism="MED4", experiment_ids=[real_exp],
+            ontology="cog_category", level=0, conn=conn,
+        )
+        envelope = result.to_envelope()
+        assert envelope["level"] == 0
+
+    def test_pathway_enrichment_flat_ontology_level_one_raises_flat_message(self, conn):
+        real_exp = self._a_real_experiment_id(conn)
+        with pytest.raises(ValueError, match=r"levels 0 only — this ontology is flat"):
+            api.pathway_enrichment(
+                organism="MED4", experiment_ids=[real_exp],
+                ontology="cog_category", level=1, conn=conn,
+            )
+
+    def test_cluster_enrichment_unknown_analysis_id_raises(self, conn):
+        with pytest.raises(ValueError, match=r"analysis_id not found: 'ca:does-not-exist'"):
+            api.cluster_enrichment(
+                analysis_id="ca:does-not-exist", organism="MED4",
+                ontology="cyanorak_role", level=1, conn=conn,
+            )
+
+    def test_cluster_enrichment_level_out_of_range_raises(self, conn):
+        analyses = api.list_clustering_analyses(organism="MED4", limit=1, conn=conn)
+        if not analyses["results"]:
+            pytest.skip("No clustering analyses for MED4")
+        analysis = analyses["results"][0]
+        with pytest.raises(
+            ValueError,
+            match=r"level 99 is out of range for ontology 'kegg' \(levels 0–\d+; 0 = root\)",
+        ):
+            api.cluster_enrichment(
+                analysis_id=analysis["analysis_id"],
+                organism=analysis["organism_name"],
+                ontology="kegg", level=99, conn=conn,
+            )

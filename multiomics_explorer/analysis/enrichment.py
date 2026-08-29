@@ -63,6 +63,16 @@ class EnrichmentInputs(BaseModel):
             "experiment_ids that exist but belong to a different organism."
         ),
     )
+    not_found_experiments: list[str] = Field(
+        default_factory=list,
+        description=(
+            "experiment_ids absent from the KG, from differential_expression_by_gene's "
+            "own experiment-level diagnostics (distinct from `not_found`, which mirrors "
+            "that tool's gene-level bucket and is always empty here since no "
+            "locus_tags are passed). pathway_enrichment raises when every "
+            "requested experiment_id lands here."
+        ),
+    )
     no_expression: list[str] = Field(
         default_factory=list,
         description=(
@@ -602,8 +612,9 @@ def de_enrichment_inputs(
     -------
     EnrichmentInputs
         Includes ``gene_sets``, ``background`` (per-cluster), and
-        ``cluster_metadata`` dicts, plus three partial-failure buckets
-        (``not_found``, ``not_matched``, ``no_expression``).
+        ``cluster_metadata`` dicts, plus partial-failure buckets
+        (``not_found``, ``not_matched``, ``no_expression``,
+        ``not_found_experiments``).
 
     Raises
     ------
@@ -790,6 +801,7 @@ def de_enrichment_inputs(
         cluster_metadata=cluster_metadata,
         not_found=list(de_full.get("not_found", []) or []),
         not_matched=list(de_full.get("not_matched", []) or []),
+        not_found_experiments=list(de_full.get("not_found_experiments", []) or []),
         no_expression=list(de_full.get("no_expression", []) or []),
         gene_stats=gene_stats,
     )
@@ -848,13 +860,19 @@ def cluster_enrichment_inputs(
     )
 
     # --- Partial-failure buckets ---
+    # `analysis_meta` (unscoped by organism) is checked first: genes_in_cluster's
+    # analysis_id mode never populates not_found_clusters (see
+    # build_genes_in_cluster_summary), so its not_matched_organism fires for
+    # BOTH "analysis_id doesn't exist anywhere" and "exists, wrong organism" —
+    # analysis_meta is the only signal that tells those two apart (Task 4,
+    # llm-review 2b.1).
     not_found: list[str] = []
     not_matched: list[str] = []
     if not cluster_result.get("results") and cluster_result.get("total_matching", 0) == 0:
-        if cluster_result.get("not_matched_organism"):
-            not_matched = [analysis_id]
-        elif not analysis_meta:
+        if not analysis_meta:
             not_found = [analysis_id]
+        elif cluster_result.get("not_matched_organism"):
+            not_matched = [analysis_id]
         else:
             not_found = [analysis_id]
 
@@ -1413,6 +1431,7 @@ class EnrichmentResult:
         if self.kind == "pathway":
             base.update({
                 "no_expression": list(self.inputs.no_expression),
+                "not_found_experiments": list(self.inputs.not_found_experiments),
                 "by_experiment": _envelope_by_experiment(df, self.inputs, pvc),
                 "by_direction": _envelope_by_direction(df, pvc),
                 "by_omics_type": _envelope_by_omics_type(df, pvc),

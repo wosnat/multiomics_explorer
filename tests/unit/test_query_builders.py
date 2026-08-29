@@ -59,6 +59,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_response_profile_envelope,
     build_gene_response_profile,
     build_ontology_landscape,
+    build_ontology_max_level,
     build_ontology_expcov,
     build_ontology_experiment_check,
     build_ontology_organism_gene_count,
@@ -5337,6 +5338,31 @@ class TestBuildOntologyLandscape:
                 ontology="cazy", organism_name="Test Org",
                 tree="Enzymes",
             )
+
+
+# ---------------------------------------------------------------------------
+# build_ontology_max_level (Task 4, llm-review 2b.1)
+# ---------------------------------------------------------------------------
+
+
+class TestBuildOntologyMaxLevel:
+    def test_returns_max_level_query_for_label(self):
+        cypher, params = build_ontology_max_level("kegg")
+        assert params == {}
+        assert "MATCH (t:`KeggTerm`)" in cypher
+        assert "RETURN max(t.level) AS max_level" in cypher
+
+    def test_uses_ontology_config_label(self):
+        for ontology, cfg in ONTOLOGY_CONFIG.items():
+            cypher, params = build_ontology_max_level(ontology)
+            assert f"`{cfg['label']}`" in cypher
+            assert params == {}
+
+    def test_flat_ontology_same_shape(self):
+        """Flat ontologies (no hierarchy_rels) use the same query — max_level
+        resolves to null/0 at read time, not a different Cypher shape."""
+        cypher, _ = build_ontology_max_level("cog_category")
+        assert "MATCH (t:`CogFunctionalCategory`)" in cypher
 
 
 # ---------------------------------------------------------------------------

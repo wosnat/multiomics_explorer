@@ -4,6 +4,7 @@ Tests business logic, validation, parameter passing, and return types
 by mocking GraphConnection.execute_query.
 """
 
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -5874,8 +5875,145 @@ class TestPathwayEnrichment:
                     "by_omics_type", "cluster_summary",
                     "top_clusters_by_min_padj", "top_pathways_by_padj",
                     "not_found", "not_matched", "no_expression",
+                    "not_found_experiments",
                     "term_validation", "clusters_skipped", "results"):
             assert key in out, f"envelope missing key: {key}"
+
+
+# ---------------------------------------------------------------------------
+# Task 4 (llm-review 2b.1) — raise on all-unknown ids / out-of-range level
+# ---------------------------------------------------------------------------
+
+
+class TestEnrichmentRaisesOnUnknownIdsAndBadLevel:
+    """pathway_enrichment / cluster_enrichment fail loudly instead of
+    returning a vacuous empty envelope; level is range-checked before any
+    gene-set query.
+
+    de_enrichment_inputs / cluster_enrichment_inputs are imported locally
+    inside pathway_enrichment / cluster_enrichment (each call re-imports from
+    multiomics_explorer.analysis.enrichment — see that module's `_call_de`
+    docstring on why), so the patchable attribute lives on the `enrichment`
+    module, not on `api`. _validate_organism_inputs / _ontology_max_level /
+    genes_by_ontology are called as bare names within api/functions.py
+    itself, so they patch directly on `api`.
+    """
+
+    def teardown_method(self, _method):
+        api._MAX_LEVEL_CACHE.clear()
+
+    def test_pathway_enrichment_all_unknown_experiments_raises(self, monkeypatch):
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(api, "_validate_organism_inputs", lambda *a, **k: "Prochlorococcus MED4")
+        monkeypatch.setattr(api, "_ontology_max_level", lambda ontology, conn: 3)
+        fake_inputs = SimpleNamespace(
+            gene_sets={}, background={}, cluster_metadata={},
+            not_found=[], not_matched=[], no_expression=[],
+            not_found_experiments=["nope"], clusters_skipped=[],
+        )
+        monkeypatch.setattr(enr, "de_enrichment_inputs", lambda *a, **k: fake_inputs)
+        with pytest.raises(ValueError, match=r"experiment_ids not found: \['nope'\]"):
+            api.pathway_enrichment(
+                organism="MED4", experiment_ids=["nope"],
+                ontology="kegg", level=1, conn=MagicMock(),
+            )
+
+    def test_pathway_enrichment_partial_unknown_experiments_keeps_running(self, monkeypatch):
+        """Partial batch (some ids unknown) does NOT raise — the unknown ones
+        surface in not_found_experiments instead."""
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(api, "_validate_organism_inputs", lambda *a, **k: "Prochlorococcus MED4")
+        monkeypatch.setattr(api, "_ontology_max_level", lambda ontology, conn: 3)
+        fake_inputs = SimpleNamespace(
+            organism_name="Prochlorococcus MED4",
+            gene_sets={"exp1|t0|up": ["PMM0001"]},
+            background={"exp1|t0|up": ["PMM0001", "PMM0002"]},
+            cluster_metadata={"exp1|t0|up": {"experiment_id": "exp1"}},
+            not_found=[], not_matched=[], no_expression=[],
+            not_found_experiments=["nope"], clusters_skipped=[],
+        )
+        monkeypatch.setattr(enr, "de_enrichment_inputs", lambda *a, **k: fake_inputs)
+        monkeypatch.setattr(
+            api, "genes_by_ontology",
+            lambda **_: {
+                "ontology": "kegg", "organism_name": "MED4", "results": [],
+                "not_found": [], "wrong_ontology": [], "wrong_level": [], "filtered_out": [],
+            },
+        )
+        result = api.pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1", "nope"],
+            ontology="kegg", level=1, conn=MagicMock(),
+        )
+        envelope = result.to_envelope()
+        assert envelope["not_found_experiments"] == ["nope"]
+
+    def test_pathway_enrichment_level_out_of_range_raises(self, monkeypatch):
+        monkeypatch.setattr(api, "_validate_organism_inputs", lambda *a, **k: "Prochlorococcus MED4")
+        monkeypatch.setattr(api, "_ontology_max_level", lambda ontology, conn: 3)
+        with pytest.raises(ValueError, match=r"level 9 is out of range for ontology 'kegg' \(levels 0–3"):
+            api.pathway_enrichment(
+                organism="MED4", experiment_ids=["x"],
+                ontology="kegg", level=9, conn=MagicMock(),
+            )
+
+    def test_pathway_enrichment_flat_ontology_level_zero_message(self, monkeypatch):
+        monkeypatch.setattr(api, "_validate_organism_inputs", lambda *a, **k: "Prochlorococcus MED4")
+        monkeypatch.setattr(api, "_ontology_max_level", lambda ontology, conn: 0)
+        with pytest.raises(ValueError, match=r"levels 0 only — this ontology is flat"):
+            api.pathway_enrichment(
+                organism="MED4", experiment_ids=["x"],
+                ontology="cog_category", level=1, conn=MagicMock(),
+            )
+
+    def test_pathway_enrichment_flat_ontology_level_zero_ok(self, monkeypatch):
+        """level=0 on a flat ontology (max_level=0) does not raise."""
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(api, "_validate_organism_inputs", lambda *a, **k: "Prochlorococcus MED4")
+        monkeypatch.setattr(api, "_ontology_max_level", lambda ontology, conn: 0)
+        fake_inputs = SimpleNamespace(
+            organism_name="Prochlorococcus MED4",
+            gene_sets={}, background={}, cluster_metadata={},
+            not_found=[], not_matched=[], no_expression=[],
+            not_found_experiments=[], clusters_skipped=[],
+        )
+        monkeypatch.setattr(enr, "de_enrichment_inputs", lambda *a, **k: fake_inputs)
+        monkeypatch.setattr(
+            api, "genes_by_ontology",
+            lambda **_: {
+                "ontology": "cog_category", "organism_name": "Prochlorococcus MED4", "results": [],
+                "not_found": [], "wrong_ontology": [], "wrong_level": [], "filtered_out": [],
+            },
+        )
+        result = api.pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cog_category", level=0, conn=MagicMock(),
+        )
+        assert result.level == 0
+
+    def test_cluster_enrichment_analysis_id_not_found_raises(self, monkeypatch):
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(api, "_validate_organism_inputs", lambda *a, **k: "Prochlorococcus MED4")
+        monkeypatch.setattr(api, "_ontology_max_level", lambda ontology, conn: 3)
+        fake_inputs = SimpleNamespace(
+            gene_sets={}, background={}, cluster_metadata={},
+            not_found=["nope"], not_matched=[], no_expression=[],
+            not_found_experiments=[], clusters_skipped=[],
+        )
+        monkeypatch.setattr(enr, "cluster_enrichment_inputs", lambda *a, **k: fake_inputs)
+        with pytest.raises(ValueError, match=r"analysis_id not found: 'nope'"):
+            api.cluster_enrichment(
+                analysis_id="nope", organism="MED4",
+                ontology="kegg", level=1, conn=MagicMock(),
+            )
+
+    def test_cluster_enrichment_level_out_of_range_raises(self, monkeypatch):
+        monkeypatch.setattr(api, "_validate_organism_inputs", lambda *a, **k: "Prochlorococcus MED4")
+        monkeypatch.setattr(api, "_ontology_max_level", lambda ontology, conn: 3)
+        with pytest.raises(ValueError, match=r"level 9 is out of range for ontology 'kegg' \(levels 0–3"):
+            api.cluster_enrichment(
+                analysis_id="ca:1", organism="MED4",
+                ontology="kegg", level=9, conn=MagicMock(),
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -6364,20 +6502,20 @@ class TestClusterEnrichment:
             "wrong_level": [], "filtered_out": [],
         }
 
-    def test_early_return_when_not_found(self, monkeypatch):
+    def test_not_found_analysis_id_raises(self, monkeypatch):
+        """Task 4 (llm-review 2b.1): an unknown analysis_id raises loudly
+        instead of returning a vacuous empty envelope."""
         from multiomics_explorer.api import cluster_enrichment
         import multiomics_explorer.analysis.enrichment as enr
         monkeypatch.setattr(
             enr, "cluster_enrichment_inputs",
             lambda **_: self._stub_inputs(gene_sets={}, not_found=["ca:missing"]),
         )
-        result = cluster_enrichment(
-            analysis_id="ca:missing", organism="MED4",
-            ontology="cyanorak_role", level=1,
-        )
-        envelope = result.to_envelope()
-        assert envelope["not_found"] == ["ca:missing"]
-        assert envelope["results"] == []
+        with pytest.raises(ValueError, match=r"analysis_id not found: 'ca:missing'"):
+            cluster_enrichment(
+                analysis_id="ca:missing", organism="MED4",
+                ontology="cyanorak_role", level=1,
+            )
 
     def test_orchestration_produces_envelope(self, monkeypatch):
         from multiomics_explorer.api import cluster_enrichment

@@ -146,6 +146,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_ontology_experiment_check,
     build_ontology_expcov,
     build_ontology_landscape,
+    build_ontology_max_level,
     build_ontology_organism_gene_count,
     build_ontology_term_details,
 )
@@ -6034,6 +6035,42 @@ def ontology_landscape(
 # ---------------------------------------------------------------------------
 
 
+_MAX_LEVEL_CACHE: dict[str, int] = {}
+
+
+def _ontology_max_level(ontology: str, conn: "GraphConnection") -> int:
+    """Loosest-bound max hierarchy level for `ontology`, cached per-process.
+
+    Flat ontologies (no `level` property anywhere, or `max(t.level)` is
+    null) resolve to 0. BRITE's bound is looser (per-tree levels collapsed
+    to one max over the whole label) — acceptable for range-checking.
+    """
+    if ontology not in _MAX_LEVEL_CACHE:
+        cypher, params = build_ontology_max_level(ontology)
+        rows = conn.execute_query(cypher, **params)
+        _MAX_LEVEL_CACHE[ontology] = int((rows[0]["max_level"] if rows else 0) or 0)
+    return _MAX_LEVEL_CACHE[ontology]
+
+
+def _check_enrichment_level(ontology: str, level: int | None, conn: "GraphConnection") -> None:
+    """Raise ValueError when `level` is out of range for `ontology`.
+
+    Checked once per call, before any gene-set query — a bad level should
+    fail before the (potentially expensive) DE / cluster fetch runs.
+    """
+    if level is None:
+        return
+    max_level = _ontology_max_level(ontology, conn)
+    if level < 0 or level > max_level:
+        rng = (
+            f"levels 0–{max_level}; 0 = root" if max_level
+            else "levels 0 only — this ontology is flat"
+        )
+        raise ValueError(
+            f"level {level} is out of range for ontology '{ontology}' ({rng})."
+        )
+
+
 # ---------------------------------------------------------------------------
 # pathway_enrichment public function
 # ---------------------------------------------------------------------------
@@ -6078,8 +6115,9 @@ def pathway_enrichment(
     Returns an EnrichmentResult. Callers who need the MCP-dict envelope
     should call result.to_envelope(...).
 
-    Raises ValueError when the ontology cannot carry a filter you set, or
-    when an InterPro run omits interpro_type.
+    Raises ValueError when the ontology cannot carry a filter you set, when
+    an InterPro run omits interpro_type, when every requested
+    experiment_id is unknown, or when level is out of range for ontology.
     """
     if ontology not in ALL_ONTOLOGIES:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {ALL_ONTOLOGIES}")
@@ -6116,13 +6154,15 @@ def pathway_enrichment(
     if not experiment_ids:
         raise ValueError("at least one experiment_id required")
 
+    conn = _default_conn(conn)
+    organism_name = _validate_organism_inputs(organism, None, experiment_ids, conn)
+    _check_enrichment_level(ontology, level, conn)
+
     from multiomics_explorer.analysis.enrichment import (
         de_enrichment_inputs, fisher_ora, EnrichmentResult,
     )
     import pandas as pd
     import numpy as np
-
-    conn = _default_conn(conn)
 
     inputs = de_enrichment_inputs(
         experiment_ids=experiment_ids,
@@ -6133,6 +6173,12 @@ def pathway_enrichment(
         growth_phases=growth_phases,
         conn=conn,
     )
+
+    if inputs.not_found_experiments and len(inputs.not_found_experiments) == len(experiment_ids):
+        raise ValueError(
+            f"experiment_ids not found: {inputs.not_found_experiments}. "
+            f"Get ids from list_experiments(organism='{organism_name}')."
+        )
 
     if background == "table_scope":
         resolved_bg = inputs.background
@@ -6283,8 +6329,9 @@ def cluster_enrichment(
     gene-to-term mapping, so tested sets and background move together.
     ``interpro_type`` is required when ``ontology='interpro'``.
 
-    Raises ValueError when the ontology cannot carry a filter you set, or
-    when an InterPro run omits interpro_type.
+    Raises ValueError when the ontology cannot carry a filter you set, when
+    an InterPro run omits interpro_type, when analysis_id is unknown, or
+    when level is out of range for ontology.
     """
     if ontology not in ALL_ONTOLOGIES:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {ALL_ONTOLOGIES}")
@@ -6321,12 +6368,14 @@ def cluster_enrichment(
     if not (0 < pvalue_cutoff < 1):
         raise ValueError(f"pvalue_cutoff must be in (0, 1]; got {pvalue_cutoff}")
 
+    conn = _default_conn(conn)
+    organism_name = _validate_organism_inputs(organism, None, None, conn)
+    _check_enrichment_level(ontology, level, conn)
+
     from multiomics_explorer.analysis.enrichment import (
         cluster_enrichment_inputs, fisher_ora, EnrichmentResult,
     )
     import pandas as pd
-
-    conn = _default_conn(conn)
 
     inputs = cluster_enrichment_inputs(
         analysis_id=analysis_id,
@@ -6335,6 +6384,12 @@ def cluster_enrichment(
         max_cluster_size=max_cluster_size,
         conn=conn,
     )
+
+    if inputs.not_found:
+        raise ValueError(
+            f"analysis_id not found: '{analysis_id}'. "
+            f"Get ids from list_clustering_analyses(organism='{organism_name}')."
+        )
 
     if background == "cluster_union":
         resolved_bg = inputs.background

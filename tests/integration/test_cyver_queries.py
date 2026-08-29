@@ -90,6 +90,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_search_ontology,
     build_search_ontology_summary,
     build_ontology_landscape,
+    build_ontology_max_level,
     build_ontology_expcov,
     build_ontology_experiment_check,
     build_ontology_organism_gene_count,
@@ -454,6 +455,11 @@ for _ont_key in ONTOLOGY_CONFIG:
             f"ontology_expcov_{_ont_key}",
             build_ontology_expcov,
             {"ontology": _ont_key, "organism_name": "Prochlorococcus MED4", "experiment_ids": _EIDS},
+        ),
+        (
+            f"ontology_max_level_{_ont_key}",
+            build_ontology_max_level,
+            {"ontology": _ont_key},
         ),
     ])
 

@@ -61,7 +61,7 @@ code (EnrichmentResult accessors, custom term2gene, compareCluster export).
 ### Envelope
 
 ```expected-keys
-organism_name, ontology, level, total_matching, returned, truncated, offset, n_significant, by_experiment, by_direction, by_omics_type, cluster_summary, top_clusters_by_min_padj, top_pathways_by_padj, not_found, not_matched, no_expression, term_validation, clusters_skipped, enrichment_params, filters_applied, trust_axes, background_filtered, interpro_type, results
+organism_name, ontology, level, total_matching, returned, truncated, offset, n_significant, by_experiment, by_direction, by_omics_type, cluster_summary, top_clusters_by_min_padj, top_pathways_by_padj, not_found, not_matched, no_expression, not_found_experiments, term_validation, clusters_skipped, enrichment_params, filters_applied, trust_axes, background_filtered, interpro_type, results
 ```
 
 - **organism_name** (string): Single organism
@@ -81,6 +81,7 @@ organism_name, ontology, level, total_matching, returned, truncated, offset, n_s
 - **not_found** (list[string]): Requested experiment_ids absent from KG
 - **not_matched** (list[string]): Experiment IDs found but wrong organism
 - **no_expression** (list[string]): Experiments matching organism but with no DE rows
+- **not_found_experiments** (list[string]): experiment_ids absent from the KG (partial-batch bucket; raises instead when every requested experiment_id lands here).
 - **term_validation** (PathwayEnrichmentTermValidation): Namespaced passthrough of term_id validation from genes_by_ontology
 - **clusters_skipped** (list[PathwayEnrichmentClusterSkipped]): Clusters that produced no rows, with reason
 - **enrichment_params** (object | None): ORA parameters used for this call. See docs://analysis/enrichment.
@@ -1084,6 +1085,8 @@ pathway_enrichment(..., ontology='interpro', interpro_type='HOMOLOGOUS_SUPERFAMI
 - MEROPS `call_class=['peptidase']` excludes `nonpeptidase_homolog` rows (catalytically-dead homologs) from both the tested gene set and the pathway definitions — run it whenever the enrichment question is about peptidase activity, not sequence homology to a peptidase family.
 
 - When a KEGG pathway is significantly enriched, drill into its chemistry via `list_metabolites(pathway_ids=[<term_id>])`. This answers 'what compounds does the enriched pathway involve?' — a different anchor than the gene-KO membership the enrichment is built on. The same KEGG pathway map (e.g. `kegg.pathway:ko00910` Nitrogen metabolism) reaches the same map from compound-membership vs gene-KO-membership; a gene whose KO is in pathway X may not catalyse any reaction whose metabolites are in pathway X (and vice versa). See docs://analysis/metabolites.
+
+- Unknown `experiment_ids` and an out-of-range `level` raise `ValueError` instead of returning a vacuous empty envelope. A partial batch (some ids unknown) keeps running — the unknown ones land in `not_found_experiments`; the call only raises when EVERY requested `experiment_id` is unknown. Flat ontologies (e.g. `cog_category`) only accept `level=0`; the raise message says so.
 
 ## Package import equivalent
 

@@ -458,9 +458,9 @@ def pathway_enrichment_scenarios():
     # Highest-risk empty-DE probe: MIT0801's experiment is METABOLOMICS-only,
     # so the DE foreground is empty — the enrichment must yield a well-formed
     # empty envelope, not crash on empty category/term rollups. unknown +
-    # genome-only experiment also bottom out at total_matching=0 (the tool
-    # leaves not_found empty for unknown experiments — empty layer, no batch
-    # diagnostic asserted).
+    # genome-only experiment both raise ValueError/ToolError (Task 4,
+    # llm-review 2b.1): every requested experiment_id is unknown, so the
+    # batch can't produce a well-formed envelope at all.
     return [
         Scenario(
             "expression_layer_empty_organism",
@@ -471,12 +471,14 @@ def pathway_enrichment_scenarios():
             "unknown_experiment",
             dict(organism=fx.CONTROL_ORGANISM,
                  experiment_ids=[fx.UNKNOWN_EXPERIMENT_ID],
-                 ontology="kegg", level=1)),
+                 ontology="kegg", level=1),
+            expects_error=ToolError),
         Scenario(
             "genome_only_organism",
             dict(organism=fx.GENOME_ONLY_ORGANISM,
                  experiment_ids=[fx.UNKNOWN_EXPERIMENT_ID],
-                 ontology="kegg", level=1)),
+                 ontology="kegg", level=1),
+            expects_error=ToolError),
         Scenario(
             "offset_past_end",
             dict(organism=fx.CONTROL_ORGANISM,
@@ -511,17 +513,18 @@ def pathway_enrichment_scenarios():
 
 
 def cluster_enrichment_scenarios():
-    # Requires analysis_id + organism + ontology + (level | term_ids). Flat
-    # not_found / not_matched on analysis IDs. unknown analysis lands in
-    # not_matched (KG resolves the ID-vs-organism pairing); a real MED4
-    # analysis under the wrong organism (genome-only) also lands in
-    # not_matched (wrong organism) — both yield empty, well-formed envelopes.
+    # Requires analysis_id + organism + ontology + (level | term_ids). An
+    # analysis_id absent from the KG entirely now raises ValueError/ToolError
+    # (Task 4, llm-review 2b.1). A real MED4 analysis passed under the wrong
+    # organism (genome-only) is a DIFFERENT case — it exists, just not for
+    # this organism — and still lands in not_matched, yielding an empty,
+    # well-formed envelope (no raise).
     return [
         Scenario(
             "unknown_analysis",
             dict(analysis_id=fx.UNKNOWN_CLUSTER_ID,
                  organism=fx.CONTROL_ORGANISM, ontology="kegg", level=1),
-            input_ids=[fx.UNKNOWN_CLUSTER_ID]),
+            expects_error=ToolError),
         Scenario(
             "analysis_wrong_organism",
             dict(analysis_id=_MED4_ANALYSIS,

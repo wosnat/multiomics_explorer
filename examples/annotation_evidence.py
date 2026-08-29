@@ -31,10 +31,22 @@ from typing import Callable
 from multiomics_explorer import (
     gene_ontology_terms,
     genes_by_ontology,
+    list_experiments,
     list_filter_values,
     list_organisms,
     pathway_enrichment,
 )
+
+
+def med4_experiment_id() -> str:
+    """A real MED4 experiment_id, discovered live (not hardcoded — avoids
+    drift across KG rebuilds). These scenarios only need a valid experiment
+    to run pathway_enrichment against; the value tested is the trust-filter
+    behavior, not this experiment's biology."""
+    found = list_experiments(organism="MED4", limit=1)
+    if not found["results"]:
+        raise SystemExit("no MED4 experiments found in the KG")
+    return found["results"][0]["experiment_id"]
 
 
 def scenario_merops_call_class() -> None:
@@ -128,10 +140,12 @@ def scenario_interpro_enrichment() -> None:
     print("Question class: 'InterPro enrichment requires picking a type first'")
     print()
 
+    exp_id = med4_experiment_id()
+
     try:
         pathway_enrichment(
             organism="MED4",
-            experiment_ids=["EXP042"],
+            experiment_ids=[exp_id],
             ontology="interpro",
             level=0,
         )
@@ -142,7 +156,7 @@ def scenario_interpro_enrichment() -> None:
 
     result = pathway_enrichment(
         organism="MED4",
-        experiment_ids=["EXP042"],
+        experiment_ids=[exp_id],
         ontology="interpro",
         interpro_type="HOMOLOGOUS_SUPERFAMILY",
         level=0,
@@ -186,7 +200,7 @@ def scenario_trust_filtered_tcdb() -> None:
 
     enrichment = pathway_enrichment(
         organism="MED4",
-        experiment_ids=["EXP042"],
+        experiment_ids=[med4_experiment_id()],
         ontology="tcdb",
         level=2,
         evidence=["homology"],

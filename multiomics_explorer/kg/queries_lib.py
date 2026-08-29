@@ -7146,6 +7146,20 @@ def build_ontology_landscape(
     return cypher, params
 
 
+def build_ontology_max_level(ontology: str) -> tuple[str, dict]:
+    """Loosest-bound max hierarchy level for one ontology label.
+
+    Used to validate a caller-supplied `level` before running enrichment.
+    Flat ontologies (no hierarchy_rels) return `max_level=null` when no term
+    carries a `level` property — callers treat that as 0. BRITE levels are
+    per `tree`; `max(t.level)` over the whole label is a looser bound (fine
+    for range-checking, not for per-tree precision).
+    """
+    label = ONTOLOGY_CONFIG[ontology]["label"]
+    cypher = f"MATCH (t:`{label}`) RETURN max(t.level) AS max_level"
+    return cypher, {}
+
+
 def build_ontology_expcov(
     *,
     ontology: str,

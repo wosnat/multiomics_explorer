@@ -241,6 +241,8 @@ cluster_enrichment(..., background='table_scope')  # not valid
 cluster_enrichment(..., background='cluster_union')  # or 'organism', or a locus_tag list
 ```
 
+- An unknown `analysis_id` and an out-of-range `level` raise `ValueError` instead of returning a vacuous empty envelope. Flat ontologies (e.g. `cog_category`) only accept `level=0`; the raise message says so.
+
 ## Package import equivalent
 
 ```python

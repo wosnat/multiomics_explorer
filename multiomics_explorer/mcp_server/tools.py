@@ -280,6 +280,11 @@ class PathwayEnrichmentResponse(BaseModel):
     no_expression: list[str] = Field(
         default_factory=list, description="Experiments matching organism but with no DE rows"
     )
+    not_found_experiments: list[str] = Field(
+        default_factory=list,
+        description="experiment_ids absent from the KG (partial-batch bucket; "
+                    "raises instead when every requested experiment_id lands here).",
+    )
     term_validation: PathwayEnrichmentTermValidation = Field(
         description="Namespaced passthrough of term_id validation from genes_by_ontology"
     )
@@ -6983,6 +6988,10 @@ def register_tools(mcp: FastMCP):
             warnings.append(f"{len(envelope['not_matched'])} not_matched (wrong organism)")
         if envelope.get("no_expression"):
             warnings.append(f"{len(envelope['no_expression'])} no_expression (no DE rows)")
+        if envelope.get("not_found_experiments"):
+            warnings.append(
+                f"{len(envelope['not_found_experiments'])} not_found_experiments"
+            )
         tv = envelope.get("term_validation", {})
         for key in ("not_found", "wrong_ontology", "wrong_level"):
             if tv.get(key):
