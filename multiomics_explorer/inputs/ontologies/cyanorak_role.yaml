@@ -8,7 +8,8 @@ what_it_is: |
   (Prochlorococcus and Synechococcus). Roles are named for the biology these
   genomes actually contain (photosynthesis, phycobilisome, nutrient
   acquisition, DNA metabolism, ...) with a three-level tree
-  (`cyanorak.role:D` Cellular processes → `cyanorak.role:D.1` ...).
+  (`cyanorak.role:D` Cellular processes → `cyanorak.role:D.2` Cell
+  division → ...).
 
 method: |
   Every edge is `evidence='curated'` from `sources=['cyanorak']`: a Cyanorak
@@ -18,15 +19,19 @@ method: |
   Cyanorak roles at all. No `evidence_score` (single source, single rung).
 
 id_form: |
-  `cyanorak.role:D` (level 0, a letter), `cyanorak.role:D.1` (level 1),
-  `cyanorak.role:D.1.2` (level 2). Node `code` holds the bare dotted code;
-  `name` is the full breadcrumb (`Cellular processes > Cell division`).
+  `cyanorak.role:D` (level 0, a letter), `cyanorak.role:D.2` (level 1),
+  `cyanorak.role:D.2.1`-style codes (level 2). One root is not a letter:
+  `cyanorak.role:0` Non-coding gene (RNA), with four children. Node `code`
+  holds the bare dotted code; `name` is the full breadcrumb
+  (`Cellular processes > Cell division`).
 
 hierarchy: |
   Strict three-level tree via `Cyanorak_role_is_a_cyanorak_role`, `level`
-  0-2. `gene_count` / `organism_count` are subtree-inclusive;
-  `direct_gene_count` is node-local (level-0 letters have genes attached
-  directly as well as through children). Level exact — no DAG ambiguity.
+  0-2: 19 roots (18 letters plus `cyanorak.role:0`), 124 level-1 roles,
+  30 level-2 roles. `gene_count` / `organism_count` are
+  subtree-inclusive; `direct_gene_count` is node-local (most roots have
+  genes attached directly as well as through children). Level exact — no
+  DAG ambiguity.
 
 interpretation: |
   The go-to axis for Prochlorococcus/Synechococcus enrichment: curated,
@@ -37,9 +42,11 @@ interpretation: |
   Alteromonas means "not covered", never "absent".
 
 informativeness_rule: |
-  `cyanorak.role:R` Other, `R.2` Conserved hypothetical proteins and a few
-  sibling "unknown" roles are flagged uninformative and dropped by
-  `informative_only=True`; they are the largest roles in every genome.
+  Five roles are flagged uninformative and dropped by
+  `informative_only=True`: the root `cyanorak.role:R` Other and its
+  children `R.1` Conserved hypothetical domains, `R.2` Conserved
+  hypothetical proteins, `R.4` Hypothetical proteins and `R.5` Other >
+  Other. They are the largest roles in every genome.
 
 pitfalls: |
   - Coverage is organism-bounded: `organism_count` tops out at the number of
@@ -53,10 +60,10 @@ pitfalls: |
     browse with `level=1`.
 
 typical_questions:
-  - "Which Cyanorak roles are enriched among MED4 genes up under iron limitation?"
-  - "How many genes per level-1 role does MIT9313 carry vs MED4?"
-  - "Which MED4 genes are curated as phycobilisome or photosystem components?"
-  - "Which organisms in the KG have Cyanorak coverage at all?"
+  - "Which Cyanorak roles are enriched among MED4 genes up under iron limitation? — `pathway_enrichment(organism='MED4', experiment_ids=[...], ontology='cyanorak_role', level=1, direction='up')`"
+  - "How many genes per level-1 role does MIT9313 carry vs MED4? — `genes_by_ontology(ontology='cyanorak_role', organism='MIT9313', level=1, summary=True)`"
+  - "Which MED4 genes are curated under Photosynthesis and respiration? — `genes_by_ontology(ontology='cyanorak_role', organism='MED4', term_ids=['cyanorak.role:J'])`"
+  - "Which organisms in the KG have Cyanorak coverage at all? — `ontology_term_details(term_ids=['cyanorak.role:J'], verbose=True)` and read `genes_by_organism[]`"
 
 see_also:
   - docs://ontologies/tigr_role

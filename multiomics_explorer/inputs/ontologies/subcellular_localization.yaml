@@ -51,7 +51,7 @@ pitfalls: |
     `localization_score` is verbose-only and never filterable.
 
 typical_questions:
-  - "Which MED4 genes up in coculture are predicted outer-membrane or extracellular?"
+  - "Which MED4 genes are predicted outer-membrane or extracellular? — `genes_by_ontology(ontology='subcellular_localization', organism='MED4', term_ids=['psortb_OuterMembrane','psortb_Extracellular'])`, then intersect with `differential_expression_by_gene`"
   - "How many predicted periplasmic proteins does each organism carry?"
   - "Is this gene's PSORTb call consistent with its SignalP signal peptide and its GO cellular-component annotation?"
 

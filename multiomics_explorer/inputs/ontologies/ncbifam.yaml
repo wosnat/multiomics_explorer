@@ -17,13 +17,20 @@ method: |
   (`sources=['interproscan']`, `evidence='signature'` — the HMM's trusted
   cutoff was met). Verbose native detail carries `evalue`, `bit_score` and
   the matched region (`start`, `end`); higher bit score is better, and it
-  is NCBIfam-internal. No `evidence_score`. Families bridge *out* to the
-  InterPro entry that integrates them (`Ncbifam_family_in_interpro_entry`,
-  membership).
+  is NCBIfam-internal. No `evidence_score`. Families bridge *out* in two
+  directions: to the InterPro entry that integrates them
+  (`Ncbifam_family_in_interpro_entry`, membership — present on about half
+  of the families), and to archived TIGR roles
+  (`Ncbifam_family_has_tigr_role`, router — about a third of the
+  families). The role bridge is a lookup aid; only `equivalog` families
+  also produce a gene-level `Gene_has_tigr_role` edge (see
+  `docs://ontologies/tigr_role`).
 
 id_form: |
-  Two accession styles on one prefix: `ncbifam:NF000812` (NCBIfam-native)
-  and `ncbifam:TIGR00254` (legacy TIGRFAMs accessions kept by NCBIfam).
+  Two accession styles on one prefix: `ncbifam:NF006762` (NCBIfam-native,
+  here hemB porphobilinogen synthase) and `ncbifam:TIGR00254` (legacy
+  TIGRFAMs accessions kept by NCBIfam, here a diguanylate-cyclase domain
+  family).
   Node `ncbifam_id` holds the bare accession; `family_type` and
   `gene_symbol` are term-level (verbose on `search_ontology`, compact on
   `ontology_term_details`).
@@ -46,26 +53,34 @@ interpretation: |
   ntcA in this genome".
 
 informativeness_rule: |
-  Broad `domain`, `superfamily` and `signature` families are flagged
-  uninformative and dropped by `informative_only=True`; `equivalog` families
-  are essentially never flagged. There is no `family_type` filter on the
-  tools — browse with `verbose=True` and filter client-side, or read
-  `family_type` on `ontology_term_details`.
+  About 200 families are flagged uninformative and dropped by
+  `informative_only=True`: mostly `hypoth_equivalog` (114 — conserved
+  hypotheticals) and `hypoth_equivalog_domain` (12), plus generically
+  named `equivalog` (51) and `subfamily` (14) families. `superfamily` and
+  `signature` families are not flagged; the flag is name-based, not
+  type-based. There is no `family_type` filter on the tools — list the
+  types with `list_filter_values(filter_type='ncbifam_family_type')`, read
+  the `by_family_type` envelope on `search_ontology`, browse with
+  `verbose=True` and filter client-side, or read `family_type` on
+  `ontology_term_details`.
 
 pitfalls: |
   - The `TIGR` accessions are NCBIfam families, not TIGR *roles*
-    (`tigr_role` is a different, curated-role ontology).
+    (`tigr_role` is a different ontology, reached from a family through
+    the `Ncbifam_family_has_tigr_role` router link).
   - A `subfamily`/`superfamily` hit does not license the family name as the
     gene's function; only `equivalog`-type families do.
   - `bit_score` / `evalue` are verbose-only and never filterable.
   - Flat: `level=1` returns nothing; hierarchy questions go through the
-    InterPro bridge.
+    InterPro bridge, which only about half of the families carry.
+  - `retired` families (`family_type='retired'`) still hold gene edges;
+    do not quote them as current names.
 
 typical_questions:
-  - "Which equivalog-type NCBIfam families does MIT1002 carry that MED4 lacks?"
-  - "Which gene is `ntcA` in each Prochlorococcus genome, by NCBIfam gene symbol?"
-  - "Which InterPro entry integrates `ncbifam:NF000812`, and what other Pfam/NCBIfam signatures sit under it?"
-  - "Among genes up under nitrogen limitation, which named NCBIfam families recur?"
+  - "Which equivalog-type NCBIfam families does MIT1002 carry that MED4 lacks? — `genes_by_ontology(ontology='ncbifam', organism='MIT1002', summary=True)` vs `organism='MED4'`, then keep `family_type='equivalog'` via `ontology_term_details`"
+  - "Which gene is `ntcA` in a Prochlorococcus genome, by NCBIfam gene symbol? — `search_ontology(ontology=['ncbifam'], search_text='ntcA', verbose=True)` then `genes_by_ontology(ontology='ncbifam', organism='MED4', term_ids=['ncbifam:TIGR03697'])`"
+  - "Which InterPro entry integrates `ncbifam:NF006762`, and which TIGR roles does `ncbifam:TIGR00254` route to? — `ontology_term_details(term_ids=['ncbifam:NF006762','ncbifam:TIGR00254'])` and read `links_out[]` (`membership` → `interpro:IPR001731`; `router` → `tigr.role:710`, `tigr.role:264`)"
+  - "Among genes up under nitrogen limitation, which named NCBIfam families recur? — `pathway_enrichment(..., ontology='ncbifam', direction='up')`"
 
 see_also:
   - docs://ontologies/interpro

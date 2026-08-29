@@ -24,9 +24,12 @@ id_form: |
   `list_filter_values(filter_type='brite_tree')`.
 
 hierarchy: |
-  Four levels within each tree, `level` 0-3 with `level_kind` `brite_class`
-  → `brite_subclass` → `brite_family` → `brite_subfamily`
-  (`Brite_category_is_a_brite_category`). Trees are independent — the
+  Up to four levels within a tree, `level` 0-3 with `level_kind`
+  `brite_class` → `brite_subclass` → `brite_family` → `brite_subfamily`
+  (`Brite_category_is_a_brite_category`); most trees stop at level 1 or
+  2 — only `enzymes` and `dna_replication` reach level 3, and
+  `peptidases`, `secretion` and `two_component` end at level 1. Trees
+  are independent — the
   transporters tree and the enzymes tree share no nodes. `gene_count` /
   `organism_count` are subtree-inclusive; there is no `direct_gene_count`
   (genes never attach to a category directly). The `enzymes` tree is by far
@@ -62,7 +65,8 @@ pitfalls: |
 typical_questions:
   - "Which transporter families (BRITE `transporters` tree) are enriched among genes up under nitrogen limitation?"
   - "How many two-component system genes does MIT1002 carry, by BRITE subclass?"
-  - "Which BRITE categories does `kegg:K02575` belong to?"
+  - "Which BRITE categories does `kegg.orthology:K02575` belong to? — `ontology_term_details(term_ids=['kegg.orthology:K02575'])` and read `links_out[]`"
+  - "Which two-component-system genes does MIT1002 carry? — `genes_by_ontology(ontology='brite', organism='MIT1002', tree='two_component', level=1)`"
   - "What are the level-2 families under the `secretion` tree, with gene counts for MED4?"
 
 see_also:

@@ -49,7 +49,7 @@ pitfalls: |
   - Cleavage fields are sparse (absent where SignalP reports no site).
 
 typical_questions:
-  - "Which MIT1002 genes up in coculture carry a Tat signal peptide?"
+  - "Which MIT1002 genes carry a Tat signal peptide? — `genes_by_ontology(ontology='signal_peptide_type', organism='MIT1002', term_ids=['signalp_TAT'])`, then intersect with `differential_expression_by_gene`"
   - "How many predicted lipoproteins does each organism have, and are they enriched in the vesicle proteome?"
   - "Which secreted-protein candidates (SP + PSORTb extracellular) respond to nitrogen limitation?"
 

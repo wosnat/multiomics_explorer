@@ -48,7 +48,7 @@ pitfalls: |
     `gene_count`s overlap.
 
 typical_questions:
-  - "What is the COG category composition of MED4 vs MIT9313?"
+  - "What is the COG category composition of MED4 vs MIT9313? — `genes_by_ontology(ontology='cog_category', organism='MED4', level=0, summary=True)`"
   - "Which COG categories are over-represented in the darkness-responsive cluster?"
   - "How many genes in this organism have no functional category beyond `S`?"
 

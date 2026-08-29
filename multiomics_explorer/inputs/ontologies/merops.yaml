@@ -4,8 +4,9 @@
 what_it_is: |
   MEROPS — the peptidase (protease) and peptidase-inhibitor database.
   Families are grouped by catalytic mechanism (`catalytic_type`: serine,
-  cysteine, metallo, aspartic, threonine, glutamic, asparagine lyase,
-  mixed, unknown) into clans that share a fold (`merops.clan:SC`,
+  cysteine, metallo, aspartic, threonine, asparagine lyase, mixed,
+  unknown; `glutamic` is in the vocabulary but on no node here) into clans
+  that share a fold (`merops.clan:SC`,
   `merops.clan:MA`), with families (`merops.family:S33` prolyl
   aminopeptidase, `merops.family:S14` Clp protease) and some subfamilies
   below. `family_class` separates peptidase families from inhibitor
@@ -67,17 +68,18 @@ pitfalls: |
     family and `nonpeptidase_homolog` in another (`gene_overview` exposes
     the set as `merops_classes`).
   - `inhibitor` families are not proteases; `family_class='inhibitor'`
-    on the term is the term-side twin.
+    on the term is the term-side twin, and `catalytic_type` is null on
+    most of them (the letter `I` encodes no mechanism).
   - `evidence_score` is MEROPS-internal; `merops_evidence_score_max` on
     `gene_overview` is sparse (null = no MEROPS call — rank, don't filter).
   - Cleavage-specificity fields describe the family's known substrates in
     MEROPS, not this organism's biology.
 
 typical_questions:
-  - "How many active peptidases, by clan, does MIT1002 carry vs MED4?"
-  - "Which MEROPS families are enriched among genes up in stationary phase, counting peptidase calls only?"
-  - "Is `PMM0001`'s S14 hit an active Clp protease or a non-peptidase homolog?"
-  - "Which Pfam domains define `merops.family:S33`, and what are its cleavage-site preferences?"
+  - "How many active peptidases, by clan, does MIT1002 carry vs MED4? — `genes_by_ontology(ontology='merops', organism='MIT1002', level=0, call_class=['peptidase'], summary=True)`"
+  - "Which MEROPS families are enriched among genes up in stationary phase, counting peptidase calls only? — `pathway_enrichment(..., ontology='merops', level=1, direction='up', call_class=['peptidase'])`"
+  - "Is the `merops.family:S14` hit on `PMM0742` (clpP1) an active Clp protease or a non-peptidase homolog? — `gene_ontology_terms(locus_tags=['PMM0742'], organism='MED4', ontology=['merops'])` and read `call_class` (`peptidase`)"
+  - "Which Pfam domains define `merops.family:S33`, and what are its cleavage-site preferences? — `ontology_term_details(term_ids=['merops.family:S33'], verbose=True)`"
 
 see_also:
   - docs://analysis/annotation_evidence
