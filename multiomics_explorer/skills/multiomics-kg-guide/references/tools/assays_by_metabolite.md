@@ -60,11 +60,11 @@ total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_dete
 - **by_assay** (list[AbmByAssay]): Counts per assay_id.
 - **by_detection_status** (list[AbmByDetectionStatus]): Numeric-row subset rollup; empty when `evidence_kind='flags'`.
 - **by_flag_value** (list[AbmByFlagValue]): Boolean-row subset rollup; empty when `evidence_kind='quantifies'`.
-- **metabolites_with_evidence** (list[string]): Input `metabolite_ids` with at least one row in the filtered slice (parallel to `gene_derived_metrics`'s `genes_with_metrics`).
+- **metabolites_with_evidence** (list[string]): Input `metabolite_ids` with at least one row in the filtered slice (parallel to `gene_derived_metrics`'s `genes_with_metrics`). Computed from the full filtered match set, not from the (paginated, possibly empty) `results` page — populated the same way whether or not `summary=True`.
 - **metabolites_without_evidence** (list[string]): Input `metabolite_ids` with no row in the filtered slice (includes both `not_found` and `not_matched` IDs).
 - **metabolites_matched** (int): Distinct-metabolite count — use this for unique tallies (NOT `total_matching`, which is row-count).
 - **not_found** (list[string]): Flat `list[str]` — single-batch reverse-lookup. Input metabolite IDs absent from the KG.
-- **not_matched** (list[string]): Flat `list[str]` — IDs in KG with no edge after filters (unmeasured for this scope). Distinct from `not_found`.
+- **not_matched** (list[string]): Flat `list[str]` — IDs in KG with no edge after filters (unmeasured for this scope). Distinct from `not_found`. Computed from the full filtered match set (see `metabolites_with_evidence`) — correct even with `summary=True` or a batch larger than `limit`.
 - **resolved_aliases** (object): Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).
 - **warnings** (list[string]): Diagnostic strings, e.g. a bare metabolite ID that resolved to more than one metabolite (expanded to all — pass the canonical id to narrow).
 - **returned** (int): Length of `results`.
@@ -89,9 +89,9 @@ total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_dete
 | publication_doi | string \| None (optional) | Parent publication DOI. |
 | value | float \| None (optional) | Raw concentration / intensity. Numeric arm only. |
 | value_sd | float \| None (optional) | Standard deviation across replicates. Numeric arm only. |
-| metric_bucket | string \| None (optional) | Bucket label. Numeric, rankable subset only. |
-| metric_percentile | float \| None (optional) | Percentile (0-100). Numeric, rankable subset only. |
-| rank_by_metric | int \| None (optional) | Rank by value (1=highest). Numeric, rankable subset only. |
+| metric_bucket | string \| None (optional) | Bucket label. Numeric, rankable subset only; null on tested-absent (`detection_status='not_detected'`) rows even then — a stored bucket from raw-zero coincidence is not a ranking signal. |
+| metric_percentile | float \| None (optional) | Percentile (0-100). Numeric, rankable subset only; null on tested-absent rows (see `metric_bucket`). |
+| rank_by_metric | int \| None (optional) | Rank by value (1=highest). Numeric, rankable subset only; null on tested-absent rows (see `metric_bucket`). |
 | detection_status | string \| None (optional) | 'detected'/'sporadic'/'not_detected'. Numeric arm only. |
 | timepoint | string \| None (optional) | Timepoint label. Numeric arm only. |
 | timepoint_hours | float \| None (optional) | Timepoint in hours. Numeric arm only. |
@@ -134,8 +134,8 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
       "publication_doi": "10.1128/msystems.01261-22",
       "value": 0.0,
       "value_sd": 0.0,
-      "metric_bucket": "mid",
-      "metric_percentile": 68.13186813186813,
+      "metric_bucket": null,
+      "metric_percentile": null,
       "rank_by_metric": null,
       "detection_status": "not_detected",
       "timepoint": null,
@@ -163,8 +163,8 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
       "publication_doi": "10.1128/msystems.01261-22",
       "value": 0.0,
       "value_sd": 0.0,
-      "metric_bucket": "mid",
-      "metric_percentile": 67.03296703296704,
+      "metric_bucket": null,
+      "metric_percentile": null,
       "rank_by_metric": null,
       "detection_status": "not_detected",
       "timepoint": null,
@@ -192,8 +192,8 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
       "publication_doi": "10.1128/msystems.01261-22",
       "value": 0.0,
       "value_sd": 0.0,
-      "metric_bucket": "mid",
-      "metric_percentile": 71.27272727272727,
+      "metric_bucket": null,
+      "metric_percentile": null,
       "rank_by_metric": null,
       "detection_status": "not_detected",
       "timepoint": null,
@@ -387,6 +387,19 @@ Conflate not_found with not_matched.
 (Metabolite exists but is unmeasured for this scope). Both are
 *unmeasured*, but only `not_matched` IDs are present in the chemistry
 layer. See `docs://guide/conventions`.
+
+```
+
+```mistake
+assays_by_metabolite(metabolite_ids=[...], summary=True)  # then read not_matched / metabolites_without_evidence off the (empty) results page
+```
+
+```correction
+`not_matched` / `metabolites_with_evidence` / `metabolites_without_evidence`
+are computed from the full filtered match set, not from `results` —
+correct whether or not `summary=True` and regardless of `limit`. A
+matched metabolite is never reported as `not_matched` just because its
+row didn't make the current page.
 
 ```
 

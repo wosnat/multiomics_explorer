@@ -276,6 +276,8 @@ In metabolomics, **two row states must not be conflated**:
 
 Tested-absent rows answer the biological question "is X actually absent under condition Y." Discarding them silently misreads the question. Unmeasured rows carry zero information either way and must not be conflated with absence.
 
+On the numeric arm (`metabolites_by_quantifies_assay` and the quantifies rows of `assays_by_metabolite`), a tested-absent row's `metric_bucket` / `metric_percentile` / `rank_by_metric` are always null — a raw-zero value can otherwise tie into a high bucket purely because most of the assay's edges are zero — and the rank-gated filters (`metric_bucket`, `metric_percentile_min`/`max`, `rank_by_metric_max`) never select `not_detected` rows for the same reason.
+
 ### Cross-tool implications
 
 | Surface | Behavior |

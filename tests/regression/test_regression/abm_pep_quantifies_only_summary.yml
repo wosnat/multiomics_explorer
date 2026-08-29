@@ -25,5 +25,7 @@ rows:
   - '{''count'': 2, ''item'': ''Prochlorococcus MIT9303''}'
   - '{''count'': 6, ''item'': ''Prochlorococcus MIT9301''}'
   - '{''count'': 8, ''item'': ''Prochlorococcus MIT9313''}'
+  matched_metabolite_ids:
+  - kegg.compound:C00074
   metabolites_matched: 1
   total_matching: 18

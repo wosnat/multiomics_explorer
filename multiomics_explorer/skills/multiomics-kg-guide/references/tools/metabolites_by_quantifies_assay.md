@@ -41,10 +41,10 @@ the metabolomics decision tree.
 | value_max | float \| None | None | Upper bound on `value`. Always applicable. |
 | detection_status | list[string] \| None | None | Detection-status filter — primary qualitative headline. Values: 'detected', 'sporadic', 'not_detected'. Excluding 'not_detected' strips tested-absent rows; surface as caller choice, never default. See `docs://guide/conventions`. |
 | timepoint | list[string] \| None | None | Timepoint label(s) — exact match. E.g. ['4 days'], ['6 days']. Non-temporal experiments expose no timepoint here (rows surface with `timepoint=null`). |
-| metric_bucket | list[string] \| None | None | Bucket label(s) — subset of {'top_decile','top_quartile','mid','low'}. **Rankable-gated** — raises if every selected assay has `rankable=false`. Soft-excludes non-rankable assays from mixed input (surfaced in envelope `excluded_assays`). |
-| metric_percentile_min | float \| None | None | Lower bound on `metric_percentile` (0-100). **Rankable-gated.** |
-| metric_percentile_max | float \| None | None | Upper bound on `metric_percentile`. **Rankable-gated.** |
-| rank_by_metric_max | int \| None | None | Cap on `rank_by_metric` (1 = highest). Top-N drill-down. **Rankable-gated.** |
+| metric_bucket | list[string] \| None | None | Bucket label(s) — subset of {'top_decile','top_quartile','mid','low'}. **Rankable-gated** — raises if every selected assay has `rankable=false`. Soft-excludes non-rankable assays from mixed input (surfaced in envelope `excluded_assays`). Tested-absent rows (`detection_status='not_detected'`) never match — their `metric_bucket` is nulled for display regardless of the stored value. |
+| metric_percentile_min | float \| None | None | Lower bound on `metric_percentile` (0-100). **Rankable-gated.** Tested-absent rows (`detection_status='not_detected'`) never match — their `metric_percentile` is nulled for display. |
+| metric_percentile_max | float \| None | None | Upper bound on `metric_percentile`. **Rankable-gated.** Tested-absent rows (`detection_status='not_detected'`) never match — their `metric_percentile` is nulled for display. |
+| rank_by_metric_max | int \| None | None | Cap on `rank_by_metric` (1 = highest). Top-N drill-down. **Rankable-gated.** Tested-absent rows (`detection_status='not_detected'`) never match — their `rank_by_metric` is nulled for display. |
 | summary | bool | False | Return summary fields only (results=[]). |
 | verbose | bool | False | Include heavy-text fields per row: assay_name, field_description, experimental_context, light_condition, replicate_values. |
 | limit | int | 5 | Max rows. Paginate with `offset`. |
@@ -87,9 +87,9 @@ total_matching, by_detection_status, by_metric_bucket, by_assay, by_compartment,
 | n_replicates | int \| None (optional) | Number of replicates. |
 | n_non_zero | int \| None (optional) | Number of replicates with non-zero signal. `n_non_zero=0` is tested-absent. |
 | metric_type | string | Parent assay's metric tag (e.g. 'cellular_concentration'). |
-| metric_bucket | string \| None (optional) | Bucket label ('top_decile' / 'top_quartile' / 'mid' / 'low'). Populated only on rankable assays. |
-| metric_percentile | float \| None (optional) | Percentile (0-100). Populated only on rankable assays. |
-| rank_by_metric | int \| None (optional) | Rank by value (1 = highest). Populated only on rankable assays. |
+| metric_bucket | string \| None (optional) | Bucket label ('top_decile' / 'top_quartile' / 'mid' / 'low'). Populated only on rankable assays, and null on tested-absent (`detection_status='not_detected'`) rows even then — a stored bucket from raw-zero coincidence is not a ranking signal. |
+| metric_percentile | float \| None (optional) | Percentile (0-100). Populated only on rankable assays; null on tested-absent rows (see `metric_bucket`). |
+| rank_by_metric | int \| None (optional) | Rank by value (1 = highest). Populated only on rankable assays; null on tested-absent rows (see `metric_bucket`). |
 | detection_status | string \| None (optional) | One of 'detected', 'sporadic', 'not_detected'. 'not_detected' = tested-absent (real biology, kept by default). Numeric edge only. |
 | timepoint | string \| None (optional) | Timepoint label ('4 days', '6 days'). Null on non-temporal experiments (sentinel timepoints stripped). |
 | timepoint_hours | float \| None (optional) | Timepoint in hours. Null on non-temporal experiments. |
@@ -348,6 +348,22 @@ Rankable-gated columns are null on rows whose parent assay has
 `rankable=false`. Boolean assays surface in `metabolites_by_flags_assay`
 instead. Per-row null on these columns means "not applicable" not
 "missing data".
+
+```
+
+```mistake
+A row with detection_status='not_detected' but a non-null metric_bucket means the KG ranked it.
+```
+
+```correction
+Tested-absent rows are nulled on `metric_bucket` / `metric_percentile` /
+`rank_by_metric` for display, even on a rankable assay — a raw-zero
+value can otherwise tie into a high bucket/percentile purely because
+most edges on the assay are zero (e.g. `value=0` landing in
+'top_quartile' simply because so much of the assay's mass sits at
+zero). `metric_bucket` / `metric_percentile_min|max` /
+`rank_by_metric_max` filters never select `not_detected` rows for the
+same reason — filter and display agree.
 
 ```
 

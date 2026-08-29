@@ -10114,6 +10114,17 @@ def _metabolites_by_quantifies_assay_where(
     if rank_by_metric_max is not None:
         conditions.append("r.rank_by_metric <= $rank_by_metric_max")
         params["rank_by_metric_max"] = rank_by_metric_max
+    # Rank filters and display agree: a tested-absent row's rank fields are
+    # nulled at the api layer regardless of what the KG stored (many raw
+    # zeros tie into a high percentile/bucket), so a rank-gated filter must
+    # never select a not_detected row in the first place.
+    if any([
+        metric_bucket,
+        metric_percentile_min is not None,
+        metric_percentile_max is not None,
+        rank_by_metric_max is not None,
+    ]):
+        conditions.append("r.detection_status <> 'not_detected'")
 
     return conditions, params
 
@@ -10659,7 +10670,12 @@ def build_assays_by_metabolite_summary(
 
     RETURN keys: total_matching, by_evidence_kind, by_organism,
     by_compartment, by_assay, by_detection_status (numeric subset),
-    by_flag_value (boolean subset), metabolites_matched.
+    by_flag_value (boolean subset), metabolites_matched,
+    matched_metabolite_ids (distinct metabolite IDs with at least one
+    edge in the unpaged filtered slice — the authoritative source for
+    api/'s not_matched / metabolites_with_evidence partition; `results`
+    is paginated and empty in summary mode, so it must never be used
+    for that partition).
 
     Per parent §13.7, the cross-arm collected fields use
     `[d IN collect(det) WHERE d IS NOT NULL]` /
@@ -10747,7 +10763,8 @@ def build_assays_by_metabolite_summary(
         "       apoc.coll.frequencies(assay_ids_collected) AS by_assay,\n"
         "       apoc.coll.frequencies(dets) AS by_detection_status,\n"
         "       apoc.coll.frequencies(flags) AS by_flag_value,\n"
-        "       size(apoc.coll.toSet(m_ids)) AS metabolites_matched"
+        "       size(apoc.coll.toSet(m_ids)) AS metabolites_matched,\n"
+        "       apoc.coll.toSet(m_ids) AS matched_metabolite_ids"
     )
     return cypher, params
 

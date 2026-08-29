@@ -9594,15 +9594,19 @@ def register_tools(mcp: FastMCP):
         metric_bucket: str | None = Field(
             default=None,
             description="Bucket label ('top_decile' / 'top_quartile' / "
-            "'mid' / 'low'). Populated only on rankable assays.")
+            "'mid' / 'low'). Populated only on rankable assays, and null on "
+            "tested-absent (`detection_status='not_detected'`) rows even "
+            "then — a stored bucket from raw-zero coincidence is not a "
+            "ranking signal.")
         metric_percentile: float | None = Field(
             default=None,
             description="Percentile (0-100). Populated only on rankable "
-            "assays.")
+            "assays; null on tested-absent rows (see `metric_bucket`).")
         rank_by_metric: int | None = Field(
             default=None,
             description="Rank by value (1 = highest). Populated only on "
-            "rankable assays.")
+            "rankable assays; null on tested-absent rows (see "
+            "`metric_bucket`).")
         # Detection
         detection_status: str | None = Field(
             default=None,
@@ -9782,20 +9786,30 @@ def register_tools(mcp: FastMCP):
                         "{'top_decile','top_quartile','mid','low'}. **Rankable-gated** "
                         "— raises if every selected assay has `rankable=false`. "
                         "Soft-excludes non-rankable assays from mixed input "
-                        "(surfaced in envelope `excluded_assays`).",
+                        "(surfaced in envelope `excluded_assays`). Tested-absent "
+                        "rows (`detection_status='not_detected'`) never match — "
+                        "their `metric_bucket` is nulled for display regardless "
+                        "of the stored value.",
         )] = None,
         metric_percentile_min: Annotated[float | None, Field(
             description="Lower bound on `metric_percentile` (0-100). "
-                        "**Rankable-gated.**",
+                        "**Rankable-gated.** Tested-absent rows "
+                        "(`detection_status='not_detected'`) never match — "
+                        "their `metric_percentile` is nulled for display.",
             ge=0, le=100,
         )] = None,
         metric_percentile_max: Annotated[float | None, Field(
-            description="Upper bound on `metric_percentile`. **Rankable-gated.**",
+            description="Upper bound on `metric_percentile`. **Rankable-gated.** "
+                        "Tested-absent rows (`detection_status='not_detected'`) "
+                        "never match — their `metric_percentile` is nulled for "
+                        "display.",
             ge=0, le=100,
         )] = None,
         rank_by_metric_max: Annotated[int | None, Field(
             description="Cap on `rank_by_metric` (1 = highest). Top-N drill-down. "
-                        "**Rankable-gated.**",
+                        "**Rankable-gated.** Tested-absent rows "
+                        "(`detection_status='not_detected'`) never match — "
+                        "their `rank_by_metric` is nulled for display.",
             ge=1,
         )] = None,
         summary: Annotated[bool, Field(
@@ -10255,13 +10269,18 @@ def register_tools(mcp: FastMCP):
             description="Standard deviation across replicates. Numeric arm only.")
         metric_bucket: str | None = Field(
             default=None,
-            description="Bucket label. Numeric, rankable subset only.")
+            description="Bucket label. Numeric, rankable subset only; null "
+            "on tested-absent (`detection_status='not_detected'`) rows even "
+            "then — a stored bucket from raw-zero coincidence is not a "
+            "ranking signal.")
         metric_percentile: float | None = Field(
             default=None,
-            description="Percentile (0-100). Numeric, rankable subset only.")
+            description="Percentile (0-100). Numeric, rankable subset only; "
+            "null on tested-absent rows (see `metric_bucket`).")
         rank_by_metric: int | None = Field(
             default=None,
-            description="Rank by value (1=highest). Numeric, rankable subset only.")
+            description="Rank by value (1=highest). Numeric, rankable "
+            "subset only; null on tested-absent rows (see `metric_bucket`).")
         detection_status: str | None = Field(
             default=None,
             description="'detected'/'sporadic'/'not_detected'. Numeric arm only.")
@@ -10329,7 +10348,9 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="Input `metabolite_ids` with at least one row in "
             "the filtered slice (parallel to `gene_derived_metrics`'s "
-            "`genes_with_metrics`).")
+            "`genes_with_metrics`). Computed from the full filtered match "
+            "set, not from the (paginated, possibly empty) `results` page — "
+            "populated the same way whether or not `summary=True`.")
         metabolites_without_evidence: list[str] = Field(
             default_factory=list,
             description="Input `metabolite_ids` with no row in the filtered "
@@ -10344,7 +10365,10 @@ def register_tools(mcp: FastMCP):
         not_matched: list[str] = Field(
             default_factory=list,
             description="Flat `list[str]` — IDs in KG with no edge after "
-            "filters (unmeasured for this scope). Distinct from `not_found`.")
+            "filters (unmeasured for this scope). Distinct from `not_found`. "
+            "Computed from the full filtered match set (see "
+            "`metabolites_with_evidence`) — correct even with "
+            "`summary=True` or a batch larger than `limit`.")
         resolved_aliases: dict[str, list[str]] = Field(
             default_factory=dict,
             description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")

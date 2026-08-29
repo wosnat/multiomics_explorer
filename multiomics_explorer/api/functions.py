@@ -8378,6 +8378,29 @@ def _probe_existence(
     return sorted(set(ids) - found)
 
 
+# Rank/display fields that only mean something on a rankable, actually-
+# measured row. A tested-absent row (`detection_status='not_detected'`)
+# can still tie into a high metric_bucket / metric_percentile purely from
+# the raw-zero coincidence (many edges are zero), so those columns are
+# nulled post-query for display — shared by `metabolites_by_quantifies_assay`
+# and `assays_by_metabolite` (the numeric-arm rows of both).
+_RANK_FIELDS = ("metric_bucket", "metric_percentile", "rank_by_metric")
+
+
+def _null_rank_on_absent(rows: list[dict]) -> list[dict]:
+    """Null `_RANK_FIELDS` in place on rows where detection_status is
+    'not_detected'. The underlying KG values are left untouched — this is
+    a display-layer fix only. No-op for rows without a `detection_status`
+    key (e.g. boolean-arm rows) or without the rank keys at all.
+    """
+    for r in rows:
+        if r.get("detection_status") == "not_detected":
+            for k in _RANK_FIELDS:
+                if k in r:
+                    r[k] = None
+    return rows
+
+
 def metabolites_by_quantifies_assay(
     *,
     assay_ids: list[str],
@@ -8613,7 +8636,7 @@ def metabolites_by_quantifies_assay(
             limit=limit,
             offset=offset,
         )
-        results = conn.execute_query(det_cypher, **det_params)
+        results = _null_rank_on_absent(conn.execute_query(det_cypher, **det_params))
 
     return {
         "results": results,
@@ -8941,26 +8964,17 @@ def assays_by_metabolite(
             limit=limit,
             offset=offset,
         )
-        results = conn.execute_query(det_cypher, **det_params)
+        results = _null_rank_on_absent(conn.execute_query(det_cypher, **det_params))
 
     # ---- Compute partition (metabolites_with / without_evidence) --------
-    # In summary mode `results=[]`, so derive metabolites_with_evidence
-    # from the summary's by_assay context if needed. Most-correct source
-    # is the row-set itself; in summary mode we approximate via the
-    # metabolite IDs surfaced through detail (or skip if absent).
-    metabolites_with_evidence = sorted({
-        r.get("metabolite_id") for r in results if r.get("metabolite_id")
-    })
-    if summary:
-        # In summary mode, we rely on the existence probe + filters to
-        # estimate. Without per-metabolite rollup in the summary, we
-        # default to "all KG-present metabolites with edges" which we
-        # can't distinguish from "no edges after filters". Best-effort:
-        # use `metabolites_matched` as a count signal; identifiers are
-        # only authoritative when detail rows are returned.
-        # Caller pattern: drop summary=True for batch routing on 50+
-        # metabolite_ids when per-ID partitions are needed.
-        pass
+    # Authoritative source is the summary's unpaged `matched_metabolite_ids`
+    # — NOT `results`, which is a paginated page (and empty entirely in
+    # summary mode). Using `results` here previously reported every matched
+    # metabolite as unmatched whenever summary=True, or under-reported it
+    # once the input batch exceeded `limit` rows.
+    metabolites_with_evidence = sorted(
+        set(sum_row.get("matched_metabolite_ids", []) or [])
+    )
 
     metabolites_without_evidence = sorted(
         set(metabolite_ids) - set(metabolites_with_evidence)

@@ -210,6 +210,17 @@ mistakes:
       instead. Per-row null on these columns means "not applicable" not
       "missing data".
 
+  - wrong: "A row with detection_status='not_detected' but a non-null metric_bucket means the KG ranked it."
+    right: |
+      Tested-absent rows are nulled on `metric_bucket` / `metric_percentile` /
+      `rank_by_metric` for display, even on a rankable assay — a raw-zero
+      value can otherwise tie into a high bucket/percentile purely because
+      most edges on the assay are zero (e.g. `value=0` landing in
+      'top_quartile' simply because so much of the assay's mass sits at
+      zero). `metric_bucket` / `metric_percentile_min|max` /
+      `rank_by_metric_max` filters never select `not_detected` rows for the
+      same reason — filter and display agree.
+
   - wrong: "growth_phase populated on every row."
     right: |
       growth_phase is currently null on every row — the schema field exists

@@ -101,3 +101,52 @@ def test_assays_by_metabolite_flag_rollup_is_boolean(conn):
     assert set(res["by_flag_value"][0].keys()) >= {"flag_value", "count"}
     assert {bv["flag_value"] for bv in res["by_flag_value"]} <= {True, False}
     assert all(isinstance(r["flag_value"], bool) for r in res["results"])
+
+
+def test_no_tested_absent_row_carries_a_rank(conn):
+    # llm-review 2b.1: a tested-absent row (`detection_status='not_detected'`)
+    # can tie into a high metric_bucket / metric_percentile purely from the
+    # raw-zero coincidence (many numeric edges are zero) — those columns
+    # must be nulled for display on both the numeric drill-down and the
+    # cross-arm reverse lookup, on every rankable numeric assay in the KG.
+    assays = api.list_metabolite_assays(
+        rankable=True, value_kind="numeric", limit=1000, conn=conn)
+    assay_ids = [r["assay_id"] for r in assays["results"]]
+    assert assay_ids
+
+    mqa = api.metabolites_by_quantifies_assay(
+        assay_ids=assay_ids, detection_status=["not_detected"],
+        limit=1000, conn=conn)
+    assert mqa["total_matching"] > 0
+    for row in mqa["results"]:
+        assert row["detection_status"] == "not_detected"
+        assert row["metric_bucket"] is None
+        assert row["metric_percentile"] is None
+        assert row["rank_by_metric"] is None
+
+    # Mirror on the metabolite-anchored reverse lookup: PEP (C00074) has
+    # not_detected numeric-arm rows on rankable assays (see
+    # test_assays_by_metabolite_flag_rollup_is_boolean for the boolean twin).
+    abm = api.assays_by_metabolite(
+        metabolite_ids=["kegg.compound:C00074"], evidence_kind="quantifies",
+        limit=100, conn=conn)
+    not_detected_rows = [
+        r for r in abm["results"] if r["detection_status"] == "not_detected"
+    ]
+    assert not_detected_rows
+    for row in not_detected_rows:
+        assert row["metric_bucket"] is None
+        assert row["metric_percentile"] is None
+
+
+def test_assays_by_metabolite_summary_not_matched_from_full_match_set(conn):
+    # llm-review 2b.1: summary=True skips the detail query, so
+    # not_matched / metabolites_without_evidence must come from the summary's
+    # unpaged matched_metabolite_ids, never from the (empty) results page.
+    res = api.assays_by_metabolite(
+        metabolite_ids=["kegg.compound:C00025"], summary=True, conn=conn)
+    assert res["results"] == []
+    assert res["metabolites_matched"] > 0
+    assert res["not_matched"] == []
+    assert res["metabolites_without_evidence"] == []
+    assert res["metabolites_with_evidence"] == ["kegg.compound:C00025"]

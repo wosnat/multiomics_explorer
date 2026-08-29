@@ -10993,6 +10993,75 @@ class TestMetabolitesByQuantifiesAssay:
         assert mock_conn.execute_query.call_count == 2
         assert data["results"] == []
 
+    def test_not_detected_rows_have_null_rank_fields(self):
+        # Regression: a tested-absent row can still carry a stored
+        # metric_bucket / metric_percentile / rank_by_metric (raw-zero
+        # coincidence — many edges are zero) — nulled for display so a
+        # rank-gated caller can't mistake it for a real ranking signal.
+        # Mirrors the live repro (MIT0801 extracellular glutamate:
+        # value=0, detection_status='not_detected', metric_bucket=
+        # 'top_quartile', metric_percentile≈78.02).
+        from multiomics_explorer.api.functions import metabolites_by_quantifies_assay
+        mock_conn = MagicMock()
+        detail_rows = [{
+            "metabolite_id": "kegg.compound:C00025",
+            "name": "L-Glutamate",
+            "kegg_compound_id": "C00025",
+            "value": 0,
+            "value_sd": 0,
+            "n_replicates": 1,
+            "n_non_zero": 0,
+            "metric_type": "extracellular_concentration",
+            "metric_bucket": "top_quartile",
+            "metric_percentile": 78.02197802197803,
+            "rank_by_metric": 21,
+            "detection_status": "not_detected",
+            "timepoint": None,
+            "timepoint_hours": None,
+            "timepoint_order": None,
+            "growth_phase": None,
+            "condition_label": "replete_light_10",
+            "assay_id": "a1",
+            "organism_name": "Prochlorococcus MIT0801",
+            "compartment": "extracellular",
+        }]
+        mock_conn.execute_query.side_effect = [
+            self._diag_rankable(("a1",)),
+            self._summary_row(),
+            detail_rows,
+        ]
+        data = metabolites_by_quantifies_assay(assay_ids=["a1"], conn=mock_conn)
+        row = data["results"][0]
+        assert row["metric_bucket"] is None
+        assert row["metric_percentile"] is None
+        assert row["rank_by_metric"] is None
+        # KG-stored value fields untouched.
+        assert row["value"] == 0
+        assert row["detection_status"] == "not_detected"
+
+    def test_detected_rows_keep_rank_fields(self):
+        # Sanity: the nulling only targets not_detected rows.
+        from multiomics_explorer.api.functions import metabolites_by_quantifies_assay
+        mock_conn = MagicMock()
+        detail_rows = [{
+            "metabolite_id": "kegg.compound:C00085",
+            "value": 0.4465,
+            "metric_bucket": "top_decile",
+            "metric_percentile": 100.0,
+            "rank_by_metric": 1,
+            "detection_status": "detected",
+        }]
+        mock_conn.execute_query.side_effect = [
+            self._diag_rankable(("a1",)),
+            self._summary_row(),
+            detail_rows,
+        ]
+        data = metabolites_by_quantifies_assay(assay_ids=["a1"], conn=mock_conn)
+        row = data["results"][0]
+        assert row["metric_bucket"] == "top_decile"
+        assert row["metric_percentile"] == 100.0
+        assert row["rank_by_metric"] == 1
+
 
 class TestMetabolitesByFlagsAssay:
     """Unit tests for api.metabolites_by_flags_assay (slice spec §5)."""
@@ -11081,6 +11150,7 @@ class TestAssaysByMetabolite:
             "by_detection_status": [],
             "by_flag_value": [],
             "metabolites_matched": 0,
+            "matched_metabolite_ids": [],
         }]
         mock_conn.execute_query.side_effect = [
             [],            # existence probe — input ID absent
@@ -11113,6 +11183,7 @@ class TestAssaysByMetabolite:
             "by_detection_status": [],
             "by_flag_value": [],
             "metabolites_matched": 1,
+            "matched_metabolite_ids": [present_id],
         }]
         detail_rows = [
             {
@@ -11134,6 +11205,88 @@ class TestAssaysByMetabolite:
         assert present_id in data["metabolites_with_evidence"]
         assert absent_id in data["metabolites_without_evidence"]
         assert present_id not in data["metabolites_without_evidence"]
+
+    def test_summary_true_not_matched_uses_full_match_set(self):
+        # Regression for the bug: summary=True skips the detail query
+        # (results=[]), so metabolites_with_evidence / not_matched must be
+        # derived from the summary's matched_metabolite_ids, never from the
+        # (empty) `results` page. Mirrors the live repro:
+        # assays_by_metabolite(['C00025'], summary=True) previously reported
+        # a matched metabolite as not_matched.
+        from multiomics_explorer.api.functions import assays_by_metabolite
+        mock_conn = MagicMock()
+        present_id = "kegg.compound:C00025"
+        existence_rows = [{"metabolite_id": present_id}]
+        summary_rows = [{
+            "total_matching": 14,
+            "by_evidence_kind": [{"item": "quantifies", "count": 12},
+                                 {"item": "flags", "count": 2}],
+            "by_organism": [],
+            "by_compartment": [],
+            "by_assay": [],
+            "by_detection_status": [],
+            "by_flag_value": [],
+            "metabolites_matched": 1,
+            "matched_metabolite_ids": [present_id],
+        }]
+        mock_conn.execute_query.side_effect = [
+            existence_rows,
+            summary_rows,
+            # detail query must NOT run when summary=True; no third item
+            # needed, but pytest-regressions-style side_effect lists tolerate
+            # unused extras — omit it to also assert call_count below.
+        ]
+        data = assays_by_metabolite(
+            metabolite_ids=[present_id], summary=True, conn=mock_conn,
+        )
+        assert data["results"] == []
+        assert data["not_matched"] == []
+        assert data["metabolites_without_evidence"] == []
+        assert data["metabolites_with_evidence"] == [present_id]
+        assert mock_conn.execute_query.call_count == 2
+
+    def test_not_detected_rows_have_null_rank_fields(self):
+        # Regression for the bug: a tested-absent row can still carry a
+        # stored metric_bucket/metric_percentile from raw-zero coincidence
+        # (many edges are zero) — those must be nulled for display so a
+        # caller can't mistake "the KG ranked this row" for a real signal.
+        from multiomics_explorer.api.functions import assays_by_metabolite
+        mock_conn = MagicMock()
+        mid = "kegg.compound:C00025"
+        existence_rows = [{"metabolite_id": mid}]
+        summary_rows = [{
+            "total_matching": 1,
+            "by_evidence_kind": [{"item": "quantifies", "count": 1}],
+            "by_organism": [],
+            "by_compartment": [],
+            "by_assay": [],
+            "by_detection_status": [],
+            "by_flag_value": [],
+            "metabolites_matched": 1,
+            "matched_metabolite_ids": [mid],
+        }]
+        detail_rows = [
+            {
+                "metabolite_id": mid,
+                "metabolite_name": "L-Glutamate",
+                "assay_id": "a1",
+                "evidence_kind": "quantifies",
+                "value": 0,
+                "metric_bucket": "top_quartile",
+                "metric_percentile": 78.02,
+                "rank_by_metric": None,
+                "detection_status": "not_detected",
+            },
+        ]
+        mock_conn.execute_query.side_effect = [
+            existence_rows, summary_rows, detail_rows,
+        ]
+        data = assays_by_metabolite(metabolite_ids=[mid], conn=mock_conn)
+        row = data["results"][0]
+        assert row["metric_bucket"] is None
+        assert row["metric_percentile"] is None
+        assert row["value"] == 0
+        assert row["detection_status"] == "not_detected"
 
 
 # ---------------------------------------------------------------------------

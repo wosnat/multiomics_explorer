@@ -10064,6 +10064,26 @@ class TestMetabolitesByQuantifiesAssayWhere:
         assert "r.rank_by_metric <= $rank_by_metric_max" in conditions
         assert params["rank_by_metric_max"] == 10
 
+    def test_no_rank_filter_omits_not_detected_guard(self):
+        # No rankable-gated filter set → no reason to exclude not_detected.
+        from multiomics_explorer.kg.queries_lib import _metabolites_by_quantifies_assay_where
+        conditions, _ = _metabolites_by_quantifies_assay_where()
+        assert "r.detection_status <> 'not_detected'" not in conditions
+
+    @pytest.mark.parametrize("kwargs", [
+        {"metric_bucket": ["top_decile"]},
+        {"metric_percentile_min": 10.0},
+        {"metric_percentile_max": 90.0},
+        {"rank_by_metric_max": 10},
+    ])
+    def test_rank_filters_exclude_tested_absent_rows(self, kwargs):
+        # Filter and display must agree: a rank-gated filter must never
+        # select a not_detected row, since its rank fields are nulled for
+        # display at the api layer regardless of what the KG stored.
+        from multiomics_explorer.kg.queries_lib import _metabolites_by_quantifies_assay_where
+        conditions, _ = _metabolites_by_quantifies_assay_where(**kwargs)
+        assert "r.detection_status <> 'not_detected'" in conditions
+
     def test_timepoint_in_list(self):
         from multiomics_explorer.kg.queries_lib import _metabolites_by_quantifies_assay_where
         conditions, params = _metabolites_by_quantifies_assay_where(timepoint=["4 days", "6 days"])
@@ -10261,7 +10281,7 @@ class TestBuildAssaysByMetaboliteSummary:
         cypher, _ = build_assays_by_metabolite_summary(metabolite_ids=["kegg.compound:C00074"])
         for key in ("by_evidence_kind", "by_organism", "by_compartment", "by_assay",
                     "by_detection_status", "by_flag_value", "metabolites_matched",
-                    "total_matching"):
+                    "matched_metabolite_ids", "total_matching"):
             assert key in cypher
 
     def test_null_filter_on_collected_arrays(self):
