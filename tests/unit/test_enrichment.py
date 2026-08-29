@@ -301,9 +301,55 @@ class TestSignedEnrichmentScore:
 
 
 class TestDeEnrichmentInputs:
+    @pytest.fixture(autouse=True)
+    def _stub_list_experiments(self, monkeypatch):
+        """Default stub: no experiment-metadata rows.
+
+        DE-row fallback values (already supplied inline by most tests in
+        this class) still populate cluster_metadata in that case. Tests
+        that care about the merge override this stub explicitly.
+        """
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(enr, "_call_list_experiments", lambda **_: {"results": []})
+
     def test_importable_from_top_level(self):
         from multiomics_explorer import de_enrichment_inputs
         assert de_enrichment_inputs is not None
+
+    def test_metadata_merged_from_list_experiments(self, monkeypatch):
+        """The five metadata columns (name, omics_type, table_scope,
+        background_factors, is_time_course) come from list_experiments, not
+        the DE rows (which — at compact verbosity — never carry them)."""
+        from multiomics_explorer import de_enrichment_inputs
+        de_result = {
+            "organism_name": "MED4",
+            "results": [
+                {"locus_tag": "PMM0001", "experiment_id": "exp1",
+                 "timepoint": "T0", "direction": "up", "significant": True},
+            ],
+            "not_found": [], "no_expression": [],
+        }
+        exp_meta_result = {
+            "results": [
+                {"experiment_id": "exp1", "experiment_name": "X",
+                 "omics_type": "proteomics",
+                 "table_scope": "all_detected_genes",
+                 "background_factors": ["axenic"],
+                 "is_time_course": False},
+            ],
+        }
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(enr, "_call_de", lambda **_: de_result)
+        monkeypatch.setattr(enr, "_call_list_experiments", lambda **_: exp_meta_result)
+
+        out = de_enrichment_inputs(experiment_ids=["exp1"], organism="MED4")
+        cluster = next(c for c in out.cluster_metadata if c.startswith("exp1|"))
+        md = out.cluster_metadata[cluster]
+        assert md["name"] == "X"
+        assert md["omics_type"] == "proteomics"
+        assert md["table_scope"] == "all_detected_genes"
+        assert md["background_factors"] == ["axenic"]
+        assert md["is_time_course"] is False
 
     def test_partition_into_clusters(self, monkeypatch):
         from multiomics_explorer import de_enrichment_inputs

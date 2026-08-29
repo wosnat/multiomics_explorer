@@ -545,6 +545,17 @@ def _call_de(**kwargs):
     return _de(**kwargs)
 
 
+def _call_list_experiments(**kwargs):
+    """Thin indirection so tests can monkeypatch the list_experiments call.
+
+    Imported inside the function to avoid circular imports at module load.
+    """
+    from multiomics_explorer.api.functions import (
+        list_experiments as _le,
+    )
+    return _le(**kwargs)
+
+
 def de_enrichment_inputs(
     experiment_ids: list[str],
     organism: str,
@@ -632,6 +643,20 @@ def de_enrichment_inputs(
         conn=conn,
     )
 
+    # Real experiment metadata (name, omics_type, table_scope,
+    # background_factors, is_time_course). DE rows are pulled at compact
+    # verbosity above and never carry these — list_experiments is the
+    # source of truth; DE-row values (when present) are the fallback.
+    exp_meta_rows = _call_list_experiments(
+        experiment_ids=list(experiment_ids),
+        organism=organism,
+        limit=len(experiment_ids),
+        conn=conn,
+    ).get("results", [])
+    exp_meta = {
+        r["experiment_id"]: r for r in exp_meta_rows if r.get("experiment_id")
+    }
+
     gene_sets: dict[str, list[str]] = {}
     background: dict[str, list[str]] = {}
     cluster_metadata: dict[str, dict] = {}
@@ -677,15 +702,22 @@ def de_enrichment_inputs(
     # down clusters at the same (exp, tp) share the same background.
     for (exp_id, tp), bg_list in quantified_by_ept.items():
         sample_row = sample_row_by_ept[(exp_id, tp)]
+        exp_row = exp_meta.get(exp_id, {})
         for d in allowed_dirs:
             cluster = f"{exp_id}|{tp}|{d}"
             background[cluster] = list(bg_list)
             gene_sets.setdefault(cluster, [])
             md: dict = {}
             for md_field in _METADATA_FIELDS:
-                md[md_field] = sample_row.get(md_field)
+                md[md_field] = exp_row.get(md_field)
+                if md[md_field] is None:
+                    md[md_field] = sample_row.get(md_field)
             md["direction"] = d
-            md["name"] = sample_row.get("experiment_name") or sample_row.get("name")
+            md["name"] = (
+                exp_row.get("experiment_name")
+                or sample_row.get("experiment_name")
+                or sample_row.get("name")
+            )
             md["timepoint"] = tp
             cluster_metadata[cluster] = md
 
