@@ -1440,12 +1440,17 @@ class EnrichmentResult:
         eff_limit = limit if limit is not None else total
         sliced = self.results.iloc[offset:offset + eff_limit] if total else self.results
         returned_rows = sliced.to_dict(orient="records")
-        # Strip sparse tree/tree_code columns for non-BRITE rows
+        # Strip sparse tree/tree_code columns for non-BRITE rows; pandas turns
+        # a missing str (e.g. a cluster with no description text) into NaN,
+        # which JSON/Pydantic reject — emit None instead.
         for r in returned_rows:
             tv = r.get("tree")
             if tv is None or (isinstance(tv, float) and pd.isna(tv)):
                 r.pop("tree", None)
                 r.pop("tree_code", None)
+            for k, v in r.items():
+                if isinstance(v, float) and pd.isna(v):
+                    r[k] = None
 
         env["results"] = returned_rows
         env["returned"] = len(returned_rows)

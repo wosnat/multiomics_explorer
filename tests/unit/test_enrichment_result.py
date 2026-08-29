@@ -557,6 +557,42 @@ class TestToEnvelope:
         assert "offset" in env
         assert env["returned"] == len(env["results"])
 
+    def test_envelope_rows_emit_none_not_nan(self):
+        """A cluster whose description text is missing must not leak NaN
+        (pandas' str-column hole) into the envelope rows — JSON/Pydantic reject it."""
+        import math
+        import pandas as pd
+        from multiomics_explorer.analysis.enrichment import EnrichmentInputs, fisher_ora
+
+        t2g = pd.DataFrame([
+            {"term_id": "GO:0001", "term_name": "transport", "locus_tag": "g1"},
+            {"term_id": "GO:0001", "term_name": "transport", "locus_tag": "g2"},
+            {"term_id": "GO:0001", "term_name": "transport", "locus_tag": "g4"},
+        ])
+        inputs = EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={"c1": ["g1"], "c2": ["g4"]},
+            background={"c1": ["g1", "g2", "g3"], "c2": ["g4", "g2", "g3"]},
+            cluster_metadata={
+                "c1": {"cluster_functional_description": "described"},
+                "c2": {},
+            },
+        )
+        result = fisher_ora(inputs, t2g, min_gene_set_size=0)
+        md_df = pd.DataFrame.from_dict(
+            inputs.cluster_metadata, orient="index"
+        ).reset_index().rename(columns={"index": "cluster"})
+        result.results = result.results.merge(md_df, on="cluster", how="left")
+        result.kind = "cluster"
+        result.ontology = "go"
+        result.level = 1
+        result.params = {"pvalue_cutoff": 0.05}
+        rows = result.to_envelope()["results"]
+        assert rows
+        for r in rows:
+            for v in r.values():
+                assert not (isinstance(v, float) and math.isnan(v)), r
+
     def test_envelope_summary_true(self):
         from multiomics_explorer.analysis.enrichment import EnrichmentInputs, fisher_ora
         import pandas as pd
