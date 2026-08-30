@@ -3657,6 +3657,14 @@ _EXPRESSION_STATUS_KEYS = ("significant_up", "significant_down", "not_significan
 _VALID_DIRECTIONS_BY_GENE = {"up", "down", "both"}
 _VALID_DIRECTIONS_BY_ORTHOLOG = {"up", "down"}
 
+# Per-experiment fields kept when verbose=False. Dropped fields
+# (experiment_name, background_factors, omics_type, coculture_partner,
+# table_scope_detail, timepoints) are restored only with verbose=True.
+_DE_EXPERIMENT_COMPACT_KEYS = (
+    "experiment_id", "treatment_type", "table_scope",
+    "is_time_course", "matching_genes", "rows_by_status",
+)
+
 
 def _apoc_freq_to_dict(freq_list: list[dict]) -> dict[str, int]:
     """Convert apoc.coll.frequencies [{item, count}] to {item: count} dict.
@@ -3798,8 +3806,8 @@ def differential_expression_by_gene(
     Returns:
         dict with keys: organism_name, matching_genes, total_matching,
         rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count,
-        rows_by_treatment_type, rows_by_background_factors, by_table_scope,
-        rows_by_growth_phase, top_categories, experiments,
+        n_experiments, rows_by_treatment_type, rows_by_background_factors,
+        by_table_scope, rows_by_growth_phase, top_categories, experiments,
         returned, truncated, not_found, no_expression, filtered_out,
         warnings, not_found_experiments, not_matched_experiments, results.
         not_found_experiments/not_matched_experiments are populated only
@@ -3809,7 +3817,13 @@ def differential_expression_by_gene(
         direction / significant_only / growth_phases filters (e.g. a
         growth_phases vocabulary typo) — never confuse this with
         no_expression. warnings: one entry per growth_phases value not in
-        the live vocabulary.
+        the live vocabulary. n_experiments: count of matching experiments
+        before any trimming (currently identical to experiment_count — no
+        experiment-list cap exists on this tool). Each experiment entry in
+        `experiments` is compact by default ({experiment_id, treatment_type,
+        table_scope, is_time_course, matching_genes, rows_by_status});
+        verbose=True restores experiment_name, background_factors,
+        omics_type, coculture_partner, table_scope_detail, timepoints.
 
     growth_phases: if provided, restricts DE rows to those whose edge-level
     growth_phase property matches any of the specified values (case-insensitive).
@@ -3915,6 +3929,13 @@ def differential_expression_by_gene(
         reverse=True,
     )
 
+    n_experiments = len(experiments)
+    if not verbose:
+        experiments = [
+            {k: v for k, v in e.items() if k in _DE_EXPERIMENT_COMPACT_KEYS}
+            for e in experiments
+        ]
+
     # --- Summary query 3: categories + batch diagnostics ---
     diag_cypher, diag_params = (
         build_differential_expression_by_gene_summary_diagnostics(
@@ -3967,6 +3988,7 @@ def differential_expression_by_gene(
         "median_abs_log2fc": global_raw["median_abs_log2fc"],
         "max_abs_log2fc": global_raw["max_abs_log2fc"],
         "experiment_count": len(experiments),
+        "n_experiments": n_experiments,
         "rows_by_treatment_type": rows_by_treatment_type,
         "rows_by_background_factors": rows_by_background_factors,
         "by_table_scope": by_table_scope,

@@ -2834,6 +2834,7 @@ class TestDifferentialExpressionByGeneWrapper:
         "median_abs_log2fc": 1.978,
         "max_abs_log2fc": 3.591,
         "experiment_count": 1,
+        "n_experiments": 1,
         "rows_by_treatment_type": {"nitrogen_stress": 15},
         "rows_by_background_factors": {},
         "by_table_scope": {"all_detected_genes": 15},
@@ -3063,6 +3064,60 @@ class TestDifferentialExpressionByGeneWrapper:
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
+
+    @pytest.mark.asyncio
+    async def test_n_experiments_passed_through(self, tool_fns, mock_ctx):
+        """(llm-review 2b.2) n_experiments surfaces on the response model."""
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["differential_expression_by_gene"](
+                mock_ctx, organism="MED4",
+            )
+        assert result.n_experiments == 1
+
+    @pytest.mark.asyncio
+    async def test_compact_experiment_validates_without_dropped_fields(
+        self, tool_fns, mock_ctx,
+    ):
+        """(llm-review 2b.2) A compact api-layer experiment dict (as
+        produced with verbose=False — no experiment_name / background_factors
+        / omics_type / coculture_partner / table_scope_detail / timepoints
+        keys) still validates against ExpressionByExperiment, and those
+        fields render as None."""
+        data = {
+            **self._SAMPLE_API_RETURN,
+            "experiments": [
+                {
+                    "experiment_id": "exp1",
+                    "treatment_type": ["nitrogen_stress"],
+                    "table_scope": "all_detected_genes",
+                    "is_time_course": "time_course",
+                    "matching_genes": 5,
+                    "rows_by_status": {
+                        "significant_up": 3,
+                        "significant_down": 0,
+                        "not_significant": 12,
+                    },
+                },
+            ],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value=data,
+        ):
+            result = await tool_fns["differential_expression_by_gene"](
+                mock_ctx, organism="MED4",
+            )
+        exp = result.experiments[0]
+        assert exp.experiment_id == "exp1"
+        assert exp.timepoints is None
+        assert exp.experiment_name is None
+        assert exp.background_factors is None
+        assert exp.omics_type is None
+        assert exp.coculture_partner is None
+        assert exp.table_scope_detail is None
 
 
 # ---------------------------------------------------------------------------
@@ -8242,6 +8297,7 @@ class TestDifferentialExpressionByGeneWrapperPhase2:
         "median_abs_log2fc": 1.5,
         "max_abs_log2fc": 3.5,
         "experiment_count": 1,
+        "n_experiments": 1,
         "rows_by_treatment_type": {"nitrogen_stress": 6},
         "rows_by_background_factors": {},
         "by_table_scope": {"all_detected_genes": 6},

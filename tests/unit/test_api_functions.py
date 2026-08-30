@@ -3056,7 +3056,7 @@ class TestDifferentialExpressionByGene:
         for key in [
             "organism_name", "matching_genes", "total_matching",
             "rows_by_status", "median_abs_log2fc", "max_abs_log2fc",
-            "experiment_count", "rows_by_treatment_type",
+            "experiment_count", "n_experiments", "rows_by_treatment_type",
             "rows_by_background_factors", "by_table_scope",
             "top_categories", "experiments", "not_found", "no_expression",
             "returned", "truncated", "results",
@@ -3199,7 +3199,9 @@ class TestDifferentialExpressionByGene:
         assert result["experiments"][1]["experiment_id"] == "low_sig"
 
     def test_non_time_course_timepoints_null(self, mock_conn):
-        """Non-time-course experiments have timepoints=None."""
+        """Non-time-course experiments have timepoints=None with
+        verbose=True; compact (default) drops the key entirely
+        (llm-review 2b.2)."""
         exp_summary = [{
             "organism_name": "Prochlorococcus MED4",
             "experiments": [
@@ -3240,7 +3242,19 @@ class TestDifferentialExpressionByGene:
         result = api.differential_expression_by_gene(
             organism="MED4", conn=mock_conn
         )
-        assert result["experiments"][0]["timepoints"] is None
+        assert "timepoints" not in result["experiments"][0]
+
+        mock_conn.execute_query.side_effect = [
+            self._organism_result(),
+            self._global_summary(total_matching=5, matching_genes=1),
+            exp_summary,
+            self._diagnostics_summary(),
+            self._detail_rows(),
+        ]
+        verbose_result = api.differential_expression_by_gene(
+            organism="MED4", verbose=True, conn=mock_conn
+        )
+        assert verbose_result["experiments"][0]["timepoints"] is None
 
     def test_not_found_and_no_expression(self, mock_conn):
         """Batch diagnostics returns not_found and no_expression."""
@@ -3348,6 +3362,91 @@ class TestDifferentialExpressionByGene:
         mock_conn.execute_query.side_effect = self._mock_side_effect_organism_only()
         result = api.differential_expression_by_gene(organism="MED4", offset=5, conn=mock_conn)
         assert result["offset"] == 5
+
+    def _two_experiment_two_timepoint_summary(self):
+        """Mock per-experiment summary: two experiments, two timepoints each
+        (llm-review 2b.2 — experiments[] compaction fixture)."""
+        def _exp(exp_id):
+            return {
+                "experiment_id": exp_id,
+                "experiment_name": f"Test experiment {exp_id}",
+                "treatment_type": "nitrogen_stress",
+                "background_factors": ["axenic"],
+                "omics_type": "RNASEQ",
+                "coculture_partner": None,
+                "is_time_course": "time_course",
+                "table_scope": "all_detected_genes",
+                "table_scope_detail": None,
+                "matching_genes": 5,
+                "rows_by_status": [
+                    {"item": "significant_up", "count": 3},
+                    {"item": "not_significant", "count": 12},
+                ],
+                "timepoints": [
+                    {
+                        "timepoint": "day 18", "timepoint_hours": 432.0,
+                        "timepoint_order": 1, "matching_genes": 5,
+                        "rows_by_status": [
+                            {"item": "not_significant", "count": 5},
+                        ],
+                    },
+                    {
+                        "timepoint": "day 31", "timepoint_hours": 744.0,
+                        "timepoint_order": 2, "matching_genes": 5,
+                        "rows_by_status": [
+                            {"item": "significant_up", "count": 3},
+                        ],
+                    },
+                ],
+            }
+        return [{
+            "organism_name": "Prochlorococcus MED4",
+            "experiments": [_exp("exp1"), _exp("exp2")],
+        }]
+
+    def test_compact_experiments_drop_verbose_fields_by_default(self, mock_conn):
+        """(llm-review 2b.2) Compact experiments[] entries carry only the six
+        always-present keys; n_experiments counts before any trimming."""
+        mock_conn.execute_query.side_effect = [
+            self._organism_result(),
+            self._global_summary(),
+            self._two_experiment_two_timepoint_summary(),
+            self._diagnostics_summary(),
+            self._detail_rows(),
+        ]
+        result = api.differential_expression_by_gene(
+            organism="MED4", conn=mock_conn
+        )
+        assert result["n_experiments"] == 2
+        for exp in result["experiments"]:
+            assert set(exp.keys()) == {
+                "experiment_id", "treatment_type", "table_scope",
+                "is_time_course", "matching_genes", "rows_by_status",
+            }
+            assert "timepoints" not in exp
+            assert "experiment_name" not in exp
+
+    def test_verbose_experiments_restore_dropped_fields(self, mock_conn):
+        """verbose=True restores experiment_name, background_factors,
+        omics_type, coculture_partner, table_scope_detail, timepoints."""
+        mock_conn.execute_query.side_effect = [
+            self._organism_result(),
+            self._global_summary(),
+            self._two_experiment_two_timepoint_summary(),
+            self._diagnostics_summary(),
+            self._detail_rows(),
+        ]
+        result = api.differential_expression_by_gene(
+            organism="MED4", verbose=True, conn=mock_conn
+        )
+        assert result["n_experiments"] == 2
+        for exp in result["experiments"]:
+            assert exp["experiment_name"].startswith("Test experiment")
+            assert exp["timepoints"] is not None
+            assert len(exp["timepoints"]) == 2
+            assert exp["background_factors"] == ["axenic"]
+            assert exp["omics_type"] == "RNASEQ"
+            assert exp["table_scope_detail"] is None
 
 
 class TestSearchHomologGroups:

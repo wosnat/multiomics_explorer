@@ -44,7 +44,7 @@ to `gene_response_profile`; cross-organism via
 ### Envelope
 
 ```expected-keys
-organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_categories, experiments, not_found, no_expression, filtered_out, warnings, not_found_experiments, not_matched_experiments, returned, offset, truncated, results
+organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, n_experiments, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_categories, experiments, not_found, no_expression, filtered_out, warnings, not_found_experiments, not_matched_experiments, returned, offset, truncated, results
 ```
 
 - **organism_name** (string): Single organism for all results (e.g. 'Alteromonas macleodii HOT1A3')
@@ -54,12 +54,13 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 - **median_abs_log2fc** (float | None): Median |log2FC| for significant rows only (e.g. 1.978). Null if no significant rows.
 - **max_abs_log2fc** (float | None): Max |log2FC| for significant rows only (e.g. 3.591). Null if no significant rows.
 - **experiment_count** (int): Number of experiments in results (e.g. 1)
+- **n_experiments** (int): Count of matching experiments before any trimming (e.g. 1). Currently identical to experiment_count.
 - **rows_by_treatment_type** (object): Row counts by treatment type (e.g. {'nitrogen': 15})
 - **rows_by_background_factors** (object): Row counts by background factor (e.g. {'axenic': 10, 'diel': 5})
 - **rows_by_growth_phase** (object): Row counts by growth phase. Growth phase is a timepoint-level condition, not gene-specific.
 - **by_table_scope** (object): Row counts by experiment table_scope (e.g. {'all_detected_genes': 100, 'significant_only': 50}). `all_detected_genes` keeps tested-absent (`not_significant`) rows; any other scope (`significant_only`, `significant_any_timepoint`, `filtered_subset`, `top_n`) collapses tested-absent with not-detected. Check before reading missing rows. See `docs://guide/conventions`.
 - **top_categories** (list[ExpressionTopCategory]): Top gene categories by significant gene count, max 5
-- **experiments** (list[ExpressionByExperiment]): Per-experiment summary with nested timepoint breakdown, sorted by significant row count desc
+- **experiments** (list[ExpressionByExperiment]): Per-experiment summary, sorted by significant row count desc. Compact by default (experiment_id, treatment_type, table_scope, is_time_course, matching_genes, rows_by_status); verbose=True restores experiment_name, background_factors, omics_type, coculture_partner, table_scope_detail, and the nested per-timepoint breakdown.
 - **not_found** (list[string]): Input locus_tags not found in KG
 - **no_expression** (list[string]): Locus tags in KG with NO Changes_expression_of edge at all in the organism
 - **filtered_out** (list[string]): Locus tags that DO have expression edges but none survive the active direction / significant_only / growth_phases filters — e.g. a growth_phases vocabulary typo. Never confuse with no_expression.
@@ -88,7 +89,6 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 | rank_down | int \| None (optional) | Rank by |log2FC| among significant_down genes within experiment x timepoint. Null if not significant_down. 1 = strongest. |
 | expression_status | string ('significant_up', 'significant_down', 'not_significant') | Significance call using publication-specific threshold (e.g. 'significant_up') |
 | growth_phase | string \| None (optional) | Physiological state of the culture at this timepoint (e.g. 'exponential', 'nutrient_limited'). Timepoint-level condition — not gene-specific. |
-| background_factors | list[string] (optional) | Background experimental factors. Verbose only. |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -102,6 +102,7 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 | coculture_partner | string \| None (optional) | Coculture partner organism, if applicable |
 | table_scope | string \| None (optional) | What genes the source DE table contains (e.g. 'all_detected_genes'). Verbose only. |
 | table_scope_detail | string \| None (optional) | Free-text clarification of table_scope. Verbose only. |
+| background_factors | list[string] (optional) | Background experimental factors. Verbose only. |
 
 ## Few-shot examples
 
@@ -120,6 +121,7 @@ differential_expression_by_gene(organism="MED4", summary=True)
   "median_abs_log2fc": 1.580899074554445,
   "max_abs_log2fc": 162.295,
   "experiment_count": 38,
+  "n_experiments": 38,
   "rows_by_treatment_type": {
     "coculture": 5412,
     "carbon": 2015,
@@ -168,214 +170,73 @@ differential_expression_by_gene(organism="MED4", summary=True)
   "experiments": [
     {
       "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture",
-      "experiment_name": "MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)",
+      "experiment_name": null,
       "treatment_type": ["nitrogen"],
-      "background_factors": ["coculture", "light"],
-      "omics_type": "RNASEQ",
+      "background_factors": null,
+      "omics_type": null,
       "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
-      "table_scope_detail": "",
+      "table_scope_detail": null,
       "matching_genes": 1849,
       "rows_by_status": {"significant_up": 553, "significant_down": 834, "not_significant": 7858},
-      "timepoints": [
-        {
-          "timepoint": "day 18",
-          "timepoint_hours": 432.0,
-          "timepoint_order": 1,
-          "matching_genes": 1849,
-          "rows_by_status": {"significant_up": 39, "significant_down": 45, "not_significant": 1765},
-          "growth_phase": "nutrient_limited"
-        },
-        {
-          "timepoint": "day 31",
-          "timepoint_hours": 744.0,
-          "timepoint_order": 2,
-          "matching_genes": 1849,
-          "rows_by_status": {"significant_up": 156, "significant_down": 235, "not_significant": 1458},
-          "growth_phase": "nutrient_limited"
-        },
-        {
-          "timepoint": "day 60",
-          "timepoint_hours": 1440.0,
-          "timepoint_order": 3,
-          "matching_genes": 1849,
-          "rows_by_status": {"significant_up": 134, "significant_down": 226, "not_significant": 1489},
-          "growth_phase": "nutrient_limited"
-        },
-        {
-          "timepoint": "day 89",
-          "timepoint_hours": 2136.0,
-          "timepoint_order": 4,
-          "matching_genes": 1849,
-          "rows_by_status": {"significant_up": 108, "significant_down": 159, "not_significant": 1582},
-          "growth_phase": "nutrient_limited"
-        },
-        {
-          "timepoint": "days 60+89",
-          "timepoint_hours": null,
-          "timepoint_order": 5,
-          "matching_genes": 1849,
-          "rows_by_status": {"significant_up": 116, "significant_down": 169, "not_significant": 1564},
-          "growth_phase": "nutrient_limited"
-        }
-      ]
+      "timepoints": null
     },
     {
       "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
-      "experiment_name": "MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)",
+      "experiment_name": null,
       "treatment_type": ["nitrogen"],
-      "background_factors": ["axenic", "light"],
-      "omics_type": "RNASEQ",
+      "background_factors": null,
+      "omics_type": null,
       "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
-      "table_scope_detail": "",
+      "table_scope_detail": null,
       "matching_genes": 1849,
       "rows_by_status": {"significant_up": 602, "significant_down": 640, "not_significant": 2456},
-      "timepoints": [
-        {
-          "timepoint": "day 14",
-          "timepoint_hours": 336.0,
-          "timepoint_order": 1,
-          "matching_genes": 1849,
-          "rows_by_status": {"significant_up": 405, "significant_down": 472, "not_significant": 972},
-          "growth_phase": "nutrient_limited"
-        },
-        {
-          "timepoint": "days 60+89",
-          "timepoint_hours": null,
-          "timepoint_order": 2,
-          "matching_genes": 1849,
-          "rows_by_status": {"significant_up": 197, "significant_down": 168, "not_significant": 1484},
-          "growth_phase": "nutrient_limited"
-        }
-      ]
+      "timepoints": null
     },
     {
       "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic",
-      "experiment_name": "MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (PROTEOMICS)",
+      "experiment_name": null,
       "treatment_type": ["nitrogen"],
-      "background_factors": ["axenic", "light"],
-      "omics_type": "PROTEOMICS",
+      "background_factors": null,
+      "omics_type": null,
       "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
-      "table_scope_detail": "",
+      "table_scope_detail": null,
       "matching_genes": 1424,
       "rows_by_status": {"significant_up": 599, "significant_down": 556, "not_significant": 3117},
-      "timepoints": [
-        {
-          "timepoint": "day 14",
-          "timepoint_hours": 336.0,
-          "timepoint_order": 1,
-          "matching_genes": 1424,
-          "rows_by_status": {"significant_up": 40, "significant_down": 95, "not_significant": 1289},
-          "growth_phase": "nutrient_limited"
-        },
-        {
-          "timepoint": "day 31",
-          "timepoint_hours": 744.0,
-          "timepoint_order": 2,
-          "matching_genes": 1424,
-          "rows_by_status": {"significant_up": 264, "significant_down": 257, "not_significant": 903},
-          "growth_phase": "death"
-        },
-        {
-          "timepoint": "day 89",
-          "timepoint_hours": 2136.0,
-          "timepoint_order": 3,
-          "matching_genes": 1424,
-          "rows_by_status": {"significant_up": 295, "significant_down": 204, "not_significant": 925},
-          "growth_phase": "death"
-        }
-      ]
+      "timepoints": null
     },
     {
       "experiment_id": "10.64898/2026.04.15.718746_extended_darkness_med4",
-      "experiment_name": "MED4 extended darkness past dawn vs normal light period (RNA-seq)",
+      "experiment_name": null,
       "treatment_type": ["darkness"],
-      "background_factors": ["axenic", "diel"],
-      "omics_type": "RNASEQ",
+      "background_factors": null,
+      "omics_type": null,
       "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
-      "table_scope_detail": "",
+      "table_scope_detail": null,
       "matching_genes": 1876,
       "rows_by_status": {"significant_up": 556, "significant_down": 469, "not_significant": 2727},
-      "timepoints": [
-        {
-          "timepoint": "2h",
-          "timepoint_hours": 2.0,
-          "timepoint_order": 1,
-          "matching_genes": 1876,
-          "rows_by_status": {"significant_up": 248, "significant_down": 203, "not_significant": 1425},
-          "growth_phase": "diel"
-        },
-        {
-          "timepoint": "4h",
-          "timepoint_hours": 4.0,
-          "timepoint_order": 2,
-          "matching_genes": 1876,
-          "rows_by_status": {"significant_up": 308, "significant_down": 266, "not_significant": 1302},
-          "growth_phase": "diel"
-        }
-      ]
+      "timepoints": null
     },
     {
       "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture",
-      "experiment_name": "MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (PROTEOMICS)",
+      "experiment_name": null,
       "treatment_type": ["nitrogen"],
-      "background_factors": ["coculture", "light"],
-      "omics_type": "PROTEOMICS",
+      "background_factors": null,
+      "omics_type": null,
       "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
-      "table_scope_detail": "",
+      "table_scope_detail": null,
       "matching_genes": 1424,
       "rows_by_status": {"significant_up": 609, "significant_down": 394, "not_significant": 6117},
-      "timepoints": [
-        {
-          "timepoint": "day 18",
-          "timepoint_hours": 432.0,
-          "timepoint_order": 1,
-          "matching_genes": 1424,
-          "rows_by_status": {"significant_up": 35, "significant_down": 14, "not_significant": 1375},
-          "growth_phase": "nutrient_limited"
-        },
-        {
-          "timepoint": "day 31",
-          "timepoint_hours": 744.0,
-          "timepoint_order": 2,
-          "matching_genes": 1424,
-          "rows_by_status": {"significant_up": 111, "significant_down": 137, "not_significant": 1176},
-          "growth_phase": "nutrient_limited"
-        },
-        {
-          "timepoint": "day 60",
-          "timepoint_hours": 1440.0,
-          "timepoint_order": 3,
-          "matching_genes": 1424,
-          "rows_by_status": {"significant_up": 145, "significant_down": 74, "not_significant": 1205},
-          "growth_phase": "nutrient_limited"
-        },
-        {
-          "timepoint": "day 89",
-          "timepoint_hours": 2136.0,
-          "timepoint_order": 4,
-          "matching_genes": 1424,
-          "rows_by_status": {"significant_up": 161, "significant_down": 92, "not_significant": 1171},
-          "growth_phase": "nutrient_limited"
-        },
-        {
-          "timepoint": "days 60+89",
-          "timepoint_hours": null,
-          "timepoint_order": 5,
-          "matching_genes": 1424,
-          "rows_by_status": {"significant_up": 157, "significant_down": 77, "not_significant": 1190},
-          "growth_phase": "nutrient_limited"
-        }
-      ]
+      "timepoints": null
     },
     ...
   ],
@@ -419,6 +280,7 @@ differential_expression_by_gene(locus_tags=["ACZ81_01830", "ACZ81_15555"], exper
   "median_abs_log2fc": 2.7846347522016206,
   "max_abs_log2fc": 3.5913485347500225,
   "experiment_count": 1,
+  "n_experiments": 1,
   "rows_by_treatment_type": {"nitrogen": 6},
   "rows_by_background_factors": {"axenic": 6, "light": 6},
   "rows_by_growth_phase": {"nutrient_limited": 6},
@@ -430,42 +292,17 @@ differential_expression_by_gene(locus_tags=["ACZ81_01830", "ACZ81_15555"], exper
   "experiments": [
     {
       "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic",
-      "experiment_name": "HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)",
+      "experiment_name": null,
       "treatment_type": ["nitrogen"],
-      "background_factors": ["axenic", "light"],
-      "omics_type": "RNASEQ",
+      "background_factors": null,
+      "omics_type": null,
       "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
-      "table_scope_detail": "",
+      "table_scope_detail": null,
       "matching_genes": 2,
       "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 4},
-      "timepoints": [
-        {
-          "timepoint": "day 18",
-          "timepoint_hours": 432.0,
-          "timepoint_order": 1,
-          "matching_genes": 2,
-          "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 2},
-          "growth_phase": "nutrient_limited"
-        },
-        {
-          "timepoint": "day 31",
-          "timepoint_hours": 744.0,
-          "timepoint_order": 2,
-          "matching_genes": 2,
-          "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 2},
-          "growth_phase": "nutrient_limited"
-        },
-        {
-          "timepoint": "days 60+89",
-          "timepoint_hours": null,
-          "timepoint_order": 3,
-          "matching_genes": 2,
-          "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 0},
-          "growth_phase": "nutrient_limited"
-        }
-      ]
+      "timepoints": null
     }
   ],
   "not_found": [],
@@ -546,6 +383,7 @@ differential_expression_by_gene(experiment_ids=["10.1126/science.1243457_vesicle
   "median_abs_log2fc": null,
   "max_abs_log2fc": null,
   "experiment_count": 0,
+  "n_experiments": 0,
   "rows_by_treatment_type": {},
   "rows_by_background_factors": {},
   "rows_by_growth_phase": {},
@@ -669,13 +507,21 @@ A growth_phases value not in the live vocabulary lands in the envelope `warnings
 
 - For cross-experiment summarization (which treatments does this gene set respond to?) see `docs://guide/python_api` (Cross-experiment summarization — `response_matrix` for gene × treatment pivots, `gene_set_compare` for two-set overlap). For pathway-level interpretation chain to `pathway_enrichment` (`docs://analysis/enrichment`).
 
+```mistake
+Expecting per-timepoint counts, experiment_name, or table_scope_detail inside `experiments[]` from a plain call
+```
+
+```correction
+`summary=True` (and every call by default) is the cheap landscape — each `experiments[]` entry is compact (experiment_id, treatment_type, table_scope, is_time_course, matching_genes, rows_by_status). Per-timepoint counts and the other experiment metadata need `verbose=True`.
+```
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import differential_expression_by_gene
 
 result = differential_expression_by_gene()
-# returns dict with keys: organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_categories, experiments, not_found, no_expression, filtered_out, warnings, not_found_experiments, not_matched_experiments, returned, offset, truncated, results
+# returns dict with keys: organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, n_experiments, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_categories, experiments, not_found, no_expression, filtered_out, warnings, not_found_experiments, not_matched_experiments, returned, offset, truncated, results
 ```
 
 Use package import for bulk data extraction in scripts.

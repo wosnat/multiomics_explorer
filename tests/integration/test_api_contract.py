@@ -427,7 +427,7 @@ class TestDifferentialExpressionByGeneContract:
         expected_keys = {
             "organism_name", "matching_genes", "total_matching",
             "rows_by_status", "median_abs_log2fc", "max_abs_log2fc",
-            "experiment_count", "rows_by_treatment_type",
+            "experiment_count", "n_experiments", "rows_by_treatment_type",
             "rows_by_background_factors", "rows_by_growth_phase",
             "by_table_scope",
             "top_categories", "experiments", "not_found", "no_expression",

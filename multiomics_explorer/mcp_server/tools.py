@@ -4181,24 +4181,29 @@ def register_tools(mcp: FastMCP):
         experiment_id: str = Field(
             description="Experiment ID (e.g. '10.1101/2025.11.24.690089_...')",
         )
-        experiment_name: str = Field(
+        experiment_name: str | None = Field(
+            default=None,
             description="Human-readable name"
-            " (e.g. 'HOT1A3 PRO99-lowN nutrient starvation (RNASEQ)')",
+            " (e.g. 'HOT1A3 PRO99-lowN nutrient starvation (RNASEQ)')."
+            " Verbose only.",
         )
         treatment_type: list[str] = Field(
             description="Treatment categories"
             " (e.g. ['nitrogen'], ['nitrogen', 'coculture'])",
         )
-        background_factors: list[str] = Field(
-            default_factory=list,
-            description="Background experimental factors",
+        background_factors: list[str] | None = Field(
+            default=None,
+            description="Background experimental factors. Verbose only.",
         )
-        omics_type: str = Field(
-            description="Omics type (e.g. 'RNASEQ', 'PROTEOMICS')",
+        omics_type: str | None = Field(
+            default=None,
+            description="Omics type (e.g. 'RNASEQ', 'PROTEOMICS')."
+            " Verbose only.",
         )
         coculture_partner: str | None = Field(
             default=None,
-            description="Coculture partner organism, if applicable",
+            description="Coculture partner organism, if applicable."
+            " Verbose only.",
         )
         is_time_course: str = Field(
             description="KG two-state literal: 'time_course' or 'single_time_point'.",
@@ -4212,7 +4217,7 @@ def register_tools(mcp: FastMCP):
         table_scope_detail: str | None = Field(
             default=None,
             description="Free-text clarification of table_scope"
-            " (e.g. 'Top 50% of genes by expression level').",
+            " (e.g. 'Top 50% of genes by expression level'). Verbose only.",
         )
         matching_genes: int = Field(
             description="Distinct genes with data in this experiment (e.g. 5)",
@@ -4223,7 +4228,8 @@ def register_tools(mcp: FastMCP):
         timepoints: list[ExpressionTimepoint] | None = Field(
             default=None,
             description="Per-timepoint breakdown, sorted by timepoint_order."
-            " Null for non-time-course experiments.",
+            " Null for non-time-course experiments; present only with"
+            " verbose=True.",
         )
 
     class ExpressionTopCategory(BaseModel):
@@ -4368,6 +4374,10 @@ def register_tools(mcp: FastMCP):
         experiment_count: int = Field(
             description="Number of experiments in results (e.g. 1)",
         )
+        n_experiments: int = Field(
+            description="Count of matching experiments before any trimming"
+            " (e.g. 1). Currently identical to experiment_count.",
+        )
         rows_by_treatment_type: dict[str, int] = Field(
             description="Row counts by treatment type"
             " (e.g. {'nitrogen': 15})",
@@ -4394,8 +4404,12 @@ def register_tools(mcp: FastMCP):
             " max 5",
         )
         experiments: list[ExpressionByExperiment] = Field(
-            description="Per-experiment summary with nested timepoint"
-            " breakdown, sorted by significant row count desc",
+            description="Per-experiment summary, sorted by significant row"
+            " count desc. Compact by default (experiment_id, treatment_type,"
+            " table_scope, is_time_course, matching_genes, rows_by_status);"
+            " verbose=True restores experiment_name, background_factors,"
+            " omics_type, coculture_partner, table_scope_detail, and the"
+            " nested per-timepoint breakdown.",
         )
         not_found: list[str] = Field(
             default_factory=list,
@@ -4584,6 +4598,7 @@ def register_tools(mcp: FastMCP):
                 median_abs_log2fc=data["median_abs_log2fc"],
                 max_abs_log2fc=data["max_abs_log2fc"],
                 experiment_count=data["experiment_count"],
+                n_experiments=data["n_experiments"],
                 offset=data.get("offset", 0),
                 rows_by_treatment_type=data["rows_by_treatment_type"],
                 rows_by_background_factors=data["rows_by_background_factors"],
