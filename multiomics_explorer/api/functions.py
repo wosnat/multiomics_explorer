@@ -1758,7 +1758,7 @@ def list_organisms(
     When verbose=True, also includes: family, order, tax_class, phylum, kingdom,
     superkingdom, lineage, cluster_count, derived_metric_gene_count,
     derived_metric_types.
-    top_metabolic_capability: top 10 organisms (within matched set) by
+    top_metabolic_capability: organisms (within matched set) ranked by
     catalyzed_metabolite_count, sorted desc; excludes zero-chemistry
     organisms. Ranks on the catalysis arm only (metabolites reached via
     Gene -> Reaction); each entry also carries transported_metabolite_count
@@ -1768,12 +1768,16 @@ def list_organisms(
     by_measurement_capability: binary 2-bucket count
     {has_metabolomics: N, no_metabolomics: M} where has_metabolomics counts
     organisms with measured_metabolite_count > 0. Sums to total_matching.
-    top_annotation_capability: top 10 organisms (within matched set) by
+    top_annotation_capability: organisms (within matched set) ranked by
     peptidase_gene_count desc, then preferred_name; each entry carries
     preferred_name, organism_name and all four annotation counts. Organisms
     with all four counts at 0 are excluded. A reading aid for choosing an
     organism for MEROPS / InterPro / NCBIfam questions — there is no filter
     on these counts.
+    top_metabolic_capability / top_annotation_capability / by_metric_type
+    are capped to the first 10 entries on detail calls (summary=False, the
+    default), with a sparse `<key>_truncated=True` flag when capped;
+    summary=True returns each list in full.
     """
     conn = _default_conn(conn)
     if summary:
@@ -1860,9 +1864,10 @@ def list_organisms(
                                      "derived_metric_types")}
                        for r in results]
 
-    # top_metabolic_capability: top 10 organisms by catalyzed_metabolite_count
+    # top_metabolic_capability: organisms ranked by catalyzed_metabolite_count
     # in the matched set; excludes zero-chemistry rows. transported_metabolite_count
-    # rides along as a column (ranking unchanged — catalysis arm).
+    # rides along as a column (ranking unchanged — catalysis arm). Capped to
+    # top 10 on detail calls by _cap_breakdowns below.
     chemistry_capable = [
         {
             "organism_name": r["organism_name"],
