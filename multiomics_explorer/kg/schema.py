@@ -3,7 +3,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import yaml
 
@@ -109,61 +109,83 @@ def _infer_type(value: Any) -> str:
     return "string"
 
 
-def load_schema_from_neo4j(conn: GraphConnection) -> GraphSchema:
-    """Introspect the full graph schema from a live Neo4j instance.
+def load_schema_from_neo4j(
+    conn: GraphConnection,
+    *,
+    labels: list[str] | None = None,
+    relationship_types: list[str] | None = None,
+    section: Literal["nodes", "relationships", "both"] = "both",
+) -> GraphSchema:
+    """Introspect the graph schema from a live Neo4j instance.
 
     Queries node labels, relationship types, and samples properties
     from each to build a GraphSchema object.
+
+    ``labels`` / ``relationship_types``, when given, restrict introspection
+    to exactly those (already-validated) values instead of enumerating
+    every label / relationship type in the graph — the caller is expected
+    to have resolved unknown values before calling in (see
+    ``api.functions.kg_schema``). ``section`` skips introspecting the other
+    half entirely (no catalog call for it).
+
+    Property sampling is ordered deterministically (``coalesce(n.id,
+    elementId(n))`` for nodes, ``elementId(r)`` for relationships) so the
+    captured type of a polymorphic property is stable across builds, even
+    for abstract labels that lack an ``id`` property.
     """
     schema = GraphSchema()
 
-    # Node labels and counts
-    labels = conn.get_labels()
-    for label in labels:
-        count = conn.get_node_count(label)
-        node_schema = NodeSchema(label=label, count=count)
+    if section in ("nodes", "both"):
+        target_labels = labels if labels is not None else conn.get_labels()
+        for label in target_labels:
+            count = conn.get_node_count(label)
+            node_schema = NodeSchema(label=label, count=count)
 
-        # Sample multiple nodes to capture optional properties
-        sample = conn.execute_query(
-            f"MATCH (n:`{label}`) RETURN properties(n) AS props LIMIT 10"
-        )
-        for row in sample:
-            if row["props"]:
-                for k, v in row["props"].items():
-                    if k not in node_schema.properties or node_schema.properties[k] == "any":
-                        node_schema.properties[k] = _infer_type(v)
+            # Sample multiple nodes, deterministically ordered, to capture
+            # optional properties.
+            sample = conn.execute_query(
+                f"MATCH (n:`{label}`) RETURN properties(n) AS props "
+                "ORDER BY coalesce(n.id, elementId(n)) LIMIT 10"
+            )
+            for row in sample:
+                if row["props"]:
+                    for k, v in row["props"].items():
+                        if k not in node_schema.properties or node_schema.properties[k] == "any":
+                            node_schema.properties[k] = _infer_type(v)
 
-        schema.nodes[label] = node_schema
+            schema.nodes[label] = node_schema
 
-    # Relationship types with source/target labels and properties
-    rel_types = conn.get_relationship_types()
-    for rel_type in rel_types:
-        rel_schema = RelationshipSchema(type=rel_type)
+    if section in ("relationships", "both"):
+        target_rel_types = relationship_types if relationship_types is not None else conn.get_relationship_types()
+        for rel_type in target_rel_types:
+            rel_schema = RelationshipSchema(type=rel_type)
 
-        # Get source and target labels
-        endpoints = conn.execute_query(
-            f"MATCH (a)-[r:`{rel_type}`]->(b) "
-            f"RETURN DISTINCT labels(a) AS src, labels(b) AS tgt LIMIT 10"
-        )
-        src_labels = set()
-        tgt_labels = set()
-        for row in endpoints:
-            src_labels.update(row["src"])
-            tgt_labels.update(row["tgt"])
-        rel_schema.source_labels = sorted(src_labels)
-        rel_schema.target_labels = sorted(tgt_labels)
+            # Get source and target labels
+            endpoints = conn.execute_query(
+                f"MATCH (a)-[r:`{rel_type}`]->(b) "
+                f"RETURN DISTINCT labels(a) AS src, labels(b) AS tgt LIMIT 10"
+            )
+            src_labels = set()
+            tgt_labels = set()
+            for row in endpoints:
+                src_labels.update(row["src"])
+                tgt_labels.update(row["tgt"])
+            rel_schema.source_labels = sorted(src_labels)
+            rel_schema.target_labels = sorted(tgt_labels)
 
-        # Sample multiple relationships to capture optional properties
-        sample = conn.execute_query(
-            f"MATCH ()-[r:`{rel_type}`]->() RETURN properties(r) AS props LIMIT 10"
-        )
-        for row in sample:
-            if row["props"]:
-                for k, v in row["props"].items():
-                    if k not in rel_schema.properties or rel_schema.properties[k] == "any":
-                        rel_schema.properties[k] = _infer_type(v)
+            # Sample multiple relationships, deterministically ordered, to
+            # capture optional properties.
+            sample = conn.execute_query(
+                f"MATCH ()-[r:`{rel_type}`]->() RETURN properties(r) AS props "
+                "ORDER BY elementId(r) LIMIT 10"
+            )
+            for row in sample:
+                if row["props"]:
+                    for k, v in row["props"].items():
+                        if k not in rel_schema.properties or rel_schema.properties[k] == "any":
+                            rel_schema.properties[k] = _infer_type(v)
 
-        schema.relationships[rel_type] = rel_schema
+            schema.relationships[rel_type] = rel_schema
 
     return schema
 

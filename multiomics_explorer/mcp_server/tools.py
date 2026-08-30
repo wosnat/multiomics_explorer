@@ -1575,27 +1575,65 @@ def register_tools(mcp: FastMCP):
 
     class KgSchemaResponse(BaseModel):
         nodes: dict[str, dict] = Field(
+            default_factory=dict,
             description="Node labels mapped to their property definitions. "
-                        "Each value is {'properties': {'prop_name': 'type_string', ...}}."
+                        "Each value is {'properties': {'prop_name': 'type_string', ...}}. "
+                        "Empty when `section='relationships'`.",
         )
         relationships: dict[str, dict] = Field(
+            default_factory=dict,
             description="Relationship types mapped to their definitions. "
                         "Each value is {'source_labels': [...], 'target_labels': [...], "
-                        "'properties': {'prop_name': 'type_string', ...}}."
+                        "'properties': {'prop_name': 'type_string', ...}}. "
+                        "Empty when `section='nodes'`.",
+        )
+        not_found_labels: list[str] = Field(
+            default_factory=list,
+            description="Requested `labels` values not present in the KG. "
+                        "Empty when `labels` was omitted or every value matched.",
+        )
+        not_found_relationship_types: list[str] = Field(
+            default_factory=list,
+            description="Requested `relationship_types` values not present in the KG. "
+                        "Empty when `relationship_types` was omitted or every value matched.",
         )
 
     @mcp.tool(
         tags={"utility", "schema"},
         annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
-    async def kg_schema(ctx: Context) -> KgSchemaResponse:
+    async def kg_schema(
+        ctx: Context,
+        labels: Annotated[list[str] | None, Field(
+            description="Restrict the node section to these labels (e.g. "
+                        "['Gene', 'Experiment']). Omit for every label. Unknown "
+                        "values land in `not_found_labels`, not an error.",
+        )] = None,
+        relationship_types: Annotated[list[str] | None, Field(
+            description="Restrict the relationship section to these types "
+                        "(e.g. ['Changes_expression_of']). Omit for every type. "
+                        "Unknown values land in `not_found_relationship_types`, "
+                        "not an error.",
+        )] = None,
+        section: Annotated[Literal["nodes", "relationships", "both"], Field(
+            description="Which half of the schema to return. 'both' (default) "
+                        "returns both node and relationship sections; 'nodes' / "
+                        "'relationships' returns only that section (the other "
+                        "comes back as an empty dict).",
+        )] = "both",
+    ) -> KgSchemaResponse:
         """Return the KG schema: node labels with property names/types and relationship types with source/target labels.
 
-        Use before `run_cypher` to discover queryable labels/properties. For an entity-level overview see `docs://guide/concepts`; for filter-value enumeration use `list_filter_values`.
+        Use before `run_cypher` to discover queryable labels/properties. Scope with `labels` / `relationship_types` / `section` to avoid a full-graph dump. For an entity-level overview see `docs://guide/concepts`; for filter-value enumeration use `list_filter_values`.
         """
-        await ctx.info("kg_schema")
+        await ctx.info(f"kg_schema section={section}")
         try:
-            data = api.kg_schema(conn=_conn(ctx))
+            data = api.kg_schema(
+                labels=labels,
+                relationship_types=relationship_types,
+                section=section,
+                conn=_conn(ctx),
+            )
             return KgSchemaResponse(**data)
         except Exception as e:
             await ctx.error(f"kg_schema unexpected error: {e}")
@@ -2625,8 +2663,9 @@ def register_tools(mcp: FastMCP):
 
         Write operations are blocked. Queries are syntax- and schema-validated
         before execution — non-blocking warnings come back in the response.
-        Validate against `kg_schema` first to avoid label / property typos;
-        see docs://guide/concepts for the KG data model.
+        Validate against `kg_schema` first to avoid label / property typos —
+        scope with `kg_schema(labels=[...])` to avoid a full-graph dump; see
+        docs://guide/concepts for the KG data model.
         """
         await ctx.info(f"run_cypher limit={limit}")
         try:

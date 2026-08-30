@@ -36,6 +36,46 @@ class TestKgSchema:
         result = api.kg_schema(conn=conn)
         assert "properties" in result["nodes"]["Gene"]
 
+    def test_default_call_reports_no_not_found(self, conn):
+        result = api.kg_schema(conn=conn)
+        assert result["not_found_labels"] == []
+        assert result["not_found_relationship_types"] == []
+
+    def test_labels_scopes_nodes_and_leaves_relationships_empty(self, conn):
+        result = api.kg_schema(labels=["Gene"], section="nodes", conn=conn)
+        assert set(result["nodes"]) == {"Gene"}
+        assert result["relationships"] == {}
+        assert "properties" in result["nodes"]["Gene"]
+        assert result["not_found_labels"] == []
+
+    def test_unknown_label_reported_not_found_and_excluded(self, conn):
+        result = api.kg_schema(labels=["Gene", "NotARealLabelXYZ"], conn=conn)
+        assert result["not_found_labels"] == ["NotARealLabelXYZ"]
+        assert "Gene" in result["nodes"]
+        assert "NotARealLabelXYZ" not in result["nodes"]
+
+    def test_relationship_types_scopes_relationships_and_leaves_nodes_empty(self, conn):
+        result = api.kg_schema(
+            relationship_types=["Changes_expression_of"], section="relationships", conn=conn,
+        )
+        assert set(result["relationships"]) == {"Changes_expression_of"}
+        assert result["nodes"] == {}
+        assert result["not_found_relationship_types"] == []
+
+    def test_unknown_relationship_type_reported_not_found_and_excluded(self, conn):
+        result = api.kg_schema(relationship_types=["Changes_expression_of", "NotARealRelXYZ"], conn=conn)
+        assert result["not_found_relationship_types"] == ["NotARealRelXYZ"]
+        assert "Changes_expression_of" in result["relationships"]
+        assert "NotARealRelXYZ" not in result["relationships"]
+
+    def test_property_sampling_is_deterministic_across_calls(self, conn):
+        """The controller-mandated ORDER BY fix: repeated calls against the
+        same live KG must capture the same property set/types for a label,
+        even one with polymorphic/optional properties."""
+        first = api.kg_schema(labels=["Gene"], section="nodes", conn=conn)
+        second = api.kg_schema(labels=["Gene"], section="nodes", conn=conn)
+        assert first["nodes"]["Gene"] == second["nodes"]["Gene"]
+
 
 @pytest.mark.kg
 class TestGenesByFunction:

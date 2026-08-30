@@ -930,18 +930,50 @@ def _strip_unowned_columns(rows: list[dict], ontology: str, verbose: bool) -> No
 
 
 def kg_schema(
+    labels: list[str] | None = None,
+    relationship_types: list[str] | None = None,
+    section: Literal["nodes", "relationships", "both"] = "both",
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
     """Get the knowledge graph schema as a plain dict.
 
+    `labels` / `relationship_types` restrict introspection to those values
+    (unknown ones are reported, not an error); `section` skips the other
+    half of the schema entirely. Omit all three for the full dump.
+
     Returns dict with keys:
       nodes: {label: {properties: {name: type}}}
       relationships: {type: {source_labels, target_labels, properties}}
+      not_found_labels: labels requested but absent from the KG
+      not_found_relationship_types: relationship types requested but absent
     """
     conn = _default_conn(conn)
-    schema = load_schema_from_neo4j(conn)
-    return schema.to_dict()
+
+    not_found_labels: list[str] = []
+    valid_labels = None
+    if labels is not None:
+        all_labels = set(conn.get_labels())
+        valid_labels = [label for label in labels if label in all_labels]
+        not_found_labels = sorted(set(labels) - all_labels)
+
+    not_found_relationship_types: list[str] = []
+    valid_relationship_types = None
+    if relationship_types is not None:
+        all_rel_types = set(conn.get_relationship_types())
+        valid_relationship_types = [rt for rt in relationship_types if rt in all_rel_types]
+        not_found_relationship_types = sorted(set(relationship_types) - all_rel_types)
+
+    schema = load_schema_from_neo4j(
+        conn,
+        labels=valid_labels,
+        relationship_types=valid_relationship_types,
+        section=section,
+    )
+    result = schema.to_dict()
+    result["not_found_labels"] = not_found_labels
+    result["not_found_relationship_types"] = not_found_relationship_types
+    return result
 
 
 def resolve_gene(

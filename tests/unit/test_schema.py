@@ -1,6 +1,8 @@
-"""P1: Tests for schema diffing, baseline round-trip, and prompt formatting."""
+"""P1: Tests for schema diffing, baseline round-trip, prompt formatting, and
+introspection scoping/determinism."""
 
 
+from unittest.mock import MagicMock
 
 from multiomics_explorer.kg.schema import (
     GraphSchema,
@@ -8,6 +10,7 @@ from multiomics_explorer.kg.schema import (
     RelationshipSchema,
     diff_schemas,
     load_baseline,
+    load_schema_from_neo4j,
     save_baseline,
 )
 
@@ -212,3 +215,90 @@ class TestPromptString:
         assert "## Graph Schema" in text
         assert "### Node Types" in text
         assert "### Relationship Types" in text
+
+
+class TestLoadSchemaFromNeo4jScoping:
+    """`labels` / `relationship_types` / `section` restrict introspection to
+    exactly the requested (already-validated) values, without enumerating
+    the full catalog."""
+
+    def test_specific_labels_skips_get_labels(self):
+        conn = MagicMock()
+        conn.get_node_count.return_value = 5
+        conn.execute_query.return_value = [{"props": {"locus_tag": "string"}}]
+
+        schema = load_schema_from_neo4j(conn, labels=["Gene"], section="nodes")
+
+        conn.get_labels.assert_not_called()
+        conn.get_node_count.assert_called_once_with("Gene")
+        assert set(schema.nodes) == {"Gene"}
+
+    def test_labels_none_enumerates_all(self):
+        conn = MagicMock()
+        conn.get_labels.return_value = ["Gene", "Experiment"]
+        conn.get_node_count.return_value = 1
+        conn.execute_query.return_value = []
+
+        schema = load_schema_from_neo4j(conn, section="nodes")
+
+        conn.get_labels.assert_called_once()
+        assert set(schema.nodes) == {"Gene", "Experiment"}
+
+    def test_section_nodes_skips_relationship_introspection(self):
+        conn = MagicMock()
+        conn.get_node_count.return_value = 1
+        conn.execute_query.return_value = []
+
+        schema = load_schema_from_neo4j(conn, labels=["Gene"], section="nodes")
+
+        conn.get_relationship_types.assert_not_called()
+        assert schema.relationships == {}
+
+    def test_section_relationships_skips_node_introspection(self):
+        conn = MagicMock()
+        conn.get_relationship_types.return_value = ["Encodes"]
+        conn.execute_query.return_value = []
+
+        schema = load_schema_from_neo4j(conn, section="relationships")
+
+        conn.get_labels.assert_not_called()
+        conn.get_node_count.assert_not_called()
+        assert schema.nodes == {}
+
+    def test_specific_relationship_types_skips_get_relationship_types(self):
+        conn = MagicMock()
+        conn.execute_query.return_value = []
+
+        schema = load_schema_from_neo4j(
+            conn, relationship_types=["Encodes"], section="relationships",
+        )
+
+        conn.get_relationship_types.assert_not_called()
+        assert set(schema.relationships) == {"Encodes"}
+
+    def test_node_property_sample_is_ordered_deterministically(self):
+        conn = MagicMock()
+        conn.get_node_count.return_value = 1
+        conn.execute_query.return_value = []
+
+        load_schema_from_neo4j(conn, labels=["Gene"], section="nodes")
+
+        cypher = conn.execute_query.call_args[0][0]
+        assert "ORDER BY coalesce(n.id, elementId(n))" in cypher
+        assert "LIMIT 10" in cypher
+
+    def test_relationship_property_sample_is_ordered_deterministically(self):
+        conn = MagicMock()
+        conn.execute_query.return_value = []
+
+        load_schema_from_neo4j(
+            conn, relationship_types=["Encodes"], section="relationships",
+        )
+
+        prop_calls = [
+            c.args[0] for c in conn.execute_query.call_args_list
+            if "properties(r)" in c.args[0]
+        ]
+        assert len(prop_calls) == 1
+        assert "ORDER BY elementId(r)" in prop_calls[0]
+        assert "LIMIT 10" in prop_calls[0]

@@ -6,8 +6,9 @@ Run a raw Cypher query (read-only escape hatch when other tools don't cover the 
 
 Write operations are blocked. Queries are syntax- and schema-validated
 before execution — non-blocking warnings come back in the response.
-Validate against `kg_schema` first to avoid label / property typos;
-see docs://guide/concepts for the KG data model.
+Validate against `kg_schema` first to avoid label / property typos —
+scope with `kg_schema(labels=[...])` to avoid a full-graph dump; see
+docs://guide/concepts for the KG data model.
 
 ## Parameters
 

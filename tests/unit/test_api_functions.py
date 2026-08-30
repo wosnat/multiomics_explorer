@@ -77,7 +77,74 @@ class TestKgSchema:
             "multiomics_explorer.api.functions.GraphConnection",
         ) as MockConn:
             api.kg_schema()
-        mock_load.assert_called_once_with(MockConn.return_value)
+        mock_load.assert_called_once_with(
+            MockConn.return_value,
+            labels=None,
+            relationship_types=None,
+            section="both",
+        )
+
+    def test_not_found_keys_default_empty(self, mock_conn):
+        mock_schema = MagicMock()
+        mock_schema.to_dict.return_value = {"nodes": {}, "relationships": {}}
+        with patch(
+            "multiomics_explorer.api.functions.load_schema_from_neo4j",
+            return_value=mock_schema,
+        ):
+            result = api.kg_schema(conn=mock_conn)
+        assert result["not_found_labels"] == []
+        assert result["not_found_relationship_types"] == []
+        mock_conn.get_labels.assert_not_called()
+        mock_conn.get_relationship_types.assert_not_called()
+
+    def test_labels_filter_reports_not_found_and_passes_valid_only(self, mock_conn):
+        mock_conn.get_labels.return_value = ["Gene", "Experiment"]
+        mock_schema = MagicMock()
+        mock_schema.to_dict.return_value = {"nodes": {"Gene": {}}, "relationships": {}}
+        with patch(
+            "multiomics_explorer.api.functions.load_schema_from_neo4j",
+            return_value=mock_schema,
+        ) as mock_load:
+            result = api.kg_schema(labels=["Gene", "Bogus"], conn=mock_conn)
+        assert result["not_found_labels"] == ["Bogus"]
+        mock_load.assert_called_once_with(
+            mock_conn,
+            labels=["Gene"],
+            relationship_types=None,
+            section="both",
+        )
+
+    def test_relationship_types_filter_reports_not_found_and_passes_valid_only(self, mock_conn):
+        mock_conn.get_relationship_types.return_value = ["Encodes"]
+        mock_schema = MagicMock()
+        mock_schema.to_dict.return_value = {"nodes": {}, "relationships": {"Encodes": {}}}
+        with patch(
+            "multiomics_explorer.api.functions.load_schema_from_neo4j",
+            return_value=mock_schema,
+        ) as mock_load:
+            result = api.kg_schema(relationship_types=["Encodes", "Bogus"], conn=mock_conn)
+        assert result["not_found_relationship_types"] == ["Bogus"]
+        mock_load.assert_called_once_with(
+            mock_conn,
+            labels=None,
+            relationship_types=["Encodes"],
+            section="both",
+        )
+
+    def test_section_passed_through(self, mock_conn):
+        mock_schema = MagicMock()
+        mock_schema.to_dict.return_value = {"nodes": {}, "relationships": {}}
+        with patch(
+            "multiomics_explorer.api.functions.load_schema_from_neo4j",
+            return_value=mock_schema,
+        ) as mock_load:
+            api.kg_schema(section="nodes", conn=mock_conn)
+        mock_load.assert_called_once_with(
+            mock_conn,
+            labels=None,
+            relationship_types=None,
+            section="nodes",
+        )
 
 
 # ---------------------------------------------------------------------------

@@ -105,6 +105,8 @@ class TestKgSchemaWrapper:
                 "properties": {},
             }
         },
+        "not_found_labels": [],
+        "not_found_relationship_types": [],
     }
 
     @pytest.mark.asyncio
@@ -116,6 +118,8 @@ class TestKgSchemaWrapper:
             result = await tool_fns["kg_schema"](mock_ctx)
         assert "Gene" in result.nodes
         assert "Has_function" in result.relationships
+        assert result.not_found_labels == []
+        assert result.not_found_relationship_types == []
 
     @pytest.mark.asyncio
     async def test_nodes_have_properties(self, tool_fns, mock_ctx):
@@ -126,6 +130,51 @@ class TestKgSchemaWrapper:
             result = await tool_fns["kg_schema"](mock_ctx)
         assert "properties" in result.nodes["Gene"]
         assert result.nodes["Gene"]["properties"]["locus_tag"] == "STRING"
+
+    @pytest.mark.asyncio
+    async def test_passes_labels_relationship_types_section_through(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.kg_schema",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["kg_schema"](
+                mock_ctx,
+                labels=["Gene"],
+                relationship_types=["Has_function"],
+                section="nodes",
+            )
+        mock_api.assert_called_once()
+        _, kwargs = mock_api.call_args
+        assert kwargs["labels"] == ["Gene"]
+        assert kwargs["relationship_types"] == ["Has_function"]
+        assert kwargs["section"] == "nodes"
+
+    @pytest.mark.asyncio
+    async def test_surfaces_not_found_labels(self, tool_fns, mock_ctx):
+        api_return = dict(self._SAMPLE_API_RETURN)
+        api_return["not_found_labels"] = ["Bogus"]
+        with patch(
+            "multiomics_explorer.api.functions.kg_schema",
+            return_value=api_return,
+        ):
+            result = await tool_fns["kg_schema"](mock_ctx, labels=["Gene", "Bogus"])
+        assert result.not_found_labels == ["Bogus"]
+
+    @pytest.mark.asyncio
+    async def test_missing_not_found_keys_default_empty(self, tool_fns, mock_ctx):
+        """Response model tolerates an api/ payload without the new keys
+        (defensive shape parity — should not happen in practice)."""
+        legacy_return = {
+            "nodes": {"Gene": {"properties": {"locus_tag": "STRING"}}},
+            "relationships": {},
+        }
+        with patch(
+            "multiomics_explorer.api.functions.kg_schema",
+            return_value=legacy_return,
+        ):
+            result = await tool_fns["kg_schema"](mock_ctx)
+        assert result.not_found_labels == []
+        assert result.not_found_relationship_types == []
 
 
 # ---------------------------------------------------------------------------
