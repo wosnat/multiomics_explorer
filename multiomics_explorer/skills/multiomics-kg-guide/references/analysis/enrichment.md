@@ -471,9 +471,13 @@ filtered_out}` for `term_ids`), `clusters_skipped`, `enrichment_params` (=
 `result.params`).
 
 Pathway kind adds `no_expression`, `by_experiment[]` (`n_tests`, `n_significant`,
-`n_clusters` + experiment metadata), `by_direction[]`, `by_omics_type[]`,
-`cluster_summary` (`n_clusters`, min/median/max of `n_tests`, `n_significant`,
-`universe_size`), `top_clusters_by_min_padj[]` (5), `top_pathways_by_padj[]` (10).
+`n_clusters` + experiment metadata, sorted desc by `n_significant`), `by_direction[]`,
+`by_omics_type[]`, `cluster_summary` (`n_clusters`, min/median/max of `n_tests`,
+`n_significant`, `universe_size`), `top_clusters_by_min_padj[]` (5),
+`top_pathways_by_padj[]` (ranked by `p_adjust` ascending). A detail call
+(`summary=False`) caps `by_experiment` and `top_pathways_by_padj` to their first
+10 entries, adding a sparse `<key>_truncated: true` sibling key when a list is
+actually capped; `summary=True` carries each list in full.
 
 Cluster kind adds `analysis_id`, `analysis_name`, `cluster_method`,
 `cluster_type`, `omics_type`, `treatment_type`, `background_factors`,
