@@ -3325,7 +3325,8 @@ def register_tools(mcp: FastMCP):
             description=_TRUST_INTERPRO_TYPE_DESC,
         )] = None,
         limit: Annotated[int, Field(
-            description="Default 50 over MCP; the package default is 500 for TERM2GENE.",
+            description="Default 50 over MCP; the Python package defaults to "
+                        "unbounded (every row) — pass an explicit limit to page.",
             ge=1,
         )] = 50,
         offset: Annotated[int, Field(
@@ -3339,10 +3340,11 @@ def register_tools(mcp: FastMCP):
         - `level` only — pathway definitions at level N (walk UP from leaves).
         - `level` + `term_ids` — scoped rollup (walk UP, restrict to given terms).
 
-        Single-organism enforced. Default `limit=50` over MCP (the package
-        default is 500 for TERM2GENE — pass an explicit `limit` to page
-        through more). `min/max_gene_set_size` is organism-scoped
-        (matches `ontology_landscape`).
+        Single-organism enforced. Default `limit=50` over MCP; the Python
+        package defaults to unbounded (all rows), which
+        `pathway_enrichment` / `cluster_enrichment` rely on for TERM2GENE.
+        `min/max_gene_set_size` is organism-scoped (matches
+        `ontology_landscape`).
 
         [TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
         `call_class` / `interpro_type` filter on the per-edge trust profile;

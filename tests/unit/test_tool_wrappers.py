@@ -1677,7 +1677,8 @@ class TestGenesByOntologyWrapper:
     @pytest.mark.asyncio
     async def test_default_limit_is_50(self, tool_fns, mock_ctx):
         """MCP default limit is 50 (llm-review 2b.2) — sized for a context
-        window; the package (api) default for TERM2GENE stays 500."""
+        window; the Python package defaults to unbounded (every row), which
+        pathway_enrichment / cluster_enrichment rely on for TERM2GENE."""
         empty_return = {
             "ontology": "go_bp", "organism_name": "MED4",
             "total_matching": 0, "total_genes": 0, "total_terms": 0,

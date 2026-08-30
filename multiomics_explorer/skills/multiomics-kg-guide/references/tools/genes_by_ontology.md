@@ -9,10 +9,11 @@ Three modes:
 - `level` only — pathway definitions at level N (walk UP from leaves).
 - `level` + `term_ids` — scoped rollup (walk UP, restrict to given terms).
 
-Single-organism enforced. Default `limit=50` over MCP (the package
-default is 500 for TERM2GENE — pass an explicit `limit` to page
-through more). `min/max_gene_set_size` is organism-scoped
-(matches `ontology_landscape`).
+Single-organism enforced. Default `limit=50` over MCP; the Python
+package defaults to unbounded (all rows), which
+`pathway_enrichment` / `cluster_enrichment` rely on for TERM2GENE.
+`min/max_gene_set_size` is organism-scoped (matches
+`ontology_landscape`).
 
 [TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
 `call_class` / `interpro_type` filter on the per-edge trust profile;
@@ -46,7 +47,7 @@ conventions; docs://analysis/enrichment for the enrichment workflow.
 | min_evidence_score | float \| None | None | Keep rows with edge evidence_score >= this cutoff (composite trust score, 0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, tcdb, merops. Envelope adds evidence_score_signals when set. |
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; leaving unfiltered mixes in catalytically-dead homologs (nonpeptidase_homolog) - the envelope warns when it does. |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
-| limit | int | 50 | Default 50 over MCP; the package default is 500 for TERM2GENE. |
+| limit | int | 50 | Default 50 over MCP; the Python package defaults to unbounded (every row) — pass an explicit limit to page. |
 | offset | int | 0 | Skip N rows before limit |
 
 **Discovery:** use `list_organisms` for valid organism names.
