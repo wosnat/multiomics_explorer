@@ -27,7 +27,7 @@ direction via `gene_homologs`; cross-organism expression view via
 ### Envelope
 
 ```expected-keys
-total_matching, total_genes, total_categories, offset, genes_per_group_max, genes_per_group_median, by_organism, top_categories, top_groups, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, resolved_aliases, returned, truncated, results
+total_matching, total_genes, total_categories, offset, genes_per_group_max, genes_per_group_median, by_organism, top_categories, top_groups, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, resolved_aliases, warnings, returned, truncated, results
 ```
 
 - **total_matching** (int): Gene×group rows matching filters (e.g. 33)
@@ -44,6 +44,7 @@ total_matching, total_genes, total_categories, offset, genes_per_group_max, gene
 - **not_found_organisms** (list[string]): Organism filter values matching zero Gene nodes in KG
 - **not_matched_organisms** (list[string]): Organisms in KG but with zero genes in the requested groups
 - **resolved_aliases** (object): Bare group_ids (e.g. 'CK_00000570', 'COG0592@2') coerced to canonical prefixed form, {input: [canonical]}. Empty when none were coerced.
+- **warnings** (list[string]): Advisory diagnostics; empty when clean. Never changes which rows are returned.
 - **returned** (int): Results in this response
 - **truncated** (bool): True if total_matching > returned
 
@@ -223,7 +224,7 @@ response['total_matching']  # use total, not len
 from multiomics_explorer import genes_by_homolog_group
 
 result = genes_by_homolog_group(group_ids=...)
-# returns dict with keys: total_matching, total_genes, total_categories, offset, genes_per_group_max, genes_per_group_median, by_organism, top_categories, top_groups, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, resolved_aliases, returned, truncated, results
+# returns dict with keys: total_matching, total_genes, total_categories, offset, genes_per_group_max, genes_per_group_median, by_organism, top_categories, top_groups, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, resolved_aliases, warnings, returned, truncated, results
 ```
 
 Use package import for bulk data extraction in scripts.

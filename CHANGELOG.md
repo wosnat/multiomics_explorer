@@ -490,6 +490,7 @@ coordinated to `0.1.0a5` ahead of the KG release.
   substrate-depth migration below, `transporter_gene_count > 0`.
 
 ### Fixed
+- `genes_by_homolog_group` / `differential_expression_by_ortholog` gain the `warnings: list[str]` envelope key every other coercing tool already had (empty when clean). `_run_fulltext` now reports a missing / unavailable fulltext index as "fulltext index unavailable … check kg_release_info" instead of mislabelling it a Lucene syntax error; only a real `ParseException` gets the Lucene message. (llm-review 2b.12)
 - `genes_by_function`: a fulltext hit count with `total_matching=0` after `organism` / `category` / `min_quality` now reports an empty-intersection warning naming the active filters (was a bare zero that read as "no such genes in this organism"; `category` is an exact `Gene.gene_category` match and `'Transport'` is a small category — most transporters sit under `'Inorganic ion transport'`). New `mistakes` entry. (upstream ticket 2026-08 #1)
 - `differential_expression_by_gene` docs: `rank` is the KG property `rank_by_effect` (direction-blind, on every reported edge); `rank_up` / `rank_down` are explicitly NOT genome-wide directional ranks — populated on the significant subset only, unusable as a GSEA ranking. Field descriptions + `mistakes` entry; GSEA itself queued as backlog 3.19. (upstream ticket 2026-08 #2)
 - `genes_by_boolean_metric(flag=False)` always reported `true_count: 0` regardless of the DM's real flagged-edge count; it now reads the actual count.

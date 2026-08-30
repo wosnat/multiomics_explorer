@@ -5026,6 +5026,8 @@ def register_tools(mcp: FastMCP):
             description="Organisms in KG but with zero genes in the requested groups")
         resolved_aliases: dict[str, list[str]] = Field(default_factory=dict,
             description="Bare group_ids (e.g. 'CK_00000570', 'COG0592@2') coerced to canonical prefixed form, {input: [canonical]}. Empty when none were coerced.")
+        warnings: list[str] = Field(default_factory=list,
+            description="Advisory diagnostics; empty when clean. Never changes which rows are returned.")
         returned: int = Field(description="Results in this response")
         truncated: bool = Field(
             description="True if total_matching > returned")
@@ -5098,6 +5100,7 @@ def register_tools(mcp: FastMCP):
                 not_found_organisms=data["not_found_organisms"],
                 not_matched_organisms=data["not_matched_organisms"],
                 resolved_aliases=data.get("resolved_aliases", {}),
+                warnings=data.get("warnings", []),
                 returned=data["returned"],
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],
@@ -5344,6 +5347,8 @@ def register_tools(mcp: FastMCP):
             description="Bare group_ids (e.g. 'CK_00000570', 'COG0592@2') coerced to "
             "canonical prefixed form, {input: [canonical]}. Empty when none were coerced.",
         )
+        warnings: list[str] = Field(default_factory=list,
+            description="Advisory diagnostics; empty when clean. Never changes which rows are returned.")
 
     @mcp.tool(
         tags={"expression", "homology"},
@@ -5470,6 +5475,7 @@ def register_tools(mcp: FastMCP):
                 not_found_experiments=data["not_found_experiments"],
                 not_matched_experiments=data["not_matched_experiments"],
                 resolved_aliases=data.get("resolved_aliases", {}),
+                warnings=data.get("warnings", []),
             )
             await ctx.info(
                 f"Returning {response.returned} rows"

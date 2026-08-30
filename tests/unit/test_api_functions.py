@@ -280,14 +280,21 @@ class TestRunFulltext:
         assert "ParseException" in msg
         assert "Quote phrases, escape special characters, or drop trailing operators" in msg
 
-    def test_querynodes_error_becomes_readable_valueerror(self, mock_conn):
+    def test_querynodes_error_without_parse_exception_is_index_unavailable(self, mock_conn):
+        """backlog 2b.12: only a ParseException is a Lucene syntax error; any
+        other queryNodes / fulltext failure (missing index, mid-rebuild) gets
+        its own message instead of blaming the user's search_text."""
         from neo4j.exceptions import ClientError as Neo4jClientError
         mock_conn.execute_query.side_effect = Neo4jClientError(
-            "Failed to invoke procedure `db.index.fulltext.queryNodes`: "
-            "Caused by: bad syntax"
+            "There is no such fulltext schema index: gene_function_fulltext "
+            "(db.index.fulltext.queryNodes)"
         )
-        with pytest.raises(ValueError, match=r"is not valid Lucene syntax"):
-            api._run_fulltext(mock_conn, "CALL ...", {}, "nitrogen AND (")
+        with pytest.raises(ValueError) as exc_info:
+            api._run_fulltext(mock_conn, "CALL ...", {}, "psbA")
+        msg = str(exc_info.value)
+        assert "fulltext index unavailable" in msg
+        assert "not valid Lucene syntax" not in msg
+        assert "kg_release_info" in msg
 
     def test_unrelated_clienterror_not_translated(self, mock_conn):
         """A ClientError with no Lucene fingerprint propagates unchanged —
@@ -3913,6 +3920,7 @@ class TestGenesByHomologGroup:
         assert len(result["top_groups"]) == 1
         assert result["top_groups"][0]["group_id"] == "cyanorak:CK_00000570"
         assert result["not_found_groups"] == []
+        assert result["warnings"] == []  # backlog 2b.12: shape parity
         assert result["not_matched_groups"] == []
         assert result["not_found_organisms"] == []
         assert result["not_matched_organisms"] == []
@@ -4050,6 +4058,7 @@ class TestDifferentialExpressionByOrtholog:
         assert "results" in result
         assert "returned" in result
         assert "truncated" in result
+        assert result["warnings"] == []  # backlog 2b.12: shape parity
 
     def test_empty_group_ids_raises(self, mock_conn):
         with pytest.raises(ValueError, match="group_ids must not be empty"):

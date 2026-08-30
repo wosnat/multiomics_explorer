@@ -11978,6 +11978,19 @@ class TestBareTermGroupIdCoercionWrappers:
         assert field.annotation == dict[str, list[str]]
         assert field.get_default(call_default_factory=True) == {}
 
+class TestGroupIdToolsWarnings:
+    """backlog 2b.12: the two group-ID coercing tools carry `warnings` like
+    every other coercing tool (list_metabolites, genes_by_ontology, …)."""
+
+    @pytest.mark.parametrize("name", _GROUP_ID_TOOLS)
+    def test_warnings_field_present(self, tool_fns, name):
+        model = _response_model(tool_fns, name)
+        field = model.model_fields["warnings"]
+        assert field.annotation == list[str]
+        assert field.get_default(call_default_factory=True) == []
+        assert "advisory" in field.description.lower()
+
+
 class TestLocusTagCaseMismatchWarningWrappers:
     """`warnings: list[str]` present on every locus-tag batch tool named in
     the 2b.3 Task 2 brief (append-only; never a second key)."""

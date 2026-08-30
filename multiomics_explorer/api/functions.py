@@ -233,7 +233,9 @@ _LUCENE_SPECIAL = re.compile(r'[+\-!(){}\[\]^"~*?:\\/]')
 
 def _run_fulltext(conn: "GraphConnection", cypher: str, params: dict, search_text: str):
     """Execute a `db.index.fulltext.queryNodes` query, turning a Lucene
-    parse error into a readable `ValueError`.
+    parse error — or a missing / unavailable fulltext index — into a
+    readable `ValueError` (only a real `ParseException` gets the Lucene
+    message; backlog 2b.12).
 
     Call this only for the LAST attempt on a given `search_text` (after
     any escape-and-retry) — every fulltext tool retries once with
@@ -245,12 +247,17 @@ def _run_fulltext(conn: "GraphConnection", cypher: str, params: dict, search_tex
         return conn.execute_query(cypher, **params)
     except Neo4jClientError as exc:
         msg = str(exc)
-        if "ParseException" in msg or "queryNodes" in msg:
-            detail = next((ln for ln in msg.splitlines() if ln.strip()), msg)
+        detail = next((ln for ln in msg.splitlines() if ln.strip()), msg)
+        if "ParseException" in msg:
             raise ValueError(
                 f"search_text {search_text!r} is not valid Lucene syntax: "
                 f"{detail}. Quote phrases, escape special characters, or "
                 f"drop trailing operators."
+            ) from exc
+        if "queryNodes" in msg or "fulltext" in msg.lower():
+            raise ValueError(
+                f"fulltext index unavailable for this query: {detail}. The KG "
+                f"may be mid-rebuild or missing the index — check kg_release_info."
             ) from exc
         raise
 
@@ -3281,7 +3288,7 @@ def genes_by_homolog_group(
     by_organism, top_categories, top_groups,
     not_found_groups, not_matched_groups,
     not_found_organisms, not_matched_organisms, resolved_aliases,
-    returned, truncated, results.
+    warnings (advisory, [] when clean), returned, truncated, results.
     Per result (compact): locus_tag, gene_name, product,
     organism_name, gene_category, group_id.
     Per result (verbose): adds gene_summary, function_description,
@@ -3337,6 +3344,7 @@ def genes_by_homolog_group(
         "not_found_groups": raw_summary["not_found_groups"],
         "not_matched_groups": raw_summary["not_matched_groups"],
         "resolved_aliases": resolved_aliases,
+        "warnings": [],
     }
 
     # Diagnostics query — only when organisms filter is active
@@ -4631,6 +4639,7 @@ def differential_expression_by_ortholog(
     not_found_groups, not_matched_groups,
     not_found_organisms, not_matched_organisms,
     not_found_experiments, not_matched_experiments, resolved_aliases,
+    warnings (advisory, [] when clean),
     returned, truncated, results.
     Per result (compact): group_id, consensus_gene_name, consensus_product,
     experiment_id, treatment_type, organism_name, coculture_partner,
@@ -4826,6 +4835,7 @@ def differential_expression_by_ortholog(
         "not_found_experiments": not_found_experiments,
         "not_matched_experiments": not_matched_experiments,
         "resolved_aliases": resolved_aliases,
+        "warnings": [],
         "returned": len(results),
         "offset": offset,
         "truncated": global_raw["total_matching"] > offset + len(results),
