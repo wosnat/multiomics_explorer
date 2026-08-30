@@ -103,6 +103,10 @@ With `summary=True` the call returns only the envelope (`results=[]`,
 any question that doesn't already specify exact IDs — the rollups
 characterize the full matched set before you commit to a slice.
 Pattern: `summary=True` → narrow filters → drop `summary=True` for detail.
+Exception to "summary is the cheap call": on `metabolites_by_gene` the
+envelope (`by_gene`, `top_metabolites`, …) is computed over the whole
+locus-tag batch, so `summary=True` on 50+ genes costs as much as a detail
+call — use it because the envelope is the artifact, not to save time.
 
 The 6 tools without `summary=`: `kg_schema`, `kg_release_info`, `ontology_term_details`,
 `list_filter_values`, `gene_response_profile`, `run_cypher`. These either return small fixed
