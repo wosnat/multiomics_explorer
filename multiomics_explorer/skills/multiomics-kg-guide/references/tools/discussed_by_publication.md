@@ -312,7 +312,7 @@ discussed_by_publication(publication_dois=['10.1038/ismej.2016.70'])  # to get D
 ```
 
 ```correction
-list_experiments(publication_doi=['10.1038/ismej.2016.70']) then differential_expression_by_gene(experiment_ids=[...])  # discusses edges are prose mentions, not expression data
+list_experiments(publication_dois=['10.1038/ismej.2016.70']) then differential_expression_by_gene(experiment_ids=[...])  # discusses edges are prose mentions, not expression data
 ```
 
 ## Package import equivalent

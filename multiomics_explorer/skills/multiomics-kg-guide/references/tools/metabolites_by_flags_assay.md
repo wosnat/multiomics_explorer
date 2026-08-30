@@ -30,7 +30,7 @@ the metabolomics decision tree.
 | metabolite_ids | list[string] \| None | None | Restrict to specific metabolites. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). Absent from KG → `not_found.metabolite_ids`. |
 | exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
 | experiment_ids | list[string] \| None | None | Filter to assays from these experiments. |
-| publication_doi | list[string] \| None | None | Filter by publication DOI(s). E.g. ['10.1128/msystems.01261-22']. |
+| publication_dois | list[string] \| None | None | Filter by publication DOI(s). E.g. ['10.1128/msystems.01261-22']. |
 | compartment | string \| None | None | Sample compartment ('whole_cell' or 'extracellular'). |
 | treatment_type | list[string] \| None | None | Treatment type(s) (ANY-overlap). |
 | background_factors | list[string] \| None | None | Background factor(s) (ANY-overlap). |

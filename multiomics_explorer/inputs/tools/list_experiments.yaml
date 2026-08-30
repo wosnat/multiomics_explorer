@@ -119,7 +119,7 @@ examples:
       Step 1: list_publications(search_text="Biller")
               → get DOI from results
 
-      Step 2: list_experiments(publication_doi=["10.1038/ismej.2016.70"])
+      Step 2: list_experiments(publication_dois=["10.1038/ismej.2016.70"])
               → browse experiments, pick experiment_id
 
       Step 3: differential_expression_by_gene(organism="MED4", experiment_ids=["..."])
@@ -435,9 +435,9 @@ mistakes:
   - "`organism=` filters the profiled organism only (word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works). It does NOT match coculture partners — for partner-side filtering use `coculture_partner=`. The two filters AND-compose. A genus word alone ('Prochlorococcus') matches every strain of the genus — fine here, but the single-organism expression tools raise on it."
   - "metabolite_count > 0 indicates a metabolomics-paired experiment. Drill into MetaboliteAssay nodes via list_metabolite_assays(experiment_ids=[...])."
   - wrong: "list_experiments(omics_type='RNASEQ')  # bare string"
-    right: "list_experiments(omics_type=['RNASEQ'])  # treatment_type / background_factors / omics_type / table_scope / publication_doi / experiment_ids are lists; a bare string is iterated character by character and silently matches 0 rows"
+    right: "list_experiments(omics_type=['RNASEQ'])  # treatment_type / background_factors / omics_type / table_scope / publication_dois / experiment_ids are lists; a bare string is iterated character by character and silently matches 0 rows"
   - wrong: "list_experiments(publication='Biller 2018')"
-    right: "list_publications(search_text='Biller') then list_experiments(publication_doi=['10.1038/...'])"
+    right: "list_publications(search_text='Biller') then list_experiments(publication_dois=['10.1038/...'])"
   - wrong: "result['results'][0]['time_point_growth_phases']"
     right: "[tp['growth_phase'] for tp in result['results'][0]['timepoints']]"
   - "DataFrame conversion: `to_dataframe(result)` auto-dispatches and returns one row per experiment × timepoint (with `timepoints` unwound and `genes_by_status` inlined at both experiment + timepoint level). See `docs://guide/python_api`."

@@ -37,7 +37,7 @@ primary diagnostic when a real DM produces zero rows.
 | organism | string \| None | None | Organism to scope the DM set to. Accepts short strain code ('MED4', 'NATL2A', 'MIT9312') or full name; word-based, case-insensitive match. Single-organism is **not** enforced — omit to drill across all organisms a metric_type spans. |
 | locus_tags | list[string] \| None | None | Restrict drill-down to a specific gene set (e.g. DE hits from `differential_expression_by_gene`). Filter on `g.locus_tag IN $locus_tags` post-MATCH. Genes with no edge for the selected DM produce no row (silent — surfaced via `total_genes` shortfall). |
 | experiment_ids | list[string] \| None | None | Scope to DMs from one or more experiments. |
-| publication_doi | list[string] \| None | None | Scope to DMs from one or more publications. |
+| publication_dois | list[string] \| None | None | Scope to DMs from one or more publications. |
 | compartment | string \| None | None | Sample compartment ('whole_cell', 'vesicle', 'exoproteome', 'extracellular'). Exact match. |
 | treatment_type | list[string] \| None | None | Treatment type(s) (e.g. ['diel', 'compartment']). ANY-overlap. Case-insensitive. |
 | background_factors | list[string] \| None | None | Background factor(s) (e.g. ['axenic', 'light']). ANY-overlap. Case-insensitive. |

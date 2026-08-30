@@ -17,7 +17,7 @@ Routing: drill via `differential_expression_by_gene(experiment_ids=[id])` for pe
 | background_factors | list[string] \| None | None | Filter by background experimental factors (case-insensitive exact match). E.g. ['axenic', 'diel']. Background factors describe experimental context beyond the primary treatment. Live vocabulary: list_experiments(summary=True). |
 | growth_phases | list[string] \| None | None | Filter by growth phase(s) (case-insensitive). Physiological state of the culture at sampling time. E.g. ['exponential', 'nutrient_limited']. |
 | omics_type | list[string] \| None | None | Filter by omics platform(s) (case-insensitive). E.g. ['RNASEQ', 'PROTEOMICS']. |
-| publication_doi | list[string] \| None | None | Filter by publication DOI(s) (case-insensitive exact match). Get DOIs from list_publications. E.g. ['10.1038/ismej.2016.70']. |
+| publication_dois | list[string] \| None | None | Filter by publication DOI(s) (case-insensitive exact match). Get DOIs from list_publications. E.g. ['10.1038/ismej.2016.70']. |
 | coculture_partner | string \| None | None | Filter by coculture partner organism (word-based, case-insensitive match). Narrows coculture experiments. E.g. 'Alteromonas', 'HOT1A3'. |
 | search_text | string \| None | None | Free-text search on experiment name, treatment, control, experimental context, and light condition (Lucene fulltext, case-insensitive). E.g. 'continuous light', 'diel'. |
 | time_course_only | bool | False | If true, return only time-course experiments (multiple time points). |
@@ -249,7 +249,7 @@ list_experiments(organism="MED4", treatment_type=["nitrogen"], time_course_only=
 Step 1: list_publications(search_text="Biller")
         → get DOI from results
 
-Step 2: list_experiments(publication_doi=["10.1038/ismej.2016.70"])
+Step 2: list_experiments(publication_dois=["10.1038/ismej.2016.70"])
         → browse experiments, pick experiment_id
 
 Step 3: differential_expression_by_gene(organism="MED4", experiment_ids=["..."])
@@ -592,7 +592,7 @@ list_experiments(omics_type='RNASEQ')  # bare string
 ```
 
 ```correction
-list_experiments(omics_type=['RNASEQ'])  # treatment_type / background_factors / omics_type / table_scope / publication_doi / experiment_ids are lists; a bare string is iterated character by character and silently matches 0 rows
+list_experiments(omics_type=['RNASEQ'])  # treatment_type / background_factors / omics_type / table_scope / publication_dois / experiment_ids are lists; a bare string is iterated character by character and silently matches 0 rows
 ```
 
 ```mistake
@@ -600,7 +600,7 @@ list_experiments(publication='Biller 2018')
 ```
 
 ```correction
-list_publications(search_text='Biller') then list_experiments(publication_doi=['10.1038/...'])
+list_publications(search_text='Biller') then list_experiments(publication_dois=['10.1038/...'])
 ```
 
 ```mistake

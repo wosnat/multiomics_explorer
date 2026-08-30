@@ -32,7 +32,7 @@ kind-specific drill-downs.
 | treatment_type | list[string] \| None | None | Treatment type(s) to match. Returns DMs whose treatment_type list overlaps ANY of the given values (e.g. 'diel', 'darkness', 'nitrogen'). Case-insensitive. Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True). |
 | background_factors | list[string] \| None | None | Background experimental factor(s) to match (e.g. 'axenic', 'coculture', 'diel'). Returns DMs overlapping ANY given value. Case-insensitive. |
 | growth_phases | list[string] \| None | None | Growth phase(s) to match (e.g. 'darkness', 'exponential'). Case-insensitive. |
-| publication_doi | list[string] \| None | None | Filter by one or more publication DOIs (e.g. '10.1128/mSystems.00040-18'). Exact match. |
+| publication_dois | list[string] \| None | None | Filter by one or more publication DOIs (e.g. '10.1128/mSystems.00040-18'). Exact match. |
 | experiment_ids | list[string] \| None | None | Filter by one or more Experiment node ids. |
 | derived_metric_ids | list[string] \| None | None | Look up specific DMs by their unique id (matches `derived_metric_id` on each result). Use to pin one DM when the same metric_type appears across publications or organisms. |
 | rankable | bool \| None | None | Filter to DMs that support rank / percentile / bucket analysis. Set to True before calling `genes_by_numeric_metric` with `bucket`, `min/max_percentile`, or `max_rank` — those filters require rankable=True on every selected DM. See `docs://guide/conventions` (DM family gating). |
@@ -75,7 +75,7 @@ total_entries, total_matching, by_organism, by_value_kind, by_metric_type, by_co
 |---|---|---|
 | derived_metric_id | string | Unique id for this DerivedMetric. Pass to `derived_metric_ids` on drill-down tools (gene_derived_metrics, genes_by_*_metric) to select this exact DM. |
 | name | string | Human-readable DM name (e.g. 'Transcript:protein amplitude ratio'). |
-| metric_type | string | Category tag identifying what is measured (e.g. 'diel_amplitude_protein_log2'). The same metric_type may appear across organisms / publications — pair with organism or publication_doi when that matters, or use derived_metric_id to pin one specific DM. |
+| metric_type | string | Category tag identifying what is measured (e.g. 'diel_amplitude_protein_log2'). The same metric_type may appear across organisms / publications — pair with organism or publication_dois when that matters, or use derived_metric_id to pin one specific DM. |
 | value_kind | string ('numeric', 'boolean', 'categorical') | Routes to the correct drill-down tool: 'numeric' → genes_by_numeric_metric, 'boolean' → genes_by_boolean_metric, 'categorical' → genes_by_categorical_metric. |
 | rankable | bool | True if this DM supports rank / percentile / bucket analysis on `genes_by_numeric_metric`. Rankable-gated filters raise if every selected DM is non-rankable, soft-exclude on mixed input. See `docs://guide/conventions` (DM family gating). |
 | unit | string | Measurement unit for numeric DMs (e.g. 'hours', 'log2'). Empty string for boolean and categorical DMs. |
@@ -125,7 +125,7 @@ list_derived_metrics(search_text="diel amplitude", limit=5)
 ### Example 4: Per-publication inventory
 
 ```example-call
-list_derived_metrics(publication_doi=["10.1128/mSystems.00040-18"])
+list_derived_metrics(publication_dois=["10.1128/mSystems.00040-18"])
 ```
 
 ### Example 5: Per-organism inventory

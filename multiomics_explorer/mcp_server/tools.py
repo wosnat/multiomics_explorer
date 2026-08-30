@@ -3807,7 +3807,7 @@ def register_tools(mcp: FastMCP):
         derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Value kinds of DerivedMetrics in this publication (subset of {numeric, boolean, categorical}). Use to route to genes_by_{kind}_metric.")
         compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured in this publication (e.g. ['whole_cell', 'vesicle']).")
         # Metabolomics measurement rollup
-        metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this publication (precomputed Publication.metabolite_count). Non-zero on metabolomics-bearing papers. When > 0, drill via list_metabolite_assays(publication_doi=[...]) to inspect the paper's MetaboliteAssay nodes.")
+        metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this publication (precomputed Publication.metabolite_count). Non-zero on metabolomics-bearing papers. When > 0, drill via list_metabolite_assays(publication_dois=[...]) to inspect the paper's MetaboliteAssay nodes.")
         metabolite_assay_count: int = Field(default=0, description="Distinct MetaboliteAssay edges anchored to this publication (precomputed). Diverges from metabolite_count when the same metabolite is measured in multiple compartments per paper.")
         metabolite_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured for metabolomics in this publication (e.g. ['whole_cell', 'extracellular']). Populated only when metabolite_assay_count > 0; [] otherwise.")
         # Literature 'discusses' rollup
@@ -3935,7 +3935,7 @@ def register_tools(mcp: FastMCP):
     ) -> ListPublicationsResponse:
         """List publications with experiment summaries, DM rollups, and metabolomics rollups. Use as the discovery entry point for studies.
 
-        Routing: drill via `list_experiments(publication_doi=[doi])` for per-experiment detail; `list_clustering_analyses(publication_doi=[doi])` for clustering; `list_derived_metrics(publication_doi=[doi])` for non-DE evidence; `list_metabolite_assays(publication_doi=[doi])` when `metabolite_count > 0`. Per-row `derived_metric_value_kinds` routes to `genes_by_{numeric,boolean,categorical}_metric`.
+        Routing: drill via `list_experiments(publication_dois=[doi])` for per-experiment detail; `list_clustering_analyses(publication_dois=[doi])` for clustering; `list_derived_metrics(publication_dois=[doi])` for non-DE evidence; `list_metabolite_assays(publication_dois=[doi])` when `metabolite_count > 0`. Per-row `derived_metric_value_kinds` routes to `genes_by_{numeric,boolean,categorical}_metric`.
         """
         await ctx.info(f"list_publications organism={organism} treatment_type={treatment_type} "
                        f"growth_phases={growth_phases} search_text={search_text} author={author} "
@@ -4159,7 +4159,7 @@ def register_tools(mcp: FastMCP):
             description="Filter by omics platform(s) (case-insensitive). "
             "E.g. ['RNASEQ', 'PROTEOMICS'].",
         )] = None,
-        publication_doi: Annotated[list[str] | None, Field(
+        publication_dois: Annotated[list[str] | None, Field(
             description="Filter by publication DOI(s) (case-insensitive exact match). "
             "Get DOIs from list_publications. "
             "E.g. ['10.1038/ismej.2016.70'].",
@@ -4228,7 +4228,7 @@ def register_tools(mcp: FastMCP):
                 organism=organism, treatment_type=treatment_type,
                 background_factors=background_factors,
                 growth_phases=growth_phases,
-                omics_type=omics_type, publication_doi=publication_doi,
+                omics_type=omics_type, publication_dois=publication_dois,
                 coculture_partner=coculture_partner, search_text=search_text,
                 time_course_only=time_course_only, table_scope=table_scope,
                 experiment_ids=experiment_ids, compartment=compartment,
@@ -5749,7 +5749,7 @@ def register_tools(mcp: FastMCP):
         omics_type: Annotated[str | None, Field(
             description="Filter: " + ", ".join(f"'{v}'" for v in sorted(VALID_OMICS_TYPES)) + ".",
         )] = None,
-        publication_doi: Annotated[list[str] | None, Field(
+        publication_dois: Annotated[list[str] | None, Field(
             description="Filter by publication DOI(s).",
         )] = None,
         experiment_ids: Annotated[list[str] | None, Field(
@@ -5790,7 +5790,7 @@ def register_tools(mcp: FastMCP):
                 cluster_type=cluster_type, treatment_type=treatment_type,
                 background_factors=background_factors,
                 growth_phases=growth_phases,
-                omics_type=omics_type, publication_doi=publication_doi,
+                omics_type=omics_type, publication_dois=publication_dois,
                 experiment_ids=experiment_ids, analysis_ids=analysis_ids,
                 summary=summary, verbose=verbose, limit=limit, offset=offset,
                 conn=conn,
@@ -6048,7 +6048,7 @@ def register_tools(mcp: FastMCP):
                 "Category tag identifying what is measured "
                 "(e.g. 'diel_amplitude_protein_log2'). The same metric_type may "
                 "appear across organisms / publications — pair with organism or "
-                "publication_doi when that matters, or use derived_metric_id to "
+                "publication_dois when that matters, or use derived_metric_id to "
                 "pin one specific DM."
             ),
         )
@@ -6326,7 +6326,7 @@ def register_tools(mcp: FastMCP):
                 "Case-insensitive."
             ),
         )] = None,
-        publication_doi: Annotated[list[str] | None, Field(
+        publication_dois: Annotated[list[str] | None, Field(
             description=(
                 "Filter by one or more publication DOIs "
                 "(e.g. '10.1128/mSystems.00040-18'). Exact match."
@@ -6409,7 +6409,7 @@ def register_tools(mcp: FastMCP):
                 compartment=compartment, omics_type=omics_type,
                 treatment_type=treatment_type,
                 background_factors=background_factors,
-                growth_phases=growth_phases, publication_doi=publication_doi,
+                growth_phases=growth_phases, publication_dois=publication_dois,
                 experiment_ids=experiment_ids,
                 derived_metric_ids=derived_metric_ids,
                 rankable=rankable, has_p_value=has_p_value,
@@ -6525,7 +6525,7 @@ def register_tools(mcp: FastMCP):
         background_factors: Annotated[list[str] | None, Field(
             description="Filter by background factors.",
         )] = None,
-        publication_doi: Annotated[list[str] | None, Field(
+        publication_dois: Annotated[list[str] | None, Field(
             description="Filter by publication DOI(s).",
         )] = None,
         analysis_ids: Annotated[list[str] | None, Field(
@@ -6561,7 +6561,7 @@ def register_tools(mcp: FastMCP):
                 locus_tags, organism=organism,
                 cluster_type=cluster_type, treatment_type=treatment_type,
                 background_factors=background_factors,
-                publication_doi=publication_doi,
+                publication_dois=publication_dois,
                 analysis_ids=analysis_ids,
                 summary=summary, verbose=verbose, limit=limit, offset=offset,
                 conn=conn,
@@ -6626,7 +6626,7 @@ def register_tools(mcp: FastMCP):
         metric_types: Annotated[list[str] | None, Field(
             description="Filter by metric_type tags (e.g. "
                         "'diel_amplitude_protein_log2'). Same metric_type may "
-                        "appear across publications — pair with publication_doi "
+                        "appear across publications — pair with publication_dois "
                         "or use derived_metric_ids to pin one specific DM.",
         )] = None,
         value_kind: Annotated[
@@ -6650,7 +6650,7 @@ def register_tools(mcp: FastMCP):
             description="Background experimental factor(s) to match. "
                         "ANY-overlap. Case-insensitive.",
         )] = None,
-        publication_doi: Annotated[list[str] | None, Field(
+        publication_dois: Annotated[list[str] | None, Field(
             description="Filter by one or more publication DOIs. Exact match.",
         )] = None,
         derived_metric_ids: Annotated[list[str] | None, Field(
@@ -6709,7 +6709,7 @@ def register_tools(mcp: FastMCP):
                 metric_types=metric_types, value_kind=value_kind,
                 compartment=compartment, treatment_type=treatment_type,
                 background_factors=background_factors,
-                publication_doi=publication_doi,
+                publication_dois=publication_dois,
                 derived_metric_ids=derived_metric_ids,
                 summary=summary, verbose=verbose,
                 limit=limit, offset=offset, conn=conn,
@@ -7766,7 +7766,7 @@ def register_tools(mcp: FastMCP):
         experiment_ids: Annotated[list[str] | None, Field(
             description="Scope to DMs from one or more experiments.",
         )] = None,
-        publication_doi: Annotated[list[str] | None, Field(
+        publication_dois: Annotated[list[str] | None, Field(
             description="Scope to DMs from one or more publications.",
         )] = None,
         compartment: Annotated[str | None, Field(
@@ -7908,7 +7908,7 @@ def register_tools(mcp: FastMCP):
                 organism=organism,
                 locus_tags=locus_tags,
                 experiment_ids=experiment_ids,
-                publication_doi=publication_doi,
+                publication_dois=publication_dois,
                 compartment=compartment,
                 treatment_type=treatment_type,
                 background_factors=background_factors,
@@ -8135,7 +8135,7 @@ def register_tools(mcp: FastMCP):
                         "entirely (any kind, any organism), or scoped out "
                         "by compartment / treatment_type / "
                         "background_factors / growth_phases / "
-                        "publication_doi / experiment_ids.")
+                        "publication_dois / experiment_ids.")
         not_matched_ids: list[str] = Field(
             default_factory=list,
             description="`derived_metric_ids` that exist but produced 0 "
@@ -8219,7 +8219,7 @@ def register_tools(mcp: FastMCP):
         experiment_ids: Annotated[list[str] | None, Field(
             description="Scope to DMs from one or more experiments.",
         )] = None,
-        publication_doi: Annotated[list[str] | None, Field(
+        publication_dois: Annotated[list[str] | None, Field(
             description="Scope to DMs from one or more publications.",
         )] = None,
         compartment: Annotated[str | None, Field(
@@ -8318,7 +8318,7 @@ def register_tools(mcp: FastMCP):
                 organism=organism,
                 locus_tags=locus_tags,
                 experiment_ids=experiment_ids,
-                publication_doi=publication_doi,
+                publication_dois=publication_dois,
                 compartment=compartment,
                 treatment_type=treatment_type,
                 background_factors=background_factors,
@@ -8538,7 +8538,7 @@ def register_tools(mcp: FastMCP):
                         "entirely (any kind, any organism), or scoped out "
                         "by compartment / treatment_type / "
                         "background_factors / growth_phases / "
-                        "publication_doi / experiment_ids.")
+                        "publication_dois / experiment_ids.")
         not_matched_ids: list[str] = Field(
             default_factory=list,
             description="`derived_metric_ids` that exist but produced 0 "
@@ -8623,7 +8623,7 @@ def register_tools(mcp: FastMCP):
         experiment_ids: Annotated[list[str] | None, Field(
             description="Scope to DMs from one or more experiments.",
         )] = None,
-        publication_doi: Annotated[list[str] | None, Field(
+        publication_dois: Annotated[list[str] | None, Field(
             description="Scope to DMs from one or more publications.",
         )] = None,
         compartment: Annotated[str | None, Field(
@@ -8714,7 +8714,7 @@ def register_tools(mcp: FastMCP):
                 organism=organism,
                 locus_tags=locus_tags,
                 experiment_ids=experiment_ids,
-                publication_doi=publication_doi,
+                publication_dois=publication_dois,
                 compartment=compartment,
                 treatment_type=treatment_type,
                 background_factors=background_factors,
@@ -9749,7 +9749,7 @@ def register_tools(mcp: FastMCP):
             description="ANY-overlap. Currently unpopulated — KG-side "
                         "backfill pending.",
         )] = None,
-        publication_doi: Annotated[list[str] | None, Field(
+        publication_dois: Annotated[list[str] | None, Field(
             description="DOI(s). Exact match. E.g. "
                         "['10.1073/pnas.2213271120', "
                         "'10.1128/msystems.01261-22'].",
@@ -9821,7 +9821,7 @@ def register_tools(mcp: FastMCP):
                 compartment=compartment, treatment_type=treatment_type,
                 background_factors=background_factors,
                 growth_phases=growth_phases,
-                publication_doi=publication_doi,
+                publication_dois=publication_dois,
                 experiment_ids=experiment_ids,
                 assay_ids=assay_ids, metabolite_ids=metabolite_ids,
                 exclude_metabolite_ids=exclude_metabolite_ids,
@@ -10171,7 +10171,7 @@ def register_tools(mcp: FastMCP):
         experiment_ids: Annotated[list[str] | None, Field(
             description="Filter to assays from these experiments.",
         )] = None,
-        publication_doi: Annotated[list[str] | None, Field(
+        publication_dois: Annotated[list[str] | None, Field(
             description="Filter by publication DOI(s). Exact match. E.g. "
                         "['10.1073/pnas.2213271120'].",
         )] = None,
@@ -10293,7 +10293,7 @@ def register_tools(mcp: FastMCP):
                 metabolite_ids=metabolite_ids,
                 exclude_metabolite_ids=exclude_metabolite_ids,
                 experiment_ids=experiment_ids,
-                publication_doi=publication_doi,
+                publication_dois=publication_dois,
                 compartment=compartment,
                 treatment_type=treatment_type,
                 background_factors=background_factors,
@@ -10519,7 +10519,7 @@ def register_tools(mcp: FastMCP):
         experiment_ids: Annotated[list[str] | None, Field(
             description="Filter to assays from these experiments.",
         )] = None,
-        publication_doi: Annotated[list[str] | None, Field(
+        publication_dois: Annotated[list[str] | None, Field(
             description="Filter by publication DOI(s). E.g. "
                         "['10.1128/msystems.01261-22'].",
         )] = None,
@@ -10590,7 +10590,7 @@ def register_tools(mcp: FastMCP):
                 metabolite_ids=metabolite_ids,
                 exclude_metabolite_ids=exclude_metabolite_ids,
                 experiment_ids=experiment_ids,
-                publication_doi=publication_doi,
+                publication_dois=publication_dois,
                 compartment=compartment,
                 treatment_type=treatment_type,
                 background_factors=background_factors,

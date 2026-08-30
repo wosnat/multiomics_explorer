@@ -30,7 +30,7 @@ for reverse lookup across both arms, and
 | treatment_type | list[string] \| None | None | ANY-overlap. E.g. ['carbon'], ['phosphorus', 'growth_phase']. |
 | background_factors | list[string] \| None | None | ANY-overlap. E.g. ['axenic', 'light']. |
 | growth_phases | list[string] \| None | None | ANY-overlap. Currently unpopulated — KG-side backfill pending. |
-| publication_doi | list[string] \| None | None | DOI(s). Exact match. E.g. ['10.1073/pnas.2213271120', '10.1128/msystems.01261-22']. |
+| publication_dois | list[string] \| None | None | DOI(s). Exact match. E.g. ['10.1073/pnas.2213271120', '10.1128/msystems.01261-22']. |
 | experiment_ids | list[string] \| None | None | Experiment node id(s). |
 | assay_ids | list[string] \| None | None | MetaboliteAssay id(s). `not_found.assay_ids` lists unknowns. |
 | metabolite_ids | list[string] \| None | None | Restrict to assays measuring at least one of these metabolites (1-hop via either assay edge). Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
@@ -189,7 +189,7 @@ list_metabolite_assays(metabolite_ids=["kegg.compound:C00074"])
 ### Example 5: Per-paper inventory
 
 ```example-call
-list_metabolite_assays(publication_doi=["10.1073/pnas.2213271120"])
+list_metabolite_assays(publication_dois=["10.1073/pnas.2213271120"])
 ```
 
 ## Chaining patterns

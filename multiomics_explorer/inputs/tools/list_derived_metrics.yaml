@@ -13,7 +13,7 @@ examples:
     call: list_derived_metrics(search_text="diel amplitude", limit=5)
 
   - title: Per-publication inventory
-    call: list_derived_metrics(publication_doi=["10.1128/mSystems.00040-18"])
+    call: list_derived_metrics(publication_dois=["10.1128/mSystems.00040-18"])
 
   - title: Per-organism inventory
     call: list_derived_metrics(organism="NATL2A", verbose=True)

@@ -4,7 +4,7 @@
 
 List publications with experiment summaries, DM rollups, and metabolomics rollups. Use as the discovery entry point for studies.
 
-Routing: drill via `list_experiments(publication_doi=[doi])` for per-experiment detail; `list_clustering_analyses(publication_doi=[doi])` for clustering; `list_derived_metrics(publication_doi=[doi])` for non-DE evidence; `list_metabolite_assays(publication_doi=[doi])` when `metabolite_count > 0`. Per-row `derived_metric_value_kinds` routes to `genes_by_{numeric,boolean,categorical}_metric`.
+Routing: drill via `list_experiments(publication_dois=[doi])` for per-experiment detail; `list_clustering_analyses(publication_dois=[doi])` for clustering; `list_derived_metrics(publication_dois=[doi])` for non-DE evidence; `list_metabolite_assays(publication_dois=[doi])` when `metabolite_count > 0`. Per-row `derived_metric_value_kinds` routes to `genes_by_{numeric,boolean,categorical}_metric`.
 
 ## Parameters
 
@@ -73,7 +73,7 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 | derived_metric_count | int (optional) | Number of DerivedMetric nodes from this publication. |
 | derived_metric_value_kinds | list[string] (optional) | Value kinds of DerivedMetrics in this publication (subset of {numeric, boolean, categorical}). Use to route to genes_by_{kind}_metric. |
 | compartments | list[string] (optional) | Wet-lab compartments measured in this publication (e.g. ['whole_cell', 'vesicle']). |
-| metabolite_count | int (optional) | Distinct metabolites measured in this publication (precomputed Publication.metabolite_count). Non-zero on metabolomics-bearing papers. When > 0, drill via list_metabolite_assays(publication_doi=[...]) to inspect the paper's MetaboliteAssay nodes. |
+| metabolite_count | int (optional) | Distinct metabolites measured in this publication (precomputed Publication.metabolite_count). Non-zero on metabolomics-bearing papers. When > 0, drill via list_metabolite_assays(publication_dois=[...]) to inspect the paper's MetaboliteAssay nodes. |
 | metabolite_assay_count | int (optional) | Distinct MetaboliteAssay edges anchored to this publication (precomputed). Diverges from metabolite_count when the same metabolite is measured in multiple compartments per paper. |
 | metabolite_compartments | list[string] (optional) | Wet-lab compartments measured for metabolomics in this publication (e.g. ['whole_cell', 'extracellular']). Populated only when metabolite_assay_count > 0; [] otherwise. |
 | discussed_gene_count | int (optional) | Distinct genes this publication discusses in prose (precomputed Publication.discussed_gene_count). Recall-biased narrative index, NOT DE-table expression. When > 0, drill via discussed_by_publication(publication_dois=[doi]). |
@@ -257,7 +257,7 @@ list_publications(treatment_type="coculture")
 Step 1: list_publications(organism="MED4")
         → find papers studying MED4
 
-Step 2: list_experiments(publication_doi=[result["doi"]])
+Step 2: list_experiments(publication_dois=[result["doi"]])
         → drill into experiments from a specific paper
 
 Step 3: genes_by_function(search_text="photosystem", organism="MED4")
@@ -716,11 +716,11 @@ list_publications()
 ```
 list_publications → list_experiments → differential_expression_by_gene
 list_publications → genes_by_function
-list_publications → list_clustering_analyses(publication_doi=[...])
+list_publications → list_clustering_analyses(publication_dois=[...])
 list_publications(search_text=..., verbose=True) → classify → list_publications(publication_dois=[...]) for the picked subset
 list_publications(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric
 list_filter_values(filter_type='metric_type') → list_publications(search_text='<metric_type>') to find publications with that metric
-list_publications (per-row `metabolite_count > 0`) → list_metabolite_assays(publication_doi=[...]) to inspect the paper's MetaboliteAssay nodes (numeric vs boolean, compartment, detection-status rollup).
+list_publications (per-row `metabolite_count > 0`) → list_metabolite_assays(publication_dois=[...]) to inspect the paper's MetaboliteAssay nodes (numeric vs boolean, compartment, detection-status rollup).
 list_publications (per-row `discussed_gene_count` or `discussed_pathway_count` > 0) → discussed_by_publication(publication_dois=[...]) to list the genes + KEGG pathways the paper names in prose.
 ```
 
@@ -738,7 +738,7 @@ list_publications (per-row `discussed_gene_count` or `discussed_pathway_count` >
 
 - experiment_count is per-publication — a publication with experiment_count=10 may span multiple organisms and treatment types.
 
-- metabolite_count > 0 indicates a metabolomics-bearing publication. Drill into MetaboliteAssay nodes via list_metabolite_assays(publication_doi=[...]); inspect compartments via metabolite_compartments per row.
+- metabolite_count > 0 indicates a metabolomics-bearing publication. Drill into MetaboliteAssay nodes via list_metabolite_assays(publication_dois=[...]); inspect compartments via metabolite_compartments per row.
 
 - discussed_gene_count / discussed_pathway_count are the paper's prose literature index — the genes + KEGG pathways it names in text (recall-biased, NOT exhaustive, NOT DE-table expression). 0 on both means no narrative index (4 such publications, the `no_discusses` bucket). Drill into the named entities via discussed_by_publication(publication_dois=[...]).
 
@@ -747,7 +747,7 @@ list_experiments(publication='Biller 2018')
 ```
 
 ```correction
-list_publications(search_text='Biller') then list_experiments(publication_doi=['10.1038/...'])
+list_publications(search_text='Biller') then list_experiments(publication_dois=['10.1038/...'])
 ```
 
 ## Package import equivalent

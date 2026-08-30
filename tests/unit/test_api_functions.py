@@ -2706,7 +2706,7 @@ class TestListExperiments:
         ]
         api.list_experiments(
             organism="MED4", treatment_type=["coculture"],
-            omics_type=["RNASEQ"], publication_doi=["10.1234/test"],
+            omics_type=["RNASEQ"], publication_dois=["10.1234/test"],
             coculture_partner="Alteromonas", time_course_only=True,
             table_scope=["gene_level"],
             verbose=True, limit=10, conn=mock_conn,
@@ -18584,3 +18584,77 @@ class TestCaseMismatchWarnings:
         conn.execute_query.return_value = [{"locus_tag": "PMM0001"}]
         warnings = self._fn()(conn, ["PMM0001"])
         assert warnings == []
+
+
+# ---------------------------------------------------------------------------
+# R3 (llm-review 2b.5): publication_doi -> publication_dois on the 11 API
+# functions that had the singular list-typed param. Builder kwarg name is
+# unchanged (Layer 1 is internal) — only the api/ surface + the deprecated
+# alias resolution renamed. Mirrors the R1 range-param pattern (Task 3):
+# canonical propagates to the (unchanged) builder kwarg, the old name still
+# works with a DeprecationWarning, both set raises ValueError.
+# ---------------------------------------------------------------------------
+
+class _R3StopProbe(Exception):
+    """Raised from a patched query builder once its kwargs are captured —
+    short-circuits the api function before any further conn access."""
+
+
+class TestR3PublicationDoisRename:
+    _CASES = [
+        ("list_experiments", "build_list_experiments_summary", {}, None),
+        ("list_clustering_analyses", "build_list_clustering_analyses_summary", {}, None),
+        ("list_derived_metrics", "build_list_derived_metrics_summary", {}, None),
+        ("gene_clusters_by_gene", "build_gene_clusters_by_gene_summary",
+         {"locus_tags": ["PMM0001"]}, [{"organisms": ["Prochlorococcus MED4"]}]),
+        ("gene_derived_metrics", "build_gene_derived_metrics_summary",
+         {"locus_tags": ["PMM0001"]}, [{"organisms": ["Prochlorococcus MED4"]}]),
+        ("genes_by_numeric_metric", "build_genes_by_numeric_metric_diagnostics",
+         {"derived_metric_ids": ["dm1"]}, []),
+        ("genes_by_boolean_metric", "build_genes_by_boolean_metric_diagnostics",
+         {"derived_metric_ids": ["dm1"]}, []),
+        ("genes_by_categorical_metric", "build_genes_by_categorical_metric_diagnostics",
+         {"derived_metric_ids": ["dm1"]}, []),
+        ("list_metabolite_assays", "build_list_metabolite_assays_summary", {}, None),
+        ("metabolites_by_quantifies_assay",
+         "build_metabolites_by_quantifies_assay_diagnostics",
+         {"assay_ids": ["a1"]}, []),
+        ("metabolites_by_flags_assay", "build_metabolites_by_flags_assay_summary",
+         {"assay_ids": ["a1"]}, []),
+    ]
+
+    @staticmethod
+    def _mock_conn(rv):
+        conn = MagicMock()
+        conn.execute_query.return_value = [] if rv is None else rv
+        return conn
+
+    @pytest.mark.parametrize("fn_name,builder_name,extra_kwargs,conn_rv", _CASES)
+    def test_canonical_reaches_builder(self, fn_name, builder_name, extra_kwargs, conn_rv):
+        fn = getattr(api, fn_name)
+        with patch(f"multiomics_explorer.api.functions.{builder_name}",
+                    side_effect=_R3StopProbe) as builder_mock:
+            with pytest.raises(_R3StopProbe):
+                fn(publication_dois=["10.1/x"], conn=self._mock_conn(conn_rv),
+                   **extra_kwargs)
+        assert builder_mock.call_args.kwargs.get("publication_doi") == ["10.1/x"]
+
+    @pytest.mark.parametrize("fn_name,builder_name,extra_kwargs,conn_rv", _CASES)
+    def test_deprecated_alias_warns_and_reaches_builder(
+        self, fn_name, builder_name, extra_kwargs, conn_rv,
+    ):
+        fn = getattr(api, fn_name)
+        with patch(f"multiomics_explorer.api.functions.{builder_name}",
+                    side_effect=_R3StopProbe) as builder_mock:
+            with pytest.warns(DeprecationWarning, match="publication_doi"):
+                with pytest.raises(_R3StopProbe):
+                    fn(publication_doi=["10.1/x"], conn=self._mock_conn(conn_rv),
+                       **extra_kwargs)
+        assert builder_mock.call_args.kwargs.get("publication_doi") == ["10.1/x"]
+
+    @pytest.mark.parametrize("fn_name,builder_name,extra_kwargs,conn_rv", _CASES)
+    def test_both_set_raises(self, fn_name, builder_name, extra_kwargs, conn_rv):
+        fn = getattr(api, fn_name)
+        with pytest.raises(ValueError):
+            fn(publication_dois=["a"], publication_doi=["b"],
+               conn=self._mock_conn(conn_rv), **extra_kwargs)

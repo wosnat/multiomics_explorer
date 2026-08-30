@@ -42,7 +42,7 @@ organism-existence, kind-mismatch, and positive-only-flag notices.
 | organism | string \| None | None | Organism to scope the DM set to. Accepts short strain code ('MED4', 'NATL2A', 'MIT9313') or full name; word-based, case-insensitive match. Single-organism is **not** enforced — omit to drill across all organisms a metric_type spans. |
 | locus_tags | list[string] \| None | None | Restrict drill-down to a specific gene set (e.g. DE hits from `differential_expression_by_gene`). Filter on `g.locus_tag IN $locus_tags` post-MATCH. Genes with no edge for the selected DM produce no row. |
 | experiment_ids | list[string] \| None | None | Scope to DMs from one or more experiments. |
-| publication_doi | list[string] \| None | None | Scope to DMs from one or more publications. |
+| publication_dois | list[string] \| None | None | Scope to DMs from one or more publications. |
 | compartment | string \| None | None | Sample compartment ('whole_cell', 'vesicle', 'exoproteome', 'extracellular'). Exact match. |
 | treatment_type | list[string] \| None | None | Treatment type(s) (e.g. ['diel']). ANY-overlap. Case-insensitive. |
 | background_factors | list[string] \| None | None | Background factor(s) (e.g. ['axenic', 'light']). ANY-overlap. Case-insensitive. |
@@ -75,7 +75,7 @@ total_matching, total_derived_metrics, total_genes, by_organism, by_compartment,
 - **by_metric** (list[GenesByBooleanMetricBreakdown]): Per-DM rollup: filtered-slice true/false counts + full-DM precomputed tallies. Sorted by count desc.
 - **genes_per_metric_max** (int): Largest per-DM gene count.
 - **genes_per_metric_median** (float): Median per-DM gene count.
-- **not_found_ids** (list[string]): `derived_metric_ids` inputs absent from the KG entirely (any kind, any organism), or scoped out by compartment / treatment_type / background_factors / growth_phases / publication_doi / experiment_ids.
+- **not_found_ids** (list[string]): `derived_metric_ids` inputs absent from the KG entirely (any kind, any organism), or scoped out by compartment / treatment_type / background_factors / growth_phases / publication_dois / experiment_ids.
 - **not_matched_ids** (list[string]): `derived_metric_ids` that exist but produced 0 rows — either a different `value_kind` (see `warnings` for the sibling tool to use) or 0 rows after edge-level filters.
 - **not_found_metric_types** (list[string]): `metric_types` inputs that match no DM after scoping.
 - **not_matched_metric_types** (list[string]): `metric_types` whose DMs produced 0 rows.

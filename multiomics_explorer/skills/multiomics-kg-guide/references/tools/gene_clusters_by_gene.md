@@ -20,7 +20,7 @@ into a cluster's full membership via `genes_in_cluster`.
 | cluster_type | string \| None | None | Filter by cluster type. Live vocabulary: list_filter_values(filter_type='cluster_type'). Offline examples: 'condition_comparison', 'decay_pattern', 'diel', 'expression_bin', 'genomic_island', 'time_course'. |
 | treatment_type | list[string] \| None | None | Filter by treatment type(s). |
 | background_factors | list[string] \| None | None | Filter by background factors. |
-| publication_doi | list[string] \| None | None | Filter by publication DOI(s). |
+| publication_dois | list[string] \| None | None | Filter by publication DOI(s). |
 | analysis_ids | list[string] \| None | None | Filter by clustering analysis IDs. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include cluster_method, member_count, cluster_functional_description, cluster_expression_dynamics, cluster_temporal_pattern, treatment, light_condition, experimental_context, p_value. |

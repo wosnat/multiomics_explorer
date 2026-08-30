@@ -2806,7 +2806,7 @@ class TestListExperimentsWrapper:
                 organism="MED4",
                 treatment_type=["coculture"],
                 omics_type=["RNASEQ"],
-                publication_doi=["10.1234/test"],
+                publication_dois=["10.1234/test"],
                 coculture_partner="Alteromonas",
                 search_text="light",
                 time_course_only=True,
@@ -2818,7 +2818,7 @@ class TestListExperimentsWrapper:
         assert kw["organism"] == "MED4"
         assert kw["treatment_type"] == ["coculture"]
         assert kw["omics_type"] == ["RNASEQ"]
-        assert kw["publication_doi"] == ["10.1234/test"]
+        assert kw["publication_dois"] == ["10.1234/test"]
         assert kw["coculture_partner"] == "Alteromonas"
         assert kw["search_text"] == "light"
         assert kw["time_course_only"] is True
@@ -5212,7 +5212,7 @@ class TestGenesByBooleanMetricWrapper:
                 organism="MED4",
                 locus_tags=["PMM0090", "PMM0097"],
                 experiment_ids=["exp:biller2014:med4_vesicle"],
-                publication_doi=["10.1111/1462-2920.12187"],
+                publication_dois=["10.1111/1462-2920.12187"],
                 compartment="vesicle",
                 treatment_type=["compartment"],
                 background_factors=["axenic"],
@@ -5229,7 +5229,7 @@ class TestGenesByBooleanMetricWrapper:
         assert kwargs["organism"] == "MED4"
         assert kwargs["locus_tags"] == ["PMM0090", "PMM0097"]
         assert kwargs["experiment_ids"] == ["exp:biller2014:med4_vesicle"]
-        assert kwargs["publication_doi"] == ["10.1111/1462-2920.12187"]
+        assert kwargs["publication_dois"] == ["10.1111/1462-2920.12187"]
         assert kwargs["compartment"] == "vesicle"
         assert kwargs["treatment_type"] == ["compartment"]
         assert kwargs["background_factors"] == ["axenic"]
@@ -5454,7 +5454,7 @@ class TestGenesByCategoricalMetricWrapper:
                 organism="MED4",
                 locus_tags=["PMM0097"],
                 experiment_ids=["exp:biller2014:med4_vesicle"],
-                publication_doi=["10.1111/1462-2920.12187"],
+                publication_dois=["10.1111/1462-2920.12187"],
                 compartment="vesicle",
                 treatment_type=["compartment"],
                 background_factors=["axenic"],
@@ -5472,7 +5472,7 @@ class TestGenesByCategoricalMetricWrapper:
         assert kwargs["organism"] == "MED4"
         assert kwargs["locus_tags"] == ["PMM0097"]
         assert kwargs["experiment_ids"] == ["exp:biller2014:med4_vesicle"]
-        assert kwargs["publication_doi"] == ["10.1111/1462-2920.12187"]
+        assert kwargs["publication_dois"] == ["10.1111/1462-2920.12187"]
         assert kwargs["compartment"] == "vesicle"
         assert kwargs["treatment_type"] == ["compartment"]
         assert kwargs["background_factors"] == ["axenic"]
@@ -12049,3 +12049,15 @@ def test_r1_range_param_names(tool, expected, forbidden):
     props = set(_all_tool_input_schemas()[tool]["properties"])
     assert expected <= props
     assert not (forbidden & props)
+
+
+def test_r3_publication_dois_everywhere():
+    """R3: ID batches are plural — no tool exposes the singular list-typed
+    name. 11 tools had `publication_doi` renamed to `publication_dois`;
+    `list_publications` and `discussed_by_publication` already used the
+    plural — 13 tools carry `publication_dois` in total."""
+    schemas = _all_tool_input_schemas()
+    singular = [n for n, s in schemas.items() if "publication_doi" in s["properties"]]
+    assert singular == [], singular
+    plural = [n for n, s in schemas.items() if "publication_dois" in s["properties"]]
+    assert len(plural) == 13, plural

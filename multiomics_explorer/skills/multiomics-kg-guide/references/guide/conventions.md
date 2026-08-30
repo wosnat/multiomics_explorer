@@ -151,7 +151,7 @@ Across tools the convention is consistent — but the exact meaning depends
 on what's being filtered:
 
 - **List filters that select rows by ID** (`metabolite_ids=[...]`,
-  `experiment_ids=[...]`, `publication_doi=[...]`,
+  `experiment_ids=[...]`,
   `publication_dois=[...]`, `assay_ids=[...]`,
   `analysis_ids=[...]`, `cluster_ids=[...]`, `derived_metric_ids=[...]`,
   `term_ids=[...]`, `group_ids=[...]`, `locus_tags=[...]`,

@@ -2617,7 +2617,7 @@ def list_experiments(
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     omics_type: list[str] | None = None,
-    publication_doi: list[str] | None = None,
+    publication_dois: list[str] | None = None,
     coculture_partner: str | None = None,
     search_text: str | None = None,
     time_course_only: bool = False,
@@ -2631,6 +2631,7 @@ def list_experiments(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
+    publication_doi: list[str] | None = None,
 ) -> dict:
     """List experiments with gene count statistics.
 
@@ -2697,6 +2698,10 @@ def list_experiments(
     regardless of timepoint. For non-time-course experiments the two are
     equal. Per-TP detail lives in ``timepoints[].gene_count``.
     """
+    publication_dois = deprecated_alias(
+        old=publication_doi, new=publication_dois,
+        old_name="publication_doi", new_name="publication_dois",
+    )
     if summary:
         limit = 0
 
@@ -2711,7 +2716,7 @@ def list_experiments(
     filter_kwargs = dict(
         organism=organism, treatment_type=treatment_type,
         background_factors=background_factors,
-        omics_type=omics_type, publication_doi=publication_doi,
+        omics_type=omics_type, publication_doi=publication_dois,
         coculture_partner=coculture_partner, search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
         growth_phases=growth_phases, experiment_ids=experiment_ids,
@@ -5059,7 +5064,7 @@ def list_clustering_analyses(
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
     omics_type: str | None = None,
-    publication_doi: list[str] | None = None,
+    publication_dois: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     analysis_ids: list[str] | None = None,
     summary: bool = False,
@@ -5068,6 +5073,7 @@ def list_clustering_analyses(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
+    publication_doi: list[str] | None = None,
 ) -> dict:
     """Browse, search, and filter clustering analyses.
 
@@ -5091,6 +5097,10 @@ def list_clustering_analyses(
     growth_phases: if provided, restricts to analyses whose growth_phases
     array contains any of the specified values (case-insensitive).
     """
+    publication_dois = deprecated_alias(
+        old=publication_doi, new=publication_dois,
+        old_name="publication_doi", new_name="publication_dois",
+    )
     if search_text is not None and not search_text.strip():
         raise ValueError("search_text must not be empty.")
     if summary:
@@ -5109,7 +5119,7 @@ def list_clustering_analyses(
         organism=organism, cluster_type=cluster_type,
         treatment_type=treatment_type, background_factors=background_factors,
         growth_phases=growth_phases,
-        omics_type=omics_type, publication_doi=publication_doi,
+        omics_type=omics_type, publication_doi=publication_dois,
         experiment_ids=experiment_ids, analysis_ids=analysis_ids,
     )
 
@@ -5219,7 +5229,7 @@ def list_derived_metrics(
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
-    publication_doi: list[str] | None = None,
+    publication_dois: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     derived_metric_ids: list[str] | None = None,
     rankable: bool | None = None,
@@ -5230,6 +5240,7 @@ def list_derived_metrics(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
+    publication_doi: list[str] | None = None,
 ) -> dict:
     """Browse, search, and filter DerivedMetric nodes.
 
@@ -5252,6 +5263,10 @@ def list_derived_metrics(
 
     summary=True: results=[], summary fields only.
     """
+    publication_dois = deprecated_alias(
+        old=publication_doi, new=publication_dois,
+        old_name="publication_doi", new_name="publication_dois",
+    )
     if search_text is not None and not search_text.strip():
         raise ValueError("search_text must not be empty.")
     if summary:
@@ -5270,7 +5285,7 @@ def list_derived_metrics(
         organism=organism, metric_types=metric_types, value_kind=value_kind,
         compartment=compartment, omics_type=omics_type,
         treatment_type=treatment_type, background_factors=background_factors,
-        growth_phases=growth_phases, publication_doi=publication_doi,
+        growth_phases=growth_phases, publication_doi=publication_dois,
         experiment_ids=experiment_ids, derived_metric_ids=derived_metric_ids,
         rankable=rankable, has_p_value=has_p_value,
     )
@@ -5360,7 +5375,7 @@ def gene_clusters_by_gene(
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
-    publication_doi: list[str] | None = None,
+    publication_dois: list[str] | None = None,
     analysis_ids: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
@@ -5368,6 +5383,7 @@ def gene_clusters_by_gene(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
+    publication_doi: list[str] | None = None,
 ) -> dict:
     """Gene-centric cluster lookup. Single organism enforced.
 
@@ -5395,6 +5411,10 @@ def gene_clusters_by_gene(
     Raises:
         ValueError: if locus_tags is empty or spans multiple organisms.
     """
+    publication_dois = deprecated_alias(
+        old=publication_doi, new=publication_dois,
+        old_name="publication_doi", new_name="publication_dois",
+    )
     if not locus_tags:
         raise ValueError("locus_tags must not be empty.")
     if summary:
@@ -5416,7 +5436,7 @@ def gene_clusters_by_gene(
     filter_kwargs = dict(
         cluster_type=cluster_type, treatment_type=treatment_type,
         background_factors=background_factors,
-        publication_doi=publication_doi,
+        publication_doi=publication_dois,
         analysis_ids=analysis_ids,
     )
 
@@ -5472,7 +5492,7 @@ def gene_derived_metrics(
     compartment: str | None = None,
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
-    publication_doi: list[str] | None = None,
+    publication_dois: list[str] | None = None,
     derived_metric_ids: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
@@ -5480,6 +5500,7 @@ def gene_derived_metrics(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
+    publication_doi: list[str] | None = None,
 ) -> dict:
     """Gene-centric DerivedMetric lookup. Single organism enforced.
 
@@ -5514,6 +5535,10 @@ def gene_derived_metrics(
         ValueError: locus_tags empty, or spans multiple organisms,
                     or organism arg conflicts with inferred organism.
     """
+    publication_dois = deprecated_alias(
+        old=publication_doi, new=publication_dois,
+        old_name="publication_doi", new_name="publication_dois",
+    )
     if not locus_tags:
         raise ValueError("locus_tags must not be empty.")
     if summary:
@@ -5570,7 +5595,7 @@ def gene_derived_metrics(
         metric_types=metric_types, value_kind=value_kind,
         compartment=compartment, treatment_type=treatment_type,
         background_factors=background_factors,
-        publication_doi=publication_doi,
+        publication_doi=publication_dois,
         derived_metric_ids=derived_metric_ids,
     )
 
@@ -5653,7 +5678,7 @@ def genes_by_numeric_metric(
     organism: str | None = None,
     locus_tags: list[str] | None = None,
     experiment_ids: list[str] | None = None,
-    publication_doi: list[str] | None = None,
+    publication_dois: list[str] | None = None,
     compartment: str | None = None,
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
@@ -5672,6 +5697,7 @@ def genes_by_numeric_metric(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
+    publication_doi: list[str] | None = None,
 ) -> dict:
     """Numeric DerivedMetric drill-down. Cross-organism by design.
 
@@ -5716,6 +5742,10 @@ def genes_by_numeric_metric(
                     has_p_value-gated filter used and ALL selected DMs
                     has_p_value=False.
     """
+    publication_dois = deprecated_alias(
+        old=publication_doi, new=publication_dois,
+        old_name="publication_doi", new_name="publication_dois",
+    )
     # 1. Mutual exclusion check
     if derived_metric_ids is not None and metric_types is not None:
         raise ValueError(
@@ -5735,7 +5765,7 @@ def genes_by_numeric_metric(
         derived_metric_ids=derived_metric_ids,
         metric_types=metric_types,
         experiment_ids=experiment_ids,
-        publication_doi=publication_doi,
+        publication_doi=publication_dois,
         compartment=compartment,
         treatment_type=treatment_type,
         background_factors=background_factors,
@@ -6020,7 +6050,7 @@ def genes_by_boolean_metric(
     organism: str | None = None,
     locus_tags: list[str] | None = None,
     experiment_ids: list[str] | None = None,
-    publication_doi: list[str] | None = None,
+    publication_dois: list[str] | None = None,
     compartment: str | None = None,
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
@@ -6032,6 +6062,7 @@ def genes_by_boolean_metric(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
+    publication_doi: list[str] | None = None,
 ) -> dict:
     """Boolean DerivedMetric drill-down. Cross-organism by design.
 
@@ -6080,6 +6111,10 @@ def genes_by_boolean_metric(
     Raises:
         ValueError: derived_metric_ids+metric_types both/neither set.
     """
+    publication_dois = deprecated_alias(
+        old=publication_doi, new=publication_dois,
+        old_name="publication_doi", new_name="publication_dois",
+    )
     # 1. Mutual exclusion check
     if derived_metric_ids is not None and metric_types is not None:
         raise ValueError(
@@ -6099,7 +6134,7 @@ def genes_by_boolean_metric(
         derived_metric_ids=derived_metric_ids,
         metric_types=metric_types,
         experiment_ids=experiment_ids,
-        publication_doi=publication_doi,
+        publication_doi=publication_dois,
         compartment=compartment,
         treatment_type=treatment_type,
         background_factors=background_factors,
@@ -6289,7 +6324,7 @@ def genes_by_categorical_metric(
     organism: str | None = None,
     locus_tags: list[str] | None = None,
     experiment_ids: list[str] | None = None,
-    publication_doi: list[str] | None = None,
+    publication_dois: list[str] | None = None,
     compartment: str | None = None,
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
@@ -6301,6 +6336,7 @@ def genes_by_categorical_metric(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
+    publication_doi: list[str] | None = None,
 ) -> dict:
     """Categorical DerivedMetric drill-down. Cross-organism by design.
 
@@ -6350,6 +6386,10 @@ def genes_by_categorical_metric(
                     categories includes value not in union of selected
                     DMs' allowed_categories.
     """
+    publication_dois = deprecated_alias(
+        old=publication_doi, new=publication_dois,
+        old_name="publication_doi", new_name="publication_dois",
+    )
     # 1. Mutual exclusion check
     if derived_metric_ids is not None and metric_types is not None:
         raise ValueError(
@@ -6369,7 +6409,7 @@ def genes_by_categorical_metric(
         derived_metric_ids=derived_metric_ids,
         metric_types=metric_types,
         experiment_ids=experiment_ids,
-        publication_doi=publication_doi,
+        publication_doi=publication_dois,
         compartment=compartment,
         treatment_type=treatment_type,
         background_factors=background_factors,
@@ -9268,7 +9308,7 @@ def list_metabolite_assays(
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
-    publication_doi: list[str] | None = None,
+    publication_dois: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     assay_ids: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
@@ -9280,6 +9320,7 @@ def list_metabolite_assays(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
+    publication_doi: list[str] | None = None,
 ) -> dict:
     """List MetaboliteAssay nodes — discovery surface for the metabolomics
     measurement layer. Mirrors `list_derived_metrics`.
@@ -9330,6 +9371,10 @@ def list_metabolite_assays(
     nodes — `"organism '<name>' has no metabolomics assays — organisms
     with assays: <names>"`, distinct from the unmatched-organism case).
     """
+    publication_dois = deprecated_alias(
+        old=publication_doi, new=publication_dois,
+        old_name="publication_doi", new_name="publication_dois",
+    )
     if search_text is not None and not search_text.strip():
         raise ValueError("search_text must not be empty if provided.")
 
@@ -9353,7 +9398,7 @@ def list_metabolite_assays(
         search_text=search_text, organism=organism, metric_types=metric_types,
         value_kind=value_kind, compartment=compartment,
         treatment_type=treatment_type, background_factors=background_factors,
-        growth_phases=growth_phases, publication_doi=publication_doi,
+        growth_phases=growth_phases, publication_doi=publication_dois,
         experiment_ids=experiment_ids, assay_ids=assay_ids,
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids, rankable=rankable,
@@ -9465,15 +9510,15 @@ def list_metabolite_assays(
         not_found["experiment_ids"] = [
             x for x in experiment_ids if x not in found
         ]
-    if publication_doi:
+    if publication_dois:
         rows = conn.execute_query(
             "MATCH (p:Publication) WHERE p.id IN $ids "
             "RETURN collect(p.id) AS found",
-            ids=publication_doi,
+            ids=publication_dois,
         )
         found = set(rows[0]["found"]) if rows else set()
         not_found["publication_doi"] = [
-            x for x in publication_doi if x not in found
+            x for x in publication_dois if x not in found
         ]
 
     return {
@@ -9607,7 +9652,7 @@ def metabolites_by_quantifies_assay(
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
     experiment_ids: list[str] | None = None,
-    publication_doi: list[str] | None = None,
+    publication_dois: list[str] | None = None,
     compartment: str | None = None,
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
@@ -9630,6 +9675,7 @@ def metabolites_by_quantifies_assay(
     metric_percentile_min: float | None = None,
     metric_percentile_max: float | None = None,
     rank_by_metric_max: int | None = None,
+    publication_doi: list[str] | None = None,
 ) -> dict:
     """Drill into numeric MetaboliteAssay edges.
 
@@ -9675,6 +9721,10 @@ def metabolites_by_quantifies_assay(
         contains invalid values; rankable-gated filter set with all
         selected assays non-rankable.
     """
+    publication_dois = deprecated_alias(
+        old=publication_doi, new=publication_dois,
+        old_name="publication_doi", new_name="publication_dois",
+    )
     min_value = deprecated_alias(
         old=value_min, new=min_value, old_name="value_min", new_name="min_value")
     max_value = deprecated_alias(
@@ -9723,7 +9773,7 @@ def metabolites_by_quantifies_assay(
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
         experiment_ids=experiment_ids,
-        publication_doi=publication_doi,
+        publication_doi=publication_dois,
         compartment=compartment,
         treatment_type=treatment_type,
         background_factors=background_factors,
@@ -9800,7 +9850,7 @@ def metabolites_by_quantifies_assay(
                 "experiment_ids": _probe_existence(
                     conn, "Experiment", "id", experiment_ids or []),
                 "publication_doi": _probe_existence(
-                    conn, "Publication", "id", publication_doi or []),
+                    conn, "Publication", "id", publication_dois or []),
             },
             "returned": 0,
             "truncated": False,
@@ -9814,7 +9864,7 @@ def metabolites_by_quantifies_assay(
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
         experiment_ids=experiment_ids,
-        publication_doi=publication_doi,
+        publication_doi=publication_dois,
         compartment=compartment,
         treatment_type=treatment_type,
         background_factors=background_factors,
@@ -9860,7 +9910,7 @@ def metabolites_by_quantifies_assay(
             metabolite_ids=metabolite_ids,
             exclude_metabolite_ids=exclude_metabolite_ids,
             experiment_ids=experiment_ids,
-            publication_doi=publication_doi,
+            publication_doi=publication_dois,
             compartment=compartment,
             treatment_type=treatment_type,
             background_factors=background_factors,
@@ -9898,7 +9948,7 @@ def metabolites_by_quantifies_assay(
             "experiment_ids": _probe_existence(
                 conn, "Experiment", "id", experiment_ids or []),
             "publication_doi": _probe_existence(
-                conn, "Publication", "id", publication_doi or []),
+                conn, "Publication", "id", publication_dois or []),
         },
         "returned": len(results),
         "truncated": total_matching > offset + len(results),
@@ -9913,7 +9963,7 @@ def metabolites_by_flags_assay(
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
     experiment_ids: list[str] | None = None,
-    publication_doi: list[str] | None = None,
+    publication_dois: list[str] | None = None,
     compartment: str | None = None,
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
@@ -9924,6 +9974,7 @@ def metabolites_by_flags_assay(
     limit: int = 5,
     offset: int = 0,
     conn: GraphConnection | None = None,
+    publication_doi: list[str] | None = None,
 ) -> dict:
     """Drill into boolean MetaboliteAssay edges.
 
@@ -9976,6 +10027,10 @@ def metabolites_by_flags_assay(
     Raises:
         ValueError: empty `assay_ids`.
     """
+    publication_dois = deprecated_alias(
+        old=publication_doi, new=publication_dois,
+        old_name="publication_doi", new_name="publication_dois",
+    )
     conn = _default_conn(conn)
 
     if not assay_ids:
@@ -10020,7 +10075,7 @@ def metabolites_by_flags_assay(
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
         experiment_ids=experiment_ids,
-        publication_doi=publication_doi,
+        publication_doi=publication_dois,
         compartment=compartment,
         treatment_type=treatment_type,
         background_factors=background_factors,
@@ -10063,7 +10118,7 @@ def metabolites_by_flags_assay(
             metabolite_ids=metabolite_ids,
             exclude_metabolite_ids=exclude_metabolite_ids,
             experiment_ids=experiment_ids,
-            publication_doi=publication_doi,
+            publication_doi=publication_dois,
             compartment=compartment,
             treatment_type=treatment_type,
             background_factors=background_factors,
@@ -10093,7 +10148,7 @@ def metabolites_by_flags_assay(
             "experiment_ids": _probe_existence(
                 conn, "Experiment", "id", experiment_ids or []),
             "publication_doi": _probe_existence(
-                conn, "Publication", "id", publication_doi or []),
+                conn, "Publication", "id", publication_dois or []),
         },
         "returned": len(results),
         "truncated": total_matching > offset + len(results),

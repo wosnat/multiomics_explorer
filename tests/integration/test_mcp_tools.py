@@ -1549,7 +1549,7 @@ class TestListDerivedMetrics:
     def test_publication_biller_7(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(
-            publication_doi=["10.1128/mSystems.00040-18"], conn=conn, limit=None)
+            publication_dois=["10.1128/mSystems.00040-18"], conn=conn, limit=None)
         assert out["total_matching"] == 7
 
     def test_derived_metric_ids_direct(self, conn):
@@ -2042,11 +2042,11 @@ class TestGeneDerivedMetrics:
         assert response.total_matching == 3  # boolean + categorical + numeric Biller 2014
 
     @pytest.mark.asyncio
-    async def test_publication_doi_filter(self, tool_fns, conn):
+    async def test_publication_dois_filter(self, tool_fns, conn):
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["gene_derived_metrics"](
             ctx, locus_tags=["PMM1714"],
-            publication_doi=["10.1371/journal.pone.0043432"], limit=20)
+            publication_dois=["10.1371/journal.pone.0043432"], limit=20)
         assert response.total_matching == 6  # 6 Waldbauer numeric DMs
 
     @pytest.mark.asyncio

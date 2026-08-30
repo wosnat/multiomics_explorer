@@ -159,7 +159,7 @@ examples:
       Step 1: list_publications(organism="MED4")
               → find papers studying MED4
 
-      Step 2: list_experiments(publication_doi=[result["doi"]])
+      Step 2: list_experiments(publication_dois=[result["doi"]])
               → drill into experiments from a specific paper
 
       Step 3: genes_by_function(search_text="photosystem", organism="MED4")
@@ -602,11 +602,11 @@ verbose_fields:
 chaining:
   - "list_publications → list_experiments → differential_expression_by_gene"
   - "list_publications → genes_by_function"
-  - "list_publications → list_clustering_analyses(publication_doi=[...])"
+  - "list_publications → list_clustering_analyses(publication_dois=[...])"
   - "list_publications(search_text=..., verbose=True) → classify → list_publications(publication_dois=[...]) for the picked subset"
   - "list_publications(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric"
   - "list_filter_values(filter_type='metric_type') → list_publications(search_text='<metric_type>') to find publications with that metric"
-  - "list_publications (per-row `metabolite_count > 0`) → list_metabolite_assays(publication_doi=[...]) to inspect the paper's MetaboliteAssay nodes (numeric vs boolean, compartment, detection-status rollup)."
+  - "list_publications (per-row `metabolite_count > 0`) → list_metabolite_assays(publication_dois=[...]) to inspect the paper's MetaboliteAssay nodes (numeric vs boolean, compartment, detection-status rollup)."
   - "list_publications (per-row `discussed_gene_count` or `discussed_pathway_count` > 0) → discussed_by_publication(publication_dois=[...]) to list the genes + KEGG pathways the paper names in prose."
 
 mistakes:
@@ -616,7 +616,7 @@ mistakes:
   - "`organism=` is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works. Two OrganismTaxon nodes share the name 'Meiothermus ruber' (genome strain + treatment taxon), so organism='Meiothermus ruber' counts papers tied to either."
   - "Use the dedicated author param for author filtering (e.g. author='Biller'), not search_text — search_text searches title, abstract, and description only."
   - "experiment_count is per-publication — a publication with experiment_count=10 may span multiple organisms and treatment types."
-  - "metabolite_count > 0 indicates a metabolomics-bearing publication. Drill into MetaboliteAssay nodes via list_metabolite_assays(publication_doi=[...]); inspect compartments via metabolite_compartments per row."
+  - "metabolite_count > 0 indicates a metabolomics-bearing publication. Drill into MetaboliteAssay nodes via list_metabolite_assays(publication_dois=[...]); inspect compartments via metabolite_compartments per row."
   - "discussed_gene_count / discussed_pathway_count are the paper's prose literature index — the genes + KEGG pathways it names in text (recall-biased, NOT exhaustive, NOT DE-table expression). 0 on both means no narrative index (4 such publications, the `no_discusses` bucket). Drill into the named entities via discussed_by_publication(publication_dois=[...])."
   - wrong: "list_experiments(publication='Biller 2018')"
-    right: "list_publications(search_text='Biller') then list_experiments(publication_doi=['10.1038/...'])"
+    right: "list_publications(search_text='Biller') then list_experiments(publication_dois=['10.1038/...'])"

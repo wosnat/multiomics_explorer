@@ -222,4 +222,4 @@ mistakes:
   - "total_entries counts all discusses edges from the matched DOIs before any entity_kind / prominence filter; total_matching reflects the filtered set. A small total_matching with a large total_entries means your filter is narrow, not that the paper is sparse."
   - "not_found means the DOI is absent from the KG; not_matched means the DOI exists but has no discusses edge (4 such publications exist — the `no_discusses` bucket of list_publications). Both buckets are flat lists of DOIs — see docs://guide/conventions for the not_found / not_matched semantics. DOI matching is case-insensitive."
   - wrong: "discussed_by_publication(publication_dois=['10.1038/ismej.2016.70'])  # to get DE results for the paper"
-    right: "list_experiments(publication_doi=['10.1038/ismej.2016.70']) then differential_expression_by_gene(experiment_ids=[...])  # discusses edges are prose mentions, not expression data"
+    right: "list_experiments(publication_dois=['10.1038/ismej.2016.70']) then differential_expression_by_gene(experiment_ids=[...])  # discusses edges are prose mentions, not expression data"

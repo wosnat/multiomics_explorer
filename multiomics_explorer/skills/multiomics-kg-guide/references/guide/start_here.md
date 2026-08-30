@@ -87,7 +87,7 @@ Plus five orthogonal helpers:
 
 ### "What do experiments in this KG measure?"
 1. `list_experiments(summary=True)` — orientation breakdowns by organism / treatment / omics / table_scope.
-2. Filter to a slice (`organism=`, `treatment_type=`, `compartment=`, `publication_doi=`, `experiment_ids=`), then drop `summary=True` to see individual experiments. Treatment / background / compartment values are closed vocabularies — read them from `list_filter_values` rather than guessing.
+2. Filter to a slice (`organism=`, `treatment_type=`, `compartment=`, `publication_dois=`, `experiment_ids=`), then drop `summary=True` to see individual experiments. Treatment / background / compartment values are closed vocabularies — read them from `list_filter_values` rather than guessing.
 3. Drill into expression: `differential_expression_by_gene(experiment_ids=[...], organism=...)`.
 
 ### "Compare gene X across Prochlorococcus and Alteromonas."
@@ -179,7 +179,7 @@ tool** (returns envelope + per-row routing fields) with one or more
 | Discovery | Drill-down(s) |
 |---|---|
 | `list_experiments` | `differential_expression_by_gene`, `pathway_enrichment`, `list_metabolite_assays(experiment_ids=...)` |
-| `list_publications` | `list_experiments(publication_doi=...)`, `list_metabolite_assays(publication_doi=...)`, `discussed_by_publication(publication_dois=...)` |
+| `list_publications` | `list_experiments(publication_dois=...)`, `list_metabolite_assays(publication_dois=...)`, `discussed_by_publication(publication_dois=...)` |
 | `list_metabolites` | `genes_by_metabolite`, `assays_by_metabolite`, `genes_by_ontology(ontology='kegg', term_ids=[pathway_id])` |
 | `list_metabolite_assays` | `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`, `assays_by_metabolite` |
 | `list_derived_metrics` | `gene_derived_metrics`, `genes_by_{numeric,boolean,categorical}_metric` |

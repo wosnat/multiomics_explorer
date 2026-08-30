@@ -64,7 +64,7 @@ examples:
     call: list_metabolite_assays(metabolite_ids=["kegg.compound:C00074"])  # PEP — covered by all 14 assays
 
   - title: Per-paper inventory
-    call: list_metabolite_assays(publication_doi=["10.1073/pnas.2213271120"])
+    call: list_metabolite_assays(publication_dois=["10.1073/pnas.2213271120"])
 
 verbose_fields:
   - treatment
