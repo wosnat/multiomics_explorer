@@ -164,6 +164,90 @@ coordinated to `0.1.0a5` ahead of the KG release.
 - Spec: `docs/tool-specs/2026-08-20-tcdb-substrate-depth-migration.md`.
 
 ### Changed
+- **LLM-consumer response diet (backlog 2b.2).** Six related trims, each
+  measured on a live call through `fastmcp.Client` (`len(json)//4`):
+  - `differential_expression_by_gene`: `experiments[]` rows go compact by
+    default — `experiment_id`, `treatment_type`, `table_scope`,
+    `is_time_course`, `matching_genes`, `rows_by_status`, `omics_type`
+    only; `experiment_name`, `background_factors`, `coculture_partner`,
+    `table_scope_detail`, `timepoints` move behind `verbose=True`. New
+    envelope key `n_experiments` (full count, computed before any
+    trimming). `differential_expression_by_gene(locus_tags=['PMM1171'],
+    summary=True)`: 22,095 chars / ~5,523 tokens → 12,586 chars / ~3,146
+    tokens.
+  - `pathway_enrichment` / `cluster_enrichment` gain `include_nonsignificant:
+    bool` (MCP default `False` — only rows with `p_adjust < pvalue_cutoff`
+    are returned; package default stays `True`, unchanged for existing
+    scripts). MCP `limit` default 100→25 (`pathway_enrichment`) / 5→25
+    (`cluster_enrichment`). `total_matching` now counts the pageable
+    subset under the active filter (the significant-only count when
+    `include_nonsignificant=False`); `n_significant` and the summary
+    breakdowns (`by_experiment`, `by_cluster`, `cluster_summary`, …)
+    always read the full tested set regardless of the flag.
+    `pathway_enrichment(organism='MED4', experiment_ids=[<first MED4
+    nitrogen experiment>], ontology='kegg', level=1)`: 105,614 chars /
+    ~26,403 tokens → 19,817 chars / ~4,954 tokens.
+  - MCP-side `limit` defaults resized for a context window (Python-package
+    defaults unchanged): `genes_by_ontology` 500→50, `gene_ontology_terms`
+    5→50, `genes_in_cluster` / `gene_clusters_by_gene` /
+    `genes_by_numeric_metric` / `genes_by_boolean_metric` /
+    `genes_by_categorical_metric` 5→25, `ontology_landscape` unlimited→15
+    (`limit=None` still returns every row). Batch tools (`gene_overview`,
+    `gene_details`, `gene_aa_sequence`, `gene_homologs`, `gene_neighbors`)
+    move to `limit: int | None = None`, resolved to `max(25,
+    len(locus_tags) * k)` (k = fan-out per tool, e.g. 1 for `gene_overview`
+    / `gene_details` / `gene_aa_sequence`, 5 for `gene_homologs`,
+    `2*window+1` for `gene_neighbors`) whenever the caller doesn't pass an
+    explicit `limit`.
+  - Detail calls (`summary=False`, the default, or tools without a
+    `summary` param) cap every ranked `by_*` / `top_*` breakdown to its
+    first 10 entries, sorted desc by its ranking count, with a sparse
+    `<key>_truncated: true` sibling key added only when a list was
+    actually capped; `summary=True` returns each list in full. Applies to
+    `list_experiments` (`by_publication`, `by_metric_type`, `by_organism`,
+    `by_treatment_type`, `by_background_factors`), `list_organisms`
+    (`by_metric_type`, `top_annotation_capability`,
+    `top_metabolic_capability` — previously hard-capped at 10 even in
+    `summary=True`), `list_publications` (`by_metric_type`, `by_organism`),
+    `resolve_gene` (`by_organism`), `genes_by_function` (`by_organism`),
+    `metabolites_by_gene` (`top_metabolite_pathways`, `by_element`),
+    `genes_by_metabolite` (`top_genes`, `top_reactions`,
+    `top_tcdb_families` — previously hard-capped unconditionally),
+    `differential_expression_by_gene` (`experiments`), and
+    `pathway_enrichment` (`by_experiment`, now sorted desc by
+    `n_significant`; `top_pathways_by_padj`, sorted by `p_adjust`
+    ascending, now full on `summary=True` rather than a flat top-10).
+    `list_experiments(organism='MED4')`: 13,600 chars / ~3,400 tokens →
+    12,132 chars / ~3,033 tokens.
+  - Compact rows drop parent-constant / verbose-only fields that were
+    previously serialized as `null` on the wire: `genes_by_metabolite` /
+    `metabolites_by_gene` (`GeneReactionMetaboliteTriplet` moved onto the
+    `SparseRow` base so its 9 already-verbose-only keys —
+    `gene_category`, `metabolite_inchikey`, `metabolite_smiles`,
+    `metabolite_mnxm_id`, `metabolite_hmdb_id`, `reaction_mnxr_id`,
+    `reaction_rhea_ids`, `tcdb_level_kind`, `tc_class_id` — are genuinely
+    absent, not `null`, in compact mode); `genes_by_numeric_metric` /
+    `genes_by_boolean_metric` / `genes_by_categorical_metric` drop
+    `name`, `value_kind`, `rankable`, `has_p_value`, `organism_name` from
+    each row in compact mode (all present in `by_metric`); `list_derived_metrics`
+    drops `has_p_value`, `field_description`, `experiment_id`,
+    `publication_doi`, `compartment`, `omics_type`, `treatment_type`,
+    `background_factors`, `growth_phases` in compact mode (`unit` stays
+    compact — a numeric DM's `value` is unreadable without it).
+    `metabolites_by_gene(['PMM0913'], 'MED4')`: 34,580 chars / ~8,645
+    tokens → 12,319 chars / ~3,079 tokens.
+  - `kg_schema` accepts `labels: list[str] | None`, `relationship_types:
+    list[str] | None`, and `section: Literal['nodes', 'relationships',
+    'both'] = 'both'` to scope the introspection instead of always
+    dumping the whole graph; unknown values land in the new
+    `not_found_labels` / `not_found_relationship_types` envelope keys
+    (always present, `[]` when clean) rather than a silent empty entry.
+    Property-sample queries are now deterministically ordered
+    (`ORDER BY coalesce(n.id, elementId(n))` / `ORDER BY elementId(r)`)
+    so repeated calls return byte-identical results. `kg_schema()` (full,
+    unscoped dump — the only call shape available before this change):
+    39,690 chars / ~9,922 tokens → `kg_schema(labels=['Gene'])`: 21,475
+    chars / ~5,368 tokens.
 - **KG rebuild 2026-08-29T18:29Z absorbed** (docs-review asks DOC-001/002/004/006, `docs/kg-specs/2026-08-29-docs-review-kg-asks.md` §4). Gene count unchanged (127,035). `controlled_vocabularies_hash` re-pinned `a7c97e00…` → `1f671eae…` (`Gene_has_pfam.evidence` gains `family_inferred`; `compartment` loses the never-used `spent_medium` / `lysate`). 10 goldens regenerated (9 from the eggNOG rung flip / KEGG global-map flag, 1 from the earlier NaN→None enrichment fix); 27 YAML example responses refreshed; 0 test pins moved. Prose rewritten wherever it described the old behaviour: eggNOG-only GO / EC / Pfam / CAZy edges now read `family_inferred` (score 0.333), never `curated`; `informative_only=True` now drops 11 of the 13 KEGG global / overview maps (`ko01100` …; `ko01310` / `ko01320` stay informative); `KeggTerm.direct_gene_count` is KO-only; compartment vocabulary is four values. Two behavioural `kg_claims` (eggNOG rung, KEGG map flags) guard the flips. `-m kg`: integration 2,753 / regression 176 green.
 - **Docs review sweep (2026-08-29):** every served doc surface re-verified against code and the live KG. Highlights: treatment / background vocabulary values quoted in ~40 sites replaced with live values; organism-matching described uniformly (word-based on `preferred_name` + `name_synonyms`); `not_found` shapes documented as the three real forms; `organism_gene_count` subtree scope on both tools; `informative_only` defaults and KEGG informativeness described as live (KO-level only — `ko01100` is not flagged; `map00001` never existed); evidence-rung glosses replaced by one canonical section in `docs://analysis/annotation_evidence` (eggNOG-only GO/EC/Pfam/CAZy edges read `curated` today — KG ask DOC-001); TIGR two-level hierarchy + NCBIfam→TigrRole router surfaced in concepts / `ontology_term_details` / annotation_evidence; `enrichment.md` rewritten with runnable recipes (773 → 532 lines); `concepts.md` inline node counts dropped; CLAUDE.md tool table trimmed to routing one-liners (≤ ~620 chars/row) and the removed CLI struck from CLAUDE.md / README; every YAML example response regenerated from the live KG (`scripts/refresh_examples.py --write`) and fabricated example inputs replaced with real IDs.
 - Generator: `## Common mistakes` heading always; union param types render every arm (`string | list[string] | None`); package-import key list no longer drops `returned` / `truncated`; ontology pages carry an "Applicable filter types" section instead of empty vocabulary boilerplate; `index.md` gains Levels / Hierarchy / Trust columns; `_NODE_PROP_NOTES` filled for every ontology label prop.

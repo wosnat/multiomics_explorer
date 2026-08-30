@@ -139,10 +139,19 @@ class TestResolveGeneEdgeCases:
         assert result["truncated"] is True
 
     def test_by_organism_populated(self, conn):
+        """by_organism is a top-10 ranking on this no-summary-param tool:
+        its counts sum to total_matching only when the match spans <=10
+        organisms; a wider match caps the list to the top 10 and flags it
+        via by_organism_truncated (counts then sum to <= total_matching)."""
         result = api.resolve_gene("dnaN", conn=conn)
         assert len(result["by_organism"]) >= 2
+        assert len(result["by_organism"]) <= 10
         total = sum(b["count"] for b in result["by_organism"])
-        assert total == result["total_matching"]
+        if result.get("by_organism_truncated"):
+            assert len(result["by_organism"]) == 10
+            assert total <= result["total_matching"]
+        else:
+            assert total == result["total_matching"]
 
 
 # ---------------------------------------------------------------------------
