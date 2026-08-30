@@ -34,7 +34,7 @@ code (EnrichmentResult accessors, custom term2gene, compareCluster export).
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') | — | Ontology for pathway definitions. Run ontology_landscape first to rank by relevance. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | level | int \| None | None | Hierarchy level (0 = root). At least one of `level` or `term_ids` required. See docs://guide/conventions. |
-| term_ids | list[string] \| None | None | Specific term IDs to test. Combines with level to scope rollup. |
+| term_ids | list[string] \| None | None | Specific term IDs to test. Combines with level to scope rollup. Bare ids are accepted (e.g. 'ko00910', 'GO:0006979') and coerced to canonical (see `term_validation.resolved_aliases`). |
 | direction | string ('up', 'down', 'both') | both | DE direction(s) to include in gene_sets. |
 | significant_only | bool | True | If true, only significant DE rows count as foreground. |
 | background | string \| list[string] | table_scope | 'table_scope' (default, per-cluster quantified set), 'organism' (full genome — inflates denominator), or explicit locus_tag list. See docs://analysis/enrichment for the full background semantics. |

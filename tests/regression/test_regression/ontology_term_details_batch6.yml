@@ -19,6 +19,7 @@ links_out_total: 135
 not_found:
 - bogus:xyz
 offset: 0
+resolved_aliases: {}
 results:
 - children:
   - '{''id'': ''tcdb:3.A.1.1'', ''level'': 3, ''name'': ''The Carbohydrate Uptake

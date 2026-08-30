@@ -37,7 +37,7 @@ docs://ontologies/{key} for how each ontology is built and read.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| term_ids | list[string] | — | Self-prefixed term IDs, any ontology mix (e.g. 'go:0006979', 'tcdb:3.A.1', 'merops.family:S14', 'interpro:IPR000362', 'ncbifam:NF006762', 'tigr.role:100', 'pfam:PF00005', 'kegg.pathway:ko00010'). Rows return in input order. |
+| term_ids | list[string] | — | Self-prefixed term IDs, any ontology mix (e.g. 'go:0006979', 'tcdb:3.A.1', 'interpro:IPR000362', 'pfam:PF00005', 'kegg.pathway:ko00010'). Rows return in input order. Bare ids accepted (e.g. 'ko00910', 'GO:0006979') — see `resolved_aliases`. |
 | organism | string \| None | None | Organism to scope genes_by_organism to (resolved like every other tool: 'MED4' -> 'Prochlorococcus MED4'; unknown/ambiguous raises). Rows gain organism_gene_count (subtree). Default: all organisms. |
 | link_kinds | list[string ('composition', 'membership', 'router')] \| None | None | Keep links_out of these kinds: 'composition' = built from target (tcdb/merops -> pfam); 'membership' = belongs to (pfam/ncbifam -> interpro, kegg -> brite); 'router' = recall-biased (interpro -> ec/cazy, ncbifam TIGR* -> tigr.role). Default all. |
 | verbose | bool | False | Add `properties` (every node prop), `links_out[].props` (curated_tcids, member_id_count, router_ambiguous) and `genes_by_organism`. Default compact. |
@@ -51,7 +51,7 @@ docs://ontologies/{key} for how each ontology is built and read.
 ### Envelope
 
 ```expected-keys
-total_matching, returned, offset, truncated, not_found, by_ontology, links_out_total, by_link_kind, warnings, results
+total_matching, returned, offset, truncated, not_found, by_ontology, links_out_total, by_link_kind, resolved_aliases, warnings, results
 ```
 
 - **total_matching** (int): Term IDs found in the KG (e.g. 5)
@@ -62,6 +62,7 @@ total_matching, returned, offset, truncated, not_found, by_ontology, links_out_t
 - **by_ontology** (list[OntologyTermDetailsByOntology]): Found terms per ontology
 - **links_out_total** (int): Total links_out entries across returned rows
 - **by_link_kind** (list[OntologyTermDetailsByLinkKind]): links_out entries per link_kind
+- **resolved_aliases** (object): Bare term_ids (e.g. 'ko00910', 'GO:0006979') coerced to canonical CURIEs, {input: [canonical]}. Empty when none were coerced.
 - **warnings** (list[string]): Auto-warnings (reserved for future use; always empty)
 
 ### Per-result fields
@@ -817,7 +818,7 @@ genes_by_ontology(ontology='tcdb', term_ids=['tcdb:3.A.1'], organism='MED4')  # 
 from multiomics_explorer import ontology_term_details
 
 result = ontology_term_details(term_ids=...)
-# returns dict with keys: total_matching, returned, offset, truncated, not_found, by_ontology, links_out_total, by_link_kind, warnings, results
+# returns dict with keys: total_matching, returned, offset, truncated, not_found, by_ontology, links_out_total, by_link_kind, resolved_aliases, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

@@ -467,8 +467,10 @@ Both kinds: `organism_name`, `ontology`, `level`, `total_matching` (rows pageabl
 under the active `include_nonsignificant` filter — see below), `n_significant`
 (`p_adjust < pvalue_cutoff`, always the full tested-set count), `not_found`,
 `not_matched`, `term_validation` (`{not_found, wrong_ontology, wrong_level,
-filtered_out}` for `term_ids`), `clusters_skipped`, `enrichment_params` (=
-`result.params`).
+filtered_out, resolved_aliases}` for `term_ids` — `resolved_aliases` is a
+passthrough of `genes_by_ontology`'s bare-term-ID coercion, `{input:
+[canonical]}`, empty when none of your `term_ids` were bare), `clusters_skipped`,
+`enrichment_params` (= `result.params`).
 
 Pathway kind adds `no_expression`, `by_experiment[]` (`n_tests`, `n_significant`,
 `n_clusters` + experiment metadata, sorted desc by `n_significant`), `by_direction[]`,

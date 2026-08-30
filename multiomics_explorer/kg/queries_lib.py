@@ -4780,6 +4780,25 @@ def build_gene_existence_check(
     return cypher, {"locus_tags": locus_tags}
 
 
+def build_locus_tag_case_matches(
+    *, not_found: list[str],
+) -> tuple[str, dict]:
+    """Find genes whose locus_tag differs only by case from a not_found tag.
+
+    No uppercase normalisation of locus_tags: real `Gene.locus_tag` values
+    are case-mixed KG-wide (e.g. 'A9601_pseudoVIMSS1362517'), so this is
+    advisory-only — one extra lookup over the not_found batch, never a
+    silent rewrite of the input.
+
+    RETURN keys: locus_tag (the existing, correctly-cased tag).
+    """
+    cypher = (
+        "MATCH (g:Gene) WHERE toUpper(g.locus_tag) IN $upper "
+        "RETURN g.locus_tag AS locus_tag"
+    )
+    return cypher, {"upper": [t.upper() for t in not_found]}
+
+
 # ---------------------------------------------------------------------------
 # gene_aa_sequence
 # ---------------------------------------------------------------------------

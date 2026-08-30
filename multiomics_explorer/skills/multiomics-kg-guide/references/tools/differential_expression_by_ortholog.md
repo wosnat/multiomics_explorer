@@ -23,7 +23,7 @@ via `differential_expression_by_gene`.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| group_ids | list[string] | — | Ortholog group IDs (from search_homolog_groups or gene_homologs). E.g. ['cyanorak:CK_00000570']. |
+| group_ids | list[string] | — | Ortholog group IDs (from search_homolog_groups or gene_homologs). E.g. ['cyanorak:CK_00000570']. Bare ids are accepted (e.g. 'CK_00000570', 'COG0592@2') and coerced to canonical (see `resolved_aliases`). |
 | organisms | list[string] \| None | None | Filter by organisms — each entry a word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word matches every strain); OR semantics. E.g. ['MED4', 'MIT9313']. Use list_organisms to see valid values. |
 | experiment_ids | list[string] \| None | None | Filter to these experiments. Get IDs from list_experiments. |
 | direction | string ('up', 'down') \| None | None | Filter by expression direction. |
@@ -39,7 +39,7 @@ via `differential_expression_by_gene`.
 ### Envelope
 
 ```expected-keys
-total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, returned, offset, truncated, by_organism, rows_by_status, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
+total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, returned, offset, truncated, by_organism, rows_by_status, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, resolved_aliases, results
 ```
 
 - **total_matching** (int): Gene x experiment x timepoint rows matching all filters
@@ -65,6 +65,7 @@ total_matching, matching_genes, matching_groups, experiment_count, median_abs_lo
 - **not_matched_organisms** (list[string]): Organisms in KG but with zero expression in groups
 - **not_found_experiments** (list[string]): Experiment IDs not found in KG
 - **not_matched_experiments** (list[string]): Experiments that exist but have 0 expression edges to group members
+- **resolved_aliases** (object): Bare group_ids (e.g. 'CK_00000570', 'COG0592@2') coerced to canonical prefixed form, {input: [canonical]}. Empty when none were coerced.
 
 ### Per-result fields
 
@@ -162,7 +163,7 @@ differential_expression_by_ortholog → genes_by_homolog_group(organisms=[...]) 
 from multiomics_explorer import differential_expression_by_ortholog
 
 result = differential_expression_by_ortholog(group_ids=...)
-# returns dict with keys: total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, returned, offset, truncated, by_organism, rows_by_status, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
+# returns dict with keys: total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, returned, offset, truncated, by_organism, rows_by_status, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, resolved_aliases, results
 ```
 
 Use package import for bulk data extraction in scripts.

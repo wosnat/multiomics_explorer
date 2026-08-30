@@ -20,7 +20,7 @@ Routing: prefer `gene_overview` for triage; chain into `metabolites_by_gene` for
 ### Envelope
 
 ```expected-keys
-total_matching, returned, offset, truncated, not_found, results
+total_matching, returned, offset, truncated, not_found, warnings, results
 ```
 
 - **total_matching** (int): Genes found from input locus_tags.
@@ -28,6 +28,7 @@ total_matching, returned, offset, truncated, not_found, results
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if total_matching > returned.
 - **not_found** (list[string]): Input locus_tags not in KG.
+- **warnings** (list[string]): Advisory diagnostics — e.g. a not_found locus_tag differs only by case from a real one (locus_tags are never case-normalised).
 
 ## Few-shot examples
 
@@ -189,7 +190,7 @@ gene_details(locus_tags=['PMM0001']) — always a list
 from multiomics_explorer import gene_details
 
 result = gene_details(locus_tags=...)
-# returns dict with keys: total_matching, returned, offset, truncated, not_found, results
+# returns dict with keys: total_matching, returned, offset, truncated, not_found, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

@@ -42,7 +42,7 @@ organism_name, genes_queried, genes_with_response, not_found, no_expression, fil
 - **not_found** (list[string]): Input locus_tags not found in KG
 - **no_expression** (list[string]): Gene exists but has NO Changes_expression_of edge at all in the organism
 - **filtered_out** (list[string]): Gene has expression edges but none survive the active treatment_types / background_factors filters — e.g. a treatment_types vocabulary typo. Never confuse with no_expression.
-- **warnings** (list[string]): One entry per treatment_types / background_factors value not found in the live vocabulary (see list_filter_values(filter_type='treatment_type' or 'background_factors')). Empty when clean.
+- **warnings** (list[string]): One entry per treatment_types / background_factors value not found in the live vocabulary (see list_filter_values(filter_type='treatment_type' or 'background_factors')), plus one per not_found locus_tag differing only by case from a real one (locus_tags are never case-normalised). Empty when clean.
 - **returned** (int): Genes in results after pagination (e.g. 15)
 - **offset** (int): Offset into paginated gene list (e.g. 0)
 - **truncated** (bool): True if more genes available beyond returned + offset

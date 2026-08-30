@@ -119,12 +119,17 @@ worth a second look — a closed-vocabulary filter value that matched no
 `ControlledVocabulary` entry (`treatment_type`, `background_factors`,
 `compartment`, `table_scope`, `growth_phases`, `omics_type`, `category` /
 `gene_categories`, `cluster_type`), an `organism` word that resolved to no
-`OrganismTaxon`, a rankable/has_p_value gate exclusion, an ID collision, and
-similar. A warning is **advisory only — it never changes which rows come
-back**; the call still runs against whatever the filters actually matched
-(often an empty result), it just tells you *why*. Each warning names the
-tool to call for the valid set — usually `list_filter_values(filter_type=
-...)` for a vocabulary typo, `list_organisms()` for an unmatched organism.
+`OrganismTaxon`, a rankable/has_p_value gate exclusion, an ID collision, a
+`not_found` locus_tag that differs only by case from a real `Gene.locus_tag`
+(`gene_overview`, `gene_details`, `gene_homologs`, `gene_aa_sequence`,
+`gene_neighbors`, `gene_ontology_terms`, `differential_expression_by_gene`,
+`gene_response_profile`, `gene_derived_metrics`, `gene_clusters_by_gene`,
+`metabolites_by_gene`), and similar. A warning is **advisory only — it never
+changes which rows come back**; the call still runs against whatever the
+filters actually matched (often an empty result), it just tells you *why*.
+Each warning names the tool to call for the valid set — usually
+`list_filter_values(filter_type=...)` for a vocabulary typo,
+`list_organisms()` for an unmatched organism.
 
 ### `verbose=True` mode
 
@@ -554,6 +559,30 @@ through verbatim and lands in `not_found`.
   (`kegg_compound_ids`, `chebi_ids`, `hmdb_ids`, `mnxm_ids`) match the xref
   property directly, never rewrite the input, and report nothing in
   `resolved_aliases`.
+
+## Ontology term / ortholog-group ID forms
+
+Canonical ontology term IDs and ortholog-group IDs carry a namespace prefix
+(`go:0006979`, `kegg.pathway:ko00910`, `kegg.orthology:K00001`,
+`pfam:PF00004`, `interpro:IPR000014`, `tcdb:3.A.1.1`, `ec:1.1.1.1`,
+`cazy:GH13`, `merops.family:S33`, `ncbifam:TIGR00254`,
+`cyanorak:CK_00000570`, `eggnog:COG0592@2`). `term_ids` on
+`genes_by_ontology`, `ontology_term_details`, `pathway_enrichment`,
+`cluster_enrichment` and `group_ids` on `genes_by_homolog_group`,
+`differential_expression_by_ortholog` also accept the bare accession —
+`ko00910`, `GO:0006979`, `PF00004`, `IPR000014`, `3.A.1.1`, `1.1.1.1`,
+`GH13`, `S33`, `TIGR00254`, `CK_00000570`, `COG0592@2` — and coerce it to
+the canonical prefixed form (a pure regex match, no query, since a bare
+accession maps onto exactly one ontology or OG source) before the query
+runs. Coerced inputs are reported in `resolved_aliases` (`{input:
+[canonical]}`, empty when none) — same shape as the metabolite-ID
+coercion above, for cross-tool consistency. On `pathway_enrichment` /
+`cluster_enrichment` this key lives nested under `term_validation`
+(a passthrough of `genes_by_ontology`'s validation buckets), not at the
+top level. Bare class-level TCDB (`3`) / CAZy (`GH`) IDs need no coercion
+— they already match the canonical form. `gene_ontology_terms` does not
+take `term_ids` (it is the reverse, genes → terms, lookup) and is
+unaffected.
 
 ---
 

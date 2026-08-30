@@ -1220,7 +1220,9 @@ class EnrichmentResult:
         contract.
     term_validation : dict
         Per-input-term_id buckets: not_found, wrong_ontology, wrong_level,
-        filtered_out. Surfaced by missing_terms() accessor.
+        filtered_out, resolved_aliases (bare term_ids coerced to canonical
+        CURIEs by the underlying genes_by_ontology call). Surfaced by
+        missing_terms() accessor.
     clusters_skipped : list[dict]
         Per-cluster skip reasons (e.g. zero foreground).
     params : dict
@@ -1373,13 +1375,14 @@ class EnrichmentResult:
                 return entry.get("reason")
         return None
 
-    def missing_terms(self) -> dict[str, list[str]]:
-        """Return term_validation buckets."""
+    def missing_terms(self) -> dict:
+        """Return term_validation buckets (+ resolved_aliases passthrough)."""
         return {
             "not_found": list(self.term_validation.get("not_found", [])),
             "wrong_ontology": list(self.term_validation.get("wrong_ontology", [])),
             "wrong_level": list(self.term_validation.get("wrong_level", [])),
             "filtered_out": list(self.term_validation.get("filtered_out", [])),
+            "resolved_aliases": dict(self.term_validation.get("resolved_aliases", {})),
         }
 
     def to_compare_cluster_frame(self) -> pd.DataFrame:

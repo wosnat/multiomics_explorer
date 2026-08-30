@@ -86,6 +86,7 @@ not_found: []
 offset: 0
 ontology: pfam
 organism_name: Prochlorococcus MED4
+resolved_aliases: {}
 results:
 - evidence: curated
   gene_category: Nucleotide metabolism

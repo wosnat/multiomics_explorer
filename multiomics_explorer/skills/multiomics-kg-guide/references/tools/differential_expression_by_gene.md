@@ -65,7 +65,7 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 - **not_found** (list[string]): Input locus_tags not found in KG
 - **no_expression** (list[string]): Locus tags in KG with NO Changes_expression_of edge at all in the organism
 - **filtered_out** (list[string]): Locus tags that DO have expression edges but none survive the active direction / significant_only / growth_phases filters — e.g. a growth_phases vocabulary typo. Never confuse with no_expression.
-- **warnings** (list[string]): One entry per growth_phases value not found in the live vocabulary (see list_filter_values(filter_type='growth_phase')). Empty when clean.
+- **warnings** (list[string]): One entry per growth_phases value not found in the live vocabulary (see list_filter_values(filter_type='growth_phase')), plus one per not_found locus_tag differing only by case from a real one (locus_tags are never case-normalised). Empty when clean.
 - **not_found_experiments** (list[string]): Input experiment_ids not found in KG (empty unless experiment_ids was provided)
 - **not_matched_experiments** (list[string]): experiment_ids in KG but with no Changes_expression_of edges satisfying the active filters (e.g. vesicle proteomics / metabolomics experiments that never wire up DE edges; or experiments where no row passes direction / significant_only / growth_phases). Empty unless experiment_ids was provided.
 - **returned** (int): Rows in results (e.g. 5)

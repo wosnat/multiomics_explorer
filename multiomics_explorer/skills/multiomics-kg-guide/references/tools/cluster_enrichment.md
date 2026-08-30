@@ -33,7 +33,7 @@ runnable code (custom term2gene path covers cluster-membership ORA).
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') | — | Ontology for pathway definitions. Run ontology_landscape first. |
 | tree | string \| None | None | BRITE tree name filter. Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | level | int \| None | None | Hierarchy level (0 = root). At least one of `level` or `term_ids` required. See docs://guide/conventions. |
-| term_ids | list[string] \| None | None | Specific term IDs to test. |
+| term_ids | list[string] \| None | None | Specific term IDs to test. Bare ids are accepted (e.g. 'ko00910', 'GO:0006979') and coerced to canonical (see `term_validation.resolved_aliases`). |
 | background | string \| list[string] | cluster_union | 'cluster_union' (default — union of all clustered genes; differs from `pathway_enrichment`'s 'table_scope' default), 'organism', or explicit locus_tag list. See docs://analysis/enrichment for the full background semantics. |
 | min_gene_set_size | int | 5 | Per-cluster M filter: drop pathways with fewer members. |
 | max_gene_set_size | int \| None | 500 | Per-cluster M filter upper bound. None disables. |

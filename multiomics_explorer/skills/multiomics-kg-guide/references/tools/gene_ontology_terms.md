@@ -75,7 +75,7 @@ total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_m
 - **evidence_score_signals** (object | None): Fired ControlledVocabulary signals per edge_type; present only when min_evidence_score was set.
 - **filters_applied** (object): Echo of the trust filters that were actually set on this call.
 - **skipped_ontologies** (list[object]): Multi-ontology: [{ontology, reason}] for ontologies dropped because a filter/facet only some of the queried ontologies own.
-- **warnings** (list[string]): Auto-warnings, incl. skipped-ontology and trust-cutoff notices.
+- **warnings** (list[string]): Auto-warnings, incl. skipped-ontology, trust-cutoff, and locus_tag case-mismatch notices.
 
 ### Per-result fields
 

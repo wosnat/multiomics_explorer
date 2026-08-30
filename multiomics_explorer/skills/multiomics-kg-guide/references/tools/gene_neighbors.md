@@ -32,7 +32,7 @@ total_matching, returned, truncated, anchors, by_organism, not_found, not_matche
 - **by_organism** (list[OrganismCount]): Neighbor-row count per organism, sorted desc. E.g. [{'organism_name': 'Alteromonas macleodii HOT1A3', 'count': 2}].
 - **not_found** (list[string]): Anchor locus_tags absent from the KG. Distinct from not_matched (those exist but lack coordinates). E.g. ['NOTAREAL'].
 - **not_matched** (list[string]): Anchors that exist but lack genomic coordinates (null start/contig) → no neighborhood. Distinct from not_found. E.g. ['SYNW1755'].
-- **warnings** (list[string]): Advisory notes, e.g. same_strand requested but an anchor's own strand is null → its neighbors returned unfiltered.
+- **warnings** (list[string]): Advisory notes, e.g. same_strand requested but an anchor's own strand is null → its neighbors returned unfiltered; or a not_found locus_tag differs only by case from a real one (locus_tags are never case-normalised).
 
 ### Per-result fields
 

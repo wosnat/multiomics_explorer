@@ -509,6 +509,7 @@ class TestGeneOverview:
                     "has_derived_metrics": 0,
                     "not_found": ["FAKE"],
                 }],
+                [],  # case-mismatch lookup over not_found
             ]
             result = api.gene_overview(["FAKE"], summary=True)
         MockConn.assert_called_once()
@@ -518,6 +519,7 @@ class TestGeneOverview:
         """Not-found locus_tags appear in not_found list."""
         mock_conn.execute_query.side_effect = [
             self._summary_result(total=0, not_found=["FAKE0001"]),
+            [],  # case-mismatch lookup over not_found
         ]
         result = api.gene_overview(["FAKE0001"], summary=True, conn=mock_conn)
         assert result["not_found"] == ["FAKE0001"]
@@ -694,6 +696,7 @@ class TestGeneDetails:
     def test_not_found(self, mock_conn):
         mock_conn.execute_query.side_effect = [
             [{"total_matching": 0, "not_found": ["FAKE0001"]}],  # summary
+            [],  # case-mismatch lookup over not_found
             [],  # detail
         ]
         result = api.gene_details(["FAKE0001"], conn=mock_conn)
@@ -805,6 +808,7 @@ class TestGeneHomologs:
         """Locus tags not in KG appear in not_found."""
         mock_conn.execute_query.side_effect = [
             self._summary_result(total=0, not_found=["FAKE0001"]),
+            [],  # case-mismatch lookup over not_found
         ]
         result = api.gene_homologs(
             ["FAKE0001"], summary=True, conn=mock_conn,
@@ -1842,6 +1846,7 @@ class TestGeneOntologyTerms:
             self._exist_mixed(found=["PMM0001"], not_found=["FAKE999"]),
             self._summary_row("PMM0001"),
             self._detail_rows("PMM0001"),
+            [],  # case-mismatch lookup over not_found
         ]
         result = api.gene_ontology_terms(
             ["PMM0001", "FAKE999"], organism="MED4", ontology="go_bp", conn=mock_conn,
@@ -3357,6 +3362,7 @@ class TestDifferentialExpressionByGene:
                 "no_expression": ["PMM9999"],
                 "filtered_out": [],
             }],
+            [],  # case-mismatch lookup over not_found
             self._detail_rows(),
         ]
         result = api.differential_expression_by_gene(
@@ -4138,6 +4144,7 @@ class TestGeneResponseProfile:
         mock_conn.execute_query.side_effect = [
             [{"organisms": [self._ORGANISM]}],
             self._make_envelope_result(found=["PMM0370"]),
+            [],  # case-mismatch lookup over not_found
             self._make_agg_rows(),
         ]
         result = api.gene_response_profile(locus_tags=["PMM0370", "FAKE999"], conn=mock_conn)
@@ -4517,6 +4524,7 @@ class TestGeneClustersByGene:
         mock_conn.execute_query.side_effect = [
             [{"organisms": ["Prochlorococcus MED4"]}],
             [summary_with_nf],
+            [],  # case-mismatch lookup over not_found
         ]
         result = api.gene_clusters_by_gene(
             locus_tags=["PMM0370", "FAKE001"], summary=True, conn=mock_conn)
@@ -11994,7 +12002,8 @@ class TestGeneAaSequence:
 
     _ENVELOPE_KEYS = {
         "total_matching", "returned", "truncated", "by_organism",
-        "sequence_length_stats", "not_found", "not_matched", "fasta", "results",
+        "sequence_length_stats", "not_found", "not_matched", "warnings",
+        "fasta", "results",
     }
 
     def _exist(self, found, not_found=()):
@@ -12098,6 +12107,7 @@ class TestGeneAaSequence:
                 len_pcts=(None, None, None, None, None, None),
             ),
             [],  # detail builder runs (limit>0) but matches nothing
+            [],  # case-mismatch lookup over not_found
         ]
         result = api.gene_aa_sequence(locus_tags=["NOTAREAL"], conn=mock_conn)
         assert result["total_matching"] == 0
@@ -12136,6 +12146,7 @@ class TestGeneAaSequence:
                 total_matching=1,
             ),
             [self._detail_rows()[1]],
+            [],  # case-mismatch lookup over not_found
         ]
         result = api.gene_aa_sequence(
             locus_tags=["ACZ81_08860", "NOTAREAL"], conn=mock_conn,
@@ -12152,6 +12163,7 @@ class TestGeneAaSequence:
                 total_matching=1,
             ),
             [self._detail_rows()[1]],
+            [],  # case-mismatch lookup over not_found
         ]
         result = api.gene_aa_sequence(
             locus_tags=["ACZ81_08860", "SYNW1755", "NOTAREAL"], conn=mock_conn,
@@ -12322,6 +12334,7 @@ class TestGeneNeighbors:
             self._exist(["ACZ81_08860"], not_found=["NOTAREAL"]),
             self._anchor_rows(("ACZ81_08860", True, "+")),
             [self._neighbor_row("ACZ81_08860", "ACZ81_08850", -1, 10, "+", True)],
+            [],  # case-mismatch lookup over not_found
         ]
         result = api.gene_neighbors(
             locus_tags=["ACZ81_08860", "NOTAREAL"], conn=mock_conn,
@@ -12337,6 +12350,7 @@ class TestGeneNeighbors:
                 ("SYNW1755", False, None),
             ),
             [self._neighbor_row("ACZ81_08860", "ACZ81_08850", -1, 10, "+", True)],
+            [],  # case-mismatch lookup over not_found
         ]
         result = api.gene_neighbors(
             locus_tags=["ACZ81_08860", "SYNW1755", "NOTAREAL"], conn=mock_conn,
@@ -17048,3 +17062,165 @@ class TestMetabolitesByGeneBreakdownCap:
         assert "Se" not in elements and "Br" not in elements
         assert len(out["by_element"]) == 12
         assert "by_element_truncated" not in out
+
+
+# ---------------------------------------------------------------------------
+# llm-review 2b.3 Task 2: bare term / group ID coercion + locus-tag
+# case-mismatch warning
+# ---------------------------------------------------------------------------
+
+class TestCoerceIds:
+    """`_coerce_ids(ids, rules)` -> `(canonical_ids, resolved_aliases)`.
+
+    Table-driven over every rule in `_TERM_ID_COERCIONS` /
+    `_GROUP_ID_COERCIONS`, plus the shared no-op / passthrough behavior.
+    """
+
+    def _fn(self):
+        from multiomics_explorer.api.functions import _coerce_ids
+        return _coerce_ids
+
+    def _term_rules(self):
+        from multiomics_explorer.api.functions import _TERM_ID_COERCIONS
+        return _TERM_ID_COERCIONS
+
+    def _group_rules(self):
+        from multiomics_explorer.api.functions import _GROUP_ID_COERCIONS
+        return _GROUP_ID_COERCIONS
+
+    # -- short-circuits ------------------------------------------------
+    def test_none_passthrough(self):
+        ids, aliases = self._fn()(None, self._term_rules())
+        assert ids is None
+        assert aliases == {}
+
+    def test_empty_list_passthrough(self):
+        ids, aliases = self._fn()([], self._term_rules())
+        assert ids == []
+        assert aliases == {}
+
+    # -- table-driven: bare -> canonical, per ontology rule -------------
+    @pytest.mark.parametrize("bare,canonical", [
+        ("ko00910", "kegg.pathway:ko00910"),
+        ("map00910", "kegg.pathway:ko00910"),
+        ("00910", "kegg.pathway:ko00910"),
+        ("K00001", "kegg.orthology:K00001"),
+        ("k00001", "kegg.orthology:K00001"),
+        ("0006979", "go:0006979"),
+        ("GO:0006979", "go:0006979"),
+        ("go:0006979", "go:0006979"),
+        ("PF00004", "pfam:PF00004"),
+        ("pf00004", "pfam:PF00004"),
+        ("IPR000014", "interpro:IPR000014"),
+        ("ipr000014", "interpro:IPR000014"),
+        ("3.A.1", "tcdb:3.A.1"),
+        ("3.A.1.1", "tcdb:3.A.1.1"),
+        ("3.A.1.1.1", "tcdb:3.A.1.1.1"),
+        ("1.1.1.1", "ec:1.1.1.1"),
+        ("1.-.-.-", "ec:1.-.-.-"),
+        ("GH13", "cazy:GH13"),
+        ("AA10_1", "cazy:AA10_1"),
+        ("S33", "merops.family:S33"),
+        ("A01A", "merops.family:A01A"),
+        ("TIGR00254", "ncbifam:TIGR00254"),
+        ("NF000282", "ncbifam:NF000282"),
+    ])
+    def test_term_id_coercion_table(self, bare, canonical):
+        ids, aliases = self._fn()([bare], self._term_rules())
+        assert ids == [canonical]
+        if bare == canonical:
+            assert aliases == {}
+        else:
+            assert aliases == {bare: [canonical]}
+
+    @pytest.mark.parametrize("canonical", [
+        "kegg.pathway:ko00910", "kegg.orthology:K00001", "go:0006979",
+        "pfam:PF00004", "interpro:IPR000014", "tcdb:3.A.1.1",
+        "ec:1.1.1.1", "cazy:GH13", "merops.family:S33",
+        "ncbifam:TIGR00254", "ncbifam:NF000282",
+    ])
+    def test_already_canonical_term_id_passes_through_unaliased(self, canonical):
+        ids, aliases = self._fn()([canonical], self._term_rules())
+        assert ids == [canonical]
+        assert aliases == {}
+
+    @pytest.mark.parametrize("bare,canonical", [
+        ("CK_00000570", "cyanorak:CK_00000570"),
+        ("COG0592@2", "eggnog:COG0592@2"),
+        ("1MKTR@1212", "eggnog:1MKTR@1212"),
+        ("1H29V@1129", "eggnog:1H29V@1129"),
+    ])
+    def test_group_id_coercion_table(self, bare, canonical):
+        ids, aliases = self._fn()([bare], self._group_rules())
+        assert ids == [canonical]
+        assert aliases == {bare: [canonical]}
+
+    @pytest.mark.parametrize("canonical", [
+        "cyanorak:CK_00000570", "eggnog:COG0592@2", "eggnog:1MKTR@1212",
+    ])
+    def test_already_canonical_group_id_passes_through_unaliased(self, canonical):
+        ids, aliases = self._fn()([canonical], self._group_rules())
+        assert ids == [canonical]
+        assert aliases == {}
+
+    # -- non-matching input passes through unchanged --------------------
+    def test_non_matching_input_passes_through(self):
+        ids, aliases = self._fn()(["not-a-term-id"], self._term_rules())
+        assert ids == ["not-a-term-id"]
+        assert aliases == {}
+
+    def test_non_matching_group_input_passes_through(self):
+        ids, aliases = self._fn()(["not-a-group-id"], self._group_rules())
+        assert ids == ["not-a-group-id"]
+        assert aliases == {}
+
+    # -- batch: order preserved, only coerced entries in the alias map --
+    def test_batch_preserves_order_and_records_only_coerced(self):
+        ids, aliases = self._fn()(
+            ["ko00910", "kegg.pathway:ko00195", "bogus"], self._term_rules(),
+        )
+        assert ids == ["kegg.pathway:ko00910", "kegg.pathway:ko00195", "bogus"]
+        assert aliases == {"ko00910": ["kegg.pathway:ko00910"]}
+
+
+class TestCaseMismatchWarnings:
+    """`_case_mismatch_warnings(conn, not_found)` — one extra lookup, no
+    normalisation of the input locus_tags."""
+
+    def _fn(self):
+        from multiomics_explorer.api.functions import _case_mismatch_warnings
+        return _case_mismatch_warnings
+
+    def test_empty_not_found_no_query(self):
+        conn = MagicMock()
+        warnings = self._fn()(conn, [])
+        assert warnings == []
+        conn.execute_query.assert_not_called()
+
+    def test_case_mismatch_produces_warning(self):
+        conn = MagicMock()
+        conn.execute_query.return_value = [{"locus_tag": "PMM0001"}]
+        warnings = self._fn()(conn, ["pmm0001"])
+        assert warnings == ["pmm0001 not found; 'PMM0001' differs only by case"]
+
+    def test_no_case_match_no_warning(self):
+        conn = MagicMock()
+        conn.execute_query.return_value = []
+        warnings = self._fn()(conn, ["totally_bogus_tag"])
+        assert warnings == []
+
+    def test_query_params_uppercased(self):
+        conn = MagicMock()
+        conn.execute_query.return_value = []
+        self._fn()(conn, ["pmm0001", "sync_0002"])
+        _, kwargs = conn.execute_query.call_args
+        assert kwargs["upper"] == ["PMM0001", "SYNC_0002"]
+
+    def test_self_match_suppressed(self):
+        """A not_found tag that exactly matches a real locus_tag (organism-
+        scoped not_found, e.g. metabolites_by_gene) must not warn — nothing
+        actually differs by case."""
+        conn = MagicMock()
+        conn.execute_query.return_value = [{"locus_tag": "PMM0001"}]
+        warnings = self._fn()(conn, ["PMM0001"])
+        assert warnings == []

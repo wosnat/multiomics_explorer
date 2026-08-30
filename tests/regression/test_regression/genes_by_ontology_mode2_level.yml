@@ -72,6 +72,7 @@ not_found: []
 offset: 0
 ontology: cyanorak_role
 organism_name: Prochlorococcus MED4
+resolved_aliases: {}
 results:
 - evidence: curated
   gene_category: Replication and repair

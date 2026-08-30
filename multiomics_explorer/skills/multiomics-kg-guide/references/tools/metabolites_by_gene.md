@@ -77,7 +77,7 @@ total_matching, returned, offset, truncated, warnings, resolved_aliases, not_fou
 - **returned** (int): Number of rows in `results` (≤ `limit`).
 - **offset** (int): Echo of the requested offset.
 - **truncated** (bool): True when `offset + limit < total_matching`.
-- **warnings** (list[string]): Diagnostic strings. Currently emitted: gene-anchored auto-warning naming input genes whose `transport_substrate_resolution='family_inferred'` — their substrate breadth is reachability, not capability; bare-ID collision notes (one input → several metabolites, expanded to all); a `gene_categories` value not found in the live vocabulary.
+- **warnings** (list[string]): Diagnostic strings. Currently emitted: gene-anchored auto-warning naming input genes whose `transport_substrate_resolution='family_inferred'` — their substrate breadth is reachability, not capability; bare-ID collision notes (one input → several metabolites, expanded to all); a `gene_categories` value not found in the live vocabulary; a `not_found.locus_tags` entry differing only by case from a real one (locus_tags are never case-normalised).
 - **resolved_aliases** (object): Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).
 - **not_found** (MbgNotFound): Inputs that did not resolve to a KG node — see model.
 - **not_matched** (list[string]): Input locus_tags that resolve to a Gene in the requested organism but produced zero chemistry rows (no Gene_catalyzes_reaction AND no Gene_has_tcdb_family). Distinct from `not_found.locus_tags` (those don't resolve at all).

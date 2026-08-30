@@ -244,6 +244,10 @@ class PathwayEnrichmentTermValidation(BaseModel):
         default_factory=list,
         description="term_ids valid but excluded by size bounds (irrelevant here since wide bounds are used internally)",
     )
+    resolved_aliases: dict[str, list[str]] = Field(
+        default_factory=dict,
+        description="Bare term_ids (e.g. 'ko00910', 'GO:0006979') coerced to canonical CURIEs, {input: [canonical]}. Empty when none were coerced.",
+    )
 
 
 class PathwayEnrichmentClusterSkipped(BaseModel):
@@ -1308,7 +1312,9 @@ class MetabolitesByGeneResponse(BaseModel):
         "`transport_substrate_resolution='family_inferred'` — their "
         "substrate breadth is reachability, not capability; bare-ID "
         "collision notes (one input → several metabolites, expanded to "
-        "all); a `gene_categories` value not found in the live vocabulary.")
+        "all); a `gene_categories` value not found in the live vocabulary; "
+        "a `not_found.locus_tags` entry differing only by case from a real "
+        "one (locus_tags are never case-normalised).")
     resolved_aliases: dict[str, list[str]] = Field(
         default_factory=dict,
         description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
@@ -2362,6 +2368,7 @@ def register_tools(mcp: FastMCP):
         offset: int = Field(default=0, description="Offset into full result set.")
         truncated: bool = Field(description="True if total_matching > returned.")
         not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG.")
+        warnings: list[str] = Field(default_factory=list, description="Advisory diagnostics — e.g. a not_found locus_tag differs only by case from a real one (locus_tags are never case-normalised).")
         results: list[GeneOverviewResult] = Field(default_factory=list, description="One row per gene.")
 
     @mcp.tool(
@@ -2441,6 +2448,7 @@ def register_tools(mcp: FastMCP):
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],
                 not_found=data["not_found"],
+                warnings=data.get("warnings", []),
                 results=results,
             )
         except ValueError as e:
@@ -2456,6 +2464,7 @@ def register_tools(mcp: FastMCP):
         offset: int = Field(default=0, description="Offset into full result set.")
         truncated: bool = Field(description="True if total_matching > returned.")
         not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG.")
+        warnings: list[str] = Field(default_factory=list, description="Advisory diagnostics — e.g. a not_found locus_tag differs only by case from a real one (locus_tags are never case-normalised).")
         results: list[dict] = Field(default_factory=list, description="One row per gene — all Gene node properties via g{.*} (~30 fields incl. locus_tag, gene_name, product, organism_name, gene_category, annotation_quality, function_description, catalytic_activities, ec_numbers). Sparse fields only present when populated. annotation_quality is 0..3 (see docs://guide/conventions for the [AQ] redefinition). TCDB and CAZy memberships are graph edges (Gene_has_tcdb_family / Gene_has_cazy_family), not properties.")
 
     @mcp.tool(
@@ -2550,6 +2559,7 @@ def register_tools(mcp: FastMCP):
         top_cog_categories: list[OntologyBreakdown] = Field(
             default_factory=list,
             description="Top 5 CogFunctionalCategory annotations by frequency")
+        warnings: list[str] = Field(default_factory=list, description="Advisory diagnostics — e.g. a not_found locus_tag differs only by case from a real one (locus_tags are never case-normalised).")
         results: list[GeneHomologResult] = Field(default_factory=list, description="One row per gene × ortholog group")
 
     @mcp.tool(
@@ -2623,6 +2633,7 @@ def register_tools(mcp: FastMCP):
                 no_groups=data["no_groups"],
                 top_cyanorak_roles=top_cr,
                 top_cog_categories=top_cc,
+                warnings=data.get("warnings", []),
                 results=results,
             )
             await ctx.info(f"Returning {response.returned} of {response.total_matching} "
@@ -3042,6 +3053,8 @@ def register_tools(mcp: FastMCP):
             description="Total links_out entries across returned rows")
         by_link_kind: list[OntologyTermDetailsByLinkKind] = Field(default_factory=list,
             description="links_out entries per link_kind")
+        resolved_aliases: dict[str, list[str]] = Field(default_factory=dict,
+            description="Bare term_ids (e.g. 'ko00910', 'GO:0006979') coerced to canonical CURIEs, {input: [canonical]}. Empty when none were coerced.")
         warnings: list[str] = Field(default_factory=list,
             description="Auto-warnings (reserved for future use; always empty)")
         results: list[OntologyTermDetailsRow] = Field(default_factory=list,
@@ -3055,9 +3068,9 @@ def register_tools(mcp: FastMCP):
         ctx: Context,
         term_ids: Annotated[list[str], Field(
             description="Self-prefixed term IDs, any ontology mix (e.g. 'go:0006979', "
-                        "'tcdb:3.A.1', 'merops.family:S14', 'interpro:IPR000362', "
-                        "'ncbifam:NF006762', 'tigr.role:100', 'pfam:PF00005', "
-                        "'kegg.pathway:ko00010'). Rows return in input order.",
+                        "'tcdb:3.A.1', 'interpro:IPR000362', 'pfam:PF00005', "
+                        "'kegg.pathway:ko00010'). Rows return in input order. Bare "
+                        "ids accepted (e.g. 'ko00910', 'GO:0006979') — see `resolved_aliases`.",
         )],
         organism: Annotated[str | None, Field(
             description="Organism to scope genes_by_organism to (resolved like every other "
@@ -3287,6 +3300,8 @@ def register_tools(mcp: FastMCP):
             description="Input term_ids in the ontology but at wrong level (only when level + term_ids both set)")
         filtered_out: list[str] = Field(default_factory=list,
             description="Input term_ids valid but outside [min, max]_gene_set_size")
+        resolved_aliases: dict[str, list[str]] = Field(default_factory=dict,
+            description="Bare term_ids (e.g. 'ko00910', 'GO:0006979') coerced to canonical CURIEs, {input: [canonical]}. Empty when none were coerced.")
         returned: int = Field(description="Rows in this response")
         offset: int = Field(default=0, description="Offset into full result set")
         truncated: bool = Field(description="True when total_matching > offset + returned")
@@ -3357,7 +3372,9 @@ def register_tools(mcp: FastMCP):
         term_ids: Annotated[list[str] | None, Field(
             description="Ontology term IDs (from search_ontology). "
                         "Without `level`: expand DOWN from each input term. "
-                        "With `level`: scope rollup to these level-N terms.",
+                        "With `level`: scope rollup to these level-N terms. "
+                        "Bare ids are accepted (e.g. 'ko00910', 'GO:0006979') and "
+                        "coerced to canonical (see `resolved_aliases`).",
         )] = None,
         min_gene_set_size: Annotated[int, Field(
             description="Exclude terms with fewer organism-scoped genes than this. "
@@ -3606,7 +3623,7 @@ def register_tools(mcp: FastMCP):
             description="Multi-ontology: [{ontology, reason}] for ontologies dropped "
                         "because a filter/facet only some of the queried ontologies own.")
         warnings: list[str] = Field(default_factory=list,
-            description="Auto-warnings, incl. skipped-ontology and trust-cutoff notices.")
+            description="Auto-warnings, incl. skipped-ontology, trust-cutoff, and locus_tag case-mismatch notices.")
         results: list[OntologyTermRow] = Field(default_factory=list, description="One row per gene × term")
 
     @mcp.tool(
@@ -4551,7 +4568,9 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="One entry per growth_phases value not found in the"
             " live vocabulary (see list_filter_values(filter_type="
-            "'growth_phase')). Empty when clean.",
+            "'growth_phase')), plus one per not_found locus_tag differing"
+            " only by case from a real one (locus_tags are never"
+            " case-normalised). Empty when clean.",
         )
         not_found_experiments: list[str] = Field(
             default_factory=list,
@@ -4979,6 +4998,8 @@ def register_tools(mcp: FastMCP):
             description="Organism filter values matching zero Gene nodes in KG")
         not_matched_organisms: list[str] = Field(default_factory=list,
             description="Organisms in KG but with zero genes in the requested groups")
+        resolved_aliases: dict[str, list[str]] = Field(default_factory=dict,
+            description="Bare group_ids (e.g. 'CK_00000570', 'COG0592@2') coerced to canonical prefixed form, {input: [canonical]}. Empty when none were coerced.")
         returned: int = Field(description="Results in this response")
         truncated: bool = Field(
             description="True if total_matching > returned")
@@ -4993,7 +5014,9 @@ def register_tools(mcp: FastMCP):
         ctx: Context,
         group_ids: Annotated[list[str], Field(
             description="Ortholog group IDs (from search_homolog_groups or "
-            "gene_homologs). E.g. ['cyanorak:CK_00000570'].",
+            "gene_homologs). E.g. ['cyanorak:CK_00000570']. Bare ids are accepted "
+            "(e.g. 'CK_00000570', 'COG0592@2') and coerced to canonical (see "
+            "`resolved_aliases`).",
         )],
         organisms: Annotated[list[str] | None, Field(
             description="Filter by organisms — each entry a word-based, case-insensitive "
@@ -5048,6 +5071,7 @@ def register_tools(mcp: FastMCP):
                 not_matched_groups=data["not_matched_groups"],
                 not_found_organisms=data["not_found_organisms"],
                 not_matched_organisms=data["not_matched_organisms"],
+                resolved_aliases=data.get("resolved_aliases", {}),
                 returned=data["returned"],
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],
@@ -5289,6 +5313,11 @@ def register_tools(mcp: FastMCP):
             description="Experiments that exist but have 0 expression"
             " edges to group members",
         )
+        resolved_aliases: dict[str, list[str]] = Field(
+            default_factory=dict,
+            description="Bare group_ids (e.g. 'CK_00000570', 'COG0592@2') coerced to "
+            "canonical prefixed form, {input: [canonical]}. Empty when none were coerced.",
+        )
 
     @mcp.tool(
         tags={"expression", "homology"},
@@ -5298,7 +5327,9 @@ def register_tools(mcp: FastMCP):
         ctx: Context,
         group_ids: Annotated[list[str], Field(
             description="Ortholog group IDs (from search_homolog_groups or "
-            "gene_homologs). E.g. ['cyanorak:CK_00000570'].",
+            "gene_homologs). E.g. ['cyanorak:CK_00000570']. Bare ids are accepted "
+            "(e.g. 'CK_00000570', 'COG0592@2') and coerced to canonical (see "
+            "`resolved_aliases`).",
         )],
         organisms: Annotated[list[str] | None, Field(
             description="Filter by organisms — each entry a word-based, case-insensitive "
@@ -5412,6 +5443,7 @@ def register_tools(mcp: FastMCP):
                 not_matched_organisms=data["not_matched_organisms"],
                 not_found_experiments=data["not_found_experiments"],
                 not_matched_experiments=data["not_matched_experiments"],
+                resolved_aliases=data.get("resolved_aliases", {}),
             )
             await ctx.info(
                 f"Returning {response.returned} rows"
@@ -5468,7 +5500,7 @@ def register_tools(mcp: FastMCP):
         not_found: list[str] = Field(default_factory=list, description="Input locus_tags not found in KG")
         no_expression: list[str] = Field(default_factory=list, description="Gene exists but has NO Changes_expression_of edge at all in the organism")
         filtered_out: list[str] = Field(default_factory=list, description="Gene has expression edges but none survive the active treatment_types / background_factors filters — e.g. a treatment_types vocabulary typo. Never confuse with no_expression.")
-        warnings: list[str] = Field(default_factory=list, description="One entry per treatment_types / background_factors value not found in the live vocabulary (see list_filter_values(filter_type='treatment_type' or 'background_factors')). Empty when clean.")
+        warnings: list[str] = Field(default_factory=list, description="One entry per treatment_types / background_factors value not found in the live vocabulary (see list_filter_values(filter_type='treatment_type' or 'background_factors')), plus one per not_found locus_tag differing only by case from a real one (locus_tags are never case-normalised). Empty when clean.")
         returned: int = Field(description="Genes in results after pagination (e.g. 15)")
         offset: int = Field(description="Offset into paginated gene list (e.g. 0)")
         truncated: bool = Field(description="True if more genes available beyond returned + offset")
@@ -5942,7 +5974,9 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="A closed-vocabulary filter value (compartment / "
                         "treatment_type / background_factors) not found in "
-                        "the live vocabulary (see list_filter_values). "
+                        "the live vocabulary (see list_filter_values), plus "
+                        "a not_found locus_tag differing only by case from "
+                        "a real one (locus_tags are never case-normalised). "
                         "Advisory only — never changes which rows are "
                         "returned. Empty when clean.")
         results: list[GeneDerivedMetricsResult] = Field(
@@ -6420,7 +6454,7 @@ def register_tools(mcp: FastMCP):
         offset: int = Field(default=0, description="Offset into result set")
         truncated: bool = Field(
             description="True if total_matching > offset + returned")
-        warnings: list[str] = Field(default_factory=list, description="A closed-vocabulary filter value (cluster_type / treatment_type / background_factors) not found in the live vocabulary (see list_filter_values). Advisory only — never changes which rows are returned. Empty when clean.")
+        warnings: list[str] = Field(default_factory=list, description="A closed-vocabulary filter value (cluster_type / treatment_type / background_factors) not found in the live vocabulary (see list_filter_values), plus a not_found locus_tag differing only by case from a real one (locus_tags are never case-normalised). Advisory only — never changes which rows are returned. Empty when clean.")
         results: list["GeneClustersByGeneResult"] = Field(
             default_factory=list, description="One row per gene × cluster")
 
@@ -7045,7 +7079,9 @@ def register_tools(mcp: FastMCP):
             ge=0,
         )] = None,
         term_ids: Annotated[list[str] | None, Field(
-            description="Specific term IDs to test. Combines with level to scope rollup.",
+            description="Specific term IDs to test. Combines with level to scope rollup. "
+                        "Bare ids are accepted (e.g. 'ko00910', 'GO:0006979') and coerced "
+                        "to canonical (see `term_validation.resolved_aliases`).",
         )] = None,
         direction: Annotated[Literal["up", "down", "both"], Field(
             description="DE direction(s) to include in gene_sets.",
@@ -7234,7 +7270,10 @@ def register_tools(mcp: FastMCP):
         level: Annotated[int | None, Field(
             description="Hierarchy level (0 = root). At least one of `level` or `term_ids` "
                         "required. See docs://guide/conventions.", ge=0)] = None,
-        term_ids: Annotated[list[str] | None, Field(description="Specific term IDs to test.")] = None,
+        term_ids: Annotated[list[str] | None, Field(
+            description="Specific term IDs to test. Bare ids are accepted (e.g. "
+                        "'ko00910', 'GO:0006979') and coerced to canonical (see "
+                        "`term_validation.resolved_aliases`).")] = None,
         background: Annotated[str | list[str], Field(
             description="'cluster_union' (default — union of all clustered genes; differs "
                         "from `pathway_enrichment`'s 'table_scope' default), 'organism', or "
@@ -10835,6 +10874,7 @@ def register_tools(mcp: FastMCP):
         sequence_length_stats: "SequenceLengthStats" = Field(description="Amino-acid-length distribution over ALL matched genes (page-independent — stable across limit/offset).")
         not_found: list[str] = Field(default_factory=list, description="Input locus_tags absent from the KG. Distinct from not_matched (those exist but lack a sequence). E.g. ['NOTAREAL'].")
         not_matched: list[str] = Field(default_factory=list, description="Locus_tags whose gene exists but has a null sequence (expression-only, no genome match). Distinct from not_found. E.g. ['SYNW1755'].")
+        warnings: list[str] = Field(default_factory=list, description="Advisory diagnostics — e.g. a not_found locus_tag differs only by case from a real one (locus_tags are never case-normalised).")
         fasta: str = Field(default="", description="Multi-FASTA blob covering the returned page (non-empty only when fasta=true; '' otherwise). Header: '>{locus_tag} {organism_name}|{protein_id}|{product}'.")
         results: list["GeneAaSequenceResult"] = Field(default_factory=list, description="One row per matched gene, sorted by organism_name then locus_tag. Empty when summary=true.")
 
@@ -10887,6 +10927,7 @@ def register_tools(mcp: FastMCP):
             sequence_length_stats=sequence_length_stats,
             not_found=data["not_found"],
             not_matched=data["not_matched"],
+            warnings=data.get("warnings", []),
             fasta=data["fasta"],
             results=results,
         )
@@ -10924,7 +10965,7 @@ def register_tools(mcp: FastMCP):
         by_organism: list["OrganismCount"] = Field(default_factory=list, description="Neighbor-row count per organism, sorted desc. E.g. [{'organism_name': 'Alteromonas macleodii HOT1A3', 'count': 2}].")
         not_found: list[str] = Field(default_factory=list, description="Anchor locus_tags absent from the KG. Distinct from not_matched (those exist but lack coordinates). E.g. ['NOTAREAL'].")
         not_matched: list[str] = Field(default_factory=list, description="Anchors that exist but lack genomic coordinates (null start/contig) → no neighborhood. Distinct from not_found. E.g. ['SYNW1755'].")
-        warnings: list[str] = Field(default_factory=list, description="Advisory notes, e.g. same_strand requested but an anchor's own strand is null → its neighbors returned unfiltered.")
+        warnings: list[str] = Field(default_factory=list, description="Advisory notes, e.g. same_strand requested but an anchor's own strand is null → its neighbors returned unfiltered; or a not_found locus_tag differs only by case from a real one (locus_tags are never case-normalised).")
         results: list["GeneNeighborsResult"] = Field(default_factory=list, description="One row per anchor × neighbor, sorted by anchor_locus_tag then rank_offset. Empty when summary=true.")
 
     @mcp.tool(tags={"gene", "genome"}, annotations={"readOnlyHint": True})

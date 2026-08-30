@@ -507,6 +507,7 @@ class TestDifferentialExpressionByOrthologContract:
             "not_found_groups", "not_matched_groups",
             "not_found_organisms", "not_matched_organisms",
             "not_found_experiments", "not_matched_experiments",
+            "resolved_aliases",
         }
         assert set(result.keys()) == expected_keys
 
@@ -761,6 +762,7 @@ class TestGenesByHomologGroupContract:
             "not_found_groups", "not_matched_groups",
             "not_found_organisms", "not_matched_organisms",
             "returned", "truncated", "offset", "results",
+            "resolved_aliases",
         }
         assert set(result.keys()) == expected_keys
 

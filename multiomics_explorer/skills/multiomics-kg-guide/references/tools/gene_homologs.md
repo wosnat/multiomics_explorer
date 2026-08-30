@@ -27,7 +27,7 @@ text-search groups via `search_homolog_groups`.
 ### Envelope
 
 ```expected-keys
-total_matching, by_organism, by_source, returned, offset, truncated, not_found, no_groups, top_cyanorak_roles, top_cog_categories, results
+total_matching, by_organism, by_source, returned, offset, truncated, not_found, no_groups, top_cyanorak_roles, top_cog_categories, warnings, results
 ```
 
 - **total_matching** (int): Total gene×group rows matching filters
@@ -40,6 +40,7 @@ total_matching, by_organism, by_source, returned, offset, truncated, not_found, 
 - **no_groups** (list[string]): Genes that exist but have zero matching ortholog groups
 - **top_cyanorak_roles** (list[OntologyBreakdown]): Top 5 CyanorakRole annotations by frequency
 - **top_cog_categories** (list[OntologyBreakdown]): Top 5 CogFunctionalCategory annotations by frequency
+- **warnings** (list[string]): Advisory diagnostics — e.g. a not_found locus_tag differs only by case from a real one (locus_tags are never case-normalised).
 
 ### Per-result fields
 
@@ -189,7 +190,7 @@ gene_homologs(locus_tags=['PMM0001']) — always a list
 from multiomics_explorer import gene_homologs
 
 result = gene_homologs(locus_tags=...)
-# returns dict with keys: total_matching, by_organism, by_source, returned, offset, truncated, not_found, no_groups, top_cyanorak_roles, top_cog_categories, results
+# returns dict with keys: total_matching, by_organism, by_source, returned, offset, truncated, not_found, no_groups, top_cyanorak_roles, top_cog_categories, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

@@ -21,7 +21,7 @@ Routing: feed locus_tags from `resolve_gene` / `gene_overview` / `genes_by_funct
 ### Envelope
 
 ```expected-keys
-total_matching, returned, truncated, by_organism, sequence_length_stats, not_found, not_matched, fasta, results
+total_matching, returned, truncated, by_organism, sequence_length_stats, not_found, not_matched, warnings, fasta, results
 ```
 
 - **total_matching** (int): Input locus_tags resolving to a gene with a sequence. E.g. 2.
@@ -31,6 +31,7 @@ total_matching, returned, truncated, by_organism, sequence_length_stats, not_fou
 - **sequence_length_stats** (SequenceLengthStats): Amino-acid-length distribution over ALL matched genes (page-independent — stable across limit/offset).
 - **not_found** (list[string]): Input locus_tags absent from the KG. Distinct from not_matched (those exist but lack a sequence). E.g. ['NOTAREAL'].
 - **not_matched** (list[string]): Locus_tags whose gene exists but has a null sequence (expression-only, no genome match). Distinct from not_found. E.g. ['SYNW1755'].
+- **warnings** (list[string]): Advisory diagnostics — e.g. a not_found locus_tag differs only by case from a real one (locus_tags are never case-normalised).
 - **fasta** (string): Multi-FASTA blob covering the returned page (non-empty only when fasta=true; '' otherwise). Header: '>{locus_tag} {organism_name}|{protein_id}|{product}'.
 
 ### Per-result fields
@@ -195,7 +196,7 @@ gene_overview → gene_aa_sequence (confirm identity, then pull the sequence)
 from multiomics_explorer import gene_aa_sequence
 
 result = gene_aa_sequence(locus_tags=...)
-# returns dict with keys: total_matching, returned, truncated, by_organism, sequence_length_stats, not_found, not_matched, fasta, results
+# returns dict with keys: total_matching, returned, truncated, by_organism, sequence_length_stats, not_found, not_matched, warnings, fasta, results
 ```
 
 Use package import for bulk data extraction in scripts.

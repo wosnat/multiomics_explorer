@@ -42,6 +42,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_details,
     build_gene_details_summary,
     build_gene_existence_check,
+    build_locus_tag_case_matches,
     build_gene_homologs,
     build_gene_homologs_summary,
     build_gene_neighbors,
@@ -245,6 +246,7 @@ _BUILDERS: list[tuple[str, ...]] = [
     ("gene_details_summary", build_gene_details_summary, {"locus_tags": _LOCUS}),
     ("gene_stub", build_gene_stub, {"gene_id": "PMM0001"}),
     ("gene_existence_check", build_gene_existence_check, {"locus_tags": _LOCUS}),
+    ("locus_tag_case_matches", build_locus_tag_case_matches, {"not_found": ["pmm0001"]}),
     # --- sequence + genomic neighbors ---
     ("gene_aa_sequence", build_gene_aa_sequence, {"locus_tags": _LOCUS, "limit": 25}),
     ("gene_aa_sequence_summary", build_gene_aa_sequence_summary, {"locus_tags": _LOCUS}),

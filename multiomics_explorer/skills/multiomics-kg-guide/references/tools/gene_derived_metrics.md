@@ -66,7 +66,7 @@ total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics
 - **returned** (int): Length of results list.
 - **offset** (int): Pagination offset used.
 - **truncated** (bool): True when total_matching > offset + returned.
-- **warnings** (list[string]): A closed-vocabulary filter value (compartment / treatment_type / background_factors) not found in the live vocabulary (see list_filter_values). Advisory only — never changes which rows are returned. Empty when clean.
+- **warnings** (list[string]): A closed-vocabulary filter value (compartment / treatment_type / background_factors) not found in the live vocabulary (see list_filter_values), plus a not_found locus_tag differing only by case from a real one (locus_tags are never case-normalised). Advisory only — never changes which rows are returned. Empty when clean.
 
 ### Per-result fields
 

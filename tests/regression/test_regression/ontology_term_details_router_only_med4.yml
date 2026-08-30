@@ -10,6 +10,7 @@ case_id: ontology_term_details_router_only_med4
 links_out_total: 5
 not_found: []
 offset: 0
+resolved_aliases: {}
 results:
 - children:
   - '{''id'': ''tcdb:3.A.1.1'', ''level'': 3, ''name'': ''The Carbohydrate Uptake

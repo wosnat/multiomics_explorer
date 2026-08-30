@@ -47,6 +47,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_aa_sequence,
     build_gene_aa_sequence_summary,
     build_gene_existence_check,
+    build_locus_tag_case_matches,
     build_gene_neighbors,
     build_gene_neighbors_summary,
     build_gene_ontology_terms,
@@ -747,6 +748,117 @@ def _organism_zero_match_warning(conn, organism: str | None) -> list[str]:
     return [f"organism '{organism}' matched no organism — see list_organisms()"]
 
 
+# ---------------------------------------------------------------------------
+# Bare ontology-term / ortholog-group ID coercion (llm-review 2b.3 Task 2).
+# Deterministic regex table, tried in order, first match wins. Unlike the
+# metabolite-ID coercion below (`_canonicalize_metabolite_ids`), this is a
+# pure local regex — no DB round trip and no ambiguity, since a bare
+# accession maps onto exactly one ontology / OG source. Patterns verified
+# against live KG IDs (go:0098045, kegg.pathway:ko01100,
+# kegg.orthology:K##### , pfam:PF#####, interpro:IPR######, ec:2.-.-.-,
+# cazy:GT2, merops.family:S33, ncbifam:TIGR00254, tcdb:3.A.1...,
+# cyanorak:CK_########, eggnog:1H29V@1129 / eggnog:COG0592@2).
+# ---------------------------------------------------------------------------
+
+_TERM_ID_COERCIONS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"^(?:kegg\.pathway:)?(?:map|ko)?(\d{5})$"), "kegg.pathway:ko{0}"),
+    (re.compile(r"^(?:kegg\.orthology:|kegg:|ko:)?(K\d{5})$", re.I), "kegg.orthology:{0}"),
+    (re.compile(r"^(?:go:)?(?:GO:)?(\d{7})$"), "go:{0}"),
+    (re.compile(r"^(?:pfam:)?(PF\d{5})$", re.I), "pfam:{0}"),
+    (re.compile(r"^(?:interpro:)?(IPR\d{6})$", re.I), "interpro:{0}"),
+    (re.compile(r"^(?:tcdb:)?(\d\.[A-Z]\.\d+(?:\.\d+){0,2})$"), "tcdb:{0}"),
+    (re.compile(r"^(?:ec:)?(\d+(?:\.(?:\d+|-)){3})$"), "ec:{0}"),
+    (re.compile(r"^(?:cazy:)?((?:GH|GT|PL|CE|AA|CBM)\d+(?:_\d+)?)$"), "cazy:{0}"),
+    (re.compile(r"^(?:merops\.family:)?([ACGMNPSTUI]\d{2}[A-Z]?)$"), "merops.family:{0}"),
+    (re.compile(r"^(?:ncbifam:)?((?:TIGR|NF)\d{5,6})$"), "ncbifam:{0}"),
+]
+_GROUP_ID_COERCIONS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"^(?:cyanorak:)?(CK_\d{8})$"), "cyanorak:{0}"),
+    (re.compile(r"^(?:eggnog:)?((?:COG|ENOG|[0-9A-Z]{5,7})\d*@\d+)$"), "eggnog:{0}"),
+]
+
+
+def _coerce_ids(
+    ids: list[str] | None, rules: list[tuple[re.Pattern, str]],
+) -> tuple[list[str] | None, dict[str, list[str]]]:
+    """Coerce bare ontology-term / ortholog-group IDs to their canonical form.
+
+    Tries each `(pattern, template)` rule in order; the first match wins
+    and the input is rewritten via `template.format(match.group(1))` (e.g.
+    `'ko00910'` -> `'kegg.pathway:ko00910'`, `'CK_00000570'` ->
+    `'cyanorak:CK_00000570'`). Already-canonical or non-matching input
+    passes through unchanged (every pattern's prefix group is optional, so
+    a canonical ID round-trips to itself and is never reported as coerced).
+
+    Returns `(canonical ids in input order, {input: [canonical]} for the
+    ones that changed)`. The alias-map shape — a list per input — mirrors
+    `_canonicalize_metabolite_ids`'s `resolved_aliases` for cross-tool
+    consistency, even though every match here is 1:1 (no collision is
+    possible: unlike a metabolite xref, a bare term/group accession cannot
+    resolve to more than one canonical ID).
+
+    `None` / `[]` pass through unchanged (mirrors the metabolite coercer).
+    """
+    if not ids:
+        return ids, {}
+    canonical: list[str] = []
+    resolved: dict[str, list[str]] = {}
+    for raw in ids:
+        canonical_form = raw
+        for pattern, template in rules:
+            m = pattern.match(raw)
+            if m:
+                accession = m.group(1)
+                # Case-insensitive rules (kegg.orthology, pfam, interpro)
+                # accept a lowercase accession but the KG's canonical form
+                # is uppercase — normalise before substitution so the
+                # coerced ID actually matches Metabolite/Term.id downstream.
+                if pattern.flags & re.IGNORECASE:
+                    accession = accession.upper()
+                canonical_form = template.format(accession)
+                break
+        canonical.append(canonical_form)
+        if canonical_form != raw:
+            resolved[raw] = [canonical_form]
+    return canonical, resolved
+
+
+def _case_mismatch_warnings(
+    conn: GraphConnection, not_found: list[str],
+) -> list[str]:
+    """Warn when a not_found locus_tag differs only by case from a real one.
+
+    One extra lookup over the not_found batch (`toUpper(g.locus_tag) IN
+    $upper`) — advisory only, never changes which rows come back and never
+    normalises the input. No uppercase normalisation of locus_tags: ~20,700
+    real `Gene.locus_tag` values are case-mixed KG-wide (e.g.
+    'A9601_pseudoVIMSS1362517'), so case is significant and a blanket
+    upper() would silently change which gene an ambiguous-cased input
+    resolves to.
+
+    Self-match guard: some callers scope their own `not_found` to one
+    organism (e.g. a gene that exists, just under a different organism than
+    requested) rather than to global existence — for those, a tag can land
+    in `not_found` even though a Gene with the exact same spelling exists.
+    Skip that case (`existing == tag`) so the warning never fires when
+    nothing actually differs by case.
+    """
+    if not not_found:
+        return []
+    cypher, params = build_locus_tag_case_matches(not_found=not_found)
+    rows = conn.execute_query(cypher, **params)
+    by_upper: dict[str, list[str]] = {}
+    for r in rows:
+        by_upper.setdefault(r["locus_tag"].upper(), []).append(r["locus_tag"])
+    warnings: list[str] = []
+    for tag in not_found:
+        for existing in by_upper.get(tag.upper(), []):
+            if existing == tag:
+                continue
+            warnings.append(f"{tag} not found; '{existing}' differs only by case")
+    return warnings
+
+
 # Categorical filter params -> where their allowed values live.
 _CATEGORICAL_VALUE_SOURCE: dict[str, tuple[str, str]] = {
     "evidence": ("edge", "evidence"),
@@ -1189,7 +1301,11 @@ def gene_overview(
     Returns dict with keys: total_matching, by_organism, by_category,
     by_annotation_type, has_expression, has_significant_expression,
     has_orthologs, has_clusters, has_discussed, top_discussing_publications,
-    returned, truncated, not_found, results.
+    returned, truncated, not_found, warnings, results.
+
+    warnings: a not_found locus_tag that differs only by case from a real
+    Gene.locus_tag (e.g. 'pmm0001' vs 'PMM0001'). Advisory only — locus_tags
+    are never case-normalised (the KG carries case-mixed real tags).
     Per result: locus_tag, gene_name, product, gene_category,
     annotation_quality, organism_name, annotation_types,
     expression_edge_count, significant_up_count, significant_down_count,
@@ -1278,6 +1394,7 @@ def gene_overview(
         "has_tcdb": raw_summary.get("has_tcdb", 0),
         "has_cazy": raw_summary.get("has_cazy", 0),
         "not_found": raw_summary["not_found"],
+        "warnings": _case_mismatch_warnings(conn, raw_summary["not_found"]),
     }
 
     # Detail query — skip when limit=0
@@ -1456,11 +1573,13 @@ def gene_details(
     """Get all properties for genes (deep-dive complement to gene_overview).
 
     Returns dict with keys: total_matching, returned, truncated,
-    not_found, results.
+    not_found, warnings, results.
     Each result is a flat dict of all Gene node properties (g {.*}).
 
     summary=True is sugar for limit=0: results=[], summary fields only.
     not_found: input locus_tags not in KG.
+    warnings: a not_found locus_tag that differs only by case from a real
+    Gene.locus_tag. Advisory only — locus_tags are never case-normalised.
     """
     if not locus_tags:
         raise ValueError("locus_tags must be a non-empty list")
@@ -1478,6 +1597,7 @@ def gene_details(
     envelope: dict = {
         "total_matching": total_matching,
         "not_found": raw_summary["not_found"],
+        "warnings": _case_mismatch_warnings(conn, raw_summary["not_found"]),
     }
 
     # Detail query — skip when limit=0
@@ -1517,7 +1637,7 @@ def gene_homologs(
 
     Returns dict with keys: total_matching, by_organism, by_source,
     top_cyanorak_roles, top_cog_categories,
-    returned, truncated, not_found, no_groups, results.
+    returned, truncated, not_found, no_groups, warnings, results.
     Per result (compact): locus_tag, organism_name, group_id,
     consensus_gene_name, consensus_product, taxonomic_level, source,
     specificity_rank.
@@ -1529,6 +1649,8 @@ def gene_homologs(
     summary=True is sugar for limit=0: results=[], summary fields only.
     not_found: input locus_tags not in KG.
     no_groups: genes that exist but have zero matching OGs.
+    warnings: a not_found locus_tag that differs only by case from a real
+    Gene.locus_tag. Advisory only — locus_tags are never case-normalised.
     """
     if not locus_tags:
         raise ValueError("locus_tags must not be empty.")
@@ -1581,6 +1703,7 @@ def gene_homologs(
         "no_groups": raw_summary["no_groups"],
         "top_cyanorak_roles": raw_summary["top_cyanorak_roles"],
         "top_cog_categories": raw_summary["top_cog_categories"],
+        "warnings": _case_mismatch_warnings(conn, raw_summary["not_found"]),
     }
 
     # Detail query — skip when limit=0
@@ -2875,12 +2998,17 @@ def genes_by_homolog_group(
     total_categories, genes_per_group_max, genes_per_group_median,
     by_organism, top_categories, top_groups,
     not_found_groups, not_matched_groups,
-    not_found_organisms, not_matched_organisms,
+    not_found_organisms, not_matched_organisms, resolved_aliases,
     returned, truncated, results.
     Per result (compact): locus_tag, gene_name, product,
     organism_name, gene_category, group_id.
     Per result (verbose): adds gene_summary, function_description,
     consensus_product, source.
+
+    group_ids: Accepts the canonical prefixed form (`cyanorak:CK_00000364`,
+        `eggnog:COG0592@2`) or a bare accession (`CK_00000364`,
+        `COG0592@2`) — resolved to canonical before the query runs; see
+        `resolved_aliases` in the envelope.
 
     summary=True: results=[], summary fields only.
 
@@ -2891,6 +3019,10 @@ def genes_by_homolog_group(
         raise ValueError("group_ids must not be empty.")
     if summary:
         limit = 0
+
+    # Bare group IDs (`CK_00000364`, `COG0592@2`) coerced to canonical
+    # prefixed form before any query.
+    group_ids, resolved_aliases = _coerce_ids(group_ids, _GROUP_ID_COERCIONS)
 
     conn = _default_conn(conn)
 
@@ -2922,6 +3054,7 @@ def genes_by_homolog_group(
         "top_groups": by_group_all[:5],
         "not_found_groups": raw_summary["not_found_groups"],
         "not_matched_groups": raw_summary["not_matched_groups"],
+        "resolved_aliases": resolved_aliases,
     }
 
     # Diagnostics query — only when organisms filter is active
@@ -3158,6 +3291,9 @@ def ontology_term_details(
             )
         link_kinds = list(link_kinds)
 
+    # Bare term IDs (`ko00910`, `GO:0006979`) coerced to canonical CURIEs.
+    term_ids, resolved_aliases = _coerce_ids(term_ids, _TERM_ID_COERCIONS)
+
     conn = _default_conn(conn)
     if organism is not None:
         organism = _validate_organism_inputs(organism, None, None, conn)
@@ -3192,6 +3328,7 @@ def ontology_term_details(
         "by_ontology": _freq_rollup(ontology_counter, "ontology"),
         "links_out_total": sum(link_counter.values()),
         "by_link_kind": _freq_rollup(link_counter, "link_kind"),
+        "resolved_aliases": resolved_aliases,
         "warnings": [],
         "results": page,
     }
@@ -3270,6 +3407,10 @@ def genes_by_ontology(
         raise ValueError("max_gene_set_size must be >= min_gene_set_size.")
     if summary:
         limit = 0
+
+    # Bare term IDs (`ko00910`, `GO:0006979`) coerced to canonical CURIEs
+    # before validation — see `_coerce_ids`.
+    term_ids, resolved_aliases = _coerce_ids(term_ids, _TERM_ID_COERCIONS)
 
     conn = _default_conn(conn)
 
@@ -3417,6 +3558,7 @@ def genes_by_ontology(
         "wrong_ontology": wrong_ontology,
         "wrong_level": wrong_level,
         "filtered_out": filtered_out,
+        "resolved_aliases": resolved_aliases,
         "offset": offset,
         "trust_axes": {ontology: ontology_trust_axes(ontology)},
         "filters_applied": dict(trust_filters),
@@ -3752,8 +3894,10 @@ def gene_ontology_terms(
         envelope["evidence_score_signals"] = _evidence_score_signals(
             conn, targets,
         )
-    envelope["warnings"] = trust_warnings + _trust_row_warnings(
-        raw_trust_rows, targets, trust_filters,
+    envelope["warnings"] = (
+        trust_warnings
+        + _trust_row_warnings(raw_trust_rows, targets, trust_filters)
+        + _case_mismatch_warnings(conn, not_found)
     )
     return envelope
 
@@ -3983,7 +4127,9 @@ def differential_expression_by_gene(
         direction / significant_only / growth_phases filters (e.g. a
         growth_phases vocabulary typo) — never confuse this with
         no_expression. warnings: one entry per growth_phases value not in
-        the live vocabulary. n_experiments / experiment_count: count of
+        the live vocabulary, plus one per not_found locus_tag that differs
+        only by case from a real Gene.locus_tag (locus_tags are never
+        case-normalised). n_experiments / experiment_count: count of
         matching experiments before any list capping (always the full
         count). `experiments` is sorted by total significant rows desc and
         capped to the first 10 entries with `experiments_truncated=True`
@@ -4114,6 +4260,7 @@ def differential_expression_by_gene(
     not_found = diag_raw["not_found"]
     no_expression = diag_raw["no_expression"]
     filtered_out = diag_raw["filtered_out"]
+    warnings = warnings + _case_mismatch_warnings(conn, not_found)
 
     # --- Experiment diagnostics (only when experiment_ids provided) ---
     if experiment_ids:
@@ -4202,7 +4349,7 @@ def differential_expression_by_ortholog(
     top_groups, top_experiments,
     not_found_groups, not_matched_groups,
     not_found_organisms, not_matched_organisms,
-    not_found_experiments, not_matched_experiments,
+    not_found_experiments, not_matched_experiments, resolved_aliases,
     returned, truncated, results.
     Per result (compact): group_id, consensus_gene_name, consensus_product,
     experiment_id, treatment_type, organism_name, coculture_partner,
@@ -4211,6 +4358,11 @@ def differential_expression_by_ortholog(
     significant_up, significant_down, not_significant.
     Per result (verbose): adds experiment_name, treatment, omics_type,
     table_scope, table_scope_detail.
+
+    group_ids: Accepts the canonical prefixed form (`cyanorak:CK_00000364`,
+        `eggnog:COG0592@2`) or a bare accession (`CK_00000364`,
+        `COG0592@2`) — resolved to canonical before the query runs; see
+        `resolved_aliases` in the envelope.
 
     Raises:
         ValueError: if group_ids is empty or direction is invalid.
@@ -4228,6 +4380,10 @@ def differential_expression_by_ortholog(
 
     if summary:
         limit = 0
+
+    # Bare group IDs (`CK_00000364`, `COG0592@2`) coerced to canonical
+    # prefixed form before any query.
+    group_ids, resolved_aliases = _coerce_ids(group_ids, _GROUP_ID_COERCIONS)
 
     conn = _default_conn(conn)
 
@@ -4388,6 +4544,7 @@ def differential_expression_by_ortholog(
         "not_matched_organisms": not_matched_organisms,
         "not_found_experiments": not_found_experiments,
         "not_matched_experiments": not_matched_experiments,
+        "resolved_aliases": resolved_aliases,
         "returned": len(results),
         "offset": offset,
         "truncated": global_raw["total_matching"] > offset + len(results),
@@ -4436,7 +4593,9 @@ def gene_response_profile(
         treatment_types / background_factors filters (e.g. a treatment_types
         vocabulary typo) — never confuse this with no_expression. warnings:
         one entry per treatment_types / background_factors value not in the
-        live vocabulary.
+        live vocabulary, plus one per not_found locus_tag that differs only
+        by case from a real Gene.locus_tag (locus_tags are never
+        case-normalised).
     """
     if not locus_tags:
         raise ValueError(
@@ -4489,6 +4648,7 @@ def gene_response_profile(
     }
 
     not_found = [lt for lt in locus_tags if lt not in found_genes]
+    warnings = warnings + _case_mismatch_warnings(conn, not_found)
     filtered_out = [
         lt for lt in found_genes
         if lt in has_any_edge and lt not in has_expression
@@ -4926,7 +5086,9 @@ def gene_clusters_by_gene(
     warnings, returned, offset, truncated, results.
 
     warnings: a closed-vocabulary filter value (cluster_type /
-    treatment_type / background_factors) not in the live vocabulary.
+    treatment_type / background_factors) not in the live vocabulary, plus
+    one per not_found locus_tag that differs only by case from a real
+    Gene.locus_tag (locus_tags are never case-normalised).
     Advisory only — never changes which rows are returned.
     Per result (compact): locus_tag, gene_name, cluster_id, cluster_name,
     cluster_type, membership_score, analysis_id, analysis_name,
@@ -4987,7 +5149,7 @@ def gene_clusters_by_gene(
             raw_summary["by_background_factors"], "background_factor"),
         "by_analysis": _rename_freq(
             raw_summary["by_analysis"], "analysis_id"),
-        "warnings": warnings,
+        "warnings": warnings + _case_mismatch_warnings(conn, raw_summary["not_found"]),
     }
 
     # Detail query — skip when limit=0
@@ -5036,7 +5198,9 @@ def gene_derived_metrics(
     returned, offset, truncated, results.
 
     warnings: a closed-vocabulary filter value (compartment /
-    treatment_type / background_factors) not in the live vocabulary.
+    treatment_type / background_factors) not in the live vocabulary, plus
+    one per not_found locus_tag that differs only by case from a real
+    Gene.locus_tag (locus_tags are never case-normalised).
     Advisory only — never changes which rows are returned.
     Per result (compact, 13 Pydantic fields; 11 emitted by Cypher in the
     current KG): locus_tag, gene_name, derived_metric_id, value_kind, name,
@@ -5110,7 +5274,7 @@ def gene_derived_metrics(
             raw_summary["by_background_factors"], "background_factor"),
         "by_publication": _rename_freq(
             raw_summary["by_publication"], "publication_doi"),
-        "warnings": warnings,
+        "warnings": warnings + _case_mismatch_warnings(conn, raw_summary["not_found"]),
     }
 
     # Detail query — skip when limit=0
@@ -6656,6 +6820,7 @@ def pathway_enrichment(
         "wrong_ontology": list(gbo_result.get("wrong_ontology", [])),
         "wrong_level": list(gbo_result.get("wrong_level", [])),
         "filtered_out": list(gbo_result.get("filtered_out", [])),
+        "resolved_aliases": dict(gbo_result.get("resolved_aliases", {})),
     }
 
     produced = set(result.results["cluster"]) if not result.results.empty else set()
@@ -6837,7 +7002,8 @@ def cluster_enrichment(
             results=pd.DataFrame(), inputs=inputs, term2gene=pd.DataFrame(),
         )
         result.term_validation = {
-            "not_found": [], "wrong_ontology": [], "wrong_level": [], "filtered_out": [],
+            "not_found": [], "wrong_ontology": [], "wrong_level": [],
+            "filtered_out": [], "resolved_aliases": {},
         }
         result.clusters_skipped = list(inputs.clusters_skipped)
         result.params = _cluster_enrichment_params_dict(
@@ -6895,6 +7061,7 @@ def cluster_enrichment(
         "wrong_ontology": list(gbo_result.get("wrong_ontology", [])),
         "wrong_level": list(gbo_result.get("wrong_level", [])),
         "filtered_out": list(gbo_result.get("filtered_out", [])),
+        "resolved_aliases": dict(gbo_result.get("resolved_aliases", {})),
     }
 
     produced = set(result.results["cluster"]) if not result.results.empty else set()
@@ -8047,8 +8214,10 @@ def metabolites_by_gene(
 
     Envelope also carries `resolved_aliases` (dict, `{input: [canonical,
     ...]}`, only coerced inputs; `{}` when none); ambiguous-xref
-    expansions and a `gene_categories` value not in the live vocabulary
-    are appended to `warnings`.
+    expansions, a `gene_categories` value not in the live vocabulary, and a
+    `not_found.locus_tags` entry that differs only by case from a real
+    Gene.locus_tag (locus_tags are never case-normalised) are appended to
+    `warnings`.
 
     Raises:
         ValueError: if `evidence_sources` contains values outside
@@ -8458,7 +8627,8 @@ def metabolites_by_gene(
     # attachment is a lumping family), NOT on a row-share threshold.
     # Suppressed when the caller set substrate_depth explicitly.
     warnings: list[str] = list(alias_warnings) + _closed_vocab_warnings(
-        conn, gene_categories=gene_categories)
+        conn, gene_categories=gene_categories,
+    ) + _case_mismatch_warnings(conn, not_found_locus)
     family_inferred_genes = [
         entry["locus_tag"] for entry in by_gene
         if entry.get("transport_substrate_resolution") == "family_inferred"
@@ -9495,8 +9665,8 @@ def gene_aa_sequence(
     a sequence is never emitted in both).
 
     Returns a dict with keys: total_matching, returned, truncated,
-    by_organism, sequence_length_stats, not_found, not_matched, fasta,
-    results.
+    by_organism, sequence_length_stats, not_found, not_matched, warnings,
+    fasta, results.
 
     - total_matching: input locus_tags resolving to a gene with a sequence.
     - by_organism: list of {organism_name, count} over matched genes.
@@ -9505,6 +9675,8 @@ def gene_aa_sequence(
       offset).
     - not_found: input locus_tags absent from the KG.
     - not_matched: locus_tags whose gene exists but has a null sequence.
+    - warnings: a not_found locus_tag that differs only by case from a real
+      Gene.locus_tag. Advisory only — locus_tags are never case-normalised.
     - fasta: multi-FASTA blob (non-empty only when fasta=True), else "".
 
     Per result: locus_tag, organism_name, gene_name, product, protein_id,
@@ -9589,6 +9761,7 @@ def gene_aa_sequence(
         "sequence_length_stats": sequence_length_stats,
         "not_found": not_found,
         "not_matched": not_matched,
+        "warnings": _case_mismatch_warnings(conn, not_found),
         "fasta": fasta_blob,
         "results": results,
     }
@@ -9628,7 +9801,9 @@ def gene_neighbors(
     - not_found: anchor locus_tags absent from the KG.
     - not_matched: anchors that exist but lack coordinates (no neighborhood).
     - warnings: e.g. same_strand requested but an anchor's own strand is null,
-      so its neighbors are returned unfiltered.
+      so its neighbors are returned unfiltered; or a not_found locus_tag that
+      differs only by case from a real Gene.locus_tag (locus_tags are never
+      case-normalised).
 
     Per result (flat long, one row per anchor × neighbor): anchor_locus_tag,
     neighbor_locus_tag, rank_offset (signed, negative = upstream by start),
@@ -9753,7 +9928,7 @@ def gene_neighbors(
         "by_organism": by_organism,
         "not_found": not_found,
         "not_matched": not_matched,
-        "warnings": warnings,
+        "warnings": warnings + _case_mismatch_warnings(conn, not_found),
         "results": results,
     }
 

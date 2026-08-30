@@ -87,6 +87,17 @@ class TestAPIInputValidation:
         with pytest.raises(ValueError, match="group_ids"):
             api.genes_by_homolog_group([], conn=conn)
 
+    def test_genes_by_homolog_group_bare_id_coerced(self, conn):
+        """Bare 'CK_00000570' (llm-review 2b.3) is coerced to the canonical
+        'cyanorak:CK_00000570' before the query runs and resolves rows."""
+        result = api.genes_by_homolog_group(
+            group_ids=["CK_00000570"], conn=conn,
+        )
+        assert result["resolved_aliases"] == {
+            "CK_00000570": ["cyanorak:CK_00000570"]
+        }
+        assert result["not_found_groups"] == []
+
     def test_diff_expr_by_ortholog_empty(self, conn):
         with pytest.raises(ValueError, match="group_ids"):
             api.differential_expression_by_ortholog([], conn=conn)
@@ -275,6 +286,18 @@ class TestGeneDetailsEdgeCases:
         assert result["results"] == []
         assert result["returned"] == 0
 
+    def test_locus_tag_case_mismatch_warns(self, conn):
+        """A not_found locus_tag differing only by case from a real one
+        (llm-review 2b.3) is never silently normalised — instead it lands
+        in not_found AND gets a case-mismatch warning."""
+        result = api.gene_details([KNOWN_GENE.lower()], conn=conn)
+        assert result["total_matching"] == 0
+        assert result["not_found"] == [KNOWN_GENE.lower()]
+        assert any(
+            KNOWN_GENE in w and "differs only by case" in w
+            for w in result["warnings"]
+        )
+
 
 # ---------------------------------------------------------------------------
 # gene_homologs edge cases
@@ -341,6 +364,21 @@ class TestSearchOntologyEdgeCases:
 
 
 # ---------------------------------------------------------------------------
+# ontology_term_details edge cases
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestOntologyTermDetailsEdgeCases:
+    def test_bare_go_term_id_coerced(self, conn):
+        """Bare 'GO:0006979' (llm-review 2b.3) is coerced to the canonical
+        'go:0006979' before the query runs and resolves a real term."""
+        result = api.ontology_term_details(term_ids=["GO:0006979"], conn=conn)
+        assert result["resolved_aliases"] == {"GO:0006979": ["go:0006979"]}
+        assert result["not_found"] == []
+        assert result["total_matching"] == 1
+        assert result["results"][0]["term_id"] == "go:0006979"
+
+
+# ---------------------------------------------------------------------------
 # genes_by_ontology edge cases
 # ---------------------------------------------------------------------------
 @pytest.mark.kg
@@ -366,6 +404,20 @@ class TestGenesByOntologyEdgeCases:
             conn=conn,
         )
         assert len(result["top_terms"]) >= 1
+
+    def test_bare_kegg_pathway_term_id_coerced(self, conn):
+        """Bare 'ko00910' (llm-review 2b.3) is coerced to the canonical
+        'kegg.pathway:ko00910' before the query runs, resolves live rows,
+        and is reported in resolved_aliases."""
+        result = api.genes_by_ontology(
+            ontology="kegg",
+            organism="MED4",
+            term_ids=["ko00910"],
+            conn=conn,
+        )
+        assert result["total_matching"] > 0
+        assert result["resolved_aliases"] == {"ko00910": ["kegg.pathway:ko00910"]}
+        assert result["not_found"] == []
 
 
 # ---------------------------------------------------------------------------

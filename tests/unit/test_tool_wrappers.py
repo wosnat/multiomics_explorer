@@ -1085,6 +1085,32 @@ class TestGeneOverviewWrapper:
         assert result.not_found == ["FAKE0001"]
 
     @pytest.mark.asyncio
+    async def test_case_mismatch_warning_passed_through(self, tool_fns, mock_ctx):
+        """A not_found tag differing only by case (llm-review 2b.3) surfaces
+        via `warnings`, not a second key."""
+        case_mismatch_return = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 0,
+            "by_organism": [], "by_category": [], "by_annotation_type": [],
+            "has_expression": 0, "has_significant_expression": 0,
+            "has_orthologs": 0, "returned": 0, "truncated": False,
+            "not_found": ["pmm1428"],
+            "warnings": ["pmm1428 not found; 'PMM1428' differs only by case"],
+            "results": [],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=case_mismatch_return,
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["pmm1428"],
+            )
+        assert result.not_found == ["pmm1428"]
+        assert result.warnings == [
+            "pmm1428 not found; 'PMM1428' differs only by case"
+        ]
+
+    @pytest.mark.asyncio
     async def test_params_forwarded(self, tool_fns, mock_ctx):
         """All params passed through to api."""
         with patch(
@@ -1777,6 +1803,23 @@ class TestGenesByOntologyWrapper:
         assert result.returned == 2
         assert result.truncated is True
         assert len(result.results) == 2
+
+    @pytest.mark.asyncio
+    async def test_resolved_aliases_passed_through(self, tool_fns, mock_ctx):
+        """A coerced bare term_id (llm-review 2b.3) surfaces unchanged."""
+        api_return = {
+            **self._SAMPLE_API_RETURN,
+            "resolved_aliases": {"ko00910": ["kegg.pathway:ko00910"]},
+        }
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_ontology",
+            return_value=api_return,
+        ):
+            result = await tool_fns["genes_by_ontology"](
+                mock_ctx, ontology="kegg", organism="Prochlorococcus MED4",
+                term_ids=["ko00910"],
+            )
+        assert result.resolved_aliases == {"ko00910": ["kegg.pathway:ko00910"]}
         r0 = result.results[0]
         assert r0.locus_tag == "PMM0001"
         assert r0.gene_name == "dnaN"
@@ -11770,3 +11813,88 @@ class TestMetaboliteIdCoercionWrappers:
         assert "bare" in desc.lower(), f"{name}.{param}: {desc!r}"
         assert "resolved_aliases" in desc, f"{name}.{param}: {desc!r}"
         assert len(desc) <= 250, f"{name}.{param} is {len(desc)} chars"
+
+
+# ---------------------------------------------------------------------------
+# Bare term / group ID coercion + locus-tag case-mismatch warning
+# (llm-review 2b.3 Task 2) — no new tool; response models gain
+# `resolved_aliases` (term/group tools) and `warnings` (locus-tag batch
+# tools that lacked it); term_ids / group_ids Field text documents bare IDs.
+# ---------------------------------------------------------------------------
+
+_TERM_ID_TOOLS = ["genes_by_ontology", "ontology_term_details"]
+_GROUP_ID_TOOLS = ["genes_by_homolog_group", "differential_expression_by_ortholog"]
+_ENRICHMENT_TERM_ID_TOOLS = ["pathway_enrichment", "cluster_enrichment"]
+
+# Locus-tag batch tools that gained the case-mismatch warning branch. Every
+# one of these already carries (or now carries) a `warnings: list[str]`
+# response field appended with `_case_mismatch_warnings`.
+_LOCUS_TAG_WARNING_TOOLS = [
+    "gene_overview", "gene_details", "gene_homologs", "gene_aa_sequence",
+    "gene_neighbors", "gene_ontology_terms", "differential_expression_by_gene",
+    "gene_response_profile", "gene_derived_metrics", "gene_clusters_by_gene",
+    "metabolites_by_gene",
+]
+
+
+class TestBareTermGroupIdCoercionWrappers:
+    """`resolved_aliases: dict[str, list[str]]` on the term/group-ID tools."""
+
+    def test_expected_tools_unchanged(self, tool_fns):
+        assert len(EXPECTED_TOOLS) == 42
+        assert sorted(tool_fns) == sorted(EXPECTED_TOOLS)
+
+    @pytest.mark.parametrize("name", _TERM_ID_TOOLS + _GROUP_ID_TOOLS)
+    def test_resolved_aliases_field(self, tool_fns, name):
+        model = _response_model(tool_fns, name)
+        field = model.model_fields["resolved_aliases"]
+        assert field.annotation == dict[str, list[str]]
+        assert field.get_default(call_default_factory=True) == {}
+        assert field.description, f"{name}: resolved_aliases needs a description"
+
+    @pytest.mark.parametrize("name", _TERM_ID_TOOLS)
+    def test_term_ids_param_mentions_bare_ids(self, tool_fns, name):
+        desc = _param_description(tool_fns, name, "term_ids")
+        assert "bare" in desc.lower(), f"{name}.term_ids: {desc!r}"
+        assert "resolved_aliases" in desc, f"{name}.term_ids: {desc!r}"
+        assert len(desc) <= 250, f"{name}.term_ids is {len(desc)} chars"
+
+    @pytest.mark.parametrize("name", _GROUP_ID_TOOLS)
+    def test_group_ids_param_mentions_bare_ids(self, tool_fns, name):
+        desc = _param_description(tool_fns, name, "group_ids")
+        assert "bare" in desc.lower(), f"{name}.group_ids: {desc!r}"
+        assert "resolved_aliases" in desc, f"{name}.group_ids: {desc!r}"
+        assert len(desc) <= 250, f"{name}.group_ids is {len(desc)} chars"
+
+    @pytest.mark.parametrize("name", _ENRICHMENT_TERM_ID_TOOLS)
+    def test_enrichment_term_ids_param_mentions_bare_ids(self, tool_fns, name):
+        desc = _param_description(tool_fns, name, "term_ids")
+        assert "bare" in desc.lower(), f"{name}.term_ids: {desc!r}"
+        assert len(desc) <= 250, f"{name}.term_ids is {len(desc)} chars"
+
+    @pytest.mark.parametrize("name", _ENRICHMENT_TERM_ID_TOOLS)
+    def test_term_validation_carries_resolved_aliases(self, tool_fns, name):
+        """pathway_enrichment / cluster_enrichment nest resolved_aliases
+        inside `term_validation` (a passthrough of genes_by_ontology's
+        validation buckets), not as a top-level response field."""
+        model = _response_model(tool_fns, name)
+        tv_model = model.model_fields["term_validation"].annotation
+        field = tv_model.model_fields["resolved_aliases"]
+        assert field.annotation == dict[str, list[str]]
+        assert field.get_default(call_default_factory=True) == {}
+
+class TestLocusTagCaseMismatchWarningWrappers:
+    """`warnings: list[str]` present on every locus-tag batch tool named in
+    the 2b.3 Task 2 brief (append-only; never a second key)."""
+
+    def test_expected_tools_unchanged(self, tool_fns):
+        assert len(EXPECTED_TOOLS) == 42
+        assert sorted(tool_fns) == sorted(EXPECTED_TOOLS)
+
+    @pytest.mark.parametrize("name", _LOCUS_TAG_WARNING_TOOLS)
+    def test_warnings_field_present(self, tool_fns, name):
+        model = _response_model(tool_fns, name)
+        field = model.model_fields["warnings"]
+        assert field.annotation == list[str]
+        assert field.get_default(call_default_factory=True) == []
+        assert field.description, f"{name}: warnings needs a description"

@@ -13,6 +13,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_aa_sequence,
     build_gene_aa_sequence_summary,
     build_gene_existence_check,
+    build_locus_tag_case_matches,
     build_gene_homologs,
     build_gene_homologs_summary,
     build_gene_neighbors,
@@ -2519,6 +2520,17 @@ class TestBuildGeneExistenceCheck:
         """params dict includes locus_tags."""
         _, params = build_gene_existence_check(locus_tags=["PMM0001", "PMM0002"])
         assert params == {"locus_tags": ["PMM0001", "PMM0002"]}
+
+
+class TestBuildLocusTagCaseMatches:
+    def test_returns_cypher(self):
+        cypher, _ = build_locus_tag_case_matches(not_found=["pmm0001"])
+        assert "toUpper(g.locus_tag) IN $upper" in cypher
+        assert "locus_tag" in cypher
+
+    def test_params_upper_cased(self):
+        _, params = build_locus_tag_case_matches(not_found=["pmm0001", "Sync_0002"])
+        assert params == {"upper": ["PMM0001", "SYNC_0002"]}
 
 
 # ---------------------------------------------------------------------------
