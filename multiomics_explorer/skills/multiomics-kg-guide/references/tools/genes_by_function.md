@@ -39,7 +39,7 @@ total_search_hits, total_matching, by_organism, by_category, score_max, score_me
 - **returned** (int): Number of results returned.
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True when total_matching > returned.
-- **warnings** (list[string]): A `category` value not found in the live vocabulary (see list_filter_values(filter_type='gene_category')), or an `organism` that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.
+- **warnings** (list[string]): An empty intersection (search_text hit genes but `organism` / `category` / `min_quality` left total_matching=0 — not an absence of matching genes), a `category` value not found in the live vocabulary (see list_filter_values(filter_type='gene_category')), or an `organism` that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.
 
 ### Per-result fields
 
@@ -209,6 +209,14 @@ len(result['results'])  # to count matches
 
 ```correction
 result['total_matching']  # results may be truncated
+```
+
+```mistake
+genes_by_function(search_text='ABC transporter permease', organism='HOT1A3', category='Transport')  # total_search_hits 8705, total_matching 1 -> 'no transporters in HOT1A3'
+```
+
+```correction
+`category` is an exact match on a curated Gene.gene_category value, and 'Transport' is a real but small category (most transporters sit under 'Inorganic ion transport'). A large total_search_hits with total_matching 0 is an empty intersection, not an absence — the envelope says so in `warnings` (a tiny non-zero count gets no warning; compare the two fields yourself). Re-run without `category` and read `by_category` to see where the hits fall, or go ontology-first (`genes_by_ontology` with a TCDB / GO term) to enumerate transporters.
 ```
 
 - Use summary=True to get organism/category breakdowns without fetching gene rows.

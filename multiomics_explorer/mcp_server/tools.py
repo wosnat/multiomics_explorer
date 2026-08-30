@@ -2119,7 +2119,7 @@ def register_tools(mcp: FastMCP):
         returned: int = Field(description="Number of results returned.")
         offset: int = Field(default=0, description="Offset into full result set.")
         truncated: bool = Field(description="True when total_matching > returned.")
-        warnings: list[str] = Field(default_factory=list, description="A `category` value not found in the live vocabulary (see list_filter_values(filter_type='gene_category')), or an `organism` that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.")
+        warnings: list[str] = Field(default_factory=list, description="An empty intersection (search_text hit genes but `organism` / `category` / `min_quality` left total_matching=0 — not an absence of matching genes), a `category` value not found in the live vocabulary (see list_filter_values(filter_type='gene_category')), or an `organism` that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.")
         results: list[GenesByFunctionResult] = Field(description="Gene results ranked by relevance.")
 
     @mcp.tool(
@@ -4428,19 +4428,25 @@ def register_tools(mcp: FastMCP):
         )
         rank: int = Field(
             description="Rank by |log2FC| within experiment x timepoint;"
-            " 1 = strongest (e.g. 77)",
+            " 1 = strongest (e.g. 77). KG property `rank_by_effect`."
+            " Direction-blind and populated on EVERY reported edge — the"
+            " only genome-wide rank on this row (see rank_up / rank_down).",
         )
         rank_up: int | None = Field(
             default=None,
             description="Rank by |log2FC| among significant_up genes"
-            " within experiment x timepoint."
-            " Null if not significant_up. 1 = strongest.",
+            " within experiment x timepoint. Null if not significant_up."
+            " 1 = strongest. NOT a genome-wide directional rank — it is"
+            " populated only on the significant-up subset, so it cannot"
+            " serve as a ranked list over all detected genes (e.g. for"
+            " GSEA); sort `log2fc` yourself for that.",
         )
         rank_down: int | None = Field(
             default=None,
             description="Rank by |log2FC| among significant_down genes"
-            " within experiment x timepoint."
-            " Null if not significant_down. 1 = strongest.",
+            " within experiment x timepoint. Null if not significant_down."
+            " 1 = strongest. NOT a genome-wide directional rank —"
+            " populated only on the significant-down subset (see rank_up).",
         )
         expression_status: Literal[
             "significant_up", "significant_down", "not_significant"

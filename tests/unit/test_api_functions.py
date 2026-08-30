@@ -362,6 +362,48 @@ class TestGenesByFunction:
         # Only summary query called
         assert mock_conn.execute_query.call_count == 1
 
+    def test_empty_intersection_warns(self, mock_conn, monkeypatch):
+        """search_text hits but the organism/category filters leave 0 rows
+        -> envelope warning (upstream ticket 2026-08 #1: a silent zero read
+        as 'no transporters in this organism')."""
+        monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total_search_hits=9374, total_matching=0),
+            [],
+        ]
+        result = api.genes_by_function(
+            "ABC transporter permease", organism="HOT1A3",
+            category="Transport", conn=mock_conn)
+        assert result["total_matching"] == 0
+        assert len(result["warnings"]) == 1
+        w = result["warnings"][0]
+        assert "9374" in w and "category='Transport'" in w
+        assert "organism='HOT1A3'" in w
+        assert "min_quality" not in w  # default 0 is not an active filter
+        assert "by_category" in w
+
+    def test_intersection_warning_yields_to_vocab_warning(self, mock_conn, monkeypatch):
+        """A category typo already explains the zero — no second warning."""
+        monkeypatch.setattr(api, "_closed_vocab_warnings",
+                            lambda *a, **k: ["category value 'Bogus' matched nothing"])
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total_search_hits=100, total_matching=0), [],
+        ]
+        result = api.genes_by_function("x", category="Bogus", conn=mock_conn)
+        assert len(result["warnings"]) == 1
+        assert "empty intersection" not in result["warnings"][0]
+
+    def test_no_intersection_warning_without_filters(self, mock_conn):
+        """A plain zero-hit search is not an empty intersection."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total_search_hits=0, total_matching=0),
+            [],
+        ]
+        result = api.genes_by_function("zzz", conn=mock_conn)
+        assert result["warnings"] == []
+
     def test_lucene_retry(self, mock_conn):
         """On Neo4jClientError, retries with escaped special chars."""
         from neo4j.exceptions import ClientError as Neo4jClientError

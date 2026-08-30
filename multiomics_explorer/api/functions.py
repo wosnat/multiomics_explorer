@@ -1427,7 +1427,8 @@ def genes_by_function(
     gene_category, annotation_quality, score.
     Verbose adds: function_description, gene_summary.
 
-    warnings: a `category` value not in the live vocabulary, or an
+    warnings: an empty intersection (search_text hit, filters left 0 rows),
+    a `category` value not in the live vocabulary, or an
     `organism` that matches no OrganismTaxon. Advisory only — never
     changes which rows are returned.
 
@@ -1481,6 +1482,23 @@ def genes_by_function(
         "score_median": raw_summary["score_median"],
     }
 
+    # Empty intersection: the fulltext search hit, but organism / category /
+    # min_quality left nothing. Without this a caller who reads only
+    # total_matching sees a bare 0 and concludes "no such genes here"
+    # (upstream ticket 2026-08 #1: category='Transport' is a real but small
+    # category; most transporters sit under 'Inorganic ion transport').
+    hits = envelope["total_search_hits"]
+    active = [f"{k}={v!r}" for k, v in (
+        ("organism", organism), ("category", category),
+        ("min_quality", min_quality or None)) if v is not None]
+    # Skipped when a vocabulary / organism warning already explains the zero.
+    if hits > 0 and total_matching == 0 and active and not warnings:
+        warnings.append(
+            f"search_text matched {hits} genes but {', '.join(active)} left"
+            " none — an empty intersection, not an absence of matching genes."
+            " Re-run without the filter and read by_organism / by_category"
+            " to see where the hits fall (gene_category values are exact —"
+            " list_filter_values(filter_type='gene_category')).")
     envelope["warnings"] = warnings
 
     # Detail query — skip when limit=0

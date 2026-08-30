@@ -85,9 +85,9 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 | timepoint_order | int | Sort key for time course order (e.g. 3) |
 | log2fc | float | Log2 fold change (e.g. 3.591). Positive = up. |
 | padj | float \| None | Adjusted p-value (e.g. 1.13e-12). Null if not computed. |
-| rank | int | Rank by |log2FC| within experiment x timepoint; 1 = strongest (e.g. 77) |
-| rank_up | int \| None (optional) | Rank by |log2FC| among significant_up genes within experiment x timepoint. Null if not significant_up. 1 = strongest. |
-| rank_down | int \| None (optional) | Rank by |log2FC| among significant_down genes within experiment x timepoint. Null if not significant_down. 1 = strongest. |
+| rank | int | Rank by |log2FC| within experiment x timepoint; 1 = strongest (e.g. 77). KG property `rank_by_effect`. Direction-blind and populated on EVERY reported edge — the only genome-wide rank on this row (see rank_up / rank_down). |
+| rank_up | int \| None (optional) | Rank by |log2FC| among significant_up genes within experiment x timepoint. Null if not significant_up. 1 = strongest. NOT a genome-wide directional rank — it is populated only on the significant-up subset, so it cannot serve as a ranked list over all detected genes (e.g. for GSEA); sort `log2fc` yourself for that. |
+| rank_down | int \| None (optional) | Rank by |log2FC| among significant_down genes within experiment x timepoint. Null if not significant_down. 1 = strongest. NOT a genome-wide directional rank — populated only on the significant-down subset (see rank_up). |
 | expression_status | string ('significant_up', 'significant_down', 'not_significant') | Significance call using publication-specific threshold (e.g. 'significant_up') |
 | growth_phase | string \| None (optional) | Physiological state of the culture at this timepoint (e.g. 'exponential', 'nutrient_limited'). Timepoint-level condition — not gene-specific. |
 
@@ -471,6 +471,14 @@ A growth_phases value not in the live vocabulary lands in the envelope `warnings
 ```
 
 - `no_expression` is this tool's name for the not_matched bucket — a gene exists but has NO Changes_expression_of edge at all in the organism; `filtered_out` is the DIFFERENT bucket for a gene that DOES have edges but none survive direction / significant_only / growth_phases (including a vocabulary typo); `not_found` = locus_tag absent; experiment ids get their own `not_found_experiments` / `not_matched_experiments` pair. See docs://guide/conventions for the shared not_found / not_matched semantics.
+
+```mistake
+Treating `rank_up` / `rank_down` as genome-wide directional ranks (e.g. as the ranked list for a GSEA-style test or a genome-wide null)
+```
+
+```correction
+They are populated ONLY on the significant subset — `rank_up` is non-null on significant_up genes, `rank_down` on significant_down genes; every non-significant gene is null and silently drops out. The one rank present on every reported edge is `rank` (KG property `rank_by_effect`, surfaced here under the shorter name), which is |log2FC|-based and direction-blind. For a signed genome-wide ranking sort the rows by `log2fc` yourself over an `all_detected_genes` experiment (check `table_scope` first), and use `rank_up` / `rank_down` only as validation handles for the significant tail.
+```
 
 - expression_status uses publication-specific thresholds, not a uniform padj<0.05
 

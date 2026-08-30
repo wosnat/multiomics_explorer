@@ -124,6 +124,8 @@ mistakes:
     right: "genes_by_ontology(ontology='go_bp', organism='MED4', term_ids=['go:0015977']) for ontology term lookup (ontology + organism required); genes_by_function is for free-text search."
   - wrong: "len(result['results'])  # to count matches"
     right: "result['total_matching']  # results may be truncated"
+  - wrong: "genes_by_function(search_text='ABC transporter permease', organism='HOT1A3', category='Transport')  # total_search_hits 8705, total_matching 1 -> 'no transporters in HOT1A3'"
+    right: "`category` is an exact match on a curated Gene.gene_category value, and 'Transport' is a real but small category (most transporters sit under 'Inorganic ion transport'). A large total_search_hits with total_matching 0 is an empty intersection, not an absence — the envelope says so in `warnings` (a tiny non-zero count gets no warning; compare the two fields yourself). Re-run without `category` and read `by_category` to see where the hits fall, or go ontology-first (`genes_by_ontology` with a TCDB / GO term) to enumerate transporters."
   - "Use summary=True to get organism/category breakdowns without fetching gene rows."
   - "Use min_quality=2 to skip hypothetical proteins and get better-annotated results."
   - "The organism filter is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works. A genus word alone ('Prochlorococcus') matches every strain of that genus. 'Meiothermus ruber' names two OrganismTaxon nodes (genome strain + gene-less treatment taxon) — only the genome strain has genes, so gene hits are unaffected."
