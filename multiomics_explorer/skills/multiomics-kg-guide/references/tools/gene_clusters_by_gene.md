@@ -34,7 +34,7 @@ into a cluster's full membership via `genes_in_cluster`.
 ### Envelope
 
 ```expected-keys
-total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not_found, not_matched, by_cluster_type, by_treatment_type, by_background_factors, by_analysis, returned, offset, truncated, results
+total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not_found, not_matched, by_cluster_type, by_treatment_type, by_background_factors, by_analysis, returned, offset, truncated, warnings, results
 ```
 
 - **total_matching** (int): Gene × cluster rows matching filters
@@ -50,6 +50,7 @@ total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not
 - **returned** (int): Results in this response
 - **offset** (int): Offset into result set
 - **truncated** (bool): True if total_matching > offset + returned
+- **warnings** (list[string]): A closed-vocabulary filter value (cluster_type / treatment_type / background_factors) not found in the live vocabulary (see list_filter_values). Advisory only — never changes which rows are returned. Empty when clean.
 
 ### Per-result fields
 
@@ -150,7 +151,7 @@ gene_clusters_by_gene(locus_tags=['PMM0370']) — always a list
 from multiomics_explorer import gene_clusters_by_gene
 
 result = gene_clusters_by_gene(locus_tags=...)
-# returns dict with keys: total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not_found, not_matched, by_cluster_type, by_treatment_type, by_background_factors, by_analysis, returned, offset, truncated, results
+# returns dict with keys: total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not_found, not_matched, by_cluster_type, by_treatment_type, by_background_factors, by_analysis, returned, offset, truncated, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

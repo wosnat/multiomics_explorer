@@ -22,7 +22,7 @@ Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, 
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind, by_metric_type, by_compartment, top_metabolic_capability, top_annotation_capability, by_measurement_capability, returned, offset, truncated, not_found, results
+total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind, by_metric_type, by_compartment, top_metabolic_capability, top_annotation_capability, by_measurement_capability, returned, offset, truncated, not_found, warnings, results
 ```
 
 - **total_entries** (int): Total organisms in the KG.
@@ -42,6 +42,7 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if total_matching > offset + returned.
 - **not_found** (list[string]): organism_names inputs that didn't match any organism (case-insensitive); [] when no filter.
+- **warnings** (list[string]): A `compartment` value not found in the live vocabulary (see list_filter_values(filter_type='compartment')). Advisory only — never changes which rows are returned. Empty when clean.
 
 ### Per-result fields
 
@@ -1237,7 +1238,7 @@ list_organisms → per-row interpro_gene_count / ncbifam_gene_count → ontology
 from multiomics_explorer import list_organisms
 
 result = list_organisms()
-# returns dict with keys: total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind, by_metric_type, by_metric_type_truncated, by_compartment, top_metabolic_capability, top_metabolic_capability_truncated, top_annotation_capability, top_annotation_capability_truncated, by_measurement_capability, returned, offset, truncated, not_found, results
+# returns dict with keys: total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind, by_metric_type, by_metric_type_truncated, by_compartment, top_metabolic_capability, top_metabolic_capability_truncated, top_annotation_capability, top_annotation_capability_truncated, by_measurement_capability, returned, offset, truncated, not_found, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

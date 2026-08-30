@@ -26,7 +26,7 @@ Routing: feed `locus_tag`s into `gene_overview` (data-availability triage), `gen
 ### Envelope
 
 ```expected-keys
-total_search_hits, total_matching, by_organism, by_category, score_max, score_median, returned, offset, truncated, results
+total_search_hits, total_matching, by_organism, by_category, score_max, score_median, returned, offset, truncated, warnings, results
 ```
 
 - **total_search_hits** (int): Total genes matching search text (before organism/category/quality filters).
@@ -39,6 +39,7 @@ total_search_hits, total_matching, by_organism, by_category, score_max, score_me
 - **returned** (int): Number of results returned.
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True when total_matching > returned.
+- **warnings** (list[string]): A `category` value not found in the live vocabulary (see list_filter_values(filter_type='gene_category')), or an `organism` that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.
 
 ### Per-result fields
 
@@ -222,7 +223,7 @@ result['total_matching']  # results may be truncated
 from multiomics_explorer import genes_by_function
 
 result = genes_by_function(search_text=...)
-# returns dict with keys: total_search_hits, total_matching, by_organism, by_organism_truncated, by_category, score_max, score_median, returned, offset, truncated, results
+# returns dict with keys: total_search_hits, total_matching, by_organism, by_organism_truncated, by_category, score_max, score_median, returned, offset, truncated, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

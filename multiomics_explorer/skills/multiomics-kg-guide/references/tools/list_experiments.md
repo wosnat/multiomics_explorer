@@ -36,7 +36,7 @@ Routing: drill via `differential_expression_by_gene(experiment_ids=[id])` for pe
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_compartment, time_course_count, score_max, score_median, not_found, results
+total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_compartment, time_course_count, score_max, score_median, not_found, warnings, results
 ```
 
 - **total_entries** (int): Total experiments in the KG (unfiltered).
@@ -64,6 +64,7 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 - **score_max** (float | None): Max Lucene relevance score, present only when search_text is used.
 - **score_median** (float | None): Median Lucene relevance score, present only when search_text is used.
 - **not_found** (list[string]): Input experiment_ids that did not match any Experiment node (empty unless experiment_ids was provided).
+- **warnings** (list[string]): A closed-vocabulary filter value (treatment_type / background_factors / omics_type / table_scope / growth_phases / compartment) not found in the live vocabulary (see list_filter_values), or an organism that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.
 
 ### Per-result fields
 
@@ -618,7 +619,7 @@ result['results'][0]['time_point_growth_phases']
 from multiomics_explorer import list_experiments
 
 result = list_experiments()
-# returns dict with keys: total_entries, total_matching, returned, offset, truncated, by_organism, by_organism_truncated, by_treatment_type, by_treatment_type_truncated, by_background_factors, by_background_factors_truncated, by_omics_type, by_publication, by_publication_truncated, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_metric_type_truncated, by_compartment, time_course_count, score_max, score_median, not_found, results
+# returns dict with keys: total_entries, total_matching, returned, offset, truncated, by_organism, by_organism_truncated, by_treatment_type, by_treatment_type_truncated, by_background_factors, by_background_factors_truncated, by_omics_type, by_publication, by_publication_truncated, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_metric_type_truncated, by_compartment, time_course_count, score_max, score_median, not_found, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

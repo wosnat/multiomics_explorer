@@ -68,7 +68,8 @@ class TestGenesByFunctionContract:
         result = api.genes_by_function("DNA polymerase", conn=conn)
         expected_envelope = {
             "total_search_hits", "total_matching", "by_organism", "by_category",
-            "score_max", "score_median", "returned", "truncated", "offset", "results",
+            "score_max", "score_median", "returned", "truncated", "offset",
+            "warnings", "results",
         }
         # by_organism_truncated (llm-review 2b.2 `_cap_breakdowns`) is a sparse
         # key, present only when `by_organism` was actually capped at 10 — a
@@ -1085,7 +1086,7 @@ class TestGeneDerivedMetricsContract:
         "not_found", "not_matched",
         "by_value_kind", "by_metric_type", "by_metric",
         "by_compartment", "by_treatment_type",
-        "by_background_factors", "by_publication",
+        "by_background_factors", "by_publication", "warnings",
         "returned", "offset", "truncated", "results",
     }
 

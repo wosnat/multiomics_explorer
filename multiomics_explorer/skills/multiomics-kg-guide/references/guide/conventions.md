@@ -104,6 +104,20 @@ sets, are themselves summaries (`gene_response_profile`), take a bounded
 batch (`ontology_term_details`), or have raw / shape-specific output
 (`run_cypher`, `kg_schema`).
 
+### `warnings`: advisory diagnostics
+
+`warnings` (`list[str]`, always present, `[]` when clean) surfaces things
+worth a second look — a closed-vocabulary filter value that matched no
+`ControlledVocabulary` entry (`treatment_type`, `background_factors`,
+`compartment`, `table_scope`, `growth_phases`, `omics_type`, `category` /
+`gene_categories`, `cluster_type`), an `organism` word that resolved to no
+`OrganismTaxon`, a rankable/has_p_value gate exclusion, an ID collision, and
+similar. A warning is **advisory only — it never changes which rows come
+back**; the call still runs against whatever the filters actually matched
+(often an empty result), it just tells you *why*. Each warning names the
+tool to call for the valid set — usually `list_filter_values(filter_type=
+...)` for a vocabulary typo, `list_organisms()` for an unmatched organism.
+
 ### `verbose=True` mode
 
 Adds heavy fields (full taxonomy, structural fingerprints, abstracts,

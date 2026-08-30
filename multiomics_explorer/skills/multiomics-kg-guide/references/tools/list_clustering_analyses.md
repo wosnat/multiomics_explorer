@@ -39,7 +39,7 @@ analysis_ids=[id])` to scope a per-gene cluster lookup.
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, by_background_factors, by_omics_type, by_growth_phase, score_max, score_median, returned, offset, truncated, results
+total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, by_background_factors, by_omics_type, by_growth_phase, score_max, score_median, returned, offset, truncated, warnings, results
 ```
 
 - **total_entries** (int): Total analyses in KG (before filters)
@@ -55,6 +55,7 @@ total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, 
 - **returned** (int): Results in this response
 - **offset** (int): Offset into result set
 - **truncated** (bool): True if total_matching > offset + returned
+- **warnings** (list[string]): A closed-vocabulary filter value (cluster_type / treatment_type / background_factors / growth_phases / omics_type) not found in the live vocabulary (see list_filter_values), or an organism that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.
 
 ### Per-result fields
 
@@ -164,7 +165,7 @@ response['total_matching']  # use total, not len — results may be truncated
 from multiomics_explorer import list_clustering_analyses
 
 result = list_clustering_analyses()
-# returns dict with keys: total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, by_background_factors, by_omics_type, by_growth_phase, score_max, score_median, returned, offset, truncated, results
+# returns dict with keys: total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, by_background_factors, by_omics_type, by_growth_phase, score_max, score_median, returned, offset, truncated, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

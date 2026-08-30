@@ -49,7 +49,7 @@ kind-specific drill-downs.
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, by_organism, by_value_kind, by_metric_type, by_compartment, by_omics_type, by_treatment_type, by_background_factors, by_growth_phase, score_max, score_median, returned, offset, truncated, results
+total_entries, total_matching, by_organism, by_value_kind, by_metric_type, by_compartment, by_omics_type, by_treatment_type, by_background_factors, by_growth_phase, score_max, score_median, returned, offset, truncated, warnings, results
 ```
 
 - **total_entries** (int): Total DMs in the KG (unfiltered baseline).
@@ -67,6 +67,7 @@ total_entries, total_matching, by_organism, by_value_kind, by_metric_type, by_co
 - **returned** (int): Number of rows in results.
 - **offset** (int): Pagination offset used for this call.
 - **truncated** (bool): True when total_matching > returned (more rows available — paginate with offset).
+- **warnings** (list[string]): A closed-vocabulary filter value (compartment / omics_type / treatment_type / background_factors / growth_phases) not found in the live vocabulary (see list_filter_values), or an organism that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.
 
 ### Per-result fields
 
@@ -189,7 +190,7 @@ list_derived_metrics(organism="MED4")
 from multiomics_explorer import list_derived_metrics
 
 result = list_derived_metrics()
-# returns dict with keys: total_entries, total_matching, by_organism, by_value_kind, by_metric_type, by_compartment, by_omics_type, by_treatment_type, by_background_factors, by_growth_phase, score_max, score_median, returned, offset, truncated, results
+# returns dict with keys: total_entries, total_matching, by_organism, by_value_kind, by_metric_type, by_compartment, by_omics_type, by_treatment_type, by_background_factors, by_growth_phase, score_max, score_median, returned, offset, truncated, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

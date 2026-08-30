@@ -928,7 +928,8 @@ class GenesByMetaboliteResponse(BaseModel):
         "dominance auto-warning when `substrate_depth='inherited'` rows "
         "are the transport-arm majority and `substrate_depth` was not set "
         "explicitly; bare-ID collision notes (one input → several "
-        "metabolites, expanded to all).")
+        "metabolites, expanded to all); a `gene_categories` value not "
+        "found in the live vocabulary.")
     resolved_aliases: dict[str, list[str]] = Field(
         default_factory=dict,
         description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
@@ -1305,7 +1306,8 @@ class MetabolitesByGeneResponse(BaseModel):
         "auto-warning naming input genes whose "
         "`transport_substrate_resolution='family_inferred'` — their "
         "substrate breadth is reachability, not capability; bare-ID "
-        "collision notes (one input → several metabolites, expanded to all).")
+        "collision notes (one input → several metabolites, expanded to "
+        "all); a `gene_categories` value not found in the live vocabulary.")
     resolved_aliases: dict[str, list[str]] = Field(
         default_factory=dict,
         description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
@@ -1889,6 +1891,7 @@ def register_tools(mcp: FastMCP):
         offset: int = Field(default=0, description="Offset into full result set.")
         truncated: bool = Field(description="True if total_matching > offset + returned.")
         not_found: list[str] = Field(default_factory=list, description="organism_names inputs that didn't match any organism (case-insensitive); [] when no filter.")
+        warnings: list[str] = Field(default_factory=list, description="A `compartment` value not found in the live vocabulary (see list_filter_values(filter_type='compartment')). Advisory only — never changes which rows are returned. Empty when clean.")
         results: list[OrganismResult]
 
     @mcp.tool(
@@ -1980,6 +1983,7 @@ def register_tools(mcp: FastMCP):
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],
                 not_found=result.get("not_found", []),
+                warnings=result.get("warnings", []),
                 results=organisms,
             )
             await ctx.info(
@@ -2093,6 +2097,7 @@ def register_tools(mcp: FastMCP):
         returned: int = Field(description="Number of results returned.")
         offset: int = Field(default=0, description="Offset into full result set.")
         truncated: bool = Field(description="True when total_matching > returned.")
+        warnings: list[str] = Field(default_factory=list, description="A `category` value not found in the live vocabulary (see list_filter_values(filter_type='gene_category')), or an `organism` that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.")
         results: list[GenesByFunctionResult] = Field(description="Gene results ranked by relevance.")
 
     @mcp.tool(
@@ -2165,6 +2170,7 @@ def register_tools(mcp: FastMCP):
                 returned=data["returned"],
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],
+                warnings=data.get("warnings", []),
                 results=results,
             )
             await ctx.info(f"Returning {response.returned} of {response.total_matching} "
@@ -3821,6 +3827,7 @@ def register_tools(mcp: FastMCP):
         offset: int = Field(default=0, description="Offset into full result set.")
         truncated: bool = Field(description="True if total_matching > returned.")
         not_found: list[str] = Field(default_factory=list, description="Input publication_dois that did not match any Publication node (empty unless publication_dois was provided).")
+        warnings: list[str] = Field(default_factory=list, description="A closed-vocabulary filter value (treatment_type / background_factors / growth_phases / compartment) not found in the live vocabulary (see list_filter_values), or an organism that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.")
         results: list[PublicationResult]
 
     @mcp.tool(
@@ -3921,6 +3928,7 @@ def register_tools(mcp: FastMCP):
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],
                 not_found=result.get("not_found", []),
+                warnings=result.get("warnings", []),
                 results=results,
             )
             await ctx.info(f"Returning {response.returned} of {response.total_matching} "
@@ -4062,6 +4070,7 @@ def register_tools(mcp: FastMCP):
         score_max: float | None = Field(default=None, description="Max Lucene relevance score, present only when search_text is used.")
         score_median: float | None = Field(default=None, description="Median Lucene relevance score, present only when search_text is used.")
         not_found: list[str] = Field(default_factory=list, description="Input experiment_ids that did not match any Experiment node (empty unless experiment_ids was provided).")
+        warnings: list[str] = Field(default_factory=list, description="A closed-vocabulary filter value (treatment_type / background_factors / omics_type / table_scope / growth_phases / compartment) not found in the live vocabulary (see list_filter_values), or an organism that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.")
         results: list[ExperimentResult] = Field(description="Individual experiments (empty when summary=true).")
 
     @mcp.tool(
@@ -4230,6 +4239,7 @@ def register_tools(mcp: FastMCP):
                 score_max=result.get("score_max"),
                 score_median=result.get("score_median"),
                 not_found=result.get("not_found", []),
+                warnings=result.get("warnings", []),
                 results=experiments,
             )
             await ctx.info(f"Returning {response.returned} of {response.total_matching} "
@@ -5457,7 +5467,7 @@ def register_tools(mcp: FastMCP):
         not_found: list[str] = Field(default_factory=list, description="Input locus_tags not found in KG")
         no_expression: list[str] = Field(default_factory=list, description="Gene exists but has NO Changes_expression_of edge at all in the organism")
         filtered_out: list[str] = Field(default_factory=list, description="Gene has expression edges but none survive the active treatment_types / background_factors filters — e.g. a treatment_types vocabulary typo. Never confuse with no_expression.")
-        warnings: list[str] = Field(default_factory=list, description="One entry per treatment_types value not found in the live vocabulary (see list_filter_values(filter_type='treatment_type')). Empty when clean.")
+        warnings: list[str] = Field(default_factory=list, description="One entry per treatment_types / background_factors value not found in the live vocabulary (see list_filter_values(filter_type='treatment_type' or 'background_factors')). Empty when clean.")
         returned: int = Field(description="Genes in results after pagination (e.g. 15)")
         offset: int = Field(description="Offset into paginated gene list (e.g. 0)")
         truncated: bool = Field(description="True if more genes available beyond returned + offset")
@@ -5625,6 +5635,7 @@ def register_tools(mcp: FastMCP):
         offset: int = Field(default=0, description="Offset into result set")
         truncated: bool = Field(
             description="True if total_matching > offset + returned")
+        warnings: list[str] = Field(default_factory=list, description="A closed-vocabulary filter value (cluster_type / treatment_type / background_factors / growth_phases / omics_type) not found in the live vocabulary (see list_filter_values), or an organism that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.")
         results: list["ListClusteringAnalysesResult"] = Field(
             default_factory=list, description="One row per clustering analysis")
 
@@ -5742,6 +5753,7 @@ def register_tools(mcp: FastMCP):
                 returned=data["returned"],
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],
+                warnings=data.get("warnings", []),
                 results=results,
             )
             await ctx.info(f"Returning {response.returned} of "
@@ -5925,6 +5937,13 @@ def register_tools(mcp: FastMCP):
         offset: int = Field(default=0, description="Pagination offset used.")
         truncated: bool = Field(
             description="True when total_matching > offset + returned.")
+        warnings: list[str] = Field(
+            default_factory=list,
+            description="A closed-vocabulary filter value (compartment / "
+                        "treatment_type / background_factors) not found in "
+                        "the live vocabulary (see list_filter_values). "
+                        "Advisory only — never changes which rows are "
+                        "returned. Empty when clean.")
         results: list[GeneDerivedMetricsResult] = Field(
             default_factory=list,
             description="One row per gene × DM. Empty when summary=True.")
@@ -6145,6 +6164,16 @@ def register_tools(mcp: FastMCP):
             description=(
                 "True when total_matching > returned (more rows available — "
                 "paginate with offset)."
+            ),
+        )
+        warnings: list[str] = Field(
+            default_factory=list,
+            description=(
+                "A closed-vocabulary filter value (compartment / omics_type "
+                "/ treatment_type / background_factors / growth_phases) not "
+                "found in the live vocabulary (see list_filter_values), or "
+                "an organism that matches no OrganismTaxon. Advisory only — "
+                "never changes which rows are returned. Empty when clean."
             ),
         )
         results: list["ListDerivedMetricsResult"] = Field(
@@ -6390,6 +6419,7 @@ def register_tools(mcp: FastMCP):
         offset: int = Field(default=0, description="Offset into result set")
         truncated: bool = Field(
             description="True if total_matching > offset + returned")
+        warnings: list[str] = Field(default_factory=list, description="A closed-vocabulary filter value (cluster_type / treatment_type / background_factors) not found in the live vocabulary (see list_filter_values). Advisory only — never changes which rows are returned. Empty when clean.")
         results: list["GeneClustersByGeneResult"] = Field(
             default_factory=list, description="One row per gene × cluster")
 
@@ -6482,6 +6512,7 @@ def register_tools(mcp: FastMCP):
                 returned=data["returned"],
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],
+                warnings=data.get("warnings", []),
                 results=results,
             )
             await ctx.info(f"Returning {response.returned} of "
@@ -6636,6 +6667,7 @@ def register_tools(mcp: FastMCP):
                 returned=data["returned"],
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],
+                warnings=data.get("warnings", []),
                 results=results,
             )
             await ctx.info(f"Returning {response.returned} of "
@@ -7568,7 +7600,12 @@ def register_tools(mcp: FastMCP):
                         "present (empty list when no exclusions).")
         warnings: list[str] = Field(
             default_factory=list,
-            description="Human-readable summary of excluded_derived_metrics.")
+            description="Human-readable summary of excluded_derived_metrics, "
+                        "a closed-vocabulary filter value (compartment / "
+                        "treatment_type / background_factors / "
+                        "growth_phases) not found in the live vocabulary, "
+                        "or an `organism` that matches no OrganismTaxon at "
+                        "all (distinct from not_matched_organism).")
         returned: int = Field(description="Length of results list.")
         offset: int = Field(default=0, description="Pagination offset used.")
         truncated: bool = Field(
@@ -7997,8 +8034,13 @@ def register_tools(mcp: FastMCP):
                         "consistency.")
         warnings: list[str] = Field(
             default_factory=list,
-            description="Always [] for boolean DMs. Kept for cross-tool "
-                        "envelope-shape consistency.")
+            description="No rankable / has_p_value gates exist for boolean "
+                        "DMs, so excluded_derived_metrics stays []; warnings "
+                        "still carries a closed-vocabulary filter value "
+                        "(compartment / treatment_type / background_factors "
+                        "/ growth_phases) not found in the live vocabulary, "
+                        "or an `organism` that matches no OrganismTaxon at "
+                        "all (distinct from not_matched_organism).")
         returned: int = Field(description="Length of results list.")
         offset: int = Field(default=0, description="Pagination offset used.")
         truncated: bool = Field(
@@ -8380,8 +8422,14 @@ def register_tools(mcp: FastMCP):
                         "consistency.")
         warnings: list[str] = Field(
             default_factory=list,
-            description="Always [] for categorical DMs. Kept for cross-tool "
-                        "envelope-shape consistency.")
+            description="No rankable / has_p_value gates exist for "
+                        "categorical DMs, so excluded_derived_metrics stays "
+                        "[]; warnings still carries a closed-vocabulary "
+                        "filter value (compartment / treatment_type / "
+                        "background_factors / growth_phases) not found in "
+                        "the live vocabulary, or an `organism` that matches "
+                        "no OrganismTaxon at all (distinct from "
+                        "not_matched_organism).")
         returned: int = Field(description="Length of results list.")
         offset: int = Field(default=0, description="Pagination offset used.")
         truncated: bool = Field(
@@ -9498,7 +9546,10 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="Diagnostic strings, e.g. a bare metabolite ID "
             "that resolved to more than one metabolite (expanded to all — "
-            "pass the canonical id to narrow).")
+            "pass the canonical id to narrow), a closed-vocabulary filter "
+            "value (compartment / treatment_type / background_factors / "
+            "growth_phases) not found in the live vocabulary, or an "
+            "organism that matches no OrganismTaxon.")
         results: list[ListMetaboliteAssaysResult] = Field(default_factory=list)
 
     @mcp.tool(

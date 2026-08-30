@@ -29,7 +29,7 @@ Routing: drill via `list_experiments(publication_doi=[doi])` for per-experiment 
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, by_value_kind, by_metric_type, by_compartment, by_discusses_coverage, returned, offset, truncated, not_found, results
+total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, by_value_kind, by_metric_type, by_compartment, by_discusses_coverage, returned, offset, truncated, not_found, warnings, results
 ```
 
 - **total_entries** (int): Total publications in KG (unfiltered).
@@ -49,6 +49,7 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if total_matching > returned.
 - **not_found** (list[string]): Input publication_dois that did not match any Publication node (empty unless publication_dois was provided).
+- **warnings** (list[string]): A closed-vocabulary filter value (treatment_type / background_factors / growth_phases / compartment) not found in the live vocabulary (see list_filter_values), or an organism that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.
 
 ### Per-result fields
 
@@ -754,7 +755,7 @@ list_publications(search_text='Biller') then list_experiments(publication_doi=['
 from multiomics_explorer import list_publications
 
 result = list_publications()
-# returns dict with keys: total_entries, total_matching, by_organism, by_organism_truncated, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, by_value_kind, by_metric_type, by_metric_type_truncated, by_compartment, by_discusses_coverage, returned, offset, truncated, not_found, results
+# returns dict with keys: total_entries, total_matching, by_organism, by_organism_truncated, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, by_value_kind, by_metric_type, by_metric_type_truncated, by_compartment, by_discusses_coverage, returned, offset, truncated, not_found, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

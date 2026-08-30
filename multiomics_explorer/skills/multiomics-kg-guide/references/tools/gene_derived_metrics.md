@@ -47,7 +47,7 @@ thresholds) live on `genes_by_numeric_metric`; flag-level filters on
 ### Envelope
 
 ```expected-keys
-total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics, not_found, not_matched, by_value_kind, by_metric_type, by_metric, by_compartment, by_treatment_type, by_background_factors, by_publication, returned, offset, truncated, results
+total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics, not_found, not_matched, by_value_kind, by_metric_type, by_metric, by_compartment, by_treatment_type, by_background_factors, by_publication, returned, offset, truncated, warnings, results
 ```
 
 - **total_matching** (int): Gene × DM rows matching all filters.
@@ -66,6 +66,7 @@ total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics
 - **returned** (int): Length of results list.
 - **offset** (int): Pagination offset used.
 - **truncated** (bool): True when total_matching > offset + returned.
+- **warnings** (list[string]): A closed-vocabulary filter value (compartment / treatment_type / background_factors) not found in the live vocabulary (see list_filter_values). Advisory only — never changes which rows are returned. Empty when clean.
 
 ### Per-result fields
 
@@ -185,7 +186,7 @@ locus_tags must be non-empty (raises ValueError).
 from multiomics_explorer import gene_derived_metrics
 
 result = gene_derived_metrics(locus_tags=...)
-# returns dict with keys: total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics, not_found, not_matched, by_value_kind, by_metric_type, by_metric, by_compartment, by_treatment_type, by_background_factors, by_publication, returned, offset, truncated, results
+# returns dict with keys: total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics, not_found, not_matched, by_value_kind, by_metric_type, by_metric, by_compartment, by_treatment_type, by_background_factors, by_publication, returned, offset, truncated, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

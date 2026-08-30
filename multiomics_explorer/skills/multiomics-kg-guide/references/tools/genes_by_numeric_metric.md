@@ -76,7 +76,7 @@ total_matching, total_derived_metrics, total_genes, by_organism, by_compartment,
 - **not_matched_metric_types** (list[string]): `metric_types` whose DMs produced 0 rows.
 - **not_matched_organism** (string | None): `organism` arg that matched no surviving DM.
 - **excluded_derived_metrics** (list[ExcludedDerivedMetric]): DMs dropped by rankable / has_p_value gate. Always present (empty list when no exclusions).
-- **warnings** (list[string]): Human-readable summary of excluded_derived_metrics.
+- **warnings** (list[string]): Human-readable summary of excluded_derived_metrics, a closed-vocabulary filter value (compartment / treatment_type / background_factors / growth_phases) not found in the live vocabulary, or an `organism` that matches no OrganismTaxon at all (distinct from not_matched_organism).
 - **returned** (int): Length of results list.
 - **offset** (int): Pagination offset used.
 - **truncated** (bool): True when total_matching > offset + returned.

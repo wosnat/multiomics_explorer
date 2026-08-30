@@ -665,31 +665,86 @@ def _read_vocab_values(
     return out
 
 
-def _vocab_warnings(
-    conn, param: str, values: list[str] | None,
-    applies_to: str, prop: str, filter_type: str,
-) -> list[str]:
-    """Warn on filter values not in the live vocabulary.
+# Closed-vocabulary filter params -> where their allowed values live.
+# param name: (applies_to label, ControlledVocabulary / pivot property,
+# list_filter_values filter_type). `None` marks a param that is
+# deliberately NOT closed (open-ended; e.g. DM metric_types).
+_CLOSED_VOCAB_PARAMS: dict[str, tuple[str, str, str] | None] = {
+    "treatment_type": ("Experiment", "treatment_type", "treatment_type"),
+    "treatment_types": ("Experiment", "treatment_type", "treatment_type"),
+    "background_factors": ("Experiment", "background_factors", "background_factors"),
+    "compartment": ("Experiment", "compartment", "compartment"),
+    "table_scope": ("Experiment", "table_scope", "table_scope"),
+    # growth_phase has no ControlledVocabulary node (always a pivot read);
+    # `growth_phases` is the real Experiment property (list<string>) — the
+    # edge-level `Changes_expression_of.growth_phase` singular used by
+    # differential_expression_by_gene draws from the same label set.
+    "growth_phases": ("Experiment", "growth_phases", "growth_phase"),
+    "omics_type": ("Experiment", "omics_type", "omics_type"),
+    "category": ("Gene", "gene_category", "gene_category"),
+    "gene_categories": ("Gene", "gene_category", "gene_category"),
+    "cluster_type": ("ClusteringAnalysis", "cluster_type", "cluster_type"),
+    "metric_types": None,  # DM metric types are open-ended; see genes_by_*_metric
+}
+
+
+def _closed_vocab_warnings(conn, **params) -> list[str]:
+    """Warn on closed-vocabulary filter values not in the live vocabulary.
+
+    Table-driven generalisation of the 2b.1 T6 per-field helper: pass any
+    subset of `_CLOSED_VOCAB_PARAMS` keys as kwargs (scalar or list; a
+    `None` / absent / unmapped param is silently skipped — callers can pass
+    every filter kwarg they have without checking membership first).
 
     Never raises and never filters — the caller decides what to do with
     unmatched values (typically: land the affected genes in
     ``filtered_out`` rather than a false ``no_expression`` / silent empty
-    result). Module-level helper; a later pass (2b.3) may generalize the
-    signature further.
+    result).
     """
-    if not values:
+    warnings: list[str] = []
+    for param, values in params.items():
+        if not values:
+            continue
+        entry = _CLOSED_VOCAB_PARAMS.get(param)
+        if entry is None:
+            continue
+        applies_to, prop, filter_type = entry
+        values_list = values if isinstance(values, list) else [values]
+        read = _read_vocab_values(conn, applies_to, prop, "node")
+        valid = set(read["values"])
+        if not valid:
+            continue
+        bad = [v for v in values_list if v not in valid]
+        if not bad:
+            continue
+        shown = ", ".join(sorted(valid)[:8]) + (", …" if len(valid) > 8 else "")
+        warnings.extend(
+            f"{param} value '{v}' matched nothing — valid values: {shown}"
+            f" (list_filter_values(filter_type='{filter_type}'))"
+            for v in bad
+        )
+    return warnings
+
+
+def _organism_zero_match_warning(conn, organism: str | None) -> list[str]:
+    """Warn when a scalar `organism` filter resolves to no OrganismTaxon.
+
+    Runs the same word-based CONTAINS resolve query
+    `_validate_organism_inputs` uses (`build_resolve_organism_for_organism`,
+    gated on `gene_count > 0`) without raising — for tools that treat an
+    unmatched organism as a normal empty result rather than a hard error.
+    Tools that already raise via `_validate_organism_inputs` (or otherwise
+    already surface a zero-match organism, e.g. `not_found.organism`) must
+    not call this — it would be unreachable dead code there.
+    """
+    if not organism:
         return []
-    read = _read_vocab_values(conn, applies_to, prop, "node")
-    valid = set(read["values"])
-    bad = [v for v in values if v not in valid]
-    if not bad:
+    cypher, params = build_resolve_organism_for_organism(organism=organism)
+    rows = conn.execute_query(cypher, **params)
+    orgs = rows[0]["organisms"] if rows else []
+    if orgs:
         return []
-    shown = ", ".join(sorted(valid)[:8]) + (", …" if len(valid) > 8 else "")
-    return [
-        f"{param} value '{v}' is not in the vocabulary (valid: {shown})"
-        f" — see list_filter_values(filter_type='{filter_type}')"
-        for v in bad
-    ]
+    return [f"organism '{organism}' matched no organism — see list_organisms()"]
 
 
 # Categorical filter params -> where their allowed values live.
@@ -1036,11 +1091,15 @@ def genes_by_function(
     """Search genes by functional annotation text.
 
     Returns dict with keys: total_search_hits, total_matching,
-    by_organism, by_category, score_max, score_median,
+    by_organism, by_category, score_max, score_median, warnings,
     returned, truncated, results.
     Per result: locus_tag, gene_name, product, organism_name,
     gene_category, annotation_quality, score.
     Verbose adds: function_description, gene_summary.
+
+    warnings: a `category` value not in the live vocabulary, or an
+    `organism` that matches no OrganismTaxon. Advisory only — never
+    changes which rows are returned.
 
     Raises ValueError if search_text is empty.
     """
@@ -1050,6 +1109,8 @@ def genes_by_function(
         limit = 0
 
     conn = _default_conn(conn)
+    warnings = _closed_vocab_warnings(conn, category=category)
+    warnings += _organism_zero_match_warning(conn, organism)
     filter_kwargs = dict(
         search_text=search_text, organism=organism,
         category=category, min_quality=min_quality,
@@ -1085,6 +1146,8 @@ def genes_by_function(
         "score_max": raw_summary["score_max"],
         "score_median": raw_summary["score_median"],
     }
+
+    envelope["warnings"] = warnings
 
     # Detail query — skip when limit=0
     if limit == 0:
@@ -1774,7 +1837,10 @@ def list_organisms(
     Returns dict with keys: total_entries, total_matching, returned, offset,
     truncated, by_cluster_type, by_organism_type, by_value_kind, by_metric_type,
     by_compartment, top_metabolic_capability, by_measurement_capability,
-    top_annotation_capability, not_found, results.
+    top_annotation_capability, not_found, warnings, results.
+
+    warnings: a `compartment` value not in the live vocabulary. Advisory
+    only — never changes which rows are returned.
     Per result (compact): organism_name, organism_type, genus, species,
     strain, clade, ncbi_taxon_id, gene_count, publication_count,
     experiment_count, treatment_types, omics_types, clustering_analysis_count,
@@ -1814,6 +1880,8 @@ def list_organisms(
     conn = _default_conn(conn)
     if summary:
         limit = 0
+
+    warnings = _closed_vocab_warnings(conn, compartment=compartment)
 
     # Resolve each input through the shared organism resolver (word match on
     # preferred_name + name_synonyms, gene_count > 0) so 'MED4' works here
@@ -1967,6 +2035,7 @@ def list_organisms(
         "offset": offset,
         "truncated": total_matching > offset + len(results),
         "not_found": not_found,
+        "warnings": warnings,
         "results": results,
     }
     return _cap_breakdowns(
@@ -2025,7 +2094,12 @@ def list_publications(
     Returns dict with keys: total_entries, total_matching, returned, offset,
     truncated, by_organism, by_treatment_type, by_background_factors,
     by_omics_type, by_cluster_type, by_value_kind, by_metric_type,
-    by_compartment, by_discusses_coverage, not_found, results.
+    by_compartment, by_discusses_coverage, not_found, warnings, results.
+
+    warnings: a closed-vocabulary filter value (treatment_type /
+    background_factors / growth_phases / compartment) not in the live
+    vocabulary, or an organism that matches no OrganismTaxon. Advisory
+    only — never changes which rows are returned.
     Per result (compact): doi, title, authors, year, journal, study_type,
     organisms, experiment_count, treatment_types, background_factors,
     omics_types, clustering_analysis_count, cluster_types, growth_phases,
@@ -2050,6 +2124,12 @@ def list_publications(
     `not_found` in the envelope lists any provided DOIs that did not match.
     """
     conn = _default_conn(conn)
+    warnings = _closed_vocab_warnings(
+        conn, treatment_type=treatment_type,
+        background_factors=background_factors,
+        growth_phases=growth_phases, compartment=compartment,
+    )
+    warnings += _organism_zero_match_warning(conn, organism)
     filter_kwargs = dict(
         organism=organism, treatment_type=treatment_type,
         background_factors=background_factors,
@@ -2132,6 +2212,7 @@ def list_publications(
         "offset": offset,
         "truncated": summary["total_matching"] > offset + len(results),
         "not_found": not_found,
+        "warnings": warnings,
         "results": results,
     }
     return _cap_breakdowns(envelope, ("by_metric_type", "by_organism"), summary=False)
@@ -2163,7 +2244,12 @@ def list_experiments(
     by_treatment_type, by_background_factors, by_omics_type,
     by_publication, by_table_scope, by_cluster_type, by_growth_phase,
     by_value_kind, by_metric_type, by_compartment,
-    time_course_count, returned, truncated, not_found, results.
+    time_course_count, returned, truncated, not_found, warnings, results.
+
+    warnings: a closed-vocabulary filter value (treatment_type /
+    background_factors / omics_type / table_scope / growth_phases /
+    compartment) not in the live vocabulary, or an organism that matches no
+    OrganismTaxon. Advisory only — never changes which rows are returned.
 
     summary=True is sugar for limit=0: results is empty list,
     returned=0, truncated=True.
@@ -2221,6 +2307,13 @@ def list_experiments(
         limit = 0
 
     conn = _default_conn(conn)
+    warnings = _closed_vocab_warnings(
+        conn, treatment_type=treatment_type,
+        background_factors=background_factors, omics_type=omics_type,
+        table_scope=table_scope, growth_phases=growth_phases,
+        compartment=compartment,
+    )
+    warnings += _organism_zero_match_warning(conn, organism)
     filter_kwargs = dict(
         organism=organism, treatment_type=treatment_type,
         background_factors=background_factors,
@@ -2294,6 +2387,8 @@ def list_experiments(
         envelope["not_found"] = [eid for eid in experiment_ids if eid not in found_ids]
     else:
         envelope["not_found"] = []
+
+    envelope["warnings"] = warnings
 
     # Score distribution (only when search_text used)
     if "score_max" in raw_summary:
@@ -3904,10 +3999,7 @@ def differential_expression_by_gene(
     """
     conn = _default_conn(conn)
 
-    warnings = _vocab_warnings(
-        conn, "growth_phases", growth_phases,
-        "Experiment", "growth_phases", "growth_phase",
-    )
+    warnings = _closed_vocab_warnings(conn, growth_phases=growth_phases)
 
     # Validate direction
     if direction is not None and direction not in _VALID_DIRECTIONS_BY_GENE:
@@ -4343,7 +4435,8 @@ def gene_response_profile(
         organism. filtered_out: gene has edges but none survive the active
         treatment_types / background_factors filters (e.g. a treatment_types
         vocabulary typo) — never confuse this with no_expression. warnings:
-        one entry per treatment_types value not in the live vocabulary.
+        one entry per treatment_types / background_factors value not in the
+        live vocabulary.
     """
     if not locus_tags:
         raise ValueError(
@@ -4357,9 +4450,9 @@ def gene_response_profile(
 
     conn = _default_conn(conn)
 
-    warnings = _vocab_warnings(
-        conn, "treatment_types", treatment_types,
-        "Experiment", "treatment_type", "treatment_type",
+    warnings = _closed_vocab_warnings(
+        conn, treatment_types=treatment_types,
+        background_factors=background_factors,
     )
 
     # Resolve organism upfront — validates single-organism constraint
@@ -4528,7 +4621,13 @@ def list_clustering_analyses(
 
     Returns dict with keys: total_entries, total_matching,
     by_organism, by_cluster_type, by_treatment_type, by_background_factors,
-    by_omics_type, by_growth_phase, returned, offset, truncated, results.
+    by_omics_type, by_growth_phase, warnings, returned, offset, truncated,
+    results.
+
+    warnings: a closed-vocabulary filter value (cluster_type /
+    treatment_type / background_factors / growth_phases / omics_type) not
+    in the live vocabulary, or an organism that matches no OrganismTaxon.
+    Advisory only — never changes which rows are returned.
     When search_text provided: adds score_max, score_median.
     Per result (compact): analysis_id, name, organism_name, cluster_method,
     cluster_type, cluster_count, total_gene_count, treatment_type,
@@ -4546,6 +4645,13 @@ def list_clustering_analyses(
         limit = 0
 
     conn = _default_conn(conn)
+
+    warnings = _closed_vocab_warnings(
+        conn, cluster_type=cluster_type, treatment_type=treatment_type,
+        background_factors=background_factors, growth_phases=growth_phases,
+        omics_type=omics_type,
+    )
+    warnings += _organism_zero_match_warning(conn, organism)
 
     filter_kwargs = dict(
         organism=organism, cluster_type=cluster_type,
@@ -4586,6 +4692,7 @@ def list_clustering_analyses(
         "by_omics_type": _rename_freq(raw_summary["by_omics_type"], "omics_type"),
         "by_growth_phase": _rename_freq(
             raw_summary.get("by_growth_phase", []), "growth_phase"),
+        "warnings": warnings,
     }
 
     if search_text is not None:
@@ -4676,8 +4783,13 @@ def list_derived_metrics(
 
     Returns dict with keys: total_entries, total_matching, by_organism,
     by_value_kind, by_metric_type, by_compartment, by_omics_type,
-    by_treatment_type, by_background_factors, by_growth_phase,
+    by_treatment_type, by_background_factors, by_growth_phase, warnings,
     score_max, score_median, returned, offset, truncated, results.
+
+    warnings: a closed-vocabulary filter value (compartment / omics_type /
+    treatment_type / background_factors / growth_phases) not in the live
+    vocabulary, or an organism that matches no OrganismTaxon. Advisory
+    only — never changes which rows are returned.
     Per result (compact): derived_metric_id, name, metric_type, value_kind,
     rankable, organism_name, unit, total_gene_count, allowed_categories,
     score (when searching).
@@ -4694,6 +4806,13 @@ def list_derived_metrics(
         limit = 0
 
     conn = _default_conn(conn)
+
+    warnings = _closed_vocab_warnings(
+        conn, compartment=compartment, omics_type=omics_type,
+        treatment_type=treatment_type, background_factors=background_factors,
+        growth_phases=growth_phases,
+    )
+    warnings += _organism_zero_match_warning(conn, organism)
 
     filter_kwargs = dict(
         organism=organism, metric_types=metric_types, value_kind=value_kind,
@@ -4736,6 +4855,7 @@ def list_derived_metrics(
             raw_summary["by_background_factors"], "background_factor"),
         "by_growth_phase": _rename_freq(
             raw_summary.get("by_growth_phase", []), "growth_phase"),
+        "warnings": warnings,
     }
 
     if search_text is not None:
@@ -4803,7 +4923,11 @@ def gene_clusters_by_gene(
     genes_with_clusters, genes_without_clusters,
     not_found, not_matched,
     by_cluster_type, by_treatment_type, by_background_factors, by_analysis,
-    returned, offset, truncated, results.
+    warnings, returned, offset, truncated, results.
+
+    warnings: a closed-vocabulary filter value (cluster_type /
+    treatment_type / background_factors) not in the live vocabulary.
+    Advisory only — never changes which rows are returned.
     Per result (compact): locus_tag, gene_name, cluster_id, cluster_name,
     cluster_type, membership_score, analysis_id, analysis_name,
     treatment_type, background_factors.
@@ -4828,6 +4952,11 @@ def gene_clusters_by_gene(
     _validate_organism_inputs(
         organism=organism, locus_tags=locus_tags,
         experiment_ids=None, conn=conn,
+    )
+
+    warnings = _closed_vocab_warnings(
+        conn, cluster_type=cluster_type, treatment_type=treatment_type,
+        background_factors=background_factors,
     )
 
     filter_kwargs = dict(
@@ -4858,6 +4987,7 @@ def gene_clusters_by_gene(
             raw_summary["by_background_factors"], "background_factor"),
         "by_analysis": _rename_freq(
             raw_summary["by_analysis"], "analysis_id"),
+        "warnings": warnings,
     }
 
     # Detail query — skip when limit=0
@@ -4902,8 +5032,12 @@ def gene_derived_metrics(
     Returns dict with keys: total_matching, total_derived_metrics,
     genes_with_metrics, genes_without_metrics, not_found, not_matched,
     by_value_kind, by_metric_type, by_metric, by_compartment,
-    by_treatment_type, by_background_factors, by_publication,
+    by_treatment_type, by_background_factors, by_publication, warnings,
     returned, offset, truncated, results.
+
+    warnings: a closed-vocabulary filter value (compartment /
+    treatment_type / background_factors) not in the live vocabulary.
+    Advisory only — never changes which rows are returned.
     Per result (compact, 13 Pydantic fields; 11 emitted by Cypher in the
     current KG): locus_tag, gene_name, derived_metric_id, value_kind, name,
     value, rankable, has_p_value, rank_by_metric, metric_percentile,
@@ -4930,6 +5064,11 @@ def gene_derived_metrics(
     _validate_organism_inputs(
         organism=organism, locus_tags=locus_tags,
         experiment_ids=None, conn=conn,
+    )
+
+    warnings = _closed_vocab_warnings(
+        conn, compartment=compartment, treatment_type=treatment_type,
+        background_factors=background_factors,
     )
 
     filter_kwargs = dict(
@@ -4971,6 +5110,7 @@ def gene_derived_metrics(
             raw_summary["by_background_factors"], "background_factor"),
         "by_publication": _rename_freq(
             raw_summary["by_publication"], "publication_doi"),
+        "warnings": warnings,
     }
 
     # Detail query — skip when limit=0
@@ -5057,6 +5197,11 @@ def genes_by_numeric_metric(
     not_found_metric_types, not_matched_metric_types,
     not_matched_organism, excluded_derived_metrics, warnings,
     returned, offset, truncated, results.
+    warnings also carries: a closed-vocabulary filter value (compartment /
+    treatment_type / background_factors / growth_phases) not in the live
+    vocabulary, and an `organism` that matches no OrganismTaxon at all
+    (distinct from `not_matched_organism`, which means the organism exists
+    but the selected DMs have no edges in it).
     Per result (compact, 9 cols): locus_tag, gene_name, product,
     gene_category, derived_metric_id, value, rank_by_metric,
     metric_percentile, metric_bucket.
@@ -5115,7 +5260,11 @@ def genes_by_numeric_metric(
     ]
 
     excluded_derived_metrics: list[dict] = []
-    warnings: list[str] = []
+    warnings: list[str] = _closed_vocab_warnings(
+        conn, compartment=compartment, treatment_type=treatment_type,
+        background_factors=background_factors, growth_phases=growth_phases,
+    )
+    warnings += _organism_zero_match_warning(conn, organism)
 
     # 5. Validate rankable gate
     rankable_filters = {
@@ -5395,9 +5544,11 @@ def genes_by_boolean_metric(
 
     Selection is mutually exclusive: pass exactly one of
     `derived_metric_ids` or `metric_types`. No rankable / has_p_value
-    gates exist for boolean DMs, so `excluded_derived_metrics` and
-    `warnings` are always returned as `[]` (kept for envelope-shape
-    consistency with genes_by_numeric_metric).
+    gates exist for boolean DMs, so `excluded_derived_metrics` is always
+    returned as `[]` (kept for envelope-shape consistency with
+    genes_by_numeric_metric); `warnings` still carries closed-vocabulary
+    (compartment / treatment_type / background_factors / growth_phases)
+    and organism-existence notices.
 
     Returns dict with keys: total_matching, total_derived_metrics,
     total_genes, by_organism, by_compartment, by_publication,
@@ -5405,7 +5556,7 @@ def genes_by_boolean_metric(
     genes_per_metric_max, genes_per_metric_median, not_found_ids,
     not_matched_ids, not_found_metric_types, not_matched_metric_types,
     not_matched_organism, excluded_derived_metrics (always []),
-    warnings (always []), returned, offset, truncated, results.
+    warnings, returned, offset, truncated, results.
     Per result (compact, 6 cols): locus_tag, gene_name, product,
     gene_category, derived_metric_id, value.
     Per result (verbose adds, 18 cols): name, value_kind, rankable,
@@ -5458,8 +5609,17 @@ def genes_by_boolean_metric(
         x for x in (metric_types or []) if x not in surviving_metric_types
     ]
 
-    # 5. No gate validation for boolean — excluded_derived_metrics /
-    #    warnings always empty. Surviving = all diagnostics survivors.
+    # No rankable / has_p_value gates exist for boolean DMs, so
+    # excluded_derived_metrics stays empty; warnings still carries
+    # closed-vocabulary / organism-existence notices (llm-review 2b.3).
+    warnings: list[str] = _closed_vocab_warnings(
+        conn, compartment=compartment, treatment_type=treatment_type,
+        background_factors=background_factors, growth_phases=growth_phases,
+    )
+    warnings += _organism_zero_match_warning(conn, organism)
+
+    # 5. No gate validation for boolean — excluded_derived_metrics always
+    #    empty. Surviving = all diagnostics survivors.
     surviving = [d["derived_metric_id"] for d in diagnostics]
 
     # 6. Defensive: if everything got filtered out at diagnostics, skip
@@ -5485,7 +5645,7 @@ def genes_by_boolean_metric(
             "not_matched_metric_types": [],
             "not_matched_organism": organism,
             "excluded_derived_metrics": [],
-            "warnings": [],
+            "warnings": warnings,
             "returned": 0,
             "offset": offset,
             "truncated": False,
@@ -5593,7 +5753,7 @@ def genes_by_boolean_metric(
         "not_matched_metric_types": not_matched_metric_types,
         "not_matched_organism": not_matched_organism,
         "excluded_derived_metrics": [],
-        "warnings": [],
+        "warnings": warnings,
         "returned": returned,
         "offset": offset,
         "truncated": truncated,
@@ -5634,9 +5794,11 @@ def genes_by_categorical_metric(
 
     Selection is mutually exclusive: pass exactly one of
     `derived_metric_ids` or `metric_types`. No rankable / has_p_value
-    gates exist for categorical DMs, so `excluded_derived_metrics` and
-    `warnings` are always returned as `[]` (kept for envelope-shape
-    consistency with genes_by_numeric_metric).
+    gates exist for categorical DMs, so `excluded_derived_metrics` is
+    always returned as `[]` (kept for envelope-shape consistency with
+    genes_by_numeric_metric); `warnings` still carries closed-vocabulary
+    (compartment / treatment_type / background_factors / growth_phases)
+    and organism-existence notices.
 
     Returns dict with keys: total_matching, total_derived_metrics,
     total_genes, by_organism, by_compartment, by_publication,
@@ -5644,7 +5806,7 @@ def genes_by_categorical_metric(
     genes_per_metric_max, genes_per_metric_median, not_found_ids,
     not_matched_ids, not_found_metric_types, not_matched_metric_types,
     not_matched_organism, excluded_derived_metrics (always []),
-    warnings (always []), returned, offset, truncated, results.
+    warnings, returned, offset, truncated, results.
     Per result (compact, 6 cols): locus_tag, gene_name, product,
     gene_category, derived_metric_id, value.
     Per result (verbose adds, 19 cols): name, value_kind, rankable,
@@ -5699,6 +5861,15 @@ def genes_by_categorical_metric(
         x for x in (metric_types or []) if x not in surviving_metric_types
     ]
 
+    # No rankable / has_p_value gates exist for categorical DMs, so
+    # excluded_derived_metrics stays empty; warnings still carries
+    # closed-vocabulary / organism-existence notices (llm-review 2b.3).
+    warnings: list[str] = _closed_vocab_warnings(
+        conn, compartment=compartment, treatment_type=treatment_type,
+        background_factors=background_factors, growth_phases=growth_phases,
+    )
+    warnings += _organism_zero_match_warning(conn, organism)
+
     # 5. Validate categories ⊆ union of surviving DMs' allowed_categories
     if categories:
         allowed_union: set[str] = set()
@@ -5740,7 +5911,7 @@ def genes_by_categorical_metric(
             "not_matched_metric_types": [],
             "not_matched_organism": organism,
             "excluded_derived_metrics": [],
-            "warnings": [],
+            "warnings": warnings,
             "returned": 0,
             "offset": offset,
             "truncated": False,
@@ -5855,7 +6026,7 @@ def genes_by_categorical_metric(
         "not_matched_metric_types": not_matched_metric_types,
         "not_matched_organism": not_matched_organism,
         "excluded_derived_metrics": [],
-        "warnings": [],
+        "warnings": warnings,
         "returned": returned,
         "offset": offset,
         "truncated": truncated,
@@ -7352,7 +7523,8 @@ def genes_by_metabolite(
 
     Envelope also carries `resolved_aliases` (dict, `{input: [canonical,
     ...]}`, only coerced inputs; `{}` when none); ambiguous-xref
-    expansions are appended to `warnings`.
+    expansions and a `gene_categories` value not in the live vocabulary
+    are appended to `warnings`.
 
     Raises:
         ValueError: if `evidence_sources` contains values outside
@@ -7429,7 +7601,8 @@ def genes_by_metabolite(
             "returned": 0,
             "offset": offset,
             "truncated": False,
-            "warnings": list(alias_warnings),
+            "warnings": list(alias_warnings) + _closed_vocab_warnings(
+                conn, gene_categories=gene_categories),
             "resolved_aliases": resolved_aliases,
             "not_found": {
                 "metabolite_ids": not_found_metab,
@@ -7675,7 +7848,8 @@ def genes_by_metabolite(
     # 11. Auto-warning: `inherited` dominance over deepest-attachment
     # transport rows. Strict majority threshold; metabolism rows do not
     # factor in; suppressed when the caller set substrate_depth explicitly.
-    warnings: list[str] = list(alias_warnings)
+    warnings: list[str] = list(alias_warnings) + _closed_vocab_warnings(
+        conn, gene_categories=gene_categories)
     transport_ms_total = sum(
         (entry.get("transport_most_specific_rows") or 0)
         for entry in by_metabolite
@@ -7873,7 +8047,8 @@ def metabolites_by_gene(
 
     Envelope also carries `resolved_aliases` (dict, `{input: [canonical,
     ...]}`, only coerced inputs; `{}` when none); ambiguous-xref
-    expansions are appended to `warnings`.
+    expansions and a `gene_categories` value not in the live vocabulary
+    are appended to `warnings`.
 
     Raises:
         ValueError: if `evidence_sources` contains values outside
@@ -7964,7 +8139,8 @@ def metabolites_by_gene(
             "returned": 0,
             "offset": offset,
             "truncated": False,
-            "warnings": list(alias_warnings),
+            "warnings": list(alias_warnings) + _closed_vocab_warnings(
+                conn, gene_categories=gene_categories),
             "resolved_aliases": resolved_aliases,
             "not_found": {
                 "locus_tags": not_found_locus,
@@ -8281,7 +8457,8 @@ def metabolites_by_gene(
     # `transport_substrate_resolution = 'family_inferred'` (every deepest
     # attachment is a lumping family), NOT on a row-share threshold.
     # Suppressed when the caller set substrate_depth explicitly.
-    warnings: list[str] = list(alias_warnings)
+    warnings: list[str] = list(alias_warnings) + _closed_vocab_warnings(
+        conn, gene_categories=gene_categories)
     family_inferred_genes = [
         entry["locus_tag"] for entry in by_gene
         if entry.get("transport_substrate_resolution") == "family_inferred"
@@ -8415,7 +8592,10 @@ def list_metabolite_assays(
 
     Envelope `resolved_aliases` (dict, `{input: [canonical, ...]}`, only
     coerced inputs; `{}` when none) and `warnings` (list of str;
-    ambiguous-xref expansions).
+    ambiguous-xref expansions, a closed-vocabulary filter value
+    (compartment / treatment_type / background_factors / growth_phases)
+    not in the live vocabulary, or an organism that matches no
+    OrganismTaxon).
     """
     if search_text is not None and not search_text.strip():
         raise ValueError("search_text must not be empty if provided.")
@@ -8430,6 +8610,11 @@ def list_metabolite_assays(
         _canonicalize_metabolite_id_params(
             conn, metabolite_ids, exclude_metabolite_ids)
     )
+    warnings = list(warnings) + _closed_vocab_warnings(
+        conn, compartment=compartment, treatment_type=treatment_type,
+        background_factors=background_factors, growth_phases=growth_phases,
+    )
+    warnings += _organism_zero_match_warning(conn, organism)
 
     builder_kwargs = dict(
         search_text=search_text, organism=organism, metric_types=metric_types,

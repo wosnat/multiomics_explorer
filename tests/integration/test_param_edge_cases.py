@@ -187,6 +187,31 @@ class TestGenesByFunctionEdgeCases:
             "photosystem", organism="ZZZZZ_FAKE", conn=conn,
         )
         assert result["total_matching"] == 0
+        # llm-review 2b.3: an organism matching no OrganismTaxon is a
+        # normal empty result (never a raise here), but it does get a
+        # warning naming the tool to check valid organisms with.
+        assert len(result["warnings"]) == 1
+        assert "ZZZZZ_FAKE" in result["warnings"][0]
+        assert "list_organisms" in result["warnings"][0]
+
+    def test_category_typo_warns(self, conn):
+        """A closed-vocabulary category typo warns but does not raise
+        (llm-review 2b.3)."""
+        result = api.genes_by_function(
+            "psbA", organism="Bogusmonas", category="Photosynthesiss",
+            conn=conn,
+        )
+        assert len(result["warnings"]) == 2
+        cat_warning = next(
+            w for w in result["warnings"] if "category" in w
+        )
+        assert "Photosynthesiss" in cat_warning
+        assert "list_filter_values" in cat_warning
+        org_warning = next(
+            w for w in result["warnings"] if "organism" in w
+        )
+        assert "Bogusmonas" in org_warning
+        assert "list_organisms" in org_warning
 
     def test_min_quality_boundaries(self, conn):
         """min_quality=3 returns fewer or equal results than min_quality=0."""
@@ -442,6 +467,18 @@ class TestListExperimentsEdgeCases:
         for b in result["by_table_scope"]:
             assert "table_scope" in b
             assert "count" in b
+
+    def test_bogus_treatment_type_warns(self, conn):
+        """A valid organism + a closed-vocabulary typo yields exactly one
+        warning naming the value and pointing at list_filter_values
+        (llm-review 2b.3); the call itself still succeeds (rows unaffected
+        by the typo)."""
+        result = api.list_experiments(
+            organism="MED4", treatment_type=["bogus"], conn=conn,
+        )
+        assert len(result["warnings"]) == 1
+        assert "bogus" in result["warnings"][0]
+        assert "list_filter_values" in result["warnings"][0]
 
 
 # ---------------------------------------------------------------------------

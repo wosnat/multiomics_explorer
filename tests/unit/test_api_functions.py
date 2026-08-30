@@ -47,6 +47,19 @@ def mock_conn():
     return MagicMock()
 
 
+@pytest.fixture(autouse=True)
+def _reset_vocab_cache():
+    """`_read_vocab_values` caches per (applies_to, prop) at module scope
+    (real-KG perf optimisation) — without a reset, whichever test in this
+    file happens to run first for a given pair silently seeds the cache
+    for every later test, making mocked `execute_query.side_effect` call
+    counts order-dependent. Reset before and after every test so each test
+    sees a cold cache regardless of run order (llm-review 2b.3)."""
+    api._reset_vocab_cache()
+    yield
+    api._reset_vocab_cache()
+
+
 # ---------------------------------------------------------------------------
 # kg_schema
 # ---------------------------------------------------------------------------
@@ -313,8 +326,10 @@ class TestGenesByFunction:
         assert mock_conn.execute_query.call_count == 3
         assert result["total_matching"] == 5
 
-    def test_passes_params(self, mock_conn):
+    def test_passes_params(self, mock_conn, monkeypatch):
         """Verify organism, category, min_quality forwarded to builder."""
+        monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
         mock_conn.execute_query.side_effect = [
             self._summary_result(),
             self._detail_rows(),
@@ -1346,7 +1361,8 @@ class TestListOrganisms:
         assert result["results"][0]["derived_metric_count"] == 7
         assert result["results"][0]["compartments"] == ["whole_cell"]
 
-    def test_compartment_filter_param_passes_through(self, mock_conn):
+    def test_compartment_filter_param_passes_through(self, mock_conn, monkeypatch):
+        monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
         mock_conn.execute_query.side_effect = [
             [{"total_entries": 30, "total_matching": 0,
               "by_value_kind": [], "by_metric_type": [], "by_compartment": []}],
@@ -2161,8 +2177,10 @@ class TestListPublications:
         assert len(result["results"]) == 1
         assert mock_conn.execute_query.call_count == 2
 
-    def test_passes_params(self, mock_conn):
+    def test_passes_params(self, mock_conn, monkeypatch):
         """All filter params are forwarded to builders."""
+        monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
         mock_conn.execute_query.side_effect = [
             [{"total_entries": 21, "total_matching": 5}],
             [{"doi": "10.1234/test"}],
@@ -2346,8 +2364,9 @@ class TestListPublications:
         ct_map = {b["cluster_type"]: b["count"] for b in result["by_cluster_type"]}
         assert ct_map["condition_comparison"] == 1
 
-    def test_compartment_filter_passed_to_builders(self, mock_conn):
+    def test_compartment_filter_passed_to_builders(self, mock_conn, monkeypatch):
         """compartment param is forwarded to summary and detail builders."""
+        monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
         mock_conn.execute_query.side_effect = [
             [{
                 "total_entries": 5, "total_matching": 2,
@@ -2513,8 +2532,10 @@ class TestListExperiments:
         # No detail query call — only 2 execute_query calls
         assert mock_conn.execute_query.call_count == 2
 
-    def test_passes_params(self, mock_conn):
+    def test_passes_params(self, mock_conn, monkeypatch):
         """All filter params forwarded to builders."""
+        monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
         mock_conn.execute_query.side_effect = [
             self._summary_result(total_matching=5),
             self._summary_result(),
@@ -2854,8 +2875,9 @@ class TestListExperiments:
         assert result["by_compartment"][0]["compartment"] == "whole_cell"
         assert result["by_compartment"][0]["count"] == 60
 
-    def test_compartment_filter_passed_to_builders(self, mock_conn):
+    def test_compartment_filter_passed_to_builders(self, mock_conn, monkeypatch):
         """compartment param is forwarded to summary and detail builder calls."""
+        monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
         mock_conn.execute_query.side_effect = [
             self._summary_result_with_dm(total_matching=5),
             self._summary_result_with_dm(),
@@ -3373,7 +3395,7 @@ class TestDifferentialExpressionByGene:
         assert result["no_expression"] == []
         assert len(result["warnings"]) == 1
         assert result["warnings"][0].startswith(
-            "growth_phases value 'log' is not in the vocabulary"
+            "growth_phases value 'log' matched nothing"
         )
 
     def test_no_growth_phases_no_warnings(self, mock_conn):
@@ -4157,7 +4179,7 @@ class TestGeneResponseProfile:
         assert result["no_expression"] == []
         assert len(result["warnings"]) == 1
         assert result["warnings"][0].startswith(
-            "treatment_types value 'Fe' is not in the vocabulary"
+            "treatment_types value 'Fe' matched nothing"
         )
 
     def test_no_treatment_types_no_warnings(self, mock_conn):
@@ -4963,7 +4985,8 @@ class TestGenesByNumericMetric:
         assert data["not_found_metric_types"] == ["no_such_type"]
 
     def test_not_matched_organism_set_when_no_match(
-            self, diag_rankable, summary_row):
+            self, diag_rankable, summary_row, monkeypatch):
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
         mock_conn = MagicMock()
         mock_conn.execute_query.side_effect = [diag_rankable, summary_row, []]
         data = api.genes_by_numeric_metric(
@@ -4974,7 +4997,8 @@ class TestGenesByNumericMetric:
         assert data["not_matched_organism"] == "Alteromonas"
 
     def test_not_matched_organism_none_when_match(
-            self, diag_rankable, summary_row):
+            self, diag_rankable, summary_row, monkeypatch):
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
         mock_conn = MagicMock()
         mock_conn.execute_query.side_effect = [diag_rankable, summary_row, []]
         data = api.genes_by_numeric_metric(
@@ -7494,8 +7518,9 @@ class TestListDerivedMetrics:
         conn.execute_query.side_effect = [[summary_row], detail_rows]
         return conn
 
-    def test_summary_and_detail_envelope(self):
+    def test_summary_and_detail_envelope(self, monkeypatch):
         from multiomics_explorer.api.functions import list_derived_metrics
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
         conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
         out = list_derived_metrics(organism="MED4", conn=conn)
         assert out["total_entries"] == 13
@@ -7576,13 +7601,14 @@ class TestListDerivedMetrics:
         out = list_derived_metrics(conn=conn)
         assert out["score_max"] is None
 
-    def test_compact_drops_verbose_only_fields(self):
+    def test_compact_drops_verbose_only_fields(self, monkeypatch):
         """verbose=False (default) strips the 9 fields moved behind
         verbose; the compact identity/routing set (derived_metric_id,
         name, metric_type, value_kind, rankable, organism_name, unit,
         total_gene_count, allowed_categories) survives — `unit` stays
         compact because a numeric `value` is unreadable without it."""
         from multiomics_explorer.api.functions import list_derived_metrics
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
         conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
         out = list_derived_metrics(organism="MED4", conn=conn)
         row = out["results"][0]
@@ -7599,8 +7625,9 @@ class TestListDerivedMetrics:
         ):
             assert kept in row, f"{kept} should remain in compact row"
 
-    def test_verbose_keeps_all_fields(self):
+    def test_verbose_keeps_all_fields(self, monkeypatch):
         from multiomics_explorer.api.functions import list_derived_metrics
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
         conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
         out = list_derived_metrics(organism="MED4", verbose=True, conn=conn)
         row = out["results"][0]
