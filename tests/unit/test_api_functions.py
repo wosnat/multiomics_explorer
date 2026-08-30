@@ -10946,6 +10946,109 @@ class TestMetabolitesByGene:
             assert row["mass_balance"] is None
 
 
+class TestChemistryInputProbesParity:
+    """llm-review 2b.3 Task 6 (carried-over 2b.1 final-review M4).
+
+    `genes_by_metabolite` and `metabolites_by_gene` each ran the same
+    metabolite / pathway / element existence-probe Cypher twice: once in
+    the organism-unresolved short-circuit, once in the main path. Both now
+    call the shared `_chemistry_input_probes` helper. This asserts the
+    helper's own shape, that it skips a query entirely for an empty/None
+    input, and that the short-circuit and main-path branches of
+    `genes_by_metabolite` produce an identical `not_found` key set for the
+    same metabolite_ids / metabolite_pathway_ids inputs and the same KG
+    existence state — the parity a shared helper is supposed to guarantee.
+    """
+
+    def test_probe_dict_shape(self):
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            [{"found": ["kegg.compound:C00086"]}],
+            [{"found": ["kegg.pathway:ko00910"]}],
+            [{"found": ["N"]}],
+        ]
+        out = api._chemistry_input_probes(
+            conn,
+            ["kegg.compound:C00086", "kegg.compound:C99999"],
+            ["kegg.pathway:ko00910", "kegg.pathway:ko99999"],
+            ["N", "Xx"],
+        )
+        assert out == {
+            "not_found_metabolite_ids": ["kegg.compound:C99999"],
+            "not_found_pathway_ids": ["kegg.pathway:ko99999"],
+            "not_found_elements": ["Xx"],
+        }
+
+    def test_empty_or_none_inputs_skip_every_query(self):
+        conn = MagicMock()
+        out = api._chemistry_input_probes(conn, None, None)
+        assert out == {
+            "not_found_metabolite_ids": [],
+            "not_found_pathway_ids": [],
+            "not_found_elements": [],
+        }
+        conn.execute_query.assert_not_called()
+
+    def test_genes_by_metabolite_short_circuit_and_main_path_agree(
+        self, monkeypatch,
+    ):
+        from multiomics_explorer.api.functions import genes_by_metabolite as gbm
+
+        metabolite_ids = ["kegg.compound:C00086", "kegg.compound:C99999"]
+        pathway_ids = ["kegg.pathway:ko00910", "kegg.pathway:ko99999"]
+        found_metab = {"found": ["kegg.compound:C00086"]}
+        found_paths = {"found": ["kegg.pathway:ko00910"]}
+
+        # --- Short-circuit path: organism doesn't resolve. ---
+        def boom(organism, locus_tags, experiment_ids, conn):
+            raise ValueError(f"no organism matching '{organism}' found.")
+        monkeypatch.setattr(api, "_validate_organism_inputs", boom)
+        conn_sc = MagicMock()
+        conn_sc.execute_query.side_effect = [[found_metab], [found_paths]]
+        out_sc = gbm(
+            metabolite_ids, "Bogus organism",
+            metabolite_pathway_ids=pathway_ids, conn=conn_sc,
+        )
+
+        # --- Main path: organism resolves; zero rows for this slice, so
+        # the deep-paging guardrail skips arm queries but existence
+        # probes still run. ---
+        monkeypatch.setattr(
+            api, "_validate_organism_inputs",
+            lambda organism, locus_tags, experiment_ids, conn: organism,
+        )
+        empty_summary = {
+            "total_matching": 0, "gene_count_total": 0,
+            "reaction_count_total": 0, "transporter_count_total": 0,
+            "metabolite_count_total": 0,
+            "rows_by_evidence_source": [], "rows_by_substrate_depth": [],
+            "by_metabolite": [], "top_reactions": [], "top_tcdb_families": [],
+            "top_gene_categories": [], "top_genes": [],
+        }
+        conn_main = MagicMock()
+        conn_main.execute_query.side_effect = [
+            [empty_summary],  # summary builder
+            [found_metab],    # not_found.metabolite_ids probe
+            [found_paths],    # not_found.metabolite_pathway_ids probe
+        ]
+        out_main = gbm(
+            metabolite_ids, "Prochlorococcus MED4",
+            metabolite_pathway_ids=pathway_ids, conn=conn_main,
+        )
+
+        assert set(out_sc["not_found"].keys()) == set(out_main["not_found"].keys())
+        assert (
+            out_sc["not_found"]["metabolite_ids"]
+            == out_main["not_found"]["metabolite_ids"]
+            == ["kegg.compound:C99999"]
+        )
+        assert (
+            out_sc["not_found"]["metabolite_pathway_ids"]
+            == out_main["not_found"]["metabolite_pathway_ids"]
+            == ["kegg.pathway:ko99999"]
+        )
+
+
 # ===========================================================================
 # Cluster A — F1 informativeness surface (frozen spec 2026-05-04)
 # ===========================================================================

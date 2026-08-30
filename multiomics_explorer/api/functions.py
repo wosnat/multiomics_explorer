@@ -8136,6 +8136,76 @@ def _gbm_sort_key(row: dict) -> tuple:
     )
 
 
+def _chemistry_input_probes(
+    conn: GraphConnection,
+    metabolite_ids: list[str] | None,
+    pathway_ids: list[str] | None,
+    elements: list[str] | None = None,
+) -> dict:
+    """Shared existence probes for `genes_by_metabolite` / `metabolites_by_gene`.
+
+    Both tools run the same three cheap existence checks twice per call —
+    once in the organism-unresolved short-circuit (metabolite-side probes
+    still run there since they don't depend on organism), once in the main
+    path (llm-review 2b.3 Task 6, carried over from the 2b.1 final review's
+    M4). Consolidated here so there is exactly one copy of each probe's
+    Cypher.
+
+    `elements` is optional — only `metabolites_by_gene` has an elements
+    filter; `genes_by_metabolite` calls this with `elements=None` and gets
+    `not_found_elements: []` back unconditionally. Each probe is skipped
+    (no query dispatched) when its input is empty/None, mirroring each
+    call site's pre-existing "only query when asked" discipline.
+
+    Returns `{"not_found_metabolite_ids": [...], "not_found_pathway_ids":
+    [...], "not_found_elements": [...]}`.
+    """
+    if metabolite_ids:
+        rows = conn.execute_query(
+            "MATCH (m:Metabolite) WHERE m.id IN $ids "
+            "RETURN collect(m.id) AS found",
+            ids=metabolite_ids,
+        )
+        found_metab = set(rows[0]["found"]) if rows else set()
+        not_found_metabolite_ids = [
+            x for x in metabolite_ids if x not in found_metab
+        ]
+    else:
+        not_found_metabolite_ids = []
+
+    if pathway_ids:
+        rows = conn.execute_query(
+            "MATCH (p:KeggTerm) WHERE p.id IN $ids "
+            "RETURN collect(p.id) AS found",
+            ids=pathway_ids,
+        )
+        found_paths = set(rows[0]["found"]) if rows else set()
+        not_found_pathway_ids = [
+            x for x in pathway_ids if x not in found_paths
+        ]
+    else:
+        not_found_pathway_ids = []
+
+    if elements:
+        rows = conn.execute_query(
+            "MATCH (m:Metabolite) "
+            "WHERE size(m.elements) > 0 "
+            "WITH apoc.coll.toSet(apoc.coll.flatten(collect(m.elements))) AS all_elements "
+            "RETURN [e IN $elements WHERE e IN all_elements] AS found",
+            elements=elements,
+        )
+        found_elems = set(rows[0]["found"]) if rows else set()
+        not_found_elements = [e for e in elements if e not in found_elems]
+    else:
+        not_found_elements = []
+
+    return {
+        "not_found_metabolite_ids": not_found_metabolite_ids,
+        "not_found_pathway_ids": not_found_pathway_ids,
+        "not_found_elements": not_found_elements,
+    }
+
+
 def genes_by_metabolite(
     metabolite_ids: list[str],
     organism: str,
@@ -8281,30 +8351,10 @@ def genes_by_metabolite(
     except ValueError as e:
         if "no organism matching" not in str(e):
             raise
-        if metabolite_ids:
-            rows = conn.execute_query(
-                "MATCH (m:Metabolite) WHERE m.id IN $ids "
-                "RETURN collect(m.id) AS found",
-                ids=metabolite_ids,
-            )
-            found_metab = set(rows[0]["found"]) if rows else set()
-            not_found_metab = [
-                x for x in metabolite_ids if x not in found_metab
-            ]
-        else:
-            not_found_metab = []
-        if metabolite_pathway_ids:
-            rows = conn.execute_query(
-                "MATCH (p:KeggTerm) WHERE p.id IN $ids "
-                "RETURN collect(p.id) AS found",
-                ids=metabolite_pathway_ids,
-            )
-            found_paths = set(rows[0]["found"]) if rows else set()
-            not_found_paths = [
-                x for x in metabolite_pathway_ids if x not in found_paths
-            ]
-        else:
-            not_found_paths = []
+        _probes = _chemistry_input_probes(
+            conn, metabolite_ids, metabolite_pathway_ids)
+        not_found_metab = _probes["not_found_metabolite_ids"]
+        not_found_paths = _probes["not_found_pathway_ids"]
         return {
             "total_matching": 0,
             "returned": 0,
@@ -8446,31 +8496,12 @@ def genes_by_metabolite(
         for row in results
     ]
 
-    # 6. Compute not_found.metabolite_ids via existence probe.
-    if metabolite_ids:
-        rows = conn.execute_query(
-            "MATCH (m:Metabolite) WHERE m.id IN $ids "
-            "RETURN collect(m.id) AS found",
-            ids=metabolite_ids,
-        )
-        found_metab = set(rows[0]["found"]) if rows else set()
-        not_found_metab = [x for x in metabolite_ids if x not in found_metab]
-    else:
-        not_found_metab = []
-
-    # 7. Compute not_found.metabolite_pathway_ids via existence probe.
-    if metabolite_pathway_ids:
-        rows = conn.execute_query(
-            "MATCH (p:KeggTerm) WHERE p.id IN $ids "
-            "RETURN collect(p.id) AS found",
-            ids=metabolite_pathway_ids,
-        )
-        found_paths = set(rows[0]["found"]) if rows else set()
-        not_found_paths = [
-            x for x in metabolite_pathway_ids if x not in found_paths
-        ]
-    else:
-        not_found_paths = []
+    # 6-7. Compute not_found.metabolite_ids / not_found.metabolite_pathway_ids
+    # via the shared existence probes (also used by the organism-unresolved
+    # short-circuit above).
+    _probes = _chemistry_input_probes(conn, metabolite_ids, metabolite_pathway_ids)
+    not_found_metab = _probes["not_found_metabolite_ids"]
+    not_found_paths = _probes["not_found_pathway_ids"]
 
     # 8. not_found.organism — organism existence was already validated in
     # step 1c (_validate_organism_inputs); reaching here means it resolved,
@@ -8807,44 +8838,11 @@ def metabolites_by_gene(
         if "no organism matching" not in str(e):
             raise
         not_found_locus = list(locus_tags) if locus_tags else []
-        if metabolite_ids:
-            rows = conn.execute_query(
-                "MATCH (m:Metabolite) WHERE m.id IN $ids "
-                "RETURN collect(m.id) AS found",
-                ids=metabolite_ids,
-            )
-            found_metab = set(rows[0]["found"]) if rows else set()
-            not_found_metab = [
-                x for x in metabolite_ids if x not in found_metab
-            ]
-        else:
-            not_found_metab = []
-        if metabolite_pathway_ids:
-            rows = conn.execute_query(
-                "MATCH (p:KeggTerm) WHERE p.id IN $ids "
-                "RETURN collect(p.id) AS found",
-                ids=metabolite_pathway_ids,
-            )
-            found_paths = set(rows[0]["found"]) if rows else set()
-            not_found_paths = [
-                x for x in metabolite_pathway_ids if x not in found_paths
-            ]
-        else:
-            not_found_paths = []
-        if metabolite_elements:
-            rows = conn.execute_query(
-                "MATCH (m:Metabolite) "
-                "WHERE size(m.elements) > 0 "
-                "WITH apoc.coll.toSet(apoc.coll.flatten(collect(m.elements))) AS all_elements "
-                "RETURN [e IN $elements WHERE e IN all_elements] AS found",
-                elements=metabolite_elements,
-            )
-            found_elems = set(rows[0]["found"]) if rows else set()
-            not_found_elements = [
-                e for e in metabolite_elements if e not in found_elems
-            ]
-        else:
-            not_found_elements = []
+        _probes = _chemistry_input_probes(
+            conn, metabolite_ids, metabolite_pathway_ids, metabolite_elements)
+        not_found_metab = _probes["not_found_metabolite_ids"]
+        not_found_paths = _probes["not_found_pathway_ids"]
+        not_found_elements = _probes["not_found_elements"]
         return {
             "total_matching": 0,
             "returned": 0,
@@ -9017,48 +9015,14 @@ def metabolites_by_gene(
         found_locus = set()
         not_found_locus = []
 
-    # 7. Compute not_found.metabolite_pathway_ids via existence probe.
-    if metabolite_pathway_ids:
-        rows = conn.execute_query(
-            "MATCH (p:KeggTerm) WHERE p.id IN $ids "
-            "RETURN collect(p.id) AS found",
-            ids=metabolite_pathway_ids,
-        )
-        found_paths = set(rows[0]["found"]) if rows else set()
-        not_found_paths = [
-            x for x in metabolite_pathway_ids if x not in found_paths
-        ]
-    else:
-        not_found_paths = []
-
-    # 8. Compute not_found.metabolite_elements via existence probe (any
-    # KG metabolite carrying the element symbol).
-    if metabolite_elements:
-        rows = conn.execute_query(
-            "MATCH (m:Metabolite) "
-            "WHERE size(m.elements) > 0 "
-            "WITH apoc.coll.toSet(apoc.coll.flatten(collect(m.elements))) AS all_elements "
-            "RETURN [e IN $elements WHERE e IN all_elements] AS found",
-            elements=metabolite_elements,
-        )
-        found_elems = set(rows[0]["found"]) if rows else set()
-        not_found_elements = [
-            e for e in metabolite_elements if e not in found_elems
-        ]
-    else:
-        not_found_elements = []
-
-    # 9. Compute not_found.metabolite_ids via existence probe.
-    if metabolite_ids:
-        rows = conn.execute_query(
-            "MATCH (m:Metabolite) WHERE m.id IN $ids "
-            "RETURN collect(m.id) AS found",
-            ids=metabolite_ids,
-        )
-        found_metab = set(rows[0]["found"]) if rows else set()
-        not_found_metab = [x for x in metabolite_ids if x not in found_metab]
-    else:
-        not_found_metab = []
+    # 7-9. Compute not_found.metabolite_pathway_ids / not_found.metabolite_elements
+    # / not_found.metabolite_ids via the shared existence probes (also used
+    # by the organism-unresolved short-circuit above).
+    _probes = _chemistry_input_probes(
+        conn, metabolite_ids, metabolite_pathway_ids, metabolite_elements)
+    not_found_paths = _probes["not_found_pathway_ids"]
+    not_found_elements = _probes["not_found_elements"]
+    not_found_metab = _probes["not_found_metabolite_ids"]
 
     # 10. not_found.organism — organism existence was already validated in
     # step 1c (_validate_organism_inputs); reaching here means it resolved,
