@@ -14,7 +14,6 @@ examples:
         "median_abs_log2fc": 1.580899074554445,
         "max_abs_log2fc": 162.295,
         "experiment_count": 38,
-        "n_experiments": 38,
         "rows_by_treatment_type": {
           "coculture": 5412,
           "carbon": 2015,
@@ -138,7 +137,6 @@ examples:
         "median_abs_log2fc": 2.7846347522016206,
         "max_abs_log2fc": 3.5913485347500225,
         "experiment_count": 1,
-        "n_experiments": 1,
         "rows_by_treatment_type": {"nitrogen": 6},
         "rows_by_background_factors": {"axenic": 6, "light": 6},
         "rows_by_growth_phase": {"nutrient_limited": 6},
@@ -232,7 +230,6 @@ examples:
         "median_abs_log2fc": null,
         "max_abs_log2fc": null,
         "experiment_count": 0,
-        "n_experiments": 0,
         "rows_by_treatment_type": {},
         "rows_by_background_factors": {},
         "rows_by_growth_phase": {},

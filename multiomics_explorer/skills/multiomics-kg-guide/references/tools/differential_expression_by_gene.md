@@ -44,7 +44,7 @@ to `gene_response_profile`; cross-organism via
 ### Envelope
 
 ```expected-keys
-organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, n_experiments, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_categories, experiments, not_found, no_expression, filtered_out, warnings, not_found_experiments, not_matched_experiments, returned, offset, truncated, results
+organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_categories, experiments, not_found, no_expression, filtered_out, warnings, not_found_experiments, not_matched_experiments, returned, offset, truncated, results
 ```
 
 - **organism_name** (string): Single organism for all results (e.g. 'Alteromonas macleodii HOT1A3')
@@ -53,14 +53,13 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 - **rows_by_status** (ExpressionStatusBreakdown): Row counts by expression_status across all results
 - **median_abs_log2fc** (float | None): Median |log2FC| for significant rows only (e.g. 1.978). Null if no significant rows.
 - **max_abs_log2fc** (float | None): Max |log2FC| for significant rows only (e.g. 3.591). Null if no significant rows.
-- **experiment_count** (int): Number of experiments in results (e.g. 1)
-- **n_experiments** (int): Count of matching experiments before any trimming (e.g. 1). Currently identical to experiment_count.
+- **experiment_count** (int): Number of matching experiments, uncapped (e.g. 1) — the `experiments` list may be capped to 10 on detail calls.
 - **rows_by_treatment_type** (object): Row counts by treatment type (e.g. {'nitrogen': 15})
 - **rows_by_background_factors** (object): Row counts by background factor (e.g. {'axenic': 10, 'diel': 5})
 - **rows_by_growth_phase** (object): Row counts by growth phase. Growth phase is a timepoint-level condition, not gene-specific.
 - **by_table_scope** (object): Row counts by experiment table_scope (e.g. {'all_detected_genes': 100, 'significant_only': 50}). `all_detected_genes` keeps tested-absent (`not_significant`) rows; any other scope (`significant_only`, `significant_any_timepoint`, `filtered_subset`, `top_n`) collapses tested-absent with not-detected. Check before reading missing rows. See `docs://guide/conventions`.
 - **top_categories** (list[ExpressionTopCategory]): Top gene categories by significant gene count, max 5
-- **experiments** (list[ExpressionByExperiment]): Per-experiment summary, sorted by significant row count desc. Compact by default (experiment_id, treatment_type, table_scope, is_time_course, matching_genes, rows_by_status, omics_type); verbose=True restores experiment_name, background_factors, coculture_partner, table_scope_detail, and the nested per-timepoint breakdown. Capped to the first 10 entries; summary=True returns the full list — n_experiments / experiment_count always reflect the full count.
+- **experiments** (list[ExpressionByExperiment]): Per-experiment summary, sorted by significant row count desc. Compact by default (experiment_id, treatment_type, table_scope, is_time_course, matching_genes, rows_by_status, omics_type); verbose=True restores experiment_name, background_factors, coculture_partner, table_scope_detail, and the nested per-timepoint breakdown. Capped to the first 10 entries; summary=True returns the full list —  experiment_count always reflects the full count.
 - **experiments_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **not_found** (list[string]): Input locus_tags not found in KG
 - **no_expression** (list[string]): Locus tags in KG with NO Changes_expression_of edge at all in the organism
@@ -122,7 +121,6 @@ differential_expression_by_gene(organism="MED4", summary=True)
   "median_abs_log2fc": 1.580899074554445,
   "max_abs_log2fc": 162.295,
   "experiment_count": 38,
-  "n_experiments": 38,
   "rows_by_treatment_type": {
     "coculture": 5412,
     "carbon": 2015,
@@ -257,7 +255,6 @@ differential_expression_by_gene(locus_tags=["ACZ81_01830", "ACZ81_15555"], exper
   "median_abs_log2fc": 2.7846347522016206,
   "max_abs_log2fc": 3.5913485347500225,
   "experiment_count": 1,
-  "n_experiments": 1,
   "rows_by_treatment_type": {"nitrogen": 6},
   "rows_by_background_factors": {"axenic": 6, "light": 6},
   "rows_by_growth_phase": {"nutrient_limited": 6},
@@ -356,7 +353,6 @@ differential_expression_by_gene(experiment_ids=["10.1126/science.1243457_vesicle
   "median_abs_log2fc": null,
   "max_abs_log2fc": null,
   "experiment_count": 0,
-  "n_experiments": 0,
   "rows_by_treatment_type": {},
   "rows_by_background_factors": {},
   "rows_by_growth_phase": {},
@@ -504,7 +500,7 @@ Expecting per-timepoint counts, experiment_name, or table_scope_detail inside `e
 from multiomics_explorer import differential_expression_by_gene
 
 result = differential_expression_by_gene()
-# returns dict with keys: organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, n_experiments, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_categories, experiments, experiments_truncated, not_found, no_expression, filtered_out, warnings, not_found_experiments, not_matched_experiments, returned, offset, truncated, results
+# returns dict with keys: organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_categories, experiments, experiments_truncated, not_found, no_expression, filtered_out, warnings, not_found_experiments, not_matched_experiments, returned, offset, truncated, results
 ```
 
 Use package import for bulk data extraction in scripts.

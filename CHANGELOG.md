@@ -240,6 +240,7 @@ coordinated to `0.1.0a5` ahead of the KG release.
 - Spec: `docs/tool-specs/2026-08-20-tcdb-substrate-depth-migration.md`.
 
 ### Changed
+- `differential_expression_by_gene` envelope drops `n_experiments` (an exact duplicate of `experiment_count`; the ortholog twin only ever had `experiment_count`). Read `experiment_count`. (llm-review 2b.8)
 - `resolve_gene` and `list_publications` gain `summary: bool = False` (envelope only, rollups uncapped) — the last two capped-rollup tools without it, so `by_organism` can always be read in full and its counts sum to `total_matching`. 36 of 42 tools now accept `summary=True`. (llm-review 2b.7)
 - **LLM-consumer response diet.** Six related trims, each
   measured on a live call through `fastmcp.Client` (`len(json)//4`):

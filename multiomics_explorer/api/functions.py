@@ -4398,7 +4398,7 @@ def differential_expression_by_gene(
     Returns:
         dict with keys: organism_name, matching_genes, total_matching,
         rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count,
-        n_experiments, rows_by_treatment_type, rows_by_background_factors,
+        rows_by_treatment_type, rows_by_background_factors,
         by_table_scope, rows_by_growth_phase, top_categories, experiments,
         returned, truncated, not_found, no_expression, filtered_out,
         warnings, not_found_experiments, not_matched_experiments, results.
@@ -4411,7 +4411,7 @@ def differential_expression_by_gene(
         no_expression. warnings: one entry per growth_phases value not in
         the live vocabulary, plus one per not_found locus_tag that differs
         only by case from a real Gene.locus_tag (locus_tags are never
-        case-normalised). n_experiments / experiment_count: count of
+        case-normalised). experiment_count: count of
         matching experiments before any list capping (always the full
         count). `experiments` is sorted by total significant rows desc and
         capped to the first 10 entries with `experiments_truncated=True`
@@ -4523,7 +4523,7 @@ def differential_expression_by_gene(
         reverse=True,
     )
 
-    n_experiments = len(experiments)
+    experiment_count = len(experiments)
     if not verbose:
         experiments = [
             {k: v for k, v in e.items() if k in _DE_EXPERIMENT_COMPACT_KEYS}
@@ -4582,8 +4582,7 @@ def differential_expression_by_gene(
         "rows_by_status": rows_by_status,
         "median_abs_log2fc": global_raw["median_abs_log2fc"],
         "max_abs_log2fc": global_raw["max_abs_log2fc"],
-        "experiment_count": len(experiments),
-        "n_experiments": n_experiments,
+        "experiment_count": experiment_count,
         "rows_by_treatment_type": rows_by_treatment_type,
         "rows_by_background_factors": rows_by_background_factors,
         "by_table_scope": by_table_scope,

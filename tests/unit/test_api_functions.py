@@ -3312,7 +3312,7 @@ class TestDifferentialExpressionByGene:
         for key in [
             "organism_name", "matching_genes", "total_matching",
             "rows_by_status", "median_abs_log2fc", "max_abs_log2fc",
-            "experiment_count", "n_experiments", "rows_by_treatment_type",
+            "experiment_count", "rows_by_treatment_type",
             "rows_by_background_factors", "by_table_scope",
             "top_categories", "experiments", "not_found", "no_expression",
             "returned", "truncated", "results",
@@ -3665,7 +3665,7 @@ class TestDifferentialExpressionByGene:
         """(llm-review 2b.2, controller ruling) Compact experiments[]
         entries carry the seven always-present keys (including omics_type
         — cheap and needed to distinguish RNASEQ vs PROTEOMICS entries);
-        n_experiments counts before any trimming."""
+        experiment_count counts before any trimming."""
         mock_conn.execute_query.side_effect = [
             self._organism_result(),
             self._global_summary(),
@@ -3676,7 +3676,7 @@ class TestDifferentialExpressionByGene:
         result = api.differential_expression_by_gene(
             organism="MED4", conn=mock_conn
         )
-        assert result["n_experiments"] == 2
+        assert result["experiment_count"] == 2
         for exp in result["experiments"]:
             assert set(exp.keys()) == {
                 "experiment_id", "treatment_type", "table_scope",
@@ -3702,7 +3702,7 @@ class TestDifferentialExpressionByGene:
         result = api.differential_expression_by_gene(
             organism="MED4", verbose=True, conn=mock_conn
         )
-        assert result["n_experiments"] == 2
+        assert result["experiment_count"] == 2
         for exp in result["experiments"]:
             assert exp["experiment_name"].startswith("Test experiment")
             assert exp["timepoints"] is not None
@@ -18178,8 +18178,9 @@ class TestDifferentialExpressionByGeneBreakdownCap:
         assert result["experiments_truncated"] is True
         # Sorted desc by significant row count — exp00 (count 12) leads.
         assert result["experiments"][0]["experiment_id"] == "exp00"
-        # n_experiments / experiment_count reflect the FULL count, uncapped.
-        assert result["n_experiments"] == 12
+        # experiment_count reflects the FULL count, uncapped (backlog 2b.8:
+        # the duplicate n_experiments key is gone).
+        assert "n_experiments" not in result
         assert result["experiment_count"] == 12
 
     def test_experiments_full_list_on_summary_true(self):

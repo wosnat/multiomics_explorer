@@ -3174,7 +3174,6 @@ class TestDifferentialExpressionByGeneWrapper:
         "median_abs_log2fc": 1.978,
         "max_abs_log2fc": 3.591,
         "experiment_count": 1,
-        "n_experiments": 1,
         "rows_by_treatment_type": {"nitrogen_stress": 15},
         "rows_by_background_factors": {},
         "by_table_scope": {"all_detected_genes": 15},
@@ -3406,8 +3405,10 @@ class TestDifferentialExpressionByGeneWrapper:
         assert call_kwargs.get("offset") == 5
 
     @pytest.mark.asyncio
-    async def test_n_experiments_passed_through(self, tool_fns, mock_ctx):
-        """(llm-review 2b.2) n_experiments surfaces on the response model."""
+    async def test_n_experiments_dropped(self, tool_fns, mock_ctx):
+        """backlog 2b.8: experiment_count is the only experiment tally
+        (n_experiments duplicated it; differential_expression_by_ortholog
+        never had it)."""
         with patch(
             "multiomics_explorer.api.functions.differential_expression_by_gene",
             return_value=self._SAMPLE_API_RETURN,
@@ -3415,7 +3416,8 @@ class TestDifferentialExpressionByGeneWrapper:
             result = await tool_fns["differential_expression_by_gene"](
                 mock_ctx, organism="MED4",
             )
-        assert result.n_experiments == 1
+        assert result.experiment_count == 1
+        assert "n_experiments" not in type(result).model_fields
 
     @pytest.mark.asyncio
     async def test_compact_experiment_validates_without_dropped_fields(
@@ -8995,7 +8997,6 @@ class TestDifferentialExpressionByGeneWrapperPhase2:
         "median_abs_log2fc": 1.5,
         "max_abs_log2fc": 3.5,
         "experiment_count": 1,
-        "n_experiments": 1,
         "rows_by_treatment_type": {"nitrogen_stress": 6},
         "rows_by_background_factors": {},
         "by_table_scope": {"all_detected_genes": 6},

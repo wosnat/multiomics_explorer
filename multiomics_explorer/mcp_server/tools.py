@@ -4536,11 +4536,8 @@ def register_tools(mcp: FastMCP):
             " (e.g. 3.591). Null if no significant rows.",
         )
         experiment_count: int = Field(
-            description="Number of experiments in results (e.g. 1)",
-        )
-        n_experiments: int = Field(
-            description="Count of matching experiments before any trimming"
-            " (e.g. 1). Currently identical to experiment_count.",
+            description="Number of matching experiments, uncapped (e.g. 1)"
+            " — the `experiments` list may be capped to 10 on detail calls.",
         )
         rows_by_treatment_type: dict[str, int] = Field(
             description="Row counts by treatment type"
@@ -4574,8 +4571,8 @@ def register_tools(mcp: FastMCP):
             " omics_type); verbose=True restores experiment_name,"
             " background_factors, coculture_partner, table_scope_detail,"
             " and the nested per-timepoint breakdown. Capped to the first 10"
-            " entries; summary=True returns the full list — n_experiments /"
-            " experiment_count always reflect the full count.",
+            " entries; summary=True returns the full list — "
+            " experiment_count always reflects the full count.",
         )
         experiments_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
         not_found: list[str] = Field(
@@ -4767,7 +4764,6 @@ def register_tools(mcp: FastMCP):
                 median_abs_log2fc=data["median_abs_log2fc"],
                 max_abs_log2fc=data["max_abs_log2fc"],
                 experiment_count=data["experiment_count"],
-                n_experiments=data["n_experiments"],
                 offset=data.get("offset", 0),
                 rows_by_treatment_type=data["rows_by_treatment_type"],
                 rows_by_background_factors=data["rows_by_background_factors"],
