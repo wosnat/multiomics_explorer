@@ -6217,12 +6217,14 @@ class TestPathwayEnrichmentIncludeNonsignificant:
         assert out["n_significant"] == 2
         assert out["returned"] == 3
 
-    def test_false_filters_rows_but_keeps_full_counts(self, monkeypatch):
+    def test_false_total_matching_is_pageable_subset(self, monkeypatch):
+        """total_matching == n_significant when filtered (controller ruling,
+        llm-review 2b.2 follow-up) — not the raw 3-row test count."""
         result = self._run(monkeypatch, include_nonsignificant=False)
         assert result.params["include_nonsignificant"] is False
         out = result.to_envelope()
-        assert out["total_matching"] == 3
         assert out["n_significant"] == 2
+        assert out["total_matching"] == out["n_significant"]
         assert out["returned"] == 2
         assert len(out["results"]) == 2
 
@@ -6267,12 +6269,14 @@ class TestClusterEnrichmentIncludeNonsignificant:
         assert out["n_significant"] == 2
         assert out["returned"] == 3
 
-    def test_false_filters_rows_but_keeps_full_counts(self, monkeypatch):
+    def test_false_total_matching_is_pageable_subset(self, monkeypatch):
+        """total_matching == n_significant when filtered (controller ruling,
+        llm-review 2b.2 follow-up) — not the raw 3-row test count."""
         result = self._run(monkeypatch, include_nonsignificant=False)
         assert result.params["include_nonsignificant"] is False
         out = result.to_envelope()
-        assert out["total_matching"] == 3
         assert out["n_significant"] == 2
+        assert out["total_matching"] == out["n_significant"]
         assert out["returned"] == 2
         assert len(out["results"]) == 2
 

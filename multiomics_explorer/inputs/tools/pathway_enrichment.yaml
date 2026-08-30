@@ -43,7 +43,7 @@ examples:
         "organism_name": "Alteromonas macleodii MIT1002",
         "ontology": "merops",
         "level": 0,
-        "total_matching": 98,
+        "total_matching": 5,
         "returned": 5,
         "truncated": false,
         "offset": 0,
@@ -349,7 +349,7 @@ examples:
         "organism_name": "Prochlorococcus MED4",
         "ontology": "tcdb",
         "level": 2,
-        "total_matching": 8,
+        "total_matching": 1,
         "returned": 1,
         "truncated": false,
         "offset": 0,
@@ -577,7 +577,7 @@ examples:
         "organism_name": "Prochlorococcus MED4",
         "ontology": "cyanorak_role",
         "level": 1,
-        "total_matching": 268,
+        "total_matching": 10,
         "returned": 0,
         "truncated": true,
         "offset": 0,
@@ -815,7 +815,7 @@ chaining:
 
 mistakes:
   - "pathway_enrichment is DE-anchored (needs `experiment_ids`); for a clustering analysis use `cluster_enrichment(analysis_id=...)`, for ortholog groups / custom lists use the Python `fisher_ora` primitive."
-  - "No rows ≠ nothing tested: read `n_significant` / `total_matching`; `include_nonsignificant=True` shows the rest. [ENR] Default `limit=25` + `include_nonsignificant=False` return only significant rows (`p_adjust < pvalue_cutoff`) — `total_matching` and `n_significant` always count the full tested set regardless of this flag."
+  - "No rows ≠ nothing tested: read `n_significant`, always the full tested-set count (also recoverable per-experiment from `by_experiment[].n_tests`). [ENR] Default `limit=25` + `include_nonsignificant=False` return only significant rows (`p_adjust < pvalue_cutoff`); `total_matching` then counts just that pageable subset (== `n_significant`), so an empty `results` page always means `total_matching=0`. Pass `include_nonsignificant=True` to page through every tested row — `total_matching` then covers all of them; `n_significant` is unaffected either way."
   - "[ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions."
   - "`informative_only=True` shrinks the TERM2GENE mapping, and `enrichment_params.term2gene_row_count` shows by how much — MED4 KEGG at `level=3`: 1124 rows with `informative_only=False`, 1094 with the default. Compare `enrichment_params` across runs before comparing p-values. For KEGG the flag also covers the global / overview maps (`kegg.pathway:ko01100` and kin), so a `level=2` run drops those rows too."
   - "Default background is `table_scope` (per-experiment quantified set). `'organism'` inflates the denominator and underestimates enrichment. See `docs://analysis/enrichment` for the full methodology note."

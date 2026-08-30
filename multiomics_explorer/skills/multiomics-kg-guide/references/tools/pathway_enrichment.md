@@ -41,7 +41,7 @@ code (EnrichmentResult accessors, custom term2gene, compareCluster export).
 | min_gene_set_size | int | 5 | Per-cluster M filter: drop pathways with fewer members in the background. |
 | max_gene_set_size | int \| None | 500 | Per-cluster M filter upper bound. None disables. |
 | pvalue_cutoff | float | 0.05 | Significance threshold for `p_adjust`. |
-| include_nonsignificant | bool | False | Include rows with `p_adjust >= pvalue_cutoff`. Default False — only significant rows are returned; `total_matching` counts all tested rows and `n_significant` the significant ones. |
+| include_nonsignificant | bool | False | Include rows with `p_adjust >= pvalue_cutoff`. Default False — only significant rows are returned, and `total_matching` counts just that pageable subset (== `n_significant`); pass True to page through every tested row, in which case `total_matching` covers all of them. `n_significant` itself is unaffected either way. |
 | timepoint_filter | list[string] \| None | None | Restrict to these timepoint labels. Useful for 10+ timepoint experiments. |
 | growth_phases | list[string] \| None | None | Filter DE results by growth phase(s) before enrichment (case-insensitive). E.g. ['exponential']. |
 | summary | bool | False | If true, omit results (envelope only). |
@@ -68,7 +68,7 @@ organism_name, ontology, level, total_matching, returned, truncated, offset, n_s
 - **organism_name** (string): Single organism
 - **ontology** (string): Ontology used
 - **level** (int | None): Hierarchy level used (or None for term_ids-only)
-- **total_matching** (int): Total (cluster x term) rows pre-pagination; equals Fisher tests run
+- **total_matching** (int): Rows pageable under the active `include_nonsignificant` filter, pre-offset/limit: all Fisher tests run when True, or just `n_significant` when False (the default) — so an empty `results` page always means total_matching=0.
 - **returned** (int): Rows in this response
 - **truncated** (bool): True when total_matching exceeds offset+returned
 - **offset** (int): Pagination offset
@@ -232,7 +232,7 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
   "organism_name": "Alteromonas macleodii MIT1002",
   "ontology": "merops",
   "level": 0,
-  "total_matching": 98,
+  "total_matching": 5,
   "returned": 5,
   "truncated": false,
   "offset": 0,
@@ -543,7 +543,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
   "organism_name": "Prochlorococcus MED4",
   "ontology": "tcdb",
   "level": 2,
-  "total_matching": 8,
+  "total_matching": 1,
   "returned": 1,
   "truncated": false,
   "offset": 0,
@@ -777,7 +777,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
   "organism_name": "Prochlorococcus MED4",
   "ontology": "cyanorak_role",
   "level": 1,
-  "total_matching": 268,
+  "total_matching": 10,
   "returned": 0,
   "truncated": true,
   "offset": 0,
@@ -984,7 +984,7 @@ See `docs://analysis/annotation_evidence` for the trust-axis registry (which fil
 
 - pathway_enrichment is DE-anchored (needs `experiment_ids`); for a clustering analysis use `cluster_enrichment(analysis_id=...)`, for ortholog groups / custom lists use the Python `fisher_ora` primitive.
 
-- No rows ≠ nothing tested: read `n_significant` / `total_matching`; `include_nonsignificant=True` shows the rest. [ENR] Default `limit=25` + `include_nonsignificant=False` return only significant rows (`p_adjust < pvalue_cutoff`) — `total_matching` and `n_significant` always count the full tested set regardless of this flag.
+- No rows ≠ nothing tested: read `n_significant`, always the full tested-set count (also recoverable per-experiment from `by_experiment[].n_tests`). [ENR] Default `limit=25` + `include_nonsignificant=False` return only significant rows (`p_adjust < pvalue_cutoff`); `total_matching` then counts just that pageable subset (== `n_significant`), so an empty `results` page always means `total_matching=0`. Pass `include_nonsignificant=True` to page through every tested row — `total_matching` then covers all of them; `n_significant` is unaffected either way.
 
 - [ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions.
 

@@ -40,7 +40,7 @@ runnable code (custom term2gene path covers cluster-membership ORA).
 | min_cluster_size | int | 3 | Skip clusters with fewer members than this. |
 | max_cluster_size | int \| None | None | Skip clusters with more members. None disables. |
 | pvalue_cutoff | float | 0.05 | Significance threshold for p_adjust. |
-| include_nonsignificant | bool | False | Include rows with `p_adjust >= pvalue_cutoff`. Default False — only significant rows are returned; `total_matching` counts all tested rows and `n_significant` the significant ones. |
+| include_nonsignificant | bool | False | Include rows with `p_adjust >= pvalue_cutoff`. Default False — only significant rows are returned, and `total_matching` counts just that pageable subset (== `n_significant`); pass True to page through every tested row, in which case `total_matching` covers all of them. `n_significant` itself is unaffected either way. |
 | summary | bool | False | If true, omit results (envelope only). |
 | limit | int | 25 | Max rows returned. Default 25 — top significant hits by p_adjust globally; pass `include_nonsignificant=True` to page through the full ranked list. |
 | offset | int | 0 | Skip N rows before limit. |
@@ -75,7 +75,7 @@ analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_t
 - **ontology** (string): Ontology used
 - **level** (int | None): Hierarchy level
 - **tree** (string | None): BRITE tree (if applicable)
-- **total_matching** (int): Total Fisher tests run
+- **total_matching** (int): Rows pageable under the active `include_nonsignificant` filter, pre-offset/limit: all Fisher tests run when True, or just `n_significant` when False (the default) — so an empty `results` page always means total_matching=0.
 - **returned** (int): Rows in this response
 - **truncated** (bool): True when total_matching exceeds offset+returned
 - **offset** (int): Pagination offset
@@ -214,7 +214,7 @@ See `docs://analysis/annotation_evidence` for the trust-axis registry and rank-v
 
 - cluster_enrichment is cluster-anchored (needs `analysis_id`); for DE gene sets use `pathway_enrichment(experiment_ids=...)`. `enrichment_params` (incl. `term2gene_row_count`) echoes what was tested, same as pathway_enrichment.
 
-- No rows ≠ nothing tested: read `n_significant` / `total_matching`; `include_nonsignificant=True` shows the rest. [ENR] Default `limit=25` + `include_nonsignificant=False` return only significant rows (`p_adjust < pvalue_cutoff`) — `total_matching` and `n_significant` always count the full tested set regardless of this flag.
+- No rows ≠ nothing tested: read `n_significant`, always the full tested-set count. [ENR] Default `limit=25` + `include_nonsignificant=False` return only significant rows (`p_adjust < pvalue_cutoff`); `total_matching` then counts just that pageable subset (== `n_significant`), so an empty `results` page always means `total_matching=0`. Pass `include_nonsignificant=True` to page through every tested row — `total_matching` then covers all of them; `n_significant` is unaffected either way.
 
 - [ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions.
 

@@ -463,10 +463,12 @@ passed through — they describe one gene's annotation, not the term.
 
 ### `generate_summary()` / `to_envelope()` keys
 
-Both kinds: `organism_name`, `ontology`, `level`, `total_matching` (rows = Fisher
-tests), `n_significant` (`p_adjust < pvalue_cutoff`), `not_found`, `not_matched`,
-`term_validation` (`{not_found, wrong_ontology, wrong_level, filtered_out}` for
-`term_ids`), `clusters_skipped`, `enrichment_params` (= `result.params`).
+Both kinds: `organism_name`, `ontology`, `level`, `total_matching` (rows pageable
+under the active `include_nonsignificant` filter — see below), `n_significant`
+(`p_adjust < pvalue_cutoff`, always the full tested-set count), `not_found`,
+`not_matched`, `term_validation` (`{not_found, wrong_ontology, wrong_level,
+filtered_out}` for `term_ids`), `clusters_skipped`, `enrichment_params` (=
+`result.params`).
 
 Pathway kind adds `no_expression`, `by_experiment[]` (`n_tests`, `n_significant`,
 `n_clusters` + experiment metadata), `by_direction[]`, `by_omics_type[]`,
@@ -492,14 +494,23 @@ a `p_adjust < pvalue_cutoff` filter applied to the sorted frame, before the
 `limit=25`, so the default response carries only significant rows; the Python
 package default is `include_nonsignificant=True` (the full ranked list), so
 scripts calling `pathway_enrichment`/`cluster_enrichment` directly are
-unaffected unless they pass the flag explicitly. Either way, `total_matching`, `n_significant`,
-and every other `generate_summary()` aggregate (`by_experiment`, `by_cluster`,
-`clusters_skipped`, ...) always read the **full** tested set — the flag only
-trims which rows are echoed back, never what was counted. A cluster with zero
-significant rows under the default contributes no rows to `results`, but still
-appears in `by_experiment` / `by_cluster` with `n_significant`/`significant_terms`
-`== 0` — it is not the same as `clusters_skipped` (that bucket is for clusters
-that produced no Fisher tests at all).
+unaffected unless they pass the flag explicitly.
+
+`total_matching` counts the rows actually pageable under this filter: the
+full tested-set size when `include_nonsignificant=True`, or exactly
+`n_significant` when False — so an empty `results` page always implies
+`total_matching == 0` (the repo-wide empty-layer invariant: a well-formed
+empty result never pairs a zero page with a nonzero total). `n_significant`
+itself, and every other `generate_summary()` aggregate (`by_experiment`,
+`by_cluster`, `clusters_skipped`, `cluster_summary`, ...), are unaffected by
+the flag and always reflect the full tested set — the all-tested count is
+still recoverable there even when `total_matching` has been narrowed (e.g.
+summing `by_experiment[].n_tests` for pathway kind). A cluster with zero
+significant rows under the default contributes no rows to `results`, but
+still appears in `by_experiment` / `by_cluster` with
+`n_significant`/`significant_terms == 0` — it is not the same as
+`clusters_skipped` (that bucket is for clusters that produced no Fisher
+tests at all).
 
 ### `result.params` (wrapper output only)
 

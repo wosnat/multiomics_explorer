@@ -215,11 +215,12 @@ class TestExperimentsToDataFrameIntegration:
 
 @pytest.mark.kg
 class TestEnrichmentIncludeNonsignificantIntegration:
-    """llm-review 2b.2 Task 2, against a real KG: `include_nonsignificant`
-    threads from `api.pathway_enrichment` through `result.to_envelope()`,
-    filtering rows without disturbing total_matching / n_significant / the
-    aggregate breakdowns — same contract the unit tests pin with mocks,
-    exercised here over real DE + ontology data.
+    """llm-review 2b.2 Task 2 (+ follow-up fix), against a real KG:
+    `include_nonsignificant` threads from `api.pathway_enrichment` through
+    `result.to_envelope()`, filtering rows and narrowing `total_matching`
+    to the pageable (significant) subset — while `n_significant` and the
+    aggregate breakdowns stay unaffected — same contract the unit tests
+    pin with mocks, exercised here over real DE + ontology data.
     """
 
     @staticmethod
@@ -231,7 +232,7 @@ class TestEnrichmentIncludeNonsignificantIntegration:
             pytest.skip("No MED4 nitrogen experiment in KG")
         return experiments["results"][0]["experiment_id"]
 
-    def test_false_returns_fewer_or_equal_rows_same_totals(self, conn):
+    def test_false_returns_fewer_or_equal_rows_narrower_total(self, conn):
         exp_id = self._med4_nitrogen_experiment_id(conn)
         common = dict(
             organism="MED4", experiment_ids=[exp_id],
@@ -243,10 +244,16 @@ class TestEnrichmentIncludeNonsignificantIntegration:
         env_full = full.to_envelope(limit=None)
         env_sig = sig_only.to_envelope(limit=None)
 
-        assert env_full["total_matching"] == env_sig["total_matching"]
         assert env_full["n_significant"] == env_sig["n_significant"]
+        # total_matching narrows to the pageable (significant) subset —
+        # controller ruling, llm-review 2b.2 follow-up.
+        assert env_full["total_matching"] >= env_sig["total_matching"]
+        assert env_sig["total_matching"] == env_sig["n_significant"]
         assert env_sig["returned"] <= env_full["returned"]
         assert env_sig["returned"] == env_sig["n_significant"]
+        # An empty results page must never pair with a nonzero total_matching
+        # (the repo-wide empty-layer invariant).
+        assert (len(env_sig["results"]) == 0) == (env_sig["total_matching"] == 0)
         # Rows returned under significant-only are exactly the significant subset.
         assert all(
             row["p_adjust"] < sig_only.params["pvalue_cutoff"]

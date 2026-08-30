@@ -6203,9 +6203,12 @@ def pathway_enrichment(
     ``include_nonsignificant`` (default True — the package returns the
     full ranked list) is stored on ``result.params`` and consumed by
     ``result.to_envelope(...)``: when False, rows with ``p_adjust >=
-    pvalue_cutoff`` are dropped before the ``offset``/``limit`` slice.
-    ``total_matching`` and ``n_significant`` (and every other summary
-    aggregate) always count the full tested set, unaffected by this flag.
+    pvalue_cutoff`` are dropped before the ``offset``/``limit`` slice, and
+    ``total_matching`` counts only that pageable (significant) subset —
+    equal to ``n_significant`` — so an empty ``results`` page always means
+    ``total_matching == 0``. ``n_significant`` and every other summary
+    aggregate (``by_experiment``, ``clusters_skipped``, ...) always reflect
+    the full tested set regardless of this flag.
 
     Returns an EnrichmentResult. Callers who need the MCP-dict envelope
     should call result.to_envelope(...).
@@ -6429,7 +6432,8 @@ def cluster_enrichment(
     ``include_nonsignificant`` (default True) behaves exactly as in
     ``pathway_enrichment``: stored on ``result.params``, consumed by
     ``result.to_envelope(...)`` to drop non-significant rows before
-    pagination without touching ``total_matching`` / ``n_significant``.
+    pagination; ``total_matching`` then counts that pageable (significant)
+    subset — ``n_significant`` is unaffected either way.
 
     Raises ValueError when the ontology cannot carry a filter you set, when
     an InterPro run omits interpro_type, when analysis_id is unknown, or

@@ -668,11 +668,14 @@ class TestToEnvelope:
 
 
 class TestToEnvelopeIncludeNonsignificant:
-    """llm-review 2b.2 Task 2: `include_nonsignificant=False` (the MCP
-    default) filters rows to `p_adjust < pvalue_cutoff` before the
-    offset/limit slice, but never touches `total_matching` / `n_significant`
-    / any other summary aggregate — those always read the full,
-    un-mutated `self.results` frame via `generate_summary()`.
+    """llm-review 2b.2 Task 2 (+ follow-up fix): `include_nonsignificant=False`
+    (the MCP default) filters rows to `p_adjust < pvalue_cutoff` before the
+    offset/limit slice, and `total_matching` counts that pageable subset —
+    `== n_significant` when False, the full row count when True (default) —
+    so an empty `results` page always implies `total_matching == 0` (the
+    repo-wide empty-layer invariant `assert_empty_layer_shape` checks).
+    `n_significant` and every other `generate_summary()` aggregate always
+    read the full, un-mutated `self.results` frame regardless of the flag.
     """
 
     @staticmethod
@@ -709,17 +712,25 @@ class TestToEnvelopeIncludeNonsignificant:
         assert len(env["results"]) == 2
         assert {r["term_id"] for r in env["results"]} == {"T1", "T2"}
 
-    def test_false_keeps_total_matching_and_n_significant_full(self):
+    def test_false_total_matching_equals_n_significant(self):
+        """Controller ruling (llm-review 2b.2 follow-up): total_matching
+        counts the pageable rows under the active filter, so when
+        include_nonsignificant=False it equals n_significant, not the raw
+        3-row test count — an empty results page must never pair with a
+        nonzero total_matching."""
+        n_tests = 3
         result = self._build({"pvalue_cutoff": 0.05, "include_nonsignificant": False})
         env = result.to_envelope()
-        assert env["total_matching"] == 3
         assert env["n_significant"] == 2
+        assert env["total_matching"] == env["n_significant"]
+        assert env["total_matching"] != n_tests
 
     def test_default_true_returns_all_rows(self):
+        n_tests = 3
         result = self._build({"pvalue_cutoff": 0.05})
         env = result.to_envelope()
-        assert env["returned"] == 3
-        assert env["total_matching"] == 3
+        assert env["returned"] == n_tests
+        assert env["total_matching"] == n_tests
         assert env["n_significant"] == 2
 
     def test_false_pagination_uses_filtered_total(self):

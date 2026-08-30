@@ -258,7 +258,10 @@ class PathwayEnrichmentResponse(BaseModel):
     ontology: str = Field(description="Ontology used")
     level: int | None = Field(default=None, description="Hierarchy level used (or None for term_ids-only)")
     total_matching: int = Field(
-        description="Total (cluster x term) rows pre-pagination; equals Fisher tests run"
+        description="Rows pageable under the active `include_nonsignificant` filter, "
+                    "pre-offset/limit: all Fisher tests run when True, or just "
+                    "`n_significant` when False (the default) — so an empty `results` "
+                    "page always means total_matching=0."
     )
     returned: int = Field(description="Rows in this response")
     truncated: bool = Field(description="True when total_matching exceeds offset+returned")
@@ -417,7 +420,12 @@ class ClusterEnrichmentResponse(BaseModel):
     ontology: str = Field(description="Ontology used")
     level: int | None = Field(default=None, description="Hierarchy level")
     tree: str | None = Field(default=None, description="BRITE tree (if applicable)")
-    total_matching: int = Field(description="Total Fisher tests run")
+    total_matching: int = Field(
+        description="Rows pageable under the active `include_nonsignificant` filter, "
+                    "pre-offset/limit: all Fisher tests run when True, or just "
+                    "`n_significant` when False (the default) — so an empty `results` "
+                    "page always means total_matching=0."
+    )
     returned: int = Field(description="Rows in this response")
     truncated: bool = Field(description="True when total_matching exceeds offset+returned")
     offset: int = Field(default=0, description="Pagination offset")
@@ -6933,8 +6941,10 @@ def register_tools(mcp: FastMCP):
         include_nonsignificant: Annotated[bool, Field(
             description=(
                 "Include rows with `p_adjust >= pvalue_cutoff`. Default False — only "
-                "significant rows are returned; `total_matching` counts all tested "
-                "rows and `n_significant` the significant ones."
+                "significant rows are returned, and `total_matching` counts just that "
+                "pageable subset (== `n_significant`); pass True to page through every "
+                "tested row, in which case `total_matching` covers all of them. "
+                "`n_significant` itself is unaffected either way."
             ),
         )] = False,
         timepoint_filter: Annotated[list[str] | None, Field(
@@ -7106,8 +7116,10 @@ def register_tools(mcp: FastMCP):
         include_nonsignificant: Annotated[bool, Field(
             description=(
                 "Include rows with `p_adjust >= pvalue_cutoff`. Default False — only "
-                "significant rows are returned; `total_matching` counts all tested "
-                "rows and `n_significant` the significant ones."
+                "significant rows are returned, and `total_matching` counts just that "
+                "pageable subset (== `n_significant`); pass True to page through every "
+                "tested row, in which case `total_matching` covers all of them. "
+                "`n_significant` itself is unaffected either way."
             ),
         )] = False,
         summary: Annotated[bool, Field(description="If true, omit results (envelope only).")] = False,

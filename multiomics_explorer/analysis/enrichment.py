@@ -1476,10 +1476,17 @@ class EnrichmentResult:
         ``include_nonsignificant`` (read from ``self.params``, default
         True) gates a ``p_adjust < pvalue_cutoff`` filter applied to a
         *local* copy of the sorted frame, before the ``offset``/``limit``
-        slice — ``self.results`` itself is never mutated, so
-        ``generate_summary()`` (``total_matching``, ``n_significant``,
-        ``by_experiment``/``by_cluster``, ``clusters_skipped``, ...) always
-        reflects the full tested set regardless of this flag.
+        slice — ``self.results`` itself is never mutated. ``total_matching``
+        counts the rows pageable under this filter: the full tested-set size
+        when ``include_nonsignificant=True``, or ``n_significant`` when
+        False (so an empty ``results`` page always implies
+        ``total_matching == 0`` — the repo-wide empty-layer invariant).
+        ``n_significant`` and every other ``generate_summary()`` aggregate
+        (``by_experiment``/``by_cluster``, ``clusters_skipped``, ...) are
+        unaffected by this flag and always reflect the full tested set;
+        the all-tested count survives there (e.g. sum ``by_experiment[].
+        n_tests``) even when ``total_matching`` itself has been narrowed to
+        the significant subset.
         """
         env = self.generate_summary()
         params = getattr(self, "params", None) or {}
@@ -1493,6 +1500,7 @@ class EnrichmentResult:
             pvc = params.get("pvalue_cutoff", 0.05)
             frame = frame[frame["p_adjust"] < pvc]
         total = int(len(frame))
+        env["total_matching"] = total
 
         if summary:
             env["results"] = []
