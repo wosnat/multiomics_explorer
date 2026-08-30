@@ -1,0 +1,28 @@
+by_category: []
+by_compartment: []
+by_experiment: []
+by_metric: []
+by_organism: []
+by_publication: []
+case_id: genes_by_categorical_metric_wrong_kind_id
+excluded_derived_metrics: []
+genes_per_metric_max: 0
+genes_per_metric_median: 0.0
+not_found_ids: []
+not_found_metric_types: []
+not_matched_ids:
+- derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+not_matched_metric_types: []
+not_matched_organism: null
+offset: 0
+results: []
+returned: 0
+row_count: 0
+top_categories: []
+total_derived_metrics: 0
+total_genes: 0
+total_matching: 0
+truncated: false
+warnings:
+- derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  exists as value_kind=numeric — use genes_by_numeric_metric

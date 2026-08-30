@@ -7858,11 +7858,48 @@ def build_gene_derived_metrics(
     return cypher, params
 
 
+def build_derived_metric_kind_lookup(
+    *,
+    derived_metric_ids: list[str] | None = None,
+    metric_types: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Kind-agnostic DM existence probe for gene_derived_metrics.
+
+    Looks up every DM matching `derived_metric_ids` OR `metric_types`
+    (no `value_kind` predicate) so api/ can tell whether a caller-supplied
+    `value_kind` filter conflicts with the id/metric_type's actual kind —
+    the not_matched rows that produces get a sibling-tool warning
+    (`"<id> exists as value_kind=<kind> — use genes_by_<kind>_metric"`).
+    At least one of the two params must be non-empty.
+
+    RETURN keys (one row per matching DM): derived_metric_id, metric_type,
+    value_kind.
+    """
+    params: dict = {}
+    or_conditions: list[str] = []
+    if derived_metric_ids:
+        or_conditions.append("dm.id IN $derived_metric_ids")
+        params["derived_metric_ids"] = derived_metric_ids
+    if metric_types:
+        or_conditions.append("dm.metric_type IN $metric_types")
+        params["metric_types"] = metric_types
+
+    where_block = "WHERE " + " OR ".join(or_conditions) + "\n"
+
+    cypher = (
+        "MATCH (dm:DerivedMetric)\n"
+        f"{where_block}"
+        "RETURN dm.id AS derived_metric_id,\n"
+        "       dm.metric_type AS metric_type,\n"
+        "       dm.value_kind AS value_kind"
+    )
+    return cypher, params
+
+
 def build_genes_by_numeric_metric_diagnostics(
     *,
     derived_metric_ids: list[str] | None = None,
     metric_types: list[str] | None = None,
-    organism: str | None = None,
     experiment_ids: list[str] | None = None,
     publication_doi: list[str] | None = None,
     compartment: str | None = None,
@@ -7873,25 +7910,35 @@ def build_genes_by_numeric_metric_diagnostics(
     """Pre-flight DM selection + gate-state probe for genes_by_numeric_metric.
 
     api/ runs this BEFORE summary/detail so it can:
-      1. Validate every selected DM has `value_kind='numeric'` (raise on
-         mismatch).
-      2. Compute `excluded_derived_metrics` for rankable-/p-value-gated
+      1. Partition every selected DM by its actual `value_kind` (a
+         mismatch — e.g. a boolean id passed here — is not a query-level
+         predicate; api/ classifies it into `not_matched_*` with a
+         sibling-tool warning instead of silently dropping it).
+      2. Partition surviving (correct-kind) DMs by `organism_name` against
+         a requested `organism` (also not a query-level predicate — a
+         kind-correct DM outside the requested organism becomes
+         `not_matched_organism`, not a silent empty result).
+      3. Compute `excluded_derived_metrics` for rankable-/p-value-gated
          filters that don't apply to some/all selected DMs.
-      3. Pass the surviving DM ID list to summary/detail.
+      4. Pass the surviving DM ID list to summary/detail.
 
-    Reuses `_list_derived_metrics_where` for DM-scoping conditions with a
-    hardcoded `value_kind='numeric'` predicate (this tool only drills into
-    numeric DMs; mismatches surface here as zero-row results that api/
-    converts to a ValueError listing offending IDs).
+    Deliberately omits `organism` and `value_kind` from the WHERE clause
+    (unlike `_list_derived_metrics_where`'s other callers) — both are
+    returned as plain columns (`organism_name`, `value_kind`) so api/ can
+    tell "doesn't exist at all" (not_found) apart from "exists as a
+    different kind" / "exists but not in this organism" (not_matched /
+    not_matched_organism). Every other scoping filter (compartment,
+    treatment_type, background_factors, growth_phases, publication_doi,
+    experiment_ids, the derived_metric_ids/metric_types selection itself)
+    still applies here — only organism and value_kind moved to Python.
 
-    RETURN keys (one row per surviving DM, 8 columns):
-      derived_metric_id, metric_type, value_kind, name,
-      rankable, has_p_value, total_gene_count, organism_name.
+    RETURN keys (one row per DM matching selection + non-kind/organism
+    scoping, any kind, any organism, 8 columns): derived_metric_id,
+    metric_type, value_kind, name, rankable, has_p_value,
+    total_gene_count, organism_name.
     """
     conditions, params = _list_derived_metrics_where(
-        organism=organism,
         metric_types=metric_types,
-        value_kind="numeric",
         compartment=compartment,
         treatment_type=treatment_type,
         background_factors=background_factors,
@@ -8152,7 +8199,6 @@ def build_genes_by_boolean_metric_diagnostics(
     *,
     derived_metric_ids: list[str] | None = None,
     metric_types: list[str] | None = None,
-    organism: str | None = None,
     experiment_ids: list[str] | None = None,
     publication_doi: list[str] | None = None,
     compartment: str | None = None,
@@ -8160,21 +8206,21 @@ def build_genes_by_boolean_metric_diagnostics(
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
 ) -> tuple[str, dict]:
-    """Pre-flight DM selection + value_kind validation probe for boolean drill-down.
+    """Pre-flight DM selection probe for boolean drill-down.
 
-    Reuses `_list_derived_metrics_where` for DM-scoping conditions with a
-    hardcoded `value_kind='boolean'` predicate. Mismatched IDs (numeric or
-    categorical DMs passed in `derived_metric_ids`) surface as zero-row
-    results that api/ converts into `not_found_ids`.
+    Deliberately omits `organism` and `value_kind` from the WHERE clause
+    — both are returned as plain columns (`organism_name`, `value_kind`)
+    so api/ can classify a mismatched id/metric_type into `not_matched_*`
+    (wrong kind — sibling-tool warning) or `not_matched_organism` (right
+    kind, wrong organism) instead of it silently disappearing into
+    `not_found_*`. Every other scoping filter still applies here.
 
-    RETURN keys (one row per surviving DM, 6 columns):
-      derived_metric_id, metric_type, value_kind, name,
-      total_gene_count, organism_name.
+    RETURN keys (one row per DM matching selection + non-kind/organism
+    scoping, any kind, any organism, 6 columns): derived_metric_id,
+    metric_type, value_kind, name, total_gene_count, organism_name.
     """
     conditions, params = _list_derived_metrics_where(
-        organism=organism,
         metric_types=metric_types,
-        value_kind="boolean",
         compartment=compartment,
         treatment_type=treatment_type,
         background_factors=background_factors,
@@ -8212,6 +8258,15 @@ def build_genes_by_boolean_metric_summary(
     edge-level `flag` filter. Boolean DMs have no rankable / has_p_value
     gates so no gate-resolution step is needed.
 
+    `flag` is NOT a hard MATCH-time predicate — it is computed per-row as
+    `flag_match` and applied only to the top-level `filtered` collection
+    (total_matching / by_organism / .../ genes_per_metric_*). This keeps
+    `rows` (all edges for the selected DMs) intact so `by_metric` always
+    carries an entry for every selected DM — including a positive-only DM
+    under `flag=False`, where `count`/`false_count` correctly read 0
+    instead of the DM vanishing from the envelope entirely (llm-review
+    2b.3).
+
     RETURN keys: total_matching, total_derived_metrics, total_genes,
     by_organism, by_compartment, by_publication, by_experiment,
     by_value, top_categories_raw, by_metric (per-DM filtered + full-DM
@@ -8223,12 +8278,15 @@ def build_genes_by_boolean_metric_summary(
     if locus_tags is not None:
         conditions.append("g.locus_tag IN $locus_tags")
         params["locus_tags"] = locus_tags
-    if flag is not None:
-        # Edge property `value` is a two-state string ('flagged' / 'not_flagged').
-        conditions.append("r.value = $flag_str")
-        params["flag_str"] = two_state("value", flag)
 
     where_block = "WHERE " + " AND ".join(conditions) + "\n"
+
+    if flag is not None:
+        # Edge property `value` is a two-state string ('flagged' / 'not_flagged').
+        params["flag_str"] = two_state("value", flag)
+        flag_match_expr = "r.value = $flag_str"
+    else:
+        flag_match_expr = "true"
 
     cypher = (
         "MATCH (dm:DerivedMetric)-[r:Derived_metric_flags_gene]->(g:Gene)\n"
@@ -8239,37 +8297,39 @@ def build_genes_by_boolean_metric_summary(
         "  comp: dm.compartment, doi: dm.publication_doi, exp: dm.experiment_id,\n"
         "  lt: g.locus_tag,\n"
         "  value: r.value,\n"
+        f"  flag_match: {flag_match_expr},\n"
         "  dm_total: dm.total_gene_count,\n"
         "  dm_true: dm.flag_true_count,\n"
         "  dm_false: dm.flag_false_count\n"
         "}) AS rows\n"
+        "WITH rows, [x IN rows WHERE x.flag_match] AS filtered\n"
         "RETURN\n"
-        "  size(rows) AS total_matching,\n"
-        "  size(apoc.coll.toSet([x IN rows | x.dm_id])) AS total_derived_metrics,\n"
-        "  size(apoc.coll.toSet([x IN rows | x.lt])) AS total_genes,\n"
-        "  apoc.coll.frequencies([x IN rows | x.org]) AS by_organism,\n"
-        "  apoc.coll.frequencies([x IN rows | x.comp]) AS by_compartment,\n"
-        "  apoc.coll.frequencies([x IN rows | x.doi]) AS by_publication,\n"
-        "  apoc.coll.frequencies([x IN rows | x.exp]) AS by_experiment,\n"
-        "  apoc.coll.frequencies([x IN rows | x.value]) AS by_value,\n"
-        "  apoc.coll.frequencies([x IN rows | x.cat]) AS top_categories_raw,\n"
+        "  size(filtered) AS total_matching,\n"
+        "  size(apoc.coll.toSet([x IN filtered | x.dm_id])) AS total_derived_metrics,\n"
+        "  size(apoc.coll.toSet([x IN filtered | x.lt])) AS total_genes,\n"
+        "  apoc.coll.frequencies([x IN filtered | x.org]) AS by_organism,\n"
+        "  apoc.coll.frequencies([x IN filtered | x.comp]) AS by_compartment,\n"
+        "  apoc.coll.frequencies([x IN filtered | x.doi]) AS by_publication,\n"
+        "  apoc.coll.frequencies([x IN filtered | x.exp]) AS by_experiment,\n"
+        "  apoc.coll.frequencies([x IN filtered | x.value]) AS by_value,\n"
+        "  apoc.coll.frequencies([x IN filtered | x.cat]) AS top_categories_raw,\n"
         "  [dm_id IN apoc.coll.toSet([x IN rows | x.dm_id]) |\n"
         "    {derived_metric_id: dm_id,\n"
         "     name:        head([x IN rows WHERE x.dm_id = dm_id | x.dm_name]),\n"
         "     metric_type: head([x IN rows WHERE x.dm_id = dm_id | x.mt]),\n"
         "     value_kind:  head([x IN rows WHERE x.dm_id = dm_id | x.vk]),\n"
-        "     count:       size([x IN rows WHERE x.dm_id = dm_id]),\n"
+        "     count:       size([x IN filtered WHERE x.dm_id = dm_id]),\n"
         "     true_count:  size([x IN rows WHERE x.dm_id = dm_id AND x.value = 'flagged']),\n"
         "     false_count: size([x IN rows WHERE x.dm_id = dm_id AND x.value = 'not_flagged']),\n"
         "     dm_total_gene_count: head([x IN rows WHERE x.dm_id = dm_id | x.dm_total]),\n"
         "     dm_true_count:  head([x IN rows WHERE x.dm_id = dm_id | x.dm_true]),\n"
         "     dm_false_count: head([x IN rows WHERE x.dm_id = dm_id | x.dm_false])\n"
         "    }] AS by_metric,\n"
-        "  apoc.coll.max([dm_id IN apoc.coll.toSet([x IN rows | x.dm_id]) |\n"
-        "                 size([x IN rows WHERE x.dm_id = dm_id])]) AS genes_per_metric_max,\n"
-        "  toFloat(apoc.coll.sort([dm_id IN apoc.coll.toSet([x IN rows | x.dm_id]) |\n"
-        "                          size([x IN rows WHERE x.dm_id = dm_id])])\n"
-        "          [toInteger(size(apoc.coll.toSet([x IN rows | x.dm_id])) / 2)])\n"
+        "  apoc.coll.max([dm_id IN apoc.coll.toSet([x IN filtered | x.dm_id]) |\n"
+        "                 size([x IN filtered WHERE x.dm_id = dm_id])]) AS genes_per_metric_max,\n"
+        "  toFloat(apoc.coll.sort([dm_id IN apoc.coll.toSet([x IN filtered | x.dm_id]) |\n"
+        "                          size([x IN filtered WHERE x.dm_id = dm_id])])\n"
+        "          [toInteger(size(apoc.coll.toSet([x IN filtered | x.dm_id])) / 2)])\n"
         "    AS genes_per_metric_median"
     )
     return cypher, params
@@ -8366,7 +8426,6 @@ def build_genes_by_categorical_metric_diagnostics(
     *,
     derived_metric_ids: list[str] | None = None,
     metric_types: list[str] | None = None,
-    organism: str | None = None,
     experiment_ids: list[str] | None = None,
     publication_doi: list[str] | None = None,
     compartment: str | None = None,
@@ -8374,20 +8433,22 @@ def build_genes_by_categorical_metric_diagnostics(
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
 ) -> tuple[str, dict]:
-    """Pre-flight DM selection + value_kind validation probe for categorical drill-down.
+    """Pre-flight DM selection probe for categorical drill-down.
 
-    Reuses `_list_derived_metrics_where` for DM-scoping conditions with a
-    hardcoded `value_kind='categorical'` predicate. Mismatched IDs surface
-    as zero-row results that api/ converts into `not_found_ids`.
+    Deliberately omits `organism` and `value_kind` from the WHERE clause
+    — both are returned as plain columns (`organism_name`, `value_kind`)
+    so api/ can classify a mismatched id/metric_type into `not_matched_*`
+    (wrong kind — sibling-tool warning) or `not_matched_organism` (right
+    kind, wrong organism) instead of it silently disappearing into
+    `not_found_*`. Every other scoping filter still applies here.
 
-    RETURN keys (one row per surviving DM, 7 columns):
-      derived_metric_id, metric_type, value_kind, name,
-      total_gene_count, organism_name, allowed_categories.
+    RETURN keys (one row per DM matching selection + non-kind/organism
+    scoping, any kind, any organism, 7 columns): derived_metric_id,
+    metric_type, value_kind, name, total_gene_count, organism_name,
+    allowed_categories.
     """
     conditions, params = _list_derived_metrics_where(
-        organism=organism,
         metric_types=metric_types,
-        value_kind="categorical",
         compartment=compartment,
         treatment_type=treatment_type,
         background_factors=background_factors,

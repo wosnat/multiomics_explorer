@@ -705,3 +705,157 @@ class TestEnrichmentRaisesEdgeCases:
                 organism=analysis["organism_name"],
                 ontology="kegg", level=99, conn=conn,
             )
+
+
+# ---------------------------------------------------------------------------
+# DM drill-down wrong-kind / impossible-filter routing (llm-review 2b.3)
+# ---------------------------------------------------------------------------
+_NUMERIC_DM_ID = (
+    "derived_metric:journal.pone.0043432:"
+    "table_s2_waldbauer_diel_metrics:damping_ratio"
+)
+_BOOLEAN_DM_ID = (
+    "derived_metric:science.1243457:"
+    "s2_med4_vesicle_proteome:vesicle_proteome_member"
+)
+_CATEGORICAL_DM_ID = (
+    "derived_metric:science.1243457:"
+    "s2_med4_vesicle_proteome:predicted_subcellular_localization"
+)
+
+
+@pytest.mark.kg
+class TestDMDrillDownKindMismatch:
+    """A derived_metric_ids / metric_types entry that exists as a
+    DIFFERENT value_kind moves to not_matched_* with a sibling-tool
+    warning — never silently into not_found_* (llm-review 2b.3)."""
+
+    def test_numeric_id_into_boolean_tool(self, conn):
+        data = api.genes_by_boolean_metric(
+            derived_metric_ids=[_NUMERIC_DM_ID], conn=conn)
+        assert data["not_found_ids"] == []
+        assert data["not_matched_ids"] == [_NUMERIC_DM_ID]
+        assert data["total_matching"] == 0
+        assert any(
+            f"{_NUMERIC_DM_ID} exists as value_kind=numeric" in w
+            and "genes_by_numeric_metric" in w
+            for w in data["warnings"]
+        )
+
+    def test_numeric_id_into_categorical_tool(self, conn):
+        data = api.genes_by_categorical_metric(
+            derived_metric_ids=[_NUMERIC_DM_ID], conn=conn)
+        assert data["not_found_ids"] == []
+        assert data["not_matched_ids"] == [_NUMERIC_DM_ID]
+        assert any(
+            f"{_NUMERIC_DM_ID} exists as value_kind=numeric" in w
+            and "genes_by_numeric_metric" in w
+            for w in data["warnings"]
+        )
+
+    def test_boolean_id_into_numeric_tool(self, conn):
+        data = api.genes_by_numeric_metric(
+            derived_metric_ids=[_BOOLEAN_DM_ID], conn=conn)
+        assert data["not_found_ids"] == []
+        assert data["not_matched_ids"] == [_BOOLEAN_DM_ID]
+        assert any(
+            f"{_BOOLEAN_DM_ID} exists as value_kind=boolean" in w
+            and "genes_by_boolean_metric" in w
+            for w in data["warnings"]
+        )
+
+    def test_categorical_id_into_numeric_tool(self, conn):
+        data = api.genes_by_numeric_metric(
+            derived_metric_ids=[_CATEGORICAL_DM_ID], conn=conn)
+        assert data["not_matched_ids"] == [_CATEGORICAL_DM_ID]
+        assert any(
+            f"{_CATEGORICAL_DM_ID} exists as value_kind=categorical" in w
+            and "genes_by_categorical_metric" in w
+            for w in data["warnings"]
+        )
+
+    def test_wrong_kind_metric_type(self, conn):
+        """metric_types selection: a numeric-only metric_type passed to
+        the boolean tool moves to not_matched_metric_types."""
+        data = api.genes_by_boolean_metric(
+            metric_types=["damping_ratio"], conn=conn)
+        assert data["not_found_metric_types"] == []
+        assert data["not_matched_metric_types"] == ["damping_ratio"]
+        assert any(
+            "damping_ratio exists as value_kind=numeric" in w
+            and "genes_by_numeric_metric" in w
+            for w in data["warnings"]
+        )
+
+    def test_truly_absent_id_stays_not_found(self, conn):
+        data = api.genes_by_numeric_metric(
+            derived_metric_ids=["derived_metric:does-not-exist:foo:bar"],
+            conn=conn,
+        )
+        assert data["not_found_ids"] == ["derived_metric:does-not-exist:foo:bar"]
+        assert data["not_matched_ids"] == []
+
+    def test_gene_derived_metrics_sibling_warning(self, conn):
+        """gene_derived_metrics: value_kind filter conflicting with the
+        actual kind of a requested derived_metric_ids entry warns (the
+        row itself already lands in not_matched via the value_kind-gated
+        OPTIONAL MATCH)."""
+        data = api.gene_derived_metrics(
+            ["PMM0090"], derived_metric_ids=[_NUMERIC_DM_ID],
+            value_kind="boolean", conn=conn,
+        )
+        assert any(
+            f"{_NUMERIC_DM_ID} exists as value_kind=numeric" in w
+            and "genes_by_numeric_metric" in w
+            for w in data["warnings"]
+        )
+
+
+@pytest.mark.kg
+class TestDMDrillDownOrganismMismatch:
+    """A correct-kind DM outside the requested organism surfaces via
+    not_matched_organism + a warning listing the DM's real organism(s) —
+    distinct from a metric_type/id that doesn't exist at all
+    (llm-review 2b.3 bug fix)."""
+
+    def test_damping_ratio_wrong_organism(self, conn):
+        """damping_ratio only exists for MED4 — requesting MIT9313
+        surfaces not_matched_organism, not a false not_found."""
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"], organism="MIT9313", conn=conn)
+        assert data["not_found_metric_types"] == []
+        assert data["not_matched_organism"] == "MIT9313"
+        assert any("Prochlorococcus MED4" in w for w in data["warnings"])
+
+    def test_absent_metric_type_not_confused_with_organism_mismatch(self, conn):
+        """A metric_type that doesn't exist at all (any organism) must
+        NOT be misreported as an organism mismatch."""
+        data = api.genes_by_numeric_metric(
+            metric_types=["totally_fake_metric_xyz"], organism="MED4",
+            conn=conn,
+        )
+        assert data["not_matched_organism"] is None
+        assert data["not_found_metric_types"] == ["totally_fake_metric_xyz"]
+
+
+@pytest.mark.kg
+class TestGenesByBooleanMetricPositiveOnlyFlag:
+    """flag=False against a positive-only boolean DM keeps its by_metric
+    row (count/false_count both 0) instead of dropping it, and warns
+    (llm-review 2b.3)."""
+
+    def test_positive_only_dm_flag_false(self, conn):
+        data = api.genes_by_boolean_metric(
+            derived_metric_ids=[_BOOLEAN_DM_ID], flag=False, conn=conn)
+        assert data["total_matching"] == 0
+        assert len(data["by_metric"]) == 1
+        bm = data["by_metric"][0]
+        assert bm["derived_metric_id"] == _BOOLEAN_DM_ID
+        assert bm["count"] == 0
+        assert bm["false_count"] == 0
+        assert bm["dm_false_count"] == 0
+        assert any(
+            f"{_BOOLEAN_DM_ID} stores positive flags only" in w
+            and "false_count" in w
+            for w in data["warnings"]
+        )

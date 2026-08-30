@@ -133,6 +133,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_clusters_by_gene_summary,
     build_gene_derived_metrics,
     build_gene_derived_metrics_summary,
+    build_derived_metric_kind_lookup,
     build_genes_by_boolean_metric,
     build_genes_by_boolean_metric_diagnostics,
     build_genes_by_boolean_metric_summary,
@@ -746,6 +747,120 @@ def _organism_zero_match_warning(conn, organism: str | None) -> list[str]:
     if orgs:
         return []
     return [f"organism '{organism}' matched no organism — see list_organisms()"]
+
+
+def _classify_dm_kind_mismatch(
+    diagnostics: list[dict],
+    expected_kind: str,
+    derived_metric_ids: list[str] | None,
+    metric_types: list[str] | None,
+) -> tuple[list[dict], list[str], list[str], list[str], list[str], list[str]]:
+    """Partition kind-agnostic DM diagnostics rows for the genes_by_*_metric
+    drill-downs (llm-review 2b.3).
+
+    `diagnostics` comes from a diagnostics builder that no longer hardcodes
+    `value_kind` — it can contain DMs of ANY kind matching the
+    id/metric_type selection + other scoping filters. This splits that
+    into the kind-correct subset (what the rest of the tool operates on)
+    plus the not_found_* / not_matched_* buckets:
+
+    - not_found_ids / not_found_metric_types: absent from `diagnostics`
+      entirely (regardless of kind) — the id/metric_type doesn't exist,
+      or was excluded by a non-kind scoping filter (compartment, ...).
+    - not_matched_ids / not_matched_metric_types: present in `diagnostics`
+      but every matching DM has a different `value_kind` — genuinely
+      exists, wrong tool. Each gets a sibling-tool warning appended.
+
+    Returns (correct_kind_rows, not_found_ids, not_matched_ids,
+    not_found_metric_types, not_matched_metric_types, warnings).
+    """
+    surviving_ids_all = {d["derived_metric_id"] for d in diagnostics}
+    surviving_mt_all = {d["metric_type"] for d in diagnostics}
+
+    not_found_ids = [
+        x for x in (derived_metric_ids or []) if x not in surviving_ids_all
+    ]
+    not_found_metric_types = [
+        x for x in (metric_types or []) if x not in surviving_mt_all
+    ]
+
+    correct_kind = [d for d in diagnostics if d["value_kind"] == expected_kind]
+    wrong_kind_by_id = {
+        d["derived_metric_id"]: d["value_kind"]
+        for d in diagnostics if d["value_kind"] != expected_kind
+    }
+
+    warnings: list[str] = []
+    not_matched_ids = [
+        x for x in (derived_metric_ids or []) if x in wrong_kind_by_id
+    ]
+    for x in not_matched_ids:
+        kind = wrong_kind_by_id[x]
+        warnings.append(
+            f"{x} exists as value_kind={kind} — use genes_by_{kind}_metric"
+        )
+
+    not_matched_metric_types: list[str] = []
+    if metric_types:
+        for mt in metric_types:
+            kinds_for_mt = {
+                d["value_kind"] for d in diagnostics if d["metric_type"] == mt
+            }
+            if not kinds_for_mt:
+                continue  # absent entirely — already in not_found_metric_types
+            if expected_kind not in kinds_for_mt:
+                other_kind = sorted(kinds_for_mt)[0]
+                not_matched_metric_types.append(mt)
+                warnings.append(
+                    f"{mt} exists as value_kind={other_kind} — use "
+                    f"genes_by_{other_kind}_metric"
+                )
+
+    return (
+        correct_kind, not_found_ids, not_matched_ids,
+        not_found_metric_types, not_matched_metric_types, warnings,
+    )
+
+
+def _classify_dm_organism_mismatch(
+    diagnostics: list[dict], organism: str | None,
+) -> tuple[list[dict], str | None, list[str]]:
+    """Filter kind-correct DM diagnostics rows by `organism` (word-based
+    CONTAINS, mirrors the SQL organism filter the diagnostics query used
+    to apply) — moved to Python so a kind-correct DM outside the
+    requested organism can be reported as `not_matched_organism` instead
+    of silently vanishing (llm-review 2b.3).
+
+    `not_matched_organism` is set only when `diagnostics` was non-empty
+    BEFORE this filter (the selected DM(s) genuinely exist) but none of
+    them touch the requested organism — never when `diagnostics` was
+    already empty for an unrelated reason (id/metric_type doesn't exist,
+    scoping filters excluded it).
+
+    Returns (organism_filtered_rows, not_matched_organism, warnings).
+    """
+    if not organism:
+        return diagnostics, None, []
+
+    words = organism.lower().split()
+
+    def _match(name: str | None) -> bool:
+        if not name:
+            return False
+        name_lower = name.lower()
+        return all(w in name_lower for w in words)
+
+    matched = [d for d in diagnostics if _match(d.get("organism_name"))]
+    if diagnostics and not matched:
+        dm_organisms = sorted({
+            d["organism_name"] for d in diagnostics if d.get("organism_name")
+        })
+        warning = (
+            f"organism '{organism}' has no edges for the selected DM(s); "
+            f"they belong to: {', '.join(dm_organisms)}"
+        )
+        return [], organism, [warning]
+    return matched, None, []
 
 
 # ---------------------------------------------------------------------------
@@ -5200,7 +5315,12 @@ def gene_derived_metrics(
     warnings: a closed-vocabulary filter value (compartment /
     treatment_type / background_factors) not in the live vocabulary, plus
     one per not_found locus_tag that differs only by case from a real
-    Gene.locus_tag (locus_tags are never case-normalised).
+    Gene.locus_tag (locus_tags are never case-normalised). When both
+    `value_kind` and (`derived_metric_ids` or `metric_types`) are given
+    and an id/metric_type actually exists as a DIFFERENT kind, adds
+    `"<id> exists as value_kind=<kind> — use genes_by_<kind>_metric"` —
+    those ids/metric_types still land in `not_matched` (kind mismatch is
+    already one of its causes), the warning just names why.
     Advisory only — never changes which rows are returned.
     Per result (compact, 13 Pydantic fields; 11 emitted by Cypher in the
     current KG): locus_tag, gene_name, derived_metric_id, value_kind, name,
@@ -5234,6 +5354,40 @@ def gene_derived_metrics(
         conn, compartment=compartment, treatment_type=treatment_type,
         background_factors=background_factors,
     )
+
+    # Sibling-tool warning: value_kind filter conflicts with the actual
+    # kind of a requested id/metric_type (llm-review 2b.3). Kind-agnostic
+    # lookup — independent of whether the DM touches these locus_tags;
+    # `not_matched` already captures the kind-mismatch exclusion itself.
+    if value_kind and (derived_metric_ids or metric_types):
+        lookup_cypher, lookup_params = build_derived_metric_kind_lookup(
+            derived_metric_ids=derived_metric_ids, metric_types=metric_types,
+        )
+        kind_rows = conn.execute_query(lookup_cypher, **lookup_params)
+        if derived_metric_ids:
+            requested_ids = set(derived_metric_ids)
+            for row in kind_rows:
+                if (row["derived_metric_id"] in requested_ids
+                        and row["value_kind"] != value_kind):
+                    warnings.append(
+                        f"{row['derived_metric_id']} exists as "
+                        f"value_kind={row['value_kind']} — use "
+                        f"genes_by_{row['value_kind']}_metric"
+                    )
+        if metric_types:
+            kinds_by_mt: dict[str, set[str]] = {}
+            for row in kind_rows:
+                if row["metric_type"] in metric_types:
+                    kinds_by_mt.setdefault(
+                        row["metric_type"], set()).add(row["value_kind"])
+            for mt in metric_types:
+                kinds = kinds_by_mt.get(mt)
+                if kinds and value_kind not in kinds:
+                    other_kind = sorted(kinds)[0]
+                    warnings.append(
+                        f"{mt} exists as value_kind={other_kind} — use "
+                        f"genes_by_{other_kind}_metric"
+                    )
 
     filter_kwargs = dict(
         metric_types=metric_types, value_kind=value_kind,
@@ -5399,11 +5553,10 @@ def genes_by_numeric_metric(
 
     conn = _default_conn(conn)
 
-    # 3. Q1: diagnostics
+    # 3. Q1: diagnostics (kind- and organism-agnostic — see builder docstring)
     diag_cypher, diag_params = build_genes_by_numeric_metric_diagnostics(
         derived_metric_ids=derived_metric_ids,
         metric_types=metric_types,
-        organism=organism,
         experiment_ids=experiment_ids,
         publication_doi=publication_doi,
         compartment=compartment,
@@ -5411,17 +5564,17 @@ def genes_by_numeric_metric(
         background_factors=background_factors,
         growth_phases=growth_phases,
     )
-    diagnostics = conn.execute_query(diag_cypher, **diag_params)
+    diagnostics_raw = conn.execute_query(diag_cypher, **diag_params)
 
-    # 4. Compute not_found_ids / not_found_metric_types
-    surviving_ids = {d["derived_metric_id"] for d in diagnostics}
-    surviving_metric_types = {d["metric_type"] for d in diagnostics}
-    not_found_ids = [
-        x for x in (derived_metric_ids or []) if x not in surviving_ids
-    ]
-    not_found_metric_types = [
-        x for x in (metric_types or []) if x not in surviving_metric_types
-    ]
+    # 4. Partition by value_kind: not_found_* (absent entirely) vs
+    #    not_matched_* (exists, wrong kind — sibling warning) vs
+    #    correct-kind survivors.
+    (
+        diagnostics, not_found_ids, not_matched_ids_kind,
+        not_found_metric_types, not_matched_metric_types_kind, kind_warnings,
+    ) = _classify_dm_kind_mismatch(
+        diagnostics_raw, "numeric", derived_metric_ids, metric_types,
+    )
 
     excluded_derived_metrics: list[dict] = []
     warnings: list[str] = _closed_vocab_warnings(
@@ -5429,6 +5582,13 @@ def genes_by_numeric_metric(
         background_factors=background_factors, growth_phases=growth_phases,
     )
     warnings += _organism_zero_match_warning(conn, organism)
+    warnings += kind_warnings
+
+    # 4b. Partition correct-kind survivors by organism.
+    diagnostics, not_matched_organism, organism_warnings = (
+        _classify_dm_organism_mismatch(diagnostics, organism)
+    )
+    warnings += organism_warnings
 
     # 5. Validate rankable gate
     rankable_filters = {
@@ -5552,10 +5712,10 @@ def genes_by_numeric_metric(
             "genes_per_metric_max": 0,
             "genes_per_metric_median": 0.0,
             "not_found_ids": not_found_ids,
-            "not_matched_ids": [],
+            "not_matched_ids": not_matched_ids_kind,
             "not_found_metric_types": not_found_metric_types,
-            "not_matched_metric_types": [],
-            "not_matched_organism": organism,
+            "not_matched_metric_types": not_matched_metric_types_kind,
+            "not_matched_organism": not_matched_organism,
             "excluded_derived_metrics": excluded_derived_metrics,
             "warnings": warnings,
             "returned": 0,
@@ -5594,14 +5754,16 @@ def genes_by_numeric_metric(
         reverse=True,
     )
 
-    # 10. Compute not_matched_ids / not_matched_metric_types
+    # 10. Compute not_matched_ids / not_matched_metric_types (zero-genes
+    #     reason) and merge with the kind-mismatch buckets from step 4.
     contributed_ids = {entry["derived_metric_id"] for entry in by_metric}
-    not_matched_ids_all = set(surviving) - contributed_ids
+    not_matched_ids_all = (set(surviving) - contributed_ids) | set(
+        not_matched_ids_kind)
     not_matched_ids = [
         x for x in (derived_metric_ids or []) if x in not_matched_ids_all
     ]
 
-    not_matched_metric_types: list[str] = []
+    not_matched_metric_types_all = set(not_matched_metric_types_kind)
     if metric_types:
         for mt in metric_types:
             dm_ids_for_mt = [
@@ -5610,21 +5772,19 @@ def genes_by_numeric_metric(
                 if d["metric_type"] == mt
             ]
             if not dm_ids_for_mt:
-                continue  # already in not_found_metric_types
+                continue  # already in not_found_metric_types / kind-mismatch
             if all(
                 d_id in excluded_set or d_id in not_matched_ids_all
                 for d_id in dm_ids_for_mt
             ):
-                not_matched_metric_types.append(mt)
+                not_matched_metric_types_all.add(mt)
+    not_matched_metric_types = [
+        mt for mt in (metric_types or []) if mt in not_matched_metric_types_all
+    ]
 
-    # not_matched_organism: organism passed but no by_organism row matches
-    not_matched_organism: str | None = None
-    if organism:
-        if not any(
-            organism.lower() in entry["organism_name"].lower()
-            for entry in by_organism
-        ):
-            not_matched_organism = organism
+    # not_matched_organism already computed in step 4b (pre-summary) —
+    # `diagnostics` here is already organism-filtered, so by_organism can
+    # never disagree with it.
 
     # 11. Q3: detail (skip when limit=0)
     results: list[dict] = []
@@ -5699,10 +5859,13 @@ def genes_by_boolean_metric(
     """Boolean DerivedMetric drill-down. Cross-organism by design.
 
     3-query orchestration:
-      1. diagnostics — resolve selection by intersecting with
-         dm.value_kind='boolean' + scoping filters; surviving IDs drive
-         Q2/Q3. Wrong-kind IDs and IDs filtered out by scoping both
-         surface as not_found_ids (matches genes_by_numeric_metric).
+      1. diagnostics — resolve selection against scoping filters only
+         (kind- and organism-agnostic); a wrong-kind id/metric_type
+         surfaces in `not_matched_ids` / `not_matched_metric_types` with
+         a sibling-tool warning naming the actual kind, an id/metric_type
+         absent entirely surfaces in `not_found_ids` /
+         `not_found_metric_types`, and a correct-kind DM outside the
+         requested `organism` surfaces via `not_matched_organism`.
       2. summary — aggregations over surviving DM ID list (always runs).
       3. detail — rows; skipped when limit==0.
 
@@ -5711,8 +5874,13 @@ def genes_by_boolean_metric(
     gates exist for boolean DMs, so `excluded_derived_metrics` is always
     returned as `[]` (kept for envelope-shape consistency with
     genes_by_numeric_metric); `warnings` still carries closed-vocabulary
-    (compartment / treatment_type / background_factors / growth_phases)
-    and organism-existence notices.
+    (compartment / treatment_type / background_factors / growth_phases),
+    organism-existence, and kind-mismatch notices.
+
+    `flag=False` against a DM that stores no `not_flagged` edges (11 of
+    27 boolean DMs are positive-only) keeps that DM's `by_metric` row
+    (count / false_count both 0 — the DM isn't dropped from the
+    envelope) and appends a warning pointing at `by_metric[*].false_count`.
 
     Returns dict with keys: total_matching, total_derived_metrics,
     total_genes, by_organism, by_compartment, by_publication,
@@ -5749,11 +5917,10 @@ def genes_by_boolean_metric(
 
     conn = _default_conn(conn)
 
-    # 3. Q1: diagnostics
+    # 3. Q1: diagnostics (kind- and organism-agnostic)
     diag_cypher, diag_params = build_genes_by_boolean_metric_diagnostics(
         derived_metric_ids=derived_metric_ids,
         metric_types=metric_types,
-        organism=organism,
         experiment_ids=experiment_ids,
         publication_doi=publication_doi,
         compartment=compartment,
@@ -5761,29 +5928,34 @@ def genes_by_boolean_metric(
         background_factors=background_factors,
         growth_phases=growth_phases,
     )
-    diagnostics = conn.execute_query(diag_cypher, **diag_params)
+    diagnostics_raw = conn.execute_query(diag_cypher, **diag_params)
 
-    # 4. Compute not_found_ids / not_found_metric_types
-    surviving_ids = {d["derived_metric_id"] for d in diagnostics}
-    surviving_metric_types = {d["metric_type"] for d in diagnostics}
-    not_found_ids = [
-        x for x in (derived_metric_ids or []) if x not in surviving_ids
-    ]
-    not_found_metric_types = [
-        x for x in (metric_types or []) if x not in surviving_metric_types
-    ]
+    # 4. Partition by value_kind, then by organism.
+    (
+        diagnostics, not_found_ids, not_matched_ids_kind,
+        not_found_metric_types, not_matched_metric_types_kind, kind_warnings,
+    ) = _classify_dm_kind_mismatch(
+        diagnostics_raw, "boolean", derived_metric_ids, metric_types,
+    )
 
     # No rankable / has_p_value gates exist for boolean DMs, so
     # excluded_derived_metrics stays empty; warnings still carries
-    # closed-vocabulary / organism-existence notices (llm-review 2b.3).
+    # closed-vocabulary / organism-existence / kind-mismatch notices
+    # (llm-review 2b.3).
     warnings: list[str] = _closed_vocab_warnings(
         conn, compartment=compartment, treatment_type=treatment_type,
         background_factors=background_factors, growth_phases=growth_phases,
     )
     warnings += _organism_zero_match_warning(conn, organism)
+    warnings += kind_warnings
+
+    diagnostics, not_matched_organism, organism_warnings = (
+        _classify_dm_organism_mismatch(diagnostics, organism)
+    )
+    warnings += organism_warnings
 
     # 5. No gate validation for boolean — excluded_derived_metrics always
-    #    empty. Surviving = all diagnostics survivors.
+    #    empty. Surviving = all kind-/organism-correct diagnostics survivors.
     surviving = [d["derived_metric_id"] for d in diagnostics]
 
     # 6. Defensive: if everything got filtered out at diagnostics, skip
@@ -5804,10 +5976,10 @@ def genes_by_boolean_metric(
             "genes_per_metric_max": 0,
             "genes_per_metric_median": 0.0,
             "not_found_ids": not_found_ids,
-            "not_matched_ids": [],
+            "not_matched_ids": not_matched_ids_kind,
             "not_found_metric_types": not_found_metric_types,
-            "not_matched_metric_types": [],
-            "not_matched_organism": organism,
+            "not_matched_metric_types": not_matched_metric_types_kind,
+            "not_matched_organism": not_matched_organism,
             "excluded_derived_metrics": [],
             "warnings": warnings,
             "returned": 0,
@@ -5839,21 +6011,34 @@ def genes_by_boolean_metric(
         sum_row.get("top_categories_raw", []), "gene_category")[:5]
 
     # by_metric: per-DM scalar rollups (true_count / false_count /
-    # dm_*_count are scalars, not freq lists — no nested rename).
+    # dm_*_count are scalars, not freq lists — no nested rename). A
+    # positive-only DM under flag=False keeps its row here (count=0,
+    # false_count=0 — the builder no longer hard-filters `flag` at
+    # MATCH time) rather than vanishing from the envelope.
     by_metric = sorted(
         sum_row.get("by_metric", []),
         key=lambda x: x["count"],
         reverse=True,
     )
+    if flag is False:
+        for entry in by_metric:
+            if not entry.get("dm_false_count"):
+                warnings.append(
+                    f"{entry['derived_metric_id']} stores positive flags "
+                    f"only — flag=False cannot match; read "
+                    f"by_metric[*].false_count"
+                )
 
-    # 9. Compute not_matched_ids / not_matched_metric_types
+    # 9. Compute not_matched_ids / not_matched_metric_types (zero-genes
+    #    reason) and merge with the kind-mismatch buckets from step 4.
     contributed_ids = {entry["derived_metric_id"] for entry in by_metric}
-    not_matched_ids_all = set(surviving) - contributed_ids
+    not_matched_ids_all = (set(surviving) - contributed_ids) | set(
+        not_matched_ids_kind)
     not_matched_ids = [
         x for x in (derived_metric_ids or []) if x in not_matched_ids_all
     ]
 
-    not_matched_metric_types: list[str] = []
+    not_matched_metric_types_all = set(not_matched_metric_types_kind)
     if metric_types:
         for mt in metric_types:
             dm_ids_for_mt = [
@@ -5862,18 +6047,14 @@ def genes_by_boolean_metric(
                 if d["metric_type"] == mt
             ]
             if not dm_ids_for_mt:
-                continue  # already in not_found_metric_types
+                continue  # already in not_found_metric_types / kind-mismatch
             if all(d_id in not_matched_ids_all for d_id in dm_ids_for_mt):
-                not_matched_metric_types.append(mt)
+                not_matched_metric_types_all.add(mt)
+    not_matched_metric_types = [
+        mt for mt in (metric_types or []) if mt in not_matched_metric_types_all
+    ]
 
-    # not_matched_organism: organism passed but no by_organism row matches
-    not_matched_organism: str | None = None
-    if organism:
-        if not any(
-            organism.lower() in entry["organism_name"].lower()
-            for entry in by_organism
-        ):
-            not_matched_organism = organism
+    # not_matched_organism already computed in step 4 (pre-summary).
 
     # 10. Q3: detail (skip when limit=0)
     results: list[dict] = []
@@ -5948,9 +6129,14 @@ def genes_by_categorical_metric(
 
     3-query orchestration (same as genes_by_boolean_metric, plus a
     categories-subset validation step):
-      1. diagnostics — resolve selection by intersecting with
-         dm.value_kind='categorical' + scoping; collect each surviving
-         DM's allowed_categories. Wrong-kind IDs surface as not_found_ids.
+      1. diagnostics — resolve selection against scoping filters only
+         (kind- and organism-agnostic); a wrong-kind id/metric_type
+         surfaces in `not_matched_ids` / `not_matched_metric_types` with
+         a sibling-tool warning naming the actual kind, an id/metric_type
+         absent entirely surfaces in `not_found_ids` /
+         `not_found_metric_types`, and a correct-kind DM outside the
+         requested `organism` surfaces via `not_matched_organism`.
+         Collect each surviving DM's allowed_categories.
       2. (api/ validates) — `categories` ⊆ union of surviving DMs'
          `allowed_categories` (raise on unknowns).
       3. summary — aggregations over surviving DM ID list (always runs).
@@ -5961,8 +6147,8 @@ def genes_by_categorical_metric(
     gates exist for categorical DMs, so `excluded_derived_metrics` is
     always returned as `[]` (kept for envelope-shape consistency with
     genes_by_numeric_metric); `warnings` still carries closed-vocabulary
-    (compartment / treatment_type / background_factors / growth_phases)
-    and organism-existence notices.
+    (compartment / treatment_type / background_factors / growth_phases),
+    organism-existence, and kind-mismatch notices.
 
     Returns dict with keys: total_matching, total_derived_metrics,
     total_genes, by_organism, by_compartment, by_publication,
@@ -6001,11 +6187,10 @@ def genes_by_categorical_metric(
 
     conn = _default_conn(conn)
 
-    # 3. Q1: diagnostics
+    # 3. Q1: diagnostics (kind- and organism-agnostic)
     diag_cypher, diag_params = build_genes_by_categorical_metric_diagnostics(
         derived_metric_ids=derived_metric_ids,
         metric_types=metric_types,
-        organism=organism,
         experiment_ids=experiment_ids,
         publication_doi=publication_doi,
         compartment=compartment,
@@ -6013,28 +6198,34 @@ def genes_by_categorical_metric(
         background_factors=background_factors,
         growth_phases=growth_phases,
     )
-    diagnostics = conn.execute_query(diag_cypher, **diag_params)
+    diagnostics_raw = conn.execute_query(diag_cypher, **diag_params)
 
-    # 4. Compute not_found_ids / not_found_metric_types
-    surviving_ids = {d["derived_metric_id"] for d in diagnostics}
-    surviving_metric_types = {d["metric_type"] for d in diagnostics}
-    not_found_ids = [
-        x for x in (derived_metric_ids or []) if x not in surviving_ids
-    ]
-    not_found_metric_types = [
-        x for x in (metric_types or []) if x not in surviving_metric_types
-    ]
+    # 4. Partition by value_kind, then by organism.
+    (
+        diagnostics, not_found_ids, not_matched_ids_kind,
+        not_found_metric_types, not_matched_metric_types_kind, kind_warnings,
+    ) = _classify_dm_kind_mismatch(
+        diagnostics_raw, "categorical", derived_metric_ids, metric_types,
+    )
 
     # No rankable / has_p_value gates exist for categorical DMs, so
     # excluded_derived_metrics stays empty; warnings still carries
-    # closed-vocabulary / organism-existence notices (llm-review 2b.3).
+    # closed-vocabulary / organism-existence / kind-mismatch notices
+    # (llm-review 2b.3).
     warnings: list[str] = _closed_vocab_warnings(
         conn, compartment=compartment, treatment_type=treatment_type,
         background_factors=background_factors, growth_phases=growth_phases,
     )
     warnings += _organism_zero_match_warning(conn, organism)
+    warnings += kind_warnings
 
-    # 5. Validate categories ⊆ union of surviving DMs' allowed_categories
+    diagnostics, not_matched_organism, organism_warnings = (
+        _classify_dm_organism_mismatch(diagnostics, organism)
+    )
+    warnings += organism_warnings
+
+    # 5. Validate categories ⊆ union of surviving (kind+organism correct)
+    #    DMs' allowed_categories
     if categories:
         allowed_union: set[str] = set()
         for d in diagnostics:
@@ -6050,7 +6241,8 @@ def genes_by_categorical_metric(
             )
 
     # 6. No gate validation for categorical — excluded_derived_metrics /
-    #    warnings always empty. Surviving = all diagnostics survivors.
+    #    warnings always empty. Surviving = all kind-/organism-correct
+    #    diagnostics survivors.
     surviving = [d["derived_metric_id"] for d in diagnostics]
 
     # 7. Defensive: if everything got filtered out at diagnostics, skip
@@ -6070,10 +6262,10 @@ def genes_by_categorical_metric(
             "genes_per_metric_max": 0,
             "genes_per_metric_median": 0.0,
             "not_found_ids": not_found_ids,
-            "not_matched_ids": [],
+            "not_matched_ids": not_matched_ids_kind,
             "not_found_metric_types": not_found_metric_types,
-            "not_matched_metric_types": [],
-            "not_matched_organism": organism,
+            "not_matched_metric_types": not_matched_metric_types_kind,
+            "not_matched_organism": not_matched_organism,
             "excluded_derived_metrics": [],
             "warnings": warnings,
             "returned": 0,
@@ -6119,14 +6311,16 @@ def genes_by_categorical_metric(
         by_metric.append(new_entry)
     by_metric.sort(key=lambda x: x["count"], reverse=True)
 
-    # 10. Compute not_matched_ids / not_matched_metric_types
+    # 10. Compute not_matched_ids / not_matched_metric_types (zero-genes
+    #     reason) and merge with the kind-mismatch buckets from step 4.
     contributed_ids = {entry["derived_metric_id"] for entry in by_metric}
-    not_matched_ids_all = set(surviving) - contributed_ids
+    not_matched_ids_all = (set(surviving) - contributed_ids) | set(
+        not_matched_ids_kind)
     not_matched_ids = [
         x for x in (derived_metric_ids or []) if x in not_matched_ids_all
     ]
 
-    not_matched_metric_types: list[str] = []
+    not_matched_metric_types_all = set(not_matched_metric_types_kind)
     if metric_types:
         for mt in metric_types:
             dm_ids_for_mt = [
@@ -6135,18 +6329,14 @@ def genes_by_categorical_metric(
                 if d["metric_type"] == mt
             ]
             if not dm_ids_for_mt:
-                continue  # already in not_found_metric_types
+                continue  # already in not_found_metric_types / kind-mismatch
             if all(d_id in not_matched_ids_all for d_id in dm_ids_for_mt):
-                not_matched_metric_types.append(mt)
+                not_matched_metric_types_all.add(mt)
+    not_matched_metric_types = [
+        mt for mt in (metric_types or []) if mt in not_matched_metric_types_all
+    ]
 
-    # not_matched_organism: organism passed but no by_organism row matches
-    not_matched_organism: str | None = None
-    if organism:
-        if not any(
-            organism.lower() in entry["organism_name"].lower()
-            for entry in by_organism
-        ):
-            not_matched_organism = organism
+    # not_matched_organism already computed in step 4 (pre-summary).
 
     # 11. Q3: detail (skip when limit=0)
     results: list[dict] = []

@@ -12,10 +12,13 @@ enforced.
 
 Empty results are diagnosable via `not_found` (locus_tag absent from
 KG) and `not_matched` (in KG but no DM rows after filters — includes
-kind-mismatch when `value_kind` is set). Pre-flight via
-`list_derived_metrics(value_kind=...)` to see which DMs touch your
-genes and whether they are rankable / has_p_value. See
-`docs://guide/conventions` for the full DM family gating contract.
+kind-mismatch when `value_kind` is set; `warnings` names the actual
+kind and the sibling `genes_by_<kind>_metric` tool when a requested
+`derived_metric_ids` / `metric_types` entry exists as a different
+kind). Pre-flight via `list_derived_metrics(value_kind=...)` to see
+which DMs touch your genes and whether they are rankable /
+has_p_value. See `docs://guide/conventions` for the full DM family
+gating contract.
 
 Routing: edge-level filters (bucket / percentile / rank / value
 thresholds) live on `genes_by_numeric_metric`; flag-level filters on

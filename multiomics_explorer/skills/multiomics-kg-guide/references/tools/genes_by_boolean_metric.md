@@ -7,16 +7,20 @@ edge value). `value` is the KG two-state literal (`'flagged'` / `'not_flagged'`)
 Cross-organism by design.
 
 Selection is `derived_metric_ids` XOR `metric_types` (exactly one
-required); wrong-kind IDs (numeric / categorical) surface silently
-in `not_found_ids`. Pre-flight via
-`list_derived_metrics(value_kind='boolean')` to pick valid boolean
-DMs. See `docs://guide/conventions` for the full DM family gating
-contract.
+required); an id/metric_type that exists as a different kind
+(numeric / categorical) moves to `not_matched_ids` /
+`not_matched_metric_types` with a `warnings` entry naming the
+sibling tool — it is never silently dropped into `not_found_*`.
+Pre-flight via `list_derived_metrics(value_kind='boolean')` to
+pick valid boolean DMs. See `docs://guide/conventions` for the
+full DM family gating contract.
 
 **Two storage conventions coexist:** 11 of 27 boolean DMs store
 both `flagged` and `not_flagged` edges (tested-absent is real
 biology — `flag=False` returns rows), the rest are positive-only
-(`flag=False` → 0 rows). Read `by_metric[*].false_count` to tell
+(`flag=False` → 0 detail rows, but the DM's `by_metric` entry is
+kept with `count`/`false_count` both 0 — never dropped — plus a
+`warnings` entry). Read `by_metric[*].false_count` to tell
 'not flagged' from 'not assessed'; `by_metric[*].dm_false_count`
 is the full-DM precomputed twin (0 on positive-only DMs).
 See `docs://guide/conventions`.
@@ -24,14 +28,16 @@ See `docs://guide/conventions`.
 The `by_metric` envelope rollup pairs filtered-slice true/false
 tallies with full-DM precomputed counts so callers can read "32 of
 32 MED4 vesicle-proteome members" directly.
-`excluded_derived_metrics` / `warnings` are always [] here (no
-gates apply); kept for envelope-shape consistency.
+`excluded_derived_metrics` is always [] here (no rankable /
+has_p_value gates apply to boolean DMs — kept for envelope-shape
+consistency); `warnings` carries closed-vocabulary,
+organism-existence, kind-mismatch, and positive-only-flag notices.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| derived_metric_ids | list[string] \| None | None | Boolean DerivedMetric node IDs. Use when the same `metric_type` appears across organisms / publications and you need to pin one. Discover IDs via `list_derived_metrics(value_kind='boolean')`. Mutually exclusive with `metric_types`. Wrong-kind IDs (numeric / categorical) surface silently in `not_found_ids`. |
+| derived_metric_ids | list[string] \| None | None | Boolean DerivedMetric node IDs. Use when the same `metric_type` appears across organisms / publications and you need to pin one. Discover IDs via `list_derived_metrics(value_kind='boolean')`. Mutually exclusive with `metric_types`. An id that exists as a different kind (numeric / categorical) moves to `not_matched_ids` with a `warnings` entry naming the sibling tool. |
 | metric_types | list[string] \| None | None | Boolean metric-type tags (e.g. ['vesicle_proteome_member', 'periodic_in_coculture_LD']). Unions every DM carrying that tag, then narrows by scoping filters. Same tag can span organisms / publications — pin one specific DM via `derived_metric_ids` instead. Mutually exclusive with `derived_metric_ids`. |
 | organism | string \| None | None | Organism to scope the DM set to. Accepts short strain code ('MED4', 'NATL2A', 'MIT9313') or full name; word-based, case-insensitive match. Single-organism is **not** enforced — omit to drill across all organisms a metric_type spans. |
 | locus_tags | list[string] \| None | None | Restrict drill-down to a specific gene set (e.g. DE hits from `differential_expression_by_gene`). Filter on `g.locus_tag IN $locus_tags` post-MATCH. Genes with no edge for the selected DM produce no row. |
@@ -69,11 +75,11 @@ total_matching, total_derived_metrics, total_genes, by_organism, by_compartment,
 - **by_metric** (list[GenesByBooleanMetricBreakdown]): Per-DM rollup: filtered-slice true/false counts + full-DM precomputed tallies. Sorted by count desc.
 - **genes_per_metric_max** (int): Largest per-DM gene count.
 - **genes_per_metric_median** (float): Median per-DM gene count.
-- **not_found_ids** (list[string]): `derived_metric_ids` inputs not present in KG (or scoped out / wrong value_kind).
-- **not_matched_ids** (list[string]): `derived_metric_ids` in KG but produced 0 rows after edge-level filters.
+- **not_found_ids** (list[string]): `derived_metric_ids` inputs absent from the KG entirely (any kind, any organism), or scoped out by compartment / treatment_type / background_factors / growth_phases / publication_doi / experiment_ids.
+- **not_matched_ids** (list[string]): `derived_metric_ids` that exist but produced 0 rows — either a different `value_kind` (see `warnings` for the sibling tool to use) or 0 rows after edge-level filters.
 - **not_found_metric_types** (list[string]): `metric_types` inputs that match no DM after scoping.
 - **not_matched_metric_types** (list[string]): `metric_types` whose DMs produced 0 rows.
-- **not_matched_organism** (string | None): `organism` arg that matched no surviving DM.
+- **not_matched_organism** (string | None): `organism` arg that matched no surviving (correct-kind) DM — set only when the DM(s) genuinely exist elsewhere; `warnings` lists the organisms they belong to.
 - **excluded_derived_metrics** (list[ExcludedDerivedMetric]): Always [] for boolean DMs (no rankable / has_p_value gates). Kept for cross-tool envelope-shape consistency.
 - **warnings** (list[string]): No rankable / has_p_value gates exist for boolean DMs, so excluded_derived_metrics stays []; warnings still carries a closed-vocabulary filter value (compartment / treatment_type / background_factors / growth_phases) not found in the live vocabulary, or an `organism` that matches no OrganismTaxon at all (distinct from not_matched_organism).
 - **returned** (int): Length of results list.
@@ -400,7 +406,7 @@ genes_by_boolean_metric(metric_types=['rapid_recovery_low_co2_shock'], flag=Fals
       "metric_type": "rapid_recovery_low_co2_shock",
       "value_kind": "boolean",
       "count": 38,
-      "true_count": 0,
+      "true_count": 13,
       "false_count": 38,
       "dm_total_gene_count": 51,
       "dm_true_count": 13,

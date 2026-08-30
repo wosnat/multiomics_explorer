@@ -1122,6 +1122,32 @@
     min_rows: 0
     columns: []
 
+- id: genes_by_numeric_metric_organism_mismatch
+  tool: genes_by_numeric_metric
+  desc: |
+    damping_ratio only exists for MED4 — requesting MIT9313 surfaces
+    not_matched_organism (the DM genuinely exists, just not here) plus a
+    warning naming its real organism, not a bare not_found (llm-review 2b.3).
+  params:
+    metric_types: ["damping_ratio"]
+    organism: "MIT9313"
+  expect:
+    min_rows: 0
+    columns: []
+
+- id: genes_by_numeric_metric_wrong_kind_id
+  tool: genes_by_numeric_metric
+  desc: |
+    A boolean DM id passed to the numeric drill-down moves to
+    not_matched_ids with a sibling-tool warning naming its actual kind —
+    never silently dropped into not_found_ids (llm-review 2b.3).
+  params:
+    derived_metric_ids:
+      - "derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member"
+  expect:
+    min_rows: 0
+    columns: []
+
 # ---------------------------------------------------------------------------
 # genes_by_boolean_metric
 # ---------------------------------------------------------------------------
@@ -1168,6 +1194,34 @@
     min_rows: 0
     columns: []
 
+- id: genes_by_boolean_metric_wrong_kind_metric_type
+  tool: genes_by_boolean_metric
+  desc: |
+    diel_amplitude_transcript_log2 is a numeric-only metric_type — passed
+    here it moves to not_matched_metric_types with a sibling-tool warning
+    naming genes_by_numeric_metric (llm-review 2b.3).
+  params:
+    metric_types: ["diel_amplitude_transcript_log2"]
+    organism: "MED4"
+  expect:
+    min_rows: 0
+    columns: []
+
+- id: genes_by_boolean_metric_flag_false_positive_only
+  tool: genes_by_boolean_metric
+  desc: |
+    vesicle_proteome_member is positive-only (no 'not_flagged' edges
+    stored) — flag=False returns 0 rows but keeps the DM's by_metric
+    entry (count/false_count both 0) instead of dropping it, plus a
+    warning pointing at by_metric[*].false_count (llm-review 2b.3).
+  params:
+    derived_metric_ids:
+      - "derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member"
+    flag: false
+  expect:
+    min_rows: 0
+    columns: []
+
 # ---------------------------------------------------------------------------
 # genes_by_categorical_metric
 # ---------------------------------------------------------------------------
@@ -1210,6 +1264,19 @@
   params:
     metric_types: ["predicted_subcellular_localization"]
     summary: true
+  expect:
+    min_rows: 0
+    columns: []
+
+- id: genes_by_categorical_metric_wrong_kind_id
+  tool: genes_by_categorical_metric
+  desc: |
+    A numeric DM id passed to the categorical drill-down moves to
+    not_matched_ids with a sibling-tool warning naming its actual kind
+    (llm-review 2b.3).
+  params:
+    derived_metric_ids:
+      - "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio"
   expect:
     min_rows: 0
     columns: []

@@ -66,6 +66,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_ontology_organism_gene_count,
     build_gene_derived_metrics_summary,
     build_gene_derived_metrics,
+    build_derived_metric_kind_lookup,
     build_genes_by_numeric_metric_diagnostics,
     build_genes_by_numeric_metric_summary,
     build_genes_by_numeric_metric,
@@ -6110,6 +6111,48 @@ class TestBuildListDerivedMetrics:
         )
 
 
+class TestBuildDerivedMetricKindLookup:
+    """Unit tests for build_derived_metric_kind_lookup (no Neo4j)."""
+
+    def test_derived_metric_ids_only(self):
+        cypher, params = build_derived_metric_kind_lookup(
+            derived_metric_ids=["dm:abc", "dm:def"])
+        assert "dm.id IN $derived_metric_ids" in cypher
+        assert "OR" not in cypher.split("RETURN")[0]
+        assert params == {"derived_metric_ids": ["dm:abc", "dm:def"]}
+
+    def test_metric_types_only(self):
+        cypher, params = build_derived_metric_kind_lookup(
+            metric_types=["damping_ratio"])
+        assert "dm.metric_type IN $metric_types" in cypher
+        assert params == {"metric_types": ["damping_ratio"]}
+
+    def test_both_or_joined(self):
+        cypher, params = build_derived_metric_kind_lookup(
+            derived_metric_ids=["dm:abc"], metric_types=["damping_ratio"])
+        where_block = cypher.split("RETURN")[0]
+        assert "dm.id IN $derived_metric_ids" in where_block
+        assert "dm.metric_type IN $metric_types" in where_block
+        assert " OR " in where_block
+        assert params["derived_metric_ids"] == ["dm:abc"]
+        assert params["metric_types"] == ["damping_ratio"]
+
+    def test_no_value_kind_predicate(self):
+        cypher, _ = build_derived_metric_kind_lookup(
+            derived_metric_ids=["dm:abc"])
+        assert "value_kind =" not in cypher
+
+    def test_returns_expected_columns(self):
+        cypher, _ = build_derived_metric_kind_lookup(
+            derived_metric_ids=["dm:abc"])
+        for col in [
+            "dm.id AS derived_metric_id",
+            "dm.metric_type AS metric_type",
+            "dm.value_kind AS value_kind",
+        ]:
+            assert col in cypher, f"missing canonical column: {col}"
+
+
 class TestBuildGenesByNumericMetricDiagnostics:
     """Unit tests for build_genes_by_numeric_metric_diagnostics (no Neo4j)."""
 
@@ -6125,18 +6168,25 @@ class TestBuildGenesByNumericMetricDiagnostics:
         assert "dm.id IN $derived_metric_ids" in cypher
         assert params["derived_metric_ids"] == ["dm:abc"]
 
-    def test_value_kind_hardcoded(self):
-        # Builder always emits the value_kind='numeric' guard
+    def test_value_kind_not_a_query_predicate(self):
+        # (llm-review 2b.3) value_kind is no longer hardcoded into the
+        # WHERE clause — api/ partitions by the returned value_kind column
+        # so wrong-kind ids can be classified as not_matched (sibling
+        # warning) instead of vanishing into not_found.
         cypher, params = build_genes_by_numeric_metric_diagnostics(
             metric_types=["damping_ratio"])
-        assert "dm.value_kind = $value_kind" in cypher
-        assert params["value_kind"] == "numeric"
+        assert "dm.value_kind = $value_kind" not in cypher
+        assert "value_kind" not in params
 
-    def test_value_kind_hardcoded_with_no_other_filters(self):
-        # Even minimal call (no selection) carries the hardcoded guard
-        cypher, params = build_genes_by_numeric_metric_diagnostics()
-        assert "dm.value_kind = $value_kind" in cypher
-        assert params["value_kind"] == "numeric"
+    def test_organism_not_a_query_predicate(self):
+        # (llm-review 2b.3) organism is no longer a builder param — moved
+        # to Python so a correct-kind DM outside the requested organism
+        # can be reported (not_matched_organism) instead of silently
+        # vanishing.
+        import pytest
+        with pytest.raises(TypeError):
+            build_genes_by_numeric_metric_diagnostics(
+                metric_types=["damping_ratio"], organism="MED4")
 
     def test_returns_canonical_columns(self):
         cypher, _ = build_genes_by_numeric_metric_diagnostics(
@@ -6152,13 +6202,6 @@ class TestBuildGenesByNumericMetricDiagnostics:
             "dm.organism_name AS organism_name",
         ]:
             assert col in cypher, f"missing canonical column: {col}"
-
-    def test_organism_filter(self):
-        cypher, params = build_genes_by_numeric_metric_diagnostics(
-            metric_types=["damping_ratio"], organism="MED4")
-        assert ("ALL(word IN split(toLower($organism), ' ')"
-                " WHERE toLower(dm.organism_name) CONTAINS word)") in cypher
-        assert params["organism"] == "MED4"
 
     def test_compartment_filter(self):
         cypher, params = build_genes_by_numeric_metric_diagnostics(
@@ -6182,12 +6225,10 @@ class TestBuildGenesByNumericMetricDiagnostics:
 
     def test_combined_filters(self):
         cypher, _ = build_genes_by_numeric_metric_diagnostics(
-            metric_types=["damping_ratio"], organism="MED4",
-            compartment="vesicle")
+            metric_types=["damping_ratio"], compartment="vesicle")
         # Conditions AND-joined
         assert " AND " in cypher.split("RETURN")[0]
         assert "dm.metric_type IN $metric_types" in cypher
-        assert "dm.value_kind = $value_kind" in cypher
         assert "dm.compartment = $compartment" in cypher
 
     def test_order_by(self):
@@ -6486,11 +6527,16 @@ class TestBuildGenesByBooleanMetricDiagnostics:
     """Unit tests for build_genes_by_boolean_metric_diagnostics (no Neo4j)."""
 
     def test_no_filters(self):
-        # Even minimal call (no selection) carries the hardcoded value_kind guard
-        cypher, params = build_genes_by_boolean_metric_diagnostics()
+        # (llm-review 2b.3) no hardcoded value_kind guard — kind is
+        # classified in Python from the returned value_kind column.
+        # (api/ always passes a selection — derived_metric_ids or
+        # metric_types — so an empty WHERE never actually occurs in
+        # practice; this exercises the "no extra scoping" case.)
+        cypher, params = build_genes_by_boolean_metric_diagnostics(
+            metric_types=["vesicle_proteome_member"])
         assert "MATCH (dm:DerivedMetric)" in cypher
-        assert "dm.value_kind = $value_kind" in cypher
-        assert params == {"value_kind": "boolean"}
+        assert "dm.value_kind = $value_kind" not in cypher
+        assert "value_kind" not in params
 
     def test_metric_types_filter(self):
         cypher, params = build_genes_by_boolean_metric_diagnostics(
@@ -6504,12 +6550,12 @@ class TestBuildGenesByBooleanMetricDiagnostics:
         assert "dm.id IN $derived_metric_ids" in cypher
         assert params["derived_metric_ids"] == ["dm:abc"]
 
-    def test_organism_filter(self):
-        cypher, params = build_genes_by_boolean_metric_diagnostics(
-            metric_types=["vesicle_proteome_member"], organism="MED4")
-        assert ("ALL(word IN split(toLower($organism), ' ')"
-                " WHERE toLower(dm.organism_name) CONTAINS word)") in cypher
-        assert params["organism"] == "MED4"
+    def test_organism_not_a_query_predicate(self):
+        # (llm-review 2b.3) organism is no longer a builder param.
+        import pytest
+        with pytest.raises(TypeError):
+            build_genes_by_boolean_metric_diagnostics(
+                metric_types=["vesicle_proteome_member"], organism="MED4")
 
     def test_scoping_filters_combine(self):
         cypher, params = build_genes_by_boolean_metric_diagnostics(
@@ -6537,11 +6583,11 @@ class TestBuildGenesByBooleanMetricDiagnostics:
         assert params["publication_doi"] == ["10.1/foo"]
         assert params["experiment_ids"] == ["exp:1"]
 
-    def test_value_kind_hardcoded_boolean(self):
+    def test_value_kind_not_a_query_predicate(self):
         cypher, params = build_genes_by_boolean_metric_diagnostics(
             metric_types=["vesicle_proteome_member"])
-        assert "dm.value_kind = $value_kind" in cypher
-        assert params["value_kind"] == "boolean"
+        assert "dm.value_kind = $value_kind" not in cypher
+        assert "value_kind" not in params
 
     def test_returns_expected_columns(self):
         cypher, _ = build_genes_by_boolean_metric_diagnostics(
@@ -6619,7 +6665,7 @@ class TestBuildGenesByBooleanMetricSummary:
             "name:        head([x IN rows WHERE x.dm_id = dm_id | x.dm_name])",
             "metric_type: head([x IN rows WHERE x.dm_id = dm_id | x.mt])",
             "value_kind:  head([x IN rows WHERE x.dm_id = dm_id | x.vk])",
-            "count:       size([x IN rows WHERE x.dm_id = dm_id])",
+            "count:       size([x IN filtered WHERE x.dm_id = dm_id])",
             "true_count:  size([x IN rows WHERE x.dm_id = dm_id AND x.value = 'flagged'])",
             "false_count: size([x IN rows WHERE x.dm_id = dm_id AND x.value = 'not_flagged'])",
             "dm_total_gene_count: head([x IN rows WHERE x.dm_id = dm_id | x.dm_total])",
@@ -6631,6 +6677,33 @@ class TestBuildGenesByBooleanMetricSummary:
         for prop in ["dm.total_gene_count", "dm.flag_true_count",
                      "dm.flag_false_count"]:
             assert prop in cypher, f"missing precomputed DM prop: {prop}"
+
+    def test_by_metric_lists_every_selected_dm_not_just_filtered(self):
+        # (llm-review 2b.3) by_metric iterates apoc.coll.toSet over `rows`
+        # (all edges for selected DMs), not `filtered` (post-flag subset)
+        # — a positive-only DM under flag=False keeps its row (count=0)
+        # instead of vanishing from the envelope.
+        cypher, _ = build_genes_by_boolean_metric_summary(
+            derived_metric_ids=["dm:abc"], flag=False)
+        assert (
+            "[dm_id IN apoc.coll.toSet([x IN rows | x.dm_id]) |"
+        ) in cypher
+
+    def test_flag_match_computed_not_hard_filtered(self):
+        # flag is no longer a hard MATCH-time WHERE predicate — it's a
+        # per-row `flag_match` field, applied only to the `filtered`
+        # collection that feeds total_matching / by_organism / etc.
+        cypher, params = build_genes_by_boolean_metric_summary(
+            derived_metric_ids=["dm:abc"], flag=False)
+        assert "flag_match: r.value = $flag_str" in cypher
+        assert "[x IN rows WHERE x.flag_match] AS filtered" in cypher
+        assert params["flag_str"] == "not_flagged"
+
+    def test_no_flag_filter_matches_everything(self):
+        cypher, params = build_genes_by_boolean_metric_summary(
+            derived_metric_ids=["dm:abc"])
+        assert "flag_match: true," in cypher
+        assert "flag_str" not in params
 
 
 class TestBuildGenesByBooleanMetric:
@@ -6737,10 +6810,12 @@ class TestBuildGenesByCategoricalMetricDiagnostics:
     """Unit tests for build_genes_by_categorical_metric_diagnostics (no Neo4j)."""
 
     def test_no_filters(self):
-        cypher, params = build_genes_by_categorical_metric_diagnostics()
+        # (llm-review 2b.3) no hardcoded value_kind guard.
+        cypher, params = build_genes_by_categorical_metric_diagnostics(
+            metric_types=["predicted_subcellular_localization"])
         assert "MATCH (dm:DerivedMetric)" in cypher
-        assert "dm.value_kind = $value_kind" in cypher
-        assert params == {"value_kind": "categorical"}
+        assert "dm.value_kind = $value_kind" not in cypher
+        assert "value_kind" not in params
 
     def test_metric_types_filter(self):
         cypher, params = build_genes_by_categorical_metric_diagnostics(
@@ -6754,13 +6829,13 @@ class TestBuildGenesByCategoricalMetricDiagnostics:
         assert "dm.id IN $derived_metric_ids" in cypher
         assert params["derived_metric_ids"] == ["dm:abc"]
 
-    def test_organism_filter(self):
-        cypher, params = build_genes_by_categorical_metric_diagnostics(
-            metric_types=["predicted_subcellular_localization"],
-            organism="MED4")
-        assert ("ALL(word IN split(toLower($organism), ' ')"
-                " WHERE toLower(dm.organism_name) CONTAINS word)") in cypher
-        assert params["organism"] == "MED4"
+    def test_organism_not_a_query_predicate(self):
+        # (llm-review 2b.3) organism is no longer a builder param.
+        import pytest
+        with pytest.raises(TypeError):
+            build_genes_by_categorical_metric_diagnostics(
+                metric_types=["predicted_subcellular_localization"],
+                organism="MED4")
 
     def test_scoping_filters_combine(self):
         cypher, params = build_genes_by_categorical_metric_diagnostics(
@@ -6783,11 +6858,11 @@ class TestBuildGenesByCategoricalMetricDiagnostics:
         assert " AND " in where_block
         assert params["compartment"] == "cell"
 
-    def test_value_kind_hardcoded_categorical(self):
+    def test_value_kind_not_a_query_predicate(self):
         cypher, params = build_genes_by_categorical_metric_diagnostics(
             metric_types=["predicted_subcellular_localization"])
-        assert "dm.value_kind = $value_kind" in cypher
-        assert params["value_kind"] == "categorical"
+        assert "dm.value_kind = $value_kind" not in cypher
+        assert "value_kind" not in params
 
     def test_returns_expected_columns(self):
         cypher, _ = build_genes_by_categorical_metric_diagnostics(

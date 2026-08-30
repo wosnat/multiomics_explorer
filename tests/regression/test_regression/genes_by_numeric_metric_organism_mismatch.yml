@@ -1,0 +1,26 @@
+by_compartment: []
+by_experiment: []
+by_metric: []
+by_organism: []
+by_publication: []
+case_id: genes_by_numeric_metric_organism_mismatch
+excluded_derived_metrics: []
+genes_per_metric_max: 0
+genes_per_metric_median: 0.0
+not_found_ids: []
+not_found_metric_types: []
+not_matched_ids: []
+not_matched_metric_types: []
+not_matched_organism: MIT9313
+offset: 0
+results: []
+returned: 0
+row_count: 0
+top_categories: []
+total_derived_metrics: 0
+total_genes: 0
+total_matching: 0
+truncated: false
+warnings:
+- 'organism ''MIT9313'' has no edges for the selected DM(s); they belong to: Prochlorococcus
+  MED4'

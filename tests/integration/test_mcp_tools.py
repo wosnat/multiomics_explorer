@@ -2368,22 +2368,29 @@ class TestGenesByBooleanMetric:
 
     @pytest.mark.asyncio
     async def test_flag_false_zero_rows(self, tool_fns, conn):
-        """flag=False → 0 rows (positive-only KG storage today).
+        """flag=False → 0 detail rows (positive-only KG storage today).
 
-        With the edge-level filter active, by_metric is necessarily empty
-        (no surviving 'false' edges). The "dm_false_count echoes 0" signal
-        is verified separately in the no-flag-filter test above (same DMs).
+        by_metric keeps a zero-count entry per selected DM (llm-review
+        2b.3) instead of the DM vanishing from the envelope — count and
+        false_count both read 0, dm_false_count confirms positive-only.
+        A warning names each positive-only DM.
         """
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["genes_by_boolean_metric"](
             ctx, metric_types=["vesicle_proteome_member"], flag=False, limit=10)
         assert response.total_matching == 0
         assert response.returned == 0
-        # All `r.value='false'` filtered out → no DMs contribute rows
-        assert response.by_metric == []
-        # excluded_derived_metrics / warnings always [] for boolean
+        assert len(response.by_metric) == 2  # MED4 + MIT9313 DMs, both kept
+        for bm in response.by_metric:
+            assert bm.count == 0
+            assert bm.false_count == 0
+            assert bm.dm_false_count == 0
+        # excluded_derived_metrics always [] for boolean (no gates)
         assert response.excluded_derived_metrics == []
-        assert response.warnings == []
+        assert any(
+            "stores positive flags only" in w and "false_count" in w
+            for w in response.warnings
+        )
 
     @pytest.mark.asyncio
     async def test_locus_tags_scoping(self, tool_fns, conn):
@@ -2404,8 +2411,11 @@ class TestGenesByBooleanMetric:
         assert response.not_matched_ids == []
 
     @pytest.mark.asyncio
-    async def test_kind_mismatch_surfaces_as_not_found_ids(self, tool_fns, conn):
-        """Numeric DM ID passed to boolean tool → not_found_ids, no raise."""
+    async def test_kind_mismatch_surfaces_as_not_matched_with_warning(
+            self, tool_fns, conn):
+        """Numeric DM ID passed to boolean tool → not_matched_ids (it
+        genuinely exists, just as a different kind) + a sibling-tool
+        warning, no raise (llm-review 2b.3)."""
         numeric_dm_id = (
             "derived_metric:journal.pone.0043432:"
             "table_s2_waldbauer_diel_metrics:damping_ratio"
@@ -2415,7 +2425,13 @@ class TestGenesByBooleanMetric:
             ctx, derived_metric_ids=[numeric_dm_id], limit=5)
         assert response.total_matching == 0
         assert response.results == []
-        assert response.not_found_ids == [numeric_dm_id]
+        assert response.not_found_ids == []
+        assert response.not_matched_ids == [numeric_dm_id]
+        assert any(
+            f"{numeric_dm_id} exists as value_kind=numeric" in w
+            and "genes_by_numeric_metric" in w
+            for w in response.warnings
+        )
 
 
 @pytest.mark.kg
@@ -2479,8 +2495,10 @@ class TestGenesByCategoricalMetric:
             assert cat in msg, f"missing '{cat}' from error message: {msg}"
 
     @pytest.mark.asyncio
-    async def test_kind_mismatch_surfaces_as_not_found_ids(self, tool_fns, conn):
-        """Numeric DM ID passed to categorical tool → not_found_ids, no raise."""
+    async def test_kind_mismatch_surfaces_as_not_matched_with_warning(
+            self, tool_fns, conn):
+        """Numeric DM ID passed to categorical tool → not_matched_ids +
+        a sibling-tool warning, no raise (llm-review 2b.3)."""
         numeric_dm_id = (
             "derived_metric:journal.pone.0043432:"
             "table_s2_waldbauer_diel_metrics:damping_ratio"
@@ -2490,7 +2508,13 @@ class TestGenesByCategoricalMetric:
             ctx, derived_metric_ids=[numeric_dm_id], limit=5)
         assert response.total_matching == 0
         assert response.results == []
-        assert response.not_found_ids == [numeric_dm_id]
+        assert response.not_found_ids == []
+        assert response.not_matched_ids == [numeric_dm_id]
+        assert any(
+            f"{numeric_dm_id} exists as value_kind=numeric" in w
+            and "genes_by_numeric_metric" in w
+            for w in response.warnings
+        )
 
     @pytest.mark.asyncio
     async def test_by_category_rename_envelope_and_nested(self, tool_fns, conn):

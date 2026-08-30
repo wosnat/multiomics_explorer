@@ -7,10 +7,13 @@ Drill into categorical DerivedMetric edges — one row per
 by design.
 
 Selection is `derived_metric_ids` XOR `metric_types` (exactly one
-required); wrong-kind IDs (numeric / boolean) surface silently in
-`not_found_ids`. The `categories` filter must be a subset of the
-union of selected DMs' `allowed_categories` — unknown values raise
-`ValueError` listing the allowed set. Pre-flight via
+required); an id/metric_type that exists as a different kind
+(numeric / boolean) moves to `not_matched_ids` /
+`not_matched_metric_types` with a `warnings` entry naming the
+sibling tool — it is never silently dropped into `not_found_*`.
+The `categories` filter must be a subset of the union of selected
+DMs' `allowed_categories` — unknown values raise `ValueError`
+listing the allowed set. Pre-flight via
 `list_derived_metrics(value_kind='categorical')` to see each DM's
 allowed set. See `docs://guide/conventions` for the full DM family
 gating contract.
@@ -19,14 +22,16 @@ The `by_metric` envelope rollup pairs filtered-slice category
 histogram (`by_category`) with full-DM precomputed histogram
 (`dm_by_category`) plus the schema-declared `allowed_categories`,
 so callers can detect declared-but-unobserved categories without an
-extra call. `excluded_derived_metrics` / `warnings` are always []
-here (no gates apply); kept for envelope-shape consistency.
+extra call. `excluded_derived_metrics` is always [] here (no
+rankable / has_p_value gates apply to categorical DMs — kept for
+envelope-shape consistency); `warnings` carries closed-vocabulary,
+organism-existence, and kind-mismatch notices.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| derived_metric_ids | list[string] \| None | None | Categorical DerivedMetric node IDs. Use when the same `metric_type` appears across organisms / publications and you need to pin one. Discover IDs via `list_derived_metrics(value_kind='categorical')`. Mutually exclusive with `metric_types`. Wrong-kind IDs (numeric / boolean) surface silently in `not_found_ids`. |
+| derived_metric_ids | list[string] \| None | None | Categorical DerivedMetric node IDs. Use when the same `metric_type` appears across organisms / publications and you need to pin one. Discover IDs via `list_derived_metrics(value_kind='categorical')`. Mutually exclusive with `metric_types`. An id that exists as a different kind (numeric / boolean) moves to `not_matched_ids` with a `warnings` entry naming the sibling tool. |
 | metric_types | list[string] \| None | None | Categorical metric-type tags (e.g. ['predicted_subcellular_localization', 'darkness_survival_class']). Unions every DM carrying that tag, then narrows by scoping filters. Same tag can span organisms / publications — pin one specific DM via `derived_metric_ids` instead. Mutually exclusive with `derived_metric_ids`. |
 | organism | string \| None | None | Organism to scope the DM set to. Accepts short strain code ('MED4', 'NATL2A', 'MIT9313') or full name; word-based, case-insensitive match. Single-organism is **not** enforced — omit to drill across all organisms a metric_type spans. |
 | locus_tags | list[string] \| None | None | Restrict drill-down to a specific gene set (e.g. DE hits from `differential_expression_by_gene`). Filter on `g.locus_tag IN $locus_tags` post-MATCH. Genes with no edge for the selected DM produce no row. |
@@ -64,11 +69,11 @@ total_matching, total_derived_metrics, total_genes, by_organism, by_compartment,
 - **by_metric** (list[GenesByCategoricalMetricBreakdown]): Per-DM rollup: filtered-slice category histogram + full-DM precomputed histogram. Sorted by count desc.
 - **genes_per_metric_max** (int): Largest per-DM gene count.
 - **genes_per_metric_median** (float): Median per-DM gene count.
-- **not_found_ids** (list[string]): `derived_metric_ids` inputs not present in KG (or scoped out / wrong value_kind).
-- **not_matched_ids** (list[string]): `derived_metric_ids` in KG but produced 0 rows after edge-level filters.
+- **not_found_ids** (list[string]): `derived_metric_ids` inputs absent from the KG entirely (any kind, any organism), or scoped out by compartment / treatment_type / background_factors / growth_phases / publication_doi / experiment_ids.
+- **not_matched_ids** (list[string]): `derived_metric_ids` that exist but produced 0 rows — either a different `value_kind` (see `warnings` for the sibling tool to use) or 0 rows after edge-level filters.
 - **not_found_metric_types** (list[string]): `metric_types` inputs that match no DM after scoping.
 - **not_matched_metric_types** (list[string]): `metric_types` whose DMs produced 0 rows.
-- **not_matched_organism** (string | None): `organism` arg that matched no surviving DM.
+- **not_matched_organism** (string | None): `organism` arg that matched no surviving (correct-kind) DM — set only when the DM(s) genuinely exist elsewhere; `warnings` lists the organisms they belong to.
 - **excluded_derived_metrics** (list[ExcludedDerivedMetric]): Always [] for categorical DMs (no rankable / has_p_value gates). Kept for cross-tool envelope-shape consistency.
 - **warnings** (list[string]): No rankable / has_p_value gates exist for categorical DMs, so excluded_derived_metrics stays []; warnings still carries a closed-vocabulary filter value (compartment / treatment_type / background_factors / growth_phases) not found in the live vocabulary, or an `organism` that matches no OrganismTaxon at all (distinct from not_matched_organism).
 - **returned** (int): Length of results list.

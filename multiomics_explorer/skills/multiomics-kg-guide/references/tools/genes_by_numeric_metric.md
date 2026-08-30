@@ -8,9 +8,15 @@ Drill into numeric DerivedMetric edges — one row per (gene × DM).
 row shape as `gene_derived_metrics`). Cross-organism by design.
 
 Selection is `derived_metric_ids` XOR `metric_types` (exactly one
-required). Rankable-gated filters (`bucket`, `min/max_percentile`,
-`max_rank`) raise on all-non-rankable selection, soft-exclude on
-mixed input. `has_p_value`-gated filters (`significant_only`,
+required); an id/metric_type that exists as a different kind
+(boolean / categorical) moves to `not_matched_ids` /
+`not_matched_metric_types` with a `warnings` entry naming the
+sibling tool, and a correct-kind DM outside the requested
+`organism` surfaces via `not_matched_organism` (also warned) —
+neither is silently dropped into `not_found_*`. Rankable-gated
+filters (`bucket`, `min/max_percentile`, `max_rank`) raise on
+all-non-rankable selection, soft-exclude on mixed input.
+`has_p_value`-gated filters (`significant_only`,
 `max_adjusted_p_value`) raise in the current KG (no DM carries
 p-values). Pre-flight via
 `list_derived_metrics(value_kind='numeric', rankable=True)`. See
@@ -26,7 +32,7 @@ primary diagnostic when a real DM produces zero rows.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| derived_metric_ids | list[string] \| None | None | DerivedMetric node IDs to drill into. Use when the same `metric_type` appears across publications / organisms and you need to pin one. Discover IDs via `list_derived_metrics`. Mutually exclusive with `metric_types`. |
+| derived_metric_ids | list[string] \| None | None | DerivedMetric node IDs to drill into. Use when the same `metric_type` appears across publications / organisms and you need to pin one. Discover IDs via `list_derived_metrics`. Mutually exclusive with `metric_types`. An id that exists as a different kind (boolean / categorical) moves to `not_matched_ids` with a `warnings` entry naming the sibling tool. |
 | metric_types | list[string] \| None | None | Metric-type tags (e.g. ['damping_ratio', 'diel_amplitude_protein_log2']). Unions every DM carrying that tag, then narrows by scoping filters. Same tag can span organisms / publications — pin one specific DM via `derived_metric_ids` instead. Mutually exclusive with `derived_metric_ids`. |
 | organism | string \| None | None | Organism to scope the DM set to. Accepts short strain code ('MED4', 'NATL2A', 'MIT9312') or full name; word-based, case-insensitive match. Single-organism is **not** enforced — omit to drill across all organisms a metric_type spans. |
 | locus_tags | list[string] \| None | None | Restrict drill-down to a specific gene set (e.g. DE hits from `differential_expression_by_gene`). Filter on `g.locus_tag IN $locus_tags` post-MATCH. Genes with no edge for the selected DM produce no row (silent — surfaced via `total_genes` shortfall). |
@@ -40,7 +46,7 @@ primary diagnostic when a real DM produces zero rows.
 | max_value | float \| None | None | Upper bound on `r.value`. Always applicable. |
 | min_percentile | float \| None | None | Lower bound on `r.metric_percentile` (0-100). **Rankable-gated** — raises if every selected DM has `rankable=False`. Soft-excludes non-rankable DMs from mixed input, surfaced in `excluded_derived_metrics`. |
 | max_percentile | float \| None | None | Upper bound on `r.metric_percentile`. **Rankable-gated.** |
-| bucket | list[string] \| None | None | Bucket label(s) — subset of {'top_decile','top_quartile','mid','low'}. **Rankable-gated.** Buckets are decile / quartile splits computed at import time per DM. |
+| bucket | list[string ('top_decile', 'top_quartile', 'mid', 'low')] \| None | None | Bucket label(s). **Rankable-gated.** Buckets are decile / quartile splits computed at import time per DM. |
 | max_rank | int \| None | None | Cap on `r.rank_by_metric` (1 = highest). Use for top-N drill-down. **Rankable-gated.** |
 | significant_only | bool | False | Filter to `r.significant='significant'`. **has_p_value-gated** — raises in the current KG (no DM has p-values yet). Forward-compat surface; check `list_derived_metrics(has_p_value=True)` before using. |
 | max_adjusted_p_value | float \| None | None | Upper bound on `r.adjusted_p_value`. **has_p_value-gated**. |
@@ -70,11 +76,11 @@ total_matching, total_derived_metrics, total_genes, by_organism, by_compartment,
 - **top_categories** (list[GenesByNumericMetricCategoryBreakdown]): Top 5 gene categories by count.
 - **genes_per_metric_max** (int): Largest per-DM gene count.
 - **genes_per_metric_median** (float): Median per-DM gene count.
-- **not_found_ids** (list[string]): `derived_metric_ids` inputs not present in KG.
-- **not_matched_ids** (list[string]): `derived_metric_ids` in KG but produced 0 rows after edge-level filters (excludes gate-excluded DMs).
+- **not_found_ids** (list[string]): `derived_metric_ids` inputs absent from the KG entirely (any kind, any organism).
+- **not_matched_ids** (list[string]): `derived_metric_ids` that exist but produced 0 rows — either a different `value_kind` (see `warnings` for the sibling tool to use) or 0 rows after edge-level filters (excludes gate-excluded DMs).
 - **not_found_metric_types** (list[string]): `metric_types` inputs that match no DM after scoping.
 - **not_matched_metric_types** (list[string]): `metric_types` whose DMs produced 0 rows.
-- **not_matched_organism** (string | None): `organism` arg that matched no surviving DM.
+- **not_matched_organism** (string | None): `organism` arg that matched no surviving (correct-kind) DM — set only when the DM(s) genuinely exist elsewhere; `warnings` lists the organisms they belong to.
 - **excluded_derived_metrics** (list[ExcludedDerivedMetric]): DMs dropped by rankable / has_p_value gate. Always present (empty list when no exclusions).
 - **warnings** (list[string]): Human-readable summary of excluded_derived_metrics, a closed-vocabulary filter value (compartment / treatment_type / background_factors / growth_phases) not found in the live vocabulary, or an `organism` that matches no OrganismTaxon at all (distinct from not_matched_organism).
 - **returned** (int): Length of results list.

@@ -267,7 +267,7 @@ examples:
             "metric_type": "rapid_recovery_low_co2_shock",
             "value_kind": "boolean",
             "count": 38,
-            "true_count": 0,
+            "true_count": 13,
             "false_count": 38,
             "dm_total_gene_count": 51,
             "dm_true_count": 13,

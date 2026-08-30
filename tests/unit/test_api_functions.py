@@ -4778,6 +4778,83 @@ class TestGeneDerivedMetrics:
         assert data["not_found"] == ["PMM_FAKE"]
         assert data["not_matched"] == []
 
+    def test_sibling_warning_on_value_kind_mismatch_with_ids(
+            self, mock_summary_result):
+        # (llm-review 2b.3) value_kind + derived_metric_ids where the id
+        # actually resolves to a different kind → sibling-tool warning
+        # (the row itself already lands in not_matched via the
+        # value_kind-gated OPTIONAL MATCH; this only adds the warning).
+        from unittest.mock import MagicMock, patch
+        mock_conn = MagicMock()
+        kind_rows = [{
+            "derived_metric_id": "dm:foo", "metric_type": "damping_ratio",
+            "value_kind": "numeric",
+        }]
+        mock_conn.execute_query.side_effect = [
+            kind_rows, mock_summary_result, [],
+        ]
+        with patch("multiomics_explorer.api.functions._validate_organism_inputs"):
+            data = api.gene_derived_metrics(
+                ["PMM1714"], derived_metric_ids=["dm:foo"],
+                value_kind="boolean", conn=mock_conn,
+            )
+        assert any(
+            "dm:foo exists as value_kind=numeric" in w
+            and "genes_by_numeric_metric" in w
+            for w in data["warnings"]
+        )
+
+    def test_sibling_warning_on_value_kind_mismatch_with_metric_types(
+            self, mock_summary_result):
+        from unittest.mock import MagicMock, patch
+        mock_conn = MagicMock()
+        kind_rows = [{
+            "derived_metric_id": "dm:foo", "metric_type": "damping_ratio",
+            "value_kind": "numeric",
+        }]
+        mock_conn.execute_query.side_effect = [
+            kind_rows, mock_summary_result, [],
+        ]
+        with patch("multiomics_explorer.api.functions._validate_organism_inputs"):
+            data = api.gene_derived_metrics(
+                ["PMM1714"], metric_types=["damping_ratio"],
+                value_kind="boolean", conn=mock_conn,
+            )
+        assert any(
+            "damping_ratio exists as value_kind=numeric" in w
+            and "genes_by_numeric_metric" in w
+            for w in data["warnings"]
+        )
+
+    def test_no_sibling_warning_when_kind_matches(self, mock_summary_result):
+        from unittest.mock import MagicMock, patch
+        mock_conn = MagicMock()
+        kind_rows = [{
+            "derived_metric_id": "dm:foo", "metric_type": "damping_ratio",
+            "value_kind": "numeric",
+        }]
+        mock_conn.execute_query.side_effect = [
+            kind_rows, mock_summary_result, [],
+        ]
+        with patch("multiomics_explorer.api.functions._validate_organism_inputs"):
+            data = api.gene_derived_metrics(
+                ["PMM1714"], derived_metric_ids=["dm:foo"],
+                value_kind="numeric", conn=mock_conn,
+            )
+        assert not any("exists as value_kind=" in w for w in data["warnings"])
+
+    def test_no_kind_lookup_query_without_value_kind(self, mock_summary_result):
+        # No value_kind filter → no sibling-lookup query (only summary +
+        # detail).
+        from unittest.mock import MagicMock, patch
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [mock_summary_result, []]
+        with patch("multiomics_explorer.api.functions._validate_organism_inputs"):
+            api.gene_derived_metrics(
+                ["PMM1714"], derived_metric_ids=["dm:foo"], conn=mock_conn,
+            )
+        assert mock_conn.execute_query.call_count == 2
+
 
 # ---------------------------------------------------------------------------
 # genes_by_numeric_metric
@@ -5015,6 +5092,60 @@ class TestGenesByNumericMetric:
             conn=mock_conn,
         )
         assert data["not_matched_organism"] is None
+
+    def test_not_matched_organism_warning_lists_dm_organisms(
+            self, diag_rankable, summary_row, monkeypatch):
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_rankable, summary_row, []]
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"],
+            organism="Alteromonas",
+            conn=mock_conn,
+        )
+        assert any("Prochlorococcus MED4" in w for w in data["warnings"])
+
+    def test_organism_mismatch_not_confused_with_absent_metric_type(
+            self, monkeypatch):
+        # (llm-review 2b.3 bug fix) organism passed + metric_type doesn't
+        # exist at all (any organism) → not_matched_organism stays None.
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [[]]  # diagnostics empty
+        data = api.genes_by_numeric_metric(
+            metric_types=["totally_fake_metric_xyz"],
+            organism="MED4",
+            conn=mock_conn,
+        )
+        assert data["not_matched_organism"] is None
+        assert data["not_found_metric_types"] == ["totally_fake_metric_xyz"]
+
+    def test_kind_mismatch_moves_to_not_matched_with_sibling_warning(self):
+        # A boolean DM id passed here is found by diagnostics (no more
+        # value_kind predicate) but its actual kind differs — moves to
+        # not_matched_ids with a sibling-tool warning.
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [[{
+            "derived_metric_id": "dm:vp_med4",
+            "metric_type": "vesicle_proteome_member",
+            "value_kind": "boolean",
+            "name": "Vesicle proteome member (MED4)",
+            "rankable": False,
+            "has_p_value": False,
+            "total_gene_count": 32,
+            "organism_name": "Prochlorococcus MED4",
+        }]]
+        data = api.genes_by_numeric_metric(
+            derived_metric_ids=["dm:vp_med4"], conn=mock_conn,
+        )
+        assert mock_conn.execute_query.call_count == 1  # short-circuit
+        assert data["not_found_ids"] == []
+        assert data["not_matched_ids"] == ["dm:vp_med4"]
+        assert any(
+            "dm:vp_med4 exists as value_kind=boolean" in w
+            and "genes_by_boolean_metric" in w
+            for w in data["warnings"]
+        )
 
     def test_top_categories_capped_at_5(self, diag_rankable):
         # 7 categories in raw — only top 5 should survive
@@ -5266,17 +5397,67 @@ class TestGenesByBooleanMetric:
         with pytest.raises(ValueError, match="must provide one of"):
             api.genes_by_boolean_metric(conn=MagicMock())
 
-    def test_kind_mismatch_in_not_found_ids(self, summary_row):
-        # Pass a numeric DM id; diagnostics' value_kind='boolean' filter
-        # gives zero rows → id surfaces in not_found_ids and we
-        # short-circuit before summary/detail.
+    def test_kind_mismatch_moves_to_not_matched_with_sibling_warning(self):
+        # (llm-review 2b.3) diagnostics no longer filters by value_kind —
+        # the numeric DM is found, but its actual kind differs from what
+        # genes_by_boolean_metric expects, so it moves to not_matched_ids
+        # (not not_found_ids) with a sibling-tool warning.
         mock_conn = MagicMock()
-        mock_conn.execute_query.side_effect = [[]]  # diagnostics empty
+        mock_conn.execute_query.side_effect = [[{
+            "derived_metric_id": "dm:numeric_dr",
+            "metric_type": "damping_ratio",
+            "value_kind": "numeric",
+            "name": "Damping ratio",
+            "total_gene_count": 320,
+            "organism_name": "Prochlorococcus MED4",
+        }]]
         data = api.genes_by_boolean_metric(
             derived_metric_ids=["dm:numeric_dr"], conn=mock_conn,
         )
         assert mock_conn.execute_query.call_count == 1  # short-circuit
-        assert data["not_found_ids"] == ["dm:numeric_dr"]
+        assert data["not_found_ids"] == []
+        assert data["not_matched_ids"] == ["dm:numeric_dr"]
+        assert data["total_matching"] == 0
+        assert data["results"] == []
+        assert any(
+            "dm:numeric_dr exists as value_kind=numeric" in w
+            and "genes_by_numeric_metric" in w
+            for w in data["warnings"]
+        )
+
+    def test_wrong_kind_metric_type_moves_to_not_matched_with_warning(self):
+        # metric_types entry that only maps to a numeric DM.
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [[{
+            "derived_metric_id": "dm:dr",
+            "metric_type": "damping_ratio",
+            "value_kind": "numeric",
+            "name": "Damping ratio",
+            "total_gene_count": 320,
+            "organism_name": "Prochlorococcus MED4",
+        }]]
+        data = api.genes_by_boolean_metric(
+            metric_types=["damping_ratio"], conn=mock_conn,
+        )
+        assert data["not_found_metric_types"] == []
+        assert data["not_matched_metric_types"] == ["damping_ratio"]
+        assert any(
+            "damping_ratio exists as value_kind=numeric" in w
+            and "genes_by_numeric_metric" in w
+            for w in data["warnings"]
+        )
+
+    def test_truly_absent_id_still_not_found(self):
+        # An id absent from the KG entirely (any kind) still lands in
+        # not_found_ids — the kind-mismatch reclassification only applies
+        # to ids diagnostics actually returns.
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [[]]
+        data = api.genes_by_boolean_metric(
+            derived_metric_ids=["dm:totally_fake"], conn=mock_conn,
+        )
+        assert data["not_found_ids"] == ["dm:totally_fake"]
+        assert data["not_matched_ids"] == []
         assert data["total_matching"] == 0
         assert data["results"] == []
 
@@ -5362,6 +5543,81 @@ class TestGenesByBooleanMetric:
         det_kwargs = mock_conn.execute_query.call_args_list[2].kwargs
         assert sum_kwargs.get("flag_str") == "flagged"
         assert det_kwargs.get("flag_str") == "flagged"
+
+    def test_flag_false_on_positive_only_dm_keeps_row_and_warns(
+            self, diag_boolean):
+        # (llm-review 2b.3) flag=False against a positive-only DM
+        # (dm_false_count=0) keeps its by_metric row (count/false_count
+        # both 0) and appends a warning pointing at false_count.
+        summary_positive_only = [{
+            "total_matching": 0, "total_derived_metrics": 0,
+            "total_genes": 0,
+            "by_organism": [], "by_compartment": [], "by_publication": [],
+            "by_experiment": [], "by_value": [],
+            "by_metric": [{
+                "derived_metric_id": "dm:vp_med4",
+                "name": "Vesicle proteome member (MED4)",
+                "metric_type": "vesicle_proteome_member",
+                "value_kind": "boolean",
+                "count": 0, "true_count": 32, "false_count": 0,
+                "dm_total_gene_count": 32, "dm_true_count": 32,
+                "dm_false_count": 0,
+            }],
+            "top_categories_raw": [],
+            "genes_per_metric_max": 0, "genes_per_metric_median": 0.0,
+        }]
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            diag_boolean, summary_positive_only, [],
+        ]
+        data = api.genes_by_boolean_metric(
+            metric_types=["vesicle_proteome_member"],
+            flag=False, conn=mock_conn,
+        )
+        assert len(data["by_metric"]) == 1
+        assert data["by_metric"][0]["derived_metric_id"] == "dm:vp_med4"
+        assert data["by_metric"][0]["count"] == 0
+        assert data["by_metric"][0]["false_count"] == 0
+        assert any(
+            "dm:vp_med4 stores positive flags only" in w
+            and "false_count" in w
+            for w in data["warnings"]
+        )
+
+    def test_organism_mismatch_not_confused_with_absent_metric_type(
+            self, monkeypatch):
+        # (llm-review 2b.3 bug fix) organism passed + metric_type doesn't
+        # exist at all (any organism) → not_matched_organism stays None
+        # (it's a not_found, not an organism mismatch).
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [[]]  # diagnostics empty
+        data = api.genes_by_boolean_metric(
+            metric_types=["totally_fake_metric_xyz"],
+            organism="MED4",
+            conn=mock_conn,
+        )
+        assert data["not_matched_organism"] is None
+        assert data["not_found_metric_types"] == ["totally_fake_metric_xyz"]
+
+    def test_not_matched_organism_set_when_dm_exists_elsewhere(
+            self, diag_boolean, monkeypatch):
+        # DM genuinely exists (MED4) but the requested organism doesn't
+        # match — not_matched_organism set, warning lists the DM's
+        # organism(s), short-circuits before summary/detail.
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_boolean]
+        data = api.genes_by_boolean_metric(
+            metric_types=["vesicle_proteome_member"],
+            organism="Alteromonas",
+            conn=mock_conn,
+        )
+        assert mock_conn.execute_query.call_count == 1  # short-circuit
+        assert data["not_matched_organism"] == "Alteromonas"
+        assert any(
+            "Prochlorococcus MED4" in w for w in data["warnings"]
+        )
 
     def test_creates_conn_when_none(self, monkeypatch):
         # Patch GraphConnection so no real Neo4j call happens.
@@ -5569,17 +5825,42 @@ class TestGenesByCategoricalMetric:
         with pytest.raises(ValueError, match="must provide one of"):
             api.genes_by_categorical_metric(conn=MagicMock())
 
-    def test_kind_mismatch_in_not_found_ids(self):
-        # Pass a numeric / boolean DM id; diagnostics' value_kind='categorical'
-        # filter gives zero rows → id surfaces in not_found_ids and we
-        # short-circuit before summary/detail.
+    def test_kind_mismatch_moves_to_not_matched_with_sibling_warning(self):
+        # (llm-review 2b.3) a boolean DM id passed here is found by
+        # diagnostics (no more value_kind predicate) but its actual kind
+        # differs — moves to not_matched_ids with a sibling-tool warning.
         mock_conn = MagicMock()
-        mock_conn.execute_query.side_effect = [[]]  # diagnostics empty
+        mock_conn.execute_query.side_effect = [[{
+            "derived_metric_id": "dm:vp_med4",
+            "metric_type": "vesicle_proteome_member",
+            "value_kind": "boolean",
+            "name": "Vesicle proteome member (MED4)",
+            "total_gene_count": 32,
+            "organism_name": "Prochlorococcus MED4",
+            "allowed_categories": None,
+        }]]
         data = api.genes_by_categorical_metric(
             derived_metric_ids=["dm:vp_med4"], conn=mock_conn,
         )
         assert mock_conn.execute_query.call_count == 1  # short-circuit
-        assert data["not_found_ids"] == ["dm:vp_med4"]
+        assert data["not_found_ids"] == []
+        assert data["not_matched_ids"] == ["dm:vp_med4"]
+        assert data["total_matching"] == 0
+        assert data["results"] == []
+        assert any(
+            "dm:vp_med4 exists as value_kind=boolean" in w
+            and "genes_by_boolean_metric" in w
+            for w in data["warnings"]
+        )
+
+    def test_truly_absent_id_still_not_found(self):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [[]]  # diagnostics empty
+        data = api.genes_by_categorical_metric(
+            derived_metric_ids=["dm:totally_fake"], conn=mock_conn,
+        )
+        assert data["not_found_ids"] == ["dm:totally_fake"]
+        assert data["not_matched_ids"] == []
         assert data["total_matching"] == 0
         assert data["results"] == []
 

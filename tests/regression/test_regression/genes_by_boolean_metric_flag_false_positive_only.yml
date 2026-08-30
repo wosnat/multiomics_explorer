@@ -1,0 +1,37 @@
+by_compartment: []
+by_experiment: []
+by_metric:
+- count: 0
+  derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  dm_false_count: 0
+  dm_total_gene_count: 32
+  dm_true_count: 32
+  false_count: 0
+  metric_type: vesicle_proteome_member
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  true_count: 32
+  value_kind: boolean
+by_organism: []
+by_publication: []
+by_value: []
+case_id: genes_by_boolean_metric_flag_false_positive_only
+excluded_derived_metrics: []
+genes_per_metric_max: 0
+genes_per_metric_median: 0.0
+not_found_ids: []
+not_found_metric_types: []
+not_matched_ids: []
+not_matched_metric_types: []
+not_matched_organism: null
+offset: 0
+results: []
+returned: 0
+row_count: 0
+top_categories: []
+total_derived_metrics: 0
+total_genes: 0
+total_matching: 0
+truncated: false
+warnings:
+- derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  stores positive flags only — flag=False cannot match; read by_metric[*].false_count

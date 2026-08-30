@@ -6645,10 +6645,13 @@ def register_tools(mcp: FastMCP):
 
         Empty results are diagnosable via `not_found` (locus_tag absent from
         KG) and `not_matched` (in KG but no DM rows after filters — includes
-        kind-mismatch when `value_kind` is set). Pre-flight via
-        `list_derived_metrics(value_kind=...)` to see which DMs touch your
-        genes and whether they are rankable / has_p_value. See
-        `docs://guide/conventions` for the full DM family gating contract.
+        kind-mismatch when `value_kind` is set; `warnings` names the actual
+        kind and the sibling `genes_by_<kind>_metric` tool when a requested
+        `derived_metric_ids` / `metric_types` entry exists as a different
+        kind). Pre-flight via `list_derived_metrics(value_kind=...)` to see
+        which DMs touch your genes and whether they are rankable /
+        has_p_value. See `docs://guide/conventions` for the full DM family
+        gating contract.
 
         Routing: edge-level filters (bucket / percentile / rank / value
         thresholds) live on `genes_by_numeric_metric`; flag-level filters on
@@ -7620,11 +7623,15 @@ def register_tools(mcp: FastMCP):
             default=0.0, description="Median per-DM gene count.")
         not_found_ids: list[str] = Field(
             default_factory=list,
-            description="`derived_metric_ids` inputs not present in KG.")
+            description="`derived_metric_ids` inputs absent from the KG "
+                        "entirely (any kind, any organism).")
         not_matched_ids: list[str] = Field(
             default_factory=list,
-            description="`derived_metric_ids` in KG but produced 0 rows after "
-                        "edge-level filters (excludes gate-excluded DMs).")
+            description="`derived_metric_ids` that exist but produced 0 "
+                        "rows — either a different `value_kind` (see "
+                        "`warnings` for the sibling tool to use) or 0 rows "
+                        "after edge-level filters (excludes gate-excluded "
+                        "DMs).")
         not_found_metric_types: list[str] = Field(
             default_factory=list,
             description="`metric_types` inputs that match no DM after scoping.")
@@ -7633,7 +7640,10 @@ def register_tools(mcp: FastMCP):
             description="`metric_types` whose DMs produced 0 rows.")
         not_matched_organism: str | None = Field(
             default=None,
-            description="`organism` arg that matched no surviving DM.")
+            description="`organism` arg that matched no surviving (correct-"
+                        "kind) DM — set only when the DM(s) genuinely exist "
+                        "elsewhere; `warnings` lists the organisms they "
+                        "belong to.")
         excluded_derived_metrics: list[ExcludedDerivedMetric] = Field(
             default_factory=list,
             description="DMs dropped by rankable / has_p_value gate. Always "
@@ -7667,7 +7677,10 @@ def register_tools(mcp: FastMCP):
                         "same `metric_type` appears across publications / "
                         "organisms and you need to pin one. Discover IDs via "
                         "`list_derived_metrics`. Mutually exclusive with "
-                        "`metric_types`.",
+                        "`metric_types`. An id that exists as a different "
+                        "kind (boolean / categorical) moves to "
+                        "`not_matched_ids` with a `warnings` entry naming "
+                        "the sibling tool.",
         )] = None,
         metric_types: Annotated[list[str] | None, Field(
             description="Metric-type tags (e.g. ['damping_ratio', "
@@ -7735,12 +7748,14 @@ def register_tools(mcp: FastMCP):
                         "**Rankable-gated.**",
             ge=0, le=100,
         )] = None,
-        bucket: Annotated[list[str] | None, Field(
-            description="Bucket label(s) — subset of "
-                        "{'top_decile','top_quartile','mid','low'}. "
-                        "**Rankable-gated.** Buckets are decile / quartile "
-                        "splits computed at import time per DM.",
-        )] = None,
+        bucket: Annotated[
+            list[Literal["top_decile", "top_quartile", "mid", "low"]] | None,
+            Field(
+                description="Bucket label(s). **Rankable-gated.** Buckets "
+                            "are decile / quartile splits computed at "
+                            "import time per DM.",
+            ),
+        ] = None,
         max_rank: Annotated[int | None, Field(
             description="Cap on `r.rank_by_metric` (1 = highest). Use for "
                         "top-N drill-down. **Rankable-gated.**",
@@ -7789,9 +7804,15 @@ def register_tools(mcp: FastMCP):
         row shape as `gene_derived_metrics`). Cross-organism by design.
 
         Selection is `derived_metric_ids` XOR `metric_types` (exactly one
-        required). Rankable-gated filters (`bucket`, `min/max_percentile`,
-        `max_rank`) raise on all-non-rankable selection, soft-exclude on
-        mixed input. `has_p_value`-gated filters (`significant_only`,
+        required); an id/metric_type that exists as a different kind
+        (boolean / categorical) moves to `not_matched_ids` /
+        `not_matched_metric_types` with a `warnings` entry naming the
+        sibling tool, and a correct-kind DM outside the requested
+        `organism` surfaces via `not_matched_organism` (also warned) —
+        neither is silently dropped into `not_found_*`. Rankable-gated
+        filters (`bucket`, `min/max_percentile`, `max_rank`) raise on
+        all-non-rankable selection, soft-exclude on mixed input.
+        `has_p_value`-gated filters (`significant_only`,
         `max_adjusted_p_value`) raise in the current KG (no DM carries
         p-values). Pre-flight via
         `list_derived_metrics(value_kind='numeric', rankable=True)`. See
@@ -8052,12 +8073,17 @@ def register_tools(mcp: FastMCP):
             default=0.0, description="Median per-DM gene count.")
         not_found_ids: list[str] = Field(
             default_factory=list,
-            description="`derived_metric_ids` inputs not present in KG (or "
-                        "scoped out / wrong value_kind).")
+            description="`derived_metric_ids` inputs absent from the KG "
+                        "entirely (any kind, any organism), or scoped out "
+                        "by compartment / treatment_type / "
+                        "background_factors / growth_phases / "
+                        "publication_doi / experiment_ids.")
         not_matched_ids: list[str] = Field(
             default_factory=list,
-            description="`derived_metric_ids` in KG but produced 0 rows after "
-                        "edge-level filters.")
+            description="`derived_metric_ids` that exist but produced 0 "
+                        "rows — either a different `value_kind` (see "
+                        "`warnings` for the sibling tool to use) or 0 rows "
+                        "after edge-level filters.")
         not_found_metric_types: list[str] = Field(
             default_factory=list,
             description="`metric_types` inputs that match no DM after scoping.")
@@ -8066,7 +8092,10 @@ def register_tools(mcp: FastMCP):
             description="`metric_types` whose DMs produced 0 rows.")
         not_matched_organism: str | None = Field(
             default=None,
-            description="`organism` arg that matched no surviving DM.")
+            description="`organism` arg that matched no surviving (correct-"
+                        "kind) DM — set only when the DM(s) genuinely exist "
+                        "elsewhere; `warnings` lists the organisms they "
+                        "belong to.")
         excluded_derived_metrics: list[ExcludedDerivedMetric] = Field(
             default_factory=list,
             description="Always [] for boolean DMs (no rankable / has_p_value "
@@ -8101,9 +8130,10 @@ def register_tools(mcp: FastMCP):
                         "`metric_type` appears across organisms / publications "
                         "and you need to pin one. Discover IDs via "
                         "`list_derived_metrics(value_kind='boolean')`. "
-                        "Mutually exclusive with `metric_types`. Wrong-kind "
-                        "IDs (numeric / categorical) surface silently in "
-                        "`not_found_ids`.",
+                        "Mutually exclusive with `metric_types`. An id that "
+                        "exists as a different kind (numeric / categorical) "
+                        "moves to `not_matched_ids` with a `warnings` entry "
+                        "naming the sibling tool.",
         )] = None,
         metric_types: Annotated[list[str] | None, Field(
             description="Boolean metric-type tags (e.g. "
@@ -8188,16 +8218,20 @@ def register_tools(mcp: FastMCP):
         Cross-organism by design.
 
         Selection is `derived_metric_ids` XOR `metric_types` (exactly one
-        required); wrong-kind IDs (numeric / categorical) surface silently
-        in `not_found_ids`. Pre-flight via
-        `list_derived_metrics(value_kind='boolean')` to pick valid boolean
-        DMs. See `docs://guide/conventions` for the full DM family gating
-        contract.
+        required); an id/metric_type that exists as a different kind
+        (numeric / categorical) moves to `not_matched_ids` /
+        `not_matched_metric_types` with a `warnings` entry naming the
+        sibling tool — it is never silently dropped into `not_found_*`.
+        Pre-flight via `list_derived_metrics(value_kind='boolean')` to
+        pick valid boolean DMs. See `docs://guide/conventions` for the
+        full DM family gating contract.
 
         **Two storage conventions coexist:** 11 of 27 boolean DMs store
         both `flagged` and `not_flagged` edges (tested-absent is real
         biology — `flag=False` returns rows), the rest are positive-only
-        (`flag=False` → 0 rows). Read `by_metric[*].false_count` to tell
+        (`flag=False` → 0 detail rows, but the DM's `by_metric` entry is
+        kept with `count`/`false_count` both 0 — never dropped — plus a
+        `warnings` entry). Read `by_metric[*].false_count` to tell
         'not flagged' from 'not assessed'; `by_metric[*].dm_false_count`
         is the full-DM precomputed twin (0 on positive-only DMs).
         See `docs://guide/conventions`.
@@ -8205,8 +8239,10 @@ def register_tools(mcp: FastMCP):
         The `by_metric` envelope rollup pairs filtered-slice true/false
         tallies with full-DM precomputed counts so callers can read "32 of
         32 MED4 vesicle-proteome members" directly.
-        `excluded_derived_metrics` / `warnings` are always [] here (no
-        gates apply); kept for envelope-shape consistency.
+        `excluded_derived_metrics` is always [] here (no rankable /
+        has_p_value gates apply to boolean DMs — kept for envelope-shape
+        consistency); `warnings` carries closed-vocabulary,
+        organism-existence, kind-mismatch, and positive-only-flag notices.
         """
         selection_size = (
             len(derived_metric_ids) if derived_metric_ids is not None
@@ -8440,12 +8476,17 @@ def register_tools(mcp: FastMCP):
             default=0.0, description="Median per-DM gene count.")
         not_found_ids: list[str] = Field(
             default_factory=list,
-            description="`derived_metric_ids` inputs not present in KG (or "
-                        "scoped out / wrong value_kind).")
+            description="`derived_metric_ids` inputs absent from the KG "
+                        "entirely (any kind, any organism), or scoped out "
+                        "by compartment / treatment_type / "
+                        "background_factors / growth_phases / "
+                        "publication_doi / experiment_ids.")
         not_matched_ids: list[str] = Field(
             default_factory=list,
-            description="`derived_metric_ids` in KG but produced 0 rows after "
-                        "edge-level filters.")
+            description="`derived_metric_ids` that exist but produced 0 "
+                        "rows — either a different `value_kind` (see "
+                        "`warnings` for the sibling tool to use) or 0 rows "
+                        "after edge-level filters.")
         not_found_metric_types: list[str] = Field(
             default_factory=list,
             description="`metric_types` inputs that match no DM after scoping.")
@@ -8454,7 +8495,10 @@ def register_tools(mcp: FastMCP):
             description="`metric_types` whose DMs produced 0 rows.")
         not_matched_organism: str | None = Field(
             default=None,
-            description="`organism` arg that matched no surviving DM.")
+            description="`organism` arg that matched no surviving (correct-"
+                        "kind) DM — set only when the DM(s) genuinely exist "
+                        "elsewhere; `warnings` lists the organisms they "
+                        "belong to.")
         excluded_derived_metrics: list[ExcludedDerivedMetric] = Field(
             default_factory=list,
             description="Always [] for categorical DMs (no rankable / "
@@ -8490,9 +8534,10 @@ def register_tools(mcp: FastMCP):
                         "same `metric_type` appears across organisms / "
                         "publications and you need to pin one. Discover IDs "
                         "via `list_derived_metrics(value_kind='categorical')`."
-                        " Mutually exclusive with `metric_types`. Wrong-kind "
-                        "IDs (numeric / boolean) surface silently in "
-                        "`not_found_ids`.",
+                        " Mutually exclusive with `metric_types`. An id that "
+                        "exists as a different kind (numeric / boolean) "
+                        "moves to `not_matched_ids` with a `warnings` entry "
+                        "naming the sibling tool.",
         )] = None,
         metric_types: Annotated[list[str] | None, Field(
             description="Categorical metric-type tags (e.g. "
@@ -8575,10 +8620,13 @@ def register_tools(mcp: FastMCP):
         by design.
 
         Selection is `derived_metric_ids` XOR `metric_types` (exactly one
-        required); wrong-kind IDs (numeric / boolean) surface silently in
-        `not_found_ids`. The `categories` filter must be a subset of the
-        union of selected DMs' `allowed_categories` — unknown values raise
-        `ValueError` listing the allowed set. Pre-flight via
+        required); an id/metric_type that exists as a different kind
+        (numeric / boolean) moves to `not_matched_ids` /
+        `not_matched_metric_types` with a `warnings` entry naming the
+        sibling tool — it is never silently dropped into `not_found_*`.
+        The `categories` filter must be a subset of the union of selected
+        DMs' `allowed_categories` — unknown values raise `ValueError`
+        listing the allowed set. Pre-flight via
         `list_derived_metrics(value_kind='categorical')` to see each DM's
         allowed set. See `docs://guide/conventions` for the full DM family
         gating contract.
@@ -8587,8 +8635,10 @@ def register_tools(mcp: FastMCP):
         histogram (`by_category`) with full-DM precomputed histogram
         (`dm_by_category`) plus the schema-declared `allowed_categories`,
         so callers can detect declared-but-unobserved categories without an
-        extra call. `excluded_derived_metrics` / `warnings` are always []
-        here (no gates apply); kept for envelope-shape consistency.
+        extra call. `excluded_derived_metrics` is always [] here (no
+        rankable / has_p_value gates apply to categorical DMs — kept for
+        envelope-shape consistency); `warnings` carries closed-vocabulary,
+        organism-existence, and kind-mismatch notices.
         """
         selection_size = (
             len(derived_metric_ids) if derived_metric_ids is not None
