@@ -379,7 +379,7 @@ parameters and most output columns stay `bool`;
 `differential_expression_by_ortholog.experiments[*].is_time_course` and the
 `genes_by_boolean_metric.by_value` rollup surface the KG literal. On the DM
 side, tested-absent (`not_flagged`) edges exist on 11 of 27 boolean DMs —
-the rest are positive-only, so `genes_by_boolean_metric(flag=False)` is
+the rest are positive-only, so `genes_by_boolean_metric(flag_value=False)` is
 DM-dependent (read `by_metric[*].false_count`). `Assay_flags_metabolite`
 always stores both states.
 

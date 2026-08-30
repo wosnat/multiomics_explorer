@@ -370,10 +370,10 @@
 
 - id: genes_by_function_category_filter
   tool: genes_by_function
-  desc: Category filter restricts to Photosynthesis genes
+  desc: gene_categories filter restricts to Photosynthesis genes
   params:
     search_text: reaction centre
-    category: Photosynthesis
+    gene_categories: [Photosynthesis]
   expect:
     min_rows: 1
 
@@ -1070,7 +1070,7 @@
     value_kind/rankable moved behind verbose (parent-constant — also in `by_metric`).
   params:
     metric_types: ["damping_ratio"]
-    bucket: ["top_decile"]
+    metric_bucket: ["top_decile"]
   expect:
     min_rows: 5
     columns:
@@ -1083,11 +1083,11 @@
 - id: genes_by_numeric_metric_mixed_rankable_soft_exclude
   tool: genes_by_numeric_metric
   desc: |
-    Mixed rankable + non-rankable selection; bucket filter soft-excludes.
+    Mixed rankable + non-rankable selection; metric_bucket filter soft-excludes.
     rankable moved behind verbose.
   params:
     metric_types: ["damping_ratio", "peak_time_protein_h"]
-    bucket: ["top_decile"]
+    metric_bucket: ["top_decile"]
   expect:
     min_rows: 5
     columns:
@@ -1103,7 +1103,7 @@
     organism_name moved behind verbose (parent-constant — also in `by_organism`).
   params:
     metric_types: ["cell_abundance_biovolume_normalized"]
-    bucket: ["top_quartile"]
+    metric_bucket: ["top_quartile"]
   expect:
     min_rows: 5
     columns:
@@ -1211,13 +1211,13 @@
   tool: genes_by_boolean_metric
   desc: |
     vesicle_proteome_member is positive-only (no 'not_flagged' edges
-    stored) — flag=False returns 0 rows but keeps the DM's by_metric
+    stored) — flag_value=False returns 0 rows but keeps the DM's by_metric
     entry (count/false_count both 0) instead of dropping it, plus a
     warning pointing at by_metric[*].false_count (llm-review 2b.3).
   params:
     derived_metric_ids:
       - "derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member"
-    flag: false
+    flag_value: false
   expect:
     min_rows: 0
     columns: []

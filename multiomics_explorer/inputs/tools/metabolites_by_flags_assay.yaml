@@ -159,7 +159,7 @@ mistakes:
       'detected' / 'not_detected', bool on the surface) — about 69% of
       boolean rows are `flag_value=false`, and flag_value=False returns real
       rows. On the DM side only 11 of 27 boolean DMs store `not_flagged`
-      edges (the rest are positive-only), so `genes_by_boolean_metric(flag=False)`
+      edges (the rest are positive-only), so `genes_by_boolean_metric(flag_value=False)`
       is DM-dependent — read its `by_metric[*].dm_false_count` first.
 
   - wrong: "excluded_assays / warnings will surface gating diagnostics."

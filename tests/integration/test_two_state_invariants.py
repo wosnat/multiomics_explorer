@@ -69,8 +69,8 @@ def test_boolean_dm_flag_partition(conn):
     ids = [r["derived_metric_id"] for r in dms["results"]]
     assert ids
     allx = api.genes_by_boolean_metric(derived_metric_ids=ids, summary=True, conn=conn)
-    yes = api.genes_by_boolean_metric(derived_metric_ids=ids, flag=True, summary=True, conn=conn)
-    no = api.genes_by_boolean_metric(derived_metric_ids=ids, flag=False, summary=True, conn=conn)
+    yes = api.genes_by_boolean_metric(derived_metric_ids=ids, flag_value=True, summary=True, conn=conn)
+    no = api.genes_by_boolean_metric(derived_metric_ids=ids, flag_value=False, summary=True, conn=conn)
     assert yes["total_matching"] > 0 and no["total_matching"] > 0  # 11/27 DMs store not_flagged
     assert yes["total_matching"] + no["total_matching"] == allx["total_matching"]
     assert {bv["value"] for bv in allx["by_value"]} == {"flagged", "not_flagged"}

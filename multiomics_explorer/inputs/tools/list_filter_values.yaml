@@ -44,7 +44,7 @@ examples:
       Step 1: list_filter_values(filter_type="gene_category")
               → extract value strings from results
 
-      Step 2: genes_by_function(search_text="photosystem", category="Photosynthesis")
+      Step 2: genes_by_function(search_text="photosystem", gene_categories=["Photosynthesis"])
               → get photosynthesis genes matching "photosystem"
 
   - title: Discover BRITE trees, then scope enrichment
@@ -392,7 +392,7 @@ response_notes:
       docs://analysis/annotation_evidence.
 
 chaining:
-  - "list_filter_values → genes_by_function(category=...)"
+  - "list_filter_values → genes_by_function(gene_categories=...)"
   - "list_filter_values(filter_type='cluster_type') → list_clustering_analyses(cluster_type=...) / gene_clusters_by_gene(cluster_type=...)"
   - "list_filter_values('brite_tree') → ontology_landscape(tree=...) → pathway_enrichment(tree=...)"
   - "list_filter_values(filter_type='metric_type') → list_derived_metrics(metric_types=[...]) → genes_by_{kind}_metric"

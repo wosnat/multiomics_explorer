@@ -13,7 +13,7 @@ pivot live nodes and carry `count`; `cluster_type`, `treatment_type`,
 return `count=None`. Trust types are documented in
 docs://analysis/annotation_evidence.
 
-Routing: feed the returned `value`s into the corresponding filter — `gene_category` → `genes_by_function(category=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `growth_phase` → `list_experiments(growth_phases=[...])` / `list_derived_metrics(growth_phases=[...])`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`; `cluster_type` → `list_clustering_analyses` / `gene_clusters_by_gene`; `treatment_type` / `background_factors` → `list_experiments` / `list_derived_metrics` / `list_metabolite_assays` / `list_clustering_analyses`; `table_scope` → `list_experiments(table_scope=[...])`; the trust types → `sources` / `evidence` / `call_class` / `interpro_type` on `genes_by_ontology` and friends.
+Routing: feed the returned `value`s into the corresponding filter — `gene_category` → `genes_by_function(gene_categories=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `growth_phase` → `list_experiments(growth_phases=[...])` / `list_derived_metrics(growth_phases=[...])`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`; `cluster_type` → `list_clustering_analyses` / `gene_clusters_by_gene`; `treatment_type` / `background_factors` → `list_experiments` / `list_derived_metrics` / `list_metabolite_assays` / `list_clustering_analyses`; `table_scope` → `list_experiments(table_scope=[...])`; the trust types → `sources` / `evidence` / `call_class` / `interpro_type` on `genes_by_ontology` and friends.
 
 ## Parameters
 
@@ -128,7 +128,7 @@ list_filter_values(filter_type="brite_tree")
 Step 1: list_filter_values(filter_type="gene_category")
         → extract value strings from results
 
-Step 2: genes_by_function(search_text="photosystem", category="Photosynthesis")
+Step 2: genes_by_function(search_text="photosystem", gene_categories=["Photosynthesis"])
         → get photosynthesis genes matching "photosystem"
 ```
 
@@ -520,7 +520,7 @@ list_filter_values(filter_type="treatment_type")
 ## Chaining patterns
 
 ```
-list_filter_values → genes_by_function(category=...)
+list_filter_values → genes_by_function(gene_categories=...)
 list_filter_values(filter_type='cluster_type') → list_clustering_analyses(cluster_type=...) / gene_clusters_by_gene(cluster_type=...)
 list_filter_values('brite_tree') → ontology_landscape(tree=...) → pathway_enrichment(tree=...)
 list_filter_values(filter_type='metric_type') → list_derived_metrics(metric_types=[...]) → genes_by_{kind}_metric

@@ -934,7 +934,7 @@ class TestGenesByFunctionWrapper:
                 mock_ctx,
                 search_text="photosystem",
                 organism="MED4",
-                category="Photosynthesis",
+                gene_categories=["Photosynthesis"],
                 min_quality=2,
                 summary=True,
                 verbose=True,
@@ -944,7 +944,7 @@ class TestGenesByFunctionWrapper:
         call_kwargs = mock_api.call_args
         assert call_kwargs.args[0] == "photosystem"
         assert call_kwargs.kwargs["organism"] == "MED4"
-        assert call_kwargs.kwargs["category"] == "Photosynthesis"
+        assert call_kwargs.kwargs["gene_categories"] == ["Photosynthesis"]
         assert call_kwargs.kwargs["min_quality"] == 2
         assert call_kwargs.kwargs["summary"] is True
         assert call_kwargs.kwargs["verbose"] is True
@@ -4947,7 +4947,7 @@ class TestGenesByNumericMetricWrapper:
         ):
             ctx = AsyncMock()
             response = await tool_fns["genes_by_numeric_metric"](
-                ctx, metric_types=["damping_ratio"], bucket=["top_decile"])
+                ctx, metric_types=["damping_ratio"], metric_bucket=["top_decile"])
         assert response.total_matching == 32
         assert response.total_derived_metrics == 1
         assert response.total_genes == 32
@@ -4980,10 +4980,10 @@ class TestGenesByNumericMetricWrapper:
             "metric_type": "peak_time_protein_h",
             "rankable": False,
             "has_p_value": False,
-            "reason": "non-rankable; bucket filter does not apply",
+            "reason": "non-rankable; metric_bucket filter does not apply",
         }]
         envelope_data["warnings"] = [
-            "1 non-rankable DM excluded by `bucket` filter "
+            "1 non-rankable DM excluded by `metric_bucket` filter "
             "(peak_time_protein_h)",
         ]
         with patch(
@@ -4993,7 +4993,7 @@ class TestGenesByNumericMetricWrapper:
             ctx = AsyncMock()
             response = await tool_fns["genes_by_numeric_metric"](
                 ctx, metric_types=["damping_ratio", "peak_time_protein_h"],
-                bucket=["top_decile"])
+                metric_bucket=["top_decile"])
         assert len(response.excluded_derived_metrics) == 1
         excl = response.excluded_derived_metrics[0]
         assert excl.derived_metric_id == "dm:peak_time_protein_h"
@@ -5217,7 +5217,7 @@ class TestGenesByBooleanMetricWrapper:
                 treatment_type=["compartment"],
                 background_factors=["axenic"],
                 growth_phases=["exponential"],
-                flag=True,
+                flag_value=True,
                 summary=False,
                 verbose=True,
                 limit=10,
@@ -5234,7 +5234,7 @@ class TestGenesByBooleanMetricWrapper:
         assert kwargs["treatment_type"] == ["compartment"]
         assert kwargs["background_factors"] == ["axenic"]
         assert kwargs["growth_phases"] == ["exponential"]
-        assert kwargs["flag"] is True
+        assert kwargs["flag_value"] is True
         assert kwargs["summary"] is False
         assert kwargs["verbose"] is True
         assert kwargs["limit"] == 10
@@ -12061,3 +12061,40 @@ def test_r3_publication_dois_everywhere():
     assert singular == [], singular
     plural = [n for n, s in schemas.items() if "publication_dois" in s["properties"]]
     assert len(plural) == 13, plural
+
+
+def _enum_choices(schema_prop: dict) -> set:
+    """String-enum choices from a `Literal[...] | None` JSON schema property."""
+    if "enum" in schema_prop:
+        return set(schema_prop["enum"])
+    return {
+        v for branch in schema_prop.get("anyOf", [])
+        for v in branch.get("enum", [])
+    }
+
+
+def test_r4_row_field_named_filters():
+    """R4: filter params named after the row field they filter.
+    genes_by_numeric_metric.bucket -> metric_bucket,
+    genes_by_boolean_metric.flag -> flag_value,
+    genes_by_function.category (str) -> gene_categories (list[str]),
+    differential_expression_by_ortholog.direction gains 'both'."""
+    schemas = _all_tool_input_schemas()
+
+    numeric_props = schemas["genes_by_numeric_metric"]["properties"]
+    assert "metric_bucket" in numeric_props
+    assert "bucket" not in numeric_props
+
+    boolean_props = schemas["genes_by_boolean_metric"]["properties"]
+    assert "flag_value" in boolean_props
+    assert "flag" not in boolean_props
+    assert _enum_choices(boolean_props["flag_value"]) == set()  # bool, not enum
+
+    function_props = schemas["genes_by_function"]["properties"]
+    assert "gene_categories" in function_props
+    assert "category" not in function_props
+    gc_branches = function_props["gene_categories"].get("anyOf", [])
+    assert any(b.get("type") == "array" for b in gc_branches), gc_branches
+
+    direction_prop = schemas["differential_expression_by_ortholog"]["properties"]["direction"]
+    assert _enum_choices(direction_prop) == {"up", "down", "both"}

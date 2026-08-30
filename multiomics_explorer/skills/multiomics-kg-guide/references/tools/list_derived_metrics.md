@@ -110,7 +110,7 @@ total_entries, total_matching, by_organism, by_value_kind, by_metric_type, by_co
 list_derived_metrics(summary=True)
 ```
 
-### Example 2: Pre-flight for numeric drill-down — which DMs support rank/bucket?
+### Example 2: Pre-flight for numeric drill-down — which DMs support rank/metric_bucket?
 
 ```example-call
 list_derived_metrics(value_kind="numeric", rankable=True)
@@ -142,7 +142,7 @@ Step 1: list_derived_metrics(search_text="damping ratio")
 
 Step 2: genes_by_numeric_metric(
           derived_metric_ids=["derived_metric:...:damping_ratio"],
-          bucket=["top_decile"])
+          metric_bucket=["top_decile"])
         → top-decile genes by transcript-to-protein damping
 ```
 
@@ -150,15 +150,15 @@ Step 2: genes_by_numeric_metric(
 
 ```
 list_derived_metrics → gene_derived_metrics(locus_tags, derived_metric_ids)
-list_derived_metrics(value_kind='numeric', rankable=True) → genes_by_numeric_metric(derived_metric_ids, bucket=[...])
-list_derived_metrics(value_kind='boolean') → genes_by_boolean_metric(derived_metric_ids, flag=True)
+list_derived_metrics(value_kind='numeric', rankable=True) → genes_by_numeric_metric(derived_metric_ids, metric_bucket=[...])
+list_derived_metrics(value_kind='boolean') → genes_by_boolean_metric(derived_metric_ids, flag_value=True)
 list_derived_metrics(value_kind='categorical') → genes_by_categorical_metric(derived_metric_ids, categories=[...])
 list_derived_metrics → genes_by_<kind>_metric → metabolites_by_gene — inspect the chemistry of DM-flagged genes (DM rows don't carry chemistry; chain through the locus_tags returned by the drill-down). See `docs://analysis/metabolites`.
 ```
 
 ## Common mistakes
 
-- Call this FIRST before drill-downs. Inspect rankable / has_p_value / value_kind / allowed_categories / compartment here — the downstream drill-down tools (genes_by_numeric_metric, genes_by_boolean_metric, genes_by_categorical_metric) hard-fail (by design) when the selected DM set doesn't support the requested filter. E.g. passing bucket=['top_decile'] with a non-rankable DM raises; passing significant_only=True when no selected DM has has_p_value=True raises.
+- Call this FIRST before drill-downs. Inspect rankable / has_p_value / value_kind / allowed_categories / compartment here — the downstream drill-down tools (genes_by_numeric_metric, genes_by_boolean_metric, genes_by_categorical_metric) hard-fail (by design) when the selected DM set doesn't support the requested filter. E.g. passing metric_bucket=['top_decile'] with a non-rankable DM raises; passing significant_only=True when no selected DM has has_p_value=True raises.
 
 - metric_type is a category tag, not a primary key — the same metric_type can appear across organisms or publications (periodic_in_coculture_LD exists once for NATL2A and once for MIT1002). Use derived_metric_ids to pin one specific DM; use metric_types to union across every DM with that tag.
 

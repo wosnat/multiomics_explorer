@@ -14,7 +14,7 @@ required); an id/metric_type that exists as a different kind
 sibling tool, and a correct-kind DM outside the requested
 `organism` surfaces via `not_matched_organism` (also warned) —
 neither is silently dropped into `not_found_*`. Rankable-gated
-filters (`bucket`, `min/max_percentile`, `max_rank`) raise on
+filters (`metric_bucket`, `min/max_percentile`, `max_rank`) raise on
 all-non-rankable selection, soft-exclude on mixed input.
 `has_p_value`-gated filters (`significant_only`,
 `max_adjusted_p_value`) raise in the current KG (no DM carries
@@ -46,7 +46,7 @@ primary diagnostic when a real DM produces zero rows.
 | max_value | float \| None | None | Upper bound on `r.value`. Always applicable. |
 | min_percentile | float \| None | None | Lower bound on `r.metric_percentile` (0-100). **Rankable-gated** — raises if every selected DM has `rankable=False`. Soft-excludes non-rankable DMs from mixed input, surfaced in `excluded_derived_metrics`. |
 | max_percentile | float \| None | None | Upper bound on `r.metric_percentile`. **Rankable-gated.** |
-| bucket | list[string ('top_decile', 'top_quartile', 'mid', 'low')] \| None | None | Bucket label(s). **Rankable-gated.** Buckets are decile / quartile splits computed at import time per DM. |
+| metric_bucket | list[string ('top_decile', 'top_quartile', 'mid', 'low')] \| None | None | Bucket label(s). **Rankable-gated.** Buckets are decile / quartile splits computed at import time per DM. |
 | max_rank | int \| None | None | Cap on `r.rank_by_metric` (1 = highest). Use for top-N drill-down. **Rankable-gated.** |
 | significant_only | bool | False | Filter to `r.significant='significant'`. **has_p_value-gated** — raises in the current KG (no DM has p-values yet). Forward-compat surface; check `list_derived_metrics(has_p_value=True)` before using. |
 | max_adjusted_p_value | float \| None | None | Upper bound on `r.adjusted_p_value`. **has_p_value-gated**. |
@@ -132,7 +132,7 @@ total_matching, total_derived_metrics, total_genes, by_organism, by_compartment,
 ### Example 1: Canonical worked example — top-decile damping_ratio
 
 ```example-call
-genes_by_numeric_metric(metric_types=['damping_ratio'], bucket=['top_decile'])
+genes_by_numeric_metric(metric_types=['damping_ratio'], metric_bucket=['top_decile'])
 ```
 
 ```example-response
@@ -226,7 +226,7 @@ genes_by_numeric_metric(metric_types=['damping_ratio'], bucket=['top_decile'])
 ### Example 2: Soft-exclude — mixed rankable + non-rankable metric_types
 
 ```example-call
-genes_by_numeric_metric(metric_types=['damping_ratio', 'peak_time_protein_h'], bucket=['top_decile'])
+genes_by_numeric_metric(metric_types=['damping_ratio', 'peak_time_protein_h'], metric_bucket=['top_decile'])
 ```
 
 ```example-response
@@ -279,10 +279,10 @@ genes_by_numeric_metric(metric_types=['damping_ratio', 'peak_time_protein_h'], b
       "metric_type": "peak_time_protein_h",
       "rankable": false,
       "has_p_value": false,
-      "reason": "non-rankable; `bucket` filter does not apply"
+      "reason": "non-rankable; `metric_bucket` filter does not apply"
     }
   ],
-  "warnings": ["1 non-rankable DM(s) excluded by `bucket` filter (peak_time_protein_h)"],
+  "warnings": ["1 non-rankable DM(s) excluded by `metric_bucket` filter (peak_time_protein_h)"],
   "returned": 25,
   "offset": 0,
   "truncated": true,
@@ -328,7 +328,7 @@ genes_by_numeric_metric(metric_types=['damping_ratio', 'peak_time_protein_h'], b
 ### Example 3: Cross-organism — same metric_type spans two strains
 
 ```example-call
-genes_by_numeric_metric(metric_types=['cell_abundance_biovolume_normalized'], bucket=['top_quartile'])
+genes_by_numeric_metric(metric_types=['cell_abundance_biovolume_normalized'], metric_bucket=['top_quartile'])
 ```
 
 ```example-response
@@ -524,14 +524,14 @@ Step 3 (drill-down): gene_overview(locus_tags=[<intersected genes>])
 ## Chaining patterns
 
 ```
-list_derived_metrics(value_kind='numeric', rankable=True) → genes_by_numeric_metric(derived_metric_ids=[...], bucket=[...])
+list_derived_metrics(value_kind='numeric', rankable=True) → genes_by_numeric_metric(derived_metric_ids=[...], metric_bucket=[...])
 differential_expression_by_gene → top hits → genes_by_numeric_metric(metric_types=[...], locus_tags=hits)
 genes_by_numeric_metric → gene_overview(locus_tags=results)
 ```
 
 ## Common mistakes
 
-- Non-rankable DM + rankable-gated filter. Calling with `metric_types=['peak_time_transcript_h']` + `bucket=['top_decile']` raises — `peak_time_transcript_h` is non-rankable. Inspect `list_derived_metrics(value_kind='numeric', rankable=True)` to see which DMs support `bucket` / `min_percentile` / `max_percentile` / `max_rank`. Mixed rankable/non-rankable DM sets don't raise — instead the envelope's `excluded_derived_metrics` + `warnings` pinpoint the excluded ones.
+- Non-rankable DM + rankable-gated filter. Calling with `metric_types=['peak_time_transcript_h']` + `metric_bucket=['top_decile']` raises — `peak_time_transcript_h` is non-rankable. Inspect `list_derived_metrics(value_kind='numeric', rankable=True)` to see which DMs support `metric_bucket` / `min_percentile` / `max_percentile` / `max_rank`. Mixed rankable/non-rankable DM sets don't raise — instead the envelope's `excluded_derived_metrics` + `warnings` pinpoint the excluded ones.
 
 - P-value filter on current KG. `significant_only=True` or `max_adjusted_p_value=0.05` raises in the current KG because no DM has `has_p_value='p_value'`. The surface exists for future DMs; check `list_derived_metrics(has_p_value=True)` first.
 

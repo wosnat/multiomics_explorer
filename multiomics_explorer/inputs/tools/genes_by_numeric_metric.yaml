@@ -4,7 +4,7 @@
 
 examples:
   - title: Canonical worked example — top-decile damping_ratio
-    call: genes_by_numeric_metric(metric_types=['damping_ratio'], bucket=['top_decile'])
+    call: genes_by_numeric_metric(metric_types=['damping_ratio'], metric_bucket=['top_decile'])
     response: |
       {
         "total_matching": 32,
@@ -93,7 +93,7 @@ examples:
       }
 
   - title: Soft-exclude — mixed rankable + non-rankable metric_types
-    call: genes_by_numeric_metric(metric_types=['damping_ratio', 'peak_time_protein_h'], bucket=['top_decile'])
+    call: genes_by_numeric_metric(metric_types=['damping_ratio', 'peak_time_protein_h'], metric_bucket=['top_decile'])
     response: |
       {
         "total_matching": 32,
@@ -144,10 +144,10 @@ examples:
             "metric_type": "peak_time_protein_h",
             "rankable": false,
             "has_p_value": false,
-            "reason": "non-rankable; `bucket` filter does not apply"
+            "reason": "non-rankable; `metric_bucket` filter does not apply"
           }
         ],
-        "warnings": ["1 non-rankable DM(s) excluded by `bucket` filter (peak_time_protein_h)"],
+        "warnings": ["1 non-rankable DM(s) excluded by `metric_bucket` filter (peak_time_protein_h)"],
         "returned": 25,
         "offset": 0,
         "truncated": true,
@@ -190,7 +190,7 @@ examples:
       }
 
   - title: Cross-organism — same metric_type spans two strains
-    call: genes_by_numeric_metric(metric_types=['cell_abundance_biovolume_normalized'], bucket=['top_quartile'])
+    call: genes_by_numeric_metric(metric_types=['cell_abundance_biovolume_normalized'], metric_bucket=['top_quartile'])
     response: |
       {
         "total_matching": 310,
@@ -395,17 +395,17 @@ verbose_fields:
   - p_value
 
 chaining:
-  - "list_derived_metrics(value_kind='numeric', rankable=True) → genes_by_numeric_metric(derived_metric_ids=[...], bucket=[...])"
+  - "list_derived_metrics(value_kind='numeric', rankable=True) → genes_by_numeric_metric(derived_metric_ids=[...], metric_bucket=[...])"
   - "differential_expression_by_gene → top hits → genes_by_numeric_metric(metric_types=[...], locus_tags=hits)"
   - "genes_by_numeric_metric → gene_overview(locus_tags=results)"
 
 mistakes:
   - >-
     Non-rankable DM + rankable-gated filter. Calling with
-    `metric_types=['peak_time_transcript_h']` + `bucket=['top_decile']`
+    `metric_types=['peak_time_transcript_h']` + `metric_bucket=['top_decile']`
     raises — `peak_time_transcript_h` is non-rankable. Inspect
     `list_derived_metrics(value_kind='numeric', rankable=True)` to see
-    which DMs support `bucket` / `min_percentile` / `max_percentile` /
+    which DMs support `metric_bucket` / `min_percentile` / `max_percentile` /
     `max_rank`. Mixed rankable/non-rankable DM sets don't raise — instead
     the envelope's `excluded_derived_metrics` + `warnings` pinpoint the
     excluded ones.

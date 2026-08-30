@@ -34,7 +34,7 @@ excluded_derived_metrics:
   has_p_value: false
   metric_type: peak_time_protein_h
   rankable: false
-  reason: non-rankable; `bucket` filter does not apply
+  reason: non-rankable; `metric_bucket` filter does not apply
 genes_per_metric_max: 32
 genes_per_metric_median: 32.0
 not_found_ids: []
@@ -352,4 +352,4 @@ total_genes: 32
 total_matching: 32
 truncated: false
 warnings:
-- 1 non-rankable DM(s) excluded by `bucket` filter (peak_time_protein_h)
+- 1 non-rankable DM(s) excluded by `metric_bucket` filter (peak_time_protein_h)

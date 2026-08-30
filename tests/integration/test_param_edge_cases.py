@@ -206,15 +206,15 @@ class TestGenesByFunctionEdgeCases:
         assert "list_organisms" in result["warnings"][0]
 
     def test_category_typo_warns(self, conn):
-        """A closed-vocabulary category typo warns but does not raise
+        """A closed-vocabulary gene_categories typo warns but does not raise
         (llm-review 2b.3)."""
         result = api.genes_by_function(
-            "psbA", organism="Bogusmonas", category="Photosynthesiss",
+            "psbA", organism="Bogusmonas", gene_categories=["Photosynthesiss"],
             conn=conn,
         )
         assert len(result["warnings"]) == 2
         cat_warning = next(
-            w for w in result["warnings"] if "category" in w
+            w for w in result["warnings"] if "gene_categories" in w
         )
         assert "Photosynthesiss" in cat_warning
         assert "list_filter_values" in cat_warning
@@ -235,11 +235,11 @@ class TestGenesByFunctionEdgeCases:
         assert q0["total_matching"] >= q3["total_matching"]
 
     def test_category_filter(self, conn):
-        """Category filter restricts results to that category."""
+        """gene_categories filter restricts results to that category."""
         result = api.genes_by_function(
-            "reaction", category="Photosynthesis", conn=conn,
+            "reaction", gene_categories=["Photosynthesis"], conn=conn,
         )
-        # All results should be Photosynthesis if category filter works
+        # All results should be Photosynthesis if gene_categories filter works
         for row in result["results"]:
             assert row["gene_category"] == "Photosynthesis"
 
@@ -840,13 +840,13 @@ class TestDMDrillDownOrganismMismatch:
 
 @pytest.mark.kg
 class TestGenesByBooleanMetricPositiveOnlyFlag:
-    """flag=False against a positive-only boolean DM keeps its by_metric
+    """flag_value=False against a positive-only boolean DM keeps its by_metric
     row (count/false_count both 0) instead of dropping it, and warns
     (llm-review 2b.3)."""
 
     def test_positive_only_dm_flag_false(self, conn):
         data = api.genes_by_boolean_metric(
-            derived_metric_ids=[_BOOLEAN_DM_ID], flag=False, conn=conn)
+            derived_metric_ids=[_BOOLEAN_DM_ID], flag_value=False, conn=conn)
         assert data["total_matching"] == 0
         assert len(data["by_metric"]) == 1
         bm = data["by_metric"][0]

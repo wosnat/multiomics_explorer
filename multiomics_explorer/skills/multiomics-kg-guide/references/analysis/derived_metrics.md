@@ -100,9 +100,9 @@ a gene does not make it part of the gene's function.
 ## Worked path: discover → gene lookup → tested-absent drill-down
 
 The one path to know. Boolean DMs are the trap: 16 of the 27 store only
-`flagged` edges, so `flag=False` returns 0 rows there and the absence of a
+`flagged` edges, so `flag_value=False` returns 0 rows there and the absence of a
 flag means nothing. The other 11 store `not_flagged` too, and there
-`flag=False` is real tested-absent biology.
+`flag_value=False` is real tested-absent biology.
 
 ```python
 from multiomics_explorer import (
@@ -136,15 +136,15 @@ rows = gene_derived_metrics(
 # 3. Tested-absent drill-down: every gene this DM says is NOT expressed above
 #    background at t0 (Steglich 2010) — a real negative, because this DM stores
 #    both states.
-absent = genes_by_boolean_metric(derived_metric_ids=[dm_id], flag=False, limit=None)
+absent = genes_by_boolean_metric(derived_metric_ids=[dm_id], flag_value=False, limit=None)
 absent["total_matching"]          # 920
 absent["by_value"]                # [{'value': 'not_flagged', 'count': 920}]
 absent["by_metric"][0]["dm_true_count"], absent["by_metric"][0]["dm_false_count"]
 # (1010, 920)  <- full-DM counts; dm_false_count == 0 means "positive-only, don't
-#                 read flag=False as absence" on the other 16 boolean DMs
+#                 read flag_value=False as absence" on the other 16 boolean DMs
 ```
 
-Read `by_metric[*].dm_false_count` before interpreting a `flag=False` result:
+Read `by_metric[*].dm_false_count` before interpreting a `flag_value=False` result:
 `0` means the paper never reported negatives, not that every gene was present.
 
 ---
@@ -171,7 +171,7 @@ for dm in list_derived_metrics(
 ```python
 from multiomics_explorer import genes_by_boolean_metric
 
-periodic = genes_by_boolean_metric(metric_types=["periodic_in_axenic_LD"], flag=True, limit=None)
+periodic = genes_by_boolean_metric(metric_types=["periodic_in_axenic_LD"], flag_value=True, limit=None)
 locus_tags = [r["locus_tag"] for r in periodic["results"]]   # 1,377 genes
 ```
 
@@ -218,7 +218,7 @@ vesicle = genes_by_numeric_metric(
 
 ## KG constraints
 
-- **Boolean tested-absent storage is per DM.** `genes_by_boolean_metric(flag=False)`
+- **Boolean tested-absent storage is per DM.** `genes_by_boolean_metric(flag_value=False)`
   returns rows only on the 11 of 27 boolean DMs that store `not_flagged`
   edges — Steglich 2010 `expressed_above_background` (1), Voigt 2014
   `has_primary_tss` (MED4 + MIT9313, 2), Hennon 2015 `rapid_recovery_*` (2),

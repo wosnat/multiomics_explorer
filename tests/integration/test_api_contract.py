@@ -1224,11 +1224,11 @@ class TestGenesByNumericMetricContract:
         assert set(data["by_metric"][0].keys()) == self.EXPECTED_BY_METRIC_KEYS
 
     def test_excluded_dm_entry_keys(self, conn):
-        """Trigger soft-exclude (mixed rankable + bucket) to populate the
-        excluded_derived_metrics list, then pin its per-entry shape."""
+        """Trigger soft-exclude (mixed rankable + metric_bucket) to populate
+        the excluded_derived_metrics list, then pin its per-entry shape."""
         data = api.genes_by_numeric_metric(
             metric_types=["damping_ratio", "peak_time_protein_h"],
-            bucket=["top_decile"], limit=1, conn=conn)
+            metric_bucket=["top_decile"], limit=1, conn=conn)
         assert len(data["excluded_derived_metrics"]) >= 1
         entry = data["excluded_derived_metrics"][0]
         assert set(entry.keys()) == self.EXPECTED_EXCLUDED_DM_KEYS

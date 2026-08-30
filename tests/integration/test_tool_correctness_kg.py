@@ -167,9 +167,9 @@ class TestGenesByFunctionCorrectnessKG:
         assert len(results_high) <= len(results_low)
 
     def test_category_filter(self, conn):
-        """Category filter restricts results to genes in that category."""
+        """gene_categories filter restricts results to genes in that category."""
         cypher, params = build_genes_by_function(
-            search_text="reaction centre", category="Photosynthesis",
+            search_text="reaction centre", gene_categories=["Photosynthesis"],
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0

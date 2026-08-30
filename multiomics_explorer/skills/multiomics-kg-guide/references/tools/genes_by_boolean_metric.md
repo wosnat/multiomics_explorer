@@ -17,8 +17,8 @@ full DM family gating contract.
 
 **Two storage conventions coexist:** 11 of 27 boolean DMs store
 both `flagged` and `not_flagged` edges (tested-absent is real
-biology — `flag=False` returns rows), the rest are positive-only
-(`flag=False` → 0 detail rows, but the DM's `by_metric` entry is
+biology — `flag_value=False` returns rows), the rest are positive-only
+(`flag_value=False` → 0 detail rows, but the DM's `by_metric` entry is
 kept with `count`/`false_count` both 0 — never dropped — plus a
 `warnings` entry). Read `by_metric[*].false_count` to tell
 'not flagged' from 'not assessed'; `by_metric[*].dm_false_count`
@@ -47,7 +47,7 @@ organism-existence, kind-mismatch, and positive-only-flag notices.
 | treatment_type | list[string] \| None | None | Treatment type(s) (e.g. ['diel']). ANY-overlap. Case-insensitive. |
 | background_factors | list[string] \| None | None | Background factor(s) (e.g. ['axenic', 'light']). ANY-overlap. Case-insensitive. |
 | growth_phases | list[string] \| None | None | Growth phase(s). ANY-overlap. Case-insensitive. |
-| flag | bool \| None | None | Filter on `r.value`: True keeps `'flagged'` edges, False keeps `'not_flagged'` edges (tested-absent — real biology, stored on 11 of 27 boolean DMs; the rest are positive-only and return 0 rows for False). Check `by_metric[*].false_count` before reading an absent gene as 'not flagged' vs 'not assessed'. |
+| flag_value | bool \| None | None | Filter on `r.value`: True keeps `'flagged'` edges, False keeps `'not_flagged'` edges (tested-absent — real biology, stored on 11 of 27 boolean DMs; the rest are positive-only and return 0 rows for False). Check `by_metric[*].false_count` before reading an absent gene as 'not flagged' vs 'not assessed'. |
 | summary | bool | False | Return summary fields only (counts, breakdowns, by_metric, diagnostics). Sugar for limit=0; results=[]. |
 | verbose | bool | False | Include heavy text fields per row: gene_function_description, gene_summary, plus DM context (metric_type, field_description, unit, compartment, experiment_id, publication_doi, treatment_type, background_factors, treatment, light_condition, experimental_context). |
 | limit | int | 25 | Max rows to return. Paginate with `offset`. Use `summary=True` for summary-only (sets limit=0). |
@@ -374,13 +374,13 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'], summary=True)
 }
 ```
 
-### Example 4: Tested-absent rows — flag=False on a DM that stores not_flagged edges
+### Example 4: Tested-absent rows — flag_value=False on a DM that stores not_flagged edges
 
 ```example-call
-genes_by_boolean_metric(metric_types=['rapid_recovery_low_co2_shock'], flag=False)
+genes_by_boolean_metric(metric_types=['rapid_recovery_low_co2_shock'], flag_value=False)
 ```
 
-*This Biller low-CO2 DM stores `not_flagged` edges, so `flag=False` returns real tested-absent rows (`value: 'not_flagged'`) and `by_metric[0].dm_false_count > 0`. On a positive-only DM (e.g. `vesicle_proteome_member`) the same call returns 0 rows and `dm_false_count: 0` — absent there means not assessed, not negative.*
+*This Biller low-CO2 DM stores `not_flagged` edges, so `flag_value=False` returns real tested-absent rows (`value: 'not_flagged'`) and `by_metric[0].dm_false_count > 0`. On a positive-only DM (e.g. `vesicle_proteome_member`) the same call returns 0 rows and `dm_false_count: 0` — absent there means not assessed, not negative.*
 
 ```example-response
 {
@@ -483,7 +483,7 @@ genes_by_boolean_metric (no organism filter) → split via envelope by_organism 
 
 ## Common mistakes
 
-- Two storage conventions coexist. 11 of 27 boolean DMs (Biller 2022, Voigt 2014, Hennon 2015, Steglich 2010) store `r.value="not_flagged"` edges, so `flag=False` returns tested-absent rows there; the rest (Biller 2014 / 2018, Coe 2016) are positive-only and return 0 rows for `flag=False`. Read `by_metric[*].false_count` before reading an absent gene as "not flagged" rather than "not assessed"; `dm_false_count` is the full-DM precomputed twin (0 on positive-only DMs). Contrast `metabolites_by_flags_assay`, whose edges always store both states.
+- Two storage conventions coexist. 11 of 27 boolean DMs (Biller 2022, Voigt 2014, Hennon 2015, Steglich 2010) store `r.value="not_flagged"` edges, so `flag_value=False` returns tested-absent rows there; the rest (Biller 2014 / 2018, Coe 2016) are positive-only and return 0 rows for `flag_value=False`. Read `by_metric[*].false_count` before reading an absent gene as "not flagged" rather than "not assessed"; `dm_false_count` is the full-DM precomputed twin (0 on positive-only DMs). Contrast `metabolites_by_flags_assay`, whose edges always store both states.
 
 - Sparse `rankable` / `has_p_value` echoes. Both are always `False` on every row from boolean DMs in the current KG — kept for cross-tool row-shape consistency with `genes_by_numeric_metric`, not because this tool reads them as a meaningful signal. Don't gate downstream logic on them.
 
@@ -495,7 +495,7 @@ genes_by_boolean_metric(derived_metric_ids=['derived_metric:...:damping_ratio'])
 genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
 ```
 
-- See `docs://analysis/derived_metrics` for the DM family overview. Note: `flag=False` returns rows only on DMs that store `not_flagged` edges (11 of 27); metabolomics `metabolites_by_flags_assay` always stores both states.
+- See `docs://analysis/derived_metrics` for the DM family overview. Note: `flag_value=False` returns rows only on DMs that store `not_flagged` edges (11 of 27); metabolomics `metabolites_by_flags_assay` always stores both states.
 
 ## Package import equivalent
 

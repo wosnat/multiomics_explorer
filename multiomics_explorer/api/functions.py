@@ -1414,7 +1414,7 @@ def resolve_gene(
 def genes_by_function(
     search_text: str,
     organism: str | None = None,
-    category: str | None = None,
+    gene_categories: list[str] | None = None,
     min_quality: int = 0,
     summary: bool = False,
     verbose: bool = False,
@@ -1422,6 +1422,7 @@ def genes_by_function(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
+    category: str | None = None,
 ) -> dict:
     """Search genes by functional annotation text.
 
@@ -1436,23 +1437,27 @@ def genes_by_function(
     Verbose adds: function_description, gene_summary.
 
     warnings: an empty intersection (search_text hit, filters left 0 rows),
-    a `category` value not in the live vocabulary, or an
+    a `gene_categories` value not in the live vocabulary, or an
     `organism` that matches no OrganismTaxon. Advisory only — never
     changes which rows are returned.
 
     Raises ValueError if search_text is empty.
     """
+    gene_categories = deprecated_alias(
+        old=category, new=gene_categories,
+        old_name="category", new_name="gene_categories", listify=True,
+    )
     if not search_text or not search_text.strip():
         raise ValueError("search_text must not be empty.")
     if summary:
         limit = 0
 
     conn = _default_conn(conn)
-    warnings = _closed_vocab_warnings(conn, category=category)
+    warnings = _closed_vocab_warnings(conn, gene_categories=gene_categories)
     warnings += _organism_zero_match_warning(conn, organism)
     filter_kwargs = dict(
         search_text=search_text, organism=organism,
-        category=category, min_quality=min_quality,
+        gene_categories=gene_categories, min_quality=min_quality,
     )
 
     def _run_summary(st=search_text, final=False):
@@ -1490,14 +1495,15 @@ def genes_by_function(
         "score_median": raw_summary["score_median"],
     }
 
-    # Empty intersection: the fulltext search hit, but organism / category /
-    # min_quality left nothing. Without this a caller who reads only
-    # total_matching sees a bare 0 and concludes "no such genes here"
-    # (upstream ticket 2026-08 #1: category='Transport' is a real but small
-    # category; most transporters sit under 'Inorganic ion transport').
+    # Empty intersection: the fulltext search hit, but organism /
+    # gene_categories / min_quality left nothing. Without this a caller who
+    # reads only total_matching sees a bare 0 and concludes "no such genes
+    # here" (upstream ticket 2026-08 #1: gene_categories=['Transport'] is a
+    # real but small category; most transporters sit under 'Inorganic ion
+    # transport').
     hits = envelope["total_search_hits"]
     active = [f"{k}={v!r}" for k, v in (
-        ("organism", organism), ("category", category),
+        ("organism", organism), ("gene_categories", gene_categories),
         ("min_quality", min_quality or None)) if v is not None]
     # Skipped when a vocabulary / organism warning already explains the zero.
     if hits > 0 and total_matching == 0 and active and not warnings:
@@ -4261,7 +4267,7 @@ def run_cypher(
 
 _EXPRESSION_STATUS_KEYS = ("significant_up", "significant_down", "not_significant")
 _VALID_DIRECTIONS_BY_GENE = {"up", "down", "both"}
-_VALID_DIRECTIONS_BY_ORTHOLOG = {"up", "down"}
+_VALID_DIRECTIONS_BY_ORTHOLOG = {"up", "down", "both"}
 
 # Per-experiment fields kept when verbose=False. Dropped fields
 # (experiment_name, background_factors, coculture_partner,
@@ -5687,7 +5693,7 @@ def genes_by_numeric_metric(
     max_value: float | None = None,
     min_percentile: float | None = None,
     max_percentile: float | None = None,
-    bucket: list[str] | None = None,
+    metric_bucket: list[str] | None = None,
     max_rank: int | None = None,
     significant_only: bool = False,
     max_adjusted_p_value: float | None = None,
@@ -5698,6 +5704,7 @@ def genes_by_numeric_metric(
     *,
     conn: GraphConnection | None = None,
     publication_doi: list[str] | None = None,
+    bucket: list[str] | None = None,
 ) -> dict:
     """Numeric DerivedMetric drill-down. Cross-organism by design.
 
@@ -5745,6 +5752,10 @@ def genes_by_numeric_metric(
     publication_dois = deprecated_alias(
         old=publication_doi, new=publication_dois,
         old_name="publication_doi", new_name="publication_dois",
+    )
+    metric_bucket = deprecated_alias(
+        old=bucket, new=metric_bucket,
+        old_name="bucket", new_name="metric_bucket",
     )
     # 1. Mutual exclusion check
     if derived_metric_ids is not None and metric_types is not None:
@@ -5801,7 +5812,7 @@ def genes_by_numeric_metric(
     rankable_filters = {
         "min_percentile": min_percentile,
         "max_percentile": max_percentile,
-        "bucket": bucket,
+        "metric_bucket": metric_bucket,
         "max_rank": max_rank,
     }
     triggered_rank = [
@@ -5937,7 +5948,7 @@ def genes_by_numeric_metric(
         locus_tags=locus_tags,
         min_value=min_value, max_value=max_value,
         min_percentile=min_percentile, max_percentile=max_percentile,
-        bucket=bucket, max_rank=max_rank,
+        bucket=metric_bucket, max_rank=max_rank,
     )
     sum_rows = conn.execute_query(sum_cypher, **sum_params)
     sum_row = sum_rows[0] if sum_rows else {}
@@ -6001,7 +6012,7 @@ def genes_by_numeric_metric(
             locus_tags=locus_tags,
             min_value=min_value, max_value=max_value,
             min_percentile=min_percentile, max_percentile=max_percentile,
-            bucket=bucket, max_rank=max_rank,
+            bucket=metric_bucket, max_rank=max_rank,
             verbose=verbose, limit=limit, offset=offset,
         )
         results = conn.execute_query(det_cypher, **det_params)
@@ -6055,7 +6066,7 @@ def genes_by_boolean_metric(
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
-    flag: bool | None = None,
+    flag_value: bool | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -6063,6 +6074,7 @@ def genes_by_boolean_metric(
     *,
     conn: GraphConnection | None = None,
     publication_doi: list[str] | None = None,
+    flag: bool | None = None,
 ) -> dict:
     """Boolean DerivedMetric drill-down. Cross-organism by design.
 
@@ -6085,7 +6097,7 @@ def genes_by_boolean_metric(
     (compartment / treatment_type / background_factors / growth_phases),
     organism-existence, and kind-mismatch notices.
 
-    `flag=False` against a DM that stores no `not_flagged` edges (11 of
+    `flag_value=False` against a DM that stores no `not_flagged` edges (11 of
     27 boolean DMs are positive-only) keeps that DM's `by_metric` row
     (count / false_count both 0 — the DM isn't dropped from the
     envelope) and appends a warning pointing at `by_metric[*].false_count`.
@@ -6114,6 +6126,10 @@ def genes_by_boolean_metric(
     publication_dois = deprecated_alias(
         old=publication_doi, new=publication_dois,
         old_name="publication_doi", new_name="publication_dois",
+    )
+    flag_value = deprecated_alias(
+        old=flag, new=flag_value,
+        old_name="flag", new_name="flag_value",
     )
     # 1. Mutual exclusion check
     if derived_metric_ids is not None and metric_types is not None:
@@ -6204,7 +6220,7 @@ def genes_by_boolean_metric(
     sum_cypher, sum_params = build_genes_by_boolean_metric_summary(
         derived_metric_ids=surviving,
         locus_tags=locus_tags,
-        flag=flag,
+        flag=flag_value,
     )
     sum_rows = conn.execute_query(sum_cypher, **sum_params)
     sum_row = sum_rows[0] if sum_rows else {}
@@ -6224,7 +6240,7 @@ def genes_by_boolean_metric(
 
     # by_metric: per-DM scalar rollups (true_count / false_count /
     # dm_*_count are scalars, not freq lists — no nested rename). A
-    # positive-only DM under flag=False keeps its row here (count=0,
+    # positive-only DM under flag_value=False keeps its row here (count=0,
     # false_count=0 — the builder no longer hard-filters `flag` at
     # MATCH time) rather than vanishing from the envelope.
     by_metric = sorted(
@@ -6232,12 +6248,12 @@ def genes_by_boolean_metric(
         key=lambda x: x["count"],
         reverse=True,
     )
-    if flag is False:
+    if flag_value is False:
         for entry in by_metric:
             if not entry.get("dm_false_count"):
                 warnings.append(
                     f"{entry['derived_metric_id']} stores positive flags "
-                    f"only — flag=False cannot match; read "
+                    f"only — flag_value=False cannot match; read "
                     f"by_metric[*].false_count"
                 )
 
@@ -6274,7 +6290,7 @@ def genes_by_boolean_metric(
         det_cypher, det_params = build_genes_by_boolean_metric(
             derived_metric_ids=surviving,
             locus_tags=locus_tags,
-            flag=flag,
+            flag=flag_value,
             verbose=verbose, limit=limit, offset=offset,
         )
         results = conn.execute_query(det_cypher, **det_params)

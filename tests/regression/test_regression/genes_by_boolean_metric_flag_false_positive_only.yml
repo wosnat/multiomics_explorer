@@ -34,4 +34,4 @@ total_matching: 0
 truncated: false
 warnings:
 - derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
-  stores positive flags only — flag=False cannot match; read by_metric[*].false_count
+  stores positive flags only — flag_value=False cannot match; read by_metric[*].false_count

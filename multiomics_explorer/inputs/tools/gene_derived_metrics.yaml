@@ -25,7 +25,7 @@ examples:
 
       Step 3 (drill-down): genes_by_numeric_metric(
                 derived_metric_ids=["derived_metric:...:damping_ratio"],
-                bucket=["top_decile"])
+                metric_bucket=["top_decile"])
               → top-decile damped genes; intersect with DE top hits
 
 verbose_fields:
@@ -43,7 +43,7 @@ verbose_fields:
   - p_value
 
 chaining:
-  - "gene_derived_metrics → genes_by_numeric_metric(derived_metric_ids, bucket=[...])"
+  - "gene_derived_metrics → genes_by_numeric_metric(derived_metric_ids, metric_bucket=[...])"
   - "differential_expression_by_gene → gene_derived_metrics(locus_tags)"
   - "resolve_gene → gene_derived_metrics(locus_tags)"
 
@@ -55,7 +55,7 @@ mistakes:
     `rank_by_metric`, `metric_percentile`, `metric_bucket` populated when
     their parent DM is rankable; null otherwise (e.g. `peak_time_protein_h`).
   - >-
-    For numeric edge filtering (bucket / percentile / rank / value
+    For numeric edge filtering (metric_bucket / percentile / rank / value
     thresholds), pivot to `genes_by_numeric_metric`. This tool intentionally
     has no edge-level numeric filters — it is the gene-anchor surface only.
   - >-

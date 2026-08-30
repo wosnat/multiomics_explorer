@@ -102,7 +102,7 @@ Plus five orthogonal helpers:
 
 ### "Find genes with diel rhythmicity / large fold-amplitude / a specific categorical trait."
 1. `list_derived_metrics(organism=..., value_kind=..., metric_types=[...])` to discover applicable DerivedMetric nodes. Inspect `rankable` / `has_p_value` / `value_kind` / `allowed_categories` here.
-2. Drill by `value_kind`: `genes_by_numeric_metric` (value thresholds; bucket / percentile / rank filters on `rankable` DMs), `genes_by_boolean_metric` (`flag=True` / `False` — tested-absent rows exist only on DMs that store them), or `genes_by_categorical_metric` (`categories=` must be a subset of `allowed_categories`).
+2. Drill by `value_kind`: `genes_by_numeric_metric` (value thresholds; metric_bucket / percentile / rank filters on `rankable` DMs), `genes_by_boolean_metric` (`flag_value=True` / `False` — tested-absent rows exist only on DMs that store them), or `genes_by_categorical_metric` (`categories=` must be a subset of `allowed_categories`).
 3. For a specific gene's full DM profile, `gene_derived_metrics(locus_tags=[...], organism=...)`.
 
 ### "What metabolites does this gene catalyse / transport?"

@@ -1174,10 +1174,10 @@ def discussed_by_publication_scenarios():
 # fix/organism-resolver-genome-only):
 #   genes_by_numeric_metric:
 #     damping_ratio        rankable=True,  has_p_value=False, value_max=25.3
-#     peak_time_protein_h  rankable=False, has_p_value=False (bucket -> raise)
+#     peak_time_protein_h  rankable=False, has_p_value=False (metric_bucket -> raise)
 #     (NO DM in the KG carries p-values -> significant_only=True -> raise)
 #   genes_by_boolean_metric:
-#     vesicle_proteome_member  (positive-only storage; flag=False -> 0 rows)
+#     vesicle_proteome_member  (positive-only storage; flag_value=False -> 0 rows)
 #   genes_by_categorical_metric:
 #     predicted_subcellular_localization
 #       allowed_categories incl. 'Outer Membrane','Periplasmic','Cytoplasmic',
@@ -1186,13 +1186,13 @@ def discussed_by_publication_scenarios():
 # All three tools surface unknown / wrong-kind DM IDs as `not_found_ids`
 # (NOT a flat not_found/not_matched the batch oracle understands), so
 # input_ids is left empty on every scenario. Gated-filter raises
-# (rankable bucket on non-rankable DM, significant_only with no p-value DM,
-# unknown category) are DOCUMENTED contract -> expects_error=ToolError.
-# Impossible value thresholds / flag=False are CORRECT empty results, not
-# raises — they stress the by_metric / by_value rollups on an empty slice.
+# (rankable metric_bucket on non-rankable DM, significant_only with no
+# p-value DM, unknown category) are DOCUMENTED contract -> expects_error=ToolError.
+# Impossible value thresholds / flag_value=False are CORRECT empty results,
+# not raises — they stress the by_metric / by_value rollups on an empty slice.
 
 _DM_RANKABLE_NUMERIC = "damping_ratio"        # rankable=True, value_max=25.3
-_DM_NONRANKABLE_NUMERIC = "peak_time_protein_h"  # rankable=False -> bucket raises
+_DM_NONRANKABLE_NUMERIC = "peak_time_protein_h"  # rankable=False -> metric_bucket raises
 _DM_BOOLEAN = "vesicle_proteome_member"       # positive-only storage
 _DM_CATEGORICAL = "predicted_subcellular_localization"
 
@@ -1209,9 +1209,9 @@ def genes_by_numeric_metric_scenarios():
             "impossible_value_threshold",
             dict(metric_types=[_DM_RANKABLE_NUMERIC], min_value=1.0e9)),
         Scenario(
-            # rankable-GATED bucket on an all-non-rankable DM -> documented raise.
+            # rankable-GATED metric_bucket on an all-non-rankable DM -> documented raise.
             "rankable_filter_non_rankable_dm",
-            dict(metric_types=[_DM_NONRANKABLE_NUMERIC], bucket=["top_decile"]),
+            dict(metric_types=[_DM_NONRANKABLE_NUMERIC], metric_bucket=["top_decile"]),
             expects_error=ToolError),
         Scenario(
             # has_p_value-GATED significance filter, no DM carries p-values ->
@@ -1232,10 +1232,10 @@ def genes_by_boolean_metric_scenarios():
             "unknown_derived_metric_id",
             dict(derived_metric_ids=[fx.UNKNOWN_DERIVED_METRIC_ID])),
         Scenario(
-            # flag=False -> 0 rows (positive-only KG storage today). CORRECT
-            # empty result, stresses by_value rollup on an empty slice.
+            # flag_value=False -> 0 rows (positive-only KG storage today).
+            # CORRECT empty result, stresses by_value rollup on an empty slice.
             "flag_false_empty",
-            dict(metric_types=[_DM_BOOLEAN], flag=False)),
+            dict(metric_types=[_DM_BOOLEAN], flag_value=False)),
         Scenario(
             "offset_past_end",
             dict(metric_types=[_DM_BOOLEAN], offset=fx.OFFSET_PAST_END)),

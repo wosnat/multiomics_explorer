@@ -2122,7 +2122,7 @@ class TestGenesByNumericMetric:
     async def test_damping_ratio_top_decile(self, tool_fns, conn):
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["genes_by_numeric_metric"](
-            ctx, metric_types=["damping_ratio"], bucket=["top_decile"],
+            ctx, metric_types=["damping_ratio"], metric_bucket=["top_decile"],
             limit=50)
         assert response.total_matching == 32
         assert response.total_genes == 32
@@ -2147,7 +2147,7 @@ class TestGenesByNumericMetric:
         """Full-DM precomputed stats (dm.value_*) populated alongside slice."""
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["genes_by_numeric_metric"](
-            ctx, metric_types=["damping_ratio"], bucket=["top_decile"],
+            ctx, metric_types=["damping_ratio"], metric_bucket=["top_decile"],
             limit=1)
         bm = response.by_metric[0]
         assert bm.dm_value_min == pytest.approx(0.2, abs=0.1)
@@ -2161,25 +2161,25 @@ class TestGenesByNumericMetric:
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["genes_by_numeric_metric"](
             ctx, metric_types=["damping_ratio", "peak_time_protein_h"],
-            bucket=["top_decile"], limit=50)
+            metric_bucket=["top_decile"], limit=50)
         # damping_ratio survives, peak_time_protein_h soft-excluded
         assert response.total_matching == 32
         assert len(response.excluded_derived_metrics) == 1
         excluded = response.excluded_derived_metrics[0]
         assert excluded.derived_metric_id.endswith("peak_time_protein_h")
         assert excluded.rankable is False
-        assert "bucket" in excluded.reason
+        assert "metric_bucket" in excluded.reason
         assert len(response.warnings) == 1
 
     def test_all_non_rankable_hard_fail(self, conn):
-        """All-non-rankable + bucket → api raises ValueError."""
+        """All-non-rankable + metric_bucket → api raises ValueError."""
         with pytest.raises(ValueError) as exc_info:
             api.genes_by_numeric_metric(
                 metric_types=["peak_time_transcript_h"],
-                bucket=["top_decile"], conn=conn)
+                metric_bucket=["top_decile"], conn=conn)
         msg = str(exc_info.value)
         assert "rankable=False" in msg or "non-rankable" in msg
-        assert "bucket" in msg
+        assert "metric_bucket" in msg
 
     def test_p_value_filter_hard_fail_today(self, conn):
         """significant_only against has_p_value=False DM → ValueError."""
@@ -2218,7 +2218,7 @@ class TestGenesByNumericMetric:
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["genes_by_numeric_metric"](
             ctx, metric_types=["cell_abundance_biovolume_normalized"],
-            bucket=["top_quartile"], limit=10)
+            metric_bucket=["top_quartile"], limit=10)
         live = {
             org: kg_count(_TOP_QUARTILE_CELL_ABUNDANCE, org=org)
             for org in ("Prochlorococcus MIT9312", "Prochlorococcus MIT9313")
@@ -2236,7 +2236,7 @@ class TestGenesByNumericMetric:
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["genes_by_numeric_metric"](
             ctx, metric_types=["cell_abundance_biovolume_normalized"],
-            bucket=["top_quartile"], organism="MIT9313", limit=10)
+            metric_bucket=["top_quartile"], organism="MIT9313", limit=10)
         assert response.total_matching == kg_count(
             _TOP_QUARTILE_CELL_ABUNDANCE, org="Prochlorococcus MIT9313")
         assert len(response.by_organism) == 1
@@ -2264,7 +2264,7 @@ class TestGenesByNumericMetric:
     async def test_summary_only(self, tool_fns, conn):
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["genes_by_numeric_metric"](
-            ctx, metric_types=["damping_ratio"], bucket=["top_decile"],
+            ctx, metric_types=["damping_ratio"], metric_bucket=["top_decile"],
             summary=True)
         assert response.results == []
         assert response.total_matching == 32
@@ -2315,7 +2315,7 @@ class TestGenesByNumericMetric:
         coincides because top-decile slice contains the global max."""
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["genes_by_numeric_metric"](
-            ctx, metric_types=["damping_ratio"], bucket=["top_decile"],
+            ctx, metric_types=["damping_ratio"], metric_bucket=["top_decile"],
             limit=1)
         bm = response.by_metric[0]
         # Filtered slice min is well above full-DM min
@@ -2368,7 +2368,7 @@ class TestGenesByBooleanMetric:
 
     @pytest.mark.asyncio
     async def test_flag_false_zero_rows(self, tool_fns, conn):
-        """flag=False → 0 detail rows (positive-only KG storage today).
+        """flag_value=False → 0 detail rows (positive-only KG storage today).
 
         by_metric keeps a zero-count entry per selected DM (llm-review
         2b.3) instead of the DM vanishing from the envelope — count and
@@ -2377,7 +2377,7 @@ class TestGenesByBooleanMetric:
         """
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["genes_by_boolean_metric"](
-            ctx, metric_types=["vesicle_proteome_member"], flag=False, limit=10)
+            ctx, metric_types=["vesicle_proteome_member"], flag_value=False, limit=10)
         assert response.total_matching == 0
         assert response.returned == 0
         assert len(response.by_metric) == 2  # MED4 + MIT9313 DMs, both kept

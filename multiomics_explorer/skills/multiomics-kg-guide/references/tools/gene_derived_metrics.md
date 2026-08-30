@@ -143,14 +143,14 @@ Step 2: gene_derived_metrics(locus_tags=top_hits)
 
 Step 3 (drill-down): genes_by_numeric_metric(
           derived_metric_ids=["derived_metric:...:damping_ratio"],
-          bucket=["top_decile"])
+          metric_bucket=["top_decile"])
         → top-decile damped genes; intersect with DE top hits
 ```
 
 ## Chaining patterns
 
 ```
-gene_derived_metrics → genes_by_numeric_metric(derived_metric_ids, bucket=[...])
+gene_derived_metrics → genes_by_numeric_metric(derived_metric_ids, metric_bucket=[...])
 differential_expression_by_gene → gene_derived_metrics(locus_tags)
 resolve_gene → gene_derived_metrics(locus_tags)
 ```
@@ -159,7 +159,7 @@ resolve_gene → gene_derived_metrics(locus_tags)
 
 - The `value` column is polymorphic — branch on each row's `value_kind` (`'numeric'` → float, `'boolean'` → `'flagged'`/`'not_flagged'` string, `'categorical'` → category string). Numeric rows additionally have `rank_by_metric`, `metric_percentile`, `metric_bucket` populated when their parent DM is rankable; null otherwise (e.g. `peak_time_protein_h`).
 
-- For numeric edge filtering (bucket / percentile / rank / value thresholds), pivot to `genes_by_numeric_metric`. This tool intentionally has no edge-level numeric filters — it is the gene-anchor surface only.
+- For numeric edge filtering (metric_bucket / percentile / rank / value thresholds), pivot to `genes_by_numeric_metric`. This tool intentionally has no edge-level numeric filters — it is the gene-anchor surface only.
 
 - `not_matched` ≠ no DM signal at all. `not_matched` lists genes that exist in the KG but have zero DM rows AFTER the applied filters. A gene with only boolean DM signal called with `value_kind='numeric'` lands in `not_matched`. Inspect `gene_overview`'s per-row `derived_metric_count` / `derived_metric_value_kinds` (verbose adds per-kind counts) for unfiltered availability.
 

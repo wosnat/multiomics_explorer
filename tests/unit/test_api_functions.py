@@ -370,9 +370,9 @@ class TestGenesByFunction:
         assert mock_conn.execute_query.call_count == 1
 
     def test_empty_intersection_warns(self, mock_conn, monkeypatch):
-        """search_text hits but the organism/category filters leave 0 rows
-        -> envelope warning (upstream ticket 2026-08 #1: a silent zero read
-        as 'no transporters in this organism')."""
+        """search_text hits but the organism/gene_categories filters leave 0
+        rows -> envelope warning (upstream ticket 2026-08 #1: a silent zero
+        read as 'no transporters in this organism')."""
         monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
         monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
         mock_conn.execute_query.side_effect = [
@@ -381,24 +381,24 @@ class TestGenesByFunction:
         ]
         result = api.genes_by_function(
             "ABC transporter permease", organism="HOT1A3",
-            category="Transport", conn=mock_conn)
+            gene_categories=["Transport"], conn=mock_conn)
         assert result["total_matching"] == 0
         assert len(result["warnings"]) == 1
         w = result["warnings"][0]
-        assert "9374" in w and "category='Transport'" in w
+        assert "9374" in w and "gene_categories=['Transport']" in w
         assert "organism='HOT1A3'" in w
         assert "min_quality" not in w  # default 0 is not an active filter
         assert "by_category" in w
 
     def test_intersection_warning_yields_to_vocab_warning(self, mock_conn, monkeypatch):
-        """A category typo already explains the zero — no second warning."""
+        """A gene_categories typo already explains the zero — no second warning."""
         monkeypatch.setattr(api, "_closed_vocab_warnings",
-                            lambda *a, **k: ["category value 'Bogus' matched nothing"])
+                            lambda *a, **k: ["gene_categories value 'Bogus' matched nothing"])
         monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
         mock_conn.execute_query.side_effect = [
             self._summary_result(total_search_hits=100, total_matching=0), [],
         ]
-        result = api.genes_by_function("x", category="Bogus", conn=mock_conn)
+        result = api.genes_by_function("x", gene_categories=["Bogus"], conn=mock_conn)
         assert len(result["warnings"]) == 1
         assert "empty intersection" not in result["warnings"][0]
 
@@ -438,7 +438,7 @@ class TestGenesByFunction:
             api.genes_by_function("psbA AND", conn=mock_conn)
 
     def test_passes_params(self, mock_conn, monkeypatch):
-        """Verify organism, category, min_quality forwarded to builder."""
+        """Verify organism, gene_categories, min_quality forwarded to builder."""
         monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
         monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
         mock_conn.execute_query.side_effect = [
@@ -446,14 +446,14 @@ class TestGenesByFunction:
             self._detail_rows(),
         ]
         api.genes_by_function(
-            "test", organism="MED4", category="Photosynthesis",
+            "test", organism="MED4", gene_categories=["Photosynthesis"],
             min_quality=2, conn=mock_conn,
         )
         # Summary query (1st call) should have filter params
         summary_call = mock_conn.execute_query.call_args_list[0]
         params = summary_call[1]
         assert params.get("organism") == "MED4"
-        assert params.get("category") == "Photosynthesis"
+        assert params.get("gene_categories") == ["Photosynthesis"]
         assert params.get("min_quality") == 2
 
     def test_creates_conn_when_none(self):
@@ -5292,7 +5292,7 @@ class TestGenesByNumericMetric:
         mock_conn.execute_query.side_effect = [diag_rankable, summary_row]
         data = api.genes_by_numeric_metric(
             metric_types=["damping_ratio"],
-            bucket=["top_decile"],
+            metric_bucket=["top_decile"],
             conn=mock_conn,
             summary=True,
         )
@@ -5325,7 +5325,7 @@ class TestGenesByNumericMetric:
         mock_conn.execute_query.side_effect = [diag_rankable, summary_row]
         data = api.genes_by_numeric_metric(
             metric_types=["damping_ratio"],
-            bucket=["top_decile"],
+            metric_bucket=["top_decile"],
             conn=mock_conn,
             summary=True,
         )
@@ -5342,7 +5342,7 @@ class TestGenesByNumericMetric:
         ]
         data = api.genes_by_numeric_metric(
             metric_types=["damping_ratio"],
-            bucket=["top_decile"],
+            metric_bucket=["top_decile"],
             conn=mock_conn,
         )
         # diag → summary → detail
@@ -5354,7 +5354,7 @@ class TestGenesByNumericMetric:
         mock_conn.execute_query.side_effect = [diag_rankable, summary_row, []]
         data = api.genes_by_numeric_metric(
             metric_types=["damping_ratio"],
-            bucket=["top_decile"],
+            metric_bucket=["top_decile"],
             conn=mock_conn,
         )
         assert data["excluded_derived_metrics"] == []
@@ -5366,7 +5366,7 @@ class TestGenesByNumericMetric:
         mock_conn.execute_query.side_effect = [diag_mixed, summary_row, []]
         data = api.genes_by_numeric_metric(
             metric_types=["damping_ratio", "diel_amplitude"],
-            bucket=["top_decile"],
+            metric_bucket=["top_decile"],
             conn=mock_conn,
         )
         assert len(data["excluded_derived_metrics"]) == 1
@@ -5383,7 +5383,7 @@ class TestGenesByNumericMetric:
         with pytest.raises(ValueError, match="non-rankable"):
             api.genes_by_numeric_metric(
                 metric_types=["diel_amplitude"],
-                bucket=["top_decile"],
+                metric_bucket=["top_decile"],
                 conn=mock_conn,
             )
 
@@ -5891,9 +5891,9 @@ class TestGenesByBooleanMetric:
         mock_conn.execute_query.side_effect = [diag_boolean, summary_row, []]
         api.genes_by_boolean_metric(
             metric_types=["vesicle_proteome_member"],
-            flag=True, conn=mock_conn,
+            flag_value=True, conn=mock_conn,
         )
-        # 3 calls: diag, summary, detail. flag → flag_str='flagged' on
+        # 3 calls: diag, summary, detail. flag_value → flag_str='flagged' on
         # summary + detail.
         assert mock_conn.execute_query.call_count == 3
         sum_kwargs = mock_conn.execute_query.call_args_list[1].kwargs
@@ -5903,7 +5903,7 @@ class TestGenesByBooleanMetric:
 
     def test_flag_false_on_positive_only_dm_keeps_row_and_warns(
             self, diag_boolean):
-        # (llm-review 2b.3) flag=False against a positive-only DM
+        # (llm-review 2b.3) flag_value=False against a positive-only DM
         # (dm_false_count=0) keeps its by_metric row (count/false_count
         # both 0) and appends a warning pointing at false_count.
         summary_positive_only = [{
@@ -5929,7 +5929,7 @@ class TestGenesByBooleanMetric:
         ]
         data = api.genes_by_boolean_metric(
             metric_types=["vesicle_proteome_member"],
-            flag=False, conn=mock_conn,
+            flag_value=False, conn=mock_conn,
         )
         assert len(data["by_metric"]) == 1
         assert data["by_metric"][0]["derived_metric_id"] == "dm:vp_med4"
@@ -18658,3 +18658,192 @@ class TestR3PublicationDoisRename:
         with pytest.raises(ValueError):
             fn(publication_dois=["a"], publication_doi=["b"],
                conn=self._mock_conn(conn_rv), **extra_kwargs)
+
+
+# ---------------------------------------------------------------------------
+# R4 (llm-review 2b.5): filter params named after the row field they filter.
+# genes_by_numeric_metric.bucket -> metric_bucket, genes_by_boolean_metric.flag
+# -> flag_value, genes_by_function.category -> gene_categories (list[str],
+# listify=True — this one IS a query-builder change: the builder kwarg is
+# also renamed to gene_categories). Builder kwargs for bucket/flag are
+# unchanged (Layer 1 keeps `bucket=` / `flag=`). Mirrors the R3 probe pattern
+# (Task 4): patch the query builder the deprecated_alias-resolved value
+# reaches, short-circuit with a probe exception, inspect captured kwargs.
+# ---------------------------------------------------------------------------
+
+class _R4StopProbe(Exception):
+    """Raised from a patched query builder once its kwargs are captured —
+    short-circuits the api function before any further conn access."""
+
+
+class TestR4NumericMetricBucketRename:
+    @pytest.fixture
+    def diag_rankable(self):
+        return [{
+            "derived_metric_id": "dm:dr",
+            "metric_type": "damping_ratio",
+            "value_kind": "numeric",
+            "name": "Damping ratio",
+            "rankable": True,
+            "has_p_value": False,
+            "total_gene_count": 320,
+            "organism_name": "Prochlorococcus MED4",
+        }]
+
+    def test_canonical_reaches_builder(self, diag_rankable):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_rankable]
+        with patch(
+            "multiomics_explorer.api.functions.build_genes_by_numeric_metric_summary",
+            side_effect=_R4StopProbe,
+        ) as builder_mock:
+            with pytest.raises(_R4StopProbe):
+                api.genes_by_numeric_metric(
+                    derived_metric_ids=["dm:dr"], metric_bucket=["top_decile"],
+                    conn=mock_conn,
+                )
+        assert builder_mock.call_args.kwargs.get("bucket") == ["top_decile"]
+
+    def test_deprecated_alias_warns_and_reaches_builder(self, diag_rankable):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_rankable]
+        with patch(
+            "multiomics_explorer.api.functions.build_genes_by_numeric_metric_summary",
+            side_effect=_R4StopProbe,
+        ) as builder_mock:
+            with pytest.warns(DeprecationWarning, match="bucket"):
+                with pytest.raises(_R4StopProbe):
+                    api.genes_by_numeric_metric(
+                        derived_metric_ids=["dm:dr"], bucket=["top_decile"],
+                        conn=mock_conn,
+                    )
+        assert builder_mock.call_args.kwargs.get("bucket") == ["top_decile"]
+
+    def test_both_set_raises(self):
+        with pytest.raises(ValueError):
+            api.genes_by_numeric_metric(
+                derived_metric_ids=["dm:dr"],
+                metric_bucket=["top_decile"], bucket=["top_decile"],
+                conn=MagicMock(),
+            )
+
+
+class TestR4BooleanMetricFlagRename:
+    @pytest.fixture
+    def diag_boolean(self):
+        return [{
+            "derived_metric_id": "dm:vp_med4",
+            "metric_type": "vesicle_proteome_member",
+            "value_kind": "boolean",
+            "name": "Vesicle proteome member (MED4)",
+            "total_gene_count": 32,
+            "organism_name": "Prochlorococcus MED4",
+        }]
+
+    def test_canonical_reaches_builder(self, diag_boolean):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_boolean]
+        with patch(
+            "multiomics_explorer.api.functions.build_genes_by_boolean_metric_summary",
+            side_effect=_R4StopProbe,
+        ) as builder_mock:
+            with pytest.raises(_R4StopProbe):
+                api.genes_by_boolean_metric(
+                    derived_metric_ids=["dm:vp_med4"], flag_value=True,
+                    conn=mock_conn,
+                )
+        assert builder_mock.call_args.kwargs.get("flag") is True
+
+    def test_deprecated_alias_warns_and_reaches_builder(self, diag_boolean):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_boolean]
+        with patch(
+            "multiomics_explorer.api.functions.build_genes_by_boolean_metric_summary",
+            side_effect=_R4StopProbe,
+        ) as builder_mock:
+            with pytest.warns(DeprecationWarning, match="flag"):
+                with pytest.raises(_R4StopProbe):
+                    api.genes_by_boolean_metric(
+                        derived_metric_ids=["dm:vp_med4"], flag=True,
+                        conn=mock_conn,
+                    )
+        assert builder_mock.call_args.kwargs.get("flag") is True
+
+    def test_both_set_raises(self):
+        with pytest.raises(ValueError):
+            api.genes_by_boolean_metric(
+                derived_metric_ids=["dm:vp_med4"],
+                flag_value=True, flag=True,
+                conn=MagicMock(),
+            )
+
+
+class TestR4GenesByFunctionGeneCategoriesRename:
+    """Unlike bucket/flag, this rename also touches the query builder
+    (Layer 1): `category: str | None` -> `gene_categories: list[str] | None`.
+    The deprecated `category` alias listifies a bare string."""
+
+    def test_canonical_reaches_builder(self):
+        with patch(
+            "multiomics_explorer.api.functions.build_genes_by_function_summary",
+            side_effect=_R4StopProbe,
+        ) as builder_mock:
+            with pytest.raises(_R4StopProbe):
+                api.genes_by_function(
+                    "urea", gene_categories=["transport"], conn=MagicMock(),
+                )
+        assert builder_mock.call_args.kwargs.get("gene_categories") == ["transport"]
+
+    def test_category_alias_listifies_and_warns(self):
+        with patch(
+            "multiomics_explorer.api.functions.build_genes_by_function_summary",
+            side_effect=_R4StopProbe,
+        ) as builder_mock:
+            with pytest.warns(DeprecationWarning, match="category"):
+                with pytest.raises(_R4StopProbe):
+                    api.genes_by_function(
+                        "urea", category="transport", conn=MagicMock(),
+                    )
+        assert builder_mock.call_args.kwargs.get("gene_categories") == ["transport"]
+
+    def test_both_set_raises(self):
+        with pytest.raises(ValueError):
+            api.genes_by_function(
+                "urea", gene_categories=["transport"], category="metabolism",
+                conn=MagicMock(),
+            )
+
+
+class TestR4DifferentialExpressionByOrthologDirectionBoth:
+    def test_direction_both_does_not_raise(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"not_found": []}],  # Q1a group check
+            [{"total_matching": 10, "matching_genes": 3, "matching_groups": 1,
+              "experiment_count": 2, "by_organism": [], "rows_by_status": [],
+              "rows_by_treatment_type": [], "rows_by_background_factors": [],
+              "by_table_scope": [],
+              "sig_log2fcs": [1.5, 2.0],
+              "matched_group_ids": ["g1"]}],  # Q1b
+            [{"top_groups": []}],  # Q2
+            [{"top_experiments": []}],  # Q3
+            [],  # Q4 results
+            [],  # Q5 membership
+        ]
+        result = api.differential_expression_by_ortholog(
+            group_ids=["g1"], direction="both", conn=mock_conn,
+        )
+        assert result["total_matching"] == 10
+
+    def test_direction_both_reaches_builder(self):
+        with patch(
+            "multiomics_explorer.api.functions."
+            "build_differential_expression_by_ortholog_group_check",
+            side_effect=_R4StopProbe,
+        ):
+            # direction validity is checked before any query runs, so a
+            # probe on the very first builder call is enough to prove
+            # 'both' clears the ValueError gate and reaches query time.
+            with pytest.raises(_R4StopProbe):
+                api.differential_expression_by_ortholog(
+                    group_ids=["g1"], direction="both", conn=MagicMock(),
+                )

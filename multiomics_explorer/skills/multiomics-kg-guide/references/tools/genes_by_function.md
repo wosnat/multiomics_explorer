@@ -12,14 +12,14 @@ Routing: feed `locus_tag`s into `gene_overview` (data-availability triage), `gen
 |---|---|---|---|
 | search_text | string | — | Free-text query (Lucene syntax: quoted phrases, AND/OR, wildcards `*`, fuzzy `~`). E.g. 'photosystem', 'nitrogen AND transport', 'dnaN~'. Multi-word input is OR'd — quote the phrase or join with AND for an exact/combined match. See docs://guide/conventions for Lucene scoring details. |
 | organism | string \| None | None | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word like 'Alteromonas' matches every strain). E.g. 'MED4', 'Prochlorococcus MED4'. Use list_organisms to see valid values. |
-| category | string \| None | None | Filter by gene_category. E.g. 'Photosynthesis', 'Transport'. Use list_filter_values to see valid values. |
+| gene_categories | list[string] \| None | None | Filter by gene_category — matches any of the given values. E.g. ['Photosynthesis', 'Transport']. Use list_filter_values to see valid values. |
 | min_quality | int | 0 | Minimum annotation_quality (0..3 numeric encoding of `Gene.annotation_state`): 0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. Use 2 to skip hypothetical proteins; 3 for high-confidence. [AQ] Definition shifted in 2026-05 KG release; see docs://guide/conventions. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include function_description and gene_summary. |
 | limit | int | 5 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
 
-**Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
+**Discovery:** use `list_organisms` for valid organism names.
 
 ## Response format
 
@@ -29,7 +29,7 @@ Routing: feed `locus_tag`s into `gene_overview` (data-availability triage), `gen
 total_search_hits, total_matching, by_organism, by_category, score_max, score_median, returned, offset, truncated, warnings, results
 ```
 
-- **total_search_hits** (int): Total genes matching search text (before organism/category/quality filters).
+- **total_search_hits** (int): Total genes matching search text (before organism/gene_categories/quality filters).
 - **total_matching** (int): Total genes matching search + all filters.
 - **by_organism** (list[FunctionOrganismBreakdown]): Gene counts per organism, sorted desc.
 - **by_organism_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
@@ -39,7 +39,7 @@ total_search_hits, total_matching, by_organism, by_category, score_max, score_me
 - **returned** (int): Number of results returned.
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True when total_matching > returned.
-- **warnings** (list[string]): An empty intersection (search_text hit genes but `organism` / `category` / `min_quality` left total_matching=0 — not an absence of matching genes), a `category` value not found in the live vocabulary (see list_filter_values(filter_type='gene_category')), or an `organism` that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.
+- **warnings** (list[string]): An empty intersection (search_text hit genes but `organism` / `gene_categories` / `min_quality` left total_matching=0 — not an absence of matching genes), a `gene_categories` value not found in the live vocabulary (see list_filter_values(filter_type='gene_category')), or an `organism` that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.
 
 ### Per-result fields
 
@@ -212,11 +212,11 @@ result['total_matching']  # results may be truncated
 ```
 
 ```mistake
-genes_by_function(search_text='ABC transporter permease', organism='HOT1A3', category='Transport')  # total_search_hits 8705, total_matching 1 -> 'no transporters in HOT1A3'
+genes_by_function(search_text='ABC transporter permease', organism='HOT1A3', gene_categories=['Transport'])  # total_search_hits 8705, total_matching 1 -> 'no transporters in HOT1A3'
 ```
 
 ```correction
-`category` is an exact match on a curated Gene.gene_category value, and 'Transport' is a real but small category (most transporters sit under 'Inorganic ion transport'). A large total_search_hits with total_matching 0 is an empty intersection, not an absence — the envelope says so in `warnings` (a tiny non-zero count gets no warning; compare the two fields yourself). Re-run without `category` and read `by_category` to see where the hits fall, or go ontology-first (`genes_by_ontology` with a TCDB / GO term) to enumerate transporters.
+`gene_categories` matches any of the given values against a curated Gene.gene_category value, and 'Transport' is a real but small category (most transporters sit under 'Inorganic ion transport'). A large total_search_hits with total_matching 0 is an empty intersection, not an absence — the envelope says so in `warnings` (a tiny non-zero count gets no warning; compare the two fields yourself). Re-run without `gene_categories` and read `by_category` to see where the hits fall, or go ontology-first (`genes_by_ontology` with a TCDB / GO term) to enumerate transporters.
 ```
 
 - Use summary=True to get organism/category breakdowns without fetching gene rows.

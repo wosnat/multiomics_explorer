@@ -470,7 +470,7 @@ class TestBuildGenesByFunction:
         assert "fulltext" in cypher.lower() or "geneFullText" in cypher
         assert params["search_text"] == "DNA repair"
         assert params["organism"] is None
-        assert params["category"] is None
+        assert params["gene_categories"] is None
         assert params["min_quality"] == 0
 
     def test_organism_filter(self):
@@ -479,27 +479,38 @@ class TestBuildGenesByFunction:
         assert params["organism"] == "prochlorococcus"
         assert "toLower($organism)" in cypher
 
-    def test_category_filter(self):
-        """When category is provided, it is passed as $category parameter."""
-        cypher, params = build_genes_by_function(search_text="x", category="Photosynthesis")
-        assert params["category"] == "Photosynthesis"
+    def test_gene_categories_filter(self):
+        """When gene_categories is provided, it is passed as $gene_categories."""
+        cypher, params = build_genes_by_function(
+            search_text="x", gene_categories=["Photosynthesis"],
+        )
+        assert params["gene_categories"] == ["Photosynthesis"]
         assert "gene_category" in cypher
-        assert "$category" in cypher
+        assert "$gene_categories" in cypher
+
+    def test_gene_categories_list_multiple(self):
+        """`R4` — g.gene_category IN $gene_categories (multi-value list)."""
+        cypher, params = build_genes_by_function(
+            search_text="urea", gene_categories=["transport", "metabolism"],
+        )
+        assert "g.gene_category IN $gene_categories" in cypher
+        assert params["gene_categories"] == ["transport", "metabolism"]
 
     def test_min_quality_filter(self):
         _, params = build_genes_by_function(search_text="x", min_quality=2)
         assert params["min_quality"] == 2
 
     def test_combined_filters(self):
-        """All three filters (organism, category, min_quality) in WHERE."""
+        """All three filters (organism, gene_categories, min_quality) in WHERE."""
         cypher, params = build_genes_by_function(
-            search_text="x", organism="MED4", category="Photosynthesis", min_quality=2,
+            search_text="x", organism="MED4", gene_categories=["Photosynthesis"],
+            min_quality=2,
         )
         assert "toLower($organism)" in cypher
-        assert "$category" in cypher
+        assert "$gene_categories" in cypher
         assert "$min_quality" in cypher
         assert params["organism"] == "MED4"
-        assert params["category"] == "Photosynthesis"
+        assert params["gene_categories"] == ["Photosynthesis"]
         assert params["min_quality"] == 2
 
     def test_returns_expected_columns(self):
@@ -560,16 +571,17 @@ class TestBuildGenesByFunctionSummary:
         assert "geneFullText" in cypher
         assert params["search_text"] == "DNA repair"
         assert params["organism"] is None
-        assert params["category"] is None
+        assert params["gene_categories"] is None
 
     def test_with_filters(self):
         """Filters are applied to the summary query."""
         cypher, params = build_genes_by_function_summary(
-            search_text="x", organism="MED4", category="Photosynthesis", min_quality=2,
+            search_text="x", organism="MED4", gene_categories=["Photosynthesis"],
+            min_quality=2,
         )
         assert "toLower($organism)" in cypher
         assert params["organism"] == "MED4"
-        assert params["category"] == "Photosynthesis"
+        assert params["gene_categories"] == ["Photosynthesis"]
         assert params["min_quality"] == 2
 
     def test_returns_total_search_hits_and_total_matching(self):
@@ -4165,6 +4177,24 @@ class TestBuildDifferentialExpressionByOrthologSummaryGlobal:
         # Direction takes precedence: significant_only's WHERE clause is NOT added
         assert "r.expression_status <> 'not_significant'" not in cypher
 
+    def test_direction_both_filter(self):
+        cypher, _ = build_differential_expression_by_ortholog_summary_global(
+            group_ids=["g1"], direction="both",
+        )
+        assert (
+            "r.expression_status IN ['significant_up', 'significant_down']"
+            in cypher
+        )
+
+    def test_direction_both_no_single_status_clause(self):
+        """direction='both' must NOT emit a single-status equality clause —
+        only the IN-list (mirrors differential_expression_by_gene's 'both')."""
+        cypher, _ = build_differential_expression_by_ortholog_summary_global(
+            group_ids=["g1"], direction="both",
+        )
+        assert "r.expression_status = 'significant_up'" not in cypher
+        assert "r.expression_status = 'significant_down'" not in cypher
+
     def test_returns_expected_keys(self):
         cypher, _ = build_differential_expression_by_ortholog_summary_global(
             group_ids=["g1"],
@@ -4238,6 +4268,15 @@ class TestBuildDifferentialExpressionByOrthologResults:
             group_ids=["g1"], verbose=False,
         )
         assert "experiment_name" not in cypher
+
+    def test_direction_both_filter(self):
+        cypher, _ = build_differential_expression_by_ortholog_results(
+            group_ids=["g1"], direction="both",
+        )
+        assert (
+            "r.expression_status IN ['significant_up', 'significant_down']"
+            in cypher
+        )
 
     def test_limit(self):
         cypher, params = build_differential_expression_by_ortholog_results(

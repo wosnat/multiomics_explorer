@@ -979,7 +979,7 @@ def _genes_by_function_filter_clause() -> str:
         "($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')"
         " WHERE toLower(g.organism_name) CONTAINS word))\n"
         "  AND ($min_quality = 0 OR g.annotation_quality >= $min_quality)\n"
-        "  AND ($category IS NULL OR g.gene_category = $category)"
+        "  AND ($gene_categories IS NULL OR g.gene_category IN $gene_categories)"
     )
 
 
@@ -987,12 +987,12 @@ def _genes_by_function_params(
     *,
     search_text: str,
     organism: str | None = None,
-    category: str | None = None,
+    gene_categories: list[str] | None = None,
     min_quality: int = 0,
 ) -> dict:
     return {
         "search_text": search_text, "organism": organism,
-        "category": category, "min_quality": min_quality,
+        "gene_categories": gene_categories, "min_quality": min_quality,
     }
 
 
@@ -1000,7 +1000,7 @@ def build_genes_by_function_summary(
     *,
     search_text: str,
     organism: str | None = None,
-    category: str | None = None,
+    gene_categories: list[str] | None = None,
     min_quality: int = 0,
 ) -> tuple[str, dict]:
     """Build summary Cypher for genes_by_function.
@@ -1036,7 +1036,7 @@ def build_genes_by_function_summary(
     )
     return cypher, _genes_by_function_params(
         search_text=search_text, organism=organism,
-        category=category, min_quality=min_quality,
+        gene_categories=gene_categories, min_quality=min_quality,
     )
 
 
@@ -1044,7 +1044,7 @@ def build_genes_by_function(
     *,
     search_text: str,
     organism: str | None = None,
-    category: str | None = None,
+    gene_categories: list[str] | None = None,
     min_quality: int = 0,
     verbose: bool = False,
     limit: int | None = None,
@@ -1058,7 +1058,7 @@ def build_genes_by_function(
     """
     params = _genes_by_function_params(
         search_text=search_text, organism=organism,
-        category=category, min_quality=min_quality,
+        gene_categories=gene_categories, min_quality=min_quality,
     )
 
     verbose_cols = (
@@ -5763,6 +5763,10 @@ def _differential_expression_by_ortholog_where(
         conditions.append("r.expression_status = 'significant_up'")
     elif direction == "down":
         conditions.append("r.expression_status = 'significant_down'")
+    elif direction == "both":
+        conditions.append(
+            "r.expression_status IN ['significant_up', 'significant_down']"
+        )
     elif significant_only:
         conditions.append("r.expression_status <> 'not_significant'")
     if growth_phases:

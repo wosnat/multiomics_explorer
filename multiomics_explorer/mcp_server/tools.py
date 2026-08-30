@@ -1800,7 +1800,7 @@ def register_tools(mcp: FastMCP):
         return `count=None`. Trust types are documented in
         docs://analysis/annotation_evidence.
 
-        Routing: feed the returned `value`s into the corresponding filter — `gene_category` → `genes_by_function(category=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `growth_phase` → `list_experiments(growth_phases=[...])` / `list_derived_metrics(growth_phases=[...])`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`; `cluster_type` → `list_clustering_analyses` / `gene_clusters_by_gene`; `treatment_type` / `background_factors` → `list_experiments` / `list_derived_metrics` / `list_metabolite_assays` / `list_clustering_analyses`; `table_scope` → `list_experiments(table_scope=[...])`; the trust types → `sources` / `evidence` / `call_class` / `interpro_type` on `genes_by_ontology` and friends.
+        Routing: feed the returned `value`s into the corresponding filter — `gene_category` → `genes_by_function(gene_categories=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `growth_phase` → `list_experiments(growth_phases=[...])` / `list_derived_metrics(growth_phases=[...])`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`; `cluster_type` → `list_clustering_analyses` / `gene_clusters_by_gene`; `treatment_type` / `background_factors` → `list_experiments` / `list_derived_metrics` / `list_metabolite_assays` / `list_clustering_analyses`; `table_scope` → `list_experiments(table_scope=[...])`; the trust types → `sources` / `evidence` / `call_class` / `interpro_type` on `genes_by_ontology` and friends.
         """
         await ctx.info(f"list_filter_values filter_type={filter_type}")
         try:
@@ -2123,7 +2123,7 @@ def register_tools(mcp: FastMCP):
         gene_summary: str | None = Field(default=None, description="Combined gene annotation summary (verbose-only).")
 
     class GenesByFunctionResponse(BaseModel):
-        total_search_hits: int = Field(description="Total genes matching search text (before organism/category/quality filters).")
+        total_search_hits: int = Field(description="Total genes matching search text (before organism/gene_categories/quality filters).")
         total_matching: int = Field(description="Total genes matching search + all filters.")
         by_organism: list[FunctionOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc.")
         by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
@@ -2133,7 +2133,7 @@ def register_tools(mcp: FastMCP):
         returned: int = Field(description="Number of results returned.")
         offset: int = Field(default=0, description="Offset into full result set.")
         truncated: bool = Field(description="True when total_matching > returned.")
-        warnings: list[str] = Field(default_factory=list, description="An empty intersection (search_text hit genes but `organism` / `category` / `min_quality` left total_matching=0 — not an absence of matching genes), a `category` value not found in the live vocabulary (see list_filter_values(filter_type='gene_category')), or an `organism` that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.")
+        warnings: list[str] = Field(default_factory=list, description="An empty intersection (search_text hit genes but `organism` / `gene_categories` / `min_quality` left total_matching=0 — not an absence of matching genes), a `gene_categories` value not found in the live vocabulary (see list_filter_values(filter_type='gene_category')), or an `organism` that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.")
         results: list[GenesByFunctionResult] = Field(description="Gene results ranked by relevance.")
 
     @mcp.tool(
@@ -2154,9 +2154,9 @@ def register_tools(mcp: FastMCP):
             "E.g. 'MED4', 'Prochlorococcus MED4'. "
             "Use list_organisms to see valid values.",
         )] = None,
-        category: Annotated[str | None, Field(
-            description="Filter by gene_category. "
-            "E.g. 'Photosynthesis', 'Transport'. "
+        gene_categories: Annotated[list[str] | None, Field(
+            description="Filter by gene_category — matches any of the given "
+            "values. E.g. ['Photosynthesis', 'Transport']. "
             "Use list_filter_values to see valid values.",
         )] = None,
         min_quality: Annotated[int, Field(
@@ -2185,12 +2185,12 @@ def register_tools(mcp: FastMCP):
         Routing: feed `locus_tag`s into `gene_overview` (data-availability triage), `gene_ontology_terms` (annotation drill-down), or `genes_by_ontology` for ontology-anchored search instead.
         """
         await ctx.info(f"genes_by_function search_text={search_text} organism={organism} "
-                       f"category={category} min_quality={min_quality}")
+                       f"gene_categories={gene_categories} min_quality={min_quality}")
         try:
             conn = _conn(ctx)
             data = api.genes_by_function(
                 search_text, organism=organism,
-                category=category, min_quality=min_quality,
+                gene_categories=gene_categories, min_quality=min_quality,
                 summary=summary, verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
             by_organism = [FunctionOrganismBreakdown(**b) for b in data["by_organism"]]
@@ -5382,8 +5382,12 @@ def register_tools(mcp: FastMCP):
             description="Filter to these experiments. "
             "Get IDs from list_experiments.",
         )] = None,
-        direction: Annotated[Literal["up", "down"] | None, Field(
-            description="Filter by expression direction.",
+        direction: Annotated[Literal["up", "down", "both"] | None, Field(
+            description="Filter by expression direction. `'up'` / `'down'` "
+            "restrict to one arm. `'both'` is the union of significant up + "
+            "significant down — functionally identical to "
+            "`direction=None, significant_only=True`; pick whichever spelling "
+            "is clearer at the call site. Default `None` is unchanged.",
         )] = None,
         significant_only: Annotated[bool, Field(
             description="If true, return only statistically significant"
@@ -7806,7 +7810,7 @@ def register_tools(mcp: FastMCP):
                         "**Rankable-gated.**",
             ge=0, le=100,
         )] = None,
-        bucket: Annotated[
+        metric_bucket: Annotated[
             list[Literal["top_decile", "top_quartile", "mid", "low"]] | None,
             Field(
                 description="Bucket label(s). **Rankable-gated.** Buckets "
@@ -7868,7 +7872,7 @@ def register_tools(mcp: FastMCP):
         sibling tool, and a correct-kind DM outside the requested
         `organism` surfaces via `not_matched_organism` (also warned) —
         neither is silently dropped into `not_found_*`. Rankable-gated
-        filters (`bucket`, `min/max_percentile`, `max_rank`) raise on
+        filters (`metric_bucket`, `min/max_percentile`, `max_rank`) raise on
         all-non-rankable selection, soft-exclude on mixed input.
         `has_p_value`-gated filters (`significant_only`,
         `max_adjusted_p_value`) raise in the current KG (no DM carries
@@ -7890,7 +7894,7 @@ def register_tools(mcp: FastMCP):
             name for name, val in (
                 ("min_percentile", min_percentile),
                 ("max_percentile", max_percentile),
-                ("bucket", bucket),
+                ("metric_bucket", metric_bucket),
                 ("max_rank", max_rank),
                 ("significant_only", significant_only or None),
                 ("max_adjusted_p_value", max_adjusted_p_value),
@@ -7917,7 +7921,7 @@ def register_tools(mcp: FastMCP):
                 max_value=max_value,
                 min_percentile=min_percentile,
                 max_percentile=max_percentile,
-                bucket=bucket,
+                metric_bucket=metric_bucket,
                 max_rank=max_rank,
                 significant_only=significant_only,
                 max_adjusted_p_value=max_adjusted_p_value,
@@ -8239,7 +8243,7 @@ def register_tools(mcp: FastMCP):
             description="Growth phase(s). ANY-overlap. Case-insensitive.",
         )] = None,
         # ── Edge-level filter (kind-specific) ───────────────────────────
-        flag: Annotated[bool | None, Field(
+        flag_value: Annotated[bool | None, Field(
             description="Filter on `r.value`: True keeps `'flagged'` edges, "
                         "False keeps `'not_flagged'` edges (tested-absent — "
                         "real biology, stored on 11 of 27 boolean DMs; the "
@@ -8286,8 +8290,8 @@ def register_tools(mcp: FastMCP):
 
         **Two storage conventions coexist:** 11 of 27 boolean DMs store
         both `flagged` and `not_flagged` edges (tested-absent is real
-        biology — `flag=False` returns rows), the rest are positive-only
-        (`flag=False` → 0 detail rows, but the DM's `by_metric` entry is
+        biology — `flag_value=False` returns rows), the rest are positive-only
+        (`flag_value=False` → 0 detail rows, but the DM's `by_metric` entry is
         kept with `count`/`false_count` both 0 — never dropped — plus a
         `warnings` entry). Read `by_metric[*].false_count` to tell
         'not flagged' from 'not assessed'; `by_metric[*].dm_false_count`
@@ -8308,7 +8312,7 @@ def register_tools(mcp: FastMCP):
         )
         await ctx.info(
             f"genes_by_boolean_metric selection_size={selection_size} "
-            f"flag={flag}"
+            f"flag_value={flag_value}"
         )
         try:
             conn = _conn(ctx)
@@ -8323,7 +8327,7 @@ def register_tools(mcp: FastMCP):
                 treatment_type=treatment_type,
                 background_factors=background_factors,
                 growth_phases=growth_phases,
-                flag=flag,
+                flag_value=flag_value,
                 summary=summary,
                 verbose=verbose,
                 limit=limit,
