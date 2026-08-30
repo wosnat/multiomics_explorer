@@ -9,6 +9,7 @@ examples:
       {
         "total_matching": 1,
         "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
+        "by_organism_truncated": null,
         "returned": 1,
         "offset": 0,
         "truncated": false,
@@ -35,6 +36,7 @@ examples:
           {"organism_name": "Alteromonas macleodii BS11", "count": 1},
           ...
         ],
+        "by_organism_truncated": true,
         "returned": 5,
         "offset": 0,
         "truncated": true,

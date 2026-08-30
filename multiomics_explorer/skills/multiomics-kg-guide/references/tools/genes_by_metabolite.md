@@ -76,10 +76,13 @@ total_matching, returned, offset, truncated, warnings, resolved_aliases, not_fou
 - **by_metabolite** (list[GbmByMetabolite]): Per-metabolite rollup. One entry per input metabolite_id that produced ≥1 row.
 - **by_evidence_source** (list[GbmByEvidenceSource]): Frequency over `evidence_source` values present in the slice (≤2 entries).
 - **by_substrate_depth** (list[GbmBySubstrateDepth]): Frequency over `substrate_depth` values across transport rows only (≤2 entries; metabolism rows are excluded).
-- **top_reactions** (list[GbmTopReaction]): Top 10 reactions by gene_count in the metabolism arm.
-- **top_tcdb_families** (list[GbmTopTcdbFamily]): Top 10 TCDB families by gene_count in the transport arm.
+- **top_reactions** (list[GbmTopReaction]): Top 10 reactions by gene_count in the metabolism arm. summary=True returns the full ranked list.
+- **top_reactions_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
+- **top_tcdb_families** (list[GbmTopTcdbFamily]): Top 10 TCDB families by gene_count in the transport arm. summary=True returns the full ranked list.
+- **top_tcdb_families_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **top_gene_categories** (list[GbmTopGeneCategory]): Top 10 gene categories by gene_count across both arms.
-- **top_genes** (list[GbmTopGene]): Top 10 genes by combined reaction + transporter breadth across both arms.
+- **top_genes** (list[GbmTopGene]): Top 10 genes by combined reaction + transporter breadth across both arms. summary=True returns the full ranked list.
+- **top_genes_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **gene_count_total** (int): Distinct genes in the filtered slice (across both arms).
 - **reaction_count_total** (int): Distinct reactions in the filtered metabolism arm.
 - **transporter_count_total** (int): Distinct TcdbFamily nodes in the filtered transport arm.
@@ -182,6 +185,7 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochloro
   "by_evidence_source": [{"evidence_source": "transport", "count": 10}],
   "by_substrate_depth": [{"substrate_depth": "most_specific", "count": 10}],
   "top_reactions": [],
+  "top_reactions_truncated": null,
   "top_tcdb_families": [
     {
       "tcdb_family_id": "tcdb:3.A.1.4.4",
@@ -200,6 +204,7 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochloro
       "metabolite_count": 1
     }
   ],
+  "top_tcdb_families_truncated": null,
   "top_gene_categories": [{"category": "Stress response and adaptation", "gene_count": 5}],
   "top_genes": [
     {
@@ -263,6 +268,7 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochloro
       "tcdb_evidence_score_max": 0.8
     }
   ],
+  "top_genes_truncated": null,
   "gene_count_total": 5,
   "reaction_count_total": 0,
   "transporter_count_total": 2,
@@ -397,6 +403,7 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00088"], organism="Prochloro
   "by_evidence_source": [{"evidence_source": "transport", "count": 29}],
   "by_substrate_depth": [{"substrate_depth": "inherited", "count": 23}, {"substrate_depth": "most_specific", "count": 6}],
   "top_reactions": [],
+  "top_reactions_truncated": null,
   "top_tcdb_families": [
     {
       "tcdb_family_id": "tcdb:3.A.1",
@@ -439,6 +446,7 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00088"], organism="Prochloro
       "metabolite_count": 1
     }
   ],
+  "top_tcdb_families_truncated": null,
   "top_gene_categories": [
     {"category": "Transport", "gene_count": 10},
     {"category": "Stress response and adaptation", "gene_count": 5},
@@ -510,6 +518,7 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00088"], organism="Prochloro
     },
     ...
   ],
+  "top_genes_truncated": true,
   "gene_count_total": 27,
   "reaction_count_total": 0,
   "transporter_count_total": 5,
@@ -717,7 +726,7 @@ in the form you passed. Exclude-wins-on-overlap is computed on the canonical IDs
 from multiomics_explorer import genes_by_metabolite
 
 result = genes_by_metabolite(metabolite_ids=..., organism=...)
-# returns dict with keys: total_matching, returned, offset, truncated, warnings, resolved_aliases, not_found, not_matched, by_metabolite, by_evidence_source, by_substrate_depth, top_reactions, top_tcdb_families, top_gene_categories, top_genes, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
+# returns dict with keys: total_matching, returned, offset, truncated, warnings, resolved_aliases, not_found, not_matched, by_metabolite, by_evidence_source, by_substrate_depth, top_reactions, top_reactions_truncated, top_tcdb_families, top_tcdb_families_truncated, top_gene_categories, top_genes, top_genes_truncated, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 
 Use package import for bulk data extraction in scripts.

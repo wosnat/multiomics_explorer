@@ -772,3 +772,98 @@ class TestToEnvelopeIncludeNonsignificant:
         assert env["results"][0]["cluster"] == "c1"
         by_cluster = {row["cluster_name"]: row for row in env["by_cluster"]}
         assert by_cluster["c2"]["significant_terms"] == 0
+
+
+class TestToEnvelopeBreakdownCaps:
+    """llm-review 2b.2 Task 4: `by_experiment` / `top_pathways_by_padj` on the
+    pathway-kind envelope are capped to 10 entries on detail calls (with a
+    sparse `<key>_truncated=True` flag) and returned in full on
+    `summary=True`. `cluster_enrichment` (kind='cluster') doesn't carry
+    either key, so it's unaffected — no test needed there."""
+
+    @staticmethod
+    def _build_pathway_result(n=12):
+        import pandas as pd
+        from multiomics_explorer.analysis.enrichment import (
+            EnrichmentInputs, EnrichmentResult,
+        )
+
+        rows = []
+        cluster_metadata = {}
+        gene_sets = {}
+        background = {}
+        for i in range(n):
+            cluster = f"exp{i:02d}__up"
+            exp_id = f"EXP{i:02d}"
+            # First 10 experiments significant (ascending p_adjust so exp00
+            # is the most significant / "top" pathway); last 2 are not —
+            # exercises both the by_experiment n_significant-desc sort and
+            # the top_pathways_by_padj ascending-p_adjust ranking together.
+            p_adjust = 0.001 * (i + 1) if i < 10 else 0.9
+            rows.append({
+                "cluster": cluster, "term_id": f"go:{i:04d}",
+                "term_name": f"term{i}", "p_adjust": p_adjust,
+                "direction": "up", "omics_type": "transcriptomics",
+                "experiment_id": exp_id,
+            })
+            cluster_metadata[cluster] = {
+                "experiment_id": exp_id, "name": f"Experiment {i}",
+                "omics_type": "transcriptomics", "table_scope": "DE",
+                "treatment_type": ["nitrogen"], "background_factors": None,
+                "is_time_course": False,
+            }
+            gene_sets[cluster] = ["g1"]
+            background[cluster] = ["g1", "g2", "g3"]
+
+        df = pd.DataFrame(rows)
+        inputs = EnrichmentInputs(
+            organism_name="MED4", gene_sets=gene_sets, background=background,
+            cluster_metadata=cluster_metadata,
+        )
+        return EnrichmentResult(
+            kind="pathway", organism_name="MED4", ontology="go", level=1,
+            results=df, inputs=inputs,
+            term2gene=pd.DataFrame(columns=["term_id", "term_name", "locus_tag"]),
+            params={"pvalue_cutoff": 0.05},
+        )
+
+    def test_top_pathways_by_padj_capped_on_detail_call(self):
+        result = self._build_pathway_result(12)
+        env = result.to_envelope(limit=0)
+        assert len(env["top_pathways_by_padj"]) == 10
+        assert env["top_pathways_by_padj_truncated"] is True
+        # Most significant (lowest p_adjust) survives the cap.
+        assert env["top_pathways_by_padj"][0]["term_id"] == "go:0000"
+
+    def test_top_pathways_by_padj_full_list_on_summary_true(self):
+        result = self._build_pathway_result(12)
+        env = result.to_envelope(summary=True)
+        assert len(env["top_pathways_by_padj"]) == 12
+        assert "top_pathways_by_padj_truncated" not in env
+
+    def test_by_experiment_capped_and_sorted_desc_by_n_significant(self):
+        result = self._build_pathway_result(12)
+        env = result.to_envelope(limit=0)
+        assert len(env["by_experiment"]) == 10
+        assert env["by_experiment_truncated"] is True
+        # The 10 significant experiments (n_significant=1) survive the cap
+        # over the 2 non-significant ones (n_significant=0); tie broken by
+        # experiment_id ascending.
+        ids = [e["experiment_id"] for e in env["by_experiment"]]
+        assert ids == [f"EXP{i:02d}" for i in range(10)]
+        assert all(e["n_significant"] == 1 for e in env["by_experiment"])
+
+    def test_by_experiment_full_list_on_summary_true(self):
+        result = self._build_pathway_result(12)
+        env = result.to_envelope(summary=True)
+        assert len(env["by_experiment"]) == 12
+        assert "by_experiment_truncated" not in env
+
+    def test_short_lists_untouched_no_truncated_keys(self):
+        """5 experiments — under the cap on both keys."""
+        result = self._build_pathway_result(5)
+        env = result.to_envelope(limit=0)
+        assert len(env["by_experiment"]) == 5
+        assert len(env["top_pathways_by_padj"]) == 5
+        assert "by_experiment_truncated" not in env
+        assert "top_pathways_by_padj_truncated" not in env

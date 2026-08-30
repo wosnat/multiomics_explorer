@@ -17,6 +17,7 @@ examples:
           {"organism_name": "Prochlorococcus MIT9312", "count": 5},
           ...
         ],
+        "by_organism_truncated": true,
         "by_treatment_type": [
           {"treatment_type": "coculture", "count": 12},
           {"treatment_type": "carbon", "count": 6},
@@ -61,6 +62,7 @@ examples:
           {"metric_type": "rapid_recovery_low_co2_shock", "count": 1},
           ...
         ],
+        "by_metric_type_truncated": true,
         "by_compartment": [
           {"compartment": "whole_cell", "count": 44},
           {"compartment": "exoproteome", "count": 4},
@@ -180,6 +182,7 @@ examples:
           {"organism_name": "Alteromonas macleodii ATCC27126", "count": 1},
           ...
         ],
+        "by_organism_truncated": null,
         "by_treatment_type": [{"treatment_type": "compartment", "count": 3}],
         "by_background_factors": [
           {"background_factor": "axenic", "count": 3},
@@ -205,6 +208,7 @@ examples:
           {"metric_type": "cell_abundance_biovolume_normalized", "count": 1},
           ...
         ],
+        "by_metric_type_truncated": null,
         "by_compartment": [{"compartment": "vesicle", "count": 3}, {"compartment": "whole_cell", "count": 1}],
         "by_discusses_coverage": {"has_discusses": 2, "no_discusses": 1},
         "returned": 3,
@@ -321,6 +325,7 @@ examples:
           {"organism_name": "Prochlorococcus MIT0801", "count": 1},
           {"organism_name": "Prochlorococcus MIT9301", "count": 1}
         ],
+        "by_organism_truncated": null,
         "by_treatment_type": [
           {"treatment_type": "compartment", "count": 1},
           {"treatment_type": "carbon", "count": 1},
@@ -340,6 +345,7 @@ examples:
           {"metric_type": "log2_vesicle_cell_enrichment", "count": 1},
           {"metric_type": "vesicle_abundance_biovolume_normalized", "count": 1}
         ],
+        "by_metric_type_truncated": null,
         "by_compartment": [
           {"compartment": "whole_cell", "count": 3},
           {"compartment": "vesicle", "count": 1},
@@ -454,6 +460,7 @@ examples:
           {"organism_name": "Prochlorococcus MIT9312", "count": 5},
           ...
         ],
+        "by_organism_truncated": true,
         "by_treatment_type": [
           {"treatment_type": "coculture", "count": 12},
           {"treatment_type": "carbon", "count": 6},
@@ -498,6 +505,7 @@ examples:
           {"metric_type": "rapid_recovery_low_co2_shock", "count": 1},
           ...
         ],
+        "by_metric_type_truncated": true,
         "by_compartment": [
           {"compartment": "whole_cell", "count": 44},
           {"compartment": "exoproteome", "count": 4},

@@ -16332,3 +16332,458 @@ class TestListMetabolitesCoercionOverlap:
         conn = _AliasConn({}, [[_LM_SUMMARY], [{"found": []}]])
         out = list_metabolites(metabolite_ids=["C99999"], summary=True, conn=conn)
         assert out["not_found"]["metabolite_ids"] == ["C99999"]
+
+
+# ---------------------------------------------------------------------------
+# _cap_breakdowns — llm-review 2b.2 Task 4 (top-10 caps on detail breakdowns)
+# ---------------------------------------------------------------------------
+class TestCapBreakdownsHelper:
+    """Pure-function tests for `api._cap_breakdowns`."""
+
+    @staticmethod
+    def _entries(n):
+        return [{"count": i} for i in range(n)]
+
+    def test_short_list_untouched_and_no_truncated_key(self):
+        envelope = {"by_x": self._entries(5)}
+        out = api._cap_breakdowns(envelope, ("by_x",), summary=False)
+        assert len(out["by_x"]) == 5
+        assert "by_x_truncated" not in out
+
+    def test_exactly_ten_untouched_and_no_truncated_key(self):
+        envelope = {"by_x": self._entries(10)}
+        out = api._cap_breakdowns(envelope, ("by_x",), summary=False)
+        assert len(out["by_x"]) == 10
+        assert "by_x_truncated" not in out
+
+    def test_over_ten_capped_to_first_ten_with_truncated_flag(self):
+        full = self._entries(12)
+        envelope = {"by_x": list(full)}
+        out = api._cap_breakdowns(envelope, ("by_x",), summary=False)
+        assert out["by_x"] == full[:10]
+        assert out["by_x_truncated"] is True
+
+    def test_summary_true_keeps_full_list_no_truncated_key(self):
+        full = self._entries(12)
+        envelope = {"by_x": list(full)}
+        out = api._cap_breakdowns(envelope, ("by_x",), summary=True)
+        assert out["by_x"] == full
+        assert "by_x_truncated" not in out
+
+    def test_missing_key_is_a_noop(self):
+        envelope = {"other": 1}
+        out = api._cap_breakdowns(envelope, ("by_x",), summary=False)
+        assert "by_x" not in out
+        assert "by_x_truncated" not in out
+
+    def test_non_list_value_is_a_noop(self):
+        envelope = {"by_x": {"a": 1}}
+        out = api._cap_breakdowns(envelope, ("by_x",), summary=False)
+        assert out["by_x"] == {"a": 1}
+        assert "by_x_truncated" not in out
+
+    def test_multiple_keys_capped_independently(self):
+        envelope = {"a": self._entries(12), "b": self._entries(3)}
+        out = api._cap_breakdowns(envelope, ("a", "b"), summary=False)
+        assert len(out["a"]) == 10 and out["a_truncated"] is True
+        assert len(out["b"]) == 3 and "b_truncated" not in out
+
+    def test_returns_the_same_envelope_object(self):
+        envelope = {"a": self._entries(12)}
+        out = api._cap_breakdowns(envelope, ("a",), summary=False)
+        assert out is envelope
+
+
+# ---------------------------------------------------------------------------
+# Tool-level _cap_breakdowns wiring — one 12-entry test per affected tool.
+# ---------------------------------------------------------------------------
+class TestResolveGeneBreakdownCap:
+    def _genes(self, n):
+        return [
+            {"locus_tag": f"PMM{i:04d}", "gene_name": "g", "product": "p",
+             "organism_name": f"Organism {i:02d}"}
+            for i in range(n)
+        ]
+
+    def test_by_organism_capped_at_ten(self, mock_conn):
+        """resolve_gene has no summary param — always capped when > 10."""
+        mock_conn.execute_query.return_value = self._genes(12)
+        result = api.resolve_gene("PMM", limit=50, conn=mock_conn)
+        assert len(result["by_organism"]) == 10
+        assert result["by_organism_truncated"] is True
+
+    def test_by_organism_untouched_under_the_cap(self, mock_conn):
+        mock_conn.execute_query.return_value = self._genes(5)
+        result = api.resolve_gene("PMM", limit=50, conn=mock_conn)
+        assert len(result["by_organism"]) == 5
+        assert "by_organism_truncated" not in result
+
+
+class TestGenesByFunctionBreakdownCap:
+    def _summary_result(self, n=12):
+        return [{
+            "total_search_hits": 100, "total_matching": n,
+            "score_max": 8.5, "score_median": 4.2,
+            "by_organism": [
+                {"item": f"Organism {i:02d}", "count": n - i} for i in range(n)
+            ],
+            "by_category": [{"item": "DNA replication", "count": n}],
+        }]
+
+    def test_by_organism_capped_on_detail_call(self, mock_conn):
+        mock_conn.execute_query.side_effect = [self._summary_result(12), []]
+        result = api.genes_by_function("DNA polymerase", conn=mock_conn)
+        assert len(result["by_organism"]) == 10
+        assert result["by_organism_truncated"] is True
+        # Sorted desc by count before slicing — highest-count orgs survive.
+        assert result["by_organism"][0]["organism_name"] == "Organism 00"
+
+    def test_by_organism_full_list_on_summary_true(self, mock_conn):
+        mock_conn.execute_query.side_effect = [self._summary_result(12)]
+        result = api.genes_by_function("DNA polymerase", summary=True, conn=mock_conn)
+        assert len(result["by_organism"]) == 12
+        assert "by_organism_truncated" not in result
+
+
+class TestListPublicationsBreakdownCap:
+    _PUB_BASE = {
+        "doi": "10.1234/test", "title": "Test", "authors": ["A"],
+        "year": 2024, "journal": "J", "study_type": "S",
+        "organisms": ["MED4"], "experiment_count": 1,
+        "treatment_types": ["coculture"], "background_factors": [],
+        "omics_types": ["RNASEQ"],
+        "clustering_analysis_count": 0, "cluster_types": [],
+    }
+
+    def test_by_organism_capped_no_summary_param(self, mock_conn):
+        """list_publications has no summary param — always capped when > 10."""
+        summary_row = {
+            "total_entries": 12, "total_matching": 12,
+            "by_organism": [
+                {"item": f"Organism {i:02d}", "count": 12 - i} for i in range(12)
+            ],
+            "by_treatment_type": [], "by_background_factors": [],
+            "by_omics_type": [],
+        }
+        mock_conn.execute_query.side_effect = [[summary_row], [dict(self._PUB_BASE)]]
+        result = api.list_publications(conn=mock_conn)
+        assert len(result["by_organism"]) == 10
+        assert result["by_organism_truncated"] is True
+        assert result["by_organism"][0]["organism_name"] == "Organism 00"
+
+
+class TestListExperimentsBreakdownCap:
+    def _summary_result(self, publication_freq):
+        return [{
+            "total_matching": 1, "time_course_count": 0,
+            "by_organism": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_omics_type": [],
+            "by_publication": publication_freq,
+            "by_table_scope": [], "by_cluster_type": [], "by_growth_phase": [],
+        }]
+
+    def test_by_publication_capped_on_detail_call(self, mock_conn):
+        pub_freq = [{"item": f"10.1234/p{i:02d}", "count": 12 - i} for i in range(12)]
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(pub_freq),  # filtered summary
+            self._summary_result(pub_freq),  # unfiltered total_entries
+            [],  # detail rows
+        ]
+        result = api.list_experiments(conn=mock_conn)
+        assert len(result["by_publication"]) == 10
+        assert result["by_publication_truncated"] is True
+        assert result["by_publication"][0]["publication_doi"] == "10.1234/p00"
+
+    def test_by_publication_full_list_on_summary_true(self, mock_conn):
+        pub_freq = [{"item": f"10.1234/p{i:02d}", "count": 12 - i} for i in range(12)]
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(pub_freq),
+            self._summary_result(pub_freq),
+        ]
+        result = api.list_experiments(summary=True, conn=mock_conn)
+        assert len(result["by_publication"]) == 12
+        assert "by_publication_truncated" not in result
+
+
+class TestListOrganismsBreakdownCap:
+    def _summary_row(self, metric_type_freq):
+        return {
+            "total_entries": 0, "total_matching": 0,
+            "by_value_kind": [], "by_metric_type": metric_type_freq,
+            "by_compartment": [], "by_cluster_type": [], "by_organism_type": [],
+            "by_measurement_capability": {"has_metabolomics": 0, "no_metabolomics": 0},
+            "top_annotation_capability": [],
+        }
+
+    def _wire(self, mock_conn, metric_type_freq):
+        summary_row = self._summary_row(metric_type_freq)
+
+        def _exec(cypher, **params):
+            if "total_entries" in cypher:
+                return [summary_row]
+            return []  # detail / capability rows — unused by this test
+
+        mock_conn.execute_query.side_effect = _exec
+
+    def test_by_metric_type_capped_on_detail_call(self, mock_conn):
+        freq = [{"item": f"metric_{i:02d}", "count": 12 - i} for i in range(12)]
+        self._wire(mock_conn, freq)
+        result = api.list_organisms(conn=mock_conn)
+        assert len(result["by_metric_type"]) == 10
+        assert result["by_metric_type_truncated"] is True
+        assert result["by_metric_type"][0]["metric_type"] == "metric_00"
+
+    def test_by_metric_type_full_list_on_summary_true(self, mock_conn):
+        freq = [{"item": f"metric_{i:02d}", "count": 12 - i} for i in range(12)]
+        self._wire(mock_conn, freq)
+        result = api.list_organisms(summary=True, conn=mock_conn)
+        assert len(result["by_metric_type"]) == 12
+        assert "by_metric_type_truncated" not in result
+
+    def test_top_annotation_capability_capped_and_ranked(self, mock_conn):
+        """top_annotation_capability is ranked api-side over the matched
+        capability rows, independent of the summary builder's own rollup."""
+        rows = [
+            {
+                "organism_name": f"Organism {i:02d}", "organism_type": "genome_strain",
+                "genus": "Genus", "species": None, "strain": None, "clade": None,
+                "ncbi_taxon_id": None, "gene_count": 1000,
+                "publication_count": 0, "experiment_count": 0,
+                "treatment_types": [], "background_factors": [], "omics_types": [],
+                "clustering_analysis_count": 0, "cluster_types": [],
+                "derived_metric_count": 0, "derived_metric_value_kinds": [],
+                "compartments": [], "reaction_count": 0,
+                "catalyzed_metabolite_count": 0, "transported_metabolite_count": 0,
+                "measured_metabolite_count": 0,
+                "peptidase_gene_count": 12 - i,
+                "nonpeptidase_homolog_gene_count": 0,
+                "interpro_gene_count": 0, "ncbifam_gene_count": 0,
+                "growth_phases": [],
+            }
+            for i in range(12)
+        ]
+        summary_row = self._summary_row([])
+        summary_row["total_entries"] = summary_row["total_matching"] = len(rows)
+
+        def _exec(cypher, **params):
+            if "total_entries" in cypher:
+                return [summary_row]
+            return list(rows)
+
+        mock_conn.execute_query.side_effect = _exec
+        result = api.list_organisms(limit=50, conn=mock_conn)
+        assert len(result["top_annotation_capability"]) == 10
+        assert result["top_annotation_capability_truncated"] is True
+        assert result["top_annotation_capability"][0]["organism_name"] == "Organism 00"
+
+        mock_conn.execute_query.side_effect = _exec
+        summary_result = api.list_organisms(summary=True, conn=mock_conn)
+        assert len(summary_result["top_annotation_capability"]) == 12
+        assert "top_annotation_capability_truncated" not in summary_result
+
+
+class TestDifferentialExpressionByGeneBreakdownCap:
+    def _organism_result(self):
+        return [{"organisms": ["Prochlorococcus MED4"]}]
+
+    def _global_summary(self):
+        return [{
+            "total_matching": 12, "matching_genes": 12,
+            "rows_by_status": [{"item": "significant_up", "count": 12}],
+            "rows_by_treatment_type": [], "rows_by_background_factors": [],
+            "by_table_scope": [], "median_abs_log2fc": 1.0, "max_abs_log2fc": 2.0,
+        }]
+
+    def _experiment_summary(self, n=12):
+        experiments = [
+            {
+                "experiment_id": f"exp{i:02d}", "treatment_type": ["nitrogen"],
+                "table_scope": "all_detected_genes", "is_time_course": "single_time_point",
+                "matching_genes": 1, "omics_type": "RNASEQ",
+                "rows_by_status": [
+                    {"item": "significant_up", "count": n - i},
+                ],
+            }
+            for i in range(n)
+        ]
+        return [{"organism_name": "Prochlorococcus MED4", "experiments": experiments}]
+
+    def _diagnostics_summary(self):
+        return [{"top_categories": [], "not_found": [], "no_expression": [], "filtered_out": []}]
+
+    def test_experiments_capped_and_sorted_desc_on_detail_call(self):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            self._organism_result(), self._global_summary(),
+            self._experiment_summary(12), self._diagnostics_summary(), [],
+        ]
+        result = api.differential_expression_by_gene(organism="MED4", conn=mock_conn)
+        assert len(result["experiments"]) == 10
+        assert result["experiments_truncated"] is True
+        # Sorted desc by significant row count — exp00 (count 12) leads.
+        assert result["experiments"][0]["experiment_id"] == "exp00"
+        # n_experiments / experiment_count reflect the FULL count, uncapped.
+        assert result["n_experiments"] == 12
+        assert result["experiment_count"] == 12
+
+    def test_experiments_full_list_on_summary_true(self):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            self._organism_result(), self._global_summary(),
+            self._experiment_summary(12), self._diagnostics_summary(),
+        ]
+        result = api.differential_expression_by_gene(
+            organism="MED4", summary=True, conn=mock_conn,
+        )
+        assert len(result["experiments"]) == 12
+        assert "experiments_truncated" not in result
+
+
+class TestGenesByMetaboliteBreakdownCap:
+    _METS = ["kegg.compound:C00086"]
+    _ORG = "Prochlorococcus MED4"
+
+    @pytest.fixture(autouse=True)
+    def _mock_validate_organism_inputs(self, monkeypatch):
+        monkeypatch.setattr(
+            api, "_validate_organism_inputs",
+            lambda organism, locus_tags, experiment_ids, conn: organism,
+        )
+
+    @staticmethod
+    def _top_genes(n=12):
+        return [
+            {
+                "locus_tag": f"PMM{i:04d}", "gene_name": None, "product": None,
+                "gene_category": None, "reaction_count": n - i,
+                "transporter_count": 0,
+                "transport_substrate_resolution": None,
+                "tcdb_evidence_score_max": None,
+            }
+            for i in range(n)
+        ]
+
+    def _summary_row(self, top_genes):
+        return {
+            "total_matching": 0, "gene_count_total": 0, "reaction_count_total": 0,
+            "transporter_count_total": 0, "metabolite_count_total": 0,
+            "rows_by_evidence_source": [], "rows_by_substrate_depth": [],
+            "by_metabolite": [], "top_reactions": [], "top_tcdb_families": [],
+            "top_gene_categories": [], "top_genes": top_genes,
+        }
+
+    def _mock_conn(self, top_genes):
+        conn = MagicMock()
+        conn.execute_query.side_effect = [[self._summary_row(top_genes)]] + [[]] * 10
+        return conn
+
+    def test_top_genes_capped_and_sorted_desc_on_detail_call(self):
+        conn = self._mock_conn(self._top_genes(12))
+        out = api.genes_by_metabolite(
+            metabolite_ids=self._METS, organism=self._ORG, conn=conn,
+        )
+        assert len(out["top_genes"]) == 10
+        assert out["top_genes_truncated"] is True
+        assert out["top_genes"][0]["locus_tag"] == "PMM0000"
+
+    def test_top_genes_full_list_on_summary_true(self):
+        conn = self._mock_conn(self._top_genes(12))
+        out = api.genes_by_metabolite(
+            metabolite_ids=self._METS, organism=self._ORG, summary=True, conn=conn,
+        )
+        assert len(out["top_genes"]) == 12
+        assert "top_genes_truncated" not in out
+
+
+class TestMetabolitesByGeneBreakdownCap:
+    _LOCUS = ["PMM0963", "PMM0964", "PMM0965"]
+    _ORG = "Prochlorococcus MED4"
+
+    @pytest.fixture(autouse=True)
+    def _mock_validate_organism_inputs(self, monkeypatch):
+        monkeypatch.setattr(
+            api, "_validate_organism_inputs",
+            lambda organism, locus_tags, experiment_ids, conn: organism,
+        )
+
+    @staticmethod
+    def _top_pathways(n=12):
+        """Deliberately shuffled input — the api layer must sort desc by
+        gene_count, then asc by pathway_metabolite_count, before capping."""
+        rows = [
+            {
+                "metabolite_pathway_id": f"kegg.pathway:ko{i:05d}",
+                "metabolite_pathway_name": f"Pathway {i}",
+                "gene_count": n - i,
+                "pathway_reaction_count": 10,
+                "pathway_metabolite_count": 5,
+            }
+            for i in range(n)
+        ]
+        # Shuffle so input order isn't already the expected output order.
+        return [rows[i] for i in (1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10)]
+
+    @staticmethod
+    def _by_element():
+        # Mix of singleton (count < 2, dropped) and repeated elements
+        # (count >= 2, kept), 12 kept entries to exercise the cap.
+        singletons = [
+            {"element": s, "metabolite_count": 1} for s in ("Se", "Br")
+        ]
+        kept = [
+            {"element": f"E{i}", "metabolite_count": 13 - i} for i in range(12)
+        ]
+        return singletons + kept
+
+    def _summary_row(self, top_pathways, by_element):
+        return {
+            "total_matching": 0, "gene_count_total": 0, "reaction_count_total": 0,
+            "transporter_count_total": 0, "metabolite_count_total": 0,
+            "rows_by_evidence_source": [], "rows_by_substrate_depth": [],
+            "by_gene": [], "top_metabolites": [], "top_reactions": [],
+            "top_tcdb_families": [], "top_gene_categories": [],
+            "top_metabolite_pathways": top_pathways, "by_element": by_element,
+        }
+
+    def _mock_conn(self, top_pathways, by_element):
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            [self._summary_row(top_pathways, by_element)]
+        ] + [[]] * 10
+        return conn
+
+    def test_top_metabolite_pathways_sorted_then_capped_on_detail_call(self):
+        conn = self._mock_conn(self._top_pathways(12), [])
+        out = api.metabolites_by_gene(self._LOCUS, self._ORG, conn=conn)
+        assert len(out["top_metabolite_pathways"]) == 10
+        assert out["top_metabolite_pathways_truncated"] is True
+        # gene_count desc: ko00000 (gene_count=12) sorts first regardless
+        # of the shuffled input order.
+        assert out["top_metabolite_pathways"][0]["metabolite_pathway_id"] == "kegg.pathway:ko00000"
+
+    def test_top_metabolite_pathways_full_list_on_summary_true(self):
+        conn = self._mock_conn(self._top_pathways(12), [])
+        out = api.metabolites_by_gene(
+            self._LOCUS, self._ORG, summary=True, conn=conn,
+        )
+        assert len(out["top_metabolite_pathways"]) == 12
+        assert "top_metabolite_pathways_truncated" not in out
+
+    def test_by_element_drops_singletons_then_caps_on_detail_call(self):
+        conn = self._mock_conn([], self._by_element())
+        out = api.metabolites_by_gene(self._LOCUS, self._ORG, conn=conn)
+        elements = {e["element"] for e in out["by_element"]}
+        assert "Se" not in elements and "Br" not in elements
+        assert len(out["by_element"]) == 10
+        assert out["by_element_truncated"] is True
+        assert out["by_element"][0]["element"] == "E0"
+
+    def test_by_element_full_list_on_summary_true(self):
+        conn = self._mock_conn([], self._by_element())
+        out = api.metabolites_by_gene(
+            self._LOCUS, self._ORG, summary=True, conn=conn,
+        )
+        elements = {e["element"] for e in out["by_element"]}
+        assert "Se" not in elements and "Br" not in elements
+        assert len(out["by_element"]) == 12
+        assert "by_element_truncated" not in out

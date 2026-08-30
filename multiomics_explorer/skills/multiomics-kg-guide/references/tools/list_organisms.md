@@ -31,9 +31,12 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 - **by_organism_type** (list[OrgTypeBreakdown]): Organism counts per type over the matched set, sorted desc.
 - **by_value_kind** (list[OrgValueKindBreakdown]): DM value_kind frequency rollup across matched organisms.
 - **by_metric_type** (list[OrgMetricTypeBreakdown]): DM metric_type frequency rollup across matched organisms.
+- **by_metric_type_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **by_compartment** (list[OrgCompartmentBreakdown]): Wet-lab compartment frequency rollup across matched organisms.
-- **top_metabolic_capability** (list[OrgMetabolicCapabilityBreakdown]): Top 10 organisms by catalyzed_metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites.
-- **top_annotation_capability** (list[OrgAnnotationCapabilityBreakdown]): Top 10 organisms (within matched set) by peptidase_gene_count desc, then preferred_name. Carries all four annotation counts; excludes organisms with all four = 0. [] when none. Coverage ranking for reading, not a filter.
+- **top_metabolic_capability** (list[OrgMetabolicCapabilityBreakdown]): Top 10 organisms by catalyzed_metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites. `summary=True` returns the full ranked list.
+- **top_metabolic_capability_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
+- **top_annotation_capability** (list[OrgAnnotationCapabilityBreakdown]): Top 10 organisms (within matched set) by peptidase_gene_count desc, then preferred_name. Carries all four annotation counts; excludes organisms with all four = 0. [] when none. Coverage ranking for reading, not a filter. `summary=True` returns the full ranked list.
+- **top_annotation_capability_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **by_measurement_capability** (OrgMeasurementCapability): Binary rollup of metabolomics measurement coverage across matched organisms: {has_metabolomics, no_metabolomics} (tool-specific deviation from list_/by_-style frequency rollups elsewhere — exactly two keys).
 - **returned** (int): Number of results returned.
 - **offset** (int): Offset into full result set.
@@ -126,6 +129,7 @@ list_organisms()
     {"metric_type": "has_primary_tss", "count": 2},
     ...
   ],
+  "by_metric_type_truncated": true,
   "by_compartment": [
     {"compartment": "vesicle", "count": 9},
     {"compartment": "whole_cell", "count": 5},
@@ -164,6 +168,7 @@ list_organisms()
     },
     ...
   ],
+  "top_metabolic_capability_truncated": true,
   "top_annotation_capability": [
     {
       "preferred_name": "Alteromonas (MarRef v6)",
@@ -207,6 +212,7 @@ list_organisms()
     },
     ...
   ],
+  "top_annotation_capability_truncated": true,
   "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 43},
   "returned": 5,
   "offset": 0,
@@ -342,6 +348,7 @@ list_organisms(summary=True)
     {"metric_type": "has_primary_tss", "count": 2},
     ...
   ],
+  "by_metric_type_truncated": null,
   "by_compartment": [
     {"compartment": "vesicle", "count": 9},
     {"compartment": "whole_cell", "count": 5},
@@ -380,6 +387,7 @@ list_organisms(summary=True)
     },
     ...
   ],
+  "top_metabolic_capability_truncated": null,
   "top_annotation_capability": [
     {
       "preferred_name": "Alteromonas (MarRef v6)",
@@ -423,6 +431,7 @@ list_organisms(summary=True)
     },
     ...
   ],
+  "top_annotation_capability_truncated": null,
   "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 43},
   "returned": 0,
   "offset": 0,
@@ -462,6 +471,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
     {"metric_type": "expressed_above_background", "count": 1},
     ...
   ],
+  "by_metric_type_truncated": true,
   "by_compartment": [{"compartment": "vesicle", "count": 2}, {"compartment": "whole_cell", "count": 2}],
   "top_metabolic_capability": [
     {
@@ -477,6 +487,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
       "transported_metabolite_count": 1069
     }
   ],
+  "top_metabolic_capability_truncated": null,
   "top_annotation_capability": [
     {
       "preferred_name": "Alteromonas macleodii MIT1002",
@@ -495,6 +506,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
       "ncbifam_gene_count": 744
     }
   ],
+  "top_annotation_capability_truncated": null,
   "by_measurement_capability": {"has_metabolomics": 0, "no_metabolomics": 2},
   "returned": 2,
   "offset": 0,
@@ -600,6 +612,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
     {"metric_type": "expressed_above_background", "count": 1},
     ...
   ],
+  "by_metric_type_truncated": true,
   "by_compartment": [{"compartment": "vesicle", "count": 1}, {"compartment": "whole_cell", "count": 1}],
   "top_metabolic_capability": [
     {
@@ -615,6 +628,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
       "transported_metabolite_count": 1069
     }
   ],
+  "top_metabolic_capability_truncated": null,
   "top_annotation_capability": [
     {
       "preferred_name": "Prochlorococcus MED4",
@@ -633,6 +647,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
       "ncbifam_gene_count": 774
     }
   ],
+  "top_annotation_capability_truncated": null,
   "by_measurement_capability": {"has_metabolomics": 1, "no_metabolomics": 1},
   "returned": 2,
   "offset": 0,
@@ -744,6 +759,7 @@ list_organisms(compartment="vesicle")
     {"metric_type": "has_primary_tss", "count": 2},
     ...
   ],
+  "by_metric_type_truncated": true,
   "by_compartment": [{"compartment": "vesicle", "count": 9}, {"compartment": "whole_cell", "count": 3}],
   "top_metabolic_capability": [
     {
@@ -778,6 +794,7 @@ list_organisms(compartment="vesicle")
     },
     ...
   ],
+  "top_metabolic_capability_truncated": null,
   "top_annotation_capability": [
     {
       "preferred_name": "Alteromonas macleodii AD45",
@@ -821,6 +838,7 @@ list_organisms(compartment="vesicle")
     },
     ...
   ],
+  "top_annotation_capability_truncated": null,
   "by_measurement_capability": {"has_metabolomics": 2, "no_metabolomics": 7},
   "returned": 5,
   "offset": 0,
@@ -954,6 +972,7 @@ list_organisms(summary=True)
     {"metric_type": "has_primary_tss", "count": 2},
     ...
   ],
+  "by_metric_type_truncated": null,
   "by_compartment": [
     {"compartment": "vesicle", "count": 9},
     {"compartment": "whole_cell", "count": 5},
@@ -992,6 +1011,7 @@ list_organisms(summary=True)
     },
     ...
   ],
+  "top_metabolic_capability_truncated": null,
   "top_annotation_capability": [
     {
       "preferred_name": "Alteromonas (MarRef v6)",
@@ -1035,6 +1055,7 @@ list_organisms(summary=True)
     },
     ...
   ],
+  "top_annotation_capability_truncated": null,
   "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 43},
   "returned": 0,
   "offset": 0,
@@ -1079,6 +1100,7 @@ list_organisms(summary=True)
     {"metric_type": "has_primary_tss", "count": 2},
     ...
   ],
+  "by_metric_type_truncated": null,
   "by_compartment": [
     {"compartment": "vesicle", "count": 9},
     {"compartment": "whole_cell", "count": 5},
@@ -1117,6 +1139,7 @@ list_organisms(summary=True)
     },
     ...
   ],
+  "top_metabolic_capability_truncated": null,
   "top_annotation_capability": [
     {
       "preferred_name": "Alteromonas (MarRef v6)",
@@ -1160,6 +1183,7 @@ list_organisms(summary=True)
     },
     ...
   ],
+  "top_annotation_capability_truncated": null,
   "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 43},
   "returned": 0,
   "offset": 0,
@@ -1197,13 +1221,13 @@ list_organisms → per-row interpro_gene_count / ncbifam_gene_count → ontology
 
 - `catalyzed_metabolite_count` counts catalysis capability only — distinct metabolites reachable through Gene → Reaction → Metabolite. Transport reach is the separate `transported_metabolite_count` (distinct metabolites through Gene → TcdbFamily → Metabolite over each gene's deepest TCDB attachments; breadth, not a confidence signal — inherited superfamily substrates count). Measurement-side coverage is `measured_metabolite_count`. catalyzed_metabolite_count=0 means no catalysis path in this organism, not that chemistry is absent from the KG.
 
-- top_metabolic_capability is a top-10 ranking sorted by catalyzed_metabolite_count descending (transported_metabolite_count is carried as a column, not a sort key); organisms with zero chemistry are excluded. Use it on summary=True calls to identify chemistry-rich organisms before drilling in via list_metabolites(organism_names=[...]).
+- top_metabolic_capability is sorted by catalyzed_metabolite_count descending (transported_metabolite_count is carried as a column, not a sort key); organisms with zero chemistry are excluded. Detail calls cap it to the first 10 (top_metabolic_capability_truncated=true when capped); summary=True returns the full ranking uncapped. Use it to identify chemistry-rich organisms before drilling in via list_metabolites(organism_names=[...]).
 
 - by_measurement_capability is a binary rollup ({has_metabolomics, no_metabolomics}) — tool-specific shape that deviates from the list[{key,count}] frequency rollups elsewhere. See docs://guide/conventions for the standard envelope shape.
 
 - The four annotation-coverage counts (`peptidase_gene_count`, `nonpeptidase_homolog_gene_count`, `interpro_gene_count`, `ncbifam_gene_count`) are distinct-gene counts per organism, zero-filled (never null). A gene carrying both a `peptidase` and a `nonpeptidase_homolog` MEROPS call counts once in each. They measure coverage, not annotation quality, and scale with genome size — rank Prochlorococcus strains against each other, not against a 4,000-gene heterotroph.
 
-- `top_annotation_capability` is a top-10 ranking of the matched set by `peptidase_gene_count` descending, then `preferred_name`; the other three counts are carried as columns, not sort keys. All-zero rows are excluded from the ranking but still appear in `results`. There is no min-count filter — read the ranking, then drill in with genes_by_ontology(ontology='merops', call_class=['peptidase'], organism=...).
+- `top_annotation_capability` ranks the matched set by `peptidase_gene_count` descending, then `preferred_name`; the other three counts are carried as columns, not sort keys. All-zero rows are excluded from the ranking but still appear in `results`. Detail calls cap the ranking to the first 10 (`top_annotation_capability_truncated=true` when capped); `summary=True` returns the full ranking uncapped. There is no min-count filter — read the ranking, then drill in with genes_by_ontology(ontology='merops', call_class=['peptidase'], organism=...).
 
 - Two OrganismTaxon nodes can share a `preferred_name` (the Meiothermus ruber genome strain and the gene-less Meiothermus ruber treatment taxon). Their rows differ in `organism_type` and `gene_count`; the treatment taxon reads 0 on every coverage count. When you need a strain, pick the `genome_strain` row.
 
@@ -1213,7 +1237,7 @@ list_organisms → per-row interpro_gene_count / ncbifam_gene_count → ontology
 from multiomics_explorer import list_organisms
 
 result = list_organisms()
-# returns dict with keys: total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind, by_metric_type, by_compartment, top_metabolic_capability, top_annotation_capability, by_measurement_capability, returned, offset, truncated, not_found, results
+# returns dict with keys: total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind, by_metric_type, by_metric_type_truncated, by_compartment, top_metabolic_capability, top_metabolic_capability_truncated, top_annotation_capability, top_annotation_capability_truncated, by_measurement_capability, returned, offset, truncated, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

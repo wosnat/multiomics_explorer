@@ -293,6 +293,7 @@ top_genes:
   transport_most_specific_rows: 0
   transport_substrate_resolution: null
   transporter_count: 0
+top_genes_truncated: true
 top_reactions:
 - ec_numbers:
   - 6.3.5.7
@@ -391,6 +392,7 @@ top_reactions:
     5^-monophosphate + ATP + L-Glutamine + H2O <=> 6-Thioguanosine monophosphate +
     AMP + Diphosphate + L-Glutamate
   reaction_id: kegg.reaction:R08244
+top_reactions_truncated: true
 top_tcdb_families:
 - gene_count: 20
   level_kind: tc_family

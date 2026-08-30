@@ -85,7 +85,29 @@ SCHEMA_BASELINE_PATH = (
 #
 # evidence_score_signals: present only when `min_evidence_score` is set —
 # pinned by tests/unit/test_api_functions.py::TestGenesByOntologyTrustEnvelope.
-CONDITIONAL_ENVELOPE_KEYS = {"evidence_score_signals"}
+#
+# `*_truncated` (llm-review 2b.2 `_cap_breakdowns`): sparse bool, present
+# only when the corresponding breakdown list was actually capped at 10 on a
+# detail call (absent/None on `summary=True` and on any call whose list
+# doesn't exceed 10) — never demanded by the examples/expected-keys gate.
+CONDITIONAL_ENVELOPE_KEYS = {
+    "evidence_score_signals",
+    "by_publication_truncated",
+    "by_metric_type_truncated",
+    "by_organism_truncated",
+    "by_treatment_type_truncated",
+    "by_background_factors_truncated",
+    "top_annotation_capability_truncated",
+    "top_metabolic_capability_truncated",
+    "top_metabolite_pathways_truncated",
+    "by_element_truncated",
+    "top_genes_truncated",
+    "top_reactions_truncated",
+    "top_tcdb_families_truncated",
+    "experiments_truncated",
+    "by_experiment_truncated",
+    "top_pathways_by_padj_truncated",
+}
 
 
 def get_tool_schemas() -> dict:

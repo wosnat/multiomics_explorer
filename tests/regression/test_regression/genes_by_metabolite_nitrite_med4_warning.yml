@@ -243,6 +243,7 @@ top_genes:
   transport_most_specific_rows: 0
   transport_substrate_resolution: family_inferred
   transporter_count: 1
+top_genes_truncated: true
 top_reactions: []
 top_tcdb_families:
 - gene_count: 20

@@ -11,10 +11,6 @@ by_element:
   metabolite_count: 3
 - element: P
   metabolite_count: 2
-- element: Co
-  metabolite_count: 1
-- element: Mg
-  metabolite_count: 1
 by_evidence_source:
 - count: 13
   evidence_source: transport
@@ -284,46 +280,6 @@ top_gene_categories:
   gene_count: 1
 top_metabolite_pathways:
 - gene_count: 1
-  metabolite_pathway_id: kegg.pathway:ko00270
-  metabolite_pathway_name: Cysteine and methionine metabolism
-  pathway_metabolite_count: 62
-  pathway_reaction_count: 63
-- gene_count: 1
-  metabolite_pathway_id: kegg.pathway:ko01100
-  metabolite_pathway_name: Metabolic pathways
-  pathway_metabolite_count: 1621
-  pathway_reaction_count: 1718
-- gene_count: 1
-  metabolite_pathway_id: kegg.pathway:ko00730
-  metabolite_pathway_name: Thiamine metabolism
-  pathway_metabolite_count: 27
-  pathway_reaction_count: 20
-- gene_count: 1
-  metabolite_pathway_id: kegg.pathway:ko01240
-  metabolite_pathway_name: Biosynthesis of cofactors
-  pathway_metabolite_count: 286
-  pathway_reaction_count: 223
-- gene_count: 1
-  metabolite_pathway_id: kegg.pathway:ko00670
-  metabolite_pathway_name: One carbon pool by folate
-  pathway_metabolite_count: 25
-  pathway_reaction_count: 32
-- gene_count: 1
-  metabolite_pathway_id: kegg.pathway:ko00790
-  metabolite_pathway_name: Folate biosynthesis
-  pathway_metabolite_count: 46
-  pathway_reaction_count: 42
-- gene_count: 1
-  metabolite_pathway_id: kegg.pathway:ko00998
-  metabolite_pathway_name: Biosynthesis of various antibiotics
-  pathway_metabolite_count: 40
-  pathway_reaction_count: 5
-- gene_count: 1
-  metabolite_pathway_id: kegg.pathway:ko01110
-  metabolite_pathway_name: Biosynthesis of secondary metabolites
-  pathway_metabolite_count: 614
-  pathway_reaction_count: 536
-- gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko00740
   metabolite_pathway_name: Riboflavin metabolism
   pathway_metabolite_count: 19
@@ -333,6 +289,46 @@ top_metabolite_pathways:
   metabolite_pathway_name: Biotin metabolism
   pathway_metabolite_count: 23
   pathway_reaction_count: 18
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko00670
+  metabolite_pathway_name: One carbon pool by folate
+  pathway_metabolite_count: 25
+  pathway_reaction_count: 32
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko00730
+  metabolite_pathway_name: Thiamine metabolism
+  pathway_metabolite_count: 27
+  pathway_reaction_count: 20
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko00998
+  metabolite_pathway_name: Biosynthesis of various antibiotics
+  pathway_metabolite_count: 40
+  pathway_reaction_count: 5
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko00790
+  metabolite_pathway_name: Folate biosynthesis
+  pathway_metabolite_count: 46
+  pathway_reaction_count: 42
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko00270
+  metabolite_pathway_name: Cysteine and methionine metabolism
+  pathway_metabolite_count: 62
+  pathway_reaction_count: 63
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko01240
+  metabolite_pathway_name: Biosynthesis of cofactors
+  pathway_metabolite_count: 286
+  pathway_reaction_count: 223
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko01110
+  metabolite_pathway_name: Biosynthesis of secondary metabolites
+  pathway_metabolite_count: 614
+  pathway_reaction_count: 536
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko01100
+  metabolite_pathway_name: Metabolic pathways
+  pathway_metabolite_count: 1621
+  pathway_reaction_count: 1718
 top_metabolites:
 - formula: null
   gene_count: 1

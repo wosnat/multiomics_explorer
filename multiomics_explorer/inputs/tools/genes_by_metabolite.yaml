@@ -66,6 +66,7 @@ examples:
         "by_evidence_source": [{"evidence_source": "transport", "count": 10}],
         "by_substrate_depth": [{"substrate_depth": "most_specific", "count": 10}],
         "top_reactions": [],
+        "top_reactions_truncated": null,
         "top_tcdb_families": [
           {
             "tcdb_family_id": "tcdb:3.A.1.4.4",
@@ -84,6 +85,7 @@ examples:
             "metabolite_count": 1
           }
         ],
+        "top_tcdb_families_truncated": null,
         "top_gene_categories": [{"category": "Stress response and adaptation", "gene_count": 5}],
         "top_genes": [
           {
@@ -147,6 +149,7 @@ examples:
             "tcdb_evidence_score_max": 0.8
           }
         ],
+        "top_genes_truncated": null,
         "gene_count_total": 5,
         "reaction_count_total": 0,
         "transporter_count_total": 2,
@@ -275,6 +278,7 @@ examples:
         "by_evidence_source": [{"evidence_source": "transport", "count": 29}],
         "by_substrate_depth": [{"substrate_depth": "inherited", "count": 23}, {"substrate_depth": "most_specific", "count": 6}],
         "top_reactions": [],
+        "top_reactions_truncated": null,
         "top_tcdb_families": [
           {
             "tcdb_family_id": "tcdb:3.A.1",
@@ -317,6 +321,7 @@ examples:
             "metabolite_count": 1
           }
         ],
+        "top_tcdb_families_truncated": null,
         "top_gene_categories": [
           {"category": "Transport", "gene_count": 10},
           {"category": "Stress response and adaptation", "gene_count": 5},
@@ -388,6 +393,7 @@ examples:
           },
           ...
         ],
+        "top_genes_truncated": true,
         "gene_count_total": 27,
         "reaction_count_total": 0,
         "transporter_count_total": 5,

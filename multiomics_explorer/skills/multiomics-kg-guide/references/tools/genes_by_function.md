@@ -32,6 +32,7 @@ total_search_hits, total_matching, by_organism, by_category, score_max, score_me
 - **total_search_hits** (int): Total genes matching search text (before organism/category/quality filters).
 - **total_matching** (int): Total genes matching search + all filters.
 - **by_organism** (list[FunctionOrganismBreakdown]): Gene counts per organism, sorted desc.
+- **by_organism_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **by_category** (list[FunctionCategoryBreakdown]): Gene counts per category, sorted desc.
 - **score_max** (float | None): Highest relevance score (null if 0 matches).
 - **score_median** (float | None): Median relevance score (null if 0 matches).
@@ -78,6 +79,7 @@ genes_by_function(search_text="photosystem")
     {"organism_name": "Prochlorococcus MIT9313", "count": 78},
     ...
   ],
+  "by_organism_truncated": true,
   "by_category": [
     {"category": "Photosynthesis", "count": 1001},
     {"category": "Stress response and adaptation", "count": 274},
@@ -148,6 +150,7 @@ genes_by_function(search_text="chaperone", summary=True)
     {"organism_name": "Alteromonas macleodii HOT1A3", "count": 42},
     ...
   ],
+  "by_organism_truncated": null,
   "by_category": [
     {"category": "Post-translational modification", "count": 641},
     {"category": "Stress response and adaptation", "count": 199},
@@ -219,7 +222,7 @@ result['total_matching']  # results may be truncated
 from multiomics_explorer import genes_by_function
 
 result = genes_by_function(search_text=...)
-# returns dict with keys: total_search_hits, total_matching, by_organism, by_category, score_max, score_median, returned, offset, truncated, results
+# returns dict with keys: total_search_hits, total_matching, by_organism, by_organism_truncated, by_category, score_max, score_median, returned, offset, truncated, results
 ```
 
 Use package import for bulk data extraction in scripts.

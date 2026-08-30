@@ -27,6 +27,7 @@ total_matching, by_organism, returned, offset, truncated, results
 
 - **total_matching** (int): Total genes matching identifier + organism filter.
 - **by_organism** (list[ResolveOrganismBreakdown]): Match counts per organism, sorted desc.
+- **by_organism_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **returned** (int): Genes in this response.
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if total_matching > returned.
@@ -52,6 +53,7 @@ resolve_gene(identifier="PMM0001")
 {
   "total_matching": 1,
   "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
+  "by_organism_truncated": null,
   "returned": 1,
   "offset": 0,
   "truncated": false,
@@ -83,6 +85,7 @@ resolve_gene(identifier="dnaN")
     {"organism_name": "Alteromonas macleodii BS11", "count": 1},
     ...
   ],
+  "by_organism_truncated": true,
   "returned": 5,
   "offset": 0,
   "truncated": true,
@@ -162,7 +165,7 @@ resolve_gene(identifier='PMM0001')  # exact identity resolution
 from multiomics_explorer import resolve_gene
 
 result = resolve_gene(identifier=...)
-# returns dict with keys: total_matching, by_organism, returned, offset, truncated, results
+# returns dict with keys: total_matching, by_organism, by_organism_truncated, returned, offset, truncated, results
 ```
 
 Use package import for bulk data extraction in scripts.

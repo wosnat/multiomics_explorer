@@ -70,7 +70,10 @@ class TestGenesByFunctionContract:
             "total_search_hits", "total_matching", "by_organism", "by_category",
             "score_max", "score_median", "returned", "truncated", "offset", "results",
         }
-        assert set(result.keys()) == expected_envelope
+        # by_organism_truncated (llm-review 2b.2 `_cap_breakdowns`) is a sparse
+        # key, present only when `by_organism` was actually capped at 10 — a
+        # common gene search like this one spans enough organisms to trigger it.
+        assert set(result.keys()) - {"by_organism_truncated"} == expected_envelope
 
     def test_result_keys(self, conn):
         result = api.genes_by_function("DNA polymerase", conn=conn)

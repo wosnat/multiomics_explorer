@@ -207,6 +207,204 @@ top_annotation_capability:
   organism_name: Alteromonas macleodii HOT1A3
   peptidase_gene_count: 118
   preferred_name: Alteromonas macleodii HOT1A3
+- interpro_gene_count: 3621
+  ncbifam_gene_count: 1686
+  nonpeptidase_homolog_gene_count: 31
+  organism_name: Alteromonas mediterranea AltDE1
+  peptidase_gene_count: 116
+  preferred_name: Alteromonas mediterranea AltDE1
+- interpro_gene_count: 3953
+  ncbifam_gene_count: 1453
+  nonpeptidase_homolog_gene_count: 33
+  organism_name: Ruegeria pomeroyi DSS-3
+  peptidase_gene_count: 111
+  preferred_name: Ruegeria pomeroyi DSS-3
+- interpro_gene_count: 3363
+  ncbifam_gene_count: 1591
+  nonpeptidase_homolog_gene_count: 31
+  organism_name: Alteromonas mediterranea AltDE
+  peptidase_gene_count: 104
+  preferred_name: Alteromonas mediterranea AltDE
+- interpro_gene_count: 2492
+  ncbifam_gene_count: 951
+  nonpeptidase_homolog_gene_count: 26
+  organism_name: Meiothermus ruber
+  peptidase_gene_count: 99
+  preferred_name: Meiothermus ruber
+- interpro_gene_count: 3780
+  ncbifam_gene_count: 1712
+  nonpeptidase_homolog_gene_count: 31
+  organism_name: Marinobacter (MarRef v6)
+  peptidase_gene_count: 94
+  preferred_name: Marinobacter (MarRef v6)
+- interpro_gene_count: 2721
+  ncbifam_gene_count: 1161
+  nonpeptidase_homolog_gene_count: 15
+  organism_name: Synechococcus PCC 7002
+  peptidase_gene_count: 94
+  preferred_name: Synechococcus PCC 7002
+- interpro_gene_count: 2336
+  ncbifam_gene_count: 1085
+  nonpeptidase_homolog_gene_count: 14
+  organism_name: Synechococcus elongatus UTEX 2973
+  peptidase_gene_count: 82
+  preferred_name: Synechococcus elongatus UTEX 2973
+- interpro_gene_count: 2339
+  ncbifam_gene_count: 1081
+  nonpeptidase_homolog_gene_count: 14
+  organism_name: Synechococcus elongatus PCC 7942
+  peptidase_gene_count: 81
+  preferred_name: Synechococcus elongatus PCC 7942
+- interpro_gene_count: 2178
+  ncbifam_gene_count: 1078
+  nonpeptidase_homolog_gene_count: 16
+  organism_name: Thermosynechococcus vestitus BP-1
+  peptidase_gene_count: 77
+  preferred_name: Thermosynechococcus vestitus BP-1
+- interpro_gene_count: 2015
+  ncbifam_gene_count: 895
+  nonpeptidase_homolog_gene_count: 13
+  organism_name: Prochlorococcus MIT9303
+  peptidase_gene_count: 72
+  preferred_name: Prochlorococcus MIT9303
+- interpro_gene_count: 1923
+  ncbifam_gene_count: 883
+  nonpeptidase_homolog_gene_count: 10
+  organism_name: Prochlorococcus MIT1327
+  peptidase_gene_count: 70
+  preferred_name: Prochlorococcus MIT1327
+- interpro_gene_count: 2152
+  ncbifam_gene_count: 909
+  nonpeptidase_homolog_gene_count: 17
+  organism_name: Synechococcus CC9311
+  peptidase_gene_count: 70
+  preferred_name: Synechococcus CC9311
+- interpro_gene_count: 2079
+  ncbifam_gene_count: 884
+  nonpeptidase_homolog_gene_count: 9
+  organism_name: Synechococcus WH7803
+  peptidase_gene_count: 68
+  preferred_name: Synechococcus WH7803
+- interpro_gene_count: 2105
+  ncbifam_gene_count: 908
+  nonpeptidase_homolog_gene_count: 13
+  organism_name: Synechococcus WH8102
+  peptidase_gene_count: 61
+  preferred_name: Synechococcus WH8102
+- interpro_gene_count: 1998
+  ncbifam_gene_count: 884
+  nonpeptidase_homolog_gene_count: 10
+  organism_name: Synechococcus sp. BL107
+  peptidase_gene_count: 61
+  preferred_name: Synechococcus sp. BL107
+- interpro_gene_count: 1888
+  ncbifam_gene_count: 905
+  nonpeptidase_homolog_gene_count: 11
+  organism_name: Prochlorococcus MIT9313
+  peptidase_gene_count: 60
+  preferred_name: Prochlorococcus MIT9313
+- interpro_gene_count: 1869
+  ncbifam_gene_count: 858
+  nonpeptidase_homolog_gene_count: 12
+  organism_name: Synechococcus WH8109
+  peptidase_gene_count: 60
+  preferred_name: Synechococcus WH8109
+- interpro_gene_count: 1616
+  ncbifam_gene_count: 793
+  nonpeptidase_homolog_gene_count: 11
+  organism_name: Prochlorococcus MIT0801
+  peptidase_gene_count: 52
+  preferred_name: Prochlorococcus MIT0801
+- interpro_gene_count: 1525
+  ncbifam_gene_count: 760
+  nonpeptidase_homolog_gene_count: 8
+  organism_name: Prochlorococcus SB
+  peptidase_gene_count: 51
+  preferred_name: Prochlorococcus SB
+- interpro_gene_count: 1545
+  ncbifam_gene_count: 744
+  nonpeptidase_homolog_gene_count: 8
+  organism_name: Prochlorococcus MED4
+  peptidase_gene_count: 50
+  preferred_name: Prochlorococcus MED4
+- interpro_gene_count: 1600
+  ncbifam_gene_count: 770
+  nonpeptidase_homolog_gene_count: 8
+  organism_name: Prochlorococcus MIT0604
+  peptidase_gene_count: 50
+  preferred_name: Prochlorococcus MIT0604
+- interpro_gene_count: 1580
+  ncbifam_gene_count: 770
+  nonpeptidase_homolog_gene_count: 10
+  organism_name: Prochlorococcus MIT9215
+  peptidase_gene_count: 50
+  preferred_name: Prochlorococcus MIT9215
+- interpro_gene_count: 1557
+  ncbifam_gene_count: 759
+  nonpeptidase_homolog_gene_count: 9
+  organism_name: Prochlorococcus MIT9312
+  peptidase_gene_count: 50
+  preferred_name: Prochlorococcus MIT9312
+- interpro_gene_count: 1538
+  ncbifam_gene_count: 744
+  nonpeptidase_homolog_gene_count: 8
+  organism_name: Prochlorococcus MIT9515
+  peptidase_gene_count: 50
+  preferred_name: Prochlorococcus MIT9515
+- interpro_gene_count: 1567
+  ncbifam_gene_count: 775
+  nonpeptidase_homolog_gene_count: 10
+  organism_name: Prochlorococcus NATL2A
+  peptidase_gene_count: 50
+  preferred_name: Prochlorococcus NATL2A
+- interpro_gene_count: 1563
+  ncbifam_gene_count: 771
+  nonpeptidase_homolog_gene_count: 10
+  organism_name: Prochlorococcus PAC1
+  peptidase_gene_count: 50
+  preferred_name: Prochlorococcus PAC1
+- interpro_gene_count: 1547
+  ncbifam_gene_count: 758
+  nonpeptidase_homolog_gene_count: 8
+  organism_name: Prochlorococcus AS9601
+  peptidase_gene_count: 49
+  preferred_name: Prochlorococcus AS9601
+- interpro_gene_count: 1537
+  ncbifam_gene_count: 774
+  nonpeptidase_homolog_gene_count: 10
+  organism_name: Prochlorococcus MIT9301
+  peptidase_gene_count: 49
+  preferred_name: Prochlorococcus MIT9301
+- interpro_gene_count: 1573
+  ncbifam_gene_count: 777
+  nonpeptidase_homolog_gene_count: 12
+  organism_name: Prochlorococcus NATL1A
+  peptidase_gene_count: 49
+  preferred_name: Prochlorococcus NATL1A
+- interpro_gene_count: 1550
+  ncbifam_gene_count: 760
+  nonpeptidase_homolog_gene_count: 10
+  organism_name: Prochlorococcus RSP50
+  peptidase_gene_count: 49
+  preferred_name: Prochlorococcus RSP50
+- interpro_gene_count: 1527
+  ncbifam_gene_count: 778
+  nonpeptidase_homolog_gene_count: 9
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  peptidase_gene_count: 49
+  preferred_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+- interpro_gene_count: 1529
+  ncbifam_gene_count: 756
+  nonpeptidase_homolog_gene_count: 11
+  organism_name: Prochlorococcus MIT9202
+  peptidase_gene_count: 48
+  preferred_name: Prochlorococcus MIT9202
+- interpro_gene_count: 1541
+  ncbifam_gene_count: 753
+  nonpeptidase_homolog_gene_count: 12
+  organism_name: Prochlorococcus MIT1314
+  peptidase_gene_count: 46
+  preferred_name: Prochlorococcus MIT1314
 top_metabolic_capability:
 - catalyzed_metabolite_count: 1490
   organism_name: Pseudomonas putida KT2440
@@ -248,6 +446,138 @@ top_metabolic_capability:
   organism_name: Alteromonas mediterranea AltDE1
   reaction_count: 1249
   transported_metabolite_count: 1256
+- catalyzed_metabolite_count: 1309
+  organism_name: Alteromonas macleodii ATCC27126
+  reaction_count: 1251
+  transported_metabolite_count: 1267
+- catalyzed_metabolite_count: 1306
+  organism_name: Alteromonas mediterranea AltDE
+  reaction_count: 1206
+  transported_metabolite_count: 1254
+- catalyzed_metabolite_count: 1306
+  organism_name: Shewanella sp. W3-18-1
+  reaction_count: 1260
+  transported_metabolite_count: 1264
+- catalyzed_metabolite_count: 1282
+  organism_name: Alteromonas macleodii BS11
+  reaction_count: 1228
+  transported_metabolite_count: 1265
+- catalyzed_metabolite_count: 1215
+  organism_name: Meiothermus ruber
+  reaction_count: 1138
+  transported_metabolite_count: 1201
+- catalyzed_metabolite_count: 1175
+  organism_name: Synechococcus elongatus UTEX 2973
+  reaction_count: 1058
+  transported_metabolite_count: 1205
+- catalyzed_metabolite_count: 1170
+  organism_name: Synechococcus elongatus PCC 7942
+  reaction_count: 1033
+  transported_metabolite_count: 1205
+- catalyzed_metabolite_count: 1145
+  organism_name: Synechococcus WH7803
+  reaction_count: 1045
+  transported_metabolite_count: 1132
+- catalyzed_metabolite_count: 1135
+  organism_name: Prochlorococcus MIT9303
+  reaction_count: 993
+  transported_metabolite_count: 1169
+- catalyzed_metabolite_count: 1129
+  organism_name: Synechococcus CC9311
+  reaction_count: 1039
+  transported_metabolite_count: 1178
+- catalyzed_metabolite_count: 1120
+  organism_name: Synechococcus WH8102
+  reaction_count: 1027
+  transported_metabolite_count: 1172
+- catalyzed_metabolite_count: 1105
+  organism_name: Synechococcus PCC 7002
+  reaction_count: 977
+  transported_metabolite_count: 1222
+- catalyzed_metabolite_count: 1084
+  organism_name: Prochlorococcus MIT1327
+  reaction_count: 956
+  transported_metabolite_count: 1099
+- catalyzed_metabolite_count: 1081
+  organism_name: Prochlorococcus MIT9313
+  reaction_count: 953
+  transported_metabolite_count: 1154
+- catalyzed_metabolite_count: 1076
+  organism_name: Prochlorococcus PAC1
+  reaction_count: 959
+  transported_metabolite_count: 1103
+- catalyzed_metabolite_count: 1068
+  organism_name: Synechococcus sp. BL107
+  reaction_count: 989
+  transported_metabolite_count: 1143
+- catalyzed_metabolite_count: 1059
+  organism_name: Synechococcus WH8109
+  reaction_count: 983
+  transported_metabolite_count: 1151
+- catalyzed_metabolite_count: 1052
+  organism_name: Prochlorococcus MIT9301
+  reaction_count: 945
+  transported_metabolite_count: 1061
+- catalyzed_metabolite_count: 1048
+  organism_name: Prochlorococcus MIT9215
+  reaction_count: 950
+  transported_metabolite_count: 1066
+- catalyzed_metabolite_count: 1047
+  organism_name: Prochlorococcus MIT9312
+  reaction_count: 943
+  transported_metabolite_count: 1061
+- catalyzed_metabolite_count: 1046
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  reaction_count: 919
+  transported_metabolite_count: 1081
+- catalyzed_metabolite_count: 1043
+  organism_name: Prochlorococcus RSP50
+  reaction_count: 948
+  transported_metabolite_count: 1083
+- catalyzed_metabolite_count: 1039
+  organism_name: Prochlorococcus MED4
+  reaction_count: 943
+  transported_metabolite_count: 1069
+- catalyzed_metabolite_count: 1039
+  organism_name: Prochlorococcus NATL1A
+  reaction_count: 935
+  transported_metabolite_count: 1106
+- catalyzed_metabolite_count: 1036
+  organism_name: Prochlorococcus MIT0801
+  reaction_count: 934
+  transported_metabolite_count: 1073
+- catalyzed_metabolite_count: 1029
+  organism_name: Prochlorococcus NATL2A
+  reaction_count: 927
+  transported_metabolite_count: 1074
+- catalyzed_metabolite_count: 1027
+  organism_name: Prochlorococcus MIT1314
+  reaction_count: 928
+  transported_metabolite_count: 1057
+- catalyzed_metabolite_count: 1025
+  organism_name: Prochlorococcus SB
+  reaction_count: 931
+  transported_metabolite_count: 1059
+- catalyzed_metabolite_count: 1022
+  organism_name: Prochlorococcus MIT0604
+  reaction_count: 930
+  transported_metabolite_count: 1057
+- catalyzed_metabolite_count: 1018
+  organism_name: Prochlorococcus MIT9515
+  reaction_count: 926
+  transported_metabolite_count: 1101
+- catalyzed_metabolite_count: 1017
+  organism_name: Prochlorococcus AS9601
+  reaction_count: 924
+  transported_metabolite_count: 1060
+- catalyzed_metabolite_count: 1014
+  organism_name: Prochlorococcus MIT9202
+  reaction_count: 921
+  transported_metabolite_count: 1065
+- catalyzed_metabolite_count: 1003
+  organism_name: Thermosynechococcus vestitus BP-1
+  reaction_count: 894
+  transported_metabolite_count: 1156
 total_entries: 48
 total_matching: 48
 truncated: true

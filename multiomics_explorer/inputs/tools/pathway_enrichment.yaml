@@ -62,6 +62,7 @@ examples:
             "n_clusters": 14
           }
         ],
+        "by_experiment_truncated": null,
         "by_direction": [
           {"direction": "down", "n_tests": 49, "n_significant": 5},
           {"direction": "up", "n_tests": 49, "n_significant": 0}
@@ -209,6 +210,7 @@ examples:
           },
           ...
         ],
+        "top_pathways_by_padj_truncated": true,
         "not_found": [],
         "not_matched": [],
         "no_expression": [],
@@ -368,6 +370,7 @@ examples:
             "n_clusters": 4
           }
         ],
+        "by_experiment_truncated": null,
         "by_direction": [
           {"direction": "down", "n_tests": 4, "n_significant": 1},
           {"direction": "up", "n_tests": 4, "n_significant": 0}
@@ -497,6 +500,7 @@ examples:
           },
           ...
         ],
+        "top_pathways_by_padj_truncated": null,
         "not_found": [],
         "not_matched": [],
         "no_expression": [],
@@ -596,6 +600,7 @@ examples:
             "n_clusters": 4
           }
         ],
+        "by_experiment_truncated": null,
         "by_direction": [
           {"direction": "down", "n_tests": 134, "n_significant": 8},
           {"direction": "up", "n_tests": 134, "n_significant": 2}
@@ -725,6 +730,7 @@ examples:
           },
           ...
         ],
+        "top_pathways_by_padj_truncated": null,
         "not_found": [],
         "not_matched": [],
         "no_expression": [],

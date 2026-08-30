@@ -396,12 +396,14 @@ class TestListOrganisms:
             assert row["catalyzed_metabolite_count"] > 0
 
     def test_top_metabolic_capability_top_organisms(self, conn):
-        """top_metabolic_capability is populated with top organisms in summary mode,
-        sorted desc by catalyzed_metabolite_count, excluding zero-chemistry
-        organisms (catalysis-arm rename, KG-SYNC-001)."""
+        """top_metabolic_capability (summary=True) is the FULL ranking
+        (llm-review 2b.2: summary keeps the full list), sorted desc by
+        catalyzed_metabolite_count, excluding zero-chemistry organisms
+        (catalysis-arm rename, KG-SYNC-001)."""
         result = api.list_organisms(summary=True, conn=conn)
         cap = result["top_metabolic_capability"]
-        assert len(cap) > 0 and len(cap) <= 10
+        assert len(cap) > 0
+        assert "top_metabolic_capability_truncated" not in result
         # Sorted descending by catalyzed_metabolite_count
         catalyzed_counts = [r["catalyzed_metabolite_count"] for r in cap]
         assert catalyzed_counts == sorted(catalyzed_counts, reverse=True)
@@ -409,6 +411,14 @@ class TestListOrganisms:
         for entry in cap:
             assert (entry["catalyzed_metabolite_count"] > 0
                     or entry["reaction_count"] > 0)
+
+    def test_top_metabolic_capability_capped_on_detail_call(self, conn):
+        """Detail calls (summary=False) cap the same ranking to the first 10
+        (llm-review 2b.2 `_cap_breakdowns`)."""
+        result = api.list_organisms(limit=500, conn=conn)
+        cap = result["top_metabolic_capability"]
+        assert len(cap) == 10
+        assert result["top_metabolic_capability_truncated"] is True
 
 
 @pytest.mark.kg
@@ -4245,10 +4255,20 @@ class TestListOrganismsAnnotationCapabilityLive:
         peps = [c["peptidase_gene_count"] for c in cap]
         assert peps == sorted(peps, reverse=True)
 
-    def test_summary_mode_matches_detail_mode(self, conn):
-        detail = api.list_organisms(limit=500, conn=conn)["top_annotation_capability"]
-        summary = api.list_organisms(summary=True, conn=conn)["top_annotation_capability"]
-        assert summary == detail
+    def test_summary_mode_is_the_full_ranking_detail_mode_is_capped(self, conn):
+        """llm-review 2b.2 `_cap_breakdowns`: detail calls (summary=False)
+        cap the ranking to the first 10 with `_truncated=True`; summary=True
+        carries the full ranking. Detail's capped list is exactly the
+        summary ranking's first 10 entries."""
+        detail_result = api.list_organisms(limit=500, conn=conn)
+        detail = detail_result["top_annotation_capability"]
+        summary_result = api.list_organisms(summary=True, conn=conn)
+        summary = summary_result["top_annotation_capability"]
+        assert len(detail) == 10
+        assert detail_result["top_annotation_capability_truncated"] is True
+        assert len(summary) > 10
+        assert "top_annotation_capability_truncated" not in summary_result
+        assert summary[:10] == detail
 
     def test_med4_subset_ranks_exactly_med4(self, conn):
         res = api.list_organisms(organism_names=[_SLICE4_MED4], conn=conn)

@@ -35,12 +35,14 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 - **total_entries** (int): Total publications in KG (unfiltered).
 - **total_matching** (int): Publications matching filters.
 - **by_organism** (list[PubOrganismBreakdown]): Publication counts per organism, sorted desc.
+- **by_organism_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **by_treatment_type** (list[PubTreatmentTypeBreakdown]): Publication counts per treatment type, sorted desc.
 - **by_background_factors** (list[PubBackgroundFactorBreakdown]): Publication counts per background factor, sorted desc.
 - **by_omics_type** (list[PubOmicsTypeBreakdown]): Publication counts per omics platform, sorted desc.
 - **by_cluster_type** (list[PubClusterTypeBreakdown]): Publication counts per cluster type, sorted desc.
 - **by_value_kind** (list[PubValueKindBreakdown]): DerivedMetric value kind frequency rollup across matched publications.
 - **by_metric_type** (list[PubMetricTypeBreakdown]): DerivedMetric type frequency rollup across matched publications.
+- **by_metric_type_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **by_compartment** (list[PubCompartmentBreakdown]): Wet-lab compartment frequency rollup across matched publications.
 - **by_discusses_coverage** (PubDiscussesCoverageBreakdown): Binary split {has_discusses, no_discusses} of matched publications by whether they carry a narrative 'discusses' literature index (45 vs 4 in the current KG).
 - **returned** (int): Publications in this response.
@@ -106,6 +108,7 @@ list_publications()
     {"organism_name": "Prochlorococcus MIT9312", "count": 5},
     ...
   ],
+  "by_organism_truncated": true,
   "by_treatment_type": [
     {"treatment_type": "coculture", "count": 12},
     {"treatment_type": "carbon", "count": 6},
@@ -150,6 +153,7 @@ list_publications()
     {"metric_type": "rapid_recovery_low_co2_shock", "count": 1},
     ...
   ],
+  "by_metric_type_truncated": true,
   "by_compartment": [
     {"compartment": "whole_cell", "count": 44},
     {"compartment": "exoproteome", "count": 4},
@@ -282,6 +286,7 @@ list_publications(compartment="vesicle")
     {"organism_name": "Alteromonas macleodii ATCC27126", "count": 1},
     ...
   ],
+  "by_organism_truncated": null,
   "by_treatment_type": [{"treatment_type": "compartment", "count": 3}],
   "by_background_factors": [
     {"background_factor": "axenic", "count": 3},
@@ -307,6 +312,7 @@ list_publications(compartment="vesicle")
     {"metric_type": "cell_abundance_biovolume_normalized", "count": 1},
     ...
   ],
+  "by_metric_type_truncated": null,
   "by_compartment": [{"compartment": "vesicle", "count": 3}, {"compartment": "whole_cell", "count": 1}],
   "by_discusses_coverage": {"has_discusses": 2, "no_discusses": 1},
   "returned": 3,
@@ -428,6 +434,7 @@ list_publications(publication_dois=["10.1128/msystems.01261-22", "10.1073/pnas.2
     {"organism_name": "Prochlorococcus MIT0801", "count": 1},
     {"organism_name": "Prochlorococcus MIT9301", "count": 1}
   ],
+  "by_organism_truncated": null,
   "by_treatment_type": [
     {"treatment_type": "compartment", "count": 1},
     {"treatment_type": "carbon", "count": 1},
@@ -447,6 +454,7 @@ list_publications(publication_dois=["10.1128/msystems.01261-22", "10.1073/pnas.2
     {"metric_type": "log2_vesicle_cell_enrichment", "count": 1},
     {"metric_type": "vesicle_abundance_biovolume_normalized", "count": 1}
   ],
+  "by_metric_type_truncated": null,
   "by_compartment": [
     {"compartment": "whole_cell", "count": 3},
     {"compartment": "vesicle", "count": 1},
@@ -566,6 +574,7 @@ list_publications()
     {"organism_name": "Prochlorococcus MIT9312", "count": 5},
     ...
   ],
+  "by_organism_truncated": true,
   "by_treatment_type": [
     {"treatment_type": "coculture", "count": 12},
     {"treatment_type": "carbon", "count": 6},
@@ -610,6 +619,7 @@ list_publications()
     {"metric_type": "rapid_recovery_low_co2_shock", "count": 1},
     ...
   ],
+  "by_metric_type_truncated": true,
   "by_compartment": [
     {"compartment": "whole_cell", "count": 44},
     {"compartment": "exoproteome", "count": 4},
@@ -744,7 +754,7 @@ list_publications(search_text='Biller') then list_experiments(publication_doi=['
 from multiomics_explorer import list_publications
 
 result = list_publications()
-# returns dict with keys: total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, by_value_kind, by_metric_type, by_compartment, by_discusses_coverage, returned, offset, truncated, not_found, results
+# returns dict with keys: total_entries, total_matching, by_organism, by_organism_truncated, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, by_value_kind, by_metric_type, by_metric_type_truncated, by_compartment, by_discusses_coverage, returned, offset, truncated, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

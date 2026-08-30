@@ -8,30 +8,28 @@ by_direction:
   n_tests: 1171
 by_experiment:
 - background_factors:
-  - axenic
+  - coculture
   - light
-  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
-  is_time_course: false
-  n_clusters: 2
-  n_significant: 4
-  n_tests: 134
-  name: MED4 Growth on cyanate as sole N source (MED4) vs N-replete Pro99 medium (MED4)
-    (MICROARRAY)
-  omics_type: MICROARRAY
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  is_time_course: true
+  n_clusters: 10
+  n_significant: 20
+  n_tests: 640
+  name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (PROTEOMICS)
+  omics_type: PROTEOMICS
   table_scope: all_detected_genes
   treatment_type:
   - nitrogen
 - background_factors:
   - axenic
   - light
-  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
-  is_time_course: false
-  n_clusters: 2
-  n_significant: 1
-  n_tests: 134
-  name: MED4 Growth on urea as sole N source (MED4) vs N-replete Pro99 medium (MED4)
-    (MICROARRAY)
-  omics_type: MICROARRAY
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  is_time_course: true
+  n_clusters: 6
+  n_significant: 8
+  n_tests: 384
+  name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (PROTEOMICS)
+  omics_type: PROTEOMICS
   table_scope: all_detected_genes
   treatment_type:
   - nitrogen
@@ -50,26 +48,14 @@ by_experiment:
 - background_factors:
   - axenic
   - light
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
-  is_time_course: true
-  n_clusters: 6
-  n_significant: 8
-  n_tests: 384
-  name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (PROTEOMICS)
-  omics_type: PROTEOMICS
-  table_scope: all_detected_genes
-  treatment_type:
-  - nitrogen
-- background_factors:
-  - coculture
-  - light
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  is_time_course: true
-  n_clusters: 10
-  n_significant: 20
-  n_tests: 640
-  name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (PROTEOMICS)
-  omics_type: PROTEOMICS
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
+  is_time_course: false
+  n_clusters: 2
+  n_significant: 4
+  n_tests: 134
+  name: MED4 Growth on cyanate as sole N source (MED4) vs N-replete Pro99 medium (MED4)
+    (MICROARRAY)
+  omics_type: MICROARRAY
   table_scope: all_detected_genes
   treatment_type:
   - nitrogen
@@ -83,6 +69,20 @@ by_experiment:
   n_tests: 670
   name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)
   omics_type: RNASEQ
+  table_scope: all_detected_genes
+  treatment_type:
+  - nitrogen
+- background_factors:
+  - axenic
+  - light
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
+  is_time_course: false
+  n_clusters: 2
+  n_significant: 1
+  n_tests: 134
+  name: MED4 Growth on urea as sole N source (MED4) vs N-replete Pro99 medium (MED4)
+    (MICROARRAY)
+  omics_type: MICROARRAY
   table_scope: all_detected_genes
   treatment_type:
   - nitrogen
@@ -86896,6 +86896,7 @@ top_pathways_by_padj:
   signed_score: 4.336816140134432
   term_id: cyanorak.role:Q.1
   term_name: Transport and binding proteins > Amino acids, peptides and amines
+top_pathways_by_padj_truncated: true
 total_matching: 2342
 truncated: false
 trust_axes:

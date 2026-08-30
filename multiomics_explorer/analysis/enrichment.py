@@ -1034,6 +1034,9 @@ def _envelope_by_experiment(df, inputs, pvalue_cutoff):
             "n_significant": int((sub["p_adjust"] < pvalue_cutoff).sum()),
             "n_clusters": int(sub["cluster"].nunique()),
         })
+    # Sorted desc by n_significant (the ranking count `_cap_breakdowns` caps
+    # on in `to_envelope`), then experiment_id for a deterministic order.
+    out.sort(key=lambda e: (-e["n_significant"], e["experiment_id"]))
     return out
 
 
@@ -1129,12 +1132,16 @@ def _envelope_top_clusters(df, inputs, top_n=5):
     return out
 
 
-def _envelope_top_pathways(df, top_n=10):
+def _envelope_top_pathways(df):
+    """Every tested (cluster, term) row ranked by p_adjust ascending (most
+    significant first). Full list — `to_envelope` caps it to the top 10 on
+    detail calls via `_cap_breakdowns`; `summary=True` keeps the full ranking.
+    """
     if df.empty:
         return []
-    top = df.sort_values(
+    ranked = df.sort_values(
         ["p_adjust", "cluster", "term_id"], ascending=True
-    ).head(top_n)
+    )
     return [
         {
             "cluster": r["cluster"],
@@ -1143,7 +1150,7 @@ def _envelope_top_pathways(df, top_n=10):
             "p_adjust": float(r["p_adjust"]),
             "signed_score": float(r["signed_score"]) if "signed_score" in r else 0.0,
         }
-        for _, r in top.iterrows()
+        for _, r in ranked.iterrows()
     ]
 
 
@@ -1487,8 +1494,22 @@ class EnrichmentResult:
         the all-tested count survives there (e.g. sum ``by_experiment[].
         n_tests``) even when ``total_matching`` itself has been narrowed to
         the significant subset.
+
+        ``by_experiment`` (sorted desc by ``n_significant``) and
+        ``top_pathways_by_padj`` (already ranked by ``p_adjust`` ascending)
+        are capped to the first 10 entries with a sparse
+        ``{key}_truncated=True`` flag when either exceeds that;
+        ``summary=True`` returns each list in full.
         """
+        # Lazy import: avoids a module-level cycle with api/functions.py,
+        # which lazily imports this module inside pathway_enrichment /
+        # cluster_enrichment.
+        from multiomics_explorer.api.functions import _cap_breakdowns
+
         env = self.generate_summary()
+        env = _cap_breakdowns(
+            env, ("top_pathways_by_padj", "by_experiment"), summary=summary,
+        )
         params = getattr(self, "params", None) or {}
         env["filters_applied"] = dict(params.get("filters_applied") or {})
         env["trust_axes"] = dict(params.get("trust_axes") or {})

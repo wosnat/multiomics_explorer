@@ -36,38 +36,7 @@ by_metric_type:
   metric_type: expression_change_low_co2_shock
 - count: 1
   metric_type: expression_level_class
-- count: 1
-  metric_type: has_primary_tss
-- count: 1
-  metric_type: internal_tss_count
-- count: 1
-  metric_type: mascot_identification_probability
-- count: 1
-  metric_type: minus10_element_score
-- count: 1
-  metric_type: pangenome_membership
-- count: 1
-  metric_type: peak_time_protein_h
-- count: 1
-  metric_type: peak_time_transcript_h
-- count: 1
-  metric_type: predicted_subcellular_localization
-- count: 1
-  metric_type: protein_transcript_lag_h
-- count: 1
-  metric_type: rapid_recovery_low_co2_no_o2_shock
-- count: 1
-  metric_type: rapid_recovery_low_co2_shock
-- count: 1
-  metric_type: rna_decay_time_min
-- count: 1
-  metric_type: rna_half_life_min
-- count: 1
-  metric_type: tss_distance_to_cds
-- count: 1
-  metric_type: vesicle_dna_avg_read_coverage
-- count: 1
-  metric_type: vesicle_proteome_member
+by_metric_type_truncated: true
 by_organism_type:
 - count: 1
   organism_type: genome_strain

@@ -84,12 +84,14 @@ total_matching, returned, offset, truncated, warnings, resolved_aliases, not_fou
 - **by_gene** (list[MbgByGene]): Per-gene rollup. One entry per input locus_tag that produced ≥1 row.
 - **by_evidence_source** (list[MbgByEvidenceSource]): Frequency over `evidence_source` values present in the slice (≤2 entries).
 - **by_substrate_depth** (list[MbgBySubstrateDepth]): Frequency over `substrate_depth` values across transport rows only (≤2 entries; metabolism rows are excluded).
-- **by_element** (list[MbgByElement]): Element-presence rollup across the metabolites the gene set touches. Periodic-table-bounded (~30 elements max in KG); full rollup, not top-N. Presence-only — count of distinct compounds containing each element at all. NOT stoichiometric (no atom counts per compound; stoichiometry lives in `metabolite.formula`). NOT mass-balanced (KG carries no substrate-vs-product role on `Reaction_has_metabolite`).
+- **by_element** (list[MbgByElement]): Element-presence rollup across the metabolites the gene set touches. Singleton elements (metabolite_count < 2) are dropped, then capped to the top 10 by metabolite_count desc on detail calls; summary=True returns the full rollup. Presence-only — count of distinct compounds containing each element at all. NOT stoichiometric (no atom counts per compound; stoichiometry lives in `metabolite.formula`). NOT mass-balanced (KG carries no substrate-vs-product role on `Reaction_has_metabolite`).
+- **by_element_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **top_metabolites** (list[MbgTopMetabolite]): Top 10 metabolites by gene reach in the filtered slice. The headline answer to 'what metabolites do my gene set hit most.' Drill into any entry via `list_metabolites(metabolite_ids=[id])`.
 - **top_reactions** (list[MbgTopReaction]): Top 10 reactions by gene_count in the metabolism arm. Drill into any entry via `genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)`.
 - **top_tcdb_families** (list[MbgTopTcdbFamily]): Top 10 TCDB families by gene_count in the transport arm. Drill into any entry via `genes_by_ontology(ontology="tcdb", term_ids=[id], organism=...)`.
 - **top_gene_categories** (list[MbgTopGeneCategory]): Top 10 gene categories by gene_count across both arms.
-- **top_metabolite_pathways** (list[MbgTopPathway]): NEW (vs GBM): top 10 KEGG pathways the gene set's chemistry reaches. Metabolite-pathway rollup (distinct from KO-pathway annotations on `genes_by_ontology(ontology="kegg")`) — see model docstring for naming disambiguation. Drill into any entry via `list_metabolites(pathway_ids=[id])`.
+- **top_metabolite_pathways** (list[MbgTopPathway]): NEW (vs GBM): top 10 KEGG pathways the gene set's chemistry reaches, sorted by gene_count desc then pathway_metabolite_count asc. Metabolite-pathway rollup (distinct from KO-pathway annotations on `genes_by_ontology(ontology="kegg")`) — see model docstring for naming disambiguation. Drill into any entry via `list_metabolites(pathway_ids=[id])`. summary=True returns the full ranked list.
+- **top_metabolite_pathways_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **gene_count_total** (int): Distinct input genes in the filtered slice (across both arms).
 - **reaction_count_total** (int): Distinct reactions in the filtered metabolism arm.
 - **transporter_count_total** (int): Distinct TcdbFamily nodes in the filtered transport arm.
@@ -338,7 +340,7 @@ in the form you passed. Exclude-wins-on-overlap is computed on the canonical IDs
 from multiomics_explorer import metabolites_by_gene
 
 result = metabolites_by_gene(locus_tags=..., organism=...)
-# returns dict with keys: total_matching, returned, offset, truncated, warnings, resolved_aliases, not_found, not_matched, by_gene, by_evidence_source, by_substrate_depth, by_element, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
+# returns dict with keys: total_matching, returned, offset, truncated, warnings, resolved_aliases, not_found, not_matched, by_gene, by_evidence_source, by_substrate_depth, by_element, by_element_truncated, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, top_metabolite_pathways_truncated, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 
 Use package import for bulk data extraction in scripts.

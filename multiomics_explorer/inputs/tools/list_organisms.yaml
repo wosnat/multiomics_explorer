@@ -34,6 +34,7 @@ examples:
           {"metric_type": "has_primary_tss", "count": 2},
           ...
         ],
+        "by_metric_type_truncated": true,
         "by_compartment": [
           {"compartment": "vesicle", "count": 9},
           {"compartment": "whole_cell", "count": 5},
@@ -72,6 +73,7 @@ examples:
           },
           ...
         ],
+        "top_metabolic_capability_truncated": true,
         "top_annotation_capability": [
           {
             "preferred_name": "Alteromonas (MarRef v6)",
@@ -115,6 +117,7 @@ examples:
           },
           ...
         ],
+        "top_annotation_capability_truncated": true,
         "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 43},
         "returned": 5,
         "offset": 0,
@@ -245,6 +248,7 @@ examples:
           {"metric_type": "has_primary_tss", "count": 2},
           ...
         ],
+        "by_metric_type_truncated": null,
         "by_compartment": [
           {"compartment": "vesicle", "count": 9},
           {"compartment": "whole_cell", "count": 5},
@@ -283,6 +287,7 @@ examples:
           },
           ...
         ],
+        "top_metabolic_capability_truncated": null,
         "top_annotation_capability": [
           {
             "preferred_name": "Alteromonas (MarRef v6)",
@@ -326,6 +331,7 @@ examples:
           },
           ...
         ],
+        "top_annotation_capability_truncated": null,
         "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 43},
         "returned": 0,
         "offset": 0,
@@ -360,6 +366,7 @@ examples:
           {"metric_type": "expressed_above_background", "count": 1},
           ...
         ],
+        "by_metric_type_truncated": true,
         "by_compartment": [{"compartment": "vesicle", "count": 2}, {"compartment": "whole_cell", "count": 2}],
         "top_metabolic_capability": [
           {
@@ -375,6 +382,7 @@ examples:
             "transported_metabolite_count": 1069
           }
         ],
+        "top_metabolic_capability_truncated": null,
         "top_annotation_capability": [
           {
             "preferred_name": "Alteromonas macleodii MIT1002",
@@ -393,6 +401,7 @@ examples:
             "ncbifam_gene_count": 744
           }
         ],
+        "top_annotation_capability_truncated": null,
         "by_measurement_capability": {"has_metabolomics": 0, "no_metabolomics": 2},
         "returned": 2,
         "offset": 0,
@@ -490,6 +499,7 @@ examples:
           {"metric_type": "expressed_above_background", "count": 1},
           ...
         ],
+        "by_metric_type_truncated": true,
         "by_compartment": [{"compartment": "vesicle", "count": 1}, {"compartment": "whole_cell", "count": 1}],
         "top_metabolic_capability": [
           {
@@ -505,6 +515,7 @@ examples:
             "transported_metabolite_count": 1069
           }
         ],
+        "top_metabolic_capability_truncated": null,
         "top_annotation_capability": [
           {
             "preferred_name": "Prochlorococcus MED4",
@@ -523,6 +534,7 @@ examples:
             "ncbifam_gene_count": 774
           }
         ],
+        "top_annotation_capability_truncated": null,
         "by_measurement_capability": {"has_metabolomics": 1, "no_metabolomics": 1},
         "returned": 2,
         "offset": 0,
@@ -627,6 +639,7 @@ examples:
           {"metric_type": "has_primary_tss", "count": 2},
           ...
         ],
+        "by_metric_type_truncated": true,
         "by_compartment": [{"compartment": "vesicle", "count": 9}, {"compartment": "whole_cell", "count": 3}],
         "top_metabolic_capability": [
           {
@@ -661,6 +674,7 @@ examples:
           },
           ...
         ],
+        "top_metabolic_capability_truncated": null,
         "top_annotation_capability": [
           {
             "preferred_name": "Alteromonas macleodii AD45",
@@ -704,6 +718,7 @@ examples:
           },
           ...
         ],
+        "top_annotation_capability_truncated": null,
         "by_measurement_capability": {"has_metabolomics": 2, "no_metabolomics": 7},
         "returned": 5,
         "offset": 0,
@@ -832,6 +847,7 @@ examples:
           {"metric_type": "has_primary_tss", "count": 2},
           ...
         ],
+        "by_metric_type_truncated": null,
         "by_compartment": [
           {"compartment": "vesicle", "count": 9},
           {"compartment": "whole_cell", "count": 5},
@@ -870,6 +886,7 @@ examples:
           },
           ...
         ],
+        "top_metabolic_capability_truncated": null,
         "top_annotation_capability": [
           {
             "preferred_name": "Alteromonas (MarRef v6)",
@@ -913,6 +930,7 @@ examples:
           },
           ...
         ],
+        "top_annotation_capability_truncated": null,
         "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 43},
         "returned": 0,
         "offset": 0,
@@ -952,6 +970,7 @@ examples:
           {"metric_type": "has_primary_tss", "count": 2},
           ...
         ],
+        "by_metric_type_truncated": null,
         "by_compartment": [
           {"compartment": "vesicle", "count": 9},
           {"compartment": "whole_cell", "count": 5},
@@ -990,6 +1009,7 @@ examples:
           },
           ...
         ],
+        "top_metabolic_capability_truncated": null,
         "top_annotation_capability": [
           {
             "preferred_name": "Alteromonas (MarRef v6)",
@@ -1033,6 +1053,7 @@ examples:
           },
           ...
         ],
+        "top_annotation_capability_truncated": null,
         "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 43},
         "returned": 0,
         "offset": 0,
@@ -1069,8 +1090,8 @@ mistakes:
   - "reference_database and reference_proteome are sparse — only present on reference_proteome_match organisms, absent from others."
   - "organism_type values: 'genome_strain' (real genome assembly), 'treatment' (non-genomic coculture partners), 'reference_proteome_match' (identified via reference database matching)."
   - "`catalyzed_metabolite_count` counts catalysis capability only — distinct metabolites reachable through Gene → Reaction → Metabolite. Transport reach is the separate `transported_metabolite_count` (distinct metabolites through Gene → TcdbFamily → Metabolite over each gene's deepest TCDB attachments; breadth, not a confidence signal — inherited superfamily substrates count). Measurement-side coverage is `measured_metabolite_count`. catalyzed_metabolite_count=0 means no catalysis path in this organism, not that chemistry is absent from the KG."
-  - "top_metabolic_capability is a top-10 ranking sorted by catalyzed_metabolite_count descending (transported_metabolite_count is carried as a column, not a sort key); organisms with zero chemistry are excluded. Use it on summary=True calls to identify chemistry-rich organisms before drilling in via list_metabolites(organism_names=[...])."
+  - "top_metabolic_capability is sorted by catalyzed_metabolite_count descending (transported_metabolite_count is carried as a column, not a sort key); organisms with zero chemistry are excluded. Detail calls cap it to the first 10 (top_metabolic_capability_truncated=true when capped); summary=True returns the full ranking uncapped. Use it to identify chemistry-rich organisms before drilling in via list_metabolites(organism_names=[...])."
   - "by_measurement_capability is a binary rollup ({has_metabolomics, no_metabolomics}) — tool-specific shape that deviates from the list[{key,count}] frequency rollups elsewhere. See docs://guide/conventions for the standard envelope shape."
   - "The four annotation-coverage counts (`peptidase_gene_count`, `nonpeptidase_homolog_gene_count`, `interpro_gene_count`, `ncbifam_gene_count`) are distinct-gene counts per organism, zero-filled (never null). A gene carrying both a `peptidase` and a `nonpeptidase_homolog` MEROPS call counts once in each. They measure coverage, not annotation quality, and scale with genome size — rank Prochlorococcus strains against each other, not against a 4,000-gene heterotroph."
-  - "`top_annotation_capability` is a top-10 ranking of the matched set by `peptidase_gene_count` descending, then `preferred_name`; the other three counts are carried as columns, not sort keys. All-zero rows are excluded from the ranking but still appear in `results`. There is no min-count filter — read the ranking, then drill in with genes_by_ontology(ontology='merops', call_class=['peptidase'], organism=...)."
+  - "`top_annotation_capability` ranks the matched set by `peptidase_gene_count` descending, then `preferred_name`; the other three counts are carried as columns, not sort keys. All-zero rows are excluded from the ranking but still appear in `results`. Detail calls cap the ranking to the first 10 (`top_annotation_capability_truncated=true` when capped); `summary=True` returns the full ranking uncapped. There is no min-count filter — read the ranking, then drill in with genes_by_ontology(ontology='merops', call_class=['peptidase'], organism=...)."
   - "Two OrganismTaxon nodes can share a `preferred_name` (the Meiothermus ruber genome strain and the gene-less Meiothermus ruber treatment taxon). Their rows differ in `organism_type` and `gene_count`; the treatment taxon reads 0 on every coverage count. When you need a strain, pick the `genome_strain` row."

@@ -73,12 +73,14 @@ organism_name, ontology, level, total_matching, returned, truncated, offset, n_s
 - **truncated** (bool): True when total_matching exceeds offset+returned
 - **offset** (int): Pagination offset
 - **n_significant** (int): Rows with p_adjust below pvalue_cutoff
-- **by_experiment** (list[PathwayEnrichmentByExperiment]): Per-experiment tests + significance
+- **by_experiment** (list[PathwayEnrichmentByExperiment]): Per-experiment tests + significance, sorted desc by n_significant. Capped to the first 10 on detail calls; summary=True returns the full list.
+- **by_experiment_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **by_direction** (list[PathwayEnrichmentByDirection]): Per-direction aggregates
 - **by_omics_type** (list[PathwayEnrichmentByOmicsType]): Per-omics-type aggregates
 - **cluster_summary** (PathwayEnrichmentClusterSummary): Distribution stats across clusters
 - **top_clusters_by_min_padj** (list[PathwayEnrichmentTopCluster]): Top 5 clusters by smallest p_adjust
-- **top_pathways_by_padj** (list[PathwayEnrichmentTopPathway]): Top 10 pathways by p_adjust across all clusters
+- **top_pathways_by_padj** (list[PathwayEnrichmentTopPathway]): Pathways ranked by p_adjust ascending across all clusters. Capped to the first 10 on detail calls; summary=True returns the full ranked list.
+- **top_pathways_by_padj_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **not_found** (list[string]): Requested experiment_ids absent from KG
 - **not_matched** (list[string]): Experiment IDs found but wrong organism
 - **no_expression** (list[string]): Experiments matching organism but with no DE rows
@@ -251,6 +253,7 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
       "n_clusters": 14
     }
   ],
+  "by_experiment_truncated": null,
   "by_direction": [
     {"direction": "down", "n_tests": 49, "n_significant": 5},
     {"direction": "up", "n_tests": 49, "n_significant": 0}
@@ -398,6 +401,7 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
     },
     ...
   ],
+  "top_pathways_by_padj_truncated": true,
   "not_found": [],
   "not_matched": [],
   "no_expression": [],
@@ -562,6 +566,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "n_clusters": 4
     }
   ],
+  "by_experiment_truncated": null,
   "by_direction": [
     {"direction": "down", "n_tests": 4, "n_significant": 1},
     {"direction": "up", "n_tests": 4, "n_significant": 0}
@@ -691,6 +696,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
     },
     ...
   ],
+  "top_pathways_by_padj_truncated": null,
   "not_found": [],
   "not_matched": [],
   "no_expression": [],
@@ -796,6 +802,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "n_clusters": 4
     }
   ],
+  "by_experiment_truncated": null,
   "by_direction": [
     {"direction": "down", "n_tests": 134, "n_significant": 8},
     {"direction": "up", "n_tests": 134, "n_significant": 2}
@@ -925,6 +932,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
     },
     ...
   ],
+  "top_pathways_by_padj_truncated": null,
   "not_found": [],
   "not_matched": [],
   "no_expression": [],

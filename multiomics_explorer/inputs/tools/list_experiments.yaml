@@ -20,6 +20,7 @@ examples:
           {"organism_name": "Alteromonas macleodii EZ55", "count": 12},
           ...
         ],
+        "by_organism_truncated": null,
         "by_treatment_type": [
           {"treatment_type": "carbon", "count": 78},
           {"treatment_type": "coculture", "count": 76},
@@ -28,6 +29,7 @@ examples:
           {"treatment_type": "light", "count": 13},
           ...
         ],
+        "by_treatment_type_truncated": null,
         "by_background_factors": [
           {"background_factor": "light", "count": 127},
           {"background_factor": "axenic", "count": 90},
@@ -36,6 +38,7 @@ examples:
           {"background_factor": "diel", "count": 19},
           ...
         ],
+        "by_background_factors_truncated": null,
         "by_omics_type": [
           {"omics_type": "PROTEOMICS", "count": 74},
           {"omics_type": "RNASEQ", "count": 71},
@@ -52,6 +55,7 @@ examples:
           {"publication_doi": "10.1128/JB.01097-06", "count": 6},
           ...
         ],
+        "by_publication_truncated": null,
         "by_table_scope": [
           {"table_scope": "all_detected_genes", "count": 111},
           {"table_scope": "significant_only", "count": 40},
@@ -86,6 +90,7 @@ examples:
           {"metric_type": "predicted_subcellular_localization", "count": 2},
           ...
         ],
+        "by_metric_type_truncated": null,
         "by_compartment": [
           {"compartment": "whole_cell", "count": 183},
           {"compartment": "vesicle", "count": 13},
@@ -154,12 +159,15 @@ examples:
           {"organism_name": "Alteromonas macleodii ATCC27126", "count": 1},
           ...
         ],
+        "by_organism_truncated": null,
         "by_treatment_type": [{"treatment_type": "compartment", "count": 13}],
+        "by_treatment_type_truncated": null,
         "by_background_factors": [
           {"background_factor": "axenic", "count": 13},
           {"background_factor": "light", "count": 7},
           {"background_factor": "darkness", "count": 6}
         ],
+        "by_background_factors_truncated": null,
         "by_omics_type": [
           {"omics_type": "VESICLE_PROTEOMICS", "count": 10},
           {"omics_type": "METABOLOMICS", "count": 2},
@@ -170,6 +178,7 @@ examples:
           {"publication_doi": "10.1111/1462-2920.15834", "count": 4},
           {"publication_doi": "10.1126/science.1243457", "count": 3}
         ],
+        "by_publication_truncated": null,
         "by_table_scope": [
           {"table_scope": "top_n", "count": 7},
           {"table_scope": "significant_only", "count": 2},
@@ -190,6 +199,7 @@ examples:
           {"metric_type": "predicted_subcellular_localization", "count": 2},
           ...
         ],
+        "by_metric_type_truncated": null,
         "by_compartment": [{"compartment": "vesicle", "count": 13}],
         "time_course_count": 0,
         "score_max": null,
@@ -280,18 +290,23 @@ examples:
           {"organism_name": "Prochlorococcus MIT9301", "count": 1},
           {"organism_name": "Prochlorococcus MIT9313", "count": 1}
         ],
+        "by_organism_truncated": null,
         "by_treatment_type": [{"treatment_type": "phosphorus", "count": 1}, {"treatment_type": "carbon", "count": 1}],
+        "by_treatment_type_truncated": null,
         "by_background_factors": [{"background_factor": "axenic", "count": 2}, {"background_factor": "light", "count": 1}],
+        "by_background_factors_truncated": null,
         "by_omics_type": [{"omics_type": "METABOLOMICS", "count": 2}],
         "by_publication": [
           {"publication_doi": "10.1128/msystems.01261-22", "count": 1},
           {"publication_doi": "10.1073/pnas.2213271120", "count": 1}
         ],
+        "by_publication_truncated": null,
         "by_table_scope": [],
         "by_cluster_type": [],
         "by_growth_phase": [],
         "by_value_kind": [],
         "by_metric_type": [],
+        "by_metric_type_truncated": null,
         "by_compartment": [{"compartment": "whole_cell", "count": 2}],
         "time_course_count": 0,
         "score_max": null,

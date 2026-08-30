@@ -250,6 +250,7 @@ top_genes:
   transport_most_specific_rows: 0
   transport_substrate_resolution: resolved
   transporter_count: 1
+top_genes_truncated: true
 top_reactions:
 - ec_numbers:
   - 3.5.1.5

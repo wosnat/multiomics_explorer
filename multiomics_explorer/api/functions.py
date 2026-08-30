@@ -210,6 +210,22 @@ def _rename_measurement_coverage(raw: dict | None) -> dict:
     return {"by_paper_count": by_pc, "by_compartment": by_comp}
 
 
+_BREAKDOWN_CAP = 10
+
+
+def _cap_breakdowns(envelope: dict, keys: tuple[str, ...], *, summary: bool) -> dict:
+    """Detail calls carry the first _BREAKDOWN_CAP entries of each breakdown list;
+    summary=True keeps the full list. Lists are already sorted by count DESC."""
+    if summary:
+        return envelope
+    for k in keys:
+        v = envelope.get(k)
+        if isinstance(v, list) and len(v) > _BREAKDOWN_CAP:
+            envelope[k] = v[:_BREAKDOWN_CAP]
+            envelope[f"{k}_truncated"] = True
+    return envelope
+
+
 # Regex for blocking write operations in raw Cypher.
 _WRITE_KEYWORDS = re.compile(
     r"\b(CREATE|MERGE|DELETE|DETACH|SET|REMOVE|DROP|FOREACH|CALL\s*\{|CALL\s+\w+\.\w+|LOAD\s+CSV)\b",
@@ -962,7 +978,7 @@ def resolve_gene(
     )
 
     results = all_results[offset:offset + limit] if limit else all_results[offset:]
-    return {
+    envelope = {
         "total_matching": total,
         "by_organism": by_organism,
         "returned": len(results),
@@ -970,6 +986,7 @@ def resolve_gene(
         "truncated": total > offset + len(results),
         "results": results,
     }
+    return _cap_breakdowns(envelope, ("by_organism",), summary=False)
 
 
 def genes_by_function(
@@ -1043,7 +1060,7 @@ def genes_by_function(
         envelope["offset"] = offset
         envelope["truncated"] = total_matching > 0
         envelope["results"] = []
-        return envelope
+        return _cap_breakdowns(envelope, ("by_organism",), summary=summary)
 
     try:
         results = _run_detail()
@@ -1060,7 +1077,7 @@ def genes_by_function(
     envelope["offset"] = offset
     envelope["truncated"] = total_matching > offset + len(results)
     envelope["results"] = results
-    return envelope
+    return _cap_breakdowns(envelope, ("by_organism",), summary=summary)
 
 
 def gene_overview(
@@ -1861,17 +1878,16 @@ def list_organisms(
     chemistry_capable.sort(
         key=lambda r: r["catalyzed_metabolite_count"], reverse=True,
     )
-    top_metabolic_capability = chemistry_capable[:10]
+    # Full sorted list; _cap_breakdowns below caps to top 10 on detail calls
+    # and keeps the full list when summary=True.
+    top_metabolic_capability = chemistry_capable
 
-    # top_annotation_capability (slice 4 §3.3): top 10 organisms by
+    # top_annotation_capability (slice 4 §3.3): organisms ranked by
     # peptidase_gene_count desc then preferred_name; all-four-zero rows
-    # excluded. Detail mode ranks the matched rows api-side (page-
-    # independent); summary mode reads the summary builder's rollup and
-    # only falls back to the capability rows when that key is absent.
-    if limit == 0 and summary_row.get("top_annotation_capability") is not None:
-        top_annotation_capability = list(summary_row["top_annotation_capability"])
-    else:
-        top_annotation_capability = _rank_annotation_capability(capability_rows)
+    # excluded. Ranked api-side from the full matched capability rows (same
+    # set in both detail and summary mode) so summary=True can carry the
+    # full ranking; _cap_breakdowns caps to top 10 on detail calls.
+    top_annotation_capability = _rank_annotation_capability(capability_rows)
 
     # not_found: input names that didn't match any OrganismTaxon
     # (case-insensitive). Original casing preserved in the returned list.
@@ -1888,7 +1904,7 @@ def list_organisms(
     else:
         not_found = []
 
-    return {
+    envelope = {
         "total_entries": total_entries,
         "total_matching": total_matching,
         "by_cluster_type": _rename_freq(
@@ -1916,6 +1932,11 @@ def list_organisms(
         "not_found": not_found,
         "results": results,
     }
+    return _cap_breakdowns(
+        envelope,
+        ("by_metric_type", "top_annotation_capability", "top_metabolic_capability"),
+        summary=summary,
+    )
 
 
 _ANNOTATION_CAPABILITY_COLS = (
@@ -1925,10 +1946,12 @@ _ANNOTATION_CAPABILITY_COLS = (
 
 
 def _rank_annotation_capability(rows: list[dict]) -> list[dict]:
-    """Top-10 `top_annotation_capability` entries over organism rows.
+    """Full ranked `top_annotation_capability` entries over organism rows.
 
     Sort key: peptidase_gene_count desc, then preferred_name (== organism_name
     on the row projection). Rows with all four counts at 0 are dropped.
+    Callers cap to the top 10 (see `_cap_breakdowns`); summary callers keep
+    the full ranking.
     """
     entries = []
     for r in rows:
@@ -1942,7 +1965,7 @@ def _rank_annotation_capability(rows: list[dict]) -> list[dict]:
             **counts,
         })
     entries.sort(key=lambda e: (-e["peptidase_gene_count"], e["preferred_name"]))
-    return entries[:10]
+    return entries
 
 
 def list_publications(
@@ -2046,7 +2069,7 @@ def list_publications(
     else:
         not_found = []
 
-    return {
+    envelope = {
         "total_entries": summary["total_entries"],
         "total_matching": summary["total_matching"],
         "by_organism": _rename_freq(
@@ -2074,6 +2097,7 @@ def list_publications(
         "not_found": not_found,
         "results": results,
     }
+    return _cap_breakdowns(envelope, ("by_metric_type", "by_organism"), summary=False)
 
 
 def list_experiments(
@@ -2247,7 +2271,12 @@ def list_experiments(
         envelope["offset"] = offset
         envelope["truncated"] = envelope["total_matching"] > 0
         envelope["results"] = []
-        return envelope
+        return _cap_breakdowns(
+            envelope,
+            ("by_publication", "by_metric_type", "by_organism",
+             "by_treatment_type", "by_background_factors"),
+            summary=summary,
+        )
 
     # Detail: run detail query
     try:
@@ -2329,7 +2358,12 @@ def list_experiments(
     envelope["offset"] = offset
     envelope["truncated"] = envelope["total_matching"] > offset + len(processed)
     envelope["results"] = processed
-    return envelope
+    return _cap_breakdowns(
+        envelope,
+        ("by_publication", "by_metric_type", "by_organism",
+         "by_treatment_type", "by_background_factors"),
+        summary=summary,
+    )
 
 
 _SEARCH_ONTOLOGY_NARROWING = ("level", "tree", "interpro_type", "min_gene_count", "organism")
@@ -3817,12 +3851,14 @@ def differential_expression_by_gene(
         direction / significant_only / growth_phases filters (e.g. a
         growth_phases vocabulary typo) — never confuse this with
         no_expression. warnings: one entry per growth_phases value not in
-        the live vocabulary. n_experiments: count of matching experiments
-        before any trimming (currently identical to experiment_count — no
-        experiment-list cap exists on this tool). Each experiment entry in
-        `experiments` is compact by default ({experiment_id, treatment_type,
-        table_scope, is_time_course, matching_genes, rows_by_status,
-        omics_type}); verbose=True restores experiment_name,
+        the live vocabulary. n_experiments / experiment_count: count of
+        matching experiments before any list capping (always the full
+        count). `experiments` is sorted by total significant rows desc and
+        capped to the first 10 entries with `experiments_truncated=True`
+        when it exceeds that; summary=True returns the full list. Each
+        experiment entry is compact by default ({experiment_id,
+        treatment_type, table_scope, is_time_course, matching_genes,
+        rows_by_status, omics_type}); verbose=True restores experiment_name,
         background_factors, coculture_partner, table_scope_detail,
         timepoints.
 
@@ -4007,7 +4043,7 @@ def differential_expression_by_gene(
         "truncated": total_matching > offset + returned,
         "results": results,
     }
-    return envelope
+    return _cap_breakdowns(envelope, ("experiments",), summary=summary)
 
 
 def differential_expression_by_ortholog(
@@ -7184,6 +7220,10 @@ def genes_by_metabolite(
     can still carry a score for other substrates). `resolved` means at
     least one non-lumping deepest attachment — a resolved gene can still
     contribute `inherited` rows.
+    `top_genes` / `top_reactions` / `top_tcdb_families` are capped to the
+    first 10 entries (each already sorted desc by its ranking count) with
+    a sparse `{key}_truncated=True` flag when capped; `summary=True` returns
+    the full ranked list uncapped.
 
     Detail sort: metabolism → `most_specific` → `inherited`; within a
     transport tier `tcdb_evidence_score` desc, then family / locus_tag.
@@ -7485,18 +7525,21 @@ def genes_by_metabolite(
         key=lambda r: r.get("metabolite_id") or "",
     )
 
-    # top_* envelopes: sort by gene_count desc + stable tiebreaker, then [:10].
+    # top_* envelopes: sort by gene_count desc + stable tiebreaker, full list
+    # here — _cap_breakdowns below caps to 10 on detail calls and keeps the
+    # full list when summary=True (top_gene_categories keeps its unconditional
+    # top-10 cap; it's not part of the summary/detail parity contract).
     top_reactions = sorted(
         raw_summary.get("top_reactions", []) or [],
         key=lambda r: (-(r.get("gene_count") or 0), r.get("reaction_id") or ""),
-    )[:10]
+    )
     top_tcdb_families = sorted(
         raw_summary.get("top_tcdb_families", []) or [],
         key=lambda r: (
             -(r.get("gene_count") or 0),
             r.get("tcdb_family_id") or "",
         ),
-    )[:10]
+    )
     top_gene_categories = sorted(
         raw_summary.get("top_gene_categories", []) or [],
         key=lambda r: (-(r.get("gene_count") or 0), r.get("category") or ""),
@@ -7522,7 +7565,7 @@ def genes_by_metabolite(
             -((r.get("reaction_count") or 0) + (r.get("transporter_count") or 0)),
             r.get("locus_tag") or "",
         ),
-    )[:10]
+    )
 
     # 11. Auto-warning: `inherited` dominance over deepest-attachment
     # transport rows. Strict majority threshold; metabolism rows do not
@@ -7561,7 +7604,7 @@ def genes_by_metabolite(
         "metabolite_pathway_ids": not_found_paths,
     }
 
-    return {
+    envelope = {
         "total_matching": total_matching,
         "returned": len(results),
         "offset": offset,
@@ -7585,6 +7628,10 @@ def genes_by_metabolite(
         "metabolite_count_total": raw_summary.get("metabolite_count_total", 0) or 0,
         "results": results,
     }
+    return _cap_breakdowns(
+        envelope, ("top_genes", "top_reactions", "top_tcdb_families"),
+        summary=summary,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -7688,6 +7735,11 @@ def metabolites_by_gene(
     least one non-lumping deepest attachment — a resolved gene can still
     contribute `inherited` rows; read per-row `substrate_depth` to separate
     them.
+    `top_metabolite_pathways` (sorted desc by `gene_count`, then asc by
+    `pathway_metabolite_count`) and `by_element` (singleton elements with
+    `metabolite_count < 2` dropped first) are capped to the first 10
+    entries with a sparse `{key}_truncated=True` flag when capped;
+    `summary=True` returns the full list uncapped.
 
     Detail sort: metabolism → `most_specific` → `inherited` globally (so a
     single ABC-only gene can't eat `limit`); within a transport tier
@@ -8069,9 +8121,14 @@ def metabolites_by_gene(
     )
 
     # by_element: full freq, periodic-table-bounded (~30 max). Sort desc by
-    # count + ascending element for deterministic output.
+    # count + ascending element for deterministic output; drop singleton
+    # elements (count < 2) before the top-10 cap so the cap keeps the
+    # elements that actually characterize the gene set.
     by_element = sorted(
-        raw_summary.get("by_element", []) or [],
+        [
+            r for r in (raw_summary.get("by_element", []) or [])
+            if (r.get("metabolite_count") or 0) >= 2
+        ],
         key=lambda r: (
             -(r.get("metabolite_count") or 0),
             r.get("element") or "",
@@ -8104,9 +8161,15 @@ def metabolites_by_gene(
     # Phase 2 Item 2: top_metabolite_pathways now sourced directly from the
     # summary builder, which produces a chemistry-pathway-filtered rollup
     # (p.reaction_count >= 3) over m.pathway_ids (KG-A5 denorm,
-    # transport-extended; uniform coverage across both arms).
-    top_metabolite_pathways = (
-        raw_summary.get("top_metabolite_pathways", []) or []
+    # transport-extended; uniform coverage across both arms). Sorted desc
+    # by gene_count, then asc by pathway_metabolite_count (breadth
+    # tiebreaker — prefer the more chemistry-specific pathway).
+    top_metabolite_pathways = sorted(
+        raw_summary.get("top_metabolite_pathways", []) or [],
+        key=lambda r: (
+            -(r.get("gene_count") or 0),
+            r.get("pathway_metabolite_count") or 0,
+        ),
     )
 
     # 13. Auto-warning: gene-anchored, keyed on the KG-authoritative
@@ -8146,7 +8209,7 @@ def metabolites_by_gene(
         "metabolite_elements": not_found_elements,
     }
 
-    return {
+    envelope = {
         "total_matching": total_matching,
         "returned": len(results),
         "offset": offset,
@@ -8171,6 +8234,9 @@ def metabolites_by_gene(
         "metabolite_count_total": raw_summary.get("metabolite_count_total", 0) or 0,
         "results": results,
     }
+    return _cap_breakdowns(
+        envelope, ("top_metabolite_pathways", "by_element"), summary=summary,
+    )
 
 
 # ---------------------------------------------------------------------------

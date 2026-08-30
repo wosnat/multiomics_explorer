@@ -133,6 +133,7 @@ examples:
           },
           ...
         ],
+        "experiments_truncated": null,
         "not_found": [],
         "no_expression": [],
         "filtered_out": [],
@@ -187,6 +188,7 @@ examples:
             "timepoints": null
           }
         ],
+        "experiments_truncated": null,
         "not_found": [],
         "no_expression": [],
         "filtered_out": [],
@@ -267,6 +269,7 @@ examples:
         "by_table_scope": {},
         "top_categories": [],
         "experiments": [],
+        "experiments_truncated": null,
         "not_found": [],
         "no_expression": [],
         "filtered_out": [],

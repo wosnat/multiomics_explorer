@@ -268,8 +268,12 @@ class PathwayEnrichmentResponse(BaseModel):
     offset: int = Field(default=0, description="Pagination offset")
     n_significant: int = Field(description="Rows with p_adjust below pvalue_cutoff")
     by_experiment: list[PathwayEnrichmentByExperiment] = Field(
-        default_factory=list, description="Per-experiment tests + significance"
+        default_factory=list,
+        description="Per-experiment tests + significance, sorted desc by "
+                    "n_significant. Capped to the first 10 on detail calls; "
+                    "summary=True returns the full list.",
     )
+    by_experiment_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
     by_direction: list[PathwayEnrichmentByDirection] = Field(
         default_factory=list, description="Per-direction aggregates"
     )
@@ -283,8 +287,12 @@ class PathwayEnrichmentResponse(BaseModel):
         default_factory=list, description="Top 5 clusters by smallest p_adjust"
     )
     top_pathways_by_padj: list[PathwayEnrichmentTopPathway] = Field(
-        default_factory=list, description="Top 10 pathways by p_adjust across all clusters"
+        default_factory=list,
+        description="Pathways ranked by p_adjust ascending across all "
+                    "clusters. Capped to the first 10 on detail calls; "
+                    "summary=True returns the full ranked list.",
     )
+    top_pathways_by_padj_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
     not_found: list[str] = Field(
         default_factory=list, description="Requested experiment_ids absent from KG"
     )
@@ -947,17 +955,22 @@ class GenesByMetaboliteResponse(BaseModel):
         "transport rows only (≤2 entries; metabolism rows are excluded).")
     top_reactions: list[GbmTopReaction] = Field(
         default_factory=list,
-        description="Top 10 reactions by gene_count in the metabolism arm.")
+        description="Top 10 reactions by gene_count in the metabolism arm. "
+        "summary=True returns the full ranked list.")
+    top_reactions_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
     top_tcdb_families: list[GbmTopTcdbFamily] = Field(
         default_factory=list,
-        description="Top 10 TCDB families by gene_count in the transport arm.")
+        description="Top 10 TCDB families by gene_count in the transport arm. "
+        "summary=True returns the full ranked list.")
+    top_tcdb_families_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
     top_gene_categories: list[GbmTopGeneCategory] = Field(
         default_factory=list,
         description="Top 10 gene categories by gene_count across both arms.")
     top_genes: list[GbmTopGene] = Field(
         default_factory=list,
         description="Top 10 genes by combined reaction + transporter "
-        "breadth across both arms.")
+        "breadth across both arms. summary=True returns the full ranked list.")
+    top_genes_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
     gene_count_total: int = Field(
         description="Distinct genes in the filtered slice (across both arms).")
     reaction_count_total: int = Field(
@@ -1320,12 +1333,14 @@ class MetabolitesByGeneResponse(BaseModel):
     by_element: list[MbgByElement] = Field(
         default_factory=list,
         description="Element-presence rollup across the metabolites the "
-        "gene set touches. Periodic-table-bounded (~30 elements max in "
-        "KG); full rollup, not top-N. Presence-only — count of distinct "
-        "compounds containing each element at all. NOT stoichiometric "
-        "(no atom counts per compound; stoichiometry lives in "
-        "`metabolite.formula`). NOT mass-balanced (KG carries no "
+        "gene set touches. Singleton elements (metabolite_count < 2) are "
+        "dropped, then capped to the top 10 by metabolite_count desc on "
+        "detail calls; summary=True returns the full rollup. Presence-only "
+        "— count of distinct compounds containing each element at all. NOT "
+        "stoichiometric (no atom counts per compound; stoichiometry lives "
+        "in `metabolite.formula`). NOT mass-balanced (KG carries no "
         "substrate-vs-product role on `Reaction_has_metabolite`).")
+    by_element_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
     top_metabolites: list[MbgTopMetabolite] = Field(
         default_factory=list,
         description="Top 10 metabolites by gene reach in the filtered "
@@ -1351,10 +1366,13 @@ class MetabolitesByGeneResponse(BaseModel):
     top_metabolite_pathways: list[MbgTopPathway] = Field(
         default_factory=list,
         description="NEW (vs GBM): top 10 KEGG pathways the gene set's "
-        "chemistry reaches. Metabolite-pathway rollup (distinct from "
-        "KO-pathway annotations on `genes_by_ontology(ontology=\"kegg\")`) "
+        "chemistry reaches, sorted by gene_count desc then "
+        "pathway_metabolite_count asc. Metabolite-pathway rollup (distinct "
+        "from KO-pathway annotations on `genes_by_ontology(ontology=\"kegg\")`) "
         "— see model docstring for naming disambiguation. Drill into "
-        "any entry via `list_metabolites(pathway_ids=[id])`.")
+        "any entry via `list_metabolites(pathway_ids=[id])`. summary=True "
+        "returns the full ranked list.")
+    top_metabolite_pathways_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
     gene_count_total: int = Field(
         description="Distinct input genes in the filtered slice (across "
         "both arms).")
@@ -1822,9 +1840,12 @@ def register_tools(mcp: FastMCP):
         by_organism_type: list[OrgTypeBreakdown] = Field(default_factory=list, description="Organism counts per type over the matched set, sorted desc.")
         by_value_kind: list[OrgValueKindBreakdown] = Field(default_factory=list, description="DM value_kind frequency rollup across matched organisms.")
         by_metric_type: list[OrgMetricTypeBreakdown] = Field(default_factory=list, description="DM metric_type frequency rollup across matched organisms.")
+        by_metric_type_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
         by_compartment: list[OrgCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched organisms.")
-        top_metabolic_capability: list[OrgMetabolicCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms by catalyzed_metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites.")
-        top_annotation_capability: list[OrgAnnotationCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms (within matched set) by peptidase_gene_count desc, then preferred_name. Carries all four annotation counts; excludes organisms with all four = 0. [] when none. Coverage ranking for reading, not a filter.")
+        top_metabolic_capability: list[OrgMetabolicCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms by catalyzed_metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites. `summary=True` returns the full ranked list.")
+        top_metabolic_capability_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
+        top_annotation_capability: list[OrgAnnotationCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms (within matched set) by peptidase_gene_count desc, then preferred_name. Carries all four annotation counts; excludes organisms with all four = 0. [] when none. Coverage ranking for reading, not a filter. `summary=True` returns the full ranked list.")
+        top_annotation_capability_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
         by_measurement_capability: OrgMeasurementCapability = Field(default_factory=OrgMeasurementCapability, description="Binary rollup of metabolomics measurement coverage across matched organisms: {has_metabolomics, no_metabolomics} (tool-specific deviation from list_/by_-style frequency rollups elsewhere — exactly two keys).")
         returned: int = Field(description="Number of results returned.")
         offset: int = Field(default=0, description="Offset into full result set.")
@@ -1910,9 +1931,12 @@ def register_tools(mcp: FastMCP):
                 by_organism_type=by_organism_type,
                 by_value_kind=by_value_kind,
                 by_metric_type=by_metric_type,
+                by_metric_type_truncated=result.get("by_metric_type_truncated"),
                 by_compartment=by_compartment,
                 top_metabolic_capability=top_metabolic_capability,
+                top_metabolic_capability_truncated=result.get("top_metabolic_capability_truncated"),
                 top_annotation_capability=top_annotation_capability,
+                top_annotation_capability_truncated=result.get("top_annotation_capability_truncated"),
                 by_measurement_capability=by_measurement_capability,
                 returned=result["returned"],
                 offset=result.get("offset", 0),
@@ -1942,6 +1966,7 @@ def register_tools(mcp: FastMCP):
     class ResolveGeneResponse(BaseModel):
         total_matching: int = Field(description="Total genes matching identifier + organism filter.")
         by_organism: list[ResolveOrganismBreakdown] = Field(description="Match counts per organism, sorted desc.")
+        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
         returned: int = Field(description="Genes in this response.")
         offset: int = Field(default=0, description="Offset into full result set.")
         truncated: bool = Field(description="True if total_matching > returned.")
@@ -1984,6 +2009,7 @@ def register_tools(mcp: FastMCP):
             return ResolveGeneResponse(
                 total_matching=result["total_matching"],
                 by_organism=by_organism,
+                by_organism_truncated=result.get("by_organism_truncated"),
                 returned=result["returned"],
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],
@@ -2022,6 +2048,7 @@ def register_tools(mcp: FastMCP):
         total_search_hits: int = Field(description="Total genes matching search text (before organism/category/quality filters).")
         total_matching: int = Field(description="Total genes matching search + all filters.")
         by_organism: list[FunctionOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc.")
+        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
         by_category: list[FunctionCategoryBreakdown] = Field(description="Gene counts per category, sorted desc.")
         score_max: float | None = Field(default=None, description="Highest relevance score (null if 0 matches).")
         score_median: float | None = Field(default=None, description="Median relevance score (null if 0 matches).")
@@ -2093,6 +2120,7 @@ def register_tools(mcp: FastMCP):
                 total_search_hits=data["total_search_hits"],
                 total_matching=data["total_matching"],
                 by_organism=by_organism,
+                by_organism_truncated=data.get("by_organism_truncated"),
                 by_category=by_category,
                 score_max=data["score_max"],
                 score_median=data["score_median"],
@@ -3740,12 +3768,14 @@ def register_tools(mcp: FastMCP):
         total_entries: int = Field(description="Total publications in KG (unfiltered).")
         total_matching: int = Field(description="Publications matching filters.")
         by_organism: list[PubOrganismBreakdown] = Field(description="Publication counts per organism, sorted desc.")
+        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
         by_treatment_type: list[PubTreatmentTypeBreakdown] = Field(description="Publication counts per treatment type, sorted desc.")
         by_background_factors: list[PubBackgroundFactorBreakdown] = Field(description="Publication counts per background factor, sorted desc.")
         by_omics_type: list[PubOmicsTypeBreakdown] = Field(description="Publication counts per omics platform, sorted desc.")
         by_cluster_type: list[PubClusterTypeBreakdown] = Field(default_factory=list, description="Publication counts per cluster type, sorted desc.")
         by_value_kind: list[PubValueKindBreakdown] = Field(default_factory=list, description="DerivedMetric value kind frequency rollup across matched publications.")
         by_metric_type: list[PubMetricTypeBreakdown] = Field(default_factory=list, description="DerivedMetric type frequency rollup across matched publications.")
+        by_metric_type_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
         by_compartment: list[PubCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched publications.")
         by_discusses_coverage: PubDiscussesCoverageBreakdown = Field(default_factory=PubDiscussesCoverageBreakdown, description="Binary split {has_discusses, no_discusses} of matched publications by whether they carry a narrative 'discusses' literature index (45 vs 4 in the current KG).")
         returned: int = Field(description="Publications in this response.")
@@ -3838,12 +3868,14 @@ def register_tools(mcp: FastMCP):
                 total_entries=result["total_entries"],
                 total_matching=result["total_matching"],
                 by_organism=by_organism,
+                by_organism_truncated=result.get("by_organism_truncated"),
                 by_treatment_type=by_treatment_type,
                 by_background_factors=by_background_factors,
                 by_omics_type=by_omics_type,
                 by_cluster_type=by_cluster_type,
                 by_value_kind=by_value_kind,
                 by_metric_type=by_metric_type,
+                by_metric_type_truncated=result.get("by_metric_type_truncated"),
                 by_compartment=by_compartment,
                 by_discusses_coverage=by_discusses_coverage,
                 returned=result["returned"],
@@ -3972,15 +4004,20 @@ def register_tools(mcp: FastMCP):
         offset: int = Field(default=0, description="Offset into full result set.")
         truncated: bool = Field(description="True if results were truncated by limit or summary=true.")
         by_organism: list[OrganismBreakdown] = Field(description="Experiment counts per organism, sorted desc.")
+        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
         by_treatment_type: list[TreatmentTypeBreakdown] = Field(description="Experiment counts per treatment type, sorted desc.")
+        by_treatment_type_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
         by_background_factors: list[BackgroundFactorBreakdown] = Field(description="Experiment counts per background factor, sorted desc.")
+        by_background_factors_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
         by_omics_type: list[OmicsTypeBreakdown] = Field(description="Experiment counts per omics platform, sorted desc.")
         by_publication: list[PublicationBreakdown] = Field(description="Experiment counts per publication, sorted desc.")
+        by_publication_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
         by_table_scope: list[TableScopeBreakdown] = Field(description="Experiment counts per table scope, sorted desc.")
         by_cluster_type: list[ClusterTypeBreakdown] = Field(default_factory=list, description="Experiment counts per cluster type, sorted desc.")
         by_growth_phase: list[GrowthPhaseBreakdown] = Field(default_factory=list, description="Experiment counts per growth phase, sorted desc.")
         by_value_kind: list[ExpValueKindBreakdown] = Field(default_factory=list, description="Experiment counts by DerivedMetric value_kind across matching experiments.")
         by_metric_type: list[ExpMetricTypeBreakdown] = Field(default_factory=list, description="Experiment counts by DerivedMetric metric_type across matching experiments.")
+        by_metric_type_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
         by_compartment: list[ExpCompartmentBreakdown] = Field(default_factory=list, description="Experiment counts per wet-lab compartment.")
         time_course_count: int = Field(description="Number of time-course experiments in matching set.")
         score_max: float | None = Field(default=None, description="Max Lucene relevance score, present only when search_text is used.")
@@ -4135,15 +4172,20 @@ def register_tools(mcp: FastMCP):
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],
                 by_organism=by_organism,
+                by_organism_truncated=result.get("by_organism_truncated"),
                 by_treatment_type=by_treatment_type,
+                by_treatment_type_truncated=result.get("by_treatment_type_truncated"),
                 by_background_factors=by_background_factors,
+                by_background_factors_truncated=result.get("by_background_factors_truncated"),
                 by_omics_type=by_omics_type,
                 by_publication=by_publication,
+                by_publication_truncated=result.get("by_publication_truncated"),
                 by_table_scope=by_table_scope,
                 by_cluster_type=by_cluster_type,
                 by_growth_phase=by_growth_phase,
                 by_value_kind=by_value_kind,
                 by_metric_type=by_metric_type,
+                by_metric_type_truncated=result.get("by_metric_type_truncated"),
                 by_compartment=by_compartment,
                 time_course_count=result["time_course_count"],
                 score_max=result.get("score_max"),
@@ -4434,8 +4476,11 @@ def register_tools(mcp: FastMCP):
             " table_scope, is_time_course, matching_genes, rows_by_status,"
             " omics_type); verbose=True restores experiment_name,"
             " background_factors, coculture_partner, table_scope_detail,"
-            " and the nested per-timepoint breakdown.",
+            " and the nested per-timepoint breakdown. Capped to the first 10"
+            " entries; summary=True returns the full list — n_experiments /"
+            " experiment_count always reflect the full count.",
         )
+        experiments_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
         not_found: list[str] = Field(
             default_factory=list,
             description="Input locus_tags not found in KG",
@@ -4631,6 +4676,7 @@ def register_tools(mcp: FastMCP):
                 by_table_scope=data["by_table_scope"],
                 top_categories=top_cat_models,
                 experiments=exp_models,
+                experiments_truncated=data.get("experiments_truncated"),
                 not_found=data["not_found"],
                 no_expression=data["no_expression"],
                 filtered_out=data["filtered_out"],
@@ -8841,9 +8887,12 @@ def register_tools(mcp: FastMCP):
                 by_evidence_source=by_evidence_source,
                 by_substrate_depth=by_substrate_depth,
                 top_reactions=top_reactions,
+                top_reactions_truncated=result.get("top_reactions_truncated"),
                 top_tcdb_families=top_tcdb_families,
+                top_tcdb_families_truncated=result.get("top_tcdb_families_truncated"),
                 top_gene_categories=top_gene_categories,
                 top_genes=top_genes,
+                top_genes_truncated=result.get("top_genes_truncated"),
                 gene_count_total=result["gene_count_total"],
                 reaction_count_total=result["reaction_count_total"],
                 transporter_count_total=result["transporter_count_total"],
@@ -9114,11 +9163,13 @@ def register_tools(mcp: FastMCP):
                 by_evidence_source=by_evidence_source,
                 by_substrate_depth=by_substrate_depth,
                 by_element=by_element,
+                by_element_truncated=result.get("by_element_truncated"),
                 top_metabolites=top_metabolites,
                 top_reactions=top_reactions,
                 top_tcdb_families=top_tcdb_families,
                 top_gene_categories=top_gene_categories,
                 top_metabolite_pathways=top_metabolite_pathways,
+                top_metabolite_pathways_truncated=result.get("top_metabolite_pathways_truncated"),
                 gene_count_total=result["gene_count_total"],
                 reaction_count_total=result["reaction_count_total"],
                 transporter_count_total=result["transporter_count_total"],

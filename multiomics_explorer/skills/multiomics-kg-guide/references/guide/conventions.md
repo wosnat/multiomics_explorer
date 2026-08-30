@@ -64,6 +64,28 @@ the recon view.
 Per-row **results** give detail; pagination via `limit` (default 5 on
 most tools) and `offset`.
 
+### Breakdown caps on detail calls
+
+Envelope rollup lists (`by_*`, `top_*`) that can grow past a handful of
+entries are capped to the **first 10** on a detail call (`summary=False`,
+the default) — the list is sorted desc by its ranking count first, so the
+10 that survive are the 10 that matter. When a cap actually trims a list,
+a sparse sibling key `<key>_truncated: true` appears next to it; the key is
+absent (not `false`) when the list was already ≤10 entries, so goldens and
+examples only change where a list genuinely exceeded the cap.
+`summary=True` always returns the **full, uncapped** list — read it first
+when you need the whole ranking (e.g. every organism's chemistry capability,
+not just the top 10). Affected: `list_experiments` / `list_organisms`
+/ `list_publications` (`by_organism`, `by_metric_type`, `by_publication`,
+`top_annotation_capability`, `top_metabolic_capability`, …), `resolve_gene`
+/ `genes_by_function` (`by_organism`), `genes_by_metabolite` /
+`metabolites_by_gene` (`top_genes`, `top_reactions`, `top_tcdb_families`,
+`top_metabolite_pathways`, `by_element`), `differential_expression_by_gene`
+(`experiments`), and `pathway_enrichment` (`by_experiment`,
+`top_pathways_by_padj`). `resolve_gene` and `list_publications` have no
+`summary=` param, so their `by_organism` rollup is always capped when it
+exceeds 10.
+
 ### `summary=True` mode
 
 **34 of 42 tools accept `summary=True`** — nearly universal across

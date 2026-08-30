@@ -45,15 +45,20 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if results were truncated by limit or summary=true.
 - **by_organism** (list[OrganismBreakdown]): Experiment counts per organism, sorted desc.
+- **by_organism_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **by_treatment_type** (list[TreatmentTypeBreakdown]): Experiment counts per treatment type, sorted desc.
+- **by_treatment_type_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **by_background_factors** (list[BackgroundFactorBreakdown]): Experiment counts per background factor, sorted desc.
+- **by_background_factors_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **by_omics_type** (list[OmicsTypeBreakdown]): Experiment counts per omics platform, sorted desc.
 - **by_publication** (list[PublicationBreakdown]): Experiment counts per publication, sorted desc.
+- **by_publication_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **by_table_scope** (list[TableScopeBreakdown]): Experiment counts per table scope, sorted desc.
 - **by_cluster_type** (list[ClusterTypeBreakdown]): Experiment counts per cluster type, sorted desc.
 - **by_growth_phase** (list[GrowthPhaseBreakdown]): Experiment counts per growth phase, sorted desc.
 - **by_value_kind** (list[ExpValueKindBreakdown]): Experiment counts by DerivedMetric value_kind across matching experiments.
 - **by_metric_type** (list[ExpMetricTypeBreakdown]): Experiment counts by DerivedMetric metric_type across matching experiments.
+- **by_metric_type_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **by_compartment** (list[ExpCompartmentBreakdown]): Experiment counts per wet-lab compartment.
 - **time_course_count** (int): Number of time-course experiments in matching set.
 - **score_max** (float | None): Max Lucene relevance score, present only when search_text is used.
@@ -132,6 +137,7 @@ list_experiments(summary=True)
     {"organism_name": "Alteromonas macleodii EZ55", "count": 12},
     ...
   ],
+  "by_organism_truncated": null,
   "by_treatment_type": [
     {"treatment_type": "carbon", "count": 78},
     {"treatment_type": "coculture", "count": 76},
@@ -140,6 +146,7 @@ list_experiments(summary=True)
     {"treatment_type": "light", "count": 13},
     ...
   ],
+  "by_treatment_type_truncated": null,
   "by_background_factors": [
     {"background_factor": "light", "count": 127},
     {"background_factor": "axenic", "count": 90},
@@ -148,6 +155,7 @@ list_experiments(summary=True)
     {"background_factor": "diel", "count": 19},
     ...
   ],
+  "by_background_factors_truncated": null,
   "by_omics_type": [
     {"omics_type": "PROTEOMICS", "count": 74},
     {"omics_type": "RNASEQ", "count": 71},
@@ -164,6 +172,7 @@ list_experiments(summary=True)
     {"publication_doi": "10.1128/JB.01097-06", "count": 6},
     ...
   ],
+  "by_publication_truncated": null,
   "by_table_scope": [
     {"table_scope": "all_detected_genes", "count": 111},
     {"table_scope": "significant_only", "count": 40},
@@ -198,6 +207,7 @@ list_experiments(summary=True)
     {"metric_type": "predicted_subcellular_localization", "count": 2},
     ...
   ],
+  "by_metric_type_truncated": null,
   "by_compartment": [
     {"compartment": "whole_cell", "count": 183},
     {"compartment": "vesicle", "count": 13},
@@ -289,12 +299,15 @@ list_experiments(compartment="vesicle", limit=2)
     {"organism_name": "Alteromonas macleodii ATCC27126", "count": 1},
     ...
   ],
+  "by_organism_truncated": null,
   "by_treatment_type": [{"treatment_type": "compartment", "count": 13}],
+  "by_treatment_type_truncated": null,
   "by_background_factors": [
     {"background_factor": "axenic", "count": 13},
     {"background_factor": "light", "count": 7},
     {"background_factor": "darkness", "count": 6}
   ],
+  "by_background_factors_truncated": null,
   "by_omics_type": [
     {"omics_type": "VESICLE_PROTEOMICS", "count": 10},
     {"omics_type": "METABOLOMICS", "count": 2},
@@ -305,6 +318,7 @@ list_experiments(compartment="vesicle", limit=2)
     {"publication_doi": "10.1111/1462-2920.15834", "count": 4},
     {"publication_doi": "10.1126/science.1243457", "count": 3}
   ],
+  "by_publication_truncated": null,
   "by_table_scope": [
     {"table_scope": "top_n", "count": 7},
     {"table_scope": "significant_only", "count": 2},
@@ -325,6 +339,7 @@ list_experiments(compartment="vesicle", limit=2)
     {"metric_type": "predicted_subcellular_localization", "count": 2},
     ...
   ],
+  "by_metric_type_truncated": null,
   "by_compartment": [{"compartment": "vesicle", "count": 13}],
   "time_course_count": 0,
   "score_max": null,
@@ -420,18 +435,23 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
     {"organism_name": "Prochlorococcus MIT9301", "count": 1},
     {"organism_name": "Prochlorococcus MIT9313", "count": 1}
   ],
+  "by_organism_truncated": null,
   "by_treatment_type": [{"treatment_type": "phosphorus", "count": 1}, {"treatment_type": "carbon", "count": 1}],
+  "by_treatment_type_truncated": null,
   "by_background_factors": [{"background_factor": "axenic", "count": 2}, {"background_factor": "light", "count": 1}],
+  "by_background_factors_truncated": null,
   "by_omics_type": [{"omics_type": "METABOLOMICS", "count": 2}],
   "by_publication": [
     {"publication_doi": "10.1128/msystems.01261-22", "count": 1},
     {"publication_doi": "10.1073/pnas.2213271120", "count": 1}
   ],
+  "by_publication_truncated": null,
   "by_table_scope": [],
   "by_cluster_type": [],
   "by_growth_phase": [],
   "by_value_kind": [],
   "by_metric_type": [],
+  "by_metric_type_truncated": null,
   "by_compartment": [{"compartment": "whole_cell", "count": 2}],
   "time_course_count": 0,
   "score_max": null,
@@ -598,7 +618,7 @@ result['results'][0]['time_point_growth_phases']
 from multiomics_explorer import list_experiments
 
 result = list_experiments()
-# returns dict with keys: total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_compartment, time_course_count, score_max, score_median, not_found, results
+# returns dict with keys: total_entries, total_matching, returned, offset, truncated, by_organism, by_organism_truncated, by_treatment_type, by_treatment_type_truncated, by_background_factors, by_background_factors_truncated, by_omics_type, by_publication, by_publication_truncated, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_metric_type_truncated, by_compartment, time_course_count, score_max, score_median, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

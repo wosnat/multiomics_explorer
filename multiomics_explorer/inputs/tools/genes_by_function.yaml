@@ -17,6 +17,7 @@ examples:
           {"organism_name": "Prochlorococcus MIT9313", "count": 78},
           ...
         ],
+        "by_organism_truncated": true,
         "by_category": [
           {"category": "Photosynthesis", "count": 1001},
           {"category": "Stress response and adaptation", "count": 274},
@@ -79,6 +80,7 @@ examples:
           {"organism_name": "Alteromonas macleodii HOT1A3", "count": 42},
           ...
         ],
+        "by_organism_truncated": null,
         "by_category": [
           {"category": "Post-translational modification", "count": 641},
           {"category": "Stress response and adaptation", "count": 199},
