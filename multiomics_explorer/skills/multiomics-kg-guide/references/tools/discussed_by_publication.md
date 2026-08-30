@@ -12,12 +12,12 @@ into gene_overview and pathways into genes_by_ontology(ontology='kegg').
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| publication_dois | list[string] \| None | — | Restrict to these publication DOIs. |
+| publication_dois | list[string] | — | Restrict to these publication DOIs. |
 | entity_kind | string ('gene', 'kegg_pathway') \| None | None | Restrict to one arm: 'gene' or 'kegg_pathway'. None = both. |
 | prominence | string ('central', 'peripheral') \| None | None | Filter edges by prominence: 'central' or 'peripheral'. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
-| limit | int \| None | 50 | Max rows returned (paging). |
+| limit | int | 50 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
 ## Response format

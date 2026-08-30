@@ -26,7 +26,7 @@ validates/scopes the inferred organism rather than driving the query.
 | background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
 | experiment_ids | list[string] \| None | None | Restrict to specific experiments. Get these from list_experiments. |
 | group_by | string ('treatment_type', 'experiment') | treatment_type | Group response summary by treatment_type (aggregates across experiments) or experiment (one entry per experiment). |
-| limit | int \| None | 50 | Max rows returned (paging). |
+| limit | int | 50 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.

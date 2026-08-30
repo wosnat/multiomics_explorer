@@ -41,7 +41,7 @@ docs://ontologies/{key} for how each ontology is built and read.
 | organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
 | link_kinds | list[string ('composition', 'membership', 'router')] \| None | None | Keep links_out of these kinds: 'composition' = built from target (tcdb/merops -> pfam); 'membership' = belongs to (pfam/ncbifam -> interpro, kegg -> brite); 'router' = recall-biased (interpro -> ec/cazy, ncbifam TIGR* -> tigr.role). Default all. |
 | verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
-| limit | int \| None | 50 | Max rows returned (paging). |
+| limit | int | 50 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_organisms` for valid organism names.

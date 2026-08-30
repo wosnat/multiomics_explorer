@@ -56,7 +56,7 @@ omit it to drill across every organism a `metric_type` spans.
 | max_adjusted_p_value | float \| None | None | Upper bound on `r.adjusted_p_value`. **has_p_value-gated**. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
-| limit | int \| None | 25 | Max rows returned (paging). |
+| limit | int | 25 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.

@@ -38,7 +38,7 @@ runnable code (custom term2gene path covers cluster-membership ORA).
 | Name | Type | Default | Description |
 |---|---|---|---|
 | analysis_id | string | — | Clustering analysis ID. Get from list_clustering_analyses. |
-| organism | string \| None | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
+| organism | string | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') | — | Ontology for pathway definitions. Run ontology_landscape first. |
 | tree | string \| None | None | BRITE tree name filter. REQUIRED when ontology='brite' (12 trees; see list_filter_values(filter_type='brite_tree')) — a tree-less BRITE run raises, since it would mix taxonomy and function terms. Invalid for any other ontology. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | level | int \| None | None | Hierarchy level (0 = root). At least one of `level` or `term_ids` required. See docs://guide/conventions. |
@@ -51,7 +51,7 @@ runnable code (custom term2gene path covers cluster-membership ORA).
 | pvalue_cutoff | float | 0.05 | Significance threshold for p_adjust. |
 | include_nonsignificant | bool | False | Include rows with `p_adjust >= pvalue_cutoff`. Default False — only significant rows are returned, and `total_matching` counts just that pageable subset (== `n_significant`); pass True to page through every tested row, in which case `total_matching` covers all of them. `n_significant` itself is unaffected either way. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| limit | int \| None | 25 | Max rows returned (paging). |
+| limit | int | 25 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 | informative_only | bool | True | True drops terms the KG flags uninformative (roots, catch-alls). |
 | sources | list[string] \| None | None | Keep rows whose edge sources[] contains any of these values. Valid on the 14 functional-edge ontologies (not PSORTb/SignalP). See list_filter_values('sources'). |

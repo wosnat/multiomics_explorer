@@ -14,7 +14,7 @@ Routing: feed returned `locus_tag`s into `gene_overview` (data-availability tria
 |---|---|---|---|
 | identifier | string | — | Gene identifier (case-insensitive) — locus_tag (e.g. 'PMM0001'), gene name (e.g. 'dnaN'), old locus tag, or RefSeq protein ID. |
 | organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
-| limit | int \| None | 5 | Max rows returned (paging). |
+| limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 

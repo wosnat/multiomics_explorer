@@ -38,16 +38,20 @@ from multiomics_explorer.mcp_server.params import (  # noqa: E402
     ExcludeMetaboliteIdsParam,
     GrowthPhasesParam,
     InformativeOnlyParam,
+    LimitOptionalParam,
     LimitParam,
     MaxTierParam,
     MetaboliteIdsParam,
+    MetaboliteIdsRequiredParam,
     MinEvidenceScoreParam,
     OffsetParam,
     OmicsTypeParam,
     OntologyKey,
     OrganismParam,
+    OrganismRequiredParam,
     OrganismsParam,
     PublicationDoisParam,
+    PublicationDoisRequiredParam,
     SourcesParam,
     SummaryParam,
     TreatmentTypeParam,
@@ -2369,7 +2373,7 @@ def register_tools(mcp: FastMCP):
         )],
         summary: SummaryParam = False,
         verbose: VerboseParam = False,
-        limit: LimitParam = None,
+        limit: LimitOptionalParam = None,
         offset: OffsetParam = 0,
     ) -> GeneOverviewResponse:
         """Batch gene routing: identity (gene_name, product, gene_category) plus per-gene data-availability signals (annotation_types, expression counts, ortholog/cluster summaries, DM rollups, chemistry rollups).
@@ -2456,7 +2460,7 @@ def register_tools(mcp: FastMCP):
             "E.g. ['PMM0001', 'sync_0001'].",
         )],
         summary: SummaryParam = False,
-        limit: LimitParam = None,
+        limit: LimitOptionalParam = None,
         offset: OffsetParam = 0,
     ) -> GeneDetailResponse:
         """All Gene node properties (deep-dive). Use `gene_overview` for the common routing case; this tool adds what overview omits — `sequence`, `gene_summary`, `function_description`, `alternate_functional_descriptions`, `catalytic_activities` (sparse: ~8k genes), `contributing_sources`, `seed_ortholog` / `seed_ortholog_evalue`, `protein_family`, coordinates (`contig`, `start`, `end`, `strand`). The Gene node carries NO `ec_numbers` / `ko_terms` / `kegg_ids` / `cog_categories` properties — chemistry and ontology annotations are graph edges: use `gene_ontology_terms(ontology=['ec','kegg'])` or `metabolites_by_gene`. TCDB/CAZy memberships are edges too.
@@ -2560,7 +2564,7 @@ def register_tools(mcp: FastMCP):
         )] = None,
         summary: SummaryParam = False,
         verbose: VerboseParam = False,
-        limit: LimitParam = None,
+        limit: LimitOptionalParam = None,
         offset: OffsetParam = 0,
     ) -> GeneHomologsResponse:
         """Look up ortholog group memberships for a gene batch — flat long
@@ -3284,7 +3288,7 @@ def register_tools(mcp: FastMCP):
         ontology: Annotated[OntologyKey, Field(
             description="Ontology for these term_ids / this level.",
         )],
-        organism: OrganismParam,
+        organism: OrganismRequiredParam,
         tree: Annotated[str | None, Field(
             description="BRITE tree name filter (e.g. 'transporters'). Only valid when "
                         "ontology='brite'. See docs://guide/conventions for the BRITE-tree "
@@ -3544,7 +3548,7 @@ def register_tools(mcp: FastMCP):
             description="Gene locus tags to look up. "
             "E.g. ['PMM0001', 'PMM0845'].",
         )],
-        organism: OrganismParam,
+        organism: OrganismRequiredParam,
         ontology: Annotated[
             list[OntologyKey] | OntologyKey | None,
             Field(description="Filter to one ontology, or a list of ontologies "
@@ -6599,7 +6603,7 @@ def register_tools(mcp: FastMCP):
     )
     async def ontology_landscape(
         ctx: Context,
-        organism: OrganismParam,
+        organism: OrganismRequiredParam,
         ontology: Annotated[
             list[OntologyKey] | OntologyKey | None,
             Field(description="If None, surveys all 17 ontologies. Accepts a "
@@ -6619,7 +6623,7 @@ def register_tools(mcp: FastMCP):
         ] = None,
         summary: SummaryParam = False,
         verbose: VerboseParam = False,
-        limit: LimitParam = 15,
+        limit: LimitOptionalParam = 15,
         offset: OffsetParam = 0,
         min_gene_set_size: Annotated[int, Field(
             description="Exclude terms with fewer genes than this (default 5).",
@@ -6697,7 +6701,7 @@ def register_tools(mcp: FastMCP):
     )
     async def pathway_enrichment(
         ctx: Context,
-        organism: OrganismParam,
+        organism: OrganismRequiredParam,
         experiment_ids: Annotated[list[str], Field(
             description="Experiments to pull DE from. Get IDs from list_experiments.",
         )],
@@ -6873,7 +6877,7 @@ def register_tools(mcp: FastMCP):
     async def cluster_enrichment(
         ctx: Context,
         analysis_id: Annotated[str, Field(description="Clustering analysis ID. Get from list_clustering_analyses.")],
-        organism: OrganismParam,
+        organism: OrganismRequiredParam,
         ontology: Annotated[OntologyKey, Field(description="Ontology for pathway definitions. Run ontology_landscape first.")],
         tree: Annotated[str | None, Field(
             description="BRITE tree name filter. REQUIRED when ontology='brite' (12 trees; "
@@ -8404,8 +8408,8 @@ def register_tools(mcp: FastMCP):
     )
     async def genes_by_metabolite(
         ctx: Context,
-        metabolite_ids: Annotated[MetaboliteIdsParam, Field(min_length=1)],
-        organism: Annotated[OrganismParam, Field(min_length=1)],
+        metabolite_ids: Annotated[MetaboliteIdsRequiredParam, Field(min_length=1)],
+        organism: Annotated[OrganismRequiredParam, Field(min_length=1)],
         exclude_metabolite_ids: ExcludeMetaboliteIdsParam = None,
         ec_numbers: Annotated[list[str] | None, Field(
             description="Narrow metabolism rows to those whose Reaction carries "
@@ -8608,7 +8612,7 @@ def register_tools(mcp: FastMCP):
             "Gene_has_tcdb_family).",
             min_length=1,
         )],
-        organism: Annotated[OrganismParam, Field(min_length=1)],
+        organism: Annotated[OrganismRequiredParam, Field(min_length=1)],
         metabolite_elements: Annotated[list[str] | None, Field(
             description="Filter to rows where the metabolite contains "
             "ALL of the given element symbols (AND-of-presence). "
@@ -10107,7 +10111,7 @@ def register_tools(mcp: FastMCP):
     )
     async def assays_by_metabolite(
         ctx: Context,
-        metabolite_ids: Annotated[MetaboliteIdsParam, Field(min_length=1)],
+        metabolite_ids: Annotated[MetaboliteIdsRequiredParam, Field(min_length=1)],
         organism: OrganismParam = None,
         evidence_kind: Annotated[Literal["quantifies", "flags"] | None, Field(
             description="Filter by edge type. `'quantifies'` = numeric arm "
@@ -10266,7 +10270,7 @@ def register_tools(mcp: FastMCP):
         fasta: Annotated[bool, Field(
             description="If true, omit per-row `sequence` and return one multi-FASTA blob in the envelope instead (no duplication).")] = False,
         summary: SummaryParam = False,
-        limit: LimitParam = None,
+        limit: LimitOptionalParam = None,
         offset: OffsetParam = 0,
     ) -> GeneAaSequenceResponse:
         """Return amino-acid sequences for a batch of genes, export-optimized for BLAST / HMMER / alignment. Set fasta=true for one multi-FASTA blob; sequence-length stats cover the full match (page-independent). not_found = locus_tag absent from KG; not_matched = gene exists but its sequence is null.
@@ -10361,7 +10365,7 @@ def register_tools(mcp: FastMCP):
         same_strand: Annotated[bool | None, Field(
             description="None=all neighbors; True=co-oriented only; False=opposite-strand only. Null-strand neighbors dropped when set.")] = None,
         summary: SummaryParam = False,
-        limit: LimitParam = None,
+        limit: LimitOptionalParam = None,
     ) -> GeneNeighborsResponse:
         """Return each anchor gene's genomic neighborhood — genes adjacent on the same contig and organism — for operon / synteny reasoning, with strand orientation and intergenic gap. Positional only (not co-expression); fragmented assemblies yield fewer neighbors near contig ends. not_found = anchor absent from KG; not_matched = anchor exists but lacks coordinates.
 
@@ -10461,7 +10465,7 @@ def register_tools(mcp: FastMCP):
     @mcp.tool(tags={"publications", "literature"}, annotations={"readOnlyHint": True})
     async def discussed_by_publication(
         ctx: Context,
-        publication_dois: PublicationDoisParam,
+        publication_dois: PublicationDoisRequiredParam,
         entity_kind: Annotated[Literal["gene", "kegg_pathway"] | None, Field(
             description="Restrict to one arm: 'gene' or 'kegg_pathway'. None = both.")] = None,
         prominence: Annotated[Literal["central", "peripheral"] | None, Field(

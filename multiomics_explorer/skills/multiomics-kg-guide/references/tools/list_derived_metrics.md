@@ -42,7 +42,7 @@ in that genus rather than raising ambiguous.
 | has_p_value | bool \| None | None | Filter to DMs that carry statistical p-values. Set to True before using `significant_only` / `max_adjusted_p_value` on drill-downs. No DM in the current KG carries p-values, so has_p_value=True returns zero rows — kept because drill-down p-value filters raise when no selected DM supports them. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
-| limit | int \| None | 20 | Max rows returned (paging). |
+| limit | int | 20 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.

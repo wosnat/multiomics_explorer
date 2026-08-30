@@ -1,0 +1,5748 @@
+{
+ "assays_by_metabolite": {
+  "compartment": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "evidence_kind": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "quantifies",
+       "flags"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "exclude_metabolite_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "metabolite_ids": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "metric_types": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "cluster_enrichment": {
+  "analysis_id": {
+   "required": true,
+   "type_sig": {
+    "type": "string"
+   }
+  },
+  "background": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     }
+    ]
+   }
+  },
+  "call_class": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "enum": [
+        "peptidase",
+        "inhibitor",
+        "nonpeptidase_homolog"
+       ],
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "evidence": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "include_nonsignificant": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "informative_only": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "interpro_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "FAMILY",
+       "DOMAIN",
+       "HOMOLOGOUS_SUPERFAMILY",
+       "REPEAT",
+       "CONSERVED_SITE",
+       "ACTIVE_SITE",
+       "BINDING_SITE",
+       "PTM"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "level": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "max_cluster_size": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "max_gene_set_size": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "max_tier": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "min_cluster_size": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "min_evidence_score": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "number"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "min_gene_set_size": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "ontology": {
+   "required": true,
+   "type_sig": {
+    "enum": [
+     "go_bp",
+     "go_mf",
+     "go_cc",
+     "ec",
+     "kegg",
+     "cog_category",
+     "cyanorak_role",
+     "tigr_role",
+     "pfam",
+     "brite",
+     "tcdb",
+     "cazy",
+     "subcellular_localization",
+     "signal_peptide_type",
+     "interpro",
+     "ncbifam",
+     "merops"
+    ],
+    "type": "string"
+   }
+  },
+  "organism": {
+   "required": true,
+   "type_sig": {
+    "type": "string"
+   }
+  },
+  "pvalue_cutoff": {
+   "required": false,
+   "type_sig": {
+    "type": "number"
+   }
+  },
+  "sources": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "term_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "tree": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  }
+ },
+ "differential_expression_by_gene": {
+  "direction": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "up",
+       "down",
+       "both"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "experiment_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "growth_phases": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "locus_tags": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "significant_only": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "differential_expression_by_ortholog": {
+  "direction": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "up",
+       "down",
+       "both"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "experiment_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "group_ids": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "growth_phases": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organisms": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "significant_only": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "discussed_by_publication": {
+  "entity_kind": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "gene",
+       "kegg_pathway"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "prominence": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "central",
+       "peripheral"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "publication_dois": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "gene_aa_sequence": {
+  "fasta": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "locus_tags": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "gene_clusters_by_gene": {
+  "analysis_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "background_factors": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "cluster_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "locus_tags": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "publication_dois": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "treatment_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "gene_derived_metrics": {
+  "background_factors": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "compartment": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "derived_metric_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "locus_tags": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "metric_types": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "publication_dois": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "treatment_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "value_kind": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "numeric",
+       "boolean",
+       "categorical"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "gene_details": {
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "locus_tags": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "gene_homologs": {
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "locus_tags": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "max_specificity_rank": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "source": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "taxonomic_level": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "gene_neighbors": {
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "locus_tags": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "max_bp_distance": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "same_strand": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "boolean"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "window": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  }
+ },
+ "gene_ontology_terms": {
+  "call_class": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "enum": [
+        "peptidase",
+        "inhibitor",
+        "nonpeptidase_homolog"
+       ],
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "evidence": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "include_superseded": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "informative_only": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "interpro_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "FAMILY",
+       "DOMAIN",
+       "HOMOLOGOUS_SUPERFAMILY",
+       "REPEAT",
+       "CONSERVED_SITE",
+       "ACTIVE_SITE",
+       "BINDING_SITE",
+       "PTM"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "level": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "locus_tags": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "max_tier": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "min_evidence_score": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "number"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "mode": {
+   "required": false,
+   "type_sig": {
+    "enum": [
+     "leaf",
+     "rollup"
+    ],
+    "type": "string"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "ontology": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "enum": [
+        "go_bp",
+        "go_mf",
+        "go_cc",
+        "ec",
+        "kegg",
+        "cog_category",
+        "cyanorak_role",
+        "tigr_role",
+        "pfam",
+        "brite",
+        "tcdb",
+        "cazy",
+        "subcellular_localization",
+        "signal_peptide_type",
+        "interpro",
+        "ncbifam",
+        "merops"
+       ],
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "enum": [
+       "go_bp",
+       "go_mf",
+       "go_cc",
+       "ec",
+       "kegg",
+       "cog_category",
+       "cyanorak_role",
+       "tigr_role",
+       "pfam",
+       "brite",
+       "tcdb",
+       "cazy",
+       "subcellular_localization",
+       "signal_peptide_type",
+       "interpro",
+       "ncbifam",
+       "merops"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "organism": {
+   "required": true,
+   "type_sig": {
+    "type": "string"
+   }
+  },
+  "sources": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "tree": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "gene_overview": {
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "locus_tags": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "gene_response_profile": {
+  "background_factors": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "experiment_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "group_by": {
+   "required": false,
+   "type_sig": {
+    "enum": [
+     "treatment_type",
+     "experiment"
+    ],
+    "type": "string"
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "locus_tags": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "treatment_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  }
+ },
+ "genes_by_boolean_metric": {
+  "background_factors": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "compartment": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "derived_metric_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "experiment_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "flag_value": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "boolean"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "growth_phases": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "locus_tags": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "metric_types": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "publication_dois": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "treatment_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "genes_by_categorical_metric": {
+  "background_factors": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "categories": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "compartment": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "derived_metric_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "experiment_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "growth_phases": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "locus_tags": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "metric_types": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "publication_dois": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "treatment_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "genes_by_function": {
+  "gene_categories": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "min_quality": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "search_text": {
+   "required": true,
+   "type_sig": {
+    "type": "string"
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "genes_by_homolog_group": {
+  "group_ids": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organisms": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "genes_by_metabolite": {
+  "ec_numbers": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "evidence_sources": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "enum": [
+        "metabolism",
+        "transport"
+       ],
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "exclude_metabolite_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "gene_categories": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "mass_balance": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "balanced",
+       "unbalanced"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "metabolite_ids": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "metabolite_pathway_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": true,
+   "type_sig": {
+    "type": "string"
+   }
+  },
+  "substrate_depth": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "enum": [
+        "most_specific",
+        "inherited"
+       ],
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "genes_by_numeric_metric": {
+  "background_factors": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "compartment": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "derived_metric_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "experiment_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "growth_phases": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "locus_tags": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "max_adjusted_p_value": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "number"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "max_percentile": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "number"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "max_rank": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "max_value": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "number"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "metric_bucket": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "enum": [
+        "top_decile",
+        "top_quartile",
+        "mid",
+        "low"
+       ],
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "metric_types": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "min_percentile": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "number"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "min_value": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "number"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "publication_dois": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "significant_only": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "treatment_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "genes_by_ontology": {
+  "call_class": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "enum": [
+        "peptidase",
+        "inhibitor",
+        "nonpeptidase_homolog"
+       ],
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "evidence": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "informative_only": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "interpro_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "FAMILY",
+       "DOMAIN",
+       "HOMOLOGOUS_SUPERFAMILY",
+       "REPEAT",
+       "CONSERVED_SITE",
+       "ACTIVE_SITE",
+       "BINDING_SITE",
+       "PTM"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "level": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "max_gene_set_size": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "max_tier": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "min_evidence_score": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "number"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "min_gene_set_size": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "ontology": {
+   "required": true,
+   "type_sig": {
+    "enum": [
+     "go_bp",
+     "go_mf",
+     "go_cc",
+     "ec",
+     "kegg",
+     "cog_category",
+     "cyanorak_role",
+     "tigr_role",
+     "pfam",
+     "brite",
+     "tcdb",
+     "cazy",
+     "subcellular_localization",
+     "signal_peptide_type",
+     "interpro",
+     "ncbifam",
+     "merops"
+    ],
+    "type": "string"
+   }
+  },
+  "organism": {
+   "required": true,
+   "type_sig": {
+    "type": "string"
+   }
+  },
+  "sources": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "term_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "tree": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "genes_in_cluster": {
+  "analysis_id": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "cluster_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "kg_release_info": {},
+ "kg_schema": {
+  "labels": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "relationship_types": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "section": {
+   "required": false,
+   "type_sig": {
+    "enum": [
+     "nodes",
+     "relationships",
+     "both"
+    ],
+    "type": "string"
+   }
+  }
+ },
+ "list_clustering_analyses": {
+  "analysis_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "background_factors": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "cluster_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "experiment_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "growth_phases": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "omics_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "publication_dois": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "search_text": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "treatment_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "list_derived_metrics": {
+  "background_factors": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "compartment": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "derived_metric_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "experiment_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "growth_phases": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "has_p_value": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "boolean"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "metric_types": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "omics_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "publication_dois": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "rankable": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "boolean"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "search_text": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "treatment_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "value_kind": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "numeric",
+       "boolean",
+       "categorical"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "list_experiments": {
+  "background_factors": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "coculture_partner": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "compartment": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "experiment_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "growth_phases": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "omics_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "publication_dois": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "search_text": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "table_scope": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "time_course_only": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "treatment_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "list_filter_values": {
+  "filter_type": {
+   "required": false,
+   "type_sig": {
+    "enum": [
+     "gene_category",
+     "brite_tree",
+     "growth_phase",
+     "metric_type",
+     "value_kind",
+     "compartment",
+     "omics_type",
+     "evidence_source",
+     "evidence",
+     "sources",
+     "call_class",
+     "interpro_type",
+     "ncbifam_family_type",
+     "merops_catalytic_type",
+     "merops_family_class",
+     "best_hit_kind",
+     "pfam_support",
+     "attachment_depth",
+     "trust_axes",
+     "link_kinds",
+     "cluster_type",
+     "treatment_type",
+     "background_factors",
+     "table_scope",
+     "detection_status",
+     "expression_status"
+    ],
+    "type": "string"
+   }
+  },
+  "ontology": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "go_bp",
+       "go_mf",
+       "go_cc",
+       "ec",
+       "kegg",
+       "cog_category",
+       "cyanorak_role",
+       "tigr_role",
+       "pfam",
+       "brite",
+       "tcdb",
+       "cazy",
+       "subcellular_localization",
+       "signal_peptide_type",
+       "interpro",
+       "ncbifam",
+       "merops"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  }
+ },
+ "list_metabolite_assays": {
+  "assay_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "background_factors": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "compartment": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "exclude_metabolite_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "experiment_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "growth_phases": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "metabolite_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "metric_types": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "publication_dois": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "rankable": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "boolean"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "search_text": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "treatment_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "value_kind": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "numeric",
+       "boolean"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "list_metabolites": {
+  "chebi_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "elements": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "evidence_sources": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "enum": [
+        "metabolism",
+        "transport",
+        "metabolomics"
+       ],
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "exclude_metabolite_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "hmdb_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "kegg_compound_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "max_mass": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "number"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "metabolite_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "min_mass": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "number"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "mnxm_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism_names": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "pathway_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "search_text": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "list_organisms": {
+  "compartment": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism_names": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "list_publications": {
+  "author": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "background_factors": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "compartment": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "growth_phases": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "publication_dois": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "search_text": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "treatment_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "metabolites_by_flags_assay": {
+  "assay_ids": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "background_factors": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "compartment": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "exclude_metabolite_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "experiment_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "flag_value": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "boolean"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "growth_phases": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "metabolite_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "publication_dois": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "treatment_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "metabolites_by_gene": {
+  "ec_numbers": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "evidence_sources": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "enum": [
+        "metabolism",
+        "transport"
+       ],
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "exclude_metabolite_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "gene_categories": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "locus_tags": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "mass_balance": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "balanced",
+       "unbalanced"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "metabolite_elements": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "metabolite_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "metabolite_pathway_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": true,
+   "type_sig": {
+    "type": "string"
+   }
+  },
+  "substrate_depth": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "enum": [
+        "most_specific",
+        "inherited"
+       ],
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "metabolites_by_quantifies_assay": {
+  "assay_ids": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "background_factors": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "compartment": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "detection_status": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "exclude_metabolite_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "experiment_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "growth_phases": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "max_percentile": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "number"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "max_rank": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "max_value": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "number"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "metabolite_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "metric_bucket": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "min_percentile": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "number"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "min_value": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "number"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "publication_dois": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "timepoint": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "treatment_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ontology_landscape": {
+  "call_class": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "enum": [
+        "peptidase",
+        "inhibitor",
+        "nonpeptidase_homolog"
+       ],
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "experiment_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "informative_only": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "interpro_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "FAMILY",
+       "DOMAIN",
+       "HOMOLOGOUS_SUPERFAMILY",
+       "REPEAT",
+       "CONSERVED_SITE",
+       "ACTIVE_SITE",
+       "BINDING_SITE",
+       "PTM"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "max_gene_set_size": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "min_gene_set_size": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "ontology": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "enum": [
+        "go_bp",
+        "go_mf",
+        "go_cc",
+        "ec",
+        "kegg",
+        "cog_category",
+        "cyanorak_role",
+        "tigr_role",
+        "pfam",
+        "brite",
+        "tcdb",
+        "cazy",
+        "subcellular_localization",
+        "signal_peptide_type",
+        "interpro",
+        "ncbifam",
+        "merops"
+       ],
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "enum": [
+       "go_bp",
+       "go_mf",
+       "go_cc",
+       "ec",
+       "kegg",
+       "cog_category",
+       "cyanorak_role",
+       "tigr_role",
+       "pfam",
+       "brite",
+       "tcdb",
+       "cazy",
+       "subcellular_localization",
+       "signal_peptide_type",
+       "interpro",
+       "ncbifam",
+       "merops"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "organism": {
+   "required": true,
+   "type_sig": {
+    "type": "string"
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "tree": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ontology_term_details": {
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "link_kinds": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "enum": [
+        "composition",
+        "membership",
+        "router"
+       ],
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "term_ids": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "pathway_enrichment": {
+  "background": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     }
+    ]
+   }
+  },
+  "call_class": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "enum": [
+        "peptidase",
+        "inhibitor",
+        "nonpeptidase_homolog"
+       ],
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "direction": {
+   "required": false,
+   "type_sig": {
+    "enum": [
+     "up",
+     "down",
+     "both"
+    ],
+    "type": "string"
+   }
+  },
+  "evidence": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "experiment_ids": {
+   "required": true,
+   "type_sig": {
+    "items": {
+     "type": "string"
+    },
+    "type": "array"
+   }
+  },
+  "growth_phases": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "include_nonsignificant": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "informative_only": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "interpro_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "FAMILY",
+       "DOMAIN",
+       "HOMOLOGOUS_SUPERFAMILY",
+       "REPEAT",
+       "CONSERVED_SITE",
+       "ACTIVE_SITE",
+       "BINDING_SITE",
+       "PTM"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "level": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "max_gene_set_size": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "max_tier": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "min_evidence_score": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "number"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "min_gene_set_size": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "ontology": {
+   "required": true,
+   "type_sig": {
+    "enum": [
+     "go_bp",
+     "go_mf",
+     "go_cc",
+     "ec",
+     "kegg",
+     "cog_category",
+     "cyanorak_role",
+     "tigr_role",
+     "pfam",
+     "brite",
+     "tcdb",
+     "cazy",
+     "subcellular_localization",
+     "signal_peptide_type",
+     "interpro",
+     "ncbifam",
+     "merops"
+    ],
+    "type": "string"
+   }
+  },
+  "organism": {
+   "required": true,
+   "type_sig": {
+    "type": "string"
+   }
+  },
+  "pvalue_cutoff": {
+   "required": false,
+   "type_sig": {
+    "type": "number"
+   }
+  },
+  "significant_only": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "sources": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "term_ids": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "timepoint_filter": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "tree": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  }
+ },
+ "resolve_gene": {
+  "identifier": {
+   "required": true,
+   "type_sig": {
+    "type": "string"
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "run_cypher": {
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "query": {
+   "required": true,
+   "type_sig": {
+    "type": "string"
+   }
+  }
+ },
+ "search_homolog_groups": {
+  "cog_categories": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "cyanorak_roles": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "max_specificity_rank": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "search_text": {
+   "required": true,
+   "type_sig": {
+    "type": "string"
+   }
+  },
+  "source": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "taxonomic_level": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ },
+ "search_ontology": {
+  "informative_only": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "interpro_type": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "FAMILY",
+       "DOMAIN",
+       "HOMOLOGOUS_SUPERFAMILY",
+       "REPEAT",
+       "CONSERVED_SITE",
+       "ACTIVE_SITE",
+       "BINDING_SITE",
+       "PTM"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "level": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "limit": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "min_gene_count": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "integer"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "offset": {
+   "required": false,
+   "type_sig": {
+    "type": "integer"
+   }
+  },
+  "ontology": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "enum": [
+        "go_bp",
+        "go_mf",
+        "go_cc",
+        "ec",
+        "kegg",
+        "cog_category",
+        "cyanorak_role",
+        "tigr_role",
+        "pfam",
+        "brite",
+        "tcdb",
+        "cazy",
+        "subcellular_localization",
+        "signal_peptide_type",
+        "interpro",
+        "ncbifam",
+        "merops"
+       ],
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "enum": [
+       "go_bp",
+       "go_mf",
+       "go_cc",
+       "ec",
+       "kegg",
+       "cog_category",
+       "cyanorak_role",
+       "tigr_role",
+       "pfam",
+       "brite",
+       "tcdb",
+       "cazy",
+       "subcellular_localization",
+       "signal_peptide_type",
+       "interpro",
+       "ncbifam",
+       "merops"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "organism": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "search_text": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "summary": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
+  "tree": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "verbose": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  }
+ }
+}

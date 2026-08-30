@@ -43,7 +43,7 @@ thresholds) live on `genes_by_numeric_metric`; flag-level filters on
 | derived_metric_ids | list[string] \| None | None | Look up specific DMs by their unique id. Use to pin one DM when the same metric_type appears across publications. Pair with `list_derived_metrics`. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
-| limit | int \| None | 5 | Max rows returned (paging). |
+| limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.

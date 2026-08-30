@@ -26,7 +26,7 @@ Routing: drill into `genes_by_metabolite(metabolite_ids=[...])` for catalysts/tr
 | evidence_sources | list[string ('metabolism', 'transport', 'metabolomics')] \| None | None | Filter by evidence path. Set-membership ANY semantics — ['transport'] returns transport-only AND dual. Valid values: 'metabolism' (catalysis-reachable), 'transport' (TCDB-curated substrate), 'metabolomics' (measured by a MetaboliteAssay). Other values raise at the MCP boundary. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
-| limit | int \| None | 5 | Max rows returned (paging). |
+| limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
 ## Response format

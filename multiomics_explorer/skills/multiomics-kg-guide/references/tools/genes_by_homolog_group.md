@@ -22,7 +22,7 @@ in that genus rather than raising ambiguous.
 | organisms | list[string] \| None | None | Organisms, each word-matched as `organism`. Omit for all. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
-| limit | int \| None | 5 | Max rows returned (paging). |
+| limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
 ## Response format

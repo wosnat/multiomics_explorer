@@ -15,6 +15,24 @@ a tighter constraint on top of the shared type (an extra `min_length`, a
 different `ge`), stack another `Field(...)` on top:
 `Annotated[OrganismParam, Field(min_length=1)]` — pydantic merges the two
 `FieldInfo` layers, with the outer one winning on overlap.
+
+A handful of tools had a required (non-`Optional`) `str` / `list[str]`
+param at spec baseline commit 8b8f16d — `organism`, `metabolite_ids`,
+`publication_dois`. Sharing a description must never widen that JSON-schema
+type to nullable, so each of those three gets a `*RequiredParam` sibling
+(`OrganismRequiredParam`, `MetaboliteIdsRequiredParam`,
+`PublicationDoisRequiredParam`) carrying the identical description text as
+its `Optional` counterpart but a non-`Optional` type — used only on the
+tools that were already required at baseline. Same story for `limit`: most
+tools had a plain `int`; a few (`gene_overview`, `gene_details`,
+`gene_homologs`, `ontology_landscape`, `gene_aa_sequence`,
+`gene_neighbors`) had `int | None` (an "unbounded — pass a number to page"
+default) — `LimitParam` stays non-`Optional` `int` (baseline majority) and
+`LimitOptionalParam` covers the `int | None` minority.
+`tests/unit/test_params.py::test_param_types_match_baseline` snapshots
+every tool's per-param JSON-schema `type`/`anyOf`/`items`/`enum` +
+`required` at 8b8f16d and asserts it is unchanged today — run before adding
+a new shared type to catch this class of accidental widening.
 """
 from __future__ import annotations
 
@@ -34,16 +52,25 @@ OntologyKey = Literal[
 # Cross-cutting filters / paging / mode switches.
 # ---------------------------------------------------------------------------
 
-OrganismParam = Annotated[str | None, Field(
-    description="Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms.",
-)]
+_ORGANISM_DESC = "Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms."
+
+OrganismParam = Annotated[str | None, Field(description=_ORGANISM_DESC)]
+
+OrganismRequiredParam = Annotated[str, Field(description=_ORGANISM_DESC)]
 
 OrganismsParam = Annotated[list[str] | None, Field(
     description="Organisms, each word-matched as `organism`. Omit for all.",
 )]
 
-LimitParam = Annotated[int | None, Field(
-    description="Max rows returned (paging).",
+_LIMIT_DESC = "Max rows returned (paging)."
+
+LimitParam = Annotated[int, Field(
+    description=_LIMIT_DESC,
+    ge=1,
+)]
+
+LimitOptionalParam = Annotated[int | None, Field(
+    description=_LIMIT_DESC,
     ge=1,
 )]
 
@@ -80,13 +107,17 @@ CompartmentParam = Annotated[str | None, Field(
     description="Keep rows in this compartment. Values: list_filter_values('compartment').",
 )]
 
-PublicationDoisParam = Annotated[list[str] | None, Field(
-    description="Restrict to these publication DOIs.",
-)]
+_PUBLICATION_DOIS_DESC = "Restrict to these publication DOIs."
 
-MetaboliteIdsParam = Annotated[list[str] | None, Field(
-    description="Metabolite IDs; bare or xref forms coerced (see resolved_aliases, docs://analysis/metabolites).",
-)]
+PublicationDoisParam = Annotated[list[str] | None, Field(description=_PUBLICATION_DOIS_DESC)]
+
+PublicationDoisRequiredParam = Annotated[list[str], Field(description=_PUBLICATION_DOIS_DESC)]
+
+_METABOLITE_IDS_DESC = "Metabolite IDs; bare or xref forms coerced (see resolved_aliases, docs://analysis/metabolites)."
+
+MetaboliteIdsParam = Annotated[list[str] | None, Field(description=_METABOLITE_IDS_DESC)]
+
+MetaboliteIdsRequiredParam = Annotated[list[str], Field(description=_METABOLITE_IDS_DESC)]
 
 ExcludeMetaboliteIdsParam = Annotated[list[str] | None, Field(
     description="Drop these metabolites; bare/xref forms coerced (see resolved_aliases); exclude wins on overlap.",
