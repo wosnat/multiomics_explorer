@@ -253,6 +253,54 @@ class TestResolveGene:
 
 
 # ---------------------------------------------------------------------------
+# _run_fulltext — shared Lucene-error-to-ValueError translation helper
+# ---------------------------------------------------------------------------
+class TestRunFulltext:
+    """Every fulltext (db.index.fulltext.queryNodes) tool routes its final
+    (post-escape-retry) query execution through this one helper so a Neo4j
+    ClientError carrying a Lucene parse failure becomes a readable
+    ValueError instead of leaking the raw driver exception (llm-review
+    2b.3)."""
+
+    def test_passes_through_success(self, mock_conn):
+        mock_conn.execute_query.return_value = [{"a": 1}]
+        rows = api._run_fulltext(mock_conn, "CALL ...", {}, "search text")
+        assert rows == [{"a": 1}]
+
+    def test_parse_exception_becomes_readable_valueerror(self, mock_conn):
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        mock_conn.execute_query.side_effect = Neo4jClientError(
+            "Invalid input 'AND': expected ... (line 1, column 6) ParseException"
+        )
+        with pytest.raises(ValueError) as exc_info:
+            api._run_fulltext(mock_conn, "CALL ...", {}, "psbA AND")
+        msg = str(exc_info.value)
+        assert "psbA AND" in msg
+        assert "is not valid Lucene syntax" in msg
+        assert "ParseException" in msg
+        assert "Quote phrases, escape special characters, or drop trailing operators" in msg
+
+    def test_querynodes_error_becomes_readable_valueerror(self, mock_conn):
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        mock_conn.execute_query.side_effect = Neo4jClientError(
+            "Failed to invoke procedure `db.index.fulltext.queryNodes`: "
+            "Caused by: bad syntax"
+        )
+        with pytest.raises(ValueError, match=r"is not valid Lucene syntax"):
+            api._run_fulltext(mock_conn, "CALL ...", {}, "nitrogen AND (")
+
+    def test_unrelated_clienterror_not_translated(self, mock_conn):
+        """A ClientError with no Lucene fingerprint propagates unchanged —
+        this helper only translates parse failures, not arbitrary errors."""
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        mock_conn.execute_query.side_effect = Neo4jClientError(
+            "Neo.ClientError.Security.Unauthorized"
+        )
+        with pytest.raises(Neo4jClientError):
+            api._run_fulltext(mock_conn, "CALL ...", {}, "fine query")
+
+
+# ---------------------------------------------------------------------------
 # genes_by_function
 # ---------------------------------------------------------------------------
 class TestGenesByFunction:
@@ -325,6 +373,20 @@ class TestGenesByFunction:
         result = api.genes_by_function("bad+query", conn=mock_conn)
         assert mock_conn.execute_query.call_count == 3
         assert result["total_matching"] == 5
+
+    def test_lucene_parse_error_survives_retry_raises_readable_valueerror(self, mock_conn):
+        """When even the escaped retry fails with a Lucene parse error, the
+        raw neo4j ClientError must not leak — it becomes a readable
+        ValueError naming the bad search_text (llm-review 2b.3)."""
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        mock_conn.execute_query.side_effect = [
+            Neo4jClientError(
+                "Invalid input 'AND': expected ... ParseException"),
+            Neo4jClientError(
+                "Invalid input 'AND': expected ... ParseException"),
+        ]
+        with pytest.raises(ValueError, match=r"is not valid Lucene syntax"):
+            api.genes_by_function("psbA AND", conn=mock_conn)
 
     def test_passes_params(self, mock_conn, monkeypatch):
         """Verify organism, category, min_quality forwarded to builder."""
@@ -1469,6 +1531,42 @@ class TestSearchOntology:
         assert mock_conn.execute_query.call_count == 3
         assert result["returned"] == 1
 
+    def test_lucene_retry_adds_sanitised_warning(self, mock_conn):
+        """When the escaped retry succeeds, the envelope names the
+        sanitised text actually used (llm-review 2b.3)."""
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        mock_conn.execute_query.side_effect = [
+            Neo4jClientError("bad"),
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        result = api.search_ontology("nitrogen AND (", "go_bp", conn=mock_conn)
+        assert any(
+            "search_text was sanitised to" in w for w in result["warnings"]
+        )
+
+    def test_lucene_retry_success_does_not_warn(self, mock_conn):
+        """No warning when the query never needed escaping."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        result = api.search_ontology("DNA replication", "go_bp", conn=mock_conn)
+        assert not any(
+            "sanitised" in w for w in result["warnings"]
+        )
+
+    def test_lucene_parse_error_survives_retry_raises_readable_valueerror(self, mock_conn):
+        """When the escaped retry also fails, the raw ClientError must not
+        leak (llm-review 2b.3)."""
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        mock_conn.execute_query.side_effect = [
+            Neo4jClientError("Invalid input ParseException"),
+            Neo4jClientError("Invalid input ParseException"),
+        ]
+        with pytest.raises(ValueError, match=r"is not valid Lucene syntax"):
+            api.search_ontology("nitrogen AND (", "go_bp", conn=mock_conn)
+
     def test_importable_from_package(self):
         from multiomics_explorer import search_ontology as fn
         assert callable(fn)
@@ -2236,6 +2334,17 @@ class TestListPublications:
         mock_conn.execute_query.side_effect = Neo4jClientError("Some error")
         with pytest.raises(Neo4jClientError):
             api.list_publications(conn=mock_conn)
+
+    def test_lucene_parse_error_survives_retry_raises_readable_valueerror(self, mock_conn):
+        """When the escaped retry also fails with a Lucene parse error, the
+        raw ClientError must not leak (llm-review 2b.3)."""
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        mock_conn.execute_query.side_effect = [
+            Neo4jClientError("Invalid input ParseException"),
+            Neo4jClientError("Invalid input ParseException"),
+        ]
+        with pytest.raises(ValueError, match=r"is not valid Lucene syntax"):
+            api.list_publications(search_text="DNA [repair", conn=mock_conn)
 
     def test_importable_from_package(self):
         """from multiomics_explorer import list_publications works."""
@@ -3026,6 +3135,17 @@ class TestListExperiments:
         result = api.list_experiments(conn=mock_conn)
         assert result["results"][0]["authors"] == ["Smith J", "Jones K"]
 
+    def test_lucene_parse_error_survives_retry_raises_readable_valueerror(self, mock_conn):
+        """When the escaped retry also fails with a Lucene parse error, the
+        raw ClientError must not leak (llm-review 2b.3)."""
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        mock_conn.execute_query.side_effect = [
+            Neo4jClientError("Invalid input ParseException"),
+            Neo4jClientError("Invalid input ParseException"),
+        ]
+        with pytest.raises(ValueError, match=r"is not valid Lucene syntax"):
+            api.list_experiments(search_text="nitrogen AND (", conn=mock_conn)
+
 
 # ---------------------------------------------------------------------------
 # differential_expression_by_gene
@@ -3590,6 +3710,35 @@ class TestSearchHomologGroups:
         assert result["results"] == []
         # Only 1 query call (summary only, detail skipped)
         assert mock_conn.execute_query.call_count == 1
+
+    def test_lucene_retry(self, mock_conn):
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        mock_conn.execute_query.side_effect = [
+            Neo4jClientError("bad"),
+            [{"total_entries": 21122, "total_matching": 5,
+              "score_max": 3.5, "score_median": 2.0,
+              "by_source": [], "by_level": [],
+              "top_cyanorak_roles": [], "top_cog_categories": []}],
+            [{"group_id": "cyanorak:CK_1", "group_name": "CK_1",
+              "consensus_gene_name": "psbB", "consensus_product": "photosystem II",
+              "source": "cyanorak", "taxonomic_level": "curated",
+              "specificity_rank": 0, "member_count": 9, "organism_count": 9,
+              "score": 3.5}],
+        ]
+        result = api.search_homolog_groups("bad+query", conn=mock_conn)
+        assert mock_conn.execute_query.call_count == 3
+        assert result["returned"] == 1
+
+    def test_lucene_parse_error_survives_retry_raises_readable_valueerror(self, mock_conn):
+        """When the escaped retry also fails with a Lucene parse error, the
+        raw ClientError must not leak (llm-review 2b.3)."""
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        mock_conn.execute_query.side_effect = [
+            Neo4jClientError("Invalid input ParseException"),
+            Neo4jClientError("Invalid input ParseException"),
+        ]
+        with pytest.raises(ValueError, match=r"is not valid Lucene syntax"):
+            api.search_homolog_groups("photosystem AND", conn=mock_conn)
 
     def test_zero_match(self, mock_conn):
         mock_conn.execute_query.side_effect = [
@@ -4433,6 +4582,30 @@ class TestListClusteringAnalyses:
             search_text="nitrogen", conn=mock_conn)
         assert result["score_max"] == 5.2
         assert result["score_median"] == 2.1
+
+    def test_lucene_retry(self, mock_conn):
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        mock_conn.execute_query.side_effect = [
+            Neo4jClientError("bad"),
+            [self._SUMMARY_RESULT_WITH_SCORE],
+            [{**self._DETAIL_ROW, "score": 5.2}],
+        ]
+        result = api.list_clustering_analyses(
+            search_text="nitrogen AND (", conn=mock_conn)
+        assert result["returned"] == 1
+        assert mock_conn.execute_query.call_count == 3
+
+    def test_lucene_parse_error_survives_retry_raises_readable_valueerror(self, mock_conn):
+        """When the escaped retry also fails with a Lucene parse error, the
+        raw ClientError must not leak (llm-review 2b.3)."""
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        mock_conn.execute_query.side_effect = [
+            Neo4jClientError("Invalid input ParseException"),
+            Neo4jClientError("Invalid input ParseException"),
+        ]
+        with pytest.raises(ValueError, match=r"is not valid Lucene syntax"):
+            api.list_clustering_analyses(
+                search_text="nitrogen AND (", conn=mock_conn)
 
 
 # ---------------------------------------------------------------------------
@@ -6950,6 +7123,73 @@ class TestEnrichmentRaisesOnUnknownIdsAndBadLevel:
                 ontology="kegg", level=9, conn=MagicMock(),
             )
 
+    def test_pathway_enrichment_brite_without_tree_raises(self, monkeypatch):
+        """BRITE pools 12 unrelated hierarchies — a tree-less run must raise
+        before any query, same as the level-range check (llm-review 2b.3)."""
+        with pytest.raises(ValueError, match=r"ontology='brite' needs tree="):
+            api.pathway_enrichment(
+                organism="MED4", experiment_ids=["exp1"],
+                ontology="brite", level=1, conn=MagicMock(),
+            )
+
+    def test_pathway_enrichment_brite_without_tree_raises_before_organism_query(self, monkeypatch):
+        """The BRITE/tree check must fire before _validate_organism_inputs —
+        an unpatched MagicMock conn would blow up first if the order were
+        wrong, so this test deliberately does NOT patch the preflight."""
+        conn = MagicMock()
+        conn.execute_query.side_effect = AssertionError(
+            "no query should run before the BRITE/tree check")
+        with pytest.raises(ValueError, match=r"ontology='brite' needs tree="):
+            api.pathway_enrichment(
+                organism="MED4", experiment_ids=["exp1"],
+                ontology="brite", level=1, conn=conn,
+            )
+
+    def test_pathway_enrichment_brite_with_tree_does_not_raise_on_tree_check(self, monkeypatch):
+        """tree='transporters' clears the BRITE check (a later stage may
+        still raise on missing DE inputs, which is unrelated)."""
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(api, "_validate_organism_inputs", lambda *a, **k: "Prochlorococcus MED4")
+        monkeypatch.setattr(api, "_ontology_max_level", lambda ontology, conn: 3)
+        fake_inputs = SimpleNamespace(
+            organism_name="Prochlorococcus MED4",
+            gene_sets={}, background={}, cluster_metadata={},
+            not_found=[], not_matched=[], no_expression=[],
+            not_found_experiments=[], clusters_skipped=[],
+        )
+        monkeypatch.setattr(enr, "de_enrichment_inputs", lambda *a, **k: fake_inputs)
+        monkeypatch.setattr(
+            api, "genes_by_ontology",
+            lambda **_: {
+                "ontology": "brite", "organism_name": "Prochlorococcus MED4", "results": [],
+                "not_found": [], "wrong_ontology": [], "wrong_level": [], "filtered_out": [],
+            },
+        )
+        result = api.pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="brite", tree="transporters", level=1, conn=MagicMock(),
+        )
+        assert result.level == 1
+
+    def test_cluster_enrichment_brite_without_tree_raises(self, monkeypatch):
+        with pytest.raises(ValueError, match=r"ontology='brite' needs tree="):
+            api.cluster_enrichment(
+                analysis_id="ca:1", organism="MED4",
+                ontology="brite", level=1, conn=MagicMock(),
+            )
+
+    def test_cluster_enrichment_brite_without_tree_raises_before_analysis_query(self, monkeypatch):
+        """The BRITE/tree check must fire before cluster_enrichment_inputs
+        runs (before any query) — deliberately no preflight patching."""
+        conn = MagicMock()
+        conn.execute_query.side_effect = AssertionError(
+            "no query should run before the BRITE/tree check")
+        with pytest.raises(ValueError, match=r"ontology='brite' needs tree="):
+            api.cluster_enrichment(
+                analysis_id="ca:1", organism="MED4",
+                ontology="brite", level=1, conn=conn,
+            )
+
 
 # ---------------------------------------------------------------------------
 # A3 — pathway_enrichment.informative_only (frozen spec 2026-05-04)
@@ -7879,6 +8119,20 @@ class TestListDerivedMetrics:
         assert second_call_params["search_text"] == r"diel\*"
         assert out["total_matching"] == 4
 
+    def test_lucene_parse_error_survives_retry_raises_readable_valueerror(self):
+        """When the escaped retry also fails with a Lucene parse error, the
+        raw ClientError must not leak (llm-review 2b.3)."""
+        from multiomics_explorer.api.functions import list_derived_metrics
+        from neo4j.exceptions import ClientError
+        from unittest.mock import MagicMock
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            ClientError("Invalid input ParseException"),
+            ClientError("Invalid input ParseException"),
+        ]
+        with pytest.raises(ValueError, match=r"is not valid Lucene syntax"):
+            list_derived_metrics(search_text="diel AND", conn=conn)
+
     def test_importable_from_package(self):
         from multiomics_explorer import list_derived_metrics as api_ldm
         from multiomics_explorer.api import list_derived_metrics as api_direct
@@ -8024,6 +8278,33 @@ class TestListMetabolites:
         out = list_metabolites(search_text="glucose*", conn=conn)
         assert out["total_matching"] == 1
         assert conn.execute_query.call_count == 3
+
+    def test_lucene_parse_error_survives_summary_retry_raises_readable_valueerror(self):
+        """When the escaped summary retry also fails with a Lucene parse
+        error, the raw ClientError must not leak (llm-review 2b.3)."""
+        from multiomics_explorer.api.functions import list_metabolites
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            Neo4jClientError("Invalid input ParseException"),
+            Neo4jClientError("Invalid input ParseException"),
+        ]
+        with pytest.raises(ValueError, match=r"is not valid Lucene syntax"):
+            list_metabolites(search_text="glucose AND", conn=conn)
+
+    def test_lucene_parse_error_on_detail_raises_readable_valueerror(self):
+        """The detail query has no escape-retry of its own (unlike summary)
+        — a Lucene parse error there must still become a readable
+        ValueError, not a raw ClientError (llm-review 2b.3)."""
+        from multiomics_explorer.api.functions import list_metabolites
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW],
+            Neo4jClientError("Invalid input ParseException"),
+        ]
+        with pytest.raises(ValueError, match=r"is not valid Lucene syntax"):
+            list_metabolites(search_text="glucose", conn=conn)
 
     def test_evidence_sources_enum_validation(self):
         from multiomics_explorer.api.functions import list_metabolites
@@ -11770,6 +12051,20 @@ class TestListMetaboliteAssays:
         ]
         result = list_metabolite_assays(search_text="chitosan AND", conn=conn)
         assert result["total_matching"] == 0
+
+    def test_lucene_parse_error_survives_retry_raises_readable_valueerror(self):
+        """When the escaped retry also fails with a Lucene parse error, the
+        raw ClientError must not leak (llm-review 2b.3)."""
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        from unittest.mock import MagicMock
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            Neo4jClientError("Invalid input ParseException"),
+            Neo4jClientError("Invalid input ParseException"),
+        ]
+        with pytest.raises(ValueError, match=r"is not valid Lucene syntax"):
+            list_metabolite_assays(search_text="chitosan AND", conn=conn)
 
     def test_not_found_structured_for_batch_inputs(self):
         """`not_found` carries per-batch buckets (parent §11 Conv B).

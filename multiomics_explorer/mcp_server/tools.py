@@ -2116,8 +2116,9 @@ def register_tools(mcp: FastMCP):
         search_text: Annotated[str, Field(
             description="Free-text query (Lucene syntax: quoted phrases, "
             "AND/OR, wildcards `*`, fuzzy `~`). E.g. 'photosystem', "
-            "'nitrogen AND transport', 'dnaN~'. See docs://guide/conventions "
-            "for Lucene scoring details.",
+            "'nitrogen AND transport', 'dnaN~'. Multi-word input is OR'd — "
+            "quote the phrase or join with AND for an exact/combined match. "
+            "See docs://guide/conventions for Lucene scoring details.",
         )],
         organism: Annotated[str | None, Field(
             description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word like 'Alteromonas' matches every strain). "
@@ -7072,9 +7073,11 @@ def register_tools(mcp: FastMCP):
             description="Ontology for pathway definitions. Run ontology_landscape first to rank by relevance.",
         )],
         tree: Annotated[str | None, Field(
-            description="BRITE tree name filter (e.g. 'transporters'). Only valid when "
-                        "ontology='brite'. See docs://guide/conventions for the BRITE-tree "
-                        "scoping rule.",
+            description="BRITE tree name filter (e.g. 'transporters'). REQUIRED when "
+                        "ontology='brite' (12 trees; see list_filter_values(filter_type="
+                        "'brite_tree')) — a tree-less BRITE run raises, since it would mix "
+                        "taxonomy and function terms. Invalid for any other ontology. See "
+                        "docs://guide/conventions for the BRITE-tree scoping rule.",
         )] = None,
         level: Annotated[int | None, Field(
             description="Hierarchy level (0 = root). At least one of `level` or `term_ids` "
@@ -7268,8 +7271,11 @@ def register_tools(mcp: FastMCP):
             "interpro", "ncbifam", "merops",
         ], Field(description="Ontology for pathway definitions. Run ontology_landscape first.")],
         tree: Annotated[str | None, Field(
-            description="BRITE tree name filter. Only valid when ontology='brite'. "
-                        "See docs://guide/conventions for the BRITE-tree scoping rule.")] = None,
+            description="BRITE tree name filter. REQUIRED when ontology='brite' (12 trees; "
+                        "see list_filter_values(filter_type='brite_tree')) — a tree-less "
+                        "BRITE run raises, since it would mix taxonomy and function terms. "
+                        "Invalid for any other ontology. See docs://guide/conventions for "
+                        "the BRITE-tree scoping rule.")] = None,
         level: Annotated[int | None, Field(
             description="Hierarchy level (0 = root). At least one of `level` or `term_ids` "
                         "required. See docs://guide/conventions.", ge=0)] = None,

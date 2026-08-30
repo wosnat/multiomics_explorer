@@ -237,6 +237,31 @@ _WRITE_KEYWORDS = re.compile(
 # Regex for escaping Lucene special characters on retry.
 _LUCENE_SPECIAL = re.compile(r'[+\-!(){}\[\]^"~*?:\\/]')
 
+
+def _run_fulltext(conn: "GraphConnection", cypher: str, params: dict, search_text: str):
+    """Execute a `db.index.fulltext.queryNodes` query, turning a Lucene
+    parse error into a readable `ValueError`.
+
+    Call this only for the LAST attempt on a given `search_text` (after
+    any escape-and-retry) — every fulltext tool retries once with
+    `_LUCENE_SPECIAL`-escaped text on a `ClientError`, and that retry
+    should surface a message a caller can act on rather than the raw
+    driver exception.
+    """
+    try:
+        return conn.execute_query(cypher, **params)
+    except Neo4jClientError as exc:
+        msg = str(exc)
+        if "ParseException" in msg or "queryNodes" in msg:
+            detail = next((ln for ln in msg.splitlines() if ln.strip()), msg)
+            raise ValueError(
+                f"search_text {search_text!r} is not valid Lucene syntax: "
+                f"{detail}. Quote phrases, escape special characters, or "
+                f"drop trailing operators."
+            ) from exc
+        raise
+
+
 # ---------------------------------------------------------------------------
 # Annotation-trust surface: shared helpers
 #
@@ -1317,6 +1342,9 @@ def genes_by_function(
 ) -> dict:
     """Search genes by functional annotation text.
 
+    search_text is Lucene syntax; multi-word input is OR'd — quote the
+    phrase or join with AND for an exact/combined match.
+
     Returns dict with keys: total_search_hits, total_matching,
     by_organism, by_category, score_max, score_median, warnings,
     returned, truncated, results.
@@ -1343,16 +1371,20 @@ def genes_by_function(
         category=category, min_quality=min_quality,
     )
 
-    def _run_summary(st=search_text):
+    def _run_summary(st=search_text, final=False):
         kw = {**filter_kwargs, "search_text": st}
         cypher, params = build_genes_by_function_summary(**kw)
+        if final:
+            return _run_fulltext(conn, cypher, params, st)[0]
         return conn.execute_query(cypher, **params)[0]
 
-    def _run_detail(st=search_text):
+    def _run_detail(st=search_text, final=False):
         kw = {**filter_kwargs, "search_text": st}
         cypher, params = build_genes_by_function(
             **kw, verbose=verbose, limit=limit, offset=offset,
         )
+        if final:
+            return _run_fulltext(conn, cypher, params, st)
         return conn.execute_query(cypher, **params)
 
     # Always run summary query
@@ -1361,7 +1393,7 @@ def genes_by_function(
     except Neo4jClientError:
         logger.debug("genes_by_function: Lucene parse error, retrying with escaped query")
         escaped = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
-        raw_summary = _run_summary(st=escaped)
+        raw_summary = _run_summary(st=escaped, final=True)
         filter_kwargs["search_text"] = escaped
 
     total_matching = raw_summary["total_matching"]
@@ -1391,7 +1423,7 @@ def genes_by_function(
             # Not yet escaped (summary succeeded without retry)
             logger.debug("genes_by_function detail: Lucene parse error, retrying")
             escaped = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
-            results = _run_detail(st=escaped)
+            results = _run_detail(st=escaped, final=True)
         else:
             raise
 
@@ -2377,16 +2409,19 @@ def list_publications(
         compartment=compartment,
     )
 
-    def _execute(st=search_text):
+    def _execute(st=search_text, final=False):
         kw = {**filter_kwargs, "search_text": st}
         summary_cypher, summary_params = build_list_publications_summary(**kw)
-        summary_row = conn.execute_query(summary_cypher, **summary_params)[0]
-
-        # Fetch all matching detail rows, then slice for results.
         data_cypher, data_params = build_list_publications(
             **kw, verbose=verbose,
         )
-        all_results = conn.execute_query(data_cypher, **data_params)
+        if final:
+            summary_row = _run_fulltext(conn, summary_cypher, summary_params, st)[0]
+            # Fetch all matching detail rows, then slice for results.
+            all_results = _run_fulltext(conn, data_cypher, data_params, st)
+        else:
+            summary_row = conn.execute_query(summary_cypher, **summary_params)[0]
+            all_results = conn.execute_query(data_cypher, **data_params)
         return summary_row, all_results
 
     try:
@@ -2395,7 +2430,7 @@ def list_publications(
         if search_text:
             logger.debug("list_publications: Lucene parse error, retrying with escaped query")
             escaped = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
-            summary, all_results = _execute(st=escaped)
+            summary, all_results = _execute(st=escaped, final=True)
         else:
             raise
 
@@ -2562,16 +2597,20 @@ def list_experiments(
         compartment=compartment,
     )
 
-    def _run_summary(st=search_text):
+    def _run_summary(st=search_text, final=False):
         kw = {**filter_kwargs, "search_text": st}
         cypher, params = build_list_experiments_summary(**kw)
+        if final:
+            return _run_fulltext(conn, cypher, params, st)[0]
         return conn.execute_query(cypher, **params)[0]
 
-    def _run_detail(st=search_text):
+    def _run_detail(st=search_text, final=False):
         kw = {**filter_kwargs, "search_text": st}
         cypher, params = build_list_experiments(
             **kw, verbose=verbose, limit=limit, offset=offset,
         )
+        if final:
+            return _run_fulltext(conn, cypher, params, st)
         return conn.execute_query(cypher, **params)
 
     # Always run summary query
@@ -2581,7 +2620,7 @@ def list_experiments(
         if search_text:
             logger.debug("list_experiments: Lucene parse error, retrying with escaped query")
             escaped = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
-            raw_summary = _run_summary(st=escaped)
+            raw_summary = _run_summary(st=escaped, final=True)
             # Update search_text for detail query too
             filter_kwargs["search_text"] = escaped
         else:
@@ -2656,7 +2695,7 @@ def list_experiments(
             # Not yet escaped (summary succeeded without retry)
             logger.debug("list_experiments detail: Lucene parse error, retrying")
             escaped = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
-            results = _run_detail(st=escaped)
+            results = _run_detail(st=escaped, final=True)
         else:
             raise
 
@@ -2744,12 +2783,15 @@ def _search_ontology_one(
     limit: int | None, offset: int, level: int | None,
     facet: dict, informative_only: bool, verbose: bool,
     min_gene_count: int | None, organism: str | None,
-) -> tuple[dict, list[dict]]:
+) -> tuple[dict, list[dict], str | None]:
     """Run the summary (+ detail) query for ONE ontology with Lucene retry.
 
-    Returns (summary_row, detail_rows). `detail_rows` is empty when
-    `limit == 0`. Search mode retries once with the Lucene-escaped text on
-    a parse error; browse mode never touches the fulltext index.
+    Returns (summary_row, detail_rows, effective_text). `detail_rows` is
+    empty when `limit == 0`. `effective_text` is the search_text actually
+    used — the Lucene-escaped form when a retry occurred, else the input
+    unchanged (or None in browse mode). Search mode retries once with the
+    Lucene-escaped text on a parse error; browse mode never touches the
+    fulltext index.
     """
     effective_text = search_text
     common = dict(
@@ -2757,18 +2799,23 @@ def _search_ontology_one(
         min_gene_count=min_gene_count, organism=organism, **facet,
     )
 
-    def _summary(text):
+    def _summary(text, final=False):
         cypher, params = build_search_ontology_summary(
             search_text=text, **common,
         )
-        rows = conn.execute_query(cypher, **params)
+        rows = (
+            _run_fulltext(conn, cypher, params, text) if final
+            else conn.execute_query(cypher, **params)
+        )
         return rows[0] if rows else {}
 
-    def _detail(text):
+    def _detail(text, final=False):
         cypher, params = build_search_ontology(
             search_text=text, limit=limit, offset=offset, verbose=verbose,
             **common,
         )
+        if final:
+            return _run_fulltext(conn, cypher, params, text)
         return conn.execute_query(cypher, **params)
 
     try:
@@ -2780,10 +2827,10 @@ def _search_ontology_one(
             "search_ontology[%s]: Lucene parse error, retrying escaped", ontology,
         )
         effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
-        raw_summary = _summary(effective_text)
+        raw_summary = _summary(effective_text, final=True)
 
     if limit == 0:
-        return raw_summary, []
+        return raw_summary, [], effective_text
 
     try:
         rows = _detail(effective_text)
@@ -2794,8 +2841,8 @@ def _search_ontology_one(
             "search_ontology[%s] detail: Lucene parse error, retrying", ontology,
         )
         effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
-        rows = _detail(effective_text)
-    return raw_summary, rows
+        rows = _detail(effective_text, final=True)
+    return raw_summary, rows, effective_text
 
 
 def search_ontology(
@@ -2895,14 +2942,17 @@ def search_ontology(
     by_ontology: list[dict] = []
     level_counter: Counter = Counter()
     single_summary: dict | None = None
+    sanitised_text: str | None = None
     for key in targets:
-        raw_summary, rows = _search_ontology_one(
+        raw_summary, rows, used_text = _search_ontology_one(
             conn, key, search_text=effective_text, mode=mode,
             limit=limit, offset=offset, level=level,
             facet=per_ontology.get(key, {}),
             informative_only=informative_only, verbose=verbose,
             min_gene_count=min_gene_count, organism=organism,
         )
+        if used_text is not None and used_text != effective_text:
+            sanitised_text = used_text
         if single_summary is None:
             single_summary = raw_summary
         o_total = raw_summary.get("total_matching") or 0
@@ -2946,6 +2996,10 @@ def search_ontology(
             "Browse mode truncated with no narrowing filter — set level, "
             "min_gene_count, organism or a facet (tree / interpro_type), "
             "or raise limit / page with offset, to see the rest."
+        ]
+    if sanitised_text is not None:
+        warnings = warnings + [
+            f"search_text was sanitised to '{sanitised_text}'"
         ]
 
     def _facet_rollup(owner: str, column: str) -> list[dict]:
@@ -3052,7 +3106,7 @@ def search_homolog_groups(
         effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
         sum_cypher, sum_params = build_search_homolog_groups_summary(
             search_text=effective_text, **filter_kwargs)
-        raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+        raw_summary = _run_fulltext(conn, sum_cypher, sum_params, effective_text)[0]
 
     total_matching = raw_summary["total_matching"]
     envelope = {
@@ -3086,7 +3140,7 @@ def search_homolog_groups(
             det_cypher, det_params = build_search_homolog_groups(
                 search_text=effective_text, **filter_kwargs,
                 verbose=verbose, limit=limit, offset=offset)
-            results = conn.execute_query(det_cypher, **det_params)
+            results = _run_fulltext(conn, det_cypher, det_params, effective_text)
         else:
             raise
 
@@ -4949,7 +5003,7 @@ def list_clustering_analyses(
             effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
             sum_cypher, sum_params = build_list_clustering_analyses_summary(
                 search_text=effective_text, **filter_kwargs)
-            raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+            raw_summary = _run_fulltext(conn, sum_cypher, sum_params, effective_text)[0]
         else:
             raise
 
@@ -4997,7 +5051,7 @@ def list_clustering_analyses(
             det_cypher, det_params = build_list_clustering_analyses(
                 search_text=effective_text, **filter_kwargs,
                 verbose=verbose, limit=limit, offset=offset)
-            results = conn.execute_query(det_cypher, **det_params)
+            results = _run_fulltext(conn, det_cypher, det_params, effective_text)
         else:
             raise
 
@@ -5111,7 +5165,7 @@ def list_derived_metrics(
             effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
             sum_cypher, sum_params = build_list_derived_metrics_summary(
                 search_text=effective_text, **filter_kwargs)
-            raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+            raw_summary = _run_fulltext(conn, sum_cypher, sum_params, effective_text)[0]
         else:
             raise
 
@@ -5160,7 +5214,7 @@ def list_derived_metrics(
             det_cypher, det_params = build_list_derived_metrics(
                 search_text=effective_text, **filter_kwargs,
                 verbose=verbose, limit=limit, offset=offset)
-            results = conn.execute_query(det_cypher, **det_params)
+            results = _run_fulltext(conn, det_cypher, det_params, effective_text)
         else:
             raise
 
@@ -6805,6 +6859,21 @@ def _ontology_max_level(ontology: str, conn: "GraphConnection") -> int:
     return _MAX_LEVEL_CACHE[ontology]
 
 
+def _check_enrichment_brite_tree(ontology: str, tree: str | None) -> None:
+    """Raise ValueError when a BRITE enrichment run omits `tree`.
+
+    A tree-less BRITE run pools all 12 hierarchies into one term set,
+    mixing taxonomy trees with functional trees — checked before any
+    query (background / DE / cluster fetch), same as `_check_enrichment_level`.
+    """
+    if ontology == "brite" and not tree:
+        raise ValueError(
+            "ontology='brite' needs tree= (12 trees; see "
+            "list_filter_values(filter_type='brite_tree')) — a tree-less "
+            "run mixes taxonomy and function terms."
+        )
+
+
 def _check_enrichment_level(ontology: str, level: int | None, conn: "GraphConnection") -> None:
     """Raise ValueError when `level` is out of range for `ontology`.
 
@@ -6880,11 +6949,13 @@ def pathway_enrichment(
     should call result.to_envelope(...).
 
     Raises ValueError when the ontology cannot carry a filter you set, when
-    an InterPro run omits interpro_type, when every requested
-    experiment_id is unknown, or when level is out of range for ontology.
+    an InterPro run omits interpro_type, when a BRITE run omits tree, when
+    every requested experiment_id is unknown, or when level is out of
+    range for ontology.
     """
     if ontology not in ALL_ONTOLOGIES:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {ALL_ONTOLOGIES}")
+    _check_enrichment_brite_tree(ontology, tree)
     trust_filters = _active_trust_filters(
         sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class,
@@ -7103,11 +7174,12 @@ def cluster_enrichment(
     subset — ``n_significant`` is unaffected either way.
 
     Raises ValueError when the ontology cannot carry a filter you set, when
-    an InterPro run omits interpro_type, when analysis_id is unknown, or
-    when level is out of range for ontology.
+    an InterPro run omits interpro_type, when a BRITE run omits tree, when
+    analysis_id is unknown, or when level is out of range for ontology.
     """
     if ontology not in ALL_ONTOLOGIES:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {ALL_ONTOLOGIES}")
+    _check_enrichment_brite_tree(ontology, tree)
     trust_filters = _active_trust_filters(
         sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class,
@@ -7556,10 +7628,12 @@ def list_metabolites(
     if exclude_metabolite_ids:
         filter_kwargs["exclude_metabolite_ids"] = exclude_metabolite_ids
 
-    def _run_summary(st=search_text):
+    def _run_summary(st=search_text, final=False):
         cypher, params = build_list_metabolites_summary(
             search_text=st, **filter_kwargs,
         )
+        if final:
+            return _run_fulltext(conn, cypher, params, st)[0]
         return conn.execute_query(cypher, **params)[0]
 
     def _run_detail(st=search_text):
@@ -7567,7 +7641,7 @@ def list_metabolites(
             search_text=st, **filter_kwargs,
             verbose=verbose, limit=limit, offset=offset,
         )
-        return conn.execute_query(cypher, **params)
+        return _run_fulltext(conn, cypher, params, st)
 
     # 4. Always run summary builder (with Lucene retry)
     effective_search = search_text
@@ -7580,7 +7654,7 @@ def list_metabolites(
                 "retrying with escaped query"
             )
             effective_search = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
-            raw_summary = _run_summary(st=effective_search)
+            raw_summary = _run_summary(st=effective_search, final=True)
         else:
             raise
 
@@ -9001,7 +9075,7 @@ def list_metabolite_assays(
             retry_kwargs = {**builder_kwargs, "search_text": effective_text}
             sum_cypher, sum_params = build_list_metabolite_assays_summary(
                 **retry_kwargs)
-            sum_result = conn.execute_query(sum_cypher, **sum_params)
+            sum_result = _run_fulltext(conn, sum_cypher, sum_params, effective_text)
         else:
             raise
 
@@ -9049,7 +9123,7 @@ def list_metabolite_assays(
                 det_cypher, det_params = build_list_metabolite_assays(
                     **retry_kwargs, verbose=verbose,
                     limit=limit, offset=offset)
-                results = conn.execute_query(det_cypher, **det_params)
+                results = _run_fulltext(conn, det_cypher, det_params, effective_text)
             else:
                 raise
 
