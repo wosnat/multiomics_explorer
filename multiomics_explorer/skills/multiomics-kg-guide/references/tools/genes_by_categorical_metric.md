@@ -39,7 +39,7 @@ here (no gates apply); kept for envelope-shape consistency.
 | categories | list[string] \| None | None | Filter on `r.value`: keep rows whose value is in this set. Validated against the union of the selected DMs' `allowed_categories` — unknown values raise `ValueError` listing the allowed set. E.g. ['Outer Membrane', 'Periplasmic'] for `predicted_subcellular_localization`. |
 | summary | bool | False | Return summary fields only (counts, breakdowns, by_metric, diagnostics). Sugar for limit=0; results=[]. |
 | verbose | bool | False | Include heavy text fields per row: gene_function_description, gene_summary, allowed_categories, plus DM context (metric_type, field_description, unit, compartment, experiment_id, publication_doi, treatment_type, background_factors, treatment, light_condition, experimental_context). |
-| limit | int | 5 | Max rows to return. Paginate with `offset`. Use `summary=True` for summary-only (sets limit=0). |
+| limit | int | 25 | Max rows to return. Paginate with `offset`. Use `summary=True` for summary-only (sets limit=0). |
 | offset | int | 0 | Pagination offset (starting row, 0-indexed). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
@@ -186,9 +186,9 @@ genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'],
   "not_matched_organism": null,
   "excluded_derived_metrics": [],
   "warnings": [],
-  "returned": 5,
+  "returned": 14,
   "offset": 0,
-  "truncated": true,
+  "truncated": false,
   "results": [
     {
       "locus_tag": "PMM0097",
@@ -292,7 +292,7 @@ genes_by_categorical_metric(metric_types=['darkness_survival_class'], categories
   "not_matched_organism": null,
   "excluded_derived_metrics": [],
   "warnings": [],
-  "returned": 5,
+  "returned": 25,
   "offset": 0,
   "truncated": true,
   "results": [

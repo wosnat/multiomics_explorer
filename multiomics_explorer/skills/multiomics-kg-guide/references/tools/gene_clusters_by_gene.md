@@ -24,7 +24,7 @@ into a cluster's full membership via `genes_in_cluster`.
 | analysis_ids | list[string] \| None | None | Filter by clustering analysis IDs. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include cluster_method, member_count, cluster_functional_description, cluster_expression_dynamics, cluster_temporal_pattern, treatment, light_condition, experimental_context, p_value. |
-| limit | int | 5 | Max results. |
+| limit | int | 25 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.

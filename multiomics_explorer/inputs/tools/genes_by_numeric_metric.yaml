@@ -51,7 +51,7 @@ examples:
         "not_matched_organism": null,
         "excluded_derived_metrics": [],
         "warnings": [],
-        "returned": 5,
+        "returned": 25,
         "offset": 0,
         "truncated": true,
         "results": [
@@ -163,7 +163,7 @@ examples:
           }
         ],
         "warnings": ["1 non-rankable DM(s) excluded by `bucket` filter (peak_time_protein_h)"],
-        "returned": 5,
+        "returned": 25,
         "offset": 0,
         "truncated": true,
         "results": [
@@ -292,7 +292,7 @@ examples:
         "not_matched_organism": null,
         "excluded_derived_metrics": [],
         "warnings": [],
-        "returned": 5,
+        "returned": 25,
         "offset": 0,
         "truncated": true,
         "results": [

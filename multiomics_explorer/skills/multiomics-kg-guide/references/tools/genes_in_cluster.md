@@ -19,7 +19,7 @@ cluster direction via `gene_clusters_by_gene`.
 | organism | string \| None | None | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises). Single organism enforced. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include gene_function_description, gene_summary (gene-level), p_value (edge-level), cluster_functional_description, cluster_expression_dynamics, cluster_temporal_pattern (cluster-level). |
-| limit | int | 5 | Max results. |
+| limit | int | 25 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
 
 **Discovery:** use `list_organisms` for valid organism names.

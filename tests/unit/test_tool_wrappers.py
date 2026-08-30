@@ -1027,6 +1027,42 @@ class TestGeneOverviewWrapper:
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
 
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "locus_tags, expected_limit",
+        [
+            (["PMM1428"], 25),  # single gene: floor of 25 applies
+            (["PMM1428", "EZ55_00275"], 25),  # 2 genes: still under the floor
+            ([f"PMM{i:04d}" for i in range(30)], 30),  # 30 genes: batch size wins
+        ],
+    )
+    async def test_default_limit_resolved_from_batch_size(
+        self, tool_fns, mock_ctx, locus_tags, expected_limit,
+    ):
+        """limit=None (default) resolves to max(25, len(locus_tags)) — the
+        whole batch is returned unless it is smaller than the 25-row floor
+        (llm-review 2b.2)."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["gene_overview"](mock_ctx, locus_tags=locus_tags)
+        mock_api.assert_called_once()
+        assert mock_api.call_args.kwargs["limit"] == expected_limit
+
+    @pytest.mark.asyncio
+    async def test_explicit_limit_overrides_batch_resolution(self, tool_fns, mock_ctx):
+        """An explicit limit is forwarded as-is, not recomputed from batch size."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=[f"PMM{i:04d}" for i in range(30)], limit=3,
+            )
+        mock_api.assert_called_once()
+        assert mock_api.call_args.kwargs["limit"] == 3
+
 
 class TestGeneDetailsWrapper:
     @pytest.mark.asyncio
@@ -1071,6 +1107,31 @@ class TestGeneDetailsWrapper:
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "locus_tags, expected_limit",
+        [
+            (["PMM0001"], 25),
+            (["PMM0001", "PMM0002"], 25),
+            ([f"PMM{i:04d}" for i in range(30)], 30),
+        ],
+    )
+    async def test_default_limit_resolved_from_batch_size(
+        self, tool_fns, mock_ctx, locus_tags, expected_limit,
+    ):
+        """limit=None (default) resolves to max(25, len(locus_tags))
+        (llm-review 2b.2)."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_details",
+            return_value={
+                "total_matching": 0, "returned": 0, "truncated": False,
+                "not_found": [], "results": [],
+            },
+        ) as mock_api:
+            await tool_fns["gene_details"](mock_ctx, locus_tags=locus_tags)
+        mock_api.assert_called_once()
+        assert mock_api.call_args.kwargs["limit"] == expected_limit
 
 
 # ---------------------------------------------------------------------------
@@ -1235,6 +1296,29 @@ class TestGeneHomologsWrapper:
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "locus_tags, expected_limit",
+        [
+            (["PMM0001"], 25),  # 1 gene * 5 groups/gene = 5, floor of 25 wins
+            (["PMM0001", "PMM0002"], 25),  # 2 * 5 = 10, still under the floor
+            ([f"PMM{i:04d}" for i in range(10)], 50),  # 10 * 5 = 50, batch wins
+        ],
+    )
+    async def test_default_limit_resolved_from_batch_size(
+        self, tool_fns, mock_ctx, locus_tags, expected_limit,
+    ):
+        """limit=None (default) resolves to max(25, len(locus_tags) * 5) —
+        the K=5 fan-out models a gene typically belonging to 1-3 groups per
+        source, with headroom (llm-review 2b.2)."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_homologs",
+            return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["gene_homologs"](mock_ctx, locus_tags=locus_tags)
+        mock_api.assert_called_once()
+        assert mock_api.call_args.kwargs["limit"] == expected_limit
 
     @pytest.mark.asyncio
     async def test_ontology_summary_in_response(self, tool_fns, mock_ctx):
@@ -1591,8 +1675,9 @@ class TestGenesByOntologyWrapper:
         assert r0.level == 1
 
     @pytest.mark.asyncio
-    async def test_default_limit_is_500(self, tool_fns, mock_ctx):
-        """Default MCP limit is 500 (not 5) because this tool feeds enrichment."""
+    async def test_default_limit_is_50(self, tool_fns, mock_ctx):
+        """MCP default limit is 50 (llm-review 2b.2) — sized for a context
+        window; the package (api) default for TERM2GENE stays 500."""
         empty_return = {
             "ontology": "go_bp", "organism_name": "MED4",
             "total_matching": 0, "total_genes": 0, "total_terms": 0,
@@ -1615,7 +1700,7 @@ class TestGenesByOntologyWrapper:
                 mock_ctx, ontology="go_bp", organism="MED4", level=1,
             )
         mock_api.assert_called_once()
-        assert mock_api.call_args.kwargs["limit"] == 500
+        assert mock_api.call_args.kwargs["limit"] == 50
 
     @pytest.mark.asyncio
     async def test_sparse_level_is_best_effort(self, tool_fns, mock_ctx):
@@ -1929,6 +2014,19 @@ class TestGeneOntologyTermsWrapper:
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
+
+    @pytest.mark.asyncio
+    async def test_default_limit_is_50(self, tool_fns, mock_ctx):
+        """MCP default limit is 50 (llm-review 2b.2), up from 5."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["gene_ontology_terms"](
+                mock_ctx, locus_tags=["PMM0001"], organism="MED4",
+            )
+        mock_api.assert_called_once()
+        assert mock_api.call_args.kwargs["limit"] == 50
 
 
 # ---------------------------------------------------------------------------
@@ -3782,6 +3880,18 @@ class TestGeneClustersByGeneWrapper:
                 await tool_fns["gene_clusters_by_gene"](
                     mock_ctx, locus_tags=[])
 
+    @pytest.mark.asyncio
+    async def test_default_limit_is_25(self, tool_fns, mock_ctx):
+        """MCP default limit is 25 (llm-review 2b.2), up from 5."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_clusters_by_gene",
+            return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["gene_clusters_by_gene"](
+                mock_ctx, locus_tags=["PMM0370"])
+        mock_api.assert_called_once()
+        assert mock_api.call_args.kwargs["limit"] == 25
+
 
 class TestGenesInClusterWrapper:
     """Tests for genes_in_cluster MCP wrapper."""
@@ -3868,6 +3978,19 @@ class TestGenesInClusterWrapper:
             with pytest.raises(ToolError):
                 await tool_fns["genes_in_cluster"](mock_ctx)
 
+    @pytest.mark.asyncio
+    async def test_default_limit_is_25(self, tool_fns, mock_ctx):
+        """MCP default limit is 25 (llm-review 2b.2), up from 5."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_in_cluster",
+            return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["genes_in_cluster"](
+                mock_ctx,
+                cluster_ids=["cluster:msb4100087:med4:up_n_transport"])
+        mock_api.assert_called_once()
+        assert mock_api.call_args.kwargs["limit"] == 25
+
 
 # ---------------------------------------------------------------------------
 # ontology_landscape
@@ -3940,18 +4063,31 @@ class TestOntologyLandscapeWrapper:
                 await tool_fns["ontology_landscape"](mock_ctx, organism="BOGUS")
 
     @pytest.mark.asyncio
-    async def test_default_limit_is_none(self, mock_ctx, tool_fns):
-        """MCP default limit should be None (Python API parity); B2 #3."""
+    async def test_default_limit_is_15(self, mock_ctx, tool_fns):
+        """MCP default limit is 15 (llm-review 2b.2) — a pre-flight ranking
+        table read by an LLM doesn't need every (ontology x level) row by
+        default. Explicit None still returns everything."""
         with patch(
             "multiomics_explorer.api.functions.ontology_landscape",
             return_value=self._SAMPLE_API_RETURN,
         ) as mock_api:
             await tool_fns["ontology_landscape"](mock_ctx, organism="MED4")
-            # Default limit should be None — assert it was passed through as None.
             kwargs = mock_api.call_args.kwargs
-            assert kwargs["limit"] is None, (
-                f"Expected default limit=None, got {kwargs['limit']}"
+            assert kwargs["limit"] == 15, (
+                f"Expected default limit=15, got {kwargs['limit']}"
             )
+
+    @pytest.mark.asyncio
+    async def test_explicit_none_still_returns_all_rows(self, mock_ctx, tool_fns):
+        """Passing limit=None explicitly is still honored (unbounded)."""
+        with patch(
+            "multiomics_explorer.api.functions.ontology_landscape",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["ontology_landscape"](
+                mock_ctx, organism="MED4", limit=None,
+            )
+            assert mock_api.call_args.kwargs["limit"] is None
 
 
 class TestPathwayEnrichmentWrapper:
@@ -4536,6 +4672,19 @@ class TestGenesByNumericMetricWrapper:
             ):
                 await tool_fns["genes_by_numeric_metric"](ctx)
 
+    @pytest.mark.asyncio
+    async def test_default_limit_is_25(self, tool_fns, envelope_data):
+        """MCP default limit is 25 (llm-review 2b.2), up from 5."""
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.genes_by_numeric_metric",
+            return_value={**envelope_data, "results": [], "returned": 0},
+        ) as mock_api:
+            ctx = AsyncMock()
+            await tool_fns["genes_by_numeric_metric"](
+                ctx, metric_types=["damping_ratio"])
+        mock_api.assert_called_once()
+        assert mock_api.call_args.kwargs["limit"] == 25
+
 
 # ---------------------------------------------------------------------------
 # genes_by_boolean_metric
@@ -4746,6 +4895,19 @@ class TestGenesByBooleanMetricWrapper:
                 match="must provide one of derived_metric_ids or metric_types",
             ):
                 await tool_fns["genes_by_boolean_metric"](ctx)
+
+    @pytest.mark.asyncio
+    async def test_default_limit_is_25(self, tool_fns, envelope_data):
+        """MCP default limit is 25 (llm-review 2b.2), up from 5."""
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.genes_by_boolean_metric",
+            return_value={**envelope_data, "results": [], "returned": 0},
+        ) as mock_api:
+            ctx = AsyncMock()
+            await tool_fns["genes_by_boolean_metric"](
+                ctx, metric_types=["vesicle_proteome_member"])
+        mock_api.assert_called_once()
+        assert mock_api.call_args.kwargs["limit"] == 25
 
 
 # ---------------------------------------------------------------------------
@@ -4985,6 +5147,20 @@ class TestGenesByCategoricalMetricWrapper:
                     ctx,
                     metric_types=["predicted_subcellular_localization"],
                     categories=["Foo"])
+
+    @pytest.mark.asyncio
+    async def test_default_limit_is_25(self, tool_fns, envelope_data):
+        """MCP default limit is 25 (llm-review 2b.2), up from 5."""
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api"
+            ".genes_by_categorical_metric",
+            return_value={**envelope_data, "results": [], "returned": 0},
+        ) as mock_api:
+            ctx = AsyncMock()
+            await tool_fns["genes_by_categorical_metric"](
+                ctx, metric_types=["predicted_subcellular_localization"])
+        mock_api.assert_called_once()
+        assert mock_api.call_args.kwargs["limit"] == 25
 
 
 # ---------------------------------------------------------------------------
@@ -9008,6 +9184,28 @@ class TestGeneAaSequenceWrapper:
             with pytest.raises(ToolError):
                 await tool_fns["gene_aa_sequence"](mock_ctx, locus_tags=[])
 
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "locus_tags, expected_limit",
+        [
+            (["ACZ81_08860"], 25),
+            (["ACZ81_08860", "ACZ81_08855"], 25),
+            ([f"ACZ81_{i:05d}" for i in range(30)], 30),
+        ],
+    )
+    async def test_default_limit_resolved_from_batch_size(
+        self, tool_fns, mock_ctx, locus_tags, expected_limit,
+    ):
+        """limit=None (default) resolves to max(25, len(locus_tags))
+        (llm-review 2b.2)."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_aa_sequence",
+            return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["gene_aa_sequence"](mock_ctx, locus_tags=locus_tags)
+        mock_api.assert_called_once()
+        assert mock_api.call_args.kwargs["limit"] == expected_limit
+
 
 # ---------------------------------------------------------------------------
 # gene_neighbors
@@ -9149,6 +9347,32 @@ class TestGeneNeighborsWrapper:
         ):
             with pytest.raises(ToolError):
                 await tool_fns["gene_neighbors"](mock_ctx, locus_tags=[])
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "locus_tags, window, expected_limit",
+        [
+            (["ACZ81_08860"], 5, 25),  # 1 anchor * (2*5+1)=11, floor of 25 wins
+            (["ACZ81_08860", "ACZ81_08855"], 5, 25),  # 2*11=22, still under floor
+            ([f"ACZ81_{i:05d}" for i in range(5)], 5, 55),  # 5*11=55, batch wins
+            (["ACZ81_08860"], 1, 25),  # window=1 -> K=3, floor still wins
+        ],
+    )
+    async def test_default_limit_resolved_from_batch_size_and_window(
+        self, tool_fns, mock_ctx, locus_tags, window, expected_limit,
+    ):
+        """limit=None (default) resolves to
+        max(25, len(locus_tags) * (2*window + 1)) — the natural neighbor
+        fan-out per anchor (llm-review 2b.2)."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_neighbors",
+            return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["gene_neighbors"](
+                mock_ctx, locus_tags=locus_tags, window=window,
+            )
+        mock_api.assert_called_once()
+        assert mock_api.call_args.kwargs["limit"] == expected_limit
 
 
 class TestOntologyLiteralAcceptsPsortbSignalp:

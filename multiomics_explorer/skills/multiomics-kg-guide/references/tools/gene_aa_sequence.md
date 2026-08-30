@@ -13,7 +13,7 @@ Routing: feed locus_tags from `resolve_gene` / `gene_overview` / `genes_by_funct
 | locus_tags | list[string] | — | Gene locus tags. Cross-organism OK (globally unique). E.g. ['ACZ81_08860', 'PMM0001']. |
 | fasta | bool | False | If true, omit per-row `sequence` and return one multi-FASTA blob in the envelope instead (no duplication). |
 | summary | bool | False | If true, return envelope only (results=[]); sugar for limit=0. |
-| limit | int | 25 | Max results. |
+| limit | int \| None | None | Default: every input gene (min 25). Pass a number to page. |
 | offset | int | 0 | Rows to skip for pagination. |
 
 ## Response format

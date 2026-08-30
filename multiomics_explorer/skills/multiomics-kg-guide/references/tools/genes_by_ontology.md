@@ -9,8 +9,9 @@ Three modes:
 - `level` only — pathway definitions at level N (walk UP from leaves).
 - `level` + `term_ids` — scoped rollup (walk UP, restrict to given terms).
 
-Single-organism enforced. Default `limit=500` because this tool feeds
-enrichment via TERM2GENE. `min/max_gene_set_size` is organism-scoped
+Single-organism enforced. Default `limit=50` over MCP (the package
+default is 500 for TERM2GENE — pass an explicit `limit` to page
+through more). `min/max_gene_set_size` is organism-scoped
 (matches `ontology_landscape`).
 
 [TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
@@ -45,7 +46,7 @@ conventions; docs://analysis/enrichment for the enrichment workflow.
 | min_evidence_score | float \| None | None | Keep rows with edge evidence_score >= this cutoff (composite trust score, 0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, tcdb, merops. Envelope adds evidence_score_signals when set. |
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; leaving unfiltered mixes in catalytically-dead homologs (nonpeptidase_homolog) - the envelope warns when it does. |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
-| limit | int | 500 | Max rows returned. Default 500 — this tool feeds enrichment. |
+| limit | int | 50 | Default 50 over MCP; the package default is 500 for TERM2GENE. |
 | offset | int | 0 | Skip N rows before limit |
 
 **Discovery:** use `list_organisms` for valid organism names.
@@ -302,7 +303,7 @@ genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
   "wrong_ontology": [],
   "wrong_level": [],
   "filtered_out": [],
-  "returned": 500,
+  "returned": 50,
   "offset": 0,
   "truncated": true,
   "trust_axes": {"cyanorak_role": ["sources", "evidence"]},
@@ -695,9 +696,9 @@ genes_by_ontology(ontology="interpro", organism="MED4", term_ids=["interpro:IPR0
   "wrong_ontology": [],
   "wrong_level": [],
   "filtered_out": [],
-  "returned": 119,
+  "returned": 50,
   "offset": 0,
-  "truncated": false,
+  "truncated": true,
   "trust_axes": {"interpro": ["sources", "evidence"]},
   "warnings": [],
   "filters_applied": {},
@@ -791,9 +792,9 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0, call_class=["p
   "wrong_ontology": [],
   "wrong_level": [],
   "filtered_out": [],
-  "returned": 72,
+  "returned": 50,
   "offset": 0,
-  "truncated": false,
+  "truncated": true,
   "trust_axes": {"merops": ["sources", "evidence", "evidence_score", "tier"]},
   "warnings": [],
   "filters_applied": {"call_class": ["peptidase"]},
@@ -887,9 +888,9 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0)
   "wrong_ontology": [],
   "wrong_level": [],
   "filtered_out": [],
-  "returned": 112,
+  "returned": 50,
   "offset": 0,
-  "truncated": false,
+  "truncated": true,
   "trust_axes": {"merops": ["sources", "evidence", "evidence_score", "tier"]},
   "warnings": [
     "29 of 112 matching rows carry call_class=['nonpeptidase_homolog'] — catalytically-dead homologs that keep the family ..."
@@ -986,9 +987,9 @@ genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], ver
   "wrong_ontology": [],
   "wrong_level": [],
   "filtered_out": [],
-  "returned": 65,
+  "returned": 50,
   "offset": 0,
-  "truncated": false,
+  "truncated": true,
   "trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]},
   "warnings": [],
   "filters_applied": {},
@@ -1240,7 +1241,7 @@ genes_by_ontology(ontology="kegg", organism="MED4", level=3, informative_only=Tr
   "wrong_ontology": [],
   "wrong_level": [],
   "filtered_out": [],
-  "returned": 500,
+  "returned": 50,
   "offset": 0,
   "truncated": true,
   "trust_axes": {"kegg": ["sources", "evidence"]},

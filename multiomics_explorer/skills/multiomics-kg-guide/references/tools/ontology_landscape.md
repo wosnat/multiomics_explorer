@@ -34,7 +34,7 @@ and BRITE-tree scoping conventions.
 | experiment_ids | list[string] \| None | None | Restrict coverage computation to genes quantified in these experiments. |
 | summary | bool | False | If true, omit per-row results (by_ontology only). |
 | verbose | bool | False | Include example_terms (top 3 terms per level). |
-| limit | int \| None | None | Max rows returned. None (default) returns all rows; set an integer to truncate. |
+| limit | int \| None | 15 | Max rows returned. Default 15 — enough to see the top-ranked (ontology x level) combinations; pass an explicit integer to page, or None for every row. |
 | offset | int | 0 | Skip N rows before limit |
 | min_gene_set_size | int | 5 | Exclude terms with fewer genes than this (default 5). |
 | max_gene_set_size | int | 500 | Exclude terms with more genes than this (default 500). |
@@ -357,8 +357,8 @@ ontology_landscape(organism="MED4")
   "not_found": [],
   "not_matched": [],
   "total_matching": 81,
-  "returned": 81,
-  "truncated": false,
+  "returned": 15,
+  "truncated": true,
   "offset": 0,
   "results": [
     {
@@ -1123,8 +1123,8 @@ ontology_landscape(organism="MED4", informative_only=False)
   "not_found": [],
   "not_matched": [],
   "total_matching": 81,
-  "returned": 81,
-  "truncated": false,
+  "returned": 15,
+  "truncated": true,
   "offset": 0,
   "results": [
     {
@@ -1314,7 +1314,7 @@ result['total_rows']  # KeyError
 result['total_matching']
 ```
 
-- Default `limit=None` returns all rows; if you set an explicit integer, check the response envelope's `truncated` field to know whether more rows exist beyond what was returned.
+- Default `limit=15` returns the top-ranked rows; pass `limit=None` for every row, or an explicit integer to page — check the response envelope's `truncated` field to know whether more rows exist beyond what was returned.
 
 - PSORTb / SignalP are flat (single `level=0`) — at most one `results` row and one `by_ontology` entry each. If only a few of their categories pass the default `min_gene_set_size=5` filter, the small `n_terms_with_genes` is expected (categories range from tens to tens of thousands of genes KG-wide; per organism it's much smaller).
 

@@ -15,7 +15,7 @@ Routing: drill into each axis when the per-gene signal is non-zero — `gene_ont
 | locus_tags | list[string] | — | Gene locus tags to look up. E.g. ['PMM0001', 'PMM0845']. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include gene_summary, function_description, all_identifiers, discussed_in_publications ({doi, prominence, evidence}), per-kind derived-metric counts and compartments_observed. |
-| limit | int | 5 | Max results. |
+| limit | int \| None | None | Default: every input gene (min 25). Pass a number to page. |
 | offset | int | 0 | Number of results to skip for pagination. |
 
 ## Response format

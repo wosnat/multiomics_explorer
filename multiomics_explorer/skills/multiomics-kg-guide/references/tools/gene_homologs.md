@@ -19,7 +19,7 @@ text-search groups via `search_homolog_groups`.
 | max_specificity_rank | int \| None | None | Cap group breadth. 0=curated only, 1=+family, 2=+order, 3=+domain (all). |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include group metadata: member_count, organism_count, genera, has_cross_genus_members, description, functional_description. |
-| limit | int | 5 | Max results. |
+| limit | int \| None | None | Default: every input gene x 5 groups (min 25). Pass a number to page. |
 | offset | int | 0 | Number of results to skip for pagination. |
 
 ## Response format

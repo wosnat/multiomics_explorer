@@ -15,7 +15,7 @@ Routing: feed anchors from `differential_expression_by_gene` or `genes_by_metabo
 | max_bp_distance | int \| None | None | Optional cap: drop neighbors whose intergenic gap to the anchor exceeds this many bp. |
 | same_strand | bool \| None | None | None=all neighbors; True=co-oriented only; False=opposite-strand only. Null-strand neighbors dropped when set. |
 | summary | bool | False | If true, return envelope only (results=[]); sugar for limit=0. |
-| limit | int | 25 | Max neighbor rows. |
+| limit | int \| None | None | Default: every anchor x (2*window+1) neighbors (min 25). Pass a number to page. |
 
 ## Response format
 

@@ -44,7 +44,7 @@ gates apply); kept for envelope-shape consistency.
 | flag | bool \| None | None | Filter on `r.value`: True keeps `'flagged'` edges, False keeps `'not_flagged'` edges (tested-absent — real biology, stored on 11 of 27 boolean DMs; the rest are positive-only and return 0 rows for False). Check `by_metric[*].false_count` before reading an absent gene as 'not flagged' vs 'not assessed'. |
 | summary | bool | False | Return summary fields only (counts, breakdowns, by_metric, diagnostics). Sugar for limit=0; results=[]. |
 | verbose | bool | False | Include heavy text fields per row: gene_function_description, gene_summary, plus DM context (metric_type, field_description, unit, compartment, experiment_id, publication_doi, treatment_type, background_factors, treatment, light_condition, experimental_context). |
-| limit | int | 5 | Max rows to return. Paginate with `offset`. Use `summary=True` for summary-only (sets limit=0). |
+| limit | int | 25 | Max rows to return. Paginate with `offset`. Use `summary=True` for summary-only (sets limit=0). |
 | offset | int | 0 | Pagination offset (starting row, 0-indexed). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
@@ -180,7 +180,7 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
   "not_matched_organism": null,
   "excluded_derived_metrics": [],
   "warnings": [],
-  "returned": 5,
+  "returned": 25,
   "offset": 0,
   "truncated": true,
   "results": [
@@ -279,7 +279,7 @@ genes_by_boolean_metric(metric_types=['periodic_in_coculture_LD'], organism='NAT
   "not_matched_organism": null,
   "excluded_derived_metrics": [],
   "warnings": [],
-  "returned": 5,
+  "returned": 25,
   "offset": 0,
   "truncated": true,
   "results": [
@@ -446,7 +446,7 @@ genes_by_boolean_metric(metric_types=['rapid_recovery_low_co2_shock'], flag=Fals
   "not_matched_organism": null,
   "excluded_derived_metrics": [],
   "warnings": [],
-  "returned": 5,
+  "returned": 25,
   "offset": 0,
   "truncated": true,
   "results": [

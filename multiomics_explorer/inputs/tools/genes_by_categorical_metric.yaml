@@ -73,9 +73,9 @@ examples:
         "not_matched_organism": null,
         "excluded_derived_metrics": [],
         "warnings": [],
-        "returned": 5,
+        "returned": 14,
         "offset": 0,
-        "truncated": true,
+        "truncated": false,
         "results": [
           {
             "locus_tag": "PMM0097",
@@ -174,7 +174,7 @@ examples:
         "not_matched_organism": null,
         "excluded_derived_metrics": [],
         "warnings": [],
-        "returned": 5,
+        "returned": 25,
         "offset": 0,
         "truncated": true,
         "results": [

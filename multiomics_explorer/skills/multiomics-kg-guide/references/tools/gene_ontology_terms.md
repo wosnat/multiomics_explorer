@@ -40,7 +40,7 @@ expansion) use `genes_by_ontology`; for term discovery by text use
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; leaving unfiltered mixes in catalytically-dead homologs (nonpeptidase_homolog) - the envelope warns when it does. |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
 | include_superseded | bool | False | TCDB leaf mode only: when True, also include rows whose gene->term attachment is less specific ('superseded') rather than the deepest ('most_specific'). Default False. |
-| limit | int | 5 | Max results. |
+| limit | int | 50 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
 
 **Discovery:** use `list_organisms` for valid organism names.
@@ -330,9 +330,9 @@ gene_ontology_terms(locus_tags=["PMM0392"], organism="MED4", ontology=["tcdb", "
   "terms_per_gene_min": 7,
   "terms_per_gene_max": 7,
   "terms_per_gene_median": 7.0,
-  "returned": 5,
+  "returned": 7,
   "offset": 0,
-  "truncated": true,
+  "truncated": false,
   "not_found": [],
   "no_terms": [],
   "trust_axes": {
@@ -436,9 +436,9 @@ gene_ontology_terms(locus_tags=["PMM0392"], organism="MED4", ontology=["tcdb"], 
   "terms_per_gene_min": 7,
   "terms_per_gene_max": 7,
   "terms_per_gene_median": 7.0,
-  "returned": 5,
+  "returned": 7,
   "offset": 0,
-  "truncated": true,
+  "truncated": false,
   "not_found": [],
   "no_terms": [],
   "trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]},
@@ -578,9 +578,9 @@ gene_ontology_terms(locus_tags=["PMM0392"], organism="MED4", ontology=["tcdb"], 
   "terms_per_gene_min": 8,
   "terms_per_gene_max": 8,
   "terms_per_gene_median": 8.0,
-  "returned": 5,
+  "returned": 8,
   "offset": 0,
-  "truncated": true,
+  "truncated": false,
   "not_found": [],
   "no_terms": [],
   "trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]},
@@ -784,9 +784,9 @@ gene_ontology_terms(locus_tags=["PMM0392"], organism="MED4", ontology=["tcdb", "
   "terms_per_gene_min": 7,
   "terms_per_gene_max": 7,
   "terms_per_gene_median": 7.0,
-  "returned": 5,
+  "returned": 7,
   "offset": 0,
-  "truncated": true,
+  "truncated": false,
   "not_found": [],
   "no_terms": [],
   "trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]},

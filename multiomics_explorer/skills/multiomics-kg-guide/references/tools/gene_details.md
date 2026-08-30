@@ -12,7 +12,7 @@ Routing: prefer `gene_overview` for triage; chain into `metabolites_by_gene` for
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags to look up. E.g. ['PMM0001', 'sync_0001']. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
-| limit | int | 5 | Max results. |
+| limit | int \| None | None | Default: every input gene (min 25). Pass a number to page. |
 | offset | int | 0 | Number of results to skip for pagination. |
 
 ## Response format

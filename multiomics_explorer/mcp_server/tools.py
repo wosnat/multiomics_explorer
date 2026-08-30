@@ -47,6 +47,17 @@ def _kg_compat_report(ctx: Context) -> dict:
     return ctx.request_context.lifespan_context.kg_compat_report
 
 
+def _resolve_batch_limit(limit: int | None, locus_tags: list[str], k: int = 1) -> int:
+    """Resolve a batch tool's `limit=None` default to a concrete row count.
+
+    Sized for an LLM context window (llm-review 2b.2): return the whole
+    batch by default (fan-out `k` rows per input gene), floored at 25 so a
+    tiny batch still gets a sane page size. An explicit `limit` is never
+    recomputed — callers should only invoke this when `limit is None`.
+    """
+    return max(25, len(locus_tags) * k)
+
+
 # ---------------------------------------------------------------------------
 # pathway_enrichment response models (module-level for direct importability)
 # ---------------------------------------------------------------------------
@@ -2290,9 +2301,9 @@ def register_tools(mcp: FastMCP):
             "discussed_in_publications ({doi, prominence, evidence}), per-kind "
             "derived-metric counts and compartments_observed.",
         )] = False,
-        limit: Annotated[int, Field(
-            description="Max results.", ge=1,
-        )] = 5,
+        limit: Annotated[int | None, Field(
+            description="Default: every input gene (min 25). Pass a number to page.", ge=1,
+        )] = None,
         offset: Annotated[int, Field(
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
@@ -2306,9 +2317,10 @@ def register_tools(mcp: FastMCP):
         await ctx.info(f"gene_overview locus_tags={locus_tags} summary={summary}")
         try:
             conn = _conn(ctx)
+            resolved_limit = limit if limit is not None else _resolve_batch_limit(limit, locus_tags)
             data = api.gene_overview(
                 locus_tags, summary=summary, verbose=verbose,
-                limit=limit, offset=offset, conn=conn,
+                limit=resolved_limit, offset=offset, conn=conn,
             )
             by_organism = [OverviewOrganismBreakdown(**b) for b in data["by_organism"]]
             by_category = [OverviewCategoryBreakdown(**b) for b in data["by_category"]]
@@ -2378,9 +2390,9 @@ def register_tools(mcp: FastMCP):
         summary: Annotated[bool, Field(
             description="When true, return only summary fields (results=[]).",
         )] = False,
-        limit: Annotated[int, Field(
-            description="Max results.", ge=1,
-        )] = 5,
+        limit: Annotated[int | None, Field(
+            description="Default: every input gene (min 25). Pass a number to page.", ge=1,
+        )] = None,
         offset: Annotated[int, Field(
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
@@ -2392,8 +2404,9 @@ def register_tools(mcp: FastMCP):
         await ctx.info(f"gene_details locus_tags={locus_tags} summary={summary}")
         try:
             conn = _conn(ctx)
+            resolved_limit = limit if limit is not None else _resolve_batch_limit(limit, locus_tags)
             data = api.gene_details(
-                locus_tags, summary=summary, limit=limit, offset=offset, conn=conn,
+                locus_tags, summary=summary, limit=resolved_limit, offset=offset, conn=conn,
             )
             return GeneDetailResponse(**data)
         except ValueError as e:
@@ -2488,9 +2501,9 @@ def register_tools(mcp: FastMCP):
             "organism_count, genera, has_cross_genus_members, "
             "description, functional_description.",
         )] = False,
-        limit: Annotated[int, Field(
-            description="Max results.", ge=1,
-        )] = 5,
+        limit: Annotated[int | None, Field(
+            description="Default: every input gene x 5 groups (min 25). Pass a number to page.", ge=1,
+        )] = None,
         offset: Annotated[int, Field(
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
@@ -2506,11 +2519,12 @@ def register_tools(mcp: FastMCP):
                        f"taxonomic_level={taxonomic_level}")
         try:
             conn = _conn(ctx)
+            resolved_limit = limit if limit is not None else _resolve_batch_limit(limit, locus_tags, k=5)
             data = api.gene_homologs(
                 locus_tags, source=source,
                 taxonomic_level=taxonomic_level,
                 max_specificity_rank=max_specificity_rank,
-                summary=summary, verbose=verbose, limit=limit, offset=offset, conn=conn,
+                summary=summary, verbose=verbose, limit=resolved_limit, offset=offset, conn=conn,
             )
             by_organism = [HomologOrganismBreakdown(**b) for b in data["by_organism"]]
             by_source = [HomologSourceBreakdown(**b) for b in data["by_source"]]
@@ -3303,9 +3317,9 @@ def register_tools(mcp: FastMCP):
             description=_TRUST_INTERPRO_TYPE_DESC,
         )] = None,
         limit: Annotated[int, Field(
-            description="Max rows returned. Default 500 — this tool feeds enrichment.",
+            description="Default 50 over MCP; the package default is 500 for TERM2GENE.",
             ge=1,
-        )] = 500,
+        )] = 50,
         offset: Annotated[int, Field(
             description="Skip N rows before limit", ge=0,
         )] = 0,
@@ -3317,8 +3331,9 @@ def register_tools(mcp: FastMCP):
         - `level` only — pathway definitions at level N (walk UP from leaves).
         - `level` + `term_ids` — scoped rollup (walk UP, restrict to given terms).
 
-        Single-organism enforced. Default `limit=500` because this tool feeds
-        enrichment via TERM2GENE. `min/max_gene_set_size` is organism-scoped
+        Single-organism enforced. Default `limit=50` over MCP (the package
+        default is 500 for TERM2GENE — pass an explicit `limit` to page
+        through more). `min/max_gene_set_size` is organism-scoped
         (matches `ontology_landscape`).
 
         [TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
@@ -3589,7 +3604,7 @@ def register_tools(mcp: FastMCP):
         )] = False,
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
-        )] = 5,
+        )] = 50,
         offset: Annotated[int, Field(
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
@@ -6311,7 +6326,7 @@ def register_tools(mcp: FastMCP):
             "cluster_temporal_pattern, treatment, light_condition, "
             "experimental_context, p_value.",
         )] = False,
-        limit: Annotated[int, Field(description="Max results.", ge=1)] = 5,
+        limit: Annotated[int, Field(description="Max results.", ge=1)] = 25,
         offset: Annotated[int, Field(
             description="Number of results to skip for pagination.", ge=0)] = 0,
     ) -> GeneClustersByGeneResponse:
@@ -6622,7 +6637,7 @@ def register_tools(mcp: FastMCP):
             "p_value (edge-level), cluster_functional_description, "
             "cluster_expression_dynamics, cluster_temporal_pattern (cluster-level).",
         )] = False,
-        limit: Annotated[int, Field(description="Max results.", ge=1)] = 5,
+        limit: Annotated[int, Field(description="Max results.", ge=1)] = 25,
         offset: Annotated[int, Field(
             description="Number of results to skip for pagination.", ge=0)] = 0,
     ) -> GenesInClusterResponse:
@@ -6785,10 +6800,11 @@ def register_tools(mcp: FastMCP):
             description="Include example_terms (top 3 terms per level).",
         )] = False,
         limit: Annotated[int | None, Field(
-            description="Max rows returned. None (default) returns all rows; "
-                        "set an integer to truncate.",
+            description="Max rows returned. Default 15 — enough to see the "
+                        "top-ranked (ontology x level) combinations; pass an "
+                        "explicit integer to page, or None for every row.",
             ge=1,
-        )] = None,
+        )] = 15,
         offset: Annotated[int, Field(description="Skip N rows before limit", ge=0)] = 0,
         min_gene_set_size: Annotated[int, Field(
             description="Exclude terms with fewer genes than this (default 5).",
@@ -7565,7 +7581,7 @@ def register_tools(mcp: FastMCP):
             description="Max rows to return. Paginate with `offset`. Use "
                         "`summary=True` for summary-only (sets limit=0).",
             ge=1,
-        )] = 5,
+        )] = 25,
         offset: Annotated[int, Field(
             description="Pagination offset (starting row, 0-indexed).",
             ge=0,
@@ -7950,7 +7966,7 @@ def register_tools(mcp: FastMCP):
             description="Max rows to return. Paginate with `offset`. Use "
                         "`summary=True` for summary-only (sets limit=0).",
             ge=1,
-        )] = 5,
+        )] = 25,
         offset: Annotated[int, Field(
             description="Pagination offset (starting row, 0-indexed).",
             ge=0,
@@ -8321,7 +8337,7 @@ def register_tools(mcp: FastMCP):
             description="Max rows to return. Paginate with `offset`. Use "
                         "`summary=True` for summary-only (sets limit=0).",
             ge=1,
-        )] = 5,
+        )] = 25,
         offset: Annotated[int, Field(
             description="Pagination offset (starting row, 0-indexed).",
             ge=0,
@@ -10635,16 +10651,17 @@ def register_tools(mcp: FastMCP):
             description="If true, omit per-row `sequence` and return one multi-FASTA blob in the envelope instead (no duplication).")] = False,
         summary: Annotated[bool, Field(
             description="If true, return envelope only (results=[]); sugar for limit=0.")] = False,
-        limit: Annotated[int, Field(description="Max results.", ge=1)] = 25,
+        limit: Annotated[int | None, Field(description="Default: every input gene (min 25). Pass a number to page.", ge=1)] = None,
         offset: Annotated[int, Field(description="Rows to skip for pagination.", ge=0)] = 0,
     ) -> GeneAaSequenceResponse:
         """Return amino-acid sequences for a batch of genes, export-optimized for BLAST / HMMER / alignment. Set fasta=true for one multi-FASTA blob; sequence-length stats cover the full match (page-independent). not_found = locus_tag absent from KG; not_matched = gene exists but its sequence is null.
 
         Routing: feed locus_tags from `resolve_gene` / `gene_overview` / `genes_by_function`; this is the terminal export step (pair with fasta=true for external tools).
         """
+        resolved_limit = limit if limit is not None else _resolve_batch_limit(limit, locus_tags)
         await ctx.info(
             f"gene_aa_sequence locus_tags={len(locus_tags)} fasta={fasta} "
-            f"summary={summary} limit={limit} offset={offset}"
+            f"summary={summary} limit={resolved_limit} offset={offset}"
         )
         try:
             conn = _conn(ctx)
@@ -10652,7 +10669,7 @@ def register_tools(mcp: FastMCP):
                 locus_tags,
                 fasta=fasta,
                 summary=summary,
-                limit=limit,
+                limit=resolved_limit,
                 offset=offset,
                 conn=conn,
             )
@@ -10727,16 +10744,19 @@ def register_tools(mcp: FastMCP):
             description="None=all neighbors; True=co-oriented only; False=opposite-strand only. Null-strand neighbors dropped when set.")] = None,
         summary: Annotated[bool, Field(
             description="If true, return envelope only (results=[]); sugar for limit=0.")] = False,
-        limit: Annotated[int, Field(description="Max neighbor rows.", ge=1)] = 25,
+        limit: Annotated[int | None, Field(description="Default: every anchor x (2*window+1) neighbors (min 25). Pass a number to page.", ge=1)] = None,
     ) -> GeneNeighborsResponse:
         """Return each anchor gene's genomic neighborhood — genes adjacent on the same contig and organism — for operon / synteny reasoning, with strand orientation and intergenic gap. Positional only (not co-expression); fragmented assemblies yield fewer neighbors near contig ends. not_found = anchor absent from KG; not_matched = anchor exists but lacks coordinates.
 
         Routing: feed anchors from `differential_expression_by_gene` or `genes_by_metabolite`, then chain the returned neighbor locus_tags into `gene_overview` / `gene_aa_sequence` / `differential_expression_by_gene` for operon context.
         """
+        resolved_limit = limit if limit is not None else _resolve_batch_limit(
+            limit, locus_tags, k=2 * window + 1,
+        )
         await ctx.info(
             f"gene_neighbors locus_tags={len(locus_tags)} window={window} "
             f"max_bp_distance={max_bp_distance} same_strand={same_strand} "
-            f"summary={summary} limit={limit}"
+            f"summary={summary} limit={resolved_limit}"
         )
         try:
             conn = _conn(ctx)
@@ -10746,7 +10766,7 @@ def register_tools(mcp: FastMCP):
                 max_bp_distance=max_bp_distance,
                 same_strand=same_strand,
                 summary=summary,
-                limit=limit,
+                limit=resolved_limit,
                 conn=conn,
             )
         except ValueError as e:

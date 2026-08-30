@@ -46,7 +46,7 @@ primary diagnostic when a real DM produces zero rows.
 | max_adjusted_p_value | float \| None | None | Upper bound on `r.adjusted_p_value`. **has_p_value-gated**. |
 | summary | bool | False | Return summary fields only (counts, breakdowns, by_metric, diagnostics). Sugar for limit=0; results=[]. |
 | verbose | bool | False | Include heavy text fields per row: gene_function_description, gene_summary, plus DM context (metric_type, field_description, unit, compartment, experiment_id, publication_doi, treatment_type, background_factors, treatment, light_condition, experimental_context). p_value (raw) is reserved for future has_p_value DMs. |
-| limit | int | 5 | Max rows to return. Paginate with `offset`. Use `summary=True` for summary-only (sets limit=0). |
+| limit | int | 25 | Max rows to return. Paginate with `offset`. Use `summary=True` for summary-only (sets limit=0). |
 | offset | int | 0 | Pagination offset (starting row, 0-indexed). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
@@ -175,7 +175,7 @@ genes_by_numeric_metric(metric_types=['damping_ratio'], bucket=['top_decile'])
   "not_matched_organism": null,
   "excluded_derived_metrics": [],
   "warnings": [],
-  "returned": 5,
+  "returned": 25,
   "offset": 0,
   "truncated": true,
   "results": [
@@ -292,7 +292,7 @@ genes_by_numeric_metric(metric_types=['damping_ratio', 'peak_time_protein_h'], b
     }
   ],
   "warnings": ["1 non-rankable DM(s) excluded by `bucket` filter (peak_time_protein_h)"],
-  "returned": 5,
+  "returned": 25,
   "offset": 0,
   "truncated": true,
   "results": [
@@ -426,7 +426,7 @@ genes_by_numeric_metric(metric_types=['cell_abundance_biovolume_normalized'], bu
   "not_matched_organism": null,
   "excluded_derived_metrics": [],
   "warnings": [],
-  "returned": 5,
+  "returned": 25,
   "offset": 0,
   "truncated": true,
   "results": [
