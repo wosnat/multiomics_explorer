@@ -239,7 +239,23 @@ coordinated to `0.1.0a5` ahead of the KG release.
   `transported_metabolite_count`.
 - Spec: `docs/tool-specs/2026-08-20-tcdb-substrate-depth-migration.md`.
 
+### Breaking
+- `mass_min` / `mass_max` → `min_mass` / `max_mass` (`list_metabolites`)
+- `value_min` / `value_max` → `min_value` / `max_value` (`metabolites_by_quantifies_assay`)
+- `metric_percentile_min` / `metric_percentile_max` → `min_percentile` / `max_percentile` (`metabolites_by_quantifies_assay`)
+- `rank_by_metric_max` → `max_rank` (`metabolites_by_quantifies_assay`)
+- `publication_doi` → `publication_dois` (`list_experiments`, `list_clustering_analyses`, `list_derived_metrics`, `gene_clusters_by_gene`, `gene_derived_metrics`, `genes_by_numeric_metric`, `genes_by_boolean_metric`, `genes_by_categorical_metric`, `list_metabolite_assays`, `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`)
+- `bucket` → `metric_bucket` (`genes_by_numeric_metric`)
+- `flag` → `flag_value` (`genes_by_boolean_metric`)
+- `category` (`str`) → `gene_categories` (`list[str]`) (`genes_by_function`)
+- `treatment_types` → `treatment_type` (`gene_response_profile`)
+- `treatment_type` / `background_factors` / `growth_phases`: `str` → `list[str]` (`list_publications`)
+- `omics_type`: `str` → `list[str]` (`list_clustering_analyses`, `list_derived_metrics`)
+- `outputSchema` no longer emitted on `tools/list`
+
 ### Changed
+- Tool descriptions rewritten to a five-slot template (what / when / params / returns / see-also), each ≤ 600 chars; shared parameter descriptions (`organism`, `limit`, `summary`, trust filters, the ontology key, …) centralized in `mcp_server/params.py` instead of re-described per tool.
+- Python-API deprecation aliases for the renames above (`api/_compat.deprecated_alias`: `publication_doi`, `bucket`, `flag`, `category`, `treatment_types`, `mass_min`/`mass_max`, `value_min`/`value_max`, `metric_percentile_min`/`metric_percentile_max`, `rank_by_metric_max`, and the bare-`str` vocab filters) keep working one release and will be removed in `0.1.0-alpha.6`.
 - `differential_expression_by_gene` envelope drops `n_experiments` (an exact duplicate of `experiment_count`; the ortholog twin only ever had `experiment_count`). Read `experiment_count`. (llm-review 2b.8)
 - `resolve_gene` and `list_publications` gain `summary: bool = False` (envelope only, rollups uncapped) — the last two capped-rollup tools without it, so `by_organism` can always be read in full (on `resolve_gene` its counts then sum to `total_matching`). 36 of 42 tools now accept `summary=True`. (llm-review 2b.7)
 - **LLM-consumer response diet.** Six related trims, each

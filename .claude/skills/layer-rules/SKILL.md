@@ -48,6 +48,16 @@ Tool docstrings + every `Field(description=...)` are agent-outfacing
 and [readability-pass spec](../../../docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md)).
 Inline `# ...` Python comments are not.
 
+Parameter names (tests/unit/test_param_naming_rules.py enforces):
+R1 ranges are `min_x` / `max_x`; R2 vocabulary filters use the KG property
+name typed `list[str]` (`treatment_type`, `background_factors`, `growth_phases`,
+`omics_type`; `compartment` is single-valued and stays `str`); R3 ID batches
+are plural (`locus_tags`, `publication_dois`); R4 a filter is named after the
+row field it filters (`metric_bucket`, `flag_value`). Shared params come from
+`mcp_server/params.py` — never re-describe `organism`, `limit`, `summary`,
+trust filters etc. inline. Python-API renames keep the old keyword one
+release via `api/_compat.deprecated_alias`; MCP schemas never carry aliases.
+
 ## Layer 4: Skills (MCP resources)
 
 Per-tool about content auto-generated from Pydantic models + input

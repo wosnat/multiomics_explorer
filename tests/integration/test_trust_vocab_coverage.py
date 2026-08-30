@@ -160,19 +160,23 @@ class TestListFilterValuesReadsTheVocabulary:
         )
 
 
-def _wrapper_literal(name: str) -> set[str]:
-    """String members of a `Literal[...]` declared inside `register_tools`.
+def _wrapper_literal(name: str, source=None) -> set[str]:
+    """String members of a `Literal[...]` assigned to `name` in `source`.
 
-    The wrapper Literals are function-local, so they are read off the source
-    rather than imported.
+    Most wrapper Literals are function-local to `register_tools`; shared
+    ones (`mcp_server/params.py`) live at module level instead. Either way
+    they are read off the source rather than imported, so the check is a
+    genuine cross-check against a second Literal declaration.
     """
     import ast
     import inspect
     import textwrap
 
-    from multiomics_explorer.mcp_server.tools import register_tools
+    if source is None:
+        from multiomics_explorer.mcp_server.tools import register_tools
+        source = register_tools
 
-    tree = ast.parse(textwrap.dedent(inspect.getsource(register_tools)))
+    tree = ast.parse(textwrap.dedent(inspect.getsource(source)))
     for node in ast.walk(tree):
         if not isinstance(node, ast.Assign):
             continue
@@ -183,7 +187,8 @@ def _wrapper_literal(name: str) -> set[str]:
             n.value for n in ast.walk(node.value)
             if isinstance(n, ast.Constant) and isinstance(n.value, str)
         }
-    raise AssertionError(f"{name} not found in register_tools")
+    where = getattr(source, "__name__", source)
+    raise AssertionError(f"{name} not found in {where}")
 
 
 @pytest.mark.kg
@@ -193,11 +198,13 @@ class TestLiteralsAgreeWithTheVocabulary:
     vocabulary change silently rejects a valid value at the wrapper."""
 
     def test_call_class_literal_matches_the_vocabulary(self, conn):
-        literal_values = _wrapper_literal("_CALL_CLASSES")
+        from multiomics_explorer.mcp_server import params as params_module
+
+        literal_values = _wrapper_literal("CallClass", source=params_module)
         row = _vocab_row(conn, "Gene_has_merops_family", "call_class")
         assert row is not None, "call_class vocabulary node is missing"
         assert literal_values == set(row["values"]), (
-            f"_CALL_CLASSES Literal {sorted(literal_values)} disagrees with "
+            f"CallClass Literal {sorted(literal_values)} disagrees with "
             f"Gene_has_merops_family.call_class {sorted(row['values'])}."
         )
 
