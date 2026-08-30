@@ -485,10 +485,27 @@ pagination (`results`, `returned`, `truncated`, `offset`). `results` is sorted b
 `p_adjust`, then `cluster`, then `term_id`, so paging recovers positions 11+ of
 `top_pathways_by_padj`.
 
+`include_nonsignificant` (an `EnrichmentResult.params` key, not a `to_envelope`
+argument — set it via the `pathway_enrichment`/`cluster_enrichment` call) gates
+a `p_adjust < pvalue_cutoff` filter applied to the sorted frame, before the
+`offset`/`limit` slice. The MCP tools default `include_nonsignificant=False` +
+`limit=25`, so the default response carries only significant rows; the Python
+package default is `include_nonsignificant=True` (the full ranked list), so
+scripts calling `pathway_enrichment`/`cluster_enrichment` directly are
+unaffected unless they pass the flag explicitly. Either way, `total_matching`, `n_significant`,
+and every other `generate_summary()` aggregate (`by_experiment`, `by_cluster`,
+`clusters_skipped`, ...) always read the **full** tested set — the flag only
+trims which rows are echoed back, never what was counted. A cluster with zero
+significant rows under the default contributes no rows to `results`, but still
+appears in `by_experiment` / `by_cluster` with `n_significant`/`significant_terms`
+`== 0` — it is not the same as `clusters_skipped` (that bucket is for clusters
+that produced no Fisher tests at all).
+
 ### `result.params` (wrapper output only)
 
 `organism`, `ontology`, `level`, `term_ids`, `tree`, `informative_only`,
-`min_gene_set_size`, `max_gene_set_size`, `pvalue_cutoff`, `background_mode`,
+`min_gene_set_size`, `max_gene_set_size`, `pvalue_cutoff`,
+`include_nonsignificant`, `background_mode`,
 `n_clusters_input`, `n_clusters_tested`, `n_clusters_skipped`,
 `term2gene_row_count`, `n_unique_terms`, `multitest_method` (`fdr_bh`), plus the
 trust block; pathway kind also `experiment_ids`, `direction`, `significant_only`,

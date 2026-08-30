@@ -1472,6 +1472,14 @@ class EnrichmentResult:
         ``background_filtered`` (True when the filters moved the background
         as well as the tested sets) and ``interpro_type`` (the stratum an
         InterPro run was scoped to).
+
+        ``include_nonsignificant`` (read from ``self.params``, default
+        True) gates a ``p_adjust < pvalue_cutoff`` filter applied to a
+        *local* copy of the sorted frame, before the ``offset``/``limit``
+        slice — ``self.results`` itself is never mutated, so
+        ``generate_summary()`` (``total_matching``, ``n_significant``,
+        ``by_experiment``/``by_cluster``, ``clusters_skipped``, ...) always
+        reflects the full tested set regardless of this flag.
         """
         env = self.generate_summary()
         params = getattr(self, "params", None) or {}
@@ -1479,7 +1487,12 @@ class EnrichmentResult:
         env["trust_axes"] = dict(params.get("trust_axes") or {})
         env["background_filtered"] = bool(params.get("background_filtered"))
         env["interpro_type"] = params.get("interpro_type")
-        total = int(len(self.results))
+
+        frame = self.results
+        if not params.get("include_nonsignificant", True) and not frame.empty:
+            pvc = params.get("pvalue_cutoff", 0.05)
+            frame = frame[frame["p_adjust"] < pvc]
+        total = int(len(frame))
 
         if summary:
             env["results"] = []
@@ -1489,7 +1502,7 @@ class EnrichmentResult:
             return env
 
         eff_limit = limit if limit is not None else total
-        sliced = self.results.iloc[offset:offset + eff_limit] if total else self.results
+        sliced = frame.iloc[offset:offset + eff_limit] if total else frame
         returned_rows = sliced.to_dict(orient="records")
         # Strip sparse tree/tree_code columns for non-BRITE rows; pandas turns
         # a missing str (e.g. a cluster with no description text) into NaN,

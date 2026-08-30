@@ -6175,6 +6175,7 @@ def pathway_enrichment(
     min_gene_set_size: int = 5,
     max_gene_set_size: int | None = 500,
     pvalue_cutoff: float = 0.05,
+    include_nonsignificant: bool = True,
     timepoint_filter: list[str] | None = None,
     growth_phases: list[str] | None = None,
     tree: str | None = None,
@@ -6198,6 +6199,13 @@ def pathway_enrichment(
     ``interpro_type`` is required when ``ontology='interpro'``: InterPro
     types are separate strata, not levels of one hierarchy, and pooling
     them mixes families with domains and superfamilies.
+
+    ``include_nonsignificant`` (default True — the package returns the
+    full ranked list) is stored on ``result.params`` and consumed by
+    ``result.to_envelope(...)``: when False, rows with ``p_adjust >=
+    pvalue_cutoff`` are dropped before the ``offset``/``limit`` slice.
+    ``total_matching`` and ``n_significant`` (and every other summary
+    aggregate) always count the full tested set, unaffected by this flag.
 
     Returns an EnrichmentResult. Callers who need the MCP-dict envelope
     should call result.to_envelope(...).
@@ -6357,6 +6365,7 @@ def pathway_enrichment(
         "min_gene_set_size": min_gene_set_size,
         "max_gene_set_size": max_gene_set_size,
         "pvalue_cutoff": pvalue_cutoff,
+        "include_nonsignificant": include_nonsignificant,
         "background_mode": background_mode,
         "experiment_ids": experiment_ids,
         "direction": direction,
@@ -6399,6 +6408,7 @@ def cluster_enrichment(
     min_cluster_size: int = 3,
     max_cluster_size: int | None = None,
     pvalue_cutoff: float = 0.05,
+    include_nonsignificant: bool = True,
     tree: str | None = None,
     informative_only: bool = True,
     sources: list[str] | None = None,
@@ -6415,6 +6425,11 @@ def cluster_enrichment(
     Takes the same trust filters as pathway_enrichment; they shape the
     gene-to-term mapping, so tested sets and background move together.
     ``interpro_type`` is required when ``ontology='interpro'``.
+
+    ``include_nonsignificant`` (default True) behaves exactly as in
+    ``pathway_enrichment``: stored on ``result.params``, consumed by
+    ``result.to_envelope(...)`` to drop non-significant rows before
+    pagination without touching ``total_matching`` / ``n_significant``.
 
     Raises ValueError when the ontology cannot carry a filter you set, when
     an InterPro run omits interpro_type, when analysis_id is unknown, or
@@ -6517,6 +6532,7 @@ def cluster_enrichment(
             min_gene_set_size=min_gene_set_size, max_gene_set_size=max_gene_set_size,
             min_cluster_size=min_cluster_size, max_cluster_size=max_cluster_size,
             pvalue_cutoff=pvalue_cutoff,
+            include_nonsignificant=include_nonsignificant,
             inputs=inputs, produced=set(), term2gene=pd.DataFrame(),
         )
         result.params.update(
@@ -6601,6 +6617,7 @@ def cluster_enrichment(
         min_gene_set_size=min_gene_set_size, max_gene_set_size=max_gene_set_size,
         min_cluster_size=min_cluster_size, max_cluster_size=max_cluster_size,
         pvalue_cutoff=pvalue_cutoff,
+        include_nonsignificant=include_nonsignificant,
         inputs=inputs, produced=produced, term2gene=term2gene,
     )
     result.params.update(
@@ -6615,6 +6632,7 @@ def _cluster_enrichment_params_dict(
     min_gene_set_size, max_gene_set_size,
     min_cluster_size, max_cluster_size, pvalue_cutoff,
     inputs, produced, term2gene,
+    include_nonsignificant=True,
 ):
     return {
         "analysis_id": analysis_id, "organism": organism,
@@ -6626,6 +6644,7 @@ def _cluster_enrichment_params_dict(
         "min_cluster_size": min_cluster_size,
         "max_cluster_size": max_cluster_size,
         "pvalue_cutoff": pvalue_cutoff,
+        "include_nonsignificant": include_nonsignificant,
         "n_clusters_input": len(inputs.cluster_metadata),
         "n_clusters_tested": len(produced),
         "n_clusters_skipped": len(inputs.clusters_skipped),

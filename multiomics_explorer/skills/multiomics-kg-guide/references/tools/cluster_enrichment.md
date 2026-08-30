@@ -40,8 +40,9 @@ runnable code (custom term2gene path covers cluster-membership ORA).
 | min_cluster_size | int | 3 | Skip clusters with fewer members than this. |
 | max_cluster_size | int \| None | None | Skip clusters with more members. None disables. |
 | pvalue_cutoff | float | 0.05 | Significance threshold for p_adjust. |
+| include_nonsignificant | bool | False | Include rows with `p_adjust >= pvalue_cutoff`. Default False — only significant rows are returned; `total_matching` counts all tested rows and `n_significant` the significant ones. |
 | summary | bool | False | If true, omit results (envelope only). |
-| limit | int | 5 | Max rows returned. |
+| limit | int | 25 | Max rows returned. Default 25 — top significant hits by p_adjust globally; pass `include_nonsignificant=True` to page through the full ranked list. |
 | offset | int | 0 | Skip N rows before limit. |
 | informative_only | bool | True | When True (default), exclude ontology terms flagged uninformative in the KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; the global / overview KEGG maps such as ko01100). Term-side filter — never restricts the gene set, background, or DE inputs. Pass False to include uninformative terms; per-row is_informative still surfaces in either mode. [ENR] Default flipped to True in 2026-05 KG release; see docs://guide/conventions. |
 | sources | list[string] \| None | None | Keep rows whose edge sources[] contains any of these values (e.g. ['eggnog']). Valid on the 14 functional-edge ontologies (not PSORTb / SignalP). Default None never filters. See list_filter_values(filter_type='sources'). |
@@ -212,6 +213,8 @@ See `docs://analysis/annotation_evidence` for the trust-axis registry and rank-v
 ## Common mistakes
 
 - cluster_enrichment is cluster-anchored (needs `analysis_id`); for DE gene sets use `pathway_enrichment(experiment_ids=...)`. `enrichment_params` (incl. `term2gene_row_count`) echoes what was tested, same as pathway_enrichment.
+
+- No rows ≠ nothing tested: read `n_significant` / `total_matching`; `include_nonsignificant=True` shows the rest. [ENR] Default `limit=25` + `include_nonsignificant=False` return only significant rows (`p_adjust < pvalue_cutoff`) — `total_matching` and `n_significant` always count the full tested set regardless of this flag.
 
 - [ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions.
 

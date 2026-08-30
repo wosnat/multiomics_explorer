@@ -665,3 +665,99 @@ class TestToEnvelope:
         env = result.to_envelope(limit=1, offset=0)
         assert env["returned"] == 1
         assert env["truncated"] is (total > 1)
+
+
+class TestToEnvelopeIncludeNonsignificant:
+    """llm-review 2b.2 Task 2: `include_nonsignificant=False` (the MCP
+    default) filters rows to `p_adjust < pvalue_cutoff` before the
+    offset/limit slice, but never touches `total_matching` / `n_significant`
+    / any other summary aggregate — those always read the full,
+    un-mutated `self.results` frame via `generate_summary()`.
+    """
+
+    @staticmethod
+    def _build(params):
+        from multiomics_explorer.analysis.enrichment import (
+            EnrichmentInputs, EnrichmentResult,
+        )
+        import pandas as pd
+
+        df = pd.DataFrame([
+            {"cluster": "c1", "term_id": "T1", "term_name": "Term1", "p_adjust": 0.01},
+            {"cluster": "c1", "term_id": "T2", "term_name": "Term2", "p_adjust": 0.04},
+            {"cluster": "c1", "term_id": "T3", "term_name": "Term3", "p_adjust": 0.5},
+        ])
+        inputs = EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={"c1": ["g1"], "c2": ["g2"]},
+            background={"c1": ["g1", "g2"], "c2": ["g1", "g2"]},
+            cluster_metadata={
+                "c1": {"cluster_id": "gc:1", "cluster_name": "c1", "member_count": 1},
+                "c2": {"cluster_id": "gc:2", "cluster_name": "c2", "member_count": 1},
+            },
+        )
+        return EnrichmentResult(
+            kind="cluster", organism_name="MED4", ontology="go", level=1,
+            results=df, inputs=inputs, term2gene=pd.DataFrame(),
+            params=params,
+        )
+
+    def test_false_filters_rows_before_pagination(self):
+        result = self._build({"pvalue_cutoff": 0.05, "include_nonsignificant": False})
+        env = result.to_envelope()
+        assert env["returned"] == 2
+        assert len(env["results"]) == 2
+        assert {r["term_id"] for r in env["results"]} == {"T1", "T2"}
+
+    def test_false_keeps_total_matching_and_n_significant_full(self):
+        result = self._build({"pvalue_cutoff": 0.05, "include_nonsignificant": False})
+        env = result.to_envelope()
+        assert env["total_matching"] == 3
+        assert env["n_significant"] == 2
+
+    def test_default_true_returns_all_rows(self):
+        result = self._build({"pvalue_cutoff": 0.05})
+        env = result.to_envelope()
+        assert env["returned"] == 3
+        assert env["total_matching"] == 3
+        assert env["n_significant"] == 2
+
+    def test_false_pagination_uses_filtered_total(self):
+        result = self._build({"pvalue_cutoff": 0.05, "include_nonsignificant": False})
+        env = result.to_envelope(limit=1, offset=0)
+        assert env["returned"] == 1
+        assert env["truncated"] is True  # 2 significant rows, only 1 returned
+
+    def test_false_zero_significant_cluster_leaves_by_cluster_unaffected(self):
+        """A cluster with zero significant rows contributes no rows to the
+        filtered envelope, but `by_cluster` (from generate_summary, computed
+        on the unfiltered frame) still reports it with significant_terms=0 —
+        it is not silently dropped from the aggregate."""
+        from multiomics_explorer.analysis.enrichment import (
+            EnrichmentInputs, EnrichmentResult,
+        )
+        import pandas as pd
+
+        df = pd.DataFrame([
+            {"cluster": "c1", "term_id": "T1", "term_name": "Term1", "p_adjust": 0.01},
+            {"cluster": "c2", "term_id": "T2", "term_name": "Term2", "p_adjust": 0.9},
+        ])
+        inputs = EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={"c1": ["g1"], "c2": ["g2"]},
+            background={"c1": ["g1", "g2"], "c2": ["g1", "g2"]},
+            cluster_metadata={
+                "c1": {"cluster_id": "gc:1", "cluster_name": "c1", "member_count": 1},
+                "c2": {"cluster_id": "gc:2", "cluster_name": "c2", "member_count": 1},
+            },
+        )
+        result = EnrichmentResult(
+            kind="cluster", organism_name="MED4", ontology="go", level=1,
+            results=df, inputs=inputs, term2gene=pd.DataFrame(),
+            params={"pvalue_cutoff": 0.05, "include_nonsignificant": False},
+        )
+        env = result.to_envelope()
+        assert len(env["results"]) == 1
+        assert env["results"][0]["cluster"] == "c1"
+        by_cluster = {row["cluster_name"]: row for row in env["by_cluster"]}
+        assert by_cluster["c2"]["significant_terms"] == 0

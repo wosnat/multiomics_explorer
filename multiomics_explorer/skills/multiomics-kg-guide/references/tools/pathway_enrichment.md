@@ -41,10 +41,11 @@ code (EnrichmentResult accessors, custom term2gene, compareCluster export).
 | min_gene_set_size | int | 5 | Per-cluster M filter: drop pathways with fewer members in the background. |
 | max_gene_set_size | int \| None | 500 | Per-cluster M filter upper bound. None disables. |
 | pvalue_cutoff | float | 0.05 | Significance threshold for `p_adjust`. |
+| include_nonsignificant | bool | False | Include rows with `p_adjust >= pvalue_cutoff`. Default False — only significant rows are returned; `total_matching` counts all tested rows and `n_significant` the significant ones. |
 | timepoint_filter | list[string] \| None | None | Restrict to these timepoint labels. Useful for 10+ timepoint experiments. |
 | growth_phases | list[string] \| None | None | Filter DE results by growth phase(s) before enrichment (case-insensitive). E.g. ['exponential']. |
 | summary | bool | False | If true, omit results (envelope only). |
-| limit | int | 100 | Max rows returned. Default 100 — top hits by p_adjust globally. |
+| limit | int | 25 | Max rows returned. Default 25 — top significant hits by p_adjust globally; pass `include_nonsignificant=True` to page through the full ranked list. |
 | offset | int | 0 | Skip N rows before limit. |
 | informative_only | bool | True | When True (default), exclude ontology terms flagged uninformative in the KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; the global / overview KEGG maps such as ko01100). Term-side filter — never restricts the gene set, background, or DE inputs. Pass False to include uninformative terms; per-row is_informative still surfaces in either mode. [ENR] Default flipped to True in 2026-05 KG release; see docs://guide/conventions. |
 | sources | list[string] \| None | None | Keep rows whose edge sources[] contains any of these values (e.g. ['eggnog']). Valid on the 14 functional-edge ontologies (not PSORTb / SignalP). Default None never filters. See list_filter_values(filter_type='sources'). |
@@ -232,7 +233,7 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
   "ontology": "merops",
   "level": 0,
   "total_matching": 98,
-  "returned": 98,
+  "returned": 5,
   "truncated": false,
   "offset": 0,
   "n_significant": 5,
@@ -400,6 +401,7 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
   "not_found": [],
   "not_matched": [],
   "no_expression": [],
+  "not_found_experiments": [],
   "term_validation": {"not_found": [], "wrong_ontology": [], "wrong_level": [], "filtered_out": []},
   "clusters_skipped": [],
   "enrichment_params": {
@@ -412,6 +414,7 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
     "min_gene_set_size": 5,
     "max_gene_set_size": 500,
     "pvalue_cutoff": 0.05,
+    "include_nonsignificant": false,
     "background_mode": "table_scope",
     "experiment_ids": ["10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq"],
     "direction": "both",
@@ -541,7 +544,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
   "ontology": "tcdb",
   "level": 2,
   "total_matching": 8,
-  "returned": 8,
+  "returned": 1,
   "truncated": false,
   "offset": 0,
   "n_significant": 1,
@@ -691,6 +694,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
   "not_found": [],
   "not_matched": [],
   "no_expression": [],
+  "not_found_experiments": [],
   "term_validation": {"not_found": [], "wrong_ontology": [], "wrong_level": [], "filtered_out": []},
   "clusters_skipped": [],
   "enrichment_params": {
@@ -703,6 +707,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
     "min_gene_set_size": 5,
     "max_gene_set_size": 500,
     "pvalue_cutoff": 0.05,
+    "include_nonsignificant": false,
     "background_mode": "table_scope",
     "experiment_ids": ["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"],
     "direction": "both",
@@ -754,68 +759,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "count": 7,
       "bg_count": 7,
       "signed_score": -3.8644078401971567
-    },
-    {
-      "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|days 60+89|down",
-      "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
-      "name": "MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)",
-      "timepoint": "days 60+89",
-      "timepoint_hours": null,
-      "timepoint_order": 2,
-      "direction": "down",
-      "omics_type": "RNASEQ",
-      "table_scope": "all_detected_genes",
-      "treatment_type": ["nitrogen"],
-      "background_factors": ["axenic", "light"],
-      "is_time_course": true,
-      "growth_phase": "nutrient_limited",
-      "term_id": "tcdb:5.B.4",
-      "term_name": "The Plant Photosystem I Supercomplex (PSI) Family",
-      "level": 2,
-      "is_informative": true,
-      "gene_ratio": "2/168",
-      "gene_ratio_numeric": 0.011904761904761904,
-      "bg_ratio": "7/1849",
-      "bg_ratio_numeric": 0.0037858301784748512,
-      "rich_factor": 0.2857142857142857,
-      "fold_enrichment": 3.1445578231292517,
-      "pvalue": 0.1272218816595758,
-      "p_adjust": 0.2544437633191516,
-      "count": 2,
-      "bg_count": 7,
-      "signed_score": -0.5944081896689429
-    },
-    {
-      "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|up",
-      "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
-      "name": "MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)",
-      "timepoint": "day 14",
-      "timepoint_hours": 336.0,
-      "timepoint_order": 1,
-      "direction": "up",
-      "omics_type": "RNASEQ",
-      "table_scope": "all_detected_genes",
-      "treatment_type": ["nitrogen"],
-      "background_factors": ["axenic", "light"],
-      "is_time_course": true,
-      "growth_phase": "nutrient_limited",
-      "term_id": "tcdb:3.A.1",
-      "term_name": "The ATP-binding Cassette (ABC) Superfamily",
-      "level": 2,
-      "is_informative": true,
-      "gene_ratio": "11/405",
-      "gene_ratio_numeric": 0.027160493827160494,
-      "bg_ratio": "37/1849",
-      "bg_ratio_numeric": 0.020010816657652784,
-      "rich_factor": 0.2972972972972973,
-      "fold_enrichment": 1.3572906239572908,
-      "pvalue": 0.16698116370140434,
-      "p_adjust": 0.3339623274028087,
-      "count": 11,
-      "bg_count": 37,
-      "signed_score": 0.4763025209843794
-    },
-    ...
+    }
   ]
 }
 ```
@@ -984,6 +928,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
   "not_found": [],
   "not_matched": [],
   "no_expression": [],
+  "not_found_experiments": [],
   "term_validation": {"not_found": [], "wrong_ontology": [], "wrong_level": [], "filtered_out": []},
   "clusters_skipped": [],
   "enrichment_params": {
@@ -996,6 +941,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
     "min_gene_set_size": 5,
     "max_gene_set_size": 500,
     "pvalue_cutoff": 0.05,
+    "include_nonsignificant": false,
     "background_mode": "table_scope",
     "experiment_ids": ["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"],
     "direction": "both",
@@ -1037,6 +983,8 @@ See `docs://analysis/annotation_evidence` for the trust-axis registry (which fil
 ## Common mistakes
 
 - pathway_enrichment is DE-anchored (needs `experiment_ids`); for a clustering analysis use `cluster_enrichment(analysis_id=...)`, for ortholog groups / custom lists use the Python `fisher_ora` primitive.
+
+- No rows ≠ nothing tested: read `n_significant` / `total_matching`; `include_nonsignificant=True` shows the rest. [ENR] Default `limit=25` + `include_nonsignificant=False` return only significant rows (`p_adjust < pvalue_cutoff`) — `total_matching` and `n_significant` always count the full tested set regardless of this flag.
 
 - [ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions.
 

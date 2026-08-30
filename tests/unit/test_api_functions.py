@@ -6145,6 +6145,139 @@ class TestPathwayEnrichment:
 
 
 # ---------------------------------------------------------------------------
+# llm-review 2b.2 Task 2 — include_nonsignificant wiring
+#
+# The exact-value filtering logic (does to_envelope actually drop rows,
+# leave total_matching/n_significant/by_cluster alone) is covered directly
+# in tests/unit/test_enrichment_result.py::TestToEnvelopeIncludeNonsignificant
+# (hand-built EnrichmentResult, no fisher_ora involved). These tests cover
+# the orchestration layer only: does pathway_enrichment / cluster_enrichment
+# thread the parameter onto result.params so to_envelope sees it. fisher_ora
+# is monkeypatched to return controlled p_adjust values (0.01, 0.04, 0.5 vs
+# cutoff 0.05) since the real Fisher-exact computation can't be pinned to
+# specific p-values from a tiny mocked gene set.
+# ---------------------------------------------------------------------------
+
+
+def _fake_fisher_ora_three_rows(cluster_name):
+    """fisher_ora stand-in: one cluster, 3 term rows, p_adjust 0.01/0.04/0.5
+    (2 significant of 3 at the default 0.05 cutoff)."""
+    def _fisher_ora(inputs, term2gene, **_kwargs):
+        import pandas as pd
+        from multiomics_explorer.analysis.enrichment import EnrichmentResult
+        df = pd.DataFrame([
+            {"cluster": cluster_name, "term_id": "T1", "term_name": "Term1", "p_adjust": 0.01},
+            {"cluster": cluster_name, "term_id": "T2", "term_name": "Term2", "p_adjust": 0.04},
+            {"cluster": cluster_name, "term_id": "T3", "term_name": "Term3", "p_adjust": 0.5},
+        ])
+        return EnrichmentResult(
+            kind="pathway", organism_name=inputs.organism_name, ontology=None, level=None,
+            results=df, inputs=inputs, term2gene=term2gene,
+        )
+    return _fisher_ora
+
+
+class TestPathwayEnrichmentIncludeNonsignificant:
+    """pathway_enrichment(include_nonsignificant=...) orchestration."""
+
+    @pytest.fixture(autouse=True)
+    def _enrichment_preflight(self, monkeypatch):
+        _patch_enrichment_preflight(monkeypatch)
+
+    def _run(self, monkeypatch, **kwargs):
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: TestPathwayEnrichmentInformativeOnly._stub_de_result(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            lambda **_: TestPathwayEnrichment._stub_gbo_result(rows=[
+                {"term_id": "T1", "term_name": "Term1", "locus_tag": "PMM0001"},
+            ]),
+        )
+        monkeypatch.setattr(
+            enr, "fisher_ora", _fake_fisher_ora_three_rows("exp1|T0|up"),
+        )
+        return pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+            min_gene_set_size=0,
+            **kwargs,
+        )
+
+    def test_default_true_returns_all_rows(self, monkeypatch):
+        result = self._run(monkeypatch)
+        assert result.params["include_nonsignificant"] is True
+        out = result.to_envelope()
+        assert out["total_matching"] == 3
+        assert out["n_significant"] == 2
+        assert out["returned"] == 3
+
+    def test_false_filters_rows_but_keeps_full_counts(self, monkeypatch):
+        result = self._run(monkeypatch, include_nonsignificant=False)
+        assert result.params["include_nonsignificant"] is False
+        out = result.to_envelope()
+        assert out["total_matching"] == 3
+        assert out["n_significant"] == 2
+        assert out["returned"] == 2
+        assert len(out["results"]) == 2
+
+
+class TestClusterEnrichmentIncludeNonsignificant:
+    """cluster_enrichment(include_nonsignificant=...) orchestration."""
+
+    @pytest.fixture(autouse=True)
+    def _enrichment_preflight(self, monkeypatch):
+        _patch_enrichment_preflight(monkeypatch)
+
+    def _run(self, monkeypatch, **kwargs):
+        from multiomics_explorer.api import cluster_enrichment
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+
+        monkeypatch.setattr(
+            enr, "cluster_enrichment_inputs",
+            lambda **_: TestClusterEnrichment._stub_inputs(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            lambda **_: TestClusterEnrichment._stub_gbo_result([
+                {"term_id": "T1", "term_name": "Term1", "locus_tag": "PMM0001", "level": 1},
+            ]),
+        )
+        monkeypatch.setattr(
+            enr, "fisher_ora", _fake_fisher_ora_three_rows("Cluster A"),
+        )
+        return cluster_enrichment(
+            analysis_id="ca:test", organism="MED4",
+            ontology="cyanorak_role", level=1,
+            min_gene_set_size=0,
+            **kwargs,
+        )
+
+    def test_default_true_returns_all_rows(self, monkeypatch):
+        result = self._run(monkeypatch)
+        assert result.params["include_nonsignificant"] is True
+        out = result.to_envelope()
+        assert out["total_matching"] == 3
+        assert out["n_significant"] == 2
+        assert out["returned"] == 3
+
+    def test_false_filters_rows_but_keeps_full_counts(self, monkeypatch):
+        result = self._run(monkeypatch, include_nonsignificant=False)
+        assert result.params["include_nonsignificant"] is False
+        out = result.to_envelope()
+        assert out["total_matching"] == 3
+        assert out["n_significant"] == 2
+        assert out["returned"] == 2
+        assert len(out["results"]) == 2
+
+
+# ---------------------------------------------------------------------------
 # Task 4 (llm-review 2b.1) — raise on all-unknown ids / out-of-range level
 # ---------------------------------------------------------------------------
 

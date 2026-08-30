@@ -6914,6 +6914,13 @@ def register_tools(mcp: FastMCP):
             description="Significance threshold for `p_adjust`.",
             gt=0, lt=1,
         )] = 0.05,
+        include_nonsignificant: Annotated[bool, Field(
+            description=(
+                "Include rows with `p_adjust >= pvalue_cutoff`. Default False — only "
+                "significant rows are returned; `total_matching` counts all tested "
+                "rows and `n_significant` the significant ones."
+            ),
+        )] = False,
         timepoint_filter: Annotated[list[str] | None, Field(
             description="Restrict to these timepoint labels. Useful for 10+ timepoint experiments.",
         )] = None,
@@ -6925,9 +6932,11 @@ def register_tools(mcp: FastMCP):
             description="If true, omit results (envelope only).",
         )] = False,
         limit: Annotated[int, Field(
-            description="Max rows returned. Default 100 — top hits by p_adjust globally.",
+            description="Max rows returned. Default 25 — top significant hits by p_adjust "
+                        "globally; pass `include_nonsignificant=True` to page through the "
+                        "full ranked list.",
             ge=1,
-        )] = 100,
+        )] = 25,
         offset: Annotated[int, Field(
             description="Skip N rows before limit.",
             ge=0,
@@ -7007,6 +7016,7 @@ def register_tools(mcp: FastMCP):
                 min_gene_set_size=min_gene_set_size,
                 max_gene_set_size=max_gene_set_size,
                 pvalue_cutoff=pvalue_cutoff,
+                include_nonsignificant=include_nonsignificant,
                 timepoint_filter=timepoint_filter,
                 growth_phases=growth_phases,
                 tree=tree,
@@ -7077,8 +7087,20 @@ def register_tools(mcp: FastMCP):
         min_cluster_size: Annotated[int, Field(description="Skip clusters with fewer members than this.", ge=0)] = 3,
         max_cluster_size: Annotated[int | None, Field(description="Skip clusters with more members. None disables.", ge=1)] = None,
         pvalue_cutoff: Annotated[float, Field(description="Significance threshold for p_adjust.", gt=0, lt=1)] = 0.05,
+        include_nonsignificant: Annotated[bool, Field(
+            description=(
+                "Include rows with `p_adjust >= pvalue_cutoff`. Default False — only "
+                "significant rows are returned; `total_matching` counts all tested "
+                "rows and `n_significant` the significant ones."
+            ),
+        )] = False,
         summary: Annotated[bool, Field(description="If true, omit results (envelope only).")] = False,
-        limit: Annotated[int, Field(description="Max rows returned.", ge=1)] = 5,
+        limit: Annotated[int, Field(
+            description="Max rows returned. Default 25 — top significant hits by p_adjust "
+                        "globally; pass `include_nonsignificant=True` to page through the "
+                        "full ranked list.",
+            ge=1,
+        )] = 25,
         offset: Annotated[int, Field(description="Skip N rows before limit.", ge=0)] = 0,
         informative_only: Annotated[bool, Field(
             description=(
@@ -7155,6 +7177,7 @@ def register_tools(mcp: FastMCP):
                 min_cluster_size=min_cluster_size,
                 max_cluster_size=max_cluster_size,
                 pvalue_cutoff=pvalue_cutoff,
+                include_nonsignificant=include_nonsignificant,
                 informative_only=informative_only,
                 sources=sources, evidence=evidence,
                 max_tier=max_tier, min_evidence_score=min_evidence_score,

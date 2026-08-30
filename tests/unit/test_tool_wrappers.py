@@ -3993,9 +3993,9 @@ class TestPathwayEnrichmentWrapper:
                 f"{field_name} description should mention clusterProfiler name {cp_name}"
             )
 
-    # Default limit=100 is asserted in the Task 16 integration test, not here —
-    # introspecting FastMCP's tool registry for signature defaults is brittle, and
-    # the default is verified by end-to-end calling behavior in integration.
+    # Default limit=25 / include_nonsignificant=False (llm-review 2b.2) are
+    # asserted via calling behavior in TestEnrichmentDefaults below —
+    # introspecting FastMCP's tool registry for signature defaults is brittle.
 
 
 class TestClusterEnrichmentWrapper:
@@ -4035,6 +4035,90 @@ class TestClusterEnrichmentWrapper:
             assert cp_name in field.description, (
                 f"{field_name} description should mention clusterProfiler name {cp_name}"
             )
+
+
+class TestEnrichmentDefaults:
+    """llm-review 2b.2 Task 2: MCP defaults are significant-only rows,
+    limit=25 — verified by calling behavior (the wrapper forwards
+    `include_nonsignificant` to api.* and `limit` to `result.to_envelope`),
+    not by introspecting FastMCP's registered signature.
+    """
+
+    @staticmethod
+    def _bare_result(kind):
+        from multiomics_explorer.analysis.enrichment import (
+            EnrichmentInputs, EnrichmentResult,
+        )
+        import pandas as pd
+
+        inputs = EnrichmentInputs(
+            organism_name="MED4", gene_sets={}, background={}, cluster_metadata={},
+            analysis_metadata=(
+                {
+                    "analysis_id": "ca:1", "analysis_name": "Test",
+                    "cluster_method": "kmeans", "cluster_type": "diel_cycle",
+                    "omics_type": "transcriptomics",
+                    "treatment_type": [], "background_factors": [],
+                    "growth_phases": [], "experiment_ids": [],
+                }
+                if kind == "cluster" else {}
+            ),
+        )
+        return EnrichmentResult(
+            kind=kind, organism_name="MED4", ontology="cyanorak_role", level=1,
+            results=pd.DataFrame(), inputs=inputs, term2gene=pd.DataFrame(),
+            params={"pvalue_cutoff": 0.05},
+        )
+
+    @pytest.mark.asyncio
+    async def test_pathway_enrichment_default_forwards_significant_only_and_limit_25(
+        self, tool_fns, mock_ctx
+    ):
+        result = self._bare_result("pathway")
+        result.to_envelope = MagicMock(wraps=result.to_envelope)
+        captured = {}
+
+        def fake_pathway_enrichment(**kwargs):
+            captured.update(kwargs)
+            return result
+
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.pathway_enrichment",
+            side_effect=fake_pathway_enrichment,
+        ):
+            await tool_fns["pathway_enrichment"](
+                mock_ctx, organism="MED4", experiment_ids=["exp1"],
+                ontology="cyanorak_role", level=1,
+            )
+
+        assert captured["include_nonsignificant"] is False
+        _, to_envelope_kwargs = result.to_envelope.call_args
+        assert to_envelope_kwargs["limit"] == 25
+
+    @pytest.mark.asyncio
+    async def test_cluster_enrichment_default_forwards_significant_only_and_limit_25(
+        self, tool_fns, mock_ctx
+    ):
+        result = self._bare_result("cluster")
+        result.to_envelope = MagicMock(wraps=result.to_envelope)
+        captured = {}
+
+        def fake_cluster_enrichment(**kwargs):
+            captured.update(kwargs)
+            return result
+
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.cluster_enrichment",
+            side_effect=fake_cluster_enrichment,
+        ):
+            await tool_fns["cluster_enrichment"](
+                mock_ctx, analysis_id="ca:1", organism="MED4",
+                ontology="cyanorak_role", level=1,
+            )
+
+        assert captured["include_nonsignificant"] is False
+        _, to_envelope_kwargs = result.to_envelope.call_args
+        assert to_envelope_kwargs["limit"] == 25
 
 
 class TestListDerivedMetricsWrapper:

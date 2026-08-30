@@ -160,6 +160,7 @@ enrichment_params:
   - 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
   filters_applied: {}
   growth_phases: null
+  include_nonsignificant: true
   informative_only: true
   interpro_type: null
   level: 1

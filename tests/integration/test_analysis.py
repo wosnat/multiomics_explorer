@@ -211,3 +211,48 @@ class TestExperimentsToDataFrameIntegration:
         for col in df.columns:
             for val in df[col].dropna():
                 assert not isinstance(val, (list, dict))
+
+
+@pytest.mark.kg
+class TestEnrichmentIncludeNonsignificantIntegration:
+    """llm-review 2b.2 Task 2, against a real KG: `include_nonsignificant`
+    threads from `api.pathway_enrichment` through `result.to_envelope()`,
+    filtering rows without disturbing total_matching / n_significant / the
+    aggregate breakdowns — same contract the unit tests pin with mocks,
+    exercised here over real DE + ontology data.
+    """
+
+    @staticmethod
+    def _med4_nitrogen_experiment_id(conn):
+        experiments = api.list_experiments(
+            organism="MED4", search_text="nitrogen", limit=5, conn=conn,
+        )
+        if not experiments["results"]:
+            pytest.skip("No MED4 nitrogen experiment in KG")
+        return experiments["results"][0]["experiment_id"]
+
+    def test_false_returns_fewer_or_equal_rows_same_totals(self, conn):
+        exp_id = self._med4_nitrogen_experiment_id(conn)
+        common = dict(
+            organism="MED4", experiment_ids=[exp_id],
+            ontology="kegg", level=1, conn=conn,
+        )
+        full = api.pathway_enrichment(**common, include_nonsignificant=True)
+        sig_only = api.pathway_enrichment(**common, include_nonsignificant=False)
+
+        env_full = full.to_envelope(limit=None)
+        env_sig = sig_only.to_envelope(limit=None)
+
+        assert env_full["total_matching"] == env_sig["total_matching"]
+        assert env_full["n_significant"] == env_sig["n_significant"]
+        assert env_sig["returned"] <= env_full["returned"]
+        assert env_sig["returned"] == env_sig["n_significant"]
+        # Rows returned under significant-only are exactly the significant subset.
+        assert all(
+            row["p_adjust"] < sig_only.params["pvalue_cutoff"]
+            for row in env_sig["results"]
+        )
+        # by_experiment / by_omics_type aggregates are unaffected by the filter.
+        assert env_full["by_experiment"] == env_sig["by_experiment"]
+        assert env_full["by_omics_type"] == env_sig["by_omics_type"]
+        assert env_full["clusters_skipped"] == env_sig["clusters_skipped"]
