@@ -329,6 +329,38 @@ class TestListOrganismsWrapper:
     }
 
     @pytest.mark.asyncio
+    async def test_warnings_default_empty_when_missing(self, tool_fns, mock_ctx):
+        """api envelope without a `warnings` key -> response.warnings == []
+        (llm-review 2b.3)."""
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 1, "total_matching": 1,
+                "returned": 1, "truncated": False,
+                "not_found": [], "results": [self._SAMPLE_ORG],
+            },
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        assert result.warnings == []
+
+    @pytest.mark.asyncio
+    async def test_warnings_forwarded_when_present(self, tool_fns, mock_ctx):
+        """api envelope with warnings=["x"] -> response.warnings == ["x"]
+        (proves the constructor wiring, not just the Pydantic default;
+        llm-review 2b.3)."""
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 1, "total_matching": 1,
+                "returned": 1, "truncated": False,
+                "not_found": [], "results": [self._SAMPLE_ORG],
+                "warnings": ["x"],
+            },
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        assert result.warnings == ["x"]
+
+    @pytest.mark.asyncio
     async def test_returns_response_envelope(self, tool_fns, mock_ctx):
         """Response has total_entries, total_matching, returned, truncated, not_found, results."""
         with patch(
@@ -797,6 +829,34 @@ class TestGenesByFunctionWrapper:
              "annotation_quality": 2, "score": 3.5},
         ],
     }
+
+    @pytest.mark.asyncio
+    async def test_warnings_default_empty_when_missing(self, tool_fns, mock_ctx):
+        """api envelope without a `warnings` key -> response.warnings == []
+        (llm-review 2b.3)."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_function",
+            return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
+        ):
+            result = await tool_fns["genes_by_function"](
+                mock_ctx, search_text="DNA polymerase")
+        assert result.warnings == []
+
+    @pytest.mark.asyncio
+    async def test_warnings_forwarded_when_present(self, tool_fns, mock_ctx):
+        """api envelope with warnings=["x"] -> response.warnings == ["x"]
+        (proves the constructor wiring, not just the Pydantic default;
+        llm-review 2b.3)."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_function",
+            return_value={
+                **self._SAMPLE_API_RETURN, "results": [], "returned": 0,
+                "warnings": ["x"],
+            },
+        ):
+            result = await tool_fns["genes_by_function"](
+                mock_ctx, search_text="DNA polymerase")
+        assert result.warnings == ["x"]
 
     @pytest.mark.asyncio
     async def test_returns_pydantic_envelope(self, tool_fns, mock_ctx):
@@ -2239,6 +2299,42 @@ class TestListPublicationsWrapper:
     }
 
     @pytest.mark.asyncio
+    async def test_warnings_default_empty_when_missing(self, tool_fns, mock_ctx):
+        """api envelope without a `warnings` key -> response.warnings == []
+        (llm-review 2b.3)."""
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={
+                "total_entries": 1, "total_matching": 1,
+                "by_organism": [], "by_treatment_type": [],
+                "by_background_factors": [], "by_omics_type": [],
+                "returned": 1, "truncated": False,
+                "results": [self._SAMPLE_PUB],
+            },
+        ):
+            result = await tool_fns["list_publications"](mock_ctx)
+        assert result.warnings == []
+
+    @pytest.mark.asyncio
+    async def test_warnings_forwarded_when_present(self, tool_fns, mock_ctx):
+        """api envelope with warnings=["x"] -> response.warnings == ["x"]
+        (proves the constructor wiring, not just the Pydantic default;
+        llm-review 2b.3)."""
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={
+                "total_entries": 1, "total_matching": 1,
+                "by_organism": [], "by_treatment_type": [],
+                "by_background_factors": [], "by_omics_type": [],
+                "returned": 1, "truncated": False,
+                "results": [self._SAMPLE_PUB],
+                "warnings": ["x"],
+            },
+        ):
+            result = await tool_fns["list_publications"](mock_ctx)
+        assert result.warnings == ["x"]
+
+    @pytest.mark.asyncio
     async def test_returns_dict_envelope(self, tool_fns, mock_ctx):
         """Response has total_entries, total_matching, returned, truncated, results."""
         with patch(
@@ -2516,6 +2612,29 @@ class TestListExperimentsWrapper:
             results = [copy.deepcopy(cls._SAMPLE_EXP)]
         return {**cls._SAMPLE_SUMMARY, "returned": len(results),
                 "truncated": True, "results": results}
+
+    @pytest.mark.asyncio
+    async def test_warnings_default_empty_when_missing(self, tool_fns, mock_ctx):
+        """api envelope without a `warnings` key -> response.warnings == []
+        (llm-review 2b.3)."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._SAMPLE_SUMMARY,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, summary=True)
+        assert result.warnings == []
+
+    @pytest.mark.asyncio
+    async def test_warnings_forwarded_when_present(self, tool_fns, mock_ctx):
+        """api envelope with warnings=["x"] -> response.warnings == ["x"]
+        (proves the constructor wiring, not just the Pydantic default;
+        llm-review 2b.3)."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value={**self._SAMPLE_SUMMARY, "warnings": ["x"]},
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, summary=True)
+        assert result.warnings == ["x"]
 
     @pytest.mark.asyncio
     async def test_summary_mode_empty_results(self, tool_fns, mock_ctx):
@@ -3830,6 +3949,29 @@ class TestListClusteringAnalysesWrapper:
     }
 
     @pytest.mark.asyncio
+    async def test_warnings_default_empty_when_missing(self, tool_fns, mock_ctx):
+        """api envelope without a `warnings` key -> response.warnings == []
+        (llm-review 2b.3)."""
+        with patch(
+            "multiomics_explorer.api.functions.list_clustering_analyses",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["list_clustering_analyses"](mock_ctx)
+        assert result.warnings == []
+
+    @pytest.mark.asyncio
+    async def test_warnings_forwarded_when_present(self, tool_fns, mock_ctx):
+        """api envelope with warnings=["x"] -> response.warnings == ["x"]
+        (proves the constructor wiring, not just the Pydantic default;
+        llm-review 2b.3)."""
+        with patch(
+            "multiomics_explorer.api.functions.list_clustering_analyses",
+            return_value={**self._SAMPLE_API_RETURN, "warnings": ["x"]},
+        ):
+            result = await tool_fns["list_clustering_analyses"](mock_ctx)
+        assert result.warnings == ["x"]
+
+    @pytest.mark.asyncio
     async def test_returns_response_model(self, tool_fns, mock_ctx):
         with patch(
             "multiomics_explorer.api.functions.list_clustering_analyses",
@@ -3903,6 +4045,31 @@ class TestGeneClustersByGeneWrapper:
              "background_factors": []},
         ],
     }
+
+    @pytest.mark.asyncio
+    async def test_warnings_default_empty_when_missing(self, tool_fns, mock_ctx):
+        """api envelope without a `warnings` key -> response.warnings == []
+        (llm-review 2b.3)."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_clusters_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["gene_clusters_by_gene"](
+                mock_ctx, locus_tags=["PMM0370"])
+        assert result.warnings == []
+
+    @pytest.mark.asyncio
+    async def test_warnings_forwarded_when_present(self, tool_fns, mock_ctx):
+        """api envelope with warnings=["x"] -> response.warnings == ["x"]
+        (proves the constructor wiring, not just the Pydantic default;
+        llm-review 2b.3)."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_clusters_by_gene",
+            return_value={**self._SAMPLE_API_RETURN, "warnings": ["x"]},
+        ):
+            result = await tool_fns["gene_clusters_by_gene"](
+                mock_ctx, locus_tags=["PMM0370"])
+        assert result.warnings == ["x"]
 
     @pytest.mark.asyncio
     async def test_returns_response_model(self, tool_fns, mock_ctx):
@@ -4351,6 +4518,29 @@ class TestListDerivedMetricsWrapper:
     }
 
     @pytest.mark.asyncio
+    async def test_warnings_default_empty_when_missing(self, tool_fns, mock_ctx):
+        """api envelope without a `warnings` key -> response.warnings == []
+        (llm-review 2b.3)."""
+        with patch(
+            "multiomics_explorer.api.functions.list_derived_metrics",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["list_derived_metrics"](mock_ctx)
+        assert result.warnings == []
+
+    @pytest.mark.asyncio
+    async def test_warnings_forwarded_when_present(self, tool_fns, mock_ctx):
+        """api envelope with warnings=["x"] -> response.warnings == ["x"]
+        (proves the constructor wiring, not just the Pydantic default;
+        llm-review 2b.3)."""
+        with patch(
+            "multiomics_explorer.api.functions.list_derived_metrics",
+            return_value={**self._SAMPLE_API_RETURN, "warnings": ["x"]},
+        ):
+            result = await tool_fns["list_derived_metrics"](mock_ctx)
+        assert result.warnings == ["x"]
+
+    @pytest.mark.asyncio
     async def test_returns_response_model(self, tool_fns, mock_ctx):
         with patch(
             "multiomics_explorer.api.functions.list_derived_metrics",
@@ -4470,6 +4660,33 @@ class TestGeneDerivedMetricsWrapper:
                 # adjusted_p_value, significant: missing in dict; Pydantic fills None
             }],
         }
+
+    @pytest.mark.asyncio
+    async def test_warnings_default_empty_when_missing(self, tool_fns, envelope_data):
+        """api envelope without a `warnings` key -> response.warnings == []
+        (llm-review 2b.3)."""
+        from unittest.mock import patch, AsyncMock
+        assert "warnings" not in envelope_data
+        with patch("multiomics_explorer.mcp_server.tools.api.gene_derived_metrics",
+                   return_value=envelope_data):
+            ctx = AsyncMock()
+            response = await tool_fns["gene_derived_metrics"](
+                ctx, locus_tags=["PMM1714"])
+        assert response.warnings == []
+
+    @pytest.mark.asyncio
+    async def test_warnings_forwarded_when_present(self, tool_fns, envelope_data):
+        """api envelope with warnings=["x"] -> response.warnings == ["x"]
+        (proves the constructor wiring, not just the Pydantic default;
+        llm-review 2b.3)."""
+        from unittest.mock import patch, AsyncMock
+        envelope_data = {**envelope_data, "warnings": ["x"]}
+        with patch("multiomics_explorer.mcp_server.tools.api.gene_derived_metrics",
+                   return_value=envelope_data):
+            ctx = AsyncMock()
+            response = await tool_fns["gene_derived_metrics"](
+                ctx, locus_tags=["PMM1714"])
+        assert response.warnings == ["x"]
 
     @pytest.mark.asyncio
     async def test_returns_response_envelope(self, tool_fns, envelope_data):
