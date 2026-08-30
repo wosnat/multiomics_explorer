@@ -6917,7 +6917,12 @@ def build_genes_in_cluster_summary(
     When analysis_id: also returns analysis_name, analysis_exists (bool —
     True iff a ClusteringAnalysis node with this id exists in the KG,
     independent of whether it has any GeneCluster / member genes; api/
-    reports an unknown id as `not_found_analysis`, llm-review 2b.3 Task 5).
+    reports an unknown id as `not_found_analysis`, llm-review 2b.3 Task 5),
+    ca_organism_name (the analysis's own `ClusteringAnalysis.organism_name`
+    property — same convention `_clustering_analysis_where` filters on;
+    api/ compares this against the requested `organism` word-for-word to
+    decide `not_matched_organism`, rather than assuming any zero-row
+    result means a mismatch, llm-review 2b.3 Task 5 controller fix).
     """
     params: dict = {"organism": organism}
 
@@ -6941,21 +6946,27 @@ def build_genes_in_cluster_summary(
         match_block = (
             "OPTIONAL MATCH (ca:ClusteringAnalysis {id: $analysis_id})\n"
             "OPTIONAL MATCH (ca)-[:ClusteringAnalysisHasGeneCluster]->(gc:GeneCluster)\n"
-            "WITH ca, gc, gc.id AS cid, ca.name AS analysis_name\n"
+            "WITH ca, gc, gc.id AS cid, ca.name AS analysis_name,\n"
+            "     ca.organism_name AS ca_organism_name\n"
             "OPTIONAL MATCH (gc)-[r:Gene_in_gene_cluster]->(g:Gene)\n"
             f"WHERE g IS NOT NULL {organism_filter}"
-            "WITH ca, cid, gc, g, analysis_name\n"
+            "WITH ca, cid, gc, g, analysis_name, ca_organism_name\n"
         )
         nf_nm_block = (
             "WITH ca, collect(CASE WHEN g IS NOT NULL THEN\n"
             "       {lt: g.locus_tag, org: g.organism_name,\n"
             "        cat: coalesce(g.gene_category, 'Unknown'),\n"
             "        cid: cid, cname: gc.name} END) AS rows,\n"
-            "     head(collect(DISTINCT analysis_name)) AS analysis_name\n"
+            "     head(collect(DISTINCT analysis_name)) AS analysis_name,\n"
+            "     head(collect(DISTINCT ca_organism_name)) AS ca_organism_name\n"
         )
-        return_suffix = ",\n       analysis_name,\n       analysis_exists"
+        return_suffix = (
+            ",\n       analysis_name,\n       analysis_exists,"
+            "\n       ca_organism_name"
+        )
         not_found_block = (
-            "WITH rows, analysis_name, (ca IS NOT NULL) AS analysis_exists,\n"
+            "WITH rows, analysis_name, ca_organism_name,\n"
+            "     (ca IS NOT NULL) AS analysis_exists,\n"
             "     [] AS not_found_clusters, [] AS not_matched_clusters\n"
         )
     else:
@@ -6995,7 +7006,8 @@ def build_genes_in_cluster_summary(
         "       {cluster_id: cid,\n"
         "        cluster_name: head([r IN rows WHERE r.cid = cid | r.cname]),\n"
         "        count: size([r IN rows WHERE r.cid = cid])}] AS by_cluster"
-        + (",\n     analysis_name,\n     analysis_exists\n"
+        + (",\n     analysis_name,\n     analysis_exists,"
+           "\n     ca_organism_name\n"
            if analysis_id is not None else "\n")
         + "RETURN total_matching, by_organism, by_cluster, by_category_raw,\n"
         f"       not_found_clusters, not_matched_clusters{return_suffix}"

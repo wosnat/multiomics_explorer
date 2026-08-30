@@ -754,6 +754,22 @@ def _closed_vocab_warnings(conn, **params) -> list[str]:
     return warnings
 
 
+def _organism_word_match(query: str, target: str | None) -> bool:
+    """Word-based CONTAINS match, mirroring the Cypher convention used
+    throughout (`_clustering_analysis_where`, `_metabolites_by_*_where`,
+    etc.): every whitespace-split word of `query` (lowercased) must be a
+    substring of `target` (lowercased). `target=None` never matches —
+    callers use that to mean "we don't actually know this entity's
+    organism," which must not be silently treated as a match OR a
+    mismatch by the caller (llm-review 2b.3 Task 5 controller fix).
+    """
+    if not target:
+        return False
+    words = query.lower().split()
+    target_lower = target.lower()
+    return all(w in target_lower for w in words)
+
+
 def _organism_resolves(conn, organism: str | None) -> bool:
     """True if `organism` word-matches at least one gene-bearing
     OrganismTaxon. Shared existence check behind `_organism_zero_match_warning`
@@ -6527,6 +6543,11 @@ def genes_in_cluster(
     that case returns `not_found_analysis=None` with `total_matching=0`.
     A `not_found_analysis` also adds a `warnings` entry pointing at
     `list_clustering_analyses(organism=...)`.
+    not_matched_organism (analysis_id mode): set only when the requested
+    `organism` genuinely differs from the analysis's own organism
+    (compared word-for-word); an analysis that matches your organism but
+    still has zero cluster->gene rows returns `not_matched_organism=None`
+    with `total_matching=0` — a normal empty result, not a mismatch claim.
     Per result (compact): locus_tag, gene_name, product, gene_category,
     organism_name, cluster_id, cluster_name, membership_score.
     Per result (verbose): adds gene_function_description, gene_summary,
@@ -6591,8 +6612,39 @@ def genes_in_cluster(
     envelope["not_found_analysis"] = not_found_analysis
     envelope["warnings"] = warnings
 
-    # Check organism match
-    if organism is not None and total_matching == 0 and not raw_summary["not_found_clusters"]:
+    # Check organism match.
+    #
+    # analysis_id mode: `not_found_clusters` is hardcoded [] in the builder
+    # (see build_genes_in_cluster_summary), so "any zero-row result with
+    # organism set" used to ALWAYS flag not_matched_organism, even when the
+    # analysis genuinely belongs to the requested organism and simply has
+    # zero cluster->gene rows for some other reason. That made the "exists
+    # but empty" case (cluster_enrichment_inputs's third branch) permanently
+    # unreachable (llm-review 2b.3 Task 5 controller fix). Fix: compare the
+    # analysis's own `ca_organism_name` (a direct ClusteringAnalysis
+    # property, same convention `_clustering_analysis_where` filters on)
+    # against the requested `organism` — flag a mismatch only when they
+    # genuinely differ. A missing `ca_organism_name` (unknown analysis, or
+    # a real analysis that somehow carries no organism_name) never counts
+    # as a mismatch here — `not_found_analysis` already covers the unknown
+    # case, and an organism-less analysis falls through to a normal empty
+    # result instead of a manufactured "wrong organism" claim.
+    #
+    # cluster_ids mode: `not_found_clusters` genuinely tracks unknown
+    # cluster_ids there, so a real cluster matched + zero organism-filtered
+    # rows already means "this cluster has no members of that organism" —
+    # unchanged.
+    if analysis_id is not None:
+        ca_organism_name = raw_summary.get("ca_organism_name")
+        if (
+            organism is not None
+            and not _organism_word_match(organism, ca_organism_name)
+            and ca_organism_name is not None
+        ):
+            envelope["not_matched_organism"] = organism
+        else:
+            envelope["not_matched_organism"] = None
+    elif organism is not None and total_matching == 0 and not raw_summary["not_found_clusters"]:
         envelope["not_matched_organism"] = organism
     else:
         envelope["not_matched_organism"] = None

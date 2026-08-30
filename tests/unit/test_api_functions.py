@@ -4855,6 +4855,84 @@ class TestGenesInCluster:
         assert result["not_found_analysis"] is None
         assert result["warnings"] == []
 
+    def test_analysis_id_zero_rows_same_organism_no_mismatch(self, mock_conn):
+        """llm-review 2b.3 Task 5 controller fix: analysis_id mode used to
+        flag not_matched_organism on ANY zero-row result. Now it compares
+        the analysis's own ca_organism_name against the requested organism
+        -- when they genuinely match, zero cluster->gene rows is a normal
+        empty result (not_matched_organism stays None), letting
+        cluster_enrichment_inputs reach its "exists but empty" warning
+        branch instead of misreporting a wrong-organism mismatch."""
+        summary_zero_same_org = {
+            "total_matching": 0,
+            "by_organism": [],
+            "by_cluster": [],
+            "by_category_raw": [],
+            "not_found_clusters": [],
+            "not_matched_clusters": [],
+            "analysis_name": "Test Analysis",
+            "analysis_exists": True,
+            "ca_organism_name": "Prochlorococcus MED4",
+        }
+        mock_conn.execute_query.side_effect = [
+            [summary_zero_same_org],
+            [],  # detail query: no gene rows
+        ]
+        result = api.genes_in_cluster(
+            analysis_id="ca:test", organism="MED4", conn=mock_conn)
+        assert result["not_found_analysis"] is None
+        assert result["not_matched_organism"] is None
+        assert result["total_matching"] == 0
+
+    def test_analysis_id_zero_rows_different_organism_sets_mismatch(self, mock_conn):
+        """The genuine-mismatch case: the analysis's own organism differs
+        from the requested one -> not_matched_organism is set to the
+        requested organism (unchanged contract for a real mismatch)."""
+        summary_zero_diff_org = {
+            "total_matching": 0,
+            "by_organism": [],
+            "by_cluster": [],
+            "by_category_raw": [],
+            "not_found_clusters": [],
+            "not_matched_clusters": [],
+            "analysis_name": "Test Analysis",
+            "analysis_exists": True,
+            "ca_organism_name": "Prochlorococcus MED4",
+        }
+        mock_conn.execute_query.side_effect = [
+            [summary_zero_diff_org],
+            [],  # detail query: no gene rows
+        ]
+        result = api.genes_in_cluster(
+            analysis_id="ca:test", organism="MIT9515", conn=mock_conn)
+        assert result["not_found_analysis"] is None
+        assert result["not_matched_organism"] == "MIT9515"
+        assert result["total_matching"] == 0
+
+    def test_analysis_id_zero_rows_unknown_ca_organism_no_mismatch(self, mock_conn):
+        """A missing ca_organism_name (e.g. a real analysis that somehow
+        carries no organism_name) must never be manufactured into a
+        mismatch -- not_found_analysis / a genuine word-match are the only
+        signals allowed to set not_matched_organism."""
+        summary_zero_no_org = {
+            "total_matching": 0,
+            "by_organism": [],
+            "by_cluster": [],
+            "by_category_raw": [],
+            "not_found_clusters": [],
+            "not_matched_clusters": [],
+            "analysis_name": "Test Analysis",
+            "analysis_exists": True,
+            "ca_organism_name": None,
+        }
+        mock_conn.execute_query.side_effect = [
+            [summary_zero_no_org],
+            [],
+        ]
+        result = api.genes_in_cluster(
+            analysis_id="ca:test", organism="MED4", conn=mock_conn)
+        assert result["not_matched_organism"] is None
+
 
 class TestGeneDerivedMetrics:
     """Unit tests for api.gene_derived_metrics with mocked GraphConnection."""
@@ -7632,19 +7710,49 @@ class TestClusterEnrichmentInputs:
     def test_warning_when_analysis_exists_but_empty(self, monkeypatch):
         """llm-review 2b.3 Task 5 carried-over item: analysis EXISTS,
         organism matches, but zero cluster->gene rows -> a warning, not
-        not_found / not_matched (a normal empty result)."""
+        not_found / not_matched (a normal empty result).
+
+        Controller fix: drives through the REAL `genes_in_cluster` (mocked
+        only at the conn level, matching build_genes_in_cluster_summary's
+        actual analysis_id-mode return shape) rather than hand-building its
+        result dict, so this test proves not_matched_organism=None is a
+        genuine reachable outcome of genes_in_cluster's own organism-match
+        logic (ca_organism_name == requested organism), not an assumption.
+        """
         import multiomics_explorer.analysis.enrichment as enr
         import multiomics_explorer.api.functions as f
-        empty_result = {
-            **self._CLUSTER_RESULT,
-            "total_matching": 0, "results": [], "returned": 0,
-            "not_found_analysis": None,
-            "not_matched_organism": None,
-        }
-        monkeypatch.setattr(f, "genes_in_cluster", lambda **_: empty_result)
-        monkeypatch.setattr(f, "list_clustering_analyses", lambda **_: self._ANALYSIS_META)
+
+        class _StubConn:
+            """Mimics the real 2-query dispatch genes_in_cluster runs in
+            analysis_id mode (limit=None -> summary, then detail)."""
+
+            def __init__(self):
+                self.calls = 0
+
+            def execute_query(self, cypher, **params):
+                self.calls += 1
+                if self.calls == 1:
+                    # Real build_genes_in_cluster_summary shape
+                    # (analysis_id mode): analysis exists, its own
+                    # organism_name matches the requested organism
+                    # word-for-word, but zero cluster->gene rows.
+                    return [{
+                        "total_matching": 0,
+                        "by_organism": [],
+                        "by_cluster": [],
+                        "by_category_raw": [],
+                        "not_found_clusters": [],
+                        "not_matched_clusters": [],
+                        "analysis_name": "Test Analysis",
+                        "analysis_exists": True,
+                        "ca_organism_name": "Prochlorococcus MED4",
+                    }]
+                return []  # detail query: no gene rows
+
+        monkeypatch.setattr(
+            f, "list_clustering_analyses", lambda **_: self._ANALYSIS_META)
         inputs = enr.cluster_enrichment_inputs(
-            analysis_id="ca:test", organism="MED4")
+            analysis_id="ca:test", organism="MED4", conn=_StubConn())
         assert inputs.not_found == []
         assert inputs.not_matched == []
         assert any(
