@@ -11,7 +11,10 @@ Sizes: **S** ≤ half a day, no spec · **M** a day, one-page spec (Mode B) · *
 
 | # | Item | Size | Notes |
 |---|---|---|---|
-| 1.1 | `/release-explorer 0.1.0-alpha.5` — cuts `[Unreleased]`, tags, builds, publishes; pushes `main` (~87 commits ahead of origin). | S | Preflight: pinned `EXPECTED_CONTROLLED_VOCABULARIES_HASH` (`sha256:d7191e2a…`, 2026-08-28 dev build) must equal the live KG's at the cut (R6 flag counts verified fixed 2026-08-29; hash unchanged). |
+| 2b.5 | **Schema diet.** Five-slot description template ≤150 tok; shared Field constants (organism ×27, trust filters ×5, informative_only ×5, metabolite-id coercion ×6); twin-name alignment with one-release aliases (`min_value`/`value_min`, `bucket`/`metric_bucket`, `flag`/`flag_value`, `category`→`gene_categories`, `publication_doi(s)`, `treatment_type` str→list on `list_publications`, `direction` enums); drop the `has_p_value` surface until the KG ships p-values; decide the `outputSchema` policy (342 KB of the 508 KB tools/list). | M | Pre-cut (decided 2026-08-30): alpha.5 already bumps `mcp_min_version`, so renames/aliases ride the same breaking boundary. Do first. Spec: `docs/superpowers/specs/2026-08-30-llm-review-2b5-schema-diet-design.md`. |
+| 2b.4 | **Discovery layer.** `docs://index` (~600 tok, sizes + read-when), guides registered first, instructions carry sizes + the `summary=True` habit; generated tool pages split brief / `/full` with capped example blocks (`kg_schema` page 26k → ~1k); `conventions` cut to its ~4.5k cross-tool core with `annotation_evidence` / `metabolites` as canonical homes (absorbs 3.15); `start_here` trimmed to family table + shapes, add cross-feeding and DE-by-functional-class recipes, step 0 for enrichment; `examples/*.py` scenario TOC. | M | Pre-cut (decided 2026-08-30): the 1.3 eval exercises exactly this surface. Do after 2b.5 so docs describe the settled schema. |
+| 2b.6a | `treatment_type` / `background_factors` filters on both DE tools (split out of 2b.6 — query change, no release boundary needed). | S | Pre-cut, after 2b.5. |
+| 1.1 | After 2b.5 + 2b.6a + 2b.4: `/release-explorer 0.1.0-alpha.5` — cuts `[Unreleased]`, tags, builds, publishes; pushes `main` (~87 commits ahead of origin). | S | Preflight: pinned `EXPECTED_CONTROLLED_VOCABULARIES_HASH` (`sha256:d7191e2a…`, 2026-08-28 dev build) must equal the live KG's at the cut (R6 flag counts verified fixed 2026-08-29; hash unchanged). |
 | 1.2 | KG cut pairing: `Schema_info.version = 0.1.0-alpha.7`, `mcp_min_version = 0.1.0a5` (new tool ⇒ a4 clients rejected), `release_highlights` / `breaking_changes` stamped. | KG | Highlights + breaking list drafted in §4 A1 below. |
 | 1.3 | Eval pass on the annotation-trust surface in `multiomics_research` (protease vs dead-homolog, urea transporter ranking, InterPro superfamily ORA on a dark-survival cluster). | M | The contract gates are green; only agent-driven runs show whether routing / warnings / `docs://` pages lead to the right tool. Roadmap "stress test" step. |
 
@@ -21,21 +24,11 @@ Sizes: **S** ≤ half a day, no spec · **M** a day, one-page spec (Mode B) · *
 |---|---|---|---|
 | 2.8 | `organism=` word-match backlog: genus node `Alteromonas` matches all strains; `AltDE` matches `AltDE1`. Resolver gates on `gene_count > 0` so treatment taxa are safe (KG B4 removes the last name collision). | M | slice-2 ledger |
 
-### 2b. From the KG hand-off 2026-08-28 (`multiomics_biocypher_kg/docs/kg-changes/2026-08-28-explorer-handoff.md`)
-
-Shipped 2026-08-28 against the 11:58Z dev build: HO-001 two-state strings (`two_state()` helper, hash re-pinned), HO-002 taxid + `name_synonyms` resolver, `genes_by_boolean_metric` flag=False doc correction. Still open:
-
-| # | Item | Size | Origin |
-|---|---|---|---|
-| 2.13 | ~~2.9~~ shipped 2026-08-29 (`kg_count` fixture; ~30 paper-batch-fragile pins now assert against live Cypher / node precomputes). Left as deliberate guards: chemistry counts (`list_metabolites` N / N+P / MED4+N), Phase-5 metabolomics §7 fixtures, `cases.yaml` eval snapshots (rankable 42/41). `Schema_info.*_count` not needed after all — per-count live queries were more precise. | — | R4 |
-
 ## 2b. LLM-consumer review 2026-08-29 (six-reviewer pass; report artifact `Explorer MCP Through an LLM's Eyes`, raw reports in session scratchpad)
 
 | # | Item | Size | Status |
 |---|---|---|---|
-| 2b.4 | **Discovery layer.** `docs://index` (~600 tok, sizes + read-when), guides registered first, instructions carry sizes + the `summary=True` habit; generated tool pages split brief / `/full` with capped example blocks (`kg_schema` page 26k → ~1k); `conventions` cut to its ~4.5k cross-tool core with `annotation_evidence` / `metabolites` as canonical homes (absorbs 3.15); `start_here` trimmed to family table + shapes, add cross-feeding and DE-by-functional-class recipes, step 0 for enrichment; `examples/*.py` scenario TOC. | M | queued |
-| 2b.5 | **Schema diet.** Five-slot description template ≤150 tok; shared Field constants (organism ×27, trust filters ×5, informative_only ×5, metabolite-id coercion ×6); twin-name alignment with one-release aliases (`min_value`/`value_min`, `bucket`/`metric_bucket`, `flag`/`flag_value`, `category`→`gene_categories`, `publication_doi(s)`, `treatment_type` str→list on `list_publications`, `direction` enums); drop the `has_p_value` surface until the KG ships p-values; decide the `outputSchema` policy (342 KB of the 508 KB tools/list). | M | queued |
-| 2b.6 | **Consolidation** (release boundary + KG `mcp_min_version`). Merge `metabolites_by_quantifies_assay` + `metabolites_by_flags_assay` → `metabolites_by_assay`; merge or front the three `genes_by_*_metric`; `treatment_type` / `background_factors` filters on both DE tools; `SKILL.md` for the skill tree and collapse CLAUDE.md's tool table; delete the research repo's duplicate python guide + fix its dangling `docs://analysis/to_dataframe` link. | L | queued |
+| 2b.6 | **Consolidation** (release boundary + KG `mcp_min_version`). Kept post-cut 2026-08-30 — tool merges too risky before alpha.5; means alpha.6 is a second breaking release. Merge `metabolites_by_quantifies_assay` + `metabolites_by_flags_assay` → `metabolites_by_assay`; merge or front the three `genes_by_*_metric`; `SKILL.md` for the skill tree and collapse CLAUDE.md's tool table; delete the research repo's duplicate python guide + fix its dangling `docs://analysis/to_dataframe` link. | L | queued |
 
 ## 3. Older backlog — verified 2026-08-28
 
@@ -66,7 +59,7 @@ Filed in chat 2026-08-28; the non-release set (B1–B3, new B5 rebuild-#3 ping, 
 
 **A — for the alpha.7 cut (P1)**
 - A1. Stamp `Schema_info` at the cut: `version 0.1.0-alpha.7`, `mcp_min_version 0.1.0a5`, `git_sha_short`, `release_highlights` (KG-SYNC-005 trust surface; KG-SYNC-006 paper batch 49 pubs / 209 experiments / 48 organisms incl. WH8109; ORG-001 organism rollups; `controlled_vocabularies_hash` recipe; dense non-empty `treatment_type` / `background_factors` with `rna_decay` / `tss_mapping` / `genomic_analysis` / `oxygen`; Bernstein 2017 relabel; sparse `table_scope`), `breaking_changes` (InterPro `gene_count` direct → subtree; ncbifam `score` → `bit_score`; MeropsFamily `family_type` → `family_class`; `treatment_type: []` no longer occurs; `table_scope ""` → absent).
-- A2. Hash freeze until the cut: no `ControlledVocabulary` value / `min_size` / `signals` edits without telling the explorer (description-only edits are hash-neutral).
+- A2. Hash freeze until the cut (extended ~1 week for 2b.5 + 2b.4, 2026-08-30): no `ControlledVocabulary` value / `min_size` / `signals` edits without telling the explorer (description-only edits are hash-neutral).
 
 **B — small, whenever (P3)**
 - ~~B1~~ landed in the 2026-08-29 08:53Z rebuild (`value_descriptions` on 39 of 122 `ControlledVocabulary` nodes, hash-neutral). 2.3 is unblocked.
