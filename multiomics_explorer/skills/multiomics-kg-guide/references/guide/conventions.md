@@ -86,17 +86,16 @@ not just the top 10). Affected: `list_experiments` / `list_organisms`
 `genes_by_metabolite` / `metabolites_by_gene` (`top_genes`, `top_reactions`,
 `top_tcdb_families`, `top_metabolite_pathways`, `by_element`),
 `differential_expression_by_gene` / `differential_expression_by_ortholog`
-(`experiments`), and `pathway_enrichment` (`by_experiment`). `resolve_gene`
-and `list_publications` have no `summary=` param, so their capped rollups
-(`by_organism`; `by_organism` and `by_metric_type` respectively) are always
-capped when they exceed 10 — page `results`, or use `list_organisms` /
-`list_experiments(summary=True)` for the full breakdown.
+(`experiments`), `pathway_enrichment` (`by_experiment`), and `resolve_gene`
+/ `list_publications` (`by_organism`; `by_organism` and `by_metric_type`
+respectively) — `summary=True` restores the full list, so the `by_organism`
+counts always sum to `total_matching`.
 `pathway_enrichment`'s `top_pathways_by_padj` is a genuine top-10 in both
 modes (not capped-with-a-flag): it carries no `_truncated` companion key.
 
 ### `summary=True` mode
 
-**34 of 42 tools accept `summary=True`** — nearly universal across
+**36 of 42 tools accept `summary=True`** — nearly universal across
 discovery, drill-down, gene-anchored, ontology, and enrichment surfaces.
 With `summary=True` the call returns only the envelope (`results=[]`,
 `returned=0`; `truncated` is `true` whenever rows were withheld and
@@ -105,9 +104,8 @@ any question that doesn't already specify exact IDs — the rollups
 characterize the full matched set before you commit to a slice.
 Pattern: `summary=True` → narrow filters → drop `summary=True` for detail.
 
-The 8 tools without `summary=`: `kg_schema`, `kg_release_info`, `ontology_term_details`,
-`list_filter_values`, `resolve_gene`, `list_publications`,
-`gene_response_profile`, `run_cypher`. These either return small fixed
+The 6 tools without `summary=`: `kg_schema`, `kg_release_info`, `ontology_term_details`,
+`list_filter_values`, `gene_response_profile`, `run_cypher`. These either return small fixed
 sets, are themselves summaries (`gene_response_profile`), take a bounded
 batch (`ontology_term_details`), or have raw / shape-specific output
 (`run_cypher`, `kg_schema`).

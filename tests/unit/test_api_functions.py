@@ -17927,7 +17927,7 @@ class TestResolveGeneBreakdownCap:
         ]
 
     def test_by_organism_capped_at_ten(self, mock_conn):
-        """resolve_gene has no summary param — always capped when > 10."""
+        """Detail call (summary=False) caps by_organism at 10."""
         mock_conn.execute_query.return_value = self._genes(12)
         result = api.resolve_gene("PMM", limit=50, conn=mock_conn)
         assert len(result["by_organism"]) == 10
@@ -17938,6 +17938,22 @@ class TestResolveGeneBreakdownCap:
         result = api.resolve_gene("PMM", limit=50, conn=mock_conn)
         assert len(result["by_organism"]) == 5
         assert "by_organism_truncated" not in result
+
+    def test_summary_true_returns_full_by_organism_and_no_rows(self, mock_conn):
+        """backlog 2b.7: summary=True uncaps by_organism; results empty."""
+        mock_conn.execute_query.return_value = self._genes(12)
+        result = api.resolve_gene("PMM", summary=True, conn=mock_conn)
+        assert len(result["by_organism"]) == 12
+        assert "by_organism_truncated" not in result
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["total_matching"] == 12
+        assert result["truncated"] is True
+
+    def test_summary_true_with_no_matches_is_not_truncated(self, mock_conn):
+        mock_conn.execute_query.return_value = []
+        result = api.resolve_gene("nope", summary=True, conn=mock_conn)
+        assert result["results"] == [] and result["truncated"] is False
 
 
 class TestGenesByFunctionBreakdownCap:
@@ -17976,21 +17992,40 @@ class TestListPublicationsBreakdownCap:
         "clustering_analysis_count": 0, "cluster_types": [],
     }
 
-    def test_by_organism_capped_no_summary_param(self, mock_conn):
-        """list_publications has no summary param — always capped when > 10."""
-        summary_row = {
-            "total_entries": 12, "total_matching": 12,
+    @staticmethod
+    def _summary_row(n=12):
+        return {
+            "total_entries": n, "total_matching": n,
             "by_organism": [
-                {"item": f"Organism {i:02d}", "count": 12 - i} for i in range(12)
+                {"item": f"Organism {i:02d}", "count": n - i} for i in range(n)
             ],
             "by_treatment_type": [], "by_background_factors": [],
             "by_omics_type": [],
         }
-        mock_conn.execute_query.side_effect = [[summary_row], [dict(self._PUB_BASE)]]
+
+    def test_by_organism_capped_on_detail_call(self, mock_conn):
+        """Detail call (summary=False) caps by_organism at 10."""
+        mock_conn.execute_query.side_effect = [[self._summary_row(12)], [dict(self._PUB_BASE)]]
         result = api.list_publications(conn=mock_conn)
         assert len(result["by_organism"]) == 10
         assert result["by_organism_truncated"] is True
         assert result["by_organism"][0]["organism_name"] == "Organism 00"
+
+    def test_summary_true_skips_detail_query_and_uncaps(self, mock_conn):
+        """backlog 2b.7: summary=True runs only the summary Cypher, returns
+        by_organism uncapped and no rows."""
+        mock_conn.execute_query.side_effect = [[self._summary_row(12)]]
+        result = api.list_publications(summary=True, conn=mock_conn)
+        assert len(result["by_organism"]) == 12
+        assert "by_organism_truncated" not in result
+        assert result["results"] == [] and result["returned"] == 0
+        assert result["truncated"] is True
+        assert mock_conn.execute_query.call_count == 1
+
+    def test_summary_true_no_matches_not_truncated(self, mock_conn):
+        mock_conn.execute_query.side_effect = [[self._summary_row(0)]]
+        result = api.list_publications(summary=True, conn=mock_conn)
+        assert result["truncated"] is False and result["results"] == []
 
 
 class TestListExperimentsBreakdownCap:

@@ -2030,8 +2030,8 @@ def register_tools(mcp: FastMCP):
     class ResolveGeneResponse(BaseModel):
         total_matching: int = Field(description="Total genes matching identifier + organism filter.")
         by_organism: list[ResolveOrganismBreakdown] = Field(description="Match counts per organism, sorted desc.")
-        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — page `results` with `limit`/`offset`, or pass `organism=` to narrow the match.")
-        returned: int = Field(description="Genes in this response.")
+        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 on a detail call — pass summary=True for the full breakdown, or organism= to narrow.")
+        returned: int = Field(description="Genes in this response (0 when summary=True).")
         offset: int = Field(default=0, description="Offset into full result set.")
         truncated: bool = Field(description="True if total_matching > returned.")
         results: list[GeneMatch] = Field(description="Matching genes sorted by organism_name, locus_tag.")
@@ -2057,16 +2057,20 @@ def register_tools(mcp: FastMCP):
         offset: Annotated[int, Field(
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
+        summary: Annotated[bool, Field(
+            description="Envelope only: results=[], by_organism uncapped. Use first when a name may hit many strains.",
+        )] = False,
     ) -> ResolveGeneResponse:
         """Resolve a gene identifier (locus_tag, gene name, old locus_tag, or RefSeq protein ID) to matching Gene nodes. Matching is case-insensitive.
 
         Routing: feed returned `locus_tag`s into `gene_overview` (data-availability triage), `gene_details` (full properties), `gene_homologs`, or `gene_ontology_terms`. The optional `organism` filter is a word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word matches every strain).
         """
-        await ctx.info(f"resolve_gene identifier={identifier} organism={organism} offset={offset}")
+        await ctx.info(f"resolve_gene identifier={identifier} organism={organism} offset={offset} summary={summary}")
         try:
             conn = _conn(ctx)
             result = api.resolve_gene(
-                identifier, organism=organism, limit=limit, offset=offset, conn=conn,
+                identifier, organism=organism, limit=limit, offset=offset,
+                summary=summary, conn=conn,
             )
             genes = [GeneMatch(**r) for r in result["results"]]
             by_organism = [ResolveOrganismBreakdown(**b) for b in result["by_organism"]]
@@ -3847,17 +3851,17 @@ def register_tools(mcp: FastMCP):
         total_entries: int = Field(description="Total publications in KG (unfiltered).")
         total_matching: int = Field(description="Publications matching filters.")
         by_organism: list[PubOrganismBreakdown] = Field(description="Publication counts per organism, sorted desc.")
-        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — page `results`, or `list_organisms` / `list_experiments(summary=True)` for full breakdowns.")
+        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 on a detail call — pass summary=True for the full breakdown.")
         by_treatment_type: list[PubTreatmentTypeBreakdown] = Field(description="Publication counts per treatment type, sorted desc.")
         by_background_factors: list[PubBackgroundFactorBreakdown] = Field(description="Publication counts per background factor, sorted desc.")
         by_omics_type: list[PubOmicsTypeBreakdown] = Field(description="Publication counts per omics platform, sorted desc.")
         by_cluster_type: list[PubClusterTypeBreakdown] = Field(default_factory=list, description="Publication counts per cluster type, sorted desc.")
         by_value_kind: list[PubValueKindBreakdown] = Field(default_factory=list, description="DerivedMetric value kind frequency rollup across matched publications.")
         by_metric_type: list[PubMetricTypeBreakdown] = Field(default_factory=list, description="DerivedMetric type frequency rollup across matched publications.")
-        by_metric_type_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — page `results`, or `list_organisms` / `list_experiments(summary=True)` for full breakdowns.")
+        by_metric_type_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 on a detail call — pass summary=True for the full breakdown.")
         by_compartment: list[PubCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched publications.")
         by_discusses_coverage: PubDiscussesCoverageBreakdown = Field(default_factory=PubDiscussesCoverageBreakdown, description="Binary split {has_discusses, no_discusses} of matched publications by whether they carry a narrative 'discusses' literature index (45 vs 4 in the current KG).")
-        returned: int = Field(description="Publications in this response.")
+        returned: int = Field(description="Publications in this response (0 when summary=True).")
         offset: int = Field(default=0, description="Offset into full result set.")
         truncated: bool = Field(description="True if total_matching > returned.")
         not_found: list[str] = Field(default_factory=list, description="Input publication_dois that did not match any Publication node (empty unless publication_dois was provided).")
@@ -3915,6 +3919,9 @@ def register_tools(mcp: FastMCP):
         offset: Annotated[int, Field(
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
+        summary: Annotated[bool, Field(
+            description="Envelope only: results=[], every by_* rollup uncapped. Use first, then narrow filters.",
+        )] = False,
     ) -> ListPublicationsResponse:
         """List publications with experiment summaries, DM rollups, and metabolomics rollups. Use as the discovery entry point for studies.
 
@@ -3922,7 +3929,7 @@ def register_tools(mcp: FastMCP):
         """
         await ctx.info(f"list_publications organism={organism} treatment_type={treatment_type} "
                        f"growth_phases={growth_phases} search_text={search_text} author={author} "
-                       f"compartment={compartment} offset={offset}")
+                       f"compartment={compartment} offset={offset} summary={summary}")
         try:
             conn = _conn(ctx)
             result = api.list_publications(
@@ -3932,7 +3939,8 @@ def register_tools(mcp: FastMCP):
                 search_text=search_text, author=author,
                 publication_dois=publication_dois,
                 compartment=compartment,
-                verbose=verbose, limit=limit, offset=offset, conn=conn,
+                verbose=verbose, limit=limit, offset=offset,
+                summary=summary, conn=conn,
             )
             results = [PublicationResult(**r) for r in result["results"]]
             by_organism = [PubOrganismBreakdown(**b) for b in result["by_organism"]]

@@ -1355,14 +1355,19 @@ def resolve_gene(
     organism: str | None = None,
     limit: int | None = None,
     offset: int = 0,
+    summary: bool = False,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
     """Resolve a gene identifier to matching graph nodes.
 
-    Returns dict with keys: total_matching, by_organism, returned, truncated,
-    results.
+    Returns dict with keys: total_matching, by_organism, returned, offset,
+    truncated, results.
     Per result: locus_tag, gene_name, product, organism_name.
+
+    by_organism is capped to 10 entries on detail calls
+    (`by_organism_truncated: True` when trimmed); summary=True returns it
+    uncapped with results=[], returned=0, truncated = total_matching > 0.
     """
     if not identifier or not identifier.strip():
         logger.debug("resolve_gene: empty identifier")
@@ -1383,16 +1388,19 @@ def resolve_gene(
         reverse=True,
     )
 
-    results = all_results[offset:offset + limit] if limit else all_results[offset:]
+    if summary:
+        results = []
+    else:
+        results = all_results[offset:offset + limit] if limit else all_results[offset:]
     envelope = {
         "total_matching": total,
         "by_organism": by_organism,
         "returned": len(results),
         "offset": offset,
-        "truncated": total > offset + len(results),
+        "truncated": (total > 0) if summary else (total > offset + len(results)),
         "results": results,
     }
-    return _cap_breakdowns(envelope, ("by_organism",), summary=False)
+    return _cap_breakdowns(envelope, ("by_organism",), summary=summary)
 
 
 def genes_by_function(
@@ -2441,6 +2449,7 @@ def list_publications(
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
+    summary: bool = False,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -2450,6 +2459,11 @@ def list_publications(
     truncated, by_organism, by_treatment_type, by_background_factors,
     by_omics_type, by_cluster_type, by_value_kind, by_metric_type,
     by_compartment, by_discusses_coverage, not_found, warnings, results.
+
+    summary=True: results=[], returned=0, truncated = total_matching > 0,
+    and every by_* rollup is returned uncapped (detail calls cap
+    by_organism / by_metric_type to 10 with a `<key>_truncated` flag).
+    The detail Cypher is skipped entirely.
 
     warnings: a closed-vocabulary filter value (treatment_type /
     background_factors / growth_phases / compartment) not in the live
@@ -2478,6 +2492,8 @@ def list_publications(
     shape on sibling list_* tools (list_experiments.experiment_ids).
     `not_found` in the envelope lists any provided DOIs that did not match.
     """
+    # `summary` is rebound to the summary *row* below — keep the flag apart.
+    summary_flag = summary
     conn = _default_conn(conn)
     warnings = _closed_vocab_warnings(
         conn, treatment_type=treatment_type,
@@ -2497,15 +2513,19 @@ def list_publications(
     def _execute(st=search_text, final=False):
         kw = {**filter_kwargs, "search_text": st}
         summary_cypher, summary_params = build_list_publications_summary(**kw)
+        if final:
+            summary_row = _run_fulltext(conn, summary_cypher, summary_params, st)[0]
+        else:
+            summary_row = conn.execute_query(summary_cypher, **summary_params)[0]
+        if summary_flag:
+            return summary_row, []
         data_cypher, data_params = build_list_publications(
             **kw, verbose=verbose,
         )
         if final:
-            summary_row = _run_fulltext(conn, summary_cypher, summary_params, st)[0]
             # Fetch all matching detail rows, then slice for results.
             all_results = _run_fulltext(conn, data_cypher, data_params, st)
         else:
-            summary_row = conn.execute_query(summary_cypher, **summary_params)[0]
             all_results = conn.execute_query(data_cypher, **data_params)
         return summary_row, all_results
 
@@ -2519,7 +2539,10 @@ def list_publications(
         else:
             raise
 
-    results = all_results[offset:offset + limit] if limit else all_results[offset:]
+    if summary_flag:
+        results = []
+    else:
+        results = all_results[offset:offset + limit] if limit else all_results[offset:]
 
     # Gate verbose-only fields
     if not verbose:
@@ -2568,12 +2591,17 @@ def list_publications(
         "by_discusses_coverage": summary.get("by_discusses_coverage", {}),
         "returned": len(results),
         "offset": offset,
-        "truncated": summary["total_matching"] > offset + len(results),
+        "truncated": (
+            (summary["total_matching"] > 0) if summary_flag
+            else summary["total_matching"] > offset + len(results)
+        ),
         "not_found": not_found,
         "warnings": warnings,
         "results": results,
     }
-    return _cap_breakdowns(envelope, ("by_metric_type", "by_organism"), summary=False)
+    return _cap_breakdowns(
+        envelope, ("by_metric_type", "by_organism"), summary=summary_flag,
+    )
 
 
 def list_experiments(

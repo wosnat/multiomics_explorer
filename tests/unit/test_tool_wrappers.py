@@ -699,6 +699,20 @@ class TestResolveGeneWrapper:
         assert result.results == []
 
     @pytest.mark.asyncio
+    async def test_summary_param_forwarded(self, tool_fns, mock_ctx):
+        """backlog 2b.7: resolve_gene accepts summary= and threads it to the api."""
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            return_value={"total_matching": 3, "by_organism": [], "returned": 0,
+                          "offset": 0, "truncated": True, "results": []},
+        ) as m:
+            result = await tool_fns["resolve_gene"](
+                mock_ctx, identifier="dnaN", summary=True,
+            )
+        assert m.call_args.kwargs["summary"] is True
+        assert result.results == [] and result.truncated is True
+
+    @pytest.mark.asyncio
     async def test_multi_match_flat_list(self, tool_fns, mock_ctx):
         """Multiple results from different organisms are a flat list, not grouped."""
         with patch(
@@ -2376,6 +2390,22 @@ class TestListPublicationsWrapper:
         ):
             result = await tool_fns["list_publications"](mock_ctx)
         assert result.warnings == ["x"]
+
+    @pytest.mark.asyncio
+    async def test_summary_param_forwarded(self, tool_fns, mock_ctx):
+        """backlog 2b.7: list_publications accepts summary= and threads it."""
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={
+                "total_entries": 1, "total_matching": 1,
+                "by_organism": [], "by_treatment_type": [],
+                "by_background_factors": [], "by_omics_type": [],
+                "returned": 0, "truncated": True, "results": [],
+            },
+        ) as m:
+            result = await tool_fns["list_publications"](mock_ctx, summary=True)
+        assert m.call_args.kwargs["summary"] is True
+        assert result.results == [] and result.truncated is True
 
     @pytest.mark.asyncio
     async def test_returns_dict_envelope(self, tool_fns, mock_ctx):

@@ -21,6 +21,7 @@ Routing: drill via `list_experiments(publication_doi=[doi])` for per-experiment 
 | verbose | bool | False | Include abstract and description. Default compact for routing. |
 | limit | int | 5 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
+| summary | bool | False | Envelope only: results=[], every by_* rollup uncapped. Use first, then narrow filters. |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 
@@ -35,17 +36,17 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 - **total_entries** (int): Total publications in KG (unfiltered).
 - **total_matching** (int): Publications matching filters.
 - **by_organism** (list[PubOrganismBreakdown]): Publication counts per organism, sorted desc.
-- **by_organism_truncated** (bool | None): True when the list was capped at 10 — page `results`, or `list_organisms` / `list_experiments(summary=True)` for full breakdowns.
+- **by_organism_truncated** (bool | None): True when the list was capped at 10 on a detail call — pass summary=True for the full breakdown.
 - **by_treatment_type** (list[PubTreatmentTypeBreakdown]): Publication counts per treatment type, sorted desc.
 - **by_background_factors** (list[PubBackgroundFactorBreakdown]): Publication counts per background factor, sorted desc.
 - **by_omics_type** (list[PubOmicsTypeBreakdown]): Publication counts per omics platform, sorted desc.
 - **by_cluster_type** (list[PubClusterTypeBreakdown]): Publication counts per cluster type, sorted desc.
 - **by_value_kind** (list[PubValueKindBreakdown]): DerivedMetric value kind frequency rollup across matched publications.
 - **by_metric_type** (list[PubMetricTypeBreakdown]): DerivedMetric type frequency rollup across matched publications.
-- **by_metric_type_truncated** (bool | None): True when the list was capped at 10 — page `results`, or `list_organisms` / `list_experiments(summary=True)` for full breakdowns.
+- **by_metric_type_truncated** (bool | None): True when the list was capped at 10 on a detail call — pass summary=True for the full breakdown.
 - **by_compartment** (list[PubCompartmentBreakdown]): Wet-lab compartment frequency rollup across matched publications.
 - **by_discusses_coverage** (PubDiscussesCoverageBreakdown): Binary split {has_discusses, no_discusses} of matched publications by whether they carry a narrative 'discusses' literature index (45 vs 4 in the current KG).
-- **returned** (int): Publications in this response.
+- **returned** (int): Publications in this response (0 when summary=True).
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if total_matching > returned.
 - **not_found** (list[string]): Input publication_dois that did not match any Publication node (empty unless publication_dois was provided).

@@ -160,11 +160,11 @@ This index is a router, NOT exhaustive and NOT expression — use `differential_
 
 ## When to call `summary=True` first
 
-34 of 42 tools accept `summary=True`: the call returns only the envelope
+36 of 42 tools accept `summary=True`: the call returns only the envelope
 rollups (`by_organism`, `by_treatment_type`, `top_*`, counts) computed
 over the **full matched set**, with `results=[]`. Pattern:
 `summary=True` → look at rollups → narrow with filters → drop
-`summary=True` to fetch detail rows. Which 8 tools lack it, and what
+`summary=True` to fetch detail rows. Which 6 tools lack it, and what
 `truncated` means in summary mode: `docs://guide/conventions`
 "`summary=True` mode".
 

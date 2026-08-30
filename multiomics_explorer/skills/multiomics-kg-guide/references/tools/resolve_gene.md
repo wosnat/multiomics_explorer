@@ -14,6 +14,7 @@ Routing: feed returned `locus_tag`s into `gene_overview` (data-availability tria
 | organism | string \| None | None | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word like 'Alteromonas' matches every strain). E.g. 'MED4', 'Prochlorococcus MED4'. |
 | limit | int | 5 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
+| summary | bool | False | Envelope only: results=[], by_organism uncapped. Use first when a name may hit many strains. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -27,8 +28,8 @@ total_matching, by_organism, returned, offset, truncated, results
 
 - **total_matching** (int): Total genes matching identifier + organism filter.
 - **by_organism** (list[ResolveOrganismBreakdown]): Match counts per organism, sorted desc.
-- **by_organism_truncated** (bool | None): True when the list was capped at 10 — page `results` with `limit`/`offset`, or pass `organism=` to narrow the match.
-- **returned** (int): Genes in this response.
+- **by_organism_truncated** (bool | None): True when the list was capped at 10 on a detail call — pass summary=True for the full breakdown, or organism= to narrow.
+- **returned** (int): Genes in this response (0 when summary=True).
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if total_matching > returned.
 
