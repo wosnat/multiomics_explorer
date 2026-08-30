@@ -3461,8 +3461,8 @@ class TestMetabolitesByQuantifiesAssayKG:
             for w in result["warnings"]
         ), result["warnings"]
 
-    def test_value_min_strips_tested_absent(self, conn):
-        """Parent §10 anti-pattern: `value_min=0.001` slashes the
+    def test_min_value_strips_tested_absent(self, conn):
+        """Parent §10 anti-pattern: `min_value=0.001` slashes the
         not_detected bucket — tested-absent rows have value=0. Confirms
         the silent-drop hazard and surfaces the caller-controlled choice."""
         from multiomics_explorer.api import metabolites_by_quantifies_assay
@@ -3472,10 +3472,10 @@ class TestMetabolitesByQuantifiesAssayKG:
         baseline_det = {b["detection_status"]: b["count"]
                         for b in baseline["by_detection_status"]}
         assert baseline_det["not_detected"] == 7
-        # With value_min=0.001 the not_detected bucket evaporates.
+        # With min_value=0.001 the not_detected bucket evaporates.
         filtered = metabolites_by_quantifies_assay(
             assay_ids=[_MIT9313_CHITOSAN_ASSAY],
-            value_min=0.001, summary=True, conn=conn)
+            min_value=0.001, summary=True, conn=conn)
         filt_det = {b["detection_status"]: b["count"]
                     for b in filtered["by_detection_status"]}
         assert filt_det.get("not_detected", 0) == 0

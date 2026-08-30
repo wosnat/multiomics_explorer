@@ -37,14 +37,14 @@ the metabolomics decision tree.
 | treatment_type | list[string] \| None | None | Treatment type(s) (ANY-overlap, case-insensitive). E.g. ['carbon']. |
 | background_factors | list[string] \| None | None | Background factor(s) (ANY-overlap). E.g. ['axenic']. |
 | growth_phases | list[string] \| None | None | Growth phase(s) (ANY-overlap). Currently unpopulated — KG-side backfill pending. |
-| value_min | float \| None | None | Lower bound on `value` (raw concentration / intensity). **Caution**: `value > 0` strips tested-absent rows (`value=0` / `detection_status='not_detected'`) — use deliberately, never as default. See `docs://guide/conventions`. |
-| value_max | float \| None | None | Upper bound on `value`. Always applicable. |
+| min_value | float \| None | None | Lower bound on `value` (raw concentration / intensity). **Caution**: `value > 0` strips tested-absent rows (`value=0` / `detection_status='not_detected'`) — use deliberately, never as default. See `docs://guide/conventions`. |
+| max_value | float \| None | None | Upper bound on `value`. Always applicable. |
 | detection_status | list[string] \| None | None | Detection-status filter — primary qualitative headline. Values: 'detected', 'sporadic', 'not_detected'. Excluding 'not_detected' strips tested-absent rows; surface as caller choice, never default. See `docs://guide/conventions`. |
 | timepoint | list[string] \| None | None | Timepoint label(s) — exact match. E.g. ['4 days'], ['6 days']. Non-temporal experiments expose no timepoint here (rows surface with `timepoint=null`). |
 | metric_bucket | list[string] \| None | None | Bucket label(s) — subset of {'top_decile','top_quartile','mid','low'}. **Rankable-gated** — raises if every selected assay has `rankable=false`. Soft-excludes non-rankable assays from mixed input (surfaced in envelope `excluded_assays`). Tested-absent rows (`detection_status='not_detected'`) never match — their `metric_bucket` is nulled for display regardless of the stored value. |
-| metric_percentile_min | float \| None | None | Lower bound on `metric_percentile` (0-100). **Rankable-gated.** Tested-absent rows (`detection_status='not_detected'`) never match — their `metric_percentile` is nulled for display. |
-| metric_percentile_max | float \| None | None | Upper bound on `metric_percentile`. **Rankable-gated.** Tested-absent rows (`detection_status='not_detected'`) never match — their `metric_percentile` is nulled for display. |
-| rank_by_metric_max | int \| None | None | Cap on `rank_by_metric` (1 = highest). Top-N drill-down. **Rankable-gated.** Tested-absent rows (`detection_status='not_detected'`) never match — their `rank_by_metric` is nulled for display. |
+| min_percentile | float \| None | None | Lower bound on `metric_percentile` (0-100). **Rankable-gated.** Tested-absent rows (`detection_status='not_detected'`) never match — their `metric_percentile` is nulled for display. |
+| max_percentile | float \| None | None | Upper bound on `metric_percentile`. **Rankable-gated.** Tested-absent rows (`detection_status='not_detected'`) never match — their `metric_percentile` is nulled for display. |
+| max_rank | int \| None | None | Cap on `rank_by_metric` (1 = highest). Top-N drill-down. **Rankable-gated.** Tested-absent rows (`detection_status='not_detected'`) never match — their `rank_by_metric` is nulled for display. |
 | summary | bool | False | Return summary fields only (results=[]). |
 | verbose | bool | False | Include heavy-text fields per row: assay_name, field_description, experimental_context, light_condition, replicate_values. |
 | limit | int | 5 | Max rows. Paginate with `offset`. |
@@ -339,13 +339,13 @@ Inspect each bucket separately to see which input was bad. Mirrors
 ```
 
 ```mistake
-Apply value_min=0.001 by default to 'clean' the data.
+Apply min_value=0.001 by default to 'clean' the data.
 ```
 
 ```correction
-`value_min > 0` strips tested-absent rows (`value=0` /
+`min_value > 0` strips tested-absent rows (`value=0` /
 `detection_status='not_detected'`). About 70% of numeric edges are
-not_detected — value_min would discard the majority of measured
+not_detected — min_value would discard the majority of measured
 biology. Surface as caller choice, never default-on. See
 `docs://guide/conventions`.
 
@@ -373,8 +373,8 @@ Tested-absent rows are nulled on `metric_bucket` / `metric_percentile` /
 value can otherwise tie into a high bucket/percentile purely because
 most edges on the assay are zero (e.g. `value=0` landing in
 'top_quartile' simply because so much of the assay's mass sits at
-zero). `metric_bucket` / `metric_percentile_min|max` /
-`rank_by_metric_max` filters never select `not_detected` rows for the
+zero). `metric_bucket` / `min_percentile` / `max_percentile` /
+`max_rank` filters never select `not_detected` rows for the
 same reason — filter and display agree.
 
 ```

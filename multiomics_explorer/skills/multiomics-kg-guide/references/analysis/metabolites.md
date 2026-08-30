@@ -276,7 +276,7 @@ In metabolomics, **two row states must not be conflated**:
 
 Tested-absent rows answer the biological question "is X actually absent under condition Y." Discarding them silently misreads the question. Unmeasured rows carry zero information either way and must not be conflated with absence.
 
-On the numeric arm (`metabolites_by_quantifies_assay` and the quantifies rows of `assays_by_metabolite`), a tested-absent row's `metric_bucket` / `metric_percentile` / `rank_by_metric` are always null — a raw-zero value can otherwise tie into a high bucket purely because most of the assay's edges are zero — and the rank-gated filters (`metric_bucket`, `metric_percentile_min`/`max`, `rank_by_metric_max`) never select `not_detected` rows for the same reason.
+On the numeric arm (`metabolites_by_quantifies_assay` and the quantifies rows of `assays_by_metabolite`), a tested-absent row's `metric_bucket` / `metric_percentile` / `rank_by_metric` are always null — a raw-zero value can otherwise tie into a high bucket purely because most of the assay's edges are zero — and the rank-gated filters (`metric_bucket`, `min_percentile` / `max_percentile`, `max_rank`) never select `not_detected` rows for the same reason.
 
 ### Cross-tool implications
 
@@ -285,7 +285,7 @@ On the numeric arm (`metabolites_by_quantifies_assay` and the quantifies rows of
 | `total_matching` | Counts measured rows = present + tested-absent. Excludes unmeasured (no row exists to count). |
 | `results` (default) | Includes tested-absent rows by default. |
 | Envelope rollups (`by_detection_status`, `by_value`, `by_flag_value`, `by_assay`, `by_compartment`, `by_organism`, `by_metric`) | Include tested-absent rows. Lets callers see how much of `total_matching` is biological absence. |
-| Edge-level filters (`value_min > 0`, `detection_status` list excluding `not_detected`, `flag_value=True`) | Caller-surfaced; never silently default-on. Each one drops tested-absent rows when set. |
+| Edge-level filters (`min_value > 0`, `detection_status` list excluding `not_detected`, `flag_value=True`) | Caller-surfaced; never silently default-on. Each one drops tested-absent rows when set. |
 | `assays_by_metabolite` `not_found` / `not_matched` buckets | **Unmeasured-only**. Tested-absent rows go in `results`, not these buckets. |
 
 ### Empirical scale
@@ -301,7 +301,7 @@ Default-filtering tested-absent rows would discard the majority of measured biol
 ### Tool-specific framing
 
 - **`list_metabolite_assays`** (discovery / pre-flight): envelope `by_detection_status` rollup over numeric assays; per-row `detection_status_counts` on numeric rows. Use this surface to gauge tested-absent share before drilling.
-- **`metabolites_by_quantifies_assay`** (numeric drill-down): `by_detection_status` is the primary headline. Edge-level `value_min > 0` and `detection_status` filters surfaced as caller choices, never default-on.
+- **`metabolites_by_quantifies_assay`** (numeric drill-down): `by_detection_status` is the primary headline. Edge-level `min_value > 0` and `detection_status` filters surfaced as caller choices, never default-on.
 - **`metabolites_by_flags_assay`** (boolean drill-down): `by_flag_value` mirror; `flag_value=False` is the explicit way to ask for tested-absent rows.
 - **`assays_by_metabolite`** (reverse lookup): `not_found` / `not_matched` buckets are unmeasured-only — the metabolite was never in the KG's metabolomics scope. Tested-absent rows for IN-scope metabolites are in `results`.
 
@@ -315,7 +315,7 @@ Default-filtering tested-absent rows would discard the majority of measured biol
 
 Four native tools cover the measurement layer (no `run_cypher` needed):
 
-- **`list_metabolite_assays`** — discovery surface. Inspect `value_kind` (numeric/boolean → routes drill-down), `rankable` (gates `metric_bucket` / `metric_percentile_*` / `rank_by_metric_max` on the numeric drill-down), `compartment`, and per-row `detection_status_counts` (numeric assays) before drilling.
+- **`list_metabolite_assays`** — discovery surface. Inspect `value_kind` (numeric/boolean → routes drill-down), `rankable` (gates `metric_bucket` / `min_percentile` / `max_percentile` / `max_rank` on the numeric drill-down), `compartment`, and per-row `detection_status_counts` (numeric assays) before drilling.
 - **`metabolites_by_quantifies_assay`** — numeric-arm drill-down. One row per (metabolite × assay-edge) with `value`, `detection_status`, `timepoint*` and rankable-gated `metric_bucket` / `metric_percentile` / `rank_by_metric`. `by_detection_status` is the primary headline.
 - **`metabolites_by_flags_assay`** — boolean-arm drill-down. Edge filter `flag_value` (`True` = presence flagged, `False` = tested-absent — real biology, 68.8% of boolean rows in the live KG).
 - **`assays_by_metabolite`** — polymorphic reverse lookup. Cross-organism by default. Numeric rows carry `value` / `detection_status` / `timepoint*`; boolean rows carry `flag_value` / `n_positive`. Cross-arm fields explicit `None` (union-shape padding).
@@ -375,7 +375,7 @@ result = metabolites_by_quantifies_assay(
 top_decile = metabolites_by_quantifies_assay(
     assay_ids=[<rankable_numeric_assay_id>],
     metric_bucket=["top_decile"],         # rankable-gated — raises if none of the assay set is rankable
-    rank_by_metric_max=10,                # top-10 by rank_by_metric
+    max_rank=10,                          # top-10 by rank_by_metric
 )
 
 # Boolean arm — pick assay_ids from list_metabolite_assays(value_kind='boolean').

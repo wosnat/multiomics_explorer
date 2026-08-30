@@ -8718,6 +8718,32 @@ class TestListMetabolites:
         from multiomics_explorer.api import list_metabolites as api_direct
         assert pkg_lm is api_direct
 
+    @pytest.mark.parametrize("new_name,old_name,builder_kwarg,value", [
+        ("min_mass", "mass_min", "mass_min", 100.0),
+        ("max_mass", "mass_max", "mass_max", 500.0),
+    ])
+    def test_mass_range_param_canonical_and_alias(
+        self, new_name, old_name, builder_kwarg, value,
+    ):
+        """R1: mass_min/mass_max become min_mass/max_mass on the API
+        surface. The builder kwarg name is unchanged (Layer 1 is
+        internal)."""
+        from multiomics_explorer.api.functions import list_metabolites
+
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        list_metabolites(conn=conn, **{new_name: value})
+        summary_call = conn.execute_query.call_args_list[0]
+        assert summary_call.kwargs.get(builder_kwarg) == value
+
+        conn2 = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        with pytest.warns(DeprecationWarning):
+            list_metabolites(conn=conn2, **{old_name: value})
+
+        with pytest.raises(ValueError):
+            list_metabolites(
+                conn=MagicMock(), **{new_name: value, old_name: value},
+            )
+
 
 # ---------------------------------------------------------------------------
 # genes_by_metabolite — Phase 1 (Stage 1 RED)
@@ -12915,6 +12941,49 @@ class TestMetabolitesByQuantifiesAssay:
         assert any("bool_a1 exists as value_kind=boolean" in w
                    for w in data["warnings"])
         assert data["total_matching"] == 3
+
+    @pytest.mark.parametrize("new_name,old_name,builder_kwarg,value", [
+        ("min_value", "value_min", "value_min", 0.1),
+        ("max_value", "value_max", "value_max", 0.9),
+        ("min_percentile", "metric_percentile_min", "metric_percentile_min", 10.0),
+        ("max_percentile", "metric_percentile_max", "metric_percentile_max", 90.0),
+        ("max_rank", "rank_by_metric_max", "rank_by_metric_max", 5),
+    ])
+    def test_range_param_canonical_and_alias(
+        self, new_name, old_name, builder_kwarg, value,
+    ):
+        """R1: value_min/value_max/metric_percentile_min/
+        metric_percentile_max/rank_by_metric_max become min_value/max_value/
+        min_percentile/max_percentile/max_rank on the API surface. The
+        builder kwarg name is unchanged (Layer 1 is internal)."""
+        from multiomics_explorer.api.functions import metabolites_by_quantifies_assay
+
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            self._diag_rankable(("a1",)), self._summary_row(), [],
+        ]
+        metabolites_by_quantifies_assay(
+            assay_ids=["a1"], summary=True, conn=mock_conn,
+            **{new_name: value},
+        )
+        summary_call = mock_conn.execute_query.call_args_list[1]
+        assert summary_call.kwargs.get(builder_kwarg) == value
+
+        mock_conn2 = MagicMock()
+        mock_conn2.execute_query.side_effect = [
+            self._diag_rankable(("a1",)), self._summary_row(), [],
+        ]
+        with pytest.warns(DeprecationWarning):
+            metabolites_by_quantifies_assay(
+                assay_ids=["a1"], summary=True, conn=mock_conn2,
+                **{old_name: value},
+            )
+
+        with pytest.raises(ValueError):
+            metabolites_by_quantifies_assay(
+                assay_ids=["a1"], conn=MagicMock(),
+                **{new_name: value, old_name: value},
+            )
 
 
 class TestMetabolitesByFlagsAssay:

@@ -23,6 +23,7 @@ from CyVer import PropertiesValidator, SchemaValidator, SyntaxValidator
 
 from neo4j.exceptions import ClientError as Neo4jClientError
 
+from multiomics_explorer.api._compat import deprecated_alias
 from multiomics_explorer.kg.connection import GraphConnection
 from multiomics_explorer.kg.constants import (
     ALL_ONTOLOGIES,
@@ -7797,8 +7798,8 @@ def list_metabolites(
     hmdb_ids: list[str] | None = None,
     mnxm_ids: list[str] | None = None,
     elements: list[str] | None = None,
-    mass_min: float | None = None,
-    mass_max: float | None = None,
+    min_mass: float | None = None,
+    max_mass: float | None = None,
     organism_names: list[str] | None = None,
     pathway_ids: list[str] | None = None,
     evidence_sources: list[str] | None = None,
@@ -7808,6 +7809,8 @@ def list_metabolites(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
+    mass_min: float | None = None,
+    mass_max: float | None = None,
 ) -> dict:
     """List metabolites in the chemistry layer with rich filtering.
 
@@ -7872,6 +7875,11 @@ def list_metabolites(
             contains values outside {"metabolism", "transport",
             "metabolomics"}.
     """
+    min_mass = deprecated_alias(
+        old=mass_min, new=min_mass, old_name="mass_min", new_name="min_mass")
+    max_mass = deprecated_alias(
+        old=mass_max, new=max_mass, old_name="mass_max", new_name="max_mass")
+
     # 1. Validate search_text (non-empty when provided)
     if search_text is not None and not search_text.strip():
         raise ValueError("search_text must not be empty or whitespace.")
@@ -7931,8 +7939,8 @@ def list_metabolites(
         hmdb_ids=hmdb_ids,
         mnxm_ids=mnxm_ids,
         elements=elements,
-        mass_min=mass_min,
-        mass_max=mass_max,
+        mass_min=min_mass,
+        mass_max=max_mass,
         organism_names_lc=organism_names_lc,
         pathway_ids=pathway_ids,
         evidence_sources=evidence_sources,
@@ -9604,19 +9612,24 @@ def metabolites_by_quantifies_assay(
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
-    value_min: float | None = None,
-    value_max: float | None = None,
+    min_value: float | None = None,
+    max_value: float | None = None,
     detection_status: list[str] | None = None,
     timepoint: list[str] | None = None,
     metric_bucket: list[str] | None = None,
-    metric_percentile_min: float | None = None,
-    metric_percentile_max: float | None = None,
-    rank_by_metric_max: int | None = None,
+    min_percentile: float | None = None,
+    max_percentile: float | None = None,
+    max_rank: int | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int = 5,
     offset: int = 0,
     conn: GraphConnection | None = None,
+    value_min: float | None = None,
+    value_max: float | None = None,
+    metric_percentile_min: float | None = None,
+    metric_percentile_max: float | None = None,
+    rank_by_metric_max: int | None = None,
 ) -> dict:
     """Drill into numeric MetaboliteAssay edges.
 
@@ -9662,6 +9675,20 @@ def metabolites_by_quantifies_assay(
         contains invalid values; rankable-gated filter set with all
         selected assays non-rankable.
     """
+    min_value = deprecated_alias(
+        old=value_min, new=min_value, old_name="value_min", new_name="min_value")
+    max_value = deprecated_alias(
+        old=value_max, new=max_value, old_name="value_max", new_name="max_value")
+    min_percentile = deprecated_alias(
+        old=metric_percentile_min, new=min_percentile,
+        old_name="metric_percentile_min", new_name="min_percentile")
+    max_percentile = deprecated_alias(
+        old=metric_percentile_max, new=max_percentile,
+        old_name="metric_percentile_max", new_name="max_percentile")
+    max_rank = deprecated_alias(
+        old=rank_by_metric_max, new=max_rank,
+        old_name="rank_by_metric_max", new_name="max_rank")
+
     conn = _default_conn(conn)
 
     # ---- Validation ------------------------------------------------------
@@ -9729,9 +9756,9 @@ def metabolites_by_quantifies_assay(
     # ---- Rankable-gating logic ------------------------------------------
     rankable_filter_set = any([
         metric_bucket,
-        metric_percentile_min is not None,
-        metric_percentile_max is not None,
-        rank_by_metric_max is not None,
+        min_percentile is not None,
+        max_percentile is not None,
+        max_rank is not None,
     ])
     excluded_assays: list[str] = []
     if rankable_filter_set and diag_rows:
@@ -9739,8 +9766,8 @@ def metabolites_by_quantifies_assay(
         if not rankable_ids:
             raise ValueError(
                 f"All selected assays have rankable=False, but a rankable-"
-                f"gated filter (metric_bucket / metric_percentile / "
-                f"rank_by_metric_max) was set. Selected assay_ids: "
+                f"gated filter (metric_bucket / min_percentile / "
+                f"max_percentile / max_rank) was set. Selected assay_ids: "
                 f"{sorted(found_ids)}. Pre-flight: "
                 f"list_metabolite_assays(rankable=True, value_kind='numeric')."
             )
@@ -9792,14 +9819,14 @@ def metabolites_by_quantifies_assay(
         treatment_type=treatment_type,
         background_factors=background_factors,
         growth_phases=growth_phases,
-        value_min=value_min,
-        value_max=value_max,
+        value_min=min_value,
+        value_max=max_value,
         detection_status=detection_status,
         timepoint=timepoint,
         metric_bucket=metric_bucket,
-        metric_percentile_min=metric_percentile_min,
-        metric_percentile_max=metric_percentile_max,
-        rank_by_metric_max=rank_by_metric_max,
+        metric_percentile_min=min_percentile,
+        metric_percentile_max=max_percentile,
+        rank_by_metric_max=max_rank,
     )
     sum_rows = conn.execute_query(sum_cypher, **sum_params)
     sum_row = sum_rows[0] if sum_rows else {}
@@ -9838,14 +9865,14 @@ def metabolites_by_quantifies_assay(
             treatment_type=treatment_type,
             background_factors=background_factors,
             growth_phases=growth_phases,
-            value_min=value_min,
-            value_max=value_max,
+            value_min=min_value,
+            value_max=max_value,
             detection_status=detection_status,
             timepoint=timepoint,
             metric_bucket=metric_bucket,
-            metric_percentile_min=metric_percentile_min,
-            metric_percentile_max=metric_percentile_max,
-            rank_by_metric_max=rank_by_metric_max,
+            metric_percentile_min=min_percentile,
+            metric_percentile_max=max_percentile,
+            rank_by_metric_max=max_rank,
             verbose=verbose,
             limit=limit,
             offset=offset,

@@ -5736,8 +5736,8 @@ class TestListMetabolitesWrapper:
                 hmdb_ids=["HMDB0000122"],
                 mnxm_ids=["MNXM1364061"],
                 elements=["N"],
-                mass_min=60.0,
-                mass_max=1000.0,
+                min_mass=60.0,
+                max_mass=1000.0,
                 organism_names=["Prochlorococcus MED4"],
                 pathway_ids=["kegg.pathway:ko00910"],
                 evidence_sources=["transport"],
@@ -5755,8 +5755,8 @@ class TestListMetabolitesWrapper:
         assert kwargs["hmdb_ids"] == ["HMDB0000122"]
         assert kwargs["mnxm_ids"] == ["MNXM1364061"]
         assert kwargs["elements"] == ["N"]
-        assert kwargs["mass_min"] == 60.0
-        assert kwargs["mass_max"] == 1000.0
+        assert kwargs["min_mass"] == 60.0
+        assert kwargs["max_mass"] == 1000.0
         assert kwargs["organism_names"] == ["Prochlorococcus MED4"]
         assert kwargs["pathway_ids"] == ["kegg.pathway:ko00910"]
         assert kwargs["evidence_sources"] == ["transport"]
@@ -12022,3 +12022,30 @@ def test_no_tool_emits_output_schema():
 
     leaking = [name for name, schema in asyncio.run(_run()) if schema]
     assert leaking == [], f"tools still emitting outputSchema: {leaking}"
+
+
+def _all_tool_input_schemas() -> dict[str, dict]:
+    """{tool_name: inputSchema} from a fresh FastMCP with register_tools (no Neo4j)."""
+    import asyncio
+    from fastmcp import FastMCP
+    from multiomics_explorer.mcp_server.tools import register_tools
+
+    mcp = FastMCP("t")
+    register_tools(mcp)
+
+    async def _run():
+        return {t.name: t.to_mcp_tool().inputSchema for t in await mcp.list_tools()}
+
+    return asyncio.run(_run())
+
+
+@pytest.mark.parametrize("tool,expected,forbidden", [
+    ("metabolites_by_quantifies_assay",
+     {"min_value", "max_value", "min_percentile", "max_percentile", "max_rank"},
+     {"value_min", "value_max", "metric_percentile_min", "metric_percentile_max", "rank_by_metric_max"}),
+    ("list_metabolites", {"min_mass", "max_mass"}, {"mass_min", "mass_max"}),
+])
+def test_r1_range_param_names(tool, expected, forbidden):
+    props = set(_all_tool_input_schemas()[tool]["properties"])
+    assert expected <= props
+    assert not (forbidden & props)

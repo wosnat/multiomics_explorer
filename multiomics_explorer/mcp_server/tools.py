@@ -8840,11 +8840,11 @@ def register_tools(mcp: FastMCP):
             "element-clash footguns: 'Cl' contains 'C', 'Na' contains "
             "'N'). Empty/null formula metabolites never match.",
         )] = None,
-        mass_min: Annotated[float | None, Field(
+        min_mass: Annotated[float | None, Field(
             description="Minimum monoisotopic mass (Da). Excludes metabolites "
             "with null `mass` (~22%). E.g. 60.0.",
         )] = None,
-        mass_max: Annotated[float | None, Field(
+        max_mass: Annotated[float | None, Field(
             description="Maximum monoisotopic mass (Da). E.g. 1000.0.",
         )] = None,
         organism_names: Annotated[list[str] | None, Field(
@@ -8908,8 +8908,8 @@ def register_tools(mcp: FastMCP):
                 hmdb_ids=hmdb_ids,
                 mnxm_ids=mnxm_ids,
                 elements=elements,
-                mass_min=mass_min,
-                mass_max=mass_max,
+                min_mass=min_mass,
+                max_mass=max_mass,
                 organism_names=organism_names,
                 pathway_ids=pathway_ids,
                 evidence_sources=evidence_sources,
@@ -10190,14 +10190,14 @@ def register_tools(mcp: FastMCP):
             description="Growth phase(s) (ANY-overlap). Currently "
                         "unpopulated — KG-side backfill pending.",
         )] = None,
-        value_min: Annotated[float | None, Field(
+        min_value: Annotated[float | None, Field(
             description="Lower bound on `value` (raw concentration / intensity). "
                         "**Caution**: `value > 0` strips tested-absent rows "
                         "(`value=0` / `detection_status='not_detected'`) — use "
                         "deliberately, never as default. See "
                         "`docs://guide/conventions`.",
         )] = None,
-        value_max: Annotated[float | None, Field(
+        max_value: Annotated[float | None, Field(
             description="Upper bound on `value`. Always applicable.",
         )] = None,
         detection_status: Annotated[list[str] | None, Field(
@@ -10223,21 +10223,21 @@ def register_tools(mcp: FastMCP):
                         "their `metric_bucket` is nulled for display regardless "
                         "of the stored value.",
         )] = None,
-        metric_percentile_min: Annotated[float | None, Field(
+        min_percentile: Annotated[float | None, Field(
             description="Lower bound on `metric_percentile` (0-100). "
                         "**Rankable-gated.** Tested-absent rows "
                         "(`detection_status='not_detected'`) never match — "
                         "their `metric_percentile` is nulled for display.",
             ge=0, le=100,
         )] = None,
-        metric_percentile_max: Annotated[float | None, Field(
+        max_percentile: Annotated[float | None, Field(
             description="Upper bound on `metric_percentile`. **Rankable-gated.** "
                         "Tested-absent rows (`detection_status='not_detected'`) "
                         "never match — their `metric_percentile` is nulled for "
                         "display.",
             ge=0, le=100,
         )] = None,
-        rank_by_metric_max: Annotated[int | None, Field(
+        max_rank: Annotated[int | None, Field(
             description="Cap on `rank_by_metric` (1 = highest). Top-N drill-down. "
                         "**Rankable-gated.** Tested-absent rows "
                         "(`detection_status='not_detected'`) never match — "
@@ -10298,14 +10298,14 @@ def register_tools(mcp: FastMCP):
                 treatment_type=treatment_type,
                 background_factors=background_factors,
                 growth_phases=growth_phases,
-                value_min=value_min,
-                value_max=value_max,
+                min_value=min_value,
+                max_value=max_value,
                 detection_status=detection_status,
                 timepoint=timepoint,
                 metric_bucket=metric_bucket,
-                metric_percentile_min=metric_percentile_min,
-                metric_percentile_max=metric_percentile_max,
-                rank_by_metric_max=rank_by_metric_max,
+                min_percentile=min_percentile,
+                max_percentile=max_percentile,
+                max_rank=max_rank,
                 summary=summary,
                 verbose=verbose,
                 limit=limit,

@@ -201,11 +201,11 @@ mistakes:
       `MetNotFound` on `list_metabolites` and `GbmNotFound` on
       `genes_by_metabolite`.
 
-  - wrong: "Apply value_min=0.001 by default to 'clean' the data."
+  - wrong: "Apply min_value=0.001 by default to 'clean' the data."
     right: |
-      `value_min > 0` strips tested-absent rows (`value=0` /
+      `min_value > 0` strips tested-absent rows (`value=0` /
       `detection_status='not_detected'`). About 70% of numeric edges are
-      not_detected — value_min would discard the majority of measured
+      not_detected — min_value would discard the majority of measured
       biology. Surface as caller choice, never default-on. See
       `docs://guide/conventions`.
 
@@ -223,8 +223,8 @@ mistakes:
       value can otherwise tie into a high bucket/percentile purely because
       most edges on the assay are zero (e.g. `value=0` landing in
       'top_quartile' simply because so much of the assay's mass sits at
-      zero). `metric_bucket` / `metric_percentile_min|max` /
-      `rank_by_metric_max` filters never select `not_detected` rows for the
+      zero). `metric_bucket` / `min_percentile` / `max_percentile` /
+      `max_rank` filters never select `not_detected` rows for the
       same reason — filter and display agree.
 
   - wrong: "growth_phase populated on every row."

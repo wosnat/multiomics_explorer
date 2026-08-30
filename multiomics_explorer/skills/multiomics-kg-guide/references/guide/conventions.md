@@ -449,7 +449,7 @@ filters that only apply to specific DM subsets. The contract is
 consistent across all three:
 
 - **Always-available filters** (raw value, flag, category) — work on every selected DM.
-- **Rankable-gated filters** (`bucket`, `min_percentile` / `max_percentile`, `max_rank` — they populate the row fields `metric_bucket`, `metric_percentile`, `rank_by_metric`; the assay twins spell the same filters `metric_bucket`, `metric_percentile_min` / `_max`, `rank_by_metric_max`) — only meaningful on DMs with `rankable=True`.
+- **Rankable-gated filters** (`bucket`, `min_percentile` / `max_percentile`, `max_rank` — they populate the row fields `metric_bucket`, `metric_percentile`, `rank_by_metric`; the assay twins spell the same filters `metric_bucket`, `min_percentile` / `max_percentile`, `max_rank`) — only meaningful on DMs with `rankable=True`.
   - Mixed-rankability input → soft-exclude non-rankable DMs, surface them in the envelope's `excluded_derived_metrics` + `warnings`.
   - All-non-rankable input + a rankable-gated filter → raises.
 - **`has_p_value`-gated filters** (`significant_only`, `max_adjusted_p_value`) — analogous; raise when no selected DM carries p-values.
