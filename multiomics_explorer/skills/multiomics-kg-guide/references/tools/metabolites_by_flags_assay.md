@@ -21,25 +21,28 @@ gene chemistry context. See `docs://guide/conventions` for
 tested-absent semantics and `docs://analysis/metabolites` for
 the metabolomics decision tree.
 
+`organism` matches by case-insensitive CONTAINS (not word-match);
+cross-organism is the default.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | assay_ids | list[string] | — | MetaboliteAssay IDs to drill into. Discover via `list_metabolite_assays(value_kind='boolean')`. E.g. ['metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular']. `not_found.assay_ids` lists IDs absent from the KG. |
-| organism | string \| None | None | Filter to assays from this organism (case-insensitive CONTAINS). Cross-organism is the default. |
-| metabolite_ids | list[string] \| None | None | Restrict to specific metabolites. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). Absent from KG → `not_found.metabolite_ids`. |
-| exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
+| metabolite_ids | list[string] \| None | None | Metabolite IDs; bare or xref forms coerced (see resolved_aliases, docs://analysis/metabolites). |
+| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; bare/xref forms coerced (see resolved_aliases); exclude wins on overlap. |
 | experiment_ids | list[string] \| None | None | Filter to assays from these experiments. |
-| publication_dois | list[string] \| None | None | Filter by publication DOI(s). E.g. ['10.1128/msystems.01261-22']. |
-| compartment | string \| None | None | Sample compartment ('whole_cell' or 'extracellular'). |
-| treatment_type | list[string] \| None | None | Treatment type(s) (ANY-overlap). |
-| background_factors | list[string] \| None | None | Background factor(s) (ANY-overlap). |
-| growth_phases | list[string] \| None | None | Growth phase(s) (ANY-overlap). Currently unpopulated — KG-side backfill pending. |
+| publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
+| compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
+| treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
+| background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
+| growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
 | flag_value | bool \| None | None | Filter by flag presence — `True` (presence flagged), `False` (absence flagged — *tested-absent*, real biology), `None` (both). `Assay_flags_metabolite` always stores both states (unlike the DM layer, where only 11 of 27 boolean DMs store `not_flagged`), so `flag_value=False` returns real rows (about 69% of boolean rows). |
-| summary | bool | False | Return summary fields only (results=[]). |
-| verbose | bool | False | Include heavy-text fields per row: assay_name, field_description. |
-| limit | int | 5 | Max rows. Paginate with `offset`. |
-| offset | int | 0 | Pagination offset. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 5 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 

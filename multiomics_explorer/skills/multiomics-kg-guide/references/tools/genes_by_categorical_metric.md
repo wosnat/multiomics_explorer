@@ -27,25 +27,29 @@ rankable / has_p_value gates apply to categorical DMs — kept for
 envelope-shape consistency); `warnings` carries closed-vocabulary,
 organism-existence, and kind-mismatch notices.
 
+`organism` is optional and single-organism is **not** enforced —
+omit it to drill across every organism a `metric_type` spans.
+`summary=True` is sugar for `limit=0`.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | derived_metric_ids | list[string] \| None | None | Categorical DerivedMetric node IDs. Use when the same `metric_type` appears across organisms / publications and you need to pin one. Discover IDs via `list_derived_metrics(value_kind='categorical')`. Mutually exclusive with `metric_types`. An id that exists as a different kind (numeric / boolean) moves to `not_matched_ids` with a `warnings` entry naming the sibling tool. |
 | metric_types | list[string] \| None | None | Categorical metric-type tags (e.g. ['predicted_subcellular_localization', 'darkness_survival_class']). Unions every DM carrying that tag, then narrows by scoping filters. Same tag can span organisms / publications — pin one specific DM via `derived_metric_ids` instead. Mutually exclusive with `derived_metric_ids`. |
-| organism | string \| None | None | Organism to scope the DM set to. Accepts short strain code ('MED4', 'NATL2A', 'MIT9313') or full name; word-based, case-insensitive match. Single-organism is **not** enforced — omit to drill across all organisms a metric_type spans. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
 | locus_tags | list[string] \| None | None | Restrict drill-down to a specific gene set (e.g. DE hits from `differential_expression_by_gene`). Filter on `g.locus_tag IN $locus_tags` post-MATCH. Genes with no edge for the selected DM produce no row. |
 | experiment_ids | list[string] \| None | None | Scope to DMs from one or more experiments. |
-| publication_dois | list[string] \| None | None | Scope to DMs from one or more publications. |
-| compartment | string \| None | None | Sample compartment ('whole_cell', 'vesicle', 'exoproteome', 'extracellular'). Exact match. |
-| treatment_type | list[string] \| None | None | Treatment type(s). ANY-overlap. Case-insensitive. |
-| background_factors | list[string] \| None | None | Background factor(s). ANY-overlap. Case-insensitive. |
-| growth_phases | list[string] \| None | None | Growth phase(s). ANY-overlap. Case-insensitive. |
+| publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
+| compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
+| treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
+| background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
+| growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
 | categories | list[string] \| None | None | Filter on `r.value`: keep rows whose value is in this set. Validated against the union of the selected DMs' `allowed_categories` — unknown values raise `ValueError` listing the allowed set. E.g. ['Outer Membrane', 'Periplasmic'] for `predicted_subcellular_localization`. |
-| summary | bool | False | Return summary fields only (counts, breakdowns, by_metric, diagnostics). Sugar for limit=0; results=[]. |
-| verbose | bool | False | Include heavy text fields per row: gene_function_description, gene_summary, allowed_categories, plus DM context (metric_type, field_description, unit, compartment, experiment_id, publication_doi, treatment_type, background_factors, treatment, light_condition, experimental_context). |
-| limit | int | 25 | Max rows to return. Paginate with `offset`. Use `summary=True` for summary-only (sets limit=0). |
-| offset | int | 0 | Pagination offset (starting row, 0-indexed). |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 25 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 

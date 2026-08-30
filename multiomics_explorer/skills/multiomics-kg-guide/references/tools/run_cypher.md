@@ -15,7 +15,7 @@ docs://guide/concepts for the KG data model.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | query | string | — | Cypher query string. Write operations are blocked. A LIMIT clause is added automatically if absent. |
-| limit | int | 25 | Max results. |
+| limit | int \| None | 25 | Max rows returned (paging). |
 
 ## Response format
 

@@ -11,21 +11,23 @@ memberships after filters).
 Routing: cluster discovery via `list_clustering_analyses`; drill
 into a cluster's full membership via `genes_in_cluster`.
 
+`organism` is inferred from the input genes when omitted.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags (e.g. ['PMM0370', 'PMM0920']). |
-| organism | string \| None | None | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises); inferred from genes if omitted. Single organism enforced. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
 | cluster_type | string \| None | None | Filter by cluster type. Live vocabulary: list_filter_values(filter_type='cluster_type'). Offline examples: 'condition_comparison', 'decay_pattern', 'diel', 'expression_bin', 'genomic_island', 'time_course'. |
-| treatment_type | list[string] \| None | None | Filter by treatment type(s). |
-| background_factors | list[string] \| None | None | Filter by background factors. |
-| publication_dois | list[string] \| None | None | Filter by publication DOI(s). |
+| treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
+| background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
+| publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
 | analysis_ids | list[string] \| None | None | Filter by clustering analysis IDs. |
-| summary | bool | False | When true, return only summary fields (results=[]). |
-| verbose | bool | False | Include cluster_method, member_count, cluster_functional_description, cluster_expression_dynamics, cluster_temporal_pattern, treatment, light_condition, experimental_context, p_value. |
-| limit | int | 25 | Max results. |
-| offset | int | 0 | Number of results to skip for pagination. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 25 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 

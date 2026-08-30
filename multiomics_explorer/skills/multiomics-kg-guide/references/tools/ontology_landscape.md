@@ -15,7 +15,15 @@ quantified genes.
 
 [TRUST] `call_class` scopes MEROPS to a peptidase call so landscape
 sizes match `genes_by_ontology`/enrichment sets; `interpro_type`
-scopes InterPro to one entry type. See docs://analysis/annotation_evidence.
+scopes InterPro to one entry type. `informative_only` defaults True
+here — it drops terms the KG flags uninformative (e.g. KEGG KO
+'uncharacterized protein' terms, GO root go:0008150, KEGG
+global/overview maps like ko01100); pass False to survey the full
+term set (rebaselines the coverage stats). See
+docs://analysis/annotation_evidence.
+
+`limit` defaults to 15 rows — enough to see the top-ranked
+combinations; pass an explicit integer to page, or None for every row.
 
 Routing: pick an `(ontology, level)` row, then call
 `pathway_enrichment(ontology=..., level=...)` or
@@ -28,18 +36,18 @@ and BRITE-tree scoping conventions.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| organism | string | — | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises). |
+| organism | string \| None | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') \| list[string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops')] \| None | None | If None, surveys all 17 ontologies. Accepts a list; a facet carried by only some of them drops the rest into skipped_ontologies. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Narrows brite and leaves any other ontology in the list untouched; raises when brite is not among them. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | experiment_ids | list[string] \| None | None | Restrict coverage computation to genes quantified in these experiments. |
-| summary | bool | False | If true, omit per-row results (by_ontology only). |
-| verbose | bool | False | Include example_terms (top 3 terms per level). |
-| limit | int \| None | 15 | Max rows returned. Default 15 — enough to see the top-ranked (ontology x level) combinations; pass an explicit integer to page, or None for every row. |
-| offset | int | 0 | Skip N rows before limit |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 15 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 | min_gene_set_size | int | 5 | Exclude terms with fewer genes than this (default 5). |
 | max_gene_set_size | int | 500 | Exclude terms with more genes than this (default 500). |
-| informative_only | bool | True | When True (default), exclude terms flagged uninformative in KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; the global / overview KEGG maps such as ko01100). Term-side filter only — never restricts the gene set. Pass False to opt out and survey the full term set (rebaselines may differ). |
-| call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; leaving unfiltered mixes in catalytically-dead homologs (nonpeptidase_homolog) - the envelope warns when it does. |
+| informative_only | bool | True | True drops terms the KG flags uninformative (roots, catch-alls). |
+| call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
 
 **Discovery:** use `list_organisms` for valid organism names.

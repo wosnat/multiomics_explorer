@@ -13,18 +13,21 @@ Routing: drill into a specific experiment's temporal pattern via
 See `docs://guide/conventions` for tested-absent semantics
 (`groups_tested_not_responded` vs `groups_not_known`).
 
+`organism` is optional and inferred from `locus_tags`; it only
+validates/scopes the inferred organism rather than driving the query.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags. E.g. ['PMM0370', 'PMM0920']. Get these from resolve_gene / gene_overview. |
-| organism | string \| None | None | Organism name for validation (optional). Inferred from genes. Fuzzy word-based matching. |
-| treatment_type | list[string] \| None | None | Filter to specific treatment type(s) (e.g. ['nitrogen', 'coculture']). Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True). |
-| background_factors | list[string] \| None | None | Filter by background experimental factors (case-insensitive exact match). E.g. ['axenic', 'diel']. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
+| treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
+| background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
 | experiment_ids | list[string] \| None | None | Restrict to specific experiments. Get these from list_experiments. |
 | group_by | string ('treatment_type', 'experiment') | treatment_type | Group response summary by treatment_type (aggregates across experiments) or experiment (one entry per experiment). |
-| limit | int | 50 | Max genes returned. |
-| offset | int | 0 | Skip N genes for pagination. |
+| limit | int \| None | 50 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 

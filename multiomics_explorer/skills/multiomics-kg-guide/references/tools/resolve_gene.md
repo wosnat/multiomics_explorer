@@ -6,15 +6,17 @@ Resolve a gene identifier (locus_tag, gene name, old locus_tag, or RefSeq protei
 
 Routing: feed returned `locus_tag`s into `gene_overview` (data-availability triage), `gene_details` (full properties), `gene_homologs`, or `gene_ontology_terms`. The optional `organism` filter is a word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word matches every strain).
 
+`summary=True` returns `by_organism` uncapped with no `results` — call it first when a name may hit many strains.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | identifier | string | — | Gene identifier (case-insensitive) — locus_tag (e.g. 'PMM0001'), gene name (e.g. 'dnaN'), old locus tag, or RefSeq protein ID. |
-| organism | string \| None | None | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word like 'Alteromonas' matches every strain). E.g. 'MED4', 'Prochlorococcus MED4'. |
-| limit | int | 5 | Max results. |
-| offset | int | 0 | Number of results to skip for pagination. |
-| summary | bool | False | Envelope only: results=[], by_organism uncapped. Use first when a name may hit many strains. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
+| limit | int \| None | 5 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 

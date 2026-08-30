@@ -12,8 +12,8 @@ Routing: drill into `genes_by_metabolite(metabolite_ids=[...])` for catalysts/tr
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string \| None | None | Free-text search on metabolite name (Lucene syntax). Index covers Metabolite.name only — element/formula composition is filtered through `elements` (presence list), not search. E.g. 'glucose', 'phosphate AND amino'. |
-| metabolite_ids | list[string] \| None | None | Restrict to specific metabolites (ANDs with other filters). Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). Unknown IDs land in `not_found.metabolite_ids`. |
-| exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
+| metabolite_ids | list[string] \| None | None | Metabolite IDs; bare or xref forms coerced (see resolved_aliases, docs://analysis/metabolites). |
+| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; bare/xref forms coerced (see resolved_aliases); exclude wins on overlap. |
 | kegg_compound_ids | list[string] \| None | None | Filter by raw KEGG C-numbers (e.g. ['C00031']). Convenience over `metabolite_ids` when working with KEGG-anchored data; the prefixed equivalent is `kegg.compound:C*`. |
 | chebi_ids | list[string] \| None | None | Filter by raw ChEBI numeric IDs (e.g. ['4167', '15422']). 90% of Metabolite nodes carry a `chebi_id`. |
 | hmdb_ids | list[string] \| None | None | Filter by raw HMDB IDs (e.g. ['HMDB0000122']). 47% coverage. |
@@ -24,10 +24,10 @@ Routing: drill into `genes_by_metabolite(metabolite_ids=[...])` for catalysts/tr
 | organism_names | list[string] \| None | None | Restrict to metabolites reachable by these organisms (case-insensitive on `preferred_name`). UNION semantics — a metabolite reached by ANY listed organism qualifies. Joined via `Organism_has_metabolite` (catalysis OR transport). E.g. ['Prochlorococcus MED4']. `not_found.organism_names` lists any unknown names. |
 | pathway_ids | list[string] \| None | None | Filter by KEGG pathway membership (`KeggTerm.id`). E.g. ['kegg.pathway:ko00910'] for nitrogen metabolism. Joined via `Metabolite_in_pathway`. `not_found.pathway_ids` lists unknown IDs. |
 | evidence_sources | list[string ('metabolism', 'transport', 'metabolomics')] \| None | None | Filter by evidence path. Set-membership ANY semantics — ['transport'] returns transport-only AND dual. Valid values: 'metabolism' (catalysis-reachable), 'transport' (TCDB-curated substrate), 'metabolomics' (measured by a MetaboliteAssay). Other values raise at the MCP boundary. |
-| summary | bool | False | When true, return only summary fields (results=[]). |
-| verbose | bool | False | Include heavy-text and structural-fingerprint fields (inchikey, smiles, mnxm_id, hmdb_id, pathway_names). |
-| limit | int | 5 | Max results. |
-| offset | int | 0 | Number of results to skip for pagination. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 5 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 ## Response format
 

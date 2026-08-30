@@ -6,15 +6,17 @@ Return amino-acid sequences for a batch of genes, export-optimized for BLAST / H
 
 Routing: feed locus_tags from `resolve_gene` / `gene_overview` / `genes_by_function`; this is the terminal export step (pair with fasta=true for external tools).
 
+`limit` defaults to every input gene (min 25); pass an explicit number to page. `summary=True` is sugar for `limit=0`.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags. Cross-organism OK (globally unique). E.g. ['ACZ81_08860', 'PMM0001']. |
 | fasta | bool | False | If true, omit per-row `sequence` and return one multi-FASTA blob in the envelope instead (no duplication). |
-| summary | bool | False | If true, return envelope only (results=[]); sugar for limit=0. |
-| limit | int \| None | None | Default: every input gene (min 25). Pass a number to page. |
-| offset | int | 0 | Rows to skip for pagination. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| limit | int \| None | None | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 ## Response format
 

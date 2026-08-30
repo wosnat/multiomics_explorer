@@ -9,6 +9,9 @@ to broadest. A gene typically belongs to 1-3 groups.
 Routing: drill into group members via `genes_by_homolog_group`;
 text-search groups via `search_homolog_groups`.
 
+`limit` defaults to every input gene × 5 groups (min 25); pass an
+explicit number to page.
+
 ## Parameters
 
 | Name | Type | Default | Description |
@@ -17,10 +20,10 @@ text-search groups via `search_homolog_groups`.
 | source | string \| None | None | Filter by OG source: 'cyanorak' or 'eggnog'. |
 | taxonomic_level | string \| None | None | Filter by taxonomic level. E.g. 'curated', 'Prochloraceae', 'Bacteria'. |
 | max_specificity_rank | int \| None | None | Cap group breadth. 0=curated only, 1=+family, 2=+order, 3=+domain (all). |
-| summary | bool | False | When true, return only summary fields (results=[]). |
-| verbose | bool | False | Include group metadata: member_count, organism_count, genera, has_cross_genus_members, description, functional_description. |
-| limit | int \| None | None | Default: every input gene x 5 groups (min 25). Pass a number to page. |
-| offset | int | 0 | Number of results to skip for pagination. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | None | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 ## Response format
 

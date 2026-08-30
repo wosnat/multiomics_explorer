@@ -6,14 +6,16 @@ All Gene node properties (deep-dive). Use `gene_overview` for the common routing
 
 Routing: prefer `gene_overview` for triage; chain into `metabolites_by_gene` for chemistry, `gene_homologs` for orthologs, `gene_ontology_terms` for annotations, `list_organisms` for taxonomy.
 
+`limit` defaults to every input gene (min 25); pass an explicit number to page.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags to look up. E.g. ['PMM0001', 'sync_0001']. |
-| summary | bool | False | When true, return only summary fields (results=[]). |
-| limit | int \| None | None | Default: every input gene (min 25). Pass a number to page. |
-| offset | int | 0 | Number of results to skip for pagination. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| limit | int \| None | None | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 ## Response format
 

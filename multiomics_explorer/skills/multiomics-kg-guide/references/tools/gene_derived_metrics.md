@@ -25,23 +25,26 @@ thresholds) live on `genes_by_numeric_metric`; flag-level filters on
 `genes_by_boolean_metric`; category filters on
 `genes_by_categorical_metric`.
 
+`organism` is inferred from `locus_tags` when omitted.
+`summary=True` is sugar for `limit=0`.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags to look up (e.g. ['PMM1714', 'PMM0001']). Required, non-empty. Single organism enforced — locus_tags must all resolve to the same organism (or pair with `organism` to disambiguate). |
-| organism | string \| None | None | Organism to scope to. Accepts short strain code ('MED4', 'NATL2A', 'MIT1002') or full name; word-based, case-insensitive match, ambiguous match raises. Inferred from locus_tags when omitted. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
 | metric_types | list[string] \| None | None | Filter by metric_type tags (e.g. 'diel_amplitude_protein_log2'). Same metric_type may appear across publications — pair with publication_dois or use derived_metric_ids to pin one specific DM. |
 | value_kind | string ('numeric', 'boolean', 'categorical') \| None | None | Restrict to one DM kind. Each kind has a different `value` column type — 'numeric' → float, 'boolean' → 'flagged'/'not_flagged', 'categorical' → category string. |
-| compartment | string \| None | None | Filter to DMs from one sample compartment ('whole_cell', 'vesicle', 'exoproteome', 'extracellular'). Exact match. |
-| treatment_type | list[string] \| None | None | Treatment type(s) to match. Returns DMs whose treatment_type list overlaps ANY of the given values. Case-insensitive. |
-| background_factors | list[string] \| None | None | Background experimental factor(s) to match. ANY-overlap. Case-insensitive. |
-| publication_dois | list[string] \| None | None | Filter by one or more publication DOIs. Exact match. |
+| compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
+| treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
+| background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
+| publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
 | derived_metric_ids | list[string] \| None | None | Look up specific DMs by their unique id. Use to pin one DM when the same metric_type appears across publications. Pair with `list_derived_metrics`. |
-| summary | bool | False | Return summary fields only (counts, breakdowns, not_found / not_matched). Sugar for limit=0; results=[]. |
-| verbose | bool | False | Include detailed text fields per row: treatment, light_condition, experimental_context, plus raw p_value when parent DM has_p_value=True. |
-| limit | int | 5 | Max rows to return. Paginate with offset. Use `summary=True` for summary-only (sets limit=0 internally). |
-| offset | int | 0 | Pagination offset (starting row, 0-indexed). |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 5 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 

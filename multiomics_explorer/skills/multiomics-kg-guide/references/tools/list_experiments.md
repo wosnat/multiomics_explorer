@@ -8,26 +8,28 @@ table_scope is critical for interpreting missing genes — `'all_detected_genes'
 
 Routing: drill via `differential_expression_by_gene(experiment_ids=[id])` for per-gene DE; `list_clustering_analyses(experiment_ids=[id])`; `list_derived_metrics(experiment_ids=[id])`; `pathway_enrichment(experiment_ids=[id])`; `list_metabolite_assays(experiment_ids=[id])` when `metabolite_count > 0`.
 
+`organism` filters to experiments where this organism is the profiled organism; use `coculture_partner=` for partner-side filtering — the two AND-compose.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| organism | string \| None | None | Filter to experiments where this organism is the profiled organism (word-based, case-insensitive match; 'MED4' works). For partner-side filtering, use coculture_partner=; the two filters AND-compose. |
-| treatment_type | list[string] \| None | None | Filter by treatment type(s) (case-insensitive exact match). E.g. ['coculture', 'nitrogen']. Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True). |
-| background_factors | list[string] \| None | None | Filter by background experimental factors (case-insensitive exact match). E.g. ['axenic', 'diel']. Background factors describe experimental context beyond the primary treatment. Live vocabulary: list_experiments(summary=True). |
-| growth_phases | list[string] \| None | None | Filter by growth phase(s) (case-insensitive). Physiological state of the culture at sampling time. E.g. ['exponential', 'nutrient_limited']. |
-| omics_type | list[string] \| None | None | Filter by omics platform(s) (case-insensitive). E.g. ['RNASEQ', 'PROTEOMICS']. |
-| publication_dois | list[string] \| None | None | Filter by publication DOI(s) (case-insensitive exact match). Get DOIs from list_publications. E.g. ['10.1038/ismej.2016.70']. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
+| treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
+| background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
+| growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
+| omics_type | list[string] \| None | None | Keep experiments whose omics_type is in this list. Values: list_filter_values('omics_type'). |
+| publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
 | coculture_partner | string \| None | None | Filter by coculture partner organism (word-based, case-insensitive match). Narrows coculture experiments. E.g. 'Alteromonas', 'HOT1A3'. |
 | search_text | string \| None | None | Free-text search on experiment name, treatment, control, experimental context, and light condition (Lucene fulltext, case-insensitive). E.g. 'continuous light', 'diel'. |
 | time_course_only | bool | False | If true, return only time-course experiments (multiple time points). |
 | table_scope | list[string] \| None | None | Filter by table scope — what genes the source DE table contains. Values: 'all_detected_genes', 'significant_any_timepoint', 'significant_only', 'top_n', 'filtered_subset'. E.g. ['all_detected_genes'] for fair cross-experiment comparison. |
 | experiment_ids | list[string] \| None | None | Restrict to specific experiments by id (exact match). Combines with other filters via AND. `not_found` in the response lists any provided ids that did not match. Mirrors the filter shape on sibling tools (pathway_enrichment, ontology_landscape). |
-| compartment | string \| None | None | Filter by wet-lab fraction (exact match on scalar Experiment.compartment). E.g. 'whole_cell', 'vesicle', 'exoproteome'. Use list_filter_values(filter_type='compartment') to enumerate valid values. |
-| summary | bool | False | When true, return only summary breakdowns (by organism, treatment type, omics type, table scope) with no individual experiments. Use to orient before drilling into detail. |
-| verbose | bool | False | Include publication title, treatment/control descriptions, and experimental conditions (light, medium, temperature, statistical test, context). |
-| limit | int | 5 | Max results. |
-| offset | int | 0 | Number of results to skip for pagination. |
+| compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 5 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 

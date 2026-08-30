@@ -19,28 +19,31 @@ lookup across all kinds; `genes_by_numeric_metric` /
 `genes_by_boolean_metric` / `genes_by_categorical_metric` for
 kind-specific drill-downs.
 
+A genus word in `organism` (e.g. 'Alteromonas') matches every strain
+in that genus rather than raising ambiguous.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string \| None | None | Full-text search over DM name and field_description. Examples: 'diel amplitude', 'darkness survival', 'peak time'. |
-| organism | string \| None | None | Organism to filter by. Accepts short strain code ('MED4', 'NATL2A', 'MIT1002') or full name ('Prochlorococcus MED4'). Word-based, case-insensitive match on preferred_name + name_synonyms; a genus word matches every strain. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
 | metric_types | list[string] \| None | None | Filter by metric_type tags (e.g. 'diel_amplitude_protein_log2', 'periodic_in_coculture_LD'). The same metric_type may appear across organisms / publications — use derived_metric_ids to pin one specific DM when that matters. |
 | value_kind | string ('numeric', 'boolean', 'categorical') \| None | None | Filter by value kind. Determines which drill-down tool applies: 'numeric' → genes_by_numeric_metric, 'boolean' → genes_by_boolean_metric, 'categorical' → genes_by_categorical_metric. |
-| compartment | string \| None | None | Sample compartment / scope. Current values: 'whole_cell', 'vesicle', 'exoproteome', 'extracellular'. |
-| omics_type | list[string] \| None | None | Omics assay type(s). Examples: ['RNASEQ'], ['PROTEOME', 'PAIRED_RNASEQ_PROTEOME']. Case-insensitive. |
-| treatment_type | list[string] \| None | None | Treatment type(s) to match. Returns DMs whose treatment_type list overlaps ANY of the given values (e.g. 'diel', 'darkness', 'nitrogen'). Case-insensitive. Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True). |
-| background_factors | list[string] \| None | None | Background experimental factor(s) to match (e.g. 'axenic', 'coculture', 'diel'). Returns DMs overlapping ANY given value. Case-insensitive. |
-| growth_phases | list[string] \| None | None | Growth phase(s) to match (e.g. 'darkness', 'exponential'). Case-insensitive. |
-| publication_dois | list[string] \| None | None | Filter by one or more publication DOIs (e.g. '10.1128/mSystems.00040-18'). Exact match. |
+| compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
+| omics_type | list[string] \| None | None | Keep experiments whose omics_type is in this list. Values: list_filter_values('omics_type'). |
+| treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
+| background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
+| growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
+| publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
 | experiment_ids | list[string] \| None | None | Filter by one or more Experiment node ids. |
 | derived_metric_ids | list[string] \| None | None | Look up specific DMs by their unique id (matches `derived_metric_id` on each result). Use to pin one DM when the same metric_type appears across publications or organisms. |
 | rankable | bool \| None | None | Filter to DMs that support rank / percentile / bucket analysis. Set to True before calling `genes_by_numeric_metric` with `bucket`, `min/max_percentile`, or `max_rank` — those filters require rankable=True on every selected DM. See `docs://guide/conventions` (DM family gating). |
 | has_p_value | bool \| None | None | Filter to DMs that carry statistical p-values. Set to True before using `significant_only` / `max_adjusted_p_value` on drill-downs. No DM in the current KG carries p-values, so has_p_value=True returns zero rows — kept because drill-down p-value filters raise when no selected DM supports them. |
-| summary | bool | False | Return summary fields only (counts and breakdowns, no individual results). Use for quick orientation. |
-| verbose | bool | False | Include detailed text fields per result: treatment, light_condition, experimental_context. (p_value_threshold is reserved for future DMs with statistical significance; always null in current data.) |
-| limit | int | 20 | Max results to return. Paginate with offset. |
-| offset | int | 0 | Pagination offset (starting row, 0-indexed). |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 20 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 

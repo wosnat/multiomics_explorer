@@ -11,16 +11,19 @@ Routing: group discovery via `search_homolog_groups`; gene → group
 direction via `gene_homologs`; cross-organism expression view via
 `differential_expression_by_ortholog`.
 
+A genus word in `organisms` (e.g. 'Alteromonas') matches every strain
+in that genus rather than raising ambiguous.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | group_ids | list[string] | — | Ortholog group IDs (from search_homolog_groups or gene_homologs). E.g. ['cyanorak:CK_00000570']. Bare ids are accepted (e.g. 'CK_00000570', 'COG0592@2') and coerced to canonical (see `resolved_aliases`). |
-| organisms | list[string] \| None | None | Filter by organisms — each entry a word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word matches every strain). E.g. ['MED4', 'AS9601']. Use list_organisms to see valid values. |
-| summary | bool | False | When true, return only summary fields (results=[]). |
-| verbose | bool | False | Include gene_summary, function_description, consensus_product, source in results. |
-| limit | int | 5 | Max results. |
-| offset | int | 0 | Number of results to skip for pagination. |
+| organisms | list[string] \| None | None | Organisms, each word-matched as `organism`. Omit for all. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 5 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 ## Response format
 

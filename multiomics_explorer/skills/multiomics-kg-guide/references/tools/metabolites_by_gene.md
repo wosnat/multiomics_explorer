@@ -43,25 +43,30 @@ organism=...)`; from `not_matched` to `gene_overview`. See
 direction-agnostic semantics, and `docs://analysis/metabolites`
 for the chemistry-layer decision tree.
 
+`not_found.organism` is set when the `organism` name resolves to
+zero organisms. Long-tail genes (ABC-only annotations) can emit
+large numbers of `limit` rows — use
+`substrate_depth=['most_specific']` to mute, or `offset` to page.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags to drill into (case-sensitive). E.g. ['PMM0963', 'PMM0964', 'PMM0965'] for urease α/β/γ subunits. `not_found.locus_tags` lists tags that don't resolve to any Gene in the requested organism; `not_matched` lists tags that DO resolve but have no chemistry edges (no Gene_catalyzes_reaction AND no Gene_has_tcdb_family). |
-| organism | string | — | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises) — mirrors `differential_expression_by_gene` and `genes_by_metabolite`). Single-organism enforced. E.g. 'Prochlorococcus MED4'. `not_found.organism` is set when the name resolves to zero organisms. |
+| organism | string \| None | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
 | metabolite_elements | list[string] \| None | None | Filter to rows where the metabolite contains ALL of the given element symbols (AND-of-presence). E.g. `['N']` keeps only N-bearing metabolites — the headline N-source workflow primitive. `['N', 'P']` requires both. Anchored on `Metabolite.elements` (KG-A3 Hill-parsed presence list); applies uniformly to both arms. Never substring-match on `formula` (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). `not_found.metabolite_elements` lists symbols that don't exist on any KG metabolite. |
-| metabolite_ids | list[string] \| None | None | Restrict rows to these metabolites (both arms). Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). Cross-feeding: feed `top_metabolites` to `genes_by_metabolite` on a partner. |
-| exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
+| metabolite_ids | list[string] \| None | None | Metabolite IDs; bare or xref forms coerced (see resolved_aliases, docs://analysis/metabolites). |
+| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; bare/xref forms coerced (see resolved_aliases); exclude wins on overlap. |
 | ec_numbers | list[string] \| None | None | Narrow metabolism rows to those whose Reaction carries any of these EC numbers. **Metabolism arm only — does not affect transport rows**, which are returned unchanged. To restrict to metabolism rows alone, combine with `evidence_sources=['metabolism']`. E.g. ['3.5.1.5'] for urease. |
 | metabolite_pathway_ids | list[string] \| None | None | Filter to rows where the **metabolite** is in any of these KEGG pathways (`KeggTerm.id`, e.g. ['kegg.pathway:ko00910'] for nitrogen metabolism). Anchored on `Metabolite.pathway_ids` (transport-extended), so applies uniformly to both arms. **Not gene-anchored** — for filtering by genes' KEGG-pathway annotations, route through `genes_by_ontology(ontology="kegg", term_ids=[pathway_id], organism=...)` first to obtain locus_tags. `not_found.metabolite_pathway_ids` lists IDs that don't exist as a KeggTerm. |
 | mass_balance | string ('balanced', 'unbalanced') \| None | None | Narrow metabolism rows to those whose Reaction has this mass balance status. **Metabolism arm only — does not affect transport rows**. Combine with `evidence_sources=['metabolism']` to restrict to metabolism rows alone. |
 | gene_categories | list[string] \| None | None | Filter on `Gene.gene_category` (exact match, applies to both arms uniformly). Use `list_filter_values(filter_type="gene_category")` for valid values. Note: somewhat redundant with `locus_tags` input; useful when locus_tags is a broad batch and you want chemistry from specific functional categories only. |
 | substrate_depth | list[string ('most_specific', 'inherited')] \| None | None | Keep transport rows whose edge `substrate_depth` is in this list. 'most_specific' = most specific surviving transporter node for the substrate (gene-pruned hierarchy, not a curation level). Transport arm only; mutes ABC tails. |
 | evidence_sources | list[string ('metabolism', 'transport')] \| None | None | Path selector — restricts which arms execute. Set to `['metabolism']` to skip transport entirely (no rollup noise); `['transport']` to skip metabolism. Default fires both arms. Note: `'metabolomics'` is NOT a valid value here — metabolomics evidence has no gene anchor and surfaces only in `list_metabolites`. |
-| summary | bool | False | When true, return only summary fields (results=[]). **Strongly recommended for batch DE inputs** (50+ locus_tags) — envelope rollups (top_metabolites, top_metabolite_pathways, top_reactions, top_tcdb_families, by_element, by_gene, top_gene_categories) are the actually-useful artifact at that scale; detail rows can exceed 1,000 quickly. |
-| verbose | bool | False | Include extended fields per row: gene_category, metabolite_inchikey/smiles/mnxm_id/hmdb_id, reaction_mnxr_id/rhea_ids (metabolism rows), tcdb_level_kind/tc_class_id (transport rows). Same field set as `genes_by_metabolite`. |
-| limit | int | 10 | Max results in `results`. Long-tail genes (ABC-only annotations) can emit large numbers of rows — use `substrate_depth=['most_specific']` to mute, or `offset` to page. |
-| offset | int | 0 | Number of results to skip for pagination. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 10 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_organisms` for valid organism names.
 

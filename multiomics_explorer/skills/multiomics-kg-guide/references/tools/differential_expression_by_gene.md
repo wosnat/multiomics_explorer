@@ -22,20 +22,24 @@ to `gene_response_profile`; cross-organism via
 `differential_expression_by_ortholog`; pathway interpretation via
 `pathway_enrichment` (`docs://analysis/enrichment`).
 
+`growth_phases` is edge-level: an unknown value reports in the
+envelope `warnings`, and a gene with edges outside the requested
+phase(s) lands in `filtered_out`, not `no_expression`.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| organism | string \| None | None | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word that matches several strains raises — name the strain). E.g. 'MED4', 'Prochlorococcus MED4'. Get valid names from list_organisms. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
 | locus_tags | list[string] \| None | None | Gene locus tags. E.g. ['PMM0001', 'PMM0845']. Get these from resolve_gene / gene_overview. |
 | experiment_ids | list[string] \| None | None | Experiment IDs to restrict to. Get these from list_experiments. |
 | direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` is unchanged. |
 | significant_only | bool | False | If true, return only statistically significant results. |
-| growth_phases | list[string] \| None | None | Filter by growth phase(s) at sampling time (case-insensitive, edge-level). Isolates specific-phase rows from multi-phase experiments. E.g. ['exponential']. Live vocabulary: list_filter_values(filter_type='growth_phase'). An unknown value reports in the envelope `warnings`, and any gene with edges outside the requested phase(s) lands in `filtered_out`, not `no_expression`. |
-| summary | bool | False | When true, return only summary fields (results=[]). |
-| verbose | bool | False | Add product, experiment_name, treatment, gene_category, omics_type, coculture_partner to each row. |
-| limit | int | 5 | Max results. |
-| offset | int | 0 | Number of results to skip for pagination. |
+| growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 5 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_organisms` for valid organism names.
 

@@ -28,20 +28,22 @@ chemistry). See `docs://guide/conventions` for tested-absent
 semantics and `docs://analysis/metabolites` for the metabolomics
 decision tree.
 
+`organism` matches by case-insensitive CONTAINS (not word-match).
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| metabolite_ids | list[string] | — | Metabolite IDs to look up (required). Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). `not_found` = absent from KG; `not_matched` = in KG but no assay edge after filters. |
-| organism | string \| None | None | Optional organism filter (case-insensitive CONTAINS). Default `None` = cross-organism — metabolite IDs are organism-agnostic (one Metabolite node shared across organisms). |
+| metabolite_ids | list[string] \| None | — | Metabolite IDs; bare or xref forms coerced (see resolved_aliases, docs://analysis/metabolites). |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
 | evidence_kind | string ('quantifies', 'flags') \| None | None | Filter by edge type. `'quantifies'` = numeric arm only (rows carry value, detection_status, timepoint*). `'flags'` = boolean arm only (rows carry flag_value, n_positive). Default `None` = both arms merged (polymorphic rows; cross-arm fields explicit `None`). |
-| exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
+| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; bare/xref forms coerced (see resolved_aliases); exclude wins on overlap. |
 | metric_types | list[string] \| None | None | Filter by metric_type tag(s) on the parent assay. E.g. ['cellular_concentration', 'extracellular_concentration', 'presence_flag_intracellular', 'presence_flag_extracellular']. |
-| compartment | string \| None | None | Sample compartment ('whole_cell' or 'extracellular'). Exact match on the parent assay. |
-| summary | bool | False | Return summary fields only (results=[]). |
-| verbose | bool | False | Include heavy-text fields per row: assay_field_description, replicate_values, experimental_context. |
-| limit | int | 5 | Max rows. Paginate with `offset`. |
-| offset | int | 0 | Pagination offset. |
+| compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 5 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_organisms` for valid organism names.
 

@@ -23,20 +23,25 @@ gene catalysts/transporters. See `docs://guide/conventions` for
 tested-absent semantics and `docs://analysis/metabolites` for
 the metabolomics decision tree.
 
+`organism` matches by case-insensitive CONTAINS (not word-match);
+cross-organism is the default. A `metabolite_ids` entry absent from
+the KG lands in `not_found.metabolite_ids`; one present but
+unmeasured by the selected assays contributes zero rows.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | assay_ids | list[string] | — | MetaboliteAssay IDs to drill into (full prefixed). Discover via `list_metabolite_assays(value_kind='numeric')`. E.g. ['metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration']. `not_found.assay_ids` lists IDs absent from the KG. |
-| organism | string \| None | None | Filter to assays from this organism (case-insensitive CONTAINS). Cross-organism is the default; pass to narrow. |
-| metabolite_ids | list[string] \| None | None | Restrict to specific metabolites. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). Absent from KG → `not_found.metabolite_ids`; unmeasured by selected assays → zero rows. |
-| exclude_metabolite_ids | list[string] \| None | None | Exclude metabolites by ID; exclude wins on overlap with `metabolite_ids`. Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
+| metabolite_ids | list[string] \| None | None | Metabolite IDs; bare or xref forms coerced (see resolved_aliases, docs://analysis/metabolites). |
+| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; bare/xref forms coerced (see resolved_aliases); exclude wins on overlap. |
 | experiment_ids | list[string] \| None | None | Filter to assays from these experiments. |
-| publication_dois | list[string] \| None | None | Filter by publication DOI(s). Exact match. E.g. ['10.1073/pnas.2213271120']. |
-| compartment | string \| None | None | Sample compartment ('whole_cell' or 'extracellular'). Exact match. |
-| treatment_type | list[string] \| None | None | Treatment type(s) (ANY-overlap, case-insensitive). E.g. ['carbon']. |
-| background_factors | list[string] \| None | None | Background factor(s) (ANY-overlap). E.g. ['axenic']. |
-| growth_phases | list[string] \| None | None | Growth phase(s) (ANY-overlap). Currently unpopulated — KG-side backfill pending. |
+| publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
+| compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
+| treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
+| background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
+| growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
 | min_value | float \| None | None | Lower bound on `value` (raw concentration / intensity). **Caution**: `value > 0` strips tested-absent rows (`value=0` / `detection_status='not_detected'`) — use deliberately, never as default. See `docs://guide/conventions`. |
 | max_value | float \| None | None | Upper bound on `value`. Always applicable. |
 | detection_status | list[string] \| None | None | Detection-status filter — primary qualitative headline. Values: 'detected', 'sporadic', 'not_detected'. Excluding 'not_detected' strips tested-absent rows; surface as caller choice, never default. See `docs://guide/conventions`. |
@@ -45,10 +50,10 @@ the metabolomics decision tree.
 | min_percentile | float \| None | None | Lower bound on `metric_percentile` (0-100). **Rankable-gated.** Tested-absent rows (`detection_status='not_detected'`) never match — their `metric_percentile` is nulled for display. |
 | max_percentile | float \| None | None | Upper bound on `metric_percentile`. **Rankable-gated.** Tested-absent rows (`detection_status='not_detected'`) never match — their `metric_percentile` is nulled for display. |
 | max_rank | int \| None | None | Cap on `rank_by_metric` (1 = highest). Top-N drill-down. **Rankable-gated.** Tested-absent rows (`detection_status='not_detected'`) never match — their `rank_by_metric` is nulled for display. |
-| summary | bool | False | Return summary fields only (results=[]). |
-| verbose | bool | False | Include heavy-text fields per row: assay_name, field_description, experimental_context, light_condition, replicate_values. |
-| limit | int | 5 | Max rows. Paginate with `offset`. |
-| offset | int | 0 | Pagination offset. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 5 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 

@@ -13,24 +13,27 @@ members; `genes_in_cluster(analysis_id=...)` for all clusters in
 one analysis; `gene_clusters_by_gene(locus_tags=[...],
 analysis_ids=[id])` to scope a per-gene cluster lookup.
 
+A genus word in `organism` (e.g. 'Alteromonas') matches every strain
+in that genus rather than raising ambiguous.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string \| None | None | Lucene full-text query over analysis name, cluster names, functional/behavioral descriptions, experimental_context. Results ranked by score. |
-| organism | string \| None | None | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word like 'Alteromonas' matches every strain). |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
 | cluster_type | string \| None | None | Filter by cluster type. Live vocabulary: list_filter_values(filter_type='cluster_type'). Offline examples: 'condition_comparison', 'decay_pattern', 'diel', 'expression_bin', 'genomic_island', 'time_course'. |
-| treatment_type | list[string] \| None | None | Filter by treatment type(s). E.g. ['nitrogen']. Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True). |
-| background_factors | list[string] \| None | None | Filter by background factors. E.g. ['axenic', 'diel']. |
-| growth_phases | list[string] \| None | None | Filter by growth phase(s) (case-insensitive). Physiological state of the culture at sampling time. E.g. ['exponential', 'nutrient_limited']. |
-| omics_type | list[string] \| None | None | Filter by omics platform(s) (case-insensitive). E.g. ['RNASEQ', 'PROTEOMICS']. |
-| publication_dois | list[string] \| None | None | Filter by publication DOI(s). |
+| treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
+| background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
+| growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
+| omics_type | list[string] \| None | None | Keep experiments whose omics_type is in this list. Values: list_filter_values('omics_type'). |
+| publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
 | experiment_ids | list[string] \| None | None | Filter by experiment IDs. |
 | analysis_ids | list[string] \| None | None | Filter by analysis IDs. |
-| summary | bool | False | When true, return only summary fields (results=[]). |
-| verbose | bool | False | Include treatment, light_condition, experimental_context on analyses; functional_description, expression_dynamics, temporal_pattern on inline clusters. |
-| limit | int | 5 | Max results. |
-| offset | int | 0 | Number of results to skip for pagination. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 5 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 

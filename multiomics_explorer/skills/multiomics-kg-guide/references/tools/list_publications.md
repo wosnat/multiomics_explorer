@@ -6,22 +6,24 @@ List publications with experiment summaries, DM rollups, and metabolomics rollup
 
 Routing: drill via `list_experiments(publication_dois=[doi])` for per-experiment detail; `list_clustering_analyses(publication_dois=[doi])` for clustering; `list_derived_metrics(publication_dois=[doi])` for non-DE evidence; `list_metabolite_assays(publication_dois=[doi])` when `metabolite_count > 0`. Per-row `derived_metric_value_kinds` routes to `genes_by_{numeric,boolean,categorical}_metric`.
 
+`publication_dois` combines with the other filters via AND; `not_found` in the response lists any provided DOIs that did not match — the same shape as `experiment_ids` on sibling `list_*` tools. `summary=True` returns every `by_*` rollup uncapped; call it first, then narrow filters. `compartment` keeps publications with at least one experiment in that compartment.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| organism | string \| None | None | Filter by organism name (case-insensitive). E.g. 'MED4', 'HOT1A3'. |
-| treatment_type | list[string] \| None | None | Filter by treatment type(s). E.g. ['coculture', 'nitrogen']. Use list_filter_values for valid values. |
-| background_factors | list[string] \| None | None | Filter by background factor(s) (case-insensitive exact match). E.g. ['axenic']. |
-| growth_phases | list[string] \| None | None | Filter by growth phase(s) (case-insensitive). E.g. ['exponential', 'nutrient_limited']. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
+| treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
+| background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
+| growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
 | search_text | string \| None | None | Free-text search on title, abstract, and description (Lucene syntax). E.g. 'nitrogen', 'co-culture AND phage'. |
 | author | string \| None | None | Filter by author name (case-insensitive). E.g. 'Sher', 'Chisholm'. |
-| publication_dois | list[string] \| None | None | Restrict to specific publications by DOI (case-insensitive). Combines with other filters via AND. `not_found` in the response lists any provided DOIs that did not match. Mirrors the filter shape on sibling list_* tools (list_experiments.experiment_ids). |
-| compartment | string \| None | None | Filter to publications with at least one experiment in this wet-lab compartment (e.g. 'vesicle', 'whole_cell'). Use list_filter_values(filter_type='compartment') to enumerate valid values. |
-| verbose | bool | False | Include abstract and description. Default compact for routing. |
-| limit | int | 5 | Max results. |
-| offset | int | 0 | Number of results to skip for pagination. |
-| summary | bool | False | Envelope only: results=[], every by_* rollup uncapped. Use first, then narrow filters. |
+| publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
+| compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 5 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 

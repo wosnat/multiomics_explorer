@@ -18,28 +18,31 @@ for reverse lookup across both arms, and
 `docs://guide/conventions` for tested-absent semantics and
 `docs://analysis/metabolites` for the metabolomics decision tree.
 
+A genus word in `organism` (e.g. 'Alteromonas') matches every strain
+in that genus rather than raising ambiguous.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string \| None | None | Full-text search over MetaboliteAssay name, field_description, treatment, experimental_context. E.g. 'chitosan', 'cellular concentration', 'KEGG export'. |
-| organism | string \| None | None | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word like 'Alteromonas' matches every strain). E.g. 'MIT9301', 'Prochlorococcus MIT9313'. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
 | metric_types | list[string] \| None | None | Filter by metric_type tags. Live values: 'cellular_concentration', 'extracellular_concentration', 'presence_flag_intracellular', 'presence_flag_extracellular'. |
 | value_kind | string ('numeric', 'boolean') \| None | None | 'numeric' → metabolites_by_quantifies_assay drill-down; 'boolean' → metabolites_by_flags_assay. |
-| compartment | string \| None | None | 'whole_cell' or 'extracellular'. Exact match. |
-| treatment_type | list[string] \| None | None | ANY-overlap. E.g. ['carbon'], ['phosphorus', 'growth_phase']. |
-| background_factors | list[string] \| None | None | ANY-overlap. E.g. ['axenic', 'light']. |
-| growth_phases | list[string] \| None | None | ANY-overlap. Currently unpopulated — KG-side backfill pending. |
-| publication_dois | list[string] \| None | None | DOI(s). Exact match. E.g. ['10.1073/pnas.2213271120', '10.1128/msystems.01261-22']. |
+| compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
+| treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
+| background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
+| growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
+| publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
 | experiment_ids | list[string] \| None | None | Experiment node id(s). |
 | assay_ids | list[string] \| None | None | MetaboliteAssay id(s). `not_found.assay_ids` lists unknowns. |
-| metabolite_ids | list[string] \| None | None | Restrict to assays measuring at least one of these metabolites (1-hop via either assay edge). Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
-| exclude_metabolite_ids | list[string] \| None | None | Exclude assays measuring any of these metabolites (set-difference; exclude wins on overlap). Accepts canonical `kegg.compound:C00064` or bare `C00064` / `CHEBI:17234` / `HMDB…` / `MNXM…` (see `resolved_aliases`). |
+| metabolite_ids | list[string] \| None | None | Metabolite IDs; bare or xref forms coerced (see resolved_aliases, docs://analysis/metabolites). |
+| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; bare/xref forms coerced (see resolved_aliases); exclude wins on overlap. |
 | rankable | bool \| None | None | True → assays supporting rank/percentile/bucket on metabolites_by_quantifies_assay's rankable-gated filters. |
-| summary | bool | False | Return summary fields only (results=[]). |
-| verbose | bool | False | Include heavy-text fields per row: treatment, light_condition, experimental_context. |
-| limit | int | 20 | Max results. |
-| offset | int | 0 | Pagination offset (0-indexed). |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 20 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 

@@ -10,17 +10,19 @@ call.
 Routing: analysis discovery via `list_clustering_analyses`; gene →
 cluster direction via `gene_clusters_by_gene`.
 
+Single organism is enforced even though `organism` is optional.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | cluster_ids | list[string] \| None | None | GeneCluster node IDs (from list_clustering_analyses or gene_clusters_by_gene). Provide this OR analysis_id. |
 | analysis_id | string \| None | None | ClusteringAnalysis node ID — returns all genes in all clusters of this analysis. Provide this OR cluster_ids. |
-| organism | string \| None | None | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises). Single organism enforced. |
-| summary | bool | False | When true, return only summary fields (results=[]). |
-| verbose | bool | False | Include gene_function_description, gene_summary (gene-level), p_value (edge-level), cluster_functional_description, cluster_expression_dynamics, cluster_temporal_pattern (cluster-level). |
-| limit | int | 25 | Max results. |
-| offset | int | 0 | Number of results to skip for pagination. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 25 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_organisms` for valid organism names.
 

@@ -4,18 +4,18 @@
 
 List organisms with taxonomy, data-availability counts, organism_type, DM rollups, chemistry-capability rollups, annotation-coverage rollups, and metabolomics-coverage rollup.
 
-Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `catalyzed_metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Read `top_annotation_capability` (top-10 by `peptidase_gene_count`, plus `interpro_gene_count` / `ncbifam_gene_count`) to see which organisms carry MEROPS / InterPro / NCBIfam coverage — then `genes_by_ontology(ontology='merops'|'interpro'|'ncbifam', organism=...)`. `organism_names=` uses the same word-based, case-insensitive match on preferred_name + name_synonyms as every other tool's organism param ('MED4' works); unknown names land in `not_found`. Two OrganismTaxon nodes share preferred_name 'Meiothermus ruber' (genome strain + gene-less treatment taxon) — both list here.
+Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `catalyzed_metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Read `top_annotation_capability` (top-10 by `peptidase_gene_count`, plus `interpro_gene_count` / `ncbifam_gene_count`) to see which organisms carry MEROPS / InterPro / NCBIfam coverage — then `genes_by_ontology(ontology='merops'|'interpro'|'ncbifam', organism=...)`. `organism_names=` uses the same word-based, case-insensitive match on preferred_name + name_synonyms as every other tool's organism param ('MED4' works); unknown names land in `not_found`. Two OrganismTaxon nodes share preferred_name 'Meiothermus ruber' (genome strain + gene-less treatment taxon) — both list here. `compartment` keeps organisms with at least one experiment in that compartment — it is not a per-organism property.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | organism_names | list[string] \| None | None | Filter by organism: case-insensitive word match on preferred_name and name_synonyms, like every other tool's organism param ('MED4', 'Prochlorococcus MED4'; the synonym 'Meiothermus taiwanensis' resolves to 'Meiothermus ruber'); a genus word like 'Alteromonas' matches every strain. Unknown names are reported in not_found rather than raising. Note: two OrganismTaxon nodes share preferred_name 'Meiothermus ruber' (the genome strain + a gene-less treatment taxon) — join counts by Gene_belongs_to_organism, never by name. |
-| compartment | string \| None | None | Filter to organisms with at least one experiment in this wet-lab compartment (e.g. 'vesicle', 'whole_cell'). Use list_filter_values(filter_type='compartment') to enumerate valid values. |
-| summary | bool | False | Return summary fields only (results=[]). |
-| verbose | bool | False | Include full taxonomy hierarchy (family, order, class, phylum, kingdom, superkingdom, lineage). |
-| limit | int | 5 | Max results. |
-| offset | int | 0 | Number of results to skip for pagination. |
+| compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 5 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 ## Response format
 

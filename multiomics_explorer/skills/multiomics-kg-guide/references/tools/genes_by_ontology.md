@@ -17,7 +17,11 @@ package defaults to unbounded (all rows), which
 
 [TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
 `call_class` / `interpro_type` filter on the per-edge trust profile;
-defaults never filter. See docs://analysis/annotation_evidence.
+defaults never filter. `informative_only` (default False) drops terms
+the KG flags uninformative — e.g. KEGG KO 'uncharacterized protein'
+terms, GO root go:0008150, KEGG global/overview maps like ko01100;
+term-side only, never restricts the gene set. See
+docs://analysis/annotation_evidence.
 
 Routing: pipe `results` into `pathway_enrichment` / `cluster_enrichment`
 as TERM2GENE; chain from `search_ontology` for term discovery;
@@ -32,23 +36,23 @@ conventions; docs://analysis/enrichment for the enrichment workflow.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') | — | Ontology for these term_ids / this level. |
-| organism | string | — | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises). Required — single-valued. Use list_organisms for valid values. |
+| organism | string \| None | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | level | int \| None | None | Hierarchy level to roll UP to (0 = broadest). At least one of `level` or `term_ids` must be provided. See docs://guide/conventions. |
 | term_ids | list[string] \| None | None | Ontology term IDs (from search_ontology). Without `level`: expand DOWN from each input term. With `level`: scope rollup to these level-N terms. Bare ids are accepted (e.g. 'ko00910', 'GO:0006979') and coerced to canonical (see `resolved_aliases`). |
 | min_gene_set_size | int | 5 | Exclude terms with fewer organism-scoped genes than this. Matches `ontology_landscape`'s organism-scoped convention. |
 | max_gene_set_size | int | 500 | Exclude terms with more organism-scoped genes than this. Matches `ontology_landscape`'s organism-scoped convention. |
-| informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; the global / overview KEGG maps such as ko01100). Term-side filter only — never restricts the gene set. Default False (opt-in). |
-| summary | bool | False | If true, omit `results` (envelope only). |
-| verbose | bool | False | Include function_description and sparse level_is_best_effort. |
-| sources | list[string] \| None | None | Keep rows whose edge sources[] contains any of these values (e.g. ['eggnog']). Valid on the 14 functional-edge ontologies (not PSORTb / SignalP). Default None never filters. See list_filter_values(filter_type='sources'). |
-| evidence | list[string] \| None | None | Keep rows whose compact evidence ladder value is in this list (read the value; rung assignment is per ontology — see docs://analysis/annotation_evidence). Valid on the 14 functional-edge ontologies. Default None never filters. |
-| max_tier | int \| None | None | Keep rows with edge tier <= this value OR tier IS NULL (diamond truncation depth, 1-3; tier-null edges are always kept - see by_tier's null bucket). Valid on tcdb, merops only. |
-| min_evidence_score | float \| None | None | Keep rows with edge evidence_score >= this cutoff (composite trust score, 0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, tcdb, merops. Envelope adds evidence_score_signals when set. |
-| call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; leaving unfiltered mixes in catalytically-dead homologs (nonpeptidase_homolog) - the envelope warns when it does. |
+| informative_only | bool | False | True drops terms the KG flags uninformative (roots, catch-alls). |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| sources | list[string] \| None | None | Keep rows whose edge sources[] contains any of these values. Valid on the 14 functional-edge ontologies (not PSORTb/SignalP). See list_filter_values('sources'). |
+| evidence | list[string] \| None | None | Keep rows whose compact evidence-ladder value is in this list. Valid on the 14 functional-edge ontologies. See docs://analysis/annotation_evidence. |
+| max_tier | int \| None | None | Keep rows with edge tier <= this value OR tier IS NULL (diamond truncation depth, 1-3; null tier always kept). Valid on tcdb, merops only. |
+| min_evidence_score | float \| None | None | Keep rows with edge evidence_score >= this cutoff (0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, tcdb, merops. |
+| call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
-| limit | int | 50 | Default 50 over MCP; the Python package defaults to unbounded (every row) — pass an explicit limit to page. |
-| offset | int | 0 | Skip N rows before limit |
+| limit | int \| None | 50 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_organisms` for valid organism names.
 

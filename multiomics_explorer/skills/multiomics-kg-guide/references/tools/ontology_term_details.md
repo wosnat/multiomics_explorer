@@ -38,11 +38,11 @@ docs://ontologies/{key} for how each ontology is built and read.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | term_ids | list[string] | — | Self-prefixed term IDs, any ontology mix (e.g. 'go:0006979', 'tcdb:3.A.1', 'interpro:IPR000362', 'pfam:PF00005', 'kegg.pathway:ko00010'). Rows return in input order. Bare ids accepted (e.g. 'ko00910', 'GO:0006979') — see `resolved_aliases`. |
-| organism | string \| None | None | Organism to scope genes_by_organism to (resolved like every other tool: 'MED4' -> 'Prochlorococcus MED4'; unknown/ambiguous raises). Rows gain organism_gene_count (subtree). Default: all organisms. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
 | link_kinds | list[string ('composition', 'membership', 'router')] \| None | None | Keep links_out of these kinds: 'composition' = built from target (tcdb/merops -> pfam); 'membership' = belongs to (pfam/ncbifam -> interpro, kegg -> brite); 'router' = recall-biased (interpro -> ec/cazy, ncbifam TIGR* -> tigr.role). Default all. |
-| verbose | bool | False | Add `properties` (every node prop), `links_out[].props` (curated_tcids, member_id_count, router_ambiguous) and `genes_by_organism`. Default compact. |
-| limit | int | 50 | Max rows (found terms) to return. |
-| offset | int | 0 | Number of found rows to skip for pagination. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 50 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_organisms` for valid organism names.
 

@@ -6,6 +6,8 @@ Return each anchor gene's genomic neighborhood — genes adjacent on the same co
 
 Routing: feed anchors from `differential_expression_by_gene` or `genes_by_metabolite`, then chain the returned neighbor locus_tags into `gene_overview` / `gene_aa_sequence` / `differential_expression_by_gene` for operon context.
 
+`limit` defaults to every anchor × (2×window+1) neighbors (min 25); pass an explicit number to page. `summary=True` is sugar for `limit=0`.
+
 ## Parameters
 
 | Name | Type | Default | Description |
@@ -14,8 +16,8 @@ Routing: feed anchors from `differential_expression_by_gene` or `genes_by_metabo
 | window | int | 5 | Number of genes upstream AND downstream on the same contig (±N by start order). |
 | max_bp_distance | int \| None | None | Optional cap: drop neighbors whose intergenic gap to the anchor exceeds this many bp. |
 | same_strand | bool \| None | None | None=all neighbors; True=co-oriented only; False=opposite-strand only. Null-strand neighbors dropped when set. |
-| summary | bool | False | If true, return envelope only (results=[]); sugar for limit=0. |
-| limit | int \| None | None | Default: every anchor x (2*window+1) neighbors (min 25). Pass a number to page. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| limit | int \| None | None | Max rows returned (paging). |
 
 ## Response format
 

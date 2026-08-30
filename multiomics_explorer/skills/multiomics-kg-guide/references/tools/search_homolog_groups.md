@@ -21,10 +21,10 @@ for Lucene scoring semantics.
 | max_specificity_rank | int \| None | None | Cap group breadth. 0=curated only, 1=+family, 2=+order, 3=+domain (all). |
 | cyanorak_roles | list[string] \| None | None | Filter by CyanorakRole term IDs. OR within list. E.g. ['cyanorak.role:G.3', 'cyanorak.role:J.8']. |
 | cog_categories | list[string] \| None | None | Filter by CogFunctionalCategory term IDs. OR within list. E.g. ['cog.category:C', 'cog.category:J']. |
-| summary | bool | False | When true, return only summary fields (results=[]). |
-| verbose | bool | False | Include description, functional_description, genera, has_cross_genus_members in results. |
-| limit | int | 5 | Max results. |
-| offset | int | 0 | Number of results to skip for pagination. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 5 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 ## Response format
 

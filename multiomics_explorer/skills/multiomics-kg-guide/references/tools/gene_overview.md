@@ -8,15 +8,17 @@ Batch gene routing: identity (gene_name, product, gene_category) plus per-gene d
 
 Routing: drill into each axis when the per-gene signal is non-zero — `gene_ontology_terms` (annotation_types non-empty), `gene_homologs` (closest_ortholog_group_size > 0), `gene_clusters_by_gene` (cluster_membership_count > 0), `differential_expression_by_gene` / `gene_response_profile` (expression_edge_count > 0), `gene_derived_metrics` and `genes_by_{numeric,boolean,categorical}_metric` keyed off `derived_metric_value_kinds`, `metabolites_by_gene` / `genes_by_metabolite` (evidence_sources non-empty), `gene_ontology_terms(ontology='merops')` (merops_classes non-empty), `gene_ontology_terms(ontology=['tcdb'])` (tcdb_family_count > 0), `gene_ontology_terms(ontology=['cazy'])` (cazy_family_count > 0). Use `gene_details` for the full Gene-node property dump.
 
+`limit` defaults to every input gene (min 25); pass an explicit number to page.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags to look up. E.g. ['PMM0001', 'PMM0845']. |
-| summary | bool | False | When true, return only summary fields (results=[]). |
-| verbose | bool | False | Include gene_summary, function_description, all_identifiers, discussed_in_publications ({doi, prominence, evidence}), per-kind derived-metric counts and compartments_observed. |
-| limit | int \| None | None | Default: every input gene (min 25). Pass a number to page. |
-| offset | int | 0 | Number of results to skip for pagination. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | None | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 ## Response format
 

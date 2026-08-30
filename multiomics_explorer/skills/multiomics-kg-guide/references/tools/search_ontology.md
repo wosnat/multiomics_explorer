@@ -15,9 +15,13 @@ apply PER ontology (lockstep paging); rows are grouped by ontology in
 registry order, then score DESC (search) / gene_count DESC (browse).
 `by_ontology` carries per-ontology truncation.
 
-[TRUST] `interpro_type` scopes InterPro terms to one entry type. See
-docs://analysis/annotation_evidence for the full trust surface, and
-docs://ontologies/{key} for what each ontology means and how to read it.
+[TRUST] `interpro_type` scopes InterPro terms to one entry type.
+`informative_only` (default False) drops terms the KG flags
+uninformative — e.g. KEGG KO 'uncharacterized protein' terms, GO root
+go:0008150, KEGG global/overview maps like ko01100; term-side only,
+never restricts the gene set. See docs://analysis/annotation_evidence
+for the full trust surface, and docs://ontologies/{key} for what each
+ontology means and how to read it.
 
 Routing: chain term_ids into `genes_by_ontology` for gene discovery;
 `ontology_term_details(term_ids=[...])` for a term's hierarchy, bridges
@@ -30,16 +34,16 @@ reference.
 |---|---|---|---|
 | search_text | string \| None | None | Lucene query over term names, e.g. 'replication', 'oxido*', 'transport AND membrane'. None/'' = browse mode: list terms sorted by gene_count DESC (score null). See docs://guide/conventions for Lucene scoring. |
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') \| list[string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops')] \| None | None | Ontology key or list. None = all 17. limit/offset apply per ontology. |
-| summary | bool | False | When true, return only summary fields (results=[]). |
-| limit | int | 5 | Max results per ontology (returned <= limit x n_ontologies). |
-| offset | int | 0 | Number of results to skip per ontology (lockstep paging). |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| limit | int \| None | 5 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 | level | int \| None | None | Hierarchy level filter (0 = broadest). See docs://guide/conventions for the level convention. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Applies to 'brite' only; raises if 'brite' is not in the ontology set. See docs://guide/conventions for the BRITE-tree scoping rule. |
-| informative_only | bool | False | When True, exclude terms flagged uninformative in KG (e.g. KEGG KO 'uncharacterized protein' terms, GO root go:0008150; the global / overview KEGG maps such as ko01100). Term-side filter only — never restricts the gene set. Default False (opt-in). |
-| verbose | bool | False | Add description, level_kind, direct_gene_count, per-ontology columns (tcdb superfamily/metabolite_count, ncbifam family_type/gene_symbol, merops family_class/catalytic_type/peptidase_gene_count) and KEGG discussed_in_publications. Default compact. |
+| informative_only | bool | False | True drops terms the KG flags uninformative (roots, catch-alls). |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type. Applies to 'interpro' only; raises if 'interpro' is not in the set. |
 | min_gene_count | int \| None | None | Keep terms with gene_count >= this (subtree organism_gene_count when `organism` is set). Narrows browse mode. |
-| organism | string \| None | None | Organism to scope counts to (resolved like every other tool: 'MED4' -> 'Prochlorococcus MED4'; unknown/ambiguous raises). Rows gain organism_gene_count (subtree-scoped, like ontology_term_details) and browse sorts by it. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 

@@ -19,20 +19,23 @@ Routing: discover groups via `search_homolog_groups`; group membership
 without expression via `genes_by_homolog_group`; per-gene drill-down
 via `differential_expression_by_gene`.
 
+Each `organisms` entry is OR-matched (word-based); a genus word
+(e.g. 'Alteromonas') matches every strain in that genus.
+
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | group_ids | list[string] | — | Ortholog group IDs (from search_homolog_groups or gene_homologs). E.g. ['cyanorak:CK_00000570']. Bare ids are accepted (e.g. 'CK_00000570', 'COG0592@2') and coerced to canonical (see `resolved_aliases`). |
-| organisms | list[string] \| None | None | Filter by organisms — each entry a word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word matches every strain); OR semantics. E.g. ['MED4', 'MIT9313']. Use list_organisms to see valid values. |
+| organisms | list[string] \| None | None | Organisms, each word-matched as `organism`. Omit for all. |
 | experiment_ids | list[string] \| None | None | Filter to these experiments. Get IDs from list_experiments. |
 | direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` is unchanged. |
 | significant_only | bool | False | If true, return only statistically significant rows. |
-| growth_phases | list[string] \| None | None | Filter by growth phase(s) at sampling time (case-insensitive, edge-level). Isolates specific-phase rows from multi-phase experiments. E.g. ['exponential']. |
-| summary | bool | False | When true, return only summary fields (results=[]). |
-| verbose | bool | False | Add experiment_name, treatment, omics_type, table_scope, table_scope_detail to each row. |
-| limit | int | 5 | Max result rows. |
-| offset | int | 0 | Number of results to skip for pagination. |
+| growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 5 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 ## Response format
 

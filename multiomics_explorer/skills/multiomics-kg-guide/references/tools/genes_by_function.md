@@ -4,20 +4,20 @@
 
 Free-text search across gene names, products, and functional descriptions. Lucene syntax (see docs://guide/conventions). Results ranked by relevance score.
 
-Routing: feed `locus_tag`s into `gene_overview` (data-availability triage), `gene_ontology_terms` (annotation drill-down), or `genes_by_ontology` for ontology-anchored search instead.
+Routing: feed `locus_tag`s into `gene_overview` (data-availability triage), `gene_ontology_terms` (annotation drill-down), or `genes_by_ontology` for ontology-anchored search instead. A genus word in `organism` (e.g. 'Alteromonas') matches every strain in that genus rather than raising ambiguous.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string | — | Free-text query (Lucene syntax: quoted phrases, AND/OR, wildcards `*`, fuzzy `~`). E.g. 'photosystem', 'nitrogen AND transport', 'dnaN~'. Multi-word input is OR'd — quote the phrase or join with AND for an exact/combined match. See docs://guide/conventions for Lucene scoring details. |
-| organism | string \| None | None | Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word like 'Alteromonas' matches every strain). E.g. 'MED4', 'Prochlorococcus MED4'. Use list_organisms to see valid values. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
 | gene_categories | list[string] \| None | None | Filter by gene_category — matches any of the given values. E.g. ['Photosynthesis', 'Transport']. Use list_filter_values to see valid values. |
 | min_quality | int | 0 | Minimum annotation_quality (0..3 numeric encoding of `Gene.annotation_state`): 0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. Use 2 to skip hypothetical proteins; 3 for high-confidence. [AQ] Definition shifted in 2026-05 KG release; see docs://guide/conventions. |
-| summary | bool | False | When true, return only summary fields (results=[]). |
-| verbose | bool | False | Include function_description and gene_summary. |
-| limit | int | 5 | Max results. |
-| offset | int | 0 | Number of results to skip for pagination. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| limit | int \| None | 5 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
