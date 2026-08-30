@@ -77,6 +77,7 @@ total_entries, total_matching, by_organism, by_value_kind, by_metric_type, by_co
 | metric_type | string | Category tag identifying what is measured (e.g. 'diel_amplitude_protein_log2'). The same metric_type may appear across organisms / publications — pair with organism or publication_doi when that matters, or use derived_metric_id to pin one specific DM. |
 | value_kind | string ('numeric', 'boolean', 'categorical') | Routes to the correct drill-down tool: 'numeric' → genes_by_numeric_metric, 'boolean' → genes_by_boolean_metric, 'categorical' → genes_by_categorical_metric. |
 | rankable | bool | True if this DM supports rank / percentile / bucket analysis on `genes_by_numeric_metric`. Rankable-gated filters raise if every selected DM is non-rankable, soft-exclude on mixed input. See `docs://guide/conventions` (DM family gating). |
+| unit | string | Measurement unit for numeric DMs (e.g. 'hours', 'log2'). Empty string for boolean and categorical DMs. |
 | allowed_categories | list[string] \| None | Valid category strings for this DM. Non-null only when value_kind='categorical'; pass a subset as `categories` to genes_by_categorical_metric. |
 | organism_name | string | Full organism name (e.g. 'Prochlorococcus MED4', 'Alteromonas macleodii MIT1002'). |
 | total_gene_count | int | Number of distinct genes with at least one measurement for this DM. |
@@ -87,7 +88,6 @@ total_entries, total_matching, by_organism, by_value_kind, by_metric_type, by_co
 | Field | Type | Description |
 |---|---|---|
 | has_p_value | bool \| None (optional) | True if this DM carries statistical p-values, enabling `significant_only` / `max_adjusted_p_value` on drill-downs. No DM in the current KG carries p-values. Verbose only. |
-| unit | string \| None (optional) | Measurement unit for numeric DMs (e.g. 'hours', 'log2'). Empty string for boolean and categorical DMs. Verbose only. |
 | field_description | string \| None (optional) | Detailed explanation of what this DM measures and how to interpret its values. Verbose only. |
 | experiment_id | string \| None (optional) | Parent Experiment node id. Look up context via list_experiments. Verbose only. |
 | publication_doi | string \| None (optional) | Parent publication DOI (e.g. '10.1128/mSystems.00040-18'). Verbose only. |

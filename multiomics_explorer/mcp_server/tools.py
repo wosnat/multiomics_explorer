@@ -5940,11 +5940,10 @@ def register_tools(mcp: FastMCP):
                 "No DM in the current KG carries p-values. Verbose only."
             ),
         )
-        unit: str | None = Field(
-            default=None,
+        unit: str = Field(
             description=(
                 "Measurement unit for numeric DMs (e.g. 'hours', 'log2'). "
-                "Empty string for boolean and categorical DMs. Verbose only."
+                "Empty string for boolean and categorical DMs."
             ),
         )
         allowed_categories: list[str] | None = Field(

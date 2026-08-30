@@ -110,7 +110,7 @@ from multiomics_explorer import (
 )
 
 # 1. Discover: what boolean DMs does MED4 have?
-# verbose=True — compartment is a verbose-only field (llm-review 2b.2).
+# verbose=True — compartment is a verbose-only field.
 dms = list_derived_metrics(
     organism="MED4", value_kind="boolean", verbose=True, limit=None,
 )
@@ -160,7 +160,7 @@ med4 = list_organisms(organism_names=["Prochlorococcus MED4"])["results"][0]
 med4["derived_metric_value_kinds"]   # ['boolean', 'categorical', 'numeric']
 med4["compartments"]                 # ['vesicle', 'whole_cell']
 
-# verbose=True — has_p_value is a verbose-only field (llm-review 2b.2).
+# verbose=True — has_p_value is a verbose-only field.
 for dm in list_derived_metrics(
         organism="MED4", verbose=True, limit=None)["results"]:   # 26 DMs
     print(dm["metric_type"], dm["value_kind"], dm["rankable"], dm["has_p_value"])

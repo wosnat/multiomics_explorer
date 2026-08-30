@@ -4594,16 +4594,19 @@ def list_clustering_analyses(
     return envelope
 
 
-# Compact-row drop list for list_derived_metrics (llm-review 2b.2 Task 5):
-# these fields are metric-level detail already surfaced by an envelope
-# `by_*` breakdown (organism_name/rankable/value_kind stay compact — they
-# are the row's own identity, not redundant) and are dropped unconditionally
-# from `results` rows when verbose=False. The Cypher builder still selects
-# them regardless of `verbose` (only treatment/light_condition/
-# experimental_context are builder-gated) — the strip happens here.
+# Compact-row drop list for list_derived_metrics: fields that are either
+# verbose-only detail (has_p_value, field_description, experiment_id,
+# publication_doi) or duplicated in an envelope breakdown (compartment,
+# omics_type, treatment_type, background_factors, growth_phases all have a
+# `by_*` rollup). `unit` stays compact — a numeric `value` is unreadable
+# without it. organism_name/rankable/value_kind/metric_type also stay
+# compact — they're the row's own identity, not redundant. Dropped
+# unconditionally from `results` rows when verbose=False. The Cypher
+# builder still selects these columns regardless of `verbose` (only
+# treatment/light_condition/experimental_context are builder-gated) — the
+# strip happens here.
 _LIST_DM_COMPACT_DROP = (
     "has_p_value",
-    "unit",
     "field_description",
     "experiment_id",
     "publication_doi",
@@ -4644,9 +4647,9 @@ def list_derived_metrics(
     by_treatment_type, by_background_factors, by_growth_phase,
     score_max, score_median, returned, offset, truncated, results.
     Per result (compact): derived_metric_id, name, metric_type, value_kind,
-    rankable, organism_name, total_gene_count, allowed_categories, score
-    (when searching).
-    Per result (verbose): adds has_p_value, unit, field_description,
+    rankable, organism_name, unit, total_gene_count, allowed_categories,
+    score (when searching).
+    Per result (verbose): adds has_p_value, field_description,
     experiment_id, publication_doi, compartment, omics_type, treatment_type,
     background_factors, growth_phases, treatment, light_condition,
     experimental_context.

@@ -7510,23 +7510,24 @@ class TestListDerivedMetrics:
         assert out["score_max"] is None
 
     def test_compact_drops_verbose_only_fields(self):
-        """verbose=False (default) strips the 10 fields moved behind
-        verbose (llm-review 2b.2 Task 5); the compact identity/routing
-        set (derived_metric_id, name, metric_type, value_kind, rankable,
-        organism_name, total_gene_count, allowed_categories) survives."""
+        """verbose=False (default) strips the 9 fields moved behind
+        verbose; the compact identity/routing set (derived_metric_id,
+        name, metric_type, value_kind, rankable, organism_name, unit,
+        total_gene_count, allowed_categories) survives — `unit` stays
+        compact because a numeric `value` is unreadable without it."""
         from multiomics_explorer.api.functions import list_derived_metrics
         conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
         out = list_derived_metrics(organism="MED4", conn=conn)
         row = out["results"][0]
         for dropped in (
-            "has_p_value", "unit", "field_description", "experiment_id",
+            "has_p_value", "field_description", "experiment_id",
             "publication_doi", "compartment", "omics_type",
             "treatment_type", "background_factors", "growth_phases",
         ):
             assert dropped not in row, f"{dropped} should be dropped compact"
         for kept in (
             "derived_metric_id", "name", "metric_type", "value_kind",
-            "rankable", "organism_name", "total_gene_count",
+            "rankable", "organism_name", "unit", "total_gene_count",
             "allowed_categories",
         ):
             assert kept in row, f"{kept} should remain in compact row"
@@ -7537,7 +7538,7 @@ class TestListDerivedMetrics:
         out = list_derived_metrics(organism="MED4", verbose=True, conn=conn)
         row = out["results"][0]
         for kept in (
-            "has_p_value", "unit", "field_description", "experiment_id",
+            "has_p_value", "field_description", "experiment_id",
             "publication_doi", "compartment", "omics_type",
             "treatment_type", "background_factors", "growth_phases",
         ):

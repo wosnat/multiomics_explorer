@@ -30,7 +30,6 @@ examples:
 
 verbose_fields:
   - has_p_value
-  - unit
   - field_description
   - experiment_id
   - publication_doi
