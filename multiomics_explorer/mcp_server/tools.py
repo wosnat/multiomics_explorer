@@ -10655,6 +10655,9 @@ def register_tools(mcp: FastMCP):
         assay_id: str = Field(description="Assay id.")
         count: int = Field(description="Row count from this assay.")
 
+    # Deliberately NOT a SparseRow (backlog 2b.9 audit): the api layer pads
+    # cross-arm fields with explicit None so every row carries identical keys
+    # (numeric + boolean arms merged). Keep BaseModel so the wire keeps them.
     class AssaysByMetaboliteResult(BaseModel):
         # Identity (always)
         metabolite_id: str = Field(
@@ -11138,6 +11141,9 @@ def register_tools(mcp: FastMCP):
     # discussed_by_publication — literature 'discusses' forward lookup
     # -----------------------------------------------------------------
 
+    # Deliberately NOT a SparseRow (backlog 2b.9 audit): rows are a
+    # gene / kegg_pathway union padded with explicit None (`organism` on
+    # pathway rows, `evidence` when not verbose) — documented as null on the wire.
     class DiscussedByPublicationResult(BaseModel):
         doi: str = Field(description="Publication DOI that discusses this entity (e.g. '10.1038/ismej.2016.70').")
         entity_kind: Literal["gene", "kegg_pathway"] = Field(description="Discussed entity type: 'gene' or 'kegg_pathway'.")

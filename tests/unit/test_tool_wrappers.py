@@ -10805,6 +10805,35 @@ class TestExpectedToolsUnchangedForAnnotationTrust:
             assert key not in tool_fns
 
 
+class TestSparseRowAudit:
+    """backlog 2b.9: every `results: list[X]` row model is a SparseRow,
+    except the polymorphic-row models whose api layer pads every key with
+    an explicit None (identical keys on every row is their contract)."""
+
+    EXPLICIT_NONE_ROW_MODELS = {"AssaysByMetaboliteResult", "DiscussedByPublicationResult"}
+
+    def test_results_row_models_are_sparse(self):
+        import inspect, re
+        import multiomics_explorer.mcp_server.tools as tools_mod
+        src = inspect.getsource(tools_mod)
+        row_models = set(re.findall(r"results: list\[(\w+)\]", src))
+        assert row_models, "regex found no results row models — file layout changed?"
+        non_sparse = {
+            name for name in row_models
+            if re.search(rf"class {name}\(BaseModel\):", src)
+        }
+        assert non_sparse == self.EXPLICIT_NONE_ROW_MODELS
+
+    @pytest.mark.parametrize("name", sorted(EXPLICIT_NONE_ROW_MODELS))
+    def test_explicit_none_models_say_why(self, name):
+        import inspect
+        import multiomics_explorer.mcp_server.tools as tools_mod
+        src = inspect.getsource(tools_mod)
+        idx = src.index(f"class {name}(BaseModel):")
+        preceding = src[max(0, idx - 400):idx]
+        assert "SparseRow" in preceding and "explicit None" in preceding
+
+
 class TestSparseRowWireShape:
     """Trust row models serialize only the fields the api layer set:
     a non-applicable column (never provided) is omitted from the wire,
