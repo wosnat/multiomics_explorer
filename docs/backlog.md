@@ -41,6 +41,7 @@ Shipped 2026-08-28 against the 11:58Z dev build: HO-001 two-state strings (`two_
 | 2b.9 | audit remaining MCP row models for `SparseRow` (ExpressionByExperiment was the last found non-sparse). | S | queued |
 | 2b.10 | `summary=True` is no longer reliably the cheap call on `metabolites_by_gene` — one conventions sentence. | S | queued |
 | 2b.11 | `_cap_breakdowns` is imported privately by `analysis/enrichment.py` — move to a shared module. | S | queued |
+| 2b.12 | `warnings` key on `genes_by_homolog_group` / `differential_expression_by_ortholog` (the only coercing tools without one); narrow `_run_fulltext`'s catch to `ParseException` or mention index-unavailable in the message. | S | llm-review 2b.3 final review |
 
 ## 3. Older backlog — verified 2026-08-28
 

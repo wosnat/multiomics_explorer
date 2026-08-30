@@ -35,7 +35,7 @@ coordinated to `0.1.0a5` ahead of the KG release.
 - `docs://examples/annotation_evidence.py` registered (was referenced but not served); `examples/pathway_enrichment.py` rebuilt with the `--scenario landscape|de|cluster|ortholog|custom` interface.
 - KG handoff `docs/kg-specs/2026-08-29-docs-review-kg-asks.md` (DOC-001..008).
 
-- **Silent-zero warnings, shared helper** (llm-review 2b.3 Task 1). New
+- **Silent-zero warnings, shared helper.** New
   `_closed_vocab_warnings` / `_organism_zero_match_warning` helpers replace
   2b.1's per-field version; wired into `genes_by_function`, `list_experiments`,
   `list_publications`, `list_organisms`, `list_derived_metrics`,
@@ -51,8 +51,8 @@ coordinated to `0.1.0a5` ahead of the KG release.
   `GeneClustersByGeneResponse`). Warning text: `"<param> value '<v>' matched
   nothing — valid values: ... (list_filter_values(filter_type='<type>'))"` /
   `"organism '<v>' matched no organism — see list_organisms()"`.
-- **Bare ontology/ortholog-group ID coercion + locus-tag case warning**
-  (llm-review 2b.3 Task 2). `genes_by_ontology`, `ontology_term_details`,
+- **Bare ontology/ortholog-group ID coercion + locus-tag case warning.**
+  `genes_by_ontology`, `ontology_term_details`,
   `genes_by_homolog_group`, `differential_expression_by_ortholog`,
   `pathway_enrichment`, `cluster_enrichment` accept bare term / group ids
   (e.g. `ko00910` → `kegg.pathway:ko00910`, `GO:0006979` → `go:0006979`,
@@ -65,8 +65,8 @@ coordinated to `0.1.0a5` ahead of the KG release.
   `metabolites_by_gene`) warn `"<input> not found; '<existing>' differs only
   by case"` on a locus_tag that differs only by case from a real
   `Gene.locus_tag` (locus tags are never normalised).
-- **DM drill-down wrong-kind / impossible-filter routing** (llm-review 2b.3
-  Task 3). `genes_by_numeric_metric` / `genes_by_boolean_metric` /
+- **DM drill-down wrong-kind / impossible-filter routing.**
+  `genes_by_numeric_metric` / `genes_by_boolean_metric` /
   `genes_by_categorical_metric` now classify a wrong-kind
   `derived_metric_ids` / `metric_types` entry as `not_matched_*` (not
   silently empty) with a `warnings` entry naming the sibling tool (`"<id>
@@ -78,12 +78,10 @@ coordinated to `0.1.0a5` ahead of the KG release.
   validation error instead of silently matching nothing.
   `genes_by_boolean_metric(flag=False)` on a positive-only DM warns `"<id>
   stores positive flags only — flag=False cannot match; read
-  by_metric[*].false_count"` (also fixes a latent bug where `true_count`
-  under `flag=False` always read 0 regardless of the DM's real flagged-edge
-  count). `gene_derived_metrics` gained the same sibling-tool warning for a
-  wrong-kind id.
-- **BRITE requires `tree`; Lucene errors are readable** (llm-review 2b.3 Task
-  4). `pathway_enrichment` / `cluster_enrichment` raise
+  by_metric[*].false_count"`. `gene_derived_metrics` gained the same
+  sibling-tool warning for a wrong-kind id.
+- **BRITE requires `tree`; Lucene errors are readable.**
+  `pathway_enrichment` / `cluster_enrichment` raise
   `ValueError("ontology='brite' needs tree= (12 trees; see
   list_filter_values(filter_type='brite_tree')) — a tree-less run mixes
   taxonomy and function terms.")` before any query when `ontology='brite'`
@@ -96,17 +94,14 @@ coordinated to `0.1.0a5` ahead of the KG release.
   exception on a persistent parse failure. `search_ontology` appends
   `"search_text was sanitised to '<q>'"` to `warnings` when its
   escape-and-retry changed the query.
-- **Remaining silent paths on assays, clusters, metabolite IDs** (llm-review
-  2b.3 Task 5). `list_metabolite_assays` / `assays_by_metabolite` warn
+- **Remaining silent paths on assays, clusters, metabolite IDs.**
+  `list_metabolite_assays` / `assays_by_metabolite` warn
   `"organism '<name>' has no metabolomics assays — organisms with assays:
   ..."` when the organism resolves genomically but has zero
   `MetaboliteAssay` nodes. `genes_in_cluster(analysis_id=)` gains
   `not_found_analysis: str | None` (an unknown `analysis_id` no longer
-  looks identical to "exists, zero clusters") plus a `warnings` entry; a
-  root-cause fix also makes `not_matched_organism` fire only on a genuine
-  organism mismatch (new `ca_organism_name` / `_organism_word_match`),
-  unblocking `cluster_enrichment`'s exists-but-empty warning path (rather
-  than raising `"analysis_id not found"`). `genes_by_metabolite` /
+  looks identical to "exists, zero clusters") plus a `warnings` entry.
+  `genes_by_metabolite` /
   `list_metabolites` warn `"'<v>' is not a metabolite id — resolve names
   with list_metabolites(search_text=...)"` on a `metabolite_ids` entry
   matching no recognized id shape at all. `list_metabolites(elements=...)`
@@ -116,8 +111,8 @@ coordinated to `0.1.0a5` ahead of the KG release.
   a wrong-kind `assay_id` as found-but-wrong-kind with a sibling-tool
   warning instead of `not_found`.
 
-- **Bare / xref metabolite-ID coercion** (backlog 3.2, closes KG-MET-014
-  explorer-side). Every `metabolite_ids` / `exclude_metabolite_ids`
+- **Bare / xref metabolite-ID coercion** (closes KG-MET-014 explorer-side).
+  Every `metabolite_ids` / `exclude_metabolite_ids`
   parameter on the 7 chemistry + metabolomics tools (`list_metabolites`,
   `genes_by_metabolite`, `metabolites_by_gene`, `list_metabolite_assays`,
   `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`,
@@ -133,7 +128,7 @@ coordinated to `0.1.0a5` ahead of the KG release.
   Exclude-wins-on-overlap is evaluated on canonical IDs. Outfacing lint
   gained release-note framing patterns (`previously`, `are now resolved`).
 
-- `list_filter_values` description parity (backlog 2.3): every
+- `list_filter_values` description parity: every
   vocabulary-backed filter type now puts the property-level
   `ControlledVocabulary` text once on the envelope `description`, and rows
   carry the per-value meaning from the KG's new `value_descriptions` (B1,
@@ -245,7 +240,7 @@ coordinated to `0.1.0a5` ahead of the KG release.
 - Spec: `docs/tool-specs/2026-08-20-tcdb-substrate-depth-migration.md`.
 
 ### Changed
-- **LLM-consumer response diet (backlog 2b.2).** Six related trims, each
+- **LLM-consumer response diet.** Six related trims, each
   measured on a live call through `fastmcp.Client` (`len(json)//4`):
   - `differential_expression_by_gene`: `experiments[]` rows go compact by
     default — `experiment_id`, `treatment_type`, `table_scope`,
@@ -296,8 +291,9 @@ coordinated to `0.1.0a5` ahead of the KG release.
     `top_tcdb_families` — previously hard-capped unconditionally),
     `differential_expression_by_gene` (`experiments`), and
     `pathway_enrichment` (`by_experiment`, now sorted desc by
-    `n_significant`; `top_pathways_by_padj`, sorted by `p_adjust`
-    ascending, now full on `summary=True` rather than a flat top-10).
+    `n_significant`; `top_pathways_by_padj` is a genuine top-10 in both
+    modes, sorted by `p_adjust` ascending, with no `_truncated`
+    companion).
     `list_experiments(organism='MED4')`: 13,600 chars / ~3,400 tokens →
     12,132 chars / ~3,033 tokens.
   - Compact rows drop parent-constant / verbose-only fields that were
@@ -492,6 +488,9 @@ coordinated to `0.1.0a5` ahead of the KG release.
   substrate-depth migration below, `transporter_gene_count > 0`.
 
 ### Fixed
+- `genes_by_boolean_metric(flag=False)` always reported `true_count: 0` regardless of the DM's real flagged-edge count; it now reads the actual count.
+- `genes_in_cluster` set `not_matched_organism` on any zero-row result, not just a genuine organism mismatch, which also made `cluster_enrichment`'s exists-but-empty warning path unreachable (it raised `"analysis_id not found"` instead); the check now only fires on a real mismatch.
+- `pathway_enrichment`'s compact `experiments[]` rows (`ExpressionByExperiment`) serialized their verbose-only fields as explicit `null` on the wire instead of omitting them; the row class now inherits `SparseRow` so compact mode only carries the keys the API layer actually set. `top_pathways_by_padj` is a genuine top-10 in both `summary` modes (the `_truncated` companion key it never needed is removed). `resolve_gene`'s and `list_publications`'s `*_truncated` field descriptions pointed callers at `summary=True` to get the full list, which doesn't apply to those breakdowns; they now point at pagination / the right full-breakdown tool instead.
 - `cluster_enrichment` / `pathway_enrichment` envelope rows emitted NaN for clusters with no description text (pandas str-column hole), which the MCP layer rejected; rows now carry `None`.
 - Outfacing-doc lint no longer scans inside ```example-response fences (live KG payloads are data, not prose).
 

@@ -579,8 +579,9 @@ runs. Coerced inputs are reported in `resolved_aliases` (`{input:
 coercion above, for cross-tool consistency. On `pathway_enrichment` /
 `cluster_enrichment` this key lives nested under `term_validation`
 (a passthrough of `genes_by_ontology`'s validation buckets), not at the
-top level. Bare class-level TCDB (`3`) / CAZy (`GH`) IDs need no coercion
-— they already match the canonical form. `gene_ontology_terms` does not
+top level. Class- and subclass-level TCDB ids (`1`, `1.A`) and bare CAZy
+class ids (`GH`, `AA`) are not coerced — pass the prefixed form
+(`tcdb:1.A`, `cazy:GH`). `gene_ontology_terms` does not
 take `term_ids` (it is the reverse, genes → terms, lookup) and is
 unaffected.
 
