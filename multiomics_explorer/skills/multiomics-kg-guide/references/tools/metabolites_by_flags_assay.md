@@ -58,9 +58,9 @@ total_matching, by_value, by_assay, by_compartment, by_organism, by_metric, excl
 - **by_organism** (list[MfaByOrganism]): Counts per organism (cross-organism by default).
 - **by_metric** (list[MfaByMetric]): Per-assay filtered-slice rollup.
 - **excluded_assays** (list[string]): Always `[]` here (no gates apply). Kept for envelope-shape consistency with the numeric drill-down.
-- **warnings** (list[string]): No gate diagnostics here (no gates apply); only bare-ID collision notes (one input → several metabolites, expanded to all). Otherwise `[]`.
+- **warnings** (list[string]): No gate diagnostics here (no gates apply); bare-ID collision notes (one input → several metabolites, expanded to all), and a sibling-tool notice when a requested assay_id exists as value_kind='numeric' (genuinely found, excluded from `not_found.assay_ids` — use `metabolites_by_quantifies_assay` instead). Otherwise `[]`.
 - **resolved_aliases** (object): Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).
-- **not_found** (MfaNotFound): Per-batch-input unknown IDs (4 buckets: assay_ids, metabolite_ids, experiment_ids, publication_doi).
+- **not_found** (MfaNotFound): Per-batch-input unknown IDs (4 buckets: assay_ids, metabolite_ids, experiment_ids, publication_doi). assay_ids is a real existence check — an assay_id that exists as the other value_kind is NOT here (see `warnings`).
 - **returned** (int): Length of `results`.
 - **truncated** (bool): True when total_matching > offset + returned.
 - **offset** (int): Pagination offset used.
@@ -208,6 +208,19 @@ metabolites_by_flags_assay → metabolites_by_gene(locus_tags=[...], organism=..
 ## Common mistakes
 
 - Boolean arm only (`Assay_flags_metabolite`). Siblings: `metabolites_by_quantifies_assay` is the numeric-arm twin (values, detection_status, rankable buckets); `assays_by_metabolite` is the metabolite-anchored reverse lookup over both arms.
+
+```mistake
+A requested assay_id silently disappears from the results and not_found.assay_ids stays empty.
+```
+
+```correction
+`not_found.assay_ids` is a real existence check — an unknown assay_id lands
+there. A numeric assay_id is genuinely found (it exists as
+`value_kind='numeric'`) but this tool only drills boolean edges — it's
+excluded from `not_found.assay_ids` and reported via a `warnings` entry
+naming `metabolites_by_quantifies_assay` as the tool to use instead.
+
+```
 
 ```mistake
 Filter out value=0 / flag_value=false rows assuming they are noise.

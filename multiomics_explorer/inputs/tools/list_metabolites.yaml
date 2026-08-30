@@ -181,6 +181,18 @@ mistakes:
   - "catalyst_gene_count counts the catalysis arm only (genes reaching the metabolite via Gene → Reaction → Metabolite). catalyst_gene_count = 0 does NOT mean metabolomics-only: transport-only metabolites (TCDB substrates with no local catalysis) also read 0. Discriminate via the paired counts: catalyst_gene_count = 0 with `transporter_gene_count > 0` is transport-only; both 0 with `evidence_sources == ['metabolomics']` is measurement-only (no gene path). `transporter_gene_count` counts distinct genes over their deepest TCDB attachments, all organisms — it equals the distinct genes `genes_by_metabolite` returns in transport rows, summed over organisms."
   - "organism_names with multiple values is UNION, not intersection. To find metabolites BOTH organisms reach, run two single-org calls and intersect by `metabolite_id` (per-row `organism_count` tells you how many organisms reach a metabolite, but not which — the envelope `top_organisms` rollup is the only per-organism breakdown)."
   - "`search_text` is a Lucene search over the metabolite name only — NOT the formula. For element/composition queries, use `elements` (presence list)."
+  - wrong: "list_metabolites(metabolite_ids=['glutamate'])  # a name, not an id"
+    right: |
+      `metabolite_ids` takes IDs only (canonical or a recognized bare/xref
+      form) — a metabolite NAME matches no known id pattern, so it's forwarded
+      verbatim, lands in `not_found.metabolite_ids`, and a `warnings` entry
+      points at `search_text` to resolve the name first.
+  - wrong: "list_metabolites(elements=['Nitrogen'])  # or lowercase 'n'/'fe'"
+    right: |
+      Both are accepted and normalized silently to the correct symbol (`N`,
+      `Fe`) for the ~12 elements this KG's chemistry layer carries. An
+      unrecognized element (not a known symbol or full name) is dropped from
+      the filter, reported in `not_found.elements`, and adds a `warnings` entry.
   - "evidence_sources='metabolomics' selects metabolites measured by a MetaboliteAssay. Drill in via list_metabolite_assays(metabolite_ids=[...]) or assays_by_metabolite to inspect the measurement evidence."
   - "Same metabolite measured in both whole_cell and extracellular returns one row with `measured_compartments=['extracellular','whole_cell']` (sorted), not two rows — Metabolite is compartment-agnostic."
   - "When a roster is dominated by ATP / ADP / NADH / NADPH / H2O (currency cofactors that every organism reaches), pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip them — the same list works on the gene-anchored `metabolites_by_gene`, whose `top_metabolites` rollup is where the noise usually shows first. KG namespace is `kegg.compound:` (not `chebi:`)."

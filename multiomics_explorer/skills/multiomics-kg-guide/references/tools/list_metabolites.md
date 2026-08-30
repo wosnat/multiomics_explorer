@@ -18,7 +18,7 @@ Routing: drill into `genes_by_metabolite(metabolite_ids=[...])` for catalysts/tr
 | chebi_ids | list[string] \| None | None | Filter by raw ChEBI numeric IDs (e.g. ['4167', '15422']). 90% of Metabolite nodes carry a `chebi_id`. |
 | hmdb_ids | list[string] \| None | None | Filter by raw HMDB IDs (e.g. ['HMDB0000122']). 47% coverage. |
 | mnxm_ids | list[string] \| None | None | Filter by raw MetaNetX IDs (e.g. ['MNXM1364061']). 100% coverage — every Metabolite has a `mnxm_id`. |
-| elements | list[string] \| None | None | Element-presence filter (Hill-notation symbols). AND of presence — ['N', 'P'] matches metabolites containing BOTH. Use this rather than substring-matching on `formula` (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Empty/null formula metabolites never match. |
+| elements | list[string] \| None | None | Element-presence filter (Hill-notation symbols, e.g. 'Fe', 'N'). AND of presence — ['N', 'P'] matches metabolites containing BOTH. A case-insensitive symbol ('n', 'fe') or a full element name ('Nitrogen') for one of the ~12 elements this KG's chemistry layer carries (C, H, N, O, P, S, Fe, Mg, Mn, Zn, Cu, Co, Mo, Ni, Se) is normalized silently; anything else is dropped from the filter and reported in `not_found.elements` with a warning. Use this rather than substring-matching on `formula` (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Empty/null formula metabolites never match. |
 | mass_min | float \| None | None | Minimum monoisotopic mass (Da). Excludes metabolites with null `mass` (~22%). E.g. 60.0. |
 | mass_max | float \| None | None | Maximum monoisotopic mass (Da). E.g. 1000.0. |
 | organism_names | list[string] \| None | None | Restrict to metabolites reachable by these organisms (case-insensitive on `preferred_name`). UNION semantics — a metabolite reached by ANY listed organism qualifies. Joined via `Organism_has_metabolite` (catalysis OR transport). E.g. ['Prochlorococcus MED4']. `not_found.organism_names` lists any unknown names. |
@@ -52,7 +52,7 @@ total_entries, total_matching, top_organisms, top_metabolite_pathways, by_eviden
 - **truncated** (bool): True if total_matching > returned.
 - **not_found** (MetNotFound): Per-filter buckets for unknown input IDs.
 - **resolved_aliases** (object): Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).
-- **warnings** (list[string]): Diagnostic strings, e.g. a bare ID that resolved to more than one metabolite (expanded to all — pass the canonical id to narrow).
+- **warnings** (list[string]): Diagnostic strings, e.g. a bare ID that resolved to more than one metabolite (expanded to all — pass the canonical id to narrow), a `metabolite_ids` / `exclude_metabolite_ids` entry matching no recognized id pattern at all (likely a NAME — resolve it with `search_text` instead), or an `elements` entry that isn't a recognized symbol or name (see `not_found.elements`).
 
 ### Per-result fields
 
@@ -294,6 +294,30 @@ list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(m
 - organism_names with multiple values is UNION, not intersection. To find metabolites BOTH organisms reach, run two single-org calls and intersect by `metabolite_id` (per-row `organism_count` tells you how many organisms reach a metabolite, but not which — the envelope `top_organisms` rollup is the only per-organism breakdown).
 
 - `search_text` is a Lucene search over the metabolite name only — NOT the formula. For element/composition queries, use `elements` (presence list).
+
+```mistake
+list_metabolites(metabolite_ids=['glutamate'])  # a name, not an id
+```
+
+```correction
+`metabolite_ids` takes IDs only (canonical or a recognized bare/xref
+form) — a metabolite NAME matches no known id pattern, so it's forwarded
+verbatim, lands in `not_found.metabolite_ids`, and a `warnings` entry
+points at `search_text` to resolve the name first.
+
+```
+
+```mistake
+list_metabolites(elements=['Nitrogen'])  # or lowercase 'n'/'fe'
+```
+
+```correction
+Both are accepted and normalized silently to the correct symbol (`N`,
+`Fe`) for the ~12 elements this KG's chemistry layer carries. An
+unrecognized element (not a known symbol or full name) is dropped from
+the filter, reported in `not_found.elements`, and adds a `warnings` entry.
+
+```
 
 - evidence_sources='metabolomics' selects metabolites measured by a MetaboliteAssay. Drill in via list_metabolite_assays(metabolite_ids=[...]) or assays_by_metabolite to inspect the measurement evidence.
 

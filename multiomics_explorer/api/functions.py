@@ -116,6 +116,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_metabolites_by_quantifies_assay,
     build_metabolites_by_quantifies_assay_diagnostics,
     build_metabolites_by_quantifies_assay_summary,
+    build_metabolite_assay_kind_lookup,
     build_metabolites_by_flags_assay,
     build_metabolites_by_flags_assay_summary,
     build_assays_by_metabolite,
@@ -753,6 +754,20 @@ def _closed_vocab_warnings(conn, **params) -> list[str]:
     return warnings
 
 
+def _organism_resolves(conn, organism: str | None) -> bool:
+    """True if `organism` word-matches at least one gene-bearing
+    OrganismTaxon. Shared existence check behind `_organism_zero_match_warning`
+    and `_assay_organism_warnings` (llm-review 2b.3 Task 5) — one query,
+    reused rather than re-run per caller.
+    """
+    if not organism:
+        return False
+    cypher, params = build_resolve_organism_for_organism(organism=organism)
+    rows = conn.execute_query(cypher, **params)
+    orgs = rows[0]["organisms"] if rows else []
+    return bool(orgs)
+
+
 def _organism_zero_match_warning(conn, organism: str | None) -> list[str]:
     """Warn when a scalar `organism` filter resolves to no OrganismTaxon.
 
@@ -766,12 +781,56 @@ def _organism_zero_match_warning(conn, organism: str | None) -> list[str]:
     """
     if not organism:
         return []
-    cypher, params = build_resolve_organism_for_organism(organism=organism)
-    rows = conn.execute_query(cypher, **params)
-    orgs = rows[0]["organisms"] if rows else []
-    if orgs:
+    if _organism_resolves(conn, organism):
         return []
     return [f"organism '{organism}' matched no organism — see list_organisms()"]
+
+
+def _assay_organism_warnings(conn, organism: str | None) -> list[str]:
+    """Organism warnings for the MetaboliteAssay-anchored tools
+    (`list_metabolite_assays`, `assays_by_metabolite`), llm-review 2b.3
+    Task 5:
+
+    1. `organism` doesn't word-match any OrganismTaxon at all — same
+       message as `_organism_zero_match_warning`.
+    2. `organism` resolves genomically (has genes) but has zero
+       MetaboliteAssay nodes — the metabolomics layer is a separate
+       empty-data-layer axis from genomic presence (e.g. a genome-only /
+       expression-only organism has genes but was never assayed). Two-stage
+       so the (potentially large) full organism-name list is only fetched
+       when the cheap targeted existence check comes back empty: a single
+       `MATCH (a:MetaboliteAssay) RETURN collect(DISTINCT a.organism_name)`
+       runs at most once per call, only for a resolved organism with zero
+       assays.
+
+    Never both at once — case 2 only runs when case 1 didn't fire.
+    """
+    if not organism:
+        return []
+    if not _organism_resolves(conn, organism):
+        return [f"organism '{organism}' matched no organism — see list_organisms()"]
+
+    exists_rows = conn.execute_query(
+        "MATCH (a:MetaboliteAssay) "
+        "WHERE ALL(word IN split(toLower($organism), ' ') "
+        "WHERE toLower(a.organism_name) CONTAINS word) "
+        "RETURN count(a) > 0 AS has_assays",
+        organism=organism,
+    )
+    has_assays = exists_rows[0]["has_assays"] if exists_rows else False
+    if has_assays:
+        return []
+
+    names_rows = conn.execute_query(
+        "MATCH (a:MetaboliteAssay) RETURN collect(DISTINCT a.organism_name) AS orgs"
+    )
+    assay_orgs = sorted(
+        o for o in (names_rows[0]["orgs"] if names_rows else []) if o
+    )
+    return [
+        f"organism '{organism}' has no metabolomics assays — organisms "
+        f"with assays: {', '.join(assay_orgs)}"
+    ]
 
 
 def _classify_dm_kind_mismatch(
@@ -6458,8 +6517,16 @@ def genes_in_cluster(
     Returns dict with keys: total_matching, by_organism, by_cluster,
     top_categories, genes_per_cluster_max, genes_per_cluster_median,
     not_found_clusters, not_matched_clusters, not_matched_organism,
-    returned, offset, truncated, results.
+    not_found_analysis, warnings, returned, offset, truncated, results.
     When analysis_id: also returns analysis_name.
+
+    not_found_analysis: the `analysis_id` you passed, when no
+    ClusteringAnalysis node with that id exists in the KG (None
+    otherwise, including when `cluster_ids` was used instead). Distinct
+    from an analysis that exists but has zero clusters / member genes —
+    that case returns `not_found_analysis=None` with `total_matching=0`.
+    A `not_found_analysis` also adds a `warnings` entry pointing at
+    `list_clustering_analyses(organism=...)`.
     Per result (compact): locus_tag, gene_name, product, gene_category,
     organism_name, cluster_id, cluster_name, membership_score.
     Per result (verbose): adds gene_function_description, gene_summary,
@@ -6506,6 +6573,23 @@ def genes_in_cluster(
     envelope["analysis_name"] = (
         raw_summary.get("analysis_name") if analysis_id is not None else None
     )
+
+    # not_found_analysis: analysis_id genuinely absent from the KG (llm-review
+    # 2b.3 Task 5) — distinct from an analysis that exists but has zero
+    # clusters / member genes (that case keeps not_found_analysis=None,
+    # total_matching=0). `analysis_exists` comes from the summary builder's
+    # OPTIONAL MATCH split, which survives even when analysis_id matches
+    # nothing at all.
+    warnings: list[str] = []
+    not_found_analysis: str | None = None
+    if analysis_id is not None and not raw_summary.get("analysis_exists", False):
+        not_found_analysis = analysis_id
+        warnings.append(
+            f"analysis_id '{analysis_id}' not found — see "
+            "list_clustering_analyses(organism=...)"
+        )
+    envelope["not_found_analysis"] = not_found_analysis
+    envelope["warnings"] = warnings
 
     # Check organism match
     if organism is not None and total_matching == 0 and not raw_summary["not_found_clusters"]:
@@ -7175,7 +7259,11 @@ def cluster_enrichment(
 
     Raises ValueError when the ontology cannot carry a filter you set, when
     an InterPro run omits interpro_type, when a BRITE run omits tree, when
-    analysis_id is unknown, or when level is out of range for ontology.
+    analysis_id doesn't exist in the KG at all, or when level is out of
+    range for ontology. An analysis_id that EXISTS and matches `organism`
+    but yields zero cluster→gene rows does NOT raise — it returns a
+    well-formed empty result (``total_matching=0``) with a `warnings`
+    entry naming the analysis (llm-review 2b.3 Task 5 carried-over item).
     """
     if ontology not in ALL_ONTOLOGIES:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {ALL_ONTOLOGIES}")
@@ -7430,6 +7518,42 @@ def _is_metabolite_alias(raw: str) -> bool:
     return any(p.match(raw) for p in _METABOLITE_ALIAS_PATTERNS)
 
 
+def _looks_like_metabolite_id(raw: str) -> bool:
+    """True when `raw` has a shape `_canonicalize_metabolite_ids` can act
+    on: either a recognized bare/xref alias (`_is_metabolite_alias`) or an
+    already-canonical `prefix:id` (`_CANONICAL_METABOLITE_PREFIXES`).
+
+    False means the resolver forwards `raw` verbatim and it will land in
+    `not_found` / `not_matched` unresolved — usually because the caller
+    passed a metabolite NAME (e.g. 'glutamate') rather than an ID
+    (llm-review 2b.3 Task 5). Reuses `_is_metabolite_alias`'s regex table
+    instead of duplicating it.
+    """
+    if _is_metabolite_alias(raw):
+        return True
+    if ":" in raw:
+        prefix = raw.split(":", 1)[0].lower()
+        return prefix in _CANONICAL_METABOLITE_PREFIXES
+    return False
+
+
+def _metabolite_id_shape_warnings(raw_ids: list[str] | None) -> list[str]:
+    """One warning per entry in `raw_ids` that doesn't look like a
+    metabolite id at all (see `_looks_like_metabolite_id`) — pointed at
+    `list_metabolites(search_text=...)` to resolve a name to an id
+    (llm-review 2b.3 Task 5). Call with the RAW caller input, before
+    `_canonicalize_metabolite_ids` overwrites it.
+    """
+    if not raw_ids:
+        return []
+    return [
+        f"'{raw}' is not a metabolite id — resolve names with "
+        f"list_metabolites(search_text=...)"
+        for raw in raw_ids
+        if not _looks_like_metabolite_id(raw)
+    ]
+
+
 def _canonicalize_metabolite_ids(
     conn: GraphConnection, ids: list[str] | None,
 ) -> tuple[list[str] | None, dict[str, list[str]], list[str]]:
@@ -7507,6 +7631,64 @@ def _canonicalize_metabolite_id_params(
     return mids, xids, merged, merged_warnings
 
 
+# `Metabolite.elements` stores case-sensitive one/two-letter symbols. The
+# ~12 biologically common elements this KG's chemistry layer actually
+# carries — accept a case-insensitive symbol (`n` -> `N`, `fe` -> `Fe`) or
+# a full element name (`Nitrogen` -> `N`) for these, unambiguously; anything
+# else is reported in `not_found.elements` (llm-review 2b.3 Task 5,
+# resolution 2).
+_VALID_ELEMENT_SYMBOLS = (
+    "C", "H", "N", "O", "P", "S",
+    "Fe", "Mg", "Mn", "Zn", "Cu", "Co", "Mo", "Ni", "Se",
+)
+_ELEMENT_NAME_TO_SYMBOL = {
+    "carbon": "C", "hydrogen": "H", "nitrogen": "N", "oxygen": "O",
+    "phosphorus": "P", "sulfur": "S", "sulphur": "S", "iron": "Fe",
+    "magnesium": "Mg", "manganese": "Mn", "zinc": "Zn", "copper": "Cu",
+    "cobalt": "Co", "molybdenum": "Mo", "nickel": "Ni", "selenium": "Se",
+}
+_ELEMENT_SYMBOL_LOWER = {s.lower(): s for s in _VALID_ELEMENT_SYMBOLS}
+
+
+def _normalize_elements(
+    elements: list[str] | None,
+) -> tuple[list[str] | None, list[str]]:
+    """Case-insensitive element-symbol / common-name normalisation for
+    `list_metabolites(elements=)`.
+
+    Accepts unchanged a correctly-cased symbol, silently normalises a
+    case-insensitive one/two-letter symbol (`n` -> `N`, `fe` -> `Fe`) or a
+    full element name (`Nitrogen` -> `N`) for the ~12 elements above.
+    Anything else is left out of the returned filter list and reported
+    back for the caller to place in `not_found.elements`.
+
+    Returns `(normalized, unmatched)`:
+      - `normalized`: recognized symbols only, in input order, `None` when
+        every input failed to normalize (so the query builder sees "no
+        filter" rather than an impossible empty-list AND). `None` / `[]`
+        input is returned unchanged.
+      - `unmatched`: inputs that matched neither a known symbol nor a
+        known element name — verbatim, in input order.
+    """
+    if not elements:
+        return elements, []
+    normalized: list[str] = []
+    unmatched: list[str] = []
+    for raw in elements:
+        if raw in _VALID_ELEMENT_SYMBOLS:
+            normalized.append(raw)
+            continue
+        symbol = (
+            _ELEMENT_NAME_TO_SYMBOL.get(raw.lower())
+            or _ELEMENT_SYMBOL_LOWER.get(raw.lower())
+        )
+        if symbol:
+            normalized.append(symbol)
+        else:
+            unmatched.append(raw)
+    return (normalized or None), unmatched
+
+
 def list_metabolites(
     search_text: str | None = None,
     metabolite_ids: list[str] | None = None,
@@ -7571,10 +7753,20 @@ def list_metabolites(
         canonical id(s) it became.
         The dedicated exact-match xref filters `kegg_compound_ids` /
         `chebi_ids` / `hmdb_ids` / `mnxm_ids` are unchanged by this.
+    elements: Case-insensitive one/two-letter symbol (`n` -> `N`, `fe` ->
+        `Fe`) or full element name (`Nitrogen` -> `N`) accepted for the
+        ~12 elements this KG's chemistry layer carries (C, H, N, O, P, S,
+        Fe, Mg, Mn, Zn, Cu, Co, Mo, Ni, Se); normalized silently.
+        Anything else is dropped from the filter, reported in
+        `not_found.elements`, and adds a warning. AND-of-presence
+        semantics across the surviving (recognized) symbols.
 
     Envelope also carries `resolved_aliases` (dict, `{input: [canonical,
     ...]}`, only coerced inputs; `{}` when none) and `warnings` (list of
-    str; ambiguous-xref expansions).
+    str; ambiguous-xref expansions, a `metabolite_ids` /
+    `exclude_metabolite_ids` entry matching no recognized id pattern at
+    all — e.g. a metabolite NAME like 'glutamate' — and an `elements`
+    entry that isn't a recognized symbol or name).
 
     Raises:
         ValueError: if search_text is empty/whitespace, or evidence_sources
@@ -7602,10 +7794,31 @@ def list_metabolites(
 
     # 1b. Coerce bare / xref metabolite IDs to canonical Metabolite.id
     # before any other query and before the exclude-overlap set-difference.
-    metabolite_ids, exclude_metabolite_ids, resolved_aliases, warnings = (
+    # Shape-check the RAW input first (llm-review 2b.3 Task 5) — an input
+    # matching no known id pattern at all (e.g. a metabolite NAME like
+    # 'glutamate') gets its own warning distinct from the alias-collision
+    # warnings _canonicalize_metabolite_id_params produces.
+    warnings = (
+        _metabolite_id_shape_warnings(metabolite_ids)
+        + _metabolite_id_shape_warnings(exclude_metabolite_ids)
+    )
+    metabolite_ids, exclude_metabolite_ids, resolved_aliases, _coerce_warnings = (
         _canonicalize_metabolite_id_params(
             conn, metabolite_ids, exclude_metabolite_ids)
     )
+    warnings += _coerce_warnings
+
+    # 1c. Normalise `elements` (case-insensitive symbol / common name for
+    # the ~12 recognized elements) — llm-review 2b.3 Task 5 resolution 2.
+    # Unmatched entries are dropped from the filter, reported in
+    # `not_found.elements`, and get a warning; a successful normalization
+    # (even case- or name-form) is silent.
+    elements, not_found_elements = _normalize_elements(elements)
+    warnings += [
+        f"'{raw}' is not a recognized element symbol or name "
+        f"(supported: {', '.join(_VALID_ELEMENT_SYMBOLS)} or their full names)"
+        for raw in not_found_elements
+    ]
 
     # 2. Lowercase organism_names for WHERE
     organism_names_lc = (
@@ -7675,6 +7888,7 @@ def list_metabolites(
         "metabolite_ids": [],
         "organism_names": [],
         "pathway_ids": [],
+        "elements": not_found_elements,
     }
     if metabolite_ids:
         rows = conn.execute_query(
@@ -7954,8 +8168,11 @@ def genes_by_metabolite(
 
     Envelope also carries `resolved_aliases` (dict, `{input: [canonical,
     ...]}`, only coerced inputs; `{}` when none); ambiguous-xref
-    expansions and a `gene_categories` value not in the live vocabulary
-    are appended to `warnings`.
+    expansions, a `gene_categories` value not in the live vocabulary, and
+    a `metabolite_ids` / `exclude_metabolite_ids` entry matching no
+    recognized id pattern at all (e.g. a metabolite NAME like
+    'glutamate') — `"'<v>' is not a metabolite id — resolve names with
+    list_metabolites(search_text=...)"` — are appended to `warnings`.
 
     Raises:
         ValueError: if `evidence_sources` contains values outside
@@ -7983,10 +8200,19 @@ def genes_by_metabolite(
 
     # 1b. Coerce bare / xref metabolite IDs to canonical Metabolite.id
     # before any other query and before the exclude-overlap set-difference.
-    metabolite_ids, exclude_metabolite_ids, resolved_aliases, alias_warnings = (
+    # Shape-check the RAW input first (llm-review 2b.3 Task 5) — an input
+    # matching no known id pattern at all (e.g. a metabolite NAME like
+    # 'glutamate') gets its own warning distinct from the alias-collision
+    # warnings _canonicalize_metabolite_id_params produces.
+    alias_warnings = (
+        _metabolite_id_shape_warnings(metabolite_ids)
+        + _metabolite_id_shape_warnings(exclude_metabolite_ids)
+    )
+    metabolite_ids, exclude_metabolite_ids, resolved_aliases, _coerce_warnings = (
         _canonicalize_metabolite_id_params(
             conn, metabolite_ids, exclude_metabolite_ids)
     )
+    alias_warnings += _coerce_warnings
 
     # 1c. Pre-validate & resolve organism to its canonical preferred_name.
     # Both the builders' organism filter and the existence probe (step 6
@@ -9028,8 +9254,10 @@ def list_metabolite_assays(
     coerced inputs; `{}` when none) and `warnings` (list of str;
     ambiguous-xref expansions, a closed-vocabulary filter value
     (compartment / treatment_type / background_factors / growth_phases)
-    not in the live vocabulary, or an organism that matches no
-    OrganismTaxon).
+    not in the live vocabulary, an organism that matches no OrganismTaxon,
+    or an organism that resolves genomically but has zero MetaboliteAssay
+    nodes — `"organism '<name>' has no metabolomics assays — organisms
+    with assays: <names>"`, distinct from the unmatched-organism case).
     """
     if search_text is not None and not search_text.strip():
         raise ValueError("search_text must not be empty if provided.")
@@ -9048,7 +9276,7 @@ def list_metabolite_assays(
         conn, compartment=compartment, treatment_type=treatment_type,
         background_factors=background_factors, growth_phases=growth_phases,
     )
-    warnings += _organism_zero_match_warning(conn, organism)
+    warnings += _assay_organism_warnings(conn, organism)
 
     builder_kwargs = dict(
         search_text=search_text, organism=organism, metric_types=metric_types,
@@ -9342,6 +9570,11 @@ def metabolites_by_quantifies_assay(
 
     `not_found` is a structured dict, one bucket per batch input
     (`assay_ids`, `metabolite_ids`, `experiment_ids`, `publication_doi`).
+    An `assay_ids` entry that exists but as `value_kind='boolean'` is NOT
+    in `not_found.assay_ids` (it's genuinely found) — it's silently
+    excluded from this numeric-only dispatch and reported via a
+    `"<id> exists as value_kind=boolean — use metabolites_by_flags_assay"`
+    warning instead (llm-review 2b.3 Task 5).
 
     metabolite_ids / exclude_metabolite_ids: Accept the canonical
         `Metabolite.id` (`kegg.compound:C00064`, `chebi:17234`,
@@ -9357,8 +9590,9 @@ def metabolites_by_quantifies_assay(
         exclude wins on overlap (computed on the canonical ids).
 
     Envelope `resolved_aliases` (dict, `{input: [canonical, ...]}`, only
-    coerced inputs; `{}` when none); ambiguous-xref expansions are
-    appended to `warnings` alongside the rankable-gate messages.
+    coerced inputs; `{}` when none); ambiguous-xref expansions and the
+    wrong-kind sibling-tool notice are appended to `warnings` alongside
+    the rankable-gate messages.
 
     Raises:
         ValueError: empty `assay_ids`; `metric_bucket` / `detection_status`
@@ -9392,7 +9626,7 @@ def metabolites_by_quantifies_assay(
             conn, metabolite_ids, exclude_metabolite_ids)
     )
 
-    # ---- Q1: diagnostics probe ------------------------------------------
+    # ---- Q1: diagnostics probe (kind-agnostic — see builder docstring) --
     diag_cypher, diag_params = build_metabolites_by_quantifies_assay_diagnostics(
         assay_ids=assay_ids,
         organism=organism,
@@ -9405,11 +9639,29 @@ def metabolites_by_quantifies_assay(
         background_factors=background_factors,
         growth_phases=growth_phases,
     )
-    diag_rows = conn.execute_query(diag_cypher, **diag_params)
+    diag_rows_all = conn.execute_query(diag_cypher, **diag_params)
 
+    found_ids_all = {r["assay_id"] for r in diag_rows_all}
+    not_found_assay_ids = sorted(set(assay_ids) - found_ids_all)
+
+    # Partition by value_kind (llm-review 2b.3 Task 5, mirrors Task 3's DM
+    # fix): a wrong-kind (boolean) assay_id is genuinely found — excluded
+    # from not_found_assay_ids — but reported via a sibling-tool warning
+    # instead of silently landing in not_found. Only kind-correct rows
+    # drive the rest of this dispatch (rankable-gating, by_metric).
+    diag_rows = [r for r in diag_rows_all if r["value_kind"] == "numeric"]
     found_ids = {r["assay_id"] for r in diag_rows}
-    not_found_assay_ids = sorted(set(assay_ids) - found_ids)
     surviving_ids = sorted(found_ids)
+
+    warnings: list[str] = list(alias_warnings)
+    for x in sorted(found_ids_all - found_ids):
+        if x in assay_ids:
+            kind = next(
+                r["value_kind"] for r in diag_rows_all if r["assay_id"] == x)
+            warnings.append(
+                f"{x} exists as value_kind={kind} — use "
+                "metabolites_by_flags_assay"
+            )
 
     # ---- Rankable-gating logic ------------------------------------------
     rankable_filter_set = any([
@@ -9419,7 +9671,6 @@ def metabolites_by_quantifies_assay(
         rank_by_metric_max is not None,
     ])
     excluded_assays: list[str] = []
-    warnings: list[str] = list(alias_warnings)
     if rankable_filter_set and diag_rows:
         rankable_ids = {r["assay_id"] for r in diag_rows if r["rankable"]}
         if not rankable_ids:
@@ -9586,10 +9837,17 @@ def metabolites_by_flags_assay(
 ) -> dict:
     """Drill into boolean MetaboliteAssay edges.
 
-    Two-query dispatch (no diagnostics — boolean tool has no rankable
-    gate):
-      1. summary — envelope rollups.
-      2. detail — top-N rows; skipped when `summary=True`.
+    Three-query dispatch (no rankable-gate diagnostics — boolean tool has
+    no rankable gate — but a kind-agnostic existence probe, llm-review
+    2b.3 Task 5):
+      1. kind lookup — every assay_id's existence + `value_kind`, no
+         scoping filters. Populates `not_found.assay_ids` honestly (an id
+         absent entirely) and classifies a wrong-kind (numeric) id as
+         genuinely found — excluded from `not_found.assay_ids` — with a
+         sibling-tool warning naming `metabolites_by_quantifies_assay`,
+         instead of silently vanishing.
+      2. summary — envelope rollups.
+      3. detail — top-N rows; skipped when `summary=True`.
 
     The API coerces `flag_value: bool | None` to string `'detected'` /
     `'not_detected'` for Cypher (KG two-state string, HO-001).
@@ -9599,9 +9857,10 @@ def metabolites_by_flags_assay(
     Tested-absent rows (`flag_value=False`) are real biology — 62% of
     boolean rows in the live KG. Don't default-filter.
 
-    `excluded_assays` is always `[]` here (no gates) — kept for
-    cross-tool envelope-shape consistency. `warnings` carries only
-    ambiguous-xref expansions from metabolite-ID coercion.
+    `excluded_assays` is always `[]` here (no rankable gates) — kept for
+    cross-tool envelope-shape consistency. `warnings` carries
+    ambiguous-xref expansions from metabolite-ID coercion plus the
+    wrong-kind sibling-tool notice.
 
     metabolite_ids / exclude_metabolite_ids: Accept the canonical
         `Metabolite.id` (`kegg.compound:C00064`, `chebi:17234`,
@@ -9617,7 +9876,12 @@ def metabolites_by_flags_assay(
         exclude wins on overlap (computed on the canonical ids).
 
     Envelope `resolved_aliases` (dict, `{input: [canonical, ...]}`, only
-    coerced inputs; `{}` when none).
+    coerced inputs; `{}` when none). `not_found.assay_ids` is a real
+    existence check (an assay_id that doesn't exist at all) — an
+    assay_id that exists as `value_kind='numeric'` is NOT in there; it's
+    silently excluded from this boolean-only dispatch and reported via a
+    `"<id> exists as value_kind=numeric — use
+    metabolites_by_quantifies_assay"` warning instead.
 
     Raises:
         ValueError: empty `assay_ids`.
@@ -9643,7 +9907,23 @@ def metabolites_by_flags_assay(
     else:
         flag_value_str = None
 
-    # ---- Q1: summary ----------------------------------------------------
+    # ---- Q1: kind-agnostic existence + value_kind probe ------------------
+    # (llm-review 2b.3 Task 5) — no scoping filters, pure id/kind lookup.
+    kind_cypher, kind_params = build_metabolite_assay_kind_lookup(assay_ids)
+    kind_rows = conn.execute_query(kind_cypher, **kind_params)
+    kind_by_id = {r["assay_id"]: r["value_kind"] for r in kind_rows}
+    not_found_assay_ids = sorted(
+        x for x in set(assay_ids) if x not in kind_by_id)
+    warnings: list[str] = list(alias_warnings)
+    for x in sorted(set(assay_ids)):
+        kind = kind_by_id.get(x)
+        if kind is not None and kind != "boolean":
+            warnings.append(
+                f"{x} exists as value_kind={kind} — use "
+                "metabolites_by_quantifies_assay"
+            )
+
+    # ---- Q2: summary ----------------------------------------------------
     sum_cypher, sum_params = build_metabolites_by_flags_assay_summary(
         assay_ids=assay_ids,
         organism=organism,
@@ -9684,16 +9964,7 @@ def metabolites_by_flags_assay(
         })
     by_metric.sort(key=lambda r: (-(r["count"] or 0), r["assay_id"]))
 
-    # `not_found.assay_ids`: derived from summary's by_assay coverage.
-    # Boolean has no diagnostics builder (per parent §13.1) so we cannot
-    # distinguish "absent from KG" vs "in KG but no edges after filters"
-    # without a probe — and the test suite asserts a strict 2-query
-    # dispatch shape on the assay_ids-only path. Best-effort: assays
-    # absent from `by_assay` are not surfaced as not_found here. The
-    # other batch-input buckets ARE probed (cheap indexed lookups).
-    not_found_assay_ids: list[str] = []
-
-    # ---- Q2: detail (skipped when summary=True) -------------------------
+    # ---- Q3: detail (skipped when summary=True) -------------------------
     results: list[dict] = []
     if not summary:
         det_cypher, det_params = build_metabolites_by_flags_assay(
@@ -9723,7 +9994,7 @@ def metabolites_by_flags_assay(
         "by_organism": by_organism,
         "by_metric": by_metric,
         "excluded_assays": [],
-        "warnings": list(alias_warnings),
+        "warnings": warnings,
         "resolved_aliases": resolved_aliases,
         "not_found": {
             "assay_ids": not_found_assay_ids,
@@ -9792,7 +10063,10 @@ def assays_by_metabolite(
 
     Envelope `resolved_aliases` (dict, `{input: [canonical, ...]}`, only
     coerced inputs; `{}` when none) and `warnings` (list of str;
-    ambiguous-xref expansions).
+    ambiguous-xref expansions, an `organism` that matches no OrganismTaxon,
+    or an `organism` that resolves genomically but has zero
+    MetaboliteAssay nodes — `"organism '<name>' has no metabolomics
+    assays — organisms with assays: <names>"`).
 
     Raises:
         ValueError: empty `metabolite_ids`; `evidence_kind` not in
@@ -9814,6 +10088,7 @@ def assays_by_metabolite(
         _canonicalize_metabolite_id_params(
             conn, metabolite_ids, exclude_metabolite_ids)
     )
+    warnings += _assay_organism_warnings(conn, organism)
 
     # ---- Q1: existence-probe (populate flat not_found per §13.6) --------
     probe_rows = conn.execute_query(

@@ -62,7 +62,7 @@ code (EnrichmentResult accessors, custom term2gene, compareCluster export).
 ### Envelope
 
 ```expected-keys
-organism_name, ontology, level, total_matching, returned, truncated, offset, n_significant, by_experiment, by_direction, by_omics_type, cluster_summary, top_clusters_by_min_padj, top_pathways_by_padj, not_found, not_matched, no_expression, not_found_experiments, term_validation, clusters_skipped, enrichment_params, filters_applied, trust_axes, background_filtered, interpro_type, results
+organism_name, ontology, level, total_matching, returned, truncated, offset, n_significant, by_experiment, by_direction, by_omics_type, cluster_summary, top_clusters_by_min_padj, top_pathways_by_padj, not_found, not_matched, warnings, no_expression, not_found_experiments, term_validation, clusters_skipped, enrichment_params, filters_applied, trust_axes, background_filtered, interpro_type, results
 ```
 
 - **organism_name** (string): Single organism
@@ -82,6 +82,7 @@ organism_name, ontology, level, total_matching, returned, truncated, offset, n_s
 - **top_pathways_by_padj** (list[PathwayEnrichmentTopPathway]): Top 10 pathways ranked by p_adjust ascending across all clusters — a genuine top-10 in both summary and detail calls (unlike `by_experiment`, `summary=True` does not expand this list).
 - **not_found** (list[string]): Requested experiment_ids absent from KG
 - **not_matched** (list[string]): Experiment IDs found but wrong organism
+- **warnings** (list[string]): Diagnostic strings. Always [] for pathway_enrichment — the field exists for envelope-shape parity with cluster_enrichment, which populates it (e.g. an analysis that exists but yields zero cluster→gene rows).
 - **no_expression** (list[string]): Experiments matching organism but with no DE rows
 - **not_found_experiments** (list[string]): experiment_ids absent from the KG (partial-batch bucket; raises instead when every requested experiment_id lands here).
 - **term_validation** (PathwayEnrichmentTermValidation): Namespaced passthrough of term_id validation from genes_by_ontology

@@ -606,6 +606,13 @@ def genes_in_cluster_scenarios():
         Scenario(
             "offset_past_end",
             dict(analysis_id=_MED4_ANALYSIS, offset=fx.OFFSET_PAST_END)),
+        # llm-review 2b.3 Task 5: unknown analysis_id -> a well-formed
+        # empty envelope with not_found_analysis set (no raise) — a scalar
+        # field, not a batch list, so no input_ids here (oracle checks
+        # crash-freedom + schema validity, not the batch-diagnostic path).
+        Scenario(
+            "unknown_analysis",
+            dict(analysis_id=fx.UNKNOWN_CLUSTER_ID)),
     ]
 
 
@@ -732,6 +739,16 @@ def list_metabolites_scenarios():
             # via xrefs before the builder runs; must not land in not_found.
             "bare_metabolite_id",
             dict(metabolite_ids=[_BARE_KEGG_ID])),
+        # llm-review 2b.3 Task 5: a name-shaped metabolite_ids entry (no
+        # recognized id pattern) warns and lands in not_found.metabolite_ids
+        # verbatim; an unrecognized `elements` entry warns and lands in
+        # not_found.elements, dropped from the filter (no impossible AND).
+        Scenario(
+            "name_shaped_metabolite_id",
+            dict(metabolite_ids=["glutamate"])),
+        Scenario(
+            "unrecognized_element",
+            dict(elements=["Xx"])),
     ]
 
 
@@ -1062,6 +1079,12 @@ def metabolites_by_quantifies_assay_scenarios():
             # backlog 3.2: bare PEP C-number coerced before the edge filter.
             "bare_metabolite_id_filter",
             dict(assay_ids=[_NUMERIC_ASSAY], metabolite_ids=[_BARE_PEP_ID])),
+        # llm-review 2b.3 Task 5: a boolean assay_id passed to this
+        # numeric-only tool is genuinely found (not in not_found.assay_ids)
+        # but reported via a sibling-tool warning — empty result, no crash.
+        Scenario(
+            "wrong_kind_assay",
+            dict(assay_ids=[_BOOLEAN_ASSAY])),
     ]
 
 
@@ -1086,6 +1109,12 @@ def metabolites_by_flags_assay_scenarios():
             # backlog 3.2: bare PEP C-number coerced before the edge filter.
             "bare_metabolite_id_filter",
             dict(assay_ids=[_BOOLEAN_ASSAY], metabolite_ids=[_BARE_PEP_ID])),
+        # llm-review 2b.3 Task 5: a numeric assay_id passed to this
+        # boolean-only tool is genuinely found (not in not_found.assay_ids)
+        # but reported via a sibling-tool warning — empty result, no crash.
+        Scenario(
+            "wrong_kind_assay",
+            dict(assay_ids=[_NUMERIC_ASSAY])),
     ]
 
 
@@ -1111,6 +1140,11 @@ def assays_by_metabolite_scenarios():
             # never appears in the flat not_found, so input_ids is omitted.
             "bare_metabolite_id",
             dict(metabolite_ids=[_BARE_PEP_ID])),
+        # llm-review 2b.3 Task 5: organism resolves genomically but has
+        # zero MetaboliteAssay nodes -> warning naming which organisms do.
+        Scenario(
+            "genome_only_organism",
+            dict(metabolite_ids=[_PEP_ID], organism=fx.GENOME_ONLY_ORGANISM)),
     ]
 
 

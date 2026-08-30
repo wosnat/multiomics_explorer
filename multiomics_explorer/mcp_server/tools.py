@@ -303,6 +303,13 @@ class PathwayEnrichmentResponse(BaseModel):
     not_matched: list[str] = Field(
         default_factory=list, description="Experiment IDs found but wrong organism"
     )
+    warnings: list[str] = Field(
+        default_factory=list,
+        description="Diagnostic strings. Always [] for pathway_enrichment — "
+        "the field exists for envelope-shape parity with "
+        "cluster_enrichment, which populates it (e.g. an analysis that "
+        "exists but yields zero cluster→gene rows).",
+    )
     no_expression: list[str] = Field(
         default_factory=list, description="Experiments matching organism but with no DE rows"
     )
@@ -451,6 +458,13 @@ class ClusterEnrichmentResponse(BaseModel):
     clusters_tested: int = Field(description="Clusters passing size filter")
     not_found: list[str] = Field(default_factory=list, description="Analysis IDs absent from KG")
     not_matched: list[str] = Field(default_factory=list, description="Analysis IDs wrong organism")
+    warnings: list[str] = Field(
+        default_factory=list,
+        description="Diagnostic strings. Currently emitted: the analysis "
+        "exists and matches the organism but yields zero cluster→gene rows "
+        "(a normal empty result — total_matching=0 — not the `not_found` "
+        "raise; that still fires only when the analysis_id doesn't exist "
+        "at all).")
     clusters_skipped: list[ClusterEnrichmentClusterSkipped] = Field(
         default_factory=list, description="Clusters filtered out or producing no rows"
     )
@@ -548,6 +562,7 @@ class MetNotFound(BaseModel):
     metabolite_ids: list[str] = Field(default_factory=list, description="Input metabolite_ids that don't exist in the KG (e.g. ['kegg.compound:C99999']).")
     organism_names: list[str] = Field(default_factory=list, description="Input organism_names with no matching OrganismTaxon (e.g. ['Bogus organism']).")
     pathway_ids: list[str] = Field(default_factory=list, description="Input pathway_ids with no matching KeggTerm (e.g. ['kegg.pathway:bogus']).")
+    elements: list[str] = Field(default_factory=list, description="Input `elements` entries that are neither a recognized element symbol nor a recognized full name (e.g. ['Xx']) — dropped from the filter; see `warnings` for the supported list. A correctly-cased symbol, a case-insensitive symbol ('n'), or a recognized full name ('Nitrogen') is normalized silently and never appears here.")
 
 
 class MetPaperCountBucket(BaseModel):
@@ -581,7 +596,7 @@ class ListMetabolitesResponse(BaseModel):
     truncated: bool = Field(description="True if total_matching > returned.")
     not_found: MetNotFound = Field(default_factory=MetNotFound, description="Per-filter buckets for unknown input IDs.")
     resolved_aliases: dict[str, list[str]] = Field(default_factory=dict, description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
-    warnings: list[str] = Field(default_factory=list, description="Diagnostic strings, e.g. a bare ID that resolved to more than one metabolite (expanded to all — pass the canonical id to narrow).")
+    warnings: list[str] = Field(default_factory=list, description="Diagnostic strings, e.g. a bare ID that resolved to more than one metabolite (expanded to all — pass the canonical id to narrow), a `metabolite_ids` / `exclude_metabolite_ids` entry matching no recognized id pattern at all (likely a NAME — resolve it with `search_text` instead), or an `elements` entry that isn't a recognized symbol or name (see `not_found.elements`).")
     results: list[MetaboliteResult] = Field(default_factory=list)
 
 
@@ -6781,6 +6796,15 @@ def register_tools(mcp: FastMCP):
             description="Clusters found but no members after organism filter")
         not_matched_organism: str | None = Field(default=None,
             description="Organism that didn't match any cluster's organism")
+        not_found_analysis: str | None = Field(default=None,
+            description="The analysis_id you passed, when no ClusteringAnalysis "
+            "node with that id exists in the KG. None otherwise — including "
+            "when cluster_ids was used, or when analysis_id exists but has "
+            "zero clusters / member genes (that case is a normal empty result, "
+            "total_matching=0).")
+        warnings: list[str] = Field(default_factory=list,
+            description="Diagnostic strings. Currently emitted: a "
+            "not_found_analysis pointer at list_clustering_analyses(organism=...).")
         returned: int = Field(description="Results in this response")
         offset: int = Field(default=0, description="Offset into result set")
         truncated: bool = Field(
@@ -6855,6 +6879,8 @@ def register_tools(mcp: FastMCP):
                 not_found_clusters=data["not_found_clusters"],
                 not_matched_clusters=data["not_matched_clusters"],
                 not_matched_organism=data.get("not_matched_organism"),
+                not_found_analysis=data.get("not_found_analysis"),
+                warnings=data.get("warnings", []),
                 returned=data["returned"],
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],
@@ -7398,19 +7424,19 @@ def register_tools(mcp: FastMCP):
         envelope = result.to_envelope(summary=summary, limit=limit, offset=offset)
 
         # Emit warnings
-        warnings = []
+        log_warnings = list(envelope.get("warnings") or [])
         if envelope.get("not_found"):
-            warnings.append(f"{len(envelope['not_found'])} not_found")
+            log_warnings.append(f"{len(envelope['not_found'])} not_found")
         if envelope.get("not_matched"):
-            warnings.append(f"{len(envelope['not_matched'])} not_matched (wrong organism)")
+            log_warnings.append(f"{len(envelope['not_matched'])} not_matched (wrong organism)")
         tv = envelope.get("term_validation", {})
         for key in ("not_found", "wrong_ontology", "wrong_level"):
             if tv.get(key):
-                warnings.append(f"{len(tv[key])} term_ids {key}")
+                log_warnings.append(f"{len(tv[key])} term_ids {key}")
         if envelope.get("clusters_skipped"):
-            warnings.append(f"{len(envelope['clusters_skipped'])} clusters skipped")
-        if warnings:
-            await ctx.warning("; ".join(warnings))
+            log_warnings.append(f"{len(envelope['clusters_skipped'])} clusters skipped")
+        if log_warnings:
+            await ctx.warning("; ".join(log_warnings))
 
         return ClusterEnrichmentResponse(**envelope)
 
@@ -8776,11 +8802,17 @@ def register_tools(mcp: FastMCP):
             "100% coverage — every Metabolite has a `mnxm_id`.",
         )] = None,
         elements: Annotated[list[str] | None, Field(
-            description="Element-presence filter (Hill-notation symbols). "
-            "AND of presence — ['N', 'P'] matches metabolites containing BOTH. "
-            "Use this rather than substring-matching on `formula` (Hill "
-            "notation has element-clash footguns: 'Cl' contains 'C', "
-            "'Na' contains 'N'). Empty/null formula metabolites never match.",
+            description="Element-presence filter (Hill-notation symbols, "
+            "e.g. 'Fe', 'N'). AND of presence — ['N', 'P'] matches "
+            "metabolites containing BOTH. A case-insensitive symbol ('n', "
+            "'fe') or a full element name ('Nitrogen') for one of the ~12 "
+            "elements this KG's chemistry layer carries (C, H, N, O, P, S, "
+            "Fe, Mg, Mn, Zn, Cu, Co, Mo, Ni, Se) is normalized silently; "
+            "anything else is dropped from the filter and reported in "
+            "`not_found.elements` with a warning. Use this rather than "
+            "substring-matching on `formula` (Hill notation has "
+            "element-clash footguns: 'Cl' contains 'C', 'Na' contains "
+            "'N'). Empty/null formula metabolites never match.",
         )] = None,
         mass_min: Annotated[float | None, Field(
             description="Minimum monoisotopic mass (Da). Excludes metabolites "
@@ -10066,9 +10098,12 @@ def register_tools(mcp: FastMCP):
             "(non-rankable assays dropped when a rankable filter is set).")
         warnings: list[str] = Field(
             default_factory=list,
-            description="Human-readable rankable-gating diagnostics, plus "
+            description="Human-readable rankable-gating diagnostics, "
             "bare-ID collision notes (one input → several metabolites, "
-            "expanded to all).")
+            "expanded to all), and a sibling-tool notice when a requested "
+            "assay_id exists as value_kind='boolean' (genuinely found, "
+            "excluded from `not_found.assay_ids` — use "
+            "`metabolites_by_flags_assay` instead).")
         resolved_aliases: dict[str, list[str]] = Field(
             default_factory=dict,
             description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
@@ -10410,16 +10445,21 @@ def register_tools(mcp: FastMCP):
             "envelope-shape consistency with the numeric drill-down.")
         warnings: list[str] = Field(
             default_factory=list,
-            description="No gate diagnostics here (no gates apply); only "
+            description="No gate diagnostics here (no gates apply); "
             "bare-ID collision notes (one input → several metabolites, "
-            "expanded to all). Otherwise `[]`.")
+            "expanded to all), and a sibling-tool notice when a requested "
+            "assay_id exists as value_kind='numeric' (genuinely found, "
+            "excluded from `not_found.assay_ids` — use "
+            "`metabolites_by_quantifies_assay` instead). Otherwise `[]`.")
         resolved_aliases: dict[str, list[str]] = Field(
             default_factory=dict,
             description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
         not_found: MfaNotFound = Field(
             default_factory=MfaNotFound,
             description="Per-batch-input unknown IDs (4 buckets: "
-            "assay_ids, metabolite_ids, experiment_ids, publication_doi).")
+            "assay_ids, metabolite_ids, experiment_ids, publication_doi). "
+            "assay_ids is a real existence check — an assay_id that "
+            "exists as the other value_kind is NOT here (see `warnings`).")
         returned: int = Field(description="Length of `results`.")
         truncated: bool = Field(
             description="True when total_matching > offset + returned.")

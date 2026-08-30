@@ -26,6 +26,7 @@ mass_stats:
   mass_median: 422.276
   mass_min: 164.157
 not_found:
+  elements: []
   metabolite_ids: []
   organism_names: []
   pathway_ids: []

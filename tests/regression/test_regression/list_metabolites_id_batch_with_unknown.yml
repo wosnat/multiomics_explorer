@@ -14,6 +14,7 @@ mass_stats:
   mass_median: 180.156
   mass_min: 180.156
 not_found:
+  elements: []
   metabolite_ids:
   - kegg.compound:C99999
   organism_names: []

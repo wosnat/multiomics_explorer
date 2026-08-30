@@ -40,6 +40,7 @@ mistakes:
   - "cluster_ids come from list_clustering_analyses or gene_clusters_by_gene results — they are not gene locus tags"
   - "Use analysis_id to get ALL genes across ALL clusters in an analysis; use cluster_ids for specific clusters"
   - "not_found_clusters means the ID doesn't exist in the KG; not_matched_clusters means the cluster exists but has no members matching your organism filter. The `_clusters` suffix is this tool's spelling of the not_found / not_matched pair — See docs://guide/conventions for the shared not_found / not_matched semantics."
+  - "In analysis_id mode, an unknown analysis_id sets `not_found_analysis` to the id you passed (plus a `warnings` entry pointing at `list_clustering_analyses`) instead of the `total_matching=0` empty result you'd otherwise get from a valid-but-empty analysis. Check `not_found_analysis` before assuming a zero-row result means the analysis has no members for your organism filter."
   - "Results are gene × cluster rows — when querying multiple clusters, a gene in both appears twice. Use by_cluster to see per-cluster counts."
   - wrong: "genes_in_cluster(cluster_ids=['PMM0370'])  # passing a gene locus tag"
     right: "gene_clusters_by_gene(locus_tags=['PMM0370'])  # use gene_clusters_by_gene for gene → cluster direction"

@@ -73,6 +73,18 @@ class EnrichmentInputs(BaseModel):
             "requested experiment_id lands here."
         ),
     )
+    warnings: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Diagnostic strings, threaded into the envelope by "
+            "generate_summary(). Always [] from de_enrichment_inputs "
+            "(pathway_enrichment). cluster_enrichment_inputs populates it "
+            "with, e.g., an analysis that exists but yields zero "
+            "cluster->gene rows for the requested organism — a normal "
+            "empty result, not the `not_found` raise (llm-review 2b.3 "
+            "Task 5 carried-over item)."
+        ),
+    )
     no_expression: list[str] = Field(
         default_factory=list,
         description=(
@@ -860,21 +872,28 @@ def cluster_enrichment_inputs(
     )
 
     # --- Partial-failure buckets ---
-    # `analysis_meta` (unscoped by organism) is checked first: genes_in_cluster's
-    # analysis_id mode never populates not_found_clusters (see
-    # build_genes_in_cluster_summary), so its not_matched_organism fires for
-    # BOTH "analysis_id doesn't exist anywhere" and "exists, wrong organism" —
-    # analysis_meta is the only signal that tells those two apart (Task 4,
-    # llm-review 2b.1).
+    # `genes_in_cluster`'s own `not_found_analysis` (llm-review 2b.3 Task 5)
+    # is now the authoritative "analysis_id doesn't exist anywhere" signal —
+    # it replaces the `analysis_meta` heuristic Task 4 (llm-review 2b.1) had
+    # to use before that field existed (analysis_id mode never populated
+    # not_found_clusters, so not_matched_organism alone couldn't tell
+    # "doesn't exist" from "exists, wrong organism"). An analysis that
+    # exists, matches the organism, but still yields zero cluster->gene rows
+    # is a normal empty result — reported via `warnings`, not `not_found`
+    # (carried-over item from the 2b.1 final review, folded in here).
     not_found: list[str] = []
     not_matched: list[str] = []
+    warnings: list[str] = []
     if not cluster_result.get("results") and cluster_result.get("total_matching", 0) == 0:
-        if not analysis_meta:
+        if cluster_result.get("not_found_analysis"):
             not_found = [analysis_id]
         elif cluster_result.get("not_matched_organism"):
             not_matched = [analysis_id]
         else:
-            not_found = [analysis_id]
+            warnings.append(
+                f"analysis '{analysis_id}' exists but has no cluster→gene "
+                f"rows for organism '{organism}'"
+            )
 
     # --- Group rows by cluster_name ---
     all_cluster_genes: dict[str, list[str]] = {}
@@ -956,6 +975,7 @@ def cluster_enrichment_inputs(
         cluster_metadata=cluster_metadata,
         not_found=not_found,
         not_matched=not_matched,
+        warnings=warnings,
         no_expression=[],
         clusters_skipped=clusters_skipped,
         analysis_metadata=analysis_md,
@@ -1433,6 +1453,7 @@ class EnrichmentResult:
             "n_significant": n_significant,
             "not_found": list(self.inputs.not_found),
             "not_matched": list(self.inputs.not_matched),
+            "warnings": list(getattr(self.inputs, "warnings", []) or []),
             "term_validation": self.missing_terms(),
             "clusters_skipped": list(self.clusters_skipped),
             "enrichment_params": dict(self.params),

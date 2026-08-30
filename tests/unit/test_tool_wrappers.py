@@ -4251,6 +4251,41 @@ class TestGenesInClusterWrapper:
         mock_api.assert_called_once()
         assert mock_api.call_args.kwargs["limit"] == 25
 
+    @pytest.mark.asyncio
+    async def test_not_found_analysis_wired_through(self, tool_fns, mock_ctx):
+        """llm-review 2b.3 Task 5: not_found_analysis + warnings pass through."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_in_cluster",
+            return_value={
+                **self._SAMPLE_API_RETURN,
+                "not_found_analysis": "nope",
+                "warnings": [
+                    "analysis_id 'nope' not found — see "
+                    "list_clustering_analyses(organism=...)"
+                ],
+            },
+        ):
+            result = await tool_fns["genes_in_cluster"](
+                mock_ctx, analysis_id="nope")
+        assert result.not_found_analysis == "nope"
+        assert result.warnings == [
+            "analysis_id 'nope' not found — see "
+            "list_clustering_analyses(organism=...)"
+        ]
+
+    @pytest.mark.asyncio
+    async def test_not_found_analysis_defaults_none(self, tool_fns, mock_ctx):
+        """Missing key (older api shape) defaults to None / []."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_in_cluster",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["genes_in_cluster"](
+                mock_ctx,
+                cluster_ids=["cluster:msb4100087:med4:up_n_transport"])
+        assert result.not_found_analysis is None
+        assert result.warnings == []
+
 
 # ---------------------------------------------------------------------------
 # ontology_landscape

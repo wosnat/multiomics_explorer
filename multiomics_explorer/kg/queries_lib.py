@@ -6914,7 +6914,10 @@ def build_genes_in_cluster_summary(
 
     RETURN keys: total_matching, by_organism, by_cluster,
     by_category_raw, not_found_clusters, not_matched_clusters.
-    When analysis_id: also returns analysis_name.
+    When analysis_id: also returns analysis_name, analysis_exists (bool —
+    True iff a ClusteringAnalysis node with this id exists in the KG,
+    independent of whether it has any GeneCluster / member genes; api/
+    reports an unknown id as `not_found_analysis`, llm-review 2b.3 Task 5).
     """
     params: dict = {"organism": organism}
 
@@ -6926,24 +6929,33 @@ def build_genes_in_cluster_summary(
 
     if analysis_id is not None:
         params["analysis_id"] = analysis_id
+        # OPTIONAL MATCH split into two stages (rather than one MATCH with
+        # a chained relationship pattern) so an unknown analysis_id and a
+        # real analysis with zero GeneClusters remain distinguishable —
+        # a plain MATCH on the whole path returns zero rows for BOTH cases,
+        # losing the `ca IS NOT NULL` existence signal `not_found_analysis`
+        # needs (llm-review 2b.3 Task 5). OPTIONAL MATCH on the bare
+        # ClusteringAnalysis lookup always yields >=1 row even when nothing
+        # matches, so `ca` (and therefore `analysis_exists`) survives the
+        # aggregation below.
         match_block = (
-            "MATCH (ca:ClusteringAnalysis {id: $analysis_id})"
-            "-[:ClusteringAnalysisHasGeneCluster]->(gc:GeneCluster)\n"
-            "WITH gc, gc.id AS cid, ca.name AS analysis_name\n"
+            "OPTIONAL MATCH (ca:ClusteringAnalysis {id: $analysis_id})\n"
+            "OPTIONAL MATCH (ca)-[:ClusteringAnalysisHasGeneCluster]->(gc:GeneCluster)\n"
+            "WITH ca, gc, gc.id AS cid, ca.name AS analysis_name\n"
             "OPTIONAL MATCH (gc)-[r:Gene_in_gene_cluster]->(g:Gene)\n"
             f"WHERE g IS NOT NULL {organism_filter}"
-            "WITH cid, gc, g, analysis_name\n"
+            "WITH ca, cid, gc, g, analysis_name\n"
         )
         nf_nm_block = (
-            "WITH collect(CASE WHEN g IS NOT NULL THEN\n"
+            "WITH ca, collect(CASE WHEN g IS NOT NULL THEN\n"
             "       {lt: g.locus_tag, org: g.organism_name,\n"
             "        cat: coalesce(g.gene_category, 'Unknown'),\n"
             "        cid: cid, cname: gc.name} END) AS rows,\n"
             "     head(collect(DISTINCT analysis_name)) AS analysis_name\n"
         )
-        return_suffix = ",\n       analysis_name"
+        return_suffix = ",\n       analysis_name,\n       analysis_exists"
         not_found_block = (
-            "WITH rows, analysis_name,\n"
+            "WITH rows, analysis_name, (ca IS NOT NULL) AS analysis_exists,\n"
             "     [] AS not_found_clusters, [] AS not_matched_clusters\n"
         )
     else:
@@ -6983,7 +6995,8 @@ def build_genes_in_cluster_summary(
         "       {cluster_id: cid,\n"
         "        cluster_name: head([r IN rows WHERE r.cid = cid | r.cname]),\n"
         "        count: size([r IN rows WHERE r.cid = cid])}] AS by_cluster"
-        + (",\n     analysis_name\n" if analysis_id is not None else "\n")
+        + (",\n     analysis_name,\n     analysis_exists\n"
+           if analysis_id is not None else "\n")
         + "RETURN total_matching, by_organism, by_cluster, by_category_raw,\n"
         f"       not_found_clusters, not_matched_clusters{return_suffix}"
     )
@@ -10278,15 +10291,21 @@ def build_metabolites_by_quantifies_assay_diagnostics(
 
     Mirrors `build_genes_by_numeric_metric_diagnostics` (parent §13.1).
     api/ runs this BEFORE summary/detail to:
-      1. Validate every selected assay has `value_kind='numeric'` (raise on
-         mismatch).
+      1. Classify every selected assay_id by `value_kind` in Python — a
+         wrong-kind (boolean) assay_id is genuinely found (excluded from
+         `not_found_assay_ids`) but reported via a sibling-tool warning
+         naming `metabolites_by_flags_assay`, instead of being hardcoded
+         out of this query and silently landing in `not_found`
+         (llm-review 2b.3 Task 5, mirrors the DM diagnostics builders'
+         Task 3 fix — no `value_kind` predicate at the query level).
       2. Compute `excluded_assays` for rankable-gated filters that don't
-         apply to some/all selected assays.
+         apply to some/all selected assays (numeric-kind rows only).
       3. Echo full-assay value range into envelope `by_metric`.
 
-    RETURN keys (one row per assay): assay_id, name, value_kind,
-    rankable (bool, D4-coerced), organism_name, compartment,
-    value_min, value_q1, value_median, value_q3, value_max.
+    RETURN keys (one row per assay, ANY value_kind — api/ filters to
+    'numeric' before using this for rankable-gating / by_metric):
+    assay_id, name, value_kind, rankable (bool, D4-coerced), organism_name,
+    compartment, value_min, value_q1, value_median, value_q3, value_max.
     """
     # Reuse WHERE-helper for organism/metabolite/scoping conditions
     # (no edge filters — diagnostics is node-level only).
@@ -10303,8 +10322,10 @@ def build_metabolites_by_quantifies_assay_diagnostics(
     )
     params["assay_ids"] = assay_ids
 
-    # Hardcoded predicate: this tool only drills numeric assays.
-    extra = ["a.id IN $assay_ids", "a.value_kind = 'numeric'"]
+    # No value_kind predicate here (llm-review 2b.3 Task 5) — api/
+    # classifies numeric vs wrong-kind in Python so a boolean assay_id
+    # can be reported as not_matched (via warning) instead of not_found.
+    extra = ["a.id IN $assay_ids"]
     all_conditions = extra + conditions
 
     # If metabolite_ids / exclude_metabolite_ids in scope, we need an EXISTS
@@ -10607,6 +10628,28 @@ def _metabolites_by_flags_assay_where(
         params["flag_value"] = flag_value
 
     return conditions, params
+
+
+def build_metabolite_assay_kind_lookup(
+    assay_ids: list[str],
+) -> tuple[str, dict]:
+    """Kind-agnostic MetaboliteAssay existence + value_kind probe.
+
+    Used by `metabolites_by_flags_assay` to distinguish an assay_id that
+    genuinely doesn't exist (not_found) from one that exists as the OTHER
+    value_kind (numeric — reported via a sibling-tool warning naming
+    `metabolites_by_quantifies_assay` instead of silently vanishing).
+    Mirrors `build_derived_metric_kind_lookup`'s role for the DM drill-downs
+    (llm-review 2b.3 Task 5). No scoping filters — pure id/kind lookup, run
+    once per call regardless of organism / compartment / etc.
+
+    RETURN keys (one row per matching assay): assay_id, value_kind.
+    """
+    return (
+        "MATCH (a:MetaboliteAssay) WHERE a.id IN $assay_ids\n"
+        "RETURN a.id AS assay_id, a.value_kind AS value_kind",
+        {"assay_ids": assay_ids},
+    )
 
 
 def build_metabolites_by_flags_assay_summary(

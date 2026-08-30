@@ -4752,6 +4752,7 @@ class TestGenesInCluster:
         summary_with_analysis = {
             **self._SUMMARY_RESULT,
             "analysis_name": "MED4 nitrogen stress clustering",
+            "analysis_exists": True,
         }
         mock_conn.execute_query.side_effect = [
             [summary_with_analysis],
@@ -4761,11 +4762,13 @@ class TestGenesInCluster:
             analysis_id="ca:tolonen2006:med4:nitrogen", conn=mock_conn)
         assert result["analysis_name"] == "MED4 nitrogen stress clustering"
         assert result["total_matching"] == 5
+        assert result["not_found_analysis"] is None
 
     def test_analysis_id_summary_mode(self, mock_conn):
         summary_with_analysis = {
             **self._SUMMARY_RESULT,
             "analysis_name": "MED4 nitrogen stress clustering",
+            "analysis_exists": True,
         }
         mock_conn.execute_query.side_effect = [
             [summary_with_analysis],
@@ -4776,6 +4779,7 @@ class TestGenesInCluster:
         assert result["returned"] == 0
         assert result["results"] == []
         assert result["analysis_name"] == "MED4 nitrogen stress clustering"
+        assert result["not_found_analysis"] is None
 
     def test_summary_mode_with_cluster_ids(self, mock_conn):
         mock_conn.execute_query.side_effect = [
@@ -4799,6 +4803,57 @@ class TestGenesInCluster:
         result = api.genes_in_cluster(
             cluster_ids=["cluster:fake:id"], summary=True, conn=mock_conn)
         assert "cluster:fake:id" in result["not_found_clusters"]
+
+    def test_unknown_analysis_id_sets_not_found_analysis(self, mock_conn):
+        # llm-review 2b.3 Task 5: analysis_exists=False (builder's OPTIONAL
+        # MATCH split) -> not_found_analysis set to the id + a warning,
+        # instead of silently reporting an indistinguishable empty result.
+        summary_unknown = {
+            "total_matching": 0,
+            "by_organism": [],
+            "by_cluster": [],
+            "by_category_raw": [],
+            "not_found_clusters": [],
+            "not_matched_clusters": [],
+            "analysis_name": None,
+            "analysis_exists": False,
+        }
+        mock_conn.execute_query.side_effect = [
+            [summary_unknown],
+        ]
+        result = api.genes_in_cluster(
+            analysis_id="nope", summary=True, conn=mock_conn)
+        assert result["not_found_analysis"] == "nope"
+        assert any(
+            "nope" in w and "list_clustering_analyses" in w
+            for w in result["warnings"]
+        )
+
+    def test_known_analysis_id_no_not_found_analysis(self, mock_conn):
+        summary_with_analysis = {
+            **self._SUMMARY_RESULT,
+            "analysis_name": "MED4 nitrogen stress clustering",
+            "analysis_exists": True,
+        }
+        mock_conn.execute_query.side_effect = [
+            [summary_with_analysis],
+        ]
+        result = api.genes_in_cluster(
+            analysis_id="ca:tolonen2006:med4:nitrogen",
+            summary=True, conn=mock_conn)
+        assert result["not_found_analysis"] is None
+        assert result["warnings"] == []
+
+    def test_cluster_ids_mode_no_not_found_analysis(self, mock_conn):
+        # analysis_exists is not a concept in cluster_ids mode.
+        mock_conn.execute_query.side_effect = [
+            [self._SUMMARY_RESULT],
+        ]
+        result = api.genes_in_cluster(
+            cluster_ids=["cluster:msb4100087:med4:up_n_transport"],
+            summary=True, conn=mock_conn)
+        assert result["not_found_analysis"] is None
+        assert result["warnings"] == []
 
 
 class TestGeneDerivedMetrics:
@@ -7541,12 +7596,15 @@ class TestClusterEnrichmentInputs:
         assert skipped_names == {"Cluster B", "Cluster C"}
 
     def test_not_found_when_analysis_missing(self, monkeypatch):
+        # llm-review 2b.3 Task 5: genes_in_cluster's own not_found_analysis
+        # is now the authoritative "doesn't exist at all" signal.
         import multiomics_explorer.analysis.enrichment as enr
         import multiomics_explorer.api.functions as f
         empty_result = {
             **self._CLUSTER_RESULT,
             "total_matching": 0, "results": [], "returned": 0,
             "analysis_name": None,
+            "not_found_analysis": "ca:missing",
         }
         empty_meta = {**self._ANALYSIS_META, "total_matching": 0, "results": [], "returned": 0}
         monkeypatch.setattr(f, "genes_in_cluster", lambda **_: empty_result)
@@ -7554,6 +7612,7 @@ class TestClusterEnrichmentInputs:
         inputs = enr.cluster_enrichment_inputs(
             analysis_id="ca:missing", organism="MED4")
         assert "ca:missing" in inputs.not_found
+        assert inputs.warnings == []
 
     def test_not_matched_when_organism_wrong(self, monkeypatch):
         import multiomics_explorer.analysis.enrichment as enr
@@ -7568,6 +7627,30 @@ class TestClusterEnrichmentInputs:
         inputs = enr.cluster_enrichment_inputs(
             analysis_id="ca:test", organism="SomeOtherOrg")
         assert "ca:test" in inputs.not_matched
+        assert inputs.warnings == []
+
+    def test_warning_when_analysis_exists_but_empty(self, monkeypatch):
+        """llm-review 2b.3 Task 5 carried-over item: analysis EXISTS,
+        organism matches, but zero cluster->gene rows -> a warning, not
+        not_found / not_matched (a normal empty result)."""
+        import multiomics_explorer.analysis.enrichment as enr
+        import multiomics_explorer.api.functions as f
+        empty_result = {
+            **self._CLUSTER_RESULT,
+            "total_matching": 0, "results": [], "returned": 0,
+            "not_found_analysis": None,
+            "not_matched_organism": None,
+        }
+        monkeypatch.setattr(f, "genes_in_cluster", lambda **_: empty_result)
+        monkeypatch.setattr(f, "list_clustering_analyses", lambda **_: self._ANALYSIS_META)
+        inputs = enr.cluster_enrichment_inputs(
+            analysis_id="ca:test", organism="MED4")
+        assert inputs.not_found == []
+        assert inputs.not_matched == []
+        assert any(
+            "ca:test" in w and "no cluster" in w and "MED4" in w
+            for w in inputs.warnings
+        ), inputs.warnings
 
     def test_cluster_metadata_populated(self, monkeypatch):
         import multiomics_explorer.analysis.enrichment as enr
@@ -8381,6 +8464,61 @@ class TestListMetabolites:
         )
         assert out["not_found"]["pathway_ids"] == ["kegg.pathway:bogus"]
 
+    def test_elements_full_name_normalized_silently(self):
+        """llm-review 2b.3 Task 5 resolution 2: a full element name
+        ('Nitrogen') normalises to its symbol with NO warning."""
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(elements=["Nitrogen"], conn=conn)
+        assert out["not_found"]["elements"] == []
+        assert not any("element" in w.lower() for w in out["warnings"])
+        # The normalized symbol reached the builder.
+        called_kwargs = conn.execute_query.call_args_list[0].kwargs
+        assert called_kwargs.get("elements") == ["N"]
+
+    def test_elements_lowercase_symbol_normalized_silently(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(elements=["n", "fe"], conn=conn)
+        assert out["not_found"]["elements"] == []
+        called_kwargs = conn.execute_query.call_args_list[0].kwargs
+        assert called_kwargs.get("elements") == ["N", "Fe"]
+
+    def test_elements_unrecognized_warns_and_not_found(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(elements=["Xx"], conn=conn)
+        assert out["not_found"]["elements"] == ["Xx"]
+        assert any(
+            "'Xx' is not a recognized element" in w for w in out["warnings"]
+        ), out["warnings"]
+        # Dropped from the filter entirely (no impossible-AND on a bogus symbol).
+        called_kwargs = conn.execute_query.call_args_list[0].kwargs
+        assert called_kwargs.get("elements") is None
+
+    def test_elements_mixed_valid_and_invalid(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(elements=["N", "Xx"], conn=conn)
+        assert out["not_found"]["elements"] == ["Xx"]
+        called_kwargs = conn.execute_query.call_args_list[0].kwargs
+        assert called_kwargs.get("elements") == ["N"]
+
+    def test_name_shaped_metabolite_id_warns(self):
+        """llm-review 2b.3 Task 5: a metabolite_ids entry matching no id
+        pattern at all (a NAME) warns and points at search_text."""
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(
+            self._SUMMARY_ROW, [self._DETAIL_ROW],
+            [{"found": []}],
+        )
+        out = list_metabolites(metabolite_ids=["glutamate"], conn=conn)
+        assert any(
+            "'glutamate' is not a metabolite id" in w
+            and "list_metabolites(search_text=...)" in w
+            for w in out["warnings"]
+        ), out["warnings"]
+
     def test_sparse_strip_null_chebi(self):
         """When chebi_id is null on a row, api/ strips the key
         (Pydantic field is optional)."""
@@ -8646,6 +8784,39 @@ class TestGenesByMetabolite:
         # Both rows surface in the result
         evidence = {r["evidence_source"] for r in out["results"]}
         assert evidence == {"metabolism", "transport"}
+
+    def test_name_shaped_metabolite_id_warns(self):
+        """llm-review 2b.3 Task 5: an input matching no metabolite-id
+        pattern at all (a NAME, not an ID) gets its own warning pointing
+        at list_metabolites(search_text=...). Zero extra queries — the
+        name never enters `_canonicalize_metabolite_ids`'s to_resolve set,
+        so it's forwarded verbatim, same query count as a canonical id."""
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_MS],
+            [{"found": []}],  # the raw name resolves to nothing in the KG
+        )
+        out = gbm(["glutamate"], self._ORG, conn=conn)
+        assert any(
+            "'glutamate' is not a metabolite id" in w
+            and "list_metabolites(search_text=...)" in w
+            for w in out["warnings"]
+        ), out["warnings"]
+
+    def test_canonical_metabolite_id_no_shape_warning(self):
+        """A correctly-shaped canonical id (already `prefix:id`) never
+        triggers the shape warning."""
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_MS],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, conn=conn)
+        assert not any("is not a metabolite id" in w for w in out["warnings"])
 
     def test_evidence_sources_metabolism_only_skips_transport_arm(self):
         """evidence_sources=['metabolism'] suppresses the transport arm.
@@ -12126,6 +12297,80 @@ class TestListMetaboliteAssays:
         from multiomics_explorer import list_metabolite_assays as _root_export
         assert _api_export is _root_export
 
+    def test_organism_no_assays_warns(self):
+        """llm-review 2b.3 Task 5: organism resolves genomically but has
+        zero MetaboliteAssay nodes -> distinct warning naming which
+        organisms DO have assays."""
+        from unittest.mock import MagicMock
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        summary_row = [{
+            "total_entries": 10, "total_matching": 0,
+            "metabolite_count_total": 0,
+            "by_organism": [], "by_value_kind": [], "by_compartment": [],
+            "top_metric_types": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_growth_phase": [],
+            "by_detection_status": [],
+        }]
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            [{"organisms": ["Prochlorococcus MED4"]}],  # organism resolve
+            [{"has_assays": False}],                     # targeted existence
+            [{"orgs": ["Prochlorococcus MED4", "Alteromonas macleodii"]}],
+            summary_row,
+            [],  # detail
+        ]
+        result = list_metabolite_assays(organism="MED4", conn=conn)
+        assert any(
+            "MED4" in w and "no metabolomics assays" in w
+            and "Alteromonas macleodii" in w
+            for w in result["warnings"]
+        ), result["warnings"]
+
+    def test_organism_with_assays_no_warning(self):
+        from unittest.mock import MagicMock
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        summary_row = [{
+            "total_entries": 10, "total_matching": 3,
+            "metabolite_count_total": 3,
+            "by_organism": [], "by_value_kind": [], "by_compartment": [],
+            "top_metric_types": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_growth_phase": [],
+            "by_detection_status": [],
+        }]
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            [{"organisms": ["Prochlorococcus MED4"]}],
+            [{"has_assays": True}],
+            summary_row,
+            [],
+        ]
+        result = list_metabolite_assays(organism="MED4", conn=conn)
+        assert not any("no metabolomics assays" in w for w in result["warnings"])
+
+    def test_organism_no_match_at_all_warns_unmatched(self):
+        from unittest.mock import MagicMock
+        from multiomics_explorer.api.functions import list_metabolite_assays
+        summary_row = [{
+            "total_entries": 10, "total_matching": 0,
+            "metabolite_count_total": 0,
+            "by_organism": [], "by_value_kind": [], "by_compartment": [],
+            "top_metric_types": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_growth_phase": [],
+            "by_detection_status": [],
+        }]
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            [{"organisms": []}],  # organism resolve: no match at all
+            summary_row,
+            [],
+        ]
+        result = list_metabolite_assays(organism="Bogus organism", conn=conn)
+        assert any(
+            "matched no organism" in w for w in result["warnings"]
+        ), result["warnings"]
+        # No metabolomics-layer query fired since organism never resolved.
+        assert conn.execute_query.call_count == 3
+
 
 # ---------------------------------------------------------------------------
 # Phase 5 metabolites-by-assay slice — 3 tools
@@ -12343,6 +12588,72 @@ class TestMetabolitesByQuantifiesAssay:
         assert row["metric_percentile"] == 100.0
         assert row["rank_by_metric"] == 1
 
+    def test_boolean_assay_id_reported_as_wrong_kind_not_not_found(self):
+        """llm-review 2b.3 Task 5: a boolean assay_id passed to this
+        numeric-only tool is genuinely found (excluded from
+        not_found.assay_ids) but reported via a sibling-tool warning."""
+        from multiomics_explorer.api.functions import metabolites_by_quantifies_assay
+        mock_conn = MagicMock()
+        diag_rows = [
+            {
+                "assay_id": "bool_a1",
+                "name": "Boolean assay",
+                "value_kind": "boolean",
+                "rankable": False,
+                "organism_name": "Prochlorococcus MIT9313",
+                "compartment": "whole_cell",
+                "value_min": None, "value_q1": None, "value_median": None,
+                "value_q3": None, "value_max": None,
+            },
+        ]
+        mock_conn.execute_query.side_effect = [diag_rows]
+        data = metabolites_by_quantifies_assay(assay_ids=["bool_a1"], conn=mock_conn)
+        assert "bool_a1" not in data["not_found"]["assay_ids"]
+        assert any(
+            "bool_a1 exists as value_kind=boolean" in w
+            and "metabolites_by_flags_assay" in w
+            for w in data["warnings"]
+        ), data["warnings"]
+        # Nothing survived the kind partition -> empty result, not a crash.
+        assert data["results"] == []
+        assert data["total_matching"] == 0
+
+    def test_mixed_kind_assay_ids_partition_correctly(self):
+        """One numeric + one boolean id: the numeric one proceeds through
+        summary/detail; the boolean one is warned, not not_found."""
+        from multiomics_explorer.api.functions import metabolites_by_quantifies_assay
+        mock_conn = MagicMock()
+        diag_rows = self._diag_rankable(("num_a1",)) + [
+            {
+                "assay_id": "bool_a1",
+                "name": "Boolean assay",
+                "value_kind": "boolean",
+                "rankable": False,
+                "organism_name": "Prochlorococcus MIT9313",
+                "compartment": "whole_cell",
+                "value_min": None, "value_q1": None, "value_median": None,
+                "value_q3": None, "value_max": None,
+            },
+        ]
+        summary = [{
+            "total_matching": 3,
+            "by_detection_status": [{"item": "detected", "count": 3}],
+            "by_metric_bucket": [],
+            "by_assay": [{"item": "num_a1", "count": 3}],
+            "by_compartment": [{"item": "whole_cell", "count": 3}],
+            "by_organism": [{"item": "Prochlorococcus MIT9313", "count": 3}],
+            "filtered_value_min": 0.0,
+            "filtered_value_max": 0.5,
+        }]
+        mock_conn.execute_query.side_effect = [diag_rows, summary]
+        data = metabolites_by_quantifies_assay(
+            assay_ids=["num_a1", "bool_a1"], summary=True, conn=mock_conn)
+        assert "bool_a1" not in data["not_found"]["assay_ids"]
+        assert "num_a1" not in data["not_found"]["assay_ids"]
+        assert any("bool_a1 exists as value_kind=boolean" in w
+                   for w in data["warnings"])
+        assert data["total_matching"] == 3
+
 
 class TestMetabolitesByFlagsAssay:
     """Unit tests for api.metabolites_by_flags_assay (slice spec §5)."""
@@ -12359,7 +12670,10 @@ class TestMetabolitesByFlagsAssay:
         class StubConn:
             def execute_query(self, cypher, **params):
                 captured.append(dict(params))
-                # Return an empty summary envelope so api/ continues.
+                if "a.id AS assay_id" in cypher:
+                    # Q1: kind-agnostic existence + value_kind probe.
+                    return [{"assay_id": "a1", "value_kind": "boolean"}]
+                # Q2: summary envelope so api/ continues.
                 return [{
                     "total_matching": 0,
                     "by_value": [],
@@ -12379,12 +12693,13 @@ class TestMetabolitesByFlagsAssay:
         )
 
     def test_no_rankable_diagnostics(self):
-        # Boolean tool has no rankable gate; diagnostics builder must NOT be called.
-        # Implementation detail: this asserts via call count — the boolean dispatch
-        # is two queries (summary + detail), not three.
+        # Boolean tool has no rankable-gate diagnostics; the dispatch is
+        # three queries (kind-agnostic existence probe, summary, detail),
+        # not four (llm-review 2b.3 Task 5 added the existence probe).
         from multiomics_explorer.api.functions import metabolites_by_flags_assay
         mock_conn = MagicMock()
         mock_conn.execute_query.side_effect = [
+            [{"assay_id": "a1", "value_kind": "boolean"}],
             [{
                 "total_matching": 0,
                 "by_value": [],
@@ -12397,8 +12712,53 @@ class TestMetabolitesByFlagsAssay:
         metabolites_by_flags_assay(
             assay_ids=["a1"], conn=mock_conn,
         )
-        # Two queries (summary + detail), not three (no diagnostics probe).
-        assert mock_conn.execute_query.call_count == 2
+        # Three queries: kind probe + summary + detail.
+        assert mock_conn.execute_query.call_count == 3
+
+    def test_unknown_assay_id_in_not_found(self):
+        """llm-review 2b.3 Task 5: not_found.assay_ids is now a real
+        existence check, not always []."""
+        from multiomics_explorer.api.functions import metabolites_by_flags_assay
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            [],  # kind probe: nothing found
+            [{
+                "total_matching": 0,
+                "by_value": [],
+                "by_assay": [],
+                "by_compartment": [],
+                "by_organism": [],
+            }],
+            [],
+        ]
+        data = metabolites_by_flags_assay(assay_ids=["nope"], conn=mock_conn)
+        assert data["not_found"]["assay_ids"] == ["nope"]
+        assert data["warnings"] == []
+
+    def test_numeric_assay_id_reported_as_wrong_kind_not_not_found(self):
+        """A numeric assay_id passed to this boolean-only tool is
+        genuinely found (excluded from not_found.assay_ids) but reported
+        via a sibling-tool warning."""
+        from multiomics_explorer.api.functions import metabolites_by_flags_assay
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            [{"assay_id": "num_a1", "value_kind": "numeric"}],
+            [{
+                "total_matching": 0,
+                "by_value": [],
+                "by_assay": [],
+                "by_compartment": [],
+                "by_organism": [],
+            }],
+            [],
+        ]
+        data = metabolites_by_flags_assay(assay_ids=["num_a1"], conn=mock_conn)
+        assert "num_a1" not in data["not_found"]["assay_ids"]
+        assert any(
+            "num_a1 exists as value_kind=numeric" in w
+            and "metabolites_by_quantifies_assay" in w
+            for w in data["warnings"]
+        ), data["warnings"]
 
 
 class TestAssaysByMetabolite:
@@ -12568,6 +12928,39 @@ class TestAssaysByMetabolite:
         assert row["metric_percentile"] is None
         assert row["value"] == 0
         assert row["detection_status"] == "not_detected"
+
+    def test_organism_no_assays_warns(self):
+        """llm-review 2b.3 Task 5: same organism-layer warning as
+        list_metabolite_assays (assays_by_metabolite had no organism
+        warning at all before this)."""
+        from multiomics_explorer.api.functions import assays_by_metabolite
+        mock_conn = MagicMock()
+        mid = "kegg.compound:C00025"
+        empty_summary = [{
+            "total_matching": 0,
+            "by_evidence_kind": [],
+            "by_organism": [],
+            "by_compartment": [],
+            "by_assay": [],
+            "by_detection_status": [],
+            "by_flag_value": [],
+            "metabolites_matched": 0,
+            "matched_metabolite_ids": [],
+        }]
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": ["Prochlorococcus MED4"]}],   # organism resolve
+            [{"has_assays": False}],                      # targeted existence
+            [{"orgs": ["Prochlorococcus MED4"]}],          # full org list
+            [{"metabolite_id": mid}],                      # existence probe
+            empty_summary,
+            [],
+        ]
+        data = assays_by_metabolite(
+            metabolite_ids=[mid], organism="MIT9313", conn=mock_conn)
+        assert any(
+            "MIT9313" in w and "no metabolomics assays" in w
+            for w in data["warnings"]
+        ), data["warnings"]
 
 
 # ---------------------------------------------------------------------------
@@ -17003,6 +17396,7 @@ _MQA_SUMMARY = {
     "by_assay": [], "by_compartment": [], "by_organism": [],
     "filtered_value_min": None, "filtered_value_max": None,
 }
+_MFA_KIND = [{"assay_id": "a1", "value_kind": "boolean"}]
 _MFA_SUMMARY = {
     "total_matching": 0, "by_value": [], "by_assay": [],
     "by_compartment": [], "by_organism": [],
@@ -17045,7 +17439,7 @@ def _tool_calls():
          lambda c, m, x: f.metabolites_by_flags_assay(
              assay_ids=["a1"], metabolite_ids=m, exclude_metabolite_ids=x,
              summary=True, conn=c),
-         lambda: [[_MFA_SUMMARY]]),
+         lambda: [list(_MFA_KIND), [_MFA_SUMMARY]]),
         ("assays_by_metabolite",
          lambda c, m, x: f.assays_by_metabolite(
              metabolite_ids=m or [_CANON], exclude_metabolite_ids=x,

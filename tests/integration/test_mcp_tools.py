@@ -3431,26 +3431,35 @@ class TestMetabolitesByQuantifiesAssayKG:
     def test_all_non_rankable_raises(self, conn):
         """All-non-rankable selected-assay set + rankable-gated filter
         → ValueError (rankable-gating contract). Today the live KG has
-        no non-rankable numeric assays — boolean assays are filtered out
-        of the diagnostics probe via `value_kind='numeric'`. We simulate
-        the failure mode by passing a boolean assay (non-rankable) — this
-        path returns an empty envelope without raising (api guard requires
-        diag_rows to be non-empty before the rankable check fires).
+        no non-rankable numeric assays — boolean assays never reach the
+        numeric-kind partition at all. We simulate the failure mode by
+        passing a boolean assay (non-rankable) — this path returns an
+        empty envelope without raising (api guard requires diag_rows to
+        be non-empty before the rankable check fires).
+
+        llm-review 2b.3 Task 5: the boolean assay_id is genuinely found
+        (diagnostics is now kind-agnostic) — it's excluded from
+        `not_found.assay_ids` and reported via a sibling-tool warning
+        instead, rather than silently landing in not_found.
 
         Documented as a KG-state limitation: the rankable-gate raise is
         unreachable from the live KG today. The test still pins the
         not-yet-failing surface so when a non-rankable numeric assay
         lands in the KG, this stops being a no-op."""
         from multiomics_explorer.api import metabolites_by_quantifies_assay
-        # Boolean assay → filtered out by 'value_kind=numeric' in diagnostics.
-        # Empty diag_rows → defensive empty-envelope path; no raise today.
         result = metabolites_by_quantifies_assay(
             assay_ids=[_MSYSTEMS_PRESENCE_FLAGS_ASSAY],
             metric_bucket=["top_decile"], conn=conn)
         assert result["total_matching"] == 0
         assert result["results"] == []
-        # boolean assay is "absent" from numeric diagnostics → not_found
-        assert _MSYSTEMS_PRESENCE_FLAGS_ASSAY in result["not_found"]["assay_ids"]
+        # Boolean assay is genuinely found -> NOT in not_found.assay_ids.
+        assert _MSYSTEMS_PRESENCE_FLAGS_ASSAY not in result["not_found"]["assay_ids"]
+        assert any(
+            _MSYSTEMS_PRESENCE_FLAGS_ASSAY in w
+            and "value_kind=boolean" in w
+            and "metabolites_by_flags_assay" in w
+            for w in result["warnings"]
+        ), result["warnings"]
 
     def test_value_min_strips_tested_absent(self, conn):
         """Parent §10 anti-pattern: `value_min=0.001` slashes the
@@ -3544,19 +3553,32 @@ class TestMetabolitesByFlagsAssayKG:
         # Positive assertion: the qualitative-detection signal is by_value.
         assert "by_value" in result
 
-    def test_assay_ids_not_found_task3_deviation(self, conn):
-        """Task 3 deviation: `metabolites_by_flags_assay` does NOT probe
-        assay_ids. When passed a non-existent assay_id, `not_found.assay_ids`
-        is `[]` (not populated) — the assay simply yields zero rows.
-
-        Documented behavior; current tests pin to it. Future enhancement
-        should add a diagnostics probe (parent §13.6 alignment)."""
+    def test_assay_ids_not_found(self, conn):
+        """llm-review 2b.3 Task 5: `metabolites_by_flags_assay` now probes
+        assay_ids via a kind-agnostic existence + value_kind lookup — a
+        non-existent assay_id genuinely surfaces in not_found.assay_ids
+        (superseding the old Task 3 deviation, which left this bucket
+        always empty)."""
         from multiomics_explorer.api import metabolites_by_flags_assay
         result = metabolites_by_flags_assay(
             assay_ids=["nonexistent_assay"], summary=True, conn=conn)
         assert result["total_matching"] == 0
-        # Current behavior: not_found.assay_ids stays empty (no probe).
-        assert result["not_found"]["assay_ids"] == []
+        assert result["not_found"]["assay_ids"] == ["nonexistent_assay"]
+
+    def test_numeric_assay_id_reported_as_wrong_kind(self, conn):
+        """A numeric assay_id passed to this boolean-only tool is
+        genuinely found (excluded from not_found.assay_ids) but reported
+        via a sibling-tool warning naming metabolites_by_quantifies_assay."""
+        from multiomics_explorer.api import metabolites_by_flags_assay
+        result = metabolites_by_flags_assay(
+            assay_ids=[_MIT9313_CHITOSAN_ASSAY], summary=True, conn=conn)
+        assert _MIT9313_CHITOSAN_ASSAY not in result["not_found"]["assay_ids"]
+        assert any(
+            _MIT9313_CHITOSAN_ASSAY in w
+            and "value_kind=numeric" in w
+            and "metabolites_by_quantifies_assay" in w
+            for w in result["warnings"]
+        ), result["warnings"]
 
 
 @pytest.mark.kg

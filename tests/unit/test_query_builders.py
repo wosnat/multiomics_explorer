@@ -10238,7 +10238,12 @@ class TestBuildMetabolitesByQuantifiesAssayDiagnostics:
             assay_ids=["metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration"])
         assert "MATCH (a:MetaboliteAssay)" in cypher
         assert "a.id IN $assay_ids" in cypher
-        assert "a.value_kind = 'numeric'" in cypher
+        # No value_kind predicate (llm-review 2b.3 Task 5) — api/
+        # classifies numeric vs wrong-kind (boolean) in Python so a
+        # boolean assay_id can be reported as not_matched (via warning)
+        # instead of not_found. value_kind is still a returned column.
+        assert "a.value_kind = 'numeric'" not in cypher
+        assert "a.value_kind AS value_kind" in cypher
         assert "(a.rankable = 'rankable') AS rankable" in cypher       # D4 string→bool
         assert "a.value_min" in cypher and "a.value_max" in cypher  # so api/ can echo full-DM range
         assert params["assay_ids"] == [
@@ -10250,6 +10255,23 @@ class TestBuildMetabolitesByQuantifiesAssayDiagnostics:
             assay_ids=["a1"], organism="MIT9313")
         assert "toLower(a.organism_name) CONTAINS" in cypher
         assert "mit9313" in str(params).lower()
+
+
+class TestBuildMetaboliteAssayKindLookup:
+    """Unit tests for build_metabolite_assay_kind_lookup (llm-review 2b.3
+    Task 5) — kind-agnostic existence + value_kind probe shared by
+    metabolites_by_flags_assay's not_found / wrong-kind classification."""
+
+    def test_basic_shape(self):
+        from multiomics_explorer.kg.queries_lib import build_metabolite_assay_kind_lookup
+        cypher, params = build_metabolite_assay_kind_lookup(["a1", "a2"])
+        assert "MATCH (a:MetaboliteAssay)" in cypher
+        assert "a.id IN $assay_ids" in cypher
+        assert "a.id AS assay_id" in cypher
+        assert "a.value_kind AS value_kind" in cypher
+        # No scoping filters — pure id/kind lookup.
+        assert "organism" not in cypher.lower()
+        assert params == {"assay_ids": ["a1", "a2"]}
 
 
 class TestBuildMetabolitesByQuantifiesAssaySummary:

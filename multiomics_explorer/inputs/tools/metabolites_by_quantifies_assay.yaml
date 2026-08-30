@@ -167,6 +167,12 @@ chaining:
 
 mistakes:
   - "Numeric arm only (`Assay_quantifies_metabolite`). Siblings: `metabolites_by_flags_assay` is the boolean-arm twin (presence flags, no values); `assays_by_metabolite` is the metabolite-anchored reverse lookup over both arms."
+  - wrong: "A requested assay_id silently disappears from the results and not_found.assay_ids stays empty."
+    right: |
+      A boolean assay_id is genuinely found (it exists as `value_kind='boolean'`)
+      but this tool only drills numeric edges — it's excluded from
+      `not_found.assay_ids` and reported via a `warnings` entry naming
+      `metabolites_by_flags_assay` as the tool to use instead.
   - wrong: "Filter out value=0 / flag_value=false rows assuming they are noise."
     right: |
       These rows are tested-absent — the metabolite was assayed and not found.

@@ -59,7 +59,7 @@ runnable code (custom term2gene path covers cluster-membership ORA).
 ### Envelope
 
 ```expected-keys
-analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_type, treatment_type, background_factors, growth_phases, experiment_ids, ontology, level, tree, total_matching, returned, truncated, offset, n_significant, by_cluster, by_term, clusters_tested, not_found, not_matched, clusters_skipped, term_validation, enrichment_params, filters_applied, trust_axes, background_filtered, interpro_type, results
+analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_type, treatment_type, background_factors, growth_phases, experiment_ids, ontology, level, tree, total_matching, returned, truncated, offset, n_significant, by_cluster, by_term, clusters_tested, not_found, not_matched, warnings, clusters_skipped, term_validation, enrichment_params, filters_applied, trust_axes, background_filtered, interpro_type, results
 ```
 
 - **analysis_id** (string | None): Clustering analysis ID
@@ -85,6 +85,7 @@ analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_t
 - **clusters_tested** (int): Clusters passing size filter
 - **not_found** (list[string]): Analysis IDs absent from KG
 - **not_matched** (list[string]): Analysis IDs wrong organism
+- **warnings** (list[string]): Diagnostic strings. Currently emitted: the analysis exists and matches the organism but yields zero cluster→gene rows (a normal empty result — total_matching=0 — not the `not_found` raise; that still fires only when the analysis_id doesn't exist at all).
 - **clusters_skipped** (list[ClusterEnrichmentClusterSkipped]): Clusters filtered out or producing no rows
 - **term_validation** (PathwayEnrichmentTermValidation): Namespaced passthrough of term_id validation from genes_by_ontology
 - **enrichment_params** (object | None): ORA parameters used for this call. See docs://analysis/enrichment.

@@ -1263,7 +1263,7 @@ class TestListMetabolitesContract:
     }
 
     EXPECTED_NOT_FOUND_KEYS = {
-        "metabolite_ids", "organism_names", "pathway_ids",
+        "metabolite_ids", "organism_names", "pathway_ids", "elements",
     }
 
     EXPECTED_XREF_COVERAGE_KEYS = {"with_chebi", "with_hmdb", "with_mnxm"}

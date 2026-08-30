@@ -68,7 +68,7 @@ total_matching, by_detection_status, by_metric_bucket, by_assay, by_compartment,
 - **by_organism** (list[MqaByOrganism]): Counts per organism (cross-organism by default).
 - **by_metric** (list[MqaByMetric]): Per-assay precomputed-vs-filtered: pairs the filtered slice min/max with the full-assay precomputed range so the LLM can read 'top-decile slice 0.012-0.16 out of full range 0-0.16' inline.
 - **excluded_assays** (list[string]): `assay_ids` soft-excluded under rankable-gating (non-rankable assays dropped when a rankable filter is set).
-- **warnings** (list[string]): Human-readable rankable-gating diagnostics, plus bare-ID collision notes (one input → several metabolites, expanded to all).
+- **warnings** (list[string]): Human-readable rankable-gating diagnostics, bare-ID collision notes (one input → several metabolites, expanded to all), and a sibling-tool notice when a requested assay_id exists as value_kind='boolean' (genuinely found, excluded from `not_found.assay_ids` — use `metabolites_by_flags_assay` instead).
 - **resolved_aliases** (object): Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).
 - **not_found** (MqaNotFound): Per-batch-input unknown IDs (4 buckets: assay_ids, metabolite_ids, experiment_ids, publication_doi).
 - **returned** (int): Length of `results`.
@@ -277,6 +277,18 @@ metabolites_by_quantifies_assay → metabolites_by_gene(locus_tags=[...], organi
 ## Common mistakes
 
 - Numeric arm only (`Assay_quantifies_metabolite`). Siblings: `metabolites_by_flags_assay` is the boolean-arm twin (presence flags, no values); `assays_by_metabolite` is the metabolite-anchored reverse lookup over both arms.
+
+```mistake
+A requested assay_id silently disappears from the results and not_found.assay_ids stays empty.
+```
+
+```correction
+A boolean assay_id is genuinely found (it exists as `value_kind='boolean'`)
+but this tool only drills numeric edges — it's excluded from
+`not_found.assay_ids` and reported via a `warnings` entry naming
+`metabolites_by_flags_assay` as the tool to use instead.
+
+```
 
 ```mistake
 Filter out value=0 / flag_value=false rows assuming they are noise.

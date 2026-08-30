@@ -29,7 +29,7 @@ cluster direction via `gene_clusters_by_gene`.
 ### Envelope
 
 ```expected-keys
-total_matching, analysis_name, by_organism, by_cluster, top_categories, genes_per_cluster_max, genes_per_cluster_median, not_found_clusters, not_matched_clusters, not_matched_organism, returned, offset, truncated, results
+total_matching, analysis_name, by_organism, by_cluster, top_categories, genes_per_cluster_max, genes_per_cluster_median, not_found_clusters, not_matched_clusters, not_matched_organism, not_found_analysis, warnings, returned, offset, truncated, results
 ```
 
 - **total_matching** (int): Gene × cluster rows
@@ -42,6 +42,8 @@ total_matching, analysis_name, by_organism, by_cluster, top_categories, genes_pe
 - **not_found_clusters** (list[string]): Input cluster_ids not found in KG
 - **not_matched_clusters** (list[string]): Clusters found but no members after organism filter
 - **not_matched_organism** (string | None): Organism that didn't match any cluster's organism
+- **not_found_analysis** (string | None): The analysis_id you passed, when no ClusteringAnalysis node with that id exists in the KG. None otherwise — including when cluster_ids was used, or when analysis_id exists but has zero clusters / member genes (that case is a normal empty result, total_matching=0).
+- **warnings** (list[string]): Diagnostic strings. Currently emitted: a not_found_analysis pointer at list_clustering_analyses(organism=...).
 - **returned** (int): Results in this response
 - **offset** (int): Offset into result set
 - **truncated** (bool): True if total_matching > offset + returned
@@ -119,6 +121,8 @@ gene_clusters_by_gene → genes_in_cluster → differential_expression_by_gene
 
 - not_found_clusters means the ID doesn't exist in the KG; not_matched_clusters means the cluster exists but has no members matching your organism filter. The `_clusters` suffix is this tool's spelling of the not_found / not_matched pair — See docs://guide/conventions for the shared not_found / not_matched semantics.
 
+- In analysis_id mode, an unknown analysis_id sets `not_found_analysis` to the id you passed (plus a `warnings` entry pointing at `list_clustering_analyses`) instead of the `total_matching=0` empty result you'd otherwise get from a valid-but-empty analysis. Check `not_found_analysis` before assuming a zero-row result means the analysis has no members for your organism filter.
+
 - Results are gene × cluster rows — when querying multiple clusters, a gene in both appears twice. Use by_cluster to see per-cluster counts.
 
 ```mistake
@@ -143,7 +147,7 @@ genes_in_cluster(cluster_ids=['cluster:msb4100087:med4_kmeans_nstarvation:8']) �
 from multiomics_explorer import genes_in_cluster
 
 result = genes_in_cluster()
-# returns dict with keys: total_matching, analysis_name, by_organism, by_cluster, top_categories, genes_per_cluster_max, genes_per_cluster_median, not_found_clusters, not_matched_clusters, not_matched_organism, returned, offset, truncated, results
+# returns dict with keys: total_matching, analysis_name, by_organism, by_cluster, top_categories, genes_per_cluster_max, genes_per_cluster_median, not_found_clusters, not_matched_clusters, not_matched_organism, not_found_analysis, warnings, returned, offset, truncated, results
 ```
 
 Use package import for bulk data extraction in scripts.
