@@ -22,6 +22,7 @@ import scipy.stats as _stats
 import statsmodels.stats.multitest as _multitest
 
 from multiomics_explorer.kg.queries_lib import ontology_edge_row_columns
+from multiomics_explorer.api.envelope import cap_breakdowns
 
 
 class EnrichmentInputs(BaseModel):
@@ -1054,7 +1055,7 @@ def _envelope_by_experiment(df, inputs, pvalue_cutoff):
             "n_significant": int((sub["p_adjust"] < pvalue_cutoff).sum()),
             "n_clusters": int(sub["cluster"].nunique()),
         })
-    # Sorted desc by n_significant (the ranking count `_cap_breakdowns` caps
+    # Sorted desc by n_significant (the ranking count `cap_breakdowns` caps
     # on in `to_envelope`), then experiment_id for a deterministic order.
     out.sort(key=lambda e: (-e["n_significant"], e["experiment_id"]))
     return out
@@ -1526,13 +1527,8 @@ class EnrichmentResult:
         always a genuine top-10 — in BOTH modes — via ``_envelope_top_pathways``
         itself, so it carries no ``_truncated`` companion key.
         """
-        # Lazy import: avoids a module-level cycle with api/functions.py,
-        # which lazily imports this module inside pathway_enrichment /
-        # cluster_enrichment.
-        from multiomics_explorer.api.functions import _cap_breakdowns
-
         env = self.generate_summary()
-        env = _cap_breakdowns(
+        env = cap_breakdowns(
             env, ("by_experiment",), summary=summary,
         )
         params = getattr(self, "params", None) or {}

@@ -213,20 +213,12 @@ def _rename_measurement_coverage(raw: dict | None) -> dict:
     return {"by_paper_count": by_pc, "by_compartment": by_comp}
 
 
-_BREAKDOWN_CAP = 10
-
-
-def _cap_breakdowns(envelope: dict, keys: tuple[str, ...], *, summary: bool) -> dict:
-    """Detail calls carry the first _BREAKDOWN_CAP entries of each breakdown list;
-    summary=True keeps the full list. Lists are already sorted by count DESC."""
-    if summary:
-        return envelope
-    for k in keys:
-        v = envelope.get(k)
-        if isinstance(v, list) and len(v) > _BREAKDOWN_CAP:
-            envelope[k] = v[:_BREAKDOWN_CAP]
-            envelope[f"{k}_truncated"] = True
-    return envelope
+# Shared with analysis/enrichment.py — see api/envelope.py (backlog 2b.11).
+# Re-exported under the private names every call site below already uses.
+from multiomics_explorer.api.envelope import (  # noqa: E402
+    BREAKDOWN_CAP as _BREAKDOWN_CAP,
+    cap_breakdowns as _cap_breakdowns,
+)
 
 
 # Regex for blocking write operations in raw Cypher.

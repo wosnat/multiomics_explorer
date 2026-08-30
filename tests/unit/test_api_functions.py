@@ -17893,6 +17893,29 @@ class TestCapBreakdownsHelper:
 
 
 # ---------------------------------------------------------------------------
+class TestCapBreakdownsSharedModule:
+    """backlog 2b.11: the helper lives in api/envelope.py; functions.py and
+    analysis/enrichment.py both import it from there (no private cross-import)."""
+
+    def test_public_module_exports(self):
+        from multiomics_explorer.api import envelope
+        assert envelope.BREAKDOWN_CAP == 10
+        out = envelope.cap_breakdowns({"by_x": list(range(12))}, ("by_x",), summary=False)
+        assert len(out["by_x"]) == 10 and out["by_x_truncated"] is True
+
+    def test_functions_reexports_same_object(self):
+        from multiomics_explorer.api import envelope
+        assert api._cap_breakdowns is envelope.cap_breakdowns
+        assert api._BREAKDOWN_CAP is envelope.BREAKDOWN_CAP
+
+    def test_enrichment_imports_from_envelope_not_functions(self):
+        import inspect
+        from multiomics_explorer.analysis import enrichment
+        src = inspect.getsource(enrichment)
+        assert "from multiomics_explorer.api.envelope import cap_breakdowns" in src
+        assert "from multiomics_explorer.api.functions import _cap_breakdowns" not in src
+
+
 # Tool-level _cap_breakdowns wiring — one 12-entry test per affected tool.
 # ---------------------------------------------------------------------------
 class TestResolveGeneBreakdownCap:
