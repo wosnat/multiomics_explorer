@@ -29,6 +29,16 @@ examples:
               → top-decile genes by transcript-to-protein damping
 
 verbose_fields:
+  - has_p_value
+  - unit
+  - field_description
+  - experiment_id
+  - publication_doi
+  - compartment
+  - omics_type
+  - treatment_type
+  - background_factors
+  - growth_phases
   - treatment
   - light_condition
   - experimental_context

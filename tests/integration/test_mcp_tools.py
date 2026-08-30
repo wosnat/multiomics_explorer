@@ -1424,7 +1424,9 @@ class TestListDerivedMetrics:
 
     def test_value_kind_numeric(self, conn, kg_count):
         from multiomics_explorer.api import list_derived_metrics
-        out = list_derived_metrics(value_kind="numeric", conn=conn, limit=None)
+        # `compartment` moved behind verbose (llm-review 2b.2 Task 5).
+        out = list_derived_metrics(
+            value_kind="numeric", verbose=True, conn=conn, limit=None)
         assert out["total_matching"] == kg_count(
             "MATCH (d:DerivedMetric {value_kind: 'numeric'}) RETURN count(d)")
         assert all(r["value_kind"] == "numeric" for r in out["results"])

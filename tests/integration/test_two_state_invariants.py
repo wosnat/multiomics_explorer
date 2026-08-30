@@ -45,8 +45,11 @@ def test_derived_metrics_rankable_and_p_value_partition(conn):
     assert yes["total_matching"] + no["total_matching"] == allx["total_matching"]
     assert all(r["rankable"] is True for r in yes["results"])
     assert all(r["rankable"] is False for r in no["results"])
+    # has_p_value moved behind verbose on list_derived_metrics compact rows
+    # (llm-review 2b.2 Task 5).
     p_yes = api.list_derived_metrics(has_p_value=True, limit=1000, conn=conn)
-    p_no = api.list_derived_metrics(has_p_value=False, limit=1000, conn=conn)
+    p_no = api.list_derived_metrics(
+        has_p_value=False, verbose=True, limit=1000, conn=conn)
     assert p_yes["total_matching"] + p_no["total_matching"] == allx["total_matching"]
     assert all(r["has_p_value"] is False for r in p_no["results"])
 

@@ -4594,6 +4594,27 @@ def list_clustering_analyses(
     return envelope
 
 
+# Compact-row drop list for list_derived_metrics (llm-review 2b.2 Task 5):
+# these fields are metric-level detail already surfaced by an envelope
+# `by_*` breakdown (organism_name/rankable/value_kind stay compact — they
+# are the row's own identity, not redundant) and are dropped unconditionally
+# from `results` rows when verbose=False. The Cypher builder still selects
+# them regardless of `verbose` (only treatment/light_condition/
+# experimental_context are builder-gated) — the strip happens here.
+_LIST_DM_COMPACT_DROP = (
+    "has_p_value",
+    "unit",
+    "field_description",
+    "experiment_id",
+    "publication_doi",
+    "compartment",
+    "omics_type",
+    "treatment_type",
+    "background_factors",
+    "growth_phases",
+)
+
+
 def list_derived_metrics(
     search_text: str | None = None,
     organism: str | None = None,
@@ -4623,11 +4644,12 @@ def list_derived_metrics(
     by_treatment_type, by_background_factors, by_growth_phase,
     score_max, score_median, returned, offset, truncated, results.
     Per result (compact): derived_metric_id, name, metric_type, value_kind,
-    rankable, has_p_value, unit, allowed_categories, field_description,
-    organism_name, experiment_id, publication_doi, compartment, omics_type,
-    treatment_type, background_factors, total_gene_count, growth_phases,
-    score (when searching).
-    Per result (verbose): adds treatment, light_condition, experimental_context.
+    rankable, organism_name, total_gene_count, allowed_categories, score
+    (when searching).
+    Per result (verbose): adds has_p_value, unit, field_description,
+    experiment_id, publication_doi, compartment, omics_type, treatment_type,
+    background_factors, growth_phases, treatment, light_condition,
+    experimental_context.
 
     summary=True: results=[], summary fields only.
     """
@@ -4711,6 +4733,12 @@ def list_derived_metrics(
             results = conn.execute_query(det_cypher, **det_params)
         else:
             raise
+
+    if not verbose:
+        results = [
+            {k: v for k, v in row.items() if k not in _LIST_DM_COMPACT_DROP}
+            for row in results
+        ]
 
     envelope["returned"] = len(results)
     envelope["offset"] = offset
@@ -4930,6 +4958,25 @@ def gene_derived_metrics(
     return envelope
 
 
+# Compact-row drop list for the three genes_by_{numeric,boolean,categorical}
+# _metric drill-downs (llm-review 2b.2 Task 5). These 5 fields are
+# metric-level facts constant across every gene row sharing the same
+# derived_metric_id — they duplicate the per-metric `by_metric[]` envelope
+# entry — so they are dropped unconditionally from `results` rows when
+# verbose=False. Per-gene fields (gene_category, product, ...) are NOT in
+# this set — they vary row to row and are neither parent-constant nor
+# verbose-only. The detail query builders return these columns
+# unconditionally (not gated on their own `verbose` arg); the strip
+# happens here at the api layer.
+_DM_COMPACT_DROP = (
+    "name",
+    "value_kind",
+    "rankable",
+    "has_p_value",
+    "organism_name",
+)
+
+
 def genes_by_numeric_metric(
     derived_metric_ids: list[str] | None = None,
     metric_types: list[str] | None = None,
@@ -4975,14 +5022,15 @@ def genes_by_numeric_metric(
     not_found_metric_types, not_matched_metric_types,
     not_matched_organism, excluded_derived_metrics, warnings,
     returned, offset, truncated, results.
-    Per result (compact, 14 cols): locus_tag, gene_name, product,
-    gene_category, organism_name, derived_metric_id, name, value_kind,
-    rankable, has_p_value, value, rank_by_metric, metric_percentile,
-    metric_bucket.
-    Per result (verbose adds, 13 cols): metric_type, field_description,
-    unit, compartment, experiment_id, publication_doi, treatment_type,
-    background_factors, treatment, light_condition, experimental_context,
-    gene_function_description, gene_summary.
+    Per result (compact, 9 cols): locus_tag, gene_name, product,
+    gene_category, derived_metric_id, value, rank_by_metric,
+    metric_percentile, metric_bucket.
+    Per result (verbose adds, 18 cols): name, value_kind, rankable,
+    has_p_value, organism_name (all also in `by_metric` / `by_organism`),
+    metric_type, field_description, unit, compartment, experiment_id,
+    publication_doi, treatment_type, background_factors, treatment,
+    light_condition, experimental_context, gene_function_description,
+    gene_summary.
 
     summary=True: results=[], summary fields only.
 
@@ -5242,6 +5290,11 @@ def genes_by_numeric_metric(
             verbose=verbose, limit=limit, offset=offset,
         )
         results = conn.execute_query(det_cypher, **det_params)
+        if not verbose:
+            results = [
+                {k: v for k, v in row.items() if k not in _DM_COMPACT_DROP}
+                for row in results
+            ]
 
     # 12. Build envelope
     total_matching = sum_row.get("total_matching", 0)
@@ -5318,13 +5371,14 @@ def genes_by_boolean_metric(
     not_matched_ids, not_found_metric_types, not_matched_metric_types,
     not_matched_organism, excluded_derived_metrics (always []),
     warnings (always []), returned, offset, truncated, results.
-    Per result (compact, 11 cols): locus_tag, gene_name, product,
-    gene_category, organism_name, derived_metric_id, name, value_kind,
-    rankable, has_p_value, value.
-    Per result (verbose adds, 13 cols): metric_type, field_description,
-    unit, compartment, experiment_id, publication_doi, treatment_type,
-    background_factors, treatment, light_condition, experimental_context,
-    gene_function_description, gene_summary.
+    Per result (compact, 6 cols): locus_tag, gene_name, product,
+    gene_category, derived_metric_id, value.
+    Per result (verbose adds, 18 cols): name, value_kind, rankable,
+    has_p_value, organism_name (all also in `by_metric` / `by_organism`),
+    metric_type, field_description, unit, compartment, experiment_id,
+    publication_doi, treatment_type, background_factors, treatment,
+    light_condition, experimental_context, gene_function_description,
+    gene_summary.
 
     summary=True: results=[], summary fields only.
 
@@ -5472,6 +5526,11 @@ def genes_by_boolean_metric(
             verbose=verbose, limit=limit, offset=offset,
         )
         results = conn.execute_query(det_cypher, **det_params)
+        if not verbose:
+            results = [
+                {k: v for k, v in row.items() if k not in _DM_COMPACT_DROP}
+                for row in results
+            ]
 
     # 11. Build envelope
     total_matching = sum_row.get("total_matching", 0)
@@ -5551,13 +5610,14 @@ def genes_by_categorical_metric(
     not_matched_ids, not_found_metric_types, not_matched_metric_types,
     not_matched_organism, excluded_derived_metrics (always []),
     warnings (always []), returned, offset, truncated, results.
-    Per result (compact, 11 cols): locus_tag, gene_name, product,
-    gene_category, organism_name, derived_metric_id, name, value_kind,
-    rankable, has_p_value, value.
-    Per result (verbose adds, 14 cols): metric_type, field_description,
-    unit, compartment, experiment_id, publication_doi, treatment_type,
-    background_factors, treatment, light_condition, experimental_context,
-    gene_function_description, gene_summary, allowed_categories.
+    Per result (compact, 6 cols): locus_tag, gene_name, product,
+    gene_category, derived_metric_id, value.
+    Per result (verbose adds, 19 cols): name, value_kind, rankable,
+    has_p_value, organism_name (all also in `by_metric` / `by_organism`),
+    metric_type, field_description, unit, compartment, experiment_id,
+    publication_doi, treatment_type, background_factors, treatment,
+    light_condition, experimental_context, gene_function_description,
+    gene_summary, allowed_categories.
 
     summary=True: results=[], summary fields only.
 
@@ -5728,6 +5788,11 @@ def genes_by_categorical_metric(
             verbose=verbose, limit=limit, offset=offset,
         )
         results = conn.execute_query(det_cypher, **det_params)
+        if not verbose:
+            results = [
+                {k: v for k, v in row.items() if k not in _DM_COMPACT_DROP}
+                for row in results
+            ]
 
     # 12. Build envelope
     total_matching = sum_row.get("total_matching", 0)

@@ -89,12 +89,7 @@ total_matching, total_derived_metrics, total_genes, by_organism, by_compartment,
 | gene_name | string \| None (optional) | Gene name (e.g. 'rpsH'); null when KG has none. |
 | product | string \| None (optional) | Gene product (e.g. '30S ribosomal protein S8'). |
 | gene_category | string \| None (optional) | Functional category (e.g. 'Translation'). |
-| organism_name | string | Organism (e.g. 'Prochlorococcus MED4'). |
 | derived_metric_id | string | Unique parent-DM id. |
-| name | string | DM human label. |
-| value_kind | string | Always 'numeric' for this tool; kept for cross-tool row-shape consistency with `gene_derived_metrics`. |
-| rankable | bool | Echoed from parent DM; True iff `rank_by_metric`/`metric_percentile`/`metric_bucket` carry data. |
-| has_p_value | bool | Echoed from parent DM; True iff `adjusted_p_value`/`significant` carry data (none in current KG). |
 | value | float | Measurement value. |
 | rank_by_metric | int \| None (optional) | Rank by value (1=highest). Populated only when rankable=True. |
 | metric_percentile | float \| None (optional) | Percentile (0-100). Same gate as rank_by_metric. |
@@ -106,6 +101,11 @@ total_matching, total_derived_metrics, total_genes, by_organism, by_compartment,
 
 | Field | Type | Description |
 |---|---|---|
+| organism_name | string \| None (optional) | Organism (e.g. 'Prochlorococcus MED4'). Also in `by_organism`. Verbose only. |
+| name | string \| None (optional) | DM human label. Also in `by_metric`. Verbose only. |
+| value_kind | string \| None (optional) | Always 'numeric' for this tool; kept for cross-tool row-shape consistency with `gene_derived_metrics`. Also in `by_metric`. Verbose only. |
+| rankable | bool \| None (optional) | Echoed from parent DM; True iff `rank_by_metric`/`metric_percentile`/`metric_bucket` carry data. Also in `by_metric`. Verbose only. |
+| has_p_value | bool \| None (optional) | Echoed from parent DM; True iff `adjusted_p_value`/`significant` carry data (none in current KG). Also in `by_metric`. Verbose only. |
 | metric_type | string \| None (optional) | Category tag. Verbose only. |
 | field_description | string \| None (optional) | Detailed explanation of what this DM measures. Verbose only. |
 | unit | string \| None (optional) | Measurement unit. Verbose only. |
@@ -184,12 +184,7 @@ genes_by_numeric_metric(metric_types=['damping_ratio'], bucket=['top_decile'])
       "gene_name": "rpsH",
       "product": "30S ribosomal protein S8",
       "gene_category": "Translation",
-      "organism_name": "Prochlorococcus MED4",
       "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
-      "name": "Transcript:protein amplitude ratio",
-      "value_kind": "numeric",
-      "rankable": true,
-      "has_p_value": false,
       "value": 25.3,
       "rank_by_metric": 1,
       "metric_percentile": 100.0,
@@ -200,12 +195,7 @@ genes_by_numeric_metric(metric_types=['damping_ratio'], bucket=['top_decile'])
       "gene_name": "phdB",
       "product": "pyruvate dehydrogenase E1 component beta subunit",
       "gene_category": "Carbohydrate metabolism",
-      "organism_name": "Prochlorococcus MED4",
       "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
-      "name": "Transcript:protein amplitude ratio",
-      "value_kind": "numeric",
-      "rankable": true,
-      "has_p_value": false,
       "value": 23.0,
       "rank_by_metric": 2,
       "metric_percentile": 99.67845659163987,
@@ -216,12 +206,7 @@ genes_by_numeric_metric(metric_types=['damping_ratio'], bucket=['top_decile'])
       "gene_name": "gltA",
       "product": "citrate synthase",
       "gene_category": "Carbohydrate metabolism",
-      "organism_name": "Prochlorococcus MED4",
       "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
-      "name": "Transcript:protein amplitude ratio",
-      "value_kind": "numeric",
-      "rankable": true,
-      "has_p_value": false,
       "value": 21.4,
       "rank_by_metric": 3,
       "metric_percentile": 99.35691318327974,
@@ -301,12 +286,7 @@ genes_by_numeric_metric(metric_types=['damping_ratio', 'peak_time_protein_h'], b
       "gene_name": "rpsH",
       "product": "30S ribosomal protein S8",
       "gene_category": "Translation",
-      "organism_name": "Prochlorococcus MED4",
       "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
-      "name": "Transcript:protein amplitude ratio",
-      "value_kind": "numeric",
-      "rankable": true,
-      "has_p_value": false,
       "value": 25.3,
       "rank_by_metric": 1,
       "metric_percentile": 100.0,
@@ -317,12 +297,7 @@ genes_by_numeric_metric(metric_types=['damping_ratio', 'peak_time_protein_h'], b
       "gene_name": "phdB",
       "product": "pyruvate dehydrogenase E1 component beta subunit",
       "gene_category": "Carbohydrate metabolism",
-      "organism_name": "Prochlorococcus MED4",
       "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
-      "name": "Transcript:protein amplitude ratio",
-      "value_kind": "numeric",
-      "rankable": true,
-      "has_p_value": false,
       "value": 23.0,
       "rank_by_metric": 2,
       "metric_percentile": 99.67845659163987,
@@ -333,12 +308,7 @@ genes_by_numeric_metric(metric_types=['damping_ratio', 'peak_time_protein_h'], b
       "gene_name": "gltA",
       "product": "citrate synthase",
       "gene_category": "Carbohydrate metabolism",
-      "organism_name": "Prochlorococcus MED4",
       "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
-      "name": "Transcript:protein amplitude ratio",
-      "value_kind": "numeric",
-      "rankable": true,
-      "has_p_value": false,
       "value": 21.4,
       "rank_by_metric": 3,
       "metric_percentile": 99.35691318327974,
@@ -435,12 +405,7 @@ genes_by_numeric_metric(metric_types=['cell_abundance_biovolume_normalized'], bu
       "gene_name": "accC",
       "product": "acetyl-CoA carboxylase, biotin carboxylase subunit",
       "gene_category": "Lipid metabolism",
-      "organism_name": "Prochlorococcus MIT9312",
       "derived_metric_id": "derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized",
-      "name": "MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)",
-      "value_kind": "numeric",
-      "rankable": true,
-      "has_p_value": false,
       "value": 4.66e-08,
       "rank_by_metric": 103,
       "metric_percentile": 89.96062992125984,
@@ -451,12 +416,7 @@ genes_by_numeric_metric(metric_types=['cell_abundance_biovolume_normalized'], bu
       "gene_name": "acrA",
       "product": "RND efflux pump, MFP subunit, HlyD family",
       "gene_category": "Transport",
-      "organism_name": "Prochlorococcus MIT9312",
       "derived_metric_id": "derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized",
-      "name": "MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)",
-      "value_kind": "numeric",
-      "rankable": true,
-      "has_p_value": false,
       "value": 4.63e-08,
       "rank_by_metric": 104,
       "metric_percentile": 89.86220472440945,
@@ -467,12 +427,7 @@ genes_by_numeric_metric(metric_types=['cell_abundance_biovolume_normalized'], bu
       "gene_name": "hemF",
       "product": "coproporphyrinogen-III oxidase",
       "gene_category": "Coenzyme metabolism",
-      "organism_name": "Prochlorococcus MIT9312",
       "derived_metric_id": "derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized",
-      "name": "MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)",
-      "value_kind": "numeric",
-      "rankable": true,
-      "has_p_value": false,
       "value": 4.6e-08,
       "rank_by_metric": 105,
       "metric_percentile": 89.76377952755905,

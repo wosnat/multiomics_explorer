@@ -1065,7 +1065,10 @@
 
 - id: genes_by_numeric_metric_damping_ratio_top_decile
   tool: genes_by_numeric_metric
-  desc: damping_ratio top-decile drill-down (single rankable DM, MED4)
+  desc: |
+    damping_ratio top-decile drill-down (single rankable DM, MED4).
+    value_kind/rankable moved behind verbose (llm-review 2b.2 Task 5,
+    parent-constant — also in `by_metric`).
   params:
     metric_types: ["damping_ratio"]
     bucket: ["top_decile"]
@@ -1074,15 +1077,15 @@
     columns:
       - locus_tag
       - derived_metric_id
-      - value_kind
       - value
-      - rankable
       - rank_by_metric
       - metric_bucket
 
 - id: genes_by_numeric_metric_mixed_rankable_soft_exclude
   tool: genes_by_numeric_metric
-  desc: Mixed rankable + non-rankable selection; bucket filter soft-excludes
+  desc: |
+    Mixed rankable + non-rankable selection; bucket filter soft-excludes.
+    rankable moved behind verbose (llm-review 2b.2 Task 5).
   params:
     metric_types: ["damping_ratio", "peak_time_protein_h"]
     bucket: ["top_decile"]
@@ -1092,12 +1095,14 @@
       - locus_tag
       - derived_metric_id
       - value
-      - rankable
       - metric_bucket
 
 - id: genes_by_numeric_metric_cross_organism
   tool: genes_by_numeric_metric
-  desc: Cross-organism cell_abundance_biovolume_normalized (no organism scope)
+  desc: |
+    Cross-organism cell_abundance_biovolume_normalized (no organism scope).
+    organism_name moved behind verbose (llm-review 2b.2 Task 5, parent-
+    constant — also in `by_organism`).
   params:
     metric_types: ["cell_abundance_biovolume_normalized"]
     bucket: ["top_quartile"]
@@ -1105,7 +1110,6 @@
     min_rows: 5
     columns:
       - locus_tag
-      - organism_name
       - derived_metric_id
       - value
       - metric_bucket
@@ -1126,7 +1130,10 @@
 
 - id: genes_by_boolean_metric_vesicle_proteome_cross_organism
   tool: genes_by_boolean_metric
-  desc: Vesicle proteome members across MED4 and MIT9313 (cross-organism)
+  desc: |
+    Vesicle proteome members across MED4 and MIT9313 (cross-organism).
+    organism_name/value_kind moved behind verbose (llm-review 2b.2 Task 5,
+    parent-constant — also in `by_organism` / `by_metric`).
   params:
     metric_types: ["vesicle_proteome_member"]
     limit: 200
@@ -1135,14 +1142,14 @@
     columns:
       - locus_tag
       - gene_name
-      - organism_name
       - derived_metric_id
-      - value_kind
       - value
 
 - id: genes_by_boolean_metric_natl2a_periodic_scope
   tool: genes_by_boolean_metric
-  desc: NATL2A periodic_in_coculture_LD organism-scoped drill-down
+  desc: |
+    NATL2A periodic_in_coculture_LD organism-scoped drill-down.
+    organism_name moved behind verbose (llm-review 2b.2 Task 5).
   params:
     metric_types: ["periodic_in_coculture_LD"]
     organism: "NATL2A"
@@ -1151,7 +1158,6 @@
     min_rows: 1
     columns:
       - locus_tag
-      - organism_name
       - derived_metric_id
       - value
 
@@ -1171,7 +1177,10 @@
 
 - id: genes_by_categorical_metric_psortb_membrane_categories
   tool: genes_by_categorical_metric
-  desc: PSORTb outer-membrane / periplasmic vesicle proteins
+  desc: |
+    PSORTb outer-membrane / periplasmic vesicle proteins. organism_name
+    moved behind verbose (llm-review 2b.2 Task 5, parent-constant — also
+    in `by_organism`).
   params:
     metric_types: ["predicted_subcellular_localization"]
     categories: ["Outer Membrane", "Periplasmic"]
@@ -1180,13 +1189,14 @@
     min_rows: 10
     columns:
       - locus_tag
-      - organism_name
       - derived_metric_id
       - value
 
 - id: genes_by_categorical_metric_darkness_survival_class
   tool: genes_by_categorical_metric
-  desc: NATL2A darkness_survival_class drill-down (single categorical DM)
+  desc: |
+    NATL2A darkness_survival_class drill-down (single categorical DM).
+    organism_name moved behind verbose (llm-review 2b.2 Task 5).
   params:
     metric_types: ["darkness_survival_class"]
     limit: 25
@@ -1194,7 +1204,6 @@
     min_rows: 5
     columns:
       - locus_tag
-      - organism_name
       - derived_metric_id
       - value
 

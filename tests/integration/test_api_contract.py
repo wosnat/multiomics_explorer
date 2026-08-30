@@ -1142,25 +1142,27 @@ class TestGenesByNumericMetricContract:
     }  # 22 keys
 
     EXPECTED_COMPACT_RESULT_KEYS = {
-        # Identity / routing (5)
-        "locus_tag", "gene_name", "product", "gene_category", "organism_name",
-        # DM identity (2)
-        "derived_metric_id", "name",
-        # Gate echoes (3)
-        "value_kind", "rankable", "has_p_value",
+        # Identity / routing (4) — organism_name moved to verbose (2b.2 T5)
+        "locus_tag", "gene_name", "product", "gene_category",
+        # DM identity (1) — name moved to verbose (2b.2 T5)
+        "derived_metric_id",
         # Numeric value + rankable extras (4)
         "value", "rank_by_metric", "metric_percentile", "metric_bucket",
         # adjusted_p_value, significant: Pydantic-only forward-compat
         # (default=None at wrapper layer; not in raw rows today)
-    }  # 14 raw + 2 forward-compat = 16 surfaced via wrapper
+    }  # 9 raw + 2 forward-compat = 11 surfaced via wrapper
 
     EXPECTED_VERBOSE_ADD_KEYS = {
+        # Gate echoes + name/organism_name (5) — parent-constant, dropped
+        # from compact and moved behind verbose (llm-review 2b.2 Task 5);
+        # all also live in `by_metric` / `by_organism`.
+        "name", "value_kind", "rankable", "has_p_value", "organism_name",
         "metric_type", "field_description", "unit", "compartment",
         "experiment_id", "publication_doi", "treatment_type",
         "background_factors", "treatment", "light_condition",
         "experimental_context", "gene_function_description", "gene_summary",
         # p_value: deferred — not in raw rows today (Pydantic-only)
-    }  # 13 verbose adds
+    }  # 18 verbose adds
 
     EXPECTED_BY_METRIC_KEYS = {
         "derived_metric_id", "name", "metric_type", "value_kind", "count",

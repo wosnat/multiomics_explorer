@@ -88,18 +88,18 @@ total_matching, total_derived_metrics, total_genes, by_organism, by_compartment,
 | gene_name | string \| None (optional) | Gene symbol; null when KG has none. |
 | product | string \| None (optional) | Gene product. |
 | gene_category | string \| None (optional) | Coarse functional category. |
-| organism_name | string | Organism (e.g. 'Prochlorococcus MED4'). |
 | derived_metric_id | string | Unique parent-DM id. |
-| name | string | DM human label. |
-| value_kind | string | Always 'boolean' for this tool; kept for cross-tool row-shape consistency with `genes_by_numeric_metric`. |
-| rankable | bool | DM-level rankable flag (always False for boolean DMs in the current KG). |
-| has_p_value | bool | DM-level p-value flag (always False for boolean DMs in the current KG). |
 | value | string | 'flagged' or 'not_flagged' (KG two-state literal — see KG-spec BioCypher constraint). |
 
 **Verbose-only fields** (included when `verbose=True`):
 
 | Field | Type | Description |
 |---|---|---|
+| organism_name | string \| None (optional) | Organism (e.g. 'Prochlorococcus MED4'). Also in `by_organism`. Verbose only. |
+| name | string \| None (optional) | DM human label. Also in `by_metric`. Verbose only. |
+| value_kind | string \| None (optional) | Always 'boolean' for this tool; kept for cross-tool row-shape consistency with `genes_by_numeric_metric`. Also in `by_metric`. Verbose only. |
+| rankable | bool \| None (optional) | DM-level rankable flag (always False for boolean DMs in the current KG). Also in `by_metric`. Verbose only. |
+| has_p_value | bool \| None (optional) | DM-level p-value flag (always False for boolean DMs in the current KG). Also in `by_metric`. Verbose only. |
 | metric_type | string \| None (optional) | Category tag. Verbose only. |
 | field_description | string \| None (optional) | Detailed explanation of what this DM measures. Verbose only. |
 | unit | string \| None (optional) | Measurement unit (typically null for boolean DMs). Verbose only. |
@@ -189,12 +189,7 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
       "gene_name": "degQ",
       "product": "serine endoprotease, periplasmic",
       "gene_category": "Post-translational modification",
-      "organism_name": "Prochlorococcus MED4",
       "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member",
-      "name": "MED4 protein detected in vesicle proteome (Biller 2014 Table S2)",
-      "value_kind": "boolean",
-      "rankable": false,
-      "has_p_value": false,
       "value": "flagged"
     },
     {
@@ -202,12 +197,7 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
       "gene_name": "tolC",
       "product": "TolC-like outer membrane efflux protein, RND family",
       "gene_category": "Stress response and adaptation",
-      "organism_name": "Prochlorococcus MED4",
       "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member",
-      "name": "MED4 protein detected in vesicle proteome (Biller 2014 Table S2)",
-      "value_kind": "boolean",
-      "rankable": false,
-      "has_p_value": false,
       "value": "flagged"
     },
     {
@@ -215,12 +205,7 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
       "gene_name": "aroK",
       "product": "shikimate kinase",
       "gene_category": "Amino acid metabolism",
-      "organism_name": "Prochlorococcus MED4",
       "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member",
-      "name": "MED4 protein detected in vesicle proteome (Biller 2014 Table S2)",
-      "value_kind": "boolean",
-      "rankable": false,
-      "has_p_value": false,
       "value": "flagged"
     },
     ...
@@ -288,12 +273,7 @@ genes_by_boolean_metric(metric_types=['periodic_in_coculture_LD'], organism='NAT
       "gene_name": "dnaA",
       "product": "chromosomal replication initiator protein",
       "gene_category": "Replication and repair",
-      "organism_name": "Prochlorococcus NATL2A",
       "derived_metric_id": "derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD",
-      "name": "Periodic in NATL2A coculture L:D (Table S4A)",
-      "value_kind": "boolean",
-      "rankable": false,
-      "has_p_value": false,
       "value": "flagged"
     },
     {
@@ -301,12 +281,7 @@ genes_by_boolean_metric(metric_types=['periodic_in_coculture_LD'], organism='NAT
       "gene_name": "gst",
       "product": "glutathione S-transferase",
       "gene_category": "Coenzyme metabolism",
-      "organism_name": "Prochlorococcus NATL2A",
       "derived_metric_id": "derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD",
-      "name": "Periodic in NATL2A coculture L:D (Table S4A)",
-      "value_kind": "boolean",
-      "rankable": false,
-      "has_p_value": false,
       "value": "flagged"
     },
     {
@@ -314,12 +289,7 @@ genes_by_boolean_metric(metric_types=['periodic_in_coculture_LD'], organism='NAT
       "gene_name": "gor",
       "product": "glutathione reductase",
       "gene_category": "Coenzyme metabolism",
-      "organism_name": "Prochlorococcus NATL2A",
       "derived_metric_id": "derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD",
-      "name": "Periodic in NATL2A coculture L:D (Table S4A)",
-      "value_kind": "boolean",
-      "rankable": false,
-      "has_p_value": false,
       "value": "flagged"
     },
     ...
@@ -455,12 +425,7 @@ genes_by_boolean_metric(metric_types=['rapid_recovery_low_co2_shock'], flag=Fals
       "gene_name": null,
       "product": "cobQ/CobB/MinD/ParA nucleotide binding domain protein",
       "gene_category": "Cell cycle and division",
-      "organism_name": "Prochlorococcus MED4",
       "derived_metric_id": "derived_metric:ismej.2015.36:s2_concordance_low_co2:rapid_recovery_low_co2_shock",
-      "name": "MED4 rapid recovery under -CO2 shock (Bagby 2015 Table S2)",
-      "value_kind": "boolean",
-      "rankable": false,
-      "has_p_value": false,
       "value": "not_flagged"
     },
     {
@@ -468,12 +433,7 @@ genes_by_boolean_metric(metric_types=['rapid_recovery_low_co2_shock'], flag=Fals
       "gene_name": null,
       "product": "conserved hypothetical protein",
       "gene_category": "Transcription",
-      "organism_name": "Prochlorococcus MED4",
       "derived_metric_id": "derived_metric:ismej.2015.36:s2_concordance_low_co2:rapid_recovery_low_co2_shock",
-      "name": "MED4 rapid recovery under -CO2 shock (Bagby 2015 Table S2)",
-      "value_kind": "boolean",
-      "rankable": false,
-      "has_p_value": false,
       "value": "not_flagged"
     },
     {
@@ -481,12 +441,7 @@ genes_by_boolean_metric(metric_types=['rapid_recovery_low_co2_shock'], flag=Fals
       "gene_name": null,
       "product": "conserved hypothetical protein",
       "gene_category": "Unknown",
-      "organism_name": "Prochlorococcus MED4",
       "derived_metric_id": "derived_metric:ismej.2015.36:s2_concordance_low_co2:rapid_recovery_low_co2_shock",
-      "name": "MED4 rapid recovery under -CO2 shock (Bagby 2015 Table S2)",
-      "value_kind": "boolean",
-      "rankable": false,
-      "has_p_value": false,
       "value": "not_flagged"
     },
     ...

@@ -592,7 +592,7 @@ class ListMetabolitesResponse(BaseModel):
 # either tool would suggest false ownership.
 # ---------------------------------------------------------------------------
 
-class GeneReactionMetaboliteTriplet(BaseModel):
+class GeneReactionMetaboliteTriplet(SparseRow):
     """Shared row class for genes_by_metabolite and metabolites_by_gene.
 
     Compact mode: 16 fields including evidence_source, substrate_depth
@@ -5932,17 +5932,19 @@ def register_tools(mcp: FastMCP):
                 "input. See `docs://guide/conventions` (DM family gating)."
             ),
         )
-        has_p_value: bool = Field(
+        has_p_value: bool | None = Field(
+            default=None,
             description=(
                 "True if this DM carries statistical p-values, enabling "
                 "`significant_only` / `max_adjusted_p_value` on drill-downs. "
-                "No DM in the current KG carries p-values."
+                "No DM in the current KG carries p-values. Verbose only."
             ),
         )
-        unit: str = Field(
+        unit: str | None = Field(
+            default=None,
             description=(
                 "Measurement unit for numeric DMs (e.g. 'hours', 'log2'). "
-                "Empty string for boolean and categorical DMs."
+                "Empty string for boolean and categorical DMs. Verbose only."
             ),
         )
         allowed_categories: list[str] | None = Field(
@@ -5952,10 +5954,11 @@ def register_tools(mcp: FastMCP):
                 "genes_by_categorical_metric."
             ),
         )
-        field_description: str = Field(
+        field_description: str | None = Field(
+            default=None,
             description=(
                 "Detailed explanation of what this DM measures and how to "
-                "interpret its values."
+                "interpret its values. Verbose only."
             ),
         )
         organism_name: str = Field(
@@ -5964,33 +5967,42 @@ def register_tools(mcp: FastMCP):
                 "'Alteromonas macleodii MIT1002')."
             ),
         )
-        experiment_id: str = Field(
+        experiment_id: str | None = Field(
+            default=None,
             description=(
-                "Parent Experiment node id. Look up context via list_experiments."
+                "Parent Experiment node id. Look up context via "
+                "list_experiments. Verbose only."
             ),
         )
-        publication_doi: str = Field(
-            description="Parent publication DOI (e.g. '10.1128/mSystems.00040-18').",
+        publication_doi: str | None = Field(
+            default=None,
+            description="Parent publication DOI (e.g. "
+                        "'10.1128/mSystems.00040-18'). Verbose only.",
         )
-        compartment: str = Field(
+        compartment: str | None = Field(
+            default=None,
             description=(
                 "Sample compartment or scope (e.g. 'whole_cell', 'vesicle', "
-                "'exoproteome', 'extracellular')."
+                "'exoproteome', 'extracellular'). Verbose only."
             ),
         )
-        omics_type: str = Field(
+        omics_type: str | None = Field(
+            default=None,
             description=(
                 "Omics assay type (e.g. 'RNASEQ', 'PROTEOME', "
-                "'PAIRED_RNASEQ_PROTEOME')."
+                "'PAIRED_RNASEQ_PROTEOME'). Verbose only."
             ),
         )
-        treatment_type: list[str] = Field(
-            description="Treatment type(s) (e.g. ['diel'], ['darkness']).",
+        treatment_type: list[str] | None = Field(
+            default=None,
+            description="Treatment type(s) (e.g. ['diel'], ['darkness']). "
+                        "Verbose only.",
         )
-        background_factors: list[str] = Field(
+        background_factors: list[str] | None = Field(
+            default=None,
             description=(
                 "Background experimental factors (e.g. ['axenic'], "
-                "['coculture', 'diel']). May be empty."
+                "['coculture', 'diel']). May be empty. Verbose only."
             ),
         )
         total_gene_count: int = Field(
@@ -5999,10 +6011,11 @@ def register_tools(mcp: FastMCP):
                 "this DM."
             ),
         )
-        growth_phases: list[str] = Field(
+        growth_phases: list[str] | None = Field(
+            default=None,
             description=(
                 "Growth phase(s) this DM pertains to (e.g. ['darkness']). "
-                "May be empty."
+                "May be empty. Also in `by_growth_phase`. Verbose only."
             ),
         )
         score: float | None = Field(
@@ -7375,24 +7388,32 @@ def register_tools(mcp: FastMCP):
         gene_category: str | None = Field(
             default=None,
             description="Functional category (e.g. 'Translation').")
-        organism_name: str = Field(
-            description="Organism (e.g. 'Prochlorococcus MED4').")
+        organism_name: str | None = Field(
+            default=None,
+            description="Organism (e.g. 'Prochlorococcus MED4'). Also in "
+                        "`by_organism`. Verbose only.")
         # DM identity (2)
         derived_metric_id: str = Field(
             description="Unique parent-DM id.")
-        name: str = Field(description="DM human label.")
+        name: str | None = Field(
+            default=None,
+            description="DM human label. Also in `by_metric`. Verbose only.")
         # Gate echoes (3) — sourced from parent DM, coerced to Python bool
-        value_kind: Literal["numeric"] = Field(
+        value_kind: Literal["numeric"] | None = Field(
+            default=None,
             description="Always 'numeric' for this tool; kept for cross-tool "
-                        "row-shape consistency with `gene_derived_metrics`.")
-        rankable: bool = Field(
+                        "row-shape consistency with `gene_derived_metrics`. "
+                        "Also in `by_metric`. Verbose only.")
+        rankable: bool | None = Field(
+            default=None,
             description="Echoed from parent DM; True iff "
                         "`rank_by_metric`/`metric_percentile`/`metric_bucket` "
-                        "carry data.")
-        has_p_value: bool = Field(
+                        "carry data. Also in `by_metric`. Verbose only.")
+        has_p_value: bool | None = Field(
+            default=None,
             description="Echoed from parent DM; True iff "
                         "`adjusted_p_value`/`significant` carry data (none "
-                        "in current KG).")
+                        "in current KG). Also in `by_metric`. Verbose only.")
         # Numeric value (4)
         value: float = Field(description="Measurement value.")
         rank_by_metric: int | None = Field(
@@ -7817,21 +7838,31 @@ def register_tools(mcp: FastMCP):
             default=None, description="Gene product.")
         gene_category: str | None = Field(
             default=None, description="Coarse functional category.")
-        organism_name: str = Field(
-            description="Organism (e.g. 'Prochlorococcus MED4').")
+        organism_name: str | None = Field(
+            default=None,
+            description="Organism (e.g. 'Prochlorococcus MED4'). Also in "
+                        "`by_organism`. Verbose only.")
         # DM identity (2)
         derived_metric_id: str = Field(description="Unique parent-DM id.")
-        name: str = Field(description="DM human label.")
+        name: str | None = Field(
+            default=None,
+            description="DM human label. Also in `by_metric`. Verbose only.")
         # Gate echoes (3) — kept for cross-tool row-shape consistency
-        value_kind: Literal["boolean"] = Field(
+        value_kind: Literal["boolean"] | None = Field(
+            default=None,
             description="Always 'boolean' for this tool; kept for cross-tool "
-                        "row-shape consistency with `genes_by_numeric_metric`.")
-        rankable: bool = Field(
+                        "row-shape consistency with `genes_by_numeric_metric`. "
+                        "Also in `by_metric`. Verbose only.")
+        rankable: bool | None = Field(
+            default=None,
             description="DM-level rankable flag (always False for boolean "
-                        "DMs in the current KG).")
-        has_p_value: bool = Field(
+                        "DMs in the current KG). Also in `by_metric`. "
+                        "Verbose only.")
+        has_p_value: bool | None = Field(
+            default=None,
             description="DM-level p-value flag (always False for boolean "
-                        "DMs in the current KG).")
+                        "DMs in the current KG). Also in `by_metric`. "
+                        "Verbose only.")
         # Edge value (1)
         value: str = Field(
             description="'flagged' or 'not_flagged' (KG two-state literal — see KG-spec "
@@ -8187,22 +8218,32 @@ def register_tools(mcp: FastMCP):
             default=None, description="Gene product.")
         gene_category: str | None = Field(
             default=None, description="Coarse functional category.")
-        organism_name: str = Field(
-            description="Organism (e.g. 'Prochlorococcus MED4').")
+        organism_name: str | None = Field(
+            default=None,
+            description="Organism (e.g. 'Prochlorococcus MED4'). Also in "
+                        "`by_organism`. Verbose only.")
         # DM identity (2)
         derived_metric_id: str = Field(description="Unique parent-DM id.")
-        name: str = Field(description="DM human label.")
+        name: str | None = Field(
+            default=None,
+            description="DM human label. Also in `by_metric`. Verbose only.")
         # Gate echoes (3) — kept for cross-tool row-shape consistency
-        value_kind: Literal["categorical"] = Field(
+        value_kind: Literal["categorical"] | None = Field(
+            default=None,
             description="Always 'categorical' for this tool; kept for "
                         "cross-tool row-shape consistency with "
-                        "`genes_by_numeric_metric`.")
-        rankable: bool = Field(
+                        "`genes_by_numeric_metric`. Also in `by_metric`. "
+                        "Verbose only.")
+        rankable: bool | None = Field(
+            default=None,
             description="DM-level rankable flag (always False for categorical "
-                        "DMs in the current KG).")
-        has_p_value: bool = Field(
+                        "DMs in the current KG). Also in `by_metric`. "
+                        "Verbose only.")
+        has_p_value: bool | None = Field(
+            default=None,
             description="DM-level p-value flag (always False for categorical "
-                        "DMs in the current KG).")
+                        "DMs in the current KG). Also in `by_metric`. "
+                        "Verbose only.")
         # Edge value (1)
         value: str = Field(
             description="Category label (one of the parent DM's "

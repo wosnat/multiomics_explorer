@@ -83,18 +83,18 @@ total_matching, total_derived_metrics, total_genes, by_organism, by_compartment,
 | gene_name | string \| None (optional) | Gene symbol; null when KG has none. |
 | product | string \| None (optional) | Gene product. |
 | gene_category | string \| None (optional) | Coarse functional category. |
-| organism_name | string | Organism (e.g. 'Prochlorococcus MED4'). |
 | derived_metric_id | string | Unique parent-DM id. |
-| name | string | DM human label. |
-| value_kind | string | Always 'categorical' for this tool; kept for cross-tool row-shape consistency with `genes_by_numeric_metric`. |
-| rankable | bool | DM-level rankable flag (always False for categorical DMs in the current KG). |
-| has_p_value | bool | DM-level p-value flag (always False for categorical DMs in the current KG). |
 | value | string | Category label (one of the parent DM's `allowed_categories`). |
 
 **Verbose-only fields** (included when `verbose=True`):
 
 | Field | Type | Description |
 |---|---|---|
+| organism_name | string \| None (optional) | Organism (e.g. 'Prochlorococcus MED4'). Also in `by_organism`. Verbose only. |
+| name | string \| None (optional) | DM human label. Also in `by_metric`. Verbose only. |
+| value_kind | string \| None (optional) | Always 'categorical' for this tool; kept for cross-tool row-shape consistency with `genes_by_numeric_metric`. Also in `by_metric`. Verbose only. |
+| rankable | bool \| None (optional) | DM-level rankable flag (always False for categorical DMs in the current KG). Also in `by_metric`. Verbose only. |
+| has_p_value | bool \| None (optional) | DM-level p-value flag (always False for categorical DMs in the current KG). Also in `by_metric`. Verbose only. |
 | metric_type | string \| None (optional) | Category tag. Verbose only. |
 | field_description | string \| None (optional) | Detailed explanation of what this DM measures. Verbose only. |
 | unit | string \| None (optional) | Measurement unit (typically null for categorical DMs). Verbose only. |
@@ -195,12 +195,7 @@ genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'],
       "gene_name": "tolC",
       "product": "TolC-like outer membrane efflux protein, RND family",
       "gene_category": "Stress response and adaptation",
-      "organism_name": "Prochlorococcus MED4",
       "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization",
-      "name": "MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)",
-      "value_kind": "categorical",
-      "rankable": false,
-      "has_p_value": false,
       "value": "Outer Membrane"
     },
     {
@@ -208,12 +203,7 @@ genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'],
       "gene_name": null,
       "product": "protein of unknown function DUF3769",
       "gene_category": "Cell wall and membrane",
-      "organism_name": "Prochlorococcus MED4",
       "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization",
-      "name": "MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)",
-      "value_kind": "categorical",
-      "rankable": false,
-      "has_p_value": false,
       "value": "Outer Membrane"
     },
     {
@@ -221,12 +211,7 @@ genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'],
       "gene_name": null,
       "product": "autotransporter beta-domain containing protein",
       "gene_category": "Signal transduction",
-      "organism_name": "Prochlorococcus MED4",
       "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization",
-      "name": "MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)",
-      "value_kind": "categorical",
-      "rankable": false,
-      "has_p_value": false,
       "value": "Outer Membrane"
     },
     ...
@@ -301,12 +286,7 @@ genes_by_categorical_metric(metric_types=['darkness_survival_class'], categories
       "gene_name": "clpB1",
       "product": "ATP-dependent Clp protease ATP-binding subunit ClpB",
       "gene_category": "Stress response and adaptation",
-      "organism_name": "Prochlorococcus NATL2A",
       "derived_metric_id": "derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class",
-      "name": "NATL2A darkness survival class (Table S5)",
-      "value_kind": "categorical",
-      "rankable": false,
-      "has_p_value": false,
       "value": "darkness_axenic+darkness_coculture"
     },
     {
@@ -314,12 +294,7 @@ genes_by_categorical_metric(metric_types=['darkness_survival_class'], categories
       "gene_name": "petE",
       "product": "plastocyanin",
       "gene_category": "Stress response and adaptation",
-      "organism_name": "Prochlorococcus NATL2A",
       "derived_metric_id": "derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class",
-      "name": "NATL2A darkness survival class (Table S5)",
-      "value_kind": "categorical",
-      "rankable": false,
-      "has_p_value": false,
       "value": "darkness_axenic+darkness_coculture"
     },
     {
@@ -327,12 +302,7 @@ genes_by_categorical_metric(metric_types=['darkness_survival_class'], categories
       "gene_name": "glgB",
       "product": "1,4-alpha-glucan branching enzyme",
       "gene_category": "Carbohydrate metabolism",
-      "organism_name": "Prochlorococcus NATL2A",
       "derived_metric_id": "derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class",
-      "name": "NATL2A darkness survival class (Table S5)",
-      "value_kind": "categorical",
-      "rankable": false,
-      "has_p_value": false,
       "value": "darkness_axenic+darkness_coculture"
     },
     ...

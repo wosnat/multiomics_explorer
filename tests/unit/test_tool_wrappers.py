@@ -5654,6 +5654,34 @@ class TestGenesByMetaboliteWrapper:
         assert t.reaction_rhea_ids is None
 
     @pytest.mark.asyncio
+    async def test_compact_wire_dump_drops_verbose_only_keys(
+            self, tool_fns, mock_ctx):
+        """llm-review 2b.2 Task 5: GeneReactionMetaboliteTriplet is a
+        SparseRow — the 9 verbose-only keys are genuinely ABSENT from
+        model_dump() in compact mode (not merely null), since the api
+        layer never puts them in the row dict when verbose=False."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["genes_by_metabolite"](
+                mock_ctx,
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+            )
+        verbose_only = {
+            "gene_category", "metabolite_inchikey", "metabolite_smiles",
+            "metabolite_mnxm_id", "metabolite_hmdb_id", "reaction_mnxr_id",
+            "reaction_rhea_ids", "tcdb_level_kind", "tc_class_id",
+        }
+        for row in result.results:
+            dumped = row.model_dump()
+            assert not (verbose_only & dumped.keys()), (
+                f"compact row leaked verbose-only keys: "
+                f"{verbose_only & dumped.keys()}"
+            )
+
+    @pytest.mark.asyncio
     async def test_not_found_structure(self, tool_fns, mock_ctx):
         """not_found is a typed dict with metabolite_ids / organism /
         metabolite_pathway_ids buckets."""
@@ -5882,9 +5910,14 @@ class TestGenesByMetaboliteWrapper:
         assert "transport_confidence" not in fields
         assert "substrate_depth" in fields
         assert "tcdb_evidence_score" in fields
+        # Mirrors real Cypher output: the metabolism-arm builder always
+        # RETURNs `null AS substrate_depth` / `null AS tcdb_evidence_score`
+        # explicitly (SparseRow keeps a key iff the constructor received
+        # it, even as None — see docstring on SparseRow).
         row = GeneReactionMetaboliteTriplet(
             locus_tag="PMM0001", evidence_source="metabolism",
             metabolite_id="kegg.compound:C00086", metabolite_name="Urea",
+            substrate_depth=None, tcdb_evidence_score=None,
         )
         assert row.substrate_depth is None
         assert row.tcdb_evidence_score is None
@@ -6373,6 +6406,33 @@ class TestMetabolitesByGeneWrapper:
         # Sparse: reaction verbose fields stay None on transport row
         assert t.reaction_mnxr_id is None
         assert t.reaction_rhea_ids is None
+
+    @pytest.mark.asyncio
+    async def test_compact_wire_dump_drops_verbose_only_keys(
+            self, tool_fns, mock_ctx):
+        """llm-review 2b.2 Task 5: same SparseRow-backed shared row class
+        as genes_by_metabolite — verbose-only keys are absent in compact
+        mode's model_dump(), not merely null."""
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["metabolites_by_gene"](
+                mock_ctx,
+                locus_tags=["PMM0963", "PMM0964", "PMM0965"],
+                organism="Prochlorococcus MED4",
+            )
+        verbose_only = {
+            "gene_category", "metabolite_inchikey", "metabolite_smiles",
+            "metabolite_mnxm_id", "metabolite_hmdb_id", "reaction_mnxr_id",
+            "reaction_rhea_ids", "tcdb_level_kind", "tc_class_id",
+        }
+        for row in result.results:
+            dumped = row.model_dump()
+            assert not (verbose_only & dumped.keys()), (
+                f"compact row leaked verbose-only keys: "
+                f"{verbose_only & dumped.keys()}"
+            )
 
     @pytest.mark.asyncio
     async def test_not_found_structure(self, tool_fns, mock_ctx):

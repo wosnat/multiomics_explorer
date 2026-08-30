@@ -82,12 +82,7 @@ examples:
             "gene_name": "tolC",
             "product": "TolC-like outer membrane efflux protein, RND family",
             "gene_category": "Stress response and adaptation",
-            "organism_name": "Prochlorococcus MED4",
             "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization",
-            "name": "MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)",
-            "value_kind": "categorical",
-            "rankable": false,
-            "has_p_value": false,
             "value": "Outer Membrane"
           },
           {
@@ -95,12 +90,7 @@ examples:
             "gene_name": null,
             "product": "protein of unknown function DUF3769",
             "gene_category": "Cell wall and membrane",
-            "organism_name": "Prochlorococcus MED4",
             "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization",
-            "name": "MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)",
-            "value_kind": "categorical",
-            "rankable": false,
-            "has_p_value": false,
             "value": "Outer Membrane"
           },
           {
@@ -108,12 +98,7 @@ examples:
             "gene_name": null,
             "product": "autotransporter beta-domain containing protein",
             "gene_category": "Signal transduction",
-            "organism_name": "Prochlorococcus MED4",
             "derived_metric_id": "derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization",
-            "name": "MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)",
-            "value_kind": "categorical",
-            "rankable": false,
-            "has_p_value": false,
             "value": "Outer Membrane"
           },
           ...
@@ -183,12 +168,7 @@ examples:
             "gene_name": "clpB1",
             "product": "ATP-dependent Clp protease ATP-binding subunit ClpB",
             "gene_category": "Stress response and adaptation",
-            "organism_name": "Prochlorococcus NATL2A",
             "derived_metric_id": "derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class",
-            "name": "NATL2A darkness survival class (Table S5)",
-            "value_kind": "categorical",
-            "rankable": false,
-            "has_p_value": false,
             "value": "darkness_axenic+darkness_coculture"
           },
           {
@@ -196,12 +176,7 @@ examples:
             "gene_name": "petE",
             "product": "plastocyanin",
             "gene_category": "Stress response and adaptation",
-            "organism_name": "Prochlorococcus NATL2A",
             "derived_metric_id": "derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class",
-            "name": "NATL2A darkness survival class (Table S5)",
-            "value_kind": "categorical",
-            "rankable": false,
-            "has_p_value": false,
             "value": "darkness_axenic+darkness_coculture"
           },
           {
@@ -209,12 +184,7 @@ examples:
             "gene_name": "glgB",
             "product": "1,4-alpha-glucan branching enzyme",
             "gene_category": "Carbohydrate metabolism",
-            "organism_name": "Prochlorococcus NATL2A",
             "derived_metric_id": "derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class",
-            "name": "NATL2A darkness survival class (Table S5)",
-            "value_kind": "categorical",
-            "rankable": false,
-            "has_p_value": false,
             "value": "darkness_axenic+darkness_coculture"
           },
           ...
@@ -333,6 +303,11 @@ examples:
                 AND classified to a target compartment.
 
 verbose_fields:
+  - name
+  - value_kind
+  - rankable
+  - has_p_value
+  - organism_name
   - metric_type
   - field_description
   - unit

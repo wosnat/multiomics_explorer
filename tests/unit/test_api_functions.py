@@ -5021,6 +5021,51 @@ class TestGenesByNumericMetric:
         assert data["returned"] == 0
         assert data["truncated"] is True  # 32 > 0+0
 
+    def _full_detail_row(self):
+        return {
+            "locus_tag": "PMM0001", "gene_name": "rpsH", "product": "ribosomal",
+            "gene_category": "Translation", "organism_name": "Prochlorococcus MED4",
+            "derived_metric_id": "dm:dr", "name": "Damping ratio",
+            "value_kind": "numeric", "rankable": True, "has_p_value": False,
+            "value": 1.5, "rank_by_metric": 1, "metric_percentile": 99.0,
+            "metric_bucket": "top_decile",
+        }
+
+    def test_compact_drops_parent_constant_fields(
+            self, diag_rankable, summary_row):
+        """verbose=False (default) strips name/value_kind/rankable/
+        has_p_value/organism_name — all duplicated on the by_metric /
+        by_organism envelope rollups (llm-review 2b.2 Task 5)."""
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            diag_rankable, summary_row, [self._full_detail_row()],
+        ]
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"], conn=mock_conn,
+        )
+        row = data["results"][0]
+        for dropped in ("name", "value_kind", "rankable", "has_p_value",
+                        "organism_name"):
+            assert dropped not in row, f"{dropped} should be dropped compact"
+        for kept in ("locus_tag", "gene_name", "product", "gene_category",
+                     "derived_metric_id", "value", "rank_by_metric",
+                     "metric_percentile", "metric_bucket"):
+            assert kept in row, f"{kept} should remain in compact row"
+
+    def test_verbose_keeps_parent_constant_fields(
+            self, diag_rankable, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            diag_rankable, summary_row, [self._full_detail_row()],
+        ]
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"], verbose=True, conn=mock_conn,
+        )
+        row = data["results"][0]
+        for kept in ("name", "value_kind", "rankable", "has_p_value",
+                     "organism_name"):
+            assert kept in row, f"{kept} should survive verbose=True"
+
 
 # ---------------------------------------------------------------------------
 # genes_by_boolean_metric
@@ -5245,6 +5290,49 @@ class TestGenesByBooleanMetric:
             genes_by_boolean_metric as api_fn,
         )
         assert pkg_fn is api_fn is api.genes_by_boolean_metric
+
+    def _full_detail_row(self):
+        return {
+            "locus_tag": "PMM0090", "gene_name": "vp1", "product": "vesicle",
+            "gene_category": "Cellular processes",
+            "organism_name": "Prochlorococcus MED4",
+            "derived_metric_id": "dm:vp_med4",
+            "name": "Vesicle proteome member (MED4)",
+            "value_kind": "boolean", "rankable": False, "has_p_value": False,
+            "value": "flagged",
+        }
+
+    def test_compact_drops_parent_constant_fields(
+            self, diag_boolean, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            diag_boolean, summary_row, [self._full_detail_row()],
+        ]
+        data = api.genes_by_boolean_metric(
+            metric_types=["vesicle_proteome_member"], conn=mock_conn,
+        )
+        row = data["results"][0]
+        for dropped in ("name", "value_kind", "rankable", "has_p_value",
+                        "organism_name"):
+            assert dropped not in row, f"{dropped} should be dropped compact"
+        for kept in ("locus_tag", "gene_name", "product", "gene_category",
+                     "derived_metric_id", "value"):
+            assert kept in row, f"{kept} should remain in compact row"
+
+    def test_verbose_keeps_parent_constant_fields(
+            self, diag_boolean, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            diag_boolean, summary_row, [self._full_detail_row()],
+        ]
+        data = api.genes_by_boolean_metric(
+            metric_types=["vesicle_proteome_member"],
+            verbose=True, conn=mock_conn,
+        )
+        row = data["results"][0]
+        for kept in ("name", "value_kind", "rankable", "has_p_value",
+                     "organism_name"):
+            assert kept in row, f"{kept} should survive verbose=True"
 
 
 # ---------------------------------------------------------------------------
@@ -5545,6 +5633,50 @@ class TestGenesByCategoricalMetric:
             genes_by_categorical_metric as api_fn,
         )
         assert pkg_fn is api_fn is api.genes_by_categorical_metric
+
+    def _full_detail_row(self):
+        return {
+            "locus_tag": "PMM0097", "gene_name": None, "product": "psortb",
+            "gene_category": "Cellular processes",
+            "organism_name": "Prochlorococcus MED4",
+            "derived_metric_id": "dm:psortb_med4",
+            "name": "PSORTb subcellular localization (MED4)",
+            "value_kind": "categorical", "rankable": False,
+            "has_p_value": False, "value": "Outer Membrane",
+        }
+
+    def test_compact_drops_parent_constant_fields(
+            self, diag_categorical, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            diag_categorical, summary_row, [self._full_detail_row()],
+        ]
+        data = api.genes_by_categorical_metric(
+            metric_types=["predicted_subcellular_localization"],
+            conn=mock_conn,
+        )
+        row = data["results"][0]
+        for dropped in ("name", "value_kind", "rankable", "has_p_value",
+                        "organism_name"):
+            assert dropped not in row, f"{dropped} should be dropped compact"
+        for kept in ("locus_tag", "product", "gene_category",
+                     "derived_metric_id", "value"):
+            assert kept in row, f"{kept} should remain in compact row"
+
+    def test_verbose_keeps_parent_constant_fields(
+            self, diag_categorical, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            diag_categorical, summary_row, [self._full_detail_row()],
+        ]
+        data = api.genes_by_categorical_metric(
+            metric_types=["predicted_subcellular_localization"],
+            verbose=True, conn=mock_conn,
+        )
+        row = data["results"][0]
+        for kept in ("name", "value_kind", "rankable", "has_p_value",
+                     "organism_name"):
+            assert kept in row, f"{kept} should survive verbose=True"
 
 
 # ---------------------------------------------------------------------------
@@ -7376,6 +7508,40 @@ class TestListDerivedMetrics:
         conn = self._mock_conn(self._SUMMARY_ROW, [])
         out = list_derived_metrics(conn=conn)
         assert out["score_max"] is None
+
+    def test_compact_drops_verbose_only_fields(self):
+        """verbose=False (default) strips the 10 fields moved behind
+        verbose (llm-review 2b.2 Task 5); the compact identity/routing
+        set (derived_metric_id, name, metric_type, value_kind, rankable,
+        organism_name, total_gene_count, allowed_categories) survives."""
+        from multiomics_explorer.api.functions import list_derived_metrics
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_derived_metrics(organism="MED4", conn=conn)
+        row = out["results"][0]
+        for dropped in (
+            "has_p_value", "unit", "field_description", "experiment_id",
+            "publication_doi", "compartment", "omics_type",
+            "treatment_type", "background_factors", "growth_phases",
+        ):
+            assert dropped not in row, f"{dropped} should be dropped compact"
+        for kept in (
+            "derived_metric_id", "name", "metric_type", "value_kind",
+            "rankable", "organism_name", "total_gene_count",
+            "allowed_categories",
+        ):
+            assert kept in row, f"{kept} should remain in compact row"
+
+    def test_verbose_keeps_all_fields(self):
+        from multiomics_explorer.api.functions import list_derived_metrics
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_derived_metrics(organism="MED4", verbose=True, conn=conn)
+        row = out["results"][0]
+        for kept in (
+            "has_p_value", "unit", "field_description", "experiment_id",
+            "publication_doi", "compartment", "omics_type",
+            "treatment_type", "background_factors", "growth_phases",
+        ):
+            assert kept in row, f"{kept} should survive verbose=True"
 
 
 # ---------------------------------------------------------------------------
