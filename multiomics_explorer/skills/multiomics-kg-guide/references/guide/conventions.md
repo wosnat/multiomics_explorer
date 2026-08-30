@@ -88,8 +88,9 @@ not just the top 10). Affected: `list_experiments` / `list_organisms`
 `differential_expression_by_gene` / `differential_expression_by_ortholog`
 (`experiments`), `pathway_enrichment` (`by_experiment`), and `resolve_gene`
 / `list_publications` (`by_organism`; `by_organism` and `by_metric_type`
-respectively) — `summary=True` restores the full list, so the `by_organism`
-counts always sum to `total_matching`.
+respectively) — `summary=True` restores the full list (on `resolve_gene`
+the `by_organism` counts then sum exactly to `total_matching`; on
+`list_publications` a multi-organism paper counts once per organism).
 `pathway_enrichment`'s `top_pathways_by_padj` is a genuine top-10 in both
 modes (not capped-with-a-flag): it carries no `_truncated` companion key.
 
