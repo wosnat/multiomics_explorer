@@ -23,7 +23,7 @@ analysis_ids=[id])` to scope a per-gene cluster lookup.
 | treatment_type | list[string] \| None | None | Filter by treatment type(s). E.g. ['nitrogen']. Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True). |
 | background_factors | list[string] \| None | None | Filter by background factors. E.g. ['axenic', 'diel']. |
 | growth_phases | list[string] \| None | None | Filter by growth phase(s) (case-insensitive). Physiological state of the culture at sampling time. E.g. ['exponential', 'nutrient_limited']. |
-| omics_type | string \| None | None | Filter: 'EXOPROTEOMICS', 'METABOLOMICS', 'MICROARRAY', 'PAIRED_RNASEQ_PROTEOME', 'PROTEOMICS', 'RNASEQ', 'VESICLE_DNASEQ', 'VESICLE_PROTEOMICS'. |
+| omics_type | list[string] \| None | None | Filter by omics platform(s) (case-insensitive). E.g. ['RNASEQ', 'PROTEOMICS']. |
 | publication_dois | list[string] \| None | None | Filter by publication DOI(s). |
 | experiment_ids | list[string] \| None | None | Filter by experiment IDs. |
 | analysis_ids | list[string] \| None | None | Filter by analysis IDs. |

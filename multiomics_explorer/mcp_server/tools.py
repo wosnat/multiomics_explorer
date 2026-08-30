@@ -29,7 +29,8 @@ class SparseRow(BaseModel):
 # every row model below; keeps the wire-format rule next to the models).
 import multiomics_explorer.api.functions as api  # noqa: E402
 from multiomics_explorer.kg.connection import GraphConnection  # noqa: E402
-from multiomics_explorer.kg.constants import VALID_CLUSTER_TYPES, VALID_OMICS_TYPES  # noqa: E402
+from multiomics_explorer.kg.constants import VALID_CLUSTER_TYPES  # noqa: E402
+from multiomics_explorer.mcp_server.params import OntologyKey  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -1784,7 +1785,7 @@ def register_tools(mcp: FastMCP):
                 "trust vocabulary."
             )),
         ] = "gene_category",
-        ontology: Annotated[str | None, Field(
+        ontology: Annotated[OntologyKey | None, Field(
             description="Scope a trust filter_type (e.g. 'trust_axes') to "
                         "one ontology key. Ignored on non-trust filter types.",
         )] = None,
@@ -2850,11 +2851,9 @@ def register_tools(mcp: FastMCP):
             "'transport AND membrane'. None/'' = browse mode: list terms sorted by "
             "gene_count DESC (score null). See docs://guide/conventions for Lucene scoring.",
         )] = None,
-        ontology: Annotated[list[str] | str | None, Field(
-            description="Ontology key or list: go_bp, go_mf, go_cc, kegg, ec, "
-            "cog_category, cyanorak_role, tigr_role, pfam, brite, tcdb, cazy, "
-            "subcellular_localization, signal_peptide_type, interpro, ncbifam, "
-            "merops. None = all 17. limit/offset apply per ontology.",
+        ontology: Annotated[list[OntologyKey] | OntologyKey | None, Field(
+            description="Ontology key or list. None = all 17. limit/offset "
+            "apply per ontology.",
         )] = None,
         summary: Annotated[bool, Field(
             description="When true, return only summary fields (results=[]).",
@@ -3376,13 +3375,7 @@ def register_tools(mcp: FastMCP):
     )
     async def genes_by_ontology(
         ctx: Context,
-        ontology: Annotated[Literal[
-            "go_bp", "go_mf", "go_cc", "ec", "kegg",
-            "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
-            "tcdb", "cazy",
-            "subcellular_localization", "signal_peptide_type",
-            "interpro", "ncbifam", "merops",
-        ], Field(
+        ontology: Annotated[OntologyKey, Field(
             description="Ontology for these term_ids / this level.",
         )],
         organism: Annotated[str, Field(
@@ -3670,17 +3663,7 @@ def register_tools(mcp: FastMCP):
             description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises). Required — single-valued.",
         )],
         ontology: Annotated[
-            list[Literal["go_bp", "go_mf", "go_cc", "kegg", "ec",
-                    "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
-                    "tcdb", "cazy",
-                    "subcellular_localization", "signal_peptide_type",
-                    "interpro", "ncbifam", "merops"]]
-            | Literal["go_bp", "go_mf", "go_cc", "kegg", "ec",
-                    "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
-                    "tcdb", "cazy",
-                    "subcellular_localization", "signal_peptide_type",
-                    "interpro", "ncbifam", "merops"]
-            | None,
+            list[OntologyKey] | OntologyKey | None,
             Field(description="Filter to one ontology, or a list of ontologies "
                               "(trust filters/facets shape all-or-skip-or-raise "
                               "per docs://guide/conventions). None returns all."),
@@ -3888,17 +3871,17 @@ def register_tools(mcp: FastMCP):
             description="Filter by organism name (case-insensitive). "
             "E.g. 'MED4', 'HOT1A3'.",
         )] = None,
-        treatment_type: Annotated[str | None, Field(
-            description="Filter by experiment treatment type. "
+        treatment_type: Annotated[list[str] | None, Field(
+            description="Filter by treatment type(s). E.g. ['coculture', 'nitrogen']. "
             "Use list_filter_values for valid values.",
         )] = None,
-        background_factors: Annotated[str | None, Field(
-            description="Filter by background factor (case-insensitive exact match). "
-            "E.g. 'axenic'.",
+        background_factors: Annotated[list[str] | None, Field(
+            description="Filter by background factor(s) (case-insensitive exact match). "
+            "E.g. ['axenic'].",
         )] = None,
-        growth_phases: Annotated[str | None, Field(
-            description="Filter by growth phase (case-insensitive). "
-            "E.g. 'exponential', 'nutrient_limited'.",
+        growth_phases: Annotated[list[str] | None, Field(
+            description="Filter by growth phase(s) (case-insensitive). "
+            "E.g. ['exponential', 'nutrient_limited'].",
         )] = None,
         search_text: Annotated[str | None, Field(
             description="Free-text search on title, abstract, and description "
@@ -5560,7 +5543,7 @@ def register_tools(mcp: FastMCP):
         ctx: Context,
         locus_tags: Annotated[list[str], Field(description="Gene locus tags. E.g. ['PMM0370', 'PMM0920']. Get these from resolve_gene / gene_overview.")],
         organism: Annotated[str | None, Field(description="Organism name for validation (optional). Inferred from genes. Fuzzy word-based matching.")] = None,
-        treatment_types: Annotated[list[str] | None, Field(description="Filter to specific treatment types (e.g. ['nitrogen', 'coculture']). Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True).")] = None,
+        treatment_type: Annotated[list[str] | None, Field(description="Filter to specific treatment type(s) (e.g. ['nitrogen', 'coculture']). Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True).")] = None,
         background_factors: Annotated[list[str] | None, Field(
             description="Filter by background experimental factors "
             "(case-insensitive exact match). "
@@ -5587,7 +5570,7 @@ def register_tools(mcp: FastMCP):
             conn = _conn(ctx)
             data = api.gene_response_profile(
                 locus_tags=locus_tags, organism=organism,
-                treatment_types=treatment_types,
+                treatment_type=treatment_type,
                 background_factors=background_factors,
                 experiment_ids=experiment_ids,
                 group_by=group_by, limit=limit, offset=offset, conn=conn,
@@ -5750,8 +5733,9 @@ def register_tools(mcp: FastMCP):
             "Physiological state of the culture at sampling time. "
             "E.g. ['exponential', 'nutrient_limited'].",
         )] = None,
-        omics_type: Annotated[str | None, Field(
-            description="Filter: " + ", ".join(f"'{v}'" for v in sorted(VALID_OMICS_TYPES)) + ".",
+        omics_type: Annotated[list[str] | None, Field(
+            description="Filter by omics platform(s) (case-insensitive). "
+            "E.g. ['RNASEQ', 'PROTEOMICS'].",
         )] = None,
         publication_dois: Annotated[list[str] | None, Field(
             description="Filter by publication DOI(s).",
@@ -6303,10 +6287,10 @@ def register_tools(mcp: FastMCP):
                 "'vesicle', 'exoproteome', 'extracellular'."
             ),
         )] = None,
-        omics_type: Annotated[str | None, Field(
+        omics_type: Annotated[list[str] | None, Field(
             description=(
-                "Omics assay type. Examples: 'RNASEQ', 'PROTEOME', "
-                "'PAIRED_RNASEQ_PROTEOME'. Case-insensitive."
+                "Omics assay type(s). Examples: ['RNASEQ'], ['PROTEOME', "
+                "'PAIRED_RNASEQ_PROTEOME']. Case-insensitive."
             ),
         )] = None,
         treatment_type: Annotated[list[str] | None, Field(
@@ -7001,17 +6985,7 @@ def register_tools(mcp: FastMCP):
             description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises).",
         )],
         ontology: Annotated[
-            list[Literal["go_bp", "go_mf", "go_cc", "ec", "kegg",
-                    "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
-                    "tcdb", "cazy",
-                    "subcellular_localization", "signal_peptide_type",
-                    "interpro", "ncbifam", "merops"]]
-            | Literal["go_bp", "go_mf", "go_cc", "ec", "kegg",
-                    "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
-                    "tcdb", "cazy",
-                    "subcellular_localization", "signal_peptide_type",
-                    "interpro", "ncbifam", "merops"]
-            | None,
+            list[OntologyKey] | OntologyKey | None,
             Field(description="If None, surveys all 17 ontologies. Accepts a "
                               "list; a facet carried by only some of them "
                               "drops the rest into skipped_ontologies."),
@@ -7119,13 +7093,7 @@ def register_tools(mcp: FastMCP):
         experiment_ids: Annotated[list[str], Field(
             description="Experiments to pull DE from. Get IDs from list_experiments.",
         )],
-        ontology: Annotated[Literal[
-            "go_bp", "go_mf", "go_cc", "ec", "kegg",
-            "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
-            "tcdb", "cazy",
-            "subcellular_localization", "signal_peptide_type",
-            "interpro", "ncbifam", "merops",
-        ], Field(
+        ontology: Annotated[OntologyKey, Field(
             description="Ontology for pathway definitions. Run ontology_landscape first to rank by relevance.",
         )],
         tree: Annotated[str | None, Field(
@@ -7319,13 +7287,7 @@ def register_tools(mcp: FastMCP):
         ctx: Context,
         analysis_id: Annotated[str, Field(description="Clustering analysis ID. Get from list_clustering_analyses.")],
         organism: Annotated[str, Field(description="Organism: word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; ambiguous match raises). Single-organism enforced.")],
-        ontology: Annotated[Literal[
-            "go_bp", "go_mf", "go_cc", "ec", "kegg",
-            "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
-            "tcdb", "cazy",
-            "subcellular_localization", "signal_peptide_type",
-            "interpro", "ncbifam", "merops",
-        ], Field(description="Ontology for pathway definitions. Run ontology_landscape first.")],
+        ontology: Annotated[OntologyKey, Field(description="Ontology for pathway definitions. Run ontology_landscape first.")],
         tree: Annotated[str | None, Field(
             description="BRITE tree name filter. REQUIRED when ontology='brite' (12 trees; "
                         "see list_filter_values(filter_type='brite_tree')) — a tree-less "

@@ -2453,9 +2453,9 @@ def _rank_annotation_capability(rows: list[dict]) -> list[dict]:
 
 def list_publications(
     organism: str | None = None,
-    treatment_type: str | None = None,
-    background_factors: str | None = None,
-    growth_phases: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
     search_text: str | None = None,
     author: str | None = None,
     publication_dois: list[str] | None = None,
@@ -2495,7 +2495,7 @@ def list_publications(
     When search_text is provided, also includes score.
 
     growth_phases: if provided, restricts to publications whose growth_phases
-    array contains the specified value (case-insensitive).
+    array contains any of the specified values (case-insensitive).
 
     compartment: if provided, restricts to publications with at least one
     experiment in that wet-lab compartment (e.g. 'vesicle', 'whole_cell').
@@ -2506,6 +2506,19 @@ def list_publications(
     shape on sibling list_* tools (list_experiments.experiment_ids).
     `not_found` in the envelope lists any provided DOIs that did not match.
     """
+    treatment_type = deprecated_alias(
+        old=None, new=treatment_type,
+        old_name="treatment_type", new_name="treatment_type", listify=True,
+    )
+    background_factors = deprecated_alias(
+        old=None, new=background_factors,
+        old_name="background_factors", new_name="background_factors",
+        listify=True,
+    )
+    growth_phases = deprecated_alias(
+        old=None, new=growth_phases,
+        old_name="growth_phases", new_name="growth_phases", listify=True,
+    )
     # `summary` is rebound to the summary *row* below — keep the flag apart.
     summary_flag = summary
     conn = _default_conn(conn)
@@ -4862,7 +4875,7 @@ _FULL_COVERAGE_SCOPES = {"significant_only", "significant_any_timepoint"}
 def gene_response_profile(
     locus_tags: list[str],
     organism: str | None = None,
-    treatment_types: list[str] | None = None,
+    treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     group_by: str = "treatment_type",
@@ -4870,6 +4883,7 @@ def gene_response_profile(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
+    treatment_types: list[str] | None = None,
 ) -> dict:
     """Cross-experiment gene-level response profile.
 
@@ -4893,13 +4907,17 @@ def gene_response_profile(
         was measured but did not respond significantly.
         no_expression: gene has NO Changes_expression_of edge at all in the
         organism. filtered_out: gene has edges but none survive the active
-        treatment_types / background_factors filters (e.g. a treatment_types
+        treatment_type / background_factors filters (e.g. a treatment_type
         vocabulary typo) — never confuse this with no_expression. warnings:
-        one entry per treatment_types / background_factors value not in the
+        one entry per treatment_type / background_factors value not in the
         live vocabulary, plus one per not_found locus_tag that differs only
         by case from a real Gene.locus_tag (locus_tags are never
         case-normalised).
     """
+    treatment_type = deprecated_alias(
+        old=treatment_types, new=treatment_type,
+        old_name="treatment_types", new_name="treatment_type",
+    )
     if not locus_tags:
         raise ValueError(
             "locus_tags must not be empty. "
@@ -4913,7 +4931,7 @@ def gene_response_profile(
     conn = _default_conn(conn)
 
     warnings = _closed_vocab_warnings(
-        conn, treatment_types=treatment_types,
+        conn, treatment_type=treatment_type,
         background_factors=background_factors,
     )
 
@@ -4929,7 +4947,7 @@ def gene_response_profile(
     env_cypher, env_params = build_gene_response_profile_envelope(
         locus_tags=locus_tags,
         organism_name=organism_name,
-        treatment_types=treatment_types,
+        treatment_types=treatment_type,
         background_factors=background_factors,
         experiment_ids=experiment_ids,
         group_by=group_by,
@@ -4965,7 +4983,7 @@ def gene_response_profile(
         agg_cypher, agg_params = build_gene_response_profile(
             locus_tags=genes_with_expr,
             organism_name=organism_name,
-            treatment_types=treatment_types,
+            treatment_types=treatment_type,
             background_factors=background_factors,
             experiment_ids=experiment_ids,
             group_by=group_by,
@@ -5069,7 +5087,7 @@ def list_clustering_analyses(
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
-    omics_type: str | None = None,
+    omics_type: list[str] | None = None,
     publication_dois: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     analysis_ids: list[str] | None = None,
@@ -5106,6 +5124,10 @@ def list_clustering_analyses(
     publication_dois = deprecated_alias(
         old=publication_doi, new=publication_dois,
         old_name="publication_doi", new_name="publication_dois",
+    )
+    omics_type = deprecated_alias(
+        old=None, new=omics_type,
+        old_name="omics_type", new_name="omics_type", listify=True,
     )
     if search_text is not None and not search_text.strip():
         raise ValueError("search_text must not be empty.")
@@ -5231,7 +5253,7 @@ def list_derived_metrics(
     metric_types: list[str] | None = None,
     value_kind: Literal["numeric", "boolean", "categorical"] | None = None,
     compartment: str | None = None,
-    omics_type: str | None = None,
+    omics_type: list[str] | None = None,
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
@@ -5272,6 +5294,10 @@ def list_derived_metrics(
     publication_dois = deprecated_alias(
         old=publication_doi, new=publication_dois,
         old_name="publication_doi", new_name="publication_dois",
+    )
+    omics_type = deprecated_alias(
+        old=None, new=omics_type,
+        old_name="omics_type", new_name="omics_type", listify=True,
     )
     if search_text is not None and not search_text.strip():
         raise ValueError("search_text must not be empty.")

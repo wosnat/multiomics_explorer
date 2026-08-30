@@ -7376,12 +7376,13 @@ class TestMetabolitesByGeneWrapper:
 # tcdb / cazy: Literal enum acceptance on the 5 ontology wrappers
 # ---------------------------------------------------------------------------
 class TestOntologyLiteralAcceptsTcdbCazy:
-    """The closed Literal[...] enums on the 5 ontology wrappers must accept
+    """The closed Literal[...] enums on the 6 ontology wrappers must accept
     'tcdb' and 'cazy'. We introspect the type hints (FastMCP uses these to
     build the JSON schema enforced at the MCP protocol boundary) — calling
     tool_fns[...] bypasses Pydantic validation, so the introspection test
-    is the right enforcement point. (search_ontology uses an open `str`,
-    so it has no Literal — only its description string changes.)
+    is the right enforcement point. search_ontology's `ontology` is the
+    shared OntologyKey enum (llm-review 2b.5 R2) nested under
+    list[...] | ... | None, same as the other 5.
     """
 
     @staticmethod
@@ -7439,28 +7440,13 @@ class TestOntologyLiteralAcceptsTcdbCazy:
         assert "'tcdb'" in hint_str
         assert "'cazy'" in hint_str
 
-    def test_search_ontology_description_mentions_tcdb_cazy(self, tool_fns):
-        """search_ontology uses open `str` (no Literal); the description
-        string is the contract surface that lists supported ontology keys."""
-        import typing
-        fn = tool_fns["search_ontology"]
-        hints = typing.get_type_hints(fn, include_extras=True)
-        ontology_hint = hints.get("ontology")
-        assert ontology_hint is not None
-        # Annotated[str, Field(description="...")] — pull the description
-        # via metadata. Iterate __metadata__ in case there's more than one
-        # annotation entry.
-        descriptions = [
-            getattr(meta, "description", None) for meta in
-            getattr(ontology_hint, "__metadata__", ())
-        ]
-        joined = " ".join(d for d in descriptions if d)
-        assert "tcdb" in joined, (
-            f"search_ontology description should mention 'tcdb'; got: {joined!r}"
+    def test_search_ontology_literal_includes_tcdb_cazy(self, tool_fns):
+        hint_str = self._ontology_hint_str(tool_fns, "search_ontology")
+        assert "Literal" in hint_str, (
+            f"Expected Literal in search_ontology ontology hint, got: {hint_str}"
         )
-        assert "cazy" in joined, (
-            f"search_ontology description should mention 'cazy'; got: {joined!r}"
-        )
+        assert "'tcdb'" in hint_str
+        assert "'cazy'" in hint_str
 
 
 class TestExpectedToolsUnchangedForTcdbCazy:
@@ -9852,19 +9838,10 @@ class TestOntologyLiteralAcceptsPsortbSignalp:
         assert "'subcellular_localization'" in hint_str
         assert "'signal_peptide_type'" in hint_str
 
-    def test_search_ontology_description_mentions_new_keys(self, tool_fns):
-        import typing
-        fn = tool_fns["search_ontology"]
-        hints = typing.get_type_hints(fn, include_extras=True)
-        ontology_hint = hints.get("ontology")
-        assert ontology_hint is not None
-        descriptions = [
-            getattr(meta, "description", None) for meta in
-            getattr(ontology_hint, "__metadata__", ())
-        ]
-        joined = " ".join(d for d in descriptions if d)
-        assert "subcellular_localization" in joined
-        assert "signal_peptide_type" in joined
+    def test_search_ontology_literal_includes_new_keys(self, tool_fns):
+        hint_str = self._ontology_hint_str(tool_fns, "search_ontology")
+        assert "'subcellular_localization'" in hint_str
+        assert "'signal_peptide_type'" in hint_str
 
 
 class TestEdgePropFieldsOnRowModels:
@@ -10429,7 +10406,7 @@ _TRUST_TOOLS = [
 
 _ONTOLOGY_LITERAL_TOOLS = [
     "genes_by_ontology", "gene_ontology_terms", "ontology_landscape",
-    "pathway_enrichment", "cluster_enrichment",
+    "pathway_enrichment", "cluster_enrichment", "search_ontology",
 ]
 
 
@@ -10449,21 +10426,20 @@ class TestOntologyLiteralAcceptsNewThree:
                     "subcellular_localization", "signal_peptide_type"):
             assert f"'{key}'" in hint_str, key
 
-    def test_search_ontology_description_mentions_new_keys(self, tool_fns):
-        joined = " ".join(
-            d for d in _field_descriptions(tool_fns, "search_ontology", "ontology")
-            if d
-        )
-        assert "interpro" in joined
-        assert "ncbifam" in joined
-        assert "merops" in joined
+    def test_search_ontology_literal_includes_new_keys(self, tool_fns):
+        hint_str = _hint_str(tool_fns, "search_ontology", "ontology")
+        assert "'interpro'" in hint_str
+        assert "'ncbifam'" in hint_str
+        assert "'merops'" in hint_str
 
 
 class TestMultiOntologyParamShape:
-    """`gene_ontology_terms` and `ontology_landscape` accept a list."""
+    """`gene_ontology_terms`, `ontology_landscape`, and `search_ontology`
+    accept a list."""
 
     @pytest.mark.parametrize(
-        "tool_name", ["gene_ontology_terms", "ontology_landscape"])
+        "tool_name",
+        ["gene_ontology_terms", "ontology_landscape", "search_ontology"])
     def test_ontology_param_accepts_a_list(self, tool_fns, tool_name):
         hint_str = _hint_str(tool_fns, tool_name, "ontology")
         assert "list" in hint_str.lower()
@@ -12098,3 +12074,70 @@ def test_r4_row_field_named_filters():
 
     direction_prop = schemas["differential_expression_by_ortholog"]["properties"]["direction"]
     assert _enum_choices(direction_prop) == {"up", "down", "both"}
+
+
+# ---------------------------------------------------------------------------
+# R2 (llm-review 2b.5): vocabulary filters are list[str] under the KG
+# property name; shared OntologyKey enum.
+# ---------------------------------------------------------------------------
+
+def _is_string_array(prop: dict) -> bool:
+    """True if a JSON-schema property is list[str] (optionally nullable):
+    either `{"type": "array", "items": {"type": "string"}}` directly, or
+    that same shape as one branch of an `anyOf` (the nullable-Optional
+    encoding FastMCP/Pydantic emits for `list[str] | None`)."""
+    def _is_array_of_strings(branch: dict) -> bool:
+        return (
+            branch.get("type") == "array"
+            and branch.get("items", {}).get("type") == "string"
+        )
+    if _is_array_of_strings(prop):
+        return True
+    return any(_is_array_of_strings(b) for b in prop.get("anyOf", []))
+
+
+def _enum_values(prop: dict) -> set:
+    """Every enum choice reachable from a JSON-schema property — collects
+    every `enum` list found under `anyOf` / `items`, at any nesting depth
+    (covers a flat `Literal[...]`, `Literal[...] | None`, and the
+    `list[Literal[...]] | Literal[...] | None` shape FastMCP/Pydantic emits
+    for a "one ontology or a list of them" param)."""
+    values: set = set()
+
+    def _collect(node: dict) -> None:
+        if "enum" in node:
+            values.update(node["enum"])
+        if "items" in node:
+            _collect(node["items"])
+        for branch in node.get("anyOf", []):
+            _collect(branch)
+
+    _collect(prop)
+    return values
+
+
+# compartment stays scalar (str | None) on every tool — this task's list[str]
+# conversion is scoped to treatment_type / background_factors / growth_phases
+# (list_publications) and omics_type (list_clustering_analyses,
+# list_derived_metrics) only. Left out of _VOCAB deliberately: asserting
+# _is_string_array on a param this task never touches would be a permanent
+# false failure, not a regression guard.
+_VOCAB = ("treatment_type", "background_factors", "growth_phases", "omics_type")
+
+
+def test_r2_vocab_filters_are_lists_everywhere():
+    for name, s in _all_tool_input_schemas().items():
+        for p in _VOCAB:
+            if p in s["properties"]:
+                assert _is_string_array(s["properties"][p]), f"{name}.{p} is not list[str]"
+        assert "treatment_types" not in s["properties"], name
+
+
+def test_ontology_param_is_enum_everywhere():
+    from typing import get_args
+    from multiomics_explorer.mcp_server.params import OntologyKey
+
+    keys = set(get_args(OntologyKey))
+    for name, s in _all_tool_input_schemas().items():
+        if "ontology" in s["properties"]:
+            assert _enum_values(s["properties"]["ontology"]) == keys, name

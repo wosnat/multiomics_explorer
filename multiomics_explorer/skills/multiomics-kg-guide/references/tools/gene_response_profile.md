@@ -19,14 +19,14 @@ See `docs://guide/conventions` for tested-absent semantics
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags. E.g. ['PMM0370', 'PMM0920']. Get these from resolve_gene / gene_overview. |
 | organism | string \| None | None | Organism name for validation (optional). Inferred from genes. Fuzzy word-based matching. |
-| treatment_types | list[string] \| None | None | Filter to specific treatment types (e.g. ['nitrogen', 'coculture']). Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True). |
+| treatment_type | list[string] \| None | None | Filter to specific treatment type(s) (e.g. ['nitrogen', 'coculture']). Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True). |
 | background_factors | list[string] \| None | None | Filter by background experimental factors (case-insensitive exact match). E.g. ['axenic', 'diel']. |
 | experiment_ids | list[string] \| None | None | Restrict to specific experiments. Get these from list_experiments. |
 | group_by | string ('treatment_type', 'experiment') | treatment_type | Group response summary by treatment_type (aggregates across experiments) or experiment (one entry per experiment). |
 | limit | int | 50 | Max genes returned. |
 | offset | int | 0 | Skip N genes for pagination. |
 
-**Discovery:** use `list_organisms` for valid organism names.
+**Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 
 ## Response format
 
@@ -321,10 +321,10 @@ gene_response_profile(locus_tags=["PMM0370", "PMM0920"])
 ### Example 2: Filter by treatment type
 
 ```example-call
-gene_response_profile(locus_tags=["PMM0370"], treatment_types=["nitrogen", "coculture"])
+gene_response_profile(locus_tags=["PMM0370"], treatment_type=["nitrogen", "coculture"])
 ```
 
-*treatment_types values come from the live treatment_type vocabulary ('nitrogen', 'light', 'coculture', ...). An unknown value (e.g. 'Fe' instead of 'iron') now reports in the envelope `warnings`, and any gene whose edges exist but don't match the requested treatment_types lands in `filtered_out` — never in `no_expression` (reserved for a gene with no expression edges at all).*
+*treatment_type values come from the live treatment_type vocabulary ('nitrogen', 'light', 'coculture', ...). An unknown value (e.g. 'Fe' instead of 'iron') now reports in the envelope `warnings`, and any gene whose edges exist but don't match the requested treatment_type lands in `filtered_out` — never in `no_expression` (reserved for a gene with no expression edges at all).*
 
 ### Example 3: Read the four group buckets (incl. groups_tested_not_responded)
 
@@ -513,17 +513,17 @@ Assuming groups_not_known means 'gene does not respond to this treatment'
 groups_not_known means no expression data exists — the gene was not profiled or not reported for that treatment. Check experiments_total in the response_summary for coverage. groups_tested_not_responded is the stronger 'absent but inferred-tested' bucket (all experiments in the group report a full-coverage scope).
 ```
 
-- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums. An unknown treatment_types value (e.g. 'Fe' instead of 'iron') now reports in the envelope `warnings` (e.g. "treatment_types value 'Fe' matched nothing — valid values: ... (list_filter_values(filter_type='treatment_type'))") — check `warnings` before trusting an empty or reduced result. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. Here the group keys of response_summary and the treatment_types filter use those values.
+- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums. An unknown treatment_type value (e.g. 'Fe' instead of 'iron') now reports in the envelope `warnings` (e.g. "treatment_type value 'Fe' matched nothing — valid values: ... (list_filter_values(filter_type='treatment_type'))") — check `warnings` before trusting an empty or reduced result. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. Here the group keys of response_summary and the treatment_type filter use those values.
 
 ```mistake
-Assuming a treatment_types typo silently returns 0 rows with no signal
+Assuming a treatment_type typo silently returns 0 rows with no signal
 ```
 
 ```correction
-A treatment_types value not in the live vocabulary lands in the envelope `warnings` (one entry per bad value), and any gene whose expression edges exist but fail to match treatment_types / background_factors lands in `filtered_out` — never in `no_expression`, which is reserved for a gene with NO Changes_expression_of edge at all in the organism.
+A treatment_type value not in the live vocabulary lands in the envelope `warnings` (one entry per bad value), and any gene whose expression edges exist but fail to match treatment_type / background_factors lands in `filtered_out` — never in `no_expression`, which is reserved for a gene with NO Changes_expression_of edge at all in the organism.
 ```
 
-- `no_expression` is this tool's name for the not_matched bucket — a gene exists but has NO Changes_expression_of edge at all in the organism; `filtered_out` is the DIFFERENT bucket for a gene that DOES have edges but none survive treatment_types / background_factors (including a vocabulary typo); `not_found` = locus_tag absent. See docs://guide/conventions for the shared not_found / not_matched semantics.
+- `no_expression` is this tool's name for the not_matched bucket — a gene exists but has NO Changes_expression_of edge at all in the organism; `filtered_out` is the DIFFERENT bucket for a gene that DOES have edges but none survive treatment_type / background_factors (including a vocabulary typo); `not_found` = locus_tag absent. See docs://guide/conventions for the shared not_found / not_matched semantics.
 
 ```mistake
 Comparing up_max_log2fc across different organisms or platforms

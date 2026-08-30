@@ -2795,10 +2795,38 @@ class TestBuildListPublications:
         assert params["organism"] == "MED4"
 
     def test_treatment_type_filter(self):
-        """Treatment type filter uses ANY on p.treatment_types with toLower match."""
-        cypher, params = build_list_publications(treatment_type="coculture")
-        assert "ANY(t IN p.treatment_types WHERE toLower(t) = toLower($treatment_type))" in cypher
-        assert params["treatment_type"] == "coculture"
+        """Treatment type filter uses ANY on p.treatment_types with a lowercased
+        IN — same fragment as _list_experiments_where's treatment_type."""
+        cypher, params = build_list_publications(treatment_type=["coculture"])
+        assert "ANY(t IN p.treatment_types WHERE toLower(t) IN $treatment_types)" in cypher
+        assert params["treatment_types"] == ["coculture"]
+
+    def test_treatment_type_filter_lowercases_multiple_values(self):
+        """Multiple treatment_type values are lowercased into one list param."""
+        cypher, params = build_list_publications(treatment_type=["Coculture", "Nitrogen"])
+        assert "ANY(t IN p.treatment_types WHERE toLower(t) IN $treatment_types)" in cypher
+        assert params["treatment_types"] == ["coculture", "nitrogen"]
+
+    def test_background_factors_filter(self):
+        """background_factors filter uses ANY on p.background_factors with a
+        lowercased IN — same fragment as _list_experiments_where's
+        background_factors."""
+        cypher, params = build_list_publications(background_factors=["axenic"])
+        assert (
+            "ANY(bf IN coalesce(p.background_factors, [])"
+            " WHERE toLower(bf) IN $background_factors)"
+        ) in cypher
+        assert params["background_factors"] == ["axenic"]
+
+    def test_growth_phases_filter(self):
+        """growth_phases filter uses ANY on p.growth_phases with a lowercased
+        IN — same fragment as _list_experiments_where's growth_phases."""
+        cypher, params = build_list_publications(growth_phases=["exponential"])
+        assert (
+            "ANY(gp IN coalesce(p.growth_phases, [])"
+            " WHERE toLower(gp) IN $growth_phases)"
+        ) in cypher
+        assert params["growth_phases"] == ["exponential"]
 
     def test_search_text(self):
         """search_text uses fulltext CALL and orders by score DESC."""
@@ -2824,12 +2852,12 @@ class TestBuildListPublications:
     def test_combined_filters(self):
         """All filters produce AND-joined WHERE."""
         cypher, params = build_list_publications(
-            organism="MED4", treatment_type="coculture", author="Sher",
+            organism="MED4", treatment_type=["coculture"], author="Sher",
         )
         assert "WHERE" in cypher
         assert " AND " in cypher
         assert params["organism"] == "MED4"
-        assert params["treatment_type"] == "coculture"
+        assert params["treatment_types"] == ["coculture"]
         assert params["author"] == "Sher"
 
     def test_returns_expected_columns(self):
@@ -4591,11 +4619,19 @@ class TestClusteringAnalysisWhere:
         assert params["treatment_type"] == ["nitrogen_stress"]
 
     def test_omics_type_filter(self):
+        """omics_type filter uses toUpper(ca.omics_type) IN $omics_types — same
+        fragment as _list_experiments_where's omics_type."""
         from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
-        conditions, params = _clustering_analysis_where(omics_type="MICROARRAY")
+        conditions, params = _clustering_analysis_where(omics_type=["microarray"])
         assert len(conditions) == 1
-        assert "$omics_type" in conditions[0]
-        assert params["omics_type"] == "MICROARRAY"
+        assert "toUpper(ca.omics_type) IN $omics_types" in conditions[0]
+        assert params["omics_types"] == ["MICROARRAY"]
+
+    def test_omics_type_filter_uppercases_multiple_values(self):
+        from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
+        conditions, params = _clustering_analysis_where(
+            omics_type=["microarray", "rnaseq"])
+        assert params["omics_types"] == ["MICROARRAY", "RNASEQ"]
 
     def test_background_factors_filter(self):
         from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
@@ -4610,7 +4646,7 @@ class TestClusteringAnalysisWhere:
         from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
         conditions, params = _clustering_analysis_where(
             organism="MED4", cluster_type="condition_comparison",
-            treatment_type=["nitrogen_stress"], omics_type="MICROARRAY",
+            treatment_type=["nitrogen_stress"], omics_type=["MICROARRAY"],
             background_factors=["axenic"],
         )
         assert len(conditions) == 5
@@ -5145,16 +5181,18 @@ class TestGrowthPhases:
 
     def test_list_publications_growth_phases_filter(self):
         """growth_phases filter adds ANY-match condition."""
-        cypher, params = build_list_publications(growth_phases="exponential")
+        cypher, params = build_list_publications(growth_phases=["exponential"])
         assert "growth_phases" in cypher
         assert "growth_phases" in params
 
     def test_list_publications_growth_phases_filter_cypher(self):
-        """growth_phases filter uses ANY on coalesce(p.growth_phases, []) with toLower."""
-        cypher, params = build_list_publications(growth_phases="exponential")
+        """growth_phases filter uses ANY on coalesce(p.growth_phases, []) with a
+        lowercased IN — same fragment as _list_experiments_where's
+        growth_phases."""
+        cypher, params = build_list_publications(growth_phases=["exponential"])
         assert "ANY(gp IN coalesce(p.growth_phases, [])" in cypher
-        assert "toLower(gp) = toLower($growth_phases)" in cypher
-        assert params["growth_phases"] == "exponential"
+        assert "toLower(gp) IN $growth_phases" in cypher
+        assert params["growth_phases"] == ["exponential"]
 
     def test_list_publications_growth_phases_none_no_filter(self):
         """growth_phases=None does not add filter."""
@@ -5163,9 +5201,9 @@ class TestGrowthPhases:
 
     def test_list_publications_summary_accepts_growth_phases(self):
         """Summary builder threads growth_phases through to where clause."""
-        cypher, params = build_list_publications_summary(growth_phases="exponential")
+        cypher, params = build_list_publications_summary(growth_phases=["exponential"])
         assert "growth_phases" in cypher
-        assert params["growth_phases"] == "exponential"
+        assert params["growth_phases"] == ["exponential"]
 
     # --- Organisms ---
 
@@ -5614,10 +5652,18 @@ class TestListDerivedMetricsWhere:
         assert params == {"compartment": "whole_cell"}
 
     def test_omics_type_upper(self):
+        """omics_type filter uses toUpper(dm.omics_type) IN $omics_type_upper —
+        same fragment as _list_experiments_where's omics_type."""
         from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
-        conditions, params = _list_derived_metrics_where(omics_type="rnaseq")
-        assert conditions == ["toUpper(dm.omics_type) = $omics_type_upper"]
-        assert params == {"omics_type_upper": "RNASEQ"}
+        conditions, params = _list_derived_metrics_where(omics_type=["rnaseq"])
+        assert conditions == ["toUpper(dm.omics_type) IN $omics_type_upper"]
+        assert params == {"omics_type_upper": ["RNASEQ"]}
+
+    def test_omics_type_upper_multiple_values(self):
+        from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
+        conditions, params = _list_derived_metrics_where(
+            omics_type=["rnaseq", "proteome"])
+        assert params == {"omics_type_upper": ["RNASEQ", "PROTEOME"]}
 
     def test_treatment_type_any_lowered(self):
         from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where

@@ -28,7 +28,7 @@ kind-specific drill-downs.
 | metric_types | list[string] \| None | None | Filter by metric_type tags (e.g. 'diel_amplitude_protein_log2', 'periodic_in_coculture_LD'). The same metric_type may appear across organisms / publications — use derived_metric_ids to pin one specific DM when that matters. |
 | value_kind | string ('numeric', 'boolean', 'categorical') \| None | None | Filter by value kind. Determines which drill-down tool applies: 'numeric' → genes_by_numeric_metric, 'boolean' → genes_by_boolean_metric, 'categorical' → genes_by_categorical_metric. |
 | compartment | string \| None | None | Sample compartment / scope. Current values: 'whole_cell', 'vesicle', 'exoproteome', 'extracellular'. |
-| omics_type | string \| None | None | Omics assay type. Examples: 'RNASEQ', 'PROTEOME', 'PAIRED_RNASEQ_PROTEOME'. Case-insensitive. |
+| omics_type | list[string] \| None | None | Omics assay type(s). Examples: ['RNASEQ'], ['PROTEOME', 'PAIRED_RNASEQ_PROTEOME']. Case-insensitive. |
 | treatment_type | list[string] \| None | None | Treatment type(s) to match. Returns DMs whose treatment_type list overlaps ANY of the given values (e.g. 'diel', 'darkness', 'nitrogen'). Case-insensitive. Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True). |
 | background_factors | list[string] \| None | None | Background experimental factor(s) to match (e.g. 'axenic', 'coculture', 'diel'). Returns DMs overlapping ANY given value. Case-insensitive. |
 | growth_phases | list[string] \| None | None | Growth phase(s) to match (e.g. 'darkness', 'exponential'). Case-insensitive. |

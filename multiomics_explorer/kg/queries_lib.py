@@ -1554,9 +1554,9 @@ def build_gene_homologs(
 def _list_publications_where(
     *,
     organism: str | None = None,
-    treatment_type: str | None = None,
-    background_factors: str | None = None,
-    growth_phases: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
     search_text: str | None = None,
     author: str | None = None,
     publication_dois: list[str] | None = None,
@@ -1565,6 +1565,10 @@ def _list_publications_where(
     """Build WHERE clause and params for publication queries.
 
     Shared between build_list_publications and build_list_publications_summary.
+    treatment_type / background_factors / growth_phases mirror the fragments
+    _list_experiments_where uses for the same three filters (ANY(...) IN a
+    lowercased list param), scoped to p.treatment_types / p.background_factors
+    / p.growth_phases instead of the Experiment-node properties.
     """
     conditions: list[str] = []
     params: dict = {}
@@ -1580,23 +1584,23 @@ def _list_publications_where(
 
     if treatment_type:
         conditions.append(
-            "ANY(t IN p.treatment_types WHERE toLower(t) = toLower($treatment_type))"
+            "ANY(t IN p.treatment_types WHERE toLower(t) IN $treatment_types)"
         )
-        params["treatment_type"] = treatment_type
+        params["treatment_types"] = [t.lower() for t in treatment_type]
 
     if background_factors:
         conditions.append(
             "ANY(bf IN coalesce(p.background_factors, [])"
-            " WHERE toLower(bf) = toLower($background_factors))"
+            " WHERE toLower(bf) IN $background_factors)"
         )
-        params["background_factors"] = background_factors
+        params["background_factors"] = [bf.lower() for bf in background_factors]
 
     if growth_phases:
         conditions.append(
             "ANY(gp IN coalesce(p.growth_phases, [])"
-            " WHERE toLower(gp) = toLower($growth_phases))"
+            " WHERE toLower(gp) IN $growth_phases)"
         )
-        params["growth_phases"] = growth_phases
+        params["growth_phases"] = [gp.lower() for gp in growth_phases]
 
     if author:
         conditions.append(
@@ -1619,9 +1623,9 @@ def _list_publications_where(
 def build_list_publications(
     *,
     organism: str | None = None,
-    treatment_type: str | None = None,
-    background_factors: str | None = None,
-    growth_phases: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
     search_text: str | None = None,
     author: str | None = None,
     publication_dois: list[str] | None = None,
@@ -1728,9 +1732,9 @@ def build_list_publications(
 def build_list_publications_summary(
     *,
     organism: str | None = None,
-    treatment_type: str | None = None,
-    background_factors: str | None = None,
-    growth_phases: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
     search_text: str | None = None,
     author: str | None = None,
     publication_dois: list[str] | None = None,
@@ -6479,11 +6483,15 @@ def _clustering_analysis_where(
     organism: str | None = None,
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
-    omics_type: str | None = None,
+    omics_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
 ) -> tuple[list[str], dict]:
-    """Build ClusteringAnalysis filter conditions + params."""
+    """Build ClusteringAnalysis filter conditions + params.
+
+    omics_type mirrors the fragment _list_experiments_where uses for the
+    same filter (toUpper(...) IN an uppercased list param).
+    """
     conditions: list[str] = []
     params: dict = {}
     if organism is not None:
@@ -6500,9 +6508,9 @@ def _clustering_analysis_where(
             "ANY(tt IN ca.treatment_type WHERE tt IN $treatment_type)"
         )
         params["treatment_type"] = treatment_type
-    if omics_type is not None:
-        conditions.append("ca.omics_type = $omics_type")
-        params["omics_type"] = omics_type
+    if omics_type:
+        conditions.append("toUpper(ca.omics_type) IN $omics_types")
+        params["omics_types"] = [t.upper() for t in omics_type]
     if background_factors is not None:
         conditions.append(
             "ANY(bf IN coalesce(ca.background_factors, [])"
@@ -6524,7 +6532,7 @@ def build_list_clustering_analyses_summary(
     organism: str | None = None,
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
-    omics_type: str | None = None,
+    omics_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
     publication_doi: list[str] | None = None,
@@ -6604,7 +6612,7 @@ def build_list_clustering_analyses(
     organism: str | None = None,
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
-    omics_type: str | None = None,
+    omics_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
     publication_doi: list[str] | None = None,
@@ -7377,7 +7385,7 @@ def _list_derived_metrics_where(
     metric_types: list[str] | None = None,
     value_kind: str | None = None,
     compartment: str | None = None,
-    omics_type: str | None = None,
+    omics_type: list[str] | None = None,
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
@@ -7393,8 +7401,10 @@ def _list_derived_metrics_where(
     Organism uses space-split CONTAINS (mirrors _list_experiments_where).
     rankable / has_p_value bool params are coerced to the KG two-state literals
     for comparison against KG-stored strings.
-    omics_type is scalar on DerivedMetric (unlike list-valued on Experiment);
-    filter is exact-match after toUpper normalization.
+    omics_type is a scalar property on DerivedMetric; the filter accepts a
+    list of allowed values matched via toUpper(...) IN — same fragment as
+    _list_experiments_where's omics_type filter on the equally-scalar
+    Experiment.omics_type property.
     treatment_type / background_factors / growth_phases are wrapped in
     coalesce(..., []) defensively — the KG convention guarantees non-null
     lists, but the coalesce keeps the ANY() filter null-safe against
@@ -7423,8 +7433,8 @@ def _list_derived_metrics_where(
         params["compartment"] = compartment
 
     if omics_type:
-        conditions.append("toUpper(dm.omics_type) = $omics_type_upper")
-        params["omics_type_upper"] = omics_type.upper()
+        conditions.append("toUpper(dm.omics_type) IN $omics_type_upper")
+        params["omics_type_upper"] = [t.upper() for t in omics_type]
 
     if treatment_type:
         conditions.append(
@@ -7477,7 +7487,7 @@ def build_list_derived_metrics_summary(
     metric_types: list[str] | None = None,
     value_kind: str | None = None,
     compartment: str | None = None,
-    omics_type: str | None = None,
+    omics_type: list[str] | None = None,
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
@@ -7554,7 +7564,7 @@ def build_list_derived_metrics(
     metric_types: list[str] | None = None,
     value_kind: str | None = None,
     compartment: str | None = None,
-    omics_type: str | None = None,
+    omics_type: list[str] | None = None,
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,

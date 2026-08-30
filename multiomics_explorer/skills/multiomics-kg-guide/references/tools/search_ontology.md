@@ -29,7 +29,7 @@ reference.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string \| None | None | Lucene query over term names, e.g. 'replication', 'oxido*', 'transport AND membrane'. None/'' = browse mode: list terms sorted by gene_count DESC (score null). See docs://guide/conventions for Lucene scoring. |
-| ontology | string \| list[string] \| None | None | Ontology key or list: go_bp, go_mf, go_cc, kegg, ec, cog_category, cyanorak_role, tigr_role, pfam, brite, tcdb, cazy, subcellular_localization, signal_peptide_type, interpro, ncbifam, merops. None = all 17. limit/offset apply per ontology. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') \| list[string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops')] \| None | None | Ontology key or list. None = all 17. limit/offset apply per ontology. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | limit | int | 5 | Max results per ontology (returned <= limit x n_ontologies). |
 | offset | int | 0 | Number of results to skip per ontology (lockstep paging). |

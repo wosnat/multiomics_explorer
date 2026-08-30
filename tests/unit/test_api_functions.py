@@ -4360,7 +4360,7 @@ class TestGeneResponseProfile:
         assert "PMM1234" in result["no_expression"]
 
     def test_vocabulary_typo_lands_in_filtered_out_not_no_expression(self, mock_conn):
-        """A gene with edges that don't survive treatment_types must land in
+        """A gene with edges that don't survive treatment_type must land in
         filtered_out, never no_expression (llm-review 2b.1)."""
         mock_conn.execute_query.side_effect = [
             [{"organisms": [self._ORGANISM]}],
@@ -4379,18 +4379,18 @@ class TestGeneResponseProfile:
             },
         ):
             result = api.gene_response_profile(
-                locus_tags=["PMM0370", "PMM1234"], treatment_types=["Fe"],
+                locus_tags=["PMM0370", "PMM1234"], treatment_type=["Fe"],
                 conn=mock_conn,
             )
         assert result["filtered_out"] == ["PMM1234"]
         assert result["no_expression"] == []
         assert len(result["warnings"]) == 1
         assert result["warnings"][0].startswith(
-            "treatment_types value 'Fe' matched nothing"
+            "treatment_type value 'Fe' matched nothing"
         )
 
     def test_no_treatment_types_no_warnings(self, mock_conn):
-        """warnings is always present and empty when treatment_types is unset."""
+        """warnings is always present and empty when treatment_type is unset."""
         mock_conn.execute_query.side_effect = [
             [{"organisms": [self._ORGANISM]}],
             self._make_envelope_result(),
@@ -18847,3 +18847,170 @@ class TestR4DifferentialExpressionByOrthologDirectionBoth:
                 api.differential_expression_by_ortholog(
                     group_ids=["g1"], direction="both", conn=MagicMock(),
                 )
+
+
+# ---------------------------------------------------------------------------
+# R2 (llm-review 2b.5): vocabulary filters are list[str] under the KG
+# property name. list_publications.{treatment_type,background_factors,
+# growth_phases} and list_clustering_analyses / list_derived_metrics.
+# omics_type go str -> list[str]: a bare string still works, silently
+# listified via deprecated_alias(old=None, listify=True) — no warning, since
+# the param name doesn't change. gene_response_profile.treatment_types ->
+# treatment_type IS a full rename (deprecated keyword-only alias, warns).
+# ---------------------------------------------------------------------------
+
+class _R2StopProbe(Exception):
+    """Raised from a patched query builder once its kwargs are captured —
+    short-circuits the api function before any further conn access."""
+
+
+class TestR2ListPublicationsVocabFiltersAreLists:
+    def test_bare_string_treatment_type_is_listified(self):
+        with patch(
+            "multiomics_explorer.api.functions.build_list_publications_summary",
+            side_effect=_R2StopProbe,
+        ) as builder_mock:
+            with pytest.raises(_R2StopProbe):
+                api.list_publications(treatment_type="coculture", conn=MagicMock())
+        assert builder_mock.call_args.kwargs.get("treatment_type") == ["coculture"]
+
+    def test_list_treatment_type_passes_through(self):
+        with patch(
+            "multiomics_explorer.api.functions.build_list_publications_summary",
+            side_effect=_R2StopProbe,
+        ) as builder_mock:
+            with pytest.raises(_R2StopProbe):
+                api.list_publications(
+                    treatment_type=["coculture", "nitrogen"], conn=MagicMock(),
+                )
+        assert builder_mock.call_args.kwargs.get("treatment_type") == [
+            "coculture", "nitrogen",
+        ]
+
+    def test_bare_string_background_factors_is_listified(self):
+        with patch(
+            "multiomics_explorer.api.functions.build_list_publications_summary",
+            side_effect=_R2StopProbe,
+        ) as builder_mock:
+            with pytest.raises(_R2StopProbe):
+                api.list_publications(background_factors="axenic", conn=MagicMock())
+        assert builder_mock.call_args.kwargs.get("background_factors") == ["axenic"]
+
+    def test_bare_string_growth_phases_is_listified(self):
+        with patch(
+            "multiomics_explorer.api.functions.build_list_publications_summary",
+            side_effect=_R2StopProbe,
+        ) as builder_mock:
+            with pytest.raises(_R2StopProbe):
+                api.list_publications(growth_phases="exponential", conn=MagicMock())
+        assert builder_mock.call_args.kwargs.get("growth_phases") == ["exponential"]
+
+    def test_no_deprecation_warning_for_bare_string(self, recwarn):
+        with patch(
+            "multiomics_explorer.api.functions.build_list_publications_summary",
+            side_effect=_R2StopProbe,
+        ):
+            with pytest.raises(_R2StopProbe):
+                api.list_publications(treatment_type="coculture", conn=MagicMock())
+        assert not any(
+            issubclass(w.category, DeprecationWarning) for w in recwarn.list
+        )
+
+
+class TestR2ListClusteringAnalysesOmicsTypeIsList:
+    def test_bare_string_is_listified(self):
+        with patch(
+            "multiomics_explorer.api.functions.build_list_clustering_analyses_summary",
+            side_effect=_R2StopProbe,
+        ) as builder_mock:
+            with pytest.raises(_R2StopProbe):
+                api.list_clustering_analyses(omics_type="RNASEQ", conn=MagicMock())
+        assert builder_mock.call_args.kwargs.get("omics_type") == ["RNASEQ"]
+
+    def test_list_passes_through(self):
+        with patch(
+            "multiomics_explorer.api.functions.build_list_clustering_analyses_summary",
+            side_effect=_R2StopProbe,
+        ) as builder_mock:
+            with pytest.raises(_R2StopProbe):
+                api.list_clustering_analyses(
+                    omics_type=["RNASEQ", "PROTEOMICS"], conn=MagicMock(),
+                )
+        assert builder_mock.call_args.kwargs.get("omics_type") == [
+            "RNASEQ", "PROTEOMICS",
+        ]
+
+
+class TestR2ListDerivedMetricsOmicsTypeIsList:
+    def test_bare_string_is_listified(self):
+        with patch(
+            "multiomics_explorer.api.functions.build_list_derived_metrics_summary",
+            side_effect=_R2StopProbe,
+        ) as builder_mock:
+            with pytest.raises(_R2StopProbe):
+                api.list_derived_metrics(omics_type="RNASEQ", conn=MagicMock())
+        assert builder_mock.call_args.kwargs.get("omics_type") == ["RNASEQ"]
+
+    def test_list_passes_through(self):
+        with patch(
+            "multiomics_explorer.api.functions.build_list_derived_metrics_summary",
+            side_effect=_R2StopProbe,
+        ) as builder_mock:
+            with pytest.raises(_R2StopProbe):
+                api.list_derived_metrics(
+                    omics_type=["RNASEQ", "PROTEOMICS"], conn=MagicMock(),
+                )
+        assert builder_mock.call_args.kwargs.get("omics_type") == [
+            "RNASEQ", "PROTEOMICS",
+        ]
+
+
+class TestR2GeneResponseProfileTreatmentTypeRename:
+    """treatment_types -> treatment_type is a full rename (unlike the
+    same-name listify cases above): the deprecated alias carries the old
+    name and warns. Layer-1 builder kwarg stays treatment_types."""
+
+    _ORGANISM_ROW = [{"organisms": ["Prochlorococcus MED4"]}]
+
+    def test_canonical_reaches_builder(self):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [self._ORGANISM_ROW]
+        with patch(
+            "multiomics_explorer.api.functions._closed_vocab_warnings",
+            return_value=[],
+        ), patch(
+            "multiomics_explorer.api.functions.build_gene_response_profile_envelope",
+            side_effect=_R2StopProbe,
+        ) as builder_mock:
+            with pytest.raises(_R2StopProbe):
+                api.gene_response_profile(
+                    locus_tags=["PMM0370"], treatment_type=["nitrogen"],
+                    conn=mock_conn,
+                )
+        assert builder_mock.call_args.kwargs.get("treatment_types") == ["nitrogen"]
+
+    def test_deprecated_alias_warns_and_reaches_builder(self):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [self._ORGANISM_ROW]
+        with patch(
+            "multiomics_explorer.api.functions._closed_vocab_warnings",
+            return_value=[],
+        ), patch(
+            "multiomics_explorer.api.functions.build_gene_response_profile_envelope",
+            side_effect=_R2StopProbe,
+        ) as builder_mock:
+            with pytest.warns(DeprecationWarning, match="treatment_types"):
+                with pytest.raises(_R2StopProbe):
+                    api.gene_response_profile(
+                        locus_tags=["PMM0370"], treatment_types=["nitrogen"],
+                        conn=mock_conn,
+                    )
+        assert builder_mock.call_args.kwargs.get("treatment_types") == ["nitrogen"]
+
+    def test_both_set_raises(self):
+        with pytest.raises(ValueError):
+            api.gene_response_profile(
+                locus_tags=["PMM0370"],
+                treatment_type=["nitrogen"], treatment_types=["coculture"],
+                conn=MagicMock(),
+            )

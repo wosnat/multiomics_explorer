@@ -193,7 +193,7 @@ class TestListPublications:
 
     def test_treatment_type_filter(self, conn):
         """Treatment type filter returns papers with coculture experiments."""
-        cypher, params = build_list_publications(treatment_type="coculture")
+        cypher, params = build_list_publications(treatment_type=["coculture"])
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 3
 

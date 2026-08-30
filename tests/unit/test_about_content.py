@@ -741,10 +741,20 @@ def test_type_string_renders_every_union_arm():
 
 
 def test_generated_union_param_shows_scalar_arm(tool_schemas):
+    from typing import get_args
+
     from scripts.build_about_content import extract_params_table
+    from multiomics_explorer.mcp_server.params import OntologyKey
 
     rows = {r["name"]: r for r in extract_params_table(tool_schemas["search_ontology"])}
-    assert rows["ontology"]["type"] == "string | list[string] | None"
+    type_str = rows["ontology"]["type"]
+    # ontology is OntologyKey-typed (Literal) — the generator renders every
+    # enum choice inline; the scalar arm must not collapse into the list arm.
+    assert type_str.startswith("string (")
+    assert "list[string (" in type_str
+    assert type_str.endswith(")] | None")
+    for key in get_args(OntologyKey):
+        assert f"'{key}'" in type_str
 
 
 def test_mistakes_heading_is_always_common_mistakes():

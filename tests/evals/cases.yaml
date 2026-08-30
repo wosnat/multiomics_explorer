@@ -854,7 +854,7 @@
   tool: list_publications
   desc: Coculture treatment type filter
   params:
-    treatment_type: "coculture"
+    treatment_type: ["coculture"]
   expect:
     min_rows: 3
     columns: [doi, title, experiment_count]

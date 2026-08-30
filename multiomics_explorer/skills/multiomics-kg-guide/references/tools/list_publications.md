@@ -11,9 +11,9 @@ Routing: drill via `list_experiments(publication_dois=[doi])` for per-experiment
 | Name | Type | Default | Description |
 |---|---|---|---|
 | organism | string \| None | None | Filter by organism name (case-insensitive). E.g. 'MED4', 'HOT1A3'. |
-| treatment_type | string \| None | None | Filter by experiment treatment type. Use list_filter_values for valid values. |
-| background_factors | string \| None | None | Filter by background factor (case-insensitive exact match). E.g. 'axenic'. |
-| growth_phases | string \| None | None | Filter by growth phase (case-insensitive). E.g. 'exponential', 'nutrient_limited'. |
+| treatment_type | list[string] \| None | None | Filter by treatment type(s). E.g. ['coculture', 'nitrogen']. Use list_filter_values for valid values. |
+| background_factors | list[string] \| None | None | Filter by background factor(s) (case-insensitive exact match). E.g. ['axenic']. |
+| growth_phases | list[string] \| None | None | Filter by growth phase(s) (case-insensitive). E.g. ['exponential', 'nutrient_limited']. |
 | search_text | string \| None | None | Free-text search on title, abstract, and description (Lucene syntax). E.g. 'nitrogen', 'co-culture AND phage'. |
 | author | string \| None | None | Filter by author name (case-insensitive). E.g. 'Sher', 'Chisholm'. |
 | publication_dois | list[string] \| None | None | Restrict to specific publications by DOI (case-insensitive). Combines with other filters via AND. `not_found` in the response lists any provided DOIs that did not match. Mirrors the filter shape on sibling list_* tools (list_experiments.experiment_ids). |
@@ -248,7 +248,7 @@ list_publications()
 ### Example 2: Find coculture studies
 
 ```example-call
-list_publications(treatment_type="coculture")
+list_publications(treatment_type=["coculture"])
 ```
 
 ### Example 3: Chaining to experiments
@@ -727,8 +727,6 @@ list_publications (per-row `discussed_gene_count` or `discussed_pathway_count` >
 ## Common mistakes
 
 - If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this publication.
-
-- treatment_type is a string filter, not a list — use treatment_type='coculture' not treatment_type=['coculture'].
 
 - treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (e.g. 'nitrogen_stress' instead of 'nitrogen') returns 0 rows, never an error. Check list_filter_values(filter_type='growth_phase') or a summary=True call's by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. On this tool the rollups come from an unfiltered list_publications() call.
 
