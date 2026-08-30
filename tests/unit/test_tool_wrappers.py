@@ -12006,3 +12006,19 @@ class TestLocusTagCaseMismatchWarningWrappers:
         assert field.annotation == list[str]
         assert field.get_default(call_default_factory=True) == []
         assert field.description, f"{name}: warnings needs a description"
+
+
+def test_no_tool_emits_output_schema():
+    """Spec D1: outputSchema is never sent on tools/list (the host never passes it to the model)."""
+    import asyncio
+    from fastmcp import FastMCP
+    from multiomics_explorer.mcp_server.tools import register_tools
+
+    mcp = FastMCP("t")
+    register_tools(mcp)
+
+    async def _run():
+        return [(t.name, t.to_mcp_tool().outputSchema) for t in await mcp.list_tools()]
+
+    leaking = [name for name, schema in asyncio.run(_run()) if schema]
+    assert leaking == [], f"tools still emitting outputSchema: {leaking}"

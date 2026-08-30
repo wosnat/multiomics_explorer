@@ -40,7 +40,9 @@ Re-exported from `multiomics_explorer/__init__.py`.
 Thin wrapper — calls api/, validates via `Response(**data)`.
 Same params as api/ (minus `conn`, plus `ctx`). Adds default `limit`
 (small, e.g. 5). `async def` with `await ctx.info/warning/error()`.
-Pydantic response models → FastMCP auto-generates `outputSchema`.
+Pydantic response models validate the payload; `register_tools` passes
+`output_schema=None` for every tool (the model never sees outputSchema —
+the docstring's "Returns" slot + docs://tools/{name} carry the shape).
 Tool docstrings + every `Field(description=...)` are agent-outfacing
 — follow the 9 outfacing-doc rules (see [layer boundaries](references/layer-boundaries.md)
 and [readability-pass spec](../../../docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md)).

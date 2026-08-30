@@ -35,14 +35,21 @@ def tool_schemas():
         for t in tools:
             tool = await mcp.get_tool(t.name)
             mcp_tool = tool.to_mcp_tool()
+            ret = tool.fn.__annotations__.get("return")
+            output_schema = ret.model_json_schema() if ret is not None and hasattr(ret, "model_json_schema") else None
             schemas[t.name] = {
                 "description": mcp_tool.description or "",
                 "parameters": mcp_tool.inputSchema,
-                "output_schema": mcp_tool.outputSchema,
+                "output_schema": output_schema,
             }
         return schemas
 
     return asyncio.run(_extract())
+
+
+def test_get_tool_schemas_has_output_schema_from_return_model(tool_schemas):
+    assert tool_schemas["list_organisms"]["output_schema"]["properties"]["results"]
+    assert all(s["output_schema"] for s in tool_schemas.values()), "every tool has a typed return model"
 
 
 def _get_about_files() -> list[Path]:

@@ -1546,6 +1546,16 @@ class DiscussedPublicationRef(BaseModel):
 
 def register_tools(mcp: FastMCP):
     """Register all KG tools with the MCP server."""
+    # Spec 2b.5 D1: outputSchema is client-side only and never reaches the
+    # model; the response shape the model reads is the docstring's
+    # "Returns" slot + docs://tools/{name}. structuredContent is unaffected.
+    _tool = mcp.tool
+
+    def _tool_no_output_schema(*args, **kwargs):
+        kwargs.setdefault("output_schema", None)
+        return _tool(*args, **kwargs)
+
+    mcp.tool = _tool_no_output_schema  # type: ignore[method-assign]
 
     # -------------------------------------------------------------------
     # Annotation-trust surface (PR 3a) — shared Field descriptions.

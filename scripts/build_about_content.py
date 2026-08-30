@@ -127,10 +127,12 @@ def get_tool_schemas() -> dict:
         for t in tools:
             tool = await mcp.get_tool(t.name)
             mcp_tool = tool.to_mcp_tool()
+            ret = tool.fn.__annotations__.get("return")
+            output_schema = ret.model_json_schema() if ret is not None and hasattr(ret, "model_json_schema") else None
             schemas[t.name] = {
                 "description": mcp_tool.description or "",
                 "parameters": mcp_tool.inputSchema,
-                "output_schema": mcp_tool.outputSchema,
+                "output_schema": output_schema,
             }
         return schemas
 
