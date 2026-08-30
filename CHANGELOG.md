@@ -35,6 +35,87 @@ coordinated to `0.1.0a5` ahead of the KG release.
 - `docs://examples/annotation_evidence.py` registered (was referenced but not served); `examples/pathway_enrichment.py` rebuilt with the `--scenario landscape|de|cluster|ortholog|custom` interface.
 - KG handoff `docs/kg-specs/2026-08-29-docs-review-kg-asks.md` (DOC-001..008).
 
+- **Silent-zero warnings, shared helper** (llm-review 2b.3 Task 1). New
+  `_closed_vocab_warnings` / `_organism_zero_match_warning` helpers replace
+  2b.1's per-field version; wired into `genes_by_function`, `list_experiments`,
+  `list_publications`, `list_organisms`, `list_derived_metrics`,
+  `list_clustering_analyses`, `gene_derived_metrics`, `gene_clusters_by_gene`,
+  `genes_by_numeric_metric`, `genes_by_boolean_metric`,
+  `genes_by_categorical_metric`, `genes_by_metabolite`, `metabolites_by_gene`,
+  `list_metabolite_assays`, `differential_expression_by_gene`,
+  `gene_response_profile`. New `warnings: list[str]` envelope key on 8
+  response models that lacked it (`ListOrganismsResponse`,
+  `GenesByFunctionResponse`, `ListPublicationsResponse`,
+  `ListExperimentsResponse`, `ListClusteringAnalysesResponse`,
+  `GeneDerivedMetricsResponse`, `ListDerivedMetricsResponse`,
+  `GeneClustersByGeneResponse`). Warning text: `"<param> value '<v>' matched
+  nothing — valid values: ... (list_filter_values(filter_type='<type>'))"` /
+  `"organism '<v>' matched no organism — see list_organisms()"`.
+- **Bare ontology/ortholog-group ID coercion + locus-tag case warning**
+  (llm-review 2b.3 Task 2). `genes_by_ontology`, `ontology_term_details`,
+  `genes_by_homolog_group`, `differential_expression_by_ortholog`,
+  `pathway_enrichment`, `cluster_enrichment` accept bare term / group ids
+  (e.g. `ko00910` → `kegg.pathway:ko00910`, `GO:0006979` → `go:0006979`,
+  `CK_00000570` → `cyanorak:CK_00000570`) and report the mapping in new
+  `resolved_aliases: dict[str, list[str]]` (top-level on the first four,
+  nested under `term_validation` on the two enrichment tools). 11 tools
+  (`gene_overview`, `gene_details`, `gene_homologs`, `gene_aa_sequence`,
+  `gene_neighbors`, `gene_ontology_terms`, `differential_expression_by_gene`,
+  `gene_response_profile`, `gene_derived_metrics`, `gene_clusters_by_gene`,
+  `metabolites_by_gene`) warn `"<input> not found; '<existing>' differs only
+  by case"` on a locus_tag that differs only by case from a real
+  `Gene.locus_tag` (locus tags are never normalised).
+- **DM drill-down wrong-kind / impossible-filter routing** (llm-review 2b.3
+  Task 3). `genes_by_numeric_metric` / `genes_by_boolean_metric` /
+  `genes_by_categorical_metric` now classify a wrong-kind
+  `derived_metric_ids` / `metric_types` entry as `not_matched_*` (not
+  silently empty) with a `warnings` entry naming the sibling tool (`"<id>
+  exists as value_kind=<kind> — use <tool>"`); an organism with no edges for
+  the selected DM(s) sets `not_matched_organism` and names the DM's real
+  organisms (previously misfired even on a wholly-absent `metric_type`).
+  `genes_by_numeric_metric.bucket` is now `list[Literal['top_decile',
+  'top_quartile', 'mid', 'low']]` — an unlisted value now raises a
+  validation error instead of silently matching nothing.
+  `genes_by_boolean_metric(flag=False)` on a positive-only DM warns `"<id>
+  stores positive flags only — flag=False cannot match; read
+  by_metric[*].false_count"` (also fixes a latent bug where `true_count`
+  under `flag=False` always read 0 regardless of the DM's real flagged-edge
+  count). `gene_derived_metrics` gained the same sibling-tool warning for a
+  wrong-kind id.
+- **BRITE requires `tree`; Lucene errors are readable** (llm-review 2b.3 Task
+  4). `pathway_enrichment` / `cluster_enrichment` raise
+  `ValueError("ontology='brite' needs tree= (12 trees; see
+  list_filter_values(filter_type='brite_tree')) — a tree-less run mixes
+  taxonomy and function terms.")` before any query when `ontology='brite'`
+  and `tree` is omitted. Every fulltext-search tool's final retry
+  (`genes_by_function`, `search_ontology`, `search_homolog_groups`,
+  `list_publications`, `list_experiments`, `list_metabolites`,
+  `list_clustering_analyses`, `list_derived_metrics`,
+  `list_metabolite_assays`) now raises a readable `ValueError("search_text
+  ... is not valid Lucene syntax: ...")` instead of the raw Neo4j driver
+  exception on a persistent parse failure. `search_ontology` appends
+  `"search_text was sanitised to '<q>'"` to `warnings` when its
+  escape-and-retry changed the query.
+- **Remaining silent paths on assays, clusters, metabolite IDs** (llm-review
+  2b.3 Task 5). `list_metabolite_assays` / `assays_by_metabolite` warn
+  `"organism '<name>' has no metabolomics assays — organisms with assays:
+  ..."` when the organism resolves genomically but has zero
+  `MetaboliteAssay` nodes. `genes_in_cluster(analysis_id=)` gains
+  `not_found_analysis: str | None` (an unknown `analysis_id` no longer
+  looks identical to "exists, zero clusters") plus a `warnings` entry; a
+  root-cause fix also makes `not_matched_organism` fire only on a genuine
+  organism mismatch (new `ca_organism_name` / `_organism_word_match`),
+  unblocking `cluster_enrichment`'s exists-but-empty warning path (rather
+  than raising `"analysis_id not found"`). `genes_by_metabolite` /
+  `list_metabolites` warn `"'<v>' is not a metabolite id — resolve names
+  with list_metabolites(search_text=...)"` on a `metabolite_ids` entry
+  matching no recognized id shape at all. `list_metabolites(elements=...)`
+  silently normalises case / full-name element inputs and reports
+  genuinely unrecognized ones in new `not_found.elements`.
+  `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay` classify
+  a wrong-kind `assay_id` as found-but-wrong-kind with a sibling-tool
+  warning instead of `not_found`.
+
 - **Bare / xref metabolite-ID coercion** (backlog 3.2, closes KG-MET-014
   explorer-side). Every `metabolite_ids` / `exclude_metabolite_ids`
   parameter on the 7 chemistry + metabolomics tools (`list_metabolites`,
