@@ -18,7 +18,7 @@ docs://tools/ontology_landscape; summary=True first.
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Narrows brite and leaves any other ontology in the list untouched; raises when brite is not among them. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | experiment_ids | list[string] \| None | None | Restrict coverage computation to genes quantified in these experiments. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | limit | int \| None | 15 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 | min_gene_set_size | int | 5 | Exclude terms with fewer genes than this (default 5). |

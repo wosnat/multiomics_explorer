@@ -22,6 +22,8 @@ Sizes: **S** ≤ half a day, no spec · **M** a day, one-page spec (Mode B) · *
 | # | Item | Size | Origin |
 |---|---|---|---|
 | 2.8 | `organism=` word-match backlog: genus node `Alteromonas` matches all strains; `AltDE` matches `AltDE1`. Resolver gates on `gene_count > 0` so treatment taxa are safe (KG B4 removes the last name collision). | M | slice-2 ledger |
+| 2.14 | Outfacing-identifier lint: cross-check backtick-quoted identifiers in tools.py Field/docstrings, inputs/tools/*.yaml, hand-authored references md, CLAUDE.md against live input-schema param names + response-model field names (final-review rec, llm-review 2b.5). | S | 2b.5 final review |
+| 2.15 | alpha.6 queue: remove api/_compat aliases; rename not_found.publication_doi buckets to publication_dois on the 3 metabolomics tools; consider compartment as list[str]; listify-or-reject bare str on remaining list[str] vocab params (3.18). | M | 2b.5 final review |
 
 ## 2b. LLM-consumer review 2026-08-29 (six-reviewer pass; report artifact `Explorer MCP Through an LLM's Eyes`, raw reports in session scratchpad)
 

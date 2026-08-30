@@ -5154,8 +5154,8 @@ def register_tools(mcp: FastMCP):
         genes_with_response: int = Field(description="Genes with at least one significant expression edge (e.g. 15)")
         not_found: list[str] = Field(default_factory=list, description="Input locus_tags not found in KG")
         no_expression: list[str] = Field(default_factory=list, description="Gene exists but has NO Changes_expression_of edge at all in the organism")
-        filtered_out: list[str] = Field(default_factory=list, description="Gene has expression edges but none survive the active treatment_types / background_factors filters — e.g. a treatment_types vocabulary typo. Never confuse with no_expression.")
-        warnings: list[str] = Field(default_factory=list, description="One entry per treatment_types / background_factors value not found in the live vocabulary (see list_filter_values(filter_type='treatment_type' or 'background_factors')), plus one per not_found locus_tag differing only by case from a real one (locus_tags are never case-normalised). Empty when clean.")
+        filtered_out: list[str] = Field(default_factory=list, description="Gene has expression edges but none survive the active treatment_type / background_factors filters — e.g. a treatment_type vocabulary typo. Never confuse with no_expression.")
+        warnings: list[str] = Field(default_factory=list, description="One entry per treatment_type / background_factors value not found in the live vocabulary (see list_filter_values(filter_type='treatment_type' or 'background_factors')), plus one per not_found locus_tag differing only by case from a real one (locus_tags are never case-normalised). Empty when clean.")
         returned: int = Field(description="Genes in results after pagination (e.g. 15)")
         offset: int = Field(description="Offset into paginated gene list (e.g. 0)")
         truncated: bool = Field(description="True if more genes available beyond returned + offset")
@@ -5886,7 +5886,7 @@ def register_tools(mcp: FastMCP):
             description=(
                 "Filter to DMs that support rank / percentile / bucket "
                 "analysis. Set to True before calling `genes_by_numeric_metric` "
-                "with `bucket`, `min/max_percentile`, or `max_rank` — those "
+                "with `metric_bucket`, `min/max_percentile`, or `max_rank` — those "
                 "filters require rankable=True on every selected DM. See "
                 "`docs://guide/conventions` (DM family gating)."
             ),
@@ -7117,9 +7117,9 @@ def register_tools(mcp: FastMCP):
     ) -> GenesByNumericMetricResponse:
         """Numeric DerivedMetric edges — one row per gene × DM with its raw value; cross-organism.
 
-        Use for value, percentile, bucket or rank cutoffs after a `list_derived_metrics` pre-flight; flags `genes_by_boolean_metric`, labels `genes_by_categorical_metric`.
-        Filters: derived_metric_ids XOR metric_types (exactly one), organism, locus_tags, min/max_value, min/max_percentile, metric_bucket, max_rank.
-        Returns: by_metric (filtered slice vs the full-DM range), by_organism, excluded_derived_metrics, not_found / not_matched; one row = one edge.
+        Use for value, percentile, bucket or rank cutoffs after `list_derived_metrics`; flags `genes_by_boolean_metric`, labels `genes_by_categorical_metric`.
+        Filters: derived_metric_ids XOR metric_types, organism, locus_tags, min/max_value, min/max_percentile, metric_bucket, max_rank.
+        Returns: by_metric (vs full-DM), by_organism, excluded_derived_metrics, not_found_ids, not_found_metric_types, not_matched_ids, not_matched_metric_types; one row = one edge.
         docs://tools/genes_by_numeric_metric; summary=True first.
         """
         selection_size = (
@@ -7475,9 +7475,9 @@ def register_tools(mcp: FastMCP):
     ) -> GenesByBooleanMetricResponse:
         """Boolean DerivedMetric edges — one row per gene × DM × edge value; cross-organism.
 
-        Use for flag membership after a `list_derived_metrics` pre-flight; values `genes_by_numeric_metric`, labels `genes_by_categorical_metric`.
-        Filters: derived_metric_ids XOR metric_types (exactly one), organism, locus_tags, flag_value, plus the publication / experiment / condition filters.
-        Returns: by_value, by_metric (slice tallies paired with full-DM counts, incl. false_count), by_organism, not_found / not_matched; one row = one edge.
+        Use for flag membership after `list_derived_metrics`; values `genes_by_numeric_metric`, labels `genes_by_categorical_metric`.
+        Filters: derived_metric_ids XOR metric_types, organism, locus_tags, flag_value, plus the publication / experiment / condition filters.
+        Returns: by_value, by_metric (vs full-DM, incl. false_count), by_organism, not_found_ids, not_found_metric_types, not_matched_ids, not_matched_metric_types; one row = one edge.
         docs://tools/genes_by_boolean_metric; summary=True first.
         """
         selection_size = (
@@ -7817,9 +7817,9 @@ def register_tools(mcp: FastMCP):
     ) -> GenesByCategoricalMetricResponse:
         """Categorical DerivedMetric edges — one row per gene × DM × edge value; cross-organism.
 
-        Use to slice genes by a category label after a `list_derived_metrics` pre-flight; values `genes_by_numeric_metric`, flags `genes_by_boolean_metric`.
-        Filters: derived_metric_ids XOR metric_types (exactly one), organism, locus_tags, categories, plus the publication / experiment / condition filters.
-        Returns: by_category, by_metric (slice histogram paired with the full-DM histogram and allowed_categories), by_organism; one row = one edge.
+        Use to slice genes by a category label after `list_derived_metrics`; values `genes_by_numeric_metric`, flags `genes_by_boolean_metric`.
+        Filters: derived_metric_ids XOR metric_types, organism, locus_tags, categories, plus the publication / experiment / condition filters.
+        Returns: by_category, by_metric (vs full-DM, allowed_categories), by_organism, not_found_ids, not_found_metric_types, not_matched_ids, not_matched_metric_types; one row = one edge.
         docs://tools/genes_by_categorical_metric; summary=True first.
         """
         selection_size = (
@@ -8670,7 +8670,9 @@ def register_tools(mcp: FastMCP):
         not_found: LmaNotFound = Field(
             default_factory=LmaNotFound,
             description="Per-batch-input unknown IDs (4 buckets: "
-            "assay_ids, metabolite_ids, experiment_ids, publication_doi).")
+            "assay_ids, metabolite_ids, experiment_ids, publication_doi — "
+            "bucket key is singular `publication_doi` regardless of the "
+            "`publication_dois` input filter name).")
         resolved_aliases: dict[str, list[str]] = Field(
             default_factory=dict,
             description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
@@ -9070,7 +9072,9 @@ def register_tools(mcp: FastMCP):
         not_found: MqaNotFound = Field(
             default_factory=MqaNotFound,
             description="Per-batch-input unknown IDs (4 buckets: "
-            "assay_ids, metabolite_ids, experiment_ids, publication_doi).")
+            "assay_ids, metabolite_ids, experiment_ids, publication_doi — "
+            "bucket key is singular `publication_doi` regardless of the "
+            "`publication_dois` input filter name).")
         returned: int = Field(description="Length of `results`.")
         truncated: bool = Field(
             description="True when total_matching > offset + returned.")
@@ -9370,7 +9374,9 @@ def register_tools(mcp: FastMCP):
         not_found: MfaNotFound = Field(
             default_factory=MfaNotFound,
             description="Per-batch-input unknown IDs (4 buckets: "
-            "assay_ids, metabolite_ids, experiment_ids, publication_doi). "
+            "assay_ids, metabolite_ids, experiment_ids, publication_doi — "
+            "bucket key is singular `publication_doi` regardless of the "
+            "`publication_dois` input filter name). "
             "assay_ids is a real existence check — an assay_id that "
             "exists as the other value_kind is NOT here (see `warnings`).")
         returned: int = Field(description="Length of `results`.")

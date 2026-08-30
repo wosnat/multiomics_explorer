@@ -254,6 +254,9 @@ coordinated to `0.1.0a5` ahead of the KG release.
 - `outputSchema` no longer emitted on `tools/list`
 
 ### Changed
+- `differential_expression_by_ortholog` accepts `direction='both'` (runs up and down per group × experiment × timepoint, matching `differential_expression_by_gene`).
+- `search_ontology.ontology` and `list_filter_values.ontology` typed to the closed 17-key ontology enum instead of a bare `str`.
+- `list_clustering_analyses` matches `omics_type` case-insensitively.
 - Tool descriptions rewritten to a five-slot template (what / when / params / returns / see-also), each ≤ 600 chars; shared parameter descriptions (`organism`, `limit`, `summary`, trust filters, the ontology key, …) centralized in `mcp_server/params.py` instead of re-described per tool.
 - Python-API deprecation aliases for the renames above (`api/_compat.deprecated_alias`: `publication_doi`, `bucket`, `flag`, `category`, `treatment_types`, `mass_min`/`mass_max`, `value_min`/`value_max`, `metric_percentile_min`/`metric_percentile_max`, `rank_by_metric_max`, and the bare-`str` vocab filters) keep working one release and will be removed in `0.1.0-alpha.6`.
 - `differential_expression_by_gene` envelope drops `n_experiments` (an exact duplicate of `experiment_count`; the ortholog twin only ever had `experiment_count`). Read `experiment_count`. (llm-review 2b.8)

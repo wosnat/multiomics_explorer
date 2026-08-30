@@ -4,9 +4,9 @@
 
 Numeric DerivedMetric edges — one row per gene × DM with its raw value; cross-organism.
 
-Use for value, percentile, bucket or rank cutoffs after a `list_derived_metrics` pre-flight; flags `genes_by_boolean_metric`, labels `genes_by_categorical_metric`.
-Filters: derived_metric_ids XOR metric_types (exactly one), organism, locus_tags, min/max_value, min/max_percentile, metric_bucket, max_rank.
-Returns: by_metric (filtered slice vs the full-DM range), by_organism, excluded_derived_metrics, not_found / not_matched; one row = one edge.
+Use for value, percentile, bucket or rank cutoffs after `list_derived_metrics`; flags `genes_by_boolean_metric`, labels `genes_by_categorical_metric`.
+Filters: derived_metric_ids XOR metric_types, organism, locus_tags, min/max_value, min/max_percentile, metric_bucket, max_rank.
+Returns: by_metric (vs full-DM), by_organism, excluded_derived_metrics, not_found_ids, not_found_metric_types, not_matched_ids, not_matched_metric_types; one row = one edge.
 docs://tools/genes_by_numeric_metric; summary=True first.
 
 ## Parameters
@@ -32,7 +32,7 @@ docs://tools/genes_by_numeric_metric; summary=True first.
 | significant_only | bool | False | Filter to `r.significant='significant'`. **has_p_value-gated** — raises in the current KG (no DM has p-values yet). Forward-compat surface; check `list_derived_metrics(has_p_value=True)` before using. |
 | max_adjusted_p_value | float \| None | None | Upper bound on `r.adjusted_p_value`. **has_p_value-gated**. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | limit | int | 25 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 

@@ -91,6 +91,7 @@ def test_param_types_match_baseline():
     refactor: sharing one description string across tools must never widen
     a required `str` to `str | None`, an `int` to `int | None`, etc."""
     baseline = json.loads(_BASELINE_FIXTURE.read_text())
+    assert baseline, "baseline fixture is empty — this test would pass vacuously"
     schemas = _all_tool_input_schemas()
     diffs = []
     for tool, tool_params in baseline.items():

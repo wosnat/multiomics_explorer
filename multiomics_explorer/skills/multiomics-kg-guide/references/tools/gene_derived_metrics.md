@@ -23,7 +23,7 @@ docs://tools/gene_derived_metrics; summary=True first.
 | publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
 | derived_metric_ids | list[string] \| None | None | Look up specific DMs by their unique id. Use to pin one DM when the same metric_type appears across publications. Pair with `list_derived_metrics`. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 

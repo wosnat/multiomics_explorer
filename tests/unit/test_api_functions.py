@@ -12978,6 +12978,8 @@ class TestMetabolitesByQuantifiesAssay:
                 assay_ids=["a1"], summary=True, conn=mock_conn2,
                 **{old_name: value},
             )
+        summary_call2 = mock_conn2.execute_query.call_args_list[1]
+        assert summary_call2.kwargs.get(builder_kwarg) == value
 
         with pytest.raises(ValueError):
             metabolites_by_quantifies_assay(

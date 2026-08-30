@@ -4,9 +4,9 @@
 
 Categorical DerivedMetric edges — one row per gene × DM × edge value; cross-organism.
 
-Use to slice genes by a category label after a `list_derived_metrics` pre-flight; values `genes_by_numeric_metric`, flags `genes_by_boolean_metric`.
-Filters: derived_metric_ids XOR metric_types (exactly one), organism, locus_tags, categories, plus the publication / experiment / condition filters.
-Returns: by_category, by_metric (slice histogram paired with the full-DM histogram and allowed_categories), by_organism; one row = one edge.
+Use to slice genes by a category label after `list_derived_metrics`; values `genes_by_numeric_metric`, flags `genes_by_boolean_metric`.
+Filters: derived_metric_ids XOR metric_types, organism, locus_tags, categories, plus the publication / experiment / condition filters.
+Returns: by_category, by_metric (vs full-DM, allowed_categories), by_organism, not_found_ids, not_found_metric_types, not_matched_ids, not_matched_metric_types; one row = one edge.
 docs://tools/genes_by_categorical_metric; summary=True first.
 
 ## Parameters
@@ -25,7 +25,7 @@ docs://tools/genes_by_categorical_metric; summary=True first.
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
 | categories | list[string] \| None | None | Filter on `r.value`: keep rows whose value is in this set. Validated against the union of the selected DMs' `allowed_categories` — unknown values raise `ValueError` listing the allowed set. E.g. ['Outer Membrane', 'Periplasmic'] for `predicted_subcellular_localization`. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields in docs://tools/{name}. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | limit | int | 25 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 

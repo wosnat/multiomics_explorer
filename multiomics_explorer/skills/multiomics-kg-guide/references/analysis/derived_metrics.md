@@ -49,7 +49,7 @@ Key properties on a `DerivedMetric` node:
 | `list_derived_metrics` | Entry point — discover DM nodes; read `derived_metric_id`, `value_kind`, `rankable`, `has_p_value`, `allowed_categories` before any drill-down |
 | `gene_derived_metrics` | Gene-centric batch lookup — one row per gene × DM, polymorphic `value` column; single organism |
 | `genes_by_numeric_metric` | Drill-down on numeric DMs — value threshold (always), bucket / percentile / rank (rankable-gated), p-value (has_p_value-gated) |
-| `genes_by_boolean_metric` | Drill-down on boolean DMs — `flag` filter (`True` / `False` / `None`) |
+| `genes_by_boolean_metric` | Drill-down on boolean DMs — `flag_value` filter (`True` / `False` / `None`) |
 | `genes_by_categorical_metric` | Drill-down on categorical DMs — `categories` filter |
 
 Both `derived_metric_ids` and `metric_types` select DMs on every drill-down;
@@ -236,7 +236,7 @@ vesicle = genes_by_numeric_metric(
   (`All N selected DMs have has_p_value=False; cannot apply has_p_value-gated
   filter(s) ['significant_only'] ...`). Check `has_p_value` on
   `list_derived_metrics` first.
-- **Rankable-gated parameters soft-exclude.** `bucket`, `min_percentile` /
+- **Rankable-gated parameters soft-exclude.** `metric_bucket`, `min_percentile` /
   `max_percentile`, `max_rank` need `rankable=True`; on a mixed selection the
   non-rankable DMs land in `excluded_derived_metrics` + `warnings`, and the
   call raises only when every selected DM is non-rankable.
