@@ -6238,7 +6238,7 @@ def pathway_enrichment(
         conn=conn,
     )
 
-    if inputs.not_found_experiments and len(inputs.not_found_experiments) == len(experiment_ids):
+    if inputs.not_found_experiments and set(inputs.not_found_experiments) >= set(experiment_ids):
         raise ValueError(
             f"experiment_ids not found: {inputs.not_found_experiments}. "
             f"Get ids from list_experiments(organism='{organism_name}')."

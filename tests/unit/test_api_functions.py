@@ -5832,8 +5832,35 @@ class TestApiAcceptsTcdbCazy:
         assert result["n_ontologies"] >= 12
 
 
+def _patch_enrichment_preflight(monkeypatch):
+    """Stub the live-KG preflight calls that pathway_enrichment /
+    cluster_enrichment now make before their (already-mocked) DE / cluster
+    inputs builders run — organism resolution, ontology level-range lookup,
+    and (inside de_enrichment_inputs) experiment-metadata lookup — so these
+    unit tests never touch Neo4j (llm-review 2b.1 finding I1).
+
+    _validate_organism_inputs / _ontology_max_level are called as bare names
+    within api/functions.py, so they patch directly on `api`.
+    _call_list_experiments is a thin indirection inside
+    multiomics_explorer.analysis.enrichment (re-imported fresh per call), so
+    it patches on that module. Returning `{}` is safe: de_enrichment_inputs
+    falls back to per-row DE metadata when exp_meta is empty.
+    """
+    import multiomics_explorer.analysis.enrichment as enr
+    monkeypatch.setattr(
+        api, "_validate_organism_inputs",
+        lambda *a, **k: "Prochlorococcus MED4",
+    )
+    monkeypatch.setattr(api, "_ontology_max_level", lambda ontology, conn: 3)
+    monkeypatch.setattr(enr, "_call_list_experiments", lambda **k: {})
+
+
 class TestPathwayEnrichment:
     """Input validation + orchestration for api.pathway_enrichment."""
+
+    @pytest.fixture(autouse=True)
+    def _enrichment_preflight(self, monkeypatch):
+        _patch_enrichment_preflight(monkeypatch)
 
     def test_importable_from_api(self):
         from multiomics_explorer.api import pathway_enrichment
@@ -5900,13 +5927,15 @@ class TestPathwayEnrichment:
             )
 
     @staticmethod
-    def _stub_de_result(rows=(), not_found=(), not_matched=(), no_expression=()):
+    def _stub_de_result(rows=(), not_found=(), not_matched=(), no_expression=(),
+                        not_found_experiments=()):
         return {
             "organism_name": "MED4",
             "results": list(rows),
             "not_found": list(not_found),
             "not_matched": list(not_matched),
             "no_expression": list(no_expression),
+            "not_found_experiments": list(not_found_experiments),
         }
 
     @staticmethod
@@ -5922,25 +5951,39 @@ class TestPathwayEnrichment:
             "filtered_out": list(filtered_out),
         }
 
-    def test_vacuous_success_when_all_experiments_missing(self, monkeypatch):
+    def test_partial_unknown_experiments_no_raise(self, monkeypatch):
+        """Renamed from test_vacuous_success_when_all_experiments_missing
+        (llm-review 2b.1 finding M1): that name/body asserted the vacuous
+        empty-envelope Task 4 eliminated for the ALL-unknown case, and only
+        passed because its stub omitted `not_found_experiments` (the DE
+        call's own not-found-experiment-ids key, distinct from the
+        gene-level `not_found`). The all-unknown-raises case is covered by
+        TestEnrichmentRaisesOnUnknownIdsAndBadLevel
+        .test_pathway_enrichment_all_unknown_experiments_raises; this test
+        now covers the complementary PARTIAL-batch contract through the
+        real (unmocked) de_enrichment_inputs, exercising the DE-mock layer
+        rather than the inputs-builder-mock layer Task 4 uses: one unknown
+        id out of two does NOT raise, and the unknown one surfaces in
+        `not_found_experiments`.
+        """
         from multiomics_explorer.api import pathway_enrichment
         import multiomics_explorer.api.functions as f
         monkeypatch.setattr(
             f, "differential_expression_by_gene",
-            lambda **_: self._stub_de_result(not_found=["exp1"]),
+            lambda **_: self._stub_de_result(not_found_experiments=["nope"]),
         )
         monkeypatch.setattr(
             f, "genes_by_ontology",
             lambda **_: self._stub_gbo_result(),
         )
         result = pathway_enrichment(
-            organism="MED4", experiment_ids=["exp1"],
+            organism="MED4", experiment_ids=["exp1", "nope"],
             ontology="cyanorak_role", level=1,
         )
         out = result.to_envelope()
         assert out["total_matching"] == 0
         assert out["results"] == []
-        assert out["not_found"] == ["exp1"]
+        assert out["not_found_experiments"] == ["nope"]
         assert out["n_significant"] == 0
 
     def test_term_validation_passthrough(self, monkeypatch):
@@ -6030,6 +6073,28 @@ class TestEnrichmentRaisesOnUnknownIdsAndBadLevel:
         with pytest.raises(ValueError, match=r"experiment_ids not found: \['nope'\]"):
             api.pathway_enrichment(
                 organism="MED4", experiment_ids=["nope"],
+                ontology="kegg", level=1, conn=MagicMock(),
+            )
+
+    def test_pathway_enrichment_duplicate_unknown_experiments_raises(self, monkeypatch):
+        """M3 (llm-review 2b.1): the all-unknown check must use set
+        comparison, not a length comparison — ``experiment_ids=['nope',
+        'nope']`` has len 2 but only one distinct id, so
+        ``len(not_found_experiments) == len(experiment_ids)`` would never
+        be True and the all-unknown case would silently fall through
+        instead of raising."""
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(api, "_validate_organism_inputs", lambda *a, **k: "Prochlorococcus MED4")
+        monkeypatch.setattr(api, "_ontology_max_level", lambda ontology, conn: 3)
+        fake_inputs = SimpleNamespace(
+            gene_sets={}, background={}, cluster_metadata={},
+            not_found=[], not_matched=[], no_expression=[],
+            not_found_experiments=["nope"], clusters_skipped=[],
+        )
+        monkeypatch.setattr(enr, "de_enrichment_inputs", lambda *a, **k: fake_inputs)
+        with pytest.raises(ValueError, match=r"experiment_ids not found: \['nope'\]"):
+            api.pathway_enrichment(
+                organism="MED4", experiment_ids=["nope", "nope"],
                 ontology="kegg", level=1, conn=MagicMock(),
             )
 
@@ -6146,6 +6211,10 @@ class TestPathwayEnrichmentInformativeOnly:
     the requested value, (c) the `is_informative` column is present on
     result.results.
     """
+
+    @pytest.fixture(autouse=True)
+    def _enrichment_preflight(self, monkeypatch):
+        _patch_enrichment_preflight(monkeypatch)
 
     @staticmethod
     def _stub_de_result():
@@ -6525,6 +6594,10 @@ class TestClusterEnrichmentInputs:
 class TestClusterEnrichment:
     """Input validation + orchestration for api.cluster_enrichment."""
 
+    @pytest.fixture(autouse=True)
+    def _enrichment_preflight(self, monkeypatch):
+        _patch_enrichment_preflight(monkeypatch)
+
     def test_importable_from_api(self):
         from multiomics_explorer.api import cluster_enrichment
         assert cluster_enrichment is not None
@@ -6743,6 +6816,10 @@ class TestClusterEnrichmentInformativeOnly:
     Mode-B template-and-extend: same param, same threading pattern, same
     `is_informative` field placement.
     """
+
+    @pytest.fixture(autouse=True)
+    def _enrichment_preflight(self, monkeypatch):
+        _patch_enrichment_preflight(monkeypatch)
 
     @staticmethod
     def _stub_inputs():

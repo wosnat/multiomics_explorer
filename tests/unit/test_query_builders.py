@@ -8656,6 +8656,26 @@ class TestBuildOntologyLandscapeF1Surface:
 # defaulting to True per spec.
 
 
+def _patch_enrichment_preflight(monkeypatch):
+    """Stub the live-KG preflight calls that pathway_enrichment /
+    cluster_enrichment make before their (already-mocked) DE / cluster
+    inputs builders run — organism resolution, ontology level-range lookup,
+    and (inside de_enrichment_inputs) experiment-metadata lookup — so these
+    unit tests never touch Neo4j (llm-review 2b.1 finding I1; same helper
+    as tests/unit/test_api_functions.py, duplicated here because these two
+    classes mock pathway_enrichment / cluster_enrichment the same way but
+    live in a separate test module).
+    """
+    import multiomics_explorer.api.functions as api
+    import multiomics_explorer.analysis.enrichment as enr
+    monkeypatch.setattr(
+        api, "_validate_organism_inputs",
+        lambda *a, **k: "Prochlorococcus MED4",
+    )
+    monkeypatch.setattr(api, "_ontology_max_level", lambda ontology, conn: 3)
+    monkeypatch.setattr(enr, "_call_list_experiments", lambda **k: {})
+
+
 class TestPathwayEnrichmentBuilderInformativeOnly:
     """api.pathway_enrichment threads `informative_only` to genes_by_ontology.
 
@@ -8664,6 +8684,10 @@ class TestPathwayEnrichmentBuilderInformativeOnly:
     tests pin the orchestration: every internal genes_by_ontology call must
     receive the caller's `informative_only` value.
     """
+
+    @pytest.fixture(autouse=True)
+    def _enrichment_preflight(self, monkeypatch):
+        _patch_enrichment_preflight(monkeypatch)
 
     @staticmethod
     def _stub_de_result(rows=()):
@@ -8767,6 +8791,10 @@ class TestClusterEnrichmentBuilderInformativeOnly:
     Parallel to TestPathwayEnrichmentBuilderInformativeOnly — same param,
     same threading pattern. Builders themselves unchanged.
     """
+
+    @pytest.fixture(autouse=True)
+    def _enrichment_preflight(self, monkeypatch):
+        _patch_enrichment_preflight(monkeypatch)
 
     @staticmethod
     def _stub_inputs(gene_sets=None, not_found=(), not_matched=()):
