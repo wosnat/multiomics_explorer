@@ -47,13 +47,13 @@ def _kg_compat_report(ctx: Context) -> dict:
     return ctx.request_context.lifespan_context.kg_compat_report
 
 
-def _resolve_batch_limit(limit: int | None, locus_tags: list[str], k: int = 1) -> int:
+def _resolve_batch_limit(locus_tags: list[str], k: int = 1) -> int:
     """Resolve a batch tool's `limit=None` default to a concrete row count.
 
     Sized for an LLM context window (llm-review 2b.2): return the whole
     batch by default (fan-out `k` rows per input gene), floored at 25 so a
-    tiny batch still gets a sane page size. An explicit `limit` is never
-    recomputed — callers should only invoke this when `limit is None`.
+    tiny batch still gets a sane page size. Callers should only invoke this
+    when `limit is None`.
     """
     return max(25, len(locus_tags) * k)
 
@@ -288,11 +288,11 @@ class PathwayEnrichmentResponse(BaseModel):
     )
     top_pathways_by_padj: list[PathwayEnrichmentTopPathway] = Field(
         default_factory=list,
-        description="Pathways ranked by p_adjust ascending across all "
-                    "clusters. Capped to the first 10 on detail calls; "
-                    "summary=True returns the full ranked list.",
+        description="Top 10 pathways ranked by p_adjust ascending across "
+                    "all clusters — a genuine top-10 in both summary and "
+                    "detail calls (unlike `by_experiment`, `summary=True` "
+                    "does not expand this list).",
     )
-    top_pathways_by_padj_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
     not_found: list[str] = Field(
         default_factory=list, description="Requested experiment_ids absent from KG"
     )
@@ -595,8 +595,9 @@ class ListMetabolitesResponse(BaseModel):
 class GeneReactionMetaboliteTriplet(SparseRow):
     """Shared row class for genes_by_metabolite and metabolites_by_gene.
 
-    Compact mode: 16 fields including evidence_source, substrate_depth
-    and tcdb_evidence_score. Verbose mode adds 9 more. All
+    Compact mode: 18 fields (e.g. on a transport row) including
+    evidence_source, substrate_depth and tcdb_evidence_score. Verbose mode
+    adds 9 more. All
     per-arm-specific fields are Optional and explicitly `None` on rows
     from the other arm — every row carries identical keys. Transport rows
     are deepest-attachment projections (a gene attached to a family AND
@@ -2008,7 +2009,7 @@ def register_tools(mcp: FastMCP):
     class ResolveGeneResponse(BaseModel):
         total_matching: int = Field(description="Total genes matching identifier + organism filter.")
         by_organism: list[ResolveOrganismBreakdown] = Field(description="Match counts per organism, sorted desc.")
-        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
+        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — page `results` with `limit`/`offset`, or pass `organism=` to narrow the match.")
         returned: int = Field(description="Genes in this response.")
         offset: int = Field(default=0, description="Offset into full result set.")
         truncated: bool = Field(description="True if total_matching > returned.")
@@ -2397,7 +2398,7 @@ def register_tools(mcp: FastMCP):
         await ctx.info(f"gene_overview locus_tags={locus_tags} summary={summary}")
         try:
             conn = _conn(ctx)
-            resolved_limit = limit if limit is not None else _resolve_batch_limit(limit, locus_tags)
+            resolved_limit = limit if limit is not None else _resolve_batch_limit(locus_tags)
             data = api.gene_overview(
                 locus_tags, summary=summary, verbose=verbose,
                 limit=resolved_limit, offset=offset, conn=conn,
@@ -2484,7 +2485,7 @@ def register_tools(mcp: FastMCP):
         await ctx.info(f"gene_details locus_tags={locus_tags} summary={summary}")
         try:
             conn = _conn(ctx)
-            resolved_limit = limit if limit is not None else _resolve_batch_limit(limit, locus_tags)
+            resolved_limit = limit if limit is not None else _resolve_batch_limit(locus_tags)
             data = api.gene_details(
                 locus_tags, summary=summary, limit=resolved_limit, offset=offset, conn=conn,
             )
@@ -2599,7 +2600,7 @@ def register_tools(mcp: FastMCP):
                        f"taxonomic_level={taxonomic_level}")
         try:
             conn = _conn(ctx)
-            resolved_limit = limit if limit is not None else _resolve_batch_limit(limit, locus_tags, k=5)
+            resolved_limit = limit if limit is not None else _resolve_batch_limit(locus_tags, k=5)
             data = api.gene_homologs(
                 locus_tags, source=source,
                 taxonomic_level=taxonomic_level,
@@ -3813,14 +3814,14 @@ def register_tools(mcp: FastMCP):
         total_entries: int = Field(description="Total publications in KG (unfiltered).")
         total_matching: int = Field(description="Publications matching filters.")
         by_organism: list[PubOrganismBreakdown] = Field(description="Publication counts per organism, sorted desc.")
-        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
+        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — page `results`, or `list_organisms` / `list_experiments(summary=True)` for full breakdowns.")
         by_treatment_type: list[PubTreatmentTypeBreakdown] = Field(description="Publication counts per treatment type, sorted desc.")
         by_background_factors: list[PubBackgroundFactorBreakdown] = Field(description="Publication counts per background factor, sorted desc.")
         by_omics_type: list[PubOmicsTypeBreakdown] = Field(description="Publication counts per omics platform, sorted desc.")
         by_cluster_type: list[PubClusterTypeBreakdown] = Field(default_factory=list, description="Publication counts per cluster type, sorted desc.")
         by_value_kind: list[PubValueKindBreakdown] = Field(default_factory=list, description="DerivedMetric value kind frequency rollup across matched publications.")
         by_metric_type: list[PubMetricTypeBreakdown] = Field(default_factory=list, description="DerivedMetric type frequency rollup across matched publications.")
-        by_metric_type_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
+        by_metric_type_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — page `results`, or `list_organisms` / `list_experiments(summary=True)` for full breakdowns.")
         by_compartment: list[PubCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched publications.")
         by_discusses_coverage: PubDiscussesCoverageBreakdown = Field(default_factory=PubDiscussesCoverageBreakdown, description="Binary split {has_discusses, no_discusses} of matched publications by whether they carry a narrative 'discusses' literature index (45 vs 4 in the current KG).")
         returned: int = Field(description="Publications in this response.")
@@ -4293,7 +4294,7 @@ def register_tools(mcp: FastMCP):
             description="Physiological state at this timepoint. Timepoint-level, not gene-specific.",
         )
 
-    class ExpressionByExperiment(BaseModel):
+    class ExpressionByExperiment(SparseRow):
         experiment_id: str = Field(
             description="Experiment ID (e.g. '10.1101/2025.11.24.690089_...')",
         )
@@ -4671,34 +4672,34 @@ def register_tools(mcp: FastMCP):
                 conn=conn,
             )
 
-            # Build nested Pydantic models
+            # Build nested Pydantic models. `exp` only carries the keys the
+            # api layer set (compact strips experiment_name,
+            # background_factors, coculture_partner, table_scope_detail,
+            # timepoints) — pass through only those keys so ExpressionByExperiment
+            # (a SparseRow) omits them on the wire instead of serializing null.
             exp_models = []
             for exp in data["experiments"]:
-                tp_models = None
-                if exp.get("timepoints") is not None:
-                    tp_models = [
-                        ExpressionTimepoint(
-                            **{
-                                **tp,
-                                "rows_by_status": ExpressionStatusBreakdown(
-                                    **tp["rows_by_status"]
-                                ),
-                            }
-                        )
-                        for tp in exp["timepoints"]
-                    ]
-                exp_models.append(
-                    ExpressionByExperiment(
-                        **{
-                            **{k: v for k, v in exp.items()
-                               if k != "timepoints" and k != "rows_by_status"},
-                            "rows_by_status": ExpressionStatusBreakdown(
-                                **exp["rows_by_status"]
-                            ),
-                            "timepoints": tp_models,
-                        }
-                    )
+                exp_kwargs = {k: v for k, v in exp.items() if k != "timepoints"}
+                exp_kwargs["rows_by_status"] = ExpressionStatusBreakdown(
+                    **exp["rows_by_status"]
                 )
+                if "timepoints" in exp:
+                    exp_kwargs["timepoints"] = (
+                        [
+                            ExpressionTimepoint(
+                                **{
+                                    **tp,
+                                    "rows_by_status": ExpressionStatusBreakdown(
+                                        **tp["rows_by_status"]
+                                    ),
+                                }
+                            )
+                            for tp in exp["timepoints"]
+                        ]
+                        if exp["timepoints"] is not None
+                        else None
+                    )
+                exp_models.append(ExpressionByExperiment(**exp_kwargs))
 
             top_cat_models = [
                 ExpressionTopCategory(**c) for c in data["top_categories"]
@@ -10853,7 +10854,7 @@ def register_tools(mcp: FastMCP):
 
         Routing: feed locus_tags from `resolve_gene` / `gene_overview` / `genes_by_function`; this is the terminal export step (pair with fasta=true for external tools).
         """
-        resolved_limit = limit if limit is not None else _resolve_batch_limit(limit, locus_tags)
+        resolved_limit = limit if limit is not None else _resolve_batch_limit(locus_tags)
         await ctx.info(
             f"gene_aa_sequence locus_tags={len(locus_tags)} fasta={fasta} "
             f"summary={summary} limit={resolved_limit} offset={offset}"
@@ -10946,7 +10947,7 @@ def register_tools(mcp: FastMCP):
         Routing: feed anchors from `differential_expression_by_gene` or `genes_by_metabolite`, then chain the returned neighbor locus_tags into `gene_overview` / `gene_aa_sequence` / `differential_expression_by_gene` for operon context.
         """
         resolved_limit = limit if limit is not None else _resolve_batch_limit(
-            limit, locus_tags, k=2 * window + 1,
+            locus_tags, k=2 * window + 1,
         )
         await ctx.info(
             f"gene_neighbors locus_tags={len(locus_tags)} window={window} "

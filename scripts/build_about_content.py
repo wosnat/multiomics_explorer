@@ -106,7 +106,6 @@ CONDITIONAL_ENVELOPE_KEYS = {
     "top_tcdb_families_truncated",
     "experiments_truncated",
     "by_experiment_truncated",
-    "top_pathways_by_padj_truncated",
 }
 
 

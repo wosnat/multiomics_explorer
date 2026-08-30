@@ -475,9 +475,11 @@ Pathway kind adds `no_expression`, `by_experiment[]` (`n_tests`, `n_significant`
 `by_omics_type[]`, `cluster_summary` (`n_clusters`, min/median/max of `n_tests`,
 `n_significant`, `universe_size`), `top_clusters_by_min_padj[]` (5),
 `top_pathways_by_padj[]` (ranked by `p_adjust` ascending). A detail call
-(`summary=False`) caps `by_experiment` and `top_pathways_by_padj` to their first
-10 entries, adding a sparse `<key>_truncated: true` sibling key when a list is
-actually capped; `summary=True` carries each list in full.
+(`summary=False`) caps `by_experiment` to its first 10 entries, adding a sparse
+`by_experiment_truncated: true` sibling key when the list is actually capped;
+`summary=True` carries it in full. `top_pathways_by_padj` is different: it is
+always a genuine top-10, in BOTH modes — `summary=True` does not expand it —
+so it carries no `_truncated` companion key.
 
 Cluster kind adds `analysis_id`, `analysis_name`, `cluster_method`,
 `cluster_type`, `omics_type`, `treatment_type`, `background_factors`,
@@ -488,8 +490,9 @@ by number of gene sets where significant), `clusters_tested`.
 `to_envelope(summary=False, limit=None, offset=0)` adds the trust block
 (`filters_applied`, `trust_axes`, `background_filtered`, `interpro_type`) and
 pagination (`results`, `returned`, `truncated`, `offset`). `results` is sorted by
-`p_adjust`, then `cluster`, then `term_id`, so paging recovers positions 11+ of
-`top_pathways_by_padj`.
+`p_adjust`, then `cluster`, then `term_id` — the same ranking `top_pathways_by_padj`
+uses for its top-10, so paging `results` recovers the full ranking beyond
+position 10.
 
 `include_nonsignificant` (an `EnrichmentResult.params` key, not a `to_envelope`
 argument — set it via the `pathway_enrichment`/`cluster_enrichment` call) gates

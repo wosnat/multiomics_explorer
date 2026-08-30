@@ -79,8 +79,7 @@ organism_name, ontology, level, total_matching, returned, truncated, offset, n_s
 - **by_omics_type** (list[PathwayEnrichmentByOmicsType]): Per-omics-type aggregates
 - **cluster_summary** (PathwayEnrichmentClusterSummary): Distribution stats across clusters
 - **top_clusters_by_min_padj** (list[PathwayEnrichmentTopCluster]): Top 5 clusters by smallest p_adjust
-- **top_pathways_by_padj** (list[PathwayEnrichmentTopPathway]): Pathways ranked by p_adjust ascending across all clusters. Capped to the first 10 on detail calls; summary=True returns the full ranked list.
-- **top_pathways_by_padj_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
+- **top_pathways_by_padj** (list[PathwayEnrichmentTopPathway]): Top 10 pathways ranked by p_adjust ascending across all clusters — a genuine top-10 in both summary and detail calls (unlike `by_experiment`, `summary=True` does not expand this list).
 - **not_found** (list[string]): Requested experiment_ids absent from KG
 - **not_matched** (list[string]): Experiment IDs found but wrong organism
 - **no_expression** (list[string]): Experiments matching organism but with no DE rows
@@ -401,7 +400,6 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
     },
     ...
   ],
-  "top_pathways_by_padj_truncated": true,
   "not_found": [],
   "not_matched": [],
   "no_expression": [],
@@ -696,7 +694,6 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
     },
     ...
   ],
-  "top_pathways_by_padj_truncated": null,
   "not_found": [],
   "not_matched": [],
   "no_expression": [],
@@ -932,7 +929,6 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
     },
     ...
   ],
-  "top_pathways_by_padj_truncated": null,
   "not_found": [],
   "not_matched": [],
   "no_expression": [],

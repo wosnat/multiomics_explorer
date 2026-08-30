@@ -210,7 +210,6 @@ examples:
           },
           ...
         ],
-        "top_pathways_by_padj_truncated": true,
         "not_found": [],
         "not_matched": [],
         "no_expression": [],
@@ -500,7 +499,6 @@ examples:
           },
           ...
         ],
-        "top_pathways_by_padj_truncated": null,
         "not_found": [],
         "not_matched": [],
         "no_expression": [],
@@ -730,7 +728,6 @@ examples:
           },
           ...
         ],
-        "top_pathways_by_padj_truncated": null,
         "not_found": [],
         "not_matched": [],
         "no_expression": [],

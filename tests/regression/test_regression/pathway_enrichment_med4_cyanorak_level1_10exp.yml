@@ -86896,7 +86896,6 @@ top_pathways_by_padj:
   signed_score: 4.336816140134432
   term_id: cyanorak.role:Q.1
   term_name: Transport and binding proteins > Amino acids, peptides and amines
-top_pathways_by_padj_truncated: true
 total_matching: 2342
 truncated: false
 trust_axes:

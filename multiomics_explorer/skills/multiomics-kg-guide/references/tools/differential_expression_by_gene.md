@@ -171,73 +171,48 @@ differential_expression_by_gene(organism="MED4", summary=True)
   "experiments": [
     {
       "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture",
-      "experiment_name": null,
       "treatment_type": ["nitrogen"],
-      "background_factors": null,
       "omics_type": "RNASEQ",
-      "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
-      "table_scope_detail": null,
       "matching_genes": 1849,
-      "rows_by_status": {"significant_up": 553, "significant_down": 834, "not_significant": 7858},
-      "timepoints": null
+      "rows_by_status": {"significant_up": 553, "significant_down": 834, "not_significant": 7858}
     },
     {
       "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
-      "experiment_name": null,
       "treatment_type": ["nitrogen"],
-      "background_factors": null,
       "omics_type": "RNASEQ",
-      "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
-      "table_scope_detail": null,
       "matching_genes": 1849,
-      "rows_by_status": {"significant_up": 602, "significant_down": 640, "not_significant": 2456},
-      "timepoints": null
+      "rows_by_status": {"significant_up": 602, "significant_down": 640, "not_significant": 2456}
     },
     {
       "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic",
-      "experiment_name": null,
       "treatment_type": ["nitrogen"],
-      "background_factors": null,
       "omics_type": "PROTEOMICS",
-      "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
-      "table_scope_detail": null,
       "matching_genes": 1424,
-      "rows_by_status": {"significant_up": 599, "significant_down": 556, "not_significant": 3117},
-      "timepoints": null
+      "rows_by_status": {"significant_up": 599, "significant_down": 556, "not_significant": 3117}
     },
     {
       "experiment_id": "10.64898/2026.04.15.718746_extended_darkness_med4",
-      "experiment_name": null,
       "treatment_type": ["darkness"],
-      "background_factors": null,
       "omics_type": "RNASEQ",
-      "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
-      "table_scope_detail": null,
       "matching_genes": 1876,
-      "rows_by_status": {"significant_up": 556, "significant_down": 469, "not_significant": 2727},
-      "timepoints": null
+      "rows_by_status": {"significant_up": 556, "significant_down": 469, "not_significant": 2727}
     },
     {
       "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture",
-      "experiment_name": null,
       "treatment_type": ["nitrogen"],
-      "background_factors": null,
       "omics_type": "PROTEOMICS",
-      "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
-      "table_scope_detail": null,
       "matching_genes": 1424,
-      "rows_by_status": {"significant_up": 609, "significant_down": 394, "not_significant": 6117},
-      "timepoints": null
+      "rows_by_status": {"significant_up": 609, "significant_down": 394, "not_significant": 6117}
     },
     ...
   ],
@@ -294,17 +269,12 @@ differential_expression_by_gene(locus_tags=["ACZ81_01830", "ACZ81_15555"], exper
   "experiments": [
     {
       "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic",
-      "experiment_name": null,
       "treatment_type": ["nitrogen"],
-      "background_factors": null,
       "omics_type": "RNASEQ",
-      "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
-      "table_scope_detail": null,
       "matching_genes": 2,
-      "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 4},
-      "timepoints": null
+      "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 4}
     }
   ],
   "experiments_truncated": null,

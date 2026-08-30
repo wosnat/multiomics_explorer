@@ -1132,16 +1132,16 @@ def _envelope_top_clusters(df, inputs, top_n=5):
     return out
 
 
-def _envelope_top_pathways(df):
-    """Every tested (cluster, term) row ranked by p_adjust ascending (most
-    significant first). Full list — `to_envelope` caps it to the top 10 on
-    detail calls via `_cap_breakdowns`; `summary=True` keeps the full ranking.
+def _envelope_top_pathways(df, top_n=10):
+    """Top-N (cluster, term) rows ranked by p_adjust ascending (most
+    significant first) — a genuine top-N in both modes; `summary=True` does
+    NOT expand this list (unlike `by_experiment`, which does).
     """
     if df.empty:
         return []
     ranked = df.sort_values(
         ["p_adjust", "cluster", "term_id"], ascending=True
-    )
+    ).head(top_n)
     return [
         {
             "cluster": r["cluster"],
@@ -1495,11 +1495,12 @@ class EnrichmentResult:
         n_tests``) even when ``total_matching`` itself has been narrowed to
         the significant subset.
 
-        ``by_experiment`` (sorted desc by ``n_significant``) and
-        ``top_pathways_by_padj`` (already ranked by ``p_adjust`` ascending)
-        are capped to the first 10 entries with a sparse
-        ``{key}_truncated=True`` flag when either exceeds that;
-        ``summary=True`` returns each list in full.
+        ``by_experiment`` (sorted desc by ``n_significant``) is capped to the
+        first 10 entries with a sparse ``by_experiment_truncated=True`` flag
+        when it exceeds that; ``summary=True`` returns it in full.
+        ``top_pathways_by_padj`` (already ranked by ``p_adjust`` ascending) is
+        always a genuine top-10 — in BOTH modes — via ``_envelope_top_pathways``
+        itself, so it carries no ``_truncated`` companion key.
         """
         # Lazy import: avoids a module-level cycle with api/functions.py,
         # which lazily imports this module inside pathway_enrichment /
@@ -1508,7 +1509,7 @@ class EnrichmentResult:
 
         env = self.generate_summary()
         env = _cap_breakdowns(
-            env, ("top_pathways_by_padj", "by_experiment"), summary=summary,
+            env, ("by_experiment",), summary=summary,
         )
         params = getattr(self, "params", None) or {}
         env["filters_applied"] = dict(params.get("filters_applied") or {})

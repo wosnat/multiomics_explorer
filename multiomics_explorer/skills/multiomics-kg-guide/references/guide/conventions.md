@@ -70,21 +70,29 @@ Envelope rollup lists (`by_*`, `top_*`) that can grow past a handful of
 entries are capped to the **first 10** on a detail call (`summary=False`,
 the default) — the list is sorted desc by its ranking count first, so the
 10 that survive are the 10 that matter. When a cap actually trims a list,
-a sparse sibling key `<key>_truncated: true` appears next to it; the key is
-absent (not `false`) when the list was already ≤10 entries, so goldens and
-examples only change where a list genuinely exceeded the cap.
+a sparse sibling key `<key>_truncated` appears next to it: `<key>_truncated`
+is `true` when capped; otherwise absent in Python / `null` over MCP (the
+Pydantic response model declares every `Optional` field, so FastMCP's wire
+format fills the unset key with `null` — it is never simply missing on the
+wire the way it is in the Python dict). The list was already ≤10 entries
+when the key is absent/null, so goldens and examples only change where a
+list genuinely exceeded the cap.
 `summary=True` always returns the **full, uncapped** list — read it first
 when you need the whole ranking (e.g. every organism's chemistry capability,
 not just the top 10). Affected: `list_experiments` / `list_organisms`
-/ `list_publications` (`by_organism`, `by_metric_type`, `by_publication`,
-`top_annotation_capability`, `top_metabolic_capability`, …), `resolve_gene`
-/ `genes_by_function` (`by_organism`), `genes_by_metabolite` /
-`metabolites_by_gene` (`top_genes`, `top_reactions`, `top_tcdb_families`,
-`top_metabolite_pathways`, `by_element`), `differential_expression_by_gene`
-(`experiments`), and `pathway_enrichment` (`by_experiment`,
-`top_pathways_by_padj`). `resolve_gene` and `list_publications` have no
-`summary=` param, so their `by_organism` rollup is always capped when it
-exceeds 10.
+(`by_organism`, `by_metric_type`, `by_publication`, `by_treatment_type`,
+`by_background_factors`, `top_annotation_capability`,
+`top_metabolic_capability`, …), `genes_by_function` (`by_organism`),
+`genes_by_metabolite` / `metabolites_by_gene` (`top_genes`, `top_reactions`,
+`top_tcdb_families`, `top_metabolite_pathways`, `by_element`),
+`differential_expression_by_gene` / `differential_expression_by_ortholog`
+(`experiments`), and `pathway_enrichment` (`by_experiment`). `resolve_gene`
+and `list_publications` have no `summary=` param, so their capped rollups
+(`by_organism`; `by_organism` and `by_metric_type` respectively) are always
+capped when they exceed 10 — page `results`, or use `list_organisms` /
+`list_experiments(summary=True)` for the full breakdown.
+`pathway_enrichment`'s `top_pathways_by_padj` is a genuine top-10 in both
+modes (not capped-with-a-flag): it carries no `_truncated` companion key.
 
 ### `summary=True` mode
 

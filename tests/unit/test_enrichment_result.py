@@ -775,11 +775,14 @@ class TestToEnvelopeIncludeNonsignificant:
 
 
 class TestToEnvelopeBreakdownCaps:
-    """llm-review 2b.2 Task 4: `by_experiment` / `top_pathways_by_padj` on the
-    pathway-kind envelope are capped to 10 entries on detail calls (with a
-    sparse `<key>_truncated=True` flag) and returned in full on
-    `summary=True`. `cluster_enrichment` (kind='cluster') doesn't carry
-    either key, so it's unaffected — no test needed there."""
+    """llm-review 2b.2 Task 4: `by_experiment` on the pathway-kind envelope
+    is capped to 10 entries on detail calls (with a sparse
+    `by_experiment_truncated=True` flag) and returned in full on
+    `summary=True`. `top_pathways_by_padj` is different (llm-review 2b final
+    review, I1): it is a genuine top-10 in BOTH modes, with no `_truncated`
+    companion key — `summary=True` does not expand it.
+    `cluster_enrichment` (kind='cluster') doesn't carry either key, so it's
+    unaffected — no test needed there."""
 
     @staticmethod
     def _build_pathway_result(n=12):
@@ -831,15 +834,20 @@ class TestToEnvelopeBreakdownCaps:
         result = self._build_pathway_result(12)
         env = result.to_envelope(limit=0)
         assert len(env["top_pathways_by_padj"]) == 10
-        assert env["top_pathways_by_padj_truncated"] is True
+        assert "top_pathways_by_padj_truncated" not in env
         # Most significant (lowest p_adjust) survives the cap.
         assert env["top_pathways_by_padj"][0]["term_id"] == "go:0000"
 
-    def test_top_pathways_by_padj_full_list_on_summary_true(self):
+    def test_top_pathways_by_padj_still_capped_on_summary_true(self):
+        """I1 (llm-review 2b final review): unlike `by_experiment`,
+        `top_pathways_by_padj` is a genuine top-10 in BOTH modes —
+        `summary=True` must NOT expand it to the full ranked frame."""
         result = self._build_pathway_result(12)
         env = result.to_envelope(summary=True)
-        assert len(env["top_pathways_by_padj"]) == 12
+        assert len(env["top_pathways_by_padj"]) <= 10
+        assert len(env["top_pathways_by_padj"]) == 10
         assert "top_pathways_by_padj_truncated" not in env
+        assert env["top_pathways_by_padj"][0]["term_id"] == "go:0000"
 
     def test_by_experiment_capped_and_sorted_desc_by_n_significant(self):
         result = self._build_pathway_result(12)

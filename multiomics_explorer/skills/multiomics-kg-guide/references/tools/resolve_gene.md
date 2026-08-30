@@ -27,7 +27,7 @@ total_matching, by_organism, returned, offset, truncated, results
 
 - **total_matching** (int): Total genes matching identifier + organism filter.
 - **by_organism** (list[ResolveOrganismBreakdown]): Match counts per organism, sorted desc.
-- **by_organism_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
+- **by_organism_truncated** (bool | None): True when the list was capped at 10 — page `results` with `limit`/`offset`, or pass `organism=` to narrow the match.
 - **returned** (int): Genes in this response.
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if total_matching > returned.

@@ -1620,11 +1620,81 @@ def tool_fns():
     return {t.name: asyncio.run(mcp.get_tool(t.name)).fn for t in tools}
 
 
+@pytest.fixture
+def mcp_client(conn):
+    """In-memory fastmcp.Client bound to a FastMCP app with the real
+    GraphConnection injected via lifespan — exercises the actual MCP wire
+    serialization (SparseRow model_serializer included), unlike `tool_fns`
+    which returns the raw Pydantic object."""
+    from contextlib import asynccontextmanager
+    from dataclasses import dataclass
+
+    from fastmcp import Client
+
+    @dataclass
+    class _LifespanContext:
+        conn: object
+
+    @asynccontextmanager
+    async def lifespan(server):
+        yield _LifespanContext(conn=conn)
+
+    app = FastMCP("test-client", lifespan=lifespan)
+    register_tools(app)
+    return Client(app)
+
+
 def _ctx_with_conn(conn):
     """Build an AsyncMock Context with the real GraphConnection injected."""
     ctx = AsyncMock()
     ctx.request_context.lifespan_context.conn = conn
     return ctx
+
+
+@pytest.mark.kg
+class TestExpressionByExperimentSparse:
+    """I2 (llm-review 2b final review): ExpressionByExperiment is a
+    SparseRow so a compact entry's verbose-only keys (timepoints,
+    experiment_name, background_factors, coculture_partner,
+    table_scope_detail) are absent on the wire, not null. Verified through
+    the real fastmcp.Client wire path (structured_content), not just the
+    Python object, since the sparse behavior lives in the model_serializer
+    that only fires on serialization."""
+
+    _VERBOSE_ONLY_KEYS = {
+        "timepoints", "experiment_name", "background_factors",
+        "coculture_partner", "table_scope_detail",
+    }
+
+    @pytest.mark.asyncio
+    async def test_compact_entry_omits_verbose_only_keys(self, mcp_client):
+        async with mcp_client as client:
+            result = await client.call_tool(
+                "differential_expression_by_gene",
+                {"organism": "MED4", "limit": 5},
+            )
+        experiments = result.structured_content["experiments"]
+        assert experiments, "expected ≥1 experiment entry for MED4"
+        for entry in experiments:
+            assert not (self._VERBOSE_ONLY_KEYS & entry.keys()), (
+                f"compact entry carried verbose-only keys: "
+                f"{self._VERBOSE_ONLY_KEYS & entry.keys()}"
+            )
+
+    @pytest.mark.asyncio
+    async def test_verbose_entry_carries_the_keys(self, mcp_client):
+        async with mcp_client as client:
+            result = await client.call_tool(
+                "differential_expression_by_gene",
+                {"organism": "MED4", "limit": 5, "verbose": True},
+            )
+        experiments = result.structured_content["experiments"]
+        assert experiments, "expected ≥1 experiment entry for MED4"
+        for entry in experiments:
+            assert self._VERBOSE_ONLY_KEYS <= entry.keys(), (
+                f"verbose entry missing keys: "
+                f"{self._VERBOSE_ONLY_KEYS - entry.keys()}"
+            )
 
 
 # ---------------------------------------------------------------------------

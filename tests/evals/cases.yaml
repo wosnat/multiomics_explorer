@@ -1067,8 +1067,7 @@
   tool: genes_by_numeric_metric
   desc: |
     damping_ratio top-decile drill-down (single rankable DM, MED4).
-    value_kind/rankable moved behind verbose (llm-review 2b.2 Task 5,
-    parent-constant — also in `by_metric`).
+    value_kind/rankable moved behind verbose (parent-constant — also in `by_metric`).
   params:
     metric_types: ["damping_ratio"]
     bucket: ["top_decile"]
@@ -1085,7 +1084,7 @@
   tool: genes_by_numeric_metric
   desc: |
     Mixed rankable + non-rankable selection; bucket filter soft-excludes.
-    rankable moved behind verbose (llm-review 2b.2 Task 5).
+    rankable moved behind verbose.
   params:
     metric_types: ["damping_ratio", "peak_time_protein_h"]
     bucket: ["top_decile"]
@@ -1101,8 +1100,7 @@
   tool: genes_by_numeric_metric
   desc: |
     Cross-organism cell_abundance_biovolume_normalized (no organism scope).
-    organism_name moved behind verbose (llm-review 2b.2 Task 5, parent-
-    constant — also in `by_organism`).
+    organism_name moved behind verbose (parent-constant — also in `by_organism`).
   params:
     metric_types: ["cell_abundance_biovolume_normalized"]
     bucket: ["top_quartile"]
@@ -1132,8 +1130,7 @@
   tool: genes_by_boolean_metric
   desc: |
     Vesicle proteome members across MED4 and MIT9313 (cross-organism).
-    organism_name/value_kind moved behind verbose (llm-review 2b.2 Task 5,
-    parent-constant — also in `by_organism` / `by_metric`).
+    organism_name/value_kind moved behind verbose (parent-constant — also in `by_organism` / `by_metric`).
   params:
     metric_types: ["vesicle_proteome_member"]
     limit: 200
@@ -1149,7 +1146,7 @@
   tool: genes_by_boolean_metric
   desc: |
     NATL2A periodic_in_coculture_LD organism-scoped drill-down.
-    organism_name moved behind verbose (llm-review 2b.2 Task 5).
+    organism_name moved behind verbose.
   params:
     metric_types: ["periodic_in_coculture_LD"]
     organism: "NATL2A"
@@ -1179,7 +1176,7 @@
   tool: genes_by_categorical_metric
   desc: |
     PSORTb outer-membrane / periplasmic vesicle proteins. organism_name
-    moved behind verbose (llm-review 2b.2 Task 5, parent-constant — also
+    moved behind verbose (parent-constant — also
     in `by_organism`).
   params:
     metric_types: ["predicted_subcellular_localization"]
@@ -1196,7 +1193,7 @@
   tool: genes_by_categorical_metric
   desc: |
     NATL2A darkness_survival_class drill-down (single categorical DM).
-    organism_name moved behind verbose (llm-review 2b.2 Task 5).
+    organism_name moved behind verbose.
   params:
     metric_types: ["darkness_survival_class"]
     limit: 25
