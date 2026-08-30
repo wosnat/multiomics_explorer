@@ -3658,11 +3658,11 @@ _VALID_DIRECTIONS_BY_GENE = {"up", "down", "both"}
 _VALID_DIRECTIONS_BY_ORTHOLOG = {"up", "down"}
 
 # Per-experiment fields kept when verbose=False. Dropped fields
-# (experiment_name, background_factors, omics_type, coculture_partner,
+# (experiment_name, background_factors, coculture_partner,
 # table_scope_detail, timepoints) are restored only with verbose=True.
 _DE_EXPERIMENT_COMPACT_KEYS = (
     "experiment_id", "treatment_type", "table_scope",
-    "is_time_course", "matching_genes", "rows_by_status",
+    "is_time_course", "matching_genes", "rows_by_status", "omics_type",
 )
 
 
@@ -3821,9 +3821,10 @@ def differential_expression_by_gene(
         before any trimming (currently identical to experiment_count — no
         experiment-list cap exists on this tool). Each experiment entry in
         `experiments` is compact by default ({experiment_id, treatment_type,
-        table_scope, is_time_course, matching_genes, rows_by_status});
-        verbose=True restores experiment_name, background_factors,
-        omics_type, coculture_partner, table_scope_detail, timepoints.
+        table_scope, is_time_course, matching_genes, rows_by_status,
+        omics_type}); verbose=True restores experiment_name,
+        background_factors, coculture_partner, table_scope_detail,
+        timepoints.
 
     growth_phases: if provided, restricts DE rows to those whose edge-level
     growth_phase property matches any of the specified values (case-insensitive).

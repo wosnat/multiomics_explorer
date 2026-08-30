@@ -66,7 +66,7 @@ examples:
             "experiment_name": null,
             "treatment_type": ["nitrogen"],
             "background_factors": null,
-            "omics_type": null,
+            "omics_type": "RNASEQ",
             "coculture_partner": null,
             "is_time_course": "time_course",
             "table_scope": "all_detected_genes",
@@ -80,7 +80,7 @@ examples:
             "experiment_name": null,
             "treatment_type": ["nitrogen"],
             "background_factors": null,
-            "omics_type": null,
+            "omics_type": "RNASEQ",
             "coculture_partner": null,
             "is_time_course": "time_course",
             "table_scope": "all_detected_genes",
@@ -94,7 +94,7 @@ examples:
             "experiment_name": null,
             "treatment_type": ["nitrogen"],
             "background_factors": null,
-            "omics_type": null,
+            "omics_type": "PROTEOMICS",
             "coculture_partner": null,
             "is_time_course": "time_course",
             "table_scope": "all_detected_genes",
@@ -108,7 +108,7 @@ examples:
             "experiment_name": null,
             "treatment_type": ["darkness"],
             "background_factors": null,
-            "omics_type": null,
+            "omics_type": "RNASEQ",
             "coculture_partner": null,
             "is_time_course": "time_course",
             "table_scope": "all_detected_genes",
@@ -122,7 +122,7 @@ examples:
             "experiment_name": null,
             "treatment_type": ["nitrogen"],
             "background_factors": null,
-            "omics_type": null,
+            "omics_type": "PROTEOMICS",
             "coculture_partner": null,
             "is_time_course": "time_course",
             "table_scope": "all_detected_genes",
@@ -177,7 +177,7 @@ examples:
             "experiment_name": null,
             "treatment_type": ["nitrogen"],
             "background_factors": null,
-            "omics_type": null,
+            "omics_type": "RNASEQ",
             "coculture_partner": null,
             "is_time_course": "time_course",
             "table_scope": "all_detected_genes",
@@ -318,6 +318,7 @@ chaining:
   - "genes_by_ontology → differential_expression_by_gene"
   - "gene_overview → differential_expression_by_gene (check expression_edge_count first)"
   - "list_experiments → differential_expression_by_gene (filter by table_scope there, pass experiment_ids)"
+  - "differential_expression_by_gene → list_experiments(experiment_ids=[...]) to get the partner organism of a coculture experiment — `coculture_partner` is verbose-only in the compact experiments[] envelope"
 
 mistakes:
   - wrong: "Interpreting absence of a row as 'no change' when truncated=true"
@@ -344,4 +345,4 @@ mistakes:
   - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"
   - "For cross-experiment summarization (which treatments does this gene set respond to?) see `docs://guide/python_api` (Cross-experiment summarization — `response_matrix` for gene × treatment pivots, `gene_set_compare` for two-set overlap). For pathway-level interpretation chain to `pathway_enrichment` (`docs://analysis/enrichment`)."
   - wrong: "Expecting per-timepoint counts, experiment_name, or table_scope_detail inside `experiments[]` from a plain call"
-    right: "`summary=True` (and every call by default) is the cheap landscape — each `experiments[]` entry is compact (experiment_id, treatment_type, table_scope, is_time_course, matching_genes, rows_by_status). Per-timepoint counts and the other experiment metadata need `verbose=True`."
+    right: "`summary=True` (and every call by default) is the cheap landscape — each `experiments[]` entry is compact (experiment_id, treatment_type, table_scope, is_time_course, matching_genes, rows_by_status, omics_type). Per-timepoint counts and the other experiment metadata (experiment_name, background_factors, coculture_partner, table_scope_detail) need `verbose=True`."

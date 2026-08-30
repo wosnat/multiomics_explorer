@@ -4195,10 +4195,10 @@ def register_tools(mcp: FastMCP):
             default=None,
             description="Background experimental factors. Verbose only.",
         )
-        omics_type: str | None = Field(
-            default=None,
+        omics_type: str = Field(
             description="Omics type (e.g. 'RNASEQ', 'PROTEOMICS')."
-            " Verbose only.",
+            " Always present — cheap to keep, and needed to distinguish"
+            " RNASEQ vs PROTEOMICS entries in a compact call.",
         )
         coculture_partner: str | None = Field(
             default=None,
@@ -4406,10 +4406,10 @@ def register_tools(mcp: FastMCP):
         experiments: list[ExpressionByExperiment] = Field(
             description="Per-experiment summary, sorted by significant row"
             " count desc. Compact by default (experiment_id, treatment_type,"
-            " table_scope, is_time_course, matching_genes, rows_by_status);"
-            " verbose=True restores experiment_name, background_factors,"
-            " omics_type, coculture_partner, table_scope_detail, and the"
-            " nested per-timepoint breakdown.",
+            " table_scope, is_time_course, matching_genes, rows_by_status,"
+            " omics_type); verbose=True restores experiment_name,"
+            " background_factors, coculture_partner, table_scope_detail,"
+            " and the nested per-timepoint breakdown.",
         )
         not_found: list[str] = Field(
             default_factory=list,

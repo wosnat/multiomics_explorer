@@ -3081,11 +3081,13 @@ class TestDifferentialExpressionByGeneWrapper:
     async def test_compact_experiment_validates_without_dropped_fields(
         self, tool_fns, mock_ctx,
     ):
-        """(llm-review 2b.2) A compact api-layer experiment dict (as
-        produced with verbose=False — no experiment_name / background_factors
-        / omics_type / coculture_partner / table_scope_detail / timepoints
-        keys) still validates against ExpressionByExperiment, and those
-        fields render as None."""
+        """(llm-review 2b.2, controller ruling) A compact api-layer
+        experiment dict (as produced with verbose=False — no
+        experiment_name / background_factors / coculture_partner /
+        table_scope_detail / timepoints keys, but omics_type present —
+        the compact set is 7 keys) still validates against
+        ExpressionByExperiment, and the dropped fields render as None
+        while omics_type carries its real value."""
         data = {
             **self._SAMPLE_API_RETURN,
             "experiments": [
@@ -3100,6 +3102,7 @@ class TestDifferentialExpressionByGeneWrapper:
                         "significant_down": 0,
                         "not_significant": 12,
                     },
+                    "omics_type": "RNASEQ",
                 },
             ],
         }
@@ -3112,10 +3115,10 @@ class TestDifferentialExpressionByGeneWrapper:
             )
         exp = result.experiments[0]
         assert exp.experiment_id == "exp1"
+        assert exp.omics_type == "RNASEQ"
         assert exp.timepoints is None
         assert exp.experiment_name is None
         assert exp.background_factors is None
-        assert exp.omics_type is None
         assert exp.coculture_partner is None
         assert exp.table_scope_detail is None
 

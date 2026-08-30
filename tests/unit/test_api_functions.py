@@ -3405,8 +3405,10 @@ class TestDifferentialExpressionByGene:
         }]
 
     def test_compact_experiments_drop_verbose_fields_by_default(self, mock_conn):
-        """(llm-review 2b.2) Compact experiments[] entries carry only the six
-        always-present keys; n_experiments counts before any trimming."""
+        """(llm-review 2b.2, controller ruling) Compact experiments[]
+        entries carry the seven always-present keys (including omics_type
+        — cheap and needed to distinguish RNASEQ vs PROTEOMICS entries);
+        n_experiments counts before any trimming."""
         mock_conn.execute_query.side_effect = [
             self._organism_result(),
             self._global_summary(),
@@ -3422,13 +3424,17 @@ class TestDifferentialExpressionByGene:
             assert set(exp.keys()) == {
                 "experiment_id", "treatment_type", "table_scope",
                 "is_time_course", "matching_genes", "rows_by_status",
+                "omics_type",
             }
+            assert exp["omics_type"] == "RNASEQ"
             assert "timepoints" not in exp
             assert "experiment_name" not in exp
+            assert "coculture_partner" not in exp
 
     def test_verbose_experiments_restore_dropped_fields(self, mock_conn):
         """verbose=True restores experiment_name, background_factors,
-        omics_type, coculture_partner, table_scope_detail, timepoints."""
+        coculture_partner, table_scope_detail, timepoints (omics_type is
+        always present, compact or verbose — controller ruling)."""
         mock_conn.execute_query.side_effect = [
             self._organism_result(),
             self._global_summary(),
@@ -3446,6 +3452,7 @@ class TestDifferentialExpressionByGene:
             assert len(exp["timepoints"]) == 2
             assert exp["background_factors"] == ["axenic"]
             assert exp["omics_type"] == "RNASEQ"
+            assert exp["coculture_partner"] is None
             assert exp["table_scope_detail"] is None
 
 

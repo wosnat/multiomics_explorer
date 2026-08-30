@@ -60,7 +60,7 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 - **rows_by_growth_phase** (object): Row counts by growth phase. Growth phase is a timepoint-level condition, not gene-specific.
 - **by_table_scope** (object): Row counts by experiment table_scope (e.g. {'all_detected_genes': 100, 'significant_only': 50}). `all_detected_genes` keeps tested-absent (`not_significant`) rows; any other scope (`significant_only`, `significant_any_timepoint`, `filtered_subset`, `top_n`) collapses tested-absent with not-detected. Check before reading missing rows. See `docs://guide/conventions`.
 - **top_categories** (list[ExpressionTopCategory]): Top gene categories by significant gene count, max 5
-- **experiments** (list[ExpressionByExperiment]): Per-experiment summary, sorted by significant row count desc. Compact by default (experiment_id, treatment_type, table_scope, is_time_course, matching_genes, rows_by_status); verbose=True restores experiment_name, background_factors, omics_type, coculture_partner, table_scope_detail, and the nested per-timepoint breakdown.
+- **experiments** (list[ExpressionByExperiment]): Per-experiment summary, sorted by significant row count desc. Compact by default (experiment_id, treatment_type, table_scope, is_time_course, matching_genes, rows_by_status, omics_type); verbose=True restores experiment_name, background_factors, coculture_partner, table_scope_detail, and the nested per-timepoint breakdown.
 - **not_found** (list[string]): Input locus_tags not found in KG
 - **no_expression** (list[string]): Locus tags in KG with NO Changes_expression_of edge at all in the organism
 - **filtered_out** (list[string]): Locus tags that DO have expression edges but none survive the active direction / significant_only / growth_phases filters — e.g. a growth_phases vocabulary typo. Never confuse with no_expression.
@@ -173,7 +173,7 @@ differential_expression_by_gene(organism="MED4", summary=True)
       "experiment_name": null,
       "treatment_type": ["nitrogen"],
       "background_factors": null,
-      "omics_type": null,
+      "omics_type": "RNASEQ",
       "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
@@ -187,7 +187,7 @@ differential_expression_by_gene(organism="MED4", summary=True)
       "experiment_name": null,
       "treatment_type": ["nitrogen"],
       "background_factors": null,
-      "omics_type": null,
+      "omics_type": "RNASEQ",
       "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
@@ -201,7 +201,7 @@ differential_expression_by_gene(organism="MED4", summary=True)
       "experiment_name": null,
       "treatment_type": ["nitrogen"],
       "background_factors": null,
-      "omics_type": null,
+      "omics_type": "PROTEOMICS",
       "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
@@ -215,7 +215,7 @@ differential_expression_by_gene(organism="MED4", summary=True)
       "experiment_name": null,
       "treatment_type": ["darkness"],
       "background_factors": null,
-      "omics_type": null,
+      "omics_type": "RNASEQ",
       "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
@@ -229,7 +229,7 @@ differential_expression_by_gene(organism="MED4", summary=True)
       "experiment_name": null,
       "treatment_type": ["nitrogen"],
       "background_factors": null,
-      "omics_type": null,
+      "omics_type": "PROTEOMICS",
       "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
@@ -295,7 +295,7 @@ differential_expression_by_gene(locus_tags=["ACZ81_01830", "ACZ81_15555"], exper
       "experiment_name": null,
       "treatment_type": ["nitrogen"],
       "background_factors": null,
-      "omics_type": null,
+      "omics_type": "RNASEQ",
       "coculture_partner": null,
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
@@ -429,6 +429,7 @@ genes_by_function → differential_expression_by_gene
 genes_by_ontology → differential_expression_by_gene
 gene_overview → differential_expression_by_gene (check expression_edge_count first)
 list_experiments → differential_expression_by_gene (filter by table_scope there, pass experiment_ids)
+differential_expression_by_gene → list_experiments(experiment_ids=[...]) to get the partner organism of a coculture experiment — `coculture_partner` is verbose-only in the compact experiments[] envelope
 ```
 
 ## Common mistakes
@@ -512,7 +513,7 @@ Expecting per-timepoint counts, experiment_name, or table_scope_detail inside `e
 ```
 
 ```correction
-`summary=True` (and every call by default) is the cheap landscape — each `experiments[]` entry is compact (experiment_id, treatment_type, table_scope, is_time_course, matching_genes, rows_by_status). Per-timepoint counts and the other experiment metadata need `verbose=True`.
+`summary=True` (and every call by default) is the cheap landscape — each `experiments[]` entry is compact (experiment_id, treatment_type, table_scope, is_time_course, matching_genes, rows_by_status, omics_type). Per-timepoint counts and the other experiment metadata (experiment_name, background_factors, coculture_partner, table_scope_detail) need `verbose=True`.
 ```
 
 ## Package import equivalent
