@@ -2,25 +2,12 @@
 
 ## What it does
 
-Find differential-expression rows framed by ortholog group —
-one row per (group × experiment × timepoint), values are gene counts
-(members responding), not individual gene rows. Cross-organism by
-design. Results sorted by significant gene count.
+DE framed by ortholog group across organisms — one row per group × experiment × timepoint, values are member gene counts per status.
 
-Each list input (`group_ids`, `organisms`, `experiment_ids`) reports
-both `not_found` (input absent from KG) and `not_matched` (in KG but
-no expression after filters). Tested-absent semantics depend on the
-parent experiment's `table_scope` — `all_detected_genes` keeps
-`not_significant` rows; any other scope (`significant_only`,
-`significant_any_timepoint`, `filtered_subset`, `top_n`) collapses
-tested-absent with not-detected. See `docs://guide/conventions`.
-
-Routing: discover groups via `search_homolog_groups`; group membership
-without expression via `genes_by_homolog_group`; per-gene drill-down
-via `differential_expression_by_gene`.
-
-Each `organisms` entry is OR-matched (word-based); a genus word
-(e.g. 'Alteromonas') matches every strain in that genus.
+Use to compare a group's response across strains; per-gene detail is `differential_expression_by_gene`, membership `genes_by_homolog_group`.
+Filters: group_ids, organisms, experiment_ids, direction, significant_only, growth_phases.
+Returns: by_organism, rows_by_status, by_table_scope, top_groups, a not_found / not_matched pair per input; one row = group × experiment × timepoint.
+docs://tools/differential_expression_by_ortholog; summary=True first.
 
 ## Parameters
 
@@ -160,6 +147,8 @@ differential_expression_by_ortholog → genes_by_homolog_group(organisms=[...]) 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
 - For cross-experiment summarization patterns see `docs://guide/python_api` (Cross-experiment summarization — covers `response_matrix` for gene × treatment-group pivots and `gene_set_compare` for two-set comparisons).
+
+- Each `organisms` entry is OR-matched word-by-word against preferred_name + name_synonyms, so a genus word (e.g. 'Alteromonas') matches every strain in that genus.
 
 ## Package import equivalent
 

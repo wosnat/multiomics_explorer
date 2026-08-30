@@ -1040,3 +1040,5 @@ mistakes:
     right: "resolve_gene(identifier='PMM0845')  # use resolve_gene for gene lookups"
   - wrong: "search_ontology(search_text='*', ontology=['merops'])  # trying to list everything"
     right: "search_ontology(ontology=['merops'], level=1)  # browse mode: omit search_text, narrow with level"
+  - "`informative_only` (default False here) drops terms the KG flags uninformative — ontology roots and catch-all KO terms, plus the KEGG global / overview maps. It is term-side only and never restricts the gene set. See docs://analysis/annotation_evidence."
+  - "`search_text` is Lucene: fuzzy `~`, wildcards `*`, quoted phrases and AND / OR are supported — see docs://guide/conventions for syntax and scoring."

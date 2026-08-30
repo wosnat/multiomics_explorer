@@ -2,17 +2,12 @@
 
 ## What it does
 
-Drill into ortholog group members — one row per (gene × group),
-per organism. Each list input (`group_ids`, `organisms`) reports
-both `not_found` (input absent from KG) and `not_matched` (in KG
-but no member after filters).
+Group IDs to their member genes per organism — one row per gene × group.
 
-Routing: group discovery via `search_homolog_groups`; gene → group
-direction via `gene_homologs`; cross-organism expression view via
-`differential_expression_by_ortholog`.
-
-A genus word in `organisms` (e.g. 'Alteromonas') matches every strain
-in that genus rather than raising ambiguous.
+Use to enumerate a group's members; for a gene's own groups use `gene_homologs`, for expression across organisms `differential_expression_by_ortholog`.
+Filters: group_ids, organisms.
+Returns: by_organism, top_categories, top_groups, genes-per-group stats, and a not_found / not_matched pair for each of groups and organisms; one row = (locus_tag, group_id).
+docs://tools/genes_by_homolog_group; summary=True first.
 
 ## Parameters
 
@@ -220,6 +215,8 @@ len(results)  # actual count
 ```correction
 response['total_matching']  # use total, not len
 ```
+
+- `organisms` entries are word-matched against preferred_name + name_synonyms, so a genus word (e.g. 'Alteromonas') matches every strain in that genus rather than raising ambiguous.
 
 ## Package import equivalent
 

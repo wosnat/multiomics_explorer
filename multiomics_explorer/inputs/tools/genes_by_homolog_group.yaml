@@ -122,3 +122,4 @@ mistakes:
     right: "search_homolog_groups(search_text='photosystem')  # search first, then use IDs"
   - wrong: "len(results)  # actual count"
     right: "response['total_matching']  # use total, not len"
+  - "`organisms` entries are word-matched against preferred_name + name_synonyms, so a genus word (e.g. 'Alteromonas') matches every strain in that genus rather than raising ambiguous."

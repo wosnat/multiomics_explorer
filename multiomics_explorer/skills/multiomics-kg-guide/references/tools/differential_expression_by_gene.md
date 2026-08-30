@@ -2,29 +2,12 @@
 
 ## What it does
 
-Find differential-expression rows for one organism — one row per
-(gene × experiment × timepoint), sorted by |log2FC|. Single-organism
-enforced; at least one of `organism` / `locus_tags` / `experiment_ids`
-is required. `expression_status` uses each experiment's publication-
-specific threshold (not a uniform padj<0.05 cutoff).
+DE rows for ONE organism (inferred from locus_tags / experiment_ids) — one row per gene × experiment × timepoint, sorted by |log2FC|.
 
-Tested-absent semantics depend on the parent experiment's
-`table_scope`: `all_detected_genes` keeps `not_significant` rows
-(real biology — gene tested but did not respond); any other scope
-(`significant_only`, `significant_any_timepoint`, `filtered_subset`,
-`top_n`) collapses tested-absent with not-detected. Always check
-`by_table_scope` (envelope) and the per-experiment `table_scope`
-before reading missing rows. See `docs://guide/conventions` for the
-full tested-absent framing.
-
-Routing: `summary=True` for counts-only landscape; per-gene drill-down
-to `gene_response_profile`; cross-organism via
-`differential_expression_by_ortholog`; pathway interpretation via
-`pathway_enrichment` (`docs://analysis/enrichment`).
-
-`growth_phases` is edge-level: an unknown value reports in the
-envelope `warnings`, and a gene with edges outside the requested
-phase(s) lands in `filtered_out`, not `no_expression`.
+Use for row-level fold changes and timepoint dynamics; a cross-experiment rollup is `gene_response_profile`, cross-organism `differential_expression_by_ortholog`.
+Filters: organism, locus_tags, experiment_ids, direction, significant_only, growth_phases.
+Returns: rows_by_status, by_table_scope, experiments, not_found, no_expression, filtered_out; one row = gene × experiment × timepoint.
+docs://tools/differential_expression_by_gene; summary=True first.
 
 ## Parameters
 

@@ -2,14 +2,12 @@
 
 ## What it does
 
-Search ortholog groups by text (Lucene over consensus_product,
-consensus_gene_name, description, functional_description). Returns
-group IDs for downstream use.
+Lucene search over ortholog groups (consensus product, consensus gene name, description).
 
-Routing: drill into member genes via `genes_by_homolog_group`;
-cross-organism expression view via
-`differential_expression_by_ortholog`. See `docs://guide/conventions`
-for Lucene scoring semantics.
+Use to find group IDs from text; for one gene's groups use `gene_homologs`, for member genes `genes_by_homolog_group`.
+Filters: search_text, source, taxonomic_level, max_specificity_rank, cyanorak_roles, cog_categories.
+Returns: by_source, by_level, score stats, top_cyanorak_roles, top_cog_categories; one row = one ortholog group.
+docs://tools/search_homolog_groups; summary=True first.
 
 ## Parameters
 
@@ -204,6 +202,8 @@ response['total_matching']  # use total, not len
 ```
 
 - Hyphens in search text are Lucene operators — use spaces instead (e.g. 'beta glycosyltransferase' not 'beta-glycosyltransferase')
+
+- `search_text` is Lucene — see docs://guide/conventions for syntax and scoring.
 
 ## Package import equivalent
 

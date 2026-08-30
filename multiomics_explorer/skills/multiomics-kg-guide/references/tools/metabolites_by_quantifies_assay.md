@@ -2,31 +2,12 @@
 
 ## What it does
 
-Drill into numeric MetaboliteAssay edges — one row per
-(metabolite × assay-edge). `value` (raw concentration /
-intensity) is always returned; `metric_bucket` /
-`metric_percentile` / `rank_by_metric` populated only on
-rankable-assay rows (mirrors `genes_by_numeric_metric`'s
-rankable gate). Rankable-gated filters raise if every selected
-assay has `rankable=false`, soft-exclude on mixed input. Tested-
-absent rows (`value=0` / `detection_status='not_detected'`) are
-real biology and kept by default. Cross-organism by design.
-Pre-flight via
-`list_metabolite_assays(value_kind='numeric', rankable=True)`. Bare /
-xref metabolite IDs are coerced to canonical (`resolved_aliases`;
-collisions expand + warn).
+Numeric MetaboliteAssay edges — one row per metabolite × assay edge with its value; cross-organism.
 
-Routing: drill across to `assays_by_metabolite(metabolite_ids=[...])`
-for the boolean-arm complement and the cross-organism reverse view,
-or `genes_by_metabolite(metabolite_ids=[...], organism=...)` for
-gene catalysts/transporters. See `docs://guide/conventions` for
-tested-absent semantics and `docs://analysis/metabolites` for
-the metabolomics decision tree.
-
-`organism` matches by case-insensitive CONTAINS (not word-match);
-cross-organism is the default. A `metabolite_ids` entry absent from
-the KG lands in `not_found.metabolite_ids`; one present but
-unmeasured by the selected assays contributes zero rows.
+Use for values, detection status and rankable cutoffs; pre-flight `list_metabolite_assays`; flags `metabolites_by_flags_assay`, both arms `assays_by_metabolite`.
+Filters: assay_ids, organism, metabolite_ids, min/max_value, detection_status, timepoint, metric_bucket, min/max_percentile, max_rank.
+Returns: by_detection_status, by_metric_bucket, by_assay, by_metric, excluded_assays; one row = one edge. Tested-absent rows kept.
+docs://tools/metabolites_by_quantifies_assay; summary=True first.
 
 ## Parameters
 
@@ -416,6 +397,10 @@ in the form you passed.
 ```
 
 - See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (about 70% of numeric edges are not_detected, kept by default).
+
+- `organism` here matches by case-insensitive CONTAINS, not the word-based match the gene tools use; cross-organism is the default.
+
+- A `metabolite_ids` entry absent from the KG lands in `not_found.metabolite_ids`; one that exists but is unmeasured by the selected assays simply contributes zero rows.
 
 ## Package import equivalent
 

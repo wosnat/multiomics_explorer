@@ -2,15 +2,12 @@
 
 ## What it does
 
-Drill into gene cluster members — one row per (gene × cluster).
-Provide `cluster_ids` OR `analysis_id` (mutually exclusive);
-passing an `analysis_id` returns every cluster's members in one
-call.
+Cluster members — one row per gene × cluster. Pass cluster_ids OR analysis_id (mutually exclusive); one organism is enforced even though organism is optional.
 
-Routing: analysis discovery via `list_clustering_analyses`; gene →
-cluster direction via `gene_clusters_by_gene`.
-
-Single organism is enforced even though `organism` is optional.
+Use for a module's full roster; for one gene's memberships use `gene_clusters_by_gene`, to find IDs `list_clustering_analyses`.
+Filters: cluster_ids, analysis_id, organism.
+Returns: analysis_name, by_cluster, top_categories, genes-per-cluster stats, not_found_clusters, not_matched_clusters, not_found_analysis; one row = (locus_tag, cluster_id).
+docs://tools/genes_in_cluster; summary=True first.
 
 ## Parameters
 

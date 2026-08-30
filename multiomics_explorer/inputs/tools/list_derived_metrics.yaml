@@ -83,3 +83,5 @@ mistakes:
     right: list_derived_metrics(rankable=True)
   - wrong: list_derived_metrics(organism="Prochlorococcus MED4 strain")
     right: list_derived_metrics(organism="MED4")
+  - "A genus word alone in `organism=` (e.g. 'Alteromonas') matches every strain in that genus rather than raising ambiguous."
+  - "`search_text` is Lucene — see docs://guide/conventions for syntax and scoring, and for the DM-family gating contract behind rankable / has_p_value / value_kind."

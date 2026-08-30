@@ -2,11 +2,12 @@
 
 ## What it does
 
-Return amino-acid sequences for a batch of genes, export-optimized for BLAST / HMMER / alignment. Set fasta=true for one multi-FASTA blob; sequence-length stats cover the full match (page-independent). not_found = locus_tag absent from KG; not_matched = gene exists but its sequence is null.
+Amino-acid sequences for a gene batch, export-shaped for BLAST / HMMER / alignment; the KG stores no nucleotide sequence.
 
-Routing: feed locus_tags from `resolve_gene` / `gene_overview` / `genes_by_function`; this is the terminal export step (pair with fasta=true for external tools).
-
-`limit` defaults to every input gene (min 25); pass an explicit number to page. `summary=True` is sugar for `limit=0`.
+Use as the terminal export step; for annotations use `gene_details`, for genomic context `gene_neighbors`.
+Filters: locus_tags, fasta.
+Returns: by_organism, sequence_length_stats, the fasta blob when fasta=True, not_found, not_matched (gene exists, sequence null); one row = (locus_tag, sequence, protein_id).
+docs://tools/gene_aa_sequence; summary=True first.
 
 ## Parameters
 
@@ -191,6 +192,8 @@ gene_overview → gene_aa_sequence (confirm identity, then pull the sequence)
 - sequence_length_stats and by_organism cover the full match, not just the returned page — they are stable across limit / offset. Page with `offset` to walk a large batch.
 
 - not_matched (gene exists but `sequence` is null, ~3% of genes — expression-only, no genome match) is distinct from not_found (locus_tag absent from the KG). See docs://guide/conventions.
+
+- `limit` defaults to every input gene (min 25) rather than a small page — pass an explicit number to page.
 
 ## Package import equivalent
 

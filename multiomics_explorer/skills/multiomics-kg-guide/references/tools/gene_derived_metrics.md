@@ -2,31 +2,12 @@
 
 ## What it does
 
-Look up DerivedMetric annotations for a gene batch — one row per
-(gene × DM), polymorphic `value` (float on numeric / `'flagged'`/`'not_flagged'`
-on boolean / category string on categorical). Numeric extras
-(`rank_by_metric`, `metric_percentile`, `metric_bucket`) populate only
-on rankable parent DMs; `adjusted_p_value` / `significant` only on
-has_p_value parent DMs (none in the current KG). Single-organism
-enforced.
+DerivedMetric annotations for a gene batch in ONE organism (inferred when omitted) — one row per gene × DM with a polymorphic value.
 
-Empty results are diagnosable via `not_found` (locus_tag absent from
-KG) and `not_matched` (in KG but no DM rows after filters — includes
-kind-mismatch when `value_kind` is set; `warnings` names the actual
-kind and the sibling `genes_by_<kind>_metric` tool when a requested
-`derived_metric_ids` / `metric_types` entry exists as a different
-kind). Pre-flight via `list_derived_metrics(value_kind=...)` to see
-which DMs touch your genes and whether they are rankable /
-has_p_value. See `docs://guide/conventions` for the full DM family
-gating contract.
-
-Routing: edge-level filters (bucket / percentile / rank / value
-thresholds) live on `genes_by_numeric_metric`; flag-level filters on
-`genes_by_boolean_metric`; category filters on
-`genes_by_categorical_metric`.
-
-`organism` is inferred from `locus_tags` when omitted.
-`summary=True` is sugar for `limit=0`.
+Use for a gene's whole DM profile; for edge-level filtering pivot to the `genes_by_{numeric,boolean,categorical}_metric` trio.
+Filters: locus_tags, organism, metric_types, value_kind, derived_metric_ids, plus the compartment / publication / condition filters.
+Returns: by_value_kind, by_metric_type, by_metric, genes_with_metrics, not_found, not_matched; one row = (locus_tag, derived_metric_id, value).
+docs://tools/gene_derived_metrics; summary=True first.
 
 ## Parameters
 

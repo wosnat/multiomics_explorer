@@ -2,34 +2,12 @@
 
 ## What it does
 
-Find (gene × term) pairs for an ontology, scoped by terms and/or level — term-anchored (start from terms, get genes); use `gene_ontology_terms` for the gene-anchored direction (start from locus_tags, get their terms).
+Gene × term pairs for ontology terms in ONE organism (term_ids expand down the hierarchy, level rolls up, both = scoped rollup).
 
-Three modes:
-- `term_ids` only — gene discovery by pathway (walk DOWN from each term).
-- `level` only — pathway definitions at level N (walk UP from leaves).
-- `level` + `term_ids` — scoped rollup (walk UP, restrict to given terms).
-
-Single-organism enforced. Default `limit=50` over MCP; the Python
-package defaults to unbounded (all rows), which
-`pathway_enrichment` / `cluster_enrichment` rely on for TERM2GENE.
-`min/max_gene_set_size` is organism-scoped (matches
-`ontology_landscape`).
-
-[TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
-`call_class` / `interpro_type` filter on the per-edge trust profile;
-defaults never filter. `informative_only` (default False) drops terms
-the KG flags uninformative — e.g. KEGG KO 'uncharacterized protein'
-terms, GO root go:0008150, KEGG global/overview maps like ko01100;
-term-side only, never restricts the gene set. See
-docs://analysis/annotation_evidence.
-
-Routing: pipe `results` into `pathway_enrichment` / `cluster_enrichment`
-as TERM2GENE; chain from `search_ontology` for term discovery;
-`gene_ontology_terms` for per-gene reverse lookup. For
-substrate-anchored TCDB / EC questions ("which genes transport / act
-on compound X?"), use `genes_by_metabolite` instead. See
-docs://guide/conventions for the hierarchy `level` and BRITE-tree
-conventions; docs://analysis/enrichment for the enrichment workflow.
+Use to build TERM2GENE or list a term's genes; for a gene's own annotations use `gene_ontology_terms`, for substrate-anchored TCDB / EC `genes_by_metabolite`.
+Filters: ontology, organism, term_ids, level, tree, min/max_gene_set_size, informative_only, trust filters.
+Returns: by_category, by_level, top_terms, trust rollups, not_found, wrong_ontology, wrong_level; one row = (locus_tag, term_id, evidence).
+docs://tools/genes_by_ontology; summary=True first.
 
 ## Parameters
 
@@ -1397,6 +1375,10 @@ response.total_genes  # distinct genes across all matches
 - `localization_score` / `signal_peptide_probability` are **edge** properties — they appear in rows only when querying their owner ontology. Other ontology queries omit those columns entirely (sparse-null stripping at the api layer).
 
 - PSORTb and SignalP are 1:1 (≤1 edge per gene). Don't expect multiple rows per gene for the same ontology. Some genes will have **no** edge (no confident call); those genes are absent from the result set entirely.
+
+- `informative_only` (default False here) drops terms the KG flags uninformative — ontology roots and catch-all KO terms, plus the KEGG global / overview maps. It is term-side only and never restricts the gene set. See docs://analysis/annotation_evidence.
+
+- `limit` defaults to 50 over MCP; the Python package defaults to unbounded (all rows), which `pathway_enrichment` / `cluster_enrichment` rely on for a complete TERM2GENE.
 
 ## Package import equivalent
 

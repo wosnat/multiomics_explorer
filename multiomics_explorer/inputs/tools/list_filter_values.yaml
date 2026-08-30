@@ -403,6 +403,7 @@ chaining:
   - "list_filter_values(filter_type='interpro_type') → genes_by_ontology(ontology='interpro', ...) / search_ontology(ontology='interpro', interpro_type=...) / pathway_enrichment(ontology='interpro', interpro_type=...)."
   - "list_filter_values(filter_type='call_class') → genes_by_ontology(ontology='merops', call_class=[...])."
   - "list_filter_values(filter_type='treatment_type') → list_experiments(treatment_type=[...]) / list_derived_metrics(treatment_type=[...]) / list_metabolite_assays(treatment_type=[...]) / list_clustering_analyses(treatment_type=[...]); same routing for filter_type='background_factors'."
+  - "list_filter_values(filter_type='growth_phase') → list_experiments(growth_phases=[...]) / list_derived_metrics(growth_phases=[...]) / differential_expression_by_gene(growth_phases=[...])"
 
 mistakes:
   - "Use filter_type='metric_type' to discover DerivedMetric tags before passing them to genes_by_{kind}_metric or list_derived_metrics. filter_type='value_kind' enumerates {numeric, boolean, categorical}. filter_type='compartment' enumerates wet-lab fractions (whole_cell, vesicle, exoproteome, ...)."

@@ -2,19 +2,12 @@
 
 ## What it does
 
-Summarize how each gene responds across experiments — one result
-per gene with `response_summary` keyed by treatment type (default)
-or experiment. Each entry reports experiments / timepoints tested,
-responded (up / down), plus rank and log2FC stats for significant
-rows. Sorted by response breadth (most groups first).
+Cross-experiment rollup for ONE organism (inferred from locus_tags) — one row per gene, responses bucketed per treatment group with timepoints collapsed, broadest first.
 
-Routing: drill into a specific experiment's temporal pattern via
-`differential_expression_by_gene(locus_tags=[...], experiment_ids=[id])`.
-See `docs://guide/conventions` for tested-absent semantics
-(`groups_tested_not_responded` vs `groups_not_known`).
-
-`organism` is optional and inferred from `locus_tags`; it only
-validates/scopes the inferred organism rather than driving the query.
+Use to see which treatments a gene set responds to; for log2FC per timepoint use `differential_expression_by_gene`.
+Filters: locus_tags, organism, treatment_type, background_factors, experiment_ids, group_by.
+Returns: genes_queried, genes_with_response, not_found, no_expression, filtered_out; one row = one gene with response_summary and groups_tested_not_responded.
+docs://tools/gene_response_profile.
 
 ## Parameters
 
@@ -327,7 +320,7 @@ gene_response_profile(locus_tags=["PMM0370", "PMM0920"])
 gene_response_profile(locus_tags=["PMM0370"], treatment_type=["nitrogen", "coculture"])
 ```
 
-*treatment_type values come from the live treatment_type vocabulary ('nitrogen', 'light', 'coculture', ...). An unknown value (e.g. 'Fe' instead of 'iron') now reports in the envelope `warnings`, and any gene whose edges exist but don't match the requested treatment_type lands in `filtered_out` — never in `no_expression` (reserved for a gene with no expression edges at all).*
+*treatment_type values come from the live treatment_type vocabulary ('nitrogen', 'light', 'coculture', ...). An unknown value (e.g. 'Fe' instead of 'iron') reports in the envelope `warnings`, and any gene whose edges exist but don't match the requested treatment_type lands in `filtered_out` — never in `no_expression` (reserved for a gene with no expression edges at all).*
 
 ### Example 3: Read the four group buckets (incl. groups_tested_not_responded)
 
@@ -516,7 +509,7 @@ Assuming groups_not_known means 'gene does not respond to this treatment'
 groups_not_known means no expression data exists — the gene was not profiled or not reported for that treatment. Check experiments_total in the response_summary for coverage. groups_tested_not_responded is the stronger 'absent but inferred-tested' bucket (all experiments in the group report a full-coverage scope).
 ```
 
-- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums. An unknown treatment_type value (e.g. 'Fe' instead of 'iron') now reports in the envelope `warnings` (e.g. "treatment_type value 'Fe' matched nothing — valid values: ... (list_filter_values(filter_type='treatment_type'))") — check `warnings` before trusting an empty or reduced result. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. Here the group keys of response_summary and the treatment_type filter use those values.
+- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums. An unknown treatment_type value (e.g. 'Fe' instead of 'iron') reports in the envelope `warnings` (e.g. "treatment_type value 'Fe' matched nothing — valid values: ... (list_filter_values(filter_type='treatment_type'))") — check `warnings` before trusting an empty or reduced result. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. Here the group keys of response_summary and the treatment_type filter use those values.
 
 ```mistake
 Assuming a treatment_type typo silently returns 0 rows with no signal

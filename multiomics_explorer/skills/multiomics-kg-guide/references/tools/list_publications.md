@@ -2,11 +2,12 @@
 
 ## What it does
 
-List publications with experiment summaries, DM rollups, and metabolomics rollups. Use as the discovery entry point for studies.
+Publications with experiment, DM, metabolomics and literature-index rollups.
 
-Routing: drill via `list_experiments(publication_dois=[doi])` for per-experiment detail; `list_clustering_analyses(publication_dois=[doi])` for clustering; `list_derived_metrics(publication_dois=[doi])` for non-DE evidence; `list_metabolite_assays(publication_dois=[doi])` when `metabolite_count > 0`. Per-row `derived_metric_value_kinds` routes to `genes_by_{numeric,boolean,categorical}_metric`.
-
-`publication_dois` combines with the other filters via AND; `not_found` in the response lists any provided DOIs that did not match — the same shape as `experiment_ids` on sibling `list_*` tools. `summary=True` returns every `by_*` rollup uncapped; call it first, then narrow filters. `compartment` keeps publications with at least one experiment in that compartment.
+Use as the study-level discovery entry point; for per-experiment detail use `list_experiments(publication_dois=[...])`, for the entities a paper names `discussed_by_publication`.
+Filters: organism, search_text, author, publication_dois, compartment, plus the condition filters.
+Returns: by_organism, by_treatment_type, by_omics_type, by_compartment, by_discusses_coverage, not_found; one row = one publication.
+docs://tools/list_publications; summary=True first.
 
 ## Parameters
 
@@ -749,6 +750,10 @@ list_experiments(publication='Biller 2018')
 ```correction
 list_publications(search_text='Biller') then list_experiments(publication_dois=['10.1038/...'])
 ```
+
+- `publication_dois` combines with the other filters via AND, and `not_found` lists any provided DOI that did not match — the same shape as `experiment_ids` on the sibling `list_*` tools.
+
+- `compartment` keeps publications with at least one experiment in that compartment — it is not a per-publication property. `summary=True` returns every `by_*` rollup uncapped, so call it first and then narrow filters.
 
 ## Package import equivalent
 

@@ -375,3 +375,4 @@ mistakes:
   - wrong: genes_by_boolean_metric(derived_metric_ids=['derived_metric:...:damping_ratio'])  # numeric DM
     right: genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])  # discover IDs via list_derived_metrics(value_kind='boolean') first
   - "See `docs://analysis/derived_metrics` for the DM family overview. Note: `flag_value=False` returns rows only on DMs that store `not_flagged` edges (11 of 27); metabolomics `metabolites_by_flags_assay` always stores both states."
+  - "`excluded_derived_metrics` is always `[]` here — no rankable / has_p_value gate applies to boolean DMs; it is kept for envelope-shape parity with `genes_by_numeric_metric`. `warnings` carries the closed-vocabulary, organism-existence, positive-only-flag and kind-mismatch notices instead."

@@ -2,9 +2,12 @@
 
 ## What it does
 
-Free-text search across gene names, products, and functional descriptions. Lucene syntax (see docs://guide/conventions). Results ranked by relevance score.
+Free-text Lucene search over gene names, products and functional descriptions, ranked by relevance score.
 
-Routing: feed `locus_tag`s into `gene_overview` (data-availability triage), `gene_ontology_terms` (annotation drill-down), or `genes_by_ontology` for ontology-anchored search instead. A genus word in `organism` (e.g. 'Alteromonas') matches every strain in that genus rather than raising ambiguous.
+Use when you have a description and no term ID; when the keyword maps to an ontology term use `search_ontology` then `genes_by_ontology`, for an exact identifier `resolve_gene`.
+Filters: search_text, organism, gene_categories, min_quality.
+Returns: total_search_hits, total_matching, by_organism, by_category, score stats; one row = one gene with its score.
+docs://tools/genes_by_function; summary=True first.
 
 ## Parameters
 
@@ -19,7 +22,7 @@ Routing: feed `locus_tag`s into `gene_overview` (data-availability triage), `gen
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
-**Discovery:** use `list_organisms` for valid organism names.
+**Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 
 ## Response format
 
@@ -224,6 +227,8 @@ genes_by_function(search_text='ABC transporter permease', organism='HOT1A3', gen
 - Use min_quality=2 to skip hypothetical proteins and get better-annotated results.
 
 - The organism filter is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works. A genus word alone ('Prochlorococcus') matches every strain of that genus. 'Meiothermus ruber' names two OrganismTaxon nodes (genome strain + gene-less treatment taxon) — only the genome strain has genes, so gene hits are unaffected.
+
+- `search_text` is Lucene: fuzzy `~`, wildcards `*`, quoted phrases and AND / OR are supported — see docs://guide/conventions for syntax and scoring.
 
 ## Package import equivalent
 

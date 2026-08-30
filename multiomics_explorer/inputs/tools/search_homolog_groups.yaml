@@ -117,3 +117,4 @@ mistakes:
   - wrong: "len(results)  # actual result count"
     right: "response['total_matching']  # use total, not len"
   - "Hyphens in search text are Lucene operators — use spaces instead (e.g. 'beta glycosyltransferase' not 'beta-glycosyltransferase')"
+  - "`search_text` is Lucene — see docs://guide/conventions for syntax and scoring."

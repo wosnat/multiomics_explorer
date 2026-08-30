@@ -2,25 +2,12 @@
 
 ## What it does
 
-Discover DerivedMetric (DM) nodes — column-level scalar summaries
-of gene behavior (rhythmicity flags, diel amplitudes,
-darkness-survival class) that sit alongside DE and clusters as
-non-DE evidence. Pre-flight before any DM drill-down.
+Discover DerivedMetric nodes — non-DE, column-level evidence (rhythmicity flags, diel amplitudes, survival classes).
 
-Inspect `value_kind` (routes to the right drill-down), `rankable`
-(gates bucket / percentile / rank filters), `has_p_value` (gates
-significance filters), and `allowed_categories` (categorical DMs)
-here — drill-down tools raise if a passed filter is not supported
-by every selected DM. See `docs://guide/conventions` for the full
-DM family gating contract.
-
-Routing: `gene_derived_metrics(locus_tags=[...])` for per-gene
-lookup across all kinds; `genes_by_numeric_metric` /
-`genes_by_boolean_metric` / `genes_by_categorical_metric` for
-kind-specific drill-downs.
-
-A genus word in `organism` (e.g. 'Alteromonas') matches every strain
-in that genus rather than raising ambiguous.
+Use as the DM-family pre-flight: read value_kind, rankable and allowed_categories here, since the drill-downs raise on an unsupported filter; one gene's values are `gene_derived_metrics`.
+Filters: search_text, organism, metric_types, value_kind, rankable, has_p_value, plus compartment / publication / experiment / condition.
+Returns: by_value_kind, by_metric_type, by_organism, by_compartment; one row = one DerivedMetric.
+docs://tools/list_derived_metrics; summary=True first.
 
 ## Parameters
 
@@ -186,6 +173,10 @@ list_derived_metrics(organism="Prochlorococcus MED4 strain")
 ```correction
 list_derived_metrics(organism="MED4")
 ```
+
+- A genus word alone in `organism=` (e.g. 'Alteromonas') matches every strain in that genus rather than raising ambiguous.
+
+- `search_text` is Lucene — see docs://guide/conventions for syntax and scoring, and for the DM-family gating contract behind rankable / has_p_value / value_kind.
 
 ## Package import equivalent
 

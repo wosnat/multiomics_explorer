@@ -248,3 +248,5 @@ mistakes:
       id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
       in the form you passed.
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (about 70% of numeric edges are not_detected, kept by default)."
+  - "`organism` here matches by case-insensitive CONTAINS, not the word-based match the gene tools use; cross-organism is the default."
+  - "A `metabolite_ids` entry absent from the KG lands in `not_found.metabolite_ids`; one that exists but is unmeasured by the selected assays simply contributes zero rows."

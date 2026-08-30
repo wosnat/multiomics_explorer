@@ -2,51 +2,12 @@
 
 ## What it does
 
-Find metabolites the input gene set's chemistry reaches in one
-organism.
+Metabolites a gene batch's chemistry reaches in ONE organism — reaction and transport arms, mirroring `genes_by_metabolite`.
 
-What: symmetric counterpart to `genes_by_metabolite` — same two
-arms (metabolism and transport over each gene's deepest TCDB
-attachments only, so distinct transport metabolites equal
-`gene_overview.transported_metabolite_count`), same per-row union
-shape with `substrate_depth` + `tcdb_evidence_score`, same
-direction-agnostic semantics. The `metabolite_elements` filter is
-the N-source workflow primitive (presence-only AND-of, e.g.
-`['N']`). The `by_element` envelope is presence-only — not
-stoichiometric, not mass-balanced.
-
-Transport semantics: genes with only lumping attachments (notably
-ABC-only) emit many `inherited` rows; the global sort (metabolism →
-most_specific → inherited, score desc within a tier) prevents one
-gene from consuming `limit`, and the auto-warning names input genes
-whose `transport_substrate_resolution` is 'family_inferred'
-(breadth is reachability, not capability; 'resolved' means at
-least one non-lumping attachment, not all).
-
-Batch advice: use `summary=True` on batch DE inputs (50+
-locus_tags). Bare / xref metabolite IDs are coerced to canonical
-(`resolved_aliases`; collisions expand + warn).
-
-Routing: narrow with `substrate_depth=['most_specific']` to mute
-inherited long tails; from `top_metabolites` drill into
-`list_metabolites(metabolite_ids=[...])` for cross-refs OR
-`genes_by_metabolite(metabolite_ids=[...], organism=PARTNER)`
-for the cross-feeding bridge; from `top_metabolite_pathways` to
-`list_metabolites(pathway_ids=[...])` (chemistry-pathway rollup,
-distinct from gene-KO pathway annotations on
-`genes_by_ontology(ontology="kegg")`); from `top_reactions` to
-`genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)`
-or `pathway_enrichment`; from `top_tcdb_families` to
-`genes_by_ontology(ontology="tcdb", term_ids=[id],
-organism=...)`; from `not_matched` to `gene_overview`. See
-`docs://guide/conventions` for substrate-depth and
-direction-agnostic semantics, and `docs://analysis/metabolites`
-for the chemistry-layer decision tree.
-
-`not_found.organism` is set when the `organism` name resolves to
-zero organisms. Long-tail genes (ABC-only annotations) can emit
-large numbers of `limit` rows — use
-`substrate_depth=['most_specific']` to mute, or `offset` to page.
+Use for the gene-anchored direction; compound-anchored is `genes_by_metabolite`, measurements `assays_by_metabolite`.
+Filters: locus_tags, organism, metabolite_elements, metabolite_ids (+exclude), ec_numbers, substrate_depth, evidence_sources.
+Returns: by_gene, by_element, by_evidence_source, by_substrate_depth, top_metabolites, top_metabolite_pathways, not_matched; one row = one gene × metabolite.
+docs://tools/metabolites_by_gene; summary=True first for 50+ genes.
 
 ## Parameters
 
@@ -68,7 +29,7 @@ large numbers of `limit` rows — use
 | limit | int | 10 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
-**Discovery:** use `list_organisms` for valid organism names.
+**Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 
 ## Response format
 
@@ -338,6 +299,10 @@ in the form you passed. Exclude-wins-on-overlap is computed on the canonical IDs
 ```
 
 - See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and the transport trust ladder, and `docs://guide/concepts` for the chemistry layer overview.
+
+- `not_found.organism` is set when the `organism` name resolves to zero organisms — check it before reading an empty result as 'no chemistry here'.
+
+- Long-tail genes (ABC-only annotations) can fill `limit` on their own: narrow with `substrate_depth=['most_specific']`, or page with `offset`.
 
 ## Package import equivalent
 

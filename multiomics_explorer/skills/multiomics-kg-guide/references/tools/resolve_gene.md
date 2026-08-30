@@ -2,11 +2,12 @@
 
 ## What it does
 
-Resolve a gene identifier (locus_tag, gene name, old locus_tag, or RefSeq protein ID) to matching Gene nodes. Matching is case-insensitive.
+Resolve a gene identifier (locus tag, gene name, old locus tag, RefSeq protein ID; case-insensitive) to matching Gene nodes.
 
-Routing: feed returned `locus_tag`s into `gene_overview` (data-availability triage), `gene_details` (full properties), `gene_homologs`, or `gene_ontology_terms`. The optional `organism` filter is a word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word matches every strain).
-
-`summary=True` returns `by_organism` uncapped with no `results` — call it first when a name may hit many strains.
+Use when the input is a name or partial label; for what a gene does use `gene_overview`, for free-text search `genes_by_function`.
+Filters: identifier, organism.
+Returns: total_matching, by_organism; one row = one Gene match (locus_tag, gene_name, product, organism_name).
+docs://tools/resolve_gene; summary=True first when a name may hit many strains.
 
 ## Parameters
 
@@ -161,6 +162,8 @@ genes_by_function(search_text='PMM0001')  # wrong tool for ID lookup
 ```correction
 resolve_gene(identifier='PMM0001')  # exact identity resolution
 ```
+
+- `summary=True` returns `by_organism` uncapped with no `results` — the cheap first call when an identifier may hit many strains.
 
 ## Package import equivalent
 

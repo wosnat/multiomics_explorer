@@ -270,7 +270,11 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
     # Discovery hints — only for tools with relevant filter params
     param_names = {p["name"] for p in params}
     has_organism = "organism" in param_names
-    has_category = "category" in param_names or "treatment_type" in param_names
+    has_category = (
+        "category" in param_names
+        or "gene_categories" in param_names
+        or "treatment_type" in param_names
+    )
     if has_organism or has_category:
         hints = []
         if has_category:
@@ -553,6 +557,19 @@ def lint_example_yaml(schemas: dict) -> list[str]:
         out += lint_example_keys(path.stem, data)
         if path.stem in schemas:
             out += lint_example_responses(path.stem, data, schemas[path.stem])
+    return out
+
+
+DESCRIPTION_MAX_CHARS = 600  # ≈150 tokens; spec 2b.5 D2
+
+
+def lint_description_length(schemas: dict) -> list[str]:
+    """Flag tool descriptions that exceed the five-slot budget."""
+    out = []
+    for name, s in schemas.items():
+        n = len(s.get("description") or "")
+        if n > DESCRIPTION_MAX_CHARS:
+            out.append(f"{name}: description {n} chars > {DESCRIPTION_MAX_CHARS}")
     return out
 
 
@@ -1331,10 +1348,17 @@ def main():
         if not args.tools:
             # Example-entry lints over inputs/tools/*.yaml: unknown keys and
             # response blocks that name no envelope key of the tool's model.
-            yaml_violations = lint_example_yaml(get_tool_schemas())
+            schemas = get_tool_schemas()
+            yaml_violations = lint_example_yaml(schemas)
             for v in yaml_violations:
                 print(v, file=sys.stderr)
             if yaml_violations:
+                rc = rc or 1
+            # Five-slot tool descriptions stay within the description budget.
+            desc_violations = lint_description_length(schemas)
+            for v in desc_violations:
+                print(v, file=sys.stderr)
+            if desc_violations:
                 rc = rc or 1
         sys.exit(rc)
 

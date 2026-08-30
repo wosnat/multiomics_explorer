@@ -2,11 +2,12 @@
 
 ## What it does
 
-Return each anchor gene's genomic neighborhood — genes adjacent on the same contig and organism — for operon / synteny reasoning, with strand orientation and intergenic gap. Positional only (not co-expression); fragmented assemblies yield fewer neighbors near contig ends. not_found = anchor absent from KG; not_matched = anchor exists but lacks coordinates.
+Genes flanking each anchor on the same contig and organism, with strand and intergenic gap — positional adjacency only, never co-expression.
 
-Routing: feed anchors from `differential_expression_by_gene` or `genes_by_metabolite`, then chain the returned neighbor locus_tags into `gene_overview` / `gene_aa_sequence` / `differential_expression_by_gene` for operon context.
-
-`limit` defaults to every anchor × (2×window+1) neighbors (min 25); pass an explicit number to page. `summary=True` is sugar for `limit=0`.
+Use for operon or synteny reasoning; for co-regulation use `differential_expression_by_gene`, for the anchor's own annotations `gene_overview`.
+Filters: locus_tags, window, max_bp_distance, same_strand.
+Returns: anchors, by_organism, not_found, not_matched (anchor lacks coordinates); one row = one neighbor with rank_offset, bp_gap, same_strand.
+docs://tools/gene_neighbors; summary=True first.
 
 ## Parameters
 
@@ -345,6 +346,8 @@ It reports positional adjacency only — genes next to the anchor on the same co
 - rank_offset gives direction (signed); bp_gap is always unsigned (use rank_offset's sign for upstream/downstream).
 
 - not_matched (gene exists but lacks contig/start coordinates) is distinct from not_found (locus_tag absent from the KG). See docs://guide/conventions.
+
+- `limit` defaults to every anchor × (2×window+1) neighbors (min 25) rather than a small page — pass an explicit number to page.
 
 ## Package import equivalent
 

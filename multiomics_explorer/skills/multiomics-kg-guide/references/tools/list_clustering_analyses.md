@@ -2,19 +2,12 @@
 
 ## What it does
 
-Browse, search, and filter clustering analyses — each analysis
-groups related gene clusters from one study / organism, with the
-cluster children inlined per result. Lucene full-text over analysis
-name, cluster names, descriptions, experimental_context. See
-`docs://guide/conventions` for Lucene scoring.
+Published clustering analyses with their GeneCluster children inlined; Lucene over analysis and cluster names, descriptions and context.
 
-Routing: `genes_in_cluster(cluster_ids=[id])` for per-cluster
-members; `genes_in_cluster(analysis_id=...)` for all clusters in
-one analysis; `gene_clusters_by_gene(locus_tags=[...],
-analysis_ids=[id])` to scope a per-gene cluster lookup.
-
-A genus word in `organism` (e.g. 'Alteromonas') matches every strain
-in that genus rather than raising ambiguous.
+Use to discover an analysis_id or cluster_ids; for a cluster's members use `genes_in_cluster`, for one gene's memberships `gene_clusters_by_gene`.
+Filters: search_text, organism, cluster_type, analysis_ids, plus the omics / publication / experiment / condition filters.
+Returns: by_organism, by_cluster_type, by_treatment_type, by_omics_type, score stats; one row = one analysis with its clusters.
+docs://tools/list_clustering_analyses; summary=True first.
 
 ## Parameters
 
@@ -161,6 +154,10 @@ response['total_matching']  # use total, not len — results may be truncated
 - `organism=` is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works. 'Meiothermus ruber' names two OrganismTaxon nodes; the clustering analyses attach to the genome strain.
 
 - DataFrame conversion: `to_dataframe(result)` auto-dispatches and returns one row per analysis × cluster (compact: cluster_id / cluster_name / cluster_member_count; verbose=True adds cluster descriptions). See `docs://guide/python_api`.
+
+- A genus word alone in `organism=` (e.g. 'Alteromonas') matches every strain in that genus rather than raising ambiguous.
+
+- `search_text` is Lucene — see docs://guide/conventions for syntax and scoring.
 
 ## Package import equivalent
 

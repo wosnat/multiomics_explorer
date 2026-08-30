@@ -2,36 +2,12 @@
 
 ## What it does
 
-Describe ontology terms in batch — identity, hierarchy (parents / children), gene reach and forward-only cross-ontology bridges, for any mix of the 17 ontologies.
+Batch term lookup across the 17 ontologies — name, level, informativeness, gene and organism counts, parents, children, forward-only cross-ontology bridges.
 
-Each row carries the term's name/description, `level` + `level_kind`,
-`is_informative`, precomputed `gene_count` / `organism_count` /
-`direct_gene_count`, the ontology's native columns (e.g. tcdb
-`superfamily`, merops `catalytic_type`, interpro `interpro_type`;
-absent props are stripped, not nulled), `parents[]`, `children[]`
-(capped at 50, see `children_total`), and `links_out[]`.
-
-Bridge-direction contract: `links_out` is forward-only. A
-`composition` link means the source term is BUILT FROM the target
-(TCDB family / MEROPS family -> Pfam domain, TCDB -> GO process);
-a `membership` link means the source BELONGS TO the target (Pfam ->
-InterPro entry, NCBIfam family -> InterPro entry, KEGG term -> BRITE
-category). A `router` link (InterPro -> EC / CAZy; NCBIfam TIGR*
-family -> TIGR role) is a recall-biased cross-reference for finding
-candidate terms — never use it to assign a gene a function; verbose
-`router_ambiguous` flags InterPro entries whose router links fan out
-or whose type is not FAMILY. Walk bridges only in the stored
-direction. TIGR roles (`tigr.role:`) are a 2-level hierarchy —
-main roles at level 0 (slug ids), sub-roles at level 1 (numeric
-ids) — so `parents[]` / `children[]` apply to them.
-
-IDs absent from the KG land in `not_found`. `organism` scopes
-`genes_by_organism` and adds `organism_gene_count` per row.
-
-Routing: `genes_by_ontology(term_ids=[...])` for the annotated genes;
-`search_ontology` to find term IDs (browse or Lucene); target IDs in
-`links_out` feed back into this tool for a bridge walk;
-docs://ontologies/{key} for how each ontology is built and read.
+Use when you already hold self-prefixed term IDs; to find IDs use `search_ontology`, for the member genes `genes_by_ontology`.
+Filters: term_ids, organism, link_kinds.
+Returns: by_ontology, by_link_kind, links_out_total, not_found; one row = one term with parents[], children[], links_out[] (composition / membership / recall-biased router).
+docs://tools/ontology_term_details; per-ontology semantics docs://ontologies/{key}.
 
 ## Parameters
 

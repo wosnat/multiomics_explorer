@@ -89,3 +89,4 @@ mistakes:
   - "not_found is not reported — an identifier with no match simply yields total_matching=0 and results=[]. See docs://guide/conventions for the not_found / not_matched shapes on batch tools."
   - wrong: "genes_by_function(search_text='PMM0001')  # wrong tool for ID lookup"
     right: "resolve_gene(identifier='PMM0001')  # exact identity resolution"
+  - "`summary=True` returns `by_organism` uncapped with no `results` — the cheap first call when an identifier may hit many strains."

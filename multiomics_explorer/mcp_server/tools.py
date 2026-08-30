@@ -1646,9 +1646,12 @@ def register_tools(mcp: FastMCP):
                         "comes back as an empty dict).",
         )] = "both",
     ) -> KgSchemaResponse:
-        """Return the KG schema: node labels with property names/types and relationship types with source/target labels.
+        """Live-KG schema: node labels with property names and types, relationship types with source and target labels.
 
-        Use before `run_cypher` to discover queryable labels/properties. Scope with `labels` / `relationship_types` / `section` to avoid a full-graph dump. For an entity-level overview see `docs://guide/concepts`; for filter-value enumeration use `list_filter_values`.
+        Use before writing a `run_cypher` query; for filter values use `list_filter_values`, for the entity model docs://guide/concepts.
+        Filters: labels, relationship_types, section.
+        Returns: nodes, relationships, not_found_labels, not_found_relationship_types; no row list — scope the call or it dumps the whole graph.
+        docs://tools/kg_schema.
         """
         await ctx.info(f"kg_schema section={section}")
         try:
@@ -1673,17 +1676,12 @@ def register_tools(mcp: FastMCP):
         },
     )
     async def kg_release_info(ctx: Context) -> KGReleaseInfoResponse:
-        """Return the KG's release identity (`Schema_info` properties) and a compatibility verdict against this explorer-MCP version.
+        """KG release identity (Schema_info version, built_at, node counts) plus a compatibility verdict against this explorer build.
 
-        **Call this first** in any new session — verifies the explorer's installed version satisfies the KG's declared `mcp_min_version`, and that the load-bearing schema shape (foundational labels, relationship types, `Schema_info` properties, non-zero gene/experiment counts) is present. The result is computed once at MCP server startup and cached; re-call is instant.
-
-        Verdict semantics:
-        - `ok`     — explorer satisfies KG min-version + all schema asserts pass.
-        - `warn`   — at least one assert failed; tools still serve but may emit confusing errors against the affected shapes. Filter `asserts` on `passed=False` for the failure list.
-        - A failed `controlled_vocabularies_hash` assert (bucket 6) yields `warn`: filters still validate live and `list_filter_values` reads live, but docs://ontologies/{key} pages (index: docs://ontologies/index) and parameter descriptions may list stale values. `kg.controlled_vocabularies_hash` carries the live digest.
-        - `unknown` — could not evaluate (no `Schema_info` node in the KG — legacy build without release metadata, or wrong database).
-
-        On non-`ok` verdicts, the tool emits `ctx.warning(summary)` so the surrounding MCP client surfaces it to the user. See `docs://guide/conventions` for cross-tool semantics.
+        Use as the first call of a session; for the graph shape use `kg_schema`, for live vocabulary values `list_filter_values`.
+        Filters: none.
+        Returns: verdict, explorer_version, kg, asserts, summary; no row list. `warn` means quoted value lists may be stale, never that calls fail.
+        docs://tools/kg_release_info.
         """
         await ctx.info("kg_release_info")
         try:
@@ -1779,18 +1777,12 @@ def register_tools(mcp: FastMCP):
                         "one ontology key. Ignored on non-trust filter types.",
         )] = None,
     ) -> ListFilterValuesResponse:
-        """Enumerate valid values (+ counts where the KG pivots them) for a categorical filter; the `filter_type` enum is the authoritative list of types.
+        """Valid values for one closed vocabulary, with counts where the KG pivots them and descriptions where it stores them.
 
-        Value sources: data types (gene_category, brite_tree, growth_phase,
-        metric_type, value_kind, compartment, omics_type, evidence_source)
-        pivot live nodes and carry `count`; `cluster_type`, `treatment_type`,
-        `background_factors`, `table_scope`, `detection_status`,
-        `expression_status`, and the annotation-trust types read
-        `ControlledVocabulary` (pivot fallback + warning when missing) and
-        return `count=None`. Trust types are documented in
-        docs://analysis/annotation_evidence.
-
-        Routing: feed the returned `value`s into the corresponding filter — `gene_category` → `genes_by_function(gene_categories=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `growth_phase` → `list_experiments(growth_phases=[...])` / `list_derived_metrics(growth_phases=[...])`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`; `cluster_type` → `list_clustering_analyses` / `gene_clusters_by_gene`; `treatment_type` / `background_factors` → `list_experiments` / `list_derived_metrics` / `list_metabolite_assays` / `list_clustering_analyses`; `table_scope` → `list_experiments(table_scope=[...])`; the trust types → `sources` / `evidence` / `call_class` / `interpro_type` on `genes_by_ontology` and friends.
+        Use whenever a filter takes a controlled value you would otherwise guess; for organism names use `list_organisms`, for ontology terms `search_ontology`.
+        Filters: filter_type, ontology.
+        Returns: filter_type, description, total_entries, warnings; one row = (value, count, description, applies_to).
+        docs://tools/list_filter_values.
         """
         await ctx.info(f"list_filter_values filter_type={filter_type}")
         try:
@@ -1941,9 +1933,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 5,
         offset: OffsetParam = 0,
     ) -> ListOrganismsResponse:
-        """List organisms with taxonomy, data-availability counts, organism_type, DM rollups, chemistry-capability rollups, annotation-coverage rollups, and metabolomics-coverage rollup.
+        """Every organism with taxonomy and per-organism capability rollups — gene, publication, experiment, DM, chemistry, metabolomics and annotation counts.
 
-        Routing: feed `organism_name` into per-organism scoping on `genes_by_function`, `genes_by_ontology`, `list_publications`, `list_experiments`. Per-row drill-downs: `catalyzed_metabolite_count > 0` → `list_metabolites(organism_names=[...])`; `measured_metabolite_count > 0` → `list_metabolite_assays(organism=...)`; `derived_metric_value_kinds` → matching `genes_by_{numeric,boolean,categorical}_metric`. Read `top_annotation_capability` (top-10 by `peptidase_gene_count`, plus `interpro_gene_count` / `ncbifam_gene_count`) to see which organisms carry MEROPS / InterPro / NCBIfam coverage — then `genes_by_ontology(ontology='merops'|'interpro'|'ncbifam', organism=...)`. `organism_names=` uses the same word-based, case-insensitive match on preferred_name + name_synonyms as every other tool's organism param ('MED4' works); unknown names land in `not_found`. Two OrganismTaxon nodes share preferred_name 'Meiothermus ruber' (genome strain + gene-less treatment taxon) — both list here. `compartment` keeps organisms with at least one experiment in that compartment — it is not a per-organism property.
+        Use to pick an organism or check what data it carries before scoping another tool; for gene lookup use `resolve_gene`.
+        Filters: organism_names, compartment.
+        Returns: by_organism_type, top_metabolic_capability, top_annotation_capability, by_measurement_capability, not_found; one row = one OrganismTaxon.
+        docs://tools/list_organisms; summary=True first.
         """
         await ctx.info(
             f"list_organisms organism_names={organism_names} compartment={compartment} "
@@ -2041,11 +2036,12 @@ def register_tools(mcp: FastMCP):
         offset: OffsetParam = 0,
         summary: SummaryParam = False,
     ) -> ResolveGeneResponse:
-        """Resolve a gene identifier (locus_tag, gene name, old locus_tag, or RefSeq protein ID) to matching Gene nodes. Matching is case-insensitive.
+        """Resolve a gene identifier (locus tag, gene name, old locus tag, RefSeq protein ID; case-insensitive) to matching Gene nodes.
 
-        Routing: feed returned `locus_tag`s into `gene_overview` (data-availability triage), `gene_details` (full properties), `gene_homologs`, or `gene_ontology_terms`. The optional `organism` filter is a word-based, case-insensitive match on preferred_name + name_synonyms ('MED4' works; a genus word matches every strain).
-
-        `summary=True` returns `by_organism` uncapped with no `results` — call it first when a name may hit many strains.
+        Use when the input is a name or partial label; for what a gene does use `gene_overview`, for free-text search `genes_by_function`.
+        Filters: identifier, organism.
+        Returns: total_matching, by_organism; one row = one Gene match (locus_tag, gene_name, product, organism_name).
+        docs://tools/resolve_gene; summary=True first when a name may hit many strains.
         """
         await ctx.info(f"resolve_gene identifier={identifier} organism={organism} offset={offset} summary={summary}")
         try:
@@ -2140,9 +2136,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 5,
         offset: OffsetParam = 0,
     ) -> GenesByFunctionResponse:
-        """Free-text search across gene names, products, and functional descriptions. Lucene syntax (see docs://guide/conventions). Results ranked by relevance score.
+        """Free-text Lucene search over gene names, products and functional descriptions, ranked by relevance score.
 
-        Routing: feed `locus_tag`s into `gene_overview` (data-availability triage), `gene_ontology_terms` (annotation drill-down), or `genes_by_ontology` for ontology-anchored search instead. A genus word in `organism` (e.g. 'Alteromonas') matches every strain in that genus rather than raising ambiguous.
+        Use when you have a description and no term ID; when the keyword maps to an ontology term use `search_ontology` then `genes_by_ontology`, for an exact identifier `resolve_gene`.
+        Filters: search_text, organism, gene_categories, min_quality.
+        Returns: total_search_hits, total_matching, by_organism, by_category, score stats; one row = one gene with its score.
+        docs://tools/genes_by_function; summary=True first.
         """
         await ctx.info(f"genes_by_function search_text={search_text} organism={organism} "
                        f"gene_categories={gene_categories} min_quality={min_quality}")
@@ -2376,13 +2375,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitOptionalParam = None,
         offset: OffsetParam = 0,
     ) -> GeneOverviewResponse:
-        """Batch gene routing: identity (gene_name, product, gene_category) plus per-gene data-availability signals (annotation_types, expression counts, ortholog/cluster summaries, DM rollups, chemistry rollups).
+        """Batch gene triage: identity plus per-gene data-availability signals — expression, ortholog, cluster, DM, chemistry, annotation-family and literature counts.
 
-        [TRUST] `merops_classes` / `ncbifam_family_count` / `tcdb_family_count` / `cazy_family_count` / `merops_evidence_score_max` are the protease / family-domain / transporter / CAZyme routing columns; `tcdb_family_count` counts deepest attachments only (superseded ancestors excluded), so it equals the default TCDB row count from `gene_ontology_terms`. See docs://analysis/annotation_evidence.
-
-        Routing: drill into each axis when the per-gene signal is non-zero — `gene_ontology_terms` (annotation_types non-empty), `gene_homologs` (closest_ortholog_group_size > 0), `gene_clusters_by_gene` (cluster_membership_count > 0), `differential_expression_by_gene` / `gene_response_profile` (expression_edge_count > 0), `gene_derived_metrics` and `genes_by_{numeric,boolean,categorical}_metric` keyed off `derived_metric_value_kinds`, `metabolites_by_gene` / `genes_by_metabolite` (evidence_sources non-empty), `gene_ontology_terms(ontology='merops')` (merops_classes non-empty), `gene_ontology_terms(ontology=['tcdb'])` (tcdb_family_count > 0), `gene_ontology_terms(ontology=['cazy'])` (cazy_family_count > 0). Use `gene_details` for the full Gene-node property dump.
-
-        `limit` defaults to every input gene (min 25); pass an explicit number to page.
+        Use to decide which drill-down has evidence for a gene batch; for the raw node dump use `gene_details`.
+        Filters: locus_tags.
+        Returns: by_organism, by_category, by_annotation_type, has_* batch counts, top_discussing_publications, not_found; one row = one gene's routing counts.
+        docs://tools/gene_overview; summary=True first.
         """
         await ctx.info(f"gene_overview locus_tags={locus_tags} summary={summary}")
         try:
@@ -2463,11 +2461,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitOptionalParam = None,
         offset: OffsetParam = 0,
     ) -> GeneDetailResponse:
-        """All Gene node properties (deep-dive). Use `gene_overview` for the common routing case; this tool adds what overview omits — `sequence`, `gene_summary`, `function_description`, `alternate_functional_descriptions`, `catalytic_activities` (sparse: ~8k genes), `contributing_sources`, `seed_ortholog` / `seed_ortholog_evalue`, `protein_family`, coordinates (`contig`, `start`, `end`, `strand`). The Gene node carries NO `ec_numbers` / `ko_terms` / `kegg_ids` / `cog_categories` properties — chemistry and ontology annotations are graph edges: use `gene_ontology_terms(ontology=['ec','kegg'])` or `metabolites_by_gene`. TCDB/CAZy memberships are edges too.
+        """Every Gene node property for a locus-tag batch — sequence, gene_summary, function_description, catalytic_activities, contributing_sources, coordinates.
 
-        Routing: prefer `gene_overview` for triage; chain into `metabolites_by_gene` for chemistry, `gene_homologs` for orthologs, `gene_ontology_terms` for annotations, `list_organisms` for taxonomy.
-
-        `limit` defaults to every input gene (min 25); pass an explicit number to page.
+        Use when triage counts are not enough; for routing use `gene_overview`. Ontology and chemistry are edges, not properties — use `gene_ontology_terms` / `metabolites_by_gene`.
+        Filters: locus_tags.
+        Returns: total_matching, not_found, warnings; one row = one gene's full property dict.
+        docs://tools/gene_details; summary=True first.
         """
         await ctx.info(f"gene_details locus_tags={locus_tags} summary={summary}")
         try:
@@ -2567,15 +2566,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitOptionalParam = None,
         offset: OffsetParam = 0,
     ) -> GeneHomologsResponse:
-        """Look up ortholog group memberships for a gene batch — flat long
-        format (one row per gene × group), ordered most-specific (curated)
-        to broadest. A gene typically belongs to 1-3 groups.
+        """Ortholog group memberships for a gene batch — one row per gene × group, most-specific (curated) first.
 
-        Routing: drill into group members via `genes_by_homolog_group`;
-        text-search groups via `search_homolog_groups`.
-
-        `limit` defaults to every input gene × 5 groups (min 25); pass an
-        explicit number to page.
+        Use to find a gene's groups before a cross-organism comparison; for a group's members use `genes_by_homolog_group`, for text search `search_homolog_groups`.
+        Filters: locus_tags, source, taxonomic_level, max_specificity_rank.
+        Returns: by_organism, by_source, top_cyanorak_roles, not_found, no_groups; one row = (locus_tag, group_id, source, taxonomic_level).
+        docs://tools/gene_homologs; summary=True first.
         """
         await ctx.info(f"gene_homologs locus_tags={locus_tags} source={source} "
                        f"taxonomic_level={taxonomic_level}")
@@ -2645,13 +2641,12 @@ def register_tools(mcp: FastMCP):
         )],
         limit: LimitParam = 25,
     ) -> RunCypherResponse:
-        """Run a raw Cypher query (read-only escape hatch when other tools don't cover the question).
+        """Read-only Cypher escape hatch — writes are blocked, syntax and schema validated before execution.
 
-        Write operations are blocked. Queries are syntax- and schema-validated
-        before execution — non-blocking warnings come back in the response.
-        Validate against `kg_schema` first to avoid label / property typos —
-        scope with `kg_schema(labels=[...])` to avoid a full-graph dump; see
-        docs://guide/concepts for the KG data model.
+        Use only when no tool covers the question; read the shape first with `kg_schema(labels=[...])`.
+        Filters: query, limit.
+        Returns: returned, truncated, warnings (non-blocking) and results as raw column dicts; there is no total_matching.
+        docs://tools/run_cypher.
         """
         await ctx.info(f"run_cypher limit={limit}")
         try:
@@ -2818,31 +2813,12 @@ def register_tools(mcp: FastMCP):
         )] = None,
         organism: OrganismParam = None,
     ) -> SearchOntologyResponse:
-        """Search or browse ontology terms — Lucene over term names (search) or a gene_count-sorted listing (browse). Counts (`gene_count`, `organism_gene_count`, `min_gene_count`) are subtree-scoped; only the text match ignores hierarchy.
+        """Search (Lucene over term names) or browse (omit search_text: terms by gene_count) across one or many of the 17 ontologies.
 
-        Returns term IDs and `level` for use with `genes_by_ontology`. With
-        `search_text`, supports fuzzy (~), wildcards (*), exact phrases ("..."),
-        boolean (AND, OR) — see docs://guide/conventions for syntax + scoring.
-        Without `search_text` (browse), rows sort by `gene_count DESC`; narrow
-        with `level`, `tree`/`interpro_type`, `min_gene_count`, `organism`.
-
-        `ontology` accepts one key, a list, or None (all 17). `limit`/`offset`
-        apply PER ontology (lockstep paging); rows are grouped by ontology in
-        registry order, then score DESC (search) / gene_count DESC (browse).
-        `by_ontology` carries per-ontology truncation.
-
-        [TRUST] `interpro_type` scopes InterPro terms to one entry type.
-        `informative_only` (default False) drops terms the KG flags
-        uninformative — e.g. KEGG KO 'uncharacterized protein' terms, GO root
-        go:0008150, KEGG global/overview maps like ko01100; term-side only,
-        never restricts the gene set. See docs://analysis/annotation_evidence
-        for the full trust surface, and docs://ontologies/{key} for what each
-        ontology means and how to read it.
-
-        Routing: chain term_ids into `genes_by_ontology` for gene discovery;
-        `ontology_term_details(term_ids=[...])` for a term's hierarchy, bridges
-        and per-organism counts; `docs://ontologies/index` for the per-ontology
-        reference.
+        Use to find term IDs or size an ontology; a term's hierarchy and bridges are `ontology_term_details`, its genes `genes_by_ontology`.
+        Filters: search_text, ontology, level, tree, interpro_type, min_gene_count, organism, informative_only.
+        Returns: mode, by_ontology, by_level, score stats, skipped_ontologies; one row = one term. Counts are subtree-scoped; limit / offset apply per ontology.
+        docs://tools/search_ontology and docs://ontologies/{key}; summary=True first.
         """
         await ctx.info(f"search_ontology search_text={search_text!r} ontology={ontology}")
         try:
@@ -3034,36 +3010,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 50,
         offset: OffsetParam = 0,
     ) -> OntologyTermDetailsResponse:
-        """Describe ontology terms in batch — identity, hierarchy (parents / children), gene reach and forward-only cross-ontology bridges, for any mix of the 17 ontologies.
+        """Batch term lookup across the 17 ontologies — name, level, informativeness, gene and organism counts, parents, children, forward-only cross-ontology bridges.
 
-        Each row carries the term's name/description, `level` + `level_kind`,
-        `is_informative`, precomputed `gene_count` / `organism_count` /
-        `direct_gene_count`, the ontology's native columns (e.g. tcdb
-        `superfamily`, merops `catalytic_type`, interpro `interpro_type`;
-        absent props are stripped, not nulled), `parents[]`, `children[]`
-        (capped at 50, see `children_total`), and `links_out[]`.
-
-        Bridge-direction contract: `links_out` is forward-only. A
-        `composition` link means the source term is BUILT FROM the target
-        (TCDB family / MEROPS family -> Pfam domain, TCDB -> GO process);
-        a `membership` link means the source BELONGS TO the target (Pfam ->
-        InterPro entry, NCBIfam family -> InterPro entry, KEGG term -> BRITE
-        category). A `router` link (InterPro -> EC / CAZy; NCBIfam TIGR*
-        family -> TIGR role) is a recall-biased cross-reference for finding
-        candidate terms — never use it to assign a gene a function; verbose
-        `router_ambiguous` flags InterPro entries whose router links fan out
-        or whose type is not FAMILY. Walk bridges only in the stored
-        direction. TIGR roles (`tigr.role:`) are a 2-level hierarchy —
-        main roles at level 0 (slug ids), sub-roles at level 1 (numeric
-        ids) — so `parents[]` / `children[]` apply to them.
-
-        IDs absent from the KG land in `not_found`. `organism` scopes
-        `genes_by_organism` and adds `organism_gene_count` per row.
-
-        Routing: `genes_by_ontology(term_ids=[...])` for the annotated genes;
-        `search_ontology` to find term IDs (browse or Lucene); target IDs in
-        `links_out` feed back into this tool for a bridge walk;
-        docs://ontologies/{key} for how each ontology is built and read.
+        Use when you already hold self-prefixed term IDs; to find IDs use `search_ontology`, for the member genes `genes_by_ontology`.
+        Filters: term_ids, organism, link_kinds.
+        Returns: by_ontology, by_link_kind, links_out_total, not_found; one row = one term with parents[], children[], links_out[] (composition / membership / recall-biased router).
+        docs://tools/ontology_term_details; per-ontology semantics docs://ontologies/{key}.
         """
         await ctx.info(
             f"ontology_term_details term_ids={len(term_ids)} organism={organism} "
@@ -3332,34 +3284,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 50,
         offset: OffsetParam = 0,
     ) -> GenesByOntologyResponse:
-        """Find (gene × term) pairs for an ontology, scoped by terms and/or level — term-anchored (start from terms, get genes); use `gene_ontology_terms` for the gene-anchored direction (start from locus_tags, get their terms).
+        """Gene × term pairs for ontology terms in ONE organism (term_ids expand down the hierarchy, level rolls up, both = scoped rollup).
 
-        Three modes:
-        - `term_ids` only — gene discovery by pathway (walk DOWN from each term).
-        - `level` only — pathway definitions at level N (walk UP from leaves).
-        - `level` + `term_ids` — scoped rollup (walk UP, restrict to given terms).
-
-        Single-organism enforced. Default `limit=50` over MCP; the Python
-        package defaults to unbounded (all rows), which
-        `pathway_enrichment` / `cluster_enrichment` rely on for TERM2GENE.
-        `min/max_gene_set_size` is organism-scoped (matches
-        `ontology_landscape`).
-
-        [TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
-        `call_class` / `interpro_type` filter on the per-edge trust profile;
-        defaults never filter. `informative_only` (default False) drops terms
-        the KG flags uninformative — e.g. KEGG KO 'uncharacterized protein'
-        terms, GO root go:0008150, KEGG global/overview maps like ko01100;
-        term-side only, never restricts the gene set. See
-        docs://analysis/annotation_evidence.
-
-        Routing: pipe `results` into `pathway_enrichment` / `cluster_enrichment`
-        as TERM2GENE; chain from `search_ontology` for term discovery;
-        `gene_ontology_terms` for per-gene reverse lookup. For
-        substrate-anchored TCDB / EC questions ("which genes transport / act
-        on compound X?"), use `genes_by_metabolite` instead. See
-        docs://guide/conventions for the hierarchy `level` and BRITE-tree
-        conventions; docs://analysis/enrichment for the enrichment workflow.
+        Use to build TERM2GENE or list a term's genes; for a gene's own annotations use `gene_ontology_terms`, for substrate-anchored TCDB / EC `genes_by_metabolite`.
+        Filters: ontology, organism, term_ids, level, tree, min/max_gene_set_size, informative_only, trust filters.
+        Returns: by_category, by_level, top_terms, trust rollups, not_found, wrong_ontology, wrong_level; one row = (locus_tag, term_id, evidence).
+        docs://tools/genes_by_ontology; summary=True first.
         """
         await ctx.info(
             f"genes_by_ontology ontology={ontology} organism={organism} "
@@ -3592,27 +3522,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 50,
         offset: OffsetParam = 0,
     ) -> GeneOntologyTermsResponse:
-        """Reverse-lookup: gene locus_tags → ontology annotations (one row per gene × term).
+        """Reverse lookup: locus_tags to their ontology annotations in ONE organism, most-specific leaves (default) or rolled up to a level.
 
-        `mode='leaf'` (default) returns the most specific annotations only —
-        redundant ancestors are excluded. `mode='rollup'` walks UP to ancestors
-        at the given level. Single-organism enforced. `ontology` accepts a
-        list; when a trust filter/facet is carried by only some of the
-        requested ontologies, the rest drop into `skipped_ontologies` with
-        a warning.
-
-        [TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
-        `call_class` / `interpro_type` filter on the per-edge trust profile;
-        `include_superseded` (tcdb leaf mode) also surfaces less-specific
-        attachments. Defaults never filter. `informative_only` (default
-        False) drops terms the KG flags uninformative — e.g. KEGG KO
-        'uncharacterized protein' terms, GO root go:0008150, KEGG
-        global/overview maps like ko01100; term-side only, never restricts
-        the gene set. See docs://analysis/annotation_evidence.
-
-        Routing: for the forward direction (term → genes, with hierarchy
-        expansion) use `genes_by_ontology`; for term discovery by text use
-        `search_ontology`.
+        Use for what a gene carries; for which genes carry a term use `genes_by_ontology`, to find term IDs `search_ontology`.
+        Filters: locus_tags, organism, ontology, mode, level, tree, informative_only, include_superseded, trust filters.
+        Returns: by_ontology, by_term, terms-per-gene stats, trust rollups, skipped_ontologies, not_found, no_terms; one row = (locus_tag, term_id, evidence).
+        docs://tools/gene_ontology_terms; summary=True first.
         """
         await ctx.info(
             f"gene_ontology_terms locus_tags={locus_tags} organism={organism} "
@@ -3759,11 +3674,12 @@ def register_tools(mcp: FastMCP):
         offset: OffsetParam = 0,
         summary: SummaryParam = False,
     ) -> ListPublicationsResponse:
-        """List publications with experiment summaries, DM rollups, and metabolomics rollups. Use as the discovery entry point for studies.
+        """Publications with experiment, DM, metabolomics and literature-index rollups.
 
-        Routing: drill via `list_experiments(publication_dois=[doi])` for per-experiment detail; `list_clustering_analyses(publication_dois=[doi])` for clustering; `list_derived_metrics(publication_dois=[doi])` for non-DE evidence; `list_metabolite_assays(publication_dois=[doi])` when `metabolite_count > 0`. Per-row `derived_metric_value_kinds` routes to `genes_by_{numeric,boolean,categorical}_metric`.
-
-        `publication_dois` combines with the other filters via AND; `not_found` in the response lists any provided DOIs that did not match — the same shape as `experiment_ids` on sibling `list_*` tools. `summary=True` returns every `by_*` rollup uncapped; call it first, then narrow filters. `compartment` keeps publications with at least one experiment in that compartment.
+        Use as the study-level discovery entry point; for per-experiment detail use `list_experiments(publication_dois=[...])`, for the entities a paper names `discussed_by_publication`.
+        Filters: organism, search_text, author, publication_dois, compartment, plus the condition filters.
+        Returns: by_organism, by_treatment_type, by_omics_type, by_compartment, by_discusses_coverage, not_found; one row = one publication.
+        docs://tools/list_publications; summary=True first.
         """
         await ctx.info(f"list_publications organism={organism} treatment_type={treatment_type} "
                        f"growth_phases={growth_phases} search_text={search_text} author={author} "
@@ -3998,13 +3914,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 5,
         offset: OffsetParam = 0,
     ) -> ListExperimentsResponse:
-        """List differential-expression experiments with rich breakdowns (organism, treatment, omics, table_scope, growth_phase, DM rollups, metabolomics rollups). Use `summary=true` to see only breakdowns.
+        """Differential-expression and characterization experiments with per-timepoint, DM and metabolomics rollups.
 
-        table_scope is critical for interpreting missing genes — `'all_detected_genes'` keeps tested-absent rows (the `not_significant` bucket reflects real biology); `'significant_only'` collapses them. Use `table_scope=['all_detected_genes']` to restrict to experiments fair for cross-experiment comparison. See `docs://guide/conventions` for the broader tested-absent framing.
-
-        Routing: drill via `differential_expression_by_gene(experiment_ids=[id])` for per-gene DE; `list_clustering_analyses(experiment_ids=[id])`; `list_derived_metrics(experiment_ids=[id])`; `pathway_enrichment(experiment_ids=[id])`; `list_metabolite_assays(experiment_ids=[id])` when `metabolite_count > 0`.
-
-        `organism` filters to experiments where this organism is the profiled organism; use `coculture_partner=` for partner-side filtering — the two AND-compose.
+        Use to pick experiment_ids and read each one's table_scope before interpreting missing DE rows; for study-level metadata use `list_publications`.
+        Filters: organism, coculture_partner, table_scope, experiment_ids, search_text, time_course_only, plus the publication / condition filters.
+        Returns: by_organism, by_treatment_type, by_table_scope, by_omics_type, by_growth_phase, not_found; one row = one experiment.
+        docs://tools/list_experiments; summary=True first.
         """
         await ctx.info(f"list_experiments summary={summary} organism={organism} "
                        f"treatment_type={treatment_type} search_text={search_text}")
@@ -4450,29 +4365,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 5,
         offset: OffsetParam = 0,
     ) -> DifferentialExpressionByGeneResponse:
-        """Find differential-expression rows for one organism — one row per
-        (gene × experiment × timepoint), sorted by |log2FC|. Single-organism
-        enforced; at least one of `organism` / `locus_tags` / `experiment_ids`
-        is required. `expression_status` uses each experiment's publication-
-        specific threshold (not a uniform padj<0.05 cutoff).
+        """DE rows for ONE organism (inferred from locus_tags / experiment_ids) — one row per gene × experiment × timepoint, sorted by |log2FC|.
 
-        Tested-absent semantics depend on the parent experiment's
-        `table_scope`: `all_detected_genes` keeps `not_significant` rows
-        (real biology — gene tested but did not respond); any other scope
-        (`significant_only`, `significant_any_timepoint`, `filtered_subset`,
-        `top_n`) collapses tested-absent with not-detected. Always check
-        `by_table_scope` (envelope) and the per-experiment `table_scope`
-        before reading missing rows. See `docs://guide/conventions` for the
-        full tested-absent framing.
-
-        Routing: `summary=True` for counts-only landscape; per-gene drill-down
-        to `gene_response_profile`; cross-organism via
-        `differential_expression_by_ortholog`; pathway interpretation via
-        `pathway_enrichment` (`docs://analysis/enrichment`).
-
-        `growth_phases` is edge-level: an unknown value reports in the
-        envelope `warnings`, and a gene with edges outside the requested
-        phase(s) lands in `filtered_out`, not `no_expression`.
+        Use for row-level fold changes and timepoint dynamics; a cross-experiment rollup is `gene_response_profile`, cross-organism `differential_expression_by_ortholog`.
+        Filters: organism, locus_tags, experiment_ids, direction, significant_only, growth_phases.
+        Returns: rows_by_status, by_table_scope, experiments, not_found, no_expression, filtered_out; one row = gene × experiment × timepoint.
+        docs://tools/differential_expression_by_gene; summary=True first.
         """
         await ctx.info(
             f"differential_expression_by_gene"
@@ -4676,14 +4574,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 5,
         offset: OffsetParam = 0,
     ) -> SearchHomologGroupsResponse:
-        """Search ortholog groups by text (Lucene over consensus_product,
-        consensus_gene_name, description, functional_description). Returns
-        group IDs for downstream use.
+        """Lucene search over ortholog groups (consensus product, consensus gene name, description).
 
-        Routing: drill into member genes via `genes_by_homolog_group`;
-        cross-organism expression view via
-        `differential_expression_by_ortholog`. See `docs://guide/conventions`
-        for Lucene scoring semantics.
+        Use to find group IDs from text; for one gene's groups use `gene_homologs`, for member genes `genes_by_homolog_group`.
+        Filters: search_text, source, taxonomic_level, max_specificity_rank, cyanorak_roles, cog_categories.
+        Returns: by_source, by_level, score stats, top_cyanorak_roles, top_cog_categories; one row = one ortholog group.
+        docs://tools/search_homolog_groups; summary=True first.
         """
         await ctx.info(f"search_homolog_groups search_text={search_text!r} "
                        f"source={source} limit={limit}")
@@ -4820,17 +4716,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 5,
         offset: OffsetParam = 0,
     ) -> GenesByHomologGroupResponse:
-        """Drill into ortholog group members — one row per (gene × group),
-        per organism. Each list input (`group_ids`, `organisms`) reports
-        both `not_found` (input absent from KG) and `not_matched` (in KG
-        but no member after filters).
+        """Group IDs to their member genes per organism — one row per gene × group.
 
-        Routing: group discovery via `search_homolog_groups`; gene → group
-        direction via `gene_homologs`; cross-organism expression view via
-        `differential_expression_by_ortholog`.
-
-        A genus word in `organisms` (e.g. 'Alteromonas') matches every strain
-        in that genus rather than raising ambiguous.
+        Use to enumerate a group's members; for a gene's own groups use `gene_homologs`, for expression across organisms `differential_expression_by_ortholog`.
+        Filters: group_ids, organisms.
+        Returns: by_organism, top_categories, top_groups, genes-per-group stats, and a not_found / not_matched pair for each of groups and organisms; one row = (locus_tag, group_id).
+        docs://tools/genes_by_homolog_group; summary=True first.
         """
         await ctx.info(f"genes_by_homolog_group group_ids={group_ids} organisms={organisms}")
         try:
@@ -5141,25 +5032,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 5,
         offset: OffsetParam = 0,
     ) -> DifferentialExpressionByOrthologResponse:
-        """Find differential-expression rows framed by ortholog group —
-        one row per (group × experiment × timepoint), values are gene counts
-        (members responding), not individual gene rows. Cross-organism by
-        design. Results sorted by significant gene count.
+        """DE framed by ortholog group across organisms — one row per group × experiment × timepoint, values are member gene counts per status.
 
-        Each list input (`group_ids`, `organisms`, `experiment_ids`) reports
-        both `not_found` (input absent from KG) and `not_matched` (in KG but
-        no expression after filters). Tested-absent semantics depend on the
-        parent experiment's `table_scope` — `all_detected_genes` keeps
-        `not_significant` rows; any other scope (`significant_only`,
-        `significant_any_timepoint`, `filtered_subset`, `top_n`) collapses
-        tested-absent with not-detected. See `docs://guide/conventions`.
-
-        Routing: discover groups via `search_homolog_groups`; group membership
-        without expression via `genes_by_homolog_group`; per-gene drill-down
-        via `differential_expression_by_gene`.
-
-        Each `organisms` entry is OR-matched (word-based); a genus word
-        (e.g. 'Alteromonas') matches every strain in that genus.
+        Use to compare a group's response across strains; per-gene detail is `differential_expression_by_gene`, membership `genes_by_homolog_group`.
+        Filters: group_ids, organisms, experiment_ids, direction, significant_only, growth_phases.
+        Returns: by_organism, rows_by_status, by_table_scope, top_groups, a not_found / not_matched pair per input; one row = group × experiment × timepoint.
+        docs://tools/differential_expression_by_ortholog; summary=True first.
         """
         await ctx.info(
             f"differential_expression_by_ortholog"
@@ -5298,19 +5176,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 50,
         offset: OffsetParam = 0,
     ) -> GeneResponseProfileResponse:
-        """Summarize how each gene responds across experiments — one result
-        per gene with `response_summary` keyed by treatment type (default)
-        or experiment. Each entry reports experiments / timepoints tested,
-        responded (up / down), plus rank and log2FC stats for significant
-        rows. Sorted by response breadth (most groups first).
+        """Cross-experiment rollup for ONE organism (inferred from locus_tags) — one row per gene, responses bucketed per treatment group with timepoints collapsed, broadest first.
 
-        Routing: drill into a specific experiment's temporal pattern via
-        `differential_expression_by_gene(locus_tags=[...], experiment_ids=[id])`.
-        See `docs://guide/conventions` for tested-absent semantics
-        (`groups_tested_not_responded` vs `groups_not_known`).
-
-        `organism` is optional and inferred from `locus_tags`; it only
-        validates/scopes the inferred organism rather than driving the query.
+        Use to see which treatments a gene set responds to; for log2FC per timepoint use `differential_expression_by_gene`.
+        Filters: locus_tags, organism, treatment_type, background_factors, experiment_ids, group_by.
+        Returns: genes_queried, genes_with_response, not_found, no_expression, filtered_out; one row = one gene with response_summary and groups_tested_not_responded.
+        docs://tools/gene_response_profile.
         """
         await ctx.info(f"gene_response_profile locus_tags={locus_tags} group_by={group_by} limit={limit}")
         try:
@@ -5482,19 +5353,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 5,
         offset: OffsetParam = 0,
     ) -> ListClusteringAnalysesResponse:
-        """Browse, search, and filter clustering analyses — each analysis
-        groups related gene clusters from one study / organism, with the
-        cluster children inlined per result. Lucene full-text over analysis
-        name, cluster names, descriptions, experimental_context. See
-        `docs://guide/conventions` for Lucene scoring.
+        """Published clustering analyses with their GeneCluster children inlined; Lucene over analysis and cluster names, descriptions and context.
 
-        Routing: `genes_in_cluster(cluster_ids=[id])` for per-cluster
-        members; `genes_in_cluster(analysis_id=...)` for all clusters in
-        one analysis; `gene_clusters_by_gene(locus_tags=[...],
-        analysis_ids=[id])` to scope a per-gene cluster lookup.
-
-        A genus word in `organism` (e.g. 'Alteromonas') matches every strain
-        in that genus rather than raising ambiguous.
+        Use to discover an analysis_id or cluster_ids; for a cluster's members use `genes_in_cluster`, for one gene's memberships `gene_clusters_by_gene`.
+        Filters: search_text, organism, cluster_type, analysis_ids, plus the omics / publication / experiment / condition filters.
+        Returns: by_organism, by_cluster_type, by_treatment_type, by_omics_type, score stats; one row = one analysis with its clusters.
+        docs://tools/list_clustering_analyses; summary=True first.
         """
         await ctx.info(f"list_clustering_analyses search_text={search_text!r} "
                        f"organism={organism} limit={limit}")
@@ -6041,25 +5905,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 20,
         offset: OffsetParam = 0,
     ) -> ListDerivedMetricsResponse:
-        """Discover DerivedMetric (DM) nodes — column-level scalar summaries
-        of gene behavior (rhythmicity flags, diel amplitudes,
-        darkness-survival class) that sit alongside DE and clusters as
-        non-DE evidence. Pre-flight before any DM drill-down.
+        """Discover DerivedMetric nodes — non-DE, column-level evidence (rhythmicity flags, diel amplitudes, survival classes).
 
-        Inspect `value_kind` (routes to the right drill-down), `rankable`
-        (gates bucket / percentile / rank filters), `has_p_value` (gates
-        significance filters), and `allowed_categories` (categorical DMs)
-        here — drill-down tools raise if a passed filter is not supported
-        by every selected DM. See `docs://guide/conventions` for the full
-        DM family gating contract.
-
-        Routing: `gene_derived_metrics(locus_tags=[...])` for per-gene
-        lookup across all kinds; `genes_by_numeric_metric` /
-        `genes_by_boolean_metric` / `genes_by_categorical_metric` for
-        kind-specific drill-downs.
-
-        A genus word in `organism` (e.g. 'Alteromonas') matches every strain
-        in that genus rather than raising ambiguous.
+        Use as the DM-family pre-flight: read value_kind, rankable and allowed_categories here, since the drill-downs raise on an unsupported filter; one gene's values are `gene_derived_metrics`.
+        Filters: search_text, organism, metric_types, value_kind, rankable, has_p_value, plus compartment / publication / experiment / condition.
+        Returns: by_value_kind, by_metric_type, by_organism, by_compartment; one row = one DerivedMetric.
+        docs://tools/list_derived_metrics; summary=True first.
         """
         await ctx.info(f"list_derived_metrics search_text={search_text!r} "
                        f"organism={organism} limit={limit}")
@@ -6189,16 +6040,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 25,
         offset: OffsetParam = 0,
     ) -> GeneClustersByGeneResponse:
-        """Look up cluster memberships for a gene batch — one row per
-        (gene × cluster) with analysis context (`analysis_id`,
-        `analysis_name`). Single-organism enforced. Reports `not_found`
-        (locus_tag absent from KG) and `not_matched` (in KG but no cluster
-        memberships after filters).
+        """Cluster memberships for a gene batch in ONE organism (inferred when omitted) — one row per gene × cluster with its analysis context.
 
-        Routing: cluster discovery via `list_clustering_analyses`; drill
-        into a cluster's full membership via `genes_in_cluster`.
-
-        `organism` is inferred from the input genes when omitted.
+        Use for which modules a gene sits in; for a cluster's full roster use `genes_in_cluster`, to discover analyses `list_clustering_analyses`.
+        Filters: locus_tags, organism, cluster_type, analysis_ids, plus the publication / condition filters.
+        Returns: genes_with_clusters, genes_without_clusters, by_cluster_type, by_analysis, not_found, not_matched; one row = (locus_tag, cluster_id, analysis_id).
+        docs://tools/gene_clusters_by_gene; summary=True first.
         """
         await ctx.info(f"gene_clusters_by_gene locus_tags={locus_tags} "
                        f"organism={organism}")
@@ -6292,31 +6139,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 5,
         offset: OffsetParam = 0,
     ) -> GeneDerivedMetricsResponse:
-        """Look up DerivedMetric annotations for a gene batch — one row per
-        (gene × DM), polymorphic `value` (float on numeric / `'flagged'`/`'not_flagged'`
-        on boolean / category string on categorical). Numeric extras
-        (`rank_by_metric`, `metric_percentile`, `metric_bucket`) populate only
-        on rankable parent DMs; `adjusted_p_value` / `significant` only on
-        has_p_value parent DMs (none in the current KG). Single-organism
-        enforced.
+        """DerivedMetric annotations for a gene batch in ONE organism (inferred when omitted) — one row per gene × DM with a polymorphic value.
 
-        Empty results are diagnosable via `not_found` (locus_tag absent from
-        KG) and `not_matched` (in KG but no DM rows after filters — includes
-        kind-mismatch when `value_kind` is set; `warnings` names the actual
-        kind and the sibling `genes_by_<kind>_metric` tool when a requested
-        `derived_metric_ids` / `metric_types` entry exists as a different
-        kind). Pre-flight via `list_derived_metrics(value_kind=...)` to see
-        which DMs touch your genes and whether they are rankable /
-        has_p_value. See `docs://guide/conventions` for the full DM family
-        gating contract.
-
-        Routing: edge-level filters (bucket / percentile / rank / value
-        thresholds) live on `genes_by_numeric_metric`; flag-level filters on
-        `genes_by_boolean_metric`; category filters on
-        `genes_by_categorical_metric`.
-
-        `organism` is inferred from `locus_tags` when omitted.
-        `summary=True` is sugar for `limit=0`.
+        Use for a gene's whole DM profile; for edge-level filtering pivot to the `genes_by_{numeric,boolean,categorical}_metric` trio.
+        Filters: locus_tags, organism, metric_types, value_kind, derived_metric_ids, plus the compartment / publication / condition filters.
+        Returns: by_value_kind, by_metric_type, by_metric, genes_with_metrics, not_found, not_matched; one row = (locus_tag, derived_metric_id, value).
+        docs://tools/gene_derived_metrics; summary=True first.
         """
         await ctx.info(f"gene_derived_metrics locus_tags={locus_tags} "
                        f"organism={organism}")
@@ -6477,15 +6305,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 25,
         offset: OffsetParam = 0,
     ) -> GenesInClusterResponse:
-        """Drill into gene cluster members — one row per (gene × cluster).
-        Provide `cluster_ids` OR `analysis_id` (mutually exclusive);
-        passing an `analysis_id` returns every cluster's members in one
-        call.
+        """Cluster members — one row per gene × cluster. Pass cluster_ids OR analysis_id (mutually exclusive); one organism is enforced even though organism is optional.
 
-        Routing: analysis discovery via `list_clustering_analyses`; gene →
-        cluster direction via `gene_clusters_by_gene`.
-
-        Single organism is enforced even though `organism` is optional.
+        Use for a module's full roster; for one gene's memberships use `gene_clusters_by_gene`, to find IDs `list_clustering_analyses`.
+        Filters: cluster_ids, analysis_id, organism.
+        Returns: analysis_name, by_cluster, top_categories, genes-per-cluster stats, not_found_clusters, not_matched_clusters, not_found_analysis; one row = (locus_tag, cluster_id).
+        docs://tools/genes_in_cluster; summary=True first.
         """
         await ctx.info(f"genes_in_cluster cluster_ids={cluster_ids} "
                        f"analysis_id={analysis_id} organism={organism}")
@@ -6641,35 +6466,12 @@ def register_tools(mcp: FastMCP):
             ),
         )] = None,
     ) -> OntologyLandscapeResponse:
-        """Rank (ontology x level) combinations by enrichment suitability — pre-flight for enrichment.
+        """Rank (ontology × level) strata by enrichment suitability — term-size distribution, genome coverage, relevance_rank.
 
-        Per-(ontology x level) stats: term-size distribution, genome coverage,
-        best-effort share (GO). Ranked by coverage x size_factor(median) with
-        sweet-spot [5, 50] median genes-per-term; `relevance_rank` is the
-        composite score (rank 1 = best). `ontology=None` surveys every key
-        (GO BP/MF/CC + 14 others); BRITE rows break down per tree (scope with
-        `tree=`); InterPro rows break down per `interpro_type`. Pass
-        `experiment_ids=` to weight by coverage of those experiments'
-        quantified genes.
-
-        [TRUST] `call_class` scopes MEROPS to a peptidase call so landscape
-        sizes match `genes_by_ontology`/enrichment sets; `interpro_type`
-        scopes InterPro to one entry type. `informative_only` defaults True
-        here — it drops terms the KG flags uninformative (e.g. KEGG KO
-        'uncharacterized protein' terms, GO root go:0008150, KEGG
-        global/overview maps like ko01100); pass False to survey the full
-        term set (rebaselines the coverage stats). See
-        docs://analysis/annotation_evidence.
-
-        `limit` defaults to 15 rows — enough to see the top-ranked
-        combinations; pass an explicit integer to page, or None for every row.
-
-        Routing: pick an `(ontology, level)` row, then call
-        `pathway_enrichment(ontology=..., level=...)` or
-        `cluster_enrichment(ontology=..., level=...)`. See
-        docs://analysis/enrichment for the pre-flight role and a worked
-        example, and docs://guide/conventions for the hierarchy `level`
-        and BRITE-tree scoping conventions.
+        Use as the pre-flight that picks (ontology, level) for `pathway_enrichment` / `cluster_enrichment`; the terms are `search_ontology`, gene sets `genes_by_ontology`.
+        Filters: organism, ontology, tree, experiment_ids, min/max_gene_set_size, informative_only, call_class, interpro_type.
+        Returns: organism_gene_count, n_ontologies, by_ontology, not_found, not_matched; one row = one stratum (BRITE per tree, InterPro per type).
+        docs://tools/ontology_landscape; summary=True first.
         """
         await ctx.info(f"ontology_landscape organism={organism} ontology={ontology}")
         try:
@@ -6776,37 +6578,12 @@ def register_tools(mcp: FastMCP):
             ),
         )] = None,
     ) -> PathwayEnrichmentResponse:
-        """Run pathway over-representation analysis from DE results (Fisher + BH).
+        """Over-representation analysis (Fisher + BH) over DE gene sets in ONE organism — one test per experiment × timepoint × direction × term.
 
-        Single-organism enforced. `direction='both'` runs up + down per
-        experiment × timepoint cluster. Three background modes — `table_scope`
-        (default, per-cluster quantified set), `organism` (full genome), or an
-        explicit locus_tag list — drive the Fisher denominator and matter more
-        than the ontology choice.
-
-        [TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
-        `call_class` filter TERM2GENE at the same match stage as the
-        background, so tested sets and background move together;
-        `interpro_type` is required when `ontology='interpro'` (ranking
-        across mixed entry types is not meaningful). `informative_only`
-        defaults True here — it drops terms the KG flags uninformative (e.g.
-        KEGG KO 'uncharacterized protein' terms, GO root go:0008150, KEGG
-        global/overview maps like ko01100), never restricting the gene set,
-        background, or DE inputs; pass False to include them (per-row
-        `is_informative` still surfaces either way). See
-        docs://analysis/annotation_evidence.
-
-        `limit` defaults to 25 — the top significant hits by `p_adjust`
-        globally; pass `include_nonsignificant=True` to page through the full
-        ranked list.
-
-        Routing: pre-flight via `ontology_landscape` to pick `(ontology, level)`;
-        chain `differential_expression_by_gene` for raw DE inputs; drill enriched
-        terms via `gene_overview` or, for KEGG, `list_metabolites(pathway_ids=...)`
-        to inspect compound-anchored membership of an enriched pathway.
-        See docs://analysis/enrichment for Fisher + BH methodology and
-        background semantics; docs://examples/pathway_enrichment.py for runnable
-        code (EnrichmentResult accessors, custom term2gene, compareCluster export).
+        Use when the gene sets come from DE, after an `ontology_landscape` pre-flight; a clustering analysis is `cluster_enrichment`, a custom list Python `fisher_ora`.
+        Filters: experiment_ids, organism, ontology, level / term_ids, tree, direction, background, gene-set size, trust filters.
+        Returns: n_significant, by_experiment, by_direction, cluster_summary, top_pathways_by_padj; one row = one (cluster, term) test.
+        docs://tools/pathway_enrichment; summary=True first.
         """
         await ctx.info(
             f"pathway_enrichment organism={organism} experiments={len(experiment_ids)} "
@@ -6926,36 +6703,12 @@ def register_tools(mcp: FastMCP):
             ),
         )] = None,
     ) -> ClusterEnrichmentResponse:
-        """Run cluster-membership over-representation analysis (Fisher + BH) — one ORA per cluster in a clustering analysis.
+        """Over-representation analysis (Fisher + BH) over one clustering analysis in ONE organism — one test per cluster × term.
 
-        Single-organism enforced. Background defaults to `cluster_union` (union
-        of all clustered genes — differs from `pathway_enrichment`'s
-        `table_scope` default); `organism` or an explicit locus_tag list are
-        also accepted. Background drives the Fisher denominator and matters
-        more than the ontology choice.
-
-        [TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
-        `call_class` filter TERM2GENE at the same match stage as the
-        background, so tested sets and background move together;
-        `interpro_type` is required when `ontology='interpro'`.
-        `informative_only` defaults True here — it drops terms the KG flags
-        uninformative (e.g. KEGG KO 'uncharacterized protein' terms, GO root
-        go:0008150, KEGG global/overview maps like ko01100), never
-        restricting the gene set, background, or DE inputs; pass False to
-        include them (per-row `is_informative` still surfaces either way).
-        See docs://analysis/annotation_evidence.
-
-        `limit` defaults to 25 — the top significant hits by `p_adjust`
-        globally; pass `include_nonsignificant=True` to page through the full
-        ranked list.
-
-        Routing: pre-flight via `list_clustering_analyses` for `analysis_id`
-        and `ontology_landscape` for `(ontology, level)`; drill enriched terms
-        via `gene_overview`, `genes_in_cluster`, or for KEGG
-        `list_metabolites(pathway_ids=...)` for compound-anchored membership.
-        See docs://analysis/enrichment for Fisher + BH methodology and
-        background semantics; docs://examples/pathway_enrichment.py for
-        runnable code (custom term2gene path covers cluster-membership ORA).
+        Use when the gene sets are published clusters, after an `ontology_landscape` pre-flight; DE gene sets are `pathway_enrichment`, a custom list Python `fisher_ora`.
+        Filters: analysis_id, organism, ontology, level / term_ids, tree, background, gene-set size, cluster size, trust filters.
+        Returns: n_significant, by_cluster, by_term, clusters_tested, clusters_skipped, term_validation; one row = one (cluster, term) test.
+        docs://tools/cluster_enrichment; summary=True first.
         """
         await ctx.info(
             f"cluster_enrichment analysis_id={analysis_id} "
@@ -7362,35 +7115,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 25,
         offset: OffsetParam = 0,
     ) -> GenesByNumericMetricResponse:
-        """Drill into numeric DerivedMetric edges — one row per (gene × DM).
-        `value` (float) always populated; `rank_by_metric` / `metric_percentile`
-        / `metric_bucket` populate only on rankable DMs (null otherwise — same
-        row shape as `gene_derived_metrics`). Cross-organism by design.
+        """Numeric DerivedMetric edges — one row per gene × DM with its raw value; cross-organism.
 
-        Selection is `derived_metric_ids` XOR `metric_types` (exactly one
-        required); an id/metric_type that exists as a different kind
-        (boolean / categorical) moves to `not_matched_ids` /
-        `not_matched_metric_types` with a `warnings` entry naming the
-        sibling tool, and a correct-kind DM outside the requested
-        `organism` surfaces via `not_matched_organism` (also warned) —
-        neither is silently dropped into `not_found_*`. Rankable-gated
-        filters (`metric_bucket`, `min/max_percentile`, `max_rank`) raise on
-        all-non-rankable selection, soft-exclude on mixed input.
-        `has_p_value`-gated filters (`significant_only`,
-        `max_adjusted_p_value`) raise in the current KG (no DM carries
-        p-values). Pre-flight via
-        `list_derived_metrics(value_kind='numeric', rankable=True)`. See
-        `docs://guide/conventions` for the full DM family gating contract.
-
-        The `by_metric` envelope rollup pairs filtered-slice value
-        distribution with full-DM distribution (precomputed dm.value_*) so
-        callers can read "top-decile slice 12.2-25.3 out of full DM range
-        0-28" directly. `excluded_derived_metrics` + `warnings` are the
-        primary diagnostic when a real DM produces zero rows.
-
-        `organism` is optional and single-organism is **not** enforced —
-        omit it to drill across every organism a `metric_type` spans.
-        `summary=True` is sugar for `limit=0`.
+        Use for value, percentile, bucket or rank cutoffs after a `list_derived_metrics` pre-flight; flags `genes_by_boolean_metric`, labels `genes_by_categorical_metric`.
+        Filters: derived_metric_ids XOR metric_types (exactly one), organism, locus_tags, min/max_value, min/max_percentile, metric_bucket, max_rank.
+        Returns: by_metric (filtered slice vs the full-DM range), by_organism, excluded_derived_metrics, not_found / not_matched; one row = one edge.
+        docs://tools/genes_by_numeric_metric; summary=True first.
         """
         selection_size = (
             len(derived_metric_ids) if derived_metric_ids is not None
@@ -7743,40 +7473,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 25,
         offset: OffsetParam = 0,
     ) -> GenesByBooleanMetricResponse:
-        """Drill into boolean DerivedMetric edges — one row per (gene × DM ×
-        edge value). `value` is the KG two-state literal (`'flagged'` / `'not_flagged'`).
-        Cross-organism by design.
+        """Boolean DerivedMetric edges — one row per gene × DM × edge value; cross-organism.
 
-        Selection is `derived_metric_ids` XOR `metric_types` (exactly one
-        required); an id/metric_type that exists as a different kind
-        (numeric / categorical) moves to `not_matched_ids` /
-        `not_matched_metric_types` with a `warnings` entry naming the
-        sibling tool — it is never silently dropped into `not_found_*`.
-        Pre-flight via `list_derived_metrics(value_kind='boolean')` to
-        pick valid boolean DMs. See `docs://guide/conventions` for the
-        full DM family gating contract.
-
-        **Two storage conventions coexist:** 11 of 27 boolean DMs store
-        both `flagged` and `not_flagged` edges (tested-absent is real
-        biology — `flag_value=False` returns rows), the rest are positive-only
-        (`flag_value=False` → 0 detail rows, but the DM's `by_metric` entry is
-        kept with `count`/`false_count` both 0 — never dropped — plus a
-        `warnings` entry). Read `by_metric[*].false_count` to tell
-        'not flagged' from 'not assessed'; `by_metric[*].dm_false_count`
-        is the full-DM precomputed twin (0 on positive-only DMs).
-        See `docs://guide/conventions`.
-
-        The `by_metric` envelope rollup pairs filtered-slice true/false
-        tallies with full-DM precomputed counts so callers can read "32 of
-        32 MED4 vesicle-proteome members" directly.
-        `excluded_derived_metrics` is always [] here (no rankable /
-        has_p_value gates apply to boolean DMs — kept for envelope-shape
-        consistency); `warnings` carries closed-vocabulary,
-        organism-existence, kind-mismatch, and positive-only-flag notices.
-
-        `organism` is optional and single-organism is **not** enforced —
-        omit it to drill across every organism a `metric_type` spans.
-        `summary=True` is sugar for `limit=0`.
+        Use for flag membership after a `list_derived_metrics` pre-flight; values `genes_by_numeric_metric`, labels `genes_by_categorical_metric`.
+        Filters: derived_metric_ids XOR metric_types (exactly one), organism, locus_tags, flag_value, plus the publication / experiment / condition filters.
+        Returns: by_value, by_metric (slice tallies paired with full-DM counts, incl. false_count), by_organism, not_found / not_matched; one row = one edge.
+        docs://tools/genes_by_boolean_metric; summary=True first.
         """
         selection_size = (
             len(derived_metric_ids) if derived_metric_ids is not None
@@ -8113,34 +7815,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 25,
         offset: OffsetParam = 0,
     ) -> GenesByCategoricalMetricResponse:
-        """Drill into categorical DerivedMetric edges — one row per
-        (gene × DM × edge value). `value` is a category label. Cross-organism
-        by design.
+        """Categorical DerivedMetric edges — one row per gene × DM × edge value; cross-organism.
 
-        Selection is `derived_metric_ids` XOR `metric_types` (exactly one
-        required); an id/metric_type that exists as a different kind
-        (numeric / boolean) moves to `not_matched_ids` /
-        `not_matched_metric_types` with a `warnings` entry naming the
-        sibling tool — it is never silently dropped into `not_found_*`.
-        The `categories` filter must be a subset of the union of selected
-        DMs' `allowed_categories` — unknown values raise `ValueError`
-        listing the allowed set. Pre-flight via
-        `list_derived_metrics(value_kind='categorical')` to see each DM's
-        allowed set. See `docs://guide/conventions` for the full DM family
-        gating contract.
-
-        The `by_metric` envelope rollup pairs filtered-slice category
-        histogram (`by_category`) with full-DM precomputed histogram
-        (`dm_by_category`) plus the schema-declared `allowed_categories`,
-        so callers can detect declared-but-unobserved categories without an
-        extra call. `excluded_derived_metrics` is always [] here (no
-        rankable / has_p_value gates apply to categorical DMs — kept for
-        envelope-shape consistency); `warnings` carries closed-vocabulary,
-        organism-existence, and kind-mismatch notices.
-
-        `organism` is optional and single-organism is **not** enforced —
-        omit it to drill across every organism a `metric_type` spans.
-        `summary=True` is sugar for `limit=0`.
+        Use to slice genes by a category label after a `list_derived_metrics` pre-flight; values `genes_by_numeric_metric`, flags `genes_by_boolean_metric`.
+        Filters: derived_metric_ids XOR metric_types (exactly one), organism, locus_tags, categories, plus the publication / experiment / condition filters.
+        Returns: by_category, by_metric (slice histogram paired with the full-DM histogram and allowed_categories), by_organism; one row = one edge.
+        docs://tools/genes_by_categorical_metric; summary=True first.
         """
         selection_size = (
             len(derived_metric_ids) if derived_metric_ids is not None
@@ -8310,10 +7990,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 5,
         offset: OffsetParam = 0,
     ) -> ListMetabolitesResponse:
-        """Browse and filter metabolites in the chemistry layer (KEGG-curated metabolism + TCDB-curated transport substrates + measured by MetaboliteAssay).
-        Bare / xref metabolite IDs (`C00064`, `CHEBI:17234`, `HMDB…`, `MNXM…`) on `metabolite_ids` / `exclude_metabolite_ids` are coerced to canonical IDs (`resolved_aliases`; collisions expand + warn) — the exact-xref filters `kegg_compound_ids` / `chebi_ids` / `hmdb_ids` / `mnxm_ids` are unchanged.
+        """Browse the chemistry layer — KEGG-curated metabolism, TCDB-curated transport substrates, and compounds measured by a MetaboliteAssay.
 
-        Routing: drill into `genes_by_metabolite(metabolite_ids=[...])` for catalysts/transporters per organism, `assays_by_metabolite(metabolite_ids=[...])` for measurement evidence, `genes_by_ontology(ontology='kegg', term_ids=[pathway_id])` for pathway → genes. See `docs://guide/conventions` for direction-agnosticism (KEGG equation order is unreliable upstream — joins through Reaction_has_metabolite and Tcdb_family_transports_metabolite return both produced and consumed metabolites identically). See `docs://analysis/metabolites` for the 3 source pipelines decision tree.
+        Use as the compound-side entry point; for a metabolite's genes use `genes_by_metabolite`, for measurement evidence `assays_by_metabolite`.
+        Filters: search_text, metabolite_ids (+exclude), xref ID lists, elements, min/max_mass, organism_names, pathway_ids, evidence_sources.
+        Returns: top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, by_measurement_coverage; one row = one metabolite.
+        docs://tools/list_metabolites; summary=True first.
         """
         await ctx.info(
             f"list_metabolites search_text={search_text} "
@@ -8465,45 +8147,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 10,
         offset: OffsetParam = 0,
     ) -> GenesByMetaboliteResponse:
-        """Find genes connected to specified metabolites in one organism.
+        """Metabolite IDs to gene catalysts (via Reaction) and transporters (via TcdbFamily, deepest attachment) in ONE organism.
 
-        What: two arms — metabolism (`Gene → Reaction → Metabolite`) and
-        transport (`Gene → TcdbFamily → Metabolite` over each gene's deepest
-        TCDB attachments only, so rows agree with the KG's precomputed
-        transport counts). Direction-agnostic (KEGG equation order is
-        unreliable upstream — joins through Reaction_has_metabolite and
-        Tcdb_family_transports_metabolite return both produced and consumed
-        metabolites identically). Per-row union shape: cross-arm fields are
-        explicitly None on rows from the other arm.
-
-        Transport semantics: transport rows carry `substrate_depth`
-        ('most_specific' = most specific surviving transporter node for the
-        substrate in the gene-pruned hierarchy, not a curation level;
-        'inherited' = rolled up from a descendant) and `tcdb_evidence_score`
-        (5-signal composite [0,1]; rank by it, don't filter — 0 =
-        uncorroborated, not absent). Detail sort: metabolism →
-        most_specific → inherited, score desc within a tier. The
-        auto-warning fires when `inherited` dominates the transport arm.
-
-        Batch advice: bare / xref metabolite IDs are coerced to canonical
-        (`resolved_aliases`; collisions expand + warn).
-
-        Routing: narrow with `substrate_depth=['most_specific']` when
-        inherited rows dominate; from `top_genes` (read
-        `transport_substrate_resolution` / `tcdb_evidence_score_max`) drill
-        into `differential_expression_by_gene(locus_tags=[...],
-        organism=...)` or `gene_overview`; from `top_tcdb_families` to
-        `genes_by_ontology(ontology="tcdb", term_ids=[id], organism=...)`;
-        from `top_reactions` to
-        `genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)` or
-        `pathway_enrichment`. See `docs://guide/conventions` for
-        substrate-depth and direction-agnostic semantics, and
-        `docs://analysis/metabolites` for the chemistry-layer decision tree.
-
-        `not_found.organism` is set when the `organism` name resolves to
-        zero organisms. `limit` defaults to covering p75 of typical
-        (metabolite × organism) UNION row distributions; coenzyme-tail
-        queries (ATP, water) should use `offset` to page.
+        Use for the compound-anchored direction; the gene-anchored mirror is `metabolites_by_gene`, family-level TCDB `genes_by_ontology`.
+        Filters: metabolite_ids (+exclude), organism, ec_numbers, metabolite_pathway_ids, gene_categories, substrate_depth, evidence_sources.
+        Returns: by_metabolite, by_evidence_source, by_substrate_depth, top_genes, top_reactions, top_tcdb_families, not_matched; one row = one gene × metabolite.
+        docs://tools/genes_by_metabolite; summary=True first.
         """
         await ctx.info(
             f"genes_by_metabolite metabolite_ids={metabolite_ids} "
@@ -8690,51 +8339,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 10,
         offset: OffsetParam = 0,
     ) -> MetabolitesByGeneResponse:
-        """Find metabolites the input gene set's chemistry reaches in one
-        organism.
+        """Metabolites a gene batch's chemistry reaches in ONE organism — reaction and transport arms, mirroring `genes_by_metabolite`.
 
-        What: symmetric counterpart to `genes_by_metabolite` — same two
-        arms (metabolism and transport over each gene's deepest TCDB
-        attachments only, so distinct transport metabolites equal
-        `gene_overview.transported_metabolite_count`), same per-row union
-        shape with `substrate_depth` + `tcdb_evidence_score`, same
-        direction-agnostic semantics. The `metabolite_elements` filter is
-        the N-source workflow primitive (presence-only AND-of, e.g.
-        `['N']`). The `by_element` envelope is presence-only — not
-        stoichiometric, not mass-balanced.
-
-        Transport semantics: genes with only lumping attachments (notably
-        ABC-only) emit many `inherited` rows; the global sort (metabolism →
-        most_specific → inherited, score desc within a tier) prevents one
-        gene from consuming `limit`, and the auto-warning names input genes
-        whose `transport_substrate_resolution` is 'family_inferred'
-        (breadth is reachability, not capability; 'resolved' means at
-        least one non-lumping attachment, not all).
-
-        Batch advice: use `summary=True` on batch DE inputs (50+
-        locus_tags). Bare / xref metabolite IDs are coerced to canonical
-        (`resolved_aliases`; collisions expand + warn).
-
-        Routing: narrow with `substrate_depth=['most_specific']` to mute
-        inherited long tails; from `top_metabolites` drill into
-        `list_metabolites(metabolite_ids=[...])` for cross-refs OR
-        `genes_by_metabolite(metabolite_ids=[...], organism=PARTNER)`
-        for the cross-feeding bridge; from `top_metabolite_pathways` to
-        `list_metabolites(pathway_ids=[...])` (chemistry-pathway rollup,
-        distinct from gene-KO pathway annotations on
-        `genes_by_ontology(ontology="kegg")`); from `top_reactions` to
-        `genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)`
-        or `pathway_enrichment`; from `top_tcdb_families` to
-        `genes_by_ontology(ontology="tcdb", term_ids=[id],
-        organism=...)`; from `not_matched` to `gene_overview`. See
-        `docs://guide/conventions` for substrate-depth and
-        direction-agnostic semantics, and `docs://analysis/metabolites`
-        for the chemistry-layer decision tree.
-
-        `not_found.organism` is set when the `organism` name resolves to
-        zero organisms. Long-tail genes (ABC-only annotations) can emit
-        large numbers of `limit` rows — use
-        `substrate_depth=['most_specific']` to mute, or `offset` to page.
+        Use for the gene-anchored direction; compound-anchored is `genes_by_metabolite`, measurements `assays_by_metabolite`.
+        Filters: locus_tags, organism, metabolite_elements, metabolite_ids (+exclude), ec_numbers, substrate_depth, evidence_sources.
+        Returns: by_gene, by_element, by_evidence_source, by_substrate_depth, top_metabolites, top_metabolite_pathways, not_matched; one row = one gene × metabolite.
+        docs://tools/metabolites_by_gene; summary=True first for 50+ genes.
         """
         await ctx.info(
             f"metabolites_by_gene locus_tags={locus_tags} "
@@ -9124,24 +8734,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 20,
         offset: OffsetParam = 0,
     ) -> ListMetaboliteAssaysResponse:
-        """Discover MetaboliteAssay nodes — the metabolomics measurement
-        layer. Mirrors `list_derived_metrics`. Inspect `value_kind` (routes
-        drill-down), `rankable` (gates rankable filters on the numeric
-        drill-down), `compartment` (whole_cell vs extracellular), and
-        per-row `detection_status_counts` (signals how much of the assay
-        is detected / sporadic / not_detected). Bare / xref metabolite IDs
-        are coerced to canonical (`resolved_aliases`; collisions expand + warn).
+        """Discover MetaboliteAssay nodes — the metabolomics measurement layer, mirroring `list_derived_metrics`.
 
-        Routing: drill into `metabolites_by_quantifies_assay(assay_ids=[...])`
-        for numeric details, `metabolites_by_flags_assay(assay_ids=[...])`
-        for boolean details, `assays_by_metabolite(metabolite_ids=[...])`
-        for reverse lookup across both arms, and
-        `list_metabolites(metabolite_ids=[...])` for chemistry context. See
-        `docs://guide/conventions` for tested-absent semantics and
-        `docs://analysis/metabolites` for the metabolomics decision tree.
-
-        A genus word in `organism` (e.g. 'Alteromonas') matches every strain
-        in that genus rather than raising ambiguous.
+        Use as the pre-flight that reads value_kind and rankable; drill down with `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay` or `assays_by_metabolite`.
+        Filters: search_text, organism, value_kind, compartment, assay_ids, metabolite_ids, rankable, plus publication / experiment / condition.
+        Returns: by_organism, by_value_kind, by_compartment, by_detection_status, not_found; one row = one assay with detection_status_counts.
+        docs://tools/list_metabolite_assays; summary=True first.
         """
         await ctx.info(
             f"list_metabolite_assays search_text={search_text} "
@@ -9562,31 +9160,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 5,
         offset: OffsetParam = 0,
     ) -> MetabolitesByQuantifiesAssayResponse:
-        """Drill into numeric MetaboliteAssay edges — one row per
-        (metabolite × assay-edge). `value` (raw concentration /
-        intensity) is always returned; `metric_bucket` /
-        `metric_percentile` / `rank_by_metric` populated only on
-        rankable-assay rows (mirrors `genes_by_numeric_metric`'s
-        rankable gate). Rankable-gated filters raise if every selected
-        assay has `rankable=false`, soft-exclude on mixed input. Tested-
-        absent rows (`value=0` / `detection_status='not_detected'`) are
-        real biology and kept by default. Cross-organism by design.
-        Pre-flight via
-        `list_metabolite_assays(value_kind='numeric', rankable=True)`. Bare /
-        xref metabolite IDs are coerced to canonical (`resolved_aliases`;
-        collisions expand + warn).
+        """Numeric MetaboliteAssay edges — one row per metabolite × assay edge with its value; cross-organism.
 
-        Routing: drill across to `assays_by_metabolite(metabolite_ids=[...])`
-        for the boolean-arm complement and the cross-organism reverse view,
-        or `genes_by_metabolite(metabolite_ids=[...], organism=...)` for
-        gene catalysts/transporters. See `docs://guide/conventions` for
-        tested-absent semantics and `docs://analysis/metabolites` for
-        the metabolomics decision tree.
-
-        `organism` matches by case-insensitive CONTAINS (not word-match);
-        cross-organism is the default. A `metabolite_ids` entry absent from
-        the KG lands in `not_found.metabolite_ids`; one present but
-        unmeasured by the selected assays contributes zero rows.
+        Use for values, detection status and rankable cutoffs; pre-flight `list_metabolite_assays`; flags `metabolites_by_flags_assay`, both arms `assays_by_metabolite`.
+        Filters: assay_ids, organism, metabolite_ids, min/max_value, detection_status, timepoint, metric_bucket, min/max_percentile, max_rank.
+        Returns: by_detection_status, by_metric_bucket, by_assay, by_metric, excluded_assays; one row = one edge. Tested-absent rows kept.
+        docs://tools/metabolites_by_quantifies_assay; summary=True first.
         """
         await ctx.info(
             f"metabolites_by_quantifies_assay assay_ids={len(assay_ids)} "
@@ -9837,27 +9416,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 5,
         offset: OffsetParam = 0,
     ) -> MetabolitesByFlagsAssayResponse:
-        """Drill into boolean MetaboliteAssay edges — one row per
-        (metabolite × flag-edge). `flag_value=False` rows are
-        *tested-absent* (assayed and not found, real biology, kept by
-        default — about 69% of boolean rows). Both states are always
-        stored on this edge (KG `'detected'` / `'not_detected'`), unlike
-        the DM layer where only some DMs store `not_flagged`.
-        Cross-organism by design. No `by_detection_status` envelope — on
-        the boolean arm, `flag_value` IS the qualitative-detection
-        signal; `by_value` is its envelope rollup. Bare / xref metabolite
-        IDs are coerced to canonical (`resolved_aliases`; collisions
-        expand + warn).
+        """Boolean MetaboliteAssay edges — one row per metabolite × flag edge; cross-organism. flag_value=False rows are tested-absent: both states are stored.
 
-        Routing: drill across to `assays_by_metabolite(metabolite_ids=[...])`
-        for the quantifies-arm complement, or
-        `genes_by_metabolite(metabolite_ids=[...], organism=...)` for
-        gene chemistry context. See `docs://guide/conventions` for
-        tested-absent semantics and `docs://analysis/metabolites` for
-        the metabolomics decision tree.
-
-        `organism` matches by case-insensitive CONTAINS (not word-match);
-        cross-organism is the default.
+        Use for presence / absence calls; pre-flight `list_metabolite_assays`; values `metabolites_by_quantifies_assay`, both arms `assays_by_metabolite`.
+        Filters: assay_ids, organism, metabolite_ids, flag_value, plus publication / experiment / condition.
+        Returns: by_value, by_assay, by_metric, not_found, excluded_assays (empty here, for parity with the numeric twin); one row = one flag.
+        docs://tools/metabolites_by_flags_assay; summary=True first.
         """
         await ctx.info(
             f"metabolites_by_flags_assay assay_ids={len(assay_ids)} "
@@ -10134,33 +9698,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 5,
         offset: OffsetParam = 0,
     ) -> AssaysByMetaboliteResponse:
-        """Batch reverse-lookup: metabolite IDs → all measurement evidence
-        across both arms (quantifies + flags). Cross-organism by default
-        (metabolite IDs are organism-agnostic). Polymorphic rows: numeric-
-        arm rows carry `value`, `value_sd`, `detection_status`,
-        `timepoint*`, `metric_bucket`, `metric_percentile`,
-        `rank_by_metric` (rankable subset). Boolean-arm rows carry
-        `flag_value`, `n_positive`. Cross-arm fields are explicit `None`
-        (union-shape padding). Three states for a metabolite: `not_found`
-        (ID not in KG), `not_matched` (ID in KG, no edge after filters),
-        and tested-absent rows surfaced in `results` (`value=0` /
-        `flag_value=false` / `detection_status='not_detected'` — real
-        biology, kept by default). Use `metabolites_matched` for distinct-
-        metabolite count (NOT `total_matching` — that's row count). Use
-        `summary=True` on batch routing for 50+ metabolite_ids. Bare / xref
-        metabolite IDs are coerced to canonical (`resolved_aliases`;
-        collisions expand + warn).
+        """Metabolite IDs to every measurement edge, numeric and boolean arms merged into one polymorphic row set; cross-organism.
 
-        Routing: drill back via
-        `metabolites_by_quantifies_assay(assay_ids=[...], metabolite_ids=[...])`
-        for numeric details. Upstream from
-        `list_metabolites(metabolite_ids=[...])` (chemistry-layer discovery)
-        or `metabolites_by_gene(locus_tags=[...])` (gene-anchored
-        chemistry). See `docs://guide/conventions` for tested-absent
-        semantics and `docs://analysis/metabolites` for the metabolomics
-        decision tree.
-
-        `organism` matches by case-insensitive CONTAINS (not word-match).
+        Use for the metabolite-anchored reverse view; drill back to one arm with `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay`.
+        Filters: metabolite_ids (+exclude), organism, evidence_kind, metric_types, compartment.
+        Returns: by_evidence_kind, by_detection_status, by_flag_value, by_assay, metabolites_matched (distinct; total_matching counts rows), not_found, not_matched; one row = one edge.
+        docs://tools/assays_by_metabolite; summary=True first for 50+ IDs.
         """
         await ctx.info(
             f"assays_by_metabolite metabolite_ids={len(metabolite_ids)} "
@@ -10273,11 +9816,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitOptionalParam = None,
         offset: OffsetParam = 0,
     ) -> GeneAaSequenceResponse:
-        """Return amino-acid sequences for a batch of genes, export-optimized for BLAST / HMMER / alignment. Set fasta=true for one multi-FASTA blob; sequence-length stats cover the full match (page-independent). not_found = locus_tag absent from KG; not_matched = gene exists but its sequence is null.
+        """Amino-acid sequences for a gene batch, export-shaped for BLAST / HMMER / alignment; the KG stores no nucleotide sequence.
 
-        Routing: feed locus_tags from `resolve_gene` / `gene_overview` / `genes_by_function`; this is the terminal export step (pair with fasta=true for external tools).
-
-        `limit` defaults to every input gene (min 25); pass an explicit number to page. `summary=True` is sugar for `limit=0`.
+        Use as the terminal export step; for annotations use `gene_details`, for genomic context `gene_neighbors`.
+        Filters: locus_tags, fasta.
+        Returns: by_organism, sequence_length_stats, the fasta blob when fasta=True, not_found, not_matched (gene exists, sequence null); one row = (locus_tag, sequence, protein_id).
+        docs://tools/gene_aa_sequence; summary=True first.
         """
         resolved_limit = limit if limit is not None else _resolve_batch_limit(locus_tags)
         await ctx.info(
@@ -10367,11 +9911,12 @@ def register_tools(mcp: FastMCP):
         summary: SummaryParam = False,
         limit: LimitOptionalParam = None,
     ) -> GeneNeighborsResponse:
-        """Return each anchor gene's genomic neighborhood — genes adjacent on the same contig and organism — for operon / synteny reasoning, with strand orientation and intergenic gap. Positional only (not co-expression); fragmented assemblies yield fewer neighbors near contig ends. not_found = anchor absent from KG; not_matched = anchor exists but lacks coordinates.
+        """Genes flanking each anchor on the same contig and organism, with strand and intergenic gap — positional adjacency only, never co-expression.
 
-        Routing: feed anchors from `differential_expression_by_gene` or `genes_by_metabolite`, then chain the returned neighbor locus_tags into `gene_overview` / `gene_aa_sequence` / `differential_expression_by_gene` for operon context.
-
-        `limit` defaults to every anchor × (2×window+1) neighbors (min 25); pass an explicit number to page. `summary=True` is sugar for `limit=0`.
+        Use for operon or synteny reasoning; for co-regulation use `differential_expression_by_gene`, for the anchor's own annotations `gene_overview`.
+        Filters: locus_tags, window, max_bp_distance, same_strand.
+        Returns: anchors, by_organism, not_found, not_matched (anchor lacks coordinates); one row = one neighbor with rank_offset, bp_gap, same_strand.
+        docs://tools/gene_neighbors; summary=True first.
         """
         resolved_limit = limit if limit is not None else _resolve_batch_limit(
             locus_tags, k=2 * window + 1,
@@ -10475,11 +10020,12 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[LimitParam, Field(ge=0)] = 50,
         offset: OffsetParam = 0,
     ) -> DiscussedByPublicationResponse:
-        """List the genes and KEGG pathways a publication discusses in prose.
+        """Literature index: publication DOIs to the genes and KEGG pathways each paper names in prose, with a prominence label — recall-biased, never DE-table data.
 
-        Recall-biased literature router (narrative mentions, NOT exhaustive, NOT DE-table
-        expression data). Routing: feed DOIs from list_publications; drill returned genes
-        into gene_overview and pathways into genes_by_ontology(ontology='kegg').
+        Use for what a paper names; its DE results come from `list_experiments` then `differential_expression_by_gene`. Pathways return verbatim — chain `genes_by_ontology(ontology='kegg')` for genes.
+        Filters: publication_dois, entity_kind, prominence.
+        Returns: by_entity_kind, by_prominence, top_kegg_pathways, not_found, not_matched; one row = (doi, entity_kind, entity_id, prominence).
+        docs://tools/discussed_by_publication; summary=True first.
         """
         await ctx.info(
             f"discussed_by_publication publication_dois={len(publication_dois)} "

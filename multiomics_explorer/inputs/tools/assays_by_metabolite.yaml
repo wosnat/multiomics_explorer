@@ -268,3 +268,4 @@ mistakes:
       id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
       in the form you passed.
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for the not_found vs not_matched convention across batch tools."
+  - "`organism` here matches by case-insensitive CONTAINS, not the word-based match the gene tools use; cross-organism is the default."

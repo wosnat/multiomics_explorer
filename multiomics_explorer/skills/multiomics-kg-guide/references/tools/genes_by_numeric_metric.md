@@ -2,35 +2,12 @@
 
 ## What it does
 
-Drill into numeric DerivedMetric edges — one row per (gene × DM).
-`value` (float) always populated; `rank_by_metric` / `metric_percentile`
-/ `metric_bucket` populate only on rankable DMs (null otherwise — same
-row shape as `gene_derived_metrics`). Cross-organism by design.
+Numeric DerivedMetric edges — one row per gene × DM with its raw value; cross-organism.
 
-Selection is `derived_metric_ids` XOR `metric_types` (exactly one
-required); an id/metric_type that exists as a different kind
-(boolean / categorical) moves to `not_matched_ids` /
-`not_matched_metric_types` with a `warnings` entry naming the
-sibling tool, and a correct-kind DM outside the requested
-`organism` surfaces via `not_matched_organism` (also warned) —
-neither is silently dropped into `not_found_*`. Rankable-gated
-filters (`metric_bucket`, `min/max_percentile`, `max_rank`) raise on
-all-non-rankable selection, soft-exclude on mixed input.
-`has_p_value`-gated filters (`significant_only`,
-`max_adjusted_p_value`) raise in the current KG (no DM carries
-p-values). Pre-flight via
-`list_derived_metrics(value_kind='numeric', rankable=True)`. See
-`docs://guide/conventions` for the full DM family gating contract.
-
-The `by_metric` envelope rollup pairs filtered-slice value
-distribution with full-DM distribution (precomputed dm.value_*) so
-callers can read "top-decile slice 12.2-25.3 out of full DM range
-0-28" directly. `excluded_derived_metrics` + `warnings` are the
-primary diagnostic when a real DM produces zero rows.
-
-`organism` is optional and single-organism is **not** enforced —
-omit it to drill across every organism a `metric_type` spans.
-`summary=True` is sugar for `limit=0`.
+Use for value, percentile, bucket or rank cutoffs after a `list_derived_metrics` pre-flight; flags `genes_by_boolean_metric`, labels `genes_by_categorical_metric`.
+Filters: derived_metric_ids XOR metric_types (exactly one), organism, locus_tags, min/max_value, min/max_percentile, metric_bucket, max_rank.
+Returns: by_metric (filtered slice vs the full-DM range), by_organism, excluded_derived_metrics, not_found / not_matched; one row = one edge.
+docs://tools/genes_by_numeric_metric; summary=True first.
 
 ## Parameters
 

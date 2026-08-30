@@ -2,40 +2,12 @@
 
 ## What it does
 
-Drill into boolean DerivedMetric edges — one row per (gene × DM ×
-edge value). `value` is the KG two-state literal (`'flagged'` / `'not_flagged'`).
-Cross-organism by design.
+Boolean DerivedMetric edges — one row per gene × DM × edge value; cross-organism.
 
-Selection is `derived_metric_ids` XOR `metric_types` (exactly one
-required); an id/metric_type that exists as a different kind
-(numeric / categorical) moves to `not_matched_ids` /
-`not_matched_metric_types` with a `warnings` entry naming the
-sibling tool — it is never silently dropped into `not_found_*`.
-Pre-flight via `list_derived_metrics(value_kind='boolean')` to
-pick valid boolean DMs. See `docs://guide/conventions` for the
-full DM family gating contract.
-
-**Two storage conventions coexist:** 11 of 27 boolean DMs store
-both `flagged` and `not_flagged` edges (tested-absent is real
-biology — `flag_value=False` returns rows), the rest are positive-only
-(`flag_value=False` → 0 detail rows, but the DM's `by_metric` entry is
-kept with `count`/`false_count` both 0 — never dropped — plus a
-`warnings` entry). Read `by_metric[*].false_count` to tell
-'not flagged' from 'not assessed'; `by_metric[*].dm_false_count`
-is the full-DM precomputed twin (0 on positive-only DMs).
-See `docs://guide/conventions`.
-
-The `by_metric` envelope rollup pairs filtered-slice true/false
-tallies with full-DM precomputed counts so callers can read "32 of
-32 MED4 vesicle-proteome members" directly.
-`excluded_derived_metrics` is always [] here (no rankable /
-has_p_value gates apply to boolean DMs — kept for envelope-shape
-consistency); `warnings` carries closed-vocabulary,
-organism-existence, kind-mismatch, and positive-only-flag notices.
-
-`organism` is optional and single-organism is **not** enforced —
-omit it to drill across every organism a `metric_type` spans.
-`summary=True` is sugar for `limit=0`.
+Use for flag membership after a `list_derived_metrics` pre-flight; values `genes_by_numeric_metric`, labels `genes_by_categorical_metric`.
+Filters: derived_metric_ids XOR metric_types (exactly one), organism, locus_tags, flag_value, plus the publication / experiment / condition filters.
+Returns: by_value, by_metric (slice tallies paired with full-DM counts, incl. false_count), by_organism, not_found / not_matched; one row = one edge.
+docs://tools/genes_by_boolean_metric; summary=True first.
 
 ## Parameters
 
@@ -500,6 +472,8 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
 ```
 
 - See `docs://analysis/derived_metrics` for the DM family overview. Note: `flag_value=False` returns rows only on DMs that store `not_flagged` edges (11 of 27); metabolomics `metabolites_by_flags_assay` always stores both states.
+
+- `excluded_derived_metrics` is always `[]` here — no rankable / has_p_value gate applies to boolean DMs; it is kept for envelope-shape parity with `genes_by_numeric_metric`. `warnings` carries the closed-vocabulary, organism-existence, positive-only-flag and kind-mismatch notices instead.
 
 ## Package import equivalent
 

@@ -10949,12 +10949,17 @@ class TestOntologyTermDetailsWrapper:
             assert len(d) <= 250, f"{param}: {len(d)} chars"
 
     def test_docstring_opens_with_a_verb_and_ends_with_routing(self, tool_fns):
-        doc = _inspect3b.getdoc(tool_fns["ontology_term_details"]) or ""
-        first = doc.strip().split()[0]
+        doc = (_inspect3b.getdoc(tool_fns["ontology_term_details"]) or "").strip()
+        first = doc.split()[0]
         assert first[0].isupper()
         assert first not in ("This", "The", "A", "An", "Tool")
-        assert "Routing:" in doc
-        assert doc.strip().rfind("Routing:") > doc.strip().rfind("\n\n")
+        # Five-slot template: what it does / where to route / filters /
+        # returns / docs pointer last.
+        slots = doc.split("\n\n")[-1].splitlines()
+        assert slots[0].startswith("Use ")
+        assert slots[1].startswith("Filters:")
+        assert slots[2].startswith("Returns:")
+        assert slots[-1].startswith("docs://tools/")
 
     @pytest.mark.parametrize("needle", [
         "genes_by_ontology", "search_ontology", "docs://ontologies",

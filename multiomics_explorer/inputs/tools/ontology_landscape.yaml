@@ -1153,3 +1153,5 @@ mistakes:
      the default `min_gene_set_size=5` filter, the small `n_terms_with_genes`
      is expected (categories range from tens to tens of thousands of genes
      KG-wide; per organism it's much smaller)."
+  - "`relevance_rank` is the composite score (rank 1 = best): genome coverage times a size factor that peaks at a mid-sized median genes-per-term. Rank the rows against each other; the score is not a probability."
+  - "`informative_only` defaults True here — pass False to survey the full term set, which rebaselines the coverage stats. `call_class` / `interpro_type` are part of the annotation-trust surface: see docs://analysis/annotation_evidence."

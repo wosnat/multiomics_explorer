@@ -119,3 +119,4 @@ mistakes:
   - "not_matched (gene exists but `sequence` is null, ~3% of genes — expression-only, no genome match) is distinct from not_found (locus_tag absent from the KG). See docs://guide/conventions."
 
 # python_returns: dict
+  - "`limit` defaults to every input gene (min 25) rather than a small page — pass an explicit number to page."

@@ -343,3 +343,5 @@ mistakes:
       id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
       in the form you passed. Exclude-wins-on-overlap is computed on the canonical IDs, so currency-cofactor exclude lists in either form behave identically.
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and the transport trust ladder, and `docs://guide/concepts` for the chemistry layer overview."
+  - "`not_found.organism` is set when the `organism` name resolves to zero organisms — check it before reading an empty result as 'no chemistry here'."
+  - "Long-tail genes (ABC-only annotations) can fill `limit` on their own: narrow with `substrate_depth=['most_specific']`, or page with `offset`."

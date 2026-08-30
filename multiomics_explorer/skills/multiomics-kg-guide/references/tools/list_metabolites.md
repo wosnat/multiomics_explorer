@@ -2,10 +2,12 @@
 
 ## What it does
 
-Browse and filter metabolites in the chemistry layer (KEGG-curated metabolism + TCDB-curated transport substrates + measured by MetaboliteAssay).
-Bare / xref metabolite IDs (`C00064`, `CHEBI:17234`, `HMDB…`, `MNXM…`) on `metabolite_ids` / `exclude_metabolite_ids` are coerced to canonical IDs (`resolved_aliases`; collisions expand + warn) — the exact-xref filters `kegg_compound_ids` / `chebi_ids` / `hmdb_ids` / `mnxm_ids` are unchanged.
+Browse the chemistry layer — KEGG-curated metabolism, TCDB-curated transport substrates, and compounds measured by a MetaboliteAssay.
 
-Routing: drill into `genes_by_metabolite(metabolite_ids=[...])` for catalysts/transporters per organism, `assays_by_metabolite(metabolite_ids=[...])` for measurement evidence, `genes_by_ontology(ontology='kegg', term_ids=[pathway_id])` for pathway → genes. See `docs://guide/conventions` for direction-agnosticism (KEGG equation order is unreliable upstream — joins through Reaction_has_metabolite and Tcdb_family_transports_metabolite return both produced and consumed metabolites identically). See `docs://analysis/metabolites` for the 3 source pipelines decision tree.
+Use as the compound-side entry point; for a metabolite's genes use `genes_by_metabolite`, for measurement evidence `assays_by_metabolite`.
+Filters: search_text, metabolite_ids (+exclude), xref ID lists, elements, min/max_mass, organism_names, pathway_ids, evidence_sources.
+Returns: top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, by_measurement_coverage; one row = one metabolite.
+docs://tools/list_metabolites; summary=True first.
 
 ## Parameters
 

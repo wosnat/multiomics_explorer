@@ -2,36 +2,12 @@
 
 ## What it does
 
-Run cluster-membership over-representation analysis (Fisher + BH) — one ORA per cluster in a clustering analysis.
+Over-representation analysis (Fisher + BH) over one clustering analysis in ONE organism — one test per cluster × term.
 
-Single-organism enforced. Background defaults to `cluster_union` (union
-of all clustered genes — differs from `pathway_enrichment`'s
-`table_scope` default); `organism` or an explicit locus_tag list are
-also accepted. Background drives the Fisher denominator and matters
-more than the ontology choice.
-
-[TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
-`call_class` filter TERM2GENE at the same match stage as the
-background, so tested sets and background move together;
-`interpro_type` is required when `ontology='interpro'`.
-`informative_only` defaults True here — it drops terms the KG flags
-uninformative (e.g. KEGG KO 'uncharacterized protein' terms, GO root
-go:0008150, KEGG global/overview maps like ko01100), never
-restricting the gene set, background, or DE inputs; pass False to
-include them (per-row `is_informative` still surfaces either way).
-See docs://analysis/annotation_evidence.
-
-`limit` defaults to 25 — the top significant hits by `p_adjust`
-globally; pass `include_nonsignificant=True` to page through the full
-ranked list.
-
-Routing: pre-flight via `list_clustering_analyses` for `analysis_id`
-and `ontology_landscape` for `(ontology, level)`; drill enriched terms
-via `gene_overview`, `genes_in_cluster`, or for KEGG
-`list_metabolites(pathway_ids=...)` for compound-anchored membership.
-See docs://analysis/enrichment for Fisher + BH methodology and
-background semantics; docs://examples/pathway_enrichment.py for
-runnable code (custom term2gene path covers cluster-membership ORA).
+Use when the gene sets are published clusters, after an `ontology_landscape` pre-flight; DE gene sets are `pathway_enrichment`, a custom list Python `fisher_ora`.
+Filters: analysis_id, organism, ontology, level / term_ids, tree, background, gene-set size, cluster size, trust filters.
+Returns: n_significant, by_cluster, by_term, clusters_tested, clusters_skipped, term_validation; one row = one (cluster, term) test.
+docs://tools/cluster_enrichment; summary=True first.
 
 ## Parameters
 
@@ -255,6 +231,8 @@ cluster_enrichment(..., background='cluster_union')  # or 'organism', or a locus
 ```
 
 - An unknown `analysis_id` and an out-of-range `level` raise `ValueError` instead of returning a vacuous empty envelope. Flat ontologies (e.g. `cog_category`) only accept `level=0`; the raise message says so.
+
+- `informative_only` filters terms only — it never restricts the tested gene set, the background, or the cluster inputs; per-row `is_informative` surfaces either way. See docs://analysis/enrichment.
 
 ## Package import equivalent
 

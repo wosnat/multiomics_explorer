@@ -2,13 +2,12 @@
 
 ## What it does
 
-Batch gene routing: identity (gene_name, product, gene_category) plus per-gene data-availability signals (annotation_types, expression counts, ortholog/cluster summaries, DM rollups, chemistry rollups).
+Batch gene triage: identity plus per-gene data-availability signals — expression, ortholog, cluster, DM, chemistry, annotation-family and literature counts.
 
-[TRUST] `merops_classes` / `ncbifam_family_count` / `tcdb_family_count` / `cazy_family_count` / `merops_evidence_score_max` are the protease / family-domain / transporter / CAZyme routing columns; `tcdb_family_count` counts deepest attachments only (superseded ancestors excluded), so it equals the default TCDB row count from `gene_ontology_terms`. See docs://analysis/annotation_evidence.
-
-Routing: drill into each axis when the per-gene signal is non-zero — `gene_ontology_terms` (annotation_types non-empty), `gene_homologs` (closest_ortholog_group_size > 0), `gene_clusters_by_gene` (cluster_membership_count > 0), `differential_expression_by_gene` / `gene_response_profile` (expression_edge_count > 0), `gene_derived_metrics` and `genes_by_{numeric,boolean,categorical}_metric` keyed off `derived_metric_value_kinds`, `metabolites_by_gene` / `genes_by_metabolite` (evidence_sources non-empty), `gene_ontology_terms(ontology='merops')` (merops_classes non-empty), `gene_ontology_terms(ontology=['tcdb'])` (tcdb_family_count > 0), `gene_ontology_terms(ontology=['cazy'])` (cazy_family_count > 0). Use `gene_details` for the full Gene-node property dump.
-
-`limit` defaults to every input gene (min 25); pass an explicit number to page.
+Use to decide which drill-down has evidence for a gene batch; for the raw node dump use `gene_details`.
+Filters: locus_tags.
+Returns: by_organism, by_category, by_annotation_type, has_* batch counts, top_discussing_publications, not_found; one row = one gene's routing counts.
+docs://tools/gene_overview; summary=True first.
 
 ## Parameters
 
@@ -679,6 +678,10 @@ gene_overview(locus_tags=['PMM0845'], verbose=True)  # just to see the gene
 ```correction
 gene_overview(locus_tags=['PMM0845'])  # compact carries every routing count; verbose adds the text fields (gene_summary, function_description, all_identifiers), the per-gene discussed_in_publications list, per-kind DM counts (numeric/boolean/categorical_metric_count + *_metric_types_observed) and compartments_observed
 ```
+
+- `limit` defaults to every input gene (min 25) rather than a small page — pass an explicit number to page.
+
+- The annotation-family columns (`merops_classes`, `tcdb_family_count`, `cazy_family_count`, `ncbifam_family_count`, `tcdb_evidence_score_max`, `merops_evidence_score_max`) belong to the annotation-trust surface — see docs://analysis/annotation_evidence for how to read them.
 
 ## Package import equivalent
 

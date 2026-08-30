@@ -440,3 +440,27 @@ def test_tool_inventory_count_claims_in_claude_md_and_readme():
         if c.get("source") == "tool_registry" and c["expect"].get("tools") != total:
             bad.append(f"inputs/lint/kg_claims.yaml: {c['id']} expects {c['expect']} (registry has {total})")
     assert not bad, "tool-count claim drift:\n  " + "\n  ".join(bad)
+
+
+def test_lint_description_length_flags_long():
+    """`lint_description_length` reports one line per over-budget description."""
+    from scripts.build_about_content import DESCRIPTION_MAX_CHARS, lint_description_length
+
+    assert DESCRIPTION_MAX_CHARS == 600
+    out = lint_description_length(
+        {"t": {"description": "x" * 601, "parameters": {}, "output_schema": None}}
+    )
+    assert out == ["t: description 601 chars > 600"]
+    assert (
+        lint_description_length(
+            {"t": {"description": "ok", "parameters": {}, "output_schema": None}}
+        )
+        == []
+    )
+
+
+def test_every_tool_description_within_budget():
+    """Every registered tool's description fits the five-slot budget."""
+    from scripts.build_about_content import get_tool_schemas, lint_description_length
+
+    assert lint_description_length(get_tool_schemas()) == []

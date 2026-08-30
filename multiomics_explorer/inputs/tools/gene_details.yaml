@@ -135,3 +135,4 @@ mistakes:
     `gene_overview` first to skip genes with no chemistry).
   - wrong: "gene_details(locus_tags='PMM0001')"
     right: "gene_details(locus_tags=['PMM0001']) — always a list"
+  - "`limit` defaults to every input gene (min 25) rather than a small page — pass an explicit number to page."

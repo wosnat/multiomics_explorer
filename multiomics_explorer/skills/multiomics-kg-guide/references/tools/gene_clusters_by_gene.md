@@ -2,16 +2,12 @@
 
 ## What it does
 
-Look up cluster memberships for a gene batch — one row per
-(gene × cluster) with analysis context (`analysis_id`,
-`analysis_name`). Single-organism enforced. Reports `not_found`
-(locus_tag absent from KG) and `not_matched` (in KG but no cluster
-memberships after filters).
+Cluster memberships for a gene batch in ONE organism (inferred when omitted) — one row per gene × cluster with its analysis context.
 
-Routing: cluster discovery via `list_clustering_analyses`; drill
-into a cluster's full membership via `genes_in_cluster`.
-
-`organism` is inferred from the input genes when omitted.
+Use for which modules a gene sits in; for a cluster's full roster use `genes_in_cluster`, to discover analyses `list_clustering_analyses`.
+Filters: locus_tags, organism, cluster_type, analysis_ids, plus the publication / condition filters.
+Returns: genes_with_clusters, genes_without_clusters, by_cluster_type, by_analysis, not_found, not_matched; one row = (locus_tag, cluster_id, analysis_id).
+docs://tools/gene_clusters_by_gene; summary=True first.
 
 ## Parameters
 

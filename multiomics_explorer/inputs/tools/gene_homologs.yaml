@@ -98,3 +98,4 @@ mistakes:
   - "For member genes within a group, use genes_by_homolog_group (not this tool)"
   - wrong: "gene_homologs(locus_tags='PMM0001')"
     right: "gene_homologs(locus_tags=['PMM0001']) — always a list"
+  - "`limit` defaults to every input gene × 5 groups (min 25) rather than a small page — pass an explicit number to page."

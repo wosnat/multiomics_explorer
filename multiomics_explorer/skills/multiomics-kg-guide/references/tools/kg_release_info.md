@@ -2,17 +2,12 @@
 
 ## What it does
 
-Return the KG's release identity (`Schema_info` properties) and a compatibility verdict against this explorer-MCP version.
+KG release identity (Schema_info version, built_at, node counts) plus a compatibility verdict against this explorer build.
 
-**Call this first** in any new session — verifies the explorer's installed version satisfies the KG's declared `mcp_min_version`, and that the load-bearing schema shape (foundational labels, relationship types, `Schema_info` properties, non-zero gene/experiment counts) is present. The result is computed once at MCP server startup and cached; re-call is instant.
-
-Verdict semantics:
-- `ok`     — explorer satisfies KG min-version + all schema asserts pass.
-- `warn`   — at least one assert failed; tools still serve but may emit confusing errors against the affected shapes. Filter `asserts` on `passed=False` for the failure list.
-- A failed `controlled_vocabularies_hash` assert (bucket 6) yields `warn`: filters still validate live and `list_filter_values` reads live, but docs://ontologies/{key} pages (index: docs://ontologies/index) and parameter descriptions may list stale values. `kg.controlled_vocabularies_hash` carries the live digest.
-- `unknown` — could not evaluate (no `Schema_info` node in the KG — legacy build without release metadata, or wrong database).
-
-On non-`ok` verdicts, the tool emits `ctx.warning(summary)` so the surrounding MCP client surfaces it to the user. See `docs://guide/conventions` for cross-tool semantics.
+Use as the first call of a session; for the graph shape use `kg_schema`, for live vocabulary values `list_filter_values`.
+Filters: none.
+Returns: verdict, explorer_version, kg, asserts, summary; no row list. `warn` means quoted value lists may be stale, never that calls fail.
+docs://tools/kg_release_info.
 
 ## Parameters
 
@@ -154,6 +149,8 @@ The pin lives in the explorer (EXPECTED_KG_SHAPE) and is set at explorer release
 ```
 
 - `kg.controlled_vocabularies_hash` is passed through from Schema_info like every other identity field; it is null on KGs built before the vocabulary contract existed, and the sixth assert then fails with detail 'KG predates the vocabulary contract' (still a warn).
+
+- Verdict `unknown` means the check could not be evaluated at all — no `Schema_info` node in the KG (a build without release metadata, or the wrong database). Treat quoted value lists the same way as under `warn`. On any non-`ok` verdict the tool also emits a `ctx.warning` so the MCP client surfaces it.
 
 ## Package import equivalent
 

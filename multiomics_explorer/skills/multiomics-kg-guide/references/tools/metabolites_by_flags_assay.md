@@ -2,27 +2,12 @@
 
 ## What it does
 
-Drill into boolean MetaboliteAssay edges — one row per
-(metabolite × flag-edge). `flag_value=False` rows are
-*tested-absent* (assayed and not found, real biology, kept by
-default — about 69% of boolean rows). Both states are always
-stored on this edge (KG `'detected'` / `'not_detected'`), unlike
-the DM layer where only some DMs store `not_flagged`.
-Cross-organism by design. No `by_detection_status` envelope — on
-the boolean arm, `flag_value` IS the qualitative-detection
-signal; `by_value` is its envelope rollup. Bare / xref metabolite
-IDs are coerced to canonical (`resolved_aliases`; collisions
-expand + warn).
+Boolean MetaboliteAssay edges — one row per metabolite × flag edge; cross-organism. flag_value=False rows are tested-absent: both states are stored.
 
-Routing: drill across to `assays_by_metabolite(metabolite_ids=[...])`
-for the quantifies-arm complement, or
-`genes_by_metabolite(metabolite_ids=[...], organism=...)` for
-gene chemistry context. See `docs://guide/conventions` for
-tested-absent semantics and `docs://analysis/metabolites` for
-the metabolomics decision tree.
-
-`organism` matches by case-insensitive CONTAINS (not word-match);
-cross-organism is the default.
+Use for presence / absence calls; pre-flight `list_metabolite_assays`; values `metabolites_by_quantifies_assay`, both arms `assays_by_metabolite`.
+Filters: assay_ids, organism, metabolite_ids, flag_value, plus publication / experiment / condition.
+Returns: by_value, by_assay, by_metric, not_found, excluded_assays (empty here, for parity with the numeric twin); one row = one flag.
+docs://tools/metabolites_by_flags_assay; summary=True first.
 
 ## Parameters
 
@@ -332,6 +317,8 @@ in the form you passed.
 ```
 
 - See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (about 69% of boolean rows are flag_value=False, kept by default; on the DM side only 11 of 27 boolean DMs store `not_flagged` edges).
+
+- `organism` here matches by case-insensitive CONTAINS, not the word-based match the gene tools use; cross-organism is the default.
 
 ## Package import equivalent
 

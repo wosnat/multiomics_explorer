@@ -193,3 +193,4 @@ mistakes:
       id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
       in the form you passed.
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (about 69% of boolean rows are flag_value=False, kept by default; on the DM side only 11 of 27 boolean DMs store `not_flagged` edges)."
+  - "`organism` here matches by case-insensitive CONTAINS, not the word-based match the gene tools use; cross-organism is the default."

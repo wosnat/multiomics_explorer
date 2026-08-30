@@ -2,33 +2,12 @@
 
 ## What it does
 
-Batch reverse-lookup: metabolite IDs → all measurement evidence
-across both arms (quantifies + flags). Cross-organism by default
-(metabolite IDs are organism-agnostic). Polymorphic rows: numeric-
-arm rows carry `value`, `value_sd`, `detection_status`,
-`timepoint*`, `metric_bucket`, `metric_percentile`,
-`rank_by_metric` (rankable subset). Boolean-arm rows carry
-`flag_value`, `n_positive`. Cross-arm fields are explicit `None`
-(union-shape padding). Three states for a metabolite: `not_found`
-(ID not in KG), `not_matched` (ID in KG, no edge after filters),
-and tested-absent rows surfaced in `results` (`value=0` /
-`flag_value=false` / `detection_status='not_detected'` — real
-biology, kept by default). Use `metabolites_matched` for distinct-
-metabolite count (NOT `total_matching` — that's row count). Use
-`summary=True` on batch routing for 50+ metabolite_ids. Bare / xref
-metabolite IDs are coerced to canonical (`resolved_aliases`;
-collisions expand + warn).
+Metabolite IDs to every measurement edge, numeric and boolean arms merged into one polymorphic row set; cross-organism.
 
-Routing: drill back via
-`metabolites_by_quantifies_assay(assay_ids=[...], metabolite_ids=[...])`
-for numeric details. Upstream from
-`list_metabolites(metabolite_ids=[...])` (chemistry-layer discovery)
-or `metabolites_by_gene(locus_tags=[...])` (gene-anchored
-chemistry). See `docs://guide/conventions` for tested-absent
-semantics and `docs://analysis/metabolites` for the metabolomics
-decision tree.
-
-`organism` matches by case-insensitive CONTAINS (not word-match).
+Use for the metabolite-anchored reverse view; drill back to one arm with `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay`.
+Filters: metabolite_ids (+exclude), organism, evidence_kind, metric_types, compartment.
+Returns: by_evidence_kind, by_detection_status, by_flag_value, by_assay, metabolites_matched (distinct; total_matching counts rows), not_found, not_matched; one row = one edge.
+docs://tools/assays_by_metabolite; summary=True first for 50+ IDs.
 
 ## Parameters
 
@@ -424,6 +403,8 @@ in the form you passed.
 ```
 
 - See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for the not_found vs not_matched convention across batch tools.
+
+- `organism` here matches by case-insensitive CONTAINS, not the word-based match the gene tools use; cross-organism is the default.
 
 ## Package import equivalent
 

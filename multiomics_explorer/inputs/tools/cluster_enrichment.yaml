@@ -84,3 +84,4 @@ mistakes:
   - wrong: "cluster_enrichment(..., background='table_scope')  # not valid"
     right: "cluster_enrichment(..., background='cluster_union')  # or 'organism', or a locus_tag list"
   - "An unknown `analysis_id` and an out-of-range `level` raise `ValueError` instead of returning a vacuous empty envelope. Flat ontologies (e.g. `cog_category`) only accept `level=0`; the raise message says so."
+  - "`informative_only` filters terms only — it never restricts the tested gene set, the background, or the cluster inputs; per-row `is_informative` surfaces either way. See docs://analysis/enrichment."

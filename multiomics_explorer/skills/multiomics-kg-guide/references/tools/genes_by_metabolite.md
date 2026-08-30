@@ -2,45 +2,12 @@
 
 ## What it does
 
-Find genes connected to specified metabolites in one organism.
+Metabolite IDs to gene catalysts (via Reaction) and transporters (via TcdbFamily, deepest attachment) in ONE organism.
 
-What: two arms — metabolism (`Gene → Reaction → Metabolite`) and
-transport (`Gene → TcdbFamily → Metabolite` over each gene's deepest
-TCDB attachments only, so rows agree with the KG's precomputed
-transport counts). Direction-agnostic (KEGG equation order is
-unreliable upstream — joins through Reaction_has_metabolite and
-Tcdb_family_transports_metabolite return both produced and consumed
-metabolites identically). Per-row union shape: cross-arm fields are
-explicitly None on rows from the other arm.
-
-Transport semantics: transport rows carry `substrate_depth`
-('most_specific' = most specific surviving transporter node for the
-substrate in the gene-pruned hierarchy, not a curation level;
-'inherited' = rolled up from a descendant) and `tcdb_evidence_score`
-(5-signal composite [0,1]; rank by it, don't filter — 0 =
-uncorroborated, not absent). Detail sort: metabolism →
-most_specific → inherited, score desc within a tier. The
-auto-warning fires when `inherited` dominates the transport arm.
-
-Batch advice: bare / xref metabolite IDs are coerced to canonical
-(`resolved_aliases`; collisions expand + warn).
-
-Routing: narrow with `substrate_depth=['most_specific']` when
-inherited rows dominate; from `top_genes` (read
-`transport_substrate_resolution` / `tcdb_evidence_score_max`) drill
-into `differential_expression_by_gene(locus_tags=[...],
-organism=...)` or `gene_overview`; from `top_tcdb_families` to
-`genes_by_ontology(ontology="tcdb", term_ids=[id], organism=...)`;
-from `top_reactions` to
-`genes_by_ontology(ontology="ec", term_ids=[ec], organism=...)` or
-`pathway_enrichment`. See `docs://guide/conventions` for
-substrate-depth and direction-agnostic semantics, and
-`docs://analysis/metabolites` for the chemistry-layer decision tree.
-
-`not_found.organism` is set when the `organism` name resolves to
-zero organisms. `limit` defaults to covering p75 of typical
-(metabolite × organism) UNION row distributions; coenzyme-tail
-queries (ATP, water) should use `offset` to page.
+Use for the compound-anchored direction; the gene-anchored mirror is `metabolites_by_gene`, family-level TCDB `genes_by_ontology`.
+Filters: metabolite_ids (+exclude), organism, ec_numbers, metabolite_pathway_ids, gene_categories, substrate_depth, evidence_sources.
+Returns: by_metabolite, by_evidence_source, by_substrate_depth, top_genes, top_reactions, top_tcdb_families, not_matched; one row = one gene × metabolite.
+docs://tools/genes_by_metabolite; summary=True first.
 
 ## Parameters
 
@@ -60,7 +27,7 @@ queries (ATP, water) should use `offset` to page.
 | limit | int | 10 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
-**Discovery:** use `list_organisms` for valid organism names.
+**Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 
 ## Response format
 
@@ -670,6 +637,10 @@ in the form you passed. Exclude-wins-on-overlap is computed on the canonical IDs
 ```
 
 - See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and the transport trust ladder, and `docs://guide/concepts` for the chemistry layer overview.
+
+- `not_found.organism` is set when the `organism` name resolves to zero organisms — check it before reading an empty result as 'no chemistry here'.
+
+- `limit` defaults to covering p75 of typical (metabolite × organism) UNION row distributions; coenzyme-tail queries (ATP, water) should page with `offset`.
 
 ## Package import equivalent
 

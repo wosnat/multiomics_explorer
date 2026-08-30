@@ -1161,3 +1161,5 @@ mistakes:
   - "PSORTb and SignalP are 1:1 (≤1 edge per gene). Don't expect multiple rows
      per gene for the same ontology. Some genes will have **no** edge (no
      confident call); those genes are absent from the result set entirely."
+  - "`informative_only` (default False here) drops terms the KG flags uninformative — ontology roots and catch-all KO terms, plus the KEGG global / overview maps. It is term-side only and never restricts the gene set. See docs://analysis/annotation_evidence."
+  - "`limit` defaults to 50 over MCP; the Python package defaults to unbounded (all rows), which `pathway_enrichment` / `cluster_enrichment` rely on for a complete TERM2GENE."

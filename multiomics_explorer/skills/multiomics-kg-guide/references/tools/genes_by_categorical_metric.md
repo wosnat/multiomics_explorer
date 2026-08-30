@@ -2,34 +2,12 @@
 
 ## What it does
 
-Drill into categorical DerivedMetric edges — one row per
-(gene × DM × edge value). `value` is a category label. Cross-organism
-by design.
+Categorical DerivedMetric edges — one row per gene × DM × edge value; cross-organism.
 
-Selection is `derived_metric_ids` XOR `metric_types` (exactly one
-required); an id/metric_type that exists as a different kind
-(numeric / boolean) moves to `not_matched_ids` /
-`not_matched_metric_types` with a `warnings` entry naming the
-sibling tool — it is never silently dropped into `not_found_*`.
-The `categories` filter must be a subset of the union of selected
-DMs' `allowed_categories` — unknown values raise `ValueError`
-listing the allowed set. Pre-flight via
-`list_derived_metrics(value_kind='categorical')` to see each DM's
-allowed set. See `docs://guide/conventions` for the full DM family
-gating contract.
-
-The `by_metric` envelope rollup pairs filtered-slice category
-histogram (`by_category`) with full-DM precomputed histogram
-(`dm_by_category`) plus the schema-declared `allowed_categories`,
-so callers can detect declared-but-unobserved categories without an
-extra call. `excluded_derived_metrics` is always [] here (no
-rankable / has_p_value gates apply to categorical DMs — kept for
-envelope-shape consistency); `warnings` carries closed-vocabulary,
-organism-existence, and kind-mismatch notices.
-
-`organism` is optional and single-organism is **not** enforced —
-omit it to drill across every organism a `metric_type` spans.
-`summary=True` is sugar for `limit=0`.
+Use to slice genes by a category label after a `list_derived_metrics` pre-flight; values `genes_by_numeric_metric`, flags `genes_by_boolean_metric`.
+Filters: derived_metric_ids XOR metric_types (exactly one), organism, locus_tags, categories, plus the publication / experiment / condition filters.
+Returns: by_category, by_metric (slice histogram paired with the full-DM histogram and allowed_categories), by_organism; one row = one edge.
+docs://tools/genes_by_categorical_metric; summary=True first.
 
 ## Parameters
 
@@ -462,6 +440,8 @@ genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'])
 ```
 
 - See `docs://analysis/derived_metrics` for the DM family overview (numeric / boolean / categorical drill-downs).
+
+- `excluded_derived_metrics` is always `[]` here — no rankable / has_p_value gate applies to categorical DMs; it is kept for envelope-shape parity with `genes_by_numeric_metric`. `warnings` carries the closed-vocabulary, organism-existence and kind-mismatch notices instead.
 
 ## Package import equivalent
 

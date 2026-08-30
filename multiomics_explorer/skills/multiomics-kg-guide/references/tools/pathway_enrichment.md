@@ -2,37 +2,12 @@
 
 ## What it does
 
-Run pathway over-representation analysis from DE results (Fisher + BH).
+Over-representation analysis (Fisher + BH) over DE gene sets in ONE organism — one test per experiment × timepoint × direction × term.
 
-Single-organism enforced. `direction='both'` runs up + down per
-experiment × timepoint cluster. Three background modes — `table_scope`
-(default, per-cluster quantified set), `organism` (full genome), or an
-explicit locus_tag list — drive the Fisher denominator and matter more
-than the ontology choice.
-
-[TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
-`call_class` filter TERM2GENE at the same match stage as the
-background, so tested sets and background move together;
-`interpro_type` is required when `ontology='interpro'` (ranking
-across mixed entry types is not meaningful). `informative_only`
-defaults True here — it drops terms the KG flags uninformative (e.g.
-KEGG KO 'uncharacterized protein' terms, GO root go:0008150, KEGG
-global/overview maps like ko01100), never restricting the gene set,
-background, or DE inputs; pass False to include them (per-row
-`is_informative` still surfaces either way). See
-docs://analysis/annotation_evidence.
-
-`limit` defaults to 25 — the top significant hits by `p_adjust`
-globally; pass `include_nonsignificant=True` to page through the full
-ranked list.
-
-Routing: pre-flight via `ontology_landscape` to pick `(ontology, level)`;
-chain `differential_expression_by_gene` for raw DE inputs; drill enriched
-terms via `gene_overview` or, for KEGG, `list_metabolites(pathway_ids=...)`
-to inspect compound-anchored membership of an enriched pathway.
-See docs://analysis/enrichment for Fisher + BH methodology and
-background semantics; docs://examples/pathway_enrichment.py for runnable
-code (EnrichmentResult accessors, custom term2gene, compareCluster export).
+Use when the gene sets come from DE, after an `ontology_landscape` pre-flight; a clustering analysis is `cluster_enrichment`, a custom list Python `fisher_ora`.
+Filters: experiment_ids, organism, ontology, level / term_ids, tree, direction, background, gene-set size, trust filters.
+Returns: n_significant, by_experiment, by_direction, cluster_summary, top_pathways_by_padj; one row = one (cluster, term) test.
+docs://tools/pathway_enrichment; summary=True first.
 
 ## Parameters
 

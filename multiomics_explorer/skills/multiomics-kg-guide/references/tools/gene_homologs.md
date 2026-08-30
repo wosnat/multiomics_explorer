@@ -2,15 +2,12 @@
 
 ## What it does
 
-Look up ortholog group memberships for a gene batch — flat long
-format (one row per gene × group), ordered most-specific (curated)
-to broadest. A gene typically belongs to 1-3 groups.
+Ortholog group memberships for a gene batch — one row per gene × group, most-specific (curated) first.
 
-Routing: drill into group members via `genes_by_homolog_group`;
-text-search groups via `search_homolog_groups`.
-
-`limit` defaults to every input gene × 5 groups (min 25); pass an
-explicit number to page.
+Use to find a gene's groups before a cross-organism comparison; for a group's members use `genes_by_homolog_group`, for text search `search_homolog_groups`.
+Filters: locus_tags, source, taxonomic_level, max_specificity_rank.
+Returns: by_organism, by_source, top_cyanorak_roles, not_found, no_groups; one row = (locus_tag, group_id, source, taxonomic_level).
+docs://tools/gene_homologs; summary=True first.
 
 ## Parameters
 
@@ -186,6 +183,8 @@ gene_homologs(locus_tags='PMM0001')
 ```correction
 gene_homologs(locus_tags=['PMM0001']) — always a list
 ```
+
+- `limit` defaults to every input gene × 5 groups (min 25) rather than a small page — pass an explicit number to page.
 
 ## Package import equivalent
 

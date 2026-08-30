@@ -2,11 +2,12 @@
 
 ## What it does
 
-All Gene node properties (deep-dive). Use `gene_overview` for the common routing case; this tool adds what overview omits — `sequence`, `gene_summary`, `function_description`, `alternate_functional_descriptions`, `catalytic_activities` (sparse: ~8k genes), `contributing_sources`, `seed_ortholog` / `seed_ortholog_evalue`, `protein_family`, coordinates (`contig`, `start`, `end`, `strand`). The Gene node carries NO `ec_numbers` / `ko_terms` / `kegg_ids` / `cog_categories` properties — chemistry and ontology annotations are graph edges: use `gene_ontology_terms(ontology=['ec','kegg'])` or `metabolites_by_gene`. TCDB/CAZy memberships are edges too.
+Every Gene node property for a locus-tag batch — sequence, gene_summary, function_description, catalytic_activities, contributing_sources, coordinates.
 
-Routing: prefer `gene_overview` for triage; chain into `metabolites_by_gene` for chemistry, `gene_homologs` for orthologs, `gene_ontology_terms` for annotations, `list_organisms` for taxonomy.
-
-`limit` defaults to every input gene (min 25); pass an explicit number to page.
+Use when triage counts are not enough; for routing use `gene_overview`. Ontology and chemistry are edges, not properties — use `gene_ontology_terms` / `metabolites_by_gene`.
+Filters: locus_tags.
+Returns: total_matching, not_found, warnings; one row = one gene's full property dict.
+docs://tools/gene_details; summary=True first.
 
 ## Parameters
 
@@ -185,6 +186,8 @@ gene_details(locus_tags='PMM0001')
 ```correction
 gene_details(locus_tags=['PMM0001']) — always a list
 ```
+
+- `limit` defaults to every input gene (min 25) rather than a small page — pass an explicit number to page.
 
 ## Package import equivalent
 

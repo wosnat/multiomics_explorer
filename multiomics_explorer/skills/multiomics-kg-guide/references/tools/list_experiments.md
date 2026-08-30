@@ -2,13 +2,12 @@
 
 ## What it does
 
-List differential-expression experiments with rich breakdowns (organism, treatment, omics, table_scope, growth_phase, DM rollups, metabolomics rollups). Use `summary=true` to see only breakdowns.
+Differential-expression and characterization experiments with per-timepoint, DM and metabolomics rollups.
 
-table_scope is critical for interpreting missing genes — `'all_detected_genes'` keeps tested-absent rows (the `not_significant` bucket reflects real biology); `'significant_only'` collapses them. Use `table_scope=['all_detected_genes']` to restrict to experiments fair for cross-experiment comparison. See `docs://guide/conventions` for the broader tested-absent framing.
-
-Routing: drill via `differential_expression_by_gene(experiment_ids=[id])` for per-gene DE; `list_clustering_analyses(experiment_ids=[id])`; `list_derived_metrics(experiment_ids=[id])`; `pathway_enrichment(experiment_ids=[id])`; `list_metabolite_assays(experiment_ids=[id])` when `metabolite_count > 0`.
-
-`organism` filters to experiments where this organism is the profiled organism; use `coculture_partner=` for partner-side filtering — the two AND-compose.
+Use to pick experiment_ids and read each one's table_scope before interpreting missing DE rows; for study-level metadata use `list_publications`.
+Filters: organism, coculture_partner, table_scope, experiment_ids, search_text, time_course_only, plus the publication / condition filters.
+Returns: by_organism, by_treatment_type, by_table_scope, by_omics_type, by_growth_phase, not_found; one row = one experiment.
+docs://tools/list_experiments; summary=True first.
 
 ## Parameters
 
@@ -614,6 +613,8 @@ result['results'][0]['time_point_growth_phases']
 ```
 
 - DataFrame conversion: `to_dataframe(result)` auto-dispatches and returns one row per experiment × timepoint (with `timepoints` unwound and `genes_by_status` inlined at both experiment + timepoint level). See `docs://guide/python_api`.
+
+- `table_scope` decides whether a missing gene means 'not affected' or 'not reported': `all_detected_genes` keeps tested-absent rows, every other scope collapses them. Filter with `table_scope=['all_detected_genes']` to keep only experiments fair for cross-experiment comparison. See docs://guide/conventions.
 
 ## Package import equivalent
 

@@ -2,18 +2,12 @@
 
 ## What it does
 
-Enumerate valid values (+ counts where the KG pivots them) for a categorical filter; the `filter_type` enum is the authoritative list of types.
+Valid values for one closed vocabulary, with counts where the KG pivots them and descriptions where it stores them.
 
-Value sources: data types (gene_category, brite_tree, growth_phase,
-metric_type, value_kind, compartment, omics_type, evidence_source)
-pivot live nodes and carry `count`; `cluster_type`, `treatment_type`,
-`background_factors`, `table_scope`, `detection_status`,
-`expression_status`, and the annotation-trust types read
-`ControlledVocabulary` (pivot fallback + warning when missing) and
-return `count=None`. Trust types are documented in
-docs://analysis/annotation_evidence.
-
-Routing: feed the returned `value`s into the corresponding filter — `gene_category` → `genes_by_function(gene_categories=...)`; `brite_tree` → `ontology_landscape(tree=...)` / `pathway_enrichment(tree=...)`; `growth_phase` → `list_experiments(growth_phases=[...])` / `list_derived_metrics(growth_phases=[...])`; `compartment` → `list_experiments` / `list_organisms` / `list_publications`; `metric_type` / `value_kind` → `list_derived_metrics` and `genes_by_{kind}_metric`; `omics_type` → `list_experiments(omics_type=...)`; `evidence_source` → `list_metabolites(evidence_sources=[...])`; `cluster_type` → `list_clustering_analyses` / `gene_clusters_by_gene`; `treatment_type` / `background_factors` → `list_experiments` / `list_derived_metrics` / `list_metabolite_assays` / `list_clustering_analyses`; `table_scope` → `list_experiments(table_scope=[...])`; the trust types → `sources` / `evidence` / `call_class` / `interpro_type` on `genes_by_ontology` and friends.
+Use whenever a filter takes a controlled value you would otherwise guess; for organism names use `list_organisms`, for ontology terms `search_ontology`.
+Filters: filter_type, ontology.
+Returns: filter_type, description, total_entries, warnings; one row = (value, count, description, applies_to).
+docs://tools/list_filter_values.
 
 ## Parameters
 
@@ -531,6 +525,7 @@ list_filter_values(filter_type='trust_axes', ontology=...) → genes_by_ontology
 list_filter_values(filter_type='interpro_type') → genes_by_ontology(ontology='interpro', ...) / search_ontology(ontology='interpro', interpro_type=...) / pathway_enrichment(ontology='interpro', interpro_type=...).
 list_filter_values(filter_type='call_class') → genes_by_ontology(ontology='merops', call_class=[...]).
 list_filter_values(filter_type='treatment_type') → list_experiments(treatment_type=[...]) / list_derived_metrics(treatment_type=[...]) / list_metabolite_assays(treatment_type=[...]) / list_clustering_analyses(treatment_type=[...]); same routing for filter_type='background_factors'.
+list_filter_values(filter_type='growth_phase') → list_experiments(growth_phases=[...]) / list_derived_metrics(growth_phases=[...]) / differential_expression_by_gene(growth_phases=[...])
 ```
 
 ## Common mistakes

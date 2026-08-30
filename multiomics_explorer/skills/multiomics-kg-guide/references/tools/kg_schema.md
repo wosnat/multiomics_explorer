@@ -2,9 +2,12 @@
 
 ## What it does
 
-Return the KG schema: node labels with property names/types and relationship types with source/target labels.
+Live-KG schema: node labels with property names and types, relationship types with source and target labels.
 
-Use before `run_cypher` to discover queryable labels/properties. Scope with `labels` / `relationship_types` / `section` to avoid a full-graph dump. For an entity-level overview see `docs://guide/concepts`; for filter-value enumeration use `list_filter_values`.
+Use before writing a `run_cypher` query; for filter values use `list_filter_values`, for the entity model docs://guide/concepts.
+Filters: labels, relationship_types, section.
+Returns: nodes, relationships, not_found_labels, not_found_relationship_types; no row list — scope the call or it dumps the whole graph.
+docs://tools/kg_schema.
 
 ## Parameters
 

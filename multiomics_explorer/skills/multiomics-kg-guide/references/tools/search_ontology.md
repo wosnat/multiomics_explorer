@@ -2,31 +2,12 @@
 
 ## What it does
 
-Search or browse ontology terms — Lucene over term names (search) or a gene_count-sorted listing (browse). Counts (`gene_count`, `organism_gene_count`, `min_gene_count`) are subtree-scoped; only the text match ignores hierarchy.
+Search (Lucene over term names) or browse (omit search_text: terms by gene_count) across one or many of the 17 ontologies.
 
-Returns term IDs and `level` for use with `genes_by_ontology`. With
-`search_text`, supports fuzzy (~), wildcards (*), exact phrases ("..."),
-boolean (AND, OR) — see docs://guide/conventions for syntax + scoring.
-Without `search_text` (browse), rows sort by `gene_count DESC`; narrow
-with `level`, `tree`/`interpro_type`, `min_gene_count`, `organism`.
-
-`ontology` accepts one key, a list, or None (all 17). `limit`/`offset`
-apply PER ontology (lockstep paging); rows are grouped by ontology in
-registry order, then score DESC (search) / gene_count DESC (browse).
-`by_ontology` carries per-ontology truncation.
-
-[TRUST] `interpro_type` scopes InterPro terms to one entry type.
-`informative_only` (default False) drops terms the KG flags
-uninformative — e.g. KEGG KO 'uncharacterized protein' terms, GO root
-go:0008150, KEGG global/overview maps like ko01100; term-side only,
-never restricts the gene set. See docs://analysis/annotation_evidence
-for the full trust surface, and docs://ontologies/{key} for what each
-ontology means and how to read it.
-
-Routing: chain term_ids into `genes_by_ontology` for gene discovery;
-`ontology_term_details(term_ids=[...])` for a term's hierarchy, bridges
-and per-organism counts; `docs://ontologies/index` for the per-ontology
-reference.
+Use to find term IDs or size an ontology; a term's hierarchy and bridges are `ontology_term_details`, its genes `genes_by_ontology`.
+Filters: search_text, ontology, level, tree, interpro_type, min_gene_count, organism, informative_only.
+Returns: mode, by_ontology, by_level, score stats, skipped_ontologies; one row = one term. Counts are subtree-scoped; limit / offset apply per ontology.
+docs://tools/search_ontology and docs://ontologies/{key}; summary=True first.
 
 ## Parameters
 
@@ -1249,6 +1230,10 @@ search_ontology(search_text='*', ontology=['merops'])  # trying to list everythi
 ```correction
 search_ontology(ontology=['merops'], level=1)  # browse mode: omit search_text, narrow with level
 ```
+
+- `informative_only` (default False here) drops terms the KG flags uninformative — ontology roots and catch-all KO terms, plus the KEGG global / overview maps. It is term-side only and never restricts the gene set. See docs://analysis/annotation_evidence.
+
+- `search_text` is Lucene: fuzzy `~`, wildcards `*`, quoted phrases and AND / OR are supported — see docs://guide/conventions for syntax and scoring.
 
 ## Package import equivalent
 

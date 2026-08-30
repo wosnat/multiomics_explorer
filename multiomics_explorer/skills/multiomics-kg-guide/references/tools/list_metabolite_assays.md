@@ -2,24 +2,12 @@
 
 ## What it does
 
-Discover MetaboliteAssay nodes — the metabolomics measurement
-layer. Mirrors `list_derived_metrics`. Inspect `value_kind` (routes
-drill-down), `rankable` (gates rankable filters on the numeric
-drill-down), `compartment` (whole_cell vs extracellular), and
-per-row `detection_status_counts` (signals how much of the assay
-is detected / sporadic / not_detected). Bare / xref metabolite IDs
-are coerced to canonical (`resolved_aliases`; collisions expand + warn).
+Discover MetaboliteAssay nodes — the metabolomics measurement layer, mirroring `list_derived_metrics`.
 
-Routing: drill into `metabolites_by_quantifies_assay(assay_ids=[...])`
-for numeric details, `metabolites_by_flags_assay(assay_ids=[...])`
-for boolean details, `assays_by_metabolite(metabolite_ids=[...])`
-for reverse lookup across both arms, and
-`list_metabolites(metabolite_ids=[...])` for chemistry context. See
-`docs://guide/conventions` for tested-absent semantics and
-`docs://analysis/metabolites` for the metabolomics decision tree.
-
-A genus word in `organism` (e.g. 'Alteromonas') matches every strain
-in that genus rather than raising ambiguous.
+Use as the pre-flight that reads value_kind and rankable; drill down with `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay` or `assays_by_metabolite`.
+Filters: search_text, organism, value_kind, compartment, assay_ids, metabolite_ids, rankable, plus publication / experiment / condition.
+Returns: by_organism, by_value_kind, by_compartment, by_detection_status, not_found; one row = one assay with detection_status_counts.
+docs://tools/list_metabolite_assays; summary=True first.
 
 ## Parameters
 
@@ -265,6 +253,8 @@ in the form you passed.
 ```
 
 - See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/conventions` for tested-absent semantics across the metabolomics layer.
+
+- A genus word alone in `organism=` (e.g. 'Alteromonas') matches every strain in that genus rather than raising ambiguous.
 
 ## Package import equivalent
 

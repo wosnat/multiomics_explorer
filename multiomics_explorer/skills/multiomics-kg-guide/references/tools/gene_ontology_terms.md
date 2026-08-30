@@ -2,27 +2,12 @@
 
 ## What it does
 
-Reverse-lookup: gene locus_tags → ontology annotations (one row per gene × term).
+Reverse lookup: locus_tags to their ontology annotations in ONE organism, most-specific leaves (default) or rolled up to a level.
 
-`mode='leaf'` (default) returns the most specific annotations only —
-redundant ancestors are excluded. `mode='rollup'` walks UP to ancestors
-at the given level. Single-organism enforced. `ontology` accepts a
-list; when a trust filter/facet is carried by only some of the
-requested ontologies, the rest drop into `skipped_ontologies` with
-a warning.
-
-[TRUST] `sources` / `evidence` / `max_tier` / `min_evidence_score` /
-`call_class` / `interpro_type` filter on the per-edge trust profile;
-`include_superseded` (tcdb leaf mode) also surfaces less-specific
-attachments. Defaults never filter. `informative_only` (default
-False) drops terms the KG flags uninformative — e.g. KEGG KO
-'uncharacterized protein' terms, GO root go:0008150, KEGG
-global/overview maps like ko01100; term-side only, never restricts
-the gene set. See docs://analysis/annotation_evidence.
-
-Routing: for the forward direction (term → genes, with hierarchy
-expansion) use `genes_by_ontology`; for term discovery by text use
-`search_ontology`.
+Use for what a gene carries; for which genes carry a term use `genes_by_ontology`, to find term IDs `search_ontology`.
+Filters: locus_tags, organism, ontology, mode, level, tree, informative_only, include_superseded, trust filters.
+Returns: by_ontology, by_term, terms-per-gene stats, trust rollups, skipped_ontologies, not_found, no_terms; one row = (locus_tag, term_id, evidence).
+docs://tools/gene_ontology_terms; summary=True first.
 
 ## Parameters
 
@@ -1031,6 +1016,8 @@ See docs://analysis/annotation_evidence for the full trust-axis reference and ra
 - CAZy rollup at `level=0` returns the 6 top-level classes (GH, GT, PL, CE, AA, CBM). Genes commonly belong to multiple top-level classes (e.g. a CBM-domain-containing GH); duplicates per `(gene × class)` are de-duped automatically.
 
 - TCDB substrate-level questions ('which genes does this metabolite bind to?') chain via `genes_by_metabolite`, NOT this tool. Use `gene_ontology_terms(ontology='tcdb')` for *family*-level annotations (e.g. 'what TCDB family does PMM1129 belong to?').
+
+- `informative_only` (default False here) drops terms the KG flags uninformative — ontology roots and catch-all KO terms, plus the KEGG global / overview maps. It is term-side only and never restricts the gene set. See docs://analysis/annotation_evidence.
 
 ## Package import equivalent
 

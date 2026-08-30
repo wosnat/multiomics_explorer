@@ -2,11 +2,12 @@
 
 ## What it does
 
-List the genes and KEGG pathways a publication discusses in prose.
+Literature index: publication DOIs to the genes and KEGG pathways each paper names in prose, with a prominence label — recall-biased, never DE-table data.
 
-Recall-biased literature router (narrative mentions, NOT exhaustive, NOT DE-table
-expression data). Routing: feed DOIs from list_publications; drill returned genes
-into gene_overview and pathways into genes_by_ontology(ontology='kegg').
+Use for what a paper names; its DE results come from `list_experiments` then `differential_expression_by_gene`. Pathways return verbatim — chain `genes_by_ontology(ontology='kegg')` for genes.
+Filters: publication_dois, entity_kind, prominence.
+Returns: by_entity_kind, by_prominence, top_kegg_pathways, not_found, not_matched; one row = (doi, entity_kind, entity_id, prominence).
+docs://tools/discussed_by_publication; summary=True first.
 
 ## Parameters
 

@@ -619,3 +619,5 @@ mistakes:
   - "discussed_gene_count / discussed_pathway_count are the paper's prose literature index — the genes + KEGG pathways it names in text (recall-biased, NOT exhaustive, NOT DE-table expression). 0 on both means no narrative index (4 such publications, the `no_discusses` bucket). Drill into the named entities via discussed_by_publication(publication_dois=[...])."
   - wrong: "list_experiments(publication='Biller 2018')"
     right: "list_publications(search_text='Biller') then list_experiments(publication_dois=['10.1038/...'])"
+  - "`publication_dois` combines with the other filters via AND, and `not_found` lists any provided DOI that did not match — the same shape as `experiment_ids` on the sibling `list_*` tools."
+  - "`compartment` keeps publications with at least one experiment in that compartment — it is not a per-publication property. `summary=True` returns every `by_*` rollup uncapped, so call it first and then narrow filters."

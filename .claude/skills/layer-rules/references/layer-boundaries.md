@@ -335,6 +335,11 @@ follow the 9 outfacing-doc style rules — see
 [`docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md`](../../../../docs/superpowers/specs/2026-05-07-mcp-docs-readability-pass-design.md)
 for the full text and rationale.
 
+10. Tool docstring = five slots, ≤ 600 chars (lint `lint_description_length`):
+    Does / Use when–not when (name the sibling tool) / Filters (names only) /
+    Returns (envelope keys + one row) / docs://tools/{name} pointer. Semantics of
+    a parameter live in its Field description; traps live in the YAML `mistakes`.
+
 Inline Python source comments (`# ...`) in `tools.py` are NOT
 outfacing — agents do not see them. Style rules do not apply.
 

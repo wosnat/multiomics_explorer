@@ -2,35 +2,12 @@
 
 ## What it does
 
-Rank (ontology x level) combinations by enrichment suitability — pre-flight for enrichment.
+Rank (ontology × level) strata by enrichment suitability — term-size distribution, genome coverage, relevance_rank.
 
-Per-(ontology x level) stats: term-size distribution, genome coverage,
-best-effort share (GO). Ranked by coverage x size_factor(median) with
-sweet-spot [5, 50] median genes-per-term; `relevance_rank` is the
-composite score (rank 1 = best). `ontology=None` surveys every key
-(GO BP/MF/CC + 14 others); BRITE rows break down per tree (scope with
-`tree=`); InterPro rows break down per `interpro_type`. Pass
-`experiment_ids=` to weight by coverage of those experiments'
-quantified genes.
-
-[TRUST] `call_class` scopes MEROPS to a peptidase call so landscape
-sizes match `genes_by_ontology`/enrichment sets; `interpro_type`
-scopes InterPro to one entry type. `informative_only` defaults True
-here — it drops terms the KG flags uninformative (e.g. KEGG KO
-'uncharacterized protein' terms, GO root go:0008150, KEGG
-global/overview maps like ko01100); pass False to survey the full
-term set (rebaselines the coverage stats). See
-docs://analysis/annotation_evidence.
-
-`limit` defaults to 15 rows — enough to see the top-ranked
-combinations; pass an explicit integer to page, or None for every row.
-
-Routing: pick an `(ontology, level)` row, then call
-`pathway_enrichment(ontology=..., level=...)` or
-`cluster_enrichment(ontology=..., level=...)`. See
-docs://analysis/enrichment for the pre-flight role and a worked
-example, and docs://guide/conventions for the hierarchy `level`
-and BRITE-tree scoping conventions.
+Use as the pre-flight that picks (ontology, level) for `pathway_enrichment` / `cluster_enrichment`; the terms are `search_ontology`, gene sets `genes_by_ontology`.
+Filters: organism, ontology, tree, experiment_ids, min/max_gene_set_size, informative_only, call_class, interpro_type.
+Returns: organism_gene_count, n_ontologies, by_ontology, not_found, not_matched; one row = one stratum (BRITE per tree, InterPro per type).
+docs://tools/ontology_landscape; summary=True first.
 
 ## Parameters
 
@@ -1325,6 +1302,10 @@ result['total_matching']
 - Default `limit=15` returns the top-ranked rows; pass `limit=None` for every row, or an explicit integer to page — check the response envelope's `truncated` field to know whether more rows exist beyond what was returned.
 
 - PSORTb / SignalP are flat (single `level=0`) — at most one `results` row and one `by_ontology` entry each. If only a few of their categories pass the default `min_gene_set_size=5` filter, the small `n_terms_with_genes` is expected (categories range from tens to tens of thousands of genes KG-wide; per organism it's much smaller).
+
+- `relevance_rank` is the composite score (rank 1 = best): genome coverage times a size factor that peaks at a mid-sized median genes-per-term. Rank the rows against each other; the score is not a probability.
+
+- `informative_only` defaults True here — pass False to survey the full term set, which rebaselines the coverage stats. `call_class` / `interpro_type` are part of the annotation-trust surface: see docs://analysis/annotation_evidence.
 
 ## Package import equivalent
 

@@ -2,13 +2,12 @@
 
 ## What it does
 
-Run a raw Cypher query (read-only escape hatch when other tools don't cover the question).
+Read-only Cypher escape hatch — writes are blocked, syntax and schema validated before execution.
 
-Write operations are blocked. Queries are syntax- and schema-validated
-before execution — non-blocking warnings come back in the response.
-Validate against `kg_schema` first to avoid label / property typos —
-scope with `kg_schema(labels=[...])` to avoid a full-graph dump; see
-docs://guide/concepts for the KG data model.
+Use only when no tool covers the question; read the shape first with `kg_schema(labels=[...])`.
+Filters: query, limit.
+Returns: returned, truncated, warnings (non-blocking) and results as raw column dicts; there is no total_matching.
+docs://tools/run_cypher.
 
 ## Parameters
 
