@@ -481,6 +481,8 @@ Expecting per-timepoint counts, experiment_name, or table_scope_detail inside `e
 `summary=True` (and every call by default) is the cheap landscape — each `experiments[]` entry is compact (experiment_id, treatment_type, table_scope, is_time_course, matching_genes, rows_by_status, omics_type). Per-timepoint counts and the other experiment metadata (experiment_name, background_factors, coculture_partner, table_scope_detail) need `verbose=True`.
 ```
 
+- At least one of `organism` / `locus_tags` / `experiment_ids` is required — calling with none of the three raises ValueError. Use list_organisms for organisms, resolve_gene for locus_tags, or list_experiments for experiment_ids.
+
 ## Package import equivalent
 
 ```python

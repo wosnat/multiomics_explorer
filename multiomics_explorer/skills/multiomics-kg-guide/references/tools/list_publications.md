@@ -725,6 +725,7 @@ list_publications(compartment=...) → use derived_metric_value_kinds per result
 list_filter_values(filter_type='metric_type') → list_publications(search_text='<metric_type>') to find publications with that metric
 list_publications (per-row `metabolite_count > 0`) → list_metabolite_assays(publication_dois=[...]) to inspect the paper's MetaboliteAssay nodes (numeric vs boolean, compartment, detection-status rollup).
 list_publications (per-row `discussed_gene_count` or `discussed_pathway_count` > 0) → discussed_by_publication(publication_dois=[...]) to list the genes + KEGG pathways the paper names in prose.
+list_publications → list_derived_metrics(publication_dois=[doi]) for the paper's non-DE, column-level evidence
 ```
 
 ## Common mistakes

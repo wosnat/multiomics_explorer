@@ -165,6 +165,7 @@ resolve_gene → gene_details
 genes_by_function → gene_details
 gene_details → gene_ontology_terms(locus_tags=[...], ontology=['ec', 'kegg']) — the EC numbers / KO terms behind a gene live on edges, not on the node.
 gene_details → metabolites_by_gene — when reaction_count / transported_metabolite_count are non-zero, list the metabolites this gene's reactions involve / its TCDB families transport. Single-gene chemistry deep-dive. See docs://analysis/metabolites.
+gene_details → gene_homologs(locus_tags=[...]) for ortholog group memberships, and list_organisms for the organism's taxonomy and capability rollups
 ```
 
 ## Common mistakes

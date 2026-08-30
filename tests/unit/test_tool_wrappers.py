@@ -10948,19 +10948,6 @@ class TestOntologyTermDetailsWrapper:
         for d in descs:
             assert len(d) <= 250, f"{param}: {len(d)} chars"
 
-    def test_docstring_opens_with_a_verb_and_ends_with_routing(self, tool_fns):
-        doc = (_inspect3b.getdoc(tool_fns["ontology_term_details"]) or "").strip()
-        first = doc.split()[0]
-        assert first[0].isupper()
-        assert first not in ("This", "The", "A", "An", "Tool")
-        # Five-slot template: what it does / where to route / filters /
-        # returns / docs pointer last.
-        slots = doc.split("\n\n")[-1].splitlines()
-        assert slots[0].startswith("Use ")
-        assert slots[1].startswith("Filters:")
-        assert slots[2].startswith("Returns:")
-        assert slots[-1].startswith("docs://tools/")
-
     @pytest.mark.parametrize("needle", [
         "genes_by_ontology", "search_ontology", "docs://ontologies",
     ])
@@ -12146,3 +12133,52 @@ def test_ontology_param_is_enum_everywhere():
     for name, s in _all_tool_input_schemas().items():
         if "ontology" in s["properties"]:
             assert _enum_values(s["properties"]["ontology"]) == keys, name
+
+
+def _all_tool_descriptions() -> dict[str, str]:
+    """{tool_name: description} from a fresh FastMCP with register_tools (no Neo4j).
+
+    The docstring IS the MCP description — FastMCP passes it through verbatim
+    (cleandoc'd), so this is exactly what an agent reads at tool-listing time.
+    """
+    import asyncio
+
+    from fastmcp import FastMCP
+
+    from multiomics_explorer.mcp_server.tools import register_tools
+
+    mcp = FastMCP("t")
+    register_tools(mcp)
+
+    async def _run():
+        return {t.name: t.description or "" for t in await mcp.list_tools()}
+
+    return asyncio.run(_run())
+
+
+@pytest.mark.parametrize("tool_name", sorted(_all_tool_descriptions()))
+def test_description_follows_five_slot_template(tool_name):
+    """Every tool description is the five-slot template, within budget.
+
+    Slots, one per line with a single blank line after the first:
+    Does / Use when-not when / Filters / Returns / docs://tools/{name}.
+    Split on "\\n" (not "\\n\\n") so a stray internal blank line fails loudly.
+    See `.claude/skills/layer-rules/references/layer-boundaries.md` rule 10.
+    """
+    from scripts.build_about_content import DESCRIPTION_MAX_CHARS
+
+    desc = _all_tool_descriptions()[tool_name]
+    assert len(desc) <= DESCRIPTION_MAX_CHARS, f"{tool_name}: {len(desc)} chars"
+
+    lines = desc.split("\n")
+    assert len(lines) == 6, f"{tool_name}: {len(lines)} lines, expected 6"
+
+    does = lines[0]
+    assert does.strip(), f"{tool_name}: empty first slot"
+    assert does[0].isupper(), f"{tool_name}: {does[:30]!r}"
+    assert does.split()[0] not in ("This", "The", "A", "An", "Tool"), tool_name
+    assert lines[1] == "", f"{tool_name}: expected one blank line after slot 1"
+    assert lines[2].startswith("Use "), f"{tool_name}: {lines[2][:40]!r}"
+    assert lines[3].startswith("Filters: "), f"{tool_name}: {lines[3][:40]!r}"
+    assert lines[4].startswith("Returns: "), f"{tool_name}: {lines[4][:40]!r}"
+    assert lines[5].startswith(f"docs://tools/{tool_name}"), f"{tool_name}: {lines[5][:60]!r}"

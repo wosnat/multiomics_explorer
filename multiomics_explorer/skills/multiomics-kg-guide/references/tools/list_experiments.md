@@ -560,6 +560,8 @@ list_experiments → list_clustering_analyses(experiment_ids=[...])
 list_experiments(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric
 list_filter_values(filter_type='metric_type') → list_experiments(search_text='<metric_type>') to find experiments with that metric
 list_experiments (per-row `metabolite_count > 0`) → list_metabolite_assays(experiment_ids=[...]) to inspect the experiment's MetaboliteAssay nodes (numeric vs boolean, compartment, detection-status rollup).
+list_experiments → list_derived_metrics(experiment_ids=[...]) for the experiment's non-DE, column-level evidence (rhythmicity flags, amplitudes, trait classes)
+list_experiments → pathway_enrichment(experiment_ids=[...], organism=...) for ORA over that experiment's DE gene sets
 ```
 
 ## Common mistakes
