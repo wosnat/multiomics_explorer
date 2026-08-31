@@ -39,7 +39,7 @@ Plus five orthogonal helpers:
 - **`kg_release_info`** — release identity + compatibility verdict. Call it first (see above).
 - **`kg_schema`** — node labels, relationship types, properties. Read this before reaching for `run_cypher`.
 - **`list_filter_values`** — canonical values for every closed vocabulary (gene categories, growth phases, `cluster_type`, `table_scope`, and the annotation-trust vocabularies), each with a `count` and, where the KG stores one, a `description`. Full enum: `docs://tools/list_filter_values`.
-- **`list_organisms`** — organism taxonomy plus per-organism capability rollups (expression/DM/chemistry/metabolomics/annotation counts).
+- **`list_organisms`** — organism taxonomy plus per-organism capability rollups (gene/expression/DM/chemistry/metabolomics/annotation counts).
 - **`run_cypher`** — read-only Cypher escape hatch for the rare question no tool covers; validate against `kg_schema` first.
 
 ---
@@ -98,7 +98,7 @@ Plus five orthogonal helpers:
 ### "Which metabolites can organism A make that organism B can take up?"
 This is **cross-feeding**: pair one organism's production with another's uptake capability.
 1. `list_metabolites(organism_names=["A"])` — per-row `catalyst_gene_count` (production) and `transporter_gene_count` (A's own uptake/export).
-2. `genes_by_metabolite(metabolite_ids=[...], organism="B")` — same IDs, filtered to B, for its transporter genes (`evidence_source='transport'`).
+2. `genes_by_metabolite(metabolite_ids=[...], organism="B")` — same IDs, filtered to B, for its transporter genes (`evidence_sources=['transport']`).
 3. Compare the two gene sets per metabolite. Full tree + the undirected-reaction caveat: `docs://analysis/metabolites`.
 
 ### "Which genes belong to BRITE category / TCDB family / CAZy family / InterPro entry / MEROPS clan X?"
@@ -110,7 +110,7 @@ This is **cross-feeding**: pair one organism's production with another's uptake 
 ### "Are transporters as a class responding to this condition?"
 This is **DE by functional class**: roll a DE result up to an ontology family instead of reading gene-by-gene.
 1. `genes_by_ontology(ontology='tcdb', level=0, organism=...)` — TERM2GENE: every gene under a top-level TCDB family.
-2. Pull those `locus_tags` into `differential_expression_by_gene(locus_tags=[...], experiment_ids=[...])` for row-level fold changes, or `pathway_enrichment(experiment_ids=[...], ontology='tcdb', level=0)` for a class-level test.
+2. Pull those `locus_tags` into `differential_expression_by_gene(locus_tags=[...], experiment_ids=[...])` for row-level fold changes, or `pathway_enrichment(experiment_ids=[...], organism=..., ontology='tcdb', level=0)` for a class-level test.
 3. Swap `ontology='tcdb'` for any other of the 17 to ask the same question of a different functional grouping.
 
 ### "This gene has a Pfam domain / InterPro entry — which transporter, peptidase or TIGR role does that point to?"
