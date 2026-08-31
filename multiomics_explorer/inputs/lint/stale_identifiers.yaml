@@ -80,4 +80,7 @@
 - pattern: 'docs://ontologies(?![/\w])'
   reason: "bare docs://ontologies is not a served resource"
   replacement: "docs://ontologies/index or docs://ontologies/{key}"
-  allow_in: '_SKILLS_DIR'   # the _DOC_DIRS registration key in server.py is the prefix itself
+  # _SKILLS_DIR: the _DOC_DIRS registration key in server.py is the prefix
+  # itself. _register_doc_dir / _DOC_DIRS[: llm-review 2b.4 D1 — server.py
+  # passes the same prefix string into the shared registration helper.
+  allow_in: '_SKILLS_DIR|_register_doc_dir|_DOC_DIRS\['

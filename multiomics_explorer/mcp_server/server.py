@@ -69,33 +69,17 @@ mcp = FastMCP(
     "multiomics-kg",
     instructions=(
         "Multi-omics knowledge graph for Prochlorococcus and Alteromonas "
-        "(42 tools across gene/sequence/expression/ortholog/ontology/cluster/"
-        "derived-metric/chemistry/metabolomics/literature/enrichment).\n\n"
-        "First call: kg_release_info — verifies your KG release matches what this "
-        "explorer-MCP version expects. Surfaces the KG's identity (version, "
-        "built_at, counts) and a verdict (ok / warn / unknown).\n\n"
-        "Start here:\n"
-        "  docs://guide/start_here  — pick the right tool for your question\n"
-        "  docs://guide/concepts    — KG data model (Gene, Experiment, "
-        "DerivedMetric, Metabolite, MetaboliteAssay, Reaction, ontology terms)\n"
-        "  docs://guide/conventions — cross-tool semantics: not_found vs "
-        "not_matched, tested-absent rows, exclude-wins-on-overlap, "
-        "rankable-gated filters, AQ / informative_only defaults\n"
-        "  docs://guide/python_api  — scripting against the Python package: "
-        "import topology, return shapes, DataFrames, connection management, "
-        "worked recipes\n\n"
-        "Per-tool: docs://tools/{tool_name}     "
-        "(e.g. docs://tools/differential_expression_by_gene)\n"
-        "Ontology: docs://ontologies/{key}      "
-        "(index: docs://ontologies/index — one page per ontology: what it is, "
-        "id form, hierarchy, how to read it)\n"
-        "Analysis: docs://analysis/{name}       "
-        "(e.g. docs://analysis/enrichment, docs://analysis/metabolites, "
-        "docs://analysis/annotation_evidence for the annotation-trust surface)\n"
-        "Examples: docs://examples/{file}       "
-        "(e.g. docs://examples/pathway_enrichment.py, "
-        "docs://examples/metabolites.py, docs://examples/ontology_terms.py, "
-        "docs://examples/annotation_evidence.py)"
+        "(42 tools).\n\n"
+        "First call: kg_release_info — KG identity + compatibility verdict.\n"
+        "Directory: docs://index — every docs:// page with its ~token size "
+        "and when to read it. Start with docs://guide/start_here (~5k tok) "
+        "to pick a tool.\n\n"
+        "Habits: summary=True first on list/discovery tools (cheap envelope, "
+        "no rows); docs://tools/{tool} is a ~1k-tok brief — append /full "
+        "only when you need every worked example; docs://guide/conventions "
+        "(~12k) for cross-tool semantics; "
+        "docs://analysis/{enrichment,metabolites,annotation_evidence,"
+        "expression,derived_metrics} for methodology."
     ),
     lifespan=lifespan,
 )
@@ -114,29 +98,66 @@ _SKILLS_DIR = (
     / "skills" / "multiomics-kg-guide" / "references"
 )
 
+# Registration order (llm-review 2b.4 D1/D5): index, guide, tools (brief),
+# tools (full), analysis, ontologies, examples. `_DOC_DIRS` order matters —
+# it drives the guide/tools/analysis/ontologies loops below, with the
+# `/full` tool pages spliced in between tools and analysis.
 _DOC_DIRS = {
+    "docs://guide": (_SKILLS_DIR / "guide", "Cross-tool guide: {stem}"),
     "docs://tools": (_SKILLS_DIR / "tools", "Usage guide for the {stem} tool"),
     "docs://analysis": (_SKILLS_DIR / "analysis", "Usage guide for the {stem} analysis utility"),
-    "docs://guide": (_SKILLS_DIR / "guide", "Cross-tool guide: {stem}"),
     "docs://ontologies": (_SKILLS_DIR / "ontologies", "Ontology reference: {stem}"),
 }
 
-for uri_prefix, (doc_dir, desc_template) in _DOC_DIRS.items():
+
+def _make_reader(path: Path):
+    return lambda: path.read_text(encoding="utf-8")
+
+
+def _register_doc_dir(uri_prefix: str, doc_dir: Path, desc_template: str) -> None:
     for md_file in sorted(doc_dir.glob("*.md")):
         stem = md_file.stem
-        uri = f"{uri_prefix}/{stem}"
-
-        def _make_reader(path: Path):
-            return lambda: path.read_text(encoding="utf-8")
-
         resource = FunctionResource.from_function(
             fn=_make_reader(md_file),
-            uri=uri,
+            uri=f"{uri_prefix}/{stem}",
             name=stem,
             description=desc_template.format(stem=stem),
             mime_type="text/plain",
         )
         mcp.add_resource(resource)
+
+
+# docs://index — directory of every docs:// page, registered first so it's
+# always the first resource a client sees when listing.
+mcp.add_resource(
+    FunctionResource.from_function(
+        fn=_make_reader(_SKILLS_DIR / "index.md"),
+        uri="docs://index",
+        name="index",
+        description="Directory of every docs:// page with size and read-when",
+        mime_type="text/plain",
+    )
+)
+
+_register_doc_dir("docs://guide", *_DOC_DIRS["docs://guide"])
+_register_doc_dir("docs://tools", *_DOC_DIRS["docs://tools"])
+
+# Full-length tool pages (references/tools/full/*.md) — served at
+# docs://tools/{name}/full, right after the brief pages.
+_FULL_DIR = _SKILLS_DIR / "tools" / "full"
+for md_file in sorted(_FULL_DIR.glob("*.md")):
+    mcp.add_resource(
+        FunctionResource.from_function(
+            fn=_make_reader(md_file),
+            uri=f"docs://tools/{md_file.stem}/full",
+            name=f"{md_file.stem}_full",
+            description=f"Full reference for the {md_file.stem} tool (all examples, full response format)",
+            mime_type="text/plain",
+        )
+    )
+
+_register_doc_dir("docs://analysis", *_DOC_DIRS["docs://analysis"])
+_register_doc_dir("docs://ontologies", *_DOC_DIRS["docs://ontologies"])
 
 # --- Static resources: example scripts (not auto-discovered from .md files) ---
 _EXAMPLES_DIR = Path(__file__).resolve().parent.parent.parent / "examples"

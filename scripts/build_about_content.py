@@ -1418,6 +1418,138 @@ def build_ontologies(*, live_vocab: bool = False) -> int:
     return written + 1
 
 
+# --- docs://index (llm-review 2b.4 D1) ---
+
+# Hard char cap on the rendered index (llm-review 2b.4 controller ruling
+# supersedes the original 3,200-char/800-tok figure in the task brief,
+# which is arithmetically impossible against the current corpus — 42 brief
+# + 42 full tool pages + 17 ontologies alone are ~100 rows). Enforced by
+# shortening the read-when text on guide/analysis/examples/ontology-index
+# rows (the only rows that carry one) — rows are never dropped.
+INDEX_MAX_CHARS = 6000
+
+_READ_WHEN_HEADING_PREFIXES = ("#",)
+_READ_WHEN_SKIP_PREFIXES = ("|", "-", "`", "<", "(", "*", "import ", "from ", "#!")
+
+
+def _read_when(path: Path, max_len: int = 110) -> str:
+    """First sentence of `path`'s first prose paragraph, cut to `max_len`.
+
+    Skips markdown headings, list/table/code/html lines and Python
+    docstring/import boilerplate while looking for the first prose line,
+    then collects the contiguous non-indented lines that follow it (the
+    rest of that paragraph) before handing the joined text to
+    `_summary_sentence` for the sentence cut.
+    """
+    lines = path.read_text(encoding="utf-8").splitlines()
+    paragraph: list[str] = []
+    for line in lines:
+        raw = line.strip()
+        if raw.startswith(('"""', "'''")):
+            raw = raw[3:].strip()
+        if not raw:
+            if paragraph:
+                break
+            continue
+        if raw.startswith(_READ_WHEN_HEADING_PREFIXES) or raw.startswith(_READ_WHEN_SKIP_PREFIXES):
+            if paragraph:
+                break
+            continue
+        if paragraph and line != line.lstrip():
+            break  # indented continuation (e.g. a list) — new block, stop
+        paragraph.append(raw)
+    if not paragraph:
+        return path.stem
+    return _summary_sentence(" ".join(paragraph), max_len=max_len)
+
+
+def _index_tok(path: Path) -> int:
+    return len(path.read_bytes()) // 4
+
+
+def _render_docs_index_at(read_when_max_len: int) -> str:
+    """Render `docs://index` with read-when text cut to `read_when_max_len`."""
+    refs = OUTPUT_DIR.parent  # .../references
+    examples_dir = Path(__file__).resolve().parent.parent / "examples"
+
+    L: list[str] = ["# docs://index — every page, its size, when to read it", ""]
+
+    L += ["## Guides", ""]
+    for f in sorted((refs / "guide").glob("*.md")):
+        uri = f"docs://guide/{f.stem}"
+        L.append(f"- `{uri}` — ~{_index_tok(f)} tok — {_read_when(f, read_when_max_len)}")
+    L.append("")
+
+    L += ["## Tools (brief)", ""]
+    for f in sorted(OUTPUT_DIR.glob("*.md")):
+        uri = f"docs://tools/{f.stem}"
+        L.append(f"- `{uri}` — ~{_index_tok(f)} tok")
+    L.append("")
+
+    L += [
+        "## Tool full pages",
+        "",
+        "Append /full for the complete page — all worked examples + full "
+        "response format.",
+        "",
+    ]
+    for f in sorted(FULL_OUTPUT_DIR.glob("*.md")):
+        uri = f"docs://tools/{f.stem}/full"
+        L.append(f"- `{uri}` — ~{_index_tok(f)} tok")
+    L.append("")
+
+    L += ["## Analysis", ""]
+    for f in sorted((refs / "analysis").glob("*.md")):
+        uri = f"docs://analysis/{f.stem}"
+        L.append(f"- `{uri}` — ~{_index_tok(f)} tok — {_read_when(f, read_when_max_len)}")
+    L.append("")
+
+    # Ontology pages are compact like tool pages (docs://ontologies/index
+    # already gives orientation); docs://ontologies/index itself gets a
+    # read-when row like a guide.
+    L += ["## Ontologies", ""]
+    for f in sorted((refs / "ontologies").glob("*.md")):
+        uri = f"docs://ontologies/{f.stem}"
+        if f.stem == "index":
+            L.append(f"- `{uri}` — ~{_index_tok(f)} tok — {_read_when(f, read_when_max_len)}")
+        else:
+            L.append(f"- `{uri}` — ~{_index_tok(f)} tok")
+    L.append("")
+
+    L += ["## Examples", ""]
+    for f in sorted(examples_dir.glob("*.py")):
+        uri = f"docs://examples/{f.name}"
+        L.append(f"- `{uri}` — ~{_index_tok(f)} tok — {_read_when(f, read_when_max_len)}")
+    L.append("")
+
+    return "\n".join(L) + "\n"
+
+
+def render_docs_index() -> str:
+    """Render `docs://index`, binary-searching the read-when cut length so the
+    whole page stays within `INDEX_MAX_CHARS` without ever dropping a row.
+    """
+    lo, hi = 0, 110
+    if len(_render_docs_index_at(hi)) <= INDEX_MAX_CHARS:
+        return _render_docs_index_at(hi)
+    while lo < hi:
+        mid = (lo + hi + 1) // 2
+        if len(_render_docs_index_at(mid)) <= INDEX_MAX_CHARS:
+            lo = mid
+        else:
+            hi = mid - 1
+    return _render_docs_index_at(lo)
+
+
+def lint_index_fresh() -> list[str]:
+    """Flag `references/index.md` if it disagrees with a fresh re-render."""
+    index_path = OUTPUT_DIR.parent / "index.md"
+    current = render_docs_index()
+    if not index_path.exists() or index_path.read_text(encoding="utf-8") != current:
+        return ["index stale — rerun build"]
+    return []
+
+
 def main():
     parser = argparse.ArgumentParser(description="Build about-content for MCP tools")
     parser.add_argument("tools", nargs="*", help="Tool names to build (default: all with input files)")
@@ -1512,6 +1644,12 @@ def main():
                 print(v, file=sys.stderr)
             if brief_violations:
                 rc = rc or 1
+            # docs://index matches a fresh re-render.
+            index_violations = lint_index_fresh()
+            for v in index_violations:
+                print(v, file=sys.stderr)
+            if index_violations:
+                rc = rc or 1
         sys.exit(rc)
 
     if args.skeleton:
@@ -1566,6 +1704,12 @@ def main():
         print("\nBuilding per-ontology reference:")
         n = build_ontologies(live_vocab=args.live_vocab)
         print(f"Done: {n} ontology pages built")
+
+        print("\nBuilding docs index:")
+        index_text = render_docs_index()
+        index_path = OUTPUT_DIR.parent / "index.md"
+        index_path.write_text(index_text, encoding="utf-8")
+        print(f"  OK   docs index: {index_path.relative_to(Path.cwd())} ({len(index_text)} chars)")
 
 
 if __name__ == "__main__":

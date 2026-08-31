@@ -120,6 +120,14 @@ def served_doc_uris() -> set[str]:
     for prefix, sub in doc_dirs.items():
         for md in (REFS / sub).glob("*.md"):
             uris.add(f"{prefix}/{md.stem}")
+    # docs://index — single FunctionResource, registered directly (not
+    # through _DOC_DIRS or the examples list).
+    uris.add("docs://index")
+    # docs://tools/{name}/full — full-length companion pages (llm-review
+    # 2b.4 D1/D2), served from references/tools/full/ alongside the briefs.
+    if "docs://tools" in doc_dirs:
+        for md in (REFS / doc_dirs["docs://tools"] / "full").glob("*.md"):
+            uris.add(f"docs://tools/{md.stem}/full")
     return uris
 
 

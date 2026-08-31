@@ -1,11 +1,27 @@
 """P3: Tests for MCP server lifespan, KGContext, and doc resources — no Neo4j needed."""
 
+import asyncio
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from multiomics_explorer.mcp_server.server import KGContext, lifespan, mcp
+
+
+def _all_resource_uris() -> list[str]:
+    """Ordered list of every registered resource URI (registration order).
+
+    `mcp._local_provider` stores components in a plain dict, which preserves
+    insertion order — the same pattern the existing async doc-resource tests
+    in this module use (`mcp._local_provider._list_resources()`), just
+    wrapped sync so plain (non-async) tests can call it.
+    """
+    async def _list() -> list[str]:
+        resources = await mcp._local_provider._list_resources()
+        return [str(r.uri) for r in resources]
+
+    return asyncio.run(_list())
 
 
 class TestKGContext:
@@ -123,6 +139,13 @@ _SKILLS_DIR = (
 _EXPECTED_TOOL_RESOURCES = {
     f"docs://tools/{p.stem}" for p in (_SKILLS_DIR / "tools").glob("*.md")
 }
+# llm-review 2b.4 D2/D1: full-length tool pages (references/tools/full/*.md)
+# served at docs://tools/{name}/full, one per brief page.
+_EXPECTED_TOOL_FULL_RESOURCES = {
+    f"docs://tools/{p.stem}/full" for p in (_SKILLS_DIR / "tools" / "full").glob("*.md")
+}
+# llm-review 2b.4 D1: docs://index — directory of every docs:// page.
+_EXPECTED_INDEX_RESOURCE = {"docs://index"}
 _EXPECTED_ANALYSIS_RESOURCES = {
     f"docs://analysis/{p.stem}" for p in (_SKILLS_DIR / "analysis").glob("*.md")
 }
@@ -143,6 +166,8 @@ _EXPECTED_ONTOLOGY_RESOURCES = {
 }
 _EXPECTED_RESOURCES = (
     _EXPECTED_TOOL_RESOURCES
+    | _EXPECTED_TOOL_FULL_RESOURCES
+    | _EXPECTED_INDEX_RESOURCE
     | _EXPECTED_ANALYSIS_RESOURCES
     | _EXPECTED_GUIDE_RESOURCES
     | _EXPECTED_EXAMPLE_RESOURCES
@@ -231,3 +256,35 @@ class TestOntologyDocResources:
         resource = await mcp._local_provider.get_resource("docs://ontologies/merops")
         content = await resource.read()
         assert "MeropsFamily" in content
+
+
+# --- llm-review 2b.4 D1/D5: docs://index, /full pages, size-aware instructions ---
+
+
+def test_docs_index_registered_and_fresh():
+    uris = _all_resource_uris()
+    assert "docs://index" in uris
+    index_text = (_SKILLS_DIR / "index.md").read_text()
+    for uri in uris:
+        if uri.startswith("docs://") and uri != "docs://index":
+            assert uri in index_text, f"{uri} missing from docs://index"
+
+
+def test_full_tool_pages_registered():
+    uris = _all_resource_uris()
+    briefs = [u for u in uris if u.startswith("docs://tools/") and not u.endswith("/full")]
+    fulls = [u for u in uris if u.startswith("docs://tools/") and u.endswith("/full")]
+    assert len(briefs) == len(fulls) == 42
+
+
+def test_resource_order_guides_first():
+    uris = [u for u in _all_resource_uris() if u.startswith("docs://")]
+    assert uris[0] == "docs://index"
+    assert uris.index("docs://guide/start_here") < uris.index("docs://tools/resolve_gene")
+
+
+def test_instructions_mention_index_and_summary_habit():
+    from multiomics_explorer.mcp_server.server import mcp as _mcp
+
+    assert "docs://index" in _mcp.instructions
+    assert "summary=True" in _mcp.instructions
