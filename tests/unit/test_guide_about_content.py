@@ -16,6 +16,11 @@ GUIDE_DIR = (
     / "multiomics_explorer" / "skills" / "multiomics-kg-guide" / "references" / "guide"
 )
 
+ANALYSIS_DIR = (
+    Path(__file__).resolve().parent.parent.parent
+    / "multiomics_explorer" / "skills" / "multiomics-kg-guide" / "references" / "analysis"
+)
+
 
 def _guide_md_files() -> list[Path]:
     if not GUIDE_DIR.exists():
@@ -54,3 +59,13 @@ def test_start_here_budget_and_recipes():
     assert len(text) <= 16000, f"start_here.md {len(text)} chars > 16k (~4k tok)"
     assert "cross-feeding" in text.lower()
     assert "ontology_landscape" in text
+
+
+def test_expression_analysis_page():
+    text = (ANALYSIS_DIR / "expression.md").read_text()   # FileNotFoundError = RED
+    for term in ("response_matrix", "gene_set_compare", "differential_expression_by_gene",
+                 "table_scope", "docs://guide/python_api"):
+        assert term in text
+    api = (GUIDE_DIR / "python_api.md").read_text()
+    assert "## Cross-experiment summarization" not in api
+    assert "docs://analysis/expression" in api
