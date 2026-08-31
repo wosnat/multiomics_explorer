@@ -1,21 +1,20 @@
 # Start here — picking the right tool
 
 This MCP server exposes 42 tools over a Prochlorococcus/Alteromonas
-multi-omics knowledge graph, clustered into ten families below. Match
-your question to a family, then read the entry-point tool's full doc at
-`docs://tools/{name}`.
+multi-omics KG, in ten families below. Match your question to a
+family, then read the entry-point tool's brief at `docs://tools/{name}`
+(append /full for every worked example).
 
 **First call: `kg_release_info`.** `ok` — proceed. `warn` / `unknown` —
-every call still works, but value lists quoted in docs may be stale;
-trust `list_filter_values` over any quoted list.
+calls still work, but value lists quoted in docs may be stale; trust
+`list_filter_values` over any quoted list.
 
 New to the entities (Gene, Experiment, DerivedMetric, Metabolite,
 MetaboliteAssay, Reaction, ontology terms)? Read `docs://guide/concepts`
 first. For cross-cutting semantics (`not_found` vs `not_matched`,
 tested-absent rows, summary/verbose modes, rankable-gated filters,
 `informative_only` defaults, organism naming), read
-`docs://guide/conventions`. For scripting the Python package, read
-`docs://guide/python_api`.
+`docs://guide/conventions`. For scripting: `docs://guide/python_api`.
 
 ---
 
@@ -25,7 +24,7 @@ tested-absent rows, summary/verbose modes, rankable-gated filters,
 |---|---|---|---|
 | **Identity** | "I have a gene name / locus tag / partial label" | `resolve_gene`, `gene_overview` | `gene_details` (every Gene property) when the overview isn't enough; family-specific tools below |
 | **Function / annotation** | "I have a function description, pathway, or ontology term" | `genes_by_function` (text), `search_ontology` (browse or search terms) | `ontology_term_details` (term → parents / children / bridges), `genes_by_ontology`, `gene_ontology_terms`. Per-ontology reference: `docs://ontologies/index` |
-| **Expression** | "I have an experimental condition or want DE results" | `list_experiments`, `list_publications` | `differential_expression_by_gene`, `differential_expression_by_ortholog`, `gene_response_profile` |
+| **Expression** | "I have an experimental condition or want DE results" | `list_experiments`, `list_publications` | `differential_expression_by_gene`, `differential_expression_by_ortholog`, `gene_response_profile` (`docs://analysis/expression`) |
 | **Literature index** | "What does paper Y name in prose? / Which papers name gene X?" | `list_publications` | `discussed_by_publication`; reverse signals on `gene_overview` (`discussed_in_publication_count`) and `search_ontology(ontology='kegg')` (`discussed_by_n_publications`) |
 | **Orthology** | "I want to compare across organisms" | `search_homolog_groups`, `gene_homologs` | `genes_by_homolog_group`, `differential_expression_by_ortholog` |
 | **Co-expression / clustering** | "I want gene modules from a published clustering" | `list_clustering_analyses` | `genes_in_cluster`, `gene_clusters_by_gene` |
@@ -38,7 +37,7 @@ Plus five orthogonal helpers:
 
 - **`kg_release_info`** — release identity + compatibility verdict. Call it first (see above).
 - **`kg_schema`** — node labels, relationship types, properties. Read this before reaching for `run_cypher`.
-- **`list_filter_values`** — canonical values for every closed vocabulary (gene categories, growth phases, `cluster_type`, `table_scope`, and the annotation-trust vocabularies), each with a `count` and, where the KG stores one, a `description`. Full enum: `docs://tools/list_filter_values`.
+- **`list_filter_values`** — canonical values for every closed vocabulary (gene categories, growth phases, `cluster_type`, `table_scope`, and the annotation-trust vocabularies), each with a `count` and, where the KG stores one, a `description`. Full enum: `docs://tools/list_filter_values/full`.
 - **`list_organisms`** — organism taxonomy plus per-organism capability rollups (gene/expression/DM/chemistry/metabolomics/annotation counts).
 - **`run_cypher`** — read-only Cypher escape hatch for the rare question no tool covers; validate against `kg_schema` first.
 
@@ -48,7 +47,7 @@ Plus five orthogonal helpers:
 
 ### "What does gene X do? / Show me everything about gene X."
 1. `resolve_gene(identifier="X")` if the input is a name or partial label.
-2. `gene_overview(locus_tags=[...])` — one-shot identity + data-availability rollup; per-row routing fields (`expression_edge_count`, `derived_metric_count`, `evidence_sources`, `tcdb_family_count`, `discussed_in_publication_count`, ...) tell you which drill-downs have evidence — full field list: `docs://tools/gene_overview`.
+2. `gene_overview(locus_tags=[...])` — one-shot identity + data-availability rollup; per-row routing fields (`expression_edge_count`, `derived_metric_count`, `evidence_sources`, `tcdb_family_count`, `discussed_in_publication_count`, ...) tell you which drill-downs have evidence — full field list: `docs://tools/gene_overview/full`.
 3. Drill into whichever signals are non-zero: `differential_expression_by_gene`, `gene_clusters_by_gene`, `gene_derived_metrics`, `gene_ontology_terms`, `metabolites_by_gene`, `gene_homologs`. `gene_details` for the raw property dump.
 
 ### "Find genes related to {keyword / function}."
@@ -114,7 +113,7 @@ This is **DE by functional class**: roll a DE result up to an ontology family in
 3. Swap `ontology='tcdb'` for any other of the 17 to ask the same question of a different functional grouping.
 
 ### "This gene has a Pfam domain / InterPro entry — which transporter, peptidase or TIGR role does that point to?"
-This is **bridge walking**: `ontology_term_details(term_ids=[...]).links_out[]` (`link_kind` = `composition` / `membership` / `router`; definitions: `docs://tools/ontology_term_details`).
+This is **bridge walking**: `ontology_term_details(term_ids=[...]).links_out[]` (`link_kind` = `composition` / `membership` / `router`; definitions: `docs://tools/ontology_term_details/full`).
 - `router` links are recall-biased, **never** a gene-function call. Bridges are forward-only — to go the other way, browse the target ontology or intersect two `genes_by_ontology` calls.
 - TIGR roles: directly (`ontology='tigr_role'`, the gene-level call) or via the NCBIfam router (explains *why*, not a call on its own). Filter with `link_kinds=[...]`.
 
@@ -165,9 +164,8 @@ drill-down has no data for the row. Full rule: `docs://guide/conventions`.
 
 Every served page — guides, per-tool briefs and `/full` pages,
 per-ontology references, analysis methodology, runnable examples — is
-listed with its size and a one-line "read when" at `docs://index`.
-Worth knowing by name: `docs://guide/concepts` (entity model),
+listed with size and a one-line "read when" at `docs://index`. Worth
+knowing by name: `docs://guide/concepts` (entity model),
 `docs://guide/conventions` (cross-tool semantics), and the methodology
-pages behind the multi-tool workflows above (`docs://analysis/enrichment`,
-`docs://analysis/metabolites`, `docs://analysis/derived_metrics`,
-`docs://analysis/annotation_evidence`).
+pages behind the workflows above: `docs://analysis/{enrichment,
+metabolites,derived_metrics,annotation_evidence,expression}`.

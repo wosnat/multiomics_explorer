@@ -72,12 +72,12 @@ mcp = FastMCP(
         "(42 tools).\n\n"
         "First call: kg_release_info — KG identity + compatibility verdict.\n"
         "Directory: docs://index — every docs:// page with its ~token size "
-        "and when to read it. Start with docs://guide/start_here (~5k tok) "
-        "to pick a tool.\n\n"
+        "(read-when notes on the guide/analysis/example rows). Start with "
+        "docs://guide/start_here (~4k tok) to pick a tool.\n\n"
         "Habits: summary=True first on list/discovery tools (cheap envelope, "
         "no rows); docs://tools/{tool} is a ~1k-tok brief — append /full "
         "only when you need every worked example; docs://guide/conventions "
-        "(~12k) for cross-tool semantics; "
+        "(~7k) for cross-tool semantics; "
         "docs://analysis/{enrichment,metabolites,annotation_evidence,"
         "expression,derived_metrics} for methodology."
     ),
@@ -99,9 +99,11 @@ _SKILLS_DIR = (
 )
 
 # Registration order (llm-review 2b.4 D1/D5): index, guide, tools (brief),
-# tools (full), analysis, ontologies, examples. `_DOC_DIRS` order matters —
-# it drives the guide/tools/analysis/ontologies loops below, with the
-# `/full` tool pages spliced in between tools and analysis.
+# tools (full), analysis, ontologies, examples. Registration is driven by
+# the explicit `_register_doc_dir(...)` calls below, in the order they're
+# written — `_DOC_DIRS` itself is just a lookup table (dict order is not
+# relied on); the `/full` tool pages are spliced in between tools and
+# analysis by a separate loop.
 _DOC_DIRS = {
     "docs://guide": (_SKILLS_DIR / "guide", "Cross-tool guide: {stem}"),
     "docs://tools": (_SKILLS_DIR / "tools", "Usage guide for the {stem} tool"),

@@ -4,8 +4,8 @@
 
 - `docs://guide/concepts` — ~6238 tok — The knowledge graph integrates Prochlorococcus and Alteromonas multi-omics data: genomes, transcriptomes…
 - `docs://guide/conventions` — ~7045 tok — Patterns that hold across most or all 42 tools — things you'd otherwise re-learn tool by tool.
-- `docs://guide/python_api` — ~3917 tok — The `multiomics_explorer` package exposes the same 42 tools available via MCP, plus a handful of analysis…
-- `docs://guide/start_here` — ~4007 tok — This MCP server exposes 42 tools over a Prochlorococcus/Alteromonas multi-omics knowledge graph, clustered…
+- `docs://guide/python_api` — ~3920 tok — The `multiomics_explorer` package exposes the same 42 tools available via MCP, plus a handful of analysis…
+- `docs://guide/start_here` — ~3999 tok — This MCP server exposes 42 tools over a Prochlorococcus/Alteromonas multi-omics KG, in ten families below.
 
 ## Tools (brief)
 
@@ -27,7 +27,7 @@
 - `docs://tools/genes_by_categorical_metric` — ~1458 tok
 - `docs://tools/genes_by_function` — ~862 tok
 - `docs://tools/genes_by_homolog_group` — ~628 tok
-- `docs://tools/genes_by_metabolite` — ~1618 tok
+- `docs://tools/genes_by_metabolite` — ~1686 tok
 - `docs://tools/genes_by_numeric_metric` — ~1654 tok
 - `docs://tools/genes_by_ontology` — ~1589 tok
 - `docs://tools/genes_in_cluster` — ~775 tok
@@ -42,11 +42,11 @@
 - `docs://tools/list_organisms` — ~965 tok
 - `docs://tools/list_publications` — ~1286 tok
 - `docs://tools/metabolites_by_flags_assay` — ~1317 tok
-- `docs://tools/metabolites_by_gene` — ~1689 tok
+- `docs://tools/metabolites_by_gene` — ~1495 tok
 - `docs://tools/metabolites_by_quantifies_assay` — ~1715 tok
 - `docs://tools/ontology_landscape` — ~1250 tok
 - `docs://tools/ontology_term_details` — ~1082 tok
-- `docs://tools/pathway_enrichment` — ~1777 tok
+- `docs://tools/pathway_enrichment` — ~1875 tok
 - `docs://tools/resolve_gene` — ~595 tok
 - `docs://tools/run_cypher` — ~407 tok
 - `docs://tools/search_homolog_groups` — ~746 tok
@@ -74,7 +74,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/genes_by_categorical_metric/full` — ~6065 tok
 - `docs://tools/genes_by_function/full` — ~2729 tok
 - `docs://tools/genes_by_homolog_group/full` — ~2409 tok
-- `docs://tools/genes_by_metabolite/full` — ~9581 tok
+- `docs://tools/genes_by_metabolite/full` — ~9582 tok
 - `docs://tools/genes_by_numeric_metric/full` — ~6762 tok
 - `docs://tools/genes_by_ontology/full` — ~14525 tok
 - `docs://tools/genes_in_cluster/full` — ~1958 tok

@@ -49,8 +49,19 @@ Result row: `locus_tag, gene_name, product, evidence_source, substrate_depth, tc
 
 - Metabolite-anchored (metabolite → genes). The gene-anchored mirror is `metabolites_by_gene` (locus_tags → metabolites); both share the same row class, discriminators and per-arm filter scope, so read whichever matches your anchor rather than post-filtering the other.
 
-- Read transport evidence as a three-level trust ladder, top down. (1) `tcdb_evidence_score` (row) / `tcdb_evidence_score_max` (gene, in `top_genes`) — how corroborated the gene × family call is. Rank by it, never filter by it; 0 means an uncorroborated hit, not an absent call (absent is `tcdb_evidence_score_max = None`). (2) Gene-level `transport_substrate_resolution` in `top_genes` — `family_inferred` means the gene's substrate breadth is reachability through a lumping family, not capability; `resolved` means AT LEAST ONE of the gene's deepest attachments is non-lumping, not all of them — a gene attached at both a specific family and the ABC superfamily is `resolved` and still carries the superfamily rollup. (3) Per-row `substrate_depth` — `most_specific` is the most specific SURVIVING transporter node for this substrate relative to the gene-pruned hierarchy; it can be a family node (nitrite via tcdb:2.A.16) and it is not a curation level. `inherited` rows came down from an ancestor's substrate set.
+## Chaining patterns
 
-- Row-level `transport_substrate_resolution` is the GENE's resolution (the same KG value `gene_overview` and `top_genes[]` carry), repeated on every transport row of that gene — it is not a per-substrate fact and it does not vary across a gene's rows. Do not read `family_inferred` on a row as "this substrate is inferred": it says the gene's whole substrate breadth is reachability through a lumping family. The per-row fact is `substrate_depth`. Metabolism rows read `None` (union padding), never `resolved`. Group rows by locus_tag when you want one resolution per gene, or read `top_genes[]` directly.
+- list_metabolites(...) → genes_by_metabolite(metabolite_ids=[chosen_ids], organism=...)
+- list_metabolites (per-row `transporter_gene_count > 0`) → genes_by_metabolite(metabolite_ids=[...], organism=..., evidence_sources=['transport']) — distinct genes in the transport rows, summed over organisms, equal that count
+- differential_expression_by_gene(...) → top hits → metabolites_by_gene(locus_tags=...) → genes_by_metabolite for the symmetric metabolite-anchored view
+- Workflow A (N-source): list_metabolites(elements=['N']) → genes_by_metabolite(metabolite_ids=[N-bearing IDs], organism=...) for catalysts + transporters
+- Workflow B (cross-feeding): genes_by_metabolite called once per organism on the same metabolite_ids; intersect/diff locus_tag result sets client-side
+- genes_by_metabolite → top_genes → differential_expression_by_gene(locus_tags=top_genes_locus_tags, organism=...) for transcriptional response
+- genes_by_metabolite → top_genes (transport_substrate_resolution='resolved', high tcdb_evidence_score_max) → gene_overview(locus_tags=...) then metabolites_by_gene for the gene's full substrate set
+- genes_by_metabolite → top_genes → gene_overview(locus_tags=...) for richer per-gene routing context
+- genes_by_metabolite → top_tcdb_families → genes_by_ontology(ontology='tcdb', term_ids=[top_tcdb_families[i].tcdb_family_id], organism=...) for sibling genes in the same family
+- genes_by_metabolite → transport rows → gene_ontology_terms(locus_tags=[...], ontology='tcdb', organism=...) to see every TCDB family a gene is attached to, including ancestors superseded in the rows here
+- genes_by_metabolite → top_reactions → genes_by_ontology(ontology='ec', term_ids=[ec_number], organism=...) for genes in adjacent reactions
+- genes_by_metabolite → top_reactions / top_genes → pathway_enrichment for KEGG-pathway context
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/genes_by_metabolite/full`

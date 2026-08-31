@@ -258,8 +258,8 @@ coordinated to `0.1.0a5` ahead of the KG release.
 - `outputSchema` no longer emitted on `tools/list`
 
 ### Changed
-- Generated tool pages default to a brief summary (params + a couple of short examples); the full page (all examples, verbose fields) moved to `docs://tools/{name}/full`.
-- `docs://guide/conventions` cut to its cross-tool core (~4.5k tokens); the chemistry sections (transport trust ladder, direction-agnosticism, metabolite ID forms) now live on `docs://analysis/metabolites` and the trust-surface sections on `docs://analysis/annotation_evidence`, with one-paragraph pointers left behind (closes backlog 3.15).
+- Generated tool pages default to a brief summary (params + one worked example); the full page (all examples, verbose fields) moved to `docs://tools/{name}/full`.
+- `docs://guide/conventions` cut to its cross-tool core (~7k tokens); the chemistry sections (transport trust ladder, direction-agnosticism, metabolite ID forms) now live on `docs://analysis/metabolites` and the trust-surface sections on `docs://analysis/annotation_evidence`, with one-paragraph pointers left behind (closes backlog 3.15).
 - `docs://guide/start_here` trimmed to the family table + response shapes, with cross-feeding and DE-by-functional-class recipes and an enrichment "step 0" added.
 - MCP server instructions are size-aware — name `docs://index` first and carry its approximate resource sizes so agents pick brief vs. full pages deliberately.
 - `differential_expression_by_ortholog` accepts `direction='both'` (runs up and down per group × experiment × timepoint, matching `differential_expression_by_gene`).

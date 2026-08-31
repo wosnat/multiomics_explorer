@@ -147,7 +147,7 @@ def _collect_test_cases() -> list[tuple[str, dict]]:
     cases = []
     if not ABOUT_DIR.exists():
         return cases
-    for path in sorted(ABOUT_DIR.glob("*.md")):
+    for path in sorted((ABOUT_DIR / "full").glob("*.md")):
         content = path.read_text()
         examples = _parse_examples(content)
         for ex in examples:
@@ -156,6 +156,7 @@ def _collect_test_cases() -> list[tuple[str, dict]]:
 
 
 _CASES = _collect_test_cases()
+assert _CASES, "no example-call blocks found under references/tools/full/"
 _CASE_IDS = [f"{name}:{ex['call'][:40]}" for name, ex in _CASES]
 
 

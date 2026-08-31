@@ -126,7 +126,7 @@ Already in `.claude/settings.json`. Update the `--directory` path if needed:
 | `multiomics_explorer/config/settings.py` | Pydantic settings from .env |
 | `multiomics_explorer/inputs/tools/{tool}.yaml` | Human-authored about-content (examples, mistakes, chaining, verbose_fields) — generated md is downstream |
 | `multiomics_explorer/inputs/ontologies/{key}.yaml` | Human-authored per-ontology reference (17, keys = `ONTOLOGY_CONFIG`) — generated `references/ontologies/{key}.md` is downstream (`docs://ontologies/{key}`) |
-| `scripts/build_about_content.py` | Generator — writes `skills/multiomics-kg-guide/references/tools/*.md` directly (no separate sync step) |
+| `scripts/build_about_content.py` | Generator — writes brief tool pages to `skills/multiomics-kg-guide/references/tools/*.md`, full tool pages to `references/tools/full/*.md`, and the docs directory to `references/index.md`, all directly (no separate sync step) |
 | `docs/backlog.md` | The only open-work list — one line per item with size + origin; delete items when they ship (CHANGELOG keeps the record) |
 
 ## Skill / about-content workflow
@@ -134,7 +134,10 @@ Already in `.claude/settings.json`. Update the `--directory` path if needed:
 Per `.claude/skills/layer-rules/`, the two skill subtrees behave differently:
 
 **Tool docs are generated** — never edit
-`multiomics_explorer/skills/multiomics-kg-guide/references/tools/*.md` directly. Source of truth:
+`multiomics_explorer/skills/multiomics-kg-guide/references/tools/*.md` (brief
+pages), `references/tools/full/*.md` (full pages), or `references/index.md`
+(the docs directory) directly — all three are written by the generator.
+Source of truth:
 
 - Human-authored sections (`examples`, `mistakes`, `chaining`, `verbose_fields`,
   any new section structures): `multiomics_explorer/inputs/tools/{tool}.yaml`.

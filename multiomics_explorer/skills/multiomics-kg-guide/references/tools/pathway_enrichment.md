@@ -61,8 +61,15 @@ Result row: `cluster, experiment_id, name, timepoint, timepoint_hours, timepoint
 
 - pathway_enrichment is DE-anchored (needs `experiment_ids`); for a clustering analysis use `cluster_enrichment(analysis_id=...)`, for ortholog groups / custom lists use the Python `fisher_ora` primitive.
 
-- No rows ≠ nothing tested: read `n_significant`, always the full tested-set count (also recoverable per-experiment from `by_experiment[].n_tests`). [ENR] Default `limit=25` + `include_nonsignificant=False` return only significant rows (`p_adjust < pvalue_cutoff`); `total_matching` then counts just that pageable subset (== `n_significant`), so an empty `results` page always means `total_matching=0`. Pass `include_nonsignificant=True` to page through every tested row — `total_matching` then covers all of them; `n_significant` is unaffected either way.
+## Chaining patterns
 
-- [ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions.
+- DE-anchored ORA: pathway_enrichment tests DE gene sets per experiment × timepoint × direction; the sibling cluster_enrichment runs the same Fisher + BH test over a clustering analysis's cluster membership (no direction). Same row/envelope shape.
+- ontology_landscape → genes_by_ontology(level=N) → pathway_enrichment
+- pathway_enrichment → gene_overview
+- differential_expression_by_gene → pathway_enrichment
+- pathway_enrichment(ontology='kegg', ...) → list_metabolites(pathway_ids=[<enriched_pathway_id>]) — inspect the chemistry of an enriched KEGG pathway (compound-anchored membership, distinct from the gene-KO membership the enrichment used). See docs://analysis/metabolites for the pathway-anchor disambiguation.
+- See `docs://analysis/enrichment` for the full methodology and the `informative_only` filter semantics.
+- ontology_landscape(ontology='interpro') → pathway_enrichment(ontology='interpro', interpro_type=..., level=...) — pick the InterPro type before enrichment; the param is required.
+- See `docs://analysis/annotation_evidence` for the trust-axis registry (which filters apply to which ontology) and rank-vs-filter guidance for evidence_score.
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/pathway_enrichment/full`

@@ -537,7 +537,7 @@ mistakes:
     conservative casts (cross-organism inference); no filter for
     broad-screen candidate enumeration (N-source DE), where inherited
     rows on real uptake genes are the biology you want. Both depths are
-    annotations, neither is ground truth — see `docs://guide/conventions`.
+    annotations, neither is ground truth — see `docs://analysis/metabolites`.
   - >-
     Transport rows are deepest-attachment projections. A gene attached to
     a TCDB family AND to one of that family's descendants contributes rows

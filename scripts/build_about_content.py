@@ -521,15 +521,20 @@ def render_brief(tool_name: str, schema: dict, input_data: dict | None) -> str:
             out += ["## Chaining patterns", ""]
             out += [f"- {c}" for c in chaining]
             out += [""]
+        elif chaining:
+            # Dropped for space — leave a visible pointer instead of
+            # silently disappearing.
+            out += [f"Chaining patterns: see `docs://tools/{tool_name}/full`.", ""]
         return out
 
     base = header + example_section + response_section
 
     # Deterministic overflow trim, in order: full slate (<=3 mistakes +
-    # chaining) -> drop chaining -> mistakes trimmed to just the first.
+    # chaining) -> mistakes trimmed to just the first (chaining kept) ->
+    # drop chaining too (marker line takes its place).
     for mistakes_slice, include_chaining in (
         (all_mistakes[:3], True),
-        (all_mistakes[:3], False),
+        (all_mistakes[:1], True),
         (all_mistakes[:1], False),
     ):
         candidate = "\n".join(base + _tail(mistakes_slice, include_chaining) + pointer)

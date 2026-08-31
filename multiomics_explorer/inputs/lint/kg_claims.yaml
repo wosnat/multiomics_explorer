@@ -24,7 +24,6 @@
   tolerance: {rel: 0.02}
   used_in:
     - CLAUDE.md
-    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
     - multiomics_explorer/inputs/tools/metabolites_by_quantifies_assay.yaml
     - multiomics_explorer/mcp_server/tools.py
@@ -40,7 +39,7 @@
   tolerance: {rel: 0.02}
   used_in:
     - CLAUDE.md
-    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
     - multiomics_explorer/inputs/tools/metabolites_by_flags_assay.yaml
     - multiomics_explorer/mcp_server/tools.py
   note: "share of boolean Assay_flags_metabolite edges with flag_value=false (docs: '~69%')"

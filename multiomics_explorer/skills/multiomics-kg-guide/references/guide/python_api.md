@@ -395,6 +395,6 @@ scenarios) see `docs://examples/metabolites.py`.
 - `docs://examples/metabolites.py` — runnable metabolites workflow examples (7 scenarios).
 - `docs://examples/annotation_evidence.py` — runnable annotation-trust examples (4 scenarios).
 - `docs://examples/ontology_terms.py` — runnable term-side examples (4 scenarios).
-- Per-tool docs (`docs://tools/{name}`) — every tool md has a
-  "Package import equivalent" section showing the matching Python
-  signature, the import statement, and the dict shape returned.
+- Per-tool full docs (`docs://tools/{name}/full`) — every full tool md
+  has a "Package import equivalent" section showing the matching
+  Python signature, the import statement, and the dict shape returned.

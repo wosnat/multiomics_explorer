@@ -51,8 +51,6 @@ Result row: `locus_tag, gene_name, product, evidence_source, substrate_depth, tc
 
 - Gene-anchored (locus_tags → metabolites). The metabolite-anchored mirror is `genes_by_metabolite` (metabolite → genes); both share the same row class, discriminators and per-arm filter scope.
 
-- Single-organism enforced (mirrors `differential_expression_by_gene` and `genes_by_metabolite`). There is no `organisms` list. For cross-organism / cross-feeding work: call MBG once on the focal organism, take `top_metabolites`, then route to `genes_by_metabolite(metabolite_ids=[...], organism=partner)` (or `list_metabolites(metabolite_ids=[...], organism_names=[partner])` for presence-only).
-
-- `'metabolomics'` is NOT accepted in `evidence_sources` here — the Pydantic Literal allows only `('metabolism', 'transport')`. The metabolomics path (`MetaboliteAssay → Metabolite`) has no Gene anchor, so a metabolomics-only metabolite contributes no rows from this tool. For measurement evidence, use `list_metabolite_assays` / `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay`. Same divergence as `genes_by_metabolite`.
+Chaining patterns: see `docs://tools/metabolites_by_gene/full`.
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/metabolites_by_gene/full`
