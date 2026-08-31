@@ -38,3 +38,9 @@ def test_examples_lint_clean(path: Path):
         for p, line_no, line, token in violations:
             msg_lines.append(f"  {p.name}:{line_no}: {token!r} in: {line.strip()}")
         pytest.fail("\n".join(msg_lines))
+
+
+def test_examples_have_scenario_toc():
+    for name in ("pathway_enrichment", "metabolites", "ontology_terms", "annotation_evidence"):
+        text = (EXAMPLES_DIR / f"{name}.py").read_text()
+        assert "# CONTENTS" in text[:2000], name

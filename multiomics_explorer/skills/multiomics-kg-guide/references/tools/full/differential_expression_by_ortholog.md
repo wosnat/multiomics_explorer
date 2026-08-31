@@ -146,7 +146,7 @@ differential_expression_by_ortholog → genes_by_homolog_group(organisms=[...]) 
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
-- For cross-experiment summarization patterns see `docs://guide/python_api` (Cross-experiment summarization — covers `response_matrix` for gene × treatment-group pivots and `gene_set_compare` for two-set comparisons).
+- For cross-experiment summarization patterns see `docs://analysis/expression` — covers `response_matrix` for gene × treatment-group pivots and `gene_set_compare` for two-set comparisons.
 
 - Each `organisms` entry is OR-matched word-by-word against preferred_name + name_synonyms, so a genus word (e.g. 'Alteromonas') matches every strain in that genus.
 

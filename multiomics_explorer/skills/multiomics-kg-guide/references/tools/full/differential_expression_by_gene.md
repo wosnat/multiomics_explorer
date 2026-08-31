@@ -471,7 +471,7 @@ They are populated ONLY on the significant subset — `rank_up` is non-null on s
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
-- For cross-experiment summarization (which treatments does this gene set respond to?) see `docs://guide/python_api` (Cross-experiment summarization — `response_matrix` for gene × treatment pivots, `gene_set_compare` for two-set overlap). For pathway-level interpretation chain to `pathway_enrichment` (`docs://analysis/enrichment`).
+- For cross-experiment summarization (which treatments does this gene set respond to?) see `docs://analysis/expression` — `response_matrix` for gene × treatment pivots, `gene_set_compare` for two-set overlap. For pathway-level interpretation chain to `pathway_enrichment` (`docs://analysis/enrichment`).
 
 ```mistake
 Expecting per-timepoint counts, experiment_name, or table_scope_detail inside `experiments[]` from a plain call

@@ -146,7 +146,7 @@ examples:
     # position, not a subfamily call; read `by_gene[].transport_substrate_resolution`
     # before trusting any of these substrates. Useful diagnostic for batch
     # DE inputs that mix superfamily-only genes with resolved transporters.
-    # See `docs://guide/conventions` — both depths are annotations,
+    # See `docs://analysis/metabolites` — both depths are annotations,
     # neither is ground truth.
 
 verbose_fields:

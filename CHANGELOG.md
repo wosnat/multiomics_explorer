@@ -29,6 +29,10 @@ version becomes `0.1.0-alpha.5` and the KG's `mcp_min_version` must be
 coordinated to `0.1.0a5` ahead of the KG release.
 
 ### Added
+- `docs://index` — directory of every `docs://` page with per-entry approximate token size and read-when guidance, registered first so it is the natural discovery entry point.
+- `docs://tools/{name}/full` — full tool pages (every example, verbose fields, complete chaining/mistakes lists), split out from the now-brief default `docs://tools/{name}` page.
+- `docs://analysis/expression` — DE-tooling reference page (`differential_expression_by_gene` / `differential_expression_by_ortholog` / `gene_response_profile`, plus the `response_matrix` / `gene_set_compare` Python wrappers), moved out of `docs://guide/python_api` (closes backlog 3.14).
+- `examples/*.py` scenario `# CONTENTS` TOC comment blocks (`pathway_enrichment.py`, `metabolites.py`, `ontology_terms.py`, `annotation_evidence.py`) naming each scenario function and its rough line number.
 - Docs lint suite `tests/unit/test_docs_lint.py` (link integrity, stale identifiers from `inputs/lint/stale_identifiers.yaml`, quoted vocabulary values vs `inputs/lint/vocab_snapshot.yaml`, CLAUDE.md table shape, tool-inventory coherence incl. `start_here` routing) + `tests/integration/test_docs_kg_claims.py` (`-m kg`: every KG number the docs quote, from `inputs/lint/kg_claims.yaml`; vocab snapshot == live).
 - `scripts/refresh_examples.py` — executes every YAML example `call` through an in-memory MCP client and rewrites (`--write`) or checks (`--check`) the `response:` block against the live KG; `tests/integration/test_about_examples.py::test_example_response_values_match_live` fails on drift. Example entries accept `illustrative: true` + `note:`.
 - `scripts/snapshot_vocab.py` — regenerates the offline vocabulary snapshot after a KG rebuild.
@@ -254,6 +258,10 @@ coordinated to `0.1.0a5` ahead of the KG release.
 - `outputSchema` no longer emitted on `tools/list`
 
 ### Changed
+- Generated tool pages default to a brief summary (params + a couple of short examples); the full page (all examples, verbose fields) moved to `docs://tools/{name}/full`.
+- `docs://guide/conventions` cut to its cross-tool core (~4.5k tokens); the chemistry sections (transport trust ladder, direction-agnosticism, metabolite ID forms) now live on `docs://analysis/metabolites` and the trust-surface sections on `docs://analysis/annotation_evidence`, with one-paragraph pointers left behind (closes backlog 3.15).
+- `docs://guide/start_here` trimmed to the family table + response shapes, with cross-feeding and DE-by-functional-class recipes and an enrichment "step 0" added.
+- MCP server instructions are size-aware — name `docs://index` first and carry its approximate resource sizes so agents pick brief vs. full pages deliberately.
 - `differential_expression_by_ortholog` accepts `direction='both'` (runs up and down per group × experiment × timepoint, matching `differential_expression_by_gene`).
 - `search_ontology.ontology` and `list_filter_values.ontology` typed to the closed 17-key ontology enum instead of a bare `str`.
 - `list_clustering_analyses` matches `omics_type` case-insensitively.

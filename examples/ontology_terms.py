@@ -27,6 +27,11 @@ Notes:
   `router` links (InterPro → EC / CAZy) are recall-biased cross-references,
   never a gene-function call.
 """
+# CONTENTS
+#   1. scenario_browse_merops      — search_ontology browse mode (line ~48)
+#   2. scenario_multi_search       — one search_text across two ontologies (line ~77)
+#   3. scenario_term_details_batch — ontology_term_details on a mixed batch (line ~108)
+#   4. scenario_bridge_walk        — forward-only bridge chain tcdb -> pfam -> interpro (line ~144)
 from __future__ import annotations
 
 import argparse

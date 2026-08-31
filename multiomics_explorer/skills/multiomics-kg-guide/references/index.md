@@ -38,7 +38,7 @@
 - `docs://tools/list_experiments` — ~1411 tok
 - `docs://tools/list_filter_values` — ~1296 tok
 - `docs://tools/list_metabolite_assays` — ~1281 tok
-- `docs://tools/list_metabolites` — ~1773 tok
+- `docs://tools/list_metabolites` — ~1774 tok
 - `docs://tools/list_organisms` — ~965 tok
 - `docs://tools/list_publications` — ~1286 tok
 - `docs://tools/metabolites_by_flags_assay` — ~1317 tok
@@ -58,8 +58,8 @@ Append /full for the complete page — all worked examples + full response forma
 
 - `docs://tools/assays_by_metabolite/full` — ~4915 tok
 - `docs://tools/cluster_enrichment/full` — ~4334 tok
-- `docs://tools/differential_expression_by_gene/full` — ~6547 tok
-- `docs://tools/differential_expression_by_ortholog/full` — ~2781 tok
+- `docs://tools/differential_expression_by_gene/full` — ~6540 tok
+- `docs://tools/differential_expression_by_ortholog/full` — ~2773 tok
 - `docs://tools/discussed_by_publication/full` — ~3476 tok
 - `docs://tools/gene_aa_sequence/full` — ~2212 tok
 - `docs://tools/gene_clusters_by_gene/full` — ~2316 tok
@@ -69,7 +69,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/gene_neighbors/full` — ~3181 tok
 - `docs://tools/gene_ontology_terms/full` — ~10285 tok
 - `docs://tools/gene_overview/full` — ~8824 tok
-- `docs://tools/gene_response_profile/full` — ~5466 tok
+- `docs://tools/gene_response_profile/full` — ~5458 tok
 - `docs://tools/genes_by_boolean_metric/full` — ~5977 tok
 - `docs://tools/genes_by_categorical_metric/full` — ~6065 tok
 - `docs://tools/genes_by_function/full` — ~2729 tok
@@ -85,7 +85,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/list_experiments/full` — ~8388 tok
 - `docs://tools/list_filter_values/full` — ~5603 tok
 - `docs://tools/list_metabolite_assays/full` — ~3911 tok
-- `docs://tools/list_metabolites/full` — ~5744 tok
+- `docs://tools/list_metabolites/full` — ~5745 tok
 - `docs://tools/list_organisms/full` — ~12752 tok
 - `docs://tools/list_publications/full` — ~8813 tok
 - `docs://tools/metabolites_by_flags_assay/full` — ~3939 tok
@@ -130,8 +130,8 @@ Append /full for the complete page — all worked examples + full response forma
 
 ## Examples
 
-- `docs://examples/annotation_evidence.py` — ~2873 tok — Example: reading the annotation-trust surface (evidence / evidence_score / tier / call_class / interpro_type)…
-- `docs://examples/metabolites.py` — ~9265 tok — Example: working with metabolites in the KG.
-- `docs://examples/ontology_terms.py` — ~2207 tok — Example: the term side of the ontology surface — browsing terms without a search string, fanning one search…
-- `docs://examples/pathway_enrichment.py` — ~3145 tok — Runnable companion to docs://analysis/enrichment.
+- `docs://examples/annotation_evidence.py` — ~2993 tok — Example: reading the annotation-trust surface (evidence / evidence_score / tier / call_class / interpro_type)…
+- `docs://examples/metabolites.py` — ~9419 tok — Example: working with metabolites in the KG.
+- `docs://examples/ontology_terms.py` — ~2300 tok — Example: the term side of the ontology surface — browsing terms without a search string, fanning one search…
+- `docs://examples/pathway_enrichment.py` — ~3249 tok — Runnable companion to docs://analysis/enrichment.
 
