@@ -53,7 +53,9 @@ capped to the **first 10** (desc by ranking count) on a detail call
 `<key>_truncated: true`; otherwise absent in Python / `null` over MCP
 (Pydantic declares every `Optional` field, so FastMCP always fills the
 key). `summary=True` always returns the **full, uncapped** list — read it
-first for a whole ranking. Affects rollups on the list/discovery and
+first for a whole ranking (on `resolve_gene` the `by_organism` counts
+then sum exactly to `total_matching`; on `list_publications` a
+multi-organism paper counts once per organism). Affects rollups on the list/discovery and
 drill-down tools (`list_experiments`, `list_organisms`,
 `genes_by_function`, `genes_by_metabolite`, `metabolites_by_gene`,
 `differential_expression_by_{gene,ortholog}`, `pathway_enrichment`,
@@ -65,7 +67,7 @@ genuine top-10 in both modes, no `_truncated` companion key.
 
 **36 of 42 tools accept `summary=True`** — nearly universal. It returns
 only the envelope (`results=[]`, `returned=0`; `truncated` is `true`
-whenever rows were withheld). Use it as the **first call** for any
+whenever rows were withheld and `false` when nothing matched). Use it as the **first call** for any
 question that doesn't already specify exact IDs. Pattern: `summary=True`
 → narrow filters → drop `summary=True` for detail. Exception: on
 `metabolites_by_gene` the envelope is computed over the whole locus-tag
@@ -204,9 +206,8 @@ signal is on `gene_overview`: **`annotation_state`** (`no_evidence` /
 `catch_all_only` / `informative_single` / `informative_multi`) tells you
 whether the gene has informative evidence at all. For the rarer
 "ran-but-empty vs never-ran" distinction, `gene_details.contributing_sources`
-lists the pipelines that contributed at least one field (`ncbi`,
-`uniprot`, `cyanorak`, `eggnog`, `interproscan`, `psortb`, `signalp`,
-`tcdb_diamond`, `merops_diamond`).
+lists the 9 pipelines that contributed at least one field (`ncbi`,
+`uniprot`, `cyanorak`, ..., `merops_diamond`).
 
 **Cross-organism caveat:** `cyanorak`-derived annotations (Cyanorak
 roles, curated products, many ortholog groups) apply to
@@ -375,8 +376,8 @@ Canonical ontology term / OG IDs carry a namespace prefix (`go:0006979`,
 `differential_expression_by_ortholog`) also accept the bare accession
 (`ko00910`, `GO:0006979`, `PF00004`, ...) and coerce it to canonical
 (regex match — a bare accession maps onto exactly one ontology/OG source)
-before the query runs. Coerced inputs land in `resolved_aliases` — same
-shape as the metabolite-ID coercion above (nested under `term_validation`
+before the query runs. Coerced inputs land in `resolved_aliases`
+(`{input: [canonical]}`, empty when none; nested under `term_validation`
 on the two enrichment tools). Class/subclass-level TCDB ids (`1`, `1.A`)
 and bare CAZy class ids (`GH`, `AA`) are not coerced — pass the prefixed
 form. `gene_ontology_terms` does not take `term_ids` (reverse lookup).
@@ -539,10 +540,8 @@ envelope carries `score_max` / `score_median` (`float | None`); results
 sort by score desc by default; Lucene syntax is supported (boolean
 operators, phrase matching, fuzzy `~`, field-boosting), e.g.
 `search_text="phosphate AND (transporter OR permease)"`. Tools with
-Lucene search: `genes_by_function`, `search_ontology`,
-`search_homolog_groups`, `list_metabolites`, `list_metabolite_assays`,
-`list_derived_metrics`, `list_clustering_analyses`, `list_experiments`,
-`list_publications`.
+`search_text=`: `genes_by_function`, `search_ontology`,
+`list_metabolites`, `list_experiments`, `list_publications`, + 4 more.
 
 The KG build replaces reserved characters before loading: an apostrophe
 becomes a caret (`^`), a pipe becomes a comma. A `search_text` or
