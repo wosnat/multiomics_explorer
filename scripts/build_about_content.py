@@ -1423,10 +1423,12 @@ def build_ontologies(*, live_vocab: bool = False) -> int:
 # Hard char cap on the rendered index (llm-review 2b.4 controller ruling
 # supersedes the original 3,200-char/800-tok figure in the task brief,
 # which is arithmetically impossible against the current corpus — 42 brief
-# + 42 full tool pages + 17 ontologies alone are ~100 rows). Enforced by
-# shortening the read-when text on guide/analysis/examples/ontology-index
-# rows (the only rows that carry one) — rows are never dropped.
-INDEX_MAX_CHARS = 6000
+# + 42 full tool pages + 17 ontologies alone are ~100 rows; a first ruling
+# raised it to 6,000, then to 7,500 after 6,000 left no room for genuinely
+# useful read-when text). Enforced by shortening the read-when text on
+# guide/analysis/examples/ontology-index rows (the only rows that carry
+# one) — rows are never dropped.
+INDEX_MAX_CHARS = 7500
 
 _READ_WHEN_HEADING_PREFIXES = ("#",)
 _READ_WHEN_SKIP_PREFIXES = ("|", "-", "`", "<", "(", "*", "import ", "from ", "#!")
