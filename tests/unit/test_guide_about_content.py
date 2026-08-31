@@ -47,3 +47,10 @@ def test_conventions_within_budget_and_pointers_present():
     ]:
         assert home in text, f"pointer to {home} missing"
         assert f"## {moved}" not in text, f"section '{moved}' should have moved to {home}"
+
+
+def test_start_here_budget_and_recipes():
+    text = (GUIDE_DIR / "start_here.md").read_text()
+    assert len(text) <= 16000, f"start_here.md {len(text)} chars > 16k (~4k tok)"
+    assert "cross-feeding" in text.lower()
+    assert "ontology_landscape" in text
