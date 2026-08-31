@@ -35,3 +35,15 @@ def test_guide_md_lint_clean(md_path: Path):
         for path, line_no, line, token in violations:
             msg_lines.append(f"  {path.name}:{line_no}: {token!r} in: {line.strip()}")
         pytest.fail("\n".join(msg_lines))
+
+
+def test_conventions_within_budget_and_pointers_present():
+    text = (GUIDE_DIR / "conventions.md").read_text()
+    assert len(text) <= 28000, f"conventions.md {len(text)} chars > 28k (~7k tok)"
+    for moved, home in [
+        ("Transport trust ladder", "docs://analysis/metabolites"),
+        ("Metabolite ID forms", "docs://analysis/metabolites"),
+        ("Annotation-trust surface", "docs://analysis/annotation_evidence"),
+    ]:
+        assert home in text, f"pointer to {home} missing"
+        assert f"## {moved}" not in text, f"section '{moved}' should have moved to {home}"

@@ -225,6 +225,81 @@ Defaults never filter: every trust param (`sources`, `evidence`, `max_tier`,
 trust filters returns the same rows it always did — the trust surface is
 purely additive until you opt in.
 
+Passing an axis an ontology doesn't carry raises `ValueError` naming that
+ontology's supported axes — check first via
+`list_filter_values(filter_type='trust_axes', ontology=...)`.
+
+---
+
+## The sparse row convention
+
+A row only carries the trust columns its ontology owns — `tier` never
+appears on a `kegg` row (KEGG has no tier axis); `interpro_type` never
+appears on a `tcdb` row. Owned-but-null columns stay (a TCDB edge with only
+eggNOG support carries `tier: null`, not an absent field). The rule holds on
+the MCP wire as well as in the Python API, and it is the general row
+convention: result rows are serialized sparsely — a key that is absent means
+"not applicable to this row" (a verbose-only column on a compact call, an
+axis this ontology does not carry), a key that is `null` means "applicable,
+but this record has no value" (a gene with no MEROPS call carries
+`merops_evidence_score_max: null`). A compact `tcdb` row from
+`genes_by_ontology` is ~9 keys, a verbose one ~22. Three tools keep a
+deliberately None-padded union shape instead, so their rows always carry
+every column: `genes_by_metabolite` / `metabolites_by_gene` (cross-arm
+fields, see `docs://analysis/metabolites`) and `assays_by_metabolite` /
+`discussed_by_publication` (polymorphic rows).
+
+---
+
+## Multi-ontology filter scoping
+
+On `gene_ontology_terms` and `ontology_landscape`, a trust filter carried by
+every requested ontology applies normally; carried by some but not all
+applies to those and drops the rest into `skipped_ontologies` with a
+warning; carried by none raises. A **facet** — `interpro_type` for InterPro,
+`tree` for BRITE — behaves differently: it narrows its own ontology and
+leaves the others untouched (nothing is skipped), and raises when its owner
+is not in the list at all.
+
+---
+
+## Envelope rollups are full-match
+
+`by_evidence`, `by_tier`, `by_sources`, `by_call_class` and
+`evidence_score_stats` describe every matching row, not the page you are
+reading, and they are populated in compact mode — where `tier`, `sources`
+and `evidence_score` are not on the row at all, the envelope is the only
+place to read their distribution. On `gene_ontology_terms` they are empty
+under `summary=true`, which fetches no rows.
+
+---
+
+## Vocabulary values: registered vs. pivoted
+
+Filterable trust values (`evidence`, `sources`, `call_class`,
+`interpro_type`, and the other categorical `filter_type`s on
+`list_filter_values`) are read from the KG's `ControlledVocabulary` nodes,
+never hard-coded. If a `ControlledVocabulary` node is missing for some edge
+type, a live pivot query derives the value set instead, flagged `source:
+"pivot"` plus a warning — same values, just not pre-registered. The same
+rule covers non-trust closed vocabularies such as `cluster_type`.
+
+---
+
+## Vocabulary-hash compatibility
+
+The KG stamps `Schema_info.controlled_vocabularies_hash` (sha256 over every
+`ControlledVocabulary` entry's ids, values, closed/sparse flags and score
+signals — descriptions excluded). `kg_release_info` compares it with the
+hash the explorer was built against; a mismatch, or a KG that predates the
+vocabulary contract, yields `verdict: warn` — never worse. What it means:
+calls are unaffected (filters validate live, `list_filter_values` reads
+live), but the value lists quoted in `docs://ontologies/{key}` pages and in
+parameter descriptions were rendered from the pinned vocabulary and may be
+stale. When the warn is up, trust `list_filter_values` over any quoted
+list. The pin is re-set at explorer release time to equal the live KG's
+hash.
+
 ---
 
 ## MEROPS `call_class` — orthogonal to `tier`

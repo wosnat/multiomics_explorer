@@ -21,7 +21,33 @@ The `metabolism` and `transport` rows share tools — the `evidence_source` fiel
 
 The `Metabolite.evidence_sources` list field on each Metabolite node already indicates which of the three pipelines contribute (e.g., `['metabolism', 'transport', 'metabolomics']`); read this to route quickly.
 
-**Metabolite ID forms.** The canonical ID is `kegg.compound:C00031`; every `metabolite_ids` / `exclude_metabolite_ids` parameter on the seven chemistry and metabolomics tools (`list_metabolites`, `genes_by_metabolite`, `metabolites_by_gene`, `list_metabolite_assays`, `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`, `assays_by_metabolite`) also accepts the bare KEGG form (`C00031`) and the `CHEBI:`, `HMDB` and `MNXM` cross-reference forms, coercing them to canonical before the query. The envelope reports what was coerced in `resolved_aliases` (`{'C00031': ['kegg.compound:C00031']}`); an xref that maps to several canonical IDs expands to all of them and adds a `warnings` entry. The examples below use bare KEGG IDs deliberately.
+**Metabolite ID forms.** Canonical `Metabolite.id` carries a namespace prefix: `kegg.compound:C00064`,
+`chebi:10004`, `mnx:MNXM…`. Every `metabolite_ids` / `exclude_metabolite_ids`
+parameter on the seven chemistry / metabolomics tools (`list_metabolites`,
+`genes_by_metabolite`, `metabolites_by_gene`, `list_metabolite_assays`,
+`metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`,
+`assays_by_metabolite`) also accepts the un-prefixed / xref aliases and
+resolves them to canonical IDs before the query runs: bare KEGG `C00064`,
+`CHEBI:17234` or bare numeric `17234`, `HMDB0000122`, `MNXM1095050`.
+Canonical forms pass through untouched; any other prefixed form is passed
+through verbatim and lands in `not_found`. The examples below use bare
+KEGG IDs deliberately.
+
+- **Collision policy.** KEGG xrefs are unique; CHEBI / HMDB / MNXM are not
+  (two KEGG nodes can share one `chebi_id`). An ambiguous alias expands to
+  **all** matching metabolites and appends a `warnings` entry
+  (`'<input>' resolved to N metabolites: [...] — pass the canonical id to
+  narrow`). Nothing is silently picked. The same rule applies to
+  `exclude_metabolite_ids` — an ambiguous exclude removes every match.
+- **Envelope.** Coerced inputs are reported in `resolved_aliases`
+  (`{input: [canonical, ...]}`, empty when none). Unresolved inputs stay
+  verbatim and appear in `not_found` in the form you passed. Exclude-wins-on-
+  overlap is evaluated on the canonical IDs, so mixed forms across
+  `metabolite_ids` and `exclude_metabolite_ids` still overlap correctly.
+- **Not coercion:** `list_metabolites`' exact-xref filters
+  (`kegg_compound_ids`, `chebi_ids`, `hmdb_ids`, `mnxm_ids`) match the xref
+  property directly, never rewrite the input, and report nothing in
+  `resolved_aliases`.
 
 **Row schema is unified across both annotation arms.** `genes_by_metabolite` and `metabolites_by_gene` rows carry the full cross-arm key set — every row has `evidence_source`, `substrate_depth`, `tcdb_evidence_score`, `reaction_id`, `reaction_name`, `ec_numbers`, `mass_balance`, `tcdb_family_id`, `tcdb_family_name`, with explicit `None` on the fields belonging to the other arm. Code against `evidence_source` to discriminate (or `substrate_depth is not None` for transport-only); the cross-arm `None`s mean every row has identical keys, no `KeyError` branching.
 
@@ -38,6 +64,22 @@ Always restate the row's caveats when the answer touches it. The LLM should neve
 ## Track A1 — Reaction (KEGG) annotation
 
 For the chemistry the gene's reaction is involved in via curated KEGG annotations. Always restate inline: KO inference may be putative; reaction direction is **permanently undirected** in this KG (upstream KEGG direction is unreliable); promiscuous enzymes inflate counts. Reversibility is also not encoded on `Reaction` nodes — KEGG lacks an `is_reversible` flag upstream, so the KG carries no direction *and* no reversibility on reactions (permanently unmitigable).
+
+### Distinguishing reaction direction
+
+KEGG reactions are stored in the KG **without substrate-vs-product
+direction** — KEGG equation order is unreliable upstream, so we do not
+encode it. Joins through `Reaction_has_metabolite` and
+`Tcdb_family_transports_metabolite` return both produced and
+consumed metabolites identically.
+
+To distinguish directionality, layer:
+
+- **DE direction** (`differential_expression_by_gene` `direction='up'`
+  vs `'down'`) — transcriptional response under treatment.
+- **Functional annotation** (`gene_overview` Pfam/KO labels —
+  `*-synthase` vs `*-permease`, `*-dehydrogenase` vs
+  `*-hydratase`) — text-level disambiguation.
 
 ### a — Metabolite discovery & filtering
 
@@ -134,10 +176,10 @@ result = metabolites_by_gene(
 
 ### g — Substrate resolution and depth (score → resolution → depth)
 
-Both depths are annotations, not ground truth — transporter specificity in nature is often promiscuous or under-characterized. Read transport evidence top-down through three fields, each answering a different question (full definitions in `docs://guide/conventions`, section "Transport trust ladder (chemistry)"; this page only adds the chemistry-tool reading):
+Both depths are annotations, not ground truth — transporter specificity in nature is often promiscuous or under-characterized. TCDB substrates are attached to transporter family nodes and inherited down the family hierarchy, so a gene annotated to a broad family (common in homology-based annotation) still surfaces candidate substrates. Read transport evidence top-down through three fields, each answering a different question:
 
-1. **`tcdb_evidence_score`** (row) / **`tcdb_evidence_score_max`** (gene; `gene_overview` rows, `genes_by_metabolite.top_genes[]`, `metabolites_by_gene.by_gene[]`) — *how corroborated is the gene × family call?* Rank by it; never filter by it. `0` is an uncorroborated hit; absent is `None` (no TCDB call).
-2. **`transport_substrate_resolution`** (gene) — *is the gene's substrate breadth meaningful?* `family_inferred` = every deepest attachment is a lumping family (reachability, not capability); `resolved` = at least one deepest attachment is non-lumping. The gene's value is repeated on each of its transport rows (`None` on metabolism rows) so a batch scan can drop `family_inferred` rows without joining back to `by_gene[]` / `top_genes[]`; it never varies across one gene's rows.
+1. **`tcdb_evidence_score`** (row) / **`tcdb_evidence_score_max`** (gene; `gene_overview` rows, `genes_by_metabolite.top_genes[]`, `metabolites_by_gene.by_gene[]`) — *how corroborated is the gene × family call?* Rank by it; never filter by it. `0` is an uncorroborated hit; absent is `None` (no TCDB call). The `'tcdb' ∈ annotation_types` gate on `gene_overview` is the binary version of the same evidence; the score is the graded one.
+2. **`transport_substrate_resolution`** (gene) — *is the gene's substrate breadth meaningful?* `family_inferred` = every deepest attachment is a lumping family (reachability, not capability); `resolved` = at least one deepest attachment is non-lumping — not all of them. A gene attached at both a specific family and the ABC superfamily is `resolved` and still carries the superfamily rollup in its `transported_metabolite_count`; only the row level separates them. The gene's value is repeated on each of its transport rows (`None` on metabolism rows) so a batch scan can drop `family_inferred` rows without joining back to `by_gene[]` / `top_genes[]`; it never varies across one gene's rows.
 3. **`substrate_depth`** (row) — *where does this substrate sit for this family?* `most_specific` = the most specific **surviving** transporter node in the gene-pruned hierarchy (can be a family node, e.g. nitrite via `tcdb:2.A.16` in MED4; not a curation level); `inherited` = came down from an ancestor's substrate set (usually the ABC superfamily `tcdb:3.A.1`).
 
 **Rows are deepest-attachment projections.** A gene attached to a family *and* to one of its descendants contributes rows only through the descendant; the ancestor's substrate rollup is intentionally absent. So distinct metabolites across a gene's transport rows equal `gene_overview.transported_metabolite_count` (PMM0392: 13, not the ABC-superfamily plateau of 554), and distinct genes across a metabolite's transport rows, summed over organisms, equal `list_metabolites.transporter_gene_count`. Full family membership, ancestors included, is visible via `gene_ontology_terms(ontology=['tcdb'], mode='leaf', include_superseded=True)` — without `include_superseded=True` leaf mode also shows deepest attachments only.
