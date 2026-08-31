@@ -31,13 +31,13 @@ Notes:
   measured-and-transport-able metabolites in one call.
 """
 # CONTENTS
-#   1. scenario_discover            — element + organism filter (line ~68)
-#   2. scenario_compound_to_genes   — evidence_source split on glutamine (line ~107)
-#   3. scenario_gene_to_metabolites — element signature + top_metabolite_pathways (line ~195)
-#   4. scenario_cross_feeding       — bridge MED4 -> ALT (line ~248)
-#   5. scenario_n_source_de         — N-source primitive -> DE (line ~387)
-#   6. scenario_tcdb_chain          — substrate-anchored vs family-anchored routes (line ~500)
-#   7. scenario_measurement         — P-stress metabolomics via MetaboliteAssay tools (line ~603)
+#   1. scenario_discover            — element + organism filter (line ~76)
+#   2. scenario_compound_to_genes   — evidence_source split on glutamine (line ~115)
+#   3. scenario_gene_to_metabolites — element signature + top_metabolite_pathways (line ~203)
+#   4. scenario_cross_feeding       — bridge MED4 -> ALT (line ~256)
+#   5. scenario_n_source_de         — N-source primitive -> DE (line ~395)
+#   6. scenario_tcdb_chain          — substrate-anchored vs family-anchored routes (line ~508)
+#   7. scenario_measurement         — P-stress metabolomics via MetaboliteAssay tools (line ~611)
 from __future__ import annotations
 
 import argparse

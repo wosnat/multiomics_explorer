@@ -21,11 +21,11 @@ Run with:
       --locus-tags PMM0001,PMM0002,PMM0003
 """
 # CONTENTS
-#   1. scenario_landscape  — ontology_landscape ranking (line ~108)
-#   2. scenario_de         — pathway_enrichment + EnrichmentResult accessors (line ~129)
-#   3. scenario_cluster    — cluster_enrichment + primitives (line ~183)
-#   4. scenario_ortholog   — ortholog-group gene set vs organism universe (line ~217)
-#   5. scenario_custom     — locus-tag list + hand-built term2gene (line ~246)
+#   1. scenario_landscape  — ontology_landscape ranking (line ~114)
+#   2. scenario_de         — pathway_enrichment + EnrichmentResult accessors (line ~135)
+#   3. scenario_cluster    — cluster_enrichment + primitives (line ~189)
+#   4. scenario_ortholog   — ortholog-group gene set vs organism universe (line ~223)
+#   5. scenario_custom     — locus-tag list + hand-built term2gene (line ~252)
 from __future__ import annotations
 
 import argparse
