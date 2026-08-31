@@ -1,0 +1,156 @@
+# gene_clusters_by_gene
+
+## What it does
+
+Cluster memberships for a gene batch in ONE organism (inferred when omitted) — one row per gene × cluster with its analysis context.
+
+Use for which modules a gene sits in; for a cluster's full roster use `genes_in_cluster`, to discover analyses `list_clustering_analyses`.
+Filters: locus_tags, organism, cluster_type, analysis_ids, plus the publication / condition filters.
+Returns: genes_with_clusters, genes_without_clusters, by_cluster_type, by_analysis, not_found, not_matched; one row = (locus_tag, cluster_id, analysis_id).
+docs://tools/gene_clusters_by_gene; summary=True first.
+
+## Parameters
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| locus_tags | list[string] | — | Gene locus tags (e.g. ['PMM0370', 'PMM0920']). |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
+| cluster_type | string \| None | None | Filter by cluster type. Live vocabulary: list_filter_values(filter_type='cluster_type'). Offline examples: 'condition_comparison', 'decay_pattern', 'diel', 'expression_bin', 'genomic_island', 'time_course'. |
+| treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
+| background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
+| publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
+| analysis_ids | list[string] \| None | None | Filter by clustering analysis IDs. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| limit | int | 25 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
+
+**Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
+
+## Response format
+
+### Envelope
+
+```expected-keys
+total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not_found, not_matched, by_cluster_type, by_treatment_type, by_background_factors, by_analysis, returned, offset, truncated, warnings, results
+```
+
+- **total_matching** (int): Gene × cluster rows matching filters
+- **total_clusters** (int): Distinct clusters matched
+- **genes_with_clusters** (int): Input genes with at least one cluster membership
+- **genes_without_clusters** (int): Input genes with zero memberships after filters
+- **not_found** (list[string]): Locus tags not found in KG
+- **not_matched** (list[string]): Locus tags in KG but no cluster memberships after filters
+- **by_cluster_type** (list[GeneClusterTypeBreakdown]): Rows per cluster type
+- **by_treatment_type** (list[GeneClusterTreatmentBreakdown]): Rows per treatment type
+- **by_background_factors** (list[GeneClusterBackgroundFactorBreakdown]): Rows per background factor
+- **by_analysis** (list[GeneClusterAnalysisBreakdown]): Rows per clustering analysis
+- **returned** (int): Results in this response
+- **offset** (int): Offset into result set
+- **truncated** (bool): True if total_matching > offset + returned
+- **warnings** (list[string]): A closed-vocabulary filter value (cluster_type / treatment_type / background_factors) not found in the live vocabulary (see list_filter_values), plus a not_found locus_tag differing only by case from a real one (locus_tags are never case-normalised). Advisory only — never changes which rows are returned. Empty when clean.
+
+### Per-result fields
+
+| Field | Type | Description |
+|---|---|---|
+| locus_tag | string | Gene locus tag (e.g. 'PMM0370') |
+| gene_name | string \| None (optional) | Gene name (e.g. 'cynA') |
+| cluster_id | string | Cluster node ID (e.g. 'cluster:msb4100087:med4_kmeans_nstarvation:8') |
+| cluster_name | string | Cluster name (e.g. 'MED4 cluster 1 (up, N transport)') |
+| cluster_type | string | Cluster category (e.g. 'condition_comparison') |
+| membership_score | float \| None (optional) | Fuzzy membership score (null for K-means) |
+| analysis_id | string | Clustering analysis ID |
+| analysis_name | string | Clustering analysis name |
+| treatment_type | list[string] | Treatment types for this cluster |
+| background_factors | list[string] (optional) | Background experimental factors |
+
+**Verbose-only fields** (included when `verbose=True`):
+
+| Field | Type | Description |
+|---|---|---|
+| cluster_method | string \| None (optional) | Clustering method (e.g. 'K-means') |
+| member_count | int \| None (optional) | Total genes in this cluster |
+| cluster_functional_description | string \| None (optional) | What the cluster genes ARE (cluster-level) |
+| cluster_expression_dynamics | string \| None (optional) | Expression dynamics label (e.g. 'periodic in L:D only') |
+| cluster_temporal_pattern | string \| None (optional) | Detailed temporal pattern description (cluster-level) |
+| treatment | string \| None (optional) | Free-text condition description |
+| light_condition | string \| None (optional) | Light regime |
+| experimental_context | string \| None (optional) | Full experimental context description |
+| p_value | float \| None (optional) | Assignment p-value (null for most methods) |
+
+## Few-shot examples
+
+### Example 1: Check cluster membership for N-transport genes
+
+```example-call
+gene_clusters_by_gene(locus_tags=["PMM0370", "PMM0920", "PMM0958"])
+```
+
+### Example 2: Summary only — which genes have clusters?
+
+```example-call
+gene_clusters_by_gene(locus_tags=["PMM0370", "PMM0001"], summary=True)
+```
+
+### Example 3: Filter to stress response clusters
+
+```example-call
+gene_clusters_by_gene(locus_tags=["PMM0370"], cluster_type="condition_comparison", verbose=True)
+```
+
+### Example 4: From gene search to cluster context
+
+```
+Step 1: genes_by_function(search_text="nitrogen transport", organism="MED4")
+        → collect locus_tags from results
+
+Step 2: gene_clusters_by_gene(locus_tags=["PMM0370", "PMM0920", ...])
+        → see which clusters these genes belong to, with analysis_id and analysis_name
+
+Step 3: genes_in_cluster(analysis_id="clustering_analysis:msb4100087:med4_kmeans_nstarvation")
+        → discover all genes in the same analysis
+```
+
+## Chaining patterns
+
+```
+resolve_gene → gene_clusters_by_gene → genes_in_cluster
+genes_by_function → gene_clusters_by_gene → genes_in_cluster
+gene_clusters_by_gene → genes_in_cluster(analysis_id=...) (see all analysis members)
+gene_clusters_by_gene → differential_expression_by_gene (check expression for cluster genes)
+```
+
+## Common mistakes
+
+- Single organism enforced — don't mix PMM (MED4) and PMT (MIT9313) locus tags in one call
+
+- not_matched means the gene exists but has no cluster membership (after the cluster_type / treatment_type / analysis filters) — it is NOT the same as not_found (gene doesn't exist in KG). Both are flat locus_tag lists; genes_with_clusters / genes_without_clusters are the counts. See docs://guide/conventions for the shared not_found / not_matched semantics.
+
+- Results are gene × cluster rows — a gene in 2 clusters appears twice. Use genes_with_clusters for the deduplicated count.
+
+```mistake
+gene_clusters_by_gene(locus_tags='PMM0370')
+```
+
+```correction
+gene_clusters_by_gene(locus_tags=['PMM0370']) — always a list
+```
+
+- Valid `cluster_type` values come from the KG vocabulary — enumerate them with list_filter_values(filter_type='cluster_type') (currently six: time_course, diel, condition_comparison, expression_bin, decay_pattern, genomic_island). The list quoted in the parameter description is documentation, not the source.
+
+- `treatment_type` is never empty: a characterization analysis with no perturbation names what was measured (`rna_decay` for the mRNA-decay clusters, `genomic_analysis` for sequence-predicted genomic-island sets). Filter on those values to isolate characterization analyses; `background_factors` is `[]` only on the genomic_island analyses.
+
+- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (a made-up suffix on a real value, say) returns 0 rows, never an error. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. A filter with a misspelled value here silently drops every membership row.
+
+## Package import equivalent
+
+```python
+from multiomics_explorer import gene_clusters_by_gene
+
+result = gene_clusters_by_gene(locus_tags=...)
+# returns dict with keys: total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not_found, not_matched, by_cluster_type, by_treatment_type, by_background_factors, by_analysis, returned, offset, truncated, warnings, results
+```
+
+Use package import for bulk data extraction in scripts.
+Use MCP for reasoning and interactive exploration.

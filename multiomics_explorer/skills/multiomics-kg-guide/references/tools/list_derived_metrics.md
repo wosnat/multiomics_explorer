@@ -34,117 +34,21 @@ docs://tools/list_derived_metrics; summary=True first.
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 
-## Response format
+## Example
 
-### Envelope
+### Orient — what DerivedMetrics exist in the KG?
+
+```python
+list_derived_metrics(summary=True)
+```
+
+## Response sketch
 
 ```expected-keys
 total_entries, total_matching, by_organism, by_value_kind, by_metric_type, by_compartment, by_omics_type, by_treatment_type, by_background_factors, by_growth_phase, score_max, score_median, returned, offset, truncated, warnings, results
 ```
 
-- **total_entries** (int): Total DMs in the KG (unfiltered baseline).
-- **total_matching** (int): DMs matching all applied filters.
-- **by_organism** (list[object]): Counts per organism (list of {organism_name, count}, sorted by count desc).
-- **by_value_kind** (list[object]): Counts per value_kind (list of {value_kind, count}).
-- **by_metric_type** (list[object]): Counts per metric_type (list of {metric_type, count}).
-- **by_compartment** (list[object]): Counts per compartment (list of {compartment, count}).
-- **by_omics_type** (list[object]): Counts per omics_type (list of {omics_type, count}).
-- **by_treatment_type** (list[object]): Counts per treatment_type (list of {treatment_type, count}; DM treatment_type lists are flattened before counting).
-- **by_background_factors** (list[object]): Counts per background_factor (list of {background_factor, count}; flattened).
-- **by_growth_phase** (list[object]): Counts per growth_phase (list of {growth_phase, count}; flattened).
-- **score_max** (float | None): Max relevance score; present only when search_text was provided.
-- **score_median** (float | None): Median relevance score; present only when search_text was provided.
-- **returned** (int): Number of rows in results.
-- **offset** (int): Pagination offset used for this call.
-- **truncated** (bool): True when total_matching > returned (more rows available — paginate with offset).
-- **warnings** (list[string]): A closed-vocabulary filter value (compartment / omics_type / treatment_type / background_factors / growth_phases) not found in the live vocabulary (see list_filter_values), or an organism that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.
-
-### Per-result fields
-
-| Field | Type | Description |
-|---|---|---|
-| derived_metric_id | string | Unique id for this DerivedMetric. Pass to `derived_metric_ids` on drill-down tools (gene_derived_metrics, genes_by_*_metric) to select this exact DM. |
-| name | string | Human-readable DM name (e.g. 'Transcript:protein amplitude ratio'). |
-| metric_type | string | Category tag identifying what is measured (e.g. 'diel_amplitude_protein_log2'). The same metric_type may appear across organisms / publications — pair with organism or publication_dois when that matters, or use derived_metric_id to pin one specific DM. |
-| value_kind | string ('numeric', 'boolean', 'categorical') | Routes to the correct drill-down tool: 'numeric' → genes_by_numeric_metric, 'boolean' → genes_by_boolean_metric, 'categorical' → genes_by_categorical_metric. |
-| rankable | bool | True if this DM supports rank / percentile / bucket analysis on `genes_by_numeric_metric`. Rankable-gated filters raise if every selected DM is non-rankable, soft-exclude on mixed input. See `docs://guide/conventions` (DM family gating). |
-| unit | string | Measurement unit for numeric DMs (e.g. 'hours', 'log2'). Empty string for boolean and categorical DMs. |
-| allowed_categories | list[string] \| None | Valid category strings for this DM. Non-null only when value_kind='categorical'; pass a subset as `categories` to genes_by_categorical_metric. |
-| organism_name | string | Full organism name (e.g. 'Prochlorococcus MED4', 'Alteromonas macleodii MIT1002'). |
-| total_gene_count | int | Number of distinct genes with at least one measurement for this DM. |
-| score | float \| None (optional) | Full-text relevance score; present only when search_text was provided. |
-
-**Verbose-only fields** (included when `verbose=True`):
-
-| Field | Type | Description |
-|---|---|---|
-| has_p_value | bool \| None (optional) | True if this DM carries statistical p-values, enabling `significant_only` / `max_adjusted_p_value` on drill-downs. No DM in the current KG carries p-values. Verbose only. |
-| field_description | string \| None (optional) | Detailed explanation of what this DM measures and how to interpret its values. Verbose only. |
-| experiment_id | string \| None (optional) | Parent Experiment node id. Look up context via list_experiments. Verbose only. |
-| publication_doi | string \| None (optional) | Parent publication DOI (e.g. '10.1128/mSystems.00040-18'). Verbose only. |
-| compartment | string \| None (optional) | Sample compartment or scope (e.g. 'whole_cell', 'vesicle', 'exoproteome', 'extracellular'). Verbose only. |
-| omics_type | string \| None (optional) | Omics assay type (e.g. 'RNASEQ', 'PROTEOME', 'PAIRED_RNASEQ_PROTEOME'). Verbose only. |
-| treatment_type | list[string] \| None (optional) | Treatment type(s) (e.g. ['diel'], ['darkness']). Verbose only. |
-| background_factors | list[string] \| None (optional) | Background experimental factors (e.g. ['axenic'], ['coculture', 'diel']). May be empty. Verbose only. |
-| growth_phases | list[string] \| None (optional) | Growth phase(s) this DM pertains to (e.g. ['darkness']). May be empty. Also in `by_growth_phase`. Verbose only. |
-| treatment | string \| None (optional) | Treatment description in plain language (verbose mode only). |
-| light_condition | string \| None (optional) | Light regime (e.g. 'light:dark cycle'; verbose mode only). |
-| experimental_context | string \| None (optional) | Longer description of the experimental setup that produced this DM (verbose mode only). |
-| p_value_threshold | float \| None (optional) | Threshold that defines statistical significance for this DM. Non-null only when has_p_value=True (verbose mode only; no DM in current KG has a threshold). |
-
-## Few-shot examples
-
-### Example 1: Orient — what DerivedMetrics exist in the KG?
-
-```example-call
-list_derived_metrics(summary=True)
-```
-
-### Example 2: Pre-flight for numeric drill-down — which DMs support rank/metric_bucket?
-
-```example-call
-list_derived_metrics(value_kind="numeric", rankable=True)
-```
-
-### Example 3: Find rhythm / diel evidence via full-text
-
-```example-call
-list_derived_metrics(search_text="diel amplitude", limit=5)
-```
-
-### Example 4: Per-publication inventory
-
-```example-call
-list_derived_metrics(publication_dois=["10.1128/mSystems.00040-18"])
-```
-
-### Example 5: Per-organism inventory
-
-```example-call
-list_derived_metrics(organism="NATL2A", verbose=True)
-```
-
-### Example 6: Pick one DM unambiguously, then drill down
-
-```
-Step 1: list_derived_metrics(search_text="damping ratio")
-        → copy the derived_metric_id of the best match
-
-Step 2: genes_by_numeric_metric(
-          derived_metric_ids=["derived_metric:...:damping_ratio"],
-          metric_bucket=["top_decile"])
-        → top-decile genes by transcript-to-protein damping
-```
-
-## Chaining patterns
-
-```
-list_derived_metrics → gene_derived_metrics(locus_tags, derived_metric_ids)
-list_derived_metrics(value_kind='numeric', rankable=True) → genes_by_numeric_metric(derived_metric_ids, metric_bucket=[...])
-list_derived_metrics(value_kind='boolean') → genes_by_boolean_metric(derived_metric_ids, flag_value=True)
-list_derived_metrics(value_kind='categorical') → genes_by_categorical_metric(derived_metric_ids, categories=[...])
-list_derived_metrics → genes_by_<kind>_metric → metabolites_by_gene — inspect the chemistry of DM-flagged genes (DM rows don't carry chemistry; chain through the locus_tags returned by the drill-down). See `docs://analysis/metabolites`.
-```
+Result row: `derived_metric_id, name, metric_type, value_kind, rankable, has_p_value, unit, allowed_categories, field_description, organism_name, experiment_id, publication_doi, …`
 
 ## Common mistakes
 
@@ -154,38 +58,12 @@ list_derived_metrics → genes_by_<kind>_metric → metabolites_by_gene — insp
 
 - has_p_value=True returns zero rows in the current KG — no DM currently carries p-values. The filter exists for forward-compat; drill-down p-value filters (significant_only, max_adjusted_p_value) will raise with a diagnostic error.
 
-- allowed_categories is non-null only when value_kind='categorical'. For boolean and numeric DMs it is null — not a bug.
+## Chaining patterns
 
-- DM rows carry no chemistry — `catalyzed_metabolite_count`, `reaction_count`, `evidence_sources` are not surfaced here by design (DM-anchored is purpose-built; chemistry adds noise). For chemistry context on DM-flagged genes, drill the kind- appropriate `genes_by_<kind>_metric` to harvest locus_tags, then chain to `metabolites_by_gene` (gene-anchored) or `genes_by_metabolite` (metabolite-anchored). See `docs://analysis/metabolites`.
+- list_derived_metrics → gene_derived_metrics(locus_tags, derived_metric_ids)
+- list_derived_metrics(value_kind='numeric', rankable=True) → genes_by_numeric_metric(derived_metric_ids, metric_bucket=[...])
+- list_derived_metrics(value_kind='boolean') → genes_by_boolean_metric(derived_metric_ids, flag_value=True)
+- list_derived_metrics(value_kind='categorical') → genes_by_categorical_metric(derived_metric_ids, categories=[...])
+- list_derived_metrics → genes_by_<kind>_metric → metabolites_by_gene — inspect the chemistry of DM-flagged genes (DM rows don't carry chemistry; chain through the locus_tags returned by the drill-down). See `docs://analysis/metabolites`.
 
-```mistake
-list_derived_metrics(rankable="true")
-```
-
-```correction
-list_derived_metrics(rankable=True)
-```
-
-```mistake
-list_derived_metrics(organism="Prochlorococcus MED4 strain")
-```
-
-```correction
-list_derived_metrics(organism="MED4")
-```
-
-- A genus word alone in `organism=` (e.g. 'Alteromonas') matches every strain in that genus rather than raising ambiguous.
-
-- `search_text` is Lucene — see docs://guide/conventions for syntax and scoring, and for the DM-family gating contract behind rankable / has_p_value / value_kind.
-
-## Package import equivalent
-
-```python
-from multiomics_explorer import list_derived_metrics
-
-result = list_derived_metrics()
-# returns dict with keys: total_entries, total_matching, by_organism, by_value_kind, by_metric_type, by_compartment, by_omics_type, by_treatment_type, by_background_factors, by_growth_phase, score_max, score_median, returned, offset, truncated, warnings, results
-```
-
-Use package import for bulk data extraction in scripts.
-Use MCP for reasoning and interactive exploration.
+Full reference (all examples, full response format, verbose fields): `docs://tools/list_derived_metrics/full`

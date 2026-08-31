@@ -27,99 +27,21 @@ docs://tools/gene_clusters_by_gene; summary=True first.
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 
-## Response format
+## Example
 
-### Envelope
+### Check cluster membership for N-transport genes
+
+```python
+gene_clusters_by_gene(locus_tags=["PMM0370", "PMM0920", "PMM0958"])
+```
+
+## Response sketch
 
 ```expected-keys
 total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not_found, not_matched, by_cluster_type, by_treatment_type, by_background_factors, by_analysis, returned, offset, truncated, warnings, results
 ```
 
-- **total_matching** (int): Gene × cluster rows matching filters
-- **total_clusters** (int): Distinct clusters matched
-- **genes_with_clusters** (int): Input genes with at least one cluster membership
-- **genes_without_clusters** (int): Input genes with zero memberships after filters
-- **not_found** (list[string]): Locus tags not found in KG
-- **not_matched** (list[string]): Locus tags in KG but no cluster memberships after filters
-- **by_cluster_type** (list[GeneClusterTypeBreakdown]): Rows per cluster type
-- **by_treatment_type** (list[GeneClusterTreatmentBreakdown]): Rows per treatment type
-- **by_background_factors** (list[GeneClusterBackgroundFactorBreakdown]): Rows per background factor
-- **by_analysis** (list[GeneClusterAnalysisBreakdown]): Rows per clustering analysis
-- **returned** (int): Results in this response
-- **offset** (int): Offset into result set
-- **truncated** (bool): True if total_matching > offset + returned
-- **warnings** (list[string]): A closed-vocabulary filter value (cluster_type / treatment_type / background_factors) not found in the live vocabulary (see list_filter_values), plus a not_found locus_tag differing only by case from a real one (locus_tags are never case-normalised). Advisory only — never changes which rows are returned. Empty when clean.
-
-### Per-result fields
-
-| Field | Type | Description |
-|---|---|---|
-| locus_tag | string | Gene locus tag (e.g. 'PMM0370') |
-| gene_name | string \| None (optional) | Gene name (e.g. 'cynA') |
-| cluster_id | string | Cluster node ID (e.g. 'cluster:msb4100087:med4_kmeans_nstarvation:8') |
-| cluster_name | string | Cluster name (e.g. 'MED4 cluster 1 (up, N transport)') |
-| cluster_type | string | Cluster category (e.g. 'condition_comparison') |
-| membership_score | float \| None (optional) | Fuzzy membership score (null for K-means) |
-| analysis_id | string | Clustering analysis ID |
-| analysis_name | string | Clustering analysis name |
-| treatment_type | list[string] | Treatment types for this cluster |
-| background_factors | list[string] (optional) | Background experimental factors |
-
-**Verbose-only fields** (included when `verbose=True`):
-
-| Field | Type | Description |
-|---|---|---|
-| cluster_method | string \| None (optional) | Clustering method (e.g. 'K-means') |
-| member_count | int \| None (optional) | Total genes in this cluster |
-| cluster_functional_description | string \| None (optional) | What the cluster genes ARE (cluster-level) |
-| cluster_expression_dynamics | string \| None (optional) | Expression dynamics label (e.g. 'periodic in L:D only') |
-| cluster_temporal_pattern | string \| None (optional) | Detailed temporal pattern description (cluster-level) |
-| treatment | string \| None (optional) | Free-text condition description |
-| light_condition | string \| None (optional) | Light regime |
-| experimental_context | string \| None (optional) | Full experimental context description |
-| p_value | float \| None (optional) | Assignment p-value (null for most methods) |
-
-## Few-shot examples
-
-### Example 1: Check cluster membership for N-transport genes
-
-```example-call
-gene_clusters_by_gene(locus_tags=["PMM0370", "PMM0920", "PMM0958"])
-```
-
-### Example 2: Summary only — which genes have clusters?
-
-```example-call
-gene_clusters_by_gene(locus_tags=["PMM0370", "PMM0001"], summary=True)
-```
-
-### Example 3: Filter to stress response clusters
-
-```example-call
-gene_clusters_by_gene(locus_tags=["PMM0370"], cluster_type="condition_comparison", verbose=True)
-```
-
-### Example 4: From gene search to cluster context
-
-```
-Step 1: genes_by_function(search_text="nitrogen transport", organism="MED4")
-        → collect locus_tags from results
-
-Step 2: gene_clusters_by_gene(locus_tags=["PMM0370", "PMM0920", ...])
-        → see which clusters these genes belong to, with analysis_id and analysis_name
-
-Step 3: genes_in_cluster(analysis_id="clustering_analysis:msb4100087:med4_kmeans_nstarvation")
-        → discover all genes in the same analysis
-```
-
-## Chaining patterns
-
-```
-resolve_gene → gene_clusters_by_gene → genes_in_cluster
-genes_by_function → gene_clusters_by_gene → genes_in_cluster
-gene_clusters_by_gene → genes_in_cluster(analysis_id=...) (see all analysis members)
-gene_clusters_by_gene → differential_expression_by_gene (check expression for cluster genes)
-```
+Result row: `locus_tag, gene_name, cluster_id, cluster_name, cluster_type, membership_score, analysis_id, analysis_name, treatment_type, background_factors, cluster_method, member_count, …`
 
 ## Common mistakes
 
@@ -129,28 +51,11 @@ gene_clusters_by_gene → differential_expression_by_gene (check expression for 
 
 - Results are gene × cluster rows — a gene in 2 clusters appears twice. Use genes_with_clusters for the deduplicated count.
 
-```mistake
-gene_clusters_by_gene(locus_tags='PMM0370')
-```
+## Chaining patterns
 
-```correction
-gene_clusters_by_gene(locus_tags=['PMM0370']) — always a list
-```
+- resolve_gene → gene_clusters_by_gene → genes_in_cluster
+- genes_by_function → gene_clusters_by_gene → genes_in_cluster
+- gene_clusters_by_gene → genes_in_cluster(analysis_id=...) (see all analysis members)
+- gene_clusters_by_gene → differential_expression_by_gene (check expression for cluster genes)
 
-- Valid `cluster_type` values come from the KG vocabulary — enumerate them with list_filter_values(filter_type='cluster_type') (currently six: time_course, diel, condition_comparison, expression_bin, decay_pattern, genomic_island). The list quoted in the parameter description is documentation, not the source.
-
-- `treatment_type` is never empty: a characterization analysis with no perturbation names what was measured (`rna_decay` for the mRNA-decay clusters, `genomic_analysis` for sequence-predicted genomic-island sets). Filter on those values to isolate characterization analyses; `background_factors` is `[]` only on the genomic_island analyses.
-
-- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (a made-up suffix on a real value, say) returns 0 rows, never an error. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. A filter with a misspelled value here silently drops every membership row.
-
-## Package import equivalent
-
-```python
-from multiomics_explorer import gene_clusters_by_gene
-
-result = gene_clusters_by_gene(locus_tags=...)
-# returns dict with keys: total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not_found, not_matched, by_cluster_type, by_treatment_type, by_background_factors, by_analysis, returned, offset, truncated, warnings, results
-```
-
-Use package import for bulk data extraction in scripts.
-Use MCP for reasoning and interactive exploration.
+Full reference (all examples, full response format, verbose fields): `docs://tools/gene_clusters_by_gene/full`

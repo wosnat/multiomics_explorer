@@ -34,163 +34,21 @@ docs://tools/list_metabolite_assays; summary=True first.
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 
-## Response format
+## Example
 
-### Envelope
+### Orient — what assays exist
+
+```python
+list_metabolite_assays(summary=True)
+```
+
+## Response sketch
 
 ```expected-keys
 total_entries, total_matching, metabolite_count_total, by_organism, by_value_kind, by_compartment, top_metric_types, by_treatment_type, by_background_factors, by_growth_phase, by_detection_status, score_max, score_median, returned, offset, truncated, not_found, resolved_aliases, warnings, results
 ```
 
-- **total_entries** (int): Total MetaboliteAssay nodes in KG.
-- **total_matching** (int): Assays matching all filters
-- **metabolite_count_total** (int): Cumulative sum of total_metabolite_count across matching assays — same metabolite measured by N assays counts N times. For distinct count, use assays_by_metabolite(metabolite_ids=..., summary=True) or list_metabolites(metabolite_ids=...).
-- **by_organism** (list[LmaOrganismBreakdown]): Counts per organism, sorted desc
-- **by_value_kind** (list[LmaValueKindBreakdown]): Counts per value_kind. Routes drill-down: numeric → metabolites_by_quantifies_assay, boolean → metabolites_by_flags_assay.
-- **by_compartment** (list[LmaCompartmentBreakdown]): Counts per compartment
-- **top_metric_types** (list[LmaMetricTypeBreakdown]): Counts per metric_type, sorted desc. Pass to metabolites_by_quantifies_assay or metabolites_by_flags_assay (assay-id resolution required first).
-- **by_treatment_type** (list[LmaTreatmentTypeBreakdown])
-- **by_background_factors** (list[LmaBackgroundFactorBreakdown])
-- **by_growth_phase** (list[LmaGrowthPhaseBreakdown]): Currently unpopulated — KG-side backfill pending.
-- **by_detection_status** (list[LmaDetectionStatusBreakdown]): Envelope-level rollup of detection_status across all numeric edges of matching assays. Primary qualitative headline — about 70% of numeric edges are not_detected (tested-absent: assayed and not found, real biology). See `docs://guide/conventions`.
-- **score_max** (float | None): Max Lucene score (only with search_text)
-- **score_median** (float | None): Median Lucene score (only with search_text)
-- **returned** (int): Rows in this response
-- **offset** (int): Pagination offset used
-- **truncated** (bool): True when total_matching > returned
-- **not_found** (LmaNotFound): Per-batch-input unknown IDs (4 buckets: assay_ids, metabolite_ids, experiment_ids, publication_doi — bucket key is singular `publication_doi` regardless of the `publication_dois` input filter name).
-- **resolved_aliases** (object): Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).
-- **warnings** (list[string]): Diagnostic strings, e.g. a bare metabolite ID that resolved to more than one metabolite (expanded to all — pass the canonical id to narrow), a closed-vocabulary filter value (compartment / treatment_type / background_factors / growth_phases) not found in the live vocabulary, or an organism that matches no OrganismTaxon.
-
-### Per-result fields
-
-| Field | Type | Description |
-|---|---|---|
-| assay_id | string | Unique id (e.g. 'metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration'). Pass to drill-downs. |
-| name | string | Human-readable assay name (e.g. 'MIT9301 intracellular metabolite concentration (mol/cell)') |
-| metric_type | string | Category tag (e.g. 'cellular_concentration', 'extracellular_concentration', 'presence_flag_intracellular') |
-| value_kind | string ('numeric', 'boolean') | Routes drill-down: 'numeric' → metabolites_by_quantifies_assay, 'boolean' → metabolites_by_flags_assay |
-| rankable | bool | True if metric_bucket / metric_percentile / rank_by_metric filters apply on the numeric drill-down (rankable=False on boolean assays) |
-| unit | string | Measurement unit (e.g. 'mol/cell', 'fg/cell'); empty string on boolean assays |
-| field_description | string | Canonical provenance description for the assay (e.g. 'Intracellular metabolite concentration in fg/cell, blank-corrected, replicate-aggregated; Capovilla 2023 Table sd03.') |
-| organism_name | string | Full organism name (e.g. 'Prochlorococcus MIT9313') |
-| experiment_id | string | Parent Experiment node id |
-| publication_doi | string | Parent publication DOI (e.g. '10.1073/pnas.2213271120') |
-| compartment | string | 'whole_cell' or 'extracellular' |
-| omics_type | string | Always 'METABOLOMICS' for assays |
-| treatment_type | list[string] (optional) | Treatment type(s) (e.g. ['carbon']) |
-| background_factors | list[string] (optional) | Background factor(s) (e.g. ['axenic', 'light']) |
-| growth_phases | list[string] (optional) | Growth phases. Currently unpopulated — KG-side backfill pending. |
-| total_metabolite_count | int | Distinct metabolites measured by this assay (e.g. 92) |
-| aggregation_method | string | How replicates were aggregated (e.g. 'mean_across_replicates') |
-| preferred_id | string | Xref hint (e.g. 'metabolite_assay_id') |
-| value_min | float \| None (optional) | Min observed value across all measurements on this assay (e.g. 0.0) |
-| value_q1 | float \| None (optional) | Q1 of values (e.g. 0.0012) |
-| value_median | float \| None (optional) | Median (e.g. 0.0056) |
-| value_q3 | float \| None (optional) | Q3 (e.g. 0.012) |
-| value_max | float \| None (optional) | Max (e.g. 0.16) |
-| timepoints | list[string] (optional) | Timepoint labels (e.g. ['4 days', '6 days']). Empty list when the parent experiment is not time-resolved (sentinel timepoints stripped). |
-| detection_status_counts | list[LmaDetectionStatusCount] (optional) | Per-status counts over outgoing Assay_quantifies_metabolite edges. Empty list on boolean assays. Lets the LLM route to detection-status-rich assays without a drill-down round-trip. |
-| score | float \| None (optional) | Lucene relevance score (only when search_text was provided) |
-
-**Verbose-only fields** (included when `verbose=True`):
-
-| Field | Type | Description |
-|---|---|---|
-| treatment | string \| None (optional) | Treatment description (verbose only) |
-| light_condition | string \| None (optional) | Light condition (verbose only, e.g. 'continuous light') |
-| experimental_context | string \| None (optional) | Long-form context (verbose only) |
-
-## Few-shot examples
-
-### Example 1: Orient — what assays exist
-
-```example-call
-list_metabolite_assays(summary=True)
-```
-
-```example-response
-{
-  "total_entries": 14,
-  "total_matching": 14,
-  "metabolite_count_total": 1044,
-  "by_organism": [
-    {"organism_name": "Prochlorococcus MIT9313", "count": 5},
-    {"organism_name": "Prochlorococcus MIT9301", "count": 4},
-    {"organism_name": "Prochlorococcus MIT9312", "count": 2},
-    {"organism_name": "Prochlorococcus MIT0801", "count": 2},
-    {"organism_name": "Prochlorococcus MIT9303", "count": 1}
-  ],
-  "by_value_kind": [{"value_kind": "numeric", "count": 12}, {"value_kind": "boolean", "count": 2}],
-  "by_compartment": [
-    {"compartment": "whole_cell", "count": 9},
-    {"compartment": "extracellular", "count": 3},
-    {"compartment": "vesicle", "count": 2}
-  ],
-  "top_metric_types": [
-    {"metric_type": "cellular_concentration", "count": 5},
-    {"metric_type": "relative_peak_area_biovolume_normalized", "count": 4},
-    {"metric_type": "extracellular_concentration", "count": 3},
-    {"metric_type": "presence_flag_intracellular", "count": 1},
-    {"metric_type": "presence_flag_extracellular", "count": 1}
-  ],
-  "by_treatment_type": [
-    {"treatment_type": "compartment", "count": 4},
-    {"treatment_type": "phosphorus", "count": 4},
-    {"treatment_type": "growth_phase", "count": 4},
-    {"treatment_type": "carbon", "count": 2}
-  ],
-  "by_background_factors": [{"background_factor": "axenic", "count": 14}, {"background_factor": "light", "count": 6}],
-  "by_growth_phase": [],
-  "by_detection_status": [
-    {"detection_status": "not_detected", "count": 1046},
-    {"detection_status": "detected", "count": 360},
-    {"detection_status": "sporadic", "count": 74}
-  ],
-  "score_max": null,
-  "score_median": null,
-  "returned": 0,
-  "offset": 0,
-  "truncated": true,
-  "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
-  "resolved_aliases": {},
-  "warnings": [],
-  "results": []
-}
-```
-
-### Example 2: Discovery via fulltext (Capovilla chitosan paper)
-
-```example-call
-list_metabolite_assays(search_text="chitosan")
-```
-
-### Example 3: Pre-flight for numeric drill-down
-
-```example-call
-list_metabolite_assays(value_kind="numeric", rankable=True)
-```
-
-### Example 4: Find assays measuring a specific metabolite
-
-```example-call
-list_metabolite_assays(metabolite_ids=["kegg.compound:C00074"])
-```
-
-### Example 5: Per-paper inventory
-
-```example-call
-list_metabolite_assays(publication_dois=["10.1073/pnas.2213271120"])
-```
-
-## Chaining patterns
-
-```
-list_metabolite_assays → metabolites_by_quantifies_assay(assay_ids=[...])
-list_metabolite_assays → metabolites_by_flags_assay(assay_ids=[...])
-list_metabolite_assays → assays_by_metabolite(metabolite_ids=[...])  # cross-organism reverse view
-list_metabolite_assays → list_metabolites(metabolite_ids=[...])  # chemistry context for measured compounds
-```
+Result row: `assay_id, name, metric_type, value_kind, rankable, unit, field_description, organism_name, experiment_id, publication_doi, compartment, omics_type, …`
 
 ## Common mistakes
 
@@ -218,52 +76,11 @@ growth_phases=[] means the assay has no growth-state metadata.
 growth_phases=[] reflects unpopulated KG state (KG-side backfill pending). The schema field exists; values populate without explorer-side code change when the upstream backfill lands.
 ```
 
-```mistake
-metabolite_count_total = total distinct metabolites across matching assays.
-```
+## Chaining patterns
 
-```correction
-metabolite_count_total is *cumulative*: same metabolite measured by N assays counts N times. For distinct counts route to assays_by_metabolite(metabolite_ids=..., summary=True) → metabolites_matched, or list_metabolites(metabolite_ids=...).
-```
+- list_metabolite_assays → metabolites_by_quantifies_assay(assay_ids=[...])
+- list_metabolite_assays → metabolites_by_flags_assay(assay_ids=[...])
+- list_metabolite_assays → assays_by_metabolite(metabolite_ids=[...])  # cross-organism reverse view
+- list_metabolite_assays → list_metabolites(metabolite_ids=[...])  # chemistry context for measured compounds
 
-```mistake
-Calling metabolites_by_quantifies_assay with bucket / metric_percentile filters before checking assay rankable.
-```
-
-```correction
-Call list_metabolite_assays(value_kind='numeric', rankable=True) first. Drill-down's rankable-gated filters raise if every selected assay has rankable=False, soft-exclude on mixed input.
-```
-
-```mistake
-list_metabolite_assays(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'
-```
-
-```correction
-Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
-the node's cross-references before the query runs: `C00064` →
-`kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
-`HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
-(`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
-inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
-CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
-ALL matching metabolites and appends a `warnings` entry; pass the canonical
-id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
-in the form you passed.
-
-```
-
-- See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/conventions` for tested-absent semantics across the metabolomics layer.
-
-- A genus word alone in `organism=` (e.g. 'Alteromonas') matches every strain in that genus rather than raising ambiguous.
-
-## Package import equivalent
-
-```python
-from multiomics_explorer import list_metabolite_assays
-
-result = list_metabolite_assays()
-# returns dict with keys: total_entries, total_matching, metabolite_count_total, by_organism, by_value_kind, by_compartment, top_metric_types, by_treatment_type, by_background_factors, by_growth_phase, by_detection_status, score_max, score_median, returned, offset, truncated, not_found, resolved_aliases, warnings, results
-```
-
-Use package import for bulk data extraction in scripts.
-Use MCP for reasoning and interactive exploration.
+Full reference (all examples, full response format, verbose fields): `docs://tools/list_metabolite_assays/full`

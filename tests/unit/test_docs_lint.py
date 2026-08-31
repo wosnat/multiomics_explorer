@@ -157,6 +157,14 @@ def test_docs_links_resolve(path: Path):
                 continue
             if path == SERVER_PY and u in prefixes:  # the _DOC_DIRS registration keys themselves
                 continue
+            # docs://tools/{name}/full — the brief page's pointer to its full
+            # companion. build_about_content.py (llm-review 2b.4 Task 1) writes
+            # the full/ pages already; server.py registers the docs://.../full
+            # resource in a later task of the same plan. Exempt only when the
+            # bare (non-/full) URI already resolves, so a typo'd tool name
+            # still fails this check.
+            if u.endswith("/full") and u[: -len("/full")] in served:
+                continue
             if u not in served:
                 bad.append(f"{i}: unresolved doc URI {u}")
         for u in _REFS_PATH_RE.findall(line):

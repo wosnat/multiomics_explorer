@@ -1,0 +1,541 @@
+# genes_by_numeric_metric
+
+## What it does
+
+Numeric DerivedMetric edges — one row per gene × DM with its raw value; cross-organism.
+
+Use for value, percentile, bucket or rank cutoffs after `list_derived_metrics`; flags `genes_by_boolean_metric`, labels `genes_by_categorical_metric`.
+Filters: derived_metric_ids XOR metric_types, organism, locus_tags, min/max_value, min/max_percentile, metric_bucket, max_rank.
+Returns: by_metric (vs full-DM), by_organism, excluded_derived_metrics, not_found_ids, not_found_metric_types, not_matched_ids, not_matched_metric_types; one row = one edge.
+docs://tools/genes_by_numeric_metric; summary=True first.
+
+## Parameters
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| derived_metric_ids | list[string] \| None | None | DerivedMetric node IDs to drill into. Use when the same `metric_type` appears across publications / organisms and you need to pin one. Discover IDs via `list_derived_metrics`. Mutually exclusive with `metric_types`. An id that exists as a different kind (boolean / categorical) moves to `not_matched_ids` with a `warnings` entry naming the sibling tool. |
+| metric_types | list[string] \| None | None | Metric-type tags (e.g. ['damping_ratio', 'diel_amplitude_protein_log2']). Unions every DM carrying that tag, then narrows by scoping filters. Same tag can span organisms / publications — pin one specific DM via `derived_metric_ids` instead. Mutually exclusive with `derived_metric_ids`. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
+| locus_tags | list[string] \| None | None | Restrict drill-down to a specific gene set (e.g. DE hits from `differential_expression_by_gene`). Filter on `g.locus_tag IN $locus_tags` post-MATCH. Genes with no edge for the selected DM produce no row (silent — surfaced via `total_genes` shortfall). |
+| experiment_ids | list[string] \| None | None | Scope to DMs from one or more experiments. |
+| publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
+| compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
+| treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
+| background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
+| growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
+| min_value | float \| None | None | Lower bound on `r.value`. Always applicable — no gate. Use for raw-threshold queries on non-rankable DMs (e.g. mascot probability >= 99). |
+| max_value | float \| None | None | Upper bound on `r.value`. Always applicable. |
+| min_percentile | float \| None | None | Lower bound on `r.metric_percentile` (0-100). **Rankable-gated** — raises if every selected DM has `rankable=False`. Soft-excludes non-rankable DMs from mixed input, surfaced in `excluded_derived_metrics`. |
+| max_percentile | float \| None | None | Upper bound on `r.metric_percentile`. **Rankable-gated.** |
+| metric_bucket | list[string ('top_decile', 'top_quartile', 'mid', 'low')] \| None | None | Bucket label(s). **Rankable-gated.** Buckets are decile / quartile splits computed at import time per DM. |
+| max_rank | int \| None | None | Cap on `r.rank_by_metric` (1 = highest). Use for top-N drill-down. **Rankable-gated.** |
+| significant_only | bool | False | Filter to `r.significant='significant'`. **has_p_value-gated** — raises in the current KG (no DM has p-values yet). Forward-compat surface; check `list_derived_metrics(has_p_value=True)` before using. |
+| max_adjusted_p_value | float \| None | None | Upper bound on `r.adjusted_p_value`. **has_p_value-gated**. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| limit | int | 25 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
+
+**Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
+
+## Response format
+
+### Envelope
+
+```expected-keys
+total_matching, total_derived_metrics, total_genes, by_organism, by_compartment, by_publication, by_experiment, by_metric, top_categories, genes_per_metric_max, genes_per_metric_median, not_found_ids, not_matched_ids, not_found_metric_types, not_matched_metric_types, not_matched_organism, excluded_derived_metrics, warnings, returned, offset, truncated, results
+```
+
+- **total_matching** (int): Rows after all filters + gate exclusion.
+- **total_derived_metrics** (int): Distinct DMs contributing rows.
+- **total_genes** (int): Distinct genes in results.
+- **by_organism** (list[GenesByNumericMetricOrganismBreakdown]): Rows per organism.
+- **by_compartment** (list[GenesByNumericMetricCompartmentBreakdown]): Rows per compartment.
+- **by_publication** (list[GenesByNumericMetricPublicationBreakdown]): Rows per publication.
+- **by_experiment** (list[GenesByNumericMetricExperimentBreakdown]): Rows per experiment.
+- **by_metric** (list[GenesByNumericMetricBreakdown]): Per-DM rollup: filtered-slice value distribution + full-DM context. Sorted by count desc.
+- **top_categories** (list[GenesByNumericMetricCategoryBreakdown]): Top 5 gene categories by count.
+- **genes_per_metric_max** (int): Largest per-DM gene count.
+- **genes_per_metric_median** (float): Median per-DM gene count.
+- **not_found_ids** (list[string]): `derived_metric_ids` inputs absent from the KG entirely (any kind, any organism).
+- **not_matched_ids** (list[string]): `derived_metric_ids` that exist but produced 0 rows — either a different `value_kind` (see `warnings` for the sibling tool to use) or 0 rows after edge-level filters (excludes gate-excluded DMs).
+- **not_found_metric_types** (list[string]): `metric_types` inputs that match no DM after scoping.
+- **not_matched_metric_types** (list[string]): `metric_types` whose DMs produced 0 rows.
+- **not_matched_organism** (string | None): `organism` arg that matched no surviving (correct-kind) DM — set only when the DM(s) genuinely exist elsewhere; `warnings` lists the organisms they belong to.
+- **excluded_derived_metrics** (list[ExcludedDerivedMetric]): DMs dropped by rankable / has_p_value gate. Always present (empty list when no exclusions).
+- **warnings** (list[string]): Human-readable summary of excluded_derived_metrics, a closed-vocabulary filter value (compartment / treatment_type / background_factors / growth_phases) not found in the live vocabulary, or an `organism` that matches no OrganismTaxon at all (distinct from not_matched_organism).
+- **returned** (int): Length of results list.
+- **offset** (int): Pagination offset used.
+- **truncated** (bool): True when total_matching > offset + returned.
+
+### Per-result fields
+
+| Field | Type | Description |
+|---|---|---|
+| locus_tag | string | Gene locus tag (e.g. 'PMM1545'). |
+| gene_name | string \| None (optional) | Gene name (e.g. 'rpsH'); null when KG has none. |
+| product | string \| None (optional) | Gene product (e.g. '30S ribosomal protein S8'). |
+| gene_category | string \| None (optional) | Functional category (e.g. 'Translation'). |
+| derived_metric_id | string | Unique parent-DM id. |
+| value | float | Measurement value. |
+| rank_by_metric | int \| None (optional) | Rank by value (1=highest). Populated only when rankable=True. |
+| metric_percentile | float \| None (optional) | Percentile (0-100). Same gate as rank_by_metric. |
+| metric_bucket | string \| None (optional) | Bucket label (top_decile / top_quartile / mid / low). Same gate. |
+| adjusted_p_value | float \| None (optional) | BH-adjusted p-value. Populated only when has_p_value=True. None in current KG. |
+| significant | bool \| None (optional) | Significance flag. Same gate as adjusted_p_value. |
+
+**Verbose-only fields** (included when `verbose=True`):
+
+| Field | Type | Description |
+|---|---|---|
+| organism_name | string \| None (optional) | Organism (e.g. 'Prochlorococcus MED4'). Also in `by_organism`. Verbose only. |
+| name | string \| None (optional) | DM human label. Also in `by_metric`. Verbose only. |
+| value_kind | string \| None (optional) | Always 'numeric' for this tool; kept for cross-tool row-shape consistency with `gene_derived_metrics`. Also in `by_metric`. Verbose only. |
+| rankable | bool \| None (optional) | Echoed from parent DM; True iff `rank_by_metric`/`metric_percentile`/`metric_bucket` carry data. Also in `by_metric`. Verbose only. |
+| has_p_value | bool \| None (optional) | Echoed from parent DM; True iff `adjusted_p_value`/`significant` carry data (none in current KG). Also in `by_metric`. Verbose only. |
+| metric_type | string \| None (optional) | Category tag. Verbose only. |
+| field_description | string \| None (optional) | Detailed explanation of what this DM measures. Verbose only. |
+| unit | string \| None (optional) | Measurement unit. Verbose only. |
+| compartment | string \| None (optional) | Sample compartment. Verbose only. |
+| experiment_id | string \| None (optional) | Parent experiment id. Verbose only. |
+| publication_doi | string \| None (optional) | Parent publication DOI. Verbose only. |
+| treatment_type | list[string] (optional) | Treatment type(s). Verbose only. |
+| background_factors | list[string] (optional) | Background factor(s). Verbose only. |
+| treatment | string \| None (optional) | Treatment description in plain language. Verbose only. |
+| light_condition | string \| None (optional) | Light regime. Verbose only. |
+| experimental_context | string \| None (optional) | Longer experimental setup description. Verbose only. |
+| gene_function_description | string \| None (optional) | Gene functional description (gene-level). Verbose only. |
+| gene_summary | string \| None (optional) | Gene summary text (gene-level). Verbose only. |
+| p_value | float \| None (optional) | Raw p-value; gated on has_p_value=True. Verbose only. None in current KG. |
+
+## Few-shot examples
+
+### Example 1: Canonical worked example — top-decile damping_ratio
+
+```example-call
+genes_by_numeric_metric(metric_types=['damping_ratio'], metric_bucket=['top_decile'])
+```
+
+```example-response
+{
+  "total_matching": 32,
+  "total_derived_metrics": 1,
+  "total_genes": 32,
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 32}],
+  "by_compartment": [{"compartment": "whole_cell", "count": 32}],
+  "by_publication": [{"publication_doi": "10.1371/journal.pone.0043432", "count": 32}],
+  "by_experiment": [{"experiment_id": "10.1371/journal.pone.0043432_waldbauer_2012_med4_paired_diel", "count": 32}],
+  "by_metric": [
+    {
+      "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+      "name": "Transcript:protein amplitude ratio",
+      "metric_type": "damping_ratio",
+      "value_kind": "numeric",
+      "count": 32,
+      "value_min": 12.2,
+      "value_q1": 13.7,
+      "value_median": 15.9,
+      "value_q3": 20.5,
+      "value_max": 25.3,
+      "dm_value_min": 0.2,
+      "dm_value_q1": 2.8,
+      "dm_value_median": 4.9,
+      "dm_value_q3": 7.8,
+      "dm_value_max": 25.3,
+      "rank_min": 1,
+      "rank_max": 32
+    }
+  ],
+  "top_categories": [
+    {"gene_category": "Translation", "count": 6},
+    {"gene_category": "Carbohydrate metabolism", "count": 5},
+    {"gene_category": "Photosynthesis", "count": 5},
+    {"gene_category": "Unknown", "count": 3},
+    {"gene_category": "Stress response and adaptation", "count": 2}
+  ],
+  "genes_per_metric_max": 32,
+  "genes_per_metric_median": 32.0,
+  "not_found_ids": [],
+  "not_matched_ids": [],
+  "not_found_metric_types": [],
+  "not_matched_metric_types": [],
+  "not_matched_organism": null,
+  "excluded_derived_metrics": [],
+  "warnings": [],
+  "returned": 25,
+  "offset": 0,
+  "truncated": true,
+  "results": [
+    {
+      "locus_tag": "PMM1545",
+      "gene_name": "rpsH",
+      "product": "30S ribosomal protein S8",
+      "gene_category": "Translation",
+      "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+      "value": 25.3,
+      "rank_by_metric": 1,
+      "metric_percentile": 100.0,
+      "metric_bucket": "top_decile"
+    },
+    {
+      "locus_tag": "PMM0930",
+      "gene_name": "phdB",
+      "product": "pyruvate dehydrogenase E1 component beta subunit",
+      "gene_category": "Carbohydrate metabolism",
+      "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+      "value": 23.0,
+      "rank_by_metric": 2,
+      "metric_percentile": 99.67845659163987,
+      "metric_bucket": "top_decile"
+    },
+    {
+      "locus_tag": "PMM0161",
+      "gene_name": "gltA",
+      "product": "citrate synthase",
+      "gene_category": "Carbohydrate metabolism",
+      "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+      "value": 21.4,
+      "rank_by_metric": 3,
+      "metric_percentile": 99.35691318327974,
+      "metric_bucket": "top_decile"
+    },
+    ...
+  ]
+}
+```
+
+### Example 2: Soft-exclude — mixed rankable + non-rankable metric_types
+
+```example-call
+genes_by_numeric_metric(metric_types=['damping_ratio', 'peak_time_protein_h'], metric_bucket=['top_decile'])
+```
+
+```example-response
+{
+  "total_matching": 32,
+  "total_derived_metrics": 1,
+  "total_genes": 32,
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 32}],
+  "by_compartment": [{"compartment": "whole_cell", "count": 32}],
+  "by_publication": [{"publication_doi": "10.1371/journal.pone.0043432", "count": 32}],
+  "by_experiment": [{"experiment_id": "10.1371/journal.pone.0043432_waldbauer_2012_med4_paired_diel", "count": 32}],
+  "by_metric": [
+    {
+      "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+      "name": "Transcript:protein amplitude ratio",
+      "metric_type": "damping_ratio",
+      "value_kind": "numeric",
+      "count": 32,
+      "value_min": 12.2,
+      "value_q1": 13.7,
+      "value_median": 15.9,
+      "value_q3": 20.5,
+      "value_max": 25.3,
+      "dm_value_min": 0.2,
+      "dm_value_q1": 2.8,
+      "dm_value_median": 4.9,
+      "dm_value_q3": 7.8,
+      "dm_value_max": 25.3,
+      "rank_min": 1,
+      "rank_max": 32
+    }
+  ],
+  "top_categories": [
+    {"gene_category": "Translation", "count": 6},
+    {"gene_category": "Carbohydrate metabolism", "count": 5},
+    {"gene_category": "Photosynthesis", "count": 5},
+    {"gene_category": "Unknown", "count": 3},
+    {"gene_category": "Stress response and adaptation", "count": 2}
+  ],
+  "genes_per_metric_max": 32,
+  "genes_per_metric_median": 32.0,
+  "not_found_ids": [],
+  "not_matched_ids": [],
+  "not_found_metric_types": [],
+  "not_matched_metric_types": ["peak_time_protein_h"],
+  "not_matched_organism": null,
+  "excluded_derived_metrics": [
+    {
+      "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:peak_time_protein_h",
+      "metric_type": "peak_time_protein_h",
+      "rankable": false,
+      "has_p_value": false,
+      "reason": "non-rankable; `metric_bucket` filter does not apply"
+    }
+  ],
+  "warnings": ["1 non-rankable DM(s) excluded by `metric_bucket` filter (peak_time_protein_h)"],
+  "returned": 25,
+  "offset": 0,
+  "truncated": true,
+  "results": [
+    {
+      "locus_tag": "PMM1545",
+      "gene_name": "rpsH",
+      "product": "30S ribosomal protein S8",
+      "gene_category": "Translation",
+      "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+      "value": 25.3,
+      "rank_by_metric": 1,
+      "metric_percentile": 100.0,
+      "metric_bucket": "top_decile"
+    },
+    {
+      "locus_tag": "PMM0930",
+      "gene_name": "phdB",
+      "product": "pyruvate dehydrogenase E1 component beta subunit",
+      "gene_category": "Carbohydrate metabolism",
+      "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+      "value": 23.0,
+      "rank_by_metric": 2,
+      "metric_percentile": 99.67845659163987,
+      "metric_bucket": "top_decile"
+    },
+    {
+      "locus_tag": "PMM0161",
+      "gene_name": "gltA",
+      "product": "citrate synthase",
+      "gene_category": "Carbohydrate metabolism",
+      "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+      "value": 21.4,
+      "rank_by_metric": 3,
+      "metric_percentile": 99.35691318327974,
+      "metric_bucket": "top_decile"
+    },
+    ...
+  ]
+}
+```
+
+### Example 3: Cross-organism — same metric_type spans two strains
+
+```example-call
+genes_by_numeric_metric(metric_types=['cell_abundance_biovolume_normalized'], metric_bucket=['top_quartile'])
+```
+
+```example-response
+{
+  "total_matching": 310,
+  "total_derived_metrics": 2,
+  "total_genes": 310,
+  "by_organism": [
+    {"organism_name": "Prochlorococcus MIT9313", "count": 157},
+    {"organism_name": "Prochlorococcus MIT9312", "count": 153}
+  ],
+  "by_compartment": [{"compartment": "vesicle", "count": 310}],
+  "by_publication": [{"publication_doi": "10.1111/1462-2920.15834", "count": 310}],
+  "by_experiment": [
+    {"experiment_id": "10.1111/1462-2920.15834_vesicle_proteomics_mit9313", "count": 157},
+    {"experiment_id": "10.1111/1462-2920.15834_vesicle_proteomics_mit9312", "count": 153}
+  ],
+  "by_metric": [
+    {
+      "derived_metric_id": "derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized",
+      "name": "MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)",
+      "metric_type": "cell_abundance_biovolume_normalized",
+      "value_kind": "numeric",
+      "count": 157,
+      "value_min": 5.09e-08,
+      "value_q1": 5.91e-08,
+      "value_median": 7.03e-08,
+      "value_q3": 8.83e-08,
+      "value_max": 1.15e-07,
+      "dm_value_min": 2.24e-09,
+      "dm_value_q1": 7.48e-09,
+      "dm_value_median": 1.87e-08,
+      "dm_value_q3": 5.09e-08,
+      "dm_value_max": 2.98e-06,
+      "rank_min": 107,
+      "rank_max": 263
+    },
+    {
+      "derived_metric_id": "derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized",
+      "name": "MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)",
+      "metric_type": "cell_abundance_biovolume_normalized",
+      "value_kind": "numeric",
+      "count": 153,
+      "value_min": 2.01e-08,
+      "value_q1": 2.39e-08,
+      "value_median": 2.92e-08,
+      "value_q3": 3.51e-08,
+      "value_max": 4.66e-08,
+      "dm_value_min": 8.85e-10,
+      "dm_value_q1": 3.25e-09,
+      "dm_value_median": 7.67e-09,
+      "dm_value_q3": 2.01e-08,
+      "dm_value_max": 8.02e-07,
+      "rank_min": 103,
+      "rank_max": 255
+    }
+  ],
+  "top_categories": [
+    {"gene_category": "Translation", "count": 52},
+    {"gene_category": "Unknown", "count": 41},
+    {"gene_category": "Stress response and adaptation", "count": 34},
+    {"gene_category": "Carbohydrate metabolism", "count": 34},
+    {"gene_category": "Coenzyme metabolism", "count": 24}
+  ],
+  "genes_per_metric_max": 157,
+  "genes_per_metric_median": 157.0,
+  "not_found_ids": [],
+  "not_matched_ids": [],
+  "not_found_metric_types": [],
+  "not_matched_metric_types": [],
+  "not_matched_organism": null,
+  "excluded_derived_metrics": [],
+  "warnings": [],
+  "returned": 25,
+  "offset": 0,
+  "truncated": true,
+  "results": [
+    {
+      "locus_tag": "PMT9312_0062",
+      "gene_name": "accC",
+      "product": "acetyl-CoA carboxylase, biotin carboxylase subunit",
+      "gene_category": "Lipid metabolism",
+      "derived_metric_id": "derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized",
+      "value": 4.66e-08,
+      "rank_by_metric": 103,
+      "metric_percentile": 89.96062992125984,
+      "metric_bucket": "top_quartile"
+    },
+    {
+      "locus_tag": "PMT9312_1235",
+      "gene_name": "acrA",
+      "product": "RND efflux pump, MFP subunit, HlyD family",
+      "gene_category": "Transport",
+      "derived_metric_id": "derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized",
+      "value": 4.63e-08,
+      "rank_by_metric": 104,
+      "metric_percentile": 89.86220472440945,
+      "metric_bucket": "top_quartile"
+    },
+    {
+      "locus_tag": "PMT9312_1674",
+      "gene_name": "hemF",
+      "product": "coproporphyrinogen-III oxidase",
+      "gene_category": "Coenzyme metabolism",
+      "derived_metric_id": "derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized",
+      "value": 4.6e-08,
+      "rank_by_metric": 105,
+      "metric_percentile": 89.76377952755905,
+      "metric_bucket": "top_quartile"
+    },
+    ...
+  ]
+}
+```
+
+### Example 4: Summary-only — distribution context without per-row drill-down
+
+```example-call
+genes_by_numeric_metric(metric_types=['damping_ratio'], summary=True)
+```
+
+```example-response
+{
+  "total_matching": 312,
+  "total_derived_metrics": 1,
+  "total_genes": 312,
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 312}],
+  "by_compartment": [{"compartment": "whole_cell", "count": 312}],
+  "by_publication": [{"publication_doi": "10.1371/journal.pone.0043432", "count": 312}],
+  "by_experiment": [{"experiment_id": "10.1371/journal.pone.0043432_waldbauer_2012_med4_paired_diel", "count": 312}],
+  "by_metric": [
+    {
+      "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio",
+      "name": "Transcript:protein amplitude ratio",
+      "metric_type": "damping_ratio",
+      "value_kind": "numeric",
+      "count": 312,
+      "value_min": 0.2,
+      "value_q1": 2.8,
+      "value_median": 4.9,
+      "value_q3": 7.8,
+      "value_max": 25.3,
+      "dm_value_min": 0.2,
+      "dm_value_q1": 2.8,
+      "dm_value_median": 4.9,
+      "dm_value_q3": 7.8,
+      "dm_value_max": 25.3,
+      "rank_min": 1,
+      "rank_max": 312
+    }
+  ],
+  "top_categories": [
+    {"gene_category": "Translation", "count": 47},
+    {"gene_category": "Amino acid metabolism", "count": 30},
+    {"gene_category": "Unknown", "count": 30},
+    {"gene_category": "Photosynthesis", "count": 29},
+    {"gene_category": "Carbohydrate metabolism", "count": 28}
+  ],
+  "genes_per_metric_max": 312,
+  "genes_per_metric_median": 312.0,
+  "not_found_ids": [],
+  "not_matched_ids": [],
+  "not_found_metric_types": [],
+  "not_matched_metric_types": [],
+  "not_matched_organism": null,
+  "excluded_derived_metrics": [],
+  "warnings": [],
+  "returned": 0,
+  "offset": 0,
+  "truncated": true,
+  "results": []
+}
+```
+
+### Example 5: DE → top hits → numeric DM intersection
+
+```
+Step 1: differential_expression_by_gene(organism="MED4", significant_only=True, limit=20)
+        → extract `locus_tag` from each result row (top-20 |log2FC|).
+
+Step 2: genes_by_numeric_metric(
+          metric_types=["damping_ratio"],
+          locus_tags=[<those 20 locus_tags>])
+        → re-rank within those genes only; check which DE hits also
+          lead the damping_ratio distribution (per-row `rank_by_metric`,
+          `metric_percentile`, `metric_bucket`).
+
+Step 3 (drill-down): gene_overview(locus_tags=[<intersected genes>])
+        → routing context for the genes that are both DE-significant
+          AND high-damping.
+```
+
+## Chaining patterns
+
+```
+list_derived_metrics(value_kind='numeric', rankable=True) → genes_by_numeric_metric(derived_metric_ids=[...], metric_bucket=[...])
+differential_expression_by_gene → top hits → genes_by_numeric_metric(metric_types=[...], locus_tags=hits)
+genes_by_numeric_metric → gene_overview(locus_tags=results)
+```
+
+## Common mistakes
+
+- Non-rankable DM + rankable-gated filter. Calling with `metric_types=['peak_time_transcript_h']` + `metric_bucket=['top_decile']` raises — `peak_time_transcript_h` is non-rankable. Inspect `list_derived_metrics(value_kind='numeric', rankable=True)` to see which DMs support `metric_bucket` / `min_percentile` / `max_percentile` / `max_rank`. Mixed rankable/non-rankable DM sets don't raise — instead the envelope's `excluded_derived_metrics` + `warnings` pinpoint the excluded ones.
+
+- P-value filter on current KG. `significant_only=True` or `max_adjusted_p_value=0.05` raises in the current KG because no DM has `has_p_value='p_value'`. The surface exists for future DMs; check `list_derived_metrics(has_p_value=True)` first.
+
+- Sparse columns in results. `rank_by_metric` / `metric_percentile` / `metric_bucket` are null in rows from non-rankable DMs (e.g. `peak_time_*_h`); don't treat null as missing data — it's gate-driven. Per-row `rankable` (echoed from the parent DM) tells you which to expect.
+
+- Cross-organism by default. No single-organism enforcement. `metric_types=['cell_abundance_biovolume_normalized']` returns rows from MIT9312 AND MIT9313 (the same metric_type spans both). Use `organism='MIT9312'` to scope; check per-row `organism_name` and envelope `by_organism` for cross-strain rows.
+
+- `by_metric` is per-DM, not per-tag. Each `by_metric` entry is one DerivedMetric (uniquely identified by `derived_metric_id`). The same `metric_type` tag can span organisms / publications. Use the per-DM rollup to disambiguate.
+
+- Wrong-`value_kind` IDs land in `not_found_ids`, not a typed error. Passing a `derived_metric_ids` of a boolean or categorical DM produces `not_found_ids=[that_id]` rather than a `value_kind` mismatch error — the diagnostics query hardcodes `value_kind='numeric'`, so non-numeric DMs simply don't appear in the result. Inspect via `list_derived_metrics(derived_metric_ids=[...])` to see the DM's actual `value_kind` and pivot to `genes_by_boolean_metric` or `genes_by_categorical_metric`.
+
+- Filtered slice vs full DM. `by_metric[i].value_*` describes rows that survived your filters. `by_metric[i].dm_value_*` describes the full DM (precomputed). They're different — your top-decile slice is intentionally narrower than the full DM range.
+
+- See `docs://analysis/derived_metrics` for the DM family overview and `docs://guide/conventions` for rankable-gated filter semantics.
+
+## Package import equivalent
+
+```python
+from multiomics_explorer import genes_by_numeric_metric
+
+result = genes_by_numeric_metric()
+# returns dict with keys: total_matching, total_derived_metrics, total_genes, by_organism, by_compartment, by_publication, by_experiment, by_metric, top_categories, genes_per_metric_max, genes_per_metric_median, not_found_ids, not_matched_ids, not_found_metric_types, not_matched_metric_types, not_matched_organism, excluded_derived_metrics, warnings, returned, offset, truncated, results
+```
+
+Use package import for bulk data extraction in scripts.
+Use MCP for reasoning and interactive exploration.

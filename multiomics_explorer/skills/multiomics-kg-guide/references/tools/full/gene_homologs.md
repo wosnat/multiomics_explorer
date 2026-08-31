@@ -1,0 +1,199 @@
+# gene_homologs
+
+## What it does
+
+Ortholog group memberships for a gene batch — one row per gene × group, most-specific (curated) first.
+
+Use to find a gene's groups before a cross-organism comparison; for a group's members use `genes_by_homolog_group`, for text search `search_homolog_groups`.
+Filters: locus_tags, source, taxonomic_level, max_specificity_rank.
+Returns: by_organism, by_source, top_cyanorak_roles, not_found, no_groups; one row = (locus_tag, group_id, source, taxonomic_level).
+docs://tools/gene_homologs; summary=True first.
+
+## Parameters
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| locus_tags | list[string] | — | Gene locus tags to look up. E.g. ['PMM0001', 'PMM0845']. |
+| source | string \| None | None | Filter by OG source: 'cyanorak' or 'eggnog'. |
+| taxonomic_level | string \| None | None | Filter by taxonomic level. E.g. 'curated', 'Prochloraceae', 'Bacteria'. |
+| max_specificity_rank | int \| None | None | Cap group breadth. 0=curated only, 1=+family, 2=+order, 3=+domain (all). |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| limit | int \| None | None | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
+
+## Response format
+
+### Envelope
+
+```expected-keys
+total_matching, by_organism, by_source, returned, offset, truncated, not_found, no_groups, top_cyanorak_roles, top_cog_categories, warnings, results
+```
+
+- **total_matching** (int): Total gene×group rows matching filters
+- **by_organism** (list[HomologOrganismBreakdown]): Gene×group counts per organism, sorted by count descending
+- **by_source** (list[HomologSourceBreakdown]): Gene×group counts per source, sorted by count descending
+- **returned** (int): Results in this response (0 when summary=true)
+- **offset** (int): Offset into full result set (e.g. 0)
+- **truncated** (bool): True if total_matching > returned
+- **not_found** (list[string]): Input locus_tags not in KG
+- **no_groups** (list[string]): Genes that exist but have zero matching ortholog groups
+- **top_cyanorak_roles** (list[OntologyBreakdown]): Top 5 CyanorakRole annotations by frequency
+- **top_cog_categories** (list[OntologyBreakdown]): Top 5 CogFunctionalCategory annotations by frequency
+- **warnings** (list[string]): Advisory diagnostics — e.g. a not_found locus_tag differs only by case from a real one (locus_tags are never case-normalised).
+
+### Per-result fields
+
+| Field | Type | Description |
+|---|---|---|
+| locus_tag | string | Gene locus tag (e.g. 'PMM0001') |
+| organism_name | string | Organism (e.g. 'Prochlorococcus MED4') |
+| group_id | string | Prefixed ortholog group ID for chaining to genes_by_homolog_group (e.g. 'cyanorak:CK_00000364', 'eggnog:COG0592@2') |
+| consensus_gene_name | string \| None (optional) | Consensus gene name across group members (e.g. 'dnaN'). Often null. |
+| consensus_product | string \| None (optional) | Consensus product across group members (e.g. 'DNA polymerase III, beta subunit') |
+| taxonomic_level | string | Taxonomic scope (e.g. 'curated', 'Prochloraceae', 'Bacteria') |
+| source | string | Source database (e.g. 'cyanorak', 'eggnog') |
+| specificity_rank | int | Group breadth: 0=curated, 1=family, 2=order, 3=domain (e.g. 0) |
+
+**Verbose-only fields** (included when `verbose=True`):
+
+| Field | Type | Description |
+|---|---|---|
+| member_count | int \| None (optional) | Total genes in group (e.g. 9) |
+| organism_count | int \| None (optional) | Distinct organisms in group (e.g. 9) |
+| genera | list[string] \| None (optional) | Genera represented (e.g. ['Prochlorococcus', 'Synechococcus']) |
+| has_cross_genus_members | string \| None (optional) | 'cross_genus' or 'single_genus' |
+| description | string \| None (optional) | Group description text |
+| functional_description | string \| None (optional) | Functional annotation text |
+| cyanorak_roles | list[object] \| None (optional) | Consensus Cyanorak roles [{id, name}]. Verbose only. |
+| cog_categories | list[object] \| None (optional) | Consensus COG categories [{id, name}]. Verbose only. |
+
+## Few-shot examples
+
+### Example 1: Look up ortholog groups for a gene
+
+```example-call
+gene_homologs(locus_tags=["PMM0001"])
+```
+
+```example-response
+{
+  "total_matching": 4,
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
+  "by_source": [{"source": "eggnog", "count": 3}, {"source": "cyanorak", "count": 1}],
+  "returned": 4,
+  "offset": 0,
+  "truncated": false,
+  "not_found": [],
+  "no_groups": [],
+  "top_cyanorak_roles": [
+    {
+      "id": "cyanorak.role:F.1",
+      "name": "DNA metabolism > DNA replication, recombination, and repair",
+      "count": 1
+    }
+  ],
+  "top_cog_categories": [{"id": "cog.category:L", "name": "Replication, recombination and repair", "count": 1}],
+  "results": [
+    {
+      "locus_tag": "PMM0001",
+      "organism_name": "Prochlorococcus MED4",
+      "group_id": "cyanorak:CK_00000364",
+      "consensus_gene_name": "dnaN",
+      "consensus_product": "DNA polymerase III, beta subunit",
+      "taxonomic_level": "curated",
+      "source": "cyanorak",
+      "specificity_rank": 0
+    },
+    {
+      "locus_tag": "PMM0001",
+      "organism_name": "Prochlorococcus MED4",
+      "group_id": "eggnog:1MKTR@1212",
+      "consensus_gene_name": "dnaN",
+      "consensus_product": "DNA polymerase III, beta subunit",
+      "taxonomic_level": "Prochloraceae",
+      "source": "eggnog",
+      "specificity_rank": 1
+    },
+    {
+      "locus_tag": "PMM0001",
+      "organism_name": "Prochlorococcus MED4",
+      "group_id": "eggnog:1FZV5@1117",
+      "consensus_gene_name": "dnaN",
+      "consensus_product": "DNA polymerase III, beta subunit",
+      "taxonomic_level": "Cyanobacteria",
+      "source": "eggnog",
+      "specificity_rank": 2
+    },
+    ...
+  ]
+}
+```
+
+### Example 2: Batch query for multiple genes
+
+```example-call
+gene_homologs(locus_tags=["PMM0001", "PMM0845", "ALT831_RS00180"])
+```
+
+### Example 3: Filter to cyanorak groups only
+
+```example-call
+gene_homologs(locus_tags=["PMM0001"], source="cyanorak")
+```
+
+### Example 4: Summary only (no individual rows)
+
+```example-call
+gene_homologs(locus_tags=["PMM0001", "PMM0845"], summary=True)
+```
+
+### Example 5: From resolve_gene to homologs
+
+```
+Step 1: resolve_gene(identifier="dnaN")
+        → collect locus_tags from results
+
+Step 2: gene_homologs(locus_tags=["PMM0001", "PMT9312_0001", ...])
+        → see which ortholog groups each gene belongs to
+
+Step 3: genes_by_homolog_group(group_ids=["cyanorak:CK_00000364"])
+        → get all member genes in a group
+```
+
+## Chaining patterns
+
+```
+resolve_gene → gene_homologs → genes_by_homolog_group
+search_homolog_groups → genes_by_homolog_group → gene_homologs
+```
+
+## Common mistakes
+
+- A gene typically belongs to 1-4 groups: one cyanorak curated group (Pro/Syn only) plus up to three eggNOG groups at nested taxonomic levels (e.g. Bacteria-level COG, Cyanobacteria, Prochloraceae). Rows are gene × group — use source / taxonomic_level / max_specificity_rank to pick one level.
+
+- not_found means the gene doesn't exist in the KG; no_groups means the gene exists but has no ortholog group membership. `no_groups` is this tool's name for the not_matched bucket — see docs://guide/conventions for the shared not_found / not_matched semantics.
+
+- For member genes within a group, use genes_by_homolog_group (not this tool)
+
+```mistake
+gene_homologs(locus_tags='PMM0001')
+```
+
+```correction
+gene_homologs(locus_tags=['PMM0001']) — always a list
+```
+
+- `limit` defaults to every input gene × 5 groups (min 25) rather than a small page — pass an explicit number to page.
+
+## Package import equivalent
+
+```python
+from multiomics_explorer import gene_homologs
+
+result = gene_homologs(locus_tags=...)
+# returns dict with keys: total_matching, by_organism, by_source, returned, offset, truncated, not_found, no_groups, top_cyanorak_roles, top_cog_categories, warnings, results
+```
+
+Use package import for bulk data extraction in scripts.
+Use MCP for reasoning and interactive exploration.

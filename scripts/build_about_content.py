@@ -6,7 +6,9 @@ YAML files to produce per-tool about pages served via MCP resource.
 
 Output: writes directly to
 ``multiomics_explorer/skills/multiomics-kg-guide/references/tools/{tool}.md``
-(no separate sync step — that path is served).
+(the brief page, no separate sync step — that path is served) and
+``multiomics_explorer/skills/multiomics-kg-guide/references/tools/full/{tool}.md``
+(the full page, unchanged content of the historical single-page render).
 
 Usage:
     uv run python scripts/build_about_content.py                  # all tools with input files
@@ -61,6 +63,14 @@ OUTPUT_DIR = (
     Path(__file__).resolve().parent.parent
     / "multiomics_explorer" / "skills" / "multiomics-kg-guide" / "references" / "tools"
 )
+# Full-length pages (unchanged content of the historical single-page render)
+# live one level down; OUTPUT_DIR itself now holds the default brief pages.
+FULL_OUTPUT_DIR = OUTPUT_DIR / "full"
+
+# Brief page hard cap (llm-review 2b.4 D2). `render_brief` trims
+# deterministically (chaining first, then mistakes beyond the first) to
+# stay under this before returning.
+BRIEF_MAX_CHARS = 8000
 
 ONTOLOGY_INPUTS_DIR = (
     Path(__file__).resolve().parent.parent / "multiomics_explorer" / "inputs" / "ontologies"
@@ -243,22 +253,12 @@ def extract_response_fields(schema: dict) -> tuple[list[dict], list[dict]]:
     return envelope, result_fields
 
 
-def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
-    """Render the about markdown for a tool."""
-    lines = []
-
-    # Header
-    lines.append(f"# {tool_name}")
-    lines.append("")
-
-    # What it does
-    lines.append("## What it does")
-    lines.append("")
-    lines.append(schema["description"])
-    lines.append("")
-
-    # Parameters (auto-generated)
+def _params_section(schema: dict) -> list[str]:
+    """Parameters table + Discovery hint block, auto-generated from the input
+    schema. Shared verbatim by `render_about` (full page) and `render_brief`
+    (brief page) — do not duplicate this logic in either renderer."""
     params = extract_params_table(schema)
+    lines: list[str] = []
     lines.append("## Parameters")
     lines.append("")
     lines.append("| Name | Type | Default | Description |")
@@ -283,6 +283,52 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
             hints.append("`list_organisms` for valid organism names")
         lines.append(f"**Discovery:** use {', '.join(hints)}.")
         lines.append("")
+    return lines
+
+
+def _render_mistake(m) -> list[str]:
+    """Render one `mistakes:` YAML entry.
+
+    Supports both shapes used across `inputs/tools/*.yaml`: a plain string
+    (rendered as a bullet) or a `{wrong, right}` dict (rendered as a
+    mistake/correction code-block pair). Shared by `render_about` and
+    `render_brief` so the brief's trimmed slice renders identically to the
+    full page's, just with fewer entries.
+    """
+    if isinstance(m, str):
+        return [f"- {m}", ""]
+    return [
+        "```mistake",
+        m["wrong"],
+        "```",
+        "",
+        "```correction",
+        m["right"],
+        "```",
+        "",
+    ]
+
+
+def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
+    """Render the FULL about markdown for a tool (all examples, full response
+    format, verbose fields, every mistake/chaining entry). Written to
+    `FULL_OUTPUT_DIR/{tool_name}.md`, served at `docs://tools/{tool_name}/full`.
+    """
+    lines = []
+
+    # Header
+    lines.append(f"# {tool_name}")
+    lines.append("")
+
+    # What it does
+    lines.append("## What it does")
+    lines.append("")
+    lines.append(schema["description"])
+    lines.append("")
+
+    # Parameters (auto-generated)
+    params = extract_params_table(schema)
+    lines += _params_section(schema)
 
     # Response format (auto-generated)
     envelope, result_fields = extract_response_fields(schema)
@@ -398,18 +444,7 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
         lines.append("## Common mistakes")
         lines.append("")
         for m in input_data["mistakes"]:
-            if isinstance(m, str):
-                lines.append(f"- {m}")
-                lines.append("")
-            else:
-                lines.append("```mistake")
-                lines.append(m["wrong"])
-                lines.append("```")
-                lines.append("")
-                lines.append("```correction")
-                lines.append(m["right"])
-                lines.append("```")
-                lines.append("")
+            lines.extend(_render_mistake(m))
 
     # Package import (auto-generated)
     lines.extend(_build_package_import_section(
@@ -422,6 +457,88 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
     ))
 
     return "\n".join(lines)
+
+
+def render_brief(tool_name: str, schema: dict, input_data: dict | None) -> str:
+    """Render the BRIEF about markdown for a tool: what it does, params,
+    one worked example, a response-shape sketch, the top few mistakes and
+    chaining patterns, plus a pointer to the full page. Written to
+    `OUTPUT_DIR/{tool_name}.md` (the default page), served at
+    `docs://tools/{tool_name}`; the full page is `docs://tools/{tool_name}/full`.
+
+    Deterministically trimmed to stay within `BRIEF_MAX_CHARS`: chaining
+    drops first, then mistakes beyond the first.
+    """
+    header = [f"# {tool_name}", ""]
+    header += ["## What it does", "", schema["description"], ""]
+    header += _params_section(schema)
+
+    examples = (input_data or {}).get("examples") or []
+    example_section: list[str] = []
+    if examples and "call" in examples[0]:
+        ex = examples[0]
+        example_section = [
+            "## Example", "", f"### {ex['title']}", "",
+            "```python", ex["call"].strip(), "```", "",
+        ]
+
+    envelope, result_fields = extract_response_fields(schema)
+    # Same has_results fallback as render_about: an untyped `results: list[dict]`
+    # (no $ref) yields no result_fields but still deserves the ", results" suffix.
+    has_results = bool(result_fields) or "results" in (
+        (schema.get("output_schema") or {}).get("properties") or {}
+    )
+    # The ```expected-keys fence holds only the envelope-keys line — same
+    # contract as render_about's, so the shared `_extract_expected_keys`
+    # test helper (a bare comma-split of the fenced block) parses it
+    # correctly. The result-row summary is separate plain text below.
+    response_section = ["## Response sketch", "", "```expected-keys"]
+    always = [f["name"] for f in envelope if f["name"] not in CONDITIONAL_ENVELOPE_KEYS]
+    response_section.append(", ".join(always) + (", results" if has_results else ""))
+    response_section += ["```", ""]
+    if result_fields:
+        row = [f["name"] for f in result_fields][:12]
+        more = "" if len(result_fields) <= 12 else ", …"
+        response_section.append(f"Result row: `{', '.join(row)}{more}`")
+        response_section.append("")
+
+    all_mistakes = (input_data or {}).get("mistakes") or []
+    chaining = (input_data or {}).get("chaining") or []
+
+    pointer = [
+        f"Full reference (all examples, full response format, verbose fields): "
+        f"`docs://tools/{tool_name}/full`",
+        "",
+    ]
+
+    def _tail(mistakes_slice: list, include_chaining: bool) -> list[str]:
+        out: list[str] = []
+        if mistakes_slice:
+            out += ["## Common mistakes", ""]
+            for m in mistakes_slice:
+                out += _render_mistake(m)
+        if include_chaining and chaining:
+            out += ["## Chaining patterns", ""]
+            out += [f"- {c}" for c in chaining]
+            out += [""]
+        return out
+
+    base = header + example_section + response_section
+
+    # Deterministic overflow trim, in order: full slate (<=3 mistakes +
+    # chaining) -> drop chaining -> mistakes trimmed to just the first.
+    for mistakes_slice, include_chaining in (
+        (all_mistakes[:3], True),
+        (all_mistakes[:3], False),
+        (all_mistakes[:1], False),
+    ):
+        candidate = "\n".join(base + _tail(mistakes_slice, include_chaining) + pointer)
+        if len(candidate) <= BRIEF_MAX_CHARS:
+            return candidate
+
+    # Still over budget with no chaining and at most one mistake — last
+    # resort, drop mistakes too.
+    return "\n".join(base + _tail([], False) + pointer)
 
 
 def _build_response_notes_section(notes: list[dict] | None) -> list[str]:
@@ -573,6 +690,26 @@ def lint_description_length(schemas: dict) -> list[str]:
     return out
 
 
+def lint_brief_size(paths: list[Path]) -> list[str]:
+    """Flag brief pages (`OUTPUT_DIR/{name}.md`) over `BRIEF_MAX_CHARS`.
+
+    `render_brief` trims deterministically before writing, so a violation
+    here means the trim floor (one mistake, no chaining) still doesn't fit —
+    a real problem with that tool's description/params/example, not
+    something the generator can fix on its own.
+    """
+    out = []
+    for p in paths:
+        try:
+            text = p.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        n = len(text)
+        if n > BRIEF_MAX_CHARS:
+            out.append(f"{p.stem}: brief {n} chars > {BRIEF_MAX_CHARS}")
+    return out
+
+
 def generate_skeleton(tool_name: str, schema: dict) -> str:
     """Generate input YAML skeleton for a tool."""
     # Check if tool has a verbose param
@@ -650,18 +787,23 @@ def build_tool(tool_name: str, schemas: dict) -> bool:
 
     schema = schemas[tool_name]
     input_path = INPUTS_DIR / f"{tool_name}.yaml"
-    output_path = OUTPUT_DIR / f"{tool_name}.md"
+    brief_path = OUTPUT_DIR / f"{tool_name}.md"
+    full_path = FULL_OUTPUT_DIR / f"{tool_name}.md"
 
     input_data = None
     if input_path.exists():
         input_data = yaml.safe_load(input_path.read_text(encoding="utf-8"))
 
-    markdown = render_about(tool_name, schema, input_data)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(markdown, encoding="utf-8")
+    full_markdown = render_about(tool_name, schema, input_data)
+    brief_markdown = render_brief(tool_name, schema, input_data)
+
+    full_path.parent.mkdir(parents=True, exist_ok=True)
+    full_path.write_text(full_markdown, encoding="utf-8")
+    brief_path.parent.mkdir(parents=True, exist_ok=True)
+    brief_path.write_text(brief_markdown, encoding="utf-8")
 
     status = "built" if input_data else "built (no input YAML — TODOs remain)"
-    print(f"  OK   {tool_name}: {output_path.relative_to(Path.cwd())} [{status}]")
+    print(f"  OK   {tool_name}: {brief_path.relative_to(Path.cwd())} + full/{full_path.name} [{status}]")
     return True
 
 
@@ -1321,6 +1463,9 @@ def main():
                         )
                         sys.exit(2)
                     paths.append(md_path)
+                    full_md_path = FULL_OUTPUT_DIR / f"{name}.md"
+                    if full_md_path.exists():
+                        paths.append(full_md_path)
         else:
             repo_root = Path(__file__).resolve().parent.parent
             skills_refs = (
@@ -1332,6 +1477,7 @@ def main():
             )
             paths = (
                 sorted(OUTPUT_DIR.glob("*.md"))
+                + sorted(FULL_OUTPUT_DIR.glob("*.md"))
                 + sorted((skills_refs / "guide").glob("*.md"))
                 + sorted((skills_refs / "analysis").glob("*.md"))
                 + sorted((skills_refs / "ontologies").glob("*.md"))
@@ -1359,6 +1505,12 @@ def main():
             for v in desc_violations:
                 print(v, file=sys.stderr)
             if desc_violations:
+                rc = rc or 1
+            # Brief pages stay under BRIEF_MAX_CHARS.
+            brief_violations = lint_brief_size(sorted(OUTPUT_DIR.glob("*.md")))
+            for v in brief_violations:
+                print(v, file=sys.stderr)
+            if brief_violations:
                 rc = rc or 1
         sys.exit(rc)
 

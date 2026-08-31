@@ -53,10 +53,14 @@ def test_get_tool_schemas_has_output_schema_from_return_model(tool_schemas):
 
 
 def _get_about_files() -> list[Path]:
-    """Return all about markdown files."""
+    """Return all about markdown files — brief pages (`ABOUT_DIR/*.md`) and
+    full pages (`ABOUT_DIR/full/*.md`, llm-review 2b.4 D2). Keeping both in
+    one list means every consumer below (lint-clean, tool-name checks,
+    expected-keys, param-name checks) covers both page kinds without a
+    second parametrize."""
     if not ABOUT_DIR.exists():
         return []
-    return sorted(ABOUT_DIR.glob("*.md"))
+    return sorted(ABOUT_DIR.glob("*.md")) + sorted((ABOUT_DIR / "full").glob("*.md"))
 
 
 def _extract_expected_keys(content: str) -> list[str]:
@@ -886,3 +890,41 @@ def test_yaml_example_responses_carry_an_envelope_key(tool_schemas):
             failures += lint_example_responses(
                 yf.stem, _yaml3b.safe_load(yf.read_text()) or {}, tool_schemas[yf.stem])
     assert not failures, "\n".join(failures)
+
+
+# ---------------------------------------------------------------------------
+# llm-review 2b.4 D2: brief/full page split. `render_about` is now the FULL
+# renderer (unchanged output, written under `full/`); `render_brief` writes
+# the new default page at `references/tools/{name}.md`.
+# ---------------------------------------------------------------------------
+
+BRIEF_SECTIONS = ["## What it does", "## Parameters", "## Example", "## Response sketch", "## Common mistakes"]
+
+
+def test_brief_page_structure_and_pointer(tool_schemas):
+    from scripts.build_about_content import render_brief
+
+    name = "resolve_gene"
+    input_data = _yaml3b.safe_load((_INPUTS_DIR / f"{name}.yaml").read_text())
+    brief = render_brief(name, tool_schemas[name], input_data)
+    for section in BRIEF_SECTIONS:
+        assert section in brief, section
+    assert f"docs://tools/{name}/full" in brief
+    assert len(brief) <= 8000
+
+
+def test_full_render_unchanged(tool_schemas):
+    """The full page is exactly what render_about produced before the split."""
+    from scripts.build_about_content import FULL_OUTPUT_DIR, render_about
+
+    name = "resolve_gene"
+    input_data = _yaml3b.safe_load((_INPUTS_DIR / f"{name}.yaml").read_text())
+    assert render_about(name, tool_schemas[name], input_data) == (
+        FULL_OUTPUT_DIR / f"{name}.md").read_text()
+
+
+def test_every_tool_has_brief_and_full():
+    briefs = {p.stem for p in ABOUT_DIR.glob("*.md")}
+    fulls = {p.stem for p in (ABOUT_DIR / "full").glob("*.md")}
+    assert briefs == fulls
+    assert len(briefs) == 42

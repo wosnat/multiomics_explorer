@@ -1,0 +1,218 @@
+# search_homolog_groups
+
+## What it does
+
+Lucene search over ortholog groups (consensus product, consensus gene name, description).
+
+Use to find group IDs from text; for one gene's groups use `gene_homologs`, for member genes `genes_by_homolog_group`.
+Filters: search_text, source, taxonomic_level, max_specificity_rank, cyanorak_roles, cog_categories.
+Returns: by_source, by_level, score stats, top_cyanorak_roles, top_cog_categories; one row = one ortholog group.
+docs://tools/search_homolog_groups; summary=True first.
+
+## Parameters
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| search_text | string | — | Search query (Lucene syntax — boolean operators, phrase matching, wildcards). Searches consensus_product, consensus_gene_name, description, functional_description. See `docs://guide/conventions` for Lucene scoring. |
+| source | string \| None | None | Filter by OG source: 'cyanorak' or 'eggnog'. |
+| taxonomic_level | string \| None | None | Filter by taxonomic level. E.g. 'curated', 'Prochloraceae', 'Bacteria'. |
+| max_specificity_rank | int \| None | None | Cap group breadth. 0=curated only, 1=+family, 2=+order, 3=+domain (all). |
+| cyanorak_roles | list[string] \| None | None | Filter by CyanorakRole term IDs. OR within list. E.g. ['cyanorak.role:G.3', 'cyanorak.role:J.8']. |
+| cog_categories | list[string] \| None | None | Filter by CogFunctionalCategory term IDs. OR within list. E.g. ['cog.category:C', 'cog.category:J']. |
+| summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| limit | int | 5 | Max rows returned (paging). |
+| offset | int | 0 | Rows to skip (paging). |
+
+## Response format
+
+### Envelope
+
+```expected-keys
+total_entries, total_matching, by_source, by_level, score_max, score_median, top_cyanorak_roles, top_cog_categories, returned, offset, truncated, results
+```
+
+- **total_entries** (int): Total OrthologGroup nodes in KG
+- **total_matching** (int): Groups matching search + filters (e.g. 884)
+- **by_source** (list[SearchHomologGroupsSourceBreakdown]): Groups per source, sorted by count desc
+- **by_level** (list[SearchHomologGroupsLevelBreakdown]): Groups per taxonomic level, sorted by count desc
+- **score_max** (float | None): Highest Lucene score (null if 0 matches, e.g. 6.13)
+- **score_median** (float | None): Median Lucene score (null if 0 matches, e.g. 1.06)
+- **top_cyanorak_roles** (list[OntologyBreakdown]): Top 5 CyanorakRole annotations by frequency
+- **top_cog_categories** (list[OntologyBreakdown]): Top 5 CogFunctionalCategory annotations by frequency
+- **returned** (int): Results in this response (0 when summary=true)
+- **offset** (int): Offset into full result set (e.g. 0)
+- **truncated** (bool): True if total_matching > returned
+
+### Per-result fields
+
+| Field | Type | Description |
+|---|---|---|
+| group_id | string | OG identifier (e.g. 'cyanorak:CK_00000570') |
+| group_name | string | Raw OG name (e.g. 'CK_00000570') |
+| consensus_gene_name | string \| None (optional) | Consensus gene name (e.g. 'psbB'). Often null. |
+| consensus_product | string | Consensus product (e.g. 'photosystem II chlorophyll-binding protein CP47') |
+| source | string | Source database (e.g. 'cyanorak') |
+| taxonomic_level | string | Taxonomic scope (e.g. 'curated') |
+| specificity_rank | int | 0=curated, 1=family, 2=order, 3=domain (e.g. 0) |
+| member_count | int | Total genes in group (e.g. 9) |
+| organism_count | int | Distinct organisms (e.g. 9) |
+| score | float | Lucene relevance score (e.g. 5.23) |
+
+**Verbose-only fields** (included when `verbose=True`):
+
+| Field | Type | Description |
+|---|---|---|
+| description | string \| None (optional) | Functional narrative from eggNOG (e.g. 'photosynthesis') |
+| functional_description | string \| None (optional) | Derived from member gene roles (e.g. 'Photosynthesis and respiration > Photosystem II') |
+| genera | list[string] \| None (optional) | Genera represented (e.g. ['Prochlorococcus', 'Synechococcus']) |
+| has_cross_genus_members | string \| None (optional) | 'cross_genus' or 'single_genus' |
+| cyanorak_roles | list[object] \| None (optional) | Consensus Cyanorak roles [{id, name}]. Verbose only. |
+| cog_categories | list[object] \| None (optional) | Consensus COG categories [{id, name}]. Verbose only. |
+
+## Few-shot examples
+
+### Example 1: Search by function
+
+```example-call
+search_homolog_groups(search_text="photosynthesis")
+```
+
+```example-response
+{
+  "total_entries": 48972,
+  "total_matching": 1212,
+  "by_source": [{"source": "eggnog", "count": 1684}, {"source": "cyanorak", "count": 430}],
+  "by_level": [
+    {"taxonomic_level": "Cyanobacteria", "count": 559},
+    {"taxonomic_level": "curated", "count": 430},
+    {"taxonomic_level": "Prochloraceae", "count": 400},
+    {"taxonomic_level": "Synechococcus", "count": 370},
+    {"taxonomic_level": "Bacteria", "count": 352},
+    ...
+  ],
+  "score_max": 6.6423540115356445,
+  "score_median": 1.0682822465896606,
+  "top_cyanorak_roles": [
+    {"id": "cyanorak.role:J.8", "name": "Photosynthesis and respiration > Photosystem II", "count": 247},
+    {
+      "id": "cyanorak.role:D.1.2",
+      "name": "Cellular processes > Adaptation/acclimation to atypical conditions and detoxification > Light",
+      "count": 242
+    },
+    {"id": "cyanorak.role:G.2", "name": "Energy metabolism > Electron transport", "count": 241},
+    {"id": "cyanorak.role:J.2", "name": "Photosynthesis and respiration > CO2 fixation", "count": 180},
+    {"id": "cyanorak.role:J", "name": "Photosynthesis and respiration", "count": 170}
+  ],
+  "top_cog_categories": [
+    {"id": "cog.category:S", "name": "Function unknown", "count": 796},
+    {"id": "cog.category:C", "name": "Energy production and conversion", "count": 681},
+    {"id": "cog.category:G", "name": "Carbohydrate transport and metabolism", "count": 100},
+    {"id": "cog.category:H", "name": "Coenzyme transport and metabolism", "count": 92},
+    {
+      "id": "cog.category:U",
+      "name": "Intracellular trafficking, secretion, and vesicular transport",
+      "count": 69
+    }
+  ],
+  "returned": 5,
+  "offset": 0,
+  "truncated": true,
+  "results": [
+    {
+      "group_id": "eggnog:30SSF@2",
+      "group_name": "30SSF@2",
+      "consensus_gene_name": "psbJ",
+      "consensus_product": "photosystem II reaction center protein PsbJ",
+      "source": "eggnog",
+      "taxonomic_level": "Bacteria",
+      "specificity_rank": 3,
+      "member_count": 19,
+      "organism_count": 19,
+      "score": 6.6423540115356445
+    },
+    {
+      "group_id": "eggnog:31GDS@2",
+      "group_name": "31GDS@2",
+      "consensus_gene_name": "psb28",
+      "consensus_product": "photosystem II reaction centre Psb28 protein",
+      "source": "eggnog",
+      "taxonomic_level": "Bacteria",
+      "specificity_rank": 3,
+      "member_count": 27,
+      "organism_count": 27,
+      "score": 6.6423540115356445
+    },
+    {
+      "group_id": "eggnog:32YIH@2",
+      "group_name": "32YIH@2",
+      "consensus_gene_name": "psaK",
+      "consensus_product": "photosystem I reaction center subunit X",
+      "source": "eggnog",
+      "taxonomic_level": "Bacteria",
+      "specificity_rank": 3,
+      "member_count": 28,
+      "organism_count": 27,
+      "score": 6.6423540115356445
+    },
+    ...
+  ]
+}
+```
+
+### Example 2: Filter to curated Cyanorak groups
+
+```example-call
+search_homolog_groups(search_text="kinase", source="cyanorak", max_specificity_rank=0)
+```
+
+### Example 3: Filter by CyanorakRole
+
+```example-call
+search_homolog_groups(search_text="transport", cyanorak_roles=["cyanorak.role:D.1.5"])
+```
+
+### Example 4: Find groups then get member genes
+
+```
+Step 1: search_homolog_groups(search_text="nitrogen regulatory")
+        → extract group_id values from results
+
+Step 2: genes_by_homolog_group(group_ids=["cyanorak:CK_00000468"])
+        → see member genes per organism
+```
+
+## Chaining patterns
+
+```
+search_homolog_groups → genes_by_homolog_group → differential_expression_by_ortholog
+gene_homologs → inspect group → search_homolog_groups for similar
+```
+
+## Common mistakes
+
+- Searching by group ID (e.g. 'COG0592') will not work — group IDs are not in the fulltext index. Use the group_id from results directly.
+
+```mistake
+len(results)  # actual result count
+```
+
+```correction
+response['total_matching']  # use total, not len
+```
+
+- Hyphens in search text are Lucene operators — use spaces instead (e.g. 'beta glycosyltransferase' not 'beta-glycosyltransferase')
+
+- `search_text` is Lucene — see docs://guide/conventions for syntax and scoring.
+
+## Package import equivalent
+
+```python
+from multiomics_explorer import search_homolog_groups
+
+result = search_homolog_groups(search_text=...)
+# returns dict with keys: total_entries, total_matching, by_source, by_level, score_max, score_median, top_cyanorak_roles, top_cog_categories, returned, offset, truncated, results
+```
+
+Use package import for bulk data extraction in scripts.
+Use MCP for reasoning and interactive exploration.
