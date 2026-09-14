@@ -11,8 +11,8 @@
 
 - `docs://tools/assays_by_metabolite` — ~1089 tok
 - `docs://tools/cluster_enrichment` — ~1907 tok
-- `docs://tools/differential_expression_by_gene` — ~1061 tok
-- `docs://tools/differential_expression_by_ortholog` — ~928 tok
+- `docs://tools/differential_expression_by_gene` — ~1149 tok
+- `docs://tools/differential_expression_by_ortholog` — ~1022 tok
 - `docs://tools/discussed_by_publication` — ~785 tok
 - `docs://tools/gene_aa_sequence` — ~604 tok
 - `docs://tools/gene_clusters_by_gene` — ~940 tok
@@ -58,8 +58,8 @@ Append /full for the complete page — all worked examples + full response forma
 
 - `docs://tools/assays_by_metabolite/full` — ~4915 tok
 - `docs://tools/cluster_enrichment/full` — ~4334 tok
-- `docs://tools/differential_expression_by_gene/full` — ~6540 tok
-- `docs://tools/differential_expression_by_ortholog/full` — ~2773 tok
+- `docs://tools/differential_expression_by_gene/full` — ~6667 tok
+- `docs://tools/differential_expression_by_ortholog/full` — ~2866 tok
 - `docs://tools/discussed_by_publication/full` — ~3476 tok
 - `docs://tools/gene_aa_sequence/full` — ~2212 tok
 - `docs://tools/gene_clusters_by_gene/full` — ~2316 tok

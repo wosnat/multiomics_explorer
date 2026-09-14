@@ -4404,6 +4404,8 @@ def differential_expression_by_gene(
     direction: str | None = None,
     significant_only: bool = False,
     growth_phases: list[str] | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -4439,9 +4441,11 @@ def differential_expression_by_gene(
         when experiment_ids is provided (empty lists otherwise).
         no_expression: gene has NO Changes_expression_of edge at all in the
         organism. filtered_out: gene has edges but none survive the active
-        direction / significant_only / growth_phases filters (e.g. a
+        direction / significant_only / growth_phases / treatment_type /
+        background_factors filters (e.g. a
         growth_phases vocabulary typo) — never confuse this with
-        no_expression. warnings: one entry per growth_phases value not in
+        no_expression. warnings: one entry per growth_phases /
+        treatment_type / background_factors value not in
         the live vocabulary, plus one per not_found locus_tag that differs
         only by case from a real Gene.locus_tag (locus_tags are never
         case-normalised). experiment_count: count of
@@ -4457,10 +4461,20 @@ def differential_expression_by_gene(
 
     growth_phases: if provided, restricts DE rows to those whose edge-level
     growth_phase property matches any of the specified values (case-insensitive).
+
+    treatment_type / background_factors: if provided, restrict DE rows to
+    experiments whose treatment_type / background_factors array contains any
+    of the specified values (case-insensitive; same semantics as
+    list_experiments). Genes whose edges all fail these filters land in
+    ``filtered_out``, never ``no_expression``; unknown values add a
+    ``warnings`` entry.
     """
     conn = _default_conn(conn)
 
-    warnings = _closed_vocab_warnings(conn, growth_phases=growth_phases)
+    warnings = _closed_vocab_warnings(
+        conn, growth_phases=growth_phases,
+        treatment_type=treatment_type, background_factors=background_factors,
+    )
 
     # Validate direction
     if direction is not None and direction not in _VALID_DIRECTIONS_BY_GENE:
@@ -4487,6 +4501,8 @@ def differential_expression_by_gene(
         direction=direction,
         significant_only=significant_only,
         growth_phases=growth_phases,
+        treatment_type=treatment_type,
+        background_factors=background_factors,
     )
 
     # Pre-validate single organism
@@ -4587,6 +4603,8 @@ def differential_expression_by_gene(
                 direction=direction,
                 significant_only=significant_only,
                 growth_phases=growth_phases,
+                treatment_type=treatment_type,
+                background_factors=background_factors,
             )
         )
         exp_diag_raw = conn.execute_query(
@@ -4643,6 +4661,8 @@ def differential_expression_by_ortholog(
     direction: str | None = None,
     significant_only: bool = False,
     growth_phases: list[str] | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -4684,6 +4704,11 @@ def differential_expression_by_ortholog(
 
     growth_phases: if provided, restricts DE rows to those whose edge-level
     growth_phase property matches any of the specified values (case-insensitive).
+
+    treatment_type / background_factors: if provided, restrict DE rows to
+    experiments whose treatment_type / background_factors array contains any
+    of the specified values (case-insensitive; same semantics as
+    list_experiments). Unknown values add a ``warnings`` entry.
     """
     if not group_ids:
         raise ValueError("group_ids must not be empty.")
@@ -4702,6 +4727,11 @@ def differential_expression_by_ortholog(
 
     conn = _default_conn(conn)
 
+    warnings = _closed_vocab_warnings(
+        conn, growth_phases=growth_phases,
+        treatment_type=treatment_type, background_factors=background_factors,
+    )
+
     # Common filter kwargs for all builders
     filter_kwargs = dict(
         organisms=organisms,
@@ -4709,6 +4739,8 @@ def differential_expression_by_ortholog(
         direction=direction,
         significant_only=significant_only,
         growth_phases=growth_phases,
+        treatment_type=treatment_type,
+        background_factors=background_factors,
     )
 
     # --- Q1a: group existence check ---
@@ -4812,6 +4844,8 @@ def differential_expression_by_ortholog(
             experiment_ids=experiment_ids,
             direction=direction, significant_only=significant_only,
             growth_phases=growth_phases,
+            treatment_type=treatment_type,
+            background_factors=background_factors,
         )
         not_found_organisms = []
         not_matched_organisms = []
@@ -4860,7 +4894,7 @@ def differential_expression_by_ortholog(
         "not_found_experiments": not_found_experiments,
         "not_matched_experiments": not_matched_experiments,
         "resolved_aliases": resolved_aliases,
-        "warnings": [],
+        "warnings": warnings,
         "returned": len(results),
         "offset": offset,
         "truncated": global_raw["total_matching"] > offset + len(results),

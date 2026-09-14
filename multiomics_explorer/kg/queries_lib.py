@@ -4986,13 +4986,17 @@ def _differential_expression_where(
     direction: str | None = None,
     significant_only: bool = False,
     growth_phases: list[str] | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
 ) -> tuple[list[str], dict]:
     """Build WHERE conditions + params shared by all de_by_gene builders.
 
     direction takes precedence over significant_only (direction implies
     significance). organism uses fuzzy word-based matching (same as
     list_experiments). growth_phases filters on the edge-level r.growth_phase
-    property (case-insensitive).
+    property (case-insensitive). treatment_type / background_factors filter
+    on the experiment's array properties (same fragments as
+    _list_experiments_where; case-insensitive, background_factors null-safe).
     """
     conditions: list[str] = []
     params: dict = {}
@@ -5021,6 +5025,17 @@ def _differential_expression_where(
     if growth_phases:
         conditions.append("toLower(r.growth_phase) IN $growth_phases")
         params["growth_phases"] = [gp.lower() for gp in growth_phases]
+    if treatment_type:
+        conditions.append(
+            "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)"
+        )
+        params["treatment_types"] = [t.lower() for t in treatment_type]
+    if background_factors:
+        conditions.append(
+            "ANY(bf IN coalesce(e.background_factors, [])"
+            " WHERE toLower(bf) IN $background_factors)"
+        )
+        params["background_factors"] = [bf.lower() for bf in background_factors]
     return conditions, params
 
 
@@ -5104,6 +5119,8 @@ def build_differential_expression_by_gene_summary_global(
     direction: str | None = None,
     significant_only: bool = False,
     growth_phases: list[str] | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Global aggregate stats for differential_expression_by_gene.
 
@@ -5120,6 +5137,7 @@ def build_differential_expression_by_gene_summary_global(
         organism=organism, locus_tags=locus_tags,
         experiment_ids=experiment_ids, direction=direction,
         significant_only=significant_only, growth_phases=growth_phases,
+        treatment_type=treatment_type, background_factors=background_factors,
     )
     where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
 
@@ -5151,6 +5169,8 @@ def build_differential_expression_by_gene_summary_by_experiment(
     direction: str | None = None,
     significant_only: bool = False,
     growth_phases: list[str] | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Per-experiment breakdown with nested timepoints (single organism enforced).
 
@@ -5164,6 +5184,7 @@ def build_differential_expression_by_gene_summary_by_experiment(
         organism=organism, locus_tags=locus_tags,
         experiment_ids=experiment_ids, direction=direction,
         significant_only=significant_only, growth_phases=growth_phases,
+        treatment_type=treatment_type, background_factors=background_factors,
     )
     where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
 
@@ -5209,6 +5230,8 @@ def build_differential_expression_by_gene_summary_diagnostics(
     direction: str | None = None,
     significant_only: bool = False,
     growth_phases: list[str] | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Top categories + batch diagnostics for differential_expression_by_gene.
 
@@ -5220,7 +5243,8 @@ def build_differential_expression_by_gene_summary_diagnostics(
     `no_expression` keeps its exact meaning — a gene has NO
     `Changes_expression_of` edge at all in the organism. `filtered_out`
     covers a gene that DOES have edges but none survive the active
-    `direction` / `significant_only` / `growth_phases` filters (e.g. a
+    `direction` / `significant_only` / `growth_phases` /
+    `treatment_type` / `background_factors` filters (e.g. a
     growth_phases vocabulary typo) — those genes must never land in
     `no_expression`. The edge-existence check (`edge_count_any`) therefore
     applies only organism / experiment_ids (structural scope); the
@@ -5232,6 +5256,8 @@ def build_differential_expression_by_gene_summary_diagnostics(
             organism=organism, locus_tags=None,
             experiment_ids=experiment_ids, direction=direction,
             significant_only=significant_only, growth_phases=growth_phases,
+            treatment_type=treatment_type,
+            background_factors=background_factors,
         )
         where_block = (
             "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
@@ -5264,6 +5290,7 @@ def build_differential_expression_by_gene_summary_diagnostics(
         organism=organism, locus_tags=None,
         experiment_ids=experiment_ids, direction=direction,
         significant_only=significant_only, growth_phases=growth_phases,
+        treatment_type=treatment_type, background_factors=background_factors,
     )
     params["locus_tags"] = locus_tags
     where_block_no_lt = (
@@ -5272,7 +5299,8 @@ def build_differential_expression_by_gene_summary_diagnostics(
     )
 
     # Unfiltered edge-existence check: organism/experiment_ids only, so a
-    # direction / significant_only / growth_phases mismatch never masquerades
+    # direction / significant_only / growth_phases / treatment_type /
+    # background_factors mismatch never masquerades
     # as "no expression data at all" (see docstring).
     conditions_any, params_any = _differential_expression_where(
         organism=organism, locus_tags=None,
@@ -5336,6 +5364,8 @@ def build_differential_expression_by_gene_experiment_diagnostics(
     direction: str | None = None,
     significant_only: bool = False,
     growth_phases: list[str] | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Validate experiment IDs against KG + expression edges for DE-by-gene.
 
@@ -5343,14 +5373,16 @@ def build_differential_expression_by_gene_experiment_diagnostics(
     ortholog-group join. RETURN keys: not_found_experiments,
     not_matched_experiments. `not_matched` applies the other active
     filters (organism, locus_tags, direction, significant_only,
-    growth_phases) so it reflects "no DE edges satisfy the user's query
-    on this experiment" rather than just "no edges at all".
+    growth_phases, treatment_type, background_factors) so it reflects
+    "no DE edges satisfy the user's query on this experiment" rather
+    than just "no edges at all".
     """
     # WHERE conditions WITHOUT experiment_ids filter (already via UNWIND)
     conditions_no_eid, params = _differential_expression_where(
         organism=organism, locus_tags=locus_tags,
         experiment_ids=None, direction=direction,
         significant_only=significant_only, growth_phases=growth_phases,
+        treatment_type=treatment_type, background_factors=background_factors,
     )
     params["experiment_ids"] = experiment_ids
 
@@ -5388,6 +5420,8 @@ def build_differential_expression_by_gene(
     direction: str | None = None,
     significant_only: bool = False,
     growth_phases: list[str] | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -5405,6 +5439,7 @@ def build_differential_expression_by_gene(
         organism=organism, locus_tags=locus_tags,
         experiment_ids=experiment_ids, direction=direction,
         significant_only=significant_only, growth_phases=growth_phases,
+        treatment_type=treatment_type, background_factors=background_factors,
     )
     where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
 
@@ -5744,12 +5779,17 @@ def _differential_expression_by_ortholog_where(
     direction: str | None = None,
     significant_only: bool = False,
     growth_phases: list[str] | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
 ) -> tuple[list[str], dict]:
     """Build WHERE conditions + params shared by de_by_ortholog builders.
 
     organisms is a list with OR semantics (any matching organism).
     direction takes precedence over significant_only. growth_phases filters
     on the edge-level r.growth_phase property (case-insensitive).
+    treatment_type / background_factors filter on the experiment's array
+    properties (same fragments as _list_experiments_where; case-insensitive,
+    background_factors null-safe).
     """
     conditions: list[str] = []
     params: dict = {}
@@ -5776,6 +5816,17 @@ def _differential_expression_by_ortholog_where(
     if growth_phases:
         conditions.append("toLower(r.growth_phase) IN $growth_phases")
         params["growth_phases"] = [gp.lower() for gp in growth_phases]
+    if treatment_type:
+        conditions.append(
+            "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)"
+        )
+        params["treatment_types"] = [t.lower() for t in treatment_type]
+    if background_factors:
+        conditions.append(
+            "ANY(bf IN coalesce(e.background_factors, [])"
+            " WHERE toLower(bf) IN $background_factors)"
+        )
+        params["background_factors"] = [bf.lower() for bf in background_factors]
     return conditions, params
 
 
@@ -5809,6 +5860,8 @@ def build_differential_expression_by_ortholog_summary_global(
     direction: str | None = None,
     significant_only: bool = False,
     growth_phases: list[str] | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Global aggregate stats for differential_expression_by_ortholog.
 
@@ -5823,6 +5876,7 @@ def build_differential_expression_by_ortholog_summary_global(
         organisms=organisms, experiment_ids=experiment_ids,
         direction=direction, significant_only=significant_only,
         growth_phases=growth_phases,
+        treatment_type=treatment_type, background_factors=background_factors,
     )
     params["group_ids"] = group_ids
 
@@ -5866,6 +5920,8 @@ def build_differential_expression_by_ortholog_top_groups(
     direction: str | None = None,
     significant_only: bool = False,
     growth_phases: list[str] | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Top ortholog groups by significant gene count.
 
@@ -5876,6 +5932,7 @@ def build_differential_expression_by_ortholog_top_groups(
         organisms=organisms, experiment_ids=experiment_ids,
         direction=direction, significant_only=significant_only,
         growth_phases=growth_phases,
+        treatment_type=treatment_type, background_factors=background_factors,
     )
     params["group_ids"] = group_ids
 
@@ -5911,6 +5968,8 @@ def build_differential_expression_by_ortholog_top_experiments(
     direction: str | None = None,
     significant_only: bool = False,
     growth_phases: list[str] | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Top experiments by significant gene count across ortholog groups.
 
@@ -5921,6 +5980,7 @@ def build_differential_expression_by_ortholog_top_experiments(
         organisms=organisms, experiment_ids=experiment_ids,
         direction=direction, significant_only=significant_only,
         growth_phases=growth_phases,
+        treatment_type=treatment_type, background_factors=background_factors,
     )
     params["group_ids"] = group_ids
 
@@ -5960,6 +6020,8 @@ def build_differential_expression_by_ortholog_results(
     direction: str | None = None,
     significant_only: bool = False,
     growth_phases: list[str] | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -5978,6 +6040,7 @@ def build_differential_expression_by_ortholog_results(
         organisms=organisms, experiment_ids=experiment_ids,
         direction=direction, significant_only=significant_only,
         growth_phases=growth_phases,
+        treatment_type=treatment_type, background_factors=background_factors,
     )
     params["group_ids"] = group_ids
 
@@ -6078,6 +6141,8 @@ def _build_de_by_ortholog_organism_diagnostics(
     direction: str | None = None,
     significant_only: bool = False,
     growth_phases: list[str] | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Validate organisms against KG + expression in ortholog groups.
 
@@ -6088,6 +6153,7 @@ def _build_de_by_ortholog_organism_diagnostics(
         organisms=None, experiment_ids=experiment_ids,
         direction=direction, significant_only=significant_only,
         growth_phases=growth_phases,
+        treatment_type=treatment_type, background_factors=background_factors,
     )
     params["group_ids"] = group_ids
     params["organisms"] = organisms
@@ -6132,6 +6198,8 @@ def _build_de_by_ortholog_experiment_diagnostics(
     direction: str | None = None,
     significant_only: bool = False,
     growth_phases: list[str] | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Validate experiment IDs against KG + expression in ortholog groups.
 
@@ -6142,6 +6210,7 @@ def _build_de_by_ortholog_experiment_diagnostics(
         organisms=organisms, experiment_ids=None,
         direction=direction, significant_only=significant_only,
         growth_phases=growth_phases,
+        treatment_type=treatment_type, background_factors=background_factors,
     )
     params["group_ids"] = group_ids
     params["experiment_ids"] = experiment_ids
@@ -6180,6 +6249,8 @@ def build_differential_expression_by_ortholog_diagnostics(
     direction: str | None = None,
     significant_only: bool = False,
     growth_phases: list[str] | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
 ) -> list[tuple[str, dict]] | None:
     """Build diagnostic queries for differential_expression_by_ortholog.
 
@@ -6196,12 +6267,16 @@ def build_differential_expression_by_ortholog_diagnostics(
             group_ids=group_ids, organisms=organisms,
             experiment_ids=experiment_ids, direction=direction,
             significant_only=significant_only, growth_phases=growth_phases,
+            treatment_type=treatment_type,
+            background_factors=background_factors,
         ))
     if experiment_ids is not None:
         queries.append(_build_de_by_ortholog_experiment_diagnostics(
             group_ids=group_ids, experiment_ids=experiment_ids,
             organisms=organisms, direction=direction,
             significant_only=significant_only, growth_phases=growth_phases,
+            treatment_type=treatment_type,
+            background_factors=background_factors,
         ))
     return queries
 

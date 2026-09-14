@@ -5615,6 +5615,189 @@ class TestDEGrowthPhases:
         assert "rows_by_growth_phase" in cypher
 
 
+class TestDETreatmentBackgroundFilters:
+    """treatment_type / background_factors filters across DE builders (2b.6a).
+
+    Same Cypher fragments as _list_experiments_where /
+    _gene_response_profile_where: ANY over the experiment's array property,
+    lowercased on both sides; background_factors null-safe via coalesce.
+    """
+
+    # --- shared WHERE helpers ---
+
+    def test_de_by_gene_where_treatment_type_fragment(self):
+        from multiomics_explorer.kg.queries_lib import (
+            _differential_expression_where,
+        )
+        conditions, params = _differential_expression_where(
+            treatment_type=["Diel", "DARKNESS"]
+        )
+        assert len(conditions) == 1
+        assert (
+            "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)"
+            in conditions[0]
+        )
+        assert params == {"treatment_types": ["diel", "darkness"]}
+
+    def test_de_by_gene_where_background_factors_fragment(self):
+        from multiomics_explorer.kg.queries_lib import (
+            _differential_expression_where,
+        )
+        conditions, params = _differential_expression_where(
+            background_factors=["Axenic"]
+        )
+        assert len(conditions) == 1
+        assert "ANY(bf IN coalesce(e.background_factors, [])" in conditions[0]
+        assert "toLower(bf) IN $background_factors" in conditions[0]
+        assert params == {"background_factors": ["axenic"]}
+
+    def test_de_by_ortholog_where_treatment_type_fragment(self):
+        from multiomics_explorer.kg.queries_lib import (
+            _differential_expression_by_ortholog_where,
+        )
+        conditions, params = _differential_expression_by_ortholog_where(
+            treatment_type=["Diel"]
+        )
+        assert len(conditions) == 1
+        assert (
+            "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)"
+            in conditions[0]
+        )
+        assert params == {"treatment_types": ["diel"]}
+
+    def test_de_by_ortholog_where_background_factors_fragment(self):
+        from multiomics_explorer.kg.queries_lib import (
+            _differential_expression_by_ortholog_where,
+        )
+        conditions, params = _differential_expression_by_ortholog_where(
+            background_factors=["Axenic"]
+        )
+        assert len(conditions) == 1
+        assert "ANY(bf IN coalesce(e.background_factors, [])" in conditions[0]
+        assert params == {"background_factors": ["axenic"]}
+
+    # --- by-gene builders thread both filters ---
+
+    def test_de_by_gene_detail_treatment_type_filter(self):
+        cypher, params = build_differential_expression_by_gene(
+            organism="MED4", treatment_type=["diel"]
+        )
+        assert "toLower(t) IN $treatment_types" in cypher
+        assert params["treatment_types"] == ["diel"]
+
+    def test_de_by_gene_detail_background_factors_filter(self):
+        cypher, params = build_differential_expression_by_gene(
+            organism="MED4", background_factors=["axenic"]
+        )
+        assert "toLower(bf) IN $background_factors" in cypher
+        assert params["background_factors"] == ["axenic"]
+
+    def test_de_by_gene_detail_none_no_filter(self):
+        cypher, _ = build_differential_expression_by_gene(organism="MED4")
+        assert "$treatment_types" not in cypher
+        assert "$background_factors" not in cypher
+
+    def test_de_by_gene_summary_global_threads_filters(self):
+        cypher, params = build_differential_expression_by_gene_summary_global(
+            treatment_type=["diel"], background_factors=["axenic"]
+        )
+        assert "toLower(t) IN $treatment_types" in cypher
+        assert "toLower(bf) IN $background_factors" in cypher
+        assert params["treatment_types"] == ["diel"]
+        assert params["background_factors"] == ["axenic"]
+
+    def test_de_by_gene_summary_by_experiment_threads_filters(self):
+        cypher, params = (
+            build_differential_expression_by_gene_summary_by_experiment(
+                treatment_type=["diel"], background_factors=["axenic"]
+            )
+        )
+        assert "toLower(t) IN $treatment_types" in cypher
+        assert "toLower(bf) IN $background_factors" in cypher
+
+    def test_de_by_gene_summary_diagnostics_threads_filters(self):
+        """Batch diagnostics apply the filters in the filtered edge count but
+        NOT in the edge-existence (edge_count_any) check — a treatment_type
+        mismatch must land genes in filtered_out, never no_expression."""
+        cypher, params = (
+            build_differential_expression_by_gene_summary_diagnostics(
+                locus_tags=["PMM0001"], treatment_type=["diel"]
+            )
+        )
+        assert params["treatment_types"] == ["diel"]
+        # where_block_no_lt is spliced twice (filtered edge count + category
+        # rollup); the edge_count_any block must stay structural-only.
+        assert cypher.count("toLower(t) IN $treatment_types") == 2
+
+    def test_de_by_gene_experiment_diagnostics_threads_filters(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_differential_expression_by_gene_experiment_diagnostics,
+        )
+        cypher, params = (
+            build_differential_expression_by_gene_experiment_diagnostics(
+                experiment_ids=["exp1"],
+                treatment_type=["diel"],
+                background_factors=["axenic"],
+            )
+        )
+        assert "toLower(t) IN $treatment_types" in cypher
+        assert "toLower(bf) IN $background_factors" in cypher
+        assert params["treatment_types"] == ["diel"]
+        assert params["background_factors"] == ["axenic"]
+
+    # --- by-ortholog builders thread both filters ---
+
+    def test_de_by_ortholog_results_treatment_type_filter(self):
+        cypher, params = build_differential_expression_by_ortholog_results(
+            group_ids=["OG1"], treatment_type=["diel"]
+        )
+        assert "toLower(t) IN $treatment_types" in cypher
+        assert params["treatment_types"] == ["diel"]
+
+    def test_de_by_ortholog_results_background_factors_filter(self):
+        cypher, params = build_differential_expression_by_ortholog_results(
+            group_ids=["OG1"], background_factors=["axenic"]
+        )
+        assert "toLower(bf) IN $background_factors" in cypher
+        assert params["background_factors"] == ["axenic"]
+
+    def test_de_by_ortholog_summary_global_threads_filters(self):
+        cypher, params = build_differential_expression_by_ortholog_summary_global(
+            group_ids=["OG1"], treatment_type=["diel"],
+            background_factors=["axenic"],
+        )
+        assert "toLower(t) IN $treatment_types" in cypher
+        assert "toLower(bf) IN $background_factors" in cypher
+
+    def test_de_by_ortholog_top_groups_threads_filters(self):
+        cypher, params = build_differential_expression_by_ortholog_top_groups(
+            group_ids=["OG1"], treatment_type=["diel"],
+            background_factors=["axenic"],
+        )
+        assert "toLower(t) IN $treatment_types" in cypher
+        assert "toLower(bf) IN $background_factors" in cypher
+
+    def test_de_by_ortholog_top_experiments_threads_filters(self):
+        cypher, params = build_differential_expression_by_ortholog_top_experiments(
+            group_ids=["OG1"], treatment_type=["diel"],
+            background_factors=["axenic"],
+        )
+        assert "toLower(t) IN $treatment_types" in cypher
+        assert "toLower(bf) IN $background_factors" in cypher
+
+    def test_de_by_ortholog_diagnostics_threads_filters(self):
+        queries = build_differential_expression_by_ortholog_diagnostics(
+            group_ids=["OG1"], organisms=["MED4"], experiment_ids=["exp1"],
+            treatment_type=["diel"], background_factors=["axenic"],
+        )
+        assert queries is not None and len(queries) == 2
+        for cypher, params in queries:
+            assert "toLower(t) IN $treatment_types" in cypher
+            assert "toLower(bf) IN $background_factors" in cypher
+            assert params["treatment_types"] == ["diel"]
+            assert params["background_factors"] == ["axenic"]
+
+
 class TestListDerivedMetricsWhere:
     """Tests for the shared WHERE-clause helper."""
 

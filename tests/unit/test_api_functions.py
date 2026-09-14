@@ -4032,6 +4032,104 @@ class TestGenesByHomologGroup:
         assert result["offset"] == 5
 
 
+class TestDETreatmentBackgroundApi:
+    """treatment_type / background_factors filters on both DE tools (2b.6a)."""
+
+    _VOCAB = {
+        "values": ["diel", "darkness", "axenic"],
+        "value_descriptions": {}, "description": None,
+        "source": "vocabulary", "warning": None,
+    }
+
+    def _by_gene_side_effect(self):
+        helper = TestDifferentialExpressionByGene()
+        return helper._mock_side_effect_organism_only()
+
+    def _by_ortholog_side_effect(self):
+        return [
+            [{"not_found": []}],  # Q1a group check
+            [{"total_matching": 10, "matching_genes": 3, "matching_groups": 1,
+              "experiment_count": 2, "by_organism": [], "rows_by_status": [],
+              "rows_by_treatment_type": [], "rows_by_background_factors": [],
+              "by_table_scope": [],
+              "sig_log2fcs": [1.5],
+              "matched_group_ids": ["g1"]}],  # Q1b
+            [{"top_groups": []}],  # Q2
+            [{"top_experiments": []}],  # Q3
+            [],  # Q4 results
+            [],  # Q5 membership
+        ]
+
+    def test_de_by_gene_filters_reach_builders(self, mock_conn):
+        """treatment_type / background_factors thread into the query params."""
+        mock_conn.execute_query.side_effect = self._by_gene_side_effect()
+        with patch(
+            "multiomics_explorer.api.functions._read_vocab_values",
+            return_value=self._VOCAB,
+        ):
+            result = api.differential_expression_by_gene(
+                organism="MED4", treatment_type=["diel"],
+                background_factors=["axenic"], conn=mock_conn,
+            )
+        assert result["warnings"] == []
+        calls = mock_conn.execute_query.call_args_list
+        assert any(
+            c.kwargs.get("treatment_types") == ["diel"] for c in calls
+        )
+        assert any(
+            c.kwargs.get("background_factors") == ["axenic"] for c in calls
+        )
+
+    def test_de_by_gene_bad_treatment_type_warns(self, mock_conn):
+        """A treatment_type value outside the live vocabulary warns."""
+        mock_conn.execute_query.side_effect = self._by_gene_side_effect()
+        with patch(
+            "multiomics_explorer.api.functions._read_vocab_values",
+            return_value=self._VOCAB,
+        ):
+            result = api.differential_expression_by_gene(
+                organism="MED4", treatment_type=["dielx"], conn=mock_conn,
+            )
+        assert len(result["warnings"]) == 1
+        assert result["warnings"][0].startswith(
+            "treatment_type value 'dielx' matched nothing"
+        )
+
+    def test_de_by_ortholog_filters_reach_builders(self, mock_conn):
+        mock_conn.execute_query.side_effect = self._by_ortholog_side_effect()
+        with patch(
+            "multiomics_explorer.api.functions._read_vocab_values",
+            return_value=self._VOCAB,
+        ):
+            result = api.differential_expression_by_ortholog(
+                group_ids=["g1"], treatment_type=["diel"],
+                background_factors=["axenic"], conn=mock_conn,
+            )
+        assert result["warnings"] == []
+        calls = mock_conn.execute_query.call_args_list
+        assert any(
+            c.kwargs.get("treatment_types") == ["diel"] for c in calls
+        )
+        assert any(
+            c.kwargs.get("background_factors") == ["axenic"] for c in calls
+        )
+
+    def test_de_by_ortholog_bad_background_factor_warns(self, mock_conn):
+        mock_conn.execute_query.side_effect = self._by_ortholog_side_effect()
+        with patch(
+            "multiomics_explorer.api.functions._read_vocab_values",
+            return_value=self._VOCAB,
+        ):
+            result = api.differential_expression_by_ortholog(
+                group_ids=["g1"], background_factors=["xenic"],
+                conn=mock_conn,
+            )
+        assert len(result["warnings"]) == 1
+        assert result["warnings"][0].startswith(
+            "background_factors value 'xenic' matched nothing"
+        )
+
+
 class TestDifferentialExpressionByOrtholog:
     """Tests for differential_expression_by_ortholog API function."""
 

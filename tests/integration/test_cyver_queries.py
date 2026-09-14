@@ -329,6 +329,8 @@ _BUILDERS: list[tuple[str, ...]] = [
     ("de_by_gene_summary_diagnostics_batch", build_differential_expression_by_gene_summary_diagnostics, {"locus_tags": _LOCUS}),
     ("de_by_gene_experiment_diagnostics", build_differential_expression_by_gene_experiment_diagnostics, {"experiment_ids": _EIDS}),
     ("de_by_gene", build_differential_expression_by_gene, {}),
+    ("de_by_gene_treatment_background", build_differential_expression_by_gene,
+     {"treatment_type": ["diel"], "background_factors": ["axenic"]}),
     # --- organism pre-validation ---
     ("resolve_organism_for_organism", build_resolve_organism_for_organism, {"organism": "Prochlorococcus"}),
     ("resolve_organism_for_locus_tags", build_resolve_organism_for_locus_tags, {"locus_tags": _LOCUS}),
@@ -339,6 +341,8 @@ _BUILDERS: list[tuple[str, ...]] = [
     ("de_by_ortholog_top_groups", build_differential_expression_by_ortholog_top_groups, {"group_ids": _GROUPS}),
     ("de_by_ortholog_top_experiments", build_differential_expression_by_ortholog_top_experiments, {"group_ids": _GROUPS}),
     ("de_by_ortholog_results", build_differential_expression_by_ortholog_results, {"group_ids": _GROUPS}),
+    ("de_by_ortholog_results_treatment_background", build_differential_expression_by_ortholog_results,
+     {"group_ids": _GROUPS, "treatment_type": ["diel"], "background_factors": ["axenic"]}),
     ("de_by_ortholog_membership_counts", build_differential_expression_by_ortholog_membership_counts, {"group_ids": _GROUPS}),
     # --- gene_response_profile ---
     ("gene_response_profile_envelope", build_gene_response_profile_envelope,

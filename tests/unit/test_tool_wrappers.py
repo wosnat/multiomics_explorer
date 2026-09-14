@@ -3275,6 +3275,23 @@ class TestDifferentialExpressionByGeneWrapper:
         assert rbs.not_significant == 12
 
     @pytest.mark.asyncio
+    async def test_treatment_background_filters_forwarded(
+        self, tool_fns, mock_ctx,
+    ):
+        """treatment_type / background_factors pass through to api (2b.6a)."""
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["differential_expression_by_gene"](
+                mock_ctx, organism="MED4",
+                treatment_type=["diel"], background_factors=["axenic"],
+            )
+        call_kwargs = mock_api.call_args.kwargs
+        assert call_kwargs["treatment_type"] == ["diel"]
+        assert call_kwargs["background_factors"] == ["axenic"]
+
+    @pytest.mark.asyncio
     async def test_experiments_with_timepoints(self, tool_fns, mock_ctx):
         """Experiment with nested timepoints rendered correctly."""
         with patch(
@@ -3877,6 +3894,23 @@ class TestDifferentialExpressionByOrthologWrapper:
         assert call_kwargs["verbose"] is True
         assert call_kwargs["limit"] == 10
         assert call_kwargs["summary"] is True
+
+    @pytest.mark.asyncio
+    async def test_treatment_background_filters_forwarded(
+        self, tool_fns, mock_ctx,
+    ):
+        """treatment_type / background_factors pass through to api (2b.6a)."""
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_ortholog",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["differential_expression_by_ortholog"](
+                mock_ctx, group_ids=["g1"],
+                treatment_type=["diel"], background_factors=["axenic"],
+            )
+        call_kwargs = mock_api.call_args.kwargs
+        assert call_kwargs["treatment_type"] == ["diel"]
+        assert call_kwargs["background_factors"] == ["axenic"]
 
     @pytest.mark.asyncio
     async def test_empty_results(self, tool_fns, mock_ctx):

@@ -5,8 +5,8 @@
 DE rows for ONE organism (inferred from locus_tags / experiment_ids) — one row per gene × experiment × timepoint, sorted by |log2FC|.
 
 Use for row-level fold changes and timepoint dynamics; a cross-experiment rollup is `gene_response_profile`, cross-organism `differential_expression_by_ortholog`.
-Filters: organism, locus_tags, experiment_ids, direction, significant_only, growth_phases.
-Returns: rows_by_status, by_table_scope, experiments, not_found, no_expression, filtered_out; one row = gene × experiment × timepoint.
+Filters: organism, locus_tags, experiment_ids, direction, significant_only, growth_phases, treatment_type, background_factors.
+Returns: rows_by_status, by_table_scope, experiments, not_found, no_expression, filtered_out.
 docs://tools/differential_expression_by_gene; summary=True first.
 
 ## Parameters
@@ -19,12 +19,14 @@ docs://tools/differential_expression_by_gene; summary=True first.
 | direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` is unchanged. |
 | significant_only | bool | False | If true, return only statistically significant results. |
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
+| treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
+| background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
-**Discovery:** use `list_organisms` for valid organism names.
+**Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 
 ## Example
 

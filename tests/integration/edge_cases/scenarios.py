@@ -154,6 +154,12 @@ def differential_expression_by_gene_scenarios():
         Scenario(
             "offset_past_end",
             dict(organism=fx.CONTROL_ORGANISM, offset=fx.OFFSET_PAST_END)),
+        # 2b.6a: unknown treatment_type -> zero rows + advisory warning,
+        # never a crash; a gene with edges lands in filtered_out.
+        Scenario(
+            "treatment_type_filter_empty",
+            dict(organism=fx.CONTROL_ORGANISM,
+                 treatment_type=["no_such_treatment"])),
     ]
 
 
@@ -568,6 +574,11 @@ def differential_expression_by_ortholog_scenarios():
         Scenario(
             "offset_past_end",
             dict(group_ids=[_GROUP_CORE], offset=fx.OFFSET_PAST_END)),
+        # 2b.6a: unknown treatment_type -> zero rows + advisory warning.
+        Scenario(
+            "treatment_type_filter_empty",
+            dict(group_ids=[_GROUP_CORE],
+                 treatment_type=["no_such_treatment"])),
     ]
 
 

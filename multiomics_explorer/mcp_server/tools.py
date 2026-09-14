@@ -4360,6 +4360,8 @@ def register_tools(mcp: FastMCP):
                         " results.",
         )] = False,
         growth_phases: GrowthPhasesParam = None,
+        treatment_type: TreatmentTypeParam = None,
+        background_factors: BackgroundFactorsParam = None,
         summary: SummaryParam = False,
         verbose: VerboseParam = False,
         limit: LimitParam = 5,
@@ -4368,8 +4370,8 @@ def register_tools(mcp: FastMCP):
         """DE rows for ONE organism (inferred from locus_tags / experiment_ids) — one row per gene × experiment × timepoint, sorted by |log2FC|.
 
         Use for row-level fold changes and timepoint dynamics; a cross-experiment rollup is `gene_response_profile`, cross-organism `differential_expression_by_ortholog`.
-        Filters: organism, locus_tags, experiment_ids, direction, significant_only, growth_phases.
-        Returns: rows_by_status, by_table_scope, experiments, not_found, no_expression, filtered_out; one row = gene × experiment × timepoint.
+        Filters: organism, locus_tags, experiment_ids, direction, significant_only, growth_phases, treatment_type, background_factors.
+        Returns: rows_by_status, by_table_scope, experiments, not_found, no_expression, filtered_out.
         docs://tools/differential_expression_by_gene; summary=True first.
         """
         await ctx.info(
@@ -4386,6 +4388,8 @@ def register_tools(mcp: FastMCP):
                 direction=direction,
                 significant_only=significant_only,
                 growth_phases=growth_phases,
+                treatment_type=treatment_type,
+                background_factors=background_factors,
                 summary=summary,
                 verbose=verbose,
                 limit=limit,
@@ -5027,6 +5031,8 @@ def register_tools(mcp: FastMCP):
             " rows.",
         )] = False,
         growth_phases: GrowthPhasesParam = None,
+        treatment_type: TreatmentTypeParam = None,
+        background_factors: BackgroundFactorsParam = None,
         summary: SummaryParam = False,
         verbose: VerboseParam = False,
         limit: LimitParam = 5,
@@ -5035,8 +5041,8 @@ def register_tools(mcp: FastMCP):
         """DE framed by ortholog group across organisms — one row per group × experiment × timepoint, values are member gene counts per status.
 
         Use to compare a group's response across strains; per-gene detail is `differential_expression_by_gene`, membership `genes_by_homolog_group`.
-        Filters: group_ids, organisms, experiment_ids, direction, significant_only, growth_phases.
-        Returns: by_organism, rows_by_status, by_table_scope, top_groups, a not_found / not_matched pair per input; one row = group × experiment × timepoint.
+        Filters: group_ids, organisms, experiment_ids, direction, significant_only, growth_phases, treatment_type, background_factors.
+        Returns: by_organism, rows_by_status, by_table_scope, top_groups, a not_found / not_matched pair per input.
         docs://tools/differential_expression_by_ortholog; summary=True first.
         """
         await ctx.info(
@@ -5052,6 +5058,8 @@ def register_tools(mcp: FastMCP):
                 direction=direction,
                 significant_only=significant_only,
                 growth_phases=growth_phases,
+                treatment_type=treatment_type,
+                background_factors=background_factors,
                 summary=summary,
                 verbose=verbose,
                 limit=limit,

@@ -5,8 +5,8 @@
 DE rows for ONE organism (inferred from locus_tags / experiment_ids) — one row per gene × experiment × timepoint, sorted by |log2FC|.
 
 Use for row-level fold changes and timepoint dynamics; a cross-experiment rollup is `gene_response_profile`, cross-organism `differential_expression_by_ortholog`.
-Filters: organism, locus_tags, experiment_ids, direction, significant_only, growth_phases.
-Returns: rows_by_status, by_table_scope, experiments, not_found, no_expression, filtered_out; one row = gene × experiment × timepoint.
+Filters: organism, locus_tags, experiment_ids, direction, significant_only, growth_phases, treatment_type, background_factors.
+Returns: rows_by_status, by_table_scope, experiments, not_found, no_expression, filtered_out.
 docs://tools/differential_expression_by_gene; summary=True first.
 
 ## Parameters
@@ -19,12 +19,14 @@ docs://tools/differential_expression_by_gene; summary=True first.
 | direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` is unchanged. |
 | significant_only | bool | False | If true, return only statistically significant results. |
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
+| treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
+| background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
-**Discovery:** use `list_organisms` for valid organism names.
+**Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 
 ## Response format
 
@@ -443,17 +445,17 @@ differential_expression_by_gene(organism='MED4', summary=True)  # organism= is a
 
 - `direction` and `significant_only` interplay: when direction is 'up' / 'down' / 'both' it filters expression_status directly and `significant_only` is ignored (direction='up', significant_only=False still returns only significant_up rows). `significant_only=True` only matters with direction=None, where it drops not_significant rows — i.e. it equals direction='both'. Pick whichever spelling is clearer at the call site; default direction=None, significant_only=False returns everything.
 
-- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums. An unknown growth_phases value (e.g. 'log' instead of 'exponential') now reports in the envelope `warnings` (e.g. "growth_phases value 'log' matched nothing — valid values: ... (list_filter_values(filter_type='growth_phase'))") — check `warnings` before trusting an empty or reduced result. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. Here they surface as the growth_phases filter and the rows_by_treatment_type / rows_by_background_factors / rows_by_growth_phase summary keys.
+- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums. An unknown growth_phases value (e.g. 'log' instead of 'exponential') now reports in the envelope `warnings` (e.g. "growth_phases value 'log' matched nothing — valid values: ... (list_filter_values(filter_type='growth_phase'))") — check `warnings` before trusting an empty or reduced result. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. Here they surface as the treatment_type / background_factors / growth_phases filters and the rows_by_treatment_type / rows_by_background_factors / rows_by_growth_phase summary keys.
 
 ```mistake
 Assuming a growth_phases typo silently returns 0 rows with no signal
 ```
 
 ```correction
-A growth_phases value not in the live vocabulary lands in the envelope `warnings` (one entry per bad value), and any gene whose expression edges exist but fail to match direction / significant_only / growth_phases lands in `filtered_out` — never in `no_expression`, which is reserved for a gene with NO Changes_expression_of edge at all in the organism.
+A growth_phases / treatment_type / background_factors value not in the live vocabulary lands in the envelope `warnings` (one entry per bad value), and any gene whose expression edges exist but fail to match direction / significant_only / growth_phases / treatment_type / background_factors lands in `filtered_out` — never in `no_expression`, which is reserved for a gene with NO Changes_expression_of edge at all in the organism.
 ```
 
-- `no_expression` is this tool's name for the not_matched bucket — a gene exists but has NO Changes_expression_of edge at all in the organism; `filtered_out` is the DIFFERENT bucket for a gene that DOES have edges but none survive direction / significant_only / growth_phases (including a vocabulary typo); `not_found` = locus_tag absent; experiment ids get their own `not_found_experiments` / `not_matched_experiments` pair. See docs://guide/conventions for the shared not_found / not_matched semantics.
+- `no_expression` is this tool's name for the not_matched bucket — a gene exists but has NO Changes_expression_of edge at all in the organism; `filtered_out` is the DIFFERENT bucket for a gene that DOES have edges but none survive direction / significant_only / growth_phases / treatment_type / background_factors (including a vocabulary typo); `not_found` = locus_tag absent; experiment ids get their own `not_found_experiments` / `not_matched_experiments` pair. See docs://guide/conventions for the shared not_found / not_matched semantics.
 
 ```mistake
 Treating `rank_up` / `rank_down` as genome-wide directional ranks (e.g. as the ranked list for a GSEA-style test or a genome-wide null)

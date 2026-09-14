@@ -29,6 +29,7 @@ version becomes `0.1.0-alpha.5` and the KG's `mcp_min_version` must be
 coordinated to `0.1.0a5` ahead of the KG release.
 
 ### Added
+- `treatment_type` / `background_factors` filters on both DE tools (`differential_expression_by_gene`, `differential_expression_by_ortholog`) — same array-containment, case-insensitive semantics as `list_experiments`; genes whose edges all fail the filters land in `filtered_out` (by-gene), unknown values add envelope `warnings` on both tools (backlog 2b.6a). `differential_expression_by_ortholog` now also warns on unknown `growth_phases` values (previously `warnings` was always `[]`).
 - `docs://index` — directory of every `docs://` page with per-entry approximate token size and read-when guidance, registered first so it is the natural discovery entry point.
 - `docs://tools/{name}/full` — full tool pages (every example, verbose fields, complete chaining/mistakes lists), split out from the now-brief default `docs://tools/{name}` page.
 - `docs://analysis/expression` — DE-tooling reference page (`differential_expression_by_gene` / `differential_expression_by_ortholog` / `gene_response_profile`, plus the `response_matrix` / `gene_set_compare` Python wrappers), moved out of `docs://guide/python_api` (closes backlog 3.14).
