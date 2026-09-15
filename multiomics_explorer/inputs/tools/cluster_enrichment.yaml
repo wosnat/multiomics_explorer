@@ -18,10 +18,7 @@ examples:
 
   - title: "InterPro enrichment requires interpro_type"
     call: cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="interpro", interpro_type="HOMOLOGOUS_SUPERFAMILY", level=0)
-    illustrative: true
-    note: "Same requirement as pathway_enrichment: ontology='interpro' without interpro_type raises (InterPro types size too differently to pool). Hand-written response — this call currently fails on the MCP surface (non-finite floats in the analysis's cluster description properties; a tool fix is pending)."
-    response: |
-      {"trust_axes": {"interpro": ["sources", "evidence"]}, "interpro_type": "HOMOLOGOUS_SUPERFAMILY", "...": "..."}
+    note: "Same requirement as pathway_enrichment: ontology='interpro' without interpro_type raises (InterPro types size too differently to pool)."
 
   - title: "MEROPS enrichment restricted to peptidase calls (call_class)"
     call: cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="merops", call_class=["peptidase"], level=0)

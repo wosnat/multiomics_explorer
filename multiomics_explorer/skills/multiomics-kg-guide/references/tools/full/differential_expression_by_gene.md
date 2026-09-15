@@ -13,7 +13,7 @@ docs://tools/differential_expression_by_gene; summary=True first.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
 | locus_tags | list[string] \| None | None | Gene locus tags. E.g. ['PMM0001', 'PMM0845']. Get these from resolve_gene / gene_overview. |
 | experiment_ids | list[string] \| None | None | Experiment IDs to restrict to. Get these from list_experiments. |
 | direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` is unchanged. |
@@ -52,10 +52,10 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 - **experiments_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **not_found** (list[string]): Input locus_tags not found in KG
 - **no_expression** (list[string]): Locus tags in KG with NO Changes_expression_of edge at all in the organism
-- **filtered_out** (list[string]): Locus tags that DO have expression edges but none survive the active direction / significant_only / growth_phases filters — e.g. a growth_phases vocabulary typo. Never confuse with no_expression.
-- **warnings** (list[string]): One entry per growth_phases value not found in the live vocabulary (see list_filter_values(filter_type='growth_phase')), plus one per not_found locus_tag differing only by case from a real one (locus_tags are never case-normalised). Empty when clean.
+- **filtered_out** (list[string]): Locus tags that DO have expression edges but none survive the active direction / significant_only / growth_phases / treatment_type / background_factors filters — e.g. a growth_phases vocabulary typo. Never confuse with no_expression.
+- **warnings** (list[string]): One entry per growth_phases / treatment_type / background_factors value not found in the live vocabulary (see list_filter_values), plus one per not_found locus_tag differing only by case from a real one (locus_tags are never case-normalised). Empty when clean.
 - **not_found_experiments** (list[string]): Input experiment_ids not found in KG (empty unless experiment_ids was provided)
-- **not_matched_experiments** (list[string]): experiment_ids in KG but with no Changes_expression_of edges satisfying the active filters (e.g. vesicle proteomics / metabolomics experiments that never wire up DE edges; or experiments where no row passes direction / significant_only / growth_phases). Empty unless experiment_ids was provided.
+- **not_matched_experiments** (list[string]): experiment_ids in KG but with no Changes_expression_of edges satisfying the active filters (e.g. vesicle proteomics / metabolomics experiments that never wire up DE edges; or experiments where no row passes direction / significant_only / growth_phases / treatment_type / background_factors). Empty unless experiment_ids was provided.
 - **returned** (int): Rows in results (e.g. 5)
 - **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned

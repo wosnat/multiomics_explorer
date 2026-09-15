@@ -666,7 +666,7 @@ examples:
 
   - title: Filter out uninformative terms (KOs named "uncharacterized protein")
     call: gene_ontology_terms(locus_tags=["PMM0001"], organism="Prochlorococcus MED4", ontology="kegg", informative_only=True)
-    note: "Each result row carries `is_informative: bool` (always populated; coalesce of the sparse term-side `is_uninformative='true'` flag). Genome-wide effect on MED4 KEGG leaf rows: 1124 → 1094 with informative_only=True (30 rows, all KO-level — KEGG pathway maps are never flagged). PMM0001's single KO is informative, so its row count is unchanged."
+    note: "Each result row carries `is_informative: bool` (always populated; coalesce of the sparse term-side `is_uninformative='true'` flag). Genome-wide effect on MED4 KEGG leaf rows: 1124 → 1094 with informative_only=True (30 rows, all KO-level — leaf mode never returns pathway-map rows; the flagged overview maps matter only in rollup / level queries). PMM0001's single KO is informative, so its row count is unchanged."
     response: |
       {
         "total_matching": 1,
@@ -841,7 +841,7 @@ mistakes:
   - "For brite: leaf annotations are KO-level terms (same leaf as kegg). Use ontology='brite' to filter; the returned term_ids are KO IDs shared with the kegg ontology."
   - "Use `tree` to scope BRITE rollup to a single tree (e.g. 'transporters'). Without it, rollup mixes all BRITE trees."
   - "Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `kegg`, `ec`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`."
-  - "`ontology` is now `str | list[str] | None` (was single-value only). With a list: a filter carried by all requested ontologies applies normally; carried by some but not all applies to those and drops the rest into `skipped_ontologies` with a warning; carried by none raises `ValueError`. An unknown ontology name always raises."
+  - "`ontology` accepts `str | list[str] | None`. With a list: a filter carried by all requested ontologies applies normally; carried by some but not all applies to those and drops the rest into `skipped_ontologies` with a warning; carried by none raises `ValueError`. An unknown ontology name always raises."
   - "`include_superseded=False` (default) applies TCDB's `attachment_depth='most_specific'` predicate in leaf mode — ancestor rows made redundant by a deeper attachment on the same gene are dropped. `include_superseded=True` adds them back labelled `attachment_depth='superseded'`; superseded means less specific, not incorrect. `most_specific` is not unique per gene — a gene attached to several sibling subfamilies keeps one row per subfamily (PMM0392: 7). `attachment_depth` itself is verbose-only."
   - "Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`) mirror `genes_by_ontology` exactly — same defaults (`None`, never filter), same per-ontology axis gating, same `ValueError` on an unsupported axis. See `docs://analysis/annotation_evidence` for the per-ontology axis table."
   - "Compact rows carry `evidence` on the 14 functional-edge ontologies (null on PSORTb/SignalP); `interpro_type` (interpro rows) and `call_class` (merops rows) are compact always. `sources`, `evidence_score`, `tier`, `attachment_depth` (tcdb) and native detail (`confidence_score`, `libraries`, `evalue`, `signal_peptide_*`, `localization_score`, ...) are verbose-only."

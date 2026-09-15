@@ -34,8 +34,10 @@ Facts with the *same meaning* wherever they occur:
 - `evidence_score` — a `[0, 1]` composite; TCDB, MEROPS, GO×3, EC, Pfam, CAZy.
 - `tier` — 1–3, diamond-truncation depth of the ortholog call; TCDB / MEROPS.
 
-Where they live: `evidence` is compact on every row of the 14 functional-edge
-ontologies (null on PSORTb / SignalP, which carry no trust axes). `sources`,
+Where they live: `evidence` is compact on every row of the 15 functional-edge
+ontologies — all but PSORTb / SignalP, which carry no trust axes (brite
+shares kegg's `Gene_has_kegg_ko` edge, so 14 distinct edge types serve 15
+ontologies). `sources`,
 `evidence_score`, `tier` are verbose. All four are filterable (`sources=`,
 `evidence=`, `max_tier=`, `min_evidence_score=`), default `None` — a call with
 no trust filters returns exactly what it always did.
@@ -76,7 +78,7 @@ confidence:
 Why one compact column and not four: rollups already carry the distribution
 (`by_evidence`, `by_tier`, `by_sources`), so the per-row payload only needs
 the one axis an agent can read on **every** functional-edge row —
-`evidence`. `evidence_score` is null on most of the 14 (only TCDB, MEROPS,
+`evidence`. `evidence_score` is null on most of the 15 (only TCDB, MEROPS,
 GO×3, EC, Pfam, CAZy carry it), so it moved to verbose and kept its role as
 the within-ontology sort key and the *only* numeric cutoff in the whole
 surface (`min_evidence_score`).

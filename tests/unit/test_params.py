@@ -26,8 +26,15 @@ from tests.unit.test_tool_wrappers import _all_tool_input_schemas  # noqa: E402
 # A handful of params (organism, limit, metabolite_ids, publication_dois)
 # have a required (non-Optional) variant on some tools and an Optional one
 # on others at baseline — both variants must carry the identical text.
+# `organism` is the sanctioned exception (docs-review 2026-09-15): three
+# matching contracts exist (widening word-match / single-organism raise /
+# substring CONTAINS on the assay drill-downs), so its variants carry
+# three texts — every tool must still use one of them verbatim.
 _SHARED = {
-    "organism": ["OrganismParam", "OrganismRequiredParam"],
+    "organism": [
+        "OrganismParam", "OrganismSingleParam",
+        "OrganismRequiredParam", "OrganismContainsParam",
+    ],
     "limit": ["LimitParam", "LimitOptionalParam"],
     "offset": ["OffsetParam"],
     "summary": ["SummaryParam"], "verbose": ["VerboseParam"],
@@ -47,10 +54,14 @@ def test_shared_params_have_one_description_each():
     schemas = _all_tool_input_schemas()
     for pname, tnames in _SHARED.items():
         descs = {params.__dict__[t].__metadata__[0].description for t in tnames}
-        assert len(descs) == 1, f"{pname}: variant types disagree on text: {descs}"
-        expected = descs.pop()
+        if pname == "organism":
+            # three matching contracts; OrganismSingleParam and
+            # OrganismRequiredParam share the single-organism text.
+            assert len(descs) == 3, f"{pname}: expected 3 contract texts, got: {descs}"
+        else:
+            assert len(descs) == 1, f"{pname}: variant types disagree on text: {descs}"
         texts = {n: s["properties"][pname].get("description") for n, s in schemas.items() if pname in s["properties"]}
-        drift = {n: t for n, t in texts.items() if t != expected}
+        drift = {n: t for n, t in texts.items() if t not in descs}
         assert not drift, f"{pname}: {list(drift)}"
 
 

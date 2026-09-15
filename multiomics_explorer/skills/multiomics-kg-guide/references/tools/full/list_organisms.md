@@ -1219,7 +1219,7 @@ list_organisms → list_experiments(organism=...) to scope experiments to the ch
 
 - gene_count and publication_count are counts of data in the KG, not biological totals.
 
-- Organisms with gene_count=0 are parent/umbrella taxonomy nodes (e.g. genus-level 'Alteromonas').
+- Organisms with gene_count=0 are the organism_type='treatment' taxa (non-genomic coculture partners / phage; some genus-level like 'Alteromonas', most strain-level).
 
 - reference_database and reference_proteome are sparse — only present on reference_proteome_match organisms, absent from others.
 

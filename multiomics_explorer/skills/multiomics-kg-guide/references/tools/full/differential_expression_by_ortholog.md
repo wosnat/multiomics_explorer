@@ -136,7 +136,7 @@ differential_expression_by_ortholog → genes_by_homolog_group(organisms=[...]) 
 
 ## Common mistakes
 
-- group_ids must be full IDs with prefix (e.g. 'cyanorak:CK_00000570')
+- Bare group ids ('CK_00000570', 'COG0592@2') are accepted and coerced to canonical — check `resolved_aliases` for the mapping; prefer the prefixed form ('cyanorak:CK_00000570') to skip coercion.
 
 - organisms is a list, not a string — use ['MED4'] not 'MED4'
 
@@ -146,7 +146,7 @@ differential_expression_by_ortholog → genes_by_homolog_group(organisms=[...]) 
 
 - Diagnostics are suffixed flat lists: `not_found_groups` / `not_matched_groups`, `not_found_organisms` / `not_matched_organisms`, `not_found_experiments` / `not_matched_experiments`. See docs://guide/conventions for the shared not_found / not_matched semantics.
 
-- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (e.g. 'nitrogen_stress' instead of 'nitrogen') returns 0 rows, never an error. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical.
+- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (e.g. 'nitrogen_stress' instead of 'nitrogen') returns 0 rows and reports in the envelope `warnings` (naming the valid set) — check `warnings` before trusting an empty result. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical.
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 

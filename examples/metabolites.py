@@ -21,7 +21,9 @@ Scenarios:
   7. measurement         — P-stress metabolomics via native MetaboliteAssay tools (measurement)
 
 Notes:
-- Metabolite IDs use the prefixed form `kegg.compound:C00064`, not bare `C00064`.
+- Metabolite IDs: bare / xref forms (`C00064`, `CHEBI:...`, `HMDB...`, `MNXM...`)
+  are coerced to canonical `kegg.compound:C00064` and reported in
+  `resolved_aliases`; the canonical prefixed form skips coercion.
 - evidence_sources filter is needed to narrow at-scale; per-row schema is union
   (metabolism rows have reaction_id/ec_numbers; transport rows have
   substrate_depth/tcdb_evidence_score/tcdb_family_id; cross-arm fields default to
@@ -748,7 +750,7 @@ def scenario_measurement() -> None:
     print("    detection_status='not_detected' / flag_value=False rows are biology,")
     print("    kept by default; missing rows are unmeasured.")
     print("  - Targeted panel — absence in measurement is not absence in cell.")
-    print("  - 149 of 3230 metabolites measured; 3 papers; 14 assays (12 numeric + 2 boolean).")
+    print("  - 149 of ~3.3k metabolites measured; 3 papers; 14 assays (12 numeric + 2 boolean).")
 
 
 SCENARIOS: dict[str, Callable[[], None]] = {

@@ -1363,7 +1363,7 @@ def render_ontology_index(inputs: dict) -> str:
     L.append("")
     L.append(
         "`Levels` is the observed `level` range (0 = root / broadest); "
-        "`Hierarchy` is tree, DAG (GO — `level` is a min-path proxy) or flat; "
+        "`Hierarchy` is tree (kegg: DAG below pathway level), DAG (GO — `level` is a min-path proxy) or flat; "
         "`Trust` says whether the gene edge carries comparable trust axes "
         "(`evidence` / `sources`, filterable on `genes_by_ontology` and friends)."
     )

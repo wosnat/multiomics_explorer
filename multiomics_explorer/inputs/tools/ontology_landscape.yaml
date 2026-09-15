@@ -1133,7 +1133,7 @@ chaining:
 
 mistakes:
   - "Don't pick a level by term-size stats alone -- always check genome_coverage. An ontology may have appealing median term size at a level that covers only 18% of the genome."
-  - "Top-ranked flat ontologies (cog_category, ncbifam) are valid enrichment surfaces but offer no level choice. For hierarchical drill-down, filter results to rows where n_levels_in_ontology > 1. Rows carry `level` only — the meaning of each level (`tc_class`, `tigr_mainrole`, ...) is documented per ontology at docs://ontologies/{key}; there is no `level_kind` column here."
+  - "Flat ontologies (cog_category, ncbifam) can rank well and are valid enrichment surfaces but offer no level choice. For hierarchical drill-down, filter results to rows where n_levels_in_ontology > 1. Rows carry `level` only — the meaning of each level (`tc_class`, `tigr_mainrole`, ...) is documented per ontology at docs://ontologies/{key}; there is no `level_kind` column here."
   - "KEGG has ~40% orphan KOs lacking pathway membership. If L3 coverage is substantially higher than L0-L2 coverage, the gap is structural -- those genes have KO-level annotations only."
   - "For GO BP, best_effort_share is typically 30-80% at useful levels (L3-L5). This is normal GO-DAG geometry (min-path != max-path), not a data quality issue."
   - "Stats reflect only terms with min_gene_set_size <= genes <= max_gene_set_size (default 5-500). If you pass min_gene_set_size=1, coverage and term counts will be higher but include terms too small or large for meaningful enrichment."

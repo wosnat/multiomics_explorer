@@ -46,7 +46,7 @@ Result row: `group_id, consensus_gene_name, consensus_product, experiment_id, tr
 
 ## Common mistakes
 
-- group_ids must be full IDs with prefix (e.g. 'cyanorak:CK_00000570')
+- Bare group ids ('CK_00000570', 'COG0592@2') are accepted and coerced to canonical — check `resolved_aliases` for the mapping; prefer the prefixed form ('cyanorak:CK_00000570') to skip coercion.
 
 - organisms is a list, not a string — use ['MED4'] not 'MED4'
 

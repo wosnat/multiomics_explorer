@@ -15,7 +15,7 @@ docs://tools/genes_by_numeric_metric; summary=True first.
 |---|---|---|---|
 | derived_metric_ids | list[string] \| None | None | DerivedMetric node IDs to drill into. Use when the same `metric_type` appears across publications / organisms and you need to pin one. Discover IDs via `list_derived_metrics`. Mutually exclusive with `metric_types`. An id that exists as a different kind (boolean / categorical) moves to `not_matched_ids` with a `warnings` entry naming the sibling tool. |
 | metric_types | list[string] \| None | None | Metric-type tags (e.g. ['damping_ratio', 'diel_amplitude_protein_log2']). Unions every DM carrying that tag, then narrows by scoping filters. Same tag can span organisms / publications — pin one specific DM via `derived_metric_ids` instead. Mutually exclusive with `derived_metric_ids`. |
-| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
 | locus_tags | list[string] \| None | None | Restrict drill-down to a specific gene set (e.g. DE hits from `differential_expression_by_gene`). Filter on `g.locus_tag IN $locus_tags` post-MATCH. Genes with no edge for the selected DM produce no row (silent — surfaced via `total_genes` shortfall). |
 | experiment_ids | list[string] \| None | None | Scope to DMs from one or more experiments. |
 | publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
@@ -522,7 +522,7 @@ genes_by_numeric_metric → gene_overview(locus_tags=results)
 
 - `by_metric` is per-DM, not per-tag. Each `by_metric` entry is one DerivedMetric (uniquely identified by `derived_metric_id`). The same `metric_type` tag can span organisms / publications. Use the per-DM rollup to disambiguate.
 
-- Wrong-`value_kind` IDs land in `not_found_ids`, not a typed error. Passing a `derived_metric_ids` of a boolean or categorical DM produces `not_found_ids=[that_id]` rather than a `value_kind` mismatch error — the diagnostics query hardcodes `value_kind='numeric'`, so non-numeric DMs simply don't appear in the result. Inspect via `list_derived_metrics(derived_metric_ids=[...])` to see the DM's actual `value_kind` and pivot to `genes_by_boolean_metric` or `genes_by_categorical_metric`.
+- Wrong-`value_kind` IDs land in `not_matched_ids`, not a typed error. Passing a `derived_metric_ids` of a boolean or categorical DM produces `not_matched_ids=[that_id]` plus a `warnings` entry naming the sibling tool ("<id> exists as value_kind=boolean — use genes_by_boolean_metric"), rather than a `value_kind` mismatch error. Read `warnings` and pivot to `genes_by_boolean_metric` or `genes_by_categorical_metric`.
 
 - Filtered slice vs full DM. `by_metric[i].value_*` describes rows that survived your filters. `by_metric[i].dm_value_*` describes the full DM (precomputed). They're different — your top-decile slice is intentionally narrower than the full DM range.
 

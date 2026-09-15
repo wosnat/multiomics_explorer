@@ -63,7 +63,7 @@ Plus five orthogonal helpers:
 ### "What do experiments in this KG measure?"
 1. `list_experiments(summary=True)` — orientation breakdowns by organism / treatment / omics / table_scope.
 2. Filter to a slice (`organism=`, `treatment_type=`, `compartment=`, `publication_dois=`, `experiment_ids=`; values are closed vocabularies — `list_filter_values`), then drop `summary=True` for individual experiments.
-3. Drill into expression: `differential_expression_by_gene(experiment_ids=[...], organism=...)`.
+3. Drill into expression: `differential_expression_by_gene(experiment_ids=[...], organism=...)` — or pass `treatment_type=` / `background_factors=` straight to the DE tools.
 
 ### "Compare gene X across Prochlorococcus and Alteromonas."
 1. `gene_homologs(locus_tags=["X"])` to find ortholog group memberships.

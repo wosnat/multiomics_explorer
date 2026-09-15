@@ -341,7 +341,7 @@ Treating gene_neighbors as a co-expression / operon-membership call.
 It reports positional adjacency only — genes next to the anchor on the same contig. Co-regulation lives in the expression / DerivedMetric tools; an operon is a hypothesis you confirm by layering DE direction + tight bp_gap + same_strand, not an output of this tool.
 ```
 
-- Neighbors are scoped to the same contig and organism. Genomes are often fragmented (e.g. Alteromonas macleodii HOT1A3 has hundreds of contigs), so an anchor near a contig end returns fewer neighbors on that side — and a gene alone on its contig returns none (still reported in `anchors`).
+- Neighbors are scoped to the same contig and organism. Genomes are often fragmented (e.g. the Alteromonas MarRef v6 assembly has 573 contigs; HOT1A3 by contrast is closed — chromosome + plasmid), so an anchor near a contig end returns fewer neighbors on that side — and a gene alone on its contig returns none (still reported in `anchors`).
 
 - rank_offset gives direction (signed); bp_gap is always unsigned (use rank_offset's sign for upstream/downstream).
 

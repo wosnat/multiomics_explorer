@@ -60,7 +60,9 @@ them (MED4: 1,758 genes at level 1 vs 1,766 at level 0). `gene_count` /
 the union over its children and its `direct_gene_count` is 0; do not mix
 levels in one ORA without collapsing them first. `ncbifam_family_count`
 is the number of NCBIfam families bridged to the role via
-`Ncbifam_family_has_tigr_role`, subtree-summed on mainroles.
+`Ncbifam_family_has_tigr_role`, subtree-inclusive on mainroles (the
+distinct families across the subtree — children's counts need not add
+up to the parent's).
 
 ## Graph shape (from the registry)
 

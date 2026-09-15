@@ -52,11 +52,24 @@ OntologyKey = Literal[
 # Cross-cutting filters / paging / mode switches.
 # ---------------------------------------------------------------------------
 
-_ORGANISM_DESC = "Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms."
+# Three organism-matching contracts (docs-review 2026-09-15): filter-style
+# tools word-match and WIDEN on a genus word; single-organism tools resolve
+# and RAISE on an ambiguous match; the metabolomics assay drill-downs use a
+# plain substring CONTAINS. The description must state the right one — the
+# old shared "Ambiguous match raises" text was false on the widening tools.
+_ORGANISM_WIDENING_DESC = "Organism: case-insensitive word match on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms."
 
-OrganismParam = Annotated[str | None, Field(description=_ORGANISM_DESC)]
+_ORGANISM_SINGLE_DESC = "Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms."
 
-OrganismRequiredParam = Annotated[str, Field(description=_ORGANISM_DESC)]
+OrganismParam = Annotated[str | None, Field(description=_ORGANISM_WIDENING_DESC)]
+
+OrganismSingleParam = Annotated[str | None, Field(description=_ORGANISM_SINGLE_DESC)]
+
+OrganismRequiredParam = Annotated[str, Field(description=_ORGANISM_SINGLE_DESC)]
+
+OrganismContainsParam = Annotated[str | None, Field(
+    description="Organism: case-insensitive substring match on the organism name ('MED4'); a genus word matches every strain. See list_organisms.",
+)]
 
 OrganismsParam = Annotated[list[str] | None, Field(
     description="Organisms, each word-matched as `organism`. Omit for all.",
@@ -136,11 +149,11 @@ InformativeOnlyParam = Annotated[bool, Field(
 CallClass = Literal["peptidase", "inhibitor", "nonpeptidase_homolog"]
 
 SourcesParam = Annotated[list[str] | None, Field(
-    description="Keep rows whose edge sources[] contains any of these values. Valid on the 14 functional-edge ontologies (not PSORTb/SignalP). See list_filter_values('sources').",
+    description="Keep rows whose edge sources[] contains any of these values. Valid on the 15 functional-edge ontologies (all but PSORTb/SignalP; brite shares kegg's edge). See list_filter_values('sources').",
 )]
 
 EvidenceParam = Annotated[list[str] | None, Field(
-    description="Keep rows whose compact evidence-ladder value is in this list. Valid on the 14 functional-edge ontologies. See docs://analysis/annotation_evidence.",
+    description="Keep rows whose compact evidence-ladder value is in this list. Valid on the 15 functional-edge ontologies (all but PSORTb/SignalP; brite shares kegg's edge). See docs://analysis/annotation_evidence.",
 )]
 
 MaxTierParam = Annotated[int | None, Field(

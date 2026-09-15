@@ -867,7 +867,7 @@ examples:
 
   - title: Filter out uninformative terms (term-side, opt-in)
     call: search_ontology(search_text="transport", ontology=["kegg"], informative_only=True)
-    note: "informative_only=True drops terms flagged is_uninformative='true' (KEGG KOs named 'uncharacterized protein' — KO level only, pathway maps are never flagged; a few Cyanorak / TIGR / GO / COG roots; broad InterPro superfamilies and NCBIfam families). Each row carries is_informative. Use it when seeding term IDs into genes_by_ontology for enrichment. KO ids are `kegg.orthology:K…`."
+    note: "informative_only=True drops terms flagged is_uninformative='true' (KEGG KO catch-alls plus the global / overview pathway maps — `ko01100` and kin; category / subcategory nodes are never flagged; a few Cyanorak / TIGR / GO / COG roots; broad InterPro superfamilies and NCBIfam families). Each row carries is_informative. Use it when seeding term IDs into genes_by_ontology for enrichment. KO ids are `kegg.orthology:K…`."
     response: |
       {
         "mode": "search",

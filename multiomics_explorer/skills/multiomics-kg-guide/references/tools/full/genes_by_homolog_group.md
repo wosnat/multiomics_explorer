@@ -192,7 +192,7 @@ gene_homologs → genes_by_homolog_group
 
 ## Common mistakes
 
-- group_ids must be full IDs with prefix (e.g. 'cyanorak:CK_00000570', not 'CK_00000570')
+- Bare group ids ('CK_00000570', 'COG0592@2') are accepted and coerced to canonical — check `resolved_aliases` for the mapping; prefer the prefixed form ('cyanorak:CK_00000570') to skip coercion.
 
 - A gene in multiple input groups appears once per group — rows are gene × group, not distinct genes. Use total_genes for the deduplicated count.
 

@@ -22,6 +22,6 @@ One page per supported ontology — what it is, how genes get annotated, identif
 | `ncbifam` | NCBIfam families | `NcbifamFamily` | 0 | flat | yes | sources, evidence | interpro (membership), tigr_role (router) | NCBIfam — NCBI's curated protein-family HMM collection, which absorbed and continues TIGRFAMs. |
 | `merops` | MEROPS peptidase families | `MeropsFamily` | 0–2 | tree | yes | sources, evidence, evidence_score, tier | pfam (composition) | MEROPS — the peptidase (protease) and peptidase-inhibitor database. |
 
-`Levels` is the observed `level` range (0 = root / broadest); `Hierarchy` is tree, DAG (GO — `level` is a min-path proxy) or flat; `Trust` says whether the gene edge carries comparable trust axes (`evidence` / `sources`, filterable on `genes_by_ontology` and friends).
+`Levels` is the observed `level` range (0 = root / broadest); `Hierarchy` is tree (kegg: DAG below pathway level), DAG (GO — `level` is a min-path proxy) or flat; `Trust` says whether the gene edge carries comparable trust axes (`evidence` / `sources`, filterable on `genes_by_ontology` and friends).
 
 Cross-cutting semantics live in `docs://analysis/annotation_evidence` (trust ladder, rank-vs-filter, bridges) and `docs://guide/conventions` (`level` convention, browse vs search, lockstep paging, strip rule).

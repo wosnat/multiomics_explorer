@@ -47,8 +47,10 @@ from multiomics_explorer.mcp_server.params import (  # noqa: E402
     OffsetParam,
     OmicsTypeParam,
     OntologyKey,
+    OrganismContainsParam,
     OrganismParam,
     OrganismRequiredParam,
+    OrganismSingleParam,
     OrganismsParam,
     PublicationDoisParam,
     PublicationDoisRequiredParam,
@@ -2811,7 +2813,7 @@ def register_tools(mcp: FastMCP):
                         "when `organism` is set). Narrows browse mode.",
             ge=0,
         )] = None,
-        organism: OrganismParam = None,
+        organism: OrganismSingleParam = None,
     ) -> SearchOntologyResponse:
         """Search (Lucene over term names) or browse (omit search_text: terms by gene_count) across one or many of the 17 ontologies.
 
@@ -2999,7 +3001,7 @@ def register_tools(mcp: FastMCP):
                         "'kegg.pathway:ko00010'). Rows return in input order. Bare "
                         "ids accepted (e.g. 'ko00910', 'GO:0006979') — see `resolved_aliases`.",
         )],
-        organism: OrganismParam = None,
+        organism: OrganismSingleParam = None,
         link_kinds: Annotated[list[Literal["composition", "membership", "router"]] | None, Field(
             description="Keep links_out of these kinds: 'composition' = built from "
                         "target (tcdb/merops -> pfam); 'membership' = belongs to "
@@ -4299,14 +4301,16 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="Locus tags that DO have expression edges but none"
             " survive the active direction / significant_only /"
-            " growth_phases filters — e.g. a growth_phases vocabulary typo."
+            " growth_phases / treatment_type / background_factors filters"
+            " — e.g. a growth_phases vocabulary typo."
             " Never confuse with no_expression.",
         )
         warnings: list[str] = Field(
             default_factory=list,
-            description="One entry per growth_phases value not found in the"
-            " live vocabulary (see list_filter_values(filter_type="
-            "'growth_phase')), plus one per not_found locus_tag differing"
+            description="One entry per growth_phases / treatment_type /"
+            " background_factors value not found in the"
+            " live vocabulary (see list_filter_values), plus one per"
+            " not_found locus_tag differing"
             " only by case from a real one (locus_tags are never"
             " case-normalised). Empty when clean.",
         )
@@ -4321,7 +4325,8 @@ def register_tools(mcp: FastMCP):
             " Changes_expression_of edges satisfying the active filters"
             " (e.g. vesicle proteomics / metabolomics experiments that"
             " never wire up DE edges; or experiments where no row passes"
-            " direction / significant_only / growth_phases)."
+            " direction / significant_only / growth_phases /"
+            " treatment_type / background_factors)."
             " Empty unless experiment_ids was provided.",
         )
         returned: int = Field(
@@ -4339,7 +4344,7 @@ def register_tools(mcp: FastMCP):
     )
     async def differential_expression_by_gene(
         ctx: Context,
-        organism: OrganismParam = None,
+        organism: OrganismSingleParam = None,
         locus_tags: Annotated[list[str] | None, Field(
             description="Gene locus tags. E.g. ['PMM0001', 'PMM0845']. "
                         "Get these from resolve_gene / gene_overview.",
@@ -5176,7 +5181,7 @@ def register_tools(mcp: FastMCP):
     async def gene_response_profile(
         ctx: Context,
         locus_tags: Annotated[list[str], Field(description="Gene locus tags. E.g. ['PMM0370', 'PMM0920']. Get these from resolve_gene / gene_overview.")],
-        organism: OrganismParam = None,
+        organism: OrganismSingleParam = None,
         treatment_type: TreatmentTypeParam = None,
         background_factors: BackgroundFactorsParam = None,
         experiment_ids: Annotated[list[str] | None, Field(description="Restrict to specific experiments. Get these from list_experiments.")] = None,
@@ -6031,7 +6036,7 @@ def register_tools(mcp: FastMCP):
         locus_tags: Annotated[list[str], Field(
             description="Gene locus tags (e.g. ['PMM0370', 'PMM0920']).",
         )],
-        organism: OrganismParam = None,
+        organism: OrganismSingleParam = None,
         cluster_type: Annotated[str | None, Field(
             description="Filter by cluster type. Live vocabulary: "
                         "list_filter_values(filter_type='cluster_type'). Offline examples: "
@@ -6119,7 +6124,7 @@ def register_tools(mcp: FastMCP):
                         "enforced — locus_tags must all resolve to the same "
                         "organism (or pair with `organism` to disambiguate).",
         )],
-        organism: OrganismParam = None,
+        organism: OrganismSingleParam = None,
         metric_types: Annotated[list[str] | None, Field(
             description="Filter by metric_type tags (e.g. "
                         "'diel_amplitude_protein_log2'). Same metric_type may "
@@ -7267,8 +7272,9 @@ def register_tools(mcp: FastMCP):
                         "`dm.flag_true_count`).")
         dm_false_count: int = Field(
             description="Full-DM negative tally (precomputed "
-                        "`dm.flag_false_count` — always 0 in the current KG, "
-                        "positive-only DM storage).")
+                        "`dm.flag_false_count` — populated on the boolean "
+                        "DMs that store `not_flagged` edges, 0 on "
+                        "positive-only DMs).")
 
     class GenesByBooleanMetricResult(SparseRow):
         # Identity / routing (5)
@@ -9102,7 +9108,7 @@ def register_tools(mcp: FastMCP):
                         "`not_found.assay_ids` lists IDs absent from the KG.",
             min_length=1,
         )],
-        organism: OrganismParam = None,
+        organism: OrganismContainsParam = None,
         metabolite_ids: MetaboliteIdsParam = None,
         exclude_metabolite_ids: ExcludeMetaboliteIdsParam = None,
         experiment_ids: Annotated[list[str] | None, Field(
@@ -9406,7 +9412,7 @@ def register_tools(mcp: FastMCP):
                         "`not_found.assay_ids` lists IDs absent from the KG.",
             min_length=1,
         )],
-        organism: OrganismParam = None,
+        organism: OrganismContainsParam = None,
         metabolite_ids: MetaboliteIdsParam = None,
         exclude_metabolite_ids: ExcludeMetaboliteIdsParam = None,
         experiment_ids: Annotated[list[str] | None, Field(
@@ -9690,7 +9696,7 @@ def register_tools(mcp: FastMCP):
     async def assays_by_metabolite(
         ctx: Context,
         metabolite_ids: Annotated[MetaboliteIdsRequiredParam, Field(min_length=1)],
-        organism: OrganismParam = None,
+        organism: OrganismContainsParam = None,
         evidence_kind: Annotated[Literal["quantifies", "flags"] | None, Field(
             description="Filter by edge type. `'quantifies'` = numeric arm "
                         "only (rows carry value, detection_status, timepoint*). "

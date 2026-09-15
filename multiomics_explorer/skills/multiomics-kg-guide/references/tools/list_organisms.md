@@ -42,7 +42,7 @@ Result row: `organism_name, organism_type, genus, species, strain, clade, ncbi_t
 
 - gene_count and publication_count are counts of data in the KG, not biological totals.
 
-- Organisms with gene_count=0 are parent/umbrella taxonomy nodes (e.g. genus-level 'Alteromonas').
+- Organisms with gene_count=0 are the organism_type='treatment' taxa (non-genomic coculture partners / phage; some genus-level like 'Alteromonas', most strain-level).
 
 ## Chaining patterns
 

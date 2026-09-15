@@ -14,7 +14,7 @@ docs://tools/ontology_term_details; per-ontology semantics docs://ontologies/{ke
 | Name | Type | Default | Description |
 |---|---|---|---|
 | term_ids | list[string] | — | Self-prefixed term IDs, any ontology mix (e.g. 'go:0006979', 'tcdb:3.A.1', 'interpro:IPR000362', 'pfam:PF00005', 'kegg.pathway:ko00010'). Rows return in input order. Bare ids accepted (e.g. 'ko00910', 'GO:0006979') — see `resolved_aliases`. |
-| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Ambiguous match raises; see list_organisms. |
+| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
 | link_kinds | list[string ('composition', 'membership', 'router')] \| None | None | Keep links_out of these kinds: 'composition' = built from target (tcdb/merops -> pfam); 'membership' = belongs to (pfam/ncbifam -> interpro, kegg -> brite); 'router' = recall-biased (interpro -> ec/cazy, ncbifam TIGR* -> tigr.role). Default all. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | limit | int | 50 | Max rows returned (paging). |
@@ -40,7 +40,7 @@ Result row: `term_id, ontology, label, name, description, level, level_kind, is_
 
 ## Common mistakes
 
-- Term IDs are self-prefixed CURIEs and the ontology is inferred from the node label — pass `go:0006979`, `tcdb:3.A.1`, `merops.family:S14`, `pfam:PF00005` / `pfam.clan:CL0023`, `kegg.pathway:ko00910`, `kegg.orthology:K02338`, `interpro:IPR000362`, `ncbifam:TIGR00254` / `ncbifam:NF006762`, `tigr.role:energy_metabolism` (main role) / `tigr.role:112` (sub role), `ec:1.1.1.1`, `cazy:GT2`. There is no `ontology=` param; a bare accession without its prefix lands in `not_found`.
+- Term IDs are self-prefixed CURIEs and the ontology is inferred from the node label — pass `go:0006979`, `tcdb:3.A.1`, `merops.family:S14`, `pfam:PF00005` / `pfam.clan:CL0023`, `kegg.pathway:ko00910`, `kegg.orthology:K02338`, `interpro:IPR000362`, `ncbifam:TIGR00254` / `ncbifam:NF006762`, `tigr.role:energy_metabolism` (main role) / `tigr.role:112` (sub role), `ec:1.1.1.1`, `cazy:GT2`. There is no `ontology=` param; a bare accession is coerced when unambiguous (see `resolved_aliases`) — an unresolvable id lands in `not_found`.
 
 - `not_found` means no node with that ID exists in any registered ontology label. It is not a filter miss — `link_kinds` can empty `links_out` but never removes the row.
 

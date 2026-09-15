@@ -121,10 +121,17 @@ result = list_metabolites(organism_names=["Prochlorococcus MED4"], elements=["N"
 ```
 
 The dict shape mirrors the MCP envelope but is **unpaginated** by
-default — with `limit=None` (the package default) the `results` list
+default on most functions — with `limit=None` the `results` list
 contains every matching row and `total_matching == len(result["results"])`.
-`returned` and `truncated` are present in the dict; they only diverge from
-the full set when you pass an explicit `limit=`.
+A handful keep numeric defaults (`genes_by_metabolite` /
+`metabolites_by_gene` 10; `assays_by_metabolite` /
+`metabolites_by_quantifies_assay` / `metabolites_by_flags_assay` 5;
+`discussed_by_publication` / `ontology_term_details` 50;
+`gene_aa_sequence` / `gene_neighbors` 25) — pass `limit=None` explicitly
+there for bulk extraction, except `genes_by_metabolite` and
+`metabolites_by_gene`, which currently reject `limit=None` with a
+`TypeError` — pass a high number (e.g. `limit=10_000`) instead. `returned` and `truncated` are present in the
+dict; they only diverge from the full set when a `limit` is in effect.
 
 ### 2. `EnrichmentResult` (2 API functions — `pathway_enrichment`, `cluster_enrichment` — plus the building block `fisher_ora`)
 
@@ -209,10 +216,12 @@ The biggest behavioral difference between MCP and the package is
   and `offset`. `truncated=true` indicates more rows beyond the page.
 - **Package:** the same `limit` / `offset` parameters exist, but
   defaults are wide-open — most tools default to `limit=None`,
-  returning every matching row in a single call.
+  returning every matching row in a single call (the exceptions with
+  numeric defaults are listed under "Return shapes" above).
 
-For bulk extraction, leave `limit=None` (the default on the package)
-and let the function return the full set:
+For bulk extraction, use `limit=None` (the default on most package
+functions — pass it explicitly on the exceptions) and let the function
+return the full set:
 
 ```python
 from multiomics_explorer import differential_expression_by_gene
@@ -249,8 +258,9 @@ rarely need it.
 
 Every API function accepts `conn: GraphConnection | None = None` as a
 **keyword-only** argument (`conn=conn`; passing it positionally raises
-`TypeError`). When `conn=None` (the default), the function creates a
-fresh `GraphConnection` per call:
+`TypeError`). The one exception is `kg_release_info(conn)`, where `conn`
+is required and positional. When `conn=None` (the default), the function
+creates a fresh `GraphConnection` per call:
 
 ```python
 def _default_conn(conn: GraphConnection | None) -> GraphConnection:
@@ -366,6 +376,7 @@ with GraphConnection() as conn:
     drill = genes_by_metabolite(
         metabolite_ids=metabolite_ids,
         organism="Prochlorococcus MED4",
+        limit=10_000,  # package default is 10 here; limit=None raises
         conn=conn,
     )
     df_genes = to_dataframe(drill)

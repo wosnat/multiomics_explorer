@@ -284,3 +284,16 @@
     Behavioural claim: eggNOG-only GO / EC / Pfam / CAZy edges read evidence='family_inferred',
     never 'curated' (KG DOC-001). Fails ⇒ annotation_evidence.md's ladder description and
     the per-ontology evidence notes are wrong for this build.
+
+- id: gene_neighbors_fragmentation_exemplars
+  cypher: >
+    MATCH (g:Gene) WHERE g.organism_name IN
+      ['Alteromonas (MarRef v6)', 'Alteromonas macleodii HOT1A3']
+    WITH g.organism_name AS org, count(DISTINCT g.contig) AS contigs
+    WITH collect({org: org, contigs: contigs}) AS rows
+    RETURN [r IN rows WHERE r.org = 'Alteromonas (MarRef v6)'][0].contigs AS marref_contigs,
+           [r IN rows WHERE r.org = 'Alteromonas macleodii HOT1A3'][0].contigs AS hot1a3_contigs
+  expect: {marref_contigs: 573, hot1a3_contigs: 2}
+  used_in:
+    - multiomics_explorer/inputs/tools/gene_neighbors.yaml
+  note: "gene_neighbors fragmentation exemplars (docs-review 2026-09-15): MarRef v6 has 573 contigs; HOT1A3 is closed (chromosome + plasmid)"

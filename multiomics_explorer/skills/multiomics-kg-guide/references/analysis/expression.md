@@ -22,6 +22,10 @@ Use `differential_expression_by_gene` for row-level fold changes and
 timepoint dynamics. Use `differential_expression_by_ortholog` to compare a
 group's response across strains — per-gene detail still comes from
 `differential_expression_by_gene`, membership from `genes_by_homolog_group`.
+Both DE tools take `treatment_type=` / `background_factors=` /
+`growth_phases=` directly (case-insensitive; a gene whose edges all fail
+the filters lands in `filtered_out`, never `no_expression`), so a
+treatment-shaped question does not need a `list_experiments` hop.
 Use `gene_response_profile` to see which treatments a gene set responds to
 without per-timepoint log2FC; for the numbers behind a response, drop back to
 `differential_expression_by_gene`.
@@ -170,12 +174,17 @@ result = gene_set_compare(
     set_b_name="late_responders",
 )
 
-print(result["overlap"])              # PMM0965
-print(result["summary_per_group"])
-#                      early_responders  late_responders  overlap  shared
-# nitrogen                           3                2        1    True
-# light                              0                1        0   False
-print(result["shared_groups"])        # ["nitrogen"]
+print(result["overlap"])              # one row: PMM0965 (ureA)
+print(result["summary_per_group"])    # one row per treatment group, e.g.:
+#             early_responders  late_responders  overlap  shared
+# group
+# darkness                   3                3        1    True
+# iron                       1                0        0   False
+# nitrogen                   3                3        1    True
+# ...
+print(result["shared_groups"])
+# ['carbon', 'coculture', 'darkness', 'light', 'nitrogen']
+print(result["divergent_groups"])     # ['iron']
 ```
 
 **Common mistakes**

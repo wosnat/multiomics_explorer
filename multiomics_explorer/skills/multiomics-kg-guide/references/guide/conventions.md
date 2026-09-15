@@ -123,9 +123,9 @@ on what's being filtered:
   `metabolite_ids` — `docs://analysis/metabolites`.
 - **Controlled-vocabulary filters** (`treatment_type`, `background_factors`,
   `compartment`, `growth_phases`, `omics_type`, `cluster_type`, the trust
-  vocabularies) match exact values. An unknown value returns 0 rows, not
-  an error — read the live set with `list_filter_values(filter_type=...)`
-  before guessing a spelling.
+  vocabularies) match whole values, case-insensitively. An unknown value
+  returns 0 rows plus (on most tools) a `warnings` entry — read the live
+  set with `list_filter_values(filter_type=...)`.
 
 When in doubt, the tool's parameter description states the semantics
 explicitly.
@@ -527,8 +527,8 @@ the strain, but joins over `run_cypher` should go through
 
 `organism=` filters the **profiled organism only** on tools where it
 applies (`list_experiments`, `differential_expression_by_gene`). For
-coculture-partner-side filtering use `coculture_partner=` — the two
-fields are distinct.
+coculture-partner-side filtering use `coculture_partner=` on
+`list_experiments`.
 
 ---
 
