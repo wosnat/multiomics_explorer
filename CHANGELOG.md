@@ -24,6 +24,7 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 ### Added
 
 ### Changed
+- Absorbed the KG `0.1.0-alpha.7` release cut (built 2026-09-15T12:52:43Z, git `6bf6e513`, `deployment_role: staging`, `mcp_min_version: 0.1.0a5`): stamp-only — `controlled_vocabularies_hash` unchanged, gene_count 127,035 unchanged, 0 vocab moves, 0 golden regens, 0 example drifts; vocab-snapshot `kg_built_at` header re-stamped. The two `deployment_role == 'local-dev'` test pins became verbatim-passthrough assertions against live `Schema_info` (the deployed build now legitimately stamps `staging`). `-m kg`: 3,229 passing. KG-side residual: `release_highlights` / `breaking_changes` were not stamped on the cut (backlog 1.2).
 
 ### Fixed
 

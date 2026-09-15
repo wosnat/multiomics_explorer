@@ -3919,11 +3919,13 @@ class TestKGReleaseInfoMCPSmoke:
 
     @pytest.mark.asyncio
     async def test_deployment_role_surfaced_from_live_kg(self, tool_fns, conn):
-        """The live dev KG self-declares deployment_role='local-dev'; the tool
-        echoes it verbatim (KG is source of truth — no host/port inference).
+        """The KG self-declares deployment_role; the tool echoes it verbatim
+        (KG is source of truth — no host/port inference).
 
         deployment_role is str|None: None means the KG predates the property
-        (unknown). On the current dev KG it is the stamped 'local-dev'.
+        (unknown). Not pinned to a specific role: dev builds stamp
+        'local-dev', the alpha.7 release cut stamps 'staging' — the contract
+        is verbatim passthrough of the live Schema_info value.
         """
         ctx = _ctx_with_kg_report(conn)
         response = await tool_fns["kg_release_info"](ctx)
@@ -3931,10 +3933,12 @@ class TestKGReleaseInfoMCPSmoke:
         assert response.kg.deployment_role in (
             "local-dev", "staging", "production", None
         ), f"Unexpected deployment_role={response.kg.deployment_role!r}"
-        # The dev KG at bolt://localhost:7687 stamps 'local-dev'.
-        assert response.kg.deployment_role == "local-dev", (
-            "Dev KG should self-declare deployment_role='local-dev'; got "
-            f"{response.kg.deployment_role!r}"
+        live = conn.execute_query(
+            "MATCH (s:Schema_info) RETURN s.deployment_role AS role"
+        )[0]["role"]
+        assert response.kg.deployment_role == live, (
+            "kg_release_info must echo Schema_info.deployment_role verbatim; "
+            f"got {response.kg.deployment_role!r}, live {live!r}"
         )
 
 

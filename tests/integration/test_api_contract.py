@@ -1725,16 +1725,27 @@ class TestKGReleaseInfoLive:
         assert report["kg"]["version"]  # any non-empty string
 
     def test_kg_identity_carries_deployment_role(self, conn):
-        """The KG self-declares deployment_role; the dev KG stamps 'local-dev'.
+        """The KG self-declares deployment_role; the tool echoes it verbatim.
 
         Key is always present in kg{} (it's in _KG_IDENTITY_FIELDS); the value
         is None only on KGs built before the property existed (unknown).
+        Not pinned to a specific role: the value depends on which build is
+        deployed at bolt://localhost:7687 (dev builds stamp 'local-dev'; the
+        alpha.7 release cut stamps 'staging') — the contract is verbatim
+        passthrough of the live Schema_info value, never host/port inference.
         """
         from multiomics_explorer import kg_release_info
 
         report = kg_release_info(conn)
         assert "deployment_role" in report["kg"]
-        assert report["kg"]["deployment_role"] == "local-dev"
+        live = conn.execute_query(
+            "MATCH (s:Schema_info) RETURN s.deployment_role AS role"
+        )[0]["role"]
+        assert report["kg"]["deployment_role"] == live
+        if live is not None:
+            assert report["kg"]["deployment_role"] in (
+                "local-dev", "staging", "production"
+            )
 
 
 
