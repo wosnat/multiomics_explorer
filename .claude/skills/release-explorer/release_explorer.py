@@ -141,8 +141,14 @@ def phase_1_preflight(args, ctx: dict) -> None:
         # Phase 3 stages + commits exactly these files. Tolerate them being
         # dirty without forcing --allow-dirty; any *other* stray change still
         # aborts so accidental edits don't ride along into the release commit.
+        # NB: run() strips stdout, so the FIRST porcelain line loses its
+        # leading status space — parse by splitting off the status token,
+        # never by fixed offset (line[3:] mangled " M CHANGELOG.md" into
+        # "ANGELOG.md" when it was the first line).
         dirty_paths = {
-            line[3:].strip() for line in porcelain.splitlines() if line.strip()
+            line.split(None, 1)[1].strip()
+            for line in porcelain.splitlines()
+            if line.strip() and len(line.split(None, 1)) == 2
         }
         unexpected = dirty_paths - RESUME_OWNED_PATHS if args.resume else dirty_paths
         if unexpected:
