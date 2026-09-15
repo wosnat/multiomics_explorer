@@ -21,6 +21,13 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
+### Fixed
+
+## [0.1.0-alpha.5] - 2026-09-15
 **KG requirement:** this release targets KG `0.1.0-alpha.7` (the
 KG-side sync that adds the organism annotation rollups, the
 `ControlledVocabulary` hash, and the paper batch below). It adds a new MCP
@@ -29,6 +36,7 @@ version becomes `0.1.0-alpha.5` and the KG's `mcp_min_version` must be
 coordinated to `0.1.0a5` ahead of the KG release.
 
 ### Added
+- Docs review 2026-09-15 (release Phase 1b, six-surface reviewer pass): 33 findings (3 P1), 32 fixed — highlights: the shared `organism` param description now states the real matching contract per tool family (widening word-match vs single-organism raise vs substring CONTAINS on the assay drill-downs); stale "never flagged pathway maps" / "must be prefixed" / "always 0" claims corrected; `python_api.md` limit-default and `kg_release_info(conn)` exceptions documented (source-side alignment → backlog 2.15); DE-tool response-model field texts caught up with the 2b.6a filters.
 - `treatment_type` / `background_factors` filters on both DE tools (`differential_expression_by_gene`, `differential_expression_by_ortholog`) — same array-containment, case-insensitive semantics as `list_experiments`; genes whose edges all fail the filters land in `filtered_out` (by-gene), unknown values add envelope `warnings` on both tools (backlog 2b.6a). `differential_expression_by_ortholog` now also warns on unknown `growth_phases` values (previously `warnings` was always `[]`).
 - `docs://index` — directory of every `docs://` page with per-entry approximate token size and read-when guidance, registered first so it is the natural discovery entry point.
 - `docs://tools/{name}/full` — full tool pages (every example, verbose fields, complete chaining/mistakes lists), split out from the now-brief default `docs://tools/{name}` page.
