@@ -11,8 +11,7 @@ Sizes: **S** ≤ half a day, no spec · **M** a day, one-page spec (Mode B) · *
 
 | # | Item | Size | Notes |
 |---|---|---|---|
-| 1.1 | After 2b.6a: `/release-explorer 0.1.0-alpha.5` — cuts `[Unreleased]`, tags, builds, publishes; pushes `main` (~87 commits ahead of origin). | S | Preflight: pinned `EXPECTED_CONTROLLED_VOCABULARIES_HASH` (`sha256:d7191e2a…`, 2026-08-28 dev build) must equal the live KG's at the cut (R6 flag counts verified fixed 2026-08-29; hash unchanged). |
-| 1.2 | KG cut pairing: `Schema_info.version = 0.1.0-alpha.7`, `mcp_min_version = 0.1.0a5` (new tool ⇒ a4 clients rejected), `release_highlights` / `breaking_changes` stamped. | KG | Highlights + breaking list drafted in §4 A1 below. |
+| 1.2 | KG cut pairing (explorer `v0.1.0-alpha.5` shipped 2026-09-15): `Schema_info.version = 0.1.0-alpha.7`, `mcp_min_version = 0.1.0a5` (new tool ⇒ a4 clients rejected), `release_highlights` / `breaking_changes` stamped. | KG | Highlights + breaking list drafted in §4 A1 below. |
 | 1.3 | Eval pass on the annotation-trust surface in `multiomics_research` (protease vs dead-homolog, urea transporter ranking, InterPro superfamily ORA on a dark-survival cluster). | M | The contract gates are green; only agent-driven runs show whether routing / warnings / `docs://` pages lead to the right tool. Roadmap "stress test" step. |
 
 ## 2. Follow-ups from the sync-release program (slices 3–4 + polish), post-cut
