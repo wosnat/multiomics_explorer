@@ -58,6 +58,8 @@ total_matching, returned, offset, truncated, warnings, resolved_aliases, not_fou
 - **top_gene_categories** (list[MbgTopGeneCategory]): Top 10 gene categories by gene_count across both arms.
 - **top_metabolite_pathways** (list[MbgTopPathway]): NEW (vs GBM): top 10 KEGG pathways the gene set's chemistry reaches, sorted by gene_count desc then pathway_metabolite_count asc. Metabolite-pathway rollup (distinct from KO-pathway annotations on `genes_by_ontology(ontology="kegg")`) — see model docstring for naming disambiguation. Drill into any entry via `list_metabolites(pathway_ids=[id])`. summary=True returns the full ranked list.
 - **top_metabolite_pathways_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
+- **no_formula_excluded** (int | None): Rows passing every other filter but dropped by `metabolite_elements` because the metabolite has no formula (generic classes like 'amino acid' never match). Null when no element filter.
+- **no_formula_excluded_metabolites** (int | None): Distinct metabolites behind `no_formula_excluded` (no formula, so never match `metabolite_elements`). Null when no element filter.
 - **gene_count_total** (int): Distinct input genes in the filtered slice (across both arms).
 - **reaction_count_total** (int): Distinct reactions in the filtered metabolism arm.
 - **transporter_count_total** (int): Distinct TcdbFamily nodes in the filtered transport arm.
@@ -252,6 +254,8 @@ metabolites_by_gene → not_matched (locus_tags with no chemistry edges) → gen
 
 - Reaction-arm rows are NOT directional — KG reactions carry neither a substrate-vs-product role on `Reaction_has_metabolite` nor an `is_reversible` flag. Read `evidence_source='metabolism'` rows as 'gene catalyses a reaction *involving* this metabolite,' never as 'produces X' / 'consumes Y' / 'reversibly interconverts'. The KG limitation is permanent (KEGG lacks both upstream).
 
+- `metabolite_elements` never matches a metabolite with no formula (empty `elements`). These are mostly generic classes such as 'amino acid', 'dipeptide' or 'Polyamine', so an element filter can silently drop N-bearing transport substrates. When the filter is set, the envelope reports the loss: `no_formula_excluded` (rows) and `no_formula_excluded_metabolites` (distinct metabolites) that pass every other filter but have no formula, plus a `warnings` entry. Re-run without `metabolite_elements` to inspect them.
+
 - `by_element` envelope is presence-only — count of distinct metabolites containing each element at all. NOT stoichiometric (atom counts live in `metabolite.formula`); NOT mass-balanced (KG `Reaction_has_metabolite` is undirected and carries no substrate/product role).
 
 - There is no `top_genes` envelope field. The per-gene rollup IS `by_gene` (one entry per input locus_tag, populated identically in summary and detail modes — `rows` / `metabolite_count` / `reaction_count` / `transporter_count` / `metabolism_rows` / `transport_most_specific_rows` / `transport_inherited_rows` / `transport_substrate_resolution` / `tcdb_evidence_score_max`). The compound-anchored counterpart `top_metabolites` exists (sorted by gene_count); there's no symmetric `top_genes` because gene-anchored aggregation already lives in `by_gene`. Inspect the actual response shape before assuming a field — don't extrapolate from `genes_by_metabolite.top_genes` (different tool, different shape) or `top_*` patterns on other tools.
@@ -310,7 +314,7 @@ in the form you passed. Exclude-wins-on-overlap is computed on the canonical IDs
 from multiomics_explorer import metabolites_by_gene
 
 result = metabolites_by_gene(locus_tags=..., organism=...)
-# returns dict with keys: total_matching, returned, offset, truncated, warnings, resolved_aliases, not_found, not_matched, by_gene, by_evidence_source, by_substrate_depth, by_element, by_element_truncated, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, top_metabolite_pathways_truncated, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
+# returns dict with keys: total_matching, returned, offset, truncated, warnings, resolved_aliases, not_found, not_matched, by_gene, by_evidence_source, by_substrate_depth, by_element, by_element_truncated, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, top_metabolite_pathways_truncated, no_formula_excluded, no_formula_excluded_metabolites, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 
 Use package import for bulk data extraction in scripts.

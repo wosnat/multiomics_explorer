@@ -322,6 +322,8 @@ results:
   term_name: DNA replication
 returned: 30
 row_count: 30
+size_filtered_genes: 0
+size_filtered_terms: 0
 skipped_ontologies: []
 terms_per_gene_max: 1
 terms_per_gene_median: 1.0

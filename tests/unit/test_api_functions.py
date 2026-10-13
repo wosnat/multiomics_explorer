@@ -1701,6 +1701,7 @@ class TestGenesByOntology:
                 ("PMM0001", "Cell cycle", 1, [1]),
                 ("PMM0002", "Stress", 1, [1]),
             ),
+            [], [],  # size-filter diagnostic re-run (per_term, per_gene)
             # Query D (detail)
             self._detail_rows(n=2),
         ]
@@ -1735,7 +1736,7 @@ class TestGenesByOntology:
         # detail
         assert len(result["results"]) == 2
         assert result["returned"] == 2
-        assert mock_conn.execute_query.call_count == 4
+        assert mock_conn.execute_query.call_count == 6  # +2: size-filter re-runs
 
     def test_mode1_term_ids_only_runs_validate(self, mock_conn):
         mock_conn.execute_query.side_effect = [
@@ -1751,6 +1752,7 @@ class TestGenesByOntology:
             self._per_gene_rows(
                 ("PMM0001", "Replication", 1, [6]),
             ),
+            [], [],  # size-filter diagnostic re-run (per_term, per_gene)
             # Query D
             self._detail_rows(n=1),
         ]
@@ -1763,7 +1765,7 @@ class TestGenesByOntology:
         assert result["not_found"] == []
         assert result["wrong_ontology"] == []
         assert result["filtered_out"] == []
-        assert mock_conn.execute_query.call_count == 5
+        assert mock_conn.execute_query.call_count == 7  # +2: size-filter re-runs
 
     def test_validation_buckets(self, mock_conn):
         mock_conn.execute_query.side_effect = [
@@ -1782,6 +1784,7 @@ class TestGenesByOntology:
             ),
             # Query B
             self._per_gene_rows(("PMM0001", "Repl", 1, [3])),
+            [], [],  # size-filter diagnostic re-run (per_term, per_gene)
             # Query D
             self._detail_rows(n=1),
         ]
@@ -1810,6 +1813,7 @@ class TestGenesByOntology:
                  [{"item": "Repl", "count": 30}]),
             ),
             self._per_gene_rows(("PMM0001", "Repl", 1, [6])),
+            [], [],  # size-filter diagnostic re-run (per_term, per_gene)
             self._detail_rows(n=1),
         ]
         result = api.genes_by_ontology(
@@ -1830,6 +1834,7 @@ class TestGenesByOntology:
                  [{"item": "Cell cycle", "count": 7}]),
             ),
             self._per_gene_rows(("PMM0001", "Cell cycle", 1, [1])),
+            [], [],  # size-filter diagnostic re-run (per_term, per_gene)
             self._detail_rows(n=1),  # Query C — rollups only, never returned
         ]
         result = api.genes_by_ontology(
@@ -1843,7 +1848,7 @@ class TestGenesByOntology:
         assert result["returned"] == 0
         assert result["truncated"] is True  # total_matching > 0 but returned=0
         # org-resolve + A + B + C; the paged detail query never runs.
-        assert mock_conn.execute_query.call_count == 4
+        assert mock_conn.execute_query.call_count == 6  # +2: size-filter re-runs
 
     def test_missing_level_and_term_ids_raises(self, mock_conn):
         with pytest.raises(ValueError, match="level.*term_ids"):
@@ -1876,6 +1881,7 @@ class TestGenesByOntology:
             self._per_gene_rows(
                 ("PMM0001", "Unknown", 1, [1]),
             ),
+            [], [],  # size-filter diagnostic re-run (per_term, per_gene)
             self._detail_rows(n=0),
         ]
         result = api.genes_by_ontology(
@@ -8725,7 +8731,11 @@ class TestListMetabolites:
         """llm-review 2b.3 Task 5 resolution 2: a full element name
         ('Nitrogen') normalises to its symbol with NO warning."""
         from multiomics_explorer.api.functions import list_metabolites
-        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        conn = self._mock_conn(
+            self._SUMMARY_ROW,
+            [{"metabolites": 0}],  # no-formula count (after summary)
+            [self._DETAIL_ROW],
+        )
         out = list_metabolites(elements=["Nitrogen"], conn=conn)
         assert out["not_found"]["elements"] == []
         assert not any("element" in w.lower() for w in out["warnings"])
@@ -8735,7 +8745,11 @@ class TestListMetabolites:
 
     def test_elements_lowercase_symbol_normalized_silently(self):
         from multiomics_explorer.api.functions import list_metabolites
-        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        conn = self._mock_conn(
+            self._SUMMARY_ROW,
+            [{"metabolites": 0}],  # no-formula count (after summary)
+            [self._DETAIL_ROW],
+        )
         out = list_metabolites(elements=["n", "fe"], conn=conn)
         assert out["not_found"]["elements"] == []
         called_kwargs = conn.execute_query.call_args_list[0].kwargs
@@ -8755,7 +8769,11 @@ class TestListMetabolites:
 
     def test_elements_mixed_valid_and_invalid(self):
         from multiomics_explorer.api.functions import list_metabolites
-        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        conn = self._mock_conn(
+            self._SUMMARY_ROW,
+            [{"metabolites": 0}],  # no-formula count (after summary)
+            [self._DETAIL_ROW],
+        )
         out = list_metabolites(elements=["N", "Xx"], conn=conn)
         assert out["not_found"]["elements"] == ["Xx"]
         called_kwargs = conn.execute_query.call_args_list[0].kwargs
@@ -10664,6 +10682,7 @@ class TestMetabolitesByGene:
         mbg = self._api()
         conn = self._mock_conn(
             [self._SUMMARY_ROW_BOTH_ARMS],
+            [{"rows": 0, "metabolites": 0}],  # no-formula count
             [self._METAB_ROW],
             [self._TRANS_ROW_MS],
             # locus_tag existence probe
@@ -11428,6 +11447,7 @@ class TestGenesByOntologyF1Surface:
             self._org_resolve(),
             self._per_term_rows(),
             self._per_gene_rows(),
+            [], [],  # size-filter diagnostic re-run (per_term, per_gene)
             self._detail_rows(),
         ]
         api.genes_by_ontology(
@@ -11446,6 +11466,7 @@ class TestGenesByOntologyF1Surface:
             self._org_resolve(),
             self._per_term_rows(),
             self._per_gene_rows(),
+            [], [],  # size-filter diagnostic re-run (per_term, per_gene)
             self._detail_rows(),
         ]
         api.genes_by_ontology(
@@ -11466,6 +11487,7 @@ class TestGenesByOntologyF1Surface:
             self._org_resolve(),
             self._per_term_rows(),
             self._per_gene_rows(),
+            [], [],  # size-filter diagnostic re-run (per_term, per_gene)
             self._detail_rows(),
         ]
         result = api.genes_by_ontology(
@@ -19147,3 +19169,541 @@ class TestR2GeneResponseProfileTreatmentTypeRename:
                 treatment_type=["nitrogen"], treatment_types=["coculture"],
                 conn=MagicMock(),
             )
+
+
+# ---------------------------------------------------------------------------
+# Silent-drop warnings (spec docs/tool-specs/2026-10-13-silent-drop-warnings.md)
+#
+# These tests are deliberately ORDER-INDEPENDENT with respect to where the new
+# queries are placed: the relevant builders are patched in the api module
+# namespace to return sentinel Cypher strings and `execute_query` dispatches on
+# that sentinel. Assumed (and recommended) placement for the api-updater:
+#   - genes_by_ontology: the two unfiltered re-runs (per_term with
+#     min_gene_set_size=0 / max_gene_set_size=None, then per_gene with the
+#     same) immediately after Query B (per_gene), before envelope assembly.
+#   - metabolites_by_gene: the no-formula count right after the summary
+#     builder query (before detail arms / existence probes).
+#   - list_metabolites: the no-formula count right after the summary query
+#     (before the detail query / existence probes).
+# ---------------------------------------------------------------------------
+
+_GBO_SIZE_HINT = "min_gene_set_size=1, max_gene_set_size=None"
+
+
+class TestGenesByOntologySizeFiltered:
+    """2c.3: `size_filtered_terms` / `size_filtered_genes` + warning."""
+
+    _ORG = "Prochlorococcus MED4"
+
+    @staticmethod
+    def _pt(*ids):
+        return [
+            {"term_id": tid, "term_name": tid, "level": 2,
+             "best_effort": False, "n_genes": 3,
+             "cat_freqs": [{"item": "Transport", "count": 3}],
+             "is_informative": True}
+            for tid in ids
+        ]
+
+    @staticmethod
+    def _pg(*lts):
+        return [
+            {"locus_tag": lt, "gene_category": "Transport",
+             "n_terms": 1, "levels_hit": [2]}
+            for lt in lts
+        ]
+
+    def _run(self, *, pt_sized, pg_sized, pt_all=None, pg_all=None,
+             validate_rows=None, **kw):
+        """Run api.genes_by_ontology with patched builders.
+
+        Builders return sentinel cypher `PT|min|max` / `PG|min|max`; the
+        dispatcher answers the requested-size call with *_sized rows and the
+        (0, None) call with *_all rows. Returns (result, calls) where calls
+        maps "pt"/"pg" to the list of builder kwargs.
+        """
+        calls = {"pt": [], "pg": [], "detail": []}
+        req_min = kw.get("min_gene_set_size", 5)
+        req_max = kw.get("max_gene_set_size", 500)
+
+        def _pt_builder(**k):
+            calls["pt"].append(k)
+            return (f"PT|{k['min_gene_set_size']}|{k['max_gene_set_size']}",
+                    {})
+
+        def _pg_builder(**k):
+            calls["pg"].append(k)
+            return (f"PG|{k['min_gene_set_size']}|{k['max_gene_set_size']}",
+                    {})
+
+        def _detail_builder(**k):
+            calls["detail"].append(k)
+            return ("DETAIL", {})
+
+        def _dispatch(cypher, **params):
+            if cypher == "VALIDATE":
+                return validate_rows or []
+            if cypher == "ROLLUP":
+                return []
+            if cypher == "DETAIL":
+                return []
+            kind, mn, mx = cypher.split("|")
+            sized = (mn, mx) == (str(req_min), str(req_max))
+            if kind == "PT":
+                return pt_sized if sized else pt_all
+            if kind == "PG":
+                return pg_sized if sized else pg_all
+            raise AssertionError(f"unexpected query: {cypher}")
+
+        conn = MagicMock()
+        conn.execute_query.side_effect = _dispatch
+        ns = "multiomics_explorer.api.functions"
+        with patch(f"{ns}.build_genes_by_ontology_per_term",
+                   side_effect=_pt_builder), \
+             patch(f"{ns}.build_genes_by_ontology_per_gene",
+                   side_effect=_pg_builder), \
+             patch(f"{ns}.build_genes_by_ontology_detail",
+                   side_effect=_detail_builder), \
+             patch(f"{ns}.build_genes_by_ontology_trust_rollups",
+                   return_value=("ROLLUP", {})), \
+             patch(f"{ns}.build_genes_by_ontology_validate",
+                   return_value=("VALIDATE", {})), \
+             patch(f"{ns}._validate_organism_inputs",
+                   side_effect=lambda **k: k["organism"]):
+            kw.setdefault("ontology", "go_bp")
+            kw.setdefault("organism", self._ORG)
+            out = api.genes_by_ontology(conn=conn, **kw)
+        return out, calls
+
+    @staticmethod
+    def _size_warnings(out):
+        return [w for w in out.get("warnings", []) if _GBO_SIZE_HINT in w]
+
+    def test_default_sizes_compute_differences(self):
+        out, calls = self._run(
+            level=2, summary=True,
+            pt_sized=self._pt("t1", "t2"),
+            pg_sized=self._pg("g1", "g2", "g3"),
+            pt_all=self._pt("t1", "t2", "t3", "t4", "t5"),
+            pg_all=self._pg("g1", "g2", "g3", "g4", "g5", "g6", "g7"),
+        )
+        assert out["size_filtered_terms"] == 3
+        assert out["size_filtered_genes"] == 4
+        # Primary totals unchanged by the diagnostic re-run.
+        assert out["total_terms"] == 2
+        assert out["total_genes"] == 3
+
+    def test_unfiltered_rerun_uses_zero_none_and_identical_other_args(self):
+        out, calls = self._run(
+            level=2, summary=True,
+            pt_sized=self._pt("t1"), pg_sized=self._pg("g1"),
+            pt_all=self._pt("t1", "t2"), pg_all=self._pg("g1", "g2"),
+        )
+        assert len(calls["pt"]) == 2
+        assert len(calls["pg"]) == 2
+        for key in ("pt", "pg"):
+            sized, unfiltered = calls[key]
+            assert sized["min_gene_set_size"] == 5
+            assert sized["max_gene_set_size"] == 500
+            assert unfiltered["min_gene_set_size"] == 0
+            assert unfiltered["max_gene_set_size"] is None
+            strip = lambda d: {  # noqa: E731
+                k: v for k, v in d.items()
+                if k not in ("min_gene_set_size", "max_gene_set_size")}
+            assert strip(sized) == strip(unfiltered)
+
+    def test_warning_text_when_terms_dropped(self):
+        out, _ = self._run(
+            level=2, summary=True,
+            pt_sized=self._pt("t1", "t2"),
+            pg_sized=self._pg("g1", "g2", "g3"),
+            pt_all=self._pt("t1", "t2", "t3", "t4", "t5"),
+            pg_all=self._pg("g1", "g2", "g3", "g4", "g5", "g6", "g7"),
+        )
+        ws = self._size_warnings(out)
+        assert len(ws) == 1, out["warnings"]
+        w = ws[0]
+        assert "3 terms (4 genes not otherwise covered)" in w
+        assert "min_gene_set_size=5 / max_gene_set_size=500" in w
+        assert "were dropped" in w
+        assert "The defaults suit enrichment" in w
+
+    def test_warning_reports_max_none(self):
+        out, _ = self._run(
+            level=2, summary=True, min_gene_set_size=5,
+            max_gene_set_size=None,
+            pt_sized=self._pt("t1"), pg_sized=self._pg("g1"),
+            pt_all=self._pt("t1", "t2"), pg_all=self._pg("g1", "g2"),
+        )
+        ws = self._size_warnings(out)
+        assert len(ws) == 1, out["warnings"]
+        assert "min_gene_set_size=5 / max_gene_set_size=None" in ws[0]
+
+    def test_warning_fires_in_detail_mode_too(self):
+        """Non-summary path rewrites `warnings` after the detail query —
+        the size warning must survive."""
+        out, calls = self._run(
+            level=2,
+            pt_sized=self._pt("t1"), pg_sized=self._pg("g1"),
+            pt_all=self._pt("t1", "t2"), pg_all=self._pg("g1", "g2"),
+        )
+        assert len(calls["detail"]) == 1
+        assert out["size_filtered_terms"] == 1
+        assert out["size_filtered_genes"] == 1
+        assert len(self._size_warnings(out)) == 1, out["warnings"]
+
+    def test_active_filter_but_nothing_dropped(self):
+        out, calls = self._run(
+            level=2, summary=True,
+            pt_sized=self._pt("t1", "t2"), pg_sized=self._pg("g1", "g2"),
+            pt_all=self._pt("t1", "t2"), pg_all=self._pg("g1", "g2"),
+        )
+        assert len(calls["pt"]) == 2  # re-run still happened
+        assert out["size_filtered_terms"] == 0
+        assert out["size_filtered_genes"] == 0
+        assert self._size_warnings(out) == []
+
+    def test_terms_dropped_but_no_genes_lost(self):
+        """size_filtered_genes counts genes lost from total_genes, so a
+        dropped term whose genes are covered elsewhere contributes 0."""
+        out, _ = self._run(
+            level=2, summary=True,
+            pt_sized=self._pt("t1"), pg_sized=self._pg("g1", "g2"),
+            pt_all=self._pt("t1", "t2"), pg_all=self._pg("g1", "g2"),
+        )
+        assert out["size_filtered_terms"] == 1
+        assert out["size_filtered_genes"] == 0
+        ws = self._size_warnings(out)
+        assert len(ws) == 1
+        assert "1 terms (0 genes not otherwise covered)" in ws[0]
+
+    @pytest.mark.parametrize("mn", [0, 1])
+    def test_noop_size_filter_runs_no_extra_query(self, mn):
+        out, calls = self._run(
+            level=2, summary=True,
+            min_gene_set_size=mn, max_gene_set_size=None,
+            pt_sized=self._pt("t1", "t2"), pg_sized=self._pg("g1"),
+        )
+        assert len(calls["pt"]) == 1
+        assert len(calls["pg"]) == 1
+        assert out["size_filtered_terms"] == 0
+        assert out["size_filtered_genes"] == 0
+        assert self._size_warnings(out) == []
+
+    def test_min_one_with_max_set_is_active(self):
+        out, calls = self._run(
+            level=2, summary=True,
+            min_gene_set_size=1, max_gene_set_size=2,
+            pt_sized=self._pt("t1"), pg_sized=self._pg("g1"),
+            pt_all=self._pt("t1", "t2"), pg_all=self._pg("g1", "g2", "g3"),
+        )
+        assert len(calls["pt"]) == 2
+        assert out["size_filtered_terms"] == 1
+        assert out["size_filtered_genes"] == 2
+
+    def test_min_above_one_with_max_none_is_active(self):
+        _, calls = self._run(
+            level=2, summary=True,
+            min_gene_set_size=2, max_gene_set_size=None,
+            pt_sized=self._pt("t1"), pg_sized=self._pg("g1"),
+            pt_all=self._pt("t1"), pg_all=self._pg("g1"),
+        )
+        assert len(calls["pt"]) == 2
+        assert len(calls["pg"]) == 2
+
+    def test_term_ids_forwarded_to_rerun(self):
+        out, calls = self._run(
+            term_ids=["go:0000001", "go:0000002"], summary=True,
+            validate_rows=[
+                {"tid": "go:0000001", "status": "ok", "matched_label": "x"},
+                {"tid": "go:0000002", "status": "ok", "matched_label": "x"},
+            ],
+            pt_sized=self._pt("go:0000001"), pg_sized=self._pg("g1"),
+            pt_all=self._pt("go:0000001", "go:0000002"),
+            pg_all=self._pg("g1", "g2"),
+        )
+        assert calls["pt"][1]["term_ids"] == ["go:0000001", "go:0000002"]
+        assert out["size_filtered_terms"] == 1
+        assert out["filtered_out"] == ["go:0000002"]
+
+    def test_all_invalid_term_ids_short_circuit_no_query(self):
+        out, calls = self._run(
+            term_ids=["fake:X"], summary=True,
+            validate_rows=[
+                {"tid": "fake:X", "status": "not_found", "matched_label": None},
+            ],
+            pt_sized=[], pg_sized=[],
+        )
+        assert calls["pt"] == []
+        assert calls["pg"] == []
+        assert out["size_filtered_terms"] == 0
+        assert out["size_filtered_genes"] == 0
+        assert self._size_warnings(out) == []
+
+    def test_fields_always_present_and_int(self):
+        out, _ = self._run(
+            level=2, summary=True,
+            min_gene_set_size=1, max_gene_set_size=None,
+            pt_sized=[], pg_sized=[],
+        )
+        assert isinstance(out["size_filtered_terms"], int)
+        assert isinstance(out["size_filtered_genes"], int)
+
+
+_NO_FORMULA_PHRASE = (
+    "metabolites have no formula and can never match an element filter"
+)
+
+
+class TestMetabolitesByGeneNoFormula:
+    """2c.4 on metabolites_by_gene: `no_formula_excluded` (rows) +
+    `no_formula_excluded_metabolites`, present only when
+    `metabolite_elements` is set; warning when > 0."""
+
+    _LOCUS = ["PMM0913"]
+    _ORG = "Prochlorococcus MED4"
+    _SENTINEL = "NO_FORMULA_COUNT_MBG"
+
+    _SUMMARY_ROW = {
+        "total_matching": 2,
+        "gene_count_total": 1,
+        "reaction_count_total": 0,
+        "transporter_count_total": 1,
+        "metabolite_count_total": 2,
+        "rows_by_evidence_source": [
+            {"evidence_source": "transport", "count": 2}],
+        "rows_by_substrate_depth": [
+            {"substrate_depth": "inherited", "count": 2}],
+        "by_gene": [{
+            "locus_tag": "PMM0913", "gene_name": "salY", "product": "ABC",
+            "rows": 2, "metabolite_count": 2, "reaction_count": 0,
+            "transporter_count": 1, "metabolism_rows": 0,
+            "transport_most_specific_rows": 0, "transport_inherited_rows": 2,
+            "transport_substrate_resolution": "resolved",
+            "tcdb_evidence_score_max": 0.5,
+        }],
+        "top_metabolites": [], "top_reactions": [], "top_tcdb_families": [],
+        "top_gene_categories": [], "top_metabolite_pathways": [],
+        "by_element": [],
+    }
+
+    @pytest.fixture(autouse=True)
+    def _mock_validate_organism_inputs(self, monkeypatch):
+        monkeypatch.setattr(
+            api, "_validate_organism_inputs",
+            lambda organism, locus_tags, experiment_ids, conn: organism,
+        )
+
+    def _run(self, count_row, *ordered, **kw):
+        """`ordered` = responses for the pre-existing queries in their
+        existing order; the sentinel no-formula query is answered wherever
+        it lands. Returns (out, conn, builder_mock)."""
+        seq = list(ordered)
+        conn = MagicMock()
+
+        def _dispatch(cypher, **params):
+            if cypher == self._SENTINEL:
+                return [count_row]
+            if not seq:
+                raise AssertionError(f"unexpected extra query: {cypher[:80]}")
+            return seq.pop(0)
+
+        conn.execute_query.side_effect = _dispatch
+        with patch(
+            "multiomics_explorer.api.functions."
+            "build_metabolites_by_gene_no_formula_count",
+            create=True, return_value=(self._SENTINEL, {}),
+        ) as builder:
+            out = api.metabolites_by_gene(
+                self._LOCUS, self._ORG, conn=conn, **kw)
+        sentinel_calls = [
+            c for c in conn.execute_query.call_args_list
+            if c.args and c.args[0] == self._SENTINEL
+        ]
+        return out, sentinel_calls, builder
+
+    def test_count_query_runs_and_fields_set(self):
+        out, sentinel_calls, builder = self._run(
+            {"rows": 7, "metabolites": 5},
+            [self._SUMMARY_ROW],
+            [{"found": ["PMM0913"]}],     # locus probe
+            [{"found": ["N"]}],           # element probe
+            metabolite_elements=["N"], summary=True,
+        )
+        assert len(sentinel_calls) == 1
+        assert out["no_formula_excluded"] == 7
+        assert out["no_formula_excluded_metabolites"] == 5
+
+    def test_builder_gets_same_filters_as_summary(self):
+        _, _, builder = self._run(
+            {"rows": 0, "metabolites": 0},
+            [self._SUMMARY_ROW],
+            [{"found": ["PMM0913"]}],
+            [{"found": ["N"]}],
+            [{"found": ["kegg.pathway:ko00910"]}],
+            metabolite_elements=["N"],
+            metabolite_pathway_ids=["kegg.pathway:ko00910"],
+            substrate_depth=["inherited"],
+            evidence_sources=["transport"],
+            summary=True,
+        )
+        assert builder.call_count == 1
+        k = builder.call_args.kwargs
+        assert k["locus_tags"] == self._LOCUS
+        assert k["organism"] == self._ORG
+        assert k["metabolite_pathway_ids"] == ["kegg.pathway:ko00910"]
+        assert k["substrate_depth"] == ["inherited"]
+        assert tuple(k["arms"]) == ("transport",)
+
+    def test_warning_fires_when_positive(self):
+        out, _, _ = self._run(
+            {"rows": 7, "metabolites": 5},
+            [self._SUMMARY_ROW],
+            [{"found": ["PMM0913"]}],
+            [{"found": ["N"]}],
+            metabolite_elements=["N"], summary=True,
+        )
+        ws = [w for w in out["warnings"] if _NO_FORMULA_PHRASE in w]
+        assert len(ws) == 1, out["warnings"]
+        assert "Re-run without metabolite_elements to inspect them" in ws[0]
+        assert "'amino acid'" in ws[0]
+
+    def test_zero_count_field_present_no_warning(self):
+        out, sentinel_calls, _ = self._run(
+            {"rows": 0, "metabolites": 0},
+            [self._SUMMARY_ROW],
+            [{"found": ["PMM0913"]}],
+            [{"found": ["N"]}],
+            metabolite_elements=["N"], summary=True,
+        )
+        assert len(sentinel_calls) == 1
+        assert out["no_formula_excluded"] == 0
+        assert out["no_formula_excluded_metabolites"] == 0
+        assert not any(_NO_FORMULA_PHRASE in w for w in out["warnings"])
+
+    @pytest.mark.parametrize("elements", [None, []])
+    def test_no_element_filter_no_query_fields_absent(self, elements):
+        out, sentinel_calls, builder = self._run(
+            {"rows": 99, "metabolites": 99},
+            [self._SUMMARY_ROW],
+            [{"found": ["PMM0913"]}],
+            metabolite_elements=elements, summary=True,
+        )
+        assert sentinel_calls == []
+        assert builder.call_count == 0
+        assert "no_formula_excluded" not in out
+        assert "no_formula_excluded_metabolites" not in out
+        assert not any(_NO_FORMULA_PHRASE in w for w in out["warnings"])
+
+    def test_detail_mode_also_reports(self):
+        out, sentinel_calls, _ = self._run(
+            {"rows": 3, "metabolites": 3},
+            [self._SUMMARY_ROW],
+            [],                           # metabolism arm detail
+            [],                           # transport arm detail
+            [{"found": ["PMM0913"]}],
+            [{"found": ["N"]}],
+            metabolite_elements=["N"],
+        )
+        assert len(sentinel_calls) == 1
+        assert out["no_formula_excluded"] == 3
+
+
+class TestListMetabolitesNoFormula:
+    """2c.4 on list_metabolites: `no_formula_excluded` (metabolites),
+    present only when `elements` survives normalisation; warning when > 0."""
+
+    _SENTINEL = "NO_FORMULA_COUNT_LM"
+    _SUMMARY_ROW = TestListMetabolites._SUMMARY_ROW
+
+    def _run(self, count_row, *ordered, **kw):
+        seq = list(ordered)
+        conn = MagicMock()
+
+        def _dispatch(cypher, **params):
+            if cypher == self._SENTINEL:
+                return [count_row]
+            if not seq:
+                raise AssertionError(f"unexpected extra query: {cypher[:80]}")
+            return seq.pop(0)
+
+        conn.execute_query.side_effect = _dispatch
+        with patch(
+            "multiomics_explorer.api.functions."
+            "build_list_metabolites_no_formula_count",
+            create=True, return_value=(self._SENTINEL, {}),
+        ) as builder:
+            out = api.list_metabolites(conn=conn, **kw)
+        sentinel_calls = [
+            c for c in conn.execute_query.call_args_list
+            if c.args and c.args[0] == self._SENTINEL
+        ]
+        return out, sentinel_calls, builder
+
+    def test_count_query_runs_and_field_set(self):
+        out, sentinel_calls, _ = self._run(
+            {"metabolites": 374}, [self._SUMMARY_ROW],
+            elements=["N"], summary=True,
+        )
+        assert len(sentinel_calls) == 1
+        assert out["no_formula_excluded"] == 374
+
+    def test_builder_gets_normalised_filters(self):
+        _, _, builder = self._run(
+            {"metabolites": 1}, [self._SUMMARY_ROW],
+            elements=["Nitrogen"], min_mass=10.0,
+            evidence_sources=["transport"], summary=True,
+        )
+        assert builder.call_count == 1
+        k = builder.call_args.kwargs
+        assert k.get("mass_min") == 10.0
+        assert k.get("evidence_sources") == ["transport"]
+
+    def test_warning_fires_when_positive(self):
+        out, _, _ = self._run(
+            {"metabolites": 12}, [self._SUMMARY_ROW],
+            elements=["N"], summary=True,
+        )
+        ws = [w for w in out["warnings"] if _NO_FORMULA_PHRASE in w]
+        assert len(ws) == 1, out["warnings"]
+        assert ws[0].startswith("12 metabolites have no formula")
+        assert "Re-run without elements to inspect them" in ws[0]
+        assert "metabolite_elements" not in ws[0]
+
+    def test_zero_count_field_present_no_warning(self):
+        out, sentinel_calls, _ = self._run(
+            {"metabolites": 0}, [self._SUMMARY_ROW],
+            elements=["N"], summary=True,
+        )
+        assert len(sentinel_calls) == 1
+        assert out["no_formula_excluded"] == 0
+        assert not any(_NO_FORMULA_PHRASE in w for w in out["warnings"])
+
+    def test_no_element_filter_no_query_field_absent(self):
+        out, sentinel_calls, builder = self._run(
+            {"metabolites": 99}, [self._SUMMARY_ROW], summary=True,
+        )
+        assert sentinel_calls == []
+        assert builder.call_count == 0
+        assert "no_formula_excluded" not in out
+        assert not any(_NO_FORMULA_PHRASE in w for w in out["warnings"])
+
+    def test_all_elements_unrecognised_no_query_field_absent(self):
+        """`elements=['Xx']` normalises to no filter → not applicable."""
+        out, sentinel_calls, builder = self._run(
+            {"metabolites": 99}, [self._SUMMARY_ROW],
+            elements=["Xx"], summary=True,
+        )
+        assert sentinel_calls == []
+        assert builder.call_count == 0
+        assert "no_formula_excluded" not in out
+
+    def test_detail_mode_also_reports(self):
+        out, sentinel_calls, _ = self._run(
+            {"metabolites": 4}, [self._SUMMARY_ROW],
+            [TestListMetabolites._DETAIL_ROW],
+            elements=["N"],
+        )
+        assert len(sentinel_calls) == 1
+        assert out["no_formula_excluded"] == 4
+        assert out["returned"] == 1

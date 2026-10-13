@@ -55,6 +55,7 @@ total_entries, total_matching, top_organisms, top_metabolite_pathways, by_eviden
 - **not_found** (MetNotFound): Per-filter buckets for unknown input IDs.
 - **resolved_aliases** (object): Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).
 - **warnings** (list[string]): Diagnostic strings, e.g. a bare ID that resolved to more than one metabolite (expanded to all — pass the canonical id to narrow), a `metabolite_ids` / `exclude_metabolite_ids` entry matching no recognized id pattern at all (likely a NAME — resolve it with `search_text` instead), or an `elements` entry that isn't a recognized symbol or name (see `not_found.elements`).
+- **no_formula_excluded** (int | None): Metabolites passing every other filter but dropped by `elements` because they have no formula (generic classes like 'amino acid' never match an element filter). Null when no `elements` filter.
 
 ### Per-result fields
 
@@ -295,6 +296,8 @@ list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(m
 
 - organism_names with multiple values is UNION, not intersection. To find metabolites BOTH organisms reach, run two single-org calls and intersect by `metabolite_id` (per-row `organism_count` tells you how many organisms reach a metabolite, but not which — the envelope `top_organisms` rollup is the only per-organism breakdown).
 
+- `elements` never matches a metabolite with no formula (empty `elements`) — mostly generic classes such as 'amino acid', 'dipeptide' or 'Polyamine'. When the filter is set, the envelope's `no_formula_excluded` counts metabolites that pass every other filter but have no formula, and a `warnings` entry fires when it is > 0. Re-run without `elements` to inspect them.
+
 - `search_text` is a Lucene search over the metabolite name only — NOT the formula. For element/composition queries, use `elements` (presence list).
 
 ```mistake
@@ -369,7 +372,7 @@ in the form you passed. The dedicated exact-xref filters (`kegg_compound_ids`, `
 from multiomics_explorer import list_metabolites
 
 result = list_metabolites()
-# returns dict with keys: total_entries, total_matching, top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, score_max, score_median, returned, offset, truncated, not_found, resolved_aliases, warnings, results
+# returns dict with keys: total_entries, total_matching, top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, score_max, score_median, returned, offset, truncated, not_found, resolved_aliases, warnings, no_formula_excluded, results
 ```
 
 Use package import for bulk data extraction in scripts.

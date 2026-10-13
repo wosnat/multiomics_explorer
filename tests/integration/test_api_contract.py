@@ -1866,3 +1866,94 @@ class TestPagingStability:
         single = fn(limit=100000, conn=conn, **kwargs)["results"]
         paged = _collect_pages(fn, page, conn=conn, **kwargs)
         assert _row_keys(paged) == _row_keys(single)
+
+
+# ---------------------------------------------------------------------------
+# Silent-drop warnings (spec docs/tool-specs/2026-10-13-silent-drop-warnings.md)
+# Numbers verified live 2026-10-13: BRITE transporters level=2 MED4 → 3 terms /
+# 16 genes at default sizes vs 23 / 57 unfiltered; PMM0913 (salY, ABC) reaches
+# 159 no-formula metabolites (159 rows) via transport; 374 metabolites KG-wide
+# have empty `elements`.
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestGenesByOntologySizeFilteredContract:
+    _KW = dict(ontology="brite", organism="MED4", level=2, tree="transporters")
+
+    def test_default_sizes_report_dropped_terms(self, conn):
+        r = api.genes_by_ontology(**self._KW, summary=True, conn=conn)
+        assert r["size_filtered_terms"] == 20
+        assert r["size_filtered_genes"] == 41
+        assert r["warnings"], r
+        assert any(
+            "min_gene_set_size=1, max_gene_set_size=None" in w
+            for w in r["warnings"]
+        ), r["warnings"]
+
+    def test_noop_sizes_report_zero(self, conn):
+        r = api.genes_by_ontology(
+            **self._KW, min_gene_set_size=1, max_gene_set_size=None,
+            summary=True, conn=conn,
+        )
+        assert r["size_filtered_terms"] == 0
+        assert r["size_filtered_genes"] == 0
+        assert not any(
+            "min_gene_set_size=1, max_gene_set_size=None" in w
+            for w in r["warnings"]
+        )
+
+    def test_differences_match_unfiltered_totals(self, conn):
+        sized = api.genes_by_ontology(**self._KW, summary=True, conn=conn)
+        full = api.genes_by_ontology(
+            **self._KW, min_gene_set_size=1, max_gene_set_size=None,
+            summary=True, conn=conn,
+        )
+        assert (sized["total_terms"] + sized["size_filtered_terms"]
+                == full["total_terms"])
+        assert (sized["total_genes"] + sized["size_filtered_genes"]
+                == full["total_genes"])
+
+
+@pytest.mark.kg
+class TestListMetabolitesNoFormulaContract:
+    def test_elements_filter_reports_no_formula(self, conn):
+        r = api.list_metabolites(elements=["N"], summary=True, conn=conn)
+        assert isinstance(r["no_formula_excluded"], int)
+        assert r["no_formula_excluded"] > 0
+        assert any("have no formula" in w for w in r["warnings"]), r["warnings"]
+
+    def test_key_absent_without_elements(self, conn):
+        r = api.list_metabolites(summary=True, conn=conn)
+        assert "no_formula_excluded" not in r
+
+
+@pytest.mark.kg
+class TestMetabolitesByGeneNoFormulaContract:
+    _ORG = "Prochlorococcus MED4"
+
+    def test_transporter_gene_reports_no_formula(self, conn):
+        r = api.metabolites_by_gene(
+            locus_tags=["PMM0913", "PMM0331", "PMM1590"], organism=self._ORG,
+            metabolite_elements=["N"], summary=True, conn=conn,
+        )
+        assert isinstance(r["no_formula_excluded"], int)
+        assert isinstance(r["no_formula_excluded_metabolites"], int)
+        assert r["no_formula_excluded"] > 0
+        assert 0 < r["no_formula_excluded_metabolites"] <= r["no_formula_excluded"]
+        assert any("have no formula" in w for w in r["warnings"]), r["warnings"]
+
+    def test_zero_when_no_formula_free_reach(self, conn):
+        """PMM0331 / PMM1590 reach no formula-less metabolites (live)."""
+        r = api.metabolites_by_gene(
+            locus_tags=["PMM0331", "PMM1590"], organism=self._ORG,
+            metabolite_elements=["N"], summary=True, conn=conn,
+        )
+        assert r["no_formula_excluded"] == 0
+        assert not any("have no formula" in w for w in r["warnings"])
+
+    def test_key_absent_without_elements(self, conn):
+        r = api.metabolites_by_gene(
+            locus_tags=["PMM0913"], organism=self._ORG,
+            summary=True, conn=conn,
+        )
+        assert "no_formula_excluded" not in r
+        assert "no_formula_excluded_metabolites" not in r

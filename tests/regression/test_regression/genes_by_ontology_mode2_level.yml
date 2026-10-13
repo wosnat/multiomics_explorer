@@ -16277,6 +16277,8 @@ results:
     detoxification
 returned: 1761
 row_count: 1761
+size_filtered_genes: 53
+size_filtered_terms: 41
 skipped_ontologies: []
 terms_per_gene_max: 3
 terms_per_gene_median: 1.0
@@ -16312,6 +16314,9 @@ trust_axes:
   cyanorak_role:
   - sources
   - evidence
-warnings: []
+warnings:
+- 41 terms (53 genes not otherwise covered) fell outside min_gene_set_size=5 / max_gene_set_size=500
+  and were dropped. The defaults suit enrichment; to enumerate every gene pass min_gene_set_size=1,
+  max_gene_set_size=None.
 wrong_level: []
 wrong_ontology: []

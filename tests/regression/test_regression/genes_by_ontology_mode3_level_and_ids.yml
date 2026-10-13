@@ -169,6 +169,8 @@ results:
   term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
 returned: 15
 row_count: 15
+size_filtered_genes: 0
+size_filtered_terms: 0
 skipped_ontologies: []
 terms_per_gene_max: 1
 terms_per_gene_median: 1.0

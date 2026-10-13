@@ -100,8 +100,14 @@ SCHEMA_BASELINE_PATH = (
 # only when the corresponding breakdown list was actually capped at 10 on a
 # detail call (absent/None on `summary=True` and on any call whose list
 # doesn't exceed 10) — never demanded by the examples/expected-keys gate.
+#
+# no_formula_excluded / no_formula_excluded_metabolites: present only when an
+# element filter is set (`elements` on list_metabolites, `metabolite_elements`
+# on metabolites_by_gene).
 CONDITIONAL_ENVELOPE_KEYS = {
     "evidence_score_signals",
+    "no_formula_excluded",
+    "no_formula_excluded_metabolites",
     "by_publication_truncated",
     "by_metric_type_truncated",
     "by_organism_truncated",

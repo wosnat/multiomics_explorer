@@ -9792,6 +9792,8 @@ results:
   term_name: DMT
 returned: 1076
 row_count: 1076
+size_filtered_genes: 263
+size_filtered_terms: 228
 skipped_ontologies: []
 terms_per_gene_max: 4
 terms_per_gene_median: 1.0
@@ -9827,6 +9829,9 @@ trust_axes:
   - sources
   - evidence
   - evidence_score
-warnings: []
+warnings:
+- 228 terms (263 genes not otherwise covered) fell outside min_gene_set_size=5 / max_gene_set_size=500
+  and were dropped. The defaults suit enrichment; to enumerate every gene pass min_gene_set_size=1,
+  max_gene_set_size=None.
 wrong_level: []
 wrong_ontology: []

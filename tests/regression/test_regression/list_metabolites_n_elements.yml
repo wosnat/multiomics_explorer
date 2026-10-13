@@ -27,6 +27,7 @@ mass_stats:
   mass_max: 5227.103
   mass_median: 323.132
   mass_min: 18.039
+no_formula_excluded: 374
 not_found:
   elements: []
   metabolite_ids: []
@@ -335,7 +336,10 @@ top_organisms:
 total_entries: 3356
 total_matching: 1693
 truncated: true
-warnings: []
+warnings:
+- 374 metabolites have no formula and can never match an element filter (often generic
+  classes such as 'amino acid' or 'dipeptide'). Re-run without elements to inspect
+  them.
 xref_coverage:
   with_chebi: 1508
   with_hmdb: 893

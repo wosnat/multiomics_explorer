@@ -626,6 +626,7 @@ class ListMetabolitesResponse(BaseModel):
     not_found: MetNotFound = Field(default_factory=MetNotFound, description="Per-filter buckets for unknown input IDs.")
     resolved_aliases: dict[str, list[str]] = Field(default_factory=dict, description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
     warnings: list[str] = Field(default_factory=list, description="Diagnostic strings, e.g. a bare ID that resolved to more than one metabolite (expanded to all — pass the canonical id to narrow), a `metabolite_ids` / `exclude_metabolite_ids` entry matching no recognized id pattern at all (likely a NAME — resolve it with `search_text` instead), or an `elements` entry that isn't a recognized symbol or name (see `not_found.elements`).")
+    no_formula_excluded: int | None = Field(default=None, description="Metabolites passing every other filter but dropped by `elements` because they have no formula (generic classes like 'amino acid' never match an element filter). Null when no `elements` filter.")
     results: list[MetaboliteResult] = Field(default_factory=list)
 
 
@@ -1426,6 +1427,8 @@ class MetabolitesByGeneResponse(BaseModel):
         "any entry via `list_metabolites(pathway_ids=[id])`. summary=True "
         "returns the full ranked list.")
     top_metabolite_pathways_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
+    no_formula_excluded: int | None = Field(default=None, description="Rows passing every other filter but dropped by `metabolite_elements` because the metabolite has no formula (generic classes like 'amino acid' never match). Null when no element filter.")
+    no_formula_excluded_metabolites: int | None = Field(default=None, description="Distinct metabolites behind `no_formula_excluded` (no formula, so never match `metabolite_elements`). Null when no element filter.")
     gene_count_total: int = Field(
         description="Distinct input genes in the filtered slice (across "
         "both arms).")
@@ -3193,6 +3196,10 @@ def register_tools(mcp: FastMCP):
             description="Input term_ids in the ontology but at wrong level (only when level + term_ids both set)")
         filtered_out: list[str] = Field(default_factory=list,
             description="Input term_ids valid but outside [min, max]_gene_set_size")
+        size_filtered_terms: int = Field(default=0,
+            description="Terms passing every other filter but outside min/max_gene_set_size, dropped. >0 also adds a warning; pass min_gene_set_size=1, max_gene_set_size=None to enumerate all.")
+        size_filtered_genes: int = Field(default=0,
+            description="Genes found only in size-dropped terms (missing from total_genes).")
         resolved_aliases: dict[str, list[str]] = Field(default_factory=dict,
             description="Bare term_ids (e.g. 'ko00910', 'GO:0006979') coerced to canonical CURIEs, {input: [canonical]}. Empty when none were coerced.")
         returned: int = Field(description="Rows in this response")
@@ -3322,6 +3329,12 @@ def register_tools(mcp: FastMCP):
                 await ctx.warning(
                     f"genes_by_ontology: {len(data['wrong_level'])} "
                     f"term_ids at wrong level (see response.wrong_level)"
+                )
+            if data.get("size_filtered_terms"):
+                await ctx.warning(
+                    f"genes_by_ontology: {data['size_filtered_terms']} "
+                    f"terms outside min/max_gene_set_size were dropped "
+                    f"(see response.size_filtered_terms)"
                 )
             return GenesByOntologyResponse(**data)
         except ValueError as e:
@@ -8081,6 +8094,7 @@ def register_tools(mcp: FastMCP):
                 not_found=not_found,
                 resolved_aliases=result.get("resolved_aliases", {}),
                 warnings=result.get("warnings", []),
+                no_formula_excluded=result.get("no_formula_excluded"),
                 results=results,
             )
             await ctx.info(
@@ -8447,6 +8461,9 @@ def register_tools(mcp: FastMCP):
                 reaction_count_total=result["reaction_count_total"],
                 transporter_count_total=result["transporter_count_total"],
                 metabolite_count_total=result["metabolite_count_total"],
+                no_formula_excluded=result.get("no_formula_excluded"),
+                no_formula_excluded_metabolites=result.get(
+                    "no_formula_excluded_metabolites"),
                 results=results,
             )
             await ctx.info(

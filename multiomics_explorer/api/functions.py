@@ -124,6 +124,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_assays_by_metabolite_summary,
     build_list_metabolites,
     build_list_metabolites_summary,
+    build_list_metabolites_no_formula_count,
     build_resolve_metabolite_aliases,
     build_genes_by_metabolite_metabolism,
     build_genes_by_metabolite_transport,
@@ -131,6 +132,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_metabolites_by_gene_metabolism,
     build_metabolites_by_gene_transport,
     build_metabolites_by_gene_summary,
+    build_metabolites_by_gene_no_formula_count,
     build_gene_clusters_by_gene,
     build_gene_clusters_by_gene_summary,
     build_gene_derived_metrics,
@@ -3697,6 +3699,16 @@ def genes_by_ontology(
     ``evidence_score_stats``, ``filters_applied``, ``skipped_ontologies``
     and ``warnings``.
 
+    ``size_filtered_terms`` / ``size_filtered_genes`` (always present, int)
+    report what the ``min_gene_set_size`` / ``max_gene_set_size`` bounds
+    dropped: terms that pass every other filter but fall outside the size
+    window, and distinct genes lost from ``total_genes`` because they sit
+    only in those terms. Both are 0 when nothing is dropped or when the size
+    filters are no-ops (``min_gene_set_size <= 1`` and
+    ``max_gene_set_size=None``). A warning fires when terms were dropped;
+    pass ``min_gene_set_size=1, max_gene_set_size=None`` to enumerate every
+    gene.
+
     Raises ValueError when the ontology does not carry a filter you set.
     """
     from collections import Counter
@@ -3761,6 +3773,8 @@ def genes_by_ontology(
     # to envelope assembly with empty aggregates. _stats and Counter both handle
     # empty inputs gracefully; `if limit == 0:` below skips Query D.
     effective_term_ids = ok_term_ids if term_ids else None
+    size_filtered_terms = 0
+    size_filtered_genes = 0
     if term_ids and not effective_term_ids:
         per_term: list[dict] = []
         per_gene: list[dict] = []
@@ -3787,6 +3801,44 @@ def genes_by_ontology(
             **trust_filters,
         )
         per_gene = conn.execute_query(pg_cypher, **pg_params)
+
+        # --- Queries A'/B': size-filter diagnostic (only when active) ---
+        # Re-run A and B with the size filters disabled; the difference is
+        # what the size bounds silently dropped.
+        if min_gene_set_size > 1 or max_gene_set_size is not None:
+            upt_cypher, upt_params = build_genes_by_ontology_per_term(
+                ontology=ontology, organism=organism,
+                level=level, term_ids=effective_term_ids,
+                min_gene_set_size=0,
+                max_gene_set_size=None,
+                informative_only=informative_only,
+                **trust_filters,
+            )
+            unfiltered_per_term = conn.execute_query(upt_cypher, **upt_params)
+            upg_cypher, upg_params = build_genes_by_ontology_per_gene(
+                ontology=ontology, organism=organism,
+                level=level, term_ids=effective_term_ids,
+                min_gene_set_size=0,
+                max_gene_set_size=None,
+                informative_only=informative_only,
+                **trust_filters,
+            )
+            unfiltered_per_gene = conn.execute_query(upg_cypher, **upg_params)
+            size_filtered_terms = max(
+                len(unfiltered_per_term) - len(per_term), 0)
+            size_filtered_genes = max(
+                len(unfiltered_per_gene) - len(per_gene), 0)
+
+    size_warnings: list[str] = []
+    if size_filtered_terms > 0:
+        size_warnings.append(
+            f"{size_filtered_terms} terms ({size_filtered_genes} genes not "
+            f"otherwise covered) fell outside "
+            f"min_gene_set_size={min_gene_set_size} / "
+            f"max_gene_set_size={max_gene_set_size} and were dropped. "
+            "The defaults suit enrichment; to enumerate every gene pass "
+            "min_gene_set_size=1, max_gene_set_size=None."
+        )
 
     # --- Compose envelope ---
     total_matching = sum(r["n_genes"] for r in per_term)
@@ -3873,6 +3925,8 @@ def genes_by_ontology(
         "wrong_ontology": wrong_ontology,
         "wrong_level": wrong_level,
         "filtered_out": filtered_out,
+        "size_filtered_terms": size_filtered_terms,
+        "size_filtered_genes": size_filtered_genes,
         "resolved_aliases": resolved_aliases,
         "offset": offset,
         "trust_axes": {ontology: ontology_trust_axes(ontology)},
@@ -3902,13 +3956,13 @@ def genes_by_ontology(
         envelope.update(rollups)
         envelope["warnings"] = trust_warnings + _trust_aggregate_warnings(
             rollups, [ontology], trust_filters, total_matching,
-        )
+        ) + size_warnings
         aggregate_done = True
     else:
         envelope.update(_trust_rollups([]))
         envelope["warnings"] = trust_warnings + _trust_row_warnings(
             [], [ontology], trust_filters,
-        )
+        ) + size_warnings
     if min_evidence_score is not None:
         envelope["evidence_score_signals"] = _evidence_score_signals(
             conn, [ontology],
@@ -3940,7 +3994,7 @@ def genes_by_ontology(
         envelope.update(_trust_rollups(results))
         envelope["warnings"] = trust_warnings + _trust_row_warnings(
             results, [ontology], trust_filters,
-        )
+        ) + size_warnings
 
     # Strip sparse level_is_best_effort=False from rows (verbose only)
     if verbose:
@@ -7905,6 +7959,16 @@ def _normalize_elements(
     return (normalized or None), unmatched
 
 
+def _no_formula_warning(n: int, param: str) -> str:
+    """Warning for metabolites silently excluded by an element filter
+    because they carry no formula (empty `m.elements`)."""
+    return (
+        f"{n} metabolites have no formula and can never match an element "
+        "filter (often generic classes such as 'amino acid' or 'dipeptide'). "
+        f"Re-run without {param} to inspect them."
+    )
+
+
 def list_metabolites(
     search_text: str | None = None,
     metabolite_ids: list[str] | None = None,
@@ -7977,14 +8041,20 @@ def list_metabolites(
         Fe, Mg, Mn, Zn, Cu, Co, Mo, Ni, Se); normalized silently.
         Anything else is dropped from the filter, reported in
         `not_found.elements`, and adds a warning. AND-of-presence
-        semantics across the surviving (recognized) symbols.
+        semantics across the surviving (recognized) symbols. Metabolites
+        with no formula (empty `elements`, often generic classes such as
+        'amino acid') can never match; when the filter is active the
+        envelope carries `no_formula_excluded` (int: metabolites passing
+        every other filter but lacking a formula) and a warning fires when
+        it is > 0. The key is absent when no element filter applies.
 
     Envelope also carries `resolved_aliases` (dict, `{input: [canonical,
     ...]}`, only coerced inputs; `{}` when none) and `warnings` (list of
     str; ambiguous-xref expansions, a `metabolite_ids` /
     `exclude_metabolite_ids` entry matching no recognized id pattern at
-    all — e.g. a metabolite NAME like 'glutamate' — and an `elements`
-    entry that isn't a recognized symbol or name).
+    all — e.g. a metabolite NAME like 'glutamate' — an `elements`
+    entry that isn't a recognized symbol or name, and no-formula
+    metabolites excluded by the element filter).
 
     Raises:
         ValueError: if search_text is empty/whitespace, or evidence_sources
@@ -8094,6 +8164,20 @@ def list_metabolites(
         else:
             raise
 
+    # 4b. No-formula diagnostic (only when an element filter survives
+    # normalisation): metabolites with empty `m.elements` can never match
+    # the element filter, so count the ones that pass every other filter.
+    no_formula_excluded: int | None = None
+    if elements:
+        nf_cypher, nf_params = build_list_metabolites_no_formula_count(
+            search_text=effective_search, **filter_kwargs,
+        )
+        nf_rows = _run_fulltext(conn, nf_cypher, nf_params, effective_search)
+        no_formula_excluded = int(
+            (nf_rows[0].get("metabolites") if nf_rows else 0) or 0)
+        if no_formula_excluded > 0:
+            warnings.append(_no_formula_warning(no_formula_excluded, "elements"))
+
     # 5. Run detail builder when limit != 0
     if limit == 0:
         results = []
@@ -8147,7 +8231,7 @@ def list_metabolites(
 
     # 8. Assemble + return envelope
     total_matching = raw_summary.get("total_matching", 0)
-    return {
+    envelope = {
         "total_entries": raw_summary.get("total_entries", 0),
         "total_matching": total_matching,
         "top_organisms": raw_summary.get("top_organisms", []) or [],
@@ -8188,6 +8272,9 @@ def list_metabolites(
         "warnings": warnings,
         "results": results,
     }
+    if no_formula_excluded is not None:
+        envelope["no_formula_excluded"] = no_formula_excluded
+    return envelope
 
 
 # evidence_sources accepted by `genes_by_metabolite` — diverges intentionally
@@ -8967,6 +9054,15 @@ def metabolites_by_gene(
     Gene.locus_tag (locus_tags are never case-normalised) are appended to
     `warnings`.
 
+    No-formula exclusion: metabolites with no formula (empty `elements`,
+    often generic classes such as 'amino acid') can never match
+    `metabolite_elements`. When that filter is set the envelope carries
+    `no_formula_excluded` (int, rows passing every other filter but
+    dropped for lacking a formula) and `no_formula_excluded_metabolites`
+    (int, distinct metabolites behind those rows), and a warning fires
+    when the count is > 0. Both keys are absent when `metabolite_elements`
+    is unset or the organism does not resolve (empty envelope).
+
     Raises:
         ValueError: if `evidence_sources` contains values outside
             ``("metabolism", "transport")``. Mirrors `genes_by_metabolite`
@@ -9077,6 +9173,31 @@ def metabolites_by_gene(
     )
     summary_rows = conn.execute_query(sum_cypher, **sum_params)
     raw_summary = summary_rows[0] if summary_rows else {}
+
+    # 3b. No-formula diagnostic (only when metabolite_elements is set):
+    # metabolites with empty `m.elements` can never match the element
+    # filter; count the rows / distinct metabolites passing every other
+    # filter that it silently drops.
+    no_formula_rows: int | None = None
+    no_formula_metabolites: int | None = None
+    if metabolite_elements:
+        nf_cypher, nf_params = build_metabolites_by_gene_no_formula_count(
+            locus_tags=locus_tags,
+            organism=organism,
+            metabolite_elements=metabolite_elements,
+            metabolite_ids=metabolite_ids,
+            exclude_metabolite_ids=exclude_metabolite_ids,
+            ec_numbers=ec_numbers,
+            mass_balance=mass_balance,
+            metabolite_pathway_ids=metabolite_pathway_ids,
+            gene_categories=gene_categories,
+            substrate_depth=substrate_depth,
+            arms=active_arms,
+        )
+        nf_rows = conn.execute_query(nf_cypher, **nf_params)
+        nf_row = nf_rows[0] if nf_rows else {}
+        no_formula_rows = int(nf_row.get("rows", 0) or 0)
+        no_formula_metabolites = int(nf_row.get("metabolites", 0) or 0)
 
     total_matching = raw_summary.get("total_matching", 0) or 0
     gene_count_total = raw_summary.get("gene_count_total", 0) or 0
@@ -9332,6 +9453,9 @@ def metabolites_by_gene(
             "non-lumping attachment (not all) — resolved genes can still "
             "contribute `inherited` rows (read per-row `substrate_depth`)."
         )
+    if no_formula_metabolites:
+        warnings.append(
+            _no_formula_warning(no_formula_metabolites, "metabolite_elements"))
 
     # 14. Assemble + return envelope.
     not_found = {
@@ -9367,6 +9491,9 @@ def metabolites_by_gene(
         "metabolite_count_total": raw_summary.get("metabolite_count_total", 0) or 0,
         "results": results,
     }
+    if no_formula_rows is not None:
+        envelope["no_formula_excluded"] = no_formula_rows
+        envelope["no_formula_excluded_metabolites"] = no_formula_metabolites
     return _cap_breakdowns(
         envelope, ("top_metabolite_pathways", "by_element"), summary=summary,
     )

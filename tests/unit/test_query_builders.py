@@ -13324,3 +13324,225 @@ class TestPagedOrderByUniqueKey:
         import multiomics_explorer.kg.queries_lib as ql
         cypher, _ = getattr(ql, builder)(**kwargs)
         assert _order_by_clause(cypher).endswith(unique_tail), _order_by_clause(cypher)
+
+
+# ---------------------------------------------------------------------------
+# Silent-drop warnings (spec docs/tool-specs/2026-10-13-silent-drop-warnings.md,
+# backlog 2c.4): no-formula count builders for the element filters.
+# Imports inside each test so pre-impl collection still passes.
+# ---------------------------------------------------------------------------
+
+_EMPTY_ELEMENTS_COND = "size(coalesce(m.elements, [])) = 0"
+
+
+class TestBuildMetabolitesByGeneNoFormulaCount:
+    """`build_metabolites_by_gene_no_formula_count`: same signature as
+    `build_metabolites_by_gene_summary`; ignores `metabolite_elements`;
+    requires empty `m.elements` in BOTH arms; RETURN rows + metabolites."""
+
+    _LOCUS = ["PMM0913", "PMM0331"]
+    _ORG = "Prochlorococcus MED4"
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolites_by_gene_no_formula_count,
+        )
+        kwargs.setdefault("locus_tags", self._LOCUS)
+        kwargs.setdefault("organism", self._ORG)
+        return build_metabolites_by_gene_no_formula_count(**kwargs)
+
+    def test_both_arms_present_by_default(self):
+        cypher, _ = self._build(metabolite_elements=["N"])
+        assert (
+            "(g:Gene)-[:Gene_catalyzes_reaction]->"
+            "(r:Reaction)-[:Reaction_has_metabolite]->(m:Metabolite)"
+            in cypher
+        )
+        assert "(g:Gene)-[gt:Gene_has_tcdb_family]->(tf:TcdbFamily)" in cypher
+        assert "UNION" in cypher
+
+    def test_empty_elements_condition_in_both_arms(self):
+        cypher, _ = self._build(metabolite_elements=["N"])
+        assert _norm_ws(cypher).count(_EMPTY_ELEMENTS_COND) >= 2, cypher
+
+    def test_element_filter_condition_absent(self):
+        """The element condition is swapped out, not ANDed in."""
+        cypher, params = self._build(metabolite_elements=["N", "P"])
+        assert "$metabolite_elements" not in cypher
+        assert "metabolite_elements" not in params
+
+    def test_element_filter_absent_without_elements_too(self):
+        cypher, params = self._build()
+        assert "$metabolite_elements" not in cypher
+        assert _EMPTY_ELEMENTS_COND in _norm_ws(cypher)
+
+    def test_transport_arm_deepest_attachment_predicate(self):
+        cypher, _ = self._build(metabolite_elements=["N"])
+        _assert_deepest_predicate(cypher)
+
+    def test_returns_rows_and_metabolites(self):
+        cypher, _ = self._build(metabolite_elements=["N"])
+        assert re.search(r"\bAS rows\b", cypher), cypher
+        assert re.search(r"count\(DISTINCT m\)\s+AS metabolites\b", cypher), cypher
+
+    def test_locus_and_organism_forwarded(self):
+        cypher, params = self._build(metabolite_elements=["N"])
+        assert "g.locus_tag IN $locus_tags" in cypher
+        assert "split(toLower($organism), ' ')" in cypher
+        assert params["locus_tags"] == self._LOCUS
+        assert params["organism"] == self._ORG
+
+    def test_shared_filters_forwarded(self):
+        cypher, params = self._build(
+            metabolite_elements=["N"],
+            metabolite_ids=["kegg.compound:C00086"],
+            exclude_metabolite_ids=["kegg.compound:C00002"],
+            metabolite_pathway_ids=["kegg.pathway:ko00910"],
+            gene_categories=["Transport"],
+        )
+        assert "m.id IN $metabolite_ids" in cypher
+        assert "(NOT (m.id IN $exclude_metabolite_ids))" in cypher
+        assert "$metabolite_pathway_ids" in cypher
+        assert "g.gene_category IN $gene_categories" in cypher
+        assert params["metabolite_ids"] == ["kegg.compound:C00086"]
+        assert params["exclude_metabolite_ids"] == ["kegg.compound:C00002"]
+        assert params["metabolite_pathway_ids"] == ["kegg.pathway:ko00910"]
+        assert params["gene_categories"] == ["Transport"]
+
+    def test_metabolism_only_filters_stay_in_metabolism_arm(self):
+        cypher, params = self._build(
+            metabolite_elements=["N"],
+            ec_numbers=["3.5.1.5"], mass_balance="balanced",
+        )
+        assert params["ec_numbers"] == ["3.5.1.5"]
+        assert params["mass_balance"] == "balanced"
+        transport_arm = cypher.split("Gene_has_tcdb_family", 1)[1]
+        assert "$ec_numbers" not in transport_arm
+        assert "$mass_balance" not in transport_arm
+
+    def test_transport_only_filter_stays_in_transport_arm(self):
+        cypher, params = self._build(
+            metabolite_elements=["N"], substrate_depth=["most_specific"],
+        )
+        assert re.search(r"\.substrate_depth IN \$substrate_depth", cypher)
+        assert params["substrate_depth"] == ["most_specific"]
+        metab_arm = cypher.split("Gene_has_tcdb_family")[0]
+        assert "$substrate_depth" not in metab_arm
+
+    def test_arms_metabolism_only(self):
+        cypher, _ = self._build(
+            metabolite_elements=["N"], arms=("metabolism",))
+        assert "Gene_catalyzes_reaction" in cypher
+        assert "Gene_has_tcdb_family]->(tf:TcdbFamily)" not in cypher
+        assert "UNION" not in cypher
+        assert _EMPTY_ELEMENTS_COND in _norm_ws(cypher)
+
+    def test_arms_transport_only(self):
+        cypher, _ = self._build(
+            metabolite_elements=["N"], arms=("transport",))
+        assert "Gene_catalyzes_reaction" not in cypher
+        assert "Gene_has_tcdb_family" in cypher
+        assert "UNION" not in cypher
+        assert _EMPTY_ELEMENTS_COND in _norm_ws(cypher)
+
+    def test_no_detail_rollups(self):
+        """A count query: no by_gene / top_* aggregation payload."""
+        cypher, _ = self._build(metabolite_elements=["N"])
+        assert "by_gene" not in cypher
+        assert "top_metabolites" not in cypher
+        assert "LIMIT" not in cypher
+
+
+class TestBuildListMetabolitesNoFormulaCount:
+    """`build_list_metabolites_no_formula_count`: same filters as
+    `build_list_metabolites_summary`; reuses `_list_metabolites_where` with
+    `elements=None` + the empty-elements condition; RETURN metabolites."""
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_list_metabolites_no_formula_count,
+        )
+        return build_list_metabolites_no_formula_count(**kwargs)
+
+    def test_matches_metabolites(self):
+        cypher, _ = self._build(elements=["N"])
+        assert "(m:Metabolite)" in cypher
+
+    def test_empty_elements_condition_present(self):
+        cypher, _ = self._build(elements=["N"])
+        assert _EMPTY_ELEMENTS_COND in _norm_ws(cypher)
+
+    def test_element_condition_absent(self):
+        cypher, params = self._build(elements=["N", "P"])
+        assert "$elements" not in cypher
+        assert "elements" not in params
+
+    def test_no_other_filters_only_empty_elements_condition(self):
+        cypher, params = self._build(elements=["N"])
+        assert params == {}
+        assert _EMPTY_ELEMENTS_COND in _norm_ws(cypher)
+
+    def test_returns_metabolites(self):
+        cypher, _ = self._build(elements=["N"])
+        assert re.search(r"\bAS metabolites\b", cypher), cypher
+
+    def test_other_filters_forwarded(self):
+        cypher, params = self._build(
+            elements=["N"],
+            metabolite_ids=["kegg.compound:C00086"],
+            exclude_metabolite_ids=["kegg.compound:C00002"],
+            kegg_compound_ids=["C00086"],
+            chebi_ids=["16199"],
+            hmdb_ids=["HMDB0000294"],
+            mnxm_ids=["MNXM731"],
+            mass_min=10.0,
+            mass_max=500.0,
+            organism_names_lc=["prochlorococcus med4"],
+            pathway_ids=["kegg.pathway:ko00910"],
+            evidence_sources=["transport"],
+        )
+        for frag in (
+            "m.id IN $metabolite_ids",
+            "(NOT (m.id IN $exclude_metabolite_ids))",
+            "m.kegg_compound_id IN $kegg_compound_ids",
+            "m.chebi_id IN $chebi_ids",
+            "m.hmdb_id IN $hmdb_ids",
+            "m.mnxm_id IN $mnxm_ids",
+            "m.mass >= $mass_min",
+            "m.mass <= $mass_max",
+            "WHERE toLower(o) IN $organism_names_lc)",
+            "ANY(p IN coalesce(m.pathway_ids, []) WHERE p IN $pathway_ids)",
+            "WHERE s IN coalesce(m.evidence_sources, []))",
+        ):
+            assert frag in cypher, f"missing filter fragment: {frag}"
+        assert params["metabolite_ids"] == ["kegg.compound:C00086"]
+        assert params["exclude_metabolite_ids"] == ["kegg.compound:C00002"]
+        assert params["kegg_compound_ids"] == ["C00086"]
+        assert params["chebi_ids"] == ["16199"]
+        assert params["hmdb_ids"] == ["HMDB0000294"]
+        assert params["mnxm_ids"] == ["MNXM731"]
+        assert params["mass_min"] == 10.0
+        assert params["mass_max"] == 500.0
+        assert params["organism_names_lc"] == ["prochlorococcus med4"]
+        assert params["pathway_ids"] == ["kegg.pathway:ko00910"]
+        assert params["evidence_sources"] == ["transport"]
+        assert "$elements" not in cypher
+
+    def test_search_text_uses_fulltext_entry(self):
+        """search_text is a filter like any other: the count must honour it
+        (same fulltext entry point as the summary builder)."""
+        cypher, params = self._build(elements=["N"], search_text="amino")
+        assert "metaboliteFullText" in cypher
+        assert params["search"] == "amino"
+        assert _EMPTY_ELEMENTS_COND in _norm_ws(cypher)
+
+    def test_no_fulltext_without_search_text(self):
+        cypher, _ = self._build(elements=["N"])
+        assert "metaboliteFullText" not in cypher
+
+    def test_single_row_even_when_empty(self):
+        """A bare count(m) aggregation always yields one row; no
+        collect / LIMIT payload."""
+        cypher, _ = self._build(elements=["N"])
+        assert re.search(r"count\((DISTINCT )?m\)", cypher), cypher
+        assert "LIMIT" not in cypher

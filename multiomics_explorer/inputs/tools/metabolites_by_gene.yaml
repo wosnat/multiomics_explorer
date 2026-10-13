@@ -248,6 +248,15 @@ mistakes:
     'produces X' / 'consumes Y' / 'reversibly interconverts'. The KG
     limitation is permanent (KEGG lacks both upstream).
   - >-
+    `metabolite_elements` never matches a metabolite with no formula (empty
+    `elements`). These are mostly generic classes such as 'amino acid',
+    'dipeptide' or 'Polyamine', so an element filter can silently drop
+    N-bearing transport substrates. When the filter is set, the envelope
+    reports the loss: `no_formula_excluded` (rows) and
+    `no_formula_excluded_metabolites` (distinct metabolites) that pass every
+    other filter but have no formula, plus a `warnings` entry. Re-run without
+    `metabolite_elements` to inspect them.
+  - >-
     `by_element` envelope is presence-only — count of distinct metabolites
     containing each element at all. NOT stoichiometric (atom counts live in
     `metabolite.formula`); NOT mass-balanced (KG `Reaction_has_metabolite`

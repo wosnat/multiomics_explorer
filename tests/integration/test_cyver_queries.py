@@ -233,6 +233,14 @@ _GROUPS = ["OG_1"]
 _EIDS = ["EXP_1"]
 _TERM_IDS = ["GO:0008150"]
 
+# Lazy wrappers for builders added by the silent-drop-warnings spec
+# (docs/tool-specs/2026-10-13-silent-drop-warnings.md): resolved at call time
+# so module collection does not depend on the builder existing yet.
+def _build_lm_no_formula_count(**kwargs):
+    from multiomics_explorer.kg import queries_lib as _ql
+    return _ql.build_list_metabolites_no_formula_count(**kwargs)
+
+
 # (test_id, builder_callable, kwargs)
 # Ontology-dependent builders are expanded below via ONTOLOGY_CONFIG.
 _BUILDERS: list[tuple[str, ...]] = [
@@ -368,6 +376,14 @@ _BUILDERS: list[tuple[str, ...]] = [
     # --- ontology landscape non-ontology builders ---
     ("ontology_experiment_check", build_ontology_experiment_check, {"experiment_ids": _EIDS}),
     ("ontology_organism_gene_count", build_ontology_organism_gene_count, {"organism_name": "Prochlorococcus MED4"}),
+    # --- silent-drop warnings (2026-10-13): no-formula count builders ---
+    # (metabolites_by_gene_no_formula_count is omitted like the rest of the
+    # MBG family: CyVer's SyntaxValidator false-positives on the UNION arms
+    # re-binding `r` as Reaction node vs transport relationship.)
+    ("list_metabolites_no_formula_count", _build_lm_no_formula_count,
+     {"elements": ["N"]}),
+    ("list_metabolites_no_formula_count_search", _build_lm_no_formula_count,
+     {"elements": ["N"], "search_text": "amino"}),
 ]
 
 # Ontology-dependent builders: expand for each ontology key.

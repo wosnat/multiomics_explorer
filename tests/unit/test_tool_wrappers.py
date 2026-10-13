@@ -12216,3 +12216,167 @@ def test_description_follows_five_slot_template(tool_name):
     assert lines[3].startswith("Filters: "), f"{tool_name}: {lines[3][:40]!r}"
     assert lines[4].startswith("Returns: "), f"{tool_name}: {lines[4][:40]!r}"
     assert lines[5].startswith(f"docs://tools/{tool_name}"), f"{tool_name}: {lines[5][:60]!r}"
+
+
+# ---------------------------------------------------------------------------
+# Silent-drop warnings (spec docs/tool-specs/2026-10-13-silent-drop-warnings.md)
+# ---------------------------------------------------------------------------
+
+class TestGenesByOntologySizeFilteredWrapper:
+    """2c.3: GenesByOntologyResponse exposes size_filtered_terms /
+    size_filtered_genes (int, default 0)."""
+
+    _BASE = TestGenesByOntologyWrapper._SAMPLE_API_RETURN
+
+    async def _call(self, tool_fns, mock_ctx, api_return):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_ontology",
+            return_value=api_return,
+        ):
+            return await tool_fns["genes_by_ontology"](
+                mock_ctx, ontology="go_bp",
+                organism="Prochlorococcus MED4", level=1,
+            )
+
+    @pytest.mark.asyncio
+    async def test_fields_passed_through(self, tool_fns, mock_ctx):
+        api_return = {
+            **self._BASE,
+            "size_filtered_terms": 20,
+            "size_filtered_genes": 41,
+            "warnings": ["20 terms (41 genes not otherwise covered) fell "
+                         "outside ..."],
+        }
+        result = await self._call(tool_fns, mock_ctx, api_return)
+        assert result.size_filtered_terms == 20
+        assert result.size_filtered_genes == 41
+        dumped = result.model_dump()
+        assert dumped["size_filtered_terms"] == 20
+        assert dumped["size_filtered_genes"] == 41
+
+    @pytest.mark.asyncio
+    async def test_fields_default_zero(self, tool_fns, mock_ctx):
+        result = await self._call(tool_fns, mock_ctx, dict(self._BASE))
+        assert result.size_filtered_terms == 0
+        assert result.size_filtered_genes == 0
+
+    def test_model_declares_int_fields(self, tool_fns):
+        import typing
+        fn = tool_fns["genes_by_ontology"]
+        model = typing.get_type_hints(fn)["return"]
+        for name in ("size_filtered_terms", "size_filtered_genes"):
+            assert name in model.model_fields, name
+            f = model.model_fields[name]
+            assert f.annotation is int
+            assert f.default == 0
+            assert f.description
+
+
+class TestMetabolitesByGeneNoFormulaWrapper:
+    """2c.4: MetabolitesByGeneResponse exposes no_formula_excluded +
+    no_formula_excluded_metabolites (int | None, None when the element
+    filter is unset)."""
+
+    _BASE = _MBG_SAMPLE_API_RETURN
+
+    async def _call(self, tool_fns, mock_ctx, api_return, **kw):
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            return_value=api_return,
+        ):
+            return await tool_fns["metabolites_by_gene"](
+                mock_ctx, locus_tags=["PMM0913"],
+                organism="Prochlorococcus MED4", **kw,
+            )
+
+    @pytest.mark.asyncio
+    async def test_fields_passed_through(self, tool_fns, mock_ctx):
+        api_return = {
+            **self._BASE,
+            "no_formula_excluded": 159,
+            "no_formula_excluded_metabolites": 158,
+        }
+        result = await self._call(
+            tool_fns, mock_ctx, api_return, metabolite_elements=["N"])
+        assert result.no_formula_excluded == 159
+        assert result.no_formula_excluded_metabolites == 158
+
+    @pytest.mark.asyncio
+    async def test_fields_none_when_absent(self, tool_fns, mock_ctx):
+        api_return = {
+            k: v for k, v in self._BASE.items()
+            if k not in ("no_formula_excluded",
+                         "no_formula_excluded_metabolites")
+        }
+        result = await self._call(tool_fns, mock_ctx, api_return)
+        assert result.no_formula_excluded is None
+        assert result.no_formula_excluded_metabolites is None
+
+    @pytest.mark.asyncio
+    async def test_zero_is_kept_not_nulled(self, tool_fns, mock_ctx):
+        api_return = {
+            **self._BASE,
+            "no_formula_excluded": 0,
+            "no_formula_excluded_metabolites": 0,
+        }
+        result = await self._call(
+            tool_fns, mock_ctx, api_return, metabolite_elements=["N"])
+        assert result.no_formula_excluded == 0
+        assert result.no_formula_excluded_metabolites == 0
+
+    def test_model_declares_optional_int_fields(self):
+        from multiomics_explorer.mcp_server.tools import (
+            MetabolitesByGeneResponse,
+        )
+        for name in ("no_formula_excluded",
+                     "no_formula_excluded_metabolites"):
+            assert name in MetabolitesByGeneResponse.model_fields, name
+            f = MetabolitesByGeneResponse.model_fields[name]
+            assert f.default is None
+            assert f.description
+
+
+class TestListMetabolitesNoFormulaWrapper:
+    """2c.4: ListMetabolitesResponse exposes no_formula_excluded
+    (int | None, None when `elements` is unset)."""
+
+    _BASE = _LM_SAMPLE_API_RETURN
+
+    async def _call(self, tool_fns, mock_ctx, api_return, **kw):
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=api_return,
+        ):
+            return await tool_fns["list_metabolites"](mock_ctx, **kw)
+
+    @pytest.mark.asyncio
+    async def test_field_passed_through(self, tool_fns, mock_ctx):
+        api_return = {**self._BASE, "no_formula_excluded": 374}
+        result = await self._call(
+            tool_fns, mock_ctx, api_return, elements=["N"])
+        assert result.no_formula_excluded == 374
+
+    @pytest.mark.asyncio
+    async def test_field_none_when_absent(self, tool_fns, mock_ctx):
+        api_return = {
+            k: v for k, v in self._BASE.items()
+            if k != "no_formula_excluded"
+        }
+        result = await self._call(tool_fns, mock_ctx, api_return)
+        assert result.no_formula_excluded is None
+
+    @pytest.mark.asyncio
+    async def test_zero_is_kept_not_nulled(self, tool_fns, mock_ctx):
+        api_return = {**self._BASE, "no_formula_excluded": 0}
+        result = await self._call(
+            tool_fns, mock_ctx, api_return, elements=["N"])
+        assert result.no_formula_excluded == 0
+
+    def test_model_declares_optional_int_field(self):
+        from multiomics_explorer.mcp_server.tools import (
+            ListMetabolitesResponse,
+        )
+        assert "no_formula_excluded" in ListMetabolitesResponse.model_fields
+        f = ListMetabolitesResponse.model_fields["no_formula_excluded"]
+        assert f.default is None
+        assert f.description

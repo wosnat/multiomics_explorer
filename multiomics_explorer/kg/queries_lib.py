@@ -2437,6 +2437,66 @@ def build_list_metabolites_summary(
     return cypher, params
 
 
+def build_list_metabolites_no_formula_count(
+    *,
+    search_text: str | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    kegg_compound_ids: list[str] | None = None,
+    chebi_ids: list[str] | None = None,
+    hmdb_ids: list[str] | None = None,
+    mnxm_ids: list[str] | None = None,
+    elements: list[str] | None = None,
+    mass_min: float | None = None,
+    mass_max: float | None = None,
+    organism_names_lc: list[str] | None = None,
+    pathway_ids: list[str] | None = None,
+    evidence_sources: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Count metabolites the `elements` filter drops because they have no
+    formula (empty `m.elements`) but pass every other filter.
+
+    Same filters as `build_list_metabolites_summary` (search_text via the
+    `metaboliteFullText` entry point). `elements` is accepted for signature
+    parity but ignored: `_list_metabolites_where(elements=None)` plus
+    `size(coalesce(m.elements, [])) = 0`.
+
+    RETURN keys: metabolites. Always one row (bare count aggregation).
+    """
+    del elements  # swapped for the empty-elements condition
+    where_block, params = _list_metabolites_where(
+        search_text=search_text,
+        metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        kegg_compound_ids=kegg_compound_ids,
+        chebi_ids=chebi_ids,
+        hmdb_ids=hmdb_ids,
+        mnxm_ids=mnxm_ids,
+        elements=None,
+        mass_min=mass_min,
+        mass_max=mass_max,
+        organism_names_lc=organism_names_lc,
+        pathway_ids=pathway_ids,
+        evidence_sources=evidence_sources,
+    )
+    empty_cond = _EMPTY_METABOLITE_ELEMENTS_CONDITION
+    if where_block:
+        where_block = where_block.rstrip("\n") + f" AND {empty_cond}\n"
+    else:
+        where_block = f"WHERE {empty_cond}\n"
+
+    if search_text:
+        entry = (
+            "CALL db.index.fulltext.queryNodes('metaboliteFullText', $search)\n"
+            "YIELD node AS m\n"
+        )
+    else:
+        entry = "MATCH (m:Metabolite)\n"
+
+    cypher = f"{entry}{where_block}RETURN count(m) AS metabolites"
+    return cypher, params
+
+
 def build_list_gene_categories() -> tuple[str, dict]:
     cypher = (
         "MATCH (g:Gene) WHERE g.gene_category IS NOT NULL\n"
@@ -9942,6 +10002,98 @@ def build_metabolites_by_gene_summary(
         "       by_gene, top_reactions, top_tcdb_families,\n"
         "       top_gene_categories, top_metabolites, by_element,\n"
         "       top_metabolite_pathways"
+    )
+    return cypher, params
+
+
+_EMPTY_METABOLITE_ELEMENTS_CONDITION = "size(coalesce(m.elements, [])) = 0"
+
+
+def build_metabolites_by_gene_no_formula_count(
+    *,
+    locus_tags: list[str],
+    organism: str,
+    metabolite_elements: list[str] | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    ec_numbers: list[str] | None = None,
+    metabolite_pathway_ids: list[str] | None = None,
+    mass_balance: str | None = None,
+    gene_categories: list[str] | None = None,
+    substrate_depth: list[str] | None = None,
+    arms: tuple[str, ...] = ("metabolism", "transport"),
+) -> tuple[str, dict]:
+    """Count rows / metabolites the `metabolite_elements` filter drops
+    because the metabolite has no formula (empty `m.elements`).
+
+    Same signature and per-arm filter scoping as
+    `build_metabolites_by_gene_summary` (`ec_numbers` / `mass_balance`
+    metabolism-only; `substrate_depth` transport-only; transport arm always
+    deepest-attachment). `metabolite_elements` is accepted for signature
+    parity but ignored: the element condition is swapped for
+    `size(coalesce(m.elements, [])) = 0` in every emitted arm.
+
+    RETURN keys: rows (count(*) over the UNION — same row identity as the
+    summary's total_matching), metabolites (count DISTINCT m). Always one
+    row.
+    """
+    del metabolite_elements  # swapped for the empty-elements condition
+    params: dict = {
+        "locus_tags": locus_tags,
+        "organism": organism,
+    }
+
+    arm_blocks: list[str] = []
+
+    if "metabolism" in arms:
+        m_conditions, m_params = _metabolites_by_gene_metabolism_where(
+            locus_tags=locus_tags,
+            organism=organism,
+            metabolite_ids=metabolite_ids,
+            exclude_metabolite_ids=exclude_metabolite_ids,
+            ec_numbers=ec_numbers,
+            metabolite_pathway_ids=metabolite_pathway_ids,
+            mass_balance=mass_balance,
+            gene_categories=gene_categories,
+        )
+        m_conditions.append(_EMPTY_METABOLITE_ELEMENTS_CONDITION)
+        params.update(m_params)
+        arm_blocks.append(
+            "  MATCH (g:Gene)-[:Gene_catalyzes_reaction]->"
+            "(r:Reaction)-[:Reaction_has_metabolite]->(m:Metabolite)\n"
+            "  WHERE " + " AND ".join(m_conditions) + "\n"
+            "  RETURN g, r, null AS tf, m, 'metabolism' AS es,"
+            " null AS sdepth, null AS tscore"
+        )
+
+    if "transport" in arms:
+        t_conditions, t_params = _metabolites_by_gene_transport_where(
+            locus_tags=locus_tags,
+            organism=organism,
+            metabolite_ids=metabolite_ids,
+            exclude_metabolite_ids=exclude_metabolite_ids,
+            metabolite_pathway_ids=metabolite_pathway_ids,
+            gene_categories=gene_categories,
+            substrate_depth=substrate_depth,
+        )
+        t_conditions.append(_EMPTY_METABOLITE_ELEMENTS_CONDITION)
+        params.update(t_params)
+        arm_blocks.append(
+            "  MATCH (g:Gene)-[gt:Gene_has_tcdb_family]->"
+            "(tf:TcdbFamily)-[r:Tcdb_family_transports_metabolite]->(m:Metabolite)\n"
+            "  WHERE " + " AND ".join(t_conditions) + "\n"
+            "  RETURN g, null AS r, tf, m, 'transport' AS es,\n"
+            "         r.substrate_depth AS sdepth,"
+            " gt.evidence_score AS tscore"
+        )
+
+    union_body = "\n  UNION\n".join(arm_blocks)
+
+    cypher = (
+        "CALL {\n"
+        f"{union_body}\n"
+        "}\n"
+        "RETURN count(*) AS rows, count(DISTINCT m) AS metabolites"
     )
     return cypher, params
 
